@@ -69,6 +69,9 @@ enum { RED, GREEN, BLUE, WHITE };
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+typedef struct filter_sys_t filter_sys_t;
+
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 

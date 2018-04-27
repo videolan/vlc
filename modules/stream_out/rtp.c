@@ -291,7 +291,7 @@ static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t * );
 static int64_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session );
 
-struct sout_stream_sys_t
+typedef struct
 {
     /* SDP */
     char    *psz_sdp;
@@ -339,7 +339,7 @@ struct sout_stream_sys_t
     vlc_mutex_t      lock_es;
     int              i_es;
     sout_stream_id_sys_t **es;
-};
+} sout_stream_sys_t;
 
 typedef struct rtp_sink_t
 {
@@ -1802,7 +1802,7 @@ static sout_access_out_t *GrabberCreate( sout_stream_t *p_stream )
     p_grab->psz_access  = strdup( "grab" );
     p_grab->p_cfg       = NULL;
     p_grab->psz_path    = strdup( "" );
-    p_grab->p_sys       = (sout_access_out_sys_t *)p_stream;
+    p_grab->p_sys       = p_stream;
     p_grab->pf_seek     = NULL;
     p_grab->pf_write    = AccessOutGrabberWrite;
     return p_grab;

@@ -55,7 +55,7 @@ static int MosaicCallback   ( vlc_object_t *, char const *, vlc_value_t,
 /*****************************************************************************
  * filter_sys_t : filter descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     vlc_mutex_t lock;         /* Internal filter lock */
 
@@ -79,7 +79,7 @@ struct filter_sys_t
     int i_offsets_length;
 
     mtime_t i_delay;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Module descriptor

@@ -63,7 +63,7 @@ vlc_module_end ()
 #define VCD_BLOCKS_ONCE 20
 #define VCD_DATA_ONCE   (VCD_BLOCKS_ONCE * VCD_DATA_SIZE)
 
-struct access_sys_t
+typedef struct
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
     uint64_t    offset;
@@ -80,7 +80,7 @@ struct access_sys_t
 
     int         i_sector;                                  /* Current Sector */
     int         *p_sectors;                                 /* Track sectors */
-};
+} access_sys_t;
 
 static block_t *Block( stream_t *, bool * );
 static int      Seek( stream_t *, uint64_t );

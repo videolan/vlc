@@ -60,7 +60,7 @@ stream_t * ChunksSourceStream::makeStream()
         p_stream->pf_read = read_Callback;
         p_stream->pf_readdir = NULL;
         p_stream->pf_seek = seek_Callback;
-        p_stream->p_sys = reinterpret_cast<stream_sys_t*>(this);
+        p_stream->p_sys = this;
     }
     return p_stream;
 }

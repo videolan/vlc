@@ -228,7 +228,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 * Struct
 *****************************************************************************/
 
-struct demux_sys_t
+typedef struct demux_sys_t
 {
     CFTypeRef _Nullable             session;       // AVCaptureSession
     CFTypeRef _Nullable             device;        // AVCaptureDevice
@@ -237,7 +237,7 @@ struct demux_sys_t
     es_format_t                     fmt;
     int                             height, width;
     BOOL                            b_es_setup;
-};
+} demux_sys_t;
 
 /*****************************************************************************
 * Open:

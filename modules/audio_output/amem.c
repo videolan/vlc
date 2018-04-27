@@ -52,7 +52,7 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-struct aout_sys_t
+typedef struct
 {
     void *opaque;
     int (*setup) (void **, char *, unsigned *, unsigned *);
@@ -78,7 +78,7 @@ struct aout_sys_t
     float volume;
     bool mute;
     bool ready;
-};
+} aout_sys_t;
 
 static void Play (audio_output_t *aout, block_t *block)
 {

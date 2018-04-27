@@ -65,15 +65,16 @@ static int UrlInterruptCallback(void *access)
     return vlc_killed();
 }
 
-struct access_sys_t
+typedef struct
 {
     AVIOContext *context;
     int64_t size;
-};
+} access_sys_t;
 
-struct sout_access_out_sys_t {
+typedef struct
+{
     AVIOContext *context;
-};
+} sout_access_out_sys_t;
 
 
 /* */

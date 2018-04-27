@@ -56,7 +56,7 @@ static const char *const srt_key_length_names[] = {
     N_("16 bytes"), N_("24 bytes"), N_("32 bytes"),
 };
 
-struct stream_sys_t
+typedef struct
 {
     SRTSOCKET   sock;
     int         i_poll_id;
@@ -64,7 +64,7 @@ struct stream_sys_t
     bool        b_interrupted;
     char       *psz_host;
     int         i_port;
-};
+} stream_sys_t;
 
 static void srt_wait_interrupted(void *p_data)
 {

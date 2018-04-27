@@ -177,14 +177,14 @@ vlc_module_end ()
 static block_t *DoWork( filter_t *, block_t * );
 static void *Thread( void *);
 
-struct filter_sys_t
+typedef struct
 {
     block_fifo_t    *fifo;
     vout_thread_t   *p_vout;
     visual_effect_t **effect;
     int             i_effect;
     vlc_thread_t    thread;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Open: open the visualizer

@@ -38,11 +38,12 @@
 
 #include "avcodec.h"
 
-struct decoder_sys_t {
+typedef struct
+{
     AVCodecContext *p_context;
     const AVCodec  *p_codec;
     bool b_need_ephemer; /* Does the format need the ephemer flag (no end time set) */
-};
+} decoder_sys_t;
 
 static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
                                      AVCodecContext *avctx);

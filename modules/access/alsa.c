@@ -122,7 +122,7 @@ static void DumpDeviceStatus (vlc_object_t *obj, snd_pcm_t *pcm)
 #define DumpDeviceStatus(o, p) DumpDeviceStatus(VLC_OBJECT(o), p)
 
 
-struct demux_sys_t
+typedef struct
 {
     snd_pcm_t *pcm;
     es_out_id_t *es;
@@ -132,7 +132,7 @@ struct demux_sys_t
     mtime_t caching;
     snd_pcm_uframes_t period_size;
     unsigned rate;
-};
+} demux_sys_t;
 
 static void Poll (snd_pcm_t *pcm, int canc)
 {

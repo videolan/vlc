@@ -186,7 +186,7 @@ typedef struct
 
 } ogg_stream_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     int     i_streams;
 
@@ -219,7 +219,7 @@ struct sout_mux_sys_t
     ssize_t i_pos;
     ssize_t i_data_start;
     ssize_t i_segment_start;
-};
+} sout_mux_sys_t;
 
 static void OggSetDate( block_t *, mtime_t , mtime_t  );
 static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *, mtime_t );

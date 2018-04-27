@@ -112,7 +112,7 @@ static const char *const ppsz_filter_options[] = {
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     vlc_atomic_float f_contrast;
     vlc_atomic_float f_brightness;
@@ -124,7 +124,7 @@ struct filter_sys_t
                                int, int );
     int (*pf_process_sat_hue_clip)( picture_t *, picture_t *, int, int,
                                     int, int, int );
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates adjust video filter

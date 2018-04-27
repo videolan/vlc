@@ -103,13 +103,13 @@ struct atomic_operation_t
     double d_amplitude_factor;
 };
 
-struct filter_sys_t
+typedef struct
 {
     size_t i_overflow_buffer_size;/* in bytes */
     float * p_overflow_buffer;
     unsigned int i_nb_atomic_operations;
     struct atomic_operation_t * p_atomic_operations;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Init: initialize internal data structures
@@ -129,7 +129,7 @@ struct filter_sys_t
  *
  *          x-axis
  *  */
-static void ComputeChannelOperations( struct filter_sys_t * p_data
+static void ComputeChannelOperations( filter_sys_t * p_data
         , unsigned int i_rate, unsigned int i_next_atomic_operation
         , int i_source_channel_offset, double d_x, double d_z
         , double d_compensation_length, double d_channel_amplitude_factor )
@@ -186,7 +186,7 @@ static void ComputeChannelOperations( struct filter_sys_t * p_data
     }
 }
 
-static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data
+static int Init( vlc_object_t *p_this, filter_sys_t * p_data
         , unsigned int i_nb_channels, uint32_t i_physical_channels
         , unsigned int i_rate )
 {
@@ -451,7 +451,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_sys = p_filter->p_sys = malloc( sizeof(struct filter_sys_t) );
+    p_sys = p_filter->p_sys = malloc( sizeof(filter_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_sys->i_overflow_buffer_size = 0;

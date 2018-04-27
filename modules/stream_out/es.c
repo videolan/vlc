@@ -124,7 +124,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
 static void              Del ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send( sout_stream_t *, sout_stream_id_sys_t *, block_t* );
 
-struct sout_stream_sys_t
+typedef struct
 {
     int  i_count_audio;
     int  i_count_video;
@@ -141,7 +141,7 @@ struct sout_stream_sys_t
     char *psz_dst;
     char *psz_dst_audio;
     char *psz_dst_video;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

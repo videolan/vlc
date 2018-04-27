@@ -104,14 +104,14 @@ static int onNewFileAdded( vlc_object_t*, char const *,
 static enum type_e fileType( services_discovery_t *p_sd, const char* psz_file );
 static void formatSnapshotItem( input_item_t* );
 
-struct services_discovery_sys_t
+typedef struct
 {
     vlc_thread_t thread;
     enum type_e i_type;
 
     char* psz_dir[2];
     const char* psz_var;
-};
+} services_discovery_sys_t;
 
 /*****************************************************************************
  * Open: initialize module

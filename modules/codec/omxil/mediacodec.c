@@ -68,7 +68,7 @@ typedef void (*dec_on_flush_cb)(decoder_t *);
 typedef int (*dec_process_output_cb)(decoder_t *, mc_api_out *, picture_t **,
                                      block_t **);
 
-struct decoder_sys_t
+typedef struct
 {
     mc_api api;
 
@@ -131,7 +131,7 @@ struct decoder_sys_t
             int pi_extraction[AOUT_CHAN_MAX];
         } audio;
     };
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes

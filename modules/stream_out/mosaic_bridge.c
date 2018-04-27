@@ -46,7 +46,7 @@
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-struct sout_stream_sys_t
+typedef struct
 {
     bridged_es_t *p_es;
 
@@ -60,7 +60,7 @@ struct sout_stream_sys_t
     int i_chroma; /* force image format chroma */
 
     filter_chain_t *p_vf2;
-};
+} sout_stream_sys_t;
 
 struct decoder_owner_sys_t
 {

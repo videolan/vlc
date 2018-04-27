@@ -57,11 +57,11 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-struct decoder_sys_t
+typedef struct
 {
     const int16_t *table;
     date_t end_date;
-};
+} decoder_sys_t;
 
 static const uint16_t pi_channels_maps[] =
 {

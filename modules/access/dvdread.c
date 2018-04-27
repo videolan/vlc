@@ -92,7 +92,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct demux_sys_t
+typedef struct
 {
     /* DVDRead state */
     dvd_reader_t *p_dvdread;
@@ -145,7 +145,7 @@ struct demux_sys_t
 
     /* SPU */
     uint32_t clut[16];
-};
+} demux_sys_t;
 
 static int Control   ( demux_t *, int, va_list );
 static int Demux     ( demux_t * );

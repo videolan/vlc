@@ -92,7 +92,8 @@ enum rtsp_result {
 };
 
 #define UDP_ADDRESS_LEN 16
-struct access_sys_t {
+typedef struct
+{
     char *content_base;
     char *control;
     char session_id[64];
@@ -115,7 +116,7 @@ struct access_sys_t {
     uint16_t last_seq_nr;
 
     bool woken;
-};
+} access_sys_t;
 
 static void parse_session(char *request_line, char *session, unsigned max, int *timeout) {
     char *state;

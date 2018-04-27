@@ -261,11 +261,12 @@ static bool dsc_is_rotated(const transform_description_t *dsc)
 static const size_t n_transforms =
     sizeof (descriptions) / sizeof (descriptions[0]);
 
-struct filter_sys_t {
+typedef struct
+{
     const vlc_chroma_description_t *chroma;
     void (*plane[PICTURE_PLANE_MAX])(plane_t *, const plane_t *);
     convert_t convert;
-};
+} filter_sys_t;
 
 static picture_t *Filter(filter_t *filter, picture_t *src)
 {

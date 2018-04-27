@@ -170,7 +170,7 @@ typedef struct
 
 } extended_header_t;
 
-struct demux_sys_t
+typedef struct
 {
     header_t          hdr;
     extended_header_t exh;
@@ -192,7 +192,7 @@ struct demux_sys_t
     int64_t i_total_length;
     /* first frame position (used for calculating size without seektable) */
     int i_first_frame_offset;
-};
+} demux_sys_t;
 
 static int HeaderLoad( demux_t *, header_t *h );
 static int FrameHeaderLoad( demux_t *, frame_header_t *h );

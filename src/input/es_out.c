@@ -121,7 +121,7 @@ typedef struct
     char        **ppsz_language;
 } es_out_es_props_t;
 
-struct es_out_sys_t
+typedef struct
 {
     input_thread_t *p_input;
 
@@ -175,7 +175,7 @@ struct es_out_sys_t
 
     /* Used only to limit debugging output */
     int         i_prev_stream_level;
-};
+} es_out_sys_t;
 
 static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
 static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );

@@ -121,7 +121,7 @@ enum internal_chroma_t
  * This structure is part of the video output thread descriptor.
  * It describes the opencv_wrapper specific properties of an output thread.
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     image_handler_t *p_image;
 
@@ -141,7 +141,7 @@ struct filter_sys_t
     char* psz_inner_name;
 
     picture_t hacked_pic;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates opencv_wrapper video thread output method

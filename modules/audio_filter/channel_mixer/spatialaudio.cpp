@@ -380,7 +380,7 @@ static int OpenBinauralizer(vlc_object_t *p_this)
     aout_FormatPrepare(infmt);
     aout_FormatPrepare(outfmt);
 
-    p_filter->p_sys = reinterpret_cast<filter_sys_t*>(p_sys);
+    p_filter->p_sys = p_sys;
     p_filter->pf_audio_filter = Mix;
     p_filter->pf_flush = Flush;
     p_filter->pf_change_viewpoint = ChangeViewpoint;
@@ -513,7 +513,7 @@ static int Open(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    p_filter->p_sys = reinterpret_cast<filter_sys_t*>(p_sys);
+    p_filter->p_sys = p_sys;
     p_filter->pf_audio_filter = Mix;
     p_filter->pf_flush = Flush;
     p_filter->pf_change_viewpoint = ChangeViewpoint;

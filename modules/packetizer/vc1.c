@@ -59,7 +59,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -103,7 +103,7 @@ struct decoder_sys_t
     cc_data_t cc;
 
     cc_data_t cc_next;
-};
+} decoder_sys_t;
 
 typedef enum
 {

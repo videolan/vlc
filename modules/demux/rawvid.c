@@ -79,7 +79,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Definitions of structures used by this plugin
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     int    frame_size;
 
@@ -89,7 +89,7 @@ struct demux_sys_t
     date_t pcr;
 
     bool b_y4m;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Local prototypes

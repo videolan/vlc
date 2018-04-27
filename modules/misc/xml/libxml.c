@@ -102,11 +102,11 @@ static void ReaderErrorHandler( void *p_arg, const char *p_msg,
     msg_Err( p_reader, "XML parser error (line %d) : %s", line, p_msg );
 }
 
-struct xml_reader_sys_t
+typedef struct
 {
     xmlTextReaderPtr xml;
     char *node;
-};
+} xml_reader_sys_t;
 
 static int ReaderUseDTD ( xml_reader_t *p_reader )
 {

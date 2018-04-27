@@ -83,7 +83,7 @@ typedef struct
 
 } stream_track_t;
 
-struct stream_sys_t
+typedef struct
 {
     uint64_t     i_pos;      /* Current reading offset */
 
@@ -105,7 +105,7 @@ struct stream_sys_t
         uint64_t i_bytes;
         uint64_t i_read_time;
     } stat;
-};
+} stream_sys_t;
 
 static int AStreamRefillStream(stream_t *s)
 {

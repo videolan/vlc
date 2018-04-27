@@ -146,7 +146,7 @@ enum {
     STATE_SYNC,
 };
 
-struct demux_sys_t
+typedef struct
 {
     /* device reader */
     int              i_fd;
@@ -186,7 +186,7 @@ struct demux_sys_t
     es_out_id_t      *p_es_video;
     sdi_audio_t      p_audios[MAX_AUDIOS];
     es_out_id_t      *p_es_telx;
-};
+} demux_sys_t;
 
 static int Control( demux_t *, int, va_list );
 static int DemuxControl( demux_t *, int, va_list );

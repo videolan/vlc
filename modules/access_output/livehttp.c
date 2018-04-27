@@ -173,7 +173,7 @@ typedef struct output_segment
     uint8_t aes_ivs[16];
 } output_segment_t;
 
-struct sout_access_out_sys_t
+typedef struct
 {
     char *psz_cursegPath;
     char *psz_indexPath;
@@ -205,7 +205,7 @@ struct sout_access_out_sys_t
     uint8_t stuffing_bytes[16];
     ssize_t stuffing_size;
     vlc_array_t segments_t;
-};
+} sout_access_out_sys_t;
 
 static int LoadCryptFile( sout_access_out_t *p_access);
 static int CryptSetup( sout_access_out_t *p_access, char *keyfile );

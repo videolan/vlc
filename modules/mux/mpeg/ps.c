@@ -107,7 +107,7 @@ typedef struct ps_stream_s
 
 } ps_stream_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     /* Which id are unused */
     bool  stream_id_mpga[16]; /* 0xc0 -> 0xcf */
@@ -134,7 +134,7 @@ struct sout_mux_sys_t
 
     int i_psm_version;
     uint32_t crc32_table[256];
-};
+} sout_mux_sys_t;
 
 static const char *const ppsz_sout_options[] = {
     "dts-delay", "pes-max-size", NULL

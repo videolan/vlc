@@ -92,7 +92,7 @@ static int AVCPlay( stream_t *, int );
 static int AVCPause( stream_t *, int );
 static int AVCStop( stream_t *, int );
 
-struct access_sys_t
+typedef struct
 {
     raw1394handle_t p_avc1394;
     raw1394handle_t p_raw1394;
@@ -108,7 +108,7 @@ struct access_sys_t
     event_thread_t *p_ev;
     vlc_mutex_t lock;
     block_t *p_frame;
-};
+} access_sys_t;
 
 #define ISOCHRONOUS_QUEUE_LENGTH 1000
 #define ISOCHRONOUS_MAX_PACKET_SIZE 4096

@@ -104,13 +104,13 @@ static block_t *Remap( filter_t *, block_t * );
 typedef void (*remap_fun_t)( filter_t *, const void *, void *,
                              int, unsigned, unsigned);
 
-struct filter_sys_t
+typedef struct
 {
     remap_fun_t pf_remap;
     int nb_in_ch[AOUT_CHAN_MAX];
     int8_t map_ch[AOUT_CHAN_MAX];
     bool b_normalize;
-};
+} filter_sys_t;
 
 static const uint32_t valid_channels[] = {
 /* list taken from aout_FormatPrintChannels */

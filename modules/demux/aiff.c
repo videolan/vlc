@@ -57,7 +57,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *es;
@@ -74,7 +74,7 @@ struct demux_sys_t
     int         i_ssnd_fsize;
 
     int64_t     i_time;
-};
+} demux_sys_t;
 
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );

@@ -60,12 +60,12 @@ static const char *const ppsz_filter_options[] = {
 
 /* We'll store pointer for previous picture we have received
    and copy that if needed on framerate increase (not preferred)*/
-struct filter_sys_t
+typedef struct
 {
     date_t          next_output_pts; /**< output calculated PTS */
     picture_t       *p_previous_pic;
     int             i_output_frame_interval;
-};
+} filter_sys_t;
 
 static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
 {

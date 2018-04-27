@@ -28,14 +28,14 @@
 #include <vlc_access.h>
 #include <vlc_plugin.h>
 
-struct access_sys_t
+typedef struct
 {
     void *opaque;
     ssize_t (*read_cb)(void *, unsigned char *, size_t);
     int (*seek_cb)(void *, uint64_t);
     void (*close_cb)(void *);
     uint64_t size;
-};
+} access_sys_t;
 
 static ssize_t Read(stream_t *access, void *buf, size_t len)
 {

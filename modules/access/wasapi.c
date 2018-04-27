@@ -267,7 +267,7 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
     return es_out_Add(demux->out, &fmt);
 }
 
-struct demux_sys_t
+typedef struct
 {
     IAudioClient *client;
     es_out_id_t *es;
@@ -281,7 +281,7 @@ struct demux_sys_t
         HANDLE thread;
         HANDLE ready;
     };
-};
+} demux_sys_t;
 
 static unsigned __stdcall Thread(void *data)
 {

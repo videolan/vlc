@@ -40,10 +40,10 @@
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
-struct decoder_sys_t
+typedef struct
 {
     uint32_t palette[256];
-};
+} decoder_sys_t;
 
 vlc_module_begin()
     set_description(N_("HDMV TextST subtitles decoder"))

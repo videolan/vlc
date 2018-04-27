@@ -47,7 +47,7 @@
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     AVCodecContext *p_context;
     const AVCodec  *p_codec;
@@ -66,7 +66,7 @@ struct decoder_sys_t
     int     pi_extraction[AOUT_CHAN_MAX];
     int     i_previous_channels;
     uint64_t i_previous_layout;
-};
+} decoder_sys_t;
 
 #define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 

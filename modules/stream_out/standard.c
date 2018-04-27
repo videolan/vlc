@@ -124,11 +124,11 @@ static const char *const ppsz_sout_options[] = {
 
 #define DEFAULT_PORT 1234
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_mux_t           *p_mux;
     session_descriptor_t *p_session;
-};
+} sout_stream_sys_t;
 
 static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {

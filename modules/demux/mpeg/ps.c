@@ -82,7 +82,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct demux_sys_t
+typedef struct
 {
     ps_psm_t    psm;
     ps_track_t  tk[PS_TK_COUNT];
@@ -114,7 +114,7 @@ struct demux_sys_t
     int         current_title;
     int         current_seekpoint;
     unsigned    updates;
-};
+} demux_sys_t;
 
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );

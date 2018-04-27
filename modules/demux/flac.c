@@ -70,7 +70,7 @@ typedef struct
     uint64_t i_byte_offset;
 } flac_seekpoint_t;
 
-struct demux_sys_t
+typedef struct
 {
     bool  b_start;
     int   i_next_block_flags;
@@ -102,7 +102,7 @@ struct demux_sys_t
     input_attachment_t **attachments;
     int                i_cover_idx;
     int                i_cover_score;
-};
+} demux_sys_t;
 
 #define FLAC_PACKET_SIZE 16384
 #define FLAC_MAX_PREROLL      (CLOCK_FREQ * 4)

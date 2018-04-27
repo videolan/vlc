@@ -87,7 +87,7 @@ static const char *const filter_options[] = {
 /*****************************************************************************
  * filter_sys_t
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     const vlc_chroma_description_t *chroma;
     int w[3], h[3];
@@ -96,7 +96,7 @@ struct filter_sys_t
     bool   b_recalc_coefs;
     vlc_mutex_t coefs_mutex;
     float  luma_spat, luma_temp, chroma_spat, chroma_temp;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Open

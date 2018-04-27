@@ -72,7 +72,7 @@ vlc_module_begin ()
     set_callbacks (OpenGzip, Close)
 vlc_module_end ()
 
-struct stream_sys_t
+typedef struct
 {
     /* Thread data */
     int          write_fd;
@@ -90,7 +90,7 @@ struct stream_sys_t
     bool         can_pace;
     bool         can_pause;
     int64_t      pts_delay;
-};
+} stream_sys_t;
 
 extern char **environ;
 

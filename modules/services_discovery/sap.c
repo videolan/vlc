@@ -211,7 +211,7 @@ struct sap_announce_t
     input_item_t * p_item;
 };
 
-struct services_discovery_sys_t
+typedef struct
 {
     vlc_thread_t thread;
 
@@ -228,12 +228,12 @@ struct services_discovery_sys_t
     bool  b_parse;
 
     int i_timeout;
-};
+} services_discovery_sys_t;
 
-struct demux_sys_t
+typedef struct
 {
     sdp_t *p_sdp;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Local prototypes

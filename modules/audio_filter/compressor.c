@@ -80,7 +80,7 @@ typedef struct
 
 } lookahead;
 
-struct filter_sys_t
+typedef struct
 {
     float f_amp;
     float pf_as[A_TBL];
@@ -106,7 +106,7 @@ struct filter_sys_t
     float f_ratio;
     float f_knee;
     float f_makeup_gain;
-};
+} filter_sys_t;
 
 typedef union
 {

@@ -114,7 +114,7 @@ typedef struct
     int i_crc;  /* -1 if not set */
 } latm_mux_t;
 
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -142,7 +142,7 @@ struct decoder_sys_t
     latm_mux_t latm;
 
     int i_warnings;
-};
+} decoder_sys_t;
 
 enum
 {

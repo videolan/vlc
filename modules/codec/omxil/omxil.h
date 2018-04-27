@@ -82,7 +82,7 @@ typedef struct OmxPort
     OMX_BOOL b_flushed;
 } OmxPort;
 
-struct decoder_sys_t
+typedef struct
 {
     OMX_HANDLETYPE omx_handle;
 
@@ -109,4 +109,4 @@ struct decoder_sys_t
     uint8_t i_nal_size_length; /* Length of the NAL size field for H264 */
     int b_use_pts;
 
-};
+} decoder_sys_t;

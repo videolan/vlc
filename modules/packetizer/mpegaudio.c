@@ -45,7 +45,7 @@
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -67,7 +67,7 @@ struct decoder_sys_t
     unsigned int i_layer, i_bit_rate;
 
     bool   b_discontinuity;
-};
+} decoder_sys_t;
 
 #define MAD_BUFFER_GUARD 8
 #define MPGA_HEADER_SIZE 4

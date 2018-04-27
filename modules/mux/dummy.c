@@ -58,12 +58,12 @@ static int AddStream( sout_mux_t *, sout_input_t * );
 static void DelStream( sout_mux_t *, sout_input_t * );
 static int Mux      ( sout_mux_t * );
 
-struct sout_mux_sys_t
+typedef struct
 {
     /* Some streams have special initialization data, we'll output this
      * data as an header in the stream. */
     bool b_header;
-};
+} sout_mux_sys_t;
 
 /*****************************************************************************
  * Open:

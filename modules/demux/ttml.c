@@ -41,7 +41,7 @@
 
 //#define TTML_DEMUX_DEBUG
 
-struct demux_sys_t
+typedef struct
 {
     xml_t*          p_xml;
     xml_reader_t*   p_reader;
@@ -65,7 +65,7 @@ struct demux_sys_t
         size_t   i_count;
         size_t   i_current;
     } times;
-};
+} demux_sys_t;
 
 static char *tt_genTiming( tt_time_t t )
 {

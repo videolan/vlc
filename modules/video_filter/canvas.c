@@ -127,10 +127,10 @@ static const char *const ppsz_filter_options[] = {
     "width", "height", "aspect", "padd", NULL
 };
 
-struct filter_sys_t
+typedef struct
 {
     filter_chain_t *p_chain;
-};
+} filter_sys_t;
 
 static picture_t *video_new( filter_t *p_filter )
 {

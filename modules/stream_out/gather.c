@@ -64,11 +64,11 @@ struct sout_stream_id_sys_t
     void          *id;
 };
 
-struct sout_stream_sys_t
+typedef struct
 {
     int              i_id;
     sout_stream_id_sys_t **id;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

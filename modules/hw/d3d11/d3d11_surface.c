@@ -50,7 +50,8 @@
 #define CAN_PROCESSOR 0
 #endif
 
-struct filter_sys_t {
+typedef struct
+{
     copy_cache_t     cache;
     union {
         ID3D11Texture2D  *staging;
@@ -77,7 +78,7 @@ struct filter_sys_t {
     picture_t  *staging_pic;
 
     d3d11_handle_t  hd3d;
-};
+} filter_sys_t;
 
 #if CAN_PROCESSOR
 static int SetupProcessor(filter_t *p_filter, ID3D11Device *d3ddevice,

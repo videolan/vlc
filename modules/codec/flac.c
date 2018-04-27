@@ -56,7 +56,7 @@
 /*****************************************************************************
  * decoder_sys_t : FLAC decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input/Output properties
@@ -73,7 +73,7 @@ struct decoder_sys_t
 
     uint8_t rgi_channels_reorder[AOUT_CHAN_MAX];
     bool b_stream_info;
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[FLAC__MAX_CHANNELS + 1] =
 {
@@ -702,7 +702,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 /*****************************************************************************
  * encoder_sys_t : flac encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -726,7 +726,7 @@ struct encoder_sys_t
      * Common properties
      */
     mtime_t i_pts;
-};
+} encoder_sys_t;
 
 #define STREAMINFO_SIZE 34
 

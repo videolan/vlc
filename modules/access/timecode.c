@@ -51,12 +51,12 @@ vlc_module_begin ()
         change_safe ()
 vlc_module_end ()
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *es;
     date_t date;
     mtime_t next_time;
-};
+} demux_sys_t;
 
 static int DemuxOnce (demux_t *demux, bool master)
 {

@@ -61,7 +61,7 @@ struct avformat_track_s
 /*****************************************************************************
  * demux_sys_t: demux descriptor
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     AVInputFormat  *fmt;
     AVFormatContext *ic;
@@ -80,7 +80,7 @@ struct demux_sys_t
     input_title_t *p_title;
     int i_seekpoint;
     unsigned i_update;
-};
+} demux_sys_t;
 
 #define AVFORMAT_IOBUFFER_SIZE 32768  /* FIXME */
 

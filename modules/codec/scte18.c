@@ -46,10 +46,10 @@ vlc_module_begin ()
     set_callbacks(Open, Close)
 vlc_module_end ()
 
-struct decoder_sys_t
+typedef struct
 {
     atsc_a65_handle_t *p_handle;
-};
+} decoder_sys_t;
 
 //#define GPS_UTC_EPOCH_OFFSET 315964800
 //#define GPS_CUR_UTC_LEAP_OFFSET  16 /* 1 Jul 2015 */

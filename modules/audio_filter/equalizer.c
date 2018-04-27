@@ -101,7 +101,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     /* Filter static config */
     int i_band;
@@ -123,7 +123,7 @@ struct filter_sys_t
     float y2[32][128][2];
 
     vlc_mutex_t lock;
-};
+} filter_sys_t;
 
 static block_t *DoWork( filter_t *, block_t * );
 

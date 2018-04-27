@@ -67,7 +67,7 @@ static int CountTracks( uint64_t const, uint64_t const, void const * const );
  * Local structures
  *****************************************************************************/
 
-struct services_discovery_sys_t
+typedef struct
 {
     int i_tracks_num;
     input_item_t **pp_items;
@@ -77,7 +77,7 @@ struct services_discovery_sys_t
     uint8_t i_dev;
     uint16_t i_product_id;
     vlc_thread_t thread;
-};
+} services_discovery_sys_t;
 
 static vlc_mutex_t mtp_lock = VLC_STATIC_MUTEX;
 static bool b_mtp_initialized = false;

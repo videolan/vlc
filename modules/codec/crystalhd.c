@@ -103,7 +103,7 @@ static int crystal_insert_sps_pps(decoder_t *, uint8_t *, uint32_t);
 /*****************************************************************************
  * decoder_sys_t : CrysalHD decoder structure
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     HANDLE bcm_handle;       /* Device Handle */
 
@@ -130,7 +130,7 @@ struct decoder_sys_t
                             BC_DTS_PROC_OUT *pOut );
     BC_STATUS (WINAPI *OurDtsIsEndOfStream)( HANDLE hDevice, U8* bEOS );
 #endif
-};
+} decoder_sys_t;
 
 /*****************************************************************************
 * OpenDecoder: probe the decoder and return score

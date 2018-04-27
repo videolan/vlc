@@ -99,11 +99,12 @@ typedef struct {
     const char *str;
 } cct_number_t;
 
-struct decoder_sys_t {
+typedef struct
+{
     stl_sg_t groups[STL_GROUPS_MAX + 1];
     cct_number_value_t cct;
     uint8_t i_fps;
-};
+} decoder_sys_t;
 
 static cct_number_t cct_nums[] = { {CCT_ISO_6937_2, "ISO_6937-2"},
                                    {CCT_ISO_8859_5, "ISO_8859-5"},

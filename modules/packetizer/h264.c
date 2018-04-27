@@ -69,7 +69,7 @@ vlc_module_end ()
  * Local prototypes
  ****************************************************************************/
 
-struct decoder_sys_t
+typedef struct
 {
     /* */
     packetizer_t packetizer;
@@ -131,7 +131,7 @@ struct decoder_sys_t
 
     /* */
     cc_storage_t *p_ccs;
-};
+} decoder_sys_t;
 
 #define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 #define BLOCK_FLAG_PRIVATE_SEI (2 << BLOCK_FLAG_PRIVATE_SHIFT)

@@ -86,11 +86,11 @@ static const char *const ppsz_filter_options[] = {
 /*****************************************************************************
  * filter_sys_t
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     atomic_uint_fast32_t sincos;
     motion_sensors_t *p_motion;
-};
+} filter_sys_t;
 
 typedef union {
     uint32_t u;
@@ -100,7 +100,7 @@ typedef union {
     };
 } sincos_t;
 
-static void store_trigo( struct filter_sys_t *sys, float f_angle )
+static void store_trigo( filter_sys_t *sys, float f_angle )
 {
     sincos_t sincos;
 
@@ -111,7 +111,7 @@ static void store_trigo( struct filter_sys_t *sys, float f_angle )
     atomic_store(&sys->sincos, sincos.u);
 }
 
-static void fetch_trigo( struct filter_sys_t *sys, int *i_sin, int *i_cos )
+static void fetch_trigo( filter_sys_t *sys, int *i_sin, int *i_cos )
 {
     sincos_t sincos = { .u = atomic_load(&sys->sincos) };
 

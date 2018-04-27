@@ -87,13 +87,13 @@ vlc_module_begin ()
 vlc_module_end ()
 
 
-struct decoder_sys_t
+typedef struct
 {
     fluid_settings_t *settings;
     fluid_synth_t    *synth;
     int               soundfont;
     date_t            end_date;
-};
+} decoder_sys_t;
 
 
 static int  DecodeBlock (decoder_t *p_dec, block_t *p_block);

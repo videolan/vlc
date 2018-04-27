@@ -49,7 +49,7 @@ typedef UINT D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS;
 #define D3D11_VIDEO_PROCESSOR_PROCESSOR_CAPS_FRAME_RATE_CONVERSION          0x20
 #endif
 
-struct filter_sys_t
+typedef struct
 {
     d3d11_handle_t                 hd3d;
     d3d11_device_t                 d3d_dev;
@@ -67,7 +67,7 @@ struct filter_sys_t
 
     struct deinterlace_ctx         context;
     picture_t *                    (*buffer_new)( filter_t * );
-};
+} filter_sys_t;
 
 struct filter_mode_t
 {

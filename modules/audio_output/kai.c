@@ -58,14 +58,14 @@ typedef struct audio_buffer_t audio_buffer_t;
  * This structure is part of the audio output thread descriptor.
  * It describes the specific properties of an audio device.
  *****************************************************************************/
-struct aout_sys_t
+typedef struct
 {
     audio_buffer_t *buffer;
     HKAI            hkai;
     float           soft_gain;
     bool            soft_mute;
     audio_sample_format_t format;
-};
+} aout_sys_t;
 
 /*****************************************************************************
  * Local prototypes

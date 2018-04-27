@@ -152,10 +152,10 @@ static const char *const ppsz_sout_options[] = {
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int Control( sout_access_out_t *, int, va_list );
 
-struct sout_access_out_sys_t
+typedef struct
 {
     shout_t *p_shout;
-};
+} sout_access_out_sys_t;
 
 /*****************************************************************************
  * Open: open the shout connection

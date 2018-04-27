@@ -40,7 +40,7 @@
 
 #include <shine/layer3.h>
 
-struct encoder_sys_t
+typedef struct
 {
     shine_t s;
     unsigned int samples_per_frame;
@@ -48,7 +48,7 @@ struct encoder_sys_t
 
     unsigned int i_buffer;
     uint8_t *p_buffer;
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes

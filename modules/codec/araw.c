@@ -69,12 +69,12 @@ vlc_module_end ()
 static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
-struct decoder_sys_t
+typedef struct
 {
     void (*decode) (void *, const uint8_t *, unsigned);
     size_t framebits;
     date_t end_date;
-};
+} decoder_sys_t;
 
 static const uint16_t pi_channels_maps[] =
 {

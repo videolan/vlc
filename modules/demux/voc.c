@@ -53,7 +53,7 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t     fmt;
     es_out_id_t     *p_es;
@@ -66,7 +66,7 @@ struct demux_sys_t
     unsigned        i_silence_countdown;
 
     date_t          pts;
-};
+} demux_sys_t;
 
 static const char ct_header[] = "Creative Voice File\x1a";
 

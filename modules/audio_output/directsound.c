@@ -127,7 +127,7 @@ typedef struct aout_stream_sys
  * This structure is part of the audio output thread descriptor.
  * It describes the direct sound specific properties of an audio device.
  */
-struct aout_sys_t
+typedef struct
 {
     aout_stream_sys_t s;
     struct
@@ -136,7 +136,7 @@ struct aout_sys_t
         LONG          mb;
         bool          mute;
     } volume;
-};
+} aout_sys_t;
 
 static HRESULT Flush( aout_stream_sys_t *sys, bool drain);
 static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )

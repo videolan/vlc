@@ -40,7 +40,7 @@
 /*****************************************************************************
  * decoder_sys_t : wma decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     date_t end_date; /* To set the PTS */
     WMADecodeContext wmadec; /* name is self explanative */
@@ -50,7 +50,7 @@ struct decoder_sys_t
     /* to not give too much samples at once to the audio output */
     int8_t *p_samples; /* point into p_output */
     unsigned int i_samples; /* number of buffered samples available */
-};
+} decoder_sys_t;
 
 /* FIXME : check supported configurations */
 /* channel configuration */

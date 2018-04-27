@@ -38,11 +38,11 @@
 #include "file.h"
 #include "live.h"
 
-struct access_sys_t
+typedef struct
 {
     struct vlc_http_mgr *manager;
     struct vlc_http_resource *resource;
-};
+} access_sys_t;
 
 static block_t *FileRead(stream_t *access, bool *restrict eof)
 {

@@ -67,13 +67,13 @@ vlc_module_end ()
  * This structure is part of the video output thread descriptor.
  * It describes the Distort specific properties of an output thread.
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     image_handler_t *p_image;
     unsigned int x, y, scale;
     int xinc, yinc, scaleinc;
     uint8_t u,v;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates Distort video thread output method

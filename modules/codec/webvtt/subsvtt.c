@@ -151,14 +151,14 @@ struct webvtt_dom_node_t
     WEBVTT_NODE_BASE_MEMBERS
 };
 
-struct decoder_sys_t
+typedef struct
 {
     webvtt_dom_tag_t *p_root;
 #ifdef HAVE_CSS
     /* CSS */
     vlc_css_rule_t *p_css_rules;
 #endif
-};
+} decoder_sys_t;
 
 #define ATOM_iden VLC_FOURCC('i', 'd', 'e', 'n')
 #define ATOM_payl VLC_FOURCC('p', 'a', 'y', 'l')

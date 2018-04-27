@@ -52,12 +52,12 @@ vlc_module_begin ()
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
-struct services_discovery_sys_t
+typedef struct
 {
     void                 *root;
     pa_context           *context;
     pa_threaded_mainloop *mainloop;
-};
+} services_discovery_sys_t;
 
 static void SourceCallback(pa_context *, const pa_source_info *, int, void *);
 static void ContextCallback(pa_context *, pa_subscription_event_type_t,

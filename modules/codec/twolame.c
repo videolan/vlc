@@ -96,7 +96,7 @@ static const char *const ppsz_enc_options[] = {
 /*****************************************************************************
  * encoder_sys_t : twolame encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -110,7 +110,7 @@ struct encoder_sys_t
      */
     twolame_options *p_twolame;
     unsigned char p_out_buffer[MAX_CODED_FRAME_SIZE];
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score

@@ -47,7 +47,7 @@
 #include "dvb.h"
 #include "scan.h"
 
-struct access_sys_t
+typedef struct
 {
     demux_handle_t p_demux_handles[MAX_DEMUX];
     dvb_sys_t dvb;
@@ -55,7 +55,7 @@ struct access_sys_t
     /* Scan */
     struct scan_t *scan;
     bool done;
-};
+} access_sys_t;
 
 /*****************************************************************************
  * Module descriptor

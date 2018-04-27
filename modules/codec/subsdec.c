@@ -200,13 +200,13 @@ vlc_module_end ()
  *****************************************************************************/
 #define NO_BREAKING_SPACE  "&#160;"
 
-struct decoder_sys_t
+typedef struct
 {
     int                 i_align;          /* Subtitles alignment on the vout */
 
     vlc_iconv_t         iconv_handle;            /* handle to iconv instance */
     bool                b_autodetect_utf8;
-};
+} decoder_sys_t;
 
 
 static int             DecodeBlock   ( decoder_t *, block_t * );

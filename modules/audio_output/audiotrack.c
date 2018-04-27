@@ -79,7 +79,8 @@ static const struct {
     {  NULL, NULL, AT_DEV_DEFAULT },
 };
 
-struct aout_sys_t {
+typedef struct
+{
     /* sw gain */
     float soft_gain;
     bool soft_mute;
@@ -166,7 +167,7 @@ struct aout_sys_t {
             } bytebuffer;
         } u;
     } circular;
-};
+} aout_sys_t;
 
 /* Soft volume helper */
 #include "audio_output/volume.h"

@@ -65,11 +65,11 @@
  *  We release blocks once the total size is bigger than STREAM_CACHE_SIZE
  */
 
-struct stream_sys_t
+typedef struct
 {
     block_bytestream_t cache; /* bytestream chain for storing cache */
 
-};
+} stream_sys_t;
 
 static int AStreamRefillBlock(stream_t *s)
 {

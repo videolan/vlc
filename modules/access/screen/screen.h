@@ -39,7 +39,7 @@
 
 typedef struct screen_data_t screen_data_t;
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t fmt;
     es_out_id_t *es;
@@ -73,7 +73,7 @@ struct demux_sys_t
 #endif
 
     screen_data_t *p_data;
-};
+} demux_sys_t;
 
 int      screen_InitCapture ( demux_t * );
 int      screen_CloseCapture( demux_t * );

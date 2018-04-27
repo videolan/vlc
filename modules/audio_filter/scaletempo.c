@@ -95,7 +95,7 @@ vlc_module_end ()
  * frame: a single set of samples, one for each channel
  * VLC uses these terms differently
  */
-struct filter_sys_t
+typedef struct
 {
     /* Filter static config */
     double    scale;
@@ -135,7 +135,7 @@ struct filter_sys_t
     filter_t * resampler;
     vlc_atomic_float rate_shift;
 #endif
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * best_overlap_offset: calculate best offset for overlap

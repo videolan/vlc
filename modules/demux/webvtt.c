@@ -42,7 +42,7 @@ struct index_entry_s
     unsigned active;
 };
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *es;
     bool         b_slave;
@@ -72,7 +72,7 @@ struct demux_sys_t
     } index;
 
     webvtt_text_parser_t *p_streamparser;
-};
+} demux_sys_t;
 
 #define WEBVTT_PREALLOC 64
 

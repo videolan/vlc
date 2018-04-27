@@ -111,7 +111,7 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 vlc_module_end()
 
-struct demux_sys_t
+typedef struct
 {
     vlc_thread_t thread;
     int i_cancel_state;
@@ -125,7 +125,7 @@ struct demux_sys_t
     mtime_t i_starttime;
 
     es_out_id_t *es;
-};
+} demux_sys_t;
 
 static void *DemuxThread( void *p_data );
 

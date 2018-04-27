@@ -86,7 +86,7 @@ typedef struct
     int             i_margin_percent_v;
 }  ssa_style_t;
 
-struct decoder_sys_t
+typedef struct
 {
     int                 i_original_height;
     int                 i_original_width;
@@ -97,7 +97,7 @@ struct decoder_sys_t
 
     image_attach_t      **pp_images;
     int                 i_images;
-};
+} decoder_sys_t;
 
 static int           DecodeBlock   ( decoder_t *, block_t * );
 static char         *CreatePlainText( char * );

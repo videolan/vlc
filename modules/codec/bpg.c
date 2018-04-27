@@ -29,10 +29,10 @@
 #include <vlc_codec.h>
 #include <libbpg.h>
 
-struct decoder_sys_t
+typedef struct
 {
     struct BPGDecoderContext *p_bpg;
-};
+} decoder_sys_t;
 
 static int  OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);

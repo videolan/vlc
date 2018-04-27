@@ -89,10 +89,10 @@ static const char *const ppsz_filter_options[] = {
  * It describes the Sharpen specific properties of an output thread.
  *****************************************************************************/
 
-struct filter_sys_t
+typedef struct
 {
     atomic_int sigma;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates Sharpen video thread output method

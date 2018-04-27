@@ -60,11 +60,11 @@ static int DemuxHold( demux_t *demux )
     return 1;
 }
 
-struct demux_sys_t
+typedef struct
 {
     mtime_t end;
     mtime_t length;
-};
+} demux_sys_t;
 
 static int DemuxPause( demux_t *demux )
 {

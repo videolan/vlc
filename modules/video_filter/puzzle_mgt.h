@@ -50,6 +50,8 @@
  * Local prototypes
  *****************************************************************************/
 
+typedef struct filter_sys_t filter_sys_t;
+
 typedef struct {
     int32_t i_preview_width, i_preview_lines;
     int32_t i_border_width, i_border_lines;

@@ -340,7 +340,7 @@ typedef struct
     pes_state_t  state;
 } sout_input_sys_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     sout_input_t    *p_pcr_input;
 
@@ -385,7 +385,7 @@ struct sout_mux_sys_t
     int             i_csa_pkt_size;
     bool            b_crypt_audio;
     bool            b_crypt_video;
-};
+} sout_mux_sys_t;
 
 
 static int GetNextFreePID( sout_mux_t *p_mux, int i_pid_start )

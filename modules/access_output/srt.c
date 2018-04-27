@@ -57,13 +57,13 @@ static const char *const srt_key_length_names[] = {
     N_("16 bytes"), N_("24 bytes"), N_("32 bytes"),
 };
 
-struct sout_access_out_sys_t
+typedef struct
 {
     SRTSOCKET     sock;
     int           i_poll_id;
     bool          b_interrupted;
     vlc_mutex_t   lock;
-};
+} sout_access_out_sys_t;
 
 static void srt_wait_interrupted(void *p_data)
 {

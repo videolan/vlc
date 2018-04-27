@@ -76,12 +76,12 @@ vlc_module_begin ()
     add_float( "svg-scale", -1.0, TEXT_SCALE, LONG_TEXT_SCALE, false )
 vlc_module_end ()
 
-struct decoder_sys_t
+typedef struct
 {
     int32_t i_width;
     int32_t i_height;
     double  f_scale;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score

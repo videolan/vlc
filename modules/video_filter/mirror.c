@@ -102,11 +102,11 @@ static int FilterCallback( vlc_object_t *, char const *,
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     atomic_int i_split;
     atomic_int i_direction;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates Mirror video thread output method

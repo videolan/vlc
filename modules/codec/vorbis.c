@@ -62,7 +62,7 @@
 /*****************************************************************************
  * decoder_sys_t : vorbis decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /* Module mode */
     bool b_packetizer;
@@ -90,7 +90,7 @@ struct decoder_sys_t
     ** Channel reordering
     */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[9] =
 {
@@ -731,7 +731,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 /*****************************************************************************
  * encoder_sys_t : vorbis encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Vorbis properties
@@ -752,7 +752,7 @@ struct encoder_sys_t
     */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
 
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score

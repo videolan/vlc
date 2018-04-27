@@ -92,7 +92,7 @@ typedef struct ValueDate_t {
     struct ValueDate_t* next;
 } ValueDate_t;
 
-struct filter_sys_t
+typedef struct
 {
     bool            bargraph;
     int             bargraph_repetition;
@@ -105,7 +105,7 @@ struct filter_sys_t
     ValueDate_t*    last;
     int             started;
     mtime_t         lastAlarm;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Open: open the visualizer

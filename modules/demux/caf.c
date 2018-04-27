@@ -79,7 +79,7 @@ typedef struct packet_table_t
     uint64_t i_descriptions_start;
 } packet_table_t;
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *es;
@@ -90,7 +90,7 @@ struct demux_sys_t
 
     frame_span_t position;
     packet_table_t packet_table;
-};
+} demux_sys_t;
 
 /*
  We use this value to indicate that the data section extends until the end of the file.

@@ -106,7 +106,7 @@ vlc_module_end ()
 
 TYPEDEF_ARRAY( uint64_t, size_array_t );
 
-struct access_sys_t
+typedef struct
 {
     /* file sizes of all parts */
     size_array_t file_sizes;
@@ -128,7 +128,7 @@ struct access_sys_t
 
     /* file format: true=TS, false=PES */
     bool b_ts_format;
-};
+} access_sys_t;
 
 #define CURRENT_FILE_SIZE ARRAY_VAL(p_sys->file_sizes, p_sys->i_current_file)
 #define FILE_SIZE(pos)    ARRAY_VAL(p_sys->file_sizes, pos)

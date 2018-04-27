@@ -47,13 +47,13 @@
  * This structure is part of the audio output thread descriptor.
  * It describes the direct sound specific properties of an audio device.
  *****************************************************************************/
-struct aout_sys_t
+typedef struct
 {
     FILE     * p_file;
     bool b_add_wav_header;
 
     WAVEHEADER waveh;                      /* Wave header of the output file */
-};
+} aout_sys_t;
 
 #define CHANNELS_MAX 6
 static const int pi_channels_maps[CHANNELS_MAX+1] =

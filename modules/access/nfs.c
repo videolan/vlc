@@ -64,7 +64,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-struct access_sys_t
+typedef struct
 {
     struct rpc_context *    p_mount; /* used to to get exports mount point */
     struct nfs_context *    p_nfs;
@@ -95,7 +95,7 @@ struct access_sys_t
             bool b_done;
         } seek;
     } res;
-};
+} access_sys_t;
 
 static bool
 nfs_check_status(stream_t *p_access, int i_status, const char *psz_error,

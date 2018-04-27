@@ -150,7 +150,7 @@ typedef struct
     uint32_t         i_indexentries;
 } mp4_stream_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     bool b_mov;
     bool b_3gp;
@@ -173,7 +173,7 @@ struct sout_mux_sys_t
     bool           b_fragmented;
     mtime_t        i_written_duration;
     uint32_t       i_mfhd_sequence;
-};
+} sout_mux_sys_t;
 
 static void box_send(sout_mux_t *p_mux,  bo_t *box);
 static bo_t *BuildMoov(sout_mux_t *p_mux);

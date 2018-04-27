@@ -65,7 +65,7 @@ static const char *const mode_list_text[] = {
 /**
  * Top-level deinterlace subsystem state.
  */
-struct filter_sys_t
+typedef struct
 {
     const vlc_chroma_description_t *chroma;
 
@@ -83,6 +83,6 @@ struct filter_sys_t
         phosphor_sys_t phosphor; /**< Phosphor algorithm state. */
         ivtc_sys_t ivtc;         /**< IVTC algorithm state. */
     };
-};
+} filter_sys_t;
 
 #endif

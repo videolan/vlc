@@ -74,7 +74,7 @@ vlc_module_end ()
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-struct aout_sys_t
+typedef struct
 {
     struct aout_sys_common c;
 
@@ -121,7 +121,7 @@ struct aout_sys_t
     bool                        b_mute;
 
     bool                        b_ignore_streams_changed_callback;
-};
+} aout_sys_t;
 
 #pragma mark -
 #pragma mark helpers

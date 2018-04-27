@@ -85,7 +85,7 @@ vlc_module_end ()
 /**
  * Internal swscale filter structure.
  */
-struct filter_sys_t
+typedef struct
 {
     SwsFilter *p_filter;
     int i_cpu_mask, i_sws_flags;
@@ -106,7 +106,7 @@ struct filter_sys_t
     bool b_copy;
     bool b_swap_uvi;
     bool b_swap_uvo;
-};
+} filter_sys_t;
 
 static picture_t *Filter( filter_t *, picture_t * );
 static int  Init( filter_t * );

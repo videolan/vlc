@@ -35,7 +35,7 @@
 /*****************************************************************************
  * decoder_sys_t : raw video decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -48,7 +48,7 @@ struct decoder_sys_t
      * Common properties
      */
     date_t pts;
-};
+} decoder_sys_t;
 
 /****************************************************************************
  * Local prototypes

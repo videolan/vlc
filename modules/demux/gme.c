@@ -49,7 +49,7 @@ vlc_module_end ()
 
 #define RATE 48000
 
-struct demux_sys_t
+typedef struct
 {
     Music_Emu   *emu;
     unsigned     track_id;
@@ -60,7 +60,7 @@ struct demux_sys_t
     input_title_t **titlev;
     unsigned        titlec;
     bool            title_changed;
-};
+} demux_sys_t;
 
 
 static int Demux (demux_t *);

@@ -40,7 +40,7 @@
 #include <alsa/version.h>
 
 /** Private data for an ALSA PCM playback stream */
-struct aout_sys_t
+typedef struct
 {
     snd_pcm_t *pcm;
     unsigned rate; /**< Sample rate */
@@ -51,7 +51,7 @@ struct aout_sys_t
     bool soft_mute;
     float soft_gain;
     char *device;
-};
+} aout_sys_t;
 
 enum {
     PASSTHROUGH_NONE,

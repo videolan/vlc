@@ -103,7 +103,7 @@ vlc_module_end()
 
 #define RDP_MAX_FD 32
 
-struct demux_sys_t
+typedef struct
 {
     vlc_thread_t thread;
     freerdp *p_instance;
@@ -121,7 +121,7 @@ struct demux_sys_t
     int i_port;
     /* cancelability */
     int i_cancel_state;
-};
+} demux_sys_t;
 
 /* context */
 

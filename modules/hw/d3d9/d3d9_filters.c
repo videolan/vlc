@@ -50,7 +50,7 @@ struct filter_level
     DXVA2_ValueRange Range;
 };
 
-struct filter_sys_t
+typedef struct
 {
     HINSTANCE                      hdecoder_dll;
     /* keep a reference in case the vout is released first */
@@ -63,7 +63,7 @@ struct filter_sys_t
     struct filter_level Contrast;
     struct filter_level Hue;
     struct filter_level Saturation;
-};
+} filter_sys_t;
 
 #define THRES_TEXT N_("Brightness threshold")
 #define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \

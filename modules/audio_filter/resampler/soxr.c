@@ -80,7 +80,7 @@ vlc_module_begin ()
     add_shortcut( "soxr" )
 vlc_module_end ()
 
-struct filter_sys_t
+typedef struct
 {
     soxr_t  soxr;
     soxr_t  vr_soxr;
@@ -88,7 +88,7 @@ struct filter_sys_t
     double  f_fixed_ratio;
     size_t  i_last_olen;
     mtime_t i_last_pts;
-};
+} filter_sys_t;
 
 static block_t *Resample( filter_t *, block_t * );
 static block_t *Drain( filter_t * );
@@ -131,7 +131,7 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
      || !SoXR_GetFormat( p_filter->fmt_out.audio.i_format, &i_otype ) )
         return VLC_EGENERIC;
 
-    filter_sys_t *p_sys = calloc( 1, sizeof( struct filter_sys_t ) );
+    filter_sys_t *p_sys = calloc( 1, sizeof( filter_sys_t ) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 

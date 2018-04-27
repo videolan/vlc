@@ -1158,7 +1158,7 @@ static int OpenAudio(vlc_object_t *p_this)
     if(!sys)
         return VLC_ENOMEM;
 
-    aout->sys = (aout_sys_t *) sys;
+    aout->sys = sys;
 
     vlc_mutex_lock(&sys->lock);
     //decklink_sys->i_channels = var_InheritInteger(vd, AUDIO_CFG_PREFIX "audio-channels");

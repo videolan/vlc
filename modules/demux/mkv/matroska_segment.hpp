@@ -25,6 +25,7 @@
 #ifndef VLC_MKV_MATROSKA_SEGMENT_HPP_
 #define VLC_MKV_MATROSKA_SEGMENT_HPP_
 
+#include "demux.hpp"
 #include "mkv.hpp"
 #include "matroska_segment_seeker.hpp"
 #include <vector>

@@ -107,7 +107,7 @@ static const char *const ppsz_filter_options[] = {
 /*****************************************************************************
  * filter_sys_t: filter method descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     bool b_done;
     int i_loops, i_alpha;
@@ -117,7 +117,7 @@ struct filter_sys_t
 
     vlc_fourcc_t i_base_chroma;
     vlc_fourcc_t i_blend_chroma;
-};
+} filter_sys_t;
 
 static int blendbench_LoadImage( vlc_object_t *p_this, picture_t **pp_pic,
                                  vlc_fourcc_t i_chroma, char *psz_file, const char *psz_name )

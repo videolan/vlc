@@ -42,7 +42,8 @@
 #include <d3d9.h>
 #include "../../video_chroma/d3d9_fmt.h"
 
-struct filter_sys_t {
+typedef struct
+{
     /* GPU to CPU */
     copy_cache_t      cache;
 
@@ -51,7 +52,7 @@ struct filter_sys_t {
     d3d9_device_t     d3d_dev;
     filter_t          *filter;
     picture_t         *staging;
-};
+} filter_sys_t;
 
 static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
                     D3DLOCKED_RECT *p_lock, D3DSURFACE_DESC *p_desc)

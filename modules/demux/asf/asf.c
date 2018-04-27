@@ -107,7 +107,7 @@ typedef struct
 
 } asf_track_t;
 
-struct demux_sys_t
+typedef struct
 {
     mtime_t             i_time;     /* s */
     mtime_t             i_sendtime;
@@ -136,7 +136,7 @@ struct demux_sys_t
     asf_packet_sys_t    packet_sys;
 
     vlc_meta_t          *meta;
-};
+} demux_sys_t;
 
 static int      DemuxInit( demux_t * );
 static void     DemuxEnd( demux_t * );

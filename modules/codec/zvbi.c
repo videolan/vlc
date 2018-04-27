@@ -150,7 +150,7 @@ typedef enum {
 
 #define MAX_SLICES 32
 
-struct decoder_sys_t
+typedef struct
 {
     vbi_decoder *     p_vbi_dec;
     vbi_sliced        p_vbi_sliced[MAX_SLICES];
@@ -171,7 +171,7 @@ struct decoder_sys_t
         int pgno, subno;
     }                 nav_link[6];
     int               i_key[3];
-};
+} decoder_sys_t;
 
 static int Decode( decoder_t *, block_t * );
 

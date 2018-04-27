@@ -101,7 +101,7 @@ static int Control (demux_t *, int, va_list);
 static es_out_id_t *InitES (demux_t *, uint_fast16_t, uint_fast16_t,
                             uint_fast8_t, uint8_t *);
 
-struct demux_sys_t
+typedef struct
 {
     /* All owned by timer thread while timer is armed: */
     xcb_connection_t *conn; /**< XCB connection */
@@ -118,7 +118,7 @@ struct demux_sys_t
     uint16_t          cur_w, cur_h; /**< Actual capture pixel dimensions */
     /* Timer does not use this, only input thread: */
     vlc_timer_t       timer;
-};
+} demux_sys_t;
 
 /** Checks MIT-SHM shared memory support */
 static bool CheckSHM (xcb_connection_t *conn)

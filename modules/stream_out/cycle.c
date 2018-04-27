@@ -53,7 +53,7 @@ struct sout_stream_id_sys_t
     void *id;
 };
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_stream_t *stream; /*< Current output stream */
     sout_stream_id_sys_t *first; /*< First elementary stream */
@@ -63,7 +63,7 @@ struct sout_stream_sys_t
     sout_cycle_t *next;
     mtime_t (*clock)(const block_t *);
     mtime_t period; /*< Total cycle duration */
-};
+} sout_stream_sys_t;
 
 static mtime_t get_dts(const block_t *block)
 {

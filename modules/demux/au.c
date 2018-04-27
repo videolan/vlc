@@ -81,7 +81,7 @@ enum AuCat_e
     AU_CAT_ADPCM    = 2
 };
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t     fmt;
     es_out_id_t     *es;
@@ -92,7 +92,7 @@ struct demux_sys_t
     mtime_t         i_frame_length;
 
     uint32_t        i_header_size;
-};
+} demux_sys_t;
 
 static int Demux( demux_t * );
 static int Control ( demux_t *, int i_query, va_list args );

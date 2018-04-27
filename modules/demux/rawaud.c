@@ -80,7 +80,7 @@ vlc_module_end();
 /*****************************************************************************
  * Definitions of structures used by this plugin
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *p_es;
     es_format_t  fmt;
@@ -88,7 +88,7 @@ struct demux_sys_t
     unsigned int i_frame_samples;
     unsigned int i_seek_step;
     date_t       pts;
-};
+} demux_sys_t;
 
 
 /*****************************************************************************

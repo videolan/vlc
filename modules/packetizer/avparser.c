@@ -50,12 +50,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     AVCodecParserContext * p_parser_ctx;
     AVCodecContext * p_codec_ctx;
     int i_offset;
-};
+} decoder_sys_t;
 
 static block_t * Packetize( decoder_t *, block_t ** );
 static block_t * PacketizeClosed( decoder_t *, block_t ** );

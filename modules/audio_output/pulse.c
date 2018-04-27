@@ -61,7 +61,7 @@ struct sink
     char name[1];
 };
 
-struct aout_sys_t
+typedef struct
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
@@ -75,7 +75,7 @@ struct aout_sys_t
     char *sink_force; /**< Forced sink name (stream must be NULL) */
 
     struct sink *sinks; /**< Locally-cached list of sinks */
-};
+} aout_sys_t;
 
 static void VolumeReport(audio_output_t *aout)
 {

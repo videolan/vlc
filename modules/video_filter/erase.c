@@ -87,13 +87,13 @@ static const char *const ppsz_filter_options[] = {
 /*****************************************************************************
  * filter_sys_t
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     int i_x;
     int i_y;
     picture_t *p_mask;
     vlc_mutex_t lock;
-};
+} filter_sys_t;
 
 static void LoadMask( filter_t *p_filter, const char *psz_filename )
 {

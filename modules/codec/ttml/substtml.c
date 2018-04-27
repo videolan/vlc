@@ -93,10 +93,10 @@ typedef struct
     text_segment_t **pp_last_segment;
 } ttml_region_t;
 
-struct decoder_sys_t
+typedef struct
 {
     int                     i_align;
-};
+} decoder_sys_t;
 
 enum
 {

@@ -80,7 +80,7 @@ vlc_module_end ()
 /*****************************************************************************
  * decoder_sys_t : lpcm decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /* Module mode */
     bool b_packetizer;
@@ -95,10 +95,10 @@ struct decoder_sys_t
     int      i_type;
     uint8_t  i_chans_to_reorder;
     uint8_t  pi_chan_table[AOUT_CHAN_MAX];
-};
+} decoder_sys_t;
 
 #ifdef ENABLE_SOUT
-struct encoder_sys_t
+typedef struct
 {
     int     i_channels;
     int     i_rate;
@@ -107,7 +107,7 @@ struct encoder_sys_t
     uint8_t *p_buffer;
     int     i_buffer_used;
     int     i_frame_num;
-};
+} encoder_sys_t;
 #endif
 
 /*

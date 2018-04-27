@@ -100,12 +100,12 @@ static sout_stream_id_sys_t *AddLang( sout_stream_t *, const es_format_t * );
 static void              Del     ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send    ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-struct sout_stream_sys_t
+typedef struct
 {
     int              i_id;
     int              i_new_id;
     char             *psz_language;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

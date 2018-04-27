@@ -65,13 +65,13 @@ vlc_module_begin()
 vlc_module_end()
 
 
-struct decoder_sys_t
+typedef struct
 {
     AUGraph     graph;
     AudioUnit   synthUnit;
     AudioUnit   outputUnit;
     date_t       end_date;
-};
+} decoder_sys_t;
 
 static int  DecodeBlock (decoder_t *p_dec, block_t *p_block);
 static void Flush (decoder_t *);

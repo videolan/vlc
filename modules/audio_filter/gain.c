@@ -44,12 +44,12 @@ static int      Open        ( vlc_object_t * );
 static void     Close       ( vlc_object_t * );
 static block_t  *Process    ( filter_t *, block_t * );
 
-struct filter_sys_t
+typedef struct
 {
     audio_volume_t volume;
     float f_gain;
     module_t *module;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Module descriptor

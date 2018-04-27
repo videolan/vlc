@@ -108,7 +108,7 @@ static const char *const ppsz_filter_options[] = {
  * This structure is part of the video output thread descriptor.
  * It describes the Distort specific properties of an output thread.
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     vlc_mutex_t lock;
     int i_mode;
@@ -123,7 +123,7 @@ struct filter_sys_t
 
     /* For hough mode */
     int *p_pre_hough;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates Distort video thread output method

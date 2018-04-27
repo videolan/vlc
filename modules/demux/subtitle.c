@@ -166,7 +166,7 @@ typedef struct
 
 } subs_properties_t;
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *es;
     bool        b_slave;
@@ -187,7 +187,7 @@ struct demux_sys_t
     subs_properties_t props;
 
     block_t * (*pf_convert)( const subtitle_t * );
-};
+} demux_sys_t;
 
 static int  ParseMicroDvd   ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );
 static int  ParseSubRip     ( vlc_object_t *, subs_properties_t *, text_t *, subtitle_t *, size_t );

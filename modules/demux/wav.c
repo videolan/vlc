@@ -62,7 +62,7 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t     fmt;
     es_out_id_t     *p_es;
@@ -78,7 +78,7 @@ struct demux_sys_t
     uint32_t i_channel_mask;
     uint8_t i_chans_to_reorder;            /* do we need channel reordering */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
-};
+} demux_sys_t;
 
 static int ChunkFind( demux_t *, const char *, unsigned int * );
 

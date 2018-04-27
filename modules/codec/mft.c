@@ -84,7 +84,7 @@ typedef struct
     HRESULT (STDCALL *fptr_MFCreateAlignedMemoryBuffer)(DWORD cbMaxLength, DWORD fAlignmentFlags, IMFMediaBuffer **ppBuffer);
 } MFHandle;
 
-struct decoder_sys_t
+typedef struct
 {
     MFHandle mf_handle;
 
@@ -112,7 +112,7 @@ struct decoder_sys_t
 
     /* H264 only. */
     uint8_t nal_length_size;
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[9] =
 {

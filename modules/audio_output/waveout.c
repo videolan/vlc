@@ -54,6 +54,9 @@ static void Play         ( audio_output_t *, block_t * );
 /*****************************************************************************
  * notification_thread_t: waveOut event thread
  *****************************************************************************/
+
+typedef struct aout_sys_t aout_sys_t;
+
 struct lkwavehdr
 {
     WAVEHDR hdr;

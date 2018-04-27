@@ -59,7 +59,7 @@ struct filter_level
     D3D11_VIDEO_PROCESSOR_FILTER_RANGE Range;
 };
 
-struct filter_sys_t
+typedef struct
 {
     float f_gamma;
     bool  b_brightness_threshold;
@@ -82,7 +82,7 @@ struct filter_sys_t
     } out[PROCESSOR_SLICES];
     ID3D11VideoProcessorInputView  *procInput[PROCESSOR_SLICES];
     ID3D11VideoProcessorOutputView *procOutput[PROCESSOR_SLICES];
-};
+} filter_sys_t;
 
 #define THRES_TEXT N_("Brightness threshold")
 #define THRES_LONGTEXT N_("When this mode is enabled, pixels will be " \

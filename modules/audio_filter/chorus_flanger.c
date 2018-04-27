@@ -38,6 +38,8 @@
  * Local prototypes
  *****************************************************************************/
 
+typedef struct filter_sys_t filter_sys_t;
+
 static int  Open     ( vlc_object_t * );
 static void Close    ( vlc_object_t * );
 static block_t *DoWork( filter_t *, block_t * );

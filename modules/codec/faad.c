@@ -65,7 +65,7 @@ static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 static void DoReordering( uint32_t *, uint32_t *, int, int, uint8_t * );
 
-struct decoder_sys_t
+typedef struct
 {
     /* faad handler */
     NeAACDecHandle *hfaad;
@@ -80,7 +80,7 @@ struct decoder_sys_t
     uint32_t pi_channel_positions[MPEG4_ASC_MAX_INDEXEDPOS];
 
     bool b_sbr, b_ps, b_discontinuity;
-};
+} decoder_sys_t;
 
 #if MPEG4_ASC_MAX_INDEXEDPOS != LFE_CHANNEL
     #error MPEG4_ASC_MAX_INDEXEDPOS != LFE_CHANNEL

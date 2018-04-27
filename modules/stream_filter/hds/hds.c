@@ -122,7 +122,7 @@ typedef struct hds_stream_s
 
 #define BITRATE_AS_BYTES_PER_SECOND 1024/8
 
-struct stream_sys_t
+typedef struct
 {
     char         *base_url;    /* URL common part for chunks */
     vlc_thread_t live_thread;
@@ -144,7 +144,7 @@ struct stream_sys_t
 
     bool         live;
     bool         closed;
-};
+} stream_sys_t;
 
 typedef struct _bootstrap_info {
     uint8_t* data;

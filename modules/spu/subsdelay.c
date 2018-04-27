@@ -169,7 +169,7 @@ typedef struct
 * filter_sys_t: Subsdelay filter descriptor
  *****************************************************************************/
 
-struct filter_sys_t
+typedef struct
 {
     int i_mode; /* delay calculation mode */
 
@@ -186,7 +186,7 @@ struct filter_sys_t
     int64_t i_min_start_stop_interval;
 
     subsdelay_heap_t heap; /* subpictures list */
-};
+} filter_sys_t;
 
 
 /*****************************************************************************

@@ -30,12 +30,12 @@
 #include <vlc_plugin.h>
 #include <vlc_stream.h>
 
-struct stream_sys_t
+typedef struct
 {
     z_stream zstream;
     bool eof;
     unsigned char buffer[16384];
-};
+} stream_sys_t;
 
 static ssize_t Read(stream_t *stream, void *buf, size_t buflen)
 {

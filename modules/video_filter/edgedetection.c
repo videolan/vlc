@@ -79,10 +79,10 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /* Store the filter chain */
-struct filter_sys_t
+typedef struct
 {
     filter_chain_t *p_chain;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Opens the filter.

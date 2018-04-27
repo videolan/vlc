@@ -87,7 +87,7 @@ typedef struct
     int64_t     i_delay;
 } vobsub_track_t;
 
-struct demux_sys_t
+typedef struct
 {
     int64_t        i_next_demux_date;
     int64_t        i_length;
@@ -103,7 +103,7 @@ struct demux_sys_t
     int            i_original_frame_height;
     bool           b_palette;
     uint32_t       palette[16];
-};
+} demux_sys_t;
 
 
 static int Demux( demux_t * );

@@ -66,11 +66,11 @@ struct sout_stream_id_sys_t
     bool b_error;
 };
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_stream_id_sys_t **pp_es;
     int i_es_num;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

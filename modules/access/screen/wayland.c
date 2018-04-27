@@ -41,7 +41,7 @@
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 
-struct demux_sys_t
+typedef struct
 {
     struct wl_display *display;
     struct wl_output *output;
@@ -62,7 +62,7 @@ struct demux_sys_t
     mtime_t start;
 
     vlc_thread_t thread;
-};
+} demux_sys_t;
 
 static bool DisplayError(vlc_object_t *obj, struct wl_display *display)
 {

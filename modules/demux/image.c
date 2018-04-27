@@ -98,7 +98,7 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     block_t     *data;
     es_out_id_t *es;
@@ -107,7 +107,7 @@ struct demux_sys_t
     mtime_t     pts_origin;
     mtime_t     pts_next;
     date_t        pts;
-};
+} demux_sys_t;
 
 static block_t *Load(demux_t *demux)
 {

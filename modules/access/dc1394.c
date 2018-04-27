@@ -54,7 +54,7 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 vlc_module_end()
 
-struct demux_sys_t
+typedef struct
 {
     /* camera info */
     dc1394_t            *p_dccontext;
@@ -77,7 +77,7 @@ struct demux_sys_t
     unsigned int        focus;
     es_out_id_t         *p_es_video;
     dc1394video_frame_t *frame;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Local prototypes

@@ -72,7 +72,7 @@ static int DecodeBlock( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
 /* */
-struct decoder_sys_t
+typedef struct
 {
     mtime_t        i_max_stop;
 
@@ -87,7 +87,7 @@ struct decoder_sys_t
 
     /* */
     ASS_Track      *p_track;
-};
+} decoder_sys_t;
 static void DecSysRelease( decoder_sys_t *p_sys );
 static void DecSysHold( decoder_sys_t *p_sys );
 

@@ -109,13 +109,13 @@ struct  va_filter_desc
     VASurfaceID *       surface_ids;
 };
 
-struct  filter_sys_t
+typedef struct
 {
     struct va_filter_desc       va;
     picture_pool_t *            dest_pics;
     bool                        b_pipeline_fast;
     void *                      p_data;
-};
+} filter_sys_t;
 
 #define DEST_PICS_POOL_SZ       3
 

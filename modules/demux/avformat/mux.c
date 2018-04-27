@@ -50,7 +50,7 @@ static const char *const ppsz_mux_options[] = {
 /*****************************************************************************
  * mux_sys_t: mux descriptor
  *****************************************************************************/
-struct sout_mux_sys_t
+typedef struct
 {
     AVIOContext     *io;
     int             io_buffer_size;
@@ -64,7 +64,7 @@ struct sout_mux_sys_t
 #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
     bool     b_header_done;
 #endif
-};
+} sout_mux_sys_t;
 
 /*****************************************************************************
  * Local prototypes

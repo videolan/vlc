@@ -283,7 +283,7 @@ typedef struct async_task_t
 
 TYPED_FIFO(async_task_t, async_task_t)
 
-struct encoder_sys_t
+typedef struct
 {
     mfxSession       session;             // Intel Media SDK Session.
     mfxVideoParam    params;              // Encoding parameters.
@@ -297,7 +297,7 @@ struct encoder_sys_t
 
     picture_pool_t   *input_pool;         // pool of pictures to feed the decoder
                                           //  as it doesn't like constantly changing buffers
-};
+} encoder_sys_t;
 
 static block_t *Encode(encoder_t *, picture_t *);
 

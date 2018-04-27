@@ -51,7 +51,7 @@
 
 #define A52_FRAME_NB 1536
 
-struct aout_sys_t
+typedef struct
 {
     int fd;
     audio_sample_format_t format;
@@ -59,7 +59,7 @@ struct aout_sys_t
     bool soft_mute;
     float soft_gain;
     char *device;
-};
+} aout_sys_t;
 
 #include "volume.h"
 

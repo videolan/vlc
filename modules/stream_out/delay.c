@@ -76,12 +76,12 @@ static sout_stream_id_sys_t *Add( sout_stream_t *, const es_format_t * );
 static void              Del   ( sout_stream_t *, sout_stream_id_sys_t * );
 static int               Send  ( sout_stream_t *, sout_stream_id_sys_t *, block_t * );
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_stream_id_sys_t *id;
     int i_id;
     mtime_t i_delay;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

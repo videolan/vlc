@@ -39,7 +39,7 @@
 /*****************************************************************************
  * decoder_sys_t : oggspots decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /* Module mode */
     bool b_packetizer;
@@ -58,7 +58,7 @@ struct decoder_sys_t
      * Common properties
      */
     mtime_t i_pts;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes

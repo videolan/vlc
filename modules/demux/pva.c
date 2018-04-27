@@ -52,7 +52,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *p_video;
     es_out_id_t *p_audio;
@@ -66,7 +66,7 @@ struct demux_sys_t
     block_t     *p_es;  /* video */
 
     int64_t     b_pcr_audio;
-};
+} demux_sys_t;
 
 static int  Demux   ( demux_t *p_demux );
 static int  Control ( demux_t *p_demux, int i_query, va_list args );

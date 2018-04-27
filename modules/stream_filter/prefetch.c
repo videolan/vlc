@@ -35,7 +35,7 @@
 #include <vlc_fs.h>
 #include <vlc_interrupt.h>
 
-struct stream_sys_t
+typedef struct
 {
     vlc_mutex_t  lock;
     vlc_cond_t   wait_data;
@@ -60,7 +60,7 @@ struct stream_sys_t
     size_t       buffer_size;
     char        *buffer;
     size_t       seek_threshold;
-};
+} stream_sys_t;
 
 static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
 {

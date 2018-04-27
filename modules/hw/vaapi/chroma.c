@@ -37,7 +37,7 @@
 
 # define DEST_PICS_POOL_SZ 3
 
-struct filter_sys_t
+typedef struct
 {
     struct vlc_vaapi_instance *va_inst;
     VADisplay           dpy;
@@ -47,7 +47,7 @@ struct filter_sys_t
 
     bool                derive_failed;
     bool                image_fallback_failed;
-};
+} filter_sys_t;
 
 static int CreateFallbackImage(filter_t *filter, picture_t *src_pic,
                                VADisplay va_dpy, VAImage *image_fallback)

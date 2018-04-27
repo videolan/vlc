@@ -60,7 +60,7 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -90,7 +90,7 @@ struct decoder_sys_t
     /* Current frame being built */
     block_t    *p_frame;
     block_t    **pp_last;
-};
+} decoder_sys_t;
 
 static block_t *Packetize( decoder_t *, block_t ** );
 static void PacketizeFlush( decoder_t * );

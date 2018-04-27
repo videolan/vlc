@@ -40,7 +40,7 @@
 
 #include "d3d9_filters.h"
 
-struct filter_sys_t
+typedef struct
 {
     HINSTANCE                      hdecoder_dll;
     /* keep a reference in case the vout is released first */
@@ -58,7 +58,7 @@ struct filter_sys_t
 
     struct deinterlace_ctx         context;
     picture_t *                    (*buffer_new)( filter_t * );
-};
+} filter_sys_t;
 
 struct filter_mode_t
 {

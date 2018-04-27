@@ -177,7 +177,7 @@ static int Open (vlc_object_t *obj)
     /* Callbacks */
     demux->pf_demux = Demux;
     demux->pf_control = Control;
-    demux->p_sys = reinterpret_cast<demux_sys_t*>(sys);
+    demux->p_sys = sys;
 
     return VLC_SUCCESS;
 

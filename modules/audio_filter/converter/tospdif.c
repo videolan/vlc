@@ -51,7 +51,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-struct filter_sys_t
+typedef struct
 {
     block_t *p_out_buf;
     size_t i_out_offset;
@@ -71,7 +71,7 @@ struct filter_sys_t
             bool b_skip;
         } dtshd;
     };
-};
+} filter_sys_t;
 
 #define SPDIF_HEADER_SIZE 8
 

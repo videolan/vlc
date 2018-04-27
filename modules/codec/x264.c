@@ -757,7 +757,7 @@ static const char *const ppsz_sout_options[] = {
 
 static block_t *Encode( encoder_t *, picture_t * );
 
-struct encoder_sys_t
+typedef struct
 {
     x264_t          *h;
     x264_param_t    param;
@@ -768,7 +768,7 @@ struct encoder_sys_t
     int             i_sei_size;
     uint32_t         i_colorspace;
     uint8_t         *p_sei;
-};
+} encoder_sys_t;
 
 #ifdef PTW32_STATIC_LIB
 static vlc_mutex_t pthread_win32_mutex = VLC_STATIC_MUTEX;

@@ -57,7 +57,7 @@ vlc_module_begin ()
     VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
-struct services_discovery_sys_t
+typedef struct
 {
     xcb_connection_t *conn;
     vlc_thread_t      thread;
@@ -66,7 +66,7 @@ struct services_discovery_sys_t
     xcb_window_t      root_window;
     void             *apps;
     input_item_t     *apps_root;
-};
+} services_discovery_sys_t;
 
 static void *Run (void *);
 static void UpdateApps (services_discovery_t *);

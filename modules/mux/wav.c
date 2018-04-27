@@ -61,7 +61,7 @@ static int Mux      ( sout_mux_t * );
 
 #define MAX_CHANNELS 6
 
-struct sout_mux_sys_t
+typedef struct
 {
     bool b_used;
     bool b_header;
@@ -77,7 +77,7 @@ struct sout_mux_sys_t
     uint32_t i_channel_mask;
     uint8_t i_chans_to_reorder;            /* do we need channel reordering */
     uint8_t pi_chan_table[AOUT_CHAN_MAX];
-};
+} sout_mux_sys_t;
 
 static const uint32_t pi_channels_in[] =
     { WAVE_SPEAKER_FRONT_LEFT, WAVE_SPEAKER_FRONT_RIGHT,

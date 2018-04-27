@@ -42,7 +42,7 @@
 #include "gstvlcpictureplaneallocator.h"
 #include "gstvlcvideosink.h"
 
-struct decoder_sys_t
+typedef struct
 {
     GstElement *p_decoder;
     GstElement *p_decode_src;
@@ -57,7 +57,7 @@ struct decoder_sys_t
     GstAtomicQueue *p_que;
     bool b_prerolled;
     bool b_running;
-};
+} decoder_sys_t;
 
 typedef struct
 {

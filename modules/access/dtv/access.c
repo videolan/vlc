@@ -426,12 +426,12 @@ vlc_module_begin ()
 #endif
 vlc_module_end ()
 
-struct access_sys_t
+typedef struct
 {
     dvb_device_t *dev;
     uint8_t signal_poll;
     tuner_setup_t pf_setup;
-};
+} access_sys_t;
 
 static block_t *Read (stream_t *, bool *);
 static int Control (stream_t *, int, va_list);

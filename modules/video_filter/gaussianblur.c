@@ -92,7 +92,7 @@ static const char *const ppsz_filter_options[] = {
 #   define type_t float
 #endif
 
-struct filter_sys_t
+typedef struct
 {
     double f_sigma;
     int i_dim;
@@ -100,7 +100,7 @@ struct filter_sys_t
     type_t *pt_distribution;
     type_t *pt_buffer;
     type_t *pt_scale;
-};
+} filter_sys_t;
 
 static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
 {

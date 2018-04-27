@@ -31,10 +31,10 @@
 #include <vlc_picture.h>
 #include "vlc_vdpau.h"
 
-struct filter_sys_t
+typedef struct
 {
     atomic_uint_fast32_t sigma;
-};
+} filter_sys_t;
 
 static float vlc_to_vdp_sigma(float sigma)
 {

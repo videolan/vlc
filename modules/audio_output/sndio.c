@@ -51,7 +51,7 @@ static int MuteSet (audio_output_t *, bool);
 static void VolumeChanged (void *, unsigned);
 static void PositionChanged (void *, int);
 
-struct aout_sys_t
+typedef struct
 {
     struct sio_hdl *hdl;
     int started;
@@ -59,7 +59,7 @@ struct aout_sys_t
     unsigned rate;
     unsigned volume;
     bool mute;
-};
+} aout_sys_t;
 
 /** Initializes an sndio playback stream */
 static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)

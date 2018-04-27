@@ -147,7 +147,7 @@ static const char *const ppsz_enc_options[] = {
 /*****************************************************************************
  * decoder_sys_t : speex decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /* Module mode */
     bool b_packetizer;
@@ -172,7 +172,7 @@ struct decoder_sys_t
      */
     date_t end_date;
 
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[6] =
 {
@@ -937,7 +937,7 @@ static void CloseDecoder( vlc_object_t *p_this )
  *****************************************************************************/
 #define MAX_FRAME_BYTES 2000
 
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -959,7 +959,7 @@ struct encoder_sys_t
     int i_frame_length;
     int i_samples_delay;
     int i_frame_size;
-};
+} encoder_sys_t;
 
 static block_t *Encode   ( encoder_t *, block_t * );
 

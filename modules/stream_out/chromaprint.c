@@ -65,7 +65,7 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-struct sout_stream_sys_t
+typedef struct
 {
     unsigned int i_duration;
     unsigned int i_total_samples;
@@ -75,7 +75,7 @@ struct sout_stream_sys_t
     ChromaprintContext *p_chromaprint_ctx;
     sout_stream_id_sys_t *id;
     chromaprint_fingerprint_t *p_data;
-};
+} sout_stream_sys_t;
 
 struct sout_stream_id_sys_t
 {

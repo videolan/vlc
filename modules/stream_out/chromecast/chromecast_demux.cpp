@@ -493,7 +493,6 @@ int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
 
     p_demux->p_sys = p_sys;
-    p_demux->p_sys = reinterpret_cast<demux_sys_t*>(p_sys);
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
 

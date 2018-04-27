@@ -55,10 +55,10 @@ typedef struct png_sys_t png_sys_t;
 /*****************************************************************************
  * decoder_sys_t : png decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     PNG_SYS_COMMON_MEMBERS
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -71,11 +71,11 @@ static int DecodeBlock  ( decoder_t *, block_t * );
 /*
  * png encoder descriptor
  */
-struct encoder_sys_t
+typedef struct
 {
     PNG_SYS_COMMON_MEMBERS
     int i_blocksize;
-};
+} encoder_sys_t;
 
 static int  OpenEncoder(vlc_object_t *);
 static void CloseEncoder(vlc_object_t *);

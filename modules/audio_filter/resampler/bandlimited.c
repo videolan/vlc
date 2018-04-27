@@ -66,7 +66,7 @@ static void ResampleFloat( filter_t *p_filter,
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     int32_t *p_buf;                        /* this filter introduces a delay */
     size_t i_buf_size;
@@ -78,7 +78,7 @@ struct filter_sys_t
     bool b_first;
 
     date_t end_date;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Module descriptor

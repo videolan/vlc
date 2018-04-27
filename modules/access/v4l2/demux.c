@@ -42,7 +42,7 @@
 
 #include "v4l2.h"
 
-struct demux_sys_t
+typedef struct
 {
     int fd;
     vlc_thread_t thread;
@@ -62,7 +62,7 @@ struct demux_sys_t
 #ifdef ZVBI_COMPILED
     vlc_v4l2_vbi_t *vbi;
 #endif
-};
+} demux_sys_t;
 
 static void *UserPtrThread (void *);
 static void *MmapThread (void *);

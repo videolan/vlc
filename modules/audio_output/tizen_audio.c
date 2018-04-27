@@ -39,7 +39,8 @@
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-struct aout_sys_t {
+typedef struct
+{
     /* sw gain */
     float               soft_gain;
     bool                soft_mute;
@@ -55,7 +56,7 @@ struct aout_sys_t {
 
     int (*pf_audio_out_drain)( audio_out_h output );
     int (*pf_audio_out_flush)( audio_out_h output );
-};
+} aout_sys_t;
 
 /* Soft volume helper */
 #include "audio_output/volume.h"

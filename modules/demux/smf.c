@@ -91,7 +91,7 @@ static int ReadDeltaTime (stream_t *s, mtrk_t *track)
     return 0;
 }
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *es;
     date_t       pts; /*< Play timestamp */
@@ -104,7 +104,7 @@ struct demux_sys_t
 
     unsigned     trackc; /*< Number of tracks */
     mtrk_t       trackv[]; /*< Track states */
-};
+} demux_sys_t;
 
 /**
  * Non-MIDI Meta events handler

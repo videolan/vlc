@@ -132,7 +132,7 @@ typedef struct scene_t {
 /*****************************************************************************
  * filter_sys_t: private data
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     image_handler_t *p_image;
     scene_t scene;
@@ -146,7 +146,7 @@ struct filter_sys_t
     int32_t i_ratio;  /* save every n-th frame */
     int32_t i_frames; /* frames count */
     bool  b_replace;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: initialize and set pf_video_filter()

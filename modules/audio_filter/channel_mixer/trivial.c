@@ -46,10 +46,10 @@ vlc_module_begin ()
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 
-struct filter_sys_t
+typedef struct
 {
     int channel_map[AOUT_CHAN_MAX];
-};
+} filter_sys_t;
 
 /**
  * Trivially upmixes

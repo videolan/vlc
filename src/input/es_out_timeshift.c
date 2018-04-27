@@ -220,7 +220,7 @@ struct es_out_id_t
     es_out_id_t *p_es;
 };
 
-struct es_out_sys_t
+typedef struct
 {
     input_thread_t *p_input;
     es_out_t       *p_out;
@@ -245,7 +245,7 @@ struct es_out_sys_t
     /* */
     int            i_es;
     es_out_id_t    **pp_es;
-};
+} es_out_sys_t;
 
 static es_out_id_t *Add    ( es_out_t *, const es_format_t * );
 static int          Send   ( es_out_t *, es_out_id_t *, block_t * );

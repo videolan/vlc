@@ -119,7 +119,7 @@ typedef struct
     sync_table_ctx_t current;
 } sync_table_t;
 
-struct demux_sys_t
+typedef struct
 {
     codec_t codec;
     vlc_fourcc_t i_original;
@@ -161,7 +161,7 @@ struct demux_sys_t
     float rgf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
 
     sync_table_t mllt;
-};
+} demux_sys_t;
 
 static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MpgaInit( demux_t *p_demux );

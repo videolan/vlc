@@ -45,7 +45,7 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     fakeesout->pf_del = esOutDel_Callback;
     fakeesout->pf_destroy = esOutDestroy_Callback;
     fakeesout->pf_send = esOutSend_Callback;
-    fakeesout->p_sys = (es_out_sys_t*) this;
+    fakeesout->p_sys = this;
 
     vlc_mutex_init(&lock);
 }

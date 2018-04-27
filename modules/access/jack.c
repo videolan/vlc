@@ -83,7 +83,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct demux_sys_t
+typedef struct
 {
     /* Audio properties */
     vlc_fourcc_t                i_acodec_raw;
@@ -106,7 +106,7 @@ struct demux_sys_t
     char                        *psz_ports;
     char                        **pp_jack_port_table;
     char                        i_match_ports;
-};
+} demux_sys_t;
 
 static int Demux( demux_t * );
 static int Control( demux_t *p_demux, int i_query, va_list args );

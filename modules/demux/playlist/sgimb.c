@@ -111,7 +111,7 @@
  *****************************************************************************/
 #define MAX_LINE 1024
 
-struct demux_sys_t
+typedef struct
 {
     char        *psz_uri;       /* Stream= or sgiQTFileBegin rtsp link */
     char        *psz_server;    /* sgiNameServerHost= */
@@ -127,7 +127,7 @@ struct demux_sys_t
     int         i_sid;          /* sgiSid= */
     bool  b_concert;      /* DeliveryService=cds */
     bool  b_rtsp_kasenna; /* kasenna style RTSP */
-};
+} demux_sys_t;
 
 static int ReadDir( stream_t *, input_item_node_t * );
 

@@ -67,7 +67,7 @@ static const char *const ppsz_color_descriptions[] = {
 /*****************************************************************************
  * filter_sys_t: marquee filter descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     vlc_mutex_t lock;
 
@@ -83,7 +83,7 @@ struct filter_sys_t
 
     mtime_t last_time;
     mtime_t i_refresh;
-};
+} filter_sys_t;
 
 #define MSG_TEXT N_("Text")
 #define MSG_LONGTEXT N_( \

@@ -88,7 +88,7 @@ struct thread_context_t
 /*****************************************************************************
  * encoder_sys_t : libavcodec encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     /*
      * libavcodec properties
@@ -146,7 +146,7 @@ struct encoder_sys_t
     int        i_aac_profile; /* AAC profile to use.*/
 
     AVFrame    *frame;
-};
+} encoder_sys_t;
 
 
 /* Taken from audio.c*/

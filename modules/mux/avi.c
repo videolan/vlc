@@ -123,7 +123,7 @@ typedef struct avi_idx1_s
     avi_idx1_entry_t *entry;
 } avi_idx1_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     bool b_write_header;
 
@@ -136,7 +136,7 @@ struct sout_mux_sys_t
     avi_idx1_t idx1;
     off_t i_idx1_size;
 
-};
+} sout_mux_sys_t;
 
 #define HDR_BASE_SIZE 512 /* single video&audio ~ 400 bytes header */
 

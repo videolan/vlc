@@ -44,10 +44,10 @@ static void CloseRD( vlc_object_t * );
 VLC_SD_PROBE_HELPER( "Bonjour", N_("Bonjour Network Discovery"), SD_CAT_LAN )
 VLC_RD_PROBE_HELPER( "Bonjour_renderer", "Bonjour Renderer Discovery" )
 
-struct services_discovery_sys_t
+typedef struct services_discovery_sys_t
 {
     CFTypeRef _Nullable discoveryController;
-};
+} services_discovery_sys_t;
 
 struct vlc_renderer_discovery_sys
 {

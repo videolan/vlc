@@ -338,7 +338,6 @@ typedef struct date_t date_t;
 typedef struct playlist_t playlist_t;
 typedef struct playlist_item_t playlist_item_t;
 typedef struct services_discovery_t services_discovery_t;
-typedef struct services_discovery_sys_t services_discovery_sys_t;
 typedef struct vlc_renderer_discovery_t vlc_renderer_discovery_t;
 typedef struct vlc_renderer_item_t vlc_renderer_item_t;
 
@@ -352,14 +351,10 @@ typedef struct config_category_t config_category_t;
 typedef struct input_thread_t input_thread_t;
 typedef struct input_item_t input_item_t;
 typedef struct input_item_node_t input_item_node_t;
-typedef struct access_sys_t access_sys_t;
 typedef struct stream_t     stream_t;
-typedef struct stream_sys_t stream_sys_t;
 typedef struct stream_t demux_t;
-typedef struct demux_sys_t demux_sys_t;
 typedef struct es_out_t     es_out_t;
 typedef struct es_out_id_t  es_out_id_t;
-typedef struct es_out_sys_t es_out_sys_t;
 typedef struct seekpoint_t seekpoint_t;
 typedef struct info_t info_t;
 typedef struct info_category_t info_category_t;
@@ -374,7 +369,6 @@ typedef struct video_palette_t video_palette_t;
 
 /* Audio */
 typedef struct audio_output audio_output_t;
-typedef struct aout_sys_t aout_sys_t;
 typedef audio_format_t audio_sample_format_t;
 
 /* Video */
@@ -399,29 +393,23 @@ typedef struct sout_input_t sout_input_t;
 typedef struct sout_packetizer_input_t sout_packetizer_input_t;
 
 typedef struct sout_access_out_t sout_access_out_t;
-typedef struct sout_access_out_sys_t   sout_access_out_sys_t;
 
 typedef struct sout_mux_t sout_mux_t;
-typedef struct sout_mux_sys_t sout_mux_sys_t;
 
 typedef struct sout_stream_t    sout_stream_t;
-typedef struct sout_stream_sys_t sout_stream_sys_t;
 
 typedef struct config_chain_t       config_chain_t;
 typedef struct session_descriptor_t session_descriptor_t;
 
 /* Decoders */
 typedef struct decoder_t         decoder_t;
-typedef struct decoder_sys_t     decoder_sys_t;
 typedef struct decoder_synchro_t decoder_synchro_t;
 
 /* Encoders */
 typedef struct encoder_t      encoder_t;
-typedef struct encoder_sys_t  encoder_sys_t;
 
 /* Filters */
 typedef struct filter_t filter_t;
-typedef struct filter_sys_t filter_sys_t;
 
 /* Network */
 typedef struct vlc_url_t vlc_url_t;
@@ -438,13 +426,10 @@ typedef struct md5_s md5_t;
 
 /* XML */
 typedef struct xml_t xml_t;
-typedef struct xml_sys_t xml_sys_t;
 typedef struct xml_reader_t xml_reader_t;
-typedef struct xml_reader_sys_t xml_reader_sys_t;
 
 /* vod server */
 typedef struct vod_t     vod_t;
-typedef struct vod_sys_t vod_sys_t;
 typedef struct vod_media_t vod_media_t;
 
 /* VLM */

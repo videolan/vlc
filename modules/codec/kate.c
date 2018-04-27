@@ -63,7 +63,7 @@
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
 #ifdef ENABLE_PACKETIZER
     /* Module mode */
@@ -113,7 +113,7 @@ struct decoder_sys_t
      */
     bool   b_formatted;
     bool   b_use_tiger;
-};
+} decoder_sys_t;
 
 struct subpicture_updater_sys_t
 {

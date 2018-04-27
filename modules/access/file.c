@@ -64,12 +64,12 @@
 #include <vlc_url.h>
 #include <vlc_interrupt.h>
 
-struct access_sys_t
+typedef struct
 {
     int fd;
 
     bool b_pace_control;
-};
+} access_sys_t;
 
 #if !defined (_WIN32) && !defined (__OS2__)
 static bool IsRemote (int fd)

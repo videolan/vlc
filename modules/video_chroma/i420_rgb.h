@@ -34,7 +34,7 @@
  * This structure is part of the chroma transformation descriptor, it
  * describes the yuv2rgb specific properties.
  */
-struct filter_sys_t
+typedef struct
 {
     uint8_t  *p_buffer;
     int *p_offset;
@@ -54,7 +54,7 @@ struct filter_sys_t
     uint16_t  p_rgb_g[CMAP_RGB2_SIZE];  /**< Green values of palette */
     uint16_t  p_rgb_b[CMAP_RGB2_SIZE];  /**< Blue values of palette */
 #endif
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Prototypes

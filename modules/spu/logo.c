@@ -151,7 +151,7 @@ typedef struct
 /**
  * Private logo data holder
  */
-struct filter_sys_t
+typedef struct
 {
     filter_t *p_blend;
 
@@ -169,7 +169,7 @@ struct filter_sys_t
 
     /* */
     bool b_mouse_grab;
-};
+} filter_sys_t;
 
 static const char *const ppsz_filter_options[] = {
     "file", "x", "y", "delay", "repeat", "opacity", "position", NULL

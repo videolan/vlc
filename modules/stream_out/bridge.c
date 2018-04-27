@@ -215,7 +215,7 @@ static int OpenOut( vlc_object_t *p_this )
     p_stream->pf_del    = DelOut;
     p_stream->pf_send   = SendOut;
 
-    p_stream->p_sys     = (sout_stream_sys_t *)p_sys;
+    p_stream->p_sys     = p_sys;
     p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;
@@ -427,7 +427,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_stream->pf_del    = DelIn;
     p_stream->pf_send   = SendIn;
 
-    p_stream->p_sys     = (sout_stream_sys_t *)p_sys;
+    p_stream->p_sys     = p_sys;
     p_stream->pace_nocontrol = true;
 
     return VLC_SUCCESS;

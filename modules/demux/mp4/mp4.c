@@ -88,7 +88,7 @@ static int   DemuxRef( demux_t *p_demux ){ (void)p_demux; return 0;}
 static int   DemuxFrag( demux_t * );
 static int   Control ( demux_t *, int, va_list );
 
-struct demux_sys_t
+typedef struct
 {
     MP4_Box_t    *p_root;      /* container for the whole file */
 
@@ -141,7 +141,7 @@ struct demux_sys_t
     } hacks;
 
     mp4_fragments_index_t *p_fragsindex;
-};
+} demux_sys_t;
 
 #define DEMUX_INCREMENT (CLOCK_FREQ / 4) /* How far the pcr will go, each round */
 #define DEMUX_TRACK_MAX_PRELOAD (CLOCK_FREQ * 15) /* maximum preloading, to deal with interleaving */

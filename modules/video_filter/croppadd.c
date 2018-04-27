@@ -111,7 +111,7 @@ static const char *const ppsz_filter_options[] = {
     NULL
 };
 
-struct filter_sys_t
+typedef struct
 {
     int i_croptop;
     int i_cropbottom;
@@ -121,7 +121,7 @@ struct filter_sys_t
     int i_paddbottom;
     int i_paddleft;
     int i_paddright;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * OpenFilter: probe the filter and return score

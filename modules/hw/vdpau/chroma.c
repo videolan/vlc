@@ -36,7 +36,7 @@
 #define MAX_PAST   2
 #define MAX_FUTURE 1
 
-struct filter_sys_t
+typedef struct
 {
     vdp_t *vdp;
     VdpDevice device;
@@ -58,7 +58,7 @@ struct filter_sys_t
         float saturation;
         float hue;
     } procamp;
-};
+} filter_sys_t;
 
 /** Initialize the colour space conversion matrix */
 static VdpStatus MixerSetupColors(filter_t *filter, const VdpProcamp *procamp,

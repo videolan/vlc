@@ -82,10 +82,10 @@ static const char *const ppsz_filter_options[] = {
     "scheme", NULL
 };
 
-struct filter_sys_t
+typedef struct
 {
     int left, right;
-};
+} filter_sys_t;
 
 
 static int Create(vlc_object_t *p_this)

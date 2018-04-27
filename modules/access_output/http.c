@@ -91,7 +91,7 @@ static const char *const ppsz_sout_options[] = {
 static ssize_t Write( sout_access_out_t *, block_t * );
 static int Control( sout_access_out_t *, int, va_list );
 
-struct sout_access_out_sys_t
+typedef struct
 {
     /* host */
     httpd_host_t        *p_httpd_host;
@@ -106,7 +106,7 @@ struct sout_access_out_sys_t
     bool                b_header_complete;
     bool                b_metacube;
     bool                b_has_keyframes;
-};
+} sout_access_out_sys_t;
 
 /* Definitions for the Metacube2 protocol, used to communicate with Cubemap. */
 

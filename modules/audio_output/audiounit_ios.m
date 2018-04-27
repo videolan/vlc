@@ -77,7 +77,7 @@ static const struct {
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-struct aout_sys_t
+typedef struct aout_sys_t
 {
     struct aout_sys_common c;
 
@@ -93,7 +93,7 @@ struct aout_sys_t
     /* sw gain */
     float               soft_gain;
     bool                soft_mute;
-};
+} aout_sys_t;
 
 /* Soft volume helper */
 #include "audio_output/volume.h"

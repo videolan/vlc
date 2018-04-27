@@ -45,14 +45,14 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 vlc_module_end()
 
-struct decoder_sys_t
+typedef struct
 {
     date_t end_date;
 
     bool     is_pal;
     bool     is_12bit;
     uint16_t shuffle[2000];
-};
+} decoder_sys_t;
 
 static void Flush(decoder_t *dec)
 {

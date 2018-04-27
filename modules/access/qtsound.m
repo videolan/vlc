@@ -220,12 +220,12 @@ vlc_module_end ()
  * Struct
  *****************************************************************************/
 
-struct demux_sys_t {
+typedef struct demux_sys_t {
     QTCaptureSession * session;
     QTCaptureDevice * audiodevice;
     VLCDecompressedAudioOutput * audiooutput;
     es_out_id_t *p_es_audio;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Open: initialize interface

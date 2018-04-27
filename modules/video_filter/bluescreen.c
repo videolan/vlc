@@ -100,12 +100,12 @@ static const char *const ppsz_filter_options[] = {
     "u", "v", "ut", "vt", NULL
 };
 
-struct filter_sys_t
+typedef struct
 {
     vlc_mutex_t lock;
     int i_u, i_v, i_ut, i_vt;
     uint8_t *p_at;
-};
+} filter_sys_t;
 
 static int Create( vlc_object_t *p_this )
 {

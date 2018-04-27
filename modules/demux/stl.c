@@ -58,7 +58,8 @@ typedef struct {
     size_t  count;
 } stl_entry_t;
 
-struct demux_sys_t {
+typedef struct
+{
     size_t      count;
     stl_entry_t *index;
 
@@ -68,7 +69,7 @@ struct demux_sys_t {
     int64_t     next_date;
     bool        b_slave;
     bool        b_first_time;
-};
+} demux_sys_t;
 
 static size_t ParseInteger(uint8_t *data, size_t size)
 {

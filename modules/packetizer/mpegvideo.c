@@ -113,7 +113,7 @@ enum extension_start_code_identifier_e
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -173,7 +173,7 @@ struct decoder_sys_t
     mtime_t i_cc_pts;
     mtime_t i_cc_dts;
     cc_data_t cc;
-};
+} decoder_sys_t;
 
 static block_t *Packetize( decoder_t *, block_t ** );
 static void PacketizeFlush( decoder_t * );

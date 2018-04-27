@@ -50,12 +50,12 @@ static void LeaveMTA(void)
     CoUninitialize();
 }
 
-struct aout_sys_t
+typedef struct
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
     module_t *module;
     IAudioClient *client;
-};
+} aout_sys_t;
 
 static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 {

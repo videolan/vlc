@@ -249,7 +249,7 @@ typedef struct
 
 } dvbsub_page_t;
 
-struct decoder_sys_t
+typedef struct
 {
     bs_t               bs;
 
@@ -270,7 +270,7 @@ struct decoder_sys_t
     /* this is very small, so keep forever */
     dvbsub_display_t   display;
     dvbsub_clut_t      default_clut;
-};
+} decoder_sys_t;
 
 
 /* List of different SEGMENT TYPES */
@@ -1682,7 +1682,7 @@ typedef struct encoder_region_t
 
 } encoder_region_t;
 
-struct encoder_sys_t
+typedef struct
 {
     unsigned int i_page_ver;
     unsigned int i_region_ver;
@@ -1696,7 +1696,7 @@ struct encoder_sys_t
     /* subpicture positioning */
     int i_offset_x;
     int i_offset_y;
-};
+} encoder_sys_t;
 
 #ifdef ENABLE_SOUT
 static void encode_page_composition( encoder_t *, bs_t *, subpicture_t * );

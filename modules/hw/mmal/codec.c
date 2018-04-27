@@ -64,7 +64,8 @@ vlc_module_begin()
     set_callbacks(OpenDecoder, CloseDecoder)
 vlc_module_end()
 
-struct decoder_sys_t {
+typedef struct
+{
     bool opaque;
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
@@ -81,7 +82,7 @@ struct decoder_sys_t {
     int output_in_transit;
     int input_in_transit;
     atomic_bool started;
-};
+} decoder_sys_t;
 
 /* Utilities */
 static int change_output_format(decoder_t *dec);

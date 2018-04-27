@@ -91,14 +91,14 @@ struct  ci_filters_ctx
     filter_t *                  dst_converter;
 };
 
-struct filter_sys_t
+typedef struct filter_sys_t
 {
     char const *                psz_filter;
     bool                        mouse_moved;
     vlc_mouse_t                 old_mouse;
     vlc_mouse_t                 mouse;
     struct ci_filters_ctx *     ctx;
-};
+} filter_sys_t;
 
 struct  range
 {

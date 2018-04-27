@@ -93,7 +93,7 @@ struct sout_stream_id_sys_t
     bool b_wait_start;
 };
 
-struct sout_stream_sys_t
+typedef struct
 {
     char *psz_prefix;
 
@@ -110,7 +110,7 @@ struct sout_stream_sys_t
     int              i_id;
     sout_stream_id_sys_t **id;
     mtime_t     i_dts_start;
-};
+} sout_stream_sys_t;
 
 static void OutputStart( sout_stream_t *p_stream );
 static void OutputSend( sout_stream_t *p_stream, sout_stream_id_sys_t *id, block_t * );

@@ -76,7 +76,7 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     vlc_thread_t thread;
 
@@ -94,7 +94,7 @@ struct filter_sys_t
 
     /* FFT window parameters */
     window_param wind_param;
-};
+} filter_sys_t;
 
 
 static block_t *DoWork(filter_t *, block_t *);

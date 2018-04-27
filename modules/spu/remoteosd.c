@@ -148,6 +148,8 @@ vlc_module_end ()
 #define CHALLENGESIZE 16
 #define MAX_VNC_SERVER_NAME_LENGTH 255
 
+typedef struct filter_sys_t filter_sys_t;
+
 /* subsource functions */
 static subpicture_t *Filter( filter_t *, mtime_t );
 

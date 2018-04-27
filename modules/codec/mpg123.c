@@ -50,13 +50,13 @@ static vlc_mutex_t mpg123_mutex = VLC_STATIC_MUTEX;
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     mpg123_handle * p_handle;
     date_t          end_date;
     block_t       * p_out;
     bool            b_opened;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Module descriptor

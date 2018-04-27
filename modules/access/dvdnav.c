@@ -120,7 +120,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     dvdnav_t    *dvdnav;
 
@@ -165,7 +165,7 @@ struct demux_sys_t
     mtime_t     i_pgc_length;
     int         i_vobu_index;
     int         i_vobu_flush;
-};
+} demux_sys_t;
 
 static int Control( demux_t *, int, va_list );
 static int Demux( demux_t * );

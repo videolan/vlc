@@ -144,7 +144,7 @@ struct frame_info_t
 #define H264_MAX_DPB 16
 #define VT_MAX_SEI_COUNT 16
 
-struct decoder_sys_t
+typedef struct decoder_sys_t
 {
     CMVideoCodecType            codec;
     struct                      hxxx_helper hh;
@@ -191,7 +191,7 @@ struct decoder_sys_t
     date_t                      pts;
 
     struct pic_holder          *pic_holder;
-};
+} decoder_sys_t;
 
 struct pic_holder
 {

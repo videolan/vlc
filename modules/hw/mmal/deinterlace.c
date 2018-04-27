@@ -61,7 +61,8 @@ vlc_module_begin()
                     MMAL_DEINTERLACE_QPU_LONGTEXT, true);
 vlc_module_end()
 
-struct filter_sys_t {
+typedef struct
+{
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
     MMAL_PORT_T *output;
@@ -74,7 +75,7 @@ struct filter_sys_t {
     /* statistics */
     int output_in_transit;
     int input_in_transit;
-};
+} filter_sys_t;
 
 static void control_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);
 static void input_port_cb(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer);

@@ -54,7 +54,7 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t     *p_es;
 
@@ -64,7 +64,7 @@ struct demux_sys_t
     unsigned int    i_bitrate;
 
     date_t          pts;
-};
+} demux_sys_t;
 
 typedef struct xa_header_t
 {

@@ -66,7 +66,7 @@ vlc_module_end ()
  * Local structures
  ****************************************************************************/
 
-struct decoder_sys_t
+typedef struct
 {
     bool              b_a_profile;
     bool              b_ignore_ruby;
@@ -75,7 +75,7 @@ struct decoder_sys_t
 
     arib_instance_t  *p_arib_instance;
     char             *psz_arib_base_dir;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes

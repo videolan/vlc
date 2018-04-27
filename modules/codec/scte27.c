@@ -50,12 +50,13 @@ vlc_module_end ()
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
-struct decoder_sys_t {
+typedef struct
+{
     int     segment_id;
     int     segment_size;
     uint8_t *segment_buffer;
     mtime_t segment_date;
-};
+} decoder_sys_t;
 
 typedef struct {
     uint8_t y, u, v;

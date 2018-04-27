@@ -96,10 +96,10 @@ static void aom_err_msg(vlc_object_t *this, aom_codec_ctx_t *ctx,
 /*****************************************************************************
  * decoder_sys_t: libaom decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     aom_codec_ctx_t ctx;
-};
+} decoder_sys_t;
 
 static const struct
 {
@@ -327,10 +327,10 @@ static void CloseDecoder(vlc_object_t *p_this)
 /*****************************************************************************
  * encoder_sys_t: libaom encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     struct aom_codec_ctx ctx;
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder

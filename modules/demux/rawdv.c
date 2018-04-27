@@ -93,7 +93,7 @@ typedef struct {
     int8_t ap3;
 } dv_header_t;
 
-struct demux_sys_t
+typedef struct
 {
     int    frame_size;
 
@@ -110,7 +110,7 @@ struct demux_sys_t
     /* program clock reference (in units of 90kHz) */
     mtime_t i_pcr;
     bool b_hurry_up;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Local prototypes

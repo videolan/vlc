@@ -39,7 +39,7 @@ static block_t *Filter ( filter_t *, block_t * );
 static int paramCallback( vlc_object_t *, char const *, vlc_value_t ,
                             vlc_value_t , void * );
 
-struct filter_sys_t
+typedef struct
 {
     float *pf_ringbuf;  /* circular buffer to store samples */
     float *pf_write;    /* where to write current sample    */
@@ -48,7 +48,7 @@ struct filter_sys_t
     float f_feedback;
     float f_crossfeed;
     float f_dry_mix;
-};
+} filter_sys_t;
 
 #define HELP_TEXT N_("This filter enhances the stereo effect by "\
             "suppressing mono (signal common to both channels) "\

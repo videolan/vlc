@@ -46,7 +46,7 @@ static int Open_CVPX_to_CVPX(vlc_object_t *);
 static void Close_CVPX_to_CVPX(vlc_object_t *);
 #endif
 
-struct filter_sys_t
+typedef struct
 {
     CVPixelBufferPoolRef pool;
     union
@@ -60,7 +60,7 @@ struct filter_sys_t
         VTPixelTransferSessionRef vttransfer;
 #endif
     };
-};
+} filter_sys_t;
 
 vlc_module_begin ()
     set_description("Conversions from/to CoreVideo buffers")

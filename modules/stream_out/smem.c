@@ -145,7 +145,7 @@ struct sout_stream_id_sys_t
     void *p_data;
 };
 
-struct sout_stream_sys_t
+typedef struct
 {
     vlc_mutex_t *p_lock;
     void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer, size_t size );
@@ -153,7 +153,7 @@ struct sout_stream_sys_t
     void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, size_t size, mtime_t pts );
     void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, size_t size, mtime_t pts );
     bool time_sync;
-};
+} sout_stream_sys_t;
 
 void VideoPrerenderDefaultCallback( void* p_video_data, uint8_t** pp_pixel_buffer, size_t size );
 void AudioPrerenderDefaultCallback( void* p_audio_data, uint8_t** pp_pcm_buffer, size_t size );

@@ -169,7 +169,7 @@ struct ogg_skeleton_t
     int64_t        i_indexlastnum;
 };
 
-struct demux_sys_t
+typedef struct
 {
     ogg_sync_state oy;        /* sync and verify incoming physical bitstream */
 
@@ -236,7 +236,7 @@ struct demux_sys_t
 
     bool b_slave;
 
-};
+} demux_sys_t;
 
 
 unsigned const char * Read7BitsVariableLE( unsigned const char *,

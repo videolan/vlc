@@ -73,7 +73,7 @@ static int PacketizeValidate(void *p_private, block_t *);
 static bool ParseSEICallback( const hxxx_sei_data_t *, void * );
 static block_t *GetCc( decoder_t *, decoder_cc_desc_t * );
 
-struct decoder_sys_t
+typedef struct
 {
     /* */
     packetizer_t packetizer;
@@ -106,7 +106,7 @@ struct decoder_sys_t
 
     /* */
     cc_storage_t *p_ccs;
-};
+} decoder_sys_t;
 
 #define BLOCK_FLAG_DROP (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 

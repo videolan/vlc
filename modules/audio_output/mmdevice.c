@@ -74,7 +74,7 @@ static void LeaveMTA(void)
 static wchar_t default_device[1] = L"";
 static char default_device_b[1] = "";
 
-struct aout_sys_t
+typedef struct
 {
     aout_stream_t *stream; /**< Underlying audio output stream */
     module_t *module;
@@ -99,7 +99,7 @@ struct aout_sys_t
     CONDITION_VARIABLE work;
     CONDITION_VARIABLE ready;
     vlc_thread_t thread; /**< Thread for audio session control */
-};
+} aout_sys_t;
 
 /* NOTE: The Core Audio API documentation totally fails to specify the thread
  * safety (or lack thereof) of the interfaces. This code takes the most

@@ -47,7 +47,7 @@
 /*****************************************************************************
  * decoder_sys_t : theora decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /* Module mode */
     bool b_packetizer;
@@ -73,7 +73,7 @@ struct decoder_sys_t
      * Common properties
      */
     mtime_t i_pts;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * Local prototypes
@@ -662,7 +662,7 @@ static void theora_CopyPicture( picture_t *p_pic,
 /*****************************************************************************
  * encoder_sys_t : theora encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -675,7 +675,7 @@ struct encoder_sys_t
     th_info      ti;                     /* theora bitstream settings */
     th_comment   tc;                     /* theora comment header */
     th_enc_ctx   *tcx;                   /* theora context */
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder and return score

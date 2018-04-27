@@ -62,14 +62,14 @@ static block_t *BlockRead( stream_t *, bool * );
 static int     Seek( stream_t *, uint64_t );
 static int     Control( stream_t *, int, va_list );
 
-struct access_sys_t
+typedef struct
 {
     rtsp_client_t *p_rtsp;
 
     int fd;
 
     block_t *p_header;
-};
+} access_sys_t;
 
 /*****************************************************************************
  * Network wrappers

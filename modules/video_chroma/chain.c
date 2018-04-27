@@ -111,11 +111,11 @@ static const vlc_fourcc_t *get_allowed_chromas( filter_t *p_filter )
     }
 }
 
-struct filter_sys_t
+typedef struct
 {
     filter_chain_t *p_chain;
     filter_t *p_video_filter;
-};
+} filter_sys_t;
 
 /* Restart filter callback */
 static int RestartFilterCallback( vlc_object_t *obj, char const *psz_name,

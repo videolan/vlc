@@ -536,7 +536,7 @@ struct picture_free_t
 /*****************************************************************************
  * decoder_sys_t : Schroedinger decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Dirac properties
@@ -545,7 +545,7 @@ struct decoder_sys_t
     mtime_t i_frame_pts_delta;
     SchroDecoder *p_schro;
     SchroVideoFormat *p_format;
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -891,7 +891,7 @@ struct picture_pts_t
  * encoder_sys_t : Schroedinger encoder descriptor
  *****************************************************************************/
 #define SCHRO_PTS_TLB_SIZE 256
-struct encoder_sys_t
+typedef struct
 {
     /*
      * Schro properties
@@ -912,7 +912,7 @@ struct encoder_sys_t
 
     bool b_eos_signalled;
     bool b_eos_pulled;
-};
+} encoder_sys_t;
 
 static struct
 {

@@ -133,13 +133,13 @@ static int OpenEncoder ( vlc_object_t *p_this )
 #endif
 
 /*** Demuxer ***/
-struct demux_sys_t
+typedef struct
 {
     es_format_t     fmt;
     es_out_id_t     *p_es;
 
     date_t          pts;
-};
+} demux_sys_t;
 
 static int Demux( demux_t *p_demux )
 {

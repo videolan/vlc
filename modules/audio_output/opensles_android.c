@@ -80,7 +80,7 @@ typedef SLresult (*slCreateEngine_t)(
 /*****************************************************************************
  *
  *****************************************************************************/
-struct aout_sys_t
+typedef struct
 {
     /* OpenSL objects */
     SLObjectItf                     engineObject;
@@ -118,7 +118,7 @@ struct aout_sys_t
     block_t                        *p_buffer_chain;
     block_t                       **pp_buffer_last;
     size_t                          samples;
-};
+} aout_sys_t;
 
 /*****************************************************************************
  * Local prototypes.

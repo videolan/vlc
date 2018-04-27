@@ -57,11 +57,11 @@ vlc_module_begin ()
     set_callbacks( Open, Close )
 vlc_module_end ()
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_description_data_t *data;
     mtime_t i_stream_start;
-};
+} sout_stream_sys_t;
 
 /*****************************************************************************
  * Open:

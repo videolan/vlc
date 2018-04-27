@@ -66,12 +66,12 @@ typedef struct jpeg_sys_t jpeg_sys_t;
 /*
  * jpeg decoder descriptor
  */
-struct decoder_sys_t
+typedef struct
 {
     JPEG_SYS_COMMON_MEMBERS
 
     struct jpeg_decompress_struct p_jpeg;
-};
+} decoder_sys_t;
 
 static int  OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
@@ -81,7 +81,7 @@ static int DecodeBlock(decoder_t *, block_t *);
 /*
  * jpeg encoder descriptor
  */
-struct encoder_sys_t
+typedef struct
 {
     JPEG_SYS_COMMON_MEMBERS
 
@@ -89,7 +89,7 @@ struct encoder_sys_t
 
     int i_blocksize;
     int i_quality;
-};
+} encoder_sys_t;
 
 static const char * const ppsz_enc_options[] = {
     "quality",

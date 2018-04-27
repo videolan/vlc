@@ -211,7 +211,7 @@ static void         Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_update
 /* It will be enough up to 63 B frames, which is far too high for
  * broadcast environment */
 #define CC_MAX_REORDER_SIZE (64)
-struct decoder_sys_t
+typedef struct
 {
     int      i_queue;
     block_t *p_queue;
@@ -226,7 +226,7 @@ struct decoder_sys_t
     cea708_t *p_cea708;
     eia608_t *p_eia608;
     bool b_opaque;
-};
+} decoder_sys_t;
 
 static int Decode( decoder_t *, block_t * );
 static void Flush( decoder_t * );

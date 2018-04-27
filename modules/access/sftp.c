@@ -82,7 +82,7 @@ static int      Control( stream_t *, int, va_list );
 
 static int DirRead( stream_t *, input_item_node_t * );
 
-struct access_sys_t
+typedef struct
 {
     int i_socket;
     LIBSSH2_SESSION* ssh_session;
@@ -90,7 +90,7 @@ struct access_sys_t
     LIBSSH2_SFTP_HANDLE* file;
     uint64_t filesize;
     char *psz_base_url;
-};
+} access_sys_t;
 
 static int AuthKeyAgent( stream_t *p_access, const char *psz_username )
 {

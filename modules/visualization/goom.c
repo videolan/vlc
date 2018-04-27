@@ -100,11 +100,11 @@ typedef struct
 
 } goom_thread_t;
 
-struct filter_sys_t
+typedef struct
 {
     goom_thread_t *p_thread;
 
-};
+} filter_sys_t;
 
 static block_t *DoWork ( filter_t *, block_t * );
 

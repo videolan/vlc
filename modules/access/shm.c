@@ -110,6 +110,8 @@ vlc_module_begin ()
     add_shortcut ("shm")
 vlc_module_end ()
 
+typedef struct demux_sys_t demux_sys_t;
+
 static int Control (demux_t *, int, va_list);
 static void DemuxFile (void *);
 static void CloseFile (demux_sys_t *);

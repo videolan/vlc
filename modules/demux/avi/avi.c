@@ -168,7 +168,7 @@ typedef struct
 
 } avi_track_t;
 
-struct demux_sys_t
+typedef struct
 {
     mtime_t i_time;
     mtime_t i_length;
@@ -195,7 +195,7 @@ struct demux_sys_t
 
     unsigned int       i_attachment;
     input_attachment_t **attachment;
-};
+} demux_sys_t;
 
 #define __EVEN(x) (((x) & 1) ? (x) + 1 : (x))
 

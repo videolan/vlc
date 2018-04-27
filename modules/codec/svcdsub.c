@@ -79,7 +79,7 @@ typedef enum  {
   SUBTITLE_BLOCK_COMPLETE = 2
 } packet_state_t;
 
-struct decoder_sys_t
+typedef struct
 {
   packet_state_t i_state; /* data-gathering state for this subtitle */
 
@@ -106,7 +106,7 @@ struct decoder_sys_t
   uint16_t i_width, i_height;    /* dimensions in pixels of image */
 
   uint8_t p_palette[4][4];       /* Palette of colors used in subtitle */
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * DecoderOpen: open/initialize the svcdsub decoder.

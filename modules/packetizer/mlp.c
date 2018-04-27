@@ -70,7 +70,7 @@ typedef struct
 
 } mlp_header_t;
 
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -90,7 +90,7 @@ struct decoder_sys_t
 
     bool         b_mlp;
     mlp_header_t mlp;
-};
+} decoder_sys_t;
 
 #define MLP_MAX_SUBSTREAMS (16)
 #define MLP_HEADER_SYNC (28)

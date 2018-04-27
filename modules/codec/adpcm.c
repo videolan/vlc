@@ -65,7 +65,7 @@ enum adpcm_codec_e
     ADPCM_EA
 };
 
-struct decoder_sys_t
+typedef struct
 {
     enum adpcm_codec_e codec;
 
@@ -74,7 +74,7 @@ struct decoder_sys_t
 
     date_t              end_date;
     int16_t            *prev;
-};
+} decoder_sys_t;
 
 static void DecodeAdpcmMs    ( decoder_t *, int16_t *, uint8_t * );
 static void DecodeAdpcmImaWav( decoder_t *, int16_t *, uint8_t * );

@@ -109,7 +109,7 @@ vlc_module_end ()
  *****************************************************************************/
 static vlc_mutex_t libmodplug_lock = VLC_STATIC_MUTEX;
 
-struct demux_sys_t
+typedef struct
 {
     es_format_t  fmt;
     es_out_id_t *es;
@@ -120,7 +120,7 @@ struct demux_sys_t
     int         i_data;
     uint8_t     *p_data;
     ModPlugFile *f;
-};
+} demux_sys_t;
 
 static int Demux  ( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );

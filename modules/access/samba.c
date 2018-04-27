@@ -38,12 +38,12 @@
 
 #include "smb_common.h"
 
-struct access_sys_t
+typedef struct
 {
     int i_smb;
     uint64_t size;
     vlc_url_t url;
-};
+} access_sys_t;
 
 /* Build an SMB URI
  * smb://[[[domain;]user[:password@]]server[/share[/path[/file]]]] */

@@ -61,7 +61,7 @@ struct atomic_operation_t
     double d_amplitude_factor;
 };
 
-struct filter_sys_t
+typedef struct
 {
     bool b_downmix;
 
@@ -73,7 +73,7 @@ struct filter_sys_t
     uint8_t * p_overflow_buffer;
     unsigned int i_nb_atomic_operations;
     struct atomic_operation_t * p_atomic_operations;
-};
+} filter_sys_t;
 
 #define MONO_DOWNMIX_TEXT N_("Use downmix algorithm")
 #define MONO_DOWNMIX_LONGTEXT N_("This option selects a stereo to mono " \
@@ -135,7 +135,7 @@ vlc_module_end ()
  *
  *          x-axis
  *  */
-static void ComputeChannelOperations( struct filter_sys_t * p_data,
+static void ComputeChannelOperations( filter_sys_t * p_data,
         unsigned int i_rate, unsigned int i_next_atomic_operation,
         int i_source_channel_offset, double d_x, double d_z,
         double d_compensation_length, double d_channel_amplitude_factor )
@@ -192,7 +192,7 @@ static void ComputeChannelOperations( struct filter_sys_t * p_data,
     }
 }
 
-static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data,
+static int Init( vlc_object_t *p_this, filter_sys_t * p_data,
                  unsigned int i_nb_channels, uint32_t i_physical_channels,
                  unsigned int i_rate )
 {

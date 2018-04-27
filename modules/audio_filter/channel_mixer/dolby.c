@@ -58,7 +58,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Internal data structures
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     int i_left;
     int i_center;
@@ -66,7 +66,7 @@ struct filter_sys_t
     int i_rear_left;
     int i_rear_center;
     int i_rear_right;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocate headphone downmixer

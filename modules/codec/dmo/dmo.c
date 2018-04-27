@@ -117,7 +117,7 @@ vlc_module_end ()
 /****************************************************************************
  * Decoder descriptor declaration
  ****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     HINSTANCE hmsdmo_dll;
     IMediaObject *p_dmo;
@@ -132,7 +132,7 @@ struct decoder_sys_t
     vlc_cond_t   wait_input, wait_output;
     bool         b_ready, b_works;
     block_t     *p_input;
-};
+} decoder_sys_t;
 
 const GUID IID_IWMCodecPrivateData = {0x73f0be8e, 0x57f7, 0x4f01, {0xaa, 0x66, 0x9f, 0x57, 0x34, 0xc, 0xfe, 0xe}};
 const GUID IID_IMediaObject = {0xd8ad0f58, 0x5494, 0x4102, {0x97, 0xc5, 0xec, 0x79, 0x8e, 0x59, 0xbc, 0xf4}};
@@ -1043,7 +1043,7 @@ static void *DecoderThread( void *data )
 /****************************************************************************
  * Encoder descriptor declaration
  ****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     HINSTANCE hmsdmo_dll;
     IMediaObject *p_dmo;
@@ -1052,7 +1052,7 @@ struct encoder_sys_t
 
     date_t end_date;
 
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * EncoderOpen: open dmo codec

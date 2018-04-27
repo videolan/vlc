@@ -532,7 +532,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_dec->pf_decode = Decode;
 
-    p_dec->p_sys = (decoder_sys_t *) text_style_Create( STYLE_NO_DEFAULTS );
+    p_dec->p_sys = text_style_Create( STYLE_NO_DEFAULTS );
     if( !p_dec->p_sys )
         return VLC_ENOMEM;
 

@@ -73,7 +73,7 @@ typedef uint32_t uni_char_t;
  * It describes the freetype specific properties of an output thread.
  *****************************************************************************/
 typedef struct vlc_family_t vlc_family_t;
-struct filter_sys_t
+typedef struct
 {
     FT_Library     p_library;       /* handle to library     */
     FT_Face        p_face;          /* handle to face object */
@@ -141,7 +141,7 @@ struct filter_sys_t
 #if defined( _WIN32 )
     void *p_dw_sys;
 #endif
-};
+} filter_sys_t;
 
 /**
  * Selects and loads the right font

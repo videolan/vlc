@@ -54,7 +54,7 @@ vlc_module_end()
 /*****************************************************************************
  * decoder_sys_t : FLAC decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -83,7 +83,7 @@ struct decoder_sys_t
     uint8_t *p_buf;
 
     int i_next_block_flags;
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[9] =
 {

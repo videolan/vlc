@@ -100,11 +100,11 @@ static const struct
 /*****************************************************************************
  * filter_sys_t: adjust filter method descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     SepiaFunction pf_sepia;
     atomic_int i_intensity;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create: allocates Sepia video thread output method

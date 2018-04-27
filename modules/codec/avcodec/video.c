@@ -63,7 +63,7 @@ struct frame_info_s
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     AVCodecContext *p_context;
     const AVCodec  *p_codec;
@@ -111,7 +111,7 @@ struct decoder_sys_t
     int level;
 
     vlc_sem_t sem_mt;
-};
+} decoder_sys_t;
 
 static inline void wait_mt(decoder_sys_t *sys)
 {

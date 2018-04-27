@@ -84,7 +84,7 @@ static const struct error_messages_s const bcas_errors[] =
     { 0, NULL },
 };
 
-struct stream_sys_t
+typedef struct
 {
     ARIB_STD_B25 *p_b25;
     B_CAS_CARD   *p_bcas;
@@ -94,7 +94,7 @@ struct stream_sys_t
         size_t   i_size;
         block_t *p_list;
     } remain;
-};
+} stream_sys_t;
 
 static const char * GetErrorMessage( const int i_error,
                                const struct error_messages_s const *p_errors_messages )

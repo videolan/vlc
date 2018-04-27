@@ -131,7 +131,7 @@ static const char *const ppsz_enc_options[] = {
 /*****************************************************************************
  * encoder_sys_t : aac encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     double d_compression_ratio;
     mtime_t i_pts_last;
@@ -139,7 +139,7 @@ struct encoder_sys_t
     int i_frame_size;
     int i_maxoutputsize; /* Maximum buffer size for encoded output */
     HANDLE_AACENCODER handle;
-};
+} encoder_sys_t;
 
 static const char *fdkaac_error(AACENC_ERROR erraac)
 {

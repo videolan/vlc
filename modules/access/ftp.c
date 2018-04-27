@@ -107,6 +107,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+typedef struct access_sys_t access_sys_t;
+
 static ssize_t Read( stream_t *, void *, size_t );
 static int Seek( stream_t *, uint64_t );
 static int Control( stream_t *, int, va_list );

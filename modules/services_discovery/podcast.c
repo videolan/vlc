@@ -83,7 +83,7 @@ enum {
   UPDATE_REQUEST
 }; /* FIXME Temporary. Updating by compound urls string to be removed later. */
 
-struct services_discovery_sys_t
+typedef struct
 {
     /* playlist node */
     input_thread_t **pp_input;
@@ -102,7 +102,7 @@ struct services_discovery_sys_t
     bool b_savedurls_loaded;
     char *psz_request;
     int update_type;
-};
+} services_discovery_sys_t;
 
 /*****************************************************************************
  * Local prototypes

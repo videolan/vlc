@@ -60,7 +60,7 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
-struct demux_sys_t
+typedef struct
 {
     /* */
     es_out_id_t *p_es;
@@ -75,7 +75,7 @@ struct demux_sys_t
     /* */
     vlc_meta_t     *p_meta;
     int64_t        i_start;
-};
+} demux_sys_t;
 
 /*****************************************************************************
  * Open: initializes ES structures

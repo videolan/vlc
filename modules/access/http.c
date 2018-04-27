@@ -79,7 +79,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-struct access_sys_t
+typedef struct
 {
     int fd;
 
@@ -115,7 +115,7 @@ struct access_sys_t
 
     bool b_reconnect;
     bool b_has_size;
-};
+} access_sys_t;
 
 /* */
 static ssize_t Read( stream_t *, void *, size_t );

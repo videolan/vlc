@@ -73,7 +73,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct demux_sys_t
+typedef struct
 {
     es_out_id_t *p_es;
 
@@ -82,7 +82,7 @@ struct demux_sys_t
     unsigned    frame_rate_den;
 
     decoder_t *p_packetizer;
-};
+} demux_sys_t;
 
 static int Demux( demux_t * );
 static int Control( demux_t *, int, va_list );

@@ -14,7 +14,7 @@
 /*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT 100000
 
-struct sout_stream_sys_t
+typedef struct
 {
     sout_stream_id_sys_t *id_video;
     block_t         *p_buffers;
@@ -68,7 +68,7 @@ struct sout_stream_sys_t
     bool            b_master_sync;
     /* i_master drift is how much audio buffer is ahead of calculated pts */
     mtime_t         i_master_drift;
-};
+} sout_stream_sys_t;
 
 struct aout_filters;
 

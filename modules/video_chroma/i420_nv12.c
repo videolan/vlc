@@ -34,10 +34,10 @@
 #include <vlc_picture.h>
 #include "copy.h"
 
-struct filter_sys_t
+typedef struct
 {
     copy_cache_t cache;
-};
+} filter_sys_t;
 
 #define GET_PITCHES( pic ) { \
     pic->p[Y_PLANE].i_pitch, \

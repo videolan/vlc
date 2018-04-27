@@ -52,12 +52,12 @@ set_capability("text renderer", 0)
 set_callbacks(Create, Destroy)
 vlc_module_end ()
 
-struct filter_sys_t
+typedef struct filter_sys_t
 {
     NSSpeechSynthesizer *speechSynthesizer;
     NSString *currentLocale;
     NSString *lastString;
-};
+} filter_sys_t;
 
 static int  Create (vlc_object_t *p_this)
 {

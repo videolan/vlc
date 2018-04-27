@@ -40,7 +40,8 @@
 #   define MOD(a, b) ((((a)%(b)) + (b))%(b))
 #endif
 
-struct filter_sys_t {
+typedef struct
+{
     bool b_init;
 
     int32_t i_planes;
@@ -51,7 +52,7 @@ struct filter_sys_t {
     int16_t **pi_freezing_countdown; /* freezed pixel delay    */
     bool    **pb_update_cache;       /* update chache request  */
 
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Prototypes

@@ -106,7 +106,7 @@ static const char *const ppsz_filter_options[] = {
 /*****************************************************************************
  * filter_sys_t : libpostproc video postprocessing descriptor
  *****************************************************************************/
-struct filter_sys_t
+typedef struct
 {
     /* Never changes after init */
     pp_context *pp_context;
@@ -116,7 +116,7 @@ struct filter_sys_t
 
     /* Lock when using or changing pp_mode */
     vlc_mutex_t lock;
-};
+} filter_sys_t;
 
 
 /*****************************************************************************

@@ -72,7 +72,7 @@ static void RenderImage( decoder_t *, block_t *, subpicture_region_t * );
 #define SUBTITLE_BLOCK_PARTIAL 1
 #define SUBTITLE_BLOCK_COMPLETE 2
 
-struct decoder_sys_t
+typedef struct
 {
   int      b_packetizer;
 
@@ -100,7 +100,7 @@ struct decoder_sys_t
 
   uint8_t p_palette[4][4];       /* Palette of colors used in subtitle */
   uint8_t p_palette_highlight[4][4];
-};
+} decoder_sys_t;
 
 /*****************************************************************************
  * DecoderOpen: open/initialize the cvdsub decoder.

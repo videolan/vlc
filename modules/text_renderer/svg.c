@@ -54,11 +54,11 @@ static int  RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
                         subpicture_region_t *p_region_in,
                         const vlc_fourcc_t * );
 
-struct filter_sys_t
+typedef struct
 {
     char *psz_file_template;
     const char *psz_token;
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Module descriptor

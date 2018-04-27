@@ -96,10 +96,10 @@ static void vpx_err_msg(vlc_object_t *this, struct vpx_codec_ctx *ctx,
 /*****************************************************************************
  * decoder_sys_t: libvpx decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     struct vpx_codec_ctx ctx;
-};
+} decoder_sys_t;
 
 static const struct
 {
@@ -364,11 +364,11 @@ static void CloseDecoder(vlc_object_t *p_this)
 /*****************************************************************************
  * encoder_sys_t: libvpx encoder descriptor
  *****************************************************************************/
-struct encoder_sys_t
+typedef struct
 {
     struct vpx_codec_ctx ctx;
     unsigned long quality;
-};
+} encoder_sys_t;
 
 /*****************************************************************************
  * OpenEncoder: probe the encoder

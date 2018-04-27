@@ -31,10 +31,10 @@
 #include <vlc_picture.h>
 #include "vlc_vdpau.h"
 
-struct filter_sys_t
+typedef struct
 {
     mtime_t last_pts;
-};
+} filter_sys_t;
 
 static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 {

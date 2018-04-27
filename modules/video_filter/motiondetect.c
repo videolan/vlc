@@ -66,7 +66,7 @@ static int FindShapes( uint32_t *, uint32_t *, int, int, int,
 static void Draw( filter_t *p_filter, uint8_t *p_pix, int i_pix_pitch, int i_pix_size );
 #define NUM_COLORS (5000)
 
-struct filter_sys_t
+typedef struct
 {
     bool is_yuv_planar;
     picture_t *p_old;
@@ -80,7 +80,7 @@ struct filter_sys_t
     int color_x_max[NUM_COLORS];
     int color_y_min[NUM_COLORS];
     int color_y_max[NUM_COLORS];
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Create

@@ -96,7 +96,7 @@ typedef struct rss_feed_t
     rss_item_t *p_items;
 } rss_feed_t;
 
-struct filter_sys_t
+typedef struct
 {
     vlc_mutex_t lock;
     vlc_timer_t timer;  /* Timer to refresh the rss feeds */
@@ -122,7 +122,7 @@ struct filter_sys_t
     int i_cur_feed;
     int i_cur_item;
     int i_cur_char;
-};
+} filter_sys_t;
 
 #define MSG_TEXT N_("Feed URLs")
 #define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) separated URLs.")

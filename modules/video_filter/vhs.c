@@ -50,7 +50,8 @@ typedef struct {
     mtime_t  i_stop_trigger;
 } blue_red_line_t;
 
-struct filter_sys_t {
+typedef struct
+{
 
     /* general data */
     bool b_init;
@@ -77,7 +78,7 @@ struct filter_sys_t {
     mtime_t  i_BR_line_trigger;
     blue_red_line_t *p_BR_lines[MAX_BLUE_RED_LINES];
 
-};
+} filter_sys_t;
 
 /*****************************************************************************
  * Prototypes

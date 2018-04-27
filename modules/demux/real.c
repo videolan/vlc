@@ -117,7 +117,7 @@ typedef struct
     uint32_t i_frame_index;
 } real_index_t;
 
-struct demux_sys_t
+typedef struct
 {
     int64_t  i_data_offset;
     int64_t  i_data_size;
@@ -145,7 +145,7 @@ struct demux_sys_t
     int64_t     i_index_offset;
     bool        b_seek;
     real_index_t *p_index;
-};
+} demux_sys_t;
 
 static const unsigned char i_subpacket_size_sipr[4] = { 29, 19, 37, 20 };
 

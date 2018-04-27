@@ -50,7 +50,7 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-struct demux_sys_t
+typedef struct
 {
     pa_stream *stream; /**< PulseAudio playback stream object */
     pa_context *context; /**< PulseAudio connection context */
@@ -60,7 +60,7 @@ struct demux_sys_t
     bool discontinuity; /**< The next block will not follow the last one */
     unsigned framesize; /**< Byte size of a sample */
     mtime_t caching; /**< Caching value */
-};
+} demux_sys_t;
 
 /* Stream helpers */
 static void stream_state_cb(pa_stream *s, void *userdata)

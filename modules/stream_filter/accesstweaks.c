@@ -50,12 +50,12 @@ vlc_module_begin ()
     add_shortcut("tweaks")
 vlc_module_end ()
 
-struct stream_sys_t
+typedef struct
 {
     bool b_seek;
     bool b_fastseek;
     bool b_size;
-};
+} stream_sys_t;
 
 /**
  *

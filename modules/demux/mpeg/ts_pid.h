@@ -26,6 +26,8 @@
 
 #include "ts_streams.h"
 
+typedef struct demux_sys_t demux_sys_t;
+
 typedef enum
 {
     TYPE_FREE = 0,

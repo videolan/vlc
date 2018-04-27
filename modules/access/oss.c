@@ -108,7 +108,7 @@ struct buffer_t
     size_t  length;
 };
 
-struct demux_sys_t
+typedef struct
 {
     const char *psz_device;  /* OSS device from MRL */
 
@@ -122,7 +122,7 @@ struct demux_sys_t
     es_out_id_t *p_es;
 
     int64_t i_next_demux_date; /* Used to handle oss:// as input-slave properly */
-};
+} demux_sys_t;
 
 static int FindMainDevice( demux_t *p_demux )
 {

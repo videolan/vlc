@@ -121,7 +121,7 @@ typedef struct hdsdi_audio_t
     es_out_id_t *p_es;
 } hdsdi_audio_t;
 
-struct demux_sys_t
+typedef struct
 {
     /* video device reader */
     int          i_vfd;
@@ -157,7 +157,7 @@ struct demux_sys_t
 
     pthread_t thread;
     int evfd;
-};
+} demux_sys_t;
 
 static int Control( demux_t *, int, va_list );
 static void *Demux( void * );

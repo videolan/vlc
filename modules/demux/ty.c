@@ -212,7 +212,7 @@ typedef struct
 
 } xds_t;
 
-struct demux_sys_t
+typedef struct
 {
   es_out_id_t *p_video;               /* ptr to video codec */
   es_out_id_t *p_audio;               /* holds either ac3 or mpeg codec ptr */
@@ -254,7 +254,7 @@ struct demux_sys_t
   ty_seq_table_t  *seq_table;         /* table of SEQ entries from mstr chk */
   bool      eof;
   bool      b_first_chunk;
-};
+} demux_sys_t;
 
 static int get_chunk_header(demux_t *);
 static mtime_t get_pts( const uint8_t *buf );

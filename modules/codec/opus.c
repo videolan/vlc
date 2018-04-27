@@ -77,7 +77,7 @@ vlc_module_end ()
 /*****************************************************************************
  * decoder_sys_t : opus decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Input properties
@@ -94,7 +94,7 @@ struct decoder_sys_t
      * Common properties
      */
     date_t end_date;
-};
+} decoder_sys_t;
 
 static const int pi_channels_maps[9] =
 {
@@ -518,7 +518,7 @@ static void CloseDecoder( vlc_object_t *p_this )
    packet per page. */
 static const unsigned OPUS_FRAME_SIZE = 960; /* 48000 * 20 / 1000 */
 
-struct encoder_sys_t
+typedef struct
 {
     OpusMSEncoder *enc;
     float *buffer;
@@ -526,7 +526,7 @@ struct encoder_sys_t
     int i_samples_delay;
     block_t *padding;
     int nb_streams;
-};
+} encoder_sys_t;
 
 static unsigned fill_buffer(encoder_t *enc, unsigned src_start, block_t *src,
                             unsigned samples)

@@ -62,7 +62,7 @@ void *rtp_dgram_thread (void *data);
 void *rtp_stream_thread (void *data);
 
 /* Global data */
-struct demux_sys_t
+typedef struct
 {
     rtp_session_t *session;
     struct vlc_demux_chained_t *chained_demux;
@@ -79,5 +79,5 @@ struct demux_sys_t
     uint8_t       max_src; /**< Max simultaneous RTP sources */
     bool          thread_ready;
     bool          autodetect; /**< Payload type autodetection pending */
-};
+} demux_sys_t;
 

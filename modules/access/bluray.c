@@ -145,7 +145,7 @@ typedef struct bluray_overlay_t
     struct subpicture_updater_sys_t *p_updater;
 } bluray_overlay_t;
 
-struct  demux_sys_t
+typedef struct
 {
     BLURAY              *bluray;
 
@@ -200,7 +200,7 @@ struct  demux_sys_t
 
     /* Used to store bluray disc path */
     char                *psz_bd_path;
-};
+} demux_sys_t;
 
 struct subpicture_updater_sys_t
 {
@@ -921,9 +921,10 @@ static void blurayClose(vlc_object_t *object)
  * Elementary streams handling
  *****************************************************************************/
 
-struct es_out_sys_t {
+typedef struct
+{
     demux_t *p_demux;
-};
+} es_out_sys_t;
 
 typedef struct  fmt_es_pair {
     int         i_id;

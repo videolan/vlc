@@ -109,7 +109,7 @@ static int Control( sout_access_out_t *, int, va_list );
 static void* ThreadWrite( void * );
 static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
 
-struct sout_access_out_sys_t
+typedef struct
 {
     mtime_t       i_caching;
     int           i_handle;
@@ -121,7 +121,7 @@ struct sout_access_out_sys_t
     block_t      *p_buffer;
 
     vlc_thread_t  thread;
-};
+} sout_access_out_sys_t;
 
 #define DEFAULT_PORT 1234
 

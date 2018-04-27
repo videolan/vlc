@@ -130,7 +130,7 @@ typedef struct
 
 } asf_track_t;
 
-struct sout_mux_sys_t
+typedef struct
 {
     guid_t          fid;    /* file id */
     int             i_packet_size;
@@ -159,7 +159,7 @@ struct sout_mux_sys_t
     char            *psz_copyright;
     char            *psz_comment;
     char            *psz_rating;
-};
+} sout_mux_sys_t;
 
 static block_t *asf_header_create( sout_mux_t *, bool );
 static block_t *asf_packet_create( sout_mux_t *, asf_track_t *, block_t * );

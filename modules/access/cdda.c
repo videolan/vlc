@@ -115,7 +115,7 @@ static vcddev_t *DiscOpen(vlc_object_t *obj, const char *location,
 /* how many blocks Demux() will read in each iteration */
 #define CDDA_BLOCKS_ONCE 20
 
-struct demux_sys_t
+typedef struct
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
     es_out_id_t *es;
@@ -124,7 +124,7 @@ struct demux_sys_t
     unsigned start; /**< Track first sector */
     unsigned length; /**< Track total sectors */
     unsigned position; /**< Current offset within track sectors */
-};
+} demux_sys_t;
 
 static int Demux(demux_t *demux)
 {
@@ -269,7 +269,7 @@ error:
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
-struct access_sys_t
+typedef struct
 {
     vcddev_t    *vcddev;                            /* vcd device descriptor */
     int         *p_sectors;                                 /* Track sectors */
@@ -279,7 +279,7 @@ struct access_sys_t
 #ifdef HAVE_LIBCDDB
     cddb_disc_t *cddb;
 #endif
-};
+} access_sys_t;
 
 #ifdef HAVE_LIBCDDB
 static cddb_disc_t *GetCDDBInfo( vlc_object_t *obj, int i_titles, int *p_sectors )

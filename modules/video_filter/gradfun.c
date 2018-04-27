@@ -102,13 +102,14 @@ vlc_module_end()
 static picture_t *Filter(filter_t *, picture_t *);
 static int Callback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
 
-struct filter_sys_t {
+typedef struct
+{
     vlc_mutex_t      lock;
     float            strength;
     int              radius;
     const vlc_chroma_description_t *chroma;
     struct vf_priv_s cfg;
-};
+} filter_sys_t;
 
 static int Open(vlc_object_t *object)
 {

@@ -103,7 +103,7 @@ static int OpenResampler (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
-    filter->p_sys = (filter_sys_t *)s;
+    filter->p_sys = s;
     filter->pf_audio_filter = Resample;
     return VLC_SUCCESS;
 }

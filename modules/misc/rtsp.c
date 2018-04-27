@@ -162,7 +162,7 @@ struct vod_media_t
     mtime_t i_length;
 };
 
-struct vod_sys_t
+typedef struct
 {
     /* RTSP server */
     httpd_host_t *p_rtsp_host;
@@ -182,7 +182,7 @@ struct vod_sys_t
     /* */
     vlc_thread_t thread;
     block_fifo_t *p_fifo_cmd;
-};
+} vod_sys_t;
 
 /* rtsp delayed command (to avoid deadlock between vlm/httpd) */
 typedef enum

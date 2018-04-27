@@ -58,13 +58,13 @@ vlc_module_end ()
 /*****************************************************************************
  * decoder_sys_t : aes3 decoder descriptor
  *****************************************************************************/
-struct decoder_sys_t
+typedef struct
 {
     /*
      * Output properties
      */
     date_t end_date;
-};
+} decoder_sys_t;
 
 #define AES3_HEADER_LEN 4
 

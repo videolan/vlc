@@ -97,10 +97,10 @@ struct discovery_sys
     vlc_array_t         items;
 };
 
-struct services_discovery_sys_t
+typedef struct
 {
     struct discovery_sys s;
-};
+} services_discovery_sys_t;
 
 struct vlc_renderer_discovery_sys
 {
