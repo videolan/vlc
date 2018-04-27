@@ -65,10 +65,6 @@ static const char *const output_list[] = { "none", "input", "processed"};
 static const char *const output_list_text[] = { N_("Don't display any video"),
   N_("Display the input video"), N_("Display the processed video")};
 
-static const char *const verbosity_list[] = { "error", "warning", "debug"};
-static const char *const verbosity_list_text[] = { N_("Show only errors"),
-  N_("Show errors and warnings"), N_("Show everything including debug messages")};
-
 vlc_module_begin ()
     set_description( N_("OpenCV video filter wrapper") )
     set_shortname( N_("OpenCV" ))
