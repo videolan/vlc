@@ -91,10 +91,12 @@ void window_get_param( vlc_object_t * p_aout, window_param * p_param )
     {
         if( !strcasecmp( psz_preset, window_list[i] ) )
         {
+            free( psz_preset );
             p_param->wind_type = i;
             return;
         }
     }
+    free( psz_preset );
 
 no_preset:
     msg_Warn( p_aout, "No matching window preset found; using rectangular "
