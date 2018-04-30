@@ -898,7 +898,7 @@
           <number>2</number>
          </property>
          <property name="maximum">
-          <number>16</number>
+          <number>42</number>
          </property>
          <property name="value">
           <number>4</number>
@@ -924,7 +924,7 @@
           <number>2</number>
          </property>
          <property name="maximum">
-          <number>16</number>
+          <number>42</number>
          </property>
          <property name="value">
           <number>4</number>
