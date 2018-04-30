@@ -4134,7 +4134,10 @@ static stime_t GetMoovTrackDuration( demux_sys_t *p_sys, unsigned i_track_ID )
          /* duration might be wrong an be set to whole duration :/ */
          BOXDATA(p_stsz)->i_sample_count > 0 )
     {
-        return BOXDATA(p_tkhd)->i_duration; /* In movie / mvhd scale */
+        if( BOXDATA(p_tkhd)->i_duration <= p_sys->i_moov_duration )
+            return BOXDATA(p_tkhd)->i_duration; /* In movie / mvhd scale */
+        else
+            return p_sys->i_moov_duration;
     }
     return 0;
 }
