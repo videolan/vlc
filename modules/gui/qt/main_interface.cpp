@@ -1352,9 +1352,8 @@ void MainInterface::resizeWindow(int w, int h)
          * By calling XMoveResizeWindow directly, Qt will not see our change
          * request until the ConfigureNotify event on success
          * and not at all if it is rejected. */
-        XMoveResizeWindow( QX11Info::display(), winId(),
-                          geometry().x() * dpr, geometry().y() * dpr,
-                          (unsigned int)size.width() * dpr, (unsigned int)size.height() * dpr);
+        XResizeWindow( QX11Info::display(), winId(),
+                       (unsigned int)size.width() * dpr, (unsigned int)size.height() * dpr);
         return;
     }
 #endif
