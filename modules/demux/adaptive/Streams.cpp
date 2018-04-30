@@ -64,7 +64,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker, 
     if((unsigned)format_ == StreamFormat::UNSUPPORTED || demuxersource)
         return false;
 
-    demuxersource = new (std::nothrow) ChunksSourceStream( VLC_OBJECT(p_realdemux), this );
+    demuxersource = new (std::nothrow) BufferedChunksSourceStream( VLC_OBJECT(p_realdemux), this );
     if(demuxersource)
     {
         CommandsFactory *factory = new (std::nothrow) CommandsFactory();
