@@ -886,13 +886,10 @@ void MainInterface::setVideoFullScreen( bool fs )
                 msg_Dbg( p_intf, "Moving video to correct position");
                 move( QPoint( screenres.x(), screenres.y() ) );
             }
-
-            /* */
-            if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
-            {
-                showTab( videoWidget );
-            }
         }
+
+        if( playlistWidget != NULL && playlistWidget->artContainer->currentWidget() == videoWidget )
+            showTab( videoWidget );
 
         /* we won't be able to get its windowed sized once in fullscreen, so update it now */
         stackWidgetsSizes[stackCentralW->currentWidget()] = stackCentralW->size();
