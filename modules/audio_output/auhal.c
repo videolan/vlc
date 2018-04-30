@@ -74,7 +74,7 @@ vlc_module_end ()
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-typedef struct aout_sys_t
+typedef struct
 {
     struct aout_sys_common c;
 
@@ -456,7 +456,7 @@ AudioDeviceHasOutput(audio_output_t *p_aout, AudioDeviceID i_dev_id)
 static void
 RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
 {
-    struct aout_sys_t   *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     msg_Dbg(p_aout, "Rebuild device list");
 
@@ -892,7 +892,7 @@ out:
 static int
 SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     if (name)
         p_sys->i_new_selected_dev = atoi(name);
@@ -910,7 +910,7 @@ SwitchAudioDevice(audio_output_t *p_aout, const char *name)
 static int
 VolumeSet(audio_output_t * p_aout, float volume)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     OSStatus ostatus = 0;
 
     if (p_sys->b_digital)
@@ -939,7 +939,7 @@ VolumeSet(audio_output_t * p_aout, float volume)
 static int
 MuteSet(audio_output_t * p_aout, bool mute)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     if(p_sys->b_digital)
         return VLC_EGENERIC;
@@ -997,7 +997,7 @@ RenderCallbackSPDIF(AudioDeviceID inDevice, const AudioTimeStamp * inNow,
 static void
 WarnConfiguration(audio_output_t *p_aout)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     char *warned_devices = var_CreateGetNonEmptyString(p_aout, "auhal-warned-devices");
     bool dev_is_warned = false;
     unsigned dev_count = 0;
@@ -1066,7 +1066,7 @@ static int
 StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
             mtime_t i_latency_us)
 {
-    struct aout_sys_t           *p_sys = p_aout->sys;
+    aout_sys_t                  *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
     UInt32                      i_param_size;
     AudioChannelLayout          *layout = NULL;
@@ -1154,7 +1154,7 @@ static int
 StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
            mtime_t i_latency_us)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     int ret;
 
     /* Check if device supports digital */
@@ -1420,7 +1420,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
 static void
 Stop(audio_output_t *p_aout)
 {
-    struct aout_sys_t   *p_sys = p_aout->sys;
+    aout_sys_t          *p_sys = p_aout->sys;
     OSStatus            err = noErr;
 
     msg_Dbg(p_aout, "Stopping the auhal module");
@@ -1507,7 +1507,7 @@ static int
 Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
     UInt32                  i_param_size = 0;
-    struct aout_sys_t       *p_sys = NULL;
+    aout_sys_t              *p_sys = NULL;
 
     /* Use int here, to match kAudioDevicePropertyDeviceIsAlive
      * property size */
