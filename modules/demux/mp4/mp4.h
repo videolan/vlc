@@ -150,6 +150,8 @@ typedef struct
     struct
     {
         /* for moof parsing */
+        bool b_resync_time_offset;
+
         /* tfhd defaults */
         uint32_t i_default_sample_size;
         uint32_t i_default_sample_duration;

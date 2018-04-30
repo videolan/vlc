@@ -188,7 +188,7 @@ static stime_t GetMoovTrackDuration( demux_sys_t *p_sys, unsigned i_track_ID );
 static int  ProbeFragments( demux_t *p_demux, bool b_force, bool *pb_fragmented );
 static int  ProbeIndex( demux_t *p_demux );
 
-static int FragCreateTrunIndex( demux_t *, MP4_Box_t *, MP4_Box_t *, stime_t, bool );
+static int FragCreateTrunIndex( demux_t *, MP4_Box_t *, MP4_Box_t *, stime_t );
 
 static int FragGetMoofBySidxIndex( demux_t *p_demux, mtime_t i_target_time,
                                    uint64_t *pi_moof_pos, mtime_t *pi_sampletime );
@@ -1553,7 +1553,13 @@ static int FragPrepareChunk( demux_t *p_demux, MP4_Box_t *p_moof,
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( FragCreateTrunIndex( p_demux, p_moof, p_sidx, i_moof_time, b_discontinuity ) == VLC_SUCCESS )
+    if( b_discontinuity )
+    {
+        for( unsigned i=0; i<p_sys->i_tracks; i++ )
+            p_sys->track[i].context.b_resync_time_offset = true;
+    }
+
+    if( FragCreateTrunIndex( p_demux, p_moof, p_sidx, i_moof_time ) == VLC_SUCCESS )
     {
         for( unsigned i=0; i<p_sys->i_tracks; i++ )
         {
@@ -4548,7 +4554,7 @@ static int DemuxMoof( demux_t *p_demux )
 }
 
 static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
-                                MP4_Box_t *p_chunksidx, stime_t i_moof_time, bool b_discontinuity )
+                                MP4_Box_t *p_chunksidx, stime_t i_moof_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -4597,8 +4603,10 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
         stime_t  i_traf_start_time = p_track->i_time;
         bool     b_has_base_media_decode_time = false;
 
-        if( b_discontinuity ) /* We NEED start time offset for each track */
+        if( p_track->context.b_resync_time_offset ) /* We NEED start time offset for each track */
         {
+            p_track->context.b_resync_time_offset = false;
+
             /* Find start time */
             const MP4_Box_t *p_tfdt = MP4_BoxGet( p_traf, "tfdt" );
             if( p_tfdt )
