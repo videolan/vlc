@@ -51,11 +51,6 @@
 /**
  * Forward declarations
  */
-
-struct picture_sys_t {
-    CVPixelBufferRef pixelBuffer;
-};
-
 static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
