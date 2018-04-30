@@ -77,7 +77,7 @@ static const struct {
  * This structure is part of the audio output thread descriptor.
  * It describes the CoreAudio specific properties of an output thread.
  *****************************************************************************/
-typedef struct aout_sys_t
+typedef struct
 {
     struct aout_sys_common c;
 
@@ -156,7 +156,7 @@ static void
 avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
                                   const audio_sample_format_t *fmt)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
 
     if (aout_BitsPerSample(fmt->i_format) == 0)
         return; /* Don't touch the number of channels for passthrough */
@@ -184,7 +184,7 @@ avas_setPreferredNumberOfChannels(audio_output_t *p_aout,
 static void
 avas_resetPreferredNumberOfChannels(audio_output_t *p_aout)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
 
     if (p_sys->b_preferred_channels_set)
@@ -198,7 +198,7 @@ static int
 avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
                              AudioChannelLayout **playout)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
     AudioChannelLayout *layout = NULL;
     *pport_type = PORT_TYPE_DEFAULT;
@@ -283,7 +283,7 @@ avas_GetOptimalChannelLayout(audio_output_t *p_aout, enum port_type *pport_type,
 static int
 avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
     AVAudioSession *instance = p_sys->avInstance;
     BOOL ret = false;
     NSError *error = nil;
@@ -313,7 +313,7 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 static void
 Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
 
     /* We need to start / stop the audio unit here because otherwise the OS
      * won't believe us that we stopped the audio output so in case of an
@@ -354,7 +354,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
 static void
 Flush(audio_output_t *p_aout, bool wait)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
 
     ca_Flush(p_aout, wait);
 }
@@ -362,7 +362,7 @@ Flush(audio_output_t *p_aout, bool wait)
 static int
 MuteSet(audio_output_t *p_aout, bool mute)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
 
     p_sys->b_muted = mute;
     if (p_sys->au_unit != NULL)
@@ -378,7 +378,7 @@ MuteSet(audio_output_t *p_aout, bool mute)
 static void
 Play(audio_output_t * p_aout, block_t * p_block)
 {
-    struct aout_sys_t * p_sys = p_aout->sys;
+    aout_sys_t * p_sys = p_aout->sys;
 
     if (p_sys->b_muted)
         block_Release(p_block);
@@ -391,7 +391,7 @@ Play(audio_output_t * p_aout, block_t * p_block)
 static void
 Stop(audio_output_t *p_aout)
 {
-    struct aout_sys_t   *p_sys = p_aout->sys;
+    aout_sys_t   *p_sys = p_aout->sys;
     OSStatus err;
 
     [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
@@ -418,7 +418,7 @@ Stop(audio_output_t *p_aout)
 static int
 Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 {
-    struct aout_sys_t *p_sys = p_aout->sys;
+    aout_sys_t *p_sys = p_aout->sys;
     OSStatus err;
     OSStatus status;
     AudioChannelLayout *layout = NULL;
