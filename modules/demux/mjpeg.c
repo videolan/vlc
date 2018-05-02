@@ -281,7 +281,10 @@ static int SendBlock( demux_t *p_demux, int i )
 
     /* set PCR */
     es_out_SetPCR( p_demux->out, p_block->i_pts );
-    es_out_Send( p_demux->out, p_sys->p_es, p_block );
+    if( p_sys->p_es )
+        es_out_Send( p_demux->out, p_sys->p_es, p_block );
+    else
+        block_Release( p_sys->p_es );
 
     if( p_sys->b_still )
         p_sys->i_still_end = mdate() + p_sys->i_frame_length;
