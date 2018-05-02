@@ -128,7 +128,7 @@ static int Demux( demux_t *p_demux )
     if( p_block == NULL )
     {
         msg_Dbg( p_demux, "cannot read data, eof" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     i_date = vlc_stream_Tell( p_demux->s ) / CDG_FRAME_SIZE * i_delta;
@@ -147,7 +147,7 @@ static int Demux( demux_t *p_demux )
 
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
