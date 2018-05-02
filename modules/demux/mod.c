@@ -268,14 +268,14 @@ static int Demux( demux_t *p_demux )
 
     p_frame = block_Alloc( p_sys->fmt.audio.i_rate / 10 * i_bk );
     if( !p_frame )
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
 
     const int i_read = ModPlug_Read( p_sys->f, p_frame->p_buffer, p_frame->i_buffer );
     if( i_read <= 0 )
     {
         /* EOF */
         block_Release( p_frame );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     p_frame->i_buffer = i_read;
     p_frame->i_dts =
@@ -289,7 +289,7 @@ static int Demux( demux_t *p_demux )
 
     date_Increment( &p_sys->pts, i_read / i_bk );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
