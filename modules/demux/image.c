@@ -188,7 +188,7 @@ static int Demux(demux_t *demux)
     demux_sys_t *sys = demux->p_sys;
 
     if (!sys->data)
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     mtime_t deadline;
     const mtime_t pts_first = sys->pts_origin + date_Get(&sys->pts);
@@ -201,7 +201,7 @@ static int Demux(demux_t *demux)
             es_out_SetPCR(demux->out, deadline);
             /* That's ugly, but not yet easily fixable */
             mwait(deadline + max_wait);
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
         }
     } else {
         deadline = 1 + pts_first;
@@ -210,14 +210,14 @@ static int Demux(demux_t *demux)
     for (;;) {
         const mtime_t pts = sys->pts_origin + date_Get(&sys->pts);
         if (sys->duration >= 0 && pts >= sys->pts_origin + sys->duration)
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         if (pts >= deadline)
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
 
         block_t *data = block_Duplicate(sys->data);
         if (!data)
-            return -1;
+            return VLC_DEMUXER_EGENERIC;
 
         data->i_dts =
         data->i_pts = VLC_TS_0 + pts;
