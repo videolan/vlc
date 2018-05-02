@@ -794,7 +794,6 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 else
                     i = (i_action == ACTIONID_SUBTITLE_TRACK) ? i+1 : i-1;
                 var_SetInteger( p_input, "spu-es", list.p_list->p_values[i].i_int );
-                var_SetInteger( p_input, "spu-choice", list.p_list->p_values[i].i_int );
                 DisplayMessage( p_vout, _("Subtitle track: %s"),
                                 list2.p_list->p_values[i].psz_string );
                 var_FreeList( &list, &list2 );
@@ -804,13 +803,9 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             if( p_input )
             {
                 vlc_value_t list, list2;
-                int i_count, i_sel_index, i_sel_id, i_old_id, i_new_index;
-                i_old_id = var_GetInteger( p_input, "spu-es" );
-                i_sel_id = var_GetInteger( p_input, "spu-choice" );
-
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
-                i_count = list.p_list->i_count;
+                int i_count = list.p_list->i_count;
                 if( i_count <= 1 )
                 {
                     DisplayMessage( p_vout, _("Subtitle track: %s"),
@@ -818,30 +813,34 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     var_FreeList( &list, &list2 );
                     break;
                 }
-                for( i_sel_index = 0; i_sel_index < i_count; i_sel_index++ )
+
+                int i_cur_id = var_GetInteger( p_input, "spu-es" );
+                int i_new_id;
+                if( i_cur_id == -1 )
                 {
-                    if( i_sel_id == list.p_list->p_values[i_sel_index].i_int )
-                    {
-                        break;
-                    }
+                    /* subtitles were disabled: restore the saved track id */
+                    i_new_id = var_GetInteger( p_input, "spu-choice" );
+                    if( i_new_id != -1 )
+                        var_SetInteger( p_input, "spu-choice", -1 );
                 }
-                /* if there is nothing to toggle choose the first track */
-                if( !i_sel_index ) {
-                    i_sel_index = 1;
-                    i_sel_id = list.p_list->p_values[1].i_int;
-                    var_SetInteger( p_input, "spu-choice", i_sel_id );
+                else
+                {
+                    /* subtitles were enabled: save the track id and disable */
+                    i_new_id = -1;
+                    var_SetInteger( p_input, "spu-choice", i_cur_id );
                 }
 
-                i_new_index = 0;
-                if( i_old_id != i_sel_id )
+                int i_new_index = 1; /* select first track by default */
+                /* if subtitles were disabled with no saved id, use the first track */
+                if( i_cur_id != -1 || i_new_id != -1 )
                 {
-                    if( i_sel_index >= i_count )
+                    for( int i = 0; i < i_count; ++i )
                     {
-                        var_SetInteger( p_input, "spu-choice", list.p_list->p_values[0].i_int );
-                    }
-                    else
-                    {
-                        i_new_index = i_sel_index;
+                        if( i_new_id == list.p_list->p_values[i].i_int )
+                        {
+                            i_new_index = i;
+                            break;
+                        }
                     }
                 }
                 var_SetInteger( p_input, "spu-es", list.p_list->p_values[i_new_index].i_int );
