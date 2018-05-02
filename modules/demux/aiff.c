@@ -243,7 +243,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_ssnd_end > 0 && i_tell >= p_sys->i_ssnd_end )
     {
         /* EOF */
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     /* Set PCR */
@@ -257,7 +257,7 @@ static int Demux( demux_t *p_demux )
     }
     if( ( p_block = vlc_stream_Block( p_demux->s, i_read ) ) == NULL )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     p_block->i_dts =
@@ -274,7 +274,7 @@ static int Demux( demux_t *p_demux )
     else
         block_Release( p_block );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
