@@ -104,7 +104,7 @@ void X11TimerLoop::removeTimer( X11Timer &rTimer )
 void X11TimerLoop::waitNextTimer()
 {
     mtime_t curDate = mdate();
-    mtime_t nextDate = LAST_MDATE;
+    mtime_t nextDate = INT64_MAX;
 
     X11Timer *nextTimer = NULL;
 

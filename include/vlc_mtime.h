@@ -33,16 +33,6 @@
 # define __VLC_MTIME_H 1
 
 /*****************************************************************************
- * LAST_MDATE: date which will never happen
- *****************************************************************************
- * This date can be used as a 'never' date, to mark missing events in a function
- * supposed to return a date, such as nothing to display in a function
- * returning the date of the first image to be displayed. It can be used in
- * comparaison with other values: all existing dates will be earlier.
- *****************************************************************************/
-#define LAST_MDATE ((mtime_t)((uint64_t)(-1)/2))
-
-/*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *****************************************************************************
  * This values is the maximal possible size of the string returned by the
