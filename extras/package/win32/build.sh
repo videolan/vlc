@@ -92,8 +92,8 @@ TRIPLET=$ARCH-w64-mingw32
 info "Building extra tools"
 cd extras/tools
 # bootstrap only if needed in interactive mode
-if [ "$INTERACTIVE" != "yes" || ! -f ./Makefile ]; then
-./bootstrap
+if [ "$INTERACTIVE" != "yes" ] || [ ! -f ./Makefile ]; then
+    ./bootstrap
 fi
 make -j$JOBS
 export PATH=$PWD/build/bin:$PATH
