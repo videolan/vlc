@@ -935,7 +935,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_data_size != kCHUNK_SIZE_EOF && p_sys->position.i_bytes >= p_sys->i_data_size )
     {
         /* EOF */
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     frame_span_t advance = (frame_span_t){0};
@@ -978,23 +978,23 @@ static int Demux( demux_t *p_demux )
     if( !advance.i_frames )
     {
         msg_Err( p_demux, "Unexpected end of file" );
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     if( vlc_stream_Seek( p_demux->s, p_sys->i_data_offset + p_sys->position.i_bytes ))
     {
         if( p_sys->i_data_size == kCHUNK_SIZE_EOF)
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         msg_Err( p_demux, "cannot seek data" );
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     p_block = vlc_stream_Block( p_demux->s, (int)advance.i_bytes );
     if( p_block == NULL )
     {
         msg_Err( p_demux, "cannot read data" );
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
     }
 
     p_block->i_dts =
@@ -1007,7 +1007,7 @@ static int Demux( demux_t *p_demux )
 
     es_out_Send( p_demux->out, p_sys->es, p_block );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
