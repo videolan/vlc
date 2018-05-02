@@ -285,7 +285,10 @@ static int Demux( demux_t *p_demux )
     es_out_SetPCR( p_demux->out, p_frame->i_pts );
 
     /* Send data */
-    es_out_Send( p_demux->out, p_sys->es, p_frame );
+    if( p_sys->es )
+        es_out_Send( p_demux->out, p_sys->es, p_frame );
+    else
+        block_Release( p_frame );
 
     date_Increment( &p_sys->pts, i_read / i_bk );
 
