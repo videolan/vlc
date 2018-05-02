@@ -269,7 +269,11 @@ static int Demux( demux_t *p_demux )
                      p_sys->fmt.audio.i_rate;
 
     /* */
-    es_out_Send( p_demux->out, p_sys->es, p_block );
+    if( p_sys->es )
+        es_out_Send( p_demux->out, p_sys->es, p_block );
+    else
+        block_Release( p_block );
+
     return 1;
 }
 
