@@ -128,7 +128,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
            p_fmt->i_codec == VLC_CODEC_H264 &&
            (i_profile != PROFILE_H264_BASELINE || i_level > 30))
         {
-            msg_Dbg(p_dec, "h264 profile/level not supported (0x" PRIx8 ", 0x" PRIx8 ")",
+            msg_Dbg(p_dec, "h264 profile/level not supported (0x%" PRIx8 ", 0x%" PRIx8 ")",
                     i_profile, i_level);
             return OMX_ErrorNotImplemented;
         }
