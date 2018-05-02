@@ -1,9 +1,8 @@
 /*****************************************************************************
  * clock.c: Clock/System date convertions, stream management
  *****************************************************************************
- * Copyright (C) 1999-2008 VLC authors and VideoLAN
+ * Copyright (C) 1999-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
- * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
  *          Laurent Aimar < fenrir _AT_ videolan _DOT_ org >

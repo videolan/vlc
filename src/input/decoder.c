@@ -46,7 +46,7 @@
 #include "audio_output/aout_internal.h"
 #include "stream_output/stream_output.h"
 #include "input_internal.h"
-#include "clock.h"
+#include "../clock/clock.h"
 #include "decoder.h"
 #include "event.h"
 #include "resource.h"

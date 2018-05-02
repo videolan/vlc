@@ -230,7 +230,7 @@ libvlccore_la_SOURCES = \
 	playlist/renderer.c \
 	input/item.c \
 	input/access.c \
-	input/clock.c \
+	clock/clock.c \
 	input/control.c \
 	input/decoder.c \
 	input/demux.c \
@@ -241,7 +241,7 @@ libvlccore_la_SOURCES = \
 	input/input.c \
 	input/info.h \
 	input/meta.c \
-	input/clock.h \
+	clock/clock.h \
 	input/decoder.h \
 	input/demux.h \
 	input/es_out.h \

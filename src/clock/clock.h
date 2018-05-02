@@ -1,9 +1,8 @@
 /*****************************************************************************
  * clock.h: clocks synchronisation
  *****************************************************************************
- * Copyright (C) 2008 VLC authors and VideoLAN
+ * Copyright (C) 2008-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar < fenrir _AT_ videolan _DOT_ org >
  *
