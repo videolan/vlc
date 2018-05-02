@@ -56,9 +56,16 @@
  *****************************************************************************/
 VLC_API char * secstotimestr( char *psz_buffer, int32_t secs );
 
-/*****************************************************************************
- * date_t: date incrementation without long-term rounding errors
- *****************************************************************************/
+/**
+ * \defgroup date Timestamps, error-free
+ * These functions support generating timestamps without long term rounding
+ * errors due to sample rate conversions.
+ * \ingroup input
+ * @{
+ */
+/**
+ * Timestamps without long-term rounding errors
+ */
 struct date_t
 {
     mtime_t  date;
@@ -67,11 +74,63 @@ struct date_t
     uint32_t i_remainder;
 };
 
-VLC_API void date_Init( date_t *, uint32_t, uint32_t );
-VLC_API void date_Change( date_t *, uint32_t, uint32_t );
-VLC_API void date_Set( date_t *, mtime_t );
-VLC_API mtime_t date_Get( const date_t * );
-VLC_API mtime_t date_Increment( date_t *, uint32_t );
-VLC_API mtime_t date_Decrement( date_t *, uint32_t );
+/**
+ * Initializes a date_t.
+ *
+ * \param date date to initialize [OUT]
+ * \param num divider (sample rate) numerator
+ * \param den divider (sample rate) denominator
+ */
+VLC_API void date_Init(date_t *restrict date, uint32_t num, uint32_t den);
+
+/**
+ * Changes the rate of a date_t.
+ *
+ * \param date date to change
+ * \param num divider (sample rate) numerator
+ * \param den divider (sample rate) denominator
+ */
+VLC_API void date_Change(date_t *restrict date, uint32_t num, uint32_t den);
+
+/**
+ * Sets the exact timestamp of a date_t.
+ *
+ * \param date date to set the timestamp into
+ * \param value date value
+ */
+VLC_API void date_Set(date_t *restrict date, mtime_t value);
+
+/**
+ * Gets the current timestamp from a date_t.
+ *
+ * \param date date to fetch the timestamp from
+ * \return date value
+ */
+VLC_API mtime_t date_Get(const date_t *restrict date) VLC_USED;
+
+/**
+ * Increments a date.
+ *
+ * Moves the date_t timestamp forward by a given number of samples.
+ *
+ * \param date date to move forward
+ * \param count number of samples
+ * \return timestamp value after incrementing
+ */
+VLC_API mtime_t date_Increment(date_t *restrict date, uint32_t count);
+
+/**
+ * Decrements a date.
+ *
+ * Moves the date_t timestamp backward by a given number of samples.
+ *
+ * \param date date to move backward
+ * \param count number of samples
+ * \return date value
+ */
+VLC_API mtime_t date_Decrement(date_t *restrict date, uint32_t count);
+
+/** @} */
+
 VLC_API uint64_t NTPtime64( void );
 #endif /* !__VLC_MTIME_ */
