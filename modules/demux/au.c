@@ -318,7 +318,7 @@ static int Demux( demux_t *p_demux )
     if( p_block == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     p_block->i_dts =
@@ -331,7 +331,7 @@ static int Demux( demux_t *p_demux )
 
     p_sys->i_time += p_sys->i_frame_length;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
