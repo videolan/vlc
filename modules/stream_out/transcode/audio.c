@@ -355,9 +355,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
                     "audio drift is too high (%"PRId64"), resetting master sync",
                     i_drift );
                 date_Set( &id->next_input_pts, p_audio_buf->i_pts );
-                i_pts = date_Get( &id->next_input_pts );
                 if( likely(p_audio_buf->i_pts != VLC_TS_INVALID ) )
-                    i_drift = p_audio_buf->i_pts - i_pts;
+                    i_drift = 0;
             }
             p_sys->i_master_drift = i_drift;
             date_Increment( &id->next_input_pts, p_audio_buf->i_nb_samples );
