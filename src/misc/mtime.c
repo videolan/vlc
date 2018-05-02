@@ -92,17 +92,6 @@ void date_Change( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
     p_date->i_divider_den = i_divider_d;
 }
 
-void date_Set( date_t *p_date, mtime_t i_new_date )
-{
-    p_date->date = i_new_date;
-    p_date->i_remainder = 0;
-}
-
-mtime_t date_Get( const date_t *p_date )
-{
-    return p_date->date;
-}
-
 mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 {
     assert( p_date->i_divider_num != 0 );

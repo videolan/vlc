@@ -88,7 +88,11 @@ VLC_API void date_Change(date_t *restrict date, uint32_t num, uint32_t den);
  * \param date date to set the timestamp into
  * \param value date value
  */
-VLC_API void date_Set(date_t *restrict date, mtime_t value);
+static inline void date_Set(date_t *restrict date, mtime_t value)
+{
+    date->date = value;
+    date->i_remainder = 0;
+}
 
 /**
  * Gets the current timestamp from a date_t.
@@ -96,7 +100,10 @@ VLC_API void date_Set(date_t *restrict date, mtime_t value);
  * \param date date to fetch the timestamp from
  * \return date value
  */
-VLC_API mtime_t date_Get(const date_t *restrict date) VLC_USED;
+VLC_USED static inline mtime_t date_Get(const date_t *restrict date)
+{
+    return date->date;
+}
 
 /**
  * Increments a date.

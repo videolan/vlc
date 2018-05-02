@@ -69,10 +69,8 @@ config_StringEscape
 config_StringUnescape
 date_Change
 date_Decrement
-date_Get
 date_Increment
 date_Init
-date_Set
 decoder_AbortPictures
 decoder_GetDisplayDate
 decoder_GetDisplayRate
