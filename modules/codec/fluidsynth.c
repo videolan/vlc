@@ -174,7 +174,7 @@ static int Open (vlc_object_t *p_this)
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     p_dec->fmt_out.audio.i_bitspersample = 32;
     date_Init (&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
-    date_Set (&p_sys->end_date, 0);
+    date_Set(&p_sys->end_date, VLC_TS_INVALID);
 
     p_dec->p_sys = p_sys;
     p_dec->pf_decode = DecodeBlock;
@@ -223,7 +223,8 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    if (p_block->i_pts > VLC_TS_INVALID && !date_Get (&p_sys->end_date))
+    if (p_block->i_pts != VLC_TS_INVALID
+     && date_Get(&p_sys->end_date) == VLC_TS_INVALID)
         date_Set (&p_sys->end_date, p_block->i_pts);
     else
     if (p_block->i_pts < date_Get (&p_sys->end_date))
