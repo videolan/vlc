@@ -290,7 +290,6 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_es_audio = es_out_Add( p_demux->out, &fmt );
     date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, 1 );
 
     return VLC_SUCCESS;
 }
@@ -464,7 +463,7 @@ static block_t *GrabJack( demux_t *p_demux )
 
     i_read = jack_ringbuffer_read( p_sys->p_jack_ringbuffer, ( char * ) p_block->p_buffer, i_read );
 
-    p_block->i_dts = p_block->i_pts =    date_Increment( &p_sys->pts,
+    p_block->i_dts = p_block->i_pts = VLC_TS_0 + date_Increment( &p_sys->pts,
          i_read/(p_sys->i_channels * p_sys->jack_sample_size) );
 
     p_sys->p_block_audio = p_block;
