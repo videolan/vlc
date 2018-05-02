@@ -265,7 +265,7 @@ static int SendBlock( demux_t *p_demux, int i )
     if( ( p_block = vlc_stream_Block( p_demux->s, i ) ) == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     if( p_sys->i_frame_length )
@@ -286,7 +286,7 @@ static int SendBlock( demux_t *p_demux, int i )
     if( p_sys->b_still )
         p_sys->i_still_end = mdate() + p_sys->i_frame_length;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
@@ -409,18 +409,18 @@ static int MjpgDemux( demux_t *p_demux )
         /* Still frame, wait until the pause delay is gone */
         mwait( p_sys->i_still_end );
         p_sys->i_still_end = 0;
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     if( !Peek( p_demux, true ) )
     {
         msg_Warn( p_demux, "cannot peek data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     if( p_sys->i_data_peeked < 4 )
     {
         msg_Warn( p_demux, "data shortage" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     i = 3;
 FIND_NEXT_EOI:
@@ -439,7 +439,7 @@ FIND_NEXT_EOI:
             if( !Peek( p_demux, false ) )
             {
                 msg_Warn( p_demux, "no more data is available at the moment" );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
         }
     }
@@ -463,11 +463,11 @@ static int MimeDemux( demux_t *p_demux )
     if( i_size > 0 )
     {
         if( vlc_stream_Read( p_demux->s, NULL, i_size ) != i_size )
-            return 0;
+            return VLC_DEMUXER_EOF;
     }
     else if( i_size < 0 )
     {
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     else
     {
@@ -478,7 +478,7 @@ static int MimeDemux( demux_t *p_demux )
     if( !Peek( p_demux, true ) )
     {
         msg_Warn( p_demux, "cannot peek data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     i = 0;
@@ -486,7 +486,7 @@ static int MimeDemux( demux_t *p_demux )
     if( p_sys->i_data_peeked < i_size )
     {
         msg_Warn( p_demux, "data shortage" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     for( ;; )
@@ -504,7 +504,7 @@ static int MimeDemux( demux_t *p_demux )
                 {
                     msg_Warn( p_demux, "no more data is available at the "
                               "moment" );
-                    return 0;
+                    return VLC_DEMUXER_EOF;
                 }
             }
         }
@@ -527,7 +527,7 @@ static int MimeDemux( demux_t *p_demux )
     if( !b_match )
     {
         msg_Err( p_demux, "discard non-JPEG part" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     return SendBlock( p_demux, i );
