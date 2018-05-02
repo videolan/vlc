@@ -154,7 +154,7 @@ static int Open( vlc_object_t *p_this )
 
     p_thread->i_blocks = 0;
     date_Init( &p_thread->date, p_filter->fmt_in.audio.i_rate, 1 );
-    date_Set( &p_thread->date, 0 );
+    date_Set( &p_thread->date, VLC_TS_0 );
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     if( vlc_clone( &p_thread->thread,
