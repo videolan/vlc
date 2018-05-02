@@ -222,7 +222,10 @@ static int Demux(demux_t *demux)
         data->i_dts =
         data->i_pts = VLC_TS_0 + pts;
         es_out_SetPCR(demux->out, data->i_pts);
-        es_out_Send(demux->out, sys->es, data);
+        if(sys->es)
+            es_out_Send(demux->out, sys->es, data);
+        else
+            block_Release(data);
 
         date_Increment(&sys->pts, 1);
     }
