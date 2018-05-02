@@ -132,17 +132,6 @@ mtime_t date_Get( const date_t *p_date )
 }
 
 /**
- * Move forwards or backwards the date of a date_t.
- *
- * \param date to move
- * \param difference value
- */
-void date_Move( date_t *p_date, mtime_t i_difference )
-{
-    p_date->date += i_difference;
-}
-
-/**
  * Increment the date and return the result, taking into account
  * rounding errors.
  *

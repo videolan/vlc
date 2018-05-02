@@ -71,7 +71,6 @@ VLC_API void date_Init( date_t *, uint32_t, uint32_t );
 VLC_API void date_Change( date_t *, uint32_t, uint32_t );
 VLC_API void date_Set( date_t *, mtime_t );
 VLC_API mtime_t date_Get( const date_t * );
-VLC_API void date_Move( date_t *, mtime_t );
 VLC_API mtime_t date_Increment( date_t *, uint32_t );
 VLC_API mtime_t date_Decrement( date_t *, uint32_t );
 VLC_API uint64_t NTPtime64( void );
