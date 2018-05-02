@@ -324,7 +324,10 @@ static int Demux( demux_t *p_demux )
     p_block->i_dts =
     p_block->i_pts = VLC_TS_0 + p_sys->i_time;
 
-    es_out_Send( p_demux->out, p_sys->es, p_block );
+    if( p_sys->es )
+        es_out_Send( p_demux->out, p_sys->es, p_block );
+    else
+        block_Release( p_block );
 
     p_sys->i_time += p_sys->i_frame_length;
 
