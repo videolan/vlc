@@ -156,7 +156,11 @@ VLC_API text_style_t * text_style_New( void );
 /**
  * Create a text style
  *
- * Set feature flags as argument if you want to set style defaults
+ * Give STYLE_NO_DEFAULTS as the argument if you want only the zero-filled
+ * object. Give STYLE_FULLY_SET (or anything other than STYLE_NO_DEFAULTS)
+ * if you want an object with sensible defaults. (The value is not stored,
+ * the only effect is to determine whether to return a zero-filled or
+ * sensible-defaults-filled object).
  */
 VLC_API text_style_t * text_style_Create( int );
 
