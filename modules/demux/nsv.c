@@ -161,13 +161,13 @@ static int Demux( demux_t *p_demux )
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         {
             msg_Warn( p_demux, "cannot peek" );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
 
         if( !memcmp( p_peek, "NSVf", 4 ) )
         {
             if( ReadNSVf( p_demux ) )
-                return -1;
+                return VLC_DEMUXER_EGENERIC;
         }
         else if( !memcmp( p_peek, "NSVs", 4 ) )
         {
@@ -179,7 +179,7 @@ static int Demux( demux_t *p_demux )
             }
 
             if( ReadNSVs( p_demux ) )
-                return -1;
+                return VLC_DEMUXER_EGENERIC;
             break;
         }
         else if( GetWLE( p_peek ) == 0xbeef )
@@ -188,7 +188,7 @@ static int Demux( demux_t *p_demux )
             if( vlc_stream_Read( p_demux->s, NULL, 2 ) < 2 )
             {
                 msg_Warn( p_demux, "cannot read" );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
             break;
         }
@@ -196,14 +196,14 @@ static int Demux( demux_t *p_demux )
         {
             msg_Err( p_demux, "invalid signature 0x%x (%4.4s)", GetDWLE( p_peek ), (const char*)p_peek );
             if( ReSynch( p_demux ) )
-                return -1;
+                return VLC_DEMUXER_EGENERIC;
         }
     }
 
     if( vlc_stream_Read( p_demux->s, header, 5 ) < 5 )
     {
         msg_Warn( p_demux, "cannot read" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     /* Set PCR */
@@ -222,7 +222,7 @@ static int Demux( demux_t *p_demux )
             if( vlc_stream_Read( p_demux->s, aux, 6 ) < 6 )
             {
                 msg_Warn( p_demux, "cannot read" );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
             i_aux = GetWLE( aux );
             fcc   = VLC_FOURCC( aux[2], aux[3], aux[4], aux[5] );
@@ -239,7 +239,7 @@ static int Demux( demux_t *p_demux )
                     es_out_Control( p_demux->out, ES_OUT_SET_ES, p_sys->p_sub );
                 }
                 if( vlc_stream_Read( p_demux->s, NULL, 2 ) < 2 )
-                    return 0;
+                    return VLC_DEMUXER_EOF;
 
                 if( ( p_frame = vlc_stream_Block( p_demux->s, i_aux - 2 ) ) )
                 {
@@ -268,7 +268,7 @@ static int Demux( demux_t *p_demux )
                 if( vlc_stream_Read( p_demux->s, NULL, i_aux ) < i_aux )
                 {
                     msg_Warn( p_demux, "cannot read" );
-                    return 0;
+                    return VLC_DEMUXER_EOF;
                 }
             }
             i_size -= 6 + i_aux;
@@ -299,7 +299,7 @@ static int Demux( demux_t *p_demux )
         {
             uint8_t h[4];
             if( vlc_stream_Read( p_demux->s, h, 4 ) < 4 )
-                return 0;
+                return VLC_DEMUXER_EOF;
 
             p_sys->fmt_audio.audio.i_channels = h[1];
             p_sys->fmt_audio.audio.i_rate = GetWLE( &h[2] );
@@ -333,7 +333,7 @@ static int Demux( demux_t *p_demux )
         p_sys->i_time += p_sys->i_pcr_inc;
     }
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
