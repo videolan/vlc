@@ -145,7 +145,10 @@ static int Demux( demux_t *p_demux )
 
     es_out_SetPCR( p_demux->out, p_block->i_pts );
 
-    es_out_Send( p_demux->out, p_sys->p_es, p_block );
+    if( p_sys->p_es )
+        es_out_Send( p_demux->out, p_sys->p_es, p_block );
+    else
+        block_Release( p_sys->p_es );
 
     return VLC_DEMUXER_SUCCESS;
 }
