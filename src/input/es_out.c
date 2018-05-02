@@ -2069,7 +2069,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     if( p_sys->i_preroll_end >= 0 )
     {
         int64_t i_date = p_block->i_pts;
-        if( p_block->i_pts <= VLC_TS_INVALID )
+        if( p_block->i_pts == VLC_TS_INVALID )
             i_date = p_block->i_dts;
 
         if( i_date + p_block->i_length < p_sys->i_preroll_end )
@@ -2477,7 +2477,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
 
         i_pcr = va_arg( args, int64_t );
-        if( i_pcr <= VLC_TS_INVALID )
+        if( i_pcr == VLC_TS_INVALID )
         {
             msg_Err( p_sys->p_input, "Invalid PCR value in ES_OUT_SET_(GROUP_)PCR !" );
             return VLC_EGENERIC;

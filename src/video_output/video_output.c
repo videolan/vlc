@@ -1219,7 +1219,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, mtime_t *deadline)
     bool refresh = false;
 
     mtime_t date_refresh = VLC_TS_INVALID;
-    if (vout->p->displayed.date > VLC_TS_INVALID) {
+    if (vout->p->displayed.date != VLC_TS_INVALID) {
         date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
         refresh = date_refresh <= date;
     }
@@ -1293,9 +1293,9 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
     if (vout->p->pause.is_on) {
         const mtime_t duration = date - vout->p->pause.date;
 
-        if (vout->p->step.timestamp > VLC_TS_INVALID)
+        if (vout->p->step.timestamp != VLC_TS_INVALID)
             vout->p->step.timestamp += duration;
-        if (vout->p->step.last > VLC_TS_INVALID)
+        if (vout->p->step.last != VLC_TS_INVALID)
             vout->p->step.last += duration;
         picture_fifo_OffsetDate(vout->p->decoder_fifo, duration);
         if (vout->p->displayed.decoded)
@@ -1342,7 +1342,7 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
 {
     *duration = 0;
 
-    if (vout->p->step.last <= VLC_TS_INVALID)
+    if (vout->p->step.last == VLC_TS_INVALID)
         vout->p->step.last = vout->p->displayed.timestamp;
 
     if (ThreadDisplayPicture(vout, NULL))
@@ -1350,7 +1350,7 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
 
     vout->p->step.timestamp = vout->p->displayed.timestamp;
 
-    if (vout->p->step.last > VLC_TS_INVALID &&
+    if (vout->p->step.last != VLC_TS_INVALID &&
         vout->p->step.timestamp > vout->p->step.last) {
         *duration = vout->p->step.timestamp - vout->p->step.last;
         vout->p->step.last = vout->p->step.timestamp;
@@ -1798,7 +1798,7 @@ static void *Thread(void *object)
         if (wait)
         {
             const mtime_t max_deadline = mdate() + 100000;
-            deadline = deadline <= VLC_TS_INVALID ? max_deadline : __MIN(deadline, max_deadline);
+            deadline = deadline == VLC_TS_INVALID ? max_deadline : __MIN(deadline, max_deadline);
         } else {
             deadline = VLC_TS_INVALID;
         }
