@@ -848,7 +848,7 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
     }
 
 #if 0 /* Breaks the video decoding */
-    if( !date_Get( &p_sys->end_date ) )
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         if( p_block ) block_Release( p_block );

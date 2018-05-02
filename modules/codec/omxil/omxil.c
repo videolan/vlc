@@ -1500,7 +1500,7 @@ int DecodeAudio ( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    if( !date_Get( &p_sys->end_date ) )
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         if( !p_block->i_pts )
         {

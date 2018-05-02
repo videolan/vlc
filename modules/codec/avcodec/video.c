@@ -744,8 +744,8 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
-    if( date_Get( &p_sys->pts ) == VLC_TS_INVALID ||
-        p_sys->pts.i_divider_num == 0 )
+    if( p_sys->pts.i_divider_num == 0 ||
+        date_Get( &p_sys->pts ) == VLC_TS_INVALID )
         return;
 
     int i_tick = p_context->ticks_per_frame;

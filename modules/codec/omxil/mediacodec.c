@@ -1676,7 +1676,7 @@ static int Audio_OnNewBlock(decoder_t *p_dec, block_t **pp_block)
     block_t *p_block = *pp_block;
 
     /* We've just started the stream, wait for the first PTS. */
-    if (!date_Get(&p_sys->audio.i_end_date))
+    if (date_Get(&p_sys->audio.i_end_date) == VLC_TS_INVALID)
     {
         if (p_block->i_pts == VLC_TS_INVALID)
             return 0;

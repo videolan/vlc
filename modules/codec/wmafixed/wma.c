@@ -229,7 +229,7 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
         /* don't reuse the same pts */
         p_block->i_pts = VLC_TS_INVALID;
     }
-    else if( !date_Get( &p_sys->end_date ) )
+    else if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

@@ -160,7 +160,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 
     if( p_block->i_pts == VLC_TS_INVALID && p_block->i_dts == VLC_TS_INVALID &&
-        !date_Get( &p_sys->pts ) )
+        date_Get( &p_sys->pts ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

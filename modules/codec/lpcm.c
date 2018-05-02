@@ -355,7 +355,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
-    if( !date_Get( &p_sys->end_date ) )
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

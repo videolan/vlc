@@ -227,7 +227,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             }
         }
 
-        if( !date_Get( &p_sys->end_date ) && i_pts == VLC_TS_INVALID )
+        if( i_pts == VLC_TS_INVALID &&
+            date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
             msg_Dbg( p_dec, "waiting for PTS" );

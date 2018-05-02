@@ -414,7 +414,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
-    if( !date_Get( &p_sys->end_date ) )
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
