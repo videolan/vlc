@@ -236,7 +236,8 @@ static int Demux( demux_t *p_demux )
                 {
                     p_sys->fmt_sub.i_codec = VLC_FOURCC( 's', 'u', 'b', 't' );
                     p_sys->p_sub = es_out_Add( p_demux->out, &p_sys->fmt_sub );
-                    es_out_Control( p_demux->out, ES_OUT_SET_ES, p_sys->p_sub );
+                    if( p_sys->p_sub )
+                        es_out_Control( p_demux->out, ES_OUT_SET_ES, p_sys->p_sub );
                 }
                 if( vlc_stream_Read( p_demux->s, NULL, 2 ) < 2 )
                     return VLC_DEMUXER_EOF;
@@ -259,7 +260,10 @@ static int Demux( demux_t *p_demux )
                     p_frame->i_pts = VLC_TS_0 + p_sys->i_pcr;
                     p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr + 4000000;    /* 4s */
 
-                    es_out_Send( p_demux->out, p_sys->p_sub, p_frame );
+                    if( p_sys->p_sub )
+                        es_out_Send( p_demux->out, p_sys->p_sub, p_frame );
+                    else
+                        block_Release( p_frame );
                 }
             }
             else
