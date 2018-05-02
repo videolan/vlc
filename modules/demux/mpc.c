@@ -262,7 +262,7 @@ static int Demux( demux_t *p_demux )
 #endif
     p_data = block_Alloc( MPC_DECODER_BUFFER_LENGTH*sizeof(MPC_SAMPLE_FORMAT) );
     if( !p_data )
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
 
 #ifndef HAVE_MPC_MPCDEC_H
     i_ret = mpc_decoder_decode( &p_sys->decoder,
@@ -271,7 +271,7 @@ static int Demux( demux_t *p_demux )
     if( i_ret <= 0 )
     {
         block_Release( p_data );
-        return i_ret < 0 ? -1 : 0;
+        return i_ret < 0 ? VLC_DEMUXER_EGENERIC : VLC_DEMUXER_EOF;
     }
 #else
     frame.buffer = (MPC_SAMPLE_FORMAT*)p_data->p_buffer;
@@ -279,12 +279,12 @@ static int Demux( demux_t *p_demux )
     if( err != MPC_STATUS_OK )
     {
         block_Release( p_data );
-        return -1;
+        return VLC_DEMUXER_EGENERIC;
     }
     else if( frame.bits == -1 )
     {
         block_Release( p_data );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     i_ret = frame.samples;
@@ -302,7 +302,7 @@ static int Demux( demux_t *p_demux )
     /* */
     p_sys->i_position += i_ret;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
