@@ -254,7 +254,6 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
     sys->es = es_out_Add(demux->out, &fmt);
 
     date_Init(&sys->pts, 44100, 1);
-    date_Set(&sys->pts, 0);
 
     sys->position = 0;
     demux->pf_demux = Demux;
