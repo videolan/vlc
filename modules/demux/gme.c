@@ -210,7 +210,7 @@ static int Demux (demux_t *demux)
     {
         msg_Dbg (demux, "track %u ended", sys->track_id);
         if (++sys->track_id >= (unsigned)gme_track_count (sys->emu))
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         sys->title_changed = true;
         gme_start_track (sys->emu, sys->track_id);
@@ -219,21 +219,21 @@ static int Demux (demux_t *demux)
 
     block_t *block = block_Alloc (2 * 2 * SAMPLES);
     if (unlikely(block == NULL))
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     gme_err_t ret = gme_play (sys->emu, 2 * SAMPLES, (void *)block->p_buffer);
     if (ret != NULL)
     {
         block_Release (block);
         msg_Err (demux, "%s", ret);
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     block->i_pts = block->i_dts = VLC_TS_0 + date_Get (&sys->pts);
     es_out_SetPCR (demux->out, block->i_pts);
     es_out_Send (demux->out, sys->es, block);
     date_Increment (&sys->pts, SAMPLES);
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 
