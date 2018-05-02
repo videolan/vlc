@@ -753,7 +753,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             //p_sys->l_last_ty_pts += 33366667;
         }
         /* set PTS for this block before we send */
-        if (p_sys->lastVideoPTS > VLC_TS_INVALID)
+        if (p_sys->lastVideoPTS != VLC_TS_INVALID)
         {
             p_block_in->i_pts = p_sys->lastVideoPTS;
             /* PTS gets used ONCE.
@@ -789,7 +789,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
     }
     /* Send the CC data */
-    if( p_block_in->i_pts > VLC_TS_INVALID && p_sys->cc.i_data > 0 )
+    if( p_block_in->i_pts != VLC_TS_INVALID && p_sys->cc.i_data > 0 )
     {
         for( i = 0; i < 4; i++ )
         {
@@ -954,7 +954,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /*msg_Dbg(p_demux,
                 "Adding SA Audio Packet Size %ld", l_rec_size ); */
 
-        if (p_sys->lastAudioPTS > VLC_TS_INVALID )
+        if (p_sys->lastAudioPTS != VLC_TS_INVALID )
             p_block_in->i_pts = p_sys->lastAudioPTS;
     }
     else if( subrec_type == 0x09 )
@@ -1005,7 +1005,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     }
 
     /* set PCR before we send (if PTS found) */
-    if( p_block_in->i_pts > VLC_TS_INVALID )
+    if( p_block_in->i_pts != VLC_TS_INVALID )
         es_out_Control( p_demux->out, ES_OUT_SET_PCR,
                         p_block_in->i_pts );
     /* Send data */

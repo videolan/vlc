@@ -1435,7 +1435,7 @@ static int Demux( demux_t *p_demux )
                 i_minpcr = tk->i_pcr;
         }
 
-        if( p_sys->i_pcr > VLC_TS_INVALID && b_need_flush )
+        if( p_sys->i_pcr != VLC_TS_INVALID && b_need_flush )
         {
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             p_sys->i_pcr = i_minpcr;

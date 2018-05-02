@@ -794,7 +794,7 @@ bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mti
         mkv_track_t &track = *it->second;
 
         track.i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
-        if( track.i_last_dts > VLC_TS_INVALID )
+        if( track.i_last_dts != VLC_TS_INVALID )
             track.b_discontinuity = true;
         track.i_last_dts        = VLC_TS_INVALID;
 

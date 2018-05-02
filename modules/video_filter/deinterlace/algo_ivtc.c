@@ -1458,7 +1458,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
     /* Note that picture_Copy() copies the PTS, too. Apply timestamp mangling
        now, if any was needed.
     */
-    if( t_final > VLC_TS_INVALID )
+    if( t_final != VLC_TS_INVALID )
         p_dst->date = t_final;
 
     return true;

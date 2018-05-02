@@ -1455,7 +1455,7 @@ static int DemuxMoov( demux_t *p_demux )
     }
 
     p_sys->i_nztime += DEMUX_INCREMENT;
-    if( p_sys->i_pcr > VLC_TS_INVALID )
+    if( p_sys->i_pcr != VLC_TS_INVALID )
     {
         p_sys->i_pcr = VLC_TS_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );

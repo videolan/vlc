@@ -731,13 +731,13 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     }
 
     *pb_ts_used = false;
-    if( p_sys->i_frame_dts <= VLC_TS_INVALID &&
-        p_sys->i_frame_pts <= VLC_TS_INVALID )
+    if( p_sys->i_frame_dts == VLC_TS_INVALID &&
+        p_sys->i_frame_pts == VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
         *pb_ts_used = true;
-        if( i_frag_dts > VLC_TS_INVALID )
+        if( i_frag_dts != VLC_TS_INVALID )
             date_Set( &p_sys->dts, i_frag_dts );
     }
 
@@ -907,7 +907,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_pic->i_pts = p_sys->i_frame_pts;
 
     /* Fixup missing timestamps after split (multiple AU/block)*/
-    if( p_pic->i_dts <= VLC_TS_INVALID )
+    if( p_pic->i_dts == VLC_TS_INVALID )
         p_pic->i_dts = date_Get( &p_sys->dts );
 
     if( p_sys->slice.type == H264_SLICE_TYPE_I )
@@ -915,7 +915,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     if( p_pic->i_pts == VLC_TS_INVALID )
     {
-        if( p_sys->prevdatedpoc.pts > VLC_TS_INVALID &&
+        if( p_sys->prevdatedpoc.pts != VLC_TS_INVALID &&
             date_Get( &p_sys->dts ) != VLC_TS_INVALID )
         {
             date_t pts = p_sys->dts;
@@ -945,7 +945,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
     }
 
-    if( p_pic->i_pts > VLC_TS_INVALID )
+    if( p_pic->i_pts != VLC_TS_INVALID )
     {
         p_sys->prevdatedpoc.pts = p_pic->i_pts;
         p_sys->prevdatedpoc.num = PictureOrderCount;

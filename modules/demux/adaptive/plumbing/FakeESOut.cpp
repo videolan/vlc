@@ -324,10 +324,10 @@ int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *
     me->checkTimestampsStart( p_block->i_dts );
 
     mtime_t offset = me->getTimestampOffset();
-    if( p_block->i_dts > VLC_TS_INVALID )
+    if( p_block->i_dts != VLC_TS_INVALID )
     {
         p_block->i_dts += offset;
-        if( p_block->i_pts > VLC_TS_INVALID )
+        if( p_block->i_pts != VLC_TS_INVALID )
                 p_block->i_pts += offset;
     }
     AbstractCommand *command = me->commandsqueue->factory()->createEsOutSendCommand( es_id, p_block );

@@ -314,7 +314,7 @@ mtime_t PlaylistManager::getPCR() const
         const mtime_t pcr = (*it)->getPCR();
         if(minpcr == VLC_TS_INVALID)
             minpcr = pcr;
-        else if(pcr > VLC_TS_INVALID)
+        else if(pcr != VLC_TS_INVALID)
             minpcr = std::min(minpcr, pcr);
     }
     return minpcr;
@@ -329,7 +329,7 @@ mtime_t PlaylistManager::getFirstDTS() const
         const mtime_t dts = (*it)->getFirstDTS();
         if(mindts == VLC_TS_INVALID)
             mindts = dts;
-        else if(dts > VLC_TS_INVALID)
+        else if(dts != VLC_TS_INVALID)
             mindts = std::min(mindts, dts);
     }
     return mindts;

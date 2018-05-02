@@ -192,7 +192,7 @@ static int Demux(demux_t *demux)
 
     mtime_t deadline;
     const mtime_t pts_first = sys->pts_origin + date_Get(&sys->pts);
-    if (sys->pts_next > VLC_TS_INVALID) {
+    if (sys->pts_next != VLC_TS_INVALID) {
         deadline = sys->pts_next;
     } else if (sys->is_realtime) {
         deadline = mdate();
@@ -265,7 +265,7 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
         int64_t pts_next = VLC_TS_0 + va_arg(args, int64_t);
-        if (sys->pts_next <= VLC_TS_INVALID)
+        if (sys->pts_next == VLC_TS_INVALID)
             sys->pts_origin = pts_next;
         sys->pts_next = pts_next;
         return VLC_SUCCESS;

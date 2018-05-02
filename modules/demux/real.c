@@ -348,10 +348,10 @@ static int Demux( demux_t *p_demux )
     {
         tk = p_sys->track[i];
 
-        if( i_pcr <= VLC_TS_INVALID || ( tk->i_last_dts > VLC_TS_INVALID && tk->i_last_dts < i_pcr ) )
+        if( i_pcr == VLC_TS_INVALID || ( tk->i_last_dts != VLC_TS_INVALID && tk->i_last_dts < i_pcr ) )
             i_pcr = tk->i_last_dts;
     }
-    if( i_pcr > VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
+    if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
     {
         p_sys->i_pcr = i_pcr;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
@@ -394,7 +394,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                so use duration to determin the position at first  */
             if( p_sys->i_our_duration > 0 )
             {
-                if( p_sys->i_pcr > VLC_TS_INVALID )
+                if( p_sys->i_pcr != VLC_TS_INVALID )
                     *pf = (double)p_sys->i_pcr / 1000.0 / p_sys->i_our_duration;
                 else
                     *pf = 0.0;
@@ -413,7 +413,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             if( p_sys->i_our_duration > 0 )
             {
-                *pi64 = p_sys->i_pcr > VLC_TS_INVALID ? p_sys->i_pcr : 0;
+                *pi64 = p_sys->i_pcr != VLC_TS_INVALID ? p_sys->i_pcr : 0;
                 return VLC_SUCCESS;
             }
 
@@ -506,10 +506,10 @@ static void CheckPcr( demux_t *p_demux, real_track_t *tk, mtime_t i_dts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( i_dts > VLC_TS_INVALID )
+    if( i_dts != VLC_TS_INVALID )
         tk->i_last_dts = i_dts;
 
-    if( p_sys->i_pcr > VLC_TS_INVALID || i_dts <= VLC_TS_INVALID )
+    if( p_sys->i_pcr != VLC_TS_INVALID || i_dts == VLC_TS_INVALID )
         return;
 
     p_sys->i_pcr = i_dts;

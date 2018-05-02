@@ -1887,7 +1887,7 @@ static int Demux( demux_t *p_demux )
                     i_pts = VLC_TS_INVALID;
             }
 
-            if( i_pts > VLC_TS_INVALID ) {
+            if( i_pts != VLC_TS_INVALID ) {
                 i_pts += 5;
                 i_pts /= 10; /* 100-ns to µs conversion */
                 i_pts += VLC_TS_0;
@@ -1901,7 +1901,7 @@ static int Demux( demux_t *p_demux )
             memcpy( p_block->p_buffer, p_data, i_data_size );
             p_block->i_pts = p_block->i_dts = i_pts;
 
-            if( i_pts > VLC_TS_INVALID )
+            if( i_pts != VLC_TS_INVALID )
                 es_out_SetPCR( p_demux->out, i_pts );
             es_out_Send( p_demux->out, p_stream->p_es, p_block );
 

@@ -247,7 +247,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     if( decoder_UpdateAudioFormat( p_dec ) )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 
-    if( date_Get( &p_sys->end_date ) <= VLC_TS_INVALID )
+    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
         return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 
     p_sys->p_aout_buffer =
@@ -662,7 +662,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
     p_sys->p_block = p_block;
 
-    if( p_sys->p_block->i_pts > VLC_TS_INVALID &&
+    if( p_sys->p_block->i_pts != VLC_TS_INVALID &&
         p_sys->p_block->i_pts != date_Get( &p_sys->end_date ) )
         date_Set( &p_sys->end_date, p_sys->p_block->i_pts );
 

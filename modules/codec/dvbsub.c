@@ -426,7 +426,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         default_dds_init( p_dec );
 
     p_sys->i_pts = p_block->i_pts;
-    if( p_sys->i_pts <= VLC_TS_INVALID )
+    if( p_sys->i_pts == VLC_TS_INVALID )
     {
 #ifdef DEBUG_DVBSUB
         /* Some DVB channels send stuffing segments in non-dated packets so

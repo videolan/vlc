@@ -453,7 +453,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             BC_STATUS status = BC_FUNC_PSYS(DtsProcInput)( p_sys->bcm_handle,
                                             p_block->p_buffer,
                                             p_block->i_buffer,
-                                            p_block->i_pts >= VLC_TS_INVALID ? TO_BC_PTS(p_block->i_pts) : 0, false );
+                                            p_block->i_pts != VLC_TS_INVALID ? TO_BC_PTS(p_block->i_pts) : 0, false );
 
             block_Release( p_block );
 

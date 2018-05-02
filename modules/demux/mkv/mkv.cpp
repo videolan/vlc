@@ -787,13 +787,13 @@ static int Demux( demux_t *p_demux)
             if( track.fmt.i_cat != VIDEO_ES && track.fmt.i_cat != AUDIO_ES )
                 continue;
 
-            if( track.i_last_dts < i_pcr || i_pcr <= VLC_TS_INVALID )
+            if( track.i_last_dts < i_pcr || i_pcr == VLC_TS_INVALID )
             {
                 i_pcr = track.i_last_dts;
             }
         }
 
-        if( i_pcr > VLC_TS_INVALID && i_pcr > p_sys->i_pcr )
+        if( i_pcr != VLC_TS_INVALID && i_pcr > p_sys->i_pcr )
         {
             if( es_out_SetPCR( p_demux->out, i_pcr ) )
             {

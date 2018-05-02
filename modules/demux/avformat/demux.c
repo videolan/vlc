@@ -852,7 +852,7 @@ static int Demux( demux_t *p_demux )
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 #endif
-    if( p_frame->i_dts > VLC_TS_INVALID && p_track->p_es != NULL )
+    if( p_frame->i_dts != VLC_TS_INVALID && p_track->p_es != NULL )
         p_track->i_pcr = p_frame->i_dts;
 
     int64_t i_ts_max = INT64_MIN;
@@ -866,7 +866,7 @@ static int Demux( demux_t *p_demux )
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL &&
-                p_sys->tracks[i].i_pcr > VLC_TS_INVALID &&
+                p_sys->tracks[i].i_pcr != VLC_TS_INVALID &&
                 p_sys->tracks[i].i_pcr + 10 * CLOCK_FREQ >= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tracks[i].i_pcr );
     }
@@ -921,7 +921,7 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         p_sys->tracks[i].i_pcr = VLC_TS_INVALID;
 
-    if( i_time > VLC_TS_INVALID )
+    if( i_time != VLC_TS_INVALID )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_time );
         UpdateSeekPoint( p_demux, i_time );

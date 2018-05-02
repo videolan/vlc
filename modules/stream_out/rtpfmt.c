@@ -917,7 +917,7 @@ static int rtp_packetize_mpv( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0,
-                          in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts );
+                          in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts );
 
         SetDWBE( out->p_buffer + 12, h );
 
@@ -1001,7 +1001,7 @@ static int rtp_packetize_split( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
@@ -1102,7 +1102,7 @@ static int rtp_packetize_mp4a_latm( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1) ? 1 : 0),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
 
         if( i == 0 )
         {
@@ -1149,7 +1149,7 @@ static int rtp_packetize_mp4a( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         /* AU headers */
         /* AU headers length (bits) */
         out->p_buffer[12] = 0;
@@ -1217,7 +1217,7 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
         /* rtp common header */
         //b_m_bit = 1; // always contains end of frame
         rtp_packetize_common( id, out, (i == i_count - 1)?1:0,
-                          in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts );
+                          in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts );
 
         /* h263 header */
         SetWBE( out->p_buffer + 12, h );
@@ -1312,7 +1312,7 @@ static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
     {
         /* TODO add STAP-A to remove a lot of overhead with small slice/sei/... */
         rtp_packetize_h264_nal( id, p_nal, i_nal,
-                (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts), in->i_dts,
+                (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts), in->i_dts,
                 it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer );
     }
 
@@ -1393,7 +1393,7 @@ static int rtp_packetize_h265( sout_stream_id_sys_t *id, block_t *in )
     while( hxxx_annexb_iterate_next( &it, &p_nal, &i_nal ) )
     {
         rtp_packetize_h265_nal( id, p_nal, i_nal,
-                (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts), in->i_dts,
+                (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts), in->i_dts,
                 it.p_head + 3 >= it.p_tail, in->i_length * i_nal / in->i_buffer );
     }
 
@@ -1418,7 +1418,7 @@ static int rtp_packetize_amr( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, ((i == i_count - 1)?1:0),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         /* Payload header */
         out->p_buffer[12] = 0xF0; /* CMR */
         out->p_buffer[13] = p_data[0]&0x7C; /* ToC */ /* FIXME: frame type */
@@ -1555,7 +1555,7 @@ static int rtp_packetize_spx( sout_stream_id_sys_t *id, block_t *in )
 
     /* Add the RTP header to our p_output buffer. */
     rtp_packetize_common( id, p_out, 0,
-                        (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                        (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
     /* Copy the Speex payload to the p_output buffer */
     memcpy( &p_out->p_buffer[12], p_buffer, i_data_size );
 
@@ -1584,7 +1584,7 @@ static int rtp_packetize_g726( sout_stream_id_sys_t *id, block_t *in, int i_pad 
 
         /* rtp common header */
         rtp_packetize_common( id, out, 0,
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
 
         memcpy( &out->p_buffer[12], p_data, i_payload );
 
@@ -1657,7 +1657,7 @@ static int rtp_packetize_vp8( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i == i_count - 1),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( &out->p_buffer[RTP_VP8_PAYLOAD_START], p_data, i_payload );
 
         out->i_dts    = in->i_dts + i * in->i_length / i_count;
@@ -1799,7 +1799,7 @@ static int rtp_packetize_rawvideo( sout_stream_id_sys_t *id, block_t *in, vlc_fo
 
         /* rtp common header */
         rtp_packetize_common( id, out, i_line_number >= i_height,
-                (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
 
         out->i_dts    = in->i_dts;
         out->i_length = in->i_length;
@@ -1990,7 +1990,7 @@ static int rtp_packetize_jpeg( sout_stream_id_sys_t *id, block_t *in )
 
         /* rtp common header */
         rtp_packetize_common( id, out, (i_payload == i_data),
-                      (in->i_pts > VLC_TS_INVALID ? in->i_pts : in->i_dts) );
+                      (in->i_pts != VLC_TS_INVALID ? in->i_pts : in->i_dts) );
         memcpy( p, p_data, i_payload );
 
         out->i_dts    = in->i_dts;

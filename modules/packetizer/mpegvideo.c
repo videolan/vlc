@@ -399,8 +399,8 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* We've just started the stream, wait for the first PTS.
      * We discard here so we can still get the sequence header. */
-    if( unlikely( p_sys->i_dts <= VLC_TS_INVALID && p_sys->i_pts <= VLC_TS_INVALID &&
-        date_Get( &p_sys->dts ) <= VLC_TS_INVALID ))
+    if( unlikely( p_sys->i_dts == VLC_TS_INVALID && p_sys->i_pts == VLC_TS_INVALID &&
+        date_Get( &p_sys->dts ) == VLC_TS_INVALID ))
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
@@ -408,7 +408,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* When starting the stream we can have the first frame with
      * an invalid DTS (i_interpolated_pts is initialized to VLC_TS_INVALID) */
-    if( unlikely( p_au->i_dts <= VLC_TS_INVALID ) )
+    if( unlikely( p_au->i_dts == VLC_TS_INVALID ) )
         p_au->i_dts = p_au->i_pts;
 
     return VLC_SUCCESS;
@@ -575,17 +575,17 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             {
                 /* Trivial case (DTS == PTS) */
                 /* Correct interpolated dts when we receive a new pts/dts */
-                if( p_sys->i_pts > VLC_TS_INVALID )
+                if( p_sys->i_pts != VLC_TS_INVALID )
                     date_Set( &p_sys->dts, p_sys->i_pts );
-                if( p_sys->i_dts > VLC_TS_INVALID )
+                if( p_sys->i_dts != VLC_TS_INVALID )
                     date_Set( &p_sys->dts, p_sys->i_dts );
             }
             else
             {
                 /* Correct interpolated dts when we receive a new pts/dts */
-                if(p_sys->i_last_ref_pts > VLC_TS_INVALID && !p_sys->b_second_field)
+                if(p_sys->i_last_ref_pts != VLC_TS_INVALID && !p_sys->b_second_field)
                     date_Set( &p_sys->dts, p_sys->i_last_ref_pts );
-                if( p_sys->i_dts > VLC_TS_INVALID )
+                if( p_sys->i_dts != VLC_TS_INVALID )
                     date_Set( &p_sys->dts, p_sys->i_dts );
 
                 if( !p_sys->b_second_field )
@@ -595,7 +595,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
             p_pic->i_dts = date_Get( &p_sys->dts );
 
             /* Set PTS only if we have a B frame or if it comes from the stream */
-            if( p_sys->i_pts > VLC_TS_INVALID )
+            if( p_sys->i_pts != VLC_TS_INVALID )
             {
                 p_pic->i_pts = p_sys->i_pts;
             }
@@ -620,7 +620,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         msg_Dbg( p_dec, "pic: type=%d ref=%d nf=%d tff=%d dts=%"PRId64" ptsdiff=%"PRId64" len=%"PRId64,
                  p_sys->i_picture_structure, p_sys->i_temporal_ref, i_num_fields,
                  p_sys->i_top_field_first,
-                 p_pic->i_dts , (p_pic->i_pts > VLC_TS_INVALID) ? p_pic->i_pts - p_pic->i_dts : 0, p_pic->i_length );
+                 p_pic->i_dts , (p_pic->i_pts != VLC_TS_INVALID) ? p_pic->i_pts - p_pic->i_dts : 0, p_pic->i_length );
 #endif
 
 

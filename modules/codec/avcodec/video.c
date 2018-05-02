@@ -765,7 +765,7 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
-   if( i_display_date > VLC_TS_INVALID && i_display_date <= current_time )
+   if( i_display_date != VLC_TS_INVALID && i_display_date <= current_time )
    {
        /* Out of preroll, consider only late frames on rising delay */
        if( p_sys->b_from_preroll )
@@ -1037,8 +1037,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 pkt.data = p_block->p_buffer;
                 pkt.size = p_block->i_buffer;
-                pkt.pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-                pkt.dts = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
+                pkt.pts = p_block->i_pts != VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+                pkt.dts = p_block->i_dts != VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
             }
             else
             {
@@ -1152,7 +1152,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_pts = date_Get( &p_sys->pts );
 
         /* Interpolate the next PTS */
-        if( i_pts > VLC_TS_INVALID )
+        if( i_pts != VLC_TS_INVALID )
             date_Set( &p_sys->pts, i_pts );
 
         interpolate_next_pts( p_dec, frame );
@@ -1272,7 +1272,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         av_frame_free(&frame);
 
         /* Send decoded frame to vout */
-        if (i_pts > VLC_TS_INVALID)
+        if (i_pts != VLC_TS_INVALID)
         {
             p_sys->b_first_frame = false;
             decoder_QueueVideo( p_dec, p_pic );

@@ -329,10 +329,10 @@ static int Demux( demux_t *p_demux )
         /* Correct timestamp */
         if( p_sys->p_packetizer->fmt_out.i_cat == VIDEO_ES )
         {
-            if( p_block_out->i_pts <= VLC_TS_INVALID &&
-                p_block_out->i_dts <= VLC_TS_INVALID )
+            if( p_block_out->i_pts == VLC_TS_INVALID &&
+                p_block_out->i_dts == VLC_TS_INVALID )
                 p_block_out->i_dts = VLC_TS_0 + p_sys->i_pts + 1000000 / p_sys->f_fps;
-            if( p_block_out->i_dts > VLC_TS_INVALID )
+            if( p_block_out->i_dts != VLC_TS_INVALID )
                 p_sys->i_pts = p_block_out->i_dts - VLC_TS_0;
         }
         else
@@ -340,11 +340,11 @@ static int Demux( demux_t *p_demux )
             p_sys->i_pts = p_block_out->i_pts - VLC_TS_0;
         }
 
-        if( p_block_out->i_pts > VLC_TS_INVALID )
+        if( p_block_out->i_pts != VLC_TS_INVALID )
         {
             p_block_out->i_pts += p_sys->i_time_offset;
         }
-        if( p_block_out->i_dts > VLC_TS_INVALID )
+        if( p_block_out->i_dts != VLC_TS_INVALID )
         {
             p_block_out->i_dts += p_sys->i_time_offset;
             es_out_SetPCR( p_demux->out, p_block_out->i_dts );

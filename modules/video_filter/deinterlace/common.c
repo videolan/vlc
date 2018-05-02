@@ -81,7 +81,7 @@ mtime_t GetFieldDuration(const struct deinterlace_ctx *p_context,
     /* Find oldest valid logged date.
        The current input frame doesn't count. */
     for( ; i < iend; i++ )
-        if( p_context->meta[i].pi_date > VLC_TS_INVALID )
+        if( p_context->meta[i].pi_date != VLC_TS_INVALID )
             break;
     if( i < iend )
     {
@@ -324,7 +324,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
             {
                 /* XXX it's not really good especially for the first picture, but
                  * I don't think that delaying by one frame is worth it */
-                if( i_base_pts > VLC_TS_INVALID )
+                if( i_base_pts != VLC_TS_INVALID )
                     p_dst[i]->date = i_base_pts + i * i_field_dur;
                 else
                     p_dst[i]->date = VLC_TS_INVALID;

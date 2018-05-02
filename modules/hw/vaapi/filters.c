@@ -915,7 +915,7 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
     mtime_t i_field_dur = 0;
     unsigned int i = 0;
     for ( ; i < METADATA_SIZE-1; i ++)
-        if (p_deint_data->meta[i].date > VLC_TS_INVALID)
+        if (p_deint_data->meta[i].date != VLC_TS_INVALID)
             break;
     if (i < METADATA_SIZE-1) {
         unsigned int i_fields_total = 0;
@@ -943,7 +943,7 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
 
     dest[0]->p_next = dest[1];
     dest[0]->date = cur->date;
-    if (dest[0]->date > VLC_TS_INVALID)
+    if (dest[0]->date != VLC_TS_INVALID)
         dest[1]->date = dest[0]->date + i_field_dur;
     else
         dest[1]->date = VLC_TS_INVALID;

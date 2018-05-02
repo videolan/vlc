@@ -336,7 +336,7 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    if (p_block->i_pts > VLC_TS_INVALID && !date_Get(&p_sys->end_date)) {
+    if (p_block->i_pts != VLC_TS_INVALID && !date_Get(&p_sys->end_date)) {
         date_Set(&p_sys->end_date, p_block->i_pts);
     } else if (p_block->i_pts < date_Get(&p_sys->end_date)) {
         msg_Warn(p_dec, "MIDI message in the past?");

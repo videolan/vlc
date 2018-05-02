@@ -309,7 +309,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
-        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts == VLC_TS_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
             msg_Dbg( p_dec, "waiting for PTS" );
@@ -349,7 +349,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts > VLC_TS_INVALID &&
+            if( p_sys->i_pts != VLC_TS_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
                 if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') )

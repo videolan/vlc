@@ -249,7 +249,7 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
                              p_tk->pi_chan_table, p_tk->fmt.i_codec );
     }
 
-    if( p_block->i_dts > VLC_TS_INVALID &&
+    if( p_block->i_dts != VLC_TS_INVALID &&
         ( p_tk->fmt.i_cat == VIDEO_ES || p_tk->fmt.i_cat == AUDIO_ES ) )
     {
         p_tk->i_last_dts = p_block->i_dts;

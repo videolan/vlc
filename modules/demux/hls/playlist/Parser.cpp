@@ -258,7 +258,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                 segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
                 nzStartTime += nzDuration;
                 totalduration += nzDuration;
-                if(absReferenceTime > VLC_TS_INVALID)
+                if(absReferenceTime != VLC_TS_INVALID)
                 {
                     segment->utcTime = absReferenceTime;
                     absReferenceTime += nzDuration;

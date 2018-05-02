@@ -476,7 +476,7 @@ mtime_t CommandsQueue::getFirstDTS() const
     for( it = commands.begin(); it != commands.end(); ++it )
     {
         const mtime_t i_dts = (*it)->getTime();
-        if( i_dts > VLC_TS_INVALID )
+        if( i_dts != VLC_TS_INVALID )
         {
             if( i_dts < i_firstdts || i_firstdts == VLC_TS_INVALID )
                 i_firstdts = i_dts;

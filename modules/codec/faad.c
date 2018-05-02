@@ -317,7 +317,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
-    if( i_pts > VLC_TS_INVALID && i_pts != date_Get( &p_sys->date ) )
+    if( i_pts != VLC_TS_INVALID && i_pts != date_Get( &p_sys->date ) )
     {
         date_Set( &p_sys->date, i_pts );
     }

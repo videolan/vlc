@@ -215,7 +215,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     /* Feed input block */
     if( p_block != NULL )
     {
-        i_pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
+        i_pts = p_block->i_pts != VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
         if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
         {
@@ -227,7 +227,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             }
         }
 
-        if( !date_Get( &p_sys->end_date ) && i_pts <= VLC_TS_INVALID )
+        if( !date_Get( &p_sys->end_date ) && i_pts == VLC_TS_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
             msg_Dbg( p_dec, "waiting for PTS" );

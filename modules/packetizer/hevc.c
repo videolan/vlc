@@ -850,7 +850,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 
     if(p_sys->b_need_ts)
     {
-        if(p_frag->i_dts > VLC_TS_INVALID)
+        if(p_frag->i_dts != VLC_TS_INVALID)
             date_Set(&p_sys->dts, p_frag->i_dts);
         p_sys->pts = p_frag->i_pts;
         if(date_Get( &p_sys->dts ) != VLC_TS_INVALID)
@@ -893,7 +893,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     if(p_output)
     {
         SetOutputBlockProperties( p_dec, p_output );
-        if (dts > VLC_TS_INVALID)
+        if (dts != VLC_TS_INVALID)
             date_Set(&p_sys->dts, dts);
         p_sys->pts = pts;
         *pb_ts_used = true;

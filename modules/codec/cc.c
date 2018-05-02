@@ -488,7 +488,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
     subpicture_t *p_spu = NULL;
 
     /* We cannot display a subpicture with no date */
-    if( i_pts <= VLC_TS_INVALID )
+    if( i_pts == VLC_TS_INVALID )
         return NULL;
 
     /* Create the subpicture unit */

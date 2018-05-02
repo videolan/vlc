@@ -336,7 +336,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         /* We've just started the stream, wait for the first PTS. */
-        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts == VLC_TS_INVALID )
             goto drop;
 
         if( p_block->i_buffer <= 0 )

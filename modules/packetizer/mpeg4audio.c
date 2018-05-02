@@ -330,10 +330,10 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
     *pp_block = NULL; /* Don't reuse this block */
 
-    if (p_block->i_pts > VLC_TS_INVALID &&
+    if (p_block->i_pts != VLC_TS_INVALID &&
         p_block->i_pts != date_Get(&p_sys->end_date))
     {
-        if(date_Get(&p_sys->end_date) > VLC_TS_INVALID)
+        if(date_Get(&p_sys->end_date) != VLC_TS_INVALID)
             p_sys->b_discontuinity = true;
         date_Set(&p_sys->end_date, p_block->i_pts);
     }
@@ -1066,7 +1066,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
     case STATE_SYNC:
         /* New frame, set the Presentation Time Stamp */
         p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-        if (p_sys->i_pts > VLC_TS_INVALID &&
+        if (p_sys->i_pts != VLC_TS_INVALID &&
             p_sys->i_pts != date_Get(&p_sys->end_date))
             date_Set(&p_sys->end_date, p_sys->i_pts);
         p_sys->i_state = STATE_HEADER;
@@ -1238,7 +1238,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             }
         }
 
-        if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID)
+        if (!date_Get(&p_sys->end_date) && p_block->i_pts == VLC_TS_INVALID)
         {
             /* We've just started the stream, wait for the first PTS. */
             block_Release(p_block);

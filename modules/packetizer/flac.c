@@ -487,14 +487,14 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
 
         if( p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
-            p_sys->bytestream.p_block->i_pts > VLC_TS_INVALID )
+            p_sys->bytestream.p_block->i_pts != VLC_TS_INVALID )
         {
             date_Init( &p_sys->pts, p_sys->headerinfo.i_rate, 1 );
             date_Set( &p_sys->pts, p_sys->bytestream.p_block->i_pts );
             p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
         }
 
-        if( date_Get( &p_sys->pts ) > VLC_TS_INVALID )
+        if( date_Get( &p_sys->pts ) != VLC_TS_INVALID )
         {
             out = block_heap_Alloc( p_sys->p_buf, p_sys->i_frame_size );
             if( out )

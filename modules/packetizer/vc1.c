@@ -298,7 +298,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->i_interpolated_dts <= VLC_TS_INVALID )
+    if( p_sys->i_interpolated_dts == VLC_TS_INVALID )
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
@@ -376,23 +376,23 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         p_pic->i_pts = p_sys->i_frame_pts;
 
         /* */
-        if( p_pic->i_dts > VLC_TS_INVALID )
+        if( p_pic->i_dts != VLC_TS_INVALID )
             p_sys->i_interpolated_dts = p_pic->i_dts;
 
         /* We can interpolate dts/pts only if we have a frame rate */
         if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
         {
-            if( p_sys->i_interpolated_dts > VLC_TS_INVALID )
+            if( p_sys->i_interpolated_dts != VLC_TS_INVALID )
                 p_sys->i_interpolated_dts += INT64_C(1000000) *
                                              p_dec->fmt_out.video.i_frame_rate_base /
                                              p_dec->fmt_out.video.i_frame_rate;
 
             //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
             //         p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
-            if( p_pic->i_dts <= VLC_TS_INVALID )
+            if( p_pic->i_dts == VLC_TS_INVALID )
                 p_pic->i_dts = p_sys->i_interpolated_dts;
 
-            if( p_pic->i_pts <= VLC_TS_INVALID )
+            if( p_pic->i_pts == VLC_TS_INVALID )
             {
                 if( !p_sys->sh.b_has_bframe || (p_pic->i_flags & BLOCK_FLAG_TYPE_B ) )
                     p_pic->i_pts = p_pic->i_dts;
@@ -419,7 +419,7 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     }
 
     /*  */
-    if( p_sys->i_frame_dts <= VLC_TS_INVALID && p_sys->i_frame_pts <= VLC_TS_INVALID )
+    if( p_sys->i_frame_dts == VLC_TS_INVALID && p_sys->i_frame_pts == VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = p_frag->i_dts;
         p_sys->i_frame_pts = p_frag->i_pts;

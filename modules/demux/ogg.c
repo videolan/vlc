@@ -194,7 +194,7 @@ static void fill_channels_info(audio_format_t *audio)
 
 /* Special TS value: don't send or derive any pts/pcr from it.
    Represents TS state prior first known valid timestamp */
-#define VLC_TS_UNKNOWN (VLC_TS_INVALID - 1)
+#define VLC_TS_UNKNOWN (VLC_TS_INVALID + 1)
 
 /*****************************************************************************
  * Open: initializes ogg demux structures
@@ -320,7 +320,7 @@ static int Demux( demux_t * p_demux )
             Ogg_EndOfStream( p_demux );
             p_sys->b_chained_boundary = true;
 
-            if( i_lastpcr > VLC_TS_INVALID )
+            if( i_lastpcr != VLC_TS_INVALID )
             {
                 p_sys->i_nzpcr_offset = i_lastpcr - VLC_TS_0;
                 if( likely( !p_sys->b_slave ) )
@@ -419,7 +419,7 @@ static int Demux( demux_t * p_demux )
             {
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
                 Ogg_ResetStream( p_stream );
-                if( p_stream->i_pcr > VLC_TS_INVALID )
+                if( p_stream->i_pcr != VLC_TS_INVALID )
                     p_sys->i_nzpcr_offset = p_stream->i_pcr - VLC_TS_0;
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
             }
@@ -677,7 +677,7 @@ static int Demux( demux_t * p_demux )
         }
     }
 
-    if ( i_pcr_candidate > VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
+    if ( i_pcr_candidate != VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
     {
         if ( p_sys->i_streams == 1 && p_sys->i_access_delay )
         {
@@ -791,7 +791,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            if( p_sys->i_pcr > VLC_TS_INVALID || p_sys->b_slave )
+            if( p_sys->i_pcr != VLC_TS_INVALID || p_sys->b_slave )
             {
                 pi64 = va_arg( args, int64_t * );
                 *pi64 = p_sys->i_pcr;
@@ -840,7 +840,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
-            if( p_sys->i_length > 0 && p_sys->i_pcr > VLC_TS_INVALID )
+            if( p_sys->i_length > 0 && p_sys->i_pcr != VLC_TS_INVALID )
             {
                 *pf =  (double) p_sys->i_pcr /
                        (double) ( p_sys->i_length * (mtime_t)1000000 );
@@ -1207,7 +1207,7 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                          tosend->i_dts, tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
                 es_out_Send( p_demux->out, p_stream->p_es, tosend );
 
-                if ( p_ogg->i_pcr < VLC_TS_0 && i_firstpts > VLC_TS_INVALID )
+                if ( p_ogg->i_pcr < VLC_TS_0 && i_firstpts != VLC_TS_INVALID )
                 {
                     p_ogg->i_pcr = i_firstpts;
                     if( likely( !p_ogg->b_slave ) )
@@ -1458,8 +1458,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         {
             ogg_int64_t nzdts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, false );
             ogg_int64_t nzpts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, true );
-            p_block->i_dts = ( nzdts > VLC_TS_INVALID ) ? VLC_TS_0 + nzdts : nzdts;
-            p_block->i_pts = ( nzpts > VLC_TS_INVALID ) ? VLC_TS_0 + nzpts : nzpts;
+            p_block->i_dts = ( nzdts != VLC_TS_INVALID ) ? VLC_TS_0 + nzdts : nzdts;
+            p_block->i_pts = ( nzpts != VLC_TS_INVALID ) ? VLC_TS_0 + nzpts : nzpts;
             /* granulepos for dirac is possibly broken, this value should be ignored */
             if( 0 >= p_oggpacket->granulepos )
             {

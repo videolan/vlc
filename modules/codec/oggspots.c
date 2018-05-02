@@ -310,7 +310,7 @@ static void* ProcessPacket(decoder_t* p_dec, block_t* p_block)
     }
 
     /* Date management */
-    if (p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts) {
+    if (p_block->i_pts != VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts) {
         p_sys->i_pts = p_block->i_pts;
     }
 

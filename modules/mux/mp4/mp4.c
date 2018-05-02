@@ -551,7 +551,7 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, mtime_t i_mux_start_dts,
     }
     else
     {
-        if(p_stream->i_last_pts > VLC_TS_INVALID)
+        if(p_stream->i_last_pts != VLC_TS_INVALID)
             p_newedit->i_duration = p_stream->i_last_pts - p_stream->i_first_dts;
         else
             p_newedit->i_duration = p_stream->i_last_dts - p_stream->i_first_dts;
@@ -594,7 +594,7 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
 
 static inline mtime_t dts_fb_pts( const block_t *p_data )
 {
-    return p_data->i_dts > VLC_TS_INVALID ? p_data->i_dts: p_data->i_pts;
+    return p_data->i_dts != VLC_TS_INVALID ? p_data->i_dts: p_data->i_pts;
 }
 
 static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_stream)
@@ -715,7 +715,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     e->i_pos    = p_sys->i_pos;
     e->i_size   = p_data->i_buffer;
 
-    if ( p_data->i_dts > VLC_TS_INVALID && p_data->i_pts > p_data->i_dts )
+    if ( p_data->i_dts != VLC_TS_INVALID && p_data->i_pts > p_data->i_dts )
     {
         e->i_pts_dts = p_data->i_pts - p_data->i_dts;
         if ( !p_stream->mux.b_hasbframes )
@@ -1065,7 +1065,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                 if (i_trun_flags & MP4_TRUN_SAMPLE_TIME_OFFSET)
                 {
                     uint32_t i_diff = 0;
-                    if ( p_entry->p_block->i_dts  > VLC_TS_INVALID &&
+                    if ( p_entry->p_block->i_dts  != VLC_TS_INVALID &&
                          p_entry->p_block->i_pts > p_entry->p_block->i_dts )
                     {
                         i_diff = p_entry->p_block->i_pts - p_entry->p_block->i_dts;
@@ -1476,7 +1476,7 @@ static int MuxFrag(sout_mux_t *p_mux)
         if (!p_stream->b_hasiframes && (p_currentblock->i_flags & BLOCK_FLAG_TYPE_I))
             p_stream->b_hasiframes = true;
 
-        if (!p_stream->mux.b_hasbframes && p_currentblock->i_dts > VLC_TS_INVALID &&
+        if (!p_stream->mux.b_hasbframes && p_currentblock->i_dts != VLC_TS_INVALID &&
             p_currentblock->i_pts > p_currentblock->i_dts)
             p_stream->mux.b_hasbframes = true;
     }

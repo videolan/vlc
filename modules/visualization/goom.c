@@ -242,7 +242,7 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
                 p_block->i_buffer / sizeof(float) / p_this->i_channels );
 
         /* Date management */
-        if( p_block->i_pts > VLC_TS_INVALID &&
+        if( p_block->i_pts != VLC_TS_INVALID &&
             p_block->i_pts != date_Get( pi_date_end ) )
         {
            date_Set( pi_date_end, p_block->i_pts );
