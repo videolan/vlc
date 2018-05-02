@@ -1,3 +1,25 @@
+Changes between 3.0.2 and 3.0.3:
+--------------------------------
+
+Core:
+ * Update subtitles display while paused
+
+Access:
+ * Enable srt support
+
+Decoders:
+ * Allow videotoolbox hardware decoding to be disabled
+ * Fix subsdec wide character support
+
+Demux:
+ * Miscellaneous ogg improvements & bugfixes
+
+macOS:
+ * Fix "Open Network Stream" URL box focus
+
+Qt:
+ * Fix tooltip display on some desktop environments
+
 Changes between 3.0.1 and 3.0.2:
 --------------------------------
 
