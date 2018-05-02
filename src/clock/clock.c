@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include "clock.h"
+#include "clock_internal.h"
 #include <assert.h>
 
 /* TODO:
@@ -97,42 +98,6 @@
 //#define CR_BUFFERING_TARGET (60000000)
 /* Due to some problems in es_out, we cannot use a large value yet */
 #define CR_BUFFERING_TARGET (100000)
-
-/*****************************************************************************
- * Structures
- *****************************************************************************/
-
-/**
- * This structure holds long term average
- */
-typedef struct
-{
-    mtime_t i_value;
-    int     i_residue;
-
-    int     i_count;
-    int     i_divider;
-} average_t;
-static void    AvgInit( average_t *, int i_divider );
-static void    AvgClean( average_t * );
-
-static void    AvgReset( average_t * );
-static void    AvgUpdate( average_t *, mtime_t i_value );
-static mtime_t AvgGet( average_t * );
-static void    AvgRescale( average_t *, int i_divider );
-
-/* */
-typedef struct
-{
-    mtime_t i_stream;
-    mtime_t i_system;
-} clock_point_t;
-
-static inline clock_point_t clock_point_Create( mtime_t i_stream, mtime_t i_system )
-{
-    clock_point_t p = { .i_stream = i_stream, .i_system = i_system };
-    return p;
-}
 
 /* */
 #define INPUT_CLOCK_LATE_COUNT (3)
@@ -630,45 +595,3 @@ static mtime_t ClockGetTsOffset( input_clock_t *cl )
     return cl->i_pts_delay * ( cl->i_rate - INPUT_RATE_DEFAULT ) / INPUT_RATE_DEFAULT;
 }
 
-/*****************************************************************************
- * Long term average helpers
- *****************************************************************************/
-static void AvgInit( average_t *p_avg, int i_divider )
-{
-    p_avg->i_divider = i_divider;
-    AvgReset( p_avg );
-}
-static void AvgClean( average_t *p_avg )
-{
-    VLC_UNUSED(p_avg);
-}
-static void AvgReset( average_t *p_avg )
-{
-    p_avg->i_value = 0;
-    p_avg->i_residue = 0;
-    p_avg->i_count = 0;
-}
-static void AvgUpdate( average_t *p_avg, mtime_t i_value )
-{
-    const int i_f0 = __MIN( p_avg->i_divider - 1, p_avg->i_count );
-    const int i_f1 = p_avg->i_divider - i_f0;
-
-    const mtime_t i_tmp = i_f0 * p_avg->i_value + i_f1 * i_value + p_avg->i_residue;
-
-    p_avg->i_value   = i_tmp / p_avg->i_divider;
-    p_avg->i_residue = i_tmp % p_avg->i_divider;
-
-    p_avg->i_count++;
-}
-static mtime_t AvgGet( average_t *p_avg )
-{
-    return p_avg->i_value;
-}
-static void AvgRescale( average_t *p_avg, int i_divider )
-{
-    const mtime_t i_tmp = p_avg->i_value * p_avg->i_divider + p_avg->i_residue;
-
-    p_avg->i_divider = i_divider;
-    p_avg->i_value   = i_tmp / p_avg->i_divider;
-    p_avg->i_residue = i_tmp % p_avg->i_divider;
-}
