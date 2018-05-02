@@ -41,7 +41,7 @@
 #include <vlc_meta.h>
 
 #include "input_internal.h"
-#include "../clock/clock.h"
+#include "../clock/input_clock.h"
 #include "decoder.h"
 #include "es_out.h"
 #include "event.h"

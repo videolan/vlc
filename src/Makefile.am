@@ -231,7 +231,7 @@ libvlccore_la_SOURCES = \
 	input/item.c \
 	input/access.c \
 	clock/clock_internal.c \
-	clock/clock.c \
+	clock/input_clock.c \
 	input/control.c \
 	input/decoder.c \
 	input/demux.c \
@@ -242,7 +242,7 @@ libvlccore_la_SOURCES = \
 	input/input.c \
 	input/info.h \
 	input/meta.c \
-	clock/clock.h \
+	clock/input_clock.h \
 	clock/clock_internal.h \
 	input/decoder.h \
 	input/demux.h \
