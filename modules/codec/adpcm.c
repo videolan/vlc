@@ -281,7 +281,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[i_channels];
 
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;
@@ -296,7 +296,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /*****************************************************************************
@@ -318,12 +318,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             goto drop;
     }
 
-    if( p_block->i_pts > VLC_TS_INVALID &&
+    if( p_block->i_pts != VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
-    else if( !date_Get( &p_sys->end_date ) )
+    else if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
         /* We've just started the stream, wait for the first PTS. */
         goto drop;
 
