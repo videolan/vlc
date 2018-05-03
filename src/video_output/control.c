@@ -27,7 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
-#include "control.h"
+#include "vout_internal.h"
 
 /* */
 void vout_control_cmd_Init(vout_control_cmd_t *cmd, int type)

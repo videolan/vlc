@@ -29,7 +29,6 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout_wrapper.h>
-#include "control.h"
 #include "snapshot.h"
 #include "statistic.h"
 #include "chrono.h"
@@ -41,6 +40,18 @@
  * may be degraded.
  */
 #define VOUT_MAX_PICTURES (20)
+
+/**
+ * Vout configuration
+ */
+typedef struct {
+    vout_thread_t        *vout;
+    vlc_object_t         *input;
+    bool                 change_fmt;
+    const video_format_t *fmt;
+    unsigned             dpb_size;
+} vout_configuration_t;
+#include "control.h"
 
 /* */
 struct vout_thread_sys_t
@@ -136,6 +147,45 @@ struct vout_thread_sys_t
     picture_fifo_t  *decoder_fifo;
     vout_chrono_t   render;           /**< picture render time estimator */
 };
+
+/**
+ * Returns a suitable vout or release the given one.
+ *
+ * If cfg->fmt is non NULL and valid, a vout will be returned, reusing cfg->vout
+ * is possible, otherwise it returns NULL.
+ * If cfg->vout is not used, it will be closed and released.
+ *
+ * You can release the returned value either by vout_Request or vout_Close()
+ * followed by a vlc_object_release() or shorter vout_CloseAndRelease()
+ *
+ * \param object a vlc object
+ * \param cfg the video configuration requested.
+ * \return a vout
+ */
+vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *cfg );
+#define vout_Request(a,b) vout_Request(VLC_OBJECT(a),b)
+
+/**
+ * This function will close a vout created by vout_Request.
+ * The associated vout module is closed.
+ * Note: It is not released yet, you'll have to call vlc_object_release()
+ * or use the convenient vout_CloseAndRelease().
+ *
+ * \param p_vout the vout to close
+ */
+void vout_Close( vout_thread_t *p_vout );
+
+/**
+ * This function will close a vout created by vout_Create
+ * and then release it.
+ *
+ * \param p_vout the vout to close and release
+ */
+static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
+{
+    vout_Close( p_vout );
+    vlc_object_release( p_vout );
+}
 
 /* TODO to move them to vlc_vout.h */
 void vout_ControlChangeFullscreen(vout_thread_t *, bool fullscreen);

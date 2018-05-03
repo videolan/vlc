@@ -703,7 +703,6 @@ vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
 vout_ChangeAspectRatio
-vout_Close
 vout_GetPicture
 vout_PutPicture
 vout_PutSubpicture
@@ -715,7 +714,6 @@ vout_OSDMessage
 vout_OSDEpg
 vout_OSDSlider
 vout_OSDText
-vout_Request
 vout_window_New
 vout_window_Delete
 vout_display_GetDefaultDisplaySize
