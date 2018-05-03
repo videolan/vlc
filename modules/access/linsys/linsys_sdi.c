@@ -55,7 +55,7 @@
 #define SDI_MODE_FILE     "/sys/class/sdi/sdirx%u/mode"
 #define READ_TIMEOUT      80000
 #define RESYNC_TIMEOUT    500000
-#define CLOCK_GAP         INT64_C(500000)
+#define CLOCK_GAP         (CLOCK_FREQ/2)
 #define START_DATE        INT64_C(4294967296)
 
 #define DEMUX_BUFFER_SIZE 1350000

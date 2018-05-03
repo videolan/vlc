@@ -492,7 +492,7 @@ int intf_sys_t::pace()
     m_interrupted = false;
     vlc_interrupt_register( interrupt_wake_up_cb, this );
     int ret = 0;
-    mtime_t deadline = mdate() + INT64_C(500000);
+    mtime_t deadline = mdate() + CLOCK_FREQ/2;
 
     /* Wait for the sout to send more data via http (m_pace), or wait for the
      * CC to finish. In case the demux filter is EOF, we always wait for

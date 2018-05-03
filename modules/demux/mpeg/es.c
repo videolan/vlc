@@ -350,7 +350,7 @@ static int Demux( demux_t *p_demux )
             es_out_SetPCR( p_demux->out, p_block_out->i_dts );
         }
         /* Re-estimate bitrate */
-        if( p_sys->b_estimate_bitrate && p_sys->i_pts > INT64_C(500000) )
+        if( p_sys->b_estimate_bitrate && p_sys->i_pts > (CLOCK_FREQ/2) )
             p_sys->i_bitrate_avg = 8*1000000*p_sys->i_bytes/(p_sys->i_pts-1);
         p_sys->i_bytes += p_block_out->i_buffer;
 

@@ -1518,7 +1518,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt > 0 )
             {
-                *pi64 = (int64_t)(p_sys->f_npt * CLOCK_FREQ);
+                *pi64 = (int64_t)(p_sys->f_npt * (double)CLOCK_FREQ);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1527,7 +1527,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
-                double d_length = p_sys->f_npt_length * CLOCK_FREQ;
+                double d_length = p_sys->f_npt_length * (double)CLOCK_FREQ;
                 if( d_length >= INT64_MAX )
                     *pi64 = INT64_MAX;
                 else

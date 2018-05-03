@@ -61,7 +61,7 @@
 #define SDIAUDIO_SAMPLESIZE_FILE "/sys/class/sdiaudio/sdiaudiorx%u/sample_size"
 #define SDIAUDIO_CHANNELS_FILE  "/sys/class/sdiaudio/sdiaudiorx%u/channels"
 #define NB_VBUFFERS             2
-#define CLOCK_GAP               INT64_C(500000)
+#define CLOCK_GAP               (CLOCK_FREQ/2)
 #define START_DATE              INT64_C(4294967296)
 
 #define MAX_AUDIOS              4
