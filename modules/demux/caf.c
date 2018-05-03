@@ -903,19 +903,13 @@ static int Open( vlc_object_t *p_this )
         goto caf_open_end;
     }
 
+    p_demux->pf_control = Control;
+    p_demux->pf_demux = Demux;
+    return VLC_SUCCESS;
+
 caf_open_end:
-
-    if( i_error )
-    {
-        es_format_Clean( &p_sys->fmt );
-        free( p_sys  );
-    }
-    else
-    {
-        p_demux->pf_control = Control;
-        p_demux->pf_demux = Demux;
-    }
-
+    es_format_Clean( &p_sys->fmt );
+    free( p_sys  );
     return i_error;
 }
 
