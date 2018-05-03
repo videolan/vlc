@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
@@ -450,6 +452,8 @@ static int ReadBlockHeader( demux_t *p_demux )
             memcpy( &p_sys->fmt, &new_fmt, sizeof( p_sys->fmt ) );
             date_Change( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
             p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+            if( unlikely(p_sys->p_es == NULL) )
+                return VLC_ENOMEM;
         }
     }
 
@@ -515,6 +519,7 @@ static int Demux( demux_t *p_demux )
     p_block->i_nb_samples = i_read_frames * p_sys->fmt.audio.i_frame_length;
     date_Increment( &p_sys->pts, p_block->i_nb_samples );
     es_out_SetPCR( p_demux->out, p_block->i_pts );
+    assert(p_sys->p_es != NULL);
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     return VLC_DEMUXER_SUCCESS;
