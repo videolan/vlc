@@ -202,11 +202,12 @@ static int Demux( demux_t *p_demux )
     block_t     *p_data;
 
     if( p_sys->i_currentframe >= p_sys->i_totalframes )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     p_data = vlc_stream_Block( p_demux->s,
                                p_sys->pi_seektable[p_sys->i_currentframe] );
-    if( p_data == NULL ) return 0;
+    if( p_data == NULL )
+        return VLC_DEMUXER_EOF;
     p_data->i_dts = p_data->i_pts = VLC_TS_0 + (int64_t)(INT64_C(1000000) * p_sys->i_currentframe) * TTA_FRAMETIME;
 
     p_sys->i_currentframe++;
@@ -215,7 +216,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->p_es )
         es_out_Send( p_demux->out, p_sys->p_es, p_data );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
