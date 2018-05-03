@@ -205,11 +205,6 @@ static const char * const dither_text[] = {
     add_module("glconv", "glconv", NULL, GLCONV_TEXT, GLCONV_LONGTEXT) \
     add_glopts_placebo ()
 
-static const vlc_fourcc_t gl_subpicture_chromas[] = {
-    VLC_CODEC_RGBA,
-    0
-};
-
 typedef struct vout_display_opengl_t vout_display_opengl_t;
 
 vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,

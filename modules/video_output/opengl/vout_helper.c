@@ -171,6 +171,11 @@ struct vout_display_opengl_t {
     float f_sar;
 };
 
+static const vlc_fourcc_t gl_subpicture_chromas[] = {
+    VLC_CODEC_RGBA,
+    0
+};
+
 static const GLfloat identity[] = {
     1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f,
