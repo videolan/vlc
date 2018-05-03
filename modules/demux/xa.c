@@ -142,6 +142,8 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
+    if( unlikely(p_sys->p_es == NULL) )
+        return VLC_ENOMEM;
 
     date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
     date_Set( &p_sys->pts, VLC_TS_0 );
