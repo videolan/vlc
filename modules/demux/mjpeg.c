@@ -278,12 +278,8 @@ static int SendBlock( demux_t *p_demux, int i )
     }
     p_block->i_dts = p_block->i_pts;
 
-    /* set PCR */
     es_out_SetPCR( p_demux->out, p_block->i_pts );
-    if( p_sys->p_es )
-        es_out_Send( p_demux->out, p_sys->p_es, p_block );
-    else
-        block_Release( p_block );
+    es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     if( p_sys->b_still )
         p_sys->i_still_end = mdate() + p_sys->i_frame_length;
@@ -387,6 +383,8 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_MJPG );
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->p_es == NULL) )
+        return VLC_ENOMEM;
 
     p_demux->pf_control = Control;
     return VLC_SUCCESS;
