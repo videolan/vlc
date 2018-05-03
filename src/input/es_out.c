@@ -588,9 +588,18 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 static void EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t      *p_sys = out->p_sys;
+    float rate = (float)i_rate / (float)INPUT_RATE_DEFAULT;
 
     p_sys->i_rate = i_rate;
     EsOutProgramsChangeRate( out );
+
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *es = p_sys->es[i];
+
+        if( es->p_dec != NULL )
+            input_DecoderChangeRate( es->p_dec, rate );
+    }
 }
 
 static void EsOutChangePosition( es_out_t *out )
@@ -1683,12 +1692,16 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 {
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
+    decoder_t *dec;
 
-    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_input_clock, input_priv(p_input)->p_sout );
-    if( p_es->p_dec )
+    dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_input_clock,
+                            input_priv(p_input)->p_sout );
+    if( dec != NULL )
     {
+        input_DecoderChangeRate( dec, p_sys->i_rate );
+
         if( p_sys->b_buffering )
-            input_DecoderStartWait( p_es->p_dec );
+            input_DecoderStartWait( dec );
 
         if( !p_es->p_master && p_sys->p_sout_record )
         {
@@ -1697,6 +1710,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
     }
+    p_es->p_dec = dec;
 
     EsOutDecoderChangeDelay( out, p_es );
 }

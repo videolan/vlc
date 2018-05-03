@@ -39,6 +39,15 @@ decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, input_clock_t *,
 void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
 
 /**
+ * Changes the decoder rate.
+ *
+ * This function changes rate of the intended playback speed to nominal speed.
+ * \param dec decoder
+ * \param rate playback rate (default is 1)
+ */
+void input_DecoderChangeRate( decoder_t *dec, float rate );
+
+/**
  * This function changes the delay.
  */
 void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );

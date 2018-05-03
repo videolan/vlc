@@ -111,8 +111,9 @@ struct decoder_owner_sys_t
     /* -- Theses variables need locking on read *and* write -- */
     /* Preroll */
     int64_t i_preroll_end;
-    /* Pause */
+    /* Pause & Rate */
     mtime_t pause_date;
+    float rate;
     unsigned frames_countdown;
     bool paused;
 
@@ -1186,8 +1187,6 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
      && i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
      && !DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
     {
-        aout_DecChangeRate( p_aout, ((float)i_rate) / 1000.f );
-
         int status = aout_DecPlay( p_aout, p_audio );
         if( status == AOUT_DEC_CHANGED )
         {
@@ -1536,6 +1535,7 @@ static void *DecoderThread( void *p_data )
 {
     decoder_t *p_dec = (decoder_t *)p_data;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
+    float rate = 1.f;
     bool paused = false;
 
     /* The decoder's main loop */
@@ -1583,6 +1583,21 @@ static void *DecoderThread( void *p_data )
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
             continue;
+        }
+
+        if( rate != p_owner->rate )
+        {
+            int canc = vlc_savecancel();
+
+            rate = p_owner->rate;
+            vlc_fifo_Unlock( p_owner->p_fifo );
+
+            msg_Dbg( p_dec, "changing rate: %f", rate );
+            if( p_owner->p_aout != NULL )
+                aout_DecChangeRate( p_owner->p_aout, rate );
+
+            vlc_restorecancel( canc );
+            vlc_fifo_Lock( p_owner->p_fifo );
         }
 
         if( p_owner->paused && p_owner->frames_countdown == 0 )
@@ -1684,6 +1699,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
+    p_owner->rate = 1.f;
     p_owner->paused = false;
     p_owner->pause_date = VLC_TS_INVALID;
     p_owner->frames_countdown = 0;
@@ -2270,6 +2286,16 @@ void input_DecoderChangePause( decoder_t *p_dec, bool b_paused, mtime_t i_date )
     p_owner->frames_countdown = 0;
     vlc_fifo_Signal( p_owner->p_fifo );
     vlc_fifo_Unlock( p_owner->p_fifo );
+}
+
+void input_DecoderChangeRate( decoder_t *dec, float rate )
+{
+    decoder_owner_sys_t *owner = dec->p_owner;
+
+    vlc_fifo_Lock( owner->p_fifo );
+    owner->rate = rate;
+    vlc_fifo_Signal( owner->p_fifo );
+    vlc_fifo_Unlock( owner->p_fifo );
 }
 
 void input_DecoderChangeDelay( decoder_t *p_dec, mtime_t i_delay )
