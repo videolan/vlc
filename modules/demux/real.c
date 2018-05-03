@@ -283,10 +283,10 @@ static int Demux( demux_t *p_demux )
         p_sys->i_data_packets_count )
     {
         if( vlc_stream_Read( p_demux->s, header, 18 ) < 18 )
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         if( memcmp( header, "DATA", 4 ) )
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         p_sys->i_data_offset = vlc_stream_Tell( p_demux->s ) - 18;
         p_sys->i_data_size   = GetDWBE( &header[4] );
@@ -301,7 +301,7 @@ static int Demux( demux_t *p_demux )
 
     /* Read Packet Header */
     if( vlc_stream_Read( p_demux->s, header, 12 ) < 12 )
-        return 0;
+        return VLC_DEMUXER_EOF;
     //const int i_version = GetWBE( &header[0] );
     const size_t  i_size = GetWBE( &header[2] ) - 12;
     const int     i_id   = GetWBE( &header[4] );
@@ -312,12 +312,12 @@ static int Demux( demux_t *p_demux )
     if( i_size > sizeof(p_sys->buffer) )
     {
         msg_Err( p_demux, "Got a NUKK size to read. (Invalid format?)" );
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     p_sys->i_buffer = vlc_stream_Read( p_demux->s, p_sys->buffer, i_size );
     if( p_sys->i_buffer < i_size )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     real_track_t *tk = NULL;
     for( int i = 0; i < p_sys->i_track; i++ )
@@ -329,7 +329,7 @@ static int Demux( demux_t *p_demux )
     if( !tk )
     {
         msg_Warn( p_demux, "unknown track id(0x%x)", i_id );
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     if( tk->fmt.i_cat == VIDEO_ES )
@@ -356,7 +356,7 @@ static int Demux( demux_t *p_demux )
         p_sys->i_pcr = i_pcr;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
     }
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
