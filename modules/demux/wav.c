@@ -424,6 +424,8 @@ static int Open( vlc_object_t * p_this )
     }
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->p_es == NULL) )
+        goto error;
 
     date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
     date_Set( &p_sys->pts, 1 );
