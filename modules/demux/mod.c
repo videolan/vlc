@@ -233,6 +233,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->fmt.audio.i_channels = settings.mChannels;
     p_sys->fmt.audio.i_bitspersample = settings.mBits;
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->es == NULL) )
+        return VLC_ENOMEM;
 
     /* Fill p_demux field */
     p_demux->pf_demux = Demux;
@@ -277,17 +279,9 @@ static int Demux( demux_t *p_demux )
     p_frame->i_dts =
     p_frame->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
 
-    /* Set PCR */
     es_out_SetPCR( p_demux->out, p_frame->i_pts );
-
-    /* Send data */
-    if( p_sys->es )
-        es_out_Send( p_demux->out, p_sys->es, p_frame );
-    else
-        block_Release( p_frame );
-
+    es_out_Send( p_demux->out, p_sys->es, p_frame );
     date_Increment( &p_sys->pts, i_read / i_bk );
-
     return VLC_DEMUXER_SUCCESS;
 }
 
