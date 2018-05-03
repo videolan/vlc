@@ -60,52 +60,6 @@ void libvlc_track_description_release( libvlc_track_description_t *p_track_descr
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_audio
- * @{
- */
-
-/**
- * Backward compatibility stub. Do not use in new code.
- * \deprecated Use libvlc_audio_output_device_list_get() instead.
- * \return always 0.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_audio_output_device_count( libvlc_instance_t *p_instance, const char *psz_audio_output );
-
-/**
- * Backward compatibility stub. Do not use in new code.
- * \deprecated Use libvlc_audio_output_device_list_get() instead.
- * \return always NULL.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_longname( libvlc_instance_t *p_instance, const char *psz_output,
-                                           int i_device );
-
-/**
- * Backward compatibility stub. Do not use in new code.
- * \deprecated Use libvlc_audio_output_device_list_get() instead.
- * \return always NULL.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-char *libvlc_audio_output_device_id( libvlc_instance_t *p_instance, const char *psz_audio_output, int i_device );
-
-/**
- * Stub for backward compatibility.
- * \return always -1.
- */
-LIBVLC_DEPRECATED
-LIBVLC_API int libvlc_audio_output_get_device_type( libvlc_media_player_t *p_mi );
-
-/**
- * Stub for backward compatibility.
- */
-LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *p_mp,
-                                                     int device_type );
-
-/** @}*/
-
-/**
  * \ingroup libvlc libvlc_media
  * @{
  */

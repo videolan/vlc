@@ -227,29 +227,6 @@ void libvlc_audio_output_device_list_release( libvlc_audio_output_device_t *l )
     }
 }
 
-int libvlc_audio_output_device_count( libvlc_instance_t *p_instance,
-                                      const char *psz_audio_output )
-{
-    (void) p_instance; (void) psz_audio_output;
-    return 0;
-}
-
-char *libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
-                                           const char *psz_audio_output,
-                                           int i_device )
-{
-    (void) p_instance; (void) psz_audio_output; (void) i_device;
-    return NULL;
-}
-
-char *libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
-                                     const char *psz_audio_output,
-                                     int i_device )
-{
-    (void) p_instance; (void) psz_audio_output; (void) i_device;
-    return NULL;
-}
-
 /*****************************
  * Set device for using
  *****************************/
@@ -293,18 +270,6 @@ char *libvlc_audio_output_device_get( libvlc_media_player_t *mp )
     vlc_object_release( aout );
 
     return devid;
-}
-
-int libvlc_audio_output_get_device_type( libvlc_media_player_t *mp )
-{
-    (void) mp;
-    return libvlc_AudioOutputDevice_Error;
-}
-
-void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
-                                          int device_type )
-{
-    (void) mp; (void) device_type;
 }
 
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
