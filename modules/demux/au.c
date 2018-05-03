@@ -273,6 +273,8 @@ static int Open( vlc_object_t *p_this )
 
     /* add the es */
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->es == NULL) )
+        return VLC_ENOMEM;
 
     /* calculate 50ms frame size/time */
     unsigned i_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
@@ -318,11 +320,7 @@ static int Demux( demux_t *p_demux )
 
     p_block->i_dts =
     p_block->i_pts = VLC_TS_0 + p_sys->i_time;
-
-    if( p_sys->es )
-        es_out_Send( p_demux->out, p_sys->es, p_block );
-    else
-        block_Release( p_block );
+    es_out_Send( p_demux->out, p_sys->es, p_block );
 
     p_sys->i_time += p_sys->i_frame_length;
 
