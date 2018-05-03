@@ -192,24 +192,6 @@ int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
     return ret;
 }
 
-int libvlc_video_get_height( libvlc_media_player_t *p_mi )
-{
-    unsigned width, height;
-
-    if (libvlc_video_get_size (p_mi, 0, &width, &height))
-        return 0;
-    return height;
-}
-
-int libvlc_video_get_width( libvlc_media_player_t *p_mi )
-{
-    unsigned width, height;
-
-    if (libvlc_video_get_size (p_mi, 0, &width, &height))
-        return 0;
-    return width;
-}
-
 int libvlc_video_get_cursor( libvlc_media_player_t *mp, unsigned num,
                              int *restrict px, int *restrict py )
 {
@@ -395,27 +377,6 @@ end:
     return i_ret;
 }
 
-int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
-                                    const char *psz_subtitle )
-{
-    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
-    bool b_ret = false;
-
-    if( p_input_thread )
-    {
-        char* psz_mrl = vlc_path2uri( psz_subtitle, NULL );
-        if( psz_mrl )
-        {
-            if( !input_AddSlave( p_input_thread, SLAVE_TYPE_SPU, psz_mrl,
-                                 true, false, false ) )
-                b_ret = true;
-            free( psz_mrl );
-        }
-        vlc_object_release( p_input_thread );
-    }
-    return b_ret;
-}
-
 int64_t libvlc_video_get_spu_delay( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
@@ -452,21 +413,6 @@ int libvlc_video_set_spu_delay( libvlc_media_player_t *p_mi,
     }
 
     return ret;
-}
-
-libvlc_track_description_t *
-        libvlc_video_get_title_description( libvlc_media_player_t *p_mi )
-{
-    return libvlc_get_track_description( p_mi, "title" );
-}
-
-libvlc_track_description_t *
-        libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi,
-                                              int i_title )
-{
-    char psz_title[sizeof ("title ") + 3 * sizeof (int)];
-    sprintf( psz_title,  "title %2u", i_title );
-    return libvlc_get_track_description( p_mi, psz_title );
 }
 
 char *libvlc_video_get_crop_geometry (libvlc_media_player_t *p_mi)
@@ -583,23 +529,6 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page )
         else
             libvlc_printerr("Key action sent while the teletext is disabled");
     }
-    vlc_object_release( p_input_thread );
-}
-
-void libvlc_toggle_teletext( libvlc_media_player_t *p_mi )
-{
-    input_thread_t *p_input_thread;
-
-    p_input_thread = libvlc_get_input_thread(p_mi);
-    if( !p_input_thread ) return;
-
-    if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
-    {
-        vlc_object_release( p_input_thread );
-        return;
-    }
-    const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
-    teletext_enable( p_input_thread, !b_selected );
     vlc_object_release( p_input_thread );
 }
 
