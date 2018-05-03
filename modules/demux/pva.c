@@ -153,19 +153,19 @@ static int Demux( demux_t *p_demux )
     if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
     {
         msg_Warn( p_demux, "eof ?" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     if( p_peek[0] != 'A' || p_peek[1] != 'V' || p_peek[4] != 0x55 )
     {
         msg_Warn( p_demux, "lost synchro" );
         if( ReSynch( p_demux ) )
         {
-            return -1;
+            return VLC_DEMUXER_EGENERIC;
         }
         if( vlc_stream_Peek( p_demux->s, &p_peek, 8 ) < 8 )
         {
             msg_Warn( p_demux, "eof ?" );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
     }
 
@@ -278,10 +278,10 @@ static int Demux( demux_t *p_demux )
         default:
             msg_Warn( p_demux, "unknown id=0x%x", p_peek[2] );
             if( vlc_stream_Read( p_demux->s, NULL, i_size + 8 ) < i_size + 8 )
-                return 0;
+                return VLC_DEMUXER_EOF;
             break;
     }
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
