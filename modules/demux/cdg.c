@@ -37,14 +37,13 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("CDG demuxer") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 3 )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
     add_shortcut( "cdg", "subtitle" )
 vlc_module_end ()
 
@@ -71,7 +70,6 @@ typedef struct
 static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
 
     /* Identify cdg file by extension, as there is no simple way to
      * detect it */
@@ -86,7 +84,7 @@ static int Open( vlc_object_t * p_this )
 //        return VLC_EGENERIC;
 //    }
 
-    p_sys = malloc( sizeof( demux_sys_t ) );
+    demux_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof (*p_sys) );
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -151,17 +149,6 @@ static int Demux( demux_t *p_demux )
         block_Release( p_block );
 
     return VLC_DEMUXER_SUCCESS;
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close ( vlc_object_t * p_this )
-{
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    free( p_sys );
 }
 
 /*****************************************************************************
