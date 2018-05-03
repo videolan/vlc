@@ -209,29 +209,6 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
 }
 
 /**************************************************************************
- *       new_from_name (Public)
- *
- * \deprecated Use libvlc_media_discoverer_new and libvlc_media_discoverer_start
- **************************************************************************/
-libvlc_media_discoverer_t *
-libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name )
-{
-    libvlc_media_discoverer_t *p_mdis = libvlc_media_discoverer_new( p_inst, psz_name );
-
-    if( !p_mdis )
-        return NULL;
-
-    if( libvlc_media_discoverer_start( p_mdis ) != 0)
-    {
-        libvlc_media_discoverer_release( p_mdis );
-        return NULL;
-    }
-
-    return p_mdis;
-}
-
-/**************************************************************************
  * release (Public)
  **************************************************************************/
 static void
@@ -255,17 +232,6 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     libvlc_release( p_mdis->p_libvlc_instance );
 
     free( p_mdis );
-}
-
-/**************************************************************************
- * localized_name (Public)
- **************************************************************************/
-char *
-libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis )
-{
-    if( p_mdis->p_sd == NULL || p_mdis->p_sd->description == NULL )
-        return NULL;
-    return strdup( p_mdis->p_sd->description );
 }
 
 /**************************************************************************

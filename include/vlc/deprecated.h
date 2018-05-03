@@ -155,32 +155,6 @@ LIBVLC_DEPRECATED int
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_media_discoverer
- * @{
- */
-
-/**
- * \deprecated Use libvlc_media_discoverer_new() and libvlc_media_discoverer_start().
- */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_media_discoverer_t *
-libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name );
-
-/**
- * Get media service discover object its localized name.
- *
- * \deprecated Useless, use libvlc_media_discoverer_list_get() to get the
- * longname of the service discovery.
- *
- * \param p_mdis media discover object
- * \return localized name or NULL if the media_discoverer is not started
- */
-LIBVLC_DEPRECATED LIBVLC_API char *
-libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
-
-/** @}*/
-
-/**
  * \ingroup libvlc libvlc_core
  * @{
  */
