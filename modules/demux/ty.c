@@ -398,7 +398,7 @@ static int Demux( demux_t *p_demux )
 
     /* did we hit EOF earlier? */
     if( p_sys->eof )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     /*
      * what we do (1 record now.. maybe more later):
@@ -418,7 +418,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_first_chunk || p_sys->i_cur_rec >= p_sys->i_num_recs )
     {
         if( get_chunk_header(p_demux) == 0 || p_sys->i_num_recs == 0 )
-            return 0;
+            return VLC_DEMUXER_EOF;
     }
 
     /*======================================================================
@@ -437,12 +437,12 @@ static int Demux( demux_t *p_demux )
         {
             /* no data in payload; we're done */
             p_sys->i_cur_rec++;
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
         }
 
         /* read in this record's payload */
         if( !( p_block_in = vlc_stream_Block( p_demux->s, l_rec_size ) ) )
-            return 0;
+            return VLC_DEMUXER_EOF;
 
         /* set these as 'unknown' for now */
         p_block_in->i_pts =
@@ -483,7 +483,7 @@ static int Demux( demux_t *p_demux )
 
     /* */
     p_sys->i_cur_rec++;
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /* Control */
