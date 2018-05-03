@@ -25,7 +25,6 @@
 #include "qt.hpp"
 
 #include <QWidget>
-#include <QBitmap>
 
 class QPaintEvent;
 class QString;
@@ -54,7 +53,6 @@ private:
     QFont mFont;
     QRect mBox;
     QPainterPath mPainterPath;
-    QBitmap mMask;
     int mTipX;
 };
 
