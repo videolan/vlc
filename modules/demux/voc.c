@@ -108,8 +108,6 @@ static int Open( vlc_object_t * p_this )
     if( vlc_stream_Read( p_demux->s, NULL, i_data_offset ) < i_data_offset )
         return VLC_EGENERIC;
 
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
@@ -122,10 +120,11 @@ static int Open( vlc_object_t * p_this )
     date_Set( &p_sys->pts, 1 );
 
     es_format_Init( &p_sys->fmt, AUDIO_ES, 0 );
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
 
     return VLC_SUCCESS;
 }
-
 
 static int fmtcmp( es_format_t *ofmt, es_format_t *nfmt )
 {
