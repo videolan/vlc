@@ -26,7 +26,6 @@
 #include <vlc_stream.h>
 #include <limits.h>
 
-#include <vlc/vlc.h>
 #include "acoustid.h"
 #include "json.h"
 

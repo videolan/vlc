@@ -30,7 +30,6 @@
 #include <vlc_meta.h>
 #include <vlc_url.h>
 
-#include <vlc/vlc.h>
 #include <vlc_input.h>
 #include <vlc_fingerprinter.h>
 #include "webservices/acoustid.h"
