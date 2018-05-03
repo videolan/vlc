@@ -52,18 +52,6 @@ LIBVLC_API float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi );
 /** end bug */
 
 /**
- * \deprecated Use libvlc_media_player_set_nsobject() instead
- */
-LIBVLC_DEPRECATED
-LIBVLC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
-
-/**
- * \deprecated Use libvlc_media_player_get_nsobject() instead
- */
-LIBVLC_DEPRECATED
-LIBVLC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
-
-/**
  * \deprecated Use libvlc_track_description_list_release() instead
  */
 LIBVLC_DEPRECATED LIBVLC_API

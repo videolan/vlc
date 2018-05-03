@@ -1169,28 +1169,6 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 }
 
 /**************************************************************************
- * set_agl
- **************************************************************************/
-void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
-                                  uint32_t drawable )
-{
-    (void)drawable;
-    libvlc_printerr ("can't set agl: use libvlc_media_player_set_nsobject instead");
-    assert(false);
-    var_SetString (p_mi, "vout", "none");
-    var_SetString (p_mi, "window", "none");
-}
-
-/**************************************************************************
- * get_agl
- **************************************************************************/
-uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
-{
-    (void) p_mi;
-    return 0;
-}
-
-/**************************************************************************
  * set_xwindow
  **************************************************************************/
 void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
