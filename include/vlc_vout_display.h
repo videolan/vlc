@@ -44,11 +44,6 @@
  * Video output display modules interface
  */
 
-/* XXX
- * Do NOT use video_format_t::i_aspect but i_sar_num/den everywhere. i_aspect
- * will be removed as soon as possible.
- *
- */
 typedef struct vout_display_t vout_display_t;
 typedef struct vout_display_sys_t vout_display_sys_t;
 typedef struct vout_display_owner_t vout_display_owner_t;
