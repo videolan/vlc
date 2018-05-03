@@ -454,7 +454,7 @@ static int Demux( demux_t *p_demux )
     {
         int64_t i_end = p_sys->i_data_pos + p_sys->i_data_size;
         if ( i_pos >= i_end )
-            return 0;  /* EOF */
+            return VLC_DEMUXER_EOF;  /* EOF */
 
         /* Don't read past data chunk boundary */
         if ( i_end < i_pos + i_read_size )
@@ -464,7 +464,7 @@ static int Demux( demux_t *p_demux )
     if( ( p_block = vlc_stream_Block( p_demux->s, i_read_size ) ) == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     p_block->i_dts =
@@ -483,7 +483,7 @@ static int Demux( demux_t *p_demux )
 
     date_Increment( &p_sys->pts, p_sys->i_frame_samples );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
