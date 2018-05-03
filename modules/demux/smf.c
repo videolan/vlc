@@ -456,20 +456,20 @@ static int Demux (demux_t *demux)
         es_out_SetPCR (demux->out, sys->tick);
 
         sys->tick += TICK;
-        return 1;
+        return VLC_DEMUXER_SUCCESS;
     }
 
     /* MIDI events in chronological order across all tracks */
     uint64_t pulse = sys->pulse;
 
     if (ReadEvents (demux, &pulse, demux->out))
-        return VLC_EGENERIC;
+        return VLC_DEMUXER_EGENERIC;
 
     if (pulse == UINT64_MAX)
-        return 0; /* all tracks are done */
+        return VLC_DEMUXER_EOF; /* all tracks are done */
 
     sys->pulse = pulse;
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 static int Seek (demux_t *demux, mtime_t pts)
