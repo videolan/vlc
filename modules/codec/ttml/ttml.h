@@ -122,7 +122,7 @@ static inline bool tt_time_Valid( const tt_time_t *t )
 static inline mtime_t tt_time_Convert( const tt_time_t *t )
 {
     if( !tt_time_Valid( t ) )
-        return -1;
+        return VLC_TS_INVALID;
     else
         return t->base + CLOCK_FREQ * t->frames / TT_FRAME_RATE;
 }
