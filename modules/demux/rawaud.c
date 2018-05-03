@@ -246,10 +246,7 @@ static int Demux( demux_t *p_demux )
 
     p_block = vlc_stream_Block( p_demux->s, p_sys->i_frame_size );
     if( p_block == NULL )
-    {
-        /* EOF */
-        return 0;
-    }
+        return VLC_DEMUXER_EOF;
 
     p_block->i_dts = p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
 
@@ -258,7 +255,7 @@ static int Demux( demux_t *p_demux )
 
     date_Increment( &p_sys->pts, p_sys->i_frame_samples );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
