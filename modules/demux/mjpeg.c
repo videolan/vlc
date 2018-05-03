@@ -284,7 +284,7 @@ static int SendBlock( demux_t *p_demux, int i )
     if( p_sys->p_es )
         es_out_Send( p_demux->out, p_sys->p_es, p_block );
     else
-        block_Release( p_sys->p_es );
+        block_Release( p_block );
 
     if( p_sys->b_still )
         p_sys->i_still_end = mdate() + p_sys->i_frame_length;
