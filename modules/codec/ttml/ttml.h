@@ -129,10 +129,11 @@ static inline mtime_t tt_time_Convert( const tt_time_t *t )
 
 static inline int tt_time_Compare( const tt_time_t *t1, const tt_time_t *t2 )
 {
-    if( tt_time_Convert( t1 ) < tt_time_Convert( t2 ) )
+    mtime_t ttt1 = tt_time_Convert( t1 );
+    mtime_t ttt2 = tt_time_Convert( t2 );
+    if (ttt1 < ttt2)
         return -1;
-    else
-        return ( tt_time_Convert( t1 ) > tt_time_Convert( t2 ) );
+    return ttt1 > ttt2;
 }
 
 static inline tt_time_t tt_time_Add( tt_time_t t1, tt_time_t t2 )
