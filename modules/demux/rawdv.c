@@ -266,10 +266,7 @@ static int Demux( demux_t *p_demux )
     es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
     p_block = vlc_stream_Block( p_demux->s, p_sys->frame_size );
     if( p_block == NULL )
-    {
-        /* EOF */
-        return 0;
-    }
+        return VLC_DEMUXER_EOF;
 
     if( p_sys->p_es_audio )
     {
@@ -294,7 +291,7 @@ static int Demux( demux_t *p_demux )
         p_sys->i_pcr += ( INT64_C(1000000) / p_sys->f_rate );
     }
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
