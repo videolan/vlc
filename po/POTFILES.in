@@ -68,8 +68,6 @@ src/config/intf.c
 src/darwin/error.c
 src/extras/libc.c
 src/input/access.c
-src/input/clock.c
-src/input/clock.h
 src/input/control.c
 src/input/decoder.c
 src/input/decoder.h
