@@ -907,7 +907,7 @@ caf_open_end:
 
     if( i_error )
     {
-        free( p_sys->fmt.p_extra );
+        es_format_Clean( &p_sys->fmt );
         free( p_sys  );
 
         if( vlc_stream_Seek( p_demux->s, 0 ))
@@ -1087,6 +1087,6 @@ static void Close( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    free( p_sys->fmt.p_extra );
+    es_format_Clean( &p_sys->fmt );
     free( p_sys );
 }
