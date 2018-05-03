@@ -208,17 +208,17 @@ static int Demux (demux_t *demux)
 
     block_t *block = block_Alloc( sys->block_size);
     if (unlikely(block==NULL))
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     if (!sys->tune->getStatus()) {
         block_Release (block);
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     int i_read = sys->player->play ((void*)block->p_buffer, block->i_buffer);
     if (i_read <= 0) {
         block_Release (block);
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
     block->i_buffer = i_read;
     block->i_pts = block->i_dts = VLC_TS_0 + date_Get (&sys->pts);
@@ -229,7 +229,7 @@ static int Demux (demux_t *demux)
 
     date_Increment (&sys->pts, i_read / sys->bytes_per_frame);
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 
