@@ -161,6 +161,16 @@ static int aout_GainNotify (audio_output_t *aout, float gain)
     return 0;
 }
 
+static const struct vlc_audio_output_events aout_events = {
+    aout_VolumeNotify,
+    aout_MuteNotify,
+    aout_PolicyNotify,
+    aout_DeviceNotify,
+    aout_HotplugNotify,
+    aout_RestartNotify,
+    aout_GainNotify,
+};
+
 static int FilterCallback (vlc_object_t *obj, const char *var,
                            vlc_value_t prev, vlc_value_t cur, void *data)
 {
@@ -231,13 +241,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     /* TODO: 3.0 HACK: only way to signal DTS_HD to aout modules. */
     var_Create (aout, "dtshd", VLC_VAR_BOOL);
 
-    aout->event.volume_report = aout_VolumeNotify;
-    aout->event.mute_report = aout_MuteNotify;
-    aout->event.policy_report = aout_PolicyNotify;
-    aout->event.device_report = aout_DeviceNotify;
-    aout->event.hotplug_report = aout_HotplugNotify;
-    aout->event.gain_request = aout_GainNotify;
-    aout->event.restart_request = aout_RestartNotify;
+    aout->events = &aout_events;
 
     /* Audio output module initialization */
     aout->start = NULL;

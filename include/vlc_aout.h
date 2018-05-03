@@ -111,6 +111,16 @@
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_block.h>
 
+struct vlc_audio_output_events {
+    void (*volume_report)(audio_output_t *, float);
+    void (*mute_report)(audio_output_t *, bool);
+    void (*policy_report)(audio_output_t *, bool);
+    void (*device_report)(audio_output_t *, const char *);
+    void (*hotplug_report)(audio_output_t *, const char *, const char *);
+    void (*restart_request)(audio_output_t *, unsigned);
+    int (*gain_request)(audio_output_t *, float);
+};
+
 /** Audio output object */
 struct audio_output
 {
@@ -176,15 +186,7 @@ struct audio_output
     } current_sink_info;
     /**< Current sink informations set by the module from the start() function */
 
-    struct {
-        void (*volume_report)(audio_output_t *, float);
-        void (*mute_report)(audio_output_t *, bool);
-        void (*policy_report)(audio_output_t *, bool);
-        void (*device_report)(audio_output_t *, const char *);
-        void (*hotplug_report)(audio_output_t *, const char *, const char *);
-        int (*gain_request)(audio_output_t *, float);
-        void (*restart_request)(audio_output_t *, unsigned);
-    } event;
+    const struct vlc_audio_output_events *events;
 };
 
 typedef enum
@@ -308,7 +310,7 @@ VLC_API int aout_DevicesList (audio_output_t *, char ***, char ***);
  */
 static inline void aout_VolumeReport(audio_output_t *aout, float volume)
 {
-    aout->event.volume_report(aout, volume);
+    aout->events->volume_report(aout, volume);
 }
 
 /**
@@ -316,7 +318,7 @@ static inline void aout_VolumeReport(audio_output_t *aout, float volume)
  */
 static inline void aout_MuteReport(audio_output_t *aout, bool mute)
 {
-    aout->event.mute_report(aout, mute);
+    aout->events->mute_report(aout, mute);
 }
 
 /**
@@ -325,7 +327,7 @@ static inline void aout_MuteReport(audio_output_t *aout, bool mute)
  */
 static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
 {
-    aout->event.policy_report(aout, cork);
+    aout->events->policy_report(aout, cork);
 }
 
 /**
@@ -333,7 +335,7 @@ static inline void aout_PolicyReport(audio_output_t *aout, bool cork)
  */
 static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
 {
-    aout->event.device_report(aout, id);
+    aout->events->device_report(aout, id);
 }
 
 /**
@@ -344,7 +346,7 @@ static inline void aout_DeviceReport(audio_output_t *aout, const char *id)
 static inline void aout_HotplugReport(audio_output_t *aout,
                                       const char *id, const char *name)
 {
-    aout->event.hotplug_report(aout, id, name);
+    aout->events->hotplug_report(aout, id, name);
 }
 
 /**
@@ -354,12 +356,12 @@ static inline void aout_HotplugReport(audio_output_t *aout,
  */
 static inline int aout_GainRequest(audio_output_t *aout, float gain)
 {
-    return aout->event.gain_request(aout, gain);
+    return aout->events->gain_request(aout, gain);
 }
 
 static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
 {
-    aout->event.restart_request(aout, mode);
+    aout->events->restart_request(aout, mode);
 }
 
 /* Audio output filters */
