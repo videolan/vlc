@@ -104,7 +104,6 @@ static unsigned int GetF80BE( const uint8_t p[10] )
 static int Open( vlc_object_t *p_this )
 {
     demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys;
 
     const uint8_t *p_peek;
 
@@ -118,7 +117,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Fill p_demux field */
-    DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
+    demux_sys_t *p_sys = calloc( 1, sizeof (*p_sys) );
     es_format_Init( &p_sys->fmt, AUDIO_ES, VLC_FOURCC( 't', 'w', 'o', 's' ) );
     p_sys->i_time = 0;
     p_sys->i_ssnd_pos = -1;
@@ -209,6 +208,10 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys;
 
     return VLC_SUCCESS;
 
