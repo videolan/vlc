@@ -169,15 +169,14 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_data_size > 0 &&
         (i_offset - HEADER_LENGTH) >= p_sys->i_data_size )
     {
-        /* EOF */
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     p_block = vlc_stream_Block( p_demux->s, p_sys->i_frame_size * i_frames );
     if( p_block == NULL )
     {
         msg_Warn( p_demux, "cannot read data" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     i_frames = p_block->i_buffer / p_sys->i_frame_size;
@@ -187,7 +186,7 @@ static int Demux( demux_t *p_demux )
 
     date_Increment( &p_sys->pts, i_frames * FRAME_LENGTH );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
