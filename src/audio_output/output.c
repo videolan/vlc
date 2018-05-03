@@ -75,7 +75,6 @@ static int var_CopyDevice (vlc_object_t *src, const char *name,
 
 /**
  * Supply or update the current custom ("hardware") volume.
- * @note This only makes sense after calling aout_VolumeHardInit().
  * @param volume current custom volume
  *
  * @warning The caller (i.e. the audio output plug-in) is responsible for
