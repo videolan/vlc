@@ -261,10 +261,10 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     time = mdate() - time;
 
     msg_Info( p_filter, "Blended %d images in %f sec", p_sys->i_loops,
-              time / 1000000.0f );
+              time / (float)CLOCK_FREQ );
     msg_Info( p_filter, "Speed is: %f images/second, %f pixels/second",
-              (float) p_sys->i_loops / time * 1000000,
-              (float) p_sys->i_loops / time * 1000000 *
+              (float) p_sys->i_loops / time * CLOCK_FREQ,
+              (float) p_sys->i_loops / time * CLOCK_FREQ *
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_pitch *
                   p_sys->p_blend_image->p[Y_PLANE].i_visible_lines );
 

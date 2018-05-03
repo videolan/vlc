@@ -331,7 +331,7 @@ static int Demux( demux_t *p_demux )
         {
             if( p_block_out->i_pts == VLC_TS_INVALID &&
                 p_block_out->i_dts == VLC_TS_INVALID )
-                p_block_out->i_dts = VLC_TS_0 + p_sys->i_pts + 1000000 / p_sys->f_fps;
+                p_block_out->i_dts = VLC_TS_0 + p_sys->i_pts + CLOCK_FREQ / p_sys->f_fps;
             if( p_block_out->i_dts != VLC_TS_INVALID )
                 p_sys->i_pts = p_block_out->i_dts - VLC_TS_0;
         }
@@ -351,7 +351,7 @@ static int Demux( demux_t *p_demux )
         }
         /* Re-estimate bitrate */
         if( p_sys->b_estimate_bitrate && p_sys->i_pts > INT64_C(500000) )
-            p_sys->i_bitrate_avg = 8*INT64_C(1000000)*p_sys->i_bytes/(p_sys->i_pts-1);
+            p_sys->i_bitrate_avg = 8*1000000*p_sys->i_bytes/(p_sys->i_pts-1);
         p_sys->i_bytes += p_block_out->i_buffer;
 
 

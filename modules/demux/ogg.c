@@ -843,7 +843,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->i_length > 0 && p_sys->i_pcr != VLC_TS_INVALID )
             {
                 *pf =  (double) p_sys->i_pcr /
-                       (double) ( p_sys->i_length * (mtime_t)1000000 );
+                       (double) ( p_sys->i_length * CLOCK_FREQ );
             }
             else if( stream_Size( p_demux->s ) > 0 )
             {

@@ -407,7 +407,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                                 int i_repeat_field, mtime_t next_pts,
                                 mtime_t next_dts, bool b_low_delay )
 {
-    mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate;
+    mtime_t         period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate;
 #if 0
     mtime_t         now = mdate();
 #endif

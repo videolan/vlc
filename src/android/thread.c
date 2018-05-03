@@ -416,6 +416,7 @@ mtime_t mdate (void)
     if (unlikely(clock_gettime (CLOCK_MONOTONIC, &ts) != 0))
         abort ();
 
+    static_assert(INT64_C(1000000) == CLOCK_FREQ, "CLOCK_FREQ mismatch");
     return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);
 }
 

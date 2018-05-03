@@ -743,7 +743,7 @@ static mtime_t mdate_perf (void)
     /* We need to split the division to avoid 63-bits overflow */
     lldiv_t d = lldiv (counter.QuadPart, clk.perf.freq.QuadPart);
 
-    return (d.quot * 1000000) + ((d.rem * 1000000) / clk.perf.freq.QuadPart);
+    return (d.quot * CLOCK_FREQ) + ((d.rem * CLOCK_FREQ) / clk.perf.freq.QuadPart);
 }
 
 static mtime_t mdate_wall (void)

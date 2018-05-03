@@ -381,9 +381,9 @@ static mtime_t strTimeToMTime( const char *psz )
     switch( sscanf( psz, "%u:%u:%u", &h, &m, &s ) )
     {
     case 3:
-        return (mtime_t)( ( h*60 + m )*60 + s ) * 1000000;
+        return (mtime_t)( ( h*60 + m )*60 + s ) * CLOCK_FREQ;
     case 2:
-        return (mtime_t)( h*60 + m ) * 1000000;
+        return (mtime_t)( h*60 + m ) * CLOCK_FREQ;
     default:
         return -1;
     }

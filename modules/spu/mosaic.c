@@ -40,7 +40,7 @@
 
 #include "mosaic.h"
 
-#define BLANK_DELAY INT64_C(1000000)
+#define BLANK_DELAY  (1*CLOCK_FREQ)
 
 /*****************************************************************************
  * Local prototypes

@@ -120,7 +120,7 @@ static int Demux( demux_t *p_demux )
     mtime_t     i_date;
     mtime_t     i_delta;
 
-    i_delta = INT64_C(1000000) / CDG_FRAME_RATE;
+    i_delta = CLOCK_FREQ / CDG_FRAME_RATE;
 
     p_block = vlc_stream_Block( p_demux->s, CDG_FRAME_SIZE );
     if( p_block == NULL )
@@ -159,7 +159,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( !i_ret && ( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME ) )
     {
         date_Set( &p_sys->pts, vlc_stream_Tell( p_demux->s ) / CDG_FRAME_SIZE *
-                    INT64_C(1000000) / CDG_FRAME_RATE );
+                    CLOCK_FREQ / CDG_FRAME_RATE );
         if ( i_old_offset > vlc_stream_Tell( p_demux->s ) )
             i_ret = vlc_stream_Seek( p_demux->s, 0 );
         else

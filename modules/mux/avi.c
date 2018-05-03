@@ -229,7 +229,7 @@ static void Close( vlc_object_t * p_this )
         {
             p_stream->f_fps = (float)p_stream->i_frames /
                               ( (float)p_stream->i_duration /
-                                (float)1000000 );
+                                (float)CLOCK_FREQ );
         }
         p_stream->i_bitrate = 128 * 1024;
         if( p_stream->i_duration > 0 )
@@ -242,7 +242,7 @@ static void Close( vlc_object_t * p_this )
         msg_Info( p_mux, "stream[%d] duration:%"PRId64" totalsize:%"PRId64
                   " frames:%d fps:%f KiB/s:%d",
                   i_stream,
-                  (int64_t)p_stream->i_duration / (int64_t)1000000,
+                  (int64_t)p_stream->i_duration / CLOCK_FREQ,
                   p_stream->i_totalsize,
                   p_stream->i_frames,
                   p_stream->f_fps, p_stream->i_bitrate/1024 );

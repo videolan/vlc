@@ -545,7 +545,7 @@ static int InitAudio( demux_t *p_demux )
 
     p_sys->i_next_adate = START_DATE;
     p_sys->i_ablock_size = p_sys->i_sample_rate * 4 * p_sys->i_frame_rate_base / p_sys->i_frame_rate;
-    p_sys->i_aincr = 1000000. * p_sys->i_ablock_size / p_sys->i_sample_rate / 4;
+    p_sys->i_aincr = 1000000 * p_sys->i_ablock_size / (p_sys->i_sample_rate * 4);
 
     return VLC_SUCCESS;
 }
@@ -632,7 +632,7 @@ static int HandleAudio( demux_t *p_demux, const uint8_t *p_buffer )
 
             p_block->i_dts = p_block->i_pts
                 = p_sys->i_next_adate + (mtime_t)p_audio->i_delay
-                   * INT64_C(1000000) / p_sys->i_sample_rate;
+                   * CLOCK_FREQ / p_sys->i_sample_rate;
             p_block->i_length = p_sys->i_aincr;
             es_out_Send( p_demux->out, p_audio->p_es, p_block );
         }

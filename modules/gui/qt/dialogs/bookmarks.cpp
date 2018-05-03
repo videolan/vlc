@@ -244,11 +244,11 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
     {
         fields = item->text( column ).split( ":", QString::SkipEmptyParts );
         if( fields.count() == 1 )
-            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toFloat() );
+            p_seekpoint->i_time_offset = CLOCK_FREQ * ( fields[0].toFloat() );
         else if( fields.count() == 2 )
-            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 60 + fields[1].toInt() );
+            p_seekpoint->i_time_offset = CLOCK_FREQ * ( fields[0].toInt() * 60 + fields[1].toInt() );
         else if( fields.count() == 3 )
-            p_seekpoint->i_time_offset = 1000000 * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toFloat() );
+            p_seekpoint->i_time_offset = CLOCK_FREQ * ( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toFloat() );
         else
         {
             msg_Err( p_intf, "Invalid string format for time" );

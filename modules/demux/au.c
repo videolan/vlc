@@ -288,7 +288,7 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - mod;
         }
     }
-    p_sys->i_frame_length = (mtime_t)1000000 *
+    p_sys->i_frame_length = CLOCK_FREQ *
                             (mtime_t)i_samples /
                             (mtime_t)p_sys->fmt.audio.i_rate;
 

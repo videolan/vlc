@@ -89,7 +89,7 @@ static void* Thread( void* data )
             else if( worker->head.deadline != VLC_TS_INVALID )
             {
                 /* Wait 1 seconds for new inputs before terminating */
-                mtime_t deadline = mdate() + INT64_C(1000000);
+                mtime_t deadline = mdate() + 1*CLOCK_FREQ;
                 int ret = vlc_cond_timedwait( &worker->tail.wait,
                                               &worker->lock, deadline );
                 if( ret != 0 )

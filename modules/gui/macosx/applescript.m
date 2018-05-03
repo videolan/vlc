@@ -235,7 +235,7 @@
     input_Control(p_input, INPUT_GET_TIME, &i_currentTime);
     vlc_object_release(p_input);
 
-    return (int)(i_currentTime / 1000000);
+    return (int)(i_currentTime / CLOCK_FREQ);
 }
 
 - (void) setCurrentTime:(int)i_currentTime {
@@ -246,7 +246,7 @@
         if (!p_input)
             return;
 
-        input_Control(p_input, INPUT_SET_TIME, (int64_t)(i64_value * 1000000));
+        input_Control(p_input, INPUT_SET_TIME, (int64_t)(i64_value * CLOCK_FREQ));
         vlc_object_release(p_input);
     }
 }

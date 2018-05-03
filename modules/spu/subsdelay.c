@@ -100,7 +100,7 @@ static const char * const ppsz_mode_descriptions[] = { N_( "Absolute delay" ), N
 /* factor convert macros */
 #define INT_FACTOR_BASE                  1000
 #define FLOAT_FACTOR_TO_INT_FACTOR( x )  (int)( ( x ) * INT_FACTOR_BASE )
-#define INT_FACTOR_TO_MICROSEC( x )      ( ( x ) * ( 1000000 / INT_FACTOR_BASE ) )
+#define INT_FACTOR_TO_MICROSEC( x )      ( ( x ) * ( CLOCK_FREQ / INT_FACTOR_BASE ) )
 #define INT_FACTOR_TO_RANK_FACTOR( x )   ( x )
 #define MILLISEC_TO_MICROSEC( x )        ( ( x ) * 1000 )
 

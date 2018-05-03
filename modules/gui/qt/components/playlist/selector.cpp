@@ -206,7 +206,7 @@ void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
     /* Formatting time */
     QString qs_timeLabel( prefix );
 
-    int i_seconds = mt_duration / 1000000;
+    int i_seconds = mt_duration / CLOCK_FREQ;
     int i_minutes = i_seconds / 60;
     i_seconds = i_seconds % 60;
     if( i_minutes >= 60 )

@@ -882,7 +882,7 @@ mtime_t mdate (void)
     /* We need to split the division to avoid 63-bits overflow */
     lldiv_t d = lldiv (Q2LL(counter), freq);
 
-    return (d.quot * 1000000) + ((d.rem * 1000000) / freq);
+    return (d.quot * CLOCK_FREQ) + ((d.rem * CLOCK_FREQ) / freq);
 }
 
 #undef mwait

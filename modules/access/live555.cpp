@@ -1518,7 +1518,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt > 0 )
             {
-                *pi64 = (int64_t)(p_sys->f_npt * 1000000.);
+                *pi64 = (int64_t)(p_sys->f_npt * CLOCK_FREQ);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -1527,7 +1527,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
-                double d_length = p_sys->f_npt_length * 1000000.0;
+                double d_length = p_sys->f_npt_length * CLOCK_FREQ;
                 if( d_length >= INT64_MAX )
                     *pi64 = INT64_MAX;
                 else
@@ -1929,7 +1929,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
-    int64_t i_pts = (int64_t)pts.tv_sec * INT64_C(1000000) +
+    int64_t i_pts = (int64_t)pts.tv_sec * CLOCK_FREQ +
         (int64_t)pts.tv_usec;
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */

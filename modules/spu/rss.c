@@ -314,7 +314,7 @@ static int CreateFilter( vlc_object_t *p_this )
         goto error;
     }
     vlc_timer_schedule( p_sys->timer, false, 1,
-                        (mtime_t)(i_ttl)*1000000 );
+                        (mtime_t)(i_ttl)*CLOCK_FREQ );
 
     free( psz_urls );
     return VLC_SUCCESS;

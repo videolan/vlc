@@ -1077,7 +1077,7 @@ void matroska_segment_c::EnsureDuration()
             }
         }
 
-        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / INT64_C(1000000);
+        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / CLOCK_FREQ;
         msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, i_duration );
     }
 

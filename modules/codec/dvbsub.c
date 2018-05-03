@@ -2124,7 +2124,7 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
     if( p_subpic && !p_subpic->b_ephemer &&
         ( p_subpic->i_stop > p_subpic->i_start ) )
     {
-        i_timeout = (p_subpic->i_stop - p_subpic->i_start) / 1000000;
+        i_timeout = (p_subpic->i_stop - p_subpic->i_start) / CLOCK_FREQ;
     }
 
     bs_write( s, 8, i_timeout ); /* Timeout */

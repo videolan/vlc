@@ -356,7 +356,7 @@ static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
     asf_object_index_t *p_index;
 
     msg_Dbg( p_demux, "seek with index: %i seconds, position %f",
-             i_date >= 0 ? (int)(i_date/1000000) : -1, f_pos );
+             i_date >= 0 ? (int)(i_date/CLOCK_FREQ) : -1, f_pos );
 
     if( i_date < 0 )
         i_date = p_sys->i_length * f_pos;

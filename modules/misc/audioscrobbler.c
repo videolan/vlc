@@ -198,7 +198,7 @@ static void ReadMetaData(intf_thread_t *p_this, input_thread_t *p_input)
     ALLOC_ITEM_META(p_sys->p_current_song.psz_m, TrackID);
     ALLOC_ITEM_META(p_sys->p_current_song.psz_n, TrackNum);
 
-    p_sys->p_current_song.i_l = input_item_GetDuration(p_item) / 1000000;
+    p_sys->p_current_song.i_l = input_item_GetDuration(p_item) / CLOCK_FREQ;
 
 #undef ALLOC_ITEM_META
 
@@ -227,7 +227,7 @@ static void AddToQueue (intf_thread_t *p_this)
     /* wait for the user to listen enough before submitting */
     played_time = mdate() - p_sys->p_current_song.i_start -
                             p_sys->time_total_pauses;
-    played_time /= 1000000; /* µs → s */
+    played_time /= CLOCK_FREQ; /* µs → s */
 
     /*HACK: it seam that the preparsing sometime fail,
             so use the playing time as the song length */
@@ -661,7 +661,7 @@ static void HandleInterval(mtime_t *next, unsigned int *i_interval)
         if (*i_interval > 120)
             *i_interval = 120;
     }
-    *next = mdate() + (*i_interval * 1000000 * 60);
+    *next = mdate() + (*i_interval * CLOCK_FREQ * 60);
 }
 
 /*****************************************************************************

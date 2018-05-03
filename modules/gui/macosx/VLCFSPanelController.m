@@ -267,7 +267,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
             mtime_t remaining = 0;
             if (dur > t)
                 remaining = dur - t;
-            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (remaining / 1000000))];
+            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (remaining / CLOCK_FREQ))];
         } else {
             totalTime = toNSStr(secstotimestr(psz_time, (dur / 1000000)));
         }

@@ -595,7 +595,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (result == RESUME_RESTART)
             return;
 
-        mtime_t lastPos = (mtime_t)lastPosition.intValue * 1000000;
+        mtime_t lastPos = (mtime_t)lastPosition.intValue * CLOCK_FREQ;
         msg_Dbg(getIntf(), "continuing playback at %lld", lastPos);
         var_SetInteger(p_input_thread, "time", lastPos);
     };
@@ -634,7 +634,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     float relativePos = var_GetFloat(p_input_thread, "position");
     mtime_t pos = var_GetInteger(p_input_thread, "time") / CLOCK_FREQ;
-    mtime_t dur = input_item_GetDuration(p_item) / 1000000;
+    mtime_t dur = input_item_GetDuration(p_item) / CLOCK_FREQ;
 
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 

@@ -71,8 +71,8 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
             free( psz_tmp );
 
             mtime_t i_duration = input_item_GetDuration( p_current->p_input );
-            int min = ( i_duration / 1000000 ) / 60;
-            int sec = ( i_duration / 1000000 ) - min * 60;
+            int min = ( i_duration / CLOCK_FREQ ) / 60;
+            int sec = ( i_duration / CLOCK_FREQ ) - min * 60;
 
             // Print the artist if we have one
             if( psz_artist && *psz_artist )

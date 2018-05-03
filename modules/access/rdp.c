@@ -434,7 +434,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->f_fps = var_InheritFloat( p_demux, CFG_PREFIX "fps" );
     if ( p_sys->f_fps <= 0 ) p_sys->f_fps = 1.0;
-    p_sys->i_frame_interval = 1000000 / p_sys->f_fps;
+    p_sys->i_frame_interval = CLOCK_FREQ / p_sys->f_fps;
 
 #if FREERDP_VERSION_MAJOR == 1 && FREERDP_VERSION_MINOR < 2
     freerdp_channels_global_init();

@@ -179,7 +179,7 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                         {
                             foreach( int64_t time, slideroptions->points )
                             {
-                                int x = groove.x() + time / 1000000.0 / slideroptions->length * groove.width();
+                                int x = groove.x() + time / (double)CLOCK_FREQ / slideroptions->length * groove.width();
                                 painter->setPen( foreground );
                                 painter->setBrush( Qt::NoBrush );
                                 painter->drawLine( x, slideroptions->rect.height(), x, slideroptions->rect.height() - CHAPTERSSPOTSIZE );

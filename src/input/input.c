@@ -897,13 +897,13 @@ static void StartTitle( input_thread_t * p_input )
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
-    priv->i_start = llroundf(1000000.f
+    priv->i_start = llroundf((float)CLOCK_FREQ
                                      * var_GetFloat( p_input, "start-time" ));
-    priv->i_stop  = llroundf(1000000.f
+    priv->i_stop  = llroundf((float)CLOCK_FREQ
                                      * var_GetFloat( p_input, "stop-time" ));
     if( priv->i_stop <= 0 )
     {
-        priv->i_stop = llroundf(1000000.f
+        priv->i_stop = llroundf((float)CLOCK_FREQ
                                      * var_GetFloat( p_input, "run-time" ));
         if( priv->i_stop < 0 )
         {

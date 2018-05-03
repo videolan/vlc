@@ -111,7 +111,7 @@ static bool ParseTime(xml_reader_t *p_xml_reader, mtime_t* pi_result )
         i_subresult = i_subresult * 10;
         i_subfractions++;
     }
-    i_result = i_result * 1000000;
+    i_result = i_result * CLOCK_FREQ;
     if( i_subfractions != -1)
         i_result += i_subresult;
 
@@ -296,13 +296,13 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 i_options = 0;
                 if( i_start )
                 {
-                    if( asprintf( ppsz_options, ":start-time=%d" ,(int) i_start/1000000 ) != -1)
+                    if( asprintf( ppsz_options, ":start-time=%d" ,(int) i_start/CLOCK_FREQ ) != -1)
                         i_options++;
                 }
                 if( i_duration)
                 {
                     if( asprintf( ppsz_options + i_options, ":stop-time=%d",
-                                (int) (i_start+i_duration)/1000000 ) != -1)
+                                (int) (i_start+i_duration)/CLOCK_FREQ ) != -1)
                         i_options++;
                 }
 

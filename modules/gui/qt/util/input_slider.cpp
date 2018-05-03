@@ -320,7 +320,7 @@ void SeekSlider::mousePressEvent( QMouseEvent* event )
                 int i_min_diff = i_width + 1;
                 for( int i = 0 ; i < points.count() ; i++ )
                 {
-                    int x = points.at(i).time / 1000000.0 / inputLength * i_width;
+                    int x = points.at(i).time / (double)CLOCK_FREQ / inputLength * i_width;
                     int diff_x = abs( x - event->x() );
                     if ( diff_x < i_min_diff )
                     {
@@ -376,7 +376,7 @@ void SeekSlider::mouseMoveEvent( QMouseEvent *event )
             int i_selected = -1;
             for( int i = 0 ; i < points.count() ; i++ )
             {
-                int x = margin + points.at(i).time / 1000000.0 / inputLength * (size().width() - 2*margin);
+                int x = margin + points.at(i).time / (double)CLOCK_FREQ / inputLength * (size().width() - 2*margin);
                 if ( event->x() >= x )
                     i_selected = i;
             }

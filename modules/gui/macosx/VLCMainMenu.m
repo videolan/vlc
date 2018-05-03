@@ -848,7 +848,7 @@
 
             input_thread_t *p_input = pl_CurrentInput(getIntf());
             if (p_input) {
-                input_Control(p_input, INPUT_SET_TIME, (int64_t)(returnTime *1000000));
+                input_Control(p_input, INPUT_SET_TIME, (int64_t)(returnTime * CLOCK_FREQ));
                 vlc_object_release(p_input);
             }
         }];

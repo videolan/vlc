@@ -492,7 +492,7 @@ static int Mux( sout_mux_t *p_mux )
             {
                 /* Update the instant bitrate every second or so */
                 if( p_sys->i_instant_size &&
-                    i_dts - p_sys->i_instant_dts > 1000000 )
+                    i_dts - p_sys->i_instant_dts > 1*CLOCK_FREQ )
                 {
                     int64_t i_instant_bitrate = p_sys->i_instant_size * 8000000 /
                             ( i_dts - p_sys->i_instant_dts );

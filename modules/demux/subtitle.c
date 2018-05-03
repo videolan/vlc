@@ -1836,10 +1836,10 @@ static int ParseJSS( vlc_object_t *p_obj, subs_properties_t *p_props,
         {
             p_subtitle->i_start = ( ( (int64_t) h1 *3600 + m1 * 60 + s1 ) +
                 (int64_t)( ( f1 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) )
-                * 1000000;
+                * CLOCK_FREQ;
             p_subtitle->i_stop = ( ( (int64_t) h2 *3600 + m2 * 60 + s2 ) +
                 (int64_t)( ( f2 +  p_props->jss.i_time_shift ) / p_props->jss.i_time_resolution ) )
-                * 1000000;
+                * CLOCK_FREQ;
             break;
         }
         /* Short time lines */
@@ -2224,9 +2224,9 @@ static int ParseDKS( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( sscanf( s, "[%d:%d:%d]%[^\r\n]",
                     &h1, &m1, &s1, psz_text ) == 4 )
         {
-            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
-                                    (int64_t)m1 * 60*1000 +
-                                    (int64_t)s1 * 1000 ) * 1000;
+            p_subtitle->i_start = ( (int64_t)h1 * 3600 +
+                                    (int64_t)m1 * 60 +
+                                    (int64_t)s1 ) * CLOCK_FREQ;
 
             s = TextGetLine( txt );
             if( !s )
@@ -2277,9 +2277,9 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
 
         if( sscanf( s, "[%d:%d:%d]", &h1, &m1, &s1 ) == 3 )
         {
-            p_subtitle->i_start = ( (int64_t)h1 * 3600*1000 +
-                                    (int64_t)m1 * 60*1000 +
-                                    (int64_t)s1 * 1000 ) * 1000;
+            p_subtitle->i_start = ( (int64_t)h1 * 3600 +
+                                    (int64_t)m1 * 60 +
+                                    (int64_t)s1 ) * CLOCK_FREQ;
 
             s = TextGetLine( txt );
             if( !s )
@@ -2297,9 +2297,9 @@ static int ParseSubViewer1( vlc_object_t *p_obj, subs_properties_t *p_props,
             }
 
             if( sscanf( s, "[%d:%d:%d]", &h2, &m2, &s2 ) == 3 )
-                p_subtitle->i_stop  = ( (int64_t)h2 * 3600*1000 +
-                                        (int64_t)m2 * 60*1000 +
-                                        (int64_t)s2 * 1000 ) * 1000;
+                p_subtitle->i_stop  = ( (int64_t)h2 * 3600 +
+                                        (int64_t)m2 * 60 +
+                                        (int64_t)s2 ) * CLOCK_FREQ;
             else
                 p_subtitle->i_stop  = -1;
 

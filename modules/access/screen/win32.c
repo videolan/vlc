@@ -224,7 +224,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
                                             (int)p_sys->fmt.video.i_height :
                                             p_data->i_fragment_size;
         p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
-        p_sys->i_incr = 1000000 / p_sys->f_fps;
+        p_sys->i_incr = CLOCK_FREQ / p_sys->f_fps;
         p_data->i_fragment = 0;
         p_data->p_block = 0;
     }

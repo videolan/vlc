@@ -969,7 +969,7 @@ static void maintain_phase_sync(vout_display_t *vd)
     MMAL_PARAMETER_VIDEO_RENDER_STATS_T render_stats = {
         .hdr = { MMAL_PARAMETER_VIDEO_RENDER_STATS, sizeof(render_stats) },
     };
-    int32_t frame_duration = 1000000 /
+    int32_t frame_duration = CLOCK_FREQ /
         ((double)vd->sys->i_frame_rate /
         vd->sys->i_frame_rate_base);
     vout_display_sys_t *sys = vd->sys;

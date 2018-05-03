@@ -320,7 +320,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     /* Timestamp */
     p_block->i_pts = p_block->i_dts =
-        mdate() - INT64_C(1000000) * (mtime_t)i_correct /
+        mdate() - CLOCK_FREQ * (mtime_t)i_correct /
         2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
 
     return p_block;

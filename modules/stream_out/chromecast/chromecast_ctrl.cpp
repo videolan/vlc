@@ -1053,14 +1053,14 @@ States intf_sys_t::state() const
 
 mtime_t intf_sys_t::timeCCToVLC(double time)
 {
-    return mtime_t(time * 1000000.0);
+    return mtime_t(time * (double)CLOCK_FREQ);
 }
 
 std::string intf_sys_t::timeVLCToCC(mtime_t time)
 {
     std::stringstream ss;
     ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-    ss << std::setprecision(6) << (double (time) / 1000000.0);
+    ss << std::setprecision(6) << (double (time) / (double)CLOCK_FREQ);
     return ss.str();
 }
 

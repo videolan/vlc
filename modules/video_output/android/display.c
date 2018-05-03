@@ -994,7 +994,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         mtime_t now = mdate();
         if (picture->date > now)
         {
-            if (picture->date - now <= INT64_C(1000000))
+            if (picture->date - now <= 1*CLOCK_FREQ)
                 AndroidOpaquePicture_ReleaseAtTime(picture->p_sys, picture->date);
             else /* The picture will be displayed from the Display callback */
                 msg_Warn(vd, "picture way too early to release at time");

@@ -771,7 +771,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
 
     p_sys->i_samples_delay -= samples;
 
-    p_block->i_length = (mtime_t)1000000 *
+    p_block->i_length = CLOCK_FREQ *
         (mtime_t)samples / (mtime_t)p_enc->fmt_in.audio.i_rate;
 
     /* Update pts */
@@ -881,7 +881,7 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     if( unlikely( !p_aout_buf ) ) return NULL;
 
     p_sys->i_pts = p_aout_buf->i_pts -
-                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
+                CLOCK_FREQ * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->fmt_in.audio.i_rate;
 
     p_sys->i_samples_delay += p_aout_buf->i_nb_samples;

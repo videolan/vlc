@@ -112,7 +112,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     p_out_buf->i_buffer = i_out_nb * framesize;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_out_buf->i_nb_samples *
-        1000000 / p_filter->fmt_out.audio.i_rate;
+        CLOCK_FREQ / p_filter->fmt_out.audio.i_rate;
 
     while( i_out_nb )
     {
