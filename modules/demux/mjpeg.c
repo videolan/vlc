@@ -308,7 +308,6 @@ static int Open( vlc_object_t * p_this )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
     p_sys->p_es         = NULL;
     p_sys->i_time       = VLC_TS_0;
@@ -388,6 +387,8 @@ static int Open( vlc_object_t * p_this )
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_MJPG );
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+
+    p_demux->pf_control = Control;
     return VLC_SUCCESS;
 }
 
