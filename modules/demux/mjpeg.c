@@ -41,7 +41,6 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 #define FPS_TEXT N_("Frames per Second")
 #define FPS_LONGTEXT N_("This is the desired frame rate when " \
@@ -52,7 +51,7 @@ vlc_module_begin ()
     set_shortname( "MJPEG")
     set_description( N_("M-JPEG camera demuxer") )
     set_capability( "demux", 5 )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     add_float( "mjpeg-fps", 0.0, FPS_TEXT, FPS_LONGTEXT, false )
@@ -305,7 +304,7 @@ static int Open( vlc_object_t * p_this )
         // let avformat handle this case
         return VLC_EGENERIC;
 
-    demux_sys_t *p_sys = malloc( sizeof( demux_sys_t ) );
+    demux_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof (*p_sys) );
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
@@ -333,11 +332,11 @@ static int Open( vlc_object_t * p_this )
                 boundary[len-1] = '\0';
                 boundary++;
             }
-            p_sys->psz_separator = strdup( boundary );
+            p_sys->psz_separator = vlc_obj_strdup( p_this, boundary );
             if( !p_sys->psz_separator )
             {
                 free( content_type );
-                goto error;
+                return VLC_ENOMEM;
             }
         }
         free( content_type );
@@ -348,7 +347,7 @@ static int Open( vlc_object_t * p_this )
     {
         p_demux->pf_demux = MimeDemux;
         if( vlc_stream_Read( p_demux->s, NULL, i_size ) < i_size )
-            goto error;
+            return VLC_EGENERIC;
     }
     else if( i_size == 0 )
     {
@@ -361,12 +360,12 @@ static int Open( vlc_object_t * p_this )
         }
         else
         {
-            goto error;
+            return VLC_EGENERIC;
         }
     }
     else
     {
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* Frame rate */
@@ -390,11 +389,6 @@ static int Open( vlc_object_t * p_this )
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
     return VLC_SUCCESS;
-
-error:
-    free( p_sys->psz_separator );
-    free( p_sys );
-    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -534,18 +528,6 @@ static int MimeDemux( demux_t *p_demux )
     }
 
     return SendBlock( p_demux, i );
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close ( vlc_object_t * p_this )
-{
-    demux_t     *p_demux = (demux_t*)p_this;
-    demux_sys_t *p_sys  = p_demux->p_sys;
-
-    free( p_sys->psz_separator );
-    free( p_sys );
 }
 
 /*****************************************************************************
