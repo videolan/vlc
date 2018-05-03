@@ -991,13 +991,8 @@ static int Demux( demux_t *p_demux )
 
     FrameSpanAddSpan( &p_sys->position, &advance );
 
-    /* set PCR */
     es_out_SetPCR( p_demux->out, p_block->i_pts );
-
-    if( p_sys->es )
-        es_out_Send( p_demux->out, p_sys->es, p_block );
-    else
-        block_Release( p_block );
+    es_out_Send( p_demux->out, p_sys->es, p_block );
 
     return VLC_DEMUXER_SUCCESS;
 }
