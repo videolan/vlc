@@ -159,10 +159,7 @@ static int Open( vlc_object_t *p_this )
     if( i_size <= 0 || i_size >= MOD_MAX_FILE_SIZE )
         return VLC_EGENERIC;
 
-    /* Fill p_demux field */
-    p_demux->pf_demux = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys = p_sys = malloc( sizeof( *p_sys ) );
+    p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -239,6 +236,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->fmt.audio.i_bitspersample = settings.mBits;
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
+    /* Fill p_demux field */
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys = p_sys;
     return VLC_SUCCESS;
 }
 
