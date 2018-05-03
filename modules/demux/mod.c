@@ -159,21 +159,21 @@ static int Open( vlc_object_t *p_this )
     if( i_size <= 0 || i_size >= MOD_MAX_FILE_SIZE )
         return VLC_EGENERIC;
 
-    p_sys = malloc( sizeof( *p_sys ) );
+    p_sys = vlc_obj_malloc( p_this, sizeof (*p_sys) );
     if( !p_sys )
         return VLC_ENOMEM;
 
     msg_Dbg( p_demux, "loading complete file (could be long)" );
     p_sys->i_data = i_size;
-    p_sys->p_data = malloc( p_sys->i_data );
-    if( p_sys->p_data )
-        p_sys->i_data = vlc_stream_Read( p_demux->s, p_sys->p_data,
-                                         p_sys->i_data );
-    if( p_sys->i_data <= 0 || !p_sys->p_data )
+    p_sys->p_data = vlc_obj_malloc( p_this, p_sys->i_data );
+    if( unlikely(p_sys->p_data == NULL) )
+        return VLC_ENOMEM;
+
+    p_sys->i_data = vlc_stream_Read( p_demux->s, p_sys->p_data,
+                                     p_sys->i_data );
+    if( p_sys->i_data <= 0 )
     {
         msg_Err( p_demux, "failed to read the complete file" );
-        free( p_sys->p_data );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -212,8 +212,6 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->f )
     {
         msg_Err( p_demux, "failed to understand the file" );
-        free( p_sys->p_data );
-        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -252,10 +250,7 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     ModPlug_Unload( p_sys->f );
-    free( p_sys->p_data );
-    free( p_sys );
 }
-
 
 /*****************************************************************************
  * Demux:
