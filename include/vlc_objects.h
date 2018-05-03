@@ -139,6 +139,7 @@ VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
 
 VLC_API VLC_MALLOC void *vlc_obj_malloc(vlc_object_t *, size_t);
 VLC_API VLC_MALLOC void *vlc_obj_calloc(vlc_object_t *, size_t, size_t);
+VLC_API VLC_MALLOC char *vlc_obj_strdup(vlc_object_t *, const char *);
 VLC_API void vlc_obj_free(vlc_object_t *, void *);
 
 /** @} */

@@ -273,6 +273,7 @@ vlc_strerror
 vlc_strerror_c
 vlc_obj_malloc
 vlc_obj_calloc
+vlc_obj_strdup
 vlc_obj_free
 msleep
 mwait

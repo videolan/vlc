@@ -26,6 +26,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <vlc_common.h>
 
@@ -164,6 +165,19 @@ static void *vlc_obj_alloc_common(vlc_object_t *obj, size_t nmemb, size_t size,
 void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
 {
     return vlc_obj_alloc_common(obj, nmemb, size, true);
+}
+
+static void *vlc_obj_memdup(vlc_object_t *obj, const void *base, size_t len)
+{
+    void *ptr = vlc_obj_malloc(obj, len);
+    if (likely(ptr != NULL))
+        memcpy(ptr, base, len);
+    return ptr;
+}
+
+char *vlc_obj_strdup(vlc_object_t *obj, const char *str)
+{
+    return vlc_obj_memdup(obj, str, strlen(str) + 1);
 }
 
 void vlc_obj_free(vlc_object_t *obj, void *ptr)
