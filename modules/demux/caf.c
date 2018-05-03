@@ -909,11 +909,6 @@ caf_open_end:
     {
         es_format_Clean( &p_sys->fmt );
         free( p_sys  );
-
-        if( vlc_stream_Seek( p_demux->s, 0 ))
-        {
-            msg_Warn(p_demux, "Could not reset stream position to 0.");
-        }
     }
     else
     {
