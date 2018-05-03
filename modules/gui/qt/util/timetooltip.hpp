@@ -26,12 +26,6 @@
 
 #include <QWidget>
 
-class QPaintEvent;
-class QString;
-class QFont;
-class QRect;
-class QPainterPath;
-
 class TimeTooltip : public QWidget
 {
     Q_OBJECT
