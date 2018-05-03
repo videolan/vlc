@@ -38,14 +38,13 @@
  * Module descriptor
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("XA demuxer") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_capability( "demux", 10 )
-    set_callbacks( Open, Close )
+    set_callbacks( Open, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -102,7 +101,7 @@ static int Open( vlc_object_t * p_this )
     if( GetWLE( peek + 8 ) != 1 ) /* format tag */
         return VLC_EGENERIC;
 
-    demux_sys_t *p_sys = malloc( sizeof( demux_sys_t ) );
+    demux_sys_t *p_sys = vlc_obj_malloc( p_this, sizeof (*p_sys) );
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
@@ -110,10 +109,7 @@ static int Open( vlc_object_t * p_this )
     xa_header_t xa;
 
     if( vlc_stream_Read( p_demux->s, &xa, HEADER_LENGTH ) < HEADER_LENGTH )
-    {
-        free( p_sys );
         return VLC_EGENERIC;
-    }
 
     es_format_t fmt;
     es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_ADPCM_XA_EA );
@@ -143,10 +139,7 @@ static int Open( vlc_object_t * p_this )
 
     if( fmt.audio.i_rate == 0 || fmt.audio.i_channels == 0
      || fmt.audio.i_bitspersample != 16 )
-    {
-        free( p_sys );
         return VLC_EGENERIC;
-    }
 
     p_sys->p_es = es_out_Add( p_demux->out, &fmt );
 
@@ -193,16 +186,6 @@ static int Demux( demux_t *p_demux )
     date_Increment( &p_sys->pts, i_frames * FRAME_LENGTH );
 
     return 1;
-}
-
-/*****************************************************************************
- * Close: frees unused data
- *****************************************************************************/
-static void Close ( vlc_object_t * p_this )
-{
-    demux_sys_t *p_sys  = ((demux_t *)p_this)->p_sys;
-
-    free( p_sys );
 }
 
 /*****************************************************************************
