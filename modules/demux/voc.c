@@ -480,8 +480,8 @@ static int Demux( demux_t *p_demux )
         if( i_offset >= p_sys->i_block_end )
         {
             if( ReadBlockHeader( p_demux ) != VLC_SUCCESS )
-                return 0;
-            return 1;
+                return VLC_DEMUXER_EOF;
+            return VLC_DEMUXER_SUCCESS;
         }
 
         i_read_frames = ( p_sys->i_block_end - i_offset )
@@ -496,7 +496,7 @@ static int Demux( demux_t *p_demux )
         if( p_block == NULL )
         {
             msg_Warn( p_demux, "cannot read data" );
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
     }
     else
@@ -519,7 +519,7 @@ static int Demux( demux_t *p_demux )
     es_out_SetPCR( p_demux->out, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
