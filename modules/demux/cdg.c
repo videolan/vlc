@@ -148,7 +148,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->p_es )
         es_out_Send( p_demux->out, p_sys->p_es, p_block );
     else
-        block_Release( p_sys->p_es );
+        block_Release( p_block );
 
     return VLC_DEMUXER_SUCCESS;
 }
