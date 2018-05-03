@@ -207,6 +207,8 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->es == NULL) )
+        return VLC_ENOMEM;
 
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
@@ -255,11 +257,7 @@ static int Demux( demux_t *p_demux )
                      p_sys->fmt.audio.i_rate;
 
     /* */
-    if( p_sys->es )
-        es_out_Send( p_demux->out, p_sys->es, p_block );
-    else
-        block_Release( p_block );
-
+    es_out_Send( p_demux->out, p_sys->es, p_block );
     return VLC_DEMUXER_SUCCESS;
 }
 
