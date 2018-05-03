@@ -88,11 +88,6 @@ static int Open( vlc_object_t * p_this )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    p_demux->pf_demux   = Demux;
-    p_demux->pf_control = Control;
-    p_demux->p_sys      = p_sys;
-
-    /* */
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_CDG );
     p_sys->fmt.video.i_width  = 300-2*6;
     p_sys->fmt.video.i_height = 216-2*12 ;
@@ -100,11 +95,16 @@ static int Open( vlc_object_t * p_this )
     p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height;
 
     p_sys->p_es = es_out_Add( p_demux->out, &p_sys->fmt );
+    if( unlikely(p_sys->p_es == NULL) )
+        return VLC_ENOMEM;
 
     /* There is CDG_FRAME_RATE frames per second */
     date_Init( &p_sys->pts, CDG_FRAME_RATE, 1 );
     date_Set( &p_sys->pts, 0 );
 
+    p_demux->pf_demux   = Demux;
+    p_demux->pf_control = Control;
+    p_demux->p_sys      = p_sys;
     return VLC_SUCCESS;
 }
 
@@ -142,12 +142,7 @@ static int Demux( demux_t *p_demux )
     }
 
     es_out_SetPCR( p_demux->out, p_block->i_pts );
-
-    if( p_sys->p_es )
-        es_out_Send( p_demux->out, p_sys->p_es, p_block );
-    else
-        block_Release( p_block );
-
+    es_out_Send( p_demux->out, p_sys->p_es, p_block );
     return VLC_DEMUXER_SUCCESS;
 }
 
