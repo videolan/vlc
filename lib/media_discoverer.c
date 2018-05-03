@@ -41,7 +41,6 @@
 
 struct libvlc_media_discoverer_t
 {
-    libvlc_event_manager_t   event_manager;
     libvlc_instance_t *      p_libvlc_instance;
     services_discovery_t *   p_sd;
     libvlc_media_list_t *    p_mlist;
@@ -164,7 +163,6 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
     p_mdis->p_sd = NULL;
 
     vlc_dictionary_init( &p_mdis->catname_to_submedialist, 0 );
-    libvlc_event_manager_init( &p_mdis->event_manager, p_mdis );
 
     libvlc_retain( p_inst );
     strcpy( p_mdis->name, psz_name );
@@ -192,9 +190,6 @@ libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
         return -1;
     }
 
-    libvlc_event_t event;
-    event.type = libvlc_MediaDiscovererStarted;
-    libvlc_event_send( &p_mdis->event_manager, &event );
     return 0;
 }
 
@@ -208,10 +203,6 @@ libvlc_media_discoverer_stop( libvlc_media_discoverer_t * p_mdis )
     libvlc_media_list_lock( p_mlist );
     libvlc_media_list_internal_end_reached( p_mlist );
     libvlc_media_list_unlock( p_mlist );
-
-    libvlc_event_t event;
-    event.type = libvlc_MediaDiscovererEnded;
-    libvlc_event_send( &p_mdis->event_manager, &event );
 
     vlc_sd_Destroy( p_mdis->p_sd );
     p_mdis->p_sd = NULL;
@@ -261,7 +252,6 @@ libvlc_media_discoverer_release( libvlc_media_discoverer_t * p_mdis )
     vlc_dictionary_clear( &p_mdis->catname_to_submedialist,
         MediaListDictValueRelease, NULL );
 
-    libvlc_event_manager_destroy( &p_mdis->event_manager );
     libvlc_release( p_mdis->p_libvlc_instance );
 
     free( p_mdis );
@@ -287,16 +277,6 @@ libvlc_media_discoverer_media_list( libvlc_media_discoverer_t * p_mdis )
     libvlc_media_list_retain( p_mdis->p_mlist );
     return p_mdis->p_mlist;
 }
-
-/**************************************************************************
- * event_manager (Public)
- **************************************************************************/
-libvlc_event_manager_t *
-libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis )
-{
-    return &p_mdis->event_manager;
-}
-
 
 /**************************************************************************
  * running (Public)

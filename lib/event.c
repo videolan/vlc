@@ -189,9 +189,6 @@ static const event_name_t event_list[] = {
     DEF(MediaListPlayerNextItemSet)
     DEF(MediaListPlayerStopped)
 
-    DEF(MediaDiscovererStarted)
-    DEF(MediaDiscovererEnded)
-
     DEF(VlmMediaAdded)
     DEF(VlmMediaRemoved)
     DEF(VlmMediaChanged)

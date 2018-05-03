@@ -178,18 +178,6 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 LIBVLC_DEPRECATED LIBVLC_API char *
 libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );
 
-/**
- * Get event manager from media service discover object.
- *
- * \deprecated Useless, media_discoverer events are only triggered when calling
- * libvlc_media_discoverer_start() and libvlc_media_discoverer_stop().
- *
- * \param p_mdis media service discover object
- * \return event manager object.
- */
-LIBVLC_DEPRECATED LIBVLC_API libvlc_event_manager_t *
-libvlc_media_discoverer_event_manager( libvlc_media_discoverer_t * p_mdis );
-
 /** @}*/
 
 /**

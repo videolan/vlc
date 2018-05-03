@@ -185,22 +185,11 @@ enum libvlc_event_e {
     libvlc_MediaListPlayerStopped,
 
     /**
-     * \deprecated Useless event, it will be triggered only when calling
-     * libvlc_media_discoverer_start()
-     */
-    libvlc_MediaDiscovererStarted=0x500,
-    /**
-     * \deprecated Useless event, it will be triggered only when calling
-     * libvlc_media_discoverer_stop()
-     */
-    libvlc_MediaDiscovererEnded,
-
-    /**
      * A new \link #libvlc_renderer_item_t renderer item\endlink was found by a
      * \link #libvlc_renderer_discoverer_t renderer discoverer\endlink.
      * The renderer item is valid until deleted.
      */
-    libvlc_RendererDiscovererItemAdded,
+    libvlc_RendererDiscovererItemAdded=0x502,
 
     /**
      * A previously discovered \link #libvlc_renderer_item_t renderer item\endlink

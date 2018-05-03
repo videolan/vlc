@@ -63,7 +63,6 @@ libvlc_log_set_file
 libvlc_log_unset
 libvlc_media_add_option
 libvlc_media_add_option_flag
-libvlc_media_discoverer_event_manager
 libvlc_media_discoverer_is_running
 libvlc_media_discoverer_localized_name
 libvlc_media_discoverer_media_list
