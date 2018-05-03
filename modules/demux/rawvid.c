@@ -402,13 +402,13 @@ static int Demux( demux_t *p_demux )
         /* Skip the frame header */
         /* Skip "FRAME" */
         if( vlc_stream_Read( p_demux->s, NULL, 5 ) < 5 )
-            return 0;
+            return VLC_DEMUXER_EOF;
         /* Find \n */
         for( ;; )
         {
             uint8_t b;
             if( vlc_stream_Read( p_demux->s, &b, 1 ) < 1 )
-                return 0;
+                return VLC_DEMUXER_EOF;
             if( b == 0x0a )
                 break;
         }
@@ -416,17 +416,14 @@ static int Demux( demux_t *p_demux )
 
     p_block = vlc_stream_Block( p_demux->s, p_sys->frame_size );
     if( p_block == NULL )
-    {
-        /* EOF */
-        return 0;
-    }
+        return VLC_DEMUXER_EOF;
 
     p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_pcr;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
     date_Increment( &p_sys->pcr, 1 );
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 /*****************************************************************************
