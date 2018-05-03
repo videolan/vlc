@@ -143,7 +143,6 @@ src/video_output/interlacing.c
 src/video_output/video_output.c
 src/video_output/video_text.c
 src/video_output/video_widgets.c
-src/video_output/vout_control.h
 src/video_output/vout_internal.h
 src/video_output/vout_intf.c
 src/video_output/vout_subpictures.c

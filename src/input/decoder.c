@@ -51,7 +51,7 @@
 #include "event.h"
 #include "resource.h"
 
-#include "../video_output/vout_control.h"
+#include "../video_output/vout_internal.h"
 
 /*
  * Possibles values set in p_owner->reload atomic

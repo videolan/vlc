@@ -39,7 +39,7 @@
 #include "../libvlc.h"
 #include "../stream_output/stream_output.h"
 #include "../audio_output/aout_internal.h"
-#include "../video_output/vout_control.h"
+#include "../video_output/vout_internal.h"
 #include "input_interface.h"
 #include "resource.h"
 

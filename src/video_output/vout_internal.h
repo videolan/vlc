@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vout_internal.h : Internal vout definitions
  *****************************************************************************
- * Copyright (C) 2008 VLC authors and VideoLAN
+ * Copyright (C) 2008-2018 VLC authors and VideoLAN
  * Copyright (C) 2008 Laurent Aimar
  * $Id$
  *
@@ -29,7 +29,6 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout_wrapper.h>
-#include "vout_control.h"
 #include "control.h"
 #include "snapshot.h"
 #include "statistic.h"
@@ -168,5 +167,54 @@ void vout_ManageWrapper(vout_thread_t *);
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, vlc_object_t *input, bool );
 void spu_ChangeMargin(spu_t *, int);
+
+typedef struct vout_window_mouse_event_t vout_window_mouse_event_t;
+
+/**
+ * This function will (un)pause the display of pictures.
+ * It is thread safe
+ */
+void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
+
+/**
+ * This function will apply an offset on subtitle subpicture.
+ */
+void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
+
+/**
+ * This function will return and reset internal statistics.
+ */
+void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
+                             unsigned *pi_lost );
+
+/**
+ * This function will ensure that all ready/displayed pictures have at most
+ * the provided date.
+ */
+void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
+
+/*
+ * Cancel the vout, if cancel is true, it won't return any pictures after this
+ * call.
+ */
+void vout_Cancel( vout_thread_t *p_vout, bool b_canceled );
+
+/**
+ * This function will force to display the next picture while paused
+ */
+void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
+
+/**
+ * This function will ask the display of the input title
+ */
+void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
+
+void vout_WindowMouseEvent( vout_thread_t *p_vout,
+                            const vout_window_mouse_event_t *mouse );
+
+/**
+ * This function will return true if no more pictures are to be displayed.
+ */
+bool vout_IsEmpty( vout_thread_t *p_vout );
 
 #endif

@@ -295,7 +295,6 @@ libvlccore_la_SOURCES = \
 	video_output/opengl.c \
 	video_output/vout_intf.c \
 	video_output/vout_internal.h \
-	video_output/vout_control.h \
 	video_output/vout_wrapper.c \
 	network/getaddrinfo.c \
 	network/http_auth.c \

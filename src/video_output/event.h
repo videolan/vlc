@@ -24,7 +24,7 @@
 #include <vlc_common.h>
 #include <math.h>
 
-#include "vout_control.h"
+#include "vout_internal.h"
 
 /* TODO/FIXME
  *
