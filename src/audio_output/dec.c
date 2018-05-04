@@ -410,7 +410,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     owner->sync.end = block->i_pts + block->i_length + 1;
     owner->sync.discontinuity = false;
     aout_OutputPlay (aout, block);
-    atomic_fetch_add(&owner->buffers_played, 1);
+    atomic_fetch_add_explicit(&owner->buffers_played, 1, memory_order_relaxed);
 out:
     aout_OutputUnlock (aout);
     return ret;
@@ -418,7 +418,7 @@ drop:
     owner->sync.discontinuity = true;
     block_Release (block);
 lost:
-    atomic_fetch_add(&owner->buffers_lost, 1);
+    atomic_fetch_add_explicit(&owner->buffers_lost, 1, memory_order_relaxed);
     goto out;
 }
 
@@ -427,8 +427,10 @@ void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    *lost = atomic_exchange(&owner->buffers_lost, 0);
-    *played = atomic_exchange(&owner->buffers_played, 0);
+    *lost = atomic_exchange_explicit(&owner->buffers_lost, 0,
+                                     memory_order_relaxed);
+    *played = atomic_exchange_explicit(&owner->buffers_played, 0,
+                                       memory_order_relaxed);
 }
 
 void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
