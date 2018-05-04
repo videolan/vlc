@@ -108,7 +108,7 @@ error:
 
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
-    atomic_store (&owner->vp.update, true);
+    atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
     return 0;
 }
 
@@ -377,10 +377,11 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
         owner->sync.discontinuity = true;
 
-    if (atomic_exchange(&owner->vp.update, false))
+    if (atomic_load_explicit(&owner->vp.update, memory_order_relaxed))
     {
         vlc_mutex_lock (&owner->vp.lock);
         aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
+        atomic_store_explicit(&owner->vp.update, false, memory_order_relaxed);
         vlc_mutex_unlock (&owner->vp.lock);
     }
 

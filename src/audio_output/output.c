@@ -930,6 +930,6 @@ static void aout_ChangeViewpoint(audio_output_t *aout,
 
     vlc_mutex_lock(&owner->vp.lock);
     owner->vp.value = *p_viewpoint;
-    atomic_store(&owner->vp.update, true);
+    atomic_store_explicit(&owner->vp.update, true, memory_order_relaxed);
     vlc_mutex_unlock(&owner->vp.lock);
 }
