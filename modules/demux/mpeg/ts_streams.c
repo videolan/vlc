@@ -131,7 +131,7 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->pcr.i_current = -1;
     pmt->pcr.i_first  = -1;
     pmt->pcr.b_disable = false;
-    pmt->pcr.i_first_dts = VLC_TS_INVALID;
+    pmt->pcr.i_first_dts = -1;
     pmt->pcr.i_pcroffset = -1;
 
     pmt->pcr.b_fix_done = false;

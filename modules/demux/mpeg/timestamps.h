@@ -25,9 +25,11 @@
 #define FROM_SCALE(x) (VLC_TS_0 + FROM_SCALE_NZ(x))
 #define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TS_0)
 
-static inline int64_t TimeStampWrapAround( int64_t i_first_pcr, int64_t i_time )
+typedef int64_t stime_t;
+
+static inline stime_t TimeStampWrapAround( stime_t i_first_pcr, stime_t i_time )
 {
-    int64_t i_adjust = 0;
+    stime_t i_adjust = 0;
     if( i_first_pcr > 0x0FFFFFFFF && i_time < 0x0FFFFFFFF )
         i_adjust = 0x1FFFFFFFF;
 

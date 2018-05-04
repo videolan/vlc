@@ -61,7 +61,7 @@ void SCTE18_Section_Callback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_
                 continue;
 
             const ts_pmt_t *p_pmt = p_es->p_program;
-            const mtime_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+            const stime_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
             block_t *p_block = block_Alloc( p_section->p_payload_end - p_section->p_payload_start );
             memcpy( p_block->p_buffer, p_section->p_payload_start, i_payload );
             p_block->i_dts = p_block->i_pts = FROM_SCALE( i_date );
