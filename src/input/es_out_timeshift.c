@@ -604,17 +604,6 @@ static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
     }
     return i_ret;
 }
-static int ControlLockedSetTime( es_out_t *p_out, mtime_t i_date )
-{
-    es_out_sys_t *p_sys = p_out->p_sys;
-
-    if( !p_sys->b_delayed )
-        return es_out_SetTime( p_sys->p_out, i_date );
-
-    /* TODO */
-    msg_Err( p_sys->p_input, "EsOutTimeshift does not yet support time change" );
-    return VLC_EGENERIC;
-}
 static int ControlLockedSetFrameNext( es_out_t *p_out )
 {
     es_out_sys_t *p_sys = p_out->p_sys;
@@ -707,12 +696,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         const int i_rate = (int)va_arg( args, int );
 
         return ControlLockedSetRate( p_out, i_src_rate, i_rate );
-    }
-    case ES_OUT_SET_TIME:
-    {
-        const mtime_t i_date = (mtime_t)va_arg( args, mtime_t );
-
-        return ControlLockedSetTime( p_out, i_date );
     }
     case ES_OUT_SET_FRAME_NEXT:
     {

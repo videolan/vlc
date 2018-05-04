@@ -2777,16 +2777,6 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         return VLC_SUCCESS;
     }
 
-    case ES_OUT_SET_TIME:
-    {
-        const mtime_t i_date = va_arg( args, mtime_t );
-
-        assert( i_date == -1 );
-        EsOutChangePosition( out );
-
-        return VLC_SUCCESS;
-    }
-
     case ES_OUT_SET_FRAME_NEXT:
         EsOutFrameNext( out );
         return VLC_SUCCESS;

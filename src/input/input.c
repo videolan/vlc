@@ -1848,7 +1848,7 @@ static bool Control( input_thread_t *p_input,
             else if( f_pos > 1.f )
                 f_pos = 1.f;
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_SetTime( input_priv(p_input)->p_es_out, -1 );
+            es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESET_PCR );
             if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_POSITION,
                                (double) f_pos, !input_priv(p_input)->b_fast_seek ) )
             {
@@ -1882,7 +1882,7 @@ static bool Control( input_thread_t *p_input,
                 i_time = 0;
 
             /* Reset the decoders states and clock sync (before calling the demuxer */
-            es_out_SetTime( input_priv(p_input)->p_es_out, -1 );
+            es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESET_PCR );
 
             i_ret = demux_Control( input_priv(p_input)->master->p_demux,
                                    DEMUX_SET_TIME, i_time,
@@ -2098,7 +2098,7 @@ static bool Control( input_thread_t *p_input,
             if( i_title < 0 || i_title >= input_priv(p_input)->master->i_title )
                 break;
 
-            es_out_SetTime( input_priv(p_input)->p_es_out, -1 );
+            es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESET_PCR );
             demux_Control( input_priv(p_input)->master->p_demux,
                            DEMUX_SET_TITLE, i_title );
             input_SendEventTitle( p_input, i_title );
@@ -2141,7 +2141,7 @@ static bool Control( input_thread_t *p_input,
              || i_seekpoint >= input_priv(p_input)->master->title[i_title]->i_seekpoint )
                 break;
 
-            es_out_SetTime( input_priv(p_input)->p_es_out, -1 );
+            es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESET_PCR );
             demux_Control( input_priv(p_input)->master->p_demux,
                            DEMUX_SET_SEEKPOINT, i_seekpoint );
             input_SendEventSeekpoint( p_input, i_title, i_seekpoint );
