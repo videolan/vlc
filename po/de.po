@@ -20,10 +20,10 @@
 # Tobias Bannert <tobannert@gmail.com>, 2014-2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-04-19 08:59+0200\n"
-"PO-Revision-Date: 2018-01-08 23:07+0100\n"
+"PO-Revision-Date: 2018-04-20 16:32+0100\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
@@ -9594,31 +9594,27 @@ msgstr "IceCAST-Ausgabe"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Verschlüsselungslänge in Bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 Bits"
+msgstr "16 Bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 Bits"
+msgstr "24 Bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 Bits"
+msgstr "32 Bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT Stream-Ausgabe"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Passwort für Zielgerät."
+msgstr "Passwort für die Stream-Verschlüsselung"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10787,7 +10783,7 @@ msgstr "Deaktiviert"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Aktiviert (nur AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16679,7 +16675,7 @@ msgstr "Skins"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Profil beim nächsten Start anwenden"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17751,9 +17747,8 @@ msgid "Jump to Time"
 msgstr "Springe zu Zeitpunkt"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Renderer"
+msgstr "Renderer"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26566,22 +26561,18 @@ msgid "Ball speed"
 msgstr "Ball-Geschwindigkeit"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Die Ballgeschwindigkeit als "
-"Verschiebungswert                                 für eine Anzahl von Pixeln "
-"pro Frame setzen."
+"Die Ballgeschwindigkeit als Verschiebungswert für eine Anzahl von Pixeln pro "
+"Frame setzen."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Ballgröße"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr ""
-"Den Radius der Ballgröße                                 in Pixeln setzen"
+msgstr "Den Radius der Ballgröße in Pixeln setzen."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -27070,7 +27061,7 @@ msgstr "FPS-Konverter"
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
-msgstr "Interaktiver-Einfrieren-Videofilter "
+msgstr "Interaktiver-Einfrieren-Videofilter"
 
 #: modules/video_filter/freeze.c:79
 msgid "Freeze"
