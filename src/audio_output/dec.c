@@ -221,9 +221,8 @@ static void aout_DecSilence (audio_output_t *aout, vlc_tick_t length, vlc_tick_t
 
 static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
 {
-    aout_owner_t *owner = aout_owner (aout);
-    const float rate = owner->sync.rate;
-    vlc_tick_t drift;
+    vlc_tick_t now = vlc_tick_now();
+    vlc_tick_t delay;
 
     /**
      * Depending on the drift between the actual and intended playback times,
@@ -241,9 +240,18 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
      * all samples in the buffer will have been played. Then:
      *    pts = vlc_tick_now() + delay
      */
-    if (aout->time_get(aout, &drift) != 0)
+    if (aout->time_get(aout, &delay) != 0)
         return; /* nothing can be done if timing is unknown */
-    drift += vlc_tick_now () - dec_pts;
+
+    aout_RequestRetiming(aout, now, dec_pts - delay);
+}
+
+void aout_RequestRetiming(audio_output_t *aout, vlc_tick_t system_ts,
+                          vlc_tick_t audio_ts)
+{
+    aout_owner_t *owner = aout_owner (aout);
+    const float rate = owner->sync.rate;
+    vlc_tick_t drift = system_ts - audio_ts;
 
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
@@ -265,11 +273,8 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
         aout_StopResampling (aout);
         owner->sync.discontinuity = true;
 
-        /* Now the output might be too early... Recheck. */
-        if (aout->time_get(aout, &drift) != 0)
-            return; /* nothing can be done if timing is unknown */
-        drift += vlc_tick_now () - dec_pts;
-    }
+        return; /* nothing can be done if timing is unknown */
+}
 
     /* Early audio output.
      * This is rare except at startup when the buffers are still empty. */
@@ -279,7 +284,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too early (%"PRId64"): "
                       "playing silence", drift);
-        aout_DecSilence (aout, -drift, dec_pts);
+        aout_DecSilence (aout, -drift, audio_ts);
 
         aout_StopResampling (aout);
         owner->sync.discontinuity = true;
