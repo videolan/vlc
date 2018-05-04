@@ -68,7 +68,8 @@ typedef struct
     pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
     pa_time_event *trigger; /**< Deferred stream trigger */
     pa_cvolume cvolume; /**< actual sink input volume */
-    mtime_t first_pts; /**< Play time of buffer start */
+    mtime_t first_pts; /**< Play stream timestamp of buffer start */
+    mtime_t first_date; /**< Play system timestamp of buffer start */
 
     pa_volume_t volume_force; /**< Forced volume (stream must be NULL) */
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
@@ -221,7 +222,7 @@ static void stream_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
  * in order to minimize desync and resampling during early playback.
  * @note PulseAudio lock required.
  */
-static void stream_start(pa_stream *s, audio_output_t *aout)
+static void stream_start(pa_stream *s, audio_output_t *aout, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
     mtime_t delta;
@@ -239,7 +240,7 @@ static void stream_start(pa_stream *s, audio_output_t *aout)
         delta = 0; /* screwed */
     }
 
-    delta = (sys->first_pts - mdate()) - delta;
+    delta = (date - mdate()) - delta;
     if (delta > 0) {
         msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
         delta += pa_rtclock_now();
@@ -260,7 +261,7 @@ static void stream_latency_cb(pa_stream *s, void *userdata)
     if (sys->first_pts == VLC_TS_INVALID)
         return; /* nothing to do if buffers are (still) empty */
     if (pa_stream_is_corked(s) > 0)
-        stream_start(s, aout);
+        stream_start(s, aout, sys->first_date);
 }
 
 
@@ -503,11 +504,14 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
      * will take place, and sooner or later a deadlock. */
     pa_threaded_mainloop_lock(sys->mainloop);
 
-    if (sys->first_pts == VLC_TS_INVALID)
+    if (sys->first_pts == VLC_TS_INVALID) {
+        msg_Err(aout, "%s: %"PRId64", %"PRId64, __func__, block->i_pts, date);
         sys->first_pts = block->i_pts;
+        sys->first_date = date;
+    }
 
     if (pa_stream_is_corked(s) > 0)
-        stream_start(s, aout);
+        stream_start(s, aout, date);
 
 #if 0 /* Fault injector to test underrun recovery */
     static volatile unsigned u = 0;
@@ -523,7 +527,6 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
     }
 
     pa_threaded_mainloop_unlock(sys->mainloop);
-    (void) date;
 }
 
 /**
