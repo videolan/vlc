@@ -69,7 +69,7 @@ typedef struct
     bool b_scrambled;
 
     /* Clock for this program */
-    input_clock_t *p_clock;
+    input_clock_t *p_input_clock;
 
     vlc_meta_t *p_meta;
 } es_out_pgrm_t;
@@ -377,7 +377,7 @@ static void EsOutTerminate( es_out_t *out )
     for( int i = 0; i < p_sys->i_pgrm; i++ )
     {
         es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
-        input_clock_Delete( p_pgrm->p_clock );
+        input_clock_Delete( p_pgrm->p_input_clock );
         if( p_pgrm->p_meta )
             vlc_meta_Delete( p_pgrm->p_meta );
 
@@ -409,7 +409,7 @@ static mtime_t EsOutGetWakeup( es_out_t *out )
         p_sys->b_buffering )
         return 0;
 
-    return input_clock_GetWakeup( p_sys->p_pgrm->p_clock );
+    return input_clock_GetWakeup( p_sys->p_pgrm->p_input_clock );
 }
 
 static es_out_id_t es_cat[DATA_ES];
@@ -519,7 +519,7 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
             if( !p_es->p_dec || p_es->p_master )
                 continue;
 
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_input_clock, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
@@ -563,7 +563,7 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
             mtime_t i_stream_duration;
             mtime_t i_system_duration;
             int i_ret;
-            i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+            i_ret = input_clock_GetState( p_sys->p_pgrm->p_input_clock,
                                           &i_stream_start, &i_system_start,
                                           &i_stream_duration, &i_system_duration );
             if( !i_ret )
@@ -616,7 +616,7 @@ static void EsOutChangePosition( es_out_t *out )
     }
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_Reset( p_sys->pgrm[i]->p_clock );
+        input_clock_Reset( p_sys->pgrm[i]->p_input_clock );
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_initial = 0;
@@ -636,7 +636,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     mtime_t i_system_start;
     mtime_t i_stream_duration;
     mtime_t i_system_duration;
-    if (input_clock_GetState( p_sys->p_pgrm->p_clock,
+    if (input_clock_GetState( p_sys->p_pgrm->p_input_clock,
                                   &i_stream_start, &i_system_start,
                                   &i_stream_duration, &i_system_duration ))
         return;
@@ -703,7 +703,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
     const mtime_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : mdate();
 
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, true,
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true,
                                     i_current_date + i_wakeup_delay - i_buffering_duration );
 
     for( int i = 0; i < p_sys->i_es; i++ )
@@ -766,7 +766,7 @@ static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_dat
     es_out_sys_t *p_sys = out->p_sys;
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_ChangePause( p_sys->pgrm[i]->p_clock, b_paused, i_date );
+        input_clock_ChangePause( p_sys->pgrm[i]->p_input_clock, b_paused, i_date );
 }
 
 static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
@@ -791,7 +791,7 @@ static void EsOutProgramsChangeRate( es_out_t *out )
     es_out_sys_t      *p_sys = out->p_sys;
 
     for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_ChangeRate( p_sys->pgrm[i]->p_clock, p_sys->i_rate );
+        input_clock_ChangeRate( p_sys->pgrm[i]->p_input_clock, p_sys->i_rate );
 }
 
 static void EsOutFrameNext( es_out_t *out )
@@ -841,7 +841,7 @@ static void EsOutFrameNext( es_out_t *out )
         mtime_t i_system_duration;
         int i_ret;
 
-        i_ret = input_clock_GetState( p_sys->p_pgrm->p_clock,
+        i_ret = input_clock_GetState( p_sys->p_pgrm->p_input_clock,
                                       &i_stream_start, &i_system_start,
                                       &i_stream_duration, &i_system_duration );
         if( i_ret )
@@ -852,7 +852,7 @@ static void EsOutFrameNext( es_out_t *out )
         p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
     }
 
-    const int i_rate = input_clock_GetRate( p_sys->p_pgrm->p_clock );
+    const int i_rate = input_clock_GetRate( p_sys->p_pgrm->p_input_clock );
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_system += i_duration;
@@ -874,7 +874,7 @@ static mtime_t EsOutGetBuffering( es_out_t *out )
     {
         mtime_t i_stream_start, i_system_duration;
 
-        if( input_clock_GetState( p_sys->p_pgrm->p_clock,
+        if( input_clock_GetState( p_sys->p_pgrm->p_input_clock,
                                   &i_stream_start, &i_system_start,
                                   &i_stream_duration, &i_system_duration ) )
             return 0;
@@ -1093,15 +1093,15 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->b_selected = false;
     p_pgrm->b_scrambled = false;
     p_pgrm->p_meta = NULL;
-    p_pgrm->p_clock = input_clock_New( p_sys->i_rate );
-    if( !p_pgrm->p_clock )
+    p_pgrm->p_input_clock = input_clock_New( p_sys->i_rate );
+    if( !p_pgrm->p_input_clock )
     {
         free( p_pgrm );
         return NULL;
     }
     if( p_sys->b_paused )
-        input_clock_ChangePause( p_pgrm->p_clock, p_sys->b_paused, p_sys->i_pause_date );
-    input_clock_SetJitter( p_pgrm->p_clock, p_sys->i_pts_delay, p_sys->i_cr_average );
+        input_clock_ChangePause( p_pgrm->p_input_clock, p_sys->b_paused, p_sys->i_pause_date );
+    input_clock_SetJitter( p_pgrm->p_input_clock, p_sys->i_pts_delay, p_sys->i_cr_average );
 
     /* Append it */
     TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
@@ -1151,7 +1151,7 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     if( p_sys->p_pgrm == p_pgrm )
         p_sys->p_pgrm = NULL;
 
-    input_clock_Delete( p_pgrm->p_clock );
+    input_clock_Delete( p_pgrm->p_input_clock );
 
     if( p_pgrm->p_meta )
         vlc_meta_Delete( p_pgrm->p_meta );
@@ -1684,7 +1684,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
 
-    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, input_priv(p_input)->p_sout );
+    p_es->p_dec = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_input_clock, input_priv(p_input)->p_sout );
     if( p_es->p_dec )
     {
         if( p_sys->b_buffering )
@@ -1692,7 +1692,7 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
 
         if( !p_es->p_master && p_sys->p_sout_record )
         {
-            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_clock, p_sys->p_sout_record );
+            p_es->p_dec_record = input_DecoderNew( p_input, &p_es->fmt, p_es->p_pgrm->p_input_clock, p_sys->p_sout_record );
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
@@ -2485,7 +2485,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         /* TODO do not use mdate() but proper stream acquisition date */
         bool b_late;
-        input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
+        input_clock_Update( p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
                             &b_late,
                             input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
                             EsOutIsExtraBufferingAllowed( out ),
@@ -2505,7 +2505,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                             !input_priv(p_sys->p_input)->b_out_pace_control ) )
             {
                 const mtime_t i_pts_delay_base = p_sys->i_pts_delay - p_sys->i_pts_jitter;
-                mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_clock );
+                mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_input_clock );
 
                 /* Avoid dangerously high value */
                 const mtime_t i_jitter_max = INT64_C(1000) * var_InheritInteger( p_sys->p_input, "clock-jitter" );
@@ -2518,7 +2518,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
                     /* reset clock */
                     for( int i = 0; i < p_sys->i_pgrm; i++ )
-                      input_clock_Reset( p_sys->pgrm[i]->p_clock );
+                      input_clock_Reset( p_sys->pgrm[i]->p_input_clock );
                 }
                 else
                 {
@@ -2825,7 +2825,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         p_sys->i_cr_average = i_cr_average;
 
         for( int i = 0; i < p_sys->i_pgrm && b_change_clock; i++ )
-            input_clock_SetJitter( p_sys->pgrm[i]->p_clock,
+            input_clock_SetJitter( p_sys->pgrm[i]->p_input_clock,
                                    i_pts_delay + i_pts_jitter, i_cr_average );
         return VLC_SUCCESS;
     }
@@ -2841,7 +2841,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         mtime_t *pi_system = va_arg( args, mtime_t *);
         mtime_t *pi_delay  = va_arg( args, mtime_t *);
-        input_clock_GetSystemOrigin( p_pgrm->p_clock, pi_system, pi_delay );
+        input_clock_GetSystemOrigin( p_pgrm->p_input_clock, pi_system, pi_delay );
         return VLC_SUCCESS;
     }
 
@@ -2856,7 +2856,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         const bool    b_absolute = va_arg( args, int );
         const mtime_t i_system   = va_arg( args, mtime_t );
-        input_clock_ChangeSystemOrigin( p_pgrm->p_clock, b_absolute, i_system );
+        input_clock_ChangeSystemOrigin( p_pgrm->p_input_clock, b_absolute, i_system );
         return VLC_SUCCESS;
     }
     case ES_OUT_SET_EOS:
