@@ -208,7 +208,6 @@ static int Open( vlc_object_t * p_this )
 
     /* initialize timing */
     date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, 0 );
 
     /* calculate 50ms frame size/time */
     p_sys->i_frame_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
