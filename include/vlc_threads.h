@@ -858,8 +858,8 @@ VLC_API void mwait(mtime_t deadline);
  */
 VLC_API void msleep(mtime_t delay);
 
-#define VLC_HARD_MIN_SLEEP   10000 /* 10 milliseconds = 1 tick at 100Hz */
-#define VLC_SOFT_MIN_SLEEP 9000000 /* 9 seconds */
+#define VLC_HARD_MIN_SLEEP  (CLOCK_FREQ/100) /* 10 milliseconds = 1 tick at 100Hz */
+#define VLC_SOFT_MIN_SLEEP  (9*CLOCK_FREQ)   /* 9 seconds */
 
 #if defined (__GNUC__) && !defined (__clang__)
 /* Linux has 100, 250, 300 or 1000Hz
