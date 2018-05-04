@@ -296,13 +296,15 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 i_options = 0;
                 if( i_start )
                 {
-                    if( asprintf( ppsz_options, ":start-time=%d" ,(int) i_start/CLOCK_FREQ ) != -1)
+                    if( asprintf( ppsz_options, ":start-time=%"PRId64 ,
+                                  i_start / CLOCK_FREQ ) != -1)
                         i_options++;
                 }
                 if( i_duration)
                 {
-                    if( asprintf( ppsz_options + i_options, ":stop-time=%d",
-                                (int) (i_start+i_duration)/CLOCK_FREQ ) != -1)
+                    if( asprintf( ppsz_options + i_options,
+                                  ":stop-time=%"PRId64,
+                                  (i_start + i_duration) / CLOCK_FREQ ) != -1)
                         i_options++;
                 }
 
