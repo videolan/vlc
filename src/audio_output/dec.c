@@ -75,9 +75,6 @@ int aout_DecNew( audio_output_t *p_aout,
 
     aout_owner_t *owner = aout_owner(p_aout);
 
-    /* TODO: reduce lock scope depending on decoder's real need */
-    aout_OutputLock (p_aout);
-
     /* Create the audio output stream */
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
 
@@ -101,7 +98,6 @@ int aout_DecNew( audio_output_t *p_aout,
 error:
         aout_volume_Delete (owner->volume);
         owner->volume = NULL;
-        aout_OutputUnlock (p_aout);
         return -1;
     }
 
@@ -109,7 +105,6 @@ error:
     owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     owner->sync.discontinuity = true;
-    aout_OutputUnlock (p_aout);
 
     atomic_init (&owner->buffers_lost, 0);
     atomic_init (&owner->buffers_played, 0);
@@ -124,7 +119,6 @@ void aout_DecDelete (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
     if (owner->mixer_format.i_format)
     {
         aout_FiltersDelete (aout, owner->filters);
@@ -132,7 +126,6 @@ void aout_DecDelete (audio_output_t *aout)
     }
     aout_volume_Delete (owner->volume);
     owner->volume = NULL;
-    aout_OutputUnlock (aout);
 }
 
 static int aout_CheckReady (audio_output_t *aout)
@@ -363,7 +356,6 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     block->i_length = CLOCK_FREQ * block->i_nb_samples
                                  / owner->input_format.i_rate;
 
-    aout_OutputLock (aout);
     int ret = aout_CheckReady (aout);
     if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
@@ -411,15 +403,13 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     owner->sync.discontinuity = false;
     aout_OutputPlay (aout, block);
     atomic_fetch_add_explicit(&owner->buffers_played, 1, memory_order_relaxed);
-out:
-    aout_OutputUnlock (aout);
     return ret;
 drop:
     owner->sync.discontinuity = true;
     block_Release (block);
 lost:
     atomic_fetch_add_explicit(&owner->buffers_lost, 1, memory_order_relaxed);
-    goto out;
+    return ret;
 }
 
 void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
@@ -437,7 +427,6 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
     if (owner->sync.end != VLC_TS_INVALID)
     {
         if (paused)
@@ -447,23 +436,19 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     }
     if (owner->mixer_format.i_format)
         aout_OutputPause (aout, paused, date);
-    aout_OutputUnlock (aout);
 }
 
 void aout_DecChangeRate(audio_output_t *aout, float rate)
 {
     aout_owner_t *owner = aout_owner(aout);
 
-    aout_OutputLock(aout);
     owner->sync.rate = rate;
-    aout_OutputUnlock(aout);
 }
 
 void aout_DecFlush (audio_output_t *aout, bool wait)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    aout_OutputLock (aout);
     owner->sync.end = VLC_TS_INVALID;
     if (owner->mixer_format.i_format)
     {
@@ -477,7 +462,6 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
             aout_FiltersFlush (owner->filters);
         aout_OutputFlush (aout, wait);
     }
-    aout_OutputUnlock (aout);
 }
 
 void aout_ChangeViewpoint(audio_output_t *aout,

@@ -530,13 +530,12 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
 /**
  * Starts an audio output stream.
  * \param fmt audio output stream format [IN/OUT]
- * \warning The caller must hold the audio output lock.
+ * \warning The caller must NOT hold the audio output lock.
  */
 int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
                     aout_filters_cfg_t *filters_cfg)
 {
     aout_owner_t *owner = aout_owner (aout);
-    aout_OutputAssertLocked (aout);
 
     audio_channel_type_t input_chan_type = fmt->channel_type;
     unsigned i_nb_input_channels = fmt->i_channels;
@@ -577,7 +576,10 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 
     aout->current_sink_info.headphones = false;
 
-    if (aout->start (aout, fmt))
+    aout_OutputLock(aout);
+    int ret = aout->start(aout, fmt);
+    aout_OutputUnlock(aout);
+    if (ret)
     {
         msg_Err (aout, "module not functional");
         return -1;
@@ -595,33 +597,36 @@ int aout_OutputNew (audio_output_t *aout, audio_sample_format_t *restrict fmt,
 /**
  * Stops the audio output stream (undoes aout_OutputNew()).
  * \note This can only be called after a successful aout_OutputNew().
- * \warning The caller must hold the audio output lock.
+ * \warning The caller must NOT hold the audio output lock.
  */
 void aout_OutputDelete (audio_output_t *aout)
 {
-    aout_OutputAssertLocked (aout);
-
+    aout_OutputLock(aout);
     if (aout->stop != NULL)
         aout->stop (aout);
+    aout_OutputUnlock(aout);
 }
 
 int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
 {
-    aout_OutputAssertLocked (aout);
+    int ret;
 
     if (aout->time_get == NULL)
         return -1;
-    return aout->time_get (aout, delay);
+
+    aout_OutputLock(aout);
+    ret = aout->time_get (aout, delay);
+    aout_OutputUnlock(aout);
+    return ret;
 }
 
 /**
  * Plays a decoded audio buffer.
  * \note This can only be called after a successful aout_OutputNew().
- * \warning The caller must hold the audio output lock.
+ * \warning The caller must NOT hold the audio output lock.
  */
 void aout_OutputPlay (audio_output_t *aout, block_t *block)
 {
-    aout_OutputAssertLocked (aout);
 #ifndef NDEBUG
     aout_owner_t *owner = aout_owner (aout);
     assert (owner->mixer_format.i_frame_length > 0);
@@ -629,13 +634,15 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
             owner->mixer_format.i_bytes_per_frame /
             owner->mixer_format.i_frame_length);
 #endif
+    aout_OutputLock(aout);
     aout->play (aout, block);
+    aout_OutputUnlock(aout);
 }
 
 static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
 {
     if (pause)
-        aout_OutputFlush (aout, false);
+        aout->flush(aout, false);
     (void) date;
 }
 
@@ -644,12 +651,13 @@ static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
  * This enables the output to expedite pause, instead of waiting for its
  * buffers to drain.
  * \note This can only be called after a successful aout_OutputNew().
- * \warning The caller must hold the audio output lock.
+ * \warning The caller must NOT hold the audio output lock.
  */
 void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
 {
-    aout_OutputAssertLocked (aout);
+    aout_OutputLock(aout);
     ((aout->pause != NULL) ? aout->pause : PauseDefault) (aout, pause, date);
+    aout_OutputUnlock(aout);
 }
 
 /**
@@ -658,12 +666,13 @@ void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
  * \param wait if true, wait for buffer playback (i.e. drain),
  *             if false, discard the buffers immediately (i.e. flush)
  * \note This can only be called after a successful aout_OutputNew().
- * \warning The caller must hold the audio output lock.
+ * \warning The caller must NOT hold the audio output lock.
  */
 void aout_OutputFlush( audio_output_t *aout, bool wait )
 {
-    aout_OutputAssertLocked( aout );
+    aout_OutputLock(aout);
     aout->flush (aout, wait);
+    aout_OutputUnlock(aout);
 }
 
 static int aout_OutputVolumeSet (audio_output_t *aout, float vol)
