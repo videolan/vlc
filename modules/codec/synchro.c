@@ -150,8 +150,8 @@ struct decoder_synchro_t
 };
 
 /* Error margins */
-#define DELTA                   (int)(0.075*CLOCK_FREQ)
-#define MAX_VALID_TAU           (int)(0.3*CLOCK_FREQ)
+#define DELTA                   ((CLOCK_FREQ * 3) / 40)
+#define MAX_VALID_TAU           ((CLOCK_FREQ * 3) / 10)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1
