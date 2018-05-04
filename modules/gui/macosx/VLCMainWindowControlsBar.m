@@ -29,6 +29,7 @@
 #import "VLCMainMenu.h"
 #import "VLCPlaylist.h"
 #import "CompatibilityFixes.h"
+#import <vlc_aout.h>
 
 /*****************************************************************************
  * VLCMainWindowControlsBar

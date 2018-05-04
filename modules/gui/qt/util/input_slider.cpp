@@ -53,6 +53,8 @@
 #include <QScreen>
 #include <QSequentialAnimationGroup>
 
+#include <vlc_aout.h>
+
 namespace {
     int const MIN_SLIDER_VALUE = 0;
     int const MAX_SLIDER_VALUE = 10000;

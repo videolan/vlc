@@ -29,6 +29,7 @@
 #import <vlc_playlist.h>
 #import <vlc_input.h>
 #import <vlc_actions.h>
+#import <vlc_aout.h>
 #import <vlc_vout.h>
 #import <vlc_vout_osd.h>
 #import <vlc/vlc.h>

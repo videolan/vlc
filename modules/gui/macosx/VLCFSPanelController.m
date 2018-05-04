@@ -28,6 +28,7 @@
 #import "VLCCoreInteraction.h"
 #import "CompatibilityFixes.h"
 #import "VLCMain.h"
+#import <vlc_aout.h>
 
 @interface VLCFSPanelController () {
     BOOL _isCounting;
