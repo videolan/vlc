@@ -1564,7 +1564,6 @@ static int LayoutParagraph( filter_t *p_filter, paragraph_t *p_paragraph,
 
             if( i_last_space == i - 1 )
             {
-                p_paragraph->p_glyph_bitmaps[ i - 1 ].i_x_advance = 0;
                 i_last_space = i;
                 continue;
             }
