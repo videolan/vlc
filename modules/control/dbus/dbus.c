@@ -832,7 +832,8 @@ static void *Run( void *data )
         if( i_events > 0 )
         {
             mtime_t now = mdate();
-            if( now - events_last_date > EVENTS_DELAY )
+            if( events_last_date == VLC_TS_INVALID
+             || now - events_last_date > EVENTS_DELAY )
             {
                 /* Send events every EVENTS_DELAY */
                 events_last_date = now;
