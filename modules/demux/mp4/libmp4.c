@@ -5637,6 +5637,7 @@ error_box:
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
+VLC_FORMAT(2, 3)
 MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
@@ -5658,6 +5659,7 @@ MP4_Box_t *MP4_BoxGet( const MP4_Box_t *p_box, const char *psz_fmt, ... )
  * ex: /moov/trak[12]
  *     ../mdia
  *****************************************************************************/
+VLC_FORMAT(2, 3)
 unsigned MP4_BoxCount( const MP4_Box_t *p_box, const char *psz_fmt, ... )
 {
     va_list args;
