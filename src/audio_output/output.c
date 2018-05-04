@@ -195,6 +195,8 @@ static int StereoModeCallback (vlc_object_t *obj, const char *varname,
     return 0;
 }
 
+static void aout_ChangeViewpoint(audio_output_t *, const vlc_viewpoint_t *);
+
 static int ViewpointCallback (vlc_object_t *obj, const char *var,
                               vlc_value_t prev, vlc_value_t cur, void *data)
 {
@@ -919,4 +921,15 @@ error:
     free(tabname);
     free(tabid);
     return -1;
+}
+
+static void aout_ChangeViewpoint(audio_output_t *aout,
+                                 const vlc_viewpoint_t *p_viewpoint)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    vlc_mutex_lock(&owner->vp.lock);
+    owner->vp.value = *p_viewpoint;
+    atomic_store(&owner->vp.update, true);
+    vlc_mutex_unlock(&owner->vp.lock);
 }

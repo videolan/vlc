@@ -183,7 +183,4 @@ static inline void aout_SetWavePhysicalChannels(audio_sample_format_t *fmt)
 /* From filters.c */
 bool aout_FiltersCanResample (aout_filters_t *filters);
 
-void aout_ChangeViewpoint(audio_output_t *aout,
-                          const vlc_viewpoint_t *p_viewpoint);
-
 #endif /* !LIBVLC_AOUT_INTERNAL_H */
