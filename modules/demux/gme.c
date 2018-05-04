@@ -130,7 +130,6 @@ static int Open (vlc_object_t *obj)
 
     sys->es = es_out_Add (demux->out, &fmt);
     date_Init (&sys->pts, RATE, 1);
-    date_Set (&sys->pts, 0);
 
     /* Titles */
     unsigned n = gme_track_count (sys->emu);
