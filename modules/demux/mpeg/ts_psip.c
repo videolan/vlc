@@ -43,6 +43,7 @@
 #include "ts_decoders.h"
 #include "ts_psip_dvbpsi_fixes.h"
 
+#include "timestamps.h"
 #include "ts_pid.h"
 #include "ts.h"
 #include "ts_streams_private.h"

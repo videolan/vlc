@@ -25,6 +25,7 @@
 
 #include "ts_pid.h"
 #include "ts_streams.h"
+#include "timestamps.h"
 
 #include "ts.h"
 
