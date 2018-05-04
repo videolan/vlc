@@ -428,7 +428,6 @@ static int Open( vlc_object_t * p_this )
         goto error;
 
     date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, 1 );
 
     return VLC_SUCCESS;
 
