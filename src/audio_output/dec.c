@@ -34,7 +34,6 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_input.h>
 
 #include "aout_internal.h"
 #include "libvlc.h"
@@ -349,7 +348,6 @@ static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
 int aout_DecPlay(audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
-    int input_rate;
 
     assert (block->i_pts != VLC_TS_INVALID);
 
@@ -385,11 +383,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
         vlc_mutex_unlock (&owner->vp.lock);
     }
 
-    input_rate = lroundf(owner->sync.rate * 1000.f);
-    assert(input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE);
-    assert(input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE);
-
-    block = aout_FiltersPlay (owner->filters, block, input_rate);
+    block = aout_FiltersPlay(owner->filters, block, owner->sync.rate);
     if (block == NULL)
         goto lost;
 

@@ -399,7 +399,7 @@ VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
 #define aout_FiltersDelete(o,f) \
         aout_FiltersDelete(VLC_OBJECT(o),f)
 VLC_API bool aout_FiltersAdjustResampling(aout_filters_t *, int);
-VLC_API block_t *aout_FiltersPlay(aout_filters_t *, block_t *, int rate);
+VLC_API block_t *aout_FiltersPlay(aout_filters_t *, block_t *, float rate);
 VLC_API block_t *aout_FiltersDrain(aout_filters_t *);
 VLC_API void     aout_FiltersFlush(aout_filters_t *);
 VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoint_t *vp);

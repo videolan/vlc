@@ -365,8 +365,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf->i_dts = p_audio_buf->i_pts;
 
         /* Run filter chain */
-        p_audio_buf = aout_FiltersPlay( id->p_af_chain, p_audio_buf,
-                                        INPUT_RATE_DEFAULT );
+        p_audio_buf = aout_FiltersPlay( id->p_af_chain, p_audio_buf, 1.f );
         if( !p_audio_buf )
             goto error;
 
