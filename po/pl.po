@@ -10,10 +10,10 @@
 # Marcin Szymański <cysioland@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-04-19 08:59+0200\n"
-"PO-Revision-Date: 2018-01-08 22:35+0100\n"
+"PO-Revision-Date: 2018-04-20 11:29+0100\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
@@ -215,7 +215,7 @@ msgid ""
 "to alter are HTTP proxy or caching settings."
 msgstr ""
 "Ustawienia dotyczące rożnych metod dostępu. Ustawienia, które chcesz zwykle "
-"zmienić to HTTP proxy lub ustawienia cache."
+"zmienić, to HTTP proxy lub ustawienia cache."
 
 #: include/vlc_config_cat.h:107
 msgid "Stream filters"
@@ -2385,7 +2385,7 @@ msgstr ""
 "To pozwala na poprawne używanie formatu obrazu HDTV-1080, nawet jeśli koder "
 "ustalił wysokość na 1088 linijek. Powinieneś wyłączyć tę opcję tylko wtedy, "
 "jeśli Twój obraz ma niestandardowy format potrzebujący wszystkie 1088 "
-"linijki."
+"linijek."
 
 #: src/libvlc-module.c:462
 msgid "Monitor pixel aspect ratio"
@@ -9476,31 +9476,27 @@ msgstr "Wyjście IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Długość klucza szyfrującego w bajtach"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bitów"
+msgstr "16 bajtów"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bitów"
+msgstr "24 bajtów"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bity"
+msgstr "32 bajtów"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Wyjście strumienia SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Hasło dla urządzenia docelowego."
+msgstr "Hasło do szyfrowania strumienia"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9592,7 +9588,7 @@ msgid ""
 msgstr ""
 "Okno czasu w ms, gdy mierzony jest poziom dźwięku dla wykrywania ciszy. "
 "Jeśli poziom dźwięku jest poniżej tego progu czasu, wysyłany będzie alarm "
-"(domyślnie 5000). "
+"(domyślnie 5000)."
 
 #: modules/audio_filter/audiobargraph_a.c:52
 msgid "Minimum Audio level to raise the alarm"
@@ -10660,7 +10656,7 @@ msgstr "Wyłączone"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Włączone (tylko AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16525,7 +16521,7 @@ msgstr "Skóry"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Zastosuj profil przy następnym uruchomieniu"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17587,9 +17583,8 @@ msgid "Jump to Time"
 msgstr "Skocz do momentu"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Render"
+msgstr "Render"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -18021,7 +18016,7 @@ msgid ""
 "button below."
 msgstr ""
 "Wpisz tutaj adres URL strumienia. Aby otworzyć strumienie RTP lub UDP, "
-"kliknij na odpowiedni przycisk poniżej. "
+"kliknij na odpowiedni przycisk poniżej."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -20792,7 +20787,7 @@ msgstr "Nie znaleziono dodatków"
 msgid "This addon has been installed manually. VLC can't manage it by itself."
 msgstr ""
 "Ten dodatek był zainstalowany ręcznie, przez to VLC nie potrafi nim "
-"zarządzać. "
+"zarządzać."
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
 msgid "Version %1"
@@ -25102,7 +25097,7 @@ msgstr "Włącz przekazywanie dźwięku"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
-msgstr "Wyłącz, jeśli twój odbiornik nie obsługuje Dolby®."
+msgstr "Wyłącz, jeśli Twój odbiornik nie obsługuje Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:216
 msgid "High (high quality and high bandwidth)"
@@ -26341,22 +26336,16 @@ msgid "Ball speed"
 msgstr "Prędkość piłki"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr ""
-"Ustaw prędkość piłki, wartość przesunięcia                                 w "
-"pikselach na klatce."
+msgstr "Ustaw prędkość piłki, wartość przesunięcia w pikselach po klatce."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Rozmiar piłki"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr ""
-"Ustaw rozmiar piłki, podając jej promień                                 w "
-"pikselach"
+msgstr "Ustaw rozmiar piłki, podając jej promień w pikselach."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
