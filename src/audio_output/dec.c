@@ -359,20 +359,6 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     if (unlikely(ret == AOUT_DEC_FAILED))
         goto drop; /* Pipeline is unrecoverably broken :-( */
 
-    const mtime_t now = mdate (), advance = block->i_pts - now;
-    if (advance < -AOUT_MAX_PTS_DELAY)
-    {   /* Late buffer can be caused by bugs in the decoder, by scheduling
-         * latency spikes (excessive load, SIGSTOP, etc.) or if buffering is
-         * insufficient. We assume the PTS is wrong and play the buffer anyway:
-         * Hopefully video has encountered a similar PTS problem as audio. */
-        msg_Warn (aout, "buffer too late (%"PRId64" us): dropped", advance);
-        goto drop;
-    }
-    if (advance > AOUT_MAX_ADVANCE_TIME)
-    {   /* Early buffers can only be caused by bugs in the decoder. */
-        msg_Err (aout, "buffer too early (%"PRId64" us): dropped", advance);
-        goto drop;
-    }
     if (block->i_flags & BLOCK_FLAG_DISCONTINUITY)
         owner->sync.discontinuity = true;
 
