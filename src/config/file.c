@@ -305,7 +305,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
     return -1;
 }
 
-static int
+VLC_FORMAT(6, 7) static int
 config_Write (FILE *file, const char *desc, const char *type,
               bool comment, const char *name, const char *fmt, ...)
 {
