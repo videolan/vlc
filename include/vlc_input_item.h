@@ -331,10 +331,10 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
                                           enum input_item_net_type i_net ) VLC_USED;
 
 #define input_item_New( psz_uri, psz_name ) \
-    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
+    input_item_NewExt( psz_uri, psz_name, VLC_TS_INVALID, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
 
 #define input_item_NewCard( psz_uri, psz_name ) \
-    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_CARD, ITEM_LOCAL )
+    input_item_NewExt( psz_uri, psz_name, VLC_TS_INVALID, ITEM_TYPE_CARD, ITEM_LOCAL )
 
 #define input_item_NewDisc( psz_uri, psz_name, i_duration ) \
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_DISC, ITEM_LOCAL )
@@ -343,7 +343,7 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_STREAM, ITEM_NET )
 
 #define input_item_NewDirectory( psz_uri, psz_name, i_net ) \
-    input_item_NewExt( psz_uri, psz_name, -1, ITEM_TYPE_DIRECTORY, i_net )
+    input_item_NewExt( psz_uri, psz_name, VLC_TS_INVALID, ITEM_TYPE_DIRECTORY, i_net )
 
 #define input_item_NewFile( psz_uri, psz_name, i_duration, i_net ) \
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_FILE, i_net )

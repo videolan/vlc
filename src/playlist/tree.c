@@ -66,7 +66,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
     PL_ASSERT_LOCKED;
     if( !psz_name ) psz_name = _("Undefined");
 
-    p_new_input = input_item_NewExt( NULL, psz_name, -1, ITEM_TYPE_NODE,
+    p_new_input = input_item_NewExt( NULL, psz_name, VLC_TS_INVALID, ITEM_TYPE_NODE,
                                      ITEM_NET_UNKNOWN );
     if( !p_new_input )
         return NULL;
