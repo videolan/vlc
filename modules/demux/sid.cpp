@@ -166,7 +166,6 @@ static int Open (vlc_object_t *obj)
     sys->es = es_out_Add (demux->out, &fmt);
 
     date_Init (&sys->pts, fmt.audio.i_rate, 1);
-    date_Set (&sys->pts, 0);
 
     sys->tune->selectSong (0);
     result = (sys->player->load (sys->tune) >=0 );
