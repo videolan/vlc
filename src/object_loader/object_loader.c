@@ -178,8 +178,18 @@ picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz
 
 void scene_material_Release(scene_material_t *p_material)
 {
-    if (p_material->p_baseColorTex != NULL)
+    if (p_material->p_baseColorTex)
         picture_Release(p_material->p_baseColorTex);
+
+    if (p_material->p_metalnessTex)
+        picture_Release(p_material->p_metalnessTex);
+
+    if (p_material->p_normalTex)
+        picture_Release(p_material->p_normalTex);
+
+    if (p_material->p_roughnessTex)
+        picture_Release(p_material->p_roughnessTex);
+
     free(p_material);
 }
 
