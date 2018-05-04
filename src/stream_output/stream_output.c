@@ -372,7 +372,7 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
 
     p_mux->b_add_stream_any_time = false;
     p_mux->b_waiting_stream = true;
-    p_mux->i_add_stream_start = -1;
+    p_mux->i_add_stream_start = VLC_TS_INVALID;
 
     p_mux->p_module =
         module_need( p_mux, "sout mux", p_mux->psz_mux, true );
@@ -540,11 +540,11 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
     {
         const int64_t i_caching = var_GetInteger( p_mux->p_sout, "sout-mux-caching" ) * INT64_C(1000);
 
-        if( p_mux->i_add_stream_start < 0 )
+        if( p_mux->i_add_stream_start == VLC_TS_INVALID )
             p_mux->i_add_stream_start = i_dts;
 
         /* Wait until we have enough data before muxing */
-        if( p_mux->i_add_stream_start < 0 ||
+        if( p_mux->i_add_stream_start == VLC_TS_INVALID ||
             i_dts < p_mux->i_add_stream_start + i_caching )
             return VLC_SUCCESS;
         p_mux->b_waiting_stream = false;
