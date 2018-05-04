@@ -225,10 +225,10 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
     aout_OutputPlay (aout, block);
 }
 
-static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
-                                 int input_rate)
+static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
 {
     aout_owner_t *owner = aout_owner (aout);
+    const float rate = owner->sync.rate;
     mtime_t drift;
 
     /**
@@ -258,7 +258,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
      * where supported. The other alternative is to flush the buffers
      * completely. */
     if (drift > (owner->sync.discontinuity ? 0
-                  : +3 * input_rate * AOUT_MAX_PTS_DELAY / INPUT_RATE_DEFAULT))
+                : lroundf(+3 * AOUT_MAX_PTS_DELAY * rate)))
     {
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too late (%"PRId64"): "
@@ -281,7 +281,7 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
     /* Early audio output.
      * This is rare except at startup when the buffers are still empty. */
     if (drift < (owner->sync.discontinuity ? 0
-                : -3 * input_rate * AOUT_MAX_PTS_ADVANCE / INPUT_RATE_DEFAULT))
+                : lroundf(-3 * AOUT_MAX_PTS_ADVANCE * rate)))
     {
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too early (%"PRId64"): "
@@ -397,7 +397,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     aout_volume_Amplify (owner->volume, block);
 
     /* Drift correction */
-    aout_DecSynchronize (aout, block->i_pts, input_rate);
+    aout_DecSynchronize(aout, block->i_pts);
 
     /* Output */
     owner->sync.end = block->i_pts + block->i_length + 1;
