@@ -1186,7 +1186,9 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
      && i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
      && !DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
     {
-        int status = aout_DecPlay( p_aout, p_audio, i_rate );
+        aout_DecChangeRate( p_aout, ((float)i_rate) / 1000.f );
+
+        int status = aout_DecPlay( p_aout, p_audio );
         if( status == AOUT_DEC_CHANGED )
         {
             /* Only reload the decoder */

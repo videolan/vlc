@@ -30,6 +30,8 @@
 
 #include <assert.h>
 
+#include <math.h>
+
 #include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
@@ -351,13 +353,12 @@ static void aout_DecSynchronize (audio_output_t *aout, mtime_t dec_pts,
 /*****************************************************************************
  * aout_DecPlay : filter & mix the decoded buffer
  *****************************************************************************/
-int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
+int aout_DecPlay(audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
+    int input_rate;
 
-    assert (input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE);
-    assert (input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE);
-    assert (block->i_pts >= VLC_TS_0);
+    assert (block->i_pts != VLC_TS_INVALID);
 
     block->i_length = CLOCK_FREQ * block->i_nb_samples
                                  / owner->input_format.i_rate;
@@ -390,6 +391,10 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
         aout_FiltersChangeViewpoint (owner->filters, &owner->vp.value);
         vlc_mutex_unlock (&owner->vp.lock);
     }
+
+    input_rate = lroundf(owner->sync.rate * 1000.f);
+    assert(input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE);
+    assert(input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE);
 
     block = aout_FiltersPlay (owner->filters, block, input_rate);
     if (block == NULL)
@@ -441,6 +446,15 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     if (owner->mixer_format.i_format)
         aout_OutputPause (aout, paused, date);
     aout_OutputUnlock (aout);
+}
+
+void aout_DecChangeRate(audio_output_t *aout, float rate)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    aout_OutputLock(aout);
+    owner->sync.rate = rate;
+    aout_OutputUnlock(aout);
 }
 
 void aout_DecFlush (audio_output_t *aout, bool wait)
