@@ -146,8 +146,10 @@ struct audio_output
       * \return 0 on success, non-zero on failure or lack of data
       * \note A stream must have been started when called.
       */
-    void (*play)(audio_output_t *, block_t *);
+    void (*play)(audio_output_t *, block_t *block, mtime_t date);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
+      * \param block block of audio samples
+      * \param date intended system time to render the first sample
       * \note A stream must have been started when called.
       */
     void (*pause)( audio_output_t *, bool pause, mtime_t date);

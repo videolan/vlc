@@ -291,7 +291,7 @@ out:
 #endif
 
 static int TimeGet (audio_output_t *aout, mtime_t *);
-static void Play (audio_output_t *, block_t *);
+static void Play(audio_output_t *, block_t *, mtime_t);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void PauseDummy (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
@@ -647,7 +647,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -687,6 +687,7 @@ static void Play (audio_output_t *aout, block_t *block)
         }
     }
     block_Release (block);
+    (void) date;
 }
 
 /**

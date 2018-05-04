@@ -221,7 +221,7 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
     block->i_pts = pts;
     block->i_dts = pts;
     block->i_length = length;
-    aout_OutputPlay (aout, block);
+    aout_OutputPlay(aout, block, pts);
 }
 
 static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
@@ -396,7 +396,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     /* Output */
     owner->sync.end = block->i_pts + block->i_length + 1;
     owner->sync.discontinuity = false;
-    aout_OutputPlay (aout, block);
+    aout_OutputPlay(aout, block, block->i_pts);
     atomic_fetch_add_explicit(&owner->buffers_played, 1, memory_order_relaxed);
     return ret;
 drop:
@@ -451,7 +451,7 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
         {
             block_t *block = aout_FiltersDrain (owner->filters);
             if (block)
-                aout_OutputPlay (aout, block);
+                aout_OutputPlay(aout, block, block->i_pts);
         }
         else
             aout_FiltersFlush (owner->filters);

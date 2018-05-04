@@ -627,7 +627,7 @@ int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
  * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must NOT hold the audio output lock.
  */
-void aout_OutputPlay (audio_output_t *aout, block_t *block)
+void aout_OutputPlay(audio_output_t *aout, block_t *block, mtime_t date)
 {
 #ifndef NDEBUG
     aout_owner_t *owner = aout_owner (aout);
@@ -637,7 +637,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
             owner->mixer_format.i_frame_length);
 #endif
     aout_OutputLock(aout);
-    aout->play (aout, block);
+    aout->play(aout, block, date);
     aout_OutputUnlock(aout);
 }
 

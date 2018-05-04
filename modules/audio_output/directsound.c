@@ -303,10 +303,11 @@ static HRESULT StreamPlay( aout_stream_t *s, block_t *block )
     return Play( VLC_OBJECT(s), s->sys, block );
 }
 
-static void OutputPlay( audio_output_t *aout, block_t *block )
+static void OutputPlay( audio_output_t *aout, block_t *block, mtime_t date )
 {
     aout_sys_t *sys = aout->sys;
     Play( VLC_OBJECT(aout), &sys->s, block );
+    (void) date;
 }
 
 static HRESULT Pause( aout_stream_sys_t *sys, bool pause )

@@ -1727,7 +1727,7 @@ AudioTrack_Thread( void *p_data )
 }
 
 static void
-Play( audio_output_t *p_aout, block_t *p_buffer )
+Play( audio_output_t *p_aout, block_t *p_buffer, mtime_t i_date )
 {
     JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
@@ -1803,6 +1803,7 @@ Play( audio_output_t *p_aout, block_t *p_buffer )
 bailout:
     vlc_mutex_unlock( &p_sys->lock );
     block_Release( p_buffer );
+    (void) i_date;
 }
 
 static void

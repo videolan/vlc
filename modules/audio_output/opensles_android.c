@@ -321,7 +321,7 @@ static int WriteBuffer(audio_output_t *aout)
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play(audio_output_t *aout, block_t *p_buffer)
+static void Play(audio_output_t *aout, block_t *p_buffer, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -338,6 +338,7 @@ static void Play(audio_output_t *aout, block_t *p_buffer)
         ;
 
     vlc_mutex_unlock(&sys->lock);
+    (void) date;
 }
 
 static void PlayedCallback (SLAndroidSimpleBufferQueueItf caller, void *pContext)

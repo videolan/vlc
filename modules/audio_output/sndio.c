@@ -44,7 +44,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static int TimeGet (audio_output_t *, mtime_t *);
-static void Play (audio_output_t *, block_t *);
+static void Play(audio_output_t *, block_t *, mtime_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
@@ -230,13 +230,14 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
     return 0;
 }
 
-static void Play (audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
 
     sio_write (sys->hdl, block->p_buffer, block->i_buffer);
     sys->delay += block->i_nb_samples;
     block_Release (block);
+    (void) date;
 }
 
 static void Flush (audio_output_t *aout, bool wait)

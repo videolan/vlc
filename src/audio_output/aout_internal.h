@@ -130,7 +130,7 @@ void aout_Destroy (audio_output_t *);
 int aout_OutputNew(audio_output_t *, audio_sample_format_t *,
                    aout_filters_cfg_t *filters_cfg);
 int aout_OutputTimeGet(audio_output_t *, mtime_t *);
-void aout_OutputPlay(audio_output_t *, block_t *);
+void aout_OutputPlay(audio_output_t *, block_t *block, mtime_t date);
 void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
 void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );

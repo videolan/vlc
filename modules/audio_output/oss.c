@@ -88,7 +88,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static int TimeGet (audio_output_t *, mtime_t *);
-static void Play (audio_output_t *, block_t *);
+static void Play(audio_output_t *, block_t *, mtime_t);
 static void Pause (audio_output_t *, bool, mtime_t);
 static void Flush (audio_output_t *, bool);
 
@@ -269,7 +269,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict pts)
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play (audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
     int fd = sys->fd;
@@ -286,6 +286,7 @@ static void Play (audio_output_t *aout, block_t *block)
             msg_Err (aout, "cannot write samples: %s", vlc_strerror_c(errno));
     }
     block_Release (block);
+    (void) date;
 }
 
 /**

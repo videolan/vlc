@@ -42,10 +42,10 @@ vlc_module_end ()
 
 #define A52_FRAME_NB 1536
 
-static void Play(audio_output_t *aout, block_t *block)
+static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 {
     block_Release( block );
-    (void) aout;
+    (void) aout; (void) date;
 }
 
 static void Flush(audio_output_t *aout, bool wait)

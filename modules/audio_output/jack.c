@@ -70,7 +70,7 @@ typedef struct
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( audio_output_t * p_aout, block_t * p_block );
+static void Play         ( audio_output_t * p_aout, block_t *, mtime_t );
 static void Pause        ( audio_output_t *aout, bool paused, mtime_t date );
 static void Flush        ( audio_output_t *p_aout, bool wait );
 static int  TimeGet      ( audio_output_t *, mtime_t * );
@@ -283,7 +283,7 @@ error_out:
     return status;
 }
 
-static void Play (audio_output_t * p_aout, block_t * p_block)
+static void Play(audio_output_t * p_aout, block_t * p_block, mtime_t date)
 {
     aout_sys_t *p_sys = p_aout->sys;
     jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;
@@ -310,6 +310,7 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
     }
 
     block_Release(p_block);
+    (void) date;
 }
 
 /**

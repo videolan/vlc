@@ -281,7 +281,7 @@ ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date)
 }
 
 void
-ca_Play(audio_output_t * p_aout, block_t * p_block)
+ca_Play(audio_output_t * p_aout, block_t * p_block, mtime_t date)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -350,6 +350,8 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 
     if (i_underrun_size > 0)
         msg_Warn(p_aout, "underrun of %zu bytes", i_underrun_size);
+
+    (void) date;
 }
 
 int

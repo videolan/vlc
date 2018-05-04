@@ -74,7 +74,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
  * Local prototypes.
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
-static void    Play        ( audio_output_t *, block_t * );
+static void    Play        ( audio_output_t *, block_t *, mtime_t );
 static void    Flush       ( audio_output_t *, bool );
 
 /*****************************************************************************
@@ -315,7 +315,7 @@ static void Stop( audio_output_t *p_aout )
 /*****************************************************************************
  * Play: pretend to play a sound
  *****************************************************************************/
-static void Play( audio_output_t * p_aout, block_t *p_buffer )
+static void Play( audio_output_t * p_aout, block_t *p_buffer, mtime_t date )
 {
     aout_sys_t *p_sys = p_aout->sys;
     if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
@@ -331,6 +331,7 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer )
     }
 
     block_Release( p_buffer );
+    (void) date;
 }
 
 static void Flush( audio_output_t *aout, bool wait )

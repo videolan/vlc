@@ -376,14 +376,14 @@ MuteSet(audio_output_t *p_aout, bool mute)
 }
 
 static void
-Play(audio_output_t * p_aout, block_t * p_block)
+Play(audio_output_t * p_aout, block_t * p_block, mtime_t date)
 {
     aout_sys_t * p_sys = p_aout->sys;
 
     if (p_sys->b_muted)
         block_Release(p_block);
     else
-        ca_Play(p_aout, p_block);
+        ca_Play(p_aout, p_block, date);
 }
 
 #pragma mark initialization

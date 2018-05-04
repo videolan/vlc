@@ -72,7 +72,7 @@ typedef struct
  *****************************************************************************/
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
-static void Play    ( audio_output_t *_p_aout, block_t *block );
+static void Play    ( audio_output_t *_p_aout, block_t *block, mtime_t );
 static void Pause   ( audio_output_t *, bool, mtime_t );
 static void Flush   ( audio_output_t *, bool );
 static int  TimeGet ( audio_output_t *, mtime_t *restrict );
@@ -233,7 +233,7 @@ exit_kai_done :
 /*****************************************************************************
  * Play: play a sound samples buffer
  *****************************************************************************/
-static void Play (audio_output_t *p_aout, block_t *block)
+static void Play(audio_output_t *p_aout, block_t *block, mtime_t date)
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -242,6 +242,7 @@ static void Play (audio_output_t *p_aout, block_t *block)
     WriteBuffer( p_aout, block->p_buffer, block->i_buffer );
 
     block_Release( block );
+    (void) date;
 }
 
 /*****************************************************************************

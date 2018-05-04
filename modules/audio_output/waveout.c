@@ -49,7 +49,7 @@
  *****************************************************************************/
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
-static void Play         ( audio_output_t *, block_t * );
+static void Play         ( audio_output_t *, block_t *, mtime_t );
 
 /*****************************************************************************
  * notification_thread_t: waveOut event thread
@@ -343,7 +343,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
  * This doesn't actually play the buffer. This just stores the buffer so it
  * can be played by the callback thread.
  *****************************************************************************/
-static void Play( audio_output_t *p_aout, block_t *block )
+static void Play( audio_output_t *p_aout, block_t *block, mtime_t date )
 {
     aout_sys_t *sys = p_aout->sys;
 
@@ -380,6 +380,7 @@ static void Play( audio_output_t *p_aout, block_t *block )
     sys->i_frames++;
     sys->i_played_length += block->i_length;
     vlc_mutex_unlock( &sys->lock );
+    (void) date;
 }
 
 /*****************************************************************************

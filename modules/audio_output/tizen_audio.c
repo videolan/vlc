@@ -265,7 +265,7 @@ Stop( audio_output_t *p_aout )
 }
 
 static void
-Play( audio_output_t *p_aout, block_t *p_block )
+Play( audio_output_t *p_aout, block_t *p_block, mtime_t date )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -295,6 +295,7 @@ Play( audio_output_t *p_aout, block_t *p_block )
             }
         }
     }
+    (void) date;
 }
 
 static void
