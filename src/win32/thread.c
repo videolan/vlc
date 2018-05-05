@@ -422,7 +422,7 @@ void vlc_addr_wait(void *addr, unsigned val)
 
 bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
-    delay = (delay + 999) / 1000;
+    delay = (delay + (1000-1)) / 1000;
 
     if (delay > 0x7fffffff)
     {
@@ -784,7 +784,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
     vlc_testcancel();
     while ((delay = (deadline - vlc_tick_now())) > 0)
     {
-        delay = (delay + 999) / 1000;
+        delay = (delay + (1000-1)) / 1000;
         if (unlikely(delay > 0x7fffffff))
             delay = 0x7fffffff;
 
