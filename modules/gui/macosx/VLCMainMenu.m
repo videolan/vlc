@@ -837,8 +837,8 @@
         /* we can obviously only do that if an input is available */
         int64_t length = var_GetInteger(p_input, "length");
         [_timeSelectionPanel setMaxValue:(int)(length / CLOCK_FREQ)];
-        int64_t pos = var_GetInteger(p_input, "time");
-        [_timeSelectionPanel setJumpTimeValue: (int)(pos / CLOCK_FREQ)];
+        vlc_tick_t pos = var_GetInteger(p_input, "time");
+        [_timeSelectionPanel setJumpTimeValue: (int)SEC_FROM_VLC_TICK(pos)];
         [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
                              completionHandler:^(NSInteger returnCode, int64_t returnTime) {
 
