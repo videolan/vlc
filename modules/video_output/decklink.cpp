@@ -1126,7 +1126,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 }
 
-static void PlayAudio(audio_output_t *aout, block_t *audio, mtime_t)
+static void PlayAudio(audio_output_t *aout, block_t *audio, mtime_t systempts)
 {
     decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
     vlc_mutex_lock(&sys->lock);
@@ -1141,7 +1141,7 @@ static void PlayAudio(audio_output_t *aout, block_t *audio, mtime_t)
     uint32_t sampleFrameCount = audio->i_buffer / (2 * 2 /*decklink_sys->i_channels*/);
     uint32_t written;
     HRESULT result = p_output->ScheduleAudioSamples(
-            audio->p_buffer, sampleFrameCount, audio->i_pts, CLOCK_FREQ, &written);
+            audio->p_buffer, sampleFrameCount, systempts, CLOCK_FREQ, &written);
 
     if (result != S_OK)
         msg_Err(aout, "Failed to schedule audio sample: 0x%X", result);
