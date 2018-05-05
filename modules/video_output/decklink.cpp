@@ -1126,7 +1126,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     return VLC_SUCCESS;
 }
 
-static void PlayAudio(audio_output_t *aout, block_t *audio)
+static void PlayAudio(audio_output_t *aout, block_t *audio, mtime_t)
 {
     decklink_sys_t *sys = (decklink_sys_t *) aout->sys;
     vlc_mutex_lock(&sys->lock);
