@@ -194,7 +194,7 @@ error:
         ufd[0] .events = (val == 1) ? POLLIN : POLLOUT;
 
         vlc_restorecancel(canc);
-        val = vlc_poll_i11e(ufd, 1, (deadline - now) / 1000);
+        val = vlc_poll_i11e(ufd, 1, MS_FROM_VLC_TICK(deadline - now));
         canc = vlc_savecancel();
         if (val == 0)
         {

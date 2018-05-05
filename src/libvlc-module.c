@@ -1861,12 +1861,12 @@ vlc_module_begin ()
 
     set_section( N_( "Advanced" ), NULL )
 
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( "file-caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  CACHING_TEXT, CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
     add_obsolete_integer( "vdr-caching" ) /* 2.0.0 */
-    add_integer( "live-caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( "live-caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  CAPTURE_CACHING_TEXT, CAPTURE_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
@@ -1881,7 +1881,7 @@ vlc_module_begin ()
     add_obsolete_integer( "oss-caching" ) /* 2.0.0 */
     add_obsolete_integer( "screen-caching" ) /* 2.0.0 */
     add_obsolete_integer( "v4l2-caching" ) /* 2.0.0 */
-    add_integer( "disc-caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( "disc-caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  DISC_CACHING_TEXT, DISC_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
@@ -1891,7 +1891,7 @@ vlc_module_begin ()
     add_obsolete_integer( "dvdnav-caching" ) /* 2.0.0 */
     add_obsolete_integer( "dvdread-caching" ) /* 2.0.0 */
     add_obsolete_integer( "vcd-caching" ) /* 2.0.0 */
-    add_integer( "network-caching", CLOCK_FREQ / 1000,
+    add_integer( "network-caching", MS_FROM_VLC_TICK(1),
                  NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_integer_range( 0, 60000 )
         change_safe()
