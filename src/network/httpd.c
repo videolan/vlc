@@ -1193,7 +1193,7 @@ static void httpd_ClientInit(httpd_client_t *cl, mtime_t now)
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = now;
-    cl->i_activity_timeout = INT64_C(10000000);
+    cl->i_activity_timeout = CLOCK_FREQ*10;
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
     cl->p_buffer = xmalloc(cl->i_buffer_size);
