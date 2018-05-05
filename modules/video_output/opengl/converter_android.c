@@ -134,13 +134,14 @@ tc_anop_update(const opengl_tex_converter_t *tc, GLuint *textures,
                const GLsizei *tex_width, const GLsizei *tex_height,
                picture_t *pic, const size_t *plane_offset)
 {
+    picture_sys_t *p_sys = pic->p_sys;
     (void) tex_width; (void) tex_height; (void) plane_offset;
     assert(textures[0] != 0);
 
     if (plane_offset != NULL)
         return VLC_EGENERIC;
 
-    if (!pic->p_sys->b_locked)
+    if (!p_sys->b_locked)
         return VLC_SUCCESS;
 
     struct priv *priv = tc->priv;
