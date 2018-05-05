@@ -984,7 +984,7 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+        var_SetInteger( p_input, "spu-delay", CLOCK_FREQ * i_delay / 10 );
 }
 
 static void GetVarSlaves( input_thread_t *p_input,
