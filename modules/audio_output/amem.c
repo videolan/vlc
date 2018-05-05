@@ -78,13 +78,16 @@ typedef struct
     float volume;
     bool mute;
     bool ready;
+    vlc_mutex_t lock;
 } aout_sys_t;
 
 static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 {
     aout_sys_t *sys = aout->sys;
 
+    vlc_mutex_lock(&sys->lock);
     sys->play(sys->opaque, block->p_buffer, block->i_nb_samples, date);
+    vlc_mutex_unlock(&sys->lock);
     block_Release (block);
 }
 
@@ -94,7 +97,11 @@ static void Pause (audio_output_t *aout, bool paused, mtime_t date)
     void (*cb) (void *, int64_t) = paused ? sys->pause : sys->resume;
 
     if (cb != NULL)
+    {
+        vlc_mutex_lock(&sys->lock);
         cb (sys->opaque, date);
+        vlc_mutex_unlock(&sys->lock);
+    }
 }
 
 static void Flush (audio_output_t *aout, bool wait)
@@ -103,27 +110,45 @@ static void Flush (audio_output_t *aout, bool wait)
     void (*cb) (void *) = wait ? sys->drain : sys->flush;
 
     if (cb != NULL)
+    {
+        vlc_mutex_lock(&sys->lock);
         cb (sys->opaque);
+        vlc_mutex_unlock(&sys->lock);
+    }
 }
 
 static int VolumeSet (audio_output_t *aout, float vol)
 {
     aout_sys_t *sys = aout->sys;
+    int val;
 
     sys->volume = vol;
-    if (!sys->ready)
-        return 0; /* sys->opaque is not yet defined... */
-    return sys->set_volume (sys->opaque, vol, sys->mute) ? -1 : 0;
+
+    vlc_mutex_lock(&sys->lock);
+    if (sys->ready)
+        val = sys->set_volume(sys->opaque, vol, sys->mute);
+    else
+        val = 0; /* sys->opaque is not yet defined... */
+    vlc_mutex_unlock(&sys->lock);
+
+    return val ? -1 : 0;
 }
 
 static int MuteSet (audio_output_t *aout, bool mute)
 {
     aout_sys_t *sys = aout->sys;
+    int val;
 
     sys->mute = mute;
-    if (!sys->ready)
-        return 0; /* sys->opaque is not yet defined... */
-    return sys->set_volume (sys->opaque, sys->volume, mute) ? -1 : 0;
+
+    vlc_mutex_lock(&sys->lock);
+    if (sys->ready)
+        val = sys->set_volume(sys->opaque, sys->volume, mute);
+    else
+        val = 0; /* sys->opaque is not yet defined... */
+    vlc_mutex_unlock(&sys->lock);
+
+    return val ? -1 : 0;
 }
 
 static int SoftVolumeSet (audio_output_t *aout, float vol)
@@ -151,9 +176,12 @@ static void Stop (audio_output_t *aout)
 {
     aout_sys_t *sys = aout->sys;
 
+    vlc_mutex_lock(&sys->lock);
     if (sys->cleanup != NULL)
         sys->cleanup (sys->opaque);
+
     sys->ready = false;
+    vlc_mutex_unlock(&sys->lock);
 }
 
 static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
@@ -165,13 +193,17 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     if (aout_FormatNbChannels(fmt) == 0)
         return VLC_EGENERIC;
 
+    vlc_mutex_lock(&sys->lock);
     if (sys->setup != NULL)
     {
         channels = aout_FormatNbChannels(fmt);
 
         sys->opaque = sys->setup_opaque;
         if (sys->setup (&sys->opaque, format, &fmt->i_rate, &channels))
+        {
+            vlc_mutex_unlock(&sys->lock);
             return VLC_EGENERIC;
+        }
     }
     else
     {
@@ -183,6 +215,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *fmt)
     sys->ready = true;
     if (sys->set_volume != NULL)
         sys->set_volume(sys->opaque, sys->volume, sys->mute);
+    vlc_mutex_unlock(&sys->lock);
 
     /* Ensure that format is supported */
     if (fmt->i_rate == 0 || fmt->i_rate > 192000
@@ -255,6 +288,7 @@ static int Open (vlc_object_t *obj)
         sys->rate = var_InheritInteger (obj, "amem-rate");
         sys->channels = var_InheritInteger (obj, "amem-channels");
     }
+
     sys->play = var_InheritAddress (obj, "amem-play");
     sys->pause = var_InheritAddress (obj, "amem-pause");
     sys->resume = var_InheritAddress (obj, "amem-resume");
@@ -264,6 +298,8 @@ static int Open (vlc_object_t *obj)
     sys->volume = 1.;
     sys->mute = false;
     sys->ready = false;
+    vlc_mutex_init(&sys->lock);
+
     if (sys->play == NULL)
     {
         free (sys);
@@ -295,5 +331,6 @@ static void Close (vlc_object_t *obj)
     audio_output_t *aout = (audio_output_t *)obj;
     aout_sys_t *sys = aout->sys;
 
+    vlc_mutex_destroy(&sys->lock);
     free (sys);
 }
