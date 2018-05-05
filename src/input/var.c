@@ -890,7 +890,7 @@ static int TimeOffsetCallback( vlc_object_t *obj, char const *varname,
 {
     VLC_UNUSED(varname); VLC_UNUSED(prev); VLC_UNUSED(data);
 
-    int64_t i_time = var_GetInteger( obj, "time" ) + cur.i_int;
+    vlc_tick_t i_time = var_GetInteger( obj, "time" ) + cur.i_int;
     if( i_time < 0 )
         i_time = 0;
     var_SetInteger( obj, "time", i_time );

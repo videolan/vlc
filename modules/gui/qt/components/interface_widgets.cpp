@@ -957,8 +957,8 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf, TimeLabel::Display _displayType  )
     CONNECT( THEMIM->getIM(), seekRequested( float ),
              this, setDisplayPosition( float ) );
 
-    CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
-              this, setDisplayPosition( float, int64_t, int ) );
+    CONNECT( THEMIM->getIM(), positionUpdated( float, vlc_tick_t, int ),
+              this, setDisplayPosition( float, vlc_tick_t, int ) );
 
     connect( this, SIGNAL( broadcastRemainingTime( bool ) ),
          THEMIM->getIM(), SIGNAL( remainingTimeChanged( bool ) ) );
@@ -983,7 +983,7 @@ void TimeLabel::refresh()
     setDisplayPosition( cachedPos, cachedTime, cachedLength );
 }
 
-void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
+void TimeLabel::setDisplayPosition( float pos, vlc_tick_t t, int length )
 {
     cachedPos = pos;
     if( pos == -1.f )
@@ -1052,7 +1052,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 
 void TimeLabel::setDisplayPosition( float pos )
 {
-    int64_t time = pos * cachedLength * 1000000;
+    vlc_tick_t time = vlc_tick_from_sec(pos * cachedLength);
     setDisplayPosition( pos, time, cachedLength );
 }
 

@@ -206,7 +206,7 @@ private:
     intf_thread_t *p_intf;
     bool b_remainingTime;
     float cachedPos;
-    int64_t cachedTime;
+    vlc_tick_t cachedTime;
     int cachedLength;
     TimeLabel::Display displayType;
 
@@ -216,7 +216,7 @@ private:
     void refresh();
 private slots:
     void setRemainingTime( bool );
-    void setDisplayPosition( float pos, int64_t time, int length );
+    void setDisplayPosition( float pos, vlc_tick_t time, int length );
     void setDisplayPosition( float pos );
 signals:
     void broadcastRemainingTime( bool );

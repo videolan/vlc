@@ -118,7 +118,7 @@ private:
     QTimer *startAnimLoadingTimer;
 
 public slots:
-    void setPosition( float, int64_t, int );
+    void setPosition( float, vlc_tick_t, int );
     void setSeekable( bool b ) { b_seekable = b ; }
     void updateBuffering( float );
     void hideHandle();

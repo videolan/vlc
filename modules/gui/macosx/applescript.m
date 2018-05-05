@@ -223,10 +223,10 @@
 
 - (int) currentTime {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
-    int i_currentTime = -1;
+    vlc_tick_t i_currentTime;
 
     if (!p_input)
-        return i_currentTime;
+        return -1;
 
     i_currentTime = var_GetInteger(p_input, "time");
     vlc_object_release(p_input);

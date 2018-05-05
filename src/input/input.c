@@ -2157,7 +2157,7 @@ static bool Control( input_thread_t *p_input,
             if( i_type == INPUT_CONTROL_SET_SEEKPOINT_PREV )
             {
                 vlc_tick_t i_seekpoint_time = priv->master->title[i_title]->seekpoint[i_seekpoint]->i_time_offset;
-                int64_t i_input_time = var_GetInteger( p_input, "time" );
+                vlc_tick_t i_input_time = var_GetInteger( p_input, "time" );
                 if( i_seekpoint_time >= 0 && i_input_time >= 0 )
                 {
                     if( i_input_time < i_seekpoint_time + VLC_TICK_FROM_SEC(3) )

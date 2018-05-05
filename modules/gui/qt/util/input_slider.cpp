@@ -200,7 +200,7 @@ void SeekSlider::setChapters( SeekPoints *chapters_ )
  * \param time Elapsed time. Unused
  * \param legnth Duration time.
  ***/
-void SeekSlider::setPosition( float pos, int64_t time, int length )
+void SeekSlider::setPosition( float pos, vlc_tick_t time, int length )
 {
     VLC_UNUSED(time);
     if( pos == -1.0  || ! b_seekable )

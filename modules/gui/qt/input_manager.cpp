@@ -423,7 +423,7 @@ void InputManager::UpdatePosition()
 {
     /* Update position */
     vlc_tick_t i_length = var_GetInteger(  p_input , "length" );
-    int64_t i_time = var_GetInteger(  p_input , "time");
+    vlc_tick_t i_time = var_GetInteger(  p_input , "time");
     float f_pos = var_GetFloat(  p_input , "position" );
     emit positionUpdated( f_pos, i_time, SEC_FROM_VLC_TICK(i_length) );
 }
@@ -946,14 +946,14 @@ void InputManager::setAtoB()
     {
         timeB = var_GetInteger( p_mim->getInput(), "time"  );
         var_SetInteger( p_mim->getInput(), "time" , timeA );
-        CONNECT( this, positionUpdated( float, int64_t, int ),
+        CONNECT( this, positionUpdated( float, vlc_tick_t, int ),
                  this, AtoBLoop( float, vlc_tick_t, int ) );
     }
     else
     {
         timeA = VLC_TICK_INVALID;
         timeB = VLC_TICK_INVALID;
-        disconnect( this, SIGNAL( positionUpdated( float, int64_t, int ) ),
+        disconnect( this, SIGNAL( positionUpdated( float, vlc_tick_t, int ) ),
                     this, SLOT( AtoBLoop( float, vlc_tick_t, int ) ) );
     }
     emit AtoBchanged( (timeA != VLC_TICK_INVALID ), (timeB != VLC_TICK_INVALID ) );

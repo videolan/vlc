@@ -1079,7 +1079,7 @@ static int vlm_ControlMediaInstanceGetTimePosition( vlm_t *p_vlm, int64_t id, co
         return VLC_EGENERIC;
 
     if( pi_time )
-        *pi_time = var_GetInteger( p_instance->p_input, "time" );
+        *pi_time = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "time" ));
     if( pd_position )
         *pd_position = var_GetFloat( p_instance->p_input, "position" );
     return VLC_SUCCESS;
@@ -1097,7 +1097,7 @@ static int vlm_ControlMediaInstanceSetTimePosition( vlm_t *p_vlm, int64_t id, co
         return VLC_EGENERIC;
 
     if( i_time >= 0 )
-        return var_SetInteger( p_instance->p_input, "time", i_time );
+        return var_SetInteger( p_instance->p_input, "time", VLC_TICK_FROM_US(i_time) );
     else if( d_position >= 0 && d_position <= 100 )
         return var_SetFloat( p_instance->p_input, "position", d_position );
     return VLC_EGENERIC;
@@ -1122,7 +1122,7 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
             p_idsc->psz_name = strdup( p_instance->psz_name );
         if( p_instance->p_input )
         {
-            p_idsc->i_time = var_GetInteger( p_instance->p_input, "time" );
+            p_idsc->i_time = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "time" ));
             p_idsc->i_length = var_GetInteger( p_instance->p_input, "length" );
             p_idsc->d_position = var_GetFloat( p_instance->p_input, "position" );
             if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
