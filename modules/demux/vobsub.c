@@ -71,7 +71,7 @@ typedef struct
 
 typedef struct
 {
-    int64_t i_start;
+    mtime_t i_start;
     int     i_vobsub_location;
 } subtitle_t;
 
@@ -89,8 +89,8 @@ typedef struct
 
 typedef struct
 {
-    int64_t        i_next_demux_date;
-    int64_t        i_length;
+    mtime_t        i_next_demux_date;
+    mtime_t        i_length;
 
     text_t         txt;
     stream_t       *p_vobsub_stream;
@@ -327,7 +327,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            p_sys->i_next_demux_date = va_arg( args, int64_t );
+            p_sys->i_next_demux_date = va_arg( args, mtime_t );
             return VLC_SUCCESS;
 
         case DEMUX_CAN_PAUSE:
@@ -356,7 +356,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i_maxdate;
+    mtime_t i_maxdate;
     int i_read;
 
     for( int i = 0; i < p_sys->i_tracks; i++ )

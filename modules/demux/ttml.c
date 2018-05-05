@@ -233,8 +233,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             }
             break;
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            i64 = va_arg( args, int64_t );
-            p_sys->i_next_demux_time = i64;
+            p_sys->i_next_demux_time = va_arg( args, mtime_t );
             p_sys->b_slave = true;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:

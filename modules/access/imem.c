@@ -549,7 +549,7 @@ static int ControlDemux(demux_t *demux, int i_query, va_list args)
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME:
-        sys->deadline = va_arg(args, int64_t);
+        sys->deadline = va_arg(args, mtime_t);
         return VLC_SUCCESS;
 
     /* */

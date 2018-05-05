@@ -115,7 +115,7 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
         sys->b_slave = true;
-        sys->next_date = va_arg(args, int64_t);
+        sys->next_date = va_arg(args, mtime_t);
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME: {

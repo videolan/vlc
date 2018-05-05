@@ -134,7 +134,7 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
         {
-            const mtime_t pts = va_arg (args, int64_t );
+            const mtime_t pts = va_arg (args, mtime_t );
 
             if (sys->next_time == VLC_TS_INVALID) /* first invocation? */
             {

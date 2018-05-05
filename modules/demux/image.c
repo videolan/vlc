@@ -267,7 +267,7 @@ static int Control(demux_t *demux, int query, va_list args)
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
-        int64_t pts_next = VLC_TS_0 + va_arg(args, int64_t);
+        mtime_t pts_next = VLC_TS_0 + va_arg(args, mtime_t);
         if (sys->pts_next == VLC_TS_INVALID)
             sys->pts_origin = pts_next;
         sys->pts_next = pts_next;

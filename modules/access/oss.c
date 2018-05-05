@@ -121,7 +121,7 @@ typedef struct
     block_t *p_block;
     es_out_id_t *p_es;
 
-    int64_t i_next_demux_date; /* Used to handle oss:// as input-slave properly */
+    mtime_t i_next_demux_date; /* Used to handle oss:// as input-slave properly */
 } demux_sys_t;
 
 static int FindMainDevice( demux_t *p_demux )
@@ -228,7 +228,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            p_sys->i_next_demux_date = va_arg( args, int64_t );
+            p_sys->i_next_demux_date = va_arg( args, mtime_t );
             return VLC_SUCCESS;
 
         /* TODO implement others */

@@ -483,7 +483,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_time = va_arg( args, int64_t ) - VLC_TS_0;
+            p_sys->i_next_demux_time = va_arg( args, mtime_t ) - VLC_TS_0;
             return VLC_SUCCESS;
 
         case DEMUX_CAN_PAUSE:
