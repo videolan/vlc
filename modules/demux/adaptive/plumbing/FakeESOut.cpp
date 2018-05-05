@@ -365,7 +365,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
                 i_group = va_arg( args, int );
             else
                 i_group = 0;
-            int64_t  pcr = va_arg( args, int64_t );
+            mtime_t  pcr = va_arg( args, mtime_t );
             me->checkTimestampsStart( pcr );
             pcr += me->getTimestampOffset();
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );

@@ -46,7 +46,7 @@ typedef struct
     xml_t*          p_xml;
     xml_reader_t*   p_reader;
     es_out_id_t*    p_es;
-    int64_t         i_next_demux_time;
+    mtime_t         i_next_demux_time;
     bool            b_slave;
     bool            b_first_time;
 
@@ -349,9 +349,9 @@ static int Demux( demux_t* p_demux )
     while( p_sys->times.i_current + 1 < p_sys->times.i_count &&
            tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current] ) <= p_sys->i_next_demux_time )
     {
-        const int64_t i_playbacktime =
+        const mtime_t i_playbacktime =
                 tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current] );
-        const int64_t i_playbackendtime =
+        const mtime_t i_playbackendtime =
                 tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current + 1] ) - 1;
 
         if ( !p_sys->b_slave && p_sys->b_first_time )

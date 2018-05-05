@@ -215,7 +215,7 @@ struct demux_sys_t
     bool             b_real;
 
     /* */
-    int64_t          i_pcr; /* The clock */
+    mtime_t          i_pcr; /* The clock */
     bool             b_rtcp_sync; /* At least one track received sync */
     double           f_npt;
     double           f_npt_length;

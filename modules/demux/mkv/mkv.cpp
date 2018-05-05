@@ -773,7 +773,7 @@ static int Demux( demux_t *p_demux)
 
     /* update pcr */
     {
-        int64_t i_pcr = VLC_TS_INVALID;
+        mtime_t i_pcr = VLC_TS_INVALID;
 
         typedef matroska_segment_c::tracks_map_t tracks_map_t;
 

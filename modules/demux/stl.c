@@ -66,7 +66,7 @@ typedef struct
     es_out_id_t *es;
 
     size_t      current;
-    int64_t     next_date;
+    mtime_t     next_date;
     bool        b_slave;
     bool        b_first_time;
 } demux_sys_t;
@@ -179,7 +179,7 @@ static int Demux(demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    int64_t i_barrier = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
+    mtime_t i_barrier = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
     if(i_barrier < 0)
         i_barrier = sys->next_date;
 

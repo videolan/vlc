@@ -2490,7 +2490,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         if( !p_pgrm )
             return VLC_EGENERIC;
 
-        i_pcr = va_arg( args, int64_t );
+        i_pcr = va_arg( args, mtime_t );
         if( i_pcr == VLC_TS_INVALID )
         {
             msg_Err( p_sys->p_input, "Invalid PCR value in ES_OUT_SET_(GROUP_)PCR !" );

@@ -60,8 +60,8 @@ enum es_out_query_e
      * XXX: if you want PREROLL just call ES_OUT_SET_NEXT_DISPLAY_TIME and send
      * as you would normally do.
      */
-    ES_OUT_SET_PCR,             /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
-    ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
+    ES_OUT_SET_PCR,             /* arg1=mtime_t i_pcr(microsecond!) (using default group 0)*/
+    ES_OUT_SET_GROUP_PCR,       /* arg1= int i_group, arg2=mtime_t i_pcr(microsecond!)*/
     ES_OUT_RESET_PCR,           /* no arg */
 
     /* Try not to use this one as it is a bit hacky */
@@ -157,7 +157,7 @@ static inline void es_out_Delete( es_out_t *p_out )
     p_out->pf_destroy( p_out );
 }
 
-static inline int es_out_SetPCR( es_out_t *out, int64_t pcr )
+static inline int es_out_SetPCR( es_out_t *out, mtime_t pcr )
 {
     return es_out_Control( out, ES_OUT_SET_PCR, pcr );
 }

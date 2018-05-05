@@ -1370,14 +1370,14 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         p_cmd->u.control.u.i_int = (int)va_arg( args, int );
         break;
 
-    case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
+    case ES_OUT_SET_PCR:                /* arg1=mtime_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
         p_cmd->u.control.u.i_i64 = (int64_t)va_arg( args, int64_t );
         break;
 
-    case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
+    case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=mtime_t i_pcr(microsecond!)*/
         p_cmd->u.control.u.int_i64.i_int = (int)va_arg( args, int );
-        p_cmd->u.control.u.int_i64.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->u.control.u.int_i64.i_i64 = (int64_t)va_arg( args, mtime_t );
         break;
 
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
@@ -1529,11 +1529,11 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.i_int );
 
-    case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
+    case ES_OUT_SET_PCR:                /* arg1=mtime_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.i_i64 );
 
-    case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
+    case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=mtime_t i_pcr(microsecond!)*/
         return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_i64.i_int,
                                                p_cmd->u.control.u.int_i64.i_i64 );
 

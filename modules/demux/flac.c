@@ -82,7 +82,7 @@ typedef struct
 
     vlc_meta_t *p_meta;
 
-    int64_t i_pts;
+    mtime_t i_pts;
     struct flac_stream_info stream_info;
     bool b_stream_info;
 
