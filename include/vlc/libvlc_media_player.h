@@ -1406,10 +1406,13 @@ int libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
  * Enable or disable deinterlace filter
  *
  * \param p_mi libvlc media player
- * \param psz_mode type of deinterlace filter, NULL to disable
+ * \param deinterlace state -1: auto (default), 0: disabled, 1: enabled
+ * \param psz_mode type of deinterlace filter, NULL for current/default filter
+ * \version LibVLC 4.0.0 and later
  */
 LIBVLC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi,
-                                                  const char *psz_mode );
+                                              int deinterlace,
+                                              const char *psz_mode );
 
 /**
  * Get an integer marquee option value
