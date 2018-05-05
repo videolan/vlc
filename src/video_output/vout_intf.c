@@ -344,7 +344,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
      * hardcoded 0 doesn't seem right */
     p_subpic->i_channel = 0;
     p_subpic->i_start = mdate();
-    p_subpic->i_stop  = p_subpic->i_start + 4000000;
+    p_subpic->i_stop  = p_subpic->i_start + CLOCK_FREQ*4;
     p_subpic->b_ephemer = true;
     p_subpic->b_fade = true;
 
