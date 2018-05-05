@@ -206,6 +206,22 @@ static int ViewpointCallback (vlc_object_t *obj, const char *var,
     return VLC_SUCCESS;
 }
 
+static void aout_OutputLock(audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    vlc_mutex_lock(&owner->lock);
+}
+
+static int aout_OutputTryLock(audio_output_t *aout)
+{
+    aout_owner_t *owner = aout_owner(aout);
+
+    return vlc_mutex_trylock(&owner->lock);
+}
+
+static void aout_OutputUnlock(audio_output_t *aout);
+
 #undef aout_New
 /**
  * Creates an audio output object and initializes an output module.
@@ -627,21 +643,7 @@ static int aout_OutputDeviceSet (audio_output_t *aout, const char *id)
     return (aout->device_select != NULL) ? aout->device_select (aout, id) : -1;
 }
 
-void aout_OutputLock (audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    vlc_mutex_lock (&owner->lock);
-}
-
-static int aout_OutputTryLock (audio_output_t *aout)
-{
-    aout_owner_t *owner = aout_owner (aout);
-
-    return vlc_mutex_trylock (&owner->lock);
-}
-
-void aout_OutputUnlock (audio_output_t *aout)
+static void aout_OutputUnlock(audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
 
