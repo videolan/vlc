@@ -231,9 +231,6 @@ static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
     const float rate = owner->sync.rate;
     mtime_t drift;
 
-    if (unlikely(aout->time_get == NULL))
-        return;
-
     /**
      * Depending on the drift between the actual and intended playback times,
      * the audio core may ignore the drift, trigger upsampling or downsampling,

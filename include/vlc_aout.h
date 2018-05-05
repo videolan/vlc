@@ -167,7 +167,16 @@ struct audio_output
       */
 
     int (*time_get)(audio_output_t *, mtime_t *delay);
-    /**< Estimates playback buffer latency (optional, may be NULL).
+    /**< Estimates playback buffer latency (mandatory, cannot be NULL).
+      *
+      * This callback computes an estimation of the delay until the current
+      * tail of the audio output buffer would be rendered. This is essential
+      * for (lip) synchronization and long term drift between the audio output
+      * clock and the media upstream clock (if any).
+      *
+      * If the audio output clock is exactly synchronized with the system
+      * monotonic clock (i.e. mdate()), then aout_TimeGetDefault() can
+      * implement this callback.
       *
       * \param delay pointer to the delay until the next sample to be written
       *              to the playback buffer is rendered [OUT]
