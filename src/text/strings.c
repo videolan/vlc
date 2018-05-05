@@ -511,7 +511,7 @@ char *vlc_strftime( const char *tformat )
     vlc_assert_unreachable ();
 }
 
-static void write_duration(struct vlc_memstream *stream, int64_t duration)
+static void write_duration(struct vlc_memstream *stream, mtime_t duration)
 {
     lldiv_t d;
     long long sec;
