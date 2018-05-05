@@ -429,7 +429,7 @@ static int VbiEvent( vlc_object_t *, const char *,
 void InputManager::UpdatePosition()
 {
     /* Update position */
-    int64_t i_length = var_GetInteger(  p_input , "length" );
+    vlc_tick_t i_length = var_GetInteger(  p_input , "length" );
     int64_t i_time = var_GetInteger(  p_input , "time");
     float f_pos = var_GetFloat(  p_input , "position" );
     emit positionUpdated( f_pos, i_time, SEC_FROM_VLC_TICK(i_length) );
