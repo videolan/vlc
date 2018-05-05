@@ -774,9 +774,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 mtime_t now = mdate();
 
                 /* Recheck ES buffer level every 20 ms when seeking */
-                if( now < i_last_seek_mdate + INT64_C(125000)
-                 && (i_deadline < 0 || i_deadline > now + INT64_C(20000)) )
-                    i_deadline = now + INT64_C(20000);
+                if( now < i_last_seek_mdate + CLOCK_FREQ/8
+                 && (i_deadline < 0 || i_deadline > now + CLOCK_FREQ/50) )
+                    i_deadline = now + CLOCK_FREQ/50;
                 else
                     b_postpone = false;
             }
