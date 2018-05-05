@@ -163,6 +163,8 @@ typedef struct
     struct vlc_list programs;
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
+    enum es_format_category_e i_master_source_cat;
+
     /* all es */
     int         i_id;
     struct vlc_list es;
@@ -345,6 +347,19 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, float rate )
                     "sub-track-id", "sub-track", "sub-language", "sub" );
 
     p_sys->i_group_id = var_GetInteger( p_input, "program" );
+
+    enum vlc_clock_master_source master_source =
+        var_InheritInteger( p_input, "clock-master" );
+    switch( master_source )
+    {
+        case VLC_CLOCK_MASTER_AUDIO:
+            p_sys->i_master_source_cat = AUDIO_ES;
+            break;
+        case VLC_CLOCK_MASTER_MONOTONIC:
+        default:
+            p_sys->i_master_source_cat = UNKNOWN_ES;
+            break;
+    }
 
     p_sys->i_pause_date = -1;
 
@@ -1796,7 +1811,9 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
     input_thread_t *p_input = p_sys->p_input;
     decoder_t *dec;
 
-    if( p_es->fmt.i_cat == AUDIO_ES && p_es->p_pgrm->p_master_clock == NULL )
+    if( p_es->fmt.i_cat != UNKNOWN_ES
+     && p_es->fmt.i_cat == p_sys->i_master_source_cat
+     && p_es->p_pgrm->p_master_clock == NULL )
         p_es->p_pgrm->p_master_clock = p_es->p_clock =
             vlc_clock_main_CreateMaster( p_es->p_pgrm->p_main_clock );
     else
