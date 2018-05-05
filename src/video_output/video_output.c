@@ -1599,7 +1599,7 @@ static void ThreadInit(vout_thread_t *vout)
     vout->p->pause.is_on     = false;
     vout->p->pause.date      = VLC_TS_INVALID;
 
-    vout_chrono_Init(&vout->p->render, 5, 10000); /* Arbitrary initial time */
+    vout_chrono_Init(&vout->p->render, 5, CLOCK_FREQ/100); /* Arbitrary initial time */
 }
 
 static void ThreadClean(vout_thread_t *vout)
