@@ -121,7 +121,19 @@ struct vlc_audio_output_events {
     int (*gain_request)(audio_output_t *, float);
 };
 
-/** Audio output object */
+/** Audio output object
+ *
+ * The audio output object is the abstraction for rendering decoded
+ * (or pass-through) audio samples. In addition to playing samples,
+ * the abstraction exposes controls for pause/resume, flush/drain,
+ * changing the volume or mut flag, and listing and changing output device.
+ *
+ * An audio output can be in one of three different states:
+ * stopped, playing or paused.
+ * The audio output is always created in stopped state and is always destroyed
+ * in that state also. It is moved from stopped to playing state by start(),
+ * and from playing or paused states back to stopped state by stop().
+ **/
 struct audio_output
 {
     struct vlc_common_members obj;
@@ -130,56 +142,95 @@ struct audio_output
 
     int (*start)(audio_output_t *, audio_sample_format_t *fmt);
     /**< Starts a new stream (mandatory, cannot be NULL).
+      *
+      * This callback changes the audio output from stopped to playing state
+      * (if succesful). After the callback returns, time_get(), play(),
+      * pause(), flush() and eventually stop() callbacks may be called.
+      *
       * \param fmt input stream sample format upon entry,
       *            output stream sample format upon return [IN/OUT]
       * \return VLC_SUCCESS on success, non-zero on failure
-      * \note No other stream may be already started when called.
+      *
+      * \note This callback can only be called while the audio output is in
+      * stopped state. There can be only one stream per audio output at a time.
+      *
+      * \note This callbacks needs not be reentrant.
       */
+
     void (*stop)(audio_output_t *);
     /**< Stops the existing stream (optional, may be NULL).
-      * \note A stream must have been started when called.
+      *
+      * This callback terminates the current audio stream,
+      * and returns the audio output to stopped state.
+      *
+      * \note This callback needs not be reentrant.
       */
+
     int (*time_get)(audio_output_t *, mtime_t *delay);
     /**< Estimates playback buffer latency (optional, may be NULL).
+      *
       * \param delay pointer to the delay until the next sample to be written
       *              to the playback buffer is rendered [OUT]
       * \return 0 on success, non-zero on failure or lack of data
-      * \note A stream must have been started when called.
+      *
+      * \note This callback cannot be called in stopped state.
       */
+
     void (*play)(audio_output_t *, block_t *block, mtime_t date);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
+      *
       * \param block block of audio samples
       * \param date intended system time to render the first sample
-      * \note A stream must have been started when called.
+      *
+      * \note This callback cannot be called in stopped state.
       */
+
     void (*pause)( audio_output_t *, bool pause, mtime_t date);
     /**< Pauses or resumes playback (optional, may be NULL).
+      *
       * \param pause pause if true, resume from pause if false
       * \param date timestamp when the pause or resume was requested
-      * \note A stream must have been started when called.
+      *
+      * \note This callback cannot be called in stopped state.
       */
+
     void (*flush)( audio_output_t *, bool wait);
     /**< Flushes or drains the playback buffers (mandatory, cannot be NULL).
+      *
       * \param wait true to wait for playback of pending buffers (drain),
       *             false to discard pending buffers (flush)
-      * \note A stream must have been started when called.
+      *
+      * \note This callback cannot be called in stopped state.
       */
+
     int (*volume_set)(audio_output_t *, float volume);
     /**< Changes playback volume (optional, may be NULL).
+      *
       * \param volume requested volume (0. = mute, 1. = nominal)
+      *
       * \note The volume is always a positive number.
+      *
       * \warning A stream may or may not have been started when called.
+      * \warning This callback may be called concurrently with
+      * time_get(), play(), pause() or flush().
+      * It will however be protected against concurrent calls to
+      * start(), stop(), volume_set(), mute_set() or device_select().
       */
+
     int (*mute_set)(audio_output_t *, bool mute);
     /**< Changes muting (optinal, may be NULL).
+      *
       * \param mute true to mute, false to unmute
-      * \warning A stream may or may not have been started when called.
+      * \warning The same constraints apply as with volume_set().
       */
+
     int (*device_select)(audio_output_t *, const char *id);
     /**< Selects an audio output device (optional, may be NULL).
+      *
       * \param id nul-terminated device unique identifier.
       * \return 0 on success, non-zero on failure.
-      * \warning A stream may or may not have been started when called.
+      *
+      * \warning The same constraints apply as with volume_set().
       */
 
     struct {
