@@ -491,7 +491,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
-    int64_t i64, *p_i64;
+    int64_t i64;
 
     /*msg_Info(p_demux, "control cmd %d", i_query);*/
     switch( i_query )
@@ -526,8 +526,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         return VLC_SUCCESS;
     case DEMUX_GET_LENGTH:    /* length of program in microseconds, 0 if unk */
         /* size / bitrate */
-        p_i64 = va_arg(args, int64_t *);
-        *p_i64 = 0;
+        *va_arg(args, vlc_tick_t *) = 0;
         return VLC_SUCCESS;
     case DEMUX_SET_TIME:      /* arg is time in microsecs */
         i64 = va_arg( args, int64_t );

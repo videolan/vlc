@@ -207,7 +207,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
 static int Control( demux_t* p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t *pi64, i64;
+    int64_t i64;
     double *pf, f;
     bool b;
 
@@ -236,12 +236,11 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             p_sys->b_slave = true;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->times.i_count )
             {
                 tt_time_t t = tt_time_Sub( p_sys->times.p_array[p_sys->times.i_count - 1],
                                            p_sys->temporal_extent.begin );
-                *pi64 = tt_time_Convert( &t );
+                *va_arg( args, vlc_tick_t * ) = tt_time_Convert( &t );
                 return VLC_SUCCESS;
             }
             break;

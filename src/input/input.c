@@ -1908,7 +1908,7 @@ static bool Control( input_thread_t *p_input,
                                    param.time.b_absolute );
             if( i_ret )
             {
-                int64_t i_length;
+                vlc_tick_t i_length;
 
                 /* Emulate it with a SET_POS */
                 if( !demux_Control( priv->master->p_demux,

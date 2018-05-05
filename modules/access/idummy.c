@@ -106,8 +106,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
 
         case DEMUX_GET_LENGTH:
         {
-            vlc_tick_t *plen = va_arg( args, vlc_tick_t * );
-            *plen = p_sys->length;
+            *va_arg( args, vlc_tick_t * ) = p_sys->length;
             break;
         }
 

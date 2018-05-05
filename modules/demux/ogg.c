@@ -671,7 +671,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     vlc_meta_t *p_meta;
-    int64_t *pi64, i64;
+    int64_t i64;
     double *pf, f;
     bool *pb_bool, b, acc;
 
@@ -801,8 +801,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if ( p_sys->i_length < 0 )
                 return demux_vaControlHelper( p_demux->s, 0, -1, p_sys->i_bitrate,
                                               1, i_query, args );
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length * 1000000;
+            *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->i_length);
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:

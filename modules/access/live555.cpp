@@ -1518,7 +1518,7 @@ static int Demux( demux_t *p_demux )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
-    int64_t *pi64, i64;
+    int64_t i64;
     double  *pf, f;
     bool *pb;
 
@@ -1535,13 +1535,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
                 if( unlikely(p_sys->f_npt_length >= (double)(INT64_MAX / CLOCK_FREQ)) )
-                    *pi64 = INT64_MAX;
+                    *va_arg( args, vlc_tick_t * ) = INT64_MAX;
                 else
-                    *pi64 = vlc_tick_from_sec(p_sys->f_npt_length);
+                    *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->f_npt_length);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

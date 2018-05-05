@@ -1590,7 +1590,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     double   f, *pf;
-    int64_t i64, *pi64;
+    vlc_tick_t i64;
     bool b;
     vlc_meta_t *p_meta;
 
@@ -1643,8 +1643,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return Seek( p_demux, i64, f, b );
         }
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_length * (vlc_tick_t)CLOCK_FREQ;
+            *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->i_length);
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:

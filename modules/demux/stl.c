@@ -102,8 +102,8 @@ static int Control(demux_t *demux, int query, va_list args)
     case DEMUX_CAN_SEEK:
         return vlc_stream_vaControl(demux->s, query, args);
     case DEMUX_GET_LENGTH: {
-        int64_t *l = va_arg(args, int64_t *);
-        *l = sys->count > 0 ? sys->index[sys->count-1].stop : 0;
+        *va_arg(args, vlc_tick_t *) =
+            sys->count > 0 ? sys->index[sys->count-1].stop : 0;
         return VLC_SUCCESS;
     }
     case DEMUX_GET_TIME: {

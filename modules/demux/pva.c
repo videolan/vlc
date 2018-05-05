@@ -332,7 +332,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
 #if 0
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
+            pi64 = va_arg( args, vlc_tick_t * );
             if( p_sys->i_mux_rate > 0 )
             {
                 *pi64 = CLOCK_FREQ * ( stream_Size( p_demux->s ) / 50 ) / p_sys->i_mux_rate;

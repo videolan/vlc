@@ -311,8 +311,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = 0;
+            *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:

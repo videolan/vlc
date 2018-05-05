@@ -42,7 +42,7 @@ struct vlc_demux_chained_t
     struct
     {
         double  position;
-        int64_t length;
+        vlc_tick_t length;
         vlc_tick_t time;
     } stats;
 
@@ -72,7 +72,7 @@ static void *vlc_demux_chained_Thread(void *data)
         if (demux_TestAndClearFlags(demux, UINT_MAX) || vlc_tick_now() >= next_update)
         {
             double newpos;
-            int64_t newlen;
+            vlc_tick_t newlen;
             vlc_tick_t newtime;
 
             if (demux_Control(demux, DEMUX_GET_POSITION, &newpos))
@@ -146,7 +146,7 @@ int vlc_demux_chained_ControlVa(vlc_demux_chained_t *dc, int query, va_list ap)
             break;
         case DEMUX_GET_LENGTH:
             vlc_mutex_lock(&dc->lock);
-            *va_arg(ap, int64_t *) = dc->stats.length;
+            *va_arg(ap, vlc_tick_t *) = dc->stats.length;
             vlc_mutex_unlock(&dc->lock);
             break;
         case DEMUX_GET_TIME:

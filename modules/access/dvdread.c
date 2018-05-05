@@ -319,7 +319,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     bool *pb;
-    int64_t *pi64;
     input_title_t ***ppp_title;
     int *pi_int;
     int i;
@@ -356,13 +355,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->cur_title >= 0 && p_sys->cur_title < p_sys->i_titles )
             {
-                *pi64 = (int64_t)dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
+                *va_arg( args, vlc_tick_t * ) = dvdtime_to_time( &p_sys->p_cur_pgc->playback_time );
                 return VLC_SUCCESS;
             }
-            *pi64 = 0;
+            *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_EGENERIC;
 
         /* Special for access_demux */

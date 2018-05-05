@@ -777,7 +777,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
 {
     double f,*pf;
     bool *pb;
-    int64_t *pi64, i64;
+    int64_t i64;
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
 
     switch ( query )
@@ -815,8 +815,8 @@ static int Control( demux_t *p_demux, int query, va_list args )
             break;
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg ( args, int64_t * );
-            *pi64 =  ( p_sys->frames_total * p_sys->frame_rate_denom / p_sys->frame_rate_num ) * CLOCK_FREQ;
+            *va_arg ( args, vlc_tick_t * ) =
+                vlc_tick_from_sec( p_sys->frames_total * p_sys->frame_rate_denom / p_sys->frame_rate_num );
             break;
 
         case DEMUX_GET_TIME:

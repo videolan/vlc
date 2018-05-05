@@ -517,7 +517,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
         case DEMUX_SET_POSITION:
             return Seek (demux, va_arg (args, double) * sys->duration);
         case DEMUX_GET_LENGTH:
-            *va_arg (args, int64_t *) = sys->duration;
+            *va_arg (args, vlc_tick_t *) = sys->duration;
             break;
         case DEMUX_GET_TIME:
             *va_arg (args, vlc_tick_t *) = sys->tick - VLC_TICK_0;

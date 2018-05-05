@@ -1001,7 +1001,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     const int64_t i_start_time = p_sys->ic->start_time != AV_NOPTS_VALUE ? p_sys->ic->start_time : 0;
     double f, *pf;
-    int64_t i64, *pi64;
+    int64_t i64;
 
     switch( i_query )
     {
@@ -1058,11 +1058,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->ic->duration != (int64_t)AV_NOPTS_VALUE )
-                *pi64 = FROM_AV_TS(p_sys->ic->duration);
+                *va_arg( args, vlc_tick_t * ) = FROM_AV_TS(p_sys->ic->duration);
             else
-                *pi64 = 0;
+                *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

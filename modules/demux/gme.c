@@ -280,12 +280,10 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_GET_LENGTH:
         {
-            int64_t *v = va_arg (args, int64_t *);
-
             if (unlikely(sys->track_id >= sys->titlec)
              || (sys->titlev[sys->track_id]->i_length == 0))
                 break;
-            *v = sys->titlev[sys->track_id]->i_length;
+            *va_arg (args, vlc_tick_t *) = sys->titlev[sys->track_id]->i_length;
             return VLC_SUCCESS;
         }
 

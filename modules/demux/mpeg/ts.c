@@ -885,7 +885,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double f, *pf;
     bool b_bool, *pb_bool;
     int64_t i64;
-    int64_t *pi64;
     int i_int;
     const ts_pmt_t *p_pmt = NULL;
     const ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
@@ -1030,14 +1029,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_GET_LENGTH:
-        pi64 = va_arg( args, int64_t * );
-
         if( p_sys->b_access_control )
         {
             time_t i_event_duration;
             if( !EITCurrentEventTime( p_pmt, p_sys, NULL, &i_event_duration ) )
             {
-                *pi64 = vlc_tick_from_sec( i_event_duration );
+                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec( i_event_duration );
                 return VLC_SUCCESS;
             }
         }
@@ -1051,7 +1048,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                               p_pmt->pcr.i_first_dts;
             stime_t i_last = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->i_last_dts );
             i_last += p_pmt->pcr.i_pcroffset;
-            *pi64 = FROM_SCALE(i_last - i_start);
+            *va_arg( args, vlc_tick_t * ) = FROM_SCALE(i_last - i_start);
             return VLC_SUCCESS;
         }
         break;

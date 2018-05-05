@@ -238,7 +238,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t *pi64, i64;
+    int64_t i64;
     int i;
     double *pf, f;
 
@@ -249,8 +249,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = (int64_t) p_sys->i_length;
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

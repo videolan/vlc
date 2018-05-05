@@ -348,7 +348,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     double f, *pf;
     bool b_bool, *pb_bool;
-    int64_t i64, *pi64;
+    int64_t i64;
 
     switch( i_query )
     {
@@ -390,13 +390,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
 #if 0
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_mux_rate > 0 )
             {
-                *pi64 = CLOCK_FREQ * ( stream_Size( p_demux->s ) / 50 ) / p_sys->i_mux_rate;
+                *va_arg( args, vlc_tick_t * ) = CLOCK_FREQ * ( stream_Size( p_demux->s ) / 50 ) / p_sys->i_mux_rate;
                 return VLC_SUCCESS;
             }
-            *pi64 = 0;
+            *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_EGENERIC;
 
 #endif

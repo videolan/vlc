@@ -1946,7 +1946,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     double f, *pf;
-    int64_t i64, *pi64;
+    int64_t i64;
     bool b;
 
     const uint64_t i_duration = __MAX(p_sys->i_duration, p_sys->i_cumulated_duration);
@@ -2000,13 +2000,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return Seek( p_demux, i64, b );
 
         case DEMUX_GET_LENGTH:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_timescale > 0 )
             {
-                *pi64 = MP4_rescale_mtime( i_duration,
-                                           p_sys->i_timescale );
+                *va_arg( args, vlc_tick_t * ) = MP4_rescale_mtime( i_duration,
+                                                           p_sys->i_timescale );
             }
-            else *pi64 = 0;
+            else *va_arg( args, vlc_tick_t * ) = 0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:

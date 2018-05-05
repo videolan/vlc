@@ -86,7 +86,7 @@ typedef struct
     struct flac_stream_info stream_info;
     bool b_stream_info;
 
-    int64_t i_length; /* Length from stream info */
+    vlc_tick_t i_length; /* Length from stream info */
     uint64_t i_data_pos;
 
     /* */
@@ -408,11 +408,11 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int64_t ControlGetLength( demux_t *p_demux )
+static vlc_tick_t ControlGetLength( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const uint64_t i_size = stream_Size(p_demux->s) - p_sys->i_data_pos;
-    int64_t i_length = p_sys->i_length;
+    vlc_tick_t i_length = p_sys->i_length;
     int i;
 
     /* Try to fix length using seekpoint and current size for truncated file */
@@ -521,8 +521,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_GET_LENGTH )
     {
-        int64_t *pi64 = va_arg( args, int64_t * );
-        *pi64 = ControlGetLength( p_demux );
+        *va_arg( args, vlc_tick_t * ) = ControlGetLength( p_demux );
         return VLC_SUCCESS;
     }
     else if( i_query == DEMUX_SET_TIME )
@@ -533,7 +532,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     else if( i_query == DEMUX_SET_POSITION )
     {
         const double f = va_arg( args, double );
-        int64_t i_length = ControlGetLength( p_demux );
+        vlc_tick_t i_length = ControlGetLength( p_demux );
         int i_ret;
         if( i_length > 0 )
         {
@@ -557,7 +556,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_GET_POSITION )
     {
-        const int64_t i_length = ControlGetLength(p_demux);
+        const vlc_tick_t i_length = ControlGetLength(p_demux);
         if( i_length > 0 )
         {
             vlc_tick_t current = ControlGetTime(p_demux);
