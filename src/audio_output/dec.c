@@ -77,7 +77,7 @@ int aout_DecNew( audio_output_t *p_aout,
     /* Create the audio output stream */
     owner->volume = aout_volume_New (p_aout, p_replay_gain);
 
-    atomic_store (&owner->restart, 0);
+    atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
     owner->request_vout = *p_request_vout;
@@ -130,9 +130,10 @@ void aout_DecDelete (audio_output_t *aout)
 static int aout_CheckReady (audio_output_t *aout)
 {
     aout_owner_t *owner = aout_owner (aout);
-
     int status = AOUT_DEC_SUCCESS;
-    int restart = atomic_exchange (&owner->restart, 0);
+
+    int restart = atomic_exchange_explicit(&owner->restart, 0,
+                                           memory_order_acquire);
     if (unlikely(restart))
     {
         if (owner->mixer_format.i_format)
@@ -188,7 +189,7 @@ static int aout_CheckReady (audio_output_t *aout)
 void aout_RequestRestart (audio_output_t *aout, unsigned mode)
 {
     aout_owner_t *owner = aout_owner (aout);
-    atomic_fetch_or (&owner->restart, mode);
+    atomic_fetch_or_explicit(&owner->restart, mode, memory_order_release);
     msg_Dbg (aout, "restart requested (%u)", mode);
 }
 
