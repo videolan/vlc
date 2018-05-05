@@ -505,7 +505,6 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
     pa_threaded_mainloop_lock(sys->mainloop);
 
     if (sys->first_pts == VLC_TS_INVALID) {
-        msg_Err(aout, "%s: %"PRId64", %"PRId64, __func__, block->i_pts, date);
         sys->first_pts = block->i_pts;
         sys->first_date = date;
     }
