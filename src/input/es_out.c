@@ -839,7 +839,7 @@ static void EsOutFrameNext( es_out_t *out )
     msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
 
     if( i_duration <= 0 )
-        i_duration = 40*1000;
+        i_duration = CLOCK_FREQ/25;
 
     /* FIXME it is not a clean way ? */
     if( p_sys->i_buffering_extra_initial <= 0 )
