@@ -756,7 +756,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( now >= i_intf_update )
             {
                 MainLoopStatistics( p_input );
-                i_intf_update = now + INT64_C(250000);
+                i_intf_update = now + CLOCK_FREQ/4;
             }
         }
 
