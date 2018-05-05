@@ -352,6 +352,7 @@ static int ParseVideoExtraHEVC(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 
 static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     int offset = 0;
 
     if (i_extra < 4)
@@ -370,7 +371,7 @@ static int ParseVideoExtraVc1(decoder_t *p_dec, uint8_t *p_extra, int i_extra)
     if (offset >= i_extra - 4)
         return VLC_EGENERIC;
 
-    p_dec->p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
+    p_sys->pf_on_new_block = VideoVC1_OnNewBlock;
     return CSDDup(p_dec, p_extra + offset, i_extra - offset);
 }
 
@@ -429,7 +430,7 @@ static int ParseExtra(decoder_t *p_dec)
         break;
     case VLC_CODEC_MPGV:
     case VLC_CODEC_MP2V:
-        p_dec->p_sys->pf_on_new_block = VideoMPEG2_OnNewBlock;
+        p_sys->pf_on_new_block = VideoMPEG2_OnNewBlock;
         break;
     }
     /* Set default CSD */
@@ -473,12 +474,13 @@ static int UpdateVout(decoder_t *p_dec)
     if (p_dummy_hwpic == NULL)
         return VLC_EGENERIC;
 
-    assert(p_dummy_hwpic->p_sys);
-    assert(p_dummy_hwpic->p_sys->hw.p_surface);
-    assert(p_dummy_hwpic->p_sys->hw.p_jsurface);
+    picture_sys_t *p_picsys = p_dummy_hwpic->p_sys;
+    assert(p_picsys);
+    assert(p_picsys->hw.p_surface);
+    assert(p_picsys->hw.p_jsurface);
 
-    p_sys->video.p_surface = p_dummy_hwpic->p_sys->hw.p_surface;
-    p_sys->video.p_jsurface = p_dummy_hwpic->p_sys->hw.p_jsurface;
+    p_sys->video.p_surface = p_picsys->hw.p_surface;
+    p_sys->video.p_jsurface = p_picsys->hw.p_jsurface;
     picture_Release(p_dummy_hwpic);
     return VLC_SUCCESS;
 }
@@ -510,7 +512,7 @@ static int StartMediaCodec(decoder_t *p_dec)
         date_Set(&p_sys->audio.i_end_date, VLC_TS_INVALID);
 
         args.audio.i_sample_rate    = p_dec->fmt_in.audio.i_rate;
-        args.audio.i_channel_count  = p_dec->p_sys->audio.i_channels;
+        args.audio.i_channel_count  = p_sys->audio.i_channels;
     }
 
     return p_sys->api.start(&p_sys->api, &args);
@@ -965,7 +967,8 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
 
         if (p_sys->api.b_direct_rendering)
         {
-            p_pic->p_sys->hw.i_index = p_out->buf.i_index;
+            picture_sys_t *p_picsys = p_pic->p_sys;
+            p_picsys->hw.i_index = p_out->buf.i_index;
             InsertInflightPicture(p_dec, p_pic->p_sys);
         } else {
             unsigned int chroma_div;
