@@ -189,7 +189,7 @@ typedef struct
     /* frameheader buffer */
     uint8_t fh_buffer[NUV_FH_SIZE];
     int64_t i_total_frames;
-    int64_t i_total_length;
+    vlc_tick_t i_total_length;
     /* first frame position (used for calculating size without seektable) */
     int i_first_frame_offset;
 } demux_sys_t;
