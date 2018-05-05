@@ -64,15 +64,15 @@ static void VoutDestructor(vlc_object_t *);
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
  */
-#define VOUT_REDISPLAY_DELAY (INT64_C(80000))
+#define VOUT_REDISPLAY_DELAY (4*CLOCK_FREQ/50)
 
 /**
  * Late pictures having a delay higher than this value are thrashed.
  */
-#define VOUT_DISPLAY_LATE_THRESHOLD (INT64_C(20000))
+#define VOUT_DISPLAY_LATE_THRESHOLD (CLOCK_FREQ/50)
 
 /* Better be in advance when awakening than late... */
-#define VOUT_MWAIT_TOLERANCE (INT64_C(4000))
+#define VOUT_MWAIT_TOLERANCE (CLOCK_FREQ/250)
 
 /* */
 static int VoutValidateFormat(video_format_t *dst,
