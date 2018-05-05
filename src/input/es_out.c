@@ -148,8 +148,8 @@ typedef struct
     int         i_group_id;
 
     /* delay */
-    int64_t i_audio_delay;
-    int64_t i_spu_delay;
+    mtime_t i_audio_delay;
+    mtime_t i_spu_delay;
 
     /* Clock configuration */
     mtime_t     i_pts_delay;
@@ -454,7 +454,7 @@ static bool EsOutDecodersIsEmpty( es_out_t *out )
     return true;
 }
 
-static void EsOutSetDelay( es_out_t *out, int i_cat, int64_t i_delay )
+static void EsOutSetDelay( es_out_t *out, int i_cat, mtime_t i_delay )
 {
     es_out_sys_t *p_sys = out->p_sys;
 
