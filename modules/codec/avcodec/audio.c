@@ -592,9 +592,9 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
     uint32_t pi_order_src[i_order_max];
 
     int i_channels_src = 0;
-    int64_t channel_layout =
+    uint64_t channel_layout =
         p_sys->p_context->channel_layout ? p_sys->p_context->channel_layout :
-        av_get_default_channel_layout( p_sys->p_context->channels );
+        (uint64_t)av_get_default_channel_layout( p_sys->p_context->channels );
 
     if( channel_layout )
     {
