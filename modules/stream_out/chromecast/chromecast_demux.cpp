@@ -320,7 +320,7 @@ struct demux_cc
             vlc_tick_t time = getTime();
             if( time >= 0 )
             {
-                *va_arg(args, int64_t *) = time;
+                *va_arg(args, vlc_tick_t *) = time;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

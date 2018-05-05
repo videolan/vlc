@@ -820,8 +820,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
             break;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = __MAX(p_sys->i_pts, 0);
+            *va_arg( args, vlc_tick_t * ) = __MAX(p_sys->i_pts, 0);
             break;
 
         case DEMUX_SET_TIME:

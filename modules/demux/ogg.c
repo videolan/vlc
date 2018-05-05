@@ -698,8 +698,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TIME:
             if( p_sys->i_pcr != VLC_TICK_INVALID || p_sys->b_slave )
             {
-                pi64 = va_arg( args, int64_t * );
-                *pi64 = p_sys->i_pcr;
+                *va_arg( args, vlc_tick_t * ) = p_sys->i_pcr;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

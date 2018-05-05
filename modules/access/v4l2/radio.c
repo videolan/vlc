@@ -55,7 +55,7 @@ static int RadioControl (demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_GET_TIME:
-            *va_arg (args, int64_t *) = vlc_tick_now () - sys->start;
+            *va_arg (args, vlc_tick_t *) = vlc_tick_now () - sys->start;
             break;
 
         /* TODO implement others */

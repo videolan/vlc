@@ -355,8 +355,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_pcr;
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_pcr;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TITLE_INFO:

@@ -1011,14 +1011,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         break;
 
     case DEMUX_GET_TIME:
-        pi64 = va_arg( args, int64_t * );
-
         if( p_sys->b_access_control )
         {
             time_t i_event_start;
             if( !EITCurrentEventTime( p_pmt, p_sys, &i_event_start, NULL ) )
             {
-                *pi64 = vlc_tick_from_sec( i_event_start );
+                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec( i_event_start );
                 return VLC_SUCCESS;
             }
         }
@@ -1026,7 +1024,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( p_pmt && p_pmt->pcr.i_current > -1 && p_pmt->pcr.i_first > -1 )
         {
             stime_t i_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
-            *pi64 = FROM_SCALE(i_pcr - p_pmt->pcr.i_first);
+            *va_arg( args, vlc_tick_t * ) = FROM_SCALE(i_pcr - p_pmt->pcr.i_first);
             return VLC_SUCCESS;
         }
         break;

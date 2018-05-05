@@ -175,7 +175,7 @@ typedef struct
     header_t          hdr;
     extended_header_t exh;
 
-    int64_t     i_pcr;
+    vlc_tick_t  i_pcr;
     es_out_id_t *p_es_video;
     int         i_extra_f;
     uint8_t     *p_extra_f;
@@ -503,8 +503,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_pcr >= 0 ? p_sys->i_pcr : 0;
+            *va_arg( args, vlc_tick_t * ) = __MAX(p_sys->i_pcr, 0);
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:

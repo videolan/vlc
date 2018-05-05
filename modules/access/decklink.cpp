@@ -150,7 +150,7 @@ struct demux_sys_t
     es_out_id_t *cc_es;
 
     vlc_mutex_t pts_lock;
-    int last_pts;  /* protected by <pts_lock> */
+    vlc_tick_t last_pts;  /* protected by <pts_lock> */
 
     uint32_t dominance_flags;
     int channels;
@@ -735,7 +735,6 @@ static int Control(demux_t *demux, int query, va_list args)
 {
     demux_sys_t *sys = (demux_sys_t *)demux->p_sys;
     bool *pb;
-    int64_t *pi64;
 
     switch(query)
     {
@@ -753,9 +752,8 @@ static int Control(demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg(args, int64_t *);
             vlc_mutex_lock(&sys->pts_lock);
-            *pi64 = sys->last_pts;
+            *va_arg(args, vlc_tick_t *) = sys->last_pts;
             vlc_mutex_unlock(&sys->pts_lock);
             return VLC_SUCCESS;
 

@@ -243,8 +243,9 @@ static int Control (demux_t *demux, int query, va_list args)
     switch (query)
     {
         case DEMUX_GET_TIME : {
-            int64_t *v = va_arg (args, int64_t*);
-            *v = sys->player->time() * sys->player->timebase() * VLC_TICK_FROM_MS(10);
+            /* FIXME resolution in 100ns? */
+            *va_arg (args, vlc_tick_t*) =
+                sys->player->time() * sys->player->timebase() * VLC_TICK_FROM_MS(10);
             return VLC_SUCCESS;
         }
 

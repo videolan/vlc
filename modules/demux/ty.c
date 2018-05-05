@@ -519,11 +519,10 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         return VLC_EGENERIC;
     case DEMUX_GET_TIME:
         /* return TiVo timestamp */
-        p_i64 = va_arg(args, int64_t *);
         //*p_i64 = p_sys->lastAudioPTS - p_sys->firstAudioPTS;
         //*p_i64 = (p_sys->l_last_ty_pts / 1000) + (p_sys->lastAudioPTS -
         //    p_sys->l_last_ty_pts_sync);
-        *p_i64 = (p_sys->l_last_ty_pts / 1000);
+        *va_arg(args, vlc_tick_t *) = VLC_TICK_FROM_NS(p_sys->l_last_ty_pts);
         return VLC_SUCCESS;
     case DEMUX_GET_LENGTH:    /* length of program in microseconds, 0 if unk */
         /* size / bitrate */

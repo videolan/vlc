@@ -767,10 +767,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
-            if( *pi64 < 0 )
-               *pi64 = p_sys->i_next_demux_date;
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
+            if( *va_arg( args, vlc_tick_t * ) < 0 )
+               *va_arg( args, vlc_tick_t * ) = p_sys->i_next_demux_date;
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:

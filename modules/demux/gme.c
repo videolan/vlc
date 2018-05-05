@@ -291,8 +291,7 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_GET_TIME:
         {
-            int64_t *v = va_arg (args, int64_t *);
-            *v = gme_tell (sys->emu) * INT64_C(1000);
+            *va_arg (args, vlc_tick_t *) = VLC_TICK_FROM_MS(gme_tell (sys->emu));
             return VLC_SUCCESS;
         }
 

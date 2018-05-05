@@ -561,7 +561,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             case DEMUX_GET_TIME:
                 if( p_sys->i_pgc_length > 0 )
                 {
-                    *va_arg( args, int64_t * ) = p_sys->i_pgc_length*pos/len;
+                    *va_arg( args, vlc_tick_t * ) = p_sys->i_pgc_length*pos/len;
                     return VLC_SUCCESS;
                 }
                 break;

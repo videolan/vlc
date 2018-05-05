@@ -69,9 +69,9 @@ typedef struct
     es_format_t  fmt_sub;
     es_out_id_t  *p_sub;
 
-    int64_t     i_pcr;
-    int64_t     i_time;
-    int64_t     i_pcr_inc;
+    vlc_tick_t  i_pcr;
+    vlc_tick_t  i_time;
+    vlc_tick_t  i_pcr_inc;
 
     bool b_start_record;
 } demux_sys_t;
@@ -380,13 +380,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
             if( p_sys->i_time < 0 )
             {
-                *pi64 = 0;
+                *va_arg( args, vlc_tick_t * ) = 0;
                 return VLC_EGENERIC;
             }
-            *pi64 = p_sys->i_time;
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_time;
             return VLC_SUCCESS;
 
 #if 0

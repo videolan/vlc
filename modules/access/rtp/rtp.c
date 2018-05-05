@@ -412,8 +412,7 @@ static int Control (demux_t *demux, int query, va_list args)
         case DEMUX_GET_LENGTH:
         case DEMUX_GET_TIME:
         {
-            int64_t *v = va_arg (args, int64_t *);
-            *v = 0;
+            *va_arg (args, vlc_tick_t *) = 0;
             return VLC_SUCCESS;
         }
     }

@@ -254,7 +254,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = va_arg( args, int64_t * );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
                 bool b_selected;
@@ -265,7 +264,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             if( i < p_sys->i_tracks && p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles )
             {
-                *pi64 = p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start;
+                *va_arg( args, vlc_tick_t * ) = p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
