@@ -295,7 +295,7 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_SET_TIME:
         {
-            int64_t v = va_arg (args, int64_t) / 1000;
+            int64_t v = MS_FROM_VLC_TICK( va_arg (args, vlc_tick_t) );
             if (v > INT_MAX || gme_seek (sys->emu, v))
                 break;
             return VLC_SUCCESS;

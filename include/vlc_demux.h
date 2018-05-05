@@ -178,7 +178,7 @@ enum demux_query_e
     /* LENGTH/TIME in microsecond, 0 if unknown */
     DEMUX_GET_LENGTH,           /* arg1= vlc_tick_t *   res=    */
     DEMUX_GET_TIME,             /* arg1= vlc_tick_t *   res=    */
-    DEMUX_SET_TIME,             /* arg1= int64_t arg2= bool b_precise   res=can fail    */
+    DEMUX_SET_TIME,             /* arg1= vlc_tick_t arg2= bool b_precise   res=can fail    */
 
     /**
      * \todo Document

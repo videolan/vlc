@@ -1625,7 +1625,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             f = 0;
 
-            i64 = va_arg( args, int64_t );
+            i64 = va_arg( args, vlc_tick_t );
             b = va_arg( args, int );
             if( !p_sys->b_seekable )
             {

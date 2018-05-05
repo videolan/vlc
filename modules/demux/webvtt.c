@@ -439,15 +439,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_TIME:
-            i64 = va_arg( args, int64_t );
-            {
-                p_sys->index.i_current = getIndexByTime( p_sys, i64 );
-                p_sys->b_first_time = true;
-                p_sys->i_next_demux_time =
-                        p_sys->index.p_array[p_sys->index.i_current].time;
-                p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
-                return VLC_SUCCESS;
-            }
+            p_sys->index.i_current = getIndexByTime( p_sys, va_arg( args, vlc_tick_t ) );
+            p_sys->b_first_time = true;
+            p_sys->i_next_demux_time =
+                    p_sys->index.p_array[p_sys->index.i_current].time;
+            p_sys->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );

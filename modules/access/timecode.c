@@ -129,7 +129,7 @@ static int Control (demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_SET_TIME:
-            date_Set (&sys->date, va_arg (args, int64_t));
+            date_Set (&sys->date, va_arg (args, vlc_tick_t));
             break;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:

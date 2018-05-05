@@ -529,8 +529,8 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
         *va_arg(args, vlc_tick_t *) = 0;
         return VLC_SUCCESS;
     case DEMUX_SET_TIME:      /* arg is time in microsecs */
-        i64 = va_arg( args, int64_t );
-        return ty_stream_seek_time(p_demux, i64 * 1000);
+        return ty_stream_seek_time(p_demux,
+                                   NS_FROM_VLC_TICK(va_arg( args, vlc_tick_t )));
     case DEMUX_CAN_PAUSE:
     case DEMUX_SET_PAUSE_STATE:
     case DEMUX_CAN_CONTROL_PACE:

@@ -413,7 +413,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     vlc_meta_t  *p_meta;
-    int64_t     i64;
+    vlc_tick_t  i64;
     int         i;
     double      f, *pf;
 
@@ -439,7 +439,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             va_list acpy;
             va_copy( acpy, args );
-            i64 = va_arg( acpy, int64_t );
+            i64 = va_arg( acpy, vlc_tick_t );
             va_end( acpy );
 
             if( !SeekIndex( p_demux, i64, -1 ) )

@@ -220,10 +220,9 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             *va_arg( args, vlc_tick_t * ) = p_sys->i_next_demux_time;
             return VLC_SUCCESS;
         case DEMUX_SET_TIME:
-            i64 = va_arg( args, int64_t );
             if( p_sys->times.i_count )
             {
-                tt_time_t t = tt_time_Create( i64 - VLC_TICK_0 );
+                tt_time_t t = tt_time_Create( va_arg( args, vlc_tick_t ) - VLC_TICK_0 );
                 size_t i_index = tt_timings_FindLowerIndex( p_sys->times.p_array,
                                                             p_sys->times.i_count, t, &b );
                 p_sys->times.i_current = i_index;

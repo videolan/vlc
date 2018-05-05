@@ -440,7 +440,7 @@ static vlc_tick_t ControlGetTime( demux_t *p_demux )
     return p_sys->i_pts;
 }
 
-static int ControlSetTime( demux_t *p_demux, int64_t i_time )
+static int ControlSetTime( demux_t *p_demux, vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     bool b_seekable;
@@ -526,8 +526,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
     else if( i_query == DEMUX_SET_TIME )
     {
-        int64_t i_time = va_arg( args, int64_t );
-        return ControlSetTime( p_demux, i_time );
+        return ControlSetTime( p_demux, va_arg( args, vlc_tick_t ) );
     }
     else if( i_query == DEMUX_SET_POSITION )
     {

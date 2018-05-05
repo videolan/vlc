@@ -1070,12 +1070,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
         {
-            i64 = va_arg( args, int64_t );
+            i64 = TO_AV_TS(va_arg( args, vlc_tick_t ));
             bool precise = va_arg( args, int );
 
             msg_Warn( p_demux, "DEMUX_SET_TIME: %"PRId64, i64 );
 
-            if( av_seek_frame( p_sys->ic, -1, TO_AV_TS(i64) + i_start_time, AVSEEK_FLAG_BACKWARD ) < 0 )
+            if( av_seek_frame( p_sys->ic, -1, i64 + i_start_time, AVSEEK_FLAG_BACKWARD ) < 0 )
             {
                 return VLC_EGENERIC;
             }

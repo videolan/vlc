@@ -62,7 +62,7 @@ static int Control( demux_t *, int, va_list );
 /* */
 typedef struct
 {
-    int64_t i_time;
+    vlc_tick_t i_time;
     int64_t i_offset;
 
 } demux_index_entry_t;
@@ -81,7 +81,7 @@ static void demux_IndexClean( demux_index_t * );
 static void demux_IndexAppend( demux_index_t *,
                                int64_t i_time, int64_t i_offset );
 /* Convert a time into offset */
-static int64_t demux_IndexConvertTime( demux_index_t *, int64_t i_time );
+static int64_t demux_IndexConvertTime( demux_index_t *, vlc_tick_t i_time );
 /* Find the nearest offset in the index */
 static int64_t demux_IndexFindOffset( demux_index_t *, int64_t i_offset );
 
@@ -509,11 +509,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
         {
             int64_t i_pos;
-            i64 = va_arg( args, int64_t );
 
             p_sys->i_pcr = -1;
 
-            i_pos = demux_IndexConvertTime( &p_sys->idx, i64 );
+            i_pos = demux_IndexConvertTime( &p_sys->idx, va_arg( args, vlc_tick_t ) );
             if( i_pos < 0 )
                 return VLC_EGENERIC;
             else
@@ -957,7 +956,7 @@ static void demux_IndexAppend( demux_index_t *p_idx,
 
     p_idx->i_idx++;
 }
-static int64_t demux_IndexConvertTime( demux_index_t *p_idx, int64_t i_time )
+static int64_t demux_IndexConvertTime( demux_index_t *p_idx, vlc_tick_t i_time )
 {
     int i_min = 0;
     int i_max = p_idx->i_idx-1;

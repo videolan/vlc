@@ -238,7 +238,7 @@ static void Close( vlc_object_t *p_this )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i64;
+    vlc_tick_t i64;
     int i;
     double *pf, f;
 
@@ -269,7 +269,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
-            i64 = va_arg( args, int64_t );
+            i64 = va_arg( args, vlc_tick_t );
             for( i = 0; i < p_sys->i_tracks; i++ )
             {
                 p_sys->track[i].i_current_subtitle = 0;
@@ -311,7 +311,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
-            i64 = (int64_t) f * p_sys->i_length;
+            i64 = (vlc_tick_t) f * p_sys->i_length;
 
             for( i = 0; i < p_sys->i_tracks; i++ )
             {

@@ -671,9 +671,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     vlc_meta_t *p_meta;
-    int64_t i64;
+    vlc_tick_t i64;
     double *pf, f;
     bool *pb_bool, b, acc;
+    logical_stream_t *p_stream;
 
     switch( i_query )
     {
@@ -704,9 +705,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_EGENERIC;
 
         case DEMUX_SET_TIME:
-            i64 = va_arg( args, int64_t );
+        {
+            i64 = va_arg( args, vlc_tick_t );
             acc = va_arg( args, int );
-            logical_stream_t *p_stream = Ogg_GetSelectedStream( p_demux );
+            p_stream = Ogg_GetSelectedStream( p_demux );
             if ( !p_stream )
             {
                 msg_Err( p_demux, "No selected seekable stream found" );
@@ -723,6 +725,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
                 return VLC_EGENERIC;
+        }
 
         case DEMUX_GET_ATTACHMENTS:
         {
@@ -751,8 +754,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( stream_Size( p_demux->s ) > 0 )
             {
-                i64 = vlc_stream_Tell( p_demux->s );
-                *pf = (double) i64 / stream_Size( p_demux->s );
+                *pf = (double) vlc_stream_Tell( p_demux->s ) / stream_Size( p_demux->s );
             }
             else *pf = 0.0;
             return VLC_SUCCESS;

@@ -369,7 +369,7 @@ struct demux_cc
         {
             m_pause_delay = m_pause_date = VLC_TICK_INVALID;
 
-            vlc_tick_t time = va_arg( args, int64_t );
+            vlc_tick_t time = va_arg( args, vlc_tick_t );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_TIME, time, false );
             if( ret != VLC_SUCCESS )

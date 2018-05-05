@@ -764,14 +764,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             break;
 
         case DEMUX_SET_TIME:
-            i64 = va_arg( args, int64_t );
+        {
             if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts != VLC_TICK_INVALID &&
                 p_sys->i_length > VLC_TICK_0)
             {
-                i64 -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
-                return demux_Control( p_demux, DEMUX_SET_POSITION, (double) i64 / p_sys->i_length );
+                vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+                i_time -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
+                return demux_Control( p_demux, DEMUX_SET_POSITION, (double) i_time / p_sys->i_length );
             }
             break;
+        }
 
         case DEMUX_GET_TITLE_INFO:
         {

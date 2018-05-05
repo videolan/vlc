@@ -119,7 +119,7 @@ static int Control(demux_t *demux, int query, va_list args)
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME: {
-        int64_t t = va_arg(args, int64_t);
+        vlc_tick_t t = va_arg(args, vlc_tick_t);
         for( size_t i = 0; i + 1< sys->count; i++ )
         {
             if( sys->index[i + 1].start >= t &&
