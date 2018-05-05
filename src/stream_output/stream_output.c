@@ -163,6 +163,7 @@ sout_packetizer_input_t *sout_InputNew( sout_instance_t *p_sout,
         return NULL;
 
     p_input->p_sout = p_sout;
+    p_input->b_flushed = false;
 
     msg_Dbg( p_sout, "adding a new sout input for `%4.4s` (sout_input: %p)",
              (char*) &p_fmt->i_codec, (void *)p_input );
@@ -221,6 +222,7 @@ void sout_InputFlush( sout_packetizer_input_t *p_input )
     vlc_mutex_lock( &p_sout->lock );
     sout_StreamFlush( p_sout->p_stream, p_input->id );
     vlc_mutex_unlock( &p_sout->lock );
+    p_input->b_flushed = true;
 }
 
 /*****************************************************************************
@@ -232,6 +234,11 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
     sout_instance_t     *p_sout = p_input->p_sout;
     int                 i_ret;
 
+    if( p_input->b_flushed )
+    {
+        p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
+        p_input->b_flushed = false;
+    }
     vlc_mutex_lock( &p_sout->lock );
     i_ret = sout_StreamIdSend( p_sout->p_stream, p_input->id, p_buffer );
     vlc_mutex_unlock( &p_sout->lock );
