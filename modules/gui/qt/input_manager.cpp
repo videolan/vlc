@@ -162,7 +162,7 @@ void InputManager::delInput()
     char *uri = input_item_GetURI( p_item );
     if( uri != NULL ) {
         float f_pos = var_GetFloat( p_input , "position" );
-        int64_t i_time = -1;
+        vlc_tick_t i_time = -1;
 
         if( f_pos >= 0.05f && f_pos <= 0.95f
          && var_GetInteger( p_input, "length" ) >= VLC_TICK_FROM_SEC(60))
