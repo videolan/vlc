@@ -1798,7 +1798,7 @@ static void *Thread(void *object)
 
         if (wait)
         {
-            const mtime_t max_deadline = mdate() + 100000;
+            const mtime_t max_deadline = mdate() + CLOCK_FREQ/10;
             deadline = deadline == VLC_TS_INVALID ? max_deadline : __MIN(deadline, max_deadline);
         } else {
             deadline = VLC_TS_INVALID;
