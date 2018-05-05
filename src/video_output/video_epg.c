@@ -646,7 +646,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input )
 
     subpic->i_channel  = VOUT_SPU_CHANNEL_OSD;
     subpic->i_start    = now;
-    subpic->i_stop     = now + 3000 * INT64_C(1000);
+    subpic->i_stop     = now + CLOCK_FREQ*3;
     subpic->b_ephemer  = true;
     subpic->b_absolute = false;
     subpic->b_fade     = true;
