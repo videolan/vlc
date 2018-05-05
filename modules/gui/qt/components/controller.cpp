@@ -378,6 +378,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case VOLUME_SPECIAL:
         b_special = true;
+        /* fallthrough */
     case VOLUME:
         {
             SoundWidget *snd = new SoundWidget( this, p_intf, b_shiny, b_special );
