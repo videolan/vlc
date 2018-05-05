@@ -584,7 +584,7 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     /* Update "length" for better intf behaviour */
-    const int64_t i_length = var_GetInteger( p_input, "length" );
+    const vlc_tick_t i_length = var_GetInteger( p_input, "length" );
     if( i_length > 0 && newval.f_float >= 0.f && newval.f_float <= 1.f )
     {
         vlc_value_t val;
