@@ -258,7 +258,7 @@ static int Demux( demux_t *p_demux )
 
                     /* Skip the first part (it is the language name) */
                     p_frame->i_pts = VLC_TS_0 + p_sys->i_pcr;
-                    p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr + 4000000;    /* 4s */
+                    p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr + 4 * CLOCK_FREQ;
 
                     if( p_sys->p_sub )
                         es_out_Send( p_demux->out, p_sys->p_sub, p_frame );
