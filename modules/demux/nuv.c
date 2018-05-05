@@ -868,7 +868,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 
     p_sys->b_index = true;
 
-    p_sys->i_total_length = p_sys->i_total_frames * 1000000 / p_sys->hdr.d_fps;
+    p_sys->i_total_length = p_sys->i_total_frames * CLOCK_FREQ / p_sys->hdr.d_fps;
 
     msg_Dbg( p_demux, "index table loaded (%d elements)", i_seek_elements );
 
