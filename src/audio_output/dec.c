@@ -100,7 +100,7 @@ error:
         return -1;
     }
 
-
+    owner->sync.rate = 1.f;
     owner->sync.end = VLC_TS_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     owner->sync.discontinuity = true;
