@@ -93,7 +93,7 @@ typedef struct input_title_t
 {
     char        *psz_name;
 
-    int64_t     i_length;   /* Length(microsecond) if known, else 0 */
+    mtime_t     i_length;   /* Length(microsecond) if known, else 0 */
 
     unsigned    i_flags;    /* Is it a menu or a normal entry */
 
