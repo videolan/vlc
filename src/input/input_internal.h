@@ -72,7 +72,7 @@ typedef struct
     double f_fps;
 
     /* */
-    int64_t i_pts_delay;
+    mtime_t i_pts_delay;
 
     bool       b_eof;   /* eof of demuxer */
 
