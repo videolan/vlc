@@ -910,7 +910,7 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
 }
 
 
-static int64_t ParseNPT (const char *str)
+static vlc_tick_t ParseNPT (const char *str)
 {
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
@@ -1104,7 +1104,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     psz_position = strstr( psz_position, "npt=" );
                 if( psz_position && !psz_scale )
                 {
-                    int64_t i_time = ParseNPT (psz_position + 4);
+                    vlc_tick_t i_time = ParseNPT (psz_position + 4);
                     msg_Dbg( p_vod, "seeking request: %s", psz_position );
                     CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
                                  psz_session, i_time, 0.0, NULL );
@@ -1421,7 +1421,7 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             if( psz_position ) psz_position = strstr( psz_position, "npt=" );
             if( psz_position )
             {
-                int64_t i_time = ParseNPT (psz_position + 4);
+                vlc_tick_t i_time = ParseNPT (psz_position + 4);
                 msg_Dbg( p_vod, "seeking request: %s", psz_position );
                 CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
                              psz_session, i_time, 0.0, NULL );
