@@ -152,7 +152,7 @@ void vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
     char *string;
     if (vasprintf(&string, format, args) != -1) {
         vout_OSDText(vout, channel,
-                     SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT, 1000000,
+                     SUBPICTURE_ALIGN_TOP|SUBPICTURE_ALIGN_RIGHT, CLOCK_FREQ*1,
                      string);
         free(string);
     }
