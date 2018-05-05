@@ -221,7 +221,7 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
     block->i_pts = pts;
     block->i_dts = pts;
     block->i_length = length;
-    aout_OutputPlay(aout, block, pts);
+    aout->play(aout, block, pts);
 }
 
 static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
@@ -229,6 +229,9 @@ static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
     aout_owner_t *owner = aout_owner (aout);
     const float rate = owner->sync.rate;
     mtime_t drift;
+
+    if (unlikely(aout->time_get == NULL))
+        return;
 
     /**
      * Depending on the drift between the actual and intended playback times,
@@ -246,7 +249,7 @@ static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
      * all samples in the buffer will have been played. Then:
      *    pts = mdate() + delay
      */
-    if (aout_OutputTimeGet (aout, &drift) != 0)
+    if (aout->time_get(aout, &drift) != 0)
         return; /* nothing can be done if timing is unknown */
     drift += mdate () - dec_pts;
 
@@ -265,14 +268,14 @@ static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
         else
             msg_Dbg (aout, "playback too late (%"PRId64"): "
                      "flushing buffers", drift);
-        aout_OutputFlush (aout, false);
+        aout->flush(aout, false);
 
         aout_StopResampling (aout);
         owner->sync.end = VLC_TS_INVALID;
         owner->sync.discontinuity = true;
 
         /* Now the output might be too early... Recheck. */
-        if (aout_OutputTimeGet (aout, &drift) != 0)
+        if (aout->time_get(aout, &drift) != 0)
             return; /* nothing can be done if timing is unknown */
         drift += mdate () - dec_pts;
     }
@@ -396,7 +399,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
     /* Output */
     owner->sync.end = block->i_pts + block->i_length + 1;
     owner->sync.discontinuity = false;
-    aout_OutputPlay(aout, block, block->i_pts);
+    aout->play(aout, block, block->i_pts);
     atomic_fetch_add_explicit(&owner->buffers_played, 1, memory_order_relaxed);
     return ret;
 drop:
@@ -429,8 +432,14 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
         else
             owner->sync.end += date;
     }
+
     if (owner->mixer_format.i_format)
-        aout_OutputPause (aout, paused, date);
+    {
+        if (aout->pause != NULL)
+            aout->pause(aout, paused, date);
+        else if (paused)
+            aout->flush(aout, false);
+    }
 }
 
 void aout_DecChangeRate(audio_output_t *aout, float rate)
@@ -451,10 +460,11 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
         {
             block_t *block = aout_FiltersDrain (owner->filters);
             if (block)
-                aout_OutputPlay(aout, block, block->i_pts);
+                aout->play(aout, block, block->i_pts);
         }
         else
             aout_FiltersFlush (owner->filters);
-        aout_OutputFlush (aout, wait);
+
+        aout->flush(aout, wait);
     }
 }
