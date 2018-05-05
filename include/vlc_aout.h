@@ -417,6 +417,16 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
     aout->events->restart_request(aout, mode);
 }
 
+/**
+ * Default implementation for audio_output_t.time_get
+ */
+static inline int aout_TimeGetDefault(audio_output_t *aout,
+                                      mtime_t *restrict delay)
+{
+    (void) aout; (void) delay;
+    return -1;
+}
+
 /* Audio output filters */
 
 typedef struct
