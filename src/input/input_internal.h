@@ -229,7 +229,7 @@ void input_ControlPush( input_thread_t *, int i_type, vlc_value_t * );
 bool input_Stopped( input_thread_t * );
 
 /* Bound pts_delay */
-#define INPUT_PTS_DELAY_MAX INT64_C(60000000)
+#define INPUT_PTS_DELAY_MAX (CLOCK_FREQ*60)
 
 /**********************************************************************
  * Item metadata
