@@ -49,9 +49,6 @@
 #ifdef __APPLE__
 #include <sys/sysctl.h>
 #endif
-#ifdef __ANDROID__
-#include <cpu-features.h>
-#endif
 
 #if defined(__OpenBSD__) && defined(__powerpc__)
 #include <sys/param.h>
@@ -250,12 +247,6 @@ out:
         i_capabilities |= VLC_CPU_ALTIVEC;
 
 #   endif
-
-#elif defined ( __arm__)
-# ifdef __ANDROID__
-    if (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON)
-        i_capabilities |= VLC_CPU_ARM_NEON;
-# endif
 
 #endif
 
