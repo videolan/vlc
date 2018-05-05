@@ -2178,7 +2178,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
                 break;
             /* FIXME there should be a way to have auto deleted es, but there will be
              * a problem when another codec of the same type is created (mainly video) */
-            msleep( 20*1000 );
+            msleep( CLOCK_FREQ/50 );
         }
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
     }
