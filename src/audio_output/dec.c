@@ -432,12 +432,7 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
     }
 
     if (owner->mixer_format.i_format)
-    {
-        if (aout->pause != NULL)
-            aout->pause(aout, paused, date);
-        else if (paused)
-            aout->flush(aout, false);
-    }
+        aout->pause(aout, paused, date);
 }
 
 void aout_DecChangeRate(audio_output_t *aout, float rate)

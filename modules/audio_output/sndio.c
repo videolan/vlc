@@ -180,7 +180,7 @@ static int Start (audio_output_t *aout, audio_sample_format_t *restrict fmt)
 
     aout->time_get = TimeGet;
     aout->play = Play;
-    aout->pause = NULL;
+    aout->pause = aout_PauseDefault;
     aout->flush = Flush;
     if (sio_onvol(sys->hdl, VolumeChanged, aout))
     {

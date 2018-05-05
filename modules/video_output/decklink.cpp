@@ -1171,7 +1171,7 @@ static int OpenAudio(vlc_object_t *p_this)
     aout->flush     = Flush;
     aout->time_get  = TimeGet;
 
-    aout->pause     = NULL;
+    aout->pause     = aout_PauseDefault;
     aout->stop      = NULL;
     aout->mute_set  = NULL;
     aout->volume_set= NULL;
