@@ -2473,7 +2473,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     {
         es_out_pgrm_t *p_pgrm = NULL;
         int            i_group = 0;
-        int64_t        i_pcr;
+        mtime_t        i_pcr;
 
         /* Search program */
         if( i_query == ES_OUT_SET_PCR )
