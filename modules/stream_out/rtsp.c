@@ -576,7 +576,7 @@ static inline const char *parameter_next( const char *str )
 }
 
 
-static int64_t ParseNPT (const char *str)
+static vlc_tick_t ParseNPT (const char *str)
 {
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t oldloc = uselocale (loc);
@@ -952,7 +952,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             answer->i_status = 200;
 
             psz_session = httpd_MsgGet( query, "Session" );
-            int64_t start = -1, end = -1, npt;
+            vlc_tick_t start = -1, end = -1, npt;
             const char *range = httpd_MsgGet (query, "Range");
             if (range != NULL)
             {
@@ -1129,7 +1129,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             if (ses != NULL && id == NULL)
             {
                 assert(vod);
-                int64_t npt = 0;
+                vlc_tick_t npt = 0;
                 vod_pause(rtsp->vod_media, psz_session, &npt);
                 double f_npt = secf_from_vlc_tick(npt);
                 httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );

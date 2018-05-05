@@ -1577,7 +1577,7 @@ static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
  * the first packets for NPT=0 is returned instead. */
 vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
                     const vod_media_t *p_media, const char *psz_vod_session,
-                    int64_t *p_npt )
+                    vlc_tick_t *p_npt )
 {
     if (p_npt != NULL)
         *p_npt = 0;
@@ -1601,7 +1601,7 @@ vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t
     if( now < i_npt_zero )
         return p_sys->i_pts_zero;
 
-    int64_t npt = now - i_npt_zero;
+    vlc_tick_t npt = now - i_npt_zero;
     if (p_npt != NULL)
         *p_npt = npt;
 
