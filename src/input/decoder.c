@@ -110,7 +110,7 @@ struct decoder_owner_sys_t
 
     /* -- Theses variables need locking on read *and* write -- */
     /* Preroll */
-    int64_t i_preroll_end;
+    mtime_t i_preroll_end;
     /* Pause & Rate */
     mtime_t pause_date;
     float rate;
@@ -754,14 +754,14 @@ static int DecoderTimedWait( decoder_t *p_dec, mtime_t deadline )
     return ret;
 }
 
-static inline void DecoderUpdatePreroll( int64_t *pi_preroll, const block_t *p )
+static inline void DecoderUpdatePreroll( mtime_t *pi_preroll, const block_t *p )
 {
     if( p->i_flags & BLOCK_FLAG_PREROLL )
-        *pi_preroll = INT64_MAX;
+        *pi_preroll = (mtime_t)INT64_MAX;
     /* Check if we can use the packet for end of preroll */
     else if( (p->i_flags & BLOCK_FLAG_DISCONTINUITY) &&
              (p->i_buffer == 0 || (p->i_flags & BLOCK_FLAG_CORRUPTED)) )
-        *pi_preroll = INT64_MAX;
+        *pi_preroll = (mtime_t)INT64_MAX;
     else if( p->i_dts != VLC_TS_INVALID )
         *pi_preroll = __MIN( *pi_preroll, p->i_dts );
     else if( p->i_pts != VLC_TS_INVALID )
@@ -1001,8 +1001,8 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         return -1;
     }
 
-    prerolled = p_owner->i_preroll_end > INT64_MIN;
-    p_owner->i_preroll_end = INT64_MIN;
+    prerolled = p_owner->i_preroll_end > (mtime_t)INT64_MIN;
+    p_owner->i_preroll_end = (mtime_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 
     if( unlikely(prerolled) )
@@ -1143,8 +1143,8 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         return -1;
     }
 
-    prerolled = p_owner->i_preroll_end > INT64_MIN;
-    p_owner->i_preroll_end = INT64_MIN;
+    prerolled = p_owner->i_preroll_end > (mtime_t)INT64_MIN;
+    p_owner->i_preroll_end = (mtime_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 
     if( unlikely(prerolled) )
@@ -1522,7 +1522,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     }
 
     vlc_mutex_lock( &p_owner->lock );
-    p_owner->i_preroll_end = INT64_MIN;
+    p_owner->i_preroll_end = (mtime_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 }
 
@@ -1683,7 +1683,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
         vlc_object_release( p_dec );
         return NULL;
     }
-    p_owner->i_preroll_end = INT64_MIN;
+    p_owner->i_preroll_end = (mtime_t)INT64_MIN;
     p_owner->i_last_rate = INPUT_RATE_DEFAULT;
     p_owner->p_input = p_input;
     p_owner->p_resource = p_resource;
