@@ -615,24 +615,6 @@ void aout_OutputDelete (audio_output_t *aout)
     aout_OutputUnlock(aout);
 }
 
-static int aout_OutputVolumeSet (audio_output_t *aout, float vol)
-{
-    aout_OutputAssertLocked (aout);
-    return (aout->volume_set != NULL) ? aout->volume_set (aout, vol) : -1;
-}
-
-static int aout_OutputMuteSet (audio_output_t *aout, bool mute)
-{
-    aout_OutputAssertLocked (aout);
-    return (aout->mute_set != NULL) ? aout->mute_set (aout, mute) : -1;
-}
-
-static int aout_OutputDeviceSet (audio_output_t *aout, const char *id)
-{
-    aout_OutputAssertLocked (aout);
-    return (aout->device_select != NULL) ? aout->device_select (aout, id) : -1;
-}
-
 /**
  * Gets the volume of the audio output stream (independent of mute).
  * \return Current audio volume (0. = silent, 1. = nominal),
@@ -653,9 +635,9 @@ int aout_VolumeSet (audio_output_t *aout, float vol)
     int ret;
 
     aout_OutputLock(aout);
-    ret = aout_OutputVolumeSet(aout, vol);
+    ret = aout->volume_set(aout, vol);
     aout_OutputUnlock(aout);
-    return ret;
+    return ret ? -1 : 0;
 }
 
 /**
@@ -703,9 +685,9 @@ int aout_MuteSet (audio_output_t *aout, bool mute)
     int ret;
 
     aout_OutputLock(aout);
-    ret = aout_OutputMuteSet(aout, mute);
+    ret = aout->mute_set(aout, mute);
     aout_OutputUnlock(aout);
-    return ret;
+    return ret ? -1 : 0;
 }
 
 /**
@@ -728,9 +710,9 @@ int aout_DeviceSet (audio_output_t *aout, const char *id)
     int ret;
 
     aout_OutputLock(aout);
-    ret = aout_OutputDeviceSet(aout, id);
+    ret = aout->device_select(aout, id);
     aout_OutputUnlock(aout);
-    return ret;
+    return ret ? -1 : 0;
 }
 
 /**
