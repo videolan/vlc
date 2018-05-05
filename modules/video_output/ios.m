@@ -55,7 +55,7 @@ static int Open(vlc_object_t *);
 static void Close(vlc_object_t *);
 
 static picture_pool_t* PicturePool(vout_display_t *, unsigned);
-static void PictureRender(vout_display_t *, picture_t *, subpicture_t *);
+static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
 static void PictureDisplay(vout_display_t *, picture_t *, subpicture_t *);
 static int Control(vout_display_t*, int, va_list);
 
@@ -314,8 +314,10 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
         subpicture_Delete(subpicture);
 }
 
-static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
+                          mtime_t date)
 {
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     struct gl_sys *glsys = sys->gl->sys;
 

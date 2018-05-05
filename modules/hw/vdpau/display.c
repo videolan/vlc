@@ -240,7 +240,8 @@ out:/* Destroy GPU surface */
     vdp_bitmap_surface_destroy(sys->vdp, surface);
 }
 
-static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
+static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+                  mtime_t date)
 {
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *p_sys = pic->p_sys;
@@ -273,7 +274,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
         return;
     }
 
-    mtime_t delay = pic->date - now;
+    mtime_t delay = date - now;
     if (delay < 0)
         delay = 0; /* core bug: date is not updated during pause */
     if (unlikely(delay > CLOCK_FREQ))

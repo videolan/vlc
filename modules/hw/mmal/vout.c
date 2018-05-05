@@ -545,8 +545,9 @@ out:
 }
 
 static void vd_prepare(vout_display_t *vd, picture_t *picture,
-                subpicture_t *subpicture)
+                       subpicture_t *subpicture, mtime_t date)
 {
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *pic_sys = picture->p_sys;
 

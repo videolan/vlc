@@ -146,8 +146,10 @@ static void Refresh(vout_display_t *vd)
 
 /**
  * Prepare a picture for display */
-static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
+                    mtime_t date)
 {
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->dither) {

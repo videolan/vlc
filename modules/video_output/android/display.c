@@ -82,7 +82,7 @@ static const vlc_fourcc_t subpicture_chromas[] =
 };
 
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
-static void             Prepare(vout_display_t *, picture_t *, subpicture_t *);
+static void             Prepare(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
@@ -944,7 +944,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture)
+                    subpicture_t *subpicture, mtime_t date)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
@@ -992,10 +992,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
      && AndroidOpaquePicture_CanReleaseAtTime(picture->p_sys))
     {
         mtime_t now = mdate();
-        if (picture->date > now)
+        if (date > now)
         {
-            if (picture->date - now <= 1*CLOCK_FREQ)
-                AndroidOpaquePicture_ReleaseAtTime(picture->p_sys, picture->date);
+            if (date - now <= 1*CLOCK_FREQ)
+                AndroidOpaquePicture_ReleaseAtTime(picture->p_sys, date);
             else /* The picture will be displayed from the Display callback */
                 msg_Warn(vd, "picture way too early to release at time");
         }

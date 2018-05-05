@@ -891,7 +891,8 @@ static void send_AFD(uint8_t afdcode, uint8_t ar, uint8_t *buf)
     }
 }
 
-static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
+static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
+                         mtime_t date)
 {
     decklink_sys_t *sys = (decklink_sys_t *) vd->sys;
     mtime_t now = mdate();
@@ -899,7 +900,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
     if (!picture)
         return;
 
-    if (now - picture->date > sys->video.nosignal_delay * CLOCK_FREQ) {
+    if (now - date > sys->video.nosignal_delay * CLOCK_FREQ) {
         msg_Dbg(vd, "no signal");
         if (sys->video.pic_nosignal) {
             picture = sys->video.pic_nosignal;
@@ -922,7 +923,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
                 }
             }
         }
-        picture->date = now;
+        date = now;
     }
 
     HRESULT result;
@@ -985,13 +986,12 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *)
     // compute frame duration in CLOCK_FREQ units
     length = (sys->frameduration * CLOCK_FREQ) / sys->timescale;
 
-    picture->date -= sys->offset;
+    date -= sys->offset;
     result = sys->p_output->ScheduleVideoFrame(pDLVideoFrame,
-        picture->date, length, CLOCK_FREQ);
+        date, length, CLOCK_FREQ);
 
     if (result != S_OK) {
-        msg_Err(vd, "Dropped Video frame %" PRId64 ": 0x%x",
-            picture->date, result);
+        msg_Err(vd, "Dropped Video frame %" PRId64 ": 0x%x", date, result);
         goto end;
     }
 

@@ -212,8 +212,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     return sys->pool;
 }
 
-static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+                    mtime_t date)
 {
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;

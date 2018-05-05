@@ -1334,7 +1334,7 @@ static picture_pool_t *SplitterPool(vout_display_t *vd, unsigned count)
 }
 static void SplitterPrepare(vout_display_t *vd,
                             picture_t *picture,
-                            subpicture_t *subpicture)
+                            subpicture_t *subpicture, mtime_t date)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -1350,7 +1350,7 @@ static void SplitterPrepare(vout_display_t *vd,
     for (int i = 0; i < sys->count; i++) {
         sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
         if (sys->picture[i])
-            vout_display_Prepare(sys->display[i], sys->picture[i], NULL);
+            vout_display_Prepare(sys->display[i], sys->picture[i], NULL, date);
     }
 }
 static void SplitterDisplay(vout_display_t *vd,

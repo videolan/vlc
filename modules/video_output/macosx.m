@@ -56,7 +56,8 @@ static int Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
-static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
+                           mtime_t date)
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
 static int Control (vout_display_t *vd, int query, va_list ap);
 
@@ -321,9 +322,10 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     return sys->pool;
 }
 
-static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
+                           mtime_t date)
 {
-
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)

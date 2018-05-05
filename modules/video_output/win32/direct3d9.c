@@ -174,7 +174,7 @@ static int  Open(vlc_object_t *);
 static picture_pool_t *Direct3D9CreatePicturePool  (vlc_object_t *, d3d9_device_t *,
      const d3d9_format_t *, const video_format_t *, unsigned);
 
-static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, mtime_t);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
 static int            Control(vout_display_t *, int, va_list);
@@ -495,8 +495,10 @@ static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
     return vd->sys->sys.pool;
 }
 
-static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
+                    mtime_t date)
 {
+    VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *p_sys = picture->p_sys;
     LPDIRECT3DSURFACE9 surface = p_sys->surface;

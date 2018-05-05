@@ -307,7 +307,8 @@ struct vout_display_t {
      * You cannot change the pixel content of the picture_t or of the
      * subpicture_t.
      */
-    void       (*prepare)(vout_display_t *, picture_t *, subpicture_t *);
+    void       (*prepare)(vout_display_t *, picture_t *, subpicture_t *,
+                          mtime_t date);
 
     /* Display a picture and an optional subpicture (mandatory).
      *
