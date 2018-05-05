@@ -75,6 +75,7 @@ static const int pi_channels_maps[CHANNELS_MAX+1] =
  *****************************************************************************/
 static int     Open        ( vlc_object_t * );
 static void    Play        ( audio_output_t *, block_t *, mtime_t );
+static void    Pause       ( audio_output_t *, bool, mtime_t );
 static void    Flush       ( audio_output_t *, bool );
 
 /*****************************************************************************
@@ -165,7 +166,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
 
     p_aout->time_get = aout_TimeGetDefault;
     p_aout->play = Play;
-    p_aout->pause = NULL;
+    p_aout->pause = Pause;
     p_aout->flush = Flush;
 
     /* Audio format */
@@ -332,6 +333,11 @@ static void Play( audio_output_t * p_aout, block_t *p_buffer, mtime_t date )
 
     block_Release( p_buffer );
     (void) date;
+}
+
+static void Pause( audio_output_t *aout, bool paused, mtime_t date )
+{
+    (void) aout; (void) paused; (void) date;
 }
 
 static void Flush( audio_output_t *aout, bool wait )
