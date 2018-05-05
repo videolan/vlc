@@ -84,7 +84,7 @@
 
 /* Latency introduced on DVDs with CR == 0 on chapter change - this is from
  * my dice --Meuuh */
-#define CR_MEAN_PTS_GAP (300000)
+#define CR_MEAN_PTS_GAP (CLOCK_FREQ * 3 / 10)
 
 /* Rate (in 1/256) at which we will read faster to try to increase our
  * internal buffer (if we control the pace of the source).
