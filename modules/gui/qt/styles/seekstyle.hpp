@@ -42,7 +42,7 @@ public:
         bool animate;
         qreal animationopacity;
         qreal animationloading;
-        QList<int64_t> points;
+        QList<vlc_tick_t> points;
     };
 
 public:

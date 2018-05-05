@@ -862,7 +862,7 @@ static void ImportMarks( stream_t *p_access )
         seekpoint_t *sp = vlc_seekpoint_New();
         if( !sp )
             continue;
-        sp->i_time_offset = i_frame * (int64_t)( CLOCK_FREQ / p_sys->fps );
+        sp->i_time_offset = i_frame * (vlc_tick_t)( CLOCK_FREQ / p_sys->fps );
         sp->psz_name = strdup( line );
 
         TAB_APPEND( p_marks->i_seekpoint, p_marks->seekpoint, sp );
