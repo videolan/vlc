@@ -205,7 +205,8 @@ static void Flush(audio_output_t *aout, bool drain)
 
 static int VolumeSet(audio_output_t *aout, float vol)
 {
-    if (!aout->sys->volumeItf)
+    aout_sys_t *sys = aout->sys;
+    if (!sys->volumeItf)
         return -1;
 
     /* Convert UI volume to linear factor (cube) */
@@ -218,16 +219,17 @@ static int VolumeSet(audio_output_t *aout, float vol)
     else if (mb > 0)
         mb = 0; /* maximum supported level could be higher: GetMaxVolumeLevel */
 
-    SLresult r = SetVolumeLevel(aout->sys->volumeItf, mb);
+    SLresult r = SetVolumeLevel(sys->volumeItf, mb);
     return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
 
 static int MuteSet(audio_output_t *aout, bool mute)
 {
-    if (!aout->sys->volumeItf)
+    aout_sys_t *sys = aout->sys;
+    if (!sys->volumeItf)
         return -1;
 
-    SLresult r = SetMute(aout->sys->volumeItf, mute);
+    SLresult r = SetMute(sys->volumeItf, mute);
     return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
 
