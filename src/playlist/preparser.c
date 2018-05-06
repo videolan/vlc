@@ -170,6 +170,7 @@ void playlist_preparser_Push( playlist_preparser_t *preparser,
         case ITEM_TYPE_PLAYLIST:
             if( !b_net || i_options & META_REQUEST_OPTION_SCOPE_NETWORK )
                 break;
+            /* fallthrough */
         default:
             input_item_SignalPreparseEnded( item, ITEM_PREPARSE_SKIPPED );
             return;
