@@ -78,7 +78,7 @@
     if (_darkInterface)
         [self.timeSlider setSliderStyleDark];
 
-    [self.fullscreenButton setToolTip: _NS("Fullscreen")];
+    [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
     [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
 
     if (!_darkInterface) {

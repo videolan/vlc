@@ -92,7 +92,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
                              forAttribute:NSAccessibilityTitleAttribute];             \
     [target accessibilitySetOverrideValue:desc                                        \
                              forAttribute:NSAccessibilityDescriptionAttribute];       \
-    [target setToolTip:desc];
+    [target setToolTip:title];
 
 - (void)setupControls
 {
@@ -113,8 +113,8 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
                 _NS("Backward"),
                 _NS("Seek backward"));
     setupButton(_fullscreenButton,
-                _NS("Toggle Fullscreen mode"),
-                _NS("Leave fullscreen mode"));
+                _NS("Leave fullscreen"),
+                _NS("Leave fullscreen"));
     setupButton(_volumeSlider,
                 _NS("Volume"),
                 _NS("Adjust the volume"));
@@ -221,11 +221,13 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 - (void)setPlay
 {
     [_playPauseButton setState:NSOffState];
+    [_playPauseButton setToolTip: _NS("Play")];
 }
 
 - (void)setPause
 {
     [_playPauseButton setState:NSOnState];
+    [_playPauseButton setToolTip: _NS("Pause")];
 }
 
 - (void)setStreamTitle:(NSString *)title
@@ -292,6 +294,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 - (void)setVolumeLevel:(int)value
 {
     [_volumeSlider setIntValue:value];
+    [_volumeSlider setToolTip: [NSString stringWithFormat:_NS("Volume: %i %%"), (value*200)/AOUT_VOLUME_MAX]];
 }
 
 #pragma mark -
