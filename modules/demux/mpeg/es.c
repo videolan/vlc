@@ -423,7 +423,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 /* The first few seconds are guaranteed to be very whacky,
                  * don't bother trying ... Too bad */
                 if( f_pos < 0.01f ||
-                    (p_sys->i_pts + p_sys->i_time_offset) < 8000000 )
+                    (p_sys->i_pts + p_sys->i_time_offset) < VLC_TICK_FROM_SEC(8) )
                 {
                     return VLC_EGENERIC;
                 }

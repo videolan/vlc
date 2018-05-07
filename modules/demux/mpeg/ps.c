@@ -402,7 +402,7 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
 static void CheckPCR( demux_sys_t *p_sys, es_out_t *out, vlc_tick_t i_scr )
 {
     if( p_sys->i_scr != VLC_TICK_INVALID &&
-        llabs( p_sys->i_scr - i_scr ) > CLOCK_FREQ )
+        llabs( p_sys->i_scr - i_scr ) > VLC_TICK_FROM_SEC(1) )
         NotifyDiscontinuity( p_sys->tk, out );
 }
 
