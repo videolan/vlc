@@ -998,7 +998,7 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - pg_start=%"PRId64, event->pg_start );
 
         /* Store the length in time of the current PGC */
-        p_sys->i_pgc_length = event->pgc_length / 90 * 1000;
+        p_sys->i_pgc_length = FROM_SCALE_NZ(event->pgc_length);
         p_sys->i_vobu_index = 0;
         p_sys->i_vobu_flush = 0;
 
@@ -1209,14 +1209,14 @@ static void DemuxTitles( demux_t *p_demux )
             p_chapters_time = NULL;
         }
         t = vlc_input_title_New();
-        t->i_length = i_title_length * 1000 / 90;
+        t->i_length = FROM_SCALE_NZ(i_title_length);
         for( int j = 0; j < __MAX( i_chapters, 1 ); j++ )
         {
             s = vlc_seekpoint_New();
             if( p_chapters_time )
             {
                 if ( j > 0 )
-                    s->i_time_offset = p_chapters_time[j - 1] * 1000 / 90;
+                    s->i_time_offset = FROM_SCALE_NZ(p_chapters_time[j - 1]);
                 else
                     s->i_time_offset = 0;
             }
