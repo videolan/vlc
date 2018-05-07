@@ -143,7 +143,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
 {
     DWORD read, status;
     HRESULT hr;
-    mtime_t size;
+    ssize_t size;
 
     hr = IDirectSoundBuffer_GetStatus( sys->p_dsbuffer, &status );
     if( hr != DS_OK )
@@ -155,7 +155,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     if( hr != DS_OK )
         return hr;
 
-    size = (mtime_t)read - sys->i_last_read;
+    size = (ssize_t)read - sys->i_last_read;
 
     /* GetCurrentPosition cannot be trusted if the return doesn't change
      * Just return an error */
