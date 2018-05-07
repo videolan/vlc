@@ -139,7 +139,7 @@ static void input_item_preparse_timeout( const vlc_event_t *p_event,
 static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
                                         int wait_and_cancel)
 {
-    log ("test_input_metadata_timeout: timeout: %d, wait_and_cancel: %d\n",
+    log ("test_input_metadata_timeout: timeout: %d, wait_and_cancel: %d ms\n",
          timeout, wait_and_cancel);
 
     int i_ret, p_pipe[2];
@@ -163,7 +163,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     if (wait_and_cancel > 0)
     {
-        vlc_tick_sleep(wait_and_cancel * 1000);
+        vlc_tick_sleep( VLC_TICK_FROM_MS(wait_and_cancel) );
         libvlc_MetadataCancel(vlc->p_libvlc_int, vlc);
 
     }
