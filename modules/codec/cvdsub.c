@@ -357,8 +357,8 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
             p_sys->i_duration = FROM_SCALE_NZ( (p[1]<<16) + (p[2]<<8) + p[3] );
 
 #ifdef DEBUG_CVDSUB
-            msg_Dbg( p_dec, "subtitle display duration %lu secs",
-                     (long unsigned int)(p_sys->i_duration / 90000) );
+            msg_Dbg( p_dec, "subtitle display duration %lu ms",
+                     MS_FROM_VLC_TICK(p_sys->i_duration) );
 #endif
             break;
 

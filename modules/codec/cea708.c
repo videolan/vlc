@@ -1128,7 +1128,7 @@ cea708_t * CEA708_Decoder_New( decoder_t *p_dec )
 
 static void CEA708_Output( cea708_t *p_cea708 )
 {
-    Debug(printf("@%ld ms\n", p_cea708->i_clock / 1000));
+    Debug(printf("@%ld ms\n", MS_FROM_VLC_TICK(p_cea708->i_clock)));
     subpicture_t *p_spu = CEA708_BuildSubtitle( p_cea708 );
     if( p_spu )
         decoder_QueueSub( p_cea708->p_dec, p_spu );

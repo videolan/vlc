@@ -398,7 +398,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_sys->p_track )
     {
         ass_process_chunk( p_sys->p_track, p_spu_sys->p_subs_data, p_spu_sys->i_subs_len,
-                           p_block->i_pts / 1000, p_block->i_length / 1000 );
+                           MS_FROM_VLC_TICK( p_block->i_pts ), MS_FROM_VLC_TICK( p_block->i_length ) );
     }
     vlc_mutex_unlock( &p_sys->lock );
 
@@ -441,7 +441,7 @@ static int SubpictureValidate( subpicture_t *p_subpic,
     const vlc_tick_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
     int i_changed;
     ASS_Image *p_img = ass_render_frame( p_sys->p_renderer, p_sys->p_track,
-                                         i_stream_date/1000, &i_changed );
+                                         MS_FROM_VLC_TICK( i_stream_date ), &i_changed );
 
     if( !i_changed && !b_fmt_src && !b_fmt_dst &&
         (p_img != NULL) == (p_subpic->p_region != NULL) )

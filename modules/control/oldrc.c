@@ -1746,7 +1746,7 @@ static bool ReadWin32( intf_thread_t *p_intf, unsigned char *p_buffer, int *pi_s
 
     /* On Win32, select() only works on socket descriptors */
     while( WaitForSingleObjectEx( p_intf->p_sys->hConsoleIn,
-                                INTF_IDLE_SLEEP/1000, TRUE ) == WAIT_OBJECT_0 )
+                                MS_FROM_VLC_TICK(INTF_IDLE_SLEEP), TRUE ) == WAIT_OBJECT_0 )
     {
         // Prefer to fail early when there's not enough space to store a 4 bytes
         // UTF8 character. The function will be immediatly called again and we won't
