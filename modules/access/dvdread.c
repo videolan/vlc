@@ -124,14 +124,11 @@ typedef struct
     int i_title_end_block;
     int i_title_blocks;
     int i_title_offset;
-    vlc_tick_t i_title_cur_time;
 
     int i_title_start_cell;
     int i_title_end_cell;
     int i_cur_cell;
     int i_next_cell;
-    vlc_tick_t i_cell_cur_time;
-    vlc_tick_t i_cell_duration;
 
     /* Track */
     ps_track_t    tk[PS_TK_COUNT];
@@ -229,9 +226,6 @@ static int Open( vlc_object_t *p_this )
     ps_track_init( p_sys->tk );
     p_sys->i_sar_num = 0;
     p_sys->i_sar_den = 0;
-    p_sys->i_title_cur_time = (vlc_tick_t) 0;
-    p_sys->i_cell_cur_time = (vlc_tick_t) 0;
-    p_sys->i_cell_duration = (vlc_tick_t) 0;
 
     p_sys->p_dvdread = p_dvdread;
     p_sys->p_vmg_file = p_vmg_file;
@@ -1171,11 +1165,6 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
     p_sys->i_cur_block = p_sys->dsi_pack.dsi_gi.nv_pck_lbn;
     p_sys->i_pack_len = p_sys->dsi_pack.dsi_gi.vobu_ea;
 
-    /*
-     * Store the timecodes so we can get the current time
-     */
-    p_sys->i_title_cur_time = (vlc_tick_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
-    p_sys->i_cell_cur_time = dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm );
 
     /*
      * If we're not at the end of this cell, we can determine the next
@@ -1243,8 +1232,6 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
 
         p_sys->i_next_vobu =
             p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].first_sector;
-
-        p_sys->i_cell_duration = dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time );
     }
 
 
