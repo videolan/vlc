@@ -314,7 +314,7 @@ static int Probe( demux_t *p_demux, bool b_end )
             {
                 tk->i_last_pts = p_pkt->i_pts;
             }
-            else if ( tk->i_first_pts == -1 )
+            else if ( tk->i_first_pts == VLC_TICK_INVALID )
             {
                 tk->i_first_pts = p_pkt->i_pts;
             }
@@ -369,10 +369,10 @@ static bool FindLength( demux_t *p_demux )
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
         ps_track_t *tk = &p_sys->tk[i];
-        if( tk->i_first_pts >= 0 &&
+        if( tk->i_first_pts != VLC_TICK_INVALID &&
             tk->i_last_pts > tk->i_first_pts )
         {
-            int64_t i_length = (int64_t)tk->i_last_pts - tk->i_first_pts;
+            vlc_tick_t i_length = tk->i_last_pts - tk->i_first_pts;
             if( i_length > p_sys->i_length )
             {
                 p_sys->i_length = i_length;
