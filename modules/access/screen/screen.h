@@ -46,7 +46,7 @@ typedef struct
 
     float f_fps;
     vlc_tick_t i_next_date;
-    int i_incr;
+    vlc_tick_t i_incr;
 
     vlc_tick_t i_start;
 
