@@ -177,8 +177,8 @@ typedef struct
     bool            b_flushing_discontinuity;
     int             i_next_block_flags;
     char            waiting;
-    int64_t         i_prevpts;
-    int64_t         i_pcr;
+    vlc_tick_t      i_prevpts;
+    vlc_tick_t      i_pcr;
     double          f_npt;
 
     struct dtsgen_t dtsgen;
