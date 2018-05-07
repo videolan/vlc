@@ -536,7 +536,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 
     if( p_mux->b_waiting_stream )
     {
-        const int64_t i_caching = var_GetInteger( p_mux->p_sout, "sout-mux-caching" ) * INT64_C(1000);
+        const vlc_tick_t i_caching = VLC_TICK_FROM_MS(var_GetInteger( p_mux->p_sout, "sout-mux-caching" ));
 
         if( p_mux->i_add_stream_start < 0 )
             p_mux->i_add_stream_start = i_dts;

@@ -106,7 +106,7 @@ static int Open( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     p_sys->i_id = var_GetInteger( p_stream, SOUT_CFG_PREFIX "id" );
-    p_sys->i_delay = 1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" );
+    p_sys->i_delay = VLC_TICK_FROM_MS(var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ));
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
