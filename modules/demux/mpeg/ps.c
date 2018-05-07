@@ -584,7 +584,7 @@ static int Demux( demux_t *p_demux )
                     tk->i_first_pts != VLC_TICK_INVALID && tk->i_first_pts - p_sys->i_pack_scr > VLC_TICK_FROM_SEC(2))
                 {
                     msg_Warn( p_demux, "Incorrect SCR timing offset by of %"PRId64 "ms, disabling",
-                                       tk->i_first_pts - p_sys->i_pack_scr / 1000 );
+                                       MS_FROM_VLC_TICK(tk->i_first_pts - p_sys->i_pack_scr) );
                     p_sys->b_bad_scr = true; /* Disable Offset SCR */
                     p_sys->i_first_scr = -1;
                 }
@@ -601,7 +601,7 @@ static int Demux( demux_t *p_demux )
                         p_sys->i_pack_scr > p_pkt->i_pts + VLC_TICK_FROM_MS(250) )
                     {
                         msg_Warn( p_demux, "Incorrect SCR timing in advance of %" PRId64 "ms, disabling",
-                                           p_sys->i_pack_scr - p_pkt->i_pts / 1000 );
+                                           MS_FROM_VLC_TICK(p_sys->i_pack_scr - p_pkt->i_pts) );
                         p_sys->b_bad_scr = true;
                         p_sys->i_first_scr = -1;
                     }
