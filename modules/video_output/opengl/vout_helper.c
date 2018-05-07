@@ -1241,6 +1241,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(ShaderSource);
     GET_PROC_ADDR(CompileShader);
     GET_PROC_ADDR(AttachShader);
+    GET_PROC_ADDR(DetachShader);
     GET_PROC_ADDR(DeleteShader);
 
     GET_PROC_ADDR(DrawElementsInstanced);

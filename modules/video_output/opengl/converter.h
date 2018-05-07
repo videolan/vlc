@@ -127,6 +127,7 @@ typedef void (APIENTRY *PFNGLVIEWPORTPROC) (GLint x, GLint y, GLsizei width, GLs
 #   define PFNGLUSEPROGRAMPROC               typeof(glUseProgram)*
 #   define PFNGLDELETEPROGRAMPROC            typeof(glDeleteProgram)*
 #   define PFNGLATTACHSHADERPROC             typeof(glAttachShader)*
+#   define PFNGLDETACHSHADERPROC             typeof(glDetachShader)*
 #   define PFNGLGENBUFFERSPROC               typeof(glGenBuffers)*
 #   define PFNGLBINDBUFFERPROC               typeof(glBindBuffer)*
 #   define PFNGLBUFFERDATAPROC               typeof(glBufferData)*
@@ -207,6 +208,7 @@ typedef struct {
     PFNGLSHADERSOURCEPROC   ShaderSource;
     PFNGLCOMPILESHADERPROC  CompileShader;
     PFNGLATTACHSHADERPROC   AttachShader;
+    PFNGLDETACHSHADERPROC   DetachShader;
     PFNGLDELETESHADERPROC   DeleteShader;
 
     /* Shader log commands */
