@@ -503,7 +503,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, vlc_tick_t i_pts )
         return NULL;
 
     p_spu->i_start    = i_pts;
-    p_spu->i_stop     = i_pts + 10000000;   /* 10s max */
+    p_spu->i_stop     = i_pts + VLC_TICK_FROM_SEC(10);   /* 10s max */
     p_spu->b_ephemer  = true;
     p_spu->b_absolute = false;
 

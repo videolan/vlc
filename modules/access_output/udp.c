@@ -367,7 +367,7 @@ static void* ThreadWrite( void *data )
         i_date = p_sys->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )
         {
-            if( i_date - i_date_last > 2000000 )
+            if( i_date - i_date_last > VLC_TICK_FROM_SEC(2) )
             {
                 if( !i_dropped_packets )
                     msg_Dbg( p_access, "mmh, hole (%"PRId64" > 2s) -> drop",

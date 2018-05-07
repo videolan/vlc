@@ -420,7 +420,7 @@ static void satip_teardown(void *data) {
     }
 }
 
-#define RECV_TIMEOUT 2 * 1000 * 1000
+#define RECV_TIMEOUT VLC_TICK_FROM_SEC(2)
 static void *satip_thread(void *data) {
     stream_t *access = data;
     access_sys_t *sys = access->p_sys;

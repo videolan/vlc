@@ -83,8 +83,8 @@ static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
     {   /* Loosy drain emulation */
         vlc_tick_t delay;
 
-        if (SUCCEEDED(aout_stream_TimeGet(s, &delay))
-         && delay <= INT64_C(5000000))
+        if (SUCCEEDED(aout_stream_TimeGet(s, &delay)) &&
+            delay <= VLC_TICK_FROM_SEC(5))
             Sleep(MS_FROM_VLC_TICK( delay ) + 1);
         return S_OK;
     }

@@ -174,7 +174,7 @@ static int Open ( vlc_object_t *p_this )
             if( p_sys->track[i].i_subtitles > 1 )
             {
                 if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
-                    p_sys->i_length = (int64_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + ( 1 *1000 *1000 );
+                    p_sys->i_length = (int64_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + VLC_TICK_FROM_SEC( 1 );
             }
         }
     }

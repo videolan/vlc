@@ -679,7 +679,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             else
             {
                 vlc_tick_t i_diff  = dts_fb_pts( p_next ) - dts_fb_pts( p_data );
-                if (i_diff < CLOCK_FREQ) /* protection */
+                if (i_diff < VLC_TICK_FROM_SEC(1)) /* protection */
                     p_data->i_length = i_diff;
             }
         }

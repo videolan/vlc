@@ -328,7 +328,7 @@ static void *Run( void *opaque )
     /* main loop */
     for (;;)
     {
-        vlc_tick_sleep( CLOCK_FREQ );
+        vlc_tick_sleep( VLC_TICK_FROM_SEC(1) );
 
         QueueIncomingRequests( p_sys );
 
