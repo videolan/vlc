@@ -685,7 +685,7 @@ static int DoDiseqc( vlc_object_t *p_access, dvb_sys_t *p_sys )
     }
 
     /* Wait for at least 15 ms. */
-    vlc_tick_sleep(15000);
+    vlc_tick_sleep(VLC_TICK_FROM_MS(15));
 
     i_val = var_GetInteger( p_access, "dvb-satno" );
     if( i_val > 0 && i_val < 5 )
@@ -724,7 +724,7 @@ static int DoDiseqc( vlc_object_t *p_access, dvb_sys_t *p_sys )
             return VLC_EGENERIC;
         }
 
-        vlc_tick_sleep(15000);
+        vlc_tick_sleep(VLC_TICK_FROM_MS(15));
     }
 
     if( ioctl( p_sys->i_frontend_handle, FE_SET_TONE, fe_tone ) )
@@ -735,7 +735,7 @@ static int DoDiseqc( vlc_object_t *p_access, dvb_sys_t *p_sys )
         return VLC_EGENERIC;
     }
 
-    vlc_tick_sleep(50000);
+    vlc_tick_sleep(VLC_TICK_FROM_MS(50));
     return 0;
 }
 

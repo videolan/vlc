@@ -112,7 +112,7 @@ void gst_vlc_dec_ensure_empty_queue( decoder_t *p_dec )
     while( p_sys->b_running && i_count < 60 &&
             gst_atomic_queue_length( p_sys->p_que ))
     {
-        vlc_tick_sleep ( 15000 );
+        vlc_tick_sleep ( VLC_TICK_FROM_MS(15) );
         i_count++;
     }
 

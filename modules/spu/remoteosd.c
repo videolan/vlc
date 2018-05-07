@@ -702,12 +702,11 @@ static void* update_request_thread( void *obj )
 {
     filter_t* p_filter = (filter_t*)obj;
     int canc = vlc_savecancel();
-    vlc_tick_t interval = var_InheritInteger( p_filter, RMTOSD_CFG "update" );
+    vlc_tick_t interval = VLC_TICK_FROM_MS( var_InheritInteger( p_filter, RMTOSD_CFG "update" ) );
     vlc_restorecancel(canc);
 
-    if( interval < 100 )
-        interval = 100;
-    interval *= 1000; /* ms -> µs */
+    if( interval < VLC_TICK_FROM_MS(100) )
+        interval = VLC_TICK_FROM_MS(100);
 
     do
         vlc_tick_sleep( interval );

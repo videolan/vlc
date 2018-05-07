@@ -843,7 +843,7 @@ known:
         cmd.msg[4] = cmd.msg[5] = 0; /* unused */
         cmd.msg_len = 4; /* length */
 
-        vlc_tick_sleep (15000); /* wait 15 ms before DiSEqC command */
+        vlc_tick_sleep (VLC_TICK_FROM_MS(15)); /* wait 15 ms before DiSEqC command */
         unsigned uncommitted = var_InheritInteger (d->obj, "dvb-uncommitted");
         if (uncommitted > 0)
         {
@@ -872,7 +872,7 @@ known:
                        vlc_strerror_c(errno));
               return -1;
           }
-          vlc_tick_sleep(125000); /* wait 125 ms before committed DiSEqC command */
+          vlc_tick_sleep(VLC_TICK_FROM_MS(125)); /* wait 125 ms before committed DiSEqC command */
         }
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
@@ -880,7 +880,7 @@ known:
                      vlc_strerror_c(errno));
             return -1;
         }
-        vlc_tick_sleep (54000 + 15000);
+        vlc_tick_sleep (VLC_TICK_FROM_MS(54 + 15));
 
         /* Mini-DiSEqC */
         satno &= 1;
@@ -891,7 +891,7 @@ known:
                      vlc_strerror_c(errno));
             return -1;
         }
-        vlc_tick_sleep (15000);
+        vlc_tick_sleep (VLC_TICK_FROM_MS(15));
     }
 
     /* Continuous tone (to select high oscillator frequency) */

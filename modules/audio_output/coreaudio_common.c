@@ -248,7 +248,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
             /* Calculate the duration of the circular buffer, in order to wait
              * for the render thread to play it all */
             const vlc_tick_t i_frame_us =
-                FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + 10000;
+                FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + VLC_TICK_FROM_MS(10);
             lock_unlock(p_sys);
             vlc_tick_sleep(i_frame_us);
             lock_lock(p_sys);

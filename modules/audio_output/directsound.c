@@ -1138,7 +1138,7 @@ static void * PlayedDataEraser( void * data )
             tosleep = ( tosleep / p_sys->i_bytes_per_sample ) * CLOCK_FREQ / p_sys->i_rate;
         }
 
-        tosleep = __MAX( tosleep, 20000 );
+        tosleep = __MAX( tosleep, VLC_TICK_FROM_MS(20) );
         dsresult = IDirectSoundBuffer_Lock( p_sys->p_dsbuffer,
                                             p_sys->i_write,
                                             toerase,
