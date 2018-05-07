@@ -92,13 +92,13 @@ static tt_time_t tt_ParseTime( const char *s )
         sscanf( s, "%u:%2u:%2u",         &h1, &m1, &s1          ) == 3 ||
                            tt_ScanReset( &h1, &m1, &s1, &c, &d1 ) )
     {
-        t.base = CLOCK_FREQ * (h1 * 3600 + m1 * 60 + s1);
+        t.base = vlc_tick_from_sec(h1 * 3600 + m1 * 60 + s1);
         if( c == '.' && d1 > 0 )
         {
             unsigned i_den = 1;
             for( const char *p = strchr( s, '.' ) + 1; *p && (i_den < UINT_MAX / 10); p++ )
                 i_den *= 10;
-            t.base += CLOCK_FREQ * d1 / i_den;
+            t.base += vlc_tick_from_sec(d1) / i_den;
         }
         else if( c == ':' )
         {
@@ -116,15 +116,15 @@ static tt_time_t tt_ParseTime( const char *s )
                 if( *(psz_end + 1) == 's' )
                     t.base = VLC_TICK_FROM_MS(v);
                 else
-                    t.base = CLOCK_FREQ * 60 * v;
+                    t.base = vlc_tick_from_sec(60 * v);
             }
             else if( *psz_end == 's' )
             {
-                t.base = CLOCK_FREQ * v;
+                t.base = vlc_tick_from_sec(v);
             }
             else if( *psz_end == 'h' )
             {
-                t.base = CLOCK_FREQ * v * 3600;
+                t.base = vlc_tick_from_sec(v * 3600);
             }
             else if( *psz_end == 'f' )
             {

@@ -89,9 +89,9 @@ struct webvtt_text_parser_t
 
 static vlc_tick_t MakeTime( unsigned t[4] )
 {
-    return VLC_TICK_FROM_SEC(t[0] * 3600)+
-           VLC_TICK_FROM_SEC(t[1] * 60)+
-           VLC_TICK_FROM_SEC(t[2]) +
+    return vlc_tick_from_sec(t[0] * 3600)+
+           vlc_tick_from_sec(t[1] * 60)+
+           vlc_tick_from_sec(t[2]) +
            VLC_TICK_FROM_MS(t[3]);
 }
 

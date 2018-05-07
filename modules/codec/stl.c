@@ -248,7 +248,7 @@ static void GroupApplyStyle(stl_sg_t *p_group, uint8_t code)
 
 static int64_t ParseTimeCode(const uint8_t *data, double fps)
 {
-    return CLOCK_FREQ * (data[0] * 3600 +
+    return vlc_tick_from_sec( data[0] * 3600 +
                          data[1] *   60 +
                          data[2] *    1 +
                          data[3] /  fps);
