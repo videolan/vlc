@@ -736,8 +736,8 @@ static logo_t *LogoListNext( logo_list_t *p_list, vlc_tick_t i_date )
 
     logo_t *p_logo = LogoListCurrent( p_list );
 
-    p_list->i_next_pic = i_date + ( p_logo->i_delay != -1 ?
-                          p_logo->i_delay : p_list->i_delay ) * 1000;
+    p_list->i_next_pic = i_date + VLC_TICK_FROM_MS( p_logo->i_delay != -1 ?
+                          p_logo->i_delay : p_list->i_delay );
     return p_logo;
 }
 /**

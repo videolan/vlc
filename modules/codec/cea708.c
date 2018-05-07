@@ -1377,7 +1377,7 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
         case CEA708_C1_DLY:
             REQUIRE_ARGS_AND_POP_COMMAND(1);
             p_cea708->suspended_deadline = p_cea708->i_clock +
-                    cea708_input_buffer_get( ib ) * 100 * 1000;
+                    VLC_TICK_FROM_MS( cea708_input_buffer_get( ib ) * 100 );
             Debug(printf("[DLY]"));
             break;
         case CEA708_C1_DLC:

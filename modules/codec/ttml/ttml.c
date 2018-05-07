@@ -114,7 +114,7 @@ static tt_time_t tt_ParseTime( const char *s )
             if( *psz_end == 'm' )
             {
                 if( *(psz_end + 1) == 's' )
-                    t.base = 1000 * v;
+                    t.base = VLC_TICK_FROM_MS(v);
                 else
                     t.base = CLOCK_FREQ * 60 * v;
             }

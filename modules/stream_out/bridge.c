@@ -397,7 +397,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_sys->i_id_offset = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "delay", &val );
-    p_sys->i_delay = (vlc_tick_t)val.i_int * 1000;
+    p_sys->i_delay = VLC_TICK_FROM_MS(val.i_int);
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "name", &val );
     if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
@@ -417,7 +417,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_sys->i_state = placeholder_on;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
-    p_sys->i_placeholder_delay = (vlc_tick_t)val.i_int * 1000;
+    p_sys->i_placeholder_delay = VLC_TICK_FROM_MS(val.i_int);
 
     p_sys->i_last_video = VLC_TICK_INVALID;
     p_sys->i_last_audio = VLC_TICK_INVALID;

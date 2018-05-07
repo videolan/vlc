@@ -978,7 +978,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     id->b_first_packet = true;
     id->i_caching =
-        (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
+        VLC_TICK_FROM_MS(var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching"));
 
     vlc_rand_bytes (&id->i_sequence, sizeof (id->i_sequence));
     vlc_rand_bytes (id->ssrc, sizeof (id->ssrc));

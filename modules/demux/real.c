@@ -305,7 +305,7 @@ static int Demux( demux_t *p_demux )
     //const int i_version = GetWBE( &header[0] );
     const size_t  i_size = GetWBE( &header[2] ) - 12;
     const int     i_id   = GetWBE( &header[4] );
-    const int64_t i_pts  = VLC_TICK_0 + 1000 * GetDWBE( &header[6] );
+    const vlc_tick_t i_pts  = VLC_TICK_0 + VLC_TICK_FROM_MS(GetDWBE( &header[6] ));
     const int     i_flags= header[11]; /* flags 0x02 -> keyframe */
 
     p_sys->i_data_packets++;

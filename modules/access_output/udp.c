@@ -202,8 +202,8 @@ static int Open( vlc_object_t *p_this )
     }
     shutdown( i_handle, SHUT_RD );
 
-    p_sys->i_caching = UINT64_C(1000)
-                     * var_GetInteger( p_access, SOUT_CFG_PREFIX "caching");
+    p_sys->i_caching = VLC_TICK_FROM_MS(
+                     var_GetInteger( p_access, SOUT_CFG_PREFIX "caching") );
     p_sys->i_handle = i_handle;
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
     p_sys->b_mtu_warning = false;

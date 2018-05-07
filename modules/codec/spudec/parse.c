@@ -215,7 +215,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             b_cmd_offset = false;
             b_cmd_alpha = false;
             /* Get the control sequence date */
-            date = (vlc_tick_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
+            date = VLC_TICK_FROM_MS(GetWBE( &p_sys->buffer[i_index] ) * 11);
 
             /* Next offset */
             i_cur_seq = i_index;

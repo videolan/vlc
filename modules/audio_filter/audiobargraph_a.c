@@ -97,9 +97,9 @@ typedef struct
     bool            bargraph;
     int             bargraph_repetition;
     bool            silence;
-    int64_t         time_window;
+    vlc_tick_t      time_window;
     float           alarm_threshold;
-    int64_t         repetition_time;
+    vlc_tick_t      repetition_time;
     int             counter;
     ValueDate_t*    first;
     ValueDate_t*    last;
@@ -126,9 +126,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->bargraph = !!var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph");
     p_sys->bargraph_repetition = var_CreateGetInteger(p_filter, CFG_PREFIX "bargraph_repetition");
     p_sys->silence = !!var_CreateGetInteger(p_filter, CFG_PREFIX "silence");
-    p_sys->time_window = var_CreateGetInteger(p_filter, CFG_PREFIX "time_window") * 1000;
+    p_sys->time_window = VLC_TICK_FROM_MS( var_CreateGetInteger(p_filter, CFG_PREFIX "time_window") );
     p_sys->alarm_threshold = var_CreateGetFloat(p_filter, CFG_PREFIX "alarm_threshold");
-    p_sys->repetition_time = var_CreateGetInteger(p_filter, CFG_PREFIX "repetition_time") * 1000;
+    p_sys->repetition_time = VLC_TICK_FROM_MS( var_CreateGetInteger(p_filter, CFG_PREFIX "repetition_time") );
     p_sys->counter = 0;
     p_sys->first = NULL;
     p_sys->last = NULL;

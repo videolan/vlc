@@ -713,7 +713,7 @@ static int DoDiseqc( vlc_object_t *p_access, dvb_sys_t *p_sys )
             return VLC_EGENERIC;
         }
 
-        vlc_tick_sleep(15000 + cmd.wait * 1000);
+        vlc_tick_sleep(VLC_TICK_FROM_MS(15 + cmd.wait));
 
         /* A or B simple diseqc ("diseqc-compatible") */
         if( ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
