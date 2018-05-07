@@ -51,6 +51,8 @@
 #include <vlc_iso_lang.h>
 #include <vlc_fs.h>
 
+#include "../demux/mpeg/timestamps.h"
+
 /* FIXME we should find a better way than including that */
 #include "../../src/text/iso-639_def.h"
 
@@ -285,8 +287,6 @@ static void  onMouseEvent(const vlc_mouse_t *mouse, void *user_data);
 static void  blurayResetParser(demux_t *p_demux);
 static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
-#define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
-#define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
 #define CURRENT_TITLE p_sys->pp_title[p_sys->cur_title]
 #define CUR_LENGTH    CURRENT_TITLE->i_length
 
@@ -1674,7 +1674,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
 
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
 {
-    t->i_length = FROM_TICKS(title_info->duration);
+    t->i_length = FROM_SCALE_NZ(title_info->duration);
 
     for (int i = 0; i < t->i_seekpoint; i++)
         vlc_seekpoint_Delete( t->seekpoint[i] );
@@ -1685,7 +1685,7 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
         if (!s) {
             break;
         }
-        s->i_time_offset = FROM_TICKS(title_info->chapters[j].start);
+        s->i_time_offset = FROM_SCALE_NZ(title_info->chapters[j].start);
 
         TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
     }
@@ -1942,7 +1942,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_TIME:
     {
         int64_t i_time = va_arg(args, int64_t);
-        bd_seek_time(p_sys->bluray, TO_TICKS(i_time));
+        bd_seek_time(p_sys->bluray, TO_SCALE_NZ(i_time));
         notifyDiscontinuity( p_sys );
         return VLC_SUCCESS;
     }
@@ -1952,7 +1952,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if(p_sys->cur_title < p_sys->i_title &&
            (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
                 return VLC_EGENERIC;
-        *pi_time = (int64_t)FROM_TICKS(bd_tell_time(p_sys->bluray));
+        *pi_time = (vlc_tick_t)FROM_SCALE_NZ(bd_tell_time(p_sys->bluray));
         return VLC_SUCCESS;
     }
 
@@ -1963,13 +1963,13 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
            (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
                 return VLC_EGENERIC;
         *pf_position = p_sys->cur_title < p_sys->i_title && CUR_LENGTH > 0 ?
-                      (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
+                      (double)FROM_SCALE_NZ(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
         return VLC_SUCCESS;
     }
     case DEMUX_SET_POSITION:
     {
         double f_position = va_arg(args, double);
-        bd_seek_time(p_sys->bluray, TO_TICKS(f_position*CUR_LENGTH));
+        bd_seek_time(p_sys->bluray, TO_SCALE_NZ(f_position*CUR_LENGTH));
         notifyDiscontinuity( p_sys );
         return VLC_SUCCESS;
     }
