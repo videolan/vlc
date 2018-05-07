@@ -285,6 +285,10 @@ static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
 #define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
 #define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
+
+#define STILL_IMAGE_NOT_SET    0
+#define STILL_IMAGE_INFINITE  -1
+
 #define CURRENT_TITLE p_sys->pp_title[p_demux->info.i_title]
 #define CUR_LENGTH    CURRENT_TITLE->i_length
 
@@ -667,7 +671,7 @@ static int blurayOpen(vlc_object_t *object)
     p_sys->i_audio_stream_idx = -1;
     p_sys->i_spu_stream_idx = -1;
     p_sys->i_video_stream = -1;
-    p_sys->i_still_end_time = 0;
+    p_sys->i_still_end_time = STILL_IMAGE_NOT_SET;
 
     /* init demux info fields */
     p_demux->info.i_update    = 0;
@@ -2160,8 +2164,8 @@ static void blurayResetStillImage( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if (p_sys->i_still_end_time) {
-        p_sys->i_still_end_time = 0;
+    if (p_sys->i_still_end_time != STILL_IMAGE_NOT_SET) {
+        p_sys->i_still_end_time = STILL_IMAGE_NOT_SET;
 
         blurayResetParser(p_demux);
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
@@ -2173,7 +2177,9 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* time period elapsed ? */
-    if (p_sys->i_still_end_time > 0 && p_sys->i_still_end_time <= mdate()) {
+    if (p_sys->i_still_end_time != STILL_IMAGE_NOT_SET &&
+        p_sys->i_still_end_time != STILL_IMAGE_INFINITE &&
+        p_sys->i_still_end_time <= mdate()) {
         msg_Dbg(p_demux, "Still image end");
         bd_read_skip_still(p_sys->bluray);
 
@@ -2182,13 +2188,13 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     }
 
     /* show last frame as still image */
-    if (!p_sys->i_still_end_time) {
+    if (p_sys->i_still_end_time == STILL_IMAGE_NOT_SET) {
         if (i_timeout) {
             msg_Dbg(p_demux, "Still image (%d seconds)", i_timeout);
             p_sys->i_still_end_time = mdate() + i_timeout * CLOCK_FREQ;
         } else {
             msg_Dbg(p_demux, "Still image (infinite)");
-            p_sys->i_still_end_time = -1;
+            p_sys->i_still_end_time = STILL_IMAGE_INFINITE;
         }
 
         /* flush demuxer and decoder (there won't be next video packet starting with ts PUSI) */
