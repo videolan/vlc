@@ -318,7 +318,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         i64 = f * p_sys->i_length;
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
-            ModPlug_Seek( p_sys->f, i64 / 1000 );
+            ModPlug_Seek( p_sys->f, MS_FROM_VLC_TICK(i64) );
             date_Set( &p_sys->pts, VLC_TICK_0 + i64 );
 
             return VLC_SUCCESS;
