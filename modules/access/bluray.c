@@ -391,8 +391,6 @@ static int   onIntfEvent(vlc_object_t *, char const *,
 static void  blurayRestartParser(demux_t *p_demux, bool, bool);
 static void  notifyDiscontinuityToParser( demux_sys_t *p_sys );
 
-#define FROM_TICKS(a) ((a)*CLOCK_FREQ / INT64_C(90000))
-#define TO_TICKS(a)   ((a)*INT64_C(90000)/CLOCK_FREQ)
 
 #define STILL_IMAGE_NOT_SET    0
 #define STILL_IMAGE_INFINITE  -1
@@ -2067,7 +2065,7 @@ static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
 
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
 {
-    t->i_length = FROM_TICKS(title_info->duration);
+    t->i_length = FROM_SCALE_NZ(title_info->duration);
 
     for (int i = 0; i < t->i_seekpoint; i++)
         vlc_seekpoint_Delete( t->seekpoint[i] );
@@ -2082,7 +2080,7 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
         if (!s) {
             break;
         }
-        s->i_time_offset = FROM_TICKS(title_info->chapters[j].start);
+        s->i_time_offset = FROM_SCALE_NZ(title_info->chapters[j].start);
 
         TAB_APPEND(t->i_seekpoint, t->seekpoint, s);
     }
@@ -2371,7 +2369,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_TIME:
     {
         int64_t i_time = va_arg(args, int64_t);
-        bd_seek_time(p_sys->bluray, TO_TICKS(i_time));
+        bd_seek_time(p_sys->bluray, TO_SCALE_NZ(i_time));
         blurayRestartParser(p_demux, true, true);
         notifyDiscontinuityToParser(p_sys);
         p_sys->b_draining = false;
@@ -2384,7 +2382,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if( p_demux->info.i_title < (int) p_sys->i_title &&
            (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
                 return VLC_EGENERIC;
-        *pi_time = (int64_t)FROM_TICKS(bd_tell_time(p_sys->bluray));
+        *pi_time = (vlc_tick_t)FROM_SCALE_NZ(bd_tell_time(p_sys->bluray));
         return VLC_SUCCESS;
     }
 
@@ -2395,13 +2393,13 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
            (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
                 return VLC_EGENERIC;
         *pf_position = p_demux->info.i_title < (int) p_sys->i_title && CUR_LENGTH > 0 ?
-                      (double)FROM_TICKS(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
+                      (double)FROM_SCALE_NZ(bd_tell_time(p_sys->bluray))/CUR_LENGTH : 0.0;
         return VLC_SUCCESS;
     }
     case DEMUX_SET_POSITION:
     {
         double f_position = va_arg(args, double);
-        bd_seek_time(p_sys->bluray, TO_TICKS(f_position*CUR_LENGTH));
+        bd_seek_time(p_sys->bluray, TO_SCALE_NZ(f_position*CUR_LENGTH));
         blurayRestartParser(p_demux, true, true);
         notifyDiscontinuityToParser(p_sys);
         p_sys->b_draining = false;
