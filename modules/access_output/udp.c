@@ -379,7 +379,7 @@ static void* ThreadWrite( void *data )
                 i_dropped_packets++;
                 continue;
             }
-            else if( i_date - i_date_last < -1000 )
+            else if( i_date - i_date_last < VLC_TICK_FROM_MS(-1) )
             {
                 if( !i_dropped_packets )
                     msg_Dbg( p_access, "mmh, packets in the past (%"PRId64")",
@@ -406,7 +406,7 @@ static void* ThreadWrite( void *data )
 
 #if 1
         i_sent = vlc_tick_now();
-        if ( i_sent > i_date + 20000 )
+        if ( i_sent > i_date + VLC_TICK_FROM_MS(20) )
         {
             msg_Dbg( p_access, "packet has been sent too late (%"PRId64 ")",
                      i_sent - i_date );

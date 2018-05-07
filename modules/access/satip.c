@@ -740,7 +740,7 @@ static int satip_open(vlc_object_t *obj)
 
     /* Extra sleep for compatibility with some satip servers, that
      * can't handle PLAY right after SETUP */
-    if (vlc_msleep_i11e(50000) < 0)
+    if (vlc_msleep_i11e(VLC_TICK_FROM_MS(50)) < 0)
         goto error;
 
     /* Open UDP socket for reading if not done */

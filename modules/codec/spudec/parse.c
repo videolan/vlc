@@ -425,7 +425,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
-        p_spu->i_stop = p_spu->i_start + (vlc_tick_t)500 * 11000;
+        p_spu->i_stop = p_spu->i_start + VLC_TICK_FROM_MS(500 * 11);
         p_spu->b_ephemer = true;
     }
 

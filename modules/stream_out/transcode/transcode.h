@@ -3,7 +3,7 @@
 #include <vlc_codec.h>
 
 /*100ms is around the limit where people are noticing lipsync issues*/
-#define MASTER_SYNC_MAX_DRIFT 100000
+#define MASTER_SYNC_MAX_DRIFT VLC_TICK_FROM_MS(100)
 
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 

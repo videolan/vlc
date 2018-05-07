@@ -2046,7 +2046,7 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_subpic )
         p_block_stop->i_buffer = bs_pos( s ) / 8;
         p_block_stop->i_pts = p_block_stop->i_dts = p_subpic->i_stop;
         block_ChainAppend( &p_block, p_block_stop );
-        p_block_stop->i_length = 100000; /* p_subpic->i_stop - p_subpic->i_start; */
+        p_block_stop->i_length = VLC_TICK_FROM_MS(100); /* p_subpic->i_stop - p_subpic->i_start; */
     }
 #ifdef DEBUG_DVBSUB
     msg_Dbg( p_enc, "subpicture encoded properly" );
