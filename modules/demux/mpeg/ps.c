@@ -310,7 +310,7 @@ static int Probe( demux_t *p_demux, bool b_end )
         if( !ps_pkt_parse_pes( VLC_OBJECT(p_demux), p_pkt, tk->i_skip ) &&
              p_pkt->i_pts != VLC_TICK_INVALID )
         {
-            if( b_end && p_pkt->i_pts > tk->i_last_pts )
+            if( b_end && (tk->i_last_pts == VLC_TICK_INVALID || p_pkt->i_pts > tk->i_last_pts) )
             {
                 tk->i_last_pts = p_pkt->i_pts;
             }

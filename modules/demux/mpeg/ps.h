@@ -79,7 +79,7 @@ static inline void ps_track_init( ps_track_t tk[PS_TK_COUNT] )
         tk[i].i_next_block_flags = 0;
         tk[i].es     = NULL;
         tk[i].i_first_pts = VLC_TICK_INVALID;
-        tk[i].i_last_pts = -1;
+        tk[i].i_last_pts = VLC_TICK_INVALID;
         es_format_Init( &tk[i].fmt, UNKNOWN_ES, 0 );
     }
 }
