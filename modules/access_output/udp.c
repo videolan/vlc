@@ -390,7 +390,7 @@ static void* ThreadWrite( void *data )
     mtime_t i_date_last = -1;
     const unsigned i_group = var_GetInteger( p_access,
                                              SOUT_CFG_PREFIX "group" );
-    mtime_t i_to_send = i_group;
+    int i_to_send = i_group;
     unsigned i_dropped_packets = 0;
 
     for (;;)
