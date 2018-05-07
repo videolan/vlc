@@ -47,10 +47,10 @@ GLint opengl_debug_CreateProgram(opengl_vtable_t vt)
     static GLuint fragment_shader = 0;
     static GLuint program = 0;
 
-    if (!vertex_shader || !fragment_shader || !program)
+    if (!program)
     {
         vertex_shader = vt.CreateShader(GL_VERTEX_SHADER);
-        GLuint fragment_shader = vt.CreateShader(GL_FRAGMENT_SHADER);
+        fragment_shader = vt.CreateShader(GL_FRAGMENT_SHADER);
 
         vt.ShaderSource(vertex_shader, 1, &psz_vertex_shader, NULL);
         vt.ShaderSource(fragment_shader, 1, &psz_fragment_shader, NULL);
@@ -82,6 +82,12 @@ GLint opengl_debug_CreateProgram(opengl_vtable_t vt)
         {
             return 0;
         }
+
+        vt.DetachShader(program, vertex_shader);
+        vt.DetachShader(program, fragment_shader);
+
+        vt.DeleteShader(vertex_shader);
+        vt.DeleteShader(fragment_shader);
     }
 
     return program;
