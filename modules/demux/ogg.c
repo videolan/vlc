@@ -1481,7 +1481,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
             /* FIXME: the biggest hack I've ever done */
             msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
                       p_block->i_pts, p_block->i_dts );
-            msleep(10000);
+            msleep(VLC_HARD_MIN_SLEEP);
         }
 
         /* Blatant abuse of the i_length field. */

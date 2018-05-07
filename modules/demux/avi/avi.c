@@ -1186,7 +1186,7 @@ static int Demux_Seekable( demux_t *p_demux )
                      * affect the reading speed too much. */
                     if( !(++i_loop_count % 1024) )
                     {
-                        msleep( 10000 );
+                        msleep( VLC_HARD_MIN_SLEEP );
 
                         if( !(i_loop_count % (1024 * 10)) )
                             msg_Warn( p_demux,
@@ -1919,7 +1919,7 @@ static int AVI_StreamChunkFind( demux_t *p_demux, unsigned int i_stream )
              * affect the reading speed too much. */
             if( !(++i_loop_count % 1024) )
             {
-                msleep( 10000 );
+                msleep( VLC_HARD_MIN_SLEEP );
 
                 if( !(i_loop_count % (1024 * 10)) )
                     msg_Warn( p_demux, "don't seem to find any data..." );
@@ -2338,7 +2338,7 @@ static int AVI_PacketSearch( demux_t *p_demux )
          * this code is called only on broken files). */
         if( !(++i_count % 1024) )
         {
-            msleep( 10000 );
+            msleep( VLC_HARD_MIN_SLEEP );
             if( !(i_count % (1024 * 10)) )
                 msg_Warn( p_demux, "trying to resync..." );
         }

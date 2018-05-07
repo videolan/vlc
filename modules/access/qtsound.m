@@ -516,7 +516,7 @@ static int Demux(demux_t *p_demux)
             block_Release(p_blocka);
 
             // Nothing to transfer yet, just forget
-            msleep(10000);
+            msleep(VLC_HARD_MIN_SLEEP);
             return 1;
         }
 
