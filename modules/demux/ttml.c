@@ -255,7 +255,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             else if( p_sys->times.i_count > 0 )
             {
                 i64 = tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_count - 1] );
-                *pf = (double) p_sys->i_next_demux_time / (i64 + 0.5);
+                *pf = (double) p_sys->i_next_demux_time / (i64 + VLC_TICK_FROM_MS(500));
             }
             else
             {

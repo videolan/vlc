@@ -459,7 +459,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else if( p_sys->index.i_count > 0 )
             {
                 *pf = (double) p_sys->i_next_demux_time /
-                      (p_sys->i_length + 0.5);
+                      (p_sys->i_length + VLC_TICK_FROM_MS(500));
             }
             else
             {
