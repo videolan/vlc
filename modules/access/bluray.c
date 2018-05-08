@@ -269,7 +269,7 @@ static const char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static es_out_t *esOutNew(demux_t *p_demux);
+static es_out_t *esOutNew(vlc_object_t*, es_out_t *, void *);
 
 static int   blurayControl(demux_t *, int, va_list);
 static int   blurayDemux(demux_t *);
@@ -840,7 +840,7 @@ static int blurayOpen(vlc_object_t *object)
     }
 
     vlc_array_init(&p_sys->es);
-    p_sys->p_out = esOutNew(p_demux);
+    p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), p_demux->out, p_demux);
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
@@ -925,7 +925,9 @@ static void blurayClose(vlc_object_t *object)
 
 typedef struct
 {
-    demux_t *p_demux;
+    es_out_t *p_dst_out;
+    vlc_object_t *p_obj;
+    void *priv;
 } es_out_sys_t;
 
 typedef struct  fmt_es_pair {
@@ -1005,7 +1007,7 @@ static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
 static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
     es_out_sys_t *es_out_sys = p_out->p_sys;
-    demux_t *p_demux = es_out_sys->p_demux;
+    demux_t *p_demux = es_out_sys->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
     bool b_select = false;
@@ -1066,15 +1068,14 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 static int esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block)
 {
     es_out_sys_t *es_out_sys = p_out->p_sys;
-    demux_t *p_demux = es_out_sys->p_demux;
 
-    return es_out_Send(p_demux->out, p_es, p_block);
+    return es_out_Send(es_out_sys->p_dst_out, p_es, p_block);
 }
 
 static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
     es_out_sys_t *es_out_sys = p_out->p_sys;
-    demux_t *p_demux = es_out_sys->p_demux;
+    demux_t *p_demux = es_out_sys->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     int idx = findEsPairIndexByEs(p_sys, p_es);
@@ -1082,21 +1083,20 @@ static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
         free(vlc_array_item_at_index(&p_sys->es, idx));
         vlc_array_remove(&p_sys->es, idx);
     }
-    es_out_Del(p_demux->out, p_es);
+    es_out_Del(es_out_sys->p_dst_out, p_es);
 }
 
 static int esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
     es_out_sys_t *es_out_sys = p_out->p_sys;
-    demux_t *p_demux = es_out_sys->p_demux;
 
-    return es_out_vaControl(p_demux->out, i_query, args);
+    return es_out_vaControl(es_out_sys->p_dst_out, i_query, args);
 }
 
 static void esOutDestroy(es_out_t *p_out)
 {
     es_out_sys_t *es_out_sys = p_out->p_sys;
-    demux_t *p_demux = es_out_sys->p_demux;
+    demux_t *p_demux = es_out_sys->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
@@ -1106,12 +1106,8 @@ static void esOutDestroy(es_out_t *p_out)
     free(p_out);
 }
 
-static es_out_t *esOutNew(demux_t *p_demux)
+static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
 {
-#ifndef NDEBUG
-    demux_sys_t *p_sys = p_demux->p_sys;
-    assert(vlc_array_count(&p_sys->es) == 0);
-#endif
     es_out_t    *p_out = malloc(sizeof(*p_out));
     if (unlikely(p_out == NULL))
         return NULL;
@@ -1128,7 +1124,9 @@ static es_out_t *esOutNew(demux_t *p_demux)
         return NULL;
     }
     p_out->p_sys = es_out_sys;
-    es_out_sys->p_demux = p_demux;
+    es_out_sys->p_dst_out = p_dst_out;
+    es_out_sys->p_obj = p_obj;
+    es_out_sys->priv = priv;
     return p_out;
 }
 
