@@ -233,7 +233,8 @@ endif
 access_LTLIBRARIES += $(LTLIBdvdnav)
 EXTRA_LTLIBRARIES += libdvdnav_plugin.la
 
-libdvdread_plugin_la_SOURCES = access/dvdread.c demux/mpeg/ps.h demux/mpeg/pes.h
+libdvdread_plugin_la_SOURCES = access/dvdread.c demux/mpeg/ps.h demux/mpeg/pes.h \
+                               demux/moving_avg.h demux/timestamps_filter.h
 libdvdread_plugin_la_CFLAGS = $(AM_CFLAGS) $(DVDREAD_CFLAGS)
 libdvdread_plugin_la_LIBADD = $(DVDREAD_LIBS)
 libdvdread_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
