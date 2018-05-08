@@ -52,6 +52,7 @@
 #include <vlc_fs.h>
 
 #include "../demux/mpeg/timestamps.h"
+#include "../demux/timestamps_filter.h"
 
 /* FIXME we should find a better way than including that */
 #include "../../src/text/iso-639_def.h"
@@ -207,6 +208,7 @@ typedef struct
     es_out_id_t         *p_video_es;
 
     /* TS stream */
+    es_out_t            *p_tf_out;
     es_out_t            *p_out;
     bool                b_spu_enable;       /* enabled / disabled */
     vlc_demux_chained_t *p_parser;
@@ -936,7 +938,11 @@ static int blurayOpen(vlc_object_t *object)
         }
     }
 
-    p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), p_demux->out, p_demux);
+    p_sys->p_tf_out = timestamps_filter_es_out_New(p_demux->out);
+    if(unlikely(!p_sys->p_tf_out))
+        goto error;
+
+    p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), p_sys->p_tf_out, p_demux);
     if (unlikely(p_sys->p_out == NULL))
         goto error;
 
@@ -994,7 +1000,11 @@ static void blurayClose(vlc_object_t *object)
 
     if (p_sys->p_parser)
         vlc_demux_chained_Delete(p_sys->p_parser);
-    es_out_Delete(p_sys->p_out);
+
+    if (p_sys->p_out != NULL)
+        es_out_Delete(p_sys->p_out);
+    if(p_sys->p_tf_out)
+        timestamps_filter_es_out_Delete(p_sys->p_tf_out);
 
     /* Titles */
     for (unsigned int i = 0; i < p_sys->i_title; i++)
@@ -1968,6 +1978,9 @@ static void blurayRestartParser(demux_t *p_demux, bool b_flush)
     if (p_sys->p_parser)
         vlc_demux_chained_Delete(p_sys->p_parser);
 
+    if(b_flush)
+        es_out_Control(p_sys->p_tf_out, ES_OUT_TF_FILTER_RESET);
+
     p_sys->p_parser = vlc_demux_chained_New(VLC_OBJECT(p_demux), "ts", p_sys->p_out);
     if (!p_sys->p_parser)
         msg_Err(p_demux, "Failed to create TS demuxer");
@@ -2565,6 +2578,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         p_sys->b_pl_playing = true;
         break;
     case BD_EVENT_PLAYITEM:
+        notifyDiscontinuityToParser(p_sys);
         blurayUpdateCurrentClip(p_demux, e->param);
         break;
     case BD_EVENT_CHAPTER:
