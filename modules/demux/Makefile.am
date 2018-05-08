@@ -221,6 +221,7 @@ demux_LTLIBRARIES += libmpgv_plugin.la
 libplaylist_plugin_la_SOURCES = \
 	demux/playlist/asx.c \
 	demux/playlist/b4s.c \
+	demux/playlist/bdmv.c \
 	demux/playlist/dvb.c \
 	demux/playlist/ifo.c \
 	demux/playlist/itml.c \
