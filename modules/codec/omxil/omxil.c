@@ -188,6 +188,7 @@ static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
 static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                        es_format_t *p_fmt)
 {
+    decoder_sys_t *p_sys = p_dec->p_sys;
     OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
     OMX_ERRORTYPE omx_error;
 
@@ -208,9 +209,9 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             def->format.video.xFramerate = (p_fmt->video.i_frame_rate << 16) /
                 p_fmt->video.i_frame_rate_base;
 
-        if(def->eDir == OMX_DirInput || p_dec->p_sys->b_enc)
+        if(def->eDir == OMX_DirInput || p_sys->b_enc)
         {
-            if (def->eDir == OMX_DirInput && p_dec->p_sys->b_enc)
+            if (def->eDir == OMX_DirInput && p_sys->b_enc)
                 def->nBufferSize = def->format.video.nFrameWidth *
                   def->format.video.nFrameHeight * 2;
             p_port->i_frame_size = def->nBufferSize;
@@ -320,7 +321,7 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             omx_error = OMX_ErrorNone;
         }
     }
-    if (!strcmp(p_dec->p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER") &&
+    if (!strcmp(p_sys->psz_component, "OMX.TI.DUCATI1.VIDEO.DECODER") &&
                 def->eDir == OMX_DirOutput)
     {
         /* When setting the output buffer size above, the decoder actually
@@ -616,7 +617,7 @@ static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                 pi_channels_maps[p_fmt->audio.i_channels];
         }
 
-        date_Init( &p_dec->p_sys->end_date, p_fmt->audio.i_rate, 1 );
+        date_Init( &p_sys->end_date, p_fmt->audio.i_rate, 1 );
 
         break;
 
@@ -1122,8 +1123,8 @@ static int OpenGeneric( vlc_object_t *p_this, bool b_encode )
     omx_error = GetPortDefinition(p_dec, &p_sys->out, p_sys->out.p_fmt);
     if(omx_error != OMX_ErrorNone) goto error;
 
-    PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->in.i_port_index);
-    PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->out.i_port_index);
+    PrintOmx(p_dec, p_sys->omx_handle, p_sys->in.i_port_index);
+    PrintOmx(p_dec, p_sys->omx_handle, p_sys->out.i_port_index);
 
     if(p_sys->b_error) goto error;
 
@@ -1151,7 +1152,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     /* Sanity checking */
     OMX_INIT_STRUCTURE(definition);
     definition.nPortIndex = p_port->i_port_index;
-    omx_error = OMX_GetParameter(p_dec->p_sys->omx_handle, OMX_IndexParamPortDefinition,
+    omx_error = OMX_GetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition,
                                  &definition);
     if(omx_error != OMX_ErrorNone || (p_dec->fmt_in.i_cat == VIDEO_ES &&
        (!definition.format.video.nFrameWidth ||
@@ -1187,7 +1188,7 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
          * Only skipping this for audio codecs, to minimize the
          * change for current working configurations for video.
          */
-        omx_error = OMX_SetParameter(p_dec->p_sys->omx_handle, OMX_IndexParamPortDefinition,
+        omx_error = OMX_SetParameter(p_sys->omx_handle, OMX_IndexParamPortDefinition,
                                      &definition);
         CHECK_ERROR(omx_error, "OMX_SetParameter failed (%x : %s)",
                     omx_error, ErrorToString(omx_error));
@@ -1205,8 +1206,8 @@ static OMX_ERRORTYPE PortReconfigure(decoder_t *p_dec, OmxPort *p_port)
     omx_error = WaitForSpecificOmxEvent(&p_sys->event_queue, OMX_EventCmdComplete, 0, 0, 0);
     CHECK_ERROR(omx_error, "Wait for PortEnable failed (%x)", omx_error );
 
-    PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->in.i_port_index);
-    PrintOmx(p_dec, p_sys->omx_handle, p_dec->p_sys->out.i_port_index);
+    PrintOmx(p_dec, p_sys->omx_handle, p_sys->in.i_port_index);
+    PrintOmx(p_dec, p_sys->omx_handle, p_sys->out.i_port_index);
 
     OMX_DBG( "PortReconfigure(%d)::done", p_port->definition.eDir );
  error:
