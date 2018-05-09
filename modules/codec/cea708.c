@@ -442,7 +442,7 @@ struct cea708_t
 
     /* Decoding context */
     cea708_window_t *p_cw; /* current window */
-    vlc_tick_t suspended_deadline; /* > 0 when delay is active */
+    vlc_tick_t suspended_deadline; /* not VLC_TICK_INVALID when delay is active */
     vlc_tick_t i_clock;
     bool b_text_waiting;
 };
@@ -1086,7 +1086,7 @@ static void CEA708_Decoder_Init( cea708_t *p_cea708 )
     for(size_t i=0; i<CEA708_WINDOWS_COUNT; i++)
         CEA708_Window_Init( &p_cea708->window[i] );
     p_cea708->p_cw = &p_cea708->window[0];
-    p_cea708->suspended_deadline = 0;
+    p_cea708->suspended_deadline = VLC_TICK_INVALID;
     p_cea708->b_text_waiting = false;
     p_cea708->i_clock = 0;
 }
@@ -1382,7 +1382,7 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
             break;
         case CEA708_C1_DLC:
             POP_COMMAND();
-            p_cea708->suspended_deadline = 0;
+            p_cea708->suspended_deadline = VLC_TICK_INVALID;
             Debug(printf("[DLC]"));
             break;
         case CEA708_C1_RST:
@@ -1676,8 +1676,8 @@ void CEA708_Decoder_Push( cea708_t *h, vlc_tick_t i_time,
         size_t i_push = cea708_input_buffer_remain(&h->input_buffer);
         if( (i_data - i) < i_push )
             i_push = (i_data - i);
-        else if( h->suspended_deadline > 0 )
-            h->suspended_deadline = 0; /* Full buffer cancels pause */
+        else
+            h->suspended_deadline = VLC_TICK_INVALID; /* Full buffer cancels pause */
 
         for( size_t j=0; j<i_push; j++ )
         {
@@ -1685,7 +1685,7 @@ void CEA708_Decoder_Push( cea708_t *h, vlc_tick_t i_time,
             cea708_input_buffer_add( &h->input_buffer, byte );
         }
 
-        if( h->suspended_deadline > 0 )
+        if( h->suspended_deadline != VLC_TICK_INVALID )
         {
             /* Decoding is paused */
             if ( h->suspended_deadline > h->i_clock )
@@ -1695,7 +1695,7 @@ void CEA708_Decoder_Push( cea708_t *h, vlc_tick_t i_time,
                     h->i_clock += CLOCK_FREQ / 1200 * i_push;
                 continue;
             }
-            h->suspended_deadline = 0;
+            h->suspended_deadline = VLC_TICK_INVALID;
         }
 
         /* Decode Buffer */
