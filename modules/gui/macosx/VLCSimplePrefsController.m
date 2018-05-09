@@ -294,7 +294,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_input_cachelevel_customLabel setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
     [_input_muxBox setTitle: _NS("Codecs / Muxers")];
     [_input_netBox setTitle: _NS("Network")];
-    [_input_hardwareAccelerationCheckbox setTitle: _NS("Enable hardware acceleration")];
+    [_input_hardwareAccelerationCheckbox setTitle: _NS("Hardware decoding")];
     [_input_postprocLabel setStringValue: _NS("Post-Processing Quality")];
     [_input_skipLoopLabel setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [_input_urlhandlerButton setTitle: _NS("Edit default application settings for network protocols")];
