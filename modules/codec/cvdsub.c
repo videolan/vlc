@@ -37,6 +37,8 @@
 
 #include <vlc_bits.h>
 
+#include "../demux/mpeg/timestamps.h"
+
 #define DEBUG_CVDSUB 1
 
 /*****************************************************************************
@@ -352,13 +354,12 @@ static void ParseMetaInfo( decoder_t *p_dec, block_t *p_spu  )
         switch( p[0] )
         {
         case 0x04: /* subtitle duration in 1/90000ths of a second */
-            p_sys->i_duration = (p[1]<<16) + (p[2]<<8) + p[3];
+            p_sys->i_duration = FROM_SCALE_NZ( (p[1]<<16) + (p[2]<<8) + p[3] );
 
 #ifdef DEBUG_CVDSUB
             msg_Dbg( p_dec, "subtitle display duration %lu secs",
                      (long unsigned int)(p_sys->i_duration / 90000) );
 #endif
-            p_sys->i_duration *= 100 / 9;
             break;
 
         case 0x0c: /* unknown */
