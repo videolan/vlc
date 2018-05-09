@@ -600,10 +600,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
     if (deinterlace != 0 && deinterlace != 1)
         deinterlace = -1;
 
-    if (psz_mode == NULL)
-        psz_mode = "";
-
-    if (*psz_mode
+    if (psz_mode
      && strcmp (psz_mode, "blend")    && strcmp (psz_mode, "bob")
      && strcmp (psz_mode, "discard")  && strcmp (psz_mode, "linear")
      && strcmp (psz_mode, "mean")     && strcmp (psz_mode, "x")
@@ -612,7 +609,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
      && strcmp (psz_mode, "auto"))
         return;
 
-    if (*psz_mode && deinterlace != 0)
+    if (psz_mode && deinterlace != 0)
         var_SetString (p_mi, "deinterlace-mode", psz_mode);
 
     var_SetInteger (p_mi, "deinterlace", deinterlace);
@@ -623,7 +620,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int deinterlace,
     {
         vout_thread_t *p_vout = pp_vouts[i];
 
-        if (*psz_mode && deinterlace != 0)
+        if (psz_mode && deinterlace != 0)
             var_SetString (p_vout, "deinterlace-mode", psz_mode);
 
         var_SetInteger (p_vout, "deinterlace", deinterlace);
