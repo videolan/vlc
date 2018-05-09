@@ -422,7 +422,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
                 {
                     p_sub->i_start    = p_block->i_pts;
                     p_sub->i_stop     = p_block->i_pts + p_block->i_length;
-                    p_sub->b_ephemer  = (p_block->i_length == 0);
+                    p_sub->b_ephemer  = (p_block->i_length == VLC_TICK_INVALID);
                 }
                 decoder_QueueSub(p_dec, p_sub);
             }
