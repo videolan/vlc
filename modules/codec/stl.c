@@ -87,8 +87,8 @@ typedef struct
 {
     uint8_t i_accumulating;
     uint8_t i_justify;
-    int64_t i_start;
-    int64_t i_end;
+    vlc_tick_t i_start;
+    vlc_tick_t i_end;
     text_style_t *p_style;
     text_segment_t *p_segment;
     text_segment_t **pp_segment_last;
@@ -246,7 +246,7 @@ static void GroupApplyStyle(stl_sg_t *p_group, uint8_t code)
     }
 }
 
-static int64_t ParseTimeCode(const uint8_t *data, double fps)
+static vlc_tick_t ParseTimeCode(const uint8_t *data, double fps)
 {
     return vlc_tick_from_sec( data[0] * 3600 +
                          data[1] *   60 +
@@ -371,8 +371,8 @@ static void ResetGroups(decoder_sys_t *p_sys)
         }
 
         p_group->i_accumulating = false;
-        p_group->i_end = 0;
-        p_group->i_start = 0;
+        p_group->i_end = VLC_TICK_INVALID;
+        p_group->i_start = VLC_TICK_INVALID;
         p_group->i_justify = 0;
     }
 }
@@ -413,7 +413,7 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
 
                 p_sub->b_absolute = false;
 
-                if(p_group->i_end && p_group->i_start >= p_block->i_dts)
+                if(p_group->i_end != VLC_TICK_INVALID && p_group->i_start >= p_block->i_dts)
                 {
                     p_sub->i_start = VLC_TICK_0 + p_group->i_start;
                     p_sub->i_stop =  VLC_TICK_0 + p_group->i_end;
