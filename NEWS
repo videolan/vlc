@@ -16,6 +16,8 @@ Demux:
 
 macOS:
  * Fix "Open Network Stream" URL box focus
+ * Add option to disable hardware acceleration for video decoding
+ * Remove option to force dolby mode from simple preferences
 
 Qt:
  * Fix tooltip display on some desktop environments
