@@ -246,7 +246,7 @@ int main(int argc, const char *argv[])
         goto out;
     }
 
-    libvlc_playlist_play (vlc, -1, 0, NULL);
+    libvlc_playlist_play (vlc);
 
     /* Qt insists on catching SIGCHLD via signal handler. To work around that,
      * unblock it after all our child threads are created. */

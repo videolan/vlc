@@ -246,7 +246,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         libvlc_add_intf (vlc, "hotkeys,none");
         libvlc_add_intf (vlc, "globalhotkeys,none");
         libvlc_add_intf (vlc, NULL);
-        libvlc_playlist_play (vlc, -1, 0, NULL);
+        libvlc_playlist_play (vlc);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }

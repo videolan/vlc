@@ -292,7 +292,7 @@ int main(int i_argc, const char *ppsz_argv[])
         fprintf(stderr, "VLC cannot start any interface. Exiting.\n");
         goto out;
     }
-    libvlc_playlist_play(vlc, -1, 0, NULL);
+    libvlc_playlist_play(vlc);
 
     /*
      * Run the main loop. If the mac interface is not initialized, only the CoreFoundation

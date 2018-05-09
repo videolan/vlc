@@ -189,15 +189,9 @@ void libvlc_wait( libvlc_instance_t *p_instance );
  * item before it is played.
  *
  * \param p_instance the playlist instance
- * \param i_id the item to play. If this is a negative number, the next
- *        item will be selected. Otherwise, the item with the given ID will be
- *        played
- * \param i_options the number of options to add to the item
- * \param ppsz_options the options to add to the item
  */
 LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
-                           int i_options, char **ppsz_options );
+void libvlc_playlist_play( libvlc_instance_t *p_instance );
 
 /** @}*/
 
