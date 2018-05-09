@@ -497,7 +497,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
          * progressive_frame. */
         p_synchro->i_current_period = i_repeat_field;
 
-        if( next_pts )
+        if( next_pts != VLC_TICK_INVALID )
         {
             if( (next_pts - p_synchro->current_pts
                     > PTS_THRESHOLD
@@ -557,7 +557,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
             p_synchro->current_pts = next_dts;
         }
 
-        if( next_pts )
+        if( next_pts != VLC_TICK_INVALID )
         {
             /* Store the PTS for the next time we have to date an I picture. */
             p_synchro->backward_pts = next_pts;

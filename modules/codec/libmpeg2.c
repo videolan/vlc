@@ -333,7 +333,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 /* Intra-slice refresh. Simulate a blank I picture. */
                 msg_Dbg( p_dec, "intra-slice refresh stream" );
                 decoder_SynchroNewPicture( p_sys->p_synchro,
-                                           I_CODING_TYPE, 2, 0, 0,
+                                           I_CODING_TYPE, 2, VLC_TICK_INVALID, 0,
                                            p_info->sequence->flags & SEQ_FLAG_LOW_DELAY );
                 decoder_SynchroDecode( p_sys->p_synchro );
                 decoder_SynchroEnd( p_sys->p_synchro, I_CODING_TYPE, 0 );
@@ -483,7 +483,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( p_sys->b_slice_i )
                 {
                     decoder_SynchroNewPicture( p_sys->p_synchro,
-                                               I_CODING_TYPE, 2, 0, 0,
+                                               I_CODING_TYPE, 2, VLC_TICK_INVALID, 0,
                                                p_sys->p_info->sequence->flags &
                                                             SEQ_FLAG_LOW_DELAY );
                     decoder_SynchroDecode( p_sys->p_synchro );
