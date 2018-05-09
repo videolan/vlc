@@ -555,14 +555,12 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
             }
             /* By definition of a DTS. */
             p_synchro->current_pts = next_dts;
-            next_dts = 0;
         }
 
         if( next_pts )
         {
             /* Store the PTS for the next time we have to date an I picture. */
             p_synchro->backward_pts = next_pts;
-            next_pts = 0;
         }
     }
 #undef PTS_THRESHOLD
