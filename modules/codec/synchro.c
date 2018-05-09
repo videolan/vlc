@@ -130,7 +130,7 @@ struct decoder_synchro_t
     unsigned int    pi_meaningful[4];            /* number of durations read */
 
     /* render_time filled by SynchroChoose() */
-    int             i_render_time;
+    vlc_tick_t      i_render_time;
 
     /* stream context */
     int             i_nb_ref;                /* Number of reference pictures */
@@ -208,7 +208,7 @@ void decoder_SynchroReset( decoder_synchro_t * p_synchro )
  * decoder_SynchroChoose : Decide whether we will decode a picture or not
  *****************************************************************************/
 bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
-                               int i_render_time, bool b_low_delay )
+                               vlc_tick_t i_render_time, bool b_low_delay )
 {
 #define TAU_PRIME( coding_type )    (p_synchro->p_tau[(coding_type)] \
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \

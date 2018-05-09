@@ -40,7 +40,7 @@
 decoder_synchro_t * decoder_SynchroInit( decoder_t *, int ) VLC_USED;
 void decoder_SynchroRelease( decoder_synchro_t * );
 void decoder_SynchroReset( decoder_synchro_t * );
-bool decoder_SynchroChoose( decoder_synchro_t *, int, int, bool );
+bool decoder_SynchroChoose( decoder_synchro_t *, int, vlc_tick_t, bool );
 void decoder_SynchroTrash( decoder_synchro_t * );
 void decoder_SynchroDecode( decoder_synchro_t * );
 void decoder_SynchroEnd( decoder_synchro_t *, int, bool );
