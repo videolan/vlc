@@ -111,6 +111,13 @@ static void PrioritizeSystem32(void)
     SetProcessMitigationPolicy( 10 /* ProcessImageLoadPolicy */, &m, sizeof( m ) );
 }
 
+static void vlc_kill(void *data)
+{
+    HANDLE *semp = data;
+
+    ReleaseSemaphore(*semp, 1, NULL);
+}
+
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine,
                     int nCmdShow )
@@ -240,6 +247,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     vlc = libvlc_new (argc, (const char **)argv);
     if (vlc != NULL)
     {
+        HANDLE sem = CreateSemaphore(NULL, 0, 1, NULL);
+
+        libvlc_set_exit_handler(vlc, vlc_kill, &sem);
         libvlc_set_app_id (vlc, "org.VideoLAN.VLC", PACKAGE_VERSION,
                            PACKAGE_NAME);
         libvlc_set_user_agent (vlc, "VLC media player", "VLC/"PACKAGE_VERSION);
@@ -247,7 +257,10 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         libvlc_add_intf (vlc, "globalhotkeys,none");
         libvlc_add_intf (vlc, NULL);
         libvlc_playlist_play (vlc);
-        libvlc_wait (vlc);
+
+        WaitForSingleObject(sem, INFINITE);
+        CloseHandle(sem);
+
         libvlc_release (vlc);
     }
     else
