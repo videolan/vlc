@@ -88,12 +88,9 @@ int main (int argc, char *argv[])
         vlc_argv[vlc_argc] = NULL;
 
         libvlc_instance_t *vlc = libvlc_new (vlc_argc, vlc_argv);
-        if (vlc != NULL)
-            libvlc_release (vlc);
-        if (vlc == NULL)
-            fprintf (stderr, "No plugins in %s\n", path);
         if (vlc == NULL)
             return 1;
+        libvlc_release(vlc);
     }
 
     return 0;
