@@ -519,7 +519,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
 
         if( p_synchro->backward_pts )
         {
-            if( next_dts &&
+            if( next_dts != VLC_TICK_INVALID &&
                 (next_dts - p_synchro->backward_pts
                     > PTS_THRESHOLD
                   || p_synchro->backward_pts - next_dts
@@ -542,7 +542,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
             p_synchro->current_pts = p_synchro->backward_pts;
             p_synchro->backward_pts = 0;
         }
-        else if( next_dts )
+        else if( next_dts != VLC_TICK_INVALID )
         {
             if( (next_dts - p_synchro->current_pts
                     > PTS_THRESHOLD
