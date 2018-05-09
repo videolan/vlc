@@ -38,7 +38,7 @@
 
 struct index_entry_s
 {
-    int64_t time;
+    vlc_tick_t time;
     unsigned active;
 };
 
