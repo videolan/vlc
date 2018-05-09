@@ -185,7 +185,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     }
 
     p_spu->i_dts = p_spu->i_pts;
-    p_spu->i_length = 0;
+    p_spu->i_length = VLC_TICK_INVALID;
 
     /* reinit context */
     p_sys->i_spu_size = 0;
