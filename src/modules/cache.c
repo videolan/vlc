@@ -374,7 +374,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
     assert( dir != NULL );
 
     if( asprintf( &psz_filename, "%s"DIR_SEP CACHE_NAME, dir ) == -1 )
-        return 0;
+        return NULL;
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
@@ -384,7 +384,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
                  vlc_strerror_c(errno));
     free(psz_filename);
     if (file == NULL)
-        return 0;
+        return NULL;
 
     /* Check the file is a plugins cache */
     char cachestr[sizeof (CACHE_STRING) - 1];
@@ -394,7 +394,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         block_Release(file);
-        return 0;
+        return NULL;
     }
 
 #ifdef DISTRO_VERSION
@@ -406,7 +406,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache" );
         block_Release(file);
-        return 0;
+        return NULL;
     }
 #endif
 
@@ -419,7 +419,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
         block_Release(file);
-        return 0;
+        return NULL;
     }
 
     /* Check header marker */
@@ -434,7 +434,7 @@ vlc_plugin_t *vlc_cache_load(vlc_object_t *p_this, const char *dir,
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
         block_Release(file);
-        return 0;
+        return NULL;
     }
 
     vlc_plugin_t *cache = NULL;
