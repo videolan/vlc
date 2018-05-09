@@ -75,7 +75,13 @@ public:
     int getY() { return posY; }
     unsigned getWidth() { return width; }
     unsigned getHeight() { return height; }
-    video_format_t *getFrameFormat() { return &p_pic->format; }
+    video_format_t *getFrameFormat()
+    {
+        video_format_t *ret = NULL;
+        if (likely(p_pic != NULL))
+            ret = &p_pic->format;
+        return ret;
+    }
 
     void setPressedCallback(void (*cb)(intf_thread_t *p_intf))
     {
@@ -200,8 +206,11 @@ public:
         : Control(p_intf, 0, 0)
     {
         p_pic = loadPicture(picPath);
-        width = p_pic->format.i_width;
-        height = p_pic->format.i_height;
+        if (likely(p_pic != NULL))
+        {
+            width = p_pic->format.i_width;
+            height = p_pic->format.i_height;
+        }
     }
 };
 
@@ -213,8 +222,11 @@ public:
         : Control(p_intf, posX, posY, 0, 0, true)
     {
         p_pic = loadPicture(picPath);
-        width = p_pic->format.i_width;
-        height = p_pic->format.i_height;
+        if (likely(p_pic != NULL))
+        {
+            width = p_pic->format.i_width;
+            height = p_pic->format.i_height;
+        }
     }
 };
 
@@ -226,8 +238,11 @@ public:
         : Control(p_intf, posX, posY)
     {
         p_pic = loadPicture(picPath);
-        width = p_pic->format.i_width;
-        height = p_pic->format.i_height;
+        if (likely(p_pic != NULL))
+        {
+            width = p_pic->format.i_width;
+            height = p_pic->format.i_height;
+        }
     }
 };
 
@@ -247,9 +262,15 @@ public:
           p_mask(nullptr), validationProgress(0)
     {
         p_mask = loadPicture(maskPath);
-        p_pic = picture_NewFromFormat(&p_mask->format);
-        width = p_pic->format.i_width;
-        height = p_pic->format.i_height;
+        if (likely(p_mask != NULL))
+        {
+            p_pic = picture_NewFromFormat(&p_mask->format);
+            if (likely(p_pic != NULL))
+            {
+                width = p_pic->format.i_width;
+                height = p_pic->format.i_height;
+            }
+        }
     }
 
     virtual void draw(picture_t *p_dstPic) const
@@ -330,7 +351,8 @@ public:
           progress(0), progressSetCallback(nullptr)
     {
         p_pic = loadPicture(picPath);
-        height = p_pic->format.i_height;
+        if (likely(p_pic != NULL))
+            height = p_pic->format.i_height;
     }
 
     virtual void draw(picture_t *p_dstPic) const
