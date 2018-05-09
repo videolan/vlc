@@ -994,7 +994,7 @@ static vlc_tick_t GetPicturePTS( encoder_t *p_enc, uint32_t u_pnum )
     }
 
     msg_Err( p_enc, "Could not retrieve PTS for picture %u", u_pnum );
-    return 0;
+    return VLC_TICK_INVALID;
 }
 
 static inline bool SchroSetEnum( const encoder_t *p_enc, int i_list_size, const char *list[],
@@ -1575,7 +1575,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             if( ReadDiracPictureNumber( &u_pic_num, p_block ) ) {
                 block_t *p_dts_block = block_FifoGet( p_sys->p_dts_fifo );
                 p_block->i_dts = p_dts_block->i_dts;
-                   p_block->i_pts = GetPicturePTS( p_enc, u_pic_num );
+                p_block->i_pts = GetPicturePTS( p_enc, u_pic_num );
                 block_Release( p_dts_block );
                 block_ChainAppend( &p_output_chain, p_block );
             } else {
