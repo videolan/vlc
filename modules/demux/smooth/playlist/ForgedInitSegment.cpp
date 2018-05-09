@@ -190,6 +190,9 @@ void ForgedInitSegment::setFourCC(const std::string &fcc)
             case VLC_FOURCC( 'W', 'V', 'C', '1' ):
                 es_type = VIDEO_ES;
                 break;
+            case VLC_FOURCC( 'T', 'T', 'M', 'L' ):
+                es_type = SPU_ES;
+                break;
             case VLC_FOURCC( 'A', 'A', 'C', 'L' ):
             case VLC_FOURCC( 'W', 'M', 'A', 'P' ):
             default:
@@ -264,6 +267,11 @@ block_t * ForgedInitSegment::buildMoovBox()
                     trackinfo.fmt.i_extra = i_extradata;
                 }
             }
+            break;
+
+        case SPU_ES:
+            break;
+
         default:
             break;
     }
