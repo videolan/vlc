@@ -284,7 +284,6 @@ libvlc_vlm_set_output
 libvlc_vlm_show_media
 libvlc_vlm_stop_media
 libvlc_set_exit_handler
-libvlc_wait
 libvlc_audio_filter_list_get
 libvlc_video_filter_list_get
 libvlc_module_description_list_release

@@ -219,7 +219,6 @@ int libvlc_add_intf( libvlc_instance_t *p_instance, const char *name );
  * \param cb callback to invoke when LibVLC wants to exit,
  *           or NULL to disable the exit handler (as by default)
  * \param opaque data pointer for the callback
- * \warning This function and libvlc_wait() cannot be used at the same time.
  */
 LIBVLC_API
 void libvlc_set_exit_handler( libvlc_instance_t *p_instance,

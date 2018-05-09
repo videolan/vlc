@@ -155,25 +155,6 @@ LIBVLC_DEPRECATED int
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_core
- * @{
- */
-
-/**
- * Waits until an interface causes the instance to exit.
- * You should start at least one interface first, using libvlc_add_intf().
- *
- * \param p_instance the instance
- * \warning This function wastes one thread doing basically nothing.
- * libvlc_set_exit_handler() should be used instead.
- */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_wait( libvlc_instance_t *p_instance );
-
-
-/** @}*/
-
-/**
  * \ingroup libvlc
  * \defgroup libvlc_playlist LibVLC playlist (legacy)
  * @deprecated Use @ref libvlc_media_list instead.
