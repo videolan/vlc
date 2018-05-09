@@ -861,7 +861,7 @@ static picture_t *DpbNewPicture( decoder_t *p_dec )
         p->b_linked = true;
         p->b_displayed = false;
 
-        p->p_picture->date = 0;
+        p->p_picture->date = VLC_TICK_INVALID;
     }
     return p->p_picture;
 }
