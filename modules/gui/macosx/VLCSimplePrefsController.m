@@ -294,6 +294,7 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     [_input_cachelevel_customLabel setStringValue: _NS("Use the complete preferences to configure custom caching values for each access module.")];
     [_input_muxBox setTitle: _NS("Codecs / Muxers")];
     [_input_netBox setTitle: _NS("Network")];
+    [_input_hardwareAccelerationCheckbox setTitle: _NS("Enable hardware acceleration")];
     [_input_postprocLabel setStringValue: _NS("Post-Processing Quality")];
     [_input_skipLoopLabel setStringValue: _NS("Skip the loop filter for H.264 decoding")];
     [_input_urlhandlerButton setTitle: _NS("Edit default application settings for network protocols")];
@@ -677,6 +678,8 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
      * input & codecs settings *
      ***************************/
     [self setupField:_input_recordTextField forOption:"input-record-path"];
+
+    [self setupButton:_input_hardwareAccelerationCheckbox forBoolValue: "videotoolbox"];
     [_input_postprocTextField setIntValue: config_GetInt("postproc-q")];
     [_input_postprocTextField setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
     [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
@@ -993,6 +996,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
      ***************************/
     if (_inputSettingChanged) {
         config_PutPsz("input-record-path", [[_input_recordTextField stringValue] UTF8String]);
+
+        config_PutInt("videotoolbox", [_input_hardwareAccelerationCheckbox state]);
         config_PutInt("postproc-q", [_input_postprocTextField intValue]);
         config_PutInt("skip-frames", [_input_skipFramesCheckbox state]);
 
