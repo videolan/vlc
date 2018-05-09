@@ -558,8 +558,10 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 {
                     p_pic->date = decoder_SynchroDate( p_sys->p_synchro );
                     if( p_sys->b_garbage_pic )
-                        p_pic->date = 0; /* ??? */
-                    p_sys->b_garbage_pic = false;
+                    {
+                        p_pic->date = VLC_TICK_INVALID; /* ??? */
+                        p_sys->b_garbage_pic = false;
+                    }
                 }
             }
 
