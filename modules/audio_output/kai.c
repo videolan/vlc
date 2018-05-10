@@ -312,7 +312,8 @@ static void Pause( audio_output_t *aout, bool pause, mtime_t date )
 
 static void Flush( audio_output_t *aout, bool drain )
 {
-    audio_buffer_t *buffer = aout->sys->buffer;
+    aout_sys_t     *sys = aout->sys;
+    audio_buffer_t *buffer = sys->buffer;
 
     vlc_mutex_lock( &buffer->mutex );
 
@@ -367,14 +368,16 @@ static int CreateBuffer( audio_output_t *aout, int size )
     vlc_mutex_init( &buffer->mutex );
     vlc_cond_init( &buffer->cond );
 
-    aout->sys->buffer = buffer;
+    aout_sys_t *sys = aout->sys;
+    sys->buffer = buffer;
 
     return 0;
 }
 
 static void DestroyBuffer( audio_output_t *aout )
 {
-    audio_buffer_t *buffer = aout->sys->buffer;
+    aout_sys_t     *sys = aout->sys;
+    audio_buffer_t *buffer = sys->buffer;
 
     vlc_mutex_destroy( &buffer->mutex );
     vlc_cond_destroy( &buffer->cond );
@@ -385,7 +388,8 @@ static void DestroyBuffer( audio_output_t *aout )
 
 static int ReadBuffer( audio_output_t *aout, uint8_t *data, int size )
 {
-    audio_buffer_t *buffer = aout->sys->buffer;
+    aout_sys_t     *sys = aout->sys;
+    audio_buffer_t *buffer = sys->buffer;
     int             len;
     int             remain_len = 0;
 
@@ -419,7 +423,8 @@ static int ReadBuffer( audio_output_t *aout, uint8_t *data, int size )
 
 static int WriteBuffer( audio_output_t *aout, uint8_t *data, int size )
 {
-    audio_buffer_t *buffer = aout->sys->buffer;
+    aout_sys_t     *sys = aout->sys;
+    audio_buffer_t *buffer = sys->buffer;
     int             len;
     int             remain_len = 0;
 
