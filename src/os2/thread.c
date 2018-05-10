@@ -429,6 +429,34 @@ int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     return vlc_cond_wait_common (p_condvar, p_mutex, ulTimeout);
 }
 
+void vlc_once(vlc_once_t *once, void (*cb)(void))
+{
+    unsigned done;
+
+    /* load once->done */
+    __atomic_xchg( &done, once->done );
+
+    /* not initialized ? */
+    if( done == 0 )
+    {
+        vlc_mutex_lock( &once->mutex );
+
+        /* load once->done */
+        __atomic_xchg( &done, once->done );
+
+        /* still not initialized ? */
+        if( done == 0 )
+        {
+            cb();
+
+            /* set once->done to 1 */
+            __atomic_xchg( &once->done, 1 );
+        }
+
+        vlc_mutex_unlock( &once->mutex );
+    }
+}
+
 /*** Thread-specific variables (TLS) ***/
 struct vlc_threadvar
 {

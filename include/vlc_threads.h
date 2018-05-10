@@ -125,6 +125,12 @@ typedef struct
 #define VLC_STATIC_COND { NULLHANDLE, 0, NULLHANDLE, 0 }
 #define LIBVLC_NEED_SEMAPHORE
 #define LIBVLC_NEED_RWLOCK
+typedef struct
+{
+    unsigned done;
+    vlc_mutex_t mutex;
+} vlc_once_t;
+#define VLC_STATIC_ONCE { 0, VLC_STATIC_MUTEX }
 typedef struct vlc_threadvar *vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
