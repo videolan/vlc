@@ -34,6 +34,33 @@
 static const int ptr_width = 2 * /* hex digits */ sizeof (uintptr_t);
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
 
+#ifdef __OS2__
+#include <vlc_charset.h>
+
+static int OS2ConsoleOutput(FILE *stream, const char *format, va_list ap)
+{
+    char *msg;
+    char *os2msg;
+
+    if (vasprintf(&msg, format, ap) == -1 )
+        return -1;
+
+    if ((os2msg = ToLocale(msg)) == NULL)
+    {
+        free(msg);
+
+        return -1;
+    }
+
+    fputs(os2msg, stream);
+
+    LocaleFree(os2msg);
+    free(msg);
+
+    return 0;
+}
+#endif
+
 #ifndef _WIN32
 # define COL(x,y) "\033[" #x ";" #y "m"
 # define RED      COL(31,1)
@@ -59,6 +86,9 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
         fprintf(stream, "[%s] ", meta->psz_header);
     fprintf(stream, "%s %s%s: %s", meta->psz_module, meta->psz_object_type,
             msg_type[type], msg_color[type]);
+#ifdef __OS2__
+    if (OS2ConsoleOutput(stream, format, ap) == -1)
+#endif
     vfprintf(stream, format, ap);
     fputs(GRAY"\n", stream);
     funlockfile(stream);
@@ -80,6 +110,9 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
         fprintf(stream, "[%s] ", meta->psz_header);
     fprintf(stream, "%s %s%s: ", meta->psz_module, meta->psz_object_type,
             msg_type[type]);
+#ifdef __OS2__
+    if (OS2ConsoleOutput(stream, format, ap) == -1)
+#endif
     vfprintf(stream, format, ap);
     putc_unlocked('\n', stream);
     funlockfile(stream);
