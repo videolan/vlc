@@ -123,6 +123,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     CONNECT( this, valueReallyChanged( int ), this, userUpdateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( float ), this, libUpdateVolume( float ) );
     CONNECT( THEMIM, soundMuteChanged( bool ), this, updateMuteStatus( bool ) );
+
+    setAccessibleName( qtr( "Volume slider" ) );
 }
 
 void SoundWidget::refreshLabels()
