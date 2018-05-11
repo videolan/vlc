@@ -94,7 +94,7 @@ static int IORead( void *opaque, uint8_t *buf, int buf_size );
 static int64_t IOSeek( void *opaque, int64_t offset, int whence );
 
 static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order );
-static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time );
+static void UpdateSeekPoint( demux_t *p_demux, vlc_tick_t i_time );
 static void ResetTime( demux_t *p_demux, int64_t i_time );
 
 static vlc_fourcc_t CodecTagToFourcc( uint32_t codec_tag )
@@ -904,7 +904,7 @@ static int Demux( demux_t *p_demux )
     return 1;
 }
 
-static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time )
+static void UpdateSeekPoint( demux_t *p_demux, vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
