@@ -220,7 +220,7 @@ static subpicture_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
     av_init_packet(&pkt);
     pkt.data = block->p_buffer;
     pkt.size = block->i_buffer;
-    pkt.pts  = block->i_pts;
+    pkt.pts  = TO_AV_TS(block->i_pts);
 
     int has_subtitle = 0;
     int used = avcodec_decode_subtitle2(sys->p_context,
@@ -243,7 +243,7 @@ static subpicture_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
     subpicture_t *spu = NULL;
     if (has_subtitle)
         spu = ConvertSubtitle(dec, &subtitle,
-                              subtitle.pts,
+                              FROM_AV_TS(subtitle.pts),
                               sys->p_context);
 
     /* */

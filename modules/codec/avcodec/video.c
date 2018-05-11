@@ -1059,8 +1059,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 pkt.data = p_block->p_buffer;
                 pkt.size = p_block->i_buffer;
-                pkt.pts = p_block->i_pts != VLC_TICK_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-                pkt.dts = p_block->i_dts != VLC_TICK_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
+                pkt.pts = p_block->i_pts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_pts) : AV_NOPTS_VALUE;
+                pkt.dts = p_block->i_dts != VLC_TICK_INVALID ? TO_AV_TS(p_block->i_dts) : AV_NOPTS_VALUE;
             }
             else
             {
@@ -1158,15 +1158,15 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Compute the PTS */
 #ifdef FF_API_PKT_PTS
-        vlc_tick_t i_pts = frame->pts;
-
-        if (i_pts == AV_NOPTS_VALUE )
-            i_pts = frame->pkt_dts;
+        int64_t av_pts = frame->pts == AV_NOPTS_VALUE ? frame->pkt_dts : frame->pts;
 #else
-        vlc_tick_t i_pts = frame->pkt_pts;
+        int64_t av_pts = frame->pkt_pts;
 #endif
-        if( i_pts == AV_NOPTS_VALUE )
+        vlc_tick_t i_pts;
+        if( av_pts == AV_NOPTS_VALUE )
             i_pts = date_Get( &p_sys->pts );
+        else
+            i_pts = FROM_AV_TS(av_pts);
 
         /* Interpolate the next PTS */
         if( i_pts != VLC_TICK_INVALID )
