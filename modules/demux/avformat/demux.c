@@ -751,7 +751,7 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     AVPacket    pkt;
     block_t     *p_frame;
-    int64_t     i_start_time;
+    vlc_tick_t  i_start_time;
 
     /* Read a frame */
     int i_av_ret = av_read_frame( p_sys->ic, &pkt );
