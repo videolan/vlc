@@ -43,6 +43,20 @@
 # include <libavutil/cpu.h>
 # include <libavutil/log.h>
 
+#if (CLOCK_FREQ == AV_TIME_BASE)
+#define FROM_AV_TS(x)  (x)
+#define TO_AV_TS(x)    (x)
+#elif (CLOCK_FREQ % AV_TIME_BASE) == 0
+#define FROM_AV_TS(x)  ((x) * (CLOCK_FREQ / AV_TIME_BASE))
+#define TO_AV_TS(x)    ((x) / (CLOCK_FREQ / AV_TIME_BASE))
+#elif (AV_TIME_BASE % CLOCK_FREQ) == 0
+#define FROM_AV_TS(x)  ((x) / (AV_TIME_BASE / CLOCK_FREQ))
+#define TO_AV_TS(x)    ((x) * (AV_TIME_BASE / CLOCK_FREQ))
+#else
+#define FROM_AV_TS(x)  ((x) * CLOCK_FREQ / AV_TIME_BASE)
+#define TO_AV_TS(x)    ((x) * AV_TIME_BASE / CLOCK_FREQ)
+#endif
+
 #define AV_OPTIONS_TEXT     N_("Advanced options")
 #define AV_OPTIONS_LONGTEXT N_("Advanced options, in the form {opt=val,opt2=val2}.")
 
