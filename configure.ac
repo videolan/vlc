@@ -936,7 +936,7 @@ dnl
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-Wall -Wextra -Wsign-compare -Wundef -Wpointer-arith -Wvolatile-register-var -Wformat -Wformat-security -Wduplicated-branches -Wduplicated-cond], [CXXFLAGS])
 
-AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local -Wmultistatement-macros], [CFLAGS])
+AX_APPEND_COMPILE_FLAGS([-Wbad-function-cast -Wwrite-strings -Wmissing-prototypes -Werror-implicit-function-declaration -Winit-self -Wlogical-op -Wshadow=local -Wmultistatement-macros -Wvla-larger-than=1024], [CFLAGS])
 AX_APPEND_COMPILE_FLAGS([-pipe], [CFLAGS])
 
 dnl
