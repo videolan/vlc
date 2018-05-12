@@ -85,11 +85,10 @@ struct vlc_common_members
 #if !defined(__cplusplus)
 # define VLC_OBJECT(x) \
     _Generic((x)->obj, \
-        struct vlc_common_members: (vlc_object_t *)(&(x)->obj), \
-        const struct vlc_common_members: (const vlc_object_t *)(&(x)->obj) \
+        struct vlc_common_members: (vlc_object_t *)(x) \
     )
 #else
-# define VLC_OBJECT( x ) ((vlc_object_t *)&(x)->obj)
+# define VLC_OBJECT(x) ((vlc_object_t *)(x))
 #endif
 
 /* Object flags */
