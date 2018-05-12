@@ -153,9 +153,6 @@ static int getDefaultAudioVolume(const char *aout)
         return config_GetFloat("mmdevice-volume") * 100.f + .5f;
     else
 #endif
-    if (!strcmp(aout, "sndio"))
-        return -1;
-    else
 #ifdef __APPLE__
     if (!strcmp(aout, "auhal") && module_exists("auhal"))
         return (config_GetFloat("auhal-volume") * 100.f + .5f)
@@ -175,9 +172,6 @@ static int getDefaultAudioVolume(const char *aout)
         return cbrtf(config_GetFloat("kai-gain")) * 100.f + .5f;
     else
 #endif
-    if (!strcmp(aout, "oss"))
-        return -1;
-    else
 #ifdef _WIN32
     if (!strcmp(aout, "waveout"))
         return config_GetFloat("waveout-volume") * 100.f + .5f;
