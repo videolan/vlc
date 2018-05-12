@@ -202,6 +202,7 @@ line_desc_t *NewLine( int i_count )
 
     p_line->p_next = NULL;
     p_line->i_width = 0;
+    p_line->i_height = 0;
     p_line->i_base_line = 0;
     p_line->i_character_count = 0;
     p_line->i_first_visible_char_index = -1;
