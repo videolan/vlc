@@ -630,7 +630,7 @@ static int Demux( demux_t *p_demux )
                 {
                     /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
                      * In this case use the last SCR + 40ms */
-                    p_pkt->i_pts = VLC_TICK_0 + p_sys->i_scr + 40000;
+                    p_pkt->i_pts = VLC_TICK_0 + p_sys->i_scr + VLC_TICK_FROM_MS(40);
                 }
 
                 if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )
