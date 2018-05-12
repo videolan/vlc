@@ -1152,7 +1152,7 @@ static int Demux_Seekable( demux_t *p_demux )
                 }
                 else
                 {
-                    i_toread = AVI_PTSToByte( tk, 20 * 1000 );
+                    i_toread = AVI_PTSToByte( tk, VLC_TICK_FROM_MS(20) );
                     i_toread = __MAX( i_toread, 100 );
                 }
             }
@@ -2619,7 +2619,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
         avi_packet_t pk;
 
         /* Don't update/check dialog too often */
-        if( p_dialog_id != NULL && vlc_tick_now() - i_dialog_update > 100000 )
+        if( p_dialog_id != NULL && vlc_tick_now() - i_dialog_update > VLC_TICK_FROM_MS(100) )
         {
             if( vlc_dialog_is_cancelled( p_demux, p_dialog_id ) )
                 break;

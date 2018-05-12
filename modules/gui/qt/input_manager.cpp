@@ -1111,7 +1111,7 @@ void MainInputManager::prev()
 
 void MainInputManager::prevOrReset()
 {
-    if( !p_input || var_GetInteger( p_input, "time") < INT64_C(10000) )
+    if( !p_input || var_GetInteger( p_input, "time") < VLC_TICK_FROM_MS(10) )
         playlist_Prev( THEPL );
     else
         getIM()->sliderUpdate( 0.0 );

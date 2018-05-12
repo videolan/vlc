@@ -50,9 +50,9 @@
 
 #include <libavutil/channel_layout.h>
 
-#define HURRY_UP_GUARD1 (450000)
-#define HURRY_UP_GUARD2 (300000)
-#define HURRY_UP_GUARD3 (100000)
+#define HURRY_UP_GUARD1 VLC_TICK_FROM_MS(450)
+#define HURRY_UP_GUARD2 VLC_TICK_FROM_MS(300)
+#define HURRY_UP_GUARD3 VLC_TICK_FROM_MS(100)
 
 #define MAX_FRAME_DELAY (FF_MAX_B_FRAMES + 2)
 

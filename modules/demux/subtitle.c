@@ -329,7 +329,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->subtitles.p_array  = NULL;
 
     p_sys->props.psz_header         = NULL;
-    p_sys->props.i_microsecperframe = 40000;
+    p_sys->props.i_microsecperframe = VLC_TICK_FROM_MS(40);
     p_sys->props.jss.b_inited       = false;
     p_sys->props.mpsub.b_inited     = false;
     p_sys->props.sami.psz_start     = NULL;

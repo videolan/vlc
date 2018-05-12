@@ -992,7 +992,7 @@ static block_t *BuildSsaFrame( const AVPacket *p_pkt, unsigned i_order )
         p_frame->i_length = vlc_tick_from_sec((h1-h0) * 3600 +
                                          (m1-m0) * 60 +
                                          (s1-s0) * 1) +
-                            CLOCK_FREQ * (c1-c0) / 100;
+                             VLC_TICK_FROM_MS (c1-c0) / 100;
     return p_frame;
 }
 

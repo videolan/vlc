@@ -620,7 +620,7 @@ static int ReadNSVs( demux_t *p_demux )
     else
     {
         msg_Dbg( p_demux, "invalid fps (0x00)" );
-        p_sys->i_pcr_inc = 40000;
+        p_sys->i_pcr_inc = VLC_TICK_FROM_MS(40);
     }
     //msg_Dbg( p_demux, "    - fps=%.3f", 1000000.0 / (double)p_sys->i_pcr_inc );
 
