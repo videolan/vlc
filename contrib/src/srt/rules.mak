@@ -15,6 +15,7 @@ ifdef HAVE_DARWIN_OS
 SRT_DARWIN=CFLAGS="$(CFLAGS) -Wno-error=partial-availability" CXXFLAGS="$(CXXFLAGS) -Wno-error=partial-availability"
 endif
 
+DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
 endif
@@ -32,8 +33,6 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(APPLY) $(SRC)/srt/srt-fix-non-gnu-detection.patch 
 	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
-
-DEPS_srt = gnutls $(DEPS_gnutls)
 
 .srt: srt toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(SRT_DARWIN) $(CMAKE) \
