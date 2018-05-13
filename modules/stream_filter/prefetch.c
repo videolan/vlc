@@ -35,6 +35,20 @@
 #include <vlc_fs.h>
 #include <vlc_interrupt.h>
 
+struct stream_ctrl
+{
+    struct stream_ctrl *next;
+    int query;
+    union
+    {
+        struct
+        {
+            int id;
+            bool state;
+        } id_state;
+    };
+};
+
 typedef struct
 {
     vlc_mutex_t  lock;
@@ -60,6 +74,8 @@ typedef struct
     size_t       buffer_size;
     char        *buffer;
     size_t       seek_threshold;
+
+    struct stream_ctrl *controls;
 } stream_sys_t;
 
 static ssize_t ThreadRead(stream_t *stream, void *buf, size_t length)
@@ -125,6 +141,17 @@ static void *Thread(void *data)
     mutex_cleanup_push(&sys->lock);
     for (;;)
     {
+        struct stream_ctrl *ctrl = sys->controls;
+
+        if (unlikely(ctrl != NULL))
+        {
+            sys->controls = ctrl->next;
+            ThreadControl(stream, ctrl->query, ctrl->id_state.id,
+                          ctrl->id_state.state);
+            free(ctrl);
+            continue;
+        }
+
         if (sys->paused != paused)
         {   /* Update pause state */
             msg_Dbg(stream, paused ? "resuming" : "pausing");
@@ -369,7 +396,24 @@ static int Control(stream_t *stream, int query, va_list args)
         }
         case STREAM_SET_TITLE:
         case STREAM_SET_SEEKPOINT:
+            return VLC_EGENERIC;
         case STREAM_SET_PRIVATE_ID_STATE:
+        {
+            struct stream_ctrl *ctrl = malloc(sizeof (*ctrl)), **pp;
+            if (unlikely(ctrl == NULL))
+                return VLC_ENOMEM;
+
+            ctrl->next = NULL;
+            ctrl->query = query;
+            ctrl->id_state.id = va_arg(args, int);
+            ctrl->id_state.state = va_arg(args, int);
+            vlc_mutex_lock(&sys->lock);
+            for (pp = &sys->controls; *pp != NULL; pp = &((*pp)->next));
+            *pp = ctrl;
+            vlc_cond_signal(&sys->wait_space);
+            vlc_mutex_unlock(&sys->lock);
+            break;
+        }
         case STREAM_SET_PRIVATE_ID_CA:
         case STREAM_GET_PRIVATE_ID_STATE:
             return VLC_EGENERIC;
@@ -427,6 +471,7 @@ static int Open(vlc_object_t *obj)
     sys->buffer_length = 0;
     sys->buffer_size = var_InheritInteger(obj, "prefetch-buffer-size") << 10u;
     sys->seek_threshold = var_InheritInteger(obj, "prefetch-seek-threshold");
+    sys->controls = NULL;
 
     uint64_t size = stream_Size(stream->s);
     if (size > 0)
