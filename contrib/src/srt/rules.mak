@@ -11,6 +11,7 @@ ifeq ($(call need_pkg,"srt >= 1.2.2"),)
 PKGS_FOUND += srt
 endif
 
+DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
 SRT_CFLAGS   += -DPTW32_STATIC_LIB
@@ -30,8 +31,6 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(APPLY) $(SRC)/srt/fix-partial-availability.patch
 	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
-
-DEPS_srt = gnutls $(DEPS_gnutls)
 
 .srt: srt toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) $(CMAKE) \
