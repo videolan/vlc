@@ -30,12 +30,14 @@
 #include <vlc_stream.h>
 #include <vlc_text_style.h>
 #include <vlc_charset.h>
+#include <vlc_image.h>
 
 #include <ctype.h>
 #include <assert.h>
 
 #include "substext.h"
 #include "ttml.h"
+#include "imageupdater.h"
 
 //#define TTML_DEBUG
 
@@ -91,6 +93,11 @@ typedef struct
 {
     substext_updater_region_t updt;
     text_segment_t **pp_last_segment;
+    struct
+    {
+        uint8_t *p_bytes;
+        size_t   i_bytes;
+    } bgbitmap; /* SMPTE-TT */
 } ttml_region_t;
 
 typedef struct
@@ -145,6 +152,7 @@ static ttml_style_t * ttml_style_New( )
 static void ttml_region_Delete( ttml_region_t *p_region )
 {
     SubpictureUpdaterSysRegionClean( &p_region->updt );
+    free( p_region->bgbitmap.p_bytes );
     free( p_region );
 }
 
@@ -887,6 +895,42 @@ static void AppendTextToRegion( ttml_context_t *p_ctx, const tt_textnode_t *p_tt
     p_region->pp_last_segment = &p_segment->p_next;
 }
 
+static const char * GetSMPTEImage( ttml_context_t *p_ctx, const char *psz_id )
+{
+    if( !p_ctx->p_rootnode )
+        return NULL;
+
+    tt_node_t *p_head = FindNode( p_ctx->p_rootnode, "head", 1, NULL );
+    if( !p_head )
+        return NULL;
+
+    for( tt_basenode_t *p_child = p_head->p_child;
+                        p_child; p_child = p_child->p_next )
+    {
+        if( p_child->i_type == TT_NODE_TYPE_TEXT )
+            continue;
+
+        tt_node_t *p_node = (tt_node_t *) p_child;
+        if( tt_node_NameCompare( p_node->psz_node_name, "metadata" ) )
+            continue;
+
+        tt_node_t *p_imagenode = FindNode( p_node, "smpte:image", 1, psz_id );
+        if( !p_imagenode )
+            continue;
+
+        if( !p_imagenode->p_child || p_imagenode->p_child->i_type != TT_NODE_TYPE_TEXT )
+            return NULL; /* was found but empty or not text node */
+
+        tt_textnode_t *p_textnode = (tt_textnode_t *) p_imagenode->p_child;
+        const char *psz_text = p_textnode->psz_text;
+        while( isspace( *psz_text ) )
+            psz_text++;
+        return psz_text;
+    }
+
+    return NULL;
+}
+
 static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t *p_node,
                                          ttml_region_t *p_region,
                                          const ttml_style_t *p_upper_set_styles,
@@ -902,6 +946,25 @@ static void ConvertNodesToRegionContent( ttml_context_t *p_ctx, const tt_node_t 
     /* Region isn't set or is changing */
     if( psz_regionid || p_region == NULL )
         p_region = GetTTMLRegion( p_ctx, psz_regionid );
+
+    /* Check for bitmap profile defined by ST2052 / SMPTE-TT */
+    if( !tt_node_NameCompare( p_node->psz_node_name, "div" ) &&
+         vlc_dictionary_has_key( &p_node->attr_dict, "smpte:backgroundImage" ) )
+    {
+        if( !p_region->bgbitmap.p_bytes )
+        {
+            const char *psz_id = vlc_dictionary_value_for_key( &p_node->attr_dict,
+                                                               "smpte:backgroundImage" );
+            /* Seems SMPTE can't make diff between html and xml.. */
+            if( psz_id && *psz_id == '#' )
+            {
+                const char *psz_base64 = GetSMPTEImage( p_ctx, &psz_id[1] );
+                if( psz_base64 )
+                    p_region->bgbitmap.i_bytes =
+                        vlc_b64_decode_binary( &p_region->bgbitmap.p_bytes, psz_base64 );
+            }
+        }
+    }
 
     /* awkward paragraph handling */
     if( !tt_node_NameCompare( p_node->psz_node_name, "p" ) &&
@@ -1088,6 +1151,68 @@ static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
     }
 }
 
+static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
+                                          const uint8_t *p_data, size_t i_data )
+{
+    if( i_data < 16 )
+        return NULL;
+    video_format_t fmt_out;
+    video_format_Init( &fmt_out, VLC_CODEC_YUVA );
+    video_format_t fmt_in;
+    video_format_Init( &fmt_in, VLC_CODEC_PNG );
+
+    block_t *p_block = block_Alloc( i_data );
+    if( !p_block )
+        return NULL;
+    memcpy( p_block->p_buffer, p_data, i_data );
+
+    picture_t *p_pic = NULL;
+    int i_flags = p_dec->obj.flags;
+    p_dec->obj.flags |= OBJECT_FLAGS_NOINTERACT|OBJECT_FLAGS_QUIET;
+    image_handler_t *p_image = image_HandlerCreate( p_dec );
+    if( p_image )
+    {
+        p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
+        image_HandlerDelete( p_image );
+    }
+    else block_Release( p_block );
+    p_dec->obj.flags = i_flags;
+
+    return p_pic;
+}
+
+static void TTMLRegionsToSpuBitmapRegions( decoder_t *p_dec, subpicture_t *p_spu,
+                                           ttml_region_t *p_regions )
+{
+    /* Create region update info from each ttml region */
+    for( ttml_region_t *p_region = p_regions;
+                        p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
+    {
+        picture_t *p_pic = picture_CreateFromPNG( p_dec, p_region->bgbitmap.p_bytes,
+                                                         p_region->bgbitmap.i_bytes );
+        if( p_pic )
+        {
+            ttml_image_updater_region_t *r = TTML_ImageUpdaterRegionNew( p_pic );
+            if( !r )
+            {
+                picture_Release( p_pic );
+                continue;
+            }
+            /* use text updt values/flags for ease */
+            static_assert((int)UPDT_REGION_ORIGIN_X_IS_RATIO == (int)ORIGIN_X_IS_RATIO,
+                          "flag enums values differs");
+            static_assert((int)UPDT_REGION_EXTENT_Y_IS_RATIO == (int)EXTENT_Y_IS_RATIO,
+                          "flag enums values differs");
+            r->i_flags = p_region->updt.flags;
+            r->origin.x = p_region->updt.origin.x;
+            r->origin.y = p_region->updt.origin.y;
+            r->extent.x = p_region->updt.extent.x;
+            r->extent.y = p_region->updt.extent.y;
+            TTML_ImageSpuAppendRegion( p_spu->updater.p_sys, r );
+        }
+    }
+}
+
 static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
     tt_time_t *p_timings_array = NULL;
@@ -1133,16 +1258,33 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
         if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 > p_block->i_dts + p_block->i_length )
             break;
 
+        bool b_bitmap_regions = false;
         subpicture_t *p_spu = NULL;
         ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
-        if( p_regions && (p_spu = decoder_NewSubpictureText( p_dec )) )
+        if( p_regions )
+        {
+            if( p_regions->bgbitmap.i_bytes > 0 && p_regions->updt.p_segments == NULL )
+            {
+                b_bitmap_regions = true;
+                p_spu = decoder_NewTTML_ImageSpu( p_dec );
+            }
+            else
+            {
+                p_spu = decoder_NewSubpictureText( p_dec );
+            }
+        }
+
+        if( p_regions && p_spu )
         {
             p_spu->i_start    = VLC_TS_0 + tt_time_Convert( &p_timings_array[i] );
             p_spu->i_stop     = VLC_TS_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = true;
 
-            TTMLRegionsToSpuTextRegions( p_dec, p_spu, p_regions );
+            if( !b_bitmap_regions ) /* TEXT regions */
+                TTMLRegionsToSpuTextRegions( p_dec, p_spu, p_regions );
+            else /* BITMAP regions */
+                TTMLRegionsToSpuBitmapRegions( p_dec, p_spu, p_regions );
         }
 
         /* cleanup */

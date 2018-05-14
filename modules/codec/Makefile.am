@@ -225,7 +225,8 @@ codec_LTLIBRARIES += libsubsusf_plugin.la
 
 libttml_plugin_la_SOURCES = codec/ttml/substtml.c \
                             demux/ttml.c \
-                            codec/ttml/ttml.h codec/ttml/ttml.c
+                            codec/ttml/ttml.h codec/ttml/ttml.c \
+                            codec/ttml/imageupdater.h
 codec_LTLIBRARIES += libttml_plugin.la
 
 libwebvtt_plugin_la_SOURCES = codec/webvtt/subsvtt.c \
