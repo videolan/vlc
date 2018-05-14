@@ -118,7 +118,6 @@ VLC_API subpicture_region_t *subpicture_region_Copy( subpicture_region_t *p_regi
 /**
  *
  */
-typedef struct subpicture_updater_sys_t subpicture_updater_sys_t;
 typedef struct
 {
     /** Optional pre update callback, usually useful on video format change.
@@ -137,7 +136,7 @@ typedef struct
                          mtime_t );
     /** Optional callback for subpicture private data cleanup */
     void (*pf_destroy) ( subpicture_t * );
-    subpicture_updater_sys_t *p_sys;
+    void *p_sys;
 } subpicture_updater_t;
 
 typedef struct subpicture_private_t subpicture_private_t;

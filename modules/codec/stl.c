@@ -332,7 +332,7 @@ static bool ParseTTI(stl_sg_t *p_group, const uint8_t *p_data, const char *psz_c
     return false;
 }
 
-static void FillSubpictureUpdater(stl_sg_t *p_group, subpicture_updater_sys_t *p_spu_sys)
+static void FillSubpictureUpdater(stl_sg_t *p_group, subtext_updater_sys_t *p_spu_sys)
 {
     if(p_group->i_accumulating)
     {

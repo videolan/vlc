@@ -1105,7 +1105,7 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = true;
 
-            subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+            subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
             substext_updater_region_t *p_updtregion = NULL;
             decoder_sys_t *p_dec_sys = p_dec->p_sys;
 

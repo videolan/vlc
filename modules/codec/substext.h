@@ -54,8 +54,8 @@ struct substext_updater_region_t
     substext_updater_region_t *p_next;
 };
 
-struct subpicture_updater_sys_t {
-
+typedef struct
+{
     /* a min of one region */
     substext_updater_region_t region;
 
@@ -64,7 +64,7 @@ struct subpicture_updater_sys_t {
     float margin_ratio;
     mtime_t i_next_update;
     bool b_blink_even;
-};
+} subtext_updater_sys_t;
 
 static inline void SubpictureUpdaterSysRegionClean(substext_updater_region_t *p_updtregion)
 {
@@ -100,7 +100,7 @@ static int SubpictureTextValidate(subpicture_t *subpic,
                                   bool has_dst_changed, const video_format_t *fmt_dst,
                                   mtime_t ts)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    subtext_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
 
     if (!has_src_changed && !has_dst_changed &&
@@ -131,7 +131,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const video_format_t *fmt_dst,
                                  mtime_t ts)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    subtext_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src);
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
@@ -267,7 +267,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    subtext_updater_sys_t *sys = subpic->updater.p_sys;
 
     SubpictureUpdaterSysRegionClean( &sys->region );
     substext_updater_region_t *p_region = sys->region.p_next;
@@ -284,7 +284,7 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
 
 static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
 {
-    subpicture_updater_sys_t *sys = calloc(1, sizeof(*sys));
+    subtext_updater_sys_t *sys = calloc(1, sizeof(*sys));
     subpicture_updater_t updater = {
         .pf_validate = SubpictureTextValidate,
         .pf_update   = SubpictureTextUpdate,

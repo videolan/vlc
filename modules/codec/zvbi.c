@@ -399,7 +399,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
                                 i_align, p_block->i_pts );
             if( !p_spu )
                 goto error;
-            subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+            subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
             p_spu_sys->region.p_segments = text_segment_New("");
 
             p_sys->b_update = true;
@@ -456,7 +456,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         while( offset < i_total && isspace( p_text[offset] ) )
            offset++;
 
-        subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+        subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
         p_spu_sys->region.p_segments = text_segment_New( &p_text[offset] );
         if( p_spu_sys->region.p_segments && b_opaque )
         {

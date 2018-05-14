@@ -1651,7 +1651,10 @@ static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
     {
         *pp_spu = decoder_NewSubpictureText( p_dec );
         if( *pp_spu )
-            *pp_updtregion = &(*pp_spu)->updater.p_sys->region;
+        {
+            subtext_updater_sys_t *p_spusys = (*pp_spu)->updater.p_sys;
+            *pp_updtregion = &p_spusys->region;
+        }
     }
     else
     {
@@ -1830,7 +1833,7 @@ static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
         p_spu->b_ephemer  = true; /* !important */
         p_spu->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
 
-        subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+        subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
         p_spu_sys->p_default_style->f_font_relsize = WEBVTT_DEFAULT_LINE_HEIGHT_VH /
                                                      WEBVTT_LINE_TO_HEIGHT_RATIO;
         decoder_QueueSub( p_dec, p_spu );

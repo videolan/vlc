@@ -129,6 +129,8 @@ typedef enum OverlayStatus {
     Outdated    //used to update the overlay after it has been sent to the vout
 } OverlayStatus;
 
+typedef struct bluray_spu_updater_sys_t bluray_spu_updater_sys_t;
+
 typedef struct bluray_overlay_t
 {
     vlc_mutex_t         lock;
@@ -142,7 +144,7 @@ typedef struct bluray_overlay_t
      * - the overlay is closed
      * - vout is changed and this overlay is sent to the new vout
      */
-    struct subpicture_updater_sys_t *p_updater;
+    bluray_spu_updater_sys_t *p_updater;
 } bluray_overlay_t;
 
 typedef struct
@@ -202,7 +204,7 @@ typedef struct
     char                *psz_bd_path;
 } demux_sys_t;
 
-struct subpicture_updater_sys_t
+struct bluray_spu_updater_sys_t
 {
     vlc_mutex_t          lock;      // protect p_overlay pointer and ref_cnt
     bluray_overlay_t    *p_overlay; // NULL if overlay has been closed
@@ -212,9 +214,9 @@ struct subpicture_updater_sys_t
 /*
  * cut the connection between vout and overlay.
  * - called when vout is closed or overlay is closed.
- * - frees subpicture_updater_sys_t when both sides have been closed.
+ * - frees bluray_spu_updater_sys_t when both sides have been closed.
  */
-static void unref_subpicture_updater(subpicture_updater_sys_t *p_sys)
+static void unref_subpicture_updater(bluray_spu_updater_sys_t *p_sys)
 {
     vlc_mutex_lock(&p_sys->lock);
     int refs = --p_sys->ref_cnt;
@@ -1134,7 +1136,7 @@ static es_out_t *esOutNew(demux_t *p_demux)
  * subpicture_updater_t functions:
  *****************************************************************************/
 
-static bluray_overlay_t *updater_lock_overlay(subpicture_updater_sys_t *p_upd_sys)
+static bluray_overlay_t *updater_lock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
 {
     /* this lock is held while vout accesses overlay. => overlay can't be closed. */
     vlc_mutex_lock(&p_upd_sys->lock);
@@ -1151,7 +1153,7 @@ static bluray_overlay_t *updater_lock_overlay(subpicture_updater_sys_t *p_upd_sy
     return NULL;
 }
 
-static void updater_unlock_overlay(subpicture_updater_sys_t *p_upd_sys)
+static void updater_unlock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
 {
     assert (p_upd_sys->p_overlay);
 
@@ -1170,7 +1172,7 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
     VLC_UNUSED(p_fmt_dst);
     VLC_UNUSED(i_ts);
 
-    subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
+    bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
     if (!p_overlay) {
@@ -1192,7 +1194,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
     VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(p_fmt_dst);
     VLC_UNUSED(i_ts);
-    subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
+    bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
     if (!p_overlay) {
@@ -1226,7 +1228,7 @@ static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
 
 static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 {
-    subpicture_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
+    bluray_spu_updater_sys_t *p_upd_sys = p_subpic->updater.p_sys;
     bluray_overlay_t         *p_overlay = updater_lock_overlay(p_upd_sys);
 
     if (p_overlay) {
@@ -1241,7 +1243,7 @@ static void subpictureUpdaterDestroy(subpicture_t *p_subpic)
 
 static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
 {
-    subpicture_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
+    bluray_spu_updater_sys_t *p_upd_sys = malloc(sizeof(*p_upd_sys));
     if (unlikely(p_upd_sys == NULL)) {
         return NULL;
     }

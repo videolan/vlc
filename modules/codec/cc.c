@@ -206,7 +206,7 @@ typedef struct
 
 static void         Eia608Init( eia608_t * );
 static eia608_status_t Eia608Parse( eia608_t *h, int i_channel_selected, const uint8_t data[2] );
-static void         Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia608_t *h );
+static void         Eia608FillUpdaterRegions( subtext_updater_sys_t *p_updater, eia608_t *h );
 
 /* It will be enough up to 63 B frames, which is far too high for
  * broadcast environment */
@@ -501,7 +501,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
     p_spu->b_ephemer  = true;
     p_spu->b_absolute = false;
 
-    subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
     decoder_sys_t *p_dec_sys = p_dec->p_sys;
 
     /* Set first region defaults */
@@ -1204,7 +1204,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row 
     return p_segments_head;
 }
 
-static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia608_t *h )
+static void Eia608FillUpdaterRegions( subtext_updater_sys_t *p_updater, eia608_t *h )
 {
     struct eia608_screen *screen = &h->screen[h->i_screen];
     substext_updater_region_t *p_region = &p_updater->region;

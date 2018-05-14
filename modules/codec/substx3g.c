@@ -357,7 +357,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
     const text_style_t *p_root_style = (text_style_t *) p_dec->p_sys;
 
     mp4_box_iterator_t it;

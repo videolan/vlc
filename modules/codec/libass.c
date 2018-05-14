@@ -102,7 +102,7 @@ static void SubpictureUpdate( subpicture_t *,
                               mtime_t );
 static void SubpictureDestroy( subpicture_t * );
 
-struct subpicture_updater_sys_t
+typedef struct
 {
     decoder_sys_t *p_dec_sys;
     void          *p_subs_data;
@@ -110,7 +110,7 @@ struct subpicture_updater_sys_t
     mtime_t       i_pts;
 
     ASS_Image     *p_img;
-};
+} libass_spu_updater_sys_t;
 
 typedef struct
 {
@@ -351,7 +351,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    subpicture_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
+    libass_spu_updater_sys_t *p_spu_sys = malloc( sizeof(*p_spu_sys) );
     if( !p_spu_sys )
     {
         block_Release( p_block );
@@ -418,7 +418,8 @@ static int SubpictureValidate( subpicture_t *p_subpic,
                                bool b_fmt_dst, const video_format_t *p_fmt_dst,
                                mtime_t i_ts )
 {
-    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+    libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
+    decoder_sys_t *p_sys = p_spusys->p_dec_sys;
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -437,7 +438,7 @@ static int SubpictureValidate( subpicture_t *p_subpic,
     }
 
     /* */
-    const mtime_t i_stream_date = p_subpic->updater.p_sys->i_pts + (i_ts - p_subpic->i_start);
+    const mtime_t i_stream_date = p_spusys->i_pts + (i_ts - p_subpic->i_start);
     int i_changed;
     ASS_Image *p_img = ass_render_frame( p_sys->p_renderer, p_sys->p_track,
                                          i_stream_date/1000, &i_changed );
@@ -448,7 +449,7 @@ static int SubpictureValidate( subpicture_t *p_subpic,
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
     }
-    p_subpic->updater.p_sys->p_img = p_img;
+    p_spusys->p_img = p_img;
 
     /* The lock is released by SubpictureUpdate */
     return VLC_EGENERIC;
@@ -461,10 +462,11 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 {
     VLC_UNUSED( p_fmt_src ); VLC_UNUSED( p_fmt_dst ); VLC_UNUSED( i_ts );
 
-    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+    libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
+    decoder_sys_t *p_sys = p_spusys->p_dec_sys;
 
     video_format_t fmt = p_sys->fmt;
-    ASS_Image *p_img = p_subpic->updater.p_sys->p_img;
+    ASS_Image *p_img = p_spusys->p_img;
 
     /* */
     p_subpic->i_original_picture_height = fmt.i_visible_height;
@@ -520,11 +522,11 @@ static void SubpictureUpdate( subpicture_t *p_subpic,
 }
 static void SubpictureDestroy( subpicture_t *p_subpic )
 {
-    subpicture_updater_sys_t *p_sys = p_subpic->updater.p_sys;
+    libass_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
 
-    DecSysRelease( p_sys->p_dec_sys );
-    free( p_sys->p_subs_data );
-    free( p_sys );
+    DecSysRelease( p_spusys->p_dec_sys );
+    free( p_spusys->p_subs_data );
+    free( p_spusys );
 }
 
 static rectangle_t r_create( int x0, int y0, int x1, int y1 )

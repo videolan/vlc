@@ -40,17 +40,17 @@ typedef struct arib_text_region_s
     struct arib_text_region_s *p_next;
 } arib_text_region_t;
 
-struct subpicture_updater_sys_t
+typedef struct
 {
     arib_text_region_t *p_region;
-};
+} arib_spu_updater_sys_t;
 
 static int SubpictureTextValidate(subpicture_t *subpic,
                                   bool has_src_changed, const video_format_t *fmt_src,
                                   bool has_dst_changed, const video_format_t *fmt_dst,
                                   mtime_t ts)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst); VLC_UNUSED(ts);
     VLC_UNUSED(sys);
 
@@ -65,7 +65,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const video_format_t *fmt_dst,
                                  mtime_t ts)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
     if (fmt_dst->i_sar_num <= 0 || fmt_dst->i_sar_den <= 0)
@@ -119,7 +119,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
 }
 static void SubpictureTextDestroy(subpicture_t *subpic)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    arib_spu_updater_sys_t *sys = subpic->updater.p_sys;
 
     arib_text_region_t *p_region, *p_region_next;
     for( p_region = sys->p_region; p_region; p_region = p_region_next )
@@ -135,8 +135,8 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
 
 static inline subpicture_t *decoder_NewSubpictureText(decoder_t *decoder)
 {
-    subpicture_updater_sys_t *sys = (subpicture_updater_sys_t*)
-        calloc( 1, sizeof(subpicture_updater_sys_t) );
+    arib_spu_updater_sys_t *sys = (arib_spu_updater_sys_t*)
+        calloc( 1, sizeof(arib_spu_updater_sys_t) );
     subpicture_updater_t updater = {
         .pf_validate = SubpictureTextValidate,
         .pf_update   = SubpictureTextUpdate,

@@ -66,13 +66,13 @@
 #define RGB_COLOR1   0x2badde
 #define ARGB_BGCOLOR 0xc003182d
 
-struct subpicture_updater_sys_t
+typedef struct
 {
     vlc_epg_t *epg;
     int64_t    time;
     char      *art;
     vlc_object_t *obj;
-};
+} epg_spu_updater_sys_t;
 
 static char * GetDefaultArtUri( void )
 {
@@ -316,7 +316,7 @@ static subpicture_region_t * vout_OSDEpgEvent(const vlc_epg_event_t *p_evt,
     return vout_OSDTextRegion(p_segment, x, y);
 }
 
-static void vout_FillRightPanel(subpicture_updater_sys_t *p_sys,
+static void vout_FillRightPanel(epg_spu_updater_sys_t *p_sys,
                                 int x, int y,
                                 int width, int height,
                                 int rx, int ry,
@@ -410,7 +410,7 @@ static void vout_FillRightPanel(subpicture_updater_sys_t *p_sys,
     }
 }
 
-static subpicture_region_t * vout_BuildOSDEpg(subpicture_updater_sys_t *p_sys,
+static subpicture_region_t * vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
                                               int x, int y,
                                               int visible_width,
                                               int visible_height)
@@ -515,7 +515,7 @@ static void OSDEpgUpdate(subpicture_t *subpic,
                          const video_format_t *fmt_dst,
                          mtime_t ts)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    epg_spu_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
 
     video_format_t fmt = *fmt_dst;
@@ -535,7 +535,7 @@ static void OSDEpgUpdate(subpicture_t *subpic,
 
 static void OSDEpgDestroy(subpicture_t *subpic)
 {
-    subpicture_updater_sys_t *sys = subpic->updater.p_sys;
+    epg_spu_updater_sys_t *sys = subpic->updater.p_sys;
     if( sys->epg )
         vlc_epg_Delete(sys->epg);
     free( sys->art );
@@ -617,7 +617,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input )
     if(epg->psz_name == NULL) /* Fallback (title == channel name) */
         epg->psz_name = input_item_GetMeta( input, vlc_meta_Title );
 
-    subpicture_updater_sys_t *sys = malloc(sizeof(*sys));
+    epg_spu_updater_sys_t *sys = malloc(sizeof(*sys));
     if (!sys) {
         vlc_epg_Delete(epg);
         return VLC_EGENERIC;

@@ -115,11 +115,11 @@ typedef struct
     bool   b_use_tiger;
 } decoder_sys_t;
 
-struct subpicture_updater_sys_t
+typedef struct
 {
     decoder_sys_t *p_dec_sys;
     mtime_t        i_start;
-};
+} kate_spu_updater_sys_t;
 
 
 /*
@@ -755,8 +755,9 @@ static void SetupText( decoder_t *p_dec, subpicture_t *p_spu, const kate_event *
 
 static void TigerDestroySubpicture( subpicture_t *p_subpic )
 {
-    DecSysRelease( p_subpic->updater.p_sys->p_dec_sys );
-    free( p_subpic->updater.p_sys );
+    kate_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
+    DecSysRelease( p_spusys->p_dec_sys );
+    free( p_spusys );
 }
 /*
  * We get premultiplied alpha, but VLC doesn't expect this, so we demultiply
@@ -816,7 +817,8 @@ static int TigerValidateSubpicture( subpicture_t *p_subpic,
 {
     VLC_UNUSED(p_fmt_src); VLC_UNUSED(p_fmt_dst);
 
-    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+    kate_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
+    decoder_sys_t *p_sys = p_spusys->p_dec_sys;
 
     if( b_fmt_src || b_fmt_dst )
         return VLC_EGENERIC;
@@ -824,7 +826,7 @@ static int TigerValidateSubpicture( subpicture_t *p_subpic,
     PROFILE_START( TigerValidateSubpicture );
 
     /* time in seconds from the start of the stream */
-    kate_float t = (p_subpic->updater.p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
+    kate_float t = (p_spusys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
 
     /* it is likely that the current region (if any) can be kept as is; test for this */
     vlc_mutex_lock( &p_sys->lock );
@@ -857,14 +859,15 @@ static void TigerUpdateSubpicture( subpicture_t *p_subpic,
                                    const video_format_t *p_fmt_dst,
                                    mtime_t ts )
 {
-    decoder_sys_t *p_sys = p_subpic->updater.p_sys->p_dec_sys;
+    kate_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
+    decoder_sys_t *p_sys = p_spusys->p_dec_sys;
     plane_t *p_plane;
     kate_float t;
     int i_ret;
 
 
     /* time in seconds from the start of the stream */
-    t = (p_subpic->updater.p_sys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
+    t = (p_spusys->i_start + ts - p_subpic->i_start ) / 1000000.0f;
 
     PROFILE_START( TigerUpdateSubpicture );
 
@@ -1060,7 +1063,7 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, kate_packet *p_kp, block_t 
     /* we have an event */
 
     /* Get a new spu */
-    subpicture_updater_sys_t *p_spu_sys = NULL;
+    kate_spu_updater_sys_t *p_spu_sys = NULL;
     if( p_sys->b_use_tiger)
     {
         p_spu_sys = malloc( sizeof(*p_spu_sys) );

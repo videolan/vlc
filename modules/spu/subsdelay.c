@@ -114,9 +114,9 @@ static const char * const ppsz_mode_descriptions[] = { N_( "Absolute delay" ), N
  * subsdelay_heap_entry_t: Heap entry
  *****************************************************************************/
 
-typedef subpicture_updater_sys_t subsdelay_heap_entry_t;
+typedef struct subsdelay_heap_entry_t subsdelay_heap_entry_t;
 
-struct subpicture_updater_sys_t
+struct subsdelay_heap_entry_t
 {
     subpicture_t *p_subpic; /* local subtitle */
 
