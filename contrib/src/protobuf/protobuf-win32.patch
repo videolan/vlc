@@ -1,0 +1,12 @@
+--- protobuf/src/google/protobuf/stubs/time.h	2018-05-14 12:03:13.005476200 +0200
++++ protobuf/src/google/protobuf/stubs/time.h.win32	2018-05-14 12:02:22.476842900 +0200
+@@ -54,6 +54,9 @@ bool LIBPROTOBUF_EXPORT SecondsToDateTim
+ // Returns false if the DateTime is not valid or is not in the valid range.
+ bool LIBPROTOBUF_EXPORT DateTimeToSeconds(const DateTime& time, int64* seconds);
+ 
++#ifdef GetCurrentTime
++#undef GetCurrentTime  // Windows has macro GetCurrentTime
++#endif
+ void LIBPROTOBUF_EXPORT GetCurrentTime(int64* seconds, int32* nanos);
+ 
+ // Formats a time string in RFC3339 fromat.
