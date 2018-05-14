@@ -624,19 +624,11 @@ static void SetupOutputFormat( decoder_t *p_dec, bool b_trust )
         if( i_channels_dst != i_channels_src && b_trust )
             msg_Warn( p_dec, "%d channels are dropped", i_channels_src - i_channels_dst );
 
-        /* Restore the right order of Ambisonic order 1 channels encoded in AAC... */
+        /* No reordering for Ambisonic order 1 channels encoded in AAC... */
         if (p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS
             && p_dec->fmt_in.i_codec == VLC_CODEC_MP4A
             && i_channels_src == 4)
-        {
-            p_sys->pi_extraction[0] = 2;
-            p_sys->pi_extraction[1] = 0;
-            p_sys->pi_extraction[2] = 1;
-            p_sys->pi_extraction[3] = 3;
-            i_layout_dst = AOUT_CHAN_CENTER | AOUT_CHAN_LEFT
-                    | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER;
-            p_sys->b_extract = true;
-        }
+            p_sys->b_extract = false;
 
         p_dec->fmt_out.audio.i_physical_channels = i_layout_dst;
     }
