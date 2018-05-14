@@ -89,7 +89,7 @@ typedef struct
 
 typedef struct
 {
-    subpicture_updater_sys_region_t updt;
+    substext_updater_region_t updt;
     text_segment_t **pp_last_segment;
 } ttml_region_t;
 
@@ -402,7 +402,7 @@ static void FillCoord( ttml_length_t v, int i_flag, float *p_val, int *pi_flags 
 }
 
 static void FillUpdaterCoords( ttml_context_t *p_ctx, ttml_length_t h, ttml_length_t v,
-                               bool b_origin, subpicture_updater_sys_region_t *p_updt )
+                               bool b_origin, substext_updater_region_t *p_updt )
 {
     ttml_length_t base = { 100.0, TTML_UNIT_PERCENT };
     ttml_length_t x = ttml_rebase_length( p_ctx->i_cell_resolution_h, h, base );
@@ -1106,7 +1106,7 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
             p_spu->b_absolute = true;
 
             subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-            subpicture_updater_sys_region_t *p_updtregion = NULL;
+            substext_updater_region_t *p_updtregion = NULL;
             decoder_sys_t *p_dec_sys = p_dec->p_sys;
 
             /* Create region update info from each ttml region */

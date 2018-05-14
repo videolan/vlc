@@ -25,9 +25,9 @@
 #include <vlc_text_style.h>
 #include <vlc_subpicture.h>
 
-typedef struct subpicture_updater_sys_region_t subpicture_updater_sys_region_t;
+typedef struct substext_updater_region_t substext_updater_region_t;
 
-enum subpicture_updater_sys_region_flags_e
+enum substext_updater_region_flags_e
 {
     UPDT_REGION_ORIGIN_X_IS_RATIO      = 1 << 0,
     UPDT_REGION_ORIGIN_Y_IS_RATIO      = 1 << 1,
@@ -38,7 +38,7 @@ enum subpicture_updater_sys_region_flags_e
     UPDT_REGION_FIXED_DONE             = 1 << 31,
 };
 
-struct subpicture_updater_sys_region_t
+struct substext_updater_region_t
 {
     struct
     {
@@ -51,13 +51,13 @@ struct subpicture_updater_sys_region_t
     int inner_align; /* alignment of content inside the region */
     text_style_t *p_region_style;
     text_segment_t *p_segments;
-    subpicture_updater_sys_region_t *p_next;
+    substext_updater_region_t *p_next;
 };
 
 struct subpicture_updater_sys_t {
 
     /* a min of one region */
-    subpicture_updater_sys_region_t region;
+    substext_updater_region_t region;
 
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
@@ -66,31 +66,31 @@ struct subpicture_updater_sys_t {
     bool b_blink_even;
 };
 
-static inline void SubpictureUpdaterSysRegionClean(subpicture_updater_sys_region_t *p_updtregion)
+static inline void SubpictureUpdaterSysRegionClean(substext_updater_region_t *p_updtregion)
 {
     text_segment_ChainDelete( p_updtregion->p_segments );
     text_style_Delete( p_updtregion->p_region_style );
 }
 
-static inline void SubpictureUpdaterSysRegionInit(subpicture_updater_sys_region_t *p_updtregion)
+static inline void SubpictureUpdaterSysRegionInit(substext_updater_region_t *p_updtregion)
 {
     memset(p_updtregion, 0, sizeof(*p_updtregion));
     p_updtregion->align = SUBPICTURE_ALIGN_BOTTOM;
     p_updtregion->inner_align = 0;
 }
 
-static inline subpicture_updater_sys_region_t *SubpictureUpdaterSysRegionNew( )
+static inline substext_updater_region_t *SubpictureUpdaterSysRegionNew( )
 {
-    subpicture_updater_sys_region_t *p_region = malloc(sizeof(*p_region));
+    substext_updater_region_t *p_region = malloc(sizeof(*p_region));
     if(p_region)
         SubpictureUpdaterSysRegionInit(p_region);
     return p_region;
 }
 
-static inline void SubpictureUpdaterSysRegionAdd(subpicture_updater_sys_region_t *p_prev,
-                                                 subpicture_updater_sys_region_t *p_new)
+static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_prev,
+                                                 substext_updater_region_t *p_new)
 {
-    subpicture_updater_sys_region_t **pp_next = &p_prev->p_next;
+    substext_updater_region_t **pp_next = &p_prev->p_next;
     for(; *pp_next; pp_next = &(*pp_next)->p_next);
     *pp_next = p_new;
 }
@@ -107,7 +107,7 @@ static int SubpictureTextValidate(subpicture_t *subpic,
         (sys->i_next_update == VLC_TS_INVALID || sys->i_next_update > ts))
         return VLC_SUCCESS;
 
-    subpicture_updater_sys_region_t *p_updtregion = &sys->region;
+    substext_updater_region_t *p_updtregion = &sys->region;
 
     if (!(p_updtregion->flags & UPDT_REGION_FIXED_DONE) &&
         subpic->b_absolute && subpic->p_region &&
@@ -158,7 +158,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     bool b_schedule_blink_update = false;
     subpicture_region_t **pp_last_region = &subpic->p_region;
 
-    for( subpicture_updater_sys_region_t *p_updtregion = &sys->region;
+    for( substext_updater_region_t *p_updtregion = &sys->region;
                                           p_updtregion; p_updtregion = p_updtregion->p_next )
     {
         subpicture_region_t *r = *pp_last_region = subpicture_region_New(&fmt);
@@ -270,10 +270,10 @@ static void SubpictureTextDestroy(subpicture_t *subpic)
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
 
     SubpictureUpdaterSysRegionClean( &sys->region );
-    subpicture_updater_sys_region_t *p_region = sys->region.p_next;
+    substext_updater_region_t *p_region = sys->region.p_next;
     while( p_region )
     {
-        subpicture_updater_sys_region_t *p_next = p_region->p_next;
+        substext_updater_region_t *p_next = p_region->p_next;
         SubpictureUpdaterSysRegionClean( p_region );
         free( p_region );
         p_region = p_next;

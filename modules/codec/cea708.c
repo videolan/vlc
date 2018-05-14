@@ -981,7 +981,7 @@ static text_segment_t * CEA708RowToSegments( const cea708_text_row_t *p_row,
 }
 
 static void CEA708SpuConvert( const cea708_window_t *p_w,
-                              subpicture_updater_sys_region_t *p_region )
+                              substext_updater_region_t *p_region )
 {
     if( !p_w->b_visible || CEA708_Window_RowCount( p_w ) == 0 )
         return;
@@ -1047,7 +1047,7 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
         return NULL;
 
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-    subpicture_updater_sys_region_t *p_region = &p_spu_sys->region;
+    substext_updater_region_t *p_region = &p_spu_sys->region;
 
     p_spu_sys->margin_ratio = CEA708_SCREEN_SAFE_MARGIN_RATIO;
 
@@ -1058,7 +1058,7 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
         {
             if( p_region != &p_spu_sys->region )
             {
-                subpicture_updater_sys_region_t *p_newregion =
+                substext_updater_region_t *p_newregion =
                         SubpictureUpdaterSysRegionNew();
                 if( p_newregion == NULL )
                     break;

@@ -62,7 +62,7 @@ vlc_module_end()
 #define BD_TEXTST_DATA_RESET_STYLE 0x0b
 
 static size_t textst_FillRegion(decoder_t *p_dec, const uint8_t *p_data, size_t i_data,
-                                subpicture_updater_sys_region_t *p_region)
+                                substext_updater_region_t *p_region)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     text_segment_t **pp_last = &p_region->p_segments;
@@ -192,9 +192,9 @@ static size_t textst_Decode_palette(decoder_t *p_dec, const uint8_t *p_data, siz
 }
 
 static void textst_FillRegions(decoder_t *p_dec, const uint8_t *p_data, size_t i_data,
-                               subpicture_updater_sys_region_t *p_region)
+                               substext_updater_region_t *p_region)
 {
-    subpicture_updater_sys_region_t **pp_last = &p_region;
+    substext_updater_region_t **pp_last = &p_region;
     bool palette_update_flag = p_data[0] >> 7;
     p_data++; i_data--;
 

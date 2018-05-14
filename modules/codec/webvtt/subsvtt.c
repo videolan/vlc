@@ -1645,7 +1645,7 @@ static void GetTimedTags( const webvtt_dom_node_t *p_node,
 
 static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
                                          subpicture_t **pp_spu,
-                                         subpicture_updater_sys_region_t **pp_updtregion )
+                                         substext_updater_region_t **pp_updtregion )
 {
     if( *pp_spu == NULL )
     {
@@ -1655,7 +1655,7 @@ static void CreateSpuOrNewUpdaterRegion( decoder_t *p_dec,
     }
     else
     {
-        subpicture_updater_sys_region_t *p_new =
+        substext_updater_region_t *p_new =
                                 SubpictureUpdaterSysRegionNew( );
         if( p_new )
         {
@@ -1715,7 +1715,7 @@ static void ApplyCSSRules( decoder_t *p_dec, const vlc_css_rule_t *p_rule,
 static void RenderRegions( decoder_t *p_dec, mtime_t i_start, mtime_t i_stop )
 {
     subpicture_t *p_spu = NULL;
-    subpicture_updater_sys_region_t *p_updtregion = NULL;
+    substext_updater_region_t *p_updtregion = NULL;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
 #ifdef HAVE_CSS

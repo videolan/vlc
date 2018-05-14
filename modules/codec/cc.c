@@ -1207,7 +1207,7 @@ static text_segment_t * Eia608TextLine( struct eia608_screen *screen, int i_row 
 static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia608_t *h )
 {
     struct eia608_screen *screen = &h->screen[h->i_screen];
-    subpicture_updater_sys_region_t *p_region = &p_updater->region;
+    substext_updater_region_t *p_region = &p_updater->region;
     text_segment_t **pp_last = &p_region->p_segments;
     bool b_newregion = false;
 
@@ -1221,7 +1221,7 @@ static void Eia608FillUpdaterRegions( subpicture_updater_sys_t *p_updater, eia60
         {
             if( b_newregion )
             {
-                subpicture_updater_sys_region_t *p_newregion;
+                substext_updater_region_t *p_newregion;
                 p_newregion = SubpictureUpdaterSysRegionNew();
                 if( !p_newregion )
                 {
