@@ -1051,6 +1051,43 @@ static ttml_region_t *GenerateRegions( tt_node_t *p_rootnode, tt_time_t playback
     return p_regions;
 }
 
+static void TTMLRegionsToSpuTextRegions( decoder_t *p_dec, subpicture_t *p_spu,
+                                         ttml_region_t *p_regions )
+{
+    decoder_sys_t *p_dec_sys = p_dec->p_sys;
+    subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
+    substext_updater_region_t *p_updtregion = NULL;
+
+    /* Create region update info from each ttml region */
+    for( ttml_region_t *p_region = p_regions;
+         p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
+    {
+        if( p_updtregion == NULL )
+        {
+            p_updtregion = &p_spu_sys->region;
+        }
+        else
+        {
+            p_updtregion = SubpictureUpdaterSysRegionNew();
+            if( p_updtregion == NULL )
+                break;
+            SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
+        }
+
+        /* broken legacy align var (can't handle center...). Will change only regions content. */
+        if( p_dec_sys->i_align & SUBPICTURE_ALIGN_MASK )
+            p_spu_sys->region.inner_align = p_dec_sys->i_align;
+
+        p_spu_sys->margin_ratio = 0.0;
+
+        /* copy and take ownership of pointeds */
+        *p_updtregion = p_region->updt;
+        p_updtregion->p_next = NULL;
+        p_region->updt.p_region_style = NULL;
+        p_region->updt.p_segments = NULL;
+    }
+}
+
 static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 {
     tt_time_t *p_timings_array = NULL;
@@ -1098,46 +1135,14 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 
         subpicture_t *p_spu = NULL;
         ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
-        if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
+        if( p_regions && (p_spu = decoder_NewSubpictureText( p_dec )) )
         {
             p_spu->i_start    = VLC_TS_0 + tt_time_Convert( &p_timings_array[i] );
             p_spu->i_stop     = VLC_TS_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = true;
 
-            subtext_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
-            substext_updater_region_t *p_updtregion = NULL;
-            decoder_sys_t *p_dec_sys = p_dec->p_sys;
-
-            /* Create region update info from each ttml region */
-            for( ttml_region_t *p_region = p_regions;
-                 p_region; p_region = (ttml_region_t *) p_region->updt.p_next )
-            {
-                if( p_updtregion == NULL )
-                {
-                    p_updtregion = &p_spu_sys->region;
-                }
-                else
-                {
-                    p_updtregion = SubpictureUpdaterSysRegionNew();
-                    if( p_updtregion == NULL )
-                        break;
-                    SubpictureUpdaterSysRegionAdd( &p_spu_sys->region, p_updtregion );
-                }
-
-                /* broken legacy align var (can't handle center...). Will change only regions content. */
-                if( p_dec_sys->i_align & SUBPICTURE_ALIGN_MASK )
-                    p_spu_sys->region.inner_align = p_dec_sys->i_align;
-
-                p_spu_sys->margin_ratio = 0.0;
-
-                /* copy and take ownership of pointeds */
-                *p_updtregion = p_region->updt;
-                p_updtregion->p_next = NULL;
-                p_region->updt.p_region_style = NULL;
-                p_region->updt.p_segments = NULL;
-            }
-
+            TTMLRegionsToSpuTextRegions( p_dec, p_spu, p_regions );
         }
 
         /* cleanup */
