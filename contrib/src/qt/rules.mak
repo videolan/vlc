@@ -49,7 +49,7 @@ endif
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
 	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
-	-no-compile-examples -nomake examples
+	-no-compile-examples -nomake examples -qt-zlib
 
 ifndef WITH_OPTIMIZATION
 QT_CONFIG += -debug
