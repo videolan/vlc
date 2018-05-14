@@ -493,8 +493,13 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
             char *psz_file = input_CreateFilename( p_input, psz_path, INPUT_RECORD_PREFIX, NULL );
             if( psz_file )
             {
-                if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file ) < 0 )
-                    psz_sout = NULL;
+                char* psz_file_esc = config_StringEscape( psz_file );
+                if ( psz_file_esc )
+                {
+                    if( asprintf( &psz_sout, "#record{dst-prefix='%s'}", psz_file_esc ) < 0 )
+                        psz_sout = NULL;
+                    free( psz_file_esc );
+                }
                 free( psz_file );
             }
         }
