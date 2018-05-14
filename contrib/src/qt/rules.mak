@@ -43,7 +43,11 @@ QT_SPEC := win32-clang-g++
 else
 QT_SPEC := win32-g++
 endif
+ifdef HAVE_CROSS_COMPILE
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
+else
+QT_PLATFORM := -platform $(QT_SPEC)
+endif
 endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
