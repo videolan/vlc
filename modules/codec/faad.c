@@ -529,12 +529,23 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 }
                 else pi_faad_channels_positions[i] = 0;
             }
-
-            b_reorder = aout_CheckChannelReorder( pi_faad_channels_positions, NULL,
-                p_dec->fmt_out.audio.i_physical_channels, pi_neworder_table );
-
-            p_dec->fmt_out.audio.i_channels = popcount(p_dec->fmt_out.audio.i_physical_channels);
         }
+        else if (p_dec->fmt_out.audio.channel_type == AUDIO_CHANNEL_TYPE_AMBISONICS
+            && frame.channels == 4)
+        {
+            pi_faad_channels_positions[0] = AOUT_CHAN_REARCENTER;
+            pi_faad_channels_positions[1] = AOUT_CHAN_LEFT;
+            pi_faad_channels_positions[2] = AOUT_CHAN_RIGHT;
+            pi_faad_channels_positions[3] = AOUT_CHAN_CENTER;
+            p_dec->fmt_out.audio.i_physical_channels =
+                AOUT_CHAN_CENTER | AOUT_CHAN_LEFT
+                | AOUT_CHAN_RIGHT | AOUT_CHAN_REARCENTER;
+        }
+
+        b_reorder = aout_CheckChannelReorder( pi_faad_channels_positions, NULL,
+            p_dec->fmt_out.audio.i_physical_channels, pi_neworder_table );
+
+        p_dec->fmt_out.audio.i_channels = popcount(p_dec->fmt_out.audio.i_physical_channels);
 
         if( !decoder_UpdateAudioFormat( p_dec ) && p_dec->fmt_out.audio.i_channels > 0 )
             p_out = decoder_NewAudioBuffer( p_dec, frame.samples / p_dec->fmt_out.audio.i_channels );
