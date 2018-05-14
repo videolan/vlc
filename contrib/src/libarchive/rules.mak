@@ -14,6 +14,10 @@ LIBARCHIVE_CONF := $(HOSTCONF) \
 		--without-nettle --without-cng \
 		--without-xml2 --without-lzma --without-iconv --without-expat
 
+ifdef HAVE_WIN32
+LIBARCHIVE_CONF += --without-openssl
+endif
+
 $(TARBALLS)/libarchive-$(LIBARCHIVE_VERSION).tar.gz:
 	$(call download_pkg,$(LIBARCHIVE_URL),libarchive)
 
