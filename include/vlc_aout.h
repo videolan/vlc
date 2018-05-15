@@ -291,7 +291,7 @@ static_assert(AOUT_CHANIDX_MAX == AOUT_CHAN_MAX, "channel count mismatch");
 /**
  * It describes the audio channel order VLC expect.
  */
-static const uint16_t pi_vlc_chan_order_wg4[] =
+static const uint32_t pi_vlc_chan_order_wg4[] =
 {
     AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
     AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
