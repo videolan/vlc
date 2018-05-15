@@ -55,11 +55,7 @@ QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-qml-debug -no-audio-backend -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples -qt-zlib
 
-ifndef WITH_OPTIMIZATION
-QT_CONFIG += -debug
-else
 QT_CONFIG += -release
-endif
 
 .qt: qt
 	cd $< && ./configure $(QT_PLATFORM) $(QT_CONFIG) -prefix $(PREFIX)
