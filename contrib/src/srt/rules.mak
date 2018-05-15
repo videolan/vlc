@@ -13,6 +13,8 @@ endif
 
 ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
+SRT_CFLAGS   += -DPTW32_STATIC_LIB
+SRT_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 
 $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:

@@ -12,7 +12,14 @@ $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 
 .sum-protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz
 
+PROTOBUF_CFLAGS   := $(CFLAGS)
+PROTOBUF_CXXFLAGS := $(CXXFLAGS)
 DEPS_protobuf = zlib $(DEPS_zlib)
+ifdef HAVE_WIN32
+DEPS_protobuf += pthreads $(DEPS_pthreads)
+PROTOBUF_CFLAGS   += -DPTW32_STATIC_LIB
+PROTOBUF_CXXFLAGS += -DPTW32_STATIC_LIB
+endif
 
 protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 	$(UNPACK)
@@ -22,6 +29,6 @@ protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz .sum-protobuf
 
 .protobuf: protobuf
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc="$(PROTOC)"
+	cd $< && CFLAGS="$(PROTOBUF_CFLAGS)" CXXFLAGS="$(PROTOBUF_CXXFLAGS)" $(HOSTVARS) ./configure $(HOSTCONF) --with-protoc="$(PROTOC)"
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
