@@ -56,7 +56,7 @@ DEPS_ffmpeg = zlib gsm
 ifndef USE_LIBAV
 FFMPEGCONF += \
 	--enable-libopenjpeg
-DEPS_ffmpeg += openjpeg
+DEPS_ffmpeg += openjpeg $(DEPS_openjpeg)
 endif
 
 # Optional dependencies
