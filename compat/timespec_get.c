@@ -22,6 +22,28 @@
 # include <config.h>
 #endif
 
+#ifdef _WIN32
+#include <windows.h>
+
+int timespec_get(struct timespec *ts, int base)
+{
+    FILETIME ft;
+    ULARGE_INTEGER s;
+    ULONGLONG t;
+
+    if (base != TIME_UTC)
+        return 0;
+
+    GetSystemTimeAsFileTime(&ft);
+    s.LowPart = ft.dwLowDateTime;
+    s.HighPart = ft.dwHighDateTime;
+    t = s.QuadPart - 116444736000000000ULL;
+    ts->tv_sec = t / 10000000;
+    ts->tv_nsec = ((int) (t % 10000000)) * 100;
+    return base;
+}
+#else /* !_WIN32 */
+
 #include <time.h>
 #include <unistd.h> /* _POSIX_TIMERS */
 #ifndef _POSIX_TIMERS
@@ -58,3 +80,4 @@ int timespec_get(struct timespec *ts, int base)
     }
     return base;
 }
+#endif /* !_WIN32 */
