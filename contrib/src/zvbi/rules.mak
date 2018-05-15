@@ -27,7 +27,7 @@ ifdef HAVE_ANDROID
 endif
 	$(MOVE)
 
-DEPS_zvbi = pthreads png $(DEPS_png) iconv $(DEPS_iconv)
+DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)
 
 ZVBI_CFLAGS := $(CFLAGS)
 ZVBICONF := \
@@ -38,9 +38,6 @@ ZVBICONF := \
 
 ifdef HAVE_MACOSX
 ZVBI_CFLAGS += -fnested-functions
-endif
-ifdef HAVE_WIN32
-ZVBI_CFLAGS += -DPTW32_STATIC_LIB
 endif
 
 .zvbi: zvbi

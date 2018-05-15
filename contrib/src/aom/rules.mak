@@ -22,7 +22,14 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
 	$(MOVE)
 
+AOM_CFLAGS   := $(CFLAGS)
+AOM_CXXFLAGS := $(CXXFLAGS)
 DEPS_aom =
+ifdef HAVE_WIN32
+DEPS_aom += pthreads $(DEPS_pthreads)
+AOM_CFLAGS   += -DPTW32_STATIC_LIB
+AOM_CXXFLAGS += -DPTW32_STATIC_LIB
+endif
 
 AOM_LDFLAGS := $(LDFLAGS)
 
@@ -59,7 +66,7 @@ endif
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
 	cd $< && mkdir -p aom_build
-	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
+	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" CFLAGS="$(AOM_CFLAGS)" CXXFLAGS="$(AOM_CXXFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
 	cd $< && $(MAKE) -C aom_build
 	cd $</aom_build && ../../../../contrib/src/pkg-static.sh aom.pc
 	cd $</aom_build && $(MAKE) install
