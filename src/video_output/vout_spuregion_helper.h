@@ -85,7 +85,10 @@ spuregion_CreateFromPicture( vlc_object_t *p_this, video_format_t *p_fmt,
 
     subpicture_region_t *region = subpicture_region_New(p_fmt);
     if (!region)
+    {
+        picture_Release( p_pic );
         return NULL;
+    }
 
     picture_Release( region->p_picture );
     region->p_picture = p_pic;
