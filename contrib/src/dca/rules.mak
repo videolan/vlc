@@ -1,6 +1,6 @@
 # libdca
 
-DCA_VERSION := 0.0.5
+DCA_VERSION := 0.0.6
 DCA_URL := $(VIDEOLAN)/libdca/$(DCA_VERSION)/libdca-$(DCA_VERSION).tar.bz2
 
 ifdef HAVE_FPU
@@ -19,9 +19,8 @@ $(TARBALLS)/libdca-$(DCA_VERSION).tar.bz2:
 
 libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(UNPACK)
-	#$(APPLY) $(SRC)/dca/libdca-llvm-gcc.patch
-	$(APPLY) $(SRC)/dca/libdca-inline.patch
-	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR) && mv config.guess config.sub autotools
+	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR)
+	$(call pkg_static,"./libdca/libdca.pc.in")
 	$(MOVE)
 
 .dca: libdca
