@@ -36,6 +36,6 @@ endif
 	sed -e 's/#if HAVE_CONFIG_H/#if 0 \&\& HAVE_CONFIG_H/' -i \
 		"$(PREFIX)/include/pthread.h"
 	mkdir -p -- "$(PREFIX)/lib"
-	cp -v $</*.a $</*.dll "$(PREFIX)/lib/"
+	cp -v $</*.a "$(PREFIX)/lib/"
 	touch $@
 endif
