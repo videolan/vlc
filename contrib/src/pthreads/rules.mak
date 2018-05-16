@@ -23,6 +23,7 @@ endif
 	$(APPLY) $(SRC)/pthreads/x86-inline-asm.patch
 	$(APPLY) $(SRC)/pthreads/arm64.patch
 	$(APPLY) $(SRC)/pthreads/pthreads-fix-warning.patch
+	$(APPLY) $(SRC)/pthreads/pthreads-fix-mode_t.patch
 	$(MOVE)
 
 ifdef HAVE_CROSS_COMPILE
