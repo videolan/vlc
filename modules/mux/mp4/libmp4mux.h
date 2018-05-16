@@ -82,7 +82,7 @@ bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
 void  box_fix     (bo_t *box, uint32_t);
 void  box_gather  (bo_t *box, bo_t *box2);
 
-bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, bool, bool);
+bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
 bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
 bo_t *mp4mux_GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
                         int64_t i_movie_duration,

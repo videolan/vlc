@@ -406,7 +406,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     mp4_stream_t    *p_stream;
 
     if(!mp4mux_CanMux(VLC_OBJECT(p_mux), p_input->p_fmt,
-                      p_sys->b_fragmented, p_sys->b_mov))
+                      p_sys->b_mov ? MAJOR_qt__ : MAJOR_isom,
+                      p_sys->b_fragmented))
     {
         msg_Err(p_mux, "unsupported codec %4.4s in mp4",
                  (char*)&p_input->p_fmt->i_codec);

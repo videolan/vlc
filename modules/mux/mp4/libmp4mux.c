@@ -1837,9 +1837,9 @@ bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], s
 }
 
 bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
-                   bool b_fragmented, bool b_mov)
+                   vlc_fourcc_t i_brand, bool b_fragmented)
 {
-    VLC_UNUSED(b_mov);
+    VLC_UNUSED(i_brand);
     switch(p_fmt->i_codec)
     {
     case VLC_CODEC_A52:
