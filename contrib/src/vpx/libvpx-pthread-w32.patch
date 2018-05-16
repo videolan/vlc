@@ -1,0 +1,23 @@
+--- libvpx.pthreads/libs.mk	2018-05-16 12:11:41.280953500 +0200
++++ libvpx.pthreads/libs.mk.pthread-w32	2018-05-16 12:07:13.696740400 +0200
+@@ -334,7 +334,7 @@ vpx.pc: config.mk libs.mk
+ 	$(qexec)echo 'Conflicts:' >> $@
+ 	$(qexec)echo 'Libs: -L$${libdir} -lvpx -lm' >> $@
+ ifeq ($(HAVE_PTHREAD_H),yes)
+-	$(qexec)echo 'Libs.private: -lm -lpthread' >> $@
++	$(qexec)echo 'Libs.private: -lm -lpthreadGC2' >> $@
+ else
+ 	$(qexec)echo 'Libs.private: -lm' >> $@
+ endif
+--- libvpx/build/make/configure.sh	2018-05-16 12:19:13.322985900 +0200
++++ libvpx/build/make/configure.sh.pthread-w32	2018-05-16 12:17:34.221291100 +0200
+@@ -1343,6 +1343,9 @@ EOF
+       *-android-gcc)
+         # bionic includes basic pthread functionality, obviating -lpthread.
+         ;;
++      *-win*)
++        check_header pthread.h && add_extralibs -lpthreadGC2
++        ;;
+       *)
+         check_header pthread.h && add_extralibs -lpthread
+         ;;
