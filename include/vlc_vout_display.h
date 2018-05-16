@@ -392,10 +392,7 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
 
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
 {
-    vout_window_t *window = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_INVALID);
-    if (window != NULL)
-        vout_display_DeleteWindow(vd, window);
-    return window != NULL;
+    return vd->cfg->window != NULL;
 }
 
 /**
