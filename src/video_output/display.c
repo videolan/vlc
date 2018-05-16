@@ -113,6 +113,10 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     } else {
         vd->module = NULL;
     }
+
+    if (cfg->window != NULL)
+        vout_display_window_Attach(cfg->window, vd);
+
     return vd;
 }
 
@@ -643,8 +647,6 @@ static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, unsigned type)
         return NULL;
     if (type != VOUT_WINDOW_TYPE_INVALID && type != window->type)
         return NULL;
-
-    vout_display_window_Attach(window, vd);
     return window;
 }
 
@@ -1231,8 +1233,6 @@ static vout_window_t *SplitterNewWindow(vout_display_t *vd, unsigned type)
         return NULL;
     if (type != VOUT_WINDOW_TYPE_INVALID && type != window->type)
         return NULL;
-
-    vout_display_window_Attach(window, vd);
     return window;
 }
 
