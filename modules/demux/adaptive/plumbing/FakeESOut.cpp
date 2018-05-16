@@ -119,6 +119,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 
     vlc_mutex_lock(&lock);
 
+    bool b_preexisting = false;
     bool b_select = false;
     for( it=recycle_candidates.begin(); it!=recycle_candidates.end(); ++it )
     {
@@ -133,6 +134,7 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
         }
         else if( cand->getFmt()->i_cat == es_id->getFmt()->i_cat && cand->realESID() )
         {
+            b_preexisting = true;
             /* We need to enforce same selection when not reused
                Otherwise the es will select any other compatible track
                and will end this in a activate/select loop when reactivating a track */
@@ -143,9 +145,16 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
 
     if( !realid )
     {
-        realid = es_out_Add( real_es_out, es_id->getFmt() );
-        if( b_select )
+        es_format_t fmt;
+        es_format_Copy( &fmt, es_id->getFmt() );
+        if( b_preexisting && !b_select ) /* was not previously selected on other format */
+            fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+        else
+            fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
+        realid = es_out_Add( real_es_out, &fmt );
+        if( b_preexisting && b_select ) /* was previously selected on other format */
             es_out_Control( real_es_out, ES_OUT_SET_ES, realid );
+        es_format_Clean( &fmt );
     }
 
     es_id->setRealESID( realid );
