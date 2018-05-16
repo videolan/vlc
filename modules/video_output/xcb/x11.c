@@ -64,7 +64,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     xcb_connection_t *conn;
-    vout_window_t *embed; /* VLC window */
 
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
@@ -113,8 +112,7 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    sys->embed = vlc_xcb_parent_Create(vd, &conn, &scr);
-    if (sys->embed == NULL)
+    if (vlc_xcb_parent_Create(vd, &conn, &scr) == NULL)
     {
         free (sys);
         return VLC_EGENERIC;
@@ -271,7 +269,7 @@ found_format:;
 
         xcb_create_pixmap (conn, sys->depth, pixmap, scr->root, 1, 1);
         c = xcb_create_window_checked (conn, sys->depth, sys->window,
-                                       sys->embed->handle.xid, 0, 0,
+                                       vd->cfg->window->handle.xid, 0, 0,
                                        vd->cfg->display.width,
                                        vd->cfg->display.height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
