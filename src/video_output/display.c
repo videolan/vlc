@@ -638,9 +638,14 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, unsigned type)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
-    vout_window_t *window = vout_NewDisplayWindow(osys->vout, type);
-    if (window != NULL)
-        vout_display_window_Attach(window, vd);
+    vout_window_t *window = vout_NewDisplayWindow(osys->vout);
+
+    if (window == NULL)
+        return NULL;
+    if (type != VOUT_WINDOW_TYPE_INVALID && type != window->type)
+        return NULL;
+
+    vout_display_window_Attach(window, vd);
     return window;
 }
 
