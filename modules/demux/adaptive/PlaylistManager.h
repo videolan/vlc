@@ -76,7 +76,7 @@ namespace adaptive
 
             virtual bool    setPosition(mtime_t);
             virtual mtime_t getDuration() const;
-            mtime_t getPCR() const;
+            mtime_t getResumeTime() const;
             mtime_t getFirstDTS() const;
 
             virtual mtime_t getFirstPlaybackTime() const;

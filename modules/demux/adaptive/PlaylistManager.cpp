@@ -305,19 +305,10 @@ void PlaylistManager::drain()
     es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
 }
 
-mtime_t PlaylistManager::getPCR() const
+mtime_t PlaylistManager::getResumeTime() const
 {
-    mtime_t minpcr = VLC_TS_INVALID;
-    std::vector<AbstractStream *>::const_iterator it;
-    for(it=streams.begin(); it!=streams.end(); ++it)
-    {
-        const mtime_t pcr = (*it)->getPCR();
-        if(minpcr == VLC_TS_INVALID)
-            minpcr = pcr;
-        else if(pcr != VLC_TS_INVALID)
-            minpcr = std::min(minpcr, pcr);
-    }
-    return minpcr;
+    vlc_mutex_locker locker(const_cast<vlc_mutex_t *>(&demux.lock));
+    return demux.i_nzpcr;
 }
 
 mtime_t PlaylistManager::getFirstDTS() const
@@ -422,7 +413,7 @@ void PlaylistManager::pruneLiveStream()
 
 bool PlaylistManager::reactivateStream(AbstractStream *stream)
 {
-    return stream->reactivate(getPCR());
+    return stream->reactivate(getResumeTime());
 }
 
 #define DEMUX_INCREMENT (CLOCK_FREQ / 20)
