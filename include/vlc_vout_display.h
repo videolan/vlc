@@ -66,6 +66,7 @@ typedef enum
  * Initial/Current configuration for a vout_display_t
  */
 typedef struct {
+    struct vout_window_t *window; /**< Window */
 #if defined(_WIN32) || defined(__OS2__)
     bool is_fullscreen VLC_DEPRECATED;  /* Is the display fullscreen */
 #endif
