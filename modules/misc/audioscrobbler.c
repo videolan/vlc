@@ -602,7 +602,6 @@ static int Handshake(intf_thread_t *p_this)
         goto proto;
 
     /* We need to read the nowplaying url */
-    p_buffer_pos += 7; /* we skip "http://" */
     psz_url = strndup(p_buffer_pos, strcspn(p_buffer_pos, "\n"));
     if (!psz_url)
         goto oom;
@@ -615,13 +614,13 @@ static int Handshake(intf_thread_t *p_this)
         vlc_UrlClean(&p_sys->p_nowp_url);
         goto proto;
     }
+    p_buffer_pos += strcspn(p_buffer_pos, "\n");
 
     p_buffer_pos = strstr(p_buffer_pos, "http://");
     if (!p_buffer_pos || strlen(p_buffer_pos) == 7)
         goto proto;
 
     /* We need to read the submission url */
-    p_buffer_pos += 7; /* we skip "http://" */
     psz_url = strndup(p_buffer_pos, strcspn(p_buffer_pos, "\n"));
     if (!psz_url)
         goto oom;
