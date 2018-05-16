@@ -80,7 +80,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     xcb_connection_t *conn;
-    vout_window_t *embed;/* VLC window */
 
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc;   /* context to put images */
@@ -369,8 +368,7 @@ static int Open (vlc_object_t *obj)
     /* Connect to X */
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
-    p_sys->embed = vlc_xcb_parent_Create(vd, &conn, &screen);
-    if (p_sys->embed == NULL)
+    if (vlc_xcb_parent_Create(vd, &conn, &screen) == NULL)
     {
         free (p_sys);
         return VLC_EGENERIC;
@@ -392,7 +390,7 @@ static int Open (vlc_object_t *obj)
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
         xcb_xv_query_adaptors_reply (conn,
-            xcb_xv_query_adaptors (conn, p_sys->embed->handle.xid), NULL);
+            xcb_xv_query_adaptors (conn, vd->cfg->window->handle.xid), NULL);
     if (adaptors == NULL)
         goto error;
 
@@ -488,7 +486,7 @@ static int Open (vlc_object_t *obj)
 
             xcb_create_pixmap (conn, f->depth, pixmap, screen->root, 1, 1);
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
-                 p_sys->embed->handle.xid, place.x, place.y,
+                 vd->cfg->window->handle.xid, place.x, place.y,
                  place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                  f->visual, mask, list);
             xcb_map_window (conn, p_sys->window);
