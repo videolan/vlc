@@ -55,7 +55,6 @@ vlc_module_end()
 struct vout_display_sys_t
 {
     xcb_connection_t *conn; /**< XCB connection */
-    vout_window_t *embed; /**< parent window */
     vdp_t *vdp; /**< VDPAU back-end */
     picture_t *current; /**< Currently visible picture */
 
@@ -426,15 +425,14 @@ static int Open(vlc_object_t *obj)
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    sys->embed = vlc_xcb_parent_Create(vd, &sys->conn, &screen);
-    if (sys->embed == NULL)
+    if (vlc_xcb_parent_Create(vd, &sys->conn, &screen) == NULL)
     {
         free(sys);
         return VLC_EGENERIC;
     }
 
     /* Load the VDPAU back-end and create a device instance */
-    VdpStatus err = vdp_get_x11(sys->embed->display.x11,
+    VdpStatus err = vdp_get_x11(vd->cfg->window->display.x11,
                                 xcb_screen_num(sys->conn, screen),
                                 &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
@@ -590,7 +588,7 @@ static int Open(vlc_object_t *obj)
 
         xcb_void_cookie_t c =
             xcb_create_window_checked(sys->conn, screen->root_depth,
-                sys->window, sys->embed->handle.xid, place.x, place.y,
+                sys->window, vd->cfg->window->handle.xid, place.x, place.y,
                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                 screen->root_visual, mask, values);
         if (vlc_xcb_error_Check(vd, sys->conn, "window creation failure", c))
