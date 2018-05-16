@@ -107,31 +107,17 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  #include <sys/time.h>
  #include <pthread.h>
  
---- zvbi/configure.in	2008-03-05 14:07:00.000000000 +0100
-+++ zvbi.new/configure.in	2008-09-11 21:12:47.000000000 +0200
-@@ -164,14 +164,14 @@
+--- zvbi/configure.in	2018-05-16 14:04:41.881375400 +0200
++++ zvbi/configure.in.pthread-w32	2018-05-16 14:03:52.661096100 +0200
+@@ -167,7 +167,7 @@ dnl
  dnl Check how to link pthreads functions.
  dnl (-lpthread on Linux, -pthread on FreeBSD).
  dnl
 -AC_CHECK_LIB(pthread, pthread_create,,[
--  AC_TRY_LINK(, pthread_create();,,[
--    LDFLAGS="$LDFLAGS -pthread"
--    AC_TRY_LINK(, pthread_create();,,[
--      AC_MSG_ERROR([Unable to link pthread functions])
--    ])
--  ])
--])
-+dnl AC_CHECK_LIB(pthread, pthread_create,,[
-+dnl  AC_TRY_LINK(, pthread_create();,,[
-+dnl    LDFLAGS="$LDFLAGS -pthread"
-+dnl    AC_TRY_LINK(, pthread_create();,,[
-+dnl      AC_MSG_ERROR([Unable to link pthread functions])
-+dnl    ])
-+dnl  ])
-+dnl ])
- 
- dnl
- dnl Check for Gnome unicode library or libc 2.1.
++AC_SEARCH_LIBS(pthread_create,[pthreadGC2 pthread],,[
+   AC_TRY_LINK(, pthread_create();,,[
+     LDFLAGS="$LDFLAGS -pthread"
+     AC_TRY_LINK(, pthread_create();,,[
 --- zvbi/src/io.c	2008-02-19 01:35:20.000000000 +0100
 +++ zvbi2/src/io.c	2008-09-11 21:18:59.000000000 +0200
 @@ -28,8 +28,10 @@
@@ -190,12 +176,3 @@ diff -ruN zvbi/src/vbi.c zvbi.new/src/vbi.c
  /**
   * @internal
   * Drop-in for munmap(). Logs the request on fp if not NULL.
---- zvbi/zvbi-0.2.pc.in 2009-10-15 14:47:54.000000000 +0200
-+++ zvbi.new/zvbi-0.2.pc.in 2009-10-15 14:47:46.000000000 +0200
-@@ -7,5 +7,5 @@
- Description: VBI Capturing and Decoding Library
- Requires: 
- Version: @VERSION@
--Libs: -L${libdir} -lzvbi -lm @LIBS@
-+Libs: -L${libdir} -lzvbi -lm -lpthreadGC2 -lwsock32 @LIBS@
- Cflags: -I${includedir}
