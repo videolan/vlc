@@ -588,7 +588,6 @@ static void Close (vlc_object_t *obj)
 
     free (p_sys->att);
     xcb_disconnect (p_sys->conn);
-    vout_display_DeleteWindow (vd, p_sys->embed);
     free (p_sys);
 }
 

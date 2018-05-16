@@ -162,8 +162,6 @@ static int Open (vlc_object_t *obj)
 error:
     if (sys->gl != NULL)
         vlc_gl_Release (sys->gl);
-    if (surface != NULL)
-        vout_display_DeleteWindow (vd, surface);
     free (sys);
     return VLC_EGENERIC;
 }
@@ -176,14 +174,12 @@ static void Close (vlc_object_t *obj)
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
     vlc_gl_t *gl = sys->gl;
-    vout_window_t *surface = gl->surface;
 
     vlc_gl_MakeCurrent (gl);
     vout_display_opengl_Delete (sys->vgl);
     vlc_gl_ReleaseCurrent (gl);
 
     vlc_gl_Release (gl);
-    vout_display_DeleteWindow (vd, surface);
     free (sys);
 }
 

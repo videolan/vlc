@@ -249,9 +249,6 @@ static void Close (vlc_object_t *p_this)
     if (sys->container)
         [sys->container release];
 
-    if (sys->embed)
-        vout_display_DeleteWindow(vd, sys->embed);
-
     if (sys->vgl != NULL && !OpenglLock(sys->gl)) {
         vout_display_opengl_Delete(sys->vgl);
         OpenglUnlock(sys->gl);

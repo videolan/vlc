@@ -441,7 +441,6 @@ static int Open(vlc_object_t *obj)
     {
         msg_Dbg(obj, "device creation failure: error %d", (int)err);
         xcb_disconnect(sys->conn);
-        vout_display_DeleteWindow(vd, sys->embed);
         free(sys);
         return VLC_EGENERIC;
     }
@@ -661,7 +660,6 @@ static int Open(vlc_object_t *obj)
 error:
     vdp_release_x11(sys->vdp);
     xcb_disconnect(sys->conn);
-    vout_display_DeleteWindow(vd, sys->embed);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -679,6 +677,5 @@ static void Close(vlc_object_t *obj)
 
     vdp_release_x11(sys->vdp);
     xcb_disconnect(sys->conn);
-    vout_display_DeleteWindow(vd, sys->embed);
     free(sys);
 }

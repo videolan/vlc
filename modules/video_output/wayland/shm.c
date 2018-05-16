@@ -482,8 +482,6 @@ static int Open(vlc_object_t *obj)
 error:
     if (sys->eventq != NULL)
         wl_event_queue_destroy(sys->eventq);
-    if (sys->embed != NULL)
-        vout_display_DeleteWindow(vd, sys->embed);
     free(sys);
     return VLC_EGENERIC;
 }
@@ -502,7 +500,6 @@ static void Close(vlc_object_t *obj)
     wl_shm_destroy(sys->shm);
     wl_display_flush(sys->embed->display.wl);
     wl_event_queue_destroy(sys->eventq);
-    vout_display_DeleteWindow(vd, sys->embed);
     free(sys);
 }
 

@@ -884,10 +884,6 @@ static void Win32VoutCloseWindow( event_thread_t *p_event )
     if( p_event->hfswnd )
         DestroyWindow( p_event->hfswnd );
 
-    #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
-    if( !p_event->use_desktop )
-    #endif
-        vout_display_DeleteWindow( vd, p_event->parent_window );
     p_event->hwnd = NULL;
 
     HINSTANCE hInstance = GetModuleHandle(NULL);

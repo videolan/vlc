@@ -302,8 +302,6 @@ exit_kva_init :
     WinDestroyWindow( sys->frame );
 
 exit_frame :
-    vout_display_DeleteWindow( vd, sys->parent_window );
-
     if( sys->is_mouse_hidden )
         WinShowPointer( HWND_DESKTOP, TRUE );
 

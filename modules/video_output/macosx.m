@@ -300,8 +300,6 @@ void Close (vlc_object_t *this)
 
         [sys->glView release];
 
-        if (sys->embed)
-            vout_display_DeleteWindow (vd, sys->embed);
         free (sys);
     }
 }

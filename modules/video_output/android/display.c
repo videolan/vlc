@@ -525,17 +525,13 @@ static int OpenCommon(vout_display_t *vd)
     {
         /* It's better to use gles2 if we are not able to change the video
          * layout */
-        vout_display_DeleteWindow(vd, embed);
         return VLC_EGENERIC;
     }
 
     /* Allocate structure */
     vd->sys = sys = (struct vout_display_sys_t*)calloc(1, sizeof(*sys));
     if (!sys)
-    {
-        vout_display_DeleteWindow(vd, embed);
         return VLC_ENOMEM;
-    }
 
     sys->embed = embed;
     sys->p_awh = p_awh;
@@ -719,10 +715,7 @@ static void Close(vlc_object_t *p_this)
         AndroidWindow_Destroy(vd, sys->p_sub_window);
 
     if (sys->embed)
-    {
         AWindowHandler_setVideoLayout(sys->p_awh, 0, 0, 0, 0, 0, 0);
-        vout_display_DeleteWindow(vd, sys->embed);
-    }
 
     free(sys);
 }
