@@ -131,9 +131,12 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     sys->height = cfg->height;
     vlc_mutex_init(&sys->lock);
 
-    vout_window_owner_t owner = {
-        .sys = sys,
+    static const struct vout_window_callbacks cbs = {
         .resized = vlc_gl_surface_ResizeNotify,
+    };
+    vout_window_owner_t owner = {
+        .cbs = &cbs,
+        .sys = sys,
     };
     char *modlist = var_InheritString(obj, "window");
 

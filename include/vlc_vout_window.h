@@ -116,11 +116,16 @@ typedef struct vout_window_cfg_t {
 
 } vout_window_cfg_t;
 
-typedef struct vout_window_owner {
-    void *sys;
+struct vout_window_callbacks {
     void (*resized)(vout_window_t *, unsigned width, unsigned height);
     void (*closed)(vout_window_t *);
-    void (*mouse_event)(vout_window_t *, const vout_window_mouse_event_t *mouse);
+    void (*mouse_event)(vout_window_t *,
+                        const vout_window_mouse_event_t *mouse);
+};
+
+typedef struct vout_window_owner {
+    const struct vout_window_callbacks *cbs;
+    void *sys;
 } vout_window_owner_t;
 
 /**
@@ -296,20 +301,20 @@ static inline int vout_window_HideMouse(vout_window_t *window, bool hide)
 static inline void vout_window_ReportSize(vout_window_t *window,
                                           unsigned width, unsigned height)
 {
-    window->owner.resized(window, width, height);
+    window->owner.cbs->resized(window, width, height);
 }
 
 static inline void vout_window_ReportClose(vout_window_t *window)
 {
-    if (window->owner.closed != NULL)
-        window->owner.closed(window);
+    if (window->owner.cbs->closed != NULL)
+        window->owner.cbs->closed(window);
 }
 
 static inline void vout_window_SendMouseEvent(vout_window_t *window,
                                               const vout_window_mouse_event_t *mouse)
 {
-    if (window->owner.mouse_event != NULL)
-        window->owner.mouse_event(window, mouse);
+    if (window->owner.cbs->mouse_event != NULL)
+        window->owner.cbs->mouse_event(window, mouse);
 }
 
 /**

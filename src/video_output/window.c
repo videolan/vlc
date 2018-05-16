@@ -163,6 +163,12 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
     vout_WindowMouseEvent(vout, mouse);
 }
 
+static const struct vout_window_callbacks vout_display_window_cbs = {
+    .resized = vout_display_window_ResizeNotify,
+    .closed = vout_display_window_CloseNotify,
+    .mouse_event = vout_display_window_MouseEvent,
+};
+
 /**
  * Creates a video window, initially without any attached display.
  */
@@ -180,10 +186,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
 
     char *modlist = var_InheritString(vout, "window");
     vout_window_owner_t owner = {
+        .cbs = &vout_display_window_cbs,
         .sys = state,
-        .resized = vout_display_window_ResizeNotify,
-        .closed = vout_display_window_CloseNotify,
-        .mouse_event = vout_display_window_MouseEvent,
     };
     vout_window_t *window;
 
