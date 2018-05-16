@@ -229,6 +229,17 @@ EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( int group, const vlc
 /*
  * Commands Queue management
  */
+#if 0
+/* For queue printing/debugging */
+std::ostream& operator<<(std::ostream& ostr, const std::list<AbstractCommand *>& list)
+{
+    for (auto &i : list) {
+        ostr << "[" << i->getType() << "]" << (i->getTime() /CLOCK_FREQ) << " ";
+    }
+    return ostr;
+}
+#endif
+
 CommandsQueue::CommandsQueue( CommandsFactory *f )
 {
     bufferinglevel = VLC_TS_INVALID;
@@ -249,7 +260,16 @@ CommandsQueue::~CommandsQueue()
 
 static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
 {
-    return (a->getTime() < b->getTime() && a->getTime() != VLC_TS_INVALID);
+    if(a->getTime() == b->getTime())
+    {
+        /* Reorder the initial clock PCR setting PCR0 DTS0 PCR0 DTS1 PCR1
+           so it appears after the block, avoiding it not being output */
+        if(a->getType() == ES_OUT_SET_GROUP_PCR &&
+           b->getType() == ES_OUT_PRIVATE_COMMAND_SEND)
+            return false;
+        return true;
+    }
+    else return (a->getTime() < b->getTime() && a->getTime() != VLC_TS_INVALID);
 }
 
 void CommandsQueue::Schedule( AbstractCommand *command )
