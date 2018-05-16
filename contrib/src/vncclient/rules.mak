@@ -32,10 +32,15 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 
 DEPS_vncclient = gcrypt $(DEPS_gcrypt) jpeg $(DEPS_jpeg) png $(DEPS_png) gnutls $(DEPS_gnutls)
 
+VNCCLIENT_CONF := $(HOSTCONF) --without-libva
+ifdef HAVE_WIN32
+VNCCLIENT_CONF += --without-pthread
+endif
+
 .vncclient: vncclient
 	$(REQUIRE_GPL)
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --without-libva
+	cd $< && $(HOSTVARS) ./configure $(VNCCLIENT_CONF)
 	cd $< && $(MAKE) -C libvncclient install
 	cd $< && $(MAKE) install-data
 	rm $(PREFIX)/lib/pkgconfig/libvncserver.pc
