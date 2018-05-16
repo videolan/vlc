@@ -296,8 +296,7 @@ static inline int vout_window_HideMouse(vout_window_t *window, bool hide)
 static inline void vout_window_ReportSize(vout_window_t *window,
                                           unsigned width, unsigned height)
 {
-    if (window->owner.resized != NULL)
-        window->owner.resized(window, width, height);
+    window->owner.resized(window, width, height);
 }
 
 static inline void vout_window_ReportClose(vout_window_t *window)
