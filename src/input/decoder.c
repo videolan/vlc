@@ -970,7 +970,7 @@ static void PacketizerGetCc( decoder_t *p_dec, decoder_t *p_dec_cc )
     DecoderPlayCc( p_dec, p_cc, &desc );
 }
 
-static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
+static void DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
                            const decoder_cc_desc_t *p_desc )
 {
     decoder_owner_sys_t *p_owner = p_videodec->p_owner;
@@ -983,10 +983,9 @@ static int DecoderQueueCc( decoder_t *p_videodec, block_t *p_cc,
         else
             block_Release( p_cc );
     }
-    return 0;
 }
 
-static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
+static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
                              unsigned *restrict pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -998,7 +997,7 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     {
         vlc_mutex_unlock( &p_owner->lock );
         picture_Release( p_picture );
-        return -1;
+        return;
     }
 
     prerolled = p_owner->i_preroll_end > (mtime_t)INT64_MIN;
@@ -1077,11 +1076,10 @@ static int DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         goto discard;
     }
 
-    return 0;
+    return;
 discard:
     *pi_lost_sum += 1;
     picture_Release( p_picture );
-    return 0;
 }
 
 static void DecoderUpdateStatVideo( decoder_owner_sys_t *p_owner,
@@ -1115,19 +1113,18 @@ static void DecoderUpdateStatVideo( decoder_owner_sys_t *p_owner,
     }
 }
 
-static int DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
+static void DecoderQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     assert( p_pic );
     unsigned i_lost = 0;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    int ret = DecoderPlayVideo( p_dec, p_pic, &i_lost );
+    DecoderPlayVideo( p_dec, p_pic, &i_lost );
 
     p_owner->pf_update_stat( p_owner, 1, i_lost );
-    return ret;
 }
 
-static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
+static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
                              unsigned *restrict pi_lost_sum )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
@@ -1140,7 +1137,7 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     {
         vlc_mutex_unlock( &p_owner->lock );
         block_Release( p_audio );
-        return -1;
+        return;
     }
 
     prerolled = p_owner->i_preroll_end > (mtime_t)INT64_MIN;
@@ -1161,7 +1158,7 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
         block_Release( p_audio );
-        return 0;
+        return;
     }
 
     /* */
@@ -1207,7 +1204,7 @@ static int DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
         *pi_lost_sum += 1;
         block_Release( p_audio );
     }
-    return 0;
+    return;
 }
 
 static void DecoderUpdateStatAudio( decoder_owner_sys_t *p_owner,
@@ -1241,16 +1238,14 @@ static void DecoderUpdateStatAudio( decoder_owner_sys_t *p_owner,
     }
 }
 
-static int DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
+static void DecoderQueueAudio( decoder_t *p_dec, block_t *p_aout_buf )
 {
     unsigned lost = 0;
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    int ret = DecoderPlayAudio( p_dec, p_aout_buf, &lost );
+    DecoderPlayAudio( p_dec, p_aout_buf, &lost );
 
     p_owner->pf_update_stat( p_owner, 1, lost );
-
-    return ret;
 }
 
 static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic )
@@ -1296,12 +1291,11 @@ static void DecoderUpdateStatSpu( decoder_owner_sys_t *p_owner,
     (void) p_owner; (void) decoded; (void) lost;
 }
 
-static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
+static void DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
 {
     assert( p_spu );
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
 
-    int i_ret = -1;
     vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
     if( p_vout && p_owner->p_spu_vout == p_vout )
     {
@@ -1318,7 +1312,6 @@ static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
         {
             vlc_mutex_unlock( &p_owner->lock );
             DecoderPlaySpu( p_dec, p_spu );
-            i_ret = 0;
         }
     }
     else
@@ -1327,7 +1320,6 @@ static int DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     }
     if( p_vout )
         vlc_object_release( p_vout );
-    return i_ret;
 }
 
 static void DecoderProcess( decoder_t *p_dec, block_t *p_block );

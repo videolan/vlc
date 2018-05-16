@@ -174,13 +174,13 @@ struct decoder_t
     int             (*pf_get_display_rate)( decoder_t * );
 
     /* XXX use decoder_QueueVideo or decoder_QueueVideoWithCc */
-    int             (*pf_queue_video)( decoder_t *, picture_t * );
+    void            (*pf_queue_video)( decoder_t *, picture_t * );
     /* XXX use decoder_QueueAudio */
-    int             (*pf_queue_audio)( decoder_t *, block_t * );
+    void            (*pf_queue_audio)( decoder_t *, block_t * );
     /* XXX use decoder_QueueCC */
-    int             (*pf_queue_cc)( decoder_t *, block_t *, const decoder_cc_desc_t * );
+    void            (*pf_queue_cc)( decoder_t *, block_t *, const decoder_cc_desc_t * );
     /* XXX use decoder_QueueSub */
-    int             (*pf_queue_sub)( decoder_t *, subpicture_t *);
+    void            (*pf_queue_sub)( decoder_t *, subpicture_t *);
     void             *p_queue_ctx;
 
     /* Private structure for the owner of the decoder */
@@ -306,14 +306,12 @@ VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
  * The caller doesn't own the picture anymore after this call (even in case of
  * error).
  * FIXME: input_DecoderFrameNext won't work if a module use this function.
- *
- * \return 0 if the picture is queued, -1 on error
  */
-static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
+static inline void decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
     assert( p_pic->p_next == NULL );
     assert( dec->pf_queue_video != NULL );
-    return dec->pf_queue_video( dec, p_pic );
+    dec->pf_queue_video( dec, p_pic );
 }
 
 /**
@@ -322,17 +320,14 @@ static inline int decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
  * \param dec the decoder object
  * \param p_cc the closed-caption to queue
  * \param p_desc decoder_cc_desc_t description structure
- * \return 0 if queued, -1 on error
  */
-static inline int decoder_QueueCc( decoder_t *dec, block_t *p_cc,
+static inline void decoder_QueueCc( decoder_t *dec, block_t *p_cc,
                                    const decoder_cc_desc_t *p_desc )
 {
     if( dec->pf_queue_cc == NULL )
-    {
         block_Release( p_cc );
-        return -1;
-    }
-    return dec->pf_queue_cc( dec, p_cc, p_desc );
+    else
+        dec->pf_queue_cc( dec, p_cc, p_desc );
 }
 
 /**
@@ -341,14 +336,12 @@ static inline int decoder_QueueCc( decoder_t *dec, block_t *p_cc,
  * \note
  * The caller doesn't own the audio block anymore after this call (even in case
  * of error).
- *
- * \return 0 if the block is queued, -1 on error
  */
-static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
+static inline void decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
 {
     assert( p_aout_buf->p_next == NULL );
     assert( dec->pf_queue_audio != NULL );
-    return dec->pf_queue_audio( dec, p_aout_buf );
+    dec->pf_queue_audio( dec, p_aout_buf );
 }
 
 /**
@@ -357,14 +350,12 @@ static inline int decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
  * \note
  * The caller doesn't own the subtitle anymore after this call (even in case of
  * error).
- *
- * \return 0 if the subtitle is queued, -1 on error
  */
-static inline int decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
+static inline void decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
 {
     assert( p_spu->p_next == NULL );
     assert( dec->pf_queue_sub != NULL );
-    return dec->pf_queue_sub( dec, p_spu );
+    dec->pf_queue_sub( dec, p_spu );
 }
 
 /**
