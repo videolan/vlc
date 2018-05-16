@@ -302,7 +302,6 @@ protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(MOVE)
 
 .protoc: protobuf
-	(cd $< && autoreconf -fiv)
 	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
 	touch $@
