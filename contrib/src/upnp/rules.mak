@@ -11,9 +11,12 @@ $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 
 .sum-upnp: libupnp-$(UPNP_VERSION).tar.bz2
 
+UPNP_CFLAGS   := $(CFLAGS)   -DUPNP_STATIC_LIB
+UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
 ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
-LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
+UPNP_CFLAGS   += -DPTW32_STATIC_LIB
+UPNP_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 ifdef HAVE_WINSTORE
 CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
@@ -50,6 +53,6 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" ./configure --disable-samples --without-documentation $(CONFIGURE_ARGS) $(HOSTCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(UPNP_CFLAGS)" CXXFLAGS="$(UPNP_CXXFLAGS)" ./configure --disable-samples --without-documentation $(CONFIGURE_ARGS) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
