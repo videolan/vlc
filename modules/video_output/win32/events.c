@@ -699,7 +699,6 @@ static int Win32VoutCreateWindow( event_thread_t *p_event )
     #if defined(MODULE_NAME_IS_direct3d9) || defined(MODULE_NAME_IS_direct3d11)
     else
     {
-        vout_display_DeleteWindow(vd, NULL);
         p_event->parent_window = NULL;
         p_event->hparent = GetDesktopHandle(vd);
     }
