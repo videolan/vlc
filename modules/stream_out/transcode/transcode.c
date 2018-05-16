@@ -499,9 +499,12 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->p_encoder = NULL;
 
     /* Create decoder object */
-    id->p_decoder = vlc_object_create( p_stream, sizeof( decoder_t ) );
-    if( !id->p_decoder )
+    struct decoder_owner * p_owner = vlc_object_create( p_stream, sizeof( *p_owner ) );
+    if( !p_owner )
         goto error;
+    p_owner->p_stream = p_stream;
+
+    id->p_decoder = &p_owner->dec;
     id->p_decoder->p_module = NULL;
     es_format_Init( &id->p_decoder->fmt_out, p_fmt->i_cat, 0 );
     es_format_Copy( &id->p_decoder->fmt_in, p_fmt );

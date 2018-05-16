@@ -52,9 +52,10 @@ static const video_format_t* video_output_format( sout_stream_id_sys_t *id,
 
 static int video_update_format_decoder( decoder_t *p_dec )
 {
-    sout_stream_t        *stream = (sout_stream_t*) p_dec->p_owner;
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    sout_stream_id_sys_t *id = p_owner->id;
+    sout_stream_t        *stream = p_owner->p_stream;
     sout_stream_sys_t    *sys    = stream->p_sys;
-    sout_stream_id_sys_t *id     = p_dec->p_queue_ctx;
     filter_chain_t       *test_chain;
 
     filter_owner_t filter_owner = {
@@ -154,7 +155,8 @@ static void* EncoderThread( void *obj )
 
 static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 {
-    sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    sout_stream_id_sys_t *id = p_owner->id;
 
     vlc_mutex_lock(&id->fifo.lock);
     *id->fifo.pic.last = p_pic;
@@ -178,15 +180,21 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     /* Open decoder
-     * Initialization of decoder structures
      */
+    dec_get_owner( id->p_decoder )->id = id;
+
+    static const struct decoder_owner_callbacks dec_cbs =
+    {
+        .video = {
+            video_update_format_decoder,
+            video_new_buffer_decoder,
+            decoder_queue_video,
+        },
+    };
+    id->p_decoder->cbs = &dec_cbs;
+
     id->p_decoder->pf_decode = NULL;
-    id->p_decoder->pf_queue_video = decoder_queue_video;
-    id->p_decoder->p_queue_ctx = id;
     id->p_decoder->pf_get_cc = NULL;
-    id->p_decoder->pf_vout_format_update = video_update_format_decoder;
-    id->p_decoder->pf_vout_buffer_new = video_new_buffer_decoder;
-    id->p_decoder->p_owner = (decoder_owner_sys_t*) p_stream;
 
     id->p_decoder->p_module =
         module_need_var( id->p_decoder, "video decoder", "codec" );

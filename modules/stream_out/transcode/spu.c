@@ -47,7 +47,8 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
 
 static void decoder_queue_sub( decoder_t *p_dec, subpicture_t *p_spu )
 {
-    sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    sout_stream_id_sys_t *id = p_owner->id;
 
     vlc_mutex_lock(&id->fifo.lock);
     *id->fifo.spu.last = p_spu;
@@ -73,12 +74,18 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
     /*
      * Open decoder
      */
+    dec_get_owner( id->p_decoder )->id = id;
 
-    /* Initialization of decoder structures */
+    static const struct decoder_owner_callbacks dec_cbs =
+    {
+        .spu = {
+            spu_new_buffer,
+            decoder_queue_sub,
+        },
+    };
+    id->p_decoder->cbs = &dec_cbs;
+
     id->p_decoder->pf_decode = NULL;
-    id->p_decoder->pf_spu_buffer_new = spu_new_buffer;
-    id->p_decoder->pf_queue_sub = decoder_queue_sub;
-    id->p_decoder->p_queue_ctx = id;
     /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
 
     id->p_decoder->p_module =

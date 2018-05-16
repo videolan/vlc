@@ -57,7 +57,8 @@ static const int pi_channels_maps[9] =
 
 static int audio_update_format( decoder_t *p_dec )
 {
-    sout_stream_id_sys_t *id     = p_dec->p_queue_ctx;
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    sout_stream_id_sys_t *id = p_owner->id;
 
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     aout_FormatPrepare( &p_dec->fmt_out.audio );
@@ -158,7 +159,8 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
 
 static void decoder_queue_audio( decoder_t *p_dec, block_t *p_audio )
 {
-    sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    sout_stream_id_sys_t *id = p_owner->id;
 
     vlc_mutex_lock(&id->fifo.lock);
     *id->fifo.audio.last = p_audio;
@@ -185,12 +187,18 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     /*
      * Open decoder
      */
+    dec_get_owner( id->p_decoder )->id = id;
 
-    /* Initialization of decoder structures */
+    static const struct decoder_owner_callbacks dec_cbs =
+    {
+        .audio = {
+            audio_update_format,
+            decoder_queue_audio,
+        },
+    };
+    id->p_decoder->cbs = &dec_cbs;
+
     id->p_decoder->pf_decode = NULL;
-    id->p_decoder->pf_queue_audio = decoder_queue_audio;
-    id->p_decoder->p_queue_ctx = id;
-    id->p_decoder->pf_aout_format_update = audio_update_format;
     /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
     id->p_decoder->p_module =
         module_need_var( id->p_decoder, "audio decoder", "codec" );

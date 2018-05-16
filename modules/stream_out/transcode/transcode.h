@@ -132,6 +132,18 @@ struct sout_stream_id_sys_t
 
 };
 
+struct decoder_owner
+{
+    decoder_t dec;
+    sout_stream_t *p_stream;
+    sout_stream_id_sys_t *id;
+};
+
+static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
+{
+    return container_of( p_dec, struct decoder_owner, dec );
+}
+
 /* SPU */
 
 void transcode_spu_close  ( sout_stream_t *, sout_stream_id_sys_t * );
