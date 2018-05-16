@@ -344,6 +344,9 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
+    if( var_InheritBool( pWnd, "video-wallpaper" ) )
+        return VLC_EGENERIC;
+
     if( cfg->type != VOUT_WINDOW_TYPE_INVALID )
     {
 #ifdef X11_SKINS
