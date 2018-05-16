@@ -640,17 +640,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static vout_window_t *VoutDisplayNewWindow(vout_display_t *vd, unsigned type)
-{
-    vout_window_t *window = vd->cfg->window;
-
-    if (window == NULL)
-        return NULL;
-    if (type != VOUT_WINDOW_TYPE_INVALID && type != window->type)
-        return NULL;
-    return window;
-}
-
 static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -1145,7 +1134,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         owner = *owner_ptr;
     } else {
         owner.event      = VoutDisplayEvent;
-        owner.window_new = VoutDisplayNewWindow;
         owner.window_del = VoutDisplayDelWindow;
     }
     owner.sys = osys;
@@ -1225,17 +1213,6 @@ struct vout_display_sys_t {
 struct video_splitter_owner_t {
     vout_display_t *wrapper;
 };
-
-static vout_window_t *SplitterNewWindow(vout_display_t *vd, unsigned type)
-{
-    vout_window_t *window = vd->cfg->window;
-
-    if (window == NULL)
-        return NULL;
-    if (type != VOUT_WINDOW_TYPE_INVALID && type != window->type)
-        return NULL;
-    return window;
-}
 
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
@@ -1422,7 +1399,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     for (int i = 0; i < splitter->i_output; i++) {
         vout_display_owner_t vdo = {
             .event      = SplitterEvent,
-            .window_new = SplitterNewWindow,
             .window_del = SplitterDelWindow,
         };
         const video_splitter_output_t *output = &splitter->p_output[i];

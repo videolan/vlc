@@ -222,7 +222,6 @@ struct vout_display_owner_t {
      * These functions are set prior to the module instantiation and must not
      * be overwritten nor used directly (use the vout_display_*Window
      * wrapper */
-    vout_window_t *(*window_new)(vout_display_t *, unsigned type);
     void           (*window_del)(vout_display_t *, vout_window_t *);
 };
 
@@ -378,8 +377,13 @@ static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
  */
 static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned type)
 {
-    return vd->owner.window_new(vd, type);
+    vout_window_t *wnd = vd->cfg->window;
+
+    if (type != VOUT_WINDOW_TYPE_INVALID && wnd != NULL && type != wnd->type)
+        wnd = NULL;
+    return wnd;
 }
+
 /**
  * Deletes a window created by vout_display_NewWindow if window is non NULL
  * or any unused windows otherwise.
