@@ -1,0 +1,15 @@
+--- aom/build/cmake/pkg_config.cmake	2018-05-16 15:23:45.271012500 +0200
++++ aom/build/cmake/pkg_config.cmake.pthreads-w32	2018-05-16 15:22:46.304363700 +0200
+@@ -50,7 +50,11 @@ file(APPEND "${pkgconfig_file}" "Require
+ file(APPEND "${pkgconfig_file}" "Conflicts:\n")
+ file(APPEND "${pkgconfig_file}" "Libs: -L\${prefix}/lib -l${pkg_name} -lm\n")
+ if (CONFIG_MULTITHREAD AND HAVE_PTHREAD_H)
+-  file(APPEND "${pkgconfig_file}" "Libs.private: -lm -lpthread\n")
++  if(WIN32)
++    file(APPEND "${pkgconfig_file}" "Libs.private: -lm -lpthreadGC2\n")
++  else ()
++    file(APPEND "${pkgconfig_file}" "Libs.private: -lm -lpthread\n")
++  endif ()
+ else ()
+   file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
+ endif ()
