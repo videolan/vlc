@@ -11,13 +11,16 @@ ifeq ($(call need_pkg,"srt >= 1.2.2"),)
 PKGS_FOUND += srt
 endif
 
-ifdef HAVE_DARWIN_OS
-SRT_DARWIN=CFLAGS="$(CFLAGS) -Wno-error=partial-availability" CXXFLAGS="$(CXXFLAGS) -Wno-error=partial-availability"
-endif
-
+SRT_CFLAGS   := $(CFLAGS)
+SRT_CXXFLAGS := $(CXXFLAGS)
 DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
+endif
+
+ifdef HAVE_DARWIN_OS
+SRT_CFLAGS   += -Wno-error=partial-availability
+SRT_CXXFLAGS += -Wno-error=partial-availability
 endif
 
 $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
@@ -35,7 +38,7 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
 .srt: srt toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(SRT_DARWIN) $(CMAKE) \
+	cd $< && $(HOSTVARS_PIC) CFLAGS="$(SRT_CFLAGS)" CXXFLAGS="$(SRT_CXXFLAGS)" $(CMAKE) \
 		-DENABLE_SHARED=OFF -DUSE_GNUTLS=ON -DENABLE_CXX11=OFF
 	cd $< && $(MAKE) install
 	touch $@
