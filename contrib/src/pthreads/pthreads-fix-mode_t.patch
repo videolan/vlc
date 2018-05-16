@@ -1,0 +1,13 @@
+--- pthreads/semaphore.h	2018-05-16 22:10:12.938777300 +0200
++++ pthreads/semaphore.h.mode_t	2018-05-16 22:08:58.453800700 +0200
+@@ -98,8 +98,10 @@
+ #  if defined(__MINGW64__)
+ #    define HAVE_STRUCT_TIMESPEC
+ #    define HAVE_MODE_T
++#    include <sys/types.h>
+ #  elif defined(_UWIN) || defined(__MINGW32__)
+ #    define HAVE_MODE_T
++#    include <sys/types.h>
+ #  endif
+ #endif
+ 
