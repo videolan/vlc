@@ -22,6 +22,7 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
 	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
 endif
+	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
 	$(MOVE)
 ifdef HAVE_ANDROID
 	cp $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.c $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.h aom/aom_ports/
