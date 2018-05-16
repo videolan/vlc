@@ -34,8 +34,6 @@ endif
 	cd $< && $(HOSTVARS) $(PTHREADS_W32_CONF) $(MAKE) GC-static
 	mkdir -p -- "$(PREFIX)/include"
 	cd $< && cp -v pthread.h sched.h semaphore.h "$(PREFIX)/include/"
-	sed -e 's/#if HAVE_CONFIG_H/#if 0 \&\& HAVE_CONFIG_H/' -i \
-		"$(PREFIX)/include/pthread.h"
 	mkdir -p -- "$(PREFIX)/lib"
 	cp -v $</*.a "$(PREFIX)/lib/"
 	touch $@
