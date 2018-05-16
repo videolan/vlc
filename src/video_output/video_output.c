@@ -613,13 +613,12 @@ vout_window_t *vout_NewDisplayWindow(vout_thread_t *vout)
     return vout->p->window;
 }
 
-void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_window_t *window)
+void vout_DeleteDisplayWindow(vout_thread_t *vout)
 {
-    if (window == NULL && vout->p->window != NULL) {
+    if (vout->p->window != NULL) {
         vout_display_window_Delete(vout->p->window);
         vout->p->window = NULL;
     }
-    assert(vout->p->window == window);
 }
 
 void vout_SetDisplayWindowSize(vout_thread_t *vout,

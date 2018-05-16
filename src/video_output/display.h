@@ -34,7 +34,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 void vout_SendDisplayEventMouse(vout_thread_t *, const vlc_mouse_t *);
 
 vout_window_t *vout_NewDisplayWindow(vout_thread_t *);
-void vout_DeleteDisplayWindow(vout_thread_t *, vout_window_t *);
+void vout_DeleteDisplayWindow(vout_thread_t *);
 void vout_SetDisplayWindowSize(vout_thread_t *, unsigned, unsigned);
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *);

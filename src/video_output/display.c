@@ -655,7 +655,8 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 
     if (window != NULL)
         vout_display_window_Detach(window);
-    vout_DeleteDisplayWindow(osys->vout, window);
+    else
+        vout_DeleteDisplayWindow(osys->vout);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
