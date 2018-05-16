@@ -1,0 +1,20 @@
+--- pthreads/pthread.h	2018-05-16 09:51:14.092544900 +0200
++++ pthreads/pthread.h.warning	2018-05-16 09:50:54.762826300 +0200
+@@ -105,6 +105,7 @@
+ #define PTW32_LEVEL_MAX 3
+ 
+ #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_LEVEL)
++#undef PTW32_LEVEL
+ #define PTW32_LEVEL PTW32_LEVEL_MAX
+ /* Include everything */
+ #endif
+--- pthreads/sched.h	2018-05-16 09:55:09.844370300 +0200
++++ pthreads/sched.h.warning	2018-05-16 09:54:53.024845400 +0200
+@@ -61,6 +61,7 @@
+ #define PTW32_SCHED_LEVEL_MAX 3
+ 
+ #if ( defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112 )  || !defined(PTW32_SCHED_LEVEL)
++#undef PTW32_SCHED_LEVEL
+ #define PTW32_SCHED_LEVEL PTW32_SCHED_LEVEL_MAX
+ /* Include everything */
+ #endif
