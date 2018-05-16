@@ -314,8 +314,6 @@ static int Open(vlc_object_t *object)
     sys->dmx_handle = vc_dispmanx_display_open(0);
     vd->info.subpicture_chromas = subpicture_chromas;
 
-    vout_display_DeleteWindow(vd, NULL);
-
 out:
     if (ret != VLC_SUCCESS)
         Close(object);
