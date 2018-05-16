@@ -121,11 +121,10 @@ void image_HandlerDelete( image_handler_t *p_image )
  *
  */
 
-static int ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
+static void ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 {
     image_handler_t *p_image = p_dec->p_queue_ctx;
     picture_fifo_Push( p_image->outfifo, p_pic );
-    return 0;
 }
 
 static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,

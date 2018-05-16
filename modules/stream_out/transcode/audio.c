@@ -156,7 +156,7 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
     return VLC_SUCCESS;
 }
 
-static int decoder_queue_audio( decoder_t *p_dec, block_t *p_audio )
+static void decoder_queue_audio( decoder_t *p_dec, block_t *p_audio )
 {
     sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
 
@@ -164,7 +164,6 @@ static int decoder_queue_audio( decoder_t *p_dec, block_t *p_audio )
     *id->fifo.audio.last = p_audio;
     id->fifo.audio.last = &p_audio->p_next;
     vlc_mutex_unlock(&id->fifo.lock);
-    return 0;
 }
 
 static block_t *transcode_dequeue_all_audios( sout_stream_id_sys_t *id )

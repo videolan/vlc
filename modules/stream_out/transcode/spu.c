@@ -45,7 +45,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     return p_subpicture;
 }
 
-static int decoder_queue_sub( decoder_t *p_dec, subpicture_t *p_spu )
+static void decoder_queue_sub( decoder_t *p_dec, subpicture_t *p_spu )
 {
     sout_stream_id_sys_t *id = p_dec->p_queue_ctx;
 
@@ -53,7 +53,6 @@ static int decoder_queue_sub( decoder_t *p_dec, subpicture_t *p_spu )
     *id->fifo.spu.last = p_spu;
     id->fifo.spu.last = &p_spu->p_next;
     vlc_mutex_unlock(&id->fifo.lock);
-    return 0;
 }
 
 static subpicture_t *transcode_dequeue_all_subs( sout_stream_id_sys_t *id )
