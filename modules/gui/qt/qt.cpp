@@ -703,6 +703,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
     switch( p_intf->p_sys->voutWindowType )
     {
         case VOUT_WINDOW_TYPE_XID:
+        case VOUT_WINDOW_TYPE_HWND:
             if( var_InheritBool( p_wnd, "video-wallpaper" ) )
                 return VLC_EGENERIC;
             break;
