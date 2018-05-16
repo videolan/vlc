@@ -734,7 +734,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
 
     vlc_mutex_unlock(&sys->lock);
 
-    vout_display_DeleteWindow(vd, NULL);
+    vout_display_DeleteWindow(vd);
 
     return VLC_SUCCESS;
 

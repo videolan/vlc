@@ -640,12 +640,11 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
+static void VoutDisplayDelWindow(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (window == NULL)
-        vout_DeleteDisplayWindow(osys->vout);
+    vout_DeleteDisplayWindow(osys->vout);
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -1214,9 +1213,9 @@ struct video_splitter_owner_t {
     vout_display_t *wrapper;
 };
 
-static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
+static void SplitterDelWindow(vout_display_t *vd)
 {
-    (void) vd; (void) window;
+    (void) vd;
 }
 
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
