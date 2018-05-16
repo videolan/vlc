@@ -1,0 +1,61 @@
+--- caca/caca/Makefile.am	2018-05-16 16:48:26.720331200 +0200
++++ caca/caca/Makefile.am.ln	2018-05-16 16:47:40.299559100 +0200
+@@ -77,15 +77,15 @@ install-exec-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(libdir)
+ 	. ./libcaca.la || exit 1; \
+ 	for x in $$library_names; do \
+-	  ln -sf $$x $(DESTDIR)$(libdir)/$$(echo $$x | sed 's/caca/cucul/g'); \
++	  $(LN_S)f $$x $(DESTDIR)$(libdir)/$$(echo $$x | sed 's/caca/cucul/g'); \
+ 	done
+-	ln -sf libcaca.la $(DESTDIR)$(libdir)/libcucul.la
++	$(LN_S)f libcaca.la $(DESTDIR)$(libdir)/libcucul.la
+ 
+ install-data-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgconfigdir)
+-	ln -sf caca.pc $(DESTDIR)$(pkgconfigdir)/cucul.pc
++	$(LN_S)f caca.pc $(DESTDIR)$(pkgconfigdir)/cucul.pc
+ 	$(mkinstalldirs) $(DESTDIR)$(includedir)
+-	ln -sf caca.h $(DESTDIR)$(includedir)/cucul.h
++	$(LN_S)f caca.h $(DESTDIR)$(includedir)/cucul.h
+ 
+ uninstall-local:
+ 	. ./libcaca.la || exit 1; \
+--- caca/cxx/Makefile.am	2018-05-16 16:52:26.779732200 +0200
++++ caca/cxx/Makefile.am.ln	2018-05-16 16:51:42.191400000 +0200
+@@ -26,13 +26,13 @@ install-exec-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(libdir)
+ 	. ./libcaca++.la || exit 1; \
+ 	for x in $$library_names; do \
+-	  ln -sf $$x $(DESTDIR)$(libdir)/$$(echo $$x | sed 's/caca/cucul/g'); \
++	  $(LN_S)f $$x $(DESTDIR)$(libdir)/$$(echo $$x | sed 's/caca/cucul/g'); \
+ 	done
+-	ln -sf libcaca++.la $(DESTDIR)$(libdir)/libcucul++.la
++	$(LN_S)f libcaca++.la $(DESTDIR)$(libdir)/libcucul++.la
+ 
+ install-data-local:
+ 	$(mkinstalldirs) $(DESTDIR)$(pkgconfigdir)
+-	ln -sf caca++.pc $(DESTDIR)$(pkgconfigdir)/cucul++.pc
++	$(LN_S)f caca++.pc $(DESTDIR)$(pkgconfigdir)/cucul++.pc
+ endif
+ 
+ uninstall-local:
+--- caca/doc/Makefile.am	2018-05-16 16:52:49.359771300 +0200
++++ caca/doc/Makefile.am.ln	2018-05-16 16:51:49.010973600 +0200
+@@ -42,7 +42,7 @@ clean-local:
+ install-data-local:
+ if BUILD_DOCUMENTATION
+ 	mkdir -p $(DESTDIR)$(datadir)/doc
+-	ln -sf libcaca-dev $(DESTDIR)$(datadir)/doc/libcucul-dev
++	$(LN_S)f libcaca-dev $(DESTDIR)$(datadir)/doc/libcucul-dev
+ 	$(mkinstalldirs) $(DESTDIR)$(datadir)/doc/libcaca-dev/html
+ 	cp `find html -name '*.html' -o -name '*.gif' -o -name '*.png'` \
+ 	  $(DESTDIR)$(datadir)/doc/libcaca-dev/html
+@@ -54,7 +54,7 @@ if BUILD_DOCUMENTATION
+ endif
+ 	$(mkinstalldirs) $(DESTDIR)$(mandir)/man1
+ 	rm -f $(DESTDIR)$(mandir)/man1/cacademo.1
+-	ln -sf cacafire.1 $(DESTDIR)$(mandir)/man1/cacademo.1
++	$(LN_S)f cacafire.1 $(DESTDIR)$(mandir)/man1/cacademo.1
+ 
+ uninstall-local:
+ 	rm -f $(DESTDIR)$(datadir)/doc/libcucul-dev
