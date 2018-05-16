@@ -72,11 +72,7 @@ date_Decrement
 date_Increment
 date_Init
 decoder_AbortPictures
-decoder_GetDisplayDate
-decoder_GetDisplayRate
-decoder_GetInputAttachments
 decoder_NewAudioBuffer
-decoder_NewSubpicture
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_New

@@ -385,27 +385,57 @@ VLC_API block_t * decoder_NewAudioBuffer( decoder_t *, int i_nb_samples ) VLC_US
  * buffer. You have to release it using subpicture_Delete() or by returning
  * it to the caller as a decoder_QueueSub parameter.
  */
-VLC_API subpicture_t * decoder_NewSubpicture( decoder_t *, const subpicture_updater_t * ) VLC_USED;
+VLC_USED
+static inline subpicture_t *decoder_NewSubpicture( decoder_t *dec,
+                                                   const subpicture_updater_t *p_dyn )
+{
+    subpicture_t *p_subpicture = dec->pf_spu_buffer_new( dec, p_dyn );
+    if( !p_subpicture )
+        msg_Warn( dec, "can't get output subpicture" );
+    return p_subpicture;
+}
 
 /**
  * This function gives all input attachments at once.
  *
  * You MUST release the returned values
  */
-VLC_API int decoder_GetInputAttachments( decoder_t *, input_attachment_t ***ppp_attachment, int *pi_attachment );
+static inline int decoder_GetInputAttachments( decoder_t *dec,
+                                               input_attachment_t ***ppp_attachment,
+                                               int *pi_attachment )
+{
+    if( !dec->pf_get_attachments )
+        return VLC_EGENERIC;
+
+    return dec->pf_get_attachments( dec, ppp_attachment, pi_attachment );
+}
 
 /**
  * This function converts a decoder timestamp into a display date comparable
  * to mdate().
  * You MUST use it *only* for gathering statistics about speed.
  */
-VLC_API mtime_t decoder_GetDisplayDate( decoder_t *, mtime_t ) VLC_USED;
+VLC_USED
+static inline mtime_t decoder_GetDisplayDate( decoder_t *dec, mtime_t i_ts )
+{
+    if( !dec->pf_get_display_date )
+        return VLC_TS_INVALID;
+
+    return dec->pf_get_display_date( dec, i_ts );
+}
 
 /**
  * This function returns the current input rate.
  * You MUST use it *only* for gathering statistics about speed.
  */
-VLC_API int decoder_GetDisplayRate( decoder_t * ) VLC_USED;
+VLC_USED
+static inline int decoder_GetDisplayRate( decoder_t *dec )
+{
+    if( !dec->pf_get_display_rate )
+        return 1000 /* XXX: INPUT_RATE_DEFAULT */;
+
+    return dec->pf_get_display_rate( dec );
+}
 
 /** @} */
 /** @} */

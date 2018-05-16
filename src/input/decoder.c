@@ -665,51 +665,12 @@ block_t *decoder_NewAudioBuffer( decoder_t *dec, int samples )
     return block;
 }
 
-subpicture_t *decoder_NewSubpicture( decoder_t *p_decoder,
-                                     const subpicture_updater_t *p_dyn )
-{
-    subpicture_t *p_subpicture = p_decoder->pf_spu_buffer_new( p_decoder, p_dyn );
-    if( !p_subpicture )
-        msg_Warn( p_decoder, "can't get output subpicture" );
-    return p_subpicture;
-}
-
 static void RequestReload( decoder_t * p_dec )
 {
     decoder_owner_sys_t *p_owner = p_dec->p_owner;
     /* Don't override reload if it's RELOAD_DECODER_AOUT */
     int expected = RELOAD_NO_REQUEST;
     atomic_compare_exchange_strong( &p_owner->reload, &expected, RELOAD_DECODER );
-}
-
-/* decoder_GetInputAttachments:
- */
-int decoder_GetInputAttachments( decoder_t *p_dec,
-                                 input_attachment_t ***ppp_attachment,
-                                 int *pi_attachment )
-{
-    if( !p_dec->pf_get_attachments )
-        return VLC_EGENERIC;
-
-    return p_dec->pf_get_attachments( p_dec, ppp_attachment, pi_attachment );
-}
-/* decoder_GetDisplayDate:
- */
-mtime_t decoder_GetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
-{
-    if( !p_dec->pf_get_display_date )
-        return VLC_TS_INVALID;
-
-    return p_dec->pf_get_display_date( p_dec, i_ts );
-}
-/* decoder_GetDisplayRate:
- */
-int decoder_GetDisplayRate( decoder_t *p_dec )
-{
-    if( !p_dec->pf_get_display_rate )
-        return INPUT_RATE_DEFAULT;
-
-    return p_dec->pf_get_display_rate( p_dec );
 }
 
 void decoder_AbortPictures( decoder_t *p_dec, bool b_abort )
