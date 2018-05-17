@@ -17,7 +17,6 @@ pthreads: mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2 .sum-pthreads
 	$(MOVE)
 
 .pthreads: pthreads
-	$(REQUIRE_GPL)
 	cd $</mingw-w64-libraries/winpthreads && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) -C mingw-w64-libraries -C winpthreads install
 	touch $@
