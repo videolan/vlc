@@ -7,15 +7,15 @@
 # dushmantha <dushmantharupasinghe@gmail.com>, 2014
 # H.Shalitha Vikum  <HSVIKUM at sinhalaya dot com>, 2010
 # Prabath Swarna <prab4th@gmail.com>, 2013
-# Miyuru Sankalpa <miyuru@live.com>, 2016
+# Miyuru Sankalpa <miyuru@live.com>, 2016-2018
 # Pasindu Kavinda <pkavinda@gmail.com>, 2013-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: Miyuru Sankalpa <miyuru@live.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Miyuru Sankalpa <miyuru@live.com>, 2018\n"
 "Language-Team: Sinhala (https://www.transifex.com/yaron/teams/16553/si/)\n"
 "Language: si\n"
 "MIME-Version: 1.0\n"
@@ -583,16 +583,16 @@ msgstr ""
 "href=\"http://wiki.videolan.org/Knowledge_Base\">දැනුම් මූලය</a> තුලින් උපදෙස් ලබා "
 "ගන්න.</p><p>>ප්‍රධාන යතුරු පුවරු කෙටිමං ගැන වටහා ගැනීමට <a href=\"http://wiki."
 "videolan.org/Hotkeys\">කෙටිමං</a> පිටුව කියවන්න.</p><h3>උදව්</h3><p>ඕනෑම ප්‍රශ්නයක් "
-"ඇසීමට පෙරාතුව <a href=\"http://www.videolan.org/support/faq.html\">නිතර අසන ප්‍"
-"රශ්න</a> පිළිබඳවත් සිත යොමු කරන්න.</p><p>ඔබට අවශ්‍ය නම් <a href=\"http://forum."
+"ඇසීමට පෙරාතුව <a href=\"http://www.videolan.org/support/faq.html\">නිතර අසන "
+"ප්‍රශ්න</a> පිළිබඳවත් සිත යොමු කරන්න.</p><p>ඔබට අවශ්‍ය නම් <a href=\"http://forum."
 "videolan.org\">ෆෝරම</a>, <a href=\"http://www.videolan.org/vlc/lists.html"
 "\">තැපැල්-ලැයිස්තු</a> හෝ අපේ IRC නාලිකාවෙන් (<em>#videolan</em> irc.freenode.net "
 "හී) උපකාර ගැනීමට (සහ දීමට) හැකියි.</p><h3>ව්‍යාපෘතියට දායක වන්න</h3><p>ඇඳුම් නිර්මාණය "
-"කිරීමට, ප්‍රලේඛනය පරිවර්තනය කිරීමට, පරීක්‍ෂා කිරීම සහ කේතනය කිරීමට ඔබගේ කාලය ලබා දීමෙන් ප්‍"
-"රජාවට උපකාර කොට VideoLAN ව්‍යාපෘතියට උදව් කිරීමට ඔබටත් පුළුවනි. ඔබට හැකියාවක් ඇත්නම් යම් කිසි "
-"ආධාරයක් හෝ ද්‍රව්‍යමය දෑ ලබා දීමෙන් අපට උපකාර කල හැකියි. ඒ වගේම, ඔබට VLC මාධ්‍ය වාදකය "
-"<b>අන් අයටත් හඳුන්වා දීමෙන් සහ භාවිතා කිරීමට අනුබල දීමෙන්</b> අප වෙත අනුග්‍රහය දක්වන්නට පුළුවනි."
-"</p></body></html>"
+"කිරීමට, ප්‍රලේඛනය පරිවර්තනය කිරීමට, පරීක්‍ෂා කිරීම සහ කේතනය කිරීමට ඔබගේ කාලය ලබා දීමෙන් "
+"ප්‍රජාවට උපකාර කොට VideoLAN ව්‍යාපෘතියට උදව් කිරීමට ඔබටත් පුළුවනි. ඔබට හැකියාවක් ඇත්නම් යම් "
+"කිසි ආධාරයක් හෝ ද්‍රව්‍යමය දෑ ලබා දීමෙන් අපට උපකාර කල හැකියි. ඒ වගේම, ඔබට VLC මාධ්‍ය "
+"වාදකය <b>අන් අයටත් හඳුන්වා දීමෙන් සහ භාවිතා කිරීමට අනුබල දීමෙන්</b> අප වෙත අනුග්‍රහය දක්වන්නට "
+"පුළුවනි.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -1154,10 +1154,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "තාරතාවය"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -3574,8 +3573,8 @@ msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
 msgstr ""
-"ඔබ විසින් VLC ආරම්භ කරන සෑම අවස්ථාවක දී ම මාධ්‍ය පුස්තකාලය ස්වයංක්‍රීයව සුරැකෙනු ඇත සහ නැවත ප්‍"
-"රවේශනය කරනු ඇත."
+"ඔබ විසින් VLC ආරම්භ කරන සෑම අවස්ථාවක දී ම මාධ්‍ය පුස්තකාලය ස්වයංක්‍රීයව සුරැකෙනු ඇත සහ නැවත "
+"ප්‍රවේශනය කරනු ඇත."
 
 #: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Display playlist tree"
@@ -8904,28 +8903,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 බිටු"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 බිටු"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 බිටු"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "HTTP ප්‍රොක්සි සඳහා රහස්පදය"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -16841,8 +16836,8 @@ msgid ""
 "sheet."
 msgstr ""
 "ඔබට අවශ්‍ය නම් බහුවිකාශන (multicast) දහරාවක් විවෘත කිරීමට, දහරාවේ ප්‍රතිපාදක විසින් ලබා දුන් "
-"IP ලිපිනය ප්‍රවේශමින් ඇතුල් කරන්න. යුනිකාස්ට් ප්‍රකාරයේ දී VLC විසින් ඔබේ පරිගණකයේ IP ලිපිනය ස්වයංක්‍"
-"රීයව භාවිතයට ගනු ඇත. \n"
+"IP ලිපිනය ප්‍රවේශමින් ඇතුල් කරන්න. යුනිකාස්ට් ප්‍රකාරයේ දී VLC විසින් ඔබේ පරිගණකයේ IP ලිපිනය "
+"ස්වයංක්‍රීයව භාවිතයට ගනු ඇත. \n"
 "\n"
 "වෙනස් වූ ප්‍රොටොකෝලයක් භාවිතයෙන් දහරාවන් විවෘත කරන්නේ නම්, මෙම පත්‍රිකාව වසා දැමීමට 'අවලංගු "
 "කරන්න' බොත්තම ඔබන්න."
@@ -23570,18 +23565,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "ක්‍රියාකාරිත්ව අභිරුචි"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "ශ්‍රව්‍ය දහරා ප්‍රතිදානය සබල කරන්න"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23604,9 +23597,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "යළි සැකසීම තත්වය"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -23633,9 +23625,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "නැවත නොවිමසන්න"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27199,14 +27190,12 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "වාග්බාහුල්‍යය (0,1,2)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "පෙරහන:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -27241,9 +27230,8 @@ msgid "Start Time"
 msgstr "ආරම්භක කාලය"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "නවත්වන වේලාව"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27270,9 +27258,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "මාධ්‍යය සඳහා ආරම්භක වේලාව වෙනස් කරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27311,9 +27298,8 @@ msgid "SVCD/VCD"
 msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disable Disc Menus"
-msgstr "ඩීවිඩී මෙනු අක්‍රිය කරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
@@ -27332,14 +27318,12 @@ msgid "Audio and Subtitles"
 msgstr "ශ්‍රව්‍ය සහ උපසිරැසි"
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "උපසිරැසි ගොනුව භාවිතා කරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:146
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "ගොනුව තෝරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
 msgid "Choose one or more media file to open"
@@ -27366,9 +27350,8 @@ msgid "Please enter a network URL:"
 msgstr "කරුණාකර ජාලයේ URL ලබාදෙන්න:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "පැතිකඩ නාමය අස්ථානගත වී ඇත"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27399,9 +27382,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27416,9 +27398,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "හැඩහුරුව"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27437,9 +27418,8 @@ msgid "Features"
 msgstr "මුහුණුවර"
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "දහරා"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -27466,9 +27446,8 @@ msgid "Custom options"
 msgstr "රිසිකළ විකල්ප"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR ගුණත්වය"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27491,14 +27470,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "නියැදි අනුපාතය"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "පැතිකඩේ නම"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27509,9 +27486,8 @@ msgid "Destination Setup"
 msgstr "ඉලක්ක පිහිටුම"
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "ඩිරෙක්ටරියක් ‍තෝරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27528,14 +27504,12 @@ msgid "Display locally"
 msgstr "ප්‍රාදේශීයව දර්ශනය කරන්න"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "අන්තර්කේත විකල්ප"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "අන්තර්කේත විකල්ප"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -27554,14 +27528,12 @@ msgid "Miscellaneous Options"
 msgstr "විවිධ වූ සිටුවම්"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "ආරම්භක දහරාවේ හැඳුනුම සකස් කරන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "ප්‍රධාන දහරා ප්‍රතිදාන සැකසුම්"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27724,18 +27696,16 @@ msgid "Show systray icon"
 msgstr "systray අයිකනය පෙන්වන්න"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses අතුරුමුහුණත"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
 msgstr "ඈඳුම් සම්පත් ගොනුව:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "ධාවනය සහ නවතන්න"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -27794,9 +27764,8 @@ msgid "Default encoding"
 msgstr "පෙරනිමි කේතීකරණය"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
-#, fuzzy
 msgid "Subtitle effects"
-msgstr "උපසිරැසි කොඩෙක්"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27819,9 +27788,8 @@ msgid "Add a background"
 msgstr "පසුබිමක් එක් කරන්න"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "ප්‍රතිදානය"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -27978,14 +27946,12 @@ msgid "Soften"
 msgstr "මෘදු කෙරූ"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "ඝෝෂාව"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "අවකාශ නොපැහැදිලි බව"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
 msgid "Temporal luma strength"
@@ -28071,8 +28037,8 @@ msgstr "මාධ්‍ය කළමණාකරණ ලැයිස්තුව"
 #~ msgid ""
 #~ "The format of '%s' cannot be detected. Have a look at the log for details."
 #~ msgstr ""
-#~ "මෙම හැඩතලය වන  '%s' අනාවරණය කර ගැනීමට නොහැකි විය. වැඩි විස්තර සඳහා ලොග් සටහන පරීක්‍"
-#~ "ෂා කරන්න."
+#~ "මෙම හැඩතලය වන  '%s' අනාවරණය කර ගැනීමට නොහැකි විය. වැඩි විස්තර සඳහා ලොග් සටහන "
+#~ "පරීක්‍ෂා කරන්න."
 
 #~ msgid "Turn off all warning and information messages."
 #~ msgstr "සියලුම අවවාදාත්මක පණිවුඩ සහ තොරතුරු පෙන්වීම අත්හිටුවන්න."
@@ -29031,11 +28997,11 @@ msgstr "මාධ්‍ය කළමණාකරණ ලැයිස්තුව"
 #~ "%m = මාසය, %d = දිනය, %H = පැය, %M = මිනිත්තු, %S = තත්පර, ... පාර-දත්ත හා "
 #~ "සම්බන්ධ: $a = කලාකරු, $b = ඇල්බමය, $c = ප්‍රකාශන හිමිකම, $d = විස්තරය, $e = "
 #~ "කේතාංකණය කළේ, $g = වර්ගය, $l = භාෂාව, $n = පථ අංකය, $p = ධාවනය වෙමින්, $r = "
-#~ "ඇගයීම, $s = උපසිරැසි භාෂාව, $t = මාතෘකාව, $u = url, $A = දිනය, $B = ශ්‍රව්‍ය බිටු සීඝ්‍"
-#~ "රතාවය (kb/s වලින්), $C = පරිච්ඡේදය,$D = කාලසීමාව, $F = පෙත සමග සම්පූර්ණ නම, $I = "
-#~ "මාතෘකාව, $L = ඉතිරි වී ඇති කාලය, $N = නම, $O = ශ්‍රව්‍ය භාෂාව, $P = ස්ථානය (% "
-#~ "ලෙස), $R = සීඝ්‍රතාවය, $S = ශ්‍රව්‍ය නියැදි සීඝ්‍රතාවය (kHz වලින්), $T = කාලය, $U = ප්‍"
-#~ "රකාශක, $V = පරිමාව, $_ = නව මග) "
+#~ "ඇගයීම, $s = උපසිරැසි භාෂාව, $t = මාතෘකාව, $u = url, $A = දිනය, $B = ශ්‍රව්‍ය බිටු "
+#~ "සීඝ්‍රතාවය (kb/s වලින්), $C = පරිච්ඡේදය,$D = කාලසීමාව, $F = පෙත සමග සම්පූර්ණ නම, $I "
+#~ "= මාතෘකාව, $L = ඉතිරි වී ඇති කාලය, $N = නම, $O = ශ්‍රව්‍ය භාෂාව, $P = ස්ථානය (% "
+#~ "ලෙස), $R = සීඝ්‍රතාවය, $S = ශ්‍රව්‍ය නියැදි සීඝ්‍රතාවය (kHz වලින්), $T = කාලය, $U = "
+#~ "ප්‍රකාශක, $V = පරිමාව, $_ = නව මග) "
 
 #~ msgid "Mac OS X OpenGL video output (requires drawable-nsobject)"
 #~ msgstr "Mac OS X OpenGL වීඩියෝ ප්‍රතිදානය (requires drawable-nsobject)"
@@ -30663,8 +30629,8 @@ msgstr "මාධ්‍ය කළමණාකරණ ලැයිස්තුව"
 #~ "By default, VLC keeps the last equalizer settings before termination. "
 #~ "This feature can be disabled here."
 #~ msgstr ""
-#~ "පෙරනිමිය ලෙස, VLC විසින් අවසන් අයිතම 10 ක ලැයිස්තුවක් තබා ගනියි. මෙම පහසුකම ඔබට මෙහිදී අක්‍"
-#~ "රිය කළ හැකියි."
+#~ "පෙරනිමිය ලෙස, VLC විසින් අවසන් අයිතම 10 ක ලැයිස්තුවක් තබා ගනියි. මෙම පහසුකම ඔබට මෙහිදී "
+#~ "අක්‍රිය කළ හැකියි."
 
 #, fuzzy
 #~ msgid "No device connected"
