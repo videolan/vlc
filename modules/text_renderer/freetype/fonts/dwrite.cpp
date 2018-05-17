@@ -359,8 +359,20 @@ static bool DWrite_PartialMatch( filter_t *p_filter, ComPtr< IDWriteLocalizedStr
     wchar_t buff_sys[ LOCALE_NAME_MAX_LENGTH ] = {};
     wchar_t buff_usr[ LOCALE_NAME_MAX_LENGTH ] = {};
 
-    GetSystemDefaultLocaleName( buff_sys, LOCALE_NAME_MAX_LENGTH );
-    GetUserDefaultLocaleName( buff_usr, LOCALE_NAME_MAX_LENGTH );
+    HMODULE h_dll = GetModuleHandle(_T("kernel32.dll"));
+
+    typedef int ( WINAPI *GetUserDefaultLocaleName )( LPWSTR lpLocaleName, int cchLocaleName );
+    GetUserDefaultLocaleName OurGetUserDefaultLocaleName =
+        (GetUserDefaultLocaleName) GetProcAddress( h_dll, "GetUserDefaultLocaleName" );
+
+    typedef int ( WINAPI *GetSystemDefaultLocaleName )( LPWSTR lpLocaleName, int cchLocaleName );
+    GetSystemDefaultLocaleName OurGetSystemDefaultLocaleName =
+        (GetSystemDefaultLocaleName) GetProcAddress( h_dll, "GetSystemDefaultLocaleName" );
+
+    if( OurGetSystemDefaultLocaleName )
+        OurGetSystemDefaultLocaleName( buff_sys, LOCALE_NAME_MAX_LENGTH );
+    if( OurGetUserDefaultLocaleName )
+        OurGetUserDefaultLocaleName( buff_usr, LOCALE_NAME_MAX_LENGTH );
 
     const wchar_t *pp_locales[] = { L"en-US", buff_sys, buff_usr };
 
