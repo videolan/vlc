@@ -1,24 +1,23 @@
 # Kazakh translation
-# Copyright (C) 2016 VideoLAN
-# This file is distributed under the same license as the vlc package.
+# Copyright (C) 2018 VideoLAN
+# This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Kerimbekov Galym <kegalym2@mail.ru>, 2015-2016
 # Kypchak Kypchak <kypchak@gmail.com>, 2009
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2016-02-05 13:10+0000\n"
-"Last-Translator: Kerimbekov Galym <kegalym2@mail.ru>\n"
-"Language-Team: Kazakh (http://www.transifex.com/yaron/vlc-trans/language/"
-"kk/)\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"Language-Team: Kazakh (https://www.transifex.com/yaron/teams/16553/kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -180,9 +179,8 @@ msgstr ""
 "Экранды меню, субтитрлерге және \"жабынды суретшелерге\" қатысты баптаулар"
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Бөлгіш"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -652,9 +650,8 @@ msgid "Spectrum"
 msgstr "Спектр"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Үнділік өлшеуіш"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -675,9 +672,8 @@ msgid "Mono"
 msgstr "Моно"
 
 #: src/audio_output/output.c:425
-#, fuzzy
 msgid "Original"
-msgstr "Бастапқы ID"
+msgstr ""
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -798,14 +794,12 @@ msgid ""
 msgstr ""
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr "(әдепкі қосылған)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr "(әдепкі істен шығарылған)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -821,6 +815,8 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"%u модулдер олардың тек қосымша параметрлері болғандықтан көрсетілмеді.\n"
+msgstr[1] ""
 "%u модулдер олардың тек қосымша параметрлері болғандықтан көрсетілмеді.\n"
 
 #: src/config/help.c:663
@@ -947,9 +943,9 @@ msgid "Yes"
 msgstr "Иә"
 
 #: src/input/es_out.c:2136
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Жасырын титрлер %u"
+msgstr ""
 
 #: src/input/es_out.c:2138
 #, c-format
@@ -1036,9 +1032,8 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
-#, fuzzy
 msgid "Video resolution"
-msgstr "Бейнелеу ажыратылымдығы"
+msgstr ""
 
 #: src/input/es_out.c:3168
 msgid "Buffer dimensions"
@@ -1059,49 +1054,40 @@ msgid "Decoded format"
 msgstr "Декодталған формат"
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Top left"
-msgstr "сол"
+msgstr ""
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Left top"
-msgstr "Алдыңғы сол жақ"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Right bottom"
-msgstr "Төменгі шетімен"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Top right"
-msgstr "Туындыгерлік құқықтары"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom left"
-msgstr "Төменгі сол жақ"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom right"
-msgstr "Төменгі оң жақ"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Left bottom"
-msgstr "Төменгі шетімен"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Right top"
-msgstr "Оң жақ"
+msgstr ""
 
 #: src/input/es_out.c:3199
-#, fuzzy
 msgid "Orientation"
-msgstr "Жеткілімі"
+msgstr ""
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1118,9 +1104,8 @@ msgid "ITU-R BT.601 (625 lines, 50 Hz)"
 msgstr ""
 
 #: src/input/es_out.c:3217
-#, fuzzy
 msgid "Color primaries"
-msgstr "Түрлітүсті хабарлар"
+msgstr ""
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1132,14 +1117,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Түс сіріндісі"
+msgstr ""
 
 #: src/input/es_out.c:3248
-#, fuzzy
 msgid "Color space"
-msgstr "Түрлітүсті хабарлар"
+msgstr ""
 
 #: src/input/es_out.c:3248
 #, c-format
@@ -1147,9 +1130,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Full"
-msgstr "ТЖ толығымен"
+msgstr ""
 
 #: src/input/es_out.c:3257 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1163,34 +1145,28 @@ msgid "Center"
 msgstr "Ортасы бойынша"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgid "Top Left"
-msgstr "Жоғарғы сол жақ"
+msgstr ""
 
 #: src/input/es_out.c:3259
-#, fuzzy
 msgid "Top Center"
-msgstr "Ортасы бойынша"
+msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Төменгі сол жақ"
+msgstr ""
 
 #: src/input/es_out.c:3261
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Төменгі сол жақ"
+msgstr ""
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgid "Chroma location"
-msgstr "Түстік пішімі"
+msgstr ""
 
 #: src/input/es_out.c:3274
-#, fuzzy
 msgid "Rectangular"
-msgstr "Тікбұрышты сызықтық фаза"
+msgstr ""
 
 #: src/input/es_out.c:3277
 msgid "Equirectangular"
@@ -1201,9 +1177,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3286
-#, fuzzy
 msgid "Projection"
-msgstr "Шың қорғанысы"
+msgstr ""
 
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
@@ -1211,10 +1186,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Қадам"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -1227,14 +1201,12 @@ msgid "Field of view"
 msgstr ""
 
 #: src/input/es_out.c:3300
-#, fuzzy
 msgid "Max. luminance"
-msgstr "Көк телімі"
+msgstr ""
 
 #: src/input/es_out.c:3305
-#, fuzzy
 msgid "Min. luminance"
-msgstr "Көк телімі"
+msgstr ""
 
 #: src/input/es_out.c:3313
 msgid "Primary R"
@@ -1249,9 +1221,8 @@ msgid "Primary B"
 msgstr ""
 
 #: src/input/es_out.c:3334
-#, fuzzy
 msgid "White point"
-msgstr "Монтаждық нүктелер"
+msgstr ""
 
 #: src/input/es_out.c:3349 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1370,14 +1341,12 @@ msgid "Actors"
 msgstr "Актерлер"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Орындаушы"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Трек нөмірі"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1418,14 +1387,12 @@ msgid "Previous title"
 msgstr "Алдыңғы тақырып"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Үзіліс"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Үзіліс"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1624,9 +1591,8 @@ msgstr ""
 "ең жақсы тәсілді автоматты түрде таңдауға бейімделген."
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Тасушы файлдар"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1646,38 +1612,32 @@ msgstr ""
 "орындалмайтындықтан, бұл сонымен өндеу қорын шамалы үнемдейді."
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Саздық"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Орналасуы"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "Ойнақы"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Күшейту"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Жеткілімі"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Жайғасым"
+msgstr ""
 
 #: src/libvlc-module.c:144
-#, fuzzy
 msgid "Accessibility"
-msgstr "Шығыс қатынау"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1727,14 +1687,10 @@ msgid "This selects which plugin to use for audio resampling."
 msgstr "Дыбыс ресэмплдеушіні қолдану үшін қосымша бағдарламаны таңдау."
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"Дыбыс шығару арналарын қолжетімді болғанда әдепкі қалып режимінде қолдануды "
-"белгілейді (мысалы, егер сіздің жабдық мұны қолдаса, сондай-ақ дыбыс ағыны "
-"ойнатылған кезде)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -2088,9 +2044,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "Бейнелік терезені басқа терезелердің ең үстіне әрқашан орналастыру."
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Түсқағаз режімін қосу"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2624,9 +2579,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "Субтитр жолшықтың қолданбақ ағын теңдестіргіші"
 
 #: src/libvlc-module.c:612
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "Жасырын титр кодсыздандырғышы"
+msgstr ""
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2745,9 +2699,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:671
-#, fuzzy
 msgid "Record directory"
-msgstr "Қайнар көз тізімдемесі"
+msgstr ""
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
@@ -2816,14 +2769,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:710
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "DVB субтитрлер кодтауышы"
+msgstr ""
 
 #: src/libvlc-module.c:711
-#, fuzzy
 msgid "Changes the subtitles size where possible"
-msgstr "Субтитр кідірісін молайту"
+msgstr ""
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -2967,9 +2918,8 @@ msgid "TCP connection timeout"
 msgstr "TCP қосылымының үзілісі"
 
 #: src/libvlc-module.c:801
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "TCP қосылымының үзілісі"
+msgstr ""
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3329,19 +3279,16 @@ msgid "Stream filter module"
 msgstr "Ағын сүзгілеу модулі"
 
 #: src/libvlc-module.c:1009
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
+msgstr ""
 
 #: src/libvlc-module.c:1011
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Ағын сүзгілеу модулі"
+msgstr ""
 
 #: src/libvlc-module.c:1013
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
+msgstr ""
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3420,9 +3367,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1058
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "Ұнамды дестелеуіш тізімі"
+msgstr ""
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
@@ -3502,9 +3448,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC жаңартулары"
+msgstr ""
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3517,23 +3462,18 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1117
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "Файлдарды өздігінен алдын-ала талдау"
+msgstr ""
 
 #: src/libvlc-module.c:1119
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"Ойнату тізіміне үстелген файлдарды өздігінен алдын-ала талдау (қайсыбір мета-"
-"деректі шығарып алу үшін)."
 
 #: src/libvlc-module.c:1122
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Үзіліс"
+msgstr ""
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
@@ -3578,9 +3518,8 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Бұру бейнелік сүзгісі"
+msgstr ""
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -3645,14 +3584,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr ""
 
 #: src/libvlc-module.c:1180
-#, fuzzy
 msgid "Start paused"
-msgstr "Басталу уақыты"
+msgstr ""
 
 #: src/libvlc-module.c:1182
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr "Ағын бейнелеуінің кідірісін енгізеді."
+msgstr ""
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3701,19 +3638,16 @@ msgid "Ignore"
 msgstr "Елемеу"
 
 #: src/libvlc-module.c:1214
-#, fuzzy
 msgid "Volume control"
-msgstr "Деңгейді басқару"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control"
-msgstr "Жайғасым"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control reversed"
-msgstr "Жайғасым"
+msgstr ""
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
@@ -3996,52 +3930,40 @@ msgid "Navigate up"
 msgstr "Жоғарыға шарлау"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
-"DVD мәзірлерінде бөлектеуішті жоғарыға жылжыту үшін қолданбақ пернесін "
-"бөлектеңіз."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "Төменге шарлау"
 
 #: src/libvlc-module.c:1298
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
-"DVD мәзірлерінде бөлектеуішті төменге жылжыту үшін қолданбақ пернесін "
-"бөлектеңіз."
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "Солға шарлау"
 
 #: src/libvlc-module.c:1300
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
-"DVD мәзірлерінде бөлектеуішті сол жаққа жылжыту үшін қолданбақ пернесін "
-"бөлектеңіз."
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "Оңға шарлау"
 
 #: src/libvlc-module.c:1302
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
-"DVD мәзірлерінде бөлектеуішті оң жаққа жылжыту үшін қолданбақ пернесін "
-"бөлектеңіз."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4137,24 +4059,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "Субтитрдің кідірісін төмендету үшін қолданбақ пернесін бөлектеңіз."
 
 #: src/libvlc-module.c:1325
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Телетекст субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: src/libvlc-module.c:1326
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Субтитр жолшығын орайғыту"
+msgstr ""
 
 #: src/libvlc-module.c:1327
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Субтитр файлын қолдану"
+msgstr ""
 
 #: src/libvlc-module.c:1328
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "Субтитрдің кідірісін жоғарылату үшін қолданбақ пернесін бөлектеңіз."
+msgstr ""
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4370,14 +4288,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "Қатынаулы дыбыстық жолшықтар (тілдер) арасында орайғыту."
 
 #: src/libvlc-module.c:1391
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "Субтитр жолшығын орайғыту"
+msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Қатынаулы субтитр жолшықтар арасында орайғыту."
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -5900,19 +5816,16 @@ msgid "Attachment input"
 msgstr ""
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "Дыбыс шығару модулі"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Дыбыс шығару модулі"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Еш кіресін құрылғысы табылмады."
+msgstr ""
 
 #: modules/access/avcapture.m:287
 msgid ""
@@ -6010,9 +5923,8 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 
 #: modules/access/bluray.c:799
-#, fuzzy
 msgid "Java required"
-msgstr "SDP URL"
+msgstr ""
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6077,23 +5989,20 @@ msgid "CDDB Server port to use."
 msgstr "CDDB серверінің қолданбақ порты."
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Кіресін тізімі"
+msgstr ""
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
 msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "Орналасуы"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "TCP пәрмен кіресіні"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6104,9 +6013,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr ""
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "Файлға жұрналдау"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6202,9 +6110,8 @@ msgid "Composite"
 msgstr ""
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "Бейне"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6484,23 +6391,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Терезе безендірулері"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
 msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "SMB кіресіні"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Қызмет әшекерлеу модульдері"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -6948,48 +6852,43 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "Серік ауқымы коды"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "DVB-T жаймалай тексеру"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
 msgstr ""
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid "Use NIT for scanning services"
-msgstr "Санақ үшін қолданады."
+msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
 msgstr "v4l2 қолдауы бар DVB кіресіні"
 
 #: modules/access/dvb/scan.c:817
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%.1f MHz (%d services)\n"
 "~%s remaining"
-msgstr "%.1f MHz (%d қызметтер)"
+msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "DVB-T жаймалай тексеру"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7081,9 +6980,8 @@ msgid "Directory"
 msgstr ""
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "Арнаулы модульдер"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7136,9 +7034,8 @@ msgid "Account that will be used for the connection."
 msgstr ""
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "HTTP түпнұсқалық растамасы"
+msgstr ""
 
 #: modules/access/ftp.c:79
 #, c-format
@@ -7196,14 +7093,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr ""
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "HTTP кіресіні"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7214,9 +7109,8 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "Алға аттау"
+msgstr ""
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
@@ -7231,9 +7125,8 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Пайдаланушы аты"
+msgstr ""
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7393,14 +7286,12 @@ msgid "Memory input"
 msgstr ""
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Таңдалғанды алып тастау"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Жалған ағындық шығасын"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7655,14 +7546,12 @@ msgid "NFS"
 msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Еш кіресін жоқ"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Сеанс сәтсіз"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -7702,19 +7591,16 @@ msgid "PulseAudio input"
 msgstr ""
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "Айнала"
+msgstr ""
 
 #: modules/access/qtsound.m:60
-#, fuzzy
 msgid "QuickTime Sound Capture"
-msgstr "Quicktime қармау"
+msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Еш кіресін құрылғысы табылмады."
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
 msgid ""
@@ -7723,9 +7609,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Еш кіресін құрылғысы табылмады."
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -7868,9 +7753,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Ағын бөлектеу"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8110,9 +7994,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr ""
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "RTSP түпнұсқалық растамасы"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8123,14 +8006,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:387
-#, fuzzy
 msgid "SRT input"
-msgstr "FTP кіресіні"
+msgstr ""
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
 msgid "SRT chunk size (bytes)"
@@ -8141,9 +8022,8 @@ msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
-#, fuzzy
 msgid "SRT latency (ms)"
-msgstr "DTS кідірісі  (ms)"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8162,9 +8042,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr ""
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "RTP көзінің үзілісі (s)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8245,9 +8124,8 @@ msgid "Frequency"
 msgstr "Жиілігі"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "Тюнер теңдестіргіші (жымдастыру щығасынын қараңыз)."
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8767,14 +8645,12 @@ msgid "VNC client access"
 msgstr ""
 
 #: modules/access/wasapi.c:485
-#, fuzzy
 msgid "Loopback mode"
-msgstr "Кайталау кідірісі:"
+msgstr ""
 
 #: modules/access/wasapi.c:486
-#, fuzzy
 msgid "Record an audio rendering endpoint."
-msgstr "Дыбыс құруды қосу/доғару."
+msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -8789,14 +8665,12 @@ msgid "Dummy stream output"
 msgstr "Жалған ағындық шығасын"
 
 #: modules/access_output/file.c:315
-#, fuzzy
 msgid "Keep existing file"
-msgstr "Бар файлға жалғау"
+msgstr ""
 
 #: modules/access_output/file.c:316
-#, fuzzy
 msgid "Overwrite"
-msgstr "Бетті алмастыру"
+msgstr ""
 
 #: modules/access_output/file.c:317
 msgid ""
@@ -8805,9 +8679,8 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/file.c:375
-#, fuzzy
 msgid "Overwrite existing file"
-msgstr "Бар файлға жалғау"
+msgstr ""
 
 #: modules/access_output/file.c:377
 msgid "If the file already exists, it will be overwritten."
@@ -8822,18 +8695,16 @@ msgid "Append to file if it exists instead of replacing it."
 msgstr ""
 
 #: modules/access_output/file.c:381
-#, fuzzy
 msgid "Format time and date"
-msgstr "Пішімделінген субтитрлер"
+msgstr ""
 
 #: modules/access_output/file.c:382
 msgid "Perform ISO C time and date formatting on the file path"
 msgstr ""
 
 #: modules/access_output/file.c:384
-#, fuzzy
 msgid "Synchronous writing"
-msgstr "Қадамдастыру"
+msgstr ""
 
 #: modules/access_output/file.c:385
 msgid "Open the file with synchronous writing."
@@ -8844,9 +8715,8 @@ msgid "File stream output"
 msgstr "Ағындық шығасынын файлға жазу"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Бейнелік ағынды өңдету үшін қолданатын бейне фильтрлері."
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -8862,9 +8732,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr ""
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Металл"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -8876,9 +8745,8 @@ msgid "HTTP stream output"
 msgstr "HTTP ағындық шығасыны"
 
 #: modules/access_output/livehttp.c:67
-#, fuzzy
 msgid "Segment length"
-msgstr "Сегмент"
+msgstr ""
 
 #: modules/access_output/livehttp.c:68
 msgid "Length of TS stream segments"
@@ -8894,14 +8762,12 @@ msgid ""
 msgstr ""
 
 #: modules/access_output/livehttp.c:74
-#, fuzzy
 msgid "Number of segments"
-msgstr "Баған саны"
+msgstr ""
 
 #: modules/access_output/livehttp.c:75
-#, fuzzy
 msgid "Number of segments to include in index"
-msgstr "Қоспалау рет саны"
+msgstr ""
 
 #: modules/access_output/livehttp.c:77
 msgid "Allow cache"
@@ -8912,14 +8778,12 @@ msgid "Add EXT-X-ALLOW-CACHE:NO directive in playlist-file if this is disabled"
 msgstr ""
 
 #: modules/access_output/livehttp.c:80
-#, fuzzy
 msgid "Index file"
-msgstr "Кескін жары"
+msgstr ""
 
 #: modules/access_output/livehttp.c:81
-#, fuzzy
 msgid "Path to the index file to create"
-msgstr "Колданбақ мұқаба жолы."
+msgstr ""
 
 #: modules/access_output/livehttp.c:83
 msgid "Full URL to put in index file"
@@ -8930,9 +8794,8 @@ msgid "Full URL to put in index file. Use #'s to represent segment number"
 msgstr ""
 
 #: modules/access_output/livehttp.c:87
-#, fuzzy
 msgid "Delete segments"
-msgstr "Телетекст туралауы"
+msgstr ""
 
 #: modules/access_output/livehttp.c:88
 msgid "Delete segments when they are no longer needed"
@@ -8943,14 +8806,12 @@ msgid "Use muxers rate control mechanism"
 msgstr ""
 
 #: modules/access_output/livehttp.c:92
-#, fuzzy
 msgid "AES key URI to place in playlist"
-msgstr "Ойнату тізімінде іздеу"
+msgstr ""
 
 #: modules/access_output/livehttp.c:94
-#, fuzzy
 msgid "AES key file"
-msgstr "Жаңа бейін жасау "
+msgstr ""
 
 #: modules/access_output/livehttp.c:95
 msgid "File containing the 16 bytes encryption key"
@@ -8976,23 +8837,20 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr ""
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Қоспалау рет саны"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
 msgstr ""
 
 #: modules/access_output/livehttp.c:109
-#, fuzzy
 msgid "HTTP Live streaming output"
-msgstr "HTTP ағындық шығасыны"
+msgstr ""
 
 #: modules/access_output/livehttp.c:110
-#, fuzzy
 msgid "LiveHTTP"
-msgstr "Лайв"
+msgstr ""
 
 #: modules/access_output/shout.c:64
 #: modules/gui/qt/components/sout/sout_widgets.cpp:385
@@ -9028,46 +8886,40 @@ msgid "Genre description"
 msgstr "Жанр сипаттамасы"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "Мазмұн жанры."
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Сипаттама"
+msgstr ""
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
 msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "Қайта кодталған ағындық қарқын туралы ақпар."
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "Қайта кодталған ағындың іріктеме қарқыны туралы ақпар."
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "Арна саны"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "Қайта кодталған ағындың арна саны туралы ақпар."
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Ogg Vorbis сапасы"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Қайта кодталған ағындың Ogg Vorbis сапасы туралы ақпар."
+msgstr ""
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9089,40 +8941,34 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "Жіберілген байттар"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "Жіберілген байттар"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "Жіберілген байттар"
+msgstr ""
 
 #: modules/access_output/srt.c:437
-#, fuzzy
 msgid "SRT stream output"
-msgstr "RTP ағындық шығасыны"
+msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "HTTP прокси үшін құпия сөз"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
 msgstr "Бүркемелеу мәні, (ms)"
 
 #: modules/access_output/udp.c:64
-#, fuzzy
 msgid ""
 "Default caching value for outbound UDP streams. This value should be set in "
 "milliseconds."
-msgstr "Бүркемелеу мәні, микросекунд"
+msgstr ""
 
 #: modules/access_output/udp.c:67
 msgid "Group packets"
@@ -9357,9 +9203,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Көрнекі бейнелеуіш"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9456,9 +9301,8 @@ msgid "Release time"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "Бейне тақырыбын x ms үшін көрсету"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9475,9 +9319,8 @@ msgid "Ratio"
 msgstr ""
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Пішімдік арақатынасы: %s"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9512,9 +9355,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "PCM пішімін түрлендіруге аналған дыбыстық сүзгі"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "A/52->S/PDIF тыстауға арналған дыбыстық сүзгі"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -9767,14 +9609,12 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Құру сапасы"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "Дыбыс ресэмплдеуші"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -9828,9 +9668,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Дыбыстық арналар"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -9867,9 +9706,8 @@ msgid "Length in milliseconds to search for best overlap position"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
-#, fuzzy
 msgid "Pitch Shift"
-msgstr "Қадам"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
@@ -10202,33 +10040,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
-#, fuzzy
 msgid "Disabled"
-msgstr "Доғару"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
-#, fuzzy
 msgid "Enabled"
-msgstr "Қосу"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1473
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "Windows GDI бейнелік шығасыны "
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Output back-end"
-msgstr "Шығасын құрылғысы"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Топтық тарату шығасынының тілдесуі"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10315,9 +10148,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "AES3/SMPTE 302M дыбыстық дестелеуіші"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10328,9 +10160,8 @@ msgid "Raw audio encoder"
 msgstr "Пішімсіз дыбыстық кодтауыш"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "Файлға жалғау"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
@@ -10349,30 +10180,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "Көрсетілетін субтитрдің X тұрағиаты"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "Мәтін құрушы"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "Көрсетілетін субтитрдің X тұрағиаты"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "DVB субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "DVB субтитрлері"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10823,14 +10649,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:357
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "PNG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "SDL кескін кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -10877,28 +10701,24 @@ msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
 msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "Кілтті кадрлар межелдемесі:"
+msgstr ""
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
 msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Theora бейнелік дестелеуіші"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11450,29 +11270,24 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "MPEG дыбыстық кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Theora бейнелік дестелеуіші"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "Тікелей құру"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "Тікелей құру"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -11706,9 +11521,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "Жалған пішімсіз бейнелік дестелеуіш"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Theora бейнелік кодтауыш"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12082,9 +11896,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr ""
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "Санақ кодсыздандыруышы"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12095,9 +11908,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "Санақ кодсыздандыруышы"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -12489,18 +12301,16 @@ msgid "Image width"
 msgstr "Кескін ені"
 
 #: modules/codec/svg.c:51
-#, fuzzy
 msgid "Specify the width to decode the image too"
-msgstr "Қолданбақ тізбектестіру модулін тапсыру."
+msgstr ""
 
 #: modules/codec/svg.c:52 modules/video_filter/scene.c:67
 msgid "Image height"
 msgstr "Кескін биіктігі"
 
 #: modules/codec/svg.c:53
-#, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "Қолданбақ тізбектестіру модулін тапсыру."
+msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
@@ -12511,9 +12321,8 @@ msgid "Scale factor to apply to image"
 msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -12554,9 +12363,8 @@ msgid "Teletext subtitles decoder"
 msgstr "Телетекст субтитрлер кодсыздандырғышы"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "DVB субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -12581,23 +12389,20 @@ msgid "Theora video encoder"
 msgstr "Theora бейнелік кодтауыш"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "Санақ кодсыздандыруышы"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "DVB субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "TTA демуксері"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -12642,14 +12447,12 @@ msgid "Ulead DV audio decoder"
 msgstr ""
 
 #: modules/codec/videotoolbox.m:82
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Жабдықтың YUV->RGB түрлендірулерін қолданып"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "CDG бейнелік кодсыздандырғыш"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -12686,9 +12489,8 @@ msgid "Vorbis audio encoder"
 msgstr "Vorbis дыбыстық кодтауышы"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Дабырсыз режімі"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -12703,24 +12505,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Theora бейнелік кодтауыш"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "Санақ кодсыздандыруышы"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "DVB субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "Vobsub субтитрлер талдағышы"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13435,9 +13233,8 @@ msgid "Default preset setting used"
 msgstr ""
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Қосымша параметрлер"
+msgstr ""
 
 #: modules/codec/x264.c:422
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
@@ -13513,9 +13310,8 @@ msgid "frame alternation"
 msgstr ""
 
 #: modules/codec/x264.c:445
-#, fuzzy
 msgid "2D"
-msgstr "2"
+msgstr ""
 
 #: modules/codec/x264.c:449
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -13565,9 +13361,8 @@ msgid "Output teletext subtitles as text instead of as RGBA."
 msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "Жаңғырықтыру деңгейі"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -13814,9 +13609,9 @@ msgid "Subtitle position %d px"
 msgstr ""
 
 #: modules/control/hotkeys.c:1354
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "DVB субтитрлер кодтауышы"
+msgstr ""
 
 #: modules/control/hotkeys.c:1515
 #, c-format
@@ -13872,9 +13667,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "VNC хост атауы не IP мекенжайы."
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -14244,6 +14038,7 @@ msgstr ""
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] ""
+msgstr[1] ""
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -14322,19 +14117,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Windows қызметінің тілдесуі"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "Бейненің ең көпі ені"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "Бейненің ең көп биіктігі"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -14345,9 +14137,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "Балама"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -14358,23 +14149,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Медитация"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "Өткізу қабілеті"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "Өткізу қабілеті"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -14385,9 +14173,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "Медитация"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -14558,14 +14345,12 @@ msgid "Dirac video demuxer"
 msgstr ""
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "DirectShow кіресіні"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "Сахна бейнелік сүзгісі"
+msgstr ""
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -14689,9 +14474,8 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Тізімдеме таңдау"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -14777,14 +14561,12 @@ msgid "Writer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:69
-#, fuzzy
 msgid "Composer"
-msgstr "Құрастырғыш: %s\n"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:70
-#, fuzzy
 msgid "Producer"
-msgstr "Жайғасым"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:71 modules/demux/mp4/meta.c:137
 #: modules/gui/qt/components/controller.hpp:112
@@ -14793,38 +14575,32 @@ msgid "Information"
 msgstr "Сипаттар"
 
 #: modules/demux/mp4/meta.c:72
-#, fuzzy
 msgid "Disclaimer"
-msgstr "Арылу"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:73
-#, fuzzy
 msgid "Requirements"
-msgstr "Сегменттер"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:74
-#, fuzzy
 msgid "Original Format"
-msgstr "Бастапқы ID"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:75
-#, fuzzy
 msgid "Display Source As"
-msgstr "Бейнелеу теңшелімдері"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:76
 msgid "Host Computer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:77
-#, fuzzy
 msgid "Performers"
-msgstr "Өнімділік параметрлері"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:78
-#, fuzzy
 msgid "Original Performer"
-msgstr "Бастапқы мөлшері"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:79
 msgid "Providers Source Content"
@@ -14835,9 +14611,8 @@ msgid "Warning"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:81
-#, fuzzy
 msgid "Software"
-msgstr "Софт"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
 #: modules/demux/xiph_metadata.h:64
@@ -14845,53 +14620,44 @@ msgid "Lyrics"
 msgstr "Ән сөзі"
 
 #: modules/demux/mp4/meta.c:83
-#, fuzzy
 msgid "Record Company"
-msgstr "Жазу бітірілді"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:84
-#, fuzzy
 msgid "Model"
-msgstr "Режім"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Жайғасым"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
-#, fuzzy
 msgid "Grouping"
-msgstr "Топ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:88
-#, fuzzy
 msgid "Sub-Title"
-msgstr "Субтитрі"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:89
 msgid "Arranger"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:90
-#, fuzzy
 msgid "Art Director"
-msgstr "Басқарушы"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:91
-#, fuzzy
 msgid "Copyright Acknowledgement"
-msgstr "Туындыгерлік құқықтар мета-дерегі"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:92
-#, fuzzy
 msgid "Conductor"
-msgstr "Жайғасым"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:93
-#, fuzzy
 msgid "Song Description"
-msgstr "Сипаттама"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:94
 msgid "Liner Notes"
@@ -14918,18 +14684,16 @@ msgid "Executive Producer"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Кодтау"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "Тасушының тізімдемелік нөмірі (MCN, Media Catalog Number)"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -14940,14 +14704,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Аластау"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "JACK дыбыстық кіресін"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -14962,9 +14724,8 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
-#, fuzzy
 msgid "Do not seek"
-msgstr "Тез іріктеу"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1683
 msgid "Build index"
@@ -15114,24 +14875,20 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG I/II тасымалдау ағындық демуксері"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Шифрланған дыбыс"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "Бүл кодек бойынша сипаттама жоқ."
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "Телетекст субтитрлері: естуі әлсіреген"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
-#, fuzzy
 msgid "Spoken subtitles for the visually impaired"
-msgstr "DVB субтитрлері: естуі әлсіреген"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -15331,9 +15088,8 @@ msgid "Load"
 msgstr "Қотару"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Қанықтық"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15903,9 +15659,8 @@ msgstr ""
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "Артқа аттау"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -15916,32 +15671,27 @@ msgstr "Алға"
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Алға аттау"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Ойнатуды басқару"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Ойнату"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Алдыңғы тақырып"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Уақытқа өту"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -16222,18 +15972,16 @@ msgid "Play/Pause the current media"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "Бұру бейнелік сүзгісі"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "Толық бейнебеттен кету"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16242,9 +15990,8 @@ msgid "Volume"
 msgstr "Деңгей"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Кескінді лайықтау"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -16701,14 +16448,12 @@ msgid "Jump to Time"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Мәтін құрушы"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
-#, fuzzy
 msgid "No renderer"
-msgstr "Мәтін құрушы"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -16986,18 +16731,17 @@ msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "Деңгей төменге"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Дыбыстық әсерлер"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17018,18 +16762,16 @@ msgid "Open"
 msgstr "Ашу"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Ағындық шығыс"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Теңшеу..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Кіресін таңдау"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17052,9 +16794,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Файл бөлектеу"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17160,14 +16901,12 @@ msgid "Subscreen top"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "Бейнебетше ені"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "Бейнебетше биіктігі"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -17178,14 +16917,12 @@ msgid "Add Subtitle File:"
 msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "Kate мәтін субтитрлер дестелеуші"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Субтитр файлын қолдану"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -17285,14 +17022,12 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:230
-#, fuzzy
 msgid "Expand All"
-msgstr "Түйінді жаю"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
-#, fuzzy
 msgid "Collapse All"
-msgstr "тасалау"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -17511,9 +17246,8 @@ msgid "Note that these are system-wide settings."
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "General settings"
-msgstr "Дыбыстың жалпы баптаулары"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -17532,14 +17266,12 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Ойнату сәтсіздігі"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:324
-#, fuzzy
 msgid "Enable notifications on playlist item change"
-msgstr "Жолшық ауысқанда қалқымалы хабарлама көрсету"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -17551,14 +17283,12 @@ msgid "Automatically check for updates"
 msgstr "Жаңартуларды өздігінен тексеру"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Qt тілдесуі"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Мұқабалы тілдесу"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -17619,14 +17349,12 @@ msgid "Show video within the main window"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Толық бейнебетке"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Бейне іске қосылуынан толық бейнебет режімінде"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -17754,40 +17482,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Ойнату/Аялдату"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
-#, fuzzy
 msgid "Toggle random order playback"
-msgstr "Ойнату тізімін кездейсоқ ойнатуын ажырата қосу"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Терезені жабу"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "URL-мекенжайы сипаттамасы"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "Ойнатылуда"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Қалта таңдау"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Аралық сақтағыштан ашу"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -18385,14 +18106,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr ""
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[Қайталау]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[Кездейсоқ]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -18432,9 +18151,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr ""
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr "Ағымдық бірлікті қайталау"
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -18471,9 +18189,8 @@ msgid "Teletext Activation"
 msgstr "Телетекст белсендіру"
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Мөлдірлікті ажырата қосу"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -18632,15 +18349,13 @@ msgid "Aspect Ratio"
 msgstr ""
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
-#, fuzzy
 msgid "No EPG Data Available"
-msgstr "Қатынаулы болғанда S/PDIF қолдану"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
-#, fuzzy
 msgid "Image Files"
-msgstr "Кескін жары"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -18774,9 +18489,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "VLC басымдылығын лайықтау"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -19149,11 +18863,10 @@ msgid "Select File"
 msgstr "Файл бөлектеу"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
-msgstr "Салғастырылған тездету пернесін ауыстыру үшін әрекетті бөлектеңіз:"
+msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -19462,9 +19175,8 @@ msgid "Convert"
 msgstr "Түрлендіру"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Еш файл бөлектелмеген"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19479,18 +19191,16 @@ msgid "Browse"
 msgstr "Шолу"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "Еш файл бөлектелмеген"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:95
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Файлға жалғау"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -19542,9 +19252,8 @@ msgid "Adjustments and Effects"
 msgstr "Лайықтаулар және әсерлер"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Стерео режімі"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19560,9 +19269,8 @@ msgid "&Save"
 msgstr "Сақтау"
 
 #: modules/gui/qt/dialogs/external.cpp:216
-#, fuzzy
 msgid "Store the Password"
-msgstr "Құпия сөз"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19679,9 +19387,8 @@ msgid "Save log file as..."
 msgstr "Жұрнал файлын басқаша сақтау..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Мәтіндер / Жұрналдар (*.log *.txt);; Бәрі (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -20189,14 +19896,12 @@ msgstr "Барлық файлдар"
 #: modules/gui/qt/extensions_manager.cpp:181
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
-#, fuzzy
 msgid "Empty"
-msgstr " - Бос - "
+msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Белсендіру"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
@@ -20235,9 +19940,8 @@ msgid "Subti&tle"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
-#, fuzzy
 msgid "Tool&s"
-msgstr "Құрал"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -20332,9 +20036,8 @@ msgid "Docked Playlist"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:501
-#, fuzzy
 msgid "Always on &top"
-msgstr "Әрқашан ең үстінде"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20365,9 +20068,8 @@ msgid "&Increase Volume"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:599
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Деңгейді төмендету"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20526,19 +20228,16 @@ msgid "&Clear"
 msgstr "Аластау"
 
 #: modules/gui/qt/menus.cpp:1641
-#, fuzzy
 msgid "&Renderer"
-msgstr "Мәтін құрушы"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1645
-#, fuzzy
 msgid "<Local>"
-msgstr "Вокалды"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "DVB-T жаймалай тексеру"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20644,9 +20343,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Деңгей жүгіртпесі түстерін анықтау"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -20657,9 +20355,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "Іске қосылу режімін және көрсетімін таңдау"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -20690,9 +20387,8 @@ msgid "Load extensions on startup"
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "Шыққанда деңгейді өздігінен сақтап қалу"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -20709,9 +20405,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "Әдепкі өң түсі"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
 msgid "Background art fits window's size."
@@ -20730,9 +20425,8 @@ msgid ""
 msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Басты интерфейс баптаулары"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
@@ -20765,10 +20459,9 @@ msgid "debug"
 msgstr ""
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "Аластау"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -20779,14 +20472,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "Мұқаба файлдары |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "Ойнату тізімі файлдары|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "|All Files |*"
-msgstr "Барлық файлдар"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -20797,9 +20488,8 @@ msgid "Save playlist"
 msgstr "Ойнату тізімін сақтау"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr " XSPF ойнату тізімі|*.xspf|M3U файлы|*.m3u|HTML ойнату тізімі|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -20862,9 +20552,8 @@ msgid "Select skin"
 msgstr "Мұқаба бөлектеу"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Мұқаба ашу..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20927,9 +20616,8 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr ""
 
 #: modules/hw/d3d9/d3d9_filters.c:454
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "DirectX дыбыстық шығасын"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -20959,9 +20647,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "Тізбектестіру"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -20990,9 +20677,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Кезектесу әдісін екпіндету"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -21009,14 +20695,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1184
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Бейнелік сүзгі"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1185
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Бейнелік сүзгі"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21079,38 +20763,32 @@ msgid "VDPAU sharpen video filter"
 msgstr ""
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "Ұнамды дестелеуіш тізімі"
+msgstr ""
 
 #: modules/keystore/file.c:55
-#, fuzzy
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Ортақ жадын қолданып"
+msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Таңдалғанды алып тастау"
+msgstr ""
 
 #: modules/keystore/file.c:66
-#, fuzzy
 msgid "Secrets are stored encrypted on a file"
-msgstr "Ортақ жадын қолданып"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
-#, fuzzy
 msgid "No"
-msgstr "Ештеңе"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:47
-#, fuzzy
 msgid "System default"
-msgstr "Жүйелік теңдестіргіш"
+msgstr ""
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -21125,9 +20803,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:52
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "Әрқашан ең үстінде"
+msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
@@ -21138,9 +20815,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:57
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "Сол және оң жақтарын қадамдастыру"
+msgstr ""
 
 #: modules/keystore/keychain.m:58
 msgid ""
@@ -21172,33 +20848,28 @@ msgid "KWallet keystore"
 msgstr ""
 
 #: modules/keystore/kwallet.c:49
-#, fuzzy
 msgid "Secrets are stored via KWallet"
-msgstr "Ортақ жадын қолданып"
+msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Таңдалғанды алып тастау"
+msgstr ""
 
 #: modules/keystore/memory.c:42
-#, fuzzy
 msgid "Secrets are stored in memory"
-msgstr "Ортақ жадын қолданып"
+msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
 msgstr ""
 
 #: modules/keystore/secret.c:40
-#, fuzzy
 msgid "Secrets are stored via libsecret"
-msgstr "Ортақ жадын қолданып"
+msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Рәміз үстеу"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -21213,28 +20884,24 @@ msgid "Turn off all messages on the console."
 msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Консоль"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Консоль"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Көбірек ақпар"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "Жымдастыру бүркеншігі"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -21257,14 +20924,12 @@ msgid "Log format"
 msgstr "Жұрнал пішімі"
 
 #: modules/logger/file.c:212
-#, fuzzy
 msgid "Specify the logging format."
-msgstr "Жұрнал файл атын тапсыру."
+msgstr ""
 
 #: modules/logger/file.c:214
-#, fuzzy
 msgid "Verbosity"
-msgstr "Сөзуарлық (0,1,2)"
+msgstr ""
 
 #: modules/logger/file.c:215
 msgid ""
@@ -21273,14 +20938,12 @@ msgid ""
 msgstr ""
 
 #: modules/logger/file.c:219
-#, fuzzy
 msgid "Logger"
-msgstr "Жұрналдау"
+msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Файлға жұрналдау"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -21299,9 +20962,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Жымдастыру бүркеншігі"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -21316,18 +20978,16 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "Ықтималдығы"
+msgstr ""
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
 msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "syslog жүйесіне жұрналдау"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -22026,39 +21686,32 @@ msgid "Synthpop"
 msgstr ""
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "Ең көп жергілікті ағындық қарқын"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
-#, fuzzy
 msgid "Addons local storage installer"
-msgstr "Ең көп жергілікті ағындық қарқын"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:93
-#, fuzzy
 msgid "Addons local storage lister"
-msgstr "Ең көп жергілікті ағындық қарқын"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "Бейне түрлендіру сүзгісі"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
-#, fuzzy
 msgid "addons.videolan.org addons finder"
-msgstr "Бейне түрлендіру сүзгісі"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:70
-#, fuzzy
 msgid "Videolan.org's single archive addons finder"
-msgstr "Бейне түрлендіру сүзгісі"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:72
-#, fuzzy
 msgid "single .vlp archive addons finder"
-msgstr "Бейне түрлендіру сүзгісі"
+msgstr ""
 
 #: modules/misc/audioscrobbler.c:115
 msgid "The username of your last.fm account"
@@ -22110,9 +21763,8 @@ msgid "acoustid"
 msgstr ""
 
 #: modules/misc/fingerprinter.c:74
-#, fuzzy
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr "Еш кіресін табылмады"
+msgstr ""
 
 #: modules/misc/gnutls.c:485
 msgid ""
@@ -22169,9 +21821,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:756
-#, fuzzy
 msgid "Use system trust database"
-msgstr "Қармау үшін ұнамды кадр қарқыны."
+msgstr ""
 
 #: modules/misc/gnutls.c:758
 msgid ""
@@ -22180,9 +21831,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:761
-#, fuzzy
 msgid "Trust directory"
-msgstr "Уақыт ығыстру тізімдемесі"
+msgstr ""
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -22229,9 +21879,8 @@ msgid "Playing some media."
 msgstr "Небір тасушыны ойнату."
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "Бейнебет қорғауышты доғару"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
 msgid "D-Bus screen saver inhibition"
@@ -22686,9 +22335,8 @@ msgid "WAV muxer"
 msgstr "WAV муксері"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "Гүріл туралы құлақтандыру қондырмасы"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -22699,18 +22347,16 @@ msgid "Now playing"
 msgstr "Ойнатылуда"
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "Жарнама елемеу"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr "Үзіліс (ms)"
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "Хабарлама қай ұзаққа бейнеледі"
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -22791,26 +22437,22 @@ msgid "VC-1 packetizer"
 msgstr "VC-1 дестелеуіші"
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
 msgid "Zeroconf network services"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -22837,14 +22479,12 @@ msgstr ""
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Bonjour қызметтері"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -22991,28 +22631,24 @@ msgid "Unknown type"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Дыбыстық арналар"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Тізімді аластау"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Қызметтер"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "Теңшелетін"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -23251,13 +22887,10 @@ msgid ""
 msgstr ""
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"Жабынды мәтіннің лайсаңдығы (мөлдірліктің керілеуі). 0 = мөлдір, 255 = "
-"бүтіндей мөлдір емес."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
@@ -23729,9 +23362,8 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Ағын фильтрлері"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
@@ -23742,9 +23374,8 @@ msgid "Block stream cache"
 msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "Ағынды жергілікті бейнелеу"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -23759,24 +23390,20 @@ msgid "gzip decompression"
 msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "+-[Ағындық жіберу]"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "Бейнені кейіңгі өңдету сүзгісі"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Ағын фильтрлері"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "Мөлшерлерін ауыстыру"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -23791,9 +23418,8 @@ msgid "Prefetch background read size (bytes)"
 msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "Сүзгілеу табалдырығы"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -23907,24 +23533,20 @@ msgid "Bridge in"
 msgstr "Тұйықтау өшіру"
 
 #: modules/stream_out/chromaprint.c:57
-#, fuzzy
 msgid "Duration of the fingerprinting"
-msgstr "Дыбыстық кіресінінің түйіспесі"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Әдепкі ағын"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Ағындық шығасынын жинау"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:188
-#, fuzzy
 msgid "HTTP port"
-msgstr "HTTP прокси"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid ""
@@ -23934,18 +23556,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Өнімділік параметрлері"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Дыбыстық ағындық шығасынын қосу"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23968,37 +23588,32 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Құру сапасы"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:226
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "Ағын алатын компьютердің мекенжайы"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:227
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Түстік пішімі"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:238
-#, fuzzy
 msgid "Chromecast"
-msgstr "Түстік"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:239
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "Ағындық шығасынын жинау"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
 msgid "Ok, Don't warn me again"
@@ -24011,18 +23626,16 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Түстік пішімі"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "Ағындық шығасынын телнұсқалау"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -24531,9 +24144,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/standard.c:51
-#, fuzzy
 msgid "Address to bind to (helper setting for dst)"
-msgstr "иемденетін мекенжайы (dst үшін көмекші баптау)"
+msgstr ""
 
 #: modules/stream_out/standard.c:53
 msgid ""
@@ -24542,9 +24154,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/standard.c:55
-#, fuzzy
 msgid "Filename for stream (helper setting for dst)"
-msgstr "ағындың файл аты (dst үшін көмекші баптау)"
+msgstr ""
 
 #: modules/stream_out/standard.c:57
 msgid ""
@@ -24731,9 +24342,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "Суретше жайғасымы"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -24787,13 +24397,10 @@ msgid "Text opacity"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"Жабынды мәтіннің лайсаңдығы (мөлдірліктің керілеуі). 0 = мөлдір, 255 = "
-"бүтіндей мөлдір емес."
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -24846,9 +24453,8 @@ msgid "Shadow distance"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Мәтін жайғасымы"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -24873,14 +24479,12 @@ msgid "Thick"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "Оң жағын толықтыру үшін нүкте саны"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "Солға шарлау"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -25026,9 +24630,8 @@ msgid "YUVP converter"
 msgstr "YUVP түрлендіруіші"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Кескін реңкі (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
@@ -25333,9 +24936,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Анықтығын үлкейту бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -25507,14 +25109,12 @@ msgid "Deinterlacing video filter"
 msgstr "Тізбектестіру бейнелік сүзгісі"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Қимыл байқаудың бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Құрылғы бөлектеуі"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -25557,14 +25157,12 @@ msgid "Extract RGB component video filter"
 msgstr "RGB құрамдасын бөліп алатын бейнелік сүзгісі"
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Сахна бейнелік сүзгісі"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "YUVP түрлендіруіші"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -25750,9 +25348,8 @@ msgid "Direction"
 msgstr ""
 
 #: modules/video_filter/mirror.c:72
-#, fuzzy
 msgid "Direction of the mirroring."
-msgstr "Дыбыстық кіресінінің түйіспесі"
+msgstr ""
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -26229,9 +25826,8 @@ msgid "ASCII-art video output"
 msgstr "Каллиграмма бейнелік шығасыны"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Терезені жабу"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -26260,9 +25856,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "Зертасты сурет мөлдірлігі."
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -26330,18 +25925,16 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Бейнелік шығасын модулі"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Дыбыс шығару модулі"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Options"
@@ -26540,18 +26133,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "DirectX дыбыстық шығасын"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "DirectX дыбыстық шығасын"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -26622,9 +26213,8 @@ msgid "Wallpaper"
 msgstr "Түсқағаз"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "OpenGL бейнелік шығасыны"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -26691,9 +26281,8 @@ msgstr "Бейнелік жады"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "X11 бейнелеу"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
@@ -26715,9 +26304,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Сұр шәкілді бейнелік шығасын"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -26823,9 +26411,8 @@ msgid "Force use of a specific chroma for output."
 msgstr ""
 
 #: modules/video_output/yuv.c:48
-#, fuzzy
 msgid "Add a YUV4MPEG2 header"
-msgstr "WAVE дерек басын үстеу"
+msgstr ""
 
 #: modules/video_output/yuv.c:49
 msgid ""
@@ -27102,24 +26689,20 @@ msgid "Image wall"
 msgstr "Кескін жары"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "Әсерлер бейнелік терезесінің еңі, нүкте."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "Әсерлер бейнелік терезесінің биіктігі, нүкте."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Спектр"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "Ағымдық көрнекі бейне"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -27265,10 +26848,8 @@ msgid "Show 80 bands instead of 20"
 msgstr ""
 
 #: modules/visualization/visual/visual.c:72
-#, fuzzy
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
 msgstr ""
-"Спектрометрде жиіліктер жолақтары көбірек : 80 егер қосылса, әйтпесе 20."
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -27359,9 +26940,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "Үстіне қалқу"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -27596,14 +27176,12 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Сөзуарлық (0,1,2)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "Сүзгі:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -27638,9 +27216,8 @@ msgid "Start Time"
 msgstr "Басталу уақыты"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Тоқтату уақыты"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27667,9 +27244,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Тасушы ойнатуының басталу уақытын ауыстыру"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27708,9 +27284,8 @@ msgid "SVCD/VCD"
 msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disable Disc Menus"
-msgstr "Бейнебет қорғауышты доғару"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
@@ -27729,14 +27304,12 @@ msgid "Audio and Subtitles"
 msgstr "Дыбыс және субтитрлер"
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "Субтитр файлын қолдану"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:146
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "Субтитр файлын қолдану"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
 msgid "Choose one or more media file to open"
@@ -27760,23 +27333,20 @@ msgid "Network Protocol"
 msgstr "Желілік хаттама"
 
 #: modules/gui/qt/ui/open_net.h:98
-#, fuzzy
 msgid "Please enter a network URL:"
-msgstr "Бейіндің жаңа атауын енгізіңіз."
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr " Бейін атауы айырлған"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27787,9 +27357,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -27800,9 +27369,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27817,9 +27385,8 @@ msgid "Webm"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27834,95 +27401,80 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
-#, fuzzy
 msgid "Features"
-msgstr "Ымдар"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "Ағын атауы"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
-#, fuzzy
 msgid "Chapters"
-msgstr "Бөлім"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:723
 msgid "Menus"
 msgstr "Мәзір"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Кадр қарқыны"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
-#, fuzzy
 msgid "Same as source"
-msgstr "Ең көп RTP көздері"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:734
-#, fuzzy
 msgid "Custom options"
-msgstr "Теңшелетін"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Сапа деңгейі"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
-#, fuzzy
 msgid "Not Used"
-msgstr "Орнатылмаған"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
 msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "Кодтау"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
-#, fuzzy
 msgid "Frame size"
-msgstr "Кадр қарқыны"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
-#, fuzzy
 msgid "px"
-msgstr " нкт"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Іріктеме қарқыны"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Бейін атауы"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Жеткілімі"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Қайда сақталатын тізімдемесін бөлектеу"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27942,23 +27494,20 @@ msgid "Display locally"
 msgstr "Жергілікті бейнелеу"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Қайта кодтау параметрлері"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Ағындық жіберу және қайта кодтау параметрлері"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "Қайта кодтауды белсендіру"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "Параметрлер"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -27981,9 +27530,8 @@ msgid " %"
 msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:415
-#, fuzzy
 msgid "Output module:"
-msgstr "Шығыс модульдері"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Use S/PDIF when available"
@@ -27994,19 +27542,16 @@ msgid "Effects"
 msgstr "Әсерлер"
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Visualization:"
-msgstr "Көрнекі бейнелеу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Уақыты созылған дыбысты іске қосу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "Қайталауды күшейту режімі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -28017,29 +27562,24 @@ msgid "Tracks"
 msgstr "Жолшықтар"
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
-#, fuzzy
 msgid "Preferred audio language:"
-msgstr " Дыбыстың ұнамды тілі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:427
-#, fuzzy
 msgid "Password:"
-msgstr "Құпия сөз"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:428
-#, fuzzy
 msgid "Username:"
-msgstr "Пайдаланушы аты"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:429
-#, fuzzy
 msgid "Submit played tracks stats to Last.fm"
-msgstr "Ойнатылған әндер туралы last.fm торабына ақпар жіберу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
-#, fuzzy
 msgid "Codecs"
-msgstr "Кодек"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
@@ -28050,14 +27590,12 @@ msgid "Hardware-accelerated decoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:360
-#, fuzzy
 msgid "Video quality post-processing level"
-msgstr "Бейнені кейіңгі өңдету сүзгісі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Тұйық сүзгісін елемеу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
@@ -28068,69 +27606,60 @@ msgid "Optical drive"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:365
-#, fuzzy
 msgid "Default optical device"
-msgstr "Әдепкі құрылғылар"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:369
-#, fuzzy
 msgid "Damaged or incomplete AVI file"
-msgstr "Кескін сипаттары сүзгісі "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:372
-#, fuzzy
 msgid "HTTP proxy URL"
-msgstr "HTTP прокси"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
 msgid "HTTP (default)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:374
-#, fuzzy
 msgid "RTP over RTSP (TCP)"
-msgstr "RTSP (TCP) үстінде RTP қолданып"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:375
 msgid "Live555 stream transport"
 msgstr "MPEG тасымалдау ағыны"
 
 #: modules/gui/qt/ui/sprefs_input.h:376
-#, fuzzy
 msgid "Default caching policy"
-msgstr "Бүркемелеудің әдепкі деңгейі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
-#, fuzzy
 msgid "Menus language:"
-msgstr "Дыбыс тілі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:532
 msgid "Look and feel"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:533
-#, fuzzy
 msgid "Use custom skin"
-msgstr "Мұқаба бөлектеу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "This is VLC's default interface, with a native look and feel."
 msgstr "Бұл әдепкі VLC тілдесуі, тумыс әсерін және түйсігін сақтаған."
 
 #: modules/gui/qt/ui/sprefs_interface.h:537
-#, fuzzy
 msgid "Use native style"
-msgstr "Субтитр файлын қолдану"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:538
 msgid "Resize interface to video size"
 msgstr "Бейне мөлшері үшін тілдесу өлшемін өзгерту"
 
 #: modules/gui/qt/ui/sprefs_interface.h:539
-#, fuzzy
 msgid "Show controls in full screen mode"
-msgstr "Басқару тақтасын толық бейнебет режімнде көрсету"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
 msgid "Pause playback when minimized"
@@ -28141,42 +27670,32 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
-#, fuzzy
 msgid "Start in minimal view mode"
-msgstr "Бейне іске қосылуынан толық бейнебет режімінде"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
-#, fuzzy
 msgid "Force window style:"
-msgstr "Белсенді терезелер"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr "Керілеудің бейнелік сүзгісі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Show systray icon"
-msgstr "Жүйе жаймасындағы белгіше"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"Qt4 тілдесуін қолданудасыз.\n"
-"\n"
-"Қазақшаға тәржімелеген: Асқар М. (kazak.tarjime@gmail.com)\n"
-"\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Lua ойнату тізімі талдағыштың тілдесуі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -28187,9 +27706,8 @@ msgid "Allow only one instance"
 msgstr "Тек қана бір данасына рұқсат ету"
 
 #: modules/gui/qt/ui/sprefs_interface.h:557
-#, fuzzy
 msgid "Activate updates notifier"
-msgstr "Жаңарту мүмкіндігі туралы құлақтандыруларды белсендіру"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:559
 msgid "Every "
@@ -28212,38 +27730,32 @@ msgid "File extensions association"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:568
-#, fuzzy
 msgid "Set up associations..."
-msgstr "Теңшеу..."
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
-#, fuzzy
 msgid "Enable On Screen Display (OSD)"
-msgstr "Бейнебеттік мәзір"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
-#, fuzzy
 msgid "Show media title on video start"
-msgstr "Тасушы тақырыбын бейнеде көрсету"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
-#, fuzzy
 msgid "Enable subtitles"
-msgstr "Суретшелерді қосу"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
-#, fuzzy
 msgid "Subtitle Language"
-msgstr "Субтитр тілі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr "Әдепкі кодтау"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
-#, fuzzy
 msgid "Subtitle effects"
-msgstr "USF субтитрлер кодсыздандырғышы"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -28262,14 +27774,12 @@ msgid " px"
 msgstr " нкт"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:307
-#, fuzzy
 msgid "Add a background"
-msgstr "Әдепкі өң түсі"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Шығасын"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28280,14 +27790,12 @@ msgid "Accelerated video output (Overlay)"
 msgstr "Жеделдеткен бейнелік шығасын (жабынды)"
 
 #: modules/gui/qt/ui/sprefs_video.h:323
-#, fuzzy
 msgid "KVA"
-msgstr "MKV"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:327
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "Тізбектестіру"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
@@ -28346,9 +27854,8 @@ msgid "Clear List"
 msgstr "Тізімді аластау"
 
 #: modules/gui/qt/ui/update.h:148
-#, fuzzy
 msgid "Check for VLC updates"
-msgstr "Жаңартуларды тексеру..."
+msgstr ""
 
 #: modules/gui/qt/ui/update.h:149
 msgid "Launching an update request..."
@@ -28368,14 +27875,12 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "Түстерді керілеу"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
-#, fuzzy
 msgid "Colors"
-msgstr "Түс"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1257
 msgid "Interactive Zoom"
@@ -28387,9 +27892,8 @@ msgstr "Бұрыш"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
-#, fuzzy
 msgid "..."
-msgstr "Үстеу..."
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -28412,32 +27916,28 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
-#, fuzzy
 msgid "Mirror"
-msgstr "Қателік"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Қимылды байқау"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Кеңістіктендіргіш"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
-#, fuzzy
 msgid "Soften"
-msgstr "Софт"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Шуыл"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
@@ -28503,7 +28003,6 @@ msgstr "AAAA; "
 msgid "Media Manager List"
 msgstr "Тасушы меңгеру тізімі"
 
-#, fuzzy
 #~ msgid "Renderer discovery off"
 #~ msgstr "Қызмет әшкерелеу"
 
