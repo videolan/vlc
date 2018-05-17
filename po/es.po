@@ -12,17 +12,17 @@
 # Juan Diego Fernández Rosado <juandiegofernandezrosado@gmail.com>, 2014
 # Konrad Iturbe <mail@chernowii.com>, 2013
 # Marc Sokolovitch <sokolovitch@yahoo.com>, 2013
-# picodotdev <pico.dev@gmail.com>, 2014-2017
+# picodotdev <pico.dev@gmail.com>, 2014-2018
 # Sam Askari <saskarip@gmail.com>, 2013
 # saulortega <saulortega.co@gmail.com>, 2013
 # Yllelder, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: picodotdev <pico.dev@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2018\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -9569,31 +9569,27 @@ msgstr "Salida de IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Longitud de la clave de cifrado en bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bits"
+msgstr "16 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bits"
+msgstr "24 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bits"
+msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Salida de emisión SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Contraseña para dispositivo objetivo."
+msgstr "Contraseña para cifrado de emisión"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10767,7 +10763,7 @@ msgstr "Deshabilitado"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Habilitado (solo AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16657,7 +16653,7 @@ msgstr "Pieles"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Aplicar perfil en el siguiente inicio"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17734,9 +17730,8 @@ msgid "Jump to Time"
 msgstr "Saltar a tiempo"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Procesado&r"
+msgstr "Procesador"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -25254,12 +25249,10 @@ msgid "Enable Audio passthrough"
 msgstr "Habilitar audio «passthrough»"
 
 #: modules/stream_out/chromecast/cast.cpp:194
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Deshabilitar si su receptor no soporta Dolby®"
 
 #: modules/stream_out/chromecast/cast.cpp:216
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Alta (calidad y ancho de banda alto)"
 
@@ -25268,12 +25261,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Media (calidad y ancho de banda medio)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Baja (calidad y ancho de banda bajo)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Bajo CPU (calidad baja pero acho de banda alto)"
 
@@ -26493,18 +26484,18 @@ msgid "Ball speed"
 msgstr "Velocidad de bola"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "Establecer velocidad de bola, el valor de desplazamiento"
+msgstr ""
+"Establecer velocidad de bola, el valor de desplazamiento en número de "
+"pixeles por fotograma. "
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Tamaño de bola"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Establecer tamaño de bola dando su radio en número de píxeles"
+msgstr "Establecer tamaño de bola dando su radio en número de píxeles."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -29356,7 +29347,7 @@ msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:717
 msgid "Features"
-msgstr "Características"
+msgstr "Funcionalidades"
 
 #: modules/gui/qt/ui/profiles.h:719
 msgid "Streamable"
