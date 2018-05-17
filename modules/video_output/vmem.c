@@ -217,7 +217,6 @@ static int Open(vlc_object_t *object)
     vd->control = Control;
 
     /* */
-    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
     vout_display_DeleteWindow(vd, NULL);
     return VLC_SUCCESS;
 }
