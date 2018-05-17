@@ -9,14 +9,15 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-05-17 22:51+0200\n"
 "Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2018\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -16568,7 +16569,6 @@ msgid ""
 msgstr "VLC media player a VideoLAN sú ochrannými značkami asociácie VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16581,11 +16581,11 @@ msgid ""
 msgstr ""
 "<p>VLC media player je voľne šíriteľný prehrávač médií, kodér a streamovací "
 "program s otvoreným zdrojovým kódom, vytvorený dobrovoľníkmi <a href="
-"\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
+"\"https://www.videolan.org/\"><span style=\" text-decoration: underline; "
 "color:#0057ae;\">tímu VideoLAN</span></a> a jeho komunitou.</p><p>VLC "
 "používa interné kodeky, funguje na každej populárnej platforme a dokáže "
 "čítať takmer všetky súbory, disky CD, DVD, sieťové streamy, čítať zo "
-"zaznamenávacích kariet a iných formátov pre médiá!</p><p><a href=\"http://"
+"zaznamenávacích kariet a iných formátov pre médiá!</p><p><a href=\"https://"
 "www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
 "color:#0057ae;\">Pomôžte a pridajte sa k nám!</span></a>"
 
@@ -17226,7 +17226,6 @@ msgstr "Prejsť na predchádzajúcu položku"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Vypnúť zobrazovanie na celú obrazovku"
 
