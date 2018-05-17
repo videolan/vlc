@@ -166,24 +166,10 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
     else if(i_stream_id >= 0xC0 && i_stream_id <= 0xDF)
     {
         pid->probed.i_cat = AUDIO_ES;
-        if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 )
+        if( p_data[0] == 0xFF && (p_data[1] & 0xE0) == 0xE0 &&
+           (p_data[1] & 0x0C) != 0x04 && (p_data[1] & 0x03) == 0x00 )
         {
-            switch(p_data[1] & 6)
-            {
-            /* 01 - Layer III
-               10 - Layer II
-               11 - Layer I */
-                case 0x06:
-                    pid->probed.i_fourcc = VLC_CODEC_MPGA;
-                    break;
-                case 0x04:
-                    pid->probed.i_fourcc = VLC_CODEC_MP2;
-                    break;
-                case 0x02:
-                    pid->probed.i_fourcc = VLC_CODEC_MP3;
-                default:
-                    break;
-            }
+            pid->probed.i_fourcc = VLC_CODEC_MPGA;
         }
         else if( p_data[0] == 0xFF && (p_data[1] & 0xF2) == 0xF0 )
         {
