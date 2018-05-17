@@ -72,6 +72,7 @@ struct ts_pid_t
     struct
     {
         vlc_fourcc_t i_fourcc;
+        vlc_fourcc_t i_original_fourcc;
         int i_cat;
         int i_pcr_count;
         uint8_t i_stream_id;
