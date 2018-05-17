@@ -245,7 +245,6 @@ static void ReleaseQuad(d3d_quad_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 
 static int Control(vout_display_t *vd, int query, va_list args);
-static void Manage(vout_display_t *vd);
 
 /* TODO: Move to a direct3d11_shaders header */
 static const char* globVertexShaderFlat = "\
@@ -551,7 +550,6 @@ static int Open(vlc_object_t *object)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
 
     msg_Dbg(vd, "Direct3D11 Open Succeeded");
 
@@ -1149,9 +1147,10 @@ static float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
     }
 }
 
-static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
-                    mtime_t date)
+static void Prepare(vout_display_t *vd, picture_t *picture,
+                    subpicture_t *subpicture, mtime_t date)
 {
+    Manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 

@@ -256,7 +256,6 @@ static int Open(vlc_object_t *object)
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
     return VLC_SUCCESS;
 
 error:
@@ -354,6 +353,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     picture_Release(picture);
     VLC_UNUSED(subpicture);
+
+    Manage(vd);
 }
 static int Control(vout_display_t *vd, int query, va_list args)
 {

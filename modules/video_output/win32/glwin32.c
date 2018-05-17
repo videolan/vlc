@@ -161,7 +161,6 @@ static int Open(vlc_object_t *object)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
 
     return VLC_SUCCESS;
 
@@ -213,6 +212,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
                     mtime_t date)
 {
+    Manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
 

@@ -330,7 +330,6 @@ static int Open(vlc_object_t *object)
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
 
     /* Fix state in case of desktop mode */
     if (sys->sys.use_desktop && vd->cfg->is_fullscreen)
@@ -495,9 +494,10 @@ static picture_pool_t *DisplayPool(vout_display_t *vd, unsigned count)
     return vd->sys->sys.pool;
 }
 
-static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
-                    mtime_t date)
+static void Prepare(vout_display_t *vd, picture_t *picture,
+                    subpicture_t *subpicture, mtime_t date)
 {
+    Manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *p_sys = picture->p_sys;
