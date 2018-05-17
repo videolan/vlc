@@ -22,13 +22,14 @@
 # Rajaa Jalil <rajaa@hilltx.com>, 2013
 # (المعتز) <sickdemonid@gmail.com>, 2014
 # محيي الدين <tx99h4@hotmail.com>, 2014-2015
+# وجدي أبو سلطان, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: وجدي أبو سلطان, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:28+0200\n"
+"Last-Translator: وجدي أبو سلطان, 2018\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -2854,7 +2855,7 @@ msgstr "يغيّر حجم الترجمات عند الإمكان."
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
-msgstr "شغِّل الصور الفرعية"
+msgstr "فعّل الصور الفرعيّة"
 
 #: src/libvlc-module.c:715
 msgid "You can completely disable the sub-picture processing."
@@ -2978,8 +2979,8 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
-"هذا جهاز (أو ملف) دي‌ڤي‌دي المبدئي لاستخدامه, لا تنسَ النقطتين الرئستين بعد اسم "
-"الجهاز (مثل D:‎)"
+"هذا جهاز (أو ملف) دي‌ڤي‌دي المبدئي لاستخدامه، لا تنسَ النقطتين الرأسيتين بعد "
+"اسم الجهاز (مثل D:‎)"
 
 #: src/libvlc-module.c:771
 msgid ""
@@ -2995,15 +2996,15 @@ msgstr ""
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
-msgstr ".للإستعمال إفتراضيا  DVD  هذا جهاز"
+msgstr "هذا جهاز دي‌ڤي‌دي المبدئي لاستخدامه."
 
 #: src/libvlc-module.c:783
 msgid "This is the default VCD device to use."
-msgstr ".اللإفتراضي للإستخدام VCDجهاز "
+msgstr "هذا جهاز VCD المبدئي لاستخدامه."
 
 #: src/libvlc-module.c:785 modules/access/cdda.c:709
 msgid "This is the default Audio CD device to use."
-msgstr ".صوتي اللإفتراضي للإستخدام CD جهاز "
+msgstr "هذا جهاز أسطوانة الصوت المبدئي لاستخدامه."
 
 #: src/libvlc-module.c:799
 msgid "TCP connection timeout"
@@ -3147,11 +3148,11 @@ msgstr "كلمة سر SOCKS"
 
 #: src/libvlc-module.c:868
 msgid "Password to be used for connection to the SOCKS proxy."
-msgstr ".SOCKS كلمة السر للإستعمال في الإرتباطات مع الخادم  "
+msgstr "كلمة السر لاستخدامها مع الاتصال بوكيل SOCKS."
 
 #: src/libvlc-module.c:870
 msgid "Title metadata"
-msgstr "العنوان"
+msgstr "بيانات العنوان الوصفية"
 
 #: src/libvlc-module.c:872
 msgid "Allows you to specify a \"title\" metadata for an input."
@@ -3159,7 +3160,7 @@ msgstr ".يسمح بتحديد  «عنوان» للدخل"
 
 #: src/libvlc-module.c:874
 msgid "Author metadata"
-msgstr "المؤلف"
+msgstr "بيانات المؤلّف الوصفية"
 
 #: src/libvlc-module.c:876
 msgid "Allows you to specify an \"author\" metadata for an input."
@@ -3167,7 +3168,7 @@ msgstr ".يسمح بتحديد  «مؤلّف» للدخل"
 
 #: src/libvlc-module.c:878
 msgid "Artist metadata"
-msgstr "بايانات الفنان الفوقية"
+msgstr "بيانات الفنّان الوصفية"
 
 #: src/libvlc-module.c:880
 msgid "Allows you to specify an \"artist\" metadata for an input."
@@ -3175,7 +3176,7 @@ msgstr ".يسمح بتحديد  «فنان» للدخل"
 
 #: src/libvlc-module.c:882
 msgid "Genre metadata"
-msgstr "النوع "
+msgstr "بيانات النوع الوصفية"
 
 #: src/libvlc-module.c:884
 msgid "Allows you to specify a \"genre\" metadata for an input."
@@ -3183,7 +3184,7 @@ msgstr ".يسمح بتحديد  « نوع» للدخل"
 
 #: src/libvlc-module.c:886
 msgid "Copyright metadata"
-msgstr "حقوق الطبع"
+msgstr "بيانات ”الحقوق محفوظة“ الوصفية"
 
 #: src/libvlc-module.c:888
 msgid "Allows you to specify a \"copyright\" metadata for an input."
@@ -3191,7 +3192,7 @@ msgstr ".يسمح بتحديد  « حقوق الطبع » للدخل"
 
 #: src/libvlc-module.c:890
 msgid "Description metadata"
-msgstr "الوصف"
+msgstr "بيانات الوصف الوصفية"
 
 #: src/libvlc-module.c:892
 msgid "Allows you to specify a \"description\" metadata for an input."
@@ -3199,7 +3200,7 @@ msgstr ".يسمح بتحديد  « وصف» للدخل"
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
-msgstr "التاريخ "
+msgstr "بيانات التاريخ الوصفية"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
@@ -3207,7 +3208,7 @@ msgstr ".يسمح بتحديد  « تاريخ» للدخل"
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
-msgstr "URL"
+msgstr "بيانات المسار الوصفية"
 
 #: src/libvlc-module.c:900
 msgid "Allows you to specify a \"url\" metadata for an input."
@@ -3840,7 +3841,7 @@ msgstr "املأ الشاشة"
 
 #: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr "اختر المفتاح الساخن الذي يستخدم للتبديل بين حالة ملء الشاشة."
+msgstr "اختر مفتاح الاختصار لتبديل حالة ملء الشاشة."
 
 #: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
@@ -3848,7 +3849,7 @@ msgstr "اخرج من نمط ملء الشاشة"
 
 #: src/libvlc-module.c:1229
 msgid "Select the hotkey to use to exit fullscreen state."
-msgstr ""
+msgstr "اختر مفتاح الاختصار لإنهاء حالة ملء الشاشة."
 
 #: src/libvlc-module.c:1230 modules/gui/macosx/VLCFSPanelController.m:109
 msgid "Play/Pause"
@@ -3856,7 +3857,7 @@ msgstr "شغّل/ألبث"
 
 #: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
-msgstr "اختر المفتاح الساخن الذي يستخدم للتبديل بين حالة الإلباث."
+msgstr "اختر مفتاح الاختصار لتبديل حالة الإلباث."
 
 #: src/libvlc-module.c:1232
 msgid "Pause only"
@@ -3864,7 +3865,7 @@ msgstr "ألبث فقط"
 
 #: src/libvlc-module.c:1233
 msgid "Select the hotkey to use to pause."
-msgstr "اختر المفتاح الساخن الذي يُستخدم للإلباث."
+msgstr "اختر مفتاح الاختصار لاستخدامه للإلباث."
 
 #: src/libvlc-module.c:1234
 msgid "Play only"
@@ -3872,7 +3873,7 @@ msgstr "شغّل فقط"
 
 #: src/libvlc-module.c:1235
 msgid "Select the hotkey to use to play."
-msgstr "اختر المفتاح الساخن الذي يستخدم للتشغيل."
+msgstr "اختر مفتاح الاختصار لاستخدامه للتشغيل."
 
 #: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/qt/components/controller.hpp:108
@@ -3900,7 +3901,7 @@ msgstr "نسبة عادية"
 
 #: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
-msgstr "اختر المفتاح الساخن الذي يعيد نسبة التشغيل إلى وضعها الطبيعي."
+msgstr "اختر مفتاح الاختصار لإرجاع معدّل التشغيل إلى طبيعته."
 
 #: src/libvlc-module.c:1242 modules/gui/qt/menus.cpp:883
 msgid "Faster (fine)"
@@ -4034,7 +4035,7 @@ msgstr "الإطار التالي"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "اختر المفتاح الساخن الذي يأتي بإطار الڤديو التالي."
+msgstr "اختر مفتاح الاختصار الذي ينتقل إلى إطار الڤديو التالي."
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
@@ -4078,7 +4079,7 @@ msgstr "أنهِ"
 
 #: src/libvlc-module.c:1294
 msgid "Select the hotkey to quit the application."
-msgstr "اختر المفتاح الساخن الذي يغادر التطبيق."
+msgstr "اختر مفتاح الاختصار لإنهاء التطبيق."
 
 #: src/libvlc-module.c:1295
 msgid "Navigate up"
@@ -4138,7 +4139,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
-msgstr "اختر عنوان الديفيدي السابق"
+msgstr "اختر عنوان دي‌ڤي‌دي السابق"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
@@ -4146,7 +4147,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
-msgstr "اختر عنوان الديفيدي القادم"
+msgstr "اختر عنوان دي‌ڤي‌دي التالي"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
@@ -4154,7 +4155,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
-msgstr "اختر فصل الديفيدي السابق"
+msgstr "اختر فصل دي‌ڤي‌دي السابق"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
@@ -4162,7 +4163,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
-msgstr "اختر فصل ديفيدي القادم"
+msgstr "اختر فصل دي‌ڤي‌دي التالي"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
@@ -5977,7 +5978,7 @@ msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 msgid "No video devices found"
-msgstr ""
+msgstr "لم يُعثر على أجهزة ڤديو"
 
 #: modules/access/avcapture.m:287
 msgid ""
@@ -6005,11 +6006,11 @@ msgstr ""
 
 #: modules/access/bluray.c:68
 msgid "Blu-ray menus"
-msgstr "قوائم ”بلو-ري“"
+msgstr "قوائم بلو-ري"
 
 #: modules/access/bluray.c:69
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
-msgstr "استخدم قوائم ”بلو-ري“. إن عُطّل فسيبدأ الفيلم مباشرة"
+msgstr "استخدم قوائم بلو-ري. إن عُطّل فسيبدأ الفيلم مباشرة"
 
 #: modules/access/bluray.c:71
 msgid "Region code"
@@ -6020,6 +6021,7 @@ msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
+"رمز منطقة مشغّل بلو-ري. لا يمكن تشغيل بعض الأسطوانات إلا برمز المنطقة الصحيح."
 
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
@@ -6028,21 +6030,22 @@ msgstr "بلو-ري"
 
 #: modules/access/bluray.c:93
 msgid "Blu-ray Disc support (libbluray)"
-msgstr ""
+msgstr "دعم أسطوانات بلو-ري (libbluray)"
 
 #: modules/access/bluray.c:722
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr "لا يبدو المسار مسار ”بلو-ري“"
+msgstr "لا يبدو المسار مسار بلو-ري"
 
 #: modules/access/bluray.c:737
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
 msgstr ""
+"تحتاج أسطوانة بلو-ري هذه مكتبة لفكّ ترميز AACS، والنظام لديك لا يحتويها."
 
 #: modules/access/bluray.c:743
 msgid "Blu-ray Disc is corrupted."
-msgstr "اسطوانة ”بلو-ري“ تالفة."
+msgstr "أسطوانة بلو-ري تالفة."
 
 #: modules/access/bluray.c:745
 msgid "Missing AACS configuration file!"
@@ -6068,7 +6071,7 @@ msgstr "فشل AACS MMC."
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
-msgstr ""
+msgstr "تحتاج أسطوانة بلو-ري هذه مكتبة لفكّ ترميز BD+‎، والنظام لديك لا يحتويها."
 
 #: modules/access/bluray.c:766
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
@@ -6084,8 +6087,8 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
-"تتطلب اسطوانة ”بلو-ري“ هذه «جاڤا» لدعم القوائم.%s\n"
-"ستُشغّل الاسطوانة دون قوائم."
+"تتطلب أسطوانة بلو-ري هذه «جاڤا» لدعم القوائم.%s\n"
+"ستُشغّل الأسطوانة دون قوائم."
 
 #: modules/access/bluray.c:801
 msgid "Java was not found on your system."
@@ -6098,7 +6101,7 @@ msgstr ""
 #: modules/access/bluray.c:852 modules/access/bluray.c:2287
 #: modules/access/bluray.c:2292
 msgid "Blu-ray error"
-msgstr ""
+msgstr "خطأ في بلو-ري"
 
 #: modules/access/bluray.c:1674
 msgid "Top Menu"
@@ -9111,28 +9114,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "١٦ بِتاً"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "٢٤ بِتاً"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "٣٢ بِتاً"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "وكيل HTTP"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -14525,7 +14524,7 @@ msgstr "فاكك دمج الإشارات"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
-msgstr ""
+msgstr "مازج إشارات Avformat"
 
 #: modules/demux/avformat/avformat.c:56 modules/stream_out/rtp.c:87
 msgid "Muxer"
@@ -14659,7 +14658,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr ""
+msgstr "فاكك مزج إشارات ڤديو Dirac"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -14744,7 +14743,7 @@ msgstr ""
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
-msgstr " M-JPEG demuxer‎  آلة تصوير"
+msgstr "فاكك مزج إشارات كمرة M-JPEG"
 
 #: modules/demux/mkv/mkv.cpp:49
 msgid "Matroska stream demuxer"
@@ -15052,7 +15051,7 @@ msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr "MusePack demuxer‎ "
+msgstr "فاكك مزج إشارات MusePack"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
@@ -15084,11 +15083,11 @@ msgstr "فاكك مزج إشارات ڤديو H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "فاكك مزج إشارات ڤديو HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr "MPEG-I/II ڤديو  demuxer‎ "
+msgstr "فاكك مزج إشارات ڤديو MPEG-I/II"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
@@ -16088,7 +16087,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
-msgstr "حفظ كملف"
+msgstr "احفظ كملف"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:149
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:392
@@ -16788,9 +16787,8 @@ msgid "Jump to Time"
 msgstr "انتقل إلى"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "ال&مصيّر"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -22425,7 +22423,7 @@ msgstr ""
 
 #: modules/mux/asf.c:73
 msgid "ASF muxer"
-msgstr "ASF muxer"
+msgstr "مازج إشارات ASF"
 
 #: modules/mux/asf.c:563
 msgid "Unknown Video"
@@ -22441,7 +22439,7 @@ msgstr ""
 
 #: modules/mux/avi.c:60
 msgid "AVI muxer"
-msgstr "AVI muxer"
+msgstr "مازج إشارات AVI"
 
 #: modules/mux/dummy.c:45
 msgid "Dummy/Raw muxer"
@@ -22725,11 +22723,11 @@ msgstr ""
 
 #: modules/mux/ogg.c:60
 msgid "Ogg/OGM muxer"
-msgstr "Ogg/OGM muxer"
+msgstr "مازج إشارات Ogg/OGM"
 
 #: modules/mux/wav.c:46
 msgid "WAV muxer"
-msgstr "بليز muxer"
+msgstr "مازج إشارات WAV"
 
 #: modules/notify/osx_notifications.m:126
 msgid "OS X Notification Plugin"
@@ -27685,9 +27683,8 @@ msgid "Show &more options"
 msgstr "أظهر الم&زيد من الخيارات"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "غيّر وقت بدء الوسائط"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
 msgid " ms"
@@ -27702,9 +27699,8 @@ msgid "Start Time"
 msgstr "وقت البدء"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "وقت التوقّف"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27731,9 +27727,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "غيّر وقت بدء الوسائط"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27832,9 +27827,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "موكسير MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27845,9 +27839,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -27858,9 +27851,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27875,9 +27867,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27924,9 +27915,8 @@ msgid "Custom options"
 msgstr "خيارات مخصصة"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "جودة VBR"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27949,28 +27939,24 @@ msgid "px"
 msgstr "بكسِل"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "  نسبة نموذجية"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "اسم اللاحة"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "المقصد"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "اختر ملفا"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27999,9 +27985,8 @@ msgid "Activate Transcoding"
 msgstr "فعّل تحويل الترميز"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "خيارات"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -28012,23 +27997,20 @@ msgid "Miscellaneous Options"
 msgstr "خيارات متفرقة"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "الجدول الناتج الابتداءيه"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "الإعدادات العامة لخرج الدفق"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
 msgstr " %"
 
 #: modules/gui/qt/ui/sprefs_audio.h:415
-#, fuzzy
 msgid "Output module:"
-msgstr "وحدات الخرج"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Use S/PDIF when available"
@@ -28039,19 +28021,16 @@ msgid "Effects"
 msgstr "المُؤثّرات"
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Visualization:"
-msgstr "التصوير البصري"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "تمكين تمديد وقت الصوت"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "وضع إعادة تشغيل الكسب"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -28094,14 +28073,12 @@ msgid "Video quality post-processing level"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "تخطى مرشح الحلقة"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "طور x264 واختار المستوى"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -28116,28 +28093,24 @@ msgid "Damaged or incomplete AVI file"
 msgstr "ملف AVI غير كامل و تالِف"
 
 #: modules/gui/qt/ui/sprefs_input.h:372
-#, fuzzy
 msgid "HTTP proxy URL"
-msgstr "وكيل HTTP"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
 msgid "HTTP (default)"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:374
-#, fuzzy
 msgid "RTP over RTSP (TCP)"
-msgstr " (TCP) RTSP انتهى  RTP  استعمال       "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:375
-#, fuzzy
 msgid "Live555 stream transport"
-msgstr "ملف ناتج التيار"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:376
-#, fuzzy
 msgid "Default caching policy"
-msgstr "مستوى الاختزان المبدئي"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
@@ -28184,18 +28157,16 @@ msgid "Force window style:"
 msgstr "أجبِر نمط النوافذ:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr " المرشح مقلوب الڤديو"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Show systray icon"
 msgstr "اعرض أيقونة في صينية النظام"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses الوصله "
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28286,9 +28257,8 @@ msgid "Add a background"
 msgstr "أضِف خلفية"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "الخرج"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
