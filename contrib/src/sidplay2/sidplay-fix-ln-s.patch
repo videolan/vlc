@@ -1,0 +1,11 @@
+--- sidplay-libs/resid/Makefile.am.ln_s	2018-05-17 13:44:08.814450800 +0200
++++ sidplay-libs/resid/Makefile.am	2018-05-17 13:44:24.333008200 +0200
+@@ -11,7 +11,7 @@ noinst_LTLIBRARIES = libresidc.la
+ noinst_HEADERS = $(resid_headers)
+ 
+ all-local:
+-	ln -sf libresidc.la libresid.la
++	$(LN_S)f libresidc.la libresid.la
+ 
+ endif
+ 
