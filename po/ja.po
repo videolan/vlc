@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2017
+# Fumio Nakayama <fumio.n6a@gmail.com>, 2002,2009-2018
 # Tadashi Jokagi <elf@elf.no-ip.org>, 2004-2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 03:02+0100\n"
-"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Fumio Nakayama <fumio.n6a@gmail.com>, 2018\n"
 "Language-Team: Japanese (https://www.transifex.com/yaron/teams/16553/ja/)\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -302,9 +302,8 @@ msgid ""
 "You can also set default parameters for each muxer."
 msgstr ""
 "マルチプレクサーは、すべての基本ストリーム(ビデオ、オーディオなど)を一緒に出"
-"力するために使用されるカプセル化フォーマットを作成します。特定のマルチプレク"
-"サーを常に使用するように設定可能です。おそらくそのような設定は避けるべきで"
-"す。\n"
+"力するために使用されるカプセル化形式を作成します。特定のマルチプレクサーを常"
+"に使用するように設定可能です。おそらくそのような設定は避けるべきです。\n"
 "それぞれのマルチプレクサーに対するデフォルトのパラメーターも指定可能です。"
 
 #: include/vlc_config_cat.h:147
@@ -1484,7 +1483,7 @@ msgstr ""
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:174
 msgid "C"
-msgstr "ja"
+msgstr "C"
 
 #: src/libvlc.h:164 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/video_output/vout_intf.c:176 modules/gui/macosx/VLCMainMenu.m:475
@@ -2194,7 +2193,7 @@ msgid ""
 "giving a \"minimal\" window."
 msgstr ""
 "VLCはビデオ周辺に表示されるウィンドウのタイトル、フレームなどの生成を抑止し、"
-"最小化されたウィンドウを表示することが可能です。"
+"最小ウィンドウを表示することが可能です。"
 
 #: src/libvlc-module.c:379
 msgid "Video splitter module"
@@ -2213,8 +2212,8 @@ msgid ""
 "This adds post-processing filters to enhance the picture quality, for "
 "instance deinterlacing, or distort the video."
 msgstr ""
-"ビデオをデインターレース化したり、ゆがめたりするためのピクチャーの品質を高め"
-"るために使用される後処理フィルターを追加します。"
+"ピクチャーの品質を高めるために後処理フィルターを追加します。ビデオをデイン"
+"ターレース化したり、歪めたりします。"
 
 #: src/libvlc-module.c:389
 msgid "Video snapshot directory (or filename)"
@@ -2242,7 +2241,7 @@ msgstr "ビデオスナップショットを表示"
 
 #: src/libvlc-module.c:403
 msgid "Display the snapshot preview in the screen's top-left corner."
-msgstr "画面左上のコーナーにスナップショットのプレビューを表示します。"
+msgstr "画面の左上隅にスナップショットのプレビューを表示します。"
 
 #: src/libvlc-module.c:405
 msgid "Use sequential numbers instead of timestamps"
@@ -2813,8 +2812,8 @@ msgid ""
 "{...}\""
 msgstr ""
 "ストリームのブックマークのリストを\"{name=ブックマーク名,time=オプションのタ"
-"イムオフセット,bytes=オプションのバイトオフセット},{...}\"のフォーマットで指"
-"定します。"
+"イムオフセット,bytes=オプションのバイトオフセット},{...}\"の形式で指定しま"
+"す。"
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -6519,15 +6518,15 @@ msgstr "使用する入力画像のアスペクト比を指定します。デフ
 
 #: modules/access/dshow/dshow.cpp:147 modules/access/v4l2/v4l2.c:53
 msgid "Video input chroma format"
-msgstr "ビデオ入力のクロマフォーマット"
+msgstr "ビデオ入力のクロマ形式"
 
 #: modules/access/dshow/dshow.cpp:149
 msgid ""
 "Force the DirectShow video input to use a specific chroma format (eg. I420 "
 "(default), RV24, etc.)"
 msgstr ""
-"DirectShowのビデオ入力で使用する特定のクロマフォーマットを指定します。(例: "
-"I420(デフォルト), RV24など)"
+"DirectShowのビデオ入力で使用する特定のクロマ形式を指定します。(例: I420(デ"
+"フォルト), RV24など)"
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
@@ -8521,9 +8520,9 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"特定のクロマフォーマットを使用するためのVideo4Linux2のビデオデバイスを強制指"
-"定します。(例: RAW画像のI420またはI422, MJPGはM-JPEGの圧縮入力) すべてのリス"
-"ト: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, I420, "
+"特定のクロマ形式を使用するためのVideo4Linux2のビデオデバイスを強制指定しま"
+"す。(例: RAW画像のI420またはI422, MJPGはM-JPEGの圧縮入力) すべてのリスト: "
+"GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, I420, "
 "I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
@@ -9405,31 +9404,27 @@ msgstr "IceCAST出力"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "暗号キーの長さ(バイト)"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16ビット"
+msgstr "16バイト"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24ビット"
+msgstr "24バイト"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32ビット"
+msgstr "32バイト"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRTストリーム出力"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "ターゲットデバイスのパスワードを指定します。"
+msgstr "ストリーム暗号化のパスワード"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10590,7 +10585,7 @@ msgstr "無効"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "有効化 (AC3/DTS のみ)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -11343,12 +11338,12 @@ msgstr "Daalaビデオエンコーダー"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
-msgstr "クロマフォーマット"
+msgstr "クロマ形式"
 
 #: modules/codec/daala.c:144 modules/codec/schroedinger.c:55
 msgid ""
 "Picking chroma format will force a conversion of the video into that format"
-msgstr "ビデオの変換で使用されるクロマフォーマットを指定します。"
+msgstr "ビデオの変換で使用されるクロマ形式を指定します。"
 
 #: modules/codec/dca.c:61
 msgid "DTS dynamic range compression"
@@ -11620,8 +11615,8 @@ msgid ""
 msgstr ""
 "DecodeBinは複数の要素を追加したり管理できるコンテナー要素です。デコーダーを追"
 "加するのとは別にDecodeBinはコーデックプロファイル、レベルやその他の属性などの"
-"より多くの情報を提供できる基本ストリームのパーサーをGstCaps (ストリームの属"
-"性)フォーマットでデコーダーに追加します。"
+"より多くの情報を提供できる基本ストリームのパーサーをGstCaps(ストリームの属性)"
+"の形式でデコーダーに追加します。"
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
@@ -14023,7 +14018,7 @@ msgstr "CPU最適化"
 
 #: modules/codec/x264.c:388
 msgid "Use assembler CPU optimizations."
-msgstr "アセンブラーCPU最適化を使用します。"
+msgstr "アセンブラーCPUの最適化を使用します。"
 
 #: modules/codec/x264.c:390
 msgid "Filename for 2 pass stats file"
@@ -14836,7 +14831,7 @@ msgstr "| normal . . . . . . . . . . . . . . . . ストリームの通常再生"
 
 #: modules/control/oldrc.c:815
 msgid "| frame. . . . . . . . . .  play frame by frame"
-msgstr "| frame  . . . . . . . . . . . . . . . . . フレームごとに再生"
+msgstr "| frame . . . . . . . . . . . . . . . . . コマ送り再生"
 
 #: modules/control/oldrc.c:816
 msgid "| f [on|off] . . . . . . . . . . . . toggle fullscreen"
@@ -15143,7 +15138,7 @@ msgstr "avformatマルチプレクサーを強制的に使用します。"
 
 #: modules/demux/avformat/avformat.h:37
 msgid "Format name"
-msgstr "フォーマット名"
+msgstr "形式名"
 
 #: modules/demux/avformat/avformat.h:38
 msgid "Internal libavcodec format name"
@@ -15401,7 +15396,7 @@ msgstr "ダミー要素"
 #: modules/demux/mkv/mkv.cpp:73
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
-"不明なEBMLエレメントを読み取り、破棄します。(壊れたファイルには適していませ"
+"不明なEBMLエレメントを読み取り、廃棄します。(壊れたファイルには適していませ"
 "ん)"
 
 #: modules/demux/mkv/mkv.cpp:76
@@ -15907,8 +15902,8 @@ msgid ""
 "Use playlist options usually used to prevent ads skipping to detect ads and "
 "prevent adding them to the playlist."
 msgstr ""
-"通常、このオプションは広告の検出を行ってスキップし、それらをプレイリストに追"
-"加しないようにするために使用されます。"
+"通常、このオプションは広告を検出をしてプレイリストに追加しないようにする広告"
+"スキップを禁止するために使用されます。"
 
 #: modules/demux/playlist/playlist.c:67
 msgid "M3U playlist import"
@@ -16100,8 +16095,8 @@ msgid ""
 "This is the desired frame rate when playing raw video streams. In the form "
 "30000/1001 or 29.97"
 msgstr ""
-"RAWビデオストリームを再生する時の理想的なフレームレートを指定します。フォー"
-"マットは、30000/1001、または29.97です。"
+"RAWビデオストリームを再生する時の理想的なフレームレートを指定します。形式は、"
+"30000/1001、または29.97です。"
 
 #: modules/demux/rawvid.c:48
 msgid "This specifies the width in pixels of the raw video stream."
@@ -16404,7 +16399,7 @@ msgstr "スキン"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "次回起動時にプロファイルを適用"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -16782,8 +16777,8 @@ msgid ""
 "You just need to fill one of the three following parameters, VLC will "
 "autodetect the other using the original aspect ratio"
 msgstr ""
-"以下の3つのパラメーターのうち、ひとつを入力する必要があります。VLCはオリジナ"
-"ルのアスペクト比を使用してその他を自動的に検出します。"
+"以下の3つのパラメーターのうち、1つを入力する必要があります。VLCはオリジナルの"
+"アスペクト比を使用してその他を自動的に検出します。"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:169
 #: modules/gui/macosx/VLCOutput.m:88 modules/gui/qt/ui/profiles.h:741
@@ -17344,7 +17339,7 @@ msgstr "VLCを隠す"
 
 #: modules/gui/macosx/VLCMainMenu.m:350
 msgid "Hide Others"
-msgstr "ほかを隠す"
+msgstr "他を隠す"
 
 #: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:377
@@ -17467,9 +17462,8 @@ msgid "Jump to Time"
 msgstr "指定時間へジャンプ"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "レンダラー (&R)"
+msgstr "レンダラー"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17638,7 +17632,7 @@ msgstr "拡張M3U"
 
 #: modules/gui/macosx/VLCMainMenu.m:1160
 msgid "XML Shareable Playlist Format (XSPF)"
-msgstr "XML共有可能プレイリスト形式(XSPF)"
+msgstr "XML共有可能なプレイリスト形式(XSPF)"
 
 #: modules/gui/macosx/VLCMainMenu.m:1161
 #: modules/gui/qt/dialogs_provider.cpp:654
@@ -17676,7 +17670,7 @@ msgstr "視聴登録解除"
 #: modules/gui/macosx/VLCMainWindow.m:202
 #: modules/gui/qt/components/playlist/selector.cpp:279
 msgid "Subscribe to a podcast"
-msgstr "Podcastの登録"
+msgstr "Podcastに登録"
 
 #: modules/gui/macosx/VLCMainWindow.m:203
 #: modules/gui/qt/components/playlist/selector.cpp:581
@@ -18396,7 +18390,7 @@ msgstr "全画面表示で開始"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
-msgstr "全画面表示時のブラックスクリーン表示"
+msgstr "全画面表示モードでのブラックスクリーン表示"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:366
 #: modules/gui/qt/ui/sprefs_video.h:330
@@ -18454,11 +18448,11 @@ msgstr "最小の遅延"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:695
 msgid "Low Latency"
-msgstr "遅延が少ない"
+msgstr "小さな遅延"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:699
 msgid "Higher Latency"
-msgstr "多めの遅延"
+msgstr "より大きな遅延"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:701
 msgid "Highest Latency"
@@ -19276,7 +19270,7 @@ msgstr "拡張パネル"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Frame By Frame"
-msgstr "フレームごと"
+msgstr "コマ送り"
 
 #: modules/gui/qt/components/controller.hpp:110
 msgid "Trickplay Reverse"
@@ -19347,11 +19341,11 @@ msgstr "ポイントAからポイントBまでを繰り返し再生"
 
 #: modules/gui/qt/components/controller.hpp:122
 msgid "Frame by frame"
-msgstr "フレームごと"
+msgstr "コマ送り"
 
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Reverse"
-msgstr "リバーブ"
+msgstr "逆転再生"
 
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Change the loop and repeat modes"
@@ -20038,19 +20032,19 @@ msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:685
 msgid "Lowest latency"
-msgstr "より遅延が少ない"
+msgstr "最小の遅延"
 
 #: modules/gui/qt/components/simple_preferences.cpp:686
 msgid "Low latency"
-msgstr "遅延が少ない"
+msgstr "小さな遅延"
 
 #: modules/gui/qt/components/simple_preferences.cpp:688
 msgid "High latency"
-msgstr "遅延が大きい"
+msgstr "大きな遅延"
 
 #: modules/gui/qt/components/simple_preferences.cpp:689
 msgid "Higher latency"
-msgstr "より遅延が大きい"
+msgstr "より大きな遅延"
 
 #: modules/gui/qt/components/simple_preferences.cpp:737
 msgid "This is VLC's skinnable interface. You can download other skins at"
@@ -20200,8 +20194,8 @@ msgstr ""
 #: modules/gui/qt/components/sout/sout_widgets.cpp:280
 msgid "This module outputs the transcoded stream to a network via RTSP."
 msgstr ""
-"このモジュールはトランスコーディングされたストリームをRTPを使用してネットワー"
-"クに出力します。"
+"このモジュールはトランスコーディングされたストリームをRTSPを使用してネット"
+"ワークに出力します。"
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:326
 msgid "This module outputs the transcoded stream to a network via UDP."
@@ -20621,7 +20615,7 @@ msgid ""
 "Skins customize player's appearance. You can activate them through "
 "preferences."
 msgstr ""
-"スキンはプレイヤーの概観をカスタマイズします。設定からスキンを有効にすること"
+"スキンはプレイヤーの外観をカスタマイズします。設定からスキンを有効にすること"
 "ができます。"
 
 #: modules/gui/qt/dialogs/plugins.cpp:382
@@ -20630,7 +20624,7 @@ msgid ""
 "meta data."
 msgstr ""
 "プレイリストパーサーはインターネットストリームの読み込みまたは、メタデータを"
-"抽出する昨日を追加しました。"
+"抽出する機能を追加します。"
 
 #: modules/gui/qt/dialogs/plugins.cpp:386
 msgid ""
@@ -24263,19 +24257,19 @@ msgstr "モザイクの幅の合計をピクセルで指定します。"
 
 #: modules/spu/mosaic.c:97
 msgid "Top left corner X coordinate"
-msgstr "左上コーナーのX座標"
+msgstr "左上隅のX座標"
 
 #: modules/spu/mosaic.c:99
 msgid "X Coordinate of the top-left corner of the mosaic."
-msgstr "モザイク表示の左上コーナーのX座標を指定します。"
+msgstr "モザイク表示の左上隅のX座標を指定します。"
 
 #: modules/spu/mosaic.c:100
 msgid "Top left corner Y coordinate"
-msgstr "左上コーナーのY座標"
+msgstr "左上隅のY座標"
 
 #: modules/spu/mosaic.c:102
 msgid "Y Coordinate of the top-left corner of the mosaic."
-msgstr "モザイク表示の左上コーナーのY座標を指定します。"
+msgstr "モザイク表示の左上隅のY座標を指定します。"
 
 #: modules/spu/mosaic.c:104
 msgid "Border width"
@@ -26173,7 +26167,6 @@ msgid "Ball speed"
 msgstr "ボールの速度"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr "ボールの速度をフレームごとの変化量(単位はピクセル)で指定します。"
 
@@ -26182,7 +26175,6 @@ msgid "Ball size"
 msgstr "ボールのサイズ"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr "ボールのサイズをその半径で指定します。"
 
@@ -27781,15 +27773,15 @@ msgstr "OpenGL用のWGLエクステンション"
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
-msgstr "ダミーの画像クロマフォーマット"
+msgstr "ダミーの画像クロマ形式"
 
 #: modules/video_output/vdummy.c:38
 msgid ""
 "Force the dummy video output to create images using a specific chroma format "
 "instead of trying to improve performances by using the most efficient one."
 msgstr ""
-"最適な形式を使用してパフォーマンスの改善を試みる代わりに、特定のクロマフォー"
-"マットを使用して画像を作成するためにダミーのビデオ出力を強制します。"
+"最適な形式を使用してパフォーマンスの改善を試みる代わりに、特定のクロマ形式を"
+"使用して画像を作成するダミーのビデオ出力を強制します。"
 
 #: modules/video_output/vdummy.c:48
 msgid "Dummy video output"
@@ -27937,15 +27929,15 @@ msgstr ""
 
 #: modules/video_output/xcb/xvideo.c:49
 msgid "XVideo format id"
-msgstr "XVideoフォーマットID"
+msgstr "XVideo形式ID"
 
 #: modules/video_output/xcb/xvideo.c:51
 msgid ""
 "XVideo image format id to use. By default, VLC will try to use the best "
 "match for the video being played."
 msgstr ""
-"使用するXVideoイメージフォーマットを指定します。VLCは、デフォルトで再生するビ"
-"デオに最適なものを使用します。"
+"使用するXVideoイメージ形式IDを指定します。VLCは、デフォルトで再生するビデオに"
+"最適なものを使用します。"
 
 #: modules/video_output/xcb/xvideo.c:62
 msgid "XVideo"
@@ -28755,7 +28747,7 @@ msgstr "ダイアログ"
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:313 modules/gui/qt/ui/streampanel.h:167
 msgid "Form"
-msgstr "フォーマット"
+msgstr "形式"
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -29261,7 +29253,7 @@ msgstr "メディア変更時にポップアップを表示:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Start in minimal view mode"
-msgstr "最小表示で起動"
+msgstr "最小表示モードで起動"
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Force window style:"
