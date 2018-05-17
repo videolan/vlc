@@ -6,9 +6,6 @@ WINPTHREADS_URL := https://sourceforge.net/projects/mingw-w64/files/mingw-w64/mi
 ifdef HAVE_WIN32
 PKGS += pthreads
 endif
-ifndef HAVE_WINSTORE
-PKGS_FOUND += pthreads
-endif
 
 $(TARBALLS)/mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2:
 	$(call download_pkg,$(WINPTHREADS_URL),winpthreads)

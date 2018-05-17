@@ -12,7 +12,7 @@ PKGS_FOUND += srt
 endif
 
 DEPS_srt = gnutls $(DEPS_gnutls)
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
 endif
 
@@ -25,7 +25,7 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
 	$(APPLY) $(SRC)/srt/add-implicit-link-libraries.patch
 	$(APPLY) $(SRC)/srt/0001-CMakeLists.txt-substitute-link-flags-for-package-nam.patch
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/srt/0002-CMakeLists.txt-let-cmake-find-pthread.patch
 endif
 	$(APPLY) $(SRC)/srt/fix-partial-availability.patch

@@ -31,7 +31,7 @@ ifdef HAVE_ANDROID
 endif
 
 DEPS_aom =
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_aom += pthreads $(DEPS_pthreads)
 endif
 
