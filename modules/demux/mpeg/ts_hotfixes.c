@@ -171,6 +171,11 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         {
             pid->probed.i_fourcc = VLC_CODEC_MPGA;
         }
+        else if( p_data[0] == 0xFF && (p_data[1] & 0xF2) == 0xF0 )
+        {
+            pid->probed.i_fourcc = VLC_CODEC_MP4A; /* ADTS */
+            pid->probed.i_original_fourcc = VLC_FOURCC('A','D','T','S');
+        }
     }
     /* VIDEO STREAM */
     else if( i_stream_id >= 0xE0 && i_stream_id <= 0xEF )
@@ -309,6 +314,7 @@ void MissingPATPMTFixup( demux_t *p_demux )
                 continue;
 
             es_format_Init(&esstreams[j].fmt, p_pid->probed.i_cat, p_pid->probed.i_fourcc);
+            esstreams[j].fmt.i_original_fourcc = p_pid->probed.i_original_fourcc;
 
             if( VLC_SUCCESS !=
                 FillPMTESParams(mux_standard, &esstreams[j].fmt, &esstreams[j].ts, &esstreams[j].pes ) )
