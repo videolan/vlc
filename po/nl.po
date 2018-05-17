@@ -6,14 +6,14 @@
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
-# Thomas De Rocker, 2008-2017
+# Thomas De Rocker, 2008-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-12-26 23:46+0100\n"
-"Last-Translator: Thomas De Rocker, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Thomas De Rocker, 2018\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -5547,7 +5547,7 @@ msgstr "Corsicaans"
 
 #: src/text/iso-639_def.h:69
 msgid "Czech"
-msgstr "Tjechisch"
+msgstr "Tsjechisch"
 
 #: src/text/iso-639_def.h:70
 msgid "Danish"
@@ -9536,22 +9536,19 @@ msgstr "IceCAST-uitvoer"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Cryptosleutel-lengte in bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16-bits"
+msgstr "16 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24-bits"
+msgstr "24 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32-bits"
+msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -9559,7 +9556,7 @@ msgstr "SRT-stream-uitvoer"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Wachtwoord voor stream-versleuteling"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10733,7 +10730,7 @@ msgstr "Uitgeschakeld"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Ingeschakeld (alleen AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16623,7 +16620,7 @@ msgstr "Thema"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Profiel toepassen bij volgende start"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17691,7 +17688,6 @@ msgid "Jump to Time"
 msgstr "Naar tijdstip springen"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
 msgstr "Renderer"
 
@@ -26438,7 +26434,6 @@ msgid "Ball speed"
 msgstr "Balsnelheid"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Stel balsnelheid in, de verplaatsingswaarde in aantal pixels per frame."
@@ -26448,9 +26443,8 @@ msgid "Ball size"
 msgstr "Balgrootte"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Stel de balgrootte in door zijn straal in pixels op te geven"
+msgstr "Stel de balgrootte in door zijn straal in pixels op te geven."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
