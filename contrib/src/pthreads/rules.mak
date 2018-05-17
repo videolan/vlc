@@ -1,6 +1,6 @@
 # POSIX threads
 
-ifndef HAVE_WIN32
+ifndef HAVE_WINSTORE
 PKGS_FOUND += pthreads
 endif
 
