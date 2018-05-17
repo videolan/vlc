@@ -1536,10 +1536,21 @@ static void *DecoderThread( void *p_data )
 
             /* NOTE: Only the audio and video outputs care about pause. */
             msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
-            if( p_owner->p_vout != NULL )
-                vout_ChangePause( p_owner->p_vout, paused, date );
-            if( p_owner->p_aout != NULL )
-                aout_DecChangePause( p_owner->p_aout, paused, date );
+            switch( p_dec->fmt_out.i_cat )
+            {
+                case VIDEO_ES:
+                    if( p_owner->p_vout != NULL )
+                        vout_ChangePause( p_owner->p_vout, paused, date );
+                    break;
+                case AUDIO_ES:
+                    if( p_owner->p_aout != NULL )
+                        aout_DecChangePause( p_owner->p_aout, paused, date );
+                    break;
+                case SPU_ES:
+                    break;
+                default:
+                    vlc_assert_unreachable();
+            }
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
@@ -1554,8 +1565,19 @@ static void *DecoderThread( void *p_data )
             vlc_fifo_Unlock( p_owner->p_fifo );
 
             msg_Dbg( p_dec, "changing rate: %f", rate );
-            if( p_owner->p_aout != NULL )
-                aout_DecChangeRate( p_owner->p_aout, rate );
+            switch( p_dec->fmt_out.i_cat )
+            {
+                case VIDEO_ES:
+                    break;
+                case AUDIO_ES:
+                    if( p_owner->p_aout != NULL )
+                        aout_DecChangeRate( p_owner->p_aout, rate );
+                    break;
+                case SPU_ES:
+                    break;
+                default:
+                    vlc_assert_unreachable();
+            }
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
@@ -1593,7 +1615,7 @@ static void *DecoderThread( void *p_data )
         int canc = vlc_savecancel();
         DecoderProcess( p_dec, p_block );
 
-        if( p_block == NULL )
+        if( p_block == NULL && p_dec->fmt_out.i_cat == AUDIO_ES )
         {   /* Draining: the decoder is drained and all decoded buffers are
              * queued to the output at this point. Now drain the output. */
             if( p_owner->p_aout != NULL )
@@ -1803,52 +1825,62 @@ static void DeleteDecoder( decoder_t * p_dec )
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
              (char*)&p_dec->fmt_in.i_codec );
 
-    const bool b_flush_spu = p_dec->fmt_out.i_cat == SPU_ES;
+    const enum es_format_category_e i_cat =p_dec->fmt_out.i_cat;
     UnloadDecoder( p_dec );
 
     /* Free all packets still in the decoder fifo. */
     block_FifoRelease( p_owner->p_fifo );
 
     /* Cleanup */
-    if( p_owner->p_aout )
-    {
-        /* TODO: REVISIT gap-less audio */
-        aout_DecFlush( p_owner->p_aout, false );
-        aout_DecDelete( p_owner->p_aout );
-        input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
-        if( p_owner->p_input != NULL )
-            input_SendEventAout( p_owner->p_input );
-    }
-    if( p_owner->p_vout )
-    {
-        /* Reset the cancel state that was set before joining the decoder
-         * thread */
-        vout_Cancel( p_owner->p_vout, false );
-
-        input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
-                                    0, true );
-        if( p_owner->p_input != NULL )
-            input_SendEventVout( p_owner->p_input );
-    }
-
 #ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
     {
         sout_InputDelete( p_owner->p_sout_input );
     }
 #endif
-    es_format_Clean( &p_owner->fmt );
 
-    if( b_flush_spu )
+    switch( i_cat )
     {
-        vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
-        if( p_vout )
+        case AUDIO_ES:
+            if( p_owner->p_aout )
+            {
+                /* TODO: REVISIT gap-less audio */
+                aout_DecFlush( p_owner->p_aout, false );
+                aout_DecDelete( p_owner->p_aout );
+                input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
+                if( p_owner->p_input != NULL )
+                    input_SendEventAout( p_owner->p_input );
+            }
+            break;
+        case VIDEO_ES:
+            if( p_owner->p_vout )
+            {
+                /* Reset the cancel state that was set before joining the decoder
+                 * thread */
+                vout_Cancel( p_owner->p_vout, false );
+
+                input_resource_RequestVout( p_owner->p_resource, p_owner->p_vout, NULL,
+                                            0, true );
+                if( p_owner->p_input != NULL )
+                    input_SendEventVout( p_owner->p_input );
+            }
+            break;
+        case SPU_ES:
         {
-            if( p_owner->p_spu_vout == p_vout )
-                vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
-            vlc_object_release( p_vout );
+            vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
+            if( p_vout )
+            {
+                if( p_owner->p_spu_vout == p_vout )
+                    vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
+                vlc_object_release( p_vout );
+            }
+            break;
         }
+        default:
+            vlc_assert_unreachable();
     }
+
+    es_format_Clean( &p_owner->fmt );
 
     if( p_owner->p_description )
         vlc_meta_Delete( p_owner->p_description );
@@ -2006,7 +2038,7 @@ void input_DecoderDelete( decoder_t *p_dec )
      *
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
-    if( p_owner->p_vout != NULL )
+    if( p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         vout_Cancel( p_owner->p_vout, true );
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -2395,8 +2427,10 @@ void input_DecoderGetObjects( decoder_t *p_dec,
 
     vlc_mutex_lock( &p_owner->lock );
     if( pp_vout )
-        *pp_vout = p_owner->p_vout ? vlc_object_hold( p_owner->p_vout ) : NULL;
+        *pp_vout = p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout ?
+            vlc_object_hold( p_owner->p_vout ) : NULL;
     if( pp_aout )
-        *pp_aout = p_owner->p_aout ? vlc_object_hold( p_owner->p_aout ) : NULL;
+        *pp_aout = p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout ?
+            vlc_object_hold( p_owner->p_aout ) : NULL;
     vlc_mutex_unlock( &p_owner->lock );
 }
