@@ -1,17 +1,16 @@
 # Bodo translation
-# Copyright (C) 2015 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2015-12-04 10:01+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
-"Language-Team: Bodo (http://www.transifex.com/yaron/vlc-trans/language/"
-"brx/)\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"Language-Team: Bodo (https://www.transifex.com/yaron/teams/16553/brx/)\n"
 "Language: brx\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -182,9 +181,8 @@ msgstr ""
 "अन-स्क्रिन-दिन्थिफुंनाय, दालाय-बिमुं आरो \"अभारले दालाय-सावगारि\" जों सोमोन्दोगोनां सेटिं "
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "बोखावग्रा"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -643,9 +641,8 @@ msgid "Spectrum"
 msgstr "स्पेक्ट्राम"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Vu मिटार"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -666,9 +663,8 @@ msgid "Mono"
 msgstr "म'न'"
 
 #: src/audio_output/output.c:425
-#, fuzzy
 msgid "Original"
-msgstr "गुबै ID"
+msgstr ""
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -821,14 +817,12 @@ msgstr ""
 "\n"
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr " (डिफल्ट हाहोनाय खालामबाय)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr " (डिफल्ट लोरबां खालामबाय)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -970,9 +964,9 @@ msgid "Yes"
 msgstr "नंगौ"
 
 #: src/input/es_out.c:2136
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "बन्द जाखानाय केपसन %u"
+msgstr ""
 
 #: src/input/es_out.c:2138
 #, c-format
@@ -1059,14 +1053,12 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
-#, fuzzy
 msgid "Video resolution"
-msgstr "पसायखानाय भिडिअ रिज'लुसन"
+msgstr ""
 
 #: src/input/es_out.c:3168
-#, fuzzy
 msgid "Buffer dimensions"
-msgstr "सेकेन्दआव बाफार महर"
+msgstr ""
 
 #: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1083,49 +1075,40 @@ msgid "Decoded format"
 msgstr "डिक'ड खालामखानाय फरमेट"
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Top left"
-msgstr "ओनसोल 3:आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Left top"
-msgstr "आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Right bottom"
-msgstr "बिजौ थालो"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Top right"
-msgstr "कपिराइट"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom left"
-msgstr "थालो-आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom right"
-msgstr "थालो-आगदा"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Left bottom"
-msgstr "बिजौ थालो"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Right top"
-msgstr "आगदा"
+msgstr ""
 
 #: src/input/es_out.c:3199
-#, fuzzy
 msgid "Orientation"
-msgstr "आयना अरियेन्टेसन"
+msgstr ""
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1134,19 +1117,16 @@ msgid "Undefined"
 msgstr "थि खालामै"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 सारि / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3209
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 सारि / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3217
-#, fuzzy
 msgid "Color primaries"
-msgstr "गाब खौरां"
+msgstr ""
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1158,14 +1138,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Color transfer function"
-msgstr "गाब बख'नाय"
+msgstr ""
 
 #: src/input/es_out.c:3248
-#, fuzzy
 msgid "Color space"
-msgstr "गाब स्किम"
+msgstr ""
 
 #: src/input/es_out.c:3248
 #, c-format
@@ -1173,9 +1151,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Full"
-msgstr "आबुं बेस"
+msgstr ""
 
 #: src/input/es_out.c:3257 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1189,29 +1166,24 @@ msgid "Center"
 msgstr "मिरु"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgid "Top Left"
-msgstr "बिजौ-आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3259
-#, fuzzy
 msgid "Top Center"
-msgstr "मिरु"
+msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgid "Bottom Left"
-msgstr "थालो-आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3261
-#, fuzzy
 msgid "Bottom Center"
-msgstr "थालो-आगसि"
+msgstr ""
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgid "Chroma location"
-msgstr "क्र'मा गेन"
+msgstr ""
 
 #: src/input/es_out.c:3274
 msgid "Rectangular"
@@ -1226,9 +1198,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3286
-#, fuzzy
 msgid "Projection"
-msgstr "दिक"
+msgstr ""
 
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
@@ -1236,10 +1207,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "पिच"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -1260,24 +1230,20 @@ msgid "Min. luminance"
 msgstr ""
 
 #: src/input/es_out.c:3313
-#, fuzzy
 msgid "Primary R"
-msgstr "गुदि राव"
+msgstr ""
 
 #: src/input/es_out.c:3320
-#, fuzzy
 msgid "Primary G"
-msgstr "गुदि राव"
+msgstr ""
 
 #: src/input/es_out.c:3327
-#, fuzzy
 msgid "Primary B"
-msgstr "गुदि राव"
+msgstr ""
 
 #: src/input/es_out.c:3334
-#, fuzzy
 msgid "White point"
-msgstr "इसारा बिन्दो"
+msgstr ""
 
 #: src/input/es_out.c:3349 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1395,14 +1361,12 @@ msgid "Actors"
 msgstr "फावखुंगुर"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "महरगिरि"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "ट्रेक नाम्बार"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1443,9 +1407,8 @@ msgid "Previous title"
 msgstr "आगोलनि बिमुं"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "उननि बिमुं"
+msgstr ""
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1594,13 +1557,10 @@ msgid "Color messages"
 msgstr "गाब खौरां"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"बेयो कनस'लनो दैथाय हरखानाय खौरांनि गाब खालामनायखौ हाहोनाय खालामो, जेराव नोंथांनि "
-"टार्मिनेलनो बेनि थाखाय लिनाक्स गाब हेफाजाबखौ गोनांथि जायो।  "
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1651,9 +1611,8 @@ msgstr ""
 "खान्थिखौ गावनो गाव महरै सायखनांगोन।"
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "मेडिया खना"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1673,33 +1632,28 @@ msgstr ""
 "बेखायनो माखासे प्रसेसिं गोसोखौ थिना दोनगोन।"
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "देंखो"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "जायगा"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "खेला"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "एमप्लिफिकेसन"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "फोरमायथिहोग्रा"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "दिहुन्थाय"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
@@ -1753,13 +1707,10 @@ msgid "This selects which plugin to use for audio resampling."
 msgstr "मबे प्लागिनखौ अडिअ' फिन-नमुना खालामनायनि थाखाय बाहायनो बेखौ बेयो सायखयो।"
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"बेयो अडिअ' आउटपुट सेनेल म'डखौ फजयो जायखौ जाथाव समाव डिफल्टजों बाहायजागोन (जेरै- "
-"नोंथांनि हार्डवेयारआ बेखौ आरो अडिअ' स्ट्रिमखौ हेफाजाब होयोब्ला दामगोन)।"
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -2113,9 +2064,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "भिडिअ' उइन्ड'खौ अरायबो गुबुन उइन्ड'नि बिजौआव दोन"
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "वालपेपार म'डखौ हाहोनाय खालाम"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2708,9 +2658,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "बाहायनो दालाय-बिमुं ट्रेकनि स्ट्रिम ID"
 
 #: src/libvlc-module.c:612
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "बन्द खालामखानाय केपसन डिक'डार"
+msgstr ""
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2838,14 +2787,12 @@ msgstr ""
 "time-offset,bytes=optional-byte-offset},{...}\" आव मेनुयेलि होनो हायो।"
 
 #: src/libvlc-module.c:671
-#, fuzzy
 msgid "Record directory"
-msgstr "फुंखा डिरेक्टरि"
+msgstr ""
 
 #: src/libvlc-module.c:673
-#, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "डिरेक्टरि एबा फाइलमुं जेराव रेकर्डखौ दोनथुमगोन"
+msgstr ""
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2924,9 +2871,8 @@ msgstr ""
 "हायो। गोबां जायगाखौ नाजा।"
 
 #: src/libvlc-module.c:710
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "दालाय-बिमुं फरा एनक'डिं"
+msgstr ""
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
@@ -3099,9 +3045,8 @@ msgid "TCP connection timeout"
 msgstr "TCP फोनांजाब समजोबनाय"
 
 #: src/libvlc-module.c:801
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "डिफल्ट TCP फोनांजाब सम जोबनाय (मिलिसेकेन्दआव)।"
+msgstr ""
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3524,19 +3469,16 @@ msgid "Stream filter module"
 msgstr "स्ट्रिम फिल्टार मडुल"
 
 #: src/libvlc-module.c:1009
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "फरायजाबाय थानाय स्ट्रिमखौ सुद्रायनो स्ट्रिम फिल्टारखौ बाहायनाय जायो।"
+msgstr ""
 
 #: src/libvlc-module.c:1011
-#, fuzzy
 msgid "Demux filter module"
-msgstr "स्ट्रिम फिल्टार मडुल"
+msgstr ""
 
 #: src/libvlc-module.c:1013
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "फरायजाबाय थानाय स्ट्रिमखौ सुद्रायनो स्ट्रिम फिल्टारखौ बाहायनाय जायो।"
+msgstr ""
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3558,13 +3500,10 @@ msgid "VoD server module"
 msgstr "VoD सार्भार मडुल"
 
 #: src/libvlc-module.c:1024
-#, fuzzy
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
-"नोंथाङा बाहायनो लुबैनाय VoD सार्भार मडुलखौ सायख। बेखौ गोजाम, लिगेसि मडुलआव लांफिननो "
-"`vod_rtsp' आव फज।"
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -3630,16 +3569,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1058
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "पसायनाय पेकेटाइजार लिस्ट"
+msgstr ""
 
 #: src/libvlc-module.c:1060
-#, fuzzy
 msgid "List of keystores that VLC will use in priority."
 msgstr ""
-"बेयो नोंथांखौ एनक'डारनि लिस्टखौ सायखनो गनायथि होयो जायखौ VLC आ गिबि गोनांथिआव "
-"बाहायगोन।"
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3725,9 +3660,8 @@ msgstr ""
 "आइटेमखौ दामबाय था।"
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC मेडिया प्लेयार आपडेट"
+msgstr ""
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3742,28 +3676,22 @@ msgstr ""
 "नेवसिगारनो हायो।"
 
 #: src/libvlc-module.c:1117
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "फाइलखौ गावनो गाव महरै आगु-पार्स खालामो"
+msgstr ""
 
 #: src/libvlc-module.c:1119
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"प्लेलिस्टआव दाजाबदेरनाय फाइलफोरखौ गावनो गाव महरै आगु-पार्स खालाम (माखासे मेटाडाटा "
-"मोनफिननो)"
 
 #: src/libvlc-module.c:1122
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "RTSP जथुम्माया सम जोबबाय (s)"
+msgstr ""
 
 #: src/libvlc-module.c:1124
-#, fuzzy
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr "मिलिसेकेन्दआव केमेरा आरो माइक्र'फननि थाखाय केछिं बेसेन"
+msgstr ""
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3811,9 +3739,8 @@ msgstr ""
 "नांथाव जायो। फेहेरनायनि कमा-आलादा खालामनाय लिस्टखौ बाहाय।"
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "Show hidden files"
-msgstr "गुवारैखौ दिन्थि"
+msgstr ""
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -3880,14 +3807,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr "जोबथा फ्रेमआव प्लेलिस्टनि मोनफ्रोम आइटेमखौ दोन्थ'हो"
 
 #: src/libvlc-module.c:1180
-#, fuzzy
 msgid "Start paused"
-msgstr "जागायनाय सम"
+msgstr ""
 
 #: src/libvlc-module.c:1182
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr "जोबथा फ्रेमआव प्लेलिस्टनि मोनफ्रोम आइटेमखौ दोन्थ'हो"
+msgstr ""
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3940,47 +3865,36 @@ msgid "Ignore"
 msgstr "नेवसि"
 
 #: src/libvlc-module.c:1214
-#, fuzzy
 msgid "Volume control"
-msgstr "भलिउम दबथायनाय"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control"
-msgstr "थासारि दबथायनाय"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control reversed"
-msgstr "थासारि दबथायनाय"
+msgstr ""
 
 #: src/libvlc-module.c:1218
-#, fuzzy
 msgid "Mouse wheel vertical axis control"
-msgstr "माउस-साका गोजौ-गाहाय अक्षहांखो दबथायनाय"
+msgstr ""
 
 #: src/libvlc-module.c:1220
-#, fuzzy
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
-"माउस-साका गोजौ-गाहाय (थोंगोर) अक्षहांखोआ भलिउमखौ दबथायनो हायो, जायहा एबा माउस-"
-"साका जाथायखौ नेवसिनो हायो"
 
 #: src/libvlc-module.c:1222
-#, fuzzy
 msgid "Mouse wheel horizontal axis control"
-msgstr "माउस-साका गोजौ-गाहाय अक्षहांखो दबथायनाय"
+msgstr ""
 
 #: src/libvlc-module.c:1224
-#, fuzzy
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
-"माउस-साका गोजौ-गाहाय (थोंगोर) अक्षहांखोआ भलिउमखौ दबथायनो हायो, जायहा एबा माउस-"
-"साका जाथायखौ नेवसिनो हायो"
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -4237,44 +4151,40 @@ msgid "Navigate up"
 msgstr "गोजौथिं नेभिगेट खालाम"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr "DVD मेनुआव सायखग्राथौ गोजौथिं लांनो साबिखौ सायख।"
+msgstr ""
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "गाहायथिं नेभिगेट खालाम"
 
 #: src/libvlc-module.c:1298
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr "DVD मेनुआव सायखग्राखौ गाहायथिं लांनो साबिखौ सायख।"
+msgstr ""
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "आगसिथिं नेभिगेट खालाम"
 
 #: src/libvlc-module.c:1300
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr "DVD मेनुआव सायखग्राथौ आगसिथिं लांनो साबिखौ सायख।"
+msgstr ""
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "आगदाथिं नेभिगेट खालाम"
 
 #: src/libvlc-module.c:1302
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr "DVD मेनुआव सायखग्राथौ आगदाथिं लांनो साबिखौ सायख।"
+msgstr ""
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4368,24 +4278,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "दालाय-बिमुं गोबावखौ खमायहोनो साबिखौ सायख।"
 
 #: src/libvlc-module.c:1325
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "टेलिटेक्स्ट दालाय-बिमुं डिक'डार"
+msgstr ""
 
 #: src/libvlc-module.c:1326
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "दालाय-बिमुंखौ हाहोनाय खालाम"
+msgstr ""
 
 #: src/libvlc-module.c:1327
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "दालाय-बिमुंखौ हाहोनाय खालाम"
+msgstr ""
 
 #: src/libvlc-module.c:1328
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "दालाय-बिमुंखौ गोजौसिनाव लांनो साबिखौ सायख"
+msgstr ""
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4606,14 +4512,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "मोननो हाथाव अडिअ' ट्रेक (राव)नि सोरगिदिं फारि फिदिं"
 
 #: src/libvlc-module.c:1391
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "दालाय-बिमुं ट्रेकखौ फारि फिदिं"
+msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "मोननो दालाय-बिमुं ट्रेकखौ फारि फिदिं"
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -5373,13 +5277,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr "डाउनल'ड खालामखानाय फाइल \"%s\" आ गाज्रि जाबाय। बेखायनो बेखौ खोमोरबाय।"
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"गोदान बिसानखौ जाफुंसारै डाउनल'ड खालामबाय। नोंथाङा VLC खौ बन्द खालामनो आरो दा बेखौ "
-"इनष्टल खालामनो लुबैयो नामा?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6152,28 +6053,22 @@ msgid "Attachment input"
 msgstr "नांजाब होनाय इनपुट"
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "भिडिअ' केपसार"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "अडिअ' आउटपुट मडुल"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "जेबो इनपुट डिभाइस मोनाखै"
+msgstr ""
 
 #: modules/access/avcapture.m:287
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
-"नोंथांनि मेकआव गोरोबथाव इनपुट डिभाइस गैयाबादि नुयो। नोंथांनि फोनांजाब आरो ड्राइभारखौ "
-"आनजाद खालाम।"
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6267,9 +6162,8 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr "नोंथांनि सिस्टेम BD+ डिक'डिं बिजाब बाख्रिआ खामानि मावया। बाइजोमहरआ गोमानाय?"
 
 #: modules/access/bluray.c:799
-#, fuzzy
 msgid "Java required"
-msgstr "SDP नांगौ"
+msgstr ""
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6334,24 +6228,20 @@ msgid "CDDB Server port to use."
 msgstr "बाहायनो CDDB सार्भार पर्ट"
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "इनपुट लिस्ट"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr "मावथि उइन्ड'सनि कमा-आलादा खालामनाय लिस्ट, गासैआव डिफल्ट"
+msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "सारि सोलायनाय"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "TCP बिथोन इनपुट"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6362,9 +6252,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "IIDC डिजिटाल केमेरा (फायारवार) इनपुट"
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "गाहाय प्रफाइल"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6471,9 +6360,8 @@ msgid "Composite"
 msgstr "गलाय-गथाय"
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-भिडिअ'"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6551,13 +6439,10 @@ msgid "Audio device name"
 msgstr "अडिअ' डिभाइस मुं"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"अडिअ' डिभाइसनि मुं जायखौ डिरेक्टश' प्लागिनजों बाहायजागोन। नोंथाङा जेबो थिक खालामाब्ला "
-"डिफल्ट डिभाइसखौ बाहायगोन।"
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6710,13 +6595,10 @@ msgid "AM Tuner mode"
 msgstr "AM टिउनार म'ड"
 
 #: modules/access/dshow/dshow.cpp:194
-#, fuzzy
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"AM टिउनार म'ड। मोनसे डिफल्ट जानो हायो (0), TV (1),AM रेडिअ' (2), FM रेडिअ' (3) "
-"एबा DSS (4)।"
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6776,24 +6658,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "केपसार डिभाइस \"%s\" आ गोनां जानाय पेरामिटारखौ हेफाजाब होआ।"
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "उइन्ड' साजायनाय"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
-#, fuzzy
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr "साम्बा (उइन्ड'स नेटवार्क शेयार) इनपुट"
+msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "SMB इनपुट"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "सिबिथाय दिहुननाय मडुल"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -7086,14 +6964,11 @@ msgid "Local oscillator high frequency (kHz)"
 msgstr "जायगानि अचिलेटर गोजौ गलेगलेथाय (kHz)"
 
 #: modules/access/dtv/access.c:186
-#, fuzzy
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
-"डाउन-कनभार्टार (LNB) आ ग्रहसा दैथायनाय गलेगलेथाय निफ्राय जायगानि अचिलेटर गलेगलेथायखौ "
-"दानख'गोन। RF केबलआव थानाय गेजेरनि गलेगलेथाय (IF) या फिथाय जायो।"
 
 #: modules/access/dtv/access.c:189
 msgid "Universal LNB switch frequency (kHz)"
@@ -7276,32 +7151,28 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "ग्रहसा सिमासारि क'ड"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "स्केलिं गुन"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
 msgstr ""
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid "Use NIT for scanning services"
-msgstr "अनजिमा सानथायनि थाखाय बाहायबाय"
+msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -7315,9 +7186,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "स्केलिं गुन"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7411,9 +7281,8 @@ msgid "Directory"
 msgstr "डिरेक्टरि"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "जरखा मडुल"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7432,11 +7301,10 @@ msgstr "बाहायग्रामुं"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "बाहायग्रा मुं जायखौ फोनांजाबनि थाखाय बाहायगोन"
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7453,12 +7321,10 @@ msgstr "पासवार्ड"
 
 #: modules/access/ftp.c:72 modules/access/rdp.c:69 modules/access/sftp.c:59
 #: modules/access/smb_common.h:25
-#, fuzzy
 msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
-"जेबो बाहायग्रा एबा पासवार्डखौ url आव फजयाखैब्ला फोनांजाबनि थाखाय बाहायग्रामुंखौ फजयो।"
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7469,14 +7335,13 @@ msgid "Account that will be used for the connection."
 msgstr "एकाउन्टखौ फोनांजाबनि थाखाय बाहायगोन"
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "SFTP थारफोरमान"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "%s आव sftp फोनांजाबनि थाखाय मोनसे बाहाय जाथाव लगिन आरो पासवार्डखौ हाबहो"
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7531,14 +7396,12 @@ msgstr ""
 "अननानै realm %s नि थाखाय मोनसे बाहाय जाथाव लगिन मुं आरो मोनसे पासवार्ड हाबहो।"
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "HTTP इनपुट"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7549,14 +7412,12 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "सिगांथिं थां"
+msgstr ""
 
 #: modules/access/http/access.c:301
-#, fuzzy
 msgid "Forward cookies across HTTP redirections."
-msgstr "http फिन-बिथोनआव कुकिखौ दावखोहो"
+msgstr ""
 
 #: modules/access/http/access.c:302
 msgid "Referrer"
@@ -7567,20 +7428,15 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "बाहायग्रा थान्दै"
+msgstr ""
 
 #: modules/access/http/access.c:308
-#, fuzzy
 msgid ""
 "Override the name and version of the application as provided to the HTTP "
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
-"प्रग्रामनि मुं आरो बिसानखौ HTTP सार्भारआव जगायना होगोन। बेफोरखौ सिगांथिं स्लेसजों आलादा "
-"खालामनाय जायो, जेरै- FooBar/1.2.3। बे उफ्राखौ मोनफा इनपुट आइटेमआवल' थि खालामनो "
-"हायो, जेरावबो नङा।"
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7733,14 +7589,12 @@ msgid "Memory input"
 msgstr "मेमरि इनपुट"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "साउट स्ट्रिम"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "डामि स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -8003,19 +7857,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "जेबो इनपुट गैया"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "RTSP फोनांजाबआ फेलें जाबाय"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8057,33 +7908,26 @@ msgid "PulseAudio input"
 msgstr "PulseAudio इनपुट"
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "बेंखन"
+msgstr ""
 
 #: modules/access/qtsound.m:60
-#, fuzzy
 msgid "QuickTime Sound Capture"
-msgstr "गोख्रैसम केपसार"
+msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "जेबो इनपुट डिभाइस मोनाखै"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
-"नोंथांनि मेकआव गोरोबथाव इनपुट डिभाइस गैयाबादि नुयो। नोंथांनि फोनांजाब आरो ड्राइभारखौ "
-"आनजाद खालाम।"
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "जेबो इनपुट डिभाइस मोनाखै"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8240,9 +8084,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr "UDP आ बाफार महरखौ लायो (बाइट्स)"
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "मोनसे स्ट्रिम सायख"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8322,9 +8165,8 @@ msgid "Display ID"
 msgstr "ID खौ दिन्थिफुं"
 
 #: modules/access/screen/screen.c:82
-#, fuzzy
 msgid "Display ID. If not specified, main display ID is used."
-msgstr "ID खौ दिन्थिफुं। थि खालामाब्ला, गाहाय दिन्थिफुंनाय ID खौ बाहायगोन।"
+msgstr ""
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
@@ -8487,9 +8329,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr "डमेइन/खामानि-हानजाखौ फोनांजाबनि थाखाय बाहायगोन।"
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "RTSP थारफोरमान"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8500,28 +8341,24 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:387
-#, fuzzy
 msgid "SRT input"
-msgstr "SFTP इनपुट"
+msgstr ""
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
-#, fuzzy
 msgid "SRT chunk size (bytes)"
-msgstr "UDP आ बाफार महरखौ लायो (बाइट्स)"
+msgstr ""
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
-#, fuzzy
 msgid "SRT latency (ms)"
-msgstr "DTS गोबाव (ms)"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8540,9 +8377,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr "सम क'ड दालाय-सावगारि गुदि स्ट्रिम जेनेरेटर"
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "RTP फुंखा समजोबनाय (sec)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8569,9 +8405,8 @@ msgid "VBI capture device"
 msgstr "VBI भिडिअ' डिभाइस"
 
 #: modules/access/v4l2/v4l2.c:48
-#, fuzzy
 msgid "The device node where VBI data can be read (for closed captions)."
-msgstr "डिभाइस नड जेराव VBI डाटाखौ फरायनो हायो (बन्द जाखानाय केपसननि थाखाय) "
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -8582,17 +8417,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "भिडिअ' थाखोमान (डिफल्ट, SECAM, PAL एबा NTSC)।"
 
 #: modules/access/v4l2/v4l2.c:55
-#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
 "I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"जरखा क्र'मा फरमेटखौ बाहायनो Video4Linux2 भिडिअ' डिभाइसखौ जर खालाम (जेरै- गोथां "
-"मुसुखानि थाखाय I420 एबा I422, M-JPEG नारसिननाय इनपुटनि थाखाय MJPG) (आबुं लिस्ट: "
-"GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, I420, "
-"I411, I410, MJPG)"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8630,9 +8460,8 @@ msgid "Frequency"
 msgstr "गले गेलथाय"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "Hz एबा kHz आव टिउनार गले गलेथाय (डेबाग आउटपुटखौ नाय)"
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8957,17 +8786,12 @@ msgid "v4l2 driver controls"
 msgstr "v4l2 ड्राइभार दबथायनाय"
 
 #: modules/access/v4l2/v4l2.c:190
-#, fuzzy
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
 "list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
-"लाव बेन्दोंजों गोसोबादियै फुसुंखानाय कमा आलादा खालामनाय लिस्टखौ बाहायनानै v4l2 ड्राइभार "
-"दबथायनायखौ थि बेसेनाव फज (जेरै: {video_bitrate=6000000,audio_crc=0,"
-"stream_type=3} )। मोननो हाथाव दबथायनायखौ लिस्ट खालामनो, भार्ब'सिटि (-vvv) खौ "
-"बांहो v4l2-ctl एप्लिकेसनखौ बाहाय।"
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
@@ -9122,18 +8946,16 @@ msgid "X.509 Client certificate"
 msgstr "X.509 क्लाइन्ट सार्टिफिकेट"
 
 #: modules/access/vnc.c:53
-#, fuzzy
 msgid "Certificate for client authentication"
-msgstr "क्लाइन्ट थारफोरमाननि थाखाय सार्टिफिकेट"
+msgstr ""
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
 msgstr "X.509 क्लाइन्ट प्राइभेट साबि"
 
 #: modules/access/vnc.c:55
-#, fuzzy
 msgid "Private key for authentication by certificate"
-msgstr "सार्टिफिकेटजों थारफोरमाननि थाखाय प्राइभेट साबि"
+msgstr ""
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9168,18 +8990,16 @@ msgid "Loopback mode"
 msgstr ""
 
 #: modules/access/wasapi.c:486
-#, fuzzy
 msgid "Record an audio rendering endpoint."
-msgstr "अडिअ' रेन्डारिंखौ हाहोनाय खालाम/लोरबां खालाम"
+msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "उइन्ड'स अडिअ' जथुम्मा API आउटपुट"
+msgstr ""
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
@@ -9238,9 +9058,8 @@ msgid "File stream output"
 msgstr "फाइल स्ट्रिम आउटपुट"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "बाहायग्रा मुं जायखौ स्ट्रिम हाबहोनो खावलायगोन"
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9348,15 +9167,11 @@ msgid "File where vlc reads key-uri and keyfile-location"
 msgstr "फाइल जेराव vlc आ साबि-uri आरो keyfile-जायगाखौ फरायो"
 
 #: modules/access_output/livehttp.c:98
-#, fuzzy
 msgid ""
 "File is read when segment starts and is assumed to be in format: key-uri"
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
-"खोन्दोखौ जागायनाय समाव फाइलखौ फरायनाय जायो आरो बेखौ फरमेट बादि हमनानै लानाय "
-"जायो: साबि-uri\\nसाबि-फाइल। फाइलखौ खोन्दो खेवनायाव फरायनाय जायो आरो बेसेनखौ बै "
-"खोन्दोयाव बाहायनाय जायो।"
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -9419,47 +9234,40 @@ msgid "Genre description"
 msgstr "आरिमु बेखेवथि"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "थानाय-आयदानि आरिमु"
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "बेखेवथि"
+msgstr ""
 
 #: modules/access_output/shout.c:86
-#, fuzzy
 msgid "URL with information about the stream or your channel."
-msgstr "स्ट्रिम एबा नोंथांनि सेनेलनि सोमोन्दै फोरमायथिहोग्राजों URL"
+msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "ट्रेन्सक'ड खालामखानाय स्ट्रिमनि बिट्रेट फोरमायथिहोग्रा"
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "ट्रेन्सक'ड खालामखानाय स्ट्रिमनि नमुना-रेट"
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "सेनेलनि अनजिमा"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "ट्रेन्सक'ड खालामखानाय स्ट्रिमनि सेनेल फोरमायथिहोग्रानि अनजिमा।"
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Ogg भर्बिस गुन"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "ट्रेन्सक'ड खालामखानाय स्ट्रिमनि Ogg भर्बिस गुन फोरमायथिहोग्रा"
+msgstr ""
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9484,29 +9292,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 बिट"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 बिट"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 बिट"
+msgstr ""
 
 #: modules/access_output/srt.c:437
-#, fuzzy
 msgid "SRT stream output"
-msgstr "RTP स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "थांखि डिभाइसनि थाखाय पासवार्ड।"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9779,9 +9582,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
-#, fuzzy
 msgid "Binauralizer"
-msgstr "भिजुयेलाइजार"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9864,36 +9666,32 @@ msgid "RMS/peak"
 msgstr "RMS/पिक"
 
 #: modules/audio_filter/compressor.c:156
-#, fuzzy
 msgid "Set the RMS/peak."
-msgstr "RMS/पिक (0 ... 1) खौ फज"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
 msgstr "गाग्लोबनाय सम"
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr "गाग्लोबनाय समखौ मिलिसेकेन्द (1.5 ... 400) आव फज।"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr "ओंखारनाय सम"
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "ओंखारनाय समखौ मिलिसेकेन्दआव फज (2 ... 800)।"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
 msgstr "सिम लेभेल"
 
 #: modules/audio_filter/compressor.c:165
-#, fuzzy
 msgid "Set the threshold level in dB."
-msgstr "सिमा लेभेलखौ dB आव फज (-30 ... 0)।"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9902,9 +9700,8 @@ msgid "Ratio"
 msgstr "रुजुथाय"
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "रुजुथायखौ फज (n:1) (1 ... 20)।"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9912,9 +9709,8 @@ msgid "Knee radius"
 msgstr "नी सोखाव"
 
 #: modules/audio_filter/compressor.c:171
-#, fuzzy
 msgid "Set the knee radius in dB."
-msgstr "नी सोखावखौ dB आव फज (1 ... 10)।"
+msgstr ""
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -9940,9 +9736,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "PCM फरमेट सोलायहोनायनि थाखाय अडिअ' फिल्टार"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "A/52->S/PDIF सुंद' सारबाहागोनि थाखाय अडिअ' फिल्टार"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10202,14 +9997,12 @@ msgstr "रिसेम्पलिं गुन"
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "रिसेम्पलिं गुन"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "SRC नमुना बुथुमग्रा"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10265,9 +10058,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "अडिअ' आउटपुट सेनेल"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10304,9 +10096,8 @@ msgid "Length in milliseconds to search for best overlap position"
 msgstr "साबसिन अभारलेप जायगानि थाखाय नागिरनो मिलिसेकेन्दआव गोलाव"
 
 #: modules/audio_filter/scaletempo.c:74
-#, fuzzy
 msgid "Pitch Shift"
-msgstr "पिच"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
@@ -10589,9 +10380,8 @@ msgid "Output file"
 msgstr "आउटपुट फाइल"
 
 #: modules/audio_output/file.c:109
-#, fuzzy
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr "फाइल जेराव अडिअ' नमुनाखौ लिरनाय जायो। stdout नि थाखाय (\"-\""
+msgstr ""
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10622,9 +10412,8 @@ msgstr ""
 "JACK क्लाइन्टखौल' फोनांजाबनि थाखाय साननाय जागोन।"
 
 #: modules/audio_output/jack.c:94
-#, fuzzy
 msgid "JACK client name"
-msgstr "VNC क्लाइन्ट हाबनाय"
+msgstr ""
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10664,33 +10453,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
-#, fuzzy
 msgid "Disabled"
-msgstr "लोरबां खालाम"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
-#, fuzzy
 msgid "Enabled"
-msgstr "हाहोनाय खालाम"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1473
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "उइन्ड'स GDI भिडिअ' आउटपुट"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Output back-end"
-msgstr "आउटपुट कार्ड"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "अडिअ' आउटपुट डिभाइस"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10785,9 +10569,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "AES3/SMPTE 302M अडिअ' पकेटाइजार"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "WebM भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10798,19 +10581,16 @@ msgid "Raw audio encoder"
 msgstr "गोथां अडिअ' डिक'डार"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "सोदोब फन्ट"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
-#, fuzzy
 msgid "SoundFont file to use for software synthesis."
-msgstr "सफ्टवेयार सिन्थेसिसनि थाखाय मोनसे सोदोब फन्ट फाइलखौ नांगौ"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:57
-#, fuzzy
 msgid "AudioToolbox MIDI synthesizer"
-msgstr "FluidSynth MIDI सिन्टेसाइजार"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
@@ -10821,30 +10601,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "रेन्डार खालामखानाय दालाय-बिमुंनि X क'अर्डिनेट"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "क'रफरा फन्ट रेन्डारार"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "रेन्डार खालामखानाय दालाय-बिमुंनि X क'अर्डिनेट"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "DVB दालाय-बिमुं डिक'डार"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "DVB दालाय-बिमुं"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -11305,9 +11080,8 @@ msgstr ""
 "libavcodec जोंल' हेफाजाब होजायो"
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "DirectX भिडिअ' खारथाय बांनाय (DXVA) 2.0"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11357,14 +11131,12 @@ msgid "VA-API video decoder via DRM"
 msgstr "DRM नि गेजेरजों VA-API भिडिअ' डिक'डार"
 
 #: modules/codec/avcodec/vaapi.c:357
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "X11 नि गेजेरजों VA-API भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "JPEG मुसुखा डिक'डार"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -11373,11 +11145,8 @@ msgid "Opacity"
 msgstr "मोलेले"
 
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
-#, fuzzy
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
 msgstr ""
-"vbi-मोलेलेखौ सैथोआव फजयोब्ला फराखौ बाक्सु सिङाव दोनो आरो फरायनो थाखाय साबसिन जानो "
-"हागौ।"
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11410,34 +11179,28 @@ msgid "Encoding quality"
 msgstr "एनक'डिं गुन"
 
 #: modules/codec/daala.c:111
-#, fuzzy
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr "0 (खम) आरो 10 (गोजौ) नि गेजेराव मोनसे गुनखौ जर हो"
+msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "गार्ड गेजेराव थाद'नाय"
+msgstr ""
 
 #: modules/codec/daala.c:114
-#, fuzzy
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr "0 (खम) आरो 10 (गोजौ) नि गेजेराव मोनसे गुनखौ जर हो"
+msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "CVD भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "थेअ'रा भिडिअ' पेकेटाइजार"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "PNG भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11560,53 +11323,45 @@ msgid "Encoder Profile"
 msgstr "एनक'डार प्रफाइल"
 
 #: modules/codec/fdkaac.c:68
-#, fuzzy
 msgid "Encoder Algorithm to use."
-msgstr "बाहायनो थाखाय एनक'डार एलग'रिडम"
+msgstr ""
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
 msgstr "स्पेक्ट्राल बेन्ड रिप्लेकेसनखौ हाहोनाय खालाम"
 
 #: modules/codec/fdkaac.c:71
-#, fuzzy
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr "बेयो AAC-ELD प्रफाइलनि थाखायल' मोनसे उफ्रायारि आखुथाय"
+msgstr ""
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
 msgstr "VBR गुन"
 
 #: modules/codec/fdkaac.c:74
-#, fuzzy
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
-msgstr "VBR एनक'डिंनि गुन (0=cbr, 1-5 दिदोम गुन vbr, 5 आ साबसिन"
+msgstr ""
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
 msgstr "आफ्टारबार्नार बिजाब बाख्रिखौ हाहोनाय खालाम"
 
 #: modules/codec/fdkaac.c:77
-#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
-"बे बिजाब बाख्रिया उफेरा CPU बाहायथियाव गोजौ गुननि अडिअ'खौ दिहुनगोन (डिफल्टखौ "
-"हाहोनाय खालामनाय जायो)"
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
 msgstr "फेहेरनाय AOT नि इसारा होनाय म'ड"
 
 #: modules/codec/fdkaac.c:80
-#, fuzzy
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
 msgstr ""
-"1 आ SBR नि थाखाय रोखा आरो PS (डिफल्ट) नि थाखाय रोखा, 2 आ फारियै बांलांनाय रोखा"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -11748,15 +11503,11 @@ msgid "Formatted Subtitles"
 msgstr "फरमेट खालामखानाय दालाय-बिमुं"
 
 #: modules/codec/kate.c:192
-#, fuzzy
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"केट स्ट्रिमआ फरा फरमेटिंनि थाखाय गनायथि होयो। VLC आ बेखौ खावसेयै बाहायो, नाथाय "
-"नोंथाङा गासै फरमेटिंखौ लोरबां खालामनो बासिखनो हायो। नायनो गोनांदि टाइगारखौ हाहोनाय "
-"खालामनानै दिन्थिनाया जेबो गोहोम गोग्लैया।"
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -12040,29 +11791,24 @@ msgid "Media Foundation Transform decoder"
 msgstr "मेडिया फाउन्डेसन ट्रेन्सफर्म डिक'डार"
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "MPEG अडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "WebM भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "थेअ'रा भिडिअ' पेकेटाइजार"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "थोंजों रेन्डारिं"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "एनड्र'इड थोंजों रेन्डारिं"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12153,33 +11899,26 @@ msgid "Group of Picture Reference Distance"
 msgstr "सावगारि रायखांनाय जानथायनि हानजा"
 
 #: modules/codec/qsv.c:81
-#, fuzzy
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
 "unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
-"I- एबा P- साबि फ्रेमनि गेजेराव थानाय जानथाय; बेयो लाथिख' जायोब्ला, GOP दाथाया थि "
-"खालामै जायो। नायनो गोनां: GopRefDist = 1 जायोब्ला, जेबो B- फ्रेमखौ बाहायनाय नङा।"
 
 #: modules/codec/qsv.c:85
 msgid "Target Usage"
 msgstr "थांखि बाहायथि"
 
 #: modules/codec/qsv.c:86
-#, fuzzy
 msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
-"थांखि बाहायथिआ गुन आरो खारथायनि गेजेराव आलादा आलादा ट्रेड-अफ निफ्राय बासिखनो "
-"गनायथियो होयो। गनायथि होजानाय बेसेनआ जाबाय : 'खारथाय', 'समानथि' आरो 'गुन'"
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
 msgstr "IDR थाद'नाय"
 
 #: modules/codec/qsv.c:92
-#, fuzzy
 msgid ""
 "For H.264, IdrInterval specifies IDR-frame interval in terms of I-frames; if "
 "IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
@@ -12188,40 +11927,27 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
-"H.264 नि थाखाय, IdrInterval आ I-फ्रेमनि IDR-फ्रेम थाद'नायखौ थि खालामो; "
-"IdrInterval=0 जायोब्ला, मोनफ्रोम I-फ्रेमआ मोनसे IDR-फ्रेम। IdrInterval=1 जायोब्ला, "
-"मोनफ्रोम गुबुन I-फ्रेमआ मोनसे IDR-फ्रेम, बाइदि बाइदि। MPEG2 नि थाखाय, IdrInterval आ "
-"I-फ्रेमनि फारि फारि हेडार थाद'नायखौ थि खालामो। IdrInterval=N जायोब्ला, SDK आ "
-"मोनफ्रोम Nth I-फ्रेमनि सिगां फारि फारि हेडारखौ सोसनो। IdrInterval=0 (डिफल्ट) "
-"जायोब्ला, SDK आ फारि फारि हेडारखौ स्ट्रिम जागायनायाव सोसनो।"
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
 msgstr "रेट दबथायनाय खान्थि"
 
 #: modules/codec/qsv.c:102
-#, fuzzy
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
 "'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
-"एनक'ड खालामनाय समाव बाहायनो रेट दबथायनाय खान्थि। 'crb', 'vbr', 'qp', 'avbr'. "
-"'qp' म'डआ mpeg2 नि थाखाय हेफाजाब होजाया।"
 
 #: modules/codec/qsv.c:105
 msgid "Quantization parameter"
 msgstr "बिबां पेरामिटार"
 
 #: modules/codec/qsv.c:106
-#, fuzzy
 msgid ""
 "Quantization parameter for all types of frames. This parameters sets qpi, "
 "qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
-"फ्रेमनि गासै रोखोमनि थाखाय बिबां पेरामिटार। बे पेरामिटारआ qpi, qpp आरो qpp खौ फजयो। "
-"बेहा आगोलाव रायखांनाय पेरामिटार निख्रुइ खमसिन गिबिथि दं। rc_method आ 'qp' "
-"जायोब्लाल'नो बाहाय।"
 
 #: modules/codec/qsv.c:110
 msgid "Quantization parameter for I-frames"
@@ -12264,45 +11990,33 @@ msgid "Maximum Bitrate"
 msgstr "बांसिन बिट्रेट"
 
 #: modules/codec/qsv.c:123
-#, fuzzy
 msgid ""
 "Defines the maximum bitrate in kbps (1000 bits/s) for VBR rate control "
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
-"VBR रेट दबथायनाय खान्थिनि थाखाय Kpbs (1000 बिट) आव बांसिन बिट्रेटखौ थि खालामो। "
-"फजआब्ला, बे पेरामिटारखौ गुबुन फुंखा निफ्राय हिसाब खालामनाय जायो, जेरै- बिट्रेट, प्रफाइल "
-"लेभेल बाइदि बाइदि।"
 
 #: modules/codec/qsv.c:127
 msgid "Accuracy of RateControl"
 msgstr "रेट-दबथायनायनि गेबें"
 
 #: modules/codec/qsv.c:128
-#, fuzzy
 msgid ""
 "Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
 "g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
 "880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
-"'avbr' (गड़ सोलायस्लु बिटरेट) खान्थिनि जौखोन्दोआव ट'लारेन्स। (जेरै- 800 kpbs नि मोनसे "
-"बिट्रेटजों 10 नि ओंथिया जाबाय एनक'डारआ 880 kpbs नि गोजौ आरो 730 kpbs नि गाहायाव "
-"थांनो नाजाया। थांखि खालामखानाय गेबेंआ खालि मोनसे थि एखे जानाय समनि उनावसो सौहैयो। एखे "
-"जानाय पेरामिटारखौ नाय।"
 
 #: modules/codec/qsv.c:134
 msgid "Convergence time of 'avbr' RateControl"
 msgstr "'avbr' रेट-दबथायनायनि एखे जानाय सम"
 
 #: modules/codec/qsv.c:135
-#, fuzzy
 msgid ""
 "Number of 100 frames before the 'avbr' rate control method reaches the "
 "requested bitrate with the requested accuracy. See the accuracy parameter."
 msgstr ""
-"'avbr' रेट दबथायनाय खान्थिनि सिगां 100 फ्रेमनि अनजिमाया खावलायखानाय गेबेंजों "
-"खावलायखानाय बिट्रेटआव सौहैयो। थि पेरामिटारखौ नाय।"
 
 #: modules/codec/qsv.c:139
 msgid "Number of slices per frame"
@@ -12327,15 +12041,11 @@ msgid "Number of parallel operations"
 msgstr "समान समान अपारेसननि अनजिमा"
 
 #: modules/codec/qsv.c:149
-#, fuzzy
 msgid ""
 "Defines the number of parallel encoding operations before we synchronise the "
 "result. Higher numbers may result on better throughput depending on "
 "hardware. MPEG2 needs at least 1 here."
 msgstr ""
-"जों फिथाइखौ सिन्क'नाइज खालामनायनि सिगां समान समान एनक'डिं अपारेसननि अनजिमाखौ थि "
-"खालामो। गोजौसिनआ हार्डबेयारआव सोनारनानै साबिसिन फिथाइ होनो हागौ। MPEG2 नो बेयाव "
-"खमैबो 1 नांगौ।"
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
@@ -12351,9 +12061,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "नंखाय गोथां भिडिअ' पेकेटाइजार"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "PNG भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12736,9 +12445,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr "libschroedinger नि हेफाजाबजों डिराक अडिअ' डिक'डार"
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "G.711 डिक'डार"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12749,9 +12457,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "G.711 डिक'डार"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -13151,32 +12858,28 @@ msgid "Image width"
 msgstr "मुसुखानि गुवार"
 
 #: modules/codec/svg.c:51
-#, fuzzy
 msgid "Specify the width to decode the image too"
-msgstr "राव गोनां सारिखौ थिक खालाम"
+msgstr ""
 
 #: modules/codec/svg.c:52 modules/video_filter/scene.c:67
 msgid "Image height"
 msgstr "मुसुखानि गोजौ"
 
 #: modules/codec/svg.c:53
-#, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "बाहायनो थाखाय आलादा खालामनाय मडुलखौ थिक खालाम"
+msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
 msgstr "स्केल फेक्टर"
 
 #: modules/codec/svg.c:55
-#, fuzzy
 msgid "Scale factor to apply to image"
-msgstr "ट्रेन्सक'ड खालामनाय समाव भिडिअ'आव बाहायनो स्केल फेक्टर (जेरै: 0.25)"
+msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "CVD भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13222,9 +12925,8 @@ msgid "Teletext subtitles decoder"
 msgstr "टेलिटेक्स्ट दालाय-बिमुं डिक'डार"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "फरा दालाय-बिमुं डिक'डार"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -13251,23 +12953,20 @@ msgid "Theora video encoder"
 msgstr "थेअ'रा भिडिअ' एनक'डार"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "MMAL डिक'डार"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "EBU STL दालाय-बिमुं डिक'डार"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "TTA डिमाक्सार"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13314,14 +13013,12 @@ msgid "Ulead DV audio decoder"
 msgstr "Ulead DV अडिअ' डिक'डार"
 
 #: modules/codec/videotoolbox.m:82
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "हार्डवेयार डिक'डिं"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "WebM भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13358,9 +13055,8 @@ msgid "Vorbis audio encoder"
 msgstr "भरबिस अडिअ' एनक'डार"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "सिरि म'ड"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13375,24 +13071,20 @@ msgid "WebM video decoder"
 msgstr "WebM भिडिअ' डिक'डार"
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "WebM भिडिअ' डिक'डार"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "MMAL डिक'डार"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "EBU STL दालाय-बिमुं डिक'डार"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "EBU STL दालाय-बिमुं पार्सार"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13403,15 +13095,11 @@ msgid "Maximum GOP size"
 msgstr "बांसिन GOP महर"
 
 #: modules/codec/x264.c:72
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames. Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"IDR-फ्रेमनि गेजेराव बांसिन जिरायथ'नायखौ फजयो। गेदेरसिन बेसेनआ बिटखौ थिना दोनो, बेखायनो "
-"नागिरनाय गोरोबनायनि जाउनाव होखानाय बिट्रेटनि थाखाय गुनखौ जौगाहोयो। सिमागैयैनि "
-"थाखाय -1 खौ बाहाय।"
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13504,13 +13192,10 @@ msgid "Adaptive B-frame decision"
 msgstr "गोरोबथाव B-फ्रेम थिरांथा"
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"बाहायनो गोनां फारि फारि B-फ्रेमनि थि अनजिमाखौ जर हो, जानो हागौ I-फ्रेमनि सिगांखौ "
-"बाद होयो। सिमासारि 0 निफ्राय 2 सिम।"
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -13880,7 +13565,6 @@ msgid "Partitions to consider"
 msgstr "साननो बोखावनाय"
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -13890,13 +13574,6 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"म'डखौ बिजिरनायाव साननो बोखावनाय: \n"
-" - मोनसेबो नङा  : \n"
-" - गोख्रै  : i4x4\n"
-" - सरासनस्रा: i4x4,p8x8,(i8x8)\n"
-" - लासै  : i4x4,p8x8,(i8x8),b8x8\n"
-" - गासै   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
-"(p4x4 नो p8x8 नांगौ। i8x8 नो 8x8dct नांगौ)।"
 
 #: modules/codec/x264.c:282
 msgid "Direct MV prediction mode"
@@ -13907,16 +13584,12 @@ msgid "Direct prediction size"
 msgstr "थोंजों इयुन बाथ्रा महर"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"थोंजों इयुन बाथ्रा महर:  -  0: 4x4\n"
-" -  1: 8x8\n"
-" - -1: लेभेल मथे फिसासिन जाथाव\n"
 
 #: modules/codec/x264.c:291
 msgid "Weighted prediction for B-frames"
@@ -13931,23 +13604,18 @@ msgid "Weighted prediction for P-frames"
 msgstr "P-फ्रेमनि थाखाय अजन खालामखानाय इयुन बाथ्रा"
 
 #: modules/codec/x264.c:295
-#, fuzzy
 msgid ""
 "Weighted prediction for P-frames:\n"
 " - 0: Disabled\n"
 " - 1: Blind offset\n"
 " - 2: Smart analysis\n"
 msgstr ""
-"P-फ्रेमनि थाखा अजन खालामखानाय इयुन बाथ्रा:  - 0: लोरबां खालामबाय\n"
-" - 1: ब्लाइन्ड अफसेट \n"
-" - 2: स्मार्ट बिजिरनाय\n"
 
 #: modules/codec/x264.c:300
 msgid "Integer pixel motion estimation method"
 msgstr "आबुं अनजिमा पिक्सेल खारथाय आन्दाज खान्थि"
 
 #: modules/codec/x264.c:301
-#, fuzzy
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -13956,12 +13624,6 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
-"खारथाय आन्दाज एलग'रिडमखौ सायखयो:  - dia: डायमन्ड नागिरनाय, सोखाव 1 (गोख्रै)\n"
-" - हेक्स: हेक्साग'नेल नागिरनाय, सोखाव 2\n"
-" - umh: समान-नङै माल्टि-हेक्सागन नागिरनाय (मोजां नाथाय लासै)\n"
-" - esa: फिट फिट फुरायै नागिरनाय (जोबोद लासै, गुबैयै आनजाद खालामनायनि थाखाय)\n"
-" - tesa: हेडमार्ड फिट फिट फुरायै नागिरनाय (जोबोद लासै, गुबैयै आनजाद खालामनायनि "
-"थाखाय)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -14064,7 +13726,6 @@ msgid "Trellis RD quantization"
 msgstr "ट्रेलिस RD बिबां"
 
 #: modules/codec/x264.c:352
-#, fuzzy
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -14072,11 +13733,6 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
-"ट्रेलिस RD बिबां: \n"
-" - 0: लोरबां खालामबाय\n"
-" - 1: MB नि जोबथा एनक'डआवल' हाहोनाय खालामबाय\n"
-" - 2: गासै म'ड थिरांथायाव हाहोनाय खालामनाय जायो\n"
-"बेयो CABAC खौ नांगौ।"
 
 #: modules/codec/x264.c:358
 msgid "Early SKIP detection on P-frames"
@@ -14091,12 +13747,10 @@ msgid "Coefficient thresholding on P-frames"
 msgstr "P-फ्रेमआव क'इफिसिन्ट थ्रेसह'ल्डिं"
 
 #: modules/codec/x264.c:362
-#, fuzzy
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"P-फ्रेमआव क'इफिसिन्ट थ्रेसह'ल्डिं। फिसा मोनसेल' क'इफिसिन्टगोनां dct ब्लकखौ खोमोर। "
 
 #: modules/codec/x264.c:365
 msgid "Use Psy-optimizations"
@@ -14232,14 +13886,12 @@ msgid "Default preset setting used"
 msgstr "डिफल्ट प्रिसेट सेटिं बाहायबाय"
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "x264 जौगानाय उफ्रा"
+msgstr ""
 
 #: modules/codec/x264.c:422
-#, fuzzy
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr "फर्म {opt=val,op2=val2}आव x264 जौगानाय उफ्रा"
+msgstr ""
 
 #: modules/codec/x264.c:427
 msgid "dia"
@@ -14339,9 +13991,8 @@ msgid "Teletext page"
 msgstr "टेलिटेक्स्ट बिलाइ"
 
 #: modules/codec/zvbi.c:62
-#, fuzzy
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr "इंगित होखानाय टेलिटेक्स्ट बिलाइखौ खेव। डिफल्ट बिलाइआ नायखांफारि 100"
+msgstr ""
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -14362,14 +14013,12 @@ msgid "Teletext text subtitles"
 msgstr "टेलिटेक्स्ट फरा दालाय-बिमुं"
 
 #: modules/codec/zvbi.c:76
-#, fuzzy
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr "RGBA नि सोलायै फरा महरै आउटपुट टेलिटेक्स्ट दालाय-बिमुं"
+msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "रिंखांनाय थोरफो"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -14619,9 +14268,9 @@ msgid "Subtitle position %d px"
 msgstr "दालाय-बिमुं जायगा %d px"
 
 #: modules/control/hotkeys.c:1354
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "दालाय-बिमुं फरा एनक'डिं"
+msgstr ""
 
 #: modules/control/hotkeys.c:1515
 #, c-format
@@ -14684,9 +14333,8 @@ msgstr ""
 "मास्टार (गाहाय) घरि महरै खामानि मावगोन"
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "मास्टार सार्भार ip थं"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -15145,19 +14793,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "उइन्ड'स सिबिथाय इन्टारफेस"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "बांसिन भिडिअ' गुवार"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "बांसिन भिडिअ' गोजौ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -15168,9 +14813,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "सोलायथाव रक"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -15181,23 +14825,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "मेडिटेटिभ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "बेण्डउइड"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "बेण्डउइड"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -15208,14 +14849,12 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "मेडिटेटिभ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
-#, fuzzy
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr "HTTP आव डायेनामिक एडाप्टिभ स्ट्रिमिं"
+msgstr ""
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15310,7 +14949,6 @@ msgid "AVI demuxer"
 msgstr "AVI डिमाक्सार"
 
 #: modules/demux/avi/avi.c:832 modules/demux/mp4/mp4.c:1674
-#, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15319,12 +14957,6 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
-"मानोना बे AVI फाइल नायखांफारिआ बायनाय एबा गोमानाय, नागिरनाया गेबेङै खामानि मावनाय "
-"नङा।\n"
-"VLC आ नोंथांनि फाइलखौ फाहामनाय नङा नाथाय मेमरियाव मोनसे नायखांफारि बानायनानै बे "
-"जेंनाखौ दसेनि थाखाय सुस्रांनो हागौ।\n"
-"बे स्टेपआ गेदेर फाइलआव गोलाव सम लानो हागौ।\n"
-"नोंथाङा मा खालामनो लुबैयो?"
 
 #: modules/demux/avi/avi.c:840
 msgid "Do not play"
@@ -15339,9 +14971,8 @@ msgid "Play as is"
 msgstr "जेरै दं एरै दाम"
 
 #: modules/demux/avi/avi.c:843 modules/demux/mp4/mp4.c:1685
-#, fuzzy
 msgid "Broken or missing Index"
-msgstr "बायनाय एबा गोमानाय AVI नायखांफारि"
+msgstr ""
 
 #: modules/demux/avi/avi.c:2719
 msgid "Broken or missing AVI Index"
@@ -15392,14 +15023,12 @@ msgid "Dirac video demuxer"
 msgstr "डिराक भिडिअ' डिमाक्सार"
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "डिरेक्टरि थख' साजायनाय फारि"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "नुथाय भिडिअ' फिल्टार"
+msgstr ""
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -15531,9 +15160,8 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr "मोनथिमोनै EBML गुदिमुवाखौ फराय आरो गार (बायनाय फाइलनि थाखाय मोजां नङा)।"
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "स्ट्रिम फिल्टार"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -15553,9 +15181,8 @@ msgid "Reverberation level (from 0 to 100, default value is 0)."
 msgstr "रिंखांनाय थोरफो (0 निफ्राय 100 सिम, डिफल्ट बेसेनआ 0)।"
 
 #: modules/demux/mod.c:59
-#, fuzzy
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
-msgstr "ms आव रिंखांनाय गोबाव। सरासनस्रा बेसेनआ 40 निफ्राय 200ms सिम।"
+msgstr ""
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -15689,9 +15316,8 @@ msgid "Model"
 msgstr "मडेल"
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "दिहुन्थाय"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
@@ -15746,18 +15372,16 @@ msgid "Executive Producer"
 msgstr "मावफुं दिहुनगिरि"
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "एनक'डिं पेरामिटार"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "सेनेल नाम्बार"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15768,14 +15392,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "खोमोर"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "अडिअ' गोबाव"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -15790,14 +15412,12 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
-#, fuzzy
 msgid "Do not seek"
-msgstr "दामनो नाङा"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1683
-#, fuzzy
 msgid "Build index"
-msgstr "नायखांफारि बानाय, बेनि उनाव दाम"
+msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -15911,13 +15531,10 @@ msgid "Packet size in bytes to decrypt"
 msgstr "डिक्राइप्ट खालामनो बाइट्सआव पेकेट महर"
 
 #: modules/demux/mpeg/ts.c:100
-#, fuzzy
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
-"डिक्राइप्ट खालामनो TS पेकेटनि महरखौ थिक खालाम। डिक्राइप्ट खालामनायनि सिगां डिक्रिपसन "
-"रुटिनआ बेसेन निफ्राय TS-हेडारखौ दानख'यो।"
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
@@ -15948,9 +15565,8 @@ msgid "Use the stream PCR as a reference."
 msgstr "स्ट्रिम PCR खौ रायखांनाय महरै बाहाय"
 
 #: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
-#, fuzzy
 msgid "Digital TV Standard"
-msgstr "डिजिटाल टेलिभिसन आरो रेडिअ'"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:127
 msgid ""
@@ -15963,24 +15579,20 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG ट्रेन्सपर्ट स्ट्रिम डिमाक्सार"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "गुबै अडिअ'"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "बे codec नि थाखाय जेबो बेखेवथि गैया"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "टेलिटेक्स्ट दालाय-बिमुं: खोमा बेंगा"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
-#, fuzzy
 msgid "Spoken subtitles for the visually impaired"
-msgstr "DVB दालाय-बिमुं: खोमा बेंगा"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -16184,9 +15796,8 @@ msgid "Load"
 msgstr "ल'ड खालाम"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "बुंफबनाय"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16218,13 +15829,10 @@ msgid "Forces the audio language"
 msgstr "अडिअ' रावखौ जर होयो"
 
 #: modules/demux/rawaud.c:54
-#, fuzzy
 msgid ""
 "Forces the audio language for the output mux. Three letter ISO639 code. "
 "Default is 'eng'."
 msgstr ""
-"आउटपुट मास्कनि थाखाय अडिअ' रावखौ जर हो। मोनथाम हांखो ISO639 क'ड। डिफल्टआ जाबाय "
-"'eng'।"
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16777,9 +16385,8 @@ msgstr "उनथिं"
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "उनथिं थां"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -16790,32 +16397,27 @@ msgstr "सिगांथि"
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "सिगांथिं थां"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "प्लेबेक दबथायनाय"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "प्लेबेक रेट"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "आगोलनि बिमुं"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "समआव थां"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -17097,23 +16699,20 @@ msgid "Clean up"
 msgstr "खोमोर"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
-#, fuzzy
 msgid "Play/Pause the current media"
-msgstr "दानि मेडियाखौ दामनो एबा दोन्थ'होनो क्लिक खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "आगोलनि प्लेलिस्ट आइटेमआव थांनो क्लिक खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr "आबुं-स्क्रिन म'डखौ टग्गल खालाम"
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "आबुं-स्क्रिनखौ नागार"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -17122,9 +16721,8 @@ msgid "Volume"
 msgstr "भलिउम"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "अडिअ' भलिउम"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -17217,13 +16815,10 @@ msgid "Display VLC status menu icon"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:83
-#, fuzzy
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
-"डिफल्टजों, VLC आ एप्पल रिमटजों बेनि निजि भलिउमखौ दबथायगोन। अदेबानि, बेनि सोलायै "
-"नोंथाङा मुलुगनां सिस्टेम भलिउमखौ दबथायनो बासिखनो हायो।"
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17317,9 +16912,8 @@ msgid "Lock Aspect Ratio"
 msgstr "नुथाय रुजुथायखौ लक खालाम"
 
 #: modules/gui/macosx/macosx.m:113
-#, fuzzy
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr "आबुं-स्क्रिन प्लेबेक निफ्राय ओंखार लांनो क्लिक खालाम।"
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17554,9 +17148,8 @@ msgid "Select All"
 msgstr "गासैबो सायख"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
-#, fuzzy
 msgid "Find"
-msgstr "नागिरना दिहुन: %s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -17606,14 +17199,12 @@ msgid "Jump to Time"
 msgstr "समआव थां"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "फरा रेन्डारार"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
-#, fuzzy
 msgid "No renderer"
-msgstr "फरा रेन्डारार"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -17794,9 +17385,8 @@ msgid "Search in Playlist"
 msgstr "प्लेलिस्टआव नागिर"
 
 #: modules/gui/macosx/VLCMainWindow.m:187
-#, fuzzy
 msgid "Search the playlist. Results will be selected in the table."
-msgstr "प्लेलिस्टखौ नागिरनो मोनसे सोदोबखौ हाबहो। फिथाइखौ फारिलाइआव सायखगोन"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Open a dialog to select the media to play"
@@ -17886,11 +17476,8 @@ msgid "Repeat"
 msgstr "खालामफिन"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:68
-#, fuzzy
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
 msgstr ""
-"खालामफिननाय म'डखौ सोलायनो क्लिक खालाम। मोन 3 थासारि दं: मोनसेखौल' खालामफिन, "
-"गासैबो खालामफिन आरो बन्द खालाम।"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: share/lua/http/index.html:239
@@ -17899,18 +17486,17 @@ msgstr "शाफल्"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "भलिउम %ld%%"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr "आबुं भलिउम"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "अडिअ' गोहोम"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17931,18 +17517,16 @@ msgid "Open"
 msgstr "खेव"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "सेटिं..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "इनपुटखौ बासिख"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17965,9 +17549,8 @@ msgstr "मोनसे फाइलखौ बासिख"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "प्लेबेकनि थाखाय मोनसे फाइलखौ सायखनो क्लिक खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17985,10 +17568,8 @@ msgid "Choose..."
 msgstr "बासिख..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:153
-#, fuzzy
 msgid "Select another file to play in sync with the previously selected file"
 msgstr ""
-"आगोलनि सायखखानाय फाइलजों गुबुन मोनसे फाइलखौ सिन्कआव दामनो बेखौ सायखनो क्लिक खालाम।"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
@@ -18041,13 +17622,10 @@ msgstr ""
 "खौल' नारसिन।"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
-#, fuzzy
 msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
-"नेटवार्क स्ट्रिमखौ खेवनो URL खौ बेयाव हाबहो। RTP एबा UDP स्ट्रिमखौ खेवनो, गाहायाव थि "
-"बुथामखौ क्लिक खालाम।"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -18086,14 +17664,12 @@ msgid "Subscreen top"
 msgstr "साब-स्क्रिन गोजौ"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "साबस्क्रिन गुवार"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "साबस्क्रिन गोजौ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -18104,14 +17680,12 @@ msgid "Add Subtitle File:"
 msgstr "दालाय-बिमुं फाइलखौ दाजाबदेर:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "दालाय-बिमुं प्लेबेकखौ आबुं गुवारैआव सेटआप खालामनो क्लिक खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "दालाय-बिमुं फाइलखौ सायख"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18136,9 +17710,8 @@ msgid "Subtitle alignment"
 msgstr "दालाय-बिमुं साजायनाय"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:364
-#, fuzzy
 msgid "Dismiss the subtitle setup dialog"
-msgstr "दालाय-बिमुं सेटआप बिबुंखौ नागारनो क्लिक खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 msgid "Font Properties"
@@ -18212,14 +17785,12 @@ msgid "File Size"
 msgstr "फाइल महर"
 
 #: modules/gui/macosx/VLCPlaylist.m:230
-#, fuzzy
 msgid "Expand All"
-msgstr "फेहेर"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
-#, fuzzy
 msgid "Collapse All"
-msgstr "हरखाब बायनाय"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18301,9 +17872,8 @@ msgid "Continue"
 msgstr "सालाय लांबाय था"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "प्लेबेकखौ सालाय लांबाय था"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18440,9 +18010,8 @@ msgid "Note that these are system-wide settings."
 msgstr "नायनो गोनांदि बेफोरो सिस्टेम-वाइड सेटिं।"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "General settings"
-msgstr "सरासनस्रा अडिअ' सेटिं"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -18461,14 +18030,12 @@ msgid "Continue playback"
 msgstr "प्लेबेकखौ सालाय लांबाय था"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "प्लेबेक फेलें"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:324
-#, fuzzy
 msgid "Enable notifications on playlist item change"
-msgstr "नेरनाय मिथिसारहोनायखौ हाहोनाय खालाम (प्लेलिस्ट आइटेम सोलायनायाव)"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -18480,14 +18047,12 @@ msgid "Automatically check for updates"
 msgstr "आपडेटखौ गावनो गाव महरै आनजाद खालाम"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Qt इन्टारफेस"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "स्किन खालामजाथाव इन्टारफेस"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -18548,14 +18113,12 @@ msgid "Show video within the main window"
 msgstr "गाहाय उइन्ड'नि सिङाव भिडिअ'खौ दिन्थि"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "आबुं-स्क्रिन"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "भिडिअ'खौ आबुं-स्क्रिन म'डव जागाय"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -18692,40 +18255,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr "बे जरायनाया सिगाङावनो \"%@\" जों लाजायो"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "दाम/दोन्थ'हो"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
-#, fuzzy
 msgid "Toggle random order playback"
-msgstr "रेन्डम प्लेलिस्ट प्लेबेकखौ टग्गल खालाम"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "गाहाय उइन्ड'..."
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "URL बेखेवथि"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "दा दामगासिनो दं"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "फल्डारखौ सायख"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "क्लिपबर्ड निफ्राय जायगाखौ खेव"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -19332,14 +18888,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr " <up>,<down>             +/-5%% खौ नागिर"
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[खालामफिन] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[रेण्डम] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -19379,9 +18933,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr " सेप्टार  : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr " फुंखा: <जेबो दानि आइटेम गैया> "
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19418,9 +18971,8 @@ msgid "Teletext Activation"
 msgstr "टेलेटेक्स्ट मावथि खालामनाय"
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "गोजोंखौ टग्गल खालाम"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -19586,9 +19138,8 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
-#, fuzzy
 msgid "Image Files"
-msgstr "फाइलखौ थिना दोन"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19730,9 +19281,8 @@ msgstr ""
 "गेन"
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "VLC गिबि खाबुखौ गोरोब हो"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -20110,13 +19660,10 @@ msgid "Select File"
 msgstr "फाइल सायख"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
-"थाफानाय हटकिखौ सोलायनो मोनसे हाबाखौ सायख एबा खेबनै क्लिक खालाम। हटकिसखौ बोखारनो "
-"साबि खोमोर-खौ बाहाय।"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20433,9 +19980,8 @@ msgid "Convert"
 msgstr "सोलाय"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "जेबो फाइल सायखआखै"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20450,18 +19996,16 @@ msgid "Browse"
 msgstr "ब्राउज खालाम"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "गोबां फाइलखौ खेव"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:95
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "फाइलआव फेहेर"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -20513,9 +20057,8 @@ msgid "Adjustments and Effects"
 msgstr "गोरोबनाय आरो गोहोम"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "स्टेरिअ' म'ड"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20531,9 +20074,8 @@ msgid "&Save"
 msgstr "थिना दोन"
 
 #: modules/gui/qt/dialogs/external.cpp:216
-#, fuzzy
 msgid "Store the Password"
-msgstr "RDP मोनथायगोहो पासवार्ड"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -20658,9 +20200,8 @@ msgid "Save log file as..."
 msgstr "बादि लग फाइलखौ थिना दोन..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "फरा / लग (*.log *.txt);; All (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -21189,9 +20730,8 @@ msgid "Empty"
 msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "मावथि खालाम"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
@@ -21230,9 +20770,8 @@ msgid "Subti&tle"
 msgstr "दालाय-बिमुं"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
-#, fuzzy
 msgid "Tool&s"
-msgstr "टुल"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21327,9 +20866,8 @@ msgid "Docked Playlist"
 msgstr "डक खालामखानाय प्लेलिस्ट"
 
 #: modules/gui/qt/menus.cpp:501
-#, fuzzy
 msgid "Always on &top"
-msgstr "अरायबो बिजौआव"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -21360,9 +20898,8 @@ msgid "&Increase Volume"
 msgstr "भलिउमखौ बांहो"
 
 #: modules/gui/qt/menus.cpp:599
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "भलिउमखौ खमाय"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -21521,19 +21058,16 @@ msgid "&Clear"
 msgstr "खोमोर"
 
 #: modules/gui/qt/menus.cpp:1641
-#, fuzzy
 msgid "&Renderer"
-msgstr "फरा रेन्डारार"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1645
-#, fuzzy
 msgid "<Local>"
-msgstr "गारां"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "स्केलिं गुन"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21562,9 +21096,8 @@ msgid "Start VLC with only a systray icon"
 msgstr "सिस्ट्रे आइकनजोंल' VLC खौ जागाय"
 
 #: modules/gui/qt/qt.cpp:92
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar."
-msgstr "VLC आ नोंथांनि टास्कबारआव मोनसेल' आइकनजों जागायगोन"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -21647,33 +21180,25 @@ msgid "List of words separated by | to filter"
 msgstr "फिल्टार खालामनो | जों आलादा खालामजानाय सोदोबनि लिस्ट"
 
 #: modules/gui/qt/qt.cpp:135
-#, fuzzy
 msgid ""
 "Regular expression used to filter the recent items played in the player."
-msgstr "प्लेयारआव दामखानाय दानिसो आइटेमखौ फिल्टार खालामनो बाहायनाय अरायबोनि बेखेवथि।"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "भलिउम स्लाइडारनि गाबखौ थि खालाम"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
-#, fuzzy
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
 "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255'"
 msgstr ""
-"भलिउम स्लाइडारनि गाबखौ थि खालाम\n"
-"मोनसे ';' जों आलादा खालामजानाय 12 नाम्बारखौ थिक खालामनानै\n"
-"डिफल्टआ '255;255;255;20;226;20;255;176;15;235;30;20'\n"
-"मोनसे सोलायथावआ '30;30;50;40;40;100;50;50;160;150;150;255' जानो हायो"
 
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "जागायनाय म'ड आरो लकनि सायखनाय"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -21701,18 +21226,16 @@ msgid "Define which screen fullscreen goes"
 msgstr "थि खालाम जेराव स्क्रिन आबुं-स्क्रिमआ थाङो"
 
 #: modules/gui/qt/qt.cpp:155
-#, fuzzy
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
-msgstr "इन्टारफेस गोनां एखे स्क्रिननि सोलायै आबुं-स्क्रिननि स्क्रिन-नाम्बार"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
 msgstr "सार्टआपआव फेहेरनायखौ ल'ड खालाम"
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "फेहेरनाय मडुलखौ स्टार्टआपआव गावनो गाव महरै ल'ड खालाम"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -21731,14 +21254,12 @@ msgstr ""
 "स्क्रिनखौ होबथानो लोरबां खालामनो हायो।"
 
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "सावगारिनि उनथिं थानाय कन एबा आर्टखौ फेहेरगासिनो दं"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
-#, fuzzy
 msgid "Background art fits window's size."
-msgstr "सावगारिनि उनथिं थानाय आर्टआ उइन्ड'नि महरजों गोरोबो"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -21757,16 +21278,14 @@ msgstr ""
 "खौ सायखयै समाव सिस्टेम भलिउमखौ सोलायगोन।"
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "गाहाय इन्टारफेसनि थाखाय सेटिं"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
-#, fuzzy
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
-msgstr "बे उफ्राया इन्टारफेसखौ गुबुन गुबुन बुब्लिआव बेनि आइकनखौ सोलायनो गनायथि होयो।"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -21793,10 +21312,9 @@ msgid "debug"
 msgstr "डेबाग"
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "खोमोर"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -21807,14 +21325,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "स्किन फाइल |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "प्लेलिस्ट फाइल|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "|All Files |*"
-msgstr "गासै फाइल"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21825,9 +21341,8 @@ msgid "Save playlist"
 msgstr "प्लेलिस्टखौ थिना दोन"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF प्लेलिस्ट|*.xspf|M3U file|*.m3u|HTML प्लेलिस्ट|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -21896,9 +21411,8 @@ msgid "Select skin"
 msgstr "स्किनखौ सायख"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "स्केनखौ खेव..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -21963,9 +21477,8 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "मुसुखा गामाखौ फज, 0.01 आरो 10 नि गेजेराव। 1 आव डिफल्ट।"
 
 #: modules/hw/d3d9/d3d9_filters.c:454
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "VDPAU गोरोबनाय भिडिअ' फिल्टार"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -21988,9 +21501,8 @@ msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr "रास्पबेरि पाइनि थाखाय MMAL-सोनारनाय डिक'डार प्लागिन"
 
 #: modules/hw/mmal/deinterlace.c:45
-#, fuzzy
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr "आलादा खालामनायखौ मावथि खालाम एबा मावथि-नङै खालाम"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
@@ -21998,14 +21510,12 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "आलादा खालाम"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
-#, fuzzy
 msgid "MMAL-based deinterlace filter plugin"
-msgstr "VDPAU आलादा खालामनाय फिल्टार"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22032,9 +21542,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr "HDMI थाजा रेटखौ भिडिअ'जों गोरोब हो"
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "गोथार-ज' खालामनाय म'ड"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -22051,14 +21560,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "Raspberry Pi नि थाखाय MMAL-सोनारनाय भाउट प्लागिन"
 
 #: modules/hw/vaapi/filters.c:1184
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "अडिअ' फिल्टार"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1185
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "भिडिअ' स्केलिं फिल्टार"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -22121,36 +21628,32 @@ msgid "VDPAU sharpen video filter"
 msgstr "VDPAU गोबौ भिडिअ' फिल्टार"
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "पसायनाय पेकेटाइजार लिस्ट"
+msgstr ""
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
 msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "साउट स्ट्रिम"
+msgstr ""
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
 msgstr ""
 
 #: modules/keystore/keychain.m:41
-#, fuzzy
 msgid "No"
-msgstr "नङा"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:47
-#, fuzzy
 msgid "System default"
-msgstr "सिस्टेमनि डिफल्ट"
+msgstr ""
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -22165,9 +21668,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:52
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "अरायबो बिजौआव"
+msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
@@ -22178,9 +21680,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:57
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "बिजौ आरो थालोखौ सिनक्र'नाइज खालाम"
+msgstr ""
 
 #: modules/keystore/keychain.m:58
 msgid ""
@@ -22204,9 +21705,8 @@ msgid "Keychain keystore"
 msgstr ""
 
 #: modules/keystore/keychain.m:110
-#, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr "OS X आरो iOS नि थाखाय TLS हेफाजाब"
+msgstr ""
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
@@ -22217,9 +21717,8 @@ msgid "Secrets are stored via KWallet"
 msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "साउट स्ट्रिम"
+msgstr ""
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
@@ -22234,9 +21733,8 @@ msgid "Secrets are stored via libsecret"
 msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "ल'ग' दाजाबदेर"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -22247,33 +21745,28 @@ msgid "Be quiet"
 msgstr "सिरि था"
 
 #: modules/logger/console.c:115
-#, fuzzy
 msgid "Turn off all messages on the console."
-msgstr "गासै VLC खौरांखौ फरा फाइलआव लग खालाम।"
+msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "कनस'ल"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "कनस'ल"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "गोबां फोरमायथिहोग्रा"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "डेबाग"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -22304,23 +21797,18 @@ msgid "Verbosity"
 msgstr "भार्ब'सिटि"
 
 #: modules/logger/file.c:215
-#, fuzzy
 msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
-"लगनि थाखाय बाहायनो भार्ब'सिटिखौ सायख एबा --भार्ब'सजों होजानाय एखे भार्ब'सिटिखौ "
-"बाहायनो -1"
 
 #: modules/logger/file.c:219
-#, fuzzy
 msgid "Logger"
-msgstr "लगिम"
+msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "फाइल लगिं"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -22339,9 +21827,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "डेबाग मास्क"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -22356,19 +21843,16 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "गोहो"
+msgstr ""
 
 #: modules/logger/syslog.c:148
-#, fuzzy
 msgid "System logging facility."
-msgstr "सिसलग सुबिधा"
+msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "सिसलगआव लग खालाम"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -23078,9 +22562,8 @@ msgid "Synthpop"
 msgstr "सिन्थपप"
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "बांसिन जायगानि बिट्रेट"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -23091,9 +22574,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "भिडिअ' महर सोलायनाय फिल्टार"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -23158,40 +22640,25 @@ msgstr ""
 "एकाउन्ट मोननो http://www.last.fm/join/ आव थां"
 
 #: modules/misc/fingerprinter.c:73
-#, fuzzy
 msgid "acoustid"
-msgstr "साबसिन-सोदोब"
+msgstr ""
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
 msgstr ""
 
 #: modules/misc/gnutls.c:485
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
-"नोंथाङा %s आव सौहैनो नाजाबाय। अदेबानि, सार्भारजों होजानाय रैखाथि सार्टिफिकेटआ "
-"मोनथिमोनै आरो जायखि जाया फोथायथाव सार्टिफिकेसन अथ'रिटिजों थारफोरमान खालामनो "
-"हायाखै। बे जेंनाया बाइजोमहर गोरोन्थिनि थाखाय जानो हागौ एबा नोंथांनि रैखाथि एबा "
-"नोंथांनि गुमुरथिखौ सिफायनो नाजायो।\n"
-"\n"
-"माबा सन्देह दंब्ला, दानो नागार।\n"
 
 #: modules/misc/gnutls.c:491
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server changed since the "
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
-"नोंथाङा %s आव सौहैनो नाजाबाय। अदेबानि, सार्भारजों होजानाय रैखाथि सार्टिफिकेटआ आगोलनि "
-"थांनाय निफ्राय सोलायबाय आरो जायखि जाया फोथायथाव सार्टिफिकेसन अथ'रिटिजों थारफोरमान "
-"खालामजायाखै। बे जेंनाया बाइजोमहर गोरोन्थिनि थाखाय जानो हागौ एबा नोंथांनि रैखाथि एबा "
-"नोंथांनि गुमुरथिखौ सिफायनायनि जानो हागौ।\n"
-"\n"
-"माबा सन्देह दंब्ला, दानो नागार।\n"
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23249,9 +22716,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:761
-#, fuzzy
 msgid "Trust directory"
-msgstr "टाइमसिफ्ट डिरेक्टरि"
+msgstr ""
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -23300,14 +22766,12 @@ msgid "Playing some media."
 msgstr "माखासे मेडियाखौ दामगासिनो दं"
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "XDG-स्क्रिनसेभार"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
-#, fuzzy
 msgid "D-Bus screen saver inhibition"
-msgstr "XDG स्क्रिन सेभार हेंथा"
+msgstr ""
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -23635,13 +23099,10 @@ msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
 msgstr "SDT बेखेवग्रा (--sout-ts-es-id-pid खौ नांगौ)"
 
 #: modules/mux/mpeg/ts.c:125
-#, fuzzy
 msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"मोनफ्रोम SDT नि बेखेवग्राखौ थि खालामो। बेनि थाखाय \"PID खौ ES नि ID आव फज\" खौ "
-"हाहोनाय खालामनांगोन।"
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23809,9 +23270,8 @@ msgid "WAV muxer"
 msgstr "WAV माक्सार"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "ग्राउल मिथिसारहोनाय प्लागिन"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23822,18 +23282,16 @@ msgid "Now playing"
 msgstr "दा दामगासिनो दं"
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "एड्सखौ बाद हो"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr "सम जोबनाय (ms)"
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "मिथिसारहोनायखौ बेसे गोबाव दिन्थिफुंगोन"
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -23916,26 +23374,22 @@ msgid "VC-1 packetizer"
 msgstr "VC-1 पेकेटाइजार"
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
 msgid "Zeroconf network services"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23962,14 +23416,12 @@ msgstr "आंनि सावगारि"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "बनजार सिबिथाय"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24120,28 +23572,24 @@ msgid "Unknown type"
 msgstr "मोनथिमोनै रोखोम"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "अडिअ' सेनेल"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "लिस्टखौ खोमोर"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "लिस्टखौ थाजा खालाम"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "कास्टम उफ्रा"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24212,24 +23660,20 @@ msgstr ""
 "नोंथाङा बेफोर बेसेननि जरायनायखौबो बाहायनो हायो, जेरै- 6 = बिजौ-आगदा)।"
 
 #: modules/spu/audiobargraph_v.c:56
-#, fuzzy
 msgid "Bar width in pixel"
-msgstr "पिक्सेलआव भिडिअ' केपसार गुवार"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:57
-#, fuzzy
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
-msgstr "दिन्थिफुंनो गोनां बार-ग्राफआव मोनफ्रोम बारनि पिक्सेलआव गुवार (डिफल्ट : 10)।"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:58
-#, fuzzy
 msgid "Bar Height in pixel"
-msgstr "पिक्सेलआव भिडिअ' केपसार गोजौ"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:59
-#, fuzzy
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr "दिन्थिफुंनो गोनां बार-ग्राफआव मोनफ्रोम बारनि पिक्सेलआव गुवार (डिफल्ट : 10)।"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24280,9 +23724,8 @@ msgid "Logo animation # of loops"
 msgstr "लुपनि ल'ग' एनिमेसन #"
 
 #: modules/spu/logo.c:54
-#, fuzzy
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
-msgstr "ल'ग' एनिमेसननि थाखाय लुपनि अनजिमा-1 = सोलिबाय थानाय, 0 = लोरबां खालामबाय"
+msgstr ""
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -24398,20 +23841,18 @@ msgstr ""
 "बाहायनाय समाव बेयो गुबैयै खामानिआव नांथाव जायो।"
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
-msgstr "अभारले खालामखानाय फरानि (गोजोंनि उल्था) मोलेले। 0 = गोजों, 255 = फुरायै मोलेले।"
+msgstr ""
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
 msgstr "फन्ट महर, पिक्सेल"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
-msgstr "फन्ट महर, पिक्सेलआव। डिफल्टआ -1 (डिफल्ट फन्ट महरखौ बाहाय)।"
+msgstr ""
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24547,12 +23988,10 @@ msgid "Number of columns"
 msgstr "खाम्फानि अनजिमा"
 
 #: modules/spu/mosaic.c:131
-#, fuzzy
 msgid ""
 "Number of image columns in the mosaic (only used if positioning method is "
 "set to \"fixed\")."
 msgstr ""
-"मजेइकआव मुसुखा खाम्फानि अनजिमा (प'जिसनिं खान्थिखौ \"थि\"आव फजयोब्लाल'नो बाहाय।"
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24575,15 +24014,11 @@ msgid "Elements order"
 msgstr "गुदिमुवा फारि"
 
 #: modules/spu/mosaic.c:144
-#, fuzzy
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
-"नोंथाङा मजेइकआव गुदिमुवानि फारिखौ जर खालामनो हायो। नोंथाङा सावगारि ID(s) नि मोनसे "
-"कमा-आलादा खालामनाय लिस्टखौ होनांगोन। बेफोर IDखौ \"मजेइक-ब्रिज\" मडुलआव रानना होनाय "
-"जायो।"
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24657,9 +24092,8 @@ msgid "VNC poll interval"
 msgstr "VNC पल थाद'नाय"
 
 #: modules/spu/remoteosd.c:85
-#, fuzzy
 msgid "In this interval an update from VNC is requested, default every 300 ms."
-msgstr "बे थाद'नायाव, VNC निफ्राय आपडेटखौ खावलायनाय जायो, डिफल्ट मोनफ्रोम 300 ms. "
+msgstr ""
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24922,23 +24356,20 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "स्ट्रिम फिल्टार"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
-#, fuzzy
 msgid "Block stream cache"
-msgstr "घरि फुंखा"
+msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "स्ट्रिमखौ जायगानि महरै दिन्थिफुं"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24953,43 +24384,36 @@ msgid "gzip decompression"
 msgstr "gzip डिकमप्रेसन"
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "HTTP लाइभ स्ट्रिमिं आउटपुट"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "LZMA डिकमप्रेसन"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "स्ट्रिम फिल्टार"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "सेकेन्दआव बाफार महर"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
-#, fuzzy
 msgid "Prefetch buffer size (KiB)"
-msgstr "UDP आ बाफार महरखौ लायो (बाइट्स)"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
 msgstr "फरायनाय महर"
 
 #: modules/stream_filter/prefetch.c:538
-#, fuzzy
 msgid "Prefetch background read size (bytes)"
-msgstr "UDP आ बाफार महरखौ लायो (बाइट्स)"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "फिल्टार सिमा"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -25069,16 +24493,12 @@ msgid "Fallback to placeholder stream when out of data"
 msgstr "डाटा गैयै समाव प्लेसह'ल्डार स्ट्रिमआव फलबेक"
 
 #: modules/stream_out/bridge.c:67
-#, fuzzy
 msgid ""
 "If set to true, the bridge will discard all input elementary streams except "
 "if it doesn't receive data from another bridge-in. This can be used to "
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
-"सैथोआव फजयोब्ला ब्रिजआ गासै इनपुट गुदि स्ट्रिमखौ गारगोन जदि बेयो गुबुन मोनसे ब्रिज-इन "
-"निफ्राय डाटा मोना। थार फुंखा बायनाय समाव बेखौ मोनसे प्लेसह'ल्डार स्ट्रिमखौ बाइजोमहर "
-"दानो बाहायनो हायो। फुंखा आरो प्लेसह'ल्डार स्ट्रिमहा एखे फरमेट थानांगौ।"
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25120,24 +24540,20 @@ msgid "Bridge in"
 msgstr "ब्रिज इन"
 
 #: modules/stream_out/chromaprint.c:57
-#, fuzzy
 msgid "Duration of the fingerprinting"
-msgstr "आयनानि दिक"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "डिफल्ट स्ट्रिम"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "ब्रिज स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:188
-#, fuzzy
 msgid "HTTP port"
-msgstr "SFTP पर्ट"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid ""
@@ -25147,18 +24563,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "मावफुंनाय उफ्रा"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "अडिअ' स्ट्रिम आउटपुटखौ हाहोनाय खालाम"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -25181,42 +24595,36 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "रेन्डारिं गुन"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:226
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "..आव स्ट्रिम खालामनो कम्पुटारनि थं"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:227
-#, fuzzy
 msgid "Chromecast port"
-msgstr "क्र'मा फरमेट"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:238
-#, fuzzy
 msgid "Chromecast"
-msgstr "क्र'मा"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:239
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "ब्रिज स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "सफ्टवेयार गेन"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -25225,18 +24633,16 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Avformat डिमाक्सार"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "नंखाय स्ट्रिम आउटपुट"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25782,32 +25188,24 @@ msgstr ""
 "स्ट्रिमनि थाखाय बाहायनो थांखि (URL)। लामाखौ नेवसियो आरो पेरामिटारखौ सिमा खालामो"
 
 #: modules/stream_out/standard.c:51
-#, fuzzy
 msgid "Address to bind to (helper setting for dst)"
-msgstr "आव सिमा खालामनो थं (dst नि थाखाय हेल्पार सेटिं)"
+msgstr ""
 
 #: modules/stream_out/standard.c:53
-#, fuzzy
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"dst,dst=bind+'/'+लामानि थाखाय हाबफैनाय स्ट्रिम हेल्पार सेटिंखौ खोनासंनानै vlc खौ सिमा "
-"खालामनो थाखाय थं:पर्ट। dst-पेरामिटारआ बेखौ नेवसियो।"
 
 #: modules/stream_out/standard.c:55
-#, fuzzy
 msgid "Filename for stream (helper setting for dst)"
-msgstr "स्ट्रिमनि थाखाय फाइलमुं (dst नि थाखाय हेल्पार सेटिं)"
+msgstr ""
 
 #: modules/stream_out/standard.c:57
-#, fuzzy
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
-"dst, dst=bind+'/'+path नि थाखाय स्ट्रिम हेल्पार सेटिंनि थाखाय फाइलमुं, dst-पेरामिटारआ "
-"बेखौ नेवसिगारो"
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -25967,17 +25365,12 @@ msgid "This is the subtitle codec that will be used."
 msgstr "बेयो दालाय-बिमुं codec जायखौ बाहायगोन।"
 
 #: modules/stream_out/transcode/transcode.c:118
-#, fuzzy
 msgid ""
 "This allows you to add overlays (also known as \"subpictures\") on the "
 "transcoded video stream. The subpictures produced by the filters will be "
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
-"बेयो नोंथांखौ ट्रेन्सक'ड खालामखानाय भिडिअ' स्ट्रिमआव अभारले (\"दालाय-सावगारि\" मुङैबो "
-"मोनथिजायो) खौ दाजाबदेरनो गनायथि होयो। फिल्टारजों दिहुनजानाय दालाय-सावगारिआ "
-"भिडिअ'आव थोंजोङै अभारले खालामजागोन। नोंथाङा दालाय-सावगारि मडुलनि कमाजों आलादा "
-"खालामजानाय लिस्टखौ थिक खालामनो हायो।"
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -25997,9 +25390,8 @@ msgid ""
 msgstr "उफ्रायारि एनक'डार थ्रेडखौ भिडिअ'नि सोलायै आउटपुट गिबि गोनांथिआव सालायो"
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "सावगारि महरनि हानजा"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -26020,13 +25412,10 @@ msgid "Overlays/Subtitles"
 msgstr "अभारले/दालाय-बिमुं"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
-#, fuzzy
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"नोंथांनि फन्ट केछखौ फिन बानायनाय समाव अननानै नेथ'।\n"
-"बेयो से मिनिट निख्रुइबो समसिन सम लानांगौ।"
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -26058,12 +25447,10 @@ msgid "Text opacity"
 msgstr "फरा मोलेले"
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"फरानि (गोजोंनि उल्था) मोलेले जायखौ भिडिअ'आव दिन्थिगोन। 0 = गोजों, 255 = फुरायै मोलेले।"
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -26122,9 +25509,8 @@ msgid "Shadow distance"
 msgstr "सायख्लुम जानथाय"
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "फरानि जायगा"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -26151,14 +25537,12 @@ msgid "Thick"
 msgstr "रोजा"
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "आगसि निफ्राय आगदा सिम/बिजौ निफ्राय थालो सिम"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "आगदा निफ्राय आगसि सिम/थालो निफ्राय बिजौ सिम"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -26304,14 +25688,12 @@ msgid "YUVP converter"
 msgstr "YUVP सोलायहोग्रा"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "मुसुखा गाब (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "मुसुखा गाबखौ फज, 0 आरो 360 नि गेजेराव। 0 आव डिफल्ट।"
+msgstr ""
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26394,18 +25776,16 @@ msgid "Ball speed"
 msgstr "बल खारथाय"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "बल खारथायखौ फज, फ्रेमजों पिक्सेलनि अनजिमायाव जायगा दोरोदनाय"
+msgstr ""
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "बल महर"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "पिक्सेलनि अनजिमायाव सोखावखौ होनानै बल महरखौ फज"
+msgstr ""
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -26630,9 +26010,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "भिडिअ' फिल्टारखौ गोबौ खालाम"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26824,14 +26203,12 @@ msgid "Deinterlacing video filter"
 msgstr "आलादा खालामनाय भिडिअ' फिल्टार"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "खारथाय संना दिहुननाय भिडिअ' फिल्टार"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "फाइल सायखनाय"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -26876,14 +26253,12 @@ msgid "Extract RGB component video filter"
 msgstr "RGB थाफानाय-मुवा भिडिअ' फिल्टारखौ बख'"
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "नुथाय भिडिअ' फिल्टार"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "YUVP सोलायहोग्रा"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -27053,10 +26428,9 @@ msgid "Mirror orientation"
 msgstr "आयना अरियेन्टेसन"
 
 #: modules/video_filter/mirror.c:65
-#, fuzzy
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
-msgstr "आयना बोखावनायनि अरियेन्टेसनखौ थि खालामो। थोंगोर एबा समानथि जानो हायो"
+msgstr ""
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -27071,9 +26445,8 @@ msgid "Direction"
 msgstr "दिक"
 
 #: modules/video_filter/mirror.c:72
-#, fuzzy
 msgid "Direction of the mirroring."
-msgstr "आयनानि दिक"
+msgstr ""
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -27140,9 +26513,8 @@ msgid "Use input chroma unaltered"
 msgstr "इनपुट क्र'मा सोलायैखौ बाहाय"
 
 #: modules/video_filter/opencv_wrapper.c:62
-#, fuzzy
 msgid "I420 - first plane is grayscale"
-msgstr "I420 - गिबि समानआ ग्रेस्केल"
+msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
@@ -27185,12 +26557,10 @@ msgid "Scale factor (0.1-2.0)"
 msgstr "स्केल फेक्टर (0.1-2.0)"
 
 #: modules/video_filter/opencv_wrapper.c:82
-#, fuzzy
 msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
-"सावगारिखौ इसिं OpenCV फिल्टारआव दैथाय हरनायनि सिगाङाव बेखौ ज'खा सुनो थाखाय बिबां"
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27569,9 +26939,8 @@ msgid "ASCII-art video output"
 msgstr "ASCII-आर्ट भिडिअ' आउटपुट"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "एनड्र'इड नेटिभ उइन्ड'"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -27602,9 +26971,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "मजेइक सावगारिनि गोजों"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -27615,9 +26983,8 @@ msgid "VBI line on which to output Active Format Descriptor."
 msgstr ""
 
 #: modules/video_output/decklink.cpp:81
-#, fuzzy
 msgid "Picture to display on input signal loss"
-msgstr "इनपुट सिन खहायाव दिन्थिफुंनो सावगारि"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:84
 msgid "Output card"
@@ -27671,34 +27038,28 @@ msgid "DecklinkOutput"
 msgstr "डेकलिंक आउटपुट"
 
 #: modules/video_output/decklink.cpp:235
-#, fuzzy
 msgid "Output module to write to Blackmagic SDI card"
-msgstr "ब्लेकमेजिक SDI कार्डआव लिरनो आउटपुट मडुल"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:236
-#, fuzzy
 msgid "DeckLink General Options"
-msgstr "डेकलिंक सरासनस्रा उफ्रा"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "डेकलिंक भिडिअ' आउटपुट मडुल"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
-#, fuzzy
 msgid "DeckLink Video Options"
-msgstr "डेकलिंक भिडिअ' उफ्रा"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "डेकलिंक अडिअ' आउटपुट मडुल"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
-#, fuzzy
 msgid "DeckLink Audio Options"
-msgstr "डेकलिंक अडिअ' उफ्रा"
+msgstr ""
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27903,19 +27264,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr "उइन्ड'स भिस्टा आरो उननि बिसाननि थाखाय थिनखानाय भिडिअ' भिडिअ'"
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "थोंजों3D भिडिअ' आउटपुट "
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
-#, fuzzy
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr "उइन्ड'स भिस्टा आरो उननि बिसाननि थाखाय थिनखानाय भिडिअ' भिडिअ'"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "थोंजों3D भिडिअ' आउटपुट "
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -27999,9 +27357,8 @@ msgid "Wallpaper"
 msgstr "वालपेपार"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "OpenGL भिडिअ' आउटपुट"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -28012,9 +27369,8 @@ msgid "GPU affinity"
 msgstr "GPU गोरोबथि"
 
 #: modules/video_output/win32/wgl.c:46
-#, fuzzy
 msgid "WGL extension for OpenGL"
-msgstr "OpenGL नि थाखाय EGL फेहेरनाय"
+msgstr ""
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -28071,17 +27427,15 @@ msgstr "भिडिअ' मेमरि"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "X11 दिन्थिफुंनाय"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
-#, fuzzy
 msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
-msgstr "बे X11 दिन्थिफुंनायजों भिडिअ'खौ होगोन। लांदांब्ला डिफल्ट दिन्थिफुंनायखौ बाहायगोन।"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
@@ -28096,9 +27450,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "ग्रेस्केल भिडिअ' आउटपुट"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28204,23 +27557,18 @@ msgid "Chroma used"
 msgstr "क्र'मा बाहायबाय"
 
 #: modules/video_output/yuv.c:46
-#, fuzzy
 msgid "Force use of a specific chroma for output."
-msgstr "आउटपुटनि थाखाय जरखा क्र'मानि बाहायथिखौ जर हो। डिफल्टआ I420।"
+msgstr ""
 
 #: modules/video_output/yuv.c:48
-#, fuzzy
 msgid "Add a YUV4MPEG2 header"
-msgstr "WAVE हेडार दाजाबदेर"
+msgstr ""
 
 #: modules/video_output/yuv.c:49
-#, fuzzy
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
-"YUV4MPEG2 हेडारआ mplayer yuv भिडिअ' आउटपुटजों गोरोबो आरो बेनो YV12/I420 fourcc "
-"नांगौ। डिफल्टजों vlc आ आउटपुट थांखियाव सावगारि फ्रेमनि fourcc खौ राइट खालामो।"
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -28499,24 +27847,20 @@ msgid "Image wall"
 msgstr "मुसुखा बेला"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "पिक्सेलआव भिडिअ' उइन्ड'नि गुवार"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "पिक्सेलआव भिडिअ' उइन्ड'नि गोजौ"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "स्पेक्ट्राम"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "दानि भिजुयेलाइजेसन"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28657,22 +28001,18 @@ msgid "Kaiser window parameter"
 msgstr "केइजार उइन्ड' पेरामिटार"
 
 #: modules/visualization/visual/visual.c:67
-#, fuzzy
 msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
-"केइजार उइन्ड'नि थाखाय पेरामिटार आल्फा। आल्फाखौ बांहोयोब्ला गाहाय-लब गुवारखौ बांहोयो "
-"आरो रुगुं-लब गोसारथिखौ खमायहोयो।"
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
 msgstr "20 नि सोलायै 80 बेण्डखौ दिन्थि"
 
 #: modules/visualization/visual/visual.c:72
-#, fuzzy
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
-msgstr "स्पेक्ट्र'मिटारनि थाखाय गोबां बेण्ड : हाहोनाय खालामोब्ला 80 जायो, नङाब्ला 20."
+msgstr ""
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -28763,9 +28103,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "बिजौआव फ्ल'ट"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -29048,9 +28387,8 @@ msgid "Start Time"
 msgstr "जागायनाय सम"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "बन्द जानाय सम"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -29077,9 +28415,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "मेडियानि थाखाय जागायनाय समखौ सोलाय"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29178,9 +28515,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -29191,9 +28527,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -29204,9 +28539,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -29221,9 +28555,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29254,9 +28587,8 @@ msgid "Menus"
 msgstr "मेनु"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "फ्रेम रेट"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -29271,9 +28603,8 @@ msgid "Custom options"
 msgstr "कास्टम उफ्रा"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "गुन"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -29296,14 +28627,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "नमुना रेट"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "प्रफाइल मुं"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29439,7 +28768,7 @@ msgstr "H.264 इन-लुप डेबलकिं फिल्टारखौ
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
-msgstr "x264 प्रिसेट आरो टिउनिं सायखनाय"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29526,9 +28855,8 @@ msgid "Show systray icon"
 msgstr "सि-स्ट्रे आइकनखौ दिन्थि"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses इन्टारफेस"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29619,9 +28947,8 @@ msgid "Add a background"
 msgstr "सावगारिनि उनथिं थानायखौ दाजाबदेर"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "आउटपुट"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
