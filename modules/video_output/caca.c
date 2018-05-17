@@ -75,7 +75,7 @@ noreturn static void *VoutDisplayEventKeyDispatch(void *data)
 
         memcpy(&key, event->p_buffer, sizeof (key));
         block_Release(event);
-        vout_display_SendEventKey(vd, key);
+        vout_window_ReportKeyPress(vd->cfg->window, key);
         vlc_restorecancel(cancel);
     }
 }
@@ -330,22 +330,13 @@ static void Manage(vout_display_t *vd)
         }
         case CACA_EVENT_RESIZE:
             break;
-        case CACA_EVENT_MOUSE_MOTION: {
-            vout_display_place_t place;
-            Place(vd, &place);
-
-            const unsigned x = vd->source.i_x_offset +
-                               (int64_t)(caca_get_event_mouse_x(&ev) - place.x) *
-                                    vd->source.i_visible_width / place.width;
-            const unsigned y = vd->source.i_y_offset +
-                               (int64_t)(caca_get_event_mouse_y(&ev) - place.y) *
-                                    vd->source.i_visible_height / place.height;
-
+        case CACA_EVENT_MOUSE_MOTION:
             caca_set_mouse(sys->dp, 1);
             sys->cursor_deadline = mdate() + sys->cursor_timeout;
-            vout_display_SendEventMouseMoved(vd, x, y);
+            vout_window_ReportMouseMoved(vd->cfg->window,
+                                         caca_get_event_mouse_x(&ev),
+                                         caca_get_event_mouse_y(&ev));
             break;
-        }
         case CACA_EVENT_MOUSE_PRESS:
         case CACA_EVENT_MOUSE_RELEASE: {
             caca_set_mouse(sys->dp, 1);
@@ -355,16 +346,18 @@ static void Manage(vout_display_t *vd)
             for (int i = 0; mouses[i].caca != -1; i++) {
                 if (mouses[i].caca == caca) {
                     if (caca_get_event_type(&ev) == CACA_EVENT_MOUSE_PRESS)
-                        vout_display_SendEventMousePressed(vd, mouses[i].vlc);
+                        vout_window_ReportMousePressed(vd->cfg->window,
+                                                       mouses[i].vlc);
                     else
-                        vout_display_SendEventMouseReleased(vd, mouses[i].vlc);
+                        vout_window_ReportMouseReleased(vd->cfg->window,
+                                                        mouses[i].vlc);
                     return;
                 }
             }
             break;
         }
         case CACA_EVENT_QUIT:
-            vout_display_SendEventClose(vd);
+            vout_window_ReportClose(vd->cfg->window);
             break;
         default:
             break;
