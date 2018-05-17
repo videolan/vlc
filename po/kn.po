@@ -15,17 +15,17 @@
 # Yogesh K S <yogesh@karnatakaeducation.org.in>, 2013-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-10-06 11:13+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Kannada (https://www.transifex.com/yaron/teams/16553/kn/)\n"
 "Language: kn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=((n<=1 && n>= 0) ? 1);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -863,6 +863,7 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] "%u ಘಟಕವನ್ನು ಪ್ರದರ್ಶಿಸಿಲ್ಲ ಕಾರಣ ಅದು ಕೇವಲ ಮುಂದುವರೆದ ಆಯ್ಕೆಗಳನ್ನು ಹೊಂದಿದೆ.\n"
+msgstr[1] "%u ಘಟಕವನ್ನು ಪ್ರದರ್ಶಿಸಿಲ್ಲ ಕಾರಣ ಅದು ಕೇವಲ ಮುಂದುವರೆದ ಆಯ್ಕೆಗಳನ್ನು ಹೊಂದಿದೆ.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -1233,10 +1234,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "ಮಟ್ಟ"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -9395,28 +9395,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 ಬಿಟ್ಗಳು"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 ಬಿಟ್ಗಳು"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "24 ಬಿಟ್ಗಳು"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "ಉದ್ದೇಶಿತ ಸಾಧನಕ್ಕೆ ಗುಪ್ತಪದ"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -14847,6 +14843,7 @@ msgstr "ದೋಷ: `goto' ಗೆ ಶೂನ್ಯಕ್ಕಿಂತ ಹೆ�
 msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] "ಪ್ಲೇಪಟ್ಟಿ ಕೇವಲ %u ಅಂಶವನ್ನು ಹೊಂದಿದೆ"
+msgstr[1] "ಪ್ಲೇಪಟ್ಟಿ ಕೇವಲ %u ಅಂಶವನ್ನು ಹೊಂದಿದೆ"
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -17340,9 +17337,8 @@ msgid "Jump to Time"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "ಪಠ್ಯ ಮೂಡಿಸುವ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -24705,18 +24701,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "ಕಾರ್ಯಕ್ಷಮತೆಯ ಆಯ್ಕೆಗಳು"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "ಧ್ವನಿಯ  ಸ್ಟ್ರೀಮ್ output ಅನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -24739,9 +24733,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "ಸಲ್ಲಿಸುವಿಕೆಯ ಗುಣಮಟ್ಟದ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -24768,9 +24761,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "ಇನ್ನೊಮ್ಮೆ ಕೇಳಬೇಡಿ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -25938,22 +25930,16 @@ msgid "Ball speed"
 msgstr "ಚೆಂಡಿನ ವೇಗ"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"ಚೆಂಡಿನ ವೇಗವನ್ನು ಹೊಂದಿಸಿ, ಸ್ಥಳಾಂತರ ಮೌಲ್ಯ                                 "
-"ಚೌಕಟ್ಟಿನಲ್ಲಿ ಪಿಕ್ಸೆಲ್ಗಳ ಸಂಖ್ಯೆಯಲ್ಲಿ."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "ಚೆಂಡಿನ ಗಾತ್ರ"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr ""
-"ತ್ರಿಜ್ಯವನ್ನು ಸಂಖ್ಯೆಯಲ್ಲಿ ನೀಡುವ ಮೂಲಕ ಚೆಂಡಿನ ಗಾತ್ರವನ್ನು "
-"ಹೊಂದಿಸಿ                                 ಪಿಕ್ಸೆಲ್ಗಳ"
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -28566,9 +28552,8 @@ msgid "Start Time"
 msgstr "ಸಮಯ ಪ್ರಾರಂಭಿಸಿ"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "ಕೊನೆಯಾಗುವ ಸಮಯ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28595,9 +28580,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "ಮಾಧ್ಯಮದ ಪ್ರಾರಂಭ ಸಮಯವನ್ನು ಬದಲಾಯಿಸಿ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28696,9 +28680,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV ಮಕ್ಸರ್"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -28721,9 +28704,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -28738,9 +28720,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "ಸ್ವರೂಪ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28787,9 +28768,8 @@ msgid "Custom options"
 msgstr "ಇಚ್ಛೆಯ ಆಯ್ಕೆಗಳು"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR ಗುಣಮಟ್ಟ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28812,14 +28792,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "ಮಾದರಿ ಮಾಡಬೇಕಾಗಿರುವ ದರ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ವಿವರದ ಹೆಸರು"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -28954,9 +28932,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 ಇನ್ ಲೂಪ್ deblocking ಶೋಧಕವನ್ನು ಬಿಟ್ಟುಬಿಡಿ"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 ಸ್ವವಿವರ ಮತ್ತು ಮಟ್ಟದ ಆಯ್ಕೆ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29043,9 +29020,8 @@ msgid "Show systray icon"
 msgstr "Systray ಚಿಹ್ನೆಯನ್ನು ತೋರಿಸಿ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses ಅಂತರ್ವರ್ತನ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29136,9 +29112,8 @@ msgid "Add a background"
 msgstr "ಒಂದು ಹಿನ್ನೆಲೆಯನ್ನು ಸೇರಿಸಿ"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Output"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -29295,29 +29270,24 @@ msgid "Soften"
 msgstr "ಮೃದುಗೊಳಿಸಿ"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "HQ Denoiser 3D"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Spatial ಲೂಮ strength (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "ಅಲ್ಪಕಾಲಿಕ ಲೂಮ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "ಪ್ರಾದೇಶಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "ಅಲ್ಪಕಾಲಿಕ ವರ್ಣಶುದ್ಧತೆಯ ಶಕ್ತಿ (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
