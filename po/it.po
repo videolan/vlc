@@ -38,17 +38,18 @@
 # Roberto91 <robh91@hotmail.it>, 2014
 # Rosario <oirasor@inventati.org>, 2014
 # sara.nocentini <sara.nocentini@gmail.com>, 2014
-# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017
+# Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017-2018
 # Marco Esposito <antani125@yahoo.it>, 2013
 # Veronica Di Giorgio <verodigiorgio@gmail.com>, 2013
-# Vincenzo Reale <vinx.reale@gmail.com>, 2014-2017
+# Vincenzo Reale <vinx.reale@gmail.com>, 2014-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 03:00+0100\n"
-"Last-Translator: Vincenzo Reale <vinx.reale@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, "
+"2018\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -1272,7 +1273,7 @@ msgstr ""
 #: src/input/es_out.c:3290
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Tonalità"
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -8372,7 +8373,7 @@ msgstr "Richiedi flusso multicast"
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
-msgstr ""
+msgstr "Richiedi al server di inviare i flussi in multicast"
 
 #: modules/access/satip.c:66 modules/lua/vlc.c:62
 #: share/lua/http/dialogs/stream_config_window.html:28
@@ -9609,31 +9610,27 @@ msgstr "Uscita IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Lunghezza della chiave di cifratura in byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bit"
+msgstr "16 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bit"
+msgstr "24 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bit"
+msgstr "32 byte"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Trasmissione in uscita SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Password del dispositivo di destinazione."
+msgstr "Password per la cifratura dei flussi"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10813,7 +10810,7 @@ msgstr "Disabilitato"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Abilitato (solo AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -15751,6 +15748,7 @@ msgstr "Livello di riverbero (0-100, predefinito a 0)."
 #: modules/demux/mod.c:59
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
 msgstr ""
+"Ritardo del riverbero, in ms. Valori normali sono compresi tra 40 e 200 ms."
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -16412,6 +16410,8 @@ msgid ""
 "Forces the audio language for the output mux. Three letter ISO639 code. "
 "Default is 'eng'."
 msgstr ""
+"Forza la lingua audio per il mux di uscita. Tre lettere in formato ISO639. "
+"Il valore predefinito è 'eng'."
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16737,7 +16737,7 @@ msgstr "Temi"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Applica profilo al prossimo avvio"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17809,13 +17809,12 @@ msgid "Jump to Time"
 msgstr "Salta a"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Rendering del testo"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "Nessun renderer"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -22172,11 +22171,11 @@ msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
-msgstr ""
+msgstr "Deinterlacciamento MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr ""
+msgstr "Plugin del filtro di interlacciamento basato su MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22192,7 +22191,7 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr ""
+msgstr "Schermo vuoto sotto al video."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
@@ -22295,7 +22294,7 @@ msgstr ""
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr ""
+msgstr "I segreti sono archiviati su un file senza alcuna cifratura"
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
@@ -24078,7 +24077,7 @@ msgstr "Rilevamento di rete Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "Rilevamento renderer Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -24110,7 +24109,7 @@ msgstr "Rilevamento di rete mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "Rilevamento renderer mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -25101,11 +25100,11 @@ msgstr "Modulo Cam ARIB STD-B25"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
-msgstr ""
+msgstr "Cache del flusso di blocchi"
 
 #: modules/stream_filter/cache_read.c:570
 msgid "Byte stream cache"
-msgstr ""
+msgstr "Cache del flusso di byte"
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -25149,7 +25148,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
-msgstr ""
+msgstr "Soglia di posizionamento"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -25383,7 +25382,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
 msgid "Chromecast demux wrapper"
-msgstr ""
+msgstr "Wrapper demux Chromecast "
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
@@ -26376,11 +26375,11 @@ msgstr "Conversioni da "
 
 #: modules/video_chroma/i420_10_p010.c:131
 msgid "YUV 10-bits planar to semiplanar 10-bits conversions"
-msgstr ""
+msgstr "Conversioni YUV da planari 10 bit a semiplanari 10 bit"
 
 #: modules/video_chroma/i420_nv12.c:237
 msgid "YUV planar to semiplanar conversions"
-msgstr ""
+msgstr "Conversioni YUV da planari a semiplanari"
 
 #: modules/video_chroma/i420_rgb.c:79
 msgid "SSE2 I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
@@ -26568,7 +26567,6 @@ msgid "Ball speed"
 msgstr "Velocità della sfera"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Imposta la velocità della palla, il valore di spostamento in numero di pixel "
@@ -26579,10 +26577,9 @@ msgid "Ball size"
 msgstr "Dimensione della sfera"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr ""
-"Imposta la dimensione della palla dato il suo raggio in numero di pixel"
+"Imposta la dimensione della palla dato il suo raggio in numero di pixel."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
