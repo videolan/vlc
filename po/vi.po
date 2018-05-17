@@ -1,5 +1,5 @@
 # Vietnamese translation
-# Copyright (C) 2014 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,13 +8,12 @@
 # Pham Kieu Thanh <thanhpk@live.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2014-06-27 23:01+0000\n"
-"Last-Translator: Sortale <sortale.zerok@gmail.com>\n"
-"Language-Team: Vietnamese (http://www.transifex.com/projects/p/vlc-trans/"
-"language/vi/)\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: bachien <bachien@ejnu.net>, 2018\n"
+"Language-Team: Vietnamese (https://www.transifex.com/yaron/teams/16553/vi/)\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -169,9 +168,8 @@ msgid "General video settings"
 msgstr "Thiết lập chung cho Video"
 
 #: include/vlc_config_cat.h:79
-#, fuzzy
 msgid "General settings for video output modules."
-msgstr "Thiết lập chung cho phướng thức xuất dữ liệu của Audio."
+msgstr "Cài đặt chung cho các bộ xuất hình ảnh."
 
 #: include/vlc_config_cat.h:82
 msgid "Video filters are used to process the video stream."
@@ -189,13 +187,12 @@ msgstr ""
 "\""
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "Cắt ghép"
+msgstr "Các bộ chia."
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
-msgstr ""
+msgstr "Bộ chia hình ảnh trực tuyến ra đa nguồn."
 
 #: include/vlc_config_cat.h:97
 msgid "Input / Codecs"
@@ -721,9 +718,8 @@ msgid "Spectrum"
 msgstr "Quang phổ"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Máy đo điện"
+msgstr "Thước đo VU."
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -744,9 +740,8 @@ msgid "Mono"
 msgstr "Mono"
 
 #: src/audio_output/output.c:425
-#, fuzzy
 msgid "Original"
-msgstr "Số ID gốc"
+msgstr "Nguyên bản"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -899,14 +894,12 @@ msgstr ""
 "\n"
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr "(mặc định mở)"
+msgstr "(Mặc định bật)"
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr "(mặc định tắt)"
+msgstr "(Mặc định tắt)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -1049,9 +1042,9 @@ msgid "Yes"
 msgstr "Đồng ý"
 
 #: src/input/es_out.c:2136
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Tiêu đề đã đóng %u"
+msgstr ""
 
 #: src/input/es_out.c:2138
 #, c-format
@@ -1138,14 +1131,12 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
-#, fuzzy
 msgid "Video resolution"
-msgstr "Độ phân giải yêu thích cho video"
+msgstr "Độ phân giải hình ảnh"
 
 #: src/input/es_out.c:3168
-#, fuzzy
 msgid "Buffer dimensions"
-msgstr "Kích thước bộ nhớ đệm tính bằng giây"
+msgstr "Các thông số đệm"
 
 #: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1162,49 +1153,40 @@ msgid "Decoded format"
 msgstr "Định dạng giải mã"
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Top left"
-msgstr "Phía sau bên trái"
+msgstr "Trên cùng bên trái"
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Left top"
-msgstr "Bên Trái"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Right bottom"
-msgstr "tận cùng bên dưới"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Top right"
-msgstr "Bản quyền"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom left"
-msgstr "Tận cùng- bên trái"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom right"
-msgstr "Tận cùng-bên phải"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Left bottom"
-msgstr "tận cùng bên dưới"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Right top"
-msgstr "Bên Phải"
+msgstr ""
 
 #: src/input/es_out.c:3199
-#, fuzzy
 msgid "Orientation"
-msgstr "Đích đến"
+msgstr ""
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1213,19 +1195,16 @@ msgid "Undefined"
 msgstr "Chưa xác định"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 lines / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3209
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 lines / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3217
-#, fuzzy
 msgid "Color primaries"
-msgstr "Màu sắc phần thông báo"
+msgstr ""
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1237,14 +1216,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Color transfer function"
-msgstr "Giải phóng màu"
+msgstr ""
 
 #: src/input/es_out.c:3248
-#, fuzzy
 msgid "Color space"
-msgstr "Biểu đồ màu"
+msgstr ""
 
 #: src/input/es_out.c:3248
 #, c-format
@@ -1252,9 +1229,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Full"
-msgstr "Bass tối đa"
+msgstr ""
 
 #: src/input/es_out.c:3257 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1268,34 +1244,28 @@ msgid "Center"
 msgstr "Ở giữa"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgid "Top Left"
-msgstr "Trên cùng- bên trái"
+msgstr ""
 
 #: src/input/es_out.c:3259
-#, fuzzy
 msgid "Top Center"
-msgstr "Ở giữa"
+msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgid "Bottom Left"
-msgstr "Tận cùng- bên trái"
+msgstr ""
 
 #: src/input/es_out.c:3261
-#, fuzzy
 msgid "Bottom Center"
-msgstr "Tận cùng- bên trái"
+msgstr ""
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgid "Chroma location"
-msgstr "Tăng độ đơn sắc"
+msgstr ""
 
 #: src/input/es_out.c:3274
-#, fuzzy
 msgid "Rectangular"
-msgstr "Nét kẻ tuyến tính hình chữ nhật"
+msgstr ""
 
 #: src/input/es_out.c:3277
 msgid "Equirectangular"
@@ -1306,9 +1276,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3286
-#, fuzzy
 msgid "Projection"
-msgstr "Peak protection"
+msgstr ""
 
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
@@ -1316,10 +1285,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Mức độ"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -1332,34 +1300,28 @@ msgid "Field of view"
 msgstr ""
 
 #: src/input/es_out.c:3300
-#, fuzzy
 msgid "Max. luminance"
-msgstr "Cân bằng xanh"
+msgstr ""
 
 #: src/input/es_out.c:3305
-#, fuzzy
 msgid "Min. luminance"
-msgstr "Cân bằng xanh"
+msgstr ""
 
 #: src/input/es_out.c:3313
-#, fuzzy
 msgid "Primary R"
-msgstr "Ngôn ngữ chính"
+msgstr ""
 
 #: src/input/es_out.c:3320
-#, fuzzy
 msgid "Primary G"
-msgstr "Ngôn ngữ chính"
+msgstr ""
 
 #: src/input/es_out.c:3327
-#, fuzzy
 msgid "Primary B"
-msgstr "Ngôn ngữ chính"
+msgstr ""
 
 #: src/input/es_out.c:3334
-#, fuzzy
 msgid "White point"
-msgstr "Trắng"
+msgstr ""
 
 #: src/input/es_out.c:3349 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1479,14 +1441,12 @@ msgid "Actors"
 msgstr "Diễn viên"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "Nghệ sĩ"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "Số thứ tự track"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1527,14 +1487,12 @@ msgid "Previous title"
 msgstr "Tựa đề trước đó"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "Thời gian chạy"
+msgstr ""
 
 #: src/input/var.c:285
-#, fuzzy
 msgid "Menu popup"
-msgstr "Thời gian chạy"
+msgstr ""
 
 #: src/input/var.c:319
 #, c-format
@@ -1682,14 +1640,10 @@ msgid "Color messages"
 msgstr "Màu sắc phần thông báo"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"Tính năng này cho phép chính sửa màu sắc của thông báo được gửi đến màn hình "
-"dùng cơ chế dòng lệnh, nếu máy bạn thuộc nền tảng linux thì cơ chế dòng lệnh "
-"của máy đó cần phải được bật tính năng này để có thể hoạt động."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1742,9 +1696,8 @@ msgstr ""
 "là tối ưu nhất với đối tượng cần được tác động."
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "Góc độ Media"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1765,38 +1718,32 @@ msgstr ""
 "thời tiết kiệm việc xử lý do ít cần tới nhiều năng lượng kèm theo."
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "Musical"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "Địa điểm"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "Game"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "Sự khuyếch đại"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "Đích đến"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "Sản phẩm"
+msgstr ""
 
 #: src/libvlc-module.c:144
-#, fuzzy
 msgid "Accessibility"
-msgstr "Truy cập dữ liệu đầu ra"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Test"
@@ -1849,14 +1796,10 @@ msgstr ""
 "Lựa chọn này giúp chọn ra plugin nào sẽ được sử dụng để resample lại audio."
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"Phần chỉnh sửa này áp dụng cho chế độ kênh xuất dữ liệu đối với audio, được "
-"sử dụng theo cơ chế mặc định (nếu phần cứng của bạn hỗ trợ cũng như khi "
-"luồng audio ở trạng thái hoạt động)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -2220,9 +2163,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "Luôn hiển thị cửa sổ video lên trên mọi cửa số khác."
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "Bật chế độ Hình Nền"
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2864,9 +2806,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "Số thứ tự của track phụ đề được sử dụng."
 
 #: src/libvlc-module.c:612
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "Đóng tiêu đề giải mã"
+msgstr ""
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2999,14 +2940,12 @@ msgstr ""
 "byte tùy chọn cho mỗi offset},{...}\""
 
 #: src/libvlc-module.c:671
-#, fuzzy
 msgid "Record directory"
-msgstr "Thư mục nguồn"
+msgstr ""
 
 #: src/libvlc-module.c:673
-#, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "Thư mục hoặc tên tập tin để lưu phần ghi âm"
+msgstr ""
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -3087,9 +3026,8 @@ msgstr ""
 "đề đi kèm. Hãy thử một vài vị trí mà bạn mong muốn."
 
 #: src/libvlc-module.c:710
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "Mã hóa văn bản của phụ đề"
+msgstr ""
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
@@ -3267,10 +3205,8 @@ msgid "TCP connection timeout"
 msgstr "Kết nối TCP đã hết hạn thời gian cho phép"
 
 #: src/libvlc-module.c:801
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
 msgstr ""
-"Lượng thời gian cho phép với kết nối TCP (tính bằng đơn vị phần nghìn giây)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3720,23 +3656,16 @@ msgid "Stream filter module"
 msgstr "Phương thức lọc luồng dữ liệu"
 
 #: src/libvlc-module.c:1009
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
 msgstr ""
-"Bộ lọc luồng dữ liệu được sử dụng để chỉnh sửa các luồng dữ liệu đang được "
-"đọc."
 
 #: src/libvlc-module.c:1011
-#, fuzzy
 msgid "Demux filter module"
-msgstr "Phương thức lọc luồng dữ liệu"
+msgstr ""
 
 #: src/libvlc-module.c:1013
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
 msgstr ""
-"Bộ lọc luồng dữ liệu được sử dụng để chỉnh sửa các luồng dữ liệu đang được "
-"đọc."
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3759,13 +3688,10 @@ msgid "VoD server module"
 msgstr "Module VoD server"
 
 #: src/libvlc-module.c:1024
-#, fuzzy
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
-"Bạn có thể lựa chọn module VoD server nếu bạn muốn. Chỉnh tùy chọn này thành "
-"'vod_rtsp' để chuyển đổi các module trước đó."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -3833,16 +3759,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1058
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "Danh sách gói tin yêu thích"
+msgstr ""
 
 #: src/libvlc-module.c:1060
-#, fuzzy
 msgid "List of keystores that VLC will use in priority."
 msgstr ""
-"Tùy chọn này cho phép bạn chọn danh sách các phương thức mã hóa mà VLC sẽ sử "
-"dụng theo thứ tự ưu tiên cao nhất."
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3943,9 +3865,8 @@ msgstr ""
 "xong."
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "Cập nhật phiên bản mới"
+msgstr ""
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3960,29 +3881,22 @@ msgstr ""
 "tùy chọn có thể ghi chồng lên hộp thoại thông báo của danh sách."
 
 #: src/libvlc-module.c:1117
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "Tự động phân tích tập tin"
+msgstr ""
 
 #: src/libvlc-module.c:1119
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"Tự động phân tích tập tin được thêm vào danh sách phát (nhận các thông tin "
-"chi tiết về tập tin đó)."
 
 #: src/libvlc-module.c:1122
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "Thời gian chạy"
+msgstr ""
 
 #: src/libvlc-module.c:1124
-#, fuzzy
 msgid "Maximum time allowed to preparse an item, in milliseconds"
 msgstr ""
-"Giá trị tạm lưu dữ liệu với camera và microphone, tính bằng phần nghìn giây."
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -4032,9 +3946,8 @@ msgstr ""
 "sách phát từ trước. Sử dụng dấu phẩy để tách biệt các định dạng tập tin."
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "Show hidden files"
-msgstr "Hiển thị chi tiết"
+msgstr ""
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -4106,14 +4019,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr "Tạm dừng mỗi đối tượng trong danh sách ở khung hình trước đó."
 
 #: src/libvlc-module.c:1180
-#, fuzzy
 msgid "Start paused"
-msgstr "Thời gian bắt đầu"
+msgstr ""
 
 #: src/libvlc-module.c:1182
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr "Tạm dừng mỗi đối tượng trong danh sách ở khung hình trước đó."
+msgstr ""
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -4170,47 +4081,36 @@ msgid "Ignore"
 msgstr "Bỏ qua"
 
 #: src/libvlc-module.c:1214
-#, fuzzy
 msgid "Volume control"
-msgstr "Điều khiển âm lượng"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control"
-msgstr "Điều khiển vị trí"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control reversed"
-msgstr "Điều khiển vị trí"
+msgstr ""
 
 #: src/libvlc-module.c:1218
-#, fuzzy
 msgid "Mouse wheel vertical axis control"
-msgstr "Điều khiển đẩy chuột giữa đi lên"
+msgstr ""
 
 #: src/libvlc-module.c:1220
-#, fuzzy
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
-"Điều khiển đẩy chuột giữa đi lên (theo chiều dọc) sẽ tác động đến phần điều "
-"khiển âm thanh, các thao tác về vị trí hoặc sự kiện khác sẽ được bỏ qua"
 
 #: src/libvlc-module.c:1222
-#, fuzzy
 msgid "Mouse wheel horizontal axis control"
-msgstr "Điều khiển đẩy chuột giữa đi lên"
+msgstr ""
 
 #: src/libvlc-module.c:1224
-#, fuzzy
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
-"Điều khiển đẩy chuột giữa đi lên (theo chiều dọc) sẽ tác động đến phần điều "
-"khiển âm thanh, các thao tác về vị trí hoặc sự kiện khác sẽ được bỏ qua"
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -4467,48 +4367,40 @@ msgid "Navigate up"
 msgstr "Phím mũi tên đi lên"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
-"Sử dụng phím tắt để chọn phím tắt cho phần chọn đi lên trong menu của DVD."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "Phím mũi tên đi xuống"
 
 #: src/libvlc-module.c:1298
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
-"Sử dụng phím tắt để chọn phím tắt cho phần chọn đi xuống trong menu của DVD."
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "Phím mũi tên bên trái"
 
 #: src/libvlc-module.c:1300
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
-"Sử dụng phím tắt để chọn phím tắt cho phần chọn qua trái trong menu của DVD."
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "Phím mũi tên bên phải"
 
 #: src/libvlc-module.c:1302
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
-"Sử dụng phím tắt để chọn phím tắt cho phần chọn qua phải trong menu của DVD."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4602,24 +4494,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "Chọn phím để hạ độ trễ hiển thị phụ đề."
 
 #: src/libvlc-module.c:1325
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "Trình giải mã phụ đề Teletext"
+msgstr ""
 
 #: src/libvlc-module.c:1326
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "Hiển thị tiêu đề"
+msgstr ""
 
 #: src/libvlc-module.c:1327
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "Hiển thị tiêu đề"
+msgstr ""
 
 #: src/libvlc-module.c:1328
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "Chọn phím để đưa phụ đề lên cao hơn."
+msgstr ""
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4839,14 +4727,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "Đảo qua các audio track hiện có (theo từng ngôn ngữ)."
 
 #: src/libvlc-module.c:1391
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "Đảo qua track phụ đề"
+msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "Đảo qua các track phụ đề hiện có."
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4857,14 +4743,12 @@ msgid "Cycle through the available subtitle tracks."
 msgstr "Đảo qua các track phụ đề hiện có."
 
 #: src/libvlc-module.c:1395
-#, fuzzy
 msgid "Toggle subtitles"
-msgstr "Phụ đề Teletext"
+msgstr ""
 
 #: src/libvlc-module.c:1396
-#, fuzzy
 msgid "Toggle subtitle track visibility."
-msgstr "Đảo qua track phụ đề"
+msgstr ""
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
@@ -5610,13 +5494,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr "Việc tải về tập tin \"%s\" bị lỗi. Vì thế thập tin này sẽ bị xóa."
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"Phiên bản cập nhật mới nhất của VLC đã được tải về thành công. Bạn có muốn "
-"đóng lại VLC và cài phiên bản vừa mới tải về không?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6389,28 +6270,22 @@ msgid "Attachment input"
 msgstr "Đính kèm dữ liệu đầu vào"
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "Ghi hình Video"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "Module xuất dữ liệu dạng audio"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
+msgstr ""
 
 #: modules/access/avcapture.m:287
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
-"Máy tính Mac không được trang bị thiết bị dữ liệu đầu vào tương thích với "
-"VLC. Kiểm tra lại dây kết nối cũng như driver của thiết bị bạn với máy Mac."
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6513,9 +6388,8 @@ msgstr ""
 "thiết lập cho phần này?"
 
 #: modules/access/bluray.c:799
-#, fuzzy
 msgid "Java required"
-msgstr "Yêu cầu SDP"
+msgstr ""
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6580,20 +6454,16 @@ msgid "CDDB Server port to use."
 msgstr "Cổng  Server CDDB để sử dụng"
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "Danh sách dữ liệu đầu vào"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
 msgstr ""
-"Danh sách tách biệt bởi dấu phẩy trong cửa sổ đang chạy, mặc định cho tất cả."
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "dòng đan xen"
+msgstr ""
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
@@ -6608,9 +6478,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "Dữ liệu đầu vào cho IIDC Digital Camera (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "Lưu trữ nhật trình hoặc log vào tập tin"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6721,9 +6590,8 @@ msgid "Composite"
 msgstr "Hỗn hợp"
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-video"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6802,13 +6670,10 @@ msgid "Audio device name"
 msgstr "Tên thiết bị audio"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"Tên của thiết bị audio sẽ được sử dụng bởi plugin DirectShow. Nếu bạn không "
-"chỉnh sửa thông số, các thiết bị mặc định sẽ được sử dụng."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6971,13 +6836,10 @@ msgid "AM Tuner mode"
 msgstr "Chế độ dò kênh AM"
 
 #: modules/access/dshow/dshow.cpp:194
-#, fuzzy
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"Chế độ dò kênh AM. Có thể theo dạng mặc định (0), TV (1),AM Radio (2), FM "
-"Radio (3) hoặc DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -7040,24 +6902,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "Thiết bị ghi hình \"%s\" không hỗ trợ các thông số cần thiết."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "Họa tiết cửa sổ"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
-#, fuzzy
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr "Đầu vào Samba (chia sẻ mạng trong Windows)"
+msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "Đầu vào SMB"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "Phương thức tìm kiếm dịch vụ"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -7273,9 +7131,8 @@ msgid "Layer C time interleaving"
 msgstr "Thời gian chèn lớp C"
 
 #: modules/access/dtv/access.c:154
-#, fuzzy
 msgid "Stream identifier"
-msgstr "Xác định Mạng"
+msgstr ""
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -7357,14 +7214,11 @@ msgid "Local oscillator high frequency (kHz)"
 msgstr "Tần số cao của máy dao động hiện tại (kHz)"
 
 #: modules/access/dtv/access.c:186
-#, fuzzy
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
-"Bộ chuyển đổi tần số thấp (LNB) sẽ trừ đi tần số máy dao động hiện tại từ "
-"tần số truyền phát vệ tinh. Tần số trung gian (IF) trên cáp RF là kết quả."
 
 #: modules/access/dtv/access.c:189
 msgid "Universal LNB switch frequency (kHz)"
@@ -7550,48 +7404,43 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "Dải mã vùng vệ tinh"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "danh sách chọn"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
 msgstr ""
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid "Use NIT for scanning services"
-msgstr "Sử dụng cho thống kê."
+msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
 msgstr ""
 
 #: modules/access/dvb/scan.c:817
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "%.1f MHz (%d services)\n"
 "~%s remaining"
-msgstr "%.1f MHz (%d dịch vụ)"
+msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "danh sách chọn"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7622,9 +7471,8 @@ msgid "DVDnav Input"
 msgstr "Đầu vào DVDnav"
 
 #: modules/access/dvdnav.c:102
-#, fuzzy
 msgid "DVDnav demuxer"
-msgstr "Tách kênh Nuv"
+msgstr ""
 
 #: modules/access/dvdnav.c:298 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -7687,9 +7535,8 @@ msgid "Directory"
 msgstr "Thư mục"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "Phương thức đặc biệt"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7708,11 +7555,10 @@ msgstr "Tên người dùng"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "Tên người dùng được dùng cho phần kết nối."
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7729,13 +7575,10 @@ msgstr "Mật khẩu"
 
 #: modules/access/ftp.c:72 modules/access/rdp.c:69 modules/access/sftp.c:59
 #: modules/access/smb_common.h:25
-#, fuzzy
 msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
-"Đặt tên người dùng cho kết nối, nếu không có tên người dùng hoặc mật khẩu "
-"được đặt trong phần url."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7746,14 +7589,13 @@ msgid "Account that will be used for the connection."
 msgstr "Tài khoản được dùng cho phần kết nối."
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "Xác nhận SFTP"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "Điền vào tên đăng nhập và mật khẩu hợp lệ cho phần kết nối đến %s"
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7808,14 +7650,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr "Điền vào tên đăng nhập và mật khẩu hợp lệ cho phần %s."
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "Đầu vào HTTP"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7826,14 +7666,12 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "Tiến lên phía trước"
+msgstr ""
 
 #: modules/access/http/access.c:301
-#, fuzzy
 msgid "Forward cookies across HTTP redirections."
-msgstr "Chuyển Cookies trong khi kết nối lại http."
+msgstr ""
 
 #: modules/access/http/access.c:302
 msgid "Referrer"
@@ -7844,21 +7682,15 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "Người đại diện"
+msgstr ""
 
 #: modules/access/http/access.c:308
-#, fuzzy
 msgid ""
 "Override the name and version of the application as provided to the HTTP "
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
-"Tên và phiên bản của chương trình sẽ được cung cấp cho phía server HTTP. Hai "
-"phần này sẽ được cách biệt bởi dấu xuyệt, ví dụ FooBar/1.2.3. Tùy chọn này "
-"chỉ có thể được thiết lập với từng đối tượng một, không thể áp dụng trên "
-"nhiều đối tượng."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -8012,14 +7844,12 @@ msgid "Memory input"
 msgstr "Bộ nhớ đầu vào"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "Loại bỏ những đối tượng đã chọn"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "Đầu vào luồng Dummy"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -8294,19 +8124,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "Không có dữ liệu nhập vào"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "Kết nối RTSP thất bại"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8354,28 +8181,22 @@ msgid "QTSound"
 msgstr ""
 
 #: modules/access/qtsound.m:60
-#, fuzzy
 msgid "QuickTime Sound Capture"
-msgstr "Ghi hình bằng Quicktime"
+msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
-"Máy tính Mac không được trang bị thiết bị dữ liệu đầu vào tương thích với "
-"VLC. Kiểm tra lại dây kết nối cũng như driver của thiết bị bạn với máy Mac."
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "Không tìm thấy thiết bị nhập dữ liệu đầu vào"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8540,9 +8361,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr ""
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "Chọn một luồng dữ liệu"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8625,11 +8445,8 @@ msgid "Display ID"
 msgstr "Hiển thị thông số ID"
 
 #: modules/access/screen/screen.c:82
-#, fuzzy
 msgid "Display ID. If not specified, main display ID is used."
 msgstr ""
-"Hiển thị thông số ID, nếu không được thiết lập, hiển thị thông số ID sẽ được "
-"sử dụng theo mặc định."
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
@@ -8799,9 +8616,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr "Domain/Workgroup sẽ được sử dụng cho kết nối."
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "Xác nhận RTSP"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8812,14 +8628,12 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:387
-#, fuzzy
 msgid "SRT input"
-msgstr "Đầu vào SFTP"
+msgstr ""
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
 msgid "SRT chunk size (bytes)"
@@ -8850,9 +8664,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr ""
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "Giới hạn thời gian nguồn RTP (giây)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8879,9 +8692,8 @@ msgid "VBI capture device"
 msgstr "Thiết bị ghi hình VBI"
 
 #: modules/access/v4l2/v4l2.c:48
-#, fuzzy
 msgid "The device node where VBI data can be read (for closed captions)."
-msgstr "Node thiết bị nơi đọc dữ liệu VBI (đối với các nhãn đóng)"
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -8892,17 +8704,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "Chuẩn Video (Mặc định, SECAM, PAL, hoặc NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
-#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
 "I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"Bắt buộc thiết bị video dạng Video4Linux2 sử dụng định dạng đơn sắc được xác "
-"định (ví dụ I420 hoặc I422 với hình ảnh raw, MJPG cho đầu vào M-JPEG được "
-"nén) (Danh sách hoàn chỉnh: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, "
-"UYVY, I41N, I422, I420, I411, I410, MJPG)"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8941,10 +8748,8 @@ msgid "Frequency"
 msgstr "Tần số"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
 msgstr ""
-"Tần số dò kênh tính bằng đơn vị Hz hoặc kHz (xem phần đầu ra của gỡ rối)"
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -9271,17 +9076,12 @@ msgid "v4l2 driver controls"
 msgstr "điều khiển driver v4l2"
 
 #: modules/access/v4l2/v4l2.c:190
-#, fuzzy
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
 "list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
-"Chỉnh điều khiển driver v4l2 đến các giá trị xác định bằng cách sử dụng dấu "
-"phẩy để cách biệt danh sách được đóng gói bởi dấu móc ngoặc (ví dụ:"
-"{video_bitrate=6000000,audio_crc=0,stream_type=3} ). Để hiển thị danh sách "
-"điều khiển, tăng độ dài (-vvv) hoặc sử dụng ứng dụng v4l2-ctl."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
@@ -9438,18 +9238,16 @@ msgid "X.509 Client certificate"
 msgstr "Chứng chỉ Client X.509"
 
 #: modules/access/vnc.c:53
-#, fuzzy
 msgid "Certificate for client authentication"
-msgstr "Chứng chỉ cho việc xác nhận Client"
+msgstr ""
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
 msgstr "Khóa riêng phía Client dạng X.509"
 
 #: modules/access/vnc.c:55
-#, fuzzy
 msgid "Private key for authentication by certificate"
-msgstr "Khóa cá nhân dành cho việc xác nhận bởi chứng chỉ"
+msgstr ""
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9480,9 +9278,8 @@ msgid "VNC client access"
 msgstr "Truy cập client VNC"
 
 #: modules/access/wasapi.c:485
-#, fuzzy
 msgid "Loopback mode"
-msgstr "Lặp / Lặp lại"
+msgstr ""
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
@@ -9556,9 +9353,8 @@ msgid "File stream output"
 msgstr "Xuất tập tin luồng dữ liệu"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "Tên người dùng nên được yêu cầu khi tác động đến luồng dữ liệu"
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9574,9 +9370,8 @@ msgid "MIME returned by the server (autodetected if not specified)."
 msgstr "MIME được trả về từ phía server (tự động xác nhận nếu chưa thiết lập)"
 
 #: modules/access_output/http.c:61
-#, fuzzy
 msgid "Metacube"
-msgstr "Meta+"
+msgstr ""
 
 #: modules/access_output/http.c:62
 msgid ""
@@ -9670,15 +9465,11 @@ msgid "File where vlc reads key-uri and keyfile-location"
 msgstr "Tập tin được vlc đọc khóa ure và địa điểm khóa tập tin"
 
 #: modules/access_output/livehttp.c:98
-#, fuzzy
 msgid ""
 "File is read when segment starts and is assumed to be in format: key-uri"
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
-"Tập tin được ghi lại khi các mảnh dữ liệu được bắt đầu phát và được quy định "
-"trong định dạng: khóa-uri\\nkhóa-tập tin. Tập tin chỉ được đọc trên các mảnh "
-"dữ liệu được mở và chỉ khi các mảnh dữ liệu đó được gán kèm theo một giá trị."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -9689,9 +9480,8 @@ msgid "Generate IV instead using segment-number as IV"
 msgstr "Sử dụng IV thay vì sử dụng số-mảnh dạng IV"
 
 #: modules/access_output/livehttp.c:105
-#, fuzzy
 msgid "Number of first segment"
-msgstr "Số lượng mảnh"
+msgstr ""
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
@@ -9742,49 +9532,40 @@ msgid "Genre description"
 msgstr "Miêu tả về loại"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "Thể loại nội dung."
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "Mô tả"
+msgstr ""
 
 #: modules/access_output/shout.c:86
-#, fuzzy
 msgid "URL with information about the stream or your channel."
 msgstr ""
-"Đường dẫn URL với thông tin về luồng dữ liệu truyền tải hoặc kênh phát sóng "
-"của bạn."
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "Thông tin về bitrate của luồng thông tin được truyền mã."
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "Thông tin mẫu về luồng dữ liệu được truyền mã."
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "Số lượng các kênh"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "Số lượng thông tin về kênh phát sóng được truyền mã."
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Chất lượng Ogg Vorbis"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "Thông tin về chất lượng Ogg Vorbis của luồng thông tin được truyền mã."
+msgstr ""
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9809,29 +9590,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bit"
+msgstr ""
 
 #: modules/access_output/srt.c:437
-#, fuzzy
 msgid "SRT stream output"
-msgstr "Luồng dữ liệu đầu vào"
+msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Tên host hoặc địa chỉ IP của thiết bị"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10115,9 +9891,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
-#, fuzzy
 msgid "Binauralizer"
-msgstr "Tầm nhìn"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -10203,37 +9978,32 @@ msgid "RMS/peak"
 msgstr "RMS/peak"
 
 #: modules/audio_filter/compressor.c:156
-#, fuzzy
 msgid "Set the RMS/peak."
-msgstr "Đặt thông số RMS/peak (0 ... 1)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
 msgstr "Thời gian Attack"
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
 msgstr ""
-"Chỉnh thông số thời gian attack bằng đơn vị phần nghìn giây (1.5 ... 400)."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr "Thời gian phát hành"
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "Chỉnh thời gian phát ở đơn vị phần nghìn giây (2 ... 800)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
 msgstr "Ngưỡng cấp độ"
 
 #: modules/audio_filter/compressor.c:165
-#, fuzzy
 msgid "Set the threshold level in dB."
-msgstr "Chỉnh ngưỡng cấp độ ở dB (-30 ... 0)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -10242,9 +10012,8 @@ msgid "Ratio"
 msgstr "Tỉ lệ"
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "Chỉnh tỉ lệ (n:1) (1 ... 20)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -10252,9 +10021,8 @@ msgid "Knee radius"
 msgstr "Bán kính xoay"
 
 #: modules/audio_filter/compressor.c:171
-#, fuzzy
 msgid "Set the knee radius in dB."
-msgstr "Chỉnh bán kính xoay ở dB (1 ... 10)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -10280,9 +10048,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "Bộ lọc audio cho phần chuyển đổi định dạng PCM"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "Bộ lọc audio cho phần tinh giản hóa A/52->S/PDIF"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10547,14 +10314,12 @@ msgstr "Chất lượng chuyển đổi"
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "Chất lượng chuyển đổi"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "Chuyển đổi SRC"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10610,9 +10375,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "Các kênh phát âm thanh"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10651,9 +10415,8 @@ msgstr ""
 "Độ dài tính bằng phần nghìn giây để tìm vị trí dành cho độ che phủ tốt nhất"
 
 #: modules/audio_filter/scaletempo.c:74
-#, fuzzy
 msgid "Pitch Shift"
-msgstr "Mức độ"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
@@ -10945,10 +10708,8 @@ msgid "Output file"
 msgstr "Tập tin được xuất ra"
 
 #: modules/audio_output/file.c:109
-#, fuzzy
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
 msgstr ""
-"Tập tin mà các mẫu aduio sẽ được ghi dữ liệu cho. (\"-\" đối với stdout"
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10979,9 +10740,8 @@ msgstr ""
 "với các miêu tả thông thường này sẽ được cân nhắc gắn vào kết nối."
 
 #: modules/audio_output/jack.c:94
-#, fuzzy
 msgid "JACK client name"
-msgstr "Truy cập client VNC"
+msgstr ""
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -11022,33 +10782,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
-#, fuzzy
 msgid "Disabled"
-msgstr "Vô hiệu"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
-#, fuzzy
 msgid "Enabled"
-msgstr "Cho phép"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1473
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "Xuất dữ liệu video của Windows GDI"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Output back-end"
-msgstr "Thiết bị đầu ra"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "Thiết bị phát âm thanh"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -11146,9 +10901,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "Đóng gói gói tin audio dạng AES3/SMPTE 302M"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -11159,21 +10913,16 @@ msgid "Raw audio encoder"
 msgstr "Mã hóa audio dạng Raw"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "Kiểu chữ âm thanh"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
-#, fuzzy
 msgid "SoundFont file to use for software synthesis."
 msgstr ""
-"Một tập tin kiểu chữ âm thanh sẽ được cần xác định cho sự tổng hợp của phần "
-"mềm."
 
 #: modules/codec/audiotoolbox_midi.c:57
-#, fuzzy
 msgid "AudioToolbox MIDI synthesizer"
-msgstr "Bộ tổng hợp cho FluidSynth MIDI"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
@@ -11184,30 +10933,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "Tạo độ X của tiêu đề được render"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "Trình render kiểu chữ dạng CoreText"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "Tạo độ X của tiêu đề được render"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "Giải mã phụ đề DVB"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "Phụ đề DVD"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -11683,9 +11427,8 @@ msgstr ""
 "với libfdk-aac nhằm bật tính năng libavcodec"
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "Tăng tốc DirectX Video (DXVA) 2.0"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11738,14 +11481,12 @@ msgid "VA-API video decoder via DRM"
 msgstr ""
 
 #: modules/codec/avcodec/vaapi.c:357
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "Giải mã video PNG"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "Trình giải mã hình ảnh XWD"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -11788,34 +11529,28 @@ msgid "Encoding quality"
 msgstr "Chất lượng mã hóa"
 
 #: modules/codec/daala.c:111
-#, fuzzy
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr "Chất lượng nằm giữa 0 (thấp) và 10 (cao)."
+msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "Khoảng thời gian của từng khung:"
+msgstr ""
 
 #: modules/codec/daala.c:114
-#, fuzzy
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr "Chất lượng nằm giữa 0 (thấp) và 10 (cao)."
+msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Trình đóng gói video dạng Theora"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11938,55 +11673,45 @@ msgid "Encoder Profile"
 msgstr "Hồ sơ cho phần Mã hóa"
 
 #: modules/codec/fdkaac.c:68
-#, fuzzy
 msgid "Encoder Algorithm to use."
-msgstr "Sử dụng thuật toán mã hóa"
+msgstr ""
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
 msgstr "Bật tính năng tái tạo băng tần quang phổ"
 
 #: modules/codec/fdkaac.c:71
-#, fuzzy
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr "Đây là tính năng chỉ dành cho hồ sơ loại AAC-ELD"
+msgstr ""
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
 msgstr "Chất lượng VBR"
 
 #: modules/codec/fdkaac.c:74
-#, fuzzy
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr ""
-"Chất lượng mã hóa VBR (0=cbr, 1-5 chất lượng vbr liên tục, 5 là tốt nhất"
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
 msgstr "Bật thư viện hậu kỳ ghi dữ liệu lên đĩa"
 
 #: modules/codec/fdkaac.c:77
-#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
-"Thư viẹn này sẽ tạo ra chất lượng audio cao hơn dựa vào tiến trình hoạt động "
-"bổ sung từ CPU (được bật theo mặc định)"
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
 msgstr "Chế độ tín tạo tín hiệu của phần mở rộng AOT"
 
 #: modules/codec/fdkaac.c:80
-#, fuzzy
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
 msgstr ""
-"1 cho phần chi tiết của SBR và không chi tiết đối với PS (mặc định), 2 cho "
-"phần chi tiết theo nhánh"
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -12126,16 +11851,11 @@ msgid "Formatted Subtitles"
 msgstr "Phụ đề được định dạng"
 
 #: modules/codec/kate.c:192
-#, fuzzy
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"Các luồng dữ liệu dạng Kate cho phép hiệu chỉnh định dạng văn bản được hiển "
-"thị. VLC thông thường sẽ tự mình hoàn thiện các tùy chỉnh này theo mặc định, "
-"tuy nhiên bạn cũng có thể tự mình vô hiệu hóa chức năng này. Chú ý rằng điều "
-"này hoàn toàn không hiệu quả khi đang render thông qua chế độ Tiger."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -12424,29 +12144,24 @@ msgid "Media Foundation Transform decoder"
 msgstr ""
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "Trình giải mã audio MPEG"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Trình đóng gói video dạng Theora"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "Render trực tiếp"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "Render trực tiếp"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12683,9 +12398,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "Đóng gói video Pseudo raw"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "Trình mã hóa video dạng Theora"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -13077,9 +12791,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr "Trình giải mã video dạng Dirac sử dụng libschroedinger"
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "Giải mã dạng G.711"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -13090,9 +12803,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "Giải mã dạng G.711"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -13516,9 +13228,8 @@ msgid "Scale factor to apply to image"
 msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "Giải mã video CDG"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13567,9 +13278,8 @@ msgid "Teletext subtitles decoder"
 msgstr "Trình giải mã phụ đề Teletext"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "Giải mã văn bản trong phụ đề"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -13597,23 +13307,20 @@ msgid "Theora video encoder"
 msgstr "Trình mã hóa video dạng Theora"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "giải mã"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "Giải mã phụ đề dạng EBU STL"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "Tách kênh TTA"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13662,14 +13369,12 @@ msgid "Ulead DV audio decoder"
 msgstr "Trình giải mã audio dạng Ulead DV"
 
 #: modules/codec/videotoolbox.m:82
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "Giải mã phần cứng"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "Trình giải mã video Theora"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13710,9 +13415,8 @@ msgid "Vorbis audio encoder"
 msgstr "Trình mã hóa audio dạng Vorbis"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "Chế độ im lặng"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13727,24 +13431,20 @@ msgid "WebM video decoder"
 msgstr ""
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "Trình mã hóa video dạng Theora"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "giải mã"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "Giải mã phụ đề dạng EBU STL"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "Bộ chuyển phụ đề dạng EBU STL"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13755,16 +13455,11 @@ msgid "Maximum GOP size"
 msgstr "Kích thước lớn nhất của GOP"
 
 #: modules/codec/x264.c:72
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames. Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"Thiết lập khoảng thời gian tối đa giữa các khung dạng IDR. Giá trị càng lớn "
-"sẽ lưu các bit nhiều hơn, điều này sẽ cải thiện chất lượng dành cho các "
-"bitrate đã được cung cấp cho phần dự đoán chi phí truyền. Sử dụng -1 cho số "
-"lượng lớn nhất."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13863,13 +13558,10 @@ msgid "Adaptive B-frame decision"
 msgstr "Quyết định chấp nhận khung hình-B"
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"Buộc xác định số lượng liên tiếp các khung hình-B được sử dụng, ngoại trừ "
-"phía trước khung hình-I. Giá trị nằm trong khoảng từ 0 đến 2."
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -14258,7 +13950,6 @@ msgid "Partitions to consider"
 msgstr "Các phân vùng cần xem xét"
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -14268,13 +13959,6 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"Các phân vùng cần xem xét trong chế độ phân tích:\n"
-"- không:\n"
-"- nhanh: i4x4\n"
-"- bình thường: i4x4,p8x8,(i8x8)\n"
-"- chậm: i4x4,p8x8,(i8x8),b8x8\n"
-"- tất cả: i4x4,p8x8,(i8x8),b8x8,p4x4\n"
-"(p4x4 yêu cầu cần có p8x8. i8x8 yêu cầu cần có 8x8dct)."
 
 #: modules/codec/x264.c:282
 msgid "Direct MV prediction mode"
@@ -14285,16 +13969,12 @@ msgid "Direct prediction size"
 msgstr "Kích thước dự đoán trực tiếp"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"Kích thước dự đoán trực tiếp: - 0:4x4\n"
-"- 1: 8x8\n"
-"- -1: nhỏ nhất có thể dựa theo cấp độ\n"
 
 #: modules/codec/x264.c:291
 msgid "Weighted prediction for B-frames"
@@ -14309,23 +13989,18 @@ msgid "Weighted prediction for P-frames"
 msgstr "Dự đoán kích thước các khung hình-P"
 
 #: modules/codec/x264.c:295
-#, fuzzy
 msgid ""
 "Weighted prediction for P-frames:\n"
 " - 0: Disabled\n"
 " - 1: Blind offset\n"
 " - 2: Smart analysis\n"
 msgstr ""
-"Dự đoán kích thước khung hình loại-P: - 0: Tắt\n"
-"- 1: Các offset không rõ\n"
-"- 2: Phân tích thông minh\n"
 
 #: modules/codec/x264.c:300
 msgid "Integer pixel motion estimation method"
 msgstr "Phương pháp dự đoán chuyển động điểm ảnh dựa vào số nguyên"
 
 #: modules/codec/x264.c:301
-#, fuzzy
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -14334,12 +14009,6 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
-"Chọn lựa thuật toán dự đoán chuyển động:  - dia: tìm kiếm dạng hình thoi, "
-"bán kính 1 (nhanh)\n"
-" - hex: tìm kiếm lục giác, bán kính 2\n"
-" - umh: tìm kiếm đa ngũ giác không đều (tốt hơn nhưng chậm hơn)\n"
-" - esa: tìm kiếm toàn diện (cực kỳ chậm, chủ yếu dành cho việc kiểm thử)\n"
-" - tesa: tìm kiếm toàn diện đầy đủ (chậm nhất, chủ yếu dành cho kiểm thử)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -14450,7 +14119,6 @@ msgid "Trellis RD quantization"
 msgstr "Nén RD Trellis"
 
 #: modules/codec/x264.c:352
-#, fuzzy
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -14458,11 +14126,6 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
-"Nén RD Trellis: \n"
-" - 0: vô hiệu hóa\n"
-" - 1: chỉ bật khi phần mã hóa cuối cùng của một MB\n"
-" - 2: bật trên mọi chế độ quyết định\n"
-"Phần này yêu cầu CABAC."
 
 #: modules/codec/x264.c:358
 msgid "Early SKIP detection on P-frames"
@@ -14477,13 +14140,10 @@ msgid "Coefficient thresholding on P-frames"
 msgstr "Ngưỡng hệ số trên khung hình-P"
 
 #: modules/codec/x264.c:362
-#, fuzzy
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
-"Ngưỡng hệ số trên khung hình-P. Loại bỏ các khối dct chỉ chứa các hệ số đơn "
-"nhỏ."
 
 #: modules/codec/x264.c:365
 msgid "Use Psy-optimizations"
@@ -14633,14 +14293,12 @@ msgid "Default preset setting used"
 msgstr "Thiết lập điều khiển đã sử dụng theo mặc định"
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "Tùy chọn nâng cao dạng x264"
+msgstr ""
 
 #: modules/codec/x264.c:422
-#, fuzzy
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr "Tùy chọn nâng cao dạng x264, theo định dạng {opt=val,op2=val2} ."
+msgstr ""
 
 #: modules/codec/x264.c:427
 msgid "dia"
@@ -14740,9 +14398,8 @@ msgid "Teletext page"
 msgstr "Trang Teletext"
 
 #: modules/codec/zvbi.c:62
-#, fuzzy
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr "Mở các trang Teletext được chỉ định. Trang mặc định là chỉ số 100"
+msgstr ""
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -14767,9 +14424,8 @@ msgid "Output teletext subtitles as text instead of as RGBA."
 msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "Mức độ nén"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -15016,9 +14672,9 @@ msgid "Subtitle position %d px"
 msgstr "Vị trí hiển thị phụ đề %d px"
 
 #: modules/control/hotkeys.c:1354
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "Mã hóa văn bản của phụ đề"
+msgstr ""
 
 #: modules/control/hotkeys.c:1515
 #, c-format
@@ -15081,9 +14737,8 @@ msgid ""
 msgstr ""
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "Địa chỉ máy chủ HTTP"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -15547,19 +15202,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "Giao diện dịch vụ của Windows"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "Chiều rộng tối đa của video"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "Chiều cao tối đa của video"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -15570,9 +15222,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "Alternative Rock"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -15583,23 +15234,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "Băng thông"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "Băng thông"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -15610,9 +15258,8 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "Meditative"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
@@ -15711,7 +15358,6 @@ msgid "AVI demuxer"
 msgstr ""
 
 #: modules/demux/avi/avi.c:832 modules/demux/mp4/mp4.c:1674
-#, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15720,12 +15366,6 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
-"Vì chỉ mục của tập tin AVI bị thiếu hoặc bị lỗi, việc xem lướt sẽ có thể "
-"không hiển thị chính xác.\n"
-"VLC sẽ không không sửa lỗi tập tin này nhưng có thể tạm thời khắc phục vấn "
-"đề này bằng cách tự động xây dựng một chỉ mục mới trong bộ nhớ.\n"
-"Thao tác này sẽ tốn nhiều thời gian nếu tập tin có kích thước lớn.\n"
-"Bạn có muốn thực hiện thao tác đánh số lại chỉ mục hay không?"
 
 #: modules/demux/avi/avi.c:840
 msgid "Do not play"
@@ -15740,9 +15380,8 @@ msgid "Play as is"
 msgstr "Phát dưới dạng"
 
 #: modules/demux/avi/avi.c:843 modules/demux/mp4/mp4.c:1685
-#, fuzzy
 msgid "Broken or missing Index"
-msgstr "Chỉ số thứ tự AVI bị thiếu hoặc bị lỗi"
+msgstr ""
 
 #: modules/demux/avi/avi.c:2719
 msgid "Broken or missing AVI Index"
@@ -15793,14 +15432,12 @@ msgid "Dirac video demuxer"
 msgstr ""
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "Dữ liệu đầu vào DirectShow"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "Bộ lọc cảnh video"
+msgstr ""
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -15930,9 +15567,8 @@ msgstr ""
 "định dạng)."
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "Bộ lọc luồng"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -16085,9 +15721,8 @@ msgid "Model"
 msgstr "Mô hình"
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "Sản phẩm"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
@@ -16142,18 +15777,16 @@ msgid "Executive Producer"
 msgstr "Chịu trách nhiệm sản xuất"
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "Thông số mã hóa"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "Số kênh"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -16164,14 +15797,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "Dọn dẹp"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "Độ trễ Audio"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -16186,14 +15817,12 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
-#, fuzzy
 msgid "Do not seek"
-msgstr "Không phát"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1683
-#, fuzzy
 msgid "Build index"
-msgstr "Lập danh mục thứ tự sau đó phát"
+msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -16332,9 +15961,8 @@ msgid "Use the stream PCR as a reference."
 msgstr ""
 
 #: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
-#, fuzzy
 msgid "Digital TV Standard"
-msgstr "Truyền hình kỹ thuật số và radio"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:127
 msgid ""
@@ -16347,24 +15975,20 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "Tách kênh luồng vận chuyển MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "Tắt âm thanh audio."
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "Không có mô tả cho codec này"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "Phụ đề Teletext: nghe bị lỗi"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
-#, fuzzy
 msgid "Spoken subtitles for the visually impaired"
-msgstr "Phụ đề DVB: nghe bị lỗi"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -16569,9 +16193,8 @@ msgid "Load"
 msgstr "Tải"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "Độ tương phản"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16606,13 +16229,10 @@ msgid "Forces the audio language"
 msgstr "Buộc sử dụng ngôn ngữ của audio"
 
 #: modules/demux/rawaud.c:54
-#, fuzzy
 msgid ""
 "Forces the audio language for the output mux. Three letter ISO639 code. "
 "Default is 'eng'."
 msgstr ""
-"Buộc sử dụng ngôn ngữ của audio cho các bộ tổng hợp tín hiệu đầu ra. Mã này "
-"gồm ba ký tự theo chuẩn ISO639. Mặc định là 'eng'."
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16880,16 +16500,14 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
-#, fuzzy
 msgid "Interfaces"
-msgstr "Giao diện"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
-#, fuzzy
 msgid "Art and meta fetchers"
-msgstr "Lua Meta Fetcher"
+msgstr ""
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:112
 #: modules/gui/macosx/VLCAddonsWindowController.m:359
@@ -17178,9 +16796,8 @@ msgstr "Quay lại"
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "Lùi lại phía sau"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -17191,32 +16808,27 @@ msgstr "Tiếp theo"
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "Tiến lên phía trước"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "Điều khiển phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "Tỉ lệ phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "Tựa đề trước đó"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "Đi đến thời gian"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -17274,9 +16886,8 @@ msgid "Setup Streaming..."
 msgstr "Cài đặt Luồng Dữ Liệu..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:147
-#, fuzzy
 msgid "Select Streaming Method"
-msgstr "Phương pháp phân luồng"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
@@ -17504,23 +17115,20 @@ msgid "Clean up"
 msgstr "Dọn dẹp"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
-#, fuzzy
 msgid "Play/Pause the current media"
-msgstr "Click để phát hoặc tạm dừng tập tin hiện tại."
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "Click để đi đến đối tượng trước đó trong danh sách."
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr "Chuyển đổi chế độ toàn màn hình"
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "Thoát khỏi toàn màn hình"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -17529,9 +17137,8 @@ msgid "Volume"
 msgstr "Âm lượng"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "Âm lượng audio"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -17633,14 +17240,10 @@ msgid "Display VLC status menu icon"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:83
-#, fuzzy
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
-"Theo mặc định, VLC sẽ kiểm soát giá trị âm lượng của chương trình bằng Điều "
-"Khiển Apple. Tuy nhiên, bạn có thể thiết chỉnh lạ các giá trị âm lượng của "
-"toàn bộ hệ thống."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17741,9 +17344,8 @@ msgid "Lock Aspect Ratio"
 msgstr "Khóa tỉ lệ khung hình"
 
 #: modules/gui/macosx/macosx.m:113
-#, fuzzy
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr "Click để thoát khỏi chế độ phát lại toàn màn hình."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17977,9 +17579,8 @@ msgid "Select All"
 msgstr "Chọn tất cả"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
-#, fuzzy
 msgid "Find"
-msgstr "Tìm:%s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -18029,14 +17630,12 @@ msgid "Jump to Time"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Trình render văn bản"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
-#, fuzzy
 msgid "No renderer"
-msgstr "Trình render văn bản"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -18217,11 +17816,8 @@ msgid "Search in Playlist"
 msgstr "Tìm trong danh sách"
 
 #: modules/gui/macosx/VLCMainWindow.m:187
-#, fuzzy
 msgid "Search the playlist. Results will be selected in the table."
 msgstr ""
-"Điền vào một cụm từ để tìm kiếm trong danh sách. Các kết quả sẽ được hiển "
-"thị trong bảng."
 
 #: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Open a dialog to select the media to play"
@@ -18307,11 +17903,8 @@ msgid "Repeat"
 msgstr "Lặp lại"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:68
-#, fuzzy
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
 msgstr ""
-"Click để thay đổi chế độ lặp lại. Có 3 trạng thái: lặp lại một đối tượng, "
-"lặp lại tất cả và tắt chế độ lặp lại."
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: share/lua/http/index.html:239
@@ -18320,18 +17913,17 @@ msgstr "Shuffle"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "Âm lượng %ld%%"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr "Âm lượng tối đa"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "Hiệu ứng Audio"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -18352,18 +17944,16 @@ msgid "Open"
 msgstr "Mở"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "Luồng dữ liệu đầu vào"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "Thiết lập..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "Chọn dữ liệu nhập vào"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -18386,9 +17976,8 @@ msgstr "Chọn một tập tin"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "Click để chọn một tập tin cho phát lại"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -18406,11 +17995,8 @@ msgid "Choose..."
 msgstr "Chọn..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:153
-#, fuzzy
 msgid "Select another file to play in sync with the previously selected file"
 msgstr ""
-"Click để chọn một tập tin khác để phát trong chế độ đồng bộ hóa với tập tin "
-"đã chọn trước đó."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
@@ -18464,13 +18050,10 @@ msgstr ""
 "nút Hủy Bỏ và đóng lại khung này."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
-#, fuzzy
 msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
-"Điền địa chỉ URL vào đây để mở các luồng dữ liệu trên mạng. Để mở luồng dữ "
-"liệu dạng RTP hoặc UDP, click và nút điều khiển riêng cho từng loại bên dưới."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -18509,14 +18092,12 @@ msgid "Subscreen top"
 msgstr "Màn hình phụ bên trên cùng"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "Chiều rộng phụ đề trên màn hình"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "Chiều cao phụ đề trên màn hình"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -18527,14 +18108,12 @@ msgid "Add Subtitle File:"
 msgstr "Thêm tập tin phụ đề:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "Click để cài đặt chế độ phát lại của phụ đề với thông tin chi tiết."
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "Chọn tập tin phụ đề"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18559,9 +18138,8 @@ msgid "Subtitle alignment"
 msgstr "Canh chỉnh vị trí phụ đề"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:364
-#, fuzzy
 msgid "Dismiss the subtitle setup dialog"
-msgstr "Click để hủy bỏ các thay đổi trong hộp thoại cài đặt phụ đề."
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 msgid "Font Properties"
@@ -18635,14 +18213,12 @@ msgid "File Size"
 msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:230
-#, fuzzy
 msgid "Expand All"
-msgstr "Mở rộng"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
-#, fuzzy
 msgid "Collapse All"
-msgstr "Xổ ra"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18724,9 +18300,8 @@ msgid "Continue"
 msgstr "Tiếp tục"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "Chế độ phát lại của VLC"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18865,9 +18440,8 @@ msgid "Note that these are system-wide settings."
 msgstr "chú ý rằng các thiết lập này thuộc về hệ thống-có màn hình lớn."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "General settings"
-msgstr "Thiết lập chung cho Audio"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -18886,16 +18460,12 @@ msgid "Continue playback"
 msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "Phát lại thất bại"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:324
-#, fuzzy
 msgid "Enable notifications on playlist item change"
 msgstr ""
-"Bật tính năng thông báo Growl (khi các đối tượng trong dánh sách phát thay "
-"đổi)"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -18907,14 +18477,12 @@ msgid "Automatically check for updates"
 msgstr "Tự động kiểm tra cập nhật"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Giao diện QT"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "Giao diện có thể thay đổi"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -18975,14 +18543,12 @@ msgid "Show video within the main window"
 msgstr "Hiển thị video trong màn hình chính"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "Toàn màn hình"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "Xem video ở chế độ toàn màn hình"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -19037,24 +18603,20 @@ msgid "No check was performed yet."
 msgstr "Vẫn chưa thực hiện việc kiểm tra."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:693
-#, fuzzy
 msgid "Lowest Latency"
-msgstr "Độ trễ thấp nhất"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:695
-#, fuzzy
 msgid "Low Latency"
-msgstr "Độ trễ thấp"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:699
-#, fuzzy
 msgid "Higher Latency"
-msgstr "Độ trễ cao hơn"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:701
-#, fuzzy
 msgid "Highest Latency"
-msgstr "Độ trễ cao hơn"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:821
 #: modules/gui/qt/dialogs/preferences.cpp:336
@@ -19123,40 +18685,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr "Việc kết hợp đã được thực hiện bởi \"%@\"."
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "Phát/Tạm dừng"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
-#, fuzzy
 msgid "Toggle random order playback"
-msgstr "Chuyển đổi danh sách phát lại ngẫu nhiên"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "Cửa sổ chính..."
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "Mô tả URL"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "Đang phát"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "Chọn thư mục"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "Mở &từ trong clipboard"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -19769,14 +19324,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr " <up>,<down>            Di den +/-5%%"
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[Lặp lại]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[Ngẫu nhiên]"
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -19816,9 +19369,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr " Chương  : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr "Nguồn: <hiện không có đối tượng nào> "
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19855,9 +19407,8 @@ msgid "Teletext Activation"
 msgstr "Kích hoạt Teletext"
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "Chuyển sang chế độ trong suốt"
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -20026,9 +19577,8 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
-#, fuzzy
 msgid "Image Files"
-msgstr "Bức tường hình ảnh"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -20166,9 +19716,8 @@ msgstr ""
 "tăng"
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "Chỉnh sửa độ ưu tiên của VLC"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -20548,13 +20097,10 @@ msgid "Select File"
 msgstr "Chọn Tập tin"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
-"Chọn hoặc click đúp chuột để thay đổi việc gán các thao tác cho phím tắt. Sử "
-"dụng phím Delete trên bàn phím để loại bỏ phím nóng"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20872,9 +20418,8 @@ msgid "Convert"
 msgstr "Chuyển đổi"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "Không tập tin nào được chọn"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20889,18 +20434,16 @@ msgid "Browse"
 msgstr "Duyệt tìm"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "&Mở Nhiều Tập Tin..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:95
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "Viết thêm vào tập tin"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -20954,9 +20497,8 @@ msgid "Adjustments and Effects"
 msgstr "Tinh chỉnh và hiêu ứng"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "Chế độ Stereo"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20972,9 +20514,8 @@ msgid "&Save"
 msgstr "&Lưu"
 
 #: modules/gui/qt/dialogs/external.cpp:216
-#, fuzzy
 msgid "Store the Password"
-msgstr "RDP auth password"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -21093,9 +20634,8 @@ msgid "Save log file as..."
 msgstr "Lưu tập tin log hoặc nhật ký VLC dưới dạng..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "Văn bản/ Logs  (*.log *.txt);; Tất cả (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -21620,18 +21160,16 @@ msgid "Empty"
 msgstr "-trống rỗng-"
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "Kích hoạt"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
 msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:379
-#, fuzzy
 msgid "&Continue"
-msgstr "Tiếp tục"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -21662,9 +21200,8 @@ msgid "Subti&tle"
 msgstr "Phụ đ&ề"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
-#, fuzzy
 msgid "Tool&s"
-msgstr "C&ông cụ"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21759,9 +21296,8 @@ msgid "Docked Playlist"
 msgstr "Hiển thị danh sách"
 
 #: modules/gui/qt/menus.cpp:501
-#, fuzzy
 msgid "Always on &top"
-msgstr "Luôn luôn đặt trên cùng"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -21792,9 +21328,8 @@ msgid "&Increase Volume"
 msgstr "&Tăng âm lượng"
 
 #: modules/gui/qt/menus.cpp:599
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "Giảm âm lượng"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -21953,19 +21488,16 @@ msgid "&Clear"
 msgstr "Xóa"
 
 #: modules/gui/qt/menus.cpp:1641
-#, fuzzy
 msgid "&Renderer"
-msgstr "Trình render văn bản"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1645
-#, fuzzy
 msgid "<Local>"
-msgstr "Vocal"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "danh sách chọn"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21996,9 +21528,8 @@ msgid "Start VLC with only a systray icon"
 msgstr "Bắt đầu chạy VLC chỉ với một biểu tượng nhỏ ở khay hệ thống"
 
 #: modules/gui/qt/qt.cpp:92
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar."
-msgstr "VLC sẽ khởi động chỉ với một biểu tượng nhỏ ở thanh Taskbar"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -22082,35 +21613,25 @@ msgid "List of words separated by | to filter"
 msgstr "Sử dụng danh sách các từ tách biệt bởi | để lọc"
 
 #: modules/gui/qt/qt.cpp:135
-#, fuzzy
 msgid ""
 "Regular expression used to filter the recent items played in the player."
 msgstr ""
-"Các thông tin về các đối tượng được phát gần đây dùng bộ lọc để hiển thị các "
-"tập tin đã được mở trước đó"
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "Đổi màu sắc của thanh trượt điều khiển âm thanh"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
-#, fuzzy
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
 "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255'"
 msgstr ""
-"Xác định màu sắc của thanh trượt điều khiển âm thanh\n"
-"Bằng việc xác định 12 số tách biệt bởi một dấu ';'\n"
-"Giá trị mặc định là '255;255;255;20;226;20;255;176;15;235;30;20'\n"
-"Các con số có thể lựa chọn là '30;30;50;40;40;100;50;50;160;150;150;255'"
 
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "Chọn chế độ khởi động và giao diện tương ứng"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -22137,21 +21658,16 @@ msgid "Define which screen fullscreen goes"
 msgstr "Xác định màn hình trong chế độ hiển thị toàn màn hình"
 
 #: modules/gui/qt/qt.cpp:155
-#, fuzzy
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
 msgstr ""
-"Số lượng mà hình của chế độ toàn màn hình, thay vì chỉ hiển thị ở cùng màn "
-"hinh nơi chứa giao diện"
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
 msgstr "Tải tiện ích khi khởi động chương trình"
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
 msgstr ""
-"Tự động tải các module liên quan đến tiện ích khi khởi động chương trình"
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -22170,14 +21686,12 @@ msgstr ""
 "có tập tin nào được phát. Bạn có thể tắt tính năng này."
 
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "Mở rộng hình nền là logo VLC hoặc hình tự chọn."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
-#, fuzzy
 msgid "Background art fits window's size."
-msgstr "Phần hình ảnh nền vừa vặn với kích thước cửa sổ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -22197,18 +21711,14 @@ msgstr ""
 "lượng của hệ thống."
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "Các thiết lập cho giao diện chính"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
-#, fuzzy
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"Tùy chọn này sẽ cho phép giao diện thay đổi các biểu tượng hiển thị theo "
-"những dịp lễ, tết, hay sự kiện nào đó."
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -22248,14 +21758,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "Tập tin giao diện |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "Tap tin danh sach|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "|All Files |*"
-msgstr "Tất cả tập tin"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -22266,9 +21774,8 @@ msgid "Save playlist"
 msgstr "Lưu danh sách"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "Danh sách XSPF|*.xspf|tập tin M3U|*.m3u| Danh sách HTML|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -22337,9 +21844,8 @@ msgid "Select skin"
 msgstr "Chọn giao diện"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "Mở giao diện...."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -22407,9 +21913,8 @@ msgstr ""
 "là 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:454
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "Audio đầu ra dạng DirectX"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -22430,9 +21935,8 @@ msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:45
-#, fuzzy
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr "Kích hoạt hoặc tắt chế độ chống quét mành."
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
@@ -22440,9 +21944,8 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "Chống quét mành"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
@@ -22471,9 +21974,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr ""
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "Chế độ quét mành-nguyên bản"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -22490,14 +21992,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr ""
 
 #: modules/hw/vaapi/filters.c:1184
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "Bộ lọc Video"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1185
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "Tăng tốc DirectX Video (DXVA) 2.0"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -22560,38 +22060,32 @@ msgid "VDPAU sharpen video filter"
 msgstr ""
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "Danh sách gói tin yêu thích"
+msgstr ""
 
 #: modules/keystore/file.c:55
-#, fuzzy
 msgid "Secrets are stored on a file without any encryption"
-msgstr "Chia sẻ bộ nhớ"
+msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "Loại bỏ những đối tượng đã chọn"
+msgstr ""
 
 #: modules/keystore/file.c:66
-#, fuzzy
 msgid "Secrets are stored encrypted on a file"
-msgstr "Chia sẻ bộ nhớ"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
-#, fuzzy
 msgid "No"
-msgstr "&Không đồng ý"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:47
-#, fuzzy
 msgid "System default"
-msgstr "Mặc định theo hệ thống"
+msgstr ""
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -22606,9 +22100,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:52
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "Luôn luôn đặt trên cùng"
+msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
@@ -22619,9 +22112,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:57
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "Đồng bộ hóa phần trên và dưới cùng"
+msgstr ""
 
 #: modules/keystore/keychain.m:58
 msgid ""
@@ -22653,33 +22145,28 @@ msgid "KWallet keystore"
 msgstr ""
 
 #: modules/keystore/kwallet.c:49
-#, fuzzy
 msgid "Secrets are stored via KWallet"
-msgstr "Chia sẻ bộ nhớ"
+msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "Loại bỏ những đối tượng đã chọn"
+msgstr ""
 
 #: modules/keystore/memory.c:42
-#, fuzzy
 msgid "Secrets are stored in memory"
-msgstr "Chia sẻ bộ nhớ"
+msgstr ""
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
 msgstr ""
 
 #: modules/keystore/secret.c:40
-#, fuzzy
 msgid "Secrets are stored via libsecret"
-msgstr "Chia sẻ bộ nhớ"
+msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "Thêm logo"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -22690,33 +22177,28 @@ msgid "Be quiet"
 msgstr "Im lặng"
 
 #: modules/logger/console.c:115
-#, fuzzy
 msgid "Turn off all messages on the console."
-msgstr "Lưu trữ tất cả các thông báo của VLC vào một tập tin dạng văn bản."
+msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "Chế độ dòng lệnh"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "Chế độ dòng lệnh"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "Thêm thông tin"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "gở rối"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -22743,9 +22225,8 @@ msgid "Specify the logging format."
 msgstr "Chỉnh sửa định dạng nhật trình của hệ thống được ghi nhận bởi VLC."
 
 #: modules/logger/file.c:214
-#, fuzzy
 msgid "Verbosity"
-msgstr "&Verbosity:"
+msgstr ""
 
 #: modules/logger/file.c:215
 msgid ""
@@ -22758,9 +22239,8 @@ msgid "Logger"
 msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "Tập tin/thư mục"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -22779,9 +22259,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "Mặt nạ gỡ rối"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -22796,19 +22275,16 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "Tính tương thích"
+msgstr ""
 
 #: modules/logger/syslog.c:148
-#, fuzzy
 msgid "System logging facility."
-msgstr "Chỉnh sửa định dạng nhật trình của hệ thống được ghi nhận bởi VLC."
+msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "Ghi vào log hệ thống"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -23517,9 +22993,8 @@ msgid "Synthpop"
 msgstr "Synthpop"
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "Bitrate tối đa tại hệ thống hiện tại"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -23530,9 +23005,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "Bộ lọc chuyển dạng video"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -23597,42 +23071,25 @@ msgstr ""
 "Truy cập vào http://www.last.fm/join/ để tạo một tài khoản."
 
 #: modules/misc/fingerprinter.c:73
-#, fuzzy
 msgid "acoustid"
-msgstr "Acoustic"
+msgstr ""
 
 #: modules/misc/fingerprinter.c:74
 msgid "Track fingerprinter (based on Acoustid)"
 msgstr ""
 
 #: modules/misc/gnutls.c:485
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
-"Bạn đang cố kết nối tới %s. Tuy nhiên chứng chỉ về an ninh từ phía server "
-"này hiện không rõ, và có thể không được chấp nhận bởi bất kỳ việc cho phép "
-"cấp chứng chỉ an toàn về kêt nối. Vấn đề này có thể xảy ra khi phần thiết "
-"lập thông tin bị lỗi gì đó hoặc có đối tượng đang muốn thu thập thông tin cá "
-"nhân từ bạn và hệ thống.\n"
-"\n"
-"Nếu nghi ngờ, hãy hủy bỏ ngay.\n"
 
 #: modules/misc/gnutls.c:491
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server changed since the "
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
-"Bạn đang cố kết nối tới %s. Tuy nhiên chứng chỉ về an ninh từ phía server "
-"này hiện không rõ, và có thể không được chấp nhận bởi bất kỳ việc cho phép "
-"cấp chứng chỉ an toàn về kêt nối. Vấn đề này có thể xảy ra khi phần thiết "
-"lập thông tin bị lỗi gì đó hoặc có đối tượng đang muốn thu thập thông tin cá "
-"nhân từ bạn và hệ thống.\n"
-"\n"
-"Nếu nghi ngờ, hãy hủy bỏ ngay.\n"
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23690,9 +23147,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:761
-#, fuzzy
 msgid "Trust directory"
-msgstr "Thư mục Timeshift"
+msgstr ""
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -23739,14 +23195,12 @@ msgid "Playing some media."
 msgstr "Đang phát một số tập tin."
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "Trình bảo vệ màn hình-XDG"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
-#, fuzzy
 msgid "D-Bus screen saver inhibition"
-msgstr "Hạn chế sử dụng trình bảo vệ màn hình XDG"
+msgstr ""
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -24226,18 +23680,16 @@ msgid "Now playing"
 msgstr "Đang phát"
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "Bỏ quảng cáo"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr ""
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "Độ dài thời gian hiển thị thông báo"
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -24252,9 +23704,8 @@ msgid "A/52 audio packetizer"
 msgstr "Bộ đóng gói âm thanh A/52"
 
 #: modules/packetizer/avparser.h:49
-#, fuzzy
 msgid "avparser packetizer"
-msgstr "đóng gói"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24319,26 +23770,22 @@ msgid "VC-1 packetizer"
 msgstr ""
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
 msgid "Zeroconf network services"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -24365,14 +23812,12 @@ msgstr "Hình ảnh của tôi"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "Dịch vụ Bonjour"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24521,28 +23966,24 @@ msgid "Unknown type"
 msgstr "Loại chưa rõ"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "Kênh audio"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "Xóa danh sách"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "Dịch vụ"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "Chỉnh sửa Tùy Chọn"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24611,28 +24052,20 @@ msgid ""
 msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
-#, fuzzy
 msgid "Bar width in pixel"
-msgstr "Chiều rộng của video được ghi hình tính bằng điểm ảnh"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:57
-#, fuzzy
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
 msgstr ""
-"Độ rộng tính bằng điểm ảnh được hiển thị của mỗi thanh trong phần Đồ Thị "
-"Thanh (mặc định:10)."
 
 #: modules/spu/audiobargraph_v.c:58
-#, fuzzy
 msgid "Bar Height in pixel"
-msgstr "Chiều cao của video được ghi hình tính bằng điểm ảnh"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:59
-#, fuzzy
 msgid "Height in pixel of BarGraph to be displayed."
 msgstr ""
-"Độ rộng tính bằng điểm ảnh được hiển thị của mỗi thanh trong phần Đồ Thị "
-"Thanh (mặc định:10)."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24800,22 +24233,18 @@ msgid ""
 msgstr ""
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"Độ mờ (tương phản với độ trong suốt) của đoạn văn bản bao phủ. 0 = trong "
-"suốt, 255 = mờ hoàn toàn."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
 msgstr "Kiểu chữ, pixel"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
-msgstr "Kiểu chữ, tính bằng pixel. Mặc định là -1(sử dụng mặc định)"
+msgstr ""
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -25036,11 +24465,8 @@ msgid "VNC poll interval"
 msgstr "Thời gian chờ VNC poll."
 
 #: modules/spu/remoteosd.c:85
-#, fuzzy
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
-"Trong khoảng thời gian này, việc cập nhật từ VNC đang được thực hiện, mặc "
-"định mỗi 300 miligiây."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -25295,23 +24721,20 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "Bộ lọc luồng"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
-#, fuzzy
 msgid "Block stream cache"
-msgstr "Nguồn thời gian"
+msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "Hiển thị các luồng dữ liệu trong hệ thống"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -25326,29 +24749,24 @@ msgid "gzip decompression"
 msgstr ""
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "Đang phân luồng dữ liệu"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "Xử lý với bộ lọc video"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "Bộ lọc luồng"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "Kích thước bộ nhớ đệm tính bằng giây"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
-#, fuzzy
 msgid "Prefetch buffer size (KiB)"
-msgstr "Kích thước khung đệm RTSP"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
@@ -25359,9 +24777,8 @@ msgid "Prefetch background read size (bytes)"
 msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "Ngưỡng"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -25479,19 +24896,16 @@ msgid "Duration of the fingerprinting"
 msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "Luồng dữ liệu mặc định"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "Xuất tập tin luồng dữ liệu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:188
-#, fuzzy
 msgid "HTTP port"
-msgstr "Cổng SFTP"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid ""
@@ -25501,18 +24915,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Tùy chọn hiển thị"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Bất tất cả các luồng dữ liệu xuất ra dạng audio"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -25535,42 +24947,36 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Chất lượng render"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:226
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "Địa chỉ của máy tính để phân luồng."
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:227
-#, fuzzy
 msgid "Chromecast port"
-msgstr "Định dạng màu sắc"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:238
-#, fuzzy
 msgid "Chromecast"
-msgstr "Màu sắc"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:239
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "Xuất tập tin luồng dữ liệu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Không hỏi lại lần nữa"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -25579,18 +24985,16 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Định dạng màu sắc"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "Xuất tập tin luồng dữ liệu"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -26103,32 +25507,24 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/standard.c:51
-#, fuzzy
 msgid "Address to bind to (helper setting for dst)"
-msgstr "tên tập tin cho luồng dữ liệu (thiết lập dành cho dst)"
+msgstr ""
 
 #: modules/stream_out/standard.c:53
-#, fuzzy
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"Tên tập tin dành cho luồng dữ liệu đối với dst, dst=bind+'/'+đường dẫn, dst-"
-"thông số sẽ ghi chồng dữ liệu lên phần này"
 
 #: modules/stream_out/standard.c:55
-#, fuzzy
 msgid "Filename for stream (helper setting for dst)"
-msgstr "tên tập tin cho luồng dữ liệu (thiết lập dành cho dst)"
+msgstr ""
 
 #: modules/stream_out/standard.c:57
-#, fuzzy
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
-"Tên tập tin dành cho luồng dữ liệu đối với dst, dst=bind+'/'+đường dẫn, dst-"
-"thông số sẽ ghi chồng dữ liệu lên phần này"
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -26309,9 +25705,8 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "Vị trí hiển thị hình ảnh phụ đề"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -26368,11 +25763,10 @@ msgid "Text opacity"
 msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
-msgstr "Độ trong suốt của văn bản. 0= trong suốt, 255= nguyên dạng."
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -26425,9 +25819,8 @@ msgid "Shadow distance"
 msgstr "Khoảng cách đổ bóng"
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "Vị trí văn bản"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -26452,14 +25845,12 @@ msgid "Thick"
 msgstr "Dày"
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "Phía sau bên phải"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "Phím mũi tên bên trái"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -26607,15 +25998,12 @@ msgid "YUVP converter"
 msgstr "Chuyển đổi YUVP"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "Tông màu hình ảnh (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
 msgstr ""
-"Chỉnh tông màu hình ảnh, khoảng giá trị từ 0 đến 360. Giá trị mặc định là 0."
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26917,9 +26305,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "Làm bóng bộ lọc video"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -27091,14 +26478,12 @@ msgid "Deinterlacing video filter"
 msgstr "Bộ lọc chống quét mành video"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "Bộ lọc chống quét mành video"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "Chọn tập tin"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -27141,14 +26526,12 @@ msgid "Extract RGB component video filter"
 msgstr ""
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "Bộ lọc cảnh video"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "Chuyển đổi YUVP"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -27317,10 +26700,9 @@ msgid "Mirror orientation"
 msgstr ""
 
 #: modules/video_filter/mirror.c:65
-#, fuzzy
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
-msgstr "Xác định việc phân tách đối xứng theo hướng. Có thể dọc hoặc ngang"
+msgstr ""
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -27829,9 +27211,8 @@ msgid "ASCII-art video output"
 msgstr "Xuất dữ liệu video ASCII"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "Đóng lại cửa sổ"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -27860,9 +27241,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "Chọn lựa tỉ lệ góc cạnh"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -27930,18 +27310,16 @@ msgid "DeckLink General Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "Module xuất Video"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
 msgid "DeckLink Video Options"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "Module xuất dữ liệu dạng audio"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
 msgid "DeckLink Audio Options"
@@ -28149,18 +27527,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "Audio đầu ra dạng DirectX"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "Audio đầu ra dạng DirectX"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -28242,9 +27618,8 @@ msgid "Wallpaper"
 msgstr "Hình nền"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "Xuất dữ liệu video của OpenGL"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -28255,9 +27630,8 @@ msgid "GPU affinity"
 msgstr ""
 
 #: modules/video_output/win32/wgl.c:46
-#, fuzzy
 msgid "WGL extension for OpenGL"
-msgstr "Tải tiện ích khi khởi động chương trình"
+msgstr ""
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -28314,19 +27688,15 @@ msgstr "Bộ nhớ video"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "Hiển thị dạng X11"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
-#, fuzzy
 msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
 msgstr ""
-"Video sẽ được render bởi định dạng X11. Nếu rỗng, phần thiết lập mặc định sẽ "
-"được áp dụng."
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
@@ -28341,9 +27711,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "Xuất video dạng trắng đen"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28447,26 +27816,18 @@ msgid "Chroma used"
 msgstr ""
 
 #: modules/video_output/yuv.c:46
-#, fuzzy
 msgid "Force use of a specific chroma for output."
 msgstr ""
-"Bắt buộc sử dụng một đơn sắc được chọn cho việc xuất dữ liệu ra. Mặc đình là "
-"I420."
 
 #: modules/video_output/yuv.c:48
-#, fuzzy
 msgid "Add a YUV4MPEG2 header"
-msgstr "Thêm vào header WAVE"
+msgstr ""
 
 #: modules/video_output/yuv.c:49
-#, fuzzy
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
-"Phần tiêu đề YUV4MPEG2 tương thích với chương trinh yuv và yêu cầu YV12/I420 "
-"fourcc. Theo mặc định, VLC sẽ ghi mã bốn ký tự của khung hình vào dữ liệu "
-"xuất ra."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -28748,24 +28109,20 @@ msgid "Image wall"
 msgstr "Bức tường hình ảnh"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "Chiều rộng của cửa sổ hiệu ứng tính bằng pixcel."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "Chiều cao của cửa sổ hiệu ứng tính bằng pixcel."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "Quang phổ"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "Hiệu ứng hiện tại"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28915,9 +28272,8 @@ msgid "Show 80 bands instead of 20"
 msgstr ""
 
 #: modules/visualization/visual/visual.c:72
-#, fuzzy
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
-msgstr "Thêm nhiều băng tần cho phần đo băng tần : 80 nếu cho phép ngoài 20."
+msgstr ""
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -29011,9 +28367,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "Nổi lên trên cùng"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -29302,9 +28657,8 @@ msgid "Start Time"
 msgstr "Thời gian bắt đầu"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Thời gian kết thúc"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -29331,9 +28685,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Thay đổi thời gian bắt đầu của tập tin"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29434,9 +28787,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -29447,9 +28799,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -29460,9 +28811,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -29477,9 +28827,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29510,9 +28859,8 @@ msgid "Menus"
 msgstr "Menu"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "Tốc độ khung hình"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -29527,9 +28875,8 @@ msgid "Custom options"
 msgstr "Chỉnh sửa Tùy Chọn"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Chất lượng"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -29552,14 +28899,12 @@ msgid "px"
 msgstr "điểm ảnh"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Tốc độ mẫu"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Tên hồ sơ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29696,7 +29041,7 @@ msgstr "Bỏ qua bộ lọc trong chế độ lọc H.264"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
-msgstr "Cài đặt x264 và lựa chọn chuyển kênh"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29731,9 +29076,8 @@ msgid "Default caching policy"
 msgstr "Chính sách đối với bộ nhớ đệm theo mặc định"
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
-#, fuzzy
 msgid "Menus language:"
-msgstr "Ngôn ngữ hiển thị"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:532
 msgid "Look and feel"
@@ -29785,11 +29129,8 @@ msgid "Show systray icon"
 msgstr "Hiển thị biểu tượng ở thanh hệ thống"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"Bạn đang sử dụng giao diện Qt4.\n"
-"\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29880,9 +29221,8 @@ msgid "Add a background"
 msgstr "Thêm phần nền"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Xuất dữ liệu"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -29978,9 +29318,8 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "Chuyển màu"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
@@ -30020,53 +29359,44 @@ msgid "Anaglyph 3D"
 msgstr "Anaglyph 3D"
 
 #: modules/gui/qt/ui/video_effects.h:1290
-#, fuzzy
 msgid "Mirror"
-msgstr "Lỗi"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Xác định chuyển động"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Spatializer"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
-#, fuzzy
 msgid "Anti-Flickering"
-msgstr "antiflicker"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
-#, fuzzy
 msgid "Soften"
-msgstr "Mềm"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Noise"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Spatializer"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "Spatializer"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "Spatializer"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "Spatializer"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
