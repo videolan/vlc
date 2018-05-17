@@ -20,13 +20,14 @@
 # Zakk <zakk0610@gmail.com>, 2017
 # Jeff Huang <s8321414@gmail.com>, 2014
 # 盧瑞元（ryuanlu） <rueiyuan.lu@gmail.com>, 2012,2017
+# 洪嘉鴻 <jerry9030@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Hsiu-Ming Chang <cges30901@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: 洪嘉鴻 <jerry9030@gmail.com>, 2018\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -1116,15 +1117,15 @@ msgstr "未定義"
 
 #: src/input/es_out.c:3207
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 行，60 赫茲 Hz)"
 
 #: src/input/es_out.c:3209
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 行，50 赫茲 Hz)"
 
 #: src/input/es_out.c:3217
 msgid "Color primaries"
-msgstr ""
+msgstr "主要顏色"
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1215,10 +1216,9 @@ msgid "Roll"
 msgstr ""
 
 #: src/input/es_out.c:3295
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "視野"
+msgstr ""
 
 #: src/input/es_out.c:3300
 msgid "Max. luminance"
@@ -8952,28 +8952,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 位元"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 位元"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 位元"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT 串流輸出"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "目標裝置的密碼。"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -16031,7 +16027,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
 msgid "Play/Pause the current media"
-msgstr ""
+msgstr "播放/暫停目前媒體"
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
 msgid "Go to the previous item"
@@ -16514,9 +16510,8 @@ msgid "Jump to Time"
 msgstr "跳至時間"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "文字算繪引擎"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -18922,6 +18917,8 @@ msgid ""
 "Playlist is currently empty.\n"
 "Drop a file here or select a media source from the left."
 msgstr ""
+"播放清單目前是空的。\n"
+"請拖曳檔案至此處或由左側選擇媒體來源。"
 
 #: modules/gui/qt/components/playlist/standardpanel.hpp:143
 msgid "Icons"
@@ -19428,7 +19425,7 @@ msgstr "檢查更新時發生錯誤..."
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:52
 msgid "Current Media Information"
-msgstr ""
+msgstr "目前媒體資訊"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:64
 msgid "&General"
@@ -19792,7 +19789,7 @@ msgstr "時間軸工具列"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
 msgid "Advanced Widget"
-msgstr ""
+msgstr "進階工具"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -20026,7 +20023,7 @@ msgstr "字幕(&T)"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "工具(&S)"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -20122,7 +20119,7 @@ msgstr "嵌入播放清單至主視窗"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "視窗置頂(&T)"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20154,7 +20151,7 @@ msgstr "提高音量(&I)"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "降低音量(&E)"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20314,16 +20311,15 @@ msgstr "清除(&C)"
 
 #: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
-msgstr ""
+msgstr "轉譯器(&R)"
 
 #: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "串流(&S)..."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20896,7 +20892,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:52
 msgid "Always, on this device only"
-msgstr ""
+msgstr "在此裝置總是如此"
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
@@ -23652,18 +23648,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "效能選項"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "啟用音訊串流輸出"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23686,9 +23680,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "輸出品質"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -23715,9 +23708,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "軟體增益"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27579,9 +27571,8 @@ msgid "Sa&mple Rate"
 msgstr "取樣率(&M)"
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "設定檔名稱"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27714,9 +27705,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "跳過 H.264 編碼迴路內去區塊效應濾波器"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 設定檔與等級選擇"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -28061,18 +28051,16 @@ msgid "Spatial luma strength"
 msgstr "空間亮度強度"
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "空間亮度強度"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
 msgid "Spatial chroma strength"
 msgstr "空間色度強度"
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "空間色度強度"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
