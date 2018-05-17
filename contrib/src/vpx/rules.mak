@@ -23,7 +23,7 @@ endif
 	$(APPLY) $(SRC)/vpx/0001-ads2gas-Add-a-noelf-option.patch
 	$(APPLY) $(SRC)/vpx/0002-configure-Add-an-armv7-win32-gcc-target.patch
 	$(APPLY) $(SRC)/vpx/0003-configure-Add-an-arm64-win64-gcc-target.patch
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/vpx/libvpx-pthread-w32.patch
 endif
 	$(MOVE)
@@ -32,7 +32,7 @@ DEPS_vpx =
 
 VPX_CFLAGS   := $(CFLAGS)
 VPX_CXXFLAGS := $(CXXFLAGS)
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_vpx += pthreads $(DEPS_pthreads)
 VPX_CFLAGS   += -DPTW32_STATIC_LIB
 VPX_CXXFLAGS += -DPTW32_STATIC_LIB

@@ -20,6 +20,9 @@ zvbi: zvbi-$(ZVBI_VERSION).tar.bz2 .sum-zvbi
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-static-linking.patch
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/zvbi/zvbi-win32.patch
+ifdef HAVE_WINSTORE
+	$(APPLY) $(SRC)/zvbi/zvbi-pthread-w32.patch
+endif
 endif
 	$(APPLY) $(SRC)/zvbi/zvbi-fix-clang-support.patch
 ifdef HAVE_ANDROID
@@ -30,12 +33,18 @@ endif
 DEPS_zvbi = png $(DEPS_png) iconv $(DEPS_iconv)
 
 ZVBI_CFLAGS := $(CFLAGS)
+ZVBI_CXXFLAGS := $(CXXFLAGS)
 ZVBICONF := \
 	--disable-dvb --disable-bktr \
 	--disable-nls --disable-proxy \
 	--without-doxygen \
 	$(HOSTCONF)
 
+ifdef HAVE_WINSTORE
+DEPS_upnp += pthreads $(DEPS_pthreads)
+ZVBI_CFLAGS   += -DPTW32_STATIC_LIB
+ZVBI_CXXFLAGS += -DPTW32_STATIC_LIB
+endif
 ifdef HAVE_MACOSX
 ZVBI_CFLAGS += -fnested-functions
 endif
@@ -43,7 +52,7 @@ endif
 .zvbi: zvbi
 	$(UPDATE_AUTOCONFIG)
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(ZVBI_CFLAGS)" ./configure $(ZVBICONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(ZVBI_CFLAGS)" CXXFLAGS="$(ZVBI_CXXFLAGS)" ./configure $(ZVBICONF)
 	cd $< && $(MAKE) -C src install
 	cd $< && $(MAKE) SUBDIRS=. install
 	sed -i.orig -e "s/\/[^ ]*libiconv.a/-liconv/" $(PREFIX)/lib/pkgconfig/zvbi-0.2.pc

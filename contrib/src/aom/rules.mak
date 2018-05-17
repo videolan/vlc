@@ -19,13 +19,15 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $@-$(AOM_VERSION) $@
 	mkdir -p $@-$(AOM_VERSION)
 	tar xvzf "$<" -C $@-$(AOM_VERSION)
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
+endif
 	$(MOVE)
 
 AOM_CFLAGS   := $(CFLAGS)
 AOM_CXXFLAGS := $(CXXFLAGS)
 DEPS_aom =
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_aom += pthreads $(DEPS_pthreads)
 AOM_CFLAGS   += -DPTW32_STATIC_LIB
 AOM_CXXFLAGS += -DPTW32_STATIC_LIB
