@@ -45,6 +45,7 @@
 
 #include "event.h"
 
+static void SplitterManage(vout_display_t *vd);
 static void SplitterClose(vout_display_t *vd);
 
 /*****************************************************************************
@@ -100,7 +101,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->prepare = NULL;
     vd->display = NULL;
     vd->control = NULL;
-    vd->manage = NULL;
     vd->sys = NULL;
 
     vd->owner = *owner;
@@ -144,12 +144,6 @@ static int vout_display_Control(vout_display_t *vd, int query, ...)
     va_end(args);
 
     return result;
-}
-
-static void vout_display_Manage(vout_display_t *vd)
-{
-    if (vd->manage)
-        vd->manage(vd);
 }
 
 /* */
@@ -717,7 +711,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    vout_display_Manage(vd);
+    if (osys->is_splitter)
+        SplitterManage(vd);
 
     /* Handle mouse timeout */
     const mtime_t date = mdate();
@@ -1447,7 +1442,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     wrapper->prepare = SplitterPrepare;
     wrapper->display = SplitterDisplay;
     wrapper->control = SplitterControl;
-    wrapper->manage  = SplitterManage;
     wrapper->sys     = sys;
 
     /* */
