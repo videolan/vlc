@@ -369,5 +369,10 @@ static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window,
     vout_window_SendMouseEvent(window, &mouse);
 }
 
+static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
+{
+    var_SetInteger(window->obj.libvlc, "key-pressed", key);
+}
+
 /** @} */
 #endif /* VLC_VOUT_WINDOW_H */
