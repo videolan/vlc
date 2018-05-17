@@ -454,6 +454,7 @@ $Id$
  * wav: Wav demuxer
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
+ * wdummy: dummy window provider
  * webvtt: WEBVTT subtitles decoder, encoder and demuxer
  * wgl: WGL extension for OpenGL
  * win_hotkeys: module to catch hotkeys when application doesn't have the focus

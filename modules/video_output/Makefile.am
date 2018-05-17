@@ -448,10 +448,12 @@ libflaschen_plugin_la_LIBADD = $(SOCKET_LIBS)
 
 libvdummy_plugin_la_SOURCES = video_output/vdummy.c
 libvmem_plugin_la_SOURCES = video_output/vmem.c
+libwdummy_plugin_la_SOURCES = video_output/wdummy.c
 libyuv_plugin_la_SOURCES = video_output/yuv.c
 
 vout_LTLIBRARIES += \
 	libflaschen_plugin.la \
 	libvdummy_plugin.la \
 	libvmem_plugin.la \
+	libwdummy_plugin.la \
 	libyuv_plugin.la

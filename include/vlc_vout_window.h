@@ -53,6 +53,7 @@ enum vout_window_type {
     VOUT_WINDOW_TYPE_NSOBJECT /**< MacOS X view */,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
+    VOUT_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */
 };
 
 /**
