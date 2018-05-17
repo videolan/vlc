@@ -30,12 +30,8 @@ endif
 
 DEPS_vpx =
 
-VPX_CFLAGS   := $(CFLAGS)
-VPX_CXXFLAGS := $(CXXFLAGS)
 ifdef HAVE_WINSTORE
 DEPS_vpx += pthreads $(DEPS_pthreads)
-VPX_CFLAGS   += -DPTW32_STATIC_LIB
-VPX_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 
 ifdef HAVE_CROSS_COMPILE
@@ -169,7 +165,7 @@ VPX_CONF += --enable-debug --disable-optimizations
 endif
 
 .vpx: libvpx
-	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) CFLAGS="$(VPX_CFLAGS)" CXXFLAGS="$(VPX_CXXFLAGS)"  ./configure --target=$(VPX_TARGET) \
+	cd $< && LDFLAGS="$(VPX_LDFLAGS)" CROSS=$(VPX_CROSS) ./configure --target=$(VPX_TARGET) \
 		$(VPX_CONF) --prefix=$(PREFIX)
 	cd $< && $(MAKE)
 	cd $< && ../../../contrib/src/pkg-static.sh vpx.pc

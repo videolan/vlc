@@ -3,12 +3,8 @@
 OPENJPEG_VERSION := 2.3.0
 OPENJPEG_URL := https://github.com/uclouvain/openjpeg/archive/v$(OPENJPEG_VERSION).tar.gz
 
-OPENJPEG_CFLAGS   := $(CFLAGS)
-OPENJPEG_CXXFLAGS := $(CXXFLAGS)
 ifdef HAVE_WINSTORE
 DEPS_openjpeg += pthreads $(DEPS_pthreads)
-OPENJPEG_CFLAGS   += -DPTW32_STATIC_LIB
-OPENJPEG_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 
 $(TARBALLS)/openjpeg-v$(OPENJPEG_VERSION).tar.gz:
@@ -30,7 +26,7 @@ endif
 	$(MOVE)
 
 .openjpeg: openjpeg toolchain.cmake
-	cd $< && $(HOSTVARS) CFLAGS="$(OPENJPEG_CFLAGS)" CXXFLAGS="$(OPENJPEG_CXXFLAGS)" $(CMAKE) \
+	cd $< && $(HOSTVARS) $(CMAKE) \
 		-DBUILD_SHARED_LIBS:bool=OFF -DBUILD_PKGCONFIG_FILES=ON \
 			-DBUILD_CODEC:bool=OFF \
 		.

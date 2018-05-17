@@ -42,8 +42,6 @@ ZVBICONF := \
 
 ifdef HAVE_WINSTORE
 DEPS_upnp += pthreads $(DEPS_pthreads)
-ZVBI_CFLAGS   += -DPTW32_STATIC_LIB
-ZVBI_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 ifdef HAVE_MACOSX
 ZVBI_CFLAGS += -fnested-functions

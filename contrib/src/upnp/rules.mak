@@ -15,8 +15,6 @@ UPNP_CFLAGS   := $(CFLAGS)   -DUPNP_STATIC_LIB
 UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
 ifdef HAVE_WINSTORE
 DEPS_upnp += pthreads $(DEPS_pthreads)
-UPNP_CFLAGS   += -DPTW32_STATIC_LIB
-UPNP_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 ifdef HAVE_WINSTORE
 CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
@@ -38,7 +36,6 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-checks.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
-	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-force.patch
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libpthread.patch
