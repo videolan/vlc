@@ -19,12 +19,9 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(MOVE)
 
 # libebml requires exceptions
-EBML_EXTRA_FLAGS = CXXFLAGS="${CXXFLAGS} -fexceptions -fvisibility=hidden"
-ifdef HAVE_ANDROID
-EBML_EXTRA_FLAGS += CPPFLAGS=""
-endif
+EBML_CXXFLAGS := $(CXXFLAGS) -fexceptions -fvisibility=hidden
 
 .ebml: ebml toolchain.cmake
-	cd $< && $(HOSTVARS_PIC) $(CMAKE) -DBUILD_SHARED_LIBS=OFF
+	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF
 	cd $< && $(MAKE) install
 	touch $@
