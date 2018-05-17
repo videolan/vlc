@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# abuyop <abuyop@gmail.com>, 2013-2017
+# abuyop <abuyop@gmail.com>, 2013-2018
 # Mahrazi Mohd Kamal <mahrazi@gmail.com>, 2006,2013-2014
 # Timothy “Glash” Wong <timty97@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: abuyop <abuyop@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: abuyop <abuyop@gmail.com>, 2018\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
@@ -9451,31 +9451,27 @@ msgstr "Output IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Panjang kunci kripto dalam bait"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bits"
+msgstr "16 bait"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bits"
+msgstr "24 bait"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bits"
+msgstr "32 bait"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Output strim SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Kata laluan untuk peranti sasaran."
+msgstr "Kata laluan untuk penyulitan strim"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10635,7 +10631,7 @@ msgstr "Dilumpuhkan"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Dibenarkan (AC3/DTS sahaja)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16471,7 +16467,7 @@ msgstr "Kulit"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Laksana profil pada perlancaran berikutnya"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17539,9 +17535,8 @@ msgid "Jump to Time"
 msgstr "Lompat ke Masa"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Pene&rap"
+msgstr "Penerap"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26246,7 +26241,6 @@ msgid "Ball speed"
 msgstr "Kelajuan bola"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Tetapkan kelajuan bola, nilai sesaran dalam bilangan piksel mengikut bingkai."
@@ -26256,9 +26250,8 @@ msgid "Ball size"
 msgstr "Saiz bola"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Tetapkan saiz bola mengikut jejari dalam bilangan piksel"
+msgstr "Tetapkan saiz bola mengikut jejari dalam bilangan piksel."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
