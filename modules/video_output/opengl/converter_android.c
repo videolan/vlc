@@ -264,7 +264,10 @@ Open(vlc_object_t *obj)
 
     char *code;
     if (asprintf(&code, template, tc->glsl_version, tc->glsl_precision_header) < 0)
-        return 0;
+    {
+        free(tc->priv);
+        return VLC_EGENERIC;
+    }
     GLuint fragment_shader = tc->vt->CreateShader(GL_FRAGMENT_SHADER);
     tc->vt->ShaderSource(fragment_shader, 1, (const char **) &code, NULL);
     tc->vt->CompileShader(fragment_shader);
