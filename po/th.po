@@ -7,14 +7,14 @@
 # Chalermpon Dasri <d.chalermpon@gmail.com>, 2013
 # <develop5@datawiz.co.th>, 2006
 # jerng <jernghan@gmail.com>, 2014
-# Rockers RRock <sumoisrock@gmail.com>, 2017
+# Rockers RRock <sumoisrock@gmail.com>, 2017-2018
 # Theppitak Karoonboonyanan <thep@linux.thai.net>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-20 03:42+0000\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
 "Last-Translator: Rockers <sumorock@hotmail.com>, 2018\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
@@ -3476,7 +3476,7 @@ msgstr ""
 #: src/libvlc-module.c:1042
 msgid ""
 "This option is useful if you want to lower the latency when reading a stream"
-msgstr ""
+msgstr "ตัวเลือกนี้จะเป็นประโยชน์ในกรณีที่คุณต้องการลดเวลาหน่วงขณะอ่านข้อมูลกระแส"
 
 #: src/libvlc-module.c:1045
 msgid "VLM configuration file"
@@ -3484,7 +3484,7 @@ msgstr "แฟ้มค่าตั้ง VLM"
 
 #: src/libvlc-module.c:1047
 msgid "Read a VLM configuration file as soon as VLM is started."
-msgstr ""
+msgstr "อ่านแฟ้มค่าตั้งของ VLM ทันทีที่ VLM เริ่มทำงาน"
 
 #: src/libvlc-module.c:1049
 msgid "Use a plugins cache"
@@ -3492,53 +3492,55 @@ msgstr "ใช้แคชปลั๊กอิน"
 
 #: src/libvlc-module.c:1051
 msgid "Use a plugins cache which will greatly improve the startup time of VLC."
-msgstr ""
+msgstr "ใช้แคชปลั๊กอินซึ่งจะช่วยให้ VLC เริ่มทำงานได้เร็วขึ้นมาก"
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "ตรวจหาปลั๊กอินใหม่ๆ"
 
 #: src/libvlc-module.c:1055
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
+"ตรวจไดเรกทอรีปลั๊กอินเพื่อหาปลั๊กอินตัวใหม่ขณะเริ่มทำงาน การตรวจหาดังกล่าวจะทำให้ VLC "
+"เริ่มทำงานได้ช้าลง"
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
-msgstr ""
+msgstr "รายชื่อแหล่งเก็บกุญแจที่เลือกใช้"
 
 #: src/libvlc-module.c:1060
 msgid "List of keystores that VLC will use in priority."
-msgstr ""
+msgstr "รายชื่อของแหล่งเก็บกุญแจต่างๆ ที่ VLC จะใช้ เรียงตามลำดับความสำคัญ"
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
-msgstr ""
+msgstr "เก็บสถิติภายในเครื่อง"
 
 #: src/libvlc-module.c:1064
 msgid "Collect miscellaneous local statistics about the playing media."
-msgstr ""
+msgstr "เก็บสถิติจิปาถะต่างๆ ในเครื่องเกี่ยวกับสื่อที่เล่น"
 
 #: src/libvlc-module.c:1066
 msgid "Run as daemon process"
-msgstr "ทำงานในกระบวนการเดมอน"
+msgstr "ทำงานเป็นดีมอน"
 
 #: src/libvlc-module.c:1068
 msgid "Runs VLC as a background daemon process."
-msgstr "ให้ VLC ทำงานในกระบวนการเดมอนเบื้องหลัง"
+msgstr "ให้ VLC ทำงานในโพรเซสแบบดีมอนเบื้องหลัง"
 
 #: src/libvlc-module.c:1070
 msgid "Write process id to file"
-msgstr "เขียนกระบวนการ id ไปยังแฟ้ม"
+msgstr "เขียน id ของโพรเซสลงในแฟ้ม"
 
 #: src/libvlc-module.c:1072
 msgid "Writes process id into specified file."
-msgstr "เขียนกระบวนการ id ไปยังแฟ้มเฉพาะ"
+msgstr "เขียน id ของโพรเซสลงในแฟ้มที่ระบุ"
 
 #: src/libvlc-module.c:1074
 msgid "Allow only one running instance"
-msgstr "อนุญาตให้เปิดได้แค่โปรแกรมเดียว"
+msgstr "อนุญาตให้เปิด VLC ได้แค่ทีละหน้าต่าง"
 
 #: src/libvlc-module.c:1076
 msgid ""
@@ -3548,22 +3550,26 @@ msgid ""
 "This option will allow you to play the file with the already running "
 "instance or enqueue it."
 msgstr ""
+"บางครั้ง การอนุญาตให้เปิด VLC ได้แค่ทีละหน้าต่างก็เป็นประโยชน์ได้ ตัวอย่างเช่น ถ้าคุณผูก VLC "
+"เข้ากับสื่อบางชนิดไว้และคุณก็ไม่ต้องการให้เปิดหน้าต่าง VLC "
+"บานใหม่ทุกครั้งที่คุณเปิดแฟ้มจากโปรแกรมจัดการแฟ้ม "
+"ตัวเลือกนี้จะช่วยให้คุณสามารถเล่นแฟ้มดังกล่าวในหน้าต่าง VLC ที่เปิดไว้แล้วได้ หรือไม่ก็เข้าคิวเล่นไว้"
 
 #: src/libvlc-module.c:1082
 msgid "VLC is started from file association"
-msgstr ""
+msgstr "VLC ถูกเปิดผ่านการผูกแฟ้ม"
 
 #: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
-msgstr ""
+msgstr "บอก VLC ว่าเป็นการเรียกทำงานอันเนื่องมาจากการผูกแฟ้มใน OS"
 
 #: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
-msgstr "เล่นในตัวเล่นเดียวเท่านั้น เมื่อเปิดแฟ้มจากตัวเรียกดูแฟ้ม"
+msgstr "ใช้หน้าต่างเดียวเท่านั้นเมื่อเปิดแฟ้มจากโปรแกรมจัดการแฟ้ม"
 
 #: src/libvlc-module.c:1089
 msgid "Increase the priority of the process"
-msgstr ""
+msgstr "เพิ่มลำดับความสำคัญของโพรเซส"
 
 #: src/libvlc-module.c:1091
 msgid ""
@@ -3574,54 +3580,61 @@ msgid ""
 "render the whole system unresponsive which might require a reboot of your "
 "machine."
 msgstr ""
+"การเพิ่มลำดับความสำคัญของโพรเซสมีแนวโน้มจะช่วยให้คุณรับชมสื่อได้ราบรื่นขึ้น เนื่องจาก VLC "
+"จะสามารถทำงานได้โดยไม่ถูกรบกวนโดยโปรแกรมอื่นที่อาจมาดึงเวลาของโพรเซสเซอร์มากเกินไป "
+"อย่างไรก็ดี พึงสังวรณ์ว่าในบางสถานการณ์ (ซึ่งถือเป็นบั๊ก) VLC "
+"อาจครอบครองเวลาทั้งหมดของโพรเซสเซอร์ และทำให้ระบบทั้งระบบหยุดตอบสนองไปเลยได้ "
+"และอาจทำให้จำเป็นต้องเริ่มเปิดเครื่องใหม่"
 
 #: src/libvlc-module.c:1099 modules/gui/qt/ui/sprefs_interface.h:553
 msgid "Enqueue items into playlist in one instance mode"
-msgstr "เข้าคิวรายการไปในผังเล่น เมื่ออยู่ในรูปแบบตัวเล่นเดียว"
+msgstr "เข้าคิวรายการในผังเล่นไว้ เมื่ออยู่ในโหมดตัวเล่นตัวเดียว"
 
 #: src/libvlc-module.c:1101
 msgid ""
 "When using the one instance only option, enqueue items to playlist and keep "
 "playing current item."
 msgstr ""
+"เมื่อใช้ตัวเลือกเปิดตัวเล่นเพียงตัวเดียว ให้เข้าคิวรายการในผังเล่นไว้ และเล่นรายการปัจจุบันต่อไป"
 
 #: src/libvlc-module.c:1104
 msgid "Expose media player via D-Bus"
-msgstr ""
+msgstr "เปิดตัวเล่นสื่อให้เข้าถึงได้ผ่าน D-Bus"
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
-msgstr ""
+msgstr "อนุญาตให้โปรแกรมอื่นควบคุม VLC ได้โดยใช้โพรโทคอล MPRIS ผ่าน D-Bus"
 
 #: src/libvlc-module.c:1114
 msgid ""
 "These options define the behavior of the playlist. Some of them can be "
 "overridden in the playlist dialog box."
 msgstr ""
+"ตัวเลือกเหล่านี้กำหนดพฤติกรรมของผังเล่น บางรายการสามารถกำหนดทับในกล่องโต้ตอบผังเล่นได้"
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "แจงอ่านรายการต่างๆ ก่อนโดยอัตโนมัติ"
 
 #: src/libvlc-module.c:1119
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
-msgstr ""
+msgstr "แจงอ่านรายการต่างๆ ที่จะเพิ่มลงในผังเล่นก่อนโดยอัตโนมัติ (เพื่อดึงข้อมูลกำกับบางอย่าง)"
 
 #: src/libvlc-module.c:1122
 msgid "Preparsing timeout"
-msgstr ""
+msgstr "กำหนดเวลาแจงอ่าน"
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr ""
+msgstr "เวลาที่มากที่สุดที่จะอนุญาตให้แจงอ่านรายการหนึ่งๆ เป็นมิลลิวินาที"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
-msgstr ""
+msgstr "อนุญาตให้เข้าถึงข้อมูลกำกับผ่านเครือข่าย"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -3629,11 +3642,11 @@ msgstr "พับเก็บ"
 
 #: src/libvlc-module.c:1131
 msgid "Expand"
-msgstr "ขยาย"
+msgstr "คลี่ออก"
 
 #: src/libvlc-module.c:1133
 msgid "Subdirectory behavior"
-msgstr "พฤติกรรมที่เก็บแฟ้มย่อย"
+msgstr "พฤติกรรมของไดเรกทอรีย่อย"
 
 #: src/libvlc-module.c:1135
 msgid ""
@@ -3642,10 +3655,14 @@ msgid ""
 "collapse: subdirectories appear but are expanded on first play.\n"
 "expand: all subdirectories are expanded.\n"
 msgstr ""
+"เลือกว่าต้องคลี่ไดเรกทอรีย่อยออกหรือไม่\n"
+"ไม่ใช้: ไม่แสดงไดเรกทอรีย่อยในผังเล่น\n"
+"พับเก็บ: แสดงไดเรกทอรีย่อยแต่คลี่ออกเมื่อมีการเล่นครั้งแรก\n"
+"คลี่ออก: คลี่ไดเรกทอรีย่อยออกทั้งหมด\n"
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
-msgstr "มองข้ามส่วนขยาย"
+msgstr "นามสกุลแฟ้มที่เพิกเฉย"
 
 #: src/libvlc-module.c:1142
 msgid ""
@@ -3654,6 +3671,9 @@ msgid ""
 "This is useful if you add directories that contain playlist files for "
 "instance. Use a comma-separated list of extensions."
 msgstr ""
+"แฟ้มต่างๆ ที่มีนามสกุลเหล่านี้จะไม่ถูกเพิ่มเข้าในผังเล่นเมื่อเปิดไดเรกทอรี\n"
+"ตัวเลือกนี้มีประโยชน์ถ้าคุณเพิ่มไดเรกทอรีที่มีแฟ้มผังเล่นอยู่ เป็นต้น ใช้จุลภาคคั่นระหว่างนามสกุลต่างๆ "
+"ในรายชื่อ"
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
@@ -3661,7 +3681,7 @@ msgstr "แสดงแฟ้มที่ซ่อนอยู่"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "ไม่แสดงแฟ้มที่ขึ้นต้นด้วย '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3672,30 +3692,31 @@ msgid ""
 "Specifies the services discovery modules to preload, separated by colons. "
 "Typical value is \"sap\"."
 msgstr ""
+"ระบุมอดูลค้นหาบริการต่างๆ ที่จะโหลดเตรียมไว้ คั่นด้วยจุลภาค ค่าที่มักใช้โดยทั่วไปคือ \"sap\""
 
 #: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
-msgstr "เล่นแฟ้มแบบสุ่มเสมอ"
+msgstr "เล่นแฟ้มแบบสุ่มไปเรื่อยๆ"
 
 #: src/libvlc-module.c:1158
 msgid "VLC will randomly play files in the playlist until interrupted."
-msgstr ""
+msgstr "VLC จะสุ่มเล่นแฟ้มต่างๆ ในผังเล่นจนกว่าจะถูกขัดจังหวะ"
 
 #: src/libvlc-module.c:1160
 msgid "Repeat all"
-msgstr "ซ้ำทั้งหมด"
+msgstr "วนซ้ำทั้งหมด"
 
 #: src/libvlc-module.c:1162
 msgid "VLC will keep playing the playlist indefinitely."
-msgstr "VLC จะเล่นซ้ำรายการในผังเล่นทั้งหมด"
+msgstr "VLC จะวนเล่นผังเล่นซ้ำไปเรื่อยๆ"
 
 #: src/libvlc-module.c:1164
 msgid "Repeat current item"
-msgstr "เล่นซ้ำรายการที่เล่นอยู่"
+msgstr "วนซ้ำรายการที่เล่นอยู่"
 
 #: src/libvlc-module.c:1166
 msgid "VLC will keep playing the current playlist item."
-msgstr "VLC จะเล่นซ้ำรายการปัจจุบันที่เล่นอยู่ในผังเล่น"
+msgstr "VLC จะวนเล่นซ้ำรายการปัจจุบันที่เล่นอยู่ในผังเล่น"
 
 #: src/libvlc-module.c:1168
 msgid "Play and stop"
@@ -3703,7 +3724,7 @@ msgstr "เล่นและหยุด"
 
 #: src/libvlc-module.c:1170
 msgid "Stop the playlist after each played playlist item."
-msgstr ""
+msgstr "หยุดเล่นหลังจบแต่ละรายการในผังเล่น"
 
 #: src/libvlc-module.c:1172
 msgid "Play and exit"
@@ -3719,33 +3740,33 @@ msgstr "เล่นและพัก"
 
 #: src/libvlc-module.c:1178
 msgid "Pause each item in the playlist on the last frame."
-msgstr "พักเมื่อเล่นจบเฟรมสุดท้ายของรายการใดก็ตามในผังเล่น (กด ก่อนหน้า/ถัดไป เพื่อเล่นต่อ)"
+msgstr "พักการเล่นแต่ละรายการในผังเล่นไว้ที่เฟรมสุดท้าย"
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
-msgstr ""
+msgstr "เริ่มเล่นโดยพักไว้"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "พักการเล่นแต่ละรายการในผังเล่นไว้ที่เฟรมแรก"
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
-msgstr "เริ่มอัตโนมัติ"
+msgstr "เริ่มเล่นโดยอัตโนมัติ"
 
 #: src/libvlc-module.c:1185
 msgid "Automatically start playing the playlist content once it's loaded."
-msgstr ""
+msgstr "เริ่มเล่นเนื้อหาในผังเล่นโดยอัตโนมัติเมื่อโหลดเสร็จ"
 
 #: src/libvlc-module.c:1188
 msgid "Pause on audio communication"
-msgstr ""
+msgstr "พักเมื่อมีการสื่อสารทางเสียง"
 
 #: src/libvlc-module.c:1190
 msgid ""
 "If pending audio communication is detected, playback will be paused "
 "automatically."
-msgstr ""
+msgstr "เมื่อพบว่ามีการสื่อสารทางเสียงเข้ามารออยู่ ก็จะพักการเล่นไว้โดยอัตโนมัติ"
 
 #: src/libvlc-module.c:1193
 msgid "Use media library"
@@ -3755,7 +3776,7 @@ msgstr "ใช้คลังสื่อ"
 msgid ""
 "The media library is automatically saved and reloaded each time you start "
 "VLC."
-msgstr ""
+msgstr "คลังสื่อจะถูกบันทึกไว้และโหลดคืนโดยอัตโนมัติทุกครั้งที่คุณเรียกทำงาน VLC"
 
 #: src/libvlc-module.c:1198 modules/gui/qt/ui/sprefs_interface.h:551
 msgid "Display playlist tree"
@@ -3765,27 +3786,27 @@ msgstr "แสดงผังเล่นแบบแผนผังต้นไ
 msgid ""
 "The playlist can use a tree to categorize some items, like the contents of a "
 "directory."
-msgstr "ผังเล่นสามารถแสดงรายการเป็นหมวดหมู่แบบแผนผังต้นไม้ ตามที่เก็บแฟ้มของรายการต่างๆ ได้"
+msgstr "ผังเล่นสามารถแสดงรายการเป็นหมวดหมู่แบบแผนผังต้นไม้ได้ เช่น เนื้อหาของไดเรกทอรี"
 
 #: src/libvlc-module.c:1209
 msgid "These settings are the global VLC key bindings, known as \"hotkeys\"."
-msgstr ""
+msgstr "ค่าตั้งเหล่านี้เป็นการกำหนดการทำงานของปุ่มแป้นพิมพ์ใน VLC ซึ่งเรียกว่า \"ปุ่มลัด\""
 
 #: src/libvlc-module.c:1214 modules/gui/macosx/VLCMain+OldPrefs.m:115
 msgid "Ignore"
-msgstr "มองข้าม"
+msgstr "เพิกเฉย"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr "การควบคุมระดับเสียง"
+msgstr "ควบคุมความดังเสียง"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr "ควบคุมตำแหน่งการแสดง"
+msgstr "ควบคุมตำแหน่งเล่น"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "ควบคุมตำแหน่งเล่นแบบกลับทิศทาง"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
@@ -3796,8 +3817,8 @@ msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
-"การเลื่อนปุ่มล้อเลื่อนเมาส์ขึ้น-ลงตามแนว(ตั้ง) สามารถใช้ควบคุม ระดับเสียง ตำแหน่งการแสดง "
-"หรือมองข้ามการใช้งานของมันไปก็ได้"
+"การเลื่อนปุ่มล้อเลื่อนเมาส์ตามแนวดิ่ง (ขึ้น/ลง) สามารถใช้ควบคุม ความดังเสียง ตำแหน่งเล่น "
+"หรือจะเพิกเฉยก็ได้"
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
@@ -3808,8 +3829,8 @@ msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
-"การเลื่อนปุ่มล้อเลื่อนเมาส์ซ้าย-ขวาตามแนว(นอน) สามารถใช้ควบคุม ระดับเสียง ตำแหน่งการแสดง "
-"หรือมองข้ามการใช้งานของมันไปก็ได้"
+"การเลื่อนปุ่มล้อเลื่อนเมาส์ตามแนวนอน (ซ้าย/ขวา) สามารถใช้ควบคุม ความดังเสียง ตำแหน่งเล่น "
+"หรือจะเพิกเฉยก็ได้"
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -3821,7 +3842,7 @@ msgstr "เต็มจอ"
 
 #: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
-msgstr "เลือกปุ่มลัดที่จะใช้เปลี่ยนไปยังการแสดงผลเต็มจอ"
+msgstr "เลือกปุ่มลัดที่จะใช้สลับสถานะการแสดงผลเต็มจอ"
 
 #: src/libvlc-module.c:1228
 msgid "Exit fullscreen"
@@ -3837,7 +3858,7 @@ msgstr "เล่น/พัก"
 
 #: src/libvlc-module.c:1231
 msgid "Select the hotkey to use to swap paused state."
-msgstr "เลือกปุ่มลัดที่จะใช้พักสื่อ"
+msgstr "เลือกปุ่มลัดที่จะใช้สลับสถานะการเล่น/พักสื่อ"
 
 #: src/libvlc-module.c:1232
 msgid "Pause only"
@@ -3853,13 +3874,13 @@ msgstr "เล่นเท่านั้น"
 
 #: src/libvlc-module.c:1235
 msgid "Select the hotkey to use to play."
-msgstr "เลือกปุ่มลัดที่จะใช้ทำการเล่น"
+msgstr "เลือกปุ่มลัดที่จะใช้สั่งเล่น"
 
 #: src/libvlc-module.c:1236 modules/gui/macosx/VLCMainMenu.m:393
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Faster"
-msgstr "เร็วขึ้น"
+msgstr "เร่ง"
 
 #: src/libvlc-module.c:1237 src/libvlc-module.c:1243
 msgid "Select the hotkey to use for fast forward playback."
@@ -3869,11 +3890,11 @@ msgstr "เลือกปุ่มลัดที่จะใช้เร่ง
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
-msgstr "ช้าลง"
+msgstr "ชะลอ"
 
 #: src/libvlc-module.c:1239 src/libvlc-module.c:1245
 msgid "Select the hotkey to use for slow motion playback."
-msgstr "เลือกปุ่มลัดที่จะใช้สำหรับการเล่นแบบช้าลง"
+msgstr "เลือกปุ่มลัดที่จะใช้สำหรับการเล่นแบบภาพช้า"
 
 #: src/libvlc-module.c:1240
 msgid "Normal rate"
@@ -3881,15 +3902,15 @@ msgstr "ความเร็วปกติ"
 
 #: src/libvlc-module.c:1241
 msgid "Select the hotkey to set the playback rate back to normal."
-msgstr ""
+msgstr "เลือกปุ่มลัดที่จะกำหนดความเร็วของการเล่นกลับเป็นอัตราปกติ"
 
 #: src/libvlc-module.c:1242 modules/gui/qt/menus.cpp:883
 msgid "Faster (fine)"
-msgstr "เร็วขึ้น (ละเอียด)"
+msgstr "เร่ง (ละเอียด)"
 
 #: src/libvlc-module.c:1244 modules/gui/qt/menus.cpp:891
 msgid "Slower (fine)"
-msgstr "ช้าลง (ละเอียด)"
+msgstr "ชะลอ (ละเอียด)"
 
 #: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:163
@@ -3904,7 +3925,7 @@ msgstr "ถัดไป"
 
 #: src/libvlc-module.c:1247
 msgid "Select the hotkey to use to skip to the next item in the playlist."
-msgstr "เลือกปุ่มลัดที่จะใช้เพื่อข้ามไปเล่นรายการถัดไปของผังเล่น"
+msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปเล่นรายการถัดไปในผังเล่น"
 
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
 #: modules/gui/macosx/VLCControlsBarCommon.m:160
@@ -3917,7 +3938,7 @@ msgstr "ก่อนหน้า"
 
 #: src/libvlc-module.c:1249
 msgid "Select the hotkey to use to skip to the previous item in the playlist."
-msgstr "เลือกปุ่มลัดที่จะใช้เพื่อข้ามไปเล่นรายการก่อนหน้าของผังเล่น"
+msgstr "เลือกปุ่มลัดที่จะใช้ย้อนไปเล่นรายการก่อนหน้าในผังเล่น"
 
 #: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:386
 #: modules/gui/macosx/VLCMainMenu.m:498 modules/gui/macosx/VLCMainMenu.m:505
@@ -3929,7 +3950,7 @@ msgstr "หยุด"
 
 #: src/libvlc-module.c:1251
 msgid "Select the hotkey to stop playback."
-msgstr "เลือกปุ่มที่จะใช้หยุดการเล่น"
+msgstr "เลือกปุ่มลัดที่จะใช้หยุดการเล่น"
 
 #: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:75
 #: modules/gui/macosx/VLCFSPanelController.m:130
@@ -3939,75 +3960,75 @@ msgstr "เลือกปุ่มที่จะใช้หยุดการ
 #: modules/gui/qt/ui/sprefs_subtitles.h:293
 #: modules/gui/qt/ui/video_effects.h:1279
 msgid "Position"
-msgstr "ตำแหน่งการแสดง"
+msgstr "ตำแหน่งเล่น"
 
 #: src/libvlc-module.c:1253
 msgid "Select the hotkey to display the position."
-msgstr "เลือกปุ่มที่จะเลือกตำแหน่งการแสดง"
+msgstr "เลือกปุ่มลัดที่จะใช้แสดงตำแหน่งเล่น"
 
 #: src/libvlc-module.c:1255
 msgid "Very short backwards jump"
-msgstr "ช่วงก่อนหน้าอย่างสั้นๆ"
+msgstr "กระโดดย้อนช่วงสั้นมาก"
 
 #: src/libvlc-module.c:1257
 msgid "Select the hotkey to make a very short backwards jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงก่อนหน้าอย่างสั้นๆ"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดย้อนไปช่วงก่อนหน้าอย่างสั้นมาก"
 
 #: src/libvlc-module.c:1258
 msgid "Short backwards jump"
-msgstr "ช่วงก่อนหน้าอย่างสั้น"
+msgstr "กระโดดย้อนช่วงสั้น"
 
 #: src/libvlc-module.c:1260
 msgid "Select the hotkey to make a short backwards jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงก่อนหน้าอย่างสั้น"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดย้อนไปช่วงก่อนหน้าอย่างสั้น"
 
 #: src/libvlc-module.c:1261
 msgid "Medium backwards jump"
-msgstr "ช่วงก่อนหน้าอย่างกลาง"
+msgstr "กระโดดย้อนปานกลาง"
 
 #: src/libvlc-module.c:1263
 msgid "Select the hotkey to make a medium backwards jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงก่อนหน้าอย่างกลาง"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดย้อนไปช่วงก่อนหน้าอย่างปานกลาง"
 
 #: src/libvlc-module.c:1264
 msgid "Long backwards jump"
-msgstr "ช่วงก่อนหน้าอย่างยาว"
+msgstr "กระโดดย้อนช่วงยาว"
 
 #: src/libvlc-module.c:1266
 msgid "Select the hotkey to make a long backwards jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงก่อนหน้าอย่างยาว"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดย้อนไปช่วงก่อนหน้าอย่างยาว"
 
 #: src/libvlc-module.c:1268
 msgid "Very short forward jump"
-msgstr "ช่วงถัดไปอย่างสั้นๆ"
+msgstr "กระโดดข้ามช่วงสั้นมาก"
 
 #: src/libvlc-module.c:1270
 msgid "Select the hotkey to make a very short forward jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงถัดไปอย่างสั้นๆ"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดข้ามไปช่วงถัดไปอย่างสั้นมาก"
 
 #: src/libvlc-module.c:1271
 msgid "Short forward jump"
-msgstr "ช่วงถัดไปอย่างสั้น"
+msgstr "กระโดดข้ามช่วงสั้น"
 
 #: src/libvlc-module.c:1273
 msgid "Select the hotkey to make a short forward jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงถัดไปอย่างสั้นๆ"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดข้ามไปช่วงถัดไปอย่างสั้น"
 
 #: src/libvlc-module.c:1274
 msgid "Medium forward jump"
-msgstr "ช่วงถัดไปอย่างกลาง"
+msgstr "กระโดดข้ามปานกลาง"
 
 #: src/libvlc-module.c:1276
 msgid "Select the hotkey to make a medium forward jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงถัดไปอย่างกลาง"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดข้ามไปช่วงถัดไปอย่างปานกลาง"
 
 #: src/libvlc-module.c:1277
 msgid "Long forward jump"
-msgstr "ช่วงถัดไปอย่างยาว"
+msgstr "กระโดดข้ามช่วงยาว"
 
 #: src/libvlc-module.c:1279
 msgid "Select the hotkey to make a long forward jump."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามไปช่วงถัดไปอย่างกลาง"
+msgstr "เลือกปุ่มลัดที่จะใช้กระโดดข้ามไปช่วงถัดไปอย่างยาว"
 
 #: src/libvlc-module.c:1280 modules/control/hotkeys.c:599
 msgid "Next frame"
@@ -4015,39 +4036,39 @@ msgstr "เฟรมถัดไป"
 
 #: src/libvlc-module.c:1282
 msgid "Select the hotkey to got to the next video frame."
-msgstr "เลือกปุ่มลัดที่จะใช้ข้ามช่วงไปยังเฟรมต่างๆ"
+msgstr "เลือกปุ่มลัดที่จะใช้เลื่อนไปยังเฟรมภาพถัดไป"
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
-msgstr "การข้ามช่วงอย่างสั้นๆ"
+msgstr "ความยาวของการกระโดดอย่างสั้นมาก"
 
 #: src/libvlc-module.c:1285
 msgid "Very short jump length, in seconds."
-msgstr "การข้ามช่วงอย่างสั้นๆ เป็นวินาที"
+msgstr "ความยาวของการกระโดดอย่างสั้นมาก เป็นวินาที"
 
 #: src/libvlc-module.c:1286
 msgid "Short jump length"
-msgstr "การข้ามช่วงอย่างสั้น"
+msgstr "ความยาวของการกระโดดอย่างสั้น"
 
 #: src/libvlc-module.c:1287
 msgid "Short jump length, in seconds."
-msgstr "การข้ามช่วงอย่างสั้น เป็นวินาที"
+msgstr "ความยาวของการกระโดดอย่างสั้น เป็นวินาที"
 
 #: src/libvlc-module.c:1288
 msgid "Medium jump length"
-msgstr "การข้ามช่วงอย่างกลาง"
+msgstr "ความยาวของการกระโดดปานกลาง"
 
 #: src/libvlc-module.c:1289
 msgid "Medium jump length, in seconds."
-msgstr "การข้ามช่วงอย่างกลาง เป็นวินาที"
+msgstr "ความยาวของการกระโดดปานกลาง เป็นวินาที"
 
 #: src/libvlc-module.c:1290
 msgid "Long jump length"
-msgstr "การข้ามช่วงอย่างยาว"
+msgstr "ความยาวของการกระโดดอย่างยาว"
 
 #: src/libvlc-module.c:1291
 msgid "Long jump length, in seconds."
-msgstr "การข้ามช่วงอย่างยาว เป็นวินาที"
+msgstr "ความยาวของการกระโดดอย่างยาว เป็นวินาที"
 
 #: src/libvlc-module.c:1293 modules/control/hotkeys.c:361
 #: modules/gui/macosx/VLCStatusBarIcon.m:116
@@ -4063,107 +4084,109 @@ msgstr "เลือกปุ่มลัดที่จะใช้ออกจ
 
 #: src/libvlc-module.c:1295
 msgid "Navigate up"
-msgstr "เคลื่อนไปด้านบน"
+msgstr "เคลื่อนขึ้น"
 
 #: src/libvlc-module.c:1296
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้เคลื่อนแถบเลือกขึ้นในเมนูดีวีดี / เคลื่อนจุดมองขึ้น (มุมก้ม/เงย)"
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
-msgstr "เคลื่อนไปด้านล่าง"
+msgstr "เคลื่อนลง"
 
 #: src/libvlc-module.c:1298
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้เคลื่อนแถบเลือกลงในเมนูดีวีดี / เคลื่อนจุดมองลง (มุมก้ม/เงย)"
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
-msgstr "เคลื่อนไปด้านซ้าย"
+msgstr "เคลื่อนซ้าย"
 
 #: src/libvlc-module.c:1300
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
+"เลือกปุ่มที่จะใช้เคลื่อนแถบเลือกไปทางซ้ายในเมนูดีวีดี / เคลื่อนจุดมองไปทางซ้าย (มุมส่ายหน้า)"
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
-msgstr "เคลื่อนไปด้านขวา"
+msgstr "เคลื่อนขวา"
 
 #: src/libvlc-module.c:1302
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
+"เลือกปุ่มที่จะใช้เคลื่อนแถบเลือกไปทางขวาในเมนูดีวีดี / เคลื่อนจุดมองไปทางขวา (มุมส่ายหน้า)"
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
-msgstr "เลือกใช้"
+msgstr "เรียกใช้"
 
 #: src/libvlc-module.c:1304
 msgid "Select the key to activate selected item in DVD menus."
-msgstr "เลือกปุ่มที่จะใช้เลือกใช้รายการในเมนู DVD"
+msgstr "เลือกปุ่มที่จะใช้เรียกใช้รายการที่เลือกในเมนูดีวีดี"
 
 #: src/libvlc-module.c:1305 modules/gui/qt/dialogs/toolbar.cpp:509
 msgid "Go to the DVD menu"
-msgstr "ไปยังเมนู DVD"
+msgstr "ไปยังเมนูดีวีดี"
 
 #: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
-msgstr "เลือกปุ่มที่จะใช้เรียกเมนู DVD"
+msgstr "เลือกปุ่มที่จะใช้เปิดเมนูดีวีดี"
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
-msgstr "เลือกเรื่องก่อนหน้าของ DVD"
+msgstr "เลือกเรื่องก่อนหน้าในดีวีดี"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr "เลือกปุ่มที่จะใช้เลือกเรื่องก่อนหน้าใน DVD"
+msgstr "เลือกปุ่มที่จะใช้เลือกเรื่องก่อนหน้าในดีวีดี"
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
-msgstr "เลือกเรื่องถัดไปของ DVD"
+msgstr "เลือกเรื่องถัดไปในดีวีดี"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr "เลือกปุ่มที่จะใช้เลือกเรื่องถัดไปใน DVD"
+msgstr "เลือกปุ่มที่จะใช้เลือกเรื่องถัดไปในดีวีดี"
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
-msgstr "เลือกตอนก่อนหน้าของ DVD"
+msgstr "เลือกตอนก่อนหน้าในดีวีดี"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr "เลือกปุ่มที่จะใช้เลือกตอนก่อนหน้าใน DVD"
+msgstr "เลือกปุ่มที่จะใช้เลือกตอนก่อนหน้าในดีวีดี"
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
-msgstr "เลือกตอนถัดไปของ DVD"
+msgstr "เลือกตอนถัดไปในดีวีดี"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr "เลือกปุ่นในการเลือกตอนถัดไปใน DVD"
+msgstr "เลือกปุ่นที่จะใช้เลือกตอนถัดไปในดีวีดี"
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
-msgstr "เพิ่มระดับเสียง"
+msgstr "เพิ่มเสียงขึ้น"
 
 #: src/libvlc-module.c:1316
 msgid "Select the key to increase audio volume."
-msgstr "เลือกปุ่มที่จะใช้เพิ่มระดับเสียง"
+msgstr "เลือกปุ่มที่จะใช้เพิ่มความดังเสียง"
 
 #: src/libvlc-module.c:1317
 msgid "Volume down"
-msgstr "ลดระดับเสียง"
+msgstr "หรี่เสียงลง"
 
 #: src/libvlc-module.c:1318
 msgid "Select the key to decrease audio volume."
-msgstr "เลือกปุ่มที่จะใช้ลดระดับเสียง"
+msgstr "เลือกปุ่มที่จะใช้ลดความดังเสียง"
 
 #: src/libvlc-module.c:1319 modules/access/v4l2/v4l2.c:181
 #: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCMainMenu.m:501
@@ -4186,7 +4209,7 @@ msgstr "เลือกปุ่มที่จะใช้เพิ่มกา
 
 #: src/libvlc-module.c:1323
 msgid "Subtitle delay down"
-msgstr "ลลดการหน่วงเวลาบทบรรยาย"
+msgstr "ลดการหน่วงเวลาบทบรรยาย"
 
 #: src/libvlc-module.c:1324
 msgid "Select the key to decrease the subtitle delay."
@@ -4194,51 +4217,51 @@ msgstr "เลือกปุ่มที่จะใช้ลดการหน
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "คืนขนาดข้อความบทบรรยายเป็นขนาดปกติ"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "เพิ่มขนาดข้อความบทบรรยาย"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "ลดขนาดข้อความบทบรรยาย"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้ปรับขนาดข้อความบทบรรยาย"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
-msgstr ""
+msgstr "การพ้องเวลาบทบรรยาย / ปักหมุดเวลาในเสียง"
 
 #: src/libvlc-module.c:1330
 msgid "Select the key to bookmark audio timestamp when syncing subtitles."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้ปักหมุดเวลาในเสียงเมื่อพ้องเวลาบทบรรยาย"
 
 #: src/libvlc-module.c:1331
 msgid "Subtitle sync / bookmark subtitle timestamp"
-msgstr ""
+msgstr "การพ้องเวลาบทบรรยาย / ปักหมุดเวลาในบทบรรยาย"
 
 #: src/libvlc-module.c:1332
 msgid "Select the key to bookmark subtitle timestamp when syncing subtitles."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้ปักหมุดเวลาในบทบรรยายเมื่อพ้องเวลาบทบรรยาย"
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr ""
+msgstr "การพ้องเวลาบทบรรยาย / พ้องเวลาเสียงกับบทบรรยาย"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้พ้องเวลาเสียงกับบทบรรยายตามที่ได้ปักหมุดไว้"
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "การพ้องเวลาบทบรรยาย / ล้างค่าการพ้องเวลาเสียงกับบทบรรยาย"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
-msgstr ""
+msgstr "เลือกปุ่มที่จะใช้ล้างค่าการพ้องเวลาเสียงกับบทบรรยาย"
 
 #: src/libvlc-module.c:1337
 msgid "Subtitle position up"
@@ -4314,7 +4337,7 @@ msgstr "เล่นที่คั่นผังเล่น 10"
 
 #: src/libvlc-module.c:1361
 msgid "Select the key to play this bookmark."
-msgstr "เลือกปุ่มที่จะทำการเล่นผังเล่นตัวนี้"
+msgstr "เลือกปุ่มที่จะใช้เล่นผังเล่นนี้"
 
 #: src/libvlc-module.c:1362
 msgid "Set playlist bookmark 1"
@@ -4358,7 +4381,7 @@ msgstr "ตั้งเป็นที่คั่นผังเล่น 10"
 
 #: src/libvlc-module.c:1372
 msgid "Select the key to set this playlist bookmark."
-msgstr "ลดการหน่วงเวลาเสียง"
+msgstr "เลือกปุ่มที่จะใช้ตั้งที่คั่นผังเล่นนี้"
 
 #: src/libvlc-module.c:1373
 #: modules/gui/qt/components/playlist/standardpanel.cpp:246
@@ -4367,7 +4390,7 @@ msgstr "ล้างผังเล่น"
 
 #: src/libvlc-module.c:1374
 msgid "Select the key to clear the current playlist."
-msgstr "เลือกปุ่มที่จะใช้ในการล้างผังเล่นปัจจุบัน"
+msgstr "เลือกปุ่มที่จะใช้ล้างผังเล่นปัจจุบัน"
 
 #: src/libvlc-module.c:1376
 msgid "Playlist bookmark 1"
@@ -4411,71 +4434,71 @@ msgstr "ที่คั่นผังเล่น 10"
 
 #: src/libvlc-module.c:1387
 msgid "This allows you to define playlist bookmarks."
-msgstr ""
+msgstr "ปุ่มนี้ให้คุณสามารถตั้งชื่อที่คั่นผังเล่นได้"
 
 #: src/libvlc-module.c:1389
 msgid "Cycle audio track"
-msgstr "สับเปลี่ยนร่องเสียง"
+msgstr "วนเปลี่ยนร่องเสียง"
 
 #: src/libvlc-module.c:1390
 msgid "Cycle through the available audio tracks(languages)."
-msgstr "สับเปลี่ยนระหว่างร่องเสียง(ภาษา)ที่มีอยู่"
+msgstr "วนเปลี่ยนร่องเสียง (ภาษา) ตามที่มีอยู่"
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "วนเปลี่ยนร่องบทบรรยายในลำดับย้อนกลับ"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "วนเปลี่ยนร่องบทบรรยายตามที่มีอยู่ในลำดับย้อนกลับ"
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
-msgstr "สับเปลี่ยนร่องบทบรรยาย"
+msgstr "วนเปลี่ยนร่องบทบรรยาย"
 
 #: src/libvlc-module.c:1394
 msgid "Cycle through the available subtitle tracks."
-msgstr "สับเปลี่ยนระหว่างร่องบทบรรยายที่มีอยู่"
+msgstr "วนเปลี่ยนร่องบทบรรยายตามที่มีอยู่"
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "เปิด/ปิดบทบรรยาย"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
-msgstr ""
+msgstr "เปิด/ปิดการแสดงบทบรรยาย"
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
-msgstr ""
+msgstr "วนเปลี่ยนไปยัง Service ID รายการถัดไป"
 
 #: src/libvlc-module.c:1398
 msgid "Cycle through the available next program Service IDs (SIDs)."
-msgstr ""
+msgstr "วนเปลี่ยนไปยัง Service ID (SID) รายการถัดไปที่มีอยู่"
 
 #: src/libvlc-module.c:1399
 msgid "Cycle previous program Service ID"
-msgstr ""
+msgstr "วนเปลี่ยนไปยัง Service ID รายการก่อนหน้า"
 
 #: src/libvlc-module.c:1400
 msgid "Cycle through the available previous program Service IDs (SIDs)."
-msgstr ""
+msgstr "วนเปลี่ยนไปยัง Service ID (SID) รายการก่อนหน้าที่มีอยู่"
 
 #: src/libvlc-module.c:1401
 msgid "Cycle source aspect ratio"
-msgstr "สับเปลี่ยนสัดส่วนภาพจากแหล่ง"
+msgstr "วนเปลี่ยนสัดส่วนภาพจากแหล่ง"
 
 #: src/libvlc-module.c:1402
 msgid "Cycle through a predefined list of source aspect ratios."
-msgstr "สับเปลี่ยนระหว่างรายการที่มีของสัดส่วนภาพจากแหล่ง"
+msgstr "วนเปลี่ยนสัดส่วนภาพจากแหล่งตามรายการที่กำหนดไว้"
 
 #: src/libvlc-module.c:1403
 msgid "Cycle video crop"
-msgstr "สับเปลี่ยนขอบตัดวีดิทัศน์"
+msgstr "วนเปลี่ยนขอบตัดวีดิทัศน์"
 
 #: src/libvlc-module.c:1404
 msgid "Cycle through a predefined list of crop formats."
-msgstr "สับเปลี่ยนระหว่างขอบตัดวีดิทัศน์ที่มีอยู่"
+msgstr "วนเปลี่ยนขอบตัดวีดิทัศน์ตามรายการที่กำหนดไว้"
 
 #: src/libvlc-module.c:1405
 msgid "Toggle autoscaling"
@@ -4483,51 +4506,51 @@ msgstr "เปิด/ปิดการปรับขนาดอัตโน�
 
 #: src/libvlc-module.c:1406
 msgid "Activate or deactivate autoscaling."
-msgstr ""
+msgstr "เปิดหรือปิดใช้การปรับขนาดอัตโนมัติ"
 
 #: src/libvlc-module.c:1407
 msgid "Increase scale factor"
-msgstr "เพิ่มสัดส่วนภาพ"
+msgstr "เพิ่มอัตราการย่อ-ขยายภาพ"
 
 #: src/libvlc-module.c:1409
 msgid "Decrease scale factor"
-msgstr "ลดสัดส่วนภาพ"
+msgstr "ลดอัตราการย่อ-ขยายภาพ"
 
 #: src/libvlc-module.c:1411
 msgid "Toggle deinterlacing"
-msgstr ""
+msgstr "เปิด-ปิดการรวมภาพสอดประสาน"
 
 #: src/libvlc-module.c:1412
 msgid "Activate or deactivate deinterlacing."
-msgstr ""
+msgstr "เปิดหรือปิดใช้การรวมภาพสอดประสาน"
 
 #: src/libvlc-module.c:1413
 msgid "Cycle deinterlace modes"
-msgstr ""
+msgstr "วนเปลี่ยนโหมดการรวมภาพสอดประสาน"
 
 #: src/libvlc-module.c:1414
 msgid "Cycle through available deinterlace modes."
-msgstr ""
+msgstr "วนเปลี่ยนโหมดการรวมภาพสอดประสานตามที่มีอยู่"
 
 #: src/libvlc-module.c:1415
 msgid "Show controller in fullscreen"
-msgstr "แสดงส่วนควบคุมเมื่ออยู่ในรูปแบบเต็มจอ"
+msgstr "แสดงส่วนควบคุมในการแสดงแบบเต็มจอ"
 
 #: src/libvlc-module.c:1416
 msgid "Boss key"
-msgstr "ปุ่มหลัก"
+msgstr "ปุ่มหลบเจ้านาย"
 
 #: src/libvlc-module.c:1417
 msgid "Hide the interface and pause playback."
-msgstr ""
+msgstr "ซ่อนส่วนติดต่อและพักการเล่น"
 
 #: src/libvlc-module.c:1418
 msgid "Context menu"
-msgstr ""
+msgstr "เมนูตามบริบท"
 
 #: src/libvlc-module.c:1419
 msgid "Show the contextual popup menu."
-msgstr ""
+msgstr "ผุดเมนูตามบริบท"
 
 #: src/libvlc-module.c:1420
 msgid "Take video snapshot"
@@ -4535,18 +4558,18 @@ msgstr "จับภาพถ่ายวีดิทัศน์"
 
 #: src/libvlc-module.c:1421
 msgid "Takes a video snapshot and writes it to disk."
-msgstr "จับภาพถ่ายวีดิทัศน์แล้วเขียนลงดิสก์"
+msgstr "จับภาพถ่ายวีดิทัศน์และเขียนลงดิสก์"
 
 #: src/libvlc-module.c:1423 modules/gui/macosx/VLCMainMenu.m:387
 #: modules/gui/qt/components/controller.hpp:110
 #: modules/gui/qt/components/controller.hpp:121 modules/gui/qt/menus.cpp:857
 #: modules/stream_out/record.c:60
 msgid "Record"
-msgstr "บันทึก"
+msgstr "อัดบันทึก"
 
 #: src/libvlc-module.c:1424
 msgid "Record access filter start/stop."
-msgstr ""
+msgstr "เริ่ม/หยุดตัวผันค่าสำหรับเข้าถึงอุปกรณ์อัดบันทึก"
 
 #: src/libvlc-module.c:1426
 msgid "Normal/Loop/Repeat"
@@ -4554,11 +4577,11 @@ msgstr "ปกติ/เล่นวน/เล่นซ้ำ"
 
 #: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
-msgstr "เปิด(ปิด)การเล่น ปกติ/ซ้ำ/วน ในส่วนของผังเล่น"
+msgstr "เปิด/ปิดการเล่นผังเล่นแบบปกติ/วน/ซ้ำ"
 
 #: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
-msgstr "เปิด/ปิด การเล่นสุ่มรายการในผังเล่น"
+msgstr "เปิด/ปิดการสุ่มเล่นรายการในผังเล่น"
 
 #: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
@@ -4598,35 +4621,35 @@ msgstr "ยกเลิกการตัดขอบวีดิทัศน์
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "ลดขอบเขตภาพ (360°)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "ขยายขอบเขตภาพ (360°)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "เอียงหน้ากล้องตามเข็มนาฬิกา (360°)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "เอียงหน้ากล้องทวนเข็มนาฬิกา (360°)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
-msgstr "เปิด/ปิดรูปแบบพื้นหลังในส่วนแสดงวีดิทัศน์"
+msgstr "เปิด/ปิดโหมดแสดงเป็นพื้นโต๊ะในการแสดงวีดิทัศน์"
 
 #: src/libvlc-module.c:1466
 msgid "Toggle wallpaper mode in video output."
-msgstr "เปิด/ปิดรูปแบบพื้นหลังในส่วนแสดงวีดิทัศน์"
+msgstr "เปิด/ปิดโหมดแสดงเป็นพื้นโต๊ะในการแสดงวีดิทัศน์"
 
 #: src/libvlc-module.c:1468
 msgid "Cycle through audio devices"
-msgstr "สับเปลี่ยนอุปกรณ์เสียง"
+msgstr "วนเปลี่ยนอุปกรณ์เสียง"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr "สับเปลี่ยนระหว่างอุปกรณ์เสียงที่มีอยู่"
+msgstr "วนเปลี่ยนอุปกรณ์เสียงตามที่มีอยู่"
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -4664,11 +4687,11 @@ msgstr "ค่าตั้งร่องข้อมูล"
 
 #: src/libvlc-module.c:1753 modules/gui/macosx/VLCSimplePrefsController.m:316
 msgid "Playback control"
-msgstr "ควบคุมการเล่น"
+msgstr "การควบคุมการเล่น"
 
 #: src/libvlc-module.c:1782
 msgid "Default devices"
-msgstr "อุปกรณ์เล่นปริยาย"
+msgstr "อุปกรณ์ปริยาย"
 
 #: src/libvlc-module.c:1789
 msgid "Network settings"
@@ -4676,7 +4699,7 @@ msgstr "ค่าตั้งเครือข่าย"
 
 #: src/libvlc-module.c:1827
 msgid "Socks proxy"
-msgstr ""
+msgstr "พร็อกซี Socks"
 
 #: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
@@ -4697,7 +4720,7 @@ msgstr "VLM"
 
 #: src/libvlc-module.c:2026
 msgid "Special modules"
-msgstr "มอดูลเฉพาะ"
+msgstr "มอดูลพิเศษ"
 
 #: src/libvlc-module.c:2031 modules/gui/qt/dialogs/plugins.cpp:89
 msgid "Plugins"
@@ -4705,11 +4728,11 @@ msgstr "ปลั๊กอิน"
 
 #: src/libvlc-module.c:2043
 msgid "Performance options"
-msgstr ""
+msgstr "ตัวเลือกเกี่ยวกับสมรรถนะ"
 
 #: src/libvlc-module.c:2061
 msgid "Clock source"
-msgstr ""
+msgstr "แหล่งสัญญาณนาฬิกา"
 
 #: src/libvlc-module.c:2179
 msgid "Hot keys"
@@ -4717,43 +4740,47 @@ msgstr "ปุ่มลัด"
 
 #: src/libvlc-module.c:2668
 msgid "Jump sizes"
-msgstr ""
+msgstr "ขนาดของการข้าม"
 
 #: src/libvlc-module.c:2753
 msgid "print help for VLC (can be combined with --advanced and --help-verbose)"
-msgstr ""
+msgstr "แสดงวิธีใช้ VLC (สามารถใช้ร่วมกับ --advanced และ --help-verbose ได้)"
 
 #: src/libvlc-module.c:2756
 msgid "Exhaustive help for VLC and its modules"
-msgstr ""
+msgstr "วิธีใช้อย่างละเอียดสำหรับ VLC และมอดูลต่างๆ"
 
 #: src/libvlc-module.c:2758
 msgid ""
 "print help for VLC and all its modules (can be combined with --advanced and "
 "--help-verbose)"
 msgstr ""
+"แสดงวิธีใช้ VLC และมอดูลต่างๆ ทั้งหมด (สามารถใช้ร่วมกับ --advanced และ --help-verbose "
+"ได้)"
 
 #: src/libvlc-module.c:2761
 msgid "ask for extra verbosity when displaying help"
-msgstr ""
+msgstr "เพิ่มรายละเอียดของข้อความวิธีใช้"
 
 #: src/libvlc-module.c:2763
 msgid "print a list of available modules"
-msgstr ""
+msgstr "แสดงรายชื่อมอดูลที่มี"
 
 #: src/libvlc-module.c:2765
 msgid "print a list of available modules with extra detail"
-msgstr ""
+msgstr "แสดงรายชื่อมอดูลที่มี พร้อมรายละเอียดเพิ่มเติม"
 
 #: src/libvlc-module.c:2767
 msgid ""
 "print help on a specific module (can be combined with --advanced and --help-"
 "verbose). Prefix the module name with = for strict matches."
 msgstr ""
+"แสดงวิธีใช้มอดูลที่ระบุ (สามารถใช้ร่วมกับ --advanced และ --help-verbose ได้) "
+"หากต้องการระบุมอดูลแบบเจาะจงก็ให้นำหน้าชื่อมอดูลด้วยเครื่องหมาย ="
 
 #: src/libvlc-module.c:2771
 msgid "no configuration option will be loaded nor saved to config file"
-msgstr ""
+msgstr "จะไม่มีการอ่านหรือบันทึกตัวเลือกการตั้งค่ากับแฟ้มค่าตั้ง"
 
 #: src/libvlc-module.c:2773
 msgid "reset the current config to the default values"
@@ -4761,11 +4788,11 @@ msgstr "เรียกคืนการตั้งค่าที่ใช้
 
 #: src/libvlc-module.c:2775
 msgid "use alternate config file"
-msgstr ""
+msgstr "ใช้แฟ้มค่าตั้งอื่นตามที่ระบุ"
 
 #: src/libvlc-module.c:2777
 msgid "resets the current plugins cache"
-msgstr ""
+msgstr "ล้างแคชปัจจุบันของปลั๊กอิน"
 
 #: src/libvlc-module.c:2779
 msgid "print version information"
@@ -4773,7 +4800,7 @@ msgstr "พิมพ์รายละเอียดรุ่น"
 
 #: src/libvlc-module.c:2819
 msgid "core program"
-msgstr ""
+msgstr "โปรแกรมแกนหลัก"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -9073,28 +9100,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 บิต"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 บิต"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 บิต"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "รหัสผ่านสำหรับฐานข้อมูล"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -15648,7 +15671,7 @@ msgstr "ลูกเล่นเสียง"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:327
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:393
 msgid "Duplicate current profile..."
-msgstr "ทำสำเนาโพรไฟล์ปัจจุบัน"
+msgstr "ทำสำเนาโพรไฟล์ปัจจุบัน..."
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:332
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1044
@@ -16465,7 +16488,7 @@ msgstr "ใหญ่มาก"
 
 #: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
-msgstr "ตรวจหาการปรับปรุง..."
+msgstr "ตรวจหารุ่นปรับปรุง..."
 
 #: modules/gui/macosx/VLCMainMenu.m:342
 msgid "Preferences..."
@@ -16498,7 +16521,7 @@ msgstr "1:แฟ้ม"
 
 #: modules/gui/macosx/VLCMainMenu.m:355
 msgid "Advanced Open File..."
-msgstr "เปิดแฟ้มขั้นสูง"
+msgstr "เปิดแฟ้มขั้นสูง..."
 
 #: modules/gui/macosx/VLCMainMenu.m:356
 msgid "Open File..."
@@ -16758,7 +16781,7 @@ msgstr "เว็บไซต์ของ VideoLAN..."
 
 #: modules/gui/macosx/VLCMainMenu.m:493
 msgid "Make a donation..."
-msgstr "ทำการบริจาค..."
+msgstr "ร่วมบริจาค..."
 
 #: modules/gui/macosx/VLCMainMenu.m:494
 msgid "Online Forum..."
@@ -19142,7 +19165,7 @@ msgstr "ค่าปริยายระบบ"
 
 #: modules/gui/qt/components/simple_preferences.cpp:1301
 msgid "File associations"
-msgstr "การเข้าใช้แฟ้ม"
+msgstr "การผูกแฟ้ม"
 
 #: modules/gui/qt/components/simple_preferences.cpp:1310
 #: modules/gui/qt/dialogs_provider.hpp:42
@@ -19242,7 +19265,7 @@ msgstr "ชื่อแฟ้ม"
 #: modules/gui/qt/components/sout/sout_widgets.cpp:173
 #: modules/gui/qt/dialogs/convert.cpp:161
 msgid "Save file..."
-msgstr "บันทึกแฟ้ม"
+msgstr "บันทึกแฟ้ม..."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:174
 msgid ""
@@ -19451,11 +19474,11 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
-msgstr "ข้อกำหนดการเข้าใช้งานเครือข่าย"
+msgstr "ข้อกำหนดการเข้าถึงเครือข่าย"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr "ตรวจหารุ่นปรับปรุ่งของ VLC อย่างสม่ำเสมอ"
+msgstr "ตรวจหารุ่นปรับปรุงของ VLC อย่างสม่ำเสมอ"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -19508,11 +19531,11 @@ msgstr "ข้อมูลสื่อปัจจุบัน"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:64
 msgid "&General"
-msgstr "&ท&ั&่วไป"
+msgstr "&ทั่วไป"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:66
 msgid "&Metadata"
-msgstr "&ข&้อมูลกำกับ"
+msgstr "&ข้อมูลกำกับ"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:68
 msgid "Co&dec"
@@ -20171,7 +20194,7 @@ msgstr "ปลั๊ก&อ&ินและส่วยขยาย"
 
 #: modules/gui/qt/menus.cpp:442
 msgid "Customi&ze Interface..."
-msgstr "กำ&หนดส่วนติดต่อเอง"
+msgstr "กำ&หนดส่วนติดต่อเอง..."
 
 #: modules/gui/qt/menus.cpp:445
 msgid "&Preferences"
@@ -20251,7 +20274,7 @@ msgstr "&มโนภาพ"
 
 #: modules/gui/qt/menus.cpp:653
 msgid "Add &Subtitle File..."
-msgstr "&เพิ่มแฟ้มบทบรรยาย"
+msgstr "&เพิ่มแฟ้มบทบรรยาย..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
@@ -20315,7 +20338,7 @@ msgstr "&จ&ัดการ"
 
 #: modules/gui/qt/menus.cpp:790
 msgid "Check for &Updates..."
-msgstr "ตร&วจหาการปรับปรุง..."
+msgstr "ตร&วจหารุ่นปรับปรุง..."
 
 #: modules/gui/qt/menus.cpp:837
 msgid "&Stop"
@@ -20323,19 +20346,19 @@ msgstr "&หยุด"
 
 #: modules/gui/qt/menus.cpp:845
 msgid "Pre&vious"
-msgstr "&ก&่อนหน้า"
+msgstr "&ก่อนหน้า"
 
 #: modules/gui/qt/menus.cpp:851
 msgid "Ne&xt"
-msgstr "&ถ&ัดไป"
+msgstr "&ถัดไป"
 
 #: modules/gui/qt/menus.cpp:869
 msgid "Sp&eed"
-msgstr "ความเ&ร&็ว"
+msgstr "ความเ&ร็ว"
 
 #: modules/gui/qt/menus.cpp:875
 msgid "&Faster"
-msgstr "เร็ว&ข&ึ&้น"
+msgstr "เร็ว&ขึ้น"
 
 #: modules/gui/qt/menus.cpp:887
 msgid "N&ormal Speed"
@@ -20526,8 +20549,8 @@ msgid ""
 " - minimal mode with limited controls"
 msgstr ""
 "เริ่มทำงาน VLC ด้วย:\n"
-" - รูปแบบปกติ\n"
-" - กันบริเวณหนึ่งไว้เสมอเพื่อแสดงข้อมูล เช่น เนื้อร้อง ภาพปก...\n"
+" - โหมดปกติ\n"
+" - กันบริเวณหนึ่งไว้เสมอเพื่อแสดงข้อมูล เช่น เนื้อร้อง ภาพปก ฯลฯ\n"
 " - แสดงแต่จอ"
 
 #: modules/gui/qt/qt.cpp:151
@@ -27336,9 +27359,8 @@ msgstr "กล่องโต้ตอบ"
 #: modules/gui/qt/ui/sprefs_interface.h:529
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:313 modules/gui/qt/ui/streampanel.h:167
-#, fuzzy
 msgid "Form"
-msgstr "รูปแบบ"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -27349,9 +27371,8 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "ระดับรายละเอียด"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
 msgid "&Filter:"
@@ -27359,7 +27380,7 @@ msgstr "ตัว&กรอง"
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
-msgstr "&บ&ันทึกเป็น"
+msgstr "&บันทึกเป็น..."
 
 #: modules/gui/qt/ui/messages_panel.h:143
 msgid "Modules Tree"
@@ -27390,9 +27411,8 @@ msgid "Start Time"
 msgstr "เวลาเริ่ม"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "เวลาหยุด"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27419,13 +27439,12 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "เปลี่ยนเวลาในการเริ่มเล่นของสื่อ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
-msgstr "เล่นสื่ออื่นผสม (อาทิ แฟ้มเสียงเพิ่มเติม ...)"
+msgstr "เล่นสื่ออื่นผสม (เช่น แฟ้มเสียงเพิ่มเติม ฯลฯ)"
 
 #: modules/gui/qt/ui/open_capture.h:97
 msgid "Capture mode"
@@ -27445,11 +27464,11 @@ msgstr "ตัวเลือก"
 
 #: modules/gui/qt/ui/open_capture.h:104
 msgid "Access advanced options to tweak the device"
-msgstr "ตัวเลือกขั้นสูงในการเข้าใช้งานอุปกรณ์"
+msgstr "เข้าถึงตัวเลือกขั้นสูงเพื่อปรับค่าอุปกรณ์"
 
 #: modules/gui/qt/ui/open_capture.h:106
 msgid "Advanced options..."
-msgstr "ตัวเลือกขั้นสูง"
+msgstr "ตัวเลือกขั้นสูง..."
 
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Disc Selection"
@@ -27480,9 +27499,8 @@ msgid "Audio and Subtitles"
 msgstr "เสียงและบทบรรยาย"
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "ใช้แฟ้มบทบรรยาย"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:146
 msgid "Select the subtitle file"
@@ -27521,9 +27539,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "ตัวรวมกระแส MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27546,9 +27563,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27563,9 +27579,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "รูปแบบ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27612,9 +27627,8 @@ msgid "Custom options"
 msgstr "ตัวเลือกตั้งเอง"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "คุณภาพของภาพ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27637,14 +27651,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "อัตราการชักตัวอย่าง"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ชื่อโพรไฟล์"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27669,9 +27681,8 @@ msgid "New destination"
 msgstr "เพิ่มการส่ง"
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Display locally"
-msgstr "แสดง"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:212
 msgid "Transcoding Options"
@@ -27690,9 +27701,8 @@ msgid "Option Setup"
 msgstr "ตั้งค่าตัวเลือก"
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "เลือกปลายทางที่จะทำกระแสส่งไป"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
@@ -27703,9 +27713,8 @@ msgid "Stream all elementary streams"
 msgstr "ทำกระแสพวกกระแสมูลฐานทั้งหมด"
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "ค่าตั้งทั่วไปของส่วนส่งกระแส"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27728,9 +27737,8 @@ msgid "Visualization:"
 msgstr "มโนภาพ:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "เปิดใช้งานการยืดเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
@@ -27781,9 +27789,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "การเลือกระดับและโพรไฟล์ x264"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -27870,9 +27877,8 @@ msgid "Show systray icon"
 msgstr "แสดงไอคอนในถาดระบบ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "ส่วนติดต่อ Ncurses"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -27911,14 +27917,12 @@ msgid "Operating System Integration"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
-#, fuzzy
 msgid "File extensions association"
-msgstr "การเข้าใช้แฟ้ม"
+msgstr "การผูกนามสกุลแห้ม"
 
 #: modules/gui/qt/ui/sprefs_interface.h:568
-#, fuzzy
 msgid "Set up associations..."
-msgstr "การเข้าใช้แฟ้ม"
+msgstr "ตั้งค่าการผูกแฟ้ม..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
 msgid "Enable On Screen Display (OSD)"
@@ -27965,9 +27969,8 @@ msgid "Add a background"
 msgstr "ตั้งเป็นพื้นหลัง"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "ส่วนแสดงผล"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -27982,9 +27985,8 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:327
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "รวมภาพสอดประสาน"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
@@ -28011,14 +28013,12 @@ msgid "Run manually"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:176
-#, fuzzy
 msgid "Setup schedule"
-msgstr "ตารางเวลา"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:177
-#, fuzzy
 msgid "Run on schedule"
-msgstr "ตารางเวลา"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:178
 msgid "Status"
@@ -28115,23 +28115,20 @@ msgid "Motion detect"
 msgstr "ตรวจจับการเคลื่อนไหว"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "สภาวะเสียง"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
-#, fuzzy
 msgid "Soften"
-msgstr "นุ่มนวล"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Noise"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
