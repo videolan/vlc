@@ -8,7 +8,7 @@
 # Circo Radu <circo DOT radusorin AT gmail DOT com>, 2005
 # Cristian Secară <cristi AT secarica DOT ro>, 2007-2013
 # Cristian Silaghi <cristian.silaghi@mozilla.ro>, 2013-2014
-# eduard pintilie <eduard.pintilie@gmail.com>, 2014
+# eduard pintilie <eduard.pintilie@gmail.com>, 2014,2018
 # Ioan-Simion Ghejan <simi@simi.ro>, 2014
 # Ileana Vucicovici <ileana.vucicovici@gmail.com>, 2013
 # laura berindei <lauraagavriloae@yahoo.com>, 2014
@@ -17,11 +17,11 @@
 # Dorin V. Barbu <the.sethan@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2014-08-19 01:41+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: eduard pintilie <eduard.pintilie@gmail.com>, 2018\n"
 "Language-Team: Romanian (https://www.transifex.com/yaron/teams/16553/ro/)\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
@@ -693,7 +693,7 @@ msgstr "Mono"
 
 #: src/audio_output/output.c:425
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -850,11 +850,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(implicit activat)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(implicit dezactivat)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -935,7 +935,7 @@ msgstr "Decodor-ul nu este suportat"
 #: src/input/decoder.c:1885
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
-msgstr ""
+msgstr "VLC nu poate decoda formatul \"%4.4s\" (%s)"
 
 #: src/input/decoder.c:1889
 msgid "Unidentified codec"
@@ -943,7 +943,7 @@ msgstr "Codec neidentificat"
 
 #: src/input/decoder.c:1890
 msgid "VLC could not identify the audio or video codec"
-msgstr ""
+msgstr "VLC nu poate identifica codecul audio sau video"
 
 #: src/input/decoder.c:1901
 msgid "packetizer"
@@ -1089,11 +1089,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
 msgid "Video resolution"
-msgstr ""
+msgstr "Rezoluția video"
 
 #: src/input/es_out.c:3168
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Dimensiunea bufferului"
 
 #: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1111,39 +1111,39 @@ msgstr "Format decodat"
 
 #: src/input/es_out.c:3194
 msgid "Top left"
-msgstr ""
+msgstr "Stânga sus"
 
 #: src/input/es_out.c:3194
 msgid "Left top"
-msgstr ""
+msgstr "Stânga sus"
 
 #: src/input/es_out.c:3195
 msgid "Right bottom"
-msgstr ""
+msgstr "Dreapta jos"
 
 #: src/input/es_out.c:3195
 msgid "Top right"
-msgstr ""
+msgstr "Dreapta sus"
 
 #: src/input/es_out.c:3196
 msgid "Bottom left"
-msgstr ""
+msgstr "Stânga jos"
 
 #: src/input/es_out.c:3196
 msgid "Bottom right"
-msgstr ""
+msgstr "Dreapta jos"
 
 #: src/input/es_out.c:3197
 msgid "Left bottom"
-msgstr ""
+msgstr "Stânga jos"
 
 #: src/input/es_out.c:3197
 msgid "Right top"
-msgstr ""
+msgstr "Dreapta sus"
 
 #: src/input/es_out.c:3199
 msgid "Orientation"
-msgstr ""
+msgstr "Orientare"
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1153,11 +1153,11 @@ msgstr "Nedefinit"
 
 #: src/input/es_out.c:3207
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 linii, 60 Hz)"
 
 #: src/input/es_out.c:3209
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 linii, 50 Hz)"
 
 #: src/input/es_out.c:3217
 msgid "Color primaries"
@@ -1170,11 +1170,11 @@ msgstr "Liniar"
 
 #: src/input/es_out.c:3231
 msgid "Hybrid Log-Gamma"
-msgstr ""
+msgstr "Log-Gamma hibrid"
 
 #: src/input/es_out.c:3235
 msgid "Color transfer function"
-msgstr ""
+msgstr "Funcția de transfer de culoare"
 
 #: src/input/es_out.c:3248
 msgid "Color space"
@@ -1202,19 +1202,19 @@ msgstr "Centru"
 
 #: src/input/es_out.c:3258
 msgid "Top Left"
-msgstr ""
+msgstr "Stânga sus"
 
 #: src/input/es_out.c:3259
 msgid "Top Center"
-msgstr ""
+msgstr "Centru sus"
 
 #: src/input/es_out.c:3260
 msgid "Bottom Left"
-msgstr ""
+msgstr "Stânga jos"
 
 #: src/input/es_out.c:3261
 msgid "Bottom Center"
-msgstr ""
+msgstr "Centru jos"
 
 #: src/input/es_out.c:3265
 msgid "Chroma location"
@@ -1222,7 +1222,7 @@ msgstr ""
 
 #: src/input/es_out.c:3274
 msgid "Rectangular"
-msgstr ""
+msgstr "Dreptunghiular"
 
 #: src/input/es_out.c:3277
 msgid "Equirectangular"
@@ -1234,12 +1234,12 @@ msgstr ""
 
 #: src/input/es_out.c:3286
 msgid "Projection"
-msgstr ""
+msgstr "Proiecție"
 
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Girație"
 
 #: src/input/es_out.c:3290
 msgctxt "ViewPoint"
@@ -1258,11 +1258,11 @@ msgstr ""
 
 #: src/input/es_out.c:3300
 msgid "Max. luminance"
-msgstr ""
+msgstr "Luminanță maximă"
 
 #: src/input/es_out.c:3305
 msgid "Min. luminance"
-msgstr ""
+msgstr "Luminanță minimă"
 
 #: src/input/es_out.c:3313
 msgid "Primary R"
@@ -1373,7 +1373,7 @@ msgstr "ID pistă"
 
 #: src/input/meta.c:73
 msgid "Number of Tracks"
-msgstr ""
+msgstr "Număr de piste"
 
 #: src/input/meta.c:74
 msgid "Director"
@@ -1397,11 +1397,11 @@ msgstr "Actori"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
 msgid "Album Artist"
-msgstr ""
+msgstr "Album"
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Număr disc"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1443,11 +1443,11 @@ msgstr "Titlul precedent"
 
 #: src/input/var.c:278
 msgid "Menu title"
-msgstr ""
+msgstr "Titlu meniu"
 
 #: src/input/var.c:285
 msgid "Menu popup"
-msgstr ""
+msgstr "Meniu popup"
 
 #: src/input/var.c:319
 #, c-format
@@ -1598,6 +1598,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"Aceasta permite colorarea mesajelor trimise către consolă. Terminalul dvs. "
+"are nevoie de suport pentru culori Linux pentru ca să funcționeze."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1672,11 +1674,11 @@ msgstr ""
 
 #: src/libvlc-module.c:142
 msgid "Music"
-msgstr ""
+msgstr "Muzică"
 
 #: src/libvlc-module.c:142
 msgid "Communication"
-msgstr ""
+msgstr "Comunicare"
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
@@ -1684,23 +1686,23 @@ msgstr "Game"
 
 #: src/libvlc-module.c:143
 msgid "Notification"
-msgstr ""
+msgstr "Notificare"
 
 #: src/libvlc-module.c:143
 msgid "Animation"
-msgstr ""
+msgstr "Animație"
 
 #: src/libvlc-module.c:143
 msgid "Production"
-msgstr ""
+msgstr "Producție"
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
-msgstr ""
+msgstr "Accesibilitate"
 
 #: src/libvlc-module.c:144
 msgid "Test"
-msgstr ""
+msgstr "Test"
 
 #: src/libvlc-module.c:147
 msgid "Audio gain"
@@ -1750,6 +1752,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Setează modul canalelor de ieșire audio care vor fi utilizate în mod "
+"implicit dacă hardware-ul și fluxul audio sunt compatibile."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1760,6 +1764,8 @@ msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Această opțiune trebuie utilizată atunci când ieșirea audio nu poate negocia "
+"suportul S/PDIF."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -1852,7 +1858,7 @@ msgstr "Protecție la vârf de sunet"
 
 #: src/libvlc-module.c:227
 msgid "Protect against sound clipping"
-msgstr ""
+msgstr "Protecție împotriva întreruperilor de sunet"
 
 #: src/libvlc-module.c:230
 msgid "Enable time stretching audio"
@@ -1863,6 +1869,8 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Permite redarea audio la viteză mai mică sau mai mare fără a afecta pasul "
+"audio"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
@@ -2093,7 +2101,7 @@ msgstr "Ieșire video pe tot ecranul"
 
 #: src/libvlc-module.c:313
 msgid "Start video in fullscreen mode"
-msgstr ""
+msgstr "Deschide video în mod fullscreen"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
@@ -2105,7 +2113,7 @@ msgstr "Plasează fereastra video întotdeauna deasupra altor ferestre."
 
 #: src/libvlc-module.c:319
 msgid "Enable wallpaper mode"
-msgstr ""
+msgstr "Activează modul wallpaper"
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2226,7 +2234,7 @@ msgstr "Modul separator video"
 
 #: src/libvlc-module.c:381
 msgid "This adds video splitters like clone or wall"
-msgstr ""
+msgstr "Adaugă întreruperi video cum ar fi clone sau wall"
 
 #: src/libvlc-module.c:383
 msgid "Video filter module"
@@ -2259,6 +2267,7 @@ msgstr "Format pentru instantanee video"
 #: src/libvlc-module.c:399
 msgid "Image format which will be used to store the video snapshots"
 msgstr ""
+"Format de imagine care va fi utilizat pentru stocarea capturilor de ecran"
 
 #: src/libvlc-module.c:401
 msgid "Display video snapshot preview"
@@ -2277,6 +2286,8 @@ msgstr "Folosește numere secvențiale în loc de marcaj temporal"
 #: src/libvlc-module.c:407
 msgid "Use sequential numbers instead of timestamps for snapshot numbering"
 msgstr ""
+"Folosește numere secvențiale în loc de marcaj temporal pentru numerotarea "
+"instantaneelor"
 
 #: src/libvlc-module.c:409
 msgid "Video snapshot width"
@@ -2853,11 +2864,11 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "Directorul înregistrărilor"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "Dosarul în care se vor stoca instantaneele video."
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2868,6 +2879,8 @@ msgid ""
 "When possible, the input stream will be recorded instead of using the stream "
 "output module"
 msgstr ""
+"Când este posibil, în locul folosirii modulului de ieşire flux, va fi "
+"înregistrat fluxul de intrare"
 
 #: src/libvlc-module.c:680
 msgid "Timeshift directory"
@@ -2936,11 +2949,11 @@ msgstr ""
 
 #: src/libvlc-module.c:710
 msgid "Subtitles text scaling factor"
-msgstr ""
+msgstr "Mărimea textului din subtitrare"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Modifică dimensiunea subtitrării acolo unde este posibil"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -3079,18 +3092,24 @@ msgid ""
 "This is the default DVD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"Aceasta este unitatea DVD (sau fișierul) utilizat implicit. Nu uitați să "
+"adăugați două puncte după litera de unitate (de exemplu, D :)"
 
 #: src/libvlc-module.c:771
 msgid ""
 "This is the default VCD drive (or file) to use. Don't forget the colon after "
 "the drive letter (e.g. D:)"
 msgstr ""
+"Aceasta este unitatea VCD (sau fișierul) utilizat implicit. Nu uitați să "
+"adăugați două puncte după litera de unitate (de exemplu, D :)"
 
 #: src/libvlc-module.c:774 modules/access/cdda.c:704
 msgid ""
 "This is the default Audio CD drive (or file) to use. Don't forget the colon "
 "after the drive letter (e.g. D:)"
 msgstr ""
+"Aceasta este unitatea audio CD (sau fișierul) utilizat implicit. Nu uitați "
+"să adăugați două puncte după litera de unitate (de exemplu, D :)"
 
 #: src/libvlc-module.c:781
 msgid "This is the default DVD device to use."
@@ -3110,7 +3129,7 @@ msgstr "Limită de timp conexiune TCP"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "Limita implicită de conectare TCP (în milisecunde)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3620,13 +3639,15 @@ msgstr ""
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "Scanare pentru puginuri noi"
 
 #: src/libvlc-module.c:1055
 msgid ""
 "Scan plugin directories for new plugins at startup. This increases the "
 "startup time of VLC."
 msgstr ""
+"Scanarea la pornire a directoarelor cu pluginuri pentru pluginuri noi. "
+"Scanarea crește timpul de pornire a programului VLC."
 
 #: src/libvlc-module.c:1058
 msgid "Preferred keystore list"
@@ -3685,6 +3706,8 @@ msgstr "Pornește pe baza asocierii de fișier"
 #: src/libvlc-module.c:1084
 msgid "Tell VLC that it is being launched due to a file association in the OS"
 msgstr ""
+"Informează VLC că este lansat datorită unei asocieri de fișier în sistemul "
+"de operare"
 
 #: src/libvlc-module.c:1087 modules/gui/qt/ui/sprefs_interface.h:550
 msgid "Use only one instance when started from file manager"
@@ -3741,7 +3764,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1117
 msgid "Automatically preparse items"
-msgstr ""
+msgstr "Preanalizează fișierele automat"
 
 #: src/libvlc-module.c:1119
 msgid ""
@@ -3755,7 +3778,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1124
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr ""
+msgstr "Timpul maxim permis pentru pregătirea unui element, în milisecunde"
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3805,11 +3828,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Afișează fișierele ascunse"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Ignoră fișierele care încep cu '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3878,7 +3901,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
-msgstr ""
+msgstr "Întrerupe fiecare element din lista de redare la primul cadru."
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3936,11 +3959,11 @@ msgstr "Ignoră"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Controlul volumului"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Controlul poziției"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
@@ -4237,6 +4260,8 @@ msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
 msgstr ""
+"Selectați tasta pentru a deplasa selectorul în sus în meniurile DVD / mutați "
+"punctul de vizualizare în sus (pas)."
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
@@ -4247,6 +4272,8 @@ msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
 msgstr ""
+"Selectați tasta pentru a deplasa selectorul în jos în meniurile DVD / mutați "
+"punctul de vizualizare în jos (pitch)."
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
@@ -4257,6 +4284,8 @@ msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
 msgstr ""
+"Selectați tasta pentru a deplasa selectorul la stânga în meniurile DVD / "
+"mutați punctul de vizualizare la stânga (yaw)."
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
@@ -4267,6 +4296,8 @@ msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
 msgstr ""
+"Selectați tasta pentru a deplasa selectorul la dreapta în meniurile DVD / "
+"mutați punctul de vizualizare la dreapta (yaw)."
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4283,7 +4314,7 @@ msgstr "Mers la meniul DVD"
 
 #: src/libvlc-module.c:1306
 msgid "Select the key to take you to the DVD menu"
-msgstr ""
+msgstr "Selectați tasta pentru a accesa meniul DVD"
 
 #: src/libvlc-module.c:1307
 msgid "Select previous DVD title"
@@ -4291,7 +4322,7 @@ msgstr "Selectare titlu DVD precedent"
 
 #: src/libvlc-module.c:1308
 msgid "Select the key to choose the previous title from the DVD"
-msgstr ""
+msgstr "Selectează tasta pentru alegerea titlului precedent din DVD"
 
 #: src/libvlc-module.c:1309
 msgid "Select next DVD title"
@@ -4299,7 +4330,7 @@ msgstr "Selectare titlu DVD următor"
 
 #: src/libvlc-module.c:1310
 msgid "Select the key to choose the next title from the DVD"
-msgstr ""
+msgstr "Selectează tasta pentru alegerea titlului următor din DVD"
 
 #: src/libvlc-module.c:1311
 msgid "Select prev DVD chapter"
@@ -4307,7 +4338,7 @@ msgstr "Selectare capitol DVD precedent"
 
 #: src/libvlc-module.c:1312
 msgid "Select the key to choose the previous chapter from the DVD"
-msgstr ""
+msgstr "Selectează tasta pentru alegerea capitolului precedent din DVD"
 
 #: src/libvlc-module.c:1313
 msgid "Select next DVD chapter"
@@ -4315,7 +4346,7 @@ msgstr "Selectare capitol DVD următor"
 
 #: src/libvlc-module.c:1314
 msgid "Select the key to choose the next chapter from the DVD"
-msgstr ""
+msgstr "Selectează tasta pentru alegerea capitolului următor din DVD"
 
 #: src/libvlc-module.c:1315
 msgid "Volume up"
@@ -4362,19 +4393,19 @@ msgstr "Selectează tasta pentru a micșora întârzierea subtitlului."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Resetarea mărimii textului subtitrării"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Mărirea textului subtitrării"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Micșorarea textului subtitrării"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
-msgstr ""
+msgstr "Selectaţi tasta pentru a modifica mărimea subtitrării"
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4598,11 +4629,11 @@ msgstr "Comutare ciclică prin pistele audio disponibile (limbi)."
 
 #: src/libvlc-module.c:1391
 msgid "Cycle subtitle track in reverse order"
-msgstr ""
+msgstr "Comutare ciclică în ordine inversă a subtitrării"
 
 #: src/libvlc-module.c:1392
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr ""
+msgstr "Comutare ciclică în ordine inversă a subtitrărilor valabile"
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -4614,7 +4645,7 @@ msgstr "Comutare ciclică prin pistele de subtitlu disponibile."
 
 #: src/libvlc-module.c:1395
 msgid "Toggle subtitles"
-msgstr ""
+msgstr "Comutare subtitrări"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
@@ -4727,15 +4758,15 @@ msgstr "Pornește/oprește filtrul de acces pentru înregistrare."
 
 #: src/libvlc-module.c:1426
 msgid "Normal/Loop/Repeat"
-msgstr ""
+msgstr "Normal / Buclă / Repetă"
 
 #: src/libvlc-module.c:1427
 msgid "Toggle Normal/Loop/Repeat playlist modes"
-msgstr ""
+msgstr "Comută între Normal / Buclă / Repetă"
 
 #: src/libvlc-module.c:1430
 msgid "Toggle random playlist playback"
-msgstr ""
+msgstr "Comută la redarea aleatoare a listei de redare"
 
 #: src/libvlc-module.c:1435 src/libvlc-module.c:1436
 msgid "Un-Zoom"
@@ -4776,19 +4807,19 @@ msgstr ""
 
 #: src/libvlc-module.c:1459
 msgid "Shrink the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Micșorează punctul de vedere al vederii (360°)"
 
 #: src/libvlc-module.c:1460
 msgid "Expand the viewpoint field of view (360°)"
-msgstr ""
+msgstr "Mărește punctul de vedere al vederii (360°)"
 
 #: src/libvlc-module.c:1461
 msgid "Roll the viewpoint clockwise (360°)"
-msgstr ""
+msgstr "Rotește punctul de vedere în sens orar (360°)"
 
 #: src/libvlc-module.c:1462
 msgid "Roll the viewpoint anti-clockwise (360°)"
-msgstr ""
+msgstr "Rotește punctul de vedere în sens antiorar (360°)"
 
 #: src/libvlc-module.c:1464
 msgid "Toggle wallpaper mode in video output"
@@ -4804,7 +4835,7 @@ msgstr "Comutare ciclică prin dispozitivele audio"
 
 #: src/libvlc-module.c:1469
 msgid "Cycle through available audio devices"
-msgstr ""
+msgstr "Comutare ciclică prin dispozitivele audio disponibile"
 
 #: src/libvlc-module.c:1598 src/video_output/vout_intf.c:274
 #: modules/gui/macosx/VLCMainMenu.m:434 modules/gui/macosx/VLCMainMenu.m:512
@@ -4961,7 +4992,7 @@ msgstr "afișează informații despre versiune"
 
 #: src/libvlc-module.c:2819
 msgid "core program"
-msgstr ""
+msgstr "program principal"
 
 #: src/misc/actions.c:52
 msgid "Backspace"
@@ -5266,7 +5297,7 @@ msgstr "%.1f KiB"
 #: src/misc/update.c:488
 #, c-format
 msgid "%<PRIu64> B"
-msgstr ""
+msgstr "%<PRIu64> B"
 
 #: src/misc/update.c:580
 msgid "Saving file failed"
@@ -6157,13 +6188,15 @@ msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
 msgid "No video devices found"
-msgstr ""
+msgstr "Niciun dispozitiv video găsit"
 
 #: modules/access/avcapture.m:287
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
+"Computerul Mac nu pare să fie echipat cu un dispozitiv de intrare video "
+"adecvat. Verificați conectorii și driverele."
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6203,6 +6236,8 @@ msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
 msgstr ""
+"Codul regional al playerului Blu-Ray. Unele discuri pot fi redate numai cu "
+"un cod de regiune corect."
 
 #: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
 #: modules/gui/qt/ui/open_disk.h:299
@@ -6215,13 +6250,15 @@ msgstr "Suport pentru disc Blu-ray Disc (libbluray)"
 
 #: modules/access/bluray.c:722
 msgid "Path doesn't appear to be a Blu-ray"
-msgstr ""
+msgstr "Calea nu pare să fie un Blu-ray"
 
 #: modules/access/bluray.c:737
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
 msgstr ""
+"Acest disc Blu-ray necesită o bibliotecă pentru decodarea AACS, iar sistemul "
+"dvs. nu o are."
 
 #: modules/access/bluray.c:743
 msgid "Blu-ray Disc is corrupted."
@@ -6256,6 +6293,8 @@ msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
 msgstr ""
+"Acest disc Blu-ray necesită o bibliotecă pentru decodarea BD+, iar sistemul "
+"dvs. nu o are."
 
 #: modules/access/bluray.c:766
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
@@ -6264,7 +6303,7 @@ msgstr ""
 
 #: modules/access/bluray.c:799
 msgid "Java required"
-msgstr ""
+msgstr "Necesită Java"
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6272,14 +6311,18 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"Acest disc Blu-ray necesită suport pentru meniuri Java.%s\n"
+"DIscul va fi redat fără meniuri."
 
 #: modules/access/bluray.c:801
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Nu a fost găsit Java în sistemul dvs."
 
 #: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
+"Eroare la pornirea redării Blu-ray. Vă rugăm să încercați fără suport de "
+"meniu."
 
 #: modules/access/bluray.c:852 modules/access/bluray.c:2287
 #: modules/access/bluray.c:2292
@@ -6288,11 +6331,11 @@ msgstr "Eroare Blu-ray"
 
 #: modules/access/bluray.c:1674
 msgid "Top Menu"
-msgstr ""
+msgstr "Meniul de sus"
 
 #: modules/access/bluray.c:1677
 msgid "First Play"
-msgstr ""
+msgstr "Primul redat"
 
 #: modules/access/cdda.c:480
 #, c-format
@@ -6330,19 +6373,20 @@ msgstr "Portul serverului CDDB folosit."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "Listă de intrări"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
 msgstr ""
+"Listă de intrări cu adrese URL separate cu virgule, pentru concatenare."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "Concatenare"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "Intrări concatenate"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6354,19 +6398,19 @@ msgstr "Intrare Cameră Digitală IIDC (FireWire)"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "Fișier de tip KDM"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
-msgstr ""
+msgstr "Calea către fișierul Key Delivery Message XML "
 
 #: modules/access/dcp/dcp.cpp:77
 msgid "DCP"
-msgstr ""
+msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
-msgstr ""
+msgstr "Modul Digital Cinema Package"
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -6383,6 +6427,7 @@ msgstr ""
 #: modules/access/decklink.cpp:49
 msgid "Desired input video mode. Leave empty for autodetection."
 msgstr ""
+"Modul video de intrare dorit. Pentru autodetecție, se lasă necompletat."
 
 #: modules/access/decklink.cpp:51
 msgid ""
@@ -6464,7 +6509,7 @@ msgstr "Compozit"
 
 #: modules/access/decklink.cpp:82
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6546,6 +6591,8 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"Numele dispozitivului audio care va fi folosit de modulul DirectShow. Dacă "
+"nu specificați nimic, se va folosi dispozitivul implicit."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6712,6 +6759,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"Modul tunerului AM. Poate fi: Implicit (0), TV (1), Radio AM (2), Radio FM "
+"(3), sau DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6779,7 +6828,7 @@ msgstr "Dispozitivul de captură „%s” nu suportă paremetrii necesari."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "Rețele Windows"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -7006,7 +7055,7 @@ msgstr "Durată întrețesere Strat C"
 
 #: modules/access/dtv/access.c:154
 msgid "Stream identifier"
-msgstr ""
+msgstr "Identificator de flux"
 
 #: modules/access/dtv/access.c:156
 msgid "Pilot"
@@ -7092,6 +7141,9 @@ msgid ""
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
+"Convertorul (LNB) va scădea frecvența oscilatorului local de la frecvența de "
+"transmisie prin satelit. Rezultatul va fi frecvența intermediară (IF) de pe "
+"cablul RF."
 
 #: modules/access/dtv/access.c:189
 msgid "Universal LNB switch frequency (kHz)"
@@ -7271,7 +7323,7 @@ msgstr "DV"
 
 #: modules/access/dvb/access.c:66
 msgid "Probe DVB card for capabilities"
-msgstr ""
+msgstr "Probează capabilitățile plăcii DVB"
 
 #: modules/access/dvb/access.c:67
 msgid ""
@@ -7281,15 +7333,15 @@ msgstr ""
 
 #: modules/access/dvb/access.c:70
 msgid "Satellite scanning config"
-msgstr ""
+msgstr "Configurare pentru scanarea prin satelit"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
-msgstr ""
+msgstr "Numele fișierului de configurare din share/dvb/dvb-s."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "Listă de scanare a posturilor"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
@@ -7301,7 +7353,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
-msgstr ""
+msgstr "DVB"
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -7316,7 +7368,7 @@ msgstr ""
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "Scanare DVB"
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7436,6 +7488,8 @@ msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
 msgstr ""
+"Numele de utilizator care va fi folosit pentru conexiune, dacă nu este setat "
+"niciun nume de utilizator în URL"
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7456,6 +7510,8 @@ msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
+"Stabileşte parola pentru conexiune, dacă nu este stabilit în adresă nici-un "
+"nume sau parolă."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7467,12 +7523,14 @@ msgstr "Contul care va fi folosit pentru conexiune."
 
 #: modules/access/ftp.c:78
 msgid "FTP authentication"
-msgstr ""
+msgstr "Autentificare FTP"
 
 #: modules/access/ftp.c:79
 #, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
 msgstr ""
+"Introduceți vă rog un utilizator și o parola validă pentru conectiunea ftp "
+"la %s"
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7528,11 +7586,11 @@ msgstr ""
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "Intrare HTTPS"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
-msgstr ""
+msgstr "HTTPS"
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7540,11 +7598,11 @@ msgstr "Flux continuu"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
-msgstr ""
+msgstr "Continuă citirea unei resurse care continuă să fie actualizată."
 
 #: modules/access/http/access.c:300
 msgid "Cookies forwarding"
-msgstr ""
+msgstr "Trimitere cookie-uri"
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
@@ -7560,7 +7618,7 @@ msgstr ""
 
 #: modules/access/http/access.c:307
 msgid "User agent"
-msgstr ""
+msgstr "Agent utilizator"
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -7987,7 +8045,7 @@ msgstr "Citirea fișierului a eșuat"
 #: modules/access/mtp.c:168
 #, c-format
 msgid "VLC could not read the file: %s"
-msgstr ""
+msgstr "VLC nu poate citi fişierul: %s"
 
 #: modules/access/nfs.c:49
 msgid "Set NFS uid/guid automatically"
@@ -8001,15 +8059,15 @@ msgstr ""
 
 #: modules/access/nfs.c:57
 msgid "NFS"
-msgstr ""
+msgstr "NFS"
 
 #: modules/access/nfs.c:58
 msgid "NFS input"
-msgstr ""
+msgstr "Intrare NFS"
 
 #: modules/access/nfs.c:114
 msgid "NFS operation failed"
-msgstr ""
+msgstr "Operațiunea NFS a eșuat"
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8054,25 +8112,27 @@ msgstr "Intrare PulseAudio"
 
 #: modules/access/qtsound.m:59
 msgid "QTSound"
-msgstr ""
+msgstr "QTSound"
 
 #: modules/access/qtsound.m:60
 msgid "QuickTime Sound Capture"
-msgstr ""
+msgstr "Captură de sunet Quicktime"
 
 #: modules/access/qtsound.m:262
 msgid "No Audio Input device found"
-msgstr ""
+msgstr "Niciun dispozitiv de intrare audio găsit"
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
+"Computerul Mac nu pare să fie echipat cu un dispozitiv de intrare audio "
+"adecvat. Verificați conectorii și driverele."
 
 #: modules/access/qtsound.m:293
 msgid "No audio input device found"
-msgstr ""
+msgstr "Niciun dispozitiv de intrare audio găsit"
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8497,15 +8557,15 @@ msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
-msgstr ""
+msgstr "SRT"
 
 #: modules/access/srt.c:387
 msgid "SRT input"
-msgstr ""
+msgstr "Intrare SRT"
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
 msgid "SRT chunk size (bytes)"
-msgstr ""
+msgstr "Dimensiunea pachetului SRT (octeți)"
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
@@ -8513,7 +8573,7 @@ msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
-msgstr ""
+msgstr "Latența SRT (ms)"
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8578,6 +8638,10 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"Forţează dispozitivul video Video4Linux2, să folosească un format specific "
+"de saturație cromatică (ex.  I420 or I422 pentru imagini brute-raw,  MJPG "
+"pentru intrările comprimate M-JPEG). Lista completă: GREY, I240, RV16, RV15, "
+"RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, I420, I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8601,7 +8665,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr ""
+msgstr "Rata de cadre maximă de utilizat (0 = fără limite)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -8949,6 +9013,11 @@ msgid ""
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
+"Setează comenzile driverului v4l2 la valorile specificate utilizând o listă "
+"separată prin virgulă, opțional încapsulată de acolade (de exemplu: "
+"{video_bitrate=6000000, audio_crc=0, stream_type=3}). Pentru a lista "
+"comenzile disponibile, măriți verbositatea (-vv) sau utilizați aplicația "
+"v4l2-ctl."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
@@ -9068,12 +9137,12 @@ msgstr "Înregistrări VDR"
 #: modules/access/vdr.c:380
 #, c-format
 msgid "VLC could not read the file (%s)."
-msgstr ""
+msgstr "VLC nu poate citi fişierul: %s"
 
 #: modules/access/vdr.c:545
 #, c-format
 msgid "VLC could not open the file \"%s\" (%s)."
-msgstr ""
+msgstr "VLC nu poate deschide fișierul \"%s\" (%s)."
 
 #: modules/access/vdr.c:820
 msgid "VDR Cut Marks"
@@ -9105,7 +9174,7 @@ msgstr "Certificat Client X.509"
 
 #: modules/access/vnc.c:53
 msgid "Certificate for client authentication"
-msgstr ""
+msgstr "Certificat pentru autentificarea clientului"
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
@@ -9113,7 +9182,7 @@ msgstr "Cheia privată X,509 a clientului "
 
 #: modules/access/vnc.c:55
 msgid "Private key for authentication by certificate"
-msgstr ""
+msgstr "Cheia privată pentru autentificarea prin certificat"
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9125,7 +9194,7 @@ msgstr "Nivel de compresie"
 
 #: modules/access/vnc.c:62
 msgid "Transfer compression level from 0 (none) to 9 (max)"
-msgstr ""
+msgstr "Nivel de compresie al transferului de la 0 (nici unul) la 9 (max)"
 
 #: modules/access/vnc.c:63
 msgid "Image quality"
@@ -9145,7 +9214,7 @@ msgstr "Accesul VNC a clientului"
 
 #: modules/access/wasapi.c:485
 msgid "Loopback mode"
-msgstr ""
+msgstr "Modul Loopback"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
@@ -9153,11 +9222,11 @@ msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
-msgstr ""
+msgstr "WASAPI"
 
 #: modules/access/wasapi.c:490
 msgid "Windows Audio Session API input"
-msgstr ""
+msgstr "Intrare Windows Audio Session API"
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
@@ -9218,7 +9287,7 @@ msgstr "Flux de ieșire în fișier"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
 msgid "Username that will be requested to access the stream."
-msgstr ""
+msgstr "Numele de utilizator care va fi cerut pentru a accesa fluxul."
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9236,12 +9305,14 @@ msgstr ""
 
 #: modules/access_output/http.c:61
 msgid "Metacube"
-msgstr ""
+msgstr "Metacube"
 
 #: modules/access_output/http.c:62
 msgid ""
 "Use the Metacube protocol. Needed for streaming to the Cubemap reflector."
 msgstr ""
+"Folosește protocolul Metacube. Necesar pentru streaming la reflectorul "
+"Cubemap."
 
 #: modules/access_output/http.c:67
 msgid "HTTP stream output"
@@ -9336,6 +9407,9 @@ msgid ""
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
+"Fişierul este citit când segmentul este iniţiat, se presupune a fi în "
+"formatul: key-uri\\nkey-file. Fişierul este citit la deschiderea "
+"segmentului, iar valorile sunt folosite pentru acel segment."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -9347,11 +9421,11 @@ msgstr "Generare IV în locul folosirii numărului-de-segment ca şi IV"
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
-msgstr ""
+msgstr "Numărul primului segment"
 
 #: modules/access_output/livehttp.c:106
 msgid "The number of the first segment generated"
-msgstr ""
+msgstr "Numărul primului segment generat"
 
 #: modules/access_output/livehttp.c:109
 msgid "HTTP Live streaming output"
@@ -9401,7 +9475,7 @@ msgstr "Descrierea genului"
 
 #: modules/access_output/shout.c:83
 msgid "Genre of the content."
-msgstr ""
+msgstr "Tipul conținutului."
 
 #: modules/access_output/shout.c:85
 msgid "URL description"
@@ -9409,11 +9483,11 @@ msgstr "Descriere URL"
 
 #: modules/access_output/shout.c:86
 msgid "URL with information about the stream or your channel."
-msgstr ""
+msgstr "URL cu informaţii despre fluxul sau despre canalul dvs."
 
 #: modules/access_output/shout.c:93
 msgid "Bitrate information of the transcoded stream."
-msgstr ""
+msgstr "Informația ratei de biți a fluxului transcodat."
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
@@ -9425,7 +9499,7 @@ msgstr "Numărul de canale"
 
 #: modules/access_output/shout.c:99
 msgid "Number of channels information of the transcoded stream."
-msgstr ""
+msgstr "Numărul de informații despre canalul din fluxul transcodat."
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
@@ -9433,7 +9507,7 @@ msgstr "Calitate Ogg Vorbis"
 
 #: modules/access_output/shout.c:102
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr ""
+msgstr "Informaţii despre Calitatea Ogg Vorbis a fluxului transcodat."
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9459,28 +9533,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 biți"
+msgstr "16 octeți"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 de biți"
+msgstr "24 octeți"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 de biți"
+msgstr "32 octeți"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
-msgstr ""
+msgstr "Flux de ieșire SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Parolă pentru proxy-ul HTTP"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9526,7 +9596,7 @@ msgstr "Saturaţie cromatică ARM NEON, YUV->RGBA"
 
 #: modules/audio_filter/audiobargraph_a.c:39
 msgid "Defines if BarGraph information should be sent"
-msgstr ""
+msgstr "Definește dacă trebuie trimisă informația BarGraph"
 
 #: modules/audio_filter/audiobargraph_a.c:40
 msgid ""
@@ -9538,7 +9608,7 @@ msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:42
 msgid "Sends the barGraph information every n audio packets"
-msgstr ""
+msgstr "Trimite informația barGraph la fiecare n pachete audio"
 
 #: modules/audio_filter/audiobargraph_a.c:43
 msgid ""
@@ -9550,7 +9620,7 @@ msgstr ""
 
 #: modules/audio_filter/audiobargraph_a.c:45
 msgid "Defines if silence alarm information should be sent"
-msgstr ""
+msgstr "Defineşte dacă ar trebui trimisă informaţia de alarmă silenţioasă"
 
 #: modules/audio_filter/audiobargraph_a.c:46
 msgid ""
@@ -9748,7 +9818,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Mod Headphones (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
@@ -9846,7 +9916,7 @@ msgstr "RMS/vârf"
 
 #: modules/audio_filter/compressor.c:156
 msgid "Set the RMS/peak."
-msgstr ""
+msgstr "Stabileşte RMS/vârf."
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
@@ -9854,7 +9924,7 @@ msgstr "Timp de Atac"
 
 #: modules/audio_filter/compressor.c:159
 msgid "Set the attack time in milliseconds."
-msgstr ""
+msgstr "Stabileşte timpul de atac, în milisecunde."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
@@ -9862,7 +9932,7 @@ msgstr "Timp de Eliberare"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
-msgstr ""
+msgstr "Stabileşte timpul de eliberare, în milisecunde."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -9870,7 +9940,7 @@ msgstr "Nivel de prag"
 
 #: modules/audio_filter/compressor.c:165
 msgid "Set the threshold level in dB."
-msgstr ""
+msgstr "Stabilește nivelul pragului în dB."
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9880,7 +9950,7 @@ msgstr "Raport"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
-msgstr ""
+msgstr "Stabilește raportul (n: 1)."
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9916,7 +9986,7 @@ msgstr "Fitru audio pentru conversie de format PCM"
 
 #: modules/audio_filter/converter/tospdif.c:49
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr ""
+msgstr "Filtru audio pentru încapsulare A/52/DTS->S/PDIF "
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10184,7 +10254,7 @@ msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
-msgstr ""
+msgstr "Reeșantionare SoX"
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10501,6 +10571,8 @@ msgid ""
 "You should configure your speaker layout with \"Audio Midi Setup\" in /"
 "Applications/Utilities. VLC will output Stereo only."
 msgstr ""
+"Ar trebui să configurați șablonul difuzorului la \"Audio Midi Setup\" în /"
+"Applications/Utilities. VLC va reda doar stereo."
 
 #: modules/audio_output/auhal.c:1180
 msgid ""
@@ -10569,7 +10641,7 @@ msgstr "Fișier de ieșire"
 
 #: modules/audio_output/file.c:109
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr ""
+msgstr "Fișierul în care vor fi scrise eșantioanele audio („-” pentru stdout)."
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10641,10 +10713,12 @@ msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
+"Schimbați această valoare dacă aveți o problemă cu codecuri HD atunci când "
+"utilizați un receptor HDMI."
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "Dezactivat"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
@@ -10652,11 +10726,11 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "Activat"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "Ieșire dispozitiv Windows Multimedia "
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Output back-end"
@@ -10692,7 +10766,7 @@ msgstr "Acest nivel liniar va fi aplicat în software."
 
 #: modules/audio_output/wasapi.c:640
 msgid "Windows Audio Session API output"
-msgstr ""
+msgstr "Ieșire API pentru Windows Session Audio"
 
 #: modules/audio_output/waveout.c:135
 msgid "Select Audio Device"
@@ -10762,7 +10836,7 @@ msgstr "Generator pachete audio AES3/SMPTE 302M"
 
 #: modules/codec/aom.c:50
 msgid "AOM video decoder"
-msgstr ""
+msgstr "Decodor video AOM"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10774,7 +10848,7 @@ msgstr "Codor audio brut"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
 msgid "SoundFont file"
-msgstr ""
+msgstr "Fișier SoundFont"
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
 msgid "SoundFont file to use for software synthesis."
@@ -10786,7 +10860,7 @@ msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
-msgstr ""
+msgstr "AUMIDI"
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
@@ -10798,20 +10872,20 @@ msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
-msgstr ""
+msgstr "Folosește randarea Core Text"
 
 #: modules/codec/arib/aribsub.c:49
 msgid "Use Core Text renderer in the subtitle."
-msgstr ""
+msgstr "Folosește randarea Core Text la subtitrare."
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
-msgstr ""
+msgstr "Decodor de subtitrări ARIB"
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
 msgid "ARIB subtitles"
-msgstr ""
+msgstr "Subtitrări ARIB"
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10872,7 +10946,7 @@ msgstr "Randare directă"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr ""
+msgstr "Afișează cadrele stricate"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
@@ -11332,19 +11406,19 @@ msgstr ""
 #: modules/codec/avcodec/encoder.c:897
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
-msgstr ""
+msgstr "VLC nu poate deschide codificatorul %4.4s %s."
 
 #: modules/codec/avcodec/vaapi.c:352
 msgid "VA-API video decoder via DRM"
-msgstr ""
+msgstr "Decodor video VA-API prin DRM"
 
 #: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
-msgstr ""
+msgstr "Decodor video VA-API"
 
 #: modules/codec/bpg.c:49
 msgid "BPG image decoder"
-msgstr ""
+msgstr "Decodor de imagine BPG"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -11355,6 +11429,7 @@ msgstr "Opacitate"
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
 msgstr ""
+"Setarea la true face ca textul să fie marcat și poate mai ușor de citit."
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11388,19 +11463,19 @@ msgstr "Calitate de codare"
 
 #: modules/codec/daala.c:111
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr ""
+msgstr "Forțează o calitate între 0 (scăzută) și 10 (înaltă)"
 
 #: modules/codec/daala.c:112
 msgid "Keyframe interval"
-msgstr ""
+msgstr "Intervalul pentru cadre cheie"
 
 #: modules/codec/daala.c:114
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr ""
+msgstr "Forțează un interval pentru cadre cheie între 1 și 1000."
 
 #: modules/codec/daala.c:120
 msgid "Daala video decoder"
-msgstr ""
+msgstr "Decodor video Daala"
 
 #: modules/codec/daala.c:125
 msgid "Daala video packetizer"
@@ -11408,7 +11483,7 @@ msgstr ""
 
 #: modules/codec/daala.c:132
 msgid "Daala video encoder"
-msgstr ""
+msgstr "Codificator video Daala"
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11542,7 +11617,7 @@ msgstr "Activare replicare bandă spectrală"
 
 #: modules/codec/fdkaac.c:71
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr ""
+msgstr "Aceasta este o caracteristică opţională numai pentru profilul AAC-ELD"
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
@@ -11552,6 +11627,7 @@ msgstr "Calitate VBR"
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
 msgstr ""
+"Calitatea codării VBR (0=cbr, 1-5 vbr rapid constant, 5 e cel mai bun)."
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
@@ -11562,6 +11638,8 @@ msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
+"Această bibliotecă va produce un sunet de calitate superioară, în "
+"detrimentul utilizării suplimentare a procesorului (implicit este activat)."
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
@@ -11572,6 +11650,8 @@ msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
 msgstr ""
+"1 este explicit pentru SBR și implicit pentru PS (implicit), 2 este explicit "
+"ierarhic."
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -11603,7 +11683,7 @@ msgstr "Codor audio FDK-AAC"
 
 #: modules/codec/flac.c:164
 msgid "Flac audio decoder"
-msgstr ""
+msgstr "Decodor audio Flac"
 
 #: modules/codec/flac.c:171
 msgid "Flac audio encoder"
@@ -11625,13 +11705,15 @@ msgstr ""
 
 #: modules/codec/fluidsynth.c:57
 msgid "Polyphony"
-msgstr ""
+msgstr "Polifonie"
 
 #: modules/codec/fluidsynth.c:59
 msgid ""
 "The polyphony defines how many voices can be played at a time. Larger values "
 "require more processing power."
 msgstr ""
+"Polifonia definește numărul de voci care se pot auzi la un moment dat. "
+"Valorile mai mari necesită mai multă putere de procesare."
 
 #: modules/codec/fluidsynth.c:62 modules/demux/mod.c:82
 msgid "Reverb"
@@ -11643,7 +11725,7 @@ msgstr ""
 
 #: modules/codec/fluidsynth.c:72
 msgid "FluidSynth"
-msgstr ""
+msgstr "FluidSynth"
 
 #: modules/codec/fluidsynth.c:150
 msgid "MIDI synthesis not set up"
@@ -11658,7 +11740,7 @@ msgstr ""
 
 #: modules/codec/g711.c:46
 msgid "G.711 decoder"
-msgstr ""
+msgstr "decodor G.711"
 
 #: modules/codec/g711.c:54
 msgid "G.711 encoder"
@@ -11670,7 +11752,7 @@ msgstr ""
 
 #: modules/codec/gstreamer/gstdecode.c:79
 msgid "Use DecodeBin"
-msgstr ""
+msgstr "Folosiți DecodeBin"
 
 #: modules/codec/gstreamer/gstdecode.c:81
 msgid ""
@@ -11679,15 +11761,22 @@ msgid ""
 "parsers which can provide more info such as codec profile, level and other "
 "attributes, in the form of GstCaps (Stream Capabilities) to decoder."
 msgstr ""
+"DecodeBin este un element de container, care poate adăuga și gestiona mai "
+"multe elemente. În afară de adăugarea decodoarelor, DecodeBin adaugă și "
+"parseri de fluxuri elementare care pot furniza mai multe informații, cum ar "
+"fi profilul codecului, nivelul și alte atribute, sub formă de GstCaps "
+"(Capabilități de Stream) la decodor."
 
 #: modules/codec/gstreamer/gstdecode.c:93
 msgid "GStreamer Based Decoder"
-msgstr ""
+msgstr "Decodor bazat pe GStreamer"
 
 #: modules/codec/jpeg.c:52
 msgid ""
 "Quality level for encoding (this can enlarge or reduce output image size)."
 msgstr ""
+"Nivelul de calitate pentru codificare (aceasta poate mări sau micșora "
+"dimensiunea imaginii de ieșire)."
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
@@ -11707,6 +11796,9 @@ msgid ""
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
+"Fluxurile Kate permit formatarea textului. VLC implementează parțial acest "
+"lucru, dar puteți alege să dezactivați toate formatele. Rețineți că acest "
+"lucru nu are niciun efect atunci când redarea prin Tiger este activată."
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11810,13 +11902,15 @@ msgstr "Aqua"
 
 #: modules/codec/kate.c:211
 msgid "Use Tiger for rendering"
-msgstr ""
+msgstr "Folosiți Tiger pentru redare"
 
 #: modules/codec/kate.c:212
 msgid ""
 "Kate streams can be rendered using the Tiger library. Disabling this will "
 "only render static text and bitmap based streams."
 msgstr ""
+"Fluxurile din Kate pot fi redate folosind biblioteca Tiger. Dacă dezactivați "
+"acest lucru, vor fi redate numai fluxuri text statice și de tip bitmap."
 
 #: modules/codec/kate.c:216
 msgid "Rendering quality"
@@ -11827,6 +11921,8 @@ msgid ""
 "Select rendering quality, at the expense of speed. 0 is fastest, 1 is "
 "highest quality."
 msgstr ""
+"Selectați calitatea redării, în detrimentul vitezei. 0 pentru redarea cea "
+"mai rapidă, 1 pentru cea mai bună calitate."
 
 #: modules/codec/kate.c:221
 msgid "Default font effect"
@@ -11837,10 +11933,12 @@ msgid ""
 "Add a font effect to text to improve readability against different "
 "backgrounds."
 msgstr ""
+"Adăugați textului un efect de font pentru a îmbunătăți lizibilitatea în "
+"medii diferite."
 
 #: modules/codec/kate.c:226
 msgid "Default font effect strength"
-msgstr ""
+msgstr "Grosimea implicită ca efect pentru font"
 
 #: modules/codec/kate.c:227
 msgid "How pronounced to make the chosen font effect (effect dependent)."
@@ -11856,6 +11954,10 @@ msgid ""
 "font parameters (name, size, etc) to use. A blank name will let Tiger choose "
 "font parameters where appropriate."
 msgstr ""
+"Descrierea fontului care va fi folosită în cazul în care fluxul Kate nu "
+"specifică anumiți parametri de font (nume, dimensiune etc.). Lăsând câmpul "
+"gol, permite Tiger să aleagă automat parametrii fonturilor, acolo unde este "
+"cazul."
 
 #: modules/codec/kate.c:237
 msgid "Default font color"
@@ -11866,6 +11968,8 @@ msgid ""
 "Default font color to use if the Kate stream does not specify a particular "
 "font color to use."
 msgstr ""
+"Culoarea implicită a fontului care va fi folosită, dacă fluxul Kate nu "
+"specifică să fie folosită o anumită culoare."
 
 #: modules/codec/kate.c:242
 msgid "Default font alpha"
@@ -11876,6 +11980,8 @@ msgid ""
 "Transparency of the default font color if the Kate stream does not specify a "
 "particular font color to use."
 msgstr ""
+"Transparența culorii implicite a fontului dacă fluxul Kate nu specifică să "
+"fie folosită o anumită culoare."
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
@@ -11886,16 +11992,20 @@ msgid ""
 "Default background color if the Kate stream does not specify a background "
 "color to use."
 msgstr ""
+"Culoarea de fundal implicită dacă fluxul Kate nu specifică să fie folosită o "
+"anumită culoare de fundal."
 
 #: modules/codec/kate.c:252
 msgid "Default background alpha"
-msgstr ""
+msgstr "Tranparența implicită a fundalului"
 
 #: modules/codec/kate.c:253
 msgid ""
 "Transparency of the default background color if the Kate stream does not "
 "specify a particular background color to use."
 msgstr ""
+"Transparența culorii de fundal implicite dacă fluxul Kate nu specifică să "
+"fie folosită o anumită culoare de fundal."
 
 #: modules/codec/kate.c:259
 msgid ""
@@ -11906,6 +12016,12 @@ msgid ""
 "Note that changing settings below will not take effect until a new stream is "
 "played. This will hopefully be fixed soon."
 msgstr ""
+"Kate este un codec pentru suprapunerile text și imagine.\n"
+"Biblioteca de redare Tiger este necesară pentru a reda fluxurile complexe "
+"Kate, dar VLC poate furniza și subtitrări statice pe bază de text și imagine "
+"dacă biblioteca nu este disponibilă.\n"
+"Rețineți că modificarea setărilor de mai jos nu va avea efect până când nu "
+"se va reda un flux nou. Sperăm că acest impediment va fi rezolvat în curând."
 
 #: modules/codec/kate.c:268
 msgid "Kate"
@@ -11917,7 +12033,7 @@ msgstr "Decodor overlay Kate"
 
 #: modules/codec/kate.c:288
 msgid "Tiger rendering defaults"
-msgstr ""
+msgstr "Parametrii impliciți de redare din Tiger"
 
 #: modules/codec/kate.c:323
 msgid "Kate text subtitles packetizer"
@@ -11946,11 +12062,11 @@ msgstr ""
 
 #: modules/codec/libmpeg2.c:137
 msgid "MPEG I/II video decoder (using libmpeg2)"
-msgstr ""
+msgstr "Decodor video MPEG I / II (folosește libmpeg2)"
 
 #: modules/codec/lpcm.c:60
 msgid "Linear PCM audio decoder"
-msgstr ""
+msgstr "Decodor audio liniar PCM"
 
 #: modules/codec/lpcm.c:65
 msgid "Linear PCM audio packetizer"
@@ -11970,11 +12086,11 @@ msgstr ""
 
 #: modules/codec/mpg123.c:67
 msgid "MPEG audio decoder using mpg123"
-msgstr ""
+msgstr "Decodor audio MPEG care folosește mpg123"
 
 #: modules/codec/oggspots.c:86
 msgid "OggSpots video decoder"
-msgstr ""
+msgstr "Decodor video OggSpots"
 
 #: modules/codec/oggspots.c:92
 msgid "OggSpots video packetizer"
@@ -11994,11 +12110,11 @@ msgstr ""
 
 #: modules/codec/omxil/omxil.c:172
 msgid "Video encoder (using OpenMAX IL)"
-msgstr ""
+msgstr "Encoder video (utilizează OpenMAX IL)"
 
 #: modules/codec/omxil/vout.c:49
 msgid "OpenMAX IL video output"
-msgstr ""
+msgstr "Ieșire video OpenMAX IL"
 
 #: modules/codec/opus.c:62
 msgid "Opus audio decoder"
@@ -12029,10 +12145,12 @@ msgid ""
 "Allow the use of the Intel Media SDK software implementation of the codecs "
 "if no QuickSync Video hardware acceleration is present on the system."
 msgstr ""
+"Permiteți utilizarea implementării software-ului Intel Media SDK a "
+"codecurilor dacă nu există o accelerație hardware QuickSync Video în sistem."
 
 #: modules/codec/qsv.c:61
 msgid "Codec Profile"
-msgstr ""
+msgstr "Profil Codec"
 
 #: modules/codec/qsv.c:63
 msgid ""
@@ -12040,10 +12158,13 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'high'"
 msgstr ""
+"Specificați explicit profilul codecului. Dacă nu, codecul va determina "
+"profilul corect din alte surse, cum ar fi rezoluția și bitrate-ul. De "
+"exemplu, 'high'"
 
 #: modules/codec/qsv.c:67
 msgid "Codec Level"
-msgstr ""
+msgstr "Nivelul codecului"
 
 #: modules/codec/qsv.c:69
 msgid ""
@@ -12051,10 +12172,13 @@ msgid ""
 "the correct profile from other sources, such as resolution and bitrate. E.g. "
 "'4.2' for mpeg4-part10 or 'low' for mpeg2"
 msgstr ""
+"Specificați explicit nivelul codecului. Altfel, codecul va determina "
+"profilul corect din alte surse, cum ar fi rezoluția și bitrate-ul. De "
+"exemplu, '4.2' pentru mpeg4-part10 sau 'low' pentru mpeg2"
 
 #: modules/codec/qsv.c:73
 msgid "Group of Picture size"
-msgstr ""
+msgstr "Mărimea grupului de imagini"
 
 #: modules/codec/qsv.c:75
 msgid ""
@@ -12062,6 +12186,9 @@ msgid ""
 "GopPicSize=0, then the GOP size is unspecified. If GopPicSize=1, only I-"
 "frames are used."
 msgstr ""
+"Numărul de imagini din actualul GOP (grup de imagini); dacă GopPicSize = 0, "
+"atunci dimensiunea GOP este nespecificată. Dacă GopPicSize = 1, se folosesc "
+"numai cadre de tip I."
 
 #: modules/codec/qsv.c:79
 msgid "Group of Picture Reference Distance"
@@ -12072,6 +12199,9 @@ msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
 "unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
+"Distanța dintre cadrele cheie I- sau P-; dacă este zero, structura grupului "
+"de imagini este nespecificată. Notă: Dacă GopRefDist = 1, nu vor fi folosite "
+"cadre B."
 
 #: modules/codec/qsv.c:85
 msgid "Target Usage"
@@ -12082,10 +12212,13 @@ msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
+"Utilizarea țintă permite alegerea între diferite compromisuri dintre "
+"calitate și viteză. Valorile permise sunt: \"viteză\", \"echilibrat\" și "
+"\"calitate\"."
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
-msgstr ""
+msgstr "interval IDR"
 
 #: modules/codec/qsv.c:92
 msgid ""
@@ -12096,6 +12229,13 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
+"Pentru H.264, IdrInterval specifică intervalul cadrului IDR în termeni de "
+"cadre I; dacă IdrInterval = 0, atunci fiecare cadru I este un cadru IDR. "
+"Dacă IdrInterval = 1, atunci fiecare alt cadru I este un cadru IDR, etc. "
+"Pentru MPEG2, IdrInterval definește intervalul antet al secvenței în termeni "
+"de cadre I. Dacă IdrInterval = N, SDK introduce antetul secvenței înaintea "
+"fiecărui al N-lea cadru I. Dacă IdrInterval = 0 (implicit), SDK introduce "
+"antetul secvenței o singură dată, la începutul fluxului."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -12307,11 +12447,11 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:113
 msgid "Noise Threshold"
-msgstr ""
+msgstr "Prag pentru sunet"
 
 #: modules/codec/schroedinger.c:114
 msgid "Noise threshold to use in constant noise threshold mode"
-msgstr ""
+msgstr "Pragul de zgomot utilizat în modul prag de zgomot constant"
 
 #: modules/codec/schroedinger.c:117
 msgid "CBR bitrate (kbps)"
@@ -12323,23 +12463,23 @@ msgstr ""
 
 #: modules/codec/schroedinger.c:121
 msgid "Maximum bitrate (kbps)"
-msgstr ""
+msgstr "Rată de biți maximă (kbps)"
 
 #: modules/codec/schroedinger.c:122
 msgid "Maximum bitrate in kbps when encoding in constant bitrate mode"
-msgstr ""
+msgstr "Rata maximă de biți în kbps la codificarea în mod constant bitrate"
 
 #: modules/codec/schroedinger.c:125
 msgid "Minimum bitrate (kbps)"
-msgstr ""
+msgstr "Rată de biți minimă (kbps)"
 
 #: modules/codec/schroedinger.c:126
 msgid "Minimum bitrate in kbps when encoding in constant bitrate mode"
-msgstr ""
+msgstr "Rata minimă de biți în kbps la codificarea în mod constant bitrate"
 
 #: modules/codec/schroedinger.c:129
 msgid "GOP length"
-msgstr ""
+msgstr "Lungime GOP"
 
 #: modules/codec/schroedinger.c:130
 msgid ""
@@ -12617,7 +12757,7 @@ msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
-msgstr ""
+msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
@@ -13107,7 +13247,7 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
-msgstr ""
+msgstr "TTML"
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
@@ -13156,7 +13296,7 @@ msgstr "Decodor audio libtwolame"
 
 #: modules/codec/uleaddvaudio.c:41
 msgid "Ulead DV audio decoder"
-msgstr ""
+msgstr "Decodor audio Ulead DV"
 
 #: modules/codec/videotoolbox.m:82
 msgid "Use Hardware decoders only"
@@ -13206,7 +13346,7 @@ msgstr "Codor audio Vorbis"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Nivel de calitate"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13215,10 +13355,14 @@ msgid ""
 " - 1: Realtime\n"
 " - 2: Best quality"
 msgstr ""
+"Setările de calitate care determină timpul maxim de codificare\n"
+" - 0: Calitate bună\n"
+" - 1: Codificare în timp real\n"
+" - 2: Cea mai bună calitate"
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
-msgstr ""
+msgstr "Decodor video WebM"
 
 #: modules/codec/vpx.c:75
 msgid "WebM video encoder"
@@ -13230,7 +13374,7 @@ msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
 msgid "WEBVTT subtitles decoder"
-msgstr ""
+msgstr "Decodor de subtitrare WEBVTT"
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
 msgid "WEBVTT subtitles parser"
@@ -13331,6 +13475,8 @@ msgstr "Cadre de tip B între I și P"
 #: modules/codec/x264.c:112
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
 msgstr ""
+"Numărul de cadre B-frames consecutive între cadrele I și P-frames. Domeniul "
+"de valori este între 1-16."
 
 #: modules/codec/x264.c:115
 msgid "Adaptive B-frame decision"
@@ -13354,7 +13500,7 @@ msgstr ""
 
 #: modules/codec/x264.c:125
 msgid "Keep some B-frames as references"
-msgstr ""
+msgstr "Păstrează câteva cadre B-frames ca referință"
 
 #: modules/codec/x264.c:126
 msgid ""
@@ -13365,6 +13511,12 @@ msgid ""
 " - strict: Strictly hierarchical pyramid\n"
 " - normal: Non-strict (not Blu-ray compatible)\n"
 msgstr ""
+"Permite cadrelor B-frames să fie folosite ca referințe pentru prezice alte "
+"cadre. Memorează mijlocul a 2+ cadre B-frames consecutive ca referință și "
+"reordonează cadrul în mod corespunzător.\n"
+" - none: Dezactvat\n"
+" - strict: Piramidă strict ierarhică\n"
+" - normal: Non-strict (nu este compatibil Blu-ray)\n"
 
 #: modules/codec/x264.c:134
 msgid "Use fullrange instead of TV colorrange"
@@ -13394,6 +13546,10 @@ msgid ""
 "but seems to make little difference in live-action source material. Some "
 "decoders are unable to deal with large frameref values. Range 1 to 16."
 msgstr ""
+"Numărul de cadre anterioare utilizate ca predictori. Acest lucru este "
+"eficient în Anime, dar se pare că face o mică diferență în materialul sursă "
+"live-action. Unele decodoare nu sunt capabile să facă față unor valori "
+"frameref mari. Domeniul 1-16."
 
 #: modules/codec/x264.c:149
 msgid "Skip loop filter"
@@ -13432,6 +13588,7 @@ msgstr "Profil H.264"
 #: modules/codec/x264.c:164
 msgid "Specify H.264 profile which limits are enforced over other settings"
 msgstr ""
+"Specifică profilul H.264 ale cărui limite sunt suprapuse peste alte setări"
 
 #: modules/codec/x264.c:170
 msgid "Interlaced mode"
@@ -13455,6 +13612,14 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
+"Pentru fișiere video stereoscopice definește aranjamentul cadrelor:\n"
+" 0: tablă de șah - pixelii sunt aranjați alternativ de la L la R\n"
+" 1: alternarea coloanelor - L și R sunt intercalate prin coloană\n"
+" 2: alternarea rândurilor - L și R sunt intercalate prin rând\n"
+" 3: unul lângă altul - L este în stânga, R în dreapta\n"
+" 4: partea de sus în partea de jos - L este în partea de sus, R în partea de "
+"jos\n"
+" 5: cadre alternative - o vizualizare pe cadru"
 
 #: modules/codec/x264.c:182
 msgid "Use Periodic Intra Refresh"
@@ -13516,7 +13681,7 @@ msgstr "1 trecere VBR axat pe calitate. Interval de la 0 la 51."
 
 #: modules/codec/x264.c:206
 msgid "Min QP"
-msgstr ""
+msgstr "Min QP"
 
 #: modules/codec/x264.c:207
 msgid "Minimum quantizer parameter. 15 to 35 seems to be a useful range."
@@ -13524,7 +13689,7 @@ msgstr ""
 
 #: modules/codec/x264.c:210
 msgid "Max QP"
-msgstr ""
+msgstr "Max QP"
 
 #: modules/codec/x264.c:211
 msgid "Maximum quantizer parameter."
@@ -13556,7 +13721,7 @@ msgstr "Setează o rată de biți locală maximă (în kbiți/s)."
 
 #: modules/codec/x264.c:223
 msgid "VBV buffer"
-msgstr ""
+msgstr "Buffer VBV"
 
 #: modules/codec/x264.c:224
 msgid "Averaging period for the maximum local bitrate (in kbits)."
@@ -13599,7 +13764,7 @@ msgstr ""
 
 #: modules/codec/x264.c:244
 msgid "QP factor between I and P"
-msgstr ""
+msgstr "Factorul QP dintre I și P"
 
 #: modules/codec/x264.c:245
 msgid "QP factor between I and P. Range 1.0 to 2.0."
@@ -13607,7 +13772,7 @@ msgstr ""
 
 #: modules/codec/x264.c:248
 msgid "QP factor between P and B"
-msgstr ""
+msgstr "Factorul QP dintre P și B"
 
 #: modules/codec/x264.c:249
 msgid "QP factor between P and B. Range 1.0 to 2.0."
@@ -13723,6 +13888,13 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
+"Selectează algoritmul de estimare al mișcării:\n"
+" - dia: căutare diamant, rază 1 (rapidă)\n"
+" - hex: căutare hexagonală, rază 2\n"
+" - umh: căutare inegală multi-hexagon (mai bună, dar mai lentă)\n"
+" - esa: căutare exhaustivă (extrem de lentă, folosită pentru testare)\n"
+" - tesa: căutare hadamard exhaustivă (extrem de lentă, folosită pentru "
+"testare)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -14029,23 +14201,23 @@ msgstr ""
 
 #: modules/codec/x264.c:445
 msgid "checkerboard"
-msgstr ""
+msgstr "tablă de șah"
 
 #: modules/codec/x264.c:445
 msgid "column alternation"
-msgstr ""
+msgstr "alternarea coloanelor"
 
 #: modules/codec/x264.c:445
 msgid "row alternation"
-msgstr ""
+msgstr "alternarea rândurilor"
 
 #: modules/codec/x264.c:445
 msgid "side by side"
-msgstr ""
+msgstr "unul lângă altul"
 
 #: modules/codec/x264.c:445
 msgid "top bottom"
-msgstr ""
+msgstr "sus jos"
 
 #: modules/codec/x264.c:445
 msgid "frame alternation"
@@ -14053,7 +14225,7 @@ msgstr "alternare cadre "
 
 #: modules/codec/x264.c:445
 msgid "2D"
-msgstr ""
+msgstr "2D"
 
 #: modules/codec/x264.c:449
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
@@ -14073,7 +14245,7 @@ msgstr "Codor H.265/HEVC (x265)"
 
 #: modules/codec/xwd.c:36
 msgid "XWD image decoder"
-msgstr ""
+msgstr "decodor de imagine XWD"
 
 #: modules/codec/zvbi.c:61
 msgid "Teletext page"
@@ -14081,7 +14253,7 @@ msgstr "Pagină teletext"
 
 #: modules/codec/zvbi.c:62
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr ""
+msgstr "Deschide pagina Teletext indicată. Pagina implicită are indexul 100."
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -14115,15 +14287,15 @@ msgstr "1"
 
 #: modules/codec/zvbi.c:88
 msgid "1.5"
-msgstr ""
+msgstr "1.5"
 
 #: modules/codec/zvbi.c:88
 msgid "2.5"
-msgstr ""
+msgstr "2.5"
 
 #: modules/codec/zvbi.c:88
 msgid "3.5"
-msgstr ""
+msgstr "3.5"
 
 #: modules/codec/zvbi.c:95
 msgid "VBI and Teletext decoder"
@@ -14876,7 +15048,7 @@ msgstr ""
 
 #: modules/control/win_msg.c:192
 msgid "WinMsg"
-msgstr ""
+msgstr "WinMsg"
 
 #: modules/control/win_msg.c:193
 msgid "Windows messages interface"
@@ -17256,9 +17428,8 @@ msgid "Jump to Time"
 msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Randare de text"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -24462,18 +24633,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Opțiuni de performanță"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Activează fluxul de ieșire audio"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -24496,9 +24665,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Calitate de randare"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -24525,9 +24693,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Nu mai întreba"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -28203,9 +28370,8 @@ msgid "Start Time"
 msgstr "Timpul de start"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Timp de stop"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28232,9 +28398,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Schimbă timpul de start pentru media"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28325,9 +28490,8 @@ msgid "Please enter a network URL:"
 msgstr "Te rog introdu un URL de rețea:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr " Lipsește numele profilului"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -28346,9 +28510,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -28359,9 +28522,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -28376,9 +28538,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28397,9 +28558,8 @@ msgid "Features"
 msgstr "Caracteristici"
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "Nume flux"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -28426,9 +28586,8 @@ msgid "Custom options"
 msgstr "Opțiuni personalizate"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Calitate VBR"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28451,28 +28610,24 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Frecvență de eșantionare"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Nume de profil"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Destinație"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Selectează un dosar"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -28495,18 +28650,16 @@ msgid "Transcoding Options"
 msgstr "Opțiuni de transcodare"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Opțiuni de difuzare și transcodare"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "Activează transcodarea"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "Opțiuni"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -28593,9 +28746,8 @@ msgid "Video quality post-processing level"
 msgstr "Nivel de post procesare a calității video"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Omite filtrul de buclă"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
@@ -28687,9 +28839,8 @@ msgid "Show systray icon"
 msgstr "Arată o pictogramă în zona de notificare"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Interfața ncurses"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28780,9 +28931,8 @@ msgid "Add a background"
 msgstr "Adaugă un fundal"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Ieșire"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28939,14 +29089,12 @@ msgid "Soften"
 msgstr "Netezire"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Zgomot"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Neclaritate spațială"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
 msgid "Temporal luma strength"
