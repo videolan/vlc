@@ -7,11 +7,11 @@
 # Վահե Գրիգորյան <vahe@keemail.me>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-20 03:43+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Armenian (https://www.transifex.com/yaron/teams/16553/hy/)\n"
 "Language: hy\n"
 "MIME-Version: 1.0\n"
@@ -8810,28 +8810,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "%s բայթ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "%s բայթ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "%s բայթ"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Գաղտնաբառը համար թիրախ սարքի\"."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -23430,18 +23426,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Ցույց տալ սխալներն եւ զգուշացումները"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Միացնել ձայնը"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23464,9 +23458,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Կոդավորման որակ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -27052,23 +27045,20 @@ msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Մանրամասնում"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "Զտիչ՝"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
 msgstr "&Պահել որպես ..."
 
 #: modules/gui/qt/ui/messages_panel.h:143
-#, fuzzy
 msgid "Modules Tree"
-msgstr "_Modules ..."
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:263
 msgid "Show extended options"
@@ -27095,9 +27085,8 @@ msgid "Start Time"
 msgstr "Սկսելու Ժամանակ"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Գնալ Ժամանակի պահի"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27124,9 +27113,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Փոխել սկսելու ժամանակը"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27165,9 +27153,8 @@ msgid "SVCD/VCD"
 msgstr "SVCD/VCD"
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disable Disc Menus"
-msgstr "Անջատել"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
@@ -27186,14 +27173,12 @@ msgid "Audio and Subtitles"
 msgstr "Ձայն եւ ենթագրեր"
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "Օգտագործել ենթագրերով ֆայլ"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:146
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "Ընտրել ֆայլը"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
 msgid "Choose one or more media file to open"
@@ -27220,18 +27205,16 @@ msgid "Please enter a network URL:"
 msgstr "Մուտքագրեք ցանցային հասցե՝"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "Անձնագիրի անունը Բացակայում է"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV մուլտիպլեքսոր"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27254,9 +27237,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27271,9 +27253,8 @@ msgid "Webm"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG-4 վիդեո"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27288,95 +27269,80 @@ msgid "MP&3"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:717
-#, fuzzy
 msgid "Features"
-msgstr "Գրանցում"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "Հոսքի բիթրեյթ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
-#, fuzzy
 msgid "Chapters"
-msgstr "Բաժին"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:723
-#, fuzzy
 msgid "Menus"
-msgstr "Մենյու"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:730
 msgid "Fra&me Rate"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
-#, fuzzy
 msgid "Same as source"
-msgstr "Աղբյուր"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
 msgstr " կադր/վ"
 
 #: modules/gui/qt/ui/profiles.h:734
-#, fuzzy
 msgid "Custom options"
-msgstr "Հնարավոր եզրերից կտրման գործակիցների ցուցակ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Որակի մակարդակ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
-#, fuzzy
 msgid "Not Used"
-msgstr "Ընտրված չէ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:738 modules/gui/qt/ui/profiles.h:757
 msgid " kb/s"
 msgstr " կբ/վ"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "Կոդավորման որակ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
-#, fuzzy
 msgid "Frame size"
-msgstr "Կադրերի արագութուն"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
-#, fuzzy
 msgid "px"
-msgstr " պքս"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Դիսկրետացման հաճախություն"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Ֆայլի անուն"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Հասցե"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Ընտրել պանակ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27395,9 +27361,8 @@ msgid "Display locally"
 msgstr "Տեղում ցույց տալ"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Ընդլայնված ընտարնքներ..."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
 msgid "Select and choose transcoding options"
@@ -27408,9 +27373,8 @@ msgid "Activate Transcoding"
 msgstr "Ակտիվացնել Վերակոդավորումը"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "Ընտրանքներ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -27461,9 +27425,8 @@ msgid "Normalize volume to:"
 msgstr "Հավասարեցնել ձայնը դեպի"
 
 #: modules/gui/qt/ui/sprefs_audio.h:425
-#, fuzzy
 msgid "Tracks"
-msgstr "Գործ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
 msgid "Preferred audio language:"
@@ -27490,9 +27453,8 @@ msgid "x264 profile and level selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr "Օգտագործել GPU արագացում (փորձնական)"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
@@ -27585,9 +27547,8 @@ msgid "Force window style:"
 msgstr "Պահպանել պատուհանի ոճը"
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr "շարժումը վերահսկող ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Show systray icon"
@@ -27596,18 +27557,16 @@ msgstr ""
 "համակարգի վահանակում"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Գլխավոր ինտերֆեյսներ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
 msgstr "Սկինի հասցե՝"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Աշխատացնել և կանգնել"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -27654,23 +27613,20 @@ msgid "Show media title on video start"
 msgstr "Ցույց տալ վերնագիրը վիդեոյի սկսելու ժամանակ"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
-#, fuzzy
 msgid "Enable subtitles"
-msgstr "Տելետեքստ ենթագրերով"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
-#, fuzzy
 msgid "Subtitle Language"
-msgstr "Ենթագրի լեզուն"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr "Հիմնական կոդավորում"
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
-#, fuzzy
 msgid "Subtitle effects"
-msgstr "Ենթագրերով Ֆայլ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27693,9 +27649,8 @@ msgid "Add a background"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Ելք"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -27710,9 +27665,8 @@ msgid "KVA"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:327
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "&Deinterlace"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
@@ -27739,14 +27693,12 @@ msgid "Run manually"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:176
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Ժամանակացույց"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:177
-#, fuzzy
 msgid "Run on schedule"
-msgstr "Ժամանակացույց"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:178
 msgid "Status"
@@ -27773,9 +27725,8 @@ msgid "Clear List"
 msgstr "Ջնջել Ցուցակը"
 
 #: modules/gui/qt/ui/update.h:148
-#, fuzzy
 msgid "Check for VLC updates"
-msgstr "Ստուգել թարմացումները..."
+msgstr ""
 
 #: modules/gui/qt/ui/update.h:149
 msgid "Launching an update request..."
@@ -27795,19 +27746,16 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "Շրջել գույները"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
-#, fuzzy
 msgid "Colors"
-msgstr "Գույն"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1257
-#, fuzzy
 msgid "Interactive Zoom"
-msgstr "Ինտերֆեյս"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27815,9 +27763,8 @@ msgstr "Անկյուն"
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
-#, fuzzy
 msgid "..."
-msgstr "Ավելացնել ..."
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -27840,51 +27787,44 @@ msgid "Anaglyph 3D"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
-#, fuzzy
 msgid "Mirror"
-msgstr "Սխալ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1294
 msgid "Motion detect"
 msgstr "Շարժման բացահայտում"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Տարածական ընդլայնում"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1300
-#, fuzzy
 msgid "Soften"
-msgstr "Մեղմ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Noise"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "TCP պորտից օգտվելու համար (նախնական 12345)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "TCP պորտից օգտվելու համար (նախնական 12345)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "TCP պորտից օգտվելու համար (նախնական 12345)"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
