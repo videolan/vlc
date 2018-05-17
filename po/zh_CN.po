@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Dian Li <xslidian@gmail.com>, 2009-2017
+# Dian Li <xslidian@gmail.com>, 2009-2018
 # pingplug <pingplug@foxmail.com>, 2016-2017
 # SnowOnion Lee <snowonionlee@gmail.com>, 2016
 # Sophia Meifang Wang <sophiatiger121@hotmail.com>, 2015
@@ -12,11 +12,11 @@
 # zhangmin <zm1990s@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 03:18+0100\n"
-"Last-Translator: Dian Li <xslidian@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Dian Li <xslidian@gmail.com>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
 "Language: zh_CN\n"
@@ -5580,7 +5580,7 @@ msgstr "波兰语"
 
 #: src/text/iso-639_def.h:151
 msgid "Portuguese"
-msgstr "葡萄要语"
+msgstr "葡萄牙语"
 
 #: src/text/iso-639_def.h:152
 msgid "Pushto"
@@ -9090,31 +9090,27 @@ msgstr "IceCAST 输出"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "加密密钥长度 (字节)"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 位"
+msgstr "16 字节"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 位"
+msgstr "24 字节"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 位"
+msgstr "32 字节"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT 流输出"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "目标设备的密码。"
+msgstr "流加密密码"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10220,7 +10216,7 @@ msgstr "K Audio 接口音频输出"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
-msgstr "HDMI/SPDIF 音频呈递"
+msgstr "HDMI/SPDIF 音频直通"
 
 #: modules/audio_output/mmdevice.c:1453
 msgid ""
@@ -10234,7 +10230,7 @@ msgstr "禁用"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "启用 (仅限 AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -15862,7 +15858,7 @@ msgstr "皮肤"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "下次启动时应用配置文件"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -16455,7 +16451,7 @@ msgstr "设置视频输出的透明度。1 是完全不透明 (默认) 0 是完�
 
 #: modules/gui/macosx/macosx.m:60
 msgid "Black screens in fullscreen"
-msgstr "全屏中的黑屏"
+msgstr "全屏时保持黑色背景"
 
 #: modules/gui/macosx/macosx.m:61
 msgid "In fullscreen mode, keep screen where there is no video displayed black"
@@ -16779,7 +16775,7 @@ msgstr "隐藏其它"
 #: modules/gui/macosx/VLCMainMenu.m:351
 #: modules/gui/macosx/VLCSimplePrefsController.m:377
 msgid "Show All"
-msgstr "全部显示"
+msgstr "显示全部"
 
 #: modules/gui/macosx/VLCMainMenu.m:352
 msgid "Quit VLC"
@@ -16897,9 +16893,8 @@ msgid "Jump to Time"
 msgstr "转到时间"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "渲染器(&R)"
+msgstr "渲染器"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17817,7 +17812,7 @@ msgstr "全屏启动"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
-msgstr "全屏模式中的黑屏"
+msgstr "全屏模式中保持黑色背景"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:366
 #: modules/gui/qt/ui/sprefs_video.h:330
@@ -24186,7 +24181,7 @@ msgstr "转码时显示性能警告"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Enable Audio passthrough"
-msgstr "启用音频呈递"
+msgstr "启用音频直通"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -25366,18 +25361,16 @@ msgid "Ball speed"
 msgstr "球速"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "设置球速，位移值即每帧移动像素数。"
+msgstr "设置球速度，位移像素数/帧。"
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "球大小"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "设置球的大小，其半径的像素数"
+msgstr "设置球的半径长度，单位为像素"
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
