@@ -61,7 +61,7 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
 {
     vout_window_sys_t *sys = wnd->sys;
 
-    if (sys->keys != NULL && XCB_keyHandler_Process (sys->keys, ev) == 0)
+    if (sys->keys != NULL && XCB_keyHandler_Process(sys->keys, ev, wnd) == 0)
         return;
 
     switch (ev->response_type & 0x7f)
@@ -417,7 +417,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     p_sys->conn = conn;
     if (var_InheritBool (wnd, "keyboard-events"))
-        p_sys->keys = XCB_keyHandler_Create (VLC_OBJECT(wnd), conn);
+        p_sys->keys = XCB_keyHandler_Create(conn);
     else
         p_sys->keys = NULL;
     p_sys->root = scr->root;
@@ -657,7 +657,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
      * subscribe to input events, so this can fail). */
     if (var_InheritBool (wnd, "keyboard-events"))
     {
-        p_sys->keys = XCB_keyHandler_Create (VLC_OBJECT(wnd), conn);
+        p_sys->keys = XCB_keyHandler_Create(conn);
         if (p_sys->keys != NULL)
             value |= XCB_EVENT_MASK_KEY_PRESS;
     }

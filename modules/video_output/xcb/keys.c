@@ -40,27 +40,24 @@
 
 struct key_handler_t
 {
-    vlc_object_t      *obj;
     xcb_key_symbols_t *syms;
 };
 
 /**
  * Create an X11 key event handler for a VLC window.
+ *
  * The caller shall arrange receiving applicable X11 events, and pass them to
  * ProcessKeyEvent() later.
  *
- * @param obj VLC object owning an X window
  * @param conn XCB connection to the X server (to fetch key mappings)
  * @return NULL on error, or a key handling context.
  */
-key_handler_t *XCB_keyHandler_Create (vlc_object_t *obj,
-                                      xcb_connection_t *conn)
+key_handler_t *XCB_keyHandler_Create(xcb_connection_t *conn)
 {
     key_handler_t *ctx = malloc (sizeof (*ctx));
     if (!ctx)
         return NULL;
 
-    ctx->obj = obj;
     ctx->syms = xcb_key_symbols_alloc (conn);
     return ctx;
 }
@@ -137,7 +134,8 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
  * @param ev XCB event to process
  * @return 0 if the event was handled and free()'d, non-zero otherwise
  */
-int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
+int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
+                           vout_window_t *window)
 {
     assert (ctx);
 
@@ -149,8 +147,8 @@ int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
             xcb_keysym_t sym = xcb_key_press_lookup_keysym (ctx->syms, e, 0);
             uint_fast32_t vk = ConvertKeySym (sym);
 
-            msg_Dbg (ctx->obj, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
-                     vk, sym);
+            msg_Dbg(window, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
+                    vk, sym);
             if (vk == KEY_UNSET)
                 break;
             if (e->state & XCB_MOD_MASK_SHIFT) /* Shift */
@@ -167,7 +165,7 @@ int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
                 vk |= KEY_MODIFIER_META;
             if (e->state & XCB_MOD_MASK_5) /* Alternate Graphic */
                 vk |= KEY_MODIFIER_ALT;
-            var_SetInteger (ctx->obj->obj.libvlc, "key-pressed", vk);
+            vout_window_ReportKeyPress(window, vk);
             break;
         }
 
@@ -177,7 +175,7 @@ int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
         case XCB_MAPPING_NOTIFY:
         {
             xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
-            msg_Dbg (ctx->obj, "refreshing keyboard mapping");
+            msg_Dbg(window, "refreshing keyboard mapping");
             xcb_refresh_keyboard_mapping (ctx->syms, e);
             break;
         }
@@ -192,10 +190,8 @@ int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
 
 #else /* HAVE_XCB_KEYSYMS */
 
-key_handler_t *XCB_keyHandler_Create (vlc_object_t *obj,
-                                      xcb_connection_t *conn)
+key_handler_t *XCB_keyHandler_Create(xcb_connection_t *conn)
 {
-    msg_Err (obj, "X11 key press support not compiled-in");
     (void) conn;
     return NULL;
 }
@@ -206,10 +202,10 @@ void XCB_keyHandler_Destroy (key_handler_t *ctx)
     abort ();
 }
 
-int XCB_keyHandler_Process (key_handler_t *ctx, xcb_generic_event_t *ev)
+int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
+                           vout_window_t *window)
 {
-    (void) ctx;
-    (void) ev;
+    (void) ctx; (void) ev; (void) window;
     abort ();
 }
 
