@@ -9,7 +9,7 @@
 # Jens Seidel <jensseidel _at_ users.sf.net>, 2005
 # Kai Hermann <kai.uwe.hermann@gmail.com>, 2009
 # Lars Gaudian <lgaudian@me.com>, 2013
-# Mario Siegmann <mario_siegmann@web.de>, 2014-2015,2017
+# Mario Siegmann <mario_siegmann@web.de>, 2014-2018
 # Martin Böh <martin-boeh@outlook.com>, 2013
 # Mathias C. Berens | welcome-soft <berens at welcome-soft.de>, 2006
 # Michael <inactive+banescar@transifex.com>, 2013
@@ -23,7 +23,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2018-04-20 16:32+0100\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
@@ -20360,7 +20360,7 @@ msgstr ""
 
 #: modules/gui/qt/components/simple_preferences.cpp:739
 msgid "VLC skins website"
-msgstr "VLC-Skins-Internetseite"
+msgstr "VLC-Skins Internetseite"
 
 #: modules/gui/qt/components/simple_preferences.cpp:763
 msgid "System's default"
@@ -20621,7 +20621,7 @@ msgstr "Container"
 
 #: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:431
 msgid "Program Guide"
-msgstr "Fernsehprogramm"
+msgstr "Fernsehprogramm (EPG)"
 
 #: modules/gui/qt/dialogs/epg.cpp:87 modules/gui/qt/ui/about.h:289
 #: modules/gui/qt/ui/about.h:290
@@ -20638,7 +20638,7 @@ msgstr "Fehler"
 
 #: modules/gui/qt/dialogs/errors.cpp:47
 msgid "Cl&ear"
-msgstr "&Löschen"
+msgstr "Lösch&en"
 
 #: modules/gui/qt/dialogs/errors.cpp:54
 msgid "Hide future errors"
@@ -21377,7 +21377,7 @@ msgstr "&Untertitel"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr "Tool&s"
+msgstr "W&erkzeuge"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
