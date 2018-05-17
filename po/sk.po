@@ -3,20 +3,21 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Marián Hikaník <podnety@mojepreklady.net>, 2014-2017
+# Marián Hikaník <podnety@mojepreklady.net>, 2014-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 03:09+0100\n"
-"Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Marián Hikaník <podnety@mojepreklady.net>, 2018\n"
 "Language-Team: Slovak (https://www.transifex.com/yaron/teams/16553/sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 ? 4: n==1 ? 1: n % 1 == 0 && "
+"n>=2 && n<=4 ? 3);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -862,6 +863,8 @@ msgstr[0] ""
 msgstr[1] ""
 "%u moduly sa nezobrazili, pretože obsahujú iba pokročilé nastavenia.\n"
 msgstr[2] ""
+"Nezobrazilo sa %u modulov, pretože obsahujú iba pokročilé možnosti.\n"
+msgstr[3] ""
 "Nezobrazilo sa %u modulov, pretože obsahujú iba pokročilé možnosti.\n"
 
 #: src/config/help.c:663
@@ -9571,31 +9574,27 @@ msgstr "Výstup IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Dĺžka šifrovacieho kľúča v bajtoch"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bitov"
+msgstr "16 bajtov"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bitov"
+msgstr "24 bajtov"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bitov"
+msgstr "32 bajtov"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Výstup streamu SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Heslo pre cieľové zariadenie."
+msgstr "Heslo pre šifrovanie streamu"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10761,7 +10760,7 @@ msgstr "Vypnuté"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Zapnuté (AC3/DTS only)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -15195,6 +15194,7 @@ msgid_plural "Playlist has only %u elements"
 msgstr[0] "Playlist má len %u prvok"
 msgstr[1] "Playlist má len %u prvkov"
 msgstr[2] "Playlist má len %u prvkov"
+msgstr[3] "Playlist má len %u prvkov"
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -16668,7 +16668,7 @@ msgstr "Vzhľad"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Použiť profil pri ďalšom spustení"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17739,9 +17739,8 @@ msgid "Jump to Time"
 msgstr "Preskočiť na čas"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Vyk&resľovač"
+msgstr "Vykresľovač"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -25275,12 +25274,10 @@ msgid "Enable Audio passthrough"
 msgstr "Zapnúť prechod zvuku"
 
 #: modules/stream_out/chromecast/cast.cpp:194
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Deaktivujte, ak vaše prijímacie zariadenie nepodporuje Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:216
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Vysoké (vysoká kvalita a veľká šírka pásma)"
 
@@ -25289,12 +25286,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Stredné (stredná kvalita a šírka pásma)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Nízke (nízka kvalita a malá šírka pásma)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Slabé CPU (nízka kvalita, ale veľká šírka pásma)"
 
@@ -26533,22 +26528,18 @@ msgid "Ball speed"
 msgstr "Rýchlosť guľôčky"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Nastavenie rýchlosti guľôčky, hodnota "
-"presunu                                 zadaná ako počet pixelov na snímku."
+"Nastavenie rýchlosti guľôčky, hodnota presunu zadaná ako počet pixlov na "
+"snímku."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Veľkosť guľôčky"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr ""
-"Nastavenie veľkosti guľôčky zadaním jej polomeru - "
-"počtu                                 pixelov"
+msgstr "Nastavenie veľkosti guľôčky zadaním jej polomeru - počtu pixlov."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
