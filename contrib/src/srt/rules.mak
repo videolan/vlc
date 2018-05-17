@@ -14,8 +14,6 @@ endif
 DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WINSTORE
 DEPS_srt += pthreads $(DEPS_pthreads)
-SRT_CFLAGS   += -DPTW32_STATIC_LIB
-SRT_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 
 $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:

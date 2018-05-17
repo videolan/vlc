@@ -16,7 +16,6 @@ $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 
 ifdef HAVE_WINSTORE
 DEPS_upnp += pthreads $(DEPS_pthreads)
-LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
 endif
 ifdef HAVE_WINSTORE
 CONFIGURE_ARGS=--disable-ipv6 --enable-unspecified_server
@@ -38,7 +37,6 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-checks.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
-	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-force.patch
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libpthread.patch
@@ -54,6 +52,6 @@ endif
 
 .upnp: upnp
 	$(RECONF)
-	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB $(LIBUPNP_ECFLAGS)" ./configure --disable-samples --without-documentation $(CONFIGURE_ARGS) $(HOSTCONF)
+	cd $< && $(HOSTVARS) CFLAGS="$(CFLAGS) -DUPNP_STATIC_LIB" ./configure --disable-samples --without-documentation $(CONFIGURE_ARGS) $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@

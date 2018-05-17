@@ -30,13 +30,9 @@ ifdef HAVE_ANDROID
 	cp $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.c $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.h aom/aom_ports/
 endif
 
-AOM_CFLAGS   := $(CFLAGS)
-AOM_CXXFLAGS := $(CXXFLAGS)
 DEPS_aom =
 ifdef HAVE_WINSTORE
 DEPS_aom += pthreads $(DEPS_pthreads)
-AOM_CFLAGS   += -DPTW32_STATIC_LIB
-AOM_CXXFLAGS += -DPTW32_STATIC_LIB
 endif
 
 AOM_LDFLAGS := $(LDFLAGS)
@@ -100,7 +96,7 @@ endif
 	rm -rf $(PREFIX)/include/aom
 	cd $< && rm -rf aom_build && mkdir -p aom_build
 	cd $< && mkdir -p aom_build
-	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) CFLAGS="$(AOM_CFLAGS)" CXXFLAGS="$(AOM_CXXFLAGS)" $(CMAKE) ../ $(AOM_CONF)
+	cd $</aom_build && LDFLAGS="$(AOM_LDFLAGS)" $(HOSTVARS) $(CMAKE) ../ $(AOM_CONF)
 	cd $< && $(CMAKEBUILD) aom_build
 	$(call pkg_static,"aom_build/aom.pc")
 	cd $</aom_build && $(CMAKEBUILD) . --target install
