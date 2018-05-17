@@ -32,8 +32,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Fan, 2018\n"
+"PO-Revision-Date: 2018-05-17 22:50+0200\n"
+"Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2018\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -16589,7 +16589,6 @@ msgstr ""
 "l'Association VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16601,15 +16600,14 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>Le lecteur multimédia VLC est un lecteur, un encodeur et un diffuseur "
-"multimédia gratuit et libre fait par des volontaires de la communauté <a "
-"href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utilise ses propres codecs, "
-"fonctionne sur les plate-formes les plus répandues, et peut lire quasiment "
-"tous les fichiers, CD, DVD, flux réseau, cartes de capture et autres formats "
-"de médias !</p><p><a href=\"http://www.videolan.org/contribute/\"><span "
-"style=\" text-decoration: underline; color:#0057ae;\">Aidez-nous et "
-"rejoignez-nous !</span></a><p><span style=\" text-decoration: underline; "
-"\">Traductions :</span> Éric Lassauge (2018-02-02 18:04+0100)"
+"multimédia libre et gratuit fait par des volontaires de la communauté <a "
+"href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utilise ses "
+"propres codecs et fonctionne sur quasiment toutes les plateformes, il peut "
+"lire quasiment tous les fichiers, CDs, DVDs, flux réseau, cartes de capture "
+"et autres formats de médias !</p><p><a href=\"https://www.videolan.org/"
+"contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Aidez nous et rejoignez nous !</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17247,7 +17245,6 @@ msgstr "Aller à l'élément précédent"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Quitter le plein écran"
 
