@@ -258,7 +258,7 @@ static void DoWork_6_1_to_5_x( filter_t * p_filter,  block_t * p_in_buf, block_t
     }
 }
 
-#if defined (CAN_COMPILE_ARM)
+#if defined (CAN_COMPILE_NEON)
 #include "simple_neon.h"
 #define GET_WORK(in, out) GET_WORK_##in##_to_##out##_neon()
 #else
