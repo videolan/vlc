@@ -70,6 +70,8 @@ libsimple_channel_mixer_plugin_arm_neon_la_SOURCES = arm_neon/simple_channel_mix
 
 libsimple_channel_mixer_plugin_la_LIBADD += libsimple_channel_mixer_plugin_arm_neon.la
 libsimple_channel_mixer_plugin_la_CFLAGS += -DCAN_COMPILE_NEON
+libsimple_channel_mixer_plugin_la_SOURCES += \
+	audio_filter/channel_mixer/simple_neon.h
 endif
 
 audio_filter_LTLIBRARIES += \
