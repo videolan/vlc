@@ -305,8 +305,6 @@ static int Open(vlc_object_t *object)
     vd->display = Display;
     vd->control = Control;
 
-    /* */
-    vout_display_SendEventDisplaySize(vd, fmt.i_visible_width, fmt.i_visible_height);
     return VLC_SUCCESS;
 }
 
