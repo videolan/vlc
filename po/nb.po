@@ -11,6 +11,7 @@
 # Christian, 2015
 # Harald H. <haarektrans@gmail.com>, 2014,2015
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
+#  Kim Malmo <berencamlost@msn.com>, 2018
 # Kristoffer Berge <kristoffer.berge@gmail.com>, 2015
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
 # Mathias Stang <mathias.stang@gmail.com>, 2015
@@ -26,14 +27,14 @@
 # Yomawaru, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Kim Malmo <kimmalmo@protonmail.ch>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Kim Malmo <berencamlost@msn.com>, 2018\n"
 "Language-Team: Norwegian Bokmål (Norway) (https://www.transifex.com/yaron/"
 "teams/16553/nb_NO/)\n"
-"Language: nb\n"
+"Language: nb_NO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1863,6 +1864,8 @@ msgid ""
 "This allows playing audio at lower or higher speed without affecting the "
 "audio pitch"
 msgstr ""
+"Dette lar deg spille lyd raskere eller tregere uten å gjøre lyden lysere "
+"eller mørkere"
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
 #: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
@@ -3927,23 +3930,27 @@ msgstr "Posisjonskotroll reversert"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Kontroll av musehjulets (vertikale) Y-akse"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"Musehjulets vertikale (opp/ned) akse kan styre volum, posisjon eller "
+"ignoreres."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Kontroll av musehjulets (horisontale) X-akse"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"Musehjulets horisontale (venstre/høyre) akse kan styre volum, posisjon eller "
+"ignoreres."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -9411,28 +9418,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT-kringkastingsutdata"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Passordet til målenheten."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -17443,9 +17446,8 @@ msgid "Jump to Time"
 msgstr "Hopp til tid"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&opptegner"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -21317,7 +21319,7 @@ msgstr "&Tøm"
 
 #: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
-msgstr "&opptegner"
+msgstr "&Opptegner"
 
 #: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
@@ -26114,7 +26116,6 @@ msgid "Ball speed"
 msgstr "Ballhastighet"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Bestem ballens hastighet, i form av bevegelsesverdien i antall piksler per "
@@ -26125,7 +26126,6 @@ msgid "Ball size"
 msgstr "Ballstørrelse"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr "Bestem ballstørrelsen, ved å oppgi dens radius i antall piksler."
 
@@ -28775,9 +28775,8 @@ msgid "Start Time"
 msgstr "Starttid"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Stoppposisjon"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28804,9 +28803,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "TT'T'.mm'm'.ss's',zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Endre starttiden til mediet"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29157,9 +29155,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Hopp over H.264-løkkeavblokkingsfilter"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "Valg av x264-profil og nivå"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29246,9 +29243,8 @@ msgid "Show systray icon"
 msgstr "Vis ikon i systemkurven"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Når grensesnittet skal løftes"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
