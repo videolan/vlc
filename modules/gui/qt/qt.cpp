@@ -696,10 +696,6 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    if( cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != p_intf->p_sys->voutWindowType )
-        return VLC_EGENERIC;
-
     switch( p_intf->p_sys->voutWindowType )
     {
         case VOUT_WINDOW_TYPE_XID:

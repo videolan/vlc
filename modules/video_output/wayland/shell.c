@@ -228,10 +228,6 @@ static const struct wl_registry_listener registry_cbs =
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != VOUT_WINDOW_TYPE_WAYLAND)
-        return VLC_EGENERIC;
-
     vout_window_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;

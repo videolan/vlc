@@ -379,10 +379,6 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
  */
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != VOUT_WINDOW_TYPE_XID)
-        return VLC_EGENERIC;
-
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
 
@@ -648,10 +644,6 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
  */
 static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != VOUT_WINDOW_TYPE_XID)
-        return VLC_EGENERIC;
-
     xcb_window_t window = var_InheritInteger (wnd, "drawable-xid");
     if (window == 0)
         return VLC_EGENERIC;

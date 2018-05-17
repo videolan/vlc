@@ -347,16 +347,6 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( var_InheritBool( pWnd, "video-wallpaper" ) )
         return VLC_EGENERIC;
 
-    if( cfg->type != VOUT_WINDOW_TYPE_INVALID )
-    {
-#ifdef X11_SKINS
-        if( cfg->type != VOUT_WINDOW_TYPE_XID )
-#else
-        if( cfg->type != VOUT_WINDOW_TYPE_HWND )
-#endif
-            return VLC_EGENERIC;
-    }
-
     vout_window_sys_t* sys;
 
     vlc_mutex_lock( &skin_load.mutex );

@@ -87,10 +87,6 @@ static void OnNewMouseCoords(vout_window_t *wnd,
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
-        return VLC_EGENERIC;
-
     vout_window_sys_t *p_sys = malloc(sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;

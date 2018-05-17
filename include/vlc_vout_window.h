@@ -96,9 +96,6 @@ typedef struct vout_window_mouse_event_t
 } vout_window_mouse_event_t;
 
 typedef struct vout_window_cfg_t {
-    /* Window handle type */
-    unsigned type;
-
     /* If true, a standalone window is requested */
     bool is_standalone;
     bool is_fullscreen;

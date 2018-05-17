@@ -1403,7 +1403,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         const video_splitter_output_t *output = &splitter->p_output[i];
         vout_display_state_t ostate;
         vout_window_cfg_t cfg = {
-            .type = VOUT_WINDOW_TYPE_INVALID,
             .width = state->cfg.display.width,
             .height = state->cfg.display.height,
             .is_standalone = true,

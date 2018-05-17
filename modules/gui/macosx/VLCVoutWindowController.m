@@ -46,10 +46,6 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
     @autoreleasepool {
-        if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-            && cfg->type != VOUT_WINDOW_TYPE_NSOBJECT)
-            return VLC_EGENERIC;
-
         msg_Dbg(p_wnd, "Opening video window");
 
         if (!atomic_load(&b_intf_starting)) {

@@ -67,10 +67,6 @@ static uintptr_t *used = NULL;
  */
 static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    if (cfg->type != VOUT_WINDOW_TYPE_INVALID
-     && cfg->type != VOUT_WINDOW_TYPE_HWND)
-        return VLC_EGENERIC;
-
     uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
     if (val == 0)
         return VLC_EGENERIC;
