@@ -177,13 +177,17 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         };
 
         vout_window_t *window = vout_display_window_New(vout, &wcfg);
-        if (window != NULL)
-        {
-            if (var_InheritBool(vout, "video-wallpaper"))
-                vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
-            else if (var_InheritBool(vout, "video-on-top"))
-                vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
+        if (unlikely(window == NULL)) {
+            spu_Destroy(vout->p->spu);
+            vlc_object_release(vout);
+            return NULL;
         }
+
+        if (var_InheritBool(vout, "video-wallpaper"))
+            vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
+        else if (var_InheritBool(vout, "video-on-top"))
+            vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
+
         vout->p->window = window;
     } else
         vout->p->window = NULL;
@@ -618,14 +622,6 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
         cfg->align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
 
-void vout_DeleteDisplayWindow(vout_thread_t *vout)
-{
-    if (vout->p->window != NULL) {
-        vout_display_window_Delete(vout->p->window);
-        vout->p->window = NULL;
-    }
-}
-
 void vout_SetDisplayWindowSize(vout_thread_t *vout,
                                unsigned width, unsigned height)
 {
@@ -635,12 +631,6 @@ void vout_SetDisplayWindowSize(vout_thread_t *vout,
     /* Request a resize of the window. If it fails, there is nothing to do.
      * If it succeeds, the window will emit a resize event later. */
         vout_window_SetSize(window, width, height);
-    else
-    if (vout->p->display.vd != NULL)
-    /* Force a resize of window-less display. This is not allowed to fail,
-     * although the display is allowed to ignore the size anyway. */
-        /* FIXME: remove this, fix MSW and OS/2 window providers */
-        vout_display_SendEventDisplaySize(vout->p->display.vd, width, height);
 }
 
 /* */
@@ -1352,13 +1342,15 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {
     vout_window_t *window = vout->p->window;
 
-    if (window != NULL)
-        vout_window_SetFullScreen(window, fullscreen);
+    if (window == NULL)
+        return; /* splitter! */
+
+    vout_window_SetFullScreen(window, fullscreen);
 #if defined(_WIN32) || defined(__OS2__)
     /* FIXME: remove this event */
     if (vout->p->display.vd != NULL)
         vout_display_SendEventFullscreen(vout->p->display.vd, fullscreen,
-                                         window != NULL);
+                                         true);
 #endif
 }
 
@@ -1366,13 +1358,10 @@ static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
 {
     vout_window_t *window = vout->p->window;
 
-    if (window != NULL)
-        vout_window_SetState(window, state);
-#if defined(_WIN32) || defined(__OS2__)
-    else /* FIXME: remove this event */
-    if (vout->p->display.vd != NULL)
-        vout_display_SendWindowState(vout->p->display.vd, state);
-#endif
+    if (window == NULL)
+        return; /* splitter! */
+
+    vout_window_SetState(window, state);
 }
 
 static void ThreadTranslateMouseState(vout_thread_t *vout,

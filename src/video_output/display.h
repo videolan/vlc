@@ -32,7 +32,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 /* FIXME should not be there */
 void vout_SendDisplayEventMouse(vout_thread_t *, const vlc_mouse_t *);
 
-void vout_DeleteDisplayWindow(vout_thread_t *);
 void vout_SetDisplayWindowSize(vout_thread_t *, unsigned, unsigned);
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *);

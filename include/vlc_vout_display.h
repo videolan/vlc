@@ -391,8 +391,7 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd)
 
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
 {
-    return vd->cfg->window != NULL
-        && vd->cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
+    return vd->cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
 }
 
 /**

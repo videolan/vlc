@@ -115,10 +115,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
         vd->module = NULL;
     }
 
-    if (cfg->window != NULL)
-        vout_window_SetSize(cfg->window,
-                            cfg->display.width, cfg->display.height);
-
+    vout_window_SetSize(cfg->window, cfg->display.width, cfg->display.height);
     return vd;
 }
 
@@ -636,9 +633,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 
 static void VoutDisplayDelWindow(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    vout_DeleteDisplayWindow(osys->vout);
+    (void) vd;
 }
 
 static void VoutDisplayFitWindow(vout_display_t *vd, bool default_size)
@@ -1316,8 +1311,7 @@ static void SplitterClose(vout_display_t *vd)
         vout_window_t *wnd = sys->display[i]->cfg->window;
 
         vout_DeleteDisplay(sys->display[i], NULL);
-        if (wnd != NULL)
-            vout_display_window_Delete(wnd);
+        vout_display_window_Delete(wnd);
     }
     TAB_CLEAN(sys->count, sys->display);
     free(sys->picture);
@@ -1390,6 +1384,10 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         vout_display_GetDefaultDisplaySize(&cfg.width, &cfg.height,
                                            source, &ostate.cfg);
         ostate.cfg.window = vout_display_window_New(vout, &cfg);
+        if (unlikely(ostate.cfg.window == NULL)) {
+            vout_DeleteDisplay(wrapper, NULL);
+            return NULL;
+        }
 
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
                                         output->psz_module ? output->psz_module : module,
