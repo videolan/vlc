@@ -7,11 +7,11 @@
 # Goce Manevski <Goce92@live.com>, 2010
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2015-02-27 09:20+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Macedonian (https://www.transifex.com/yaron/teams/16553/mk/)\n"
 "Language: mk\n"
 "MIME-Version: 1.0\n"
@@ -23412,9 +23412,8 @@ msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Овозможи аудио"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -27010,9 +27009,8 @@ msgstr ""
 #: modules/gui/qt/ui/sprefs_interface.h:529
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:313 modules/gui/qt/ui/streampanel.h:167
-#, fuzzy
 msgid "Form"
-msgstr "Формат"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:135
 msgid "Preset"
@@ -27027,14 +27025,12 @@ msgid "&Verbosity:"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "Филтери"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
-#, fuzzy
 msgid "&Save as..."
-msgstr "Меморирај..."
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:143
 msgid "Modules Tree"
@@ -27069,9 +27065,8 @@ msgid "Stop Time"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
-#, fuzzy
 msgid "Edit Options"
-msgstr "Опции"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:275
 msgid "Extra media"
@@ -27082,9 +27077,8 @@ msgid "Complete MRL for VLC internal"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:280
-#, fuzzy
 msgid "Select the file"
-msgstr "Избери Папка"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:284
 msgid "Change the start time for the media"
@@ -27111,9 +27105,8 @@ msgid "Select the capture device type"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
-#, fuzzy
 msgid "Device Selection"
-msgstr "Отстрани Избрани"
+msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:102
 msgid "Options"
@@ -27124,9 +27117,8 @@ msgid "Access advanced options to tweak the device"
 msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:106
-#, fuzzy
 msgid "Advanced options..."
-msgstr "&Напредно отварање..."
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Disc Selection"
@@ -27137,27 +27129,24 @@ msgid "SVCD/VCD"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disable Disc Menus"
-msgstr "Деактивирај"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:306
-#, fuzzy
 msgid "Disc device"
-msgstr "Екран резолуција"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:308
 msgid "Starting Position"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:311
-#, fuzzy
 msgid "Audio and Subtitles"
-msgstr "Аудио Фајлови"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:144
 msgid "Use a sub&title file"
@@ -27168,9 +27157,8 @@ msgid "Select the subtitle file"
 msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
-#, fuzzy
 msgid "Choose one or more media file to open"
-msgstr "Селектрирај еден или повеќе датотеки за отварање"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:152
 msgid "File Selection"
@@ -27185,18 +27173,16 @@ msgid "Add..."
 msgstr ""
 
 #: modules/gui/qt/ui/open_net.h:97
-#, fuzzy
 msgid "Network Protocol"
-msgstr "Мрежа"
+msgstr ""
 
 #: modules/gui/qt/ui/open_net.h:98
 msgid "Please enter a network URL:"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "Профил"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27263,9 +27249,8 @@ msgid "Features"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "Стрим филтери"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -27280,9 +27265,8 @@ msgid "Fra&me Rate"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
-#, fuzzy
 msgid "Same as source"
-msgstr "Извор"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:733
 msgid " fps"
@@ -27321,9 +27305,8 @@ msgid "Sa&mple Rate"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Профил"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27334,9 +27317,8 @@ msgid "Destination Setup"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Избери \"Напредни Прилагодувања\" за да ги видиш сите опции."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27349,54 +27331,48 @@ msgid "New destination"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:210
-#, fuzzy
 msgid "Display locally"
-msgstr "Екран резолуција"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:212
 msgid "Transcoding Options"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Избери \"Напредни Прилагодувања\" за да ги видиш сите опции."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "Опции"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:217
-#, fuzzy
 msgid "Miscellaneous Options"
-msgstr "Разновидност"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:218
 msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Прилагодувања за главни стрим излези"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:415
-#, fuzzy
 msgid "Output module:"
-msgstr "Излезни модули"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:418
 msgid "Use S/PDIF when available"
@@ -27407,14 +27383,12 @@ msgid "Effects"
 msgstr "Ефекти"
 
 #: modules/gui/qt/ui/sprefs_audio.h:421
-#, fuzzy
 msgid "Visualization:"
-msgstr "Визуелизација"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Овозможи аудио"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
@@ -27429,9 +27403,8 @@ msgid "Tracks"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:426
-#, fuzzy
 msgid "Preferred audio language:"
-msgstr "Аудио јазик"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:427
 msgid "Password:"
@@ -27446,9 +27419,8 @@ msgid "Submit played tracks stats to Last.fm"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
-#, fuzzy
 msgid "Codecs"
-msgstr "Влезови / Кодеци"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
@@ -27503,9 +27475,8 @@ msgid "Default caching policy"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
-#, fuzzy
 msgid "Menus language:"
-msgstr "Јазик на мени"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:532
 msgid "Look and feel"
@@ -27548,18 +27519,16 @@ msgid "Force window style:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
-#, fuzzy
 msgid "Integrate video in interface"
-msgstr "Прилагодувања за главниот изглед"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
 msgid "Show systray icon"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Прилагодувања за главниот изглед"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -27614,23 +27583,20 @@ msgid "Show media title on video start"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
-#, fuzzy
 msgid "Enable subtitles"
-msgstr "Овозможи аудио"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:295
-#, fuzzy
 msgid "Subtitle Language"
-msgstr "Јазик на превод"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:297
 msgid "Default encoding"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:298
-#, fuzzy
 msgid "Subtitle effects"
-msgstr "Кодеци за превод"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:304
 msgid "Add a shadow"
@@ -27657,9 +27623,8 @@ msgid "O&utput"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
-#, fuzzy
 msgid "DirectX"
-msgstr "Режисер"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:322
 msgid "Accelerated video output (Overlay)"
@@ -27686,9 +27651,8 @@ msgid "Stuff"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:173
-#, fuzzy
 msgid "Edit settings"
-msgstr "Звучни прилагодувања"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:174
 msgid "Control"
@@ -27752,18 +27716,16 @@ msgid ">HHHHHH;#"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "Боја на текст"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1257
-#, fuzzy
 msgid "Interactive Zoom"
-msgstr "Изглед"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1263
 msgid "Angle"
@@ -27771,9 +27733,8 @@ msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1270
 #: modules/gui/qt/ui/video_effects.h:1287
-#, fuzzy
 msgid "..."
-msgstr "Меморирај..."
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1275
 msgid "full"
@@ -27836,14 +27797,12 @@ msgid "Temporal chroma strength"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
-#, fuzzy
 msgid "VLM configurator"
-msgstr "&VLM Конфикурирање"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:287
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Мадиа &Информации"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
@@ -27862,9 +27821,8 @@ msgid "Output:"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:293
-#, fuzzy
 msgid "Select Output"
-msgstr "Стим излези"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:294
 msgid "Time Control"
@@ -27875,9 +27833,8 @@ msgid "Mux Control"
 msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:296
-#, fuzzy
 msgid "Muxer:"
-msgstr "Миксери"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:297
 msgid "AAAA; "
