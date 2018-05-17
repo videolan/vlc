@@ -13,7 +13,7 @@
 # Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
 # Damien Erambert <damien.erambert@me.com>, 2013
 # Eric Lassauge <lassauge@users.sourceforge.net>, 2013-2015
-# Fan, 2017
+# Fan, 2018
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Rafaël Carré <funman@videolan.org>, 2014
 # chouquette <hugo@beauzee.fr>, 2015
@@ -29,11 +29,11 @@
 # ryann, 2015-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-20 03:42+0000\n"
-"Last-Translator: Mortimer <doug.mortimer@netcourrier.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Fan, 2018\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -692,7 +692,7 @@ msgstr "Filtres audio"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr "Gain de lecture"
+msgstr "ReplayGain"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
@@ -1015,12 +1015,12 @@ msgstr "Oui"
 #: src/input/es_out.c:2136
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "Sous-titrage DTVCC %u"
+msgstr "Sous-titrage pour malentendants DTVCC %u"
 
 #: src/input/es_out.c:2138
 #, c-format
 msgid "Closed captions %u"
-msgstr "Sous-titrage %u"
+msgstr "Sous-titrage malentendants %u"
 
 #: src/input/es_out.c:3091
 msgid "Original ID"
@@ -1064,7 +1064,7 @@ msgstr "Canaux "
 #: src/input/es_out.c:3123 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
-msgstr "Fréquence d'échantillonnage "
+msgstr "Fréquence d'échantillonnage"
 
 #: src/input/es_out.c:3123
 #, c-format
@@ -1090,11 +1090,11 @@ msgstr "%u kbit/s"
 
 #: src/input/es_out.c:3150
 msgid "Track replay gain"
-msgstr "Valeur du ReplayGain pour la piste"
+msgstr "Valeur de ReplayGain pour la piste"
 
 #: src/input/es_out.c:3152
 msgid "Album replay gain"
-msgstr "Valeur du ReplayGain pour l'album"
+msgstr "Valeur de ReplayGain pour l'album"
 
 #: src/input/es_out.c:3153
 #, c-format
@@ -1103,11 +1103,11 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
 msgid "Video resolution"
-msgstr "Résolution vidéo "
+msgstr "Résolution vidéo"
 
 #: src/input/es_out.c:3168
 msgid "Buffer dimensions"
-msgstr "Dimensions du tampon "
+msgstr "Dimensions du tampon"
 
 #: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1121,7 +1121,7 @@ msgstr "Débit d'images "
 
 #: src/input/es_out.c:3189
 msgid "Decoded format"
-msgstr "Format décodé "
+msgstr "Format décodé"
 
 #: src/input/es_out.c:3194
 msgid "Top left"
@@ -1157,7 +1157,7 @@ msgstr "Droite-haut"
 
 #: src/input/es_out.c:3199
 msgid "Orientation"
-msgstr "Orientation "
+msgstr "Orientation"
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1175,7 +1175,7 @@ msgstr "ITU-R BT.601 (625 lignes, 50 Hz)"
 
 #: src/input/es_out.c:3217
 msgid "Color primaries"
-msgstr "Couleurs primaires "
+msgstr "Couleurs primaires"
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1188,11 +1188,11 @@ msgstr "Hybrid Log-Gamma"
 
 #: src/input/es_out.c:3235
 msgid "Color transfer function"
-msgstr "Fonction de transfert de couleur "
+msgstr "Fonction de transfert de couleur"
 
 #: src/input/es_out.c:3248
 msgid "Color space"
-msgstr "Espace colorimétrique "
+msgstr "Espace colorimétrique"
 
 #: src/input/es_out.c:3248
 #, c-format
@@ -1232,7 +1232,7 @@ msgstr "Bas-centre"
 
 #: src/input/es_out.c:3265
 msgid "Chroma location"
-msgstr "Emplacement chrominance "
+msgstr "Emplacement chrominance"
 
 #: src/input/es_out.c:3274
 msgid "Rectangular"
@@ -1272,11 +1272,11 @@ msgstr "Champ de vision"
 
 #: src/input/es_out.c:3300
 msgid "Max. luminance"
-msgstr "Luminosité max."
+msgstr "Luminance max."
 
 #: src/input/es_out.c:3305
 msgid "Min. luminance"
-msgstr "Luminosité min."
+msgstr "Luminance min."
 
 #: src/input/es_out.c:3313
 msgid "Primary R"
@@ -1671,7 +1671,7 @@ msgstr "Rôle du média"
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
 msgstr ""
-"Rôle du média (du lecteur) pour la politique du système d'exploitation."
+"Rôle multimédia (du lecteur) pour la politique du système d'exploitation."
 
 #: src/libvlc-module.c:132 modules/gui/macosx/VLCSimplePrefsController.m:267
 #: modules/stream_out/display.c:40 modules/gui/qt/ui/sprefs_audio.h:410
@@ -1843,7 +1843,7 @@ msgstr ""
 
 #: src/libvlc-module.c:212
 msgid "Replay gain mode"
-msgstr "Mode Replay gain"
+msgstr "Mode ReplayGain"
 
 #: src/libvlc-module.c:214
 msgid "Select the replay gain mode"
@@ -1858,17 +1858,16 @@ msgid ""
 "This allows you to change the default target level (89 dB) for stream with "
 "replay gain information"
 msgstr ""
-"Cette option vous permet de changer la valeur par défaut (89 dB) pour les "
-"flux avec une information ReplayGain"
+"Cette option vous permet de changer la cible par défaut (89 dB) pour les "
+"flux avec information de ReplayGain"
 
 #: src/libvlc-module.c:221
 msgid "Default replay gain"
-msgstr "Valeur par défaut du ReplayGain"
+msgstr "Valeur par défaut de ReplayGain"
 
 #: src/libvlc-module.c:223
 msgid "This is the gain used for stream without replay gain information"
-msgstr ""
-"Valeur par défaut utilisée pour les flux sans information de ReplayGain"
+msgstr "Gain utilisé pour les flux sans information de ReplayGain"
 
 #: src/libvlc-module.c:225
 msgid "Peak protection"
@@ -2182,7 +2181,7 @@ msgstr ""
 #: modules/video_filter/deinterlace/deinterlace.c:300
 #: share/lua/http/dialogs/create_stream.html:346
 msgid "Deinterlace"
-msgstr "Désentrelacer"
+msgstr "Désentrelacement"
 
 #: src/libvlc-module.c:352 src/video_output/interlacing.c:128
 #: modules/gui/macosx/VLCMainMenu.m:445 modules/gui/macosx/VLCMainMenu.m:446
@@ -2748,7 +2747,7 @@ msgstr "Identifiant du canal de sous-titres à utiliser (de 0 à n)."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr "Décodeur de sous-titres préféré"
+msgstr "Décodeur de sous-titrage pour malentendants préféré"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2825,7 +2824,7 @@ msgstr "Le flux sera joué pendant tant de secondes."
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
-msgstr "Avance rapide"
+msgstr "Déplacement rapide"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
@@ -5092,7 +5091,7 @@ msgstr "Navigateur accueil"
 
 #: src/misc/actions.c:59
 msgid "Browser Refresh"
-msgstr "Navigateur actualiser"
+msgstr "Actualiser le navigateur"
 
 #: src/misc/actions.c:60
 msgid "Browser Search"
@@ -6571,11 +6570,11 @@ msgstr "SDI optique"
 
 #: modules/access/decklink.cpp:82
 msgid "Component"
-msgstr "Entrée composite"
+msgstr "Vidéo composante"
 
 #: modules/access/decklink.cpp:82
 msgid "Composite"
-msgstr "Entrée composite"
+msgstr "Vidéo composite"
 
 #: modules/access/decklink.cpp:82
 msgid "S-Video"
@@ -6611,7 +6610,7 @@ msgstr "10 bits"
 
 #: modules/access/decklink.cpp:353 modules/demux/ty.c:769
 msgid "Closed captions 1"
-msgstr "Sous-titrage codé 1"
+msgstr "Sous-titrage malentendants 1"
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6697,7 +6696,7 @@ msgid ""
 "(default), RV24, etc.)"
 msgstr ""
 "Forcer l'entrée vidéo DirectShow à utiliser un format de chrominance "
-"particulier (par exemple I420 (défaut), RV24, etc.)"
+"particulier (par exemple I420 (par défaut), RV24, etc.)"
 
 #: modules/access/dshow/dshow.cpp:151
 msgid "Video input frame rate"
@@ -6888,7 +6887,8 @@ msgstr ""
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
 msgstr ""
-"Le périphérique de capture « %s » ne supporte pas les paramètres requis."
+"Le périphérique de capture « %s » n'est pas compatible avec les paramètres "
+"requis."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 msgid "Windows networks"
@@ -7169,7 +7169,7 @@ msgstr "Verticale (13V)"
 
 #: modules/access/dtv/access.c:174
 msgid "Horizontal (18V)"
-msgstr "Horizontal e(18V)"
+msgstr "Horizontale (18V)"
 
 #: modules/access/dtv/access.c:175
 msgid "Circular Right Hand (13V)"
@@ -7191,7 +7191,7 @@ msgid ""
 msgstr ""
 "Si le câble entre la tête universelle (LNB) et le récepteur est long, un "
 "voltage plus élevé peut être nécessaire.\n"
-"Tous les récepteurs ne le supportent pas."
+"Mais tous les récepteurs ne sont pas compatibles."
 
 #: modules/access/dtv/access.c:183
 msgid "Local oscillator low frequency (kHz)"
@@ -7329,7 +7329,7 @@ msgstr "DTV"
 
 #: modules/access/dtv/access.c:243
 msgid "Digital Television and Radio"
-msgstr "Télévision numérique  et radio"
+msgstr "Télévision numérique et radio"
 
 #: modules/access/dtv/access.c:281
 msgid "Terrestrial reception parameters"
@@ -7554,7 +7554,9 @@ msgstr "Nom d'utilisateur"
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "Nom utilisé pour la connection, s'il n'y a pas de nom dans l'URL."
+msgstr ""
+"Nom d'utilisateur utilisé pour la connexion, s'il n'est pas défini dans "
+"l'URL."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7575,8 +7577,8 @@ msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
-"Mot de passe utilisé pour la connection, s'il n'y a pas de mot de passe dans "
-"l'URL."
+"Mot de passe utilisé pour la connexion, s'il n'y a pas de nom d'utilisateur "
+"ou de mot de passe dans l'URL."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -8146,7 +8148,7 @@ msgstr "Capture audio en stéréo."
 #: modules/access/oss.c:67 modules/access_output/shout.c:95
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:176
 msgid "Samplerate"
-msgstr "Fréquence d'échantillonnage "
+msgstr "Fréquence d'échantillonnage"
 
 #: modules/access/oss.c:69
 msgid ""
@@ -8448,7 +8450,7 @@ msgstr "N° affichage"
 #: modules/access/screen/screen.c:82
 msgid "Display ID. If not specified, main display ID is used."
 msgstr ""
-"N° de l'affichage. Si non renseigné ,le numéro de l'affichage principal sera "
+"N° de l'affichage. Si non renseigné, le numéro de l'affichage principal sera "
 "utilisé."
 
 #: modules/access/screen/screen.c:83
@@ -8644,7 +8646,7 @@ msgstr "Taille des portions SRT (octets)"
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
-msgstr ""
+msgstr "Envoyer le vote après un délai en millisecondes (-1 = infini)"
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
@@ -8697,6 +8699,8 @@ msgstr "Périphérique de capture VBI"
 #: modules/access/v4l2/v4l2.c:48
 msgid "The device node where VBI data can be read (for closed captions)."
 msgstr ""
+"Le nœud du périphérique où lire les données VBI (sous-titrage pour "
+"malentendants)."
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -9601,31 +9605,27 @@ msgstr "Sortie IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Longueur de la clé de cryptage en octets"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bits"
+msgstr "16 octets"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bits"
+msgstr "24 octets"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bits"
+msgstr "32 octets"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Flux de sortie SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Mot de passe pour le périphérique cible."
+msgstr "Mot de passe du cryptage de flux"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9896,6 +9896,8 @@ msgstr "Mode casque (binaural)"
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
+"Si la sortie est en stéréo, créer la spatialisation sonore avec le décodeur "
+"binaural"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
@@ -10800,7 +10802,7 @@ msgstr "Désactivée"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Activé (AC3/DTS seulement)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -10812,7 +10814,7 @@ msgstr "Sortie périphérique Windows Multimédia"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Output back-end"
-msgstr "back-end de sortie"
+msgstr "Back-end de sortie"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Audio output back-end interface."
@@ -11101,7 +11103,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:92
 msgid "Skip frame (default=0)"
-msgstr "Sauter des images (defaut = 0)"
+msgstr "Sauter des images (par defaut = 0)"
 
 #: modules/codec/avcodec/avcodec.h:94
 msgid ""
@@ -11109,20 +11111,20 @@ msgid ""
 "frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
 "Forcer à sauter des trames pour accélérer le décodage (-1=Aucune, 0=Par "
-"défaut, 1=trames-B, 2=trames-P, 3=trames B+P, A=toutes les trames)."
+"défaut, 1=Trames-B, 2=Trames-P, 3=Trames B+P, 4=Toutes les trames)."
 
 #: modules/codec/avcodec/avcodec.h:97
 msgid "Skip idct (default=0)"
-msgstr "Sauter idct (par défaut=0)"
+msgstr "Sauter la DCT inverse (par défaut=0)"
 
 #: modules/codec/avcodec/avcodec.h:99
 msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Forcer à sauter des idcts pour accélérer le décodage pour certaines trames "
-"(-1=Aucune, 0=Par défaut, 1=trames-B, 2=trames-P, 3=trames B+P, A=toutes les "
-"trames)."
+"Forcer à sauter la DCT inverse pour accélérer le décodage pour certaines "
+"trames (-1=Aucune, 0=Par défaut, 1=Trames-B, 2=Trames-P, 3=Trames B+P, "
+"4=Toutes les trames)."
 
 #: modules/codec/avcodec/avcodec.h:102
 msgid "Debug mask"
@@ -11143,7 +11145,7 @@ msgstr "Nom interne du codec « libavcodec »"
 #: modules/codec/avcodec/avcodec.h:108
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
 msgid "Skip the loop filter for H.264 decoding"
-msgstr "Pas de filtre de boucle pour H264"
+msgstr "Inhiber le filtre de boucle H.264"
 
 #: modules/codec/avcodec/avcodec.h:109
 msgid ""
@@ -11514,7 +11516,7 @@ msgstr "CC 608/708"
 
 #: modules/codec/cc.c:57
 msgid "Closed Captions decoder"
-msgstr "Décodeur de sous-titres pour malentendants"
+msgstr "Décodeur de sous-titrage pour malentendants"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
@@ -11728,6 +11730,8 @@ msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
 msgstr ""
+"1 est explicite pour SBR et implicite pour PS (par défaut), 2 est une "
+"hiérarchie explicite "
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -12123,7 +12127,7 @@ msgstr "Sous-titres (avancé)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Paramètres de sous-titres avec libass"
+msgstr "Rendu des sous-titres avec libass"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
@@ -12291,6 +12295,9 @@ msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
+"L'utilisation ciblée permet de choisir entre la vitesse et la qualité. Les "
+"valeurs autorisées sont 'speed' (vitesse), 'balanced' (équilibrée) et "
+"'quality' (qualité)"
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
@@ -12305,6 +12312,12 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
+"Pour le H.264, IdrInterval spécifie l'intervalle de l'IDR-frame en terme d'I-"
+"Frames : si IdrInterval=0, alors toutes les I-Frames sont un IDR-Frame, si "
+"IdrInterval=1, alors toutes les autres I-Frames sont un IDR-Frame, etc. Pour "
+"MPEG2, IdrInterval définit l’intervalle de séquence d'en-tête en terme d'I-"
+"Frames : si IdrInterval=N, une en-tête est insérée toutes les N I-Frames, si "
+"IdrInterval=0 (par défaut), une seule en-tête est insérée au début du flux."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
@@ -12853,7 +12866,7 @@ msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
-msgstr ""
+msgstr "Message d'alerte d'urgence pour le câble"
 
 #: modules/codec/scte27.c:42
 msgid "SCTE-27 decoder"
@@ -12999,7 +13012,7 @@ msgstr "Décodeur de sous-titres EBU STL"
 #. languages using the Latin alphabet.
 #: modules/codec/subsdec.c:100
 msgid "Default (Windows-1252)"
-msgstr "Défaut (Windows-1252)"
+msgstr "Par défaut (Windows-1252)"
 
 #: modules/codec/subsdec.c:101
 msgid "System codeset"
@@ -13686,7 +13699,7 @@ msgstr ""
 
 #: modules/codec/x264.c:149
 msgid "Skip loop filter"
-msgstr "Pas de filtre de boucle"
+msgstr "Inhiber de filtre de boucle"
 
 #: modules/codec/x264.c:150
 msgid "Deactivate the deblocking loop filter (decreases quality)."
@@ -14519,11 +14532,11 @@ msgstr "3,5"
 
 #: modules/codec/zvbi.c:95
 msgid "VBI and Teletext decoder"
-msgstr "Décodeur de sous-titres VBI et Télétexte"
+msgstr "Décodeur VBI et télétexte"
 
 #: modules/codec/zvbi.c:96
 msgid "VBI & Teletext"
-msgstr "VBI & Télétexte"
+msgstr "VBI & télétexte"
 
 #: modules/control/dbus/dbus.c:137
 msgid "DBus"
@@ -15033,7 +15046,7 @@ msgstr "| clear . . . . . . . . .  effacer la liste de lecture"
 
 #: modules/control/oldrc.c:800
 msgid "| status . . . . . . . . . . . current playlist status"
-msgstr "| status . . . . . . . . . . afficher les informations"
+msgstr "| état . . . . . . . . . . état de la liste de lecture"
 
 #: modules/control/oldrc.c:801
 msgid "| title [X]  . . . . . . set/get title in current item"
@@ -15345,7 +15358,7 @@ msgstr "Débit adaptatif"
 
 #: modules/demux/adaptive/adaptive.cpp:113
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr ""
+msgstr "Flux adaptatif unifié pour DASH et HLS (formats de streaming)"
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15528,7 +15541,7 @@ msgstr "Import de dossier"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
-msgstr ""
+msgstr "Utiliser le filtre démultiplexeur préventif"
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -15665,12 +15678,13 @@ msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:76
 msgid "Preload clusters"
-msgstr ""
+msgstr "Précharger les clusters"
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
+"Trouver toutes les positions de cluster par petits sauts avant la lecture"
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
@@ -15996,7 +16010,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:84
 msgid "Set id of ES to PID"
-msgstr "Sélectionner l'id de l'ES pour le PID"
+msgstr "Définir l'ID de l'ES comme le PID"
 
 #: modules/demux/mpeg/ts.c:85
 msgid ""
@@ -16005,7 +16019,7 @@ msgid ""
 "'#duplicate{..., select=\"es=<pid>\"}'."
 msgstr ""
 "Définir l'identifiant interne de chaque flux élémentaire de VLC à la valeur "
-"du PID dans le flux TS, au lieu de 1,2,3. Utile par exemple pour faire "
+"du PID dans le flux TS, au lieu de 1, 2, 3. Utile par exemple pour faire "
 "« #duplicate{…, select=\"es=<pid>\"} »."
 
 #: modules/demux/mpeg/ts.c:90 modules/mux/mpeg/ts.c:173
@@ -16229,7 +16243,7 @@ msgstr "Démultiplexeur ifo bidon"
 
 #: modules/demux/playlist/playlist.c:124
 msgid "iTunes Music Library importer"
-msgstr "Importation de bibliothèque iTunes"
+msgstr "Importation de musicothèque iTunes"
 
 #: modules/demux/playlist/playlist.c:129
 msgid "WPL playlist import"
@@ -16463,15 +16477,15 @@ msgstr "Décodeur de flux TY audio/vidéo"
 
 #: modules/demux/ty.c:770
 msgid "Closed captions 2"
-msgstr "Sous-titrage codé 2"
+msgstr "Sous-titrage malentendants 2"
 
 #: modules/demux/ty.c:771
 msgid "Closed captions 3"
-msgstr "Sous-titrage codé 3"
+msgstr "Sous-titrage malentendants 3"
 
 #: modules/demux/ty.c:772
 msgid "Closed captions 4"
-msgstr "Sous-titrage codé 4"
+msgstr "Sous-titrage malentendants 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
@@ -16503,7 +16517,7 @@ msgstr "catégorie inconnue"
 
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
-msgstr "Sous-titres"
+msgstr "Sous-titrage pour malentendants"
 
 #: modules/demux/xiph_metadata.h:50
 msgid "Textual audio descriptions"
@@ -16675,7 +16689,7 @@ msgstr "Habillages"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Appliquer le profil au prochain démarrage"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17342,15 +17356,15 @@ msgstr ""
 #: modules/gui/macosx/macosx.m:82
 #: modules/gui/macosx/VLCSimplePrefsController.m:321
 msgid "Display VLC status menu icon"
-msgstr "Afficher les icônes de status de VLC."
+msgstr "Afficher l'icône d'état de VLC"
 
 #: modules/gui/macosx/macosx.m:83
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
-"Par défaut VLC affiche les icônes de status. Cependant vous pouvez choisir "
-"de les cacher (redémarrage nécessaire)."
+"Par défaut VLC affiche l'icône du menu dans la barre d'état. Cependant vous "
+"pouvez choisir de le cacher (redémarrage nécessaire)."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17743,9 +17757,8 @@ msgid "Jump to Time"
 msgstr "Sauter à un moment"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Rendu"
+msgstr "Rendu"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17788,7 +17801,7 @@ msgstr "Flotter au-dessus"
 #: modules/gui/macosx/VLCSimplePrefsController.m:364
 #: modules/gui/qt/ui/sprefs_video.h:319
 msgid "Fullscreen Video Device"
-msgstr "Sortie vidéo en plein écran"
+msgstr "Périphérique vidéo en plein écran"
 
 #: modules/gui/macosx/VLCMainMenu.m:447 modules/gui/macosx/VLCMainMenu.m:448
 #: modules/video_filter/postproc.c:201
@@ -18720,6 +18733,8 @@ msgstr "Préférences"
 msgid ""
 "Media files cannot be resumed because keeping recent media items is disabled."
 msgstr ""
+"La lecture des fichiers média ne peut pas être reprise car la récupération "
+"des médias récents est désactivée."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:574
 msgid "Last check on: %@"
@@ -18762,10 +18777,11 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"Ceci va remettre à zéro toutes les préférences de VLC.\n"
+"Ceci va réinitialiser toutes les préférences de VLC.\n"
 "\n"
 "Notez que VLC va redémarrer pendant cette procédure, ainsi votre liste de "
-"lecture sera vidée et les lectures ou transcodages en cours seront arrêtés.\n"
+"lecture sera vidée et les lectures, diffusions ou transcodages en cours "
+"seront arrêtés.\n"
 "\n"
 "La médiathèque ne sera pas affectée.\n"
 "\n"
@@ -18818,7 +18834,7 @@ msgstr "Basculer Lire/Pause"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
 msgid "Toggle random order playback"
-msgstr ""
+msgstr "Activer la lecture aléatoire"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
@@ -19296,7 +19312,7 @@ msgstr "     [Echap]     Fermer le dialogue Ajouter/Chercher"
 
 #: modules/gui/ncurses.c:870
 msgid " Ctrl-l                 Refresh the screen"
-msgstr "     Ctrl+l      Rafraîchir l'écran"
+msgstr "     Ctrl+l      Actualiser l'écran"
 
 #: modules/gui/ncurses.c:874
 msgid "[Global]"
@@ -19589,7 +19605,7 @@ msgstr "Ouvrir sous-titres"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Dock fullscreen controller"
-msgstr "Afficher le contrôleur plein écran"
+msgstr "Ancrer le contrôleur plein écran"
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Stop playback"
@@ -20664,9 +20680,9 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>Pour protéger votre vie privée, <i>VLC media player</i> ne collecte ni ne "
-"transmet <b>aucune</b> de vos données personnelles, même sous une forme "
-"anonyme, à quiconque.</p>\n"
+"<p>Pour protéger votre vie privée, <i>Lecteur multimédia VLC</i> ne collecte "
+"ni ne transmet <b>aucune</b> de vos données personnelles, même sous une "
+"forme anonyme, à quiconque.</p>\n"
 "<p>En revanche, <i>VLC</i> est capable de récupérer automatiquement des "
 "informations sur votre liste de lecture à partir de services internet tiers. "
 "Cela inclut les pochettes, les noms des pistes, les noms d'artistes et "
@@ -22102,12 +22118,14 @@ msgstr "Décodeur MMAL pour Raspberry Pi"
 
 #: modules/hw/mmal/deinterlace.c:45
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr ""
+msgstr "Utiliser les processeurs QPU pour le désentrelacement HD avancé"
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"Utiliser les processeurs QPU pour autoriser le désentrelacement haute "
+"qualité des contenus HD"
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
@@ -22115,7 +22133,7 @@ msgstr "Désentrelacement MMAL"
 
 #: modules/hw/mmal/deinterlace.c:53
 msgid "MMAL-based deinterlace filter plugin"
-msgstr "filtre de désentrelacement VDPAU"
+msgstr "Filtre de désentrelacement MMAL-based"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -22131,11 +22149,12 @@ msgstr ""
 
 #: modules/hw/mmal/vout.c:54
 msgid "Blank screen below video."
-msgstr ""
+msgstr "Écran vide en dessous de la vidéo."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
 msgstr ""
+"Afficher un écran vierge en fond de vidéo. Augmente la charge du VideoCore."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -22150,6 +22169,8 @@ msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
+"Forcer la sortie HDMI dans un mode vidéo entrelacé pour le contenu vidéo "
+"entrelacé."
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
@@ -22229,19 +22250,19 @@ msgstr "Filtre de netteté VDPAU"
 
 #: modules/keystore/file.c:54
 msgid "File keystore (plaintext)"
-msgstr ""
+msgstr "Fichier des séquences de touches (plaintext)"
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
-msgstr ""
+msgstr "Le contenu confidentiel est stocké dans un fichier non crypté."
 
 #: modules/keystore/file.c:65
 msgid "Crypt keystore"
-msgstr ""
+msgstr "Crypter les séquences de touches"
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
-msgstr ""
+msgstr "Le contenu confidentiel est stocké dans un fichier crypté"
 
 #: modules/keystore/keychain.m:41
 msgid "No"
@@ -22281,40 +22302,45 @@ msgstr "Quand déverrouillé, sur cet appareil seulement"
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
-msgstr ""
+msgstr "Synchroniser les éléments stockés"
 
 #: modules/keystore/keychain.m:58
 msgid ""
 "Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
+"Synchroniser les éléments stockés via le trousseau iCloud si activé sur le "
+"domaine de l'utilisateur."
 
 #: modules/keystore/keychain.m:60
 msgid "Accessibility type for all future passwords saved to the Keychain"
 msgstr ""
+"Type d'accessibilité pour tous les futurs mots de passe enregistré dans le "
+"Trousseau"
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group"
-msgstr ""
+msgstr "Groupe du Trousseau d'accès"
 
 #: modules/keystore/keychain.m:63
 msgid "Keychain access group as defined by the app entitlements."
 msgstr ""
+"Groupe du Trousseau d'accès tel que défini dans les droits d'application."
 
 #: modules/keystore/keychain.m:109
 msgid "Keychain keystore"
-msgstr ""
+msgstr "Chaîne de caractères des séquences de touches"
 
 #: modules/keystore/keychain.m:110
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr ""
+msgstr "Séquences de touches pour iOS, Mac OS X et tvOS"
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
-msgstr ""
+msgstr "Magasin de clés KWallet"
 
 #: modules/keystore/kwallet.c:49
 msgid "Secrets are stored via KWallet"
-msgstr ""
+msgstr "Le contenu confidentiel est stocké via KWallet"
 
 #: modules/keystore/memory.c:41
 msgid "Memory keystore"
@@ -22322,23 +22348,23 @@ msgstr "Flux mémoire"
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
-msgstr ""
+msgstr "Le contenu confidentiel est stocké dans la mémoire"
 
 #: modules/keystore/secret.c:39
 msgid "libsecret keystore"
-msgstr ""
+msgstr "Magasin de clés libsecret"
 
 #: modules/keystore/secret.c:40
 msgid "Secrets are stored via libsecret"
-msgstr ""
+msgstr "Le contenu confidentiel est stocké vie libsecret"
 
 #: modules/logger/android.c:85
 msgid "Android log"
-msgstr ""
+msgstr "journalisation Android"
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
-msgstr ""
+msgstr "Journalisation d'Android en utilisant logcat"
 
 #: modules/logger/console.c:114
 msgid "Be quiet"
@@ -22346,7 +22372,7 @@ msgstr "Ne rien afficher"
 
 #: modules/logger/console.c:115
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Désactiver tous les messages sur la console."
 
 #: modules/logger/console.c:118
 msgid "Console log"
@@ -22418,7 +22444,7 @@ msgstr "Journal"
 
 #: modules/logger/journal.c:78
 msgid "SystemD journal logger"
-msgstr ""
+msgstr "Enregistreur de journal SystemD"
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
@@ -22426,7 +22452,7 @@ msgstr "System log (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
-msgstr ""
+msgstr "Émettre les messages du journal dans le journal du système POSIX."
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
@@ -22438,19 +22464,19 @@ msgstr "Inclure les messages de débogage dans les journaux systèmes."
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
-msgstr ""
+msgstr "Identité"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Traiter l'identité dans le journal système."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
-msgstr ""
+msgstr "Facilité"
 
 #: modules/logger/syslog.c:148
 msgid "System logging facility."
-msgstr ""
+msgstr "Facilité de l'enregistreur de journal système."
 
 #: modules/logger/syslog.c:151
 msgid "syslog"
@@ -22458,7 +22484,7 @@ msgstr "syslog"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Enregistreur de journal système (syslog)"
 
 #: modules/lua/extension.c:1194
 msgid "Extension not responding!"
@@ -23257,6 +23283,8 @@ msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
+"Attention, le certificat de sécurité présenté par le serveur est inconnu et "
+"ne peut pas être authentifié par une autorité de certificat fiable."
 
 #: modules/misc/gnutls.c:491
 msgid ""
@@ -23264,6 +23292,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Attention, le certificat de sécurité présenté par le serveur est différent "
+"de votre précédente visite et n'a été authentifié par aucune autorité de "
+"certificat fiable."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23288,6 +23319,11 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
+"Vous avez tenté d'atteindre %s.%s\n"
+"Le problème peut provenir d'une tentative de violation de votre sécurité "
+"compromettant votre confidentialité, ou d'une erreur de configuration \n"
+"\n"
+"En cas de doute, annulez immédiatement.\n"
 
 #: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
@@ -23604,7 +23640,7 @@ msgstr "Multiplexeur MP4/MOV"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Multiplexeur MP4 fragmenté et diffusable"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23694,7 +23730,9 @@ msgstr "Numéro du programme PMT"
 msgid ""
 "Assign a program number to each PMT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
-msgstr "Assigner un programme à chaque PMT."
+msgstr ""
+"Affecter un n° de programme à chaque PMT. Ceci nécessite d'activer « Définir "
+"le PID comme l'ID de l'ES »."
 
 #: modules/mux/mpeg/ts.c:120
 msgid "Mux PMT (requires --sout-ts-es-id-pid)"
@@ -23705,8 +23743,8 @@ msgid ""
 "Define the pids to add to each pmt. This requires \"Set PID to ID of ES\" to "
 "be enabled."
 msgstr ""
-"Définir les PID à ajouter à chaque PMT. L'option « Régler le PID à l'ID de "
-"l'ES » doit être activée."
+"Définir les PID à ajouter à chaque PMT. Ceci nécessite d'activer « Définir "
+"le PID comme l'ID de l'ES »."
 
 #: modules/mux/mpeg/ts.c:124
 msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
@@ -23717,19 +23755,21 @@ msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
+"Définit les descripteurs de chaque SDT. Ceci nécessite d'activer \"Définir "
+"le PID comme l'ID de l'ES\"."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
-msgstr "Régler l'id du PID comme celui de l'ES"
+msgstr "Définir le PID comme l'ID de l'ES"
 
 #: modules/mux/mpeg/ts.c:129
 msgid ""
 "Sets PID to the ID if the incoming ES. This is for use with --ts-es-id-pid, "
 "and allows having the same PIDs in the input and output streams."
 msgstr ""
-"Règle le PID à l'identifiant du flux élémentaire. Ceci devrait être utilisé "
-"avec --ts-es-id-pid, et permet d'avoir les mêmes PIDs dans les flux entrants "
-"et sortants."
+"Définit le PID comme l'identifiant du flux élémentaire entrant. Ceci "
+"s'utilise avec --ts-es-id-pid, et permet d'avoir les mêmes PID dans les flux "
+"entrants et sortants."
 
 #: modules/mux/mpeg/ts.c:133
 msgid "Data alignment"
@@ -23889,7 +23929,7 @@ msgstr "Multiplexeur WAV"
 
 #: modules/notify/osx_notifications.m:126
 msgid "OS X Notification Plugin"
-msgstr ""
+msgstr "Plugin de notification pour OS X"
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23925,7 +23965,7 @@ msgstr "Empaqueteur audio A/52"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "Mise en paquets avparser"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23945,7 +23985,7 @@ msgstr "Empaqueteur audio Flac"
 
 #: modules/packetizer/h264.c:62
 msgid "H.264 video packetizer"
-msgstr "Empaqueteur H264 vidéo"
+msgstr "Empaqueteur vidéo H.264"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
@@ -23994,11 +24034,11 @@ msgstr "Empaqueteur « VC-1 »"
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr ""
+msgstr "Services réseau Zeroconf"
 
 #: modules/services_discovery/avahi.c:56
 msgid "Zeroconf services"
-msgstr ""
+msgstr "Services Zeroconf"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
@@ -24008,7 +24048,7 @@ msgstr "Découverte réseau Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
-msgstr ""
+msgstr "Découverte de moteur de rendu Bonjour"
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -24040,7 +24080,7 @@ msgstr "Découverte réseau mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
-msgstr ""
+msgstr "Découverte de moteur de rendu mDNS"
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -24995,11 +25035,11 @@ msgstr "Réparer les recouvrements"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
-msgstr ""
+msgstr "Dossier de flux utilisant libarchive"
 
 #: modules/stream_extractor/archive.c:58
 msgid "libarchive based stream extractor"
-msgstr ""
+msgstr "Extracteur de flux utilisant libarchive"
 
 #: modules/stream_filter/adf.c:42
 msgid "ADF stream filter"
@@ -25007,7 +25047,7 @@ msgstr "Filtre flux ADF"
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
-msgstr ""
+msgstr "Module Cam ARIB STD-B25"
 
 #: modules/stream_filter/cache_block.c:498
 msgid "Block stream cache"
@@ -25059,7 +25099,7 @@ msgstr "Taille de lecture du préchargement (octets)"
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
-msgstr "Seuil de recherche"
+msgstr "Seuil de déplacement"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -25071,7 +25111,7 @@ msgstr "Enregistrement flux interne"
 
 #: modules/stream_filter/skiptags.c:243
 msgid "APE/ID3 tags-skipping filter"
-msgstr "Filtre pour les tags APR/ID3"
+msgstr "Filtre des tags APR/ID3"
 
 #: modules/stream_out/autodel.c:46
 msgid "Autodel"
@@ -25146,6 +25186,10 @@ msgid ""
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
+"Si activé, le pont rejettera toutes entrées de flux élémentaires sauf s'il "
+"ne reçoit pas les données depuis un autre pont. Ceci peut être utilisé pour "
+"configurer un flux de secours lorsque la source est défaillante. Flux source "
+"et substitution doivent être au même format."
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -25280,10 +25324,13 @@ msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"La diffusion de cette vidéo nécessite une conversion. Cette conversion peut "
+"utiliser toute la puissance disponible et peut rapidement vider votre "
+"batterie."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
 msgid "Chromecast demux wrapper"
-msgstr ""
+msgstr "Encapsulation du demux Chromecast"
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
@@ -25847,6 +25894,8 @@ msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
+"adresse:port pour le lien de vlc en écoute de flux entrants. Info pour dst, "
+"dst=lien+'/'+chemin. Le paramètre dst remplace ceci."
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
@@ -25857,6 +25906,8 @@ msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
+"Nom de fichier pour le flux. Info pour dst, dst=lien+'/'+chemin. Le "
+"paramètre dst remplace ceci."
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -26027,6 +26078,10 @@ msgid ""
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
+"Permet d'ajouter des incrustations (superpositions) sur le flux vidéo "
+"transcodé. Les superpositions produites par les filtres seront directement "
+"incrustées sur la vidéo. Vous pouvez fournir une liste de modules "
+"d’incrustations séparés par un double point \":\"."
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -26049,13 +26104,15 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
-msgstr ""
+msgstr "Taille du groupe d'images"
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
 "Defines how many pictures we allow to be in pool between decoder/encoder "
 "threads when threads > 0"
 msgstr ""
+"Définit le nombre d'images autorisées à être dans le groupe entre le "
+"décodeur/encodeur de threads lorsque threads > 0"
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
@@ -26441,20 +26498,18 @@ msgid "Ball speed"
 msgstr "Vitesse des balles"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Choisir la vitesse des balles, donc la valeur de déplacement en pixels par "
-"image."
+"Définir la vitesse de la balle, la valeur du déplacement exprimée en pixels "
+"par image."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Taille des balles"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Choisir la taille des balles, donc la valeur du rayon en pixels"
+msgstr "Définir la taille de la balle en donnant son rayon en pixels."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -26671,12 +26726,13 @@ msgstr "Filtre vidéo canevas"
 
 #: modules/video_filter/ci_filters.m:755
 msgid "Use a specific Core Image Filter"
-msgstr ""
+msgstr "Utiliser un filtre Core Image spécifique"
 
 #: modules/video_filter/ci_filters.m:757
 msgid ""
 "Example: 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 msgstr ""
+"Exemple : 'CICrystallize', 'CIBumpDistortion', 'CIThermal', 'CIComicEffect'"
 
 #: modules/video_filter/ci_filters.m:763
 msgid "Mac OS X hardware video filters"
@@ -26780,7 +26836,7 @@ msgstr "Rogner/Ajouter"
 
 #: modules/video_filter/croppadd.c:80
 msgid "Video cropping filter"
-msgstr "Filtre de redimensionnement"
+msgstr "Filtre de recadrage"
 
 #: modules/video_filter/croppadd.c:97
 msgid "Padd"
@@ -27649,7 +27705,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:73
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Valeur du descripteur actif de format AFD"
 
 #: modules/video_output/decklink.cpp:76
 msgid "Aspect Ratio of the source picture."
@@ -27657,11 +27713,11 @@ msgstr "Ratio d'aspect de l'image source."
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Ligne du descripteur actif de format AFD"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
-msgstr ""
+msgstr "Ligne VBI à laquelle associer le descripteur actif de format AFD"
 
 #: modules/video_output/decklink.cpp:81
 msgid "Picture to display on input signal loss"
@@ -28162,7 +28218,7 @@ msgstr "XDG shell surface"
 #: modules/video_output/xcb/window.c:433
 msgctxt "ASCII"
 msgid "VLC media player"
-msgstr "VLC media player"
+msgstr "Lecteur multimédia VLC"
 
 #. xgettext: This is a plain ASCII spelling of "VLC"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -28738,6 +28794,8 @@ msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
+"Le paramètre alpha pour la fenêtre Kaiser. Augmenter l'alpha augmente la "
+"taille du lobe principal et diminue l'amplitude du lobe secondaire. "
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
@@ -28998,7 +29056,7 @@ msgstr "Lecture"
 
 #: share/lua/http/index.html:245
 msgid "Refresh List"
-msgstr "Rafraîchir la liste"
+msgstr "Actualiser la liste"
 
 #: share/lua/http/index.html:252
 msgid "Loading flowplayer..."
@@ -29022,9 +29080,9 @@ msgid ""
 "configuration, or to modify the default settings, select the button to the "
 "right: <i>Manage Streams</i>"
 msgstr ""
-"Le flux sera créé en utilisant les paramètres par défaut, pour une "
-"configuration avancée, ou pour modifier ces paramètres par défaut, cliquez "
-"sur le bouton <i>Gérer les flux</i> à droite"
+"Le flux sera créé d'après les paramètres par défaut, pour une configuration "
+"avancée, ou pour modifier ces paramètres, cliquer sur le bouton <i>Gérer les "
+"flux</i> à droite"
 
 #: share/lua/http/index.html:268
 msgid ""
@@ -29047,9 +29105,9 @@ msgid ""
 "item, the first selected item from the <i>Library</i> will be the subject of "
 "the stream."
 msgstr ""
-"Le média en cours de lecture sera émis en flux. S'il n'y a pas d'élément en "
-"cours de lecture, le premier sélectionné dans la <i>Bibliothèque</i> sera "
-"utilisé pour le flux."
+"Le média en cours de lecture sera diffusé. S'il n'y a pas d'élément en cours "
+"de lecture, le premier sélectionné dans la <i>Bibliothèque</i> sera utilisé "
+"pour la diffusion."
 
 #: share/lua/http/index.html:275
 msgid ""
@@ -29362,7 +29420,7 @@ msgstr "Paramètres d'encodage"
 
 #: modules/gui/qt/ui/profiles.h:742
 msgid "Frame size"
-msgstr "Taille d'images "
+msgstr "Taille d'image"
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
@@ -29495,7 +29553,7 @@ msgstr "Codecs"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
-msgstr "profil x264 et sélection du niveau"
+msgstr "Profil et niveau x264"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Hardware-accelerated decoding"
@@ -29579,7 +29637,7 @@ msgstr "Mettre en pause la lecture si minimisé"
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Show media change popup:"
-msgstr "Afficher une infobulle de changement de média :"
+msgstr "Afficher une infobulle de changement de média :"
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
 msgid "Start in minimal view mode"
@@ -29599,7 +29657,7 @@ msgstr "Afficher une icône dans la barre système"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
 msgid "Auto raising the interface:"
-msgstr "Faire réapparaître l'interface :"
+msgstr "Réapparition automatique de l'interface :"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29707,7 +29765,7 @@ msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:327
 msgid "Deinterlacing"
-msgstr "Mode de désentrelacement"
+msgstr "Désentrelacement"
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
