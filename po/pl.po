@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-05-17 22:51+0200\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
@@ -16423,7 +16423,6 @@ msgstr ""
 "VLC media player i VideoLAN są znakami towarowymi Stowarzyszenia VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16435,12 +16434,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player to darmowy i otwarty odtwarzacz multimedialny, koder i "
-"streamer stworzony przez wolontariuszy społeczności <a href=\"http://www."
+"streamer stworzony przez wolontariuszy społeczności <a href=\"https://www."
 "videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>.</p><p>VLC korzysta ze swoich wewnętrznych kodeków, "
 "działa na każdej popularnej platformie i jest w stanie odczytać niemal "
 "wszystkie pliki, CD, DVD, strumienie sieciowe, karty przechwytywania i inne "
-"formaty multimedialne!</p><p><a href=\"http://www.videolan.org/contribute/"
+"formaty multimedialne!</p><p><a href=\"https://www.videolan.org/contribute/"
 "\"><span style=\" text-decoration: underline; color:#0057ae;\">Wspomóż nas i "
 "dołącz do nas!</span></a>"
 
@@ -17080,9 +17079,8 @@ msgstr "Przejdź do poprzedniego elementu"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Opuść pełny ekran"
+msgstr "Opuść tryb pełnoekranowy"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
