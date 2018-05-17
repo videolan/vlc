@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# A S Alam <apreet.alam@gmail.com>, 2009-2016
+# A S Alam <apreet.alam@gmail.com>, 2009-2018
 # Navpreet Kaur <passionate.preet3@gmail.com>, 2014
 # Punjabi Fied <towtruckerwiki@gmail.com>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: A S Alam <alam.yellow@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: A S Alam <alam.yellow@gmail.com>, 2018\n"
 "Language-Team: Panjabi (Punjabi) (https://www.transifex.com/yaron/"
 "teams/16553/pa/)\n"
 "Language: pa\n"
@@ -1128,22 +1128,19 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "ਪਿੱਚ"
+msgstr ""
 
 #: src/input/es_out.c:3292
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "ਰੋਲ"
+msgstr ""
 
 #: src/input/es_out.c:3295
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "ਵੇਖਣ ਦਾ ਖੇਤਰ"
+msgstr ""
 
 #: src/input/es_out.c:3300
 msgid "Max. luminance"
@@ -8847,28 +8844,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 ਬਿੱਟ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 ਬਿੱਟ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 ਬਿੱਟ"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "ਟਾਰਗੇਟ ਜੰਤਰ ਲਈ ਪਾਸਵਰਡ।"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -16358,9 +16351,8 @@ msgid "Jump to Time"
 msgstr "ਸਮੇਂ ਉੱਤੇ ਜਾਓ"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "ਟੈਕਸਟ ਰੈਂਡਰਰ"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -19976,7 +19968,7 @@ msgstr "ਵਾਲੀਅਮ ਵਧਾਓ(&I)"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "ਵਾਲੀਅਮ ਘਟਾਓ(&e)"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20004,7 +19996,7 @@ msgstr "...ਸਬਟਾਈਟਲ ਫਾਇਲ ਸ਼ਾਮਿਲ(&S)"
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
-msgstr ""
+msgstr "ਸਬ ਟਰੈਕ(&T)"
 
 #: modules/gui/qt/menus.cpp:677
 msgid "Video &Track"
@@ -20143,9 +20135,8 @@ msgid "<Local>"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "...ਸਟਰੀਮ(&S)"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -23463,18 +23454,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "ਕਾਰਗੁਜ਼ਾਰੀ ਚੋਣਾਂ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "ਆਡੀਓ ਸਟਰੀਮ ਆਉਟਪੁੱਟ ਯੋਗ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23497,9 +23486,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "ਰੈਡਰਿੰਗ ਕੁਆਲਟੀ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -23526,9 +23514,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "ਫੇਰ ਨਾ ਪੁੱਛੋ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27124,9 +27111,8 @@ msgid "Start Time"
 msgstr "ਸਟਾਰਟ ਟਾਈਮ"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "ਸਟਾਪ ਟਾਈਮ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27153,9 +27139,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "ਮੀਡਿਆ ਲਈ ਸ਼ੁਰੂ ਟਾਈਮ ਬਦਲੋ"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27314,9 +27299,8 @@ msgid "Features"
 msgstr "ਫੀਚਰ"
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "ਸਟਰੀਮ ਨਾਂ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -27367,14 +27351,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "ਸੈਂਪਲ ਰੇਟ"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "ਪਰੋਫਾਇਲ ਨਾਂ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27385,9 +27367,8 @@ msgid "Destination Setup"
 msgstr "ਟਿਕਾਣਾ ਸੈਟਅੱਪ"
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "ਇੱਕ ਡਾਇਰੈਕਟਰੀ ਚੁਣੋ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27408,9 +27389,8 @@ msgid "Transcoding Options"
 msgstr "ਟਰਾਂਸਕੋਡਿੰਗ ਚੋਣਾਂ"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "ਸਟਰੀਮਿੰਗ ਅਤੇ ਟਰਾਂਸਕੋਡਿੰਗ ਚੋਣਾਂ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -27429,9 +27409,8 @@ msgid "Miscellaneous Options"
 msgstr "ਫੁਟਕਲ ਚੋਣਾਂ"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "ਆਡੀਓ ਐਲੀਮੈਂਟਰੀ ਸਟਰੀਮ ਦੀ ਸੈਂਪਲ ਰੇਟ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
 msgid "Generated stream output string"
@@ -27458,9 +27437,8 @@ msgid "Visualization:"
 msgstr "ਦਿੱਖ:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "ਆਡੀਓ ਯੋਗ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
@@ -27487,9 +27465,8 @@ msgid "Username:"
 msgstr "ਯੂਜ਼ਰ ਨਾਂ:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:429
-#, fuzzy
 msgid "Submit played tracks stats to Last.fm"
-msgstr "ਚਲਾਏ ਗਏ ਗੀਤਾਂ ਨੂੰ last.fm ਨੂੰ ਭੇਜਣਾ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Codecs"
@@ -27500,18 +27477,16 @@ msgid "x264 profile and level selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr "ਹਾਰਡਵੇਅਰ ਡੀਕੋਡਿੰਗ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
 msgstr "ਵਿਡੀਓ ਕੁਆਥਟੀ ਪੋਸਟ ਪਰੋਸੈੱਸ ਲੈਵਲ"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "ਲੂਪ ਫਿਲਟਰ ਛੱਡੋ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
@@ -27578,9 +27553,8 @@ msgid "Show controls in full screen mode"
 msgstr "ਪੂਰੀ ਸਕਰੀਨ ਮੋਡ ਵਿੱਚ ਕੰਟਰੋਲ ਵੇਖੋ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:540
-#, fuzzy
 msgid "Pause playback when minimized"
-msgstr "ਜਦੋਂ ਘੱਟੋ-ਘੱਟ ਹੋਵੇ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:541
 msgid "Show media change popup:"
@@ -27603,9 +27577,8 @@ msgid "Show systray icon"
 msgstr "ਸਿਸਟਮ ਟਰੇ ਵੇਖੋ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses ਇੰਟਰਫੇਸ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -27644,9 +27617,8 @@ msgid "Operating System Integration"
 msgstr "ਓਪਰੇਟਿੰਗ ਸਿਸਟਮ ਐਟੀਗਰੇਸ਼ਨ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
-#, fuzzy
 msgid "File extensions association"
-msgstr "ਫਾਇਲ ਸਬੰਧ"
+msgstr "ਫਾਇਲ ਇਕਸਟੈਂਸ਼ਨ ਸੰਬੰਧ"
 
 #: modules/gui/qt/ui/sprefs_interface.h:568
 msgid "Set up associations..."
@@ -27697,9 +27669,8 @@ msgid "Add a background"
 msgstr "ਬੈਕਗਰਾਊਂਡ ਜੋੜੋ"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "ਆਉਟਪੁੱਟ"
+msgstr "ਆਉਟਪੁੱਟ(&u)"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -27795,9 +27766,8 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "ਉਲਟ ਰੰਗ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
@@ -27845,9 +27815,8 @@ msgid "Motion detect"
 msgstr "ਗਤੀ ਖੋਜ"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "ਮੋਸ਼ਨ ਬਲੱਰ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -27858,9 +27827,8 @@ msgid "Soften"
 msgstr "ਸਾਫਟਨ"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "ਨੋਵਾਇਸ"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
