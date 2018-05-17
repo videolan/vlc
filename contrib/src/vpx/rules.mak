@@ -27,14 +27,14 @@ ifeq ($(ARCH),aarch64)
 	$(APPLY) $(SRC)/vpx/libvpx-darwin-aarch64.patch
 endif
 endif
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/vpx/libvpx-pthread-w32.patch
 endif
 	$(MOVE)
 
 DEPS_vpx =
 
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_vpx += pthreads $(DEPS_pthreads)
 VPX_HOSTVARS = $(HOSTVARS) CFLAGS="$(CFLAGS) -DPTW32_STATIC_LIB" CXXFLAGS="$(CXXFLAGS) -DPTW32_STATIC_LIB"
 endif

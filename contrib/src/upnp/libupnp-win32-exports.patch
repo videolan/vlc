@@ -1,0 +1,31 @@
+--- upnp/configure.ac.win32	2013-11-15 17:18:45.000000000 +0100
++++ upnp/configure.ac	2018-05-17 11:41:56.647083600 +0200
+@@ -670,6 +670,17 @@ ACX_PTHREAD(
+ CC="$PTHREAD_CC"
+ CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+ LIBS="$PTHREAD_LIBS $LIBS"
++
++PC_CFLAGS="$PTHREAD_CFLAGS"
++
++# WIN32 specific
++if test "$ac_cv_win32" = "yes"; then
++WIN32_LIBS="-liphlpapi -lws2_32"
++PC_CFLAGS="$PC_CFLAGS -DUPNP_STATIC_LIB"
++fi
++AC_SUBST(PC_CFLAGS)
++AC_SUBST(WIN32_LIBS)
++
+ #
+ # Determine if pthread_rwlock_t is available
+ #
+--- upnp/libupnp.pc.in.win32	2010-12-23 21:24:05.000000000 +0100
++++ upnp/libupnp.pc.in	2018-05-17 11:43:06.014745400 +0200
+@@ -6,6 +6,6 @@ includedir=@includedir@
+ Name: libupnp
+ Description: Linux SDK for UPnP Devices
+ Version: @VERSION@
+-Libs: @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ -L${libdir} -lupnp -lthreadutil -lixml 
+-Cflags: @PTHREAD_CFLAGS@ -I${includedir}/upnp
++Libs: -L${libdir} -lupnp -lthreadutil -lixml @PTHREAD_LIBS@ @WIN32_LIBS@
++Cflags: @PC_CFLAGS@ -I${includedir}/upnp
+ 

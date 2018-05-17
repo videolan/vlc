@@ -16,17 +16,12 @@ new file mode 100644
 index 0000000..4c431cf
 --- /dev/null
 +++ b/Makefile
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,38 @@
 +SRCS := colorspace.c common.c context.c dither.c dispatch.c filters.c ra.c renderer.c shaders.c \
 +	shaders/colorspace.c shaders/sampling.c spirv.c bstr/bstr.c bstr/format.c 3rdparty/siphash.c \
 +	ta/ta.c ta/ta_utils.c ta/talloc.c
 +
-+ifdef HAVE_WIN32
-+CFLAGS += -DPTW32_STATIC_LIB
-+lpthread_libs = -lpthreadGC2 -lws2_32
-+else
 +lpthread_libs = $(shell $(LD) -lpthread && echo "-lpthread" || echo "")
-+endif
 +
 +OBJS = $(patsubst %.c, $(OBJDIR)src/%.o, $(SRCS))
 +

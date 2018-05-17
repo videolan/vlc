@@ -5,7 +5,7 @@ OPENJPEG_URL := https://github.com/uclouvain/openjpeg/archive/v$(OPENJPEG_VERSIO
 
 OPENJPEG_CFLAGS   := $(CFLAGS)
 OPENJPEG_CXXFLAGS := $(CXXFLAGS)
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_openjpeg += pthreads $(DEPS_pthreads)
 OPENJPEG_CFLAGS   += -DPTW32_STATIC_LIB
 OPENJPEG_CXXFLAGS += -DPTW32_STATIC_LIB

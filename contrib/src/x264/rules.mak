@@ -34,7 +34,11 @@ X264CONF = --prefix="$(PREFIX)" --host="$(HOST)" \
 ifndef HAVE_WIN32
 X264CONF += --enable-pic
 else
+ifdef HAVE_WINSTORE
 X264CONF += --enable-win32thread
+else
+X264CONF += --disable-win32thread
+endif
 ifeq ($(ARCH), arm)
 X264_AS = AS="./tools/gas-preprocessor.pl -arch arm -as-type clang -force-thumb -- $(CC) -mimplicit-it=always"
 endif

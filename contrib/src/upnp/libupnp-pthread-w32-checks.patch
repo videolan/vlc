@@ -1,0 +1,54 @@
+--- upnp/threadutil/src/ThreadPool.c.pthread-w32	2018-05-17 10:53:48.438587300 +0200
++++ upnp/threadutil/src/ThreadPool.c	2018-05-17 10:54:03.696907300 +0200
+@@ -34,7 +34,7 @@
+  * \file
+  */
+ 
+-#if !defined(WIN32)
++#if !defined(WIN32) || !defined(_MSC_VER)
+ 	#include <sys/param.h>
+ #endif
+ 
+@@ -263,8 +263,16 @@ static int SetPolicyType(
+ #elif defined(__OSX__) || defined(__APPLE__) || defined(__NetBSD__)
+ 	setpriority(PRIO_PROCESS, 0, 0);
+ 	retVal = 0;
+-#elif defined(WIN32)
++#elif defined(PTW32_LEVEL) 
+ 	retVal = sched_setscheduler(0, in);
++#elif defined(WIN32)
++	struct sched_param current;
++	int sched_result;
++
++	memset(&current, 0, sizeof(current));
++	current.sched_priority = sched_get_priority_min(DEFAULT_POLICY);
++	sched_result = sched_setscheduler(0, in, &current);
++	retVal = (sched_result != -1 || errno == EPERM) ? 0 : errno;
+ #elif defined(_POSIX_PRIORITY_SCHEDULING) && _POSIX_PRIORITY_SCHEDULING > 0
+ 	struct sched_param current;
+ 	int sched_result;
+@@ -415,11 +423,11 @@ static void SetSeed(void)
+ 	struct timeval t;
+   
+ 	gettimeofday(&t, NULL);
+-#if defined(WIN32)
++#if defined(PTW32_LEVEL)
+ 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id().p);
+ #elif defined(BSD) || defined(__OSX__) || defined(__APPLE__) || defined(__FreeBSD_kernel__)
+ 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
+-#elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__)
++#elif defined(__linux__) || defined(__sun) || defined(__CYGWIN__) || defined(__GLIBC__) || defined(WIN32)
+ 	srand((unsigned int)t.tv_usec + (unsigned int)ithread_get_current_thread_id());
+ #else
+ 	{
+--- upnp/upnp/src/api/upnpdebug.c.pthread-w32	2018-05-17 10:53:05.030173700 +0200
++++ upnp/upnp/src/api/upnpdebug.c	2018-05-17 10:53:44.686358100 +0200
+@@ -183,7 +183,7 @@ void UpnpDisplayFileAndLine(FILE *fd, co
+ 		lines[i] = buf[i];
+ 	/* Put the debug lines in the buffer */
+ 	sprintf(buf[0], "DEBUG - THREAD ID: 0x%lX",
+-#ifdef WIN32
++#if defined(PTW32_LEVEL)
+ 		(unsigned long int)ithread_self().p
+ #else
+ 		(unsigned long int)ithread_self()

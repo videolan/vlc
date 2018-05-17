@@ -14,7 +14,7 @@ $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 
 .sum-upnp: libupnp-$(UPNP_VERSION).tar.bz2
 
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_upnp += pthreads $(DEPS_pthreads)
 LIBUPNP_ECFLAGS = -DPTW32_STATIC_LIB
 endif
@@ -30,14 +30,15 @@ endif
 upnp: libupnp-$(UPNP_VERSION).tar.bz2 .sum-upnp
 	$(UNPACK)
 ifdef HAVE_WIN32
-	$(APPLY) $(SRC)/upnp/libupnp-configure.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win32.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win64.patch
 	$(APPLY) $(SRC)/upnp/windows-random.patch
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
+	$(APPLY) $(SRC)/upnp/libupnp-win32-exports.patch
+	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-checks.patch
 ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/upnp/winrt-dont-force-win32-winnt.patch
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
+	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-force.patch
 endif
 endif
 	$(APPLY) $(SRC)/upnp/libpthread.patch

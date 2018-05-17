@@ -1,0 +1,11 @@
+--- zvbi/configure.in	2018-05-16 14:04:41.881375400 +0200
++++ zvbi/configure.in.pthread-w32	2018-05-16 14:03:52.661096100 +0200
+@@ -167,7 +167,7 @@ dnl
+ dnl Check how to link pthreads functions.
+ dnl (-lpthread on Linux, -pthread on FreeBSD).
+ dnl
+-AC_CHECK_LIB(pthread, pthread_create,,[
++AC_SEARCH_LIBS(pthread_create,[pthreadGC2 pthread],,[
+   AC_TRY_LINK(, pthread_create();,,[
+     LDFLAGS="$LDFLAGS -pthread"
+     AC_TRY_LINK(, pthread_create();,,[

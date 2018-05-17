@@ -22,7 +22,9 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
 	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
 endif
+ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
+endif
 	$(MOVE)
 ifdef HAVE_ANDROID
 	cp $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.c $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.h aom/aom_ports/
@@ -31,7 +33,7 @@ endif
 AOM_CFLAGS   := $(CFLAGS)
 AOM_CXXFLAGS := $(CXXFLAGS)
 DEPS_aom =
-ifdef HAVE_WIN32
+ifdef HAVE_WINSTORE
 DEPS_aom += pthreads $(DEPS_pthreads)
 AOM_CFLAGS   += -DPTW32_STATIC_LIB
 AOM_CXXFLAGS += -DPTW32_STATIC_LIB
