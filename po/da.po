@@ -9,7 +9,8 @@
 # Louis Tim Larsen <louis@louis.dk>, 2014
 # Nicolai Nystrup-Eriksen <nicolain-e@hotmail.dk>, 2014
 # Peter Jespersen <flywheel@illogical.dk>, 2013
-# scootergrisen, 2015-2017
+# Mikkel <scheike@outlook.com>, 2018
+# scootergrisen, 2015-2018
 # Sejani, 2013
 # Ulrik Johansen, 2016
 # ulrik, 2013-2014
@@ -30,11 +31,11 @@
 # Decode
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-01 07:26+0000\n"
-"Last-Translator: Mikkel <scheike@outlook.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Mikkel <scheike@outlook.com>, 2018\n"
 "Language-Team: Danish (https://www.transifex.com/yaron/teams/16553/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -1250,7 +1251,7 @@ msgstr ""
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rulning"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
@@ -9446,28 +9447,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32-bit"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Adgangskode til målenheden."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -17453,9 +17450,8 @@ msgid "Jump to Time"
 msgstr "Gå til tidspunkt"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Optegner"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -20886,7 +20882,7 @@ msgstr "Hastighedsvælger"
 
 #: modules/gui/qt/dialogs/vlm.cpp:73
 msgid "Broadcast"
-msgstr "Transmittere"
+msgstr "Transmittér"
 
 #: modules/gui/qt/dialogs/vlm.cpp:74
 msgid "Schedule"
@@ -20938,7 +20934,7 @@ msgstr "Åbn VLM-opsætning..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:532
 msgid "Broadcast: "
-msgstr "Transmittere: "
+msgstr "Transmittér: "
 
 #: modules/gui/qt/dialogs/vlm.cpp:605
 msgid "Schedule: "
@@ -21600,7 +21596,7 @@ msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Alle filer |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -24548,7 +24544,7 @@ msgstr "RSS og Atom-feed visning"
 
 #: modules/spu/subsdelay.c:45
 msgid "Change subtitle delay"
-msgstr "Skift undertekst forsinkelse"
+msgstr "Skift undertekstforsinkelse"
 
 #: modules/spu/subsdelay.c:47
 msgid "Delay calculation mode"
@@ -26118,7 +26114,6 @@ msgid "Ball speed"
 msgstr "Boldens hastighed"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr "Angiv boldens hastighed, ændringsværdien i antal pixels pr. billede."
 
@@ -26127,9 +26122,8 @@ msgid "Ball size"
 msgstr "Boldens størrelse"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Angiv boldens størrelse ved at give den en radius i antal af pixels"
+msgstr "Angiv boldens størrelse ved at give den en radius i antal af pixels."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -28756,9 +28750,8 @@ msgid "Start Time"
 msgstr "Starttidspunkt"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Sluttidspunkt"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28785,9 +28778,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Skift starttidspunktet for mediet"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28959,7 +28951,7 @@ msgstr "Menuer"
 
 #: modules/gui/qt/ui/profiles.h:730
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "&Billedhastighed"
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -28998,9 +28990,8 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Samplinghastighed"
+msgstr "&Samplinghastighed"
 
 #: modules/gui/qt/ui/profiles.h:766
 msgid "Profile &Name"
@@ -29139,9 +29130,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Skip H.264 in-loop deblocking filter"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profil og niveau"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29228,9 +29218,8 @@ msgid "Show systray icon"
 msgstr "Vis ikon på proceslinjen"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses grænseflade"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
