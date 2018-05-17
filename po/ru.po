@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Alexander Lakhin <exclusion@gmail.com>, 2014-2015,2017
+# Alexander Lakhin <exclusion@gmail.com>, 2014-2018
 # Andrey Brilevskiy <andrey-brilevskiy@yandex.ru>, 2005
 # Andrey Wolk (Lorni) <andywolk@gmail.com>, 2009
 # Konstantin Pavlov <thresh@videolan.org>, 2011
@@ -11,11 +11,11 @@
 # Valek Filippov <frob@df.ru>, 2001
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-git\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Alexander Lakhin <exclusion@gmail.com>, 2018\n"
 "Language-Team: Russian (https://www.transifex.com/yaron/teams/16553/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -9479,31 +9479,27 @@ msgstr "Вывод в IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Длина ключа шифрования в байтах"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 бит"
+msgstr "16 байт"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 бита"
+msgstr "24 байт"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 бита"
+msgstr "32 байт"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Вывод потока через SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Пароль для целевого устройства."
+msgstr "Пароль для шифрования потока"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10665,7 +10661,7 @@ msgstr "Отключено"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Включено (только AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16538,7 +16534,7 @@ msgstr "Оболочки"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Применить профиль при следующем запуске"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17603,9 +17599,8 @@ msgid "Jump to Time"
 msgstr "Перейти ко времени"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Визуализатор"
+msgstr "Визуализатор"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -25078,12 +25073,10 @@ msgid "Enable Audio passthrough"
 msgstr "Разрешить сквозной вывод звука"
 
 #: modules/stream_out/chromecast/cast.cpp:194
-#, fuzzy
 msgid "Disable if your receiver does not support Dolby®."
 msgstr "Отключите, если ваш ресивер не поддерживает Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:216
-#, fuzzy
 msgid "High (high quality and high bandwidth)"
 msgstr "Высокое (высокое качество и широкий поток)"
 
@@ -25092,12 +25085,10 @@ msgid "Medium (medium quality and medium bandwidth)"
 msgstr "Среднее (среднее качество и средний поток)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
-#, fuzzy
 msgid "Low (low quality and low bandwidth)"
 msgstr "Низкое (низкое качество и узкий поток)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
-#, fuzzy
 msgid "Low CPU (low quality but high bandwidth)"
 msgstr "Минимизация нагрузки процессора (низкое качество, но широкий поток)"
 
@@ -26308,7 +26299,6 @@ msgid "Ball speed"
 msgstr "Скорость шарика"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Определяет скорость шарика как смещение на заданное количество пикселов за "
@@ -26319,7 +26309,6 @@ msgid "Ball size"
 msgstr "Размер шарика"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr "Определяет размер шарика (радиус в пикселах)."
 
