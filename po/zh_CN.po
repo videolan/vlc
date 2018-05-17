@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-05-17 22:51+0200\n"
 "Last-Translator: Dian Li <xslidian@gmail.com>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
@@ -15761,7 +15761,6 @@ msgid ""
 msgstr "VLC media player 及 VideoLAN 为 VideoLAN Association 的注册商标。"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15772,13 +15771,13 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player 是由 <a href=\"http://www.videolan.org/\"><span style=\" "
-"text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> 社区的志愿者"
-"们开发的自由开源媒体播放器、编码器及串流器。</p><p>VLC 使用内置的编解码器，能"
-"在几乎所有流行平台上运行，并能读取几乎所有文件、CD、DVD、网络流、捕获卡及其他"
-"媒体格式!</p><p><a href=\"http://www.videolan.org/contribute/\"><span style="
-"\" text-decoration: underline; color:#0057ae;\">提供帮助或加入我们!</span></"
-"a>"
+"<p>VLC media player 是由 <a href=\"https://www.videolan.org/\"><span style="
+"\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> 社区的志"
+"愿者们开发的自由开源媒体播放器、编码器及串流器。</p><p>VLC 使用内置的编解码"
+"器，能在几乎所有流行平台上运行，并能读取几乎所有文件、CD、DVD、网络流、捕获卡"
+"及其他媒体格式!</p><p><a href=\"https://www.videolan.org/contribute/\"><span "
+"style=\" text-decoration: underline; color:#0057ae;\">提供帮助或加入我们!</"
+"span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16409,7 +16408,6 @@ msgstr "转到前一项"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "退出全屏"
 
