@@ -6,15 +6,15 @@
 # Semsudin Abdic <abdic88@gmail.com>, 2013
 # Adnan Memija <sream_92@live.com>, 2014-2015
 # Domagoj Jelaš <djelas007@gmail.com>, 2014
-# Sirius2007 <dugonjicd@gmail.com>, 2014
+# Sirius2007 <dugonjicd@gmail.com>, 2014,2018
 # Senad HASANBAŠIĆ <elvedin@hotmail.fr>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2015-12-04 10:01+0000\n"
-"Last-Translator: Sirius2007 <dugonjicd@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Sirius2007 <dugonjicd@gmail.com>, 2018\n"
 "Language-Team: Bosnian (https://www.transifex.com/yaron/teams/16553/bs/)\n"
 "Language: bs\n"
 "MIME-Version: 1.0\n"
@@ -1184,28 +1184,24 @@ msgid "Projection"
 msgstr "Projekcija"
 
 #: src/input/es_out.c:3288
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr "Odstupanje"
+msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Visina tona"
+msgstr ""
 
 #: src/input/es_out.c:3292
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr "Film"
+msgstr ""
 
 #: src/input/es_out.c:3295
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr "Vidno polje"
+msgstr ""
 
 #: src/input/es_out.c:3300
 msgid "Max. luminance"
@@ -9066,19 +9062,16 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bita"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bita"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bita"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -23688,18 +23681,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Opcije performanse"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Omogući izlaz strujanja zvuka"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23722,9 +23713,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Kvalitet renderovanja"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -23751,9 +23741,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Softversko zauzeće"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27291,9 +27280,8 @@ msgstr ""
 
 #: modules/gui/qt/ui/about.h:288 modules/gui/qt/ui/open.h:260
 #: modules/gui/qt/ui/podcast_configuration.h:100
-#, fuzzy
 msgid "Dialog"
-msgstr "Analogno"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:132 modules/gui/qt/ui/open_disk.h:296
 #: modules/gui/qt/ui/open_net.h:96 modules/gui/qt/ui/sprefs_audio.h:409
@@ -27301,28 +27289,24 @@ msgstr "Analogno"
 #: modules/gui/qt/ui/sprefs_interface.h:529
 #: modules/gui/qt/ui/sprefs_subtitles.h:289
 #: modules/gui/qt/ui/sprefs_video.h:313 modules/gui/qt/ui/streampanel.h:167
-#, fuzzy
 msgid "Form"
-msgstr "Format"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:135
-#, fuzzy
 msgid "Preset"
-msgstr "Resetuj"
+msgstr ""
 
 #: modules/gui/qt/ui/equalizer.h:137
 msgid "0.00 dB"
 msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Preopširnost (0,1,2)"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "Filter"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -27333,41 +27317,36 @@ msgid "Modules Tree"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:263
-#, fuzzy
 msgid "Show extended options"
-msgstr "Pokaži proširene postavke"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:265
 msgid "Show &more options"
 msgstr "Pokaži &više opcija"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "Promijeni naziv na osnovu trenutnog medija"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
 msgid " ms"
 msgstr " ms"
 
 #: modules/gui/qt/ui/open.h:271
-#, fuzzy
 msgid "MRL"
-msgstr "URL"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:272
 msgid "Start Time"
 msgstr "Početno Vrijeme"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Završno vrijeme"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
-#, fuzzy
 msgid "Edit Options"
-msgstr "Opcije"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:275
 msgid "Extra media"
@@ -27378,23 +27357,20 @@ msgid "Complete MRL for VLC internal"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:280
-#, fuzzy
 msgid "Select the file"
-msgstr "Izaberi datoteku"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:284
-#, fuzzy
 msgid "Change the start time for the media"
-msgstr "Promijeni naziv na osnovu trenutnog medija"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286 modules/gui/qt/ui/open.h:290
 msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Promijeni naziv na osnovu trenutnog medija"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27405,9 +27381,8 @@ msgid "Capture mode"
 msgstr "Mod hvatanja"
 
 #: modules/gui/qt/ui/open_capture.h:99
-#, fuzzy
 msgid "Select the capture device type"
-msgstr "Uređaj hvatanja videa"
+msgstr ""
 
 #: modules/gui/qt/ui/open_capture.h:101
 msgid "Device Selection"
@@ -27434,9 +27409,8 @@ msgid "SVCD/VCD"
 msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:303
-#, fuzzy
 msgid "Disable Disc Menus"
-msgstr "Onemogući DVD izbornike"
+msgstr ""
 
 #: modules/gui/qt/ui/open_disk.h:305
 msgid "No disc menus"
@@ -27455,14 +27429,12 @@ msgid "Audio and Subtitles"
 msgstr "Zvuk i Podtitlovi"
 
 #: modules/gui/qt/ui/open_file.h:144
-#, fuzzy
 msgid "Use a sub&title file"
-msgstr "Koristi datoteku podtitla"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:146
-#, fuzzy
 msgid "Select the subtitle file"
-msgstr "Automatski prepoznaj podtitl datoteke"
+msgstr ""
 
 #: modules/gui/qt/ui/open_file.h:150
 msgid "Choose one or more media file to open"
@@ -27489,9 +27461,8 @@ msgid "Please enter a network URL:"
 msgstr "Molimo unesite mrežni URL:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "Naziv Profila"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27522,9 +27493,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27587,9 +27557,8 @@ msgid "Custom options"
 msgstr "Kotisnički prilagođene opcije"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR Kvalitet"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27612,29 +27581,24 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Brzina"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Naziv Profila"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
-#, fuzzy
 msgid "Set up media sources to stream"
-msgstr "Podesi bilo koje dodatne opcije za strujanje"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Odredište"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Izaberi \"Napredne Opcije\" za prikaz svih opcija."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27651,14 +27615,12 @@ msgid "Display locally"
 msgstr "Prikaži lokalno"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Napredne Opcije"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Izaberi \"Napredne Opcije\" za prikaz svih opcija."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -27677,14 +27639,12 @@ msgid "Miscellaneous Options"
 msgstr "Raznorazne Opcije:"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "Postavi ID osnovnog strujanja"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Opšte postavke izlaznog strujanja"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27707,9 +27667,8 @@ msgid "Visualization:"
 msgstr "Vizualizacija:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Uključi vremensko proširavanje zvuka"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
 msgid "Replay gain mode:"
@@ -27748,9 +27707,8 @@ msgid "x264 profile and level selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:359
-#, fuzzy
 msgid "Hardware-accelerated decoding"
-msgstr "Hardversko kodiranje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:360
 msgid "Video quality post-processing level"
@@ -27765,23 +27723,20 @@ msgid "x264 preset and tuning selection"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
-#, fuzzy
 msgid "Optical drive"
-msgstr "Lokalni diskovi"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:365
 msgid "Default optical device"
 msgstr "Zadani optički uređaj"
 
 #: modules/gui/qt/ui/sprefs_input.h:369
-#, fuzzy
 msgid "Damaged or incomplete AVI file"
-msgstr "Svojstva filtera slika"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:372
-#, fuzzy
 msgid "HTTP proxy URL"
-msgstr "HTTP poslužitelj"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:373
 msgid "HTTP (default)"
@@ -27792,14 +27747,12 @@ msgid "RTP over RTSP (TCP)"
 msgstr "RTP preko RTSP (TCP)"
 
 #: modules/gui/qt/ui/sprefs_input.h:375
-#, fuzzy
 msgid "Live555 stream transport"
-msgstr "Izlaz strujanja datoteke"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:376
-#, fuzzy
 msgid "Default caching policy"
-msgstr "Zadano Kodiranje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
@@ -27838,9 +27791,8 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
-#, fuzzy
 msgid "Start in minimal view mode"
-msgstr "Pokreni video u modu cijelog ekrana"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
 msgid "Force window style:"
@@ -27851,14 +27803,12 @@ msgid "Integrate video in interface"
 msgstr "Ugradi video u okruženje"
 
 #: modules/gui/qt/ui/sprefs_interface.h:545
-#, fuzzy
 msgid "Show systray icon"
-msgstr "Prikaži postavke"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Postavke za glavno okruženje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -27901,19 +27851,16 @@ msgid "File extensions association"
 msgstr "Asocijacije ekstenzija datoteka"
 
 #: modules/gui/qt/ui/sprefs_interface.h:568
-#, fuzzy
 msgid "Set up associations..."
-msgstr "Asocijacije datoteka"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
-#, fuzzy
 msgid "Enable On Screen Display (OSD)"
-msgstr "Prikaz na Ekranu"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
-#, fuzzy
 msgid "Show media title on video start"
-msgstr "Pokaži naslov medija na videu"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:294
 msgid "Enable subtitles"
@@ -27952,9 +27899,8 @@ msgid "Add a background"
 msgstr "Dodaj pozadinu"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Izlaz"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -27969,9 +27915,8 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:327
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "Raspletavanje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
 msgid "Force Aspect Ratio"
@@ -27990,18 +27935,16 @@ msgid "Edit settings"
 msgstr "Uredite podešavanja"
 
 #: modules/gui/qt/ui/streampanel.h:174
-#, fuzzy
 msgid "Control"
-msgstr "Kontrole"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:175
 msgid "Run manually"
 msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:176
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Teletekst: raspored programa"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:177
 msgid "Run on schedule"
@@ -28053,9 +27996,8 @@ msgid ">HHHHHH;#"
 msgstr ">HHHHHH;#"
 
 #: modules/gui/qt/ui/video_effects.h:1243
-#, fuzzy
 msgid "Negate colors"
-msgstr "Kreiraj Mapu"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1256
 msgid "Colors"
@@ -28115,9 +28057,8 @@ msgid "Soften"
 msgstr "Mekšanje"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Šum"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
@@ -28140,9 +28081,8 @@ msgid "VLM configurator"
 msgstr "VLM konfigurator"
 
 #: modules/gui/qt/ui/vlm.h:287
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Upravljanje Listom Medija"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
