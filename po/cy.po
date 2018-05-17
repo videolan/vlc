@@ -7,11 +7,11 @@
 # Huw Waters <huwwaters@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Welsh (https://www.transifex.com/yaron/teams/16553/cy/)\n"
 "Language: cy\n"
 "MIME-Version: 1.0\n"
@@ -1182,10 +1182,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Traw (Pitch)"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -9057,19 +9056,16 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 did"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 did"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 did"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -23834,18 +23830,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Dewisiadau perfformiad"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Galluogi allbwn ffrwd sain"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -23868,9 +23862,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Ansawdd ailsamplu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -23897,9 +23890,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Peidio gofyn eto"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27568,9 +27560,8 @@ msgid "Start Time"
 msgstr "Amser Dechrau"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Amser stopio"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27589,18 +27580,16 @@ msgid "Select the file"
 msgstr "Dewis y ffeil"
 
 #: modules/gui/qt/ui/open.h:284
-#, fuzzy
 msgid "Change the start time for the media"
-msgstr "Amser, mewn milieiliadau (me), i'w gadw mewn cof dros dro (cache)"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:286 modules/gui/qt/ui/open.h:290
 msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "AA'A':mm'm':ee'e'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Amser, mewn milieiliadau (me), i'w gadw mewn cof dros dro (cache)"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27699,9 +27688,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "Amlblecsydd MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27724,9 +27712,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27741,9 +27728,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "Fformat"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27790,9 +27776,8 @@ msgid "Custom options"
 msgstr "Dewisiadau addasedig"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "Lefel ansawdd"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27815,14 +27800,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Cyfradd sampl"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Enw'r Proffil"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27859,9 +27842,8 @@ msgid "Transcoding Options"
 msgstr "Dewisiadau trawsgodio"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Dewisiadau Ffrydio a Trawsgodio"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -27872,23 +27854,20 @@ msgid "Option Setup"
 msgstr "Gosod Dewisiadau"
 
 #: modules/gui/qt/ui/sout.h:216
-#, fuzzy
 msgid "Set up any additional options for streaming"
-msgstr "Dewis cyrchfannau i'w ffrydio iddynt"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:217
 msgid "Miscellaneous Options"
 msgstr "Dewisiadau Amrywiol"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "Newid ID ffrwd elfennol (elementary stream)"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Gosodiadau cyffredin allanbwn ffrwd"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27915,9 +27894,8 @@ msgid "Enable Time-Stretching audio"
 msgstr "Galluogi ymestyn sain dros amser"
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "Dull cynyddu wrth ail-chwarae"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -27992,14 +27970,12 @@ msgid "RTP over RTSP (TCP)"
 msgstr "RTP dros RTSP (TCP)"
 
 #: modules/gui/qt/ui/sprefs_input.h:375
-#, fuzzy
 msgid "Live555 stream transport"
-msgstr "Allbwn ffrwd ffeil"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:376
-#, fuzzy
 msgid "Default caching policy"
-msgstr "Amser Rhagosodedig i'w Gofio Dros Dro"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
@@ -28054,9 +28030,8 @@ msgid "Show systray icon"
 msgstr "Dangos eicon yn y bar tasgau"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Gosodiadau i'r brif ryngwyneb"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -28147,9 +28122,8 @@ msgid "Add a background"
 msgstr "Ychwanegu cefndir"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Allbwn"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28282,9 +28256,8 @@ msgid "Mask"
 msgstr "Masg"
 
 #: modules/gui/qt/ui/video_effects.h:1289
-#, fuzzy
 msgid "Anaglyph 3D"
-msgstr "Anaglyff"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
 msgid "Mirror"
@@ -28311,9 +28284,8 @@ msgid "Denoiser"
 msgstr "Tynnwr sŵn"
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Aneglurder gofodol"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
 msgid "Temporal luma strength"
@@ -28332,9 +28304,8 @@ msgid "VLM configurator"
 msgstr "Ffurfweddwr VLM"
 
 #: modules/gui/qt/ui/vlm.h:287
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Rhestr Rheolwyr Cyfryngau"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
