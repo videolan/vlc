@@ -8,15 +8,15 @@
 # Han HoJoong <0demon0@paran.com>, 2005
 # Kang Jeong-Hee <keizie@gmail.com>, 2007
 # Namhyung Kim <namhyung@gmail.com>, 2007
-# Potato <sheppaul@naver.com>, 2013-2017
+# Potato <sheppaul@naver.com>, 2013-2018
 # Seongki Shin <skshin@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-20 03:42+0000\n"
-"Last-Translator: Potato <sheppaul@naver.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Potato <sheppaul@naver.com>, 2018\n"
 "Language-Team: Korean (https://www.transifex.com/yaron/teams/16553/ko/)\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -1475,7 +1475,7 @@ msgstr ""
 #. xgettext: Translate "C" to the language code: "fr", "en_GB", "nl", "ru"...
 #: src/libvlc.c:174
 msgid "C"
-msgstr "ko"
+msgstr "C"
 
 #: src/libvlc.h:164 src/libvlc-module.c:1432 src/libvlc-module.c:1433
 #: src/video_output/vout_intf.c:176 modules/gui/macosx/VLCMainMenu.m:475
@@ -9316,31 +9316,27 @@ msgstr "iceCAST 출력"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "크립토 키 길이, 바이트 단위"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 비트"
+msgstr "16바이트"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 비트"
+msgstr "24바이트"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 비트"
+msgstr "32바이트"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT 스트림 출력"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "대상 장치의 비밀번호."
+msgstr "스트림 암호화용 비밀번호"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10508,7 +10504,7 @@ msgstr "비활성화됨"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "활성화됨 (AC3/DTS만)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -12885,7 +12881,7 @@ msgstr ""
 
 #: modules/codec/subsusf.c:50
 msgid "USFSubs"
-msgstr "USFSubs"
+msgstr "USF 자막"
 
 #: modules/codec/subsusf.c:51
 msgid "USF subtitles decoder"
@@ -16251,7 +16247,7 @@ msgstr "스킨"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "다음 실행시에 프로파일 적용하기"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17304,9 +17300,8 @@ msgid "Jump to Time"
 msgstr "시간으로 건너뛰기"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "렌더러(&R)"
+msgstr "렌더러"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -25925,18 +25920,16 @@ msgid "Ball speed"
 msgstr "공 속도"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "프레임의 픽셀 개수로 치환값의 공 속도를 정합니다."
+msgstr "프레임에 의한 픽셀 개수로 치환값의 공 속도를 정합니다."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "공 크기"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "공의 반경을 픽셀수로 주는 공 크기를 정하세요"
+msgstr "공의 반경을 픽셀수로 주는 공 크기를 정합니다"
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
