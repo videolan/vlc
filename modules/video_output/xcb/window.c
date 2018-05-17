@@ -43,7 +43,9 @@ typedef xcb_atom_t Atom;
 struct vout_window_sys_t
 {
     xcb_connection_t *conn;
-    key_handler_t *keys;
+#ifdef HAVE_XCB_KEYSYMS
+    xcb_key_symbols_t *keys;
+#endif
     vlc_thread_t thread;
 
     xcb_cursor_t cursor; /* blank cursor */
@@ -61,8 +63,10 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
 {
     vout_window_sys_t *sys = wnd->sys;
 
+#ifdef HAVE_XCB_KEYSYMS
     if (sys->keys != NULL && XCB_keyHandler_Process(sys->keys, ev, wnd) == 0)
         return;
+#endif
 
     switch (ev->response_type & 0x7f)
     {
@@ -416,10 +420,12 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
+#ifdef HAVE_XCB_KEYSYMS
     if (var_InheritBool (wnd, "keyboard-events"))
-        p_sys->keys = XCB_keyHandler_Create(conn);
+        p_sys->keys = xcb_key_symbols_alloc(conn);
     else
         p_sys->keys = NULL;
+#endif
     p_sys->root = scr->root;
 
     /* ICCCM
@@ -491,8 +497,10 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
      * request from this thread must be completed at this point. */
     if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
+#ifdef HAVE_XCB_KEYSYMS
         if (p_sys->keys != NULL)
-            XCB_keyHandler_Destroy (p_sys->keys);
+            xcb_key_symbols_free(p_sys->keys);
+#endif
         goto error;
     }
 
@@ -520,8 +528,10 @@ static void Close (vout_window_t *wnd)
 
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
+#ifdef HAVE_XCB_KEYSYMS
     if (p_sys->keys != NULL)
-        XCB_keyHandler_Destroy (p_sys->keys);
+        xcb_key_symbols_free(p_sys->keys);
+#endif
 
     xcb_disconnect (conn);
     free (wnd->display.x11);
@@ -653,16 +663,18 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
+#ifdef HAVE_XCB_KEYSYMS
     /* Try to subscribe to keyboard and mouse events (only one X11 client can
      * subscribe to input events, so this can fail). */
     if (var_InheritBool (wnd, "keyboard-events"))
     {
-        p_sys->keys = XCB_keyHandler_Create(conn);
+        p_sys->keys = xcb_key_symbols_alloc(conn);
         if (p_sys->keys != NULL)
             value |= XCB_EVENT_MASK_KEY_PRESS;
     }
     else
         p_sys->keys = NULL;
+#endif
 
     if (var_InheritBool(wnd, "mouse-events"))
         value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
@@ -673,8 +685,10 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     CacheAtoms (p_sys);
     if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
+#ifdef HAVE_XCB_KEYSYMS
         if (p_sys->keys != NULL)
-            XCB_keyHandler_Destroy (p_sys->keys);
+            xcb_key_symbols_free(p_sys->keys);
+#endif
         goto error;
     }
 

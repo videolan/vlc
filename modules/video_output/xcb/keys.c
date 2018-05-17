@@ -32,41 +32,10 @@
 #include <vlc_common.h>
 #include "events.h"
 
-#ifdef HAVE_XCB_KEYSYMS
 #include <xcb/xcb_keysyms.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
 #include <vlc_actions.h>
-
-struct key_handler_t
-{
-    xcb_key_symbols_t *syms;
-};
-
-/**
- * Create an X11 key event handler for a VLC window.
- *
- * The caller shall arrange receiving applicable X11 events, and pass them to
- * ProcessKeyEvent() later.
- *
- * @param conn XCB connection to the X server (to fetch key mappings)
- * @return NULL on error, or a key handling context.
- */
-key_handler_t *XCB_keyHandler_Create(xcb_connection_t *conn)
-{
-    key_handler_t *ctx = malloc (sizeof (*ctx));
-    if (!ctx)
-        return NULL;
-
-    ctx->syms = xcb_key_symbols_alloc (conn);
-    return ctx;
-}
-
-void XCB_keyHandler_Destroy (key_handler_t *ctx)
-{
-    xcb_key_symbols_free (ctx->syms);
-    free (ctx);
-}
 
 static int keysymcmp (const void *pa, const void *pb)
 {
@@ -130,21 +99,21 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
 /**
  * Process an X11 event, convert into VLC hotkey event if applicable.
  *
- * @param ctx key handler created with CreateKeyHandler()
+ * @param syms XCB key symbols (created by xcb_key_symbols_alloc())
  * @param ev XCB event to process
  * @return 0 if the event was handled and free()'d, non-zero otherwise
  */
-int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
+int XCB_keyHandler_Process(xcb_key_symbols_t *syms, xcb_generic_event_t *ev,
                            vout_window_t *window)
 {
-    assert (ctx);
+    assert(syms != NULL);
 
     switch (ev->response_type & 0x7f)
     {
         case XCB_KEY_PRESS:
         {
             xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
-            xcb_keysym_t sym = xcb_key_press_lookup_keysym (ctx->syms, e, 0);
+            xcb_keysym_t sym = xcb_key_press_lookup_keysym(syms, e, 0);
             uint_fast32_t vk = ConvertKeySym (sym);
 
             msg_Dbg(window, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
@@ -176,7 +145,7 @@ int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
         {
             xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
             msg_Dbg(window, "refreshing keyboard mapping");
-            xcb_refresh_keyboard_mapping (ctx->syms, e);
+            xcb_refresh_keyboard_mapping(syms, e);
             break;
         }
 
@@ -187,26 +156,3 @@ int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
     free (ev);
     return 0;
 }
-
-#else /* HAVE_XCB_KEYSYMS */
-
-key_handler_t *XCB_keyHandler_Create(xcb_connection_t *conn)
-{
-    (void) conn;
-    return NULL;
-}
-
-void XCB_keyHandler_Destroy (key_handler_t *ctx)
-{
-    (void) ctx;
-    abort ();
-}
-
-int XCB_keyHandler_Process(key_handler_t *ctx, xcb_generic_event_t *ev,
-                           vout_window_t *window)
-{
-    (void) ctx; (void) ev; (void) window;
-    abort ();
-}
-
-#endif /* HAVE_XCB_KEYSYMS */

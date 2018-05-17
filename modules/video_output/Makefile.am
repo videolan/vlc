@@ -147,10 +147,7 @@ libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_xv_plugin_la_LIBADD = libvlc_xcb_events.la \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
 
-libxcb_window_plugin_la_SOURCES =  \
-	video_output/xcb/keys.c \
-	video_output/xcb/keysym.h video_output/xcb/xcb_keysym.h \
-	video_output/xcb/window.c
+libxcb_window_plugin_la_SOURCES = video_output/xcb/window.c
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(CFLAGS_xcb_window) \
 	$(XPROTO_CFLAGS) $(XCB_CFLAGS) $(XCB_KEYSYMS_CFLAGS)
@@ -169,6 +166,9 @@ if HAVE_XCB
 pkglib_LTLIBRARIES += libvlc_xcb_events.la
 vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
 if HAVE_XCB_KEYSYMS
+libxcb_window_plugin_la_SOURCES += \
+	video_output/xcb/keysym.h video_output/xcb/xcb_keysym.h \
+	video_output/xcb/keys.c
 libxcb_window_plugin_la_CFLAGS += -DHAVE_XCB_KEYSYMS
 endif
 if HAVE_XCB_XVIDEO
