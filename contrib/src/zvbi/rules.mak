@@ -40,7 +40,7 @@ ZVBICONF := \
 	--without-doxygen \
 	$(HOSTCONF)
 
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
 endif
 ifdef HAVE_MACOSX

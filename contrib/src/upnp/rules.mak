@@ -13,7 +13,7 @@ $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 
 UPNP_CFLAGS   := $(CFLAGS)   -DUPNP_STATIC_LIB
 UPNP_CXXFLAGS := $(CXXFLAGS) -DUPNP_STATIC_LIB
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_upnp += pthreads $(DEPS_pthreads)
 endif
 ifdef HAVE_WINSTORE

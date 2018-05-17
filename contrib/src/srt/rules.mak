@@ -14,7 +14,7 @@ endif
 SRT_CFLAGS   := $(CFLAGS)
 SRT_CXXFLAGS := $(CXXFLAGS)
 DEPS_srt = gnutls $(DEPS_gnutls)
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
 endif
 

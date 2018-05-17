@@ -30,7 +30,7 @@ endif
 
 DEPS_vpx =
 
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_vpx += pthreads $(DEPS_pthreads)
 endif
 

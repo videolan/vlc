@@ -10,7 +10,7 @@ PKGS_FOUND += mysofa
 endif
 
 DEPS_mysofa += zlib $(DEPS_zlib)
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_mysofa += pthreads $(DEPS_pthreads)
 endif
 

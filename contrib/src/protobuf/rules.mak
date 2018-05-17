@@ -28,7 +28,7 @@ $(TARBALLS)/protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz:
 .sum-protobuf: protobuf-$(PROTOBUF_VERSION)-cpp.tar.gz
 
 DEPS_protobuf = zlib $(DEPS_zlib)
-ifdef HAVE_WINSTORE
+ifdef HAVE_WIN32
 DEPS_protobuf += pthreads $(DEPS_pthreads)
 endif
 
