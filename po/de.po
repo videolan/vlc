@@ -23,8 +23,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-05-17 22:50+0200\n"
+"Last-Translator: Mario Siegmann <mario_siegmann@web.de>, 2018\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -16577,7 +16577,6 @@ msgstr ""
 "VLC media player und VideoLAN sind Warenzeichen der VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16589,12 +16588,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player ist ein freier und quelloffener Medienspieler, Encoder "
-"und Streamer, der von Freiwilligen der <a href=\"http://www.videolan.org/"
+"und Streamer, der von Freiwilligen der <a href=\"https://www.videolan.org/"
 "\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-"span></a>-Gemeinschaft erstellt wurde.</p><p>VLC benutzt seine internen "
-"Codecs, arbeitet auf so gut wie allen bekannten Plattformen und kann fast "
+"span></a>-Gemeinschaft gemacht wurde.</p><p>VLC benutzt seine internen "
+"Codecs, Arbeitet auf so gut wie allen bekannten Plattformen und kann fast "
 "alle Dateien, CDs, DVDs, Netzwerk-Streams, Aufnahmekarten und andere "
-"Medienformate lesen!</p><p><a href=\"http://www.videolan.org/contribute/"
+"Medienformate lesen!</p><p><a href=\"https://www.videolan.org/contribute/"
 "\"><span style=\" text-decoration: underline; color:#0057ae;\">Helfen Sie "
 "uns und treten Sie uns bei!</span></a>"
 
@@ -17236,9 +17235,8 @@ msgstr "Zu dem vorherigen Eintrag gehen"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Vollbild verlassen"
+msgstr "Vollbildmodus verlassen"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
