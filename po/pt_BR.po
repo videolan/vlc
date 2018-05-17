@@ -4,14 +4,14 @@
 #
 # Translators:
 # André de Barros Martins Ribeiro  <andrerib at ajato.com dot br>, 2003
-# ssdoria <ssdoria@gmail.com>, 2008-2015
+# ssdoria <ssdoria@gmail.com>, 2008-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2016-01-22 02:26+0000\n"
-"Last-Translator: ssdoria <ssdoria@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: ssdoria <ssdoria@gmail.com>, 2018\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -8784,11 +8784,11 @@ msgstr "Balanço do azul."
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:209
 #: modules/gui/qt/ui/video_effects.h:1221
 msgid "Gamma"
-msgstr "Gamma"
+msgstr "Gama"
 
 #: modules/access/v4l2/v4l2.c:113
 msgid "Gamma adjust."
-msgstr "Ajuste de imagem"
+msgstr "Ajuste de gama da imagem."
 
 #: modules/access/v4l2/v4l2.c:114
 msgid "Automatic gain"
@@ -9518,28 +9518,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bits"
+msgstr "16 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bits"
+msgstr "24 bytes"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bits"
+msgstr "32 bytes"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Saída de fluxo SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Senha para o dispositivo alvo."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -17679,9 +17675,8 @@ msgid "Jump to Time"
 msgstr "Ir ao Ponto"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Exibido&r"
+msgstr "Exibidor"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -21998,12 +21993,12 @@ msgstr "Configura o brilho da imagem, entre 0 e 2. O padrão é 1."
 #: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
 #: modules/video_filter/adjust.c:73
 msgid "Image gamma (0-10)"
-msgstr "Gamma da imagem (0-10)"
+msgstr "Gama da imagem (0-10)"
 
 #: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr "Configura o gamma da imagem, entre 0.01 e 10. O padrão é 1."
+msgstr "Configura o gama da imagem, entre 0.01 e 10. O padrão é 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -26435,22 +26430,18 @@ msgid "Ball speed"
 msgstr "Velocidade da bola"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Define a velocidade da bola através do valor de "
-"deslocamento                                 em pixels por quadro."
+"Define a velocidade da bola através do valor de deslocamento em pixels por "
+"quadro."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Tamanho da bola"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr ""
-"Define o tamanho da bola, dispondo o tamanho do seu "
-"raio                                 em pixels"
+msgstr "Define o tamanho da bola, dispondo o tamanho do seu raio em pixels."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
