@@ -19,11 +19,11 @@
 # Kasvain <kasvain@gmail.com>, 2014-2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
-"Last-Translator: M T <michtrz@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Finnish (https://www.transifex.com/yaron/teams/16553/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -1255,10 +1255,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Pitch-arvo"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -9457,28 +9456,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bittiä"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bittiä"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bittiä"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Kohdelaitteen salasana."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -17409,9 +17404,8 @@ msgid "Jump to Time"
 msgstr "Hyppää aikaan"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Tekstirenderöijä"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -24771,18 +24765,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Suorituskykyasetukset"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Ohjaa äänilähtö suoratoistoon"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -24805,9 +24797,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Renderöinnin laatu"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -24834,9 +24825,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Ohjelmistopohjainen gain"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -26001,7 +25991,6 @@ msgid "Ball speed"
 msgstr "Pallon nopeus"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr "Aseta pallon nopeus (siirtymä per videoruutu)."
 
@@ -26010,7 +25999,6 @@ msgid "Ball size"
 msgstr "Pallon koko"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
 msgstr "Pallon säde pikseleinä."
 
@@ -28609,9 +28597,8 @@ msgid "0.00 dB"
 msgstr "0.00 dB"
 
 #: modules/gui/qt/ui/messages_panel.h:139
-#, fuzzy
 msgid "&Verbosity:"
-msgstr "Sanaisuustaso"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:140
 msgid "&Filter:"
@@ -28650,9 +28637,8 @@ msgid "Start Time"
 msgstr "Aloituskohta"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Lopetusaika"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28679,9 +28665,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Vaihda median aloituskohta"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28780,9 +28765,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV-kanavoija"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -28793,9 +28777,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -28806,9 +28789,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -28823,9 +28805,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -28872,9 +28853,8 @@ msgid "Custom options"
 msgstr "Erikoisasetukset"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR:n laatu"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -28897,14 +28877,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Näytteenottotaajuus"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Profiilin nimi"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29015,9 +28993,8 @@ msgid "Username:"
 msgstr "Käyttäjätunnus"
 
 #: modules/gui/qt/ui/sprefs_audio.h:429
-#, fuzzy
 msgid "Submit played tracks stats to Last.fm"
-msgstr "Lähetä tiedot soitetuista kappaleista last.fm:ään"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
 msgid "Codecs"
@@ -29040,9 +29017,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "Ohita H.264-palikanpoistosuodin"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264-profiilin ja tason valinta"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29129,9 +29105,8 @@ msgid "Show systray icon"
 msgstr "Näytä kuvake tehtäväpalkissa"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses-käyttöliittymä"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29222,9 +29197,8 @@ msgid "Add a background"
 msgstr "Lisää tausta"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Lähtö"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -29385,24 +29359,20 @@ msgid "Denoiser"
 msgstr "Kohinanvaimentaja"
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Avaruudellinen luma-vahvuus (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "Ajallinen luma-vahvuus (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "Avaruudellinen chroma-vahvuus (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "Ajallinen chroma-vahvuus (0-254)"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
