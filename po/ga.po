@@ -4,14 +4,14 @@
 #
 # Translators:
 # David Ó Laıġeanáın, 2015,2016
-# Seanán Ó Coistín <seananoc@gmail.com>, 2010,2016-2017
+# Seanán Ó Coistín <seananoc@gmail.com>, 2010,2016-2018
 # Seán Ó Séaghdha <sean.anseo@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-10-04 04:27+0000\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
 "Last-Translator: Seanán Ó Coistín, 2018\n"
 "Language-Team: Irish (https://www.transifex.com/yaron/teams/16553/ga/)\n"
 "Language: ga\n"
@@ -607,7 +607,7 @@ msgstr "Speictream"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "Méadar VU"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -2440,7 +2440,7 @@ msgstr ""
 
 #: src/libvlc-module.c:583 modules/gui/qt/ui/open_disk.h:313
 msgid "Subtitle track"
-msgstr ""
+msgstr "Rian fotheidil"
 
 #: src/libvlc-module.c:585
 msgid "Stream number of the subtitle track to use (from 0 to n)."
@@ -2469,13 +2469,16 @@ msgstr ""
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
-msgstr ""
+msgstr "Teanga an roghchláir"
 
 #: src/libvlc-module.c:600
 msgid ""
 "Language of the menus you want to use with DVD/BluRay (comma separated, two "
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
+"An teanga ar mhaith leat feidhm a bhaint aisti do na roghchláir do DVD/"
+"BluRay (deighilte le camóga, dhá nó trí litir do thagairt do thir, is féidir "
+"feidhm a bhaint as 'ceann ar bith' mar chúltaca)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
@@ -2619,7 +2622,7 @@ msgstr ""
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
-msgstr ""
+msgstr "An chomhadlann ina gcuirfear taifid i dtaisce"
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2864,7 +2867,7 @@ msgstr ""
 
 #: src/libvlc-module.c:817
 msgid "HTTP server port"
-msgstr ""
+msgstr "Port freastalaí HTTP"
 
 #: src/libvlc-module.c:819
 msgid ""
@@ -2943,7 +2946,7 @@ msgstr ""
 
 #: src/libvlc-module.c:862
 msgid "SOCKS user name"
-msgstr ""
+msgstr "Ainm úsáideora SOCKS"
 
 #: src/libvlc-module.c:864
 msgid "User name to be used for connection to the SOCKS proxy."
@@ -3425,7 +3428,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1140
 msgid "Ignored extensions"
-msgstr ""
+msgstr "Breiseáin ar rinneadh neamhaird dóibh"
 
 #: src/libvlc-module.c:1142
 msgid ""
@@ -3504,7 +3507,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
-msgstr ""
+msgstr "Cuireadh an tosú ar sos"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
@@ -3560,11 +3563,11 @@ msgstr "Ná bac leis"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Rialtán na hairde"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Rialtán an tsuímh"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
@@ -3798,7 +3801,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1284
 msgid "Very short jump length"
-msgstr ""
+msgstr "Achar léime an-bheag"
 
 #: src/libvlc-module.c:1285
 msgid "Very short jump length, in seconds."
@@ -3810,7 +3813,7 @@ msgstr "Aga na léime giorra"
 
 #: src/libvlc-module.c:1287
 msgid "Short jump length, in seconds."
-msgstr ""
+msgstr "Achar léime gar, i soicindí."
 
 #: src/libvlc-module.c:1288
 msgid "Medium jump length"
@@ -3818,7 +3821,7 @@ msgstr "Aga na scoth-léime"
 
 #: src/libvlc-module.c:1289
 msgid "Medium jump length, in seconds."
-msgstr ""
+msgstr "Achar léime meánach, i soicindí."
 
 #: src/libvlc-module.c:1290
 msgid "Long jump length"
@@ -8863,28 +8866,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 beart"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 beart"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 beart"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Focal faire don gléas sprice."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -15029,7 +15028,7 @@ msgstr "Luchtaigh"
 
 #: modules/demux/playlist/wpl.c:99
 msgid "Total duration"
-msgstr ""
+msgstr "Aga iomlán"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -15212,7 +15211,7 @@ msgstr "Aicme anaithnid"
 
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
-msgstr ""
+msgstr "Fortheideal dúnta"
 
 #: modules/demux/xiph_metadata.h:50
 msgid "Textual audio descriptions"
@@ -15338,7 +15337,7 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
-msgstr ""
+msgstr "Bainisteoir na mbreiseán"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
@@ -15656,7 +15655,7 @@ msgstr "Oscail meán..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:140
 msgid "Choose Profile"
-msgstr ""
+msgstr "Roghnaigh beathaisnéisín"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:141
 msgid "Customize..."
@@ -15697,7 +15696,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:148
 msgid "Save as File"
-msgstr ""
+msgstr "Taisc mar chomhad"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:149
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:392
@@ -15843,7 +15842,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:336
 msgid "Remove a profile"
-msgstr ""
+msgstr "Bain beathaisnéisín"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:337
 msgid "Select the profile you would like to remove:"
@@ -18062,7 +18061,7 @@ msgstr " <suas>,<síos>           Cuardaigh +/-5%%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
-msgstr ""
+msgstr "[Athdhéan é]"
 
 #: modules/gui/ncurses.c:1047
 msgid "[Random]"
@@ -18107,7 +18106,7 @@ msgstr " Caibidil  : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
 msgid " Source: <no current item>"
-msgstr ""
+msgstr " Foinse: <no current item>"
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19136,7 +19135,7 @@ msgstr "Tiontaigh"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
 msgid "Multiple files selected."
-msgstr ""
+msgstr "Iliomad comhad roghnaithe."
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19231,7 +19230,7 @@ msgstr "Tai&sc"
 
 #: modules/gui/qt/dialogs/external.cpp:216
 msgid "Store the Password"
-msgstr ""
+msgstr "Taisc an focal faire"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19287,7 +19286,7 @@ msgstr "Is mian liom"
 
 #: modules/gui/qt/dialogs/help.cpp:219
 msgid "&No"
-msgstr ""
+msgstr "&Níl"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:147
 msgid "VLC media player updates"
@@ -20027,7 +20026,7 @@ msgstr "Roghnóir léirshamhluithe"
 
 #: modules/gui/qt/menus.cpp:596
 msgid "&Increase Volume"
-msgstr ""
+msgstr "&Méadaigh an Airde"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
@@ -20728,7 +20727,7 @@ msgstr ""
 
 #: modules/hw/vdpau/display.c:46
 msgid "VDPAU output"
-msgstr ""
+msgstr "Aschur VDPAU"
 
 #: modules/hw/vdpau/sharpen.c:143
 msgid "VDPAU sharpen video filter"
@@ -20752,7 +20751,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "No"
-msgstr ""
+msgstr "Níl"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
@@ -20780,11 +20779,11 @@ msgstr "I gcónaí, ar an ngléas seo amháin"
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
-msgstr ""
+msgstr "Nuair atá an glas bainte"
 
 #: modules/keystore/keychain.m:54
 msgid "When unlocked, on this device only"
-msgstr ""
+msgstr "Nuair atá an glas bainte, ar an ngléas seo amháin"
 
 #: modules/keystore/keychain.m:57
 msgid "Synchronize stored items"
@@ -20919,7 +20918,7 @@ msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
-msgstr ""
+msgstr "Iris"
 
 #: modules/logger/journal.c:78
 msgid "SystemD journal logger"
@@ -22320,7 +22319,7 @@ msgstr "Á seinm anois"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
-msgstr ""
+msgstr "Léim thar seo"
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -22812,7 +22811,7 @@ msgstr ""
 
 #: modules/spu/marq.c:94
 msgid "Text file"
-msgstr ""
+msgstr "Comhad téacs"
 
 #: modules/spu/marq.c:95
 msgid "File to read the marquee text from."
@@ -23601,7 +23600,7 @@ msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
-msgstr ""
+msgstr "timthriall"
 
 #: modules/stream_out/cycle.c:326
 msgid "Cyclic stream output"
@@ -24424,7 +24423,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:118
 msgid "Text direction"
-msgstr ""
+msgstr "Treo an téacs"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -24450,11 +24449,11 @@ msgstr "Tiubh"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Left to right"
-msgstr ""
+msgstr "Clé go deas"
 
 #: modules/text_renderer/freetype/freetype.c:151
 msgid "Right to left"
-msgstr ""
+msgstr "Deas go clé"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -27168,9 +27167,8 @@ msgid "Show &more options"
 msgstr "Taispeáin tuilleadh roghanna"
 
 #: modules/gui/qt/ui/open.h:268
-#, fuzzy
 msgid "Change the caching for the media"
-msgstr "Athraigh am tosaithe don meán"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:270
 msgid " ms"
@@ -27185,9 +27183,8 @@ msgid "Start Time"
 msgstr "Am Tosaithe"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Am críochnaithe"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27214,9 +27211,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "UU'U':nn'n':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Athraigh am tosaithe don meán"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27309,9 +27305,8 @@ msgid "Please enter a network URL:"
 msgstr "Cuir isteach URL líonra:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "Ainm na Beathaisnéisíne In Easnamh"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27418,42 +27413,36 @@ msgid " kb/s"
 msgstr " kb/s"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "An caighdeán ionchódaithe"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:742
-#, fuzzy
 msgid "Frame size"
-msgstr "Méid an tseomra"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:745 modules/gui/qt/ui/profiles.h:748
 msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Luas samplach"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Ainm na Beathaisnéisíne In Easnamh"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:205
-#, fuzzy
 msgid "Destination Setup"
-msgstr "Sprioc"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Roghnaigh comhadlann"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27470,14 +27459,12 @@ msgid "Display locally"
 msgstr "Taispeáin go logánta"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "Ardroghanna"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Roghnaigh \"Ardroghanna\" chun gach rogha a fheiceáil."
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -27500,9 +27487,8 @@ msgid "Stream all elementary streams"
 msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "Socruithe coiteann aschurtha an tsrutha"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27525,14 +27511,12 @@ msgid "Visualization:"
 msgstr "Léirshamhlú:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "Cumasaigh fuaim"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "Athsheinn arís"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -27559,9 +27543,8 @@ msgid "Submit played tracks stats to Last.fm"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:357
-#, fuzzy
 msgid "Codecs"
-msgstr "Scéim Comhbhrúite"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
@@ -27612,9 +27595,8 @@ msgid "Live555 stream transport"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:376
-#, fuzzy
 msgid "Default caching policy"
-msgstr "Ionchódú Réamhshocraithe"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:531
 msgid "Menus language:"
@@ -27653,14 +27635,12 @@ msgid "Show media change popup:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:542
-#, fuzzy
 msgid "Start in minimal view mode"
-msgstr "Tosaigh in amharc íosta (gan roghchláir)"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:543
-#, fuzzy
 msgid "Force window style:"
-msgstr "Fuinneoga ghníomhacha"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:544
 msgid "Integrate video in interface"
@@ -27671,18 +27651,16 @@ msgid "Show systray icon"
 msgstr "Taispeáin deilbhín tráidire an chórais"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Socruithe an phríomhchomhéadainan"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Seinn agus stad"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -27693,18 +27671,16 @@ msgid "Allow only one instance"
 msgstr "Ceadaigh ásc amháin"
 
 #: modules/gui/qt/ui/sprefs_interface.h:557
-#, fuzzy
 msgid "Activate updates notifier"
-msgstr "Gníomhachtaigh an fógra a thaispeántar nuair atá nuashonrú ar fáil"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:559
 msgid "Every "
 msgstr "Gach"
 
 #: modules/gui/qt/ui/sprefs_interface.h:560
-#, fuzzy
 msgid "Save recently played items"
-msgstr "Seinnte le déanaí"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:563
 msgid "Separate words by | (without space)"
@@ -27715,18 +27691,16 @@ msgid "Operating System Integration"
 msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
-#, fuzzy
 msgid "File extensions association"
-msgstr " Iarmhíreanna oscailte comhad"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:568
 msgid "Set up associations..."
 msgstr "Socraigh na comhcheangail..."
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:291
-#, fuzzy
 msgid "Enable On Screen Display (OSD)"
-msgstr "Taispeáint Ar An Scáileán"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_subtitles.h:292
 msgid "Show media title on video start"
@@ -27785,14 +27759,12 @@ msgid "KVA"
 msgstr "KVA"
 
 #: modules/gui/qt/ui/sprefs_video.h:327
-#, fuzzy
 msgid "Deinterlacing"
-msgstr "Díchrosfhigh"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:329
-#, fuzzy
 msgid "Force Aspect Ratio"
-msgstr "Glasaigh an Cóimheas Treoíochta"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:334
 msgid "vlc-snap"
@@ -27815,9 +27787,8 @@ msgid "Run manually"
 msgstr "Rith de láimh"
 
 #: modules/gui/qt/ui/streampanel.h:176
-#, fuzzy
 msgid "Setup schedule"
-msgstr "Clár Ama"
+msgstr ""
 
 #: modules/gui/qt/ui/streampanel.h:177
 msgid "Run on schedule"
@@ -27906,9 +27877,8 @@ msgid "Mask"
 msgstr "Aghaidh fidil"
 
 #: modules/gui/qt/ui/video_effects.h:1289
-#, fuzzy
 msgid "Anaglyph 3D"
-msgstr "Anaiglif"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1290
 msgid "Mirror"
@@ -27919,9 +27889,8 @@ msgid "Motion detect"
 msgstr "Braith gluaisne"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "Spásúil"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -27932,37 +27901,32 @@ msgid "Soften"
 msgstr "Bogaigh"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "Fuaim"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
 msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
-#, fuzzy
 msgid "Temporal luma strength"
-msgstr "Port TCP le feidhm a bhaint as (12345 an réamhshocrú)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1304
-#, fuzzy
 msgid "Spatial chroma strength"
-msgstr "Port TCP le feidhm a bhaint as (12345 an réamhshocrú)"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1305
-#, fuzzy
 msgid "Temporal chroma strength"
-msgstr "Port TCP le feidhm a bhaint as (12345 an réamhshocrú)"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:286
 msgid "VLM configurator"
 msgstr "Cumraitheoir VLM"
 
 #: modules/gui/qt/ui/vlm.h:287
-#, fuzzy
 msgid "Media Manager Edition"
-msgstr "Eolas an mheáin"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:288
 msgid "Name:"
@@ -27989,9 +27953,8 @@ msgid "Time Control"
 msgstr "Rialtán Ama"
 
 #: modules/gui/qt/ui/vlm.h:295
-#, fuzzy
 msgid "Mux Control"
-msgstr "Rialtán"
+msgstr ""
 
 #: modules/gui/qt/ui/vlm.h:296
 msgid "Muxer:"
