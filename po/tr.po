@@ -8,7 +8,7 @@
 # Caner Başaran <basaran.caner@protonmail.com>, 2013
 # Servet CEBECİ <servet.cebeci@hotmail.com>, 2013
 # AYBERK HALAC <diskjockey@windowslive.com>, 2013
-# Kaya Zeren <kayazeren@gmail.com>, 2014-2017
+# Kaya Zeren <kayazeren@gmail.com>, 2014-2018
 # Mehmet Ertekin <byscul@gmail.com>, 2013
 # muaz742, 2013
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2015-2017
@@ -17,11 +17,11 @@
 # Yaşar TAY <yasartay@yahoo.com>, 2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-12-11 00:15+0100\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2018\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -9544,22 +9544,19 @@ msgstr "IceCAST Çıkışı"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Bayt cinsinden şifreleme anahtarı uzunluğu"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bit"
+msgstr "16 bayt"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bit"
+msgstr "24 bayt"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bit"
+msgstr "32 bayt"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -9567,7 +9564,7 @@ msgstr "SRT Akış Çıkışı"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Akış şifreleme parolası"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10730,7 +10727,7 @@ msgstr "Devre Dışı"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Etkin (Yalnız AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -16632,7 +16629,7 @@ msgstr "Temalar"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Sonraki başlatmada profili uygula"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17705,9 +17702,8 @@ msgid "Jump to Time"
 msgstr "Şu zamana atla"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Gönderici"
+msgstr "Görüntüleyici"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26433,20 +26429,17 @@ msgid "Ball speed"
 msgstr "Top hızı"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Karenin piksel sayısına göre                                 top hızının "
-"değişim hızını ayarlayın."
+"Kareye göre piksel sayısı cinsinden top hızını ve sapma değerini yazın."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Top boyutu"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Piksel cinsinden yazılan çap değerine göre topun boyutunu ayarlayın"
+msgstr "Top büyüklüğü için piksel cinsinden yarıçap değerini yazın."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
