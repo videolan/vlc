@@ -4,20 +4,21 @@
 #
 # Translators:
 # Amir Aharoni <amir.aharoni@mail.huji.ac.il>, 2016
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2017
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2018\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 1: n == 2 ? 2 : (n % 10 == 0 and n "
+"> 10) ? 4);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -836,6 +837,7 @@ msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] "מודול אחד (%u) לא הוצג כיוון שיש לו ההגדרות מתקדמות בלבד.\n"
 msgstr[1] "%u מודולים לא הוצגו כיוון שיש להם הגדרות מתקדמות בלבד\n"
+msgstr[2] "%u מודולים לא הוצגו כיוון שיש להם הגדרות מתקדמות בלבד\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -1116,11 +1118,11 @@ msgstr "לא מוגדר"
 
 #: src/input/es_out.c:3207
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 שורות, 60 הרץ)"
 
 #: src/input/es_out.c:3209
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 שורות, 50 הרץ)"
 
 #: src/input/es_out.c:3217
 msgid "Color primaries"
@@ -1215,7 +1217,6 @@ msgid "Roll"
 msgstr ""
 
 #: src/input/es_out.c:3295
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Field of view"
 msgstr "שדה תצוגה"
@@ -4131,7 +4132,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1333
 msgid "Subtitle sync / synchronize audio & subtitle timestamps"
-msgstr ""
+msgstr "סנכרון כתוביות / סנכרון חותמות הזמן בין השמע והכתוביות"
 
 #: src/libvlc-module.c:1334
 msgid "Select the key to synchronize bookmarked audio & subtitle timestamps."
@@ -4139,7 +4140,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1335
 msgid "Subtitle sync / reset audio & subtitle synchronization"
-msgstr ""
+msgstr "סנכרון כתוביות / איפוס סנכרון בין שמע לכתוביות"
 
 #: src/libvlc-module.c:1336
 msgid "Select the key to reset synchronization of audio & subtitle timestamps."
@@ -6630,15 +6631,15 @@ msgstr ""
 
 #: modules/access/dtv/access.c:146
 msgid "Layer A segments count"
-msgstr ""
+msgstr "ספירת מקטעי שכבה A"
 
 #: modules/access/dtv/access.c:147
 msgid "Layer B segments count"
-msgstr ""
+msgstr "ספירת מקטעי שכבה B"
 
 #: modules/access/dtv/access.c:148
 msgid "Layer C segments count"
-msgstr ""
+msgstr "ספירת מקטעי שכבה C"
 
 #: modules/access/dtv/access.c:150
 msgid "Layer A time interleaving"
@@ -6666,15 +6667,15 @@ msgstr ""
 
 #: modules/access/dtv/access.c:163
 msgid "0.35 (same as DVB-S)"
-msgstr ""
+msgstr "0.35 (כמו DVB-S)"
 
 #: modules/access/dtv/access.c:163
 msgid "0.20"
-msgstr ""
+msgstr "0.20"
 
 #: modules/access/dtv/access.c:163
 msgid "0.25"
-msgstr ""
+msgstr "0.25"
 
 #: modules/access/dtv/access.c:166
 msgid "Transport stream ID"
@@ -8996,28 +8997,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 סיביות"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 סיביות"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 סיביות"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "ססמה למתווך ה־HTTP"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -14107,6 +14104,8 @@ msgid "Playlist has only %u element"
 msgid_plural "Playlist has only %u elements"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -16537,9 +16536,8 @@ msgid "Jump to Time"
 msgstr "קפיצה לזמן מסוים"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "מעבד טקסט"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17337,7 +17335,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
 msgid "General settings"
-msgstr ""
+msgstr "הגדרות כלליות"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -17374,11 +17372,11 @@ msgstr "בדיקת עדכונים אוטומטית"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
 msgid "HTTP web interface"
-msgstr ""
+msgstr "מנשק דפדפן HTTP"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
 msgid "Enable HTTP web interface"
-msgstr ""
+msgstr "הפעלת מנשק דפדפן HTTP."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -17440,11 +17438,11 @@ msgstr "הצגת וידאו בתוך החלון הראשי"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
 msgid "Fullscreen settings"
-msgstr ""
+msgstr "הגדרות מסך מלא"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Start in fullscreen"
-msgstr ""
+msgstr "התחלה במסך מלא"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -17581,7 +17579,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
 msgid "Show Main Window"
-msgstr ""
+msgstr "הצגת החלון הראשי"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
@@ -17590,7 +17588,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
 msgid "Nothing playing"
-msgstr ""
+msgstr "שום דבר לא מתנגן"
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
 msgid "Select File In Finder"
@@ -17598,7 +17596,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
 msgid "Copy URL to clipboard"
-msgstr ""
+msgstr "העתקת כתובת ללוח הגזירים"
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -17644,7 +17642,7 @@ msgstr ""
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:58
 #: modules/gui/qt/components/extended_panels.cpp:1435
 msgid "Subtitle speed:"
-msgstr ""
+msgstr "מהירות כתוביות:"
 
 #: modules/gui/macosx/VLCTrackSynchronizationWindowController.m:59
 msgid "fps"
@@ -18381,7 +18379,7 @@ msgstr "שקופית אחר שקופית"
 
 #: modules/gui/qt/components/controller.hpp:123
 msgid "Reverse"
-msgstr ""
+msgstr "היפוך"
 
 #: modules/gui/qt/components/controller.hpp:124
 msgid "Change the loop and repeat modes"
@@ -18494,73 +18492,73 @@ msgstr "דציבל"
 
 #: modules/gui/qt/components/extended_panels.cpp:1108
 msgid "170 Hz"
-msgstr ""
+msgstr "170 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1109
 msgid "310 Hz"
-msgstr ""
+msgstr "310 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1110
 msgid "600 Hz"
-msgstr ""
+msgstr "600 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1111
 #: modules/gui/qt/components/extended_panels.cpp:1125
 msgid "1 KHz"
-msgstr ""
+msgstr "1 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1112
 msgid "3 KHz"
-msgstr ""
+msgstr "3 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1113
 msgid "6 KHz"
-msgstr ""
+msgstr "6 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1114
 msgid "12 KHz"
-msgstr ""
+msgstr "12 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1115
 msgid "14 KHz"
-msgstr ""
+msgstr "14 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1116
 #: modules/gui/qt/components/extended_panels.cpp:1129
 msgid "16 KHz"
-msgstr ""
+msgstr "16 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1120
 msgid "31 Hz"
-msgstr ""
+msgstr "31 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1121
 msgid "63 Hz"
-msgstr ""
+msgstr "63 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1122
 msgid "125 Hz"
-msgstr ""
+msgstr "125 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1123
 msgid "250 Hz"
-msgstr ""
+msgstr "250 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1124
 msgid "500 Hz"
-msgstr ""
+msgstr "500 הרץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1126
 msgid "2 KHz"
-msgstr ""
+msgstr "2 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1127
 msgid "4 KHz"
-msgstr ""
+msgstr "4 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1128
 msgid "8 KHz"
-msgstr ""
+msgstr "8 קה״ץ"
 
 #: modules/gui/qt/components/extended_panels.cpp:1296
 #: modules/gui/qt/components/extended_panels.cpp:1297
@@ -18887,19 +18885,19 @@ msgstr "נא להזין שם עבור התיקייה החדשה:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Directory"
-msgstr ""
+msgstr "שינוי שם תיקייה"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Folder"
-msgstr ""
+msgstr "שינוי שם תיקייה"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
-msgstr ""
+msgstr "נא להקליד שם חדש לתיקייה:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
 msgid "Enter a new name for the folder:"
-msgstr ""
+msgstr "נא להקליד שם חדש לתיקייה:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -19485,7 +19483,7 @@ msgstr "שמירת קובץ הדוח בשם..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr ""
+msgstr "קובצי טקסט/יומן (‎*.log ‎*.txt);; הכול (*.*)"
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -19997,19 +19995,19 @@ msgstr "כל הקבצים"
 #: modules/gui/qt/extensions_manager.cpp:191
 #: modules/gui/qt/util/qmenuview.cpp:70
 msgid "Empty"
-msgstr ""
+msgstr "ריק"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
-msgstr ""
+msgstr "השבתה"
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
-msgstr ""
+msgstr "להמשיך לנגן מהמיקום שבו הופסקה הנגינה בפעם האחרונה?"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
-msgstr ""
+msgstr "להמ&שיך"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -20041,7 +20039,7 @@ msgstr "&כתוביות"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "&כלים"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -20137,7 +20135,7 @@ msgstr "רשימת נגינה מוצמדת"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "תמיד &עליון"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20169,7 +20167,7 @@ msgstr "ה&גברת עצמת השמע"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "ה&נמכת עצמת שמע"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20329,16 +20327,15 @@ msgstr "&ניקוי"
 
 #: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
-msgstr ""
+msgstr "התקן &עיבוד"
 
 #: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "הגדרות..."
+msgstr "מתבצעת סריקה…"
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20561,7 +20558,7 @@ msgstr "מנשק Qt"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
-msgstr ""
+msgstr "שגיאות"
 
 #: modules/gui/qt/util/customwidgets.cpp:82
 msgid "warnings"
@@ -20574,7 +20571,7 @@ msgstr ""
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "פינוי"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -20586,11 +20583,11 @@ msgstr "קובצי מעטפת |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "קובצי רשימת נגינה |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|כל הקבצים |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -20602,7 +20599,7 @@ msgstr "שמירת רשימת נגינה"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr ""
+msgstr "רשימת נגינה XSPF |*.xspf|קובץ M3U |*.m3u|רשימת נגינהHTML |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -20662,11 +20659,11 @@ msgstr "מנשק הניתן לעיצוב"
 
 #: modules/gui/skins2/src/theme_repository.cpp:58
 msgid "Select skin"
-msgstr ""
+msgstr "נא לבחור מעטפת"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "פתיחת מעטפת…"
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20721,12 +20718,12 @@ msgstr ""
 #: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
 #: modules/video_filter/adjust.c:73
 msgid "Image gamma (0-10)"
-msgstr ""
+msgstr "גוון התמונה (0-10)"
 
 #: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
-msgstr ""
+msgstr "הגדרת גוון התמונה, בין 0.01 ל־10. בררת המחדל היא 1."
 
 #: modules/hw/d3d9/d3d9_filters.c:454
 msgid "Direct3D9 adjust filter"
@@ -20893,7 +20890,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "No"
-msgstr ""
+msgstr "לא"
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
@@ -20901,7 +20898,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:47
 msgid "System default"
-msgstr ""
+msgstr "בררת המחדל של המערכת"
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -21006,15 +21003,15 @@ msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
-msgstr ""
+msgstr "HTML"
 
 #: modules/logger/file.c:203
 msgid "Info"
-msgstr ""
+msgstr "מידע"
 
 #: modules/logger/file.c:203
 msgid "Debug"
-msgstr ""
+msgstr "ניפוי שגיאות"
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -21240,7 +21237,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:160 modules/lua/vlc.c:161
 msgid "Lua Extension"
-msgstr ""
+msgstr "הרחבת Lua"
 
 #: modules/lua/vlc.c:167
 msgid "Lua SD Module"
@@ -21584,23 +21581,23 @@ msgstr "רוק גותי"
 
 #: modules/meta_engine/ID3Genres.h:125
 msgid "Progressive Rock"
-msgstr ""
+msgstr "רוק מתקדם"
 
 #: modules/meta_engine/ID3Genres.h:126
 msgid "Psychedelic Rock"
-msgstr ""
+msgstr "רוק פסיכדלי"
 
 #: modules/meta_engine/ID3Genres.h:127
 msgid "Symphonic Rock"
-msgstr ""
+msgstr "רוק סימפוני"
 
 #: modules/meta_engine/ID3Genres.h:128
 msgid "Slow Rock"
-msgstr ""
+msgstr "רוק אטי"
 
 #: modules/meta_engine/ID3Genres.h:129
 msgid "Big Band"
-msgstr ""
+msgstr "להקה גדולה"
 
 #: modules/meta_engine/ID3Genres.h:131
 msgid "Easy Listening"
@@ -21608,7 +21605,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:132
 msgid "Acoustic"
-msgstr ""
+msgstr "אקוסטי"
 
 #: modules/meta_engine/ID3Genres.h:133
 msgid "Humour"
@@ -21616,15 +21613,15 @@ msgstr "הומור"
 
 #: modules/meta_engine/ID3Genres.h:134
 msgid "Speech"
-msgstr ""
+msgstr "דיבור"
 
 #: modules/meta_engine/ID3Genres.h:135
 msgid "Chanson"
-msgstr ""
+msgstr "שנסון"
 
 #: modules/meta_engine/ID3Genres.h:136
 msgid "Opera"
-msgstr ""
+msgstr "אופרה"
 
 #: modules/meta_engine/ID3Genres.h:137
 msgid "Chamber Music"
@@ -21632,11 +21629,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:138
 msgid "Sonata"
-msgstr ""
+msgstr "סונטה"
 
 #: modules/meta_engine/ID3Genres.h:139
 msgid "Symphony"
-msgstr ""
+msgstr "סימפוניה"
 
 #: modules/meta_engine/ID3Genres.h:140
 msgid "Booty Bass"
@@ -21652,7 +21649,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:143
 msgid "Satire"
-msgstr ""
+msgstr "סאטירה"
 
 #: modules/meta_engine/ID3Genres.h:144
 msgid "Slow Jam"
@@ -21660,11 +21657,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:146
 msgid "Tango"
-msgstr ""
+msgstr "טנגו"
 
 #: modules/meta_engine/ID3Genres.h:147
 msgid "Samba"
-msgstr ""
+msgstr "סמבה"
 
 #: modules/meta_engine/ID3Genres.h:148
 msgid "Folklore"
@@ -21672,7 +21669,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:149
 msgid "Ballad"
-msgstr ""
+msgstr "בלדה"
 
 #: modules/meta_engine/ID3Genres.h:150
 msgid "Power Ballad"
@@ -21688,7 +21685,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:153
 msgid "Duet"
-msgstr ""
+msgstr "דואט"
 
 #: modules/meta_engine/ID3Genres.h:154
 msgid "Punk Rock"
@@ -21696,11 +21693,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:155
 msgid "Drum Solo"
-msgstr ""
+msgstr "סולו תופים"
 
 #: modules/meta_engine/ID3Genres.h:156
 msgid "Acapella"
-msgstr ""
+msgstr "אקפלה"
 
 #: modules/meta_engine/ID3Genres.h:157
 msgid "Euro-House"
@@ -21708,15 +21705,15 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:158
 msgid "Dance Hall"
-msgstr ""
+msgstr "דאנסהול"
 
 #: modules/meta_engine/ID3Genres.h:159
 msgid "Goa"
-msgstr ""
+msgstr "גואה טראנס"
 
 #: modules/meta_engine/ID3Genres.h:160
 msgid "Drum & Bass"
-msgstr ""
+msgstr "דראם נ׳ בייס"
 
 #: modules/meta_engine/ID3Genres.h:161
 msgid "Club - House"
@@ -21732,11 +21729,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:164
 msgid "Indie"
-msgstr ""
+msgstr "אינדי"
 
 #: modules/meta_engine/ID3Genres.h:165
 msgid "BritPop"
-msgstr ""
+msgstr "פופ בריטי"
 
 #: modules/meta_engine/ID3Genres.h:166
 msgid "Negerpunk"
@@ -21756,15 +21753,15 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:170
 msgid "Heavy Metal"
-msgstr ""
+msgstr "הבי מטאל"
 
 #: modules/meta_engine/ID3Genres.h:171
 msgid "Black Metal"
-msgstr ""
+msgstr "בלאק מטאל"
 
 #: modules/meta_engine/ID3Genres.h:172
 msgid "Crossover"
-msgstr ""
+msgstr "מעבר בין סגנונות"
 
 #: modules/meta_engine/ID3Genres.h:173
 msgid "Contemporary Christian"
@@ -21772,31 +21769,31 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:174
 msgid "Christian Rock"
-msgstr ""
+msgstr "רוק נוצרי"
 
 #: modules/meta_engine/ID3Genres.h:175
 msgid "Merengue"
-msgstr ""
+msgstr "מרנגה"
 
 #: modules/meta_engine/ID3Genres.h:176
 msgid "Salsa"
-msgstr ""
+msgstr "סלסה"
 
 #: modules/meta_engine/ID3Genres.h:177
 msgid "Thrash Metal"
-msgstr ""
+msgstr "ת׳ראש מטאל"
 
 #: modules/meta_engine/ID3Genres.h:178
 msgid "Anime"
-msgstr ""
+msgstr "אנימה"
 
 #: modules/meta_engine/ID3Genres.h:179
 msgid "JPop"
-msgstr ""
+msgstr "פופ יפני"
 
 #: modules/meta_engine/ID3Genres.h:180
 msgid "Synthpop"
-msgstr ""
+msgstr "סינת׳פופ"
 
 #: modules/misc/addons/fsstorage.c:83
 msgid "addons local storage"
@@ -22017,23 +22014,23 @@ msgstr ""
 
 #: modules/misc/playlist/export.c:51
 msgid "M3U playlist export"
-msgstr ""
+msgstr "ייצוא רשימת נגינה מסוג M3U"
 
 #: modules/misc/playlist/export.c:57
 msgid "M3U8 playlist export"
-msgstr ""
+msgstr "ייצוא רשימת נגינה מסוג M3U8"
 
 #: modules/misc/playlist/export.c:63
 msgid "XSPF playlist export"
-msgstr ""
+msgstr "ייצוא רשימת נגינה מסוג XSPF"
 
 #: modules/misc/playlist/export.c:69
 msgid "HTML playlist export"
-msgstr ""
+msgstr "ייצוא רשימת נגינה מסוג HTML"
 
 #: modules/misc/rtsp.c:63
 msgid "Maximum number of connections"
-msgstr ""
+msgstr "מספר החיבורים המרבי"
 
 #: modules/misc/rtsp.c:64
 msgid ""
@@ -22067,11 +22064,11 @@ msgstr ""
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr ""
+msgstr "תמיכה ב־TLS עבור OS X ו־iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr ""
+msgstr "תמיכה בשרת TLS עבור OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -22461,7 +22458,7 @@ msgstr "מתנגן כעת"
 
 #: modules/notify/osx_notifications.m:402
 msgid "Skip"
-msgstr ""
+msgstr "דילוג"
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
@@ -22551,17 +22548,17 @@ msgstr ""
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
 msgid "Zeroconf network services"
-msgstr ""
+msgstr "שירותי רשת Zeroconf"
 
 #: modules/services_discovery/avahi.c:56
 msgid "Zeroconf services"
-msgstr ""
+msgstr "שירותי Zeroconf"
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
 msgid "Bonjour Network Discovery"
-msgstr ""
+msgstr "גילוי רשת Bonjour"
 
 #: modules/services_discovery/bonjour.m:70
 msgid "Bonjour Renderer Discovery"
@@ -22593,7 +22590,7 @@ msgstr "התמונות שלי"
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
 msgid "mDNS Network Discovery"
-msgstr ""
+msgstr "גילוי רשת mDNS"
 
 #: modules/services_discovery/microdns.c:65
 msgid "mDNS Renderer Discovery"
@@ -22753,15 +22750,15 @@ msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Master List"
-msgstr ""
+msgstr "רשימה ראית"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Server List"
-msgstr ""
+msgstr "רשימת שרתים"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
-msgstr ""
+msgstr "רשימה בהתאמה אישית"
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -22779,7 +22776,7 @@ msgstr "לכידת המסך"
 
 #: modules/services_discovery/xcb_apps.c:154
 msgid "Your window manager does not provide a list of applications."
-msgstr ""
+msgstr "מנהל החלונות שלך לא מספק רשימת יישומים."
 
 #: modules/services_discovery/xcb_apps.c:167
 msgid "Applications"
@@ -22833,19 +22830,19 @@ msgstr ""
 
 #: modules/spu/audiobargraph_v.c:56
 msgid "Bar width in pixel"
-msgstr ""
+msgstr "רוחב העמודה בפיקסלים"
 
 #: modules/spu/audiobargraph_v.c:57
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
-msgstr ""
+msgstr "רוחב בפיקסלים לכל עמודה בתרשים עמודות."
 
 #: modules/spu/audiobargraph_v.c:58
 msgid "Bar Height in pixel"
-msgstr ""
+msgstr "גובה העמודה בפיקסלים"
 
 #: modules/spu/audiobargraph_v.c:59
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr ""
+msgstr "גובה בפיקסלים לכל עמודה בתרשים עמודות."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -22890,11 +22887,11 @@ msgstr ""
 
 #: modules/spu/logo.c:53
 msgid "Logo animation # of loops"
-msgstr ""
+msgstr "מספר לולאות של הנפשת לוגו"
 
 #: modules/spu/logo.c:54
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
-msgstr ""
+msgstr "מספר הלולאות להנפשת הלוגו. ‎-1 = ברצף, 0 = מושבת"
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -23087,7 +23084,7 @@ msgstr "עובי המסגרת"
 
 #: modules/spu/mosaic.c:106
 msgid "Width in pixels of the border between miniatures."
-msgstr ""
+msgstr "רוחב בפיקסלים של הגבול בין המיניאטורות."
 
 #: modules/spu/mosaic.c:107
 msgid "Border height"
@@ -23095,11 +23092,11 @@ msgstr "גובה המסגרת"
 
 #: modules/spu/mosaic.c:109
 msgid "Height in pixels of the border between miniatures."
-msgstr ""
+msgstr "גובה בפיקסלים של הגבול בין המיניאטורות."
 
 #: modules/spu/mosaic.c:111
 msgid "Mosaic alignment"
-msgstr ""
+msgstr "יישור פסיפס"
 
 #: modules/spu/mosaic.c:113
 msgid ""
@@ -23143,7 +23140,7 @@ msgstr ""
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
-msgstr ""
+msgstr "קיבוע יחס תצוגה"
 
 #: modules/spu/mosaic.c:136
 msgid "Keep the original aspect ratio when resizing mosaic elements."
@@ -23212,7 +23209,7 @@ msgstr "מארח VNC"
 
 #: modules/spu/remoteosd.c:73
 msgid "VNC hostname or IP address."
-msgstr ""
+msgstr "שם מארח או כתובת IP של VNC"
 
 #: modules/spu/remoteosd.c:75
 msgid "VNC Port"
@@ -23220,7 +23217,7 @@ msgstr "פתחת VNC"
 
 #: modules/spu/remoteosd.c:77
 msgid "VNC port number."
-msgstr ""
+msgstr "מספר פתחה של VNC."
 
 #: modules/spu/remoteosd.c:79
 msgid "VNC Password"
@@ -23232,15 +23229,15 @@ msgstr "ססמת VNC."
 
 #: modules/spu/remoteosd.c:83
 msgid "VNC poll interval"
-msgstr ""
+msgstr "מרווח תשאול VNC"
 
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
-msgstr ""
+msgstr "במרווח זמן זה נדרש עדכון מ־VNC, בררת המחדל היא 300 מילישניות."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
-msgstr ""
+msgstr "תשאול VNC"
 
 #: modules/spu/remoteosd.c:89
 msgid "Activate VNC polling. Do NOT activate for use as VDR ffnetdev client."
@@ -23253,15 +23250,15 @@ msgstr "שליחת אירועי עכבר למארח VNC. אין צורך לשי�
 
 #: modules/spu/remoteosd.c:95
 msgid "Key events"
-msgstr ""
+msgstr "אירועי מקשים"
 
 #: modules/spu/remoteosd.c:97
 msgid "Send key events to VNC host."
-msgstr ""
+msgstr "שליחת אירועי מקשים למארח ה־VNC."
 
 #: modules/spu/remoteosd.c:99
 msgid "Alpha transparency value (default 255)"
-msgstr ""
+msgstr "ערך שקיפות (בררת מחדל 255)"
 
 #: modules/spu/remoteosd.c:101
 msgid ""
@@ -23374,11 +23371,11 @@ msgstr "הצגת הזנת RSS ו־ATOM"
 
 #: modules/spu/subsdelay.c:45
 msgid "Change subtitle delay"
-msgstr ""
+msgstr "שינוי השהיית כתוביות"
 
 #: modules/spu/subsdelay.c:47
 msgid "Delay calculation mode"
-msgstr ""
+msgstr "מצב חישוב השהיה"
 
 #: modules/spu/subsdelay.c:49
 msgid ""
@@ -23465,7 +23462,7 @@ msgstr ""
 
 #: modules/spu/subsdelay.c:291
 msgid "Overlap fix"
-msgstr ""
+msgstr "תיקון חפיפה"
 
 #: modules/stream_extractor/archive.c:54
 msgid "libarchive based stream directory"
@@ -23493,15 +23490,15 @@ msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
-msgstr ""
+msgstr "פריסת LZMA"
 
 #: modules/stream_filter/decomp.c:66
 msgid "Burrows-Wheeler decompression"
-msgstr ""
+msgstr "פריסת Burrows-Wheeler"
 
 #: modules/stream_filter/decomp.c:71
 msgid "gzip decompression"
-msgstr ""
+msgstr "דחיסת gzip"
 
 #: modules/stream_filter/hds/hds.c:208
 msgid "HTTP Dynamic Streaming"
@@ -23509,7 +23506,7 @@ msgstr ""
 
 #: modules/stream_filter/inflate.c:201
 msgid "Zlib decompression filter"
-msgstr ""
+msgstr "מסנן פריסה Zlib"
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
@@ -23517,7 +23514,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
-msgstr ""
+msgstr "גודל חוצץ"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
@@ -23648,11 +23645,11 @@ msgstr ""
 
 #: modules/stream_out/chromaprint.c:57
 msgid "Duration of the fingerprinting"
-msgstr ""
+msgstr "משך הטבעת האצבע"
 
 #: modules/stream_out/chromaprint.c:58
 msgid "Default: 90sec"
-msgstr ""
+msgstr "בררת מחדל: 90 שניות"
 
 #: modules/stream_out/chromaprint.c:61
 msgid "Chromaprint stream output"
@@ -23660,7 +23657,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:188
 msgid "HTTP port"
-msgstr ""
+msgstr "פתחת HTTP"
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid ""
@@ -23670,22 +23667,20 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "אפשרויות ביצועים"
+msgstr "אזהרת ביצועים"
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "אפשר שמע"
+msgstr "הפעלת העברת שמע"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "יש להשבית אם המגבר שלך אינו תומך ב־Dolby®‎."
 
 #: modules/stream_out/chromecast/cast.cpp:216
 msgid "High (high quality and high bandwidth)"
@@ -23701,40 +23696,39 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "צריכת מעבד נמוכה (איכות נמוכה אבל רוחב פס רחב)"
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "איכות הקידוד"
+msgstr "איכות המרה"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
-msgstr ""
+msgstr "יש לשנות אפשרות זו כדי להגביר את מהירות או איכות ההמרה."
 
 #: modules/stream_out/chromecast/cast.cpp:226
 msgid "IP Address of the Chromecast."
-msgstr ""
+msgstr "כתובת IP של ה־Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "Chromecast port"
-msgstr ""
+msgstr "פתחת Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "The port used to talk to the Chromecast."
-msgstr ""
+msgstr "הפתחה לצורך תקשורת עם Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:238
 msgid "Chromecast"
-msgstr ""
+msgstr "Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:239
 msgid "Chromecast stream output"
-msgstr ""
+msgstr "פלט תזרים Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:1201
 msgid "Ok, Don't warn me again"
-msgstr ""
+msgstr "בסדר, לא להזהיר אותי שוב"
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -23790,67 +23784,67 @@ msgstr ""
 
 #: modules/stream_out/display.c:44
 msgid "Delay (ms)"
-msgstr ""
+msgstr "השהיה (מילישניות)"
 
 #: modules/stream_out/display.c:45
 msgid "Introduces a delay in the display of the stream."
-msgstr ""
+msgstr "מוסיף השהיה בהצגת התזרים."
 
 #: modules/stream_out/display.c:54
 msgid "Display stream output"
-msgstr ""
+msgstr "הצגת פלט תזרים"
 
 #: modules/stream_out/duplicate.c:44
 msgid "Duplicate stream output"
-msgstr ""
+msgstr "פלט תזרים משוכפל"
 
 #: modules/stream_out/es.c:42 modules/stream_out/standard.c:42
 msgid "Output access method"
-msgstr ""
+msgstr "שיטת גישת פלט"
 
 #: modules/stream_out/es.c:44
 msgid "This is the default output access method that will be used."
-msgstr ""
+msgstr "זו שיטת גישת הפלט כבררת המחדל בה ייעשה שימוש."
 
 #: modules/stream_out/es.c:46
 msgid "Audio output access method"
-msgstr ""
+msgstr "שיטת גישה לפלט שמע"
 
 #: modules/stream_out/es.c:48
 msgid "This is the output access method that will be used for audio."
-msgstr ""
+msgstr "זו שיטת גישת הפלט שבה יעשה שימוש לשמע."
 
 #: modules/stream_out/es.c:49
 msgid "Video output access method"
-msgstr ""
+msgstr "שיטת גישה לפלט לווידאו"
 
 #: modules/stream_out/es.c:51
 msgid "This is the output access method that will be used for video."
-msgstr ""
+msgstr "זו שיטת גישת הפלט שבה יעשה שימוש לווידאו."
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
-msgstr ""
+msgstr "מרבב פלט"
 
 #: modules/stream_out/es.c:55
 msgid "This is the default muxer method that will be used."
-msgstr ""
+msgstr "זו שיטת הריבוב בה יעשה שימוש כבררת מחדל."
 
 #: modules/stream_out/es.c:56
 msgid "Audio output muxer"
-msgstr ""
+msgstr "מרבב פלט שמע"
 
 #: modules/stream_out/es.c:58
 msgid "This is the muxer that will be used for audio."
-msgstr ""
+msgstr "זה המרבב בו יעשה שימוש עבור שמע."
 
 #: modules/stream_out/es.c:59
 msgid "Video output muxer"
-msgstr ""
+msgstr "מרבב פלט וידאו"
 
 #: modules/stream_out/es.c:61
 msgid "This is the muxer that will be used for video."
-msgstr ""
+msgstr "זה המרבב בו יעשה שימוש עבור וידאו."
 
 #: modules/stream_out/es.c:63
 msgid "Output URL"
@@ -24837,18 +24831,16 @@ msgid "Ball speed"
 msgstr "מהירות הכדור"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "הגדרת מהירות הכדור, ערך התזוזה כמספר של פיקסלים לשנייה."
+msgstr ""
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "גודל הכדור"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "הגדרת גודל הכדור על ידי הגדרת הרדיוס שלו במספר פיקסלים"
+msgstr ""
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -25350,17 +25342,18 @@ msgstr ""
 
 #: modules/video_filter/gradient.c:65
 msgid "Gradient image type"
-msgstr ""
+msgstr "סוג תמונת ההדרגה"
 
 #: modules/video_filter/gradient.c:66
 msgid ""
 "Gradient image type (0 or 1). 0 will turn the image to white while 1 will "
 "keep colors."
 msgstr ""
+"סוג תמונת הדרגה (0 או 1). 0 יהפוך את התמונה ללבנה בעוד 1 ישמור על הצבעים."
 
 #: modules/video_filter/gradient.c:69
 msgid "Apply cartoon effect"
-msgstr ""
+msgstr "הפעלת אפקט סרטונים מצוירים"
 
 #: modules/video_filter/gradient.c:70
 msgid "Apply cartoon effect. It is only used by \"gradient\" and \"edge\"."
@@ -25901,35 +25894,35 @@ msgstr ""
 
 #: modules/video_filter/transform.c:49
 msgid "Transform type"
-msgstr ""
+msgstr "סוג ההתמרה"
 
 #: modules/video_filter/transform.c:55
 msgid "Transpose"
-msgstr ""
+msgstr "שחלוף"
 
 #: modules/video_filter/transform.c:55
 msgid "Anti-transpose"
-msgstr ""
+msgstr "שחלוף הפוך"
 
 #: modules/video_filter/transform.c:58
 msgid "Video transformation filter"
-msgstr ""
+msgstr "מסנן התמרת וידאו"
 
 #: modules/video_filter/transform.c:59
 msgid "Transformation"
-msgstr ""
+msgstr "התמרה"
 
 #: modules/video_filter/transform.c:60
 msgid "Rotate or flip the video"
-msgstr ""
+msgstr "הטיה או היפוך של הווידאו"
 
 #: modules/video_filter/vhs.c:105
 msgid "VHS movie effect video filter"
-msgstr ""
+msgstr "מסנן וידאו אפקט סרט בקלטת"
 
 #: modules/video_filter/vhs.c:106
 msgid "VHS movie"
-msgstr ""
+msgstr "סרט בקלטת"
 
 #: modules/video_filter/wave.c:53
 msgid "Wave video filter"
@@ -26256,15 +26249,15 @@ msgstr "פלט הווידאו המומלץ ל־Windows Vista וגרסאות עד
 
 #: modules/video_output/win32/direct3d9.c:91
 msgid "Direct3D9 video output"
-msgstr ""
+msgstr "פלט וידאו Direct3D9"
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr ""
+msgstr "פלט וידאו מומלץ עבור Windows מגרסה 8 ואילך"
 
 #: modules/video_output/win32/direct3d11.c:78
 msgid "Direct3D11 video output"
-msgstr ""
+msgstr "פלט וידאו Direct3D11"
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -26338,7 +26331,7 @@ msgstr "רקע"
 
 #: modules/video_output/win32/glwin32.c:51
 msgid "OpenGL video output for Windows"
-msgstr ""
+msgstr "פלט וידאו OpenGL ל־Windows"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -26350,7 +26343,7 @@ msgstr "קרבה למעבד"
 
 #: modules/video_output/win32/wgl.c:46
 msgid "WGL extension for OpenGL"
-msgstr ""
+msgstr "הרחבת WGL ל־OpenGL"
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -26800,19 +26793,19 @@ msgstr ""
 
 #: modules/video_splitter/wall.c:58
 msgid "Element aspect ratio"
-msgstr ""
+msgstr "יחס התצוגה של הרכיב"
 
 #: modules/video_splitter/wall.c:59
 msgid "Aspect ratio of the individual displays building the wall."
-msgstr ""
+msgstr "יחס התצוגה של כל אחד מהצגים שמרכיבים את הקיר."
 
 #: modules/video_splitter/wall.c:68
 msgid "Wall video filter"
-msgstr ""
+msgstr "מסנן קיר וידאו"
 
 #: modules/video_splitter/wall.c:69
 msgid "Image wall"
-msgstr ""
+msgstr "קיר תמונות"
 
 #: modules/visualization/glspectrum.c:56
 msgid "The width of the visualization window, in pixels."
@@ -26927,11 +26920,11 @@ msgstr "גודל התבנית בפיקסלים."
 
 #: modules/visualization/projectm.cpp:101
 msgid "projectM"
-msgstr ""
+msgstr "projectM"
 
 #: modules/visualization/projectm.cpp:102
 msgid "libprojectM effect"
-msgstr ""
+msgstr "אפקט libprojectM"
 
 #: modules/visualization/visual/visual.c:47
 msgid "Effects list"
@@ -27277,7 +27270,7 @@ msgstr ""
 
 #: share/lua/http/index.html:278
 msgid "Are you sure you wish to create the stream?"
-msgstr ""
+msgstr "ליצור את התזרים?"
 
 #: modules/gui/qt/ui/about.h:288 modules/gui/qt/ui/open.h:260
 #: modules/gui/qt/ui/podcast_configuration.h:100
@@ -27299,7 +27292,7 @@ msgstr "ערכה"
 
 #: modules/gui/qt/ui/equalizer.h:137
 msgid "0.00 dB"
-msgstr ""
+msgstr "0.00 דציבל"
 
 #: modules/gui/qt/ui/messages_panel.h:139
 msgid "&Verbosity:"
@@ -27342,9 +27335,8 @@ msgid "Start Time"
 msgstr "זמן ההתחלה"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "זמן העצירה"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27371,9 +27363,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr ""
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "שינוי זמן ההתחלה של המדיה"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27464,17 +27455,16 @@ msgid "Please enter a network URL:"
 msgstr "נא להזין כתובת מהרשת:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr " שם הפרופיל חסר"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
-msgstr ""
+msgstr "FLAC"
 
 #: modules/gui/qt/ui/profiles.h:703
 msgid "MP&4/MOV"
-msgstr ""
+msgstr "MP&4/MOV"
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -27482,12 +27472,11 @@ msgstr "Ogg/Ogm"
 
 #: modules/gui/qt/ui/profiles.h:705
 msgid "M&KV"
-msgstr ""
+msgstr "M&KV"
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -27495,12 +27484,11 @@ msgstr "MPEG-PS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr "&MPEG-TS"
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -27515,9 +27503,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG-PS"
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -27529,16 +27516,15 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:716
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:717
 msgid "Features"
 msgstr "תכונות"
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "שם התזרים"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -27550,7 +27536,7 @@ msgstr "תפריטים"
 
 #: modules/gui/qt/ui/profiles.h:730
 msgid "Fra&me Rate"
-msgstr ""
+msgstr "ק&צב שקופיות"
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -27565,9 +27551,8 @@ msgid "Custom options"
 msgstr "אפשרויות בהתאמה אישית"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "רמת האיכות"
+msgstr "&איכות"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -27578,9 +27563,8 @@ msgid " kb/s"
 msgstr " ק״ב/ש׳"
 
 #: modules/gui/qt/ui/profiles.h:739 modules/gui/qt/ui/profiles.h:759
-#, fuzzy
 msgid "Encoding parameters"
-msgstr "דריסת משתנים"
+msgstr "משתני הצפנה"
 
 #: modules/gui/qt/ui/profiles.h:742
 msgid "Frame size"
@@ -27591,14 +27575,12 @@ msgid "px"
 msgstr "פיקסלים"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "קצב דגימה"
+msgstr "קצב &דגימה"
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "שם הפרופיל"
+msgstr "שם &פרופיל"
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -27609,9 +27591,8 @@ msgid "Destination Setup"
 msgstr "הגדרת יעד"
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "בחירת תיקייה"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -27628,23 +27609,20 @@ msgid "Display locally"
 msgstr "הצגה מקומית"
 
 #: modules/gui/qt/ui/sout.h:212
-#, fuzzy
 msgid "Transcoding Options"
-msgstr "אפשרויות ההתמרה"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "אפשרויות הזרמה והתמרה"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
 msgstr "הפעלת התמרה"
 
 #: modules/gui/qt/ui/sout.h:215
-#, fuzzy
 msgid "Option Setup"
-msgstr "הגדרת יעד"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:216
 msgid "Set up any additional options for streaming"
@@ -27655,14 +27633,12 @@ msgid "Miscellaneous Options"
 msgstr "אפשרויות שונות"
 
 #: modules/gui/qt/ui/sout.h:218
-#, fuzzy
 msgid "Stream all elementary streams"
-msgstr "הגדרת המזהה של התזרים היסודי"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:219
-#, fuzzy
 msgid "Generated stream output string"
-msgstr "הגדרות כלליות של שדרים זורמים"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:412
 msgid " %"
@@ -27685,14 +27661,12 @@ msgid "Visualization:"
 msgstr "אפקט חזותי:"
 
 #: modules/gui/qt/ui/sprefs_audio.h:422
-#, fuzzy
 msgid "Enable Time-Stretching audio"
-msgstr "אפשר שמע"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:423
-#, fuzzy
 msgid "Replay gain mode:"
-msgstr "איזון עצמת השמע"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_audio.h:424
 msgid "Normalize volume to:"
@@ -27827,9 +27801,8 @@ msgid "Show systray icon"
 msgstr "הצגת סמל בשורת המשימות"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "מנשק Ncurses"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -27920,9 +27893,8 @@ msgid "Add a background"
 msgstr "הוספת רקע"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "פלט"
+msgstr "&פלט"
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
@@ -28067,9 +28039,8 @@ msgid "Motion detect"
 msgstr "גלאי תנועה"
 
 #: modules/gui/qt/ui/video_effects.h:1295
-#, fuzzy
 msgid "Spatial blur"
-msgstr "טשטוש תנועה"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1299
 msgid "Anti-Flickering"
@@ -28080,9 +28051,8 @@ msgid "Soften"
 msgstr "ריכוך"
 
 #: modules/gui/qt/ui/video_effects.h:1301
-#, fuzzy
 msgid "Denoiser"
-msgstr "רעש"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1302
 msgid "Spatial luma strength"
