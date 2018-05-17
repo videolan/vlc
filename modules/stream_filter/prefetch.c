@@ -532,6 +532,12 @@ static void Close (vlc_object_t *obj)
     vlc_cond_destroy(&sys->wait_data);
     vlc_mutex_destroy(&sys->lock);
 
+    while(sys->controls)
+    {
+        struct stream_ctrl *ctrl = sys->controls;
+        sys->controls = ctrl->next;
+        free(ctrl);
+    }
     free(sys->buffer);
     free(sys->content_type);
     free(sys);
