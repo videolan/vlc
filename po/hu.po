@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Balázs Meskó <meskobalazs@gmail.com>, 2017
+# Balázs Meskó <meskobalazs@gmail.com>, 2017-2018
 # Dávid Eredics, 2015
 # Gabor Kelemen <kelemeng@ubuntu.com>, 2005-2015
 # iskr <iscreamd@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 02:54+0100\n"
-"Last-Translator: Balázs Meskó <meskobalazs@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Balázs Meskó <meskobalazs@gmail.com>, 2018\n"
 "Language-Team: Hungarian (https://www.transifex.com/yaron/teams/16553/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -1228,17 +1228,17 @@ msgstr "Vetítés"
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Legyezés"
 
 #: src/input/es_out.c:3290
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Bólintás"
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Dőlés"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
@@ -1742,6 +1742,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Beállítja a hangkimeneti csatornák módját, amely alapértelmezetten használva "
+"lesz, ha a hardver és a hangfolyam kompatibilis egymással."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -1752,6 +1754,8 @@ msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"Ezt a beállítást akkor kell használni, ha a hangkimenet nem tud megállapodni "
+"az S/PDIF támogatásban."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -7334,15 +7338,15 @@ msgstr "A beállítófájl neve a share/dvb/dvb-s alatt."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
-msgstr ""
+msgstr "Hangolási lista letapogatása"
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
-msgstr ""
+msgstr "A kezdeti letapogatott hangolási adatok fájlneve."
 
 #: modules/access/dvb/access.c:76
 msgid "Use NIT for scanning services"
-msgstr ""
+msgstr "NIT használata a szolgáltatások használatához"
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
@@ -7425,7 +7429,7 @@ msgstr "A DVDRead nem tudta megnyitni a(z) „%s” lemezt."
 
 #: modules/access/dvdread.c:217
 msgid "Cannot play a non-UDF mastered DVD."
-msgstr ""
+msgstr "A nem-UDF írt DVD-k nem játszhatóak el"
 
 #: modules/access/dvdread.c:472
 #, c-format
@@ -7464,7 +7468,7 @@ msgstr "Speciális fájlok listázása"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "Eszközök és csatornák bevétele a mappák felsorolásakor"
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:83
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7483,6 +7487,7 @@ msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
 msgstr ""
+"A kapcsolódáshoz használandó felhasználónév, ha nincs megadva az URL-ben."
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7503,6 +7508,8 @@ msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
+"A kapcsolódáshoz használandó jelszó, ha nincs megadva felhasználónév vagy "
+"jelszó az URL-ben."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -9519,28 +9526,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bit"
+msgstr "16 bájt"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bit"
+msgstr "24 bájt"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bit"
+msgstr "32 bájt"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT folyamkimenet"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Céleszköz jelszava."
+msgstr "Jelszó az adatfolyam titkosításához"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9905,7 +9908,7 @@ msgstr "RMS/csúcs"
 
 #: modules/audio_filter/compressor.c:156
 msgid "Set the RMS/peak."
-msgstr ""
+msgstr "RMS/csúcs beállítása."
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
@@ -9929,7 +9932,7 @@ msgstr "Küszöbszint"
 
 #: modules/audio_filter/compressor.c:165
 msgid "Set the threshold level in dB."
-msgstr ""
+msgstr "Küszöbszint beállítása dB-ben."
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9948,7 +9951,7 @@ msgstr "Térdsugár"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "Térdsugár beállítása dB-ben."
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -9975,7 +9978,7 @@ msgstr "Hangszűrő a PCM formátum átalakításhoz"
 
 #: modules/audio_filter/converter/tospdif.c:49
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr ""
+msgstr "Hangszűrő az A/52/DTS → S/PDIF betokozáshoz"
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10241,7 +10244,7 @@ msgstr "Újramintavételezési minőség, a legrosszabbtól a legjobbig"
 
 #: modules/audio_filter/resampler/soxr.c:67
 msgid "SoX Resampler"
-msgstr ""
+msgstr "SoX újramintavételező"
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10691,7 +10694,7 @@ msgstr "K Audio Interface hangkimenet"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
-msgstr ""
+msgstr "HDMI/SPDIF hangáteresztés"
 
 #: modules/audio_output/mmdevice.c:1453
 msgid ""
@@ -10705,7 +10708,7 @@ msgstr "Kikapcsolva"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Engedélyezve (csak AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -10717,11 +10720,11 @@ msgstr "Windows multimédia eszköz kimenet"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Output back-end"
-msgstr ""
+msgstr "Kimeneti háttérrendszer"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Audio output back-end interface."
-msgstr ""
+msgstr "Hangkimeneti háttérrendszer interfész."
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -16013,7 +16016,7 @@ msgstr "MPEG továbbító folyamszétválasztó"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
-msgstr ""
+msgstr "Fő hang"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
@@ -16596,7 +16599,7 @@ msgstr "Sminkek"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Profil alkalmazása következő indításkor"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17656,9 +17659,8 @@ msgid "Jump to Time"
 msgstr "Ugrás időpontra"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Megjelenítő"
+msgstr "Megjelenítő"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26379,7 +26381,6 @@ msgid "Ball speed"
 msgstr "Labda sebessége"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Labda sebességének megadása, a kiszorítási érték megadásával képkockánkénti "
@@ -26390,9 +26391,8 @@ msgid "Ball size"
 msgstr "Labdaméret"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Labdaméret megadása a sugarának megadásával képpontokban"
+msgstr "Labdaméret megadása a sugarának megadásával képpontokban."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -27592,7 +27592,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:73
 msgid "Active Format Descriptor value"
-msgstr ""
+msgstr "Active Format Descriptor érték"
 
 #: modules/video_output/decklink.cpp:76
 msgid "Aspect Ratio of the source picture."
@@ -27600,7 +27600,7 @@ msgstr "A forráskép képaránya."
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Active Format Descriptor sor"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
