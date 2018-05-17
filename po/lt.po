@@ -5,22 +5,23 @@
 # Translators:
 # Tomas <jawnuolis@gmail.com>, 2013
 # Karolis Runas <karolis.runas@yahoo.com>, 2014
-# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2017
+# Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2009-2018
 # Vaidotas Kalvelis <vaidotaskal@gmail.com>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc3\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2018\n"
 "Language-Team: Lithuanian (https://www.transifex.com/yaron/teams/16553/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 1 : (n%10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 3 : "
+"n % 1 != 0 ? 4);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -857,6 +858,7 @@ msgid_plural ""
 msgstr[0] "%u modulis nerodomi, nes jis turi tik sudėtingesnes parinktis.\n"
 msgstr[1] "%u moduliai nerodomi, nes jie turi tik sudėtingesnes parinktis.\n"
 msgstr[2] "%u moduliai nerodomi, nes jie turi tik sudėtingesnes parinktis.\n"
+msgstr[3] "%u moduliai nerodomi, nes jie turi tik sudėtingesnes parinktis.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -1225,10 +1227,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Tonas"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -9194,28 +9195,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bitų"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bitai"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bitai"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Paskirties įrenginio slaptažodis."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -14355,6 +14352,7 @@ msgid_plural "Playlist has only %u elements"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+msgstr[3] ""
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -16811,9 +16809,8 @@ msgid "Jump to Time"
 msgstr "Šokti į laiką"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Ti&ekimas"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -20634,9 +20631,8 @@ msgid "<Local>"
 msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "&Srautas..."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -24028,18 +24024,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "Našumo nustatymai"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "Įgalinti garso srauto išvestį"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -24062,9 +24056,8 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "Vaizdavimo kokybė"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -24091,9 +24084,8 @@ msgid "Chromecast stream output"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "Nebeklausti"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -27712,9 +27704,8 @@ msgid "&Verbosity:"
 msgstr "Pranešimų &išsamumas:"
 
 #: modules/gui/qt/ui/messages_panel.h:140
-#, fuzzy
 msgid "&Filter:"
-msgstr "Filtras:"
+msgstr ""
 
 #: modules/gui/qt/ui/messages_panel.h:141
 msgid "&Save as..."
@@ -27749,9 +27740,8 @@ msgid "Start Time"
 msgstr "Pradžios laikas"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Pabaigos laikas"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -27778,9 +27768,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'v':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Keisti kūrinio pradžios laiką"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -27873,9 +27862,8 @@ msgid "Please enter a network URL:"
 msgstr "Įveskite tinklo URL:"
 
 #: modules/gui/qt/ui/profiles.h:701
-#, fuzzy
 msgid "Profile edition"
-msgstr "Profilis nepavadintas"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:702
 msgid "FLAC"
@@ -27942,9 +27930,8 @@ msgid "Features"
 msgstr "Savybės"
 
 #: modules/gui/qt/ui/profiles.h:719
-#, fuzzy
 msgid "Streamable"
-msgstr "Srauto pavadinimas"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:720
 msgid "Chapters"
@@ -27995,9 +27982,8 @@ msgid "px"
 msgstr " tšk"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Garso elementų dažnis"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
 msgid "Profile &Name"
@@ -28012,9 +27998,8 @@ msgid "Destination Setup"
 msgstr "Paskirties parinktys"
 
 #: modules/gui/qt/ui/sout.h:206
-#, fuzzy
 msgid "Select destinations to stream to"
-msgstr "Pasirinkite aplanką"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:207
 msgid ""
@@ -28037,9 +28022,8 @@ msgid "Transcoding Options"
 msgstr "Perkodavimo parinktys"
 
 #: modules/gui/qt/ui/sout.h:213
-#, fuzzy
 msgid "Select and choose transcoding options"
-msgstr "Srauto siuntimo ir perkodavimo parinktys"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:214
 msgid "Activate Transcoding"
@@ -28134,9 +28118,8 @@ msgid "Video quality post-processing level"
 msgstr "Vaizdo kokybės galutinio apdorojimo lygis"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Praleisti kartojimo filtrą"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
@@ -28227,18 +28210,16 @@ msgid "Show systray icon"
 msgstr "Ženkliukas sistemos dėkle"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses sąsaja"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
 msgstr "Apipavidalinimo failas:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:549
-#, fuzzy
 msgid "Playlist and Instances"
-msgstr "Grojaraščių analizatoriai"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:552
 msgid "Pause on the last frame of a video"
@@ -28483,9 +28464,8 @@ msgid "Denoiser"
 msgstr "Triukšmo šalinimas"
 
 #: modules/gui/qt/ui/video_effects.h:1302
-#, fuzzy
 msgid "Spatial luma strength"
-msgstr "Erdvinis suliejimas"
+msgstr ""
 
 #: modules/gui/qt/ui/video_effects.h:1303
 msgid "Temporal luma strength"
