@@ -1,14 +1,13 @@
-# Tagalog translation for vlc package.
-# Copyright (C) 2005 the VideoLAN team
-# This file is distributed under the same license as the vlc package.
-# $Id$
+# Tagalog translation
+# Copyright (C) 2018 VideoLAN
+# This file is distributed under the same license as the VLC package.
 #
+# Translators:
 # Adi Nugroho <adi@internux.co.id>, 2005.
 # Simos Xenitellis <simos74@gmx.net>, 2005.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
 "PO-Revision-Date: 2005-02-01 14:25+0000\n"
