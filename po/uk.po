@@ -5,21 +5,23 @@
 # Translators:
 # Eugene Kutia <fossugn@gmail.com>, 2013
 # Oleksandr Natalenko <oleksandr@natalenko.name>, 2009-2012
-# Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2017
+# Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-11-16 03:16+0100\n"
-"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2018\n"
 "Language-Team: Ukrainian (https://www.transifex.com/yaron/teams/16553/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=( n % 1 == 0 && n % 10 =1 && n % 100 != "
+"11) ? 1 : ( n %1 == 0 && ( n >= 2 && n <=4) && ( n % 100 <12 || n % 100 > "
+"14)) ? 3 : ( n % 1 ==0 && (n% 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % "
+"100 >=11 && n % 100 <=14));\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -854,6 +856,7 @@ msgid_plural ""
 msgstr[0] "%u модуль не показано, тому що він має лише додаткові опції.\n"
 msgstr[1] "%u модулі не показано, тому що вони мають лише додаткові опції.\n"
 msgstr[2] "%u модулів не показано, тому що вони мають лише додаткові опції.\n"
+msgstr[3] "%u модулів не показано, тому що вони мають лише додаткові опції.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -9483,31 +9486,27 @@ msgstr "Виведення IceCAST"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Довжина криптоключа у байтах"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16-бітний"
+msgstr "16 байтів"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24-бітний"
+msgstr "24 байти"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32-бітний"
+msgstr "32 байти"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Вивід потоку по SRT"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Пароль для цільового пристрою."
+msgstr "Пароль для потокового шифрування"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10670,7 +10669,7 @@ msgstr "Вимкнено"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Увімкнено (AC3/DTS лише)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -15109,6 +15108,7 @@ msgid_plural "Playlist has only %u elements"
 msgstr[0] "Список відтворення має лише %u елемент"
 msgstr[1] "Список відтворення має лише %u елементи"
 msgstr[2] "Список відтворення має лише %u елементів"
+msgstr[3] "Список відтворення має лише %u елементів"
 
 #: modules/control/oldrc.c:1735 modules/gui/ncurses.c:808
 msgid "+-[Incoming]"
@@ -16570,7 +16570,7 @@ msgstr "Обкладинки"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Застосувати профіль при наступному запуску"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17631,9 +17631,8 @@ msgid "Jump to Time"
 msgstr "Перейти до часу"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Відтворювач"
+msgstr "Відтворювач"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26345,7 +26344,6 @@ msgid "Ball speed"
 msgstr "Швидкість кульки"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr "Встановити швидкість кульки, значення зміщення у пікселях на кадр."
 
@@ -26354,9 +26352,8 @@ msgid "Ball size"
 msgstr "Розмір кульки"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Встановити розмір кульки через її радіус у пікселях"
+msgstr "Встановити розмір кульки через її радіус у пікселях."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
