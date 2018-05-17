@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# A. Regnander <anton_r_3@hotmail.com>, 2014-2017
+# A. Regnander <anton_r_3@hotmail.com>, 2014-2018
 # Christopher Rönngren <christopher.ronngren@hotmail.com>, 2015
 # Claes-Göran Nydahl <goldug@gmail.com>, 2016
 # Daniel <daniel.a.back@telia.com>, 2015
@@ -19,7 +19,7 @@
 # Jonathan Schmidt <jhschmidt@wpsdk12.org>, 2016
 # Josef Andersson <josef.andersson@fripost.org>, 2015
 # Andreas Everos, 2014
-# Kristoffer Grundström <kristoffer.grundstrom1983@gmail.com>, 2015-2016
+# Kristoffer Grundström <kristoffer.grundstrom1983@gmail.com>, 2015-2018
 # Isis, 2013,2014
 # leveebreaks, 2013,2014
 # Linus Malmgren <linus@malmgren.nu>, 2015
@@ -36,11 +36,11 @@
 # Isis, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-09-23 19:54+0000\n"
-"Last-Translator: Henrik Mattsson-Mårn <h@reglage.net>, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: A. Regnander <anton_r_3@hotmail.com>, 2018\n"
 "Language-Team: Swedish (https://www.transifex.com/yaron/teams/16553/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -480,7 +480,7 @@ msgstr "&Meddelanden"
 
 #: include/vlc_intf_strings.h:58
 msgid "Jump to Specific &Time"
-msgstr "Hoppa till specifik &tid"
+msgstr "H&oppa till specifik tid"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
@@ -914,7 +914,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"Dumpade innehåll till filen vlc-help.txt.\n"
+"Sparade innehållet till filen vlc-help.txt.\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -1170,7 +1170,7 @@ msgstr "ITU-R BT.601 (625 linjer, 50 Hz)"
 
 #: src/input/es_out.c:3217
 msgid "Color primaries"
-msgstr ""
+msgstr "Färgpremier"
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1235,7 +1235,7 @@ msgstr "Rektangulär"
 
 #: src/input/es_out.c:3277
 msgid "Equirectangular"
-msgstr ""
+msgstr "Ekvirektangulär"
 
 #: src/input/es_out.c:3280
 msgid "Cubemap"
@@ -1248,17 +1248,17 @@ msgstr "Projektion"
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Horisontal lutning"
 
 #: src/input/es_out.c:3290
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Vertikal lutning"
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rotation"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
@@ -1761,6 +1761,8 @@ msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
+"Ändrar läget för ljudutmatningskanalerna som kommer att användas som "
+"standard om din hårdvara och ljudströmmen är kompatibla."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -2806,11 +2808,11 @@ msgstr "Strömningen kommer att köras (i sekunder)"
 
 #: src/libvlc-module.c:646 modules/gui/qt/ui/sprefs_input.h:363
 msgid "Fast seek"
-msgstr "Snabbsökning"
+msgstr "Snabb snabbspolning"
 
 #: src/libvlc-module.c:648
 msgid "Favor speed over precision while seeking"
-msgstr "Prioritera hastighet över precision under sökning"
+msgstr "Prioritera hastighet över precision under snabbspolning"
 
 #: src/libvlc-module.c:650
 msgid "Playback speed"
@@ -5016,7 +5018,7 @@ msgstr "Webbläsarknapp Stoppa"
 #: modules/gui/qt/ui/podcast_configuration.h:104
 #: modules/gui/qt/ui/streampanel.h:172
 msgid "Delete"
-msgstr "Delete"
+msgstr "Radera"
 
 #: src/misc/actions.c:63
 msgid "Down"
@@ -7508,11 +7510,11 @@ msgstr "Fortsätt läsa en resurs som uppdaterar sig."
 
 #: modules/access/http/access.c:300
 msgid "Cookies forwarding"
-msgstr ""
+msgstr "Vidarebefordring av Cookies"
 
 #: modules/access/http/access.c:301
 msgid "Forward cookies across HTTP redirections."
-msgstr ""
+msgstr "Vidarebefordra Cookies genom HTTP-omdirigeringar."
 
 #: modules/access/http/access.c:302
 msgid "Referrer"
@@ -8438,6 +8440,9 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+"Datorn (%s) du försöker ansluta till kräver autentisering.\n"
+"Var god ange ett användarnamn (ideellt ett domännamn som använder formatet "
+"DOMÄN;användarnamn) och ett lösenord."
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
@@ -8522,6 +8527,10 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"Tvinga videoenheten Video4Linux2 att använda ett specifikt färgformat (t.ex. "
+"I420 eller I422 för råa bilder, MJPG för M-JPEG-komprimerad inmatning). "
+"Fullständig lista: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, "
+"I41N, I422, I420, I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -9389,28 +9398,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bitar"
+msgstr "16 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bitar"
+msgstr "24 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bitar"
+msgstr "32 byte"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "Utmatning för SRT-ström"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Lösenord för målenhet."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10107,7 +10112,7 @@ msgstr "Speex-återsamplare"
 
 #: modules/audio_filter/resampler/src.c:40
 msgid "Sample rate converter type"
-msgstr ""
+msgstr "Konverteringstyp för samplingsfrekvens"
 
 #: modules/audio_filter/resampler/src.c:42
 msgid ""
@@ -10566,7 +10571,7 @@ msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
-msgstr ""
+msgstr "Sökväg till OSS-enhetsnod."
 
 #: modules/audio_output/oss.c:74
 msgid "Open Sound System audio output"
@@ -10876,6 +10881,9 @@ msgid ""
 "Skipping the loop filter (aka deblocking) usually has a detrimental effect "
 "on quality. However it provides a big speedup for high definition streams."
 msgstr ""
+"Hoppar över slingande filtret (även känt som avblockering) som vanligtvis "
+"har en skadlig inverkan på kvaliteten. Men den ger en stor prestandaökning "
+"för strömmar i hög definition."
 
 #: modules/codec/avcodec/avcodec.h:113
 #: modules/gui/macosx/VLCSimplePrefsController.m:297
@@ -11288,7 +11296,7 @@ msgstr "Dummy-avkodare"
 
 #: modules/codec/ddummy.c:64 modules/codec/ddummy.c:65
 msgid "Dump decoder"
-msgstr "Dumpa avkodare"
+msgstr "Kopiera avkodare"
 
 #: modules/codec/dmo/dmo.c:91
 msgid "DirectMedia Object decoder"
@@ -13258,17 +13266,20 @@ msgstr "Hoppa över slingande filter"
 
 #: modules/codec/x264.c:150
 msgid "Deactivate the deblocking loop filter (decreases quality)."
-msgstr ""
+msgstr "Inaktiverar det avblockerande slingande filtret (sänker kvaliteten)."
 
 #: modules/codec/x264.c:152
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
-msgstr ""
+msgstr "Parametrarna alpha:beta för det slingande filtret AlphaC0 och Beta "
 
 #: modules/codec/x264.c:153
 msgid ""
 "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and "
 "beta parameters. -6 means light filter, 6 means strong."
 msgstr ""
+"Parametrarna alpha:beta för det slingande filtret AlphaC0 och Beta. "
+"Intervallet -6 till 6 är för båda parametrarna, alpha och beta. -6 betyder "
+"enkelt filter, 6 betyder starkt."
 
 #: modules/codec/x264.c:157
 msgid "H.264 level"
@@ -13281,6 +13292,10 @@ msgid ""
 "the encoding options. Range 1 to 5.1 (10 to 51 is also allowed). Set to 0 "
 "for letting x264 set level."
 msgstr ""
+"Ange H.264-nivå (som definieras av standardens Annex A). Nivåer framtvingas "
+"inte; det är upp till användaren att välja en nivå som ä kompatibel med "
+"resten av kodningsalternativen. Intervall mellan 1 till 5.1 (10 till 51 är "
+"även tillåtet). Ändra till 0 för att låta x264 ange en nivå."
 
 #: modules/codec/x264.c:163
 msgid "H.264 profile"
@@ -13289,6 +13304,7 @@ msgstr "H.264-profil"
 #: modules/codec/x264.c:164
 msgid "Specify H.264 profile which limits are enforced over other settings"
 msgstr ""
+"Ange en H.264-profil, vars gränser framtvingas över andra inställningar"
 
 #: modules/codec/x264.c:170
 msgid "Interlaced mode"
@@ -14734,11 +14750,11 @@ msgstr "Windows meddelandegränssnitt"
 
 #: modules/demux/adaptive/adaptive.cpp:68
 msgid "Maximum device width"
-msgstr ""
+msgstr "Maximal enhetsbredd"
 
 #: modules/demux/adaptive/adaptive.cpp:69
 msgid "Maximum device height"
-msgstr ""
+msgstr "Maximal enhetshöjd"
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -14754,19 +14770,19 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
-msgstr ""
+msgstr "Använd vanliga HTTP-moduler"
 
 #: modules/demux/adaptive/adaptive.cpp:77
 msgid "Connect using HTTP access instead of custom HTTP code"
-msgstr ""
+msgstr "Anslut med HTTP-åtkomst istället för anpassad HTTP-kod"
 
 #: modules/demux/adaptive/adaptive.cpp:98
 msgid "Predictive"
-msgstr ""
+msgstr "Förutsägande"
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
-msgstr ""
+msgstr "Nästan optimal"
 
 #: modules/demux/adaptive/adaptive.cpp:100
 msgid "Bandwidth Adaptive"
@@ -14908,7 +14924,7 @@ msgstr "Spela upp som den är"
 
 #: modules/demux/avi/avi.c:843 modules/demux/mp4/mp4.c:1685
 msgid "Broken or missing Index"
-msgstr ""
+msgstr "Trasigt eller saknat index"
 
 #: modules/demux/avi/avi.c:2719
 msgid "Broken or missing AVI Index"
@@ -14928,15 +14944,15 @@ msgstr "Demuxer för CDG"
 
 #: modules/demux/demuxdump.c:32
 msgid "Dump module"
-msgstr "Dumpa modul"
+msgstr "Kopiera modul"
 
 #: modules/demux/demuxdump.c:33
 msgid "Dump filename"
-msgstr "Filnamn för dump"
+msgstr "Filnamn för kopia"
 
 #: modules/demux/demuxdump.c:35
 msgid "Name of the file to which the raw stream will be dumped."
-msgstr "Filnamnet till vilken den råa strömmen kommer att dumpas."
+msgstr "Filnamnet till vilken den råa strömmen kommer att sparas."
 
 #: modules/demux/demuxdump.c:36
 msgid "Append to existing file"
@@ -14948,7 +14964,7 @@ msgstr "Om filen redan finns kommer den inte att skrivas över."
 
 #: modules/demux/demuxdump.c:47
 msgid "File dumper"
-msgstr "Fildumpare"
+msgstr "Filkopierare"
 
 #: modules/demux/dirac.c:41
 msgid "Value to adjust dts by"
@@ -14960,7 +14976,7 @@ msgstr "Videodemuxer för Dirac"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Katalogimport"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
@@ -15075,11 +15091,11 @@ msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:68 modules/demux/mpeg/ts.c:109
 msgid "Seek based on percent not time"
-msgstr "Sökning baserad på procent, inte tid"
+msgstr "Snabbspolning baserat på procent, inte tid"
 
 #: modules/demux/mkv/mkv.cpp:69
 msgid "Seek based on percent not time."
-msgstr "Sökning baserad på procent, inte tid."
+msgstr "Snabbspolning baserat på procent, inte tid."
 
 #: modules/demux/mkv/mkv.cpp:72
 msgid "Dummy Elements"
@@ -15091,12 +15107,14 @@ msgstr "Läs och förkasta okända EBML-element (inte bra för trasiga filer)."
 
 #: modules/demux/mkv/mkv.cpp:76
 msgid "Preload clusters"
-msgstr ""
+msgstr "Förhandshämta kluster"
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
+"Hitta alla klusterpositioner genom att hoppa kluster-till-kluster innan "
+"uppspelning"
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
@@ -15301,7 +15319,7 @@ msgstr "Exekutiv producent"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
-msgstr ""
+msgstr "Kodningsparametrar"
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
@@ -15341,7 +15359,7 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
 msgid "Do not seek"
-msgstr "Sök inte"
+msgstr "Snabbspola inte"
 
 #: modules/demux/mp4/mp4.c:1683
 msgid "Build index"
@@ -16312,7 +16330,7 @@ msgstr "Bakåt"
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
 msgid "Seek backward"
-msgstr "Sök bakåt"
+msgstr "Snabbspola bakåt"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -16324,7 +16342,7 @@ msgstr "Framåt"
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
 msgid "Seek forward"
-msgstr "Sök framåt"
+msgstr "Snabbspola framåt"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
 msgid "Playback position"
@@ -17138,9 +17156,8 @@ msgid "Jump to Time"
 msgstr "Hoppa till tid"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "&Renderare"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17688,7 +17705,7 @@ msgstr "Visa strömmen lokalt"
 
 #: modules/gui/macosx/VLCOutput.m:66 modules/gui/qt/dialogs/convert.cpp:107
 msgid "Dump raw input"
-msgstr "Dumpa rå inmatning"
+msgstr "Spara rå inmatning"
 
 #: modules/gui/macosx/VLCOutput.m:77
 msgid "Encapsulation Method"
@@ -18732,7 +18749,7 @@ msgstr " <, > Nästa/föregående kapitel"
 #: modules/gui/ncurses.c:887
 #, c-format
 msgid " <left>,<right>         Seek -/+ 1%%"
-msgstr " <left>,<right> Sök -/+ 1%%"
+msgstr " <left>,<right>         Snabbspola -/+ 1%%"
 
 #: modules/gui/ncurses.c:888
 msgid " a, z                   Volume Up/Down"
@@ -18830,7 +18847,7 @@ msgstr "[Uppspelare]"
 #: modules/gui/ncurses.c:927
 #, c-format
 msgid " <up>,<down>            Seek +/-5%%"
-msgstr " <up>,<down> Sök +/-5%%"
+msgstr " <up>,<down>            Snabbspola +/-5%%"
 
 #: modules/gui/ncurses.c:1046
 msgid "[Repeat]"
@@ -20841,7 +20858,7 @@ msgstr "&Höj volymen"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr "&Sänk volymen"
+msgstr "S&änk volymen"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20901,11 +20918,11 @@ msgstr "&Beskär"
 
 #: modules/gui/qt/menus.cpp:693
 msgid "&Deinterlace"
-msgstr "Av&fläta"
+msgstr "&Avfläta"
 
 #: modules/gui/qt/menus.cpp:694
 msgid "&Deinterlace mode"
-msgstr "Av&flätningsläge"
+msgstr "A&vflätningsläge"
 
 #: modules/gui/qt/menus.cpp:698
 msgid "Take &Snapshot"
@@ -20933,11 +20950,11 @@ msgstr "Leta efter &uppdateringar..."
 
 #: modules/gui/qt/menus.cpp:837
 msgid "&Stop"
-msgstr "S&toppa"
+msgstr "&Stoppa"
 
 #: modules/gui/qt/menus.cpp:845
 msgid "Pre&vious"
-msgstr "Fö&regående"
+msgstr "Före&gående"
 
 #: modules/gui/qt/menus.cpp:851
 msgid "Ne&xt"
@@ -21484,7 +21501,7 @@ msgstr "Tom skärm nedanför video."
 
 #: modules/hw/mmal/vout.c:55
 msgid "Render blank screen below video. Increases VideoCore load."
-msgstr ""
+msgstr "Renderar svart skärm under videon. Ökar belastningen på videokärnan."
 
 #: modules/hw/mmal/vout.c:59 modules/hw/mmal/vout.c:60
 msgid "Adjust HDMI refresh rate to the video."
@@ -21961,7 +21978,7 @@ msgstr "Lua-tillägg"
 
 #: modules/lua/vlc.c:167
 msgid "Lua SD Module"
-msgstr ""
+msgstr "Lua SD-modul"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
@@ -22521,19 +22538,19 @@ msgstr "lokalt lagringsutrymme för tillägg"
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
-msgstr ""
+msgstr "Installationsprogram för lokal tilläggslagring"
 
 #: modules/misc/addons/fsstorage.c:93
 msgid "Addons local storage lister"
-msgstr ""
+msgstr "Lista över lokal tilläggslagring"
 
 #: modules/misc/addons/vorepository.c:62
 msgid "Videolan.org's addons finder"
-msgstr ""
+msgstr "Videolan.org:s tilläggshittare"
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
-msgstr ""
+msgstr "addons.videolan.org tilläggshittare"
 
 #: modules/misc/addons/vorepository.c:70
 msgid "Videolan.org's single archive addons finder"
@@ -23178,14 +23195,18 @@ msgstr "Indexintervall"
 msgid ""
 "Minimal index interval, in microseconds. Set to 0 to disable index creation."
 msgstr ""
+"Minimat indexintervall, i mikrosekunder. Ändra till 0 för att inaktivera "
+"indexskapande."
 
 #: modules/mux/ogg.c:50
 msgid "Index size ratio"
-msgstr ""
+msgstr "Förhållande för indexstorlek"
 
 #: modules/mux/ogg.c:52
 msgid "Set index size ratio. Alters default (60min content) or estimated size."
 msgstr ""
+"Ändra förhållandet för indexstorleken. Förändrar standard- (60 minuters "
+"innehåll) eller uppskattad storlek."
 
 #: modules/mux/ogg.c:60
 msgid "Ogg/OGM muxer"
@@ -23253,7 +23274,7 @@ msgstr "Flac-ljudpaketerare"
 
 #: modules/packetizer/h264.c:62
 msgid "H.264 video packetizer"
-msgstr "H.264-videopaketerare"
+msgstr "Videopaketerare för H.264"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
@@ -24030,6 +24051,7 @@ msgstr "Pollningsintervall för VNC"
 #: modules/spu/remoteosd.c:85
 msgid "In this interval an update from VNC is requested, default every 300 ms."
 msgstr ""
+"I detta intervall begärs en uppdatering från VNC, standard varje 300 ms."
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24191,6 +24213,10 @@ msgid ""
 "delay - multiply subtitle delay. Relative to source content - determine "
 "subtitle delay from its content (text)."
 msgstr ""
+"Absolut fördröjning - lägger till absolut fördröjning i varje undertextrad. "
+"Relativ till den ursprungliga fördröjningen - multiplicera "
+"undertextfördröjning. Relativ till den ursprungliga fördröjningen - bestäm "
+"undertextens fördröjning från dess innehåll (text)."
 
 #: modules/spu/subsdelay.c:53
 msgid "Calculation factor"
@@ -24231,6 +24257,9 @@ msgid ""
 "predecessor has disappeared (subtitle delay will be extended to meet this "
 "requirement)."
 msgstr ""
+"Minimal tid (i millisekunder) som undertexten bör stanna efter att dess "
+"eftergångare har försvunnit (undertextens fördröjning kommer att fördröjas "
+"för att möta detta krav)."
 
 #: modules/spu/subsdelay.c:69
 msgid "Interval between disappearance and appearance"
@@ -24326,7 +24355,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
 msgid "Stream prefetch filter"
-msgstr ""
+msgstr "Förhandshämtande filter för ström"
 
 #: modules/stream_filter/prefetch.c:534
 msgid "Buffer size"
@@ -24346,7 +24375,7 @@ msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
 msgid "Seek threshold"
-msgstr ""
+msgstr "Tröskel för snabbspolning"
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -24488,7 +24517,7 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
 msgid "Performance warning"
-msgstr ""
+msgstr "Prestandavarning"
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
@@ -24500,31 +24529,32 @@ msgstr "Aktivera passthrough för ljud"
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
-msgstr ""
+msgstr "Inaktivera om din mottagare inte stöder Dolby®."
 
 #: modules/stream_out/chromecast/cast.cpp:216
 msgid "High (high quality and high bandwidth)"
-msgstr ""
+msgstr "Hög (hög kvalitet och hög bandbredd)"
 
 #: modules/stream_out/chromecast/cast.cpp:217
 msgid "Medium (medium quality and medium bandwidth)"
-msgstr ""
+msgstr "Medelhög (medelhög kvalitet och medelhög bandbredd)"
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Low (low quality and low bandwidth)"
-msgstr ""
+msgstr "Låg (låg kvalitet och låg bandbredd)"
 
 #: modules/stream_out/chromecast/cast.cpp:219
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "Låg processor (låg kvalitet, men hög bandbredd)"
 
 #: modules/stream_out/chromecast/cast.cpp:222
 msgid "Conversion quality"
-msgstr ""
+msgstr "Konverteringskvalitet"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
+"Ändra detta alternativ för att öka konverteringens hastighet eller kvalitet."
 
 #: modules/stream_out/chromecast/cast.cpp:226
 msgid "IP Address of the Chromecast."
@@ -24548,13 +24578,15 @@ msgstr "Strömutmatning för Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:1201
 msgid "Ok, Don't warn me again"
-msgstr ""
+msgstr "OK, varna inte mig igen"
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
 "Casting this video requires conversion. This conversion can use all the "
 "available power and could quickly drain your battery."
 msgstr ""
+"Denna video måste konverteras för att castas. Denna konvertering kan använda "
+"all tillgänglig kraft och kan snabbt dränera ditt batteri."
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
 msgid "Chromecast demux wrapper"
@@ -25109,7 +25141,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:55
 msgid "Filename for stream (helper setting for dst)"
-msgstr ""
+msgstr "Filnamn för ström (hjälpinställning för dst)"
 
 #: modules/stream_out/standard.c:57
 msgid ""
@@ -25695,7 +25727,6 @@ msgid "Ball speed"
 msgstr "Bollhastighet"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
 "Ange bollens hastighet, förskjutningsvärdet i antalet bildpunkter per "
@@ -25706,9 +25737,8 @@ msgid "Ball size"
 msgstr "Bollstorlek"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Ange bollens storlek genom att ställa in radien i antal bildpunkter"
+msgstr "Ange bollens storlek genom att ställa in radien i antal bildpunkter."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -26469,6 +26499,8 @@ msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
 msgstr ""
+"Mängden som bilden ska skalas innan den skickas till det interna OpenCV-"
+"filtret."
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27216,7 +27248,7 @@ msgstr ""
 
 #: modules/video_output/win32/directdraw.c:82
 msgid "Use triple buffering for overlays"
-msgstr ""
+msgstr "Använd tredubbel buffert för överlägg"
 
 #: modules/video_output/win32/directdraw.c:84
 msgid ""
@@ -27255,7 +27287,7 @@ msgstr "Skrivbordsbakgrund"
 
 #: modules/video_output/win32/glwin32.c:51
 msgid "OpenGL video output for Windows"
-msgstr ""
+msgstr "OpenGL-videoutmatning för Windows"
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -27267,7 +27299,7 @@ msgstr "Grafikprocessoraffinitet"
 
 #: modules/video_output/win32/wgl.c:46
 msgid "WGL extension for OpenGL"
-msgstr ""
+msgstr "WGL-tillägg för OpenGL"
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -28658,7 +28690,7 @@ msgstr "Kodekar"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
-msgstr "x264-profile och nivåval"
+msgstr "x264-profil och nivåval"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Hardware-accelerated decoding"
@@ -28669,14 +28701,12 @@ msgid "Video quality post-processing level"
 msgstr "Nivå för efterbehandling av videokvalitet"
 
 #: modules/gui/qt/ui/sprefs_input.h:361
-#, fuzzy
 msgid "Skip H.264 in-loop deblocking filter"
-msgstr "Hoppa över slingande filter"
+msgstr "Hoppa över H.264 i det slingande avblockeringsfiltret"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264-profile och nivåval"
+msgstr "Val av x264-förhandsinställning och -justering"
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
