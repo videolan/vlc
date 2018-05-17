@@ -10,10 +10,10 @@
 # Wiebe Tokkel <justmarkus@gmx.net>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2017-02-06 13:43+0000\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
 "Last-Translator: Wiebe Tokkel <justmarkus@gmx.net>, 2018\n"
 "Language-Team: Western Frisian (https://www.transifex.com/yaron/teams/16553/"
 "fy/)\n"
@@ -6356,19 +6356,19 @@ msgstr "CDDB-serverpoort om te gebruiken."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "Ynfierlist"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr ""
+msgstr "Komma-skieden lyst fan ynfier-URLS dy't tegearre foeget wurde."
 
 #: modules/access/concat.c:308
 msgid "Concatenation"
-msgstr ""
+msgstr "Tegearre foegjen"
 
 #: modules/access/concat.c:309
 msgid "Concatenated inputs"
-msgstr ""
+msgstr "Tegearre foege ynfier"
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6380,7 +6380,7 @@ msgstr "IIDC digitale camera (FireWire) invoer"
 
 #: modules/access/dcp/dcp.cpp:43
 msgid "KDM file"
-msgstr ""
+msgstr "KDM-triem"
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -9480,28 +9480,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16-bits"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24-bits"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32-bits"
+msgstr ""
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Wachtwoord voor doelapparaat."
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -17525,9 +17521,8 @@ msgid "Jump to Time"
 msgstr "Naar tijdstip springen"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "Tekstweergave"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -26191,19 +26186,16 @@ msgid "Ball speed"
 msgstr "Balsnelheid"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Stel balsnelheid in, de verplaatsingswaarde in aantal pixels per frame."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Balgrootte"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "Stel de balgrootte in door zijn straal in pixels op te geven"
+msgstr ""
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -28866,9 +28858,8 @@ msgid "Start Time"
 msgstr "Start tijd"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "Stoptiid"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28895,9 +28886,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'h':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "Verander de starttijd voor het medium"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -28996,9 +28986,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV demuxer"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -29021,9 +29010,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-PS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -29038,9 +29026,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "Formaat"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29087,9 +29074,8 @@ msgid "Custom options"
 msgstr "Aangepaste opties"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "VBR-kwaliteit"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -29112,14 +29098,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "Samplefluggens"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "Profielnaam"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29254,9 +29238,8 @@ msgid "Skip H.264 in-loop deblocking filter"
 msgstr "H.264 in-loop deblocking filter overslaan"
 
 #: modules/gui/qt/ui/sprefs_input.h:362
-#, fuzzy
 msgid "x264 preset and tuning selection"
-msgstr "x264 profiel- en niveauselectie"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29345,9 +29328,8 @@ msgid "Show systray icon"
 msgstr "Pictogram in systeemvak weergeven"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
-msgstr "Ncurses-ynterfaasje"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29438,9 +29420,8 @@ msgid "Add a background"
 msgstr "Achtergrond toevoegen"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "Utfier"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
