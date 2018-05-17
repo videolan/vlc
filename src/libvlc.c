@@ -43,6 +43,7 @@
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "preparser/preparser.h"
+#include "media_source/media_source.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
@@ -98,6 +99,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
     priv->playlist = NULL;
     priv->main_playlist = NULL;
     priv->p_vlm = NULL;
+    priv->media_source_provider = NULL;
 
     vlc_ExitInit( &priv->exit );
 
@@ -291,6 +293,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !priv->parser )
         goto error;
 
+    priv->media_source_provider = vlc_media_source_provider_New( VLC_OBJECT( p_libvlc ) );
+    if( !priv->media_source_provider )
+        goto error;
+
     /* variables for signalling creation of new files */
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );
@@ -435,6 +441,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     if ( priv->p_media_library )
         libvlc_MlRelease( priv->p_media_library );
+
+    if( priv->media_source_provider )
+        vlc_media_source_provider_Delete( priv->media_source_provider );
 
     libvlc_InternalDialogClean( p_libvlc );
     libvlc_InternalKeystoreClean( p_libvlc );

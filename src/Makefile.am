@@ -63,6 +63,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_keystore.h \
 	../include/vlc_list.h \
 	../include/vlc_md5.h \
+	../include/vlc_media_source.h \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
 	../include/vlc_meta_fetcher.h \
@@ -207,6 +208,10 @@ libvlccore_la_SOURCES = \
 	config/getopt.c \
 	config/vlc_getopt.h \
 	extras/libc.c \
+	media_source/media_source.c \
+	media_source/media_source.h \
+	media_source/media_tree.c \
+	media_source/media_tree.h \
 	modules/modules.h \
 	modules/modules.c \
 	modules/bank.c \
@@ -561,7 +566,8 @@ check_PROGRAMS = \
 	test_vector \
 	test_shared_data_ptr \
 	test_playlist \
-	test_randomizer
+	test_randomizer \
+	test_media_source
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -601,6 +607,11 @@ test_playlist_SOURCES = playlist/test.c \
 test_playlist_CFLAGS = -DTEST_PLAYLIST
 test_randomizer_SOURCES = playlist/randomizer.c
 test_randomizer_CFLAGS = -DTEST_RANDOMIZER
+test_media_source_LDADD = $(LDADD) $(LIBS_libvlccore)
+test_media_source_CFLAGS = -DTEST_MEDIA_SOURCE
+test_media_source_SOURCES = media_source/test.c \
+	media_source/media_source.c \
+	media_source/media_tree.c
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \

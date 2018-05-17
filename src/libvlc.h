@@ -184,6 +184,7 @@ typedef struct vlc_dialog_provider vlc_dialog_provider;
 typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_actions_t vlc_actions_t;
 typedef struct vlc_playlist vlc_playlist_t;
+typedef struct vlc_media_source_provider_t vlc_media_source_provider_t;
 
 typedef struct libvlc_priv_t
 {
@@ -197,6 +198,7 @@ typedef struct libvlc_priv_t
     struct playlist_t *playlist; ///< Playlist for interfaces
     vlc_playlist_t *main_playlist;
     struct input_preparser_t *parser; ///< Input item meta data handler
+    vlc_media_source_provider_t *media_source_provider;
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
     struct vlc_thumbnailer_t *p_thumbnailer; ///< Lazily instantiated media thumbnailer

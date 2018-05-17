@@ -946,3 +946,13 @@ vlc_playlist_Pause
 vlc_playlist_Resume
 vlc_playlist_Preparse
 vlc_intf_GetMainPlaylist
+vlc_media_source_Hold
+vlc_media_source_Release
+vlc_media_source_provider_Get
+vlc_media_source_provider_GetMediaSource
+vlc_media_tree_AddListener
+vlc_media_tree_RemoveListener
+vlc_media_tree_Lock
+vlc_media_tree_Unlock
+vlc_media_tree_Find
+vlc_media_tree_Preparse
