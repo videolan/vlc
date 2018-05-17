@@ -55,11 +55,8 @@ static void
 pool_unlock_pic(picture_t *p_pic)
 {
     picture_sys_t *p_picsys = p_pic->p_sys;
-    if (p_picsys->b_locked)
-    {
-        AndroidOpaquePicture_Release(p_picsys, false);
-        p_picsys->b_locked  = false;
-    }
+
+    AndroidOpaquePicture_Release(p_picsys, false);
 }
 
 static int
