@@ -36,6 +36,7 @@
 #include <QString>
 #include <QFont>
 #include <QToolButton>
+#include <QButtonGroup>
 #include <QSignalMapper>
 #include <QVBoxLayout>
 #include <QScrollArea>
