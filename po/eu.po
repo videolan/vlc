@@ -11,11 +11,11 @@
 # LEIRE LÓPEZ GOIBURU <leirerentzat@gmail.com>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.0-rc8\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2016-04-04 16:53+0000\n"
-"Last-Translator: julen, 2017\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Txopi <txopi@ikusimakusi.eus>, 2018\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -9627,31 +9627,27 @@ msgstr "IceCAST irteera"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Zifratze-gakoaren luzera bytetan"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 bit"
+msgstr "16 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 bit"
+msgstr "24 byte"
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 bit"
+msgstr "32 byte"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
 msgstr "SRT transmisio jarraituaren irteera"
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "Helburuko gailuaren pasahitza."
+msgstr "Transmisio zifraturako pasahitza"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10829,7 +10825,7 @@ msgstr "Desgaituta"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Gaituta (AC3/DTS soilik)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -14192,7 +14188,7 @@ msgid ""
 "motion estimation decision process (lower = quicker and higher = better "
 "quality). Range 1 to 9."
 msgstr ""
-"Parametro honek kalitatearen eta emariaren arteko erlazioa kontrolatzen du "
+"Parametro honek kalitatearen eta abiaduraren arteko erlazioa kontrolatzen du "
 "mugimendua zenbatesteko erabakitze-prozesuan (txikiagoa = bizkorrago eta "
 "handiagoa = kalitate hobea). Barrutia: 1etik 9ra."
 
@@ -16760,7 +16756,7 @@ msgstr "Azalak"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Aplikatu profila hurrengo abiaratzean"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -17834,9 +17830,8 @@ msgid "Jump to Time"
 msgstr "Jauzi egin denborara"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "E&rrendatzailea"
+msgstr "Errendatzailea"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -20059,12 +20054,12 @@ msgid ""
 "Current playback speed: %1\n"
 "Click to adjust"
 msgstr ""
-"Uneko erreprodukzio-emaria: %1\n"
+"Uneko erreprodukzio-abiadura: %1\n"
 "Egin klik doitzeko"
 
 #: modules/gui/qt/components/interface_widgets.cpp:712
 msgid "Revert to normal play speed"
-msgstr "Alderantzikatu erreprodukzio-emaria normalera"
+msgstr "Alderantzikatu erreprodukzio-abiadura normalera"
 
 #: modules/gui/qt/components/interface_widgets.cpp:819
 msgid "Download cover art"
@@ -26649,25 +26644,21 @@ msgstr "Ezarri ertzaren ikusgaitasuna."
 
 #: modules/video_filter/ball.c:103
 msgid "Ball speed"
-msgstr "Bolaren emaria"
+msgstr "Bolaren abiadura"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
 msgstr ""
-"Ezarri bolaren emaria, desplazamenduaren "
-"balioa                                 markoko pixel kopuruan adierazita."
+"Ezarri bolaren abiadura, mugimenduaren balioa marko bakoitzeko pixel "
+"kopuruan adierazita."
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "Bolaren tamaina"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr ""
-"Ezarri bolaren tamaina haren erradioa                                 pixel "
-"kopuruan adieraziz"
+msgstr "Ezarri bolaren tamaina bere erradioa pixeletan adierazita."
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
