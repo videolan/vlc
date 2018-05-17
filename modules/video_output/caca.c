@@ -125,25 +125,6 @@ static void Place(vout_display_t *vd, vout_display_place_t *place)
     }
 }
 
-/**
- * Refresh the display and send resize event
- */
-static void Refresh(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    caca_refresh_display(sys->dp);
-
-    /* */
-    const unsigned width  = caca_get_display_width(sys->dp);
-    const unsigned height = caca_get_display_height(sys->dp);
-
-    if (width  != vd->cfg->display.width ||
-        height != vd->cfg->display.height)
-        vout_display_SendEventDisplaySize(vd, width, height);
-}
-
 static void Manage(vout_display_t *vd);
 
 /**
@@ -193,7 +174,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
  */
 static void PictureDisplay(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
-    Refresh(vd);
+    vout_display_sys_t *sys = vd->sys;
+
+    caca_refresh_display(sys->dp);
     picture_Release(picture);
     VLC_UNUSED(subpicture);
 }
@@ -342,8 +325,6 @@ static void Manage(vout_display_t *vd)
             break;
         }
         case CACA_EVENT_RESIZE:
-            vout_display_SendEventDisplaySize(vd, caca_get_event_resize_width(&ev),
-                                                  caca_get_event_resize_height(&ev));
             break;
         case CACA_EVENT_MOUSE_MOTION: {
             vout_display_place_t place;
@@ -510,7 +491,7 @@ static int Open(vlc_object_t *object)
     vd->control = Control;
 
     /* Fix initial state */
-    Refresh(vd);
+    caca_refresh_display(sys->dp);
 
     return VLC_SUCCESS;
 
