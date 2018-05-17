@@ -301,7 +301,6 @@ static int Open(vlc_object_t *object)
     vd->prepare = vd_prepare;
     vd->display = vd_display;
     vd->control = vd_control;
-    vd->manage = vd_manage;
 
     vc_tv_register_callback(tvservice_cb, vd);
 
@@ -547,6 +546,7 @@ out:
 static void vd_prepare(vout_display_t *vd, picture_t *picture,
                        subpicture_t *subpicture, mtime_t date)
 {
+    vd_manage(vd);
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *pic_sys = picture->p_sys;
