@@ -116,7 +116,6 @@ typedef struct
 static picture_pool_t *Pool   (vout_display_t *, unsigned);
 static void            Display(vout_display_t *, picture_t *, subpicture_t * );
 static int             Control(vout_display_t *, int, va_list);
-static void            Manage (vout_display_t *);
 
 static int  OpenDisplay ( vout_display_t *, video_format_t * );
 static void CloseDisplay( vout_display_t * );
@@ -269,7 +268,6 @@ static void PMThread( void *arg )
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
-    vd->manage  = Manage;
 
     /* Prevent SIG_FPE */
     _control87(MCW_EM, MCW_EM);
@@ -384,21 +382,10 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Display( vout_display_t *vd, picture_t *picture,
                      subpicture_t *subpicture )
 {
-    VLC_UNUSED( vd );
-    VLC_UNUSED( subpicture );
-
-    picture_Release( picture );
-}
-
-/*****************************************************************************
- * Manage: handle Sys events
- *****************************************************************************
- * This function should be called regularly by video output thread. It returns
- * a non null value if an error occurred.
- *****************************************************************************/
-static void Manage( vout_display_t *vd )
-{
     vout_display_sys_t * sys = vd->sys;
+
+    VLC_UNUSED( subpicture );
+    picture_Release( picture );
 
     /* Let a window procedure manage instead because if resizing a frame window
      * here, WM_SIZE is not sent to its child window.
