@@ -1,5 +1,5 @@
 # Gujarati translation
-# Copyright (C) 2015 VideoLAN
+# Copyright (C) 2018 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,14 +8,14 @@
 # pardava rajnik <nilurajnik@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: VLC - Trans\n"
+"Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-09 23:42+0200\n"
-"PO-Revision-Date: 2015-12-04 10:01+0000\n"
-"Last-Translator: Christoph Miebach <christoph.miebach@web.de>\n"
-"Language-Team: Gujarati (India) (http://www.transifex.com/yaron/vlc-trans/"
-"language/gu_IN/)\n"
-"Language: gu\n"
+"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"Language-Team: Gujarati (India) (https://www.transifex.com/yaron/teams/16553/"
+"gu_IN/)\n"
+"Language: gu_IN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -184,9 +184,8 @@ msgid ""
 msgstr "ઓન સ્ક્રીન ડિસપ્લે, ઉપશીર્ષકો અને \"ઓવરલે ઉપચિત્રો\" ને સંબંધિત સુયોજનો"
 
 #: include/vlc_config_cat.h:88
-#, fuzzy
 msgid "Splitters"
-msgstr "સ્પ્લીટર"
+msgstr ""
 
 #: include/vlc_config_cat.h:89
 msgid "Video splitters separate the stream into multiple videos."
@@ -645,9 +644,8 @@ msgid "Spectrum"
 msgstr "વર્ણપટ"
 
 #: src/audio_output/output.c:275
-#, fuzzy
 msgid "VU meter"
-msgstr "Vu મિટર"
+msgstr ""
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -668,9 +666,8 @@ msgid "Mono"
 msgstr "મોનો"
 
 #: src/audio_output/output.c:425
-#, fuzzy
 msgid "Original"
-msgstr "મૂળ ID"
+msgstr ""
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
@@ -824,14 +821,12 @@ msgstr ""
 "\n"
 
 #: src/config/help.c:490
-#, fuzzy
 msgid "(default enabled)"
-msgstr " (મૂળભૂત રીતે સક્રિય થયેલ છે)"
+msgstr ""
 
 #: src/config/help.c:491
-#, fuzzy
 msgid "(default disabled)"
-msgstr " (મૂળભૂત રીતે નિષ્ક્રિય થયેલ છે)"
+msgstr ""
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -973,9 +968,9 @@ msgid "Yes"
 msgstr "હાં"
 
 #: src/input/es_out.c:2136
-#, fuzzy, c-format
+#, c-format
 msgid "DTVCC Closed captions %u"
-msgstr "બંધ કૅપ્શન %u"
+msgstr ""
 
 #: src/input/es_out.c:2138
 #, c-format
@@ -1062,14 +1057,12 @@ msgid "%.2f dB"
 msgstr "%.2f dB"
 
 #: src/input/es_out.c:3163
-#, fuzzy
 msgid "Video resolution"
-msgstr "પસંદ થયેલ વિડિઓ રિઝોલ્યુશન"
+msgstr ""
 
 #: src/input/es_out.c:3168
-#, fuzzy
 msgid "Buffer dimensions"
-msgstr "સેકંડમાં બફર માપ"
+msgstr ""
 
 #: src/input/es_out.c:3178 src/input/es_out.c:3181 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -1086,49 +1079,40 @@ msgid "Decoded format"
 msgstr "ડિકોડ થયેલ બંધારણ"
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Top left"
-msgstr "વિસ્તાર 3:ડાબે"
+msgstr ""
 
 #: src/input/es_out.c:3194
-#, fuzzy
 msgid "Left top"
-msgstr "ડાબુ"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Right bottom"
-msgstr "ઉંચે નીચે"
+msgstr ""
 
 #: src/input/es_out.c:3195
-#, fuzzy
 msgid "Top right"
-msgstr "કોપીરાઇટ"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom left"
-msgstr "નીચે-ડાબે"
+msgstr ""
 
 #: src/input/es_out.c:3196
-#, fuzzy
 msgid "Bottom right"
-msgstr "નીચે-જમણે"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Left bottom"
-msgstr "ઉંચે નીચે"
+msgstr ""
 
 #: src/input/es_out.c:3197
-#, fuzzy
 msgid "Right top"
-msgstr "જમણું"
+msgstr ""
 
 #: src/input/es_out.c:3199
-#, fuzzy
 msgid "Orientation"
-msgstr "મિરર દિશા"
+msgstr ""
 
 #: src/input/es_out.c:3205 src/input/es_out.c:3223 src/input/es_out.c:3241
 #: src/input/es_out.c:3255 src/playlist/tree.c:67
@@ -1137,19 +1121,16 @@ msgid "Undefined"
 msgstr "અવ્યાખ્યાયિત"
 
 #: src/input/es_out.c:3207
-#, fuzzy
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr "525 લાઇનો / 60 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3209
-#, fuzzy
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr "625 લાઇનો / 50 Hz"
+msgstr ""
 
 #: src/input/es_out.c:3217
-#, fuzzy
 msgid "Color primaries"
-msgstr "રંગ સંદેશા"
+msgstr ""
 
 #: src/input/es_out.c:3224 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -1161,14 +1142,12 @@ msgid "Hybrid Log-Gamma"
 msgstr ""
 
 #: src/input/es_out.c:3235
-#, fuzzy
 msgid "Color transfer function"
-msgstr "રંગ નિષ્કર્ષણ"
+msgstr ""
 
 #: src/input/es_out.c:3248
-#, fuzzy
 msgid "Color space"
-msgstr "રંગ યોજના"
+msgstr ""
 
 #: src/input/es_out.c:3248
 #, c-format
@@ -1176,9 +1155,8 @@ msgid "%s Range"
 msgstr ""
 
 #: src/input/es_out.c:3250
-#, fuzzy
 msgid "Full"
-msgstr "પૂર્ણ બાસ"
+msgstr ""
 
 #: src/input/es_out.c:3257 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1192,29 +1170,24 @@ msgid "Center"
 msgstr "કેન્દ્ર"
 
 #: src/input/es_out.c:3258
-#, fuzzy
 msgid "Top Left"
-msgstr "ઉપર-ડાબે"
+msgstr ""
 
 #: src/input/es_out.c:3259
-#, fuzzy
 msgid "Top Center"
-msgstr "કેન્દ્ર"
+msgstr ""
 
 #: src/input/es_out.c:3260
-#, fuzzy
 msgid "Bottom Left"
-msgstr "નીચે-ડાબે"
+msgstr ""
 
 #: src/input/es_out.c:3261
-#, fuzzy
 msgid "Bottom Center"
-msgstr "નીચે-ડાબે"
+msgstr ""
 
 #: src/input/es_out.c:3265
-#, fuzzy
 msgid "Chroma location"
-msgstr "ક્રોમા ગેઇન"
+msgstr ""
 
 #: src/input/es_out.c:3274
 msgid "Rectangular"
@@ -1229,9 +1202,8 @@ msgid "Cubemap"
 msgstr ""
 
 #: src/input/es_out.c:3286
-#, fuzzy
 msgid "Projection"
-msgstr "દિશા"
+msgstr ""
 
 #: src/input/es_out.c:3288
 msgctxt "ViewPoint"
@@ -1239,10 +1211,9 @@ msgid "Yaw"
 msgstr ""
 
 #: src/input/es_out.c:3290
-#, fuzzy
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "પીચ"
+msgstr ""
 
 #: src/input/es_out.c:3292
 msgctxt "ViewPoint"
@@ -1263,24 +1234,20 @@ msgid "Min. luminance"
 msgstr ""
 
 #: src/input/es_out.c:3313
-#, fuzzy
 msgid "Primary R"
-msgstr "મુખ્ય ભાષા"
+msgstr ""
 
 #: src/input/es_out.c:3320
-#, fuzzy
 msgid "Primary G"
-msgstr "મુખ્ય ભાષા"
+msgstr ""
 
 #: src/input/es_out.c:3327
-#, fuzzy
 msgid "Primary B"
-msgstr "મુખ્ય ભાષા"
+msgstr ""
 
 #: src/input/es_out.c:3334
-#, fuzzy
 msgid "White point"
-msgstr "કયૂ પોઇન્ટ"
+msgstr ""
 
 #: src/input/es_out.c:3349 modules/access/imem.c:64
 msgid "Subtitle"
@@ -1398,14 +1365,12 @@ msgid "Actors"
 msgstr "કલાકાર"
 
 #: src/input/meta.c:79 modules/demux/mp4/meta.c:101
-#, fuzzy
 msgid "Album Artist"
-msgstr "કલાકાર"
+msgstr ""
 
 #: src/input/meta.c:80
-#, fuzzy
 msgid "Disc number"
-msgstr "ટ્રેક નંબર"
+msgstr ""
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -1446,9 +1411,8 @@ msgid "Previous title"
 msgstr "પહેલાંનુ શીર્ષક"
 
 #: src/input/var.c:278
-#, fuzzy
 msgid "Menu title"
-msgstr "આગળનું શીર્ષક"
+msgstr ""
 
 #: src/input/var.c:285
 msgid "Menu popup"
@@ -1595,13 +1559,10 @@ msgid "Color messages"
 msgstr "રંગ સંદેશા"
 
 #: src/libvlc-module.c:96
-#, fuzzy
 msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
-"આ કન્સોલમાં મોકલેલ સંદેશાના રંગીકરણને સક્રિય કરે છે તમારાં ટર્મિનલને કામ કરવા આની માટે "
-"Linux રંગ આધારની જરૂરિયાત છે."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1652,9 +1613,8 @@ msgstr ""
 "આપમેળે પસંદ કરવાની છે."
 
 #: src/libvlc-module.c:129
-#, fuzzy
 msgid "Media role"
-msgstr "મીડિયા ખૂણો"
+msgstr ""
 
 #: src/libvlc-module.c:130
 msgid "Media (player) role for operating system policy."
@@ -1674,33 +1634,28 @@ msgstr ""
 "નહિં. છતાં થોડો પ્રક્રિયા પાવર સાચવી રહ્યા છે."
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Music"
-msgstr "સંગીત"
+msgstr ""
 
 #: src/libvlc-module.c:142
-#, fuzzy
 msgid "Communication"
-msgstr "સ્થાન"
+msgstr ""
 
 #: src/libvlc-module.c:142 modules/meta_engine/ID3Genres.h:69
 msgid "Game"
 msgstr "રમત"
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Notification"
-msgstr "ઍમ્પલીફીકેશન"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Animation"
-msgstr "જાણકારી"
+msgstr ""
 
 #: src/libvlc-module.c:143
-#, fuzzy
 msgid "Production"
-msgstr "પ્રોડક્ટ"
+msgstr ""
 
 #: src/libvlc-module.c:144
 msgid "Accessibility"
@@ -1753,13 +1708,10 @@ msgid "This selects which plugin to use for audio resampling."
 msgstr "ઓડિયો સ્ટ્રીમીંગ માટે વાપરવા ક્યાં પ્લગઇન જોઇએ છે તે આ પસંદ કરે છે."
 
 #: src/libvlc-module.c:171
-#, fuzzy
 msgid ""
 "Sets the audio output channels mode that will be used by default if your "
 "hardware and the audio stream are compatible."
 msgstr ""
-"આ ઓડિયો આઉટપુટ ચેનલોની સ્થિતિને સુયોજિત કરે છે કે જે મૂળભૂત રીતે વાપરેલ હશે જ્યારે શક્ય હોય "
-"(એટલે કે. જો તમારું હાર્ડવેર એ તેને આધાર આપે તો ની સાથે સાથે ઓડિયો સ્ટ્રીમને વગાડેલ છે)."
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
@@ -2108,9 +2060,8 @@ msgid "Always place the video window on top of other windows."
 msgstr "હંમેશા બીજા વિન્ડોની ટોચે વિડિઓ વિન્ડોને હંમેશા સ્થિત કરો."
 
 #: src/libvlc-module.c:319
-#, fuzzy
 msgid "Enable wallpaper mode"
-msgstr "વોલપેર સ્થિતિને સક્રિય કરો "
+msgstr ""
 
 #: src/libvlc-module.c:321
 msgid ""
@@ -2700,9 +2651,8 @@ msgid "Stream ID of the subtitle track to use."
 msgstr "વાપરવા માટે ઉપશીર્ષક ટ્રેકનું સ્ટ્રીમ ID."
 
 #: src/libvlc-module.c:612
-#, fuzzy
 msgid "Preferred Closed Captions decoder"
-msgstr "બંધ કૅપ્શન ડિકોડર"
+msgstr ""
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2830,14 +2780,12 @@ msgstr ""
 "offset},{...}\" રૂપમાં સ્ટ્રીમ માટે બુકમાર્કોની યાદીને આપી શકો છો"
 
 #: src/libvlc-module.c:671
-#, fuzzy
 msgid "Record directory"
-msgstr "સ્રોત ડિરેક્ટરી"
+msgstr ""
 
 #: src/libvlc-module.c:673
-#, fuzzy
 msgid "Directory where the records will be stored"
-msgstr "ડિરેક્ટરી અથવા ફાઇલનામ જ્યાં અહેવાલો સંગ્રહેલ હશે"
+msgstr ""
 
 #: src/libvlc-module.c:675
 msgid "Prefer native stream recording"
@@ -2913,9 +2861,8 @@ msgstr ""
 "સ્થાનોનો પ્રયત્ન કરો."
 
 #: src/libvlc-module.c:710
-#, fuzzy
 msgid "Subtitles text scaling factor"
-msgstr "ઉપશીર્ષક લખાણ એનકોડીંગ"
+msgstr ""
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
@@ -3088,9 +3035,8 @@ msgid "TCP connection timeout"
 msgstr "TCP જોડાણ સમયસમાપ્તિ"
 
 #: src/libvlc-module.c:801
-#, fuzzy
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr "મૂળભૂત TCP જોડાણ સમયસમાપ્તિ (મિલિસેકંડમાં). "
+msgstr ""
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3496,19 +3442,16 @@ msgid "Stream filter module"
 msgstr "સ્ટ્રીમ ફિલ્ટર મોડ્યુલ"
 
 #: src/libvlc-module.c:1009
-#, fuzzy
 msgid "Stream filters are used to modify the stream that is being read."
-msgstr "સ્ટ્રીમ ફિલ્ટર એ સ્ટ્રીમને બદલવા માટે વાપરેલ છે કે જેને વાંચી દેવામાં આવી છે. "
+msgstr ""
 
 #: src/libvlc-module.c:1011
-#, fuzzy
 msgid "Demux filter module"
-msgstr "સ્ટ્રીમ ફિલ્ટર મોડ્યુલ"
+msgstr ""
 
 #: src/libvlc-module.c:1013
-#, fuzzy
 msgid "Demux filters are used to modify/control the stream that is being read."
-msgstr "સ્ટ્રીમ ફિલ્ટર એ સ્ટ્રીમને બદલવા માટે વાપરેલ છે કે જેને વાંચી દેવામાં આવી છે. "
+msgstr ""
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
@@ -3530,13 +3473,10 @@ msgid "VoD server module"
 msgstr "VoD સર્વર મોડ્યુલ"
 
 #: src/libvlc-module.c:1024
-#, fuzzy
 msgid ""
 "You can select which VoD server module you want to use. Set this to "
 "'vod_rtsp' to switch back to the old, legacy module."
 msgstr ""
-"તમે પસંદ કરી શકો છો કે VoD સર્વર મોડ્યુલ જે તમે વાપરવા માંગો છો. જૂના ચાલી આવતા "
-"મોડ્યુલમાં પાછા જવા માટે `vod_rtsp' આને સુયોજિત કરો."
 
 #: src/libvlc-module.c:1027
 msgid "Allow real-time priority"
@@ -3600,14 +3540,12 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1058
-#, fuzzy
 msgid "Preferred keystore list"
-msgstr "પસંદ થયેલ પેકેટસાઇઝર યાદી"
+msgstr ""
 
 #: src/libvlc-module.c:1060
-#, fuzzy
 msgid "List of keystores that VLC will use in priority."
-msgstr "આ એનકોડની યાદીને પસંદ કરવા માટે તમને પરવાનગી આપે છે કે જે VLC પ્રાધાન્યમાં વાપરશે."
+msgstr ""
 
 #: src/libvlc-module.c:1062
 msgid "Locally collect statistics"
@@ -3694,9 +3632,8 @@ msgstr ""
 "અને હાલની વસ્તુને વગાડવાનું ચાલુ રાખો."
 
 #: src/libvlc-module.c:1104
-#, fuzzy
 msgid "Expose media player via D-Bus"
-msgstr "VLC મીડિયા પ્લેયર સુધારા"
+msgstr ""
 
 #: src/libvlc-module.c:1105
 msgid "Allow other applications to control VLC using the D-Bus MPRIS protocol."
@@ -3711,28 +3648,22 @@ msgstr ""
 "બોક્સમાં અમુક તેઓને ઉપર લખાઇ શકે છે."
 
 #: src/libvlc-module.c:1117
-#, fuzzy
 msgid "Automatically preparse items"
-msgstr "આપમેળે ફાઇલોનું ફરી પદચ્છેદન કરો"
+msgstr ""
 
 #: src/libvlc-module.c:1119
-#, fuzzy
 msgid ""
 "Automatically preparse items added to the playlist (to retrieve some "
 "metadata)."
 msgstr ""
-"વગાડવા માટેની યાદીમાં ઉમેરાયેલ ફાઇલોનું આપમેળે ફરી પદચ્છેદન કરો (અમુક મેટાડેટાને પ્રાપ્ત "
-"કરવા માટે)."
 
 #: src/libvlc-module.c:1122
-#, fuzzy
 msgid "Preparsing timeout"
-msgstr "RTSP સત્ર સમયસમાપ્તિ (s)"
+msgstr ""
 
 #: src/libvlc-module.c:1124
-#, fuzzy
 msgid "Maximum time allowed to preparse an item, in milliseconds"
-msgstr "કૅમેરા અને માઇક્રોફોન માટે કેશીંગ કિંમત, મિલિસેકંડમાં."
+msgstr ""
 
 #: src/libvlc-module.c:1126 modules/gui/macosx/VLCSimplePrefsController.m:328
 #: modules/gui/qt/dialogs/firstrun.cpp:95
@@ -3780,9 +3711,8 @@ msgstr ""
 "છે. એક્સટેન્શનોની અવતરણચિહ્નથી અલગ થયેલ યાદીને વાપરો."
 
 #: src/libvlc-module.c:1147
-#, fuzzy
 msgid "Show hidden files"
-msgstr "વિગતો બતાવો"
+msgstr ""
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -3849,14 +3779,12 @@ msgid "Pause each item in the playlist on the last frame."
 msgstr "છેલ્લા ચોકઠા પર વગાડવા માટેની યાદીમાં દરેક વસ્તુને અટકાવો."
 
 #: src/libvlc-module.c:1180
-#, fuzzy
 msgid "Start paused"
-msgstr "શરૂઆતનો સમય"
+msgstr ""
 
 #: src/libvlc-module.c:1182
-#, fuzzy
 msgid "Pause each item in the playlist on the first frame."
-msgstr "છેલ્લા ચોકઠા પર વગાડવા માટેની યાદીમાં દરેક વસ્તુને અટકાવો."
+msgstr ""
 
 #: src/libvlc-module.c:1184
 msgid "Auto start"
@@ -3907,47 +3835,36 @@ msgid "Ignore"
 msgstr "અવગણો"
 
 #: src/libvlc-module.c:1214
-#, fuzzy
 msgid "Volume control"
-msgstr "વોલ્યુમ નિયંત્રણ"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control"
-msgstr "સ્થાન નિયંત્રણ"
+msgstr ""
 
 #: src/libvlc-module.c:1215
-#, fuzzy
 msgid "Position control reversed"
-msgstr "સ્થાન નિયંત્રણ"
+msgstr ""
 
 #: src/libvlc-module.c:1218
-#, fuzzy
 msgid "Mouse wheel vertical axis control"
-msgstr "માઉસ વ્હિલ ઉપર-નીચે ધરી નિયંત્રણ"
+msgstr ""
 
 #: src/libvlc-module.c:1220
-#, fuzzy
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
-"માઉસવ્હિલ ઉપર-નીચે (ઉભી) ધરી અવાજને નિયંત્રીત કરી શકે છે, સ્થિતિ અથવા માઉસવ્હિલ ઘટનાને "
-"અવગણી શકાય"
 
 #: src/libvlc-module.c:1222
-#, fuzzy
 msgid "Mouse wheel horizontal axis control"
-msgstr "માઉસ વ્હિલ ઉપર-નીચે ધરી નિયંત્રણ"
+msgstr ""
 
 #: src/libvlc-module.c:1224
-#, fuzzy
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
-"માઉસવ્હિલ ઉપર-નીચે (ઉભી) ધરી અવાજને નિયંત્રીત કરી શકે છે, સ્થિતિ અથવા માઉસવ્હિલ ઘટનાને "
-"અવગણી શકાય"
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -4204,44 +4121,40 @@ msgid "Navigate up"
 msgstr "ઉપર શોધખોળ"
 
 #: src/libvlc-module.c:1296
-#, fuzzy
 msgid ""
 "Select the key to move the selector up in DVD menus / Move viewpoint to up "
 "(pitch)."
-msgstr "DVD મેનુમાં ઉપર પસંદકર્તાને ખસેડવા માટે કીને પસંદ કરો."
+msgstr ""
 
 #: src/libvlc-module.c:1297
 msgid "Navigate down"
 msgstr "નીચે શોધખોળ"
 
 #: src/libvlc-module.c:1298
-#, fuzzy
 msgid ""
 "Select the key to move the selector down in DVD menus / Move viewpoint to "
 "down (pitch)."
-msgstr "DVD મેનુમાં નીચે પસંદકર્તાને ખસેડવા માટે કીને પસંદ કરો."
+msgstr ""
 
 #: src/libvlc-module.c:1299
 msgid "Navigate left"
 msgstr "ડાબે શોધખોળ"
 
 #: src/libvlc-module.c:1300
-#, fuzzy
 msgid ""
 "Select the key to move the selector left in DVD menus / Move viewpoint to "
 "left (yaw)."
-msgstr "DVD મેનુમાં ડાબે પસંદકર્તાને ખસેડવા માટે કીને પસંદ કરો."
+msgstr ""
 
 #: src/libvlc-module.c:1301
 msgid "Navigate right"
 msgstr "જમણે શોધખોળ"
 
 #: src/libvlc-module.c:1302
-#, fuzzy
 msgid ""
 "Select the key to move the selector right in DVD menus / Move viewpoint to "
 "right (yaw)."
-msgstr "DVD મેનુમાં જમણે પસંદકર્તાને ખસેડવા માટે કીને પસંદ કરો."
+msgstr ""
 
 #: src/libvlc-module.c:1303
 msgid "Activate"
@@ -4335,24 +4248,20 @@ msgid "Select the key to decrease the subtitle delay."
 msgstr "ઉપશીર્ષક વિલંબને ઘટાડવા માટે કીને પસંદ કરો."
 
 #: src/libvlc-module.c:1325
-#, fuzzy
 msgid "Reset subtitles text scale"
-msgstr "ટેલિટેક્સ ઉપશીર્ષક ડિકોડર"
+msgstr ""
 
 #: src/libvlc-module.c:1326
-#, fuzzy
 msgid "Scale up subtitles text"
-msgstr "ઉપશીર્ષકને સક્રિય કરો"
+msgstr ""
 
 #: src/libvlc-module.c:1327
-#, fuzzy
 msgid "Scale down subtitles text"
-msgstr "ઉપશીર્ષકને સક્રિય કરો"
+msgstr ""
 
 #: src/libvlc-module.c:1328
-#, fuzzy
 msgid "Select the key to change subtitles text scaling"
-msgstr "ઉપશીર્ષકોને ઉંચે ખસેડવા માટે કીને પસંદ કરો."
+msgstr ""
 
 #: src/libvlc-module.c:1329
 msgid "Subtitle sync / bookmark audio timestamp"
@@ -4571,14 +4480,12 @@ msgid "Cycle through the available audio tracks(languages)."
 msgstr "ઉપલબ્ધ ઓડિયો ટ્રેક (ભાષાઓ) મારફતે ખસેડો."
 
 #: src/libvlc-module.c:1391
-#, fuzzy
 msgid "Cycle subtitle track in reverse order"
-msgstr "ઉપશીર્ષક ટ્રેકને ખસેડો"
+msgstr ""
 
 #: src/libvlc-module.c:1392
-#, fuzzy
 msgid "Cycle through the available subtitle tracks in reverse order."
-msgstr "ઉપલબ્ધ ઉપશીર્ષક ટ્રેક મારફતે ખસેડો."
+msgstr ""
 
 #: src/libvlc-module.c:1393
 msgid "Cycle subtitle track"
@@ -5336,13 +5243,10 @@ msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
 msgstr "ડાઉનલોડ થયેલ ફાઇલ \"%s\" બગડી ગયેલ છે. એટલે, તેને કાઢી નાંખેલ હતી."
 
 #: src/misc/update.c:723
-#, fuzzy
 msgid ""
 "The new version was successfully downloaded. Do you want to close VLC and "
 "install it now?"
 msgstr ""
-"નવી આવૃત્તિ એ સફળતાપૂર્વક ડાઉનલોડ થયેલ છે. શું તમે VLC ને બંધ કરવા માંગો છો અને તેને સ્થાપિત "
-"કરવાનાં છો?"
 
 #: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
 msgid "Install"
@@ -6115,27 +6019,22 @@ msgid "Attachment input"
 msgstr "જોડાણ ઇનપુટ"
 
 #: modules/access/avcapture.m:57
-#, fuzzy
 msgid "AVFoundation Video Capture"
-msgstr "ઓડિયો આઉટપુટ મોડ્યુલ"
+msgstr ""
 
 #: modules/access/avcapture.m:58
-#, fuzzy
 msgid "AVFoundation video capture module."
-msgstr "ઓડિયો આઉટપુટ મોડ્યુલ"
+msgstr ""
 
 #: modules/access/avcapture.m:286 modules/access/avcapture.m:315
-#, fuzzy
 msgid "No video devices found"
-msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
+msgstr ""
 
 #: modules/access/avcapture.m:287
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
-"તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
 
 #: modules/access/avcapture.m:316
 msgid ""
@@ -6230,9 +6129,8 @@ msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr "તમારી સિસ્ટમ BD+ ડિકોડીંગ લાઇબ્રેરી કામ કરતી નથી. શું રૂપરેખાંકન ગુમ થયેલ છે?"
 
 #: modules/access/bluray.c:799
-#, fuzzy
 msgid "Java required"
-msgstr "SDP જરૂરી"
+msgstr ""
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6297,24 +6195,20 @@ msgid "CDDB Server port to use."
 msgstr "વાપરવા માટે CDDB સર્વર પોર્ટ."
 
 #: modules/access/concat.c:303
-#, fuzzy
 msgid "Inputs list"
-msgstr "ઈનપુટ યાદી"
+msgstr ""
 
 #: modules/access/concat.c:305
-#, fuzzy
 msgid "Comma-separated list of input URLs to concatenate."
-msgstr "સક્રિય વિન્ડોની અવતરણ ચિહ્નથી અલગ થયેલ યાદી, બધા મૂળભૂત છે"
+msgstr ""
 
 #: modules/access/concat.c:308
-#, fuzzy
 msgid "Concatenation"
-msgstr "હરોળ ફેરફાર"
+msgstr ""
 
 #: modules/access/concat.c:309
-#, fuzzy
 msgid "Concatenated inputs"
-msgstr "TCP આદેશ ઇનપુટ"
+msgstr ""
 
 #: modules/access/dc1394.c:51
 msgid "DC1394"
@@ -6325,9 +6219,8 @@ msgid "IIDC Digital Camera (FireWire) input"
 msgstr "IIDC ડિજિટલ કૅમેરા (ફાયરવાયર) ઇનપુટ"
 
 #: modules/access/dcp/dcp.cpp:43
-#, fuzzy
 msgid "KDM file"
-msgstr "મુખ્ય રૂપરેખા"
+msgstr ""
 
 #: modules/access/dcp/dcp.cpp:44
 msgid "Path to Key Delivery Message XML file"
@@ -6433,9 +6326,8 @@ msgid "Composite"
 msgstr "સંયુક્ત"
 
 #: modules/access/decklink.cpp:82
-#, fuzzy
 msgid "S-Video"
-msgstr "S-વિડિઓ"
+msgstr ""
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6513,13 +6405,10 @@ msgid "Audio device name"
 msgstr "ઓડિયો ઉપકરણ નામ"
 
 #: modules/access/dshow/dshow.cpp:137
-#, fuzzy
 msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
-"ઓડિયો ઉપકરણનું નામ કે જે ડાયરેક્ટશો પ્લગઇન દ્દારા વાપરેલ હશે. જો તમે કંઇપણ સ્પષ્ટ થયેલ ન "
-"હોય તો. મૂળભૂત ઉપકરણને વાપરેલ હશે. "
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6671,13 +6560,10 @@ msgid "AM Tuner mode"
 msgstr "AM ટુનર સ્થિતિ"
 
 #: modules/access/dshow/dshow.cpp:194
-#, fuzzy
 msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
-"AM ટ્યુનર સ્થિતિ. મૂળભૂત (0), TV (1),AM રેડીઓ (2), FM રેડીઓ (3) અથવા DSS (4) માંનુ "
-"હોઇ શકે છે."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6734,24 +6620,20 @@ msgid "The capture device \"%s\" does not support the required parameters."
 msgstr "બંધિત ઉપકરણ \"%s\" એ જરૂરી પરિમાણોને આધાર આપતુ નથી."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
-#, fuzzy
 msgid "Windows networks"
-msgstr "વિન્ડો સજાવટ"
+msgstr ""
 
 #: modules/access/dsm/access.c:63
-#, fuzzy
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr "સામ્બા (વિન્ડો નેટવર્ક શૅર) ઇનપુટ"
+msgstr ""
 
 #: modules/access/dsm/access.c:67
-#, fuzzy
 msgid "libdsm SMB input"
-msgstr "SMB ઇનપુટ"
+msgstr ""
 
 #: modules/access/dsm/access.c:80
-#, fuzzy
 msgid "libdsm NETBIOS discovery module"
-msgstr "સેવા શોધ મોડ્યુલ"
+msgstr ""
 
 #: modules/access/dtv/access.c:36
 msgid "DVB adapter"
@@ -7044,14 +6926,11 @@ msgid "Local oscillator high frequency (kHz)"
 msgstr "સ્થાનિક ઓક્સિલેટર વધુ આવૃત્તિ (kHz)"
 
 #: modules/access/dtv/access.c:186
-#, fuzzy
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
-"ડાઉનકનવરટર (LNB) સેટેલાઈટની પ્રસારણ ફ્રિકવન્સીમાં થી સ્થાનિક ઑસિલેટરની ફ્રિકવન્સી બાદ "
-"કરશે. એનું પરિણામ RF તાર પરની ઈંટરમીડીયટ ફ્રિકવન્સી (IF) છે."
 
 #: modules/access/dtv/access.c:189
 msgid "Universal LNB switch frequency (kHz)"
@@ -7232,32 +7111,28 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/access.c:70
-#, fuzzy
 msgid "Satellite scanning config"
-msgstr "સેટેલાઇટ પહોંચ કોડ"
+msgstr ""
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
 msgstr ""
 
 #: modules/access/dvb/access.c:73
-#, fuzzy
 msgid "Scan tuning list"
-msgstr "માપ ગુણવત્તા"
+msgstr ""
 
 #: modules/access/dvb/access.c:74
 msgid "Filename containing initial scan tuning data."
 msgstr ""
 
 #: modules/access/dvb/access.c:76
-#, fuzzy
 msgid "Use NIT for scanning services"
-msgstr "આંકડાશાસ્ત્ર માટે વાપરેલ."
+msgstr ""
 
 #: modules/access/dvb/access.c:79
-#, fuzzy
 msgid "DVB"
-msgstr "DV"
+msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
@@ -7271,9 +7146,8 @@ msgid ""
 msgstr ""
 
 #: modules/access/dvb/scan.c:827
-#, fuzzy
 msgid "Scanning DVB"
-msgstr "માપ ગુણવત્તા"
+msgstr ""
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -7368,9 +7242,8 @@ msgid "Directory"
 msgstr "ડિરેક્ટરી"
 
 #: modules/access/fs.c:53
-#, fuzzy
 msgid "List special files"
-msgstr "ખાસ મોડ્યુલો"
+msgstr ""
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7389,11 +7262,10 @@ msgstr "વપરાશકર્તાનામ"
 
 #: modules/access/ftp.c:69 modules/access/rdp.c:66 modules/access/sftp.c:56
 #: modules/access/smb_common.h:22
-#, fuzzy
 msgid ""
 "Username that will be used for the connection, if no username is set in the "
 "URL."
-msgstr "વપરાશકર્તા નામ કે જે જોડાણ માટે વાપરેલ હશે."
+msgstr ""
 
 #: modules/access/ftp.c:71 modules/access/live555.cpp:86
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
@@ -7410,13 +7282,10 @@ msgstr "પાસવર્ડ"
 
 #: modules/access/ftp.c:72 modules/access/rdp.c:69 modules/access/sftp.c:59
 #: modules/access/smb_common.h:25
-#, fuzzy
 msgid ""
 "Password that will be used for the connection, if no username or password "
 "are set in URL."
 msgstr ""
-"જોડાણ માટે વપરાશકર્તાનામને સુયોજિત કરે છે. જો વપરાશકર્તાનામ અથવા પાસવર્ડ એ url માં "
-"સુયોજિત ન હોય."
 
 #: modules/access/ftp.c:74
 msgid "FTP account"
@@ -7427,14 +7296,13 @@ msgid "Account that will be used for the connection."
 msgstr "ખાતુ કે જે જોડાણ માટે વાપરેલ હશે."
 
 #: modules/access/ftp.c:78
-#, fuzzy
 msgid "FTP authentication"
-msgstr "SFTP સત્તાધિકરણ"
+msgstr ""
 
 #: modules/access/ftp.c:79
-#, fuzzy, c-format
+#, c-format
 msgid "Please enter a valid login and password for the ftp connexion to %s"
-msgstr "મહેરબાની કરીને %s નાં sftp જોડાણ માટે યોગ્ય પ્રવેશ અને પાસવર્ડને દાખલ કરો"
+msgstr ""
 
 #: modules/access/ftp.c:84
 msgid "FTP input"
@@ -7489,14 +7357,12 @@ msgid "Please enter a valid login name and a password for realm %s."
 msgstr "મહેરબાની કરીને વિસ્તાર %s માટે  યોગ્ય પ્રવેશ નામ અને પાસવર્ડને દાખલ કરો."
 
 #: modules/access/http/access.c:288
-#, fuzzy
 msgid "HTTPS input"
-msgstr "HTTP ઇનપુટ"
+msgstr ""
 
 #: modules/access/http/access.c:289
-#, fuzzy
 msgid "HTTPS"
-msgstr "HTTP(S)"
+msgstr ""
 
 #: modules/access/http/access.c:296
 msgid "Continuous stream"
@@ -7507,14 +7373,12 @@ msgid "Keep reading a resource that keeps being updated."
 msgstr ""
 
 #: modules/access/http/access.c:300
-#, fuzzy
 msgid "Cookies forwarding"
-msgstr "આગળ વધો"
+msgstr ""
 
 #: modules/access/http/access.c:301
-#, fuzzy
 msgid "Forward cookies across HTTP redirections."
-msgstr "http દિશામાન તરફ કુકીઓને આગળ ધપાવો."
+msgstr ""
 
 #: modules/access/http/access.c:302
 msgid "Referrer"
@@ -7525,20 +7389,15 @@ msgid "Provide the referral URL, i.e. HTTP \"Referer\" (sic)."
 msgstr ""
 
 #: modules/access/http/access.c:307
-#, fuzzy
 msgid "User agent"
-msgstr "વપરાશકર્તા એજન્ટ"
+msgstr ""
 
 #: modules/access/http/access.c:308
-#, fuzzy
 msgid ""
 "Override the name and version of the application as provided to the HTTP "
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
-"પ્રોગ્રામ નું નામ અને આવૃત્તિ HTTP સર્વરને આપવામાં આવશે. તે આગળના સ્લેશ થી છુટ્ટા પડાયેલા "
-"હોવા જોઈએ, દા.ત. ફૂબાર/1.2.3. આ વિકલ્પ ફક્ત દર ઇનપુટ દીઠ આપી શકાય, ના કે વૈશ્વિક "
-"રીતે."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -7691,14 +7550,12 @@ msgid "Memory input"
 msgstr "મેમરી ઇનપુટ"
 
 #: modules/access/imem-access.c:159
-#, fuzzy
 msgid "Memory stream"
-msgstr "સાઉટ સ્ટ્રીમ"
+msgstr ""
 
 #: modules/access/imem-access.c:160
-#, fuzzy
 msgid "In-memory stream input"
-msgstr "નકલી સ્ટ્રીન આઉટપુટ"
+msgstr ""
 
 #: modules/access/jack.c:59
 msgid "Pace"
@@ -7967,19 +7824,16 @@ msgid ""
 msgstr ""
 
 #: modules/access/nfs.c:57
-#, fuzzy
 msgid "NFS"
-msgstr "FPS"
+msgstr ""
 
 #: modules/access/nfs.c:58
-#, fuzzy
 msgid "NFS input"
-msgstr "ઇનપુટ નથી"
+msgstr ""
 
 #: modules/access/nfs.c:114
-#, fuzzy
 msgid "NFS operation failed"
-msgstr "RTSP જોડાણ નિષ્ફળ"
+msgstr ""
 
 #: modules/access/oss.c:66
 msgid "Capture the audio stream in stereo."
@@ -8021,32 +7875,26 @@ msgid "PulseAudio input"
 msgstr "પલ્સઓડિયો ઇનપુટ"
 
 #: modules/access/qtsound.m:59
-#, fuzzy
 msgid "QTSound"
-msgstr "આસપાસ"
+msgstr ""
 
 #: modules/access/qtsound.m:60
-#, fuzzy
 msgid "QuickTime Sound Capture"
-msgstr "ક્વિકટાઇમ કેપ્ચર"
+msgstr ""
 
 #: modules/access/qtsound.m:262
-#, fuzzy
 msgid "No Audio Input device found"
-msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
+msgstr ""
 
 #: modules/access/qtsound.m:263 modules/access/qtsound.m:294
-#, fuzzy
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
-"તમારું Mac યોગ્ય ઇનપુટ ઉપકરણ ધરાવતું લાગતું નથી. કૃપ્યા તમારા કનેક્ટર અને ડ્રાઈવર ચકાસો."
 
 #: modules/access/qtsound.m:293
-#, fuzzy
 msgid "No audio input device found"
-msgstr "ઇનપુટ ઉપકરણ મળ્યુ નથી"
+msgstr ""
 
 #: modules/access/rdp.c:72
 msgid "Encrypted connexion"
@@ -8203,9 +8051,8 @@ msgid "UDP receive buffer size (bytes)"
 msgstr "UDP એ બફર માપને પ્રાપ્ત કરે છે (bytes)"
 
 #: modules/access/satip.c:63
-#, fuzzy
 msgid "Request multicast stream"
-msgstr "સ્ટ્રીમ પસંદ કરો"
+msgstr ""
 
 #: modules/access/satip.c:64
 msgid "Request server to send stream as multicast"
@@ -8285,9 +8132,8 @@ msgid "Display ID"
 msgstr "દર્શાવ ID"
 
 #: modules/access/screen/screen.c:82
-#, fuzzy
 msgid "Display ID. If not specified, main display ID is used."
-msgstr "ID ને દર્શાવો. જો સ્પષ્ટ થયેલ ન હોય તો, મુખ્ય દર્શાવ ID વાપરેલ છે. "
+msgstr ""
 
 #: modules/access/screen/screen.c:83
 msgid "Screen index"
@@ -8450,9 +8296,8 @@ msgid "Domain/Workgroup that will be used for the connection."
 msgstr "ડોમેઇન/કાર્યજૂથ કે જે જોડાણ માટે વાપરેલ છે."
 
 #: modules/access/smb_common.h:31
-#, fuzzy
 msgid "SMB authentication required"
-msgstr "RTSP સત્તાધિકરણ"
+msgstr ""
 
 #: modules/access/smb_common.h:32
 #, c-format
@@ -8463,28 +8308,24 @@ msgid ""
 msgstr ""
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
-#, fuzzy
 msgid "SRT"
-msgstr "RTP"
+msgstr ""
 
 #: modules/access/srt.c:387
-#, fuzzy
 msgid "SRT input"
-msgstr "SFTP ઇનપુટ"
+msgstr ""
 
 #: modules/access/srt.c:392 modules/access_output/srt.c:442
-#, fuzzy
 msgid "SRT chunk size (bytes)"
-msgstr "UDP એ બફર માપને પ્રાપ્ત કરે છે (bytes)"
+msgstr ""
 
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
-#, fuzzy
 msgid "SRT latency (ms)"
-msgstr "DTS વિલંબ (ms)"
+msgstr ""
 
 #: modules/access/tcp.c:116
 msgid "TCP"
@@ -8503,9 +8344,8 @@ msgid "Time code subpicture elementary stream generator"
 msgstr "શરૂઆતી સ્ટ્રીમ ઉપચીત્ર ઉત્પન્ન કરનારનેટાઇમ કોડ કરો "
 
 #: modules/access/udp.c:61
-#, fuzzy
 msgid "UDP Source timeout (sec)"
-msgstr "RTP સ્ત્રોત સમસમાપ્તિ (સેકંડ)"
+msgstr ""
 
 #: modules/access/udp.c:64
 msgid "UDP"
@@ -8532,9 +8372,8 @@ msgid "VBI capture device"
 msgstr "VBI બંધિત ઉપકરણ"
 
 #: modules/access/v4l2/v4l2.c:48
-#, fuzzy
 msgid "The device node where VBI data can be read (for closed captions)."
-msgstr "ઉપકરણ નોડ જ્યાં VBI માહિતીને વાંચી શકાય છે (બંધ થયેલ કૅપ્શન માટે) "
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -8545,17 +8384,12 @@ msgid "Video standard (Default, SECAM, PAL, or NTSC)."
 msgstr "વિડિઓ મૂળભૂત (મૂળભૂત, SECAM, PAL, અથવા NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
-#, fuzzy
 msgid ""
 "Force the Video4Linux2 video device to use a specific chroma format (eg. "
 "I420 or I422 for raw images, MJPG for M-JPEG compressed input). Complete "
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
-"Video4Linux2 વિડિઓ ઉપકરણને ચોક્કસ ક્રોમા બંધારણનો ઉપયોગ કરવાની ફરજ પાડો (દા.ત. "
-"અપૂર્ણ ચિત્ર માટે I420 અથવા I422, M-JPEG દ્વારા સંકુચિત કરાયેલ ઇનપુટ માટે MJPG) (સંપૂર્ણ "
-"યાદી:  GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
-"I420, I411, I410, MJPG)"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8593,9 +8427,8 @@ msgid "Frequency"
 msgstr "આવૃત્તિ"
 
 #: modules/access/v4l2/v4l2.c:77
-#, fuzzy
 msgid "Tuner frequency in Hz or kHz (see debug output)."
-msgstr "Hz અથવા kHz માં ટુનર આવૃત્તિ (ડિબગ આઉટપુટને જુઓ)"
+msgstr ""
 
 #: modules/access/v4l2/v4l2.c:78
 msgid "Audio mode"
@@ -8919,17 +8752,12 @@ msgid "v4l2 driver controls"
 msgstr "v4l2 ડ્રાઇવર નિયંત્રણો"
 
 #: modules/access/v4l2/v4l2.c:190
-#, fuzzy
 msgid ""
 "Set the v4l2 driver controls to the values specified using a comma separated "
 "list optionally encapsulated by curly braces (e.g.: {video_bitrate=6000000,"
 "audio_crc=0,stream_type=3} ). To list available controls, increase verbosity "
 "(-vv) or use the v4l2-ctl application."
 msgstr ""
-"v4l2 ડ્રાઈવર કંટ્રોલોને અલ્પવિરામ દ્વારા છુટ્ટી પડાયેલી અને વૈકલ્પિક રીતે વાંકડીયા બ્રેકેટમાં "
-"અપાયેલી કિંમતો પર સુયોજિત કરો (દા.ત.:{video_bitrate=6000000,audio_crc=0,"
-"stream_type=3} ).ઉપલબ્ધ કંટ્રોલની યાદી જોવા માટે શબ્દબહુલતા વધારો (-vvv) અથવા v4l2-"
-"ctl  એપ્લીકેશનનો પ્રયોગ કરો."
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
 #: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
@@ -9084,18 +8912,16 @@ msgid "X.509 Client certificate"
 msgstr "X.509 ક્લાઇન્ટ પ્રમાણપત્ર"
 
 #: modules/access/vnc.c:53
-#, fuzzy
 msgid "Certificate for client authentication"
-msgstr "ક્લાઇન્ટ સત્તાધિકરણ માટે પ્રમાણપત્ર"
+msgstr ""
 
 #: modules/access/vnc.c:54
 msgid "X.509 Client private key"
 msgstr "X.509 ક્લાઇન્ટ ખાનગી કી"
 
 #: modules/access/vnc.c:55
-#, fuzzy
 msgid "Private key for authentication by certificate"
-msgstr "પ્રમાણપત્ર દ્દારા સત્તાધિતકણ માટે ખાનગી કી"
+msgstr ""
 
 #: modules/access/vnc.c:58
 msgid "RGB chroma (RV32, RV24, RV16, RGB2)"
@@ -9130,18 +8956,16 @@ msgid "Loopback mode"
 msgstr ""
 
 #: modules/access/wasapi.c:486
-#, fuzzy
 msgid "Record an audio rendering endpoint."
-msgstr "ઓડિયો રેન્ડરીંગને સક્રિય/નિષ્ક્રિય કરો."
+msgstr ""
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
 msgstr ""
 
 #: modules/access/wasapi.c:490
-#, fuzzy
 msgid "Windows Audio Session API input"
-msgstr "વિન્ડો ઓડિયો સત્ર API આઉટપુટ"
+msgstr ""
 
 #: modules/access_output/dummy.c:43 modules/stream_out/dummy.c:50
 msgid "Dummy stream output"
@@ -9200,9 +9024,8 @@ msgid "File stream output"
 msgstr "ફાઇલ સ્ટ્રીમ આઉટપુટ"
 
 #: modules/access_output/http.c:53 modules/stream_out/rtp.c:174
-#, fuzzy
 msgid "Username that will be requested to access the stream."
-msgstr "વપરાશકર્તાનામ કે જે સ્ટ્રીમમાં પ્રવેશવા સૂચિત થયેલ હશે."
+msgstr ""
 
 #: modules/access_output/http.c:56 modules/stream_out/rtp.c:177
 msgid "Password that will be requested to access the stream."
@@ -9308,14 +9131,11 @@ msgid "File where vlc reads key-uri and keyfile-location"
 msgstr "ફાઇલ જ્યાં vlc એ key-uri અને keyfile-location વાંચે છે"
 
 #: modules/access_output/livehttp.c:98
-#, fuzzy
 msgid ""
 "File is read when segment starts and is assumed to be in format: key-uri"
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
-"ફાઇલ વાંચેલ છે જ્યારે ભાગ શરૂ થાય અને બંધારણમાં છે તેવું ધારેલ છે: key-uri\\nkey-file. ફાઇલ "
-"ખોલેલ ભાગ પર વાંચ્યુ છે અને કિંમતો તે ભાગ પર વાપરેલ છે."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
@@ -9377,47 +9197,40 @@ msgid "Genre description"
 msgstr "પ્રકારનું વર્ણન"
 
 #: modules/access_output/shout.c:83
-#, fuzzy
 msgid "Genre of the content."
-msgstr "સમાવિષ્ટોનાં પ્રકાર. "
+msgstr ""
 
 #: modules/access_output/shout.c:85
-#, fuzzy
 msgid "URL description"
-msgstr "વર્ણન"
+msgstr ""
 
 #: modules/access_output/shout.c:86
-#, fuzzy
 msgid "URL with information about the stream or your channel."
-msgstr "સ્ટ્રીમ અથવા તમારાં ચેનલ વિશે જાણકારી સાથે URL."
+msgstr ""
 
 #: modules/access_output/shout.c:93
-#, fuzzy
 msgid "Bitrate information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની બીટરેટ જાણકારી. "
+msgstr ""
 
 #: modules/access_output/shout.c:96
-#, fuzzy
 msgid "Samplerate information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની નમૂનાદર જાણતાકી. "
+msgstr ""
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
 msgstr "ચેનલોની સંખ્યા"
 
 #: modules/access_output/shout.c:99
-#, fuzzy
 msgid "Number of channels information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમી ચેનલોની સંખ્યાની જાણકારી. "
+msgstr ""
 
 #: modules/access_output/shout.c:101
 msgid "Ogg Vorbis Quality"
 msgstr "Ogg વર્બિસ ગુણવત્તા"
 
 #: modules/access_output/shout.c:102
-#, fuzzy
 msgid "Ogg Vorbis Quality information of the transcoded stream."
-msgstr "ટ્રાન્સકોડેડ સ્ટ્રીમની Ogg વર્બિસ ગુણવત્તા જાણકારી. "
+msgstr ""
 
 #: modules/access_output/shout.c:104
 msgid "Stream public"
@@ -9442,29 +9255,24 @@ msgid "Crypto key length in bytes"
 msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "16 bytes"
-msgstr "16 બીટ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "24 bytes"
-msgstr "24 બીટ"
+msgstr ""
 
 #: modules/access_output/srt.c:57
-#, fuzzy
 msgid "32 bytes"
-msgstr "32 બીટ"
+msgstr ""
 
 #: modules/access_output/srt.c:437
-#, fuzzy
 msgid "SRT stream output"
-msgstr "RTP સ્ટ્રીમ આઉટપુટ"
+msgstr ""
 
 #: modules/access_output/srt.c:446
-#, fuzzy
 msgid "Password for stream encryption"
-msgstr "લક્ષ્ય ઉપકરણ માટે પાસવર્ડ"
+msgstr ""
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9735,9 +9543,8 @@ msgid "Ambisonics renderer and binauralizer"
 msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
-#, fuzzy
 msgid "Binauralizer"
-msgstr "વિઝ્યુલાઈઝર"
+msgstr ""
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9819,36 +9626,32 @@ msgid "RMS/peak"
 msgstr "RMS/પીક"
 
 #: modules/audio_filter/compressor.c:156
-#, fuzzy
 msgid "Set the RMS/peak."
-msgstr "RMS/પીક (0 ... 1) ને સુયોજિત કરો."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:158
 msgid "Attack time"
 msgstr "હુમલા સમય"
 
 #: modules/audio_filter/compressor.c:159
-#, fuzzy
 msgid "Set the attack time in milliseconds."
-msgstr "મિલિસેકંડમાં હુમલા સમય સુયોજિત કરો 1.5 ... 400)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
 msgstr "પ્રકાશન સમય"
 
 #: modules/audio_filter/compressor.c:162
-#, fuzzy
 msgid "Set the release time in milliseconds."
-msgstr "મિલિસેકંડમા પ્રકાશન સમયન સુયોજિત કરો (2 ... 800)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
 msgstr "થ્રેશોલ્ડ સ્તર"
 
 #: modules/audio_filter/compressor.c:165
-#, fuzzy
 msgid "Set the threshold level in dB."
-msgstr "dB માં થ્રેશોલ્ડ સ્તરને સુયોજિત કરો (-30 ... 0)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:167
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
@@ -9857,9 +9660,8 @@ msgid "Ratio"
 msgstr "ગુણોત્તર"
 
 #: modules/audio_filter/compressor.c:168
-#, fuzzy
 msgid "Set the ratio (n:1)."
-msgstr "ગુણોત્તર સુયોજિત કરો (n:1) (1 ... 20)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
@@ -9867,9 +9669,8 @@ msgid "Knee radius"
 msgstr "ની રેડીયસ"
 
 #: modules/audio_filter/compressor.c:171
-#, fuzzy
 msgid "Set the knee radius in dB."
-msgstr "ની રેડીયસને dB માં સુયોજિત કરો (1 ... 10)."
+msgstr ""
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -9895,9 +9696,8 @@ msgid "Audio filter for PCM format conversion"
 msgstr "PCM બંધારણ રૂપાંતરણ માટે ઓડિયો ફિલ્ટર"
 
 #: modules/audio_filter/converter/tospdif.c:49
-#, fuzzy
 msgid "Audio filter for A/52/DTS->S/PDIF encapsulation"
-msgstr "A/52->S/PDIF એનકેપ્સ્યુલેશન માટે ઓડિયો ફિલ્ટર"
+msgstr ""
 
 #: modules/audio_filter/equalizer.c:58
 msgid "Equalizer preset"
@@ -10154,14 +9954,12 @@ msgstr "ફરીથી લેવાતા નમુનાની ગુણવત
 
 #: modules/audio_filter/resampler/soxr.c:41
 #: modules/audio_filter/resampler/speex.c:35
-#, fuzzy
 msgid "Resampling quality, from worst to best"
-msgstr "ફરીથી લેવાતા નમુનાની ગુણવત્તા"
+msgstr ""
 
 #: modules/audio_filter/resampler/soxr.c:67
-#, fuzzy
 msgid "SoX Resampler"
-msgstr "SRC રીસેમ્પલર"
+msgstr ""
 
 #: modules/audio_filter/resampler/speex.c:42
 #: modules/audio_filter/resampler/speex.c:43
@@ -10217,9 +10015,8 @@ msgid "Pitch Shifter"
 msgstr ""
 
 #: modules/audio_filter/scaletempo.c:53
-#, fuzzy
 msgid "Audio pitch changer"
-msgstr "ઓડિયો આઉટપુટ ચેનલો"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10256,9 +10053,8 @@ msgid "Length in milliseconds to search for best overlap position"
 msgstr "શ્રેષ્ઠ ઓવરલેપ સ્થાન શોધવા માટે મિલિસેકન્ડોમાં લંબાઇ"
 
 #: modules/audio_filter/scaletempo.c:74
-#, fuzzy
 msgid "Pitch Shift"
-msgstr "પીચ"
+msgstr ""
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
@@ -10540,9 +10336,8 @@ msgid "Output file"
 msgstr "આઉટપુટ ફાઇલ"
 
 #: modules/audio_output/file.c:109
-#, fuzzy
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr "ફાઈલ કે જેમાં ઓડિયો નમૂનાઓને તેમાં લખાયેલ હશે. stdout માટે (\"-\""
+msgstr ""
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10573,9 +10368,8 @@ msgstr ""
 "સમીકરણને બંધબેસે છે તેને જોડાણ માટે નક્કી થયેલ હશે."
 
 #: modules/audio_output/jack.c:94
-#, fuzzy
 msgid "JACK client name"
-msgstr "VNC ક્લાઇન્ટ પ્રવેશ"
+msgstr ""
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10614,33 +10408,28 @@ msgid ""
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
-#, fuzzy
 msgid "Disabled"
-msgstr "નિષ્ક્રિય"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
 msgstr ""
 
 #: modules/audio_output/mmdevice.c:1462
-#, fuzzy
 msgid "Enabled"
-msgstr "સક્રિય"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1473
-#, fuzzy
 msgid "Windows Multimedia Device output"
-msgstr "વિન્ડો GDI વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Output back-end"
-msgstr "આઉટપુટ કાર્ડ"
+msgstr ""
 
 #: modules/audio_output/mmdevice.c:1479
-#, fuzzy
 msgid "Audio output back-end interface."
-msgstr "ઓડિયો આઉટપુટ ઉપકરણ"
+msgstr ""
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10734,9 +10523,8 @@ msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "AES3/SMPTE 302M ઓડિયો પેકેટસાઇઝર"
 
 #: modules/codec/aom.c:50
-#, fuzzy
 msgid "AOM video decoder"
-msgstr "WebM વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10747,19 +10535,16 @@ msgid "Raw audio encoder"
 msgstr "કાચા ઓડિયો એનકોડર"
 
 #: modules/codec/audiotoolbox_midi.c:47 modules/codec/fluidsynth.c:47
-#, fuzzy
 msgid "SoundFont file"
-msgstr "સાઉન્ડ ફોન્ટ"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:49 modules/codec/fluidsynth.c:49
-#, fuzzy
 msgid "SoundFont file to use for software synthesis."
-msgstr "એક અવાજ ફોન્ટ ફાઈલ સોફ્ટવેર સંશ્લેષણ માટે જરૂરી છે."
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:57
-#, fuzzy
 msgid "AudioToolbox MIDI synthesizer"
-msgstr "FluidSynth MIDI સિન્થેસાઇઝર"
+msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
@@ -10770,30 +10555,25 @@ msgid "Ignore ruby (furigana)"
 msgstr ""
 
 #: modules/codec/arib/aribsub.c:47
-#, fuzzy
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr "રેન્ડર થયેલ ઉપશીર્ષકનું X નિર્દેશાંક"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
-#, fuzzy
 msgid "Use Core Text renderer"
-msgstr "CoreText ફોન્ટ રેન્ડરર"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:49
-#, fuzzy
 msgid "Use Core Text renderer in the subtitle."
-msgstr "રેન્ડર થયેલ ઉપશીર્ષકનું X નિર્દેશાંક"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
-#, fuzzy
 msgid "ARIB subtitles decoder"
-msgstr "DVB ઉપશીર્ષક ડિકોડર"
+msgstr ""
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
-#, fuzzy
 msgid "ARIB subtitles"
-msgstr "DVB ઉપશીર્ષક"
+msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -11243,9 +11023,8 @@ msgstr ""
 "hev2 હાલમાં libfdk-aac સક્રિય libavcodec સાથે ફક્ત આધારભૂત છે"
 
 #: modules/codec/avcodec/d3d11va.c:63
-#, fuzzy
 msgid "Direct3D11 Video Acceleration"
-msgstr "ડાયરેકટ વિડિઓ એક્સેલરેશન (DXVA) 2.0"
+msgstr ""
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -11295,14 +11074,12 @@ msgid "VA-API video decoder via DRM"
 msgstr "DRM મારફતે VA-API વિડિઓ ડિકોડર"
 
 #: modules/codec/avcodec/vaapi.c:357
-#, fuzzy
 msgid "VA-API video decoder"
-msgstr "X11 મારફતે VA-API વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/bpg.c:49
-#, fuzzy
 msgid "BPG image decoder"
-msgstr "JPEG છબી ડિકોડર"
+msgstr ""
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -11311,10 +11088,8 @@ msgid "Opacity"
 msgstr "પારદર્શકતા"
 
 #: modules/codec/cc.c:52 modules/codec/zvbi.c:66
-#, fuzzy
 msgid "Setting to true makes the text to be boxed and maybe easier to read."
 msgstr ""
-"બોક્સ થયેn લખાણને સાચું બનાવા માટે vbi-opaque સુયોજનો અને કદાચ વાંચવાનું સરળ બની શકે છે."
 
 #: modules/codec/cc.c:56
 msgid "CC 608/708"
@@ -11347,34 +11122,28 @@ msgid "Encoding quality"
 msgstr "એનકોડીંગ ગુણવત્તા"
 
 #: modules/codec/daala.c:111
-#, fuzzy
 msgid "Enforce a quality between 0 (lossless) and 511 (worst)."
-msgstr "0 (ઓછી) અને 10 (વધારે) વચ્ચે ગુણવત્તા પર દબાણ કરો."
+msgstr ""
 
 #: modules/codec/daala.c:112
-#, fuzzy
 msgid "Keyframe interval"
-msgstr "ગાર્ડ અંતરાલ"
+msgstr ""
 
 #: modules/codec/daala.c:114
-#, fuzzy
 msgid "Enforce a keyframe interval between 1 and 1000."
-msgstr "0 (ઓછી) અને 10 (વધારે) વચ્ચે ગુણવત્તા પર દબાણ કરો."
+msgstr ""
 
 #: modules/codec/daala.c:120
-#, fuzzy
 msgid "Daala video decoder"
-msgstr "CDG વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/daala.c:125
-#, fuzzy
 msgid "Daala video packetizer"
-msgstr "Theora વિડિઓ પેકેટસાઇઝર"
+msgstr ""
 
 #: modules/codec/daala.c:132
-#, fuzzy
 msgid "Daala video encoder"
-msgstr "PNG વિડિઓ એનકોડર"
+msgstr ""
 
 #: modules/codec/daala.c:143 modules/codec/schroedinger.c:54
 msgid "Chroma format"
@@ -11495,51 +11264,45 @@ msgid "Encoder Profile"
 msgstr "એનકોડર રૂપરેખા"
 
 #: modules/codec/fdkaac.c:68
-#, fuzzy
 msgid "Encoder Algorithm to use."
-msgstr "વાપરવા માટે એનકોડર અલગોરિધમ"
+msgstr ""
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
 msgstr "સ્પેક્ટ્રલ બેન્ડ નકલ સક્ષમ"
 
 #: modules/codec/fdkaac.c:71
-#, fuzzy
 msgid "This is an optional feature only for the AAC-ELD profile."
-msgstr "આ AAC-ELD રૂપરેખા માટે ફક્ત વૈકલ્પિક લક્ષણ છે"
+msgstr ""
 
 #: modules/codec/fdkaac.c:73
 msgid "VBR Quality"
 msgstr "VBR ગુણવત્તા"
 
 #: modules/codec/fdkaac.c:74
-#, fuzzy
 msgid ""
 "Quality of the VBR Encoding (0=cbr, 1-5 constant vbr quality, 5 is the best)."
-msgstr "VBR એનકોડીંગની ગુણવત્તા (0=cbr, 1-5 અચળ ગુણવત્તા vbr, 5 એ સારામાં સારું છે"
+msgstr ""
 
 #: modules/codec/fdkaac.c:76
 msgid "Enable afterburner library"
 msgstr "આફટરબર્નર લાઈબ્રેરીને સક્રિય કરો"
 
 #: modules/codec/fdkaac.c:77
-#, fuzzy
 msgid ""
 "This library will produce higher quality audio at the expense of additional "
 "CPU usage (default is enabled)."
 msgstr ""
-"વધારાના CPU વપરાશના ખર્ચે આ લાઈબ્રેરી ઉચ્ચ ગુણવત્તા ઓડિયોને બનાવશે (મૂળભૂત સક્ષમ છે)"
 
 #: modules/codec/fdkaac.c:79
 msgid "Signaling mode of the extension AOT"
 msgstr "એક્સટેન્શન AOT ની સાંકેતિક સ્થિતિ"
 
 #: modules/codec/fdkaac.c:80
-#, fuzzy
 msgid ""
 "1 is explicit for SBR and implicit for PS (default), 2 is explicit "
 "hierarchical."
-msgstr "SBR માટે 1 સુસ્પષ્ટ છે અને PS (મૂળભૂત) માટે ગર્ભિત, 2 સુસ્પષ્ટ રીતે અધિક્રમિક છે "
+msgstr ""
 
 #: modules/codec/fdkaac.c:97
 msgid "AAC-LC"
@@ -11681,15 +11444,11 @@ msgid "Formatted Subtitles"
 msgstr "બંધારિત થયેલ ઉપશીર્ષક"
 
 #: modules/codec/kate.c:192
-#, fuzzy
 msgid ""
 "Kate streams allow for text formatting. VLC partly implements this, but you "
 "can choose to disable all formatting. Note that this has no effect is "
 "rendering via Tiger is enabled."
 msgstr ""
-"કેટ સ્ટ્રીમ લખાણ બંધારણ માટે પરવાનગી આપે છે. VLC નું આંશિક રીતે અમલીકરણ થાય છે, પરંતુ તમે "
-"બધા બંધારણ ને નિષ્ક્રિય કરવા માટે પસંદ કરી શકો છો.નોંધો કે ટાઈગર મારફતે અસર ને રેન્ડરીંગ "
-"કરવામાં આવી નથી તે સક્રિય થયેલ છે. "
 
 #: modules/codec/kate.c:199
 msgid "Shadow"
@@ -11966,29 +11725,24 @@ msgid "Media Foundation Transform decoder"
 msgstr "મીડિયા ફાઉન્ડેશન ટ્રાન્સફોર્મ ડિકોડર"
 
 #: modules/codec/mpg123.c:67
-#, fuzzy
 msgid "MPEG audio decoder using mpg123"
-msgstr "MPEG ઓડિયો ડિકોડર"
+msgstr ""
 
 #: modules/codec/oggspots.c:86
-#, fuzzy
 msgid "OggSpots video decoder"
-msgstr "WebM વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/oggspots.c:92
-#, fuzzy
 msgid "OggSpots video packetizer"
-msgstr "Theora વિડિઓ પેકેટસાઇઝર"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:139
-#, fuzzy
 msgid "OMX direct rendering"
-msgstr "સીધુ રેન્ડરીંગ"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:141
-#, fuzzy
 msgid "Enable OMX direct rendering."
-msgstr "એન્ડ્રોઇડ સીધુ રેન્ડરીંગ"
+msgstr ""
 
 #: modules/codec/omxil/omxil.c:145
 msgid "Audio/Video decoder (using OpenMAX IL)"
@@ -12079,33 +11833,26 @@ msgid "Group of Picture Reference Distance"
 msgstr "ચિત્ર સંદર્ભ અંતરનું જૂથ"
 
 #: modules/codec/qsv.c:81
-#, fuzzy
 msgid ""
 "Distance between I- or P- key frames; if it is zero, the GOP structure is "
 "unspecified. Note: If GopRefDist = 1, there are no B-frames used."
 msgstr ""
-"I- અથવા P-કી ફ્રેમ વચ્ચેનું અંતર, જો તે શૂન્ય હોય તો, GOP બંધારણ સ્પષ્ટ થયેલ છે. નોંધો કે: જો "
-"GopRefDist = 1, ત્યાં B- ફ્રેમ વાપરેલ નથી. "
 
 #: modules/codec/qsv.c:85
 msgid "Target Usage"
 msgstr "લક્ષ્ય વપરાશ"
 
 #: modules/codec/qsv.c:86
-#, fuzzy
 msgid ""
 "The target usage allow to choose between different trade-offs between "
 "quality and speed. Allowed values are: 'speed', 'balanced' and 'quality'."
 msgstr ""
-"ગુણવત્તા અને ઝડપ વચ્ચે વિવિધ ટ્રેડ-ઓફ વચ્ચે પસંદ કરવા માટે લક્ષ્ય વપરાશને પરવાનગી આપે છે. "
-"પરવાનગી મળેલ કિમંતો આ છે : 'ઝડપ', 'સંતુલન' અને 'ગુણવત્તા'."
 
 #: modules/codec/qsv.c:90
 msgid "IDR interval"
 msgstr "IDR અંતરાલ"
 
 #: modules/codec/qsv.c:92
-#, fuzzy
 msgid ""
 "For H.264, IdrInterval specifies IDR-frame interval in terms of I-frames; if "
 "IdrInterval=0, then every I-frame is an IDR-frame. If IdrInterval=1, then "
@@ -12114,39 +11861,27 @@ msgid ""
 "the sequence header before every Nth I-frame. If IdrInterval=0 (default), "
 "SDK inserts the sequence header once at the beginning of the stream."
 msgstr ""
-"H.264 માટે, IdrInterval I- ફ્રેમ દ્રષ્ટિએ IDR ફ્રેમ અંતરાલ સ્પષ્ટ; IdrInterval = 0 "
-"હોય, તો પછી દરેક I-ફ્રેમ એક IDR-ફ્રેમ હોય છે. IdrInterval = 1 છે, તો પછી દરેક અન્ય I-"
-"ફ્રેમ MPEG2 માટે એક IDR ફ્રેમ, વગેરે છે, IdrInterval I-ફ્રેમ દ્રષ્ટિએ ક્રમ હેડર અંતરાલ "
-"વ્યાખ્યાયિત કરે છે. IdrInterval = N, તો એસડીકે દરેક N મી I-ફ્રેમ પહેલાં ક્રમ હેડર દાખલ. "
-"IdrInterval = 0 (મૂળભૂત), તો SDK સ્ટ્રીમ શરૂઆતમાં એક વખત ક્રમ હેડર દાખલ કરો."
 
 #: modules/codec/qsv.c:100
 msgid "Rate Control Method"
 msgstr "દર નિયંત્રણ પદ્દતિ"
 
 #: modules/codec/qsv.c:102
-#, fuzzy
 msgid ""
 "The rate control method to use when encoding. Can be one of 'cbr', 'vbr', "
 "'qp', 'avbr'. 'qp' mode isn't supported for mpeg2."
 msgstr ""
-"વાપરવા માટે દર નિયંત્રણ પદ્ધતિ જયારે એનકોડ કરી રહ્યા હોય. 'crb', 'vbr', 'qp', "
-"'avbr'. 'qp' સ્થિતિ માનું એક હોઈ શકે છે કે જે mpeg2 માટે આધારભૂત નથી"
 
 #: modules/codec/qsv.c:105
 msgid "Quantization parameter"
 msgstr "ક્વૉનટાઈઝેશન પરિમાણ"
 
 #: modules/codec/qsv.c:106
-#, fuzzy
 msgid ""
 "Quantization parameter for all types of frames. This parameters sets qpi, "
 "qpp and qpb. It has less precedence than the forementionned parameters. Used "
 "only if rc_method is 'qp'."
 msgstr ""
-"બધી જતની ફ્રેમો માટે ક્વૉનટાઈઝેશન પરિમાણ. આ પરિમાણ qpi, qpp અને qpp સુયોજિત કરે છે. "
-"અગાઉ ઉલ્લેખ કરાયેલ પરિમાણો કરતા એની ઓછી અગ્રવર્તિતા છે. જો rc_method 'qp' હોય તોજ "
-"વપરાય છે."
 
 #: modules/codec/qsv.c:110
 msgid "Quantization parameter for I-frames"
@@ -12189,43 +11924,33 @@ msgid "Maximum Bitrate"
 msgstr "મહત્તમ બીટરેટ"
 
 #: modules/codec/qsv.c:123
-#, fuzzy
 msgid ""
 "Defines the maximum bitrate in kbps (1000 bits/s) for VBR rate control "
 "method. If not set, this parameter is computed from other sources such as "
 "bitrate, profile, level, etc."
 msgstr ""
-"VBR દર નિયંત્રણ પદ્ધતિ માટે Kpbs (1000 bits/s) માં મહત્તમ બીટરેટને વ્યાખ્યાયિત કરે છે. "
-"જો ના સુયોજિત હોય તો. બીજા સ્ત્રોતમાંથી ગણતરી થયેલ છે જેમ કે બીટરેટ, રૂપરેખા, સ્તર, વગેરે."
 
 #: modules/codec/qsv.c:127
 msgid "Accuracy of RateControl"
 msgstr "રેટકંન્ટ્રોલ ની ચોક્કસતા"
 
 #: modules/codec/qsv.c:128
-#, fuzzy
 msgid ""
 "Tolerance in percentage of the 'avbr'  (Average Variable BitRate) method. (e."
 "g. 10 with a bitrate of 800  kbps means the encoder tries not to  go above "
 "880 kbps and under  730 kbps. The targeted accuracy is only reached after a "
 "certained  convergence period. See the convergence parameter"
 msgstr ""
-"'avbr'  (એવરેજ વેરીએબલ બીટરેટ) પદ્ધતિની ટકાવારીમાં છૂટ. (દા.ત. 800 kpbs બીટરેટ સાથે "
-"10 નો અર્થ થાય કે એનકોડર 880 kpbs ની ઉપર અને 730 kpbs ની નીચે નહિ જવાનો પ્રયાસ "
-"કરશે. ઇચ્છિત ચોક્સાઈ અમુક એક કેન્દ્રાભિસરણ સમય પછીજ મળે છે. કેન્દ્રાભિસરણ પરિમાણ જુઓ"
 
 #: modules/codec/qsv.c:134
 msgid "Convergence time of 'avbr' RateControl"
 msgstr "'avbr' રેટકંટ્રોલ નું રૂપાંતરણ સમય"
 
 #: modules/codec/qsv.c:135
-#, fuzzy
 msgid ""
 "Number of 100 frames before the 'avbr' rate control method reaches the "
 "requested bitrate with the requested accuracy. See the accuracy parameter."
 msgstr ""
-" 'avbr' દર નિયંત્રણ પદ્ધતિ વિનંતી કરાયેલ બીટરેટ પર વિનંતી કરાયેલ ચોકસાઈ સાથે પોહચે તે "
-"પેહલાની 100 ફ્રેમોમાની એ સંખ્યા. ચોકસાઈ પરિમાણ જુઓ."
 
 #: modules/codec/qsv.c:139
 msgid "Number of slices per frame"
@@ -12250,15 +11975,11 @@ msgid "Number of parallel operations"
 msgstr "સમાંતર ક્રિયાઓની સંખ્યા"
 
 #: modules/codec/qsv.c:149
-#, fuzzy
 msgid ""
 "Defines the number of parallel encoding operations before we synchronise the "
 "result. Higher numbers may result on better throughput depending on "
 "hardware. MPEG2 needs at least 1 here."
 msgstr ""
-"પરિણામોમાં સુમેળતા લાવતા પેહલા એક સાથે કરી શકાતા એનકોડ કરવાના કાર્યની સંખ્યા "
-"વ્યાખ્યાયિત કરે છે. હાર્ડવેર પ્રમાણે ઉંચી સંખ્યા વધુ સારુ પરિણામ આપશે. MPEG2 ને ઓછામાં ઓછુ 1 "
-"જોઈએ."
 
 #: modules/codec/qsv.c:193
 msgid "Intel QuickSync Video encoder for MPEG4-Part10/MPEG2 (aka H.264/H.262)"
@@ -12273,9 +11994,8 @@ msgid "Pseudo raw video packetizer"
 msgstr "Pseudo રો વિડિઓ પેકેટસાઈઝર"
 
 #: modules/codec/rtpvideo.c:45
-#, fuzzy
 msgid "Raw video encoder for RTP"
-msgstr "PNG વિડિઓ એનકોડર"
+msgstr ""
 
 #: modules/codec/schroedinger.c:60
 msgid "4:2:0"
@@ -12652,9 +12372,8 @@ msgid "Dirac video encoder using libschroedinger"
 msgstr "libschroedinger મદદથી સીધુ વિડિઓ એનકોડર"
 
 #: modules/codec/scte18.c:41
-#, fuzzy
 msgid "SCTE-18 decoder"
-msgstr "G.711 ડિકોડર"
+msgstr ""
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
@@ -12665,9 +12384,8 @@ msgid "Emergency Alert Messaging for Cable"
 msgstr ""
 
 #: modules/codec/scte27.c:42
-#, fuzzy
 msgid "SCTE-27 decoder"
-msgstr "G.711 ડિકોડર"
+msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
@@ -13063,32 +12781,28 @@ msgid "Image width"
 msgstr "છબી પહોળાઇ"
 
 #: modules/codec/svg.c:51
-#, fuzzy
 msgid "Specify the width to decode the image too"
-msgstr "હારમાળા સમાવતી ભાષાને સ્પષ્ટ કરો"
+msgstr ""
 
 #: modules/codec/svg.c:52 modules/video_filter/scene.c:67
 msgid "Image height"
 msgstr "છબી ઊંચાઇ"
 
 #: modules/codec/svg.c:53
-#, fuzzy
 msgid "Specify the height to decode the image too"
-msgstr "વાપરવા માટે અમિશ્રિત મોડ્યુલને સ્પષ્ટ કરો."
+msgstr ""
 
 #: modules/codec/svg.c:54
 msgid "Scale factor"
 msgstr "માપ ફેક્ટર"
 
 #: modules/codec/svg.c:55
-#, fuzzy
 msgid "Scale factor to apply to image"
-msgstr "વિડિઓને લાગુ કરવા માટે માપ ફેક્ટર જ્યારે ટ્રાન્સકોડ કરી રહ્યા હોય (દાત: 0.25)"
+msgstr ""
 
 #: modules/codec/svg.c:63
-#, fuzzy
 msgid "SVG video decoder"
-msgstr "CDG વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/t140.c:36
 msgid "T.140 text encoder"
@@ -13134,9 +12848,8 @@ msgid "Teletext subtitles decoder"
 msgstr "ટેલિટેક્સ ઉપશીર્ષક ડિકોડર"
 
 #: modules/codec/textst.c:49
-#, fuzzy
 msgid "HDMV TextST subtitles decoder"
-msgstr "લખાણ ઉપશીર્ષક ડિકોડર"
+msgstr ""
 
 #: modules/codec/theora.c:107 modules/codec/vorbis.c:175
 msgid ""
@@ -13163,23 +12876,20 @@ msgid "Theora video encoder"
 msgstr "Theora વિડિઓ એનકોડર"
 
 #: modules/codec/ttml/ttml.c:45
-#, fuzzy
 msgid "TTML decoder"
-msgstr "MMAL ડિકોડર"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:46
-#, fuzzy
 msgid "TTML subtitles decoder"
-msgstr "EBU STL ઉપશીર્ષક ડિકોડર"
+msgstr ""
 
 #: modules/codec/ttml/ttml.c:53
 msgid "TTML"
 msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
-#, fuzzy
 msgid "TTML demuxer"
-msgstr "TTA ડિમક્સર"
+msgstr ""
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13226,14 +12936,12 @@ msgid "Ulead DV audio decoder"
 msgstr "Ulead DV ઓડિયો ડિકોડર"
 
 #: modules/codec/videotoolbox.m:82
-#, fuzzy
 msgid "Use Hardware decoders only"
-msgstr "હાર્ડવેર ડિકોડીંગ"
+msgstr ""
 
 #: modules/codec/videotoolbox.m:90
-#, fuzzy
 msgid "VideoToolbox video decoder"
-msgstr "WebM વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
@@ -13270,9 +12978,8 @@ msgid "Vorbis audio encoder"
 msgstr "Vorbis ઓડિયો એનકોડર"
 
 #: modules/codec/vpx.c:53
-#, fuzzy
 msgid "Quality mode"
-msgstr "શાંત સ્થિતિ"
+msgstr ""
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13287,24 +12994,20 @@ msgid "WebM video decoder"
 msgstr "WebM વિડિઓ ડિકોડર"
 
 #: modules/codec/vpx.c:75
-#, fuzzy
 msgid "WebM video encoder"
-msgstr "WebM વિડિઓ ડિકોડર"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:40
-#, fuzzy
 msgid "WEBVTT decoder"
-msgstr "MMAL ડિકોડર"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:41
-#, fuzzy
 msgid "WEBVTT subtitles decoder"
-msgstr "EBU STL ઉપશીર્ષક ડિકોડર"
+msgstr ""
 
 #: modules/codec/webvtt/webvtt.c:47 modules/codec/webvtt/webvtt.c:55
-#, fuzzy
 msgid "WEBVTT subtitles parser"
-msgstr "EBU STL ઉપશીર્ષક પાર્સર"
+msgstr ""
 
 #: modules/codec/wmafixed/wma.c:83
 msgid "WMA v1/v2 fixed point audio decoder"
@@ -13315,14 +13018,11 @@ msgid "Maximum GOP size"
 msgstr "મહત્તમ GOP માપ"
 
 #: modules/codec/x264.c:72
-#, fuzzy
 msgid ""
 "Sets maximum interval between IDR-frames. Larger values save bits, thus "
 "improving quality for a given bitrate at the cost of seeking precision. Use "
 "-1 for infinite."
 msgstr ""
-"IDR-ફ્રેમો વચ્ચે મહત્તમ અંતરાલ સુયોજિત કરો. મોટી કિંમતો બીટ સંગ્રહે છે, તેથી કરીને અપાયેલ "
-"બીટરેટ માટે શોધવાની ચોકસાઈની કિંમતે ગુણવત્તા સુધારે છે. અસંખ્ય માટે -1 વાપરો."
 
 #: modules/codec/x264.c:76
 msgid "Minimum GOP size"
@@ -13411,13 +13111,10 @@ msgid "Adaptive B-frame decision"
 msgstr "અનુકૂલનશીલ B-ફ્રેમ નિર્ણય"
 
 #: modules/codec/x264.c:116
-#, fuzzy
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
-"સ્પષ્ટ કરાયેલી અનુક્રમિક B-ફ્રેમોના ઉપયોગ માટે દબાણ કરો, સિવાય કે I-ફ્રેમ પેહલા હોય. "
-"શ્રેણી 0 થી 2."
 
 #: modules/codec/x264.c:120
 msgid "Influence (bias) B-frames usage"
@@ -13779,7 +13476,6 @@ msgid "Partitions to consider"
 msgstr "નક્કી કરવા માટે પાર્ટીશન"
 
 #: modules/codec/x264.c:274
-#, fuzzy
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -13789,13 +13485,6 @@ msgid ""
 " - all   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
-"વિશ્લેષણ સ્થિતિમાં નક્કી કરવા માટે પાર્ટીશનો: \n"
-" - કઈ નહિ  : \n"
-" - ઝડપી  : i4x4\n"
-" - સામાન્ય: i4x4,p8x8,(i8x8)\n"
-" - ધીમું  : i4x4,p8x8,(i8x8),b8x8\n"
-" - બધા   : i4x4,p8x8,(i8x8),b8x8,p4x4\n"
-"(p4x4 ને p8x8 ની જરૂરિયાત છે. i8x8 ને 8x8dct ની જરૂરિયાત છે)."
 
 #: modules/codec/x264.c:282
 msgid "Direct MV prediction mode"
@@ -13806,16 +13495,12 @@ msgid "Direct prediction size"
 msgstr "સીધુ ધારણા માપ"
 
 #: modules/codec/x264.c:286
-#, fuzzy
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
 " -  1: 8x8\n"
 " - -1: smallest possible according to level\n"
 msgstr ""
-"સીધું ધરેલ માપ:  -  0: 4x4\n"
-" -  1: 8x8\n"
-" - -1: સ્તરને પ્રમાણે શક્ય હોય તેટલું નાનામાં નાનું\n"
 
 #: modules/codec/x264.c:291
 msgid "Weighted prediction for B-frames"
@@ -13830,23 +13515,18 @@ msgid "Weighted prediction for P-frames"
 msgstr "P-ફ્રેમ માટે ભારપૂર્વક ધારણા"
 
 #: modules/codec/x264.c:295
-#, fuzzy
 msgid ""
 "Weighted prediction for P-frames:\n"
 " - 0: Disabled\n"
 " - 1: Blind offset\n"
 " - 2: Smart analysis\n"
 msgstr ""
-" P-ફ્રેમ માટે ભારપૂર્વક ધારણા:  - 0: નિષ્ક્રિય\n"
-" - 1: આંધળો ઓફસેટ\n"
-" - 2: ચતુરાઈથી વિશ્લેષણ\n"
 
 #: modules/codec/x264.c:300
 msgid "Integer pixel motion estimation method"
 msgstr "પૂર્ણાંક  પિક્સેલ ગતિ અંદાજ પદ્ધતિ"
 
 #: modules/codec/x264.c:301
-#, fuzzy
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -13855,11 +13535,6 @@ msgid ""
 " - esa: exhaustive search (extremely slow, primarily for testing)\n"
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
-"ગતિ અંદાજના અલગોરિધમ પસંદ કરો: - dia: ડાયમંડ શોધ, ત્રિજ્યા 1 (ઝડપી)\n"
-"- hex: ષટ્કોણ શોધ, ત્રિજ્યા 2\n"
-"- umh: અસમતલ મલ્ટી-ષટ્કોણ શોધ (સારું પરંતુ ધીમું)\n"
-"- esa: સંપૂર્ણ શોધ (ખુબજ ધીમું, મુખ્યત્વે ચકાસણી માટે)\n"
-"- tesa: હાડામાર્ડ સંપૂર્ણ શોધ (ખુબજ ધીમું, મુખ્યત્વે ચકાસણી માટે)\n"
 
 #: modules/codec/x264.c:308
 msgid "Maximum motion vector search range"
@@ -13961,7 +13636,6 @@ msgid "Trellis RD quantization"
 msgstr "ટ્રેલીસ RD ક્વૉનટાઈઝેશન"
 
 #: modules/codec/x264.c:352
-#, fuzzy
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -13969,11 +13643,6 @@ msgid ""
 " - 2: enabled on all mode decisions\n"
 "This requires CABAC."
 msgstr ""
-"ટ્રેલીસ RD ક્વૉનટાઈઝેશન: \n"
-"- 0: નિષ્ક્રિય\n"
-"- 1: ફક્ત MB ના છેલ્લા એનકોડ પર સક્રિય કરાયેલું\n"
-"- 2: દરેક પ્રણાલીના નિર્ણય પર સક્રિય કરાયેલું\n"
-"આની માટે CABACની જરૂર છે."
 
 #: modules/codec/x264.c:358
 msgid "Early SKIP detection on P-frames"
@@ -13988,11 +13657,10 @@ msgid "Coefficient thresholding on P-frames"
 msgstr "P-ફ્રેમ પર ગુણાંક થ્રેશોલ્ડિંગ"
 
 #: modules/codec/x264.c:362
-#, fuzzy
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
-msgstr "P-ફ્રેમો પર ગુણાંકની સીમા. ફક્ત નાનો એકલો ગુણાંક ધરાવતા dct બ્લોકને કાઢી નાખો."
+msgstr ""
 
 #: modules/codec/x264.c:365
 msgid "Use Psy-optimizations"
@@ -14127,14 +13795,12 @@ msgid "Default preset setting used"
 msgstr "મૂળભૂત પ્રીસેટ સુયોજન વાપરેલ છે"
 
 #: modules/codec/x264.c:421
-#, fuzzy
 msgid "x264 advanced options"
-msgstr "x264 અદ્યતન વિકલ્પો."
+msgstr ""
 
 #: modules/codec/x264.c:422
-#, fuzzy
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
-msgstr "x264 અદ્યતન વિકલ્પો, આ રૂપમાં {opt=val,op2=val2} ."
+msgstr ""
 
 #: modules/codec/x264.c:427
 msgid "dia"
@@ -14234,9 +13900,8 @@ msgid "Teletext page"
 msgstr "ટેલિટેક્સ પાનું"
 
 #: modules/codec/zvbi.c:62
-#, fuzzy
 msgid "Open the indicated Teletext page. Default page is index 100."
-msgstr "સૂચિત ટેલિટેક્સ પાનાંને ખોલો. મૂળભૂત પાનું એ અનુક્રમણિકા 100 છે"
+msgstr ""
 
 #: modules/codec/zvbi.c:69
 msgid "Teletext alignment"
@@ -14256,14 +13921,12 @@ msgid "Teletext text subtitles"
 msgstr "ટેલિટેક્સ લખાણ ઉપશીર્ષકો"
 
 #: modules/codec/zvbi.c:76
-#, fuzzy
 msgid "Output teletext subtitles as text instead of as RGBA."
-msgstr "RGBA ને બદલે લખાણ તરીકે આઉટપુટ ટેલિટેક્સ ઉપશીર્ષક"
+msgstr ""
 
 #: modules/codec/zvbi.c:79
-#, fuzzy
 msgid "Presentation Level"
-msgstr "પડઘા સ્તર"
+msgstr ""
 
 #: modules/codec/zvbi.c:88 modules/gui/qt/ui/streampanel.h:169
 msgid "1"
@@ -14513,9 +14176,9 @@ msgid "Subtitle position %d px"
 msgstr "ઉપશીર્ષક સ્થાન %d px"
 
 #: modules/control/hotkeys.c:1354
-#, fuzzy, c-format
+#, c-format
 msgid "Subtitle text scale %d%%"
-msgstr "ઉપશીર્ષક લખાણ એનકોડીંગ"
+msgstr ""
 
 #: modules/control/hotkeys.c:1515
 #, c-format
@@ -14578,9 +14241,8 @@ msgstr ""
 "વર્તશે"
 
 #: modules/control/netsync.c:61
-#, fuzzy
 msgid "Master server IP address"
-msgstr "મુખ્ય સર્વર ip સરનામું"
+msgstr ""
 
 #: modules/control/netsync.c:62
 msgid ""
@@ -15041,19 +14703,16 @@ msgid "WinMsg"
 msgstr ""
 
 #: modules/control/win_msg.c:193
-#, fuzzy
 msgid "Windows messages interface"
-msgstr "વિન્ડો સેવા ઇન્ટરફેસ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:68
-#, fuzzy
 msgid "Maximum device width"
-msgstr "મહત્તમ વિડિઓ પહોળાઇ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:69
-#, fuzzy
 msgid "Maximum device height"
-msgstr "મહત્તમ વિડિઓ ઊંચાઇ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:71
 msgid "Fixed Bandwidth in KiB/s"
@@ -15064,9 +14723,8 @@ msgid "Preferred bandwidth for non adaptive streams"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:74
-#, fuzzy
 msgid "Adaptive Logic"
-msgstr "વૈકલ્પિક રોક"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -15077,23 +14735,20 @@ msgid "Connect using HTTP access instead of custom HTTP code"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:98
-#, fuzzy
 msgid "Predictive"
-msgstr "ધ્યાન"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:100
-#, fuzzy
 msgid "Bandwidth Adaptive"
-msgstr "બેન્ડવીથ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:101
-#, fuzzy
 msgid "Fixed Bandwidth"
-msgstr "બેન્ડવીથ"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:102
 msgid "Lowest Bandwidth/Quality"
@@ -15104,14 +14759,12 @@ msgid "Highest Bandwidth/Quality"
 msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:112
-#, fuzzy
 msgid "Adaptive"
-msgstr "ધ્યાન"
+msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:113
-#, fuzzy
 msgid "Unified adaptive streaming for DASH/HLS"
-msgstr "ડાયનેમિક અડૈપ્ટિવ સ્ટ્રીમીંગ ઓવર HTTP"
+msgstr ""
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
@@ -15206,7 +14859,6 @@ msgid "AVI demuxer"
 msgstr "AVI ડિમક્સર"
 
 #: modules/demux/avi/avi.c:832 modules/demux/mp4/mp4.c:1674
-#, fuzzy
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15215,11 +14867,6 @@ msgid ""
 "This step might take a long time on a large file.\n"
 "What do you want to do?"
 msgstr ""
-"કારણ કે આ AVI ફાઈલ અનુક્રમણિકા તૂટેલ અથવા ગુમ થયેલ છે, શોધવાનું યોગ્ય રીતે કામ કરતુ નથી.\n"
-"VLC એ તમારી ફાઈલને સુધારતું નથી પરંતુ મેમરી માં અનુક્રમણિકાને બનાવા દ્વારા આ સમસ્યાને "
-"કામચલાઉ રીતે સુધારી શકાય છે .\n"
-"આ પગલું વિશાળ ફાઈલ માટે લાંબો સમય લગાડી શકે છે.\n"
-"તમારે શું કરવાની ઈચ્છા છે?"
 
 #: modules/demux/avi/avi.c:840
 msgid "Do not play"
@@ -15234,9 +14881,8 @@ msgid "Play as is"
 msgstr "આ રીતે વગાડો"
 
 #: modules/demux/avi/avi.c:843 modules/demux/mp4/mp4.c:1685
-#, fuzzy
 msgid "Broken or missing Index"
-msgstr "તુટેલ અથવા ગુમ થયેલ AVI અનુક્રમણિકા"
+msgstr ""
 
 #: modules/demux/avi/avi.c:2719
 msgid "Broken or missing AVI Index"
@@ -15287,14 +14933,12 @@ msgid "Dirac video demuxer"
 msgstr "સીધું વિડિઓ ડિમક્સર"
 
 #: modules/demux/directory.c:94
-#, fuzzy
 msgid "Directory import"
-msgstr "ડિરેક્ટરી ગોઠવવાનો ક્રમ"
+msgstr ""
 
 #: modules/demux/filter/noseek.c:79
-#, fuzzy
 msgid "Seek prevention demux filter"
-msgstr "દૃશ્ય વિડિઓ ફિલ્ટર"
+msgstr ""
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
@@ -15426,9 +15070,8 @@ msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr "અજ્ઞાત EBML ઘટકોને વાંચો અને કાઢી નાંખો (તૂટેલ ફાઇલો માટે સારુ નથી)."
 
 #: modules/demux/mkv/mkv.cpp:76
-#, fuzzy
 msgid "Preload clusters"
-msgstr "સ્ટ્રીમ ફિલ્ટર"
+msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:77
 msgid ""
@@ -15448,9 +15091,8 @@ msgid "Reverberation level (from 0 to 100, default value is 0)."
 msgstr "પડઘા સ્તર (0 થી 100 સુધી, મૂળભૂત કિમંત 0 છે)."
 
 #: modules/demux/mod.c:59
-#, fuzzy
 msgid "Reverberation delay, in ms. Usual values are from 40 to 200ms."
-msgstr "પડઘા વિલંબ, ms માં. સામાન્ય કિમંતો એ 40 થી 200ms સુધીની છે."
+msgstr ""
 
 #: modules/demux/mod.c:61
 msgid "Enable megabass mode"
@@ -15584,9 +15226,8 @@ msgid "Model"
 msgstr "મોડલ"
 
 #: modules/demux/mp4/meta.c:85
-#, fuzzy
 msgid "Product"
-msgstr "પ્રોડક્ટ"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:86
 msgid "Grouping"
@@ -15641,18 +15282,16 @@ msgid "Executive Producer"
 msgstr "એક્ઝિક્યુટિવ નિર્માતા"
 
 #: modules/demux/mp4/meta.c:102
-#, fuzzy
 msgid "Encoding Params"
-msgstr "એનકોડીંગ પરિમાણો"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:104
-#, fuzzy
 msgid "Catalog Number"
-msgstr "ચેનલ નંબર"
+msgstr ""
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -15663,14 +15302,12 @@ msgid "Explicit"
 msgstr ""
 
 #: modules/demux/mp4/meta.c:426
-#, fuzzy
 msgid "Clean"
-msgstr "સાફ કરો"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:49
-#, fuzzy
 msgid "M4A audio only"
-msgstr "ઓડિયો વિલંબ"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:50
 msgid "Ignore non audio tracks from iTunes audio files"
@@ -15685,14 +15322,12 @@ msgid "MP4"
 msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1682
-#, fuzzy
 msgid "Do not seek"
-msgstr "વગાડો નહિં"
+msgstr ""
 
 #: modules/demux/mp4/mp4.c:1683
-#, fuzzy
 msgid "Build index"
-msgstr "અનુક્રમણિકાને બનાવો પછી વગાડો"
+msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
@@ -15803,13 +15438,10 @@ msgid "Packet size in bytes to decrypt"
 msgstr "ડિક્રિપ્ટ કરવા માટે બાઇટમાં પેકેટ માપ"
 
 #: modules/demux/mpeg/ts.c:100
-#, fuzzy
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
-"ડિક્રીપ્ટ કરવા માટે TS પેકેટના માપને સ્પષ્ટ કરો. ડિક્રીપ્ટ કરતા પહેલા  ડિક્રીપ્શન રુટિન "
-"કિમંત માંથી TS-હેડર ને બાદ કરે છે. "
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
@@ -15840,9 +15472,8 @@ msgid "Use the stream PCR as a reference."
 msgstr "સંદર્ભ તરીકે સ્ટ્રીમ PCR ને વાપરો."
 
 #: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
-#, fuzzy
 msgid "Digital TV Standard"
-msgstr "ડિજિટલ ટેલિવિઝન અને રેડિઓ"
+msgstr ""
 
 #: modules/demux/mpeg/ts.c:127
 msgid ""
@@ -15855,24 +15486,20 @@ msgid "MPEG Transport Stream demuxer"
 msgstr "MPEG ટ્રાન્સપોર્ટ સ્ટ્રીમ ડિમક્સર"
 
 #: modules/demux/mpeg/ts_psi.c:422
-#, fuzzy
 msgid "Main audio"
-msgstr "મૂળભૂત ઓડિયો"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:423
-#, fuzzy
 msgid "Audio description for the visually impaired"
-msgstr "આ કોડેક માટે વર્ણન નથી"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:424
-#, fuzzy
 msgid "Clean audio for the hearing impaired"
-msgstr "ટેલીટેક્સ ઉપશીર્ષકો: સાંભળવાની તકલીફ હોય"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:425
-#, fuzzy
 msgid "Spoken subtitles for the visually impaired"
-msgstr "DVB ઉપશીર્ષકો: સાંભળવાની તકલીફ હોય"
+msgstr ""
 
 #: modules/demux/mpeg/ts_psi.c:607 modules/gui/macosx/VLCMainMenu.m:465
 #: modules/gui/qt/dialogs/toolbar.cpp:541
@@ -16076,9 +15703,8 @@ msgid "Load"
 msgstr "લાવો"
 
 #: modules/demux/playlist/wpl.c:99
-#, fuzzy
 msgid "Total duration"
-msgstr "સંતૃપ્તિ"
+msgstr ""
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
@@ -16110,12 +15736,10 @@ msgid "Forces the audio language"
 msgstr "ઓડિયો ભાષાનું દબાણ કરે છે"
 
 #: modules/demux/rawaud.c:54
-#, fuzzy
 msgid ""
 "Forces the audio language for the output mux. Three letter ISO639 code. "
 "Default is 'eng'."
 msgstr ""
-"આઉટપુટ મક્સ માટે ઓડિયો ભાષા પર દબાણ કરે છે. ત્રણ અક્ષર ISO639 કોડ છે. મૂળભૂત 'eng' છે."
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
@@ -16666,9 +16290,8 @@ msgstr "પાછા ફરો"
 #: modules/gui/macosx/VLCControlsBarCommon.m:68
 #: modules/gui/macosx/VLCControlsBarCommon.m:150
 #: modules/gui/macosx/VLCFSPanelController.m:122
-#, fuzzy
 msgid "Seek backward"
-msgstr "પાછળ જાઓ"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:71
 #: modules/gui/macosx/VLCControlsBarCommon.m:152
@@ -16679,32 +16302,27 @@ msgstr "આગળ ધપાવો"
 #: modules/gui/macosx/VLCControlsBarCommon.m:72
 #: modules/gui/macosx/VLCControlsBarCommon.m:153
 #: modules/gui/macosx/VLCFSPanelController.m:119
-#, fuzzy
 msgid "Seek forward"
-msgstr "આગળ વધો"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:76
-#, fuzzy
 msgid "Playback position"
-msgstr "પ્લેબેક નિયંત્રણ"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:127
-#, fuzzy
 msgid "Playback time"
-msgstr "પ્લેબેક દર"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:161
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
-#, fuzzy
 msgid "Go to previous item"
-msgstr "પહેલાંનુ શીર્ષક"
+msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:164
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
-#, fuzzy
 msgid "Go to next item"
-msgstr "સમય સાથે જાઓ"
+msgstr ""
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:136
 msgid "Convert & Stream"
@@ -16985,23 +16603,20 @@ msgid "Clean up"
 msgstr "સાફ કરો"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
-#, fuzzy
 msgid "Play/Pause the current media"
-msgstr "હાલની મીડિયાને વગાડો અથવા થોભો પર ક્લિક કરો."
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
-#, fuzzy
 msgid "Go to the previous item"
-msgstr "પહેલાંની વગાડવા માટેની યાદીમાં જવા ક્લિક કરો."
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 msgid "Toggle Fullscreen mode"
 msgstr "ટૉગલ સંપૂર્ણસ્ક્રીન સ્થિતિ"
 
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen mode"
-msgstr "પૂર્ણસ્ક્રીન છોડો"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -17010,9 +16625,8 @@ msgid "Volume"
 msgstr "અવાજ"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
-#, fuzzy
 msgid "Adjust the volume"
-msgstr "ઓડિયો અવાજ"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
@@ -17106,13 +16720,10 @@ msgid "Display VLC status menu icon"
 msgstr ""
 
 #: modules/gui/macosx/macosx.m:83
-#, fuzzy
 msgid ""
 "By default, VLC will show the statusbar icon menu. However, you can choose "
 "to disable it (restart required)."
 msgstr ""
-"મૂળભૂત રીતે, VLC એ એપલ દૂરસ્થ સાથે તેના પોતાના અવાજને નિયંત્રણ કરશે. છતાંપણ, તમે તેને બદલે "
-"વૈશ્વિક સિસ્ટમ અવાજને નિયંત્રણ કરવા પસંદ કરી શકે છે."
 
 #: modules/gui/macosx/macosx.m:85
 msgid "Control playlist items with the Apple Remote"
@@ -17205,9 +16816,8 @@ msgid "Lock Aspect Ratio"
 msgstr "આશરે દરને તાળુ મારો"
 
 #: modules/gui/macosx/macosx.m:113
-#, fuzzy
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr "સંપૂર્ણસ્ક્રીન પ્લેબેકને બહાર નીકાળવા ક્લિક કરો."
+msgstr ""
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17442,9 +17052,8 @@ msgid "Select All"
 msgstr "બધુ પસંદ કરો"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
-#, fuzzy
 msgid "Find"
-msgstr "શોધો: %s"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -17494,14 +17103,12 @@ msgid "Jump to Time"
 msgstr "સમય સાથે કૂદો"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
-#, fuzzy
 msgid "Renderer"
-msgstr "લખાણ રેન્ડરર"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:406
-#, fuzzy
 msgid "No renderer"
-msgstr "લખાણ રેન્ડરર"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -17682,9 +17289,8 @@ msgid "Search in Playlist"
 msgstr "વગાડવાની યાદીમાં શોધો"
 
 #: modules/gui/macosx/VLCMainWindow.m:187
-#, fuzzy
 msgid "Search the playlist. Results will be selected in the table."
-msgstr "વગાડવા માટેની યાદીને શોધવા શબ્દને દાખલ કરો. પરિણામો કોષ્ટકમાં પસંદ થયેલ હશે."
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Open a dialog to select the media to play"
@@ -17774,11 +17380,8 @@ msgid "Repeat"
 msgstr "પૂનરાવર્તન"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:68
-#, fuzzy
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
 msgstr ""
-"પૂનરાવર્તન સ્થિતિને બદલવા માટે ક્લિક કરો. ત્યાં 3 સ્થિતિઓ છે: એકનું પૂનરાવર્તન કરો, બધું "
-"પૂનરાવર્તન કરો અને બંધ કરો."
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: share/lua/http/index.html:239
@@ -17787,18 +17390,17 @@ msgstr "શફલ"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:74
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:466
-#, fuzzy, c-format
+#, c-format
 msgid "Volume: %i %%"
-msgstr "અવાજ %ld%%"
+msgstr ""
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:81
 msgid "Full Volume"
 msgstr "પૂર્ણ અવાજ"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:85
-#, fuzzy
 msgid "Open Audio Effects window"
-msgstr "ઓડિયો અસરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:130
 msgid "Open Source"
@@ -17819,18 +17421,16 @@ msgid "Open"
 msgstr "ખોલો"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:136
-#, fuzzy
 msgid "Stream output:"
-msgstr "સ્ટ્રીમ આઉટપુટ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:137
 msgid "Settings..."
 msgstr "સુયોજનો..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:139
-#, fuzzy
 msgid "Choose media input type"
-msgstr "ઇનપુટ પસંદ કરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:141
 msgid "Disc"
@@ -17853,9 +17453,8 @@ msgstr "ફાઇલ પસંદ કરો"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:148
 #: modules/gui/macosx/VLCOpenWindowController.m:349
-#, fuzzy
 msgid "Select a file for playback"
-msgstr "પ્લેબેક માટે ફાઇલને પસંદ કરવા માટે ક્લિક કરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:149
 msgid "Treat as a pipe rather than as a file"
@@ -17873,10 +17472,8 @@ msgid "Choose..."
 msgstr "પસંદ કરો..."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:153
-#, fuzzy
 msgid "Select another file to play in sync with the previously selected file"
 msgstr ""
-"પહેલાંની પસંદ થયેલ ફાઇલ સાથે સુમેળમાં તેને વગાડવા માટે બીજી ફાઇલને પસંદ કરવા માટે ક્લિક કરો."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
@@ -17927,13 +17524,10 @@ msgstr ""
 "વિવિધ પ્રોટોકોલની મદદથી સ્ટ્રીમને ખોલવા માટે, આ શીટને બંધ કરવા માટે રદ કરો દબાવો."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:191
-#, fuzzy
 msgid ""
 "Enter a stream URL here. To open RTP or UDP streams, use the respective "
 "button below."
 msgstr ""
-"નેટવર્ક સ્ટ્રીમને ખોલવા માટે અહિંયા URL ને દાખલ કરો. RTP અથવા UDP સ્ટ્રીમને ખોલવા માટે, "
-"નીચે સંબંધિત બટન પર ક્લિક કરો."
 
 #: modules/gui/macosx/VLCOpenWindowController.m:194
 msgid "Open RTP/UDP Stream"
@@ -17972,14 +17566,12 @@ msgid "Subscreen top"
 msgstr "ઉપસ્ક્રીન ઉંચે"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:212
-#, fuzzy
 msgid "Subscreen Width"
-msgstr "ઉપસ્ક્રીન પહોળાઇ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:213
-#, fuzzy
 msgid "Subscreen Height"
-msgstr "ઉપસ્ક્રીન ઊંચાઈ"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:215
 msgid "Capture Audio"
@@ -17990,14 +17582,12 @@ msgid "Add Subtitle File:"
 msgstr "ઉપશીર્ષક ફાઇલને ઉમેરો:"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:348
-#, fuzzy
 msgid "Setup subtitle playback details"
-msgstr "સંપૂર્ણ વિગતમાં ઉપશીર્ષક પ્લેબેકને સુયોજિત કરવા માટે ક્લિક કરો."
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:351
-#, fuzzy
 msgid "Select a subtitle file"
-msgstr "ઉપશીર્ષક ફાઇલને પસંદ કરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:352
 msgid "Override parameters"
@@ -18022,9 +17612,8 @@ msgid "Subtitle alignment"
 msgstr "ઉપશીર્ષક ગોઠવણી"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:364
-#, fuzzy
 msgid "Dismiss the subtitle setup dialog"
-msgstr "ઉપશીર્ષક સુયોજન સંવાદને કાઢી નાંખવા પર ક્લિક કરો."
+msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:365
 msgid "Font Properties"
@@ -18098,14 +17687,12 @@ msgid "File Size"
 msgstr "ફાઇલ માપ"
 
 #: modules/gui/macosx/VLCPlaylist.m:230
-#, fuzzy
 msgid "Expand All"
-msgstr "વિસ્તારો"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylist.m:231
-#, fuzzy
 msgid "Collapse All"
-msgstr "પડી ભાંગવુ"
+msgstr ""
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:58
 #: modules/gui/qt/dialogs/mediainfo.cpp:54
@@ -18187,9 +17774,8 @@ msgid "Continue"
 msgstr "ચાલુ રાખો"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:51
-#, fuzzy
 msgid "Always continue media playback"
-msgstr "સતત ચાલતુ પ્લેબેક"
+msgstr ""
 
 #: modules/gui/macosx/VLCResumeDialogController.m:62
 #: modules/gui/macosx/VLCResumeDialogController.m:94
@@ -18326,9 +17912,8 @@ msgid "Note that these are system-wide settings."
 msgstr "નોંધો કે આ સિસ્ટમ-વ્યાપક સુયોજનો છે."
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:310
-#, fuzzy
 msgid "General settings"
-msgstr "સામાન્ય ઓડિયો સુયોજનો"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:312
 msgid "Interface style"
@@ -18347,14 +17932,12 @@ msgid "Continue playback"
 msgstr "સતત ચાલતુ પ્લેબેક"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
-#, fuzzy
 msgid "Playback behaviour"
-msgstr "પ્લેબેક નિષ્ફળ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:324
-#, fuzzy
 msgid "Enable notifications on playlist item change"
-msgstr "Growl સૂચનાઓને સક્રિય કરો (વગાડવા માટેની યાદી વસ્તુ બદલાવ પર)"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:327
 #: modules/gui/qt/ui/sprefs_interface.h:556
@@ -18366,14 +17949,12 @@ msgid "Automatically check for updates"
 msgstr "સુધારા માટે આપમેળે ચકાસો"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:332
-#, fuzzy
 msgid "HTTP web interface"
-msgstr "Qt ઇન્ટરફેસ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:333
-#, fuzzy
 msgid "Enable HTTP web interface"
-msgstr "આવરણ કરી શકાય તેવું ઇન્ટરફેસ"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:337
 msgid "Default Encoding"
@@ -18434,14 +18015,12 @@ msgid "Show video within the main window"
 msgstr "મુખ્ય વિન્ડોમાં વિડિઓને બતાવો"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
-#, fuzzy
 msgid "Fullscreen settings"
-msgstr "સંપૂર્ણસ્ક્રીન"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
-#, fuzzy
 msgid "Start in fullscreen"
-msgstr "સંપૂર્ણસ્ક્રીન સ્થિતિમાં વિડિઓને શરૂ કરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -18577,40 +18156,33 @@ msgid "This combination is already taken by \"%@\"."
 msgstr "આ સંયોજન પહેલેથી \"%@\" દ્દારા લીધેલ છે."
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:103
-#, fuzzy
 msgid "Toggle Play/Pause"
-msgstr "વગાડો/થોભો"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:109
-#, fuzzy
 msgid "Toggle random order playback"
-msgstr "ટોગલ ગમેતે વગાડવા માટેની યાદીને ફરી વગાડો "
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:114
-#, fuzzy
 msgid "Show Main Window"
-msgstr "મુખ્ય વિન્ડો..."
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:115
 #: modules/gui/macosx/VLCStatusBarIcon.m:406
-#, fuzzy
 msgid "Path/URL Action"
-msgstr "URL વર્ણન"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:379
-#, fuzzy
 msgid "Nothing playing"
-msgstr "હવે વગાડી રહ્યા છે"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:413
-#, fuzzy
 msgid "Select File In Finder"
-msgstr "ફોલ્ડર પસંદ કરો"
+msgstr ""
 
 #: modules/gui/macosx/VLCStatusBarIcon.m:415
-#, fuzzy
 msgid "Copy URL to clipboard"
-msgstr "ક્લિપબોર્ડમાંથી સ્થાનને ખોલો (&L)"
+msgstr ""
 
 #: modules/gui/macosx/VLCStringUtility.m:243
 msgid "Not Set"
@@ -19217,14 +18789,12 @@ msgid " <up>,<down>            Seek +/-5%%"
 msgstr " <up>,<down>            Seek +/-5%%"
 
 #: modules/gui/ncurses.c:1046
-#, fuzzy
 msgid "[Repeat]"
-msgstr "[પૂનરાવર્તન] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1047
-#, fuzzy
 msgid "[Random]"
-msgstr "[અવ્યવસ્થિત] "
+msgstr ""
 
 #: modules/gui/ncurses.c:1048
 msgid "[Loop]"
@@ -19264,9 +18834,8 @@ msgid " Chapter  : %<PRId64>/%d"
 msgstr " પ્રકરણ  : %<PRId64>/%d"
 
 #: modules/gui/ncurses.c:1113
-#, fuzzy
 msgid " Source: <no current item>"
-msgstr " સ્ત્રોત: <હાલની વસ્તુ નથી> "
+msgstr ""
 
 #: modules/gui/ncurses.c:1115
 msgid " [ h for help ]"
@@ -19303,9 +18872,8 @@ msgid "Teletext Activation"
 msgstr "ટેલિટેક્સ સક્રિયકરણ"
 
 #: modules/gui/qt/components/controller.cpp:620
-#, fuzzy
 msgid "Toggle Transparency"
-msgstr "ટૉગલ પારદર્શકતા "
+msgstr ""
 
 #: modules/gui/qt/components/controller.hpp:43
 msgid ""
@@ -19471,9 +19039,8 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
-#, fuzzy
 msgid "Image Files"
-msgstr "છબી દિવાલ"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -19615,9 +19182,8 @@ msgstr ""
 " ગેઇન"
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
-#, fuzzy
 msgid "Adjust pitch"
-msgstr "VLC પ્રાધાન્યતાને ગોઠવો"
+msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -19994,13 +19560,10 @@ msgid "Select File"
 msgstr "ફાઈલ પસંદ કરો"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1134
-#, fuzzy
 msgid ""
 "Select or double click an action to change the associated hotkey. Use delete "
 "key to remove hotkeys."
 msgstr ""
-"સંકળાયેલ હોટકીને બદલવા માટે ક્રિયા પર બે વાર ક્લિક કરો અથવા પસંદ કરો. હોટકીને દૂર કરવા "
-"માટે કાઢી નાંખો કીને વાપરો"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1141
 msgid "in"
@@ -20316,9 +19879,8 @@ msgid "Convert"
 msgstr "રૂપાંતર કરો"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
-#, fuzzy
 msgid "Multiple files selected."
-msgstr "ફાઇલ પસંદ થયેલ નથી"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -20333,18 +19895,16 @@ msgid "Browse"
 msgstr "બ્રાઉઝ"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
-#, fuzzy
 msgid "Multiple Files Selected."
-msgstr "ઘણી ફાઇલને ખોલો (&O)..."
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
 msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:95
-#, fuzzy
 msgid "Append '-converted' to filename"
-msgstr "ફાઇલ સાથે જોડાવો"
+msgstr ""
 
 #: modules/gui/qt/dialogs/convert.cpp:103
 msgid "Settings"
@@ -20396,9 +19956,8 @@ msgid "Adjustments and Effects"
 msgstr "ગોઠવણી અને અસરો"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
-#, fuzzy
 msgid "Stereo Widener"
-msgstr "સ્ટીરિયો સ્થિતિ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -20414,9 +19973,8 @@ msgid "&Save"
 msgstr "સંગ્રહો (&S)"
 
 #: modules/gui/qt/dialogs/external.cpp:216
-#, fuzzy
 msgid "Store the Password"
-msgstr "RDP સત્તાધિકરણ પાસવર્ડ"
+msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -20541,9 +20099,8 @@ msgid "Save log file as..."
 msgstr "આ તરીકે લૉગ ફાઇલને સંગ્રહો..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
-#, fuzzy
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr "લખાણો / લૉગો (*.log *.txt);; બધા (*.*) "
+msgstr ""
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -21071,9 +20628,8 @@ msgid "Empty"
 msgstr ""
 
 #: modules/gui/qt/extensions_manager.cpp:197
-#, fuzzy
 msgid "Deactivate"
-msgstr "સક્રિય કરો"
+msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
@@ -21112,9 +20668,8 @@ msgid "Subti&tle"
 msgstr "ઉપશીર્ષક (&t)"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
-#, fuzzy
 msgid "Tool&s"
-msgstr "સાધન"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21209,9 +20764,8 @@ msgid "Docked Playlist"
 msgstr "ડોક થયેલ વગાડવા માટેની યાદી"
 
 #: modules/gui/qt/menus.cpp:501
-#, fuzzy
 msgid "Always on &top"
-msgstr "હંમેશા ટોચ ઉપર"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -21242,9 +20796,8 @@ msgid "&Increase Volume"
 msgstr "અવાજ વધારો (&I)"
 
 #: modules/gui/qt/menus.cpp:599
-#, fuzzy
 msgid "D&ecrease Volume"
-msgstr "અવાજ ઘટાડો"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -21403,19 +20956,16 @@ msgid "&Clear"
 msgstr "સાફ કરો (&C)"
 
 #: modules/gui/qt/menus.cpp:1641
-#, fuzzy
 msgid "&Renderer"
-msgstr "લખાણ રેન્ડરર"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1645
-#, fuzzy
 msgid "<Local>"
-msgstr "કંઠ્ય"
+msgstr ""
 
 #: modules/gui/qt/menus.cpp:1658
-#, fuzzy
 msgid "Scanning..."
-msgstr "માપ ગુણવત્તા"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21444,9 +20994,8 @@ msgid "Start VLC with only a systray icon"
 msgstr "ફક્ત systray ચિહ્ન સાથે VLC ને શરૂ કરો"
 
 #: modules/gui/qt/qt.cpp:92
-#, fuzzy
 msgid "VLC will start with just an icon in your taskbar."
-msgstr "VLC એ તમારી કાર્યપટ્ટીમાં ફક્ત ચિહ્ન સાથે શરૂ થશે"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -21527,33 +21076,25 @@ msgid "List of words separated by | to filter"
 msgstr "ફિલ્ટરમાં |  દ્દારા શબ્દોની યાદી અલગ થયેલ છે"
 
 #: modules/gui/qt/qt.cpp:135
-#, fuzzy
 msgid ""
 "Regular expression used to filter the recent items played in the player."
-msgstr "પ્લેયરમાં વગાડેલ તાજેતરની વસ્તુઓને ફિલ્ટર કરવા માટે વાપરેલ નિયમિત સમીકરણ"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
-#, fuzzy
 msgid "Define the colors of the volume slider"
-msgstr "અવાજ સ્લાઇડરનાં રંગોને વ્યાખ્યાયિત કરો "
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:139
-#, fuzzy
 msgid ""
 "Define the colors of the volume slider\n"
 "By specifying the 12 numbers separated by a ';'\n"
 "Default is '255;255;255;20;226;20;255;176;15;235;30;20'\n"
 "An alternative can be '30;30;50;40;40;100;50;50;160;150;150;255'"
 msgstr ""
-"અવાજ સ્લાઇડરનાં રંગોને વ્યાખ્યાયિત કરો\n"
-"';' દ્દારા અલગ થયેલ 12 નંબરોને અલગ કરે છે\n"
-"મૂળભૂત એ '255;255;255;20;226;20;255;176;15;235;30;20' છે\n"
-"વૈકલ્પિક '30;30;50;40;40;100;50;50;160;150;150;255' આ હોઇ શકે છે  "
 
 #: modules/gui/qt/qt.cpp:144
-#, fuzzy
 msgid "Selection of the starting mode and look"
-msgstr "શરૂઆતની સ્થિતિ અને જોવાની પસંદગી "
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:145
 msgid ""
@@ -21580,18 +21121,16 @@ msgid "Define which screen fullscreen goes"
 msgstr "વ્યાખ્યાયિત કરો કંઇ સ્ક્રીન સંપૂર્ણસ્ક્રીન તરીકે જાય છે"
 
 #: modules/gui/qt/qt.cpp:155
-#, fuzzy
 msgid "Screennumber of fullscreen, instead of same screen where interface is."
-msgstr "સંપૂર્ણસ્ક્રીનનો સ્ક્રીનનંબર, એજ સ્ક્રીનને બદલે જ્યાં ઇન્ટરફેસ છે"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:158
 msgid "Load extensions on startup"
 msgstr "શરૂઆતે એક્સટેન્શને લાવો"
 
 #: modules/gui/qt/qt.cpp:159
-#, fuzzy
 msgid "Automatically load the extensions module on startup."
-msgstr "શરૂઆત પર ઍક્સટેન્શન મોડ્યુલને આપમેળે લાવો"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:162
 msgid "Start in minimal view (without menus)"
@@ -21610,14 +21149,12 @@ msgstr ""
 "થતું અટકાવા માટે નિષ્ક્રિય કરી સકાય છે."
 
 #: modules/gui/qt/qt.cpp:168
-#, fuzzy
 msgid "Expanding background cone or art"
-msgstr "પાશ્ર્વભાગ કોન અથવા કલાને વિસ્તારી રહ્યા છે."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:169
-#, fuzzy
 msgid "Background art fits window's size."
-msgstr "પાશ્ર્વભાગ કલા એ વિન્ડોનાં માપને બંધબેસે છે"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:171
 msgid "Ignore keyboard volume buttons."
@@ -21635,16 +21172,14 @@ msgstr ""
 "જયારે VLC પસંદ થયેલ હોય અને સીસ્ટમ અવાજને બદલો જયારે VLC પસંદ થયેલ ના હોય."
 
 #: modules/gui/qt/qt.cpp:188
-#, fuzzy
 msgid "When to raise the interface"
-msgstr "મુખ્ય ઇન્ટરફેસ માટે સુયોજનો"
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:189
-#, fuzzy
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
-msgstr "વિવિધ પ્રસંગો પર તેનાં ચિહ્નને બદલવા માટે આ વિકલ્પ ઇન્ટરફેસને પરવાનગી આપે છે."
+msgstr ""
 
 #: modules/gui/qt/qt.cpp:192
 msgid "Fullscreen controller mouse sensitivity"
@@ -21671,10 +21206,9 @@ msgid "debug"
 msgstr "ડિબગ"
 
 #: modules/gui/qt/util/searchlineedit.cpp:49
-#, fuzzy
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr "સાફ કરો"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -21685,14 +21219,12 @@ msgid "Skin files |*.vlt;*.wsz;*.xml"
 msgstr "સ્કીન ફાઇલો |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "Playlist Files |"
-msgstr "વગાડવા માટેની યાદી ફાઇલો|"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:221
-#, fuzzy
 msgid "|All Files |*"
-msgstr "બધી ફાઇલો"
+msgstr ""
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -21703,9 +21235,8 @@ msgid "Save playlist"
 msgstr "વગાડવા માટેની યાદીને સંગ્રહો"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
-#, fuzzy
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF playlist|*.xspf|M3U file|*.m3u|HTML playlist|*.html"
+msgstr ""
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
@@ -21772,9 +21303,8 @@ msgid "Select skin"
 msgstr "આવરણ પસંદ કરો"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
-#, fuzzy
 msgid "Open skin..."
-msgstr "આવરણ ખોલો ..."
+msgstr ""
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -21839,9 +21369,8 @@ msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "છબી ગામાને સુયોજિત કરો, 0.01 અને 10 ની વચ્ચે, મૂળભૂત 1 છે."
 
 #: modules/hw/d3d9/d3d9_filters.c:454
-#, fuzzy
 msgid "Direct3D9 adjust filter"
-msgstr "VDPAU વિડિઓ ફિલ્ટર સંતુલિત"
+msgstr ""
 
 #: modules/hw/mmal/codec.c:51
 msgid "Decode frames directly into RPI VideoCore instead of host memory."
@@ -21864,9 +21393,8 @@ msgid "MMAL-based decoder plugin for Raspberry Pi"
 msgstr "રાસબરી Pi માટે MMAL-આધારિત ડિકોડર પ્લગઇન"
 
 #: modules/hw/mmal/deinterlace.c:45
-#, fuzzy
 msgid "Use QPUs for advanced HD deinterlacing."
-msgstr "અમિશ્રણ કરવાનું સક્રિય અથવા નિષ્ક્રિય કરો."
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:46
 msgid ""
@@ -21874,14 +21402,12 @@ msgid ""
 msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:52
-#, fuzzy
 msgid "MMAL deinterlace"
-msgstr "અમિશ્રિત"
+msgstr ""
 
 #: modules/hw/mmal/deinterlace.c:53
-#, fuzzy
 msgid "MMAL-based deinterlace filter plugin"
-msgstr "VDPAU અમિશ્રીત ફિલ્ટર"
+msgstr ""
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
@@ -21908,9 +21434,8 @@ msgid "Adjust HDMI refresh rate to the video."
 msgstr "વિડિઓ માટે HDMI તાજા દરને ગોઠવો."
 
 #: modules/hw/mmal/vout.c:63
-#, fuzzy
 msgid "Force interlaced video mode."
-msgstr "શુદ્ધ-મિશ્રિત સ્થિતિ."
+msgstr ""
 
 #: modules/hw/mmal/vout.c:64
 msgid ""
@@ -21927,14 +21452,12 @@ msgid "MMAL-based vout plugin for Raspberry Pi"
 msgstr "રાસબરી Pi માટે MMAL-આધારિત vout પ્લગઇન"
 
 #: modules/hw/vaapi/filters.c:1184
-#, fuzzy
 msgid "VAAPI filters"
-msgstr "ઓડિયો ફિલ્ટર"
+msgstr ""
 
 #: modules/hw/vaapi/filters.c:1185
-#, fuzzy
 msgid "Video Accelerated API filters"
-msgstr "વિડિઓ માપ ફિલ્ટર"
+msgstr ""
 
 #: modules/hw/vdpau/adjust.c:187
 msgid "VDPAU adjust video filter"
@@ -21997,36 +21520,32 @@ msgid "VDPAU sharpen video filter"
 msgstr "VDPAU તીવ્રતા વિડિઓ ફિલ્ટર"
 
 #: modules/keystore/file.c:54
-#, fuzzy
 msgid "File keystore (plaintext)"
-msgstr "પસંદ થયેલ પેકેટસાઇઝર યાદી"
+msgstr ""
 
 #: modules/keystore/file.c:55
 msgid "Secrets are stored on a file without any encryption"
 msgstr ""
 
 #: modules/keystore/file.c:65
-#, fuzzy
 msgid "Crypt keystore"
-msgstr "સાઉટ સ્ટ્રીમ"
+msgstr ""
 
 #: modules/keystore/file.c:66
 msgid "Secrets are stored encrypted on a file"
 msgstr ""
 
 #: modules/keystore/keychain.m:41
-#, fuzzy
 msgid "No"
-msgstr "ના (&N)"
+msgstr ""
 
 #: modules/keystore/keychain.m:41
 msgid "Any"
 msgstr ""
 
 #: modules/keystore/keychain.m:47
-#, fuzzy
 msgid "System default"
-msgstr "સુસ્ટમનું મૂળભૂત"
+msgstr ""
 
 #: modules/keystore/keychain.m:48
 msgid "After first unlock"
@@ -22041,9 +21560,8 @@ msgid "When passcode set, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:52
-#, fuzzy
 msgid "Always, on this device only"
-msgstr "હંમેશા ટોચ ઉપર"
+msgstr ""
 
 #: modules/keystore/keychain.m:53
 msgid "When unlocked"
@@ -22054,9 +21572,8 @@ msgid "When unlocked, on this device only"
 msgstr ""
 
 #: modules/keystore/keychain.m:57
-#, fuzzy
 msgid "Synchronize stored items"
-msgstr "ઉપર અને નીચે સુમેળ કરો"
+msgstr ""
 
 #: modules/keystore/keychain.m:58
 msgid ""
@@ -22080,9 +21597,8 @@ msgid "Keychain keystore"
 msgstr ""
 
 #: modules/keystore/keychain.m:110
-#, fuzzy
 msgid "Keystore for iOS, Mac OS X and tvOS"
-msgstr "OS X અને iOS માટે TLS આધાર"
+msgstr ""
 
 #: modules/keystore/kwallet.c:48
 msgid "KWallet keystore"
@@ -22093,9 +21609,8 @@ msgid "Secrets are stored via KWallet"
 msgstr ""
 
 #: modules/keystore/memory.c:41
-#, fuzzy
 msgid "Memory keystore"
-msgstr "સાઉટ સ્ટ્રીમ"
+msgstr ""
 
 #: modules/keystore/memory.c:42
 msgid "Secrets are stored in memory"
@@ -22110,9 +21625,8 @@ msgid "Secrets are stored via libsecret"
 msgstr ""
 
 #: modules/logger/android.c:85
-#, fuzzy
 msgid "Android log"
-msgstr "લૉગો ઉમેરો"
+msgstr ""
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
@@ -22123,33 +21637,28 @@ msgid "Be quiet"
 msgstr "શાંત રહો"
 
 #: modules/logger/console.c:115
-#, fuzzy
 msgid "Turn off all messages on the console."
-msgstr "લખાણ ફાઇલમાં બધા VLC સંદેશાનો લ઼ૉગ કરો."
+msgstr ""
 
 #: modules/logger/console.c:118
-#, fuzzy
 msgid "Console log"
-msgstr "કન્સોલ"
+msgstr ""
 
 #: modules/logger/console.c:119
-#, fuzzy
 msgid "Console logger"
-msgstr "કન્સોલ"
+msgstr ""
 
 #: modules/logger/file.c:193
 msgid "HTML"
 msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Info"
-msgstr "વધારે જાણકારી"
+msgstr ""
 
 #: modules/logger/file.c:203
-#, fuzzy
 msgid "Debug"
-msgstr "ડિબગ"
+msgstr ""
 
 #: modules/logger/file.c:205
 msgid "Log to file"
@@ -22180,23 +21689,18 @@ msgid "Verbosity"
 msgstr "વર્બોસીટી"
 
 #: modules/logger/file.c:215
-#, fuzzy
 msgid ""
 "Select the logging verbosity or default to use the same verbosity given by --"
 "verbose."
 msgstr ""
-"લૉગ માટે વાપરવા વર્બોસીટીને પસંદ કરો અથવા --verbose દ્દારા આપેલ એજ વર્બોસીટીને "
-"વાપરવા -1."
 
 #: modules/logger/file.c:219
-#, fuzzy
 msgid "Logger"
-msgstr "પ્રવેશી રહ્યા છે"
+msgstr ""
 
 #: modules/logger/file.c:220
-#, fuzzy
 msgid "File logger"
-msgstr "ફાઇલ પ્રવેશ"
+msgstr ""
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -22215,9 +21719,8 @@ msgid "Emit log messages through the POSIX system log."
 msgstr ""
 
 #: modules/logger/syslog.c:141
-#, fuzzy
 msgid "Debug messages"
-msgstr "ડિબગ માસ્ક"
+msgstr ""
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -22232,19 +21735,16 @@ msgid "Process identity in system log."
 msgstr ""
 
 #: modules/logger/syslog.c:147
-#, fuzzy
 msgid "Facility"
-msgstr "ક્ષમતા"
+msgstr ""
 
 #: modules/logger/syslog.c:148
-#, fuzzy
 msgid "System logging facility."
-msgstr "Syslog સુવિધા"
+msgstr ""
 
 #: modules/logger/syslog.c:151
-#, fuzzy
 msgid "syslog"
-msgstr "syslog માં લૉગ લો"
+msgstr ""
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
@@ -22954,9 +22454,8 @@ msgid "Synthpop"
 msgstr "સીન્થપોપ"
 
 #: modules/misc/addons/fsstorage.c:83
-#, fuzzy
 msgid "addons local storage"
-msgstr "મહત્તમ સ્થાનિક બીટરેટ"
+msgstr ""
 
 #: modules/misc/addons/fsstorage.c:85
 msgid "Addons local storage installer"
@@ -22967,9 +22466,8 @@ msgid "Addons local storage lister"
 msgstr ""
 
 #: modules/misc/addons/vorepository.c:62
-#, fuzzy
 msgid "Videolan.org's addons finder"
-msgstr "વિડિઓ રૂપાંતરણ ફિલ્ટર"
+msgstr ""
 
 #: modules/misc/addons/vorepository.c:64
 msgid "addons.videolan.org addons finder"
@@ -23034,41 +22532,25 @@ msgstr ""
 "ખાતાને મેળવવા માટે http://www.last.fm/join/ ની મુલાકાત લો."
 
 #: modules/misc/fingerprinter.c:73
-#, fuzzy
 msgid "acoustid"
-msgstr "એકોસ્ટિક"
+msgstr ""
 
 #: modules/misc/fingerprinter.c:74
-#, fuzzy
 msgid "Track fingerprinter (based on Acoustid)"
-msgstr "ઇનપુટ મળ્યુ નથી"
+msgstr ""
 
 #: modules/misc/gnutls.c:485
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server is unknown and "
 "could not be authenticated by any trusted Certificate Authority."
 msgstr ""
-"તમે %s સુધી પહોચવા પ્રયત્ન કરેલ છે. છતાંપણ સર્વર દ્વારા રજુ થયેલ સુરક્ષા પ્રમાણપત્ર અજ્ઞાત છે "
-"અને કોઈપણ વિશ્વાસપાત્ર પ્રમાણપત્ર સત્તા દ્વારા સત્તાધિકરણ કરી શક્યાં નહિ. આ સમસ્યા "
-"રૂપરેખાંકન ભૂલનું કારણ બની શકે છે અથવા તમારી સુરક્ષા અથવા તમારી ખાનગી સુધી પહોચવાનો "
-"પ્રયત્ન કરે છે.\n"
-"\n"
-"જો શક હોય તો, હવે કાઢી નાખો.\n"
 
 #: modules/misc/gnutls.c:491
-#, fuzzy
 msgid ""
 "However, the security certificate presented by the server changed since the "
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
-"તમે %s સુધી પહોચવા પ્રયત્ન કરેલ છે. છતાંપણ સર્વર દ્વારા રજુ થયેલ સુરક્ષા પ્રમાણપત્રને બદલેલ છે "
-"જ્યાં સુધી પહેલાની મુલાકાત ના થાય અને કોઈપણ વિશ્વાસપાત્ર પ્રમાણપત્ર સત્તા દ્વારા "
-"સત્તાધિકરણ ન હતું. આ સમસ્યા રૂપરેખાંકન ભૂલનું કારણ બની શકે છે અથવા તમારી સુરક્ષા અથવા "
-"તમારી ખાનગી સુધી પહોચવાનો પ્રયત્ન કરે છે.\n"
-"\n"
-"જો શક હોય તો, હવે કાઢી નાખો.\n"
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23126,9 +22608,8 @@ msgid ""
 msgstr ""
 
 #: modules/misc/gnutls.c:761
-#, fuzzy
 msgid "Trust directory"
-msgstr "ટાઇમશીફ્ટ ડિરેક્ટરી"
+msgstr ""
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -23177,14 +22658,12 @@ msgid "Playing some media."
 msgstr "અમુક મીડિયાને વગાડી રહ્યા છે."
 
 #: modules/misc/inhibit/dbus.c:232
-#, fuzzy
 msgid "D-Bus screensaver"
-msgstr "XDG-સ્ક્રીનસેવર"
+msgstr ""
 
 #: modules/misc/inhibit/dbus.c:233
-#, fuzzy
 msgid "D-Bus screen saver inhibition"
-msgstr "XDG સ્ક્રીન સેવર નિષેધ"
+msgstr ""
 
 #: modules/misc/inhibit/xdg.c:37
 msgid "XDG-screensaver"
@@ -23512,13 +22991,10 @@ msgid "SDT Descriptors (requires --sout-ts-es-id-pid)"
 msgstr "SDT વર્ણનકર્તાઓ (--sout-ts-es-id-pid ની જરૂરિયાત છે)"
 
 #: modules/mux/mpeg/ts.c:125
-#, fuzzy
 msgid ""
 "Defines the descriptors of each SDT. This requires \"Set PID to ID of ES\" "
 "to be enabled."
 msgstr ""
-"દરેક SDT નાં વર્ણનકર્તાઓને વ્યાખ્યાયિત કરે છે. સક્રિય કરવા માટે આને \"ES ની ID માં PID ને "
-"સુયોજિત કરો\" ની જરૂરિયાત છે."
 
 #: modules/mux/mpeg/ts.c:128
 msgid "Set PID to ID of ES"
@@ -23684,9 +23160,8 @@ msgid "WAV muxer"
 msgstr "WAV મક્સર"
 
 #: modules/notify/osx_notifications.m:126
-#, fuzzy
 msgid "OS X Notification Plugin"
-msgstr "Growl સૂચના પ્લગઇન"
+msgstr ""
 
 #: modules/notify/osx_notifications.m:303
 msgid "New input playing"
@@ -23697,18 +23172,16 @@ msgid "Now playing"
 msgstr "હવે વગાડી રહ્યા છે"
 
 #: modules/notify/osx_notifications.m:402
-#, fuzzy
 msgid "Skip"
-msgstr "જાહેરાત છોડી દો"
+msgstr ""
 
 #: modules/notify/notify.c:55
 msgid "Timeout (ms)"
 msgstr "સમયસમાપ્તિ (ms)"
 
 #: modules/notify/notify.c:56
-#, fuzzy
 msgid "How long the notification will be displayed."
-msgstr "કેટલી લાંબી સૂચના દર્શાવેલ હશે "
+msgstr ""
 
 #: modules/notify/notify.c:61
 msgid "Notify"
@@ -23791,26 +23264,22 @@ msgid "VC-1 packetizer"
 msgstr "VC-1 પેકેટસાઇઝર"
 
 #: modules/services_discovery/avahi.c:52 modules/services_discovery/avahi.c:277
-#, fuzzy
 msgid "Zeroconf network services"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/avahi.c:56
-#, fuzzy
 msgid "Zeroconf services"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:44
 #: modules/services_discovery/bonjour.m:62
 #: modules/services_discovery/bonjour.m:398
-#, fuzzy
 msgid "Bonjour Network Discovery"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/bonjour.m:70
-#, fuzzy
 msgid "Bonjour Renderer Discovery"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/mediadirs.c:71
 #: modules/services_discovery/mediadirs.c:133
@@ -23837,14 +23306,12 @@ msgstr "મારું ચિત્ર"
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
 #: modules/services_discovery/microdns.c:644
-#, fuzzy
 msgid "mDNS Network Discovery"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/microdns.c:65
-#, fuzzy
 msgid "mDNS Renderer Discovery"
-msgstr "બોન્જોર સેવાઓ"
+msgstr ""
 
 #: modules/services_discovery/mtp.c:40 modules/services_discovery/mtp.c:44
 #: modules/services_discovery/mtp.c:96
@@ -23995,28 +23462,24 @@ msgid "Unknown type"
 msgstr "અજ્ઞાત પ્રકાર"
 
 #: modules/services_discovery/upnp.cpp:72
-#, fuzzy
 msgid "SAT>IP channel list"
-msgstr "ઓડિયો ચેનલો"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:73
 msgid "Custom SAT>IP channel list URL"
 msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Master List"
-msgstr "યાદી સાફ કરો"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Server List"
-msgstr "યાદીને તાજી કરો"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
-#, fuzzy
 msgid "Custom List"
-msgstr "વૈવિધ્ય વિકલ્પો"
+msgstr ""
 
 #: modules/services_discovery/upnp.cpp:114
 #: modules/services_discovery/upnp.cpp:121
@@ -24088,24 +23551,20 @@ msgstr ""
 "કિમંતોના સંયોજનને પણ વાપરી શકો છો, દાત 6 = ઉપર-જમણે)."
 
 #: modules/spu/audiobargraph_v.c:56
-#, fuzzy
 msgid "Bar width in pixel"
-msgstr "પિક્સેલમાં બંધિત વિડિઓની પહોળાઇ"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:57
-#, fuzzy
 msgid "Width in pixel of each bar in the BarGraph to be displayed."
-msgstr "દર્શાવવા માટે બારગ્રાફમાં દરેક પટ્ટીની પિક્સેલમાં પહોળાઇ (મૂળભૂત: 10)."
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:58
-#, fuzzy
 msgid "Bar Height in pixel"
-msgstr "પિક્સેલમાં બંધિત વિડિઓની ઊંચાઇ"
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:59
-#, fuzzy
 msgid "Height in pixel of BarGraph to be displayed."
-msgstr "દર્શાવવા માટે બારગ્રાફમાં દરેક પટ્ટીની પિક્સેલમાં પહોળાઇ (મૂળભૂત: 10)."
+msgstr ""
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
@@ -24156,9 +23615,8 @@ msgid "Logo animation # of loops"
 msgstr "લૉગોના એનિમેશન માટેના ગોળાનો #"
 
 #: modules/spu/logo.c:54
-#, fuzzy
 msgid "Number of loops for the logo animation. -1 = continuous, 0 = disabled"
-msgstr "લોગો એનીમેશન માટે ગોળાઓની સંખ્યા. -1 = સળંગ, 0 = નિષ્ક્રિય"
+msgstr ""
 
 #: modules/spu/logo.c:56
 msgid "Logo individual image time in ms"
@@ -24274,22 +23732,18 @@ msgstr ""
 "શબ્દમાળા ક્રમને વાપરી રહ્યા હોય."
 
 #: modules/spu/marq.c:109
-#, fuzzy
 msgid ""
 "Opacity (inverse of transparency) of overlayed text. 0 = transparent, 255 = "
 "totally opaque."
 msgstr ""
-"ઉપરના લખાણની અપારદર્શકતા (પારદર્શકતાનું ઊંધું). 0 = પારદર્શકતા, 255 = સંપૂર્ણ "
-"અપારદર્શકતા."
 
 #: modules/spu/marq.c:111 modules/spu/rss.c:148
 msgid "Font size, pixels"
 msgstr "ફોન્ટ માપ, પિક્સેલ"
 
 #: modules/spu/marq.c:112 modules/spu/rss.c:149
-#, fuzzy
 msgid "Font size, in pixels. Default is 0 (use default font size)."
-msgstr "ફોન્ટ માપ, પિક્સેલમાંય મૂળભૂત -1 છે (મૂળભૂત ફોન્ટ માપને વાપરો)."
+msgstr ""
 
 #: modules/spu/marq.c:116 modules/spu/rss.c:153
 msgid ""
@@ -24424,13 +23878,10 @@ msgid "Number of columns"
 msgstr "સ્તંભોની સંખ્યા"
 
 #: modules/spu/mosaic.c:131
-#, fuzzy
 msgid ""
 "Number of image columns in the mosaic (only used if positioning method is "
 "set to \"fixed\")."
 msgstr ""
-"મોઝાઇકમાં ચિત્રના કોલમોની સંખ્યા  (તોજ વપરાય જો સ્થિતિ નિર્ધારિત કરવાની પદ્ધતિ "
-"\"સુધારેલ\" પર સુયોજિત હોય)."
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24453,14 +23904,11 @@ msgid "Elements order"
 msgstr "ઘટક ક્રમ"
 
 #: modules/spu/mosaic.c:144
-#, fuzzy
 msgid ""
 "You can enforce the order of the elements on the mosaic. You must give a "
 "comma-separated list of picture ID(s). These IDs are assigned in the "
 "\"mosaic-bridge\" module."
 msgstr ""
-"તમે મોઝાઇક પર તત્વોની વ્યવસ્થા સુનિશ્ચિત કરી શકો છો. તમારે અલ્પવિરામથી છુટ્ટા પડાયેલા "
-"ચિત્રોના ID ની યાદી પૂરી પાડવી પડશે. આ ID \"mosaic-bridge\" મોડ્યુલમાં અપાય છે."
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
@@ -24534,9 +23982,8 @@ msgid "VNC poll interval"
 msgstr "VNC પોલ અંતરાલ"
 
 #: modules/spu/remoteosd.c:85
-#, fuzzy
 msgid "In this interval an update from VNC is requested, default every 300 ms."
-msgstr "આ અંતરાળમાં VNC પાસેથી સુધારા માટે વિનંતી કરાય છે, મૂળભૂત 300 ms છે."
+msgstr ""
 
 #: modules/spu/remoteosd.c:87
 msgid "VNC polling"
@@ -24797,23 +24244,20 @@ msgid "libarchive based stream extractor"
 msgstr ""
 
 #: modules/stream_filter/adf.c:42
-#, fuzzy
 msgid "ADF stream filter"
-msgstr "સ્ટ્રીમ ફિલ્ટર"
+msgstr ""
 
 #: modules/stream_filter/aribcam.c:45
 msgid "ARIB STD-B25 Cam module"
 msgstr ""
 
 #: modules/stream_filter/cache_block.c:498
-#, fuzzy
 msgid "Block stream cache"
-msgstr "ઘડિયાળ સ્ત્રોત"
+msgstr ""
 
 #: modules/stream_filter/cache_read.c:570
-#, fuzzy
 msgid "Byte stream cache"
-msgstr "સ્થાનિક રીતે સ્ટ્રીમને દર્શાવો"
+msgstr ""
 
 #: modules/stream_filter/decomp.c:62
 msgid "LZMA decompression"
@@ -24828,43 +24272,36 @@ msgid "gzip decompression"
 msgstr "gzip પ્રતિસંકોચન"
 
 #: modules/stream_filter/hds/hds.c:208
-#, fuzzy
 msgid "HTTP Dynamic Streaming"
-msgstr "HTTP જીવંત સ્ટ્રીમીંગ આઉટપુટ"
+msgstr ""
 
 #: modules/stream_filter/inflate.c:201
-#, fuzzy
 msgid "Zlib decompression filter"
-msgstr "LZMA પ્રતિસંકોચન"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:531
-#, fuzzy
 msgid "Stream prefetch filter"
-msgstr "સ્ટ્રીમ ફિલ્ટર"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:534
-#, fuzzy
 msgid "Buffer size"
-msgstr "સેકંડમાં બફર માપ"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:535
-#, fuzzy
 msgid "Prefetch buffer size (KiB)"
-msgstr "UDP એ બફર માપને પ્રાપ્ત કરે છે (bytes)"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
 msgstr "માપને વાંચો"
 
 #: modules/stream_filter/prefetch.c:538
-#, fuzzy
 msgid "Prefetch background read size (bytes)"
-msgstr "UDP એ બફર માપને પ્રાપ્ત કરે છે (bytes)"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:540
-#, fuzzy
 msgid "Seek threshold"
-msgstr "ફિલ્ટર થ્રેશોલ્ડ"
+msgstr ""
 
 #: modules/stream_filter/prefetch.c:541
 msgid "Prefetch forward seek threshold (bytes)"
@@ -24943,16 +24380,12 @@ msgid "Fallback to placeholder stream when out of data"
 msgstr "માહિતી ખૂટી જાય તો સ્થળ ધારક સ્ટ્રીમ પર પાછા ફરો"
 
 #: modules/stream_out/bridge.c:67
-#, fuzzy
 msgid ""
 "If set to true, the bridge will discard all input elementary streams except "
 "if it doesn't receive data from another bridge-in. This can be used to "
 "configure a place holder stream when the real source breaks. Source and "
 "placeholder streams should have the same format."
 msgstr ""
-"જો true તરીકે સુયોજિત હોય તો, બ્રીજ બધા ઈનપુટ પ્રાથમિક સ્ટ્રીમને કાઢી નાખશે જો બીજા "
-"બ્રિજ-ઇન માંથી માહિતીને પ્રાપ્ત કરતા ના હોય તો. આ પ્લેસ હોલ્ડર સ્ટ્રીમને વાપરી શકાય છે "
-"જયારે સાચો સ્ત્રોત તૂટે તો. સ્ત્રોત અને સ્થળ ધારકની સ્ટ્રીમ પાસે એજ બંધારણ હોવું જોઈએ. "
 
 #: modules/stream_out/bridge.c:72
 msgid "Placeholder delay"
@@ -24994,24 +24427,20 @@ msgid "Bridge in"
 msgstr "બ્રિજ ઇન"
 
 #: modules/stream_out/chromaprint.c:57
-#, fuzzy
 msgid "Duration of the fingerprinting"
-msgstr "મીરરીંગની દિશા"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:58
-#, fuzzy
 msgid "Default: 90sec"
-msgstr "મૂળભૂત સ્ટ્રીમ"
+msgstr ""
 
 #: modules/stream_out/chromaprint.c:61
-#, fuzzy
 msgid "Chromaprint stream output"
-msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:188
-#, fuzzy
 msgid "HTTP port"
-msgstr "SFTP પોર્ટ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:189
 msgid ""
@@ -25021,18 +24450,16 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
-#, fuzzy
 msgid "Performance warning"
-msgstr "પ્રભાવ વિકલ્પો"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:193
-#, fuzzy
 msgid "Enable Audio passthrough"
-msgstr "ઓડિયો સ્ટ્રીમ આઉટપુટને સક્રિય કરો"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:194
 msgid "Disable if your receiver does not support Dolby®."
@@ -25055,42 +24482,36 @@ msgid "Low CPU (low quality but high bandwidth)"
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
-#, fuzzy
 msgid "Conversion quality"
-msgstr "રેન્ડરીંગ ગુણવત્તા"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:226
-#, fuzzy
 msgid "IP Address of the Chromecast."
-msgstr "તેમાં સ્ટ્રીમ કરવા માટે કમ્પ્યૂટરનું સરનામું."
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:227
-#, fuzzy
 msgid "Chromecast port"
-msgstr "ક્રોમા બંધારણ"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:228
 msgid "The port used to talk to the Chromecast."
 msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:238
-#, fuzzy
 msgid "Chromecast"
-msgstr "ક્રોમા"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:239
-#, fuzzy
 msgid "Chromecast stream output"
-msgstr "સ્ટ્રીમ આઉટપુટને ભેગુ કરી રહ્યા છે"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1201
-#, fuzzy
 msgid "Ok, Don't warn me again"
-msgstr "સોફ્ટવેર ગેઇન"
+msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:1203
 msgid ""
@@ -25099,18 +24520,16 @@ msgid ""
 msgstr ""
 
 #: modules/stream_out/chromecast/chromecast_demux.cpp:540
-#, fuzzy
 msgid "Chromecast demux wrapper"
-msgstr "Avformat ડિમક્સર"
+msgstr ""
 
 #: modules/stream_out/cycle.c:325
 msgid "cycle"
 msgstr ""
 
 #: modules/stream_out/cycle.c:326
-#, fuzzy
 msgid "Cyclic stream output"
-msgstr "નકલી સ્ટ્રીમ આઉટપુટ"
+msgstr ""
 
 #: modules/stream_out/delay.c:39 modules/stream_out/setid.c:41
 msgid "Elementary Stream ID"
@@ -25651,32 +25070,24 @@ msgstr ""
 "સ્ટ્રીમ માટે વાપરવાનું લક્ષ્યસ્થાન (URL). પથ અને બાઈન્ડ પરિમાણોને બિનઅસરકારક બનાવે છે"
 
 #: modules/stream_out/standard.c:51
-#, fuzzy
 msgid "Address to bind to (helper setting for dst)"
-msgstr "બાઇન્ડ કરવા માટે સરનામું (dst માટે મદદકર્તા સુયોજન)"
+msgstr ""
 
 #: modules/stream_out/standard.c:53
-#, fuzzy
 msgid ""
 "address:port to bind vlc to listening incoming streams. Helper setting for "
 "dst, dst=bind+'/'+path. dst-parameter overrides this."
 msgstr ""
-"સરનામું: vlc ને અંદર આવત સ્ટ્રીમોને સંભાળવા માટે બાઈન્ડ કરવા માટેનું પોર્ટ dst,dst=bind"
-"+'/'+path માટે મદદનીશ સુયોજન. dst-પરિમાણ એને બિનઅસરકારક બનાવશે"
 
 #: modules/stream_out/standard.c:55
-#, fuzzy
 msgid "Filename for stream (helper setting for dst)"
-msgstr "સ્ટ્રીમ માટે ફાઇલનામ (dst માટે મદદકર્તા સુયોજન)"
+msgstr ""
 
 #: modules/stream_out/standard.c:57
-#, fuzzy
 msgid ""
 "Filename for stream. Helper setting for dst, dst=bind+'/'+path. dst-"
 "parameter overrides this."
 msgstr ""
-"dst, dst=bind+'/'+path, dst-parameter પરિમાણ માટે સ્ટ્રીમ મદદકર્તા સુયોજનો માટે "
-"ફાઈલનામ આની પર લખાય છે"
 
 #: modules/stream_out/standard.c:93
 msgid "Standard stream output"
@@ -25836,16 +25247,12 @@ msgid "This is the subtitle codec that will be used."
 msgstr "આ ઉપશીર્ષક કોડેક છે કે જે વાપરેલ હશે."
 
 #: modules/stream_out/transcode/transcode.c:118
-#, fuzzy
 msgid ""
 "This allows you to add overlays (also known as \"subpictures\") on the "
 "transcoded video stream. The subpictures produced by the filters will be "
 "overlayed directly onto the video. You can specify a colon-separated list of "
 "subpicture modules."
 msgstr ""
-"આ ટ્રાન્સકોડેડ વિડિઓ સ્ટ્રીમ પર (\"ઉપચિત્ર\" તરીકે જાણીતા છે તેવા ઓવરલેને ઉમેરવા માટે તમને "
-"પરવાનગી આપે છે. ફિલ્ટર દ્વારા પેદા થયેલ ઉપચિત્રો સીધા વિડિઓમાં ઓવરલે થયેલ છે. તમે ઉપચિત્ર "
-"મોડ્યુલોની વિરામચિહ્નથી અલગ થયેલ યાદીને સ્પષ્ટ કરી શકો છો "
 
 #: modules/stream_out/transcode/transcode.c:123
 msgid "Number of threads"
@@ -25865,9 +25272,8 @@ msgid ""
 msgstr "VIDEO ને બદલે OUTPUT પ્રાધાન્ય પર વૈકલ્પિક એનકોડર થ્રેડને ચલાવે છે."
 
 #: modules/stream_out/transcode/transcode.c:130
-#, fuzzy
 msgid "Picture pool size"
-msgstr "ચિત્ર માપનું જૂથ"
+msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
@@ -25888,13 +25294,10 @@ msgid "Overlays/Subtitles"
 msgstr "ઓવરલે /ઉપશીર્ષક"
 
 #: modules/text_renderer/freetype/fonts/fontconfig.c:79
-#, fuzzy
 msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
-"મહેરબાની કરીને જ્યારે તમારાં ફોન્ટ કેશ ફરી બને ત્યારે રાહ જુઓ.\n"
-"આને એક મિનિટ કરતા ઓછો સમય લાગવો જોઇએ."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -25926,13 +25329,10 @@ msgid "Text opacity"
 msgstr "લખાણ પારદર્શકતા"
 
 #: modules/text_renderer/freetype/freetype.c:92
-#, fuzzy
 msgid ""
 "The opacity (inverse of transparency) of the text that will be rendered on "
 "the video. 0 = transparent, 255 = totally opaque."
 msgstr ""
-"વિડિઓ પર રેન્ડર કરવામાં આવશે કે જે લખાણ આ અસ્પષ્ટ (પારદર્શકતા વ્યસ્ત). 0 = પારદર્શક, 255 "
-"= તદ્દન અપારદર્શક. "
 
 #: modules/text_renderer/freetype/freetype.c:95
 msgid "Text default color"
@@ -25990,9 +25390,8 @@ msgid "Shadow distance"
 msgstr "પડછાયો અંતર"
 
 #: modules/text_renderer/freetype/freetype.c:118
-#, fuzzy
 msgid "Text direction"
-msgstr "લખાણ સ્થાન"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
@@ -26019,14 +25418,12 @@ msgid "Thick"
 msgstr "ઝાડુ"
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Left to right"
-msgstr "ડાબે થી જમણે/ઉપર થી નીચે"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:151
-#, fuzzy
 msgid "Right to left"
-msgstr "જમણે થી ડાબે/નીચે થી ઉપર"
+msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
@@ -26172,14 +25569,12 @@ msgid "YUVP converter"
 msgstr "YUVP રૂપાંતરક"
 
 #: modules/video_filter/adjust.c:67
-#, fuzzy
 msgid "Image hue (-180..180)"
-msgstr "છબી રંગ (0-360)"
+msgstr ""
 
 #: modules/video_filter/adjust.c:68
-#, fuzzy
 msgid "Set the image hue, between -180 and 180. Defaults to 0."
-msgstr "છબી રંગને સુયોજિત કરો, 0 અને 360 વચ્ચે. મૂળભૂત 0 છે."
+msgstr ""
 
 #: modules/video_filter/adjust.c:77
 msgid "Image properties filter"
@@ -26262,18 +25657,16 @@ msgid "Ball speed"
 msgstr "બોલ ઝડપ"
 
 #: modules/video_filter/ball.c:104
-#, fuzzy
 msgid "Set ball speed, the displacement value in number of pixels by frame."
-msgstr "બોલની ગતિ, ખસવાની કિંમત ફ્રેમ દીઠ પિક્સેલની સંખ્યામા સુયોજિત કરો."
+msgstr ""
 
 #: modules/video_filter/ball.c:107
 msgid "Ball size"
 msgstr "બોલ માપ"
 
 #: modules/video_filter/ball.c:108
-#, fuzzy
 msgid "Set ball size giving its radius in number of pixels"
-msgstr "બોલની ત્રિજ્યાનું માપ પિક્સેલની સંખ્યામા આપી એનું માપ સુયોજિત કરો."
+msgstr ""
 
 #: modules/video_filter/ball.c:111
 msgid "Gradient threshold"
@@ -26496,9 +25889,8 @@ msgid ""
 msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
-#, fuzzy
 msgid "Mac OS X hardware video filters"
-msgstr "વિડ઼િઓ ફિલ્ટરની તીવ્રતા વધારો"
+msgstr ""
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -26686,14 +26078,12 @@ msgid "Deinterlacing video filter"
 msgstr "વિડિઓ ફિલ્ટરને અમિશ્રિત કરી રહ્યા છે"
 
 #: modules/video_filter/edgedetection.c:39
-#, fuzzy
 msgid "Edge detection video filter"
-msgstr "ગતિ શોધ વિડિઓ ફિલ્ટર"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:40
-#, fuzzy
 msgid "Edge detection"
-msgstr "ફાઇલ પસંદગી"
+msgstr ""
 
 #: modules/video_filter/edgedetection.c:42
 msgid "Detects edges in the frame and highlights them in white."
@@ -26736,14 +26126,12 @@ msgid "Extract RGB component video filter"
 msgstr "RGB ઘટક વિડિઓ ફિલ્ટરને કાઢી નાંખો"
 
 #: modules/video_filter/fps.c:45
-#, fuzzy
 msgid "FPS conversion video filter"
-msgstr "દૃશ્ય વિડિઓ ફિલ્ટર"
+msgstr ""
 
 #: modules/video_filter/fps.c:46
-#, fuzzy
 msgid "FPS Converter"
-msgstr "YUVP રૂપાંતરક"
+msgstr ""
 
 #: modules/video_filter/freeze.c:78
 msgid "Freezing interactive video filter"
@@ -26913,10 +26301,9 @@ msgid "Mirror orientation"
 msgstr "મિરર દિશા"
 
 #: modules/video_filter/mirror.c:65
-#, fuzzy
 msgid ""
 "Defines orientation of the mirror splitting. Can be vertical or horizontal."
-msgstr "મિરરના વિભાજનની દિશાને વ્યાખ્યાયિત કરે છે.     આડું અથવા ઊભું હોઈ શકે છે"
+msgstr ""
 
 #: modules/video_filter/mirror.c:69
 msgid "Vertical"
@@ -26931,9 +26318,8 @@ msgid "Direction"
 msgstr "દિશા"
 
 #: modules/video_filter/mirror.c:72
-#, fuzzy
 msgid "Direction of the mirroring."
-msgstr "મીરરીંગની દિશા"
+msgstr ""
 
 #: modules/video_filter/mirror.c:75
 msgid "Left to right/Top to bottom"
@@ -27000,9 +26386,8 @@ msgid "Use input chroma unaltered"
 msgstr "બદલેલ ન હોય તેવાં ઇનપુટ ક્રોમાને વાપરો"
 
 #: modules/video_filter/opencv_wrapper.c:62
-#, fuzzy
 msgid "I420 - first plane is grayscale"
-msgstr "I420 - પ્રથમ પ્લેન ગ્રેસ્કેલ છે"
+msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:62
 msgid "RGB32"
@@ -27045,11 +26430,10 @@ msgid "Scale factor (0.1-2.0)"
 msgstr "માપ ફેક્ટર (0.1-2.0)"
 
 #: modules/video_filter/opencv_wrapper.c:82
-#, fuzzy
 msgid ""
 "Amount by which to scale the picture before sending it to the internal "
 "OpenCV filter"
-msgstr "આંતરિક OpenCV ફિલ્ટરને મોકલતા પેહલા ચિત્રનું માપ બદલવાની સંખ્યા"
+msgstr ""
 
 #: modules/video_filter/opencv_wrapper.c:85
 msgid "OpenCV filter chroma"
@@ -27426,9 +26810,8 @@ msgid "ASCII-art video output"
 msgstr "ASCII-art વિડિઓ આઉટપુટ"
 
 #: modules/video_output/android/window.c:50
-#, fuzzy
 msgid "Android Window"
-msgstr "એન્ડ્રોઇડ મૂળ વિન્ડો"
+msgstr ""
 
 #: modules/video_output/android/window.c:51
 msgid "Android native window"
@@ -27459,9 +26842,8 @@ msgid "Active Format Descriptor value"
 msgstr ""
 
 #: modules/video_output/decklink.cpp:76
-#, fuzzy
 msgid "Aspect Ratio of the source picture."
-msgstr "મોઝેક ચિત્રની પારદર્શકતા."
+msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
@@ -27472,9 +26854,8 @@ msgid "VBI line on which to output Active Format Descriptor."
 msgstr ""
 
 #: modules/video_output/decklink.cpp:81
-#, fuzzy
 msgid "Picture to display on input signal loss"
-msgstr "ચિત્ર ઇનપુટ સંકેત નુકશાન પર પ્રદર્શિત કરવા માટે."
+msgstr ""
 
 #: modules/video_output/decklink.cpp:84
 msgid "Output card"
@@ -27525,34 +26906,28 @@ msgid "DecklinkOutput"
 msgstr "ડેકલીંકઆઉટપુટ"
 
 #: modules/video_output/decklink.cpp:235
-#, fuzzy
 msgid "Output module to write to Blackmagic SDI card"
-msgstr "બ્લેકમેજીક SDI કાર્ડમાં લખવા માટે આઉટપુટ મોડ્યુલ"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:236
-#, fuzzy
 msgid "DeckLink General Options"
-msgstr "ડેકલીંક સામાન્ય વિકલ્પો"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:241
-#, fuzzy
 msgid "DeckLink Video Output module"
-msgstr "ડેકલીંક વિડિઓ આઉટપુટ મોડ્યુલ"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:246
-#, fuzzy
 msgid "DeckLink Video Options"
-msgstr "ડેકલીંક વિડિઓ વિકલ્પો"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:269
-#, fuzzy
 msgid "DeckLink Audio Output module"
-msgstr "ડેકલીંક ઓડિયો આઉટપુટ મોડ્યુલ"
+msgstr ""
 
 #: modules/video_output/decklink.cpp:274
-#, fuzzy
 msgid "DeckLink Audio Options"
-msgstr "ડેકલીંક ઓડિયો વિકલ્પો"
+msgstr ""
 
 #: modules/video_output/drawable.c:34
 msgid "Window handle (HWND)"
@@ -27755,19 +27130,16 @@ msgid "Recommended video output for Windows Vista and later versions"
 msgstr "વિન્ડોસ વિસ્તા અને તાજેતરની આવૃત્તિઓ માટે અગ્રહણીય વિડિઓ આઉટપુટ"
 
 #: modules/video_output/win32/direct3d9.c:91
-#, fuzzy
 msgid "Direct3D9 video output"
-msgstr "Direct3D  વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:71
-#, fuzzy
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr "વિન્ડોસ વિસ્તા અને તાજેતરની આવૃત્તિઓ માટે અગ્રહણીય વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/video_output/win32/direct3d11.c:78
-#, fuzzy
 msgid "Direct3D11 video output"
-msgstr "Direct3D  વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/video_output/win32/directdraw.c:65
 #: modules/gui/qt/ui/sprefs_video.h:321
@@ -27851,9 +27223,8 @@ msgid "Wallpaper"
 msgstr "વોલપેપર"
 
 #: modules/video_output/win32/glwin32.c:51
-#, fuzzy
 msgid "OpenGL video output for Windows"
-msgstr "OpenGL વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/video_output/win32/wingdi.c:52
 msgid "Windows GDI video output"
@@ -27864,9 +27235,8 @@ msgid "GPU affinity"
 msgstr "GPU એફીનીટી"
 
 #: modules/video_output/win32/wgl.c:46
-#, fuzzy
 msgid "WGL extension for OpenGL"
-msgstr "OpenGL માટે EGL એક્સટેન્શન"
+msgstr ""
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -27923,18 +27293,15 @@ msgstr "વિડિઓ મેમરી"
 
 #: modules/video_output/wayland/shell.c:405
 #: modules/video_output/wayland/xdg-shell.c:374
-#, fuzzy
 msgid "Wayland display"
-msgstr "X11 દર્શાવ"
+msgstr ""
 
 #: modules/video_output/wayland/shell.c:407
 #: modules/video_output/wayland/xdg-shell.c:376
-#, fuzzy
 msgid ""
 "Video will be rendered with this Wayland display. If empty, the default "
 "display will be used."
 msgstr ""
-"વિડિઓ આ X11 દર્શાવ સાથે રેન્ડર થયેલ હશે. જો ખાલી હોય તો, મૂળભૂત દર્શાવ વાપરેલ હશે."
 
 #: modules/video_output/wayland/shell.c:411
 msgid "WL shell"
@@ -27949,9 +27316,8 @@ msgid "WL SHM"
 msgstr ""
 
 #: modules/video_output/wayland/shm.c:509
-#, fuzzy
 msgid "Wayland shared memory video output"
-msgstr "ગ્રેસ્કેલ વિડિઓ આઉટપુટ"
+msgstr ""
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28057,23 +27423,18 @@ msgid "Chroma used"
 msgstr "ક્રોમા વાપરેલ છે"
 
 #: modules/video_output/yuv.c:46
-#, fuzzy
 msgid "Force use of a specific chroma for output."
-msgstr "આઉટપુટ માટે ખાસ ક્રોમાને વાપરવા દબાણ કરો. મૂળભૂત I420 છે."
+msgstr ""
 
 #: modules/video_output/yuv.c:48
-#, fuzzy
 msgid "Add a YUV4MPEG2 header"
-msgstr "WAVE હેડરને ઉમેરો"
+msgstr ""
 
 #: modules/video_output/yuv.c:49
-#, fuzzy
 msgid ""
 "The YUV4MPEG2 header is compatible with mplayer yuv video output and "
 "requires YV12/I420 fourcc."
 msgstr ""
-"YUV4MPEG2 હેડર એ mplayer yuv વિડિઓ આઉટપુટ સાથે સુસંગત છે અને YV12/I420 fourcc ની "
-"જરૂરિયાત છે. મૂળભૂત રીતે આઉટપુટ લક્ષ્યમાં ચિત્ર માળખાના fourcc  ને લખે છે."
 
 #: modules/video_output/yuv.c:58
 msgid "YUV output"
@@ -28348,24 +27709,20 @@ msgid "Image wall"
 msgstr "છબી દિવાલ"
 
 #: modules/visualization/glspectrum.c:56
-#, fuzzy
 msgid "The width of the visualization window, in pixels."
-msgstr "વિડિઓ વિન્ડોની પહોળાઇ, પિક્સેલમાં."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:59
-#, fuzzy
 msgid "The height of the visualization window, in pixels."
-msgstr "વિડિઓ વિન્ડોની ઊંચાઇ, પિક્સેલમાં."
+msgstr ""
 
 #: modules/visualization/glspectrum.c:62
-#, fuzzy
 msgid "glSpectrum"
-msgstr "વર્ણપટ"
+msgstr ""
 
 #: modules/visualization/glspectrum.c:63
-#, fuzzy
 msgid "3D OpenGL spectrum visualization"
-msgstr "હાલની કલ્પના"
+msgstr ""
 
 #: modules/visualization/goom.c:46
 msgid "Goom display width"
@@ -28505,22 +27862,18 @@ msgid "Kaiser window parameter"
 msgstr "કૈસર વિન્ડો પરિમાણ"
 
 #: modules/visualization/visual/visual.c:67
-#, fuzzy
 msgid ""
 "The parameter alpha for the Kaiser window. Increasing alpha increases the "
 "main-lobe width and decreases the side-lobe amplitude."
 msgstr ""
-"કાઈઝર વિન્ડો માટે આલ્ફા પરિમાણ. આલ્ફા વધારવાથી મુખ્ય-લોબની પોહળાઈ વધે છે અને બાજુના-"
-"લોબનું કંપ-વિસ્તાર ઘટે છે."
 
 #: modules/visualization/visual/visual.c:70
 msgid "Show 80 bands instead of 20"
 msgstr "20 ની જગ્યાએ 80 બેન્ડ બતાવો"
 
 #: modules/visualization/visual/visual.c:72
-#, fuzzy
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
-msgstr "સ્પેક્ટ્રોમીટર માટે વધારે બેન્ડ : 80 જો સક્રિય હોય તો નહિ તો  20."
+msgstr ""
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -28611,9 +27964,8 @@ msgid "Hann"
 msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
-#, fuzzy
 msgid "Flat Top"
-msgstr "ટોચ પર તરો"
+msgstr ""
 
 #: modules/visualization/visual/window_presets.h:34
 msgid "Blackman-Harris"
@@ -28894,9 +28246,8 @@ msgid "Start Time"
 msgstr "શરૂઆતનો સમય"
 
 #: modules/gui/qt/ui/open.h:273
-#, fuzzy
 msgid "Stop Time"
-msgstr "સમય બંધ કરો"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28923,9 +28274,8 @@ msgid "HH'H':mm'm':ss's'.zzz"
 msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
-#, fuzzy
 msgid "Change the stop time for the media"
-msgstr "મીડિયા માટે શરૂઆતનો સમય બદલો"
+msgstr ""
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
@@ -29024,9 +28374,8 @@ msgid "FLAC"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:703
-#, fuzzy
 msgid "MP&4/MOV"
-msgstr "MP4/MOV"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:704
 msgid "Ogg/Ogm"
@@ -29037,9 +28386,8 @@ msgid "M&KV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
-#, fuzzy
 msgid "M&JPEG"
-msgstr "MJPEG"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -29050,9 +28398,8 @@ msgid "F&LV"
 msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:709
-#, fuzzy
 msgid "&MPEG-TS"
-msgstr "MPEG-TS"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:710
 msgid "RAW"
@@ -29067,9 +28414,8 @@ msgid "Webm"
 msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
-#, fuzzy
 msgid "MPEG &1"
-msgstr "MPEG 1"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29100,9 +28446,8 @@ msgid "Menus"
 msgstr "મેનુ"
 
 #: modules/gui/qt/ui/profiles.h:730
-#, fuzzy
 msgid "Fra&me Rate"
-msgstr "ચોકઠાંનો દર"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:731
 msgid "Same as source"
@@ -29117,9 +28462,8 @@ msgid "Custom options"
 msgstr "વૈવિધ્ય વિકલ્પો"
 
 #: modules/gui/qt/ui/profiles.h:735
-#, fuzzy
 msgid "&Quality"
-msgstr "ગુણવત્તા"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
@@ -29142,14 +28486,12 @@ msgid "px"
 msgstr "px"
 
 #: modules/gui/qt/ui/profiles.h:758
-#, fuzzy
 msgid "Sa&mple Rate"
-msgstr "નમૂના દર"
+msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:766
-#, fuzzy
 msgid "Profile &Name"
-msgstr "રૂપરેખા નામ"
+msgstr ""
 
 #: modules/gui/qt/ui/sout.h:203
 msgid "Set up media sources to stream"
@@ -29285,7 +28627,7 @@ msgstr "H.264 ઇન-લુપ ડીબ્લોકીંગ ફિલ્ટર
 
 #: modules/gui/qt/ui/sprefs_input.h:362
 msgid "x264 preset and tuning selection"
-msgstr "x264 પ્રીસેટ અને ટુનિંગ પસંદગી"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_input.h:364
 msgid "Optical drive"
@@ -29372,11 +28714,8 @@ msgid "Show systray icon"
 msgstr "systray ચિહ્ને બતાવો"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
-#, fuzzy
 msgid "Auto raising the interface:"
 msgstr ""
-"તમે કયું તી ૪ વાપરી રહ્યા છો \n"
-"\n"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29467,9 +28806,8 @@ msgid "Add a background"
 msgstr "પાશ્વભાગ ઉમેરો"
 
 #: modules/gui/qt/ui/sprefs_video.h:316
-#, fuzzy
 msgid "O&utput"
-msgstr "આઉટપુટ"
+msgstr ""
 
 #: modules/gui/qt/ui/sprefs_video.h:320
 msgid "DirectX"
