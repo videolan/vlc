@@ -347,7 +347,6 @@ typedef struct {
     bool window_fullscreen;
     bool ch_wm_state;
     unsigned wm_state;
-    unsigned wm_state_initial;
 #endif
     bool ch_sar;
     vlc_rational_t sar;
@@ -787,13 +786,10 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         }
 #if defined(_WIN32) || defined(__OS2__)
         /* */
-        if (ch_wm_state) {
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, wm_state)) {
-                msg_Err(vd, "Failed to set on top");
-                wm_state = osys->wm_state;
-            }
-            osys->wm_state_initial = wm_state;
-        }
+        if (ch_wm_state
+         && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
+                                 wm_state))
+            msg_Err(vd, "Failed to set on top");
 #endif
         /* */
         if (osys->ch_sar) {
@@ -1111,7 +1107,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                            source, &cfg_windowed);
     }
 
-    osys->wm_state_initial = VOUT_WINDOW_STATE_NORMAL;
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
 #endif
