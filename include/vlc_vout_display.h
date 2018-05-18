@@ -320,9 +320,11 @@ static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_PICTURES_INVALID);
 }
+
+VLC_DEPRECATED /* Use vout_window_ReportClose() in window provider instead. */
 static inline void vout_display_SendEventClose(vout_display_t *vd)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_CLOSE);
+    vout_window_ReportClose(vd->cfg->window);
 }
 
 #if defined(_WIN32) || defined(__OS2__)
