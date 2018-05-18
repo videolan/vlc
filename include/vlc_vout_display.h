@@ -313,10 +313,13 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
     va_end(args);
 }
 
-static inline void vout_display_SendEventDisplaySize(vout_display_t *vd, int width, int height)
+VLC_DEPRECATED /* Use vout_window_ReportSize() in window provider instead. */
+static inline void vout_display_SendEventDisplaySize(vout_display_t *vd,
+                                                     int width, int height)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_DISPLAY_SIZE, width, height);
+    vout_window_ReportSize(vd->cfg->window, width, height);
 }
+
 static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_PICTURES_INVALID);
