@@ -325,11 +325,15 @@ static inline void vout_display_SendEventClose(vout_display_t *vd)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_CLOSE);
 }
+
+#if defined(_WIN32) || defined(__OS2__)
+VLC_DEPRECATED
+/* Use vout_window_ReportKeyPress() in window provider instead. */
 static inline void vout_display_SendEventKey(vout_display_t *vd, int key)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_KEY, key);
+    vout_window_ReportKeyPress(vd->cfg->window, key);
 }
-#if defined(_WIN32) || defined(__OS2__)
+
 static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen,
                                                     bool is_window_fullscreen)
 {
