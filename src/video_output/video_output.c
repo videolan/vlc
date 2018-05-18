@@ -1638,7 +1638,7 @@ static int ThreadReinit(vout_thread_t *vout,
         state.cfg.display.sar.num = 1;
         state.cfg.display.sar.den = 1;
     }
-    if (state.cfg.zoom.num <= 0 || state.cfg.zoom.den <= 0) {
+    if (state.cfg.zoom.num == 0 || state.cfg.zoom.den == 0) {
         state.cfg.zoom.num = 1;
         state.cfg.zoom.den = 1;
     }

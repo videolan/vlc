@@ -94,8 +94,8 @@ typedef struct {
      * It will be applied to the whole display if b_display_filled is set, otherwise
      * only on the video source */
     struct {
-        int num;
-        int den;
+        unsigned num;
+        unsigned den;
     } zoom;
 
     vlc_viewpoint_t viewpoint;
