@@ -28,6 +28,7 @@
 # include "config.h"
 #endif
 #include <assert.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_video_splitter.h>
@@ -379,7 +380,7 @@ typedef struct {
         mtime_t last_pressed;
     } mouse;
 
-    bool reset_pictures;
+    atomic_bool reset_pictures;
 
     signed char fit_window;
 
@@ -622,13 +623,8 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID: {
         msg_Warn(vd, "VoutDisplayEvent 'pictures invalid'");
-
-        /* */
         assert(vd->info.has_pictures_invalid);
-
-        vlc_mutex_lock(&osys->lock);
-        osys->reset_pictures = true;
-        vlc_mutex_unlock(&osys->lock);
+        atomic_store(&osys->reset_pictures, true);
         break;
     }
     default:
@@ -697,7 +693,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
     bool reset_render = false;
     for (;;) {
-
         vlc_mutex_lock(&osys->lock);
 #if defined(_WIN32) || defined(__OS2__)
         bool ch_fullscreen  = osys->ch_fullscreen;
@@ -714,15 +709,10 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         int  display_height        = osys->display_height;
         osys->ch_display_size = false;
 
-        bool reset_pictures;
-        if (allow_reset_pictures) {
-            reset_pictures = osys->reset_pictures;
-            osys->reset_pictures = false;
-        } else {
-            reset_pictures = false;
-        }
-
         vlc_mutex_unlock(&osys->lock);
+
+        bool reset_pictures = allow_reset_pictures
+            && atomic_exchange(&osys->reset_pictures, false);
 
         if (!ch_display_size &&
             !reset_pictures &&
@@ -891,11 +881,7 @@ bool vout_AreDisplayPicturesInvalid(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    vlc_mutex_lock(&osys->lock);
-    const bool reset_pictures = osys->reset_pictures;
-    vlc_mutex_unlock(&osys->lock);
-
-    return reset_pictures;
+    return atomic_load(&osys->reset_pictures);
 }
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)
@@ -1077,6 +1063,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->vout = vout;
     osys->is_splitter = is_splitter;
 
+    atomic_init(&osys->reset_pictures, false);
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
