@@ -500,7 +500,6 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
     bool b_hw_accel = 0;
     FOURCC i_kva_fourcc;
     int i_chroma_shift;
-    char sz_title[ 256 ];
     RECTL rcl;
     int w, h;
 
@@ -633,16 +632,15 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         return VLC_ENOMEM;
     }
 
-    if (vd->cfg->display.title)
-        snprintf( sz_title, sizeof( sz_title ), "%s", vd->cfg->display.title );
-    else
-        snprintf( sz_title, sizeof( sz_title ),
-                  "%s (%4.4s to %4.4s - %s mode KVA output)",
-                  VOUT_TITLE,
-                  ( char * )&vd->fmt.i_chroma,
-                  ( char * )&sys->kvas.fccSrcColor,
-                  psz_video_mode[ sys->kvac.ulMode - 1 ]);
-    WinSetWindowText( sys->frame, sz_title );
+    char *title = var_InheritString( vd, "video-title" );
+    if (title != NULL
+     || asprintf( &title, VOUT_TITLE " (%4.4s to %4.4s - %s mode KVA output)",
+                  (char *)&vd->fmt.i_chroma, (char *)&sys->kvas.fccSrcColor,
+                  psz_video_mode[sys->kvac.ulMode - 1] ) >= 0)
+    {
+        WinSetWindowText( sys->frame, title );
+        free( title );
+    }
 
     sys->cursor_timeout = var_InheritInteger( vd, "mouse-hide-timeout" )
                           * (CLOCK_FREQ / 1000);

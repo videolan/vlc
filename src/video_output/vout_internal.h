@@ -88,7 +88,6 @@ struct vout_thread_sys_t
 
     /* */
     struct {
-        char           *title;
         vout_display_t *vd;
         bool           use_dr;
     } display;

@@ -577,7 +577,7 @@ void vout_ControlChangeViewpoint(vout_thread_t *vout,
 }
 
 /* */
-static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
+static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     /* Load configuration */
     cfg->window = vout->p->window;
@@ -587,7 +587,6 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
 #endif
     cfg->viewpoint = vout->p->original.pose;
 
-    cfg->display.title = title;
     const int display_width = var_GetInteger(vout, "width");
     const int display_height = var_GetInteger(vout, "height");
     cfg->display.width   = display_width > 0  ? display_width  : 0;
@@ -1492,7 +1491,7 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
 
     vout_display_state_t state_default;
     if (!state) {
-        VoutGetDisplayCfg(vout, &state_default.cfg, vout->p->display.title);
+        VoutGetDisplayCfg(vout, &state_default.cfg);
 
 #if defined(_WIN32) || defined(__OS2__)
         bool below = var_InheritBool(vout, "video-wallpaper");

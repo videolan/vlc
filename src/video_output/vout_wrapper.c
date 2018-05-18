@@ -54,9 +54,6 @@ int vout_OpenWrapper(vout_thread_t *vout,
     msg_Dbg(vout, "Opening vout display wrapper");
 
     /* */
-    sys->display.title = var_InheritString(vout, "video-title");
-
-    /* */
     char *modlist = var_InheritString(vout, "vout");
 
     if (splitter_name)
@@ -65,10 +62,8 @@ int vout_OpenWrapper(vout_thread_t *vout,
         sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, modlist);
     free(modlist);
 
-    if (!sys->display.vd) {
-        free(sys->display.title);
+    if (!sys->display.vd)
         return VLC_EGENERIC;
-    }
 
     /* */
 #ifdef _WIN32
@@ -95,7 +90,6 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
     sys->decoder_pool = NULL; /* FIXME remove */
 
     vout_DeleteDisplay(sys->display.vd, state);
-    free(sys->display.title);
 }
 
 /*****************************************************************************

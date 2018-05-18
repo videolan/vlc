@@ -73,9 +73,6 @@ typedef struct {
 
     /* Display properties */
     struct {
-        /* Window title (may be NULL) */
-        const char *title;
-
         /* Display size */
         unsigned  width;
         unsigned  height;

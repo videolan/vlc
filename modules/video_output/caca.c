@@ -461,12 +461,10 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-    if (vd->cfg->display.title)
-        caca_set_display_title(sys->dp,
-                               vd->cfg->display.title);
-    else
-        caca_set_display_title(sys->dp,
-                               VOUT_TITLE "(Colour AsCii Art)");
+    char *title = var_InheritString(vd, "video-title");
+    caca_set_display_title(sys->dp,
+        (title != NULL) ? title : VOUT_TITLE "(Colour AsCii Art)");
+    free(title);
 
     block_fifo_t *fifo = block_FifoNew();
     if (likely(fifo != NULL)) {
