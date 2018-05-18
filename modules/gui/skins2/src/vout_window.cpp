@@ -27,6 +27,7 @@
 #include "theme.hpp"
 #include "os_factory.hpp"
 #include "os_graphics.hpp"
+#include "os_timer.hpp"
 #include "os_window.hpp"
 #include "../events/evt_key.hpp"
 #include "../events/evt_motion.hpp"
@@ -40,8 +41,12 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
       GenericWindow( pIntf, 0, 0, false, false, pParent,
                      GenericWindow::VoutWindow ),
       m_pWnd( pWnd ), original_width( width ), original_height( height ),
-      m_pCtrlVideo( NULL ), m_pParentWindow( pParent )
+      m_pCtrlVideo( NULL ), m_pParentWindow( pParent ),
+      mouse_hide_timeout( var_InheritInteger( pWnd, "mouse-hide-timeout" ) ),
+      m_cmdHideMouse( this )
 {
+    OSFactory *pOsFactory = OSFactory::instance( pIntf );
+
     if( m_pWnd )
     {
         vlc_object_hold( m_pWnd );
@@ -52,6 +57,8 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
 #else
         m_pWnd->handle.hwnd = getOSHandle();
 #endif
+
+        m_pTimer = pOsFactory->createOSTimer( m_cmdHideMouse );
     }
 }
 
@@ -60,6 +67,7 @@ VoutWindow::~VoutWindow()
 {
     if( m_pWnd )
     {
+        delete m_pTimer;
         vlc_object_release( m_pWnd );
     }
 }
@@ -125,7 +133,9 @@ void VoutWindow::processEvent( EvtMotion &rEvtMotion )
 {
     int x = rEvtMotion.getXPos() - m_pParentWindow->getLeft() - getLeft();
     int y = rEvtMotion.getYPos() - m_pParentWindow->getTop() - getTop();
+
     vout_window_ReportMouseMoved( m_pWnd, x, y );
+    showMouse();
 }
 
 
@@ -145,4 +155,24 @@ void VoutWindow::processEvent( EvtMouse &rEvtMouse )
         vout_window_ReportMouseReleased( m_pWnd, button );
     else if( rEvtMouse.getAction() == EvtMouse::kDblClick )
         vout_window_ReportMouseDoubleClick( m_pWnd, button );
+    showMouse();
+}
+
+
+void VoutWindow::showMouse()
+{
+    m_pTimer->start( mouse_hide_timeout, true );
+    hideMouse( false );
+}
+
+
+void VoutWindow::hideMouse( bool hide )
+{
+    VoutManager::instance( getIntf() )->hideMouseWnd( m_pWnd, hide );
+}
+
+
+void VoutWindow::CmdHideMouse::execute()
+{
+    m_pParent->hideMouse( true );
 }

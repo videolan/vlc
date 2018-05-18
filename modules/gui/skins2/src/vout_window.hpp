@@ -26,9 +26,11 @@
 
 #include "generic_window.hpp"
 #include "dialogs.hpp"
+#include "../commands/cmd_generic.hpp"
 #include <vlc_vout_window.h>
 
 class OSGraphics;
+class OSTimer;
 class CtrlVideo;
 
 
@@ -75,6 +77,10 @@ public:
     /// Resize the window
     virtual void resize( int width, int height );
 
+    // Hide/show cursor
+    void showMouse( );
+    void hideMouse( bool );
+
     virtual std::string getType() const { return "Vout"; }
 
 private:
@@ -91,6 +97,11 @@ private:
 
     /// Parent Window
     GenericWindow* m_pParentWindow;
+
+    // Cursor timer
+    OSTimer *m_pTimer;
+    int mouse_hide_timeout;
+    DEFINE_CALLBACK( VoutWindow, HideMouse );
 };
 
 typedef CountedPtr<VoutWindow> VoutWindowPtr;

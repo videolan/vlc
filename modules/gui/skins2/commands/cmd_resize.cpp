@@ -64,14 +64,3 @@ void CmdSetFullscreen::execute()
 {
     getIntf()->p_sys->p_voutManager->setFullscreenWnd( m_pWnd, m_bFullscreen );
 }
-
-
-CmdHideMouse::CmdHideMouse( intf_thread_t *pIntf,
-			    vout_window_t * pWnd, bool hide )
-    : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_bHide( hide ) { }
-
-
-void CmdHideMouse::execute()
-{
-    getIntf()->p_sys->p_voutManager->hideMouseWnd( m_pWnd, m_bHide );
-}

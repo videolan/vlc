@@ -475,16 +475,6 @@ static int WindowControl( vout_window_t *pWnd, int query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case VOUT_WINDOW_HIDE_MOUSE:
-        {
-            bool hide = va_arg( args, int );
-            // Post a HideMouse command
-            CmdHideMouse* pCmd =
-                new CmdHideMouse( pIntf, pWnd, hide );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-            return VLC_SUCCESS;
-        }
-
         default:
             msg_Dbg( pIntf, "control query not supported" );
             return VLC_EGENERIC;

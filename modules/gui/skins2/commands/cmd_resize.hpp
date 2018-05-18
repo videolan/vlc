@@ -83,20 +83,4 @@ private:
     vout_window_t* m_pWnd;
     bool m_bFullscreen;
 };
-
-
-/// Command to hide mouse
-class CmdHideMouse: public CmdGeneric
-{
-public:
-    /// hide the mouse
-    CmdHideMouse( intf_thread_t *pIntf, vout_window_t* pWnd, bool hide );
-    virtual ~CmdHideMouse() { }
-    virtual void execute();
-    virtual std::string getType() const { return "hide mouse"; }
-
-private:
-    vout_window_t* m_pWnd;
-    bool m_bHide;
-};
 #endif
