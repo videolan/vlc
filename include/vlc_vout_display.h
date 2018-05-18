@@ -132,8 +132,7 @@ enum {
      * after being requested externally or by VOUT_DISPLAY_WINDOW_STATE */
     VOUT_DISPLAY_CHANGE_WINDOW_STATE VLC_DEPRECATED_ENUM,   /* unsigned state */
 #endif
-    /* Ask the module to acknowledge/refuse the display size change requested
-     * (externally or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
+    /* Ask the module to acknowledge the display size change */
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,   /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse fill display state change after
@@ -176,8 +175,6 @@ enum {
     VOUT_DISPLAY_EVENT_FULLSCREEN,
     VOUT_DISPLAY_EVENT_WINDOW_STATE,
 #endif
-
-    VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height */
 
     /* */
     VOUT_DISPLAY_EVENT_CLOSE,

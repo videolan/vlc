@@ -380,10 +380,6 @@ typedef struct {
     atomic_bool reset_pictures;
 
     signed char fit_window;
-
-    bool ch_display_size;
-    int  display_width;
-    int  display_height;
 } vout_display_owner_sys_t;
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
@@ -602,21 +598,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         break;
     }
 #endif
-    case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
-        const int width  = (int)va_arg(args, int);
-        const int height = (int)va_arg(args, int);
-        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d", width, height);
-
-        /* */
-        vlc_mutex_lock(&osys->lock);
-
-        osys->ch_display_size   = true;
-        osys->display_width     = width;
-        osys->display_height    = height;
-
-        vlc_mutex_unlock(&osys->lock);
-        break;
-    }
 
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID: {
         msg_Warn(vd, "VoutDisplayEvent 'pictures invalid'");
@@ -683,8 +664,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
     bool reset_render = false;
     for (;;) {
-        vlc_mutex_lock(&osys->lock);
 #if defined(_WIN32) || defined(__OS2__)
+        vlc_mutex_lock(&osys->lock);
         bool ch_fullscreen  = osys->ch_fullscreen;
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
@@ -692,20 +673,13 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         bool ch_wm_state  = osys->ch_wm_state;
         unsigned wm_state  = osys->wm_state;
         osys->ch_wm_state = false;
-#endif
-
-        bool ch_display_size       = osys->ch_display_size;
-        int  display_width         = osys->display_width;
-        int  display_height        = osys->display_height;
-        osys->ch_display_size = false;
-
         vlc_mutex_unlock(&osys->lock);
+#endif
 
         bool reset_pictures = allow_reset_pictures
             && atomic_exchange(&osys->reset_pictures, false);
 
-        if (!ch_display_size &&
-            !reset_pictures &&
+        if (!reset_pictures &&
             osys->is_display_filled == osys->cfg.is_display_filled &&
             !osys->ch_zoom &&
 #if defined(_WIN32) || defined(__OS2__)
@@ -739,10 +713,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 msg_Err(vd, "Failed to set fullscreen");
         }
 #endif
-
-        /* */
-        if (ch_display_size)
-            vout_SetDisplaySize(vd, display_width, display_height);
 
         /* */
         if (osys->is_display_filled != osys->cfg.is_display_filled) {
@@ -1057,8 +1027,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
-    osys->display_width  = cfg->display.width;
-    osys->display_height = cfg->display.height;
     osys->is_display_filled = cfg->is_display_filled;
     osys->viewpoint      = cfg->viewpoint;
 
@@ -1190,7 +1158,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
     case VOUT_DISPLAY_EVENT_KEY:
     case VOUT_DISPLAY_EVENT_CLOSE:
-    case VOUT_DISPLAY_EVENT_DISPLAY_SIZE:
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
         VoutDisplayEvent(vd, event, args);
         break;
