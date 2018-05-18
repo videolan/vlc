@@ -125,11 +125,15 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 #include "window.h"
 #include "event.h"
 
+#define DOUBLE_CLICK_TIME (3 * CLOCK_FREQ / 10)
+
 typedef struct vout_display_window
 {
     vout_display_t *vd;
     unsigned width;
     unsigned height;
+    vlc_mouse_t mouse;
+    mtime_t last_left_press;
 
     vlc_mutex_t lock;
 } vout_display_window_t;
@@ -157,10 +161,55 @@ static void vout_display_window_CloseNotify(vout_window_t *window)
 }
 
 static void vout_display_window_MouseEvent(vout_window_t *window,
-                                           const vout_window_mouse_event_t *mouse)
+                                           const vout_window_mouse_event_t *ev)
 {
+    vout_display_window_t *state = window->owner.sys;
     vout_thread_t *vout = (vout_thread_t *)window->obj.parent;
-    vout_WindowMouseEvent(vout, mouse);
+    vlc_mouse_t *m = &state->mouse;
+
+    m->b_double_click = false;
+
+    switch (ev->type)
+    {
+        case VOUT_WINDOW_MOUSE_MOVED:
+            vlc_mouse_SetPosition(m, ev->x, ev->y);
+            state->last_left_press = INT64_MIN;
+            break;
+
+        case VOUT_WINDOW_MOUSE_PRESSED:
+            if (!window->info.has_double_click
+             && ev->button_mask == MOUSE_BUTTON_LEFT
+             && !vlc_mouse_IsLeftPressed(m))
+            {
+                const mtime_t now = mdate();
+
+                if (state->last_left_press != INT64_MIN
+                 && now - state->last_left_press < DOUBLE_CLICK_TIME)
+                {
+                    m->b_double_click = true;
+                    state->last_left_press = INT64_MIN;
+                }
+                else
+                    state->last_left_press = now;
+            }
+
+            vlc_mouse_SetPressed(m, ev->button_mask);
+            break;
+
+        case VOUT_WINDOW_MOUSE_RELEASED:
+            vlc_mouse_SetReleased(m, ev->button_mask);
+            break;
+
+        case VOUT_WINDOW_MOUSE_DOUBLE_CLICK:
+            assert(window->info.has_double_click);
+            m->b_double_click = true;
+            break;
+
+        default:
+            vlc_assert_unreachable();
+    }
+
+    vout_MouseState(vout, m);
 }
 
 static void vout_display_window_KeyboardEvent(vout_window_t *window,
@@ -191,6 +240,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     state->vd = NULL;
     state->width = cfg->width;
     state->height = cfg->height;
+    vlc_mouse_Init(&state->mouse);
+    state->last_left_press = INT64_MIN;
     vlc_mutex_init(&state->lock);
 
     char *modlist = var_InheritString(vout, "window");

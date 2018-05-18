@@ -218,13 +218,16 @@ int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, vlc_object_t *input, bool );
 void spu_ChangeMargin(spu_t *, int);
 
-typedef struct vout_window_mouse_event_t vout_window_mouse_event_t;
-
 /**
  * This function will (un)pause the display of pictures.
  * It is thread safe
  */
 void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
+
+/**
+ * Updates the pointing device state.
+ */
+void vout_MouseState(vout_thread_t *, const vlc_mouse_t *);
 
 /**
  * This function will apply an offset on subtitle subpicture.
@@ -258,9 +261,6 @@ void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
  * This function will ask the display of the input title
  */
 void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
-
-void vout_WindowMouseEvent( vout_thread_t *p_vout,
-                            const vout_window_mouse_event_t *mouse );
 
 /**
  * This function will return true if no more pictures are to be displayed.
