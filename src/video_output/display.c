@@ -544,11 +544,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     switch (event) {
-    case VOUT_DISPLAY_EVENT_CLOSE: {
-        msg_Dbg(vd, "VoutDisplayEvent 'close'");
-        vout_SendEventClose(osys->vout);
-        break;
-    }
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
     case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
     case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
@@ -1150,7 +1145,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
         break;
 #endif
     case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
-    case VOUT_DISPLAY_EVENT_CLOSE:
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
         VoutDisplayEvent(vd, event, args);
         break;
