@@ -48,8 +48,6 @@ struct vout_window_sys_t
 #endif
     vlc_thread_t thread;
 
-    xcb_cursor_t cursor; /* blank cursor */
-
     xcb_window_t root;
     xcb_atom_t wm_state;
     xcb_atom_t wm_state_above;
@@ -59,13 +57,24 @@ struct vout_window_sys_t
     bool embedded;
 };
 
-static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
+static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
+{
+    xcb_cursor_t cur = xcb_generate_id(conn);
+    xcb_pixmap_t pix = xcb_generate_id(conn);
+
+    xcb_create_pixmap(conn, 1, pix, root, 1, 1);
+    xcb_create_cursor(conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
+    return cur;
+}
+
+static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
 {
     vout_window_sys_t *sys = wnd->sys;
+    int ret = 0;
 
 #ifdef HAVE_XCB_KEYSYMS
     if (sys->keys != NULL && XCB_keyHandler_Process(sys->keys, ev, wnd) == 0)
-        return;
+        return 0;
 #endif
 
     switch (ev->response_type & 0x7f)
@@ -74,21 +83,27 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
         case XCB_BUTTON_PRESS:
         {
             xcb_button_release_event_t *bpe = (void *)ev;
+
             vout_window_ReportMousePressed(wnd, bpe->detail - 1);
+            ret = 1;
             break;
         }
 
         case XCB_BUTTON_RELEASE:
         {
             xcb_button_release_event_t *bre = (void *)ev;
+
             vout_window_ReportMouseReleased(wnd, bre->detail - 1);
+            ret = 1;
             break;
         }
 
         case XCB_MOTION_NOTIFY:
         {
             xcb_motion_notify_event_t *mne = (void *)ev;
+
             vout_window_ReportMouseMoved(wnd, mne->event_x, mne->event_y);
+            ret = 1;
             break;
         }
 
@@ -110,6 +125,7 @@ static void ProcessEvent (vout_window_t *wnd, xcb_generic_event_t *ev)
     }
 
     free (ev);
+    return ret;
 }
 
 /** Background thread for X11 events handling */
@@ -118,21 +134,57 @@ static void *Thread (void *data)
     vout_window_t *wnd = data;
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
+    struct pollfd ufd = {
+        .fd = xcb_get_file_descriptor(conn),
+        .events = POLLIN,
+    };
+    xcb_cursor_t cursor = CursorCreate(conn, p_sys->root); /* blank cursor */
+    mtime_t lifetime = var_InheritInteger(wnd, "mouse-hide-timeout")
+                       * (CLOCK_FREQ / 1000);
+    mtime_t deadline = INT64_MAX;
 
-    int fd = xcb_get_file_descriptor (conn);
-    if (fd == -1)
+    if (ufd.fd == -1)
         return NULL;
 
     for (;;)
     {
-        xcb_generic_event_t *ev;
-        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
+        int timeout = -1;
 
-        poll (&ufd, 1, -1);
+        if (deadline != INT64_MAX)
+        {
+            mtime_t delay = deadline - mdate();
+            timeout = (delay > 0) ? delay / (CLOCK_FREQ / 1000) : 0;
+        }
+
+        int val = poll(&ufd, 1, timeout);
 
         int canc = vlc_savecancel ();
-        while ((ev = xcb_poll_for_event (conn)) != NULL)
-            ProcessEvent(wnd, ev);
+
+        if (val == 0)
+        {   /* timeout: hide cursor */
+            xcb_change_window_attributes(conn, wnd->handle.xid,
+                                         XCB_CW_CURSOR, &cursor);
+            xcb_flush(conn);
+            deadline = INT64_MAX;
+        }
+        else
+        {
+            xcb_generic_event_t *ev;
+            bool show_cursor = false;
+
+            while ((ev = xcb_poll_for_event (conn)) != NULL)
+                show_cursor = ProcessEvent(wnd, ev) || show_cursor;
+
+            if (show_cursor)
+            {
+                xcb_change_window_attributes(conn, wnd->handle.xid,
+                                             XCB_CW_CURSOR,
+                                             &(uint32_t){ XCB_CURSOR_NONE });
+                xcb_flush(conn);
+                deadline = mdate() + lifetime;
+            }
+        }
+
         vlc_restorecancel (canc);
 
         if (xcb_connection_has_error (conn))
@@ -225,14 +277,6 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             change_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
             break;
         }
-        case VOUT_WINDOW_HIDE_MOUSE:
-        {
-            xcb_cursor_t cursor = (va_arg (ap, int) ? p_sys->cursor
-                                                    : XCB_CURSOR_NONE);
-            xcb_change_window_attributes (p_sys->conn, wnd->handle.xid,
-                                          XCB_CW_CURSOR, &(uint32_t){ cursor });
-            break;
-        }
 
         default:
             msg_Err (wnd, "request %d not implemented", cmd);
@@ -311,18 +355,6 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     atom = reply->atom;
     free (reply);
     return atom;
-}
-
-static
-xcb_cursor_t CursorCreate(xcb_connection_t *conn,
-                                   const xcb_screen_t *scr)
-{
-    xcb_cursor_t cur = xcb_generate_id (conn);
-    xcb_pixmap_t pix = xcb_generate_id (conn);
-
-    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
-    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 1, 1);
-    return cur;
 }
 
 static void CacheAtoms (vout_window_sys_t *p_sys)
@@ -503,9 +535,6 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 #endif
         goto error;
     }
-
-    /* Create cursor */
-    p_sys->cursor = CursorCreate(conn, scr);
 
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
