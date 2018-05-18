@@ -305,7 +305,8 @@ static int Open(vlc_object_t *object)
     vc_tv_register_callback(tvservice_cb, vd);
 
     if (query_resolution(vd, &sys->display_width, &sys->display_height) >= 0) {
-        vout_display_SendEventDisplaySize(vd, sys->display_width, sys->display_height);
+        vout_window_ReportSize(vd->cfg->window,
+                               sys->display_width, sys->display_height);
     } else {
         sys->display_width = vd->cfg->display.width;
         sys->display_height = vd->cfg->display.height;
@@ -666,7 +667,7 @@ static void vd_manage(vout_display_t *vd)
         if (query_resolution(vd, &width, &height) >= 0) {
             sys->display_width = width;
             sys->display_height = height;
-            vout_display_SendEventDisplaySize(vd, width, height);
+            vout_window_ReportSize(vd->cfg->window, width, height);
         }
 
         sys->need_configure_display = false;
