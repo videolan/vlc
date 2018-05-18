@@ -222,8 +222,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
         CONNECT( this, askVideoSetFullScreen( bool ),
                  this, setVideoFullScreen( bool ) );
-        CONNECT( this, askHideMouse( bool ),
-                 this, setHideMouse( bool ) );
     }
 
     CONNECT( THEDP, toolBarConfUpdated(), this, toolBarConfUpdated() );
@@ -930,11 +928,6 @@ void MainInterface::setVideoFullScreen( bool fs )
     videoWidget->sync();
 }
 
-void MainInterface::setHideMouse( bool hide )
-{
-    videoWidget->setCursor( hide ? Qt::BlankCursor : Qt::ArrowCursor );
-}
-
 /* Slot to change the video always-on-top flag.
  * Emit askVideoOnTop() to invoke this from other thread. */
 void MainInterface::setVideoOnTop( bool on_top )
@@ -998,13 +991,6 @@ int MainInterface::controlVideo( int i_query, va_list args )
         bool b_fs = va_arg( args, int );
 
         emit askVideoSetFullScreen( b_fs );
-        return VLC_SUCCESS;
-    }
-    case VOUT_WINDOW_HIDE_MOUSE:
-    {
-        bool b_hide = va_arg( args, int );
-
-        emit askHideMouse( b_hide );
         return VLC_SUCCESS;
     }
     default:

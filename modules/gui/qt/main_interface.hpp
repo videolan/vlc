@@ -262,7 +262,6 @@ protected slots:
     void setVideoSize( unsigned int, unsigned int );
     void videoSizeChanged( int, int );
     virtual void setVideoFullScreen( bool );
-    void setHideMouse( bool );
     void setVideoOnTop( bool );
     void setBoss();
     void setRaise();
@@ -279,7 +278,6 @@ signals:
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
-    void askHideMouse( bool );
     void askVideoOnTop( bool );
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );

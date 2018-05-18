@@ -88,6 +88,12 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i, QWidget* p_parent )
     layout->setContentsMargins( 0, 0, 0, 0 );
     stable = NULL;
     p_window = NULL;
+
+    cursorTimer = new QTimer( this );
+    cursorTimer->setSingleShot( true );
+    connect( cursorTimer, SIGNAL(timeout()), this, SLOT(hideCursor()) );
+    cursorTimeout = var_InheritInteger( _p_i, "mouse-hide-timeout" );
+
     show();
 }
 
@@ -297,6 +303,17 @@ void VideoWidget::resizeEvent( QResizeEvent *event )
     reportSize();
 }
 
+void VideoWidget::hideCursor()
+{
+    setCursor( Qt::BlankCursor );
+}
+
+void VideoWidget::showCursor()
+{
+    setCursor( Qt::ArrowCursor );
+    cursorTimer->start( cursorTimeout );
+}
+
 int VideoWidget::qtMouseButton2VLC( Qt::MouseButton qtButton )
 {
     if( p_window == NULL )
@@ -320,6 +337,7 @@ void VideoWidget::mouseReleaseEvent( QMouseEvent *event )
     if( vlc_button >= 0 )
     {
         vout_window_ReportMouseReleased( p_window, vlc_button );
+        showCursor();
         event->accept();
     }
     else
@@ -332,6 +350,7 @@ void VideoWidget::mousePressEvent( QMouseEvent* event )
     if( vlc_button >= 0 )
     {
         vout_window_ReportMousePressed( p_window, vlc_button );
+        showCursor();
         event->accept();
     }
     else
@@ -350,6 +369,7 @@ void VideoWidget::mouseMoveEvent( QMouseEvent *event )
         current_pos *= devicePixelRatio();
 #endif
         vout_window_ReportMouseMoved( p_window, current_pos.x(), current_pos.y() );
+        showCursor();
         event->accept();
     }
     else
@@ -362,6 +382,7 @@ void VideoWidget::mouseDoubleClickEvent( QMouseEvent *event )
     if( vlc_button >= 0 )
     {
         vout_window_ReportMouseDoubleClick( p_window, vlc_button );
+        showCursor();
         event->accept();
     }
     else
