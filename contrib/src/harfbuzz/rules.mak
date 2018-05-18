@@ -7,8 +7,6 @@ ifeq ($(call need_pkg,"harfbuzz"),)
 PKGS_FOUND += harfbuzz
 endif
 
-HARFBUZZCONF = --with-icu=no --with-glib=no --with-fontconfig=no
-
 ifdef HAVE_DARWIN_OS
 HARFBUZZCONF += --with-coretext=yes
 endif
@@ -22,13 +20,14 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
+	$(APPLY) $(SRC)/harfbuzz/Cmake-test.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
 .harfbuzz: harfbuzz toolchain.cmake
 	cd $< && mkdir -p build && cd build && $(HOSTVARS_PIC) $(CMAKE) \
-		-DBUILD_SHARED_LIBS:BOOL=OFF \
+		-DBUILD_SHARED_LIBS:BOOL=OFF -DHB_HAVE_FREETYPE:BOOL=ON \
 		.. && $(MAKE)
 	cd $< && cd build && $(MAKE) install
 	touch $@
