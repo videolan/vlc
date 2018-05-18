@@ -377,7 +377,6 @@ typedef struct {
         vlc_mouse_t state;
 
         mtime_t last_pressed;
-        mtime_t double_click_timeout;
     } mouse;
 
     bool reset_pictures;
@@ -530,7 +529,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         vlc_mouse_HasPressed(&osys->mouse.state, &m, MOUSE_BUTTON_LEFT)) {
         const mtime_t i_date = mdate();
 
-        if (i_date - osys->mouse.last_pressed < osys->mouse.double_click_timeout ) {
+        if (i_date - osys->mouse.last_pressed < 3*CLOCK_FREQ/10 ) {
             m.b_double_click = true;
             osys->mouse.last_pressed = 0;
         } else {
@@ -1064,7 +1063,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_state_t *state,
                                   const char *module, bool is_splitter,
-                                  mtime_t double_click_timeout,
                                   const vout_display_owner_t *owner_ptr)
 {
     /* */
@@ -1082,7 +1080,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
-    osys->mouse.double_click_timeout = double_click_timeout;
     osys->display_width  = cfg->display.width;
     osys->display_height = cfg->display.height;
     osys->is_display_filled = cfg->is_display_filled;
@@ -1182,11 +1179,9 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
 vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const vout_display_state_t *state,
-                                const char *module,
-                                mtime_t double_click_timeout)
+                                const char *module)
 {
-    return DisplayNew(vout, source, state, module, false,
-                      double_click_timeout, NULL);
+    return DisplayNew(vout, source, state, module, false, NULL);
 }
 
 /*****************************************************************************
@@ -1347,8 +1342,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                  const video_format_t *source,
                                  const vout_display_state_t *state,
                                  const char *module,
-                                 const char *splitter_module,
-                                 mtime_t double_click_timeout)
+                                 const char *splitter_module)
 {
     video_splitter_t *splitter =
         video_splitter_New(VLC_OBJECT(vout), splitter_module, source);
@@ -1357,8 +1351,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     /* */
     vout_display_t *wrapper =
-        DisplayNew(vout, source, state, module, true,
-                   double_click_timeout, NULL);
+        DisplayNew(vout, source, state, module, true, NULL);
     if (!wrapper) {
         video_splitter_Delete(splitter);
         return NULL;
@@ -1413,8 +1406,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
                                         output->psz_module ? output->psz_module : module,
-                                        false,
-                                        double_click_timeout, &vdo);
+                                        false, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
             if (ostate.cfg.window != NULL)

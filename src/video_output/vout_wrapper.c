@@ -57,15 +57,12 @@ int vout_OpenWrapper(vout_thread_t *vout,
     sys->display.title = var_InheritString(vout, "video-title");
 
     /* */
-    const mtime_t double_click_timeout = 3*CLOCK_FREQ/10;
     char *modlist = var_InheritString(vout, "vout");
 
     if (splitter_name)
-        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, modlist, splitter_name,
-                                           double_click_timeout);
+        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, modlist, splitter_name);
     else
-        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, modlist,
-                                          double_click_timeout);
+        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, modlist);
     free(modlist);
 
     if (!sys->display.vd) {
