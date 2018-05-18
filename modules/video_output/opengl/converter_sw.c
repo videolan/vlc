@@ -139,6 +139,8 @@ pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
         picsys->gl = tc->gl;
         vlc_gl_Hold(picsys->gl);
     }
+
+    /* XXX: needed since picture_NewFromResource override pic planes */
     if (picture_Setup(pic, &tc->fmt))
     {
         picture_Release(pic);
