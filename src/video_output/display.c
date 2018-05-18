@@ -652,9 +652,7 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (window != NULL)
-        vout_display_window_Detach(window);
-    else
+    if (window == NULL)
         vout_DeleteDisplayWindow(osys->vout);
 }
 
@@ -1240,9 +1238,7 @@ static vout_window_t *SplitterNewWindow(vout_display_t *vd, unsigned type)
 
 static void SplitterDelWindow(vout_display_t *vd, vout_window_t *window)
 {
-    if (window != NULL)
-        vout_display_window_Detach(window);
-    (void) vd;
+    (void) vd; (void) window;
 }
 
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)

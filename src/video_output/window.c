@@ -130,27 +130,17 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 typedef struct vout_display_window
 {
     vout_display_t *vd;
-    unsigned width;
-    unsigned height;
     vlc_mouse_t mouse;
     mtime_t last_left_press;
-
-    vlc_mutex_t lock;
 } vout_display_window_t;
 
 static void vout_display_window_ResizeNotify(vout_window_t *window,
                                              unsigned width, unsigned height)
 {
-    vout_display_window_t *state = window->owner.sys;
+    vout_thread_t *vout = (vout_thread_t *)window->obj.parent;
 
     msg_Dbg(window, "resized to %ux%u", width, height);
-    vlc_mutex_lock(&state->lock);
-    state->width = width;
-    state->height = height;
-
-    if (state->vd != NULL)
-        vout_display_SendEventDisplaySize(state->vd, width, height);
-    vlc_mutex_unlock(&state->lock);
+    vout_ControlChangeDisplaySize(vout, width, height);
 }
 
 static void vout_display_window_CloseNotify(vout_window_t *window)
@@ -237,12 +227,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     if (state == NULL)
         return NULL;
 
-    state->vd = NULL;
-    state->width = cfg->width;
-    state->height = cfg->height;
     vlc_mouse_Init(&state->mouse);
     state->last_left_press = INT64_MIN;
-    vlc_mutex_init(&state->lock);
 
     char *modlist = var_InheritString(vout, "window");
     vout_window_owner_t owner = {
@@ -253,10 +239,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
 
     window = vout_window_New((vlc_object_t *)vout, modlist, cfg, &owner);
     free(modlist);
-    if (window == NULL) {
-        vlc_mutex_destroy(&state->lock);
+    if (window == NULL)
         free(state);
-    }
     return window;
 }
 
@@ -266,29 +250,8 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
  */
 void vout_display_window_Attach(vout_window_t *window, vout_display_t *vd)
 {
-    vout_display_window_t *state = window->owner.sys;
-
     vout_window_SetSize(window,
                         vd->cfg->display.width, vd->cfg->display.height);
-
-    vlc_mutex_lock(&state->lock);
-    state->vd = vd;
-
-    vout_display_SendEventDisplaySize(vd, state->width, state->height);
-    vlc_mutex_unlock(&state->lock);
-}
-
-/**
- * Detaches a window from a display. Window events will no longer be dispatched
- * (except those that do not need a display).
- */
-void vout_display_window_Detach(vout_window_t *window)
-{
-    vout_display_window_t *state = window->owner.sys;
-
-    vlc_mutex_lock(&state->lock);
-    state->vd = NULL;
-    vlc_mutex_unlock(&state->lock);
 }
 
 /**
@@ -300,8 +263,5 @@ void vout_display_window_Delete(vout_window_t *window)
     vout_display_window_t *state = window->owner.sys;
 
     vout_window_Delete(window);
-
-    assert(state->vd == NULL);
-    vlc_mutex_destroy(&state->lock);
     free(state);
 }
