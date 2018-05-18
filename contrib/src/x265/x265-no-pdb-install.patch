@@ -1,0 +1,11 @@
+--- x265/source/CMakeLists.txt.nopdb	2018-05-18 16:28:43.150790700 +0200
++++ x265/source/CMakeLists.txt	2018-05-18 16:28:53.838634400 +0200
+@@ -546,7 +546,7 @@ if(ENABLE_HDR10_PLUS)
+         ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
+ endif()
+ install(FILES x265.h "${PROJECT_BINARY_DIR}/x265_config.h" DESTINATION include)
+-if(WIN32)
++if(WIN32 AND MSVC_IDE)
+     if(MSVC_IDE)
+         install(FILES "${PROJECT_BINARY_DIR}/Debug/x265.pdb" DESTINATION ${BIN_INSTALL_DIR} CONFIGURATIONS Debug)
+         install(FILES "${PROJECT_BINARY_DIR}/RelWithDebInfo/x265.pdb" DESTINATION ${BIN_INSTALL_DIR} CONFIGURATIONS RelWithDebInfo)
