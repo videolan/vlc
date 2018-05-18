@@ -40,14 +40,14 @@ void vout_control_cmd_Clean(vout_control_cmd_t *cmd)
 {
     switch (cmd->type) {
     case VOUT_CONTROL_SUBPICTURE:
-        if (cmd->u.subpicture)
-            subpicture_Delete(cmd->u.subpicture);
+        if (cmd->subpicture)
+            subpicture_Delete(cmd->subpicture);
         break;
     case VOUT_CONTROL_OSD_TITLE:
     case VOUT_CONTROL_CHANGE_FILTERS:
     case VOUT_CONTROL_CHANGE_SUB_SOURCES:
     case VOUT_CONTROL_CHANGE_SUB_FILTERS:
-        free(cmd->u.string);
+        free(cmd->string);
         break;
     default:
         break;
@@ -130,7 +130,7 @@ void vout_control_PushBool(vout_control_t *ctrl, int type, bool boolean)
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.boolean = boolean;
+    cmd.boolean = boolean;
     vout_control_Push(ctrl, &cmd);
 }
 void vout_control_PushInteger(vout_control_t *ctrl, int type, int integer)
@@ -138,7 +138,7 @@ void vout_control_PushInteger(vout_control_t *ctrl, int type, int integer)
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.integer = integer;
+    cmd.integer = integer;
     vout_control_Push(ctrl, &cmd);
 }
 void vout_control_PushTime(vout_control_t *ctrl, int type, mtime_t time)
@@ -146,7 +146,7 @@ void vout_control_PushTime(vout_control_t *ctrl, int type, mtime_t time)
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.time = time;
+    cmd.time = time;
     vout_control_Push(ctrl, &cmd);
 }
 void vout_control_PushMessage(vout_control_t *ctrl, int type, int channel, const char *string)
@@ -154,8 +154,8 @@ void vout_control_PushMessage(vout_control_t *ctrl, int type, int channel, const
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.message.channel = channel;
-    cmd.u.message.string = strdup(string);
+    cmd.message.channel = channel;
+    cmd.message.string = strdup(string);
     vout_control_Push(ctrl, &cmd);
 }
 void vout_control_PushPair(vout_control_t *ctrl, int type, int a, int b)
@@ -163,8 +163,8 @@ void vout_control_PushPair(vout_control_t *ctrl, int type, int a, int b)
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.pair.a = a;
-    cmd.u.pair.b = b;
+    cmd.pair.a = a;
+    cmd.pair.b = b;
     vout_control_Push(ctrl, &cmd);
 }
 void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
@@ -172,7 +172,7 @@ void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, type);
-    cmd.u.string = string ? strdup(string) : NULL;
+    cmd.string = string ? strdup(string) : NULL;
     vout_control_Push(ctrl, &cmd);
 }
 

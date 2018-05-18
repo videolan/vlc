@@ -54,6 +54,7 @@ enum {
     VOUT_CONTROL_FULLSCREEN,            /* bool */
     VOUT_CONTROL_WINDOW_STATE,          /* unsigned */
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
+    VOUT_CONTROL_DISPLAY_SIZE,          /* window */
     VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
     VOUT_CONTROL_ZOOM,                  /* pair */
 
@@ -101,7 +102,7 @@ typedef struct {
         const vout_configuration_t *cfg;
         subpicture_t *subpicture;
         vlc_viewpoint_t viewpoint;
-    } u;
+    };
 } vout_control_cmd_t;
 
 void vout_control_cmd_Init(vout_control_cmd_t *, int type);

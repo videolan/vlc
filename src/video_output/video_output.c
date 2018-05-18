@@ -241,7 +241,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         if (cfg->change_fmt) {
             vout_control_cmd_t cmd;
             vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-            cmd.u.cfg = cfg;
+            cmd.cfg = cfg;
 
             vout_control_Push(&vout->p->control, &cmd);
             vout_control_WaitEmpty(&vout->p->control);
@@ -315,8 +315,8 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, mtime_t date)
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_PAUSE);
-    cmd.u.pause.is_on = is_paused;
-    cmd.u.pause.date  = date;
+    cmd.pause.is_on = is_paused;
+    cmd.pause.date  = date;
     vout_control_Push(&vout->p->control, &cmd);
 
     vout_control_WaitEmpty(&vout->p->control);
@@ -347,7 +347,7 @@ void vout_NextPicture(vout_thread_t *vout, mtime_t *duration)
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_STEP);
-    cmd.u.time_ptr = duration;
+    cmd.time_ptr = duration;
 
     vout_control_Push(&vout->p->control, &cmd);
     vout_control_WaitEmpty(&vout->p->control);
@@ -364,7 +364,7 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
     assert(mouse);
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_MOUSE_STATE);
-    cmd.u.mouse = *mouse;
+    cmd.mouse = *mouse;
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -373,7 +373,7 @@ void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_SUBPICTURE);
-    cmd.u.subpicture = subpic;
+    cmd.subpicture = subpic;
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -516,10 +516,10 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
-    cmd.u.window.x      = __MAX(x, 0);
-    cmd.u.window.y      = __MAX(y, 0);
-    cmd.u.window.width  = __MAX(width, 0);
-    cmd.u.window.height = __MAX(height, 0);
+    cmd.window.x      = __MAX(x, 0);
+    cmd.window.y      = __MAX(y, 0);
+    cmd.window.width  = __MAX(width, 0);
+    cmd.window.height = __MAX(height, 0);
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -528,10 +528,10 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
-    cmd.u.border.left   = __MAX(left, 0);
-    cmd.u.border.top    = __MAX(top, 0);
-    cmd.u.border.right  = __MAX(right, 0);
-    cmd.u.border.bottom = __MAX(bottom, 0);
+    cmd.border.left   = __MAX(left, 0);
+    cmd.border.top    = __MAX(top, 0);
+    cmd.border.right  = __MAX(right, 0);
+    cmd.border.bottom = __MAX(bottom, 0);
 
     vout_control_Push(&vout->p->control, &cmd);
 }
@@ -561,7 +561,7 @@ void vout_ControlChangeViewpoint(vout_thread_t *vout,
 {
     vout_control_cmd_t cmd;
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_VIEWPOINT);
-    cmd.u.viewpoint = *p_viewpoint;
+    cmd.viewpoint = *p_viewpoint;
     vout_control_Push(&vout->p->control, &cmd);
 }
 
@@ -1677,83 +1677,81 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadClean(vout);
         return 1;
     case VOUT_CONTROL_REINIT:
-        if (ThreadReinit(vout, cmd.u.cfg))
+        if (ThreadReinit(vout, cmd.cfg))
             return 1;
         break;
     case VOUT_CONTROL_CANCEL:
-        ThreadCancel(vout, cmd.u.boolean);
+        ThreadCancel(vout, cmd.boolean);
         break;
     case VOUT_CONTROL_SUBPICTURE:
-        ThreadDisplaySubpicture(vout, cmd.u.subpicture);
-        cmd.u.subpicture = NULL;
+        ThreadDisplaySubpicture(vout, cmd.subpicture);
+        cmd.subpicture = NULL;
         break;
     case VOUT_CONTROL_FLUSH_SUBPICTURE:
-        ThreadFlushSubpicture(vout, cmd.u.integer);
+        ThreadFlushSubpicture(vout, cmd.integer);
         break;
     case VOUT_CONTROL_OSD_TITLE:
-        ThreadDisplayOsdTitle(vout, cmd.u.string);
+        ThreadDisplayOsdTitle(vout, cmd.string);
         break;
     case VOUT_CONTROL_CHANGE_FILTERS:
         ThreadChangeFilters(vout, NULL,
-                            cmd.u.string != NULL ?
-                            cmd.u.string : vout->p->filter.configuration,
+                            cmd.string != NULL ?
+                            cmd.string : vout->p->filter.configuration,
                             -1, false);
         break;
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
-                            cmd.u.boolean ? 1 : 0, false);
+                            cmd.boolean ? 1 : 0, false);
         break;
     case VOUT_CONTROL_CHANGE_SUB_SOURCES:
-        ThreadChangeSubSources(vout, cmd.u.string);
+        ThreadChangeSubSources(vout, cmd.string);
         break;
     case VOUT_CONTROL_CHANGE_SUB_FILTERS:
-        ThreadChangeSubFilters(vout, cmd.u.string);
+        ThreadChangeSubFilters(vout, cmd.string);
         break;
     case VOUT_CONTROL_CHANGE_SUB_MARGIN:
-        ThreadChangeSubMargin(vout, cmd.u.integer);
+        ThreadChangeSubMargin(vout, cmd.integer);
         break;
     case VOUT_CONTROL_PAUSE:
-        ThreadChangePause(vout, cmd.u.pause.is_on, cmd.u.pause.date);
+        ThreadChangePause(vout, cmd.pause.is_on, cmd.pause.date);
         break;
     case VOUT_CONTROL_FLUSH:
-        ThreadFlush(vout, false, cmd.u.time);
+        ThreadFlush(vout, false, cmd.time);
         break;
     case VOUT_CONTROL_STEP:
-        ThreadStep(vout, cmd.u.time_ptr);
+        ThreadStep(vout, cmd.time_ptr);
         break;
     case VOUT_CONTROL_FULLSCREEN:
-        ThreadChangeFullscreen(vout, cmd.u.boolean);
+        ThreadChangeFullscreen(vout, cmd.boolean);
         break;
     case VOUT_CONTROL_WINDOW_STATE:
-        ThreadChangeWindowState(vout, cmd.u.integer);
+        ThreadChangeWindowState(vout, cmd.integer);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
-        ThreadTranslateMouseState(vout, &cmd.u.mouse);
+        ThreadTranslateMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
-        ThreadChangeDisplayFilled(vout, cmd.u.boolean);
+        ThreadChangeDisplayFilled(vout, cmd.boolean);
         break;
     case VOUT_CONTROL_ZOOM:
-        ThreadChangeZoom(vout, cmd.u.pair.a, cmd.u.pair.b);
+        ThreadChangeZoom(vout, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_ASPECT_RATIO:
-        ThreadChangeAspectRatio(vout, cmd.u.pair.a, cmd.u.pair.b);
+        ThreadChangeAspectRatio(vout, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_CROP_RATIO:
-        ThreadExecuteCropRatio(vout, cmd.u.pair.a, cmd.u.pair.b);
+        ThreadExecuteCropRatio(vout, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_CROP_WINDOW:
-        ThreadExecuteCropWindow(vout,
-                cmd.u.window.x, cmd.u.window.y,
-                cmd.u.window.width, cmd.u.window.height);
+        ThreadExecuteCropWindow(vout, cmd.window.x, cmd.window.y,
+                                cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_CROP_BORDER:
-        ThreadExecuteCropBorder(vout,
-                cmd.u.border.left,  cmd.u.border.top,
-                cmd.u.border.right, cmd.u.border.bottom);
+        ThreadExecuteCropBorder(vout, cmd.border.left, cmd.border.top,
+                                cmd.border.right, cmd.border.bottom);
         break;
     case VOUT_CONTROL_VIEWPOINT:
-        ThreadExecuteViewpoint(vout, &cmd.u.viewpoint);
+        ThreadExecuteViewpoint(vout, &cmd.viewpoint);
         break;
     default:
         break;
