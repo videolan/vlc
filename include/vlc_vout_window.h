@@ -66,6 +66,15 @@ enum vout_window_control {
 };
 
 /**
+ * Window management state.
+ */
+enum {
+    VOUT_WINDOW_STATE_NORMAL,
+    VOUT_WINDOW_STATE_ABOVE,
+    VOUT_WINDOW_STATE_BELOW,
+};
+
+/**
  * Window mouse event type for vout_window_mouse_event_t
  */
 enum vout_window_mouse_event_type {

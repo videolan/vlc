@@ -63,16 +63,6 @@ typedef enum
 } vout_display_align_t;
 
 /**
- * Window management state.
- */
-enum {
-    VOUT_WINDOW_STATE_NORMAL=0,
-    VOUT_WINDOW_STATE_ABOVE=1,
-    VOUT_WINDOW_STATE_BELOW=2,
-    VOUT_WINDOW_STACK_MASK=3,
-};
-
-/**
  * Initial/Current configuration for a vout_display_t
  */
 typedef struct {
