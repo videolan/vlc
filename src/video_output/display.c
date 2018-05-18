@@ -777,17 +777,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 #endif
 
         /* */
-        if (ch_display_size) {
-#if defined(_WIN32) || defined(__OS2__)
-            osys->width_saved  = osys->cfg.display.width;
-            osys->height_saved = osys->cfg.display.height;
-#endif
-            osys->cfg.display.width  = display_width;
-            osys->cfg.display.height = display_height;
+        if (ch_display_size)
+            vout_SetDisplaySize(vd, display_width, display_height);
 
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
-                                 &osys->cfg);
-        }
         /* */
         if (osys->is_display_filled != osys->cfg.is_display_filled) {
             osys->cfg.is_display_filled = osys->is_display_filled;
@@ -980,6 +972,19 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
          * crop settings. */
         osys->ch_crop = true;
     }
+}
+
+void vout_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+
+#if defined(_WIN32) || defined(__OS2__)
+    osys->width_saved  = osys->cfg.display.width;
+    osys->height_saved = osys->cfg.display.height;
+#endif
+    osys->cfg.display.width  = width;
+    osys->cfg.display.height = height;
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg);
 }
 
 void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)

@@ -489,6 +489,18 @@ void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
 {
     vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_WINDOW_STATE, st);
 }
+void vout_ControlChangeDisplaySize(vout_thread_t *vout,
+                                   unsigned width, unsigned height)
+{
+    vout_control_cmd_t cmd;
+
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_DISPLAY_SIZE);
+    cmd.window.x      = 0;
+    cmd.window.y      = 0;
+    cmd.window.width  = width;
+    cmd.window.height = height;
+    vout_control_Push(&vout->p->control, &cmd);
+}
 void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
     vout_control_PushBool(&vout->p->control, VOUT_CONTROL_DISPLAY_FILLED,
@@ -1396,6 +1408,12 @@ static void ThreadTranslateMouseState(vout_thread_t *vout,
     vout_SendDisplayEventMouse(vout, &vid_mouse);
 }
 
+static void ThreadChangeDisplaySize(vout_thread_t *vout,
+                                    unsigned width, unsigned height)
+{
+    vout_SetDisplaySize(vout->p->display.vd, width, height);
+}
+
 static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
     vout_SetDisplayFilled(vout->p->display.vd, is_filled);
@@ -1709,6 +1727,9 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadTranslateMouseState(vout, &cmd.mouse);
+        break;
+    case VOUT_CONTROL_DISPLAY_SIZE:
+        ThreadChangeDisplaySize(vout, cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
         ThreadChangeDisplayFilled(vout, cmd.boolean);
