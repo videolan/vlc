@@ -265,8 +265,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
                      &p_peek, TS_PACKET_SIZE_MAX ) < TS_PACKET_SIZE_MAX )
         return -1;
 
-    if( memcmp( p_peek, "TFrc", 4 ) == 0 &&
-        p_peek[6] == 0 && ((GetDWBE(&p_peek[53]) & 0x7FFFFF00U) == 0x00) &&
+    if( memcmp( p_peek, "TFrc", 4 ) == 0 && p_peek[6] == 0 &&
         vlc_stream_Peek( p_demux->s, &p_peek, TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
             == TOPFIELD_HEADER_SIZE + TS_PACKET_SIZE_MAX )
     {
@@ -277,7 +276,7 @@ static int DetectPVRHeadersAndHeaderSize( demux_t *p_demux, unsigned *pi_header_
             msg_Dbg( p_demux, "this is a topfield file" );
 #if 0
             /* I used the TF5000PVR 2004 Firmware .doc header documentation,
-             * http://www.i-topfield.com/data/product/firmware/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc
+             * /doc/Structure%20of%20Recorded%20File%20in%20TF5000PVR%20(Feb%2021%202004).doc on streams.vo
              * but after the filename the offsets seem to be incorrect.  - DJ */
             int i_duration, i_name;
             char *psz_name = xmalloc(25);
