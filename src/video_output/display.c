@@ -342,7 +342,6 @@ typedef struct {
     unsigned height_saved;
     bool ch_fullscreen;
     bool is_fullscreen;
-    bool window_fullscreen;
     bool ch_wm_state;
     unsigned wm_state;
 #endif
@@ -559,7 +558,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 #if defined(_WIN32) || defined(__OS2__)
     case VOUT_DISPLAY_EVENT_FULLSCREEN: {
         const int is_fullscreen = (int)va_arg(args, int);
-        const bool window_fullscreen = va_arg(args, int);
 
         msg_Dbg(vd, "VoutDisplayEvent 'fullscreen' %d", is_fullscreen);
 
@@ -567,7 +565,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         if (!is_fullscreen != !osys->is_fullscreen) {
             osys->ch_fullscreen = true;
             osys->is_fullscreen = is_fullscreen;
-            osys->window_fullscreen = window_fullscreen;
         }
         vlc_mutex_unlock(&osys->lock);
         break;
@@ -690,12 +687,11 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         /* */
 #if defined(_WIN32) || defined(__OS2__)
         if (ch_fullscreen) {
-            if (osys->window_fullscreen
-             || vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
                                      is_fullscreen) == VLC_SUCCESS) {
                 osys->cfg.is_fullscreen = is_fullscreen;
 
-                if (!is_fullscreen && !osys->window_fullscreen)
+                if (!is_fullscreen)
                     vout_SetDisplayWindowSize(osys->vout, osys->width_saved,
                                               osys->height_saved);
             } else

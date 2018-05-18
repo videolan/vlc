@@ -332,10 +332,9 @@ static inline void vout_display_SendEventKey(vout_display_t *vd, int key)
     vout_window_ReportKeyPress(vd->cfg->window, key);
 }
 
-static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen,
-                                                    bool is_window_fullscreen)
+static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen, is_window_fullscreen);
+    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
 }
 
 VLC_DEPRECATED /* Core needs not know about this. Don't call. */
