@@ -45,8 +45,10 @@ void *vlc_dlopen(const char *path, bool lazy)
     const int flags = lazy ? RTLD_LAZY : RTLD_NOW;
 #elif defined (DL_LAZY)
     const int flags = DL_LAZY;
+    VLC_UNUSED(lazy);
 #else
     const int flags = 0;
+    VLC_UNUSED(lazy);
 #endif
     return dlopen (path, flags);
 }
