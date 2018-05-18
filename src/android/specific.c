@@ -302,6 +302,29 @@ char *config_GetUserDir (vlc_userdir_t type)
     return NULL;
 }
 
+char *config_GetSysPath(vlc_sysdir_t type, const char *filename)
+{
+    char *dir = NULL;
+
+    switch (type)
+    {
+        case VLC_LIB_DIR:
+            dir = config_GetLibDir();
+            break;
+        default:
+            break;
+    }
+
+    if (filename == NULL || dir == NULL)
+        return dir;
+
+    char *path;
+    if (unlikely(asprintf(&path, "%s/%s", dir, filename) == -1))
+        path = NULL;
+    free(dir);
+    return path;
+}
+
 /**
  * Determines the network proxy server to use (if any).
  *
