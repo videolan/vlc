@@ -435,7 +435,8 @@ static bool hevc_parse_scaling_list_rbsp( bs_t *p_bs )
     return true;
 }
 
-static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p_vui )
+static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p_vui,
+                                            bool b_broken )
 {
     if( bs_remain( p_bs ) < 10 )
         return false;
@@ -486,7 +487,7 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
     p_vui->field_seq_flag = bs_read1( p_bs );
     p_vui->frame_field_info_present_flag = bs_read1( p_bs );
 
-    p_vui->default_display_window_flag = bs_read1( p_bs );
+    p_vui->default_display_window_flag = !b_broken && bs_read1( p_bs );
     if( p_vui->default_display_window_flag )
     {
         p_vui->def_disp.win_left_offset = bs_read_ue( p_bs );
@@ -895,9 +896,24 @@ static bool hevc_parse_sequence_parameter_set_rbsp( bs_t *p_bs,
         return false;
 
     p_sps->vui_parameters_present_flag = bs_read1( p_bs );
-    if( p_sps->vui_parameters_present_flag &&
-        !hevc_parse_vui_parameters_rbsp( p_bs, &p_sps->vui ) )
-        return false;
+    if( p_sps->vui_parameters_present_flag )
+    {
+        bs_t rollbackpoint = *p_bs;
+        if( !hevc_parse_vui_parameters_rbsp( p_bs, &p_sps->vui, false ) &&
+            p_sps->vui.default_display_window_flag &&
+            bs_remain( p_bs ) < 66 )
+        {
+            /* Broken MKV SPS vui bitstreams with missing display_window bits.
+             * Forced to accept it since some decided to accept it...
+             * see https://trac.ffmpeg.org/ticket/6644
+             * Might break decoders since cropping & clock rate have totally
+             * funky values when decoded properly */
+            *p_bs = rollbackpoint;
+            memset( &p_sps->vui, 0, sizeof(p_sps->vui) );
+            if( !hevc_parse_vui_parameters_rbsp( p_bs, &p_sps->vui, true ) )
+                return false;
+        }
+    }
 
     /* incomplete */
 
