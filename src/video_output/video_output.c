@@ -646,13 +646,6 @@ void vout_SetDisplayWindowSize(vout_thread_t *vout,
         vout_display_SendEventDisplaySize(vout->p->display.vd, width, height);
 }
 
-int vout_HideWindowMouse(vout_thread_t *vout, bool hide)
-{
-    vout_window_t *window = vout->p->window;
-
-    return window != NULL ? vout_window_HideMouse(window, hide) : VLC_EGENERIC;
-}
-
 /* */
 static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
                                  vlc_value_t oldval, vlc_value_t newval,

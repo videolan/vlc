@@ -373,13 +373,7 @@ typedef struct {
         vlc_mouse_t state;
 
         mtime_t last_pressed;
-        mtime_t last_moved;
-        bool    is_hidden;
-        bool    ch_activity;
-
-        /* */
         mtime_t double_click_timeout;
-        mtime_t hide_timeout;
     } mouse;
 
     bool reset_pictures;
@@ -542,10 +536,6 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
     /* */
     osys->mouse.state = m;
-
-    /* */
-    osys->mouse.ch_activity = true;
-    osys->mouse.last_moved = mdate();
 
     /* */
     vout_SendDisplayEventMouse(osys->vout, &m);
@@ -712,28 +702,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
     if (osys->is_splitter)
         SplitterManage(vd);
-
-    /* Handle mouse timeout */
-    const mtime_t date = mdate();
-    bool  hide_mouse = false;
-
-    vlc_mutex_lock(&osys->lock);
-
-    if (!osys->mouse.is_hidden &&
-        osys->mouse.last_moved + osys->mouse.hide_timeout < date) {
-        osys->mouse.is_hidden = hide_mouse = true;
-    } else if (osys->mouse.ch_activity) {
-        if (osys->mouse.is_hidden)
-            vout_HideWindowMouse(osys->vout, false);
-        osys->mouse.is_hidden = false;
-    }
-    osys->mouse.ch_activity = false;
-    vlc_mutex_unlock(&osys->lock);
-
-    if (hide_mouse) {
-        msg_Dbg(vd, "auto hiding mouse cursor");
-        vout_HideWindowMouse(osys->vout, true);
-    }
 
     bool reset_render = false;
     for (;;) {
@@ -1105,7 +1073,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const vout_display_state_t *state,
                                   const char *module, bool is_splitter,
                                   mtime_t double_click_timeout,
-                                  mtime_t hide_timeout,
                                   const vout_display_owner_t *owner_ptr)
 {
     /* */
@@ -1123,9 +1090,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
-    osys->mouse.last_moved = mdate();
     osys->mouse.double_click_timeout = double_click_timeout;
-    osys->mouse.hide_timeout = hide_timeout;
     osys->display_width  = cfg->display.width;
     osys->display_height = cfg->display.height;
     osys->is_display_filled = cfg->is_display_filled;
@@ -1228,11 +1193,10 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const vout_display_state_t *state,
                                 const char *module,
-                                mtime_t double_click_timeout,
-                                mtime_t hide_timeout)
+                                mtime_t double_click_timeout)
 {
     return DisplayNew(vout, source, state, module, false,
-                      double_click_timeout, hide_timeout, NULL);
+                      double_click_timeout, NULL);
 }
 
 /*****************************************************************************
@@ -1410,8 +1374,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                  const vout_display_state_t *state,
                                  const char *module,
                                  const char *splitter_module,
-                                 mtime_t double_click_timeout,
-                                 mtime_t hide_timeout)
+                                 mtime_t double_click_timeout)
 {
     video_splitter_t *splitter =
         video_splitter_New(VLC_OBJECT(vout), splitter_module, source);
@@ -1421,7 +1384,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     /* */
     vout_display_t *wrapper =
         DisplayNew(vout, source, state, module, true,
-                    double_click_timeout, hide_timeout, NULL);
+                   double_click_timeout, NULL);
     if (!wrapper) {
         video_splitter_Delete(splitter);
         return NULL;
@@ -1470,7 +1433,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
                                         output->psz_module ? output->psz_module : module,
                                         false,
-                                        double_click_timeout, hide_timeout, &vdo);
+                                        double_click_timeout, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
             return NULL;
