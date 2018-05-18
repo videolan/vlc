@@ -549,12 +549,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vout_SendEventClose(osys->vout);
         break;
     }
-    case VOUT_DISPLAY_EVENT_KEY: {
-        const int key = (int)va_arg(args, int);
-        msg_Dbg(vd, "VoutDisplayEvent 'key' 0x%2.2x", key);
-        vout_SendEventKey(osys->vout, key);
-        break;
-    }
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
     case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
     case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
@@ -1156,7 +1150,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
         break;
 #endif
     case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
-    case VOUT_DISPLAY_EVENT_KEY:
     case VOUT_DISPLAY_EVENT_CLOSE:
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
         VoutDisplayEvent(vd, event, args);

@@ -178,7 +178,6 @@ enum {
 
     /* */
     VOUT_DISPLAY_EVENT_CLOSE,
-    VOUT_DISPLAY_EVENT_KEY,
 
     /* Mouse event */
     VOUT_DISPLAY_EVENT_MOUSE_MOVED,
