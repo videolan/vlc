@@ -1396,7 +1396,6 @@ static void ThreadChangeWindowMouse(vout_thread_t *vout,
     vout_display_t *vd = vout->p->display.vd;
     switch (mouse->type)
     {
-        case VOUT_WINDOW_MOUSE_STATE:
         case VOUT_WINDOW_MOUSE_MOVED:
         {
             vout_display_place_t place;
@@ -1412,10 +1411,7 @@ static void ThreadChangeWindowMouse(vout_thread_t *vout,
                 (int64_t)(mouse->y - place.y) *
                 vd->source.i_visible_height/ place.height;
 
-            if (mouse->type == VOUT_WINDOW_MOUSE_STATE)
-                vout_display_SendEventMouseState(vd, x, y, mouse->button_mask);
-            else
-                vout_display_SendEventMouseMoved(vd, x, y);
+            vout_display_SendEventMouseMoved(vd, x, y);
             break;
         }
         case VOUT_WINDOW_MOUSE_PRESSED:

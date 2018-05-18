@@ -192,12 +192,6 @@ enum {
     VOUT_DISPLAY_EVENT_CLOSE,
     VOUT_DISPLAY_EVENT_KEY,
 
-    /* Full mouse state.
-     * You can use it OR use the other mouse events. The core will do
-     * the conversion.
-     */
-    VOUT_DISPLAY_EVENT_MOUSE_STATE,
-
     /* Mouse event */
     VOUT_DISPLAY_EVENT_MOUSE_MOVED,
     VOUT_DISPLAY_EVENT_MOUSE_PRESSED,
@@ -366,11 +360,6 @@ static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned sta
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
 }
 #endif
-/* The mouse position (State and Moved event) must be expressed against vout_display_t::source unit */
-static inline void vout_display_SendEventMouseState(vout_display_t *vd, int x, int y, int button_mask)
-{
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_MOUSE_STATE, x, y, button_mask);
-}
 static inline void vout_display_SendEventMouseMoved(vout_display_t *vd, int x, int y)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_MOUSE_MOVED, x, y);

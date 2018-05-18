@@ -78,7 +78,6 @@ enum {
  * Window mouse event type for vout_window_mouse_event_t
  */
 enum vout_window_mouse_event_type {
-    VOUT_WINDOW_MOUSE_STATE,
     VOUT_WINDOW_MOUSE_MOVED,
     VOUT_WINDOW_MOUSE_PRESSED,
     VOUT_WINDOW_MOUSE_RELEASED,
@@ -316,21 +315,6 @@ static inline void vout_window_SendMouseEvent(vout_window_t *window,
 {
     if (window->owner.cbs->mouse_event != NULL)
         window->owner.cbs->mouse_event(window, mouse);
-}
-
-/**
- * Send a full mouse state
- *
- * The mouse position must be expressed against window unit. You can use this
- * function of others vout_window_ReportMouse*() functions.
- */
-static inline void vout_window_ReportMouseState(vout_window_t *window,
-                                                int x, int y, int button_mask)
-{
-    const vout_window_mouse_event_t mouse = {
-        VOUT_WINDOW_MOUSE_STATE, x, y, button_mask
-    };
-    vout_window_SendMouseEvent(window, &mouse);
 }
 
 /**

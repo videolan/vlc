@@ -488,17 +488,6 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     bool is_ignored = false;
 
     switch (event) {
-    case VOUT_DISPLAY_EVENT_MOUSE_STATE: {
-        const int x = (int)va_arg(args, int);
-        const int y = (int)va_arg(args, int);
-        const int button_mask = (int)va_arg(args, int);
-
-        vlc_mouse_Init(&m);
-        m.i_x = x;
-        m.i_y = y;
-        m.i_pressed = button_mask;
-        break;
-    }
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED: {
         const int x = (int)va_arg(args, int);
         const int y = (int)va_arg(args, int);
@@ -587,7 +576,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vout_SendEventKey(osys->vout, key);
         break;
     }
-    case VOUT_DISPLAY_EVENT_MOUSE_STATE:
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
     case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
     case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
@@ -1304,7 +1292,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
 
     switch (event) {
 #if 0
-    case VOUT_DISPLAY_EVENT_MOUSE_STATE:
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
     case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
     case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
