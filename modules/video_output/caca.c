@@ -56,6 +56,9 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
     block_fifo_t *fifo;
     vlc_thread_t thread;
+
+    mtime_t cursor_timeout;
+    mtime_t cursor_deadline;
 };
 
 noreturn static void *VoutDisplayEventKeyDispatch(void *data)
@@ -191,10 +194,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     (void) args;
 
     switch (query) {
-    case VOUT_DISPLAY_HIDE_MOUSE:
-        caca_set_mouse(sys->dp, 0);
-        return VLC_SUCCESS;
-
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
@@ -303,6 +302,11 @@ static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    if (sys->cursor_deadline != INT64_MAX && sys->cursor_deadline < mdate()) {
+        caca_set_mouse(sys->dp, 0);
+        sys->cursor_deadline = INT64_MAX;
+    }
+
     struct caca_event ev;
     while (caca_get_event(sys->dp, CACA_EVENT_ANY, &ev, 0) > 0) {
         switch (caca_get_event_type(&ev)) {
@@ -338,12 +342,15 @@ static void Manage(vout_display_t *vd)
                                     vd->source.i_visible_height / place.height;
 
             caca_set_mouse(sys->dp, 1);
+            sys->cursor_deadline = mdate() + sys->cursor_timeout;
             vout_display_SendEventMouseMoved(vd, x, y);
             break;
         }
         case CACA_EVENT_MOUSE_PRESS:
         case CACA_EVENT_MOUSE_RELEASE: {
             caca_set_mouse(sys->dp, 1);
+            sys->cursor_deadline = mdate() + sys->cursor_timeout;
+
             const int caca = caca_get_event_mouse_button(&ev);
             for (int i = 0; mouses[i].caca != -1; i++) {
                 if (mouses[i].caca == caca) {
@@ -472,6 +479,10 @@ static int Open(vlc_object_t *object)
         }
     }
 
+    sys->cursor_timeout = var_InheritInteger(vd, "mouse-hide-timeout")
+                          * (CLOCK_FREQ / 1000);
+    sys->cursor_deadline = INT64_MAX;
+
     /* Fix format */
     video_format_t fmt = vd->fmt;
     if (fmt.i_chroma != VLC_CODEC_RGB32) {
@@ -483,7 +494,6 @@ static int Open(vlc_object_t *object)
 
     /* Setup vout_display now that everything is fine */
     vd->fmt = fmt;
-    vd->info.needs_hide_mouse = true;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
