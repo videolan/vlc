@@ -20,15 +20,15 @@ $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 
 harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
-	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
-.harfbuzz: harfbuzz
-	cd $< && env NOCONFIGURE=1 sh autogen.sh
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) $(HARFBUZZCONF)
-	cd $< && $(MAKE) install
+.harfbuzz: harfbuzz toolchain.cmake
+	cd $< && mkdir -p build && cd build && $(HOSTVARS_PIC) $(CMAKE) \
+		-DBUILD_SHARED_LIBS:BOOL=OFF \
+		.. && $(MAKE)
+	cd $< && cd build && $(MAKE) install
 	touch $@
