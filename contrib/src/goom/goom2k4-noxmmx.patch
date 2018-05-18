@@ -18,3 +18,20 @@
  #ifdef VERBOSE
  		printf ("MMX detected. Using fast methods !\n");
  #endif
+--- goom/src/xmmx.c.no-xmmx	2005-02-07 14:46:41.000000000 +0100
++++ goom/src/xmmx.c	2018-05-18 15:04:47.031571100 +0200
+@@ -26,6 +26,7 @@ int xmmx_supported (void) {
+ 	return (mm_support()&0x8)>>3;
+ }
+ 
++#if 0
+ void zoom_filter_xmmx (int prevX, int prevY,
+                        Pixel *expix1, Pixel *expix2,
+                        int *lbruS, int *lbruD, int buffratio,
+@@ -389,5 +390,5 @@ void draw_line_xmmx (Pixel *data, int x1
+ end_of_line:
+ 	__asm__ __volatile__ ("femms\n"); 
+ }
+-
++#endif /* 0 */
+ #endif
