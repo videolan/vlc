@@ -148,15 +148,12 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            bool fs = va_arg(ap, int);
-
-            if (fs)
-                xdg_toplevel_set_fullscreen(sys->toplevel, NULL);
-            else
-                xdg_toplevel_unset_fullscreen(sys->toplevel);
+            xdg_toplevel_set_fullscreen(sys->toplevel, NULL);
             break;
-        }
+
+        case VOUT_WINDOW_UNSET_FULLSCREEN:
+            xdg_toplevel_unset_fullscreen(sys->toplevel);
+            break;
 
         default:
             msg_Err(wnd, "request %d not implemented", cmd);

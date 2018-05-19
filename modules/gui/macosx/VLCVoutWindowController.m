@@ -122,13 +122,14 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 break;
             }
             case VOUT_WINDOW_SET_FULLSCREEN:
+            case VOUT_WINDOW_UNSET_FULLSCREEN:
             {
                 if (var_InheritBool(getIntf(), "video-wallpaper")) {
                     msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
                     goto out;
                 }
 
-                int i_full = va_arg(args, int);
+                int i_full = i_query == VOUT_WINDOW_SET_FULLSCREEN;
                 BOOL b_animation = YES;
 
                 dispatch_async(dispatch_get_main_queue(), ^{

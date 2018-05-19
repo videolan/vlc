@@ -158,8 +158,9 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             return VLC_SUCCESS;
         }
         case VOUT_WINDOW_SET_FULLSCREEN:
+        case VOUT_WINDOW_UNSET_FULLSCREEN:
         {
-            int i_full = va_arg(args, int);
+            int i_full = i_query == VOUT_WINDOW_SET_FULLSCREEN;
             @autoreleasepool {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if (i_full)

@@ -987,12 +987,11 @@ int MainInterface::controlVideo( int i_query, va_list args )
         return VLC_SUCCESS;
     }
     case VOUT_WINDOW_SET_FULLSCREEN:
-    {
-        bool b_fs = va_arg( args, int );
-
-        emit askVideoSetFullScreen( b_fs );
+        emit askVideoSetFullScreen( true );
         return VLC_SUCCESS;
-    }
+    case VOUT_WINDOW_UNSET_FULLSCREEN:
+        emit askVideoSetFullScreen( false );
+        return VLC_SUCCESS;
     default:
         msg_Warn( p_intf, "unsupported control query" );
         return VLC_EGENERIC;

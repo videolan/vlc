@@ -443,12 +443,11 @@ static int WindowControl( vout_window_t *pWnd, int query, va_list args )
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
+        case VOUT_WINDOW_UNSET_FULLSCREEN:
         {
-            bool b_fullscreen = va_arg( args, int );
-
             // Post a set fullscreen command
-            CmdSetFullscreen* pCmd =
-                new CmdSetFullscreen( pIntf, pWnd, b_fullscreen );
+            CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd,
+                query == VOUT_WINDOW_SET_FULLSCREEN );
             pQueue->push( CmdGenericPtr( pCmd ) );
             return VLC_SUCCESS;
         }

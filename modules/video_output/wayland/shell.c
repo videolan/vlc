@@ -116,29 +116,22 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
             break;
         }
         case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            bool fs = va_arg(ap, int);
+            wl_shell_surface_set_fullscreen(sys->shell_surface, 1, 0, NULL);
 
-            if (fs)
-            {
-                wl_shell_surface_set_fullscreen(sys->shell_surface, 1, 0,
-                                                NULL);
-                vlc_mutex_lock(&sys->lock);
-                sys->fullscreen = true;
-                vout_window_ReportSize(wnd, sys->fs_width, sys->fs_height);
-                vlc_mutex_unlock(&sys->lock);
-            }
-            else
-            {
-                wl_shell_surface_set_toplevel(sys->shell_surface);
-
-                vlc_mutex_lock(&sys->lock);
-                sys->fullscreen = false;
-                vout_window_ReportSize(wnd, sys->top_width, sys->top_height);
-                vlc_mutex_unlock(&sys->lock);
-            }
+            vlc_mutex_lock(&sys->lock);
+            sys->fullscreen = true;
+            vout_window_ReportSize(wnd, sys->fs_width, sys->fs_height);
+            vlc_mutex_unlock(&sys->lock);
             break;
-        }
+
+        case VOUT_WINDOW_UNSET_FULLSCREEN:
+            wl_shell_surface_set_toplevel(sys->shell_surface);
+
+            vlc_mutex_lock(&sys->lock);
+            sys->fullscreen = false;
+            vout_window_ReportSize(wnd, sys->top_width, sys->top_height);
+            vlc_mutex_unlock(&sys->lock);
+            break;
 
         default:
             msg_Err(wnd, "request %d not implemented", cmd);

@@ -272,11 +272,10 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            bool fs = va_arg (ap, int);
-            change_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
+        case VOUT_WINDOW_UNSET_FULLSCREEN:
+            change_wm_state (wnd, cmd == VOUT_WINDOW_SET_FULLSCREEN,
+                             p_sys->wm_state_fullscreen);
             break;
-        }
 
         default:
             msg_Err (wnd, "request %d not implemented", cmd);
