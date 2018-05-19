@@ -1345,8 +1345,10 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
     if (window == NULL)
         return; /* splitter! */
 
-    (fullscreen ? vout_window_SetFullScreen
-                : vout_window_UnsetFullScreen)(window);
+    if (fullscreen)
+        vout_window_SetFullScreen(window, NULL);
+    else
+        vout_window_UnsetFullScreen(window);
 }
 
 static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)

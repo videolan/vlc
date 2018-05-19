@@ -274,14 +274,17 @@ static inline int vout_window_SetSize(vout_window_t *window,
 /**
  * Requests fullscreen mode.
  *
+ * \param id nul-terminated output identifier, NULL for default
+ *
  * \retval VLC_SUCCESS The request has been queued to the windowing system
  * (that does <b>not</b> imply that the request is complete nor succesful).
  * \retval VLC_EGENERIC The request could not be queued, e.g. the back-end does
  * not implement toggling between fullscreen and windowed modes.
  */
-static inline int vout_window_SetFullScreen(vout_window_t *window)
+static inline int vout_window_SetFullScreen(vout_window_t *window,
+                                            const char *id)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN);
+    return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, id);
 }
 
 /**
