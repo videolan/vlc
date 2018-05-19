@@ -366,7 +366,6 @@ typedef struct {
 
     bool ch_viewpoint;
     vlc_viewpoint_t viewpoint;
-    vlc_viewpoint_t display_viewpoint;
 
     /* */
     video_format_t source;
