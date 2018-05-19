@@ -270,7 +270,14 @@ static inline int vout_window_SetSize(vout_window_t *window,
 }
 
 /**
- * Sets fullscreen mode.
+ * Requests fullscreen mode.
+ *
+ * \param full true to request full screen, false to request window mode
+ *
+ * \retval VLC_SUCCESS The request has been queued to the windowing system
+ * (that does <b>not</b> imply that the request is complete nor succesful).
+ * \retval VLC_EGENERIC The request could not be queued, e.g. the back-end does
+ * not implement toggling between fullscreen and windowed modes.
  */
 static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
 {

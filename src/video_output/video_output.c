@@ -1352,17 +1352,13 @@ static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
 {
     vout_window_t *window = vout->p->window;
 
-#if !defined(_WIN32) && !defined(__OS2__)
     if (window != NULL)
         vout_window_SetFullScreen(window, fullscreen);
-#else
-    bool window_fullscreen = false;
-    if (window != NULL
-     && vout_window_SetFullScreen(window, fullscreen) == VLC_SUCCESS)
-        window_fullscreen = true;
+#if defined(_WIN32) || defined(__OS2__)
     /* FIXME: remove this event */
     if (vout->p->display.vd != NULL)
-        vout_display_SendEventFullscreen(vout->p->display.vd, fullscreen, window_fullscreen);
+        vout_display_SendEventFullscreen(vout->p->display.vd, fullscreen,
+                                         window != NULL);
 #endif
 }
 
