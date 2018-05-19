@@ -200,7 +200,7 @@ video_output/wayland/viewporter-client-protocol.h: \
 
 video_output/wayland/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml
-	$(AM_V_GEN)$(WAYLAND_SCANNER) code $< $@
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 libwl_shell_plugin_la_SOURCES = video_output/wayland/shell.c
 libwl_shell_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
@@ -223,7 +223,7 @@ video_output/wayland/xdg-shell-client-protocol.h: \
 
 video_output/wayland/xdg-shell-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/unstable/xdg-shell/xdg-shell-unstable-v5.xml
-	$(AM_V_GEN)$(WAYLAND_SCANNER) code $< $@
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 video_output/wayland/server-decoration-client-protocol.h: \
 		video_output/wayland/server-decoration.xml
