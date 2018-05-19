@@ -122,9 +122,7 @@ static int Open (vlc_object_t *p_this)
 
     @autoreleasepool {
         id container = var_CreateGetAddress(vd, "drawable-nsobject");
-        if (container)
-            vout_display_DeleteWindow(vd);
-        else {
+        if (!container) {
             sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_NSOBJECT);
             if (sys->embed)
                 container = sys->embed->handle.nsobject;

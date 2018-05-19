@@ -147,8 +147,6 @@ static int Open(vlc_object_t *object)
     vd->display = Display;
     vd->control = Control;
 
-    vout_display_DeleteWindow(vd);
-
     return VLC_SUCCESS;
 }
 

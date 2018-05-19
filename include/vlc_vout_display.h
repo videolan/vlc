@@ -213,13 +213,6 @@ struct vout_display_owner_t {
      * from multiple threads.
      */
     void            (*event)(vout_display_t *, int, va_list);
-
-    /* Window management
-     *
-     * These functions are set prior to the module instantiation and must not
-     * be overwritten nor used directly (use the vout_display_*Window
-     * wrapper */
-    void           (*window_del)(vout_display_t *);
 };
 
 struct vout_display_t {
@@ -379,14 +372,6 @@ static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned
     if (type != VOUT_WINDOW_TYPE_INVALID && wnd != NULL && type != wnd->type)
         wnd = NULL;
     return wnd;
-}
-
-/**
- * Deletes any unused windows.
- */
-static inline void vout_display_DeleteWindow(vout_display_t *vd)
-{
-    vd->owner.window_del(vd);
 }
 
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
