@@ -245,16 +245,6 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
 }
 
 /**
- * Attaches a window to a display. Window events will be dispatched to the
- * display until they are detached.
- */
-void vout_display_window_Attach(vout_window_t *window, vout_display_t *vd)
-{
-    vout_window_SetSize(window,
-                        vd->cfg->display.width, vd->cfg->display.height);
-}
-
-/**
  * Destroys a video window.
  * \note The window must be detached.
  */

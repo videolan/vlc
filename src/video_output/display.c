@@ -115,7 +115,8 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     }
 
     if (cfg->window != NULL)
-        vout_display_window_Attach(cfg->window, vd);
+        vout_window_SetSize(cfg->window,
+                            cfg->display.width, cfg->display.height);
 
     return vd;
 }
