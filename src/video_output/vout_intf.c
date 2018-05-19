@@ -533,7 +533,7 @@ static int WallPaperCallback( vlc_object_t *obj, char const *name,
     if( cur.b_bool )
     {
         vout_ControlChangeWindowState( vout, VOUT_WINDOW_STATE_BELOW );
-        vout_ControlChangeFullscreen( vout, true );
+        vout_ControlChangeFullscreen( vout, NULL );
     }
     else
     {
@@ -550,7 +550,10 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     (void)psz_cmd; (void) oldval; (void)p_data;
 
-    vout_ControlChangeFullscreen( p_vout, newval.b_bool );
+    if( newval.b_bool )
+        vout_ControlChangeFullscreen( p_vout, NULL );
+    else
+        vout_ControlChangeWindowed( p_vout );
     return VLC_SUCCESS;
 }
 

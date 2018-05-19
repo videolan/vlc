@@ -483,11 +483,16 @@ void vout_ChangeAspectRatio( vout_thread_t *p_vout,
 }
 
 /* vout_Control* are usable by anyone at anytime */
-void vout_ControlChangeFullscreen(vout_thread_t *vout, bool fullscreen)
+void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
 {
-    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_FULLSCREEN,
-                          fullscreen);
+    vout_control_PushString(&vout->p->control, VOUT_CONTROL_FULLSCREEN, id);
 }
+
+void vout_ControlChangeWindowed(vout_thread_t *vout)
+{
+    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_WINDOWED);
+}
+
 void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
 {
     vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_WINDOW_STATE, st);
@@ -1338,17 +1343,24 @@ static void ThreadStep(vout_thread_t *vout, mtime_t *duration)
     }
 }
 
-static void ThreadChangeFullscreen(vout_thread_t *vout, bool fullscreen)
+static void ThreadChangeFullscreen(vout_thread_t *vout, const char *id)
 {
     vout_window_t *window = vout->p->window;
 
     if (window == NULL)
         return; /* splitter! */
 
-    if (fullscreen)
-        vout_window_SetFullScreen(window, NULL);
-    else
-        vout_window_UnsetFullScreen(window);
+    vout_window_SetFullScreen(window, id);
+}
+
+static void ThreadChangeWindow(vout_thread_t *vout)
+{
+    vout_window_t *window = vout->p->window;
+
+    if (window == NULL)
+        return; /* splitter! */
+
+    vout_window_UnsetFullScreen(window);
 }
 
 static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
@@ -1700,7 +1712,10 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadStep(vout, cmd.time_ptr);
         break;
     case VOUT_CONTROL_FULLSCREEN:
-        ThreadChangeFullscreen(vout, cmd.boolean);
+        ThreadChangeFullscreen(vout, cmd.string);
+        break;
+    case VOUT_CONTROL_WINDOWED:
+        ThreadChangeWindow(vout);
         break;
     case VOUT_CONTROL_WINDOW_STATE:
         ThreadChangeWindowState(vout, cmd.integer);

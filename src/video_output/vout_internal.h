@@ -187,7 +187,8 @@ static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
 }
 
 /* TODO to move them to vlc_vout.h */
-void vout_ControlChangeFullscreen(vout_thread_t *, bool fullscreen);
+void vout_ControlChangeFullscreen(vout_thread_t *, const char *id);
+void vout_ControlChangeWindowed(vout_thread_t *);
 void vout_ControlChangeWindowState(vout_thread_t *, unsigned state);
 void vout_ControlChangeDisplaySize(vout_thread_t *,
                                    unsigned width, unsigned height);
