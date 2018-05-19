@@ -29,6 +29,8 @@
 typedef struct vlc_inhibit vlc_inhibit_t;
 typedef struct vlc_inhibit_sys vlc_inhibit_sys_t;
 
+struct vout_window_t;
+
 enum vlc_inhibit_flags
 {
     VLC_INHIBIT_NONE=0 /*< No inhibition */,
@@ -45,6 +47,11 @@ struct vlc_inhibit
     vlc_inhibit_sys_t *p_sys;
     void (*inhibit) (vlc_inhibit_t *, unsigned flags);
 };
+
+static inline struct vout_window_t *vlc_inhibit_GetWindow(vlc_inhibit_t *ih)
+{
+    return (struct vout_window_t *)(ih->obj.parent);
+}
 
 static inline void vlc_inhibit_Set (vlc_inhibit_t *ih, unsigned flags)
 {

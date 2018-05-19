@@ -462,6 +462,7 @@ $Id$
  * wingdi: WIN 32 / WIN CE GDI video output
  * winhibit: Win32 screensaver inhibition
  * winstore: Windows Store App audio output
+ * wl_idle_inhibit: Wayland idle inhibitor
  * wl_screenshooter: Wayland screen capture input
  * wl_shell: Wayland shell surface window provider
  * wl_shm: Wayland shared memory video output
