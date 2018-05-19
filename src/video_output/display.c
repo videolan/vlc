@@ -335,8 +335,6 @@ typedef struct {
     /* */
     bool is_display_filled;
 
-    bool ch_zoom;
-    vlc_rational_t zoom;
 #if defined(_WIN32) || defined(__OS2__)
     unsigned width_saved;
     unsigned height_saved;
@@ -378,7 +376,7 @@ typedef struct {
 
     atomic_bool reset_pictures;
 
-    signed char fit_window;
+    bool fit_window;
 } vout_display_owner_sys_t;
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
@@ -667,7 +665,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
         if (!reset_pictures &&
             osys->is_display_filled == osys->cfg.is_display_filled &&
-            !osys->ch_zoom &&
 #if defined(_WIN32) || defined(__OS2__)
             !ch_fullscreen &&
             !ch_wm_state &&
@@ -676,9 +673,9 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !osys->ch_crop &&
             !osys->ch_viewpoint) {
 
-            if (osys->fit_window != 0) {
-                VoutDisplayFitWindow(vd, osys->fit_window == -1);
-                osys->fit_window = 0;
+            if (osys->fit_window) {
+                VoutDisplayFitWindow(vd, false);
+                osys->fit_window = false;
                 continue;
             }
             break;
@@ -706,15 +703,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
                                  &osys->cfg);
         }
-        /* */
-        if (osys->ch_zoom) {
-            osys->fit_window = -1;
-            osys->cfg.zoom.num = osys->zoom.num;
-            osys->cfg.zoom.den = osys->zoom.den;
-            osys->ch_zoom = false;
-
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg);
-        }
 #if defined(_WIN32) || defined(__OS2__)
         /* */
         if (ch_wm_state
@@ -733,8 +721,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
 
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
-            if (!osys->fit_window)
-                osys->fit_window = 1;
+            osys->fit_window = true;
             osys->sar.num = vd->source.i_sar_num;
             osys->sar.den = vd->source.i_sar_den;
             osys->ch_sar  = false;
@@ -781,8 +768,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
 
-            if (!osys->fit_window)
-                osys->fit_window = 1;
+            osys->fit_window = true;
             osys->crop.left   = left - osys->source.i_x_offset;
             osys->crop.top    = top  - osys->source.i_y_offset;
             /* FIXME for right/bottom we should keep the 'type' border vs window */
@@ -925,12 +911,14 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         den = 1;
     }
 
-    if (osys->is_display_filled ||
-        osys->zoom.num != num || osys->zoom.den != den) {
-        osys->ch_zoom = true;
-        osys->zoom.num = num;
-        osys->zoom.den = den;
-    }
+    if (!osys->is_display_filled
+     && osys->cfg.zoom.num == num && osys->cfg.zoom.den == den)
+        return; /* nothing to do */
+
+    osys->cfg.zoom.num = num;
+    osys->cfg.zoom.den = den;
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg);
+    VoutDisplayFitWindow(vd, true);
 }
 
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
@@ -1015,8 +1003,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->is_display_filled = cfg->is_display_filled;
     osys->viewpoint      = cfg->viewpoint;
 
-    osys->zoom.num = cfg->zoom.num;
-    osys->zoom.den = cfg->zoom.den;
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = cfg->is_fullscreen;
     osys->width_saved    = cfg->display.width;
@@ -1034,7 +1020,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
 #endif
-    osys->fit_window = 0;
+    osys->fit_window = false;
 
     osys->source = *source;
     osys->crop.left   = 0;
