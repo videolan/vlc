@@ -639,9 +639,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     if (osys->is_splitter)
         SplitterManage(vd);
 
-    bool fit_window = false;
-    for (;;) {
 #if defined(_WIN32) || defined(__OS2__)
+    for (;;) {
         vlc_mutex_lock(&osys->lock);
         bool ch_fullscreen  = osys->ch_fullscreen;
         bool is_fullscreen  = osys->is_fullscreen;
@@ -651,19 +650,11 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         unsigned wm_state  = osys->wm_state;
         osys->ch_wm_state = false;
         vlc_mutex_unlock(&osys->lock);
-#endif
 
-        if (
-#if defined(_WIN32) || defined(__OS2__)
-            !ch_fullscreen &&
-            !ch_wm_state &&
-#endif
-            !osys->ch_sar &&
-            !osys->ch_crop)
+        if (!ch_fullscreen && !ch_wm_state)
             break;
 
         /* */
-#if defined(_WIN32) || defined(__OS2__)
         if (ch_fullscreen) {
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
                                      is_fullscreen) == VLC_SUCCESS) {
@@ -681,77 +672,81 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
          && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
                                  wm_state))
             msg_Err(vd, "Failed to set on top");
+    }
 #endif
-        /* */
-        if (osys->ch_sar) {
-            if (osys->sar.num > 0 && osys->sar.den > 0) {
-                vd->source.i_sar_num = osys->sar.num;
-                vd->source.i_sar_den = osys->sar.den;
-            } else {
-                vd->source.i_sar_num = osys->source.i_sar_num;
-                vd->source.i_sar_den = osys->source.i_sar_den;
-            }
 
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
-            fit_window = true;
-            osys->sar.num = vd->source.i_sar_num;
-            osys->sar.den = vd->source.i_sar_den;
-            osys->ch_sar  = false;
+    bool fit_window = false;
 
-            /* If a crop ratio is requested, recompute the parameters */
-            if (osys->crop.num != 0 && osys->crop.den != 0)
-                osys->ch_crop = true;
+    if (osys->ch_sar) {
+        if (osys->sar.num > 0 && osys->sar.den > 0) {
+            vd->source.i_sar_num = osys->sar.num;
+            vd->source.i_sar_den = osys->sar.den;
+        } else {
+            vd->source.i_sar_num = osys->source.i_sar_num;
+            vd->source.i_sar_den = osys->source.i_sar_den;
         }
-        /* */
-        if (osys->ch_crop) {
-            unsigned crop_num = osys->crop.num;
-            unsigned crop_den = osys->crop.den;
-            if (crop_num != 0 && crop_den != 0) {
-                video_format_t fmt = osys->source;
-                fmt.i_sar_num = vd->source.i_sar_num;
-                fmt.i_sar_den = vd->source.i_sar_den;
-                VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
-                                     &osys->crop.right, &osys->crop.bottom,
-                                     &fmt, crop_num, crop_den);
-            }
-            const int right_max  = osys->source.i_x_offset + osys->source.i_visible_width;
-            const int bottom_max = osys->source.i_y_offset + osys->source.i_visible_height;
-            int left   = VLC_CLIP((int)osys->source.i_x_offset + osys->crop.left,
-                                0, right_max - 1);
-            int top    = VLC_CLIP((int)osys->source.i_y_offset + osys->crop.top,
-                                0, bottom_max - 1);
-            int right, bottom;
-            if (osys->crop.right <= 0)
-                right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + osys->crop.right;
-            else
-                right = (int)osys->source.i_x_offset + osys->crop.right;
-            right = VLC_CLIP(right, left + 1, right_max);
-            if (osys->crop.bottom <= 0)
-                bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + osys->crop.bottom;
-            else
-                bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
-            bottom = VLC_CLIP(bottom, top + 1, bottom_max);
 
-            vd->source.i_x_offset       = left;
-            vd->source.i_y_offset       = top;
-            vd->source.i_visible_width  = right - left;
-            vd->source.i_visible_height = bottom - top;
-            video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
-            video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
+        fit_window = true;
+        osys->sar.num = vd->source.i_sar_num;
+        osys->sar.den = vd->source.i_sar_den;
+        osys->ch_sar  = false;
 
-            fit_window = true;
-            osys->crop.left   = left - osys->source.i_x_offset;
-            osys->crop.top    = top  - osys->source.i_y_offset;
-            /* FIXME for right/bottom we should keep the 'type' border vs window */
-            osys->crop.right  = right -
-                                (osys->source.i_x_offset + osys->source.i_visible_width);
-            osys->crop.bottom = bottom -
-                                (osys->source.i_y_offset + osys->source.i_visible_height);
-            osys->crop.num    = crop_num;
-            osys->crop.den    = crop_den;
-            osys->ch_crop = false;
+        /* If a crop ratio is requested, recompute the parameters */
+        if (osys->crop.num != 0 && osys->crop.den != 0)
+            osys->ch_crop = true;
+    }
+
+    if (osys->ch_crop) {
+        unsigned crop_num = osys->crop.num;
+        unsigned crop_den = osys->crop.den;
+
+        if (crop_num != 0 && crop_den != 0) {
+            video_format_t fmt = osys->source;
+            fmt.i_sar_num = vd->source.i_sar_num;
+            fmt.i_sar_den = vd->source.i_sar_den;
+            VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
+                                 &osys->crop.right, &osys->crop.bottom,
+                                 &fmt, crop_num, crop_den);
         }
+
+        const int right_max  = osys->source.i_x_offset + osys->source.i_visible_width;
+        const int bottom_max = osys->source.i_y_offset + osys->source.i_visible_height;
+        int left   = VLC_CLIP((int)osys->source.i_x_offset + osys->crop.left,
+                              0, right_max - 1);
+        int top    = VLC_CLIP((int)osys->source.i_y_offset + osys->crop.top,
+                              0, bottom_max - 1);
+        int right, bottom;
+
+        if (osys->crop.right <= 0)
+            right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + osys->crop.right;
+        else
+            right = (int)osys->source.i_x_offset + osys->crop.right;
+        right = VLC_CLIP(right, left + 1, right_max);
+        if (osys->crop.bottom <= 0)
+            bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + osys->crop.bottom;
+        else
+            bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
+        bottom = VLC_CLIP(bottom, top + 1, bottom_max);
+
+        vd->source.i_x_offset       = left;
+        vd->source.i_y_offset       = top;
+        vd->source.i_visible_width  = right - left;
+        vd->source.i_visible_height = bottom - top;
+        video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
+        video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+        fit_window = true;
+        osys->crop.left   = left - osys->source.i_x_offset;
+        osys->crop.top    = top  - osys->source.i_y_offset;
+        /* FIXME for right/bottom we should keep the 'type' border vs window */
+        osys->crop.right  = right -
+                            (osys->source.i_x_offset + osys->source.i_visible_width);
+        osys->crop.bottom = bottom -
+                            (osys->source.i_y_offset + osys->source.i_visible_height);
+        osys->crop.num    = crop_num;
+        osys->crop.den    = crop_den;
+        osys->ch_crop = false;
     }
 
     if (fit_window)
