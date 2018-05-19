@@ -354,9 +354,6 @@ typedef struct {
         unsigned den;
     } crop;
 
-    bool ch_viewpoint;
-    vlc_viewpoint_t viewpoint;
-
     /* */
     video_format_t source;
     filter_chain_t *filters;
@@ -662,8 +659,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !ch_wm_state &&
 #endif
             !osys->ch_sar &&
-            !osys->ch_crop &&
-            !osys->ch_viewpoint)
+            !osys->ch_crop)
             break;
 
         /* */
@@ -755,18 +751,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->crop.num    = crop_num;
             osys->crop.den    = crop_den;
             osys->ch_crop = false;
-        }
-        if (osys->ch_viewpoint) {
-            vout_display_cfg_t cfg = osys->cfg;
-
-            cfg.viewpoint = osys->viewpoint;
-
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_VIEWPOINT, &cfg)) {
-                msg_Err(vd, "Failed to change Viewpoint");
-                osys->viewpoint = osys->cfg.viewpoint;
-            }
-            osys->cfg.viewpoint = osys->viewpoint;
-            osys->ch_viewpoint  = false;
         }
     }
 
@@ -950,13 +934,19 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->viewpoint.yaw   != p_viewpoint->yaw ||
-        osys->viewpoint.pitch != p_viewpoint->pitch ||
-        osys->viewpoint.roll  != p_viewpoint->roll ||
-        osys->viewpoint.fov   != p_viewpoint->fov) {
-        osys->viewpoint = *p_viewpoint;
+    if (osys->cfg.viewpoint.yaw   != p_viewpoint->yaw ||
+        osys->cfg.viewpoint.pitch != p_viewpoint->pitch ||
+        osys->cfg.viewpoint.roll  != p_viewpoint->roll ||
+        osys->cfg.viewpoint.fov   != p_viewpoint->fov) {
+        vlc_viewpoint_t old_vp = osys->cfg.viewpoint;
 
-        osys->ch_viewpoint = true;
+        osys->cfg.viewpoint = *p_viewpoint;
+
+        if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_VIEWPOINT,
+                                 &osys->cfg)) {
+            msg_Err(vd, "Failed to change Viewpoint");
+            osys->cfg.viewpoint = old_vp;
+        }
     }
 }
 
@@ -982,7 +972,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
-    osys->viewpoint      = cfg->viewpoint;
 
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = cfg->is_fullscreen;
