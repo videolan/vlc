@@ -1703,7 +1703,9 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
                             input_priv(p_input)->p_sout );
     if( dec != NULL )
     {
-        input_DecoderChangeRate( dec, p_sys->i_rate );
+        float rate = (float)p_sys->i_rate / (float)INPUT_RATE_DEFAULT;
+
+        input_DecoderChangeRate( dec, rate );
 
         if( p_sys->b_buffering )
             input_DecoderStartWait( dec );
