@@ -73,6 +73,9 @@ struct vout_window_sys_t
     struct org_kde_kwin_server_decoration_manager *deco_manager;
     struct org_kde_kwin_server_decoration *deco;
 
+    unsigned width;
+    unsigned height;
+
     vlc_thread_t thread;
 };
 
@@ -170,6 +173,7 @@ static void xdg_toplevel_configure_cb(void *data,
                                       struct wl_array *states)
 {
     vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
     const uint32_t *state;
 
     msg_Dbg(wnd, "new configuration: %"PRId32"x%"PRId32, width, height);
@@ -180,8 +184,10 @@ static void xdg_toplevel_configure_cb(void *data,
 
     /* Zero width or zero height means client (we) should choose.
      * DO NOT REPORT those values to video output... */
-    if (width != 0 && height != 0)
-        vout_window_ReportSize(wnd,  width, height);
+    if (width != 0)
+        sys->width = width;
+    if (height != 0)
+        sys->height = height;
 
     /* TODO: report fullscreen/minimized/maximized state
      * not implemented in VLC vout_window_t yet though */
@@ -205,7 +211,11 @@ static const struct xdg_toplevel_listener xdg_toplevel_cbs =
 static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
                                      uint32_t serial)
 {
-    (void) data;
+    vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
+
+    vout_window_ReportSize(wnd, sys->width, sys->height);
+    xdg_surface_set_window_geometry(surface, 0, 0, sys->width, sys->height);
     xdg_surface_ack_configure(surface, serial);
 }
 
@@ -286,6 +296,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->toplevel = NULL;
     sys->deco_manager = NULL;
     sys->deco = NULL;
+    sys->width = cfg->width;
+    sys->height = cfg->height;
     wnd->sys = sys;
 
     /* Connect to the display server */
