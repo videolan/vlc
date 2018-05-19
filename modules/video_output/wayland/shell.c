@@ -296,7 +296,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
-    vout_window_SetFullScreen(wnd, cfg->is_fullscreen);
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen(wnd);
     return VLC_SUCCESS;
 
 error:

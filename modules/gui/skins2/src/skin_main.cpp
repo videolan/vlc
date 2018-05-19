@@ -400,7 +400,8 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    vout_window_SetFullScreen( pWnd, cfg->is_fullscreen );
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen( pWnd );
     return VLC_SUCCESS;
 }
 
