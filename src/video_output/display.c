@@ -643,7 +643,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         SplitterManage(vd);
 
     bool fit_window = false;
-    bool reset_render = false;
     for (;;) {
 #if defined(_WIN32) || defined(__OS2__)
         vlc_mutex_lock(&osys->lock);
@@ -657,10 +656,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         vlc_mutex_unlock(&osys->lock);
 #endif
 
-        bool reset_pictures = allow_reset_pictures
-            && atomic_exchange(&osys->reset_pictures, false);
-
-        if (!reset_pictures &&
+        if (
 #if defined(_WIN32) || defined(__OS2__)
             !ch_fullscreen &&
             !ch_wm_state &&
@@ -772,24 +768,22 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             osys->cfg.viewpoint = osys->viewpoint;
             osys->ch_viewpoint  = false;
         }
-
-        /* */
-        if (reset_pictures) {
-            if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES)) {
-                /* FIXME what to do here ? */
-                msg_Err(vd, "Failed to reset pictures (probably fatal)");
-            }
-            reset_render = true;
-        }
     }
 
     if (fit_window)
         VoutDisplayFitWindow(vd, false);
 
-    if (reset_render)
+    if (allow_reset_pictures
+     && atomic_exchange(&osys->reset_pictures, false)) {
+        if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES)) {
+            /* FIXME what to do here ? */
+            msg_Err(vd, "Failed to reset pictures (probably fatal)");
+        }
         VoutDisplayResetRender(vd);
+        return true;
+    }
 
-    return reset_render;
+    return false;
 }
 
 bool vout_AreDisplayPicturesInvalid(vout_display_t *vd)
