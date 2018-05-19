@@ -333,8 +333,6 @@ typedef struct {
     vlc_rational_t sar_initial;
 
     /* */
-    bool is_display_filled;
-
 #if defined(_WIN32) || defined(__OS2__)
     unsigned width_saved;
     unsigned height_saved;
@@ -664,7 +662,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             && atomic_exchange(&osys->reset_pictures, false);
 
         if (!reset_pictures &&
-            osys->is_display_filled == osys->cfg.is_display_filled &&
 #if defined(_WIN32) || defined(__OS2__)
             !ch_fullscreen &&
             !ch_wm_state &&
@@ -694,16 +691,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             } else
                 msg_Err(vd, "Failed to set fullscreen");
         }
-#endif
 
-        /* */
-        if (osys->is_display_filled != osys->cfg.is_display_filled) {
-            osys->cfg.is_display_filled = osys->is_display_filled;
-
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
-                                 &osys->cfg);
-        }
-#if defined(_WIN32) || defined(__OS2__)
         /* */
         if (ch_wm_state
          && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
@@ -889,7 +877,11 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    osys->is_display_filled = is_filled;
+    if (is_filled == osys->cfg.is_display_filled)
+        return; /* nothing to do */
+
+    osys->cfg.is_display_filled = is_filled;
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &osys->cfg);
 }
 
 void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
@@ -911,7 +903,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
         den = 1;
     }
 
-    if (!osys->is_display_filled
+    if (!osys->cfg.is_display_filled
      && osys->cfg.zoom.num == num && osys->cfg.zoom.den == den)
         return; /* nothing to do */
 
@@ -1000,7 +992,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
-    osys->is_display_filled = cfg->is_display_filled;
     osys->viewpoint      = cfg->viewpoint;
 
 #if defined(_WIN32) || defined(__OS2__)
