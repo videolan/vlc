@@ -756,11 +756,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
                 if (!is_fullscreen && !osys->window_fullscreen)
                     vout_SetDisplayWindowSize(osys->vout, osys->width_saved,
                                               osys->height_saved);
-            } else {
-                is_fullscreen = osys->cfg.is_fullscreen;
-
+            } else
                 msg_Err(vd, "Failed to set fullscreen");
-            }
         }
 #endif
 
