@@ -218,11 +218,13 @@ libxdg_shell_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libxdg_shell_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 
 video_output/wayland/xdg-shell-client-protocol.h: \
-		$(WAYLAND_PROTOCOLS)/unstable/xdg-shell/xdg-shell-unstable-v5.xml
+		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml \
+		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
 
 video_output/wayland/xdg-shell-protocol.c: \
-		$(WAYLAND_PROTOCOLS)/unstable/xdg-shell/xdg-shell-unstable-v5.xml
+		$(WAYLAND_PROTOCOLS)/stable/xdg-shell/xdg-shell.xml \
+		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 video_output/wayland/server-decoration-client-protocol.h: \

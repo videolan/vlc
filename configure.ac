@@ -3153,12 +3153,12 @@ have_wayland_egl="no"
 AS_IF([test "${enable_wayland}" != "no"], [
   PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
     AC_MSG_CHECKING([for the Wayland protocols])
-    PKG_CHECK_EXISTS([wayland-protocols >= 1.4], [
+    PKG_CHECK_EXISTS([wayland-protocols >= 1.12], [
       WAYLAND_PROTOCOLS="$(${PKG_CONFIG} wayland-protocols --variable pkgdatadir)"
       AC_MSG_RESULT([${WAYLAND_PROTOCOLS}])
     ], [
       AC_MSG_RESULT([not found])
-      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-protocols >= 1.4')])
+      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-protocols >= 1.12')])
     ])
 
     AC_MSG_CHECKING([for the Wayland scanner])
