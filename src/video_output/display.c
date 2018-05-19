@@ -373,8 +373,6 @@ typedef struct {
     } mouse;
 
     atomic_bool reset_pictures;
-
-    bool fit_window;
 } vout_display_owner_sys_t;
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
@@ -644,6 +642,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     if (osys->is_splitter)
         SplitterManage(vd);
 
+    bool fit_window = false;
     bool reset_render = false;
     for (;;) {
 #if defined(_WIN32) || defined(__OS2__)
@@ -668,15 +667,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 #endif
             !osys->ch_sar &&
             !osys->ch_crop &&
-            !osys->ch_viewpoint) {
-
-            if (osys->fit_window) {
-                VoutDisplayFitWindow(vd, false);
-                osys->fit_window = false;
-                continue;
-            }
+            !osys->ch_viewpoint)
             break;
-        }
 
         /* */
 #if defined(_WIN32) || defined(__OS2__)
@@ -709,7 +701,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             }
 
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
-            osys->fit_window = true;
+            fit_window = true;
             osys->sar.num = vd->source.i_sar_num;
             osys->sar.den = vd->source.i_sar_den;
             osys->ch_sar  = false;
@@ -756,7 +748,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
 
-            osys->fit_window = true;
+            fit_window = true;
             osys->crop.left   = left - osys->source.i_x_offset;
             osys->crop.top    = top  - osys->source.i_y_offset;
             /* FIXME for right/bottom we should keep the 'type' border vs window */
@@ -790,6 +782,10 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             reset_render = true;
         }
     }
+
+    if (fit_window)
+        VoutDisplayFitWindow(vd, false);
+
     if (reset_render)
         VoutDisplayResetRender(vd);
 
@@ -1011,7 +1007,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
 #endif
-    osys->fit_window = false;
 
     osys->source = *source;
     osys->crop.left   = 0;
