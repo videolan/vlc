@@ -163,10 +163,19 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
     vout_WindowMouseEvent(vout, mouse);
 }
 
+static void vout_display_window_KeyboardEvent(vout_window_t *window,
+                                              unsigned key)
+{
+    vout_thread_t *vout = (vout_thread_t *)window->obj.parent;
+
+    vout_SendEventKey(vout, key);
+}
+
 static const struct vout_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
     .mouse_event = vout_display_window_MouseEvent,
+    .keyboard_event = vout_display_window_KeyboardEvent,
 };
 
 /**

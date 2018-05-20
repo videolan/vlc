@@ -121,6 +121,7 @@ struct vout_window_callbacks {
     void (*closed)(vout_window_t *);
     void (*mouse_event)(vout_window_t *,
                         const vout_window_mouse_event_t *mouse);
+    void (*keyboard_event)(vout_window_t *, unsigned key);
 };
 
 typedef struct vout_window_owner {
@@ -384,7 +385,8 @@ static inline void vout_window_ReportMouseDoubleClick(vout_window_t *window,
 
 static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
 {
-    var_SetInteger(window->obj.libvlc, "key-pressed", key);
+    if (window->owner.cbs->keyboard_event != NULL)
+        window->owner.cbs->keyboard_event(window, key);
 }
 
 /** @} */
