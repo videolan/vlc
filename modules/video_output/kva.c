@@ -103,6 +103,8 @@ struct vout_display_sys_t
     unsigned           button_pressed;
     bool               is_mouse_hidden;
     bool               is_on_top;
+    mtime_t            cursor_timeout;
+    mtime_t            cursor_deadline;
 };
 
 typedef struct
@@ -391,6 +393,18 @@ static void Display( vout_display_t *vd, picture_t *picture,
      * here, WM_SIZE is not sent to its child window.
      * Maybe, is this due to the different threads ? */
     WinPostMsg( sys->client, WM_VLC_MANAGE, 0, 0 );
+
+    if( !sys->is_mouse_hidden && sys->cursor_deadline < mdate() )
+    {
+        POINTL ptl;
+
+        WinQueryPointerPos( HWND_DESKTOP, &ptl );
+        if( WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE ) == sys->client )
+        {
+            WinShowPointer( HWND_DESKTOP, FALSE );
+            sys->is_mouse_hidden = true;
+        }
+    }
 }
 
 /*****************************************************************************
@@ -402,21 +416,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     switch (query)
     {
-    case VOUT_DISPLAY_HIDE_MOUSE:
-    {
-        POINTL ptl;
-
-        WinQueryPointerPos( HWND_DESKTOP, &ptl );
-        if( !sys->is_mouse_hidden &&
-            WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE ) == sys->client )
-        {
-            WinShowPointer( HWND_DESKTOP, FALSE );
-            sys->is_mouse_hidden = true;
-        }
-
-        return VLC_SUCCESS;
-    }
-
     case VOUT_DISPLAY_CHANGE_FULLSCREEN:
     {
         bool fs = va_arg(args, int);
@@ -646,6 +645,10 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
                   ( char * )&sys->kvas.fccSrcColor,
                   psz_video_mode[ sys->kvac.ulMode - 1 ]);
     WinSetWindowText( sys->frame, sz_title );
+
+    sys->cursor_timeout = var_InheritInteger( vd, "mouse-hide-timeout" )
+                          * (CLOCK_FREQ / 1000);
+    sys->cursor_deadline = INT64_MAX;
 
     sys->i_screen_width  = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
     sys->i_screen_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
@@ -956,6 +959,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     {
         WinShowPointer(HWND_DESKTOP, TRUE);
         sys->is_mouse_hidden = false;
+        sys->cursor_deadline = mdate() + sys->cursor_timeout;
     }
 
     switch( msg )
