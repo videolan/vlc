@@ -126,6 +126,12 @@ static void *Thread(void *data)
     //return NULL;
 }
 
+struct device_data
+{
+    uint32_t name;
+    struct vout_window_t *window;
+};
+
 static int Control(vout_window_t *wnd, int cmd, va_list ap)
 {
     vout_window_sys_t *sys = wnd->sys;
@@ -275,6 +281,64 @@ static const struct xdg_wm_base_listener xdg_wm_base_cbs =
     xdg_wm_base_ping_cb,
 };
 
+static void output_geometry_cb(void *data, struct wl_output *output,
+                               int32_t x, int32_t y, int32_t w, int32_t h,
+                               int32_t sp, const char *make, const char *model,
+                               int32_t transform)
+{
+    struct device_data *dd = data;
+    struct vout_window_t *wnd = dd->window;
+    char idstr[11];
+    char *name;
+
+    msg_Dbg(wnd, "output %"PRIu32" geometry: %"PRId32"x%"PRId32"mm"
+            "+%"PRId32"+%"PRId32", subpixel %"PRId32", transform %"PRId32,
+            dd->name, w, h, x, y, sp, transform);
+
+    sprintf(idstr, "%"PRIu32, dd->name);
+    if (likely(asprintf(&name, "%s - %s", make, model) >= 0))
+    {
+        vout_window_ReportOutputDevice(wnd, idstr, name);
+        free(name);
+    }
+    (void) output;
+}
+
+static void output_mode_cb(void *data, struct wl_output *output,
+                           uint32_t flags, int32_t w, int32_t h, int32_t vr)
+{
+    struct device_data *dd = data;
+    struct vout_window_t *wnd = dd->window;
+    div_t d = div(vr, 1000);
+
+    msg_Dbg(wnd, "output %"PRIu32" mode: 0x%"PRIx32" %"PRId32"x%"PRId32
+            ", %d.%03d Hz", dd->name, flags, w, h, d.quot, d.rem);
+    (void) output;
+}
+
+static void output_done_cb(void *data, struct wl_output *output)
+{
+    wl_output_destroy(output);
+    free(data);
+}
+
+static void output_scale_cb(void *data, struct wl_output *output, int32_t f)
+{
+    struct device_data *dd = data;
+    struct vout_window_t *wnd = dd->window;
+
+    msg_Dbg(wnd, "output %"PRIu32" scale: %"PRId32, dd->name, f);
+    (void) output;
+}
+
+static const struct wl_output_listener output_cbs =
+{
+    output_geometry_cb,
+    output_mode_cb,
+    output_done_cb,
+    output_scale_cb,
+};
+
 static void registry_global_cb(void *data, struct wl_registry *registry,
                                uint32_t name, const char *iface, uint32_t vers)
 {
@@ -287,6 +351,22 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
         sys->compositor = wl_registry_bind(registry, name,
                                            &wl_compositor_interface,
                                            (vers < 2) ? vers : 2);
+    else
+    if (!strcmp(iface, "wl_output") && vers >= 2)
+    {
+        struct device_data *dd = malloc(sizeof (*dd));
+        if (unlikely(dd == NULL))
+            return;
+
+        struct wl_output *output = wl_registry_bind(registry, name,
+                                                    &wl_output_interface, 2);
+        if (unlikely(output == NULL))
+            return;
+
+        dd->name = name;
+        dd->window = wnd;
+        wl_output_add_listener(output, &output_cbs, dd);
+    }
     else
 #ifndef XDG_SHELL_UNSTABLE_VERSION
     if (!strcmp(iface, "xdg_wm_base"))
@@ -305,8 +385,14 @@ static void registry_global_remove_cb(void *data, struct wl_registry *registry,
                                       uint32_t name)
 {
     vout_window_t *wnd = data;
+    char idstr[11];
 
     msg_Dbg(wnd, "global remove %3"PRIu32, name);
+
+    /* If the global was an output, this will remove it. Otherwise, no-op. */
+    sprintf(idstr, "%"PRIu32, name);
+    vout_window_ReportOutputDevice(wnd, idstr, NULL);
+
     (void) registry;
 }
 
@@ -356,6 +442,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     wl_registry_add_listener(sys->registry, &registry_cbs, wnd);
     wl_display_roundtrip(display); /* complete registry enumeration */
+    wl_display_roundtrip(display); /* complete devices enumeration */
 
     if (sys->compositor == NULL || sys->wm_base == NULL)
         goto error;
