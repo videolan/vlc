@@ -57,6 +57,7 @@
 # define xdg_toplevel_set_app_id zxdg_toplevel_v6_set_app_id
 # define xdg_toplevel_set_fullscreen zxdg_toplevel_v6_set_fullscreen
 # define xdg_toplevel_unset_fullscreen zxdg_toplevel_v6_unset_fullscreen
+# define XDG_TOPLEVEL_STATE_FULLSCREEN ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN
 #endif
 #include "server-decoration-client-protocol.h"
 
@@ -75,6 +76,7 @@ struct vout_window_sys_t
 
     unsigned width;
     unsigned height;
+    bool fullscreen;
 
     vlc_thread_t thread;
 };
@@ -174,9 +176,18 @@ static void xdg_toplevel_configure_cb(void *data,
     const uint32_t *state;
 
     msg_Dbg(wnd, "new configuration: %"PRId32"x%"PRId32, width, height);
+
+    sys->fullscreen = false;
     wl_array_for_each(state, states)
     {
         msg_Dbg(wnd, " - state 0x%04"PRIX32, *state);
+
+        switch (*state)
+        {
+            case XDG_TOPLEVEL_STATE_FULLSCREEN:
+                sys->fullscreen = true;
+                break;
+        }
     }
 
     /* Zero width or zero height means client (we) should choose.
@@ -186,8 +197,6 @@ static void xdg_toplevel_configure_cb(void *data,
     if (height != 0)
         sys->height = height;
 
-    /* TODO: report fullscreen/minimized/maximized state
-     * not implemented in VLC vout_window_t yet though */
     (void) toplevel;
 }
 
@@ -212,6 +221,12 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
     vout_window_sys_t *sys = wnd->sys;
 
     vout_window_ReportSize(wnd, sys->width, sys->height);
+
+    if (sys->fullscreen)
+        vout_window_ReportFullscreen(wnd, NULL);
+    else
+        vout_window_ReportWindowed(wnd);
+
     xdg_surface_set_window_geometry(surface, 0, 0, sys->width, sys->height);
     xdg_surface_ack_configure(surface, serial);
 }
@@ -291,6 +306,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->deco = NULL;
     sys->width = cfg->width;
     sys->height = cfg->height;
+    sys->fullscreen = false;
     wnd->sys = sys;
 
     /* Connect to the display server */
