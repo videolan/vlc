@@ -76,6 +76,8 @@ struct vout_window_sys_t
     struct org_kde_kwin_server_decoration_manager *deco_manager;
     struct org_kde_kwin_server_decoration *deco;
 
+    uint32_t default_output;
+
     unsigned width;
     unsigned height;
     bool fullscreen;
@@ -165,6 +167,10 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
                 output = wl_registry_bind(sys->registry, name,
                                           &wl_output_interface, 1);
             }
+            else
+            if (sys->default_output != 0)
+                output = wl_registry_bind(sys->registry, sys->default_output,
+                                          &wl_output_interface, 1);
 
             xdg_toplevel_set_fullscreen(sys->toplevel, output);
 
@@ -324,6 +330,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->toplevel = NULL;
     sys->deco_manager = NULL;
     sys->deco = NULL;
+    sys->default_output = var_InheritInteger(wnd, "wl-output");
     sys->width = cfg->width;
     sys->height = cfg->height;
     sys->fullscreen = false;
@@ -474,6 +481,10 @@ static void Close(vout_window_t *wnd)
     "Video will be rendered with this Wayland display. " \
     "If empty, the default display will be used.")
 
+#define OUTPUT_TEXT N_("Fullscreen output")
+#define OUTPUT_LONGTEXT N_( \
+    "Fullscreen mode with use the output with this name by default.")
+
 vlc_module_begin()
 #ifndef XDG_SHELL_UNSTABLE_VERSION
     set_shortname(N_("XDG shell"))
@@ -492,4 +503,7 @@ vlc_module_begin()
     set_callbacks(Open, Close)
 
     add_string("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+    add_integer("wl-output", 0, OUTPUT_TEXT, OUTPUT_LONGTEXT, true)
+        change_integer_range(0, UINT32_MAX)
+        change_volatile()
 vlc_module_end()
