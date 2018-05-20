@@ -495,8 +495,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
                                                    sys->deco_manager, surface);
     if (sys->deco != NULL)
         org_kde_kwin_server_decoration_request_mode(sys->deco, deco_mode);
-    else if (deco_mode == ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER)
+    else
+    if (deco_mode != ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT)
+    {
         msg_Err(wnd, "server-side decoration not supported");
+        goto error;
+    }
 
     //if (var_InheritBool (wnd, "keyboard-events"))
     //    do_something();
