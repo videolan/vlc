@@ -69,6 +69,7 @@
 
 struct vout_window_sys_t
 {
+    struct wl_registry *registry;
     struct wl_compositor *compositor;
     struct xdg_wm_base *wm_base;
     struct xdg_surface *surface;
@@ -349,13 +350,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     }
 
     /* Find the interesting singleton(s) */
-    struct wl_registry *registry = wl_display_get_registry(display);
-    if (registry == NULL)
+    sys->registry = wl_display_get_registry(display);
+    if (sys->registry == NULL)
         goto error;
 
-    wl_registry_add_listener(registry, &registry_cbs, wnd);
-    wl_display_roundtrip(display);
-    wl_registry_destroy(registry);
+    wl_registry_add_listener(sys->registry, &registry_cbs, wnd);
+    wl_display_roundtrip(display); /* complete registry enumeration */
 
     if (sys->compositor == NULL || sys->wm_base == NULL)
         goto error;
@@ -447,6 +447,8 @@ error:
         xdg_wm_base_destroy(sys->wm_base);
     if (sys->compositor != NULL)
         wl_compositor_destroy(sys->compositor);
+    if (sys->registry != NULL)
+        wl_registry_destroy(sys->registry);
     wl_display_disconnect(display);
     free(sys);
     return VLC_EGENERIC;
@@ -471,6 +473,7 @@ static void Close(vout_window_t *wnd)
     wl_surface_destroy(wnd->handle.wl);
     xdg_wm_base_destroy(sys->wm_base);
     wl_compositor_destroy(sys->compositor);
+    wl_registry_destroy(sys->registry);
     wl_display_disconnect(wnd->display.wl);
     free(sys);
 }
