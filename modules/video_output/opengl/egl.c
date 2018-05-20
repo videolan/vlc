@@ -53,7 +53,6 @@ typedef struct vlc_gl_sys_t
 #endif
 #if defined (USE_PLATFORM_WAYLAND)
     struct wl_egl_window *window;
-    unsigned width, height;
 #endif
     PFNEGLCREATEIMAGEKHRPROC    eglCreateImageKHR;
     PFNEGLDESTROYIMAGEKHRPROC   eglDestroyImageKHR;
@@ -82,11 +81,7 @@ static void Resize (vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vlc_gl_sys_t *sys = gl->sys;
 
-    wl_egl_window_resize(sys->window, width, height,
-                         (sys->width - width) / 2,
-                         (sys->height - height) / 2);
-    sys->width = width;
-    sys->height = height;
+    wl_egl_window_resize(sys->window, width, height, 0, 0);
 }
 #else
 # define Resize (NULL)
