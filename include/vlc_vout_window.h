@@ -120,9 +120,12 @@ struct vout_window_callbacks {
     void (*state_changed)(vout_window_t *, unsigned state);
     void (*windowed)(vout_window_t *);
     void (*fullscreened)(vout_window_t *, const char *id);
+
     void (*mouse_event)(vout_window_t *,
                         const vout_window_mouse_event_t *mouse);
     void (*keyboard_event)(vout_window_t *, unsigned key);
+
+    void (*output_event)(vout_window_t *, const char *id, const char *desc);
 };
 
 typedef struct vout_window_owner {
@@ -419,6 +422,27 @@ static inline void vout_window_ReportKeyPress(vout_window_t *window, int key)
 {
     if (window->owner.cbs->keyboard_event != NULL)
         window->owner.cbs->keyboard_event(window, key);
+}
+
+/**
+ * Adds/removes a fullscreen output.
+ *
+ * This notifies the owner of the window that a usable fullscreen output has
+ * been added, changed or removed.
+ *
+ * If an output with the same identifier is already known, its name will be
+ * updated. Otherwise it will be added.
+ * If the name parameter is NULL, the output will be removed.
+ *
+ * \param id unique nul-terminated identifier for the output
+ * \param name human-readable name
+ */
+static inline void vout_window_ReportOutputDevice(vout_window_t *window,
+                                                  const char *id,
+                                                  const char *name)
+{
+    if (window->owner.cbs->output_event != NULL)
+        window->owner.cbs->output_event(window, id, name);
 }
 
 /** @} */

@@ -240,6 +240,15 @@ static void vout_display_window_KeyboardEvent(vout_window_t *window,
     vout_SendEventKey(vout, key);
 }
 
+static void vout_display_window_OutputEvent(vout_window_t *window,
+                                            const char *name, const char *desc)
+{
+    if (desc != NULL)
+        msg_Dbg(window, "fullscreen output %s (%s) added", name, desc);
+    else
+        msg_Dbg(window, "fullscreen output %s removed", name);
+}
+
 static const struct vout_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
@@ -248,6 +257,7 @@ static const struct vout_window_callbacks vout_display_window_cbs = {
     .windowed = vout_display_window_WindowingNotify,
     .mouse_event = vout_display_window_MouseEvent,
     .keyboard_event = vout_display_window_KeyboardEvent,
+    .output_event = vout_display_window_OutputEvent,
 };
 
 /**
