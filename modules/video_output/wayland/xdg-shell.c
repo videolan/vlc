@@ -1,6 +1,6 @@
 /**
  * @file xdg-shell.c
- * @brief XDG shell surface provider module for VLC media player
+ * @brief Desktop shell surface provider module for VLC media player
  */
 /*****************************************************************************
  * Copyright © 2014, 2017 Rémi Denis-Courmont
@@ -33,6 +33,7 @@
 #include <poll.h>
 
 #include <wayland-client.h>
+#ifdef XDG_SHELL
 #ifndef XDG_SHELL_UNSTABLE_VERSION
 #include "xdg-shell-client-protocol.h"
 #else
@@ -60,6 +61,28 @@
 # define xdg_toplevel_set_fullscreen zxdg_toplevel_v6_set_fullscreen
 # define xdg_toplevel_unset_fullscreen zxdg_toplevel_v6_unset_fullscreen
 # define XDG_TOPLEVEL_STATE_FULLSCREEN ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN
+#endif
+#else
+# define xdg_wm_base wl_shell
+# define xdg_wm_base_interface wl_shell_interface
+# define xdg_wm_base_add_listener(s, l, q) (void)0
+# define xdg_wm_base_destroy wl_shell_destroy
+# define xdg_wm_base_get_xdg_surface wl_shell_get_shell_surface
+# define xdg_wm_base_pong wl_shell_pong
+# define xdg_surface wl_shell_surface
+# define xdg_surface_listener wl_shell_surface_listener
+# define xdg_surface_add_listener wl_shell_surface_add_listener
+# define xdg_surface_destroy wl_shell_surface_destroy
+# define xdg_surface_get_toplevel(s) (s)
+# define xdg_surface_set_window_geometry(s,x,y,w,h) (void)0
+# define xdg_toplevel wl_shell_surface
+# define xdg_toplevel_add_listener(s, l, q) (void)0
+# define xdg_toplevel_destroy(s) (void)0
+# define xdg_toplevel_set_title wl_shell_surface_set_title
+# define xdg_toplevel_set_app_id(s, i) (void)0
+# define xdg_toplevel_set_fullscreen(s, o) \
+         wl_shell_surface_set_fullscreen(s, 1, 0, o)
+# define xdg_toplevel_unset_fullscreen wl_shell_surface_set_toplevel
 #endif
 #include "server-decoration-client-protocol.h"
 
@@ -199,6 +222,7 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
     return VLC_SUCCESS;
 }
 
+#ifdef XDG_SHELL
 static void xdg_toplevel_configure_cb(void *data,
                                       struct xdg_toplevel *toplevel,
                                       int32_t width, int32_t height,
@@ -280,6 +304,41 @@ static const struct xdg_wm_base_listener xdg_wm_base_cbs =
 {
     xdg_wm_base_ping_cb,
 };
+#else
+static void wl_shell_surface_configure_cb(void *data,
+                                          struct wl_shell_surface *toplevel,
+                                          uint32_t edges,
+                                          int32_t width, int32_t height)
+{
+    vout_window_t *wnd = data;
+
+    msg_Dbg(wnd, "new configuration: %"PRId32"x%"PRId32, width, height);
+    vout_window_ReportSize(wnd, width, height);
+    (void) toplevel; (void) edges;
+}
+
+static void wl_shell_surface_ping_cb(void *data,
+                                     struct wl_shell_surface *surface,
+                                     uint32_t serial)
+{
+    (void) data;
+    wl_shell_surface_pong(surface, serial);
+}
+
+static void wl_shell_surface_popup_done_cb(void *data,
+                                           struct wl_shell_surface *surface)
+{
+    (void) data; (void) surface;
+}
+
+static const struct wl_shell_surface_listener wl_shell_surface_cbs =
+{
+    wl_shell_surface_ping_cb,
+    wl_shell_surface_configure_cb,
+    wl_shell_surface_popup_done_cb,
+};
+#define xdg_surface_cbs wl_shell_surface_cbs
+#endif
 
 static void output_geometry_cb(void *data, struct wl_output *output,
                                int32_t x, int32_t y, int32_t w, int32_t h,
@@ -368,10 +427,14 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
         wl_output_add_listener(output, &output_cbs, dd);
     }
     else
-#ifndef XDG_SHELL_UNSTABLE_VERSION
+#ifdef XDG_SHELL
+# ifndef XDG_SHELL_UNSTABLE_VERSION
     if (!strcmp(iface, "xdg_wm_base"))
-#else
+# else
     if (!strcmp(iface, "zxdg_shell_v6"))
+# endif
+#else
+    if (!strcmp(iface, "wl_shell"))
 #endif
         sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
                                         1);
@@ -580,19 +643,28 @@ static void Close(vout_window_t *wnd)
     "Fullscreen mode with use the output with this name by default.")
 
 vlc_module_begin()
-#ifndef XDG_SHELL_UNSTABLE_VERSION
+#ifdef XDG_SHELL
+# ifndef XDG_SHELL_UNSTABLE_VERSION
     set_shortname(N_("XDG shell"))
     set_description(N_("XDG shell surface"))
-#else
+# else
     set_shortname(N_("XDG shell v6"))
     set_description(N_("XDG shell (unstable version 6) surface"))
+# endif
+#else
+    set_shortname(N_("WL shell"))
+    set_description(N_("Wayland shell surface"))
 #endif
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
-#ifndef XDG_SHELL_UNSTABLE_VERSION
+#ifdef XDG_SHELL
+# ifndef XDG_SHELL_UNSTABLE_VERSION
     set_capability("vout window", 20)
-#else
+# else
     set_capability("vout window", 19)
+# endif
+#else
+    set_capability("vout window", 10)
 #endif
     set_callbacks(Open, Close)
 
