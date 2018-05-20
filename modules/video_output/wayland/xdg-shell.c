@@ -25,8 +25,10 @@
 #endif
 
 #include <assert.h>
+#include <inttypes.h>
 #include <stdarg.h>
-#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <poll.h>
 
@@ -150,8 +152,26 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
-            xdg_toplevel_set_fullscreen(sys->toplevel, NULL);
+        {
+            const char *idstr = va_arg(ap, const char *);
+            struct wl_output *output = NULL;
+
+            if (idstr != NULL)
+            {
+                char *end;
+                unsigned long name = strtoul(idstr, &end, 10);
+
+                assert(*end == '\0' && name <= UINT32_MAX);
+                output = wl_registry_bind(sys->registry, name,
+                                          &wl_output_interface, 1);
+            }
+
+            xdg_toplevel_set_fullscreen(sys->toplevel, output);
+
+            if (output != NULL)
+                wl_output_destroy(output);
             break;
+        }
 
         case VOUT_WINDOW_UNSET_FULLSCREEN:
             xdg_toplevel_unset_fullscreen(sys->toplevel);
