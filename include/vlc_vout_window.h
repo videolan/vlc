@@ -70,7 +70,7 @@ enum vout_window_control {
 /**
  * Window management state.
  */
-enum {
+enum vout_window_state {
     VOUT_WINDOW_STATE_NORMAL,
     VOUT_WINDOW_STATE_ABOVE,
     VOUT_WINDOW_STATE_BELOW,
@@ -117,6 +117,9 @@ typedef struct vout_window_cfg_t {
 struct vout_window_callbacks {
     void (*resized)(vout_window_t *, unsigned width, unsigned height);
     void (*closed)(vout_window_t *);
+    void (*state_changed)(vout_window_t *, unsigned state);
+    void (*windowed)(vout_window_t *);
+    void (*fullscreened)(vout_window_t *, const char *id);
     void (*mouse_event)(vout_window_t *,
                         const vout_window_mouse_event_t *mouse);
     void (*keyboard_event)(vout_window_t *, unsigned key);
@@ -316,6 +319,43 @@ static inline void vout_window_ReportClose(vout_window_t *window)
 {
     if (window->owner.cbs->closed != NULL)
         window->owner.cbs->closed(window);
+}
+
+/**
+ * Reports the current window state.
+ *
+ * This notifies the owner of the window that the state of the window changed.
+ * \param state \see vout_window_state
+ */
+static inline void vout_window_ReportState(vout_window_t *window,
+                                           unsigned state)
+{
+    if (window->owner.cbs->state_changed != NULL)
+        window->owner.cbs->state_changed(window, state);
+}
+
+/**
+ * Reports that the window is not in full screen.
+ *
+ * This notifies the owner of the window that the window is windowed, i.e. not
+ * in full screen mode.
+ */
+static inline void vout_window_ReportWindowed(vout_window_t *window)
+{
+    if (window->owner.cbs->windowed != NULL)
+        window->owner.cbs->windowed(window);
+}
+
+/**
+ * Reports that the window is in full screen.
+ *
+ * \param id fullscreen output nul-terminated identifier, NULL for default
+ */
+static inline void vout_window_ReportFullscreen(vout_window_t *window,
+                                                const char *id)
+{
+    if (window->owner.cbs->fullscreened != NULL)
+        window->owner.cbs->fullscreened(window, id);
 }
 
 static inline void vout_window_SendMouseEvent(vout_window_t *window,

@@ -150,6 +150,36 @@ static void vout_display_window_CloseNotify(vout_window_t *window)
     msg_Err(window, "window closed");
 }
 
+static void vout_display_window_StateNotify(vout_window_t *window,
+                                            unsigned state)
+{
+    static const char states[][8] = {
+        [VOUT_WINDOW_STATE_NORMAL] = "normal",
+        [VOUT_WINDOW_STATE_ABOVE] = "above",
+        [VOUT_WINDOW_STATE_BELOW] = "below",
+    };
+
+    assert(state < ARRAY_SIZE(states));
+    msg_Dbg(window, "window state changed: %s", states[state]);
+    var_SetInteger(window->obj.parent, "window-state", state);
+}
+
+static void vout_display_window_FullscreenNotify(vout_window_t *window,
+                                                 const char *id)
+{
+    msg_Dbg(window, (id != NULL) ? "window set to fullscreen on %s"
+                                 : "window set to fullscreen", id);
+    var_SetString(window->obj.parent, "window-fullscreen-output",
+                  (id != NULL) ? id : "");
+    var_SetBool(window->obj.parent, "window-fullscreen", true);
+}
+
+static void vout_display_window_WindowingNotify(vout_window_t *window)
+{
+    msg_Dbg(window, "window set windowed");
+    var_SetBool(window->obj.parent, "window-fullscreen", false);
+}
+
 static void vout_display_window_MouseEvent(vout_window_t *window,
                                            const vout_window_mouse_event_t *ev)
 {
@@ -213,6 +243,9 @@ static void vout_display_window_KeyboardEvent(vout_window_t *window,
 static const struct vout_window_callbacks vout_display_window_cbs = {
     .resized = vout_display_window_ResizeNotify,
     .closed = vout_display_window_CloseNotify,
+    .state_changed = vout_display_window_StateNotify,
+    .fullscreened = vout_display_window_FullscreenNotify,
+    .windowed = vout_display_window_WindowingNotify,
     .mouse_event = vout_display_window_MouseEvent,
     .keyboard_event = vout_display_window_KeyboardEvent,
 };
@@ -237,6 +270,10 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     };
     vout_window_t *window;
 
+    var_Create(vout, "window-state", VLC_VAR_INTEGER);
+    var_Create(vout, "window-fullscreen", VLC_VAR_BOOL);
+    var_Create(vout, "window-fullscreen-output", VLC_VAR_STRING);
+
     window = vout_window_New((vlc_object_t *)vout, modlist, cfg, &owner);
     free(modlist);
     if (window == NULL)
@@ -250,8 +287,12 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
  */
 void vout_display_window_Delete(vout_window_t *window)
 {
+    vout_thread_t *vout = (vout_thread_t *)(window->obj.parent);
     vout_display_window_t *state = window->owner.sys;
 
     vout_window_Delete(window);
+    var_Destroy(vout, "window-fullscreen-output");
+    var_Destroy(vout, "window-fullscreen");
+    var_Destroy(vout, "window-state");
     free(state);
 }
