@@ -39,7 +39,6 @@
 struct vout_window_sys_t
 {
     struct wl_compositor *compositor;
-    struct wl_output *output;
     struct wl_shell *shell;
     struct wl_shell_surface *shell_surface;
 
@@ -120,10 +119,10 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
         {
             bool fs = va_arg(ap, int);
 
-            if (fs && sys->output != NULL)
+            if (fs)
             {
                 wl_shell_surface_set_fullscreen(sys->shell_surface, 1, 0,
-                                                sys->output);
+                                                NULL);
                 vlc_mutex_lock(&sys->lock);
                 sys->fullscreen = true;
                 vout_window_ReportSize(wnd, sys->fs_width, sys->fs_height);
@@ -149,52 +148,6 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
     wl_display_flush(display);
     return VLC_SUCCESS;
 }
-
-static void output_geometry_cb(void *data, struct wl_output *output, int32_t x,
-                               int32_t y, int32_t width, int32_t height,
-                               int32_t subpixel, const char *vendor,
-                               const char *model, int32_t transform)
-{
-    vout_window_t *wnd = data;
-
-    msg_Dbg(wnd, "output geometry: %s %s %"PRId32"x%"PRId32"mm "
-            "@ %"PRId32"x%"PRId32" subpixel: %"PRId32" transform: %"PRId32,
-            vendor, model, width, height, x, y, subpixel, transform);
-    (void) output;
-}
-
-static void output_mode_cb(void *data, struct wl_output *output,
-                           uint32_t flags, int32_t width, int32_t height,
-                           int32_t refresh)
-{
-    vout_window_t *wnd = data;
-    vout_window_sys_t *sys = wnd->sys;
-
-    msg_Dbg(wnd, "output mode: 0x%08"PRIX32" %"PRId32"x%"PRId32
-            " %"PRId32"mHz%s", flags, width, height, refresh,
-            (flags & WL_OUTPUT_MODE_CURRENT) ? " (current)" : "");
-
-    if (!(flags & WL_OUTPUT_MODE_CURRENT))
-        return;
-
-    vlc_mutex_lock(&sys->lock);
-    sys->fs_width = width;
-    sys->fs_height = height;
-
-    if (sys->fullscreen)
-        vout_window_ReportSize(wnd, width, height);
-    vlc_mutex_unlock(&sys->lock);
-
-    (void) output;
-}
-
-const struct wl_output_listener output_cbs =
-{
-    output_geometry_cb,
-    output_mode_cb,
-    NULL,
-    NULL,
-};
 
 static void shell_surface_ping_cb(void *data,
                                   struct wl_shell_surface *shell_surface,
@@ -251,10 +204,6 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
                                            &wl_compositor_interface,
                                            (vers < 2) ? vers : 2);
     else
-    if (!strcmp(iface, "wl_output"))
-        sys->output = wl_registry_bind(registry, name, &wl_output_interface,
-                                       1);
-    else
     if (!strcmp(iface, "wl_shell"))
         sys->shell = wl_registry_bind(registry, name, &wl_shell_interface, 1);
 }
@@ -288,7 +237,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         return VLC_ENOMEM;
 
     sys->compositor = NULL;
-    sys->output = NULL;
     sys->shell = NULL;
     sys->shell_surface = NULL;
     sys->top_width = cfg->width;
@@ -323,9 +271,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     if (sys->compositor == NULL || sys->shell == NULL)
         goto error;
-
-    if (sys->output != NULL)
-        wl_output_add_listener(sys->output, &output_cbs, wnd);
 
     /* Create a surface */
     struct wl_surface *surface = wl_compositor_create_surface(sys->compositor);
@@ -370,8 +315,6 @@ error:
         wl_shell_surface_destroy(sys->shell_surface);
     if (sys->shell != NULL)
         wl_shell_destroy(sys->shell);
-    if (sys->output != NULL)
-        wl_output_destroy(sys->output);
     if (sys->compositor != NULL)
         wl_compositor_destroy(sys->compositor);
     wl_display_disconnect(display);
@@ -393,8 +336,6 @@ static void Close(vout_window_t *wnd)
     wl_shell_surface_destroy(sys->shell_surface);
     wl_surface_destroy(wnd->handle.wl);
     wl_shell_destroy(sys->shell);
-    if (sys->output != NULL)
-        wl_output_destroy(sys->output);
     wl_compositor_destroy(sys->compositor);
     wl_display_disconnect(wnd->display.wl);
     vlc_mutex_destroy(&sys->lock);
