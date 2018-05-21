@@ -1486,6 +1486,48 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     vlc_mutex_unlock( &p_owner->lock );
 }
 
+static void OutputChangePause( decoder_t *p_dec, bool paused, mtime_t date )
+{
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+
+    msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
+    switch( p_dec->fmt_out.i_cat )
+    {
+        case VIDEO_ES:
+            if( p_owner->p_vout != NULL )
+                vout_ChangePause( p_owner->p_vout, paused, date );
+            break;
+        case AUDIO_ES:
+            if( p_owner->p_aout != NULL )
+                aout_DecChangePause( p_owner->p_aout, paused, date );
+            break;
+        case SPU_ES:
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
+static void OutputChangeRate( decoder_t *p_dec, float rate )
+{
+    struct decoder_owner *p_owner = dec_get_owner( p_dec );
+
+    msg_Dbg( p_dec, "changing rate: %f", rate );
+    switch( p_dec->fmt_out.i_cat )
+    {
+        case VIDEO_ES:
+            break;
+        case AUDIO_ES:
+            if( p_owner->p_aout != NULL )
+                aout_DecChangeRate( p_owner->p_aout, rate );
+            break;
+        case SPU_ES:
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+}
+
 /**
  * The decoding main loop
  *
@@ -1533,23 +1575,7 @@ static void *DecoderThread( void *p_data )
             paused = p_owner->paused;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
-            /* NOTE: Only the audio and video outputs care about pause. */
-            msg_Dbg( p_dec, "toggling %s", paused ? "resume" : "pause" );
-            switch( p_dec->fmt_out.i_cat )
-            {
-                case VIDEO_ES:
-                    if( p_owner->p_vout != NULL )
-                        vout_ChangePause( p_owner->p_vout, paused, date );
-                    break;
-                case AUDIO_ES:
-                    if( p_owner->p_aout != NULL )
-                        aout_DecChangePause( p_owner->p_aout, paused, date );
-                    break;
-                case SPU_ES:
-                    break;
-                default:
-                    vlc_assert_unreachable();
-            }
+            OutputChangePause( p_dec, paused, date );
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
@@ -1563,20 +1589,7 @@ static void *DecoderThread( void *p_data )
             rate = p_owner->rate;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
-            msg_Dbg( p_dec, "changing rate: %f", rate );
-            switch( p_dec->fmt_out.i_cat )
-            {
-                case VIDEO_ES:
-                    break;
-                case AUDIO_ES:
-                    if( p_owner->p_aout != NULL )
-                        aout_DecChangeRate( p_owner->p_aout, rate );
-                    break;
-                case SPU_ES:
-                    break;
-                default:
-                    vlc_assert_unreachable();
-            }
+            OutputChangeRate( p_dec, rate );
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
