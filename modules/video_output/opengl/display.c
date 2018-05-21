@@ -246,7 +246,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             c.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
 
         vout_display_PlacePicture (&place, src, &c, false);
-        vlc_gl_Resize (sys->gl, place.width, place.height);
+        vlc_gl_Resize (sys->gl, c.display.width, c.display.height);
         if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
             return VLC_EGENERIC;
         vout_display_opengl_SetWindowAspectRatio(sys->vgl, (float)place.width / place.height);
