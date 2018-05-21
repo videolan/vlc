@@ -3162,12 +3162,12 @@ AS_IF([test "${enable_wayland}" != "no"], [
     ])
 
     AC_MSG_CHECKING([for the Wayland scanner])
-    PKG_CHECK_EXISTS([wayland-scanner], [
+    PKG_CHECK_EXISTS([wayland-scanner >= 1.15], [
       WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
       AC_MSG_RESULT([${WAYLAND_SCANNER}])
     ], [
       AC_MSG_RESULT([not found])
-      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors wayland-scanner)])
+      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-scanner >= 1.15')])
     ])
 
     have_wayland="yes"
