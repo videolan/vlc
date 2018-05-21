@@ -21,6 +21,7 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
 	$(APPLY) $(SRC)/harfbuzz/Cmake-test.patch
+	$(APPLY) $(SRC)/harfbuzz/0001-Skip-using-the-_BitScan-intrinsics-on-mingw.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
