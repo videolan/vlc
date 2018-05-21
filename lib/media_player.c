@@ -1113,7 +1113,7 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vmem-data", opaque );
     var_SetString( mp, "avcodec-hw", "none" );
     var_SetString( mp, "vout", "vmem" );
-    var_SetString( mp, "window", "none" );
+    var_SetString( mp, "window", "dummy" );
 }
 
 void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
