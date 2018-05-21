@@ -14,6 +14,7 @@ $(TARBALLS)/mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2:
 
 pthreads: mingw-w64-v$(WINPTHREADS_VERSION).tar.bz2 .sum-pthreads
 	$(UNPACK)
+	$(APPLY) $(SRC)/pthreads/0001-winpthreads-Fix-building-for-ARM-and-ARM64.patch
 	$(MOVE)
 
 .pthreads: pthreads
