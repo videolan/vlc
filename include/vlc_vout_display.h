@@ -372,9 +372,7 @@ static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned
 {
     vout_window_t *wnd = vd->cfg->window;
 
-    if (type != VOUT_WINDOW_TYPE_INVALID && wnd != NULL && type != wnd->type)
-        wnd = NULL;
-    return wnd;
+    return (type == wnd->type) ? wnd : NULL;
 }
 
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
