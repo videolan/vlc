@@ -42,7 +42,6 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
 
@@ -57,7 +56,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "wave" )
-    set_callbacks( Create, Destroy )
+    set_callbacks( Create, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -87,7 +86,10 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     /* Allocate structure */
-    filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys =
+        vlc_obj_malloc( p_this, sizeof(*p_sys) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_filter->pf_video_filter = Filter;
 
@@ -95,17 +97,6 @@ static int Create( vlc_object_t *p_this )
     p_sys->last_date = 0;
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Destroy: destroy Distort video thread output method
- *****************************************************************************
- * Terminate an output method created by DistortCreateOutputMethod
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
