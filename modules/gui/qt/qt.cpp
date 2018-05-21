@@ -570,7 +570,8 @@ static void *Thread( void *obj )
         p_sys->p_mi = p_mi;
 
         /* Check window type from the Qt platform back-end */
-        p_sys->voutWindowType = VOUT_WINDOW_TYPE_INVALID;
+        bool known_type = true;
+
         QString platform = app.platformName();
         if( platform == qfu("xcb") )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_XID;
@@ -581,13 +582,19 @@ static void *Thread( void *obj )
         else if( platform == qfu("cocoa" ) )
             p_sys->voutWindowType = VOUT_WINDOW_TYPE_NSOBJECT;
         else
+        {
             msg_Err( p_intf, "unknown Qt platform: %s", qtu(platform) );
+            known_type = false;
+        }
 
         var_Create( THEPL, "qt4-iface", VLC_VAR_ADDRESS );
-        var_SetAddress( THEPL, "qt4-iface", p_intf );
         var_Create( THEPL, "window", VLC_VAR_STRING );
-        if( p_sys->voutWindowType != VOUT_WINDOW_TYPE_INVALID )
+
+        if( known_type )
+        {
+            var_SetAddress( THEPL, "qt4-iface", p_intf );
             var_SetString( THEPL, "window", "qt,any" );
+        }
     }
 
     /* Explain how to show a dialog :D */

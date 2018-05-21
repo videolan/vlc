@@ -47,13 +47,12 @@ struct wl_surface;
  * Window handle type
  */
 enum vout_window_type {
-    VOUT_WINDOW_TYPE_INVALID=0 /**< Invalid or unspecified window type */,
+    VOUT_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */,
     VOUT_WINDOW_TYPE_XID /**< X11 window */,
     VOUT_WINDOW_TYPE_HWND /**< Win32 or OS/2 window */,
     VOUT_WINDOW_TYPE_NSOBJECT /**< MacOS X view */,
     VOUT_WINDOW_TYPE_ANDROID_NATIVE /**< Android native window */,
     VOUT_WINDOW_TYPE_WAYLAND /**< Wayland surface */,
-    VOUT_WINDOW_TYPE_DUMMY /**< Dummy window (not an actual window) */
 };
 
 /**
@@ -157,10 +156,6 @@ struct vout_window_t {
       * and the \ref display union are to be set.
       *
       * The possible values are defined in \ref vout_window_type.
-      *
-      * VOUT_WINDOW_TYPE_INVALID is a special placeholder type. It means that
-      * any windowing system is acceptable. In that case, the plugin must set
-      * its actual type during activation.
       */
     unsigned type;
 
