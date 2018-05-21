@@ -41,7 +41,7 @@
 
 struct video_palette_t
 {
-    int i_entries;      /**< to keep the compatibility with libavcodec's palette */
+    int i_entries;                         /**< number of in-use palette entries */
     uint8_t palette[VIDEO_PALETTE_COLORS_MAX][4];  /**< 4-byte RGBA/YUVA palette */
 };
 
