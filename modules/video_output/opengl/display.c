@@ -95,13 +95,7 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    vout_window_t *surface = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_INVALID);
-    if (surface == NULL)
-    {
-        msg_Err (vd, "parent window not available");
-        goto error;
-    }
-
+    vout_window_t *surface = vd->cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
 
     /* VDPAU GL interop works only with GLX. Override the "gl" option to force
