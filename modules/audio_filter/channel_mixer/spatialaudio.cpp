@@ -126,6 +126,7 @@ struct filter_spatialaudio
     mtime_t i_last_input_pts;
     unsigned i_order;
     unsigned i_nondiegetic;
+    unsigned i_lr_channels; // number of physical left/right channel pairs
 
     float** inBuf;
     float** outBuf;
@@ -249,6 +250,20 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
         for (unsigned i = 0; i < p_sys->i_outputNb; ++i)
             for (unsigned j = 0; j < AMB_BLOCK_TIME_LEN; ++j)
                 p_dest[(b * AMB_BLOCK_TIME_LEN + j) * p_sys->i_outputNb + i] = p_sys->outBuf[i][j];
+
+        if (p_sys->i_nondiegetic == 2)
+        {
+            for (unsigned i = 0; i < p_sys->i_lr_channels * 2; i += 2)
+                for (unsigned j = 0; j < AMB_BLOCK_TIME_LEN; ++j)
+                {
+                    p_dest[(b * AMB_BLOCK_TIME_LEN + j) * p_sys->i_outputNb + i] =
+                            p_dest[(b * AMB_BLOCK_TIME_LEN + j) * p_sys->i_outputNb + i]  / 2.f
+                            + p_sys->inBuf[p_sys->i_inputNb - 2][j] / 2.f; //left
+                    p_dest[(b * AMB_BLOCK_TIME_LEN + j) * p_sys->i_outputNb + i + 1] =
+                            p_dest[(b * AMB_BLOCK_TIME_LEN + j) * p_sys->i_outputNb + i + 1]  / 2.f
+                            + p_sys->inBuf[p_sys->i_inputNb - 1][j] / 2.f; //right
+                }
+        }
     }
 
     p_sys->inputSamples.erase(p_sys->inputSamples.begin(),
@@ -325,6 +340,7 @@ static int OpenBinauralizer(vlc_object_t *p_this)
     p_sys->mode = filter_spatialaudio::BINAURALIZER;
     p_sys->i_inputNb = p_filter->fmt_in.audio.i_channels;
     p_sys->i_outputNb = 2;
+    p_sys->i_lr_channels = 1;
 
     if (allocateBuffers(p_sys) != VLC_SUCCESS)
     {
@@ -491,17 +507,20 @@ static int Open(vlc_object_t *p_this)
 
         p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(30), 0.f, 1.f});
         p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(-30), 0.f, 1.f});
+        p_sys->i_lr_channels = 1;
 
         if ((outfmt->i_physical_channels & AOUT_CHANS_MIDDLE) == AOUT_CHANS_MIDDLE)
         {
             p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(110), 0.f, 1.f});
             p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(-110), 0.f, 1.f});
+            p_sys->i_lr_channels++;
         }
 
         if ((outfmt->i_physical_channels & AOUT_CHANS_REAR) == AOUT_CHANS_REAR)
         {
             p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(145), 0.f, 1.f});
             p_sys->speakerDecoder.SetPosition(s++, {DegreesToRadians(-145), 0.f, 1.f});
+            p_sys->i_lr_channels++;
         }
 
         if ((outfmt->i_physical_channels & AOUT_CHAN_CENTER) == AOUT_CHAN_CENTER)
