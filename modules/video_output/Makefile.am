@@ -202,7 +202,7 @@ video_output/wayland/viewporter-protocol.c: \
 		$(WAYLAND_PROTOCOLS)/stable/viewporter/viewporter.xml
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
-libwl_shell_plugin_la_SOURCES = video_output/wayland/xdg-shell.c
+libwl_shell_plugin_la_SOURCES = $(libxdg_shell_plugin_la_SOURCES)
 nodist_libwl_shell_plugin_la_SOURCES = \
 	video_output/wayland/server-decoration-client-protocol.h \
 	video_output/wayland/server-decoration-protocol.c
@@ -211,7 +211,9 @@ libwl_shell_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 libwl_shell_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
 libwl_shell_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBPTHREAD)
 
-libxdg_shell_plugin_la_SOURCES = video_output/wayland/xdg-shell.c
+libxdg_shell_plugin_la_SOURCES = \
+	video_output/wayland/input.h video_output/wayland/input.c \
+	video_output/wayland/xdg-shell.c
 nodist_libxdg_shell_plugin_la_SOURCES = \
 	video_output/wayland/xdg-shell-client-protocol.h \
 	video_output/wayland/xdg-shell-protocol.c \
@@ -238,7 +240,7 @@ video_output/wayland/server-decoration-protocol.c: \
 		video_output/wayland/server-decoration.xml
 EXTRA_DIST += video_output/wayland/server-decoration.xml
 
-libxdg_shell_v6_plugin_la_SOURCES = video_output/wayland/xdg-shell.c
+libxdg_shell_v6_plugin_la_SOURCES = $(libxdg_shell_plugin_la_SOURCES)
 nodist_libxdg_shell_v6_plugin_la_SOURCES = \
 	video_output/wayland/xdg-shell-unstable-v6-client-protocol.h \
 	video_output/wayland/xdg-shell-unstable-v6-protocol.c \

@@ -90,6 +90,8 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
+#include "input.h"
+
 struct vout_window_sys_t
 {
     struct wl_registry *registry;
@@ -105,6 +107,8 @@ struct vout_window_sys_t
     unsigned width;
     unsigned height;
     bool fullscreen;
+
+    struct wl_list seats;
 
     vlc_thread_t thread;
 };
@@ -439,6 +443,9 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
         sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
                                         1);
     else
+    if (!strcmp(iface, "wl_seat"))
+        seat_create(wnd, registry, name, vers, &sys->seats);
+    else
     if (!strcmp(iface, "org_kde_kwin_server_decoration_manager"))
         sys->deco_manager = wl_registry_bind(registry, name,
                          &org_kde_kwin_server_decoration_manager_interface, 1);
@@ -484,6 +491,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->width = cfg->width;
     sys->height = cfg->height;
     sys->fullscreen = false;
+    wl_list_init(&sys->seats);
     wnd->sys = sys;
 
     /* Connect to the display server */
@@ -589,6 +597,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 
 error:
+    seat_destroy_all(&sys->seats);
     if (sys->deco != NULL)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
@@ -618,6 +627,7 @@ static void Close(vout_window_t *wnd)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
+    seat_destroy_all(&sys->seats);
     if (sys->deco != NULL)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
