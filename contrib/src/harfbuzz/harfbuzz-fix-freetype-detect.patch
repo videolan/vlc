@@ -1,0 +1,39 @@
+--- harfbuzz/CMakeLists.txt.pkg-freetype	2018-05-22 15:42:04.861877600 +0200
++++ harfbuzz/CMakeLists.txt	2018-05-22 15:53:50.808676800 +0200
+@@ -267,6 +267,14 @@ set (subset_project_headers
+ 
+ ## Find and include needed header folders and libraries
+ if (HB_HAVE_FREETYPE)
++  find_package(PkgConfig)
++  pkg_check_modules(PC_FREETYPE2 QUIET freetype2)
++  
++  if (PC_FREETYPE2_FOUND)
++    include_directories(AFTER ${PC_FREETYPE2_STATIC_INCLUDE_DIRS})
++    list(APPEND THIRD_PARTY_LIBS ${PC_FREETYPE2_STATIC_LIBRARIES})
++    add_definitions(${PC_FREETYPE2_STATIC_CFLAGS})
++  else ()
+   include (FindFreetype)
+   if (NOT FREETYPE_FOUND)
+     message(FATAL_ERROR "HB_HAVE_FREETYPE was set, but we failed to find it. Maybe add a CMAKE_PREFIX_PATH= to your Freetype2 install prefix")
+@@ -274,15 +282,17 @@ if (HB_HAVE_FREETYPE)
+ 
+   list(APPEND THIRD_PARTY_LIBS ${FREETYPE_LIBRARIES} -lz)
+   include_directories(AFTER ${FREETYPE_INCLUDE_DIRS})
+-  add_definitions(-DHAVE_FREETYPE=1)
+-
+-  list(APPEND project_sources ${PROJECT_SOURCE_DIR}/src/hb-ft.cc)
+-  list(APPEND project_headers ${PROJECT_SOURCE_DIR}/src/hb-ft.h)
+ 
+   # So check_funcs can find its headers
+   set (CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${FREETYPE_INCLUDE_DIRS})
+   set (CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${FREETYPE_LIBRARIES})
++  endif ()
+ 
++  list(APPEND project_sources ${PROJECT_SOURCE_DIR}/src/hb-ft.cc)
++  list(APPEND project_headers ${PROJECT_SOURCE_DIR}/src/hb-ft.h)
++
++  add_definitions(-DHAVE_FREETYPE=1)
++  
+   check_funcs(FT_Get_Var_Blend_Coordinates FT_Set_Var_Blend_Coordinates FT_Done_MM_Var)
+ endif ()
+ 
