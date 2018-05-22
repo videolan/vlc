@@ -1584,11 +1584,31 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
          PMTEsHasRegistration( p_demux, p_dvbpsies, "HDMV" ) )
         p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
 
-    /* Disable dolbyvision */
-    if ( registration_type == TS_PMT_REGISTRATION_BLURAY &&
-         p_dvbpsies->i_pid == 0x1015 &&
-         PMTEsHasRegistration( p_demux, p_dvbpsies, "HDMV" ) )
-        p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+    if ( registration_type == TS_PMT_REGISTRATION_BLURAY )
+    {
+        /*
+         * 0x1011 primary video
+         * 0x1100- 0x111f primary audio
+         * 0x1a00- 0x1a1f secondary audio
+         * 0x1b00- 0x1b1f secondary video */
+
+        /* Disable dolbyvision */
+        if ( p_dvbpsies->i_pid == 0x1015 &&
+            PMTEsHasRegistration( p_demux, p_dvbpsies, "HDMV" ) )
+        {
+            p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+        }
+        else if( p_dvbpsies->i_pid > 0x19ff )
+        {
+            /* We might just want to prio, but it will trigger multiple videos es */
+            p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
+        }
+        else
+        {
+            p_pes->p_es->fmt.i_priority = 0xFFFF - (p_dvbpsies->i_pid & 0xFFFF) +
+                                                    ES_PRIORITY_SELECTABLE_MIN;
+        }
+    }
 
     /* PES packets usually contain truncated frames */
     p_pes->p_es->fmt.b_packetized = false;
