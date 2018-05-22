@@ -14,6 +14,7 @@ $(TARBALLS)/libebml-$(EBML_VERSION).tar.xz:
 
 ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(UNPACK)
+	$(APPLY) $(SRC)/ebml/ebml-fix-univeral-windows.patch
 	$(MOVE)
 
 # libebml requires exceptions
