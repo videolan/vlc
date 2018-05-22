@@ -365,6 +365,7 @@ int InitVideoEnc( vlc_object_t *p_this )
 "*** Please check with your Libav/FFmpeg packager. ***\n"
 "*** This is NOT a VLC media player issue.   ***", psz_namecodec );
 
+#if !defined(_WIN32)
         vlc_dialog_display_error( p_enc, _("Streaming / Transcoding failed"), _(
 /* I have had enough of all these MPEG-3 transcoding bug reports.
  * Downstream packager, you had better not patch this out, or I will be really
@@ -377,6 +378,8 @@ int InitVideoEnc( vlc_object_t *p_this )
 "This is not an error inside VLC media player.\n"
 "Do not contact the VideoLAN project about this issue.\n"),
             psz_namecodec );
+#endif
+
         return VLC_EGENERIC;
     }
 
