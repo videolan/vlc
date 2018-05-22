@@ -1523,11 +1523,8 @@ static BOOL deviceSupportsAdvancedProfiles()
     if (type == CPU_TYPE_ARM64)
         return YES;
 
-    return NO;
-#else
-    /* Assume that the CPU support advanced profiles if it can handle HEVC */
-    return deviceSupportsHEVC();
 #endif
+    return NO;
 }
 
 static BOOL deviceSupportsAdvancedLevels()
