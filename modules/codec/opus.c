@@ -315,6 +315,7 @@ static int ProcessHeaders( decoder_t *p_dec )
 static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
 {
     int err;
+    unsigned char* p_stream_map;
     unsigned char new_stream_map[8];
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -328,36 +329,61 @@ static int ProcessInitialHeader( decoder_t *p_dec, ogg_packet *p_oggpacket )
     msg_Dbg( p_dec, "Opus audio with %d channels", p_header->channels);
 
     if((p_header->channels>2 && p_header->channel_mapping==0) ||
-        p_header->channels>8 ||
-        p_header->channel_mapping>1)
+        (p_header->channels>8 && p_header->channel_mapping==1) ||
+        (p_header->channels>18 && p_header->channel_mapping==2) ||
+        p_header->channel_mapping>2)
     {
         msg_Err( p_dec, "Unsupported channel mapping" );
         return VLC_EGENERIC;
     }
+    if (p_header->channel_mapping == 2)
+    {
+        int i_order = floor(sqrt(p_header->channels));
+        int i_nondiegetic = p_header->channels - i_order * i_order;
+        if (i_nondiegetic != 0 && i_nondiegetic != 2)
+        {
+            msg_Err( p_dec, "Unsupported ambisonic channel mapping" );
+            return VLC_EGENERIC;
+        }
+    }
 
     /* Setup the format */
-    p_dec->fmt_out.audio.i_physical_channels =
-        pi_channels_maps[p_header->channels];
     p_dec->fmt_out.audio.i_channels = p_header->channels;
     p_dec->fmt_out.audio.i_rate = 48000;
 
-    if( p_header->channels>2 )
+    if (p_header->channel_mapping <= 1)
     {
-        static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
-                                            pi_5channels_in, pi_6channels_in,
-                                            pi_7channels_in, pi_8channels_in };
-        uint8_t pi_chan_table[AOUT_CHAN_MAX];
+        p_dec->fmt_out.audio.i_physical_channels =
+            pi_channels_maps[p_header->channels];
 
-        aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
-                                  p_dec->fmt_out.audio.i_physical_channels,
-                                  pi_chan_table );
-        for(int i=0;i<p_header->channels;i++)
-            new_stream_map[pi_chan_table[i]]=p_header->stream_map[i];
+        if( p_header->channels>2 )
+        {
+            static const uint32_t *pi_ch[6] = { pi_3channels_in, pi_4channels_in,
+                                                pi_5channels_in, pi_6channels_in,
+                                                pi_7channels_in, pi_8channels_in };
+            uint8_t pi_chan_table[AOUT_CHAN_MAX];
+
+            aout_CheckChannelReorder( pi_ch[p_header->channels-3], NULL,
+                                      p_dec->fmt_out.audio.i_physical_channels,
+                                      pi_chan_table );
+            for(int i=0;i<p_header->channels;i++)
+                new_stream_map[pi_chan_table[i]]=p_header->stream_map[i];
+
+            p_stream_map = new_stream_map;
+        }
+        else
+            p_stream_map = p_header->stream_map;
     }
+    else //p_header->channel_mapping == 2
+    {
+        p_dec->fmt_out.audio.channel_type = AUDIO_CHANNEL_TYPE_AMBISONICS;
+        p_stream_map = p_header->stream_map;
+    }
+
     /* Opus decoder init */
     p_sys->p_st = opus_multistream_decoder_create( 48000, p_header->channels,
                     p_header->nb_streams, p_header->nb_coupled,
-                    p_header->channels>2?new_stream_map:p_header->stream_map,
+                    p_stream_map,
                     &err );
     if( !p_sys->p_st || err!=OPUS_OK )
     {
