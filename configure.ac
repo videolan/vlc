@@ -3179,6 +3179,12 @@ AS_IF([test "${enable_wayland}" != "no"], [
         AC_MSG_ERROR([${WAYLAND_EGL_PKG_ERRORS}.])
       ])
     ])
+
+    PKG_CHECK_MODULES([XKBCOMMON], [xkbcommon], [
+      have_xkbcommon="yes"
+    ], [
+      AC_MSG_WARN([${XKBCOMMON_PKG_ERRORS}])
+    ])
   ], [
     AS_IF([test -n "${enable_wayland}"], [
       AC_MSG_ERROR([${WAYLAND_CLIENT_PKG_ERRORS}.])
@@ -3189,6 +3195,7 @@ AC_SUBST([WAYLAND_PROTOCOLS])
 AC_SUBST([WAYLAND_SCANNER])
 AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
 AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
+AM_CONDITIONAL([HAVE_XKBCOMMON], [test "${have_xkbcommon}" = "yes"])
 
 
 dnl

@@ -27,11 +27,17 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 #include <linux/input-event-codes.h>
 #include <wayland-client.h>
+#ifdef HAVE_XKBCOMMON
+# include <xkbcommon/xkbcommon.h>
+# include "../xcb/vlc_xkb.h"
+#endif
 #include <vlc_common.h>
 #include <vlc_vout_window.h>
 #include <vlc_mouse.h>
+#include <vlc_fs.h>
 
 #include "input.h"
 
@@ -40,6 +46,12 @@ struct seat_data
     vout_window_t *owner;
     struct wl_seat *seat;
     struct wl_pointer *pointer;
+#ifdef HAVE_XKBCOMMON
+    struct xkb_context *xkb;
+    struct wl_keyboard *keyboard;
+    struct xkb_keymap *keymap;
+    struct xkb_state *keystate;
+#endif
 
     uint32_t version;
     struct wl_list node;
@@ -190,7 +202,153 @@ static void pointer_destroy(struct seat_data *sd)
         wl_pointer_release(sd->pointer);
     else
         wl_pointer_destroy(sd->pointer);
+
+    sd->pointer = NULL;
 }
+
+#ifdef HAVE_XKBCOMMON
+static void keyboard_keymap_cb(void *data, struct wl_keyboard *keyboard,
+                               uint32_t format, int fd, uint32_t size)
+{
+    struct seat_data *sd = data;
+    vout_window_t *wnd = sd->owner;
+    void *map;
+
+    msg_Dbg(wnd, "format %"PRIu32" keymap of %"PRIu32" bytes", format, size);
+
+    if (format != WL_KEYBOARD_KEYMAP_FORMAT_XKB_V1)
+    {
+        msg_Err(wnd, "unsupported keymap format %"PRIu32, format);
+        goto out;
+    }
+
+    size++; /* trailing nul */
+
+    map = mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+    if (map == MAP_FAILED)
+        goto out;
+
+    assert(((char *)map)[size - 1] == '\0');
+    sd->keymap = xkb_keymap_new_from_string(sd->xkb, map,
+                                            XKB_KEYMAP_FORMAT_TEXT_V1,
+                                            XKB_KEYMAP_COMPILE_NO_FLAGS);
+    munmap(map, size);
+
+    if (sd->keymap != NULL)
+        sd->keystate = xkb_state_new(sd->keymap);
+    else
+        msg_Err(wnd, "keymap parse error");
+
+out:
+    vlc_close(fd);
+    (void) keyboard;
+}
+
+static void keyboard_enter_cb(void *data, struct wl_keyboard *keyboard,
+                              uint32_t serial, struct wl_surface *surface,
+                              struct wl_array *keys)
+{
+    (void) data; (void) keyboard; (void) serial; (void) surface; (void) keys;
+}
+
+static void keyboard_leave_cb(void *data, struct wl_keyboard *keyboard,
+                              uint32_t serial, struct wl_surface *surface)
+{
+    (void) data; (void) keyboard; (void) serial; (void) surface;}
+
+static void keyboard_key_cb(void *data, struct wl_keyboard *keyboard,
+                            uint32_t serial, uint32_t time, uint32_t keycode,
+                            uint32_t state)
+{
+    struct seat_data *sd = data;
+    vout_window_t *wnd = sd->owner;
+    uint_fast32_t vk;
+
+    if (state != WL_KEYBOARD_KEY_STATE_PRESSED)
+        return;
+    if (unlikely(sd->keystate == NULL))
+        return;
+
+    vk = vlc_xkb_get_one(sd->keystate, keycode);
+    if (vk)
+    {
+        msg_Dbg(wnd, "key: 0x%08"PRIxFAST32" (XKB: 0x%04"PRIx32")",
+                vk, keycode);
+        vout_window_ReportKeyPress(wnd, vk);
+    }
+
+    (void) keyboard; (void) serial; (void) time;
+}
+
+static void keyboard_modifiers_cb(void *data, struct wl_keyboard *keyboard,
+                                  uint32_t serial, uint32_t depressed,
+                                  uint32_t latched, uint32_t locked,
+                                  uint32_t group)
+{
+    struct seat_data *sd = data;
+
+    if (unlikely(sd->keystate == NULL))
+        return;
+
+    xkb_state_update_mask(sd->keystate, depressed, latched, locked,
+                          0, 0, group);
+
+    (void) keyboard; (void) serial;
+}
+
+static void keyboard_repeat_info_cb(void *data, struct wl_keyboard *keyboard,
+                                    int32_t rate, int32_t delay)
+{
+    struct seat_data *sd = data;
+    vout_window_t *wnd = sd->owner;
+
+    msg_Dbg(wnd, "keyboard repeat info: %d Hz after %d ms", rate, delay);
+    (void) keyboard;
+}
+
+static const struct wl_keyboard_listener keyboard_cbs =
+{
+    keyboard_keymap_cb,
+    keyboard_enter_cb,
+    keyboard_leave_cb,
+    keyboard_key_cb,
+    keyboard_modifiers_cb,
+    keyboard_repeat_info_cb,
+};
+
+static void keyboard_create(struct seat_data *sd)
+{
+    if (sd->keyboard != NULL)
+        return;
+
+    sd->keyboard = wl_seat_get_keyboard(sd->seat);
+    if (likely(sd->keyboard != NULL))
+    {
+        sd->keymap = NULL;
+        wl_keyboard_add_listener(sd->keyboard, &keyboard_cbs, sd);
+    }
+}
+
+static void keyboard_destroy(struct seat_data *sd)
+{
+    if (sd->keyboard == NULL)
+        return;
+
+    if (sd->version >= WL_KEYBOARD_RELEASE_SINCE_VERSION)
+        wl_keyboard_release(sd->keyboard);
+    else
+        wl_keyboard_destroy(sd->keyboard);
+
+    if (sd->keymap != NULL)
+    {
+        if (sd->keystate != NULL)
+            xkb_state_unref(sd->keystate);
+        xkb_keymap_unref(sd->keymap);
+    }
+
+    sd->keyboard = NULL;
+}
+#endif /* HAVE_XKBCOMMON */
 
 static void seat_capabilities_cb(void *data, struct wl_seat *seat,
                                  uint32_t capabilities)
@@ -208,6 +366,16 @@ static void seat_capabilities_cb(void *data, struct wl_seat *seat,
     }
     else
         pointer_destroy(sd);
+
+#ifdef HAVE_XKBCOMMON
+    if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD)
+    {
+        if (sd->xkb != NULL)
+            keyboard_create(sd);
+    }
+    else
+        keyboard_destroy(sd);
+#endif
 }
 
 static void seat_name_cb(void *data, struct wl_seat *seat, const char *name)
@@ -234,16 +402,22 @@ int seat_create(vout_window_t *wnd, struct wl_registry *registry,
     if (version > 5)
         version = 5;
 
-    sd->owner = wnd;
-    sd->pointer = NULL;
-    sd->version = version;
-
     sd->seat = wl_registry_bind(registry, name, &wl_seat_interface, version);
     if (unlikely(sd->seat == NULL))
     {
         free(sd);
         return -1;
     }
+
+    sd->owner = wnd;
+    sd->pointer = NULL;
+#ifdef HAVE_XKBCOMMON
+    if (var_InheritBool(wnd, "keyboard-events"))
+        sd->xkb = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+
+    sd->keyboard = NULL;
+#endif
+    sd->version = version;
 
     wl_seat_add_listener(sd->seat, &seat_cbs, sd);
     wl_list_insert(list, &sd->node);
@@ -254,6 +428,12 @@ static void seat_destroy(struct seat_data *sd)
 {
     wl_list_remove(&sd->node);
 
+#ifdef HAVE_XKBCOMMON
+    keyboard_destroy(sd);
+
+    if (sd->xkb != NULL)
+        xkb_context_unref(sd->xkb);
+#endif
     pointer_destroy(sd);
 
     if (sd->version >= WL_SEAT_RELEASE_SINCE_VERSION)
