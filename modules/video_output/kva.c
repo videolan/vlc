@@ -103,8 +103,7 @@ struct vout_display_sys_t
     unsigned           button_pressed;
     bool               is_mouse_hidden;
     bool               is_on_top;
-    mtime_t            cursor_timeout;
-    mtime_t            cursor_deadline;
+    ULONG              cursor_timeout;
 };
 
 typedef struct
@@ -137,6 +136,8 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 #define WM_VLC_MANAGE               ( WM_USER + 1 )
 #define WM_VLC_FULLSCREEN_CHANGE    ( WM_USER + 2 )
 #define WM_VLC_SIZE_CHANGE          ( WM_USER + 3 )
+
+#define TID_HIDE_MOUSE  0x1010
 
 static const char *psz_video_mode[ 4 ] = {"DIVE", "WarpOverlay!", "SNAP",
                                           "VMAN"};
@@ -390,18 +391,6 @@ static void Display( vout_display_t *vd, picture_t *picture,
      * here, WM_SIZE is not sent to its child window.
      * Maybe, is this due to the different threads ? */
     WinPostMsg( sys->client, WM_VLC_MANAGE, 0, 0 );
-
-    if( !sys->is_mouse_hidden && sys->cursor_deadline < mdate() )
-    {
-        POINTL ptl;
-
-        WinQueryPointerPos( HWND_DESKTOP, &ptl );
-        if( WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE ) == sys->client )
-        {
-            WinShowPointer( HWND_DESKTOP, FALSE );
-            sys->is_mouse_hidden = true;
-        }
-    }
 }
 
 /*****************************************************************************
@@ -641,9 +630,10 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         free( title );
     }
 
-    sys->cursor_timeout = var_InheritInteger( vd, "mouse-hide-timeout" )
-                          * (CLOCK_FREQ / 1000);
-    sys->cursor_deadline = INT64_MAX;
+    sys->cursor_timeout =
+        ( ULONG )var_InheritInteger( vd, "mouse-hide-timeout" );
+    WinStartTimer( sys->hab, sys->client, TID_HIDE_MOUSE,
+                   sys->cursor_timeout );
 
     sys->i_screen_width  = WinQuerySysValue( HWND_DESKTOP, SV_CXSCREEN );
     sys->i_screen_height = WinQuerySysValue( HWND_DESKTOP, SV_CYSCREEN );
@@ -954,7 +944,9 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     {
         WinShowPointer(HWND_DESKTOP, TRUE);
         sys->is_mouse_hidden = false;
-        sys->cursor_deadline = mdate() + sys->cursor_timeout;
+
+        WinStartTimer( sys->hab, sys->client, TID_HIDE_MOUSE,
+                       sys->cursor_timeout );
     }
 
     switch( msg )
@@ -1069,6 +1061,24 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             }
             break;
         }
+
+        case WM_TIMER :
+            if( !sys->is_mouse_hidden &&
+                SHORT1FROMMP( mp1 ) == TID_HIDE_MOUSE )
+            {
+                POINTL ptl;
+
+                WinQueryPointerPos( HWND_DESKTOP, &ptl );
+                if( WinWindowFromPoint( HWND_DESKTOP, &ptl, TRUE )
+                        == sys->client )
+                {
+                    WinShowPointer( HWND_DESKTOP, FALSE );
+                    sys->is_mouse_hidden = true;
+
+                    WinStopTimer( sys->hab, sys->client, TID_HIDE_MOUSE );
+                }
+            }
+            break;
 
         /* Process Manage() call */
         case WM_VLC_MANAGE :
