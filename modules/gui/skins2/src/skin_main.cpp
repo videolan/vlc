@@ -380,6 +380,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 #else
     pWnd->type = VOUT_WINDOW_TYPE_HWND;
 #endif
+    pWnd->info.has_double_click = true;
     pWnd->control = WindowControl;
 
     // force execution in the skins2 thread context
