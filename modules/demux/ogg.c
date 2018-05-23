@@ -1159,25 +1159,21 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
     else
     {
         /* Because ES creation is delayed for preparsing */
-        mtime_t i_firstpts = VLC_TS_UNKNOWN;
         if ( p_stream->p_preparse_block )
         {
             block_t *temp = p_stream->p_preparse_block;
             while ( temp )
             {
-                if ( temp && i_firstpts < VLC_TS_0 )
-                    i_firstpts = temp->i_pts;
-
                 block_t *tosend = temp;
                 temp = temp->p_next;
                 tosend->p_next = NULL;
 
-                if( tosend->i_dts < VLC_TS_0 )
+                if( tosend->i_dts == VLC_TS_INVALID )
                 {
                     tosend->i_dts = tosend->i_pts;
                 }
 
-                if( tosend->i_dts < VLC_TS_0 )
+                if( tosend->i_dts == VLC_TS_INVALID )
                 {
                     /* Don't send metadata from chained streams */
                     block_Release( tosend );
@@ -1187,9 +1183,9 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                 DemuxDebug( msg_Dbg( p_demux, "block sent from preparse > dts %"PRId64" pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
                          tosend->i_dts, tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
 
-                if ( p_ogg->i_pcr == VLC_TS_INVALID && i_firstpts != VLC_TS_INVALID )
+                if ( p_ogg->i_pcr == VLC_TS_INVALID && tosend->i_dts != VLC_TS_INVALID )
                 {
-                    p_ogg->i_pcr = i_firstpts;
+                    p_ogg->i_pcr = tosend->i_dts;
                     if( likely( !p_ogg->b_slave ) )
                         es_out_SetPCR( p_demux->out, p_ogg->i_pcr );
                 }
