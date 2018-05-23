@@ -1943,7 +1943,7 @@ GLConvOpen(vlc_object_t *obj)
 
     const char *wglExt = tc->gl->wgl.getExtensionsString(tc->gl);
 
-    if (wglExt == NULL || !HasExtension(wglExt, "WGL_NV_DX_interop"))
+    if (wglExt == NULL || !vlc_gl_HasExtension(wglExt, "WGL_NV_DX_interop"))
         return VLC_EGENERIC;
 
     struct wgl_vt vt;

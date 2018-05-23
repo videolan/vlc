@@ -238,19 +238,6 @@ typedef struct {
     PFNGLCLIENTWAITSYNCPROC         ClientWaitSync; /* can be NULL */
 } opengl_vtable_t;
 
-static inline bool HasExtension(const char *apis, const char *api)
-{
-    size_t apilen = strlen(api);
-    while (apis) {
-        while (*apis == ' ')
-            apis++;
-        if (!strncmp(apis, api, apilen) && memchr(" ", apis[apilen], 2))
-            return true;
-        apis = strchr(apis, ' ');
-    }
-    return false;
-}
-
 struct pl_context;
 struct pl_shader;
 struct pl_shader_res;
