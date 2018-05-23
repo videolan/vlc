@@ -70,11 +70,12 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
     if (unlikely(glpriv == NULL))
         return NULL;
 
-    glpriv->gl.surface = wnd;
-    glpriv->gl.module = module_need(&glpriv->gl, type, name, true);
-    if (glpriv->gl.module == NULL)
+    vlc_gl_t *gl = &glpriv->gl;
+    gl->surface = wnd;
+    gl->module = module_need(gl, type, name, true);
+    if (gl->module == NULL)
     {
-        vlc_object_release(&glpriv->gl);
+        vlc_object_release(gl);
         return NULL;
     }
     atomic_init(&glpriv->ref_count, 1);
