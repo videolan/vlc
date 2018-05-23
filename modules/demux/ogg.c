@@ -1014,7 +1014,8 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
     {
         /* We're in headers, and we haven't parsed 1st data packet yet */
 //        p_stream->i_pcr = VLC_TS_UNKNOWN;
-        if( p_stream->b_oggds && ogg_page_packets( p_oggpacket ) )
+        if( p_stream->b_oggds && p_oggpacket->bytes > 0 &&
+            (p_oggpacket->packet[0] & PACKET_TYPE_HEADER) == 0 )
         {
             p_stream->i_pcr = VLC_TS_0 + p_ogg->i_nzpcr_offset;
         }
