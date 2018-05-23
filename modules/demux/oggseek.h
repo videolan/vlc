@@ -42,7 +42,7 @@ struct oggseek_index_entry
     demux_index_entry_t *p_prev;
 
     /* value is highest granulepos for theora, sync frame for dirac */
-    int64_t i_value;
+    mtime_t i_value;
     int64_t i_pagepos;
 
     /* not used for theora because the granulepos tells us this */
@@ -52,12 +52,12 @@ struct oggseek_index_entry
 int64_t Ogg_GetKeyframeGranule ( logical_stream_t *p_stream, int64_t i_granule );
 bool    Ogg_IsKeyFrame ( logical_stream_t *, ogg_packet * );
 
-int64_t Oggseek_GranuleToAbsTimestamp ( logical_stream_t *p_stream, int64_t i_granule,
-                                       bool b_presentation );
-int     Oggseek_BlindSeektoAbsoluteTime ( demux_t *, logical_stream_t *, int64_t, bool );
+mtime_t Oggseek_GranuleToAbsTimestamp ( logical_stream_t *p_stream, int64_t i_granule,
+                                        bool b_presentation );
+int     Oggseek_BlindSeektoAbsoluteTime ( demux_t *, logical_stream_t *, mtime_t, bool );
 int     Oggseek_BlindSeektoPosition ( demux_t *, logical_stream_t *, double f, bool );
-int     Oggseek_SeektoAbsolutetime ( demux_t *, logical_stream_t *, int64_t i_granulepos );
-const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *, int64_t, int64_t );
+int     Oggseek_SeektoAbsolutetime ( demux_t *, logical_stream_t *, mtime_t );
+const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *, mtime_t, int64_t );
 void    Oggseek_ProbeEnd( demux_t * );
 
 void oggseek_index_entries_free ( demux_index_entry_t * );

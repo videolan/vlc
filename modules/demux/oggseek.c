@@ -96,7 +96,7 @@ static demux_index_entry_t *index_entry_new( void )
 /* We insert into index, sorting by pagepos (as a page can match multiple
    time stamps) */
 const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
-                                             int64_t i_timestamp,
+                                             mtime_t i_timestamp,
                                              int64_t i_pagepos )
 {
     demux_index_entry_t *idx;
@@ -106,7 +106,7 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
 
     idx = p_stream->idx;
 
-    if ( i_timestamp < 1 || i_pagepos < 1 ) return NULL;
+    if ( i_timestamp == VLC_TS_INVALID || i_pagepos < 1 ) return NULL;
 
     if ( idx == NULL )
     {
@@ -151,7 +151,7 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
     return idx;
 }
 
-static bool OggSeekIndexFind ( logical_stream_t *p_stream, int64_t i_timestamp,
+static bool OggSeekIndexFind ( logical_stream_t *p_stream, mtime_t i_timestamp,
                                int64_t *pi_pos_lower, int64_t *pi_pos_upper )
 {
     demux_index_entry_t *idx = p_stream->idx;
@@ -290,15 +290,16 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                         continue;
 
                     i_length = Oggseek_GranuleToAbsTimestamp( p_sys->pp_stream[i], i_granule, false );
-                    p_sys->i_length = __MAX( p_sys->i_length, i_length / 1000000 );
+                    if( i_length > VLC_TS_INVALID )
+                        p_sys->i_length = __MAX( p_sys->i_length, (i_length - VLC_TS_0) / 1000000 );
                     break;
                 }
             }
-            if ( i_length > 0 ) break;
+            if ( i_length > VLC_TS_INVALID ) break;
         }
 
         /* We found at least a page with valid granule */
-        if ( i_length > 0 ) break;
+        if ( i_length > VLC_TS_INVALID ) break;
 
         /* Otherwise increase read size, starting earlier */
         if ( i_backoffset <= ( UINT_MAX >> 1 ) )
@@ -674,12 +675,12 @@ restart:
 }
 
 /* Dont use b_presentation with frames granules ! */
-int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
+mtime_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
                                        int64_t i_granule, bool b_presentation )
 {
-    int64_t i_timestamp = -1;
+    mtime_t i_timestamp = VLC_TS_INVALID;
     if ( i_granule < 1 - !!p_stream->b_oggds )
-        return -1;
+        return VLC_TS_INVALID;
 
     if ( p_stream->b_oggds )
     {
@@ -746,12 +747,12 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
     }
     }
 
-    return i_timestamp;
+    return i_timestamp != VLC_TS_INVALID ? i_timestamp + VLC_TS_0 : VLC_TS_INVALID;
 }
 
 /* returns pos */
 static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stream,
-            int64_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
+            mtime_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
 {
     int64_t i_start_pos;
     int64_t i_end_pos;
@@ -760,11 +761,11 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
     struct
     {
         int64_t i_pos;
-        int64_t i_timestamp;
+        mtime_t i_timestamp;
         int64_t i_granule;
-    } bestlower = { p_stream->i_data_start, -1, -1 },
-      current = { -1, -1, -1 },
-      lowestupper = { -1, -1, -1 };
+    } bestlower = { p_stream->i_data_start, VLC_TS_INVALID, -1 },
+      current = { -1, VLC_TS_INVALID, -1 },
+      lowestupper = { -1, VLC_TS_INVALID, -1 };
 
     demux_sys_t *p_sys  = p_demux->p_sys;
 
@@ -805,14 +806,10 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
         current.i_timestamp = Oggseek_GranuleToAbsTimestamp( p_stream,
                                                              current.i_granule, false );
 
-        if ( current.i_timestamp == -1 && current.i_granule > 0 )
+        if ( current.i_timestamp == VLC_TS_INVALID && current.i_granule > 0 )
         {
             msg_Err( p_demux, "Unmatched granule. New codec ?" );
             return -1;
-        }
-        else if ( current.i_timestamp < -1 )  /* due to preskip with some codecs */
-        {
-            current.i_timestamp = 0;
         }
 
         if ( current.i_pos != -1 && current.i_granule != -1 )
@@ -828,7 +825,8 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
             }
             else if ( current.i_timestamp > i_targettime )
             {
-                if ( lowestupper.i_timestamp == -1 || current.i_timestamp < lowestupper.i_timestamp )
+                if ( lowestupper.i_timestamp == VLC_TS_INVALID ||
+                     current.i_timestamp < lowestupper.i_timestamp )
                     lowestupper = current;
                 /* check lower half of segment */
                 i_start_pos -= i_segsize;
@@ -895,7 +893,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
  *************************************************************************/
 
 int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_stream,
-                                     int64_t i_time, bool b_fastseek )
+                                     mtime_t i_time, bool b_fastseek )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t i_lowerpos = -1;
@@ -918,7 +916,7 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
     {
         /* But only if there's no keyframe/preload requirements */
         /* FIXME: add function to get preload time by codec, ex: opus */
-        i_lowerpos = i_time * p_sys->i_bitrate / INT64_C(8000000);
+        i_lowerpos = VLC_TS_0 + (i_time - VLC_TS_0) * p_sys->i_bitrate / INT64_C(8000000);
         b_found = true;
     }
 
@@ -991,7 +989,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
 }
 
 int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
-                                int64_t i_time )
+                                mtime_t i_time )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 

@@ -535,7 +535,7 @@ static int Demux( demux_t * p_demux )
 
         if ( p_stream->prepcr.pp_blocks )
         {
-            int64_t pagestamp = Oggseek_GranuleToAbsTimestamp( p_stream, ogg_page_granulepos(  &p_sys->current_page ), false );
+            mtime_t pagestamp = Oggseek_GranuleToAbsTimestamp( p_stream, ogg_page_granulepos(  &p_sys->current_page ), false );
             p_stream->i_previous_pcr = pagestamp;
 #ifdef HAVE_LIBVORBIS
             int i_prev_blocksize = 0;
@@ -587,24 +587,27 @@ static int Demux( demux_t * p_demux )
                 case VLC_CODEC_SPEEX:
                 case VLC_CODEC_OPUS:
                 case VLC_CODEC_VORBIS:
-                    pagestamp -= CLOCK_FREQ * p_block->i_nb_samples / p_stream->f_rate;
-                    if ( pagestamp < 0 )
+                    if( pagestamp != VLC_TS_INVALID )
+                    {
+                        pagestamp -= CLOCK_FREQ * p_block->i_nb_samples / p_stream->f_rate;
+                        p_block->i_pts = p_sys->i_nzpcr_offset + pagestamp;
+                    }
+                    else
                     {
                         p_block->i_pts = VLC_TS_INVALID;
                         if( p_sys->i_nzpcr_offset == 0 ) /* not on chained streams */
                             p_block->i_flags |= BLOCK_FLAG_PREROLL;
                     }
-                    else
-                        p_block->i_pts = VLC_TS_0 + p_sys->i_nzpcr_offset + pagestamp;
                     b_fixed = true;
                     break;
                 default:
                     if ( p_stream->fmt.i_cat == VIDEO_ES )
                     {
-                        pagestamp = pagestamp - ( CLOCK_FREQ / p_stream->f_rate );
-                        if( pagestamp < 0 )
-                            pagestamp = 0;
-                        p_block->i_pts = VLC_TS_0 + p_sys->i_nzpcr_offset + pagestamp;
+                        if( pagestamp != VLC_TS_INVALID )
+                        {
+                            pagestamp = pagestamp - ( CLOCK_FREQ / p_stream->f_rate );
+                            p_block->i_pts = p_sys->i_nzpcr_offset + pagestamp;
+                        }
                         b_fixed = true;
                     }
                 }
@@ -613,8 +616,7 @@ static int Demux( demux_t * p_demux )
             if ( b_fixed )
             {
                 pagestamp = p_stream->i_previous_pcr; /* as set above */
-                if ( pagestamp < 0 ) pagestamp = 0;
-                p_stream->i_pcr = VLC_TS_0 + pagestamp;
+                p_stream->i_pcr = pagestamp;
                 p_stream->i_pcr += p_sys->i_nzpcr_offset;
                 p_stream->i_previous_granulepos = ogg_page_granulepos( &p_sys->current_page );
             }
@@ -626,11 +628,11 @@ static int Demux( demux_t * p_demux )
 
         }
 
-        int64_t i_pagestamp = Oggseek_GranuleToAbsTimestamp( p_stream,
-                            ogg_page_granulepos( &p_sys->current_page ), false );
-        if ( i_pagestamp > -1 )
+        mtime_t i_pagestamp = Oggseek_GranuleToAbsTimestamp( p_stream,
+                              ogg_page_granulepos( &p_sys->current_page ), false );
+        if ( i_pagestamp != VLC_TS_INVALID )
         {
-            p_stream->i_pcr = VLC_TS_0 + i_pagestamp;
+            p_stream->i_pcr = i_pagestamp;
             p_stream->i_pcr += p_sys->i_nzpcr_offset;
         }
 
@@ -809,7 +811,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
-            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TS_0 + i64, b ) )
             {
                 Ogg_ResetStreamsHelper( p_sys );
                 if( acc )
@@ -883,7 +885,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             assert( p_sys->i_length > 0 );
             i64 = CLOCK_FREQ * p_sys->i_length * f;
             Ogg_ResetStreamsHelper( p_sys );
-            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, i64 ) >= 0 )
+            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TS_0 + i64 ) >= 0 )
             {
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
@@ -954,7 +956,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
-            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, i64, b ) )
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TS_0 + i64, b ) )
             {
                 Ogg_ResetStreamsHelper( p_sys );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
@@ -1044,7 +1046,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS ||
             (p_stream->b_oggds && p_stream->fmt.i_cat == VIDEO_ES) )
         {
-            p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream,
+            p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream,
                                          p_oggpacket->granulepos, true );
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
         }
@@ -1082,7 +1084,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
         {
             if( p_stream->i_previous_granulepos > 0 )
             {
-                p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream, ++p_stream->i_previous_granulepos, false );
+                p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream, ++p_stream->i_previous_granulepos, false );
                 p_stream->i_pcr += p_ogg->i_nzpcr_offset;
             }
             /* First frame in ogm can be -1 (0 0 -1 2 3 -1 5 ...) */
@@ -1121,7 +1123,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             i_duration = p_stream->special.speex.i_framesize *
                          p_stream->special.speex.i_framesperpacket;
             p_oggpacket->granulepos = p_stream->i_previous_granulepos + i_duration;
-            p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream,
+            p_stream->i_pcr = Oggseek_GranuleToAbsTimestamp( p_stream,
                                     p_stream->i_previous_granulepos, false );
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
         }
@@ -1204,7 +1206,7 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                          tosend->i_dts, tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
                 es_out_Send( p_demux->out, p_stream->p_es, tosend );
 
-                if ( p_ogg->i_pcr < VLC_TS_0 && i_firstpts != VLC_TS_INVALID )
+                if ( p_ogg->i_pcr == VLC_TS_INVALID && i_firstpts != VLC_TS_INVALID )
                 {
                     p_ogg->i_pcr = i_firstpts;
                     if( likely( !p_ogg->b_slave ) )
@@ -1453,10 +1455,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
         {
-            ogg_int64_t nzdts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, false );
-            ogg_int64_t nzpts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, true );
-            p_block->i_dts = ( nzdts != VLC_TS_INVALID ) ? VLC_TS_0 + nzdts : nzdts;
-            p_block->i_pts = ( nzpts != VLC_TS_INVALID ) ? VLC_TS_0 + nzpts : nzpts;
+            p_block->i_dts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, false );
+            p_block->i_pts = Oggseek_GranuleToAbsTimestamp( p_stream, p_oggpacket->granulepos, true );
             /* granulepos for dirac is possibly broken, this value should be ignored */
             if( 0 >= p_oggpacket->granulepos )
             {
@@ -3322,11 +3322,14 @@ static void Ogg_ApplySkeleton( logical_stream_t *p_stream )
 }
 
 /* Return true if there's a skeleton exact match */
-bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, int64_t i_time,
+bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, mtime_t i_time,
                                       int64_t *pi_lower, int64_t *pi_upper )
 {
-    if ( !p_stream || !p_stream->p_skel || !p_stream->p_skel->p_index )
+    if ( !p_stream || !p_stream->p_skel || !p_stream->p_skel->p_index ||
+         i_time == VLC_TS_INVALID )
         return false;
+
+    i_time -= VLC_TS_0;
 
     /* Validate range */
     if ( i_time < p_stream->p_skel->i_indexfirstnum
