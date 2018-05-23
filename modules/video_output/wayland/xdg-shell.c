@@ -34,37 +34,11 @@
 
 #include <wayland-client.h>
 #ifdef XDG_SHELL
-#ifndef XDG_SHELL_UNSTABLE_VERSION
 #include "xdg-shell-client-protocol.h"
-#else
-#include "xdg-shell-unstable-v6-client-protocol.h"
-# define xdg_wm_base zxdg_shell_v6
-# define xdg_wm_base_interface zxdg_shell_v6_interface
-# define xdg_wm_base_listener zxdg_shell_v6_listener
-# define xdg_wm_base_add_listener zxdg_shell_v6_add_listener
-# define xdg_wm_base_destroy zxdg_shell_v6_destroy
-# define xdg_wm_base_get_xdg_surface zxdg_shell_v6_get_xdg_surface
-# define xdg_wm_base_pong zxdg_shell_v6_pong
-# define xdg_surface zxdg_surface_v6
-# define xdg_surface_listener zxdg_surface_v6_listener
-# define xdg_surface_add_listener zxdg_surface_v6_add_listener
-# define xdg_surface_destroy zxdg_surface_v6_destroy
-# define xdg_surface_get_toplevel zxdg_surface_v6_get_toplevel
-# define xdg_surface_set_window_geometry zxdg_surface_v6_set_window_geometry
-# define xdg_surface_ack_configure zxdg_surface_v6_ack_configure
-# define xdg_toplevel zxdg_toplevel_v6
-# define xdg_toplevel_listener zxdg_toplevel_v6_listener
-# define xdg_toplevel_add_listener zxdg_toplevel_v6_add_listener
-# define xdg_toplevel_destroy zxdg_toplevel_v6_destroy
-# define xdg_toplevel_set_title zxdg_toplevel_v6_set_title
-# define xdg_toplevel_set_app_id zxdg_toplevel_v6_set_app_id
-# define xdg_toplevel_set_fullscreen zxdg_toplevel_v6_set_fullscreen
-# define xdg_toplevel_unset_fullscreen zxdg_toplevel_v6_unset_fullscreen
-# define XDG_TOPLEVEL_STATE_FULLSCREEN ZXDG_TOPLEVEL_V6_STATE_FULLSCREEN
-#endif
+/** Temporary backward compatibility hack for XDG shell unstable v6 */
+# define XDG_SHELL_UNSTABLE
 #else
 # define xdg_wm_base wl_shell
-# define xdg_wm_base_interface wl_shell_interface
 # define xdg_wm_base_add_listener(s, l, q) (void)0
 # define xdg_wm_base_destroy wl_shell_destroy
 # define xdg_wm_base_get_xdg_surface wl_shell_get_shell_surface
@@ -107,6 +81,9 @@ struct vout_window_sys_t
     unsigned width;
     unsigned height;
     bool fullscreen;
+# ifdef XDG_SHELL_UNSTABLE
+    bool unstable;
+#endif
 
     struct wl_list seats;
 
@@ -432,16 +409,29 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
     }
     else
 #ifdef XDG_SHELL
-# ifndef XDG_SHELL_UNSTABLE_VERSION
+# ifdef XDG_SHELL_UNSTABLE
+    if (!strcmp(iface, "zxdg_shell_v6") && sys->wm_base == NULL)
+        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
+                                        1);
+    else
     if (!strcmp(iface, "xdg_wm_base"))
+    {
+        if (sys->wm_base != NULL)
+            xdg_wm_base_destroy(sys->wm_base);
+        sys->unstable = false;
+        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
+                                        1);
+    }
 # else
-    if (!strcmp(iface, "zxdg_shell_v6"))
+    if (!strcmp(iface, "xdg_wm_base"))
+        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
+                                        1);
 # endif
 #else
     if (!strcmp(iface, "wl_shell"))
-#endif
-        sys->wm_base = wl_registry_bind(registry, name, &xdg_wm_base_interface,
+        sys->wm_base = wl_registry_bind(registry, name, &wl_shell_interface,
                                         1);
+#endif
     else
     if (!strcmp(iface, "wl_seat"))
         seat_create(wnd, registry, name, vers, &sys->seats);
@@ -511,6 +501,9 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (sys->registry == NULL)
         goto error;
 
+#ifdef XDG_SHELL_UNSTABLE
+    sys->unstable = true;
+#endif
     wl_registry_add_listener(sys->registry, &registry_cbs, wnd);
     wl_display_roundtrip(display); /* complete registry enumeration */
     wl_display_roundtrip(display); /* complete devices enumeration */
@@ -589,10 +582,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         goto error;
 
-#ifdef XDG_SHELL_UNSTABLE_VERSION
-    msg_Warn(wnd, "using XDG shell unstable version %d",
-             XDG_SHELL_UNSTABLE_VERSION);
-    msg_Info(wnd, "The window manager needs an update.");
+#ifdef XDG_SHELL_UNSTABLE
+    if (sys->unstable)
+    {
+        msg_Warn(wnd, "using XDG shell unstable version");
+        msg_Info(wnd, "The window manager needs an update.");
+    }
 #endif
     return VLC_SUCCESS;
 
@@ -654,13 +649,8 @@ static void Close(vout_window_t *wnd)
 
 vlc_module_begin()
 #ifdef XDG_SHELL
-# ifndef XDG_SHELL_UNSTABLE_VERSION
     set_shortname(N_("XDG shell"))
     set_description(N_("XDG shell surface"))
-# else
-    set_shortname(N_("XDG shell v6"))
-    set_description(N_("XDG shell (unstable version 6) surface"))
-# endif
 #else
     set_shortname(N_("WL shell"))
     set_description(N_("Wayland shell surface"))
@@ -668,11 +658,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 #ifdef XDG_SHELL
-# ifndef XDG_SHELL_UNSTABLE_VERSION
     set_capability("vout window", 20)
-# else
-    set_capability("vout window", 19)
-# endif
 #else
     set_capability("vout window", 10)
 #endif
