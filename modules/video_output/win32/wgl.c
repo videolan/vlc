@@ -198,7 +198,7 @@ static int Open(vlc_object_t *object)
 #ifdef WGL_EXT_swap_control
     /* Create an GPU Affinity DC */
     const char *extensions = (const char*)glGetString(GL_EXTENSIONS);
-    if (vlc_gl_HasExtension(extensions, "WGL_EXT_swap_control")) {
+    if (vlc_gl_StrHasToken(extensions, "WGL_EXT_swap_control")) {
         PFNWGLSWAPINTERVALEXTPROC SwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
         if (SwapIntervalEXT)
             SwapIntervalEXT(1);

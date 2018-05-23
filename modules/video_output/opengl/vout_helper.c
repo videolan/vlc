@@ -871,8 +871,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
      * so checks for extensions are bound to fail. Check for OpenGL ES version instead. */
     vgl->supports_npot = true;
 #else
-    vgl->supports_npot = vlc_gl_HasExtension(extensions, "GL_ARB_texture_non_power_of_two") ||
-                         vlc_gl_HasExtension(extensions, "GL_APPLE_texture_2D_limited_npot");
+    vgl->supports_npot = vlc_gl_StrHasToken(extensions, "GL_ARB_texture_non_power_of_two") ||
+                         vlc_gl_StrHasToken(extensions, "GL_APPLE_texture_2D_limited_npot");
 #endif
 
     bool b_dump_shaders = var_InheritInteger(gl, "verbose") >= 4;

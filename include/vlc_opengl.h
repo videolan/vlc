@@ -118,7 +118,7 @@ VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
 VLC_API bool vlc_gl_surface_CheckSize(vlc_gl_t *, unsigned *w, unsigned *h);
 VLC_API void vlc_gl_surface_Destroy(vlc_gl_t *);
 
-static inline bool vlc_gl_HasExtension(const char *apis, const char *api)
+static inline bool vlc_gl_StrHasToken(const char *apis, const char *api)
 {
     size_t apilen = strlen(api);
     while (apis) {

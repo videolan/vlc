@@ -406,11 +406,11 @@ Open(vlc_object_t *obj)
      || tc->gl->egl.destroyImageKHR == NULL)
         return VLC_EGENERIC;
 
-    if (!vlc_gl_HasExtension(tc->glexts, "GL_OES_EGL_image"))
+    if (!vlc_gl_StrHasToken(tc->glexts, "GL_OES_EGL_image"))
         return VLC_EGENERIC;
 
     const char *eglexts = tc->gl->egl.queryString(tc->gl, EGL_EXTENSIONS);
-    if (eglexts == NULL || !vlc_gl_HasExtension(eglexts, "EGL_EXT_image_dma_buf_import"))
+    if (eglexts == NULL || !vlc_gl_StrHasToken(eglexts, "EGL_EXT_image_dma_buf_import"))
         return VLC_EGENERIC;
 
     struct priv *priv = tc->priv = calloc(1, sizeof(struct priv));

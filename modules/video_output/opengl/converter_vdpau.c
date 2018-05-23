@@ -175,7 +175,7 @@ Open(vlc_object_t *obj)
     if ((tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_420 &&
          tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_422 &&
          tc->fmt.i_chroma != VLC_CODEC_VDPAU_VIDEO_444) ||
-        !vlc_gl_HasExtension(tc->glexts, "GL_NV_vdpau_interop") ||
+        !vlc_gl_StrHasToken(tc->glexts, "GL_NV_vdpau_interop") ||
         tc->gl->surface->type != VOUT_WINDOW_TYPE_XID)
         return VLC_EGENERIC;
 
