@@ -662,13 +662,13 @@ static int Demux( demux_t * p_demux )
             continue;
         if( p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS )
             continue;
-        if( p_stream->i_pcr < VLC_TS_0 )
+        if( p_stream->i_pcr <= VLC_TS_UNKNOWN )
             continue;
         if ( p_stream->b_finished || p_stream->b_initializing )
             continue;
         if ( p_stream->p_preparse_block )
             continue;
-        if( i_pcr_candidate < VLC_TS_0
+        if( i_pcr_candidate <= VLC_TS_UNKNOWN
             || p_stream->i_pcr <= i_pcr_candidate )
         {
             i_pcr_candidate = p_stream->i_pcr;
