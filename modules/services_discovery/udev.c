@@ -25,9 +25,7 @@
 #endif
 
 #include <errno.h>
-#ifdef HAVE_SEARCH_H
 #include <search.h>
-#endif
 #include <poll.h>
 #include <sys/stat.h>
 #include <fcntl.h>
