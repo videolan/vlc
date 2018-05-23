@@ -1,6 +1,6 @@
 /**
- * @file events.h
- * @brief X C Bindings VLC module common header
+ * @file vlc_xkb.h
+ * @brief XKeyboard symbol mappings for VLC
  */
 /*****************************************************************************
  * Copyright © 2009 Rémi Denis-Courmont
@@ -20,30 +20,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef XCB_CURSOR_NONE
-# define XCB_CURSOR_NONE ((xcb_cursor_t) 0U)
-#endif
+#include <stdint.h>
 
-#include <vlc_vout_display.h>
+uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym);
 
-/* events.c */
-
-/**
- * Checks for an XCB error.
- */
-int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
-                        const char *str, xcb_void_cookie_t);
-
-/**
- * Allocates a window for XCB-based output.
- *
- * Creates a VLC video X window object, connects to the corresponding X server,
- * finds the corresponding X server screen.
- */
-struct vout_window_t *vlc_xcb_parent_Create(vout_display_t *obj,
-                                            xcb_connection_t **connp,
-                                            const xcb_screen_t **screenp);
-/**
- * Processes XCB events.
- */
-int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn, bool *visible);

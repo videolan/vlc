@@ -1,6 +1,6 @@
 /**
- * @file keys.c
- * @brief X C Bindings VLC keyboard event handling
+ * @file xkb.c
+ * @brief XKeyboard symbols mapping for VLC
  */
 /*****************************************************************************
  * Copyright © 2009 Rémi Denis-Courmont
@@ -25,31 +25,26 @@
 #endif
 
 #include <stdlib.h>
-#include <inttypes.h>
-#include <assert.h>
-
-#include <xcb/xcb.h>
-#include <vlc_common.h>
-#include "events.h"
-
-#include <xcb/xcb_keysyms.h>
+#include <stdint.h>
 #include <X11/keysym.h>
 #include <X11/XF86keysym.h>
+#include <vlc_common.h>
 #include <vlc_actions.h>
+#include "video_output/xcb/vlc_xkb.h"
 
 static int keysymcmp (const void *pa, const void *pb)
 {
-    int a = *(const xcb_keysym_t *)pa;
-    int b = *(const xcb_keysym_t *)pb;
+    int a = *(const uint32_t *)pa;
+    int b = *(const uint32_t *)pb;
 
     return a - b;
 }
 
-static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
+uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
 {
     static const struct
     {
-        xcb_keysym_t x11;
+        uint32_t x11;
         uint32_t vlc;
     } *res, tab[] = {
 #include "xcb_keysym.h"
@@ -93,66 +88,4 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
         return res->vlc;
 
     return KEY_UNSET;
-}
-
-
-/**
- * Process an X11 event, convert into VLC hotkey event if applicable.
- *
- * @param syms XCB key symbols (created by xcb_key_symbols_alloc())
- * @param ev XCB event to process
- * @return 0 if the event was handled and free()'d, non-zero otherwise
- */
-int XCB_keyHandler_Process(xcb_key_symbols_t *syms, xcb_generic_event_t *ev,
-                           vout_window_t *window)
-{
-    assert(syms != NULL);
-
-    switch (ev->response_type & 0x7f)
-    {
-        case XCB_KEY_PRESS:
-        {
-            xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
-            xcb_keysym_t sym = xcb_key_press_lookup_keysym(syms, e, 0);
-            uint_fast32_t vk = ConvertKeySym (sym);
-
-            msg_Dbg(window, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
-                    vk, sym);
-            if (vk == KEY_UNSET)
-                break;
-            if (e->state & XCB_MOD_MASK_SHIFT) /* Shift */
-                vk |= KEY_MODIFIER_SHIFT;
-            /* XCB_MOD_MASK_LOCK */ /* Caps Lock */
-            if (e->state & XCB_MOD_MASK_CONTROL) /* Control */
-                vk |= KEY_MODIFIER_CTRL;
-            if (e->state & XCB_MOD_MASK_1) /* Alternate */
-                vk |= KEY_MODIFIER_ALT;
-            /* XCB_MOD_MASK_2 */ /* Numeric Pad Lock */
-            if (e->state & XCB_MOD_MASK_3) /* Super */
-                vk |= KEY_MODIFIER_META;
-            if (e->state & XCB_MOD_MASK_4) /* Meta */
-                vk |= KEY_MODIFIER_META;
-            if (e->state & XCB_MOD_MASK_5) /* Alternate Graphic */
-                vk |= KEY_MODIFIER_ALT;
-            vout_window_ReportKeyPress(window, vk);
-            break;
-        }
-
-        case XCB_KEY_RELEASE:
-            break;
-
-        case XCB_MAPPING_NOTIFY:
-        {
-            xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
-            msg_Dbg(window, "refreshing keyboard mapping");
-            xcb_refresh_keyboard_mapping(syms, e);
-            break;
-        }
-
-        default:
-            return -1;
-    }
-
-    free (ev);
-    return 0;
 }

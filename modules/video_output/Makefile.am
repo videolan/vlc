@@ -168,7 +168,7 @@ vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
 if HAVE_XCB_KEYSYMS
 libxcb_window_plugin_la_SOURCES += \
 	video_output/xcb/keysym.h video_output/xcb/xcb_keysym.h \
-	video_output/xcb/keys.c
+	video_output/xcb/vlc_xkb.h video_output/xcb/xkb.c
 libxcb_window_plugin_la_CFLAGS += -DHAVE_XCB_KEYSYMS
 endif
 if HAVE_XCB_XVIDEO

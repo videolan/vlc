@@ -31,6 +31,10 @@
 #include <limits.h> /* _POSIX_HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
+#ifdef HAVE_XCB_KEYSYMS
+# include <xcb/xcb_keysyms.h>
+# include "vlc_xkb.h"
+#endif
 typedef xcb_atom_t Atom;
 #include <X11/Xatom.h> /* XA_WM_NAME */
 
@@ -72,13 +76,42 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
     vout_window_sys_t *sys = wnd->sys;
     int ret = 0;
 
-#ifdef HAVE_XCB_KEYSYMS
-    if (sys->keys != NULL && XCB_keyHandler_Process(sys->keys, ev, wnd) == 0)
-        return 0;
-#endif
-
     switch (ev->response_type & 0x7f)
     {
+        case XCB_KEY_PRESS:
+        {
+#ifdef HAVE_XCB_KEYSYMS
+            xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
+            xcb_keysym_t sym = xcb_key_press_lookup_keysym(sys->keys, e, 0);
+            uint_fast32_t vk = vlc_xkb_convert_keysym(sym);
+
+            msg_Dbg(wnd, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
+                    vk, sym);
+            if (vk == KEY_UNSET)
+                break;
+            if (e->state & XCB_MOD_MASK_SHIFT) /* Shift */
+                vk |= KEY_MODIFIER_SHIFT;
+            /* XCB_MOD_MASK_LOCK */ /* Caps Lock */
+            if (e->state & XCB_MOD_MASK_CONTROL) /* Control */
+                vk |= KEY_MODIFIER_CTRL;
+            if (e->state & XCB_MOD_MASK_1) /* Alternate */
+                vk |= KEY_MODIFIER_ALT;
+            /* XCB_MOD_MASK_2 */ /* Numeric Pad Lock */
+            if (e->state & XCB_MOD_MASK_3) /* Super */
+                vk |= KEY_MODIFIER_META;
+            if (e->state & XCB_MOD_MASK_4) /* Meta */
+                vk |= KEY_MODIFIER_META;
+            if (e->state & XCB_MOD_MASK_5) /* Alternate Graphic */
+                vk |= KEY_MODIFIER_ALT;
+
+            vout_window_ReportKeyPress(wnd, vk);
+#endif
+            break;
+        }
+
+        case XCB_KEY_RELEASE:
+            break;
+
         /* Note a direct mapping of buttons from XCB to VLC is assumed. */
         case XCB_BUTTON_PRESS:
         {
@@ -118,7 +151,15 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
             break;
 
         case XCB_MAPPING_NOTIFY:
+        {
+#ifdef HAVE_XCB_KEYSYMS
+            xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
+
+            msg_Dbg(wnd, "refreshing keyboard mapping");
+            xcb_refresh_keyboard_mapping(sys->keys, e);
+#endif
             break;
+        }
 
         default:
             msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
