@@ -1,0 +1,23 @@
+--- srt/CMakeLists.txt.msvc-detect	2018-05-23 08:55:10.318208300 +0200
++++ srt/CMakeLists.txt	2018-05-18 13:33:40.442158800 +0200
+@@ -115,12 +115,14 @@ message (STATUS "SSL libraries: ${SSL_LI
+ 
+ # Detect if the compiler is GNU compatable for flags
+ set(HAVE_COMPILER_GNU_COMPAT 0)
+-foreach (gnid GNU Intel Clang AppleClang)
+-	if (${CMAKE_CXX_COMPILER_ID} STREQUAL ${gnid})
+-		set(HAVE_COMPILER_GNU_COMPAT 1)
+-		break()
+-	endif()
+-endforeach()
++if ( CMAKE_CXX_COMPILER_ID )
++	foreach (gnid GNU Intel Clang AppleClang)
++		if (${CMAKE_CXX_COMPILER_ID} STREQUAL ${gnid})
++			set(HAVE_COMPILER_GNU_COMPAT 1)
++			break()
++		endif()
++	endforeach()
++endif()
+ 
+ if (DISABLE_CXX11)
+ 	set (ENABLE_CXX11 0)
