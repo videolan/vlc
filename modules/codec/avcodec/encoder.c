@@ -745,6 +745,7 @@ int InitVideoEnc( vlc_object_t *p_this )
          */
         const unsigned i_order_max = 8 * sizeof(p_context->channel_layout);
         uint32_t pi_order_dst[AOUT_CHAN_MAX] = { 0 };
+        uint32_t order_mask = 0;
         int i_channels_src = 0;
 
         if( p_context->channel_layout )
@@ -756,6 +757,7 @@ int InitVideoEnc( vlc_object_t *p_this )
                 {
                     msg_Dbg( p_enc, "%d %"PRIx64" mapped to %"PRIx64"", i_channels_src, pi_channels_map[i][0], pi_channels_map[i][1]);
                     pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
+                    order_mask |= pi_channels_map[i][1];
                 }
             }
         }
@@ -769,14 +771,16 @@ int InitVideoEnc( vlc_object_t *p_this )
                 {
                     msg_Dbg( p_enc, "%d channel is %"PRIx64"", i_channels_src, pi_channels_map[i][1]);
                     pi_order_dst[i_channels_src++] = pi_channels_map[i][1];
+                    order_mask |= pi_channels_map[i][1];
                 }
             }
         }
         if( i_channels_src != p_context->channels )
             msg_Err( p_enc, "Channel layout not understood" );
 
-        p_sys->i_channels_to_reorder = aout_CheckChannelReorder( NULL, pi_order_dst,
-            channel_mask[p_context->channels][0], p_sys->pi_reorder_layout );
+        p_sys->i_channels_to_reorder =
+            aout_CheckChannelReorder( NULL, pi_order_dst, order_mask,
+                                      p_sys->pi_reorder_layout );
 #endif
 
         if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )
