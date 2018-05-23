@@ -483,6 +483,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->fullscreen = false;
     wl_list_init(&sys->seats);
     wnd->sys = sys;
+    wnd->handle.wl = NULL;
 
     /* Connect to the display server */
     char *dpy_name = var_InheritString(wnd, "wl-display");
@@ -511,12 +512,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (sys->compositor == NULL || sys->wm_base == NULL)
         goto error;
 
-    xdg_wm_base_add_listener(sys->wm_base, &xdg_wm_base_cbs, NULL);
-
     /* Create a surface */
     struct wl_surface *surface = wl_compositor_create_surface(sys->compositor);
     if (surface == NULL)
         goto error;
+
+    xdg_wm_base_add_listener(sys->wm_base, &xdg_wm_base_cbs, NULL);
 
     struct xdg_surface *xdg_surface =
         xdg_wm_base_get_xdg_surface(sys->wm_base, surface);
@@ -603,6 +604,8 @@ error:
         xdg_surface_destroy(sys->surface);
     if (sys->wm_base != NULL)
         xdg_wm_base_destroy(sys->wm_base);
+    if (wnd->handle.wl != NULL)
+        wl_surface_destroy(wnd->handle.wl);
     if (sys->compositor != NULL)
         wl_compositor_destroy(sys->compositor);
     if (sys->registry != NULL)
@@ -629,8 +632,8 @@ static void Close(vout_window_t *wnd)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
     xdg_toplevel_destroy(sys->toplevel);
     xdg_surface_destroy(sys->surface);
-    wl_surface_destroy(wnd->handle.wl);
     xdg_wm_base_destroy(sys->wm_base);
+    wl_surface_destroy(wnd->handle.wl);
     wl_compositor_destroy(sys->compositor);
     wl_registry_destroy(sys->registry);
     wl_display_disconnect(wnd->display.wl);
