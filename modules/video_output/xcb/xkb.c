@@ -3,7 +3,7 @@
  * @brief XKeyboard symbols mapping for VLC
  */
 /*****************************************************************************
- * Copyright © 2009 Rémi Denis-Courmont
+ * Copyright © 2009-2018 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -89,3 +89,35 @@ uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
 
     return KEY_UNSET;
 }
+
+#ifdef HAVE_XKBCOMMON
+# include <xkbcommon/xkbcommon.h>
+
+struct modifiers
+{
+    char name[8];
+    uint32_t mask;
+};
+
+static const struct modifiers modifiers[] =
+{
+    { XKB_MOD_NAME_SHIFT, KEY_MODIFIER_SHIFT },
+    { XKB_MOD_NAME_CTRL,  KEY_MODIFIER_CTRL },
+    { XKB_MOD_NAME_ALT,   KEY_MODIFIER_ALT },
+    { XKB_MOD_NAME_LOGO,  KEY_MODIFIER_META },
+};
+
+uint_fast32_t vlc_xkb_get_one(struct xkb_state *state, uint_fast32_t keycode)
+{
+    xkb_keysym_t keysym = xkb_state_key_get_one_sym(state, keycode + 8);
+    uint_fast32_t vk = vlc_xkb_convert_keysym(keysym);
+
+    if (vk != KEY_UNSET)
+        for (size_t i = 0; i < ARRAY_SIZE(modifiers); i++)
+            if (xkb_state_mod_name_is_active(state, modifiers[i].name,
+                                             XKB_STATE_MODS_EFFECTIVE) > 0)
+                vk |= modifiers[i].mask;
+
+    return vk;
+}
+#endif /* HAVE_XKBCOMMON */
