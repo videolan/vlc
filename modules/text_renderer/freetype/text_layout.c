@@ -587,6 +587,7 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
     /* Maximum number of faces to try for each run */
     #define MAX_FACES 5
     FT_Face pp_faces[ MAX_FACES ] = {0};
+    FT_Face p_face = NULL;
 
     pp_faces[ 0 ] = SelectAndLoadFace( p_filter, p_style, 0 );
 
@@ -594,7 +595,27 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
     {
         int i_index = 0;
         int i_glyph_index = 0;
-        FT_Face p_face = NULL;
+
+#ifdef HAVE_FRIBIDI
+        /*
+         * For white space, punctuation and neutral characters, try to use
+         * the font of the previous character, if any. See #20466.
+         */
+        if( p_face &&
+            ( p_paragraph->p_types[ i ] == FRIBIDI_TYPE_WS
+           || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_CS
+           || p_paragraph->p_types[ i ] == FRIBIDI_TYPE_ON ) )
+        {
+            i_glyph_index = FT_Get_Char_Index( p_face,
+                                               p_paragraph->p_code_points[ i ] );
+            if( i_glyph_index )
+            {
+                p_paragraph->pp_faces[ i ] = p_face;
+                continue;
+            }
+        }
+#endif
+
         do {
             p_face = pp_faces[ i_index ];
             if( !p_face )
@@ -606,31 +627,7 @@ static int AddRunWithFallback( filter_t *p_filter, paragraph_t *p_paragraph,
             i_glyph_index = FT_Get_Char_Index( p_face,
                                                p_paragraph->p_code_points[ i ] );
             if( i_glyph_index )
-            {
                 p_paragraph->pp_faces[ i ] = p_face;
-
-                /*
-                 * Move p_face to the beginning of the array. Otherwise strikethrough
-                 * lines can appear segmented, being rendered at a certain height
-                 * through spaces and at a different height through words.
-                 * Skip this step for the specified special characters. See #15840.
-                 */
-                if( i_index > 0 )
-                {
-                    uni_char_t codepoint = p_paragraph->p_code_points[ i ];
-                    if( codepoint != 0x0009 && codepoint != 0x00A0
-                     && codepoint != 0x1680 && codepoint != 0x061C
-                     && codepoint != 0x202F && codepoint != 0x205F
-                     && codepoint != 0x3000 && codepoint != 0xFEFF
-                     && !( codepoint >= 0x2000 && codepoint <= 0x200F )
-                     && !( codepoint >= 0x202A && codepoint <= 0x202E )
-                     && !( codepoint >= 0x2060 && codepoint <= 0x2069 ) )
-                    {
-                        pp_faces[ i_index ] = pp_faces[ 0 ];
-                        pp_faces[ 0 ] = p_face;
-                    }
-                }
-            }
 
         } while( i_glyph_index == 0 && ++i_index < MAX_FACES );
     }
