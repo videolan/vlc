@@ -35,6 +35,10 @@
 #include <vlc_vout_window.h>
 #include <vlc_xlib.h>
 
+#ifndef GLX_ARB_get_proc_address
+#error GLX_ARB_get_proc_address extension missing
+#endif
+
 typedef struct vlc_gl_sys_t
 {
     Display *display;
@@ -68,11 +72,7 @@ static void SwapBuffers (vlc_gl_t *gl)
 static void *GetSymbol(vlc_gl_t *gl, const char *procname)
 {
     (void) gl;
-#ifdef GLX_ARB_get_proc_address
     return glXGetProcAddressARB ((const GLubyte *)procname);
-#else
-    return NULL;
-#endif
 }
 
 static bool CheckGLX (vlc_object_t *vd, Display *dpy)
@@ -209,7 +209,6 @@ static int Open (vlc_object_t *obj)
     gl->swap = SwapBuffers;
     gl->getProcAddress = GetSymbol;
 
-#ifdef GLX_ARB_get_proc_address
     bool is_swap_interval_set = false;
 
     MakeCurrent (gl);
@@ -235,7 +234,6 @@ static int Open (vlc_object_t *obj)
     }
 # endif
     ReleaseCurrent (gl);
-#endif
 
     /* XXX: Prevent other gl backends (like EGL) to be opened within the same
      * X11 window instance. Indeed, using EGL after GLX on the same X11 window
