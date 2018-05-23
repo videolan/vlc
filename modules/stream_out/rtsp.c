@@ -705,7 +705,9 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                  tpt = transport_next( tpt ) )
             {
                 bool b_multicast = true, b_unsupp = false;
+                bool b_multicast_port_set = false;
                 unsigned loport = 5004, hiport; /* from RFC3551 */
+                unsigned mloport = 5004, mhiport = mloport + 1;
 
                 /* Check transport protocol. */
                 /* Currently, we only support RTP/AVP over UDP */
@@ -732,6 +734,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                                 == 2 )
                         ;
                     else
+                    if( sscanf( opt, "port=%u-%u", &mloport, &mhiport )
+                                == 2 )
+                        b_multicast_port_set = true;
+                    else
                     if( strncmp( opt, "mode=", 5 ) == 0 )
                     {
                         if( strncasecmp( opt + 5, "play", 4 )
@@ -756,7 +762,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                      * "source" and "append" are invalid (server-only);
                      * "ssrc" also (as clarified per RFC2326bis).
                      *
-                     * For multicast, "port", "layers", "ttl" are set by the
+                     * For multicast, "layers", "ttl" are set by the
                      * stream output configuration.
                      *
                      * For unicast, we want to decide "server_port" values.
@@ -779,6 +785,15 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         continue;
 
                     net_GetPeerAddress(id->mcast_fd, dst, &dport);
+
+                    /* Checking for multicast port override */
+                    if( b_multicast_port_set
+                     && ((unsigned)dport != mloport
+                      || (unsigned)dport + 1 != mhiport))
+                    {
+                        answer->i_status = 551;
+                        continue;
+                    }
 
                     ttl = var_InheritInteger(owner, "ttl");
                     if (ttl <= 0)
