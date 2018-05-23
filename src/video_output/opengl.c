@@ -78,6 +78,8 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
         vlc_object_release(gl);
         return NULL;
     }
+    assert(gl->makeCurrent && gl->releaseCurrent && gl->swap
+        && gl->getProcAddress);
     atomic_init(&glpriv->ref_count, 1);
 
     return &glpriv->gl;
