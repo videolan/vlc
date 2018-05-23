@@ -578,7 +578,10 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->control = Control;
 
     if (cfg->is_fullscreen)
+    {
         vout_window_SetFullScreen(wnd, NULL);
+        sys->fullscreen = true;
+    }
 
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         goto error;
