@@ -1186,7 +1186,6 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
 
                 DemuxDebug( msg_Dbg( p_demux, "block sent from preparse > dts %"PRId64" pts %"PRId64" spcr %"PRId64" pcr %"PRId64,
                          tosend->i_dts, tosend->i_pts, p_stream->i_pcr, p_ogg->i_pcr ); )
-                es_out_Send( p_demux->out, p_stream->p_es, tosend );
 
                 if ( p_ogg->i_pcr == VLC_TS_INVALID && i_firstpts != VLC_TS_INVALID )
                 {
@@ -1194,6 +1193,8 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
                     if( likely( !p_ogg->b_slave ) )
                         es_out_SetPCR( p_demux->out, p_ogg->i_pcr );
                 }
+
+                es_out_Send( p_demux->out, p_stream->p_es, tosend );
             }
             p_stream->p_preparse_block = NULL;
         }
