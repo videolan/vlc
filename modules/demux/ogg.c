@@ -273,6 +273,55 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+
+static void Ogg_GeneratePCR( demux_t * p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    /* We will consider the lowest PCR among tracks, because the audio core badly
+     * handles PCR rewind (mute)
+     */
+    mtime_t i_pcr_candidate = VLC_TS_INVALID;
+    for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    {
+        logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+
+        if( p_stream->fmt.i_cat == SPU_ES )
+            continue;
+        if( p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS )
+            continue;
+        if( p_stream->i_pcr <= VLC_TS_UNKNOWN )
+            continue;
+        if ( p_stream->b_finished || p_stream->b_initializing )
+            continue;
+        if ( p_stream->p_preparse_block )
+            continue;
+        if( i_pcr_candidate == VLC_TS_INVALID
+            || p_stream->i_pcr <= i_pcr_candidate )
+        {
+            i_pcr_candidate = p_stream->i_pcr;
+        }
+    }
+
+    if ( i_pcr_candidate != VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
+    {
+        if ( p_sys->i_streams == 1 && p_sys->i_access_delay )
+        {
+            int64_t i_pcr_jitter = i_pcr_candidate - p_sys->i_pcr;
+            if ( i_pcr_jitter > p_sys->i_pcr_jitter )
+            {
+                p_sys->i_pcr_jitter = i_pcr_jitter;
+                if ( p_sys->i_access_delay < i_pcr_jitter )
+                    msg_Warn( p_demux, "Consider increasing access caching variable from %"PRId64" to >%"PRId64,
+                              p_sys->i_access_delay / 1000, i_pcr_jitter / 1000 );
+            }
+        }
+
+        p_sys->i_pcr = i_pcr_candidate;
+        if( likely( !p_sys->b_slave ) )
+            es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+    }
+}
+
 /*****************************************************************************
  * Demux: reads and demuxes data packets
  *****************************************************************************
@@ -647,58 +696,22 @@ static int Demux( demux_t * p_demux )
     else
         p_sys->b_preparsing_done = true;
 
-    /* We will consider the lowest PCR among tracks, because the audio core badly
-     * handles PCR rewind (mute)
-     */
-    mtime_t i_pcr_candidate = VLC_TS_INVALID;
-    for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    if( p_sys->b_preparsing_done )
     {
-        logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-
-        if ( p_sys->b_preparsing_done && p_stream->b_initializing )
+        for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
         {
-            /* We have 1 or more streams needing more than 1 page for preparsing */
-            p_sys->b_preparsing_done = false;
-        }
-
-        if( p_stream->fmt.i_cat == SPU_ES )
-            continue;
-        if( p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS )
-            continue;
-        if( p_stream->i_pcr <= VLC_TS_UNKNOWN )
-            continue;
-        if ( p_stream->b_finished || p_stream->b_initializing )
-            continue;
-        if ( p_stream->p_preparse_block )
-            continue;
-        if( i_pcr_candidate <= VLC_TS_UNKNOWN
-            || p_stream->i_pcr <= i_pcr_candidate )
-        {
-            i_pcr_candidate = p_stream->i_pcr;
-        }
-    }
-
-    if ( i_pcr_candidate != VLC_TS_INVALID && p_sys->i_pcr != i_pcr_candidate )
-    {
-        if ( p_sys->i_streams == 1 && p_sys->i_access_delay )
-        {
-            int64_t i_pcr_jitter = i_pcr_candidate - p_sys->i_pcr;
-            if ( i_pcr_jitter > p_sys->i_pcr_jitter )
+            logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+            if ( p_stream->b_initializing )
             {
-                p_sys->i_pcr_jitter = i_pcr_jitter;
-                if ( p_sys->i_access_delay < i_pcr_jitter )
-                    msg_Warn( p_demux, "Consider increasing access caching variable from %"PRId64" to >%"PRId64,
-                              p_sys->i_access_delay / 1000, i_pcr_jitter / 1000 );
+                /* We have 1 or more streams needing more than 1 page for preparsing */
+                p_sys->b_preparsing_done = false;
+                break;
             }
         }
-
-        if( ! b_skipping && p_sys->b_preparsing_done )
-        {
-            p_sys->i_pcr = i_pcr_candidate;
-            if( likely( !p_sys->b_slave ) )
-                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-        }
     }
+
+    if( !b_skipping && p_sys->b_preparsing_done )
+        Ogg_GeneratePCR( p_demux );
 
     return VLC_DEMUXER_SUCCESS;
 }
