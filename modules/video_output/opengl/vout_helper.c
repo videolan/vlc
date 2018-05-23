@@ -733,11 +733,6 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
                                                vlc_gl_t *gl,
                                                const vlc_viewpoint_t *viewpoint)
 {
-    if (gl->getProcAddress == NULL) {
-        msg_Err(gl, "getProcAddress not implemented, bailing out");
-        return NULL;
-    }
-
     vout_display_opengl_t *vgl = calloc(1, sizeof(*vgl));
     if (!vgl)
         return NULL;
