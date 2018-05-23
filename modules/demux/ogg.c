@@ -575,6 +575,9 @@ static int Demux( demux_t * p_demux )
 
             // PASS 2
             bool b_fixed = false;
+            date_t d;
+            date_Init( &d, p_stream->f_rate, 1 );
+            date_Set( &d, p_sys->i_nzpcr_offset + pagestamp - VLC_TS_0 );
             for( int i=p_stream->prepcr.i_used - 1; i>=0; i-- )
             {
                 block_t *p_block = p_stream->prepcr.pp_blocks[i];
@@ -585,8 +588,8 @@ static int Demux( demux_t * p_demux )
                 case VLC_CODEC_VORBIS:
                     if( pagestamp != VLC_TS_INVALID )
                     {
-                        pagestamp -= CLOCK_FREQ * p_block->i_nb_samples / p_stream->f_rate;
-                        p_block->i_pts = p_sys->i_nzpcr_offset + pagestamp;
+                        date_Decrement( &d, p_block->i_nb_samples );
+                        p_block->i_pts = date_Get( &d ) + VLC_TS_0;
                     }
                     else
                     {
@@ -601,8 +604,8 @@ static int Demux( demux_t * p_demux )
                     {
                         if( pagestamp != VLC_TS_INVALID )
                         {
-                            pagestamp = pagestamp - ( CLOCK_FREQ / p_stream->f_rate );
-                            p_block->i_pts = p_sys->i_nzpcr_offset + pagestamp;
+                            date_Decrement( &d, 1 );
+                            p_block->i_pts = date_Get( &d ) + VLC_TS_0;
                         }
                         b_fixed = true;
                     }
