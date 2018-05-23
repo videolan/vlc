@@ -109,7 +109,7 @@ static inline void vlc_gl_Swap(vlc_gl_t *gl)
 
 static inline void *vlc_gl_GetProcAddress(vlc_gl_t *gl, const char *name)
 {
-    return (gl->getProcAddress != NULL) ? gl->getProcAddress(gl, name) : NULL;
+    return gl->getProcAddress(gl, name);
 }
 
 VLC_API vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *,
