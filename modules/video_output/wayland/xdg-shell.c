@@ -71,6 +71,7 @@ struct vout_window_sys_t
 {
     struct wl_registry *registry;
     struct wl_compositor *compositor;
+    struct wl_shm *shm;
     struct xdg_wm_base *wm_base;
     struct xdg_surface *surface;
     struct xdg_toplevel *toplevel;
@@ -355,6 +356,9 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
                                         1);
 #endif
     else
+    if (!strcmp(iface, "wl_shm"))
+        sys->shm = wl_registry_bind(registry, name, &wl_shm_interface, 1);
+    else
     if (!strcmp(iface, "wl_seat"))
         seat_create(wnd, registry, name, vers, &sys->seats);
     else
@@ -398,6 +402,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         return VLC_ENOMEM;
 
     sys->compositor = NULL;
+    sys->shm = NULL;
     sys->wm_base = NULL;
     sys->surface = NULL;
     sys->toplevel = NULL;
@@ -536,6 +541,8 @@ error:
         xdg_wm_base_destroy(sys->wm_base);
     if (wnd->handle.wl != NULL)
         wl_surface_destroy(wnd->handle.wl);
+    if (sys->shm != NULL)
+        wl_shm_destroy(sys->shm);
     if (sys->compositor != NULL)
         wl_compositor_destroy(sys->compositor);
     if (sys->registry != NULL)
@@ -565,6 +572,8 @@ static void Close(vout_window_t *wnd)
     xdg_surface_destroy(sys->surface);
     xdg_wm_base_destroy(sys->wm_base);
     wl_surface_destroy(wnd->handle.wl);
+    if (sys->shm != NULL)
+        wl_shm_destroy(sys->shm);
     wl_compositor_destroy(sys->compositor);
     wl_registry_destroy(sys->registry);
     wl_display_disconnect(wnd->display.wl);
