@@ -91,11 +91,7 @@ public:
                                 const QUrl& path = QUrl() );
     bool isDying() { return b_isDying; }
     static QString getDirectoryDialog( intf_thread_t *p_intf);
-    static QStringList getOpenURL(QWidget *parent = NULL,
-                                  const QString &caption = QString(),
-                                  const QUrl &dir = QUrl(),
-                                  const QString &filter = QString(),
-                                  QString *selectedFilter = NULL );
+
     static QString getSaveFileName(QWidget *parent = NULL,
                                     const QString &caption = QString(),
                                     const QUrl &dir = QUrl(),

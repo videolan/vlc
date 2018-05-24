@@ -114,21 +114,6 @@ DialogsProvider::~DialogsProvider()
     delete miscPopupMenu;
 }
 
-QStringList DialogsProvider::getOpenURL( QWidget *parent,
-                                         const QString &caption,
-                                         const QUrl &dir,
-                                         const QString &filter,
-                                         QString *selectedFilter )
-{
-    QStringList res;
-    QList<QUrl> urls = QFileDialog::getOpenFileUrls( parent, caption, dir, filter, selectedFilter );
-
-    foreach( const QUrl& url, urls )
-        res.append( url.toEncoded() );
-
-    return res;
-}
-
 QString DialogsProvider::getSaveFileName( QWidget *parent,
                                           const QString &caption,
                                           const QUrl &dir,
@@ -405,17 +390,15 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
     }
     else /* non-save mode */
     {
-        QStringList urls = getOpenURL( NULL, qfu( p_arg->psz_title ),
+        QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL, qfu( p_arg->psz_title ),
                                        p_intf->p_sys->filepath, extensions );
         p_arg->i_results = urls.count();
         p_arg->psz_results = (char **)vlc_alloc( p_arg->i_results, sizeof( char * ) );
         i = 0;
-        foreach( const QString &uri, urls )
-            p_arg->psz_results[i++] = strdup( qtu( uri ) );
-        if(i == 0)
-            p_intf->p_sys->filepath = "";
-        else
-            p_intf->p_sys->filepath = QUrl::fromEncoded(p_arg->psz_results[i-1]);
+        foreach( const QUrl &uri, urls )
+            p_arg->psz_results[i++] = strdup( uri.toEncoded().constData() );
+        if( !urls.isEmpty() )
+            p_intf->p_sys->filepath =  urls.last();
     }
 
     /* Callback */
@@ -504,15 +487,19 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     fileTypes.replace( ";*", " *");
     fileTypes.chop(2); //remove trailling ";;"
 
-    QStringList urls = getOpenURL( NULL,
+    QList<QUrl> urls = QFileDialog::getOpenFileUrls( NULL,
         help.isEmpty() ? qtr(I_OP_SEL_FILES ) : help,
         path.isEmpty() ? p_intf->p_sys->filepath : path,
         fileTypes );
 
     if( !urls.isEmpty() )
-        p_intf->p_sys->filepath = QUrl( urls.last() );
+        p_intf->p_sys->filepath = urls.last();
 
-    return urls;
+    QStringList res;
+    foreach( const QUrl &url, urls )
+        res << url.toEncoded();
+
+    return res;
 }
 
 /**
