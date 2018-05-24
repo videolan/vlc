@@ -445,9 +445,13 @@ static void registry_global_remove_cb(void *data, struct wl_registry *registry,
                                       uint32_t name)
 {
     vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
     char idstr[11];
 
     msg_Dbg(wnd, "global remove %3"PRIu32, name);
+
+    if (seat_destroy_one(&sys->seats, name) == 0)
+        return;
 
     /* If the global was an output, this will remove it. Otherwise, no-op. */
     sprintf(idstr, "%"PRIu32, name);

@@ -53,6 +53,7 @@ struct seat_data
     struct xkb_state *keystate;
 #endif
 
+    uint32_t name;
     uint32_t version;
     struct wl_list node;
 };
@@ -441,6 +442,23 @@ static void seat_destroy(struct seat_data *sd)
     else
         wl_seat_destroy(sd->seat);
     free(sd);
+}
+
+int seat_destroy_one(struct wl_list *list, uint32_t name)
+{
+    struct seat_data *sd;
+
+    wl_list_for_each(sd, list, node)
+    {
+        if (sd->name == name)
+        {
+            seat_destroy(sd);
+            /* Note: return here so no needs for safe walk variant */
+            return 0;
+        }
+    }
+
+    return -1;
 }
 
 void seat_destroy_all(struct wl_list *list)

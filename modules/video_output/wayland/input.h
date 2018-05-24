@@ -24,4 +24,5 @@ struct wl_list;
 
 int seat_create(struct vout_window_t *wnd, struct wl_registry *,
                 uint32_t name, uint32_t version, struct wl_list *list);
+int seat_destroy_one(struct wl_list *list, uint32_t name);
 void seat_destroy_all(struct wl_list *list);
