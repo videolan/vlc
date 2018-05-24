@@ -50,8 +50,14 @@ endif
 endif
 endif
 
+GPGERROR_CONF := $(HOSTCONF) \
+	--disable-nls \
+	--disable-shared \
+	--disable-languages \
+	--disable-tests
+
 .gpg-error: libgpg-error
 	$(RECONF)
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-nls --disable-shared --disable-languages --disable-tests
+	cd $< && $(HOSTVARS) ./configure $(GPGERROR_CONF)
 	cd $< && $(MAKE) install
 	touch $@
