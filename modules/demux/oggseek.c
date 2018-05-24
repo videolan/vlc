@@ -30,6 +30,10 @@
 # include "config.h"
 #endif
 
+#ifdef HAVE_LIBVORBIS
+  #include <vorbis/codec.h>
+#endif
+
 #include <vlc_common.h>
 #include <vlc_demux.h>
 
@@ -40,10 +44,7 @@
 
 #include "ogg.h"
 #include "oggseek.h"
-
-/* Theora spec 7.1 */
-#define THEORA_FTYPE_NOTDATA       0x80
-#define THEORA_FTYPE_INTERFRAME    0x40
+#include "ogg_granule.h"
 
 #define SEGMENT_NOT_FOUND -1
 
@@ -55,14 +56,6 @@ typedef struct packetStartCoordinates
     int64_t i_skip;
 } packetStartCoordinates;
 
-//#define OGG_SEEK_DEBUG 1
-#ifdef OGG_SEEK_DEBUG
-  #define OggDebug(code) code
-  #define OggNoDebug(code)
-#else
-  #define OggDebug(code)
-  #define OggNoDebug(code) code
-#endif
 /************************************************************
 * index entries
 *************************************************************/
@@ -289,7 +282,8 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                     if ( p_sys->pp_stream[i]->i_serial_no != ogg_page_serialno( &page ) )
                         continue;
 
-                    i_length = Oggseek_GranuleToAbsTimestamp( p_sys->pp_stream[i], i_granule, false );
+                    i_length = Ogg_GranuleToTime( p_sys->pp_stream[i], i_granule,
+                                                  !p_sys->pp_stream[i]->b_contiguous, false );
                     if( i_length > VLC_TS_INVALID )
                         p_sys->i_length = __MAX( p_sys->i_length, (i_length - VLC_TS_0) / 1000000 );
                     break;
@@ -439,49 +433,6 @@ static int64_t find_first_page_granule( demux_t *p_demux,
         p_sys->i_input_position += i_result;
         i_pos1 = p_sys->i_input_position;
     }
-}
-
-/* Checks if current packet matches codec keyframe */
-bool Ogg_IsKeyFrame( logical_stream_t *p_stream, ogg_packet *p_packet )
-{
-    if ( p_stream->b_oggds )
-    {
-        return ( p_packet->bytes > 0 && p_packet->packet[0] & PACKET_IS_SYNCPOINT );
-    }
-    else switch ( p_stream->fmt.i_codec )
-    {
-    case VLC_CODEC_THEORA:
-    case VLC_CODEC_DAALA: /* Same convention used in daala */
-        if ( p_packet->bytes <= 0 || p_packet->packet[0] & THEORA_FTYPE_NOTDATA )
-            return false;
-        else
-            return !( p_packet->packet[0] & THEORA_FTYPE_INTERFRAME );
-    case VLC_CODEC_VP8:
-        return ( ( ( p_packet->granulepos >> 3 ) & 0x07FFFFFF ) == 0 );
-    case VLC_CODEC_DIRAC:
-        return ( p_packet->granulepos & 0xFF8000FF );
-    default:
-        return true;
-    }
-}
-
-int64_t Ogg_GetKeyframeGranule( logical_stream_t *p_stream, int64_t i_granule )
-{
-    if ( p_stream->b_oggds )
-    {
-           return -1; /* We have no way to know */
-    }
-    else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA ||
-             p_stream->fmt.i_codec == VLC_CODEC_DAALA )
-    {
-        return ( i_granule >> p_stream->i_granule_shift ) << p_stream->i_granule_shift;
-    }
-    else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
-    {
-        return ( i_granule >> 31 ) << 31;
-    }
-    /* No change, that's keyframe or it can't be shifted out (oggds) */
-    return i_granule;
 }
 
 static bool OggSeekToPacket( demux_t *p_demux, logical_stream_t *p_stream,
@@ -674,82 +625,6 @@ restart:
     return i_result;
 }
 
-/* Dont use b_presentation with frames granules ! */
-mtime_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
-                                       int64_t i_granule, bool b_presentation )
-{
-    mtime_t i_timestamp = VLC_TS_INVALID;
-    if ( i_granule < 1 - !!p_stream->b_oggds )
-        return VLC_TS_INVALID;
-
-    if ( p_stream->b_oggds )
-    {
-        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
-    }
-    else  switch( p_stream->fmt.i_codec )
-    {
-    case VLC_CODEC_THEORA:
-    case VLC_CODEC_DAALA:
-    case VLC_CODEC_KATE:
-    {
-        ogg_int64_t iframe = i_granule >> p_stream->i_granule_shift;
-        ogg_int64_t pframe = i_granule - ( iframe << p_stream->i_granule_shift );
-        /* See Theora A.2.3 */
-        if ( b_presentation ) pframe -= p_stream->i_keyframe_offset;
-        i_timestamp = ( iframe + pframe ) * CLOCK_FREQ / p_stream->f_rate;
-        break;
-    }
-    case VLC_CODEC_VP8:
-    {
-        ogg_int64_t frame = i_granule >> p_stream->i_granule_shift;
-        if ( b_presentation ) frame--;
-        i_timestamp = frame * CLOCK_FREQ / p_stream->f_rate;
-        break;
-    }
-    case VLC_CODEC_DIRAC:
-    {
-        ogg_int64_t i_dts = i_granule >> 31;
-        ogg_int64_t delay = (i_granule >> 9) & 0x1fff;
-        /* NB, OggDirac granulepos values are in units of 2*picturerate */
-        double f_rate = p_stream->f_rate;
-        if ( !p_stream->special.dirac.b_interlaced ) f_rate *= 2;
-        if ( b_presentation ) i_dts += delay;
-        i_timestamp = i_dts * CLOCK_FREQ / f_rate;
-        break;
-    }
-    case VLC_CODEC_OPUS:
-    {
-        if ( b_presentation ) return VLC_TS_INVALID;
-        i_timestamp = ( i_granule - p_stream->i_pre_skip ) * CLOCK_FREQ / 48000;
-        break;
-    }
-    case VLC_CODEC_VORBIS:
-    case VLC_CODEC_FLAC:
-    {
-        if ( b_presentation ) return VLC_TS_INVALID;
-        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
-        break;
-    }
-    case VLC_CODEC_SPEEX:
-    {
-        if ( b_presentation )
-            i_granule -= p_stream->special.speex.i_framesize *
-                         p_stream->special.speex.i_framesperpacket;
-        i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
-        break;
-    }
-    case VLC_CODEC_OGGSPOTS:
-    {
-        if ( b_presentation ) return VLC_TS_INVALID;
-        i_timestamp = ( i_granule >> p_stream->i_granule_shift )
-                * CLOCK_FREQ / p_stream->f_rate;
-        break;
-    }
-    }
-
-    return i_timestamp != VLC_TS_INVALID ? i_timestamp + VLC_TS_0 : VLC_TS_INVALID;
-}
-
 /* returns pos */
 static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stream,
             mtime_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
@@ -803,13 +678,17 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
                                                  p_stream,
                                                  &current.i_granule );
 
-        current.i_timestamp = Oggseek_GranuleToAbsTimestamp( p_stream,
-                                                             current.i_granule, false );
+        current.i_timestamp = Ogg_GranuleToTime( p_stream, current.i_granule,
+                                                 !p_stream->b_contiguous, false );
 
         if ( current.i_timestamp == VLC_TS_INVALID && current.i_granule > 0 )
         {
             msg_Err( p_demux, "Unmatched granule. New codec ?" );
             return -1;
+        }
+        else if ( current.i_timestamp < 0 )  /* due to preskip with some codecs */
+        {
+            current.i_timestamp = 0;
         }
 
         if ( current.i_pos != -1 && current.i_granule != -1 )
@@ -874,7 +753,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
                            i_keyframegranule >> p_stream->i_granule_shift,
                            bestlower.i_granule,
                            i_pos_upper,
-                           Oggseek_GranuleToAbsTimestamp( p_stream, i_keyframegranule, false ) ) );
+                           Ogg_GranuleToTime( p_stream, i_keyframegranule, !p_stream->b_contiguous, false ) ) );
 
         OggDebug( msg_Dbg( p_demux, "Seeking back to %"PRId64, __MAX ( bestlower.i_pos - OGGSEEK_BYTES_TO_READ, p_stream->i_data_start ) ) );
 

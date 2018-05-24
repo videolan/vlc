@@ -26,6 +26,15 @@
  * Preamble
  *****************************************************************************/
 
+//#define OGG_SEEK_DEBUG 1
+#ifdef OGG_SEEK_DEBUG
+  #define OggDebug(code) code
+  #define OggNoDebug(code)
+#else
+  #define OggDebug(code)
+  #define OggNoDebug(code) code
+#endif
+
 #define PAGE_HEADER_BYTES 27
 
 #define OGGSEEK_BYTES_TO_READ 8500
@@ -49,11 +58,6 @@ struct oggseek_index_entry
     int64_t i_pagepos_end;
 };
 
-int64_t Ogg_GetKeyframeGranule ( logical_stream_t *p_stream, int64_t i_granule );
-bool    Ogg_IsKeyFrame ( logical_stream_t *, ogg_packet * );
-
-mtime_t Oggseek_GranuleToAbsTimestamp ( logical_stream_t *p_stream, int64_t i_granule,
-                                        bool b_presentation );
 int     Oggseek_BlindSeektoAbsoluteTime ( demux_t *, logical_stream_t *, mtime_t, bool );
 int     Oggseek_BlindSeektoPosition ( demux_t *, logical_stream_t *, double f, bool );
 int     Oggseek_SeektoAbsolutetime ( demux_t *, logical_stream_t *, mtime_t );
