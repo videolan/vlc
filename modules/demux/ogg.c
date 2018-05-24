@@ -1053,10 +1053,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             if( p_stream->fmt.i_codec == VLC_CODEC_OPUS && p_oggpacket->e_o_s )
                 p_stream->i_end_trim = p_oggpacket->granulepos - sample;
 
-            if (sample >= p_stream->i_pre_skip)
-                sample -= p_stream->i_pre_skip;
-            else
-                sample = 0;
+            sample -= p_stream->i_pre_skip;
 
             p_stream->i_pcr =  VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
@@ -1123,10 +1120,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             ogg_int64_t sample;
             p_oggpacket->granulepos = p_stream->i_previous_granulepos + i_duration;
             sample = p_stream->i_previous_granulepos;
-            if (sample >= p_stream->i_pre_skip)
-                sample -= p_stream->i_pre_skip;
-            else
-                sample = 0;
+            sample -= p_stream->i_pre_skip;
 
             p_stream->i_pcr = VLC_TS_0 + sample * CLOCK_FREQ / p_stream->f_rate;
             p_stream->i_pcr += p_ogg->i_nzpcr_offset;
