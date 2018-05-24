@@ -45,7 +45,12 @@ struct seat_data
 {
     vout_window_t *owner;
     struct wl_seat *seat;
+
     struct wl_pointer *pointer;
+    mtime_t cursor_timeout;
+    mtime_t cursor_deadline;
+    uint32_t cursor_serial;
+
 #ifdef HAVE_XKBCOMMON
     struct xkb_context *xkb;
     struct wl_keyboard *keyboard;
@@ -58,12 +63,27 @@ struct seat_data
     struct wl_list node;
 };
 
+static void pointer_show(struct seat_data *sd, struct wl_pointer *pointer)
+{
+    int hsx, hsy;
+    struct wl_surface *surface = window_get_cursor(sd->owner, &hsx, &hsy);
+
+    if (surface != NULL)
+    {
+        wl_pointer_set_cursor(pointer, sd->cursor_serial, surface, hsx, hsy);
+        sd->cursor_deadline = mdate() + sd->cursor_timeout;
+    }
+}
+
 static void pointer_enter_cb(void *data, struct wl_pointer *pointer,
                              uint32_t serial, struct wl_surface *surface,
                              wl_fixed_t sx, wl_fixed_t sy)
 {
-    (void) data; (void) pointer; (void) serial; (void) surface;
-    (void) sx; (void) sy; /* TODO: set_cursor */
+    struct seat_data *sd = data;
+
+    sd->cursor_serial = serial;
+    pointer_show(sd, pointer);
+    (void) surface; (void) sx; (void) sy;
 }
 
 static void pointer_leave_cb(void *data, struct wl_pointer *pointer,
@@ -77,9 +97,10 @@ static void pointer_motion_cb(void *data, struct wl_pointer *pointer,
 {
     struct seat_data *sd = data;
 
+    pointer_show(sd, pointer);
     vout_window_ReportMouseMoved(sd->owner,
                                  wl_fixed_to_int(sx), wl_fixed_to_int(sy));
-    (void) pointer; (void) time;
+    (void) time;
 }
 
 static void pointer_button_cb(void *data, struct wl_pointer *pointer,
@@ -88,6 +109,8 @@ static void pointer_button_cb(void *data, struct wl_pointer *pointer,
 {
     struct seat_data *sd = data;
     int button;
+
+    pointer_show(sd, pointer);
 
     switch (keycode)
     {
@@ -114,7 +137,7 @@ static void pointer_button_cb(void *data, struct wl_pointer *pointer,
             break;
     }
 
-    (void) pointer; (void) serial; (void) time;
+    (void) serial; (void) time;
 }
 
 static void pointer_axis_cb(void *data, struct wl_pointer *pointer,
@@ -125,6 +148,7 @@ static void pointer_axis_cb(void *data, struct wl_pointer *pointer,
     int button;
     bool plus = value > 0;
 
+    pointer_show(sd, pointer);
     value = abs(value);
 
     switch (type)
@@ -145,7 +169,7 @@ static void pointer_axis_cb(void *data, struct wl_pointer *pointer,
         vout_window_ReportMouseReleased(wnd, button);
         value -= wl_fixed_from_int(10);
     }
-    (void) pointer; (void) serial;
+    (void) serial;
 }
 
 static void pointer_frame_cb(void *data, struct wl_pointer *pointer)
@@ -192,6 +216,10 @@ static void pointer_create(struct seat_data *sd)
     sd->pointer = wl_seat_get_pointer(sd->seat);
     if (likely(sd->pointer != NULL))
         wl_pointer_add_listener(sd->pointer, &pointer_cbs, sd);
+
+    sd->cursor_timeout = var_InheritInteger(sd->owner, "mouse-hide-timeout")
+                         * (CLOCK_FREQ / 1000);
+    sd->cursor_deadline = INT64_MAX;
 }
 
 static void pointer_destroy(struct seat_data *sd)
@@ -425,6 +453,20 @@ int seat_create(vout_window_t *wnd, struct wl_registry *registry,
     return 0;
 }
 
+static mtime_t seat_next_deadline(const struct seat_data *sd)
+{
+    return (sd->pointer != NULL) ? sd->cursor_deadline : INT64_MAX;
+}
+
+static void seat_refresh(struct seat_data *sd, mtime_t now)
+{
+    if (sd->pointer != NULL && sd->cursor_deadline <= now)
+    {   /* Hide cursor */
+        wl_pointer_set_cursor(sd->pointer, sd->cursor_serial, NULL, 0, 0);
+        sd->cursor_deadline = INT64_MAX;
+    }
+}
+
 static void seat_destroy(struct seat_data *sd)
 {
     wl_list_remove(&sd->node);
@@ -465,4 +507,35 @@ void seat_destroy_all(struct wl_list *list)
 {
     while (!wl_list_empty(list))
         seat_destroy(container_of(list->next, struct seat_data, node));
+}
+
+int seat_next_timeout(const struct wl_list *list)
+{
+    struct seat_data *sd;
+    mtime_t deadline = INT64_MAX;
+
+    wl_list_for_each(sd, list, node)
+    {
+        mtime_t d = seat_next_deadline(sd);
+        if (deadline > d)
+            deadline = d;
+    }
+
+    if (deadline == INT64_MAX)
+        return -1;
+
+    mtime_t now = mdate();
+    if (now >= deadline)
+        return 0;
+
+    return (deadline - now) / 1000 + 1;
+}
+
+void seat_timeout(struct wl_list *list)
+{
+    struct seat_data *sd;
+    mtime_t now = mdate();
+
+    wl_list_for_each(sd, list, node)
+        seat_refresh(sd, now);
 }

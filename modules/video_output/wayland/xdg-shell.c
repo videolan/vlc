@@ -124,15 +124,21 @@ static void *Thread(void *data)
 
     for (;;)
     {
+        int timeout;
+
         while (wl_display_prepare_read(display) != 0)
             wl_display_dispatch_pending(display);
 
         wl_display_flush(display);
+        timeout = seat_next_timeout(&sys->seats);
         vlc_restorecancel(canc);
 
-        while (poll(ufd, 1, -1) < 0);
+        int val = poll(ufd, 1, timeout);
 
         canc = vlc_savecancel();
+        if (val == 0)
+            seat_timeout(&sys->seats);
+
         wl_display_read_events(display);
         wl_display_dispatch_pending(display);
     }
