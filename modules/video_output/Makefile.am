@@ -224,9 +224,15 @@ nodist_libxdg_shell_plugin_la_SOURCES = \
 libxdg_shell_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DXDG_SHELL \
 	-I$(builddir)/video_output/wayland
 libxdg_shell_plugin_la_CFLAGS = \
-	$(WAYLAND_CLIENT_CFLAGS) $(XKBCOMMON_CFLAGS)
+	$(WAYLAND_CLIENT_CFLAGS) $(WAYLAND_CURSOR_CFLAGS) \
+	$(XKBCOMMON_CFLAGS)
 libxdg_shell_plugin_la_LIBADD = \
-	$(WAYLAND_CLIENT_LIBS) $(XKBCOMMON_LIBS) $(LIBPTHREAD)
+	$(WAYLAND_CLIENT_LIBS) $(WAYLAND_CURSOR_LIBS) \
+	$(XKBCOMMON_LIBS) $(LIBPTHREAD)
+if HAVE_WAYLAND_CURSOR
+libwl_shell_plugin_la_CPPFLAGS += -DHAVE_WAYLAND_CURSOR
+libxdg_shell_plugin_la_CPPFLAGS += -DHAVE_WAYLAND_CURSOR
+endif
 if HAVE_XKBCOMMON
 libwl_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON
 libxdg_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON

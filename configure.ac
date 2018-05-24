@@ -3148,6 +3148,7 @@ dnl
 AC_ARG_ENABLE(wayland,
   [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
 have_wayland="no"
+have_wayland_cursor="no"
 have_wayland_egl="no"
 
 AS_IF([test "${enable_wayland}" != "no"], [
@@ -3159,6 +3160,12 @@ AS_IF([test "${enable_wayland}" != "no"], [
     ], [
       AC_MSG_RESULT([not found])
       AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-protocols >= 1.12')])
+    ])
+
+    PKG_CHECK_MODULES([WAYLAND_CURSOR], [wayland-cursor], [
+      have_wayland_cursor="yes"
+    ], [
+      AC_MSG_WARN([${WAYLAND_CURSOR_PKG_ERRORS}.])
     ])
 
     AC_MSG_CHECKING([for the Wayland scanner])
@@ -3194,6 +3201,7 @@ AS_IF([test "${enable_wayland}" != "no"], [
 AC_SUBST([WAYLAND_PROTOCOLS])
 AC_SUBST([WAYLAND_SCANNER])
 AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
+AM_CONDITIONAL([HAVE_WAYLAND_CURSOR], [test "${have_wayland_cursor}" = "yes"])
 AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
 AM_CONDITIONAL([HAVE_XKBCOMMON], [test "${have_xkbcommon}" = "yes"])
 

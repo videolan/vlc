@@ -33,6 +33,9 @@
 #include <poll.h>
 
 #include <wayland-client.h>
+#ifdef HAVE_WAYLAND_CURSOR
+#include <wayland-cursor.h>
+#endif
 #ifdef XDG_SHELL
 #include "xdg-shell-client-protocol.h"
 /** Temporary backward compatibility hack for XDG shell unstable v6 */
@@ -89,6 +92,11 @@ struct vout_window_sys_t
 
     struct wl_list outputs;
     struct wl_list seats;
+#ifdef HAVE_WAYLAND_CURSOR
+    struct wl_cursor_theme *cursor_theme;
+    struct wl_cursor *cursor;
+    struct wl_surface *cursor_surface;
+#endif
 
     vlc_thread_t thread;
 };
@@ -104,6 +112,7 @@ static void cleanup_wl_display_read(void *data)
 static void *Thread(void *data)
 {
     vout_window_t *wnd = data;
+    vout_window_sys_t *sys = wnd->sys;
     struct wl_display *display = wnd->display.wl;
     struct pollfd ufd[1];
 
@@ -392,6 +401,37 @@ static const struct wl_registry_listener registry_cbs =
     registry_global_remove_cb,
 };
 
+struct wl_surface *window_get_cursor(vout_window_t *wnd, int32_t *restrict hsx,
+                                     int32_t *restrict hsy)
+{
+#ifdef HAVE_WAYLAND_CURSOR
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (unlikely(sys->cursor == NULL))
+        return NULL;
+
+    assert(sys->cursor->image_count > 0);
+
+    /* TODO? animated cursor (more than one image) */
+    struct wl_cursor_image *img = sys->cursor->images[0];
+    struct wl_surface *surface = sys->cursor_surface;
+
+    if (likely(surface != NULL))
+    {
+        wl_surface_attach(surface, wl_cursor_image_get_buffer(img), 0, 0);
+        wl_surface_damage(surface, 0, 0, img->width, img->height);
+        wl_surface_commit(surface);
+    }
+
+    *hsx = img->hotspot_x;
+    *hsy = img->hotspot_y;
+    return surface;
+#else
+    (void) wnd; (void) hsx; (void) hsy;
+    return NULL;
+#endif
+}
+
 /**
  * Creates a Wayland shell surface.
  */
@@ -406,6 +446,10 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->wm_base = NULL;
     sys->surface = NULL;
     sys->toplevel = NULL;
+#ifdef HAVE_WAYLAND_CURSOR
+    sys->cursor_theme = NULL;
+    sys->cursor = NULL;
+#endif
     sys->deco_manager = NULL;
     sys->deco = NULL;
     sys->default_output = var_InheritInteger(wnd, "wl-output");
@@ -481,6 +525,20 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
                                     cfg->width, cfg->height);
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
 
+#ifdef HAVE_WAYLAND_CURSOR
+    if (sys->shm != NULL)
+    {
+        sys->cursor_theme = wl_cursor_theme_load(NULL, 32, sys->shm);
+        if (sys->cursor_theme != NULL)
+            sys->cursor = wl_cursor_theme_get_cursor(sys->cursor_theme,
+                                                     "left_ptr");
+
+        sys->cursor_surface = wl_compositor_create_surface(sys->compositor);
+    }
+    if (sys->cursor == NULL)
+        msg_Err(wnd, "failed to load cursor");
+#endif
+
     const uint_fast32_t deco_mode =
         var_InheritBool(wnd, "video-deco")
             ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
@@ -533,6 +591,12 @@ error:
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+#ifdef HAVE_WAYLAND_CURSOR
+    if (sys->cursor_surface != NULL)
+        wl_surface_destroy(sys->cursor_surface);
+    if (sys->cursor_theme != NULL)
+        wl_cursor_theme_destroy(sys->cursor_theme);
+#endif
     if (sys->toplevel != NULL)
         xdg_toplevel_destroy(sys->toplevel);
     if (sys->surface != NULL)
@@ -568,6 +632,12 @@ static void Close(vout_window_t *wnd)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+#ifdef HAVE_WAYLAND_CURSOR
+    if (sys->cursor_surface != NULL)
+        wl_surface_destroy(sys->cursor_surface);
+    if (sys->cursor_theme != NULL)
+        wl_cursor_theme_destroy(sys->cursor_theme);
+#endif
     xdg_toplevel_destroy(sys->toplevel);
     xdg_surface_destroy(sys->surface);
     xdg_wm_base_destroy(sys->wm_base);
