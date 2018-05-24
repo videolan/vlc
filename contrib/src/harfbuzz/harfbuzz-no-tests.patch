@@ -1,0 +1,18 @@
+--- harfbuzz/CMakeLists.txt.notests	2018-05-24 15:14:05.682443200 +0200
++++ harfbuzz/CMakeLists.txt	2018-05-24 15:14:17.437916300 +0200
+@@ -808,6 +808,7 @@ endif ()
+ 
+ 
+ ## src/ executables
++if(NOT WIN32 OR NOT ${CMAKE_SYSTEM_NAME} MATCHES "WindowsStore")
+ foreach (prog main test test-would-substitute test-size-params test-buffer-serialize hb-ot-tag test-unicode-ranges)
+   set (prog_name ${prog})
+   if (${prog_name} STREQUAL "test")
+@@ -818,6 +819,7 @@ foreach (prog main test test-would-subst
+   target_link_libraries(${prog_name} harfbuzz ${THIRD_PARTY_LIBS})
+ endforeach ()
+ set_target_properties(hb-ot-tag PROPERTIES COMPILE_FLAGS "-DMAIN")
++endif()
+ 
+ ## Tests
+ if (UNIX OR MINGW)
