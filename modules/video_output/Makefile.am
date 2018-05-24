@@ -212,6 +212,7 @@ libwl_shell_plugin_la_CFLAGS = $(libxdg_shell_plugin_la_CFLAGS)
 libwl_shell_plugin_la_LIBADD = $(libxdg_shell_plugin_la_LIBADD)
 
 libxdg_shell_plugin_la_SOURCES = \
+	video_output/wayland/output.h video_output/wayland/output.c \
 	video_output/wayland/input.h video_output/wayland/input.c \
 	video_output/xcb/vlc_xkb.h video_output/xcb/xkb.c \
 	video_output/wayland/xdg-shell.c
