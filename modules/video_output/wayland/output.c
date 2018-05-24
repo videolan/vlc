@@ -40,6 +40,7 @@ struct output_data
     struct wl_output *wl_output;
 
     uint32_t name;
+    uint32_t version;
     struct wl_list node;
 };
 
@@ -107,8 +108,8 @@ int output_create(vout_window_t *wnd, struct wl_registry *registry,
     if (unlikely(od == NULL))
         return -1;
 
-    if (version > 2)
-        version = 2;
+    if (version > 3)
+        version = 3;
 
     od->wl_output = wl_registry_bind(registry, name, &wl_output_interface,
                                      version);
@@ -120,6 +121,7 @@ int output_create(vout_window_t *wnd, struct wl_registry *registry,
 
     od->owner = wnd;
     od->name = name;
+    od->version = version;
 
     wl_output_add_listener(od->wl_output, &wl_output_cbs, od);
     wl_list_insert(list, &od->node);
@@ -134,7 +136,11 @@ static void output_destroy(struct output_data *od)
     vout_window_ReportOutputDevice(od->owner, idstr, NULL);
 
     wl_list_remove(&od->node);
-    wl_output_destroy(od->wl_output);
+
+    if (od->version >= WL_OUTPUT_RELEASE_SINCE_VERSION)
+        wl_output_release(od->wl_output);
+    else
+        wl_output_destroy(od->wl_output);
     free(od);
 }
 
