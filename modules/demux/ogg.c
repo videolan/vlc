@@ -1068,7 +1068,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
         {
             if( p_stream->i_previous_granulepos > 0 )
             {
-                p_stream->i_pcr = VLC_TS_0 + p_stream->i_previous_granulepos * CLOCK_FREQ / p_stream->f_rate;
+                p_stream->i_pcr = VLC_TS_0 + Oggseek_GranuleToAbsTimestamp( p_stream, ++p_stream->i_previous_granulepos, false );
                 p_stream->i_pcr += p_ogg->i_nzpcr_offset;
             }
             /* First frame in ogm can be -1 (0 0 -1 2 3 -1 5 ...) */
