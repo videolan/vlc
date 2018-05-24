@@ -581,14 +581,15 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
 QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
 {
     const QStringList schemes = QStringList(QStringLiteral("file"));
-    QString dir = QFileDialog::getExistingDirectoryUrl( NULL,
+    QUrl dirurl = QFileDialog::getExistingDirectoryUrl( NULL,
             qtr( I_OP_DIR_WINTITLE ), p_intf->p_sys->filepath,
-            QFileDialog::ShowDirsOnly, schemes ).toLocalFile();
+            QFileDialog::ShowDirsOnly, schemes );
 
-    if( dir.isEmpty() ) return QString();
+    if( dirurl.isEmpty() ) return QString();
 
-    p_intf->p_sys->filepath = dir;
+    p_intf->p_sys->filepath = dirurl;
 
+    QString dir = dirurl.toLocalFile();
     const char *scheme = "directory";
     if( dir.endsWith( DIR_SEP "VIDEO_TS", Qt::CaseInsensitive ) )
         scheme = "dvd";
