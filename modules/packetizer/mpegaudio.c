@@ -630,7 +630,6 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
     date_Init( &p_sys->end_date, 1, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     block_BytestreamInit( &p_sys->bytestream );
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_discontinuity = false;

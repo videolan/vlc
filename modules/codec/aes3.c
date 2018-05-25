@@ -279,7 +279,6 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
 
     /* Misc init */
     date_Init( &p_sys->end_date, 48000, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     /* Set output properties */
     p_dec->fmt_out.audio.i_rate = 48000;

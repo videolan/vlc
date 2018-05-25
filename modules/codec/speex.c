@@ -210,7 +210,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->rtp_rate = p_dec->fmt_in.audio.i_rate;
     p_sys->b_has_headers = false;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
@@ -554,7 +554,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /*****************************************************************************

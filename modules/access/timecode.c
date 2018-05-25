@@ -65,7 +65,7 @@ static int DemuxOnce (demux_t *demux, bool master)
     lldiv_t d;
     unsigned h, m, s, f;
 
-    d = lldiv (pts, CLOCK_FREQ);
+    d = lldiv (pts - VLC_TS_0, CLOCK_FREQ);
     f = d.rem * sys->date.i_divider_num / sys->date.i_divider_den / CLOCK_FREQ;
     d = lldiv (d.quot, 60);
     s = d.rem;

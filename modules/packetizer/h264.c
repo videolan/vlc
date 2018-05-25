@@ -372,7 +372,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->prevdatedpoc.pts = VLC_TS_INVALID;
 
     date_Init( &p_sys->dts, 30000 * 2, 1001 );
-    date_Set( &p_sys->dts, VLC_TS_INVALID );
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );

@@ -597,6 +597,7 @@ static int DecOpen( decoder_t *p_dec )
         date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
     else
         date_Init( &p_sys->end_date, 25 /* FIXME */, 1 );
+    date_Set( &p_sys->end_date, VLC_TS_0 );
 
     free( p_vih );
     free( p_wf );

@@ -341,6 +341,7 @@ valid:
                  u_fps_num, u_fps_den, 0);
     date_Init( &p_sys->pcr, p_sys->fmt_video.video.i_frame_rate,
                p_sys->fmt_video.video.i_frame_rate_base );
+    date_Set( &p_sys->pcr, VLC_TS_0 );
 
     if( !p_sys->fmt_video.video.i_bits_per_pixel )
     {
@@ -394,7 +395,7 @@ static int Demux( demux_t *p_demux )
     mtime_t i_pcr = date_Get( &p_sys->pcr );
 
     /* Call the pace control */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + i_pcr );
+    es_out_SetPCR( p_demux->out, i_pcr );
 
     if( p_sys->b_y4m )
     {
@@ -417,7 +418,7 @@ static int Demux( demux_t *p_demux )
     if( p_block == NULL )
         return VLC_DEMUXER_EOF;
 
-    p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_pcr;
+    p_block->i_dts = p_block->i_pts = i_pcr;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
     date_Increment( &p_sys->pcr, 1 );

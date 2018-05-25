@@ -58,7 +58,7 @@ static void Flush(decoder_t *dec)
 {
     decoder_sys_t *sys = dec->p_sys;
 
-    date_Set(&sys->end_date, 0);
+    date_Set(&sys->end_date, VLC_TS_INVALID);
 }
 
 static block_t *DecodeBlock(decoder_t *dec, block_t **block_ptr)
@@ -155,7 +155,6 @@ static int Open(vlc_object_t *object)
     sys->is_12bit = dec->fmt_in.audio.i_bitspersample == 12;
 
     date_Init(&sys->end_date, dec->fmt_in.audio.i_rate, 1);
-    date_Set(&sys->end_date, 0);
 
     for (unsigned i = 0; i < sizeof(sys->shuffle) / sizeof(*sys->shuffle); i++) {
         const unsigned a = sys->is_pal ? 18 : 15;

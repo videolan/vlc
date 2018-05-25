@@ -252,7 +252,7 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
 
     /* Misc init */
     p_sys->b_packetizer = b_packetizer;
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     p_sys->i_type = i_type;
     p_sys->i_header_size = i_header_size;
     p_sys->i_chans_to_reorder = 0;
@@ -317,7 +317,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /*****************************************************************************

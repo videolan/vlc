@@ -169,7 +169,6 @@ static int Open( vlc_object_t *p_this)
     date_Init( &p_sys->next_output_pts,
                p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );
 
-    date_Set( &p_sys->next_output_pts, VLC_TS_INVALID );
     p_sys->p_previous_pic = NULL;
 
     p_filter->pf_video_filter = Filter;

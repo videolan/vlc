@@ -149,8 +149,7 @@ static int Demux( demux_t *p_demux )
 
     if( !p_block ) return 1;
 
-    p_block->i_dts = p_block->i_pts =
-        VLC_TS_0 + date_Increment( &p_sys->pts, kBufferSize );
+    p_block->i_dts = p_block->i_pts = date_Increment( &p_sys->pts, kBufferSize );
 
     msg_Dbg( p_demux, "demux got %"PRId64" ms offset",
              (mdate() - *(mtime_t *)p_block->p_buffer) / 1000 );
@@ -190,6 +189,7 @@ static int OpenDemux ( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     date_Init( &p_sys->pts, 1, 1 );
+    date_Set( &p_sys->pts, VLC_TS_0 );
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_FOURCC('s','t','a','t') );
     p_sys->fmt.video.i_width = 720;

@@ -614,7 +614,6 @@ int InitVideoDec( vlc_object_t *obj )
 
     /* ***** misc init ***** */
     date_Init(&p_sys->pts, 1, 30001);
-    date_Set(&p_sys->pts, VLC_TS_INVALID);
     p_sys->b_first_frame = true;
     p_sys->i_late_frames = 0;
     p_sys->b_from_preroll = false;

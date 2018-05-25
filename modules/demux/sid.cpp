@@ -166,6 +166,7 @@ static int Open (vlc_object_t *obj)
     sys->es = es_out_Add (demux->out, &fmt);
 
     date_Init (&sys->pts, fmt.audio.i_rate, 1);
+    date_Set(&sys->pts, VLC_TS_0);
 
     sys->tune->selectSong (0);
     result = (sys->player->load (sys->tune) >=0 );
@@ -220,7 +221,7 @@ static int Demux (demux_t *demux)
         return VLC_DEMUXER_EOF;
     }
     block->i_buffer = i_read;
-    block->i_pts = block->i_dts = VLC_TS_0 + date_Get (&sys->pts);
+    block->i_pts = block->i_dts = date_Get (&sys->pts);
 
     es_out_SetPCR (demux->out, block->i_pts);
 

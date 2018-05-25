@@ -130,6 +130,7 @@ static int Open (vlc_object_t *obj)
 
     sys->es = es_out_Add (demux->out, &fmt);
     date_Init (&sys->pts, RATE, 1);
+    date_Set(&sys->pts, VLC_TS_0);
 
     /* Titles */
     unsigned n = gme_track_count (sys->emu);
@@ -228,7 +229,7 @@ static int Demux (demux_t *demux)
         return VLC_DEMUXER_EOF;
     }
 
-    block->i_pts = block->i_dts = VLC_TS_0 + date_Get (&sys->pts);
+    block->i_pts = block->i_dts = date_Get (&sys->pts);
     es_out_SetPCR (demux->out, block->i_pts);
     es_out_Send (demux->out, sys->es, block);
     date_Increment (&sys->pts, SAMPLES);

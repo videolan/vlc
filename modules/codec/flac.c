@@ -326,7 +326,6 @@ static void DecoderMetadataCallback( const FLAC__StreamDecoder *decoder,
             p_sys->stream_info = metadata->data.stream_info;
 
             date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-            date_Set( &p_sys->end_date, VLC_TS_INVALID );
             break;
 
         case FLAC__METADATA_TYPE_VORBIS_COMMENT:
@@ -628,7 +627,7 @@ static void Flush( decoder_t *p_dec )
 
     if( p_sys->b_stream_info )
         FLAC__stream_decoder_flush( p_sys->p_flac );
-    date_Set( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 }
 
 /****************************************************************************

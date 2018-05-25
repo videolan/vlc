@@ -156,11 +156,11 @@ static int Demux(demux_t *demux)
     sys->position += count;
 
     block->i_nb_samples = block->i_buffer / 4;
-    block->i_dts = block->i_pts = VLC_TS_0 + date_Get(&sys->pts);
+    block->i_dts = block->i_pts = date_Get(&sys->pts);
     date_Increment(&sys->pts, block->i_nb_samples);
 
     es_out_Send(demux->out, sys->es, block);
-    es_out_SetPCR(demux->out, VLC_TS_0 + date_Get(&sys->pts));
+    es_out_SetPCR(demux->out, date_Get(&sys->pts));
     return VLC_DEMUXER_SUCCESS;
 }
 
@@ -254,6 +254,7 @@ static int DemuxOpen(vlc_object_t *obj, vcddev_t *dev, unsigned track)
     sys->es = es_out_Add(demux->out, &fmt);
 
     date_Init(&sys->pts, 44100, 1);
+    date_Set(&sys->pts, VLC_TS_0);
 
     sys->position = 0;
     demux->pf_demux = Demux;

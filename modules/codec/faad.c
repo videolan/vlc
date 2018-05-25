@@ -128,8 +128,6 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Misc init */
-    date_Set( &p_sys->date, 0 );
-
     p_dec->fmt_out.audio.channel_type = p_dec->fmt_in.audio.channel_type;
 
     if( p_dec->fmt_in.i_extra > 0 )
@@ -160,6 +158,7 @@ static int Open( vlc_object_t *p_this )
         /* Will be initalised from first frame */
         p_dec->fmt_out.audio.i_rate = 0;
         p_dec->fmt_out.audio.i_channels = 0;
+        date_Set( &p_sys->date, VLC_TS_INVALID );
     }
 
     p_dec->fmt_out.i_codec = HAVE_FPU ? VLC_CODEC_FL32 : VLC_CODEC_S16N;
@@ -321,7 +320,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     {
         date_Set( &p_sys->date, i_pts );
     }
-    else if( !date_Get( &p_sys->date ) )
+    else if( date_Get( &p_sys->date ) == VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         FlushBuffer( p_sys, SIZE_MAX );

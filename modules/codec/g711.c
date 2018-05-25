@@ -202,7 +202,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     p_sys->table = table;
 
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     return VLC_SUCCESS;
 }

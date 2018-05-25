@@ -251,7 +251,6 @@ int InitAudioDec( vlc_object_t *obj )
     /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
     if( !p_dec->fmt_out.audio.i_rate )
         p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     if( p_dec->fmt_out.audio.i_rate )

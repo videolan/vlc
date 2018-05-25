@@ -104,7 +104,7 @@ typedef struct
     es_out_id_t *es;
     mtime_t     duration;
     bool        is_realtime;
-    mtime_t     pts_origin;
+    int64_t     pts_offset;
     mtime_t     pts_next;
     date_t        pts;
 } demux_sys_t;
@@ -191,7 +191,7 @@ static int Demux(demux_t *demux)
         return VLC_DEMUXER_EOF;
 
     mtime_t deadline;
-    const mtime_t pts_first = sys->pts_origin + date_Get(&sys->pts);
+    const mtime_t pts_first = sys->pts_offset + date_Get(&sys->pts);
     if (sys->pts_next != VLC_TS_INVALID) {
         deadline = sys->pts_next;
     } else if (sys->is_realtime) {
@@ -208,8 +208,8 @@ static int Demux(demux_t *demux)
     }
 
     for (;;) {
-        const mtime_t pts = sys->pts_origin + date_Get(&sys->pts);
-        if (sys->duration >= 0 && pts >= sys->pts_origin + sys->duration)
+        const mtime_t pts = sys->pts_offset + date_Get(&sys->pts);
+        if (sys->duration >= 0 && pts >= VLC_TS_0 + sys->pts_offset + sys->duration)
             return VLC_DEMUXER_EOF;
 
         if (pts >= deadline)
@@ -256,20 +256,20 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_GET_TIME: {
         int64_t *time = va_arg(args, int64_t *);
-        *time = sys->pts_origin + date_Get(&sys->pts);
+        *time = sys->pts_offset + date_Get(&sys->pts);
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME: {
         if (sys->duration < 0 || sys->is_realtime)
             return VLC_EGENERIC;
         int64_t time = va_arg(args, int64_t);
-        date_Set(&sys->pts, VLC_CLIP(time - sys->pts_origin, 0, sys->duration));
+        date_Set(&sys->pts, VLC_CLIP(time - sys->pts_offset, VLC_TS_0, sys->duration));
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
         mtime_t pts_next = VLC_TS_0 + va_arg(args, mtime_t);
         if (sys->pts_next == VLC_TS_INVALID)
-            sys->pts_origin = pts_next;
+            sys->pts_offset = pts_next - VLC_TS_0;
         sys->pts_next = pts_next;
         return VLC_SUCCESS;
     }
@@ -733,10 +733,10 @@ static int Open(vlc_object_t *object)
     sys->es          = es_out_Add(demux->out, &fmt);
     sys->duration    = CLOCK_FREQ * var_InheritFloat(demux, "image-duration");
     sys->is_realtime = var_InheritBool(demux, "image-realtime");
-    sys->pts_origin  = sys->is_realtime ? mdate() : 0;
+    sys->pts_offset  = sys->is_realtime ? mdate() : 0;
     sys->pts_next    = VLC_TS_INVALID;
     date_Init(&sys->pts, fmt.video.i_frame_rate, fmt.video.i_frame_rate_base);
-    date_Set(&sys->pts, 0);
+    date_Set(&sys->pts, VLC_TS_0);
 
     es_format_Clean(&fmt);
 

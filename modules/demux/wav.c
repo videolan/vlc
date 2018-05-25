@@ -428,6 +428,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
 
     date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
+    date_Set( &p_sys->pts, VLC_TS_0 );
 
     return VLC_SUCCESS;
 
@@ -469,7 +470,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
+    p_block->i_pts = date_Get( &p_sys->pts );
 
     /* set PCR */
     es_out_SetPCR( p_demux->out, p_block->i_pts );

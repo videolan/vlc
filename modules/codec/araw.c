@@ -289,7 +289,6 @@ static int DecoderOpen( vlc_object_t *p_this )
     assert( p_sys->framebits );
 
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = Flush;

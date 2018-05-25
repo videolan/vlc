@@ -97,6 +97,7 @@ vlc_module_end ()
         p_qtsound = p_demux;
         currentAudioBuffer = nil;
         date_Init(&date, 44100, 1);
+        date_Set(&date, 0);
         currentPts = 0;
         previousPts = 0;
     }
@@ -116,7 +117,7 @@ vlc_module_end ()
     @synchronized (self) {
         numberOfSamples = [sampleBuffer numberOfSamples];
         date_Increment(&date,numberOfSamples);
-        currentPts = VLC_TS_0 + date_Get(&date);
+        currentPts = date_Get(&date);
 
         tempAudioBufferList = [sampleBuffer audioBufferListWithOptions:0];
         if (tempAudioBufferList->mNumberBuffers == 2) {

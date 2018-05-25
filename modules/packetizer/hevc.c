@@ -204,7 +204,6 @@ static int Open(vlc_object_t *p_this)
                                 p_dec->fmt_in.video.i_frame_rate_base );
     else
         date_Init( &p_sys->dts, 2 * 30000, 1001 );
-    date_Set( &p_sys->dts, VLC_TS_INVALID );
     p_sys->pts = VLC_TS_INVALID;
     p_sys->b_need_ts = true;
 

@@ -270,7 +270,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.audio.i_physical_channels = vlc_chan_maps[i_channels];
 
     date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
     p_dec->pf_decode = DecodeAudio;
     p_dec->pf_flush  = Flush;

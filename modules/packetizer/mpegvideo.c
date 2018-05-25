@@ -222,9 +222,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_dts =
     p_sys->i_pts = VLC_TS_INVALID;
     date_Init( &p_sys->dts, 30000, 1001 );
-    date_Set( &p_sys->dts, VLC_TS_INVALID );
     date_Init( &p_sys->prev_iframe_dts, 30000, 1001 );
-    date_Set( &p_sys->prev_iframe_dts, VLC_TS_INVALID );
 
     p_sys->i_frame_rate = 2 * 30000;
     p_sys->i_frame_rate_base = 1001;

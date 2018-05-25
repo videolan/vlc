@@ -554,7 +554,6 @@ static int Open(vlc_object_t *p_this)
     p_sys->i_next_block_flags = 0;
     block_BytestreamInit(&p_sys->bytestream);
     date_Init( &p_sys->pts, 1, 1 );
-    date_Set( &p_sys->pts, VLC_TS_INVALID );
 
     /* */
     es_format_Copy(&p_dec->fmt_out, &p_dec->fmt_in);
