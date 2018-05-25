@@ -21,6 +21,7 @@ libdca: libdca-$(DCA_VERSION).tar.bz2 .sum-dca
 	$(UNPACK)
 	$(UPDATE_AUTOCONFIG) && cd $(UNPACK_DIR)
 	$(APPLY) $(SRC)/dca/dca-fix-ln-s-call.patch
+	$(APPLY) $(SRC)/dca/dca-dts-install-link.patch
 	$(call pkg_static,"./libdca/libdca.pc.in")
 	$(MOVE)
 
