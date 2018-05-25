@@ -97,7 +97,7 @@ vlc_module_end ()
         p_qtsound = p_demux;
         currentAudioBuffer = nil;
         date_Init(&date, 44100, 1);
-        date_Set(&date, 0);
+        date_Set(&date, VLC_TS_0);
         currentPts = 0;
         previousPts = 0;
     }
