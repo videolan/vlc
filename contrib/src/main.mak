@@ -348,6 +348,11 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR)
 
+ifeq ($(V),1)
+CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+endif
+
+
 ifdef GPL
 REQUIRE_GPL =
 else
