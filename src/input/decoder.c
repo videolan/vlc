@@ -1887,6 +1887,9 @@ static void DeleteDecoder( decoder_t * p_dec )
             }
             break;
         }
+        case DATA_ES:
+        case UNKNOWN_ES:
+            break;
         default:
             vlc_assert_unreachable();
     }
