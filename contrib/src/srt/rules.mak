@@ -37,7 +37,6 @@ ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/srt/0002-CMakeLists.txt-let-cmake-find-pthread.patch
 	$(APPLY) $(SRC)/srt/srt-no-implicit-libs.patch 
 endif
-	$(APPLY) $(SRC)/srt/srt-fix-compiler-detect.patch
 	$(call pkg_static,"scripts/haisrt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
