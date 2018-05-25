@@ -12,10 +12,12 @@ lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
 	$(APPLY) $(SRC)/lame/lame-forceinline.patch
 	$(APPLY) $(SRC)/lame/sse.patch
+	$(APPLY) $(SRC)/lame/lame-outdated-autotools.patch
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
 .lame: lame
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-analyzer-hooks --disable-decoder --disable-gtktest --disable-frontend
 	cd $< && $(MAKE) install
 	touch $@
