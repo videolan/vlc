@@ -423,6 +423,11 @@ else
 MESON = meson $(MESONFLAGS)
 endif
 
+ifeq ($(V),1)
+CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+endif
+
+
 ifdef GPL
 REQUIRE_GPL =
 else
