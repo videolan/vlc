@@ -868,7 +868,7 @@ static int isdbt_setup (vlc_object_t *obj, dvb_device_t *dev, uint64_t freq)
     for (unsigned i = 0; i < 3; i++)
     {
         char varname[sizeof ("dvb-X-interleaving")];
-        memcpy (varname, "dvb-X-", 4);
+        memcpy (varname, "dvb-X-", 6);
         varname[4] = 'a' + i;
 
         strcpy (varname + 6, "modulation");
