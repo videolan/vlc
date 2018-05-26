@@ -3,6 +3,9 @@
 LAME_VERSION := 3.99.5
 LAME_URL := $(SF)/lame/lame-$(LAME_VERSION).tar.gz
 
+# gettext is necessary for $(RECONF) of lame
+DEPS_lame = gettext
+
 $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
 	$(call download_pkg,$(LAME_URL),lame)
 
