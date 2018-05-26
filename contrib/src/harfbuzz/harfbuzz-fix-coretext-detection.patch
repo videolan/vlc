@@ -1,0 +1,51 @@
+diff -ru harfbuzz/CMakeLists.txt harfbuzz/CMakeLists.txt
+--- harfbuzz/CMakeLists.txt	2018-05-26 17:51:35.000000000 +0200
++++ harfbuzz/CMakeLists.txt	2018-05-26 17:47:57.000000000 +0200
+@@ -364,16 +364,41 @@
+ if (APPLE AND HB_HAVE_CORETEXT)
+   # Apple Advanced Typography
+   add_definitions(-DHAVE_CORETEXT)
++  
++  set(CMAKE_FIND_ROOT_PATH ${CMAKE_IOS_DEVELOPER_ROOT} ${CMAKE_OSX_SYSROOT}
++    ${CMAKE_PREFIX_PATH} CACHE string  "appleOS find search path root" FORCE)
++  # Default to searching for frameworks first.
++  set(CMAKE_FIND_FRAMEWORK FIRST)
++  # Set up the default search directories for frameworks.
++  set(CMAKE_SYSTEM_FRAMEWORK_PATH
++    ${CMAKE_OSX_SYSROOT}/System/Library/Frameworks
++    ${CMAKE_OSX_SYSROOT}/System/Library/PrivateFrameworks
++    ${CMAKE_OSX_SYSROOT}/Developer/Library/Frameworks)
++  # Only search the specified iOS SDK, not the remainder of the host filesystem.
++  set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM ONLY)
++  set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
++  set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+ 
+   list(APPEND project_sources ${PROJECT_SOURCE_DIR}/src/hb-coretext.cc)
+   list(APPEND project_headers ${PROJECT_SOURCE_DIR}/src/hb-coretext.h)
+ 
+-  find_library(APPLICATION_SERVICES_FRAMEWORK ApplicationServices)
+-  if (APPLICATION_SERVICES_FRAMEWORK)
+-    list(APPEND THIRD_PARTY_LIBS ${APPLICATION_SERVICES_FRAMEWORK})
+-  endif (APPLICATION_SERVICES_FRAMEWORK)
+-
+-  mark_as_advanced(APPLICATION_SERVICES_FRAMEWORK)
++  find_library(CORETEXT_FRAMEWORK CoreText)
++  if (CORETEXT_FRAMEWORK)
++    list(APPEND THIRD_PARTY_LIBS ${CORETEXT_FRAMEWORK})
++  endif (CORETEXT_FRAMEWORK)
++  mark_as_advanced(CORETEXT_FRAMEWORK)
++  
++  find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
++  if (COREFOUNDATION_FRAMEWORK)
++    list(APPEND THIRD_PARTY_LIBS ${COREFOUNDATION_FRAMEWORK})
++  endif (COREFOUNDATION_FRAMEWORK)
++  mark_as_advanced(COREFOUNDATION_FRAMEWORK)
++  
++  find_library(COREGRAPHICS_FRAMEWORK CoreGraphics)
++  if (COREGRAPHICS_FRAMEWORK)
++    list(APPEND THIRD_PARTY_LIBS ${COREGRAPHICS_FRAMEWORK})
++  endif (COREGRAPHICS_FRAMEWORK)
++  mark_as_advanced(COREGRAPHICS_FRAMEWORK)
+ endif ()
+ 
+ if (WIN32 AND HB_HAVE_UNISCRIBE)

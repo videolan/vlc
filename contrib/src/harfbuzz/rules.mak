@@ -23,6 +23,7 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(APPLY) $(SRC)/harfbuzz/0001-Skip-using-the-_BitScan-intrinsics-on-mingw.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-freetype-detect.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-no-tests.patch
+	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-coretext-detection.patch
 	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
