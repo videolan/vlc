@@ -136,10 +136,10 @@ using namespace LIBMATROSKA_NAMESPACE;
 class attachment_c
 {
 public:
-    attachment_c( const std::string& _psz_file_name, const std::string& _psz_mime_type, int _i_size )
+    attachment_c( const std::string& _str_file_name, const std::string& _str_mime_type, int _i_size )
         :i_size(_i_size)
-        ,psz_file_name( _psz_file_name)
-        ,psz_mime_type( _psz_mime_type)
+        ,str_file_name( _str_file_name)
+        ,str_mime_type( _str_mime_type)
     {
         p_data = NULL;
     }
@@ -152,15 +152,15 @@ public:
         return (p_data != NULL);
     }
 
-    const char* fileName() const { return psz_file_name.c_str(); }
-    const char* mimeType() const { return psz_mime_type.c_str(); }
+    const char* fileName() const { return str_file_name.c_str(); }
+    const char* mimeType() const { return str_mime_type.c_str(); }
     int         size() const    { return i_size; }
 
     void          *p_data;
 private:
     int            i_size;
-    std::string    psz_file_name;
-    std::string    psz_mime_type;
+    std::string    str_file_name;
+    std::string    str_mime_type;
 };
 
 class matroska_segment_c;
