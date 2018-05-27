@@ -507,10 +507,6 @@ static int Demux( demux_t * p_demux )
                     Ogg_ReadVorbisHeader( p_stream, &oggpacket );
                     p_stream->i_secondary_header_packets = 0;
                 }
-                else if( p_stream->fmt.i_codec == VLC_CODEC_CMML )
-                {
-                    p_stream->i_secondary_header_packets = 0;
-                }
 
                 /* update start of data pointer */
                 p_stream->i_data_start = vlc_stream_Tell( p_demux->s );
@@ -1477,14 +1473,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
-        if( p_stream->fmt.i_codec == VLC_CODEC_TARKIN )
-        {
-            /* FIXME: the biggest hack I've ever done */
-            msg_Warn( p_demux, "tarkin pts: %"PRId64", granule: %"PRId64,
-                      p_block->i_pts, p_block->i_dts );
-            msleep(VLC_HARD_MIN_SLEEP);
-        }
-
         /* Blatant abuse of the i_length field. */
         p_block->i_length = p_stream->i_end_trim;
         p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
@@ -1500,10 +1488,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
         p_stream->fmt.i_codec != VLC_CODEC_VP8 &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
-        p_stream->fmt.i_codec != VLC_CODEC_TARKIN &&
         p_stream->fmt.i_codec != VLC_CODEC_THEORA &&
         p_stream->fmt.i_codec != VLC_CODEC_DAALA &&
-        p_stream->fmt.i_codec != VLC_CODEC_CMML &&
         p_stream->fmt.i_codec != VLC_CODEC_DIRAC &&
         p_stream->fmt.i_codec != VLC_CODEC_KATE &&
         p_stream->fmt.i_codec != VLC_CODEC_OGGSPOTS )
@@ -1761,25 +1747,6 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         p_stream = NULL;
                         p_ogg->i_streams--;
                     }
-                }
-                /* Check for Tarkin header */
-                else if( oggpacket.bytes >= 7 &&
-                         ! memcmp( &oggpacket.packet[1], "tarkin", 6 ) )
-                {
-                    oggpack_buffer opb;
-
-                    msg_Dbg( p_demux, "found tarkin header" );
-                    es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_TARKIN );
-
-                    /* Cheat and get additionnal info ;) */
-                    oggpack_readinit( &opb, oggpacket.packet, oggpacket.bytes);
-                    oggpack_adv( &opb, 88 );
-                    oggpack_adv( &opb, 104 );
-                    p_stream->fmt.i_bitrate = oggpack_read( &opb, 32 );
-                    p_stream->f_rate = 2; /* FIXME */
-                    msg_Dbg( p_demux,
-                             "found tarkin header, bitrate: %i, rate: %f",
-                             p_stream->fmt.i_bitrate, p_stream->f_rate );
                 }
                 /* Check for VP8 header */
                 else if( oggpacket.bytes >= 26 &&
@@ -2198,13 +2165,6 @@ static void Ogg_CreateES( demux_t *p_demux )
             {
                 p_stream->p_es = es_out_Add( p_demux->out, &p_stream->fmt );
             }
-
-            // TODO: something to do here ?
-            if( p_stream->fmt.i_codec == VLC_CODEC_CMML )
-            {
-                /* Set the CMML stream active */
-                es_out_Control( p_demux->out, ES_OUT_SET_ES, p_stream->p_es );
-            }
         }
     }
 
@@ -2612,7 +2572,6 @@ static void Ogg_ExtractMeta( demux_t *p_demux, es_format_t *p_fmt, const uint8_t
         break;
 
     /* No meta data */
-    case VLC_CODEC_CMML: /* CMML is XML text, doesn't have Vorbis comments */
     case VLC_CODEC_DIRAC:
     default:
         break;
@@ -3003,7 +2962,7 @@ static bool Ogg_ReadVP8Header( demux_t *p_demux, logical_stream_t *p_stream,
 }
 
 static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_value,
-                                  bool *b_force_backup, bool *b_packet_out )
+                                  bool *b_force_backup )
 {
     if( p_stream->fmt.i_cat != UNKNOWN_ES )
         return;
@@ -3059,12 +3018,6 @@ static void Ogg_ApplyContentType( logical_stream_t *p_stream, const char* psz_va
     {
         /* n.b. MPEG streams are unsupported right now */
         es_format_Change( &p_stream->fmt, VIDEO_ES, VLC_CODEC_MPGV );
-    }
-    else if( !strncmp(psz_value, "text/x-cmml", 11) ||
-             !strncmp(psz_value, "text/cmml", 9) )
-    {
-        es_format_Change( &p_stream->fmt, SPU_ES, VLC_CODEC_CMML );
-        *b_packet_out = true;
     }
     else if( !strncmp(psz_value, "application/kate", 16) )
     {
@@ -3142,10 +3095,8 @@ static void Ogg_ReadAnnodexHeader( demux_t *p_demux,
         /* What type of file do we have?
          * strcmp is safe to use here because we've extracted
          * content_type_string from the stream manually */
-        bool b_dopacketout = false;
         Ogg_ApplyContentType( p_stream, content_type_string,
-                              &p_stream->b_force_backup, &b_dopacketout );
-        if ( b_dopacketout ) ogg_stream_packetout( &p_stream->os, p_oggpacket );
+                              &p_stream->b_force_backup );
     }
 }
 
@@ -3316,7 +3267,7 @@ static void Ogg_ApplySkeleton( logical_stream_t *p_stream )
         else if ( ! strncmp("Content-Type: ", psz_message, 14 ) )
         {
             bool b_foo;
-            Ogg_ApplyContentType( p_stream, psz_message + 14, &b_foo, &b_foo );
+            Ogg_ApplyContentType( p_stream, psz_message + 14, &b_foo );
         }
     }
 }
