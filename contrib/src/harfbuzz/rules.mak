@@ -16,11 +16,10 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
+	$(APPLY) $(SRC)/harfbuzz/harfbuzz-no-tests.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-freetype-detect.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-coretext-detection.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-create-pkgconfig-file.patch
-	$(APPLY) $(SRC)/harfbuzz/harfbuzz-no-tests.patch
-	$(MOVE)
 
 DEPS_harfbuzz = freetype2 $(DEPS_freetype2)
 
