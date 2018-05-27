@@ -148,6 +148,8 @@ FunctionEnd
   !insertmacro ${_action} Audio ".caf"
   !insertmacro ${_action} Audio ".cda"
   !insertmacro ${_action} Audio ".dts"
+  !insertmacro ${_action} Audio ".dsf"
+  !insertmacro ${_action} Audio ".dff"
   !insertmacro ${_action} Audio ".flac"
   !insertmacro ${_action} Audio ".it"
   !insertmacro ${_action} Audio ".m4a"

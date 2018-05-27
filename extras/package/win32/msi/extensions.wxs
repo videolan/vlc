@@ -139,6 +139,22 @@
                         <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
                     </Extension>
                 </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".dsf" Value="VLC.dsf.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".dsf" Value="" Type="string" />
+                <ProgId Id='VLC.dsf.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='dsf'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
+                <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".dff" Value="VLC.dff.Document" Type="string" />
+                <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".dff" Value="" Type="string" />
+                <ProgId Id='VLC.dff.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
+                    <Extension Id='dff'>
+                        <Verb Id='open' Command='Play with VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --no-playlist-enqueue &quot;%1&quot;" />
+                        <Verb Id='enqueue' Command='Enqueue in VLC media player' TargetFile="vlc.exe" Argument="--started-from-file --playlist-enqueue &quot;%1&quot;" />
+                    </Extension>
+                </ProgId>
                 <RegistryValue Root="HKLM" Key="Software\Clients\Media\VLC\Capabilities\FileAssociations" Name=".flac" Value="VLC.flac.Document" Type="string" />
                 <RegistryValue Root="HKCR" Key="Applications\vlc.exe\SupportedTypes" Name=".flac" Value="" Type="string" />
                 <ProgId Id='VLC.flac.Document' Description='Video File' Icon='vlc.ico' Advertise='no'>
