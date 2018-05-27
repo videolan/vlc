@@ -5,22 +5,46 @@ Core:
  * Update subtitles display while paused
 
 Access:
- * Enable srt support
+ * Enable srt support on binary builds
 
 Decoders:
  * Allow videotoolbox hardware decoding to be disabled
+ * Disable VideoToolbox for 10bits H.264
+ * Fix VideoToolbox with some invalid HEVC streams
  * Fix subsdec wide character support
+ * Fix 1st order Ambisonics in AAC
 
 Demux:
- * Miscellaneous ogg improvements & bugfixes
+ * Miscellaneous ogg improvements & bugfixes, including oggds
+ * Fix forced tracks selection
+ * Fix Topfield files
+ * Probe AAC/ADTS inside TS
+ * Fix tracks detection issues with DolbyVision and Bluray streams
 
 macOS:
  * Fix "Open Network Stream" URL box focus
  * Add option to disable hardware acceleration for video decoding
  * Remove option to force dolby mode from simple preferences
 
+Video Output:
+ * Fix crashes on Direct3D11
+
 Qt:
  * Fix tooltip display on some desktop environments
+ * Fix spurious movement of the main Window
+ * Fix playlist being displayed in fullscreen
+
+Misc:
+ * Fix amem output
+ * Fix numerous issues on fonts fallback and font shaping
+ * Fix subtitles toggle through hotkeys
+ * Fix audioscrobbling
+ * Fix buffer over-read in avcodec audio encoding with non-default layouts
+ * Numerous 3rd party libraries updated, fixing security issues
+
+Translations:
+ * Update of most languages
+
 
 Changes between 3.0.1 and 3.0.2:
 --------------------------------
