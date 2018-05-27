@@ -464,6 +464,14 @@ static const struct vlc_avcodec_fourcc audio_codecs[] =
     /* AV_CODEC_ID_PAF_AUDIO */
     { VLC_CODEC_ON2AVC, AV_CODEC_ID_ON2AVC },
 
+    /* DSD (FFmpeg only) */
+#if LIBAVCODEC_VERSION_MICRO >= 100
+    { VLC_CODEC_DSD_LSBF, AV_CODEC_ID_DSD_LSBF },
+    { VLC_CODEC_DSD_MSBF, AV_CODEC_ID_DSD_MSBF },
+    { VLC_CODEC_DSD_LSBF_PLANAR, AV_CODEC_ID_DSD_LSBF_PLANAR },
+    { VLC_CODEC_DSD_MSBF_PLANAR, AV_CODEC_ID_DSD_MSBF_PLANAR },
+#endif
+
     /* ffmpeg only: AV_CODEC_ID_FFWAVESYNTH */
     /* ffmpeg only: AV_CODEC_ID_SONIC */
     /* ffmpeg only: AV_CODEC_ID_SONIC_LS */

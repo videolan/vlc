@@ -1557,6 +1557,14 @@ static const staticentry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_EA_R1, "ADPCM Electronic Arts R1"),
 
     B(VLC_CODEC_ADPCM_IMA_APC, "ADPCM APC"),
+
+    B(VLC_CODEC_DSD_LSBF, "DSD (Direct Stream Digital) LSB first"),
+
+    B(VLC_CODEC_DSD_MSBF, "DSD (Direct Stream Digital) MSB first"),
+
+    B(VLC_CODEC_DSD_LSBF_PLANAR, "DSD (Direct Stream Digital) LSB first, planar"),
+
+    B(VLC_CODEC_DSD_MSBF_PLANAR, "DSD (Direct Stream Digital) MSB first, planar"),
 };
 
 static const staticentry_t p_list_spu[] = {

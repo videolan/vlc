@@ -529,6 +529,10 @@
 #define VLC_CODEC_ADPCM_IMA_EA_SEAD          VLC_FOURCC('S','E','A','D')
 #define VLC_CODEC_ADPCM_EA_R1                VLC_FOURCC('E','A','R','1')
 #define VLC_CODEC_ADPCM_IMA_APC              VLC_FOURCC('A','I','P','C')
+#define VLC_CODEC_DSD_LSBF                   VLC_FOURCC('D','S','D','l')
+#define VLC_CODEC_DSD_LSBF_PLANAR            VLC_FOURCC('D','S','F','l')
+#define VLC_CODEC_DSD_MSBF                   VLC_FOURCC('D','S','D',' ')
+#define VLC_CODEC_DSD_MSBF_PLANAR            VLC_FOURCC('D','S','F','m')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')
