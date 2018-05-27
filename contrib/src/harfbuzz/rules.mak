@@ -7,10 +7,6 @@ ifeq ($(call need_pkg,"harfbuzz"),)
 PKGS_FOUND += harfbuzz
 endif
 
-ifdef HAVE_DARWIN_OS
-HARFBUZZCONF += --with-coretext=yes
-endif
-
 $(TARBALLS)/harfbuzz-$(HARFBUZZ_VERSION).tar.bz2:
 	$(call download_pkg,$(HARFBUZZ_URL),harfbuzz)
 
