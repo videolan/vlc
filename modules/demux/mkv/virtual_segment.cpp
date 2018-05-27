@@ -57,7 +57,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     {
         msg_Warn( &main_segment.sys.demuxer,
                   "Couldn't find segment 0x%x or not ordered... - ignoring chapter %s",
-                  *( (uint32_t *) p_chap->p_segment_uid->GetBuffer() ),p_chap->psz_name.c_str() );
+                  *( (uint32_t *) p_chap->p_segment_uid->GetBuffer() ),p_chap->str_name.c_str() );
         return NULL;
     }
 
@@ -94,7 +94,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
 
     msg_Dbg( &main_segment.sys.demuxer,
              "Virtual chapter %s from %" PRId64 " to %" PRId64 " - " ,
-             p_chap->psz_name.c_str(), p_vchap->i_mk_virtual_start_time, p_vchap->i_mk_virtual_stop_time );
+             p_chap->str_name.c_str(), p_vchap->i_mk_virtual_start_time, p_vchap->i_mk_virtual_stop_time );
 
     return p_vchap;
 }
@@ -594,7 +594,7 @@ int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chap
     {
         std::string chap_name;
         if ( p_chapter->b_user_display )
-            chap_name = p_chapter->psz_name;
+            chap_name = p_chapter->str_name;
         if (chap_name == "")
             chap_name = p_chapter->GetCodecName();
 
@@ -633,7 +633,7 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
     {
         seekpoint_t *sk = vlc_seekpoint_New();
         sk->i_time_offset = 0;
-        sk->psz_name = strdup( p_edition->psz_name.c_str() );
+        sk->psz_name = strdup( p_edition->str_name.c_str() );
 
         title.i_seekpoint++;
         title.seekpoint = static_cast<seekpoint_t**>( xrealloc( title.seekpoint,

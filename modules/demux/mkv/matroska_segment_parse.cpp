@@ -1190,10 +1190,10 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             char *psz_tmp_utf8 = ToUTF8( UTFstring( name ) );
 
             for ( int k = 0; k < vars.i_level; k++)
-                vars.chapters.psz_name += '+';
+                vars.chapters.str_name += '+';
 
-            vars.chapters.psz_name += ' ';
-            vars.chapters.psz_name += psz_tmp_utf8;
+            vars.chapters.str_name += ' ';
+            vars.chapters.str_name += psz_tmp_utf8;
             vars.chapters.b_user_display = true;
 
             debug( vars, "ChapterString=%s", psz_tmp_utf8 );

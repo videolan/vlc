@@ -79,7 +79,7 @@ public:
     int64_t                     i_uid;
     bool                        b_display_seekpoint;
     bool                        b_user_display;
-    std::string                 psz_name;
+    std::string                 str_name;
     chapter_item_c              *p_parent;
     bool                        b_is_leaving;
 
