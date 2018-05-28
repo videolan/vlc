@@ -888,7 +888,7 @@ mkv_track_t::~mkv_track_t()
 
 matroska_stream_c::matroska_stream_c( stream_t *s, bool owner )
     :io_callback( new vlc_stream_io_callback( s, owner ) )
-    ,estream( EbmlStream( *io_callback ) )
+    ,estream( *io_callback )
 {}
 
 bool matroska_stream_c::isUsed() const
