@@ -25,7 +25,15 @@
 #ifndef VLC_MKV_STREAM_IO_CALLBACK_HPP_
 #define VLC_MKV_STREAM_IO_CALLBACK_HPP_
 
-#include "mkv.hpp"
+#ifdef HAVE_CONFIG_H
+# include "config.h"
+#endif
+
+#include <vlc_demux.h>
+
+#include "ebml/IOCallback.h"
+
+using namespace LIBEBML_NAMESPACE;
 
 /*****************************************************************************
  * Stream managment
