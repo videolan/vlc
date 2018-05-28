@@ -191,7 +191,6 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/open.moc.cpp \
 	gui/qt/dialogs/openurl.moc.cpp \
 	gui/qt/dialogs/podcast_configuration.moc.cpp \
-	gui/qt/dialogs/vlm.moc.cpp \
 	gui/qt/dialogs/firstrun.moc.cpp \
 	gui/qt/dialogs/extensions.moc.cpp \
 	gui/qt/dialogs/fingerprintdialog.moc.cpp \
@@ -444,6 +443,10 @@ libqt_plugin_la_RES = \
 EXTRA_DIST += gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 
 nodist_libqt_plugin_la_SOURCES += gui/qt/resources.cpp
+
+if ENABLE_VLM
+nodist_libqt_plugin_la_SOURCES += gui/qt/dialogs/vlm.moc.cpp
+endif
 
 gui/qt/resources.cpp: gui/qt/vlc.qrc $(libqt_plugin_la_RES)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
