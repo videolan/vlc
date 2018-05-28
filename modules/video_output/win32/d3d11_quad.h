@@ -24,13 +24,9 @@
 #define VLC_D3D11_QUAD_H
 
 #include "../../video_chroma/d3d11_fmt.h"
+#include "d3d11_shaders.h"
 
-typedef struct {
-    FLOAT Opacity;
-    FLOAT BoundaryX;
-    FLOAT BoundaryY;
-    FLOAT LuminanceScale;
-} PS_CONSTANT_BUFFER;
+#define SPHERE_RADIUS 1.f
 
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
@@ -55,8 +51,39 @@ typedef struct
     PS_CONSTANT_BUFFER        shaderConstants;
 } d3d_quad_t;
 
+/* matches the D3D11_INPUT_ELEMENT_DESC we setup */
+typedef struct d3d_vertex_t {
+    struct {
+        FLOAT x;
+        FLOAT y;
+        FLOAT z;
+    } position;
+    struct {
+        FLOAT x;
+        FLOAT y;
+    } texture;
+} d3d_vertex_t;
+
 void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *,
                       ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
                       ID3D11RenderTargetView *);
+
+void D3D11_ReleaseQuad(d3d_quad_t *);
+
+int D3D11_SetupQuad(vlc_object_t *, d3d11_device_t *, const video_format_t *, d3d_quad_t *,
+                    const display_info_t *, const RECT *, const d3d_format_t *,
+                    ID3D11PixelShader *, ID3D11VertexShader *, video_projection_mode_t,
+                    video_orientation_t);
+#define D3D11_SetupQuad(a,b,c,d,e,f,g,h,i,j,k)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e,f,g,h,i,j,k)
+
+bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d_quad_t *,
+                               const RECT *output, video_orientation_t );
+#define D3D11_UpdateQuadPosition(a,b,c,d,e)  D3D11_UpdateQuadPosition(VLC_OBJECT(a),b,c,d,e)
+
+void D3D11_UpdateQuadOpacity(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float opacity);
+#define D3D11_UpdateQuadOpacity(a,b,c,d)  D3D11_UpdateQuadOpacity(VLC_OBJECT(a),b,c,d)
+
+void D3D11_UpdateQuadLuminanceScale(vlc_object_t *, d3d11_device_t *, d3d_quad_t *, float luminanceScale);
+#define D3D11_UpdateQuadLuminanceScale(a,b,c,d)  D3D11_UpdateQuadLuminanceScale(VLC_OBJECT(a),b,c,d)
 
 #endif /* VLC_D3D11_QUAD_H */
