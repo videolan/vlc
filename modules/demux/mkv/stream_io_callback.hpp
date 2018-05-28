@@ -21,6 +21,10 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
+#ifndef VLC_MKV_STREAM_IO_CALLBACK_HPP_
+#define VLC_MKV_STREAM_IO_CALLBACK_HPP_
+
 #include "mkv.hpp"
 
 /*****************************************************************************
@@ -52,3 +56,4 @@ class vlc_stream_io_callback: public IOCallback
     uint64           toRead          ( void );
 };
 
+#endif
