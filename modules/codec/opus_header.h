@@ -36,7 +36,7 @@ typedef struct {
     int preskip;
     uint32_t input_sample_rate;
     int gain; /* in dB S7.8 should be zero whenever possible */
-    int channel_mapping;
+    uint8_t channel_mapping;
     /* The rest is only used if channel_mapping != 0 */
     int nb_streams;
     int nb_coupled;

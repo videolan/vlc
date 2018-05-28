@@ -948,7 +948,8 @@ static void OpusSetup(demux_t *demux, uint8_t *p, size_t len, es_format_t *p_fmt
     static const unsigned char map[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
     memcpy(h.stream_map, map, sizeof(map));
 
-    int csc, mapping;
+    uint8_t mapping;
+    int csc;
     int channels = 0;
     int stream_count = 0;
     int ccc = p[1]; // channel_config_code
