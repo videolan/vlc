@@ -1051,15 +1051,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             ogg_int64_t sample = p_stream->i_previous_granulepos;
 
             if( p_stream->fmt.i_codec == VLC_CODEC_OPUS && p_oggpacket->e_o_s )
-            {
-                unsigned duration = Ogg_OpusPacketDuration( p_oggpacket );
-                if( duration > 0 )
-                {
-                    ogg_int64_t end_sample = p_oggpacket->granulepos;
-                    if( end_sample < ( sample + duration ) )
-                        p_stream->i_end_trim = sample + duration - end_sample;
-                }
-            }
+                p_stream->i_end_trim = p_oggpacket->granulepos - sample;
 
             if (sample >= p_stream->i_pre_skip)
                 sample -= p_stream->i_pre_skip;
@@ -1474,7 +1466,11 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
         /* Blatant abuse of the i_length field. */
-        p_block->i_length = p_stream->i_end_trim;
+        if( p_stream->i_end_trim > 0 )
+        {
+            p_block->i_length = p_stream->i_end_trim * CLOCK_FREQ / p_stream->f_rate;
+            p_block->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
+        }
         p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )

@@ -161,7 +161,7 @@ static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static block_t *ProcessPacket( decoder_t *, ogg_packet *, block_t * );
 
-static block_t *DecodePacket( decoder_t *, ogg_packet *, int, int );
+static block_t *DecodePacket( decoder_t *, ogg_packet *, int, mtime_t );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -447,9 +447,13 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
         return NULL;
     }
 
+    /* trimming info */
+    mtime_t i_max_duration = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE) ?
+                             p_block->i_length : 0;
+
     block_t *p_aout_buffer = DecodePacket( p_dec, p_oggpacket,
                                            p_block->i_nb_samples,
-                                           (int)p_block->i_length );
+                                           i_max_duration );
 
     block_Release( p_block );
     return p_aout_buffer;
@@ -459,7 +463,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
  * DecodePacket: decodes a Opus packet.
  *****************************************************************************/
 static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
-                              int i_nb_samples, int i_end_trim )
+                              int i_nb_samples, mtime_t i_duration )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -487,6 +491,14 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
     spp=opus_multistream_decode_float(p_sys->p_st, p_oggpacket->packet,
          p_oggpacket->bytes, (float *)p_aout_buffer->p_buffer, spp, 0);
+
+    int i_end_trim = 0;
+    if( i_duration > 0 && spp > 0 &&
+        i_duration < i_nb_samples * CLOCK_FREQ / 48000 )
+    {
+        i_end_trim = spp - VLC_CLIP(i_duration * 48000 / CLOCK_FREQ, 0, spp);
+    }
+
     if( spp < 0 || i_nb_samples <= 0 || i_end_trim >= i_nb_samples)
     {
         block_Release(p_aout_buffer);
