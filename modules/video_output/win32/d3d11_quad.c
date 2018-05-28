@@ -1,5 +1,5 @@
 /*****************************************************************************
- * d3d11_quad.c: Direct3D11 Qaud handling
+ * d3d11_quad.c: Direct3D11 Quad handling
  *****************************************************************************
  * Copyright (C) 2017-2018 VLC authors and VideoLAN
  *
@@ -269,7 +269,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
      * the rest of the visible area must correspond to -1,1 */
     switch (orientation)
     {
-    case ORIENT_ROTATED_90: /* 90° anti clockwise */
+    case ORIENT_ROTATED_90: /* 90Â° anti clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -278,7 +278,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   =  (MidX - src_height) / (MidX - output->left);
         right  =                 MidX / (MidX - (src_width - output->right));
         break;
-    case ORIENT_ROTATED_180: /* 180° */
+    case ORIENT_ROTATED_180: /* 180Â° */
         /* right/top aligned */
         MidY = (output->top + output->bottom) / 2.f;
         MidX = (output->left + output->right) / 2.f;
@@ -287,7 +287,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_width  - MidX) / (output->right - MidX);
         break;
-    case ORIENT_ROTATED_270: /* 90° clockwise */
+    case ORIENT_ROTATED_270: /* 90Â° clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -679,12 +679,12 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         switch (quad->formatInfo->bitsPerChannel)
         {
         case 8:
-            /* Rec. ITU-R BT.709-6 §4.6 */
+            /* Rec. ITU-R BT.709-6 Â¶4.6 */
             itu_black_level  =              16.f / 255.f;
             itu_achromacy    =             128.f / 255.f;
             break;
         case 10:
-            /* Rec. ITU-R BT.709-6 §4.6 */
+            /* Rec. ITU-R BT.709-6 Â¶4.6 */
             itu_black_level  =              64.f / 1023.f;
             itu_achromacy    =             512.f / 1023.f;
             break;
