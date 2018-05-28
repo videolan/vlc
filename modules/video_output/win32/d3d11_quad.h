@@ -23,6 +23,8 @@
 #ifndef VLC_D3D11_QUAD_H
 #define VLC_D3D11_QUAD_H
 
+#include "../../video_chroma/d3d11_fmt.h"
+
 typedef struct {
     FLOAT Opacity;
     FLOAT BoundaryX;
@@ -52,5 +54,9 @@ typedef struct
 
     PS_CONSTANT_BUFFER        shaderConstants;
 } d3d_quad_t;
+
+void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *,
+                      ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
+                      ID3D11RenderTargetView *);
 
 #endif /* VLC_D3D11_QUAD_H */
