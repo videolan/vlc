@@ -486,4 +486,23 @@ ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, con
     return pShaderBlob;
 }
 
-
+#undef GetFormatLuminance
+float GetFormatLuminance(vlc_object_t *o, const video_format_t *fmt)
+{
+    switch (fmt->transfer)
+    {
+        case TRANSFER_FUNC_SMPTE_ST2084:
+            /* that's the default PQ value if the metadata are not set */
+            return MAX_PQ_BRIGHTNESS;
+        case TRANSFER_FUNC_HLG:
+            return 2000;
+        case TRANSFER_FUNC_BT470_BG:
+        case TRANSFER_FUNC_BT470_M:
+        case TRANSFER_FUNC_BT709:
+        case TRANSFER_FUNC_SRGB:
+            return DEFAULT_BRIGHTNESS;
+        default:
+            msg_Dbg(o, "unhandled source transfer %d", fmt->transfer);
+            return DEFAULT_BRIGHTNESS;
+    }
+}

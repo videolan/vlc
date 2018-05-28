@@ -26,6 +26,10 @@
 #include "../../video_chroma/d3d11_fmt.h"
 #include <dxgi1_4.h>
 
+#define DEFAULT_BRIGHTNESS         100
+#define DEFAULT_SRGB_BRIGHTNESS    100
+#define MAX_PQ_BRIGHTNESS        10000
+
 typedef enum video_color_axis {
     COLOR_AXIS_RGB,
     COLOR_AXIS_YCBCR,
@@ -46,6 +50,27 @@ typedef struct {
     unsigned                 luminance_peak;
 } display_info_t;
 
+/* structures passed to the pixel shader */
+typedef struct {
+    FLOAT Opacity;
+    FLOAT BoundaryX;
+    FLOAT BoundaryY;
+    FLOAT LuminanceScale;
+} PS_CONSTANT_BUFFER;
+
+typedef struct {
+    FLOAT WhitePoint[4*4];
+    FLOAT Colorspace[4*4];
+} PS_COLOR_TRANSFORM;
+
+typedef struct {
+    FLOAT RotX[4*4];
+    FLOAT RotY[4*4];
+    FLOAT RotZ[4*4];
+    FLOAT View[4*4];
+    FLOAT Projection[4*4];
+} VS_PROJECTION_CONST;
+
 const char* globVertexShaderFlat;
 const char* globVertexShaderProjection;
 
@@ -61,4 +86,8 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_s
                                  ID3D11PixelShader **output);
 #define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i) \
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
+
+float GetFormatLuminance(vlc_object_t *, const video_format_t *);
+#define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
+
 #endif /* VLC_D3D11_SHADERS_H */
