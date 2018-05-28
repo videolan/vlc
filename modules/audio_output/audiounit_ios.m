@@ -71,6 +71,53 @@ static const struct {
       AU_DEV_ENCODED }, /* This can also be forced with the --spdif option */
 };
 
+@interface SessionManager : NSObject
+{
+    NSMutableSet *_registeredInstances;
+}
++ (SessionManager *)sharedInstance;
+- (void)addAoutInstance:(AoutWrapper *)wrapperInstance;
+- (NSInteger)removeAoutInstance:(AoutWrapper *)wrapperInstance;
+@end
+
+@implementation SessionManager
++ (SessionManager *)sharedInstance
+{
+    static SessionManager *sharedInstance = nil;
+    static dispatch_once_t pred;
+
+    dispatch_once(&pred, ^{
+        sharedInstance = [SessionManager new];
+    });
+
+    return sharedInstance;
+}
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _registeredInstances = [[NSMutableSet alloc] init];
+    }
+    return self;
+}
+
+- (void)addAoutInstance:(AoutWrapper *)wrapperInstance
+{
+    @synchronized(_registeredInstances) {
+        [_registeredInstances addObject:wrapperInstance];
+    }
+}
+
+- (NSInteger)removeAoutInstance:(AoutWrapper *)wrapperInstance
+{
+    @synchronized(_registeredInstances) {
+        [_registeredInstances removeObject:wrapperInstance];
+        return _registeredInstances.count;
+    }
+}
+@end
+
 /*****************************************************************************
  * aout_sys_t: private audio output method descriptor
  *****************************************************************************
@@ -293,9 +340,15 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
         ret = [instance setCategory:AVAudioSessionCategoryPlayback error:&error];
         ret = ret && [instance setMode:AVAudioSessionModeMoviePlayback error:&error];
         ret = ret && [instance setActive:YES withOptions:options error:&error];
+        [[SessionManager sharedInstance] addAoutInstance: p_sys->aoutWrapper];
+    } else {
+        NSInteger numberOfRegisteredInstances = [[SessionManager sharedInstance] removeAoutInstance: p_sys->aoutWrapper];
+        if (numberOfRegisteredInstances == 0) {
+            ret = [instance setActive:NO withOptions:options error:&error];
+        } else {
+            ret = true;
+        }
     }
-    else
-        ret = [instance setActive:NO withOptions:options error:&error];
 
     if (!ret)
     {
