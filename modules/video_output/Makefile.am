@@ -276,7 +276,7 @@ libdirect3d11_plugin_la_SOURCES += video_output/win32/events.c \
  video_output/win32/events.h \
  video_output/win32/sensors.cpp \
  video_output/win32/win32touch.c video_output/win32/win32touch.h \
- video_output/win32/d3d11_quad.h
+ video_output/win32/d3d11_quad.c video_output/win32/d3d11_quad.h
 libdirect3d11_plugin_la_LIBADD += -lgdi32
 else
 libdirect3d11_plugin_la_LIBADD += -ld3d11
