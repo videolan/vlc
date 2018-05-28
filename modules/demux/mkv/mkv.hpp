@@ -62,7 +62,6 @@
 #include "ebml/EbmlContexts.h"
 #include "ebml/EbmlVoid.h"
 #include "ebml/EbmlVersion.h"
-#include "ebml/StdIOCallback.h"
 
 #include "matroska/KaxAttachments.h"
 #include "matroska/KaxAttached.h"
@@ -80,15 +79,12 @@
 #include "matroska/KaxSegment.h"
 #include "matroska/KaxTag.h"
 #include "matroska/KaxTags.h"
-//#include "matroska/KaxTagMulti.h"
 #include "matroska/KaxTracks.h"
 #include "matroska/KaxTrackAudio.h"
 #include "matroska/KaxTrackVideo.h"
 #include "matroska/KaxTrackEntryData.h"
 #include "matroska/KaxContentEncoding.h"
 #include "matroska/KaxVersion.h"
-
-#include "ebml/StdIOCallback.h"
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
