@@ -140,10 +140,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
     width = width / i_modulo_w * i_modulo_w;
     height = height / i_modulo_h * i_modulo_h;
 
-    /* Hack: append two scan lines for some SIMD assembler */
-    if (unlikely(add_overflow(height, 2 * i_ratio_h, &height)))
-        return VLC_EGENERIC;
-
     /* plane_t uses 'int'. */
     if (unlikely(width > INT_MAX) || unlikely(height > INT_MAX))
         return VLC_EGENERIC;
