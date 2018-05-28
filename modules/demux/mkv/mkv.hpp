@@ -86,6 +86,8 @@
 #include "matroska/KaxContentEncoding.h"
 #include "matroska/KaxVersion.h"
 
+#include "stream_io_callback.hpp"
+
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #endif
@@ -153,14 +155,11 @@ class matroska_segment_c;
 struct matroska_stream_c
 {
     matroska_stream_c(stream_t *s, bool owner);
-    ~matroska_stream_c()
-    {
-        delete io_callback;
-    }
+    ~matroska_stream_c() {}
 
     bool isUsed() const;
 
-    IOCallback         * io_callback;
+    vlc_stream_io_callback io_callback;
     EbmlStream         estream;
 
     std::vector<matroska_segment_c*> segments;

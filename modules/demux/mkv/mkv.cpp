@@ -31,8 +31,6 @@
 #include "chapters.hpp"
 #include "Ebml_parser.hpp"
 
-#include "stream_io_callback.hpp"
-
 #include <new>
 
 #include <vlc_fs.h>
@@ -887,8 +885,8 @@ mkv_track_t::~mkv_track_t()
 }
 
 matroska_stream_c::matroska_stream_c( stream_t *s, bool owner )
-    :io_callback( new vlc_stream_io_callback( s, owner ) )
-    ,estream( *io_callback )
+    :io_callback( s, owner )
+    ,estream( io_callback )
 {}
 
 bool matroska_stream_c::isUsed() const
