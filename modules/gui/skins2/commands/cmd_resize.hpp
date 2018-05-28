@@ -77,7 +77,7 @@ public:
                       bool fullscreen );
     virtual ~CmdSetFullscreen() { }
     virtual void execute();
-    virtual std::string getType() const { return "toogle fullscreen"; }
+    virtual std::string getType() const { return "toggle fullscreen"; }
 
 private:
     vout_window_t* m_pWnd;
