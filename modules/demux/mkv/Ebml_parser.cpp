@@ -224,8 +224,6 @@ next:
         {
             if( !mb_keep )
             {
-                if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
-                    static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix(); // !! WARNING : TODO !! this is undefined-behavior
                 delete p_prev;
                 p_prev = NULL;
             }
@@ -285,8 +283,6 @@ next:
             {
                 if( !mb_keep )
                 {
-                    if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
-                        static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix(); // !! WARNING : TODO !! this is undefined-behavior
                     delete p_prev;
                     p_prev = NULL;
                 }
@@ -318,8 +314,6 @@ next:
             {
                 if( !mb_keep )
                 {
-                    if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
-                        static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix(); // !! WARNING : TODO !! this is undefined-behavior
                     delete p_prev;
                     p_prev = NULL;
                 }
@@ -333,8 +327,6 @@ next:
     {
         if( !mb_keep )
         {
-            if( MKV_IS_ID( p_prev, KaxBlockVirtual ) )
-                static_cast<KaxBlockVirtualWorkaround*>(p_prev)->Fix();
             delete p_prev;
         }
         mb_keep = false;
