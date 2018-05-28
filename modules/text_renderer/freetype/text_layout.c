@@ -1037,11 +1037,11 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 p_bitmaps->i_x_advance = p_face->glyph->advance.x;
                 p_bitmaps->i_y_advance = p_face->glyph->advance.y;
             }
-        }
 
-        int i_max_run_advance_x = FT_FLOOR( FT_MulFix( p_face->max_advance_width, p_face->size->metrics.x_scale ) );
-        if( i_max_run_advance_x > *pi_max_advance_x )
-            *pi_max_advance_x = i_max_run_advance_x;
+            unsigned i_x_advance = FT_FLOOR( p_bitmaps->i_x_advance );
+            if( i_x_advance > *pi_max_advance_x )
+                *pi_max_advance_x = i_x_advance;
+        }
     }
     return VLC_SUCCESS;
 }
