@@ -109,7 +109,7 @@ static const struct modifiers modifiers[] =
 
 uint_fast32_t vlc_xkb_get_one(struct xkb_state *state, uint_fast32_t keycode)
 {
-    xkb_keysym_t keysym = xkb_state_key_get_one_sym(state, keycode + 8);
+    xkb_keysym_t keysym = xkb_state_key_get_one_sym(state, keycode);
     uint_fast32_t vk = vlc_xkb_convert_keysym(keysym);
 
     if (vk != KEY_UNSET)

@@ -298,7 +298,7 @@ static void keyboard_key_cb(void *data, struct wl_keyboard *keyboard,
     if (unlikely(sd->keystate == NULL))
         return;
 
-    vk = vlc_xkb_get_one(sd->keystate, keycode);
+    vk = vlc_xkb_get_one(sd->keystate, keycode + 8);
     if (vk)
     {
         msg_Dbg(wnd, "key: 0x%08"PRIxFAST32" (XKB: 0x%04"PRIx32")",
