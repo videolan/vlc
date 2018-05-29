@@ -509,9 +509,8 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
             p_segment1->Preload();
 
-            b_keep_segment = (FindSegment( *p_segment1->p_segment_uid ) == NULL);
-
-            if ( b_keep_segment || !p_segment1->p_segment_uid )
+            if ( !p_segment1->p_segment_uid ||
+                 (b_keep_segment = (FindSegment( *p_segment1->p_segment_uid ) == NULL)))
             {
                 opened_segments.push_back( p_segment1 );
                 b_keep_stream = true;
