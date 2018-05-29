@@ -69,6 +69,7 @@ parts:
       ../bootstrap \
         --enable-libdsm \
         --enable-dvdcss \
+        --enable-protobuf \
         --disable-upnp \
         --disable-srt \
         --disable-chromaprint
