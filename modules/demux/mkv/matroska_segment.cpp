@@ -545,6 +545,8 @@ bool matroska_segment_c::CompareSegmentUIDs( const matroska_segment_c * p_item_a
         return false;
 
     p_tmp = static_cast<EbmlBinary *>( p_item_a->p_segment_uid );
+    if ( !p_tmp )
+        return false;
     if ( p_item_b->p_prev_segment_uid != NULL
           && *p_tmp == *p_item_b->p_prev_segment_uid )
         return true;
