@@ -19,7 +19,7 @@ ebml: libebml-$(EBML_VERSION).tar.xz .sum-ebml
 	$(MOVE)
 
 # libebml requires exceptions
-EBML_CXXFLAGS := $(CXXFLAGS) -fexceptions -fvisibility=hidden
+EBML_CXXFLAGS := $(CXXFLAGS) $(PIC) -fexceptions -fvisibility=hidden
 
 .ebml: ebml toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(EBML_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF
