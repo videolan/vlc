@@ -11,8 +11,8 @@ ifeq ($(call need_pkg,"srt >= 1.2.2"),)
 PKGS_FOUND += srt
 endif
 
-SRT_CFLAGS   := $(CFLAGS)
-SRT_CXXFLAGS := $(CXXFLAGS)
+SRT_CFLAGS   := $(CFLAGS) $(PIC)
+SRT_CXXFLAGS := $(CXXFLAGS) $(PIC)
 DEPS_srt = gnutls $(DEPS_gnutls)
 ifdef HAVE_WIN32
 DEPS_srt += pthreads $(DEPS_pthreads)
