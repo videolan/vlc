@@ -81,6 +81,8 @@ vlc_module_end()
 
 #define AMB_BLOCK_TIME_LEN 1024
 
+#define AMB_MAX_ORDER 3
+
 struct filter_spatialaudio
 {
     filter_spatialaudio()
@@ -123,6 +125,7 @@ struct filter_spatialaudio
     mtime_t i_inputPTS;
     mtime_t i_last_input_pts;
     unsigned i_order;
+    unsigned i_nondiegetic;
 
     float** inBuf;
     float** outBuf;
@@ -220,7 +223,7 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
                 CBFormat inData;
                 inData.Configure(p_sys->i_order, true, AMB_BLOCK_TIME_LEN);
 
-                for (unsigned i = 0; i < p_sys->i_inputNb; ++i)
+                for (unsigned i = 0; i < p_sys->i_inputNb - p_sys->i_nondiegetic; ++i)
                     inData.InsertStream(p_sys->inBuf[i], i, AMB_BLOCK_TIME_LEN);
 
                 Orientation ori(p_sys->f_teta, p_sys->f_phi, p_sys->f_roll);
@@ -402,6 +405,13 @@ static int Open(vlc_object_t *p_this)
     if (infmt->i_format != VLC_CODEC_FL32 || outfmt->i_format != VLC_CODEC_FL32)
         return VLC_EGENERIC;
 
+    //support order 1 to 3
+    if ( infmt->i_channels < 4 || infmt->i_channels > ( (AMB_MAX_ORDER + 1) * (AMB_MAX_ORDER + 1) + 2 ) )
+    {
+        msg_Err(p_filter, "Unsupported number of Ambisonics channels");
+        return VLC_EGENERIC;
+    }
+
     filter_spatialaudio *p_sys = new(std::nothrow)filter_spatialaudio();
     if (p_sys == NULL)
         return VLC_ENOMEM;
@@ -419,16 +429,23 @@ static int Open(vlc_object_t *p_this)
         return VLC_ENOMEM;
     }
 
-    p_sys->i_order = sqrt(infmt->i_channels) - 1;
+    int i_sqrt_channels = 1;
+    while( ( i_sqrt_channels < ( AMB_MAX_ORDER + 2 ) )
+           && ( i_sqrt_channels * i_sqrt_channels <= infmt->i_channels ) )
+        i_sqrt_channels++;
+    i_sqrt_channels--;
 
-    if (p_sys->i_order < 1)
+    p_sys->i_order = i_sqrt_channels - 1;
+    p_sys->i_nondiegetic = infmt->i_channels - i_sqrt_channels * i_sqrt_channels;
+
+    if ( p_sys->i_nondiegetic != 0 && p_sys->i_nondiegetic != 2 )
     {
-        msg_Err(p_filter, "Invalid number of Ambisonics channels");
+        msg_Err(p_filter, "Invalid number of non-diegetic Ambisonics channels %i", p_sys->i_nondiegetic);
         delete p_sys;
         return VLC_EGENERIC;
     }
 
-    msg_Dbg(p_filter, "Order: %d %d", p_sys->i_order, infmt->i_channels);
+    msg_Dbg(p_filter, "Order: %d %d %d", p_sys->i_order, p_sys->i_nondiegetic, infmt->i_channels);
 
     static const char *const options[] = { "headphones", NULL };
     config_ChainParse(p_filter, CFG_PREFIX, options, p_filter->p_cfg);
