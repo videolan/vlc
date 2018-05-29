@@ -160,7 +160,7 @@ class HTTPOutputStore(OutputStore):
     def store(self, dump: typing.io.TextIO, meta):
         post_args = {**meta, **self.extra_args}
         r = requests.post(self.url, post_args, files={"symfile": dump})
-        if r.status_code != requests.codes.ok:
+        if not r.ok:
             logging.error("Unable to perform request, ret {}".format(r.status_code))
             r.raise_for_status()
 
