@@ -65,9 +65,9 @@ static block_t * PacketizeClosed( decoder_t *, block_t ** );
  *****************************************************************************/
 static void FlushPacketizer( decoder_t *p_dec )
 {
-    ClosePacketizer( VLC_OBJECT( p_dec ) );
+    avparser_ClosePacketizer( VLC_OBJECT( p_dec ) );
     p_dec->p_sys = NULL;
-    int res = OpenPacketizer( VLC_OBJECT( p_dec ) );
+    int res = avparser_OpenPacketizer( VLC_OBJECT( p_dec ) );
     if ( res != VLC_SUCCESS )
     {
         msg_Err( p_dec, "failed to flush with error %d", res );
@@ -76,12 +76,12 @@ static void FlushPacketizer( decoder_t *p_dec )
 }
 
 /*****************************************************************************
- * OpenPacketizer: probe the packetizer and return score
+ * avparser_OpenPacketizer: probe the packetizer and return score
  *****************************************************************************
  * Tries to launch a decoder and return score so that the interface is able
  * to choose.
  *****************************************************************************/
-int OpenPacketizer( vlc_object_t *p_this )
+int avparser_OpenPacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -137,9 +137,9 @@ int OpenPacketizer( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * ClosePacketizer:
+ * avparser_ClosePacketizer:
  *****************************************************************************/
-void ClosePacketizer( vlc_object_t *p_this )
+void avparser_ClosePacketizer( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     if (likely( p_dec->p_sys != NULL ))
