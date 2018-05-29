@@ -3077,6 +3077,7 @@ have_xcb="no"
 have_xcb_keysyms="no"
 have_xcb_randr="no"
 have_xcb_xvideo="no"
+have_xcb_xkb="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb >= 1.6])
@@ -3091,15 +3092,26 @@ AS_IF([test "${enable_xcb}" != "no"], [
 
   PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [have_xcb_randr="yes"])
 
+  PKG_CHECK_MODULES([XCB_XKB], [xcb-xkb], [
+    PKG_CHECK_MODULES([XKBCOMMON_X11], [xkbcommon-x11], [
+      have_xcb_xkb="yes"
+    ], [
+      AC_MSG_WARN([${XKBCOMMON_X11_PKG_ERRORS}. Hotkeys will not work.])
+    ])
+  ], [
+    AC_MSG_WARN([${XCB_XKB_PKG_ERRORS}. Hotkeys will not work.])
+  ])
+
   dnl xcb-utils
   PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [have_xcb_keysyms="yes"], [
-    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Hotkeys will not work.])
+    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}])
   ])
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_KEYSYMS], [test "${have_xcb_keysyms}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_RANDR], [test "${have_xcb_randr}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_XVIDEO], [test "${have_xcb_xvideo}" = "yes"])
+AM_CONDITIONAL([HAVE_XCB_XKB], [test "${have_xcb_xkb}" = "yes"])
 
 
 dnl

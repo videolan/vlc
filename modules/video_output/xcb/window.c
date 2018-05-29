@@ -31,8 +31,9 @@
 #include <limits.h> /* _POSIX_HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
-#ifdef HAVE_XCB_KEYSYMS
-# include <xcb/xcb_keysyms.h>
+#ifdef HAVE_XCB_XKB
+# include <xcb/xkb.h>
+# include <xkbcommon/xkbcommon-x11.h>
 # include "vlc_xkb.h"
 #endif
 typedef xcb_atom_t Atom;
@@ -47,9 +48,6 @@ typedef xcb_atom_t Atom;
 struct vout_window_sys_t
 {
     xcb_connection_t *conn;
-#ifdef HAVE_XCB_KEYSYMS
-    xcb_key_symbols_t *keys;
-#endif
     vlc_thread_t thread;
 
     xcb_window_t root;
@@ -58,8 +56,161 @@ struct vout_window_sys_t
     xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
 
+#ifdef HAVE_XCB_XKB
+    struct
+    {
+        struct xkb_context *ctx;
+        struct xkb_keymap *map;
+        struct xkb_state *state;
+        uint8_t base;
+    } xkb;
+#endif
+
     bool embedded;
 };
+
+#ifdef HAVE_XCB_XKB
+static int InitKeyboard(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+
+    int32_t core = xkb_x11_get_core_keyboard_device_id(conn);
+    if (core == -1)
+        return -1;
+
+    sys->xkb.map = xkb_x11_keymap_new_from_device(sys->xkb.ctx, conn, core,
+                                                  XKB_KEYMAP_COMPILE_NO_FLAGS);
+    if (unlikely(sys->xkb.map == NULL))
+        return -1;
+
+    sys->xkb.state = xkb_x11_state_new_from_device(sys->xkb.map, conn, core);
+    if (unlikely(sys->xkb.state == NULL))
+    {
+        xkb_keymap_unref(sys->xkb.map);
+        sys->xkb.map = NULL;
+        return -1;
+    }
+    return 0;
+}
+
+static void DeinitKeyboard(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (sys->xkb.map == NULL)
+        return;
+
+    xkb_state_unref(sys->xkb.state);
+    xkb_keymap_unref(sys->xkb.map);
+    sys->xkb.map = NULL;
+}
+
+static void ProcessKeyboardEvent(vout_window_t *wnd,
+                                 const xcb_generic_event_t *ev)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    switch (ev->pad0)
+    {
+        case XCB_XKB_NEW_KEYBOARD_NOTIFY:
+        case XCB_XKB_MAP_NOTIFY:
+            msg_Dbg(wnd, "refreshing keyboard mapping");
+            DeinitKeyboard(wnd);
+            InitKeyboard(wnd);
+            break;
+
+        case XCB_XKB_STATE_NOTIFY:
+            if (sys->xkb.map != NULL)
+            {
+                const xcb_xkb_state_notify_event_t *ne = (void *)ev;
+
+                xkb_state_update_mask(sys->xkb.state, ne->baseMods,
+                                      ne->latchedMods, ne->lockedMods,
+                                      ne->baseGroup, ne->latchedGroup,
+                                      ne->lockedGroup);
+            }
+            break;
+    }
+}
+
+static int InitKeyboardExtension(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+    uint16_t maj, min;
+
+    if (!xkb_x11_setup_xkb_extension(conn, XKB_X11_MIN_MAJOR_XKB_VERSION,
+                                     XKB_X11_MIN_MINOR_XKB_VERSION,
+                                     XKB_X11_SETUP_XKB_EXTENSION_NO_FLAGS,
+                                     &maj, &min, &sys->xkb.base, NULL))
+    {
+        msg_Err(wnd, "XKeyboard initialization error");
+        return 0;
+    }
+
+    msg_Dbg(wnd, "XKeyboard v%"PRIu16".%"PRIu16" initialized", maj, min);
+    sys->xkb.ctx = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
+    if (unlikely(sys->xkb.ctx == NULL))
+        return -1;
+
+    /* Events: new KB, keymap change, state (modifiers) change */
+    const uint16_t affect = XCB_XKB_EVENT_TYPE_NEW_KEYBOARD_NOTIFY
+                          | XCB_XKB_EVENT_TYPE_MAP_NOTIFY
+                          | XCB_XKB_EVENT_TYPE_STATE_NOTIFY;
+    /* Map event sub-types: everything except key behaviours */
+    const uint16_t map_parts = XCB_XKB_MAP_PART_KEY_TYPES
+                             | XCB_XKB_MAP_PART_KEY_SYMS
+                             | XCB_XKB_MAP_PART_MODIFIER_MAP
+                             | XCB_XKB_MAP_PART_EXPLICIT_COMPONENTS
+                             | XCB_XKB_MAP_PART_KEY_ACTIONS
+                             | XCB_XKB_MAP_PART_VIRTUAL_MODS
+                             | XCB_XKB_MAP_PART_VIRTUAL_MOD_MAP;
+    static const xcb_xkb_select_events_details_t details =
+    {
+        /* New keyboard details */
+        .affectNewKeyboard = XCB_XKB_NKN_DETAIL_KEYCODES,
+        .newKeyboardDetails = XCB_XKB_NKN_DETAIL_KEYCODES,
+        /* State event sub-types: as per xkb_state_update_mask() */
+#define STATE_PARTS  XCB_XKB_STATE_PART_MODIFIER_BASE \
+                   | XCB_XKB_STATE_PART_MODIFIER_LATCH \
+                   | XCB_XKB_STATE_PART_MODIFIER_LOCK \
+                   | XCB_XKB_STATE_PART_GROUP_BASE \
+                   | XCB_XKB_STATE_PART_GROUP_LATCH \
+                   | XCB_XKB_STATE_PART_GROUP_LOCK
+        .affectState = STATE_PARTS,
+        .stateDetails = STATE_PARTS,
+    };
+
+    int32_t core = xkb_x11_get_core_keyboard_device_id(conn);
+    if (core == -1)
+    {
+        xkb_context_unref(sys->xkb.ctx);
+        sys->xkb.ctx = NULL;
+        return -1;
+    }
+
+    xcb_xkb_select_events_aux(conn, core, affect, 0, 0, map_parts, map_parts,
+                              &details);
+
+    InitKeyboard(wnd);
+    return 0;
+}
+
+static void DeinitKeyboardExtension(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    if (sys->xkb.ctx == NULL)
+        return;
+
+    DeinitKeyboard(wnd);
+    xkb_context_unref(sys->xkb.ctx);
+}
+#else
+# define InitKeyboardExtension(w) (w, -1)
+# define DeinitKeyboardExtension(w) ((void)(w))
+#endif
 
 static xcb_cursor_t CursorCreate(xcb_connection_t *conn, xcb_window_t root)
 {
@@ -80,29 +231,14 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
     {
         case XCB_KEY_PRESS:
         {
-#ifdef HAVE_XCB_KEYSYMS
+#ifdef HAVE_XCB_XKB
             xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
-            xcb_keysym_t sym = xcb_key_press_lookup_keysym(sys->keys, e, 0);
-            uint_fast32_t vk = vlc_xkb_convert_keysym(sym);
+            uint_fast32_t vk = vlc_xkb_get_one(sys->xkb.state, e->detail);
 
             msg_Dbg(wnd, "key: 0x%08"PRIxFAST32" (X11: 0x%04"PRIx32")",
-                    vk, sym);
+                    vk, e->detail);
             if (vk == KEY_UNSET)
                 break;
-            if (e->state & XCB_MOD_MASK_SHIFT) /* Shift */
-                vk |= KEY_MODIFIER_SHIFT;
-            /* XCB_MOD_MASK_LOCK */ /* Caps Lock */
-            if (e->state & XCB_MOD_MASK_CONTROL) /* Control */
-                vk |= KEY_MODIFIER_CTRL;
-            if (e->state & XCB_MOD_MASK_1) /* Alternate */
-                vk |= KEY_MODIFIER_ALT;
-            /* XCB_MOD_MASK_2 */ /* Numeric Pad Lock */
-            if (e->state & XCB_MOD_MASK_3) /* Super */
-                vk |= KEY_MODIFIER_META;
-            if (e->state & XCB_MOD_MASK_4) /* Meta */
-                vk |= KEY_MODIFIER_META;
-            if (e->state & XCB_MOD_MASK_5) /* Alternate Graphic */
-                vk |= KEY_MODIFIER_ALT;
 
             vout_window_ReportKeyPress(wnd, vk);
 #endif
@@ -151,17 +287,16 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
             break;
 
         case XCB_MAPPING_NOTIFY:
-        {
-#ifdef HAVE_XCB_KEYSYMS
-            xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
-
-            msg_Dbg(wnd, "refreshing keyboard mapping");
-            xcb_refresh_keyboard_mapping(sys->keys, e);
-#endif
             break;
-        }
 
         default:
+#ifdef HAVE_XCB_XKB
+            if (sys->xkb.ctx != NULL && ev->response_type == sys->xkb.base)
+            {
+                ProcessKeyboardEvent(wnd, ev);
+                break;
+            }
+#endif
             msg_Dbg (wnd, "unhandled event %"PRIu8, ev->response_type);
     }
 
@@ -488,12 +623,8 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
-#ifdef HAVE_XCB_KEYSYMS
-    if (var_InheritBool (wnd, "keyboard-events"))
-        p_sys->keys = xcb_key_symbols_alloc(conn);
-    else
-        p_sys->keys = NULL;
-#endif
+    if (var_InheritBool(wnd, "keyboard-events"))
+        InitKeyboardExtension(wnd);
     p_sys->root = scr->root;
 
     /* ICCCM
@@ -565,10 +696,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
      * request from this thread must be completed at this point. */
     if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-#ifdef HAVE_XCB_KEYSYMS
-        if (p_sys->keys != NULL)
-            xcb_key_symbols_free(p_sys->keys);
-#endif
+        DeinitKeyboardExtension(wnd);
         goto error;
     }
 
@@ -593,11 +721,8 @@ static void Close (vout_window_t *wnd)
 
     vlc_cancel (p_sys->thread);
     vlc_join (p_sys->thread, NULL);
-#ifdef HAVE_XCB_KEYSYMS
-    if (p_sys->keys != NULL)
-        xcb_key_symbols_free(p_sys->keys);
-#endif
 
+    DeinitKeyboardExtension(wnd);
     xcb_disconnect (conn);
     free (wnd->display.x11);
     free (p_sys);
@@ -724,18 +849,11 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
-#ifdef HAVE_XCB_KEYSYMS
     /* Try to subscribe to keyboard and mouse events (only one X11 client can
      * subscribe to input events, so this can fail). */
-    if (var_InheritBool (wnd, "keyboard-events"))
-    {
-        p_sys->keys = xcb_key_symbols_alloc(conn);
-        if (p_sys->keys != NULL)
-            value |= XCB_EVENT_MASK_KEY_PRESS;
-    }
-    else
-        p_sys->keys = NULL;
-#endif
+    if (var_InheritBool(wnd, "keyboard-events")
+     && InitKeyboardExtension(wnd) == 0)
+        value |= XCB_EVENT_MASK_KEY_PRESS;
 
     if (var_InheritBool(wnd, "mouse-events"))
         value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
@@ -746,10 +864,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     CacheAtoms (p_sys);
     if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
-#ifdef HAVE_XCB_KEYSYMS
-        if (p_sys->keys != NULL)
-            xcb_key_symbols_free(p_sys->keys);
-#endif
+        DeinitKeyboardExtension(wnd);
         goto error;
     }
 
