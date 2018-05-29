@@ -31,4 +31,4 @@ export KDE_FORK_SLAVES=1
 ## Neon PATCH! make KIO look for slaves in a dynamic location depending on $SNAP
 export KF5_LIBEXEC_DIR=$SNAP/usr/lib/$ARCH/libexec/kf5
 
-exec $SNAP/usr/bin/vlc "$@"
+exec $SNAP/usr/bin/vlc --config=$SNAP_USER_COMMON/vlcrc "$@"
