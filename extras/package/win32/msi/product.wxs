@@ -36,7 +36,8 @@
             InstallPrivileges='elevated'
             InstallScope='perMachine'
             InstallerVersion='200'
-            Compressed='yes' />
+            Compressed='yes'
+            Platform="$(var.Platform)" />
 
         <Condition Message="This application is only supported on Windows XP or higher.">
             <![CDATA[Installed OR (VersionNT >= 501)]]>
