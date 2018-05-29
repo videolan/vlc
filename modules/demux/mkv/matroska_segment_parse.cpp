@@ -1528,7 +1528,6 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         static void v_real_helper (vlc_fourcc_t codec, HandlerPayload& vars)
         {
-            vars.p_tk->b_dts_only = true;
             vars.p_fmt->i_codec   = codec;
 
             /* Extract the framerate from the header */
