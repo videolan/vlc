@@ -40,7 +40,7 @@ static int keysymcmp (const void *pa, const void *pb)
     return a - b;
 }
 
-uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
+static uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym)
 {
     static const struct
     {

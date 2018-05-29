@@ -24,6 +24,5 @@
 
 struct xkb_state;
 
-uint_fast32_t vlc_xkb_convert_keysym(uint_fast32_t sym);
 uint_fast32_t vlc_xkb_get_one(struct xkb_state *state, uint_fast32_t keycode);
 
