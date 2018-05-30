@@ -5,13 +5,13 @@
 #USE_FFMPEG ?= 1
 
 ifndef USE_LIBAV
-FFMPEG_HASH=d268094f889479a8edee43d8c847da8838b8bf0f
+FFMPEG_HASH=d0e740b8fb30f02914594d00eb311a32442a63f8
 FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
-FFMPEG_HASH=99e9697e3a12ab4a6638a36b95edafd6a98f9eaa
+FFMPEG_HASH=35ed7f93dbc72d733e454ae464b1324f38af62a0
 FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
@@ -236,12 +236,7 @@ ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
 	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
-	$(APPLY) $(SRC)/ffmpeg/0001-arm-vc1dsp-Add-commas-between-macro-arguments.patch
-	$(APPLY) $(SRC)/ffmpeg/0002-arm-Produce-.const_data-instead-of-.section-.rodata-.patch
 ifdef USE_FFMPEG
-	$(APPLY) $(SRC)/ffmpeg/0003-arm-swscale-Only-compile-the-rgb2yuv-asm-if-.dn-alia.patch
-	$(APPLY) $(SRC)/ffmpeg/0004-arm-hevcdsp-Avoid-using-macro-expansion-counters.patch
-	$(APPLY) $(SRC)/ffmpeg/0005-arm-hevcdsp-Add-commas-between-macro-arguments.patch
 	$(APPLY) $(SRC)/ffmpeg/armv7_fixup.patch
 	$(APPLY) $(SRC)/ffmpeg/dxva_vc1_crash.patch
 	$(APPLY) $(SRC)/ffmpeg/h264_early_SAR.patch
