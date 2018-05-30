@@ -218,11 +218,6 @@ check_ios_sdk()
 
 check_macosx_sdk()
 {
-   if [ -z "${OSX_VERSION}" ]
-   then
-      OSX_VERSION=`xcrun --show-sdk-version`
-      echo "OSX_VERSION not specified, assuming $OSX_VERSION"
-   fi
    if [ -z "$SDKROOT" ]; then
       SDKROOT=$(xcrun --show-sdk-path)
       echo "SDKROOT not specified, assuming $SDKROOT"
@@ -234,7 +229,6 @@ check_macosx_sdk()
    fi
 
    add_make "MACOSX_SDK=${SDKROOT}"
-   add_make "OSX_VERSION ?= ${OSX_VERSION}"
 }
 
 check_android_sdk()
