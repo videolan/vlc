@@ -3,7 +3,9 @@
 FONTCONFIG_VERSION := 2.12.3
 FONTCONFIG_URL := https://www.freedesktop.org/software/fontconfig/release/fontconfig-$(FONTCONFIG_VERSION).tar.gz
 
+ifndef HAVE_WIN32
 PKGS += fontconfig
+endif
 ifeq ($(call need_pkg,"fontconfig >= 2.11"),)
 PKGS_FOUND += fontconfig
 endif
