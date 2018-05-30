@@ -51,6 +51,14 @@ FFMPEGCONF += \
 endif
 endif
 
+# Disable VDA on macOS with libav
+ifdef USE_LIBAV
+ifdef HAVE_DARWIN_OS
+FFMPEGCONF += \
+	--disable-vda
+endif
+endif
+
 DEPS_ffmpeg = zlib gsm
 
 ifndef USE_LIBAV
