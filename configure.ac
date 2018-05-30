@@ -3068,50 +3068,54 @@ AC_ARG_ENABLE(xcb,
     enable_xcb="no"
   ])
 ])
-AC_ARG_ENABLE(xvideo,
-  [  --enable-xvideo         XVideo support (default enabled)],, [
-    enable_xvideo="$enable_xcb"
-])
 
 have_xcb="no"
+have_xkbcommon_x11="no"
 have_xcb_keysyms="no"
-have_xcb_randr="no"
-have_xcb_xvideo="no"
-have_xcb_xkb="no"
 AS_IF([test "${enable_xcb}" != "no"], [
-  dnl libxcb
-  PKG_CHECK_MODULES(XCB, [xcb >= 1.6])
-  have_xcb="yes"
-  PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
-  PKG_CHECK_MODULES(XCB_COMPOSITE, [xcb-composite])
-  PKG_CHECK_MODULES(XPROTO, [xproto])
+  xcb_err=""
 
-  AS_IF([test "${enable_xvideo}" != "no"], [
-    PKG_CHECK_MODULES(XCB_XV, [xcb-xv >= 1.1.90.1], [have_xcb_xvideo="yes"])
+  dnl libxcb
+  PKG_CHECK_MODULES([XCB], [xcb >= 1.6],, [
+    xcb_err="$xcb_err ${XCB_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_COMPOSITE], [xcb-composite],, [
+    xcb_err="$xcb_err ${XCB_COMPOSITE_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_RANDR], [xcb-randr >= 1.3],, [
+    xcb_err="$xcb_err ${XCB_RANDR_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_SHM], [xcb-shm],, [
+    xcb_err="$xcb_err ${XCB_SHM_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_XKB], [xcb-xkb],, [
+    xcb_err="$xcb_err ${XCB_XKB_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_XV], [xcb-xv >= 1.1.90.1],, [
+    xcb_err="$xcb_err ${XCB_XV_PKG_ERRORS}."])
+
+  dnl xproto
+  PKG_CHECK_MODULES(XPROTO, [xproto],, [
+    xcb_err="$xcb_err ${XPROTO_PKG_ERRORS}."])
+
+  AS_IF([test -n "$xcb_err"], [
+    AC_MSG_ERROR([$xcb_err Pass --disable-xcb to skip X11 support.])
   ])
 
-  PKG_CHECK_MODULES(XCB_RANDR, [xcb-randr >= 1.3], [have_xcb_randr="yes"])
-
-  PKG_CHECK_MODULES([XCB_XKB], [xcb-xkb], [
-    PKG_CHECK_MODULES([XKBCOMMON_X11], [xkbcommon-x11], [
-      have_xcb_xkb="yes"
-    ], [
-      AC_MSG_WARN([${XKBCOMMON_X11_PKG_ERRORS}. Hotkeys will not work.])
-    ])
+  dnl xkbcommon
+  PKG_CHECK_MODULES([XKBCOMMON_X11], [xkbcommon-x11], [
+    have_xkbcommon_x11="yes"
   ], [
-    AC_MSG_WARN([${XCB_XKB_PKG_ERRORS}. Hotkeys will not work.])
+    AC_MSG_WARN([${XKBCOMMON_X11_PKG_ERRORS}. Hotkeys are disabled.])
   ])
 
   dnl xcb-utils
-  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [have_xcb_keysyms="yes"], [
-    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}])
+  PKG_CHECK_MODULES([XCB_KEYSYMS], [xcb-keysyms >= 0.3.4], [
+    have_xcb_keysyms="yes"
+  ], [
+    AC_MSG_WARN([${XCB_KEYSYMS_PKG_ERRORS}. Global hotkeys are disabled.])
   ])
+
+  have_xcb="yes"
 ])
 AM_CONDITIONAL([HAVE_XCB], [test "${have_xcb}" = "yes"])
+AM_CONDITIONAL([HAVE_XKBCOMMON_X11], [test "${have_xkbcommon_x11}" = "yes"])
 AM_CONDITIONAL([HAVE_XCB_KEYSYMS], [test "${have_xcb_keysyms}" = "yes"])
-AM_CONDITIONAL([HAVE_XCB_RANDR], [test "${have_xcb_randr}" = "yes"])
-AM_CONDITIONAL([HAVE_XCB_XVIDEO], [test "${have_xcb_xvideo}" = "yes"])
-AM_CONDITIONAL([HAVE_XCB_XKB], [test "${have_xcb_xkb}" = "yes"])
 
 
 dnl

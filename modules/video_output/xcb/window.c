@@ -31,7 +31,7 @@
 #include <limits.h> /* _POSIX_HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
-#ifdef HAVE_XCB_XKB
+#ifdef HAVE_XKBCOMMON
 # include <xcb/xkb.h>
 # include <xkbcommon/xkbcommon-x11.h>
 # include "vlc_xkb.h"
@@ -56,7 +56,7 @@ struct vout_window_sys_t
     xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
 
-#ifdef HAVE_XCB_XKB
+#ifdef HAVE_XKBCOMMON
     struct
     {
         struct xkb_context *ctx;
@@ -69,7 +69,7 @@ struct vout_window_sys_t
     bool embedded;
 };
 
-#ifdef HAVE_XCB_XKB
+#ifdef HAVE_XKBCOMMON
 static int InitKeyboard(vout_window_t *wnd)
 {
     vout_window_sys_t *sys = wnd->sys;
@@ -231,7 +231,7 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
     {
         case XCB_KEY_PRESS:
         {
-#ifdef HAVE_XCB_XKB
+#ifdef HAVE_XKBCOMMON
             xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
             uint_fast32_t vk = vlc_xkb_get_one(sys->xkb.state, e->detail);
 
@@ -290,7 +290,7 @@ static int ProcessEvent(vout_window_t *wnd, xcb_generic_event_t *ev)
             break;
 
         default:
-#ifdef HAVE_XCB_XKB
+#ifdef HAVE_XKBCOMMON
             if (sys->xkb.ctx != NULL && ev->response_type == sys->xkb.base)
             {
                 ProcessKeyboardEvent(wnd, ev);
