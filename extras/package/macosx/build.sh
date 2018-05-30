@@ -14,8 +14,8 @@ source "$SCRIPTDIR/env.build.sh" "none"
 
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.10"
-OSX_VERSION=`xcrun --show-sdk-version`
-SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
+OSX_VERSION=$(xcrun --show-sdk-version)
+SDKROOT=$(xcrun --show-sdk-path)
 VLCBUILDDIR=""
 
 CORE_COUNT=`getconf NPROCESSORS_ONLN 2>&1`
