@@ -100,7 +100,7 @@ if HAVE_GL
 vout_LTLIBRARIES += libgl_plugin.la
 if HAVE_EGL
 if HAVE_VAAPI
-if HAVE_WAYLAND_EGL
+if HAVE_WAYLAND
 if HAVE_VAAPI_WL
 vout_LTLIBRARIES += libglconv_vaapi_wl_plugin.la
 endif
@@ -229,10 +229,6 @@ libxdg_shell_plugin_la_CFLAGS = \
 libxdg_shell_plugin_la_LIBADD = \
 	$(WAYLAND_CLIENT_LIBS) $(WAYLAND_CURSOR_LIBS) \
 	$(XKBCOMMON_LIBS) $(LIBPTHREAD)
-if HAVE_WAYLAND_CURSOR
-libwl_shell_plugin_la_CPPFLAGS += -DHAVE_WAYLAND_CURSOR
-libxdg_shell_plugin_la_CPPFLAGS += -DHAVE_WAYLAND_CURSOR
-endif
 if HAVE_XKBCOMMON
 libwl_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON
 libxdg_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON
@@ -265,10 +261,8 @@ vout_LTLIBRARIES += libwl_shm_plugin.la
 vout_LTLIBRARIES += libwl_shell_plugin.la
 BUILT_SOURCES += $(nodist_libxdg_shell_plugin_la_SOURCES)
 vout_LTLIBRARIES += libxdg_shell_plugin.la
-if HAVE_WAYLAND_EGL
 if HAVE_EGL
 vout_LTLIBRARIES += libegl_wl_plugin.la
-endif
 endif
 endif
 

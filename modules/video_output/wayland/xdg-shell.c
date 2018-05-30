@@ -33,9 +33,7 @@
 #include <poll.h>
 
 #include <wayland-client.h>
-#ifdef HAVE_WAYLAND_CURSOR
 #include <wayland-cursor.h>
-#endif
 #ifdef XDG_SHELL
 #include "xdg-shell-client-protocol.h"
 /** Temporary backward compatibility hack for XDG shell unstable v6 */
@@ -92,11 +90,9 @@ struct vout_window_sys_t
 
     struct wl_list outputs;
     struct wl_list seats;
-#ifdef HAVE_WAYLAND_CURSOR
     struct wl_cursor_theme *cursor_theme;
     struct wl_cursor *cursor;
     struct wl_surface *cursor_surface;
-#endif
 
     vlc_thread_t thread;
 };
@@ -410,7 +406,6 @@ static const struct wl_registry_listener registry_cbs =
 struct wl_surface *window_get_cursor(vout_window_t *wnd, int32_t *restrict hsx,
                                      int32_t *restrict hsy)
 {
-#ifdef HAVE_WAYLAND_CURSOR
     vout_window_sys_t *sys = wnd->sys;
 
     if (unlikely(sys->cursor == NULL))
@@ -432,10 +427,6 @@ struct wl_surface *window_get_cursor(vout_window_t *wnd, int32_t *restrict hsx,
     *hsx = img->hotspot_x;
     *hsy = img->hotspot_y;
     return surface;
-#else
-    (void) wnd; (void) hsx; (void) hsy;
-    return NULL;
-#endif
 }
 
 /**
@@ -452,10 +443,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->wm_base = NULL;
     sys->surface = NULL;
     sys->toplevel = NULL;
-#ifdef HAVE_WAYLAND_CURSOR
     sys->cursor_theme = NULL;
     sys->cursor = NULL;
-#endif
     sys->deco_manager = NULL;
     sys->deco = NULL;
     sys->default_output = var_InheritInteger(wnd, "wl-output");
@@ -531,7 +520,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
                                     cfg->width, cfg->height);
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
 
-#ifdef HAVE_WAYLAND_CURSOR
     if (sys->shm != NULL)
     {
         sys->cursor_theme = wl_cursor_theme_load(NULL, 32, sys->shm);
@@ -543,7 +531,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     }
     if (sys->cursor == NULL)
         msg_Err(wnd, "failed to load cursor");
-#endif
 
     const uint_fast32_t deco_mode =
         var_InheritBool(wnd, "video-deco")
@@ -597,12 +584,10 @@ error:
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
-#ifdef HAVE_WAYLAND_CURSOR
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
     if (sys->cursor_theme != NULL)
         wl_cursor_theme_destroy(sys->cursor_theme);
-#endif
     if (sys->toplevel != NULL)
         xdg_toplevel_destroy(sys->toplevel);
     if (sys->surface != NULL)
@@ -638,12 +623,10 @@ static void Close(vout_window_t *wnd)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
-#ifdef HAVE_WAYLAND_CURSOR
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
     if (sys->cursor_theme != NULL)
         wl_cursor_theme_destroy(sys->cursor_theme);
-#endif
     xdg_toplevel_destroy(sys->toplevel);
     xdg_surface_destroy(sys->surface);
     xdg_wm_base_destroy(sys->wm_base);

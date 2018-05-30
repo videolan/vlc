@@ -3163,62 +3163,54 @@ dnl  Wayland
 dnl
 AC_ARG_ENABLE(wayland,
   [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
+
 have_wayland="no"
-have_wayland_cursor="no"
-have_wayland_egl="no"
-
 AS_IF([test "${enable_wayland}" != "no"], [
-  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
-    AC_MSG_CHECKING([for the Wayland protocols])
-    PKG_CHECK_EXISTS([wayland-protocols >= 1.12], [
-      WAYLAND_PROTOCOLS="$(${PKG_CONFIG} wayland-protocols --variable pkgdatadir)"
-      AC_MSG_RESULT([${WAYLAND_PROTOCOLS}])
+  wl_err=""
+
+  dnl wayland
+  PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91],, [
+    wl_err="$wl_err ${WAYLAND_CLIENT_PKG_ERRORS}."
+  ])
+  PKG_CHECK_MODULES([WAYLAND_CURSOR], [wayland-cursor],, [
+    wl_err="$wl_err ${WAYLAND_CURSOR_PKG_ERRORS}."
+  ])
+  PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl],, [
+    wl_err="$wl_err ${WAYLAND_EGL_PKG_ERRORS}."
+  ])
+  PKG_CHECK_MODULES([WAYLAND_SCANNER], [wayland-scanner >= 1.15], [
+    WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
+  ], [
+    wl_err="$wl_err ${WAYLAND_SCANNER_PKG_ERRORS}."
+  ])
+
+  dnl wayland-protocols
+  PKG_CHECK_MODULES([WAYLAND_PROTOCOLS], [wayland-protocols >= 1.12], [
+    WAYLAND_PROTOCOLS="$(${PKG_CONFIG} wayland-protocols --variable pkgdatadir)"
+  ], [
+    wl_err="$wl_err ${WAYLAND_PROTOCOLS_PKG_ERRORS}."
+  ])
+
+  AS_IF([test -n "$wl_err"], [
+    AS_IF([test -n "$enable_wayland"], [
+      AC_MSG_ERROR([$wl_err])
     ], [
-      AC_MSG_RESULT([not found])
-      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-protocols >= 1.12')])
-    ])
-
-    PKG_CHECK_MODULES([WAYLAND_CURSOR], [wayland-cursor], [
-      have_wayland_cursor="yes"
-    ], [
-      AC_MSG_WARN([${WAYLAND_CURSOR_PKG_ERRORS}.])
-    ])
-
-    AC_MSG_CHECKING([for the Wayland scanner])
-    PKG_CHECK_EXISTS([wayland-scanner >= 1.15], [
-      WAYLAND_SCANNER="$(${PKG_CONFIG} wayland-scanner --variable wayland_scanner)"
-      AC_MSG_RESULT([${WAYLAND_SCANNER}])
-    ], [
-      AC_MSG_RESULT([not found])
-      AC_MSG_ERROR([$(${PKG_CONFIG} --print-errors 'wayland-scanner >= 1.15')])
-    ])
-
-    have_wayland="yes"
-
-    AS_IF([test "${have_egl}" = "yes"], [
-      PKG_CHECK_MODULES([WAYLAND_EGL], [wayland-egl], [
-        have_wayland_egl="yes"
-      ], [
-        AC_MSG_ERROR([${WAYLAND_EGL_PKG_ERRORS}.])
-      ])
-    ])
-
-    PKG_CHECK_MODULES([XKBCOMMON], [xkbcommon], [
-      have_xkbcommon="yes"
-    ], [
-      AC_MSG_WARN([${XKBCOMMON_PKG_ERRORS}])
+      AC_MSG_WARN([$wl_err])
     ])
   ], [
-    AS_IF([test -n "${enable_wayland}"], [
-      AC_MSG_ERROR([${WAYLAND_CLIENT_PKG_ERRORS}.])
-    ])
+    have_wayland="yes"
+  ])
+
+  dnl xkbcommon
+  PKG_CHECK_MODULES([XKBCOMMON], [xkbcommon], [
+    have_xkbcommon="yes"
+  ], [
+    AC_MSG_WARN([${XKBCOMMON_PKG_ERRORS}. Hotkeys are disabled.])
   ])
 ])
+AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
 AC_SUBST([WAYLAND_PROTOCOLS])
 AC_SUBST([WAYLAND_SCANNER])
-AM_CONDITIONAL([HAVE_WAYLAND], [test "${have_wayland}" = "yes"])
-AM_CONDITIONAL([HAVE_WAYLAND_CURSOR], [test "${have_wayland_cursor}" = "yes"])
-AM_CONDITIONAL([HAVE_WAYLAND_EGL], [test "${have_wayland_egl}" = "yes"])
 AM_CONDITIONAL([HAVE_XKBCOMMON], [test "${have_xkbcommon}" = "yes"])
 
 
