@@ -14,7 +14,6 @@ source "$SCRIPTDIR/env.build.sh" "none"
 
 ARCH="x86_64"
 MINIMAL_OSX_VERSION="10.10"
-OSX_VERSION=$(xcrun --show-sdk-version)
 SDKROOT=$(xcrun --show-sdk-path)
 VLCBUILDDIR=""
 
