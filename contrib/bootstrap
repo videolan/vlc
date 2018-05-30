@@ -223,28 +223,13 @@ check_macosx_sdk()
       OSX_VERSION=`xcrun --show-sdk-version`
       echo "OSX_VERSION not specified, assuming $OSX_VERSION"
    fi
-   if test -z "$SDKROOT"
-   then
-      SDKROOT=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
+   if [ -z "$SDKROOT" ]; then
+      SDKROOT=$(xcrun --show-sdk-path)
       echo "SDKROOT not specified, assuming $SDKROOT"
    fi
 
-   if [ ! -d "${SDKROOT}" ]
-   then
-      SDKROOT_NOT_FOUND=`xcode-select -print-path`/Platforms/MacOSX.platform/Developer/SDKs/MacOSX$OSX_VERSION.sdk
-      SDKROOT=`xcode-select -print-path`/SDKs/MacOSX$OSX_VERSION.sdk
-      echo "SDKROOT not found at $SDKROOT_NOT_FOUND, trying $SDKROOT"
-   fi
-   if [ ! -d "${SDKROOT}" ]
-   then
-      SDKROOT_NOT_FOUND="$SDKROOT"
-      SDKROOT=`xcrun --show-sdk-path`
-      echo "SDKROOT not found at $SDKROOT_NOT_FOUND, trying $SDKROOT"
-   fi
-
-   if [ ! -d "${SDKROOT}" ]
-   then
-      echo "*** ${SDKROOT} does not exist, please install required SDK, or set SDKROOT manually. ***"
+   if [ ! -d "$SDKROOT" ]; then
+      echo "*** $SDKROOT does not exist, please install required SDK, or set SDKROOT manually. ***"
       exit 1
    fi
 
