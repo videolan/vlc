@@ -73,11 +73,7 @@ VPX_OS := android
 else ifdef HAVE_LINUX
 VPX_OS := linux
 else ifdef HAVE_MACOSX
-ifeq ($(OSX_VERSION),10.5)
-VPX_OS := darwin9
-else
 VPX_OS := darwin10
-endif
 VPX_CROSS :=
 else ifdef HAVE_IOS
 ifeq ($(ARCH),arm)
