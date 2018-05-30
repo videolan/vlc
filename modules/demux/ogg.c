@@ -1181,7 +1181,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
     bool b_selected;
-    int i_header_len = 0;
+    long i_header_len = 0;
 
     if( p_oggpacket->bytes >= 7 &&
         ! memcmp ( p_oggpacket->packet, "Annodex", 7 ) )
@@ -1440,16 +1440,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_block->i_pts = p_block->i_dts;
     }
 
-    if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
-        p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
-        p_stream->fmt.i_codec != VLC_CODEC_OPUS &&
-        p_stream->fmt.i_codec != VLC_CODEC_VP8 &&
-        p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
-        p_stream->fmt.i_codec != VLC_CODEC_THEORA &&
-        p_stream->fmt.i_codec != VLC_CODEC_DAALA &&
-        p_stream->fmt.i_codec != VLC_CODEC_DIRAC &&
-        p_stream->fmt.i_codec != VLC_CODEC_KATE &&
-        p_stream->fmt.i_codec != VLC_CODEC_OGGSPOTS )
+    if( p_stream->b_oggds )
     {
         if( p_oggpacket->bytes <= 0 )
         {
