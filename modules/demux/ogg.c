@@ -2087,8 +2087,11 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                 }
                 else
                 {
+                    Ogg_LogicalStreamDelete( p_demux, p_stream );
+                    p_stream = NULL;
+                    p_ogg->i_streams--;
                     msg_Dbg( p_demux, "stream %d is of unknown type",
-                             p_ogg->i_streams-1 );
+                             p_ogg->i_streams );
                 }
 
                 /* we'll need to get all headers */
