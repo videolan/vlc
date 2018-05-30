@@ -1671,6 +1671,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     p_stream->b_force_backup = true;
                     p_stream->i_extra_headers_packets = 1;
                     p_stream->special.flac.b_old = true;
+                    p_stream->f_rate = 48000; /* better be safe since that's delayed */
                     es_format_Change( &p_stream->fmt, AUDIO_ES, VLC_CODEC_FLAC );
                 }
                 /* Check for Flac header (>= version 1.0.0) */
