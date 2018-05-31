@@ -55,25 +55,42 @@
 #include <limits.h>
 #include <assert.h>
 
-static void PrintObject (vlc_object_t *obj, const char *prefix)
+static void PrintObjectPrefix(vlc_object_t *obj, bool last)
+{
+    const char *str;
+
+    if (obj->obj.parent == NULL)
+        return;
+
+    PrintObjectPrefix(obj->obj.parent, false);
+
+    if (vlc_internals(obj)->next != NULL)
+        str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
+    else
+        str = last ? " \xE2\x94\x94" : "  ";
+
+    fputs(str, stdout);
+}
+
+static void PrintObject(vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
 
     int canc = vlc_savecancel ();
-    printf(" %so %p %s, %u refs\n", prefix, (void *)obj,
-           obj->obj.object_type, atomic_load(&priv->refs));
+
+    PrintObjectPrefix(obj, true);
+    printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
+           (priv->first != NULL) ? 0xAC : 0x80,
+           (void *)obj, obj->obj.object_type, atomic_load(&priv->refs));
+
     vlc_restorecancel (canc);
 }
 
-static void DumpStructure (vlc_object_t *obj, unsigned level, char *psz_foo)
+static void DumpStructure(vlc_object_t *obj, unsigned level)
 {
-    char back = psz_foo[level];
+    PrintObject(obj);
 
-    psz_foo[level] = '\0';
-    PrintObject (obj, psz_foo);
-    psz_foo[level] = back;
-
-    if (level / 2 >= MAX_DUMPSTRUCTURE_DEPTH)
+    if (unlikely(level > 100))
     {
         msg_Warn (obj, "structure tree is too deep");
         return;
@@ -84,22 +101,7 @@ static void DumpStructure (vlc_object_t *obj, unsigned level, char *psz_foo)
     /* NOTE: nested locking here (due to recursive call) */
     vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
     for (priv = priv->first; priv != NULL; priv = priv->next)
-    {
-        if (level > 0)
-        {
-            assert(level >= 2);
-            psz_foo[level - 1] = ' ';
-
-            if (psz_foo[level - 2] == '`')
-                psz_foo[level - 2] = ' ';
-        }
-
-        psz_foo[level] = priv->next ? '|' : '`';
-        psz_foo[level + 1] = '-';
-        psz_foo[level + 2] = '\0';
-
-        DumpStructure (vlc_externals(priv), level + 2, psz_foo);
-    }
+        DumpStructure(vlc_externals(priv), level + 1);
     vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
 }
 
@@ -117,10 +119,9 @@ static int TreeCommand (vlc_object_t *obj, char const *cmd,
 
     if (cmd[0] == 't')
     {
-        char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-
-        psz_foo[0] = '|';
-        DumpStructure (obj, 0, psz_foo);
+        flockfile(stdout);
+        DumpStructure (obj, 0);
+        funlockfile(stdout);
     }
 
     return VLC_SUCCESS;

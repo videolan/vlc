@@ -105,10 +105,3 @@
 
 /* The default video output window title */
 #define VOUT_TITLE                      "VLC"
-
-/*****************************************************************************
- * Messages and console interfaces configuration
- *****************************************************************************/
-
-/* Maximal depth of the object tree output by vlc_dumpstructure */
-#define MAX_DUMPSTRUCTURE_DEPTH         100
