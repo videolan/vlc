@@ -44,8 +44,6 @@
 #include "display.h"
 #include "window.h"
 
-#include "event.h"
-
 static void SplitterManage(vout_display_t *vd);
 static void SplitterClose(vout_display_t *vd);
 
@@ -542,8 +540,8 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         break;
 
     case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
-        vout_SendEventViewpointMoved(osys->vout,
-                                     va_arg(args, const vlc_viewpoint_t *));
+        var_SetAddress(osys->vout, "viewpoint-moved",
+                       (void *)va_arg(args, const vlc_viewpoint_t *));
         break;
 
 #if defined(_WIN32) || defined(__OS2__)
@@ -1020,8 +1018,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         osys->sar.den != source->i_sar_den)
         osys->ch_sar = true;
 
-    vout_SendEventViewpointChangeable(osys->vout,
-        p_display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+    var_SetBool(osys->vout, "viewpoint-changeable",
+                p_display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
 
     return p_display;
 error:
