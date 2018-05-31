@@ -278,7 +278,6 @@ libvlccore_la_SOURCES = \
 	video_output/control.h \
 	video_output/display.c \
 	video_output/display.h \
-	video_output/event.h \
 	video_output/inhibit.c \
 	video_output/inhibit.h \
 	video_output/interlacing.c \
