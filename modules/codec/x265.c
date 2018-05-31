@@ -71,7 +71,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
     if (likely(p_pict)) {
         pic.pts = p_pict->date;
-        if (unlikely(p_sys->initial_date == 0)) {
+        if (unlikely(p_sys->initial_date == VLC_TICK_INVALID)) {
             p_sys->initial_date = p_pict->date;
 #ifndef NDEBUG
             p_sys->start = vlc_tick_now();
@@ -225,7 +225,7 @@ static int  Open (vlc_object_t *p_this)
     }
 
     p_sys->dts = 0;
-    p_sys->initial_date = 0;
+    p_sys->initial_date = VLC_TICK_INVALID;
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
