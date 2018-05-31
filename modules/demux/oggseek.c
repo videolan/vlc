@@ -284,16 +284,16 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
 
                     i_length = Ogg_GranuleToTime( p_sys->pp_stream[i], i_granule,
                                                   !p_sys->pp_stream[i]->b_contiguous, false );
-                    if( i_length > VLC_TICK_INVALID )
+                    if( i_length != VLC_TICK_INVALID )
                         p_sys->i_length = __MAX( p_sys->i_length, SEC_FROM_VLC_TICK(i_length - VLC_TICK_0) );
                     break;
                 }
             }
-            if ( i_length > VLC_TICK_INVALID ) break;
+            if ( i_length != VLC_TICK_INVALID ) break;
         }
 
         /* We found at least a page with valid granule */
-        if ( i_length > VLC_TICK_INVALID ) break;
+        if ( i_length != VLC_TICK_INVALID ) break;
 
         /* Otherwise increase read size, starting earlier */
         if ( i_backoffset <= ( UINT_MAX >> 1 ) )
