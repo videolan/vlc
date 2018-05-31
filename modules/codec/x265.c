@@ -55,8 +55,6 @@ typedef struct
     x265_encoder    *h;
     x265_param      param;
 
-    vlc_tick_t      i_initial_delay;
-
     vlc_tick_t      dts;
     vlc_tick_t      initial_date;
 #ifndef NDEBUG
@@ -228,7 +226,6 @@ static int  Open (vlc_object_t *p_this)
 
     p_sys->dts = 0;
     p_sys->initial_date = 0;
-    p_sys->i_initial_delay = 0;
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
