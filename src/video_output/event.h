@@ -66,15 +66,10 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
         int x, y;
         var_GetCoords(vout, "mouse-moved", &x, &y);
         var_SetCoords(vout, "mouse-clicked", x, y);
-        var_SetBool(vout->obj.libvlc, "intf-popupmenu", false);
         return;
     }
     case MOUSE_BUTTON_CENTER:
-        return;
     case MOUSE_BUTTON_RIGHT:
-#if !defined(_WIN32)
-        var_SetBool(vout->obj.libvlc, "intf-popupmenu", true);
-#endif
         return;
     case MOUSE_BUTTON_WHEEL_UP:    key = KEY_MOUSEWHEELUP;    break;
     case MOUSE_BUTTON_WHEEL_DOWN:  key = KEY_MOUSEWHEELDOWN;  break;
@@ -86,14 +81,6 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
 {
     var_NAndInteger(vout, "mouse-button-down", 1 << button);
-#if defined(_WIN32)
-    switch (button)
-    {
-    case MOUSE_BUTTON_RIGHT:
-        var_SetBool(vout->obj.libvlc, "intf-popupmenu", true);
-        return;
-    }
-#endif
 }
 static inline void vout_SendEventMouseDoubleClick(vout_thread_t *vout)
 {
