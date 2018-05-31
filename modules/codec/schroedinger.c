@@ -907,8 +907,8 @@ typedef struct
     block_t *p_chain;
 
     struct picture_pts_t pts_tlb[SCHRO_PTS_TLB_SIZE];
-    unsigned i_pts_offset;
-    unsigned i_field_duration;
+    vlc_tick_t i_pts_offset;
+    vlc_tick_t i_field_duration;
 
     bool b_eos_signalled;
     bool b_eos_pulled;
