@@ -142,6 +142,7 @@ parts:
       - libxext-dev
       - libxi-dev
       - libxinerama-dev
+      - libxkbcommon-x11-dev
       - libxml2-dev
       - libxpm-dev
       - libzvbi-dev
@@ -184,6 +185,7 @@ parts:
       - libxext6
       - libxi6
       - libxinerama1
+      - libxkbcommon-x11-0
       - libxpm4
       - vdpau-va-driver
       - i965-va-driver
