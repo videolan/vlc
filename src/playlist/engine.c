@@ -472,6 +472,9 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Callbacks between interfaces */
 
+    /* Create a variable for showing the fullscreen interface */
+    var_Create( p_playlist, "intf-toggle-fscontrol", VLC_VAR_VOID );
+
     /* Create a variable for the Boss Key */
     var_Create( p_playlist, "intf-boss", VLC_VAR_VOID );
 

@@ -170,7 +170,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     if ((newval.i_int & (1 << MOUSE_BUTTON_CENTER))
      && !(oldval.i_int & (1 << MOUSE_BUTTON_CENTER)))
-        var_ToggleBool(p_intf->obj.libvlc, "intf-toggle-fscontrol");
+        var_TriggerCallback(pl_Get(p_intf), "intf-toggle-fscontrol");
 
     return VLC_SUCCESS;
 }
@@ -368,7 +368,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
 
         case ACTIONID_INTF_TOGGLE_FSC:
         case ACTIONID_INTF_HIDE:
-            var_TriggerCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol" );
+            var_TriggerCallback( p_playlist, "intf-toggle-fscontrol" );
             break;
         case ACTIONID_INTF_BOSS:
             var_TriggerCallback( p_playlist, "intf-boss" );

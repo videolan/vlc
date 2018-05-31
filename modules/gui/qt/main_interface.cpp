@@ -240,7 +240,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /************
      * Callbacks
      ************/
-    var_AddCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_AddCallback( pl_Get(p_intf), "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_AddCallback( pl_Get(p_intf), "intf-boss", IntfBossCB, p_intf );
     var_AddCallback( pl_Get(p_intf), "intf-show", IntfRaiseMainCB, p_intf );
 
@@ -303,7 +303,7 @@ MainInterface::~MainInterface()
     /* Unregister callbacks */
     var_DelCallback( pl_Get(p_intf), "intf-boss", IntfBossCB, p_intf );
     var_DelCallback( pl_Get(p_intf), "intf-show", IntfRaiseMainCB, p_intf );
-    var_DelCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol", IntfShowCB, p_intf );
+    var_DelCallback( pl_Get(p_intf), "intf-toggle-fscontrol", IntfShowCB, p_intf );
     var_DelCallback( p_intf->obj.libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
     p_intf->p_sys->p_mi = NULL;
