@@ -1421,7 +1421,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     msg_Dbg( p_demux, "seek requested: %"PRId64" seconds %2.2f%%",
-             i_date / CLOCK_FREQ, f_ratio * 100 );
+             SEC_FROM_VLC_TICK(i_date), f_ratio * 100 );
 
     if( p_sys->b_seekable )
     {
@@ -1550,7 +1550,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
         es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
         if( b_accurate )
             es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TICK_0 + i_date );
-        msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
+        msg_Dbg( p_demux, "seek: %"PRId64" seconds", SEC_FROM_VLC_TICK(p_sys->i_time) );
         return VLC_SUCCESS;
 
 failandresetpos:
@@ -1723,7 +1723,7 @@ static int64_t AVI_PTSToChunk( avi_track_t *tk, vlc_tick_t i_pts )
         return 0;
 
     i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
-    return i_pts / CLOCK_FREQ;
+    return SEC_FROM_VLC_TICK(i_pts);
 }
 
 static int64_t AVI_PTSToByte( avi_track_t *tk, vlc_tick_t i_pts )
@@ -3010,7 +3010,7 @@ static vlc_tick_t  AVI_MovieGetLength( demux_t *p_demux )
         msg_Dbg( p_demux,
                  "stream[%d] length:%"PRId64" (based on index)",
                  i,
-                 i_length );
+                 SEC_FROM_VLC_TICK(i_length) );
         i_maxlength = __MAX( i_maxlength, i_length );
     }
 

@@ -285,7 +285,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                     i_length = Ogg_GranuleToTime( p_sys->pp_stream[i], i_granule,
                                                   !p_sys->pp_stream[i]->b_contiguous, false );
                     if( i_length > VLC_TICK_INVALID )
-                        p_sys->i_length = __MAX( p_sys->i_length, (i_length - VLC_TICK_0) / 1000000 );
+                        p_sys->i_length = __MAX( p_sys->i_length, SEC_FROM_VLC_TICK(i_length - VLC_TICK_0) );
                     break;
                 }
             }

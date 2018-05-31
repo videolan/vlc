@@ -697,14 +697,14 @@ static void *Run( void *data )
         {
             int64_t t = 0;
             if( p_sys->p_input != NULL )
-                t = var_GetInteger( p_sys->p_input, "time" ) / CLOCK_FREQ;
+                t = SEC_FROM_VLC_TICK(var_GetInteger( p_sys->p_input, "time" ));
             msg_rc( "%"PRIu64, t );
         }
         else if( !strcmp( psz_cmd, "get_length" ) )
         {
             int64_t l = 0;
             if( p_sys->p_input != NULL )
-                l = var_GetInteger( p_sys->p_input, "length" ) / CLOCK_FREQ;
+                l = SEC_FROM_VLC_TICK(var_GetInteger( p_sys->p_input, "length" ));
             msg_rc( "%"PRIu64, l );
         }
         else if( !strcmp( psz_cmd, "get_title" ) )
@@ -905,7 +905,7 @@ static void PositionChanged( intf_thread_t *p_intf,
     vlc_mutex_lock( &p_intf->p_sys->status_lock );
     if( p_intf->p_sys->b_input_buffering )
         msg_rc( STATUS_CHANGE "( time: %"PRId64"s )",
-                (var_GetInteger( p_input, "time" ) / CLOCK_FREQ) );
+                SEC_FROM_VLC_TICK(var_GetInteger( p_input, "time" )) );
     p_intf->p_sys->b_input_buffering = false;
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
 }
@@ -1158,7 +1158,7 @@ static void print_playlist( intf_thread_t *p_intf, playlist_item_t *p_item, int 
     {
         if( p_item->pp_children[i]->p_input->i_duration != INPUT_DURATION_INDEFINITE )
         {
-            secstotimestr( psz_buffer, p_item->pp_children[i]->p_input->i_duration / CLOCK_FREQ );
+            secstotimestr( psz_buffer, SEC_FROM_VLC_TICK(p_item->pp_children[i]->p_input->i_duration) );
             msg_rc( "|%*s- %s (%s)", 2 * i_level, "", p_item->pp_children[i]->p_input->psz_name, psz_buffer );
         }
         else
