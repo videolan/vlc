@@ -235,9 +235,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !priv->parser )
         goto error;
 
-    /* Create a variable for showing the right click menu */
-    var_Create( p_libvlc, "intf-popupmenu", VLC_VAR_BOOL );
-
     /* variables for signalling creation of new files */
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
     var_Create( p_libvlc, "record-file", VLC_VAR_STRING );

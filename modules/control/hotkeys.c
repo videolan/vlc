@@ -170,7 +170,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     if ((newval.i_int & (1 << MOUSE_BUTTON_LEFT))
      && !(oldval.i_int & (1 << MOUSE_BUTTON_LEFT)))
-        var_SetBool(p_intf->obj.libvlc, "intf-popupmenu", false);
+        var_SetBool(pl_Get(p_intf), "intf-popupmenu", false);
 
     if ((newval.i_int & (1 << MOUSE_BUTTON_CENTER))
      && !(oldval.i_int & (1 << MOUSE_BUTTON_CENTER)))
@@ -183,7 +183,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     if ((oldval.i_int & (1 << MOUSE_BUTTON_RIGHT))
      && !(newval.i_int & (1 << MOUSE_BUTTON_RIGHT)))
 #endif
-        var_SetBool(p_intf->obj.libvlc, "intf-popupmenu", true);
+        var_SetBool(pl_Get(p_intf), "intf-popupmenu", true);
 
     return VLC_SUCCESS;
 }
@@ -387,7 +387,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             var_TriggerCallback( p_playlist, "intf-boss" );
             break;
         case ACTIONID_INTF_POPUP_MENU:
-            var_TriggerCallback( p_intf->obj.libvlc, "intf-popupmenu" );
+            var_TriggerCallback( p_playlist, "intf-popupmenu" );
             break;
 
         /* Playlist actions (including audio) */

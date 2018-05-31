@@ -472,6 +472,9 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Callbacks between interfaces */
 
+    /* Create a variable for showing the right click menu */
+    var_Create( p_playlist, "intf-popupmenu", VLC_VAR_BOOL );
+
     /* Create a variable for showing the fullscreen interface */
     var_Create( p_playlist, "intf-toggle-fscontrol", VLC_VAR_VOID );
 
