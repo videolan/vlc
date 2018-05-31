@@ -73,8 +73,8 @@
 #include <assert.h>
 
 /* BC pts are multiple of 100ns */
-#define TO_BC_PTS( a ) ( a * 10 + 1 )
-#define FROM_BC_PTS( a ) ((a - 1) /10)
+#define TO_BC_PTS( a )   ( MSFTIME_FROM_VLC_TICK(a) + 1 )
+#define FROM_BC_PTS( a ) VLC_TICK_FROM_MSFTIME(a - 1)
 
 //#define DEBUG_CRYSTALHD 1
 
