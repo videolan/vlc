@@ -171,11 +171,6 @@ private:
     // init variables (libvlc and playlist levels)
     void init_variables();
 
-    /// Callback for intf-show variable
-    static int onIntfShow( vlc_object_t *pObj, const char *pVariable,
-                           vlc_value_t oldVal, vlc_value_t newVal,
-                           void *pParam );
-
     /// Callback for input-current variable
     static int onInputNew( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
