@@ -36,6 +36,7 @@
 #include <vlc_interface.h>
 #include <vlc_input.h>
 #include <vlc_aout.h>
+#include <vlc_mouse.h>
 #include <vlc_viewpoint.h>
 #include <vlc_vout_osd.h>
 #include <vlc_playlist.h>
@@ -155,7 +156,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     (void) psz_var; (void) oldval;
 
-    if( newval.i_int & 0x01 )
+    if (newval.i_int & (1 << MOUSE_BUTTON_LEFT))
     {
         if( !p_sys->vrnav.b_button_pressed )
         {
