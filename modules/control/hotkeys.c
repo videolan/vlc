@@ -168,22 +168,24 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     else
         p_sys->vrnav.b_button_pressed = false;
 
-    if ((newval.i_int & (1 << MOUSE_BUTTON_LEFT))
-     && !(oldval.i_int & (1 << MOUSE_BUTTON_LEFT)))
+    unsigned pressed = newval.i_int & ~oldval.i_int;
+
+    if (pressed & (1 << MOUSE_BUTTON_LEFT))
         var_SetBool(pl_Get(p_intf), "intf-popupmenu", false);
-
-    if ((newval.i_int & (1 << MOUSE_BUTTON_CENTER))
-     && !(oldval.i_int & (1 << MOUSE_BUTTON_CENTER)))
+    if (pressed & (1 << MOUSE_BUTTON_CENTER))
         var_TriggerCallback(pl_Get(p_intf), "intf-toggle-fscontrol");
-
 #ifndef _WIN32
-    if ((newval.i_int & (1 << MOUSE_BUTTON_RIGHT))
-     && !(oldval.i_int & (1 << MOUSE_BUTTON_RIGHT)))
+    if (pressed & (1 << MOUSE_BUTTON_RIGHT))
 #else
     if ((oldval.i_int & (1 << MOUSE_BUTTON_RIGHT))
      && !(newval.i_int & (1 << MOUSE_BUTTON_RIGHT)))
 #endif
         var_SetBool(pl_Get(p_intf), "intf-popupmenu", true);
+
+    for (int i = MOUSE_BUTTON_WHEEL_UP; i <= MOUSE_BUTTON_WHEEL_RIGHT; i++)
+        if (pressed & (1 << i))
+            var_SetInteger(p_intf->obj.libvlc, "key-pressed",
+                           i - MOUSE_BUTTON_WHEEL_UP + KEY_MOUSEWHEELUP);
 
     return VLC_SUCCESS;
 }

@@ -55,28 +55,15 @@ static inline void vout_SendEventViewpointMoved(vout_thread_t *vout,
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
-    int key = KEY_UNSET;
     var_OrInteger(vout, "mouse-button-down", 1 << button);
 
-    switch (button)
-    {
-    case MOUSE_BUTTON_LEFT:
+    if (button == MOUSE_BUTTON_LEFT)
     {
         /* FIXME? */
         int x, y;
         var_GetCoords(vout, "mouse-moved", &x, &y);
         var_SetCoords(vout, "mouse-clicked", x, y);
-        return;
     }
-    case MOUSE_BUTTON_CENTER:
-    case MOUSE_BUTTON_RIGHT:
-        return;
-    case MOUSE_BUTTON_WHEEL_UP:    key = KEY_MOUSEWHEELUP;    break;
-    case MOUSE_BUTTON_WHEEL_DOWN:  key = KEY_MOUSEWHEELDOWN;  break;
-    case MOUSE_BUTTON_WHEEL_LEFT:  key = KEY_MOUSEWHEELLEFT;  break;
-    case MOUSE_BUTTON_WHEEL_RIGHT: key = KEY_MOUSEWHEELRIGHT; break;
-    }
-    vout_SendEventKey(vout, key);
 }
 static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
 {
