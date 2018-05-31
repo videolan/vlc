@@ -978,7 +978,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     break;
             }
 
-            vlc_tick_t it = var_InheritInteger( p_input, varname );
+            int it = var_InheritInteger( p_input, varname );
             if( it < 0 )
                 break;
             var_SetInteger( p_input, "time-offset", vlc_tick_from_sec( it * sign ) );
