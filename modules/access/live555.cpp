@@ -1286,6 +1286,8 @@ static int Play( demux_t *p_demux )
  *****************************************************************************/
 static bool HasSharedSession( MediaSubsession *session )
 {
+    if( session->sessionId() == NULL )
+        return false;
     MediaSubsessionIterator *it =
             new MediaSubsessionIterator( session->parentSession() );
     MediaSubsession *subsession;
@@ -1294,7 +1296,8 @@ static bool HasSharedSession( MediaSubsession *session )
     {
         if( session == subsession )
             continue;
-        if( !strcmp( session->sessionId(), subsession->sessionId() ) )
+        if( subsession->sessionId() != NULL &&
+            !strcmp( session->sessionId(), subsession->sessionId() ) )
         {
             b_shared = true;
             break;
