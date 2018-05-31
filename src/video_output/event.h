@@ -70,7 +70,6 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
         return;
     }
     case MOUSE_BUTTON_CENTER:
-        var_ToggleBool(vout->obj.libvlc, "intf-toggle-fscontrol");
         return;
     case MOUSE_BUTTON_RIGHT:
 #if !defined(_WIN32)

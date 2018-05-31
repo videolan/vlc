@@ -154,7 +154,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     intf_thread_t *p_intf = p_data;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    (void) psz_var; (void) oldval;
+    (void) psz_var;
 
     if (newval.i_int & (1 << MOUSE_BUTTON_LEFT))
     {
@@ -167,6 +167,10 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
     }
     else
         p_sys->vrnav.b_button_pressed = false;
+
+    if ((newval.i_int & (1 << MOUSE_BUTTON_CENTER))
+     && !(oldval.i_int & (1 << MOUSE_BUTTON_CENTER)))
+        var_ToggleBool(p_intf->obj.libvlc, "intf-toggle-fscontrol");
 
     return VLC_SUCCESS;
 }
