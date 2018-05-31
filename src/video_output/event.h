@@ -37,10 +37,6 @@
  * (Some case may infinite loop otherwise here)
  */
 
-static inline void vout_SendEventKey(vout_thread_t *vout, int key)
-{
-    var_SetInteger(vout->obj.libvlc, "key-pressed", key);
-}
 static inline void vout_SendEventViewpointMoved(vout_thread_t *vout,
                                                 const vlc_viewpoint_t *p_viewpoint)
 {

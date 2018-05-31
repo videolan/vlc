@@ -123,7 +123,7 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 #include <vlc_vout.h>
 #include <vlc_vout_display.h>
 #include "window.h"
-#include "event.h"
+#include "vout_internal.h"
 
 #define DOUBLE_CLICK_TIME (3 * CLOCK_FREQ / 10)
 
@@ -235,9 +235,7 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
 static void vout_display_window_KeyboardEvent(vout_window_t *window,
                                               unsigned key)
 {
-    vout_thread_t *vout = (vout_thread_t *)window->obj.parent;
-
-    vout_SendEventKey(vout, key);
+    var_SetInteger(window->obj.libvlc, "key-pressed", key);
 }
 
 static void vout_display_window_OutputEvent(vout_window_t *window,
