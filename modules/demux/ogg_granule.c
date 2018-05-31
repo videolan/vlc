@@ -56,7 +56,10 @@ bool Ogg_IsKeyFrame( const logical_stream_t *p_stream, const ogg_packet *p_packe
         case VLC_CODEC_VP8:
             return ( ( ( p_packet->granulepos >> 3 ) & 0x07FFFFFF ) == 0 );
         case VLC_CODEC_DIRAC:
-            return ( p_packet->granulepos & 0xFF8000FF );
+            if( p_stream->special.dirac.b_old )
+                return (p_packet->granulepos & 0x3FFFFFFF) == 0;
+            else
+                return (p_packet->granulepos & 0xFF8000FF) == 0;
         default:
             return true;
     }
@@ -74,7 +77,10 @@ int64_t Ogg_GetKeyframeGranule( const logical_stream_t *p_stream, int64_t i_gran
         case VLC_CODEC_DAALA:
             return ( i_granule >> p_stream->i_granule_shift ) << p_stream->i_granule_shift;
         case VLC_CODEC_DIRAC:
-            return ( i_granule >> 31 ) << 31;
+            if( p_stream->special.dirac.b_old )
+                return ( i_granule >> 30 ) << 30;
+            else
+                return ( i_granule >> 31 ) << 31;
         default:
             /* No change, that's keyframe */
             return i_granule;
@@ -83,7 +89,7 @@ int64_t Ogg_GetKeyframeGranule( const logical_stream_t *p_stream, int64_t i_gran
 
 static int64_t Ogg_GranuleToSampleDelta( const logical_stream_t *p_stream, int64_t i_granule )
 {
-    if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
+    if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC && !p_stream->special.dirac.b_old )
         return (i_granule >> 9) & 0x1fff;
     else
         return -1;
@@ -105,7 +111,10 @@ static int64_t Ogg_GranuleToSample( const logical_stream_t *p_stream, int64_t i_
         case VLC_CODEC_OGGSPOTS:
             return i_granule >> p_stream->i_granule_shift;
         case VLC_CODEC_DIRAC:
-            return (i_granule >> 31);
+            if( p_stream->special.dirac.b_old )
+                return (i_granule >> 30) + (i_granule & 0x3FFFFFFF);
+            else
+                return (i_granule >> 31);
         case VLC_CODEC_OPUS:
         case VLC_CODEC_VORBIS:
         case VLC_CODEC_SPEEX:

@@ -83,6 +83,7 @@ typedef struct logical_stream_s
     bool b_reinit;
     bool b_oggds;
     int i_granule_shift;
+    int i_next_block_flags;
 
     /* Opus has a starting offset in the headers. */
     int i_pre_skip;
@@ -108,12 +109,9 @@ typedef struct logical_stream_s
     /* All blocks which can't be sent because track PCR isn't known yet */
     struct
     {
-        block_t **pp_blocks;
-        uint8_t i_size; /* max 255 */
-        uint8_t i_used;
-    } prepcr;
-    /* All blocks that are queued because ES isn't created yet */
-    block_t *p_preparse_block;
+        block_t *p_blocks;
+        block_t **pp_append;
+    } queue;
 
     union
     {
@@ -134,6 +132,7 @@ typedef struct logical_stream_s
         struct
         {
             bool b_interlaced;
+            bool b_old;
         } dirac;
         struct
         {
@@ -174,9 +173,6 @@ typedef struct
      * the sub-streams */
     mtime_t i_pcr;
     mtime_t i_nzpcr_offset;
-    /* informative only */
-    mtime_t i_pcr_jitter;
-    int64_t i_access_delay;
 
     /* new stream or starting from a chain */
     bool b_chained_boundary;
