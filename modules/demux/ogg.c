@@ -3265,7 +3265,7 @@ bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_t
     struct
     {
         int64_t i_pos;
-        int64_t i_time;
+        vlc_tick_t i_time;
     } current = { 0, 0 }, prev = { -1, -1 };
 
     uint64_t i_keypoints_found = 0;
