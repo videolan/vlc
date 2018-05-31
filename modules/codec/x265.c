@@ -55,7 +55,7 @@ typedef struct
     x265_encoder    *h;
     x265_param      param;
 
-    vlc_tick_t      dts;
+    unsigned        frame_count;
     vlc_tick_t      initial_date;
 #ifndef NDEBUG
     vlc_tick_t      start;
@@ -109,7 +109,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
             p_enc->fmt_in.video.i_frame_rate;
 
     p_block->i_pts = p_sys->initial_date + pic.poc * p_block->i_length;
-    p_block->i_dts = p_sys->initial_date + p_sys->dts++ * p_block->i_length;
+    p_block->i_dts = p_sys->initial_date + p_sys->frame_count++ * p_block->i_length;
 
     switch (pic.sliceType)
     {
@@ -128,7 +128,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
 #ifndef NDEBUG
     msg_Dbg(p_enc, "%zu bytes (frame %"PRId64", %.2ffps)", p_block->i_buffer,
-        p_sys->dts, (float)p_sys->dts * CLOCK_FREQ / (vlc_tick_now() - p_sys->start));
+        p_sys->frame_count, (float)p_sys->frame_count * CLOCK_FREQ / (vlc_tick_now() - p_sys->start));
 #endif
 
     return p_block;
@@ -224,7 +224,7 @@ static int  Open (vlc_object_t *p_this)
         p_extra += nal[i].sizeBytes;
     }
 
-    p_sys->dts = 0;
+    p_sys->frame_count = 0;
     p_sys->initial_date = VLC_TICK_INVALID;
 
     p_enc->pf_encode_video = Encode;
