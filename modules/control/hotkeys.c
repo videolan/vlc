@@ -366,7 +366,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             var_TriggerCallback( p_intf->obj.libvlc, "intf-toggle-fscontrol" );
             break;
         case ACTIONID_INTF_BOSS:
-            var_TriggerCallback( p_intf->obj.libvlc, "intf-boss" );
+            var_TriggerCallback( p_playlist, "intf-boss" );
             break;
         case ACTIONID_INTF_POPUP_MENU:
             var_TriggerCallback( p_intf->obj.libvlc, "intf-popupmenu" );

@@ -471,6 +471,10 @@ static void VariablesInit( playlist_t *p_playlist )
                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
     /* Callbacks between interfaces */
+
+    /* Create a variable for the Boss Key */
+    var_Create( p_playlist, "intf-boss", VLC_VAR_VOID );
+
     /* Create a variable for showing the main interface */
     var_Create( p_playlist, "intf-show", VLC_VAR_VOID );
 }

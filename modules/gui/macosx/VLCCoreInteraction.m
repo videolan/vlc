@@ -114,7 +114,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
         [_remote setDelegate: self];
 
-        var_AddCallback(p_intf->obj.libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+        var_AddCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     }
     return self;
 }
@@ -122,7 +122,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 - (void)dealloc
 {
     intf_thread_t *p_intf = getIntf();
-    var_DelCallback(p_intf->obj.libvlc, "intf-boss", BossCallback, (__bridge void *)self);
+    var_DelCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 }
 
