@@ -271,8 +271,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Load background interfaces
      */
-    psz_modules = var_CreateGetNonEmptyString( p_libvlc, "extraintf" );
-    psz_control = var_CreateGetNonEmptyString( p_libvlc, "control" );
+    psz_modules = var_InheritString( p_libvlc, "extraintf" );
+    psz_control = var_InheritString( p_libvlc, "control" );
 
     if( psz_modules && psz_control )
     {
