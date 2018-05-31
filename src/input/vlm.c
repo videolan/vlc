@@ -115,10 +115,9 @@ static vlc_mutex_t vlm_mutex = VLC_STATIC_MUTEX;
 /*****************************************************************************
  * vlm_New:
  *****************************************************************************/
-vlm_t *vlm_New ( vlc_object_t *p_this )
+vlm_t *vlm_New ( vlc_object_t *p_this, const char *psz_vlmconf )
 {
     vlm_t *p_vlm = NULL, **pp_vlm = &(libvlc_priv (p_this->obj.libvlc)->p_vlm);
-    char *psz_vlmconf;
 
     /* Avoid multiple creation */
     vlc_mutex_lock( &vlm_mutex );
@@ -167,9 +166,10 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
 
     *pp_vlm = p_vlm; /* for future reference */
 
+    vlc_mutex_unlock( &vlm_mutex );
+
     /* Load our configuration file */
-    psz_vlmconf = var_CreateGetString( p_vlm, "vlm-conf" );
-    if( psz_vlmconf && *psz_vlmconf )
+    if( psz_vlmconf != NULL )
     {
         vlm_message_t *p_message = NULL;
         char *psz_buffer = NULL;
@@ -185,9 +185,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
             free( psz_buffer );
         }
     }
-    free( psz_vlmconf );
-
-    vlc_mutex_unlock( &vlm_mutex );
 
     return p_vlm;
 }

@@ -139,7 +139,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance )
 
     if( !p_instance->vlm->p_vlm )
     {
-        p_instance->vlm->p_vlm = vlm_New( p_instance->p_libvlc_int );
+        p_instance->vlm->p_vlm = vlm_New( p_instance->p_libvlc_int, NULL );
         if( !p_instance->vlm->p_vlm )
         {
             libvlc_printerr( "VLM not supported or out of memory" );

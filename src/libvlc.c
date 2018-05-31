@@ -258,14 +258,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
-    psz_parser = var_CreateGetNonEmptyString( p_libvlc, "vlm-conf" );
+    psz_parser = var_InheritString( p_libvlc, "vlm-conf" );
     if( psz_parser )
     {
-        priv->p_vlm = vlm_New( p_libvlc );
+        priv->p_vlm = vlm_New( p_libvlc, psz_parser );
         if( !priv->p_vlm )
             msg_Err( p_libvlc, "VLM initialization failed" );
+        free( psz_parser );
     }
-    free( psz_parser );
 #endif
 
     /*
