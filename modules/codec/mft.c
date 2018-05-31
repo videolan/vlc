@@ -646,12 +646,10 @@ static int ProcessInputStream(decoder_t *p_dec, DWORD stream_id, block_t *p_bloc
     if (FAILED(hr))
         goto error;
 
-    LONGLONG ts = p_block->i_pts;
-    if (!ts && p_block->i_dts)
-        ts = p_block->i_dts;
+    vlc_tick_t ts = p_block->i_pts == VLC_TICK_INVALID ? p_block->i_dts : p_block->i_pts;
 
     /* Convert from microseconds to 100 nanoseconds unit. */
-    hr = IMFSample_SetSampleTime(input_sample, ts * 10);
+    hr = IMFSample_SetSampleTime(input_sample, MSFTIME_FROM_VLC_TICK(ts));
     if (FAILED(hr))
         goto error;
 
@@ -721,7 +719,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
         if (FAILED(hr))
             goto error;
         /* Convert from 100 nanoseconds unit to microseconds. */
-        sample_time /= 10;
+        vlc_tick_t samp_time = VLC_TICK_FROM_MSFTIME(sample_time);
 
         DWORD total_length = 0;
         hr = IMFSample_GetTotalLength(output_sample, &total_length);
@@ -740,7 +738,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
             hr = IMFSample_GetUINT32(output_sample, &MFSampleExtension_Interlaced, &interlaced);
             picture->b_progressive = !interlaced;
 
-            picture->date = sample_time;
+            picture->date = samp_time;
         }
         else
         {
@@ -755,7 +753,7 @@ static int ProcessOutputStream(decoder_t *p_dec, DWORD stream_id)
             if (aout_buffer->i_buffer < total_length)
                 goto error;
 
-            aout_buffer->i_pts = sample_time;
+            aout_buffer->i_pts = samp_time;
         }
 
         IMFMediaBuffer *output_media_buffer = NULL;
