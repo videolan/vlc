@@ -469,6 +469,10 @@ static void VariablesInit( playlist_t *p_playlist )
 
     var_Create( p_playlist, "sub-text-scale",
                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
+
+    /* Callbacks between interfaces */
+    /* Create a variable for showing the main interface */
+    var_Create( p_playlist, "intf-show", VLC_VAR_VOID );
 }
 
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )

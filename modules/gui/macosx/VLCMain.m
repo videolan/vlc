@@ -237,7 +237,7 @@ static VLCMain *sharedInstance = nil;
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
 
         var_AddCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-        var_AddCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
+        var_AddCallback(pl_Get(p_intf), "intf-show", ShowController, (__bridge void *)self);
 
         // Load them here already to apply stored profiles
         _videoEffectsPanel = [[VLCVideoEffectsWindowController alloc] init];
@@ -345,7 +345,7 @@ static VLCMain *sharedInstance = nil;
     config_PutInt("repeat", var_GetBool(p_playlist, "repeat"));
 
     var_DelCallback(p_intf->obj.libvlc, "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
-    var_DelCallback(p_intf->obj.libvlc, "intf-show", ShowController, (__bridge void *)self);
+    var_DelCallback(pl_Get(p_intf), "intf-show", ShowController, (__bridge void *)self);
 
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
