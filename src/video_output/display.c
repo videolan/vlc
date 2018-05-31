@@ -1317,12 +1317,7 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
         var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
 
     if (vlc_mouse_HasButton(&vout->p->mouse, m)) {
-        for (unsigned button = 0; button < MOUSE_BUTTON_MAX; button++) {
-            if (vlc_mouse_HasPressed(&vout->p->mouse, m, button))
-                var_OrInteger(vout, "mouse-button-down", 1 << button);
-            else if (vlc_mouse_HasReleased(&vout->p->mouse, m, button))
-                var_NAndInteger(vout, "mouse-button-down", 1 << button);
-        }
+        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
 
         if (vlc_mouse_HasPressed(&vout->p->mouse, m, MOUSE_BUTTON_LEFT)) {
             /* FIXME? */
