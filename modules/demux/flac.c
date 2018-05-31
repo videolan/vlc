@@ -318,7 +318,7 @@ static int RefineSeek( demux_t *p_demux, vlc_tick_t i_time, double i_bytemicrora
             }
             else b_found = true;
         }
-        else if( p_block_out->i_dts < i_time )
+        else
         {
             vlc_tick_t i_diff = i_time - p_block_out->i_dts;
             /* Not in acceptable NEXT_TIME demux range */
