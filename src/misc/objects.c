@@ -60,9 +60,8 @@ static void PrintObject (vlc_object_t *obj, const char *prefix)
     vlc_object_internals_t *priv = vlc_internals(obj);
 
     int canc = vlc_savecancel ();
-    printf (" %so %p %s, %u refs, parent %p\n", prefix, (void *)obj,
-            obj->obj.object_type, atomic_load(&priv->refs),
-            (void *)obj->obj.parent);
+    printf(" %so %p %s, %u refs\n", prefix, (void *)obj,
+           obj->obj.object_type, atomic_load(&priv->refs));
     vlc_restorecancel (canc);
 }
 
@@ -165,7 +164,8 @@ static int VarsCommand (vlc_object_t *obj, char const *cmd,
     else
         vlc_object_hold (obj);
 
-    PrintObject (obj, "");
+    printf(" o %p %s, parent %p\n", (void *)obj,
+           obj->obj.object_type, (void *)obj->obj.parent);
     DumpVariables (obj);
     vlc_object_release (obj);
 
