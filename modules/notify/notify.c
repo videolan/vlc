@@ -172,7 +172,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* Playing something ... */
     input_item_t *p_input_item = input_GetItem( p_input );
-    psz_title = input_item_GetTitleFbName( p_input_item );
 
     /* Checking for click on directories */
     if(p_input_item->i_type == ITEM_TYPE_DIRECTORY || p_input_item->i_type == ITEM_TYPE_PLAYLIST
@@ -181,6 +180,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
         return VLC_SUCCESS;
     }
 
+    psz_title = input_item_GetTitleFbName( p_input_item );
     /* We need at least a title */
     if( EMPTY_STR( psz_title ) )
     {
