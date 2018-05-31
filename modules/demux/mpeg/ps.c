@@ -377,7 +377,7 @@ static bool FindLength( demux_t *p_demux )
             {
                 p_sys->i_length = i_length;
                 p_sys->i_time_track_index = i;
-                msg_Dbg( p_demux, "we found a length of: %"PRId64 "s", p_sys->i_length / CLOCK_FREQ );
+                msg_Dbg( p_demux, "we found a length of: %"PRId64 "s", SEC_FROM_VLC_TICK(p_sys->i_length) );
             }
         }
     }
