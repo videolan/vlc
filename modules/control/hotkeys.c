@@ -345,8 +345,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_input = NULL;
     p_sys->vrnav.b_can_change = false;
     p_sys->vrnav.b_button_pressed = false;
-    p_sys->subtitle_delaybookmarks.i_time_audio = 0;
-    p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
+    p_sys->subtitle_delaybookmarks.i_time_audio = VLC_TICK_INVALID;
+    p_sys->subtitle_delaybookmarks.i_time_subtitle = VLC_TICK_INVALID;
 
     vlc_mutex_init( &p_sys->lock );
 
@@ -679,7 +679,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
              * (This problem is also present in the "Track synchronization" window) */
             if ( p_input )
             {
-                if ( (p_sys->subtitle_delaybookmarks.i_time_audio == 0) || (p_sys->subtitle_delaybookmarks.i_time_subtitle == 0) )
+                if ( (p_sys->subtitle_delaybookmarks.i_time_audio == VLC_TICK_INVALID) || (p_sys->subtitle_delaybookmarks.i_time_subtitle == VLC_TICK_INVALID) )
                 {
                     DisplayMessage( p_vout, _( "Sub sync: set bookmarks first!" ) );
                 }
@@ -693,8 +693,8 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     DisplayMessage( p_vout, _( "Sub sync: corrected %"PRId64" ms (total delay = %"PRId64" ms)" ),
                                             MS_FROM_VLC_TICK( i_additional_subdelay ),
                                             MS_FROM_VLC_TICK( i_total_subdelay ) );
-                    p_sys->subtitle_delaybookmarks.i_time_audio = 0;
-                    p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
+                    p_sys->subtitle_delaybookmarks.i_time_audio = VLC_TICK_INVALID;
+                    p_sys->subtitle_delaybookmarks.i_time_subtitle = VLC_TICK_INVALID;
                 }
             }
             break;
@@ -704,8 +704,8 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             var_SetInteger( p_input, "spu-delay", 0);
             ClearChannels( p_vout, slider_chan );
             DisplayMessage( p_vout, _( "Sub sync: delay reset" ) );
-            p_sys->subtitle_delaybookmarks.i_time_audio = 0;
-            p_sys->subtitle_delaybookmarks.i_time_subtitle = 0;
+            p_sys->subtitle_delaybookmarks.i_time_audio = VLC_TICK_INVALID;
+            p_sys->subtitle_delaybookmarks.i_time_subtitle = VLC_TICK_INVALID;
             break;
         }
 
