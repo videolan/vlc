@@ -206,11 +206,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             free( pidfile );
         }
     }
-    else
-    {
-        var_Create( p_libvlc, "pidfile", VLC_VAR_STRING );
-        var_SetString( p_libvlc, "pidfile", "" );
-    }
 #endif
 
     i_ret = VLC_ENOMEM;

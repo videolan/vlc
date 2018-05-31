@@ -214,10 +214,7 @@ int libvlc_InternalAddIntf(libvlc_int_t *libvlc, const char *name)
         if (intf == NULL) /* "intf" has not been set */
         {
 #if !defined(_WIN32) && !defined(__OS2__)
-            char *pidfile = var_InheritString(libvlc, "pidfile");
-            if (pidfile != NULL)
-                free(pidfile);
-            else
+            if (!var_InheritBool(libvlc, "daemon"))
 #endif
                 msg_Info(libvlc, _("Running vlc with the default interface. "
                          "Use 'cvlc' to use vlc without interface."));
