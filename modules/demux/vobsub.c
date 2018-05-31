@@ -592,10 +592,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                     i_sign = -1;
                     h = -h;
                 }
-                i_start = (int64_t) ( h * 3600*1000 +
-                            m * 60*1000 +
-                            s * 1000 +
-                            ms ) * 1000;
+                i_start = vlc_tick_from_sec( h * 3600 + m * 60 + s ) + VLC_TICK_FROM_MS( ms );
                 i_location = loc;
 
                 current_tk->i_subtitles++;
@@ -632,10 +629,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                     i_sign = -1;
                     h = -h;
                 }
-                i_gap = (int64_t) ( h * 3600*1000 +
-                            m * 60*1000 +
-                            s * 1000 +
-                            ms ) * 1000;
+                i_gap = vlc_tick_from_sec( h * 3600 + m * 60 + s ) + VLC_TICK_FROM_MS( ms );
 
                 current_tk->i_delay = current_tk->i_delay + (i_gap * i_sign);
                 msg_Dbg( p_demux, "sign: %+d gap: %+"PRId64" global delay: %+"PRId64"",
