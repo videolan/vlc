@@ -37,6 +37,7 @@
 #include <vlc_fifo_helper.h>
 
 #include <mfx/mfxvideo.h>
+#include "../demux/mpeg/timestamps.h"
 
 #define SOUT_CFG_PREFIX     "sout-qsv-"
 
@@ -304,12 +305,12 @@ static block_t *Encode(encoder_t *, picture_t *);
 
 static inline vlc_tick_t qsv_timestamp_to_mtime(int64_t mfx_ts)
 {
-    return mfx_ts / INT64_C(9) * INT64_C(100);
+    return FROM_SCALE_NZ(mfx_ts);
 }
 
 static inline uint64_t qsv_mtime_to_timestamp(vlc_tick_t vlc_ts)
 {
-    return vlc_ts / UINT64_C(100) * UINT64_C(9);
+    return TO_SCALE_NZ(vlc_ts);
 }
 
 static void clear_unused_frames(encoder_sys_t *sys)
