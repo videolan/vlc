@@ -702,7 +702,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
                     bestlower = current;
                 i_start_pos = current.i_pos;
             }
-            else if ( current.i_timestamp > i_targettime )
+            else
             {
                 if ( lowestupper.i_timestamp == VLC_TICK_INVALID ||
                      current.i_timestamp < lowestupper.i_timestamp )
