@@ -138,7 +138,7 @@ typedef struct
 typedef struct
 {
     enum subtitle_type_e i_type;
-    int64_t     i_microsecperframe;
+    vlc_tick_t  i_microsecperframe;
 
     char        *psz_header; /* SSA */
 
@@ -338,7 +338,7 @@ static int Open ( vlc_object_t *p_this )
     f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
     if( f_fps >= 1.f )
     {
-        p_sys->props.i_microsecperframe = llroundf( 1000000.f / f_fps );
+        p_sys->props.i_microsecperframe = llroundf( (float)CLOCK_FREQ / f_fps );
         msg_Dbg( p_demux, "Override subtitle fps %f", (double) f_fps );
     }
 
@@ -1012,7 +1012,7 @@ static int ParseMicroDvd( vlc_object_t *p_obj, subs_properties_t *p_props,
             /* Check if it's usable, and if the sub-fps is not set */
             float f_fps = us_strtof( psz_text, NULL );
             if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
-                p_props->i_microsecperframe = llroundf(1000000.f / f_fps);
+                p_props->i_microsecperframe = llroundf((float)CLOCK_FREQ / f_fps);
         }
         free( psz_text );
     }
