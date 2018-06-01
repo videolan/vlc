@@ -343,12 +343,16 @@ void VLCProfileSelector::updateOptions( int i )
     HASHPICK( "subtitles", "enable" );
     if( !value.isEmpty() )
     {
-        HASHPICK( "subtitles", "codec" );
-        smrl.option( "scodec", value );
-
         HASHPICK( "subtitles", "overlay" );
-        if ( !value.isEmpty() )
+        if ( value.isEmpty() )
+        {
+            HASHPICK( "subtitles", "codec" );
+            smrl.option( "scodec", value );
+        }
+        else
+        {
             smrl.option( "soverlay" );
+        }
     } else {
         smrl.option( "scodec", "none" );
     }
@@ -452,6 +456,8 @@ VLCProfileEditor::VLCProfileEditor( const QString& qs_name, const QString& value
     CONNECT( ui.valueholder_video_copy, stateChanged( int ),
              this, activatePanels() );
     CONNECT( ui.valueholder_audio_copy, stateChanged( int ),
+             this, activatePanels() );
+    CONNECT( ui.valueholder_subtitles_overlay, stateChanged( int ),
              this, activatePanels() );
     CONNECT( ui.valueholder_vcodec_bitrate, editingFinished( ),
              this, fixBirateState() );
@@ -883,6 +889,7 @@ void VLCProfileEditor::activatePanels()
 {
     ui.transcodevideo->setEnabled( ! ui.valueholder_video_copy->isChecked() );
     ui.transcodeaudio->setEnabled( ! ui.valueholder_audio_copy->isChecked() );
+    ui.valueholder_subtitles_codec->setEnabled( ! ui.valueholder_subtitles_overlay->isChecked() );
 }
 
 void VLCProfileEditor::fixBirateState()
