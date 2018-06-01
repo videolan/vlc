@@ -597,7 +597,7 @@ static int Demux( demux_t *p_demux )
             {
                 if( tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES )
                 {
-                    if( !p_sys->b_bad_scr && p_sys->i_pack_scr != VLC_TICK_INVALID && p_pkt->i_pts > 0 &&
+                    if( !p_sys->b_bad_scr && p_sys->i_pack_scr != VLC_TICK_INVALID && p_pkt->i_pts != VLC_TICK_INVALID &&
                         p_sys->i_pack_scr > p_pkt->i_pts + VLC_TICK_FROM_MS(250) )
                     {
                         msg_Warn( p_demux, "Incorrect SCR timing in advance of %" PRId64 "ms, disabling",
