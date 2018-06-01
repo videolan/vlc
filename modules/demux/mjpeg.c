@@ -267,7 +267,7 @@ static int SendBlock( demux_t *p_demux, int i )
         return VLC_DEMUXER_EOF;
     }
 
-    if( p_sys->i_frame_length )
+    if( p_sys->i_frame_length != VLC_TICK_INVALID )
     {
         p_block->i_pts = p_sys->i_time;
         p_sys->i_time += p_sys->i_frame_length;
@@ -378,7 +378,7 @@ static int Open( vlc_object_t * p_this )
     }
     else
         p_sys->b_still = false;
-    p_sys->i_frame_length = f_fps ? (CLOCK_FREQ / f_fps) : 0;
+    p_sys->i_frame_length = f_fps ? (CLOCK_FREQ / f_fps) : VLC_TICK_INVALID;
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_CODEC_MJPG );
 
