@@ -337,7 +337,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     case DEMUX_SET_TIME:
         i64 = va_arg( args, vlc_tick_t );
 
-        if( i64 >= 0 && i64 <= p_sys->i_length )
+        if( likely(i64 >= 0) && i64 <= p_sys->i_length )
         {
             ModPlug_Seek( p_sys->f, MS_FROM_VLC_TICK( i64 ) );
             date_Set( &p_sys->pts, VLC_TICK_0 + i64 );
