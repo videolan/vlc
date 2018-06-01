@@ -449,7 +449,7 @@ static void ParsePES( demux_t *p_demux )
         p_pes->i_pts = FROM_SCALE(i_pts);
 
     /* Set PCR */
-    if( p_pes->i_pts > 0 )
+    if( p_pes->i_pts != VLC_TICK_INVALID )
     {
         es_out_SetPCR( p_demux->out, p_pes->i_pts);
         p_sys->b_pcr_audio = true;
