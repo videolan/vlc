@@ -403,7 +403,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 #endif
         case DEMUX_GET_FPS:
             pf = va_arg( args, double * );
-            *pf = (double)1000000.0 / (double)p_sys->i_pcr_inc;
+            *pf = (double)CLOCK_FREQ / (double)p_sys->i_pcr_inc;
             return VLC_SUCCESS;
 
         case DEMUX_CAN_RECORD:
