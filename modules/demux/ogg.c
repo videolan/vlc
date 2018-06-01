@@ -313,7 +313,7 @@ static vlc_tick_t Ogg_GeneratePCR( demux_t * p_demux, bool b_drain )
         if ( (!b_drain && p_stream->b_finished) || p_stream->b_initializing )
             continue;
         if( i_pcr_candidate == VLC_TICK_INVALID ||
-            p_stream->i_pcr <= i_pcr_candidate )
+            p_stream->i_pcr < i_pcr_candidate )
         {
             i_pcr_candidate = p_stream->i_pcr;
         }
