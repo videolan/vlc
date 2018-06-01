@@ -553,14 +553,13 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_VCODEC( "DIVX 2" , "DIV2" )
     ADD_VCODEC( "DIVX 3" , "DIV3" )
     ADD_VCODEC( "H-263", "H263" )
-    ADD_VCODEC( "H-264", "h264" )
-    ADD_VCODEC( "H-265", "hevc" )
+    ADD_VCODEC( "H-264 (AVC)", "h264" )
+    ADD_VCODEC( "H-265 (HEVC)", "hevc" )
     ADD_VCODEC( "VP8", "VP80" )
     ADD_VCODEC( "WMV1", "WMV1" )
     ADD_VCODEC( "WMV2" , "WMV2" )
     ADD_VCODEC( "M-JPEG", "MJPG" )
     ADD_VCODEC( "Theora", "theo" )
-    ADD_VCODEC( "Dirac", "drac" )
 #undef ADD_VCODEC
     /* can do quality */
     qpcodecsList << "h264";
