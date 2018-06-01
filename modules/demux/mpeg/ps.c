@@ -92,7 +92,7 @@ typedef struct
     vlc_tick_t  i_scr; /* committed, current position */
     int64_t     i_scr_track_id;
     int         i_mux_rate;
-    int64_t     i_length;
+    vlc_tick_t  i_length;
     int         i_time_track_index;
     int64_t     i_current_pts;
     uint64_t    i_start_byte;
@@ -137,7 +137,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     unsigned i_max_packets = PS_PACKET_PROBE;
     int format = MPEG_PS;
     int i_mux_rate = 0;
-    int i_length = -1;
+    vlc_tick_t i_length = VLC_TICK_INVALID;
 
     i_peek = vlc_stream_Peek( p_demux->s, &p_peek, 16 );
     if( i_peek < 16 )
@@ -343,9 +343,9 @@ static bool FindLength( demux_t *p_demux )
     if( !var_CreateGetBool( p_demux, "ps-trust-timestamps" ) )
         return true;
 
-    if( p_sys->i_length == -1 ) /* First time */
+    if( p_sys->i_length == VLC_TICK_INVALID ) /* First time */
     {
-        p_sys->i_length = 0;
+        p_sys->i_length = VLC_TICK_0;
         /* Check beginning */
         int i = 0;
         i_current_pos = vlc_stream_Tell( p_demux->s );
@@ -436,7 +436,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->b_lost_sync ) msg_Warn( p_demux, "found sync code" );
     p_sys->b_lost_sync = false;
 
-    if( p_sys->i_length < 0 && p_sys->b_seekable )
+    if( p_sys->i_length == VLC_TICK_INVALID && p_sys->b_seekable )
     {
         if( !FindLength( p_demux ) )
             return VLC_DEMUXER_EGENERIC;
@@ -751,7 +751,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
-            if( p_sys->i_length > 0 )
+            if( p_sys->i_length > VLC_TICK_0 )
             {
                 *pi64 = p_sys->i_length;
                 return VLC_SUCCESS;
@@ -767,7 +767,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
-            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 && p_sys->i_length )
+            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 &&
+                p_sys->i_length > VLC_TICK_0)
             {
                 i64 -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
                 return demux_Control( p_demux, DEMUX_SET_POSITION, (double) i64 / p_sys->i_length );
