@@ -157,7 +157,7 @@ typedef struct
         bool  b_inited;
 
         float f_total;
-        float f_factor;
+        int i_factor;
     } mpsub;
 
     struct
@@ -1707,7 +1707,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
     if( !p_props->mpsub.b_inited )
     {
         p_props->mpsub.f_total = 0.0;
-        p_props->mpsub.f_factor = 0.0;
+        p_props->mpsub.i_factor = 0;
 
         p_props->mpsub.b_inited = true;
     }
@@ -1728,7 +1728,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         {
             if( sscanf (s, "FORMAT=TIM%c", &p_dummy ) == 1 && p_dummy == 'E')
             {
-                p_props->mpsub.f_factor = 100.0;
+                p_props->mpsub.i_factor = 100;
                 break;
             }
 
@@ -1746,7 +1746,7 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
                 if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
                     var_SetFloat( p_obj, "sub-fps", f_fps );
 
-                p_props->mpsub.f_factor = 1.f;
+                p_props->mpsub.i_factor = 1;
                 free( psz_temp );
                 break;
             }
@@ -1758,9 +1758,9 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
         if( *psz_temp )
         {
             float f2 = us_strtof( psz_temp, NULL );
-            p_props->mpsub.f_total += f1 * p_props->mpsub.f_factor;
+            p_props->mpsub.f_total += f1 * p_props->mpsub.i_factor;
             p_subtitle->i_start = llroundf(10000.f * p_props->mpsub.f_total);
-            p_props->mpsub.f_total += f2 * p_props->mpsub.f_factor;
+            p_props->mpsub.f_total += f2 * p_props->mpsub.i_factor;
             p_subtitle->i_stop = llroundf(10000.f * p_props->mpsub.f_total);
             break;
         }
