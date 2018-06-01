@@ -349,6 +349,8 @@ void VLCProfileSelector::updateOptions( int i )
         HASHPICK( "subtitles", "overlay" );
         if ( !value.isEmpty() )
             smrl.option( "soverlay" );
+    } else {
+        smrl.option( "scodec", "none" );
     }
     smrl.end();
 #undef HASHPICK
