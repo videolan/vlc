@@ -212,13 +212,16 @@ static subpicture_region_t *OSDIcon(int type, const video_format_t *fmt)
     const int x      = fmt->i_x_offset + fmt->i_visible_width - margin_ratio * size - width;
     const int y      = fmt->i_y_offset                        + margin_ratio * size;
 
+    if( width < 1 || height < 1 )
+        return NULL;
+
     subpicture_region_t *r = OSDRegion(__MAX(x, 0),
                                        __MIN(y, (int)fmt->i_visible_height - height),
                                        width, height);
     if (!r)
         return NULL;
 
-    DrawRect(r, STYLE_FILLED, COL_TRANSPARENT, 0, 0, width, height);
+    DrawRect(r, STYLE_FILLED, COL_TRANSPARENT, 0, 0, width - 1, height - 1);
 
     if (type == OSD_PAUSE_ICON) {
         int bar_width = width / 3;
