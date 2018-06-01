@@ -531,9 +531,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else if( vlc_stream_Tell( p_demux->s ) > p_sys->i_first_frame_offset )
             {
                 /* This should give an approximation of the total duration */
-                *pi64 = (double)( stream_Size( p_demux->s ) - p_sys->i_first_frame_offset ) /
-                        (double)( vlc_stream_Tell( p_demux->s ) - p_sys->i_first_frame_offset )
-                        * (double)( p_sys->i_pcr >= 0 ? p_sys->i_pcr : 0 );
+                if (p_sys->i_pcr <= 0)
+                    *pi64 = 0;
+                else
+                    *pi64 = p_sys->i_pcr *
+                            (double)( stream_Size( p_demux->s ) - p_sys->i_first_frame_offset ) /
+                            (double)( vlc_stream_Tell( p_demux->s ) - p_sys->i_first_frame_offset );
+
                 return VLC_SUCCESS;
             }
             else
