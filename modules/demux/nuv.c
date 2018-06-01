@@ -848,7 +848,7 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             kfa_entry_id++;
         }
 
-        i_time = (double)( (int64_t)frame * 1000000 ) / p_sys->hdr.d_fps;
+        i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
         i_offset = GetQWLE( p_seek_table + j * 12 );
 
         if( i_offset == 0 && i_time != 0 )
