@@ -615,7 +615,7 @@ static int ReadNSVs( demux_t *p_demux )
     else if( header[16] != 0 )
     {
         /* Integer frame rate */
-        p_sys->i_pcr_inc = 1000000 / header[16];
+        p_sys->i_pcr_inc = CLOCK_FREQ / header[16];
     }
     else
     {
