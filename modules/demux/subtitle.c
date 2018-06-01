@@ -129,8 +129,8 @@ static void TextUnload( text_t * );
 
 typedef struct
 {
-    int64_t i_start;
-    int64_t i_stop;
+    vlc_tick_t i_start;
+    vlc_tick_t i_stop;
 
     char    *psz_text;
 } subtitle_t;
@@ -891,7 +891,7 @@ static int Demux( demux_t *p_demux )
 
 static int subtitle_cmp( const void *first, const void *second )
 {
-    int64_t result = ((subtitle_t *)(first))->i_start - ((subtitle_t *)(second))->i_start;
+    vlc_tick_t result = ((subtitle_t *)(first))->i_start - ((subtitle_t *)(second))->i_start;
     /* Return -1, 0 ,1, and not directly subtraction
      * as result can be > INT_MAX */
     return result == 0 ? 0 : result > 0 ? 1 : -1;
@@ -1114,7 +1114,7 @@ static int ParseSubRipSubViewer( vlc_object_t *p_obj, subs_properties_t *p_props
 /* subtitle_ParseSubRipTimingValue
  * Parses SubRip timing value.
  */
-static int subtitle_ParseSubRipTimingValue(int64_t *timing_value,
+static int subtitle_ParseSubRipTimingValue(vlc_tick_t *timing_value,
                                            const char *s)
 {
     int h1, m1, s1, d1 = 0;
