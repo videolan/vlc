@@ -94,7 +94,7 @@ typedef struct
     int         i_mux_rate;
     vlc_tick_t  i_length;
     int         i_time_track_index;
-    int64_t     i_current_pts;
+    vlc_tick_t  i_current_pts;
     uint64_t    i_start_byte;
     uint64_t    i_lastpack_byte;
 
@@ -216,7 +216,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->i_scr = VLC_TICK_INVALID;
     p_sys->i_scr_track_id = 0;
     p_sys->i_length   = i_length;
-    p_sys->i_current_pts = (vlc_tick_t) 0;
+    p_sys->i_current_pts = VLC_TICK_INVALID;
     p_sys->i_time_track_index = -1;
     p_sys->i_aob_mlp_count = 0;
     p_sys->i_start_byte = i_skip;
@@ -633,9 +633,9 @@ static int Demux( demux_t *p_demux )
                     p_pkt->i_pts = p_sys->i_scr + VLC_TICK_FROM_MS(40);
                 }
 
-                if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )
+                if( p_pkt->i_pts > p_sys->i_current_pts )
                 {
-                    p_sys->i_current_pts = (int64_t)p_pkt->i_pts;
+                    p_sys->i_current_pts = p_pkt->i_pts;
                 }
 
                 if( tk->i_next_block_flags )
@@ -707,7 +707,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
             i64 = stream_Size( p_demux->s ) - p_sys->i_start_byte;
-            p_sys->i_current_pts = 0;
+            p_sys->i_current_pts = VLC_TICK_INVALID;
             p_sys->i_scr = VLC_TICK_INVALID;
 
             if( p_sys->format == CDXA_PS )
@@ -730,7 +730,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 )
+            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts != VLC_TICK_INVALID )
             {
                 *pi64 = p_sys->i_current_pts - p_sys->tk[p_sys->i_time_track_index].i_first_pts;
                 return VLC_SUCCESS;
@@ -767,7 +767,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = va_arg( args, int64_t );
-            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts > 0 &&
+            if( p_sys->i_time_track_index >= 0 && p_sys->i_current_pts != VLC_TICK_INVALID &&
                 p_sys->i_length > VLC_TICK_0)
             {
                 i64 -= p_sys->tk[p_sys->i_time_track_index].i_first_pts;
