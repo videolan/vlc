@@ -848,13 +848,13 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
             kfa_entry_id++;
         }
 
-        i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
         i_offset = GetQWLE( p_seek_table + j * 12 );
 
-        if( i_offset == 0 && i_time != 0 )
+        if( i_offset == 0 && frame != 0 )
             msg_Dbg( p_demux, "invalid file offset %d %"PRIi64, keyframe, i_offset );
         else
         {
+            i_time = (double)( (vlc_tick_t)frame * CLOCK_FREQ ) / p_sys->hdr.d_fps;
             demux_IndexAppend( &p_sys->idx, i_time , i_offset );
 #if 0
             msg_Dbg( p_demux, "adding entry position %d %"PRIi64 " file offset %"PRIi64, keyframe, i_time, i_offset );
