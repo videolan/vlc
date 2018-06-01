@@ -598,8 +598,9 @@ inline void VLCProfileEditor::registerCodecs()
 #undef ADD_SAMPLERATE
 
 #define ADD_SCODEC( name, fourcc ) ui.valueholder_subtitles_codec->addItem( name, QVariant( fourcc ) );
-    ADD_SCODEC( "DVB subtitle", "dvbs" )
-    ADD_SCODEC( "T.140", "t140" )
+    ADD_SCODEC( "DVBS (DVB subtitles)", "dvbs" )
+    ADD_SCODEC( "tx3g (MPEG-4 timed text)", "tx3g" )
+    ADD_SCODEC( "T-REC 140 (for rtp)", "t140" )
 #undef ADD_SCODEC
 }
 
