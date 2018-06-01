@@ -366,7 +366,7 @@ static int Open( vlc_object_t * p_this )
     /* Frame rate */
     float f_fps = var_InheritFloat( p_demux, "mjpeg-fps" );
 
-    p_sys->i_still_end = 0;
+    p_sys->i_still_end = VLC_TICK_INVALID;
     if( demux_IsPathExtension( p_demux, ".jpeg" ) ||
         demux_IsPathExtension( p_demux, ".jpg" ) )
     {
@@ -400,11 +400,11 @@ static int MjpgDemux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
 
-    if( p_sys->b_still && p_sys->i_still_end )
+    if( p_sys->b_still && p_sys->i_still_end != VLC_TICK_INVALID )
     {
         /* Still frame, wait until the pause delay is gone */
         vlc_tick_wait( p_sys->i_still_end );
-        p_sys->i_still_end = 0;
+        p_sys->i_still_end = VLC_TICK_INVALID;
         return VLC_DEMUXER_SUCCESS;
     }
 
