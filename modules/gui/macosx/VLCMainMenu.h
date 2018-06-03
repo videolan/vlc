@@ -205,7 +205,7 @@
 @property (readwrite, weak) IBOutlet NSMenuItem *voutMenufullscreen;
 @property (readwrite, weak) IBOutlet NSMenuItem *voutMenusnapshot;
 
-@property (readwrite, weak) IBOutlet NSView *playlistSaveAccessoryView;
+@property (readwrite, strong) IBOutlet NSView *playlistSaveAccessoryView;
 @property (readwrite, weak) IBOutlet NSPopUpButton *playlistSaveAccessoryPopup;
 @property (readwrite, weak) IBOutlet NSTextField *playlistSaveAccessoryText;
 
