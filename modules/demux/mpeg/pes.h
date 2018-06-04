@@ -22,6 +22,15 @@
 
 #include "timestamps.h"
 
+static inline stime_t GetPESTimestamp( const uint8_t *p_data )
+{
+    return  ((int64_t)(p_data[ 0]&0x0e ) << 29)|
+             (int64_t)(p_data[1] << 22)|
+            ((int64_t)(p_data[2]&0xfe) << 14)|
+             (int64_t)(p_data[3] << 7)|
+             (int64_t)(p_data[4] >> 1);
+}
+
 static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, stime_t *ret )
 {
     /* !warn broken muxers set incorrect flags. see #17773 and #19140 */
@@ -34,11 +43,7 @@ static inline bool ExtractPESTimestamp( const uint8_t *p_data, uint8_t i_flags, 
         return false;
 
 
-    *ret =  ((int64_t)(p_data[ 0]&0x0e ) << 29)|
-             (int64_t)(p_data[1] << 22)|
-            ((int64_t)(p_data[2]&0xfe) << 14)|
-             (int64_t)(p_data[3] << 7)|
-             (int64_t)(p_data[4] >> 1);
+    *ret =  GetPESTimestamp( p_data );
     return true;
 }
 
