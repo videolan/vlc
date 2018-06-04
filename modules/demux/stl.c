@@ -80,14 +80,14 @@ static size_t ParseInteger(uint8_t *data, size_t size)
 
     return strtol(tmp, NULL, 10);
 }
-static int64_t ParseTimeCode(uint8_t *data, double fps)
+static vlc_tick_t ParseTimeCode(uint8_t *data, double fps)
 {
     return CLOCK_FREQ * (data[0] * 3600 +
                          data[1] *   60 +
                          data[2] *    1 +
                          data[3] /  fps);
 }
-static int64_t ParseTextTimeCode(uint8_t *data, double fps)
+static vlc_tick_t ParseTextTimeCode(uint8_t *data, double fps)
 {
     uint8_t tmp[4];
     for (int i = 0; i < 4; i++)
