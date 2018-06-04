@@ -216,6 +216,7 @@ void *HookWindowsSensors(vout_display_t *vd, HWND hwnd)
                     }
 
                     pSensor->Release();
+                    pSensor = NULL;
                 }
             }
             pInclinometers->Release();
