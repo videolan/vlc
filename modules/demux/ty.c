@@ -245,7 +245,6 @@ typedef struct
   unsigned        i_seq_table_size;   /* number of entries in SEQ table */
   unsigned        i_bits_per_seq_entry; /* # of bits in SEQ table bitmask */
 
-  vlc_tick_t      firstAudioPTS;
   vlc_tick_t      lastAudioPTS;
   vlc_tick_t      lastVideoPTS;
 
@@ -335,7 +334,6 @@ static int Open(vlc_object_t *p_this)
     /* set up our struct (most were zero'd out with the memset above) */
     p_sys->b_first_chunk = true;
     p_sys->b_have_master = (U32_AT(p_peek) == TIVO_PES_FILEID);
-    p_sys->firstAudioPTS = -1;
     p_sys->lastAudioPTS  = VLC_TICK_INVALID;
     p_sys->lastVideoPTS  = VLC_TICK_INVALID;
     p_sys->i_stream_size = stream_Size(p_demux->s);
@@ -630,8 +628,6 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block,
     /* full PES header present, extract PTS */
     p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block->p_buffer[ offset +
                                    p_sys->i_Pts_Offset ] );
-    if (p_sys->firstAudioPTS < 0)
-        p_sys->firstAudioPTS = p_sys->lastAudioPTS;
     p_block->i_pts = p_sys->lastAudioPTS;
     /*msg_Dbg(p_demux, "Audio PTS %"PRId64, p_sys->lastAudioPTS );*/
     /* adjust audio record to remove PES header */
@@ -909,8 +905,6 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         {
             p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block_in->p_buffer[
                         SA_PTS_OFFSET ] );
-            if (p_sys->firstAudioPTS < 0)
-                p_sys->firstAudioPTS = p_sys->lastAudioPTS;
 
             block_Release(p_block_in);
             return 0;
