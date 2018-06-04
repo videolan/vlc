@@ -465,6 +465,24 @@ static UINT hevc_blacklist[] = {
     0x1626, /* HD Graphics 6000 */
     0x162A, /* Iris Pro Graphics P6300 */
     0x162B, /* Iris Graphics 6100 */
+
+    0x0402, /* HD Graphics */
+    0x0406, /* HD Graphics */
+    0x040A, /* HD Graphics */
+    0x0412, /* HD Graphics 4600 */
+    0x0416, /* HD Graphics 4600 */
+    0x041E, /* HD Graphics 4400 */
+    0x041A, /* HD Graphics P4600/P4700 */
+
+    0x0A06, /* HD Graphics */
+    0x0A0E, /* HD Graphics */
+    0x0A16, /* HD Graphics Family */
+    0x0A1E, /* HD Graphics Family */
+    0x0A26, /* HD Graphics 5000 */
+    0x0A2E, /* Iris(TM) Graphics 5100 */
+
+    0x0D22, /* Iris(TM) Pro Graphics 5200 */
+    0x0D26, /* Iris(TM) Pro Graphics 5200 */
 };
 
 bool directx_va_canUseHevc(vlc_va_t *va, UINT DeviceId)
