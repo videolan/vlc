@@ -165,8 +165,9 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     {
         // Associate the fsc window to the fullscreen window
         VoutManager* pVoutManager = VoutManager::instance( getIntf() );
-        GenericWindow* pWin = pVoutManager->getVoutMainWindow();
-        Window wnd = (Window) pWin->getOSHandle();
+        GenericWindow* pGenericWin = pVoutManager->getVoutMainWindow();
+        X11Window *pWin = (X11Window*)pGenericWin->getOSWindow();
+        Window wnd = pWin->getDrawable();
         XSetTransientForHint( XDISPLAY, m_wnd, wnd );
     }
     else
@@ -242,11 +243,12 @@ X11Window::~X11Window()
     XSync( XDISPLAY, False );
 }
 
-void X11Window::reparent( uint32_t OSHandle, int x, int y, int w, int h )
+void X11Window::reparent( OSWindow *win, int x, int y, int w, int h )
 {
     // Reparent the window
+    X11Window *parent = (X11Window*)win;
     Window new_parent =
-           OSHandle ? (Window) OSHandle : DefaultRootWindow( XDISPLAY );
+           parent ? parent->m_wnd : DefaultRootWindow( XDISPLAY );
 
     XReparentWindow( XDISPLAY, m_wnd, new_parent, x, y);
     if( w && h )

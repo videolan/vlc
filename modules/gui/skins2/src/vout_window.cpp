@@ -51,12 +51,7 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
     {
         vlc_object_hold( m_pWnd );
 
-#ifdef X11_SKINS
-        m_pWnd->handle.xid = getOSHandle();
-        m_pWnd->display.x11 = NULL;
-#else
-        m_pWnd->handle.hwnd = getOSHandle();
-#endif
+        updateWindowConfiguration( m_pWnd );
 
         m_pTimer = pOsFactory->createOSTimer( m_cmdHideMouse );
     }

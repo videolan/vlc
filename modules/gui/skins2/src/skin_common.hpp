@@ -60,12 +60,6 @@ class ThemeRepository;
 #pragma warning ( disable:4786 )
 #endif
 
-#ifdef X11_SKINS
-typedef uint32_t vlc_wnd_type;
-#else
-typedef void* vlc_wnd_type;
-#endif
-
 /// Wrapper around FromLocale, to avoid the need to call LocaleFree()
 static inline std::string sFromLocale( const std::string &rLocale )
 {

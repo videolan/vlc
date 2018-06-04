@@ -129,7 +129,7 @@ public:
     virtual int getScreenHeight() const;
 
     /// Get Monitor Information
-    virtual void getMonitorInfo( const GenericWindow &rWindow,
+    virtual void getMonitorInfo( OSWindow *pWindow,
                                  int* x, int* y,
                                  int* width, int* height ) const;
     virtual void getMonitorInfo( int numScreen,

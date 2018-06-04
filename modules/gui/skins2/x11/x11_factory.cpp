@@ -204,10 +204,11 @@ int X11Factory::getScreenHeight() const
 }
 
 
-void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
+void X11Factory::getMonitorInfo( OSWindow *pWindow,
                                  int* p_x, int* p_y,
                                  int* p_width, int* p_height ) const
 {
+    X11Window *pWin = (X11Window*)pWindow;
     // initialize to default geometry
     *p_x = 0;
     *p_y = 0;
@@ -217,7 +218,7 @@ void X11Factory::getMonitorInfo( const GenericWindow &rWindow,
     // Use Xinerama to determine the monitor where the video
     // mostly resides (biggest surface)
     Display *pDisplay = m_pDisplay->getDisplay();
-    Window wnd = (Window)rWindow.getOSHandle();
+    Window wnd = pWin->getDrawable();
     Window root = DefaultRootWindow( pDisplay );
     Window child_wnd;
 

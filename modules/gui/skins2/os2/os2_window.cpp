@@ -83,7 +83,9 @@ OS2Window::OS2Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         GenericWindow* pParent =
            (GenericWindow*)pVoutManager->getVoutMainWindow();
 
-        m_hWnd_parent = (HWND)pParent->getOSHandle();
+        OS2Window* pWin = (OS2Window*)pParent->getOSWindow();
+        m_hWnd_parent = pWin->getHandle();
+
 
         // top-level window
         m_hWnd = WinCreateStdWindow( HWND_DESKTOP,
@@ -152,9 +154,10 @@ OS2Window::~OS2Window()
 }
 
 
-void OS2Window::reparent( void* OSHandle, int x, int y, int w, int h )
+void OS2Window::reparent( OSWindow* parent, int x, int y, int w, int h )
 {
-    HWND hwndParent = ( HWND )OSHandle;
+    OS2Window *pParentWin = (OS2Window*)parent;
+    HWND hwndParent = pParentWin->getHandle();
 
     // Reparent the window
     if( !WinSetParent( m_hWnd, hwndParent, TRUE ) )

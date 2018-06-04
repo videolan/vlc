@@ -363,7 +363,7 @@ int OS2Factory::getScreenHeight() const
 }
 
 
-void OS2Factory::getMonitorInfo( const GenericWindow &rWindow,
+void OS2Factory::getMonitorInfo( OSWindow* pWindow,
                                  int* p_x, int* p_y,
                                  int* p_width, int* p_height ) const
 {

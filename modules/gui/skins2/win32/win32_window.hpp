@@ -59,14 +59,18 @@ public:
     /// Toggle the window on top
     virtual void toggleOnTop( bool onTop ) const;
 
+    /// Set the window handler
+    void setOSHandle( vout_window_t *pWnd ) const {
+        pWnd->type = VOUT_WINDOW_TYPE_HWND;
+        pWnd->info.has_double_click = true;
+        pWnd->handle.hwnd = m_hWnd;
+    }
+
     /// Getter for the window handle
     HWND getHandle() const { return m_hWnd; }
 
-    /// Getter for the window handle
-    void* getOSHandle() const { return (void*) m_hWnd; }
-
     /// reparent the window
-    void reparent( void* OSHandle, int x, int y, int w, int h );
+    void reparent( OSWindow* parent, int x, int y, int w, int h );
 
     /// invalidate a window surface
     bool invalidateRect( int x, int y, int w, int h ) const;

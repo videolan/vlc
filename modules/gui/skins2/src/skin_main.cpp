@@ -375,27 +375,18 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     pWnd->sys = sys;
     pWnd->sys->cfg = *cfg;
     pWnd->sys->pIntf = pIntf;
-#ifdef X11_SKINS
-    pWnd->type = VOUT_WINDOW_TYPE_XID;
-#else
-    pWnd->type = VOUT_WINDOW_TYPE_HWND;
-#endif
-    pWnd->info.has_double_click = true;
     pWnd->control = WindowControl;
+
+    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
 
     // force execution in the skins2 thread context
     CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
                                                 WindowOpenLocal );
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-#ifdef X11_SKINS
-    pWnd->display.x11 = NULL;
-
-    if( !pWnd->handle.xid )
-#else
-    if( !pWnd->handle.hwnd )
-#endif
+    if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
     {
+        msg_Dbg( pIntf, "Vout window creation failed" );
         free( sys );
         vlc_object_release( pIntf );
         return VLC_EGENERIC;

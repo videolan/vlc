@@ -384,11 +384,12 @@ int Win32Factory::getScreenHeight() const
 }
 
 
-void Win32Factory::getMonitorInfo( const GenericWindow &rWindow,
+void Win32Factory::getMonitorInfo( OSWindow *pWindow,
                                    int* p_x, int* p_y,
                                    int* p_width, int* p_height ) const
 {
-    HWND wnd = (HWND)rWindow.getOSHandle();
+    Win32Window *pWin = (Win32Window*)pWindow;
+    HWND wnd = pWin->getHandle();
     HMONITOR hmon = MonitorFromWindow( wnd, MONITOR_DEFAULTTONEAREST );
     MONITORINFO mi;
     mi.cbSize = sizeof( MONITORINFO );

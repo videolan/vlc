@@ -60,8 +60,12 @@ public:
     /// Getter for the window handle
     HWND getHandle() const { return m_hWndClient; }
 
-    /// Getter for the window handle
-    void* getOSHandle() const { return (void*) m_hWndClient; }
+    /// Set the window handler
+    void setOSHandle( vout_window_t *pWnd ) const {
+        pWnd->type = VOUT_WINDOW_TYPE_HWND;
+        pWnd->info.has_double_click = true;
+        pWnd->handle.hwnd = getHandle();
+    }
 
     /// reparent the window
     void reparent( void* OSHandle, int x, int y, int w, int h );

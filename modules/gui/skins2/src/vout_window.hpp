@@ -49,7 +49,7 @@ public:
     using GenericWindow::hide;
     using GenericWindow::move;
     using GenericWindow::resize;
-    using GenericWindow::getOSHandle;
+    using GenericWindow::updateWindowConfiguration;
     using GenericWindow::getMonitorInfo;
     //@}
 
