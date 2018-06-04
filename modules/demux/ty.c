@@ -47,6 +47,8 @@
 #include <vlc_input.h>
 #include "../codec/cc.h"
 
+#include "mpeg/pes.h"
+
 #include <assert.h>
 
 /*****************************************************************************
@@ -563,15 +565,8 @@ static void Close( vlc_object_t *p_this )
  * Assume buf points to beginning of PTS */
 static vlc_tick_t get_pts( const uint8_t *buf )
 {
-    vlc_tick_t i_pts;
-
-    i_pts = ((vlc_tick_t)(buf[0]&0x0e ) << 29)|
-             (vlc_tick_t)(buf[1] << 22)|
-            ((vlc_tick_t)(buf[2]&0xfe) << 14)|
-             (vlc_tick_t)(buf[3] << 7)|
-             (vlc_tick_t)(buf[4] >> 1);
-    i_pts *= 100 / 9;   /* convert PTS (90Khz clock) to microseconds */
-    return i_pts;
+    stime_t i_pts = GetPESTimestamp( buf );
+    return FROM_SCALE_NZ(i_pts); /* convert PTS (90Khz clock) to microseconds */
 }
 
 

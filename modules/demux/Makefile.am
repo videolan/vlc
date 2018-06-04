@@ -64,7 +64,8 @@ libsubtitle_plugin_la_SOURCES = demux/subtitle.c
 libsubtitle_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libsubtitle_plugin.la
 
-libty_plugin_la_SOURCES = demux/ty.c codec/cc.h
+libty_plugin_la_SOURCES = demux/ty.c codec/cc.h \
+                          demux/mpeg/pes.h demux/mpeg/timestamps.h
 demux_LTLIBRARIES += libty_plugin.la
 
 libvobsub_plugin_la_SOURCES = demux/vobsub.c demux/vobsub.h \
