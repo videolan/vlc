@@ -314,12 +314,21 @@ static int Open( vlc_object_t* p_this )
 
     }
 
+#if LIBSSH2_VERSION_NUM >= 0x010206
+    int check = libssh2_knownhost_checkp( ssh_knownhosts, url.psz_host, i_port,
+                                         fingerprint, i_len,
+                                         LIBSSH2_KNOWNHOST_TYPE_PLAIN |
+                                         LIBSSH2_KNOWNHOST_KEYENC_RAW |
+                                         knownhost_fingerprint_algo,
+                                         &host );
+#else
     int check = libssh2_knownhost_check( ssh_knownhosts, url.psz_host,
                                          fingerprint, i_len,
                                          LIBSSH2_KNOWNHOST_TYPE_PLAIN |
                                          LIBSSH2_KNOWNHOST_KEYENC_RAW |
                                          knownhost_fingerprint_algo,
                                          &host );
+#endif
 
     libssh2_knownhost_free( ssh_knownhosts );
 
