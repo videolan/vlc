@@ -288,8 +288,9 @@ static int Open( vlc_object_t* p_this )
     char *psz_knownhosts_file;
     if( asprintf( &psz_knownhosts_file, "%s/.ssh/known_hosts", psz_home ) != -1 )
     {
-        libssh2_knownhost_readfile( ssh_knownhosts, psz_knownhosts_file,
-                LIBSSH2_KNOWNHOST_FILE_OPENSSH );
+        if( libssh2_knownhost_readfile( ssh_knownhosts, psz_knownhosts_file,
+                                        LIBSSH2_KNOWNHOST_FILE_OPENSSH ) < 0 )
+            msg_Err( p_access, "Failure reading known_hosts '%s'", psz_knownhosts_file );
         free( psz_knownhosts_file );
     }
 
