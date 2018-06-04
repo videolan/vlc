@@ -146,7 +146,6 @@ static int Open ( vlc_object_t *p_this )
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
-    p_sys->i_length = 0;
     p_sys->p_vobsub_stream = NULL;
     p_sys->i_tracks = 0;
     p_sys->track = malloc( sizeof( vobsub_track_t ) );
@@ -167,6 +166,7 @@ static int Open ( vlc_object_t *p_this )
     TextUnload( &p_sys->txt );
 
     /* Find the total length of the vobsubs */
+    p_sys->i_length = 0;
     if( p_sys->i_tracks > 0 )
     {
         for( int i = 0; i < p_sys->i_tracks; i++ )
@@ -174,10 +174,12 @@ static int Open ( vlc_object_t *p_this )
             if( p_sys->track[i].i_subtitles > 1 )
             {
                 if( p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start > p_sys->i_length )
-                    p_sys->i_length = (int64_t) p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start + VLC_TICK_FROM_SEC( 1 );
+                    p_sys->i_length = p_sys->track[i].p_subtitles[p_sys->track[i].i_subtitles-1].i_start;
             }
         }
     }
+    if ( p_sys->i_length != 0)
+        p_sys->i_length += VLC_TICK_FROM_SEC( 1 );
 
     psz_vobname = strdup( p_demux->psz_url );
     if( psz_vobname == NULL )
