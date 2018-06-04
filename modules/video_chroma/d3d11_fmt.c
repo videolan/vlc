@@ -273,12 +273,9 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                     D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
                     &out->d3ddevice, &out->feature_level, &out->d3dcontext);
         if (SUCCEEDED(hr)) {
-#ifndef NDEBUG
-            msg_Dbg(obj, "Created the D3D11 device 0x%p ctx 0x%p type %d level %x.",
-                    (void *)out->d3ddevice, (void *)out->d3dcontext,
+            msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
                     driverAttempts[driver], out->feature_level);
             D3D11_GetDriverVersion( obj, out );
-#endif
             /* we can work with legacy levels but only if forced */
             if ( obj->obj.force || out->feature_level >= D3D_FEATURE_LEVEL_11_0 )
                 break;
