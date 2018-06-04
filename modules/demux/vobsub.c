@@ -84,7 +84,7 @@ typedef struct
     int         i_subtitles;
     subtitle_t  *p_subtitles;
 
-    int64_t     i_delay;
+    vlc_tick_t  i_delay;
 } vobsub_track_t;
 
 typedef struct
@@ -557,7 +557,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
             current_tk->i_subtitles = 0;
             current_tk->p_subtitles = xmalloc( sizeof( subtitle_t ) );
             current_tk->i_track_id = i_track_id;
-            current_tk->i_delay = (int64_t)0;
+            current_tk->i_delay = (vlc_tick_t)0;
 
             es_format_Init( &fmt, SPU_ES, VLC_CODEC_SPU );
             fmt.subs.spu.i_original_frame_width = p_sys->i_original_frame_width;
@@ -620,7 +620,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
              */
             int h, m, s, ms, count = 0;
             int i_sign = 1;
-            int64_t i_gap = 0;
+            vlc_tick_t i_gap = 0;
 
             if( p_sys->i_tracks > 0 &&
                 sscanf( line, "%*celay: %d%n:%d:%d:%d",
@@ -634,7 +634,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 }
                 i_gap = vlc_tick_from_sec( h * 3600 + m * 60 + s ) + VLC_TICK_FROM_MS( ms );
 
-                current_tk->i_delay = current_tk->i_delay + (i_gap * i_sign);
+                current_tk->i_delay += i_gap * i_sign;
                 msg_Dbg( p_demux, "sign: %+d gap: %+"PRId64" global delay: %+"PRId64"",
                          i_sign, i_gap, current_tk->i_delay );
             }
