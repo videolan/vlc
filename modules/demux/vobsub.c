@@ -580,7 +580,8 @@ static int ParseVobSubIDX( demux_t *p_demux )
              */
             int h, m, s, ms, count, loc = 0;
             int i_sign = 1;
-            int64_t i_start, i_location = 0;
+            vlc_tick_t i_start;
+            int64_t i_location = 0;
 
             if( p_sys->i_tracks > 0 &&
                 sscanf( line, "timestamp: %d%n:%d:%d:%d, filepos: %x",
