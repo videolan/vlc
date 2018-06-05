@@ -551,6 +551,7 @@ static void SetupQuadCube(d3d_vertex_t *dst_data, const RECT *output,
 bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad,
                                 const RECT *output, video_orientation_t orientation )
 {
+    bool result = true;
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -587,13 +588,13 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
         break;
     default:
         msg_Warn(o, "Projection mode %d not handled", quad->projection);
-        return false;
+        result = false;
     }
 
     ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0);
     ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
 
-    return true;
+    return result;
 }
 
 static bool ShaderUpdateConstants(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, size_t index, void *new_buf)
