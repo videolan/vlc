@@ -129,7 +129,12 @@ static int  Ogg_ReadPage     ( demux_t *, ogg_page * );
 static void Ogg_DecodePacket ( demux_t *, logical_stream_t *, ogg_packet * );
 static unsigned Ogg_OpusPacketDuration( ogg_packet * );
 static void Ogg_QueueBlocks( demux_t *, logical_stream_t *, block_t * );
-static void Ogg_SendQueuedBlocks( demux_t *, logical_stream_t * );
+static void Ogg_SendQueuedBlock( demux_t *, logical_stream_t * );
+
+static inline bool Ogg_HasQueuedBlocks( const logical_stream_t *p_stream )
+{
+    return ( p_stream->queue.p_blocks != NULL );
+}
 
 static void Ogg_CreateES( demux_t *p_demux );
 static int Ogg_BeginningOfStream( demux_t *p_demux );
@@ -336,17 +341,27 @@ static void Ogg_OutputQueues( demux_t *p_demux, bool b_drain )
 
     if( p_sys->i_pcr != VLC_TS_INVALID )
     {
-        for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
-            Ogg_SendQueuedBlocks( p_demux, p_sys->pp_stream[i_stream] );
-
-        /* Generate Current PCR */
-        i_pcr = Ogg_GeneratePCR( p_demux, b_drain );
-        if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
+        bool b_continue;
+        do
         {
-            p_sys->i_pcr = i_pcr;
-            if( likely( !p_sys->b_slave ) )
-                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-        }
+            b_continue = false;
+            for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+            {
+                logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+                if( Ogg_HasQueuedBlocks( p_stream ) )
+                    Ogg_SendQueuedBlock( p_demux, p_stream );
+                b_continue |= Ogg_HasQueuedBlocks( p_stream );
+            }
+
+            /* Generate Current PCR */
+            i_pcr = Ogg_GeneratePCR( p_demux, b_drain );
+            if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
+            {
+                p_sys->i_pcr = i_pcr;
+                if( likely( !p_sys->b_slave ) )
+                    es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+            }
+        } while ( b_continue );
     }
 }
 
@@ -1071,11 +1086,11 @@ static void Ogg_QueueBlocks( demux_t *p_demux, logical_stream_t *p_stream, block
                          (char*)&p_stream->fmt.i_codec, p_block->i_dts, p_stream->i_pcr, p_sys->i_pcr ); )
 }
 
-static void Ogg_SendQueuedBlocks( demux_t *p_demux, logical_stream_t *p_stream )
+static void Ogg_SendQueuedBlock( demux_t *p_demux, logical_stream_t *p_stream )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    while( p_stream->queue.p_blocks )
+    if( Ogg_HasQueuedBlocks( p_stream ) )
     {
         block_t *p_queued = p_stream->queue.p_blocks;
         p_stream->queue.p_blocks = p_queued->p_next;
@@ -1090,7 +1105,7 @@ static void Ogg_SendQueuedBlocks( demux_t *p_demux, logical_stream_t *p_stream )
                 p_stream->fmt.i_extra > 0 )  /* Don't send metadata if configured by extradata */
             {
                 block_Release( p_queued );
-                continue;
+                goto end;
             }
             p_queued->i_flags &= ~BLOCK_FLAG_HEADER;
         }
@@ -1131,8 +1146,9 @@ static void Ogg_SendQueuedBlocks( demux_t *p_demux, logical_stream_t *p_stream )
             block_Release( p_queued );
     }
 
-    assert( p_stream->queue.p_blocks == NULL );
-    p_stream->queue.pp_append = &p_stream->queue.p_blocks;
+end:
+    if( p_stream->queue.p_blocks == NULL )
+        p_stream->queue.pp_append = &p_stream->queue.p_blocks;
 }
 
 static bool Ogg_IsHeaderPacket( const logical_stream_t *p_stream,
