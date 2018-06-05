@@ -1024,7 +1024,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
             {
                 vars.obj->p_segment_uid = new KaxSegmentUID( uid );
             }
-            debug( vars, "UID=%x", *reinterpret_cast<uint32*>( vars.obj->p_segment_uid->GetBuffer() ) );
+            debug( vars, "UID=%" PRIx64, *reinterpret_cast<uint64*>( vars.obj->p_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxPrevUID, uid )
         {
@@ -1033,7 +1033,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 vars.obj->p_prev_segment_uid = new KaxPrevUID( uid );
                 vars.obj->b_ref_external_segments = true;
             }
-            debug( vars, "PrevUID=%x", *reinterpret_cast<uint32*>( vars.obj->p_prev_segment_uid->GetBuffer() ) );
+            debug( vars, "PrevUID=%" PRIx64, *reinterpret_cast<uint64*>( vars.obj->p_prev_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxNextUID, uid )
         {
@@ -1042,7 +1042,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
                 vars.obj->p_next_segment_uid = new KaxNextUID( uid );
                 vars.obj->b_ref_external_segments = true;
             }
-            debug( vars, "NextUID=%x", *reinterpret_cast<uint32*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
+            debug( vars, "NextUID=%" PRIx64, *reinterpret_cast<uint64*>( vars.obj->p_next_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxTimecodeScale, tcs )
         {
@@ -1077,7 +1077,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         E_CASE( KaxSegmentFamily, uid )
         {
             vars.obj->families.push_back( new KaxSegmentFamily(uid) );
-            debug( vars, "Family=%x", *reinterpret_cast<uint32*>( uid.GetBuffer() ) );
+            debug( vars, "Family=%" PRIx64, *reinterpret_cast<uint64*>( uid.GetBuffer() ) );
         }
         E_CASE( KaxDateUTC, date )
         {
@@ -1197,7 +1197,7 @@ void matroska_segment_c::ParseChapterAtom( int i_level, KaxChapterAtom *ca, chap
             vars.chapters.p_segment_uid = new KaxChapterSegmentUID( uid );
             vars.obj->b_ref_external_segments = true;
 
-            debug( vars, "ChapterSegmentUID=%x", *reinterpret_cast<uint32*>( vars.chapters.p_segment_uid->GetBuffer() ) );
+            debug( vars, "ChapterSegmentUID=%" PRIx64, *reinterpret_cast<uint64*>( vars.chapters.p_segment_uid->GetBuffer() ) );
         }
         E_CASE( KaxChapterSegmentEditionUID, euid )
         {
