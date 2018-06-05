@@ -614,8 +614,7 @@ static void CloseDecoder( vlc_object_t *p_this )
 static void theora_CopyPicture( picture_t *p_pic,
                                 th_ycbcr_buffer ycbcr )
 {
-    int i_plane, i_planes, i_line, i_dst_stride, i_src_stride;
-    uint8_t *p_dst, *p_src;
+    int i_plane, i_planes;
     /* th_img_plane
        int  width   The width of this plane.
        int  height  The height of this plane.
@@ -637,21 +636,16 @@ static void theora_CopyPicture( picture_t *p_pic,
        typedef th_img_plane th_ycbcr_buffer[3]
     */
 
-    i_planes = p_pic->i_planes < 3 ? p_pic->i_planes : 3;
+    i_planes = __MIN(p_pic->i_planes, 3);
     for( i_plane = 0; i_plane < i_planes; i_plane++ )
     {
-        p_dst = p_pic->p[i_plane].p_pixels;
-        p_src = ycbcr[i_plane].data;
-        i_dst_stride  = p_pic->p[i_plane].i_pitch;
-        i_src_stride  = ycbcr[i_plane].stride;
-        for( i_line = 0;
-             i_line < __MIN(p_pic->p[i_plane].i_lines, ycbcr[i_plane].height);
-             i_line++ )
-        {
-            memcpy( p_dst, p_src, ycbcr[i_plane].width );
-            p_src += i_src_stride;
-            p_dst += i_dst_stride;
-        }
+        plane_t src;
+        src.i_lines = ycbcr[i_plane].height;
+        src.p_pixels = ycbcr[i_plane].data;
+        src.i_pitch = ycbcr[i_plane].stride;
+        src.i_visible_pitch = src.i_pitch;
+        src.i_visible_lines = src.i_lines;
+        plane_CopyPixels( &p_pic->p[i_plane], &src );
     }
 }
 
