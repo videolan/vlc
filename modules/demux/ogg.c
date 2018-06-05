@@ -272,8 +272,24 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static mtime_t Ogg_GetLastDTS( demux_t * p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-static mtime_t Ogg_GeneratePCR( demux_t * p_demux )
+    mtime_t i_dts = VLC_TS_INVALID;
+    for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+    {
+        logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
+        if ( p_stream->b_initializing )
+            continue;
+        if( p_stream->i_pcr > i_dts )
+            i_dts = p_stream->i_pcr;
+    }
+
+    return i_dts;
+}
+
+static mtime_t Ogg_GeneratePCR( demux_t * p_demux, bool b_drain )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     /* We will consider the lowest PCR among tracks, because the audio core badly
@@ -283,17 +299,16 @@ static mtime_t Ogg_GeneratePCR( demux_t * p_demux )
     for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-
         if( p_stream->fmt.i_cat == SPU_ES )
             continue;
         if( p_stream->fmt.i_codec == VLC_CODEC_OGGSPOTS )
             continue;
         if( p_stream->i_pcr == VLC_TS_INVALID )
             continue;
-        if ( p_stream->b_finished || p_stream->b_initializing )
+        if ( (!b_drain && p_stream->b_finished) || p_stream->b_initializing )
             continue;
-        if( i_pcr_candidate == VLC_TS_INVALID
-            || p_stream->i_pcr <= i_pcr_candidate )
+        if( i_pcr_candidate == VLC_TS_INVALID ||
+            p_stream->i_pcr <= i_pcr_candidate )
         {
             i_pcr_candidate = p_stream->i_pcr;
         }
@@ -301,6 +316,40 @@ static mtime_t Ogg_GeneratePCR( demux_t * p_demux )
 
     return i_pcr_candidate;
 }
+
+static void Ogg_OutputQueues( demux_t *p_demux, bool b_drain )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    mtime_t i_pcr;
+
+    /* Generate First PCR */
+    if( p_sys->i_pcr == VLC_TS_INVALID )
+    {
+        i_pcr = Ogg_GeneratePCR( p_demux, b_drain );
+        if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
+        {
+            p_sys->i_pcr = i_pcr;
+            if( likely( !p_sys->b_slave ) )
+                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+        }
+    }
+
+    if( p_sys->i_pcr != VLC_TS_INVALID )
+    {
+        for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
+            Ogg_SendQueuedBlocks( p_demux, p_sys->pp_stream[i_stream] );
+
+        /* Generate Current PCR */
+        i_pcr = Ogg_GeneratePCR( p_demux, b_drain );
+        if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
+        {
+            p_sys->i_pcr = i_pcr;
+            if( likely( !p_sys->b_slave ) )
+                es_out_SetPCR( p_demux->out, p_sys->i_pcr );
+        }
+    }
+}
+
 
 /*****************************************************************************
  * Demux: reads and demuxes data packets
@@ -327,13 +376,9 @@ static int Demux( demux_t * p_demux )
         {
             msg_Dbg( p_demux, "end of a group of %d logical streams", p_sys->i_streams );
 
-            mtime_t i_lastpcr = VLC_TS_INVALID;
-            for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
-            {
-                logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
-                if( p_stream->i_pcr > i_lastpcr )
-                    i_lastpcr = p_stream->i_pcr;
-            }
+            Ogg_OutputQueues( p_demux, true );
+
+            mtime_t i_lastdts = Ogg_GetLastDTS( p_demux );
 
             /* We keep the ES to try reusing it in Ogg_BeginningOfStream
              * only 1 ES is supported (common case for ogg web radio) */
@@ -348,11 +393,11 @@ static int Demux( demux_t * p_demux )
             Ogg_EndOfStream( p_demux );
             p_sys->b_chained_boundary = true;
 
-            if( i_lastpcr != VLC_TS_INVALID )
+            if( i_lastdts != VLC_TS_INVALID )
             {
-                p_sys->i_nzpcr_offset = i_lastpcr - VLC_TS_0;
+                p_sys->i_nzpcr_offset = i_lastdts - VLC_TS_0;
                 if( likely( !p_sys->b_slave ) )
-                    es_out_SetPCR( p_demux->out, i_lastpcr );
+                    es_out_SetPCR( p_demux->out, i_lastdts );
             }
             p_sys->i_pcr = VLC_TS_INVALID;
         }
@@ -539,36 +584,7 @@ static int Demux( demux_t * p_demux )
     }
 
     if( p_sys->b_preparsing_done )
-    {
-        mtime_t i_pcr;
-
-        /* Generate First PCR */
-        if( p_sys->i_pcr == VLC_TS_INVALID )
-        {
-            i_pcr = Ogg_GeneratePCR( p_demux );
-            if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
-            {
-                p_sys->i_pcr = i_pcr;
-                if( likely( !p_sys->b_slave ) )
-                    es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-            }
-        }
-
-        if( p_sys->i_pcr != VLC_TS_INVALID )
-        {
-            for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
-                Ogg_SendQueuedBlocks( p_demux, p_sys->pp_stream[i_stream] );
-
-            /* Generate Current PCR */
-            i_pcr = Ogg_GeneratePCR( p_demux );
-            if( i_pcr != VLC_TS_INVALID && i_pcr != p_sys->i_pcr )
-            {
-                p_sys->i_pcr = i_pcr;
-                if( likely( !p_sys->b_slave ) )
-                    es_out_SetPCR( p_demux->out, p_sys->i_pcr );
-            }
-        }
-    }
+        Ogg_OutputQueues( p_demux, false );
 
     return VLC_DEMUXER_SUCCESS;
 }
