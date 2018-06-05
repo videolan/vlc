@@ -309,11 +309,8 @@ static int ProcessHeaders( decoder_t *p_dec )
         p_dec->fmt_out.video.i_visible_width = p_sys->ti.pic_width;
         p_dec->fmt_out.video.i_visible_height = p_sys->ti.pic_height;
 
-        if( p_sys->ti.pic_x || p_sys->ti.pic_y )
-        {
-            p_dec->fmt_out.video.i_x_offset = p_sys->ti.pic_x;
-            p_dec->fmt_out.video.i_y_offset = p_sys->ti.pic_y;
-        }
+        p_dec->fmt_out.video.i_x_offset = p_sys->ti.pic_x;
+        p_dec->fmt_out.video.i_y_offset = p_sys->ti.pic_y;
     }
 
     if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
