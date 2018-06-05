@@ -1021,6 +1021,8 @@ static mtime_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_strea
             }
 #endif
             default:
+                if( p_stream->fmt.i_cat == VIDEO_ES )
+                    p_block->i_nb_samples = 1;
                 break;
         }
         i_total_samples += p_block->i_nb_samples;
