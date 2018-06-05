@@ -16,7 +16,6 @@ harfbuzz: harfbuzz-$(HARFBUZZ_VERSION).tar.bz2 .sum-harfbuzz
 	$(UNPACK)
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-aarch64.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-clang.patch
-	$(APPLY) $(SRC)/harfbuzz/0001-Skip-using-the-_BitScan-intrinsics-on-mingw.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-freetype-detect.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-no-tests.patch
 	$(APPLY) $(SRC)/harfbuzz/harfbuzz-fix-coretext-detection.patch
