@@ -55,9 +55,9 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block->i_buffer == kBufferSize )
     {
         msg_Dbg( p_dec, "got %"PRIu64" ms",
-                 *(vlc_tick_t *)p_block->p_buffer  / 1000 );
+                 MS_FROM_VLC_TICK(*(vlc_tick_t *)p_block->p_buffer) );
         msg_Dbg( p_dec, "got %"PRIu64" ms offset",
-                 (vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) / 1000 );
+                 MS_FROM_VLC_TICK(vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) );
         *(vlc_tick_t *)(p_pic->p->p_pixels) = *(vlc_tick_t *)p_block->p_buffer;
     }
     else
@@ -108,7 +108,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     p_block->i_dts = p_pict->date;
 
     msg_Dbg( p_enc, "putting %"PRIu64"ms",
-             *(vlc_tick_t*)p_block->p_buffer / 1000 );
+             MS_FROM_VLC_TICK(*(vlc_tick_t*)p_block->p_buffer) );
     return p_block;
 }
 
@@ -152,7 +152,7 @@ static int Demux( demux_t *p_demux )
     p_block->i_dts = p_block->i_pts = date_Increment( &p_sys->pts, kBufferSize );
 
     msg_Dbg( p_demux, "demux got %"PRId64" ms offset",
-             (vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) / 1000 );
+             MS_FROM_VLC_TICK(vlc_tick_now() - *(vlc_tick_t *)p_block->p_buffer) );
 
     //es_out_SetPCR( p_demux->out, p_block->i_pts );
 

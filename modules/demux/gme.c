@@ -272,7 +272,7 @@ static int Control (demux_t *demux, int query, va_list args)
              || (sys->titlev[sys->track_id]->i_length == 0))
                 break;
 
-            int seek = (sys->titlev[sys->track_id]->i_length / 1000) * pos;
+            int seek = MS_FROM_VLC_TICK(sys->titlev[sys->track_id]->i_length) * pos;
             if (gme_seek (sys->emu, seek))
                 break;
             return VLC_SUCCESS;
