@@ -684,7 +684,7 @@ aviindex:
         AVI_IndexLoad( p_demux );
     }
 
-    /* *** movie length in sec *** */
+    /* *** movie length in vlc_tick_t *** */
     p_sys->i_length = AVI_MovieGetLength( p_demux );
 
     /* Check the index completeness */
@@ -697,8 +697,7 @@ aviindex:
     }
     if( i_idx_totalframes != p_avih->i_totalframes &&
         p_sys->i_length < VLC_TICK_FROM_US( p_avih->i_totalframes *
-                                            p_avih->i_microsecperframe ) /
-                          CLOCK_FREQ )
+                                            p_avih->i_microsecperframe ) )
     {
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
                            "approximative or will exhibit strange behavior" );
@@ -945,12 +944,10 @@ static int Demux_Seekable( demux_t *p_demux )
 
     if( i_track_count <= 0 )
     {
-        int64_t i_length = vlc_tick_from_sec( p_sys->i_length );
-
         p_sys->i_time += p_sys->i_read_increment;
         if( p_sys->i_length != 0 )
         {
-            if( p_sys->i_time >= i_length )
+            if( p_sys->i_time >= p_sys->i_length )
                 return VLC_DEMUXER_EOF;
             return VLC_DEMUXER_SUCCESS;
         }
@@ -1576,7 +1573,7 @@ static double ControlGetPosition( demux_t *p_demux )
 
     if( p_sys->i_length != 0 )
     {
-        return (double)p_sys->i_time / (double)( p_sys->i_length * (vlc_tick_t)CLOCK_FREQ );
+        return (double)p_sys->i_time / (double)p_sys->i_length;
     }
     else if( stream_Size( p_demux->s ) > 0 )
     {
@@ -1613,7 +1610,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
             {
-                i64 = vlc_tick_from_sec( f * p_sys->i_length );
+                i64 = f * p_sys->i_length;
                 return Seek( p_demux, i64, f, b );
             }
 
@@ -1633,7 +1630,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_length != 0 )
             {
-                f = (double)i64 / (p_sys->i_length*CLOCK_FREQ);
+                f = (double)i64 / p_sys->i_length;
             }
             else if( p_sys->i_time > 0 )
             {
@@ -1643,7 +1640,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return Seek( p_demux, i64, f, b );
         }
         case DEMUX_GET_LENGTH:
-            *va_arg( args, vlc_tick_t * ) = vlc_tick_from_sec(p_sys->i_length);
+            *va_arg( args, vlc_tick_t * ) = p_sys->i_length;
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
@@ -2976,7 +2973,7 @@ static int AVI_TrackStopFinishedStreams( demux_t *p_demux )
 }
 
 /****************************************************************************
- * AVI_MovieGetLength give max streams length in second
+ * AVI_MovieGetLength give max streams length in ticks
  ****************************************************************************/
 static vlc_tick_t  AVI_MovieGetLength( demux_t *p_demux )
 {
@@ -3005,7 +3002,6 @@ static vlc_tick_t  AVI_MovieGetLength( demux_t *p_demux )
         {
             i_length = AVI_GetDPTS( tk, tk->idx.i_size );
         }
-        i_length /= CLOCK_FREQ;    /* in seconds */
 
         msg_Dbg( p_demux,
                  "stream[%d] length:%"PRId64" (based on index)",
