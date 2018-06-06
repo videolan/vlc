@@ -1156,7 +1156,7 @@ static block_t *asf_packet_flush( sout_mux_t *p_mux )
     bo_add_u8( &bo, 0x11 );
     bo_add_u8( &bo, 0x5d );
     bo_addle_u16( &bo, i_pad );
-    bo_addle_u32( &bo, (p_sys->i_pk_dts - p_sys->i_dts_first) / 1000 +
+    bo_addle_u32( &bo, MS_FROM_VLC_TICK(p_sys->i_pk_dts - p_sys->i_dts_first) +
                   p_sys->i_preroll_time );
     bo_addle_u16( &bo, 0 /* data->i_length */ );
     bo_add_u8( &bo, 0x80 | p_sys->i_pk_frame );
@@ -1216,7 +1216,7 @@ static block_t *asf_packet_create( sout_mux_t *p_mux,
         bo_addle_u32( &bo, i_pos );
         bo_add_u8   ( &bo, 0x08 );  /* flags */
         bo_addle_u32( &bo, i_data );
-        bo_addle_u32( &bo, (data->i_dts - p_sys->i_dts_first) / 1000 +
+        bo_addle_u32( &bo, MS_FROM_VLC_TICK(data->i_dts - p_sys->i_dts_first) +
                       p_sys->i_preroll_time );
         bo_addle_u16( &bo, i_payload );
         bo_add_mem  ( &bo, &p_data[i_pos], i_payload );
