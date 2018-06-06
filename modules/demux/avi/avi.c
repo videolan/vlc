@@ -948,7 +948,7 @@ static int Demux_Seekable( demux_t *p_demux )
         int64_t i_length = vlc_tick_from_sec( p_sys->i_length );
 
         p_sys->i_time += p_sys->i_read_increment;
-        if( i_length > 0 )
+        if( p_sys->i_length != 0 )
         {
             if( p_sys->i_time >= i_length )
                 return VLC_DEMUXER_EOF;
@@ -1449,7 +1449,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, double f_ratio, bool b_acc
             p_sys->b_indexloaded = true; /* we don't want to try each time */
         }
 
-        if( !p_sys->i_length )
+        if( p_sys->i_length == 0 )
         {
             avi_track_t *p_stream = NULL;
             unsigned i_stream = 0;
@@ -1574,7 +1574,7 @@ static double ControlGetPosition( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_sys->i_length > 0 )
+    if( p_sys->i_length != 0 )
     {
         return (double)p_sys->i_time / (double)( p_sys->i_length * (vlc_tick_t)CLOCK_FREQ );
     }
@@ -1632,7 +1632,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 return VLC_EGENERIC;
             }
-            else if( p_sys->i_length > 0 )
+            else if( p_sys->i_length != 0 )
             {
                 f = (double)i64 / (p_sys->i_length*CLOCK_FREQ);
             }
