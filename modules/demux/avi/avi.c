@@ -1740,10 +1740,12 @@ static vlc_tick_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
     vlc_tick_t i_dpts = 0;
 
     if( !tk->i_rate )
-        return i_dpts;
+        return 0;
 
-    if( tk->i_scale )
-        i_dpts = AVI_Rescale( vlc_tick_from_sec( i_count ), tk->i_rate, tk->i_scale );
+    if( !tk->i_scale )
+        return 0;
+
+    i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
 
     if( tk->i_samplesize )
     {
