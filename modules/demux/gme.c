@@ -150,7 +150,7 @@ static int Open (vlc_object_t *obj)
              continue;
          msg_Dbg (obj, "track %u: %s %d ms", i, infos->song, infos->length);
          if (infos->length != -1)
-             title->i_length = infos->length * INT64_C(1000);
+             title->i_length = VLC_TICK_FROM_MS(infos->length);
          if (infos->song[0])
              title->psz_name = strdup (infos->song);
          gme_free_info (infos);
