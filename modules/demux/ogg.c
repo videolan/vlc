@@ -1889,10 +1889,13 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         msg_Dbg( p_demux, "found video header of type: %.4s",
                                  (char *)&p_stream->fmt.i_codec );
 
+                        /* FIXME: no clue where it's from */
                         if( st->time_unit <= 0 )
                             st->time_unit = 400000;
-                        unsigned num,den;
-                        vlc_ureduce( &num, &den, OGGDS_RESOLUTION, st->time_unit,
+                        unsigned num, den;
+                        vlc_ureduce( &num, &den,
+                                     st->samples_per_unit * OGGDS_RESOLUTION,
+                                     st->time_unit > 0 ? st->time_unit : OGGDS_RESOLUTION,
                                      OGGDS_RESOLUTION );
                         date_Init( &p_stream->dts, num, den );
                         p_stream->fmt.video.i_frame_rate = num;
@@ -1949,6 +1952,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                         i_format_tag = strtol(p_buffer,NULL,16);
                         p_stream->fmt.audio.i_channels = st->sh.audio.channels;
                         fill_channels_info(&p_stream->fmt.audio);
+
                         unsigned num,den;
                         vlc_ureduce( &num, &den,
                                      st->samples_per_unit * OGGDS_RESOLUTION,
