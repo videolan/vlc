@@ -104,7 +104,7 @@ typedef struct
     es_out_id_t *es;
     vlc_tick_t  duration;
     bool        is_realtime;
-    int64_t     pts_offset;
+    vlc_tick_t  pts_offset;
     vlc_tick_t  pts_next;
     date_t        pts;
 } demux_sys_t;
