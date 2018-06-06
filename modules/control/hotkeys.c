@@ -156,7 +156,7 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     (void) psz_var;
 
-    if (newval.i_int & (1 << MOUSE_BUTTON_LEFT))
+    if ((newval.i_int & (1 << MOUSE_BUTTON_LEFT)) && p_sys->vrnav.b_can_change)
     {
         if( !p_sys->vrnav.b_button_pressed )
         {
@@ -218,26 +218,23 @@ static void ChangeVout( intf_thread_t *p_intf, vout_thread_t *p_vout )
     if( p_old_vout != NULL )
     {
         if( b_vrnav_could_change )
-        {
-            var_DelCallback( p_old_vout, "mouse-moved", MovedEvent,
-                             p_intf );
-            var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
-                             p_intf );
             var_DelCallback( p_old_vout, "viewpoint-moved", ViewpointMovedEvent,
                              p_intf );
-        }
+
+        var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
+                         p_intf );
+        var_DelCallback( p_old_vout, "mouse-moved", MovedEvent, p_intf );
         vlc_object_release( p_old_vout );
     }
 
-    if( p_sys->vrnav.b_can_change )
+    if( p_vout != NULL )
     {
-        assert( p_sys->p_vout != NULL );
-        var_AddCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
-                         p_intf );
-        var_AddCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,
-                         p_intf );
-        var_AddCallback( p_sys->p_vout, "viewpoint-moved", ViewpointMovedEvent,
-                         p_intf );
+        var_AddCallback( p_vout, "mouse-moved", MovedEvent, p_intf );
+        var_AddCallback( p_vout, "mouse-button-down", ButtonEvent, p_intf );
+
+        if( p_sys->vrnav.b_can_change )
+            var_AddCallback( p_vout, "viewpoint-moved",
+                             ViewpointMovedEvent, p_intf );
     }
 }
 
@@ -270,13 +267,15 @@ static void ChangeInput( intf_thread_t *p_intf, input_thread_t *p_input )
         p_old_vout = p_sys->p_vout;
         /* Remove mouse events before setting new input, since callbacks may
          * access it */
-        if( p_old_vout != NULL && p_sys->vrnav.b_can_change )
+        if( p_old_vout != NULL )
         {
-            var_DelCallback( p_old_vout, "mouse-moved", MovedEvent,
-                             p_intf );
+            if( p_sys->vrnav.b_can_change )
+                var_DelCallback( p_old_vout, "viewpoint-moved",
+                                 ViewpointMovedEvent, p_intf );
+
             var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
                              p_intf );
-            var_DelCallback( p_old_vout, "viewpoint-moved", ViewpointMovedEvent,
+            var_DelCallback( p_old_vout, "mouse-moved", MovedEvent,
                              p_intf );
         }
     }
