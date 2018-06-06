@@ -202,9 +202,12 @@ static void ChangeVout( intf_thread_t *p_intf, vout_thread_t *p_vout )
         b_vrnav_can_change = var_GetBool( p_vout, "viewpoint-changeable" );
     }
 
-    vlc_mutex_lock( &p_sys->lock );
     vout_thread_t *p_old_vout = p_sys->p_vout;
-    bool b_vrnav_could_change = p_sys->vrnav.b_can_change;
+    if( p_old_vout != NULL && p_sys->vrnav.b_can_change )
+        var_DelCallback( p_old_vout, "viewpoint-moved", ViewpointMovedEvent,
+                         p_intf );
+
+    vlc_mutex_lock( &p_sys->lock );
     p_sys->p_vout = p_vout;
     if( p_vout != NULL )
     {
@@ -217,10 +220,6 @@ static void ChangeVout( intf_thread_t *p_intf, vout_thread_t *p_vout )
 
     if( p_old_vout != NULL )
     {
-        if( b_vrnav_could_change )
-            var_DelCallback( p_old_vout, "viewpoint-moved", ViewpointMovedEvent,
-                             p_intf );
-
         var_DelCallback( p_old_vout, "mouse-button-down", ButtonEvent,
                          p_intf );
         var_DelCallback( p_old_vout, "mouse-moved", MovedEvent, p_intf );
