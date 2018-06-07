@@ -121,7 +121,7 @@ typedef struct
 
     guid_t  i_stream_type;
     guid_t  i_error_correction_type;
-    uint64_t     i_time_offset;
+    msftime_t    i_time_offset;
     uint32_t     i_type_specific_data_length;
     uint32_t     i_error_correction_data_length;
     uint16_t     i_flags;

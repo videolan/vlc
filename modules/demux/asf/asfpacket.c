@@ -337,12 +337,12 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         vlc_tick_t i_payload_pts;
         i_payload_pts = i_pkt_time + (vlc_tick_t)i_pkt_time_delta * i_subpayload_count * 1000;
         if ( p_tkinfo->p_sp )
-            i_payload_pts -= p_tkinfo->p_sp->i_time_offset * 10;
+            i_payload_pts -= VLC_TICK_FROM_MSFTIME(p_tkinfo->p_sp->i_time_offset);
 
         vlc_tick_t i_payload_dts = i_pkt_time;
 
         if ( p_tkinfo->p_sp )
-            i_payload_dts -= p_tkinfo->p_sp->i_time_offset * 10;
+            i_payload_dts -= VLC_TICK_FROM_MSFTIME(p_tkinfo->p_sp->i_time_offset);
 
         if ( i_sub_payload_data_length &&
              DemuxSubPayload( p_packetsys, i_stream_number, &p_tkinfo->p_frame,
