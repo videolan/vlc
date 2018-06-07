@@ -82,7 +82,7 @@ typedef struct
 {
     ASF_OBJECT_COMMON
     guid_t      i_file_id;
-    uint64_t    i_index_entry_time_interval;
+    msftime_t   i_index_entry_time_interval;
     uint32_t    i_max_packet_count;
     uint32_t    i_index_entry_count;
 
