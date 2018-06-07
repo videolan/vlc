@@ -106,8 +106,7 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
 static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
                                     const asf_track_info_t *p_tkinfo,
                                     const uint8_t *p_data, size_t i_data,
-                                    bool *b_keyframe,
-                                    int64_t *pi_extension_pts )
+                                    bool *b_keyframe )
 {
     demux_t *p_demux = p_packetsys->p_demux;
 
@@ -166,9 +165,7 @@ static void ParsePayloadExtensions( asf_packet_sys_t *p_packetsys,
         else if ( guidcmp( &p_ext->i_extension_id, &asf_dvr_sampleextension_timing_rep_data_guid ) )
         {
             if ( i_payload_extensions_size != 48 ) goto sizeerror;
-            const int64_t i_pts = GetQWLE(&p_data[8]);
-            if(i_pts != -1)
-                *pi_extension_pts = i_pts / 10000;
+            /* const int64_t i_pts = GetQWLE(&p_data[8]); */
         }
 #if 0
         else
@@ -212,7 +209,6 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
 
     int64_t i_pkt_time;
     uint8_t i_pkt_time_delta = 0;
-    int64_t i_extension_pts = -1;
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
     *p_packetsys->pi_preroll = __MIN( *p_packetsys->pi_preroll, INT64_MAX );
@@ -240,11 +236,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         ParsePayloadExtensions( p_packetsys, p_tkinfo,
                                 &pkt->p_peek[pkt->i_skip + 8],
                                 i_replicated_data_length - 8,
-                                &b_packet_keyframe,
-                                &i_extension_pts );
+                                &b_packet_keyframe );
         i_pkt_time -= *p_packetsys->pi_preroll;
-        if(i_extension_pts != -1)
-            i_extension_pts -= *p_packetsys->pi_preroll;
         pkt->i_skip += i_replicated_data_length;
     }
     else if ( i_replicated_data_length == 0 )
@@ -302,8 +295,8 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
      msg_Dbg( p_demux,
-              "  extpts=%"PRId64" pkttime=%"PRId64" st=%"PRIu32,
-              (i_extension_pts >= 0) ? i_extension_pts * 1000 : -1, i_pkt_time, pkt->send_time );
+              "  pkttime=%"PRId64" st=%"PRIu32,
+              i_pkt_time, pkt->send_time );
 #endif
 
      if( ! i_payload_data_length || i_payload_data_length > pkt->left )
@@ -342,19 +335,9 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         SkipBytes( p_demux->s, pkt->i_skip );
 
         mtime_t i_payload_pts;
-#if 0
-        if( i_extension_pts != -1 )
-        {
-            i_payload_pts = i_extension_pts * 1000;
-            b_ignore_pts = false;
-        }
-        else
-#endif
-        {
-            i_payload_pts = i_pkt_time + (mtime_t)i_pkt_time_delta * i_subpayload_count * 1000;
-            if ( p_tkinfo->p_sp )
-                i_payload_pts -= p_tkinfo->p_sp->i_time_offset * 10;
-        }
+        i_payload_pts = i_pkt_time + (mtime_t)i_pkt_time_delta * i_subpayload_count * 1000;
+        if ( p_tkinfo->p_sp )
+            i_payload_pts -= p_tkinfo->p_sp->i_time_offset * 10;
 
         mtime_t i_payload_dts = i_pkt_time;
 
