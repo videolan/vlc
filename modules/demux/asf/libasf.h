@@ -281,7 +281,7 @@ typedef struct
     uint32_t i_flags;
     uint16_t i_stream_number;
     uint16_t i_language_index;
-    uint64_t i_average_time_per_frame;
+    msftime_t i_average_time_per_frame;
 
     uint16_t i_stream_name_count;
 

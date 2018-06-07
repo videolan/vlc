@@ -317,9 +317,9 @@ static void WaitKeyframe( demux_t *p_demux )
         {
             /* 1 min if fastseek, otherwise 5 sec */
             /* That's a guess for bandwidth */
-            uint64_t i_maxwaittime = ( p_sys->b_canfastseek ) ? 600000000 : 50000000;
-            i_maxwaittime /= tk->info.p_esp->i_average_time_per_frame;
-            p_sys->i_wait_keyframe = __MIN( i_maxwaittime, UINT_MAX );
+            msftime_t i_maxwaittime = MSFTIME_FROM_SEC( p_sys->b_canfastseek ? 60 : 5);
+            uint64_t frames = i_maxwaittime / tk->info.p_esp->i_average_time_per_frame;
+            p_sys->i_wait_keyframe = __MIN( frames, UINT_MAX );
         }
         else
         {
