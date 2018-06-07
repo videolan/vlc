@@ -109,10 +109,6 @@ playlist_item_t * get_current_status_node( playlist_t * p_playlist );
 void set_current_status_item( playlist_t *, playlist_item_t * );
 void set_current_status_node( playlist_t *, playlist_item_t * );
 
-/* Load/Save */
-int playlist_MLLoad( playlist_t *p_playlist );
-int playlist_MLDump( playlist_t *p_playlist );
-
 /**********************************************************************
  * Item management
  **********************************************************************/

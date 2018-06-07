@@ -453,7 +453,7 @@ void playlist_Clear( playlist_t * p_playlist, bool b_locked )
 int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
 {
     return playlist_AddExt( p_playlist, psz_uri, NULL, play_now,
-                            0, NULL, 0, true );
+                            0, NULL, 0 );
 }
 
 /**
@@ -466,20 +466,18 @@ int playlist_Add( playlist_t *p_playlist, const char *psz_uri, bool play_now )
  * \param i_options the number of options
  * \param ppsz_options an array of options
  * \param i_option_flags options flags
- * \param b_playlist TRUE for playlist, FALSE for media library
  * \return VLC_SUCCESS or a VLC error code
 */
 int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
                      const char *psz_name, bool play_now,
                      int i_options, const char *const *ppsz_options,
-                     unsigned i_option_flags,
-                     bool b_playlist )
+                     unsigned i_option_flags )
 {
     input_item_t *p_input = input_item_New( psz_uri, psz_name );
     if( !p_input )
         return VLC_ENOMEM;
     input_item_AddOptions( p_input, i_options, ppsz_options, i_option_flags );
-    int i_ret = playlist_AddInput( p_playlist, p_input, play_now, b_playlist );
+    int i_ret = playlist_AddInput( p_playlist, p_input, play_now );
     input_item_Release( p_input );
     return i_ret;
 }
@@ -494,11 +492,10 @@ int playlist_AddExt( playlist_t *p_playlist, const char * psz_uri,
  * \return VLC_SUCCESS or VLC_ENOMEM or VLC_EGENERIC
 */
 int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
-                       bool play_now, bool b_playlist )
+                       bool play_now)
 {
     PL_LOCK;
-    playlist_item_t *item = b_playlist ? p_playlist->p_playing
-                                       : p_playlist->p_media_library;
+    playlist_item_t *item = p_playlist->p_playing;
 
     item = playlist_NodeAddInput( p_playlist, p_input, item, PLAYLIST_END );
 

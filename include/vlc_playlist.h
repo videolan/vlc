@@ -61,7 +61,6 @@ struct intf_thread_t;
  * Under the playlist root item node, the top-level items are the main
  * media sources and include:
  * - the actual playlist,
- * - the media library,
  * - the service discovery root node, whose children are services discovery
  *   module instances.
  *
@@ -75,8 +74,6 @@ struct intf_thread_t;
  * - playlist (id 1)
  *    - category 1 (id 2)
  *      - foo 2 (id 6 - input 2)
- * - media library (id 2)
- *    - foo 1 (id 5 - input 1)
  * \endverbatim
  *
  * Sometimes, an item creates subitems. This happens for the directory access
@@ -88,8 +85,7 @@ struct intf_thread_t;
  *
  * For "standard" item addition, you can use playlist_Add(), playlist_AddExt()
  * (more options) or playlist_AddInput() if you already created your input
- * item. This will add the item at the root of "Playlist" or of "Media library"
- * in each of the two trees.
+ * item. This will add the item at the root of "Playlist" in each of the two trees.
  *
  * You can create nodes with playlist_NodeCreate() and can create items from
  * existing input items to be placed under any node with
@@ -160,7 +156,6 @@ struct playlist_t
     /* Predefined items */
     playlist_item_t  root;
     playlist_item_t *p_playing;
-    playlist_item_t *p_media_library;
 };
 
 /* A bit of macro magic to generate an enum out of the following list,
@@ -334,13 +329,12 @@ VLC_API int playlist_Status( playlist_t * );
 
 /**
  * Export a node of the playlist to a certain type of playlistfile
- * \param b_playlist true for the playlist, false for the media library
  * \param psz_filename the location where the exported file will be saved
  * \param psz_type the type of playlist file to create (m3u, pls, ..)
  * \return VLC_SUCCESS on success
  */
 VLC_API int playlist_Export( playlist_t *p_playlist, const char *psz_name,
-                             bool b_playlist, const char *psz_type );
+                             const char *psz_type );
 
 /**
  * Open a playlist file, add its content to the current playlist
@@ -374,8 +368,8 @@ VLC_API int playlist_SetRenderer( playlist_t* p_pl, vlc_renderer_item_t* p_item 
 
 /******************** Item addition ********************/
 VLC_API int playlist_Add( playlist_t *, const char *, bool );
-VLC_API int playlist_AddExt( playlist_t *, const char *, const char *, bool, int, const char *const *, unsigned, bool );
-VLC_API int playlist_AddInput( playlist_t *, input_item_t *, bool, bool );
+VLC_API int playlist_AddExt( playlist_t *, const char *, const char *, bool, int, const char *const *, unsigned );
+VLC_API int playlist_AddInput( playlist_t *, input_item_t *, bool );
 VLC_API playlist_item_t * playlist_NodeAddInput( playlist_t *, input_item_t *, playlist_item_t *, int );
 VLC_API int playlist_NodeAddCopy( playlist_t *, playlist_item_t *, playlist_item_t *, int );
 

@@ -91,7 +91,7 @@ void CmdPlaylistSave::execute()
         return;
     }
 
-    playlist_Export( getPL(), m_file.c_str(), true, psz_module );
+    playlist_Export( getPL(), m_file.c_str(), psz_module );
 }
 
 void CmdPlaylistFirst::execute()

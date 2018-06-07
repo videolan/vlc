@@ -211,7 +211,7 @@ int Open::openMRLwithOptions( intf_thread_t* p_intf,
 
     /* Add to playlist */
     int i_ret = playlist_AddExt( THEPL, qtu(mrl), title, b_start,
-                  i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED, true );
+                  i_options, ppsz_options, VLC_INPUT_OPTION_TRUSTED );
 
     /* Add to recent items, only if played */
     if( i_ret == VLC_SUCCESS && b_start )

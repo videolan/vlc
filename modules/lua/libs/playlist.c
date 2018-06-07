@@ -195,7 +195,7 @@ static int vlclua_playlist_add_common(lua_State *L, bool play)
         {
             /* Play or Enqueue (preparse) */
             /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput(playlist, item, play, true);
+            playlist_AddInput(playlist, item, play);
             input_item_Release(item);
             count++;
         }

@@ -103,8 +103,7 @@ static LRESULT CALLBACK WMCOPYWNDPROC(HWND hwnd, UINT uMsg,
                         NULL, (i_opt == 0 && !p_data->enqueue),
                         i_options,
                         (char const **)( i_options ? &ppsz_argv[i_opt+1] : NULL ),
-                        VLC_INPUT_OPTION_TRUSTED,
-                        true );
+                        VLC_INPUT_OPTION_TRUSTED );
 
                 i_opt += i_options;
                 free( psz_URI );

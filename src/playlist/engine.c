@@ -236,35 +236,25 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     p_playlist->root.i_id = 0;
     p_playlist->root.i_flags = 0;
 
-    /* Create the root, playing items and meida library nodes */
-    playlist_item_t *playing, *ml;
+    /* Create the root, playing items nodes */
+    playlist_item_t *playing;
 
     PL_LOCK;
     playing = playlist_NodeCreate( p_playlist, _( "Playlist" ),
                                    &p_playlist->root, PLAYLIST_END,
                                    PLAYLIST_RO_FLAG|PLAYLIST_NO_INHERIT_FLAG );
-    if( var_InheritBool( p_parent, "media-library") )
-        ml = playlist_NodeCreate( p_playlist, _( "Media Library" ),
-                                  &p_playlist->root, PLAYLIST_END,
-                                  PLAYLIST_RO_FLAG|PLAYLIST_NO_INHERIT_FLAG );
-    else
-        ml = NULL;
     PL_UNLOCK;
 
     if( unlikely(playing == NULL) )
         abort();
 
     p_playlist->p_playing = playing;
-    p_playlist->p_media_library = ml;
 
     /* Initial status */
     pl_priv(p_playlist)->status.p_item = NULL;
     pl_priv(p_playlist)->status.p_node = p_playlist->p_playing;
     pl_priv(p_playlist)->request.b_request = false;
     p->request.input_dead = false;
-
-    if (ml != NULL)
-        playlist_MLLoad( p_playlist );
 
     /* Input resources */
     p->p_input_resource = input_resource_New( VLC_OBJECT( p_playlist ) );
@@ -325,9 +315,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     if( p_sys->p_renderer )
         vlc_renderer_item_release( p_sys->p_renderer );
 
-    if( p_playlist->p_media_library != NULL )
-        playlist_MLDump( p_playlist );
-
     PL_LOCK;
     /* Release the current node */
     set_current_status_node( p_playlist, NULL );
@@ -339,12 +326,6 @@ void playlist_Destroy( playlist_t *p_playlist )
     ARRAY_RESET( p_playlist->current );
 
     /* Remove all remaining items */
-    if( p_playlist->p_media_library != NULL )
-    {
-        playlist_NodeDeleteExplicit( p_playlist, p_playlist->p_media_library,
-            PLAYLIST_DELETE_FORCE );
-    }
-
     playlist_NodeDeleteExplicit( p_playlist, p_playlist->p_playing,
         PLAYLIST_DELETE_FORCE );
 
