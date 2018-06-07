@@ -111,7 +111,7 @@ typedef struct
 {
     mtime_t             i_time;     /* s */
     mtime_t             i_sendtime;
-    mtime_t             i_length;   /* length of file file */
+    mtime_t             i_length;   /* length of file */
     uint64_t            i_bitrate;  /* global file bitrate */
     bool                b_eos;      /* end of current stream */
     bool                b_eof;      /* end of current media */
