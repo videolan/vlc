@@ -280,7 +280,7 @@ static inline bool hxxx_iterate_next( hxxx_iterator_ctx_t *p_ctx, const uint8_t 
     if( p_ctx->p_tail - p_ctx->p_head < p_ctx->i_nal_length_size )
         return false;
 
-    size_t i_nal_size = 0;
+    uint32_t i_nal_size = 0;
     for( uint8_t i=0; i < p_ctx->i_nal_length_size ; i++ )
         i_nal_size = (i_nal_size << 8) | *p_ctx->p_head++;
 
