@@ -154,7 +154,6 @@ static const uint32_t pi_3channels_in[] =
  * Local prototypes
  ****************************************************************************/
 
-static block_t *Packetize ( decoder_t *, block_t ** );
 static int  DecodeAudio ( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 static int  ProcessHeaders( decoder_t * );
@@ -185,7 +184,6 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 
     p_dec->pf_decode    = DecodeAudio;
-    p_dec->pf_packetize = Packetize;
     p_dec->pf_flush     = Flush;
 
     p_sys->p_st = NULL;
@@ -235,16 +233,6 @@ static int DecodeAudio( decoder_t *p_dec, block_t *p_block )
     if( p_block != NULL )
         decoder_QueueAudio( p_dec, p_block );
     return VLCDEC_SUCCESS;
-}
-
-static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
-{
-    if( pp_block == NULL ) /* No Drain */
-        return NULL;
-    block_t *p_block = *pp_block; *pp_block = NULL;
-    if( p_block == NULL )
-        return NULL;
-    return DecodeBlock( p_dec, p_block );
 }
 
 /*****************************************************************************
