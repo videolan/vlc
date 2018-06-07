@@ -1255,7 +1255,7 @@ static int DemuxInit( demux_t *p_demux )
 
         if( p_sys->i_length > 0 )
         {
-            p_sys->i_bitrate = 8 * i_size * 1000000 / p_sys->i_length;
+            p_sys->i_bitrate = 8 * i_size * CLOCK_FREQ / p_sys->i_length;
         }
     }
 
