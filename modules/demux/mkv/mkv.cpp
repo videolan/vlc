@@ -591,7 +591,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
             handle_real_audio(p_demux, &track, p_block, i_pts);
             block_Release(p_block);
             i_pts = ( track.i_default_duration )?
-                i_pts + ( vlc_tick_t )track.i_default_duration:
+                i_pts + track.i_default_duration:
                 VLC_TICK_INVALID;
             continue;
          }
@@ -685,7 +685,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
                 else if ( track.i_last_dts == VLC_TICK_INVALID )
                     p_block->i_dts = i_pts;
                 else
-                    p_block->i_dts = std::min( i_pts, track.i_last_dts + ( vlc_tick_t )track.i_default_duration );
+                    p_block->i_dts = std::min( i_pts, track.i_last_dts + track.i_default_duration );
             }
         }
 
@@ -693,7 +693,7 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
 
         /* use time stamp only for first block */
         i_pts = ( track.i_default_duration )?
-                 i_pts + ( vlc_tick_t )track.i_default_duration:
+                 i_pts + track.i_default_duration:
                  ( track.fmt.b_packetized ) ? VLC_TICK_INVALID : i_pts + 1;
     }
 }
