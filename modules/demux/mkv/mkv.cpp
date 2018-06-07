@@ -816,7 +816,7 @@ static int Demux( demux_t *p_demux)
     /* set pts */
     {
         p_sys->i_pts = p_sys->i_mk_chapter_time + VLC_TICK_0;
-        p_sys->i_pts += internal_block.GlobalTimecode() / INT64_C( 1000 );
+        p_sys->i_pts += VLC_TICK_FROM_NS(internal_block.GlobalTimecode());
     }
 
     if ( p_vsegment->CurrentEdition() &&

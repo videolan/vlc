@@ -1477,7 +1477,7 @@ bool matroska_segment_c::ParseCluster( KaxCluster *cluster, bool b_update_start_
     }
 
     if( b_update_start_time )
-        i_mk_start_time = cluster->GlobalTimecode() / INT64_C( 1000 );
+        i_mk_start_time = VLC_TICK_FROM_NS( cluster->GlobalTimecode() );
 
     return true;
 }

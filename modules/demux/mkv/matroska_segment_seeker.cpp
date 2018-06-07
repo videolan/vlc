@@ -68,7 +68,7 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
 {
     Cluster cinfo = {
         /* fpos     */ p_cluster->GetElementPosition(),
-        /* pts      */ vlc_tick_t( p_cluster->GlobalTimecode() / INT64_C( 1000 ) ),
+        /* pts      */ vlc_tick_t( VLC_TICK_FROM_NS( p_cluster->GlobalTimecode() ) ),
         /* duration */ vlc_tick_t( -1 ),
         /* size     */ p_cluster->IsFiniteSize()
             ? p_cluster->GetEndPosition() - p_cluster->GetElementPosition()
@@ -364,7 +364,7 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
             : static_cast<KaxInternalBlock&>( *block );
 
         block_pos = internal_block.GetElementPosition();
-        block_pts = internal_block.GlobalTimecode() / 1000;
+        block_pts = VLC_TICK_FROM_NS(internal_block.GlobalTimecode());
         track_id  = internal_block.TrackNum();
 
         bool const b_valid_track = ms.FindTrackByBlock( block, simpleblock ) != NULL;
