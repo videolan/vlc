@@ -237,7 +237,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
                                 &pkt->p_peek[pkt->i_skip + 8],
                                 i_replicated_data_length - 8,
                                 &b_packet_keyframe );
-        i_pkt_time -= *p_packetsys->pi_preroll;
+        i_pkt_time -= MS_FROM_VLC_TICK(*p_packetsys->pi_preroll);
         pkt->i_skip += i_replicated_data_length;
     }
     else if ( i_replicated_data_length == 0 )
@@ -253,7 +253,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         i_pkt_time_delta = VLC_TICK_FROM_MS(pkt->p_peek[pkt->i_skip]);
         b_ignore_pts = false;
         i_pkt_time = (vlc_tick_t)i_media_object_offset;
-        i_pkt_time -= *p_packetsys->pi_preroll;
+        i_pkt_time -= MS_FROM_VLC_TICK(*p_packetsys->pi_preroll);
         pkt->i_skip++;
         i_media_object_offset = 0;
     }
@@ -271,7 +271,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     if( ! pkt->left || pkt->i_skip >= pkt->left )
         return -1;
 
-    bool b_preroll_done = ( pkt->send_time/1000 > (*p_packetsys->pi_preroll_start/1000 + *p_packetsys->pi_preroll) );
+    bool b_preroll_done = ( pkt->send_time > (*p_packetsys->pi_preroll_start + *p_packetsys->pi_preroll) );
 
     if (i_pkt_time < 0) i_pkt_time = 0; // FIXME?
     i_pkt_time *= 1000;

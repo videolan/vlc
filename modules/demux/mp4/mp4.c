@@ -132,7 +132,7 @@ typedef struct
 
     /* ASF in MP4 */
     asf_packet_sys_t asfpacketsys;
-    uint64_t i_preroll;         /* foobar */
+    vlc_tick_t i_preroll;       /* foobar */
     vlc_tick_t i_preroll_start;
 
     struct

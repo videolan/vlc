@@ -43,7 +43,7 @@ struct asf_packet_sys_s
     demux_t *p_demux;
 
     /* global stream info */
-    uint64_t *pi_preroll;
+    vlc_tick_t *pi_preroll;
     vlc_tick_t *pi_preroll_start;
 
     /* callbacks */

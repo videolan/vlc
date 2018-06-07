@@ -213,8 +213,8 @@ static int Demux( demux_t *p_demux )
     }
 
     while( !p_sys->b_eos && ( p_sys->i_sendtime - p_sys->i_time - CHUNK < 0 ||
-                            ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
-                              UINT64_C( 1000 ) < p_sys->p_fp->i_preroll ) )
+                            ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) <
+                                                     p_sys->p_fp->i_preroll ) )
     {
         /* Read and demux a packet */
         if( DemuxASFPacket( &p_sys->packet_sys,
@@ -242,8 +242,8 @@ static int Demux( demux_t *p_demux )
     }
 
     if( p_sys->b_eos || ( p_sys->i_sendtime - p_sys->i_time - CHUNK >= 0 &&
-                        ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) /
-                          UINT64_C( 1000 ) >= p_sys->p_fp->i_preroll ) )
+                        ( p_sys->i_sendtime - p_sys->i_time - CHUNK ) >=
+                                                     p_sys->p_fp->i_preroll ) )
     {
         bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
 
@@ -358,7 +358,7 @@ static int SeekIndex( demux_t *p_demux, vlc_tick_t i_date, float f_pos )
     if( i_date < 0 )
         i_date = p_sys->i_length * f_pos;
 
-    p_sys->i_preroll_start = i_date - (int64_t) p_sys->p_fp->i_preroll;
+    p_sys->i_preroll_start = i_date - p_sys->p_fp->i_preroll;
     if ( p_sys->i_preroll_start < 0 ) p_sys->i_preroll_start = 0;
 
     p_index = ASF_FindObject( p_sys->p_root, &asf_object_simple_index_guid, 0 );
@@ -1237,7 +1237,7 @@ static int DemuxInit( demux_t *p_demux )
         /* calculate the time duration in micro-s */
         p_sys->i_length = VLC_TICK_FROM_MSFTIME(p_sys->p_fp->i_play_duration) *
                    (vlc_tick_t)i_count /
-                   (vlc_tick_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll * 1000;
+                   (vlc_tick_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll;
         if( p_sys->i_length < 0 )
             p_sys->i_length = 0;
 

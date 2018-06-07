@@ -106,7 +106,7 @@ typedef struct
     uint64_t     i_data_packets_count;
     msftime_t    i_play_duration;
     msftime_t    i_send_duration;
-    uint64_t     i_preroll;
+    vlc_tick_t   i_preroll;
     uint32_t     i_flags;
     uint32_t     i_min_data_packet_size;
     uint32_t     i_max_data_packet_size;
