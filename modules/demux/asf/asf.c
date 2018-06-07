@@ -437,7 +437,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         SeekPrepare( p_demux );
 
-        if( p_sys->b_index && p_sys->i_length > 0 )
+        if( p_sys->b_index && p_sys->i_length != 0 )
         {
             va_list acpy;
             va_copy( acpy, args );
@@ -495,7 +495,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_POSITION:
         if( p_sys->i_time == VLC_TICK_INVALID ) return VLC_EGENERIC;
-        if( p_sys->i_length > 0 )
+        if( p_sys->i_length != 0 )
         {
             pf = va_arg( args, double * );
             *pf = p_sys->i_time / (double)p_sys->i_length;
@@ -515,7 +515,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         SeekPrepare( p_demux );
 
-        if( p_sys->b_index && p_sys->i_length > 0 )
+        if( p_sys->b_index && p_sys->i_length != 0 )
         {
             va_list acpy;
             va_copy( acpy, args );
@@ -1237,12 +1237,12 @@ static int DemuxInit( demux_t *p_demux )
         /* calculate the time duration in micro-s */
         p_sys->i_length = VLC_TICK_FROM_MSFTIME(p_sys->p_fp->i_play_duration) *
                    (vlc_tick_t)i_count /
-                   (vlc_tick_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll;
-        if( p_sys->i_length < 0 )
+                   (vlc_tick_t)p_sys->p_fp->i_data_packets_count;
+        if( p_sys->i_length <= p_sys->p_fp->i_preroll )
             p_sys->i_length = 0;
-
-        if( p_sys->i_length > 0 )
+        else
         {
+            p_sys->i_length  -= p_sys->p_fp->i_preroll;
             p_sys->i_bitrate = 8 * i_size * CLOCK_FREQ / p_sys->i_length;
         }
     }
