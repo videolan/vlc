@@ -35,7 +35,7 @@ typedef struct asf_packet_t
     uint32_t property;
     uint32_t length;
     uint32_t padding_length;
-    uint32_t send_time;
+    vlc_tick_t  send_time;
     bool multiple;
     int length_type;
 
@@ -215,7 +215,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
 
     /* First packet, in case we do not have index to guess preroll start time */
     if ( *p_packetsys->pi_preroll_start == ASFPACKET_PREROLL_FROM_CURRENT )
-        *p_packetsys->pi_preroll_start = pkt->send_time * 1000;
+        *p_packetsys->pi_preroll_start = pkt->send_time;
 
     asf_track_info_t *p_tkinfo = p_packetsys->pf_gettrackinfo( p_packetsys, i_stream_number );
     if ( !p_tkinfo )
@@ -243,7 +243,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     else if ( i_replicated_data_length == 0 )
     {
         /* optional DWORDS missing */
-        i_pkt_time = (vlc_tick_t)pkt->send_time;
+        i_pkt_time = pkt->send_time/1000;
     }
     /* Compressed payload */
     else if( i_replicated_data_length == 1 )
@@ -271,7 +271,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     if( ! pkt->left || pkt->i_skip >= pkt->left )
         return -1;
 
-    bool b_preroll_done = ( pkt->send_time > (*p_packetsys->pi_preroll_start/1000 + *p_packetsys->pi_preroll) );
+    bool b_preroll_done = ( pkt->send_time/1000 > (*p_packetsys->pi_preroll_start/1000 + *p_packetsys->pi_preroll) );
 
     if (i_pkt_time < 0) i_pkt_time = 0; // FIXME?
     i_pkt_time *= 1000;
@@ -296,7 +296,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
      msg_Dbg( p_demux,
               "  pkttime=%"PRId64" st=%"PRIu32,
-              i_pkt_time, pkt->send_time );
+              i_pkt_time, MS_FROM_VLC_TICK(pkt->send_time) );
 #endif
 
      if( ! i_payload_data_length || i_payload_data_length > pkt->left )
@@ -318,7 +318,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     }
 
     if( p_packetsys->pf_updatesendtime )
-        p_packetsys->pf_updatesendtime( p_packetsys, INT64_C(1000) * pkt->send_time );
+        p_packetsys->pf_updatesendtime( p_packetsys, pkt->send_time );
 
     uint32_t i_subpayload_count = 0;
     while (i_payload_data_length && pkt->i_skip < pkt->left )
@@ -450,7 +450,7 @@ int DemuxASFPacket( asf_packet_sys_t *p_packetsys,
     if( i_skip + 4 > i_data_packet_min )
         goto loop_error_recovery;
 
-    pkt.send_time = GetDWLE( p_peek + i_skip ); i_skip += 4;
+    pkt.send_time = VLC_TICK_FROM_MS(GetDWLE( p_peek + i_skip )); i_skip += 4;
     /* uint16_t i_packet_duration = GetWLE( p_peek + i_skip ); */ i_skip += 2;
 
     i_return = vlc_stream_Peek( p_demux->s, &p_peek, pkt.length );
