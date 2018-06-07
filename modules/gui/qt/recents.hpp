@@ -40,14 +40,12 @@ class Open
 public:
     static int openMRL( intf_thread_t*,
                         const QString &,
-                        bool b_start = true,
-                        bool b_playlist = true);
+                        bool b_start = true);
 
     static int openMRLwithOptions( intf_thread_t*,
                                    const QString &,
                                    QStringList *options,
                                    bool b_start = true,
-                                   bool b_playlist = true,
                                    const char* title = NULL);
 };
 

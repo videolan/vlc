@@ -178,12 +178,10 @@ PlaylistWidget::~PlaylistWidget()
 
 void PlaylistWidget::dropEvent( QDropEvent *event )
 {
-    if( !( selector->getCurrentItemCategory() == IS_PL ||
-           selector->getCurrentItemCategory() == IS_ML ) ) return;
+    if( selector->getCurrentItemCategory() != IS_PL ) return;
 
     if( p_intf->p_sys->p_mi )
-        p_intf->p_sys->p_mi->dropEventPlay( event, false,
-                (selector->getCurrentItemCategory() == IS_PL) );
+        p_intf->p_sys->p_mi->dropEventPlay( event, false );
 }
 void PlaylistWidget::dragEnterEvent( QDragEnterEvent *event )
 {

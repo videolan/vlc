@@ -383,7 +383,7 @@ void StandardPLPanel::popupAction( QAction *action )
         break;
 
     case VLCModelSubInterface::ACTION_ENQUEUEGENERIC:
-        dialog = OpenDialog::getInstance( this, p_intf, false, SELECT, true, true );
+        dialog = OpenDialog::getInstance( this, p_intf, false, SELECT, true );
         dialog->showTab( OPEN_FILE_TAB );
         dialog->exec(); /* make it modal */
         a.uris = dialog->getMRLs();

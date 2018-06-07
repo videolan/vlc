@@ -230,15 +230,6 @@ void PLSelector::createItems()
     playlistItem->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/playlist.svg" ) );
     setCurrentItem( playlistItem->treeItem() );
 
-    /* ML */
-    if( THEPL->p_media_library )
-    {
-        PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, N_("Media Library"), true ),
-          THEPL->p_media_library );
-        ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
-        ml->treeItem()->setData( 0, Qt::DecorationRole, QIcon( ":/sidebar/library.svg" ) );
-    }
-
     /* SD nodes */
     QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, N_("My Computer"), false, true )->treeItem();
     QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, N_("Devices"), false, true )->treeItem();
@@ -464,9 +455,7 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int,
     if( type == QVariant() ) return false;
 
     int i_truth = parent->data( 0, SPECIAL_ROLE ).toInt();
-    if( i_truth != IS_PL && i_truth != IS_ML ) return false;
-
-    bool to_pl = ( i_truth == IS_PL );
+    if( i_truth != IS_PL ) return false;
 
     const PlMimeData *plMimeData = qobject_cast<const PlMimeData*>( data );
     if( !plMimeData ) return false;
@@ -480,9 +469,7 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int,
         playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
         if( !p_item ) continue;
 
-        playlist_NodeAddCopy( THEPL, p_item,
-                              to_pl ? THEPL->p_playing : THEPL->p_media_library,
-                              PLAYLIST_END );
+        playlist_NodeAddCopy( THEPL, p_item, THEPL->p_playing, PLAYLIST_END );
     }
 
     playlist_Unlock( THEPL );

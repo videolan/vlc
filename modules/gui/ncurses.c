@@ -1298,7 +1298,7 @@ static void AddItem(intf_thread_t *intf, const char *path)
     node = playlist_CurrentPlayingItem(playlist);
 
     while (node != NULL) {
-        if (node == playlist->p_playing || node == playlist->p_media_library)
+        if (node == playlist->p_playing)
             break;
         node = node->p_parent;
     }

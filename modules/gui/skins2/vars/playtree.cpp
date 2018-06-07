@@ -296,12 +296,6 @@ void Playtree::insertItems( VarTree& elem, const std::list<std::string>& files, 
         i_pos = 0;
         p_elem->setExpanded( true );
     }
-    else if( p_elem->getId() == m_pPlaylist->p_media_library->i_id )
-    {
-        p_node = m_pPlaylist->p_media_library;
-        i_pos = 0;
-        p_elem->setExpanded( true );
-    }
     else if( p_elem->size() && p_elem->isExpanded() )
     {
         p_node = playlist_ItemGetById( m_pPlaylist, p_elem->getId() );

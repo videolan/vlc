@@ -277,8 +277,6 @@ static const float f_min_window_height = 307.;
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
     [playlistItem setIcon: imageFromRes(@"sidebar-playlist")];
-    SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
-    [medialibraryItem setIcon: imageFromRes(@"sidebar-playlist")];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -343,7 +341,7 @@ static const float f_min_window_height = 307.;
     free(ppsz_longnames);
     free(p_categories);
 
-    [libraryItem setChildren: [NSArray arrayWithObjects:playlistItem, medialibraryItem, nil]];
+    [libraryItem setChildren: [NSArray arrayWithObjects:playlistItem, nil]];
     [o_sidebaritems addObject: libraryItem];
     if ([mycompItem hasChildren])
         [o_sidebaritems addObject: mycompItem];
@@ -823,8 +821,6 @@ static const float f_min_window_height = 307.;
     PL_LOCK;
     if (root == ROOT_TYPE_PLAYLIST)
         [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
-    else if (root == ROOT_TYPE_MEDIALIBRARY)
-        [_categoryLabel setStringValue: [_NS("Media Library") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_media_library]]];
 
     PL_UNLOCK;
 }
@@ -901,7 +897,7 @@ static const float f_min_window_height = 307.;
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
 {
-    if ([[item identifier] isEqualToString: @"playlist"] || [[item identifier] isEqualToString: @"medialibrary"])
+    if ([[item identifier] isEqualToString: @"playlist"])
         return YES;
 
     return [item hasBadge];
@@ -916,14 +912,6 @@ static const float f_min_window_height = 307.;
     if ([[item identifier] isEqualToString: @"playlist"]) {
         PL_LOCK;
         i_playlist_size = p_playlist->p_playing->i_children;
-        PL_UNLOCK;
-
-        return i_playlist_size;
-    }
-    if ([[item identifier] isEqualToString: @"medialibrary"]) {
-        PL_LOCK;
-        if (p_playlist->p_media_library)
-            i_playlist_size = p_playlist->p_media_library->i_children;
         PL_UNLOCK;
 
         return i_playlist_size;
@@ -1014,16 +1002,6 @@ static const float f_min_window_height = 307.;
 
         [self _updatePlaylistTitle];
 
-    } else if ([[item identifier] isEqualToString:@"medialibrary"]) {
-        if (p_playlist->p_media_library) {
-
-            PL_LOCK;
-            [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_media_library];
-
-            PL_UNLOCK;
-
-            [self _updatePlaylistTitle];
-        }
     } else {
         PL_LOCK;
         const char *title = [[item title] UTF8String];
@@ -1057,7 +1035,7 @@ static const float f_min_window_height = 307.;
 
 - (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
 {
-    if ([[item identifier] isEqualToString:@"playlist"] || [[item identifier] isEqualToString:@"medialibrary"]) {
+    if ([[item identifier] isEqualToString:@"playlist"]) {
         NSPasteboard *o_pasteboard = [info draggingPasteboard];
         if ([[o_pasteboard types] containsObject: VLCPLItemPasteboadType] || [[o_pasteboard types] containsObject: NSFilenamesPboardType])
             return NSDragOperationGeneric;
@@ -1074,8 +1052,6 @@ static const float f_min_window_height = 307.;
 
     if ([[item identifier] isEqualToString:@"playlist"])
         p_node = p_playlist->p_playing;
-    else
-        p_node = p_playlist->p_media_library;
 
     if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
         NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];

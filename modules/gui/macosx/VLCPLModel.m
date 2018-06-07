@@ -185,16 +185,13 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
     int i_root_id = [_rootItem plItemId];
     if (i_root_id == p_playlist->p_playing->i_id)
         return ROOT_TYPE_PLAYLIST;
-    if (p_playlist->p_media_library && i_root_id == p_playlist->p_media_library->i_id)
-        return ROOT_TYPE_MEDIALIBRARY;
 
     return ROOT_TYPE_OTHER;
 }
 
 - (BOOL)editAllowed
 {
-    return [self currentRootType] == ROOT_TYPE_MEDIALIBRARY ||
-    [self currentRootType] == ROOT_TYPE_PLAYLIST;
+    return [self currentRootType] == ROOT_TYPE_PLAYLIST;
 }
 
 - (void)deleteSelectedItem

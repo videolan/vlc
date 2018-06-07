@@ -119,7 +119,6 @@ private:
     bool b_isDying;
 
     void openDialog( int );
-    void addFromSimple( bool, bool );
 
 public slots:
     void playlistDialog();
@@ -159,7 +158,6 @@ public slots:
     void openCaptureDialog();
 
     void PLAppendDialog( int tab = OPEN_FILE_TAB );
-    void MLAppendDialog( int tab = OPEN_FILE_TAB );
 
     void PLOpenDir();
     void PLAppendDir();

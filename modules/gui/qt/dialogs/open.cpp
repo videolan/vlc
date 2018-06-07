@@ -40,12 +40,12 @@
 OpenDialog *OpenDialog::instance = NULL;
 
 OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
-        bool b_rawInstance, int _action_flag, bool b_selectMode, bool _b_pl )
+        bool b_rawInstance, int _action_flag, bool b_selectMode )
 {
     /* Creation */
     if( !instance )
         instance = new OpenDialog( parent, p_intf, b_selectMode,
-                                   _action_flag, _b_pl );
+                                   _action_flag );
     else if( !b_rawInstance )
     {
         /* Request the instance but change small details:
@@ -55,7 +55,6 @@ OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
                                       if the call is correct */
         instance->setWindowModality( Qt::WindowModal );
         instance->i_action_flag = _action_flag;
-        instance->b_pl = _b_pl;
         instance->setMenuAction();
     }
     return instance;
@@ -64,11 +63,9 @@ OpenDialog* OpenDialog::getInstance( QWidget *parent, intf_thread_t *p_intf,
 OpenDialog::OpenDialog( QWidget *parent,
                         intf_thread_t *_p_intf,
                         bool b_selectMode,
-                        int _action_flag,
-                        bool _b_pl)  :  QVLCDialog( parent, _p_intf )
+                        int _action_flag )  :  QVLCDialog( parent, _p_intf )
 {
     i_action_flag = _action_flag;
-    b_pl =_b_pl;
 
     if( b_selectMode ) /* Select mode */
         i_action_flag = SELECT;
@@ -382,7 +379,7 @@ void OpenDialog::enqueue( bool b_enqueue )
         QStringList optionsList = getOptions().split( " :" );
 
         /* Switch between enqueuing and starting the item */
-        Open::openMRLwithOptions( p_intf, itemsMRL[i], &optionsList, b_start, b_pl );
+        Open::openMRLwithOptions( p_intf, itemsMRL[i], &optionsList, b_start );
     }
 }
 

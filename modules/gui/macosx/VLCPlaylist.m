@@ -589,10 +589,6 @@
 
     int i_plItemId = -1;
 
-    // add items directly to media library if this is the current root
-    if ([[self model] currentRootType] == ROOT_TYPE_MEDIALIBRARY)
-        i_plItemId = [[[self model] rootItem] plItemId];
-
     BOOL b_autoplay = var_InheritBool(getIntf(), "macosx-autoplay");
 
     [self addPlaylistItems:array withParentItemId:i_plItemId atPos:-1 startPlayback:b_autoplay];

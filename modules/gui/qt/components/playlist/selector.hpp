@@ -49,7 +49,6 @@ enum SelectorItemType {
 enum SpecialData {
     IS_PODCAST = 1,
     IS_PL,
-    IS_ML
 };
 
 enum {

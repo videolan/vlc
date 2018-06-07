@@ -147,7 +147,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     } else {
         PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
-        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST || root == ROOT_TYPE_MEDIALIBRARY))
+        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST))
             [[[VLCMain sharedInstance] open] openFileGeneric];
         else
             [[[VLCMain sharedInstance] playlist] playItem:nil];

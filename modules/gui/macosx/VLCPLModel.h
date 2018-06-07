@@ -43,7 +43,6 @@
 
 typedef enum {
     ROOT_TYPE_PLAYLIST,
-    ROOT_TYPE_MEDIALIBRARY,
     ROOT_TYPE_OTHER
 } PLRootType;
 

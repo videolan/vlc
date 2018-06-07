@@ -99,8 +99,7 @@ public:
     StandardPLPanel* getPlaylistView();
 
 protected:
-    void dropEventPlay( QDropEvent* event, bool b_play ) { dropEventPlay(event, b_play, true); }
-    void dropEventPlay( QDropEvent *, bool, bool );
+    void dropEventPlay( QDropEvent* event, bool b_play );
     void changeEvent( QEvent * ) Q_DECL_OVERRIDE;
     void dropEvent( QDropEvent *) Q_DECL_OVERRIDE;
     void dragEnterEvent( QDragEnterEvent * ) Q_DECL_OVERRIDE;

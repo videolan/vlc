@@ -453,13 +453,6 @@ void DialogsProvider::PLAppendDialog( int tab )
                              OPEN_AND_ENQUEUE )->showTab( tab );
 }
 
-void DialogsProvider::MLAppendDialog( int tab )
-{
-    OpenDialog::getInstance( p_intf->p_sys->p_mi, p_intf, false,
-                            OPEN_AND_ENQUEUE, false, false )
-                                    ->showTab( tab );
-}
-
 /**
  * Simple open
  ***/
@@ -502,27 +495,17 @@ QStringList DialogsProvider::showSimpleOpen( const QString& help,
     return res;
 }
 
-/**
- * Open a file,
- * pl helps you to choose from playlist or media library,
- * go to start or enqueue
- **/
-void DialogsProvider::addFromSimple( bool pl, bool go)
+void DialogsProvider::simpleOpenDialog()
 {
     QStringList urls = DialogsProvider::showSimpleOpen();
 
-    bool first = go;
+    bool first = true;
     urls.sort();
     foreach( const QString &url, urls )
     {
-        Open::openMRL( p_intf, url, first, pl);
+        Open::openMRL( p_intf, url, first );
         first = false;
     }
-}
-
-void DialogsProvider::simpleOpenDialog()
-{
-    addFromSimple( true, true ); /* Playlist and Go */
 }
 
 /* Url & Clipboard */
@@ -558,11 +541,11 @@ void DialogsProvider::openUrlDialog()
  * pl helps you to choose from playlist or media library,
  * go to start or enqueue
  **/
-static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
+static void openDirectory( intf_thread_t *p_intf, bool go )
 {
     QString uri = DialogsProvider::getDirectoryDialog( p_intf );
     if( !uri.isEmpty() )
-        Open::openMRL( p_intf, uri, go, pl );
+        Open::openMRL( p_intf, uri, go );
 }
 
 QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
@@ -600,12 +583,12 @@ QString DialogsProvider::getDirectoryDialog( intf_thread_t *p_intf )
 
 void DialogsProvider::PLOpenDir()
 {
-    openDirectory( p_intf, true, true );
+    openDirectory( p_intf, true );
 }
 
 void DialogsProvider::PLAppendDir()
 {
-    openDirectory( p_intf, true, false );
+    openDirectory( p_intf, false );
 }
 
 /****************
@@ -694,8 +677,8 @@ void DialogsProvider::savePlayingToPlaylist()
 
     if ( psz_selected_module )
     {
-        playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
-                         true, psz_selected_module );
+        playlist_Export( THEPL, qtu( toNativeSeparators( file ) ), true,
+                         psz_selected_module );
         getSettings()->setValue( "last-playlist-ext", psz_last_playlist_ext );
     }
 }
@@ -765,7 +748,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
             QString title = "Converting " + mrls[i];
 
             /* Add each file to convert to our playlist, making sure to not attempt to start playing it.*/
-            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, true, qtu( title ) );
+            Open::openMRLwithOptions( p_intf, mrls[i], &optionsCopy, false, qtu( title ) );
         }
 
         /* Start the playlist from the beginning */

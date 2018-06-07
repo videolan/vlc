@@ -584,10 +584,6 @@ PLModel::pl_nodetype PLModel::getPLRootType() const
     if( plitem->id() == p_playlist->p_playing->i_id )
         return ROOTTYPE_CURRENT_PLAYING;
 
-    if( p_playlist->p_media_library &&
-        plitem->id() == p_playlist->p_media_library->i_id )
-        return ROOTTYPE_MEDIA_LIBRARY;
-
     return ROOTTYPE_OTHER;
 }
 
@@ -1002,14 +998,14 @@ bool PLModel::action( QAction *action, const QModelIndexList &indexes )
     case ACTION_ENQUEUEFILE:
         foreach( const QString &uri, a.uris )
             Open::openMRL( p_intf, uri.toLatin1().constData(),
-                           false, getPLRootType() == ROOTTYPE_CURRENT_PLAYING );
+                           false );
         return true;
 
     case ACTION_ENQUEUEDIR:
         if( a.uris.isEmpty() ) break;
 
         Open::openMRL( p_intf, a.uris.first().toLatin1().constData(),
-                       false, getPLRootType() == ROOTTYPE_CURRENT_PLAYING );
+                       false );
 
         return true;
 
