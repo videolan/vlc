@@ -38,7 +38,7 @@ namespace mkv {
 class virtual_chapter_c
 {
 public:
-    virtual_chapter_c( matroska_segment_c &seg, chapter_item_c *p_chap, int64_t start, int64_t stop, std::vector<virtual_chapter_c *> & sub_chaps ):
+    virtual_chapter_c( matroska_segment_c &seg, chapter_item_c *p_chap, vlc_tick_t start, vlc_tick_t stop, std::vector<virtual_chapter_c *> & sub_chaps ):
         segment(seg), p_chapter(p_chap),
         i_mk_virtual_start_time(start), i_mk_virtual_stop_time(stop),
         sub_vchapters(sub_chaps)
@@ -48,7 +48,7 @@ public:
     static virtual_chapter_c * CreateVirtualChapter( chapter_item_c * p_chap,
                                                      matroska_segment_c & main_segment,
                                                      std::vector<matroska_segment_c*> & segments,
-                                                     int64_t & usertime_offset, bool b_ordered );
+                                                     vlc_tick_t & usertime_offset, bool b_ordered );
 
     virtual_chapter_c* getSubChapterbyTimecode( int64_t time );
     bool Leave( );
