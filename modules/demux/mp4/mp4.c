@@ -114,7 +114,7 @@ struct demux_sys_t
     /* ASF in MP4 */
     asf_packet_sys_t asfpacketsys;
     uint64_t i_preroll;         /* foobar */
-    int64_t  i_preroll_start;
+    mtime_t i_preroll_start;
 
     struct
     {

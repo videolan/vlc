@@ -44,7 +44,7 @@ struct asf_packet_sys_s
 
     /* global stream info */
     uint64_t *pi_preroll;
-    int64_t *pi_preroll_start;
+    mtime_t *pi_preroll_start;
 
     /* callbacks */
     void (*pf_send)(asf_packet_sys_t *, uint8_t, block_t **);
