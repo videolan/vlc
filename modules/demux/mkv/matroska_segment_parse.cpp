@@ -327,9 +327,8 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxTrackDefaultDuration, defd )
         {
-            vars.tk->i_default_duration = static_cast<uint64>(defd);
+            vars.tk->i_default_duration = VLC_TICK_FROM_NS(static_cast<uint64>(defd));
             debug( vars, "Track Default Duration=%" PRId64, vars.tk->i_default_duration );
-            vars.tk->i_default_duration /= 1000;
         }
         E_CASE( KaxTrackTimecodeScale, ttcs )
         {
