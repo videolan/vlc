@@ -78,6 +78,8 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
         return VLC_EGENERIC;
 
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     p_sys->b_packetizer = b_packetizer;
     p_sys->b_disabletrans = var_InheritBool( p_dec, "dvdsub-transparency" );
