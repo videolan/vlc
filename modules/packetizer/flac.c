@@ -559,7 +559,6 @@ static int Open(vlc_object_t *p_this)
     p_dec->fmt_out.b_packetized = true;
 
     /* */
-    p_dec->pf_decode    = NULL;
     p_dec->pf_packetize = Packetize;
     p_dec->pf_flush     = Flush;
 
