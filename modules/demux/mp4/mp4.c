@@ -2267,7 +2267,8 @@ static void LoadChapterGpac( demux_t  *p_demux, MP4_Box_t *p_chpl )
         }
 
         EnsureUTF8( s->psz_name );
-        s->i_time_offset = BOXDATA(p_chpl)->chapter[i].i_start / 10;
+        msftime_t offset = BOXDATA(p_chpl)->chapter[i].i_start;
+        s->i_time_offset = VLC_TICK_FROM_MSFTIME(offset);
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
 }
