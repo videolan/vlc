@@ -50,7 +50,7 @@ public:
                                                      std::vector<matroska_segment_c*> & segments,
                                                      vlc_tick_t & usertime_offset, bool b_ordered );
 
-    virtual_chapter_c* getSubChapterbyTimecode( int64_t time );
+    virtual_chapter_c* getSubChapterbyTimecode( vlc_tick_t time );
     bool Leave( );
     bool EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bool b_enter = true );
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
@@ -90,7 +90,7 @@ public:
     ~virtual_edition_c();
     std::vector<virtual_chapter_c*> vchapters;
 
-    virtual_chapter_c* getChapterbyTimecode( int64_t time );
+    virtual_chapter_c* getChapterbyTimecode( vlc_tick_t time );
     std::string GetMainName();
     int PublishChapters( input_title_t & title, int & i_user_chapters, int i_level );
     virtual_chapter_c * BrowseCodecPrivate( unsigned int codec_id,
