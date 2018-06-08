@@ -191,10 +191,7 @@ static block_t *SendPacket( decoder_t *, block_t * );
 
 static void ParseSpeexComments( decoder_t *, ogg_packet * );
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -206,32 +203,39 @@ static int OpenDecoder( vlc_object_t *p_this )
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
     p_sys->bits.buf_size = 0;
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
     p_sys->rtp_rate = p_dec->fmt_in.audio.i_rate;
     p_sys->b_has_headers = false;
 
     date_Set( &p_sys->end_date, VLC_TS_INVALID );
 
-    /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
-
-    /*
-      Set callbacks
-      If the codec is spxr then this decoder is
-      being invoked on a Speex stream arriving via RTP.
-      A special decoder callback is used.
-    */
-    if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC('s', 'p', 'x', 'r'))
+    if( b_packetizer )
     {
-        msg_Dbg( p_dec, "Using RTP version of Speex decoder @ rate %d.",
-        p_dec->fmt_in.audio.i_rate );
-        p_dec->pf_decode = DecodeRtpSpeexPacket;
+        p_dec->fmt_out.i_codec = VLC_CODEC_SPEEX;
+        p_dec->pf_packetize    = Packetize;
     }
     else
     {
-        p_dec->pf_decode = DecodeAudio;
+        /* Set output properties */
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
+
+        /*
+          Set callbacks
+          If the codec is spxr then this decoder is
+          being invoked on a Speex stream arriving via RTP.
+          A special decoder callback is used.
+        */
+        if (p_dec->fmt_in.i_original_fourcc == VLC_FOURCC('s', 'p', 'x', 'r'))
+        {
+            msg_Dbg( p_dec, "Using RTP version of Speex decoder @ rate %d.",
+            p_dec->fmt_in.audio.i_rate );
+            p_dec->pf_decode = DecodeRtpSpeexPacket;
+        }
+        else
+        {
+            p_dec->pf_decode = DecodeAudio;
+        }
     }
-    p_dec->pf_packetize    = Packetize;
     p_dec->pf_flush        = Flush;
 
     p_sys->p_state = NULL;
@@ -241,20 +245,17 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * OpenDecoder: probe the decoder and return score
+ *****************************************************************************/
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
+}
+
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS )
-    {
-        p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_CODEC_SPEEX;
-    }
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 
 static int CreateDefaultHeader( decoder_t *p_dec )
