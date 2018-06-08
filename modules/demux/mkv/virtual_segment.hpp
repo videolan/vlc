@@ -145,9 +145,9 @@ public:
         return &p_current_vchapter->segment;
     }
 
-    inline int64_t Duration()
+    inline vlc_tick_t Duration()
     {
-        return veditions[i_current_edition]->i_duration / 1000;
+        return veditions[i_current_edition]->i_duration;
     }
 
     inline std::vector<virtual_edition_c*>* Editions() { return &veditions; }

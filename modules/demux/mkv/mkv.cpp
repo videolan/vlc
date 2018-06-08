@@ -331,22 +331,22 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
-            if( p_sys->f_duration > 0.0 )
-                *pi64 = static_cast<int64_t>( p_sys->f_duration * 1000 );
+            if( p_sys->i_duration > 0 )
+                *pi64 = static_cast<int64_t>( p_sys->i_duration );
             else
                 *pi64 = VLC_TICK_INVALID;
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
-            if ( p_sys->f_duration > 0.0 )
+            if ( p_sys->i_duration > 0 )
                 *pf = static_cast<double> (p_sys->i_pcr >= (p_sys->i_start_pts + p_sys->i_mk_chapter_time) ?
                                                p_sys->i_pcr :
-                                               (p_sys->i_start_pts + p_sys->i_mk_chapter_time) ) / (1000.0 * p_sys->f_duration);
+                                               (p_sys->i_start_pts + p_sys->i_mk_chapter_time) ) / p_sys->i_duration;
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            if( p_sys->f_duration > 0.0 )
+            if( p_sys->i_duration > 0)
             {
                 f = va_arg( args, double );
                 b = va_arg( args, int ); /* precise? */
@@ -388,7 +388,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     p_sys->i_updates |= INPUT_UPDATE_SEEKPOINT|INPUT_UPDATE_TITLE;
                     p_sys->i_current_seekpoint = 0;
-                    p_sys->f_duration = (float) p_sys->titles[i_idx]->i_length / 1000.f;
+                    p_sys->i_duration = p_sys->titles[i_idx]->i_length;
                     return VLC_SUCCESS;
                 }
                 else
@@ -489,7 +489,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtu
         msg_Warn( p_demux, "cannot seek so far!" );
         return VLC_EGENERIC;
     }
-    if( p_sys->f_duration < 0 )
+    if( p_sys->i_duration < 0 )
     {
         msg_Warn( p_demux, "cannot seek without duration!");
         return VLC_EGENERIC;
@@ -503,7 +503,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtu
     /* seek without index or without date */
     if( f_percent >= 0 && (var_InheritBool( p_demux, "mkv-seek-percent" ) || i_mk_date < 0 ))
     {
-        i_mk_date = int64_t( f_percent * p_sys->f_duration * 1000.0 );
+        i_mk_date = vlc_tick_t( f_percent * p_sys->i_duration );
     }
     return p_vsegment->Seek( *p_demux, i_mk_date, p_vchapter, b_precise ) ? VLC_SUCCESS : VLC_EGENERIC;
 }

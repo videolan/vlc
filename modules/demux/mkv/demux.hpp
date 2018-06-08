@@ -54,7 +54,7 @@ public:
         ,i_updates(0)
         ,p_current_vsegment(NULL)
         ,dvd_interpretor( *this )
-        ,f_duration(-1.0)
+        ,i_duration(-1)
         ,p_input(NULL)
         ,ev(&demux)
     {
@@ -89,7 +89,7 @@ public:
     dvd_command_interpretor_c        dvd_interpretor;
 
     /* duration of the stream */
-    float                   f_duration;
+    vlc_tick_t              i_duration;
 
     matroska_segment_c *FindSegment( const EbmlBinary & uid ) const;
     virtual_chapter_c *BrowseCodecPrivate( unsigned int codec_id,
