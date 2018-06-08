@@ -177,7 +177,7 @@ static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
 static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
 
-static void     MP4_UpdateSeekpoint( demux_t *, int64_t );
+static void     MP4_UpdateSeekpoint( demux_t *, vlc_tick_t );
 
 static MP4_Box_t * MP4_GetTrexByTrackID( MP4_Box_t *p_moov, const uint32_t i_id );
 static void MP4_GetDefaultSizeAndDuration( MP4_Box_t *p_moov,
@@ -1483,7 +1483,7 @@ static int Demux( demux_t *p_demux )
     return i_status;
 }
 
-static void MP4_UpdateSeekpoint( demux_t *p_demux, int64_t i_time )
+static void MP4_UpdateSeekpoint( demux_t *p_demux, vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i;
