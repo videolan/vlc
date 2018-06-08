@@ -4003,7 +4003,7 @@ static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
 
         for( tk->i_elst = 0; (unsigned int)tk->i_elst < elst->i_entry_count; tk->i_elst++ )
         {
-            vlc_tick_t i_dur = elst->i_segment_duration[tk->i_elst];
+            uint64_t i_dur = elst->i_segment_duration[tk->i_elst];
 
             if( tk->i_elst_time <= i_mvt && i_mvt < tk->i_elst_time + i_dur )
             {
