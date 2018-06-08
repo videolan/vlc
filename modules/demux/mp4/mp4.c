@@ -3078,7 +3078,7 @@ static int TrackGetNearestSeekPoint( demux_t *p_demux, mp4_track_t *p_track,
  * it also update elst field of the track
  */
 static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
-                                   vlc_tick_t i_start, uint32_t *pi_chunk,
+                                   vlc_tick_t start, uint32_t *pi_chunk,
                                    uint32_t *pi_sample )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -3086,21 +3086,22 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     unsigned int i_sample;
     unsigned int i_chunk;
     int          i_index;
+    stime_t      i_start;
 
     /* FIXME see if it's needed to check p_track->i_chunk_count */
     if( p_track->i_chunk_count == 0 )
         return( VLC_EGENERIC );
 
     /* handle elst (find the correct one) */
-    MP4_TrackSetELST( p_demux, p_track, i_start );
+    MP4_TrackSetELST( p_demux, p_track, start );
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count > 0 )
     {
         MP4_Box_data_elst_t *elst = p_track->BOXDATA(p_elst);
-        int64_t i_mvt= MP4_rescale_qtime( i_start, p_sys->i_timescale );
+        int64_t i_mvt= MP4_rescale_qtime( start, p_sys->i_timescale );
 
         /* now calculate i_start for this elst */
         /* offset */
-        if( i_start < MP4_rescale_mtime( p_track->i_elst_time, p_sys->i_timescale ) )
+        if( start < MP4_rescale_mtime( p_track->i_elst_time, p_sys->i_timescale ) )
         {
             *pi_chunk = 0;
             *pi_sample= 0;
@@ -3108,7 +3109,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
             return VLC_SUCCESS;
         }
         /* to track time scale */
-        i_start  = MP4_rescale_qtime( i_start, p_track->i_timescale );
+        i_start  = MP4_rescale_qtime( start, p_track->i_timescale );
         /* add elst offset */
         if( ( elst->i_media_rate_integer[p_track->i_elst] > 0 ||
              elst->i_media_rate_fraction[p_track->i_elst] > 0 ) &&
@@ -3125,7 +3126,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     else
     {
         /* convert absolute time to in timescale unit */
-        i_start = MP4_rescale_qtime( i_start, p_track->i_timescale );
+        i_start = MP4_rescale_qtime( start, p_track->i_timescale );
     }
 
     /* we start from sample 0/chunk 0, hope it won't take too much time */
