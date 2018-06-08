@@ -311,6 +311,7 @@ INPUT_META(Episode)
 INPUT_META(ShowName)
 INPUT_META(Actors)
 INPUT_META(DiscNumber)
+INPUT_META(DiscTotal)
 
 #define input_item_SetTrackNum input_item_SetTrackNumber
 #define input_item_GetTrackNum input_item_GetTrackNumber
