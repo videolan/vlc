@@ -295,8 +295,10 @@ static int OpenCommon( decoder_t *p_dec, bool b_packetizer )
     }
 
     /* Set callback */
-    p_dec->pf_decode    = DecodeFrame;
-    p_dec->pf_packetize = Packetize;
+    if( !b_packetizer )
+        p_dec->pf_decode    = DecodeFrame;
+    else
+        p_dec->pf_packetize = Packetize;
     p_dec->pf_flush     = Flush;
 
     return VLC_SUCCESS;
