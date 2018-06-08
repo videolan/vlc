@@ -102,10 +102,7 @@ typedef struct
   uint8_t p_palette_highlight[4][4];
 } decoder_sys_t;
 
-/*****************************************************************************
- * DecoderOpen: open/initialize the cvdsub decoder.
- *****************************************************************************/
-static int DecoderOpen( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -117,17 +114,30 @@ static int DecoderOpen( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->b_packetizer  = false;
+    p_sys->b_packetizer  = b_packetizer;
 
     p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
     p_sys->p_spu   = NULL;
 
-    p_dec->pf_decode     = Decode;
-    p_dec->pf_packetize  = Packetize;
-
-    p_dec->fmt_out.i_codec = VLC_CODEC_YUVP;
+    if( b_packetizer )
+    {
+        p_dec->pf_packetize    = Packetize;
+        p_dec->fmt_out.i_codec = VLC_CODEC_CVD;
+    }
+    else
+    {
+        p_dec->pf_decode       = Decode;
+        p_dec->fmt_out.i_codec = VLC_CODEC_YUVP;
+    }
 
     return VLC_SUCCESS;
+}
+/*****************************************************************************
+ * DecoderOpen: open/initialize the cvdsub decoder.
+ *****************************************************************************/
+static int DecoderOpen( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
 }
 
 /*****************************************************************************
@@ -135,16 +145,7 @@ static int DecoderOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static int PacketizerOpen( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    if( DecoderOpen( p_this ) != VLC_SUCCESS ) return VLC_EGENERIC;
-
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    p_dec->fmt_out.i_codec = VLC_CODEC_CVD;
-    p_sys->b_packetizer = true;
-
-    return VLC_SUCCESS;
+    return OpenCommon( p_this, true );
 }
 
 /*****************************************************************************
