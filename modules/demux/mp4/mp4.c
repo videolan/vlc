@@ -3088,8 +3088,7 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
 
         /* now calculate i_start for this elst */
         /* offset */
-        i_start -= MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, CLOCK_FREQ );
-        if( i_start < 0 )
+        if( i_start < MP4_rescale( p_track->i_elst_time, p_sys->i_timescale, CLOCK_FREQ ) )
         {
             *pi_chunk = 0;
             *pi_sample= 0;
