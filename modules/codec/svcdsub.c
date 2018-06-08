@@ -108,10 +108,7 @@ typedef struct
   uint8_t p_palette[4][4];       /* Palette of colors used in subtitle */
 } decoder_sys_t;
 
-/*****************************************************************************
- * DecoderOpen: open/initialize the svcdsub decoder.
- *****************************************************************************/
-static int DecoderOpen( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -131,10 +128,20 @@ static int DecoderOpen( vlc_object_t *p_this )
 
     p_dec->fmt_out.i_codec = VLC_CODEC_OGT;
 
-    p_dec->pf_decode    = Decode;
-    p_dec->pf_packetize = Packetize;
+    if( b_packetizer )
+        p_dec->pf_packetize = Packetize;
+    else
+        p_dec->pf_decode    = Decode;
 
     return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * DecoderOpen: open/initialize the svcdsub decoder.
+ *****************************************************************************/
+static int DecoderOpen( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
 }
 
 /*****************************************************************************
@@ -142,9 +149,7 @@ static int DecoderOpen( vlc_object_t *p_this )
  *****************************************************************************/
 static int PacketizerOpen( vlc_object_t *p_this )
 {
-    if( DecoderOpen( p_this ) != VLC_SUCCESS ) return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
+    return OpenCommon( p_this, true );
 }
 
 /*****************************************************************************
