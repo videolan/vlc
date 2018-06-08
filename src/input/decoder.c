@@ -643,13 +643,13 @@ static mtime_t DecoderGetDisplayDate( decoder_t *p_dec, mtime_t i_ts )
     return i_ts;
 }
 
-static int DecoderGetDisplayRate( decoder_t *p_dec )
+static float DecoderGetDisplayRate( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
     if( !p_owner->p_clock )
-        return INPUT_RATE_DEFAULT;
-    return input_clock_GetRate( p_owner->p_clock );
+        return 1.f;
+    return input_clock_GetRate( p_owner->p_clock ) / (float) INPUT_RATE_DEFAULT;
 }
 
 /*****************************************************************************

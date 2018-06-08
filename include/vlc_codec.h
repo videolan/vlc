@@ -64,7 +64,7 @@ struct decoder_owner_callbacks
             mtime_t     (*get_display_date)( decoder_t *, mtime_t );
             /* Display rate
              * cf. decoder_GetDisplayRate */
-            int         (*get_display_rate)( decoder_t * );
+            float       (*get_display_rate)( decoder_t * );
         } video;
         struct
         {
@@ -444,11 +444,11 @@ static inline mtime_t decoder_GetDisplayDate( decoder_t *dec, mtime_t i_ts )
  * You MUST use it *only* for gathering statistics about speed.
  */
 VLC_USED
-static inline int decoder_GetDisplayRate( decoder_t *dec )
+static inline float decoder_GetDisplayRate( decoder_t *dec )
 {
     assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
     if( !dec->cbs->video.get_display_rate )
-        return 1000 /* XXX: INPUT_RATE_DEFAULT */;
+        return 1.f;
 
     return dec->cbs->video.get_display_rate( dec );
 }

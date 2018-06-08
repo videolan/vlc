@@ -217,7 +217,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
     mtime_t         now, period;
     mtime_t         pts;
     bool      b_decode = 0;
-    int       i_current_rate;
+    float     i_current_rate;
 
     if ( p_synchro->b_no_skip )
         return 1;
@@ -225,8 +225,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
     i_current_rate = decoder_GetDisplayRate( p_synchro->p_dec );
 
     now = mdate();
-    period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate
-                     * i_current_rate / INPUT_RATE_DEFAULT;
+    period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate * i_current_rate;
 
     p_synchro->i_render_time = i_render_time;
 
