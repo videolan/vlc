@@ -25,7 +25,9 @@
 #import "VLCRemoteControlService.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMain.h"
+#ifdef MAC_OS_X_VERSION_10_12_2
 #import <MediaPlayer/MediaPlayer.h>
+#endif
 #import "CompatibilityFixes.h"
 
 #define kVLCSettingPlaybackForwardSkipLength @(60)
@@ -68,8 +70,6 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     commandCenter.bookmarkCommand.enabled = NO;
     commandCenter.enableLanguageOptionCommand.enabled = NO;
     commandCenter.disableLanguageOptionCommand.enabled = NO;
-    commandCenter.changeRepeatModeCommand.enabled = NO;
-    commandCenter.changeShuffleModeCommand.enabled = NO;
     commandCenter.seekForwardCommand.enabled = NO;
     commandCenter.seekBackwardCommand.enabled = NO;
 
@@ -136,8 +136,29 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
         [coreInteraction jumpToTime:positionEvent.positionTime * CLOCK_FREQ];
         return MPRemoteCommandHandlerStatusSuccess;
     }
+    if (event.command == cc.changeRepeatModeCommand) {
+        MPChangeRepeatModeCommandEvent *repeatEvent = (MPChangeRepeatModeCommandEvent *)event;
+        MPRepeatType repeatType = repeatEvent.repeatType;
+        switch (repeatType) {
+            case MPRepeatTypeAll:
+                [coreInteraction repeatAll];
+                 break;
 
-    NSAssert(NO, @"remote control event not handled");
+            case MPRepeatTypeOne:
+                [coreInteraction repeatOne];
+                break;
+
+            default:
+                [coreInteraction repeatOff];
+                break;
+        }
+        return MPRemoteCommandHandlerStatusSuccess;
+    }
+    if (event.command == cc.changeShuffleModeCommand) {
+        [coreInteraction shuffle];
+        return MPRemoteCommandHandlerStatusSuccess;
+    }
+
     msg_Dbg(getIntf(), "%s Wasn't able to handle remote control event: %s",__PRETTY_FUNCTION__,[event.description UTF8String]);
     return MPRemoteCommandHandlerStatusCommandFailed;
 }
