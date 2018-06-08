@@ -328,13 +328,7 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************
- * Tries to launch a decoder and return score so that the interface is able
- * to chose.
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -346,14 +340,15 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     msg_Dbg( p_dec, "kate: OpenDecoder");
 
-    /* Set callbacks */
-    p_dec->pf_decode    = DecodeSub;
-    p_dec->pf_packetize = Packetize;
-    p_dec->pf_flush     = Flush;
-
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = malloc(sizeof(*p_sys)) ) == NULL )
         return VLC_ENOMEM;
+
+    if( b_packetizer )
+        p_dec->pf_packetize = Packetize;
+    else
+        p_dec->pf_decode    = DecodeSub;
+    p_dec->pf_flush = Flush;
 
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 0;
@@ -361,7 +356,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     /* init of p_sys */
 #ifdef ENABLE_PACKETIZER
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
 #endif
     p_sys->b_ready = false;
     p_sys->i_pts =
@@ -417,7 +412,10 @@ static int OpenDecoder( vlc_object_t *p_this )
 
 #endif
 
-    p_dec->fmt_out.i_codec = 0; // may vary during the stream
+    if( b_packetizer )
+        p_dec->fmt_out.i_codec = VLC_CODEC_KATE;
+    else
+        p_dec->fmt_out.i_codec = 0; // may vary during the stream
 
     /* add the decoder to the global list */
     decoder_t **list = realloc( kate_decoder_list, (kate_decoder_list_size+1) * sizeof( *list ));
@@ -432,21 +430,15 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
+}
+
 #ifdef ENABLE_PACKETIZER
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS )
-    {
-        p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_CODEC_KATE;
-    }
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 #endif
 
