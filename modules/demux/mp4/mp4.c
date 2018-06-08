@@ -548,7 +548,7 @@ static uint32_t MP4_TrackGetRunSeq( mp4_track_t *p_track )
 
 /* Analyzes chunks to find max interleave length
  * sets flat flag if no interleaving is in use */
-static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, bool *pb_flat )
+static void MP4_GetInterleaving( demux_t *p_demux, vlc_tick_t *pi_max_contiguous, bool *pb_flat )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     *pi_max_contiguous = 0;
@@ -592,9 +592,9 @@ static void MP4_GetInterleaving( demux_t *p_demux, uint64_t *pi_max_contiguous, 
 
         if( tk != nexttk )
         {
-            i_duration = MP4_rescale( i_duration, tk->i_timescale, CLOCK_FREQ );
-            if( i_duration > *pi_max_contiguous )
-                *pi_max_contiguous = i_duration;
+            vlc_tick_t i_dur = MP4_rescale( i_duration, tk->i_timescale, CLOCK_FREQ );
+            if( i_dur > *pi_max_contiguous )
+                *pi_max_contiguous = i_dur;
             i_duration = 0;
 
             if( tk->i_chunk != tk->i_chunk_count )
@@ -1075,7 +1075,7 @@ static int Open( vlc_object_t * p_this )
 
     if( p_sys->i_tracks > 1 && !p_sys->b_fastseekable )
     {
-        uint64_t i_max_continuity;
+        vlc_tick_t i_max_continuity;
         bool b_flat;
         MP4_GetInterleaving( p_demux, &i_max_continuity, &b_flat );
         if( b_flat )
