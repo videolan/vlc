@@ -227,10 +227,7 @@ static const char *const ppsz_enc_options[] = {
 };
 #endif
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -246,42 +243,41 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Misc init */
     date_Set( &p_sys->end_date, VLC_TS_INVALID );
     p_sys->i_last_block_size = 0;
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
     p_sys->b_has_headers = false;
 
     /* Take care of vorbis init */
     vorbis_info_init( &p_sys->vi );
     vorbis_comment_init( &p_sys->vc );
 
-    /* Set output properties */
+    if( b_packetizer )
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_VORBIS;
+        p_dec->pf_packetize  = Packetize;
+    }
+    else
+    {
 #ifdef MODULE_NAME_IS_tremor
-    p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
+        p_dec->fmt_out.i_codec = VLC_CODEC_S32N;
 #else
-    p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
+        p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
 #endif
+        p_dec->pf_decode     = DecodeAudio;
+    }
 
-    /* Set callbacks */
-    p_dec->pf_decode     = DecodeAudio;
-    p_dec->pf_packetize  = Packetize;
     p_dec->pf_flush      = Flush;
 
     return VLC_SUCCESS;
 }
 
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
+}
+
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS )
-    {
-        p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_CODEC_VORBIS;
-    }
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 
 /****************************************************************************
