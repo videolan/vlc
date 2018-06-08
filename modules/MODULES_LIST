@@ -289,6 +289,7 @@ $Id$
  * packetizer_flac: FLAC audio packetizer
  * packetizer_h264: H264 video packetizer
  * packetizer_hevc: H.265/HEVC video packetizer
+ * packetizer_mjpeg: MJPEG packetizer
  * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer
  * packetizer_mpeg4video: MPEG4 video packetizer
