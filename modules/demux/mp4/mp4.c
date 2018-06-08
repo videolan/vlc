@@ -1712,12 +1712,14 @@ static void FragTrunSeekToTime( mp4_track_t *p_track, stime_t i_target_time )
     p_track->context.runs.i_current = i_run;
 }
 
+#define INVALID_SEGMENT_TIME  INT64_MAX
+
 static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurate )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint64_t i64 = UINT64_MAX;
     uint32_t i_segment_type = ATOM_moof;
-    stime_t  i_segment_time = INT64_MAX;
+    stime_t  i_segment_time = INVALID_SEGMENT_TIME;
     vlc_tick_t i_sync_time = i_nztime;
     bool b_iframesync = false;
 
@@ -4671,7 +4673,7 @@ static int FragCreateTrunIndex( demux_t *p_demux, MP4_Box_t *p_moof,
             }
 
             /* Use global sidx moof time, in case moof does not carry tfdt */
-            if( !b_has_base_media_decode_time && i_moof_time != INT64_MAX )
+            if( !b_has_base_media_decode_time && i_moof_time != INVALID_SEGMENT_TIME )
                 i_traf_start_time = MP4_rescale( i_moof_time, p_sys->i_timescale, p_track->i_timescale );
 
             /* That should not happen */
@@ -4999,7 +5001,7 @@ static int DemuxFrag( demux_t *p_demux )
 
                     /* Prepare chunk */
                     if( FragPrepareChunk( p_demux, p_sys->context.p_fragment_atom,
-                                          MP4_BoxGet( p_vroot, "sidx"), INT64_MAX,
+                                          MP4_BoxGet( p_vroot, "sidx"), INVALID_SEGMENT_TIME,
                                           b_discontinuity ) != VLC_SUCCESS )
                     {
                         MP4_BoxFree( p_vroot );
