@@ -1218,6 +1218,9 @@ int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
                 if (ret != VLC_SUCCESS)
                     continue;
             }
+            /* Use the visible pitch of the region */
+            r->p_picture->p[0].i_visible_pitch = r->fmt.i_visible_width
+                                               * r->p_picture->p[0].i_pixel_pitch;
             ret = tc->pf_update(tc, &glr->texture, &glr->width, &glr->height,
                                 r->p_picture, &pixels_offset);
         }
