@@ -2615,7 +2615,7 @@ static int TrackCreateSamplesIndex( demux_t *p_demux,
      /* FIXME: refactor STTS & CTTS, STTS having now only few extra lines and
       *        differing in 2/2 fields and 1 signedness */
 
-    vlc_tick_t i_next_dts = 0;
+    int64_t i_next_dts = 0;
     /* Find stts
      *  Gives mapping between sample and decoding time
      */
