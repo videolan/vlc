@@ -80,7 +80,7 @@ struct demux_sys_t
     uint64_t     i_duration;           /* Declared fragmented duration (movie time scale) */
     uint64_t     i_cumulated_duration; /* Same as above, but not from probing, (movie time scale) */
     uint32_t     i_timescale;          /* movie time scale */
-    uint64_t     i_nztime;             /* time position of the presentation (CLOCK_FREQ timescale) */
+    vlc_tick_t   i_nztime;             /* time position of the presentation (CLOCK_FREQ timescale) */
     unsigned int i_tracks;       /* number of tracks */
     mp4_track_t  *track;         /* array of track */
     float        f_fps;          /* number of frame per seconds */
@@ -479,7 +479,7 @@ static inline mtime_t MP4_GetSamplesDuration( demux_t *p_demux, mp4_track_t *p_t
     return MP4_rescale( i_duration, p_track->i_timescale, CLOCK_FREQ );
 }
 
-static inline int64_t MP4_GetMoviePTS(demux_sys_t *p_sys )
+static inline vlc_tick_t MP4_GetMoviePTS(demux_sys_t *p_sys )
 {
     return p_sys->i_nztime;
 }
