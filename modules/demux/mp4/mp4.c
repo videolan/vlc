@@ -2287,7 +2287,7 @@ static void LoadChapterGoPro( demux_t *p_demux, MP4_Box_t *p_hmmt )
                     EnsureUTF8( s->psz_name );
 
                 /* HiLights are stored in ms so we convert them to µs */
-                s->i_time_offset = BOXDATA(p_hmmt)->pi_chapter_start[i] * 1000;
+                s->i_time_offset = VLC_TICK_FROM_MS( BOXDATA(p_hmmt)->pi_chapter_start[i] );
                 TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
             }
         }
