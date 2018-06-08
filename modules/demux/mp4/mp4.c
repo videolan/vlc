@@ -146,6 +146,8 @@ typedef struct
 #define DEMUX_INCREMENT VLC_TICK_FROM_MS(250) /* How far the pcr will go, each round */
 #define DEMUX_TRACK_MAX_PRELOAD VLC_TICK_FROM_SEC(15) /* maximum preloading, to deal with interleaving */
 
+#define INVALID_PRELOAD  UINT_MAX
+
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)
 #define VLC_DEMUXER_FATAL (VLC_DEMUXER_EGENERIC - 2)
 
@@ -1261,7 +1263,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
 
     uint32_t i_run_seq = MP4_TrackGetRunSeq( tk );
     vlc_tick_t i_current_nzdts = MP4_TrackGetDTS( p_demux, tk );
-    const vlc_tick_t i_demux_max_nzdts =(i_max_preload < UINT_MAX)
+    const vlc_tick_t i_demux_max_nzdts =i_max_preload < INVALID_PRELOAD
                                     ? i_current_nzdts + i_max_preload
                                     : INT64_MAX;
 
@@ -1392,7 +1394,7 @@ static int DemuxMoov( demux_t *p_demux )
             return VLC_DEMUXER_EOS;
     }
 
-    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : UINT_MAX;
+    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
     int i_status;
     /* demux up to increment amount of data on every track, or just set pcr if empty data */
     for( ;; )
@@ -4373,7 +4375,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
         MP4_Seek( p_demux->s, p_track->context.i_trun_sample_pos ) != VLC_SUCCESS )
         return VLC_DEMUXER_EOF;
 
-    const stime_t i_demux_max_dts = (i_max_preload < UINT_MAX) ?
+    const stime_t i_demux_max_dts = (i_max_preload < INVALID_PRELOAD) ?
                 p_track->i_time + MP4_rescale( i_max_preload, CLOCK_FREQ, p_track->i_timescale ) :
                 INT64_MAX;
 
@@ -4457,7 +4459,7 @@ static int DemuxMoof( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_status;
 
-    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : UINT_MAX;
+    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
 
     const vlc_tick_t i_nztime = MP4_GetMoviePTS( p_sys );
 
