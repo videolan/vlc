@@ -1248,7 +1248,7 @@ static block_t * MP4_RTPHint_Convert( demux_t *p_demux, block_t *p_block, vlc_fo
  * TODO check for newly selected track (ie audio upt to now )
  *****************************************************************************/
 static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
-                       unsigned i_max_preload )
+                       vlc_tick_t i_max_preload )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint32_t i_nb_samples = 0;
@@ -1393,7 +1393,7 @@ static int DemuxMoov( demux_t *p_demux )
             return VLC_DEMUXER_EOS;
     }
 
-    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
+    const vlc_tick_t i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
     int i_status;
     /* demux up to increment amount of data on every track, or just set pcr if empty data */
     for( ;; )
@@ -1425,7 +1425,7 @@ static int DemuxMoov( demux_t *p_demux )
             /* Second pass, refine and find any best candidate having a chunk pos closer than
              * current candidate (avoids seeks when increment falls between the 2) from
              * current position, but within extended interleave time */
-            for( i_track = 0; i_max_preload > 0 && i_track < p_sys->i_tracks; i_track++ )
+            for( i_track = 0; i_max_preload != 0 && i_track < p_sys->i_tracks; i_track++ )
             {
                 mp4_track_t *tk_tmp = &p_sys->track[i_track];
                 if( tk_tmp == tk ||
@@ -4358,7 +4358,7 @@ static void FragResetContext( demux_sys_t *p_sys )
 }
 
 static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
-                           unsigned i_max_preload )
+                           vlc_tick_t i_max_preload )
 {
     if( !p_track->b_ok ||
          p_track->context.runs.i_current >= p_track->context.runs.i_count )
@@ -4461,7 +4461,7 @@ static int DemuxMoof( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_status;
 
-    const unsigned i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
+    const vlc_tick_t i_max_preload = ( p_sys->b_fastseekable ) ? 0 : ( p_sys->b_seekable ) ? DEMUX_TRACK_MAX_PRELOAD : INVALID_PRELOAD;
 
     const vlc_tick_t i_nztime = MP4_GetMoviePTS( p_sys );
 
@@ -4500,7 +4500,7 @@ static int DemuxMoof( demux_t *p_demux )
             /* Second pass, refine and find any best candidate having a chunk pos closer than
              * current candidate (avoids seeks when increment falls between the 2) from
              * current position, but within extended interleave time */
-            for( unsigned i = 0; i_max_preload > 0 && i < p_sys->i_tracks; i++ )
+            for( unsigned i = 0; i_max_preload != 0 && i < p_sys->i_tracks; i++ )
             {
                 mp4_track_t *tk_tmp = &p_sys->track[i];
                 if( tk_tmp == tk ||
