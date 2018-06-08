@@ -134,7 +134,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
                         b_invalid_cue = true;
                         break;
                     }
-                    cue_mk_time = static_cast<uint64>( *kct_ptr ) * i_timescale / INT64_C(1000);
+                    cue_mk_time = VLC_TICK_FROM_NS(static_cast<uint64>( *kct_ptr ) * i_timescale);
                 }
                 else if( MKV_IS_ID( el, KaxCueTrackPositions ) )
                 {
