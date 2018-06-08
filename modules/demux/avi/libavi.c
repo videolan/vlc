@@ -107,6 +107,22 @@ static int AVI_ChunkReadCommon( stream_t *s, avi_chunk_t *p_chk,
     return VLC_SUCCESS;
 }
 
+static int AVI_GotoNextChunk( stream_t *s, const avi_chunk_t *p_chk )
+{
+    bool b_seekable = false;
+    const uint64_t i_offset = AVI_ChunkEnd( p_chk );
+    if ( !vlc_stream_Control(s, STREAM_CAN_SEEK, &b_seekable) && b_seekable )
+    {
+        return vlc_stream_Seek( s, i_offset );
+    }
+    else
+    {
+        ssize_t i_read = i_offset - vlc_stream_Tell( s );
+        return (i_read >=0 && vlc_stream_Read( s, NULL, i_read ) == i_read) ?
+                    VLC_SUCCESS : VLC_EGENERIC;
+    }
+}
+
 static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
 {
     avi_chunk_t chk;
@@ -120,18 +136,7 @@ static int AVI_NextChunk( stream_t *s, avi_chunk_t *p_chk )
         p_chk = &chk;
     }
 
-    bool b_seekable = false;
-    const uint64_t i_offset = AVI_ChunkEnd( p_chk );
-    if ( !vlc_stream_Control(s, STREAM_CAN_SEEK, &b_seekable) && b_seekable )
-    {
-        return vlc_stream_Seek( s, i_offset );
-    }
-    else
-    {
-        ssize_t i_read = i_offset - vlc_stream_Tell( s );
-        return (i_read >=0 && vlc_stream_Read( s, NULL, i_read ) == i_read) ?
-                    VLC_SUCCESS : VLC_EGENERIC;
-    }
+    return AVI_GotoNextChunk( s, p_chk );
 }
 
 /****************************************************************************
@@ -225,9 +230,11 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
         }
 
     }
-    msg_Dbg( (vlc_object_t*)s, "</list \'%4.4s\'>", (char*)&p_container->list.i_type );
+    msg_Dbg( (vlc_object_t*)s, "</list \'%4.4s\'>%x", (char*)&p_container->list.i_type, i_ret );
 
-    if ( i_ret == AVI_ZERO_FOURCC ) return i_ret;
+    if( i_ret == AVI_ZERO_FOURCC || i_ret == AVI_ZEROSIZED_CHUNK )
+        return AVI_GotoNextChunk( s, p_container );
+
     return VLC_SUCCESS;
 }
 
@@ -998,15 +1005,7 @@ int  AVI_ChunkRead( stream_t *s, avi_chunk_t *p_chk, avi_chunk_t *p_father )
     i_index = AVI_ChunkFunctionFind( p_chk->common.i_chunk_fourcc );
     if( AVI_Chunk_Function[i_index].AVI_ChunkRead_function )
     {
-        int i_return = AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
-        if ( i_return == AVI_ZEROSIZED_CHUNK || i_return == AVI_ZERO_FOURCC )
-        {
-            if ( !p_father )
-                return VLC_EGENERIC;
-            p_chk->common.i_chunk_fourcc = 0;
-            return AVI_NextChunk( s, ( i_return == AVI_ZEROSIZED_CHUNK ) ? p_chk : p_father );
-        }
-        return i_return;
+        return AVI_Chunk_Function[i_index].AVI_ChunkRead_function( s, p_chk );
     }
     else if( ( ((char*)&p_chk->common.i_chunk_fourcc)[0] == 'i' &&
                ((char*)&p_chk->common.i_chunk_fourcc)[1] == 'x' ) ||
