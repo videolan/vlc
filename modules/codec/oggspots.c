@@ -95,10 +95,7 @@ vlc_module_begin ()
     add_shortcut("oggspots")
 vlc_module_end ()
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder(vlc_object_t* p_this)
+static int OpenCommon(vlc_object_t* p_this, bool b_packetizer)
 {
     decoder_t* p_dec = (decoder_t*)p_this;
     decoder_sys_t* p_sys;
@@ -113,7 +110,7 @@ static int OpenDecoder(vlc_object_t* p_this)
         return VLC_ENOMEM;
     }
     p_dec->p_sys = p_sys;
-    p_sys->b_packetizer = false;
+    p_sys->b_packetizer = b_packetizer;
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TS_INVALID;
 
@@ -124,30 +121,33 @@ static int OpenDecoder(vlc_object_t* p_this)
         return VLC_ENOMEM;
     }
 
-    /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+    if( b_packetizer )
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_OGGSPOTS;
+        p_dec->pf_packetize = Packetize;
+    }
+    else
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+        p_dec->pf_decode = DecodeVideo;
+    }
 
-    /* Set callbacks */
-    p_dec->pf_decode    = DecodeVideo;
-    p_dec->pf_packetize = Packetize;
-    p_dec->pf_flush     = Flush;
+    p_dec->pf_flush = Flush;
 
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * OpenDecoder: probe the decoder and return score
+ *****************************************************************************/
+static int OpenDecoder(vlc_object_t* p_this)
+{
+    return OpenCommon(p_this, false);
+}
+
 static int OpenPacketizer(vlc_object_t* p_this)
 {
-    decoder_t* p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys = p_dec->p_sys;
-
-    int i_ret = OpenDecoder(p_this);
-
-    if (i_ret == VLC_SUCCESS) {
-        p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_CODEC_OGGSPOTS;
-    }
-
-    return i_ret;
+    return OpenCommon(p_this, true);
 }
 
 /****************************************************************************
