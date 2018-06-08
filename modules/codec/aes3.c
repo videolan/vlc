@@ -288,7 +288,6 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     {
         p_dec->fmt_out.i_codec = VLC_CODEC_302M;
 
-        p_dec->pf_decode       = NULL;
         p_dec->pf_packetize    = Packetize;
     }
     else
@@ -297,7 +296,6 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
         p_dec->fmt_out.audio.i_bitspersample = 16;
 
         p_dec->pf_decode    = Decode;
-        p_dec->pf_packetize = NULL;
     }
     p_dec->pf_flush            = Flush;
     return VLC_SUCCESS;
