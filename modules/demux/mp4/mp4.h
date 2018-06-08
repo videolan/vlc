@@ -137,7 +137,7 @@ typedef struct
     bool b_codec_need_restart;
 #endif
 
-    mtime_t i_time; // track scaled
+    stime_t i_time; // track scaled
 
     /* rrtp reception hint track */
     MP4_Box_t *p_sdp;                         /* parsed for codec and other info */
