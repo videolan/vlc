@@ -175,7 +175,7 @@ static int  MP4_TrackSeek   ( demux_t *, mp4_track_t *, vlc_tick_t );
 static uint64_t MP4_TrackGetPos    ( mp4_track_t * );
 static uint32_t MP4_TrackGetReadSize( mp4_track_t *, uint32_t * );
 static int      MP4_TrackNextSample( demux_t *, mp4_track_t *, uint32_t );
-static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, int64_t );
+static void     MP4_TrackSetELST( demux_t *, mp4_track_t *, vlc_tick_t );
 
 static void     MP4_UpdateSeekpoint( demux_t *, vlc_tick_t );
 
@@ -3990,7 +3990,7 @@ static int MP4_TrackNextSample( demux_t *p_demux, mp4_track_t *p_track, uint32_t
 }
 
 static void MP4_TrackSetELST( demux_t *p_demux, mp4_track_t *tk,
-                              int64_t i_time )
+                              vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int         i_elst_last = tk->i_elst;
