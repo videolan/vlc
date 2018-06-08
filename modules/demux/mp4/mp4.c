@@ -321,25 +321,25 @@ static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track
 
     unsigned int i_index = 0;
     unsigned int i_sample = p_track->i_sample - p_chunk->i_sample_first;
-    int64_t i_dts = p_chunk->i_first_dts;
+    int64_t sdts = p_chunk->i_first_dts;
 
     while( i_sample > 0 && i_index < p_chunk->i_entries_dts )
     {
         if( i_sample > p_chunk->p_sample_count_dts[i_index] )
         {
-            i_dts += p_chunk->p_sample_count_dts[i_index] *
+            sdts += p_chunk->p_sample_count_dts[i_index] *
                 p_chunk->p_sample_delta_dts[i_index];
             i_sample -= p_chunk->p_sample_count_dts[i_index];
             i_index++;
         }
         else
         {
-            i_dts += i_sample * p_chunk->p_sample_delta_dts[i_index];
+            sdts += i_sample * p_chunk->p_sample_delta_dts[i_index];
             break;
         }
     }
 
-    i_dts = MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
+    vlc_tick_t i_dts = MP4_rescale( sdts, p_track->i_timescale, CLOCK_FREQ );
 
     /* now handle elst */
     if( p_track->p_elst && p_track->BOXDATA(p_elst)->i_entry_count )
