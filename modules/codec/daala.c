@@ -154,10 +154,7 @@ static const char *const ppsz_enc_options[] = {
 };
 #endif
 
-/*****************************************************************************
- * OpenDecoder: probe the decoder and return score
- *****************************************************************************/
-static int OpenDecoder( vlc_object_t *p_this )
+static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
@@ -173,18 +170,22 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_dec->p_sys = p_sys;
-    p_dec->p_sys->b_packetizer = false;
+    p_dec->p_sys->b_packetizer = b_packetizer;
     p_sys->b_has_headers = false;
     p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_decoded_first_keyframe = false;
     p_sys->dcx = NULL;
 
-    /* Set output properties */
-    p_dec->fmt_out.i_codec = VLC_CODEC_I420;
-
-    /* Set callbacks */
-    p_dec->pf_decode    = DecodeVideo;
-    p_dec->pf_packetize = Packetize;
+    if( b_packetizer )
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_DAALA;
+        p_dec->pf_packetize = Packetize;
+    }
+    else
+    {
+        p_dec->fmt_out.i_codec = VLC_CODEC_I420;
+        p_dec->pf_decode = DecodeVideo;
+    }
 
     /* Init supporting Daala structures needed in header parsing */
     daala_comment_init( &p_sys->dc );
@@ -193,19 +194,17 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * OpenDecoder: probe the decoder and return score
+ *****************************************************************************/
+static int OpenDecoder( vlc_object_t *p_this )
+{
+    return OpenCommon( p_this, false );
+}
+
 static int OpenPacketizer( vlc_object_t *p_this )
 {
-    decoder_t *p_dec = (decoder_t*)p_this;
-
-    int i_ret = OpenDecoder( p_this );
-
-    if( i_ret == VLC_SUCCESS )
-    {
-        p_dec->p_sys->b_packetizer = true;
-        p_dec->fmt_out.i_codec = VLC_CODEC_DAALA;
-    }
-
-    return i_ret;
+    return OpenCommon( p_this, true );
 }
 
 /****************************************************************************
