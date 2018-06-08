@@ -314,7 +314,7 @@ static es_out_id_t * MP4_AddTrackES( es_out_t *out, mp4_track_t *p_track )
 }
 
 /* Return time in microsecond of a track */
-static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
+static inline vlc_tick_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     const mp4_chunk_t *p_chunk = &p_track->chunk[p_track->i_chunk];
@@ -364,7 +364,7 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
 }
 
 static inline bool MP4_TrackGetPTSDelta( demux_t *p_demux, mp4_track_t *p_track,
-                                         int64_t *pi_delta )
+                                         vlc_tick_t *pi_delta )
 {
     VLC_UNUSED( p_demux );
     mp4_chunk_t *ck = &p_track->chunk[p_track->i_chunk];
@@ -1280,7 +1280,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
         if( i_samplessize > 0 )
         {
             block_t *p_block;
-            int64_t i_delta;
+            vlc_tick_t i_delta;
 
             if( vlc_stream_Tell( p_demux->s ) != i_readpos )
             {
@@ -2297,8 +2297,8 @@ static void LoadChapterApple( demux_t  *p_demux, mp4_track_t *tk )
 
     for( tk->i_sample = 0; tk->i_sample < tk->i_sample_count; tk->i_sample++ )
     {
-        const int64_t i_dts = MP4_TrackGetDTS( p_demux, tk );
-        int64_t i_pts_delta;
+        const vlc_tick_t i_dts = MP4_TrackGetDTS( p_demux, tk );
+        vlc_tick_t i_pts_delta;
         if ( !MP4_TrackGetPTSDelta( p_demux, tk, &i_pts_delta ) )
             i_pts_delta = 0;
         uint32_t i_nb_samples = 0;
