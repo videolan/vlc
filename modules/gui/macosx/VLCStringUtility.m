@@ -73,7 +73,6 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     NSMutableString *o_wrapped;
     NSString *o_out_string;
     NSRange glyphRange, effectiveRange, charRange;
-    NSRect lineFragmentRect;
     unsigned glyphIndex, breaksInserted = 0;
 
     NSTextStorage *o_storage = [[NSTextStorage alloc] initWithString: o_in_string
@@ -91,8 +90,8 @@ NSString *const kVLCMediaUnknown = @"Unknown";
 
     for (glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
         glyphIndex += effectiveRange.length) {
-        lineFragmentRect = [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
-                                                              effectiveRange: &effectiveRange];
+        [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
+                                           effectiveRange: &effectiveRange];
         charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
                                                  actualGlyphRange: &effectiveRange];
         if ([o_wrapped lineRangeForRange:

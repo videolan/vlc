@@ -68,8 +68,6 @@
     NSString *o_command = [[self commandDescription] commandName];
     NSString *o_parameter = [self directParameter];
 
-    intf_thread_t * p_intf = getIntf();
-
     if ([o_command isEqualToString:@"play"])
         [[VLCCoreInteraction sharedInstance] playOrPause];
     else if ([o_command isEqualToString:@"stop"])

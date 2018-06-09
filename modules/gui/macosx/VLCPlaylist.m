@@ -702,7 +702,6 @@
 - (void)outlineView:(NSOutlineView *)outlineView didClickTableColumn:(NSTableColumn *)aTableColumn
 {
     int type = 0;
-    intf_thread_t *p_intf = getIntf();
     NSString * identifier = [aTableColumn identifier];
 
     if (_sortTableColumn == aTableColumn)
