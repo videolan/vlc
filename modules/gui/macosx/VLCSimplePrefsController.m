@@ -1227,7 +1227,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [self osdSettingChanged:self];
 }
 
-- (NSUInteger)validModesForFontPanel:(NSFontPanel *)fontPanel
+- (NSFontPanelModeMask)validModesForFontPanel:(NSFontPanel *)fontPanel
 {
     return NSFontPanelFaceModeMask | NSFontPanelCollectionModeMask;
 }
