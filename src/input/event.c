@@ -322,7 +322,7 @@ static void VarListDel( input_thread_t *p_input,
     if( i_value >= 0 )
     {
         val.i_int = i_value;
-        var_Change( p_input, psz_variable, VLC_VAR_DELCHOICE, &val );
+        var_Change( p_input, psz_variable, VLC_VAR_DELCHOICE, val );
     }
     else
     {

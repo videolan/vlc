@@ -156,7 +156,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_input, "program", &val );
     if( val.i_int <= 0 )
-        var_Change( p_input, "program", VLC_VAR_DELCHOICE, &val );
+        var_Change( p_input, "program", VLC_VAR_DELCHOICE, val );
     text.psz_string = _("Program");
     var_Change( p_input, "program", VLC_VAR_SETTEXT, &text );
 

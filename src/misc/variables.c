@@ -495,11 +495,11 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
         }
         case VLC_VAR_DELCHOICE:
         {
-            vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
+            vlc_value_t val = va_arg(ap, vlc_value_t);
             int i;
 
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
-                if( p_var->ops->pf_cmp( p_var->choices.p_values[i], *p_val ) == 0 )
+                if( p_var->ops->pf_cmp( p_var->choices.p_values[i], val ) == 0 )
                     break;
 
             if( i == p_var->choices.i_count )
@@ -514,7 +514,8 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             TAB_ERASE(p_var->choices_text.i_count,
                       p_var->choices_text.p_values, i);
 
-            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_DELCHOICE, p_val);
+            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_DELCHOICE,
+                                &val);
             break;
         }
         case VLC_VAR_CHOICESCOUNT:

@@ -333,7 +333,7 @@ static void test_choices( libvlc_int_t *p_libvlc )
 
     assert( var_CountChoices( p_libvlc, "bla" ) == 2 );
 
-    var_Change( p_libvlc, "bla", VLC_VAR_DELCHOICE, &val );
+    var_Change( p_libvlc, "bla", VLC_VAR_DELCHOICE, val );
     assert( var_CountChoices( p_libvlc, "bla" ) == 1 );
 
     var_Change( p_libvlc, "bla", VLC_VAR_GETCHOICES, &val, &val2 );
