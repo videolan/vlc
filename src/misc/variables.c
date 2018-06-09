@@ -500,10 +500,9 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
                     break;
 
             if( i == p_var->choices.i_count )
-            {
-                /* Not found */
-                vlc_mutex_unlock( &p_priv->var_lock );
-                return VLC_EGENERIC;
+            {   /* Not found */
+                ret = VLC_EGENERIC;
+                break;
             }
 
             p_var->ops->pf_free( &p_var->choices.p_values[i] );
