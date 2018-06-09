@@ -80,6 +80,10 @@
         return NO;
     }
     err = AudioObjectSetPropertyData(i_device, &propertyAddress, 0, NULL, i_size, &f_volume);
+    if (err != noErr ) {
+        msg_Warn( getIntf(), "failed to set the main device volume" );
+        return NO;
+    }
 
     return YES;
 }
