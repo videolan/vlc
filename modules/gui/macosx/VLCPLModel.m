@@ -42,6 +42,22 @@
 #include <vlc_input.h>
 #include <vlc_url.h>
 
+@interface VLCPLModel ()
+{
+    playlist_t *p_playlist;
+    __weak NSOutlineView *_outlineView;
+
+    NSUInteger _retainedRowSelection;
+}
+
+- (void)VLCPLItemAppended:(NSArray *)valueArray;
+- (void)VLCPLItemRemoved:(NSNumber *)value;
+- (void)VLCPLItemUpdated;
+
+@end
+
+#pragma mark -
+
 static int VLCPLItemUpdated(vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t new_val, void *param)
 {
@@ -104,15 +120,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 }
 
 #pragma mark -
-
-@interface VLCPLModel ()
-{
-    playlist_t *p_playlist;
-    __weak NSOutlineView *_outlineView;
-
-    NSUInteger _retainedRowSelection;
-}
-@end
 
 @implementation VLCPLModel
 

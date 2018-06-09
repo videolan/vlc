@@ -2197,7 +2197,6 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
               row:(NSInteger)dropRow dropOperation:(NSTableViewDropOperation)op;
 {
     NSPasteboard    *pb = [info draggingPasteboard];
-    NSDragOperation srcMask = [info draggingSourceOperationMask];
     BOOL accepted = NO;
 
     NS_DURING

@@ -88,6 +88,4 @@
 - (IBAction)transcodeInfoChanged:(id)object;
 - (IBAction)announceChanged:(id)sender;
 
-- (IBAction)streamTTLStepperChanged:(id)sender;
-
 @end
