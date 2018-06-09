@@ -198,9 +198,8 @@ static int OpenPostproc( vlc_object_t *p_this )
 
     var_Create( p_filter, FILTER_PREFIX "q", VLC_VAR_INTEGER |
                 VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-
-    text.psz_string = _("Post processing");
-    var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETTEXT, &text );
+    var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETTEXT,
+                _("Post processing") );
 
     var_Get( p_filter, FILTER_PREFIX "q", &val_orig );
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_DELCHOICE, val_orig );

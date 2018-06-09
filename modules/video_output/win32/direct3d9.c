@@ -316,9 +316,7 @@ static int Open(vlc_object_t *object)
     sys->ch_desktop = false;
     sys->desktop_requested = sys->sys.use_desktop;
 
-    vlc_value_t val;
-    val.psz_string = _("Desktop");
-    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, &val);
+    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Desktop"));
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
     /* Setup vout_display now that everything is fine */

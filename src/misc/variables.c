@@ -583,13 +583,10 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
         }
         case VLC_VAR_SETTEXT:
         {
-            const vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
+            const char *text = va_arg(ap, const char *);
 
             free( p_var->psz_text );
-            if( p_val && p_val->psz_string )
-                p_var->psz_text = strdup( p_val->psz_string );
-            else
-                p_var->psz_text = NULL;
+            p_var->psz_text = (text != NULL) ? strdup(text) : NULL;
             break;
         }
         case VLC_VAR_GETTEXT:

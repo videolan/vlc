@@ -149,7 +149,7 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
 
 void vout_IntfInit( vout_thread_t *p_vout )
 {
-    vlc_value_t val, text;
+    vlc_value_t val;
     char *psz_buf;
 
     /* Create a few object variables we'll need later on */
@@ -166,15 +166,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Add variables to manage scaling video */
     var_Create( p_vout, "autoscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Autoscale video");
-    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, _("Autoscale video") );
     var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
 
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
-
-    text.psz_string = _("Zoom");
-    var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, _("Zoom") );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
@@ -199,9 +196,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Crop object var */
     var_Create( p_vout, "crop", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
-
-    text.psz_string = _("Crop");
-    var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "crop", VLC_VAR_SETTEXT, _("Crop") );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_crop_values); i++ )
     {
@@ -226,9 +221,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Aspect-ratio object var */
     var_Create( p_vout, "aspect-ratio", VLC_VAR_STRING | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
-
-    text.psz_string = _("Aspect ratio");
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, _("Aspect ratio") );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_aspect_ratio_values); i++ )
     {
@@ -250,8 +243,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Add a variable to indicate if the window should be on top of others */
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Always on top");
-    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT,
+                _("Always on top") );
     var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
 
     /* Add a variable to indicate if the window should be below all others */
@@ -265,14 +258,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     /* Add a fullscreen variable */
     var_Create( p_vout, "fullscreen",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Fullscreen");
-    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, _("Fullscreen") );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     /* Add a snapshot variable */
     var_Create( p_vout, "video-snapshot", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Snapshot");
-    var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, &text );
+    var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, _("Snapshot") );
     var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
 
     /* Add a video-filter variable */

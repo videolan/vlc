@@ -128,7 +128,7 @@ static const vlc_input_callback_t p_input_title_navigation_callbacks[] =
  *****************************************************************************/
 void input_ControlVarInit ( input_thread_t *p_input )
 {
-    vlc_value_t val, text;
+    vlc_value_t val;
 
     /* State */
     var_Create( p_input, "state", VLC_VAR_INTEGER );
@@ -149,31 +149,26 @@ void input_ControlVarInit ( input_thread_t *p_input )
 
     /* Bookmark */
     var_Create( p_input, "bookmark", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
-    val.psz_string = _("Bookmark");
-    var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, &val );
+    var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, _("Bookmark") );
 
     /* Program */
     var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_input, "program", &val );
     if( val.i_int <= 0 )
         var_Change( p_input, "program", VLC_VAR_DELCHOICE, val );
-    text.psz_string = _("Program");
-    var_Change( p_input, "program", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "program", VLC_VAR_SETTEXT, _("Program") );
 
     /* Programs */
     var_Create( p_input, "programs", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    text.psz_string = _("Programs");
-    var_Change( p_input, "programs", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "programs", VLC_VAR_SETTEXT, _("Programs") );
 
     /* Title */
     var_Create( p_input, "title", VLC_VAR_INTEGER );
-    text.psz_string = _("Title");
-    var_Change( p_input, "title", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "title", VLC_VAR_SETTEXT, _("Title") );
 
     /* Chapter */
     var_Create( p_input, "chapter", VLC_VAR_INTEGER );
-    text.psz_string = _("Chapter");
-    var_Change( p_input, "chapter", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "chapter", VLC_VAR_SETTEXT, _("Chapter") );
 
     /* Delay */
     var_Create( p_input, "audio-delay", VLC_VAR_INTEGER );
@@ -185,20 +180,17 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER );
     var_Change( p_input, "video-es", VLC_VAR_SETVALUE, val );
-    text.psz_string = _("Video Track");
-    var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "video-es", VLC_VAR_SETTEXT, _("Video Track") );
 
     /* Audio ES */
     var_Create( p_input, "audio-es", VLC_VAR_INTEGER );
     var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, val );
-    text.psz_string = _("Audio Track");
-    var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, _("Audio Track") );
 
     /* Spu ES */
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER );
     var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, val );
-    text.psz_string = _("Subtitle Track");
-    var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text );
+    var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, _("Subtitle Track") );
 
     var_Create( p_input, "spu-choice", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "spu-choice", -1 );
@@ -254,36 +246,34 @@ void input_ControlVarStop( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarNavigation( input_thread_t *p_input )
 {
-    vlc_value_t text;
-
     /* Create more command variables */
     if( input_priv(p_input)->i_title > 1 )
     {
         if( var_Type( p_input, "next-title" ) == 0 ) {
             var_Create( p_input, "next-title", VLC_VAR_VOID );
-            text.psz_string = _("Next title");
-            var_Change( p_input, "next-title", VLC_VAR_SETTEXT, &text );
+            var_Change( p_input, "next-title", VLC_VAR_SETTEXT,
+                        _("Next title") );
             var_AddCallback( p_input, "next-title", TitleCallback, NULL );
         }
 
         if( var_Type( p_input, "prev-title" ) == 0 ) {
             var_Create( p_input, "prev-title", VLC_VAR_VOID );
-            text.psz_string = _("Previous title");
-            var_Change( p_input, "prev-title", VLC_VAR_SETTEXT, &text );
+            var_Change( p_input, "prev-title", VLC_VAR_SETTEXT,
+                        _("Previous title") );
             var_AddCallback( p_input, "prev-title", TitleCallback, NULL );
         }
 
         if( var_Type( p_input, "menu-title" ) == 0 ) {
             var_Create( p_input, "menu-title", VLC_VAR_VOID );
-            text.psz_string = _("Menu title");
-            var_Change( p_input, "menu-title", VLC_VAR_SETTEXT, &text );
+            var_Change( p_input, "menu-title", VLC_VAR_SETTEXT,
+                        _("Menu title") );
             var_AddCallback( p_input, "menu-title", TitleCallback, NULL );
         }
 
         if( var_Type( p_input, "menu-popup" ) == 0 ) {
             var_Create( p_input, "menu-popup", VLC_VAR_VOID );
-            text.psz_string = _("Menu popup");
-            var_Change( p_input, "menu-popup", VLC_VAR_SETTEXT, &text );
+            var_Change( p_input, "menu-popup", VLC_VAR_SETTEXT,
+                        _("Menu popup") );
             var_AddCallback( p_input, "menu-popup", TitleCallback, NULL );
         }
     }
@@ -313,16 +303,17 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         else
             psz_length[0] = '\0';
 
+        char *titlestr;
         if( input_priv(p_input)->title[i]->psz_name == NULL ||
             *input_priv(p_input)->title[i]->psz_name == '\0' )
         {
-            if( asprintf( &text.psz_string, _("Title %i%s"),
+            if( asprintf( &titlestr, _("Title %i%s"),
                           i + input_priv(p_input)->i_title_offset, psz_length ) == -1 )
                 continue;
         }
         else
         {
-            if( asprintf( &text.psz_string, "%s%s",
+            if( asprintf( &titlestr, "%s%s",
                           input_priv(p_input)->title[i]->psz_name, psz_length ) == -1 )
                 continue;
         }
@@ -330,9 +321,9 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         /* Add title choice */
         val2.i_int = i;
         var_Change( p_input, "title", VLC_VAR_ADDCHOICE, val2,
-                    (const char *)text.psz_string );
+                    (const char *)titlestr );
 
-        free( text.psz_string );
+        free( titlestr );
 
         for( int j = 0; j < input_priv(p_input)->title[i]->i_seekpoint; j++ )
         {
@@ -379,13 +370,13 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     else if( var_Type( p_input, "next-chapter" ) == 0 )
     {
         var_Create( p_input, "next-chapter", VLC_VAR_VOID );
-        text.psz_string = _("Next chapter");
-        var_Change( p_input, "next-chapter", VLC_VAR_SETTEXT, &text );
+        var_Change( p_input, "next-chapter", VLC_VAR_SETTEXT,
+                    _("Next chapter") );
         var_AddCallback( p_input, "next-chapter", SeekpointCallback, NULL );
 
         var_Create( p_input, "prev-chapter", VLC_VAR_VOID );
-        text.psz_string = _("Previous chapter");
-        var_Change( p_input, "prev-chapter", VLC_VAR_SETTEXT, &text );
+        var_Change( p_input, "prev-chapter", VLC_VAR_SETTEXT,
+                    _("Previous chapter") );
         var_AddCallback( p_input, "prev-chapter", SeekpointCallback, NULL );
     }
 

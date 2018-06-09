@@ -727,11 +727,11 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         vlc_v4l2_ctrl_t *c = handler (obj, fd, &query);
         if (c != NULL)
         {
-            vlc_value_t val, text;
+            vlc_value_t val;
 
             var_AddCallback (obj, c->name, ControlSetCallback, c);
-            text.psz_string = (char *)query.name;
-            var_Change(obj, c->name, VLC_VAR_SETTEXT, &text);
+            var_Change(obj, c->name, VLC_VAR_SETTEXT,
+                       (const char *)query.name);
             val.i_int = query.id;
             var_Change(obj, "controls", VLC_VAR_ADDCHOICE, val,
                        (const char *)c->name);
@@ -765,8 +765,7 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
         vlc_value_t val;
 
         var_Create (obj, "reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND);
-        val.psz_string = _("Reset defaults");
-        var_Change(obj, "reset", VLC_VAR_SETTEXT, &val);
+        var_Change(obj, "reset", VLC_VAR_SETTEXT, _("Reset defaults"));
         val.i_int = -1;
 
         var_Change(obj, "controls", VLC_VAR_ADDCHOICE, val, "reset");

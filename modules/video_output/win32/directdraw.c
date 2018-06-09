@@ -242,9 +242,7 @@ static int Open(vlc_object_t *object)
     sys->wallpaper_requested = sys->use_wallpaper;
     sys->use_wallpaper = false;
 
-    vlc_value_t val;
-    val.psz_string = _("Wallpaper");
-    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, &val);
+    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Wallpaper"));
     var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
