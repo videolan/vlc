@@ -1540,7 +1540,7 @@ static void CycleESTrack(input_thread_t *input, const char *var)
 
     vlc_list_t list;
     if (var_Change(input, var, VLC_VAR_GETCHOICES, &list,
-                   (vlc_list_t *)NULL) < 0)
+                   (char ***)NULL) < 0)
         return;
 
     int64_t current = var_GetInteger(input, var);

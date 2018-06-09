@@ -388,7 +388,7 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
         return -1;
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list,
-                (vlc_list_t *)NULL );
+                (char ***)NULL );
     for( int i = 0; i < val_list.i_count; i++ )
     {
         if( i_track == val_list.p_values[i].i_int )

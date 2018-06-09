@@ -360,7 +360,7 @@ int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
         return -1;
 
     var_Change(p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &list,
-               (vlc_list_t *)NULL);
+               (char ***)NULL);
     for (int i = 0; i < list.i_count; i++)
     {
         if( i_spu == list.p_values[i].i_int )
@@ -453,7 +453,7 @@ static void teletext_enable( input_thread_t *p_input_thread, bool b_enable )
     {
         vlc_list_t list;
         if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETCHOICES,
-                         &list, (vlc_list_t *)NULL ) )
+                         &list, (char ***)NULL ) )
         {
             if( list.i_count > 0 )
                 var_SetInteger( p_input_thread, "spu-es",
@@ -575,7 +575,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
         return -1;
 
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list,
-                (vlc_list_t *)NULL );
+                (char ***)NULL );
     for( int i = 0; i < val_list.i_count; i++ )
     {
         if( i_track == val_list.p_values[i].i_int )

@@ -651,7 +651,8 @@ void ExtV4l2::Refresh( void )
     }
     if( p_obj )
     {
-        vlc_list_t val, text;
+        vlc_list_t val;
+        char **text;
         int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
                                 &val, &text );
         if( i_ret < 0 )
@@ -670,7 +671,7 @@ void ExtV4l2::Refresh( void )
         for( int i = 0; i < val.i_count; i++ )
         {
             char *vartext;
-            const char *psz_var = text.p_values[i].psz_string;
+            const char *psz_var = text[i];
 
             if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
                 continue;
@@ -694,13 +695,13 @@ void ExtV4l2::Refresh( void )
                         QComboBox *combobox = new QComboBox( box );
                         combobox->setObjectName( qfu( psz_var ) );
 
-                        vlc_list_t val2, text2;
+                        vlc_list_t val2;
+                        char **text2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
                                     &val2, &text2 );
                         for( int j = 0; j < val2.i_count; j++ )
                         {
-                            combobox->addItem(
-                                       text2.p_values[j].psz_string,
+                            combobox->addItem( text2[j],
                                        qlonglong( val2.p_values[j].i_int) );
                             if( i_val == val2.p_values[j].i_int )
                                 combobox->setCurrentIndex( j );

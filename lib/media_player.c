@@ -1788,7 +1788,8 @@ libvlc_track_description_t *
     if( !p_input )
         return NULL;
 
-    vlc_list_t val_list, text_list;
+    vlc_list_t val_list;
+    char **text_list;
     int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETCHOICES, &val_list, &text_list );
     if( i_ret != VLC_SUCCESS )
         return NULL;
@@ -1820,7 +1821,7 @@ libvlc_track_description_t *
             }
         }
         p_actual->i_id = val_list.p_values[i].i_int;
-        p_actual->psz_name = strdup( text_list.p_values[i].psz_string );
+        p_actual->psz_name = strdup( text_list[i] );
         p_actual->p_next = NULL;
         if( p_previous )
             p_previous->p_next = p_actual;

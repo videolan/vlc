@@ -279,7 +279,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             vlc_list_t list;
             var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
-                        &list, (vlc_list_t *)NULL );
+                        &list, (char ***)NULL );
 
             if( list.i_count > 1 )
             {
@@ -316,7 +316,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             vlc_list_t list;
             var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                        &list, (vlc_list_t *)NULL );
+                        &list, (char ***)NULL );
 
             if( list.i_count > 1 )
             {

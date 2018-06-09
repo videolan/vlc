@@ -1375,7 +1375,8 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                                    vlc_object_t *p_object )
 {
     vlc_value_t val;
-    vlc_list_t val_list, text_list;
+    vlc_list_t val_list;
+    char **text_list;
     int i_type, i;
 
     /* Check the type of the object variable */
@@ -1405,7 +1406,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     }
 
 #define CURVAL val_list.p_values[i]
-#define CURTEXT text_list.p_values[i].psz_string
+#define CURTEXT text_list[i]
 #define RADIO_OR_COMMAND  ( i_type & ( VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE ) ) ? ITEM_RADIO : ITEM_NORMAL
 
     for( i = 0; i < val_list.i_count; i++ )

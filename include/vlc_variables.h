@@ -212,7 +212,7 @@ VLC_API int var_Inherit( vlc_object_t *, const char *, int, vlc_value_t * );
  * @param p_val: the list variable
  * @param p_val2: the variable associated or NULL
  */
-VLC_API void var_FreeList( vlc_list_t *, vlc_list_t * );
+VLC_API void var_FreeList( vlc_list_t *, char *** );
 
 
 /*****************************************************************************

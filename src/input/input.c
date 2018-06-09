@@ -3280,7 +3280,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     vlc_list_t list;
 
     if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES, &list,
-                    (vlc_list_t *)NULL ) )
+                    (char ***)NULL ) )
         return VLC_SUCCESS;
 
     if( count == 0 )

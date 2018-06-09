@@ -268,7 +268,8 @@ void AspectRatioComboBox::updateRatios()
 {
     /* Clear the list before updating */
     clear();
-    vlc_list_t val_list, text_list;
+    vlc_list_t val_list;
+    char **text_list;
     vout_thread_t* p_vout = THEMIM->getVout();
 
     /* Disable if there is no vout */
@@ -281,7 +282,7 @@ void AspectRatioComboBox::updateRatios()
 
     var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES, &val_list, &text_list );
     for( int i = 0; i < val_list.i_count; i++ )
-        addItem( qfu( text_list.p_values[i].psz_string ),
+        addItem( qfu( text_list[i] ),
                  QString( val_list.p_values[i].psz_string ) );
     setEnabled( true );
     var_FreeList( &val_list, &text_list );

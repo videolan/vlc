@@ -552,7 +552,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
         case VLC_VAR_GETCHOICES:
         {
             vlc_list_t *values = va_arg(ap, vlc_list_t *);
-            vlc_list_t *texts = va_arg(ap, vlc_list_t *);
+            char ***texts = va_arg(ap, char ***);
 
             values->p_values =
                 xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
@@ -567,17 +567,12 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
 
             if( texts != NULL )
             {
-                texts->p_values =
-                    xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
-                texts->i_type = VLC_VAR_STRING;
-                texts->i_count = p_var->choices.i_count;
+                *texts = xmalloc( p_var->choices.i_count * sizeof(char *) );
 
                 for( int i = 0 ; i < p_var->choices.i_count ; i++ )
-                {
-                    texts->p_values[i].psz_string =
+                    (*texts)[i] =
                         p_var->choices_text.p_values[i].psz_string
                             ? strdup(p_var->choices_text.p_values[i].psz_string) : NULL;
-                }
             }
             break;
         }
@@ -1135,7 +1130,7 @@ error:
     return VLC_EGENERIC;
 }
 
-void var_FreeList( vlc_list_t *values, vlc_list_t *texts )
+void var_FreeList( vlc_list_t *values, char ***texts )
 {
     switch( values->i_type & VLC_VAR_CLASS )
     {
@@ -1149,11 +1144,9 @@ void var_FreeList( vlc_list_t *values, vlc_list_t *texts )
 
     if( texts != NULL )
     {
-        assert( texts->i_type == VLC_VAR_STRING );
-
-        for( int i = 0; i < texts->i_count; i++ )
-            free( texts->p_values[i].psz_string );
-        free( texts->p_values );
+        for( int i = 0; i < values->i_count; i++ )
+            free( (*texts)[i] );
+        free( *texts );
     }
 }
 
