@@ -1269,8 +1269,18 @@ static void InitPrograms( input_thread_t * p_input )
     }
     else
     {
-        demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP,
-                       es_out_GetGroupForced( input_priv(p_input)->p_es_out ), NULL );
+        int program = es_out_GetGroupForced( input_priv(p_input)->p_es_out );
+        if( program == 0 )
+            demux_Control( input_priv(p_input)->master->p_demux,
+                           DEMUX_SET_GROUP, 0, NULL );
+        else
+        {
+            vlc_value_t val = { .i_int = program };
+            list.i_count = 1, list.p_values = &val;
+
+            demux_Control( input_priv(p_input)->master->p_demux,
+                           DEMUX_SET_GROUP, -1, &list );
+        }
     }
 }
 
@@ -2015,8 +2025,16 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( input_priv(p_input)->p_es_out,
                             ES_OUT_SET_GROUP, val.i_int );
 
-            demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP, val.i_int,
-                            NULL );
+            if( val.i_int == 0 )
+                demux_Control( input_priv(p_input)->master->p_demux,
+                               DEMUX_SET_GROUP, 0, NULL );
+            else
+            {
+                vlc_list_t list = { .i_count = 1, list.p_values = &val };
+
+                demux_Control( input_priv(p_input)->master->p_demux,
+                               DEMUX_SET_GROUP, -1, &list );
+            }
             break;
 
         case INPUT_CONTROL_SET_ES:
