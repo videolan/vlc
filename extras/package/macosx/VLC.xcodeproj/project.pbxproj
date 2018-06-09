@@ -405,10 +405,10 @@
 		7D8BB0B418302AC000FAE9B7 /* VLCLogWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCLogWindowController.m; sourceTree = "<group>"; };
 		7DA481221B5FC13700917FD7 /* VLCPlaylistView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistView.h; sourceTree = "<group>"; };
 		7DA481231B5FC13700917FD7 /* VLCPlaylistView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistView.m; sourceTree = "<group>"; };
-		7DB40D2820CBCEB500F63173 /* VLCMainMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMainMenu.h; path = ../VLCMainMenu.h; sourceTree = "<group>"; };
-		7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCMainMenu.m; path = ../VLCMainMenu.m; sourceTree = "<group>"; };
-		7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCStatusBarIcon.m; path = ../VLCStatusBarIcon.m; sourceTree = "<group>"; };
-		7DB40D2C20CBCEC200F63173 /* VLCStatusBarIcon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCStatusBarIcon.h; path = ../VLCStatusBarIcon.h; sourceTree = "<group>"; };
+		7DB40D2820CBCEB500F63173 /* VLCMainMenu.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainMenu.h; sourceTree = "<group>"; };
+		7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainMenu.m; sourceTree = "<group>"; };
+		7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCStatusBarIcon.m; sourceTree = "<group>"; };
+		7DB40D2C20CBCEC200F63173 /* VLCStatusBarIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCStatusBarIcon.h; sourceTree = "<group>"; };
 		7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAddonsWindowController.h; sourceTree = "<group>"; };
 		7DB65D5318ABD6380053B874 /* VLCAddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAddonsWindowController.m; sourceTree = "<group>"; };
 		7DB7F1EB20CC036D00C2CAED /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
@@ -1145,7 +1145,7 @@
 				7DB40D2C20CBCEC200F63173 /* VLCStatusBarIcon.h */,
 				7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */,
 			);
-			path = Menus;
+			name = Menus;
 			sourceTree = "<group>";
 		};
 		7D349C9D20CBC979003359A1 /* Stream output */ = {
