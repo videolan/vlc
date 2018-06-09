@@ -489,7 +489,8 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
 
     bool mode_available = false;
     vlc_value_t vals;
-    if (!var_Change(aout, "stereo-mode", VLC_VAR_GETCHOICES, &vals, NULL))
+    if (!var_Change(aout, "stereo-mode", VLC_VAR_GETCHOICES, &vals,
+                    (vlc_value_t *)NULL))
     {
         for (int i = 0; !mode_available && i < vals.p_list->i_count; ++i)
         {

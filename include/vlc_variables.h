@@ -147,10 +147,9 @@ VLC_API void var_Destroy(vlc_object_t *obj, const char *name);
  * \param name Variable name
  * \param action Action to perform. Must be one of \ref var_action
  * \param val First action parameter
- * \param val2 Second action parameter
  */
 VLC_API int var_Change(vlc_object_t *obj, const char *name, int action,
-                       vlc_value_t *val, vlc_value_t *val2);
+                       vlc_value_t *val, ...);
 
 /**
  * Get the type of a variable.
@@ -780,7 +779,7 @@ VLC_API int var_LocationParse(vlc_object_t *, const char *mrl, const char *prefi
 #ifndef DOC
 #define var_Create(a,b,c) var_Create(VLC_OBJECT(a), b, c)
 #define var_Destroy(a,b) var_Destroy(VLC_OBJECT(a), b)
-#define var_Change(a,b,c,d,e) var_Change(VLC_OBJECT(a), b, c, d, e)
+#define var_Change(a,b,c,...) var_Change(VLC_OBJECT(a), b, c, __VA_ARGS__)
 #define var_Type(a,b) var_Type(VLC_OBJECT(a), b)
 #define var_Set(a,b,c) var_Set(VLC_OBJECT(a), b, c)
 #define var_Get(a,b,c) var_Get(VLC_OBJECT(a), b, c)

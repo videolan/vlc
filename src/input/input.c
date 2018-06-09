@@ -3279,7 +3279,8 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     /* Select the ES */
     vlc_value_t list;
 
-    if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES, &list, NULL ) )
+    if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES, &list,
+                    (vlc_value_t *)NULL ) )
         return VLC_SUCCESS;
 
     if( count.i_int == 0 )

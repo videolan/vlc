@@ -421,8 +421,9 @@ void var_DestroyAll( vlc_object_t *obj )
 }
 
 int (var_Change)(vlc_object_t *p_this, const char *psz_name,
-                 int i_action, vlc_value_t *p_val, vlc_value_t *p_val2)
+                 int i_action, vlc_value_t *p_val, ...)
 {
+    va_list ap;
     int ret = VLC_SUCCESS;
     variable_t *p_var;
     vlc_value_t oldval;
@@ -439,6 +440,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
         return VLC_ENOVAR;
     }
 
+    va_start(ap, p_val);
     switch( i_action )
     {
         case VLC_VAR_GETMIN:
@@ -448,10 +450,14 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             *p_val = p_var->max;
             break;
         case VLC_VAR_SETMINMAX:
+        {
+            const vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
+
             assert(p_var->ops->pf_free == FreeDummy);
             p_var->min = *p_val;
             p_var->max = *p_val2;
             break;
+        }
         case VLC_VAR_SETSTEP:
             assert(p_var->ops->pf_free == FreeDummy);
             p_var->step = *p_val;
@@ -476,6 +482,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_ADDCHOICE:
         {
+            const vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
             int i = p_var->choices.i_count;
 
             TAB_APPEND(p_var->choices.i_count,
@@ -546,6 +553,9 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             p_var->ops->pf_free( &oldval );
             break;
         case VLC_VAR_GETCHOICES:
+        {
+            vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
+
             p_val->p_list = xmalloc( sizeof(vlc_list_t) );
             p_val->p_list->p_values =
                 xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
@@ -571,6 +581,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
                 }
             }
             break;
+        }
         case VLC_VAR_SETTEXT:
             free( p_var->psz_text );
             if( p_val && p_val->psz_string )
@@ -585,9 +596,8 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
         default:
             break;
     }
-
+    va_end(ap);
     vlc_mutex_unlock( &p_priv->var_lock );
-
     return ret;
 }
 
