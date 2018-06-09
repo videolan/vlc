@@ -208,11 +208,21 @@
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input) {
-        NSBeginCriticalAlertSheet(_NS("No input"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("No input found. A stream must be playing or paused for bookmarks to work."));
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setMessageText:_NS("No input")];
+        [alert setInformativeText:_NS("No input found. A stream must be playing or paused for bookmarks to work.")];
+        [alert beginSheetModalForWindow:self.window
+                      completionHandler:nil];
         return;
     }
     if (p_old_input != p_input) {
-        NSBeginCriticalAlertSheet(_NS("Input has changed"), _NS("OK"), @"", @"", self.window, nil, nil, nil, nil, @"%@",_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input."));
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert setMessageText:_NS("Input has changed")];
+        [alert setInformativeText:_NS("Input has changed, unable to save bookmark. Suspending playback with \"Pause\" while editing bookmarks to ensure to keep the same input.")];
+        [alert beginSheetModalForWindow:self.window
+                      completionHandler:nil];
         vlc_object_release(p_input);
         return;
     }

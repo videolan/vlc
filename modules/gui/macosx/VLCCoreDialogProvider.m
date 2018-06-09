@@ -241,11 +241,12 @@ static void updateProgressCallback(void *p_data,
 
 - (void)displayQuestion:(NSArray *)dialogData
 {
-    NSAlert *alert = [NSAlert alertWithMessageText:[dialogData objectAtIndex:1]
-                                     defaultButton:[dialogData objectAtIndex:5]
-                                   alternateButton:[dialogData objectAtIndex:6]
-                                       otherButton:[dialogData objectAtIndex:4]
-                         informativeTextWithFormat:@"%@", [dialogData objectAtIndex:2]];
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:[dialogData objectAtIndex:1]];
+    [alert setInformativeText:[dialogData objectAtIndex:2]];
+    [alert addButtonWithTitle:[dialogData objectAtIndex:5]];
+    [alert addButtonWithTitle:[dialogData objectAtIndex:6]];
+    [alert addButtonWithTitle:[dialogData objectAtIndex:4]];
 
     switch ([[dialogData objectAtIndex:3] intValue]) {
         case VLC_DIALOG_QUESTION_WARNING:
@@ -261,15 +262,15 @@ static void updateProgressCallback(void *p_data,
 
     NSInteger returnValue = [alert runModal];
     switch (returnValue) {
-        case NSAlertDefaultReturn:
+        case NSAlertFirstButtonReturn:
             vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 1);
             break;
 
-        case NSAlertAlternateReturn:
+        case NSAlertSecondButtonReturn:
             vlc_dialog_id_post_action([[dialogData objectAtIndex:0] pointerValue], 2);
             break;
 
-        case NSAlertOtherReturn:
+        case NSAlertThirdButtonReturn:
         default:
             vlc_dialog_id_dismiss([[dialogData objectAtIndex:0] pointerValue]);
     }

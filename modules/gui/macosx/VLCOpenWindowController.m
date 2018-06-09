@@ -613,11 +613,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (!b_outputNibLoaded)
         b_outputNibLoaded = [NSBundle loadNibNamed:@"StreamOutput" owner:_output];
 
-    [NSApp beginSheet:_output.outputSheet
-       modalForWindow:self.window
-        modalDelegate:self
-       didEndSelector:NULL
-          contextInfo:nil];
+    [self.window beginSheet:_output.outputSheet completionHandler:nil];
 }
 
 #pragma mark -

@@ -267,10 +267,13 @@
         if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"HTTP"]) {
             NSString *muxformat = [self.currentProfile firstObject];
             if ([muxformat isEqualToString:@"wav"] || [muxformat isEqualToString:@"mov"] || [muxformat isEqualToString:@"mp4"] || [muxformat isEqualToString:@"mkv"]) {
-                NSBeginInformationalAlertSheet(_NS("Invalid container format for HTTP streaming"), _NS("OK"), @"", @"", self.window,
-                                               nil, nil, nil, nil,
-                                               _NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
-                                               [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]);
+                NSAlert *alert = [[NSAlert alloc] init];
+                [alert setAlertStyle:NSInformationalAlertStyle];
+                [alert setMessageText:_NS("Invalid container format for HTTP streaming")];
+                [alert setInformativeText:[NSString stringWithFormat:_NS("Media encapsulated as %@ cannot be streamed through the HTTP protocol for technical reasons."),
+                                           [[self currentEncapsulationFormatAsFileExtension:YES] uppercaseString]]];
+                [alert beginSheetModalForWindow:self.window
+                              completionHandler:nil];
                 return;
             }
         }

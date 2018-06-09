@@ -224,9 +224,14 @@ static const float f_min_window_height = 307.;
 
         [_sidebarView expandItem:nil expandChildren:YES];
 
-        NSAlert *albumArtAlert = [NSAlert alertWithMessageText:_NS("Check for album art and metadata?") defaultButton:_NS("Enable Metadata Retrieval") alternateButton:_NS("No, Thanks") otherButton:nil informativeTextWithFormat:@"%@",_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
+        NSAlert *albumArtAlert = [[NSAlert alloc] init];
+        [albumArtAlert setMessageText:_NS("Check for album art and metadata?")];
+        [albumArtAlert setInformativeText:_NS("VLC can check online for album art and metadata to enrich your playback experience, e.g. by providing track information when playing Audio CDs. To provide this functionality, VLC will send information about your contents to trusted services in an anonymized form.")];
+        [albumArtAlert addButtonWithTitle:_NS("Enable Metadata Retrieval")];
+        [albumArtAlert addButtonWithTitle:_NS("No, Thanks")];
+
         NSInteger returnValue = [albumArtAlert runModal];
-        config_PutInt("metadata-network-access", returnValue == NSAlertDefaultReturn);
+        config_PutInt("metadata-network-access", returnValue == NSAlertFirstButtonReturn);
     }
 
     [_playlistScrollView setBorderType:NSNoBorder];
