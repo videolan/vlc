@@ -1295,38 +1295,34 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 - (IBAction)urlHandlerAction:(id)sender
 {
     if (sender == _input_urlhandlerButton) {
-        NSArray *handlers;
-        NSString *handler;
-        NSString *rawhandler;
-        NSMutableArray *rawHandlers;
-        NSUInteger count;
 
-#define fillUrlHandlerPopup( protocol, object ) \
-        handlers = (__bridge_transfer NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
-        rawHandlers = [[NSMutableArray alloc] init]; \
-        [object removeAllItems]; \
-        count = [handlers count]; \
-        for (NSUInteger x = 0; x < count; x++) { \
-            rawhandler = [handlers objectAtIndex:x]; \
-            handler = [self applicationNameForBundleIdentifier:rawhandler]; \
-            if (handler && ![handler isEqualToString:@""]) { \
-                [object addItemWithTitle:handler]; \
-                [[object lastItem] setImage: [self iconForBundleIdentifier:[handlers objectAtIndex:x]]]; \
-                [rawHandlers addObject: rawhandler]; \
-            } \
-        } \
-        [object selectItemAtIndex: [rawHandlers indexOfObject:(__bridge_transfer id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]];
+        void (^fillUrlHandlerPopup)(NSString*, NSPopUpButton*) = ^void(NSString *protocol, NSPopUpButton *object) {
 
-        fillUrlHandlerPopup( "ftp", _urlhandler_ftpPopup);
-        fillUrlHandlerPopup( "mms", _urlhandler_mmsPopup);
-        fillUrlHandlerPopup( "rtmp", _urlhandler_rtmpPopup);
-        fillUrlHandlerPopup( "rtp", _urlhandler_rtpPopup);
-        fillUrlHandlerPopup( "rtsp", _urlhandler_rtspPopup);
-        fillUrlHandlerPopup( "sftp", _urlhandler_sftpPopup);
-        fillUrlHandlerPopup( "smb", _urlhandler_smbPopup);
-        fillUrlHandlerPopup( "udp", _urlhandler_udpPopup);
+            NSArray *handlers = (__bridge_transfer NSArray *)LSCopyAllHandlersForURLScheme((__bridge CFStringRef)protocol);
+            NSMutableArray *rawHandlers = [[NSMutableArray alloc] init];
+            [object removeAllItems];
+            NSUInteger count = [handlers count];
+            for (NSUInteger x = 0; x < count; x++) {
+                NSString *rawhandler = [handlers objectAtIndex:x];
+                NSString *handler = [self applicationNameForBundleIdentifier:rawhandler];
+                if (handler && ![handler isEqualToString:@""]) {
+                    [object addItemWithTitle:handler];
+                    [[object lastItem] setImage: [self iconForBundleIdentifier:[handlers objectAtIndex:x]]];
+                    [rawHandlers addObject: rawhandler];
+                }
+            }
+            [object selectItemAtIndex: [rawHandlers indexOfObject:(__bridge_transfer id)LSCopyDefaultHandlerForURLScheme((__bridge CFStringRef)protocol)]];
+        };
 
-#undef fillUrlHandlerPopup
+        fillUrlHandlerPopup(@"ftp", _urlhandler_ftpPopup);
+        fillUrlHandlerPopup(@"mms", _urlhandler_mmsPopup);
+        fillUrlHandlerPopup(@"rtmp", _urlhandler_rtmpPopup);
+        fillUrlHandlerPopup(@"rtp", _urlhandler_rtpPopup);
+        fillUrlHandlerPopup(@"rtsp", _urlhandler_rtspPopup);
+        fillUrlHandlerPopup(@"sftp", _urlhandler_sftpPopup);
+        fillUrlHandlerPopup(@"smb", _urlhandler_smbPopup);
+        fillUrlHandlerPopup(@"udp", _urlhandler_udpPopup);
+
 
         [NSApp beginSheet:_urlhandler_win modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
     } else {
