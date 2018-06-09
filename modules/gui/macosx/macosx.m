@@ -196,3 +196,12 @@ vlc_module_begin()
         add_bool("macosx-black", false, BLACK_TEXT, BLACK_LONGTEXT, false)
 vlc_module_end()
 
+/* the following is fake code to make the pseudo VLC target for the macOS module compile and link */
+#ifdef MACOS_PSEUDO_VLC
+const char vlc_module_name[] = "macos-pseudo-vlc";
+
+int main(int argc, char *argv[])
+{
+    return 0;
+}
+#endif
