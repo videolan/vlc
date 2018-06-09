@@ -60,11 +60,11 @@ void input_SendEventPosition( input_thread_t *p_input, double f_position, mtime_
 
     /* */
     val.f_float = f_position;
-    var_Change( p_input, "position", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "position", VLC_VAR_SETVALUE, val );
 
     /* */
     val.i_int = i_time;
-    var_Change( p_input, "time", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "time", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_POSITION );
 }
@@ -79,7 +79,7 @@ void input_SendEventLength( input_thread_t *p_input, mtime_t i_length )
     input_item_SetDuration( input_priv(p_input)->p_item, i_length );
 
     val.i_int = i_length;
-    var_Change( p_input, "length", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "length", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_LENGTH );
 }
@@ -92,7 +92,7 @@ void input_SendEventRate( input_thread_t *p_input, int i_rate )
     vlc_value_t val;
 
     val.f_float = (float)INPUT_RATE_DEFAULT / (float)i_rate;
-    var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "rate", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_RATE );
 }
@@ -101,7 +101,7 @@ void input_SendEventAudioDelay( input_thread_t *p_input, mtime_t i_delay )
     vlc_value_t val;
 
     val.i_int = i_delay;
-    var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_AUDIO_DELAY );
 }
@@ -111,7 +111,7 @@ void input_SendEventSubtitleDelay( input_thread_t *p_input, mtime_t i_delay )
     vlc_value_t val;
 
     val.i_int = i_delay;
-    var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_SUBTITLE_DELAY );
 }
@@ -122,7 +122,7 @@ void input_SendEventRecord( input_thread_t *p_input, bool b_recording )
     vlc_value_t val;
 
     val.b_bool = b_recording;
-    var_Change( p_input, "record", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "record", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_RECORD );
 }
@@ -132,7 +132,7 @@ void input_SendEventTitle( input_thread_t *p_input, int i_title )
     vlc_value_t val;
 
     val.i_int = i_title;
-    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
 
     input_ControlVarTitle( p_input, i_title );
 
@@ -145,12 +145,12 @@ void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekp
 
     /* "chapter" */
     val.i_int = i_seekpoint;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, val );
 
     /* "title %2u" */
     char psz_title[sizeof ("title ") + 3 * sizeof (int)];
     sprintf( psz_title, "title %2u", i_title );
-    var_Change( p_input, psz_title, VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, psz_title, VLC_VAR_SETVALUE, val );
 
     /* */
     Trigger( p_input, INPUT_EVENT_CHAPTER );
@@ -161,10 +161,10 @@ void input_SendEventSignal( input_thread_t *p_input, double f_quality, double f_
     vlc_value_t val;
 
     val.f_float = f_quality;
-    var_Change( p_input, "signal-quality", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "signal-quality", VLC_VAR_SETVALUE, val );
 
     val.f_float = f_strength;
-    var_Change( p_input, "signal-strength", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "signal-strength", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_SIGNAL );
 }
@@ -174,7 +174,7 @@ void input_SendEventState( input_thread_t *p_input, int i_state )
     vlc_value_t val;
 
     val.i_int = i_state;
-    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "state", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_STATE );
 }
@@ -184,7 +184,7 @@ void input_SendEventCache( input_thread_t *p_input, double f_level )
     vlc_value_t val;
 
     val.f_float = f_level;
-    var_Change( p_input, "cache", VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, INPUT_EVENT_CACHE );
 }
@@ -338,7 +338,7 @@ static void VarListSelect( input_thread_t *p_input,
     vlc_value_t val;
 
     val.i_int = i_value;
-    var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, &val );
+    var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, val );
 
     Trigger( p_input, i_event );
 }

@@ -229,7 +229,7 @@ void ThemeRepository::updateRepository()
     }
 
     // mark this current skins as 'checked' in list
-    var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val );
+    var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, val );
 
     free( psz_current );
 }

@@ -390,7 +390,7 @@ static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
         msg_Dbg (obj, "  current: %3"PRId32", default: %3"PRId32,
                  ctrl.value, query->default_value);
         val.i_int = ctrl.value;
-        var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+        var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
         (vlc_value_t){ .i_int = query->minimum },
@@ -429,7 +429,7 @@ static vlc_v4l2_ctrl_t *ControlAddBoolean (vlc_object_t *obj, int fd,
                  ctrl.value ? " true" : "false",
                  query->default_value ? " true" : "false");
         val.b_bool = ctrl.value;
-        var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+        var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
     }
     return c;
 }
@@ -459,7 +459,7 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
         msg_Dbg (obj, "  current: %"PRId32", default: %"PRId32,
                  ctrl.value, query->default_value);
         val.i_int = ctrl.value;
-        var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+        var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
         (vlc_value_t){ .i_int = query->minimum },
@@ -532,7 +532,7 @@ static vlc_v4l2_ctrl_t *ControlAddInteger64 (vlc_object_t *obj, int fd,
         vlc_value_t val = { .i_int = ext_ctrl.value64 };
 
         msg_Dbg (obj, "  current: %"PRId64, val.i_int);
-        var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+        var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
     }
 
     return c;
@@ -584,7 +584,7 @@ static vlc_v4l2_ctrl_t *ControlAddString (vlc_object_t *obj, int fd,
             vlc_value_t val = { .psz_string = buf };
 
             msg_Dbg (obj, "  current: \"%s\"", buf);
-            var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+            var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
         }
         free (buf);
     }
@@ -617,7 +617,7 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
         msg_Dbg (obj, "  current: 0x%08"PRIX32", default: 0x%08"PRIX32,
                  ctrl.value, query->default_value);
         val.i_int = ctrl.value;
-        var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
+        var_Change(obj, c->name, VLC_VAR_SETVALUE, val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
         (vlc_value_t){ .i_int = 0 },

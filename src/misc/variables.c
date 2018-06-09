@@ -538,7 +538,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         case VLC_VAR_SETVALUE:
             /* Duplicate data if needed */
-            newval = *va_arg(ap, vlc_value_t *);
+            newval = va_arg(ap, vlc_value_t);
             p_var->ops->pf_dup( &newval );
             /* Backup needed stuff */
             oldval = p_var->val;

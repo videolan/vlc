@@ -520,7 +520,7 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     }
 
     var_Change(aout, "stereo-mode", VLC_VAR_SETVALUE,
-               &(vlc_value_t) { .i_int = i_output_mode });
+               (vlc_value_t) { .i_int = i_output_mode });
 }
 
 /**
