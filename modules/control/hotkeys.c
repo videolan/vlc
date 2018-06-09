@@ -628,22 +628,22 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             if( p_input )
             {
                 vlc_value_t val;
-                vlc_list_t list, list2;
+                vlc_list_t list;
 
                 var_Get( p_input, "spu-es", &val );
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &list, (vlc_list_t *)NULL );
 
                 if( list.i_count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( &list, NULL );
                     break;
                 }
                 p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
                 DisplayMessage( p_vout,
                                 _("Sub sync: bookmarked subtitle time"));
-                var_FreeList( &list, &list2 );
+                var_FreeList( &list, NULL );
             }
             break;
         case ACTIONID_SUBSYNC_APPLY:
@@ -697,16 +697,16 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             if( p_input )
             {
                 vlc_value_t val;
-                vlc_list_t list, list2;
+                vlc_list_t list;
 
                 var_Get( p_input, "spu-es", &val );
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &list, (vlc_list_t *)NULL );
 
                 if( list.i_count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( &list, NULL );
                     break;
                 }
                 int64_t i_delay = var_GetInteger( p_input, "spu-delay" ) + diff;
@@ -715,7 +715,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 ClearChannels( p_vout, slider_chan );
                 DisplayMessage( p_vout, _( "Subtitle delay %i ms" ),
                                 (int)(i_delay/1000) );
-                var_FreeList( &list, &list2 );
+                var_FreeList( &list, NULL );
             }
             break;
         }
@@ -1337,16 +1337,16 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             if( p_input )
             {
                 vlc_value_t val;
-                vlc_list_t list, list2;
+                vlc_list_t list;
                 var_Get( p_input, "spu-es", &val );
 
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &list, (vlc_list_t *)NULL );
                 if( list.i_count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout,
                                     _("Subtitle position: no active subtitle") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( &list, NULL );
                     break;
                 }
 
@@ -1358,7 +1358,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
 
                 ClearChannels( p_vout, slider_chan );
                 DisplayMessage( p_vout, _( "Subtitle position %d px" ), i_pos );
-                var_FreeList( &list, &list2 );
+                var_FreeList( &list, NULL );
             }
             break;
         }
