@@ -52,7 +52,6 @@
 static const float f_min_video_height = 70.0;
 
 @class VLCControlsBarCommon;
-@class VLCMainWindowTitleView;
 
 /*****************************************************************************
  * VLCVideoWindowCommon
