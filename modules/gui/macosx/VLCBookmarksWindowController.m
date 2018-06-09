@@ -160,8 +160,7 @@
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     seekpoint_t **pp_bookmarks;
     int i_bookmarks;
-    int row;
-    row = [_dataTable selectedRow];
+    int row = (int)[_dataTable selectedRow];
 
     if (!p_input)
         return;
@@ -204,7 +203,8 @@
 {
     /* save field contents and close sheet */
      seekpoint_t **pp_bookmarks;
-    int i_bookmarks, i;
+    int i_bookmarks;
+    NSInteger i;
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (!p_input) {
@@ -279,7 +279,7 @@ clear:
     if (!p_input)
         return;
 
-    int i_focused = [_dataTable selectedRow];
+    int i_focused = (int)[_dataTable selectedRow];
 
     if (i_focused >= 0)
         input_Control(p_input, INPUT_DEL_BOOKMARK, i_focused);

@@ -268,7 +268,7 @@
             tmpItem = [tmpItem parent];
         }
 
-        for(int i = itemsToExpand.count - 1; i >= 0; i--) {
+        for(int i = (int)itemsToExpand.count - 1; i >= 0; i--) {
             VLCPLItem *currentItem = [itemsToExpand objectAtIndex:i];
             [_outlineView expandItem: currentItem];
         }
@@ -347,11 +347,11 @@
 {
     NSIndexSet *selectedRows = [_outlineView selectedRowIndexes];
 
-    NSInteger position = -1;
+    int position = -1;
     VLCPLItem *parentItem = [[self model] rootItem];
 
     if (selectedRows.count >= 1) {
-        position = selectedRows.firstIndex + 1;
+        position = (int)selectedRows.firstIndex + 1;
         parentItem = [_outlineView itemAtRow:selectedRows.firstIndex];
         if ([parentItem parent] != nil)
             parentItem = [parentItem parent];
@@ -689,7 +689,7 @@
         b_playlistmenu_nib_loaded = [NSBundle loadNibNamed:@"PlaylistMenu" owner:self];
 
     NSPoint pt = [_outlineView convertPoint: [o_event locationInWindow] fromView: nil];
-    int row = [_outlineView rowAtPoint:pt];
+    NSInteger row = [_outlineView rowAtPoint:pt];
     if (row != -1 && ![[_outlineView selectedRowIndexes] containsIndex: row])
         [_outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
 

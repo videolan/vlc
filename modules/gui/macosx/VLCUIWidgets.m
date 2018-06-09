@@ -306,9 +306,11 @@
     return nil;
 }
 
-- (void)addSubview:(NSView *)view atRow:(NSUInteger)row column:(NSUInteger)column
-                                                       rowSpan:(NSUInteger)rowSpan
-                                                       colSpan:(NSUInteger)colSpan
+- (void)addSubview:(NSView *)view
+             atRow:(NSUInteger)row
+            column:(NSUInteger)column
+           rowSpan:(NSUInteger)rowSpan
+           colSpan:(NSUInteger)colSpan
 {
     if (row + 1 > _rowCount)
         _rowCount = row + 1;
@@ -321,10 +323,10 @@
         [dict setObject:view forKey:@"view"];
         [_griddedViews addObject:dict];
     }
-    [dict setObject:[NSNumber numberWithInt:rowSpan] forKey:@"rowSpan"];
-    [dict setObject:[NSNumber numberWithInt:colSpan] forKey:@"colSpan"];
-    [dict setObject:[NSNumber numberWithInt:row] forKey:@"row"];
-    [dict setObject:[NSNumber numberWithInt:column] forKey:@"col"];
+    [dict setObject:[NSNumber numberWithUnsignedInteger:rowSpan] forKey:@"rowSpan"];
+    [dict setObject:[NSNumber numberWithUnsignedInteger:colSpan] forKey:@"colSpan"];
+    [dict setObject:[NSNumber numberWithUnsignedInteger:row] forKey:@"row"];
+    [dict setObject:[NSNumber numberWithUnsignedInteger:column] forKey:@"col"];
 
     [self addSubview:view];
     [self relayout];

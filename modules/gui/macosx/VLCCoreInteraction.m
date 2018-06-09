@@ -248,7 +248,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     playlist_Next(pl_Get(getIntf()));
 }
 
-- (int)durationOfCurrentPlaylistItem
+- (NSInteger)durationOfCurrentPlaylistItem
 {
     intf_thread_t *p_intf = getIntf();
     if (!p_intf)
@@ -262,7 +262,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     input_Control(p_input, INPUT_GET_LENGTH, &i_duration);
     vlc_object_release(p_input);
 
-    return (int)(i_duration / 1000000);
+    return (i_duration / 1000000);
 }
 
 - (NSURL*)URLOfCurrentPlaylistItem
@@ -357,7 +357,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (!p_input)
         return;
 
-    int i_interval = var_InheritInteger( p_input, p_value );
+    int64_t i_interval = var_InheritInteger( p_input, p_value );
     if (i_interval > 0) {
         mtime_t val = CLOCK_FREQ * i_interval;
         if (!b_value)
@@ -595,7 +595,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     float volume = playlist_VolumeGet(pl_Get(p_intf));
 
-    return lroundf(volume * AOUT_VOLUME_DEFAULT);
+    return (int)lroundf(volume * AOUT_VOLUME_DEFAULT);
 }
 
 - (void)setVolume: (int)i_value

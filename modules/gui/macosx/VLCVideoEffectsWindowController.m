@@ -433,17 +433,17 @@
     {
         if ([widget isKindOfClass: [NSSlider class]])
         {
-            [widget setIntValue: val.i_int];
+            [widget setIntValue: (int)val.i_int];
             [widget setToolTip: [NSString stringWithFormat:@"%lli", val.i_int]];
         }
         else if ([widget isKindOfClass: [NSButton class]])
             [widget setState: val.i_int ? NSOnState : NSOffState];
         else if ([widget isKindOfClass: [NSTextField class]])
-            [widget setIntValue: val.i_int];
+            [widget setIntValue: (int)val.i_int];
         else if ([widget isKindOfClass: [NSStepper class]])
-            [widget setIntValue: val.i_int];
+            [widget setIntValue: (int)val.i_int];
         else if ([widget isKindOfClass: [NSPopUpButton class]])
-            [widget selectItemWithTag: val.i_int];
+            [widget selectItemWithTag: (int)val.i_int];
     }
     else if (i_type == VLC_VAR_FLOAT)
     {

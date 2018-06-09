@@ -520,7 +520,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         char psz_duration[MSTRTIME_MAX_SIZE];
         mtime_t dur = input_item_GetDuration(p_input);
         if (dur != -1) {
-            secstotimestr(psz_duration, dur/1000000);
+            secstotimestr(psz_duration, (int)(dur/1000000));
             o_value = toNSStr(psz_duration);
         }
         else
@@ -688,8 +688,8 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
             return NO;
         }
 
-        NSUInteger j = 0;
-        for (NSUInteger i = 0; i < count; i++) {
+        int j = 0;
+        for (int i = 0; i < count; i++) {
             playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [[o_filteredItems objectAtIndex:i] plItemId]);
             if (p_item)
                 pp_items[j++] = p_item;
@@ -699,7 +699,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         if (index == NSOutlineViewDropOnItemIndex)
             index = p_new_parent->i_children;
 
-        if (playlist_TreeMoveMany(p_playlist, j, pp_items, p_new_parent, index) != VLC_SUCCESS) {
+        if (playlist_TreeMoveMany(p_playlist, j, pp_items, p_new_parent, (int)index) != VLC_SUCCESS) {
             PL_UNLOCK;
             free(pp_items);
             return NO;
@@ -710,11 +710,11 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
         // rebuild our model
         NSUInteger filteredItemsCount = [o_filteredItems count];
-        for(NSUInteger i = 0; i < filteredItemsCount; ++i) {
+        for(int i = 0; i < filteredItemsCount; ++i) {
             VLCPLItem *o_item = [o_filteredItems objectAtIndex:i];
             NSLog(@"delete child from parent %p", [o_item parent]);
             [[o_item parent] deleteChild:o_item];
-            [targetItem addChild:o_item atPos:index + i];
+            [targetItem addChild:o_item atPos:(int)index + i];
         }
 
         [_outlineView reloadData];
@@ -747,7 +747,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
     [[[VLCMain sharedInstance] playlist] addPlaylistItems:items
                                          withParentItemId:[targetItem plItemId]
-                                                    atPos:index
+                                                    atPos:(int)index
                                             startPlayback:NO];
     return YES;
 }

@@ -200,7 +200,7 @@
 - (void)triggerMenu:(id)sender
 {
     intf_thread_t *p_intf = getIntf();
-    uint32_t identifier = [(NSMenuItem *)sender tag];
+    uint32_t identifier = (unsigned int)[(NSMenuItem *)sender tag];
 
     uint16_t i_ext = MENU_GET_EXTENSION(identifier);
     uint16_t i_action = MENU_GET_ACTION(identifier);

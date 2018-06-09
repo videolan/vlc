@@ -31,7 +31,7 @@
 @property (readonly, nonatomic) float maxVolume;
 @property (readwrite) int playbackRate;
 @property (nonatomic, readwrite) BOOL aspectRatioIsLocked;
-@property (readonly) int durationOfCurrentPlaylistItem;
+@property (readonly) NSInteger durationOfCurrentPlaylistItem;
 @property (readonly) NSURL * URLOfCurrentPlaylistItem;
 @property (readonly) NSString * nameOfCurrentPlaylistItem;
 @property (nonatomic, readwrite) BOOL mute;

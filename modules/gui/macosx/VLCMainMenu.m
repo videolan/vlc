@@ -275,7 +275,7 @@
     var_Create(p_playlist, "freetype-outline-thickness", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
 
     [self setupMenu: _subtitle_textcolorMenu withIntList:"freetype-color" andSelector:@selector(switchSubtitleOption:)];
-    [_subtitle_bgopacity_sld setIntValue: config_GetInt("freetype-background-opacity")];
+    [_subtitle_bgopacity_sld setIntegerValue: config_GetInt("freetype-background-opacity")];
     [self setupMenu: _subtitle_bgcolorMenu withIntList:"freetype-background-color" andSelector:@selector(switchSubtitleOption:)];
     [self setupMenu: _subtitle_outlinethicknessMenu withIntList:"freetype-outline-thickness" andSelector:@selector(switchSubtitleOption:)];
 
@@ -836,9 +836,9 @@
     if (p_input) {
         /* we can obviously only do that if an input is available */
         int64_t length = var_GetInteger(p_input, "length");
-        [_timeSelectionPanel setMaxValue:(length / CLOCK_FREQ)];
+        [_timeSelectionPanel setMaxValue:(int)(length / CLOCK_FREQ)];
         int64_t pos = var_GetInteger(p_input, "time");
-        [_timeSelectionPanel setJumpTimeValue: (pos / CLOCK_FREQ)];
+        [_timeSelectionPanel setJumpTimeValue: (int)(pos / CLOCK_FREQ)];
         [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
                              completionHandler:^(NSInteger returnCode, int64_t returnTime) {
 
@@ -1056,14 +1056,14 @@
 
 - (void)switchSubtitleSize:(id)sender
 {
-    int intValue = [sender tag];
+    NSInteger intValue = [sender tag];
     var_SetInteger(pl_Get(getIntf()), "sub-text-scale", intValue);
 }
 
 
 - (void)switchSubtitleOption:(id)sender
 {
-    int intValue = [sender tag];
+    NSInteger intValue = [sender tag];
     NSString *representedObject = [sender representedObject];
 
     var_SetInteger(pl_Get(getIntf()), [representedObject UTF8String], intValue);

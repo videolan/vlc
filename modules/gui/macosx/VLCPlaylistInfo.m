@@ -276,14 +276,14 @@ FREENULL( psz_##foo );
                                              @"%6.0f kb/s", (float)(p_item->p_stats->f_demux_bitrate)*8000]];
 
     /* Video */
-    [_videoDecodedTextField setIntValue: p_item->p_stats->i_decoded_video];
-    [_displayedTextField setIntValue: p_item->p_stats->i_displayed_pictures];
-    [_lostFramesTextField setIntValue: p_item->p_stats->i_lost_pictures];
+    [_videoDecodedTextField setIntegerValue: p_item->p_stats->i_decoded_video];
+    [_displayedTextField setIntegerValue: p_item->p_stats->i_displayed_pictures];
+    [_lostFramesTextField setIntegerValue: p_item->p_stats->i_lost_pictures];
 
     /* Audio */
-    [_audioDecodedTextField setIntValue: p_item->p_stats->i_decoded_audio];
-    [_playedAudioBuffersTextField setIntValue: p_item->p_stats->i_played_abuffers];
-    [_lostAudioBuffersTextField setIntValue: p_item->p_stats->i_lost_abuffers];
+    [_audioDecodedTextField setIntegerValue: p_item->p_stats->i_decoded_audio];
+    [_playedAudioBuffersTextField setIntegerValue: p_item->p_stats->i_played_abuffers];
+    [_lostAudioBuffersTextField setIntegerValue: p_item->p_stats->i_lost_abuffers];
 }
 
 - (void)updateStreamsList

@@ -465,7 +465,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     ssize_t count = config_GetIntChoices(name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
-        [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
+        [mi setRepresentedObject:[NSNumber numberWithInteger:values[i]]];
         [[object menu] addItem:mi];
 
         if (p_item->value.i == values[i])
@@ -525,7 +525,8 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (void)resetControls
 {
-    int i, y = 0;
+    int i = 0;
+    NSInteger y = 0;
 
     /**********************
      * interface settings *
@@ -598,7 +599,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
         [_audio_volTextField setEnabled: YES];
         [_audio_volSlider setEnabled: YES];
 
-        i = var_InheritInteger(p_intf, "auhal-volume");
+        i = (int)var_InheritInteger(p_intf, "auhal-volume");
         i = i * 200. / AOUT_VOLUME_MAX;
         [_audio_volSlider setIntValue: i];
         [_audio_volTextField setIntValue: i];
@@ -693,7 +694,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     /* Select the accurate value of the PopupButton */
     bool cache_equal = true;
-    int i_cache = config_GetInt("file-caching");
+    int i_cache = (int)config_GetInt("file-caching");
 
     TestCaC("network-caching", 10/3);
     TestCaC("disc-caching", 1);
@@ -1407,7 +1408,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [self showSettingsForCategory:_hotkeysView];
 }
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSUInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
     return [_hotkeySettings count];
 }

@@ -1394,7 +1394,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 -(void)resetValues
 {
-    [o_textfield setIntValue: config_GetInt(self.p_item->psz_name)];
+    [o_textfield setIntegerValue: config_GetInt(self.p_item->psz_name)];
     [super resetValues];
 }
 
@@ -1470,13 +1470,13 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 {
     [o_popup removeAllItems];
 
-    int i_current_selection = config_GetInt(self.p_item->psz_name);
+    NSInteger i_current_selection = config_GetInt(self.p_item->psz_name);
     int64_t *values;
     char **texts;
     ssize_t count = config_GetIntChoices(self.p_item->psz_name, &values, &texts);
     for (ssize_t i = 0; i < count; i++) {
         NSMenuItem *mi = [[NSMenuItem alloc] initWithTitle: toNSStr(texts[i]) action: NULL keyEquivalent: @""];
-        [mi setRepresentedObject:[NSNumber numberWithInt:values[i]]];
+        [mi setRepresentedObject:[NSNumber numberWithInteger:values[i]]];
         [[o_popup menu] addItem:mi];
 
         if (i_current_selection == values[i])
@@ -1522,7 +1522,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         /* build the textfield */
         ADD_TEXTFIELD(o_textfield, mainFrame, [self.label frame].size.width + 2,
                       28, 70, toolTip, @"")
-        [o_textfield setIntValue: p_item->value.i];
+        [o_textfield setIntegerValue: p_item->value.i];
         [o_textfield setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield setDelegate: self];
         [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1533,7 +1533,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         /* build the mintextfield */
         ADD_LABEL(o_textfield_min, mainFrame, 12, -30, @"-88888", @"")
-        [o_textfield_min setIntValue: p_item->min.i];
+        [o_textfield_min setIntegerValue: p_item->min.i];
         [o_textfield_min setAutoresizingMask:NSViewMaxXMargin ];
         [o_textfield_min setAlignment:NSRightTextAlignment];
         [self addSubview: o_textfield_min];
@@ -1541,7 +1541,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         /* build the maxtextfield */
         ADD_LABEL(o_textfield_max, mainFrame,
                   mainFrame.size.width - 50, -30, @"88888", @"")
-        [o_textfield_max setIntValue: p_item->max.i];
+        [o_textfield_max setIntegerValue: p_item->max.i];
         [o_textfield_max setAutoresizingMask:NSViewMinXMargin ];
         [self addSubview: o_textfield_max];
 
@@ -1554,7 +1554,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
                    [o_textfield_max frame].origin.x -
                    ([o_textfield_min frame].origin.x + [o_textfield_min frame].size.width) - 14, toolTip,
                    p_item->min.i, p_item->max.i)
-        [o_slider setIntValue: p_item->value.i];
+        [o_slider setIntegerValue: p_item->value.i];
         [o_slider setAutoresizingMask:NSViewWidthSizable ];
         [o_slider setTarget: self];
         [o_slider setAction: @selector(sliderChanged:)];
@@ -1595,9 +1595,9 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    int value = config_GetInt(self.p_item->psz_name);
-    [o_textfield setIntValue:value];
-    [o_slider setIntValue:value];
+    NSInteger value = config_GetInt(self.p_item->psz_name);
+    [o_textfield setIntegerValue:value];
+    [o_slider setIntegerValue:value];
     [super resetValues];
 }
 @end
@@ -1831,7 +1831,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         /* add the checkbox */
         ADD_CHECKBOX(o_checkbox, mainFrame, 0,
-                     0, labelString, toolTip, p_item->value.i, NSImageLeft)
+                     0, labelString, toolTip, (int)p_item->value.i, NSImageLeft)
         [o_checkbox setAutoresizingMask:NSViewNotSizable];
         [self addSubview: o_checkbox];
     }
@@ -1918,7 +1918,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (int)intValue
 {
-    return [o_popup selectedTag];
+    return (int)[o_popup selectedTag];
 }
 
 - (void)resetValues

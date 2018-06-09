@@ -418,7 +418,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_tabView selectTabViewItemWithIdentifier:identifier];
     [_fileSubCheckbox setState: NSOffState];
 
-    int i_result = [NSApp runModalForWindow: self.window];
+    NSModalResponse i_result = [NSApp runModalForWindow: self.window];
     [self.window close];
 
     // Check if dialog was canceled or stopped (NSModalResponseStop)
@@ -484,7 +484,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [options addObject: [NSString stringWithFormat: @"input-slave=%@", _fileSlavePath]];
     if ([[[_tabView selectedTabViewItem] identifier] isEqualToString: kCaptureTabViewId]) {
         if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
-            int selected_index = [_screenPopup indexOfSelectedItem];
+            NSInteger selected_index = [_screenPopup indexOfSelectedItem];
             NSValue *v = [_displayInfos objectAtIndex:selected_index];
             struct display_info_t *item = (struct display_info_t *)[v pointerValue];
 
@@ -985,7 +985,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)openNetStepperChanged:(id)sender
 {
-    int i_tag = [sender tag];
+    NSInteger i_tag = [sender tag];
 
     if (i_tag == 0) {
         [_netUDPPortTextField setIntValue: [_netUDPPortStepper intValue]];
@@ -1103,15 +1103,15 @@ static NSString *kCaptureTabViewId  = @"capture";
         [_captureTabView selectTabViewItemAtIndex:1];
 
         [self setMRL: @"screen://"];
-        [_screenHeightTextField setIntValue: config_GetInt("screen-height")];
-        [_screenWidthTextField setIntValue: config_GetInt("screen-width")];
+        [_screenHeightTextField setIntegerValue: config_GetInt("screen-height")];
+        [_screenWidthTextField setIntegerValue: config_GetInt("screen-width")];
         [_screenFPSTextField setFloatValue: config_GetFloat("screen-fps")];
-        [_screenLeftTextField setIntValue: config_GetInt("screen-left")];
-        [_screenTopTextField setIntValue: config_GetInt("screen-top")];
-        [_screenFollowMouseCheckbox setIntValue: config_GetInt("screen-follow-mouse")];
+        [_screenLeftTextField setIntegerValue: config_GetInt("screen-left")];
+        [_screenTopTextField setIntegerValue: config_GetInt("screen-top")];
+        [_screenFollowMouseCheckbox setIntegerValue: config_GetInt("screen-follow-mouse")];
 
-        int screenIindex = config_GetInt("screen-index");
-        int displayID = config_GetInt("screen-display-id");
+        NSInteger screenIindex = config_GetInt("screen-index");
+        NSInteger displayID = config_GetInt("screen-display-id");
         unsigned int displayCount = 0;
         CGError returnedError;
         struct display_info_t *item;
@@ -1175,8 +1175,9 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)screenChanged:(id)sender
 {
-    int selected_index = [_screenPopup indexOfSelectedItem];
-    if (selected_index >= [_displayInfos count]) return;
+    NSInteger selected_index = [_screenPopup indexOfSelectedItem];
+    if (selected_index >= [_displayInfos count])
+        return;
 
     NSValue *v = [_displayInfos objectAtIndex:selected_index];
     struct display_info_t *item = (struct display_info_t *)[v pointerValue];

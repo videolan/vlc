@@ -273,7 +273,7 @@ static void addonChangedCallback( addons_manager_t *manager,
 - (void)_refactorDataModel
 {
     BOOL installedOnly = _localAddonsOnlyCheckbox.state == NSOnState;
-    int type = [[_typeSwitcher selectedItem] tag];
+    int type = (int)[[_typeSwitcher selectedItem] tag];
 
     NSUInteger count = _addons.count;
     NSMutableArray *filteredItems = [[NSMutableArray alloc] initWithCapacity:count];

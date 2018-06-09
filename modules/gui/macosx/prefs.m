@@ -91,7 +91,7 @@
 
 - (id)initWithName:(NSString*)name;
 
-- (int)numberOfChildren;
+- (NSInteger)numberOfChildren;
 - (VLCTreeItem *)childAtIndex:(NSInteger)i_index;
 
 - (NSString *)name;
@@ -320,7 +320,7 @@
     return [[self children] objectAtIndex:i_index];
 }
 
-- (int)numberOfChildren
+- (NSInteger)numberOfChildren
 {
     return [[self children] count];
 }
@@ -505,15 +505,15 @@
         for (j = 0; j < confsize; j++) {
             int configType = p_configs[j].i_type;
             if (configType == CONFIG_CATEGORY) {
-                categoryItem = [self itemRepresentingCategory:p_configs[j].value.i];
+                categoryItem = [self itemRepresentingCategory:(int)p_configs[j].value.i];
                 if (!categoryItem) {
-                    categoryItem = [VLCTreeCategoryItem categoryTreeItemWithCategory:p_configs[j].value.i];
+                    categoryItem = [VLCTreeCategoryItem categoryTreeItemWithCategory:(int)p_configs[j].value.i];
                     if (categoryItem)
                         [[self children] addObject:categoryItem];
                 }
             }
             else if (configType == CONFIG_SUBCATEGORY) {
-                lastsubcat = p_configs[j].value.i;
+                lastsubcat = (int)p_configs[j].value.i;
                 if (categoryItem && ![self isSubCategoryGeneral:lastsubcat]) {
                     subCategoryItem = [categoryItem itemRepresentingSubCategory:lastsubcat];
                     if (!subCategoryItem) {

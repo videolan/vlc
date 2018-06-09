@@ -302,7 +302,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         return;
     }
 
-    int state = -1;
+    int64_t state = -1;
     if (p_current_input) {
         state = var_GetInteger(p_current_input, "state");
     }
@@ -385,7 +385,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)stopItunesPlayback
 {
     intf_thread_t *p_intf = getIntf();
-    int controlItunes = var_InheritInteger(p_intf, "macosx-control-itunes");
+    int64_t controlItunes = var_InheritInteger(p_intf, "macosx-control-itunes");
     if (controlItunes <= 0)
         return;
 
@@ -663,7 +663,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     if (!lastPosition || lastPosition.intValue <= 0)
         return;
 
-    int settingValue = config_GetInt("macosx-continue-playback");
+    int settingValue = (int)config_GetInt("macosx-continue-playback");
     if (settingValue == 2) // never resume
         return;
 
@@ -717,7 +717,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     if (relativePos > .05 && relativePos < .95 && dur > 180) {
         msg_Dbg(getIntf(), "Store current playback position of %f", relativePos);
-        [mutDict setObject:[NSNumber numberWithInt:pos] forKey:url];
+        [mutDict setObject:[NSNumber numberWithInteger:pos] forKey:url];
 
         [mediaList removeObject:url];
         [mediaList addObject:url];

@@ -95,7 +95,7 @@
     bool b_returned = YES;
 
     /* since core audio doesn't provide a reasonable way to see how many channels we got, let's see how long we can do this */
-    for (NSUInteger x = 1; b_returned ; x++)
+    for (int x = 1; b_returned ; x++)
         b_returned = [NSSound setSystemVolume: f_volume forChannel:x];
 }
 
@@ -106,7 +106,7 @@
     bool b_returned = YES;
 
     /* since core audio doesn't provide a reasonable way to see how many channels we got, let's see how long we can do this */
-    for (NSUInteger x = 1; b_returned ; x++)
+    for (int x = 1; b_returned ; x++)
         b_returned = [NSSound setSystemVolume: f_volume forChannel:x];
 }
 
