@@ -500,8 +500,6 @@ modules/gui/macosx/VLCMainWindow.h
 modules/gui/macosx/VLCMainWindow.m
 modules/gui/macosx/VLCMainWindowControlsBar.h
 modules/gui/macosx/VLCMainWindowControlsBar.m
-modules/gui/macosx/VLCMainWindowTitleView.h
-modules/gui/macosx/VLCMainWindowTitleView.m
 modules/gui/macosx/VLCOpenWindowController.h
 modules/gui/macosx/VLCOpenWindowController.m
 modules/gui/macosx/VLCOutput.h
