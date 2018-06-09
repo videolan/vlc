@@ -33,7 +33,6 @@
 		1C3113BC1E508C6900D4DD76 /* VLCKeyboardBacklightControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DF812F01B555C8E0052293C /* VLCKeyboardBacklightControl.m */; };
 		1C3113BD1E508C6900D4DD76 /* macosx.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C27E03E2EB1C0059A3A7 /* macosx.m */; };
 		1C3113C11E508C6900D4DD76 /* VLCMainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */; };
-		1C3113C31E508C6900D4DD76 /* VLCMainWindowTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */; };
 		1C3113C51E508C6900D4DD76 /* misc.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28003E2EB1C0059A3A7 /* misc.m */; };
 		1C3113C71E508C6900D4DD76 /* VLCOpenWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ED6C28203E2EB1C0059A3A7 /* VLCOpenWindowController.m */; };
 		1C3113C91E508C6900D4DD76 /* VLCOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 8E55FB800459B0FD00FB3317 /* VLCOutput.m */; };
@@ -459,8 +458,6 @@
 		8ED6C28403E2EB1C0059A3A7 /* VLCPlaylist.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylist.m; sourceTree = "<group>"; };
 		8ED6C28503E2EB1C0059A3A7 /* prefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prefs.h; sourceTree = "<group>"; };
 		8ED6C28603E2EB1C0059A3A7 /* prefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = prefs.m; sourceTree = "<group>"; };
-		CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCMainWindowTitleView.h; sourceTree = "<group>"; };
-		CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainWindowTitleView.m; sourceTree = "<group>"; };
 		CC0663341566C34C003A411C /* VLCConvertAndSaveWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = VLCConvertAndSaveWindowController.h; sourceTree = "<group>"; };
 		CC0663351566C34C003A411C /* VLCConvertAndSaveWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; lineEnding = 0; path = VLCConvertAndSaveWindowController.m; sourceTree = "<group>"; };
 		CC0CD0DF13DE0EAE00B0D90D /* PXSourceList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PXSourceList.h; sourceTree = "<group>"; };
@@ -1060,8 +1057,6 @@
 				7D5678EF1D5BA397002698F3 /* VLCMainWindowControlsBar.m */,
 				CC448A6213B68A0B009F72E0 /* VLCMainWindow.h */,
 				CC448A6313B68A0B009F72E0 /* VLCMainWindow.m */,
-				CC017A0B14A4C8AF00C09A4F /* VLCMainWindowTitleView.h */,
-				CC017A0C14A4C8AF00C09A4F /* VLCMainWindowTitleView.m */,
 			);
 			name = "Main Window";
 			sourceTree = "<group>";
@@ -1488,7 +1483,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1593,7 +1588,6 @@
 				1C3113BD1E508C6900D4DD76 /* macosx.m in Sources */,
 				1C3113C11E508C6900D4DD76 /* VLCMainWindow.m in Sources */,
 				6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */,
-				1C3113C31E508C6900D4DD76 /* VLCMainWindowTitleView.m in Sources */,
 				1C3113C51E508C6900D4DD76 /* misc.m in Sources */,
 				1C3113C71E508C6900D4DD76 /* VLCOpenWindowController.m in Sources */,
 				1C3113C91E508C6900D4DD76 /* VLCOutput.m in Sources */,
@@ -1869,7 +1863,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,

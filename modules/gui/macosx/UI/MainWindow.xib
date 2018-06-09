@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17D47" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
         <capability name="box content view" minToolsVersion="7.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSWindowController">
@@ -22,116 +23,27 @@
                 <rect key="frame" x="0.0" y="0.0" width="716" height="333"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="4850" customClass="VLCMainWindowTitleView">
-                        <rect key="frame" x="0.0" y="311" width="716" height="22"/>
-                        <subviews>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="4895" customClass="VLCCustomWindowCloseButton">
-                                <rect key="frame" x="7" y="3" width="14" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="14" id="RZv-ag-rGe"/>
-                                    <constraint firstAttribute="height" constant="16" id="qJu-ND-mkX"/>
-                                </constraints>
-                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" imagePosition="only" alignment="center" state="on" imageScaling="axesIndependently" inset="2" id="4904" customClass="VLCWindowButtonCell">
-                                    <behavior key="behavior" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="buttonAction:" target="4850" id="4917"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="4896" customClass="VLCCustomWindowMinimizeButton">
-                                <rect key="frame" x="27" y="3" width="14" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="16" id="ARN-CQ-jIu"/>
-                                    <constraint firstAttribute="width" constant="14" id="ejR-g1-Kfq"/>
-                                </constraints>
-                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="4903" customClass="VLCWindowButtonCell">
-                                    <behavior key="behavior" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="buttonAction:" target="4850" id="4916"/>
-                                </connections>
-                            </button>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="4897" customClass="VLCCustomWindowZoomButton">
-                                <rect key="frame" x="47" y="3" width="14" height="16"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="14" id="aFX-QU-2FJ"/>
-                                    <constraint firstAttribute="height" constant="16" id="h7s-Kd-KA9"/>
-                                </constraints>
-                                <buttonCell key="cell" type="bevel" bezelStyle="regularSquare" imagePosition="only" alignment="center" imageScaling="axesIndependently" inset="2" id="4902" customClass="VLCWindowButtonCell">
-                                    <behavior key="behavior" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="buttonAction:" target="4850" id="4915"/>
-                                </connections>
-                            </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="4899" customClass="VLCWindowTitleTextField">
-                                <rect key="frame" x="65" y="3" width="577" height="17"/>
-                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="VLC media player" allowsEditingTextAttributes="YES" usesSingleLineMode="YES" id="4900">
-                                    <font key="font" metaFont="system"/>
-                                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button translatesAutoresizingMaskIntoConstraints="NO" id="4898" customClass="VLCCustomWindowFullscreenButton">
-                                <rect key="frame" x="698" y="3" width="14" height="15"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="14" id="f3g-MG-7Ed"/>
-                                </constraints>
-                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" state="on" inset="2" id="4901" customClass="VLCWindowButtonCell">
-                                    <behavior key="behavior" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="buttonAction:" target="4850" id="4914"/>
-                                </connections>
-                            </button>
-                        </subviews>
-                        <constraints>
-                            <constraint firstItem="4897" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="2ij-98-UM8"/>
-                            <constraint firstItem="4895" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="5L5-iR-hzi"/>
-                            <constraint firstItem="4895" firstAttribute="left" secondItem="4850" secondAttribute="left" constant="7" id="5rk-de-0OR"/>
-                            <constraint firstItem="4896" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="ObI-6s-vN3"/>
-                            <constraint firstAttribute="right" secondItem="4898" secondAttribute="right" constant="4" id="P0a-sl-gz9"/>
-                            <constraint firstItem="4899" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="S8e-hh-HbK"/>
-                            <constraint firstItem="4898" firstAttribute="left" secondItem="4899" secondAttribute="right" constant="58" id="TnQ-Lu-s8V"/>
-                            <constraint firstItem="4897" firstAttribute="left" secondItem="4896" secondAttribute="right" constant="6" id="XTh-J6-ocw"/>
-                            <constraint firstAttribute="height" constant="22" id="buN-9i-9oy"/>
-                            <constraint firstItem="4896" firstAttribute="left" secondItem="4895" secondAttribute="right" constant="6" id="jS6-Nc-Whc"/>
-                            <constraint firstItem="4898" firstAttribute="centerY" secondItem="4850" secondAttribute="centerY" id="tj5-SN-vII"/>
-                            <constraint firstItem="4899" firstAttribute="left" secondItem="4897" secondAttribute="right" constant="6" id="wQh-pU-b7u"/>
-                        </constraints>
-                        <connections>
-                            <outlet property="fullscreenButton" destination="4898" id="lbk-lI-Uov"/>
-                            <outlet property="greenButton" destination="4897" id="2J9-uI-vLb"/>
-                            <outlet property="redButton" destination="4895" id="ktq-aJ-S89"/>
-                            <outlet property="titleLabel" destination="4899" id="44w-AH-65I"/>
-                            <outlet property="yellowButton" destination="4896" id="aib-Yt-4kE"/>
-                        </connections>
-                    </customView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="3Bj-Gx-5iu" userLabel="Middle Content">
-                        <rect key="frame" x="0.0" y="36" width="716" height="275"/>
+                        <rect key="frame" x="0.0" y="36" width="716" height="297"/>
                         <subviews>
                             <customView hidden="YES" focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="4665" customClass="VLCVoutView">
-                                <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
+                                <rect key="frame" x="0.0" y="0.0" width="716" height="297"/>
                             </customView>
                             <splitView autosaveName="mainWindowSplitView" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680" customClass="VLCMainWindowSplitView">
-                                <rect key="frame" x="0.0" y="0.0" width="716" height="275"/>
+                                <rect key="frame" x="0.0" y="0.0" width="716" height="297"/>
                                 <subviews>
                                     <customView id="4681">
-                                        <rect key="frame" x="0.0" y="0.0" width="238" height="275"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="238" height="297"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
                                             <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="20" horizontalPageScroll="10" verticalLineScroll="20" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4713">
-                                                <rect key="frame" x="0.0" y="0.0" width="238" height="275"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="238" height="297"/>
                                                 <clipView key="contentView" drawsBackground="NO" id="3dd-Re-96d">
-                                                    <rect key="frame" x="1" y="1" width="236" height="273"/>
+                                                    <rect key="frame" x="1" y="1" width="236" height="295"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="20" indentationPerLevel="14" autoresizesOutlineColumn="YES" outlineTableColumn="4717" id="4714" customClass="PXSourceList">
-                                                            <rect key="frame" x="0.0" y="0.0" width="203" height="20"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="236" height="295"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                             <size key="intercellSpacing" width="3" height="0.0"/>
                                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -173,11 +85,11 @@
                                         </constraints>
                                     </customView>
                                     <customView id="4682">
-                                        <rect key="frame" x="239" y="0.0" width="477" height="275"/>
+                                        <rect key="frame" x="239" y="0.0" width="477" height="297"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="gff-CR-TiL" userLabel="Header View">
-                                                <rect key="frame" x="0.0" y="252" width="477" height="23"/>
+                                                <rect key="frame" x="0.0" y="274" width="477" height="23"/>
                                                 <subviews>
                                                     <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4692">
                                                         <rect key="frame" x="0.0" y="-4" width="477" height="27"/>
@@ -219,20 +131,20 @@
                                                 </constraints>
                                             </customView>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="U2A-0F-udY" userLabel="Inner content view">
-                                                <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
                                                 <subviews>
                                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="4722" userLabel="Dropzone">
-                                                        <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
                                                         <subviews>
                                                             <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4731" customClass="VLCDropDisabledImageView">
-                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
                                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="dropzone-background" id="4732"/>
                                                             </imageView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5605" customClass="VLCDragDropView">
-                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
                                                                 <subviews>
-                                                                    <box autoresizesSubviews="NO" transparent="YES" title="Box" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="4739">
-                                                                        <rect key="frame" x="89" y="10" width="300" height="230"/>
+                                                                    <box autoresizesSubviews="NO" borderType="none" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4739">
+                                                                        <rect key="frame" x="89" y="21" width="300" height="230"/>
                                                                         <view key="contentView" id="pxq-Tn-LtA">
                                                                             <rect key="frame" x="0.0" y="0.0" width="300" height="230"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -298,13 +210,13 @@
                                                         </constraints>
                                                     </customView>
                                                     <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4372">
-                                                        <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
                                                         <clipView key="contentView" id="wTX-wO-asx">
-                                                            <rect key="frame" x="1" y="0.0" width="475" height="251"/>
+                                                            <rect key="frame" x="1" y="0.0" width="475" height="273"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                             <subviews>
                                                                 <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="reverseSequential" alternatingRowBackgroundColors="YES" autosaveColumns="NO" rowHeight="15" headerView="4373" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="4380" id="4376" customClass="VLCPlaylistView">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="475" height="228"/>
+                                                                    <rect key="frame" x="0.0" y="0.0" width="475" height="250"/>
                                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                     <size key="intercellSpacing" width="3" height="2"/>
                                                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -720,17 +632,13 @@
                     </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="4850" firstAttribute="top" secondItem="2" secondAttribute="top" id="0hK-vP-S7V"/>
-                    <constraint firstAttribute="trailing" secondItem="4850" secondAttribute="trailing" id="1Te-pH-1Va"/>
-                    <constraint firstItem="3Bj-Gx-5iu" firstAttribute="top" secondItem="2" secondAttribute="top" priority="750" id="1tZ-Wy-sCS"/>
+                    <constraint firstItem="3Bj-Gx-5iu" firstAttribute="top" secondItem="2" secondAttribute="top" id="1tZ-Wy-sCS"/>
                     <constraint firstItem="4756" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="557-Ee-bES"/>
                     <constraint firstAttribute="trailing" secondItem="3Bj-Gx-5iu" secondAttribute="trailing" id="7zX-eF-Vez"/>
                     <constraint firstAttribute="bottom" secondItem="4756" secondAttribute="bottom" id="HK1-1U-ca3"/>
                     <constraint firstAttribute="bottom" secondItem="3Bj-Gx-5iu" secondAttribute="bottom" priority="750" id="OGC-NR-LLR"/>
                     <constraint firstItem="3Bj-Gx-5iu" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="XkA-TM-ova"/>
-                    <constraint firstItem="4850" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="YnQ-ht-C3F"/>
                     <constraint firstItem="4756" firstAttribute="top" secondItem="3Bj-Gx-5iu" secondAttribute="bottom" priority="999" id="ZVn-EJ-9CG"/>
-                    <constraint firstItem="3Bj-Gx-5iu" firstAttribute="top" secondItem="4850" secondAttribute="bottom" priority="999" id="jue-fS-RgT"/>
                     <constraint firstAttribute="trailing" secondItem="4756" secondAttribute="trailing" id="uz3-RG-aAD"/>
                 </constraints>
             </view>
@@ -766,10 +674,8 @@
                 <outlet property="splitViewLeft" destination="4681" id="ryK-3z-wuu"/>
                 <outlet property="splitViewRight" destination="4682" id="REX-fd-CCP"/>
                 <outlet property="tableViewToPodcastConstraint" destination="AIy-oz-19u" id="NaG-yj-Yoh"/>
-                <outlet property="titlebarView" destination="4850" id="5625"/>
                 <outlet property="videoView" destination="4665" id="5622"/>
                 <outlet property="videoViewBottomConstraint" destination="ZVn-EJ-9CG" id="8F2-BP-yVS"/>
-                <outlet property="videoViewTopConstraint" destination="jue-fS-RgT" id="r7T-dB-Gsi"/>
             </connections>
             <point key="canvasLocation" x="465" y="507.5"/>
         </window>

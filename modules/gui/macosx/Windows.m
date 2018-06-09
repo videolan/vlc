@@ -255,11 +255,6 @@
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
 
-    if (self.titlebarView) {
-        [self.titlebarView removeFromSuperview];
-        self.titlebarView = nil;
-    }
-
     [super awakeFromNib];
 }
 
@@ -526,17 +521,6 @@
 - (void)windowDidDeminiaturize:(NSNotification *)notification
 {
     [self setLevel: i_originalLevel];
-}
-
-#pragma mark -
-#pragma mark Key events
-
-- (void)flagsChanged:(NSEvent *)theEvent
-{
-    BOOL b_alt_pressed = ([theEvent modifierFlags] & NSAlternateKeyMask) != 0;
-    [self.titlebarView informModifierPressed: b_alt_pressed];
-
-    [super flagsChanged:theEvent];
 }
 
 #pragma mark -
@@ -1021,30 +1005,6 @@
     } else
     /* Fullscreen started */
         [self hasBecomeFullscreen];
-}
-
-#pragma mark -
-#pragma mark Accessibility stuff
-
-- (NSArray *)accessibilityAttributeNames
-{
-    if (!self.titlebarView)
-        return [super accessibilityAttributeNames];
-
-    static NSMutableArray *attributes = nil;
-    if (attributes == nil) {
-        attributes = [[super accessibilityAttributeNames] mutableCopy];
-        NSArray *appendAttributes = [NSArray arrayWithObjects:NSAccessibilitySubroleAttribute,
-                                     NSAccessibilityCloseButtonAttribute,
-                                     NSAccessibilityMinimizeButtonAttribute,
-                                     NSAccessibilityZoomButtonAttribute, nil];
-
-        for(NSString *attribute in appendAttributes) {
-            if (![attributes containsObject:attribute])
-                [attributes addObject:attribute];
-        }
-    }
-    return attributes;
 }
 
 @end

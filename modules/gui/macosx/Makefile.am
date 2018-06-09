@@ -1,6 +1,6 @@
 SUFFIXES += .xib
 
-libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc 
+libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc
 libmacosx_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(guidir)' \
 	-Wl,-framework,Cocoa -Wl,-framework,Carbon -Wl,-framework,CoreServices \
 	-Wl,-framework,AVFoundation -Wl,-framework,CoreMedia -Wl,-framework,IOKit \
@@ -36,7 +36,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCKeyboardBacklightControl.h gui/macosx/VLCKeyboardBacklightControl.m \
 	gui/macosx/macosx.m \
 	gui/macosx/VLCMainMenu.h gui/macosx/VLCMainMenu.m \
-	gui/macosx/VLCMainWindowTitleView.h gui/macosx/VLCMainWindowTitleView.m \
 	gui/macosx/misc.h gui/macosx/misc.m \
 	gui/macosx/NSSound+VLCAdditions.h gui/macosx/NSSound+VLCAdditions.m \
 	gui/macosx/NSScreen+VLCAdditions.h gui/macosx/NSScreen+VLCAdditions.m \

@@ -33,7 +33,6 @@
 #import "Windows.h"
 #import "misc.h"
 #import "VLCFSPanelController.h"
-#import "VLCMainWindowTitleView.h"
 
 @class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
