@@ -1,7 +1,7 @@
 /*****************************************************************************
  * prefs.m: MacOS X module for vlc
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
@@ -315,6 +315,11 @@
     return self;
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"%@: name: %@, number of children %li", NSStringFromClass([self class]), [self name], [self numberOfChildren]];
+}
+
 - (VLCTreeItem *)childAtIndex:(NSInteger)i_index
 {
     return [[self children] objectAtIndex:i_index];
@@ -454,7 +459,6 @@
 - (bool)isSubCategoryGeneral:(int)category
 {
     if (category == SUBCAT_VIDEO_GENERAL ||
-          category == SUBCAT_ADVANCED_MISC ||
           category == SUBCAT_INPUT_GENERAL ||
           category == SUBCAT_INTERFACE_GENERAL ||
           category == SUBCAT_SOUT_GENERAL||
@@ -501,8 +505,7 @@
         }
         p_configs = [pluginItem configItems];
 
-        unsigned int j;
-        for (j = 0; j < confsize; j++) {
+        for (unsigned int j = 0; j < confsize; j++) {
             int configType = p_configs[j].i_type;
             if (configType == CONFIG_CATEGORY) {
                 categoryItem = [self itemRepresentingCategory:(int)p_configs[j].value.i];
@@ -525,17 +528,23 @@
             }
 
             if (module_is_main(p_module) && (CONFIG_ITEM(configType) || configType == CONFIG_SECTION)) {
-                if (categoryItem && [self isSubCategoryGeneral:lastsubcat])
+                if (categoryItem && [self isSubCategoryGeneral:lastsubcat]) {
                     [[categoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
-                else if (subCategoryItem)
+                } else if (subCategoryItem) {
                     [[subCategoryItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
+                }
             }
             else if (!module_is_main(p_module) && (CONFIG_ITEM(configType) || configType == CONFIG_SECTION)) {
-                if (![[subCategoryItem children] containsObject: pluginItem])
+                if (![[subCategoryItem children] containsObject: pluginItem]) {
                     [[subCategoryItem children] addObject:pluginItem];
+                }
 
-                if (pluginItem)
+                if (pluginItem) {
                     [[pluginItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
+                }
+            }
+            else {
+                msg_Err(getIntf(), "failed to handle index %i which is neither a category nor a subcategory", j);
             }
         }
     }
@@ -548,7 +557,10 @@
 @implementation VLCTreeCategoryItem
 + (VLCTreeCategoryItem *)categoryTreeItemWithCategory:(int)category
 {
-    if (!config_CategoryNameGet(category)) return nil;
+    if (!config_CategoryNameGet(category)) {
+        msg_Err(getIntf(), "failed to get name for category %i", category);
+        return nil;
+    }
     return [[[self class] alloc] initWithCategory:category];
 }
 
@@ -578,6 +590,7 @@
 {
     return _category;
 }
+
 @end
 
 #pragma mark -
