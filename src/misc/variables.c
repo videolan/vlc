@@ -455,7 +455,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         case VLC_VAR_SETSTEP:
             assert(p_var->ops->pf_free == FreeDummy);
-            p_var->step = *va_arg(ap, vlc_value_t *);
+            p_var->step = va_arg(ap, vlc_value_t);
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETSTEP:
