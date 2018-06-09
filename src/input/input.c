@@ -1259,11 +1259,11 @@ static void InitPrograms( input_thread_t * p_input )
     /* Inform the demuxer about waited group (needed only for DVB) */
     if( i_es_out_mode == ES_OUT_MODE_ALL )
     {
-        demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP, -1, NULL );
+        demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP, NULL );
     }
     else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
     {
-        demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP, -1,
+        demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_GROUP,
                        &list );
         TAB_CLEAN( list.i_count, list.p_values );
     }
@@ -1272,14 +1272,14 @@ static void InitPrograms( input_thread_t * p_input )
         int program = es_out_GetGroupForced( input_priv(p_input)->p_es_out );
         if( program == 0 )
             demux_Control( input_priv(p_input)->master->p_demux,
-                           DEMUX_SET_GROUP, 0, NULL );
+                           DEMUX_SET_GROUP_DEFAULT );
         else
         {
             vlc_value_t val = { .i_int = program };
             list.i_count = 1, list.p_values = &val;
 
             demux_Control( input_priv(p_input)->master->p_demux,
-                           DEMUX_SET_GROUP, -1, &list );
+                           DEMUX_SET_GROUP, &list );
         }
     }
 }
@@ -2027,13 +2027,13 @@ static bool Control( input_thread_t *p_input,
 
             if( val.i_int == 0 )
                 demux_Control( input_priv(p_input)->master->p_demux,
-                               DEMUX_SET_GROUP, 0, NULL );
+                               DEMUX_SET_GROUP_DEFAULT );
             else
             {
                 vlc_list_t list = { .i_count = 1, list.p_values = &val };
 
                 demux_Control( input_priv(p_input)->master->p_demux,
-                               DEMUX_SET_GROUP, -1, &list );
+                               DEMUX_SET_GROUP, &list );
             }
             break;
 
