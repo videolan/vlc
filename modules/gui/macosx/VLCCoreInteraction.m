@@ -543,7 +543,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (p_input) {
-        mtime_t currentTime = var_GetInteger(p_input, "time");
         var_SetInteger(p_input, "time", time);
         vlc_object_release(p_input);
     }

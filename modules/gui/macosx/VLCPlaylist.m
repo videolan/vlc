@@ -192,7 +192,6 @@
 
 - (void)setPlaylistHeaderView:(NSTableHeaderView * __nullable)playlistHeaderView
 {
-    VLCMainMenu *mainMenu = [[VLCMain sharedInstance] mainMenu];
     _playlistHeaderView = playlistHeaderView;
 
     // Setup playlist table column selection for both context and main menu
@@ -504,7 +503,6 @@
 - (input_item_t *)createItem:(NSDictionary *)itemToCreateDict
 {
     intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
 
     input_item_t *p_input;
     BOOL b_rem = FALSE, b_dir = FALSE, b_writable = FALSE;
@@ -668,7 +666,6 @@
     [selectedRows getIndexes:indexes maxCount:count inIndexRange:nil];
 
     id item;
-    playlist_item_t *p_item;
     for (NSUInteger i = 0; i < count; i++) {
         item = [_outlineView itemAtRow: indexes[i]];
 
@@ -707,8 +704,6 @@
     int type = 0;
     intf_thread_t *p_intf = getIntf();
     NSString * identifier = [aTableColumn identifier];
-
-    playlist_t *p_playlist = pl_Get(p_intf);
 
     if (_sortTableColumn == aTableColumn)
         b_isSortDescending = !b_isSortDescending;

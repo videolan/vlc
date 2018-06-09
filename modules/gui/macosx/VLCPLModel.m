@@ -604,7 +604,6 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView writeItems:(NSArray *)items toPasteboard:(NSPasteboard *)pboard
 {
-    NSUInteger itemCount = [items count];
     _draggedItems = [[NSMutableArray alloc] initWithArray:items];
 
     /* Add the data to the pasteboard object. */

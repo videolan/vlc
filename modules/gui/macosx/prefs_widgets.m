@@ -1885,11 +1885,10 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         [o_popup setAutoresizingMask:NSViewWidthSizable ];
 
         if (o_keys_menu == nil) {
-            unsigned int i;
             o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
 #warning This does not work anymore. FIXME.
 #if 0
-            for (i = 0; i < sizeof(vlc_key) / sizeof(key_descriptor_t); i++)
+            for (unsigned int i = 0; i < sizeof(vlc_key) / sizeof(key_descriptor_t); i++)
                 if (vlc_key[i].psz_key_string)
                     POPULATE_A_KEY(o_keys_menu,toNSStr(vlc_key[i].psz_key_string),
                                    vlc_key[i].i_key_code)
@@ -1965,7 +1964,6 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
             module_config_t *p_configlist = module_config_get(p_parser, &confsize);
 
             for (i = 0; i < confsize; i++) {
-                unsigned int unused;
                 module_config_t *p_config = &p_configlist[i];
                 NSString *o_modulelongname, *o_modulename;
                 NSNumber *o_moduleenabled = nil;
@@ -2200,7 +2198,6 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
                       [pb propertyListForType:@"VLC media player module"]) != NULL) {
         NSEnumerator *iter = nil;
         id val;
-        BOOL isCopy = (srcMask & NSDragOperationMove) ? NO:YES;
         // Move the modules
         iter = [array objectEnumerator];
         while ((val = [iter nextObject]) != NULL) {
@@ -2267,7 +2264,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
           withView:(NSView *)parentView
 {
     NSRect mainFrame = [parentView frame];
-    NSString *labelString, *toolTip;
+    NSString *labelString;
     mainFrame.size.height = 17;
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;

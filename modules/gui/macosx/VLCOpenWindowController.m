@@ -1099,8 +1099,6 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)openCaptureModeChanged:(id)sender
 {
-    intf_thread_t * p_intf = getIntf();
-
     if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Screen")]) {
         [_captureTabView selectTabViewItemAtIndex:1];
 

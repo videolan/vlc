@@ -525,9 +525,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (void)resetControls
 {
-    module_config_t *p_item;
     int i, y = 0;
-    char *psz_tmp;
 
     /**********************
      * interface settings *
@@ -669,7 +667,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     [self setupField:_input_recordTextField forOption:"input-record-path"];
 
     [self setupButton:_input_hardwareAccelerationCheckbox forBoolValue: "videotoolbox"];
-    [_input_postprocTextField setIntValue: config_GetInt("postproc-q")];
+//    [_input_postprocTextField setIntValue: config_GetInt("postproc-q")];
     [_input_postprocTextField setToolTip: _NS(config_GetLabel(p_intf, "postproc-q"))];
     [self setupButton:_input_skipFramesCheckbox forBoolValue: "skip-frames"];
     [self setupButton:_input_aviPopup forIntList: "avi-index"];
@@ -1295,8 +1293,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
 - (IBAction)urlHandlerAction:(id)sender
 {
-    NSString *bundleIdentifier = [[NSBundle mainBundle] bundleIdentifier];
-
     if (sender == _input_urlhandlerButton) {
         NSArray *handlers;
         NSString *handler;

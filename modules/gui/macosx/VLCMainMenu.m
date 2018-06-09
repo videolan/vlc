@@ -105,7 +105,6 @@
 #endif
 
     NSString* keyString;
-    vlc_value_t val;
     VLCStringUtility *stringUtility = [VLCStringUtility sharedInstance];
     char *key;
 
@@ -995,7 +994,6 @@
 
 - (void)togglePostProcessing:(id)sender
 {
-    char *psz_name = "postproc";
     NSInteger count = [_postprocessingMenu numberOfItems];
     for (NSUInteger x = 0; x < count; x++)
         [[_postprocessingMenu itemAtIndex:x] setState:NSOffState];
@@ -1604,7 +1602,6 @@
 
 - (BOOL)validateMenuItem:(NSMenuItem *)mi
 {
-    NSString *title = [mi title];
     BOOL enabled = YES;
     vlc_value_t val;
     playlist_t *p_playlist = pl_Get(getIntf());

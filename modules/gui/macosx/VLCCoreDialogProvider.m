@@ -297,7 +297,7 @@ static void updateProgressCallback(void *p_data,
     [progressIndicator startAnimation:self];
 
     [progressWindow center];
-    NSInteger returnValue = [NSApp runModalForWindow:progressWindow];
+    [NSApp runModalForWindow:progressWindow];
     [progressWindow close];
 
     [progressIndicator stopAnimation:self];

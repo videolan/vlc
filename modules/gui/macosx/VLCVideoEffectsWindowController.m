@@ -381,7 +381,6 @@
 
 - (void)resetProfileSelector
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [_profilePopup removeAllItems];
 
     // Ignore "Default" index 0 from settings
@@ -479,8 +478,6 @@
 {
     intf_thread_t *p_intf = getIntf();
     playlist_t *p_playlist = pl_Get(p_intf);
-    NSString *tmpString;
-    char *tmpChar;
     BOOL b_state;
 
     /* do we have any filter enabled? if yes, show it. */

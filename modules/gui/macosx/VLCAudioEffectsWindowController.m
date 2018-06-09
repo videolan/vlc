@@ -315,7 +315,6 @@
 
 - (void)resetProfileSelector
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [_profilePopup removeAllItems];
 
     // Ignore "Default" index 0 from settings
@@ -410,7 +409,6 @@
     if (_applyProfileCheckbox.state == NSOffState)
         return;
 
-    playlist_t *p_playlist = pl_Get(getIntf());
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if ([[self generateProfileString] compare:[VLCAudioEffectsWindowController defaultProfileString]] == NSOrderedSame)
         return;
