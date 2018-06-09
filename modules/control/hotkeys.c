@@ -107,23 +107,23 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
-static void var_FreeList( vlc_list_t *values, char ***texts )
+static void var_FreeList( vlc_list_t values, char **texts )
 {
-    switch( values->i_type & VLC_VAR_CLASS )
+    switch( values.i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_STRING:
-            for( int i = 0; i < values->i_count; i++ )
-                free( values->p_values[i].psz_string );
+            for( int i = 0; i < values.i_count; i++ )
+                free( values.p_values[i].psz_string );
             break;
     }
 
-    free( values->p_values );
+    free( values.p_values );
 
     if( texts != NULL )
     {
-        for( int i = 0; i < values->i_count; i++ )
-            free( (*texts)[i] );
-        free( *texts );
+        for( int i = 0; i < values.i_count; i++ )
+            free( texts[i] );
+        free( texts );
     }
 }
 
@@ -796,7 +796,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     var_Set( p_input, "audio-es", list.p_values[i] );
                     DisplayMessage( p_vout, _("Audio track: %s"), list2[i] );
                 }
-                var_FreeList( &list, &list2 );
+                var_FreeList( list, list2 );
             }
             break;
 
@@ -817,7 +817,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 {
                     DisplayMessage( p_vout, _("Subtitle track: %s"),
                                     _("N/A") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( list, list2 );
                     break;
                 }
                 for( i = 0; i < count; i++ )
@@ -838,7 +838,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     i = (i_action == ACTIONID_SUBTITLE_TRACK) ? i+1 : i-1;
                 var_SetInteger( p_input, "spu-es", list.p_values[i].i_int );
                 DisplayMessage( p_vout, _("Subtitle track: %s"), list2[i] );
-                var_FreeList( &list, &list2 );
+                var_FreeList( list, list2 );
             }
             break;
         case ACTIONID_SUBTITLE_TOGGLE:
@@ -855,7 +855,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 {
                     DisplayMessage( p_vout, _("Subtitle track: %s"),
                                     _("N/A") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( list, list2 );
                     break;
                 }
 
@@ -891,7 +891,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 var_SetInteger( p_input, "spu-es", list.p_values[i_new_index].i_int );
                 DisplayMessage( p_vout, _("Subtitle track: %s"),
                                 list2[i_new_index] );
-                var_FreeList( &list, &list2 );
+                var_FreeList( list, list2 );
             }
             break;
         case ACTIONID_PROGRAM_SID_NEXT:
@@ -911,7 +911,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 {
                     DisplayMessage( p_vout, _("Program Service ID: %s"),
                                     _("N/A") );
-                    var_FreeList( &list, &list2 );
+                    var_FreeList( list, list2 );
                     break;
                 }
                 for( i = 0; i < count; i++ )
@@ -939,7 +939,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 var_Set( p_input, "program", list.p_values[i] );
                 DisplayMessage( p_vout, _("Program Service ID: %s"),
                                 list2[i] );
-                var_FreeList( &list, &list2 );
+                var_FreeList( list, list2 );
             }
             break;
 
@@ -1087,7 +1087,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     DisplayMessage( p_vout, _("Aspect ratio: %s"),
                                     text_list[i] );
 
-                    var_FreeList( &val_list, &text_list );
+                    var_FreeList( val_list, text_list );
                 }
                 free( val.psz_string );
             }
@@ -1120,7 +1120,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                    val_list.p_values[i].psz_string );
                     DisplayMessage( p_vout, _("Crop: %s"), text_list[i] );
 
-                    var_FreeList( &val_list, &text_list );
+                    var_FreeList( val_list, text_list );
                 }
                 free( val.psz_string );
             }
@@ -1274,7 +1274,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                   val_list.p_values[i].f_float );
                     DisplayMessage( p_vout, _("Zoom mode: %s"), text_list[i] );
 
-                    var_FreeList( &val_list, &text_list );
+                    var_FreeList( val_list, text_list );
                 }
             }
             break;
@@ -1311,7 +1311,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                         DisplayMessage( p_vout, "%s (%s)", _("Deinterlace on"),
                                         psz_text ? psz_text : psz_mode );
 
-                        var_FreeList( &vlist, &tlist );
+                        var_FreeList( vlist, tlist );
                     }
                     free( psz_mode );
                 }
@@ -1354,7 +1354,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                       psz_text ? psz_text : psz_mode );
                     }
 
-                    var_FreeList( &vlist, &tlist );
+                    var_FreeList( vlist, tlist );
                 }
                 free( psz_mode );
             }
