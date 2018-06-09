@@ -43,6 +43,13 @@
 #import <MediaPlayer/MediaPlayer.h>
 #endif
 
+@interface VLCInputManager()
+- (void)updateMainMenu;
+- (void)updateMainWindow;
+- (void)updateMetaAndInfo;
+- (void)updateDelays;
+@end
+
 #pragma mark Callbacks
 
 static int InputThreadChanged(vlc_object_t *p_this, const char *psz_var,
