@@ -717,8 +717,7 @@ void ExtV4l2::Refresh( void )
                         slider->setObjectName( qfu( psz_var ) );
                         slider->setOrientation( Qt::Horizontal );
                         vlc_value_t val2;
-                        var_Change( p_obj, psz_var, VLC_VAR_GETMIN,
-                                    &val2, NULL );
+                        var_Change( p_obj, psz_var, VLC_VAR_GETMIN, &val2 );
                         if( val2.i_int < INT_MIN )
                             val2.i_int = INT_MIN; /* FIXME */
                         slider->setMinimum( val2.i_int );

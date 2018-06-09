@@ -284,7 +284,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
     val.i_int = 0;
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
 
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == INT64_MIN );
     var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
     assert( val.i_int == INT64_MAX );
@@ -293,7 +293,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
                 &(vlc_value_t){ .i_int = -1234 },
                 &(vlc_value_t){ .i_int = 12345 } );
 
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == -1234 );
     var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
     assert( val.i_int == 12345 );
@@ -376,7 +376,7 @@ static void test_change( libvlc_int_t *p_libvlc )
     assert( var_GetInteger( p_libvlc, "bla" ) == -26 );
 
     /* Test everything is right */
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == min.i_int );
     var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
     assert( val.i_int == max.i_int );
@@ -400,13 +400,13 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
 
-    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL ) != 0
+    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val ) != 0
          || val.i_int == INT64_MIN );
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) != 0
          || val.i_int == INT64_MAX );
     val.i_int = 4212;
     var_Change( p_libvlc, "bla", VLC_VAR_SETMINMAX, &val, &val );
-    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val, NULL ) == 0
+    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val ) == 0
          && val.i_int == 4212 );
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) == 0
          && val.i_int == 4212 );
