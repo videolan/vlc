@@ -426,8 +426,10 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
             /* Explicitily release here, as we do not have transfered ownership to ARC,
              * given that not in all cases we want to destroy the widget.
              */
-            CFRelease(widget->p_sys_intf);
-            widget->p_sys_intf = NULL;
+            if (widget->p_sys_intf) {
+                CFRelease(widget->p_sys_intf);
+                widget->p_sys_intf = NULL;
+            }
         }
     }
     FOREACH_END()
