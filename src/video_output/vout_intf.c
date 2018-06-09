@@ -133,7 +133,7 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
     char *psz_next;
     while( psz_cur && *psz_cur )
     {
-        vlc_value_t val, text;
+        vlc_value_t val;
         psz_next = strchr( psz_cur, ',' );
         if( psz_next )
         {
@@ -141,8 +141,8 @@ static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
             psz_next++;
         }
         val.psz_string = psz_cur;
-        text.psz_string = psz_cur;
-        var_Change( p_vout, psz_var, VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change( p_vout, psz_var, VLC_VAR_ADDCHOICE, val,
+                    (const char *)psz_cur );
         psz_cur = psz_next;
     }
 }
@@ -179,8 +179,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
         val.f_float = p_zoom_values[i].f_value;
-        text.psz_string = vlc_gettext( p_zoom_values[i].psz_label );
-        var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_vout, "zoom", VLC_VAR_ADDCHOICE, val,
+                    vlc_gettext( p_zoom_values[i].psz_label ) );
     }
 
     var_AddCallback( p_vout, "zoom", ZoomCallback, NULL );
@@ -206,8 +206,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     for( size_t i = 0; i < ARRAY_SIZE(p_crop_values); i++ )
     {
         val.psz_string = (char*)p_crop_values[i].psz_value;
-        text.psz_string = _( p_crop_values[i].psz_label );
-        var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_vout, "crop", VLC_VAR_ADDCHOICE, val,
+                    p_crop_values[i].psz_label );
     }
 
     /* Add custom crop ratios */
@@ -233,8 +233,8 @@ void vout_IntfInit( vout_thread_t *p_vout )
     for( size_t i = 0; i < ARRAY_SIZE(p_aspect_ratio_values); i++ )
     {
         val.psz_string = (char*)p_aspect_ratio_values[i].psz_value;
-        text.psz_string = _( p_aspect_ratio_values[i].psz_label );
-        var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_vout, "aspect-ratio", VLC_VAR_ADDCHOICE, val,
+                    vlc_gettext(p_aspect_ratio_values[i].psz_label) );
     }
 
     /* Add custom aspect ratios */

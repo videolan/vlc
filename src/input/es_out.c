@@ -955,8 +955,8 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
         vlc_value_t val2;
 
         /* First one, we need to add the "Disable" choice */
-        val2.i_int = -1; text.psz_string = _("Disable");
-        var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, &val2, &text );
+        val2.i_int = -1;
+        var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, val2, _("Disable") );
         val.i_int++;
     }
 

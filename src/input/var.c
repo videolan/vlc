@@ -329,7 +329,8 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 
         /* Add title choice */
         val2.i_int = i;
-        var_Change( p_input, "title", VLC_VAR_ADDCHOICE, &val2, &text );
+        var_Change( p_input, "title", VLC_VAR_ADDCHOICE, val2,
+                    (const char *)text.psz_string );
 
         free( text.psz_string );
 
@@ -351,7 +352,8 @@ void input_ControlVarNavigation( input_thread_t *p_input )
                     strdup( input_priv(p_input)->title[i]->seekpoint[j]->psz_name );
             }
 
-            var_Change( p_input, title, VLC_VAR_ADDCHOICE, &val2, &text2 );
+            var_Change( p_input, title, VLC_VAR_ADDCHOICE, val2,
+                        (const char *)text2.psz_string );
             free( text2.psz_string );
         }
 
@@ -407,7 +409,8 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
             text.psz_string = strdup( t->seekpoint[i]->psz_name );
         }
 
-        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_input, "chapter", VLC_VAR_ADDCHOICE, val,
+                    (const char *)text.psz_string );
         free( text.psz_string );
     }
 }

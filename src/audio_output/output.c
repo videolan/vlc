@@ -278,47 +278,38 @@ audio_output_t *aout_New (vlc_object_t *parent)
     text.psz_string = _("Visualizations");
     var_Change(aout, "visual", VLC_VAR_SETTEXT, &text);
     val.psz_string = (char *)"";
-    text.psz_string = _("Disable");
-    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("Disable"));
     val.psz_string = (char *)"spectrometer";
-    text.psz_string = _("Spectrometer");
-    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("Spectrometer"));
     val.psz_string = (char *)"scope";
-    text.psz_string = _("Scope");
-    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("Scope"));
     val.psz_string = (char *)"spectrum";
-    text.psz_string = _("Spectrum");
-    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("Spectrum"));
     val.psz_string = (char *)"vuMeter";
-    text.psz_string = _("VU meter");
-    var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+    var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, _("VU meter"));
     /* Look for goom plugin */
     if (module_exists ("goom"))
     {
         val.psz_string = (char *)"goom";
-        text.psz_string = (char *)"Goom";
-        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "Goom");
     }
     /* Look for libprojectM plugin */
     if (module_exists ("projectm"))
     {
         val.psz_string = (char *)"projectm";
-        text.psz_string = (char*)"projectM";
-        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "projectM");
     }
     /* Look for VSXu plugin */
     if (module_exists ("vsxu"))
     {
         val.psz_string = (char *)"vsxu";
-        text.psz_string = (char*)"Vovoid VSXu";
-        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "Vovoid VSXU");
     }
     /* Look for glspectrum plugin */
     if (module_exists ("glspectrum"))
     {
         val.psz_string = (char *)"glspectrum";
-        text.psz_string = (char*)"3D spectrum";
-        var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(aout, "visual", VLC_VAR_ADDCHOICE, val, "3D spectrum");
     }
     str = var_GetNonEmptyString (aout, "effect-list");
     if (str != NULL)
@@ -349,9 +340,8 @@ audio_output_t *aout_New (vlc_object_t *parent)
         for (unsigned i = 0; i < cfg->list_count; i++)
         {
             val.psz_string = (char *)cfg->list.psz[i];
-            text.psz_string = vlc_gettext(cfg->list_text[i]);
-            var_Change (aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
-                            &val, &text);
+            var_Change(aout, "audio-replay-gain-mode", VLC_VAR_ADDCHOICE,
+                       val, vlc_gettext(cfg->list_text[i]));
         }
 
     /* Stereo mode */
@@ -426,7 +416,8 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
 
     /* Fill Stereo mode choices */
     var_Change(aout, "stereo-mode", VLC_VAR_CLEARCHOICES);
-    vlc_value_t val, txt;
+    vlc_value_t val;
+    const char *txt;
     val.i_int = 0;
 
     if (!AOUT_FMT_LINEAR(fmt) || i_nb_input_channels == 1)
@@ -436,26 +427,24 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     int i_default_mode = AOUT_VAR_CHAN_UNSET;
 
     val.i_int = AOUT_VAR_CHAN_MONO;
-    txt.psz_string = _("Mono");
-    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Mono"));
 
     if (i_nb_input_channels != 2)
     {
         val.i_int = AOUT_VAR_CHAN_UNSET;
-        txt.psz_string = _("Original");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Original"));
     }
     if (fmt->i_chan_mode & AOUT_CHANMODE_DOLBYSTEREO)
     {
         val.i_int = AOUT_VAR_CHAN_DOLBYS;
-        txt.psz_string = _("Dolby Surround");
+        txt = _("Dolby Surround");
     }
     else
     {
         val.i_int = AOUT_VAR_CHAN_STEREO;
-        txt.psz_string = _("Stereo");
+        txt = _("Stereo");
     }
-    var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+    var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, txt);
 
     if (i_nb_input_channels == 2)
     {
@@ -465,23 +454,21 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
             i_default_mode = val.i_int; /* Stereo or Dolby Surround */
 
         val.i_int = AOUT_VAR_CHAN_LEFT;
-        txt.psz_string = _("Left");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, _("Left"));
         val.i_int = AOUT_VAR_CHAN_RIGHT;
-        txt.psz_string = _("Right");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val, _("Right"));
 
         val.i_int = AOUT_VAR_CHAN_RSTEREO;
-        txt.psz_string = _("Reverse stereo");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val,
+                   _("Reverse stereo"));
     }
 
     if (input_chan_type == AUDIO_CHANNEL_TYPE_AMBISONICS
      || i_nb_input_channels > 2)
     {
         val.i_int = AOUT_VAR_CHAN_HEADPHONES;
-        txt.psz_string = _("Headphones");
-        var_Change (aout, "stereo-mode", VLC_VAR_ADDCHOICE, &val, &txt);
+        var_Change(aout, "stereo-mode", VLC_VAR_ADDCHOICE, val,
+                   _("Headphones"));
 
         if (aout->current_sink_info.headphones)
             i_default_mode = AOUT_VAR_CHAN_HEADPHONES;

@@ -477,21 +477,20 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         case VLC_VAR_ADDCHOICE:
         {
-            vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
-            const vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
+            vlc_value_t val = va_arg(ap, vlc_value_t);
+            const char *text = va_arg(ap, const char *);
             int i = p_var->choices.i_count;
 
-            TAB_APPEND(p_var->choices.i_count,
-                       p_var->choices.p_values, *p_val);
+            TAB_APPEND(p_var->choices.i_count, p_var->choices.p_values, val);
             assert(i == p_var->choices_text.i_count);
             TAB_APPEND(p_var->choices_text.i_count,
-                       p_var->choices_text.p_values, *p_val);
+                       p_var->choices_text.p_values, val);
             p_var->ops->pf_dup( &p_var->choices.p_values[i] );
             p_var->choices_text.p_values[i].psz_string =
-                ( p_val2 && p_val2->psz_string ) ?
-                strdup( p_val2->psz_string ) : NULL;
+                (text != NULL) ? strdup(text) : NULL;
 
-            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_ADDCHOICE, p_val);
+            TriggerListCallback(p_this, p_var, psz_name, VLC_VAR_ADDCHOICE,
+                                &val);
             break;
         }
         case VLC_VAR_DELCHOICE:

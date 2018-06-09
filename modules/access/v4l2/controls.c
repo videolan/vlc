@@ -476,10 +476,9 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
             continue;
         msg_Dbg (obj, "  choice %"PRIu32") %s", menu.index, menu.name);
 
-        vlc_value_t text;
         val.i_int = menu.index;
-        text.psz_string = (char *)menu.name;
-        var_Change (obj, c->name, VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(obj, c->name, VLC_VAR_ADDCHOICE, val,
+                   (const char *)menu.name);
     }
     return c;
 }
@@ -670,11 +669,10 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
         msg_Dbg (obj, "  choice %"PRIu32") %"PRId64, menu.index,
                  (uint64_t)menu.value);
 
-        vlc_value_t text;
         val.i_int = menu.index;
-        sprintf (name, "%"PRId64, (int64_t)menu.value);
-        text.psz_string = name;
-        var_Change (obj, c->name, VLC_VAR_ADDCHOICE, &val, &text);
+        sprintf(name, "%"PRId64, (int64_t)menu.value);
+        var_Change(obj, c->name, VLC_VAR_ADDCHOICE, val,
+                   (const char *)name);
     }
     return c;
 }
@@ -735,8 +733,8 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
             text.psz_string = (char *)query.name;
             var_Change(obj, c->name, VLC_VAR_SETTEXT, &text);
             val.i_int = query.id;
-            text.psz_string = (char *)c->name;
-            var_Change (obj, "controls", VLC_VAR_ADDCHOICE, &val, &text);
+            var_Change(obj, "controls", VLC_VAR_ADDCHOICE, val,
+                       (const char *)c->name);
 
             c->next = list;
             list = c;
@@ -764,15 +762,14 @@ vlc_v4l2_ctrl_t *ControlsInit (vlc_object_t *obj, int fd)
 
     /* Add a control to reset all controls to their default values */
     {
-        vlc_value_t val, text;
+        vlc_value_t val;
 
         var_Create (obj, "reset", VLC_VAR_VOID | VLC_VAR_ISCOMMAND);
         val.psz_string = _("Reset defaults");
         var_Change(obj, "reset", VLC_VAR_SETTEXT, &val);
         val.i_int = -1;
 
-        text.psz_string = (char *)"reset";
-        var_Change (obj, "controls", VLC_VAR_ADDCHOICE, &val, &text);
+        var_Change(obj, "controls", VLC_VAR_ADDCHOICE, val, "reset");
         var_AddCallback (obj, "reset", ControlsResetCallback, list);
     }
     if (var_InheritBool (obj, CFG_PREFIX"controls-reset"))

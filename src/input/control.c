@@ -605,8 +605,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
 
         /* Add bookmark to choice-list */
         var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
-                    &(vlc_value_t){ .i_int = i },
-                    &(vlc_value_t){ .psz_string = sp->psz_name } );
+                    (vlc_value_t){ .i_int = i }, sp->psz_name );
 
         /* Append bookmark to option-buffer */
         /* TODO: escape inappropriate values */

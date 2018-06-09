@@ -127,6 +127,7 @@ static int OpenPostproc( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     vlc_value_t val, val_orig, text;
+    const char *desc;
     int i_flags = 0;
 
     if( p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma ||
@@ -232,20 +233,19 @@ static int OpenPostproc( vlc_object_t *p_this )
         switch( val.i_int )
         {
             case 0:
-                text.psz_string = _("Disable");
+                desc = _("Disable");
                 break;
             case 1:
-                text.psz_string = _("Lowest");
+                desc = _("Lowest");
                 break;
             case PP_QUALITY_MAX:
-                text.psz_string = _("Highest");
+                desc = _("Highest");
                 break;
             default:
-                text.psz_string = NULL;
+                desc = NULL;
                 break;
         }
-        var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_ADDCHOICE,
-                    &val, text.psz_string?&text:NULL );
+        var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_ADDCHOICE, val, desc );
     }
 
     vlc_mutex_init( &p_sys->lock );

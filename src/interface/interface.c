@@ -86,18 +86,15 @@ int intf_Create( playlist_t *playlist, const char *chain )
 #endif
     {
         val.psz_string = (char *)"rc,none";
-        text.psz_string = (char *)_("Console");
-        var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+        var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Console") );
     }
     val.psz_string = (char *)"telnet,none";
-    text.psz_string = (char *)_("Telnet");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Telnet") );
     val.psz_string = (char *)"http,none";
-    text.psz_string = (char *)_("Web");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val, _("Web") );
     val.psz_string = (char *)"gestures,none";
-    text.psz_string = (char *)_("Mouse Gestures");
-    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, &val, &text );
+    var_Change( p_intf, "intf-add", VLC_VAR_ADDCHOICE, val,
+                _("Mouse Gestures") );
 
     var_AddCallback( p_intf, "intf-add", AddIntfCallback, playlist );
 

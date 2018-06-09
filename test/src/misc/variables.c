@@ -326,12 +326,10 @@ static void test_choices( libvlc_int_t *p_libvlc )
     vlc_value_t val, val2;
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     val.i_int = 1;
-    val2.psz_string = (char*)"one";
-    var_Change( p_libvlc, "bla", VLC_VAR_ADDCHOICE, &val, &val2 );
+    var_Change( p_libvlc, "bla", VLC_VAR_ADDCHOICE, val, "one" );
 
     val.i_int = 2;
-    val2.psz_string = (char*)"two";
-    var_Change( p_libvlc, "bla", VLC_VAR_ADDCHOICE, &val, &val2 );
+    var_Change( p_libvlc, "bla", VLC_VAR_ADDCHOICE, val, "two" );
 
     assert( var_CountChoices( p_libvlc, "bla" ) == 2 );
 
