@@ -81,7 +81,7 @@
 
     if (self) {
         msg_Dbg(getIntf(), "Loading VLCStatusBarIcon");
-        [NSBundle loadNibNamed:@"VLCStatusBarIconMainMenu" owner:self];
+        [[NSBundle mainBundle] loadNibNamed:@"VLCStatusBarIconMainMenu" owner:self topLevelObjects:nil];
     }
 
     return self;
