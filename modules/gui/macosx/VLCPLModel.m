@@ -692,6 +692,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         playlist_item_t *p_new_parent = playlist_ItemGetById(p_playlist, [targetItem plItemId]);
         if (!p_new_parent) {
             PL_UNLOCK;
+            free(pp_items);
             return NO;
         }
 
