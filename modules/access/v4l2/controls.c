@@ -398,7 +398,7 @@ static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
     if (query->step != 1)
     {
         val.i_int = query->step;
-        var_Change (obj, c->name, VLC_VAR_SETSTEP, &val, NULL);
+        var_Change (obj, c->name, VLC_VAR_SETSTEP, &val);
     }
     return c;
 }
