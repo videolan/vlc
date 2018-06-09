@@ -283,7 +283,6 @@ void WindowClose(vout_window_t *p_wnd)
         [newVideoWindow setCanBecomeMainWindow: !videoWallpaper];
         [newVideoWindow setAcceptsMouseMovedEvents: !videoWallpaper];
         [newVideoWindow setMovableByWindowBackground: !videoWallpaper];
-        [newVideoWindow useOptimizedDrawing: YES];
 
         voutView = [[VLCVoutView alloc] initWithFrame:[[newVideoWindow contentView] bounds]];
         [voutView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
@@ -324,7 +323,6 @@ void WindowClose(vout_window_t *p_wnd)
 
             [newVideoWindow setDelegate: newVideoWindow];
             [newVideoWindow setLevel:NSNormalWindowLevel];
-            [newVideoWindow useOptimizedDrawing: YES];
             voutView = [newVideoWindow videoView];
             isEmbedded = NO;
         }

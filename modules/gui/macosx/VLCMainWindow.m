@@ -152,10 +152,6 @@ static const float f_min_window_height = 307.;
 
     [self setDelegate:self];
     [self setRestorable:NO];
-    // TODO: useOptimizedDrawing deprecated since 10.10, but no
-    // documentation provided what do use instead.
-    // see radar://23047516
-    [self useOptimizedDrawing:YES];
     [self setExcludedFromWindowsMenu:YES];
     [self setAcceptsMouseMovedEvents:YES];
     [self setFrameAutosaveName:@"mainwindow"];
