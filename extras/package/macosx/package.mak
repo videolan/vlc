@@ -57,7 +57,7 @@ endif
 	mkdir -p $@/Contents/MacOS/plugins
 	find $(prefix)/lib/vlc/plugins -name 'lib*_plugin.dylib' -maxdepth 2 -exec cp -a {} $@/Contents/MacOS/plugins \;
 	## Copy libbluray jar
-	find "$(CONTRIB_DIR)/share/java/" -name 'libbluray-j2se-*.jar' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/plugins \;
+	find "$(CONTRIB_DIR)/share/java/" -name 'libbluray-j2se-*.jar' -maxdepth 1 -exec cp -a {} $@/Contents/MacOS/plugins \; || true
 	## Install binary
 	cp $(prefix)/bin/vlc $@/Contents/MacOS/VLC
 	## Generate plugin cache
