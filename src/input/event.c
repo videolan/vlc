@@ -329,7 +329,7 @@ static void VarListDel( input_thread_t *p_input,
     }
     else
     {
-        var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES, &val );
+        var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES );
     }
 
     Trigger( p_input, i_event );

@@ -344,7 +344,7 @@ static void test_choices( libvlc_int_t *p_libvlc )
             !strcmp( val2.p_list->p_values[0].psz_string, "one" ) );
     var_FreeList( &val, &val2 );
 
-    var_Change( p_libvlc, "bla", VLC_VAR_CLEARCHOICES, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_CLEARCHOICES );
     assert( var_CountChoices( p_libvlc, "bla" ) == 0 );
 
     var_Destroy( p_libvlc, "bla" );
