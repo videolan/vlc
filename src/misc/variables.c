@@ -420,8 +420,7 @@ void var_DestroyAll( vlc_object_t *obj )
     priv->var_root = NULL;
 }
 
-int (var_Change)(vlc_object_t *p_this, const char *psz_name,
-                 int i_action, vlc_value_t *p_val, ...)
+int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
 {
     va_list ap;
     int ret = VLC_SUCCESS;
@@ -440,27 +439,23 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
         return VLC_ENOVAR;
     }
 
-    va_start(ap, p_val);
+    va_start(ap, i_action);
     switch( i_action )
     {
         case VLC_VAR_GETMIN:
-            *p_val = p_var->min;
+            *va_arg(ap, vlc_value_t *) = p_var->min;
             break;
         case VLC_VAR_GETMAX:
-            *p_val = p_var->max;
+            *va_arg(ap, vlc_value_t *) = p_var->max;
             break;
         case VLC_VAR_SETMINMAX:
-        {
-            const vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
-
             assert(p_var->ops->pf_free == FreeDummy);
-            p_var->min = *p_val;
-            p_var->max = *p_val2;
+            p_var->min = *va_arg(ap, vlc_value_t *);
+            p_var->max = *va_arg(ap, vlc_value_t *);
             break;
-        }
         case VLC_VAR_SETSTEP:
             assert(p_var->ops->pf_free == FreeDummy);
-            p_var->step = *p_val;
+            p_var->step = *va_arg(ap, vlc_value_t *);
             CheckValue( p_var, &p_var->val );
             break;
         case VLC_VAR_GETSTEP:
@@ -478,10 +473,11 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
                     ret = VLC_EGENERIC;
             }
             if (ret == VLC_SUCCESS)
-                *p_val = p_var->step;
+                *va_arg(ap, vlc_value_t *) = p_var->step;
             break;
         case VLC_VAR_ADDCHOICE:
         {
+            vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
             const vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
             int i = p_var->choices.i_count;
 
@@ -500,6 +496,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
         }
         case VLC_VAR_DELCHOICE:
         {
+            vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
             int i;
 
             for( i = 0 ; i < p_var->choices.i_count ; i++ )
@@ -522,7 +519,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             break;
         }
         case VLC_VAR_CHOICESCOUNT:
-            p_val->i_int = p_var->choices.i_count;
+            va_arg(ap, vlc_value_t *)->i_int = p_var->choices.i_count;
             break;
         case VLC_VAR_CLEARCHOICES:
             for( int i = 0 ; i < p_var->choices.i_count ; i++ )
@@ -541,7 +538,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_SETVALUE:
             /* Duplicate data if needed */
-            newval = *p_val;
+            newval = *va_arg(ap, vlc_value_t *);
             p_var->ops->pf_dup( &newval );
             /* Backup needed stuff */
             oldval = p_var->val;
@@ -554,6 +551,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_GETCHOICES:
         {
+            vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
             vlc_value_t *p_val2 = va_arg(ap, vlc_value_t *);
 
             p_val->p_list = xmalloc( sizeof(vlc_list_t) );
@@ -583,15 +581,19 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name,
             break;
         }
         case VLC_VAR_SETTEXT:
+        {
+            const vlc_value_t *p_val = va_arg(ap, vlc_value_t *);
+
             free( p_var->psz_text );
             if( p_val && p_val->psz_string )
                 p_var->psz_text = strdup( p_val->psz_string );
             else
                 p_var->psz_text = NULL;
             break;
+        }
         case VLC_VAR_GETTEXT:
-            p_val->psz_string = p_var->psz_text ? strdup( p_var->psz_text )
-                                                : NULL;
+            va_arg(ap, vlc_value_t *)->psz_string =
+                p_var->psz_text ? strdup( p_var->psz_text ) : NULL;
             break;
         default:
             break;
