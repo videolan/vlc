@@ -1129,7 +1129,10 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
 
             if ( var_Change( p_input, psz_variable,
                              VLC_VAR_GETCHOICES, &val, &text ) < 0 )
+            {
+                free( val_name.psz_string );
                 goto out;
+            }
 
             msg_rc( "+----[ %s ]", val_name.psz_string );
             for ( int i = 0; i < val.p_list->i_count; i++ )
