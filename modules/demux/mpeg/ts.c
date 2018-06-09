@@ -1071,13 +1071,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* Deselect/filter current ones */
             ARRAY_RESET( p_sys->programs );
 
-            if( i_int != -1 )
-            {
-                p_sys->seltype = PROGRAM_LIST;
-                ARRAY_APPEND( p_sys->programs, i_int );
-                UpdatePESFilters( p_demux, false );
-            }
-            else if( likely( p_list != NULL ) )
+            if( likely(p_list != NULL) )
             {
                 p_sys->seltype = PROGRAM_LIST;
                 for( int i = 0; i < p_list->i_count; i++ )
