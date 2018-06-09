@@ -110,7 +110,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     int deinterlace_state = var_GetInteger(vout, "deinterlace");
 
     text.psz_string = _("Deinterlace");
-    var_Change(vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(vout, "deinterlace", VLC_VAR_SETTEXT, &text);
 
     const module_config_t *optd = config_FindConfig("deinterlace");
     var_Change(vout, "deinterlace", VLC_VAR_CLEARCHOICES, NULL);
@@ -126,7 +126,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     char *deinterlace_mode = var_GetNonEmptyString(vout, "deinterlace-mode");
 
     text.psz_string = _("Deinterlace mode");
-    var_Change(vout, "deinterlace-mode", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(vout, "deinterlace-mode", VLC_VAR_SETTEXT, &text);
 
     const module_config_t *optm = config_FindConfig("deinterlace-mode");
     var_Change(vout, "deinterlace-mode", VLC_VAR_CLEARCHOICES, NULL);

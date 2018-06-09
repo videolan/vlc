@@ -276,7 +276,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     /* Visualizations */
     var_Create (aout, "visual", VLC_VAR_STRING);
     text.psz_string = _("Visualizations");
-    var_Change (aout, "visual", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(aout, "visual", VLC_VAR_SETTEXT, &text);
     val.psz_string = (char *)"";
     text.psz_string = _("Disable");
     var_Change (aout, "visual", VLC_VAR_ADDCHOICE, &val, &text);
@@ -330,20 +330,20 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_Create (aout, "audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     var_AddCallback (aout, "audio-filter", FilterCallback, NULL);
     text.psz_string = _("Audio filters");
-    var_Change (aout, "audio-filter", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(aout, "audio-filter", VLC_VAR_SETTEXT, &text);
 
     var_Create (aout, "viewpoint", VLC_VAR_ADDRESS );
     var_AddCallback (aout, "viewpoint", ViewpointCallback, NULL);
 
     var_Create (aout, "audio-visual", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     text.psz_string = _("Audio visualizations");
-    var_Change (aout, "audio-visual", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(aout, "audio-visual", VLC_VAR_SETTEXT, &text);
 
     /* Replay gain */
     var_Create (aout, "audio-replay-gain-mode",
                 VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     text.psz_string = _("Replay gain");
-    var_Change (aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text, NULL);
+    var_Change(aout, "audio-replay-gain-mode", VLC_VAR_SETTEXT, &text);
     cfg = config_FindConfig("audio-replay-gain-mode");
     if (likely(cfg != NULL))
         for (unsigned i = 0; i < cfg->list_count; i++)
@@ -361,7 +361,7 @@ audio_output_t *aout_New (vlc_object_t *parent)
     var_AddCallback (aout, "stereo-mode", StereoModeCallback, NULL);
     vlc_value_t txt;
     txt.psz_string = _("Stereo audio mode");
-    var_Change (aout, "stereo-mode", VLC_VAR_SETTEXT, &txt, NULL);
+    var_Change(aout, "stereo-mode", VLC_VAR_SETTEXT, &txt);
 
     /* Equalizer */
     var_Create (aout, "equalizer-preamp", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);

@@ -80,7 +80,7 @@ int intf_Create( playlist_t *playlist, const char *chain )
     vlc_value_t val, text;
     var_Create( p_intf, "intf-add", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Add Interface");
-    var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_intf, "intf-add", VLC_VAR_SETTEXT, &text );
 #if !defined(_WIN32) && defined(HAVE_ISATTY)
     if( isatty( 0 ) )
 #endif

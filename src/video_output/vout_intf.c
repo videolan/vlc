@@ -167,14 +167,14 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "autoscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Autoscale video");
-    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "autoscale", VLC_VAR_SETTEXT, &text );
     var_AddCallback( p_vout, "autoscale", AutoScaleCallback, NULL );
 
     var_Create( p_vout, "zoom", VLC_VAR_FLOAT | VLC_VAR_ISCOMMAND |
                 VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Zoom");
-    var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "zoom", VLC_VAR_SETTEXT, &text );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_zoom_values); i++ )
     {
@@ -201,7 +201,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Crop");
-    var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "crop", VLC_VAR_SETTEXT, &text );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_crop_values); i++ )
     {
@@ -228,7 +228,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
                 VLC_VAR_DOINHERIT );
 
     text.psz_string = _("Aspect ratio");
-    var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "aspect-ratio", VLC_VAR_SETTEXT, &text );
 
     for( size_t i = 0; i < ARRAY_SIZE(p_aspect_ratio_values); i++ )
     {
@@ -251,7 +251,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-on-top", VLC_VAR_BOOL | VLC_VAR_DOINHERIT
                 | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Always on top");
-    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "video-on-top", VLC_VAR_SETTEXT, &text );
     var_AddCallback( p_vout, "video-on-top", AboveCallback, NULL );
 
     /* Add a variable to indicate if the window should be below all others */
@@ -266,13 +266,13 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "fullscreen",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Fullscreen");
-    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "fullscreen", VLC_VAR_SETTEXT, &text );
     var_AddCallback( p_vout, "fullscreen", FullscreenCallback, NULL );
 
     /* Add a snapshot variable */
     var_Create( p_vout, "video-snapshot", VLC_VAR_VOID | VLC_VAR_ISCOMMAND );
     text.psz_string = _("Snapshot");
-    var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, &text, NULL );
+    var_Change( p_vout, "video-snapshot", VLC_VAR_SETTEXT, &text );
     var_AddCallback( p_vout, "video-snapshot", SnapshotCallback, NULL );
 
     /* Add a video-filter variable */
