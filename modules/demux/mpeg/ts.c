@@ -1085,15 +1085,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_SET_GROUP_LIST:
     {
-        vlc_list_t *p_list = va_arg( args, vlc_list_t * );
+        size_t count = va_arg(args, size_t);
+        const int *pids = va_arg(args, const int *);
 
         msg_Dbg( p_demux, "DEMUX_SET_GROUP_%s", "LIST" );
 
         /* Deselect/filter current ones */
         ARRAY_RESET( p_sys->programs );
         p_sys->seltype = PROGRAM_LIST;
-        for( int i = 0; i < p_list->i_count; i++ )
-            ARRAY_APPEND( p_sys->programs, p_list->p_values[i].i_int );
+        for( size_t i = 0; i < count; i++ )
+            ARRAY_APPEND( p_sys->programs, pids[i] );
         UpdatePESFilters( p_demux, false );
 
         p_sys->b_default_selection = false;

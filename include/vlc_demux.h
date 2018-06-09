@@ -197,7 +197,7 @@ enum demux_query_e
      * If you don't know what to do with it, just IGNORE it: it is safe(r). */
     DEMUX_SET_GROUP_DEFAULT,
     DEMUX_SET_GROUP_ALL,
-    DEMUX_SET_GROUP_LIST,       /* arg1= vlc_list_t *, can fail */
+    DEMUX_SET_GROUP_LIST,       /* arg1= size_t, arg2= const int *, can fail */
     DEMUX_SET_ES,               /* arg1= int                            can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call

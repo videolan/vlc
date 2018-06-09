@@ -1219,7 +1219,8 @@ static void UpdatePtsDelay( input_thread_t *p_input )
 static void InitPrograms( input_thread_t * p_input )
 {
     int i_es_out_mode;
-    vlc_list_t list;
+    int *tab;
+    size_t count;
 
     /* Compute correct pts_delay */
     UpdatePtsDelay( p_input );
@@ -1234,16 +1235,15 @@ static void InitPrograms( input_thread_t * p_input )
         {
             char *buf;
 
-            TAB_INIT( list.i_count, list.p_values );
+            TAB_INIT(count, tab);
             for( const char *prgm = strtok_r( prgms, ",", &buf );
                  prgm != NULL;
                  prgm = strtok_r( NULL, ",", &buf ) )
             {
-                vlc_value_t val = { .i_int = atoi( prgm ) };
-                TAB_APPEND(list.i_count, list.p_values, val);
+                TAB_APPEND(count, tab, atoi(prgm));
             }
 
-            if( list.i_count > 0 )
+            if( count > 0 )
                 i_es_out_mode = ES_OUT_MODE_PARTIAL;
                 /* Note : we should remove the "program" callback. */
 
@@ -1265,8 +1265,8 @@ static void InitPrograms( input_thread_t * p_input )
     else if( i_es_out_mode == ES_OUT_MODE_PARTIAL )
     {
         demux_Control( input_priv(p_input)->master->p_demux,
-                       DEMUX_SET_GROUP_LIST, &list );
-        TAB_CLEAN( list.i_count, list.p_values );
+                       DEMUX_SET_GROUP_LIST, count, tab );
+        free(tab);
     }
     else
     {
@@ -1275,13 +1275,9 @@ static void InitPrograms( input_thread_t * p_input )
             demux_Control( input_priv(p_input)->master->p_demux,
                            DEMUX_SET_GROUP_DEFAULT );
         else
-        {
-            vlc_value_t val = { .i_int = program };
-            list.i_count = 1, list.p_values = &val;
-
             demux_Control( input_priv(p_input)->master->p_demux,
-                           DEMUX_SET_GROUP_LIST, &list );
-        }
+                           DEMUX_SET_GROUP_LIST, (size_t)1,
+                           (const int *)&program );
     }
 }
 
@@ -2030,12 +2026,9 @@ static bool Control( input_thread_t *p_input,
                 demux_Control( input_priv(p_input)->master->p_demux,
                                DEMUX_SET_GROUP_DEFAULT );
             else
-            {
-                vlc_list_t list = { .i_count = 1, list.p_values = &val };
-
                 demux_Control( input_priv(p_input)->master->p_demux,
-                               DEMUX_SET_GROUP_LIST, &list );
-            }
+                               DEMUX_SET_GROUP_LIST,
+                               (size_t)1, &(const int){ val.i_int });
             break;
 
         case INPUT_CONTROL_SET_ES:
