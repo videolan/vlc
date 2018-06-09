@@ -660,7 +660,8 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
                           void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    vlc_value_t val, count;
+    vlc_value_t val;
+    size_t count;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "next-title" ) )
@@ -669,7 +670,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         val.i_int = var_GetInteger( p_input, "title" ) + 1;
         var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &count );
-        if( val.i_int < count.i_int )
+        if( (size_t)val.i_int < count )
             var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
     }
     else if( !strcmp( psz_cmd, "prev-title" ) )
@@ -701,7 +702,8 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
                               void *p_data )
 {
     input_thread_t *p_input = (input_thread_t*)p_this;
-    vlc_value_t val, count;
+    vlc_value_t val;
+    size_t count;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( !strcmp( psz_cmd, "next-chapter" ) )
@@ -710,7 +712,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         val.i_int = var_GetInteger( p_input, "chapter" ) + 1;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &count );
-        if( val.i_int < count.i_int )
+        if( (size_t)val.i_int < count )
             var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
     }
     else if( !strcmp( psz_cmd, "prev-chapter" ) )

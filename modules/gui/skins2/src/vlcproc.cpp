@@ -483,9 +483,9 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         case INPUT_EVENT_ES:
         {
             // Do we have audio
-            vlc_value_t audio_es;
+            size_t audio_es;
             var_Change( pInput, "audio-es", VLC_VAR_CHOICESCOUNT, &audio_es );
-            SET_BOOL( m_cVarHasAudio, audio_es.i_int > 0 );
+            SET_BOOL( m_cVarHasAudio, audio_es > 0 );
             break;
         }
 
@@ -518,10 +518,10 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
         case INPUT_EVENT_CHAPTER:
         {
-            vlc_value_t chapters_count;
+            size_t chapters_count;
             var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
                         &chapters_count );
-            SET_BOOL( m_cVarDvdActive, chapters_count.i_int > 0 );
+            SET_BOOL( m_cVarDvdActive, chapters_count > 0 );
             break;
         }
 

@@ -929,7 +929,8 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
-    vlc_value_t       val, text;
+    vlc_value_t       text;
+    size_t count;
 
     if( b_delete )
     {
@@ -949,15 +950,15 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     else
         psz_var = "spu-es";
 
-    var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val );
-    if( val.i_int == 0 )
+    var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &count );
+    if( count == 0 )
     {
         vlc_value_t val2;
 
         /* First one, we need to add the "Disable" choice */
         val2.i_int = -1;
         var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, val2, _("Disable") );
-        val.i_int++;
+        count++;
     }
 
     /* Take care of the ES description */
@@ -975,12 +976,13 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     {
         if( psz_language && *psz_language )
         {
-            if( asprintf( &text.psz_string, "%s %"PRId64" - [%s]", _( "Track" ), val.i_int, psz_language ) == -1 )
+            if( asprintf( &text.psz_string, "%s %zu - [%s]", _("Track"), count,
+                          psz_language ) == -1 )
                 text.psz_string = NULL;
         }
         else
         {
-            if( asprintf( &text.psz_string, "%s %"PRId64, _( "Track" ), val.i_int ) == -1 )
+            if( asprintf( &text.psz_string, "%s %zu", _("Track"), count ) == -1 )
                 text.psz_string = NULL;
         }
     }

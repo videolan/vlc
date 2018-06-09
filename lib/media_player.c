@@ -1397,7 +1397,7 @@ int libvlc_media_player_get_chapter( libvlc_media_player_t *p_mi )
 int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    size_t val;
 
     p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
@@ -1406,14 +1406,14 @@ int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi )
     int i_ret = var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
-    return i_ret == VLC_SUCCESS ? val.i_int : -1;
+    return i_ret == VLC_SUCCESS ? (ssize_t)val : -1;
 }
 
 int libvlc_media_player_get_chapter_count_for_title(
                                  libvlc_media_player_t *p_mi,
                                  int i_title )
 {
-    vlc_value_t val;
+    size_t val;
 
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
@@ -1425,7 +1425,7 @@ int libvlc_media_player_get_chapter_count_for_title(
     int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
-    return i_ret == VLC_SUCCESS ? val.i_int : -1;
+    return i_ret == VLC_SUCCESS ? (ssize_t)val : -1;
 }
 
 void libvlc_media_player_set_title( libvlc_media_player_t *p_mi,
@@ -1465,7 +1465,7 @@ int libvlc_media_player_get_title( libvlc_media_player_t *p_mi )
 int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    size_t val;
 
     p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
@@ -1474,7 +1474,7 @@ int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
     int i_ret = var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
-    return i_ret == VLC_SUCCESS ? val.i_int : -1;
+    return i_ret == VLC_SUCCESS ? (ssize_t)val : -1;
 }
 
 int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi,

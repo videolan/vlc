@@ -3203,7 +3203,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
                                  enum slave_type i_type, const char *psz_uri,
                                  unsigned i_flags )
 {
-    vlc_value_t count;
+    size_t count;
     const char *psz_es;
     const char *psz_forced_demux;
     const bool b_can_fail = i_flags & SLAVE_ADD_CANFAIL;
@@ -3283,13 +3283,13 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
                     (vlc_value_t *)NULL ) )
         return VLC_SUCCESS;
 
-    if( count.i_int == 0 )
-        count.i_int++;
+    if( count == 0 )
+        count++;
     /* if it was first one, there is disable too */
 
-    if( count.i_int < list.p_list->i_count )
+    if( count < (size_t)list.p_list->i_count )
     {
-        const int i_id = list.p_list->p_values[count.i_int].i_int;
+        const int i_id = list.p_list->p_values[count].i_int;
 
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );

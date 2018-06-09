@@ -664,10 +664,10 @@ static inline char *var_CreateGetNonEmptyStringCommand( vlc_object_t *p_obj,
 VLC_USED
 static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 {
-    vlc_value_t count;
+    size_t count;
     if( var_Change( p_obj, psz_name, VLC_VAR_CHOICESCOUNT, &count ) )
         return 0;
-    return count.i_int;
+    return count;
 }
 
 static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )

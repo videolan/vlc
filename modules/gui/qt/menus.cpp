@@ -1239,9 +1239,9 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
     if( !(var_Type( p_object, psz_var) & VLC_VAR_HASCHOICE) )
         return false;
 
-    vlc_value_t val;
+    size_t val;
     var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val );
-    return val.i_int == 0 || val.i_int == 1;
+    return val <= 1;
 }
 
 #define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )

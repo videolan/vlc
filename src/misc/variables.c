@@ -519,7 +519,7 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         }
         case VLC_VAR_CHOICESCOUNT:
-            va_arg(ap, vlc_value_t *)->i_int = p_var->choices.i_count;
+            *va_arg(ap, size_t *) = p_var->choices.i_count;
             break;
         case VLC_VAR_CLEARCHOICES:
             for( int i = 0 ; i < p_var->choices.i_count ; i++ )
