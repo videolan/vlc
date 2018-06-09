@@ -286,7 +286,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
 
     var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == INT64_MIN );
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val );
     assert( val.i_int == INT64_MAX );
 
     var_Change( p_libvlc, "bla", VLC_VAR_SETMINMAX,
@@ -295,7 +295,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
 
     var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == -1234 );
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val );
     assert( val.i_int == 12345 );
 
     var_SetInteger( p_libvlc, "bla", -123456 );
@@ -378,7 +378,7 @@ static void test_change( libvlc_int_t *p_libvlc )
     /* Test everything is right */
     var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val );
     assert( val.i_int == min.i_int );
-    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val );
     assert( val.i_int == max.i_int );
     var_Change( p_libvlc, "bla", VLC_VAR_GETSTEP, &val, NULL );
     assert( val.i_int == step.i_int );
@@ -402,13 +402,13 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
 
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val ) != 0
          || val.i_int == INT64_MIN );
-    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) != 0
+    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val ) != 0
          || val.i_int == INT64_MAX );
     val.i_int = 4212;
     var_Change( p_libvlc, "bla", VLC_VAR_SETMINMAX, &val, &val );
     assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMIN, &val ) == 0
          && val.i_int == 4212 );
-    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val, NULL ) == 0
+    assert( var_Change( p_libvlc, "bla", VLC_VAR_GETMAX, &val ) == 0
          && val.i_int == 4212 );
 
     assert( var_Change( p_libvlc, "bla" , VLC_VAR_GETSTEP, &val, NULL ) != 0 );

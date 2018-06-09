@@ -721,8 +721,7 @@ void ExtV4l2::Refresh( void )
                         if( val2.i_int < INT_MIN )
                             val2.i_int = INT_MIN; /* FIXME */
                         slider->setMinimum( val2.i_int );
-                        var_Change( p_obj, psz_var, VLC_VAR_GETMAX,
-                                    &val2, NULL );
+                        var_Change( p_obj, psz_var, VLC_VAR_GETMAX, &val2 );
                         if( val2.i_int > INT_MAX )
                             val2.i_int = INT_MAX; /* FIXME */
                         slider->setMaximum( val2.i_int );
