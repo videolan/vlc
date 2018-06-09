@@ -453,7 +453,6 @@ typedef union
     float           f_float;
     char *          psz_string;
     void *          p_address;
-    vlc_list_t *    p_list;
     struct { int32_t x; int32_t y; } coords;
 
 } vlc_value_t;
