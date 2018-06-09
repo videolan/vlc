@@ -393,8 +393,8 @@ static vlc_v4l2_ctrl_t *ControlAddInteger (vlc_object_t *obj, int fd,
         var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
-        &(vlc_value_t){ .i_int = query->minimum },
-        &(vlc_value_t){ .i_int = query->maximum } );
+        (vlc_value_t){ .i_int = query->minimum },
+        (vlc_value_t){ .i_int = query->maximum } );
     if (query->step != 1)
     {
         val.i_int = query->step;
@@ -462,8 +462,8 @@ static vlc_v4l2_ctrl_t *ControlAddMenu (vlc_object_t *obj, int fd,
         var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
-        &(vlc_value_t){ .i_int = query->minimum },
-        &(vlc_value_t){ .i_int = query->maximum } );
+        (vlc_value_t){ .i_int = query->minimum },
+        (vlc_value_t){ .i_int = query->maximum } );
 
     /* Import menu choices */
     for (uint_fast32_t idx = query->minimum;
@@ -621,8 +621,8 @@ static vlc_v4l2_ctrl_t *ControlAddBitMask (vlc_object_t *obj, int fd,
         var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
-        &(vlc_value_t){ .i_int = 0 },
-        &(vlc_value_t){ .i_int = (uint32_t)query->maximum } );
+        (vlc_value_t){ .i_int = 0 },
+        (vlc_value_t){ .i_int = (uint32_t)query->maximum } );
     return c;
 }
 
@@ -654,8 +654,8 @@ static vlc_v4l2_ctrl_t *ControlAddIntMenu (vlc_object_t *obj, int fd,
         var_Change(obj, c->name, VLC_VAR_SETVALUE, &val);
     }
     var_Change (obj, c->name, VLC_VAR_SETMINMAX,
-        &(vlc_value_t){ .i_int = query->minimum },
-        &(vlc_value_t){ .i_int = query->maximum } );
+        (vlc_value_t){ .i_int = query->minimum },
+        (vlc_value_t){ .i_int = query->maximum } );
 
     /* Import menu choices */
     for (uint_fast32_t idx = query->minimum;

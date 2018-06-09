@@ -450,8 +450,8 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         case VLC_VAR_SETMINMAX:
             assert(p_var->ops->pf_free == FreeDummy);
-            p_var->min = *va_arg(ap, vlc_value_t *);
-            p_var->max = *va_arg(ap, vlc_value_t *);
+            p_var->min = va_arg(ap, vlc_value_t);
+            p_var->max = va_arg(ap, vlc_value_t);
             break;
         case VLC_VAR_SETSTEP:
             assert(p_var->ops->pf_free == FreeDummy);

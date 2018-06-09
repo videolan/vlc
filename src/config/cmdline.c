@@ -219,16 +219,16 @@ int config_LoadCmdLine( vlc_object_t *p_this, int i_argc,
                     case CONFIG_ITEM_INTEGER:
                         var_Create( p_this, psz_name, VLC_VAR_INTEGER );
                         var_Change( p_this, psz_name, VLC_VAR_SETMINMAX,
-                            &(vlc_value_t){ .i_int = p_conf->min.i },
-                            &(vlc_value_t){ .i_int = p_conf->max.i } );
+                            (vlc_value_t){ .i_int = p_conf->min.i },
+                            (vlc_value_t){ .i_int = p_conf->max.i } );
                         var_SetInteger( p_this, psz_name,
                                         strtoll(state.arg, NULL, 0));
                         break;
                     case CONFIG_ITEM_FLOAT:
                         var_Create( p_this, psz_name, VLC_VAR_FLOAT );
                         var_Change( p_this, psz_name, VLC_VAR_SETMINMAX,
-                            &(vlc_value_t){ .f_float = p_conf->min.f },
-                            &(vlc_value_t){ .f_float = p_conf->max.f } );
+                            (vlc_value_t){ .f_float = p_conf->min.f },
+                            (vlc_value_t){ .f_float = p_conf->max.f } );
                         var_SetFloat( p_this, psz_name, us_atof(state.arg) );
                         break;
                     case CONFIG_ITEM_BOOL:
