@@ -1302,7 +1302,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         NSUInteger count;
 
 #define fillUrlHandlerPopup( protocol, object ) \
-        handlers = (__bridge NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
+        handlers = (__bridge_transfer NSArray *)LSCopyAllHandlersForURLScheme(CFSTR( protocol )); \
         rawHandlers = [[NSMutableArray alloc] init]; \
         [object removeAllItems]; \
         count = [handlers count]; \
@@ -1315,7 +1315,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
                 [rawHandlers addObject: rawhandler]; \
             } \
         } \
-        [object selectItemAtIndex: [rawHandlers indexOfObject:(__bridge id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]];
+        [object selectItemAtIndex: [rawHandlers indexOfObject:(__bridge_transfer id)LSCopyDefaultHandlerForURLScheme(CFSTR( protocol ))]];
 
         fillUrlHandlerPopup( "ftp", _urlhandler_ftpPopup);
         fillUrlHandlerPopup( "mms", _urlhandler_mmsPopup);
