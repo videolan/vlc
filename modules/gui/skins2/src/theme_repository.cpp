@@ -55,7 +55,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
 
     // Create a variable to add items in wxwindows popup menu
     var_Create( pIntf, "intf-skins", VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Select skin");
+    text.psz_string = (char *)_("Select skin");
     var_Change( pIntf, "intf-skins", VLC_VAR_SETTEXT, &text );
 
     // Scan vlt files in the resource path
@@ -113,7 +113,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     // variable for opening a dialog box to change skins
     var_Create( pIntf, "intf-skins-interactive", VLC_VAR_VOID |
                 VLC_VAR_ISCOMMAND );
-    text.psz_string = _("Open skin...");
+    text.psz_string = (char *)_("Open skin...");
     var_Change( pIntf, "intf-skins-interactive", VLC_VAR_SETTEXT, &text );
 
     // Set the callback
