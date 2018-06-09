@@ -916,7 +916,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         if (p_item->i_type == CONFIG_ITEM_PASSWORD)
             self.viewType = CONFIG_ITEM_PASSWORD;
         else
@@ -1000,7 +1000,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame: mainFrame item:p_item]) {
         if (p_item->i_type == CONFIG_ITEM_STRING)
             self.viewType = CONFIG_ITEM_STRING_LIST;
         else
@@ -1101,7 +1101,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_LOADFILE;
 
         o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1197,7 +1197,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_MODULE;
 
         o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1329,7 +1329,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1418,7 +1418,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_STRING_LIST;
 
         o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1508,7 +1508,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame: mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame: mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1620,7 +1620,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1711,7 +1711,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -1867,7 +1867,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_KEY;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -2079,7 +2079,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     mainFrame.size.width = mainFrame.size.width - LEFTMARGIN - RIGHTMARGIN;
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_MODULE_LIST;
 
         toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
@@ -2269,7 +2269,7 @@ objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
     mainFrame.origin.x = LEFTMARGIN;
     mainFrame.origin.y = 0;
 
-    if ([super initWithFrame:mainFrame item:p_item] != nil) {
+    if (self = [super initWithFrame:mainFrame item:p_item]) {
         /* add the label */
         labelString = _NS(p_item->psz_text);
 
