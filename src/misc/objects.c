@@ -493,59 +493,43 @@ void vlc_object_release (vlc_object_t *obj)
     }
 }
 
-#undef vlc_list_children
 /**
- * Gets the list of children of an object, and increment their reference
- * count.
- * @return a list (possibly empty) or NULL in case of error.
+ * Lists the children of an object.
+ *
+ * Fills a table of pointers to children object of an object, incrementing the
+ * reference count for each of them.
+ *
+ * @param obj object whose children are to be listed
+ * @param tab base address to hold the list of children [OUT]
+ * @param max size of the table
+ *
+ * @return the actual numer of children (may be larger than requested).
+ *
+ * @warning The list of object can change asynchronously even before the
+ * function returns. The list meant exclusively for debugging and tracing,
+ * not for functional introspection of any kind.
+ *
+ * @warning Objects appear in the object tree early, and disappear late.
+ * Most object properties are not accessible or not defined when the object is
+ * accessed through this function.
+ * For instance, the object cannot be used as a message log target
+ * (because object flags are not accessible asynchronously).
+ * Also type-specific object variables may not have been created yet, or may
+ * already have been deleted.
  */
-vlc_list_t *vlc_list_children( vlc_object_t *obj )
+size_t vlc_list_children(vlc_object_t *obj, vlc_object_t **restrict tab,
+                         size_t max)
 {
-    vlc_list_t *l = malloc (sizeof (*l));
-    if (unlikely(l == NULL))
-        return NULL;
-
-    l->i_count = 0;
-    l->p_values = NULL;
-
     vlc_object_internals_t *priv;
-    unsigned count = 0;
+    size_t count = 0;
 
     vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
-    for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
-         count++;
-
-    if (count > 0)
+    for (priv = vlc_internals(obj)->first; priv != NULL; priv = priv->next)
     {
-        l->p_values = vlc_alloc (count, sizeof (vlc_value_t));
-        if (unlikely(l->p_values == NULL))
-        {
-            vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
-            free (l);
-            return NULL;
-        }
-        l->i_count = count;
+         if (count < max)
+             tab[count] = vlc_object_hold(vlc_externals(priv));
+         count++;
     }
-
-    unsigned i = 0;
-
-    for (priv = vlc_internals (obj)->first; priv; priv = priv->next)
-        l->p_values[i++].p_address = vlc_object_hold (vlc_externals (priv));
     vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
-    return l;
-}
-
-/*****************************************************************************
- * vlc_list_release: free a list previously allocated by vlc_list_find
- *****************************************************************************
- * This function decreases the refcount of all objects in the list and
- * frees the list.
- *****************************************************************************/
-void vlc_list_release( vlc_list_t *p_list )
-{
-    for( int i = 0; i < p_list->i_count; i++ )
-        vlc_object_release( p_list->p_values[i].p_address );
-
-    free( p_list->p_values );
-    free( p_list );
+    return count;
 }

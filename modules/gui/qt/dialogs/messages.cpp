@@ -307,10 +307,25 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     free( name );
     item->setExpanded( true );
 
-    vlc_list_t *l = vlc_list_children( p_obj );
-    for( int i=0; i < l->i_count; i++ )
-        buildTree( item, (vlc_object_t *)l->p_values[i].p_address );
-    vlc_list_release( l );
+    size_t count = 0, size;
+    vlc_object_t **tab = NULL;
+
+    do
+    {
+        delete[] tab;
+        size = count;
+        tab = new vlc_object_t *[size];
+        count = vlc_list_children(p_obj, tab, size);
+    }
+    while (size < count);
+
+    for (size_t i = 0; i < count ; i++)
+    {
+        buildTree( item, tab[i] );
+        vlc_object_release(tab[i]);
+    }
+
+    delete[] tab;
 }
 
 void MessagesDialog::updateOrClear()

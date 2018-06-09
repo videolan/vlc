@@ -713,12 +713,21 @@ static int SubDrawObject(intf_sys_t *sys, int l, vlc_object_t *p_obj, int i_leve
                   p_obj->obj.object_type, name ? name : "", (void *)p_obj);
     free(name);
 
-    vlc_list_t *list = vlc_list_children(p_obj);
-    for (int i = 0; i < list->i_count ; i++) {
-        l = SubDrawObject(sys, l, list->p_values[i].p_address, i_level,
-            (i == list->i_count - 1) ? "`-" : "|-" );
+    size_t count = 0, size;
+    vlc_object_t **tab = NULL;
+
+    do {
+        size = count;
+        tab = xrealloc(tab, size * sizeof (*tab));
+        count = vlc_list_children(p_obj, tab, size);
+    } while (size < count);
+
+    for (size_t i = 0; i < count ; i++) {
+        l = SubDrawObject(sys, l, tab[i], i_level,
+            (i == count - 1) ? "`-" : "|-" );
+        vlc_object_release(tab[i]);
     }
-    vlc_list_release(list);
+    free(tab);
     return l;
 }
 
