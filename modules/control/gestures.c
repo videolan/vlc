@@ -277,9 +277,9 @@ static void ProcessGesture( intf_thread_t *p_intf )
             if( p_input == NULL )
                 break;
 
-            vlc_list_t list, list2;
+            vlc_list_t list;
             var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
-                        &list, &list2 );
+                        &list, (vlc_list_t *)NULL );
 
             if( list.i_count > 1 )
             {
@@ -303,7 +303,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es",
                                 list.p_values[i].i_int );
             }
-            var_FreeList( &list, &list2 );
+            var_FreeList( &list, NULL );
             vlc_object_release( p_input );
             break;
         }
@@ -314,9 +314,9 @@ static void ProcessGesture( intf_thread_t *p_intf )
             if( p_input == NULL )
                 break;
 
-            vlc_list_t list, list2;
+            vlc_list_t list;
             var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                        &list, &list2 );
+                        &list, (vlc_list_t *)NULL );
 
             if( list.i_count > 1 )
             {
@@ -340,7 +340,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es",
                                 list.p_values[i].i_int );
             }
-            var_FreeList( &list, &list2 );
+            var_FreeList( &list, NULL );
             vlc_object_release( p_input );
             break;
         }
