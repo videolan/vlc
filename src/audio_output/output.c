@@ -425,7 +425,7 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
     aout_owner_t *owner = aout_owner (aout);
 
     /* Fill Stereo mode choices */
-    var_Change (aout, "stereo-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
+    var_Change (aout, "stereo-mode", VLC_VAR_CLEARCHOICES, NULL);
     vlc_value_t val, txt;
     val.i_int = 0;
 

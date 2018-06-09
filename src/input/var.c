@@ -289,7 +289,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
     }
 
     /* Create titles and chapters */
-    var_Change( p_input, "title", VLC_VAR_CLEARCHOICES, NULL, NULL );
+    var_Change( p_input, "title", VLC_VAR_CLEARCHOICES, NULL );
 
     for( int i = 0; i < input_priv(p_input)->i_title; i++ )
     {
@@ -388,7 +388,7 @@ void input_ControlVarTitle( input_thread_t *p_input, int i_title )
     }
 
     /* Build chapter list */
-    var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL, NULL );
+    var_Change( p_input, "chapter", VLC_VAR_CLEARCHOICES, NULL );
     for( i = 0; i <  t->i_seekpoint; i++ )
     {
         vlc_value_t val;

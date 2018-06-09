@@ -597,7 +597,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     vlc_memstream_puts( &vstr, "bookmarks=" );
 
     vlc_mutex_lock( &priv->p_item->lock );
-    var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0, 0 );
+    var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES, 0 );
 
     for( int i = 0; i < priv->i_bookmark; i++ )
     {

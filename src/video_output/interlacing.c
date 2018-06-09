@@ -113,7 +113,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     var_Change(vout, "deinterlace", VLC_VAR_SETTEXT, &text, NULL);
 
     const module_config_t *optd = config_FindConfig("deinterlace");
-    var_Change(vout, "deinterlace", VLC_VAR_CLEARCHOICES, NULL, NULL);
+    var_Change(vout, "deinterlace", VLC_VAR_CLEARCHOICES, NULL);
     if (likely(optd != NULL))
         for (unsigned i = 0; i < optd->list_count; i++) {
             val.i_int = optd->list.i[i];
@@ -129,7 +129,7 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
     var_Change(vout, "deinterlace-mode", VLC_VAR_SETTEXT, &text, NULL);
 
     const module_config_t *optm = config_FindConfig("deinterlace-mode");
-    var_Change(vout, "deinterlace-mode", VLC_VAR_CLEARCHOICES, NULL, NULL);
+    var_Change(vout, "deinterlace-mode", VLC_VAR_CLEARCHOICES, NULL);
     if (likely(optm != NULL))
         for (unsigned i = 0; i < optm->list_count; i++) {
              if (!DeinterlaceIsModeValid(optm->list.psz[i]))
