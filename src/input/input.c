@@ -1701,7 +1701,7 @@ static void ViewpointApply( input_thread_t *p_input )
         var_SetAddress( pp_vout[i], "viewpoint", &priv->viewpoint );
         /* This variable can only be read from callbacks */
         var_Change( pp_vout[i], "viewpoint", VLC_VAR_SETVALUE,
-                    &(vlc_value_t) { .p_address = NULL }, NULL );
+                    &(vlc_value_t) { .p_address = NULL } );
         vlc_object_release( pp_vout[i] );
     }
     free( pp_vout );
@@ -1713,7 +1713,7 @@ static void ViewpointApply( input_thread_t *p_input )
         var_SetAddress( p_aout, "viewpoint", &priv->viewpoint );
         /* This variable can only be read from callbacks */
         var_Change( p_aout, "viewpoint", VLC_VAR_SETVALUE,
-                    &(vlc_value_t) { .p_address = NULL }, NULL );
+                    &(vlc_value_t) { .p_address = NULL } );
         vlc_object_release( p_aout );
     }
 }

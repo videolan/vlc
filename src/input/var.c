@@ -133,7 +133,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* State */
     var_Create( p_input, "state", VLC_VAR_INTEGER );
     val.i_int = input_priv(p_input)->i_state;
-    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "state", VLC_VAR_SETVALUE, &val );
 
     /* Rate */
     var_Create( p_input, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
@@ -184,19 +184,19 @@ void input_ControlVarInit ( input_thread_t *p_input )
     val.i_int = -1;
     /* Video ES */
     var_Create( p_input, "video-es", VLC_VAR_INTEGER );
-    var_Change( p_input, "video-es", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "video-es", VLC_VAR_SETVALUE, &val );
     text.psz_string = _("Video Track");
     var_Change( p_input, "video-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Audio ES */
     var_Create( p_input, "audio-es", VLC_VAR_INTEGER );
-    var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "audio-es", VLC_VAR_SETVALUE, &val );
     text.psz_string = _("Audio Track");
     var_Change( p_input, "audio-es", VLC_VAR_SETTEXT, &text, NULL );
 
     /* Spu ES */
     var_Create( p_input, "spu-es", VLC_VAR_INTEGER );
-    var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "spu-es", VLC_VAR_SETVALUE, &val );
     text.psz_string = _("Subtitle Track");
     var_Change( p_input, "spu-es", VLC_VAR_SETTEXT, &text, NULL );
 
@@ -596,7 +596,7 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
 
         val.i_int = i_length * newval.f_float;
-        var_Change( p_input, "time", VLC_VAR_SETVALUE, &val, NULL );
+        var_Change( p_input, "time", VLC_VAR_SETVALUE, &val );
     }
 
     input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &newval );
@@ -616,7 +616,7 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
         vlc_value_t val;
 
         val.f_float = (double)newval.i_int/(double)i_length;
-        var_Change( p_input, "position", VLC_VAR_SETVALUE, &val, NULL );
+        var_Change( p_input, "position", VLC_VAR_SETVALUE, &val );
         /*
          * Notify the intf that a new event has been occurred.
          * XXX this is a bit hackish but it's the only way to do it now.
@@ -667,7 +667,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
         val.i_int = var_GetInteger( p_input, "title" ) + 1;
         var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &count );
         if( val.i_int < count.i_int )
-            var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+            var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
     }
     else if( !strcmp( psz_cmd, "prev-title" ) )
     {
@@ -675,7 +675,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         val.i_int = var_GetInteger( p_input, "title" ) - 1;
         if( val.i_int >= 0 )
-            var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+            var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
     }
     else if( !strcmp( psz_cmd, "menu-title" ) )
     {
@@ -708,7 +708,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
         val.i_int = var_GetInteger( p_input, "chapter" ) + 1;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &count );
         if( val.i_int < count.i_int )
-            var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
+            var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
     }
     else if( !strcmp( psz_cmd, "prev-chapter" ) )
     {
@@ -716,7 +716,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 
         val.i_int = var_GetInteger( p_input, "chapter" ) - 1;
         if( val.i_int >= 0 )
-            var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
+            var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val );
     }
     else
     {
@@ -738,12 +738,12 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
     val.i_int = (intptr_t)p_data;
     input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
-    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
+    var_Change( p_input, "title", VLC_VAR_SETVALUE, &val );
 
     /* And a chapter change */
     input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
 
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &newval, NULL );
+    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &newval );
 
     return VLC_SUCCESS;
 }

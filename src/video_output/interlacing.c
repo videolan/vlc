@@ -157,9 +157,9 @@ void vout_InitInterlacingSupport(vout_thread_t *vout, bool is_interlaced)
 
     /* */
     val.psz_string = deinterlace_mode ? deinterlace_mode : optm->orig.psz;
-    var_Change(vout, "deinterlace-mode", VLC_VAR_SETVALUE, &val, NULL);
+    var_Change(vout, "deinterlace-mode", VLC_VAR_SETVALUE, &val);
     val.b_bool = is_interlaced;
-    var_Change(vout, "deinterlace-needed", VLC_VAR_SETVALUE, &val, NULL);
+    var_Change(vout, "deinterlace-needed", VLC_VAR_SETVALUE, &val);
 
     var_SetInteger(vout, "deinterlace", deinterlace_state);
     free(deinterlace_mode);
