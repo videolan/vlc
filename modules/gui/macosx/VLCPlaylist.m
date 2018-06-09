@@ -686,7 +686,7 @@
 - (NSMenu *)menuForEvent:(NSEvent *)o_event
 {
     if (!b_playlistmenu_nib_loaded)
-        b_playlistmenu_nib_loaded = [NSBundle loadNibNamed:@"PlaylistMenu" owner:self];
+        b_playlistmenu_nib_loaded = [[NSBundle mainBundle] loadNibNamed:@"PlaylistMenu" owner:self topLevelObjects:nil];
 
     NSPoint pt = [_outlineView convertPoint: [o_event locationInWindow] fromView: nil];
     NSInteger row = [_outlineView rowAtPoint:pt];

@@ -29,7 +29,7 @@
 
 @interface VLCPlaylist : NSResponder<NSOutlineViewDelegate>
 
-@property (readwrite, weak) IBOutlet NSMenu *playlistMenu;
+@property (readwrite, strong) IBOutlet NSMenu *playlistMenu;
 @property (readwrite, weak) IBOutlet NSMenuItem *playPlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *deletePlaylistMenuItem;
 @property (readwrite, weak) IBOutlet NSMenuItem *infoPlaylistMenuItem;
