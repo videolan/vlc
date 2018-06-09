@@ -669,14 +669,14 @@ void ExtV4l2::Refresh( void )
 
         for( int i = 0; i < val.i_count; i++ )
         {
-            vlc_value_t vartext;
+            char *vartext;
             const char *psz_var = text.p_values[i].psz_string;
 
             if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
                 continue;
 
-            QString name = qtr( vartext.psz_string );
-            free( vartext.psz_string );
+            QString name = qtr( vartext );
+            free( vartext );
             msg_Dbg( p_intf, "v4l2 control \"%" PRIx64 "\": %s (%s)",
                      val.p_values[i].i_int, psz_var, qtu( name ) );
 

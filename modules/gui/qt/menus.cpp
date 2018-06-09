@@ -1244,12 +1244,13 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
     return val <= 1;
 }
 
-#define TEXT_OR_VAR qfue ( text.psz_string ? text.psz_string : psz_var )
+#define TEXT_OR_VAR qfue ( text ? text : psz_var )
 
 void VLCMenuBar::UpdateItem( QMenu *menu,
         const char *psz_var, vlc_object_t *p_object, bool b_submenu )
 {
-    vlc_value_t val, text;
+    vlc_value_t val;
+    char *text;
     int i_type;
 
     QAction *action = FindActionWithVar( menu, psz_var );
@@ -1299,11 +1300,8 @@ void VLCMenuBar::UpdateItem( QMenu *menu,
     }
 
     /* Get the descriptive name of the variable */
-    int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text );
-    if( i_ret != VLC_SUCCESS )
-    {
-        text.psz_string = NULL;
-    }
+    if( var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text ) )
+        text = NULL;
 
     if( !action )
     {
@@ -1333,7 +1331,7 @@ void VLCMenuBar::UpdateItem( QMenu *menu,
             action->setEnabled(
                 CreateChoicesMenu( menu, psz_var, p_object ) == 0 );
         }
-        FREENULL( text.psz_string );
+        free( text );
         return;
     }
     else
@@ -1354,7 +1352,7 @@ void VLCMenuBar::UpdateItem( QMenu *menu,
                     p_object, val, i_type, !val.b_bool );
             break;
     }
-    FREENULL( text.psz_string );
+    free( text );
 }
 
 #undef TEXT_OR_VAR

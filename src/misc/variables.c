@@ -590,8 +590,8 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         }
         case VLC_VAR_GETTEXT:
-            va_arg(ap, vlc_value_t *)->psz_string =
-                p_var->psz_text ? strdup( p_var->psz_text ) : NULL;
+            *va_arg(ap, char **) = (p_var->psz_text != NULL)
+                ? strdup(p_var->psz_text) : NULL;
             break;
         default:
             break;

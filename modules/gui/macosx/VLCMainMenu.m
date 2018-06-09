@@ -1383,7 +1383,8 @@
                      var:(const char *)psz_variable
                 selector:(SEL)pf_callback
 {
-    vlc_value_t val, text;
+    vlc_value_t val;
+    char *text;
     int i_type = var_Type(p_object, psz_variable);
 
     switch(i_type & VLC_VAR_TYPE) {
@@ -1400,7 +1401,7 @@
 
     /* Get the descriptive name of the variable */
     var_Change(p_object, psz_variable, VLC_VAR_GETTEXT, &text);
-    [mi setTitle: _NS(text.psz_string ? text.psz_string : psz_variable)];
+    [mi setTitle: _NS(text ? text : psz_variable)];
 
     if (i_type & VLC_VAR_HASCHOICE) {
         NSMenu *menu = [mi submenu];
@@ -1408,7 +1409,7 @@
         [self setupVarMenu:menu forMenuItem:mi target:p_object
                        var:psz_variable selector:pf_callback];
 
-        free(text.psz_string);
+        free(text);
         return;
     }
 
@@ -1436,7 +1437,7 @@
     }
 
     if ((i_type & VLC_VAR_TYPE) == VLC_VAR_STRING) free(val.psz_string);
-    free(text.psz_string);
+    free(text);
 }
 
 

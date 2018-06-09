@@ -1094,7 +1094,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
              || !strcmp( psz_cmd, "strack" ) )
     {
         const char *psz_variable;
-        vlc_value_t val_name;
+        char *name;
 
         if( !strcmp( psz_cmd, "atrack" ) )
         {
@@ -1110,8 +1110,8 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         /* Get the descriptive name of the variable */
-        var_Change( p_input, psz_variable, VLC_VAR_GETTEXT, &val_name );
-        if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
+        var_Change( p_input, psz_variable, VLC_VAR_GETTEXT, &name );
+        if( !name ) name = strdup(psz_variable);
 
         if( newval.psz_string && *newval.psz_string )
         {
@@ -1133,7 +1133,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                 goto out;
             }
 
-            msg_rc( "+----[ %s ]", val_name.psz_string );
+            msg_rc( "+----[ %s ]", name );
             for ( int i = 0; i < val.i_count; i++ )
             {
                 if ( i_value == val.p_values[i].i_int )
@@ -1144,9 +1144,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
                             text.p_values[i].psz_string );
             }
             var_FreeList( &val, &text );
-            msg_rc( "+----[ end of %s ]", val_name.psz_string );
+            msg_rc( "+----[ end of %s ]", name );
         }
-        free( val_name.psz_string );
+        free( name );
     }
 out:
     vlc_object_release( p_input );
@@ -1555,7 +1555,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     else
     {
         /* get */
-        vlc_value_t val_name;
+        char *name;
         vlc_list_t val, text;
         float f_value = 0.;
         char *psz_value = NULL;
@@ -1581,10 +1581,10 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         /* Get the descriptive name of the variable */
-        var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT, &val_name );
-        if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
+        var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT, &name );
+        if( !name ) name = strdup(psz_variable);
 
-        msg_rc( "+----[ %s ]", val_name.psz_string );
+        msg_rc( "+----[ %s ]", name );
         if( !strcmp( psz_variable, "zoom" ) )
         {
             for ( int i = 0; i < val.i_count; i++ )
@@ -1611,9 +1611,9 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             free( psz_value );
         }
         var_FreeList( &val, &text );
-        msg_rc( "+----[ end of %s ]", val_name.psz_string );
+        msg_rc( "+----[ end of %s ]", name );
 
-        free( val_name.psz_string );
+        free( name );
     }
     vlc_object_release( p_vout );
     return i_error;
