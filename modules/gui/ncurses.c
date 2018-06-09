@@ -1021,7 +1021,7 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
 {
     intf_sys_t     *sys = intf->p_sys;
     playlist_t     *p_playlist = pl_Get(intf);
-    char *name = _("VLC media player");
+    const char *name = _("VLC media player");
     const size_t name_len = strlen(name) + sizeof(PACKAGE_VERSION);
     int y = 0;
     const char *repeat, *loop, *random;
