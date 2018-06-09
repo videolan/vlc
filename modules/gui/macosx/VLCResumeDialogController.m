@@ -99,7 +99,7 @@
 
 - (IBAction)buttonClicked:(id)sender
 {
-    enum ResumeResult resumeResult;
+    enum ResumeResult resumeResult = RESUME_FAIL;
 
     if (sender == o_restart_btn)
         resumeResult = RESUME_RESTART;

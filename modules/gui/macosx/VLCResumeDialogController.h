@@ -28,7 +28,8 @@
 
 enum ResumeResult {
     RESUME_RESTART,
-    RESUME_NOW
+    RESUME_NOW,
+    RESUME_FAIL
 };
 
 typedef void(^CompletionBlock)(enum ResumeResult);
