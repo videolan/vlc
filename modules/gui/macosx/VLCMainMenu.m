@@ -1151,7 +1151,10 @@
     NSSavePanel *savePanel = [NSSavePanel savePanel];
     NSString * name = [NSString stringWithFormat: @"%@", _NS("Untitled")];
 
-    [NSBundle loadNibNamed:@"PlaylistAccessoryView" owner:self];
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        [[NSBundle mainBundle] loadNibNamed:@"PlaylistAccessoryView" owner:self topLevelObjects:nil];
+    });
 
     [_playlistSaveAccessoryText setStringValue: _NS("File Format:")];
     [[_playlistSaveAccessoryPopup itemAtIndex:0] setTitle: _NS("Extended M3U")];
