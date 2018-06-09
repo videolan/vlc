@@ -672,7 +672,7 @@ void ExtV4l2::Refresh( void )
             vlc_value_t vartext;
             const char *psz_var = text.p_list->p_values[i].psz_string;
 
-            if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext, NULL ) )
+            if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
                 continue;
 
             QString name = qtr( vartext.psz_string );

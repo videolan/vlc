@@ -1110,8 +1110,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         /* Get the descriptive name of the variable */
-        var_Change( p_input, psz_variable, VLC_VAR_GETTEXT,
-                     &val_name, NULL );
+        var_Change( p_input, psz_variable, VLC_VAR_GETTEXT, &val_name );
         if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
 
         if( newval.psz_string && *newval.psz_string )
@@ -1581,8 +1580,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
 
         /* Get the descriptive name of the variable */
-        var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT,
-                    &val_name, NULL );
+        var_Change( p_vout, psz_variable, VLC_VAR_GETTEXT, &val_name );
         if( !val_name.psz_string ) val_name.psz_string = strdup(psz_variable);
 
         msg_rc( "+----[ %s ]", val_name.psz_string );

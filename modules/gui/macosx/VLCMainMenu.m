@@ -1399,7 +1399,7 @@
     }
 
     /* Get the descriptive name of the variable */
-    var_Change(p_object, psz_variable, VLC_VAR_GETTEXT, &text, NULL);
+    var_Change(p_object, psz_variable, VLC_VAR_GETTEXT, &text);
     [mi setTitle: _NS(text.psz_string ? text.psz_string : psz_variable)];
 
     if (i_type & VLC_VAR_HASCHOICE) {

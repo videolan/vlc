@@ -1299,7 +1299,7 @@ void VLCMenuBar::UpdateItem( QMenu *menu,
     }
 
     /* Get the descriptive name of the variable */
-    int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text, NULL );
+    int i_ret = var_Change( p_object, psz_var, VLC_VAR_GETTEXT, &text );
     if( i_ret != VLC_SUCCESS )
     {
         text.psz_string = NULL;
