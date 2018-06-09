@@ -326,7 +326,6 @@
     bool b_plmul = false;
     bool b_seekable = false;
     bool b_chapters = false;
-    bool b_buffering = false;
 
     playlist_t * p_playlist = pl_Get(getIntf());
 
@@ -337,10 +336,6 @@
     input_thread_t * p_input = playlist_CurrentInput(p_playlist);
 
     if (p_input) {
-        input_state_e inputState = input_GetState(p_input);
-        if (inputState == INIT_S || inputState == OPENING_S)
-            b_buffering = YES;
-
         /* seekable streams */
         b_seekable = var_GetBool(p_input, "can-seek");
 
