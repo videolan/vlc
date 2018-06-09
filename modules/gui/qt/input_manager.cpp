@@ -859,24 +859,24 @@ void InputManager::telexSetTransparency( bool b_transparentTelextext )
 
 void InputManager::activateTeletext( bool b_enable )
 {
-    vlc_value_t list;
-    vlc_value_t text;
+    vlc_list_t list, text;
+
     if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETCHOICES, &list, &text ) )
     {
-        if( list.p_list->i_count > 0 )
+        if( list.i_count > 0 )
         {
             /* Prefer the page 100 if it is present */
             int i;
-            for( i = 0; i < text.p_list->i_count; i++ )
+            for( i = 0; i < text.i_count; i++ )
             {
                 /* The description is the page number as a string */
-                const char *psz_page = text.p_list->p_values[i].psz_string;
+                const char *psz_page = text.p_values[i].psz_string;
                 if( psz_page && !strcmp( psz_page, "100" ) )
                     break;
             }
-            if( i >= list.p_list->i_count )
+            if( i >= list.i_count )
                 i = 0;
-            var_SetInteger( p_input, "spu-es", b_enable ? list.p_list->p_values[i].i_int : -1 );
+            var_SetInteger( p_input, "spu-es", b_enable ? list.p_values[i].i_int : -1 );
         }
         var_FreeList( &list, &text );
     }

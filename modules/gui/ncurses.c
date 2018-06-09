@@ -1529,22 +1529,21 @@ static void CycleESTrack(input_thread_t *input, const char *var)
     if (!input)
         return;
 
-    vlc_value_t val;
-    if (var_Change(input, var, VLC_VAR_GETCHOICES, &val,
-                   (vlc_value_t *)NULL) < 0)
+    vlc_list_t list;
+    if (var_Change(input, var, VLC_VAR_GETCHOICES, &list,
+                   (vlc_list_t *)NULL) < 0)
         return;
 
-    vlc_list_t *list = val.p_list;
     int64_t current = var_GetInteger(input, var);
 
     int i;
-    for (i = 0; i < list->i_count; i++)
-        if (list->p_values[i].i_int == current)
+    for (i = 0; i < list.i_count; i++)
+        if (list.p_values[i].i_int == current)
             break;
 
-    if (++i >= list->i_count)
+    if (++i >= list.i_count)
         i = 0;
-    var_SetInteger(input, var, list->p_values[i].i_int);
+    var_SetInteger(input, var, list.p_values[i].i_int);
 }
 
 static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,

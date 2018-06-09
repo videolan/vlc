@@ -3277,19 +3277,19 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         return VLC_SUCCESS;
 
     /* Select the ES */
-    vlc_value_t list;
+    vlc_list_t list;
 
     if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES, &list,
-                    (vlc_value_t *)NULL ) )
+                    (vlc_list_t *)NULL ) )
         return VLC_SUCCESS;
 
     if( count == 0 )
         count++;
     /* if it was first one, there is disable too */
 
-    if( count < (size_t)list.p_list->i_count )
+    if( count < (size_t)list.i_count )
     {
-        const int i_id = list.p_list->p_values[count].i_int;
+        const int i_id = list.p_values[count].i_int;
 
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );

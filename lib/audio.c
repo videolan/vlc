@@ -381,17 +381,17 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi )
 int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
-    vlc_value_t val_list;
+    vlc_list_t val_list;
     int i_ret = -1;
 
     if( !p_input_thread )
         return -1;
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list,
-                (vlc_value_t *)NULL );
-    for( int i = 0; i < val_list.p_list->i_count; i++ )
+                (vlc_list_t *)NULL );
+    for( int i = 0; i < val_list.i_count; i++ )
     {
-        if( i_track == val_list.p_list->p_values[i].i_int )
+        if( i_track == val_list.p_values[i].i_int )
         {
             if( var_SetInteger( p_input_thread, "audio-es", i_track ) < 0 )
                 break;

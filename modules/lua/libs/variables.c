@@ -235,8 +235,7 @@ static int vlclua_var_create( lua_State *L )
 
 static int vlclua_var_get_list( lua_State *L )
 {
-    vlc_value_t val;
-    vlc_value_t text;
+    vlc_list_t val, text;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
 
@@ -244,8 +243,8 @@ static int vlclua_var_get_list( lua_State *L )
     if( i_ret < 0 )
         return vlclua_push_ret( L, i_ret );
 
-    vlclua_pushlist( L, val.p_list );
-    vlclua_pushlist( L, text.p_list );
+    vlclua_pushlist( L, &val );
+    vlclua_pushlist( L, &text );
 
     var_FreeList( &val, &text );
     return 2;

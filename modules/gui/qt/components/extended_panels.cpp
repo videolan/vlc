@@ -651,7 +651,7 @@ void ExtV4l2::Refresh( void )
     }
     if( p_obj )
     {
-        vlc_value_t val, text;
+        vlc_list_t val, text;
         int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
                                 &val, &text );
         if( i_ret < 0 )
@@ -667,10 +667,10 @@ void ExtV4l2::Refresh( void )
         QVBoxLayout *layout = new QVBoxLayout( box );
         box->setLayout( layout );
 
-        for( int i = 0; i < val.p_list->i_count; i++ )
+        for( int i = 0; i < val.i_count; i++ )
         {
             vlc_value_t vartext;
-            const char *psz_var = text.p_list->p_values[i].psz_string;
+            const char *psz_var = text.p_values[i].psz_string;
 
             if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
                 continue;
@@ -678,7 +678,7 @@ void ExtV4l2::Refresh( void )
             QString name = qtr( vartext.psz_string );
             free( vartext.psz_string );
             msg_Dbg( p_intf, "v4l2 control \"%" PRIx64 "\": %s (%s)",
-                     val.p_list->p_values[i].i_int, psz_var, qtu( name ) );
+                     val.p_values[i].i_int, psz_var, qtu( name ) );
 
             int i_type = var_Type( p_obj, psz_var );
             switch( i_type & VLC_VAR_TYPE )
@@ -694,15 +694,15 @@ void ExtV4l2::Refresh( void )
                         QComboBox *combobox = new QComboBox( box );
                         combobox->setObjectName( qfu( psz_var ) );
 
-                        vlc_value_t val2, text2;
+                        vlc_list_t val2, text2;
                         var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
                                     &val2, &text2 );
-                        for( int j = 0; j < val2.p_list->i_count; j++ )
+                        for( int j = 0; j < val2.i_count; j++ )
                         {
                             combobox->addItem(
-                                       text2.p_list->p_values[j].psz_string,
-                                       qlonglong( val2.p_list->p_values[j].i_int) );
-                            if( i_val == val2.p_list->p_values[j].i_int )
+                                       text2.p_values[j].psz_string,
+                                       qlonglong( val2.p_values[j].i_int) );
+                            if( i_val == val2.p_values[j].i_int )
                                 combobox->setCurrentIndex( j );
                         }
                         var_FreeList( &val2, &text2 );

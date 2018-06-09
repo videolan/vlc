@@ -1376,7 +1376,8 @@ static bool CheckTitle( vlc_object_t *p_object, const char *psz_var )
 int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                                    vlc_object_t *p_object )
 {
-    vlc_value_t val, val_list, text_list;
+    vlc_value_t val;
+    vlc_list_t val_list, text_list;
     int i_type, i;
 
     /* Check the type of the object variable */
@@ -1405,11 +1406,11 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
         return VLC_EGENERIC;
     }
 
-#define CURVAL val_list.p_list->p_values[i]
-#define CURTEXT text_list.p_list->p_values[i].psz_string
+#define CURVAL val_list.p_values[i]
+#define CURTEXT text_list.p_values[i].psz_string
 #define RADIO_OR_COMMAND  ( i_type & ( VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE ) ) ? ITEM_RADIO : ITEM_NORMAL
 
-    for( i = 0; i < val_list.p_list->i_count; i++ )
+    for( i = 0; i < val_list.i_count; i++ )
     {
         vlc_value_t another_val;
         QString menutext;
