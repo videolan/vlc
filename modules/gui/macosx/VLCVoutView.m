@@ -76,10 +76,9 @@
 {
     if (self = [super initWithFrame:frameRect]) {
         [self registerForDraggedTypes:[NSArray arrayWithObject:NSFilenamesPboardType]];
+        i_lastScrollWheelDirection = 0;
+        f_cumulated_magnification = 0.0;
     }
-
-    i_lastScrollWheelDirection = 0;
-    f_cumulated_magnification = 0.0;
 
     return self;
 }
