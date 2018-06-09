@@ -726,7 +726,7 @@ void ExtV4l2::Refresh( void )
                             val2.i_int = INT_MAX; /* FIXME */
                         slider->setMaximum( val2.i_int );
                         if( !var_Change( p_obj, psz_var, VLC_VAR_GETSTEP,
-                                         &val2, NULL ) )
+                                         &val2 ) )
                             slider->setSingleStep( val2.i_int );
                         slider->setValue( i_val );
                         CONNECT( slider, valueChanged( int ), this,
