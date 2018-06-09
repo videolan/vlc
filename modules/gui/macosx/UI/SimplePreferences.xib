@@ -166,7 +166,7 @@
                 <subviews>
                     <scrollView autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b28-nA-RR5">
                         <rect key="frame" x="0.0" y="45" width="580" height="575"/>
-                        <clipView key="contentView" copiesOnScroll="NO" id="ecH-Hh-jJF" customClass="VLCSimplePrefsClipView">
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="ecH-Hh-jJF" customClass="VLCSimplePrefsClipView">
                             <rect key="frame" x="1" y="1" width="578" height="573"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
@@ -281,13 +281,13 @@ Gw
             <rect key="frame" x="0.0" y="0.0" width="597" height="597"/>
             <subviews>
                 <box borderType="line" title="General Settings" translatesAutoresizingMaskIntoConstraints="NO" id="kup-aY-Wqq">
-                    <rect key="frame" x="18" y="459" width="563" height="117"/>
+                    <rect key="frame" x="18" y="483" width="563" height="93"/>
                     <view key="contentView" id="wFl-aV-3Hn">
-                        <rect key="frame" x="1" y="1" width="561" height="101"/>
+                        <rect key="frame" x="1" y="1" width="561" height="77"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3892">
-                                <rect key="frame" x="15" y="72" width="117" height="17"/>
+                                <rect key="frame" x="15" y="48" width="117" height="17"/>
                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Language" usesSingleLineMode="YES" id="3893">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -295,7 +295,7 @@ Gw
                                 </textFieldCell>
                             </textField>
                             <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3900">
-                                <rect key="frame" x="145" y="67" width="399" height="26"/>
+                                <rect key="frame" x="145" y="43" width="399" height="26"/>
                                 <constraints>
                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="288" id="Kfa-pp-08X"/>
                                 </constraints>
@@ -308,7 +308,7 @@ Gw
                                     <action selector="interfaceSettingChanged:" target="-2" id="iZ8-Hl-fvA"/>
                                 </connections>
                             </popUpButton>
-                            <button ambiguous="YES" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
+                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="r3P-eU-tEX">
                                 <rect key="frame" x="15" y="15" width="185" height="18"/>
                                 <buttonCell key="cell" type="check" title="Enable VLC status bar icon" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Vhy-1T-Knj">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -320,18 +320,19 @@ Gw
                             </button>
                         </subviews>
                         <constraints>
+                            <constraint firstItem="r3P-eU-tEX" firstAttribute="top" secondItem="3892" secondAttribute="bottom" constant="17" id="0lq-Ud-BSO"/>
                             <constraint firstItem="3892" firstAttribute="centerY" secondItem="3900" secondAttribute="centerY" id="I4b-x2-YzY"/>
-                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="r3P-eU-tEX" secondAttribute="trailing" constant="17" id="J12-Bj-Mpv"/>
                             <constraint firstItem="3892" firstAttribute="top" secondItem="wFl-aV-3Hn" secondAttribute="top" constant="12" id="QjC-Pr-bJB"/>
                             <constraint firstAttribute="bottom" secondItem="r3P-eU-tEX" secondAttribute="bottom" constant="17" id="S5c-OB-bFD"/>
                             <constraint firstItem="3892" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="SZk-gE-9Fb"/>
+                            <constraint firstItem="r3P-eU-tEX" firstAttribute="leading" secondItem="wFl-aV-3Hn" secondAttribute="leading" constant="17" id="g2X-29-Ah0"/>
                             <constraint firstItem="3900" firstAttribute="leading" secondItem="3892" secondAttribute="trailing" constant="17" id="h9A-kZ-JjD"/>
                             <constraint firstAttribute="trailing" secondItem="3900" secondAttribute="trailing" constant="20" id="tlF-b1-Tuz"/>
                         </constraints>
                     </view>
                 </box>
                 <box borderType="line" title="Playback control" translatesAutoresizingMaskIntoConstraints="NO" id="CZP-ZN-k6p">
-                    <rect key="frame" x="18" y="313" width="563" height="142"/>
+                    <rect key="frame" x="18" y="337" width="563" height="142"/>
                     <view key="contentView" id="gj4-zO-E26">
                         <rect key="frame" x="1" y="1" width="561" height="126"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -406,7 +407,7 @@ Gw
                     </view>
                 </box>
                 <box verticalHuggingPriority="251" verticalCompressionResistancePriority="751" borderType="line" title="Playback behaviour" translatesAutoresizingMaskIntoConstraints="NO" id="EKZ-iB-CMo">
-                    <rect key="frame" x="18" y="223" width="563" height="86"/>
+                    <rect key="frame" x="18" y="247" width="563" height="86"/>
                     <view key="contentView" id="BMS-wa-oJS">
                         <rect key="frame" x="1" y="1" width="561" height="70"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -456,13 +457,13 @@ Gw
                         <constraint firstAttribute="bottom" secondItem="3911" secondAttribute="bottom" constant="11" id="PWH-HQ-Y6B"/>
                     </constraints>
                 </box>
-                <box borderType="line" title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
-                    <rect key="frame" x="18" y="112" width="563" height="107"/>
+                <box verticalHuggingPriority="249" borderType="line" title="Privacy / Network Interaction" translatesAutoresizingMaskIntoConstraints="NO" id="2318">
+                    <rect key="frame" x="18" y="112" width="563" height="131"/>
                     <view key="contentView" id="nnH-Tj-ON7">
-                        <rect key="frame" x="1" y="1" width="561" height="91"/>
+                        <rect key="frame" x="1" y="1" width="561" height="115"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3556">
+                            <button verticalHuggingPriority="251" mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3556">
                                 <rect key="frame" x="14" y="37" width="217" height="18"/>
                                 <buttonCell key="cell" type="check" title="Automatically check for updates" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="3557">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -473,7 +474,7 @@ Gw
                                 </connections>
                             </button>
                             <button mirrorLayoutDirectionWhenInternationalizing="always" translatesAutoresizingMaskIntoConstraints="NO" id="3928">
-                                <rect key="frame" x="14" y="65" width="161" height="18"/>
+                                <rect key="frame" x="14" y="65" width="161" height="42"/>
                                 <buttonCell key="cell" type="check" title="Allow metadata access" bezelStyle="regularSquare" imagePosition="left" alignment="left" state="on" inset="2" id="3929">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
