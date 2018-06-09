@@ -1058,36 +1058,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
         break;
 
-    case DEMUX_SET_GROUP:
-    {
-        vlc_list_t *p_list;
-
-        p_list = va_arg( args, vlc_list_t * );
-        msg_Dbg( p_demux, "DEMUX_SET_GROUP %p", (void *)p_list );
-
-        /* Deselect/filter current ones */
-        ARRAY_RESET( p_sys->programs );
-
-        if( likely(p_list != NULL) )
-        {
-            p_sys->seltype = PROGRAM_LIST;
-            for( int i = 0; i < p_list->i_count; i++ )
-                ARRAY_APPEND( p_sys->programs, p_list->p_values[i].i_int );
-            UpdatePESFilters( p_demux, false );
-        }
-        else // All ES Mode
-        {
-            p_pat = GetPID(p_sys, 0)->u.p_pat;
-            for( int i = 0; i < p_pat->programs.i_size; i++ )
-                ARRAY_APPEND( p_sys->programs, p_pat->programs.p_elems[i]->i_pid );
-            p_sys->seltype = PROGRAM_ALL;
-            UpdatePESFilters( p_demux, true );
-        }
-
-        p_sys->b_default_selection = false;
-        return VLC_SUCCESS;
-    }
-
     case DEMUX_SET_GROUP_DEFAULT:
         msg_Dbg( p_demux, "DEMUX_SET_GROUP_%s", "DEFAULT" );
 
@@ -1097,6 +1067,38 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->seltype = PROGRAM_AUTO_DEFAULT;
         }
         return VLC_SUCCESS;
+
+    case DEMUX_SET_GROUP_ALL: // All ES Mode
+    {
+        msg_Dbg( p_demux, "DEMUX_SET_GROUP_%s", "ALL" );
+
+        ARRAY_RESET( p_sys->programs );
+        p_pat = GetPID(p_sys, 0)->u.p_pat;
+        for( int i = 0; i < p_pat->programs.i_size; i++ )
+             ARRAY_APPEND( p_sys->programs, p_pat->programs.p_elems[i]->i_pid );
+        p_sys->seltype = PROGRAM_ALL;
+        UpdatePESFilters( p_demux, true );
+
+        p_sys->b_default_selection = false;
+        return VLC_SUCCESS;
+    }
+
+    case DEMUX_SET_GROUP_LIST:
+    {
+        vlc_list_t *p_list = va_arg( args, vlc_list_t * );
+
+        msg_Dbg( p_demux, "DEMUX_SET_GROUP_%s", "LIST" );
+
+        /* Deselect/filter current ones */
+        ARRAY_RESET( p_sys->programs );
+        p_sys->seltype = PROGRAM_LIST;
+        for( int i = 0; i < p_list->i_count; i++ )
+            ARRAY_APPEND( p_sys->programs, p_list->p_values[i].i_int );
+        UpdatePESFilters( p_demux, false );
+
+        p_sys->b_default_selection = false;
+        return VLC_SUCCESS;
+    }
 
     case DEMUX_SET_ES:
     {

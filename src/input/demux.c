@@ -372,8 +372,9 @@ int demux_vaControlHelper( stream_t *s,
         case DEMUX_HAS_UNSUPPORTED_META:
         case DEMUX_SET_NEXT_DEMUX_TIME:
         case DEMUX_GET_TITLE_INFO:
-        case DEMUX_SET_GROUP:
         case DEMUX_SET_GROUP_DEFAULT:
+        case DEMUX_SET_GROUP_ALL:
+        case DEMUX_SET_GROUP_LIST:
         case DEMUX_SET_ES:
         case DEMUX_GET_ATTACHMENTS:
         case DEMUX_CAN_RECORD:

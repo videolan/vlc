@@ -191,12 +191,13 @@ enum demux_query_e
      * arg4= int *pi_seekpoint_offset(0) */
     DEMUX_GET_TITLE_INFO,
 
-    /* DEMUX_SET_GROUP* / DEMUX_SET_ES is only a hint for demuxer (mainly DVB)
+    /* DEMUX_SET_GROUP_* / DEMUX_SET_ES is only a hint for demuxer (mainly DVB)
      * to avoid parsing everything (you should not use this to call
      * es_out_Control()).
      * If you don't know what to do with it, just IGNORE it: it is safe(r). */
-    DEMUX_SET_GROUP,            /* arg1=const vlc_list_t *   can fail */
     DEMUX_SET_GROUP_DEFAULT,
+    DEMUX_SET_GROUP_ALL,
+    DEMUX_SET_GROUP_LIST,       /* arg1= vlc_list_t *, can fail */
     DEMUX_SET_ES,               /* arg1= int                            can fail */
 
     /* Ask the demux to demux until the given date at the next pf_demux call

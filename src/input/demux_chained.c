@@ -63,7 +63,7 @@ static void *vlc_demux_chained_Thread(void *data)
 
     /* Stream FIFO cannot apply DVB filters.
      * Get all programs and let the E/S output sort them out. */
-    demux_Control(demux, DEMUX_SET_GROUP, NULL);
+    demux_Control(demux, DEMUX_SET_GROUP_ALL);
 
     /* Main loop */
     mtime_t next_update = 0;

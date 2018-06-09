@@ -2048,8 +2048,9 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
     case DEMUX_CAN_RECORD:
     case DEMUX_GET_FPS:
-    case DEMUX_SET_GROUP:
     case DEMUX_SET_GROUP_DEFAULT:
+    case DEMUX_SET_GROUP_ALL:
+    case DEMUX_SET_GROUP_LIST:
     case DEMUX_HAS_UNSUPPORTED_META:
     default:
         return VLC_EGENERIC;
