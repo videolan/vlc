@@ -949,7 +949,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     else
         psz_var = "spu-es";
 
-    var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &val );
     if( val.i_int == 0 )
     {
         vlc_value_t val2;

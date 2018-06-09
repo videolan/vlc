@@ -1471,7 +1471,7 @@
 
     /* Make sure we want to display the variable */
     if (i_type & VLC_VAR_HASCHOICE) {
-        var_Change(p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val, NULL);
+        var_Change(p_object, psz_variable, VLC_VAR_CHOICESCOUNT, &val);
         if (val.i_int == 0 || val.i_int == 1)
             return;
     }

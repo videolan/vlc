@@ -665,7 +665,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
         input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE_NEXT, NULL );
 
         val.i_int = var_GetInteger( p_input, "title" ) + 1;
-        var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &count, NULL );
+        var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &count );
         if( val.i_int < count.i_int )
             var_Change( p_input, "title", VLC_VAR_SETVALUE, &val, NULL );
     }
@@ -706,7 +706,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
         input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT_NEXT, NULL );
 
         val.i_int = var_GetInteger( p_input, "chapter" ) + 1;
-        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &count, NULL );
+        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &count );
         if( val.i_int < count.i_int )
             var_Change( p_input, "chapter", VLC_VAR_SETVALUE, &val, NULL );
     }

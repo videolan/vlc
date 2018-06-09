@@ -1403,7 +1403,7 @@ int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi )
     if( !p_input_thread )
         return -1;
 
-    int i_ret = var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, "chapter", VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
     return i_ret == VLC_SUCCESS ? val.i_int : -1;
@@ -1422,7 +1422,7 @@ int libvlc_media_player_get_chapter_count_for_title(
     char psz_name[sizeof ("title ") + 3 * sizeof (int)];
     sprintf( psz_name, "title %2u", i_title );
 
-    int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, psz_name, VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
     return i_ret == VLC_SUCCESS ? val.i_int : -1;
@@ -1471,7 +1471,7 @@ int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
     if( !p_input_thread )
         return -1;
 
-    int i_ret = var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    int i_ret = var_Change( p_input_thread, "title", VLC_VAR_CHOICESCOUNT, &val );
     vlc_object_release( p_input_thread );
 
     return i_ret == VLC_SUCCESS ? val.i_int : -1;

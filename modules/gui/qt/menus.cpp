@@ -1240,7 +1240,7 @@ static bool IsMenuEmpty( const char *psz_var, vlc_object_t *p_object )
         return false;
 
     vlc_value_t val;
-    var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( p_object, psz_var, VLC_VAR_CHOICESCOUNT, &val );
     return val.i_int == 0 || val.i_int == 1;
 }
 

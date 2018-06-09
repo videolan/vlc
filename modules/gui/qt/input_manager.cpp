@@ -441,7 +441,7 @@ void InputManager::UpdateNavigation()
     vlc_value_t val; val.i_int = 0;
     vlc_value_t val2; val2.i_int = 0;
 
-    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val, NULL );
+    var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &val );
 
     if( val.i_int > 0 )
     {
@@ -463,7 +463,7 @@ void InputManager::UpdateNavigation()
         }
 
         /* p_input != NULL since val.i_int != 0 */
-        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val2, NULL );
+        var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &val2 );
 
         emit titleChanged( b_menu );
         emit chapterChanged( val2.i_int > 1 );
@@ -553,7 +553,7 @@ bool InputManager::hasAudio()
     if( hasInput() )
     {
         vlc_value_t val;
-        var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val, NULL );
+        var_Change( p_input, "audio-es", VLC_VAR_CHOICESCOUNT, &val );
         return val.i_int > 0;
     }
     return false;
