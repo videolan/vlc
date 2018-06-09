@@ -89,9 +89,6 @@ void WindowClose  (vout_window_t *);
 #define USE_MEDIAKEYS_LONGTEXT N_("By default, VLC can be controlled using the media keys on modern Apple " \
                                   "keyboards.")
 
-#define INTERFACE_STYLE_TEXT N_("Run VLC with dark interface style")
-#define INTERFACE_STYLE_LONGTEXT N_("If this option is enabled, VLC will use the dark interface style. Otherwise, the grey interface style is used.")
-
 #define NATIVE_FULLSCREEN_MODE_ON_LION_TEXT N_("Use the native fullscreen mode")
 #define NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT N_("By default, VLC uses the fullscreen mode known from previous Mac OS X releases. It can also use the native fullscreen mode on Mac OS X 10.7 and later.")
 
@@ -154,7 +151,6 @@ vlc_module_begin()
     cannot_unload_broken_library()
 
     set_section(N_("Appearance"), 0)
-        add_bool("macosx-interfacestyle", false, INTERFACE_STYLE_TEXT, INTERFACE_STYLE_LONGTEXT, false)
         add_bool("macosx-nativefullscreenmode", false, NATIVE_FULLSCREEN_MODE_ON_LION_TEXT, NATIVE_FULLSCREEN_MODE_ON_LION_LONGTEXT, false)
         add_bool("macosx-statusicon", true, DISPLAY_STATUS_ICONMENU_TEXT, DISPLAY_STATUS_ICONMENU_LONGTEXT, false)
         add_bool("macosx-icon-change", true, ICONCHANGE_TEXT, ICONCHANGE_LONGTEXT, true)
@@ -187,6 +183,7 @@ vlc_module_begin()
     add_obsolete_bool("macosx-eq-keep") /* since 2.0.0 */
     add_obsolete_bool("macosx-autosave-volume") /* since 2.1.0 */
     add_obsolete_bool("macosx-show-sidebar") /* since 3.0.1 */
+    add_obsolete_bool("macosx-interfacestyle") /* since 4.0.0 */
 
     add_submodule()
         set_description("Mac OS X Video Output Provider")

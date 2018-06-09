@@ -309,9 +309,6 @@ create_toolbar_item(NSString *itemIdent, NSString *name, NSString *desc, NSStrin
     /* interface */
     [_intf_generalSettingsBox setTitle:_NS("General settings")];
     [_intf_languageLabel setStringValue: _NS("Language")];
-    [_intf_styleLabel setStringValue: _NS("Interface style")];
-    [_intf_style_darkButtonCell setTitle: _NS("Dark")];
-    [_intf_style_brightButtonCell setTitle: _NS("Bright")];
 
     [_intf_playbackControlBox setTitle:_NS("Playback control")];
     [_intf_continueplaybackLabel setStringValue:_NS("Continue playback")];
@@ -577,14 +574,6 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
     BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
     [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
-
-    if (config_GetInt("macosx-interfacestyle")) {
-        [_intf_style_darkButtonCell setState: YES];
-        [_intf_style_brightButtonCell setState: NO];
-    } else {
-        [_intf_style_darkButtonCell setState: NO];
-        [_intf_style_brightButtonCell setState: YES];
-    }
 
     BOOL httpEnabled = [self hasModule:@"http" inConfig:@"extraintf"];
     [_intf_enableluahttpCheckbox setState: httpEnabled ? NSOnState : NSOffState];
@@ -918,7 +907,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         config_PutInt("macosx-appleremote-sysvol", [_intf_appleremote_sysvolCheckbox state]);
         config_PutInt("macosx-statusicon", [_intf_statusIconCheckbox state]);
         config_PutInt("macosx-mediakeys", [_intf_mediakeysCheckbox state]);
-        config_PutInt("macosx-interfacestyle", [_intf_style_darkButtonCell state]);
 
         [self changeModule:@"growl" inConfig:@"control" enable:[_intf_enableNotificationsCheckbox state] == NSOnState];
 

@@ -52,7 +52,6 @@
 
 @property (readwrite, strong) IBOutlet VLCBottomBarView *bottomBarView;
 
-@property (readonly) BOOL darkInterface;
 @property (readonly) BOOL nativeFullscreenMode;
 
 - (CGFloat)height;

@@ -212,16 +212,12 @@ static const float f_min_window_height = 307.;
 
     /* interface builder action */
     CGFloat f_threshold_height = f_min_video_height + [self.controlsBar height];
-    if (self.darkInterface)
-        f_threshold_height += [self.titlebarView frame].size.height;
+
     if ([[self contentView] frame].size.height < f_threshold_height)
         splitViewShouldBeHidden = YES;
 
     // Set that here as IB seems to be buggy
-    if (self.darkInterface)
-        [self setContentMinSize:NSMakeSize(604., f_min_window_height + [self.titlebarView frame].size.height)];
-    else
-        [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
+    [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
 
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
@@ -237,21 +233,8 @@ static const float f_min_window_height = 307.;
         config_PutInt("metadata-network-access", returnValue == NSAlertDefaultReturn);
     }
 
-    if (self.darkInterface) {
-        [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidResizeNotification object: nil];
-        [defaultCenter addObserver: self selector: @selector(windowResizedOrMoved:) name: NSWindowDidMoveNotification object: nil];
-
-        [self setBackgroundColor: [NSColor clearColor]];
-        [self setOpaque: NO];
-        [self display];
-        [self setHasShadow:NO];
-        [self setHasShadow:YES];
-
-        self.previousSavedFrame = [self frame];
-    } else {
-        [_playlistScrollView setBorderType:NSNoBorder];
-        [_sidebarScrollView setBorderType:NSNoBorder];
-    }
+    [_playlistScrollView setBorderType:NSNoBorder];
+    [_sidebarScrollView setBorderType:NSNoBorder];
 
     [defaultCenter addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
     [defaultCenter addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
@@ -389,10 +372,7 @@ static const float f_min_window_height = 307.;
 // Show split view and hide the video view
 - (void)makeSplitViewVisible
 {
-    if (self.darkInterface)
-        [self setContentMinSize: NSMakeSize(604., f_min_window_height + [self.titlebarView frame].size.height)];
-    else
-        [self setContentMinSize: NSMakeSize(604., f_min_window_height)];
+    [self setContentMinSize: NSMakeSize(604., f_min_window_height)];
 
     NSRect old_frame = [self frame];
     CGFloat newHeight = [self minSize].height;
@@ -417,10 +397,7 @@ static const float f_min_window_height = 307.;
 // Hides the split view and makes the vout view in foreground
 - (void)makeSplitViewHidden
 {
-    if (self.darkInterface)
-        [self setContentMinSize: NSMakeSize(604., f_min_video_height + [self.titlebarView frame].size.height)];
-    else
-        [self setContentMinSize: NSMakeSize(604., f_min_video_height)];
+    [self setContentMinSize: NSMakeSize(604., f_min_video_height)];
 
     [_splitView setHidden:YES];
     [self.videoView setHidden:NO];
@@ -432,7 +409,6 @@ static const float f_min_window_height = 307.;
     if ([[self.videoView subviews] count] > 0)
         [self makeFirstResponder: [[self.videoView subviews] firstObject]];
 }
-
 
 - (void)changePlaylistState:(VLCPlaylistStateEvent)event
 {
@@ -567,13 +543,8 @@ static const float f_min_window_height = 307.;
         [self setFrame:winrect display:YES animate:YES];
     }
 
-    if (self.darkInterface) {
-        [self setContentMinSize: NSMakeSize(604., [self.controlsBar height] + [self.titlebarView frame].size.height)];
-        [self setContentMaxSize: NSMakeSize(FLT_MAX, [self.controlsBar height] + [self.titlebarView frame].size.height)];
-    } else {
-        [self setContentMinSize: NSMakeSize(604., [self.controlsBar height])];
-        [self setContentMaxSize: NSMakeSize(FLT_MAX, [self.controlsBar height])];
-    }
+    [self setContentMinSize: NSMakeSize(604., [self.controlsBar height])];
+    [self setContentMaxSize: NSMakeSize(FLT_MAX, [self.controlsBar height])];
 
     b_splitview_removed = YES;
 }
@@ -581,10 +552,7 @@ static const float f_min_window_height = 307.;
 - (void)showSplitView:(BOOL)resize
 {
     [self updateWindow];
-    if (self.darkInterface)
-        [self setContentMinSize:NSMakeSize(604., f_min_window_height + [self.titlebarView frame].size.height)];
-    else
-        [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
+    [self setContentMinSize:NSMakeSize(604., f_min_window_height)];
     [self setContentMaxSize: NSMakeSize(FLT_MAX, FLT_MAX)];
 
     if (resize) {
@@ -1252,22 +1220,7 @@ static const float f_min_window_height = 307.;
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    BOOL darkInterface = config_GetInt("macosx-interfacestyle");
-
-    if (darkInterface) {
-        [self setBackgroundColor: [NSColor clearColor]];
-
-        [self setOpaque: NO];
-        [self display];
-        [self setHasShadow:NO];
-        [self setHasShadow:YES];
-
-        [self setTitle: _NS("VLC media player")];
-
-        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height] + [self.titlebarView frame].size.height)];
-    } else {
-        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
-    }
+    [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
 }
 
 @end

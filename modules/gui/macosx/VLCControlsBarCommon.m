@@ -56,7 +56,6 @@
 {
     [super awakeFromNib];
     
-    _darkInterface = var_InheritBool(getIntf(), "macosx-interfacestyle");
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     [self.dropView setDrawBorder: NO];
@@ -75,50 +74,26 @@
     [self.timeSlider setToolTip: _NS("Position")];
     [[self.timeSlider cell] accessibilitySetOverrideValue:_NS("Playback position") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.timeSlider cell] accessibilitySetOverrideValue:[self.timeSlider toolTip] forAttribute:NSAccessibilityTitleAttribute];
-    if (_darkInterface)
-        [self.timeSlider setSliderStyleDark];
 
     [self.fullscreenButton setToolTip: _NS("Enter fullscreen")];
     [[self.fullscreenButton cell] accessibilitySetOverrideValue:[self.fullscreenButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
 
-    if (!_darkInterface) {
-        [self.bottomBarView setDark:NO];
+    [self.backwardButton setImage: imageFromRes(@"backward-3btns")];
+    [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
+    _playImage = imageFromRes(@"play");
+    _pressedPlayImage = imageFromRes(@"play-pressed");
+    _pauseImage = imageFromRes(@"pause");
+    _pressedPauseImage = imageFromRes(@"pause-pressed");
+    [self.forwardButton setImage: imageFromRes(@"forward-3btns")];
+    [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
 
-        [self.backwardButton setImage: imageFromRes(@"backward-3btns")];
-        [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-pressed")];
-        _playImage = imageFromRes(@"play");
-        _pressedPlayImage = imageFromRes(@"play-pressed");
-        _pauseImage = imageFromRes(@"pause");
-        _pressedPauseImage = imageFromRes(@"pause-pressed");
-        [self.forwardButton setImage: imageFromRes(@"forward-3btns")];
-        [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-pressed")];
-
-        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
-        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
-    } else {
-        [self.bottomBarView setDark:YES];
-
-        [self.backwardButton setImage: imageFromRes(@"backward-3btns-dark")];
-        [self.backwardButton setAlternateImage: imageFromRes(@"backward-3btns-dark-pressed")];
-        _playImage = imageFromRes(@"play_dark");
-        _pressedPlayImage = imageFromRes(@"play-pressed_dark");
-        _pauseImage = imageFromRes(@"pause_dark");
-        _pressedPauseImage = imageFromRes(@"pause-pressed_dark");
-        [self.forwardButton setImage: imageFromRes(@"forward-3btns-dark")];
-        [self.forwardButton setAlternateImage: imageFromRes(@"forward-3btns-dark-pressed")];
-
-        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
-        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
-    }
+    [self.fullscreenButton setImage: imageFromRes(@"fullscreen-one-button")];
+    [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
 
     [self.playButton setImage: _playImage];
     [self.playButton setAlternateImage: _pressedPlayImage];
 
-    NSColor *timeFieldTextColor;
-    if (!var_InheritBool(getIntf(), "macosx-interfacestyle"))
-        timeFieldTextColor = [NSColor colorWithCalibratedRed:0.229 green:0.229 blue:0.229 alpha:100.0];
-    else
-        timeFieldTextColor = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
+    NSColor *timeFieldTextColor = [NSColor colorWithCalibratedRed:0.64 green:0.64 blue:0.64 alpha:100.0];
     [self.timeField setTextColor: timeFieldTextColor];
     [self.timeField setFont:[NSFont titleBarFontOfSize:10.0]];
     [self.timeField setAlignment: NSCenterTextAlignment];
@@ -134,7 +109,6 @@
 
     if (config_GetInt("macosx-show-playback-buttons"))
         [self toggleForwardBackwardMode: YES];
-
 }
 
 - (CGFloat)height

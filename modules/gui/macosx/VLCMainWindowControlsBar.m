@@ -86,79 +86,41 @@
     [[self.effectsButton cell] accessibilitySetOverrideValue:_NS("Open Audio Effects window") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.effectsButton cell] accessibilitySetOverrideValue:[self.effectsButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    if (!self.darkInterface) {
-        [self.stopButton setImage: imageFromRes(@"stop")];
-        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
+    [self.stopButton setImage: imageFromRes(@"stop")];
+    [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
 
-        [self.playlistButton setImage: imageFromRes(@"playlist-btn")];
-        [self.playlistButton setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
-        _repeatImage = imageFromRes(@"repeat");
-        _pressedRepeatImage = imageFromRes(@"repeat-pressed");
-        _repeatAllImage  = imageFromRes(@"repeat-all");
-        _pressedRepeatAllImage = imageFromRes(@"repeat-all-pressed");
-        _repeatOneImage = imageFromRes(@"repeat-one");
-        _pressedRepeatOneImage = imageFromRes(@"repeat-one-pressed");
-        _shuffleImage = imageFromRes(@"shuffle");
-        _pressedShuffleImage = imageFromRes(@"shuffle-pressed");
-        _shuffleOnImage = imageFromRes(@"shuffle-blue");
-        _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed");
+    [self.playlistButton setImage: imageFromRes(@"playlist-btn")];
+    [self.playlistButton setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
+    _repeatImage = imageFromRes(@"repeat");
+    _pressedRepeatImage = imageFromRes(@"repeat-pressed");
+    _repeatAllImage  = imageFromRes(@"repeat-all");
+    _pressedRepeatAllImage = imageFromRes(@"repeat-all-pressed");
+    _repeatOneImage = imageFromRes(@"repeat-one");
+    _pressedRepeatOneImage = imageFromRes(@"repeat-one-pressed");
+    _shuffleImage = imageFromRes(@"shuffle");
+    _pressedShuffleImage = imageFromRes(@"shuffle-pressed");
+    _shuffleOnImage = imageFromRes(@"shuffle-blue");
+    _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed");
 
-        [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
-        [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
-        [self.volumeSlider setUsesBrightArtwork: YES];
+    [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
+    [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
+    [self.volumeSlider setUsesBrightArtwork: YES];
 
-        if (self.nativeFullscreenMode) {
-            [self.effectsButton setImage: imageFromRes(@"effects-one-button")];
-            [self.effectsButton setAlternateImage: imageFromRes(@"effects-one-button-pressed")];
-        } else {
-            [self.effectsButton setImage: imageFromRes(@"effects-double-buttons")];
-            [self.effectsButton setAlternateImage: imageFromRes(@"effects-double-buttons-pressed")];
-        }
-
-        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
-        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
-
-        [self.prevButton setImage: imageFromRes(@"previous-6btns")];
-        [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
-        [self.nextButton setImage: imageFromRes(@"next-6btns")];
-        [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
+    if (self.nativeFullscreenMode) {
+        [self.effectsButton setImage: imageFromRes(@"effects-one-button")];
+        [self.effectsButton setAlternateImage: imageFromRes(@"effects-one-button-pressed")];
     } else {
-        [self.stopButton setImage: imageFromRes(@"stop_dark")];
-        [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed_dark")];
-
-        [self.playlistButton setImage: imageFromRes(@"playlist_dark")];
-        [self.playlistButton setAlternateImage: imageFromRes(@"playlist-pressed_dark")];
-        _repeatImage = imageFromRes(@"repeat_dark");
-        _pressedRepeatImage = imageFromRes(@"repeat-pressed_dark");
-        _repeatAllImage  = imageFromRes(@"repeat-all-blue_dark");
-        _pressedRepeatAllImage = imageFromRes(@"repeat-all-blue-pressed_dark");
-        _repeatOneImage = imageFromRes(@"repeat-one-blue_dark");
-        _pressedRepeatOneImage = imageFromRes(@"repeat-one-blue-pressed_dark");
-        _shuffleImage = imageFromRes(@"shuffle_dark");
-        _pressedShuffleImage = imageFromRes(@"shuffle-pressed_dark");
-        _shuffleOnImage = imageFromRes(@"shuffle-blue_dark");
-        _pressedShuffleOnImage = imageFromRes(@"shuffle-blue-pressed_dark");
-
-        [self.volumeDownButton setImage: imageFromRes(@"volume-low_dark")];
-        [self.volumeUpButton setImage: imageFromRes(@"volume-high_dark")];
-        [self.volumeSlider setUsesBrightArtwork: NO];
-
-        if (self.nativeFullscreenMode) {
-            [self.effectsButton setImage: imageFromRes(@"effects-one-button_dark")];
-            [self.effectsButton setAlternateImage: imageFromRes(@"effects-one-button-pressed-dark")];
-        } else {
-            [self.effectsButton setImage: imageFromRes(@"effects-double-buttons_dark")];
-            [self.effectsButton setAlternateImage: imageFromRes(@"effects-double-buttons-pressed_dark")];
-        }
-
-        [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-        [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
-
-        [self.prevButton setImage: imageFromRes(@"previous-6btns-dark")];
-        [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-dark-pressed")];
-        [self.nextButton setImage: imageFromRes(@"next-6btns-dark")];
-        [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
+        [self.effectsButton setImage: imageFromRes(@"effects-double-buttons")];
+        [self.effectsButton setAlternateImage: imageFromRes(@"effects-double-buttons-pressed")];
     }
+
+    [self.fullscreenButton setImage: imageFromRes(@"fullscreen-double-buttons")];
+    [self.fullscreenButton setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
+
+    [self.prevButton setImage: imageFromRes(@"previous-6btns")];
+    [self.prevButton setAlternateImage: imageFromRes(@"previous-6btns-pressed")];
+    [self.nextButton setImage: imageFromRes(@"next-6btns")];
+    [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
     [self.repeatButton setImage: _repeatImage];
     [self.repeatButton setAlternateImage: _pressedRepeatImage];
     [self.shuffleButton setImage: _shuffleImage];
@@ -219,13 +181,8 @@
 
     id button = withAnimation ? self.fullscreenButton.animator : self.fullscreenButton;
     if (!self.nativeFullscreenMode) {
-        if (self.darkInterface) {
-            [button setImage: imageFromRes(@"fullscreen-double-buttons_dark")];
-            [button setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed_dark")];
-        } else {
-            [button setImage: imageFromRes(@"fullscreen-double-buttons")];
-            [button setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
-        }
+        [button setImage: imageFromRes(@"fullscreen-double-buttons")];
+        [button setAlternateImage: imageFromRes(@"fullscreen-double-buttons-pressed")];
     }
     [NSAnimationContext endGrouping];
 }
@@ -237,13 +194,8 @@
 
     id button = withAnimation ? self.fullscreenButton.animator : self.fullscreenButton;
     if (!self.nativeFullscreenMode) {
-        if (self.darkInterface) {
-            [button setImage: imageFromRes(@"fullscreen-one-button_dark")];
-            [button setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed_dark")];
-        } else {
-            [button setImage: imageFromRes(@"fullscreen-one-button")];
-            [button setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
-        }
+        [button setImage: imageFromRes(@"fullscreen-one-button")];
+        [button setAlternateImage: imageFromRes(@"fullscreen-one-button-pressed")];
     }
     [NSAnimationContext endGrouping];
 }
@@ -264,17 +216,11 @@
 
     id backwardButton = withAnimation ? self.backwardButton.animator : self.backwardButton;
     id forwardButton = withAnimation ? self.forwardButton.animator : self.forwardButton;
-    if (self.darkInterface) {
-        [forwardButton setImage:imageFromRes(@"forward-6btns-dark")];
-        [forwardButton setAlternateImage:imageFromRes(@"forward-6btns-dark-pressed")];
-        [backwardButton setImage:imageFromRes(@"backward-6btns-dark")];
-        [backwardButton setAlternateImage:imageFromRes(@"backward-6btns-dark-pressed")];
-    } else {
-        [forwardButton setImage:imageFromRes(@"forward-6btns")];
-        [forwardButton setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
-        [backwardButton setImage:imageFromRes(@"backward-6btns")];
-        [backwardButton setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
-    }
+    [forwardButton setImage:imageFromRes(@"forward-6btns")];
+    [forwardButton setAlternateImage:imageFromRes(@"forward-6btns-pressed")];
+    [backwardButton setImage:imageFromRes(@"backward-6btns")];
+    [backwardButton setAlternateImage:imageFromRes(@"backward-6btns-pressed")];
+
     [NSAnimationContext endGrouping];
 
     [self toggleForwardBackwardMode: YES];
@@ -288,17 +234,10 @@
 
     id backwardButton = withAnimation ? self.backwardButton.animator : self.backwardButton;
     id forwardButton = withAnimation ? self.forwardButton.animator : self.forwardButton;
-    if (self.darkInterface) {
-        [forwardButton setImage:imageFromRes(@"forward-3btns-dark")];
-        [forwardButton setAlternateImage:imageFromRes(@"forward-3btns-dark-pressed")];
-        [backwardButton setImage:imageFromRes(@"backward-3btns-dark")];
-        [backwardButton setAlternateImage:imageFromRes(@"backward-3btns-dark-pressed")];
-    } else {
-        [forwardButton setImage:imageFromRes(@"forward-3btns")];
-        [forwardButton setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
-        [backwardButton setImage:imageFromRes(@"backward-3btns")];
-        [backwardButton setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
-    }
+    [forwardButton setImage:imageFromRes(@"forward-3btns")];
+    [forwardButton setAlternateImage:imageFromRes(@"forward-3btns-pressed")];
+    [backwardButton setImage:imageFromRes(@"backward-3btns")];
+    [backwardButton setAlternateImage:imageFromRes(@"backward-3btns-pressed")];
     [NSAnimationContext endGrouping];
 
     [self toggleForwardBackwardMode: NO];
@@ -319,13 +258,8 @@
     [self showButtonWithConstraint:self.shuffleButtonWidthConstraint animation:withAnimation];
 
     id button = withAnimation ? self.playlistButton.animator : self.playlistButton;
-    if (self.darkInterface) {
-        [button setImage:imageFromRes(@"playlist_dark")];
-        [button setAlternateImage:imageFromRes(@"playlist-pressed_dark")];
-    } else {
-        [button setImage:imageFromRes(@"playlist-btn")];
-        [button setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
-    }
+    [button setImage:imageFromRes(@"playlist-btn")];
+    [button setAlternateImage:imageFromRes(@"playlist-btn-pressed")];
     [NSAnimationContext endGrouping];
 }
 
@@ -337,13 +271,8 @@
     [self hideButtonWithConstraint:self.shuffleButtonWidthConstraint animation:withAnimation];
 
     id button = withAnimation ? self.playlistButton.animator : self.playlistButton;
-    if (self.darkInterface) {
-        [button setImage:imageFromRes(@"playlist-1btn-dark")];
-        [button setAlternateImage:imageFromRes(@"playlist-1btn-dark-pressed")];
-    } else {
-        [button setImage:imageFromRes(@"playlist-1btn")];
-        [button setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
-    }
+    [button setImage:imageFromRes(@"playlist-1btn")];
+    [button setAlternateImage:imageFromRes(@"playlist-1btn-pressed")];
     [NSAnimationContext endGrouping];
 }
 

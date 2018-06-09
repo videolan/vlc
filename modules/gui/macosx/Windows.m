@@ -231,12 +231,6 @@
 - (id)initWithContentRect:(NSRect)contentRect styleMask:(NSWindowStyleMask)styleMask
                   backing:(NSBackingStoreType)backingType defer:(BOOL)flag
 {
-    _darkInterface = config_GetInt("macosx-interfacestyle");
-
-    if (_darkInterface) {
-        styleMask = NSBorderlessWindowMask | NSResizableWindowMask | NSMiniaturizableWindowMask;
-    }
-
     self = [super initWithContentRect:contentRect styleMask:styleMask
                               backing:backingType defer:flag];
 
@@ -261,7 +255,7 @@
         [self setCollectionBehavior: NSWindowCollectionBehaviorFullScreenAuxiliary];
     }
 
-    if (!_darkInterface && self.titlebarView) {
+    if (self.titlebarView) {
         [self.titlebarView removeFromSuperview];
         self.titlebarView = nil;
     }
@@ -273,9 +267,6 @@
 {
     if (!title || [title length] < 1)
         return;
-
-    if (_darkInterface && self.titlebarView)
-        [self.titlebarView setWindowTitle: title];
 
     [super setTitle: title];
 }
@@ -517,8 +508,6 @@
         NSRect contentRect = [self contentRectForFrameRect:videoWindowFrame];
         CGFloat marginy = viewRect.origin.y + videoWindowFrame.size.height - contentRect.size.height;
         CGFloat marginx = contentRect.size.width - viewRect.size.width;
-        if (self.titlebarView && _darkInterface)
-            marginy += [self.titlebarView frame].size.height;
 
         proposedFrameSize.height = (proposedFrameSize.width - marginx) * self.nativeVideoSize.height / self.nativeVideoSize.width + marginy;
     }
@@ -649,18 +638,6 @@
         }
     }
 
-    if (_darkInterface) {
-        [self.titlebarView setHidden:YES];
-        self.videoViewTopConstraint.priority = 1;
-
-        // shrink window height
-        CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-        NSRect winrect = [self frame];
-
-        winrect.size.height = winrect.size.height - f_titleBarHeight;
-        [self setFrame: winrect display:NO animate:NO];
-    }
-
     if (![_videoView isHidden]) {
         [self hideControlsBar];
     }
@@ -709,16 +686,6 @@
 
     [NSCursor setHiddenUntilMouseMoves: NO];
     [[[[VLCMain sharedInstance] mainWindow] fspanel] setNonActive];
-
-    if (_darkInterface) {
-        [self.titlebarView setHidden:NO];
-        self.videoViewTopConstraint.priority = 999;
-
-        NSRect winrect = [self frame];
-        CGFloat f_titleBarHeight = [self.titlebarView frame].size.height;
-        winrect.size.height = winrect.size.height + f_titleBarHeight;
-        [self setFrame: winrect display:NO animate:NO];
-    }
 
     if (![_videoView isHidden]) {
         [self showControlsBar];
@@ -1061,7 +1028,7 @@
 
 - (NSArray *)accessibilityAttributeNames
 {
-    if (!_darkInterface || !self.titlebarView)
+    if (!self.titlebarView)
         return [super accessibilityAttributeNames];
 
     static NSMutableArray *attributes = nil;
@@ -1078,27 +1045,6 @@
         }
     }
     return attributes;
-}
-
-- (id)accessibilityAttributeValue: (NSString*)o_attribute_name
-{
-    if (_darkInterface && self.titlebarView) {
-        VLCMainWindowTitleView *o_tbv = self.titlebarView;
-
-        if ([o_attribute_name isEqualTo: NSAccessibilitySubroleAttribute])
-            return NSAccessibilityStandardWindowSubrole;
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityCloseButtonAttribute])
-            return [[o_tbv closeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityMinimizeButtonAttribute])
-            return [[o_tbv minimizeButton] cell];
-
-        if ([o_attribute_name isEqualTo: NSAccessibilityZoomButtonAttribute])
-            return [[o_tbv zoomButton] cell];
-    }
-
-    return [super accessibilityAttributeValue: o_attribute_name];
 }
 
 @end
