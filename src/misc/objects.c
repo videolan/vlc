@@ -55,6 +55,9 @@
 #include <limits.h>
 #include <assert.h>
 
+#define vlc_children_foreach(pos, priv) \
+    vlc_list_foreach(pos, &priv->children, siblings)
+
 static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 {
     const char *str;
@@ -64,10 +67,11 @@ static void PrintObjectPrefix(vlc_object_t *obj, bool last)
 
     PrintObjectPrefix(obj->obj.parent, false);
 
-    if (vlc_internals(obj)->next != NULL)
-        str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
-    else
+    if (vlc_list_is_last(&vlc_internals(obj)->siblings,
+                         &vlc_internals(obj->obj.parent)->children))
         str = last ? " \xE2\x94\x94" : "  ";
+    else
+        str = last ? " \xE2\x94\x9C" : " \xE2\x94\x82";
 
     fputs(str, stdout);
 }
@@ -80,7 +84,7 @@ static void PrintObject(vlc_object_t *obj)
 
     PrintObjectPrefix(obj, true);
     printf("\xE2\x94\x80\xE2\x94%c\xE2\x95\xB4%p %s, %u refs\n",
-           (priv->first != NULL) ? 0xAC : 0x80,
+           vlc_list_is_empty(&priv->children) ? 0x80 : 0xAC,
            (void *)obj, obj->obj.object_type, atomic_load(&priv->refs));
 
     vlc_restorecancel (canc);
@@ -100,7 +104,7 @@ static void DumpStructure(vlc_object_t *obj, unsigned level)
 
     /* NOTE: nested locking here (due to recursive call) */
     vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
-    for (priv = priv->first; priv != NULL; priv = priv->next)
+    vlc_children_foreach(priv, priv)
         DumpStructure(vlc_externals(priv), level + 1);
     vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
 }
@@ -138,8 +142,12 @@ static vlc_object_t *ObjectExists (vlc_object_t *root, void *obj)
     /* NOTE: nested locking here (due to recursive call) */
     vlc_mutex_lock (&vlc_internals(root)->tree_lock);
 
-    for (priv = priv->first; priv != NULL && ret == NULL; priv = priv->next)
+    vlc_children_foreach(priv, priv)
+    {
         ret = ObjectExists (vlc_externals (priv), obj);
+        if (ret != NULL)
+            break;
+    }
 
     vlc_mutex_unlock (&vlc_internals(root)->tree_lock);
     return ret;
@@ -197,8 +205,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
     vlc_cond_init (&priv->var_wait);
     atomic_init (&priv->refs, 1);
     priv->pf_destructor = NULL;
-    priv->prev = NULL;
-    priv->first = NULL;
+    vlc_list_init(&priv->children);
     vlc_mutex_init (&priv->tree_lock);
     priv->resources = NULL;
 
@@ -220,10 +227,7 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
 
         /* Attach the parent to its child (structure lock needed) */
         vlc_mutex_lock (&papriv->tree_lock);
-        priv->next = papriv->first;
-        if (priv->next != NULL)
-            priv->next->prev = priv;
-        papriv->first = priv;
+        vlc_list_append(&priv->siblings, &papriv->children);
         vlc_mutex_unlock (&papriv->tree_lock);
     }
     else
@@ -233,7 +237,6 @@ void *vlc_custom_create (vlc_object_t *parent, size_t length,
         obj->obj.flags = 0;
         obj->obj.libvlc = self;
         obj->obj.parent = NULL;
-        priv->next = NULL;
 
         /* TODO: should be in src/libvlc.c */
         int canc = vlc_savecancel ();
@@ -348,11 +351,16 @@ static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
         return vlc_object_hold (obj);
 
     vlc_object_t *found = NULL;
+
     /* NOTE: nested locking here (due to recursive call) */
     vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
 
-    for (priv = priv->first; priv != NULL && found == NULL; priv = priv->next)
+    vlc_children_foreach(priv, priv)
+    {
         found = FindName (vlc_externals(priv), name);
+        if (found != NULL)
+            break;
+    }
 
     /* NOTE: nested locking here (due to recursive call) */
     vlc_mutex_unlock (&vlc_internals(obj)->tree_lock);
@@ -441,8 +449,8 @@ void vlc_object_release (vlc_object_t *obj)
     {   /* Destroying the root object */
         refs = atomic_fetch_sub (&priv->refs, 1);
         assert (refs == 1); /* nobody to race against in this case */
-
-        assert (priv->first == NULL); /* no children can be left */
+        /* no children can be left */
+        assert(vlc_list_is_empty(&priv->children));
 
         int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
@@ -458,31 +466,14 @@ void vlc_object_release (vlc_object_t *obj)
     assert (refs > 0);
 
     if (likely(refs == 1))
-    {   /* Detach from parent to protect against vlc_object_find_name() */
-        vlc_object_internals_t *prev = priv->prev;
-        vlc_object_internals_t *next = priv->next;
-
-        if (prev != NULL)
-        {
-            assert (prev->next == priv);
-            prev->next = next;
-        }
-        else
-        {
-            assert (papriv->first == priv);
-            papriv->first = next;
-        }
-        if (next != NULL)
-        {
-            assert (next->prev == priv);
-            next->prev = prev;
-        }
-    }
+        /* Detach from parent to protect against vlc_object_find_name() */
+        vlc_list_remove(&priv->siblings);
     vlc_mutex_unlock (&papriv->tree_lock);
 
     if (likely(refs == 1))
     {
-        assert (priv->first == NULL); /* no children can be left */
+        /* no children can be left (because children reference their parent) */
+        assert(vlc_list_is_empty(&priv->children));
 
         int canc = vlc_savecancel ();
         vlc_object_destroy (obj);
@@ -523,7 +514,7 @@ size_t vlc_list_children(vlc_object_t *obj, vlc_object_t **restrict tab,
     size_t count = 0;
 
     vlc_mutex_lock (&vlc_internals(obj)->tree_lock);
-    for (priv = vlc_internals(obj)->first; priv != NULL; priv = priv->next)
+    vlc_children_foreach(priv, vlc_internals(obj))
     {
          if (count < max)
              tab[count] = vlc_object_hold(vlc_externals(priv));
