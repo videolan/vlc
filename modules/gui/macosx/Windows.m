@@ -356,7 +356,7 @@
      bottom edge is on the screen or can be on the screen when the user moves
      the window */
     difference = NSMaxY (screenRect) - NSMaxY (frameRect);
-    if (_styleMask & NSResizableWindowMask) {
+    if (self.styleMask & NSResizableWindowMask) {
         CGFloat difference2;
 
         difference2 = screenRect.origin.y - frameRect.origin.y;
