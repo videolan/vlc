@@ -543,9 +543,6 @@
                     [[pluginItem options] addObject:[[VLCTreeLeafItem alloc] initWithConfigItem:&p_configs[j]]];
                 }
             }
-            else {
-                msg_Err(getIntf(), "failed to handle index %i which is neither a category nor a subcategory", j);
-            }
         }
     }
     module_list_free(modules);

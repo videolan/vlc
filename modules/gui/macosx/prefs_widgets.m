@@ -973,12 +973,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 - (void)resetValues
 {
-    NSString *o_textfieldString;
     char *psz_value = config_GetPsz(self.p_item->psz_name);
-    if (psz_value)
-        o_textfieldString = _NS(psz_value);
-    else
-        o_textfieldString = @"";
+    [o_textfield setStringValue:toNSStr(psz_value)];
     free(psz_value);
     [super resetValues];
 }
@@ -1166,13 +1162,8 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
 -(void)resetValues
 {
-    NSString *o_textfieldString;
     char *psz_value = config_GetPsz(self.p_item->psz_name);
-    if (psz_value)
-        o_textfieldString = [NSString stringWithFormat: @"%s", psz_value];
-    else
-        o_textfieldString = @"";
-
+    [o_textfield setStringValue:toNSStr(psz_value)];
     free(psz_value);
     [super resetValues];
 }
