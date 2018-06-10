@@ -324,7 +324,7 @@ static void test_limits( libvlc_int_t *p_libvlc )
 static void test_choices( libvlc_int_t *p_libvlc )
 {
     vlc_value_t val;
-    vlc_list_t vals;
+    vlc_value_t *vals;
     char **texts;
     size_t count;
 
@@ -341,11 +341,10 @@ static void test_choices( libvlc_int_t *p_libvlc )
     assert( var_CountChoices( p_libvlc, "bla" ) == 1 );
 
     var_Change( p_libvlc, "bla", VLC_VAR_GETCHOICES, &count, &vals, &texts );
-    assert( count == 1 && vals.i_count == 1 && vals.p_values[0].i_int == 1 &&
-            !strcmp( texts[0], "one" ) );
+    assert( count == 1 && vals[0].i_int == 1 && !strcmp( texts[0], "one" ) );
     free(texts[0]);
     free(texts);
-    free(vals.p_values);
+    free(vals);
 
     var_Change( p_libvlc, "bla", VLC_VAR_CLEARCHOICES );
     assert( var_CountChoices( p_libvlc, "bla" ) == 0 );

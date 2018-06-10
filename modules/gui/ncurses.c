@@ -1538,7 +1538,7 @@ static void CycleESTrack(input_thread_t *input, const char *var)
     if (!input)
         return;
 
-    vlc_list_t list;
+    vlc_value_t *list;
     size_t count;
 
     if (var_Change(input, var, VLC_VAR_GETCHOICES,
@@ -1549,13 +1549,13 @@ static void CycleESTrack(input_thread_t *input, const char *var)
 
     size_t i;
     for (i = 0; i < count; i++)
-        if (list.p_values[i].i_int == current)
+        if (list[i].i_int == current)
             break;
 
     if (++i >= count)
         i = 0;
-    var_SetInteger(input, var, list.p_values[i].i_int);
-    free(list.p_values);
+    var_SetInteger(input, var, list[i].i_int);
+    free(list);
 }
 
 static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,

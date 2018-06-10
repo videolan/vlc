@@ -268,7 +268,7 @@ void AspectRatioComboBox::updateRatios()
 {
     /* Clear the list before updating */
     clear();
-    vlc_list_t val_list;
+    vlc_value_t *val_list;
     char **text_list;
     size_t count;
 
@@ -287,13 +287,13 @@ void AspectRatioComboBox::updateRatios()
     for( size_t i = 0; i < count; i++ )
     {
         addItem( qfu( text_list[i] ),
-                 QString( val_list.p_values[i].psz_string ) );
+                 QString( val_list[i].psz_string ) );
         free(text_list[i]);
-        free(val_list.p_values[i].psz_string);
+        free(val_list[i].psz_string);
     }
     setEnabled( true );
     free(text_list);
-    free(val_list.p_values);
+    free(val_list);
     vlc_object_release( p_vout );
 }
 

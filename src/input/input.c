@@ -3277,7 +3277,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         return VLC_SUCCESS;
 
     /* Select the ES */
-    vlc_list_t list;
+    vlc_value_t *list;
     size_t entries;
 
     if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES,
@@ -3290,12 +3290,12 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     if( count < entries )
     {
-        const int i_id = list.p_values[count].i_int;
+        const int i_id = list[count].i_int;
 
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
     }
-    free(list.p_values);
+    free(list);
 
     return VLC_SUCCESS;
 }

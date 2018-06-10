@@ -277,7 +277,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             if( p_input == NULL )
                 break;
 
-            vlc_list_t list;
+            vlc_value_t *list;
             size_t count;
 
             var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
@@ -289,7 +289,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 size_t i;
 
                 for( i = 0; i < count; i++ )
-                     if( i_audio_es == list.p_values[i].i_int )
+                     if( i_audio_es == list[i].i_int )
                          break;
                 /* value of audio-es was not in choices list */
                 if( i == count )
@@ -302,10 +302,9 @@ static void ProcessGesture( intf_thread_t *p_intf )
                     i = 1;
                 else
                     i++;
-                var_SetInteger( p_input, "audio-es",
-                                list.p_values[i].i_int );
+                var_SetInteger( p_input, "audio-es", list[i].i_int );
             }
-            free(list.p_values);
+            free(list);
             vlc_object_release( p_input );
             break;
         }
@@ -316,7 +315,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
             if( p_input == NULL )
                 break;
 
-            vlc_list_t list;
+            vlc_value_t *list;
             size_t count;
 
             var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
@@ -328,7 +327,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 size_t i;
 
                 for( i = 0; i < count; i++ )
-                     if( i_audio_es == list.p_values[i].i_int )
+                     if( i_audio_es == list[i].i_int )
                          break;
                 /* value of audio-es was not in choices list */
                 if( i == count )
@@ -341,10 +340,9 @@ static void ProcessGesture( intf_thread_t *p_intf )
                     i = 1;
                 else
                     i++;
-                var_SetInteger( p_input, "audio-es",
-                                list.p_values[i].i_int );
+                var_SetInteger( p_input, "audio-es", list[i].i_int );
             }
-            free(list.p_values);
+            free(list);
             vlc_object_release( p_input );
             break;
         }

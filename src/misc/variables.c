@@ -545,18 +545,17 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
         case VLC_VAR_GETCHOICES:
         {
             size_t *count = va_arg(ap, size_t *);
-            vlc_list_t *values = va_arg(ap, vlc_list_t *);
+            vlc_value_t **values = va_arg(ap, vlc_value_t **);
             char ***texts = va_arg(ap, char ***);
 
             *count = p_var->choices_count;
-            values->i_type = p_var->i_type;
-            values->i_count = *count;
-            values->p_values = xmalloc(*count * sizeof (values->p_values));
+            *values = xmalloc(p_var->choices_count * sizeof (**values));
 
             for (size_t i = 0; i < p_var->choices_count; i++)
             {
-                values->p_values[i] = p_var->choices[i];
-                p_var->ops->pf_dup( &values->p_values[i] );
+                vlc_value_t *val = (*values) + i;
+                *val = p_var->choices[i];
+                p_var->ops->pf_dup(val);
             }
 
             if( texts != NULL )

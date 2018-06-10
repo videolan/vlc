@@ -1787,7 +1787,7 @@ libvlc_track_description_t *
     if( !p_input )
         return NULL;
 
-    vlc_list_t val_list;
+    vlc_value_t *val_list;
     char **text_list;
     size_t count;
 
@@ -1806,13 +1806,13 @@ libvlc_track_description_t *
         }
 
         *pp = tr;
-        tr->i_id = val_list.p_values[i].i_int;
+        tr->i_id = val_list[i].i_int;
         tr->psz_name = text_list[i];
         pp = &tr->p_next;
     }
 
     *pp = NULL;
-    free(val_list.p_values);
+    free(val_list);
     free(text_list);
     vlc_object_release( p_input );
 

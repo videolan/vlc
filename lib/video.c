@@ -353,7 +353,7 @@ libvlc_track_description_t *
 int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
-    vlc_list_t list;
+    vlc_value_t *list;
     size_t count;
     int i_ret = -1;
 
@@ -364,7 +364,7 @@ int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
                &count, &list, (char ***)NULL);
     for (size_t i = 0; i < count; i++)
     {
-        if( i_spu == list.p_values[i].i_int )
+        if( i_spu == list[i].i_int )
         {
             if( var_SetInteger( p_input_thread, "spu-es", i_spu ) < 0 )
                 break;
@@ -375,7 +375,7 @@ int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
     libvlc_printerr( "Track identifier not found" );
 end:
     vlc_object_release (p_input_thread);
-    free(list.p_values);
+    free(list);
     return i_ret;
 }
 
@@ -452,17 +452,16 @@ static void teletext_enable( input_thread_t *p_input_thread, bool b_enable )
 {
     if( b_enable )
     {
-        vlc_list_t list;
+        vlc_value_t *list;
         size_t count;
 
         if( !var_Change( p_input_thread, "teletext-es", VLC_VAR_GETCHOICES,
                          &count, &list, (char ***)NULL ) )
         {
             if( count > 0 )
-                var_SetInteger( p_input_thread, "spu-es",
-                                list.p_values[0].i_int );
+                var_SetInteger( p_input_thread, "spu-es", list[0].i_int );
 
-            free(list.p_values);
+            free(list);
         }
     }
     else
@@ -571,7 +570,7 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi )
 int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
-    vlc_list_t val_list;
+    vlc_value_t *val_list;
     size_t count;
     int i_ret = -1;
 
@@ -582,7 +581,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
                 &count, &val_list, (char ***)NULL );
     for( size_t i = 0; i < count; i++ )
     {
-        if( i_track == val_list.p_values[i].i_int )
+        if( i_track == val_list[i].i_int )
         {
             if( var_SetInteger( p_input_thread, "video-es", i_track ) < 0 )
                 break;
@@ -592,7 +591,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
     }
     libvlc_printerr( "Track identifier not found" );
 end:
-    free(val_list.p_values);
+    free(val_list);
     vlc_object_release( p_input_thread );
     return i_ret;
 }

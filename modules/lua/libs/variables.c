@@ -220,7 +220,7 @@ static int vlclua_var_create( lua_State *L )
 
 static int vlclua_var_get_list( lua_State *L )
 {
-    vlc_list_t val;
+    vlc_value_t *val;
     char **text;
     size_t count;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
@@ -231,15 +231,17 @@ static int vlclua_var_get_list( lua_State *L )
     if( i_ret < 0 )
         return vlclua_push_ret( L, i_ret );
 
+    int type = var_Type( *pp_obj, psz_var );
+
     lua_createtable( L, count, 0 );
     for( size_t i = 0; i < count; i++ )
     {
         lua_pushinteger( L, i+1 );
-        if( !vlclua_pushvalue( L, val.i_type, val.p_values[i] ) )
-             lua_pushnil( L );
+        if( !vlclua_pushvalue( L, type, val[i] ) )
+            lua_pushnil( L );
         lua_settable( L, -3 );
-        if( (val.i_type & VLC_VAR_CLASS) == VLC_VAR_STRING )
-            free(val.p_values[i].psz_string);
+        if( (type & VLC_VAR_CLASS) == VLC_VAR_STRING )
+            free(val[i].psz_string);
     }
 
     lua_createtable( L, count, 0 );
@@ -252,7 +254,7 @@ static int vlclua_var_get_list( lua_State *L )
     }
 
     free(text);
-    free(val.p_values);
+    free(val);
     return 2;
 }
 

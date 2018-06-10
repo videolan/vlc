@@ -651,7 +651,7 @@ void ExtV4l2::Refresh( void )
     }
     if( p_obj )
     {
-        vlc_list_t val;
+        vlc_value_t *val;
         char **text;
         size_t count;
 
@@ -684,7 +684,7 @@ void ExtV4l2::Refresh( void )
                 name = qfu(psz_var);
 
             msg_Dbg( p_intf, "v4l2 control \"%" PRIx64 "\": %s (%s)",
-                     val.p_values[i].i_int, psz_var, qtu( name ) );
+                     val[i].i_int, psz_var, qtu( name ) );
 
             int i_type = var_Type( p_obj, psz_var );
             switch( i_type & VLC_VAR_TYPE )
@@ -700,7 +700,7 @@ void ExtV4l2::Refresh( void )
                         QComboBox *combobox = new QComboBox( box );
                         combobox->setObjectName( qfu( psz_var ) );
 
-                        vlc_list_t val2;
+                        vlc_value_t *val2;
                         char **text2;
                         size_t count2;
 
@@ -709,13 +709,13 @@ void ExtV4l2::Refresh( void )
                         for( size_t j = 0; j < count2; j++ )
                         {
                             combobox->addItem( text2[j],
-                                       qlonglong( val2.p_values[j].i_int) );
-                            if( i_val == val2.p_values[j].i_int )
+                                       qlonglong( val2[j].i_int) );
+                            if( i_val == val2[j].i_int )
                                 combobox->setCurrentIndex( j );
                             free(text2[j]);
                         }
                         free(text2);
-                        free(val2.p_values);
+                        free(val2);
 
                         CONNECT( combobox, currentIndexChanged( int ), this,
                                  ValueChange( int ) );
@@ -782,7 +782,7 @@ void ExtV4l2::Refresh( void )
             free(psz_var);
         }
         free(text);
-        free(val.p_values);
+        free(val);
         vlc_object_release( p_obj );
     }
     else
