@@ -22,12 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#import <MediaPlayer/MediaPlayer.h>
+
 #import "VLCRemoteControlService.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMain.h"
-#ifdef MAC_OS_X_VERSION_10_12_2
-#import <MediaPlayer/MediaPlayer.h>
-#endif
 #import "CompatibilityFixes.h"
 
 #define kVLCSettingPlaybackForwardSkipLength @(60)

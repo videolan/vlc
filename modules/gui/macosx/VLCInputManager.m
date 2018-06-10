@@ -39,9 +39,7 @@
 #import "iTunes.h"
 #import "Spotify.h"
 
-#ifdef MAC_OS_X_VERSION_10_12_2
 #import <MediaPlayer/MediaPlayer.h>
-#endif
 
 @interface VLCInputManager()
 - (void)updateMainMenu;

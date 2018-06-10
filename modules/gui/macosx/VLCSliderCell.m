@@ -167,11 +167,7 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
 
 - (NSRect)knobRectFlipped:(BOOL)flipped
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-    // This is our own implementation, so no need to guard it on < 10.9
     NSRect barRect = [self barRectFlipped:NO];
-#pragma clang diagnostic pop
     CGFloat knobThickness = barRect.size.height;
     double val = [self myNormalizedDouble];
 
@@ -205,11 +201,6 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         [_knobShadow set];
     [knobPath stroke];
     [NSGraphicsContext restoreGraphicsState];
-}
-
-- (NSRect)barRectFlipped:(BOOL)flipped
-{
-    return [[self controlView] bounds];
 }
 
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
