@@ -861,21 +861,23 @@ void InputManager::activateTeletext( bool b_enable )
 {
     vlc_list_t list;
     char **text;
+    size_t count;
 
-    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETCHOICES, &list, &text ) )
+    if( hasInput() && !var_Change( p_input, "teletext-es", VLC_VAR_GETCHOICES,
+                                   &count, &list, &text ) )
     {
-        if( list.i_count > 0 )
+        if( count > 0 )
         {
             /* Prefer the page 100 if it is present */
-            int i;
-            for( i = 0; i < list.i_count; i++ )
+            size_t i;
+            for( i = 0; i < count; i++ )
             {
                 /* The description is the page number as a string */
                 const char *psz_page = text[i];
                 if( psz_page && !strcmp( psz_page, "100" ) )
                     break;
             }
-            if( i >= list.i_count )
+            if( i >= count )
                 i = 0;
             var_SetInteger( p_input, "spu-es", b_enable ? list.p_values[i].i_int : -1 );
         }

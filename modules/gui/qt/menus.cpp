@@ -1377,7 +1377,8 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     vlc_value_t val;
     vlc_list_t val_list;
     char **text_list;
-    int i_type, i;
+    size_t count, i;
+    int i_type;
 
     /* Check the type of the object variable */
     i_type = var_Type( p_object, psz_var );
@@ -1400,7 +1401,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
     }
 
     if( var_Change( p_object, psz_var, VLC_VAR_GETCHOICES,
-                    &val_list, &text_list ) < 0 )
+                    &count, &val_list, &text_list ) < 0 )
     {
         return VLC_EGENERIC;
     }
@@ -1409,7 +1410,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 #define CURTEXT text_list[i]
 #define RADIO_OR_COMMAND  ( i_type & ( VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE ) ) ? ITEM_RADIO : ITEM_NORMAL
 
-    for( i = 0; i < val_list.i_count; i++ )
+    for( i = 0; i < count; i++ )
     {
         vlc_value_t another_val;
         QString menutext;

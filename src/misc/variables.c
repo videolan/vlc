@@ -551,9 +551,11 @@ int (var_Change)(vlc_object_t *p_this, const char *psz_name, int i_action, ...)
             break;
         case VLC_VAR_GETCHOICES:
         {
+            size_t *count = va_arg(ap, size_t *);
             vlc_list_t *values = va_arg(ap, vlc_list_t *);
             char ***texts = va_arg(ap, char ***);
 
+            *count = p_var->choices.i_count;
             values->p_values =
                 xmalloc( p_var->choices.i_count * sizeof(vlc_value_t) );
             values->i_type = p_var->i_type;

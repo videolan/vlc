@@ -278,25 +278,27 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 break;
 
             vlc_list_t list;
-            var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
-                        &list, (char ***)NULL );
+            size_t count;
 
-            if( list.i_count > 1 )
+            var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
+                        &count, &list, (char ***)NULL );
+
+            if( count > 1 )
             {
                 int i_audio_es = var_GetInteger( p_input, "audio-es" );
-                int i;
+                size_t i;
 
-                for( i = 0; i < list.i_count; i++ )
+                for( i = 0; i < count; i++ )
                      if( i_audio_es == list.p_values[i].i_int )
                          break;
                 /* value of audio-es was not in choices list */
-                if( i == list.i_count )
+                if( i == count )
                 {
                     msg_Warn( p_input,
                               "invalid current audio track, selecting 0" );
                     i = 0;
                 }
-                else if( i == list.i_count - 1 )
+                else if( i == count - 1 )
                     i = 1;
                 else
                     i++;
@@ -315,25 +317,27 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 break;
 
             vlc_list_t list;
-            var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                        &list, (char ***)NULL );
+            size_t count;
 
-            if( list.i_count > 1 )
+            var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
+                        &count, &list, (char ***)NULL );
+
+            if( count > 1 )
             {
                 int i_audio_es = var_GetInteger( p_input, "spu-es" );
-                int i;
+                size_t i;
 
-                for( i = 0; i < list.i_count; i++ )
+                for( i = 0; i < count; i++ )
                      if( i_audio_es == list.p_values[i].i_int )
                          break;
                 /* value of audio-es was not in choices list */
-                if( i == list.i_count )
+                if( i == count )
                 {
                     msg_Warn( p_input,
                               "invalid current subtitle track, selecting 0" );
                     i = 0;
                 }
-                else if( i == list.i_count - 1 )
+                else if( i == count - 1 )
                     i = 1;
                 else
                     i++;

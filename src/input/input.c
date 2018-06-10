@@ -3278,16 +3278,17 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     /* Select the ES */
     vlc_list_t list;
+    size_t entries;
 
-    if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES, &list,
-                    (char ***)NULL ) )
+    if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES,
+                    &entries, &list, (char ***)NULL ) )
         return VLC_SUCCESS;
 
     if( count == 0 )
         count++;
     /* if it was first one, there is disable too */
 
-    if( count < (size_t)list.i_count )
+    if( count < entries )
     {
         const int i_id = list.p_values[count].i_int;
 

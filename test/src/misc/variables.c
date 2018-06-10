@@ -326,6 +326,7 @@ static void test_choices( libvlc_int_t *p_libvlc )
     vlc_value_t val;
     vlc_list_t vals;
     char **texts;
+    size_t count;
 
     var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND );
     val.i_int = 1;
@@ -339,8 +340,8 @@ static void test_choices( libvlc_int_t *p_libvlc )
     var_Change( p_libvlc, "bla", VLC_VAR_DELCHOICE, val );
     assert( var_CountChoices( p_libvlc, "bla" ) == 1 );
 
-    var_Change( p_libvlc, "bla", VLC_VAR_GETCHOICES, &vals, &texts );
-    assert( vals.i_count == 1 && vals.p_values[0].i_int == 1 &&
+    var_Change( p_libvlc, "bla", VLC_VAR_GETCHOICES, &count, &vals, &texts );
+    assert( count == 1 && vals.i_count == 1 && vals.p_values[0].i_int == 1 &&
             !strcmp( texts[0], "one" ) );
     var_FreeList( &vals, &texts );
 

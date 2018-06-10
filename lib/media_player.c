@@ -1790,12 +1790,15 @@ libvlc_track_description_t *
 
     vlc_list_t val_list;
     char **text_list;
-    int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETCHOICES, &val_list, &text_list );
+    size_t count;
+
+    int i_ret = var_Change( p_input, psz_variable, VLC_VAR_GETCHOICES,
+                            &count, &val_list, &text_list );
     if( i_ret != VLC_SUCCESS )
         return NULL;
 
     /* no tracks */
-    if( val_list.i_count <= 0 )
+    if( count == 0 )
         goto end;
 
     p_track_description = malloc( sizeof *p_track_description );
@@ -1806,7 +1809,7 @@ libvlc_track_description_t *
     }
     p_actual = p_track_description;
     p_previous = NULL;
-    for( int i = 0; i < val_list.i_count; i++ )
+    for( size_t i = 0; i < count; i++ )
     {
         if( !p_actual )
         {

@@ -83,21 +83,6 @@ static int vlclua_pushvalue( lua_State *L, int i_type, vlc_value_t val )
     return 1;
 }
 
-static int vlclua_pushlist( lua_State *L, vlc_list_t *p_list )
-{
-    int i_count = p_list->i_count;
-
-    lua_createtable( L, i_count, 0 );
-    for( int i = 0; i < i_count; i++ )
-    {
-        lua_pushinteger( L, i+1 );
-        if( !vlclua_pushvalue( L, p_list->i_type, p_list->p_values[i] ) )
-             lua_pushnil( L );
-        lua_settable( L, -3 );
-    }
-    return 1;
-}
-
 static int vlclua_tovalue( lua_State *L, int i_type, vlc_value_t *val )
 {
     switch( i_type & VLC_VAR_CLASS )
@@ -237,17 +222,26 @@ static int vlclua_var_get_list( lua_State *L )
 {
     vlc_list_t val;
     char **text;
+    size_t count;
     vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
     const char *psz_var = luaL_checkstring( L, 2 );
 
-    int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETCHOICES, &val, &text );
+    int i_ret = var_Change( *pp_obj, psz_var, VLC_VAR_GETCHOICES,
+                            &count, &val, &text );
     if( i_ret < 0 )
         return vlclua_push_ret( L, i_ret );
 
-    vlclua_pushlist( L, &val );
+    lua_createtable( L, count, 0 );
+    for( size_t i = 0; i < count; i++ )
+    {
+        lua_pushinteger( L, i+1 );
+        if( !vlclua_pushvalue( L, val.i_type, val.p_values[i] ) )
+             lua_pushnil( L );
+        lua_settable( L, -3 );
+    }
 
-    lua_createtable( L, val.i_count, 0 );
-    for( int i = 0; i < val.i_count; i++ )
+    lua_createtable( L, count, 0 );
+    for( size_t i = 0; i < count; i++ )
     {
         lua_pushinteger( L, i + 1 );
         lua_pushstring( L, text[i] );

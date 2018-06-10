@@ -1539,18 +1539,20 @@ static void CycleESTrack(input_thread_t *input, const char *var)
         return;
 
     vlc_list_t list;
-    if (var_Change(input, var, VLC_VAR_GETCHOICES, &list,
-                   (char ***)NULL) < 0)
+    size_t count;
+
+    if (var_Change(input, var, VLC_VAR_GETCHOICES,
+                   &count, &list, (char ***)NULL) < 0)
         return;
 
     int64_t current = var_GetInteger(input, var);
 
-    int i;
-    for (i = 0; i < list.i_count; i++)
+    size_t i;
+    for (i = 0; i < count; i++)
         if (list.p_values[i].i_int == current)
             break;
 
-    if (++i >= list.i_count)
+    if (++i >= count)
         i = 0;
     var_SetInteger(input, var, list.p_values[i].i_int);
 }

@@ -629,12 +629,13 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             {
                 vlc_value_t val;
                 vlc_list_t list;
+                size_t count;
 
                 var_Get( p_input, "spu-es", &val );
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, (char ***)NULL );
+                            &count, &list, (char ***)NULL );
 
-                if( list.i_count < 1 || val.i_int < 0 )
+                if( count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
                     var_FreeList( &list, NULL );
@@ -698,12 +699,13 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             {
                 vlc_value_t val;
                 vlc_list_t list;
+                size_t count;
 
                 var_Get( p_input, "spu-es", &val );
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, (char ***)NULL );
+                            &count, &list, (char ***)NULL );
 
-                if( list.i_count < 1 || val.i_int < 0 )
+                if( count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
                     var_FreeList( &list, NULL );
@@ -742,16 +744,17 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t list;
                 char **list2;
+                size_t count;
 
                 var_Get( p_input, "audio-es", &val );
                 var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &count, &list, &list2 );
 
-                if( list.i_count > 1 )
+                if( count > 1 )
                 {
-                    int i;
+                    size_t i;
 
-                    for( i = 0; i < list.i_count; i++ )
+                    for( i = 0; i < count; i++ )
                     {
                         if( val.i_int == list.p_values[i].i_int )
                         {
@@ -759,13 +762,13 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                         }
                     }
                     /* value of audio-es was not in choices list */
-                    if( i == list.i_count )
+                    if( i == count )
                     {
                         msg_Warn( p_input,
                                   "invalid current audio track, selecting 0" );
                         i = 0;
                     }
-                    else if( i == list.i_count - 1 )
+                    else if( i == count - 1 )
                         i = 1;
                     else
                         i++;
@@ -783,37 +786,33 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t list;
                 char **list2;
-                int i;
+                size_t count, i;
                 var_Get( p_input, "spu-es", &val );
 
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &count, &list, &list2 );
 
-                if( list.i_count <= 1 )
+                if( count <= 1 )
                 {
                     DisplayMessage( p_vout, _("Subtitle track: %s"),
                                     _("N/A") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
-                for( i = 0; i < list.i_count; i++ )
-                {
+                for( i = 0; i < count; i++ )
                     if( val.i_int == list.p_values[i].i_int )
-                    {
                         break;
-                    }
-                }
                 /* value of spu-es was not in choices list */
-                if( i == list.i_count )
+                if( i == count )
                 {
                     msg_Warn( p_input,
                               "invalid current subtitle track, selecting 0" );
                     i = 0;
                 }
-                else if ((i == list.i_count - 1) && (i_action == ACTIONID_SUBTITLE_TRACK))
+                else if ((i == count - 1) && (i_action == ACTIONID_SUBTITLE_TRACK))
                     i = 0;
                 else if ((i == 0) && (i_action == ACTIONID_SUBTITLE_REVERSE_TRACK))
-                    i = list.i_count - 1;
+                    i = count - 1;
                 else
                     i = (i_action == ACTIONID_SUBTITLE_TRACK) ? i+1 : i-1;
                 var_SetInteger( p_input, "spu-es", list.p_values[i].i_int );
@@ -826,11 +825,12 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             {
                 vlc_list_t list;
                 char **list2;
+                size_t count;
 
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &count, &list, &list2 );
 
-                if( list.i_count <= 1 )
+                if( count <= 1 )
                 {
                     DisplayMessage( p_vout, _("Subtitle track: %s"),
                                     _("N/A") );
@@ -858,7 +858,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 /* if subtitles were disabled with no saved id, use the first track */
                 if( i_cur_id != -1 || i_new_id != -1 )
                 {
-                    for( int i = 0; i < list.i_count; ++i )
+                    for( size_t i = 0; i < count; ++i )
                     {
                         if( i_new_id == list.p_values[i].i_int )
                         {
@@ -880,42 +880,38 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t list;
                 char **list2;
-                int i;
+                size_t count, i;
                 var_Get( p_input, "program", &val );
 
                 var_Change( p_input, "program", VLC_VAR_GETCHOICES,
-                            &list, &list2 );
+                            &count, &list, &list2 );
 
-                if( list.i_count <= 1 )
+                if( count <= 1 )
                 {
                     DisplayMessage( p_vout, _("Program Service ID: %s"),
                                     _("N/A") );
                     var_FreeList( &list, &list2 );
                     break;
                 }
-                for( i = 0; i < list.i_count; i++ )
-                {
+                for( i = 0; i < count; i++ )
                     if( val.i_int == list.p_values[i].i_int )
-                    {
                         break;
-                    }
-                }
                 /* value of program sid was not in choices list */
-                if( i == list.i_count )
+                if( i == count )
                 {
                     msg_Warn( p_input,
                               "invalid current program SID, selecting 0" );
                     i = 0;
                 }
                 else if( i_action == ACTIONID_PROGRAM_SID_NEXT ) {
-                    if( i == list.i_count - 1 )
+                    if( i == count - 1 )
                         i = 0;
                     else
                         i++;
                     }
                 else { /* ACTIONID_PROGRAM_SID_PREV */
                     if( i == 0 )
-                        i = list.i_count - 1;
+                        i = count - 1;
                     else
                         i--;
                     }
@@ -1048,13 +1044,14 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t val_list;
                 char **text_list;
+                size_t count;
 
                 var_Get( p_vout, "aspect-ratio", &val );
                 if( var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES,
-                                &val_list, &text_list ) >= 0 )
+                                &count, &val_list, &text_list ) >= 0 )
                 {
-                    int i;
-                    for( i = 0; i < val_list.i_count; i++ )
+                    size_t i;
+                    for( i = 0; i < count; i++ )
                     {
                         if( !strcmp( val_list.p_values[i].psz_string,
                                      val.psz_string ) )
@@ -1063,7 +1060,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                             break;
                         }
                     }
-                    if( i == val_list.i_count ) i = 0;
+                    if( i == count ) i = 0;
                     var_SetString( p_vout, "aspect-ratio",
                                    val_list.p_values[i].psz_string );
                     DisplayMessage( p_vout, _("Aspect ratio: %s"),
@@ -1081,13 +1078,14 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t val_list;
                 char **text_list;
+                size_t count;
 
                 var_Get( p_vout, "crop", &val );
                 if( var_Change( p_vout, "crop", VLC_VAR_GETCHOICES,
-                                &val_list, &text_list ) >= 0 )
+                                &count, &val_list, &text_list ) >= 0 )
                 {
-                    int i;
-                    for( i = 0; i < val_list.i_count; i++ )
+                    size_t i;
+                    for( i = 0; i < count; i++ )
                     {
                         if( !strcmp( val_list.p_values[i].psz_string,
                                      val.psz_string ) )
@@ -1096,7 +1094,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                             break;
                         }
                     }
-                    if( i == val_list.i_count ) i = 0;
+                    if( i == count ) i = 0;
                     var_SetString( p_vout, "crop",
                                    val_list.p_values[i].psz_string );
                     DisplayMessage( p_vout, _("Crop: %s"), text_list[i] );
@@ -1231,13 +1229,14 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 vlc_value_t val;
                 vlc_list_t val_list;
                 char **text_list;
+                size_t count;
 
                 var_Get( p_vout, "zoom", &val );
                 if( var_Change( p_vout, "zoom", VLC_VAR_GETCHOICES,
-                                &val_list, &text_list ) >= 0 )
+                                &count, &val_list, &text_list ) >= 0 )
                 {
-                    int i;
-                    for( i = 0; i < val_list.i_count; i++ )
+                    size_t i;
+                    for( i = 0; i < count; i++ )
                     {
                         if( val_list.p_values[i].f_float == val.f_float )
                         {
@@ -1248,8 +1247,8 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                             break;
                         }
                     }
-                    if( i == val_list.i_count ) i = 0;
-                    if( i == -1 ) i = val_list.i_count-1;
+                    if( i == count ) i = 0;
+                    if( i == (size_t)-1 ) i = count-1;
                     var_SetFloat( p_vout, "zoom",
                                   val_list.p_values[i].f_float );
                     DisplayMessage( p_vout, _("Zoom mode: %s"), text_list[i] );
@@ -1275,10 +1274,12 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
                     vlc_list_t vlist;
                     char **tlist;
-                    if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ) )
+                    size_t count;
+
+                    if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &count, &vlist, &tlist ) )
                     {
                         const char *psz_text = NULL;
-                        for( int i = 0; i < vlist.i_count; i++ )
+                        for( size_t i = 0; i < count; i++ )
                         {
                             if( !strcmp( vlist.p_values[i].psz_string, psz_mode ) )
                             {
@@ -1301,12 +1302,14 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
                 vlc_list_t vlist;
                 char **tlist;
+                size_t count;
 
-                if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ))
+                if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &count, &vlist, &tlist ))
                 {
                     const char *psz_text = NULL;
-                    int i;
-                    for( i = 0; i < vlist.i_count; i++ )
+                    size_t i;
+
+                    for( i = 0; i < count; i++ )
                     {
                         if( !strcmp( vlist.p_values[i].psz_string, psz_mode ) )
                         {
@@ -1314,7 +1317,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                             break;
                         }
                     }
-                    if( i == vlist.i_count ) i = 0;
+                    if( i == count ) i = 0;
                     psz_text = tlist[i];
                     var_SetString( p_vout, "deinterlace-mode", vlist.p_values[i].psz_string );
 
@@ -1343,11 +1346,13 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             {
                 vlc_value_t val;
                 vlc_list_t list;
+                size_t count;
+
                 var_Get( p_input, "spu-es", &val );
 
                 var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
-                            &list, (char ***)NULL );
-                if( list.i_count < 1 || val.i_int < 0 )
+                            &count, &list, (char ***)NULL );
+                if( count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout,
                                     _("Subtitle position: no active subtitle") );

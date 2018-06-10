@@ -1124,18 +1124,19 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             /* get */
             vlc_list_t val;
             char **text;
+            size_t count;
 
             int i_value = var_GetInteger( p_input, psz_variable );
 
-            if ( var_Change( p_input, psz_variable,
-                             VLC_VAR_GETCHOICES, &val, &text ) < 0 )
+            if ( var_Change( p_input, psz_variable, VLC_VAR_GETCHOICES,
+                             &count, &val, &text ) < 0 )
             {
                 free( name );
                 goto out;
             }
 
             msg_rc( "+----[ %s ]", name );
-            for ( int i = 0; i < val.i_count; i++ )
+            for ( size_t i = 0; i < count; i++ )
             {
                 if ( i_value == val.p_values[i].i_int )
                     msg_rc( "| %"PRId64" - %s *", val.p_values[i].i_int,
@@ -1561,6 +1562,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         char **text;
         float f_value = 0.;
         char *psz_value = NULL;
+        size_t count;
 
         if( !strcmp( psz_variable, "zoom" ) )
             f_value = var_GetFloat( p_vout, "zoom" );
@@ -1574,8 +1576,8 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
 
-        if ( var_Change( p_vout, psz_variable,
-                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
+        if ( var_Change( p_vout, psz_variable, VLC_VAR_GETCHOICES,
+                         &count, &val, &text ) < 0 )
         {
             vlc_object_release( p_vout );
             free( psz_value );
@@ -1589,7 +1591,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "+----[ %s ]", name );
         if( !strcmp( psz_variable, "zoom" ) )
         {
-            for ( int i = 0; i < val.i_count; i++ )
+            for ( size_t i = 0; i < count; i++ )
             {
                 if ( f_value == val.p_values[i].f_float )
                     msg_rc( "| %f - %s *", val.p_values[i].f_float, text[i] );
@@ -1599,7 +1601,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            for ( int i = 0; i < val.i_count; i++ )
+            for ( size_t i = 0; i < count; i++ )
             {
                 if ( !strcmp( psz_value, val.p_values[i].psz_string ) )
                     msg_rc( "| %s - %s *", val.p_values[i].psz_string,
@@ -1676,8 +1678,10 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         /* Retrieve all registered ***. */
         vlc_list_t val;
         char **text;
-        if ( var_Change( p_aout, "stereo-mode",
-                         VLC_VAR_GETCHOICES, &val, &text ) < 0 )
+        size_t count;
+
+        if ( var_Change( p_aout, "stereo-mode", VLC_VAR_GETCHOICES,
+                         &count, &val, &text ) < 0 )
         {
             ret = VLC_ENOVAR;
             goto out;
@@ -1686,7 +1690,7 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         int i_value = var_GetInteger( p_aout, "stereo-mode" );
 
         msg_rc( "+----[ %s ]", cmd );
-        for ( int i = 0; i < val.i_count; i++ )
+        for ( size_t i = 0; i < count; i++ )
         {
             if ( i_value == val.p_values[i].i_int )
                 msg_rc( "| %"PRId64" - %s *", val.p_values[i].i_int, text[i] );

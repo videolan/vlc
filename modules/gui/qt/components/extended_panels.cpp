@@ -653,8 +653,10 @@ void ExtV4l2::Refresh( void )
     {
         vlc_list_t val;
         char **text;
+        size_t count;
+
         int i_ret = var_Change( p_obj, "controls", VLC_VAR_GETCHOICES,
-                                &val, &text );
+                                &count, &val, &text );
         if( i_ret < 0 )
         {
             msg_Err( p_intf, "Oops, v4l2 object doesn't have a 'controls' variable." );
@@ -668,7 +670,7 @@ void ExtV4l2::Refresh( void )
         QVBoxLayout *layout = new QVBoxLayout( box );
         box->setLayout( layout );
 
-        for( int i = 0; i < val.i_count; i++ )
+        for( size_t i = 0; i < count; i++ )
         {
             char *vartext;
             const char *psz_var = text[i];
@@ -697,9 +699,11 @@ void ExtV4l2::Refresh( void )
 
                         vlc_list_t val2;
                         char **text2;
+                        size_t count2;
+
                         var_Change( p_obj, psz_var, VLC_VAR_GETCHOICES,
-                                    &val2, &text2 );
-                        for( int j = 0; j < val2.i_count; j++ )
+                                    &count2, &val2, &text2 );
+                        for( size_t j = 0; j < count2; j++ )
                         {
                             combobox->addItem( text2[j],
                                        qlonglong( val2.p_values[j].i_int) );
