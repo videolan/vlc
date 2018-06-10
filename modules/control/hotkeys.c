@@ -107,6 +107,26 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
+static void var_FreeList( vlc_list_t *values, char ***texts )
+{
+    switch( values->i_type & VLC_VAR_CLASS )
+    {
+        case VLC_VAR_STRING:
+            for( int i = 0; i < values->i_count; i++ )
+                free( values->p_values[i].psz_string );
+            break;
+    }
+
+    free( values->p_values );
+
+    if( texts != NULL )
+    {
+        for( int i = 0; i < values->i_count; i++ )
+            free( (*texts)[i] );
+        free( *texts );
+    }
+}
+
 static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {

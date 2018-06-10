@@ -486,7 +486,6 @@ var_Create
 var_DelCallback
 var_DelListCallback
 var_Destroy
-var_FreeList
 var_Get
 var_GetAndSet
 var_GetChecked

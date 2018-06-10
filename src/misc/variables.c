@@ -1124,26 +1124,6 @@ error:
     return VLC_EGENERIC;
 }
 
-void var_FreeList( vlc_list_t *values, char ***texts )
-{
-    switch( values->i_type & VLC_VAR_CLASS )
-    {
-        case VLC_VAR_STRING:
-            for( int i = 0; i < values->i_count; i++ )
-                free( values->p_values[i].psz_string );
-            break;
-    }
-
-    free( values->p_values );
-
-    if( texts != NULL )
-    {
-        for( int i = 0; i < values->i_count; i++ )
-            free( (*texts)[i] );
-        free( *texts );
-    }
-}
-
 static void DumpVariable(const void *data, const VISIT which, const int depth)
 {
     if (which != postorder && which != leaf)

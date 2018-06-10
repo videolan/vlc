@@ -207,13 +207,6 @@ VLC_API int var_GetAndSet(vlc_object_t *obj, const char *name, int op,
  */
 VLC_API int var_Inherit( vlc_object_t *, const char *, int, vlc_value_t * );
 
-/**
- * Frees a list and the associated strings.
- * @param p_val: the list variable
- * @param p_val2: the variable associated or NULL
- */
-VLC_API void var_FreeList( vlc_list_t *, char *** );
-
 
 /*****************************************************************************
  * Variable callbacks
