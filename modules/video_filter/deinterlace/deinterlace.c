@@ -442,6 +442,11 @@ static void GetOutputFormat( filter_t *p_filter,
  * video filter functions
  *****************************************************************************/
 
+picture_t *AllocPicture( filter_t *filter )
+{
+    return filter_NewPicture( filter );
+}
+
 /* This is the filter function. See Open(). */
 picture_t *Deinterlace( filter_t *p_filter, picture_t *p_pic )
 {

@@ -139,7 +139,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
     bool b_top_field_first;
 
     /* Request output picture */
-    p_dst[0] = filter_NewPicture( p_filter );
+    p_dst[0] = AllocPicture( p_filter );
     if( p_dst[0] == NULL )
     {
         picture_Release( p_pic );
@@ -221,7 +221,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
         {
             /* Note that the effective buffer size depends also on the constant
                private_picture in vout_wrapper.c, since that determines the
-               maximum number of output pictures filter_NewPicture() will
+               maximum number of output pictures AllocPicture() will
                successfully allocate for one input frame.
             */
             msg_Err( p_filter, "Framerate doubler: output buffer too small; "\
@@ -235,7 +235,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
         for( int i = 1; i < i_double_rate_alloc_end ; ++i )
         {
             p_dst[i-1]->p_next =
-            p_dst[i]           = filter_NewPicture( p_filter );
+            p_dst[i]           = AllocPicture( p_filter );
             if( p_dst[i] )
             {
                 picture_CopyProperties( p_dst[i], p_pic );

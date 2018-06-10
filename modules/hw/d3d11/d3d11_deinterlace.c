@@ -62,7 +62,6 @@ typedef struct
     ID3D11VideoProcessorOutputView *processorOutput;
 
     struct deinterlace_ctx         context;
-    picture_t *                    (*buffer_new)( filter_t * );
 } filter_sys_t;
 
 struct filter_mode_t
@@ -238,10 +237,10 @@ static struct picture_context_t *d3d11_pic_context_copy(struct picture_context_t
     return &pic_ctx->s;
 }
 
-static picture_t *NewOutputPicture( filter_t *p_filter )
+picture_t *AllocPicture( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    picture_t *pic = p_sys->buffer_new( p_filter );
+    picture_t *pic = filter_NewPicture( p_filter );
     picture_sys_t *pic_sys = pic->p_sys;
     if ( !pic->context )
     {
@@ -464,8 +463,6 @@ int D3D11OpenDeinterlace(vlc_object_t *obj)
        goto error;
     }
 
-    sys->buffer_new = filter->owner.video.buffer_new;
-    filter->owner.video.buffer_new = NewOutputPicture;
     filter->fmt_out.video   = out_fmt;
     filter->pf_video_filter = Deinterlace;
     filter->pf_flush        = Flush;
