@@ -87,11 +87,9 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     [self setupControls];
 }
 
-#define setupButton(target, title, desc)                                              \
-    [target accessibilitySetOverrideValue:title                                       \
-                             forAttribute:NSAccessibilityTitleAttribute];             \
-    [target accessibilitySetOverrideValue:desc                                        \
-                             forAttribute:NSAccessibilityDescriptionAttribute];       \
+#define setupButton(target, title, desc)            \
+    target.accessibilityTitle = title;              \
+    target.accessibilityLabel = desc;               \
     [target setToolTip:title];
 
 - (void)setupControls

@@ -97,18 +97,10 @@
     [self configurationChanged:nil];
 
     // Set Accessibility Attributes for Image Buttons
-    [backwardsButton.cell accessibilitySetOverrideValue:_NS("Go to previous item")
-                                           forAttribute:NSAccessibilityDescriptionAttribute];
-
-    [playPauseButton.cell accessibilitySetOverrideValue:_NS("Toggle Play/Pause")
-                                           forAttribute:NSAccessibilityDescriptionAttribute];
-
-    [forwardButton.cell accessibilitySetOverrideValue:_NS("Go to next item")
-                                         forAttribute:NSAccessibilityDescriptionAttribute];
-
-    [randButton.cell accessibilitySetOverrideValue:_NS("Toggle random order playback")
-                                      forAttribute:NSAccessibilityDescriptionAttribute];
-    
+    backwardsButton.accessibilityLabel = _NS("Go to previous item");
+    playPauseButton.accessibilityLabel = _NS("Toggle Play/Pause");
+    forwardButton.accessibilityLabel = _NS("Go to next item");
+    randButton.accessibilityLabel = _NS("Toggle random order playback");
 
     // Populate menu items with localized strings
     [showMainWindowItem setTitle:_NS("Show Main Window")];

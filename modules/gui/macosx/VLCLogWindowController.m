@@ -94,10 +94,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [self.window setTitle:_NS("Messages")];
 
 #define setupButton(target, title, desc)                                              \
-    [target accessibilitySetOverrideValue:title                                       \
-                             forAttribute:NSAccessibilityTitleAttribute];             \
-    [target accessibilitySetOverrideValue:desc                                        \
-                             forAttribute:NSAccessibilityDescriptionAttribute];       \
+    target.accessibilityTitle = title;                                                \
+    target.accessibilityLabel = desc;                                                 \
     [target setToolTip:desc];
 
     setupButton(_saveButton,

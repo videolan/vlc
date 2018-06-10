@@ -60,31 +60,31 @@
     [super awakeFromNib];
 
     [self.stopButton setToolTip: _NS("Stop")];
-    [[self.stopButton cell] accessibilitySetOverrideValue:[self.stopButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
+    self.stopButton.accessibilityLabel = self.stopButton.toolTip;
 
     [self.playlistButton setToolTip: _NS("Show/Hide Playlist")];
-    [[self.playlistButton cell] accessibilitySetOverrideValue:[self.playlistButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
+    self.playlistButton.accessibilityLabel = self.playlistButton.toolTip;
 
     [self.repeatButton setToolTip: _NS("Repeat")];
-    [[self.repeatButton cell] accessibilitySetOverrideValue:_NS("Change repeat mode. Modes: repeat one, repeat all and no repeat.") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[self.repeatButton cell] accessibilitySetOverrideValue:[self.repeatButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    self.repeatButton.accessibilityLabel = _NS("Change repeat mode. Modes: repeat one, repeat all and no repeat.");
+    self.repeatButton.accessibilityTitle = self.repeatButton.toolTip;
 
     [self.shuffleButton setToolTip: _NS("Shuffle")];
-    [[self.shuffleButton cell] accessibilitySetOverrideValue:[self.shuffleButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
+    self.shuffleButton.accessibilityLabel = self.shuffleButton.toolTip;
 
     NSString *volumeTooltip = [NSString stringWithFormat:_NS("Volume: %i %%"), 100];
     [self.volumeSlider setToolTip: volumeTooltip];
-    [[self.volumeSlider cell] accessibilitySetOverrideValue:_NS("Volume") forAttribute:NSAccessibilityDescriptionAttribute];
+    self.volumeSlider.accessibilityLabel = _NS("Volume");
     
     [self.volumeDownButton setToolTip: _NS("Mute")];
-    [[self.volumeDownButton cell] accessibilitySetOverrideValue:[self.volumeDownButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
+    self.volumeDownButton.accessibilityLabel = self.volumeDownButton.toolTip;
     
     [self.volumeUpButton setToolTip: _NS("Full Volume")];
-    [[self.volumeUpButton cell] accessibilitySetOverrideValue:[self.volumeUpButton toolTip] forAttribute:NSAccessibilityDescriptionAttribute];
+    self.volumeUpButton.accessibilityLabel = self.volumeUpButton.toolTip;
 
     [self.effectsButton setToolTip: _NS("Audio Effects")];
-    [[self.effectsButton cell] accessibilitySetOverrideValue:_NS("Open Audio Effects window") forAttribute:NSAccessibilityDescriptionAttribute];
-    [[self.effectsButton cell] accessibilitySetOverrideValue:[self.effectsButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
+    self.effectsButton.accessibilityTitle = _NS("Open Audio Effects window");
+    self.effectsButton.accessibilityLabel = self.effectsButton.toolTip;
 
     [self.stopButton setImage: imageFromRes(@"stop")];
     [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
