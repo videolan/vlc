@@ -1555,7 +1555,7 @@
 
     /* clean up everything */
     if ((i_type & VLC_VAR_TYPE) == VLC_VAR_STRING) free(val.psz_string);
-    free(text);
+    free(text_list);
     free(val_list);
 }
 
