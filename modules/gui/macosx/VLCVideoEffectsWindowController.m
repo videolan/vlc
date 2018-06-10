@@ -775,14 +775,7 @@
 - (void)addProfile:(id)sender
 {
     /* show panel */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-#ifdef MAC_OS_X_VERSION_10_10
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        [[_textfieldPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
-    }
-#endif
-#pragma clang diagnostic pop
+    [[_textfieldPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [_textfieldPanel setTitleString:_NS("Duplicate current profile for a new profile")];
     [_textfieldPanel setSubTitleString:_NS("Enter a name for the new profile:")];
     [_textfieldPanel setCancelButtonString:_NS("Cancel")];
@@ -840,14 +833,7 @@
 - (void)removeProfile:(id)sender
 {
     /* show panel */
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-#ifdef MAC_OS_X_VERSION_10_10
-    if (OSX_YOSEMITE_AND_HIGHER) {
-        [[_popupPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
-    }
-#endif
-#pragma clang diagnostic pop
+    [[_popupPanel window] setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     [_popupPanel setTitleString:_NS("Remove a preset")];
     [_popupPanel setSubTitleString:_NS("Select the preset you would like to remove:")];
     [_popupPanel setOkButtonString:_NS("Remove")];

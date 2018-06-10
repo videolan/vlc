@@ -26,7 +26,6 @@
 
 #pragma mark -
 #pragma OS detection code
-#define OSX_YOSEMITE_AND_HIGHER (NSAppKitVersionNumber >= 1334)
 #define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
 #define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
 #define OSX_SIERRA_DOT_TWO_AND_HIGHER (NSAppKitVersionNumber >= 1504.76) // this is needed to check for MPRemoteCommandCenter

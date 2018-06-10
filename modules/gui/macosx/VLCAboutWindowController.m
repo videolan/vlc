@@ -141,7 +141,7 @@
                                  "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
                                  "underline; color:#0057ae;\">Help and join us!</span></a>"));
 
-    NSString *fontfamily = (OSX_YOSEMITE_AND_HIGHER) ? @"Helvetica Neue" : @"Lucida Grande";
+    NSString *fontfamily = @"Helvetica Neue";
     NSString *joinUsWithStyle = [NSString stringWithFormat:@"<div style=\"text-align:left;font-family: -apple-system, %@;\">%@</div>",
                                  fontfamily, joinus];
     NSAttributedString *joinus_readytorender = [[NSAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES] options:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:NSUTF8StringEncoding] forKey:NSCharacterEncodingDocumentOption] documentAttributes:NULL];

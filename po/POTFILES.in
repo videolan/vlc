@@ -544,8 +544,6 @@ modules/gui/macosx/VLCTimeField.h
 modules/gui/macosx/VLCTimeField.m
 modules/gui/macosx/VLCTimeSelectionPanelController.h
 modules/gui/macosx/VLCTimeSelectionPanelController.m
-modules/gui/macosx/VLCTintedImageButtonCell.h
-modules/gui/macosx/VLCTintedImageButtonCell.m
 modules/gui/macosx/VLCTrackSynchronizationWindowController.h
 modules/gui/macosx/VLCTrackSynchronizationWindowController.m
 modules/gui/macosx/VLCUIWidgets.h

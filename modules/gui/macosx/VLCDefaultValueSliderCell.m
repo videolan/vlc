@@ -182,10 +182,8 @@
                 tickFrame.origin.x = mid;
             } else {
                 tickFrame.origin.x = mid - tickThickness;
-                if (OSX_YOSEMITE_AND_HIGHER) {
-                    tickFrame.size.height = cellFrame.size.height - 1;
-                    tickFrame.origin.y = cellFrame.origin.y - 1;
-                }
+                tickFrame.size.height = cellFrame.size.height - 1;
+                tickFrame.origin.y = cellFrame.origin.y - 1;
             }
             tickFrame.size.width = tickThickness;
         }
