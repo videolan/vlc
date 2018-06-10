@@ -150,7 +150,7 @@ struct filter_t
      * XXX use filter_GetInputAttachments */
     int (*pf_get_attachments)( filter_t *, input_attachment_t ***, int * );
 
-    /* Private structure for the owner of the decoder */
+    /** Private structure for the owner of the filter */
     filter_owner_t      owner;
 };
 
