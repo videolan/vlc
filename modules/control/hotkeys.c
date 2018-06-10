@@ -109,19 +109,19 @@ vlc_module_end ()
 
 static void var_FreeList( vlc_list_t values, char **texts )
 {
-    switch( values.i_type & VLC_VAR_CLASS )
-    {
-        case VLC_VAR_STRING:
-            for( int i = 0; i < values.i_count; i++ )
-                free( values.p_values[i].psz_string );
-            break;
-    }
-
     free( values.p_values );
 
     for( int i = 0; i < values.i_count; i++ )
         free( texts[i] );
     free( texts );
+}
+
+static void var_FreeStringList( vlc_list_t values, char **texts )
+{
+    for( int i = 0; i < values.i_count; i++ )
+         free( values.p_values[i].psz_string );
+
+    var_FreeList( values, texts );
 }
 
 static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
@@ -1084,7 +1084,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     DisplayMessage( p_vout, _("Aspect ratio: %s"),
                                     text_list[i] );
 
-                    var_FreeList( val_list, text_list );
+                    var_FreeStringList( val_list, text_list );
                 }
                 free( val.psz_string );
             }
@@ -1117,7 +1117,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                    val_list.p_values[i].psz_string );
                     DisplayMessage( p_vout, _("Crop: %s"), text_list[i] );
 
-                    var_FreeList( val_list, text_list );
+                    var_FreeStringList( val_list, text_list );
                 }
                 free( val.psz_string );
             }
@@ -1271,7 +1271,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                   val_list.p_values[i].f_float );
                     DisplayMessage( p_vout, _("Zoom mode: %s"), text_list[i] );
 
-                    var_FreeList( val_list, text_list );
+                    var_FreeStringList( val_list, text_list );
                 }
             }
             break;
@@ -1308,7 +1308,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                         DisplayMessage( p_vout, "%s (%s)", _("Deinterlace on"),
                                         psz_text ? psz_text : psz_mode );
 
-                        var_FreeList( vlist, tlist );
+                        var_FreeStringList( vlist, tlist );
                     }
                     free( psz_mode );
                 }
@@ -1351,7 +1351,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                                       psz_text ? psz_text : psz_mode );
                     }
 
-                    var_FreeList( vlist, tlist );
+                    var_FreeStringList( vlist, tlist );
                 }
                 free( psz_mode );
             }
