@@ -169,6 +169,11 @@ libvlc_media_discoverer_new( libvlc_instance_t * p_inst, const char * psz_name )
     return p_mdis;
 }
 
+static const struct services_discovery_callbacks sd_cbs = {
+    .item_added = services_discovery_item_added,
+    .item_removed = services_discovery_item_removed,
+};
+
 /**************************************************************************
  *       start (Public)
  **************************************************************************/
@@ -176,9 +181,8 @@ LIBVLC_API int
 libvlc_media_discoverer_start( libvlc_media_discoverer_t * p_mdis )
 {
     struct services_discovery_owner_t owner = {
+        &sd_cbs,
         p_mdis,
-        services_discovery_item_added,
-        services_discovery_item_removed,
     };
 
     /* Here we go */

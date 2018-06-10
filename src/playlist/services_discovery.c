@@ -110,6 +110,11 @@ static void playlist_sd_item_removed(services_discovery_t *sd,
     playlist_Unlock(playlist);
 }
 
+static const struct services_discovery_callbacks playlist_sd_cbs = {
+    .item_added = playlist_sd_item_added,
+    .item_removed = playlist_sd_item_removed,
+};
+
 int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
 {
     vlc_sd_internal_t *sds = malloc(sizeof (*sds) + strlen(chain) + 1);
@@ -119,9 +124,8 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
     sds->node = NULL;
 
     struct services_discovery_owner_t owner = {
+        &playlist_sd_cbs,
         sds,
-        playlist_sd_item_added,
-        playlist_sd_item_removed,
     };
 
     /* Perform the addition */
