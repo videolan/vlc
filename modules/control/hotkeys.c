@@ -638,13 +638,14 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 if( count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
-                    var_FreeList( &list, NULL );
-                    break;
                 }
-                p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
-                DisplayMessage( p_vout,
-                                _("Sub sync: bookmarked subtitle time"));
-                var_FreeList( &list, NULL );
+                else
+                {
+                    p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
+                    DisplayMessage(p_vout,
+                                   _("Sub sync: bookmarked subtitle time"));
+                }
+                free(list.p_values);
             }
             break;
         case ACTIONID_SUBSYNC_APPLY:
@@ -708,7 +709,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 if( count < 1 || val.i_int < 0 )
                 {
                     DisplayMessage( p_vout, _("No active subtitle") );
-                    var_FreeList( &list, NULL );
+                    free(list.p_values);
                     break;
                 }
                 int64_t i_delay = var_GetInteger( p_input, "spu-delay" ) + diff;
@@ -717,7 +718,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 ClearChannels( p_vout, slider_chan );
                 DisplayMessage( p_vout, _( "Subtitle delay %i ms" ),
                                 (int)(i_delay/1000) );
-                var_FreeList( &list, NULL );
+                free(list.p_values);
             }
             break;
         }
@@ -1356,7 +1357,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 {
                     DisplayMessage( p_vout,
                                     _("Subtitle position: no active subtitle") );
-                    var_FreeList( &list, NULL );
+                    free(list.p_values);
                     break;
                 }
 
@@ -1368,7 +1369,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
 
                 ClearChannels( p_vout, slider_chan );
                 DisplayMessage( p_vout, _( "Subtitle position %d px" ), i_pos );
-                var_FreeList( &list, NULL );
+                free(list.p_values);
             }
             break;
         }

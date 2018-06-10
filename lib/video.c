@@ -375,7 +375,7 @@ int libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu )
     libvlc_printerr( "Track identifier not found" );
 end:
     vlc_object_release (p_input_thread);
-    var_FreeList (&list, NULL);
+    free(list.p_values);
     return i_ret;
 }
 
@@ -462,7 +462,7 @@ static void teletext_enable( input_thread_t *p_input_thread, bool b_enable )
                 var_SetInteger( p_input_thread, "spu-es",
                                 list.p_values[0].i_int );
 
-            var_FreeList( &list, NULL );
+            free(list.p_values);
         }
     }
     else
@@ -592,7 +592,7 @@ int libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track )
     }
     libvlc_printerr( "Track identifier not found" );
 end:
-    var_FreeList( &val_list, NULL );
+    free(val_list.p_values);
     vlc_object_release( p_input_thread );
     return i_ret;
 }

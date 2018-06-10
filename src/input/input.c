@@ -3295,7 +3295,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
     }
-    var_FreeList( &list, NULL );
+    free(list.p_values);
 
     return VLC_SUCCESS;
 }

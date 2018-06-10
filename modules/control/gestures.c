@@ -305,7 +305,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es",
                                 list.p_values[i].i_int );
             }
-            var_FreeList( &list, NULL );
+            free(list.p_values);
             vlc_object_release( p_input );
             break;
         }
@@ -344,7 +344,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
                 var_SetInteger( p_input, "audio-es",
                                 list.p_values[i].i_int );
             }
-            var_FreeList( &list, NULL );
+            free(list.p_values);
             vlc_object_release( p_input );
             break;
         }

@@ -482,7 +482,7 @@ static void aout_PrepareStereoMode (audio_output_t *aout,
             if (vals.p_values[i].i_int == i_output_mode)
                 mode_available = true;
         }
-        var_FreeList(&vals, NULL);
+        free(vals.p_values);
     }
     if (!mode_available)
         i_output_mode = i_default_mode;

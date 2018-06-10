@@ -402,7 +402,7 @@ int libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track )
     }
     libvlc_printerr( "Track identifier not found" );
 end:
-    var_FreeList( &val_list, NULL );
+    free( val_list.p_values );
     vlc_object_release( p_input_thread );
     return i_ret;
 }
