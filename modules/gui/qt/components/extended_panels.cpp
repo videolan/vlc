@@ -672,14 +672,17 @@ void ExtV4l2::Refresh( void )
 
         for( size_t i = 0; i < count; i++ )
         {
-            char *vartext;
-            const char *psz_var = text[i];
+            char *vartext, *psz_var = text[i];
+            QString name;
 
-            if( var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
-                continue;
+            if( !var_Change( p_obj, psz_var, VLC_VAR_GETTEXT, &vartext ) )
+            {
+                name = qtr(vartext);
+                free(vartext);
+            }
+            else
+                name = qfu(psz_var);
 
-            QString name = qtr( vartext );
-            free( vartext );
             msg_Dbg( p_intf, "v4l2 control \"%" PRIx64 "\": %s (%s)",
                      val.p_values[i].i_int, psz_var, qtu( name ) );
 
@@ -709,8 +712,10 @@ void ExtV4l2::Refresh( void )
                                        qlonglong( val2.p_values[j].i_int) );
                             if( i_val == val2.p_values[j].i_int )
                                 combobox->setCurrentIndex( j );
+                            free(text2[j]);
                         }
-                        var_FreeList( &val2, &text2 );
+                        free(text2);
+                        free(val2.p_values);
 
                         CONNECT( combobox, currentIndexChanged( int ), this,
                                  ValueChange( int ) );
@@ -774,8 +779,10 @@ void ExtV4l2::Refresh( void )
                     msg_Warn( p_intf, "Unhandled var type for %s", psz_var );
                     break;
             }
+            free(psz_var);
         }
-        var_FreeList( &val, &text );
+        free(text);
+        free(val.p_values);
         vlc_object_release( p_obj );
     }
     else

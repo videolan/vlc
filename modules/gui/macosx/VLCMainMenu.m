@@ -1527,6 +1527,8 @@
                 if (!strcmp(val.psz_string, val_list.p_values[i].psz_string) && !(i_type & VLC_VAR_ISCOMMAND))
                     [lmi setState: TRUE ];
 
+                free(text_list[i]);
+                free(val_list.p_values[i].psz_string);
                 break;
 
             case VLC_VAR_INTEGER:
@@ -1542,6 +1544,8 @@
 
                 if (val_list.p_values[i].i_int == val.i_int && !(i_type & VLC_VAR_ISCOMMAND))
                     [lmi setState: TRUE ];
+
+                free(text_list[i]);
                 break;
 
             default:
@@ -1551,7 +1555,8 @@
 
     /* clean up everything */
     if ((i_type & VLC_VAR_TYPE) == VLC_VAR_STRING) free(val.psz_string);
-    var_FreeList(&val_list, &text_list);
+    free(text);
+    free(val_list.p_values);
 }
 
 - (void)toggleVar:(id)sender

@@ -1426,6 +1426,7 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
                         val.psz_string && !strcmp( val.psz_string, CURVAL.psz_string ) );
 
                 free( val.psz_string );
+                free(CURVAL.psz_string);
                 break;
 
             case VLC_VAR_INTEGER:
@@ -1450,11 +1451,13 @@ int VLCMenuBar::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
             default:
                 break;
         }
+        free(CURTEXT);
     }
     currentGroup = NULL;
 
     /* clean up everything */
-    var_FreeList( &val_list, &text_list );
+    free(text_list);
+    free(val_list.p_values);
 
 #undef RADIO_OR_COMMAND
 #undef CURVAL

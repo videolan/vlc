@@ -1138,14 +1138,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             msg_rc( "+----[ %s ]", name );
             for ( size_t i = 0; i < count; i++ )
             {
-                if ( i_value == val.p_values[i].i_int )
-                    msg_rc( "| %"PRId64" - %s *", val.p_values[i].i_int,
-                            text[i] );
-                else
-                    msg_rc( "| %"PRId64" - %s", val.p_values[i].i_int,
-                            text[i] );
+                msg_rc( "| %"PRId64" - %s%s", val.p_values[i].i_int, text[i],
+                        (i_value == val.p_values[i].i_int) ? " *" : "" );
+                free(text[i]);
             }
-            var_FreeList( &val, &text );
+            free(text);
+            free(val.p_values);
             msg_rc( "+----[ end of %s ]", name );
         }
         free( name );
@@ -1593,25 +1591,25 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         {
             for ( size_t i = 0; i < count; i++ )
             {
-                if ( f_value == val.p_values[i].f_float )
-                    msg_rc( "| %f - %s *", val.p_values[i].f_float, text[i] );
-                else
-                    msg_rc( "| %f - %s", val.p_values[i].f_float, text[i] );
+                msg_rc( "| %f - %s%s", val.p_values[i].f_float, text[i],
+                        f_value == val.p_values[i].f_float ? " *" : "" );
+                free(text[i]);
             }
         }
         else
         {
             for ( size_t i = 0; i < count; i++ )
             {
-                if ( !strcmp( psz_value, val.p_values[i].psz_string ) )
-                    msg_rc( "| %s - %s *", val.p_values[i].psz_string,
-                            text[i] );
-                else
-                    msg_rc( "| %s - %s", val.p_values[i].psz_string, text[i] );
+                msg_rc( "| %s - %s%s", val.p_values[i].psz_string, text[i],
+                       strcmp(psz_value, val.p_values[i].psz_string)
+                           ? "" : " *" );
+                free(text[i]);
+                free(val.p_values[i].psz_string);
             }
             free( psz_value );
         }
-        var_FreeList( &val, &text );
+        free(text);
+        free(val.p_values);
         msg_rc( "+----[ end of %s ]", name );
 
         free( name );
@@ -1692,12 +1690,12 @@ static int AudioChannel( vlc_object_t *obj, char const *cmd,
         msg_rc( "+----[ %s ]", cmd );
         for ( size_t i = 0; i < count; i++ )
         {
-            if ( i_value == val.p_values[i].i_int )
-                msg_rc( "| %"PRId64" - %s *", val.p_values[i].i_int, text[i] );
-            else
-                msg_rc( "| %"PRId64" - %s", val.p_values[i].i_int, text[i] );
+            msg_rc( "| %"PRId64" - %s%s", val.p_values[i].i_int, text[i],
+                    i_value == val.p_values[i].i_int ? " *" : "" );
+            free(text[i]);
         }
-        var_FreeList( &val, &text );
+        free(text);
+        free(val.p_values);
         msg_rc( "+----[ end of %s ]", cmd );
     }
     else

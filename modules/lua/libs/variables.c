@@ -238,6 +238,8 @@ static int vlclua_var_get_list( lua_State *L )
         if( !vlclua_pushvalue( L, val.i_type, val.p_values[i] ) )
              lua_pushnil( L );
         lua_settable( L, -3 );
+        if( (val.i_type & VLC_VAR_CLASS) == VLC_VAR_STRING )
+            free(val.p_values[i].psz_string);
     }
 
     lua_createtable( L, count, 0 );
@@ -246,9 +248,11 @@ static int vlclua_var_get_list( lua_State *L )
         lua_pushinteger( L, i + 1 );
         lua_pushstring( L, text[i] );
         lua_settable( L, -3 );
+        free(text[i]);
     }
 
-    var_FreeList( &val, &text );
+    free(text);
+    free(val.p_values);
     return 2;
 }
 

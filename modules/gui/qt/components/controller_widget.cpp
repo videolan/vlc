@@ -285,10 +285,15 @@ void AspectRatioComboBox::updateRatios()
     var_Change( p_vout, "aspect-ratio", VLC_VAR_GETCHOICES,
                 &count, &val_list, &text_list );
     for( size_t i = 0; i < count; i++ )
+    {
         addItem( qfu( text_list[i] ),
                  QString( val_list.p_values[i].psz_string ) );
+        free(text_list[i]);
+        free(val_list.p_values[i].psz_string);
+    }
     setEnabled( true );
-    var_FreeList( &val_list, &text_list );
+    free(text_list);
+    free(val_list.p_values);
     vlc_object_release( p_vout );
 }
 
