@@ -512,6 +512,7 @@ check_PROGRAMS = \
 	test_dictionary \
 	test_i18n_atof \
 	test_interrupt \
+	test_list \
 	test_md5 \
 	test_picture_pool \
 	test_sort \
@@ -532,6 +533,7 @@ test_dictionary_SOURCES = test/dictionary.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_interrupt_SOURCES = test/interrupt.c
 test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore) $(LIBPTHREAD)
+test_list_SOURCES = test/list.c
 test_md5_SOURCES = test/md5.c
 test_picture_pool_SOURCES = test/picture_pool.c
 test_sort_SOURCES = test/sort.c
