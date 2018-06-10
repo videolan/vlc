@@ -525,8 +525,9 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
     if (unlikely(p_filter == NULL))
         return NULL;
 
+    static const struct filter_video_callbacks cbs = { NewBuffer };
     p_filter->b_allow_fmt_out_change = false;
-    p_filter->owner.video.buffer_new = NewBuffer;
+    p_filter->owner.video = &cbs;
     p_filter->owner.sys = p_this;
 
     es_format_InitFromVideo( &p_filter->fmt_in,  &p_fmt_in->video );
