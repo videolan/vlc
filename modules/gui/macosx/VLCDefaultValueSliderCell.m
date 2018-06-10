@@ -66,7 +66,7 @@
 
 - (void)setDefaultValue:(double)value
 {
-    if (value > _maxValue || value < _minValue)
+    if (value > self.maxValue || value < self.minValue)
         value = DBL_MAX;
 
     if (_defaultValue == DBL_MAX && value != DBL_MAX) {
@@ -127,18 +127,19 @@
 - (NSRect)knobRectFlipped:(BOOL)flipped forValue:(double)doubleValue
  {
      NSRect resultRect;
+     NSRect trackRect = self.trackRect;
      double val = [self normalizedValue:doubleValue] / 100;
 
      if (self.isVertical) {
          resultRect.origin.x = -1;
-         resultRect.origin.y = (NSHeight(_trackRect) - self.knobThickness) * val;
+         resultRect.origin.y = (NSHeight(trackRect) - self.knobThickness) * val;
          if (_isRTL)
-             resultRect.origin.y = (NSHeight(_trackRect) - self.knobThickness) - resultRect.origin.y;
+             resultRect.origin.y = (NSHeight(trackRect) - self.knobThickness) - resultRect.origin.y;
      } else {
-         resultRect.origin.x = (NSWidth(_trackRect) - self.knobThickness) * val;
+         resultRect.origin.x = (NSWidth(trackRect) - self.knobThickness) * val;
          resultRect.origin.y = -1;
          if (_isRTL)
-             resultRect.origin.x = (NSWidth(_trackRect) - self.knobThickness) - resultRect.origin.x;
+             resultRect.origin.x = (NSWidth(trackRect) - self.knobThickness) - resultRect.origin.x;
      }
 
      resultRect.size.height = self.knobThickness;
@@ -227,7 +228,7 @@
     BOOL sliderMovingForward = (oldValue > newValue) ? NO : YES;
 
     // Claculate snap-threshhold
-    double thresh = 100 * (self.knobThickness/3) / _trackRect.size.width;
+    double thresh = 100 * (self.knobThickness/3) / self.trackRect.size.width;
 
     // Snap to default value
     if (_snapsToDefault && ABS(newValue - _normalizedDefaultValue) < thresh) {
