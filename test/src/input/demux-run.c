@@ -53,6 +53,9 @@ struct test_es_out_t
 {
     struct es_out_t out;
     struct es_out_id_t *ids;
+#ifdef HAVE_DECODERS
+    vlc_object_t *parent;
+#endif
 };
 
 struct es_out_id_t
@@ -79,7 +82,7 @@ static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
     ctx->ids = id;
 #ifdef HAVE_DECODERS
     es_format_Copy(&id->fmt, fmt);
-    id->decoder = test_decoder_create((void *)out->p_sys, &id->fmt);
+    id->decoder = test_decoder_create(ctx->parent, &id->fmt);
     if (id->decoder == NULL)
         es_format_Clean(&id->fmt);
 #endif
@@ -88,10 +91,8 @@ static es_out_id_t *EsOutAdd(es_out_t *out, const es_format_t *fmt)
     return id;
 }
 
-static void EsOutCheckId(es_out_t *out, es_out_id_t *id)
+static void EsOutCheckId(struct test_es_out_t *ctx, es_out_id_t *id)
 {
-    struct test_es_out_t *ctx = (struct test_es_out_t *) out;
-
     for (es_out_id_t *ids = ctx->ids; ids != NULL; ids = ids->next)
         if (ids == id)
             return;
@@ -101,8 +102,10 @@ static void EsOutCheckId(es_out_t *out, es_out_id_t *id)
 
 static int EsOutSend(es_out_t *out, es_out_id_t *id, block_t *block)
 {
+    struct test_es_out_t *ctx = (struct test_es_out_t *) out;
+
     //debug("[%p] Sent    ES: %zu\n", (void *)idd, block->i_buffer);
-    EsOutCheckId(out, id);
+    EsOutCheckId(ctx, id);
 #ifdef HAVE_DECODERS
     if (id->decoder)
         test_decoder_process(id->decoder, block);
@@ -145,6 +148,8 @@ static void EsOutDelete(es_out_t *out, es_out_id_t *id)
 
 static int EsOutControl(es_out_t *out, int query, va_list args)
 {
+    struct test_es_out_t *ctx = (struct test_es_out_t *) out;
+
     switch (query)
     {
         case ES_OUT_SET_ES:
@@ -153,9 +158,9 @@ static int EsOutControl(es_out_t *out, int query, va_list args)
         {
 #ifdef HAVE_DECODERS
             es_out_id_t* id = va_arg(args, es_out_id_t*);
-            EsOutCheckId(out, id);
+            EsOutCheckId(ctx, id);
             test_decoder_destroy(id->decoder);
-            test_decoder_create((void*)out->p_sys, &id->fmt);
+            test_decoder_create(ctx->parent, &id->fmt);
 #endif
             break;
         }
@@ -163,7 +168,7 @@ static int EsOutControl(es_out_t *out, int query, va_list args)
         case ES_OUT_SET_ES_STATE:
             break;
         case ES_OUT_GET_ES_STATE:
-            EsOutCheckId(out, va_arg(args, es_out_id_t *));
+            EsOutCheckId(ctx, va_arg(args, es_out_id_t *));
             *va_arg(args, bool *) = true;
             break;
         case ES_OUT_SET_ES_CAT_POLICY:
@@ -228,8 +233,9 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
 
     es_out_t *out = &ctx->out;
     out->cbs = &es_out_cbs;
-    out->p_sys = (void *)parent;
-
+#ifdef HAVE_DECODERS
+    ctx->parent = parent;
+#endif
     return out;
 }
 
