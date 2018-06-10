@@ -157,39 +157,4 @@
     return nil;
 }
 
-- (NSRect)constrainFrameRect:(NSRect)frameRect toScreen:(NSScreen *)screen
-{
-    if (!screen)
-        screen = [self screen];
-    NSRect screenRect = [screen frame];
-    NSRect constrainedRect = [super constrainFrameRect:frameRect toScreen:screen];
-
-    /*
-     * Ugly workaround!
-     * With Mavericks, there is a nasty bug resulting in grey bars on top in fullscreen mode.
-     * It looks like this is enforced by the os because the window is in the way for the menu bar.
-     *
-     * According to the documentation, this constraining can be changed by overwriting this
-     * method. But in this situation, even the received frameRect is already contrained with the
-     * menu bars height substracted. This case is detected here, and the full height is
-     * enforced again.
-     *
-     * See #9469 and radar://15583566
-     */
-
-    BOOL b_inFullscreen = [self fullscreen] || ([self respondsToSelector:@selector(inFullscreenTransition)] && [(VLCVideoWindowCommon *)self inFullscreenTransition]);
-
-    if ((OSX_MAVERICKS_AND_HIGHER && !OSX_YOSEMITE_AND_HIGHER) &&
-        b_inFullscreen &&
-        constrainedRect.size.width == screenRect.size.width &&
-        constrainedRect.size.height != screenRect.size.height &&
-        fabs(screenRect.size.height - constrainedRect.size.height) <= 25.) {
-        msg_Dbg(getIntf(), "Contrain window height %.1f to screen height %.1f",
-                constrainedRect.size.height, screenRect.size.height);
-        constrainedRect.size.height = screenRect.size.height;
-    }
-
-    return constrainedRect;
-}
-
 @end
