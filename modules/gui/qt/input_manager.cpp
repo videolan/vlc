@@ -867,21 +867,18 @@ void InputManager::activateTeletext( bool b_enable )
                                    &count, &list, &text ) )
     {
         if( count > 0 )
-        {
-            /* Prefer the page 100 if it is present */
-            size_t i;
-            for( i = 0; i < count; i++ )
-            {
-                /* The description is the page number as a string */
-                const char *psz_page = text[i];
-                if( psz_page && !strcmp( psz_page, "100" ) )
-                    break;
+        {   /* Prefer the page 100 if it is present */
+            int id = list.p_values[0].i_int;
+            for( size_t i = 0; i < count; i++ )
+            {   /* The description is the page number as a string */
+                if( text[i] != NULL && !strcmp( text[i], "100" ) )
+                    id = list.p_values[i].i_int;
+                free(text[i]);
             }
-            if( i >= count )
-                i = 0;
-            var_SetInteger( p_input, "spu-es", b_enable ? list.p_values[i].i_int : -1 );
+            var_SetInteger( p_input, "spu-es", b_enable ? id : -1 );
         }
-        var_FreeList( &list, &text );
+        free(text);
+        free(list.p_values);
     }
 }
 
