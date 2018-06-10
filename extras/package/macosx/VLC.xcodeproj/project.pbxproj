@@ -412,6 +412,7 @@
 		7DB40D2920CBCEB500F63173 /* VLCMainMenu.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCMainMenu.m; sourceTree = "<group>"; };
 		7DB40D2B20CBCEC200F63173 /* VLCStatusBarIcon.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCStatusBarIcon.m; sourceTree = "<group>"; };
 		7DB40D2C20CBCEC200F63173 /* VLCStatusBarIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCStatusBarIcon.h; sourceTree = "<group>"; };
+		7DB5D7E820CD851F00326DFE /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ../../../../build/share/macosx/Info.plist; sourceTree = "<group>"; };
 		7DB65D5218ABD6380053B874 /* VLCAddonsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAddonsWindowController.h; sourceTree = "<group>"; };
 		7DB65D5318ABD6380053B874 /* VLCAddonsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAddonsWindowController.m; sourceTree = "<group>"; };
 		7DB7F1EB20CC036D00C2CAED /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
@@ -584,6 +585,7 @@
 				6B822A031E4D2DEB00833BE1 /* README */,
 				6B8229FF1E4D2DD100833BE1 /* vlc.scriptSuite */,
 				6B822A001E4D2DD100833BE1 /* vlc.scriptTerminology */,
+				7DB5D7E820CD851F00326DFE /* Info.plist */,
 			);
 			name = Resources;
 			path = ../../../modules/gui/macosx/Resources;
@@ -1653,8 +1655,7 @@
 					../../../build/,
 					../../../modules/codec/,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				INFOPLIST_FILE = "$(SRCROOT)/../../../build/share/macosx/Info.plist";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"-lvlccore",
@@ -1689,8 +1690,7 @@
 					../../../build/,
 					../../../modules/codec/,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				INFOPLIST_FILE = "$(SRCROOT)/../../../build/share/macosx/Info.plist";
 				OTHER_LDFLAGS = (
 					"-lvlccore",
 					"-framework",
@@ -1724,8 +1724,7 @@
 					../../../build/,
 					../../../modules/codec/,
 				);
-				LD_RUNPATH_SEARCH_PATHS = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				INFOPLIST_FILE = "$(SRCROOT)/../../../build/share/macosx/Info.plist";
 				OTHER_LDFLAGS = (
 					"-lvlccore",
 					"-framework",
