@@ -206,6 +206,15 @@ static void EsOutDestroy(es_out_t *out)
     free(ctx);
 }
 
+static const struct es_out_callbacks es_out_cbs =
+{
+    .add = EsOutAdd,
+    .send = EsOutSend,
+    .del = EsOutDelete,
+    .control = EsOutControl,
+    .destroy = EsOutDestroy,
+};
+
 static es_out_t *test_es_out_create(vlc_object_t *parent)
 {
     struct test_es_out_t *ctx = malloc(sizeof (*ctx));
@@ -218,11 +227,7 @@ static es_out_t *test_es_out_create(vlc_object_t *parent)
     ctx->ids = NULL;
 
     es_out_t *out = &ctx->out;
-    out->pf_add = EsOutAdd;
-    out->pf_send = EsOutSend;
-    out->pf_del = EsOutDelete;
-    out->pf_control = EsOutControl;
-    out->pf_destroy = EsOutDestroy;
+    out->cbs = &es_out_cbs;
     out->p_sys = (void *)parent;
 
     return out;

@@ -177,11 +177,7 @@ typedef struct
     int         i_prev_stream_level;
 } es_out_sys_t;
 
-static es_out_id_t *EsOutAdd    ( es_out_t *, const es_format_t * );
-static int          EsOutSend   ( es_out_t *, es_out_id_t *, block_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
-static int          EsOutControl( es_out_t *, int i_query, va_list );
-static void         EsOutDelete ( es_out_t * );
 
 static void         EsOutTerminate( es_out_t * );
 static void         EsOutSelect( es_out_t *, es_out_id_t *es, bool b_force );
@@ -282,6 +278,8 @@ static void EsOutPropsInit( es_out_es_props_t *p_props,
     }
 }
 
+static const struct es_out_callbacks es_out_cbs;
+
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
@@ -298,11 +296,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
         return NULL;
     }
 
-    out->pf_add     = EsOutAdd;
-    out->pf_send    = EsOutSend;
-    out->pf_del     = EsOutDel;
-    out->pf_control = EsOutControl;
-    out->pf_destroy = EsOutDelete;
+    out->cbs = &es_out_cbs;
     out->p_sys      = p_sys;
 
     vlc_mutex_init_recursive( &p_sys->lock );
@@ -2906,6 +2900,15 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
 
     return i_ret;
 }
+
+static const struct es_out_callbacks es_out_cbs =
+{
+    .add = EsOutAdd,
+    .send = EsOutSend,
+    .del = EsOutDel,
+    .control = EsOutControl,
+    .destroy = EsOutDelete,
+};
 
 /****************************************************************************
  * LanguageGetName: try to expend iso639 into plain name

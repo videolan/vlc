@@ -1106,17 +1106,21 @@ static void esOutDestroy(es_out_t *p_out)
     free(p_out);
 }
 
+static const struct es_out_callbacks esOutCallbacks = {
+    .add = esOutAdd,
+    .send = esOutSend,
+    .del = esOutDel,
+    .control = esOutControl,
+    .destroy = esOutDestroy,
+};
+
 static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
 {
     es_out_t    *p_out = malloc(sizeof(*p_out));
     if (unlikely(p_out == NULL))
         return NULL;
 
-    p_out->pf_add       = esOutAdd;
-    p_out->pf_control   = esOutControl;
-    p_out->pf_del       = esOutDel;
-    p_out->pf_destroy   = esOutDestroy;
-    p_out->pf_send      = esOutSend;
+    p_out->cbs = &esOutCallbacks;
 
     es_out_sys_t *es_out_sys = malloc(sizeof(*es_out_sys));
     if (unlikely(es_out_sys == NULL)) {

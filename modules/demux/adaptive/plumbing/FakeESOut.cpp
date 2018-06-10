@@ -31,6 +31,15 @@
 
 using namespace adaptive;
 
+static const struct es_out_callbacks esOutCallbacks =
+{
+    FakeESOut::esOutAdd_Callback,
+    FakeESOut::esOutSend_Callback,
+    FakeESOut::esOutDel_Callback,
+    FakeESOut::esOutControl_Callback,
+    FakeESOut::esOutDestroy_Callback,
+};
+
 FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     : real_es_out( es )
     , extrainfo( NULL )
@@ -40,11 +49,7 @@ FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     , timestamps_expected( 0 )
     , timestamps_check_done( false )
 {
-    fakeesout->pf_add = esOutAdd_Callback;
-    fakeesout->pf_control = esOutControl_Callback;
-    fakeesout->pf_del = esOutDel_Callback;
-    fakeesout->pf_destroy = esOutDestroy_Callback;
-    fakeesout->pf_send = esOutSend_Callback;
+    fakeesout->cbs = &esOutCallbacks;
     fakeesout->p_sys = this;
 
     vlc_mutex_init(&lock);

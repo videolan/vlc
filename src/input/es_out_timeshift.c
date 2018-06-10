@@ -247,11 +247,7 @@ typedef struct
     es_out_id_t    **pp_es;
 } es_out_sys_t;
 
-static es_out_id_t *Add    ( es_out_t *, const es_format_t * );
-static int          Send   ( es_out_t *, es_out_id_t *, block_t * );
 static void         Del    ( es_out_t *, es_out_id_t * );
-static int          Control( es_out_t *, int i_query, va_list );
-static void         Destroy( es_out_t * );
 
 static int          TsStart( es_out_t * );
 static void         TsAutoStop( es_out_t * );
@@ -296,6 +292,8 @@ static int  CmdExecuteControl( es_out_t *, ts_cmd_t * );
 /* File helpers */
 static int GetTmpFile( char **ppsz_file, const char *psz_path );
 
+static const struct es_out_callbacks es_out_timeshift_cbs;
+
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
  *****************************************************************************/
@@ -312,12 +310,7 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
         return NULL;
     }
 
-    /* */
-    p_out->pf_add     = Add;
-    p_out->pf_send    = Send;
-    p_out->pf_del     = Del;
-    p_out->pf_control = Control;
-    p_out->pf_destroy = Destroy;
+    p_out->cbs = &es_out_timeshift_cbs;
     p_out->p_sys      = p_sys;
 
     /* */
@@ -750,6 +743,15 @@ static int Control( es_out_t *p_out, int i_query, va_list args )
 
     return i_ret;
 }
+
+static const struct es_out_callbacks es_out_timeshift_cbs =
+{
+    .add = Add,
+    .send = Send,
+    .del = Del,
+    .control = Control,
+    .destroy = Destroy,
+};
 
 /*****************************************************************************
  *
