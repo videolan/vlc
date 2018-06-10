@@ -560,7 +560,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     FREENULL(psz_album);
 
     char *psz_track_number = input_item_GetTrackNumber(p_input_item);
-    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = toNSStr(psz_track_number);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyAlbumTrackNumber] = @([toNSStr(psz_track_number) intValue]);
     FREENULL(psz_track_number);
 
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = currentlyPlayingTrackInfo;
