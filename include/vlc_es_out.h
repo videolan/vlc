@@ -120,7 +120,6 @@ struct es_out_callbacks
 struct es_out_t
 {
     const struct es_out_callbacks *cbs;
-    void        *p_sys;
 };
 
 VLC_USED

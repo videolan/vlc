@@ -40,24 +40,30 @@ static const struct es_out_callbacks esOutCallbacks =
     FakeESOut::esOutDestroy_Callback,
 };
 
+struct adaptive::es_out_fake
+{
+    FakeESOut *fake;
+    es_out_t es_out;
+};
+
 FakeESOut::FakeESOut( es_out_t *es, CommandsQueue *queue )
     : real_es_out( es )
     , extrainfo( NULL )
     , commandsqueue( queue )
-    , fakeesout( new es_out_t )
+    , fakeesout( new struct es_out_fake )
     , timestamps_offset( 0 )
     , timestamps_expected( 0 )
     , timestamps_check_done( false )
 {
-    fakeesout->cbs = &esOutCallbacks;
-    fakeesout->p_sys = this;
+    fakeesout->fake = this;
+    fakeesout->es_out.cbs = &esOutCallbacks;
 
     vlc_mutex_init(&lock);
 }
 
 es_out_t * FakeESOut::getEsOut()
 {
-    return fakeesout;
+    return &fakeesout->es_out;
 }
 
 FakeESOut::~FakeESOut()
@@ -289,7 +295,7 @@ void FakeESOut::recycle( FakeESOutID *id )
 /* Always pass Fake ES ID to slave demuxes, it is just an opaque struct to them */
 es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *p_fmt)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    FakeESOut *me = container_of(fakees, es_out_fake, es_out)->fake;
 
     if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
         return NULL;
@@ -331,7 +337,7 @@ void FakeESOut::checkTimestampsStart(mtime_t i_start)
 
 int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *p_block)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    FakeESOut *me = container_of(fakees, es_out_fake, es_out)->fake;
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     assert(!es_id->scheduledForDeletion());
 
@@ -355,7 +361,7 @@ int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *
 
 void FakeESOut::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    FakeESOut *me = container_of(fakees, es_out_fake, es_out)->fake;
     FakeESOutID *es_id = reinterpret_cast<FakeESOutID *>( p_es );
     AbstractCommand *command = me->commandsqueue->factory()->createEsOutDelCommand( es_id );
     if( likely(command) )
@@ -367,7 +373,7 @@ void FakeESOut::esOutDel_Callback(es_out_t *fakees, es_out_id_t *p_es)
 
 int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    FakeESOut *me = container_of(fakees, es_out_fake, es_out)->fake;
 
     switch( i_query )
     {
@@ -424,7 +430,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
 
 void FakeESOut::esOutDestroy_Callback(es_out_t *fakees)
 {
-    FakeESOut *me = (FakeESOut *) fakees->p_sys;
+    FakeESOut *me = container_of(fakees, es_out_fake, es_out)->fake;
     AbstractCommand *command = me->commandsqueue->factory()->createEsOutDestroyCommand();
     if( likely(command) )
         me->commandsqueue->Schedule( command );
