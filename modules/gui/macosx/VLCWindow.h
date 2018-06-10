@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Windows.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2012-2014 VLC authors and VideoLAN
+ * Copyright (C) 2012-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -45,48 +45,5 @@
 - (void)orderOut:(id)sender animate:(BOOL)animate;
 
 - (VLCVoutView *)videoView;
-
-@end
-
-
-static const float f_min_video_height = 70.0;
-
-@class VLCControlsBarCommon;
-
-/*****************************************************************************
- * VLCVideoWindowCommon
- *
- *  Common code for main window, detached window and extra video window
- *****************************************************************************/
-
-@interface VLCVideoWindowCommon : VLCWindow <NSWindowDelegate, NSAnimationDelegate>
-
-@property (weak) IBOutlet NSLayoutConstraint *videoViewBottomConstraint;
-
-@property (nonatomic, weak) IBOutlet VLCVoutView* videoView;
-@property (nonatomic, weak) IBOutlet VLCControlsBarCommon* controlsBar;
-@property (readonly) BOOL inFullscreenTransition;
-@property (readonly) BOOL windowShouldExitFullscreenWhenFinished;
-@property (readwrite, assign) NSRect previousSavedFrame;
-@property (nonatomic, readwrite, assign) NSSize nativeVideoSize;
-
-- (void)setWindowLevel:(NSInteger)i_state;
-- (void)resizeWindow;
-
-- (NSRect)getWindowRectForProposedVideoViewSize:(NSSize)size;
-
-- (void)setTitle:(NSString *)title;
-
-/* fullscreen handling */
-- (void)enterFullscreenWithAnimation:(BOOL)b_animation;
-- (void)leaveFullscreenWithAnimation:(BOOL)b_animation;
-
-/* lion fullscreen handling */
-- (void)hideControlsBar;
-- (void)showControlsBar;
-
-- (void)windowWillEnterFullScreen:(NSNotification *)notification;
-- (void)windowDidEnterFullScreen:(NSNotification *)notification;
-- (void)windowWillExitFullScreen:(NSNotification *)notification;
 
 @end

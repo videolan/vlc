@@ -30,7 +30,7 @@
 #import <vlc_input.h>
 #import <vlc_vout_window.h>
 
-#import "Windows.h"
+#import "VLCVideoWindowCommon.h"
 #import "misc.h"
 #import "VLCFSPanelController.h"
 

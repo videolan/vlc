@@ -552,6 +552,8 @@ modules/gui/macosx/VLCUIWidgets.h
 modules/gui/macosx/VLCUIWidgets.m
 modules/gui/macosx/VLCVideoEffectsWindowController.h
 modules/gui/macosx/VLCVideoEffectsWindowController.m
+modules/gui/macosx/VLCVideoWindowCommon.h
+modules/gui/macosx/VLCVideoWindowCommon.m
 modules/gui/macosx/VLCVolumeSlider.h
 modules/gui/macosx/VLCVolumeSlider.m
 modules/gui/macosx/VLCVolumeSliderCell.h
@@ -560,10 +562,10 @@ modules/gui/macosx/VLCVoutView.h
 modules/gui/macosx/VLCVoutView.m
 modules/gui/macosx/VLCVideoOutputProvider.h
 modules/gui/macosx/VLCVideoOutputProvider.m
+modules/gui/macosx/VLCWindow.h
+modules/gui/macosx/VLCWindow.m
 modules/gui/macosx/VLCWrappableTextField.h
 modules/gui/macosx/VLCWrappableTextField.m
-modules/gui/macosx/Windows.h
-modules/gui/macosx/Windows.m
 modules/gui/macosx/applescript.h
 modules/gui/macosx/applescript.m
 modules/gui/macosx/helpers.h
