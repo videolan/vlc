@@ -731,7 +731,7 @@ char *input_item_GetInfo( input_item_t *p_i,
     const info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
     if( p_cat )
     {
-        info_t *p_info = info_category_FindInfo( p_cat, NULL, psz_name );
+        info_t *p_info = info_category_FindInfo( p_cat, psz_name );
         if( p_info && p_info->psz_value )
         {
             char *psz_ret = strdup( p_info->psz_value );
@@ -847,9 +847,11 @@ void input_item_MergeInfos( input_item_t *p_item, info_category_t *p_cat )
     info_category_t *p_old = InputItemFindCat( p_item, NULL, p_cat->psz_name );
     if( p_old )
     {
-        for( int i = 0; i < p_cat->i_infos; i++ )
-            info_category_ReplaceInfo( p_old, p_cat->pp_infos[i] );
-        TAB_CLEAN( p_cat->i_infos, p_cat->pp_infos );
+        info_t *info;
+
+        info_foreach(info, &p_cat->infos)
+            info_category_ReplaceInfo( p_old, info );
+        vlc_list_init( &p_cat->infos );
         info_category_Delete( p_cat );
     }
     else

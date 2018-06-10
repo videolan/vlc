@@ -502,18 +502,19 @@ void InfoPanel::update( input_item_t *p_item)
 
     for( int i = 0; i< p_item->i_categories ; i++)
     {
+        struct vlc_list *const head = &p_item->pp_categories[i]->infos;
+
         current_item = new QTreeWidgetItem();
         current_item->setText( 0, qfu(p_item->pp_categories[i]->psz_name) );
         InfoTree->addTopLevelItem( current_item );
 
-        for( int j = 0 ; j < p_item->pp_categories[i]->i_infos ; j++ )
+        for (info_t *info = vlc_list_first_entry_or_null(head, info_t, node);
+             info != NULL;
+             info = vlc_list_next_entry_or_null(head, info, info_t, node))
         {
             child_item = new QTreeWidgetItem ();
-            child_item->setText( 0,
-                    qfu(p_item->pp_categories[i]->pp_infos[j]->psz_name)
-                    + ": "
-                    + qfu(p_item->pp_categories[i]->pp_infos[j]->psz_value));
-
+            child_item->setText( 0, qfu(info->psz_name) + ": "
+                                    + qfu(info->psz_value));
             current_item->addChild(child_item);
         }
         InfoTree->setItemExpanded( current_item, true);

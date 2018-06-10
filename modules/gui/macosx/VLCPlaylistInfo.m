@@ -297,6 +297,7 @@ FREENULL( psz_##foo );
 
         for (int i = 0; i < p_item->i_categories; i++) {
             info_category_t *cat = p_item->pp_categories[i];
+            info_t *info;
 
             VLCInfoTreeItem *subItem = [[VLCInfoTreeItem alloc] init];
             subItem.name = toNSStr(cat->psz_name);
@@ -304,10 +305,10 @@ FREENULL( psz_##foo );
             // Build list of codec details
             NSMutableArray *infos = [NSMutableArray array];
 
-            for (int j = 0; j < cat->i_infos; j++) {
+            info_foreach(info, &cat->infos) {
                 VLCInfoTreeItem *infoItem = [[VLCInfoTreeItem alloc] init];
-                infoItem.name = toNSStr(cat->pp_infos[j]->psz_name);
-                infoItem.value = toNSStr(cat->pp_infos[j]->psz_value);
+                infoItem.name = toNSStr(info->psz_name);
+                infoItem.value = toNSStr(info->psz_value);
                 [infos addObject:infoItem];
             }
 

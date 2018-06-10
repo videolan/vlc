@@ -33,6 +33,7 @@
 #include <vlc_meta.h>
 #include <vlc_epg.h>
 #include <vlc_events.h>
+#include <vlc_list.h>
 
 #include <string.h>
 
@@ -43,13 +44,15 @@ struct info_t
 {
     char *psz_name;            /**< Name of this info */
     char *psz_value;           /**< Value of the info */
+    struct vlc_list node;
 };
+
+#define info_foreach(info, cat) vlc_list_foreach(info, cat, node)
 
 struct info_category_t
 {
     char   *psz_name;      /**< Name of this category */
-    int    i_infos;        /**< Number of infos in the category */
-    struct info_t **pp_infos;     /**< Pointer to an array of infos */
+    struct vlc_list infos; /**< Infos in the category */
 };
 
 /**

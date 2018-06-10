@@ -659,21 +659,19 @@ static void *Run( void *data )
         {
             if( p_sys->p_input )
             {
-                int i, j;
+                int i;
                 vlc_mutex_lock( &input_GetItem(p_sys->p_input)->lock );
                 for ( i = 0; i < input_GetItem(p_sys->p_input)->i_categories; i++ )
                 {
                     info_category_t *p_category = input_GetItem(p_sys->p_input)
                                                         ->pp_categories[i];
+                    info_t *p_info;
 
                     msg_rc( "+----[ %s ]", p_category->psz_name );
                     msg_rc( "| " );
-                    for ( j = 0; j < p_category->i_infos; j++ )
-                    {
-                        info_t *p_info = p_category->pp_infos[j];
+                    info_foreach(p_info, &p_category->infos)
                         msg_rc( "| %s: %s", p_info->psz_name,
                                 p_info->psz_value );
-                    }
                     msg_rc( "| " );
                 }
                 msg_rc( "+----[ end of stream info ]" );
