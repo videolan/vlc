@@ -27,6 +27,8 @@
 
 #include "qt.hpp"
 
+#include "components/custom_menus.hpp"
+
 #include <QObject>
 #include <QMenu>
 #include <QVector>
@@ -94,8 +96,7 @@ public:
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
 
-    static QMenu *rendererMenu;
-    static QActionGroup *rendererGroup;
+    static RendererMenu *rendererMenu;
 
 private:
     /* All main Menus */
@@ -131,7 +132,6 @@ private:
     }
 
     static QMenu *HelpMenu( QWidget * );
-    static QMenu *RendererMenu(intf_thread_t *p_intf , QMenu *menu = NULL );
 
     /* Popups Menus */
     static void PopupMenuStaticEntries( QMenu *menu );

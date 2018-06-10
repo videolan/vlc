@@ -595,6 +595,8 @@ modules/gui/qt/components/controller.cpp
 modules/gui/qt/components/controller.hpp
 modules/gui/qt/components/controller_widget.cpp
 modules/gui/qt/components/controller_widget.hpp
+modules/gui/qt/components/custom_menus.cpp
+modules/gui/qt/components/custom_menus.hpp
 modules/gui/qt/components/epg/EPGChannels.cpp
 modules/gui/qt/components/epg/EPGChannels.hpp
 modules/gui/qt/components/epg/EPGItem.cpp

@@ -80,8 +80,7 @@ enum
 static QActionGroup *currentGroup;
 
 QMenu *VLCMenuBar::recentsMenu = NULL;
-QMenu *VLCMenuBar::rendererMenu = NULL;
-QActionGroup *VLCMenuBar::rendererGroup = NULL;
+RendererMenu *VLCMenuBar::rendererMenu = NULL;
 
 /**
  * @brief Add static entries to DP in menus
@@ -733,10 +732,10 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
 
     menu->addSeparator();
 
-    if ( !rendererMenu )
-        rendererMenu = RendererMenu( p_intf );
+    if ( !VLCMenuBar::rendererMenu )
+        VLCMenuBar::rendererMenu = new RendererMenu( menu, p_intf );
 
-    menu->addMenu( rendererMenu );
+    menu->addMenu( VLCMenuBar::rendererMenu );
     menu->addSeparator();
 
 
@@ -1629,34 +1628,4 @@ void VLCMenuBar::updateRecents( intf_thread_t *p_intf )
             recentsMenu->setEnabled( true );
         }
     }
-}
-
-QMenu *VLCMenuBar::RendererMenu(intf_thread_t *p_intf, QMenu *menu )
-{
-    QMenu *submenu = new QMenu( qtr("&Renderer"), menu );
-
-    rendererGroup = new QActionGroup(submenu);
-
-    QAction *action = new QAction( qtr("<Local>"), submenu );
-    action->setCheckable(true);
-    submenu->addAction( action );
-    rendererGroup->addAction(action);
-
-    char *psz_renderer = var_InheritString( THEPL, "sout" );
-    if ( psz_renderer == NULL )
-        action->setChecked( true );
-    else
-        free( psz_renderer );
-
-    submenu->addSeparator();
-
-    action = new QAction( qtr("Scanning..."), submenu );
-    action->setEnabled( false );
-    submenu->addAction( action );
-
-    CONNECT( submenu, aboutToShow(), ActionsManager::getInstance( p_intf ), StartRendererScan() );
-    CONNECT( submenu, aboutToHide(), ActionsManager::getInstance( p_intf ), RendererMenuCountdown() );
-    CONNECT( rendererGroup, triggered(QAction*), ActionsManager::getInstance( p_intf ), RendererSelected( QAction* ) );
-
-    return submenu;
 }

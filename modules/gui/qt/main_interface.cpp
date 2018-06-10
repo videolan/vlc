@@ -32,6 +32,7 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"                    // Creation
 #include "actions_manager.hpp"                  // killInstance
+#include "managers/renderer_manager.hpp"
 
 #include "util/customwidgets.hpp"               // qtEventToVLCKey, QVLCStackedWidget
 #include "util/qt_dirs.hpp"                     // toNativeSeparators
@@ -279,6 +280,8 @@ MainInterface::~MainInterface()
 
     /* Delete the FSC controller */
     delete fullscreenControls;
+
+    RendererManager::killInstance();
 
     /* Save states */
 

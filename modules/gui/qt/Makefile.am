@@ -48,6 +48,7 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/actions_manager.cpp gui/qt/actions_manager.hpp \
 	gui/qt/extensions_manager.cpp gui/qt/extensions_manager.hpp \
 	gui/qt/managers/addons_manager.cpp gui/qt/managers/addons_manager.hpp \
+	gui/qt/managers/renderer_manager.cpp gui/qt/managers/renderer_manager.hpp \
 	gui/qt/recents.cpp gui/qt/recents.hpp \
 	gui/qt/adapters/seekpoints.cpp gui/qt/adapters/seekpoints.hpp \
 	gui/qt/adapters/chromaprint.cpp gui/qt/adapters/chromaprint.hpp \
@@ -92,6 +93,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/controller.cpp gui/qt/components/controller.hpp \
 	gui/qt/components/controller_widget.cpp \
 	gui/qt/components/controller_widget.hpp \
+	gui/qt/components/custom_menus.cpp \
+	gui/qt/components/custom_menus.hpp \
 	gui/qt/components/epg/EPGChannels.cpp \
 	gui/qt/components/epg/EPGChannels.hpp \
 	gui/qt/components/epg/EPGItem.cpp \
@@ -169,6 +172,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/actions_manager.moc.cpp \
 	gui/qt/extensions_manager.moc.cpp \
 	gui/qt/managers/addons_manager.moc.cpp \
+	gui/qt/managers/renderer_manager.moc.cpp \
 	gui/qt/recents.moc.cpp \
 	gui/qt/adapters/seekpoints.moc.cpp \
 	gui/qt/adapters/chromaprint.moc.cpp \
@@ -204,6 +208,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/interface_widgets.moc.cpp \
 	gui/qt/components/controller.moc.cpp \
 	gui/qt/components/controller_widget.moc.cpp \
+	gui/qt/components/custom_menus.moc.cpp \
 	gui/qt/components/epg/EPGChannels.moc.cpp \
 	gui/qt/components/epg/EPGProgram.moc.cpp \
 	gui/qt/components/epg/EPGRuler.moc.cpp \
