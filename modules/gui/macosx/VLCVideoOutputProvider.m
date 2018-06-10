@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVoutWindowController.m: MacOS X interface module
+ * VLCVideoOutputProvider.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012-2014 VLC authors and VideoLAN
  * $Id$
@@ -25,7 +25,7 @@
 #include <vlc_vout_display.h>
 
 #import "CompatibilityFixes.h"
-#import "VLCVoutWindowController.h"
+#import "VLCVideoOutputProvider.h"
 #import "VLCMain.h"
 #import "VLCMainWindow.h"
 #import "VLCVoutView.h"
@@ -55,15 +55,15 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 
         NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
-        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
-        if (!voutController) {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
             return VLC_EGENERIC;
         }
 
         __block VLCVoutView *videoView = nil;
 
         dispatch_sync(dispatch_get_main_queue(), ^{
-            videoView = [voutController setupVoutForWindow:p_wnd
+            videoView = [voutProvider setupVoutForWindow:p_wnd
                              withProposedVideoViewPosition:proposedVideoViewPosition];
         });
 
@@ -84,8 +84,8 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 {
     @autoreleasepool {
-        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
-        if (!voutController) {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
             return VLC_EGENERIC;
         }
 
@@ -105,7 +105,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                     i_cooca_level = NSStatusWindowLevel;
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutController setWindowLevel:i_cooca_level forWindow:p_wnd];
+                    [voutProvider setWindowLevel:i_cooca_level forWindow:p_wnd];
                 });
 
                 break;
@@ -116,7 +116,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 unsigned int i_height = va_arg(args, unsigned int);
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutController setNativeVideoSize:NSMakeSize(i_width, i_height)
+                    [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
                                              forWindow:p_wnd];
                 });
 
@@ -134,7 +134,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 BOOL b_animation = YES;
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutController setFullscreen:i_full
+                    [voutProvider setFullscreen:i_full
                                         forWindow:p_wnd
                                     withAnimation:b_animation];
                 });
@@ -143,7 +143,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
             }
             case VOUT_WINDOW_HIDE_MOUSE:
             {
-                [voutController hideMouseForWindow:p_wnd];
+                [voutProvider hideMouseForWindow:p_wnd];
                 break;
             }
             default:
@@ -161,18 +161,18 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 void WindowClose(vout_window_t *p_wnd)
 {
     @autoreleasepool {
-        VLCVoutWindowController *voutController = [[VLCMain sharedInstance] voutController];
-        if (!voutController) {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
             return;
         }
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [voutController removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
+            [voutProvider removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
         });
     }
 }
 
-@interface VLCVoutWindowController ()
+@interface VLCVideoOutputProvider ()
 {
     NSMutableDictionary *voutWindows;
     VLCKeyboardBacklightControl *keyboardBacklight;
@@ -187,7 +187,7 @@ void WindowClose(vout_window_t *p_wnd)
 }
 @end
 
-@implementation VLCVoutWindowController
+@implementation VLCVideoOutputProvider
 
 - (id)init
 {

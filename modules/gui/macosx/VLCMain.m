@@ -231,7 +231,7 @@ static VLCMain *sharedInstance = nil;
         _mainmenu = [[VLCMainMenu alloc] init];
         _statusBarIcon = [[VLCStatusBarIcon  alloc] init];
 
-        _voutController = [[VLCVoutWindowController alloc] init];
+        _voutProvider = [[VLCVideoOutputProvider alloc] init];
         _playlist = [[VLCPlaylist alloc] init];
 
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
@@ -350,7 +350,7 @@ static VLCMain *sharedInstance = nil;
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 
     // closes all open vouts
-    _voutController = nil;
+    _voutProvider = nil;
 
     /* write cached user defaults to disk */
     [[NSUserDefaults standardUserDefaults] synchronize];

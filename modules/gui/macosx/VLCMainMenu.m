@@ -682,7 +682,7 @@
     config_PutInt("macosx-show-playback-buttons", b_value);
 
     [(VLCMainWindowControlsBar *)[[[VLCMain sharedInstance] mainWindow] controlsBar] toggleJumpButtons];
-    [[[VLCMain sharedInstance] voutController] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
+    [[[VLCMain sharedInstance] voutProvider] updateWindowsUsingBlock:^(VLCVideoWindowCommon *window) {
         [[window controlsBar] toggleForwardBackwardMode: b_value];
     }];
 
@@ -1242,7 +1242,7 @@
 
 - (IBAction)showPreferences:(id)sender
 {
-    NSInteger i_level = [[[VLCMain sharedInstance] voutController] currentStatusWindowLevel];
+    NSInteger i_level = [[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel];
     [[[VLCMain sharedInstance] simplePreferences] showSimplePrefsWithLevel:i_level];
 }
 

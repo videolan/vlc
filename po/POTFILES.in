@@ -558,8 +558,8 @@ modules/gui/macosx/VLCVolumeSliderCell.h
 modules/gui/macosx/VLCVolumeSliderCell.m
 modules/gui/macosx/VLCVoutView.h
 modules/gui/macosx/VLCVoutView.m
-modules/gui/macosx/VLCVoutWindowController.h
-modules/gui/macosx/VLCVoutWindowController.m
+modules/gui/macosx/VLCVideoOutputProvider.h
+modules/gui/macosx/VLCVideoOutputProvider.m
 modules/gui/macosx/VLCWrappableTextField.h
 modules/gui/macosx/VLCWrappableTextField.m
 modules/gui/macosx/Windows.h

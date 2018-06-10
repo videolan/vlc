@@ -604,7 +604,7 @@
 
     NSInteger i_currLevel = [self level];
     // self.fullscreen and _inFullscreenTransition must not be true yet
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
     i_originalLevel = i_currLevel;
 
@@ -682,7 +682,7 @@
 {
     _inFullscreenTransition = NO;
 
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
+    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 }
 
@@ -720,7 +720,7 @@
     /* Make sure we don't see the window flashes in float-on-top mode */
     NSInteger i_currLevel = [self level];
     // self.fullscreen must not be true yet
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
+    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: NSNormalWindowLevel];
     [self setLevel:NSNormalWindowLevel];
     i_originalLevel = i_currLevel; // would be overwritten by previous call
 
@@ -984,7 +984,7 @@
 
     o_fullscreen_window = nil;
 
-    [[[VLCMain sharedInstance] voutController] updateWindowLevelForHelperWindows: i_originalLevel];
+    [[[VLCMain sharedInstance] voutProvider] updateWindowLevelForHelperWindows: i_originalLevel];
     [self setLevel:i_originalLevel];
 
     [self setAlphaValue: config_GetFloat("macosx-opaqueness")];

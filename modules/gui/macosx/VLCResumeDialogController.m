@@ -76,7 +76,7 @@
                                                        userInfo:nil
                                                         repeats:YES];
 
-    [w setLevel:[[[VLCMain sharedInstance] voutController] currentStatusWindowLevel]];
+    [w setLevel:[[[VLCMain sharedInstance] voutProvider] currentStatusWindowLevel]];
     [w center];
 
     [w makeKeyAndOrderFront:nil];

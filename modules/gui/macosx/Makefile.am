@@ -65,7 +65,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCUIWidgets.h gui/macosx/VLCUIWidgets.m \
 	gui/macosx/VLCScrollingClipView.h gui/macosx/VLCScrollingClipView.m \
 	gui/macosx/VLCStatusBarIcon.h gui/macosx/VLCStatusBarIcon.m \
-	gui/macosx/VLCVoutWindowController.h gui/macosx/VLCVoutWindowController.m \
+	gui/macosx/VLCVideoOutputProvider.h gui/macosx/VLCVideoOutputProvider.m \
 	gui/macosx/Windows.h gui/macosx/Windows.m \
 	gui/macosx/VLCAudioEffectsWindowController.h gui/macosx/VLCAudioEffectsWindowController.m \
 	gui/macosx/VLCBookmarksWindowController.h gui/macosx/VLCBookmarksWindowController.m \

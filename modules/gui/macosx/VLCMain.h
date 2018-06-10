@@ -40,7 +40,7 @@
 #import <Cocoa/Cocoa.h>
 #import "misc.h"
 #import "VLCMainWindow.h"
-#import "VLCVoutWindowController.h"
+#import "VLCVideoOutputProvider.h"
 #import "VLCStatusBarIcon.h"
 #import "VLCStringUtility.h"
 
@@ -79,7 +79,7 @@ static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySu
 
 @interface VLCMain : NSObject <NSWindowDelegate, NSApplicationDelegate>
 
-@property (readonly) VLCVoutWindowController* voutController;
+@property (readonly) VLCVideoOutputProvider* voutProvider;
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
 

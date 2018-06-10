@@ -63,6 +63,7 @@
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C5716AB1F5B142200678627 /* coreaudio_common.c */; };
 		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
+		1CAC3EE820CD1B3B00613DB2 /* VLCVideoOutputProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CAC3EE620CD1B3B00613DB2 /* VLCVideoOutputProvider.m */; };
 		1CCC88EC2078A3D500E5626F /* MainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224091E4D2A9000833BE1 /* MainMenu.xib */; };
 		1CCC88ED2078A3D500E5626F /* MainWindow.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82240A1E4D2A9000833BE1 /* MainWindow.xib */; };
 		1CCC88EE2078A3D500E5626F /* VLCStatusBarIconMainMenu.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */; };
@@ -105,7 +106,6 @@
 		6B7F1FDF1F07DA920002BDD8 /* VLCHexNumberFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B7F1FDE1F07DA920002BDD8 /* VLCHexNumberFormatter.m */; };
 		6B8166291EBFC34300C26F1B /* VLCDefaultValueSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499B1DFD9B23009128AC /* VLCDefaultValueSlider.m */; };
 		6B81662A1EBFC34300C26F1B /* VLCDefaultValueSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B6A499D1DFD9B23009128AC /* VLCDefaultValueSliderCell.m */; };
-		6B81662B1EBFC35D00C26F1B /* VLCVoutWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */; };
 		6B81662C1EBFC38100C26F1B /* VLCUIWidgets.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCED71514C0D4A90057F8D1 /* VLCUIWidgets.m */; };
 		6BBB05DA1EEFEA29003A1019 /* VLCHUDOutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05D91EEFEA29003A1019 /* VLCHUDOutlineView.m */; };
 		6BBB05E01EEFF165003A1019 /* VLCHUDTableCornerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBB05DF1EEFF165003A1019 /* VLCHUDTableCornerView.m */; };
@@ -152,6 +152,8 @@
 		1C67C8A71D58C0A40079E1C1 /* VLCAboutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCAboutWindowController.m; sourceTree = "<group>"; };
 		1C7CB91A1D787E7600388902 /* VLCPopupPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCPopupPanelController.h; sourceTree = "<group>"; };
 		1C7CB91B1D787E7600388902 /* VLCPopupPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCPopupPanelController.m; sourceTree = "<group>"; };
+		1CAC3EE620CD1B3B00613DB2 /* VLCVideoOutputProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVideoOutputProvider.m; sourceTree = "<group>"; };
+		1CAC3EE720CD1B3B00613DB2 /* VLCVideoOutputProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVideoOutputProvider.h; sourceTree = "<group>"; };
 		1CAEBBFF1E1EC0A400A99E49 /* VLCFSPanelDraggableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCFSPanelDraggableView.h; sourceTree = "<group>"; };
 		1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelDraggableView.m; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
@@ -517,8 +519,6 @@
 		E0382C01160BA09E0031D7FF /* VLCControlsBarCommon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCControlsBarCommon.m; sourceTree = "<group>"; };
 		E06CF7F416020F6200C698B7 /* Windows.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Windows.h; sourceTree = "<group>"; };
 		E06CF7F516020F6200C698B7 /* Windows.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Windows.m; sourceTree = "<group>"; };
-		E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVoutWindowController.h; sourceTree = "<group>"; };
-		E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVoutWindowController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1100,8 +1100,8 @@
 			children = (
 				CCCCDCA01413E1C000FE3DE1 /* VLCVoutView.h */,
 				CCCCDCA11413E1C000FE3DE1 /* VLCVoutView.m */,
-				E0C2583E161B593D00185AAD /* VLCVoutWindowController.h */,
-				E0C2583F161B593D00185AAD /* VLCVoutWindowController.m */,
+				1CAC3EE720CD1B3B00613DB2 /* VLCVideoOutputProvider.h */,
+				1CAC3EE620CD1B3B00613DB2 /* VLCVideoOutputProvider.m */,
 			);
 			name = "Video Output";
 			sourceTree = "<group>";
@@ -1537,7 +1537,6 @@
 				1CCC89062078A3D500E5626F /* TimeSelectionPanel.xib in Sources */,
 				6B81662C1EBFC38100C26F1B /* VLCUIWidgets.m in Sources */,
 				6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */,
-				6B81662B1EBFC35D00C26F1B /* VLCVoutWindowController.m in Sources */,
 				6B8166291EBFC34300C26F1B /* VLCDefaultValueSlider.m in Sources */,
 				6B81662A1EBFC34300C26F1B /* VLCDefaultValueSliderCell.m in Sources */,
 				1C69FDF61EAB30C7007724ED /* Windows.m in Sources */,
@@ -1583,6 +1582,7 @@
 				1C3113B41E508C6900D4DD76 /* VLCInputManager.m in Sources */,
 				1C3113B61E508C6900D4DD76 /* VLCMain+OldPrefs.m in Sources */,
 				1C3113B81E508C6900D4DD76 /* VLCMain.m in Sources */,
+				1CAC3EE820CD1B3B00613DB2 /* VLCVideoOutputProvider.m in Sources */,
 				1C3113BA1E508C6900D4DD76 /* VLCApplication.m in Sources */,
 				1C3113BC1E508C6900D4DD76 /* VLCKeyboardBacklightControl.m in Sources */,
 				1C3113BD1E508C6900D4DD76 /* macosx.m in Sources */,

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCVoutWindowController.h: MacOS X interface module
+ * VLCVideoOutputProvider.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012-2014 VLC authors and VideoLAN
  * $Id$
@@ -31,7 +31,7 @@
 @class VLCVideoWindowCommon;
 @class VLCVoutView;
 
-@interface VLCVoutWindowController : NSObject
+@interface VLCVideoOutputProvider : NSObject
 
 @property (readonly, nonatomic) NSInteger currentStatusWindowLevel;
 
