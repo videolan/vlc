@@ -26,14 +26,14 @@
 
 #include "vlc_input_item.h"
 
-static inline info_t *info_New(const char *name, const char *value )
+static inline info_t *info_New(const char *name)
 {
     info_t *info = malloc(sizeof(*info));
     if (!info)
         return NULL;
 
     info->psz_name = strdup(name);
-    info->psz_value = value ? strdup(value) : NULL;
+    info->psz_value = NULL;
     return info;
 }
 
@@ -87,7 +87,7 @@ static inline info_t *info_category_VaAddInfo(info_category_t *cat,
 {
     info_t *info = info_category_FindInfo(cat, NULL, name);
     if (!info) {
-        info = info_New(name, NULL);
+        info = info_New(name);
         if (!info)
             return NULL;
         TAB_APPEND(cat->i_infos, cat->pp_infos, info);
