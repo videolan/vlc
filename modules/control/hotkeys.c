@@ -119,12 +119,9 @@ static void var_FreeList( vlc_list_t values, char **texts )
 
     free( values.p_values );
 
-    if( texts != NULL )
-    {
-        for( int i = 0; i < values.i_count; i++ )
-            free( texts[i] );
-        free( texts );
-    }
+    for( int i = 0; i < values.i_count; i++ )
+        free( texts[i] );
+    free( texts );
 }
 
 static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
