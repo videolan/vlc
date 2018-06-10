@@ -1227,10 +1227,14 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
     [self osdSettingChanged:self];
 }
 
+// NSFontPanelModeMask is replacing NSUInteger, and should be backwards compatible
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
 - (NSFontPanelModeMask)validModesForFontPanel:(NSFontPanel *)fontPanel
 {
     return NSFontPanelFaceModeMask | NSFontPanelCollectionModeMask;
 }
+#pragma clang diagnostic pop
 
 - (IBAction)inputSettingChanged:(id)sender
 {
