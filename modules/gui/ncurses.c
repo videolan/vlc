@@ -1546,6 +1546,7 @@ static void CycleESTrack(input_thread_t *input, const char *var)
     if (++i >= list->i_count)
         i = 0;
     var_SetInteger(input, var, list->p_values[i].i_int);
+    var_FreeList(&val, NULL);
 }
 
 static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
