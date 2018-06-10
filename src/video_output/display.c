@@ -370,14 +370,16 @@ typedef struct {
     atomic_bool reset_pictures;
 } vout_display_owner_sys_t;
 
+static const struct filter_video_callbacks vout_display_filter_cbs = {
+    .buffer_new = VideoBufferNew,
+};
+
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
     filter_owner_t owner = {
+        .video = &vout_display_filter_cbs,
         .sys = vd,
-        .video = {
-            .buffer_new = VideoBufferNew,
-        },
     };
 
     osys->filters = filter_chain_NewVideo(vd, false, &owner);

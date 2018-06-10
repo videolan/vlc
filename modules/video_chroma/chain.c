@@ -140,6 +140,11 @@ static picture_t *BufferNew( filter_t *p_filter )
 
 #define CHAIN_LEVEL_MAX 2
 
+static const struct filter_video_callbacks filter_video_chain_cbs =
+{
+    .buffer_new = BufferNew,
+};
+
 /*****************************************************************************
  * Activate: allocate a chroma function
  *****************************************************************************
@@ -155,10 +160,8 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
         return VLC_ENOMEM;
 
     filter_owner_t owner = {
+        .video = &filter_video_chain_cbs,
         .sys = p_filter,
-        .video = {
-            .buffer_new = BufferNew,
-        },
     };
 
     p_sys->p_chain = filter_chain_NewVideo( p_filter, p_filter->b_allow_fmt_out_change, &owner );

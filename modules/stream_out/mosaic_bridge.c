@@ -383,15 +383,18 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     msg_Dbg( p_stream, "mosaic bridge id=%s pos=%d", p_es->psz_id, i );
 
     /* Create user specified video filters */
+    static const struct filter_video_callbacks cbs =
+    {
+        .buffer_new = video_new_buffer_filter,
+    };
+
     psz_chain = var_GetNonEmptyString( p_stream, CFG_PREFIX "vfilter" );
     msg_Dbg( p_stream, "psz_chain: %s", psz_chain );
     if( psz_chain )
     {
         filter_owner_t owner = {
+            .video = &cbs,
             .sys = p_owner,
-            .video = {
-                .buffer_new = video_new_buffer_filter,
-            },
         };
 
         p_sys->p_vf2 = filter_chain_NewVideo( p_stream, false, &owner );

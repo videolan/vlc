@@ -214,6 +214,10 @@ static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)
     return text;
 }
 
+static const struct filter_video_callbacks spu_scaler_cbs = {
+    .buffer_new = spu_new_video_buffer,
+};
+
 static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
                                              vlc_fourcc_t src_chroma,
                                              vlc_fourcc_t dst_chroma,
@@ -237,7 +241,7 @@ static filter_t *SpuRenderCreateAndLoadScale(vlc_object_t *object,
     scale->fmt_out.video.i_height =
     scale->fmt_out.video.i_visible_height = require_resize ? 16 : 32;
 
-    scale->owner.video.buffer_new = spu_new_video_buffer;
+    scale->owner.video = &spu_scaler_cbs;
 
     scale->p_module = module_need(scale, "video converter", NULL, false);
 
@@ -1202,13 +1206,17 @@ static subpicture_t *sub_new_buffer(filter_t *filter)
     return subpicture;
 }
 
+static const struct filter_subpicture_callbacks sub_cbs = {
+    .buffer_new = sub_new_buffer,
+};
+
 static int SubSourceInit(filter_t *filter, void *data)
 {
     spu_t *spu = data;
     int channel = spu_RegisterChannel(spu);
 
     filter->owner.sys = (void *)(intptr_t)channel;
-    filter->owner.sub.buffer_new = sub_new_buffer;
+    filter->owner.sub = &sub_cbs;
     return VLC_SUCCESS;
 }
 

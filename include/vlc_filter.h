@@ -38,21 +38,24 @@
 
 typedef struct filter_owner_sys_t filter_owner_sys_t;
 
+struct filter_video_callbacks
+{
+    picture_t *(*buffer_new)(filter_t *);
+};
+
+struct filter_subpicture_callbacks
+{
+    subpicture_t *(*buffer_new)(filter_t *);
+};
+
 typedef struct filter_owner_t
 {
-    void *sys;
-
     union
     {
-        struct
-        {
-            picture_t * (*buffer_new)( filter_t * );
-        } video;
-        struct
-        {
-            subpicture_t * (*buffer_new)( filter_t * );
-        } sub;
+        const struct filter_video_callbacks *video;
+        const struct filter_subpicture_callbacks *sub;
     };
+    void *sys;
 } filter_owner_t;
 
 struct vlc_mouse_t;
@@ -162,7 +165,7 @@ struct filter_t
  */
 static inline picture_t *filter_NewPicture( filter_t *p_filter )
 {
-    picture_t *pic = p_filter->owner.video.buffer_new( p_filter );
+    picture_t *pic = p_filter->owner.video->buffer_new( p_filter );
     if( pic == NULL )
         msg_Warn( p_filter, "can't get output picture" );
     return pic;
@@ -208,7 +211,7 @@ static inline block_t *filter_DrainAudio( filter_t *p_filter )
  */
 static inline subpicture_t *filter_NewSubpicture( filter_t *p_filter )
 {
-    subpicture_t *subpic = p_filter->owner.sub.buffer_new( p_filter );
+    subpicture_t *subpic = p_filter->owner.sub->buffer_new( p_filter );
     if( subpic == NULL )
         msg_Warn( p_filter, "can't get output subpicture" );
     return subpic;

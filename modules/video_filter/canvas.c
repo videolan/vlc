@@ -137,6 +137,11 @@ static picture_t *video_new( filter_t *p_filter )
     return filter_NewPicture( p_filter->owner.sys );
 }
 
+static const struct filter_video_callbacks canvas_cbs =
+{
+    .buffer_new = video_new,
+};
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -232,10 +237,8 @@ static int Activate( vlc_object_t *p_this )
     p_filter->p_sys = p_sys;
 
     filter_owner_t owner = {
+        .video = &canvas_cbs,
         .sys = p_filter,
-        .video = {
-            .buffer_new = video_new,
-        },
     };
 
     p_sys->p_chain = filter_chain_NewVideo( p_filter, true, &owner );
