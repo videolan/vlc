@@ -1782,8 +1782,7 @@ libvlc_track_description_t *
                                       const char *psz_variable )
 {
     input_thread_t *p_input = libvlc_get_input_thread( p_mi );
-    libvlc_track_description_t *p_track_description = NULL,
-                               *p_actual, *p_previous;
+    libvlc_track_description_t *ret, **pp = &ret;
 
     if( !p_input )
         return NULL;
@@ -1797,46 +1796,27 @@ libvlc_track_description_t *
     if( i_ret != VLC_SUCCESS )
         return NULL;
 
-    /* no tracks */
-    if( count == 0 )
-        goto end;
-
-    p_track_description = malloc( sizeof *p_track_description );
-    if ( !p_track_description )
+    for (size_t i = 0; i < count; i++)
     {
-        libvlc_printerr( "Not enough memory" );
-        goto end;
-    }
-    p_actual = p_track_description;
-    p_previous = NULL;
-    for( size_t i = 0; i < count; i++ )
-    {
-        if( !p_actual )
+        libvlc_track_description_t *tr = malloc(sizeof (*tr));
+        if (unlikely(tr == NULL))
         {
-            p_actual = malloc( sizeof *p_actual );
-            if ( !p_actual )
-            {
-                libvlc_track_description_list_release( p_track_description );
-                libvlc_printerr( "Not enough memory" );
-
-                p_track_description = NULL;
-                goto end;
-            }
+            libvlc_printerr("Not enough memory");
+            continue;
         }
-        p_actual->i_id = val_list.p_values[i].i_int;
-        p_actual->psz_name = strdup( text_list[i] );
-        p_actual->p_next = NULL;
-        if( p_previous )
-            p_previous->p_next = p_actual;
-        p_previous = p_actual;
-        p_actual =  NULL;
+
+        *pp = tr;
+        tr->i_id = val_list.p_values[i].i_int;
+        tr->psz_name = text_list[i];
+        pp = &tr->p_next;
     }
 
-end:
-    var_FreeList( &val_list, &text_list );
+    *pp = NULL;
+    free(val_list.p_values);
+    free(text_list);
     vlc_object_release( p_input );
 
-    return p_track_description;
+    return ret;
 }
 
 // Deprecated alias for libvlc_track_description_list_release
