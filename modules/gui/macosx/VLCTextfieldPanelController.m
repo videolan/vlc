@@ -32,7 +32,6 @@
 
 @implementation VLCTextfieldPanelController
 
-
 - (id)init
 {
     self = [super initWithWindowNibName:@"TextfieldPanel"];
@@ -61,7 +60,7 @@
 
     _completionBlock = [handler copy];
 
-    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [window beginSheet:self.window completionHandler:nil];
 }
 
 @end

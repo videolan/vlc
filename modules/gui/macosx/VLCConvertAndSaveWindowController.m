@@ -435,7 +435,7 @@
 
 - (IBAction)customizeProfile:(id)sender
 {
-    [NSApp beginSheet:_customizePanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [self.window beginSheet:_customizePanel completionHandler:nil];
 }
 
 - (IBAction)closeCustomizationSheet:(id)sender
@@ -446,8 +446,6 @@
     if (sender == _customizeOkButton)
         [self updateCurrentProfile];
 }
-
-
 
 - (IBAction)videoSettingsChanged:(id)sender
 {
@@ -510,7 +508,7 @@
 
 - (IBAction)showStreamPanel:(id)sender
 {
-    [NSApp beginSheet:_streamPanel modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [self.window beginSheet:_streamPanel completionHandler:nil];
 }
 
 - (IBAction)closeStreamPanel:(id)sender
@@ -531,23 +529,32 @@
 
     /* catch obvious errors */
     if ([[_streamAddressField stringValue] length] == 0) {
-        NSBeginInformationalAlertSheet(_NS("No Address given"),
-                                       _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
-                                       @"%@", _NS("In order to stream, a valid destination address is required."));
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setMessageText:_NS("No Address given")];
+        [alert setInformativeText:_NS("In order to stream, a valid destination address is required.")];
+        [alert beginSheetModalForWindow:_streamPanel
+                      completionHandler:nil];
         return;
     }
 
     if ([_streamSAPCheckbox state] && [[_streamChannelField stringValue] length] == 0) {
-        NSBeginInformationalAlertSheet(_NS("No Channel Name given"),
-                                       _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
-                                       @"%@", _NS("SAP stream announcement is enabled. However, no channel name is provided."));
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setMessageText:_NS("No Channel Name given")];
+        [alert setInformativeText:_NS("SAP stream announcement is enabled. However, no channel name is provided.")];
+        [alert beginSheetModalForWindow:_streamPanel
+                      completionHandler:nil];
         return;
     }
 
     if ([_streamSDPMatrix isEnabled] && [_streamSDPMatrix selectedCell] != [_streamSDPMatrix cellWithTag:0] && [[_streamSDPField stringValue] length] == 0) {
-        NSBeginInformationalAlertSheet(_NS("No SDP URL given"),
-                                       _NS("OK"), @"", @"", _streamPanel, nil, nil, nil, nil,
-                                       @"%@", _NS("A SDP export is requested, but no URL is provided."));
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setAlertStyle:NSInformationalAlertStyle];
+        [alert setMessageText:_NS("No SDP URL given")];
+        [alert setInformativeText:_NS("A SDP export is requested, but no URL is provided.")];
+        [alert beginSheetModalForWindow:_streamPanel
+                      completionHandler:nil];
         return;
     }
 

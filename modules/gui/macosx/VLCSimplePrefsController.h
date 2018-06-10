@@ -222,9 +222,6 @@
 
 - (IBAction)buttonAction:(id)sender;
 - (IBAction)resetPreferences:(id)sender;
-- (void)sheetDidEnd:(NSWindow *)o_sheet
-         returnCode:(int)i_return
-        contextInfo:(void *)o_context;
 
 /* interface */
 - (IBAction)interfaceSettingChanged:(id)sender;

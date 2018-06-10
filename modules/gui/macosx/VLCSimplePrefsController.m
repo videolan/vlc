@@ -805,42 +805,40 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
 
 - (IBAction)resetPreferences:(NSControl *)sender
 {
-    NSBeginInformationalAlertSheet(_NS("Reset Preferences"), _NS("Cancel"),
-                                   _NS("Continue"), nil, [sender window], self,
-                                   @selector(sheetDidEnd: returnCode: contextInfo:), NULL, nil, @"%@",
-                                   _NS("This will reset VLC media player's preferences.\n\n"
-                                       "Note that VLC will restart during the process, so your current "
-                                       "playlist will be emptied and eventual playback, streaming or "
-                                       "transcoding activities will stop immediately.\n\n"
-                                       "The Media Library will not be affected.\n\n"
-                                       "Are you sure you want to continue?"));
-}
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setAlertStyle:NSInformationalAlertStyle];
+    [alert setMessageText:_NS("Reset Preferences")];
+    [alert setInformativeText:_NS("This will reset VLC media player's preferences.\n\n"
+                                  "Note that VLC will restart during the process, so your current "
+                                  "playlist will be emptied and eventual playback, streaming or "
+                                  "transcoding activities will stop immediately.\n\n"
+                                  "The Media Library will not be affected.\n\n"
+                                  "Are you sure you want to continue?")];
+    [alert addButtonWithTitle:_NS("Cancel")];
+    [alert addButtonWithTitle:_NS("Continue")];
+    [alert beginSheetModalForWindow:[sender window] completionHandler:^(NSModalResponse returnCode) {
+        if (returnCode == NSAlertSecondButtonReturn) {
+            /* reset VLC's config */
+            config_ResetAll();
+            [self resetControls];
 
-- (void)sheetDidEnd:(NSWindow *)o_sheet
-         returnCode:(int)i_return
-        contextInfo:(void *)o_context
-{
-    if (i_return == NSAlertAlternateReturn) {
-        /* reset VLC's config */
-        config_ResetAll();
-        [self resetControls];
+            /* force config file creation, since libvlc won't exit normally */
+            config_SaveConfigFile(p_intf);
 
-        /* force config file creation, since libvlc won't exit normally */
-        config_SaveConfigFile(p_intf);
+            /* reset OS X defaults */
+            [[VLCMain sharedInstance] resetAndReinitializeUserDefaults];
 
-        /* reset OS X defaults */
-        [[VLCMain sharedInstance] resetAndReinitializeUserDefaults];
+            /* Relaunch now */
+            const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
 
-        /* Relaunch now */
-        const char * path = [[[NSBundle mainBundle] executablePath] UTF8String];
-
-        /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
-        if (fork() != 0) {
-            exit(0);
-            return;
+            /* For some reason we need to fork(), not just execl(), which reports a ENOTSUP then. */
+            if (fork() != 0) {
+                exit(0);
+                return;
+            }
+            execl(path, path, NULL);
         }
-        execl(path, path, NULL);
-    }
+    }];
 }
 
 static inline void save_int_list(intf_thread_t * p_intf, id object, const char * name)
@@ -1327,8 +1325,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         fillUrlHandlerPopup(@"smb", _urlhandler_smbPopup);
         fillUrlHandlerPopup(@"udp", _urlhandler_udpPopup);
 
-
-        [NSApp beginSheet:_urlhandler_win modalForWindow:self.window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+        [self.window beginSheet:_urlhandler_win completionHandler:nil];
     } else {
         [_urlhandler_win orderOut:sender];
         [NSApp endSheet:_urlhandler_win];

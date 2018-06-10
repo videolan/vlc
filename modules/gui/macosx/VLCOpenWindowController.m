@@ -610,8 +610,9 @@ static NSString *kCaptureTabViewId  = @"capture";
         return;
     }
 
-    if (!b_outputNibLoaded)
-        b_outputNibLoaded = [NSBundle loadNibNamed:@"StreamOutput" owner:_output];
+    if (!b_outputNibLoaded) {
+        b_outputNibLoaded = [[NSBundle mainBundle] loadNibNamed:@"StreamOutput" owner:_output topLevelObjects:nil];
+    }
 
     [self.window beginSheet:_output.outputSheet completionHandler:nil];
 }
@@ -1043,11 +1044,8 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (IBAction)openNetUDPButtonAction:(id)sender
 {
     if (sender == _netOpenUDPButton) {
-        [NSApp beginSheet: self.netUDPPanel
-           modalForWindow: self.window
-            modalDelegate: self
-           didEndSelector: NULL
-              contextInfo: nil];
+        [self.window beginSheet:self.netUDPPanel
+              completionHandler:nil];
         [self openNetInfoChanged:nil];
     }
     else if (sender == _netUDPCancelButton) {
@@ -1240,11 +1238,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (IBAction)subSettings:(id)sender
 {
-    [NSApp beginSheet: self.fileSubSheet
-       modalForWindow: [sender window]
-        modalDelegate: self
-       didEndSelector: NULL
-          contextInfo: nil];
+    [[self window] beginSheet:self.fileSubSheet completionHandler:nil];
 }
 
 - (IBAction)subCloseSheet:(id)sender

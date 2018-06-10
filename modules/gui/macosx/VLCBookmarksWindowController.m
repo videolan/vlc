@@ -184,7 +184,7 @@
     p_old_input = p_input;
     vlc_object_release(p_input);
 
-    [NSApp beginSheet: _editBookmarksWindow modalForWindow: self.window modalDelegate: _editBookmarksWindow didEndSelector: nil contextInfo: nil];
+    [self.window beginSheet:_editBookmarksWindow completionHandler:nil];
 
     // Clear the bookmark list
     for (int i = 0; i < i_bookmarks; i++)

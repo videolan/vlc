@@ -89,10 +89,8 @@
     [_stepper setMaxValue:self.maxValue];
 
     _completionHandler = [handler copy];
-    [NSApp beginSheet:self.window
-       modalForWindow:window modalDelegate:self
-       didEndSelector:nil
-          contextInfo:nil];
+
+    [window beginSheet:self.window completionHandler:nil];
 }
 
 @end

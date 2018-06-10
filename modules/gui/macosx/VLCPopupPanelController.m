@@ -61,7 +61,7 @@
 
     _completionBlock = [handler copy];
 
-    [NSApp beginSheet:self.window modalForWindow:window modalDelegate:self didEndSelector:NULL contextInfo:nil];
+    [window beginSheet:self.window completionHandler:nil];
 }
 
 @end
