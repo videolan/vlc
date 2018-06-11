@@ -111,10 +111,10 @@ void Representation::scheduleNextUpdate(uint64_t number)
      * but we need to update before reaching that last segment, thus -1 */
     if(targetDuration)
     {
-        if(minbuffer > CLOCK_FREQ * ( 2 * targetDuration + 1 ))
-            minbuffer -= CLOCK_FREQ * ( targetDuration + 1 );
+        if(minbuffer > vlc_tick_from_sec( 2 * targetDuration + 1 ))
+            minbuffer -= vlc_tick_from_sec( targetDuration + 1 );
         else
-            minbuffer = CLOCK_FREQ * ( targetDuration - 1 );
+            minbuffer = vlc_tick_from_sec( targetDuration - 1 );
     }
     else
     {
