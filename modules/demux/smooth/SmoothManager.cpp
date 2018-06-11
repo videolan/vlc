@@ -137,7 +137,7 @@ void SmoothManager::scheduleNextUpdate()
 
     minbuffer = std::max(minbuffer, VLC_TICK_FROM_SEC(5));
 
-    nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
+    nextPlaylistupdate = now + SEC_FROM_VLC_TICK(minbuffer);
 
     msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (int64_t) nextPlaylistupdate - now );
 }

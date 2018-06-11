@@ -70,7 +70,7 @@ void MPD::debug()
     msg_Dbg(p_object, "MPD profile=%s mediaPresentationDuration=%" PRId64
             " minBufferTime=%" PRId64,
             static_cast<std::string>(getProfile()).c_str(),
-            duration.Get() / CLOCK_FREQ,
+            SEC_FROM_VLC_TICK(duration.Get()),
             minBufferTime);
     msg_Dbg(p_object, "BaseUrl=%s", getUrlSegment().toString().c_str());
 

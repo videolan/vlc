@@ -171,7 +171,7 @@ UTCTime::UTCTime(const std::string &str)
 
 time_t UTCTime::time() const
 {
-    return t / CLOCK_FREQ;
+    return SEC_FROM_VLC_TICK(t);
 }
 
 vlc_tick_t UTCTime::mtime() const
