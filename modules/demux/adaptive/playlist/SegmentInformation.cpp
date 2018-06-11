@@ -349,8 +349,8 @@ bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) 
         SegmentTimeline *timeline = mediaSegmentTemplate->segmentTimeline.Get();
         if(timeline)
         {
-            time = timescale.ToScaled(time);
-            *ret = timeline->getElementNumberByScaledPlaybackTime(time);
+            stime_t st = timescale.ToScaled(time);
+            *ret = timeline->getElementNumberByScaledPlaybackTime(st);
             return true;
         }
 
@@ -372,16 +372,16 @@ bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) 
     else if ( segmentList && !segmentList->getSegments().empty() )
     {
         const Timescale timescale = segmentList->inheritTimescale();
-        time = timescale.ToScaled(time);
-        return segmentList->getSegmentNumberByScaledTime(time, ret);
+        stime_t st = timescale.ToScaled(time);
+        return segmentList->getSegmentNumberByScaledTime(st, ret);
     }
     else if( segmentBase )
     {
         const Timescale timescale = inheritTimescale();
-        time = timescale.ToScaled(time);
+        stime_t st = timescale.ToScaled(time);
         *ret = 0;
         const std::vector<ISegment *> list = segmentBase->subSegments();
-        return SegmentInfoCommon::getSegmentNumberByScaledTime(list, time, ret);
+        return SegmentInfoCommon::getSegmentNumberByScaledTime(list, st, ret);
     }
 
     if(parent)
