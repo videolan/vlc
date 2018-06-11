@@ -412,7 +412,7 @@ int PlaylistManager::demux_callback(demux_t *p_demux)
     return manager->doDemux(DEMUX_INCREMENT);
 }
 
-int PlaylistManager::doDemux(int64_t increment)
+int PlaylistManager::doDemux(mtime_t increment)
 {
     vlc_mutex_lock(&demux.lock);
     if(demux.i_nzpcr == VLC_TS_INVALID)

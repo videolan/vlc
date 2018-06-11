@@ -72,7 +72,7 @@ namespace adaptive
         protected:
             /* Demux calls */
             virtual int doControl(int, va_list);
-            virtual int doDemux(int64_t);
+            virtual int doDemux(mtime_t);
 
             virtual bool    setPosition(mtime_t);
             virtual mtime_t getDuration() const;
