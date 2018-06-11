@@ -113,23 +113,23 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("mediaPresentationDuration");
     if(it != attr.end())
-        mpd->duration.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->duration.Set(IsoTime(it->second));
 
     it = attr.find("minBufferTime");
     if(it != attr.end())
-        mpd->setMinBuffering(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->setMinBuffering(IsoTime(it->second));
 
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
     {
-        mtime_t minupdate = IsoTime(it->second) * CLOCK_FREQ;
+        mtime_t minupdate = IsoTime(it->second);
         if(minupdate > 0)
             mpd->minUpdatePeriod.Set(minupdate);
     }
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
-        mpd->maxSegmentDuration.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->maxSegmentDuration.Set(IsoTime(it->second));
 
     it = attr.find("type");
     if(it != attr.end())
@@ -145,11 +145,11 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
 
     it = attr.find("timeShiftBufferDepth");
         if(it != attr.end())
-            mpd->timeShiftBufferDepth.Set(IsoTime(it->second) * CLOCK_FREQ);
+            mpd->timeShiftBufferDepth.Set(IsoTime(it->second));
 
     it = attr.find("suggestedPresentationDelay");
     if(it != attr.end())
-        mpd->suggestedPresentationDelay.Set(IsoTime(it->second) * CLOCK_FREQ);
+        mpd->suggestedPresentationDelay.Set(IsoTime(it->second));
 }
 
 void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
@@ -165,9 +165,9 @@ void IsoffMainParser::parsePeriods(MPD *mpd, Node *root)
             continue;
         parseSegmentInformation(mpd, *it, period, &nextid);
         if((*it)->hasAttribute("start"))
-            period->startTime.Set(IsoTime((*it)->getAttributeValue("start")) * CLOCK_FREQ);
+            period->startTime.Set(IsoTime((*it)->getAttributeValue("start")));
         if((*it)->hasAttribute("duration"))
-            period->duration.Set(IsoTime((*it)->getAttributeValue("duration")) * CLOCK_FREQ);
+            period->duration.Set(IsoTime((*it)->getAttributeValue("duration")));
         std::vector<Node *> baseUrls = DOMHelper::getChildElementByTagName(*it, "BaseURL");
         if(!baseUrls.empty())
         {

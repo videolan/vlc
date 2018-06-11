@@ -28,10 +28,10 @@ class IsoTime
 {
     public:
         IsoTime(const std::string&);
-        operator time_t() const;
+        operator mtime_t() const;
 
     private:
-        time_t time;
+        mtime_t time;
 };
 
 class UTCTime

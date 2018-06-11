@@ -88,10 +88,10 @@ static time_t str_duration( const char *psz_duration )
 
 IsoTime::IsoTime(const std::string &str)
 {
-    time = str_duration(str.c_str());
+    time = str_duration(str.c_str()) * CLOCK_FREQ;
 }
 
-IsoTime::operator time_t () const
+IsoTime::operator mtime_t () const
 {
     return time;
 }
