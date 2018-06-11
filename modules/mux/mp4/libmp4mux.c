@@ -1471,7 +1471,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     for (unsigned int i_trak = 0; i_trak < i_tracks; i_trak++) {
         mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
 
-        vlc_tick_t i_stream_duration;
+        int64_t i_stream_duration;
         if ( !b_fragmented )
             i_stream_duration = p_stream->i_read_duration * i_movie_timescale / CLOCK_FREQ;
         else
