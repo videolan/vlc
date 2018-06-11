@@ -41,7 +41,7 @@ namespace adaptive
                 mtime_t buffering_level;
                 mtime_t buffering_target;
                 unsigned last_download_rate;
-                unsigned last_duration;
+                mtime_t last_duration;
                 MovingAverage<unsigned> average;
         };
 
