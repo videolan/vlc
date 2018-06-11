@@ -422,6 +422,16 @@ EXTRA_LTLIBRARIES += libfb_plugin.la
 vout_LTLIBRARIES += $(LTLIBfb)
 
 
+### Kernel Mode Setting ###
+
+libkms_plugin_la_SOURCES = video_output/kms.c
+libkms_plugin_la_CFLAGS = $(AM_CFLAGS) $(KMS_CFLAGS)
+libkms_plugin_la_LIBADD = $(KMS_LIBS)
+libkms_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libkms_plugin.la
+vout_LTLIBRARIES += $(LTLIBkms)
+
+
 ### Coloured ASCII art ###
 libcaca_plugin_la_SOURCES = video_output/caca.c
 libcaca_plugin_la_CFLAGS = $(AM_CFLAGS) $(CACA_CFLAGS)

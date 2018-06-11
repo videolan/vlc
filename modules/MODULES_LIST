@@ -209,6 +209,7 @@ $Id$
  * karaoke: simple karaoke audio filter
  * kate: kate text bitstream decoder
  * keychain: Keystore for iOS, Mac OS X and tvOS
+ * kms: Kernel mode setting video output
  * kva: OS/2 video output
  * kwallet: store secrets via KDE Kwallet
  * libass: Subtitle renderers using libass

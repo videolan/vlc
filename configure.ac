@@ -3373,6 +3373,11 @@ AC_CHECK_HEADER([linux/fb.h], [
 ])
 
 dnl
+dnl  Linux kernel mode setting module
+dnl
+PKG_ENABLE_MODULES_VLC([KMS], [], [libdrm >= 2.4.83], [Linux kernel mode setting output], [auto])
+
+dnl
 dnl  libcaca plugin
 dnl
 PKG_ENABLE_MODULES_VLC([CACA], [], [caca >= 0.99.beta14], [libcaca output],[auto])
