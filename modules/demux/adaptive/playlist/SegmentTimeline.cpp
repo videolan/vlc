@@ -248,22 +248,6 @@ void SegmentTimeline::mergeWith(SegmentTimeline &other)
     }
 }
 
-vlc_tick_t SegmentTimeline::start() const
-{
-    if(elements.empty())
-        return 0;
-    return inheritTimescale().ToTime(elements.front()->t);
-}
-
-vlc_tick_t SegmentTimeline::end() const
-{
-    if(elements.empty())
-        return 0;
-    const Element *last = elements.back();
-    stime_t scaled = last->t + last->d * (last->r + 1);
-    return inheritTimescale().ToTime(scaled);
-}
-
 void SegmentTimeline::debug(vlc_object_t *obj, int indent) const
 {
     std::stringstream ss;
