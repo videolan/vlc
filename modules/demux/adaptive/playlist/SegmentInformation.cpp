@@ -165,7 +165,7 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
 uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 {
     const vlc_tick_t i_max_buffering = getPlaylist()->getMaxBuffering() +
-                                    /* FIXME: add dynamic pts-delay */ CLOCK_FREQ;
+                                    /* FIXME: add dynamic pts-delay */ VLC_TICK_FROM_SEC(1);
 
     /* Try to never buffer up to really end */
     const uint64_t OFFSET_FROM_END = 3;

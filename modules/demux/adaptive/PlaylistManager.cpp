@@ -597,7 +597,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
         }
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = 1000 * INT64_C(1000);
+            *va_arg (args, int64_t *) = VLC_TICK_FROM_SEC(1);
             break;
 
         default:
@@ -653,7 +653,7 @@ void PlaylistManager::Run()
             else if(i_return == AbstractStream::buffering_full)
                 i_deadline += VLC_TICK_FROM_MS(100);
             else if(i_return == AbstractStream::buffering_end)
-                i_deadline += (CLOCK_FREQ);
+                i_deadline += VLC_TICK_FROM_SEC(1);
             else /*if(i_return == AbstractStream::buffering_suspended)*/
                 i_deadline += VLC_TICK_FROM_MS(250);
 

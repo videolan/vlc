@@ -328,7 +328,7 @@ void FakeESOut::checkTimestampsStart(vlc_tick_t i_start)
     vlc_mutex_lock(&lock);
     if( !timestamps_check_done )
     {
-        if( i_start < CLOCK_FREQ ) /* Starts 0 */
+        if( i_start < VLC_TICK_FROM_SEC(1) ) /* Starts 0 */
             timestamps_offset = timestamps_expected;
         timestamps_check_done = true;
     }

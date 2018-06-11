@@ -121,7 +121,7 @@ vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
         }
 
         /* should not happen */
-        return CLOCK_FREQ;
+        return VLC_TICK_FROM_SEC(1);
     }
 
     vlc_tick_t minTime = 0;
