@@ -85,5 +85,5 @@ void  box_gather  (bo_t *box, bo_t *box2);
 bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
 bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
 bo_t *mp4mux_GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
-                        int64_t i_movie_duration,
+                        mtime_t i_movie_duration,
                         bool b_fragmented, bool b_mov, bool b_64ext, bool b_stco64);

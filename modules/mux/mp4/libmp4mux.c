@@ -1398,7 +1398,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 }
 
 bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
-                         int64_t i_movie_duration,
+                         mtime_t i_duration,
                          bool b_fragmented, bool b_mov, bool b_64_ext, bool b_stco64 )
 {
     bo_t            *moov, *mvhd;
@@ -1415,17 +1415,16 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     if(!moov)
         return NULL;
     /* Create general info */
-    if( i_movie_duration == 0 && !b_fragmented )
+    if( i_duration == 0 && !b_fragmented )
     {
         for (unsigned int i = 0; i < i_tracks; i++) {
             mp4mux_trackinfo_t *p_stream = pp_tracks[i];
-            i_movie_duration = __MAX(i_movie_duration, p_stream->i_read_duration);
+            i_duration = __MAX(i_duration, p_stream->i_read_duration);
         }
         if(p_obj)
-            msg_Dbg(p_obj, "movie duration %"PRId64"s", i_movie_duration / CLOCK_FREQ);
-
-        i_movie_duration = i_movie_duration * i_movie_timescale / CLOCK_FREQ;
+            msg_Dbg(p_obj, "movie duration %"PRId64"s", i_duration / CLOCK_FREQ);
     }
+    int64_t i_movie_duration = i_duration * i_movie_timescale / CLOCK_FREQ;
 
     /* *** add /moov/mvhd *** */
     if (!b_64_ext) {
@@ -1796,9 +1795,9 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
                 if(mehd)
                 {
                     if(b_64_ext)
-                        bo_add_64be(mehd, i_movie_duration * i_movie_timescale / CLOCK_FREQ);
+                        bo_add_64be(mehd, i_movie_duration);
                     else
-                        bo_add_32be(mehd, i_movie_duration * i_movie_timescale / CLOCK_FREQ);
+                        bo_add_32be(mehd, i_movie_duration);
                     box_gather(mvex, mehd);
                 }
             }
