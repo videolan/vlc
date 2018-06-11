@@ -139,7 +139,7 @@ void SmoothManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (int64_t) nextPlaylistupdate - now );
 }
 
 bool SmoothManager::needsUpdate() const

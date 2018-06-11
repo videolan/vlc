@@ -127,7 +127,7 @@ void Representation::scheduleNextUpdate(uint64_t number)
     nextUpdateTime = now + minbuffer / CLOCK_FREQ;
 
     msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-            getID().str().c_str(), (vlc_tick_t) nextUpdateTime - now);
+            getID().str().c_str(), (int64_t) nextUpdateTime - now);
 
     debug(playlist->getVLCObject(), 0);
 }

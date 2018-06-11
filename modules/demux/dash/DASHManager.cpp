@@ -84,7 +84,7 @@ void DASHManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (int64_t) nextPlaylistupdate - now );
 }
 
 bool DASHManager::needsUpdate() const
