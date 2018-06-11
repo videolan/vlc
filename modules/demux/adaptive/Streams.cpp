@@ -295,14 +295,14 @@ mtime_t AbstractStream::getDemuxedAmount() const
 }
 
 AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
-                                                           unsigned i_min_buffering, unsigned i_extra_buffering)
+                                                           mtime_t i_min_buffering, mtime_t i_extra_buffering)
 {
     last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering);
     return last_buffer_status;
 }
 
 AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline,
-                                                             unsigned i_min_buffering, unsigned i_extra_buffering)
+                                                             mtime_t i_min_buffering, mtime_t i_extra_buffering)
 {
     vlc_mutex_lock(&lock);
 
@@ -353,7 +353,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         }
     }
 
-    const int64_t i_total_buffering = i_min_buffering + i_extra_buffering;
+    const mtime_t i_total_buffering = i_min_buffering + i_extra_buffering;
 
     mtime_t i_demuxed = commandsqueue->getDemuxedAmount();
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);

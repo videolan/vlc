@@ -83,7 +83,7 @@ namespace adaptive
             buffering_ongoing,
             buffering_lessthanmin,
         } buffering_status;
-        buffering_status bufferize(mtime_t, unsigned, unsigned);
+        buffering_status bufferize(mtime_t, mtime_t, mtime_t);
         buffering_status getLastBufferStatus() const;
         mtime_t getDemuxedAmount() const;
         status dequeue(mtime_t, mtime_t *);
@@ -134,7 +134,7 @@ namespace adaptive
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
 
     private:
-        buffering_status doBufferize(mtime_t, unsigned, unsigned);
+        buffering_status doBufferize(mtime_t, mtime_t, mtime_t);
         buffering_status last_buffer_status;
         bool dead;
         bool disabled;

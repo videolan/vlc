@@ -209,7 +209,7 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
 }
 
 AbstractStream::buffering_status PlaylistManager::bufferize(mtime_t i_nzdeadline,
-                                                            unsigned i_min_buffering, unsigned i_extra_buffering)
+                                                            mtime_t i_min_buffering, mtime_t i_extra_buffering)
 {
     AbstractStream::buffering_status i_return = AbstractStream::buffering_end;
 
@@ -617,8 +617,8 @@ void PlaylistManager::setBufferingRunState(bool b)
 void PlaylistManager::Run()
 {
     vlc_mutex_lock(&lock);
-    const unsigned i_min_buffering = playlist->getMinBuffering();
-    const unsigned i_extra_buffering = playlist->getMaxBuffering() - i_min_buffering;
+    const mtime_t i_min_buffering = playlist->getMinBuffering();
+    const mtime_t i_extra_buffering = playlist->getMaxBuffering() - i_min_buffering;
     while(1)
     {
         mutex_cleanup_push(&lock);
