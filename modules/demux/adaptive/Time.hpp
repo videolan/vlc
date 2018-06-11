@@ -35,14 +35,14 @@ class Timescale
             if( !scale ) return 0;
             stime_t v = t / scale;
             stime_t r = t % scale;
-            return v * 1000000 + r * 1000000 / scale;
+            return v * CLOCK_FREQ + r * CLOCK_FREQ / scale;
         }
 
         stime_t ToScaled(vlc_tick_t t) const
         {
-            vlc_tick_t v = t / 1000000;
-            vlc_tick_t r = t % 1000000;
-            return v * scale + r * scale / 1000000;
+            int64_t v = t / CLOCK_FREQ;
+            int64_t r = t % CLOCK_FREQ;
+            return v * scale + r * scale / CLOCK_FREQ;
         }
 
         bool isValid() const { return !!scale; }
