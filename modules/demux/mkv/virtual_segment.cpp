@@ -27,6 +27,8 @@
 
 #include "demux.hpp"
 
+namespace mkv {
+
 /* FIXME move this, it's demux_sys_t::FindSegment */
 matroska_segment_c * getSegmentbyUID( KaxSegmentUID * p_uid, std::vector<matroska_segment_c*> & segments )
 {
@@ -754,3 +756,5 @@ void virtual_segment_c::KeepTrackSelection( matroska_segment_c & old, matroska_s
         }
     }
 }
+
+} // namespace

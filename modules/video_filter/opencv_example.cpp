@@ -49,6 +49,9 @@
 /*****************************************************************************
  * filter_sys_t : filter descriptor
  *****************************************************************************/
+
+namespace {
+
 struct filter_sys_t
 {
     CvMemStorage* p_storage;
@@ -56,6 +59,8 @@ struct filter_sys_t
     video_filter_event_info_t event_info;
     int i_id;
 };
+
+} // namespace
 
 /****************************************************************************
  * Local prototypes

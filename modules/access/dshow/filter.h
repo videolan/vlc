@@ -28,6 +28,8 @@
 
 #include <deque>
 
+namespace dshow {
+
 struct VLCMediaSample
 {
     ComPtr<IMediaSample> p_sample;
@@ -226,3 +228,5 @@ public:
 private:
     virtual ~CaptureEnumMediaTypes();
 };
+
+} // namespace

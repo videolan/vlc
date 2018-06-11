@@ -57,6 +57,8 @@
 #define INSTANCEDATA_OF_PROPERTY_PTR(x) ((PKSPROPERTY((x))) + 1)
 #define INSTANCEDATA_OF_PROPERTY_SIZE(x) (sizeof((x)) - sizeof(KSPROPERTY))
 
+namespace dshow {
+
 /*****************************************************************************
  * Access: local prototypes
  *****************************************************************************/
@@ -215,6 +217,10 @@ static void AccessClose( vlc_object_t * );
 static int  DemuxOpen  ( vlc_object_t * );
 static void DemuxClose ( vlc_object_t * );
 
+} // namespace
+
+using namespace dshow;
+
 vlc_module_begin ()
     set_shortname( N_("DirectShow") )
     set_description( N_("DirectShow input") )
@@ -301,6 +307,8 @@ vlc_module_begin ()
     set_callbacks( AccessOpen, AccessClose )
 
 vlc_module_end ()
+
+namespace dshow {
 
 struct ComContext
 {
@@ -2389,3 +2397,5 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
         }
     }
 }
+
+} // namespace

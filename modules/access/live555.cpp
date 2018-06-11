@@ -145,6 +145,8 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
+namespace {
+
 typedef struct
 {
     demux_t         *p_demux;
@@ -260,6 +262,8 @@ public:
     }
     demux_sys_t *p_sys;
 };
+
+} // namespace
 
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );

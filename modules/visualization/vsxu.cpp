@@ -73,6 +73,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+namespace {
 
 struct filter_sys_t
 {
@@ -91,6 +92,8 @@ struct filter_sys_t
 
     bool b_quit;
 };
+
+} // namespace
 
 static block_t *DoWork( filter_t *, block_t * );
 static void *Thread( void * );

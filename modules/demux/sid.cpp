@@ -57,7 +57,9 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-struct demux_sid
+namespace {
+
+struct demux_sys_t
 {
     sidplay2 *player;
     sid2_config_t config;
@@ -74,6 +76,7 @@ struct demux_sid
     bool title_changed;
 };
 
+} // namespace
 
 static int Demux (demux_t *);
 static int Control (demux_t *, int, va_list);
@@ -81,7 +84,7 @@ static int Control (demux_t *, int, va_list);
 static int Open (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sid *sys = NULL;
+    demux_sys_t *sys = NULL;
     es_format_t fmt;
     bool result = false;
     SidTune *tune = NULL;
@@ -124,7 +127,7 @@ static int Open (vlc_object_t *obj)
     if (unlikely(player==NULL))
         goto error;
 
-    sys = reinterpret_cast<demux_sid*>(calloc (1, sizeof(demux_sid)));
+    sys = reinterpret_cast<demux_sys_t *>(calloc(1, sizeof(demux_sys_t)));
     if (unlikely(sys==NULL))
         goto error;
 
@@ -194,7 +197,7 @@ error:
 static void Close (vlc_object_t *obj)
 {
     demux_t *demux = (demux_t *)obj;
-    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
+    demux_sys_t *sys = reinterpret_cast<demux_sys_t *>(demux->p_sys);
 
     delete sys->player;
     delete sys->config.sidEmulation;
@@ -204,7 +207,7 @@ static void Close (vlc_object_t *obj)
 
 static int Demux (demux_t *demux)
 {
-    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
+    demux_sys_t *sys = reinterpret_cast<demux_sys_t *>(demux->p_sys);
 
     block_t *block = block_Alloc( sys->block_size);
     if (unlikely(block==NULL))
@@ -235,7 +238,7 @@ static int Demux (demux_t *demux)
 
 static int Control (demux_t *demux, int query, va_list args)
 {
-    demux_sid *sys = reinterpret_cast<demux_sid*>(demux->p_sys);
+    demux_sys_t *sys = reinterpret_cast<demux_sys_t *>(demux->p_sys);
 
     switch (query)
     {

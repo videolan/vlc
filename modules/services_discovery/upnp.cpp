@@ -59,6 +59,8 @@ static const char *const ppsz_readible_satip_channel_lists[] = {
     "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", N_("Master List"), N_("Server List"), N_("Custom List")
 };
 
+namespace {
+
 /*
  * VLC handle
  */
@@ -73,6 +75,8 @@ struct access_sys_t
 {
     UpnpInstanceWrapper* p_upnp;
 };
+
+} // namespace
 
 /*
  * VLC callback prototypes

@@ -35,6 +35,8 @@ using Microsoft::WRL::ComPtr;
 
 typedef struct demux_sys_t demux_sys_t;
 
+namespace dshow {
+
 /****************************************************************************
  * Crossbar stuff
  ****************************************************************************/
@@ -81,4 +83,6 @@ struct access_sys_t
     int            i_chroma;
     vlc_tick_t     i_start;
 };
+
+}
 

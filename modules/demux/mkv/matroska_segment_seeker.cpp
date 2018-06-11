@@ -49,6 +49,8 @@ namespace {
     template<class It> It next_( It it ) { return ++it; }
 }
 
+namespace mkv {
+
 SegmentSeeker::cluster_positions_t::iterator
 SegmentSeeker::add_cluster_position( fptr_t fpos )
 {
@@ -521,3 +523,4 @@ SegmentSeeker::mkv_jump_to( matroska_segment_c& ms, fptr_t fpos )
         ms.es.I_O().setFilePointer( fpos );
 }
 
+} // namespace

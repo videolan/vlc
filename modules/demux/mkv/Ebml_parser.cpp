@@ -26,6 +26,8 @@
 #include "Ebml_parser.hpp"
 #include "stream_io_callback.hpp"
 
+namespace mkv {
+
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
@@ -344,3 +346,4 @@ bool EbmlParser::IsTopPresent( EbmlElement *el ) const
     return false;
 }
 
+} // namespace

@@ -29,6 +29,8 @@
 
 #include <vlc_actions.h>
 
+namespace mkv {
+
 event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
 {
     vlc_mutex_init( &lock );
@@ -811,3 +813,4 @@ virtual_chapter_c *demux_sys_t::FindChapter( int64_t i_find_uid, virtual_segment
     return p_result;
 }
 
+} // namespace

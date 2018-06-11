@@ -35,6 +35,8 @@
 
 using namespace LIBEBML_NAMESPACE;
 
+namespace mkv {
+
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
@@ -63,5 +65,7 @@ class vlc_stream_io_callback: public IOCallback
     virtual void     close           ( void ) { return; }
     uint64           toRead          ( void );
 };
+
+} // namespace
 
 #endif

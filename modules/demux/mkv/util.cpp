@@ -25,6 +25,8 @@
 #include "util.hpp"
 #include "demux.hpp"
 
+namespace mkv {
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -425,3 +427,5 @@ void MkvTree( demux_t & demuxer, int i_level, const char *psz_format, ... )
     MkvTree_va( demuxer, i_level, psz_format, args );
     va_end( args );
 }
+
+} // namespace

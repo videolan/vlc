@@ -44,6 +44,8 @@
 
 #include <dshow.h>
 
+namespace dshow {
+
 /*****************************************************************************
  * DirectShow GUIDs.
  *****************************************************************************/
@@ -369,6 +371,8 @@ DECLARE_INTERFACE_(IAMTVAudio, IUnknown)
     STDMETHOD(RegisterNotificationCallBack) (THIS_ IAMTunerNotification*, long);
     STDMETHOD(UnRegisterNotificationCallBack) (THIS_ IAMTunerNotification*);
 };
+
+} // namespace
 
 #endif /* __MINGW64_VERSION_MAJOR */
 #endif /* VLC_DSHOW_H */

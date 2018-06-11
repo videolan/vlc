@@ -31,6 +31,8 @@
 #include <map>
 #include <limits>
 
+namespace mkv {
+
 class matroska_segment_c;
 
 class SegmentSeeker
@@ -124,5 +126,7 @@ class SegmentSeeker
         cluster_positions_t _cluster_positions;
         cluster_map_t       _clusters;
 };
+
+} // namespace
 
 #endif /* include-guard */

@@ -91,11 +91,16 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
+namespace {
+
 struct filter_sys_t
 {
     vlc_mutex_t lock;
     revmodel *p_reverbm;
 };
+
+} // namespace
 
 #define DECLARECB(fn) static int fn (vlc_object_t *,char const *, \
                                      vlc_value_t, vlc_value_t, void *)
@@ -107,12 +112,16 @@ DECLARECB( WidthCallback );
 
 #undef  DECLARECB
 
+namespace {
+
 struct callback_s {
   const char *psz_name;
   int (*fp_callback)(vlc_object_t *,const char *,
                      vlc_value_t,vlc_value_t,void *);
   void (revmodel::* fp_set)(float);
 };
+
+} // namespace
 
 static const callback_s callbacks[] = {
     { "spatializer-roomsize", RoomCallback,  &revmodel::setroomsize },

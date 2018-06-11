@@ -24,6 +24,8 @@
 
 #include "stream_io_callback.hpp"
 
+namespace mkv {
+
 /*****************************************************************************
  * Stream managment
  *****************************************************************************/
@@ -113,3 +115,4 @@ uint64 vlc_stream_io_callback::toRead( void )
     return static_cast<uint64>( i_size - vlc_stream_Tell( s ) );
 }
 
+} // namespace

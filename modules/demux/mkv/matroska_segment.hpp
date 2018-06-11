@@ -37,6 +37,8 @@
 
 #include "Ebml_parser.hpp"
 
+namespace mkv {
+
 class EbmlParser;
 
 class chapter_edition_c;
@@ -177,5 +179,6 @@ private:
     friend SegmentSeeker;
 };
 
+} // namespace
 
 #endif

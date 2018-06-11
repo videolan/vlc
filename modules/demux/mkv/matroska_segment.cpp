@@ -32,6 +32,8 @@
 #include <new>
 #include <iterator>
 
+namespace mkv {
+
 matroska_segment_c::matroska_segment_c( demux_sys_t & demuxer, EbmlStream & estream, KaxSegment *p_seg )
     :segment(p_seg)
     ,es(estream)
@@ -1436,3 +1438,5 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         }
     }
 }
+
+} // namespace

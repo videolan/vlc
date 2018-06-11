@@ -49,6 +49,8 @@
 #define CC_ENABLE_SPU
 #endif
 
+namespace {
+
 struct sout_access_out_sys_t
 {
     sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
@@ -169,6 +171,8 @@ struct sout_stream_id_sys_t
     sout_stream_id_sys_t  *p_sub_id;
     bool                  flushed;
 };
+
+} // namespace
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 

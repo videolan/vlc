@@ -29,6 +29,8 @@
 #include <functional>
 #include <algorithm>
 
+namespace mkv {
+
 chapter_item_c::~chapter_item_c()
 {
     delete p_segment_uid;
@@ -233,3 +235,4 @@ std::string chapter_edition_c::GetMainName() const
     return "";
 }
 
+} // namespace

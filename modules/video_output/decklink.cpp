@@ -177,10 +177,12 @@ static const char * const rgsz_ar_text[] = {
 };
 static_assert(ARRAY_SIZE(rgi_ar_values) == ARRAY_SIZE(rgsz_ar_text), "afd arrays messed up");
 
+namespace {
+
 /* Only one audio output module and one video output module
  * can be used per process.
  * We use a static mutex in audio/video submodules entry points.  */
-typedef struct decklink_sys_t
+struct decklink_sys_t
 {
     /* With LOCK */
     IDeckLinkOutput *p_output;
@@ -217,7 +219,9 @@ typedef struct decklink_sys_t
         int nosignal_delay;
         picture_t *pic_nosignal;
     } video;
-} decklink_sys_t;
+};
+
+} // namespace
 
 /*****************************************************************************
  * Local prototypes.

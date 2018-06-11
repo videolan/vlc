@@ -84,6 +84,8 @@ vlc_module_begin()
     set_callbacks( Open, Close )
 vlc_module_end()
 
+namespace {
+
 //! Kind of MXF MEDIA TYPE
 typedef enum MxfMedia_t {
     MXF_UNKNOWN = 0,
@@ -214,6 +216,8 @@ class demux_sys_t
         delete p_dcp;
     }
 };
+
+} // namespace
 
 /*TODO: basic correlation between SMPTE S428-3/S429-2
  * Real sound is more complex with case of left/right surround, ...

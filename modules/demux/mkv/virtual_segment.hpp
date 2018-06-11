@@ -31,6 +31,8 @@
 #include "matroska_segment.hpp"
 #include "chapters.hpp"
 
+namespace mkv {
+
 /* virtual classes don't own anything but virtual elements so they shouldn't have to delete anything */
 
 class virtual_chapter_c
@@ -164,5 +166,7 @@ public:
 private:
     void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
 };
+
+} // namespace
 
 #endif

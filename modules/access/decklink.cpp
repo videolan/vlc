@@ -129,6 +129,8 @@ static int Control(demux_t *, int, va_list);
 
 class DeckLinkCaptureDelegate;
 
+namespace {
+
 struct demux_sys_t
 {
     IDeckLink *card;
@@ -155,6 +157,8 @@ struct demux_sys_t
 
     bool tenbits;
 };
+
+} // namespace
 
 static const char *GetFieldDominance(BMDFieldDominance dom, uint32_t *flags)
 {
@@ -224,6 +228,7 @@ static es_format_t GetModeSettings(demux_t *demux, IDeckLinkDisplayMode *m,
 
     return video_fmt;
 }
+namespace {
 
 class DeckLinkCaptureDelegate : public IDeckLinkInputCallback
 {
@@ -296,6 +301,8 @@ private:
     std::atomic_uint m_ref_;
     demux_t *demux_;
 };
+
+} // namespace
 
 HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame* videoFrame, IDeckLinkAudioInputPacket* audioFrame)
 {

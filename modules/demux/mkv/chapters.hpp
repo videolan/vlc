@@ -29,6 +29,8 @@
 
 #include "mkv.hpp"
 
+namespace mkv {
+
 class chapter_translation_c
 {
 public:
@@ -104,5 +106,7 @@ public:
     bool                        b_default;
     bool                        b_hidden;
 };
+
+} // namespace
 
 #endif

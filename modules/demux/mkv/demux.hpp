@@ -30,6 +30,8 @@
 #include "chapter_command.hpp"
 #include "virtual_segment.hpp"
 
+namespace mkv {
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #undef ATTRIBUTE_PACKED
 #undef PRAGMA_PACK_BEGIN
@@ -407,5 +409,6 @@ public:
     event_thread_t *p_ev;
 };
 
+} // namespace
 
 #endif

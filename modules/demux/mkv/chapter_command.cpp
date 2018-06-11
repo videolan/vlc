@@ -23,7 +23,10 @@
  *****************************************************************************/
 
 #include "chapter_command.hpp"
+#include "demux.hpp"
 #include <algorithm>
+
+namespace mkv {
 
 void chapter_codec_cmds_c::AddCommand( const KaxChapterProcessCommand & command )
 {
@@ -766,4 +769,4 @@ bool matroska_script_codec_c::Leave()
     return f_result;
 }
 
-
+} // namespace

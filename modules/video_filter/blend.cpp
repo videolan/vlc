@@ -60,6 +60,8 @@ void merge(T *dst, unsigned src, unsigned f)
     *dst = div255((255 - f) * (*dst) + src * f);
 }
 
+namespace {
+
 struct CPixel {
     unsigned i, j, k;
     unsigned a;
@@ -519,6 +521,8 @@ private:
     G g;
 };
 
+} // namespace
+
 template <class TDst, class TSrc, class TConvert>
 void Blend(const CPicture &dst_data, const CPicture &src_data,
            unsigned width, unsigned height, int alpha)
@@ -550,6 +554,8 @@ void Blend(const CPicture &dst_data, const CPicture &src_data,
 
 typedef void (*blend_function_t)(const CPicture &dst_data, const CPicture &src_data,
                                  unsigned width, unsigned height, int alpha);
+
+namespace {
 
 static const struct {
     vlc_fourcc_t     dst;
@@ -631,6 +637,8 @@ struct filter_sys_t {
     }
     blend_function_t blend;
 };
+
+} // namespace
 
 /**
  * It blends 2 picture together.

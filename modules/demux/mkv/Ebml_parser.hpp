@@ -27,6 +27,8 @@
 
 #include "mkv.hpp"
 
+namespace mkv {
+
 /*****************************************************************************
  * Ebml Stream parser
  *****************************************************************************/
@@ -65,5 +67,7 @@ class EbmlParser
     /* Allow dummy/unknown EBML elements */
     bool         mb_dummy;
 };
+
+} // namespace
 
 #endif
