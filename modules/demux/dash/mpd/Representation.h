@@ -55,7 +55,7 @@ namespace dash
             private:
 
                 /* for contextualize() */
-                vlc_tick_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
+                stime_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
         };
     }
 }

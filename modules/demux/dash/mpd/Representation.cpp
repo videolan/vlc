@@ -101,9 +101,9 @@ std::string Representation::contextualize(size_t number, const std::string &comp
     return str;
 }
 
-vlc_tick_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
+stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
 {
-    vlc_tick_t time = 0;
+    stime_t time = 0;
     if(templ->segmentTimeline.Get())
     {
         time = templ->segmentTimeline.Get()->getScaledPlaybackTimeByElementNumber(index);
