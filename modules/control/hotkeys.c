@@ -1263,7 +1263,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     var_SetFloat( p_vout, "zoom", val_list[i].f_float );
                     DisplayMessage( p_vout, _("Zoom mode: %s"), text_list[i] );
 
-                    var_FreeStringList( count, val_list, text_list );
+                    var_FreeList( count, val_list, text_list );
                 }
             }
             break;
