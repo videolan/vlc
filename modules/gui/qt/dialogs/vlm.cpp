@@ -55,7 +55,7 @@
 
 VLMDialog::VLMDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
-    vlm_t *p_vlm = vlm_New( p_intf, NULL );
+    vlm_t *p_vlm = vlm_New( p_intf->obj.libvlc, NULL );
 
     if( !p_vlm )
     {
