@@ -65,7 +65,7 @@ NearOptimalAdaptationLogic::~NearOptimalAdaptationLogic()
 
 BaseRepresentation *
 NearOptimalAdaptationLogic::getNextQualityIndex( BaseAdaptationSet *adaptSet, RepresentationSelector &selector,
-                                                 float gammaP, vlc_tick_t VD, vlc_tick_t Q )
+                                                 float gammaP, float VD, float Q )
 {
     BaseRepresentation *ret = NULL;
     BaseRepresentation *prev = NULL;

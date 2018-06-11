@@ -56,8 +56,8 @@ namespace adaptive
 
             private:
                 BaseRepresentation *        getNextQualityIndex( BaseAdaptationSet *, RepresentationSelector &,
-                                                                 float gammaP, vlc_tick_t VD,
-                                                                 vlc_tick_t Q /*current buffer level*/);
+                                                                 float gammaP, float VD,
+                                                                 float Q /*current buffer level*/);
                 float                       getUtility(const BaseRepresentation *);
                 unsigned                    getAvailableBw(unsigned, const BaseRepresentation *) const;
                 unsigned                    getMaxCurrentBw() const;
