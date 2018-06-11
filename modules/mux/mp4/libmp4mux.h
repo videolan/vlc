@@ -55,7 +55,7 @@ typedef struct
     block_t      *a52_frame;
 
     /* stats */
-    int64_t      i_read_duration;
+    mtime_t      i_read_duration;
     uint32_t     i_timescale;
     mtime_t      i_firstdts; /* the really first packet */
     bool         b_hasbframes;

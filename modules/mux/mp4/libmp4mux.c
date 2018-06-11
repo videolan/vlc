@@ -244,7 +244,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     }
 
     if (p_track->i_read_duration > 0)
-        i_bitrate_avg = INT64_C(8000000) * i_bitrate_avg / p_track->i_read_duration;
+        i_bitrate_avg = CLOCK_FREQ * 8 * i_bitrate_avg / p_track->i_read_duration;
     else
         i_bitrate_avg = 0;
     if (i_bitrate_max <= 1)
