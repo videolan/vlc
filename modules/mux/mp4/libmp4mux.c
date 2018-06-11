@@ -192,7 +192,7 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
     for(unsigned i=0; i<p_track->i_edits_count; i++)
     {
         /* !WARN! media time must start sample time 0, we need a -1 edit for start offsets */
-        if(p_track->p_edits[i].i_start_offset)
+        if(p_track->p_edits[i].i_start_offset != 0)
             i_total_edits++;
     }
 
@@ -200,7 +200,7 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
 
     for(unsigned i=0; i<p_track->i_edits_count; i++)
     {
-        if(p_track->p_edits[i].i_start_offset)
+        if(p_track->p_edits[i].i_start_offset != 0)
         {
             AddEdit(elst,
                     p_track->p_edits[i].i_start_offset * i_movietimescale / CLOCK_FREQ,
