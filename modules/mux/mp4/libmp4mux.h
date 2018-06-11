@@ -36,7 +36,7 @@ typedef struct
 
 typedef struct
 {
-    uint64_t i_duration;
+    mtime_t i_duration;
     mtime_t i_start_time;
     mtime_t i_start_offset;
 } mp4mux_edit_t;
