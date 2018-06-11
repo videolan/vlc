@@ -119,7 +119,6 @@ VLC_API void * vlc_object_hold( vlc_object_t * );
 VLC_API void vlc_object_release( vlc_object_t * );
 VLC_API size_t vlc_list_children(vlc_object_t *, vlc_object_t **, size_t) VLC_USED;
 VLC_API char *vlc_object_get_name( const vlc_object_t * ) VLC_USED;
-#define vlc_object_get_name(o) vlc_object_get_name(VLC_OBJECT(o))
 
 #define vlc_object_create(a,b) vlc_object_create( VLC_OBJECT(a), b )
 
