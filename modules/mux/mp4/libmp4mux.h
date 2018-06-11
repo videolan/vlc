@@ -65,7 +65,7 @@ typedef struct
     uint64_t     i_stco_pos;
 
     /* frags */
-    uint32_t     i_trex_default_length;
+    mtime_t      i_trex_default_length;
     uint32_t     i_trex_default_size;
 
     /* edit list */
