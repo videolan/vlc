@@ -42,7 +42,7 @@ using namespace smooth::http;
 ForgedInitSegment::ForgedInitSegment(ICanonicalUrl *parent,
                                      const std::string &type_,
                                      uint64_t timescale_,
-                                     uint64_t duration_) :
+                                     vlc_tick_t duration_) :
     InitSegment(parent), TimescaleAble()
 {
     type = type_;
