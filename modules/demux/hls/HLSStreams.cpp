@@ -25,6 +25,8 @@
 #include <vlc_demux.h>
 #include <vlc_meta.h>
 
+#include "../mpeg/timestamps.h"
+
 extern "C"
 {
     #include "../meta_engine/ID3Tag.h"
@@ -74,7 +76,7 @@ int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
     {
         if(!b_id3_timestamps_offset_set)
         {
-            const vlc_tick_t i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
+            const vlc_tick_t i_aac_offset = FROM_SCALE_NZ(GetQWBE(&p_payload[45]));
             setTimeOffset(i_aac_offset);
             b_id3_timestamps_offset_set = true;
         }
