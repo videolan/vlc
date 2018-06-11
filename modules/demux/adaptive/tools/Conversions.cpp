@@ -159,11 +159,11 @@ UTCTime::UTCTime(const std::string &str)
         tm.tm_sec = values[UTCTIME_SEC];
         tm.tm_isdst = 0;
 
-        t = timegm( &tm );
-        t += values[UTCTIME_TZ] * 60;
-        t *= 1000;
-        t += values[UTCTIME_MSEC];
-        t *= CLOCK_FREQ / 1000;
+        int64_t mst = timegm( &tm );
+        mst += values[UTCTIME_TZ] * 60;
+        mst *= 1000;
+        mst += values[UTCTIME_MSEC];
+        t = VLC_TICK_FROM_MS(mst);
     } catch(int) {
         t = 0;
     }
