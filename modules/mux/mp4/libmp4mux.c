@@ -237,7 +237,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     for (unsigned i = 0; i < p_track->i_entry_count; i++) {
         i_bitrate_avg += p_track->entry[i].i_size;
         if (p_track->entry[i].i_length > 0) {
-            int64_t i_bitrate = INT64_C(8000000) * p_track->entry[i].i_size / p_track->entry[i].i_length;
+            int64_t i_bitrate = CLOCK_FREQ * 8 * p_track->entry[i].i_size / p_track->entry[i].i_length;
             if (i_bitrate > i_bitrate_max)
                 i_bitrate_max = i_bitrate;
         }
