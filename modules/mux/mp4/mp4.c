@@ -675,7 +675,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             }
             else
             {
-                int64_t i_diff  = dts_fb_pts( p_next ) - dts_fb_pts( p_data );
+                mtime_t i_diff  = dts_fb_pts( p_next ) - dts_fb_pts( p_data );
                 if (i_diff < CLOCK_FREQ) /* protection */
                     p_data->i_length = i_diff;
             }
@@ -1071,7 +1071,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
                 if (i_trun_flags & MP4_TRUN_SAMPLE_TIME_OFFSET)
                 {
-                    uint32_t i_diff = 0;
+                    mtime_t i_diff = 0;
                     if ( p_entry->p_block->i_dts  != VLC_TS_INVALID &&
                          p_entry->p_block->i_pts > p_entry->p_block->i_dts )
                     {
