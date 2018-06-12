@@ -40,6 +40,8 @@
 #include "bits.h"
 #include "pes.h"
 
+#include "../../demux/mpeg/timestamps.h"
+
 #include <vlc_iso_lang.h>
 
 /*****************************************************************************
@@ -592,10 +594,10 @@ static void MuxWritePackHeader( sout_mux_t *p_mux, block_t **p_buf,
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bits_buffer_t bits;
     block_t *p_hdr;
-    vlc_tick_t i_scr;
+    int64_t i_scr;
     int i_mux_rate;
 
-    i_scr = (i_dts - p_sys->i_dts_delay) * 9 / 100;
+    i_scr = TO_SCALE_NZ(i_dts - p_sys->i_dts_delay);
 
     p_hdr = block_Alloc( 18 );
     if( !p_hdr )
