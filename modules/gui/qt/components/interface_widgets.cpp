@@ -996,7 +996,7 @@ void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
         return;
     }
 
-    int time = t / 1000000;
+    int time = SEC_FROM_VLC_TICK(t);
 
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time

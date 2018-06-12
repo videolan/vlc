@@ -432,7 +432,7 @@ void InputManager::UpdatePosition()
     int64_t i_length = var_GetInteger(  p_input , "length" );
     int64_t i_time = var_GetInteger(  p_input , "time");
     float f_pos = var_GetFloat(  p_input , "position" );
-    emit positionUpdated( f_pos, i_time, i_length / CLOCK_FREQ );
+    emit positionUpdated( f_pos, i_time, SEC_FROM_VLC_TICK(i_length) );
 }
 
 void InputManager::UpdateNavigation()

@@ -89,7 +89,7 @@ void GotoTimeDialog::toggleVisible()
     if ( !isVisible() && THEMIM->getIM()->hasInput() )
     {
         int64_t i_time = var_GetInteger( THEMIM->getInput(), "time" );
-        timeEdit->setTime( timeEdit->time().addSecs( i_time / CLOCK_FREQ ) );
+        timeEdit->setTime( timeEdit->time().addSecs( SEC_FROM_VLC_TICK(i_time) ) );
     }
     QVLCDialog::toggleVisible();
     if(isVisible())
