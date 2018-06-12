@@ -225,9 +225,8 @@ static void AddToQueue (intf_thread_t *p_this)
         goto end;
 
     /* wait for the user to listen enough before submitting */
-    played_time = vlc_tick_now() - p_sys->p_current_song.i_start -
-                            p_sys->time_total_pauses;
-    played_time /= CLOCK_FREQ; /* µs → s */
+    played_time = SEC_FROM_VLC_TICK(vlc_tick_now() - p_sys->p_current_song.i_start -
+                                    p_sys->time_total_pauses);
 
     /*HACK: it seam that the preparsing sometime fail,
             so use the playing time as the song length */
