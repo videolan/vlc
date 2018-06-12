@@ -177,7 +177,7 @@ void SeekStyle::drawComplexControl( ComplexControl cc, const QStyleOptionComplex
                                         ( background.value() + foreground.value() ) / 2 );
                         if ( slideroptions->orientation == Qt::Horizontal ) /* TODO: vertical */
                         {
-                            foreach( int64_t time, slideroptions->points )
+                            foreach( mtime_t time, slideroptions->points )
                             {
                                 int x = groove.x() + time / (double)CLOCK_FREQ / slideroptions->length * groove.width();
                                 painter->setPen( foreground );
