@@ -211,7 +211,7 @@ public slots:
     void setAtoB();
 
 private slots:
-    void AtoBLoop( float, int64_t, int );
+    void AtoBLoop( float, vlc_tick_t, int );
 
 signals:
     /// Send new position, new time and new length

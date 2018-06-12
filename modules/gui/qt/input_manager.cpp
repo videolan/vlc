@@ -953,20 +953,20 @@ void InputManager::setAtoB()
         timeB = var_GetInteger( p_mim->getInput(), "time"  );
         var_SetInteger( p_mim->getInput(), "time" , timeA );
         CONNECT( this, positionUpdated( float, int64_t, int ),
-                 this, AtoBLoop( float, int64_t, int ) );
+                 this, AtoBLoop( float, vlc_tick_t, int ) );
     }
     else
     {
         timeA = 0;
         timeB = 0;
         disconnect( this, SIGNAL( positionUpdated( float, int64_t, int ) ),
-                    this, SLOT( AtoBLoop( float, int64_t, int ) ) );
+                    this, SLOT( AtoBLoop( float, vlc_tick_t, int ) ) );
     }
     emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
 }
 
 /* Function called regularly when in an AtoB loop */
-void InputManager::AtoBLoop( float, int64_t i_time, int )
+void InputManager::AtoBLoop( float, vlc_tick_t i_time, int )
 {
     if( timeB && i_time >= timeB )
         var_SetInteger( p_mim->getInput(), "time" , timeA );
