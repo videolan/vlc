@@ -1089,10 +1089,8 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
                         repeat, random, loop);
 
         default:
-            val.i_int = var_GetInteger(p_input, "time");
-            secstotimestr(buf1, val.i_int / CLOCK_FREQ);
-            val.i_int = var_GetInteger(p_input, "length");
-            secstotimestr(buf2, val.i_int / CLOCK_FREQ);
+            secstotimestr(buf1, SEC_FROM_VLC_TICK(var_GetInteger(p_input, "time")));
+            secstotimestr(buf2, SEC_FROM_VLC_TICK(var_GetInteger(p_input, "length")));
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
