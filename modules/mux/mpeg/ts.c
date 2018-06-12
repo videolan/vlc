@@ -374,7 +374,7 @@ typedef struct
     int64_t         i_shaping_delay;
     int64_t         i_pcr_delay;
 
-    int64_t         i_dts_delay;
+    mtime_t         i_dts_delay;
     mtime_t         first_dts;
 
     bool            b_use_key_frames;
