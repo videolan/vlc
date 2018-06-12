@@ -525,7 +525,7 @@ static int SubpictureCmp(const void *s0, const void *s1)
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
 static void SpuSelectSubpictures(spu_t *spu,
-                                 unsigned int *subpicture_count,
+                                 size_t *subpicture_count,
                                  subpicture_t **subpicture_array,
                                  vlc_tick_t render_subtitle_date,
                                  vlc_tick_t render_osd_date,
@@ -558,7 +558,7 @@ static void SpuSelectSubpictures(spu_t *spu,
     for (int i = 0; i < channel_count; i++) {
         subpicture_t *available_subpic[VOUT_MAX_SUBPICTURES];
         bool         is_available_late[VOUT_MAX_SUBPICTURES];
-        int          available_count = 0;
+        size_t       available_count = 0;
 
         vlc_tick_t   start_date = render_subtitle_date;
         vlc_tick_t   ephemer_subtitle_date = 0;
@@ -621,7 +621,7 @@ static void SpuSelectSubpictures(spu_t *spu,
             start_date = INT64_MAX;
 
         /* Select pictures to be displayed */
-        for (int index = 0; index < available_count; index++) {
+        for (size_t index = 0; index < available_count; index++) {
             subpicture_t *current = available_subpic[index];
             bool is_late = is_available_late[index];
 
@@ -995,7 +995,7 @@ exit:
  * This function renders all sub picture units in the list.
  */
 static subpicture_t *SpuRenderSubpictures(spu_t *spu,
-                                          unsigned int i_subpicture,
+                                          size_t i_subpicture,
                                           subpicture_t **pp_subpicture,
                                           const vlc_fourcc_t *chroma_list,
                                           const video_format_t *fmt_dst,
@@ -1579,19 +1579,19 @@ subpicture_t *spu_Render(spu_t *spu,
 
     vlc_mutex_lock(&sys->lock);
 
-    unsigned int subpicture_count;
+    size_t subpicture_count;
     subpicture_t *subpicture_array[VOUT_MAX_SUBPICTURES];
 
     /* Get an array of subpictures to render */
     SpuSelectSubpictures(spu, &subpicture_count, subpicture_array,
                          render_subtitle_date, render_osd_date, ignore_osd);
-    if (subpicture_count <= 0) {
+    if (subpicture_count == 0) {
         vlc_mutex_unlock(&sys->lock);
         return NULL;
     }
 
     /* Updates the subpictures */
-    for (unsigned i = 0; i < subpicture_count; i++) {
+    for (size_t i = 0; i < subpicture_count; i++) {
         subpicture_t *subpic = subpicture_array[i];
         subpicture_Update(subpic,
                           fmt_src, fmt_dst,
