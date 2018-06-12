@@ -444,11 +444,12 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 es_fmt.video.i_frame_rate_base = rate.den;
             }
 
-            es_fmt.video.i_sar_num = s->sample_aspect_ratio.num;
-            if (s->sample_aspect_ratio.num > 0)
-                es_fmt.video.i_sar_den = s->sample_aspect_ratio.den;
-            else
-                es_fmt.video.i_sar_den = 0;
+            AVRational ar = av_guess_sample_aspect_ratio( p_sys->ic, s, NULL );
+            if( ar.num && ar.den )
+            {
+                es_fmt.video.i_sar_den = ar.den;
+                es_fmt.video.i_sar_num = ar.num;
+            }
             break;
 
         case AVMEDIA_TYPE_SUBTITLE:
