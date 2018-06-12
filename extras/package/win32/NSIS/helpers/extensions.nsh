@@ -1,6 +1,12 @@
+!include "StrFunc.nsh"
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 1. File type associations ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; "Initialize" string functions
+${StrRep}
+${StrCase}
 
 ;; Function that associates one extension with VLC
 Function AssociateExtension
@@ -15,7 +21,13 @@ FunctionEnd
 
 ;; Function that registers one extension for VLC
 Function RegisterExtension
-  WriteRegStr HKCR "VLC$R0" "" "VLC media file ($R0)"
+  ; R0 contains the extension, R1 contains the type (Audio/Video)
+  ; Remove the leading dot from the filetype string
+  ${StrRep} $R2 $R0 "." ""
+  ; And capitalize the extension
+  ${StrCase} $R2 $R2 "U"
+  ; for instance: MKV Video File (VLC)
+  WriteRegStr HKCR "VLC$R0" "" "$R2 $R1 File (VLC)"
   WriteRegStr HKCR "VLC$R0\shell" "" "Open"
   WriteRegStr HKCR "VLC$R0\shell\Open" "" "$(ShellAssociation_Play)"
   WriteRegStr HKCR "VLC$R0\shell\Open" "MultiSelectModel" "Player"
@@ -92,7 +104,10 @@ FunctionEnd
 !macro RegisterExtensionMacro TYPE EXT
   Push $R0
   StrCpy $R0 ${EXT}
+  Push $R1
+  StrCpy $R1 ${TYPE}
   Call RegisterExtension
+  Pop $R1
   Pop $R0
 !macroend
 
