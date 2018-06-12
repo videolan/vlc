@@ -678,6 +678,12 @@ inline void MainInterface::showTab( QWidget *widget, bool video_closing )
     }
 
     stackCentralW->setCurrentWidget( widget );
+    if( b_autoresize )
+    {
+        QSize size = stackWidgetsSizes[widget];
+        if( size.isValid() )
+            resizeStack( size.width(), size.height() );
+    }
 
 #ifdef DEBUG_INTF
     msg_Dbg( p_intf, "Stack state changed to %s, index %i",
