@@ -74,8 +74,8 @@ InputManager::InputManager( MainInputManager *mim, intf_thread_t *_p_intf) :
     f_rate       = 0.;
     p_item       = NULL;
     b_video      = false;
-    timeA        = 0;
-    timeB        = 0;
+    timeA        = VLC_TICK_INVALID;
+    timeB        = VLC_TICK_INVALID;
     f_cache      = -1.; /* impossible initial value, different from all */
     registerAndCheckEventIds( IMEvent::PositionUpdate, IMEvent::FullscreenControlPlanHide );
     registerAndCheckEventIds( PLEvent::PLItemAppended, PLEvent::PLEmpty );
@@ -178,8 +178,8 @@ void InputManager::delInput()
     oldName              = "";
     artUrl               = "";
     b_video              = false;
-    timeA                = 0;
-    timeB                = 0;
+    timeA                = VLC_TICK_INVALID;
+    timeB                = VLC_TICK_INVALID;
     f_rate               = 0. ;
 
     if( p_input_vbi )
@@ -938,11 +938,11 @@ void InputManager::jumpBwd()
 
 void InputManager::setAtoB()
 {
-    if( !timeA )
+    if( timeA != VLC_TICK_INVALID )
     {
         timeA = var_GetInteger( p_mim->getInput(), "time"  );
     }
-    else if( !timeB )
+    else if( timeB != VLC_TICK_INVALID )
     {
         timeB = var_GetInteger( p_mim->getInput(), "time"  );
         var_SetInteger( p_mim->getInput(), "time" , timeA );
@@ -951,18 +951,18 @@ void InputManager::setAtoB()
     }
     else
     {
-        timeA = 0;
-        timeB = 0;
+        timeA = VLC_TICK_INVALID;
+        timeB = VLC_TICK_INVALID;
         disconnect( this, SIGNAL( positionUpdated( float, int64_t, int ) ),
                     this, SLOT( AtoBLoop( float, vlc_tick_t, int ) ) );
     }
-    emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
+    emit AtoBchanged( (timeA != VLC_TICK_INVALID ), (timeB != VLC_TICK_INVALID ) );
 }
 
 /* Function called regularly when in an AtoB loop */
 void InputManager::AtoBLoop( float, vlc_tick_t i_time, int )
 {
-    if( timeB && i_time >= timeB )
+    if( timeB != VLC_TICK_INVALID && i_time >= timeB )
         var_SetInteger( p_mim->getInput(), "time" , timeA );
 }
 
