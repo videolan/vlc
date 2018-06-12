@@ -39,7 +39,8 @@ libmux_ts_plugin_la_SOURCES = \
 	mux/mpeg/tables.c mux/mpeg/tables.h \
 	mux/mpeg/tsutil.c mux/mpeg/tsutil.h \
 	codec/jpeg2000.h \
-	mux/mpeg/ts.c mux/mpeg/bits.h mux/mpeg/dvbpsi_compat.h
+	mux/mpeg/ts.c mux/mpeg/bits.h mux/mpeg/dvbpsi_compat.h \
+	demux/mpeg/timestamps.h
 libmux_ts_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(DVBPSI_CFLAGS)
 libmux_ts_plugin_la_LIBADD = $(DVBPSI_LIBS)
 if HAVE_DVBPSI
