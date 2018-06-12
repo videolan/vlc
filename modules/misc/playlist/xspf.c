@@ -142,7 +142,7 @@ xspfexportitem_end:
     i_duration = input_item_GetDuration( p_item->p_input );
     if( i_duration > 0 )
         fprintf( p_file, "\t\t\t<duration>%"PRIu64"</duration>\n",
-                 i_duration / 1000 );
+                 MS_FROM_VLC_TICK(i_duration) );
 
     /* export the intenal id and the input's options (bookmarks, ...)
      * in <extension> */
