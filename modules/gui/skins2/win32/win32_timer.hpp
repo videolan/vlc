@@ -51,7 +51,7 @@ private:
     CmdGeneric &m_rCommand;
 
     /// Delay between two execute
-    mtime_t m_interval;
+    int m_interval;
 
     /// Flag to tell whether the timer must be stopped after the
     /// first execution
