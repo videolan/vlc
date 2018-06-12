@@ -712,7 +712,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
         case ACTIONID_SUBDELAY_DOWN:
         case ACTIONID_SUBDELAY_UP:
         {
-            int diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
+            mtime_t diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
             if( p_input )
             {
                 vlc_value_t val;
@@ -729,7 +729,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     free(list);
                     break;
                 }
-                int64_t i_delay = var_GetInteger( p_input, "spu-delay" ) + diff;
+                mtime_t i_delay = var_GetInteger( p_input, "spu-delay" ) + diff;
 
                 var_SetInteger( p_input, "spu-delay", i_delay );
                 ClearChannels( p_vout, slider_chan );
@@ -742,10 +742,10 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
         case ACTIONID_AUDIODELAY_DOWN:
         case ACTIONID_AUDIODELAY_UP:
         {
-            int diff = (i_action == ACTIONID_AUDIODELAY_UP) ? 50000 : -50000;
+            mtime_t diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
             if( p_input )
             {
-                int64_t i_delay = var_GetInteger( p_input, "audio-delay" )
+                mtime_t i_delay = var_GetInteger( p_input, "audio-delay" )
                                   + diff;
 
                 var_SetInteger( p_input, "audio-delay", i_delay );
