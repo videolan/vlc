@@ -103,7 +103,7 @@ typedef struct ps_stream_s
 
     /* Language is iso639-2T */
     uint8_t lang[3];
-    int64_t i_dts;
+    mtime_t i_dts;
 
 } ps_stream_t;
 
@@ -121,12 +121,12 @@ typedef struct
     int i_video_bound;
     int i_pes_count;
     int i_system_header;
-    int i_dts_delay;
+    mtime_t i_dts_delay;
     int i_rate_bound; /* units of 50 bytes/second */
  
     int64_t i_instant_bitrate;
     int64_t i_instant_size;
-    int64_t i_instant_dts;
+    mtime_t i_instant_dts;
 
     bool b_mpeg2;
 
@@ -478,7 +478,7 @@ static int Mux( sout_mux_t *p_mux )
         /* Write regulary PackHeader */
         if( p_sys->i_pes_count % 30 == 0)
         {
-            int64_t i_mindts = INT64_MAX;
+            mtime_t i_mindts = INT64_MAX;
             for( size_t i=0; i<p_mux->i_nb_inputs; i++ )
             {
                 ps_stream_t *p_s = (ps_stream_t*)p_input->p_sys;
