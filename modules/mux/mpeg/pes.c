@@ -38,6 +38,8 @@
 #include "pes.h"
 #include "bits.h"
 
+#include "../../demux/mpeg/timestamps.h"
+
 /** PESHeader, write a pes header
  * \param i_es_size length of payload data. (Must be < PES_PAYLOAD_SIZE_MAX
  *                  unless the conditions for unbounded PES packets are met)
@@ -50,7 +52,7 @@
  * \param i_header_size length of padding data to insert into PES packet
  *                      header in bytes.
  */
-static inline int PESHeader( uint8_t *p_hdr, vlc_tick_t i_pts, vlc_tick_t i_dts,
+static inline int PESHeader( uint8_t *p_hdr, int64_t i_pts, int64_t i_dts,
                              int i_es_size, const es_format_t *p_fmt,
                              int i_stream_id, bool b_mpeg2,
                              bool b_data_alignment, int i_header_size )
@@ -382,12 +384,12 @@ void EStoPES ( block_t **pp_pes,
 
     }
 
-    vlc_tick_t i_dts = 0;
-    vlc_tick_t i_pts = 0;
+    int64_t i_dts = 0;
+    int64_t i_pts = 0;
     if (p_es->i_pts != VLC_TICK_INVALID)
-        i_pts = (p_es->i_pts - ts_offset) * 9 / 100;
+        i_pts = TO_SCALE_NZ(p_es->i_pts - ts_offset);
     if (p_es->i_dts != VLC_TICK_INVALID)
-        i_dts = (p_es->i_dts - ts_offset) * 9 / 100;
+        i_dts = TO_SCALE_NZ(p_es->i_dts - ts_offset);
 
     i_size = p_es->i_buffer;
     p_data = p_es->p_buffer;
@@ -437,14 +439,14 @@ void EStoPES ( block_t **pp_pes,
 
     /* Now redate all pes */
     p_pes = *pp_pes;
-    i_dts    = p_pes->i_dts;
+    vlc_tick_t i_block_dts = p_pes->i_dts;
     vlc_tick_t i_length = p_pes->i_length / i_pes_count;
     while( p_pes )
     {
-        p_pes->i_dts = i_dts;
+        p_pes->i_dts = i_block_dts;
         p_pes->i_length = i_length;
 
-        i_dts += i_length;
+        i_block_dts += i_length;
         p_pes = p_pes->p_next;
     }
 }

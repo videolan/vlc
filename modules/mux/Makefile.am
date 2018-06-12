@@ -13,7 +13,8 @@ libmux_mp4_plugin_la_SOURCES = mux/mp4/mp4.c \
 libmux_mpjpeg_plugin_la_SOURCES = mux/mpjpeg.c
 libmux_ps_plugin_la_SOURCES = \
 	mux/mpeg/pes.c mux/mpeg/pes.h \
-	mux/mpeg/ps.c mux/mpeg/bits.h
+	mux/mpeg/ps.c mux/mpeg/bits.h \
+	demux/mpeg/timestamps.h
 libmux_wav_plugin_la_SOURCES = mux/wav.c
 
 mux_LTLIBRARIES = \
