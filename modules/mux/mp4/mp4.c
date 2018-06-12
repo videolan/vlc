@@ -129,7 +129,7 @@ typedef struct
     mp4mux_trackinfo_t mux;
 
     /* index */
-    int64_t      i_length_neg;
+    mtime_t      i_length_neg;
 
     /* applies to current segment only */
     int64_t      i_first_dts;
