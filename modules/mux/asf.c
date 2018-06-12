@@ -137,7 +137,7 @@ typedef struct
     int64_t         i_packet_count;
     mtime_t         i_dts_first;
     mtime_t         i_dts_last;
-    mtime_t         i_preroll_time;
+    int64_t         i_preroll_time; /* in milliseconds */
     int64_t         i_bitrate;
     int64_t         i_bitrate_override;
 
