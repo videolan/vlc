@@ -180,7 +180,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_mpeg2 = !(p_mux->psz_mux && !strcmp( p_mux->psz_mux, "mpeg1" ));
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
-    p_sys->i_dts_delay = (int64_t)val.i_int * 1000;
+    p_sys->i_dts_delay = VLC_TICK_FROM_MS(val.i_int);
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pes-max-size", &val );
     p_sys->i_pes_max_size = (int64_t)val.i_int;
