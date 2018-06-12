@@ -854,10 +854,9 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
 
     msg_Dbg( p_mux, "Asf muxer creating header" );
 
-    if( p_sys->i_dts_first != VLC_TICK_INVALID )
+    if( p_sys->i_dts_first != VLC_TICK_INVALID && p_sys->i_dts_last > p_sys->i_dts_first )
     {
         i_duration = p_sys->i_dts_last - p_sys->i_dts_first;
-        if( i_duration < 0 ) i_duration = 0;
     }
 
     /* calculate header size */
