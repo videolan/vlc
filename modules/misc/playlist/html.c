@@ -71,8 +71,8 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
             free( psz_tmp );
 
             vlc_tick_t i_duration = input_item_GetDuration( p_current->p_input );
-            int min = ( i_duration / CLOCK_FREQ ) / 60;
-            int sec = ( i_duration / CLOCK_FREQ ) - min * 60;
+            int min = SEC_FROM_VLC_TICK( i_duration ) / 60;
+            int sec = SEC_FROM_VLC_TICK( i_duration ) - min * 60;
 
             // Print the artist if we have one
             if( psz_artist && *psz_artist )

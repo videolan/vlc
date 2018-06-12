@@ -89,13 +89,13 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root,
             {
                 /* write EXTINF with artist */
                 pf_fprintf( p_export->p_file, "#EXTINF:%"PRIu64",%s - %s\n",
-                            i_duration / CLOCK_FREQ, psz_artist, psz_name);
+                            SEC_FROM_VLC_TICK(i_duration), psz_artist, psz_name);
             }
             else
             {
                 /* write EXTINF without artist */
                 pf_fprintf( p_export->p_file, "#EXTINF:%"PRIu64",%s\n",
-                            i_duration / CLOCK_FREQ, psz_name);
+                            SEC_FROM_VLC_TICK(i_duration), psz_name);
             }
             free( psz_artist );
         }
