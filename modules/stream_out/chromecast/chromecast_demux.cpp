@@ -210,7 +210,7 @@ struct demux_cc
 
     double getPosition()
     {
-        if( m_length >= 0 && m_start_pos >= 0 )
+        if( m_length > 0 && m_start_pos >= 0 )
         {
             m_last_pos = ( getCCTime() / double( m_length ) ) + m_start_pos;
             return m_last_pos;
