@@ -215,7 +215,7 @@ end:
  *****************************************************************************/
 static void AddToQueue (intf_thread_t *p_this)
 {
-    mtime_t                     played_time;
+    int64_t                     played_time;
     intf_sys_t                  *p_sys = p_this->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
