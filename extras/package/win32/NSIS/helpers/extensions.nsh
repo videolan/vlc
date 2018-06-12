@@ -15,7 +15,7 @@ FunctionEnd
 
 ;; Function that registers one extension for VLC
 Function RegisterExtension
-  WriteRegStr HKCR "VLC$R0" "" "VLC media file"
+  WriteRegStr HKCR "VLC$R0" "" "VLC media file ($R0)"
   WriteRegStr HKCR "VLC$R0\shell" "" "Open"
   WriteRegStr HKCR "VLC$R0\shell\Open" "" "$(ShellAssociation_Play)"
   WriteRegStr HKCR "VLC$R0\shell\Open" "MultiSelectModel" "Player"
