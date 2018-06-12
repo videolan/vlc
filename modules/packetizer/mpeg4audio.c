@@ -329,11 +329,12 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
     *pp_block = NULL; /* Don't reuse this block */
 
+    int64_t i_diff = 0;
     if (p_block->i_pts != VLC_TS_INVALID &&
         p_block->i_pts != date_Get(&p_sys->end_date))
     {
         if(date_Get(&p_sys->end_date) != VLC_TS_INVALID)
-            p_sys->b_discontuinity = true;
+            i_diff = llabs( date_Get(&p_sys->end_date) - p_block->i_pts );
         date_Set(&p_sys->end_date, p_block->i_pts);
     }
 
@@ -341,9 +342,14 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
 
     /* Might not be known due to missing extradata,
        will be set to block pts above */
-    if(p_dec->fmt_out.audio.i_frame_length)
+    if(p_dec->fmt_out.audio.i_frame_length && p_block->i_pts != VLC_TS_INVALID)
+    {
         p_block->i_length = date_Increment(&p_sys->end_date,
             p_dec->fmt_out.audio.i_frame_length) - p_block->i_pts;
+
+        if( i_diff > p_block->i_length )
+            p_sys->b_discontuinity = true;
+    }
 
     return p_block;
 }
