@@ -1474,11 +1474,10 @@ static bool MuxStreams(sout_mux_t *p_mux )
              p_pes = p_pes->p_next )
         {
             int i_size = p_pes->i_buffer;
-            if( p_pes->i_dts + p_pes->i_length >
-                p_pcr_stream->state.i_pes_dts + p_pcr_stream->state.i_pes_length )
+            vlc_tick_t i_frag = p_pcr_stream->state.i_pes_dts +
+                             p_pcr_stream->state.i_pes_length - p_pes->i_dts;
+            if( p_pes->i_length > i_frag )
             {
-                vlc_tick_t i_frag = p_pcr_stream->state.i_pes_dts +
-                    p_pcr_stream->state.i_pes_length - p_pes->i_dts;
                 if( i_frag < 0 )
                 {
                     /* Next stream */
