@@ -1172,7 +1172,7 @@ static block_t *Encap_J2K( block_t *p_data, const es_format_t *p_fmt )
     SetDWBE(&p_data->p_buffer[16], max );
     SetDWBE(&p_data->p_buffer[20], min );
     memcpy( &p_data->p_buffer[24], "tcod", 4 );
-    const unsigned s = p_data->i_pts / CLOCK_FREQ;
+    const unsigned s = SEC_FROM_VLC_TICK(p_data->i_pts);
     const unsigned m = s / 60;
     const unsigned h = m / 60;
     const uint64_t l = p_fmt->video.i_frame_rate_base * CLOCK_FREQ /
