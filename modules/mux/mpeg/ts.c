@@ -713,7 +713,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_mux,
                  "invalid shaping (%"PRId64"ms) resetting to 200ms",
                  p_sys->i_shaping_delay / 1000 );
-        p_sys->i_shaping_delay = 200000;
+        p_sys->i_shaping_delay = VLC_TICK_FROM_MS(200);
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val );
@@ -724,7 +724,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_mux,
                  "invalid pcr delay (%"PRId64"ms) resetting to 70ms",
                  p_sys->i_pcr_delay / 1000 );
-        p_sys->i_pcr_delay = 70000;
+        p_sys->i_pcr_delay = VLC_TICK_FROM_MS(70);
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
@@ -1104,12 +1104,12 @@ static void SetBlockDuration( sout_input_t *p_input, block_t *p_data )
                 p_data->i_length = p_next->i_length;
             /* or worse */
             else
-                p_data->i_length = 1000;
+                p_data->i_length = VLC_TICK_FROM_MS(1);
         }
     }
     else if( p_input->p_fmt->i_codec != VLC_CODEC_SUBT )
     {
-        p_data->i_length = 1000;
+        p_data->i_length = VLC_TICK_FROM_MS(1);
     }
 }
 
@@ -1368,7 +1368,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
                 p_spu->i_dts = p_data->i_dts + p_data->i_length;
                 p_spu->i_pts = p_spu->i_dts;
-                p_spu->i_length = 1000;
+                p_spu->i_length = VLC_TICK_FROM_MS(1);
 
                 p_spu->p_buffer[0] = 0;
                 p_spu->p_buffer[1] = 1;
@@ -1407,7 +1407,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
         {
             /* FIXME choose a better value, but anyway we
              * should never have to do that */
-            p_data->i_length = 1000;
+            p_data->i_length = VLC_TICK_FROM_MS(1);
         }
 
         p_stream->state.i_pes_length += p_data->i_length;
@@ -1445,7 +1445,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
         if( p_sys->b_use_key_frames && p_stream == p_pcr_stream
             && (p_data->i_flags & BLOCK_FLAG_TYPE_I)
             && !(p_data->i_flags & BLOCK_FLAG_NO_KEYFRAME)
-            && (p_stream->state.i_pes_length > 400000) )
+            && (p_stream->state.i_pes_length > VLC_TICK_FROM_MS(400)) )
         {
             i_shaping_delay = p_stream->state.i_pes_length;
             p_stream->state.b_key_frame = 1;
