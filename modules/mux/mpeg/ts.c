@@ -1721,7 +1721,7 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 
     BufferChainInit( &new_chain );
 
-    if ( i_pcr_length <= 0 )
+    if ( unlikely(i_pcr_length <= 0) )
     {
         i_pcr_length = i_packet_count;
     }
@@ -1774,7 +1774,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     int i_packet_count = p_chain_ts->i_depth;
 
-    if ( i_pcr_length / 1000 > 0 )
+    if ( likely(i_pcr_length / 1000 > 0) )
     {
         int i_bitrate = ((uint64_t)i_packet_count * 188 * 8000)
                           / MS_FROM_VLC_TICK(i_pcr_length);
