@@ -200,7 +200,7 @@ static int SubsdelayCallback( vlc_object_t *p_this, char const *psz_var, vlc_val
 
 static void SubsdelayEnforceDelayRules( filter_t *p_filter );
 
-static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_t *p_entry );
+static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_t *p_entry );
 
 static void SubsdelayRecalculateDelays( filter_t *p_filter );
 
@@ -1161,7 +1161,7 @@ static void SubpicDestroyClone( subpicture_t *p_subpic )
  * SubsdelayEstimateDelay: Calculate new subtitle delay according to its
  *     content and the calculation mode
  *****************************************************************************/
-static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_t *p_entry )
+static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_t *p_entry )
 {
     int i_mode;
     int i_rank;
@@ -1182,7 +1182,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
             //FIXME: We only use a single segment here
             i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
 
-            return (int64_t)( i_rank * CLOCK_FREQ * p_sys->f_factor );
+            return (vlc_tick_t)( i_rank * CLOCK_FREQ * p_sys->f_factor );
         }
 
         /* content is unavailable, calculation mode should be based on source delay */
@@ -1191,7 +1191,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
 
     if( likely(i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY) )
     {
-        return (int64_t)( p_sys->f_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) );
+        return (vlc_tick_t)( p_sys->f_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) );
     }
 
     return VLC_TICK_FROM_SEC(10); /* 10 sec */
