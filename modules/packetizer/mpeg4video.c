@@ -258,7 +258,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* When starting the stream we can have the first frame with
      * a null DTS (i_interpolated_pts is initialized to 0) */
-    if( !p_au->i_dts )
+    if( p_au->i_dts == VLC_TICK_INVALID )
         p_au->i_dts = p_au->i_pts;
     return VLC_SUCCESS;
 }
