@@ -73,10 +73,10 @@ typedef struct
     mtime_t i_interpolated_pts;
     mtime_t i_interpolated_dts;
     mtime_t i_last_ref_pts;
-    mtime_t i_last_time_ref;
-    mtime_t i_time_ref;
-    mtime_t i_last_time;
-    mtime_t i_last_timeincr;
+    int64_t i_last_time_ref;
+    int64_t i_time_ref;
+    int64_t i_last_time;
+    int64_t i_last_timeincr;
 
     unsigned int i_flags;
 
