@@ -419,7 +419,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             }
             p_stream->p_oggds_header->i_size = 0 ;
             p_stream->p_oggds_header->i_time_unit =
-                     INT64_C(10000000) * p_stream->fmt.video.i_frame_rate_base /
+                     MSFTIME_FROM_SEC(1) * p_stream->fmt.video.i_frame_rate_base /
                      (int64_t)p_stream->fmt.video.i_frame_rate;
             p_stream->p_oggds_header->i_samples_per_unit = 1;
             p_stream->p_oggds_header->i_default_len = 1 ; /* ??? */
@@ -505,7 +505,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             snprintf( buf, sizeof(buf), "%"PRIx16, i_tag );
             strncpy( p_stream->p_oggds_header->sub_type, buf, 4 );
 
-            p_stream->p_oggds_header->i_time_unit = INT64_C(10000000);
+            p_stream->p_oggds_header->i_time_unit = MSFTIME_FROM_SEC(1);
             p_stream->p_oggds_header->i_default_len = 1;
             p_stream->p_oggds_header->i_buffer_size = 30*1024 ;
             p_stream->p_oggds_header->i_samples_per_unit = p_input->p_fmt->audio.i_rate;
@@ -1721,7 +1721,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             ( ( ( p_stream->i_num_frames - p_stream->i_last_keyframe ) & 0x07FFFFFF ) << 3 );
         }
         else if( p_stream->p_oggds_header )
-            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) * INT64_C(10) /
+            op.granulepos = MSFTIME_FROM_VLC_TICK( p_data->i_dts - p_sys->i_start_dts ) /
                 p_stream->p_oggds_header->i_time_unit;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
