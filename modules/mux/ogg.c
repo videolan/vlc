@@ -1446,7 +1446,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
         /* estimate length of pos value */
         if ( p_input->p_fmt->i_bitrate )
         {
-            i = i_interval * p_input->p_fmt->i_bitrate / 1000000;
+            i = i_interval * p_input->p_fmt->i_bitrate / CLOCK_FREQ;
             while ( i <<= 1 ) i_tuple_size++;
         }
         else
