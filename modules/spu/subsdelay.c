@@ -1189,7 +1189,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
         i_mode = SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY;
     }
 
-    if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY )
+    if( likely(i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY) )
     {
         return (int64_t)( p_sys->f_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) );
     }
