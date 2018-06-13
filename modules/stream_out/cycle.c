@@ -287,7 +287,7 @@ static int Open(vlc_object_t *obj)
         }
     }
 
-    if (sys->start == NULL || offset <= 0)
+    if (sys->start == NULL || offset == 0)
     {
         free(sys);
         msg_Err(stream, "unknown or invalid cycle specification");
