@@ -1729,7 +1729,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
         /* granulepos is in millisec */
-        op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) / 1000;
+        op.granulepos = MS_FROM_VLC_TICK( p_data->i_dts - p_sys->i_start_dts );
     }
     else
         return VLC_EGENERIC;
