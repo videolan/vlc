@@ -39,6 +39,7 @@
 #include <vlc_aout.h>
 #include <vlc_fourcc.h>
 #include <vlc_meta.h>
+#include <vlc_list.h>
 
 #include "input_internal.h"
 #include "../clock/input_clock.h"
@@ -72,6 +73,7 @@ typedef struct
     input_clock_t *p_input_clock;
 
     vlc_meta_t *p_meta;
+    struct vlc_list node;
 } es_out_pgrm_t;
 
 struct es_out_id_t
@@ -129,8 +131,7 @@ typedef struct
     vlc_mutex_t   lock;
 
     /* all programs */
-    int           i_pgrm;
-    es_out_pgrm_t **pgrm;
+    struct vlc_list programs;
     es_out_pgrm_t *p_pgrm;  /* Master program */
 
     /* all es */
@@ -299,7 +300,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->b_active = false;
     p_sys->i_mode   = ES_OUT_MODE_NONE;
 
-    TAB_INIT( p_sys->i_pgrm, p_sys->pgrm );
+    vlc_list_init(&p_sys->programs);
 
     TAB_INIT( p_sys->i_es, p_sys->es );
 
@@ -331,7 +332,9 @@ static void EsOutDelete( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
-    assert( !p_sys->i_es && !p_sys->i_pgrm && !p_sys->p_pgrm );
+    assert(p_sys->i_es == 0);
+    assert(vlc_list_is_empty(&p_sys->programs));
+    assert(p_sys->p_pgrm == NULL);
     EsOutPropsCleanup( &p_sys->audio );
     EsOutPropsCleanup( &p_sys->sub );
 
@@ -361,16 +364,16 @@ static void EsOutTerminate( es_out_t *out )
     TAB_CLEAN( p_sys->i_es, p_sys->es );
 
     /* FIXME duplicate work EsOutProgramDel (but we cannot use it) add a EsOutProgramClean ? */
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
+    es_out_pgrm_t *p_pgrm;
+    vlc_list_foreach(p_pgrm, &p_sys->programs, node)
     {
-        es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
         input_clock_Delete( p_pgrm->p_input_clock );
         if( p_pgrm->p_meta )
             vlc_meta_Delete( p_pgrm->p_meta );
 
+        vlc_list_remove(&p_pgrm->node);
         free( p_pgrm );
     }
-    TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
 
     p_sys->p_pgrm = NULL;
 
@@ -617,8 +620,9 @@ static void EsOutChangePosition( es_out_t *out )
         }
     }
 
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_Reset( p_sys->pgrm[i]->p_input_clock );
+    es_out_pgrm_t *pgrm;
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        input_clock_Reset(pgrm->p_input_clock);
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_initial = 0;
@@ -766,9 +770,10 @@ static bool EsOutIsExtraBufferingAllowed( es_out_t *out )
 static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    es_out_pgrm_t *pgrm;
 
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_ChangePause( p_sys->pgrm[i]->p_input_clock, b_paused, i_date );
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        input_clock_ChangePause(pgrm->p_input_clock, b_paused, i_date);
 }
 
 static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
@@ -791,9 +796,10 @@ static void EsOutDecoderChangeDelay( es_out_t *out, es_out_id_t *p_es )
 static void EsOutProgramsChangeRate( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    es_out_pgrm_t *pgrm;
 
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-        input_clock_ChangeRate( p_sys->pgrm[i]->p_input_clock, p_sys->i_rate );
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        input_clock_ChangeRate(pgrm->p_input_clock, p_sys->i_rate);
 }
 
 static void EsOutFrameNext( es_out_t *out )
@@ -1108,7 +1114,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     input_clock_SetJitter( p_pgrm->p_input_clock, p_sys->i_pts_delay, p_sys->i_cr_average );
 
     /* Append it */
-    TAB_APPEND( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
+    vlc_list_append(&p_pgrm->node, &p_sys->programs);
 
     /* Update "program" variable */
     if( EsOutIsProgramVisible( out, i_group ) )
@@ -1127,17 +1133,14 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
-    es_out_pgrm_t     *p_pgrm = NULL;
-    int               i;
+    es_out_pgrm_t *p_pgrm = NULL, *pgrm;
 
-    for( i = 0; i < p_sys->i_pgrm; i++ )
-    {
-        if( p_sys->pgrm[i]->i_id == i_group )
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        if (pgrm->i_id == i_group)
         {
-            p_pgrm = p_sys->pgrm[i];
+            p_pgrm = pgrm;
             break;
         }
-    }
 
     if( p_pgrm == NULL )
         return VLC_EGENERIC;
@@ -1149,7 +1152,7 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
         return VLC_EGENERIC;
     }
 
-    TAB_REMOVE( p_sys->i_pgrm, p_sys->pgrm, p_pgrm );
+    vlc_list_remove(&p_pgrm->node);
 
     /* If program is selected we need to unselect it */
     if( p_sys->p_pgrm == p_pgrm )
@@ -1172,12 +1175,12 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
 static es_out_pgrm_t *EsOutProgramFind( es_out_t *p_out, int i_group )
 {
     es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
+    es_out_pgrm_t *pgrm;
 
-    for( int i = 0; i < p_sys->i_pgrm; i++ )
-    {
-        if( p_sys->pgrm[i]->i_id == i_group )
-            return p_sys->pgrm[i];
-    }
+    vlc_list_foreach(pgrm, &p_sys->programs, node)
+        if (pgrm->i_id == i_group)
+            return pgrm;
+
     return EsOutProgramAdd( p_out, i_group );
 }
 
@@ -2522,14 +2525,16 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 const mtime_t i_jitter_max = INT64_C(1000) * var_InheritInteger( p_sys->p_input, "clock-jitter" );
                 if( i_pts_delay > __MIN( i_pts_delay_base + i_jitter_max, INPUT_PTS_DELAY_MAX ) )
                 {
+                    es_out_pgrm_t *pgrm;
+
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ignored)",
                              (int)(i_pts_delay - i_pts_delay_base) / 1000 );
                     i_pts_delay = p_sys->i_pts_delay;
 
                     /* reset clock */
-                    for( int i = 0; i < p_sys->i_pgrm; i++ )
-                      input_clock_Reset( p_sys->pgrm[i]->p_input_clock );
+                    vlc_list_foreach(pgrm, &p_sys->programs, node)
+                        input_clock_Reset(pgrm->p_input_clock);
                 }
                 else
                 {
@@ -2558,15 +2563,14 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
     case ES_OUT_SET_GROUP:
     {
         int i = va_arg( args, int );
-        for( int j = 0; j < p_sys->i_pgrm; j++ )
-        {
-            es_out_pgrm_t *p_pgrm = p_sys->pgrm[j];
+        es_out_pgrm_t *p_pgrm;
+
+        vlc_list_foreach(p_pgrm, &p_sys->programs, node)
             if( p_pgrm->i_id == i )
             {
                 EsOutProgramSelect( out, p_pgrm );
                 return VLC_SUCCESS;
             }
-        }
         return VLC_EGENERIC;
     }
 
@@ -2815,6 +2819,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         mtime_t i_pts_delay  = va_arg( args, mtime_t );
         mtime_t i_pts_jitter = va_arg( args, mtime_t );
         int     i_cr_average = va_arg( args, int );
+        es_out_pgrm_t *pgrm;
 
         bool b_change_clock =
             i_pts_delay + i_pts_jitter != p_sys->i_pts_delay ||
@@ -2825,9 +2830,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         p_sys->i_pts_jitter = i_pts_jitter;
         p_sys->i_cr_average = i_cr_average;
 
-        for( int i = 0; i < p_sys->i_pgrm && b_change_clock; i++ )
-            input_clock_SetJitter( p_sys->pgrm[i]->p_input_clock,
-                                   i_pts_delay + i_pts_jitter, i_cr_average );
+        if (b_change_clock)
+            vlc_list_foreach(pgrm, &p_sys->programs, node)
+                 input_clock_SetJitter(pgrm->p_input_clock, i_pts_delay
+                                       + i_pts_jitter, i_cr_average);
         return VLC_SUCCESS;
     }
 
