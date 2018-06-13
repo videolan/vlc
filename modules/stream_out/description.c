@@ -137,7 +137,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
     block_ChainRelease( p_buffer );
 
-    if( p_sys->i_stream_start + 1500000 < vlc_tick_now() )
+    if( p_sys->i_stream_start + VLC_TICK_FROM_MS(1500) < vlc_tick_now() )
         vlc_sem_post(p_sys->data->sem);
 
     return VLC_SUCCESS;
