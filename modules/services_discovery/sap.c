@@ -227,7 +227,7 @@ typedef struct
     bool  b_strict;
     bool  b_parse;
 
-    int i_timeout;
+    vlc_tick_t i_timeout;
 } services_discovery_sys_t;
 
 typedef struct
@@ -293,7 +293,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_timeout = var_CreateGetInteger( p_sd, "sap-timeout" );
+    p_sys->i_timeout = vlc_tick_from_sec(var_CreateGetInteger( p_sd, "sap-timeout" ));
 
     p_sd->p_sys  = p_sys;
     p_sd->description = _("Network streams (SAP)");
@@ -574,7 +574,6 @@ static void *Run( void *data )
         /* Check for items that need deletion */
         for( int i = 0; i < p_sys->i_announces; i++ )
         {
-            vlc_tick_t i_timeout = vlc_tick_from_sec( p_sys->i_timeout );
             sap_announce_t * p_announce = p_sys->pp_announces[i];
             vlc_tick_t i_last_period = now - p_announce->i_last;
 
@@ -582,7 +581,7 @@ static void *Run( void *data )
              * or if the last packet emitted was 10 times the average time
              * between two packets */
             if( ( p_announce->i_period_trust > 5 && i_last_period > 10 * p_announce->i_period ) ||
-                i_last_period > i_timeout )
+                i_last_period > p_sys->i_timeout )
             {
                 RemoveAnnounce( p_sd, p_announce );
             }
@@ -591,7 +590,7 @@ static void *Run( void *data )
                 /* Compute next timeout */
                 if( p_announce->i_period_trust > 5 )
                     timeout = __MIN((10 * p_announce->i_period - i_last_period) / 1000, timeout);
-                timeout = __MIN((i_timeout - i_last_period)/1000, timeout);
+                timeout = __MIN((p_sys->i_timeout - i_last_period)/1000, timeout);
             }
         }
 
