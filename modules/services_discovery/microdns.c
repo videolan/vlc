@@ -46,8 +46,8 @@ VLC_RD_PROBE_HELPER( "microdns_renderer", "mDNS renderer Discovery" )
 
 #define CFG_PREFIX "sd-microdns-"
 
-#define LISTEN_INTERVAL INT64_C(15000000) /* 15 seconds */
-#define TIMEOUT (3 * LISTEN_INTERVAL + INT64_C(5000000)) /* 3 * interval + 5 seconds */
+#define LISTEN_INTERVAL VLC_TICK_FROM_SEC(15) /* 15 seconds */
+#define TIMEOUT (3 * LISTEN_INTERVAL + VLC_TICK_FROM_SEC(5)) /* 3 * interval + 5 seconds */
 
 /*
  * Module descriptor
