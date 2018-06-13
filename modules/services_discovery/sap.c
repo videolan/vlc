@@ -589,8 +589,8 @@ static void *Run( void *data )
             {
                 /* Compute next timeout */
                 if( p_announce->i_period_trust > 5 )
-                    timeout = __MIN((10 * p_announce->i_period - i_last_period) / 1000, timeout);
-                timeout = __MIN((p_sys->i_timeout - i_last_period)/1000, timeout);
+                    timeout = __MIN(MS_FROM_VLC_TICK(10 * p_announce->i_period - i_last_period), timeout);
+                timeout = __MIN(MS_FROM_VLC_TICK(p_sys->i_timeout - i_last_period), timeout);
             }
         }
 
