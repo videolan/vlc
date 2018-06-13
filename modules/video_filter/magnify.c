@@ -80,7 +80,7 @@ typedef struct
 
     bool b_visible; /* is "interface" visible ? */
 
-    int64_t i_last_activity;
+    mtime_t i_last_activity;
 } filter_sys_t;
 
 #define VIS_ZOOM 4
