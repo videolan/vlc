@@ -98,10 +98,6 @@ static const char * const ppsz_mode_descriptions[] = { N_( "Absolute delay" ), N
 #define SUBSDELAY_MAX_ENTRIES 16
 
 /* factor convert macros */
-#define INT_FACTOR_BASE                  1000
-#define FLOAT_FACTOR_TO_INT_FACTOR( x )  (int)( ( x ) * INT_FACTOR_BASE )
-#define INT_FACTOR_TO_MICROSEC( x )      ( ( x ) * ( CLOCK_FREQ / INT_FACTOR_BASE ) )
-#define INT_FACTOR_TO_RANK_FACTOR( x )   ( x )
 #define MILLISEC_TO_MICROSEC( x )        ( ( x ) * 1000 )
 
 
@@ -1172,17 +1168,15 @@ static void SubpicDestroyClone( subpicture_t *p_subpic )
 static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_t *p_entry )
 {
     int i_mode;
-    int i_factor;
     int i_rank;
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
     i_mode = p_sys->i_mode;
-    i_factor = FLOAT_FACTOR_TO_INT_FACTOR( p_sys->f_factor );
 
     if( i_mode == SUBSDELAY_MODE_ABSOLUTE )
     {
-        return ( p_entry->p_source->i_stop - p_entry->p_source->i_start + INT_FACTOR_TO_MICROSEC( i_factor ) );
+        return ( p_entry->p_source->i_stop - p_entry->p_source->i_start + (vlc_tick_t)( CLOCK_FREQ * p_sys->f_factor ) );
     }
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT )
@@ -1192,7 +1186,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
             //FIXME: We only use a single segment here
             i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
 
-            return ( i_rank * INT_FACTOR_TO_RANK_FACTOR( i_factor ) );
+            return (int64_t)( i_rank * CLOCK_FREQ * p_sys->f_factor );
         }
 
         /* content is unavailable, calculation mode should be based on source delay */
@@ -1201,7 +1195,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY )
     {
-        return ( ( i_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) ) / INT_FACTOR_BASE );
+        return (int64_t)( p_sys->f_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) );
     }
 
     return 10000000; /* 10 sec */
