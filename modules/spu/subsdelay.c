@@ -882,10 +882,7 @@ static void SubsdelayEnforceDelayRules( filter_t *p_filter )
 
     for( int i = 0; i < i_count - i_overlap; i++ )
     {
-        if( p_list[i]->i_new_stop > p_list[i + i_overlap]->p_source->i_start )
-        {
-            p_list[i]->i_new_stop = p_list[i + i_overlap]->p_source->i_start;
-        }
+        p_list[i]->i_new_stop = __MIN(p_list[i]->i_new_stop, p_list[i + i_overlap]->p_source->i_start);
     }
 
     /* finally - update all */
