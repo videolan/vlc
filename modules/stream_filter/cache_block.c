@@ -73,7 +73,7 @@ typedef struct
     {
         /* Stats for calculating speed */
         uint64_t read_bytes;
-        uint64_t read_time;
+        mtime_t read_time;
     } stat;
 } stream_sys_t;
 
