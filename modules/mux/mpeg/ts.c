@@ -1771,7 +1771,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     if ( i_pcr_length / 1000 > 0 )
     {
         int i_bitrate = ((uint64_t)i_packet_count * 188 * 8000)
-                          / (uint64_t)(i_pcr_length / 1000);
+                          / MS_FROM_VLC_TICK(i_pcr_length);
         if ( p_sys->i_bitrate_max && p_sys->i_bitrate_max < i_bitrate )
         {
             msg_Warn( p_mux, "max bitrate exceeded at %"PRId64
