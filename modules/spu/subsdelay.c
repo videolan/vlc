@@ -97,10 +97,6 @@ static const char * const ppsz_mode_descriptions[] = { N_( "Absolute delay" ), N
 /* max subtitles handled on the heap */
 #define SUBSDELAY_MAX_ENTRIES 16
 
-/* factor convert macros */
-#define MILLISEC_TO_MICROSEC( x )        ( ( x ) * 1000 )
-
-
 #define SUBSDELAY_MODE_ABSOLUTE                0
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_DELAY   1
 #define SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT 2
@@ -175,11 +171,11 @@ typedef struct
 
     int i_min_alpha; /* oldest subtitle alpha value */
 
-    int64_t i_min_stops_interval;
+    vlc_tick_t i_min_stops_interval;
 
-    int64_t i_min_stop_start_interval;
+    vlc_tick_t i_min_stop_start_interval;
 
-    int64_t i_min_start_stop_interval;
+    vlc_tick_t i_min_start_stop_interval;
 
     subsdelay_heap_t heap; /* subpictures list */
 } filter_sys_t;
@@ -329,15 +325,15 @@ static int SubsdelayCreate( vlc_object_t *p_this )
     var_AddCallback( p_filter, CFG_MIN_ALPHA, SubsdelayCallback, p_sys );
 
     p_sys->i_min_stops_interval
-            = MILLISEC_TO_MICROSEC( var_CreateGetIntegerCommand( p_filter, CFG_MIN_STOPS_INTERVAL ) );
+            = VLC_TICK_FROM_MS( var_CreateGetIntegerCommand( p_filter, CFG_MIN_STOPS_INTERVAL ) );
     var_AddCallback( p_filter, CFG_MIN_STOPS_INTERVAL, SubsdelayCallback, p_sys );
 
     p_sys->i_min_stop_start_interval
-            = MILLISEC_TO_MICROSEC( var_CreateGetIntegerCommand( p_filter, CFG_MIN_STOP_START_INTERVAL ) );
+            = VLC_TICK_FROM_MS( var_CreateGetIntegerCommand( p_filter, CFG_MIN_STOP_START_INTERVAL ) );
     var_AddCallback( p_filter, CFG_MIN_STOP_START_INTERVAL, SubsdelayCallback, p_sys );
 
     p_sys->i_min_start_stop_interval
-            = MILLISEC_TO_MICROSEC( var_CreateGetIntegerCommand( p_filter, CFG_MIN_START_STOP_INTERVAL ) );
+            = VLC_TICK_FROM_MS( var_CreateGetIntegerCommand( p_filter, CFG_MIN_START_STOP_INTERVAL ) );
     var_AddCallback( p_filter, CFG_MIN_START_STOP_INTERVAL, SubsdelayCallback, p_sys );
 
     p_filter->p_sys = p_sys;
@@ -475,15 +471,15 @@ static int SubsdelayCallback( vlc_object_t *p_this, char const *psz_var, vlc_val
     }
     else if( !strcmp( psz_var, CFG_MIN_STOPS_INTERVAL ) )
     {
-        p_sys->i_min_stops_interval = MILLISEC_TO_MICROSEC( newval.i_int );
+        p_sys->i_min_stops_interval = VLC_TICK_FROM_MS( newval.i_int );
     }
     else if( !strcmp( psz_var, CFG_MIN_STOP_START_INTERVAL ) )
     {
-        p_sys->i_min_stop_start_interval = MILLISEC_TO_MICROSEC( newval.i_int );
+        p_sys->i_min_stop_start_interval = VLC_TICK_FROM_MS( newval.i_int );
     }
     else if( !strcmp( psz_var, CFG_MIN_START_STOP_INTERVAL ) )
     {
-        p_sys->i_min_start_stop_interval = MILLISEC_TO_MICROSEC( newval.i_int );
+        p_sys->i_min_start_stop_interval = VLC_TICK_FROM_MS( newval.i_int );
     }
     else
     {
@@ -771,9 +767,9 @@ static void SubsdelayEnforceDelayRules( filter_t *p_filter )
     subsdelay_heap_entry_t ** p_list;
     int i_count, i_overlap;
     vlc_tick_t i_offset;
-    int64_t i_min_stops_interval;
-    int64_t i_min_stop_start_interval;
-    int64_t i_min_start_stop_interval;
+    vlc_tick_t i_min_stops_interval;
+    vlc_tick_t i_min_stop_start_interval;
+    vlc_tick_t i_min_start_stop_interval;
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
