@@ -71,7 +71,7 @@ struct event_thread_t
     HCURSOR cursor_arrow;
     HCURSOR cursor_empty;
     unsigned button_pressed;
-    mtime_t hide_timeout;
+    int64_t hide_timeout;
     mtime_t last_moved;
 
     /* Gestures */
