@@ -1140,7 +1140,7 @@ vlc_tick_t intf_sys_t::getPlaybackTimestamp()
             assert( m_communication );
             vlc_tick_t now = vlc_tick_now();
             if( m_state == Playing && m_last_request_id == 0
-             && now - m_cc_time_last_request_date > INT64_C(4000000) )
+             && now - m_cc_time_last_request_date > VLC_TICK_FROM_SEC(4) )
             {
                 m_cc_time_last_request_date = now;
                 m_last_request_id =
