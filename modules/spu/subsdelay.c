@@ -429,7 +429,7 @@ static subpicture_t * SubsdelayFilter( filter_t *p_filter, subpicture_t* p_subpi
         /* set a relativly long delay in hope that the next subtitle
            will arrive in this time and the real delay could be determined */
 
-        p_subpic->i_stop = p_subpic->i_start + 20000000; /* start + 20 sec */
+        p_subpic->i_stop = p_subpic->i_start + VLC_TICK_FROM_SEC(20); /* start + 20 sec */
         p_subpic->b_ephemer = false;
     }
 
@@ -1194,7 +1194,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
         return (int64_t)( p_sys->f_factor * ( p_entry->p_source->i_stop - p_entry->p_source->i_start ) );
     }
 
-    return 10000000; /* 10 sec */
+    return VLC_TICK_FROM_SEC(10); /* 10 sec */
 }
 
 /*****************************************************************************
