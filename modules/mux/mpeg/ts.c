@@ -1652,11 +1652,12 @@ static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
         i_copy = __MIN( STD_PES_PAYLOAD - i_size, p_next->i_buffer );
 
         memcpy( &p_data->p_buffer[i_size], p_next->p_buffer, i_copy );
+        vlc_tick_t offset = p_next->i_length * i_copy / p_next->i_buffer;
         if( p_next->i_pts )
-            p_next->i_pts += p_next->i_length * i_copy / p_next->i_buffer;
+            p_next->i_pts += offset;
         if( p_next->i_dts )
-            p_next->i_dts += p_next->i_length * i_copy / p_next->i_buffer;
-        p_next->i_length -= p_next->i_length * i_copy / p_next->i_buffer;
+            p_next->i_dts += offset;
+        p_next->i_length -= offset;
         p_next->i_buffer -= i_copy;
         p_next->p_buffer += i_copy;
         p_next->i_flags |= BLOCK_FLAG_NO_KEYFRAME;
