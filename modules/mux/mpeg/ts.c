@@ -1403,7 +1403,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                     return false;
             }
         }
-        else if( p_data->i_length < 0 || p_data->i_length > 2000000 )
+        else if( p_data->i_length < 0 || p_data->i_length > VLC_TICK_FROM_SEC(2) )
         {
             /* FIXME choose a better value, but anyway we
              * should never have to do that */
