@@ -508,7 +508,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     bridge_t *p_bridge;
     bool b_no_es = true;
     int i;
-    int i_date = mdate();
+    mtime_t i_date = mdate();
 
     /* First forward the packet for our own ES */
     if( !p_sys->b_placeholder )
