@@ -103,7 +103,7 @@ typedef struct
         /* Stat about reading data */
         uint64_t i_read_count;
         uint64_t i_bytes;
-        uint64_t i_read_time;
+        mtime_t i_read_time;
     } stat;
 } stream_sys_t;
 
