@@ -73,10 +73,10 @@ struct decoder_sys_t
     vlc_tick_t i_interpolated_pts;
     vlc_tick_t i_interpolated_dts;
     vlc_tick_t i_last_ref_pts;
-    vlc_tick_t i_last_time_ref;
-    vlc_tick_t i_time_ref;
-    vlc_tick_t i_last_time;
-    vlc_tick_t i_last_timeincr;
+    int64_t i_last_time_ref;
+    int64_t i_time_ref;
+    int64_t i_last_time;
+    int64_t i_last_timeincr;
 
     unsigned int i_flags;
 
