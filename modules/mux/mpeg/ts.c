@@ -1533,13 +1533,13 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
         /* do we need to issue pcr */
         bool b_pcr = false;
+        vlc_tick_t packet_length = i_pcr_length * i_packet_pos / i_packet_count;
         if( p_stream == p_pcr_stream &&
-            i_pcr_dts + i_packet_pos * i_pcr_length / i_packet_count >=
+            i_pcr_dts + packet_length >=
             p_sys->i_pcr + p_sys->i_pcr_delay )
         {
             b_pcr = true;
-            p_sys->i_pcr = i_pcr_dts + i_packet_pos *
-                i_pcr_length / i_packet_count;
+            p_sys->i_pcr = i_pcr_dts + packet_length;
         }
 
         /* Build the TS packet */
