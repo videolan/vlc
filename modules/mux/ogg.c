@@ -1437,7 +1437,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             /* optimize for fps < 1 */
             i_interval= __MAX( i_interval,
-                       INT64_C(10000000) *
+                       VLC_TICK_FROM_SEC(10) *
                        p_stream->fmt.video.i_frame_rate_base /
                        p_stream->fmt.video.i_frame_rate );
         }
