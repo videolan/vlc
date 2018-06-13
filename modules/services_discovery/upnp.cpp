@@ -870,7 +870,7 @@ namespace
             {
                 int i_hours, i_minutes, i_seconds;
                 if( sscanf( psz_duration, "%d:%02d:%02d", &i_hours, &i_minutes, &i_seconds ) )
-                    i_duration = CLOCK_FREQ * ( i_hours * 3600 + i_minutes * 60 +
+                    i_duration = vlc_tick_from_sec( i_hours * 3600 + i_minutes * 60 +
                                                 i_seconds );
             }
             return input_item_NewExt( psz_resource_url, title, i_duration,
