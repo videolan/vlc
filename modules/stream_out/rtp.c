@@ -287,7 +287,7 @@ static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t * );
 
-static int64_t rtp_init_ts( const vod_media_t *p_media,
+static mtime_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session );
 
 typedef struct
@@ -312,8 +312,8 @@ typedef struct
 
     /* RTSP NPT and timestamp computations */
     mtime_t      i_npt_zero;    /* when NPT=0 packet is sent */
-    int64_t      i_pts_zero;    /* predicts PTS of NPT=0 packet */
-    int64_t      i_pts_offset;  /* matches actual PTS to prediction */
+    mtime_t      i_pts_zero;    /* predicts PTS of NPT=0 packet */
+    mtime_t      i_pts_offset;  /* matches actual PTS to prediction */
     vlc_mutex_t  lock_ts;
 
     /* */
@@ -382,7 +382,7 @@ struct sout_stream_id_sys_t
     } listen;
 
     block_fifo_t     *p_fifo;
-    int64_t           i_caching;
+    mtime_t           i_caching;
 };
 
 /*****************************************************************************
@@ -936,7 +936,7 @@ rtp_set_ptime (sout_stream_id_sys_t *id, unsigned ptime_ms, size_t bytes)
         id->i_mtu = 12 + (((id->i_mtu - 12) / bytes) * bytes);
 }
 
-uint32_t rtp_compute_ts( unsigned i_clock_rate, int64_t i_pts )
+uint32_t rtp_compute_ts( unsigned i_clock_rate, mtime_t i_pts )
 {
     /* This is an overflow-proof way of doing:
      * return i_pts * (int64_t)i_clock_rate / CLOCK_FREQ;
@@ -1397,7 +1397,7 @@ static void* ThreadSend( void *data )
 # define EWOULDBLOCK  WSAEWOULDBLOCK
 #endif
     sout_stream_id_sys_t *id = data;
-    unsigned i_caching = id->i_caching;
+    mtime_t i_caching = id->i_caching;
 
     for (;;)
     {
@@ -1554,7 +1554,7 @@ uint16_t rtp_get_seq( sout_stream_id_sys_t *id )
  * feature). In the VoD case, this function is called independently
  * from several parts of the code, so we need to always return the same
  * value. */
-static int64_t rtp_init_ts( const vod_media_t *p_media,
+static mtime_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session )
 {
     if (p_media == NULL || psz_vod_session == NULL)
@@ -1575,7 +1575,7 @@ static int64_t rtp_init_ts( const vod_media_t *p_media,
  * Also return the NPT corresponding to this timestamp. If the stream
  * output is not started, the initial timestamp that will be used with
  * the first packets for NPT=0 is returned instead. */
-int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
+mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
                     const vod_media_t *p_media, const char *psz_vod_session,
                     int64_t *p_npt )
 {
@@ -1609,7 +1609,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
 }
 
 void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
-                           bool b_m_bit, int64_t i_pts )
+                           bool b_m_bit, mtime_t i_pts )
 {
     if( !id->b_ts_init )
     {
@@ -1718,7 +1718,7 @@ static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = p_sys->es[0];
 
-    int64_t  i_dts = p_buffer->i_dts;
+    mtime_t  i_dts = p_buffer->i_dts;
 
     uint8_t         *p_data = p_buffer->p_buffer;
     size_t          i_data  = p_buffer->i_buffer;

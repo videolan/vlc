@@ -69,7 +69,7 @@ struct rtsp_stream_t
     int             sessionc;
     rtsp_session_t **sessionv;
 
-    int             timeout;
+    mtime_t         timeout;
     vlc_timer_t     timer;
 };
 
@@ -1006,7 +1006,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                             break;
                     }
                 }
-                int64_t ts = rtp_get_ts(vod ? NULL : (sout_stream_t *)owner,
+                mtime_t ts = rtp_get_ts(vod ? NULL : (sout_stream_t *)owner,
                                         sout_id, rtsp->vod_media, psz_session,
                                         vod ? NULL : &npt);
 

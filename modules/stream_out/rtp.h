@@ -46,22 +46,22 @@ void RtspTrackDetach( rtsp_stream_t *rtsp, const char *name,
 char *SDPGenerate( sout_stream_t *p_stream, const char *rtsp_url );
 char *SDPGenerateVoD( const vod_media_t *p_media, const char *rtsp_url );
 
-uint32_t rtp_compute_ts( unsigned i_clock_rate, int64_t i_pts );
+uint32_t rtp_compute_ts( unsigned i_clock_rate, mtime_t i_pts );
 int rtp_add_sink( sout_stream_id_sys_t *id, int fd, bool rtcp_mux, uint16_t *seq );
 void rtp_del_sink( sout_stream_id_sys_t *id, int fd );
 uint16_t rtp_get_seq( sout_stream_id_sys_t *id );
-int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
+mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
                     const vod_media_t *p_media, const char *psz_vod_session,
-                    int64_t *p_npt );
+                    mtime_t *p_npt );
 
 /* RTP packetization */
 void rtp_packetize_common (sout_stream_id_sys_t *id, block_t *out,
-                           bool b_m_bit, int64_t i_pts);
+                           bool b_m_bit, mtime_t i_pts);
 void rtp_packetize_send (sout_stream_id_sys_t *id, block_t *out);
 size_t rtp_mtu (const sout_stream_id_sys_t *id);
 
 int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
-                               int64_t i_pts );
+                               mtime_t i_pts );
 
 /* RTCP */
 typedef struct rtcp_sender_t rtcp_sender_t;
@@ -99,7 +99,7 @@ int  OpenVoD ( vlc_object_t * );
 void CloseVoD( vlc_object_t * );
 
 int vod_check_range(vod_media_t *p_media, const char *psz_session,
-                    int64_t start, int64_t end);
+                    mtime_t start, mtime_t end);
 void vod_play(vod_media_t *p_media, const char *psz_session,
               int64_t *start, int64_t end);
 void vod_pause(vod_media_t *p_media, const char *psz_session, int64_t *npt);
