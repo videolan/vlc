@@ -104,7 +104,7 @@ typedef struct
 
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
-    int i_speed;
+    mtime_t i_speed;
     int i_length;
 
     char *psz_marquee;    /* marquee string */
