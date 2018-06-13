@@ -960,7 +960,7 @@ bool intf_sys_t::handleMessages()
         // how many bytes to read
         ssize_t i_ret = m_communication->receive( p_packet + i_received,
                                         i_payloadSize + PACKET_HEADER_LEN - i_received,
-                                        PING_WAIT_TIME - ( vlc_tick_now() - i_begin_time ) / CLOCK_FREQ,
+                                        PING_WAIT_TIME - SEC_FROM_VLC_TICK( vlc_tick_now() - i_begin_time ),
                                         &b_timeout );
         if ( i_ret < 0 )
         {
