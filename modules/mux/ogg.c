@@ -1585,7 +1585,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     block_t *p_og = NULL;
     ogg_packet op;
-    uint64_t i_time;
+    mtime_t i_time;
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
