@@ -240,7 +240,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
           p_sys->i_size > p_sys->i_max_size ) )
     {
         msg_Dbg( p_stream, "Starting recording, waited %ds and %dbyte",
-                 (int)((vlc_tick_now() - p_sys->i_date_start)/CLOCK_FREQ), (int)p_sys->i_size );
+                 (int)SEC_FROM_VLC_TICK(vlc_tick_now() - p_sys->i_date_start), (int)p_sys->i_size );
         OutputStart( p_stream );
     }
 
