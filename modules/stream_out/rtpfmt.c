@@ -674,11 +674,11 @@ int rtp_get_fmt( vlc_object_t *obj, const es_format_t *p_fmt, const char *mux,
 
 static int
 rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
-                        const uint8_t *p_data, int i_data, int64_t i_pts,
-                        int64_t i_dts, bool b_last, int64_t i_length );
+                        const uint8_t *p_data, int i_data, mtime_t i_pts,
+                        mtime_t i_dts, bool b_last, mtime_t i_length );
 
 int rtp_packetize_xiph_config( sout_stream_id_sys_t *id, const char *fmtp,
-                               int64_t i_pts )
+                               mtime_t i_pts )
 {
     if (fmtp == NULL)
         return VLC_EGENERIC;
@@ -1055,7 +1055,7 @@ static int rtp_packetize_swab(sout_stream_id_sys_t *id, block_t *in)
     while (in->i_buffer > 0)
     {
         unsigned payload = (max < in->i_buffer) ? max : in->i_buffer;
-        unsigned duration = (in->i_length * payload) / in->i_buffer;
+        mtime_t duration = (in->i_length * payload) / in->i_buffer;
         bool marker = (in->i_flags & BLOCK_FLAG_DISCONTINUITY) != 0;
 
         block_t *out = block_Alloc(12 + payload);
@@ -1239,8 +1239,8 @@ static int rtp_packetize_h263( sout_stream_id_sys_t *id, block_t *in )
 /* rfc3984 */
 static int
 rtp_packetize_h264_nal( sout_stream_id_sys_t *id,
-                        const uint8_t *p_data, int i_data, int64_t i_pts,
-                        int64_t i_dts, bool b_last, int64_t i_length )
+                        const uint8_t *p_data, int i_data, mtime_t i_pts,
+                        mtime_t i_dts, bool b_last, mtime_t i_length )
 {
     const int i_max = rtp_mtu (id); /* payload max in one packet */
     int i_nal_hdr;
@@ -1323,8 +1323,8 @@ static int rtp_packetize_h264( sout_stream_id_sys_t *id, block_t *in )
 /* rfc7798 */
 static int
 rtp_packetize_h265_nal( sout_stream_id_sys_t *id,
-                        const uint8_t *p_data, size_t i_data, int64_t i_pts,
-                        int64_t i_dts, bool b_last, int64_t i_length )
+                        const uint8_t *p_data, size_t i_data, mtime_t i_pts,
+                        mtime_t i_dts, bool b_last, mtime_t i_length )
 {
     const size_t i_max = rtp_mtu (id); /* payload max in one packet */
 
