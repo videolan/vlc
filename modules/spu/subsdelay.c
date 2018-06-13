@@ -774,7 +774,7 @@ static void SubsdelayEnforceDelayRules( filter_t *p_filter )
 {
     subsdelay_heap_entry_t ** p_list;
     int i_count, i_overlap;
-    int64_t i_offset;
+    mtime_t i_offset;
     int64_t i_min_stops_interval;
     int64_t i_min_stop_start_interval;
     int64_t i_min_start_stop_interval;
