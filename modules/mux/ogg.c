@@ -1692,8 +1692,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                 dt *=2;
             }
 
-            int64_t delay = pt - dt;
-            if ( delay < 0 ) delay *= -1;
+            int64_t delay = llabs(pt - dt);
 
             op.granulepos = (pt - delay) << 31 | (dist&0xff00) << 14
                           | (delay&0x1fff) << 9 | (dist&0xff);
