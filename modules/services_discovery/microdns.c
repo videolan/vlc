@@ -457,7 +457,7 @@ RunSD( void *p_this )
     int i_status = mdns_listen( p_sys->p_microdns,
                                 p_sys->ppsz_service_names,
                                 p_sys->i_nb_service_names,
-                                RR_PTR, LISTEN_INTERVAL / INT64_C(1000000),
+                                RR_PTR, SEC_FROM_VLC_TICK(LISTEN_INTERVAL),
                                 stop_sd_cb, new_entries_sd_cb, p_sd );
 
     if( i_status < 0 )
@@ -569,7 +569,7 @@ RunRD( void *p_this )
     int i_status = mdns_listen( p_sys->p_microdns,
                                 p_sys->ppsz_service_names,
                                 p_sys->i_nb_service_names,
-                                RR_PTR, LISTEN_INTERVAL / INT64_C(1000000),
+                                RR_PTR, SEC_FROM_VLC_TICK(LISTEN_INTERVAL),
                                 stop_rd_cb, new_entries_rd_cb, p_rd );
 
     if( i_status < 0 )
