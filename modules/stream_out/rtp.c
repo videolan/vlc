@@ -225,7 +225,7 @@ vlc_module_begin ()
                  TTL_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000,
+    add_integer( SOUT_CFG_PREFIX "caching", MS_FROM_VLC_TICK(DEFAULT_PTS_DELAY),
                  CACHING_TEXT, CACHING_LONGTEXT, true )
 
 #ifdef HAVE_SRTP
