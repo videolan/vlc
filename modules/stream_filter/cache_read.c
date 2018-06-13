@@ -194,7 +194,7 @@ static void AStreamPrebufferStream(stream_t *s)
 
             msg_Dbg(s, "pre-buffering done %"PRId64" bytes in %"PRId64"s - "
                     "%"PRId64" KiB/s", sys->stat.i_bytes,
-                    sys->stat.i_read_time / CLOCK_FREQ, i_byterate / 1024);
+                    SEC_FROM_VLC_TICK(sys->stat.i_read_time), i_byterate / 1024);
             break;
         }
 
@@ -209,7 +209,7 @@ static void AStreamPrebufferStream(stream_t *s)
         if (first)
         {
             msg_Dbg(s, "received first data after %"PRId64" ms",
-                    (vlc_tick_now() - start) / 1000);
+                    MS_FROM_VLC_TICK(vlc_tick_now() - start));
             first = false;
         }
 
