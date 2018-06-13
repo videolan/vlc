@@ -96,8 +96,8 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
     rtsp->vod_media = media;
     vlc_mutex_init( &rtsp->lock );
 
-    rtsp->timeout = var_InheritInteger(owner, "rtsp-timeout");
-    if (rtsp->timeout > 0)
+    rtsp->timeout = __MAX(0,var_InheritInteger(owner, "rtsp-timeout"));
+    if (rtsp->timeout != 0)
     {
         if (vlc_timer_create(&rtsp->timer, RtspTimeOut, rtsp))
             goto error;
@@ -148,7 +148,7 @@ void RtspUnsetup( rtsp_stream_t *rtsp )
     while( rtsp->sessionc > 0 )
         RtspClientDel( rtsp, rtsp->sessionv[0] );
 
-    if (rtsp->timeout > 0)
+    if (rtsp->timeout != 0)
         vlc_timer_destroy(rtsp->timer);
 
     free( rtsp->psz_path );
@@ -300,7 +300,7 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
 /** rtsp must be locked */
 static void RtspUpdateTimer( rtsp_stream_t *rtsp )
 {
-    if (rtsp->timeout <= 0)
+    if (rtsp->timeout == 0)
         return;
 
     vlc_tick_t timeout = 0;
@@ -409,7 +409,7 @@ void RtspClientDel( rtsp_stream_t *rtsp, rtsp_session_t *session )
 /** rtsp must be locked */
 static void RtspClientAlive( rtsp_session_t *session )
 {
-    if (session->stream->timeout <= 0)
+    if (session->stream->timeout == 0)
         return;
 
     session->last_seen = vlc_tick_now();
@@ -1200,7 +1200,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
 
     if( psz_session )
     {
-        if (rtsp->timeout > 0)
+        if (rtsp->timeout != 0)
             httpd_MsgAdd( answer, "Session", "%s;timeout=%u", psz_session,
                                                               rtsp->timeout );
         else
