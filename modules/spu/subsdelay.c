@@ -173,7 +173,7 @@ typedef struct
 {
     int i_mode; /* delay calculation mode */
 
-    int i_factor; /* calculation factor */
+    float f_factor; /* calculation factor */
 
     int i_overlap; /* max overlap */
 
@@ -323,7 +323,7 @@ static int SubsdelayCreate( vlc_object_t *p_this )
     p_sys->i_mode = var_CreateGetIntegerCommand( p_filter, CFG_MODE );
     var_AddCallback( p_filter, CFG_MODE, SubsdelayCallback, p_sys );
 
-    p_sys->i_factor = FLOAT_FACTOR_TO_INT_FACTOR( var_CreateGetFloatCommand( p_filter, CFG_FACTOR ) );
+    p_sys->f_factor = var_CreateGetFloatCommand( p_filter, CFG_FACTOR );
     var_AddCallback( p_filter, CFG_FACTOR, SubsdelayCallback, p_sys );
 
     p_sys->i_overlap = var_CreateGetIntegerCommand( p_filter, CFG_OVERLAP );
@@ -467,7 +467,7 @@ static int SubsdelayCallback( vlc_object_t *p_this, char const *psz_var, vlc_val
     }
     else if( !strcmp( psz_var, CFG_FACTOR ) )
     {
-        p_sys->i_factor = FLOAT_FACTOR_TO_INT_FACTOR( newval.f_float );
+        p_sys->f_factor = newval.f_float;
     }
     else if( !strcmp( psz_var, CFG_OVERLAP ) )
     {
@@ -1178,7 +1178,7 @@ static int64_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_entry_
     filter_sys_t *p_sys = p_filter->p_sys;
 
     i_mode = p_sys->i_mode;
-    i_factor = p_sys->i_factor;
+    i_factor = FLOAT_FACTOR_TO_INT_FACTOR( p_sys->f_factor );
 
     if( i_mode == SUBSDELAY_MODE_ABSOLUTE )
     {
