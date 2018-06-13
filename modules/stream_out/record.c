@@ -145,7 +145,7 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    p_sys->i_date_start = -1;
+    p_sys->i_date_start = VLC_TICK_INVALID;
     p_sys->i_size = 0;
 #ifdef OPTIMIZE_MEMORY
     p_sys->i_max_wait = VLC_TICK_FROM_SEC(5);
@@ -233,7 +233,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    if( p_sys->i_date_start < 0 )
+    if( p_sys->i_date_start == VLC_TICK_INVALID )
         p_sys->i_date_start = vlc_tick_now();
     if( !p_sys->p_out &&
         ( vlc_tick_now() - p_sys->i_date_start > p_sys->i_max_wait ||
