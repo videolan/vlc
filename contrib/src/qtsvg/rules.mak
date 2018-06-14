@@ -31,7 +31,7 @@ qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	cd $< && $(MAKE) -C src sub-plugins-install_subtargets sub-svg-install_subtargets
 	mv $(PREFIX)/plugins/iconengines/libqsvgicon.a $(PREFIX)/lib/
 	mv $(PREFIX)/plugins/imageformats/libqsvg.a $(PREFIX)/lib/
-	cd $(PREFIX)/lib/pkgconfig; sed -i \
+	cd $(PREFIX)/lib/pkgconfig; sed -i.orig \
 		-e 's/d\.a/.a/g' \
 		-e 's/-lQt\([^ ]*\)d/-lQt\1/g' \
 		-e '/Libs:/  s/-lQt5Svg/-lqsvg -lqsvgicon -lQt5Svg/ ' \
