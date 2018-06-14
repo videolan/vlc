@@ -930,7 +930,7 @@ static void StartTitle( input_thread_t * p_input )
     if( priv->i_start > 0 )
     {
         msg_Dbg( p_input, "starting at time: %"PRId64"s",
-                 priv->i_start / CLOCK_FREQ );
+                 SEC_FROM_VLC_TICK(priv->i_start) );
 
         input_SetTime( p_input, priv->i_start, false );
     }
