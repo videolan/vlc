@@ -328,7 +328,7 @@ static void *Thread (void *data)
         if (deadline != INT64_MAX)
         {
             vlc_tick_t delay = deadline - vlc_tick_now();
-            timeout = (delay > 0) ? delay / (CLOCK_FREQ / 1000) : 0;
+            timeout = (delay > 0) ? MS_FROM_VLC_TICK(delay) : 0;
         }
 
         int val = poll(&ufd, 1, timeout);
