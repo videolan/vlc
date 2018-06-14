@@ -675,7 +675,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     input_SendEventCache( p_sys->p_input, 1.0 );
 
     msg_Dbg( p_sys->p_input, "Stream buffering done (%d ms in %d ms)",
-              (int)(i_stream_duration/1000), (int)(i_system_duration/1000) );
+              (int)MS_FROM_VLC_TICK(i_stream_duration), (int)MS_FROM_VLC_TICK(i_system_duration) );
     p_sys->b_buffering = false;
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
@@ -697,7 +697,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     }
 
     msg_Dbg( p_sys->p_input, "Decoder wait done in %d ms",
-              (int)(vlc_tick_now() - i_decoder_buffering_start)/1000 );
+              (int)MS_FROM_VLC_TICK(vlc_tick_now() - i_decoder_buffering_start) );
 
     /* Here is a good place to destroy unused vout with every demuxer */
     input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
@@ -822,7 +822,7 @@ static void EsOutFrameNext( es_out_t *out )
     vlc_tick_t i_duration;
     input_DecoderFrameNext( p_es_video->p_dec, &i_duration );
 
-    msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
+    msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)MS_FROM_VLC_TICK(i_duration) );
 
     if( i_duration <= 0 )
         i_duration = VLC_TICK_FROM_MS(40);
@@ -2526,7 +2526,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called too late (jitter of %d ms ignored)",
-                             (int)(i_pts_delay - i_pts_delay_base) / 1000 );
+                             (int)MS_FROM_VLC_TICK(i_pts_delay - i_pts_delay_base) );
                     i_pts_delay = p_sys->i_pts_delay;
 
                     /* reset clock */
@@ -2537,7 +2537,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 {
                     msg_Err( p_sys->p_input,
                              "ES_OUT_SET_(GROUP_)PCR  is called too late (pts_delay increased to %d ms)",
-                             (int)(i_pts_delay/1000) );
+                             (int)MS_FROM_VLC_TICK(i_pts_delay) );
 
                     /* Force a rebufferization when we are too late */
 
