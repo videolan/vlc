@@ -2143,7 +2143,7 @@ static int pic_holder_wait(struct pic_holder *pic_holder, const picture_t *pic)
      * output pictures (will they be rendered immediately ?), so don't wait
      * infinitely. The output will be paced anyway by the vlc_cond_timedwait()
      * call. */
-    vlc_tick_t deadline = vlc_tick_now() + INT64_C(200000);
+    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(200);
     int ret = 0;
     while (ret == 0 && pic_holder->field_reorder_max != 0
         && pic_holder->nb_field_out >= pic_holder->field_reorder_max + reserved_fields)
