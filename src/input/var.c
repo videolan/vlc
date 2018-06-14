@@ -297,7 +297,7 @@ void input_ControlVarNavigation( input_thread_t *p_input )
         if( input_priv(p_input)->title[i]->i_length > 0 )
         {
             strcpy( psz_length, " [" );
-            secstotimestr( &psz_length[2], input_priv(p_input)->title[i]->i_length / CLOCK_FREQ );
+            secstotimestr( &psz_length[2], SEC_FROM_VLC_TICK(input_priv(p_input)->title[i]->i_length) );
             strcat( psz_length, "]" );
         }
         else
