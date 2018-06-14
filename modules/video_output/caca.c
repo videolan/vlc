@@ -295,6 +295,8 @@ static const struct {
     { -1, -1 }
 };
 
+#define INVALID_DEADLINE  INT64_MAX
+
 /**
  * Proccess pending event
  */
@@ -302,9 +304,9 @@ static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->cursor_deadline != INT64_MAX && sys->cursor_deadline < vlc_tick_now()) {
+    if (sys->cursor_deadline != INVALID_DEADLINE && sys->cursor_deadline < vlc_tick_now()) {
         caca_set_mouse(sys->dp, 0);
-        sys->cursor_deadline = INT64_MAX;
+        sys->cursor_deadline = INVALID_DEADLINE;
     }
 
     struct caca_event ev;
@@ -471,7 +473,7 @@ static int Open(vlc_object_t *object)
     }
 
     sys->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(vd, "mouse-hide-timeout") );
-    sys->cursor_deadline = INT64_MAX;
+    sys->cursor_deadline = INVALID_DEADLINE;
 
     /* Fix format */
     video_format_t fmt = vd->fmt;
