@@ -478,8 +478,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
                      }
                      else if( !strncmp( psz_start, "time=", 5 ) )
                      {
-                         p_seekpoint->i_time_offset = atof(psz_start + 5) *
-                                                        CLOCK_FREQ;
+                         p_seekpoint->i_time_offset = vlc_tick_from_sec(atof(psz_start + 5));
                      }
                      psz_start = psz_end + 1;
                 }
