@@ -56,7 +56,7 @@
 #define READ_TIMEOUT      80000
 #define RESYNC_TIMEOUT    500000
 #define CLOCK_GAP         VLC_TICK_FROM_MS(500)
-#define START_DATE        INT64_C(4294967296)
+#define START_DATE        INT64_C(0x100000000)
 
 #define DEMUX_BUFFER_SIZE 1350000
 #define MAX_AUDIOS        4

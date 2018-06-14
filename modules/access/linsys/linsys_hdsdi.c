@@ -62,7 +62,7 @@
 #define SDIAUDIO_CHANNELS_FILE  "/sys/class/sdiaudio/sdiaudiorx%u/channels"
 #define NB_VBUFFERS             2
 #define CLOCK_GAP               VLC_TICK_FROM_MS(500)
-#define START_DATE              INT64_C(4294967296)
+#define START_DATE              INT64_C(0x100000000)
 
 #define MAX_AUDIOS              4
 
