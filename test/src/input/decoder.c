@@ -162,6 +162,7 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
         return NULL;
     }
     decoder = &owner->dec;
+    owner->packetizer = packetizer;
 
     static const struct decoder_owner_callbacks dec_video_cbs =
     {
