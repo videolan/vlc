@@ -238,7 +238,7 @@ libvlc_module_description_t *libvlc_video_filter_list_get( libvlc_instance_t *p_
 
 int64_t libvlc_clock(void)
 {
-    return vlc_tick_now();
+    return US_FROM_VLC_TICK(vlc_tick_now());
 }
 
 const char vlc_module_name[] = "libvlc";

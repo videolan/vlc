@@ -660,7 +660,7 @@ int libvlc_vlm_get_media_instance_time( libvlc_instance_t *p_instance,
     p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name, i_instance );
     if( p_mi )
     {
-        result = p_mi->i_time;
+        result = US_FROM_VLC_TICK(p_mi->i_time);
         vlm_media_instance_Delete( p_mi );
     }
     return result;
@@ -676,7 +676,7 @@ int libvlc_vlm_get_media_instance_length( libvlc_instance_t *p_instance,
     p_mi = libvlc_vlm_get_media_instance( p_instance, psz_name, i_instance );
     if( p_mi )
     {
-        result = p_mi->i_length;
+        result = US_FROM_VLC_TICK(p_mi->i_length);
         vlm_media_instance_Delete( p_mi );
     }
     return result;
