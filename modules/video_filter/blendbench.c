@@ -261,7 +261,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     time = vlc_tick_now() - time;
 
     msg_Info( p_filter, "Blended %d images in %f sec", p_sys->i_loops,
-              time / (float)CLOCK_FREQ );
+              secf_from_vlc_tick(time) );
     msg_Info( p_filter, "Speed is: %f images/second, %f pixels/second",
               (float) p_sys->i_loops / time * CLOCK_FREQ,
               (float) p_sys->i_loops / time * CLOCK_FREQ *
