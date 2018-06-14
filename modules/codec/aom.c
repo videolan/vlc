@@ -431,26 +431,16 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         AOM_IMG_FMT_I42016 : AOM_IMG_FMT_I420;
 
     /* Create and initialize the aom_image */
-    if (!aom_img_alloc(&img, img_fmt, i_w, i_h, 16))
+    if (!aom_img_wrap(&img, img_fmt, i_w, i_h, 32, p_pict->p[0].p_pixels))
     {
-        AOM_ERR(p_enc, ctx, "Failed to allocate image");
+        AOM_ERR(p_enc, ctx, "Failed to wrap image");
         return NULL;
     }
 
-    for (int plane = 0; plane < p_pict->i_planes; plane++) {
-        uint8_t *src = p_pict->p[plane].p_pixels;
-        uint8_t *dst = img.planes[plane];
-        int src_stride = p_pict->p[plane].i_pitch;
-        int dst_stride = img.stride[plane];
-
-        int size = __MIN(src_stride, dst_stride);
-        for (int line = 0; line < p_pict->p[plane].i_visible_lines; line++)
-        {
-            /* FIXME: do this in-place */
-            memcpy(dst, src, size);
-            src += src_stride;
-            dst += dst_stride;
-        }
+    /* Correct chroma plane offsets. */
+    for (int plane = 1; plane < p_pict->i_planes; plane++) {
+        img.planes[plane] = p_pict->p[plane].p_pixels;
+        img.stride[plane] = p_pict->p[plane].i_pitch;
     }
 
     aom_codec_err_t res = aom_codec_encode(ctx, &img, p_pict->date, 1, 0);
