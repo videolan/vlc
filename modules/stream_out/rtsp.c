@@ -1067,7 +1067,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     npt = start;
                 }
 
-                double f_npt = (double) npt / CLOCK_FREQ;
+                double f_npt = secf_from_vlc_tick(npt);
                 httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
             }
 
@@ -1125,7 +1125,7 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                 assert(vod);
                 int64_t npt = 0;
                 vod_pause(rtsp->vod_media, psz_session, &npt);
-                double f_npt = (double) npt / CLOCK_FREQ;
+                double f_npt = secf_from_vlc_tick(npt);
                 httpd_MsgAdd( answer, "Range", "npt=%f-", f_npt );
             }
             break;
