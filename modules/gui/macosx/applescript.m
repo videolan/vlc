@@ -232,7 +232,7 @@
     input_Control(p_input, INPUT_GET_TIME, &i_currentTime);
     vlc_object_release(p_input);
 
-    return (int)(i_currentTime / CLOCK_FREQ);
+    return (int)SEC_FROM_VLC_TICK(i_currentTime);
 }
 
 - (void) setCurrentTime:(int)i_currentTime {

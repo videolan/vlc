@@ -268,15 +268,15 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
             vlc_tick_t remaining = 0;
             if (dur > t)
                 remaining = dur - t;
-            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (int)(remaining / CLOCK_FREQ))];
+            totalTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(remaining))];
         } else {
-            totalTime = toNSStr(secstotimestr(psz_time, (int)(dur / 1000000)));
+            totalTime = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(dur)));
         }
         [_remainingOrTotalTime setStringValue:totalTime];
     }
 
     /* Update current position (left field) */
-    NSString *playbackPosition = toNSStr(secstotimestr(psz_time, (int)(t / CLOCK_FREQ)));
+    NSString *playbackPosition = toNSStr(secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(t)));
 
     [_elapsedTime setStringValue:playbackPosition];
     vlc_object_release(p_input);

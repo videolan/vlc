@@ -842,12 +842,10 @@ static const float f_min_window_height = 307.;
     if (mt_duration < 1)
         return @"";
 
-    mt_duration = mt_duration / CLOCK_FREQ;
-
     NSDateComponentsFormatter *formatter = [[NSDateComponentsFormatter alloc] init];
     formatter.unitsStyle = NSDateComponentsFormatterUnitsStyleAbbreviated;
 
-    NSString* outputString = [formatter stringFromTimeInterval:mt_duration];
+    NSString* outputString = [formatter stringFromTimeInterval:SEC_FROM_VLC_TICK(mt_duration)];
 
     return [NSString stringWithFormat:@" — %@", outputString];
 }
