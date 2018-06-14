@@ -422,50 +422,67 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
             aiString path;
             myAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL);
 
-            std::string baseTexFileName = std::string(path.C_Str()).substr(strlen("Projet_maya\\sourceimages\\"));
-            std::string::size_type baseTexFileNameEnd = baseTexFileName.find_last_of("_");
-            if (baseTexFileNameEnd != std::string::npos)
-                baseTexFileName = baseTexFileName.substr(0, baseTexFileNameEnd);
+            std::string pathStr(path.C_Str());
 
-            char *psz_dataDir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
-            if (unlikely(psz_dataDir == NULL))
+            if (pathStr.size() > 1 && pathStr[0] == '*')
             {
-                msg_Warn(p_loader, "Could not get the main data directory");
-                continue;
+                // Embeded texture
+                unsigned i_textureId = atoi(pathStr.data() + 1);
+
+                aiTexture *tex = myAiScene->mTextures[i_textureId];
+
+                p_material->p_baseColorTex = scene_material_LoadTextureFromData(p_loader, (char *)tex->pcData, tex->mWidth);
+                if (p_material->p_baseColorTex == NULL)
+                    msg_Warn(p_loader, "Could not load the base color texture from embedded data");
             }
-
-            std::string baseTexPath(psz_dataDir);
-            #define TEXTURE_DIR DIR_SEP "VirtualTheater" DIR_SEP "Textures" DIR_SEP
-            baseTexPath += TEXTURE_DIR + baseTexFileName;
-
-            std::string diffuseTexPath = baseTexPath;
-            if (baseTexFileNameEnd != std::string::npos)
-                diffuseTexPath += + "_BaseColor.png";
-
-            msg_Dbg(p_loader, "Base color texture path: %s", diffuseTexPath.c_str());
-            p_material->p_baseColorTex = scene_material_LoadTexture(p_loader, diffuseTexPath.c_str());
-            if (p_material->p_baseColorTex == NULL)
-                msg_Warn(p_loader, "Could not load the base color texture");
-
-            if (baseTexFileNameEnd != std::string::npos)
+            else
             {
-                std::string metalnessTexPath = baseTexPath + "_Metalness.png";
-                msg_Dbg(p_loader, "Metalness texture path: %s", metalnessTexPath.c_str());
-                p_material->p_metalnessTex = scene_material_LoadTexture(p_loader, metalnessTexPath.c_str());
-                if (p_material->p_metalnessTex == NULL)
-                    msg_Warn(p_loader, "Could not load the metalness texture");
+                // External texutre
+                std::string baseTexFileName = pathStr.substr(strlen("C:\\sourceimages\\"));
+                std::string::size_type baseTexFileNameEnd = baseTexFileName.find_last_of("_");
+                if (baseTexFileNameEnd != std::string::npos)
+                    baseTexFileName = baseTexFileName.substr(0, baseTexFileNameEnd);
 
-                std::string normalTexPath = baseTexPath + "_Normal.png";
-                msg_Dbg(p_loader, "Normal texture path: %s", normalTexPath.c_str());
-                p_material->p_normalTex = scene_material_LoadTexture(p_loader, normalTexPath.c_str());
-                if (p_material->p_normalTex == NULL)
-                    msg_Warn(p_loader, "Could not load the normal texture");
+                char *psz_dataDir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
+                if (unlikely(psz_dataDir == NULL))
+                {
+                    msg_Warn(p_loader, "Could not get the main data directory");
+                    continue;
+                }
 
-                std::string roughnessTexPath = baseTexPath + "_Roughness.png";
-                msg_Dbg(p_loader, "Roughness texture path: %s", roughnessTexPath.c_str());
-                p_material->p_roughnessTex = scene_material_LoadTexture(p_loader, roughnessTexPath.c_str());
-                if (p_material->p_roughnessTex == NULL)
-                    msg_Warn(p_loader, "Could not load the roughness texture");
+                std::string baseTexPath(psz_dataDir);
+                #define TEXTURE_DIR DIR_SEP "VirtualTheater" DIR_SEP "Textures" DIR_SEP
+                baseTexPath += TEXTURE_DIR + baseTexFileName;
+
+                std::string diffuseTexPath = baseTexPath;
+                if (baseTexFileNameEnd != std::string::npos)
+                    diffuseTexPath += + "_BaseColor.png";
+
+                msg_Dbg(p_loader, "Base color texture path: %s", diffuseTexPath.c_str());
+                p_material->p_baseColorTex = scene_material_LoadTexture(p_loader, diffuseTexPath.c_str());
+                if (p_material->p_baseColorTex == NULL)
+                    msg_Warn(p_loader, "Could not load the base color texture");
+
+                if (baseTexFileNameEnd != std::string::npos)
+                {
+                    std::string metalnessTexPath = baseTexPath + "_Metalness.png";
+                    msg_Dbg(p_loader, "Metalness texture path: %s", metalnessTexPath.c_str());
+                    p_material->p_metalnessTex = scene_material_LoadTexture(p_loader, metalnessTexPath.c_str());
+                    if (p_material->p_metalnessTex == NULL)
+                        msg_Warn(p_loader, "Could not load the metalness texture");
+
+                    std::string normalTexPath = baseTexPath + "_Normal.png";
+                    msg_Dbg(p_loader, "Normal texture path: %s", normalTexPath.c_str());
+                    p_material->p_normalTex = scene_material_LoadTexture(p_loader, normalTexPath.c_str());
+                    if (p_material->p_normalTex == NULL)
+                        msg_Warn(p_loader, "Could not load the normal texture");
+
+                    std::string roughnessTexPath = baseTexPath + "_Roughness.png";
+                    msg_Dbg(p_loader, "Roughness texture path: %s", roughnessTexPath.c_str());
+                    p_material->p_roughnessTex = scene_material_LoadTexture(p_loader, roughnessTexPath.c_str());
+                    if (p_material->p_roughnessTex == NULL)
+                        msg_Warn(p_loader, "Could not load the roughness texture");
+                }
             }
         }
 
