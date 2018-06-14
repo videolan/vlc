@@ -115,6 +115,7 @@ VLC_API void scene_mesh_Release(scene_mesh_t *p_mesh);
 VLC_API float scene_mesh_computeBoundingSquareRadius(scene_mesh_t *p_object);
 VLC_API scene_material_t *scene_material_New(void);
 VLC_API picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz_path);
+VLC_API picture_t *scene_material_LoadTextureFromData(object_loader_t *p_loader, const char *p_data, size_t size);
 VLC_API void scene_material_Release(scene_material_t *p_material);
 VLC_API scene_light_t *scene_light_New(void);
 VLC_API void scene_light_Release(scene_light_t *p_light);

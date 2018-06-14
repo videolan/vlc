@@ -7,6 +7,7 @@
 #include <vlc_modules.h>
 #include <vlc_object_loader.h>
 #include <vlc_vout.h>
+#include <vlc_block.h>
 
 #include "../libvlc.h"
 
@@ -173,6 +174,31 @@ picture_t *scene_material_LoadTexture(object_loader_t *p_loader, const char *psz
                                      &p_loader->texPic_fmt_in,
                                      &p_loader->texPic_fmt_out);
     free(psz_url);
+
+    return p_pic;
+}
+
+
+static void embeddedTextureDataRelease(block_t *block)
+{
+    // Nothing to do as the object loaded library owns the data.
+    VLC_UNUSED(block);
+}
+
+
+static const struct vlc_block_callbacks scene_material_block_callbacks =
+    { embeddedTextureDataRelease };
+
+picture_t *scene_material_LoadTextureFromData(object_loader_t *p_loader, const char *p_data, size_t size)
+{
+    block_t dataBlock;
+
+    block_Init(&dataBlock, &scene_material_block_callbacks,
+               (void *)p_data, size);
+
+    picture_t *p_pic = image_Read(p_loader->p_imgHandler, &dataBlock,
+                                  &p_loader->texPic_fmt_in,
+                                  &p_loader->texPic_fmt_out);
 
     return p_pic;
 }
