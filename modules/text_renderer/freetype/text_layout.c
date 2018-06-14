@@ -348,7 +348,7 @@ static paragraph_t *NewParagraph( filter_t *p_filter,
 
     if( pi_k_dates )
     {
-        int64_t i_elapsed  = var_GetInteger( p_filter, "spu-elapsed" ) / 1000;
+        int64_t i_elapsed  = MS_FROM_VLC_TICK(var_GetInteger( p_filter, "spu-elapsed" ));
         for( int i = 0; i < i_size; ++i )
         {
             p_paragraph->pi_karaoke_bar[ i ] = pi_k_dates[ i ] >= i_elapsed;
