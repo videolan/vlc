@@ -855,12 +855,12 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                     const vlc_tick_t predicted = vlc_tick_now() + 0; /* TODO improve */
                     const vlc_tick_t late = predicted - decoded->date;
                     if (late > late_threshold) {
-                        msg_Warn(vout, "picture is too late to be displayed (missing %"PRId64" ms)", late/1000);
+                        msg_Warn(vout, "picture is too late to be displayed (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
                         picture_Release(decoded);
                         vout_statistic_AddLost(&vout->p->statistic, 1);
                         continue;
                     } else if (late > 0) {
-                        msg_Dbg(vout, "picture might be displayed late (missing %"PRId64" ms)", late/1000);
+                        msg_Dbg(vout, "picture might be displayed late (missing %"PRId64" ms)", MS_FROM_VLC_TICK(late));
                     }
                 }
                 if (!VideoFormatIsCropArEqual(&decoded->format, &vout->p->filter.format))
