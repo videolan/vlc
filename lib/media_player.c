@@ -1515,7 +1515,7 @@ int libvlc_media_player_get_full_title_descriptions( libvlc_media_player_t *p_mi
         titles[i] = title;
 
         /* we want to return milliseconds to match the rest of the API */
-        title->i_duration = p_input_title[i]->i_length / 1000;
+        title->i_duration = MS_FROM_VLC_TICK(p_input_title[i]->i_length);
         title->i_flags = p_input_title[i]->i_flags;
         if( p_input_title[i]->psz_name )
             title->psz_name = strdup( p_input_title[i]->psz_name );
@@ -1580,7 +1580,7 @@ int libvlc_media_player_get_full_chapter_descriptions( libvlc_media_player_t *p_
     {
         goto error;
     }
-    int64_t i_title_duration = p_title->i_length / 1000;
+    int64_t i_title_duration = MS_FROM_VLC_TICK(p_title->i_length);
     vlc_input_title_Delete( p_title );
 
     *pp_chapters = calloc( ci_chapter_count, sizeof(**pp_chapters) );
