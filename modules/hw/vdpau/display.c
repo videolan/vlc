@@ -281,7 +281,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
         msg_Dbg(vd, "picture date corrupt: delay of %"PRId64" us", delay);
         delay = VLC_TICK_FROM_MS(20);
     }
-    pts += delay * 1000;
+    pts += MS_FROM_VLC_TICK(delay);
 
     /* Queue picture */
     err = vdp_presentation_queue_display(sys->vdp, sys->queue, surface, 0, 0,
