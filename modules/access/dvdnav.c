@@ -884,7 +884,7 @@ static int Demux( demux_t *p_demux )
             DemuxForceStill( p_demux );
             p_sys->b_reset_pcr = true;
         }
-        vlc_tick_sleep( 40000 );
+        vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
         break;
     }
 
@@ -1109,7 +1109,7 @@ static int Demux( demux_t *p_demux )
         es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
         if( !b_empty )
         {
-            vlc_tick_sleep( 40*1000 );
+            vlc_tick_sleep( VLC_TICK_FROM_MS(40) );
         }
         else
         {
