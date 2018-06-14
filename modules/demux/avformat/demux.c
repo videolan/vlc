@@ -456,7 +456,13 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                 es_fmt.video.i_frame_rate_base = rate.den;
             }
 
-            AVRational ar = av_guess_sample_aspect_ratio( p_sys->ic, s, NULL );
+            AVRational ar;
+#if (LIBAVUTIL_VERSION_MICRO < 100) /* libav */
+            ar.num = s->sample_aspect_ratio.num;
+            ar.den = s->sample_aspect_ratio.den;
+#else
+            ar = av_guess_sample_aspect_ratio( p_sys->ic, s, NULL );
+#endif
             if( ar.num && ar.den )
             {
                 es_fmt.video.i_sar_den = ar.den;
