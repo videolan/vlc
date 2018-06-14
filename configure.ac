@@ -2931,25 +2931,6 @@ AS_IF( [test "${enable_telx}" != "no" ],[
   ])
 
 dnl
-dnl libass subtitle rendering module
-dnl
-AC_ARG_ENABLE(libass,
-  [  --enable-libass         Subtitle support using libass (default enabled)])
-AS_IF( [test "${enable_libass}" != "no"], [
-  PKG_CHECK_MODULES(LIBASS, [libass >= 0.9.8],
-      [
-        VLC_ADD_PLUGIN([libass])
-
-        AC_CHECK_HEADERS(fontconfig/fontconfig.h,
-          [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
-           VLC_ADD_LIBS([libass],[-lfontconfig])
-       ])
-      ],[
-        AC_MSG_WARN([${LIBASS_PKG_ERRORS}.])
-      ])
-  ])
-
-dnl
 dnl ARIB subtitles rendering module
 dnl
 AC_ARG_ENABLE(aribsub,
@@ -3311,6 +3292,25 @@ AM_CONDITIONAL([HAVE_FREETYPE], [test "${have_freetype}" = "yes"])
 AM_CONDITIONAL([HAVE_FONTCONFIG], [test "${have_fontconfig}" = "yes"])
 AM_CONDITIONAL([HAVE_FRIBIDI], [test "${have_fribidi}" = "yes"])
 AM_CONDITIONAL([HAVE_HARFBUZZ], [test "${have_harfbuzz}" = "yes"])
+
+dnl
+dnl libass subtitle rendering module
+dnl
+AC_ARG_ENABLE(libass,
+  [  --enable-libass         Subtitle support using libass (default enabled)])
+AS_IF( [test "${enable_libass}" != "no"], [
+  PKG_CHECK_MODULES(LIBASS, [libass >= 0.9.8],
+      [
+        VLC_ADD_PLUGIN([libass])
+
+        if test "${have_fontconfig}" != "no"; then
+            VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
+            VLC_ADD_LIBS([libass],[${FONTCONFIG_LIBS}])
+        fi
+      ],[
+        AC_MSG_WARN([${LIBASS_PKG_ERRORS}.])
+      ])
+  ])
 
 dnl
 dnl SAPI (text to Speech renderer for Windows)
