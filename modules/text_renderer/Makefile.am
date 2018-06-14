@@ -27,7 +27,7 @@ endif
 if HAVE_FONTCONFIG
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/fontconfig.c
 libfreetype_plugin_la_CPPFLAGS += -DHAVE_FONTCONFIG
-libfreetype_plugin_la_LIBADD += -lfontconfig
+libfreetype_plugin_la_LIBADD += $(FONTCONFIG_LIBS)
 endif
 if HAVE_ANDROID
 libfreetype_plugin_la_SOURCES += text_renderer/freetype/fonts/android.c
