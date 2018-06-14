@@ -424,6 +424,27 @@ CLEAN_PKG += ninja
 DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
 CLEAN_FILE += .buildninja
 
+
+#
+# GNU gettext
+#
+
+gettext-$(GETTEXT_VERSION).tar.gz:
+	$(call download_pkg,$(GETTEXT_URL),gettext)
+
+gettext: gettext-$(GETTEXT_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.buildgettext: gettext
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += gettext
+DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
+CLEAN_FILE += .gettext
+
+
 #
 #
 #
