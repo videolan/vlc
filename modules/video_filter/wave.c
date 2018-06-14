@@ -123,7 +123,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    p_sys->f_angle += (new_date - p_sys->last_date) / 200000.0;
+    p_sys->f_angle += 5.0f * secf_from_vlc_tick(new_date - p_sys->last_date);
     p_sys->last_date = new_date;
     f_angle = p_sys->f_angle;
 
