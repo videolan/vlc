@@ -460,7 +460,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
         /* check if offset is close to 0 and then ready to stop */
         if ( abs( p_sys->i_sliding_ofs ) < abs( p_sys->i_sliding_speed
              * p_sys->i_height[Y_PLANE]
-             * ( p_sys->i_cur_time - p_sys->i_last_time ) / CLOCK_FREQ )
+             * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time ) )
              ||  abs( p_sys->i_sliding_ofs ) < p_sys->i_height[Y_PLANE] * 100 / 20 ) {
 
             /* reset sliding parameters */
@@ -471,8 +471,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
 
     /* update offset */
     p_sys->i_sliding_ofs += p_sys->i_sliding_speed * p_sys->i_height[Y_PLANE]
-                         * ( p_sys->i_cur_time - p_sys->i_last_time )
-                         / CLOCK_FREQ;
+                      * SEC_FROM_VLC_TICK( p_sys->i_cur_time - p_sys->i_last_time );
 
     p_sys->i_sliding_ofs = MOD( p_sys->i_sliding_ofs,
                                 p_sys->i_height[Y_PLANE] * 100 );
