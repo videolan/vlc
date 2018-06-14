@@ -1,0 +1,24 @@
+From 2dc984dcaa28fd4df90fe011a58fd8fe329bc7a1 Mon Sep 17 00:00:00 2001
+From: Thomas Anderson <tanderson@caltech.edu>
+Date: Wed, 15 Apr 2015 03:42:32 +0000
+Subject: [PATCH] configure.ac: Use AC_CHECK_TOOL for cross-compiling support.
+
+When cross-compiling the ar program has the appropriate prefix prepended.
+Respect that here and have autotools autodetect the appropriate tool.
+---
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index bcf51283..3069eedd 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -24,7 +24,7 @@ test "x$GCC" = "xyes" && CFLAGS="$CFLAGS -Wall"
+ AC_PROG_MAKE_SET
+ AC_LIBTOOL_WIN32_DLL
+ AC_PROG_LIBTOOL
+-AC_PATH_PROG([AR], [ar], [/usr/bin/ar],
++AC_CHECK_TOOL([AR], [ar], [/usr/bin/ar],
+                   [$PATH:/usr/ccs/bin])
+ 
+ # Options

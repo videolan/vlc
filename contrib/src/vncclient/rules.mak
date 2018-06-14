@@ -24,6 +24,7 @@ vncclient: LibVNCServer-$(VNCCLIENT_VERSION).tar.gz .sum-vncclient
 	$(APPLY) $(SRC)/vncclient/vnc-gnutls-pkg.patch
 	$(APPLY) $(SRC)/vncclient/gnutls-recent.patch
 	$(APPLY) $(SRC)/vncclient/vnc-gnutls-anon.patch
+	$(APPLY) $(SRC)/vncclient/cross-ar.patch
 	$(call pkg_static,"libvncclient.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
