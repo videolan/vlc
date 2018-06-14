@@ -148,7 +148,7 @@ typedef struct
     unsigned int i_width, i_height, i_aspect, i_forced_aspect;
     unsigned int i_vblock_size, i_ablock_size;
     vlc_tick_t   i_next_vdate, i_next_adate;
-    int          i_incr, i_aincr;
+    vlc_tick_t   i_incr, i_aincr;
 
     /* ES stuff */
     int          i_id_video;
@@ -495,7 +495,7 @@ static int InitVideo( demux_t *p_demux )
     }
 
     p_sys->i_next_vdate = START_DATE;
-    p_sys->i_incr = 1000000 * p_sys->i_frame_rate_base / p_sys->i_frame_rate;
+    p_sys->i_incr = CLOCK_FREQ * p_sys->i_frame_rate_base / p_sys->i_frame_rate;
     p_sys->i_vblock_size = p_sys->i_width * p_sys->i_height * 3 / 2
                             + sizeof(struct block_extension_t);
 
@@ -544,7 +544,7 @@ static int InitAudio( demux_t *p_demux )
 
     p_sys->i_next_adate = START_DATE;
     p_sys->i_ablock_size = p_sys->i_sample_rate * 4 * p_sys->i_frame_rate_base / p_sys->i_frame_rate;
-    p_sys->i_aincr = 1000000 * p_sys->i_ablock_size / (p_sys->i_sample_rate * 4);
+    p_sys->i_aincr = CLOCK_FREQ * p_sys->i_ablock_size / (p_sys->i_sample_rate * 4);
 
     return VLC_SUCCESS;
 }

@@ -179,7 +179,7 @@ typedef struct
     bool             b_hd, b_vbi;
     vbi_raw_decoder  rd_wss, rd_telx;
     vlc_tick_t       i_next_date;
-    int              i_incr;
+    vlc_tick_t       i_incr;
 
     /* ES stuff */
     int              i_id_video;
