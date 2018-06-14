@@ -192,7 +192,7 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
         /* Append bookmark to option-buffer */
         /* TODO: escape inappropriate values */
         vlc_memstream_printf( &vstr, "%s{name=%s,time=%.3f}",
-            i > 0 ? "," : "", sp->psz_name, ( 1. * sp->i_time_offset ) / CLOCK_FREQ );
+            i > 0 ? "," : "", sp->psz_name, secf_from_vlc_tick(sp->i_time_offset) );
     }
 
     if( vlc_memstream_close( &vstr ) )
