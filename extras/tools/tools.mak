@@ -351,6 +351,27 @@ DISTCLEAN_PKG += flex-$(FLEX_VERSION).tar.gz
 CLEAN_FILE += .flex
 
 
+
+#
+# GNU gettext
+#
+
+gettext-$(GETTEXT_VERSION).tar.gz:
+	$(call download_pkg,$(GETTEXT_URL),gettext)
+
+gettext: gettext-$(GETTEXT_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.gettext: gettext
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_PKG += gettext
+DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
+CLEAN_FILE += .gettext
+
+
 #
 #
 #
