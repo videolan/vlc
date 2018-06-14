@@ -1060,7 +1060,7 @@ std::string intf_sys_t::timeVLCToCC(vlc_tick_t time)
 {
     std::stringstream ss;
     ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-    ss << std::setprecision(6) << (double (time) / (double)CLOCK_FREQ);
+    ss << std::setprecision(6) << secf_from_vlc_tick(time);
     return ss.str();
 }
 
