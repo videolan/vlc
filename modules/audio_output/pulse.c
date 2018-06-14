@@ -569,7 +569,7 @@ static void Flush(audio_output_t *aout, bool wait)
         /* XXX: Loosy drain emulation.
          * See #18141: drain callback is never received */
         vlc_tick_t delay;
-        if (TimeGet(aout, &delay) == 0 && delay <= INT64_C(5000000))
+        if (TimeGet(aout, &delay) == 0 && delay <= VLC_TICK_FROM_SEC(5))
             vlc_tick_sleep(delay);
     }
     else
