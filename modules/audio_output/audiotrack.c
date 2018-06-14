@@ -36,7 +36,7 @@
 #include "../video_output/android/utils.h"
 
 #define SMOOTHPOS_SAMPLE_COUNT 10
-#define SMOOTHPOS_INTERVAL_US INT64_C(30000) // 30ms
+#define SMOOTHPOS_INTERVAL_US VLC_TICK_FROM_MS(30) // 30ms
 
 #define AUDIOTIMESTAMP_INTERVAL_US VLC_TICK_FROM_MS(500) // 500ms
 
