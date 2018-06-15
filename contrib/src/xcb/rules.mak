@@ -50,7 +50,7 @@ XCBCONF := \
 	--without-doxygen \
 	$(HOSTCONF)
 
-DEPS_xcb = xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
+DEPS_xcb = pthread-stubs xau $(DEPS_xau) xcb-proto $(DEPS_xcb-proto)
 
 .xcb: libxcb
 	cd $< && $(HOSTVARS) ./configure $(XCBCONF)
