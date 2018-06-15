@@ -57,7 +57,7 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID reserved)
     return TRUE;
 }
 
-static UINT64 GetQPC(void)
+static msftime_t GetQPC(void)
 {
     LARGE_INTEGER counter;
 
@@ -325,7 +325,7 @@ static unsigned __stdcall Thread(void *data)
         if (hr != S_OK)
             continue;
 
-        pts = vlc_tick_now() - ((GetQPC() - qpc) / 10);
+        pts = vlc_tick_now() - VLC_TICK_FROM_MSFTIME(GetQPC() - qpc);
 
         es_out_SetPCR(demux->out, pts);
 

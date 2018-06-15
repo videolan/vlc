@@ -71,7 +71,7 @@ static BOOL CALLBACK InitFreq(INIT_ONCE *once, void *param, void **context)
 
 static LARGE_INTEGER freq; /* performance counters frequency */
 
-static UINT64 GetQPC(void)
+static msftime_t GetQPC(void)
 {
     LARGE_INTEGER counter;
 
@@ -129,10 +129,10 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
 
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
 
-    *delay = ((w.quot - r.quot) * CLOCK_FREQ)
-           + ((w.rem * CLOCK_FREQ) / sys->rate)
-           - ((r.rem * CLOCK_FREQ) / freq)
-           - ((GetQPC() - qpcpos) / (10000000 / CLOCK_FREQ));
+    *delay = vlc_tick_from_sec(w.quot - r.quot)
+           + (vlc_tick_from_sec(w.rem) / sys->rate)
+           - (vlc_tick_from_sec(r.rem) / freq)
+           - VLC_TICK_FROM_MSFTIME(GetQPC() - qpcpos);
 
     return hr;
 }
