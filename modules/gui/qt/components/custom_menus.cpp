@@ -37,7 +37,7 @@
 #include <QProgressBar>
 
 RendererAction::RendererAction( vlc_renderer_item_t *p_item_ )
-    : QAction(nullptr)
+    : QAction()
 {
     p_item = p_item_;
     vlc_renderer_item_hold( p_item );
@@ -66,7 +66,7 @@ RendererMenu::RendererMenu( QMenu *parent, intf_thread_t *p_intf_ )
 
     group = new QActionGroup( this );
 
-    QAction *action = new QAction( qtr("<Local>"), nullptr );
+    QAction *action = new QAction( qtr("<Local>") );
     action->setCheckable(true);
     addAction( action );
     group->addAction(action);
