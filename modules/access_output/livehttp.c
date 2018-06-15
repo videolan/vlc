@@ -998,9 +998,8 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
            return -1;
         }
 
-        p_sys->f_seglen =
-            (float)(output_last_length +
-                    output->i_dts - p_sys->i_opendts) / CLOCK_FREQ;
+        p_sys->f_seglen = secf_from_vlc_tick(output_last_length +
+                                    output->i_dts - p_sys->i_opendts);
 
         if ( (size_t)val >= output->i_buffer )
         {
