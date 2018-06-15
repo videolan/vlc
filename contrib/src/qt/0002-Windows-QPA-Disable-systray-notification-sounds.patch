@@ -1,0 +1,27 @@
+From f76248e9c67927d3a403b43ff941f72117e427f0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Fri, 15 Jun 2018 09:59:42 +0300
+Subject: [PATCH 2/2] Windows QPA: Disable systray notification sounds
+
+---
+ src/plugins/platforms/windows/qwindowssystemtrayicon.cpp | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
+index 901d132ea5..c30fa0e76d 100644
+--- a/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
++++ b/src/plugins/platforms/windows/qwindowssystemtrayicon.cpp
+@@ -279,6 +279,10 @@ void QWindowsSystemTrayIcon::showMessage(const QString &title, const QString &me
+         }
+         tnd.hBalloonIcon = qt_pixmapToWinHICON(pm);
+     }
++
++    // Never play audio on notifications.
++    tnd.dwInfoFlags |= NIIF_NOSOUND;
++
+     tnd.hWnd = m_hwnd;
+     tnd.uTimeout = msecsIn <= 0 ?  UINT(10000) : UINT(msecsIn); // 10s default
+     tnd.uFlags = NIF_INFO | NIF_SHOWTIP;
+-- 
+2.15.2 (Apple Git-101.1)
+
