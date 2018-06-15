@@ -1,7 +1,7 @@
 # Qt
 
-QTSVG_VERSION := 5.6.3
-QTSVG_URL := https://download.qt.io/official_releases/qt/5.6/$(QTSVG_VERSION)/submodules/qtsvg-opensource-src-$(QTSVG_VERSION).tar.xz
+QTSVG_VERSION := 5.11.0
+QTSVG_URL := https://download.qt.io/official_releases/qt/5.11/$(QTSVG_VERSION)/submodules/qtsvg-everywhere-src-$(QTSVG_VERSION).tar.xz
 
 DEPS_qtsvg += qt $(DEPS_qt)
 
@@ -20,7 +20,7 @@ $(TARBALLS)/qtsvg-$(QTSVG_VERSION).tar.xz:
 
 qtsvg: qtsvg-$(QTSVG_VERSION).tar.xz .sum-qtsvg
 	$(UNPACK)
-	mv qtsvg-opensource-src-$(QTSVG_VERSION) qtsvg-$(QTSVG_VERSION)
+	mv qtsvg-everywhere-src-$(QTSVG_VERSION) qtsvg-$(QTSVG_VERSION)
 	$(APPLY) $(SRC)/qtsvg/0001-Force-the-usage-of-QtZlib-header.patch
 	$(MOVE)
 
