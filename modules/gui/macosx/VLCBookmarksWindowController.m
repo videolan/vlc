@@ -241,11 +241,11 @@
     NSArray * components = [[_editTimeTextField stringValue] componentsSeparatedByString:@":"];
     NSUInteger componentCount = [components count];
     if (componentCount == 1)
-        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] floatValue]);
+        pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] floatValue]);
     else if (componentCount == 2)
         pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] longLongValue] * 60 + [[components objectAtIndex:1] longLongValue]);
     else if (componentCount == 3)
-        pp_bookmarks[i]->i_time_offset = 1000000LL * ([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] floatValue]);
+        pp_bookmarks[i]->i_time_offset = vlc_tick_from_sec([[components firstObject] longLongValue] * 3600 + [[components objectAtIndex:1] longLongValue] * 60 + [[components objectAtIndex:2] floatValue]);
     else {
         msg_Err(getIntf(), "Invalid string format for time");
         goto clear;
