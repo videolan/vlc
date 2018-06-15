@@ -106,7 +106,7 @@ static inline libvlc_time_t from_mtime(vlc_tick_t time)
 
 static inline vlc_tick_t to_mtime(libvlc_time_t time)
 {
-    return time * 1000ULL;
+    return VLC_TICK_FROM_MS(time);
 }
 
 #endif
