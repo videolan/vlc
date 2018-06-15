@@ -234,7 +234,7 @@ EsOutMetaCommand * CommandsFactory::createEsOutMetaCommand( int group, const vlc
 std::ostream& operator<<(std::ostream& ostr, const std::list<AbstractCommand *>& list)
 {
     for (auto &i : list) {
-        ostr << "[" << i->getType() << "]" << (i->getTime() /CLOCK_FREQ) << " ";
+        ostr << "[" << i->getType() << "]" << SEC_FROM_VLC_TICK(i->getTime()) << " ";
     }
     return ostr;
 }
