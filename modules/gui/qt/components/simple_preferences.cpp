@@ -40,6 +40,7 @@
 #include <QSignalMapper>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QHeaderView>
 
 #include <QStyleFactory>
 #include <QSettings>
