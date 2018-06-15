@@ -246,7 +246,7 @@ void BookmarksDialog::edit( QTreeWidgetItem *item, int column )
         if( fields.count() == 1 )
             p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toFloat() );
         else if( fields.count() == 2 )
-            p_seekpoint->i_time_offset = CLOCK_FREQ * ( fields[0].toInt() * 60 + fields[1].toInt() );
+            p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toInt() * 60 + fields[1].toInt() );
         else if( fields.count() == 3 )
             p_seekpoint->i_time_offset = vlc_tick_from_sec( fields[0].toInt() * 3600 + fields[1].toInt() * 60 + fields[2].toFloat() );
         else
