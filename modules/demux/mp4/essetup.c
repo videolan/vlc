@@ -555,6 +555,12 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
+        case VLC_FOURCC( 'A', 'V', 'j', '2' ):
+            p_track->fmt.i_codec = VLC_CODEC_JPEG2000;
+            /* final decoded resolution stored in ARES w, h, nbfields to group
+             * but since avcodec can't tell... */
+            break;
+
         case VLC_FOURCC('j', 'p', 'e', 'g'):
             p_track->fmt.i_codec = VLC_CODEC_MJPG;
            break;
