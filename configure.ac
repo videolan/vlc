@@ -130,8 +130,8 @@ case "${host_os}" in
 
     dnl Force gcc "-arch" flag
     ARCH_flag=""
-    case "${host}" in
-      i?86*)
+    case "${host_cpu}" in
+      i?86)
         ARCH_flag="-arch i386"
       ;;
       ppc64*)
@@ -140,7 +140,7 @@ case "${host_os}" in
       ppc*)
         ARCH_flag="-arch ppc"
       ;;
-      x86_64*)
+      x86_64)
         ARCH_flag="-arch x86_64"
       ;;
       arm*)
@@ -250,8 +250,8 @@ case "${host_os}" in
         dnl
         dnl NSIS/MSI Installer prefix and WIN64
         dnl
-        case "${host}" in
-            amd64*|x86_64*)
+        case "${host_cpu}" in
+            amd64|x86_64)
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
