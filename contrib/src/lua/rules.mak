@@ -68,7 +68,7 @@ endif
 		-e 's%CC=%#CC=%' \
 		-e 's%= *strip%=$(STRIP)%' \
 		-e 's%= *ranlib%= $(RANLIB)%' \
-		-e 's%= *ar%= $(AR)%' \
+		-e 's%AR= *ar%AR= $(AR)%' \
 		Makefile
 	$(MOVE)
 
