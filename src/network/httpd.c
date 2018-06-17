@@ -145,7 +145,6 @@ struct httpd_client_t
     vlc_tls_t   *sock;
 
     struct vlc_list node;
-    int     i_ref;
 
     bool    b_stream_mode;
     uint8_t i_state;
@@ -1218,7 +1217,6 @@ static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, mtime_t now)
 
     if (!cl) return NULL;
 
-    cl->i_ref   = 0;
     cl->sock    = sock;
     cl->url     = NULL;
 
@@ -1701,10 +1699,9 @@ static void httpdLoop(httpd_host_t *host)
     vlc_list_foreach(cl, &host->clients, node) {
         int64_t i_offset;
 
-        if (cl->i_ref < 0 || (cl->i_ref == 0 &&
-                    (cl->i_state == HTTPD_CLIENT_DEAD ||
-                      (cl->i_activity_timeout > 0 &&
-                        cl->i_activity_date+cl->i_activity_timeout < now)))) {
+        if (cl->i_state == HTTPD_CLIENT_DEAD
+         || (cl->i_activity_timeout > 0
+          && cl->i_activity_date + cl->i_activity_timeout < now)) {
             host->client_count--;
             httpd_ClientDestroy(cl);
             continue;
