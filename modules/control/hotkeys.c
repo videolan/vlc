@@ -742,7 +742,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
         case ACTIONID_AUDIODELAY_DOWN:
         case ACTIONID_AUDIODELAY_UP:
         {
-            mtime_t diff = (i_action == ACTIONID_SUBDELAY_UP) ? 50000 : -50000;
+            mtime_t diff = (i_action == ACTIONID_AUDIODELAY_UP) ? 50000 : -50000;
             if( p_input )
             {
                 mtime_t i_delay = var_GetInteger( p_input, "audio-delay" )
