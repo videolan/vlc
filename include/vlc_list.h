@@ -46,6 +46,11 @@ struct vlc_list
 };
 
 /**
+ * Static initializer for a list head.
+ */
+#define VLC_LIST_INITIALIZER(h) { h, h }
+
+/**
  * Initializes an empty list head.
  */
 static inline void vlc_list_init(struct vlc_list *restrict head)
