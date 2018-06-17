@@ -40,8 +40,6 @@
 #include "art.h"
 #include "preparser.h"
 
-typedef struct vlc_sd_internal_t vlc_sd_internal_t;
-
 void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
 
 typedef struct playlist_private_t
@@ -53,8 +51,7 @@ typedef struct playlist_private_t
                            to playlist item mapping */
     void *id_tree; /**< Search tree for item ID to item mapping */
 
-    vlc_sd_internal_t   **pp_sds;
-    int                   i_sds;   /**< Number of service discovery modules */
+    struct vlc_list       sds;
     input_thread_t *      p_input;  /**< the input thread associated
                                      * with the current item */
     input_resource_t *   p_input_resource; /**< input resources */

@@ -30,13 +30,14 @@
 #include <vlc_services_discovery.h>
 #include "playlist_internal.h"
 
-struct vlc_sd_internal_t
+typedef struct vlc_sd_internal_t
 {
     /* the playlist items for category and onelevel */
     playlist_item_t      *node;
     services_discovery_t *sd; /**< Loaded service discovery modules */
+    struct vlc_list       siblings;
     char name[];
-};
+} vlc_sd_internal_t;
 
  /* A new item has been added to a certain sd */
 static void playlist_sd_item_added(services_discovery_t *sd,
@@ -146,7 +147,7 @@ int playlist_ServicesDiscoveryAdd(playlist_t *playlist, const char *chain)
                                         &playlist->root, PLAYLIST_END,
                                         PLAYLIST_RO_FLAG);
 
-    TAB_APPEND(pl_priv(playlist)->i_sds, pl_priv(playlist)->pp_sds, sds);
+    vlc_list_append(&sds->siblings, &pl_priv(playlist)->sds);
     playlist_Unlock(playlist);
     return VLC_SUCCESS;
 }
@@ -171,20 +172,16 @@ static void playlist_ServicesDiscoveryInternalRemove(playlist_t *playlist,
 int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
 {
     playlist_private_t *priv = pl_priv(playlist);
-    vlc_sd_internal_t *sds = NULL;
+    vlc_sd_internal_t *sds = NULL, *entry;
 
     playlist_Lock(playlist);
-    for (int i = 0; i < priv->i_sds; i++)
-    {
-        vlc_sd_internal_t *entry = priv->pp_sds[i];
-
+    vlc_list_foreach(entry, &priv->sds, siblings)
         if (!strcmp(name, entry->name))
         {
-            TAB_ERASE(priv->i_sds, priv->pp_sds, i);
+            vlc_list_remove(&sds->siblings);
             sds = entry;
             break;
         }
-    }
     playlist_Unlock(playlist);
 
     if (sds == NULL)
@@ -201,19 +198,16 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * playlist,
                                          const char *psz_name )
 {
     playlist_private_t *priv = pl_priv( playlist );
+    vlc_sd_internal_t *sds;
     bool found = false;
+
     playlist_Lock(playlist);
-
-    for( int i = 0; i < priv->i_sds; i++ )
-    {
-        vlc_sd_internal_t *sds = priv->pp_sds[i];
-
+    vlc_list_foreach(sds, &priv->sds, siblings)
         if (!strcmp(psz_name, sds->name))
         {
             found = true;
             break;
         }
-    }
     playlist_Unlock(playlist);
     return found;
 }
@@ -221,13 +215,11 @@ bool playlist_IsServicesDiscoveryLoaded( playlist_t * playlist,
 int playlist_ServicesDiscoveryControl( playlist_t *playlist, const char *psz_name, int i_control, ... )
 {
     playlist_private_t *priv = pl_priv( playlist );
+    vlc_sd_internal_t *sds;
     int i_ret = VLC_EGENERIC;
-    int i;
 
     playlist_Lock(playlist);
-    for( i = 0; i < priv->i_sds; i++ )
-    {
-        vlc_sd_internal_t *sds = priv->pp_sds[i];
+    vlc_list_foreach(sds, &priv->sds, siblings)
         if (!strcmp(psz_name, sds->name))
         {
             va_list args;
@@ -236,9 +228,6 @@ int playlist_ServicesDiscoveryControl( playlist_t *playlist, const char *psz_nam
             va_end( args );
             break;
         }
-    }
-
-    assert( i != priv->i_sds );
     playlist_Unlock(playlist);
 
     return i_ret;
@@ -247,9 +236,8 @@ int playlist_ServicesDiscoveryControl( playlist_t *playlist, const char *psz_nam
 void playlist_ServicesDiscoveryKillAll(playlist_t *playlist)
 {
     playlist_private_t *priv = pl_priv(playlist);
+    vlc_sd_internal_t *sds;
 
-    for (int i = 0; i < priv->i_sds; i++)
-        playlist_ServicesDiscoveryInternalRemove(playlist, priv->pp_sds[i]);
-
-    TAB_CLEAN(priv->i_sds, priv->pp_sds);
+    vlc_list_foreach(sds, &priv->sds, siblings)
+        playlist_ServicesDiscoveryInternalRemove(playlist, sds);
 }

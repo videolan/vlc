@@ -199,7 +199,7 @@ playlist_t *playlist_Create( vlc_object_t *p_parent )
     p->input_tree = NULL;
     p->id_tree = NULL;
 
-    TAB_INIT( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds );
+    vlc_list_init(&p->sds);
 
     VariablesInit( p_playlist );
     vlc_mutex_init( &p->lock );
