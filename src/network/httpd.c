@@ -94,8 +94,7 @@ struct httpd_host_t
      * This will slow down the url research but make my live easier
      * All url will have their cb trigger, but only the first one can answer
      * */
-    int         i_url;
-    httpd_url_t **url;
+    struct vlc_list urls;
 
     size_t client_count;
     struct vlc_list clients;
@@ -108,7 +107,7 @@ struct httpd_host_t
 struct httpd_url_t
 {
     httpd_host_t *host;
-
+    struct vlc_list node;
     vlc_mutex_t lock;
 
     char      *psz_url;
@@ -960,8 +959,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     for (host->nfd = 0; host->fds[host->nfd] != -1; host->nfd++);
 
     host->port     = port;
-    host->i_url    = 0;
-    host->url      = NULL;
+    vlc_list_init(&host->urls);
     host->client_count = 0;
     vlc_list_init(&host->clients);
     host->p_tls    = p_tls;
@@ -1000,6 +998,7 @@ error:
 void httpd_HostDelete(httpd_host_t *host)
 {
     httpd_client_t *client;
+    httpd_url_t *url;
 
     vlc_mutex_lock(&httpd.mutex);
 
@@ -1016,8 +1015,8 @@ void httpd_HostDelete(httpd_host_t *host)
 
     msg_Dbg(host, "HTTP host removed");
 
-    for (int i = 0; i < host->i_url; i++)
-        msg_Err(host, "url still registered: %s", host->url[i]->psz_url);
+    vlc_list_foreach(url, &host->urls, node)
+        msg_Err(host, "url still registered: %s", url->psz_url);
 
     vlc_list_foreach(client, &host->clients, node) {
         msg_Warn(host, "client still connected");
@@ -1041,8 +1040,8 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
     assert(psz_url);
 
     vlc_mutex_lock(&host->lock);
-    for (int i = 0; i < host->i_url; i++)
-        if (!strcmp(psz_url, host->url[i]->psz_url)) {
+    vlc_list_foreach(url, &host->urls, node)
+        if (!strcmp(psz_url, url->psz_url)) {
             msg_Warn(host, "cannot add '%s' (url already defined)", psz_url);
             vlc_mutex_unlock(&host->lock);
             return NULL;
@@ -1060,7 +1059,7 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
         url->catch[i].p_sys = NULL;
     }
 
-    TAB_APPEND(host->i_url, host->url, url);
+    vlc_list_append(&url->node, &host->urls);
     vlc_cond_signal(&host->wait);
     vlc_mutex_unlock(&host->lock);
 
@@ -1086,7 +1085,7 @@ void httpd_UrlDelete(httpd_url_t *url)
     httpd_client_t *client;
 
     vlc_mutex_lock(&host->lock);
-    TAB_REMOVE(host->i_url, host->url, url);
+    vlc_list_remove(&url->node);
 
     vlc_mutex_destroy(&url->lock);
     free(url->psz_url);
@@ -1685,7 +1684,7 @@ static void httpdLoop(httpd_host_t *host)
 
     vlc_mutex_lock(&host->lock);
     /* add all socket that should be read/write and close dead connection */
-    while (host->i_url <= 0) {
+    while (vlc_list_is_empty(&host->urls)) {
         mutex_cleanup_push(&host->lock);
         vlc_cond_wait(&host->wait, &host->lock);
         vlc_cleanup_pop();
@@ -1805,13 +1804,12 @@ static void httpdLoop(httpd_host_t *host)
                         break;
 
                     default: {
+                        httpd_url_t *url;
                         int i_msg = query->i_type;
                         bool b_auth_failed = false;
 
                         /* Search the url and trigger callbacks */
-                        for (int i = 0; i < host->i_url; i++) {
-                            httpd_url_t *url = host->url[i];
-
+                        vlc_list_foreach(url, &host->urls, node) {
                             if (strcmp(url->psz_url, query->psz_url))
                                 continue;
                             if (!url->catch[i_msg].cb)
