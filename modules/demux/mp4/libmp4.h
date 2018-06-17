@@ -176,6 +176,7 @@ typedef int64_t stime_t;
 #define ATOM_OggS VLC_FOURCC( 'O', 'g', 'g', 'S' )
 #define ATOM_agsm VLC_FOURCC( 'a', 'g', 's', 'm' )
 #define ATOM_alac VLC_FOURCC( 'a', 'l', 'a', 'c' )
+#define ATOM_AC3  VLC_FOURCC( 'A', 'C', '-', '3' )
 #define ATOM_ac3  VLC_FOURCC( 'a', 'c', '-', '3' )
 #define ATOM_eac3 VLC_FOURCC( 'e', 'c', '-', '3' )
 #define ATOM_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
