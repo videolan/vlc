@@ -344,11 +344,14 @@ SkinsRect X11Factory::getWorkArea() const
                                 &ret, &i_format, &i_items, &i_bytesafter,
                                 (unsigned char **)&values ) == Success )
         {
-            x = values[0];
-            y = values[1];
-            w = values[2];
-            h = values[3];
-            XFree( values );
+            if( values )
+            {
+                x = values[0];
+                y = values[1];
+                w = values[2];
+                h = values[3];
+                XFree( values );
+            }
         }
     }
     msg_Dbg( getIntf(),"WorkArea: %ix%i at +%i+%i", w, h, x, y );
