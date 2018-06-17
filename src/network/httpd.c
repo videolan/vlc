@@ -32,6 +32,7 @@
 
 #include <assert.h>
 
+#include <vlc_list.h>
 #include <vlc_network.h>
 #include <vlc_tls.h>
 #include <vlc_strings.h>
@@ -73,6 +74,7 @@ static void httpd_AppendData(httpd_stream_t *stream, uint8_t *p_data, int i_data
 struct httpd_host_t
 {
     struct vlc_common_members obj;
+    struct vlc_list node;
 
     /* ref count */
     unsigned    i_ref;
@@ -899,10 +901,8 @@ httpd_host_t *vlc_rtsp_HostNew(vlc_object_t *p_this)
 static struct httpd
 {
     vlc_mutex_t  mutex;
-
-    httpd_host_t **host;
-    int          i_host;
-} httpd = { VLC_STATIC_MUTEX, NULL, 0 };
+    struct vlc_list hosts;
+} httpd = { VLC_STATIC_MUTEX, VLC_LIST_INITIALIZER(&httpd.hosts) };
 
 static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
                                        const char *hostvar,
@@ -926,9 +926,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     vlc_mutex_lock(&httpd.mutex);
 
     /* verify if it already exist */
-    for (int i = 0; i < httpd.i_host; i++) {
-        host = httpd.host[i];
-
+    vlc_list_foreach(host, &httpd.hosts, node) {
         /* cannot mix TLS and non-TLS hosts */
         if (host->port != port
          || (host->p_tls != NULL) != (p_tls != NULL))
@@ -980,7 +978,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     }
 
     /* now add it to httpd */
-    TAB_APPEND(httpd.i_host, httpd.host, host);
+    vlc_list_append(&host->node, &httpd.hosts);
     vlc_mutex_unlock(&httpd.mutex);
 
     vlc_UrlClean(&url);
@@ -1020,8 +1018,8 @@ void httpd_HostDelete(httpd_host_t *host)
         msg_Dbg(host, "httpd_HostDelete: host still in use");
         return;
     }
-    TAB_REMOVE(httpd.i_host, httpd.host, host);
 
+    vlc_list_remove(&host->node);
     vlc_cancel(host->thread);
     vlc_join(host->thread, NULL);
 
