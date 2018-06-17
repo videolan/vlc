@@ -1006,6 +1006,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             }
             break;
         }
+        case( ATOM_AC3 ):
         case( ATOM_ac3 ):
         {
             p_track->fmt.i_codec = VLC_CODEC_A52;

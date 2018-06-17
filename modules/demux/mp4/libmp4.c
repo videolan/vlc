@@ -4863,6 +4863,7 @@ static const struct
     { ATOM_soun,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_agsm,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_ac3,     MP4_ReadBox_sample_soun,  ATOM_stsd },
+    { ATOM_AC3,     MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_eac3,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_fLaC,    MP4_ReadBox_sample_soun,  ATOM_stsd },
     { ATOM_lpcm,    MP4_ReadBox_sample_soun,  ATOM_stsd },
