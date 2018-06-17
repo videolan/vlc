@@ -27,6 +27,8 @@
 # include "config.h"
 #endif
 
+#include <stdatomic.h>
+
 #include <vlc_common.h>
 #include <vlc_httpd.h>
 
@@ -77,7 +79,7 @@ struct httpd_host_t
     struct vlc_list node;
 
     /* ref count */
-    unsigned    i_ref;
+    atomic_uint ref;
 
     /* address/port and socket for listening at connections */
     int         *fds;
@@ -932,13 +934,8 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
          || (host->p_tls != NULL) != (p_tls != NULL))
             continue;
 
-        /* Increase existing matching host reference count.
-         * The reference count is written under both the global httpd and the
-         * host lock. It is read with either or both locks held. The global
-         * lock is always acquired first. */
-        vlc_mutex_lock(&host->lock);
-        host->i_ref++;
-        vlc_mutex_unlock(&host->lock);
+        /* Increase existing matching host reference count. */
+        atomic_fetch_add_explicit(&host->ref, 1, memory_order_relaxed);
 
         vlc_mutex_unlock(&httpd.mutex);
         vlc_UrlClean(&url);
@@ -954,7 +951,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
 
     vlc_mutex_init(&host->lock);
     vlc_cond_init(&host->wait);
-    host->i_ref = 1;
+    atomic_init(&host->ref, 1);
 
     host->fds = net_ListenTCP(p_this, url.psz_host, port);
     if (!host->fds) {
@@ -1003,16 +1000,9 @@ error:
 /* delete a host */
 void httpd_HostDelete(httpd_host_t *host)
 {
-    bool delete = false;
-
     vlc_mutex_lock(&httpd.mutex);
 
-    vlc_mutex_lock(&host->lock);
-    host->i_ref--;
-    if (host->i_ref == 0)
-        delete = true;
-    vlc_mutex_unlock(&host->lock);
-    if (!delete) {
+    if (atomic_fetch_sub_explicit(&host->ref, 1, memory_order_relaxed) > 1) {
         /* still used */
         vlc_mutex_unlock(&httpd.mutex);
         msg_Dbg(host, "httpd_HostDelete: host still in use");
@@ -1695,6 +1685,7 @@ static void httpdLoop(httpd_host_t *host)
         ufd[nfd].revents = 0;
     }
 
+    vlc_mutex_lock(&host->lock);
     /* add all socket that should be read/write and close dead connection */
     while (host->i_url <= 0) {
         mutex_cleanup_push(&host->lock);
@@ -2036,6 +2027,7 @@ static void httpdLoop(httpd_host_t *host)
         TAB_APPEND(host->i_client, host->client, cl);
     }
 
+    vlc_mutex_unlock(&host->lock);
     vlc_restorecancel(canc);
 }
 
@@ -2043,10 +2035,8 @@ static void* httpd_HostThread(void *data)
 {
     httpd_host_t *host = data;
 
-    vlc_mutex_lock(&host->lock);
-    while (host->i_ref > 0)
+    while (atomic_load_explicit(&host->ref, memory_order_relaxed) > 0)
         httpdLoop(host);
-    vlc_mutex_unlock(&host->lock);
     return NULL;
 }
 
