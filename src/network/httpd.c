@@ -1047,7 +1047,12 @@ httpd_url_t *httpd_UrlNew(httpd_host_t *host, const char *psz_url,
             return NULL;
         }
 
-    url = xmalloc(sizeof(httpd_url_t));
+    url = malloc(sizeof (*url));
+    if (unlikely(url == NULL)) {
+        vlc_mutex_unlock(&host->lock);
+        return NULL;
+    }
+
     url->host = host;
 
     vlc_mutex_init(&url->lock);
