@@ -998,7 +998,6 @@ error:
 void httpd_HostDelete(httpd_host_t *host)
 {
     httpd_client_t *client;
-    httpd_url_t *url;
 
     vlc_mutex_lock(&httpd.mutex);
 
@@ -1015,14 +1014,12 @@ void httpd_HostDelete(httpd_host_t *host)
 
     msg_Dbg(host, "HTTP host removed");
 
-    vlc_list_foreach(url, &host->urls, node)
-        msg_Err(host, "url still registered: %s", url->psz_url);
-
     vlc_list_foreach(client, &host->clients, node) {
         msg_Warn(host, "client still connected");
         httpd_ClientDestroy(client);
     }
 
+    assert(vlc_list_is_empty(&host->urls));
     vlc_tls_Delete(host->p_tls);
     net_ListenClose(host->fds);
     vlc_cond_destroy(&host->wait);
