@@ -6,7 +6,7 @@ libstats_plugin_la_SOURCES = misc/stats.c
 misc_LTLIBRARIES = liblogger_plugin.la libstats_plugin.la
 
 libaudioscrobbler_plugin_la_SOURCES = misc/audioscrobbler.c
-libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
+libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS)
 misc_LTLIBRARIES += libaudioscrobbler_plugin.la
 
 libexport_plugin_la_SOURCES = \
@@ -21,7 +21,7 @@ libfingerprinter_plugin_la_SOURCES =  \
 	misc/webservices/json.c misc/webservices/json.h \
 	misc/fingerprinter.c
 libfingerprinter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/misc
-libfingerprinter_plugin_la_LIBADD = $(LIBM) $(LIBPTHREAD)
+libfingerprinter_plugin_la_LIBADD = $(LIBM)
 misc_LTLIBRARIES += libfingerprinter_plugin.la
 
 libgnutls_plugin_la_SOURCES = misc/gnutls.c

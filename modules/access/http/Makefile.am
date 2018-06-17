@@ -15,9 +15,7 @@ libvlc_http_la_SOURCES = \
 	access/http/chunked.c access/http/tunnel.c access/http/conn.h \
 	access/http/connmgr.c access/http/connmgr.h
 libvlc_http_la_CPPFLAGS = -Dneedsomethinghere
-libvlc_http_la_LIBADD = \
-	$(LTLIBVLCCORE) ../compat/libcompat.la \
-	$(SOCKET_LIBS) $(LIBPTHREAD)
+libvlc_http_la_LIBADD = $(LTLIBVLCCORE) ../compat/libcompat.la $(SOCKET_LIBS)
 #libvlc_http_la_LDFLAGS = -no-undefined -export-symbols-regex ^vlc_http_
 #pkglib_LTLIBRARIES += libvlc_http.la
 libvlc_http_la_LDFLAGS = -static
@@ -31,9 +29,9 @@ h2frame_test_SOURCES = access/http/h2frame_test.c \
 	access/http/hpack.c access/http/hpack.h access/http/hpackenc.c \
 	access/http/h2frame.c access/http/h2frame.h
 h2output_test_SOURCES = access/http/h2output_test.c
-h2output_test_LDADD = libvlc_http.la $(LIBPTHREAD)
+h2output_test_LDADD = libvlc_http.la
 h2conn_test_SOURCES = access/http/h2conn_test.c
-h2conn_test_LDADD = libvlc_http.la $(LIBPTHREAD)
+h2conn_test_LDADD = libvlc_http.la
 h1conn_test_SOURCES = access/http/h1conn_test.c
 h1conn_test_LDADD = libvlc_http.la
 h1chunked_test_SOURCES = access/http/chunked_test.c

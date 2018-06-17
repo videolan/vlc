@@ -564,7 +564,7 @@ libaom_plugin_la_SOURCES = codec/aom.c
 libaom_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
 libaom_plugin_la_CFLAGS = $(AM_CFLAGS) $(AOM_CFLAGS) $(CPPFLAGS_aom)
 libaom_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(codecdir)'
-libaom_plugin_la_LIBADD = $(AOM_LIBS) $(LIBPTHREAD)
+libaom_plugin_la_LIBADD = $(AOM_LIBS)
 EXTRA_LTLIBRARIES += libaom_plugin.la
 codec_LTLIBRARIES += $(LTLIBaom)
 

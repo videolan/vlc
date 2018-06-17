@@ -55,8 +55,7 @@ libvlc_la_SOURCES = \
 	media_discoverer.c
 EXTRA_DIST = libvlc.pc.in libvlc.sym ../include/vlc/libvlc_version.h.in
 
-libvlc_la_LIBADD = \
-	../src/libvlccore.la ../compat/libcompat.la $(LIBPTHREAD) $(LIBM)
+libvlc_la_LIBADD = ../src/libvlccore.la ../compat/libcompat.la $(LIBM)
 libvlc_la_LDFLAGS = \
 	$(LDFLAGS_libvlc) \
 	-no-undefined \

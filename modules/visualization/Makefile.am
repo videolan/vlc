@@ -21,7 +21,7 @@ visu_LTLIBRARIES += $(LTLIBgoom)
 libprojectm_plugin_la_SOURCES = visualization/projectm.cpp
 libprojectm_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(PROJECTM_CFLAGS)
 libprojectm_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(visudir)'
-libprojectm_plugin_la_LIBADD = $(PROJECTM_LIBS) $(LIBPTHREAD)
+libprojectm_plugin_la_LIBADD = $(PROJECTM_LIBS)
 EXTRA_LTLIBRARIES += libprojectm_plugin.la
 visu_LTLIBRARIES += $(LTLIBprojectm)
 

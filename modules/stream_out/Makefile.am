@@ -50,7 +50,7 @@ libstream_out_rtp_plugin_la_SOURCES = \
 	stream_out/rtp.c stream_out/rtp.h stream_out/rtpfmt.c \
 	stream_out/rtcp.c stream_out/rtsp.c stream_out/vod.c
 libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
-libstream_out_rtp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
+libstream_out_rtp_plugin_la_LIBADD = $(SOCKET_LIBS)
 if HAVE_GCRYPT
 SRTP_CFLAGS = -I$(srcdir)/access/rtp
 SRTP_LIBS = libvlc_srtp.la

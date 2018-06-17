@@ -106,7 +106,7 @@ EXTRA_LTLIBRARIES += libdc1394_plugin.la
 
 libdv1394_plugin_la_SOURCES = access/dv.c
 libdv1394_plugin_la_CFLAGS = $(AM_CFLAGS) $(DV1394_CFLAGS)
-libdv1394_plugin_la_LIBADD = $(DV1394_LIBS) $(LIBPTHREAD)
+libdv1394_plugin_la_LIBADD = $(DV1394_LIBS)
 libdv1394_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBdv1394)
 EXTRA_LTLIBRARIES += libdv1394_plugin.la
@@ -116,7 +116,6 @@ liblinsys_hdsdi_plugin_la_SOURCES = \
 	access/linsys/linsys_sdivideo.h \
 	access/linsys/linsys_hdsdi.c
 liblinsys_hdsdi_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-liblinsys_hdsdi_plugin_la_LIBADD = $(LIBPTHREAD)
 liblinsys_sdi_plugin_la_SOURCES = access/linsys/linsys_sdi.c access/linsys/linsys_sdi.h
 liblinsys_sdi_plugin_la_CFLAGS = $(AM_CFLAGS) $(LINSYS_SDI_CFLAGS)
 liblinsys_sdi_plugin_la_LIBADD = $(LINSYS_SDI_LIBS)
@@ -150,7 +149,7 @@ libv4l2_plugin_la_SOURCES = \
 	access/v4l2/v4l2.h
 libv4l2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -I$(srcdir)/access/v4l2
 libv4l2_plugin_la_CFLAGS = $(AM_CFLAGS) $(ZVBI_CFLAGS)
-libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS) $(LIBPTHREAD)
+libv4l2_plugin_la_LIBADD = $(LIBDL) $(LIBM) $(ZVBI_LIBS)
 if HAVE_V4L2
 access_LTLIBRARIES += libv4l2_plugin.la
 endif
@@ -180,8 +179,7 @@ nodist_libwl_screenshooter_plugin_la_SOURCES = \
 	access/screen/screenshooter-protocol.c
 libwl_screenshooter_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -Iaccess/screen
 libwl_screenshooter_plugin_la_CFLAGS = $(WAYLAND_CLIENT_CFLAGS)
-libwl_screenshooter_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) \
-	$(LIBPTHREAD) $(LIBM)
+libwl_screenshooter_plugin_la_LIBADD = $(WAYLAND_CLIENT_LIBS) $(LIBM)
 EXTRA_DIST += access/screen/screenshooter.xml
 CLEANFILES += $(nodist_libwl_screenshooter_plugin_la_SOURCES)
 if HAVE_WAYLAND
@@ -360,7 +358,7 @@ libtcp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libtcp_plugin.la
 
 libudp_plugin_la_SOURCES = access/udp.c
-libudp_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
+libudp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libudp_plugin.la
 
 libunc_plugin_la_SOURCES = access/unc.c access/smb_common.h
@@ -409,7 +407,7 @@ endif
 endif
 
 libsatip_plugin_la_SOURCES = access/satip.c
-libsatip_plugin_la_LIBADD = $(SOCKET_LIBS) $(LIBPTHREAD)
+libsatip_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libsatip_plugin.la
 
 ### Misc ###

@@ -789,20 +789,6 @@ AM_CONDITIONAL(HAVE_DYNAMIC_PLUGINS, [test "${have_dynamic_objects}" != "no"])
 
 AC_SUBST(LIBDL)
 
-dnl Check for thread library
-LIBPTHREAD=""
-AS_IF([test "${SYS}" != "mingw32"], [
-  VLC_SAVE_FLAGS
-  LIBS=""
-  AC_SEARCH_LIBS(pthread_rwlock_init, pthread pthreads c_r, [
-    AS_IF([test "$ac_cv_search_pthread_rwlock_init" != "none required"], [
-      LIBPTHREAD="$ac_cv_search_pthread_rwlock_init"
-    ])
-  ])
-  VLC_RESTORE_FLAGS
-])
-AC_SUBST(LIBPTHREAD)
-
 AC_SEARCH_LIBS([clock_nanosleep], [rt pthread], [
   AS_IF([test "$ac_cv_search_clock_nanosleep" != "none required"], [
     LIBRT="$ac_cv_search_clock_nanosleep"
@@ -4241,7 +4227,7 @@ dnl
 dnl Fuzzer (at the end in order to don't mess dependencies FLAGS)
 dnl
 AS_VAR_IF(with_libfuzzer, no, [], [
-    LIBS="-lstdc++ ${LIBM} ${LIBPTHREAD} -L${with_libfuzzer} -lFuzzer"
+    LIBS="-lstdc++ ${LIBM} -L${with_libfuzzer} -lFuzzer"
     AX_CHECK_COMPILE_FLAG(-fsanitize-coverage=trace-pc-guard, [
         AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard])
         AX_APPEND_FLAG([-fsanitize-coverage=trace-pc-guard], [CXXFLAGS])

@@ -360,7 +360,7 @@ libvlccore_la_SOURCES = \
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
-	$(IDN_LIBS) $(LIBPTHREAD) $(SOCKET_LIBS) $(LIBRT) $(LIBDL) $(LIBM)
+	$(IDN_LIBS) $(SOCKET_LIBS) $(LIBRT) $(LIBDL) $(LIBM)
 
 if HAVE_WIN32
 libvlccore_la_SOURCES += \
@@ -532,7 +532,7 @@ test_block_DEPENDENCIES =
 test_dictionary_SOURCES = test/dictionary.c
 test_i18n_atof_SOURCES = test/i18n_atof.c
 test_interrupt_SOURCES = test/interrupt.c
-test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore) $(LIBPTHREAD)
+test_interrupt_LDADD = $(LDADD) $(LIBS_libvlccore)
 test_list_SOURCES = test/list.c
 test_md5_SOURCES = test/md5.c
 test_picture_pool_SOURCES = test/picture_pool.c

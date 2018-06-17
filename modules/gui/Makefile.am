@@ -3,7 +3,7 @@ gui_LTLIBRARIES =
 
 libncurses_plugin_la_SOURCES = gui/ncurses.c
 libncurses_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(NCURSES_CFLAGS)
-libncurses_plugin_la_LIBADD = $(NCURSES_LIBS) $(LIBPTHREAD) $(LIBM)
+libncurses_plugin_la_LIBADD = $(NCURSES_LIBS) $(LIBM)
 if HAVE_NCURSES
 gui_LTLIBRARIES += libncurses_plugin.la
 endif

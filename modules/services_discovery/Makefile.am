@@ -5,7 +5,6 @@ libmediadirs_plugin_la_SOURCES = services_discovery/mediadirs.c
 sd_LTLIBRARIES += libmediadirs_plugin.la
 
 libpodcast_plugin_la_SOURCES = services_discovery/podcast.c
-libpodcast_plugin_la_LIBADD = $(LIBPTHREAD)
 sd_LTLIBRARIES += libpodcast_plugin.la
 
 libsap_plugin_la_SOURCES = services_discovery/sap.c

@@ -2,8 +2,7 @@ vdpaudir = $(pluginsdir)/vdpau
 
 libvlc_vdpau_la_SOURCES = hw/vdpau/vlc_vdpau.c hw/vdpau/vlc_vdpau.h hw/vdpau/instance.c
 libvlc_vdpau_la_CFLAGS = $(VDPAU_CFLAGS)
-libvlc_vdpau_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 \
-	$(LIBDL) $(LIBPTHREAD)
+libvlc_vdpau_la_LIBADD = $(X_LIBS) $(X_PRE_LIBS) -lX11 $(LIBDL)
 libvlc_vdpau_la_LDFLAGS = \
 	-no-undefined \
 	-export-symbols-regex ^vdp_ \

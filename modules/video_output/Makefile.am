@@ -228,7 +228,7 @@ libxdg_shell_plugin_la_CFLAGS = \
 	$(XKBCOMMON_CFLAGS)
 libxdg_shell_plugin_la_LIBADD = \
 	$(WAYLAND_CLIENT_LIBS) $(WAYLAND_CURSOR_LIBS) \
-	$(XKBCOMMON_LIBS) $(LIBPTHREAD)
+	$(XKBCOMMON_LIBS)
 if HAVE_XKBCOMMON
 libwl_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON
 libxdg_shell_plugin_la_CPPFLAGS += -DHAVE_XKBCOMMON
