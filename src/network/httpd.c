@@ -97,8 +97,8 @@ struct httpd_host_t
     int         i_url;
     httpd_url_t **url;
 
-    int            i_client;
-    httpd_client_t **client;
+    size_t client_count;
+    struct vlc_list clients;
 
     /* TLS data */
     vlc_tls_creds_t *p_tls;
@@ -144,6 +144,7 @@ struct httpd_client_t
     httpd_url_t *url;
     vlc_tls_t   *sock;
 
+    struct vlc_list node;
     int     i_ref;
 
     bool    b_stream_mode;
@@ -167,7 +168,6 @@ struct httpd_client_t
     /* */
     httpd_message_t query;  /* client -> httpd */
     httpd_message_t answer; /* httpd -> client */
-
 };
 
 
@@ -963,8 +963,8 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     host->port     = port;
     host->i_url    = 0;
     host->url      = NULL;
-    host->i_client = 0;
-    host->client   = NULL;
+    host->client_count = 0;
+    vlc_list_init(&host->clients);
     host->p_tls    = p_tls;
 
     /* create the thread */
@@ -1000,6 +1000,8 @@ error:
 /* delete a host */
 void httpd_HostDelete(httpd_host_t *host)
 {
+    httpd_client_t *client;
+
     vlc_mutex_lock(&httpd.mutex);
 
     if (atomic_fetch_sub_explicit(&host->ref, 1, memory_order_relaxed) > 1) {
@@ -1018,11 +1020,10 @@ void httpd_HostDelete(httpd_host_t *host)
     for (int i = 0; i < host->i_url; i++)
         msg_Err(host, "url still registered: %s", host->url[i]->psz_url);
 
-    for (int i = 0; i < host->i_client; i++) {
+    vlc_list_foreach(client, &host->clients, node) {
         msg_Warn(host, "client still connected");
-        httpd_ClientDestroy(host->client[i]);
+        httpd_ClientDestroy(client);
     }
-    TAB_CLEAN(host->i_client, host->client);
 
     vlc_tls_Delete(host->p_tls);
     net_ListenClose(host->fds);
@@ -1083,6 +1084,7 @@ int httpd_UrlCatch(httpd_url_t *url, int i_msg, httpd_callback_t cb,
 void httpd_UrlDelete(httpd_url_t *url)
 {
     httpd_host_t *host = url->host;
+    httpd_client_t *client;
 
     vlc_mutex_lock(&host->lock);
     TAB_REMOVE(host->i_url, host->url, url);
@@ -1092,17 +1094,14 @@ void httpd_UrlDelete(httpd_url_t *url)
     free(url->psz_user);
     free(url->psz_password);
 
-    for (int i = 0; i < host->i_client; i++) {
-        httpd_client_t *client = host->client[i];
-
+    vlc_list_foreach(client, &host->clients, node) {
         if (client->url != url)
             continue;
 
         /* TODO complete it */
         msg_Warn(host, "force closing connections");
-        TAB_REMOVE(host->i_client, host->client, client);
+        host->client_count--;
         httpd_ClientDestroy(client);
-        i--;
     }
     free(url);
     vlc_mutex_unlock(&host->lock);
@@ -1204,6 +1203,7 @@ char* httpd_ServerIP(const httpd_client_t *cl, char *ip, int *port)
 
 static void httpd_ClientDestroy(httpd_client_t *cl)
 {
+    vlc_list_remove(&cl->node);
     vlc_tls_Close(cl->sock);
     httpd_MsgClean(&cl->answer);
     httpd_MsgClean(&cl->query);
@@ -1677,7 +1677,7 @@ auth_failed:
 
 static void httpdLoop(httpd_host_t *host)
 {
-    struct pollfd ufd[host->nfd + host->i_client];
+    struct pollfd ufd[host->nfd + host->client_count];
     unsigned nfd;
     for (nfd = 0; nfd < host->nfd; nfd++) {
         ufd[nfd].fd = host->fds[nfd];
@@ -1695,17 +1695,17 @@ static void httpdLoop(httpd_host_t *host)
 
     mtime_t now = mdate();
     bool b_low_delay = false;
+    httpd_client_t *cl;
 
     int canc = vlc_savecancel();
-    for (int i_client = 0; i_client < host->i_client; i_client++) {
+    vlc_list_foreach(cl, &host->clients, node) {
         int64_t i_offset;
-        httpd_client_t *cl = host->client[i_client];
+
         if (cl->i_ref < 0 || (cl->i_ref == 0 &&
                     (cl->i_state == HTTPD_CLIENT_DEAD ||
                       (cl->i_activity_timeout > 0 &&
                         cl->i_activity_date+cl->i_activity_timeout < now)))) {
-            TAB_REMOVE(host->i_client, host->client, cl);
-            i_client--;
+            host->client_count--;
             httpd_ClientDestroy(cl);
             continue;
         }
@@ -1957,8 +1957,7 @@ static void httpdLoop(httpd_host_t *host)
     now = mdate();
     nfd = host->nfd;
 
-    for (int i_client = 0; i_client < host->i_client; i_client++) {
-        httpd_client_t *cl = host->client[i_client];
+    vlc_list_foreach(cl, &host->clients, node) {
         const struct pollfd *pufd = &ufd[nfd];
 
         assert(pufd < &ufd[sizeof(ufd) / sizeof(ufd[0])]);
@@ -1983,7 +1982,6 @@ static void httpdLoop(httpd_host_t *host)
 
     /* Handle server sockets (accept new connections) */
     for (nfd = 0; nfd < host->nfd; nfd++) {
-        httpd_client_t *cl;
         int fd = ufd[nfd].fd;
 
         assert (fd == host->fds[nfd]);
@@ -2024,7 +2022,8 @@ static void httpdLoop(httpd_host_t *host)
         if (host->p_tls != NULL)
             cl->i_state = HTTPD_CLIENT_TLS_HS_OUT;
 
-        TAB_APPEND(host->i_client, host->client, cl);
+        host->client_count++;
+        vlc_list_append(&cl->node, &host->clients);
     }
 
     vlc_mutex_unlock(&host->lock);
