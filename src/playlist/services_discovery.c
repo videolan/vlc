@@ -178,8 +178,8 @@ int playlist_ServicesDiscoveryRemove(playlist_t *playlist, const char *name)
     vlc_list_foreach(entry, &priv->sds, siblings)
         if (!strcmp(name, entry->name))
         {
-            vlc_list_remove(&sds->siblings);
             sds = entry;
+            vlc_list_remove(&sds->siblings);
             break;
         }
     playlist_Unlock(playlist);
