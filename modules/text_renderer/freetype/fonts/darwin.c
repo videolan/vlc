@@ -200,6 +200,39 @@ end:
     return p_family;
 }
 
+/* Obtains a copy of the contents of a CFString in UTF8 encoding.
+ * Returns char* (must be freed by caller) or NULL on failure.
+ */
+static char* CFStringCopyUTF8CString(CFStringRef cfString)
+{
+    // Try the quick way to obtain the buffer
+    const char *tmpBuffer = CFStringGetCStringPtr(cfString, kCFStringEncodingUTF8);
+
+    if (tmpBuffer != NULL) {
+       return strdup(tmpBuffer);
+    }
+
+    // The quick way did not work, try the long way
+    CFIndex length = CFStringGetLength(cfString);
+    CFIndex maxSize =
+        CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingUTF8);
+
+    // If result would exceed LONG_MAX, kCFNotFound is returned
+    if (unlikely(maxSize == kCFNotFound)) {
+        return NULL;
+    }
+
+    // Account for the null terminator
+    maxSize++;
+
+    char *buffer = (char *)malloc(maxSize);
+    Boolean success = CFStringGetCString(cfString, buffer, maxSize, kCFStringEncodingUTF8);
+
+    if (!success)
+        FREENULL(buffer);
+    return buffer;
+}
+
 vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, uni_char_t codepoint)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
@@ -227,15 +260,16 @@ vlc_family_t *CoreText_GetFallbacks(filter_t *p_filter, const char *psz_family, 
     CFStringRef fallbackFontFamilyName = CTFontCopyFamilyName(fallbackFont);
 
     /* create a new family object */
-    const char *psz_fallbackFamilyName = CFStringGetCStringPtr(fallbackFontFamilyName, kCFStringEncodingUTF8);
+    char *psz_fallbackFamilyName = CFStringCopyUTF8CString(fallbackFontFamilyName);
     if (psz_fallbackFamilyName == NULL) {
+        msg_Warn(p_filter, "Failed to convert font family name CFString to C string");
         goto done;
     }
 #ifndef NDEBUG
     msg_Dbg(p_filter, "Will deploy fallback font '%s'", psz_fallbackFamilyName);
 #endif
 
-    psz_lc_fallback = ToLower(strdup(psz_fallbackFamilyName));
+    psz_lc_fallback = ToLower(psz_fallbackFamilyName);
 
     p_family = vlc_dictionary_value_for_key(&p_sys->family_map, psz_lc_fallback);
     if (p_family) {
