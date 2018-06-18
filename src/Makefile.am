@@ -357,7 +357,8 @@ libvlccore_la_SOURCES = \
 	misc/fingerprinter.c \
 	misc/text_style.c \
 	misc/subpicture.c \
-	misc/subpicture.h
+	misc/subpicture.h \
+	misc/medialibrary.c
 libvlccore_la_LIBADD = $(LIBS_libvlccore) \
 	../compat/libcompat.la \
 	$(LTLIBINTL) $(LTLIBICONV) \
