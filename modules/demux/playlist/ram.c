@@ -202,7 +202,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char       *psz_line;
     char       *psz_artist = NULL, *psz_album = NULL, *psz_genre = NULL, *psz_year = NULL;
     char       *psz_author = NULL, *psz_title = NULL, *psz_copyright = NULL, *psz_cdnum = NULL, *psz_comments = NULL;
-    mtime_t    i_duration = -1;
     const char **ppsz_options = NULL;
     int        i_options = 0, i_start = 0, i_stop = 0;
     bool b_cleanup = false;
@@ -318,8 +317,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             }
 
             /* Create the input item and pump in all the options into playlist item */
-            p_input = input_item_NewExt( psz_mrl, psz_title, i_duration,
-                                         ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN );
+            p_input = input_item_New( psz_mrl, psz_title );
             if( !p_input )
             {
                 free( psz_mrl );
@@ -364,7 +362,6 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             FREENULL( psz_cdnum );
             FREENULL( psz_comments );
             i_options = 0;
-            i_duration = -1;
             i_start = 0;
             i_stop = 0;
             b_cleanup = false;
