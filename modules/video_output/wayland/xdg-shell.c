@@ -81,9 +81,22 @@ struct vout_window_sys_t
 
     uint32_t default_output;
 
-    unsigned width;
-    unsigned height;
-    bool fullscreen;
+    struct
+    {
+        unsigned width;
+        unsigned height;
+    } set;
+    struct
+    {
+        unsigned width;
+        unsigned height;
+        struct
+        {
+            unsigned width;
+            unsigned height;
+            bool fullscreen;
+         } latch;
+    } wm;
 # ifdef XDG_SHELL_UNSTABLE
     bool unstable;
 #endif
@@ -94,6 +107,7 @@ struct vout_window_sys_t
     struct wl_cursor *cursor;
     struct wl_surface *cursor_surface;
 
+    vlc_mutex_t lock;
     vlc_thread_t thread;
 };
 
@@ -144,6 +158,18 @@ static void *Thread(void *data)
     //return NULL;
 }
 
+static void ReportSize(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    /* Zero wm.width or zero wm.height means the client should choose.
+     * DO NOT REPORT those values to video output... */
+    unsigned width = sys->wm.width ? sys->wm.width : sys->set.width;
+    unsigned height = sys->wm.height ? sys->wm.height : sys->set.height;
+
+    vout_window_ReportSize(wnd, width, height);
+    xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
+}
+
 static int Control(vout_window_t *wnd, int cmd, va_list ap)
 {
     vout_window_sys_t *sys = wnd->sys;
@@ -159,16 +185,11 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
             unsigned width = va_arg(ap, unsigned);
             unsigned height = va_arg(ap, unsigned);
 
-            /* Unlike X11, the client basically gets to choose its size, which
-             * is the size of the buffer attached to the surface.
-             * Note that it is unspecified who "wins" in case of a race
-             * (e.g. if trying to resize the window, and changing the zoom
-             * at the same time). With X11, the race is arbitrated by the X11
-             * server. With Wayland, it is arbitrated in the client windowing
-             * code. In this case, it is arbitrated by the window core code.
-             */
-            vout_window_ReportSize(wnd, width, height);
-            xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
+            vlc_mutex_lock(&sys->lock);
+            sys->set.width = width;
+            sys->set.height = height;
+            ReportSize(wnd);
+            vlc_mutex_unlock(&sys->lock);
             break;
         }
 
@@ -222,8 +243,10 @@ static void xdg_toplevel_configure_cb(void *data,
     const uint32_t *state;
 
     msg_Dbg(wnd, "new configuration: %"PRId32"x%"PRId32, width, height);
+    sys->wm.latch.width = width;
+    sys->wm.latch.height = height;
+    sys->wm.latch.fullscreen = false;
 
-    sys->fullscreen = false;
     wl_array_for_each(state, states)
     {
         msg_Dbg(wnd, " - state 0x%04"PRIX32, *state);
@@ -231,17 +254,10 @@ static void xdg_toplevel_configure_cb(void *data,
         switch (*state)
         {
             case XDG_TOPLEVEL_STATE_FULLSCREEN:
-                sys->fullscreen = true;
+                sys->wm.latch.fullscreen = true;
                 break;
         }
     }
-
-    /* Zero width or zero height means client (we) should choose.
-     * DO NOT REPORT those values to video output... */
-    if (width != 0)
-        sys->width = width;
-    if (height != 0)
-        sys->height = height;
 
     (void) toplevel;
 }
@@ -266,14 +282,17 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
     vout_window_t *wnd = data;
     vout_window_sys_t *sys = wnd->sys;
 
-    vout_window_ReportSize(wnd, sys->width, sys->height);
+    vlc_mutex_lock(&sys->lock);
+    sys->wm.width = sys->wm.latch.width;
+    sys->wm.height = sys->wm.latch.height;
+    ReportSize(wnd);
+    vlc_mutex_unlock(&sys->lock);
 
-    if (sys->fullscreen)
+    if (sys->wm.latch.fullscreen)
         vout_window_ReportFullscreen(wnd, NULL);
     else
         vout_window_ReportWindowed(wnd);
 
-    xdg_surface_set_window_geometry(surface, 0, 0, sys->width, sys->height);
     xdg_surface_ack_configure(surface, serial);
 }
 
@@ -448,11 +467,16 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->deco_manager = NULL;
     sys->deco = NULL;
     sys->default_output = var_InheritInteger(wnd, "wl-output");
-    sys->width = cfg->width;
-    sys->height = cfg->height;
-    sys->fullscreen = false;
+    sys->wm.width = 0;
+    sys->wm.height = 0;
+    sys->wm.latch.width = 0;
+    sys->wm.latch.height = 0;
+    sys->wm.latch.fullscreen = false;
+    sys->set.width = cfg->width;
+    sys->set.height = cfg->height;
     wl_list_init(&sys->outputs);
     wl_list_init(&sys->seats);
+    vlc_mutex_init(&sys->lock);
     wnd->sys = sys;
     wnd->handle.wl = NULL;
 
@@ -613,6 +637,7 @@ static void Close(vout_window_t *wnd)
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
+    vlc_mutex_destroy(&sys->lock);
     seat_destroy_all(&sys->seats);
     output_destroy_all(&sys->outputs);
     if (sys->deco != NULL)
