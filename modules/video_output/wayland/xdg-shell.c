@@ -559,15 +559,11 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->display.wl = display;
     wnd->control = Control;
 
-    if (cfg->is_fullscreen)
-    {
-        vout_window_SetFullScreen(wnd, NULL);
-        sys->fullscreen = true;
-    }
-
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         goto error;
 
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen(wnd, NULL);
 #ifdef XDG_SHELL_UNSTABLE
     if (sys->unstable)
     {
