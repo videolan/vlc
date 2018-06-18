@@ -1521,7 +1521,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt > 0 )
             {
-                *pi64 = (int64_t)(p_sys->f_npt * (double)CLOCK_FREQ);
+                *pi64 = vlc_tick_from_sec(p_sys->f_npt);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
