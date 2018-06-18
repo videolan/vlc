@@ -200,7 +200,7 @@ end:
     return p_family;
 }
 
-/* Obtains a copy of the contents of a CFString in ASCII encoding.
+/* Obtains a copy of the contents of a CFString in UTF8 encoding.
  * Returns char* (must be freed by caller) or NULL on failure.
  */
 static char* CFStringCopyUTF8CString(CFStringRef cfString)
