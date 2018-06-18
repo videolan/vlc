@@ -1539,11 +1539,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             pi64 = va_arg( args, int64_t * );
             if( p_sys->f_npt_length > 0 )
             {
-                double d_length = p_sys->f_npt_length * (double)CLOCK_FREQ;
-                if( d_length >= INT64_MAX )
+                if( unlikely(p_sys->f_npt_length >= (double)(INT64_MAX / CLOCK_FREQ)) )
                     *pi64 = INT64_MAX;
                 else
-                    *pi64 = (int64_t)d_length;
+                    *pi64 = vlc_tick_from_sec(p_sys->f_npt_length);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
