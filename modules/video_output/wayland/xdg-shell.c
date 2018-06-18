@@ -185,6 +185,14 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
             unsigned width = va_arg(ap, unsigned);
             unsigned height = va_arg(ap, unsigned);
 
+#ifdef XDG_SHELL
+            /* The minimum size must be smaller or equal to the maximum size
+             * at _all_ times. This gets a bit cumbersome. */
+            xdg_toplevel_set_min_size(sys->toplevel, 0, 0);
+            xdg_toplevel_set_max_size(sys->toplevel, width, height);
+            xdg_toplevel_set_min_size(sys->toplevel, width, height);
+#endif
+
             vlc_mutex_lock(&sys->lock);
             sys->set.width = width;
             sys->set.height = height;
