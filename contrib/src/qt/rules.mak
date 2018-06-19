@@ -22,8 +22,13 @@ $(TARBALLS)/qt-$(QT_VERSION).tar.xz:
 qt: qt-$(QT_VERSION).tar.xz .sum-qt
 	$(UNPACK)
 	mv qtbase-everywhere-src-$(QT_VERSION) qt-$(QT_VERSION)
+ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-prefer-lower-value-when-rounding-fractio.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
+ifndef HAVE_WIN64
+	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
+endif
+endif
 	$(MOVE)
 
 ifdef HAVE_MACOSX

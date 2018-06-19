@@ -1,0 +1,11 @@
+--- qt-5.11.0/src/corelib/global/qrandom.cpp.orig	2018-06-19 11:22:03.011543136 +0200
++++ qt-5.11.0/src/corelib/global/qrandom.cpp	2018-06-19 11:23:45.231337043 +0200
+@@ -90,7 +90,7 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
+-#if defined(Q_PROCESSOR_X86) && QT_COMPILER_SUPPORTS_HERE(RDRND)
++#if 0
+ static qsizetype qt_random_cpu(void *buffer, qsizetype count) Q_DECL_NOTHROW;
+ 
+ #  ifdef Q_PROCESSOR_X86_64
