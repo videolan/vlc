@@ -549,6 +549,19 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
     p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
 }
 
+static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
+{
+    if (on)
+        return;
+
+    xcb_intern_atom_cookie_t atom_ck = intern_string(conn, "_MOTIF_WM_HINTS");
+    xcb_atom_t atom = get_atom(conn, atom_ck);
+    static const uint32_t motif_wm_hints[5] = { 2, 0, 0, 0, 0 };
+
+    xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window, atom,
+                        atom, 32, ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
+}
+
 /**
  * Create an X11 window.
  */
@@ -645,6 +658,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
                          XA_STRING, 8, 8, "vlc\0Vlc");
     set_hostname_prop (conn, window);
+    set_wm_deco(conn, window, cfg->is_decorated);
 
     /* EWMH */
     xcb_intern_atom_cookie_t utf8_string_ck
