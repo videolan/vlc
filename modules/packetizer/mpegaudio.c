@@ -646,6 +646,7 @@ static int Open( vlc_object_t *p_this )
     /* Set callback */
     p_dec->pf_packetize    = DecodeBlock;
     p_dec->pf_flush        = Flush;
+    p_dec->pf_get_cc       = NULL;
 
     /* Start with the minimum size for a free bitrate frame */
     p_sys->i_free_frame_size = MPGA_HEADER_SIZE;
