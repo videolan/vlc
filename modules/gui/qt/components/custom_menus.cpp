@@ -66,7 +66,7 @@ RendererMenu::RendererMenu( QMenu *parent, intf_thread_t *p_intf_ )
 
     group = new QActionGroup( this );
 
-    QAction *action = new QAction( qtr("<Local>") );
+    QAction *action = new QAction( qtr("<Local>"), this );
     action->setCheckable(true);
     addAction( action );
     group->addAction(action);
