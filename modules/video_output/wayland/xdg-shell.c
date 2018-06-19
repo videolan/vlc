@@ -95,7 +95,7 @@ struct vout_window_sys_t
             unsigned width;
             unsigned height;
             bool fullscreen;
-         } latch;
+        } latch;
     } wm;
 # ifdef XDG_SHELL_UNSTABLE
     bool unstable;
