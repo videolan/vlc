@@ -567,8 +567,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (sys->cursor == NULL)
         msg_Err(wnd, "failed to load cursor");
 
-    const uint_fast32_t deco_mode =
-        var_InheritBool(wnd, "video-deco")
+    const uint_fast32_t deco_mode = cfg->is_decorated
             ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
             : ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT;
 
