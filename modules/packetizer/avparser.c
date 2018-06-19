@@ -128,6 +128,7 @@ int avparser_OpenPacketizer( vlc_object_t *p_this )
     }
     p_dec->pf_packetize = Packetize;
     p_dec->pf_flush = FlushPacketizer;
+    p_dec->pf_get_cc = NULL;
     p_sys->p_parser_ctx = p_ctx;
     p_sys->p_codec_ctx = p_codec_ctx;
     p_sys->i_offset = 0;
