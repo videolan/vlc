@@ -4143,6 +4143,7 @@ AS_IF([test "$enable_libplacebo" != "no"], [
 ])
 AM_CONDITIONAL(HAVE_LIBPLACEBO, [test "$enable_libplacebo" != "no"])
 
+PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary], (medialibrary support), [auto])
 
 dnl
 dnl  Endianness check

@@ -990,6 +990,7 @@ modules/misc/gnutls.c
 modules/misc/inhibit/dbus.c
 modules/misc/inhibit/wl-idle-inhibit.c
 modules/misc/inhibit/xdg.c
+modules/misc/medialibrary/medialib.cpp
 modules/misc/playlist/export.c
 modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c

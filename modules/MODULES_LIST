@@ -227,6 +227,7 @@ $Id$
  * marq: Overlays a marquee on the video
  * mediacodec: Android Jelly Bean MediaCodec decoder module
  * mediadirs: Picture/Music/Video user directories as service discoveries
+ * medialibrary: Media collection management
  * memory_keystore: store secrets in memory
  * mft: Media Foundation Transform audio/video decoder
  * microdns: mDNS services discovery
