@@ -96,6 +96,7 @@ struct vout_window_sys_t
             unsigned height;
             bool fullscreen;
         } latch;
+        bool configured;
     } wm;
 # ifdef XDG_SHELL_UNSTABLE
     bool unstable;
@@ -302,6 +303,7 @@ static void xdg_surface_configure_cb(void *data, struct xdg_surface *surface,
         vout_window_ReportWindowed(wnd);
 
     xdg_surface_ack_configure(surface, serial);
+    sys->wm.configured = true;
 }
 
 static const struct xdg_surface_listener xdg_surface_cbs =
@@ -480,6 +482,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->wm.latch.width = 0;
     sys->wm.latch.height = 0;
     sys->wm.latch.fullscreen = false;
+    sys->wm.configured = false;
     sys->set.width = cfg->width;
     sys->set.height = cfg->height;
     wl_list_init(&sys->outputs);
@@ -581,7 +584,13 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
 
+    wl_surface_commit(surface);
     wl_display_flush(display);
+
+#ifdef XDG_SHELL
+    while (!sys->wm.configured)
+        wl_display_dispatch(display);
+#endif
 
     wnd->type = VOUT_WINDOW_TYPE_WAYLAND;
     wnd->handle.wl = surface;
