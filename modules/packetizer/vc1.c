@@ -146,15 +146,15 @@ static int Open( vlc_object_t *p_this )
     if( p_dec->fmt_in.i_codec !=  VLC_CODEC_VC1 )
         return VLC_EGENERIC;
 
-    p_dec->pf_packetize = Packetize;
-    p_dec->pf_flush = Flush;
-    p_dec->pf_get_cc = GetCc;
-
-    /* Create the output format */
-    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
+
+    /* Create the output format */
+    es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
+    p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush = Flush;
+    p_dec->pf_get_cc = GetCc;
 
     packetizer_Init( &p_sys->packetizer,
                      p_vc1_startcode, sizeof(p_vc1_startcode), startcode_FindAnnexB,
