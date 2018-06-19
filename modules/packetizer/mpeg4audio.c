@@ -297,6 +297,7 @@ static int OpenPacketizer(vlc_object_t *p_this)
     /* Set callbacks */
     p_dec->pf_packetize = Packetize;
     p_dec->pf_flush = Flush;
+    p_dec->pf_get_cc = NULL;
 
     return VLC_SUCCESS;
 }
