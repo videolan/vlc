@@ -119,60 +119,64 @@ struct decoder_t
      */
     int                 i_extra_picture_buffers;
 
-#   define VLCDEC_SUCCESS   VLC_SUCCESS
-#   define VLCDEC_ECRITICAL VLC_EGENERIC
-#   define VLCDEC_RELOAD    (-100)
-    /* This function is called to decode one packetized block.
-     *
-     * The module implementation will own the input block (p_block) and should
-     * process and release it. Depending of the decoder type, the module should
-     * send output frames/blocks via decoder_QueueVideo(), decoder_QueueAudio()
-     * or decoder_QueueSub().
-     *
-     * If p_block is NULL, the decoder asks the module to drain itself. The
-     * module should return all available output frames/block via the queue
-     * functions.
-     *
-     * Return values can be:
-     *  VLCDEC_SUCCESS: pf_decode will be called again
-     *  VLCDEC_ECRITICAL: in case of critical error, pf_decode won't be called
-     *  again.
-     *  VLCDEC_RELOAD: Request that the decoder should be reloaded. The current
-     *  module will be unloaded. Reloading a module may cause a loss of frames.
-     *  When returning this status, the implementation shouldn't release or
-     *  modify the p_block in argument (The same p_block will be feed to the
-     *  next decoder module).
-     */
-    int                 ( * pf_decode )   ( decoder_t *, block_t *p_block );
+    union
+    {
+#       define VLCDEC_SUCCESS   VLC_SUCCESS
+#       define VLCDEC_ECRITICAL VLC_EGENERIC
+#       define VLCDEC_RELOAD    (-100)
+        /* This function is called to decode one packetized block.
+         *
+         * The module implementation will own the input block (p_block) and should
+         * process and release it. Depending of the decoder type, the module should
+         * send output frames/blocks via decoder_QueueVideo(), decoder_QueueAudio()
+         * or decoder_QueueSub().
+         *
+         * If p_block is NULL, the decoder asks the module to drain itself. The
+         * module should return all available output frames/block via the queue
+         * functions.
+         *
+         * Return values can be:
+         *  VLCDEC_SUCCESS: pf_decode will be called again
+         *  VLCDEC_ECRITICAL: in case of critical error, pf_decode won't be called
+         *  again.
+         *  VLCDEC_RELOAD: Request that the decoder should be reloaded. The current
+         *  module will be unloaded. Reloading a module may cause a loss of frames.
+         *  When returning this status, the implementation shouldn't release or
+         *  modify the p_block in argument (The same p_block will be feed to the
+         *  next decoder module).
+         */
+        int             ( * pf_decode )   ( decoder_t *, block_t *p_block );
 
-    /* This function is called in a loop with the same pp_block argument until
-     * it returns NULL. This allows a module implementation to return more than
-     * one output blocks for one input block.
-     *
-     * pp_block or *pp_block can be NULL.
-     *
-     * If pp_block and *pp_block are not NULL, the module implementation will
-     * own the input block (*pp_block) and should process and release it. The
-     * module can also process a part of the block. In that case, it should
-     * modify (*pp_block)->p_buffer/i_buffer accordingly and return a valid
-     * output block. The module can also set *pp_block to NULL when the input
-     * block is consumed.
-     *
-     * If pp_block is not NULL but *pp_block is NULL, a previous call of the pf
-     * function has set the *pp_block to NULL. Here, the module can return new
-     * output block for the same, already processed, input block (the
-     * pf_packetize function will be called as long as the module return an
-     * output block).
-     *
-     * When the pf function returns NULL, the next call to this function will
-     * have a new a valid pp_block (if the packetizer is not drained).
-     *
-     * If pp_block is NULL, the packetizer asks the module to drain itself. In
-     * that case, the module has to return all output frames available (the
-     * pf_packetize function will be called as long as the module return an
-     * output block).
-     */
-    block_t *           ( * pf_packetize )( decoder_t *, block_t **pp_block );
+        /* This function is called in a loop with the same pp_block argument until
+         * it returns NULL. This allows a module implementation to return more than
+         * one output blocks for one input block.
+         *
+         * pp_block or *pp_block can be NULL.
+         *
+         * If pp_block and *pp_block are not NULL, the module implementation will
+         * own the input block (*pp_block) and should process and release it. The
+         * module can also process a part of the block. In that case, it should
+         * modify (*pp_block)->p_buffer/i_buffer accordingly and return a valid
+         * output block. The module can also set *pp_block to NULL when the input
+         * block is consumed.
+         *
+         * If pp_block is not NULL but *pp_block is NULL, a previous call of the pf
+         * function has set the *pp_block to NULL. Here, the module can return new
+         * output block for the same, already processed, input block (the
+         * pf_packetize function will be called as long as the module return an
+         * output block).
+         *
+         * When the pf function returns NULL, the next call to this function will
+         * have a new a valid pp_block (if the packetizer is not drained).
+         *
+         * If pp_block is NULL, the packetizer asks the module to drain itself. In
+         * that case, the module has to return all output frames available (the
+         * pf_packetize function will be called as long as the module return an
+         * output block).
+         */
+        block_t *       ( * pf_packetize )( decoder_t *, block_t **pp_block );
+    };
+
     /* */
     void                ( * pf_flush ) ( decoder_t * );
 
