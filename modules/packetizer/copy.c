@@ -84,12 +84,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( p_dec->fmt_in.i_cat == SPU_ES )
-        p_dec->pf_packetize = PacketizeSub;
-    else
-        p_dec->pf_packetize = Packetize;
-    p_dec->pf_flush = Flush;
-
     p_dec->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if (unlikely(p_sys == NULL))
         return VLC_ENOMEM;
@@ -122,6 +116,12 @@ static int Open( vlc_object_t *p_this )
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = fcc;
+    if( p_dec->fmt_in.i_cat == SPU_ES )
+        p_dec->pf_packetize = PacketizeSub;
+    else
+        p_dec->pf_packetize = Packetize;
+    p_dec->pf_flush = Flush;
+    p_dec->pf_get_cc = NULL;
 
     return VLC_SUCCESS;
 }
