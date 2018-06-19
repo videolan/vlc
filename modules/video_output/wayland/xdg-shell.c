@@ -581,9 +581,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
 
-    //if (var_InheritBool (wnd, "keyboard-events"))
-    //    do_something();
-
     wl_display_flush(display);
 
     wnd->type = VOUT_WINDOW_TYPE_WAYLAND;
