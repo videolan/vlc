@@ -32,6 +32,19 @@
 #ifndef __VLC_MTIME_H
 # define __VLC_MTIME_H 1
 
+/**
+ * High precision date or time interval
+ *
+ * Store a high precision date or time interval. The maximum precision is the
+ * microsecond, and a 64 bits integer is used to avoid overflows (maximum
+ * time interval is then 292271 years, which should be long enough for any
+ * video). Dates are stored as microseconds since a common date (usually the
+ * epoch). Note that date and time intervals can be manipulated using regular
+ * arithmetic operators, and that no special functions are required.
+ */
+typedef int64_t vlc_tick_t;
+typedef vlc_tick_t mtime_t; /* deprecated, use vlc_tick_t */
+
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *****************************************************************************
