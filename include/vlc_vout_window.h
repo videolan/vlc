@@ -100,6 +100,7 @@ typedef struct vout_window_cfg_t {
     /* If true, a standalone window is requested */
     bool is_standalone;
     bool is_fullscreen;
+    bool is_decorated;
 
 #ifdef __APPLE__
     /* Window position hint */

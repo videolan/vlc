@@ -1259,6 +1259,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
             .width = state->cfg.display.width,
             .height = state->cfg.display.height,
             .is_standalone = true,
+            .is_decorated = true,
         };
 
         memset(&ostate, 0, sizeof(ostate));
