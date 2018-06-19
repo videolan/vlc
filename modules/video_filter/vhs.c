@@ -34,7 +34,7 @@
 #include <vlc_filter.h>
 #include <vlc_picture.h>
 #include <vlc_rand.h>
-#include <vlc_mtime.h>
+#include <vlc_tick.h>
 
 #include "filter_picture.h"
 

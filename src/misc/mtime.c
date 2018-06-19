@@ -1,6 +1,6 @@
 /*****************************************************************************
  * mtime.c: high resolution time management functions
- * Functions are prototyped in vlc_mtime.h.
+ * Functions are prototyped in vlc_tick.h.
  *****************************************************************************
  * Copyright (C) 1998-2007 VLC authors and VideoLAN
  * Copyright © 2006-2007 Rémi Denis-Courmont

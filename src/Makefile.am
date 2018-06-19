@@ -70,7 +70,6 @@ pluginsinclude_HEADERS = \
 	../include/vlc_mime.h \
 	../include/vlc_modules.h \
 	../include/vlc_mouse.h \
-	../include/vlc_mtime.h \
 	../include/vlc_network.h \
 	../include/vlc_objects.h \
 	../include/vlc_picture.h \
@@ -92,6 +91,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_subpicture.h \
 	../include/vlc_text_style.h \
 	../include/vlc_threads.h \
+	../include/vlc_tick.h \
 	../include/vlc_timestamp_helper.h \
 	../include/vlc_tls.h \
 	../include/vlc_url.h \

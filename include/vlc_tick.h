@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_mtime.h: high resolution time management functions
+ * vlc_tick.h: high resolution time management functions
  *****************************************************************************
  * This header provides portable high precision time management functions,
  * which should be the only ones used in other segments of the program, since

@@ -25,7 +25,7 @@
 
  // For msleep
 #include <vlc_common.h>
-#include <vlc_mtime.h>
+#include <vlc_tick.h>
 
 #include "libvlc_additions.h"
 
