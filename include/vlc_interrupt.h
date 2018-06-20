@@ -61,7 +61,7 @@ struct msghdr;
 VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
 
 /**
- * Interruptible variant of mwait().
+ * Interruptible variant of vlc_tick_wait().
  *
  * Waits for a specified timestamp or, if the calling thread has an
  * interruption context, an interruption.

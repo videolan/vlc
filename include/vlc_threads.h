@@ -521,7 +521,7 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  *
  * This works like vlc_cond_wait() but with an additional time-out.
  * The time-out is expressed as an absolute timestamp using the same arbitrary
- * time reference as the mdate() and mwait() functions.
+ * time reference as the mdate() and vlc_tick_wait() functions.
  *
  * \note This function is a cancellation point. In case of thread cancellation,
  * the mutex is always locked before cancellation proceeds.
@@ -832,7 +832,7 @@ VLC_API unsigned long vlc_thread_id(void) VLC_USED;
  * Precision monotonic clock.
  *
  * In principles, the clock has a precision of 1 MHz. But the actual resolution
- * may be much lower, especially when it comes to sleeping with mwait() or
+ * may be much lower, especially when it comes to sleeping with vlc_tick_wait() or
  * msleep(). Most general-purpose operating systems provide a resolution of
  * only 100 to 1000 Hz.
  *
@@ -852,7 +852,7 @@ VLC_API vlc_tick_t mdate(void);
  * \note The deadline may be exceeded due to OS scheduling.
  * \note This function is a cancellation point.
  */
-VLC_API void mwait(vlc_tick_t deadline);
+VLC_API void vlc_tick_wait(vlc_tick_t deadline);
 
 /**
  * Waits for an interval of time.
@@ -918,7 +918,7 @@ vlc_tick_t impossible_deadline( vlc_tick_t deadline )
 #endif
 
 #define msleep(d) msleep(check_delay(d))
-#define mwait(d) mwait(check_deadline(d))
+#define vlc_tick_wait(d) vlc_tick_wait(check_deadline(d))
 
 /**
  * Initializes an asynchronous timer.

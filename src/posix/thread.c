@@ -589,8 +589,8 @@ vlc_tick_t mdate (void)
     return (INT64_C(1000000) * ts.tv_sec) + (ts.tv_nsec / 1000);
 }
 
-#undef mwait
-void mwait (vlc_tick_t deadline)
+#undef vlc_tick_wait
+void vlc_tick_wait (vlc_tick_t deadline)
 {
     static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
 

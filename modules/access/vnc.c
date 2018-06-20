@@ -348,7 +348,7 @@ static void *DemuxThread( void *p_data )
 
         /* Ensure we're not building frames too fast */
         /* as WaitForMessage takes only a maximum wait */
-        mwait( i_next_frame_date );
+        vlc_tick_wait( i_next_frame_date );
         i_next_frame_date += p_sys->i_frame_interval;
 
         if ( i_status > 0 )

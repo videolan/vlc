@@ -913,8 +913,8 @@ vlc_tick_t mdate (void)
     return (d.quot * CLOCK_FREQ) + ((d.rem * CLOCK_FREQ) / freq);
 }
 
-#undef mwait
-void mwait (vlc_tick_t deadline)
+#undef vlc_tick_wait
+void vlc_tick_wait (vlc_tick_t deadline)
 {
     vlc_tick_t delay;
 
@@ -932,7 +932,7 @@ void mwait (vlc_tick_t deadline)
 #undef msleep
 void msleep (vlc_tick_t delay)
 {
-    mwait (mdate () + delay);
+    vlc_tick_wait (mdate () + delay);
 }
 
 /*** Timers ***/

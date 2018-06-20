@@ -396,7 +396,7 @@ static void *DemuxThread( void *p_data )
             vlc_restorecancel( p_sys->i_cancel_state );
         }
 
-        mwait( i_next_frame_date );
+        vlc_tick_wait( i_next_frame_date );
         i_next_frame_date += p_sys->i_frame_interval;
 
         if ( i_ret >= 0 )

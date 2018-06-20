@@ -487,7 +487,7 @@ static void *Thread( void *p_data )
         glPopMatrix();
 
         /* Wait to swapp the frame on time. */
-        mwait(block->i_pts + (block->i_length / 2));
+        vlc_tick_wait(block->i_pts + (block->i_length / 2));
         vlc_gl_Swap(gl);
 
 release:

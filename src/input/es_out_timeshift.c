@@ -1044,7 +1044,7 @@ static void *TsRun( void *p_data )
          * reading  */
         vlc_cleanup_push( cmd_cleanup_routine, &cmd );
 
-        mwait( i_deadline );
+        vlc_tick_wait( i_deadline );
 
         vlc_cleanup_pop();
 

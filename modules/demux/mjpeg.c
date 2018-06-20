@@ -403,7 +403,7 @@ static int MjpgDemux( demux_t *p_demux )
     if( p_sys->b_still && p_sys->i_still_end )
     {
         /* Still frame, wait until the pause delay is gone */
-        mwait( p_sys->i_still_end );
+        vlc_tick_wait( p_sys->i_still_end );
         p_sys->i_still_end = 0;
         return VLC_DEMUXER_SUCCESS;
     }

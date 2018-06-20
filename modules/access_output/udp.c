@@ -425,7 +425,7 @@ static void* ThreadWrite( void *data )
         i_to_send--;
         if( !i_to_send || (p_pk->i_flags & BLOCK_FLAG_CLOCK) )
         {
-            mwait( i_date );
+            vlc_tick_wait( i_date );
             i_to_send = i_group;
         }
         if ( send( p_sys->i_handle, p_pk->p_buffer, p_pk->i_buffer, 0 ) == -1 )

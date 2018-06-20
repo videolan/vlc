@@ -200,7 +200,7 @@ static int Demux(demux_t *demux)
         if (deadline + max_wait < pts_first) {
             es_out_SetPCR(demux->out, deadline);
             /* That's ugly, but not yet easily fixable */
-            mwait(deadline + max_wait);
+            vlc_tick_wait(deadline + max_wait);
             return VLC_DEMUXER_SUCCESS;
         }
     } else {

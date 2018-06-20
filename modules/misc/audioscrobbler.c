@@ -684,7 +684,7 @@ static void *Run(void *data)
     for (;;)
     {
         vlc_restorecancel(canc);
-        mwait(next_exchange);
+        vlc_tick_wait(next_exchange);
 
         vlc_mutex_lock(&p_sys->lock);
         mutex_cleanup_push(&p_sys->lock);

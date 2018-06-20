@@ -281,7 +281,7 @@ static int Demux( demux_t *p_demux )
     while( mdate() >= p_sys->i_next_date + p_sys->i_incr )
         p_sys->i_next_date += p_sys->i_incr;
 
-    mwait( p_sys->i_next_date );
+    vlc_tick_wait( p_sys->i_next_date );
     p_block = screen_Capture( p_demux );
     if( !p_block )
     {

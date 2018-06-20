@@ -1425,12 +1425,12 @@ static void* ThreadSend( void *data )
                 out->i_buffer = len;
         }
         if (out)
-            mwait (out->i_dts + i_caching);
+            vlc_tick_wait (out->i_dts + i_caching);
         vlc_cleanup_pop ();
         if (out == NULL)
             continue;
 #else
-        mwait (out->i_dts + i_caching);
+        vlc_tick_wait (out->i_dts + i_caching);
         vlc_cleanup_pop ();
 #endif
 

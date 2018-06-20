@@ -272,7 +272,7 @@ vlc_obj_calloc
 vlc_obj_strdup
 vlc_obj_free
 msleep
-mwait
+vlc_tick_wait
 net_Accept
 net_AcceptSingle
 net_Connect

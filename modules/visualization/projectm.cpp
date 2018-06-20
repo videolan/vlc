@@ -373,7 +373,7 @@ static void *Thread( void *p_data )
         p_projectm->renderFrame();
 
         /* */
-        mwait( i_deadline );
+        vlc_tick_wait( i_deadline );
 
         vlc_gl_Swap( gl );
     }

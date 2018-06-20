@@ -777,7 +777,7 @@ vlc_tick_t mdate (void)
 }
 
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-void (mwait)(vlc_tick_t deadline)
+void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
 
@@ -795,7 +795,7 @@ void (mwait)(vlc_tick_t deadline)
 
 void (msleep)(vlc_tick_t delay)
 {
-    mwait (mdate () + delay);
+    vlc_tick_wait (mdate () + delay);
 }
 #endif
 

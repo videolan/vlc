@@ -536,8 +536,8 @@ vlc_tick_t mdate (void)
     return (d.quot * date) + ((d.rem * date) / denom);
 }
 
-#undef mwait
-void mwait (vlc_tick_t deadline)
+#undef vlc_tick_wait
+void vlc_tick_wait (vlc_tick_t deadline)
 {
     deadline -= mdate ();
     if (deadline > 0)

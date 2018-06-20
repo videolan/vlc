@@ -80,7 +80,7 @@ static void vlc_cancel_addr_finish(void *addr)
 #endif
 
 #ifdef LIBVLC_NEED_SLEEP
-void (mwait)(vlc_tick_t deadline)
+void (vlc_tick_wait)(vlc_tick_t deadline)
 {
     vlc_tick_t delay;
     atomic_int value = ATOMIC_VAR_INIT(0);
@@ -98,7 +98,7 @@ void (mwait)(vlc_tick_t deadline)
 
 void (msleep)(vlc_tick_t delay)
 {
-    mwait(mdate() + delay);
+    vlc_tick_wait(mdate() + delay);
 }
 #endif
 
