@@ -367,7 +367,11 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_threads = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
     p_sys->pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
-    p_sys->b_high_priority = var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" );
+
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" ) )
+        p_sys->i_thread_priority = VLC_THREAD_PRIORITY_OUTPUT;
+    else
+        p_sys->i_thread_priority = VLC_THREAD_PRIORITY_VIDEO;
 
     if( p_sys->i_vcodec )
     {

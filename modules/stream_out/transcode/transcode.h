@@ -19,14 +19,7 @@ typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 typedef struct
 {
     sout_stream_id_sys_t *id_video;
-    block_t         *p_buffers;
-    vlc_mutex_t     lock_out;
-    vlc_cond_t      cond;
-    bool            b_abort;
-    picture_fifo_t *pp_pics;
-    vlc_sem_t       picture_pool_has_room;
     uint32_t        pool_size;
-    vlc_thread_t    thread;
 
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
@@ -50,7 +43,7 @@ typedef struct
     char            *psz_deinterlace;
     config_chain_t  *p_deinterlace_cfg;
     int             i_threads;
-    bool            b_high_priority;
+    int             i_thread_priority;
     bool            b_hurry_up;
     unsigned int    fps_num,fps_den;
 
@@ -125,6 +118,14 @@ struct sout_stream_id_sys_t
 
     /* Encoder */
     encoder_t       *p_encoder;
+    block_t         *p_buffers;
+    vlc_thread_t    thread;
+    vlc_mutex_t     lock_out;
+    bool            b_abort;
+    picture_fifo_t *pp_pics;
+    vlc_sem_t       picture_pool_has_room;
+    vlc_cond_t      cond;
+
 
     /* Sync */
     date_t          next_input_pts; /**< Incoming calculated PTS */
