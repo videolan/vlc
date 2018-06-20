@@ -678,13 +678,13 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_mutex_unlock( &id->lock_out );
 
         vlc_join( id->thread, NULL );
-
-        picture_fifo_Delete( id->pp_pics );
-        block_ChainRelease( id->p_buffers );
     }
 
     if( p_sys->i_threads >= 1 )
     {
+        picture_fifo_Delete( id->pp_pics );
+        block_ChainRelease( id->p_buffers );
+
         vlc_mutex_destroy( &id->lock_out );
         vlc_cond_destroy( &id->cond );
     }
