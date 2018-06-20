@@ -328,7 +328,7 @@ static void *Thread (void *data)
 
         if (deadline != INT64_MAX)
         {
-            vlc_tick_t delay = deadline - mdate();
+            vlc_tick_t delay = deadline - vlc_tick_now();
             timeout = (delay > 0) ? delay / (CLOCK_FREQ / 1000) : 0;
         }
 
@@ -357,7 +357,7 @@ static void *Thread (void *data)
                                              XCB_CW_CURSOR,
                                              &(uint32_t){ XCB_CURSOR_NONE });
                 xcb_flush(conn);
-                deadline = mdate() + lifetime;
+                deadline = vlc_tick_now() + lifetime;
             }
         }
 

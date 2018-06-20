@@ -537,7 +537,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
 
     if( p_mux->p_sout->i_out_pace_nocontrol )
     {
-        vlc_tick_t current_date = mdate();
+        vlc_tick_t current_date = vlc_tick_now();
         if ( current_date > i_dts )
             msg_Warn( p_mux, "late buffer for mux input (%"PRId64")",
                       current_date - i_dts );

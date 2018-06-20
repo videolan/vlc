@@ -133,7 +133,7 @@ static void CALLBACK HideMouse(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwT
 static void UpdateCursorMoved( event_thread_t *p_event )
 {
     UpdateCursor( p_event, true );
-    p_event->last_moved = mdate();
+    p_event->last_moved = vlc_tick_now();
     if( p_event->hwnd )
         SetTimer( p_event->hwnd, (UINT_PTR)p_event, p_event->hide_timeout, HideMouse );
 }

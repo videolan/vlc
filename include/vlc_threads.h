@@ -521,7 +521,7 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  *
  * This works like vlc_cond_wait() but with an additional time-out.
  * The time-out is expressed as an absolute timestamp using the same arbitrary
- * time reference as the mdate() and vlc_tick_wait() functions.
+ * time reference as the vlc_tick_now() and vlc_tick_wait() functions.
  *
  * \note This function is a cancellation point. In case of thread cancellation,
  * the mutex is always locked before cancellation proceeds.
@@ -534,7 +534,7 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * \warning If the variable was initialized with vlc_cond_init_daytime(), or
  * was statically initialized with \ref VLC_STATIC_COND, the time reference
  * used by this function is unspecified (depending on the implementation, it
- * might be the Unix epoch or the mdate() clock).
+ * might be the Unix epoch or the vlc_tick_now() clock).
  *
  * \return 0 if the condition was signaled, an error code in case of timeout.
  */
@@ -842,12 +842,12 @@ VLC_API unsigned long vlc_thread_id(void) VLC_USED;
  *
  * \return a timestamp in microseconds.
  */
-VLC_API vlc_tick_t mdate(void);
+VLC_API vlc_tick_t vlc_tick_now(void);
 
 /**
  * Waits until a deadline.
  *
- * \param deadline timestamp to wait for (\ref mdate())
+ * \param deadline timestamp to wait for (\ref vlc_tick_now())
  *
  * \note The deadline may be exceeded due to OS scheduling.
  * \note This function is a cancellation point.
@@ -959,7 +959,7 @@ VLC_API void vlc_timer_destroy(vlc_timer_t timer);
  * timer is still running. See also vlc_timer_getoverrun().
  *
  * \param timer initialized timer
- * \param absolute the timer value origin is the same as mdate() if true,
+ * \param absolute the timer value origin is the same as vlc_tick_now() if true,
  *                 the timer value is relative to now if false.
  * \param value zero to disarm the timer, otherwise the initial time to wait
  *              before firing the timer.

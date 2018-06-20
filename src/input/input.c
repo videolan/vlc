@@ -690,7 +690,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     vlc_tick_t i_last_seek_mdate = 0;
 
     if( b_interactive && var_InheritBool( p_input, "start-paused" ) )
-        ControlPause( p_input, mdate() );
+        ControlPause( p_input, vlc_tick_now() );
 
     bool b_pause_after_eof = b_interactive &&
                            var_InheritBool( p_input, "play-and-pause" );
@@ -728,7 +728,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             else if( !es_out_GetEmpty( input_priv(p_input)->p_es_out ) )
             {
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
-                i_wakeup = mdate() + INPUT_IDLE_SLEEP;
+                i_wakeup = vlc_tick_now() + INPUT_IDLE_SLEEP;
             }
             /* Pause after eof only if the input is pausable.
              * This way we won't trigger timeshifting for nothing */
@@ -752,7 +752,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
 
             /* Update interface and statistics */
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
             if( now >= i_intf_update )
             {
                 MainLoopStatistics( p_input );
@@ -771,7 +771,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                             && !input_priv(p_input)->master->b_eof;
             if( b_postpone )
             {
-                vlc_tick_t now = mdate();
+                vlc_tick_t now = vlc_tick_now();
 
                 /* Recheck ES buffer level every 20 ms when seeking */
                 if( now < i_last_seek_mdate + CLOCK_FREQ/8
@@ -797,7 +797,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( Control( p_input, i_type, val ) )
             {
                 if( ControlIsSeekRequest( i_type ) )
-                    i_last_seek_mdate = mdate();
+                    i_last_seek_mdate = vlc_tick_now();
                 i_intf_update = 0;
             }
 
@@ -1832,7 +1832,7 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
 static bool Control( input_thread_t *p_input,
                      int i_type, vlc_value_t val )
 {
-    const vlc_tick_t i_control_date = mdate();
+    const vlc_tick_t i_control_date = vlc_tick_now();
     /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
 

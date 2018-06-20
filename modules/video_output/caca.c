@@ -302,7 +302,7 @@ static void Manage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->cursor_deadline != INT64_MAX && sys->cursor_deadline < mdate()) {
+    if (sys->cursor_deadline != INT64_MAX && sys->cursor_deadline < vlc_tick_now()) {
         caca_set_mouse(sys->dp, 0);
         sys->cursor_deadline = INT64_MAX;
     }
@@ -332,7 +332,7 @@ static void Manage(vout_display_t *vd)
             break;
         case CACA_EVENT_MOUSE_MOTION:
             caca_set_mouse(sys->dp, 1);
-            sys->cursor_deadline = mdate() + sys->cursor_timeout;
+            sys->cursor_deadline = vlc_tick_now() + sys->cursor_timeout;
             vout_window_ReportMouseMoved(vd->cfg->window,
                                          caca_get_event_mouse_x(&ev),
                                          caca_get_event_mouse_y(&ev));
@@ -340,7 +340,7 @@ static void Manage(vout_display_t *vd)
         case CACA_EVENT_MOUSE_PRESS:
         case CACA_EVENT_MOUSE_RELEASE: {
             caca_set_mouse(sys->dp, 1);
-            sys->cursor_deadline = mdate() + sys->cursor_timeout;
+            sys->cursor_deadline = vlc_tick_now() + sys->cursor_timeout;
 
             const int caca = caca_get_event_mouse_button(&ev);
             for (int i = 0; mouses[i].caca != -1; i++) {

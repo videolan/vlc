@@ -135,7 +135,7 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     }
 
     subpic->i_channel  = channel;
-    subpic->i_start    = mdate();
+    subpic->i_start    = vlc_tick_now();
     subpic->i_stop     = subpic->i_start + duration;
     subpic->b_ephemer  = true;
     subpic->b_absolute = false;

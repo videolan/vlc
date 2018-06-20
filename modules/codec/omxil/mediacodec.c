@@ -1422,7 +1422,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
         /* Wait for the OutThread to stop (and process all remaining output
          * frames. Use a timeout here since we can't know if all decoders will
          * behave correctly. */
-        vlc_tick_t deadline = mdate() + INT64_C(3000000);
+        vlc_tick_t deadline = vlc_tick_now() + INT64_C(3000000);
         while (!p_sys->b_aborted && !p_sys->b_drained
             && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
 

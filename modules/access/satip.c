@@ -425,9 +425,9 @@ static void *satip_thread(void *data) {
     stream_t *access = data;
     access_sys_t *sys = access->p_sys;
     int sock = sys->udp_sock;
-    vlc_tick_t last_recv = mdate();
+    vlc_tick_t last_recv = vlc_tick_now();
     ssize_t len;
-    vlc_tick_t next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
+    vlc_tick_t next_keepalive = vlc_tick_now() + sys->keepalive_interval * 1000 * 1000;
 #ifdef HAVE_RECVMMSG
     struct mmsghdr msgs[VLEN];
     struct iovec iovecs[VLEN];
@@ -449,7 +449,7 @@ static void *satip_thread(void *data) {
     ufd.events = POLLIN;
 #endif
 
-    while (last_recv > mdate() - RECV_TIMEOUT) {
+    while (last_recv > vlc_tick_now() - RECV_TIMEOUT) {
 #ifdef HAVE_RECVMMSG
         for (size_t i = 0; i < VLEN; i++) {
             if (input_blocks[i] != NULL)
@@ -468,7 +468,7 @@ static void *satip_thread(void *data) {
         if (retval == -1)
             continue;
 
-        last_recv = mdate();
+        last_recv = vlc_tick_now();
         for (int i = 0; i < retval; ++i) {
             block_t *block = input_blocks[i];
 
@@ -504,13 +504,13 @@ static void *satip_thread(void *data) {
             block_Release(block);
             continue;
         }
-        last_recv = mdate();
+        last_recv = vlc_tick_now();
         block->p_buffer += RTP_HEADER_SIZE;
         block->i_buffer = len - RTP_HEADER_SIZE;
         block_FifoPut(sys->fifo, block);
 #endif
 
-        if (sys->keepalive_interval > 0 && mdate() > next_keepalive) {
+        if (sys->keepalive_interval > 0 && vlc_tick_now() > next_keepalive) {
             net_Printf(access, sys->tcp_sock,
                     "OPTIONS %s RTSP/1.0\r\n"
                     "CSeq: %d\r\n"
@@ -519,7 +519,7 @@ static void *satip_thread(void *data) {
             if (rtsp_handle(access, NULL) != RTSP_RESULT_OK)
                 msg_Warn(access, "Failed to keepalive RTSP session");
 
-            next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
+            next_keepalive = vlc_tick_now() + sys->keepalive_interval * 1000 * 1000;
         }
     }
 

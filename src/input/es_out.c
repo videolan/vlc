@@ -678,7 +678,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
         return;
     }
 
-    const vlc_tick_t i_decoder_buffering_start = mdate();
+    const vlc_tick_t i_decoder_buffering_start = vlc_tick_now();
     vlc_list_foreach(p_es, &p_sys->es, node)
     {
         if( !p_es->p_dec || p_es->fmt.i_cat == SPU_ES )
@@ -689,14 +689,14 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     }
 
     msg_Dbg( p_sys->p_input, "Decoder wait done in %d ms",
-              (int)(mdate() - i_decoder_buffering_start)/1000 );
+              (int)(vlc_tick_now() - i_decoder_buffering_start)/1000 );
 
     /* Here is a good place to destroy unused vout with every demuxer */
     input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
 
     /* */
     const vlc_tick_t i_wakeup_delay = CLOCK_FREQ/100; /* FIXME CLEANUP thread wake up time*/
-    const vlc_tick_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : mdate();
+    const vlc_tick_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : vlc_tick_now();
 
     input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true,
                                     i_current_date + i_wakeup_delay - i_buffering_duration );
@@ -885,7 +885,7 @@ static vlc_tick_t EsOutGetBuffering( es_out_t *out )
         }
         else
         {
-            i_system_duration = mdate() - i_system_start;
+            i_system_duration = vlc_tick_now() - i_system_start;
         }
 
         const vlc_tick_t i_consumed = i_system_duration * INPUT_RATE_DEFAULT / p_sys->i_rate - i_stream_duration;
@@ -2477,13 +2477,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
-        /* TODO do not use mdate() but proper stream acquisition date */
+        /* TODO do not use vlc_tick_now() but proper stream acquisition date */
         bool b_late;
         input_clock_Update( p_pgrm->p_input_clock, VLC_OBJECT(p_sys->p_input),
                             &b_late,
                             input_priv(p_sys->p_input)->b_can_pace_control || p_sys->b_buffering,
                             EsOutIsExtraBufferingAllowed( out ),
-                            i_pcr, mdate() );
+                            i_pcr, vlc_tick_now() );
 
         if( !p_sys->p_pgrm )
             return VLC_SUCCESS;

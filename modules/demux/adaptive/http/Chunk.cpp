@@ -192,9 +192,9 @@ block_t * HTTPChunkSource::read(size_t readsize)
         return NULL;
     }
 
-    vlc_tick_t time = mdate();
+    vlc_tick_t time = vlc_tick_now();
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
-    time = mdate() - time;
+    time = vlc_tick_now() - time;
     if(ret < 0)
     {
         block_Release(p_block);
@@ -369,7 +369,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         vlc_mutex_locker locker( &lock );
         done = true;
         rate.size = buffered + consumed;
-        rate.time = mdate() - downloadstart;
+        rate.time = vlc_tick_now() - downloadstart;
         downloadstart = 0;
     }
     else
@@ -382,7 +382,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
         {
             done = true;
             rate.size = buffered + consumed;
-            rate.time = mdate() - downloadstart;
+            rate.time = vlc_tick_now() - downloadstart;
             downloadstart = 0;
         }
     }
@@ -399,7 +399,7 @@ bool HTTPChunkBufferedSource::prepare()
 {
     if(!prepared)
     {
-        downloadstart = mdate();
+        downloadstart = vlc_tick_now();
         return HTTPChunkSource::prepare();
     }
     return true;

@@ -306,7 +306,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            *pi64 = mdate() - p_sys->i_starttime;
+            *pi64 = vlc_tick_now() - p_sys->i_starttime;
             return VLC_SUCCESS;
 
         case DEMUX_GET_LENGTH:
@@ -337,7 +337,7 @@ static void *DemuxThread( void *p_data )
 {
     demux_t *p_demux = (demux_t *) p_data;
     demux_sys_t  *p_sys = p_demux->p_sys;
-    vlc_tick_t i_next_frame_date = mdate() + p_sys->i_frame_interval;
+    vlc_tick_t i_next_frame_date = vlc_tick_now() + p_sys->i_frame_interval;
     int i_status;
 
     for(;;)
@@ -369,7 +369,7 @@ static void *DemuxThread( void *p_data )
                 block_t *p_block = block_Duplicate( p_sys->p_block );
                 if ( p_block ) /* drop frame/content if no next block */
                 {
-                    p_sys->p_block->i_dts = p_sys->p_block->i_pts = mdate();
+                    p_sys->p_block->i_dts = p_sys->p_block->i_pts = vlc_tick_now();
                     es_out_SetPCR( p_demux->out, p_sys->p_block->i_pts );
                     es_out_Send( p_demux->out, p_sys->es, p_sys->p_block );
                     p_sys->p_block = p_block;
@@ -472,7 +472,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_starttime = mdate();
+    p_sys->i_starttime = vlc_tick_now();
 
     if ( vlc_clone( &p_sys->thread, DemuxThread, p_demux, VLC_THREAD_PRIORITY_INPUT ) != VLC_SUCCESS )
     {

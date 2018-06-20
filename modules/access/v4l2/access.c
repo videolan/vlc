@@ -220,7 +220,7 @@ static block_t *MMapBlock (stream_t *access, bool *restrict eof)
     block_t *block = GrabVideo (VLC_OBJECT(access), sys->fd, sys->bufv);
     if( block != NULL )
     {
-        block->i_pts = block->i_dts = mdate();
+        block->i_pts = block->i_dts = vlc_tick_now();
         block->i_flags |= sys->block_flags;
     }
     (void) eof;

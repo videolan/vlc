@@ -771,7 +771,7 @@ static vlc_tick_t mdate_default(void)
 
 static vlc_tick_t (*mdate_selected) (void) = mdate_default;
 
-vlc_tick_t mdate (void)
+vlc_tick_t vlc_tick_now (void)
 {
     return mdate_selected ();
 }
@@ -782,7 +782,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
     vlc_tick_t delay;
 
     vlc_testcancel();
-    while ((delay = (deadline - mdate())) > 0)
+    while ((delay = (deadline - vlc_tick_now())) > 0)
     {
         delay = (delay + 999) / 1000;
         if (unlikely(delay > 0x7fffffff))
@@ -795,7 +795,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 
 void (vlc_tick_sleep)(vlc_tick_t delay)
 {
-    vlc_tick_wait (mdate () + delay);
+    vlc_tick_wait (vlc_tick_now () + delay);
 }
 #endif
 

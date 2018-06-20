@@ -96,7 +96,7 @@ static int AStreamRefillBlock(stream_t *s)
     }
 
     /* Now read a new block */
-    const vlc_tick_t start = mdate();
+    const vlc_tick_t start = vlc_tick_now();
     block_t *b;
 
     for (;;)
@@ -110,7 +110,7 @@ static int AStreamRefillBlock(stream_t *s)
         if (vlc_stream_Eof(s->s))
             return VLC_EGENERIC;
     }
-    sys->stat.read_time += mdate() - start;
+    sys->stat.read_time += vlc_tick_now() - start;
     size_t added_bytes;
     block_ChainProperties( b, NULL, &added_bytes, NULL );
     sys->stat.read_bytes += added_bytes;
@@ -122,13 +122,13 @@ static int AStreamRefillBlock(stream_t *s)
 static void AStreamPrebufferBlock(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
-    vlc_tick_t start = mdate();
+    vlc_tick_t start = vlc_tick_now();
     bool first = true;
 
     msg_Dbg(s, "starting pre-buffering");
     for (;;)
     {
-        const vlc_tick_t now = mdate();
+        const vlc_tick_t now = vlc_tick_now();
         size_t cache_size = block_BytestreamRemaining( &sys->cache );
 
         if (vlc_killed() || cache_size > STREAM_CACHE_PREBUFFER_SIZE)
@@ -162,7 +162,7 @@ static void AStreamPrebufferBlock(stream_t *s)
         if (first)
         {
             msg_Dbg(s, "received first data after %"PRId64" ms",
-                    (mdate() - start) / 1000);
+                    (vlc_tick_now() - start) / 1000);
             first = false;
         }
     }

@@ -319,7 +319,7 @@ static void OSDWidget(vout_thread_t *vout, int channel, int type, int position)
     }
 
     subpic->i_channel  = channel;
-    subpic->i_start    = mdate();
+    subpic->i_start    = vlc_tick_now();
     subpic->i_stop     = subpic->i_start + 12*CLOCK_FREQ/10;
     subpic->b_ephemer  = true;
     subpic->b_absolute = true;

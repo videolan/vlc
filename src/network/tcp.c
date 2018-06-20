@@ -163,11 +163,11 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
 
             ufd.fd = fd;
             ufd.events = POLLOUT;
-            deadline = mdate() + timeout;
+            deadline = vlc_tick_now() + timeout;
 
             do
             {
-                vlc_tick_t now = mdate();
+                vlc_tick_t now = vlc_tick_now();
 
                 if (vlc_killed())
                     goto next_ai;

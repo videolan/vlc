@@ -328,7 +328,7 @@ static void DemuxFile (void *data)
     block_t *block = block_File(sys->fd, true);
     if (block == NULL)
         return;
-    block->i_pts = block->i_dts = mdate ();
+    block->i_pts = block->i_dts = vlc_tick_now ();
 
     /* Send block */
     es_out_SetPCR(demux->out, block->i_pts);
@@ -351,7 +351,7 @@ static void DemuxIPC (void *data)
     if (block == NULL)
         return;
     memcpy (block->p_buffer, sys->mem.addr, sys->mem.length);
-    block->i_pts = block->i_dts = mdate ();
+    block->i_pts = block->i_dts = vlc_tick_now ();
 
     /* Send block */
     es_out_SetPCR(demux->out, block->i_pts);

@@ -110,7 +110,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     double f_angle;
-    vlc_tick_t new_date = mdate();
+    vlc_tick_t new_date = vlc_tick_now();
 
     if( !p_pic ) return NULL;
 

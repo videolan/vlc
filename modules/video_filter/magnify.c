@@ -126,7 +126,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_y = 0;
     p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_sys->b_visible = true;
-    p_sys->i_last_activity = mdate();
+    p_sys->i_last_activity = vlc_tick_now();
     p_sys->i_hide_timeout = 1000 * var_InheritInteger( p_filter, "mouse-hide-timeout" );
 
     /* */
@@ -245,7 +245,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     /* print a small "VLC ZOOM" */
 
-    if( b_visible || p_sys->i_last_activity + p_sys->i_hide_timeout > mdate() )
+    if( b_visible || p_sys->i_last_activity + p_sys->i_hide_timeout > vlc_tick_now() )
         DrawZoomStatus( p_oyp->p_pixels, p_oyp->i_visible_pitch, p_oyp->i_pitch, p_oyp->i_lines,
                         1, v_h, b_visible );
 
@@ -410,7 +410,7 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse, const vlc_mouse_t *p
     }
 
     if( vlc_mouse_HasMoved( p_old, p_new ) )
-        p_sys->i_last_activity = mdate();
+        p_sys->i_last_activity = vlc_tick_now();
 
     if( b_grab )
         return VLC_EGENERIC;

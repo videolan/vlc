@@ -1439,7 +1439,7 @@ static void DateTimeSend( cam_t * p_cam, int i_session_id )
 
         APDUSend( p_cam, i_session_id, AOT_DATE_TIME, p_response, 7 );
 
-        p_date->i_last = mdate();
+        p_date->i_last = vlc_tick_now();
     }
 }
 
@@ -1488,7 +1488,7 @@ static void DateTimeManage( cam_t * p_cam, int i_session_id )
         (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     if ( p_date->i_interval
-          && mdate() > p_date->i_last + (vlc_tick_t)p_date->i_interval * CLOCK_FREQ )
+          && vlc_tick_now() > p_date->i_last + (vlc_tick_t)p_date->i_interval * CLOCK_FREQ )
     {
         DateTimeSend( p_cam, i_session_id );
     }
@@ -2030,7 +2030,7 @@ void en50221_Poll( cam_t * p_cam )
     switch( p_cam->i_ca_type )
     {
     case CA_CI_LINK:
-        if( mdate() > p_cam->i_next_event )
+        if( vlc_tick_now() > p_cam->i_next_event )
             break;
     case CA_CI:
         return;
@@ -2168,7 +2168,7 @@ void en50221_Poll( cam_t * p_cam )
         }
     }
 
-    p_cam->i_next_event = mdate() + p_cam->i_timeout;
+    p_cam->i_next_event = vlc_tick_now() + p_cam->i_timeout;
 }
 
 

@@ -1135,7 +1135,7 @@ static void* live_thread( void* p )
 
     while( ! sys->closed )
     {
-        last_dl_start_time = mdate();
+        last_dl_start_time = vlc_tick_now();
         stream_t* download_stream = vlc_stream_NewURL( p_this, abst_url );
         if( ! download_stream )
         {

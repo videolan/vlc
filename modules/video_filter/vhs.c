@@ -145,7 +145,7 @@ static int Open( vlc_object_t *p_this )
 
     /* init data */
     p_filter->pf_video_filter = Filter;
-    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = mdate();
+    p_sys->i_start_time = p_sys->i_cur_time = p_sys->i_last_time = vlc_tick_now();
 
     return VLC_SUCCESS;
 }
@@ -181,7 +181,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic_in ) {
     * manage time
     */
     p_sys->i_last_time = p_sys->i_cur_time;
-    p_sys->i_cur_time = mdate();
+    p_sys->i_cur_time = vlc_tick_now();
 
    /*
     * allocate data

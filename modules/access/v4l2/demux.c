@@ -104,7 +104,7 @@ int DemuxOpen( vlc_object_t *obj )
     }
 
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
-    sys->start = mdate ();
+    sys->start = vlc_tick_now ();
     demux->pf_demux = NULL;
     demux->pf_control = DemuxControl;
     return VLC_SUCCESS;
@@ -811,7 +811,7 @@ static void *ReadThread (void *data)
                 v4l2_read (fd, NULL, 0); /* discard frame */
                 continue;
             }
-            block->i_pts = block->i_dts = mdate ();
+            block->i_pts = block->i_dts = vlc_tick_now ();
             block->i_flags |= sys->block_flags;
 
             int canc = vlc_savecancel ();
@@ -853,7 +853,7 @@ static int DemuxControl( demux_t *demux, int query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg (args, int64_t *) = mdate() - sys->start;
+            *va_arg (args, int64_t *) = vlc_tick_now() - sys->start;
             return VLC_SUCCESS;
 
         /* TODO implement others */

@@ -201,7 +201,7 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
              && ev->button_mask == MOUSE_BUTTON_LEFT
              && !vlc_mouse_IsLeftPressed(m))
             {
-                const vlc_tick_t now = mdate();
+                const vlc_tick_t now = vlc_tick_now();
 
                 if (state->last_left_press != INT64_MIN
                  && now - state->last_left_press < DOUBLE_CLICK_TIME)

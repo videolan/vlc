@@ -452,7 +452,7 @@ static block_t *GrabVideo( demux_t *p_demux )
     memcpy( p_block->p_buffer, (const char *)p_sys->frame->image,
             p_sys->width * p_sys->height * 2 );
 
-    p_block->i_pts = p_block->i_dts = mdate();
+    p_block->i_pts = p_block->i_dts = vlc_tick_now();
     dc1394_capture_enqueue( p_sys->camera, p_sys->frame );
     return p_block;
 }
@@ -502,7 +502,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg( args, int64_t * ) = mdate();
+            *va_arg( args, int64_t * ) = vlc_tick_now();
             return VLC_SUCCESS;
 
         /* TODO implement others */

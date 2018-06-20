@@ -102,7 +102,7 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_ti
  * p_ts1 is a pointer to a timestamp to be converted (in place) and can be NULL.
  *
  * It will return VLC_EGENERIC if i_ts_bound is not INT64_MAX and if the value *p_ts0
- * after conversion is not before the deadline mdate() + i_pts_delay + i_ts_bound.
+ * after conversion is not before the deadline vlc_tick_now() + i_pts_delay + i_ts_bound.
  * It will also return VLC_EGENERIC if the conversion cannot be done successfully. In
  * this case, *p_ts0 and *p_ts1 will hold an invalid timestamp.
  * Otherwise it will return VLC_SUCCESS.

@@ -254,7 +254,7 @@ void X11Loop::handleX11Event()
             if( event.type == ButtonPress &&
                 event.xbutton.button == 1 )
             {
-                vlc_tick_t time = mdate();
+                vlc_tick_t time = vlc_tick_now();
                 int x, y;
                 pFactory->getMousePos( x, y );
                 if( time - m_lastClickTime < m_dblClickDelay &&

@@ -322,7 +322,7 @@ static void *Thread( void *p_thread_data )
         if( p_thread->i_speed && (++i_count % (p_thread->i_speed+1)) ) continue;
 
         /* Frame dropping if necessary */
-        if( date_Get( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
+        if( date_Get( &i_pts ) + GOOM_DELAY <= vlc_tick_now() ) continue;
 
         plane = goom_update( p_plugin_info, p_data, 0, 0.0,
                              NULL, NULL );

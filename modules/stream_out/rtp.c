@@ -1558,7 +1558,7 @@ static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session )
 {
     if (p_media == NULL || psz_vod_session == NULL)
-        return mdate();
+        return vlc_tick_now();
 
     uint64_t i_ts_init;
     /* As per RFC 2326, session identifiers are at least 8 bytes long */
@@ -1597,7 +1597,7 @@ vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t
     if( i_npt_zero == VLC_TS_INVALID )
         return p_sys->i_pts_zero;
 
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
     if( now < i_npt_zero )
         return p_sys->i_pts_zero;
 

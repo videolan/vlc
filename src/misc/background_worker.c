@@ -82,14 +82,14 @@ static void* Thread( void* data )
             if( item )
             {
                 if( item->timeout > 0 )
-                    worker->head.deadline = mdate() + item->timeout * 1000;
+                    worker->head.deadline = vlc_tick_now() + item->timeout * 1000;
                 else
                     worker->head.deadline = INT64_MAX;
             }
             else if( worker->head.deadline != VLC_TS_INVALID )
             {
                 /* Wait 1 seconds for new inputs before terminating */
-                vlc_tick_t deadline = mdate() + 1*CLOCK_FREQ;
+                vlc_tick_t deadline = vlc_tick_now() + 1*CLOCK_FREQ;
                 int ret = vlc_cond_timedwait( &worker->tail.wait,
                                               &worker->lock, deadline );
                 if( ret != 0 )
@@ -123,7 +123,7 @@ static void* Thread( void* data )
         {
             vlc_mutex_lock( &worker->lock );
 
-            bool const b_timeout = worker->head.deadline <= mdate();
+            bool const b_timeout = worker->head.deadline <= vlc_tick_now();
             worker->head.probe_request = false;
 
             vlc_mutex_unlock( &worker->lock );
@@ -139,7 +139,7 @@ static void* Thread( void* data )
 
             vlc_mutex_lock( &worker->lock );
             if( worker->head.probe_request == false &&
-                worker->head.deadline > mdate() )
+                worker->head.deadline > vlc_tick_now() )
             {
                 vlc_cond_timedwait( &worker->head.worker_wait, &worker->lock,
                                      worker->head.deadline );

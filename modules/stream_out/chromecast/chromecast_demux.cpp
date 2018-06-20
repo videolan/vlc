@@ -391,13 +391,13 @@ struct demux_cc
             if (paused)
             {
                 if (m_pause_date == VLC_TS_INVALID)
-                    m_pause_date = mdate();
+                    m_pause_date = vlc_tick_now();
             }
             else
             {
                 if (m_pause_date != VLC_TS_INVALID)
                 {
-                    m_pause_delay += mdate() - m_pause_date;
+                    m_pause_delay += vlc_tick_now() - m_pause_date;
                     m_pause_date = VLC_TS_INVALID;
                 }
             }

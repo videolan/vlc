@@ -577,7 +577,7 @@ AudioTrack_ResetPositions( JNIEnv *env, audio_output_t *p_aout )
     aout_sys_t *p_sys = p_aout->sys;
     VLC_UNUSED( env );
 
-    p_sys->timestamp.i_play_time = mdate();
+    p_sys->timestamp.i_play_time = vlc_tick_now();
     p_sys->timestamp.i_last_time = 0;
     p_sys->timestamp.i_frame_us = 0;
     p_sys->timestamp.i_frame_pos = 0;
@@ -613,7 +613,7 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     uint64_t i_audiotrack_us;
-    vlc_tick_t i_now = mdate();
+    vlc_tick_t i_now = vlc_tick_now();
 
     /* Fetch an AudioTrack position every SMOOTHPOS_INTERVAL_US (30ms) */
     if( i_now - p_sys->smoothpos.i_last_time >= SMOOTHPOS_INTERVAL_US )
@@ -661,7 +661,7 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
     if( !p_sys->timestamp.p_obj )
         return 0;
 
-    i_now = mdate();
+    i_now = vlc_tick_now();
 
     /* Android doc:
      * getTimestamp: Poll for a timestamp on demand.
@@ -741,7 +741,7 @@ TimeGet( audio_output_t *p_aout, vlc_tick_t *restrict p_delay )
     if( i_ts_us > 0 )
         i_smooth_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
     else if ( p_sys->smoothpos.i_us != 0 )
-        i_smooth_us = p_sys->smoothpos.i_us + mdate()
+        i_smooth_us = p_sys->smoothpos.i_us + vlc_tick_now()
             - p_sys->smoothpos.i_latency_us;
 
     msg_Err( p_aout, "TimeGet: TimeStamp: %lld, Smooth: %lld (latency: %lld)",
@@ -1647,7 +1647,7 @@ AudioTrack_Thread( void *p_data )
         vlc_mutex_lock( &p_sys->lock );
 
         /* Wait for free space in Audiotrack internal buffer */
-        if( i_play_deadline != 0 && mdate() < i_play_deadline )
+        if( i_play_deadline != 0 && vlc_tick_now() < i_play_deadline )
         {
             /* Don't wake up the thread when there is new data since we are
              * waiting for more space */
@@ -1685,7 +1685,7 @@ AudioTrack_Thread( void *p_data )
          * Android 4.4.2 if we send frames too quickly. To fix this issue,
          * force the writing of the buffer after a certain delay. */
         if( i_last_time_blocked != 0 )
-            b_forced = mdate() - i_last_time_blocked >
+            b_forced = vlc_tick_now() - i_last_time_blocked >
                        FRAMES_TO_US( p_sys->i_max_audiotrack_samples ) * 2;
         else
             b_forced = false;
@@ -1703,11 +1703,11 @@ AudioTrack_Thread( void *p_data )
                 if( i_ret != 0 )
                     i_last_time_blocked = 0;
                 else if( i_last_time_blocked == 0 )
-                    i_last_time_blocked = mdate();
+                    i_last_time_blocked = vlc_tick_now();
             }
 
             if( i_ret == 0 )
-                i_play_deadline = mdate() + __MAX( 10000, FRAMES_TO_US(
+                i_play_deadline = vlc_tick_now() + __MAX( 10000, FRAMES_TO_US(
                                   p_sys->i_max_audiotrack_samples / 5 ) );
             else
                 p_sys->circular.i_read += i_ret;

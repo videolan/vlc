@@ -2702,7 +2702,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
 
 
     /* Only show dialog if AVI is > 10MB */
-    i_dialog_update = mdate();
+    i_dialog_update = vlc_tick_now();
     if( stream_Size( p_demux->s ) > 10000000 )
     {
         p_dialog_id =
@@ -2716,7 +2716,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
         avi_packet_t pk;
 
         /* Don't update/check dialog too often */
-        if( p_dialog_id != NULL && mdate() - i_dialog_update > 100000 )
+        if( p_dialog_id != NULL && vlc_tick_now() - i_dialog_update > 100000 )
         {
             if( vlc_dialog_is_cancelled( p_demux, p_dialog_id ) )
                 break;
@@ -2726,7 +2726,7 @@ static void AVI_IndexCreate( demux_t *p_demux )
             double f_pos     = f_current / f_size;
             vlc_dialog_update_progress( p_demux, p_dialog_id, f_pos );
 
-            i_dialog_update = mdate();
+            i_dialog_update = vlc_tick_now();
         }
 
         if( AVI_PacketGetHeader( p_demux, &pk ) )

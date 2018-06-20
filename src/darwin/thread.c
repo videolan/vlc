@@ -251,10 +251,10 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     pthread_testcancel();
 
     /*
-     * mdate() is the monotonic clock, pthread_cond_timedwait expects
+     * vlc_tick_now() is the monotonic clock, pthread_cond_timedwait expects
      * origin of gettimeofday(). Use timedwait_relative_np() instead.
      */
-    vlc_tick_t base = mdate();
+    vlc_tick_t base = vlc_tick_now();
     deadline -= base;
     if (deadline < 0)
         deadline = 0;
@@ -519,7 +519,7 @@ void vlc_control_cancel (int cmd, ...)
     vlc_assert_unreachable ();
 }
 
-vlc_tick_t mdate (void)
+vlc_tick_t vlc_tick_now (void)
 {
     vlc_clock_setup();
     uint64_t date = mach_absolute_time();
@@ -539,7 +539,7 @@ vlc_tick_t mdate (void)
 #undef vlc_tick_wait
 void vlc_tick_wait (vlc_tick_t deadline)
 {
-    deadline -= mdate ();
+    deadline -= vlc_tick_now ();
     if (deadline > 0)
         vlc_tick_sleep (deadline);
 }

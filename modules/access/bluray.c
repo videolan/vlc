@@ -414,7 +414,7 @@ static void startBackground(demux_t *p_demux)
     }
 
     // XXX TODO: what would be correct timestamp ???
-    p_block->i_dts = p_block->i_pts = mdate() + CLOCK_FREQ/25;
+    p_block->i_dts = p_block->i_pts = vlc_tick_now() + CLOCK_FREQ/25;
 
     uint8_t *p = p_block->p_buffer;
     memset(p, 0, fmt.video.i_width * fmt.video.i_height);
@@ -1634,7 +1634,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
         return;
     }
 
-    p_pic->i_start = p_pic->i_stop = mdate();
+    p_pic->i_start = p_pic->i_stop = vlc_tick_now();
     p_pic->i_channel = vout_RegisterSubpictureChannel(p_sys->p_vout);
     p_ov->i_channel = p_pic->i_channel;
 
@@ -2189,7 +2189,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* time period elapsed ? */
-    if (p_sys->i_still_end_time > 0 && p_sys->i_still_end_time <= mdate()) {
+    if (p_sys->i_still_end_time > 0 && p_sys->i_still_end_time <= vlc_tick_now()) {
         msg_Dbg(p_demux, "Still image end");
         bd_read_skip_still(p_sys->bluray);
 
@@ -2201,7 +2201,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     if (!p_sys->i_still_end_time) {
         if (i_timeout) {
             msg_Dbg(p_demux, "Still image (%d seconds)", i_timeout);
-            p_sys->i_still_end_time = mdate() + i_timeout * CLOCK_FREQ;
+            p_sys->i_still_end_time = vlc_tick_now() + i_timeout * CLOCK_FREQ;
         } else {
             msg_Dbg(p_demux, "Still image (infinite)");
             p_sys->i_still_end_time = -1;

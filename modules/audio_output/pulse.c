@@ -240,7 +240,7 @@ static void stream_start(pa_stream *s, audio_output_t *aout, vlc_tick_t date)
         delta = 0; /* screwed */
     }
 
-    delta = (date - mdate()) - delta;
+    delta = (date - vlc_tick_now()) - delta;
     if (delta > 0) {
         msg_Dbg(aout, "deferring start (%"PRId64" us)", delta);
         delta += pa_rtclock_now();

@@ -723,7 +723,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
 
     /* start */
     result = sys->p_output->StartScheduledPlayback(
-        (mdate() * sys->timescale) / CLOCK_FREQ, sys->timescale, 1.0);
+        (vlc_tick_now() * sys->timescale) / CLOCK_FREQ, sys->timescale, 1.0);
     CHECK("Could not start playback");
 
     p_config->Release();
@@ -893,7 +893,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
                          vlc_tick_t date)
 {
     decklink_sys_t *sys = (decklink_sys_t *) vd->sys;
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
 
     if (!picture)
         return;
@@ -993,7 +993,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
         goto end;
     }
 
-    now = mdate() - sys->offset;
+    now = vlc_tick_now() - sys->offset;
 
     BMDTimeValue decklink_now;
     double speed;

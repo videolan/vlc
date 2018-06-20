@@ -84,7 +84,7 @@ VLC_API int vlc_mwait_i11e(vlc_tick_t);
  */
 static inline int vlc_msleep_i11e(vlc_tick_t delay)
 {
-    return vlc_mwait_i11e(mdate() + delay);
+    return vlc_mwait_i11e(vlc_tick_now() + delay);
 }
 
 /**

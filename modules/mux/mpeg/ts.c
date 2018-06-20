@@ -1776,7 +1776,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
         {
             msg_Warn( p_mux, "max bitrate exceeded at %"PRId64
                       " (%d bi/s for %d pkt in %"PRId64" us)",
-                      i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - mdate(),
+                      i_pcr_dts + p_sys->i_shaping_delay * 3 / 2 - vlc_tick_now(),
                       i_bitrate, i_packet_count, i_pcr_length);
         }
     }

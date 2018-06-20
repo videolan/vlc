@@ -221,7 +221,7 @@ static int DemuxHEIF( demux_t *p_demux )
     {
         bool b_empty;
         es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
-        if( !b_empty || mdate() <= p_sys->i_end_display_time )
+        if( !b_empty || vlc_tick_now() <= p_sys->i_end_display_time )
         {
             vlc_tick_sleep( 40 * 1000 );
             return VLC_DEMUXER_SUCCESS;
@@ -423,7 +423,7 @@ static int DemuxHEIF( demux_t *p_demux )
 
     p_block->i_flags |= BLOCK_FLAG_END_OF_SEQUENCE;
 
-    p_sys->i_end_display_time = mdate() + p_block->i_length;
+    p_sys->i_end_display_time = vlc_tick_now() + p_block->i_length;
     p_sys->b_seekpoint_changed = true;
 
     p_sys->i_pcr = p_block->i_dts + p_block->i_length;

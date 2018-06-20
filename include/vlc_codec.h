@@ -430,7 +430,7 @@ static inline int decoder_GetInputAttachments( decoder_t *dec,
 
 /**
  * This function converts a decoder timestamp into a display date comparable
- * to mdate().
+ * to vlc_tick_now().
  * You MUST use it *only* for gathering statistics about speed.
  */
 VLC_USED

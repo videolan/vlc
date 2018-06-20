@@ -136,7 +136,7 @@ void GrabVBI (demux_t *p_demux, vlc_v4l2_vbi_t *vbi)
                 memcpy(data, sliced_array[field].data, sliced_size);
                 data += sliced_size;
             }
-            p_block->i_pts = mdate();
+            p_block->i_pts = vlc_tick_now();
 
             for (unsigned i = 0; i < VBI_NUM_CC_STREAMS; i++)
             {

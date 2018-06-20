@@ -224,7 +224,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            *pi64 = mdate();
+            *pi64 = vlc_tick_now();
             return VLC_SUCCESS;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
@@ -320,7 +320,7 @@ static block_t* GrabAudio( demux_t *p_demux )
 
     /* Timestamp */
     p_block->i_pts = p_block->i_dts =
-        mdate() - CLOCK_FREQ * (vlc_tick_t)i_correct /
+        vlc_tick_now() - CLOCK_FREQ * (vlc_tick_t)i_correct /
         2 / ( p_sys->b_stereo ? 2 : 1) / p_sys->i_sample_rate;
 
     return p_block;

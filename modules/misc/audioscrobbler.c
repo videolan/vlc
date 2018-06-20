@@ -225,7 +225,7 @@ static void AddToQueue (intf_thread_t *p_this)
         goto end;
 
     /* wait for the user to listen enough before submitting */
-    played_time = mdate() - p_sys->p_current_song.i_start -
+    played_time = vlc_tick_now() - p_sys->p_current_song.i_start -
                             p_sys->time_total_pauses;
     played_time /= CLOCK_FREQ; /* µs → s */
 
@@ -327,10 +327,10 @@ static int PlayingChange(vlc_object_t *p_this, const char *psz_var,
     if (state >= END_S)
         AddToQueue(p_intf);
     else if (state == PAUSE_S)
-        p_sys->time_pause = mdate();
+        p_sys->time_pause = vlc_tick_now();
     else if (p_sys->time_pause > 0 && state == PLAYING_S)
     {
-        p_sys->time_total_pauses += (mdate() - p_sys->time_pause);
+        p_sys->time_total_pauses += (vlc_tick_now() - p_sys->time_pause);
         p_sys->time_pause = 0;
     }
 
@@ -374,7 +374,7 @@ static int ItemChange(vlc_object_t *p_this, const char *psz_var,
 
     p_sys->time_total_pauses = 0;
     time(&p_sys->p_current_song.date);        /* to be sent to last.fm */
-    p_sys->p_current_song.i_start = mdate();    /* only used locally */
+    p_sys->p_current_song.i_start = vlc_tick_now();    /* only used locally */
 
     p_sys->p_input = vlc_object_hold(p_input);
     var_AddCallback(p_input, "intf-event", PlayingChange, p_intf);
@@ -660,7 +660,7 @@ static void HandleInterval(vlc_tick_t *next, unsigned int *i_interval)
         if (*i_interval > 120)
             *i_interval = 120;
     }
-    *next = mdate() + (*i_interval * CLOCK_FREQ * 60);
+    *next = vlc_tick_now() + (*i_interval * CLOCK_FREQ * 60);
 }
 
 /*****************************************************************************

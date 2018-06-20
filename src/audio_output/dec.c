@@ -240,16 +240,16 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
      * The audio output plugin is responsible for estimating its actual
      * playback time, or rather the estimated time when the next sample will
      * be played. (The actual playback time is always the current time, that is
-     * to say mdate(). It is not an useful statistic.)
+     * to say vlc_tick_now(). It is not an useful statistic.)
      *
      * Most audio output plugins can estimate the delay until playback of
      * the next sample to be written to the buffer, or equally the time until
      * all samples in the buffer will have been played. Then:
-     *    pts = mdate() + delay
+     *    pts = vlc_tick_now() + delay
      */
     if (aout->time_get(aout, &drift) != 0)
         return; /* nothing can be done if timing is unknown */
-    drift += mdate () - dec_pts;
+    drift += vlc_tick_now () - dec_pts;
 
     /* Late audio output.
      * This can happen due to insufficient caching, scheduling jitter
@@ -275,7 +275,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
         /* Now the output might be too early... Recheck. */
         if (aout->time_get(aout, &drift) != 0)
             return; /* nothing can be done if timing is unknown */
-        drift += mdate () - dec_pts;
+        drift += vlc_tick_now () - dec_pts;
     }
 
     /* Early audio output.

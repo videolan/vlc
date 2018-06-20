@@ -195,7 +195,7 @@ static int Demux(demux_t *demux)
     if (sys->pts_next != VLC_TS_INVALID) {
         deadline = sys->pts_next;
     } else if (sys->is_realtime) {
-        deadline = mdate();
+        deadline = vlc_tick_now();
         const vlc_tick_t max_wait = CLOCK_FREQ / 50;
         if (deadline + max_wait < pts_first) {
             es_out_SetPCR(demux->out, deadline);
@@ -733,7 +733,7 @@ static int Open(vlc_object_t *object)
     sys->es          = es_out_Add(demux->out, &fmt);
     sys->duration    = CLOCK_FREQ * var_InheritFloat(demux, "image-duration");
     sys->is_realtime = var_InheritBool(demux, "image-realtime");
-    sys->pts_offset  = sys->is_realtime ? mdate() : 0;
+    sys->pts_offset  = sys->is_realtime ? vlc_tick_now() : 0;
     sys->pts_next    = VLC_TS_INVALID;
     date_Init(&sys->pts, fmt.video.i_frame_rate, fmt.video.i_frame_rate_base);
     date_Set(&sys->pts, VLC_TS_0);

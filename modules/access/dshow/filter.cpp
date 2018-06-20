@@ -638,7 +638,7 @@ STDMETHODIMP CapturePin::Receive( IMediaSample *pSample )
     msg_Dbg( p_input, "CapturePin::Receive" );
 #endif
 
-    vlc_tick_t i_timestamp = mdate() * 10;
+    vlc_tick_t i_timestamp = vlc_tick_now() * 10;
     VLCMediaSample vlc_sample = {pSample, i_timestamp};
 
     vlc_mutex_lock( &p_sys->lock );

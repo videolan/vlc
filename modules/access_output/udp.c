@@ -277,7 +277,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         block_t *p_next;
         int i_packets = 0;
-        vlc_tick_t now = mdate();
+        vlc_tick_t now = vlc_tick_now();
 
         if( !p_sys->b_mtu_warning && p_buffer->i_buffer > p_sys->i_mtu )
         {
@@ -333,7 +333,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
                 if( p_sys->p_buffer->i_dts + p_sys->i_caching < now )
                 {
                     msg_Dbg( p_access, "late packet for udp input (%"PRId64 ")",
-                             mdate() - p_sys->p_buffer->i_dts
+                             vlc_tick_now() - p_sys->p_buffer->i_dts
                               - p_sys->i_caching );
                 }
                 block_FifoPut( p_sys->p_fifo, p_sys->p_buffer );
@@ -439,7 +439,7 @@ static void* ThreadWrite( void *data )
         }
 
 #if 1
-        i_sent = mdate();
+        i_sent = vlc_tick_now();
         if ( i_sent > i_date + 20000 )
         {
             msg_Dbg( p_access, "packet has been sent too late (%"PRId64 ")",

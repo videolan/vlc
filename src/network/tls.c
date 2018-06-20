@@ -167,7 +167,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
         return NULL;
 
     int canc = vlc_savecancel();
-    vlc_tick_t deadline = mdate ();
+    vlc_tick_t deadline = vlc_tick_now ();
     deadline += var_InheritInteger (crd, "ipv4-timeout") * 1000;
 
     struct pollfd ufd[1];
@@ -186,7 +186,7 @@ error:
             break;
         }
 
-        vlc_tick_t now = mdate ();
+        vlc_tick_t now = vlc_tick_now ();
         if (now > deadline)
            now = deadline;
 

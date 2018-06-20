@@ -90,7 +90,7 @@ static int rtp_timeout (vlc_tick_t deadline)
     if (deadline == VLC_TS_INVALID)
         return -1; /* infinite */
 
-    vlc_tick_t t = mdate ();
+    vlc_tick_t t = vlc_tick_now ();
     if (t >= deadline)
         return 0;
 

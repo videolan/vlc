@@ -369,7 +369,7 @@ static void toggle_timeout(DBusTimeout *to, void *data)
 
     vlc_mutex_lock(&sys->lock);
     if (dbus_timeout_get_enabled(to))
-        *expiry = mdate() + UINT64_C(1000) * dbus_timeout_get_interval(to);
+        *expiry = vlc_tick_now() + UINT64_C(1000) * dbus_timeout_get_interval(to);
     vlc_mutex_unlock(&sys->lock);
 
     wakeup_main_loop(intf);
@@ -428,7 +428,7 @@ static void process_timeouts(intf_thread_t *intf)
             continue;
 
         vlc_tick_t *expiry = dbus_timeout_get_data(to);
-        if (*expiry > mdate())
+        if (*expiry > vlc_tick_now())
             continue;
 
         expiry += UINT64_C(1000) * dbus_timeout_get_interval(to);
@@ -831,7 +831,7 @@ static void *Run( void *data )
 
         if( i_events > 0 )
         {
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
             if( events_last_date == VLC_TS_INVALID
              || now - events_last_date > EVENTS_DELAY )
             {
@@ -953,7 +953,7 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_POSITION:
         {
-            vlc_tick_t i_now = mdate(), i_pos, i_projected_pos, i_interval;
+            vlc_tick_t i_now = vlc_tick_now(), i_pos, i_projected_pos, i_interval;
             float f_current_rate;
 
             /* Detect seeks

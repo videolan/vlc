@@ -55,7 +55,7 @@ static int RadioControl (demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_GET_TIME:
-            *va_arg (args, int64_t *) = mdate () - sys->start;
+            *va_arg (args, int64_t *) = vlc_tick_now () - sys->start;
             break;
 
         /* TODO implement others */
@@ -101,7 +101,7 @@ int RadioOpen (vlc_object_t *obj)
 
     sys->fd = fd;
     sys->controls = ControlsInit (VLC_OBJECT(demux), fd);
-    sys->start = mdate ();
+    sys->start = vlc_tick_now ();
 
     demux->p_sys = sys;
     demux->pf_demux = NULL;

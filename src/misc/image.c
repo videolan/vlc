@@ -170,7 +170,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
     }
 
-    p_block->i_pts = p_block->i_dts = mdate();
+    p_block->i_pts = p_block->i_dts = vlc_tick_now();
     int ret = p_image->p_dec->pf_decode( p_image->p_dec, p_block );
     if( ret == VLCDEC_SUCCESS )
     {

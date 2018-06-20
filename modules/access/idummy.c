@@ -69,7 +69,7 @@ typedef struct
 static int DemuxPause( demux_t *demux )
 {
     demux_sys_t *p_sys = demux->p_sys;
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
 
     if( now >= p_sys->end )
         return 0;
@@ -88,7 +88,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
         {
             double *ppos = va_arg( args, double * );
             double pos;
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
 
             pos = 1. + ((double)(now - p_sys->end) / (double)p_sys->length);
             *ppos = (pos <= 1.) ? pos : 1.;
@@ -98,7 +98,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
         case DEMUX_SET_POSITION:
         {
             double pos = va_arg( args, double );
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
 
             p_sys->end = now + (p_sys->length * (1. - pos));
             break;
@@ -114,14 +114,14 @@ static int ControlPause( demux_t *demux, int query, va_list args )
         case DEMUX_GET_TIME:
         {
             vlc_tick_t *ppos = va_arg( args, vlc_tick_t * );
-            *ppos = mdate() + p_sys->length - p_sys->end;
+            *ppos = vlc_tick_now() + p_sys->length - p_sys->end;
             break;
         }
 
         case DEMUX_SET_TIME:
         {
             vlc_tick_t pos = va_arg( args, vlc_tick_t );
-            p_sys->end = mdate() + p_sys->length - pos;
+            p_sys->end = vlc_tick_now() + p_sys->length - pos;
             break;
         }
 
@@ -188,7 +188,7 @@ nop:
         if( p_sys == NULL )
             return VLC_ENOMEM;
 
-        p_sys->end = mdate() + length;
+        p_sys->end = vlc_tick_now() + length;
         p_sys->length = length;
 
         p_demux->p_sys = p_sys;

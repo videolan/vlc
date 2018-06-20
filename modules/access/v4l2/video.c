@@ -573,7 +573,7 @@ vlc_tick_t GetBufferPTS (const struct v4l2_buffer *buf)
             break;
         case V4L2_BUF_FLAG_TIMESTAMP_UNKNOWN:
         default:
-            pts = mdate ();
+            pts = vlc_tick_now ();
             break;
     }
     return pts;

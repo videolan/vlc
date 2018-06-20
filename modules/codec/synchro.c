@@ -224,7 +224,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
 
     i_current_rate = decoder_GetDisplayRate( p_synchro->p_dec );
 
-    now = mdate();
+    now = vlc_tick_now();
     period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate * i_current_rate;
 
     p_synchro->i_render_time = i_render_time;
@@ -356,7 +356,7 @@ void decoder_SynchroTrash( decoder_synchro_t * p_synchro )
  *****************************************************************************/
 void decoder_SynchroDecode( decoder_synchro_t * p_synchro )
 {
-    p_synchro->decoding_start = mdate();
+    p_synchro->decoding_start = vlc_tick_now();
     p_synchro->i_nb_ref = p_synchro->i_dec_nb_ref;
 }
 
@@ -371,7 +371,7 @@ void decoder_SynchroEnd( decoder_synchro_t * p_synchro, int i_coding_type,
     if( b_garbage )
         return;
 
-    tau = mdate() - p_synchro->decoding_start;
+    tau = vlc_tick_now() - p_synchro->decoding_start;
 
     /* If duration too high, something happened (pause ?), so don't
      * take it into account. */
@@ -408,7 +408,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
 {
     vlc_tick_t      period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate;
 #if 0
-    vlc_tick_t      now = mdate();
+    vlc_tick_t      now = vlc_tick_now();
 #endif
 
     switch( i_coding_type )

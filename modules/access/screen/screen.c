@@ -246,7 +246,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->es = es_out_Add( p_demux->out, &p_sys->fmt );
 
-    p_sys->i_start = mdate();
+    p_sys->i_start = vlc_tick_now();
 
     return VLC_SUCCESS;
 }
@@ -275,10 +275,10 @@ static int Demux( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block;
 
-    if( !p_sys->i_next_date ) p_sys->i_next_date = mdate();
+    if( !p_sys->i_next_date ) p_sys->i_next_date = vlc_tick_now();
 
     /* Frame skipping if necessary */
-    while( mdate() >= p_sys->i_next_date + p_sys->i_incr )
+    while( vlc_tick_now() >= p_sys->i_next_date + p_sys->i_incr )
         p_sys->i_next_date += p_sys->i_incr;
 
     vlc_tick_wait( p_sys->i_next_date );
@@ -327,7 +327,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            *pi64 = mdate() - p_sys->i_start;
+            *pi64 = vlc_tick_now() - p_sys->i_start;
             return VLC_SUCCESS;
 
         /* TODO implement others */

@@ -409,7 +409,7 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 }
 
 /* time */
-vlc_tick_t mdate (void)
+vlc_tick_t vlc_tick_now (void)
 {
     struct timespec ts;
 

@@ -508,7 +508,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     bridge_t *p_bridge;
     bool b_no_es = true;
     int i;
-    vlc_tick_t i_date = mdate();
+    vlc_tick_t i_date = vlc_tick_now();
 
     /* First forward the packet for our own ES */
     if( !p_sys->b_placeholder )

@@ -67,7 +67,7 @@ noreturn static void *vlc_timer_thread (void *data)
 
         if (timer->interval != 0)
         {
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
 
             if (now > timer->value)
             {   /* Update overrun counter */
@@ -150,7 +150,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         interval = 0;
     else
     if (!absolute)
-        value += mdate();
+        value += vlc_tick_now();
 
     vlc_mutex_lock (&timer->lock);
     timer->value = value;

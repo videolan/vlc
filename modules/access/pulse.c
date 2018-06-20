@@ -161,7 +161,7 @@ static void stream_read_cb(pa_stream *s, size_t length, void *userdata)
         return;
     }
 
-    vlc_tick_t pts = mdate();
+    vlc_tick_t pts = vlc_tick_now();
     pa_usec_t latency;
     int negative;
 

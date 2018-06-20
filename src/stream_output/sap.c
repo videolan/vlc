@@ -149,7 +149,7 @@ noreturn static void *RunThread (void *self)
 
         assert (addr->session_count > 0);
 
-        deadline = mdate ();
+        deadline = vlc_tick_now ();
         for (p_session = addr->first; p_session; p_session = p_session->next)
         {
             send (addr->fd, p_session->data, p_session->length, 0);
@@ -317,7 +317,7 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
 #endif
     vlc_memstream_putc(&stream, flags);
     vlc_memstream_putc(&stream, 0x00); /* No authentication length */
-    vlc_memstream_write(&stream, &(uint16_t){ mdate() }, 2); /* ID hash */
+    vlc_memstream_write(&stream, &(uint16_t){ vlc_tick_now() }, 2); /* ID hash */
 
     switch (sap_addr->orig.ss_family)
     {

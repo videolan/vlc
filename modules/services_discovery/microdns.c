@@ -173,7 +173,7 @@ items_add_input( struct discovery_sys *p_sys, services_discovery_t *p_sd,
     p_item->psz_uri = psz_uri;
     p_item->p_input_item = p_input_item;
     p_item->p_renderer_item = NULL;
-    p_item->i_last_seen = mdate();
+    p_item->i_last_seen = vlc_tick_now();
     vlc_array_append_or_abort( &p_sys->items, p_item );
     services_discovery_AddItem( p_sd, p_input_item );
 
@@ -205,7 +205,7 @@ items_add_renderer( struct discovery_sys *p_sys, vlc_renderer_discovery_t *p_rd,
     p_item->psz_uri = psz_uri;
     p_item->p_input_item = NULL;
     p_item->p_renderer_item = p_renderer_item;
-    p_item->i_last_seen = mdate();
+    p_item->i_last_seen = vlc_tick_now();
     vlc_array_append_or_abort( &p_sys->items, p_item );
     vlc_rd_add_item( p_rd, p_renderer_item );
 
@@ -238,7 +238,7 @@ items_exists( struct discovery_sys *p_sys, const char *psz_uri )
         struct item *p_item = vlc_array_item_at_index( &p_sys->items, i );
         if( strcmp( p_item->psz_uri, psz_uri ) == 0 )
         {
-            p_item->i_last_seen = mdate();
+            p_item->i_last_seen = vlc_tick_now();
             return true;
         }
     }
@@ -250,7 +250,7 @@ items_timeout( struct discovery_sys *p_sys, services_discovery_t *p_sd,
                vlc_renderer_discovery_t *p_rd )
 {
     assert( p_rd != NULL || p_sd != NULL );
-    vlc_tick_t i_now = mdate();
+    vlc_tick_t i_now = vlc_tick_now();
 
     /* Remove items that are not seen since TIMEOUT */
     for( size_t i = 0; i < vlc_array_count( &p_sys->items ); ++i )

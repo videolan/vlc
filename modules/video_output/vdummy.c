@@ -153,7 +153,7 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *su
         vlc_tick_t date;
         memcpy(&date, p->p_pixels, sizeof(date));
         msg_Dbg(vd, "VOUT got %"PRIu64" ms offset",
-                (mdate() - date) / 1000 );
+                (vlc_tick_now() - date) / 1000 );
     }
     picture_Release(picture);
 }

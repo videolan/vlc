@@ -76,7 +76,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         if (unlikely(p_sys->initial_date == 0)) {
             p_sys->initial_date = p_pict->date;
 #ifndef NDEBUG
-            p_sys->start = mdate();
+            p_sys->start = vlc_tick_now();
 #endif
         }
 
@@ -130,7 +130,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
 #ifndef NDEBUG
     msg_Dbg(p_enc, "%zu bytes (frame %"PRId64", %.2ffps)", p_block->i_buffer,
-        p_sys->dts, (float)p_sys->dts * CLOCK_FREQ / (mdate() - p_sys->start));
+        p_sys->dts, (float)p_sys->dts * CLOCK_FREQ / (vlc_tick_now() - p_sys->start));
 #endif
 
     return p_block;

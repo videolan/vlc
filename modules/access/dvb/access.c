@@ -292,7 +292,7 @@ static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
     FrontendGetStatus( &p_sys->dvb, &status );
     bool b_has_lock = status.b_has_lock;
 
-    vlc_tick_t i_scan_start = mdate();
+    vlc_tick_t i_scan_start = vlc_tick_now();
 
     for( ; *pi_count == 0; )
     {
@@ -304,7 +304,7 @@ static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
 
         do
         {
-            vlc_tick_t i_poll_timeout = i_scan_start - mdate() + i_timeout;
+            vlc_tick_t i_poll_timeout = i_scan_start - vlc_tick_now() + i_timeout;
 
             i_ret = 0;
 
@@ -332,7 +332,7 @@ static int ScanReadCallback( scan_t *p_scan, void *p_privdata,
             FrontendGetStatus( &p_sys->dvb, &status );
             if( status.b_has_lock && !b_has_lock )
             {
-                i_scan_start = mdate();
+                i_scan_start = vlc_tick_now();
                 b_has_lock = true;
             }
         }

@@ -43,8 +43,8 @@
 /* #define ENABLE_PROFILE */
 
 #ifdef ENABLE_PROFILE
-# define PROFILE_START(name) int64_t profile_start_##name = mdate()
-# define PROFILE_STOP(name) fprintf( stderr, #name ": %f ms\n", (mdate() - profile_start_##name)/1000.0f )
+# define PROFILE_START(name) int64_t profile_start_##name = vlc_tick_now()
+# define PROFILE_STOP(name) fprintf( stderr, #name ": %f ms\n", (vlc_tick_now() - profile_start_##name)/1000.0f )
 #else
 # define PROFILE_START(name) ((void)0)
 # define PROFILE_STOP(name) ((void)0)

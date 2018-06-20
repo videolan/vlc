@@ -236,7 +236,7 @@ vlc_uri_encode
 vlc_uri_compose
 vlc_uri_resolve
 vlc_uri_fixup
-mdate
+vlc_tick_now
 module_config_free
 module_config_get
 module_exists

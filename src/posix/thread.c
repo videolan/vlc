@@ -578,7 +578,7 @@ void vlc_control_cancel (int cmd, ...)
     vlc_assert_unreachable ();
 }
 
-vlc_tick_t mdate (void)
+vlc_tick_t vlc_tick_now (void)
 {
     struct timespec ts;
 

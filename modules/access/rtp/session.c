@@ -256,7 +256,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         block->i_buffer -= padding;
     }
 
-    vlc_tick_t     now = mdate ();
+    vlc_tick_t     now = vlc_tick_now ();
     rtp_source_t  *src  = NULL;
     const uint16_t seq  = rtp_seq (block);
     const uint32_t ssrc = GetDWBE (block->p_buffer + 8);
@@ -393,7 +393,7 @@ static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
 bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
                   vlc_tick_t *restrict deadlinep)
 {
-    vlc_tick_t now = mdate ();
+    vlc_tick_t now = vlc_tick_now ();
     bool pending = false;
 
     *deadlinep = INT64_MAX;

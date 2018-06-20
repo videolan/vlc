@@ -413,7 +413,7 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
 
     /* Check ts validity */
     if (i_ts_bound != INT64_MAX && *pi_ts0 != VLC_TS_INVALID) {
-        if (*pi_ts0 >= mdate() + i_ts_delay + i_ts_buffering + i_ts_bound) {
+        if (*pi_ts0 >= vlc_tick_now() + i_ts_delay + i_ts_buffering + i_ts_bound) {
             msg_Err(p_object,
                 "Timestamp conversion failed (delay %"PRId64", buffering "
                 "%"PRId64", bound %"PRId64")",

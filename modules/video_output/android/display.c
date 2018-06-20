@@ -988,7 +988,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     if (sys->p_window->b_opaque
      && AndroidOpaquePicture_CanReleaseAtTime(picture->p_sys))
     {
-        vlc_tick_t now = mdate();
+        vlc_tick_t now = vlc_tick_now();
         if (date > now)
         {
             if (date - now <= 1*CLOCK_FREQ)

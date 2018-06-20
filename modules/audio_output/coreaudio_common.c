@@ -216,7 +216,7 @@ ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
     {
         const uint64_t i_render_time_us = p_sys->i_render_host_time
                                         * tinfo.numer / tinfo.denom / 1000;
-        i_render_delay = i_render_time_us - mdate();
+        i_render_delay = i_render_time_us - vlc_tick_now();
     }
     else
         i_render_delay = 0;

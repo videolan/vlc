@@ -320,7 +320,7 @@ static void RtspTimeOut( void *data )
     rtsp_stream_t *rtsp = data;
 
     vlc_mutex_lock(&rtsp->lock);
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
     for (int i = rtsp->sessionc - 1; i >= 0; i--)
     {
         if (rtsp->sessionv[i]->last_seen + rtsp->timeout * CLOCK_FREQ < now)
@@ -406,7 +406,7 @@ static void RtspClientAlive( rtsp_session_t *session )
     if (session->stream->timeout <= 0)
         return;
 
-    session->last_seen = mdate();
+    session->last_seen = vlc_tick_now();
     RtspUpdateTimer(session->stream);
 }
 

@@ -773,7 +773,7 @@ static int TsStart( es_out_t *p_out )
     vlc_mutex_init( &p_ts->lock );
     vlc_cond_init( &p_ts->wait );
     p_ts->b_paused = p_sys->b_input_paused && !p_sys->b_input_paused_source;
-    p_ts->i_pause_date = p_ts->b_paused ? mdate() : -1;
+    p_ts->i_pause_date = p_ts->b_paused ? vlc_tick_now() : -1;
     p_ts->i_rate_source = p_sys->i_input_rate_source;
     p_ts->i_rate        = p_sys->i_input_rate;
     p_ts->i_rate_date = -1;
@@ -1284,7 +1284,7 @@ static void CmdClean( ts_cmd_t *p_cmd )
 static int CmdInitAdd( ts_cmd_t *p_cmd, es_out_id_t *p_es, const es_format_t *p_fmt, bool b_copy )
 {
     p_cmd->i_type = C_ADD;
-    p_cmd->i_date = mdate();
+    p_cmd->i_date = vlc_tick_now();
     p_cmd->u.add.p_es = p_es;
     if( b_copy )
     {
@@ -1312,7 +1312,7 @@ static void CmdCleanAdd( ts_cmd_t *p_cmd )
 static void CmdInitSend( ts_cmd_t *p_cmd, es_out_id_t *p_es, block_t *p_block )
 {
     p_cmd->i_type = C_SEND;
-    p_cmd->i_date = mdate();
+    p_cmd->i_date = vlc_tick_now();
     p_cmd->u.send.p_es = p_es;
     p_cmd->u.send.p_block = p_block;
 }
@@ -1339,7 +1339,7 @@ static void CmdCleanSend( ts_cmd_t *p_cmd )
 static int CmdInitDel( ts_cmd_t *p_cmd, es_out_id_t *p_es )
 {
     p_cmd->i_type = C_DEL;
-    p_cmd->i_date = mdate();
+    p_cmd->i_date = vlc_tick_now();
     p_cmd->u.del.p_es = p_es;
     return VLC_SUCCESS;
 }
@@ -1353,7 +1353,7 @@ static void CmdExecuteDel( es_out_t *p_out, ts_cmd_t *p_cmd )
 static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_copy )
 {
     p_cmd->i_type = C_CONTROL;
-    p_cmd->i_date = mdate();
+    p_cmd->i_date = vlc_tick_now();
     p_cmd->u.control.i_query = i_query;
 
     switch( i_query )

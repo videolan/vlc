@@ -74,14 +74,14 @@ int main (void)
     assert (val == 0);
 
     /* Relative timer */
-    ts = mdate ();
+    ts = vlc_tick_now ();
     vlc_timer_schedule (data.timer, false, 1, CLOCK_FREQ / 100);
 
     vlc_mutex_lock (&data.lock);
     while (data.count <= 10)
         vlc_cond_wait(&data.wait, &data.lock);
 
-    ts = mdate () - ts;
+    ts = vlc_tick_now () - ts;
     printf ("%u iterations in %"PRId64" us\n", data.count, ts);
     data.count = 0;
     vlc_mutex_unlock (&data.lock);
@@ -90,7 +90,7 @@ int main (void)
     vlc_timer_schedule (data.timer, false, 0, 0);
 
     /* Absolute timer */
-    ts = mdate ();
+    ts = vlc_tick_now ();
 
     vlc_timer_schedule (data.timer, true, ts + CLOCK_FREQ / 10,
                         CLOCK_FREQ / 100);
@@ -99,7 +99,7 @@ int main (void)
     while (data.count <= 10)
         vlc_cond_wait(&data.wait, &data.lock);
 
-    ts = mdate () - ts;
+    ts = vlc_tick_now () - ts;
     printf ("%u iterations in %"PRId64" us\n", data.count, ts);
     vlc_mutex_unlock (&data.lock);
     assert(ts >= (CLOCK_FREQ / 5));

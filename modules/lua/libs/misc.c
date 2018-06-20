@@ -129,7 +129,7 @@ static int vlclua_quit( lua_State *L )
 
 static int vlclua_mdate( lua_State *L )
 {
-    lua_pushnumber( L, mdate() );
+    lua_pushnumber( L, vlc_tick_now() );
     return 1;
 }
 

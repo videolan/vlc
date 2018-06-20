@@ -1692,7 +1692,7 @@ static void httpdLoop(httpd_host_t *host)
         vlc_cleanup_pop();
     }
 
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
     bool b_low_delay = false;
     httpd_client_t *cl;
 
@@ -1951,7 +1951,7 @@ static void httpdLoop(httpd_host_t *host)
     vlc_mutex_lock(&host->lock);
 
     /* Handle client sockets */
-    now = mdate();
+    now = vlc_tick_now();
     nfd = host->nfd;
 
     vlc_list_foreach(cl, &host->clients, node) {

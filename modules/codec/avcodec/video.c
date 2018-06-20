@@ -1156,7 +1156,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         interpolate_next_pts( p_dec, frame );
 
-        update_late_frame_count( p_dec, p_block, mdate(), i_pts, frame->reordered_opaque);
+        update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts, frame->reordered_opaque);
 
         if( ( !p_sys->p_va && !frame->linesize[0] ) ||
            ( p_dec->b_frame_drop_allowed && (frame->flags & AV_FRAME_FLAG_CORRUPT) &&

@@ -75,7 +75,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
 
     if (absolute)
     {
-        value -= mdate ();
+        value -= vlc_tick_now ();
         if (value < 0)
             value = 0;
     }

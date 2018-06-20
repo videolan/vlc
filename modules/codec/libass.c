@@ -561,7 +561,7 @@ static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_i
     int i_count;
 
 #ifdef DEBUG_REGION
-    int64_t i_ck_start = mdate();
+    int64_t i_ck_start = vlc_tick_now();
 #endif
 
     for( p_tmp = p_img_list, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->next )
@@ -674,7 +674,7 @@ static int BuildRegions( rectangle_t *p_region, int i_max_region, ASS_Image *p_i
         p_region[n] = region[n];
 
 #ifdef DEBUG_REGION
-    int64_t i_ck_time = mdate() - i_ck_start;
+    int64_t i_ck_time = vlc_tick_now() - i_ck_start;
     msg_Err( p_spu, "ASS: %d objects merged into %d region in %d micros", i_count, i_region, (int)(i_ck_time) );
 #endif
 

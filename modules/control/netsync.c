@@ -198,7 +198,7 @@ static void *Master(void *handle)
         if (master_system < 0)
             continue;
 
-        data[0] = hton64(mdate());
+        data[0] = hton64(vlc_tick_now());
         data[1] = hton64(master_system);
 
         /* Reply to the sender */
@@ -231,7 +231,7 @@ static void *Slave(void *handle)
             goto wait;
 
         /* Send clock request to the master */
-        const vlc_tick_t send_date = mdate();
+        const vlc_tick_t send_date = vlc_tick_now();
 
         data[0] = hton64(system);
         send(sys->fd, data, 8, 0);
@@ -240,7 +240,7 @@ static void *Slave(void *handle)
         if (poll(&ufd, 1, sys->timeout) <= 0)
             continue;
 
-        const vlc_tick_t receive_date = mdate();
+        const vlc_tick_t receive_date = vlc_tick_now();
         if (recv(sys->fd, data, 16, 0) < 16)
             goto wait;
 

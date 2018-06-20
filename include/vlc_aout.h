@@ -175,7 +175,7 @@ struct audio_output
       * clock and the media upstream clock (if any).
       *
       * If the audio output clock is exactly synchronized with the system
-      * monotonic clock (i.e. mdate()), then aout_TimeGetDefault() can
+      * monotonic clock (i.e. vlc_tick_now()), then aout_TimeGetDefault() can
       * implement this callback.
       *
       * \param delay pointer to the delay until the next sample to be written

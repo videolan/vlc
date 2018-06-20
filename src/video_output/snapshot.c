@@ -77,7 +77,7 @@ void vout_snapshot_End(vout_snapshot_t *snap)
 /* */
 picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
 {
-    const vlc_tick_t deadline = mdate() + timeout;
+    const vlc_tick_t deadline = vlc_tick_now() + timeout;
 
     vlc_mutex_lock(&snap->lock);
 

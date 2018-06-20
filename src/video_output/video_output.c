@@ -852,7 +852,7 @@ static int ThreadDisplayPreparePicture(vout_thread_t *vout, bool reuse, bool fra
                         late_threshold = ((CLOCK_FREQ/2) * decoded->format.i_frame_rate_base) / decoded->format.i_frame_rate;
                     else
                         late_threshold = VOUT_DISPLAY_LATE_THRESHOLD;
-                    const vlc_tick_t predicted = mdate() + 0; /* TODO improve */
+                    const vlc_tick_t predicted = vlc_tick_now() + 0; /* TODO improve */
                     const vlc_tick_t late = predicted - decoded->date;
                     if (late > late_threshold) {
                         msg_Warn(vout, "picture is too late to be displayed (missing %"PRId64" ms)", late/1000);
@@ -977,8 +977,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (vout->p->pause.is_on)
         render_subtitle_date = vout->p->pause.date;
     else
-        render_subtitle_date = filtered->date > 1 ? filtered->date : mdate();
-    vlc_tick_t render_osd_date = mdate(); /* FIXME wrong */
+        render_subtitle_date = filtered->date > 1 ? filtered->date : vlc_tick_now();
+    vlc_tick_t render_osd_date = vlc_tick_now(); /* FIXME wrong */
 
     /*
      * Get the subpicture to be displayed
@@ -1153,7 +1153,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     /* Wait the real date (for rendering jitter) */
 #if 0
-    vlc_tick_t delay = todisplay->date - mdate();
+    vlc_tick_t delay = todisplay->date - vlc_tick_now();
     if (delay < 1000)
         msg_Warn(vout, "picture is late (%lld ms)", delay / 1000);
 #endif
@@ -1161,7 +1161,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         vlc_tick_wait(todisplay->date);
 
     /* Display the direct buffer returned by vout_RenderPicture */
-    vout->p->displayed.date = mdate();
+    vout->p->displayed.date = vlc_tick_now();
     vout_display_Display(vd, todisplay, subpic);
 
     vout_statistic_AddDisplayed(&vout->p->statistic, 1);
@@ -1183,7 +1183,7 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
         while (!vout->p->displayed.next && !ThreadDisplayPreparePicture(vout, false, frame_by_frame))
             ;
 
-    const vlc_tick_t date = mdate();
+    const vlc_tick_t date = vlc_tick_now();
     const vlc_tick_t render_delay = vout_chrono_GetHigh(&vout->p->render) + VOUT_MWAIT_TOLERANCE;
 
     bool drop_next_frame = frame_by_frame;
@@ -1781,7 +1781,7 @@ static void *Thread(void *object)
 
         if (wait)
         {
-            const vlc_tick_t max_deadline = mdate() + CLOCK_FREQ/10;
+            const vlc_tick_t max_deadline = vlc_tick_now() + CLOCK_FREQ/10;
             deadline = deadline == VLC_TS_INVALID ? max_deadline : __MIN(deadline, max_deadline);
         } else {
             deadline = VLC_TS_INVALID;

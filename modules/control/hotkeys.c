@@ -637,7 +637,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
 
         case ACTIONID_SUBSYNC_MARKAUDIO:
         {
-            p_sys->subtitle_delaybookmarks.i_time_audio = mdate();
+            p_sys->subtitle_delaybookmarks.i_time_audio = vlc_tick_now();
             DisplayMessage( p_vout, _("Sub sync: bookmarked audio time"));
             break;
         }
@@ -658,7 +658,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 }
                 else
                 {
-                    p_sys->subtitle_delaybookmarks.i_time_subtitle = mdate();
+                    p_sys->subtitle_delaybookmarks.i_time_subtitle = vlc_tick_now();
                     DisplayMessage(p_vout,
                                    _("Sub sync: bookmarked subtitle time"));
                 }

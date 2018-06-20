@@ -251,14 +251,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    vlc_tick_t time = mdate();
+    vlc_tick_t time = vlc_tick_now();
     for( int i_iter = 0; i_iter < p_sys->i_loops; ++i_iter )
     {
         p_blend->pf_video_blend( p_blend,
                                  p_sys->p_base_image, p_sys->p_blend_image,
                                  0, 0, p_sys->i_alpha );
     }
-    time = mdate() - time;
+    time = vlc_tick_now() - time;
 
     msg_Info( p_filter, "Blended %d images in %f sec", p_sys->i_loops,
               time / (float)CLOCK_FREQ );

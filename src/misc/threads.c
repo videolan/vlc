@@ -87,7 +87,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 
     vlc_cancel_addr_prepare(&value);
 
-    while ((delay = (deadline - mdate())) > 0)
+    while ((delay = (deadline - vlc_tick_now())) > 0)
     {
         vlc_addr_timedwait(&value, 0, delay);
         vlc_testcancel();
@@ -98,7 +98,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
 
 void (vlc_tick_sleep)(vlc_tick_t delay)
 {
-    vlc_tick_wait(mdate() + delay);
+    vlc_tick_wait(vlc_tick_now() + delay);
 }
 #endif
 
@@ -209,7 +209,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
 
 int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, vlc_tick_t deadline)
 {
-    return vlc_cond_wait_delay(cond, mutex, deadline - mdate());
+    return vlc_cond_wait_delay(cond, mutex, deadline - vlc_tick_now());
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,

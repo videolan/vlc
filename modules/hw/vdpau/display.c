@@ -260,7 +260,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
             RenderRegion(vd, surface, subpic, r);
 
     /* Compute picture presentation time */
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
     VdpTime pts;
 
     err = vdp_presentation_queue_get_time(sys->vdp, sys->queue, &pts);

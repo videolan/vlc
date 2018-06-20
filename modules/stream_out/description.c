@@ -118,7 +118,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     TAB_APPEND( p_sys->data->i_es, p_sys->data->es, p_fmt_copy );
 
     if( p_sys->i_stream_start <= 0 )
-        p_sys->i_stream_start = mdate();
+        p_sys->i_stream_start = vlc_tick_now();
 
     return (void *)p_fmt_copy;
 }
@@ -137,7 +137,7 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
     block_ChainRelease( p_buffer );
 
-    if( p_sys->i_stream_start + 1500000 < mdate() )
+    if( p_sys->i_stream_start + 1500000 < vlc_tick_now() )
         vlc_sem_post(p_sys->data->sem);
 
     return VLC_SUCCESS;

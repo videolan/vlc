@@ -389,7 +389,7 @@ Raw1394Handler(raw1394handle_t handle, unsigned char *data,
             if( p_sys->p_ev->p_frame )
             {
                 /* Push current frame to p_access thread. */
-                //p_sys->p_ev->p_frame->i_pts = mdate();
+                //p_sys->p_ev->p_frame->i_pts = vlc_tick_now();
                 block_ChainAppend( &p_sys->p_frame, p_sys->p_ev->p_frame );
             }
             /* reset list */

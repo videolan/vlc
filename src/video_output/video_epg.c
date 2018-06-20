@@ -636,7 +636,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input )
         .p_sys       = sys
     };
 
-    const vlc_tick_t now = mdate();
+    const vlc_tick_t now = vlc_tick_now();
     subpicture_t *subpic = subpicture_New(&updater);
     if (!subpic) {
         vlc_epg_Delete(sys->epg);

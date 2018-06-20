@@ -50,7 +50,7 @@ public:
 
     block_holder* consume()
     {
-        vlc_tick_t cur_machine_time = mdate();
+        vlc_tick_t cur_machine_time = vlc_tick_now();
         size_t steps = 0;
         while (
                (cycl_buffer[consumer_pos].pts < cur_machine_time)

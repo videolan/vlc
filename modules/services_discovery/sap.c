@@ -570,7 +570,7 @@ static void *Run( void *data )
             }
         }
 
-        vlc_tick_t now = mdate();
+        vlc_tick_t now = vlc_tick_now();
 
         /* A 1 hour timeout correspond to the RFC Implicit timeout.
          * This timeout is tuned in the following loop. */
@@ -814,7 +814,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                     p_announce->i_period_trust++;
 
                 /* Compute the average period */
-                vlc_tick_t now = mdate();
+                vlc_tick_t now = vlc_tick_now();
                 p_announce->i_period = ( p_announce->i_period * (p_announce->i_period_trust-1) + (now - p_announce->i_last) ) / p_announce->i_period_trust;
                 p_announce->i_last = now;
             }
@@ -846,7 +846,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
 
     p_sys = p_sd->p_sys;
 
-    p_sap->i_last = mdate();
+    p_sap->i_last = vlc_tick_now();
     p_sap->i_period = 0;
     p_sap->i_period_trust = 0;
     p_sap->i_hash = i_hash;

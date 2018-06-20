@@ -274,7 +274,7 @@ static int SendBlock( demux_t *p_demux, int i )
     }
     else
     {
-        p_block->i_pts = mdate();
+        p_block->i_pts = vlc_tick_now();
     }
     p_block->i_dts = p_block->i_pts;
 
@@ -282,7 +282,7 @@ static int SendBlock( demux_t *p_demux, int i )
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
 
     if( p_sys->b_still )
-        p_sys->i_still_end = mdate() + p_sys->i_frame_length;
+        p_sys->i_still_end = vlc_tick_now() + p_sys->i_frame_length;
 
     return VLC_DEMUXER_SUCCESS;
 }

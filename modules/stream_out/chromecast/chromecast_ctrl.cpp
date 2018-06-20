@@ -492,7 +492,7 @@ int intf_sys_t::pace()
     m_interrupted = false;
     vlc_interrupt_register( interrupt_wake_up_cb, this );
     int ret = 0;
-    vlc_tick_t deadline = mdate() + CLOCK_FREQ/2;
+    vlc_tick_t deadline = vlc_tick_now() + CLOCK_FREQ/2;
 
     /* Wait for the sout to send more data via http (m_pace), or wait for the
      * CC to finish. In case the demux filter is EOF, we always wait for
@@ -862,7 +862,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             {
                 vlc_tick_t currentTime = timeCCToVLC((double) status[0]["currentTime"]);
                 m_cc_time = currentTime;
-                m_cc_time_date = mdate();
+                m_cc_time_date = vlc_tick_now();
 
                 setState( Playing );
             }
@@ -947,7 +947,7 @@ bool intf_sys_t::handleMessages()
     size_t i_payloadSize = 0;
     size_t i_received = 0;
     bool b_timeout = false;
-    vlc_tick_t i_begin_time = mdate();
+    vlc_tick_t i_begin_time = vlc_tick_now();
 
     /* Packet structure:
      * +------------------------------------+------------------------------+
@@ -960,7 +960,7 @@ bool intf_sys_t::handleMessages()
         // how many bytes to read
         ssize_t i_ret = m_communication->receive( p_packet + i_received,
                                         i_payloadSize + PACKET_HEADER_LEN - i_received,
-                                        PING_WAIT_TIME - ( mdate() - i_begin_time ) / CLOCK_FREQ,
+                                        PING_WAIT_TIME - ( vlc_tick_now() - i_begin_time ) / CLOCK_FREQ,
                                         &b_timeout );
         if ( i_ret < 0 )
         {
@@ -1138,7 +1138,7 @@ vlc_tick_t intf_sys_t::getPlaybackTimestamp()
         case Playing:
         {
             assert( m_communication );
-            vlc_tick_t now = mdate();
+            vlc_tick_t now = vlc_tick_now();
             if( m_state == Playing && m_last_request_id == 0
              && now - m_cc_time_last_request_date > INT64_C(4000000) )
             {

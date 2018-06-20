@@ -502,7 +502,7 @@ noshm:
     /* Send block - zero copy */
     if (sys->es != NULL)
     {
-        block->i_pts = block->i_dts = mdate ();
+        block->i_pts = block->i_dts = vlc_tick_now ();
 
         es_out_SetPCR(demux->out, block->i_pts);
         es_out_Send (demux->out, sys->es, block);

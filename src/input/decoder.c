@@ -709,7 +709,7 @@ static int DecoderTimedWait( decoder_t *p_dec, vlc_tick_t deadline )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    if (deadline - mdate() <= 0)
+    if (deadline - vlc_tick_now() <= 0)
         return VLC_SUCCESS;
 
     vlc_fifo_Lock( p_owner->p_fifo );

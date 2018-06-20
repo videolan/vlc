@@ -234,13 +234,13 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->i_date_start < 0 )
-        p_sys->i_date_start = mdate();
+        p_sys->i_date_start = vlc_tick_now();
     if( !p_sys->p_out &&
-        ( mdate() - p_sys->i_date_start > p_sys->i_max_wait ||
+        ( vlc_tick_now() - p_sys->i_date_start > p_sys->i_max_wait ||
           p_sys->i_size > p_sys->i_max_size ) )
     {
         msg_Dbg( p_stream, "Starting recording, waited %ds and %dbyte",
-                 (int)((mdate() - p_sys->i_date_start)/CLOCK_FREQ), (int)p_sys->i_size );
+                 (int)((vlc_tick_now() - p_sys->i_date_start)/CLOCK_FREQ), (int)p_sys->i_size );
         OutputStart( p_stream );
     }
 

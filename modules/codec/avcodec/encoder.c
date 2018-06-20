@@ -1103,7 +1103,7 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCode
 
 static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_enc )
 {
-    vlc_tick_t current_date = mdate();
+    vlc_tick_t current_date = vlc_tick_now();
 
     if ( current_date + HURRY_UP_GUARD3 > frame->pts )
     {

@@ -422,7 +422,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         for(it=streams.begin(); it!=streams.end(); ++it)
             b_dead &= !(*it)->canActivate();
         if(!b_dead)
-            vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
+            vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
         return (b_dead) ? AbstractStream::status_eof : AbstractStream::status_buffering;
     }
@@ -464,7 +464,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         break;
     case AbstractStream::status_buffering:
         vlc_mutex_lock(&demux.lock);
-        vlc_cond_timedwait(&demux.cond, &demux.lock, mdate() + CLOCK_FREQ / 20);
+        vlc_cond_timedwait(&demux.cond, &demux.lock, vlc_tick_now() + CLOCK_FREQ / 20);
         vlc_mutex_unlock(&demux.lock);
         break;
     case AbstractStream::status_discontinuity:
@@ -647,7 +647,7 @@ void PlaylistManager::Run()
 
         if(i_return != AbstractStream::buffering_lessthanmin)
         {
-            vlc_tick_t i_deadline = mdate();
+            vlc_tick_t i_deadline = vlc_tick_now();
             if(i_return == AbstractStream::buffering_ongoing)
                 i_deadline += (CLOCK_FREQ / 100);
             else if(i_return == AbstractStream::buffering_full)
@@ -664,7 +664,7 @@ void PlaylistManager::Run()
             mutex_cleanup_push(&lock);
             while(b_buffering &&
                     vlc_cond_timedwait(&waitcond, &lock, i_deadline) == 0 &&
-                    i_deadline > mdate());
+                    i_deadline > vlc_tick_now());
             vlc_cleanup_pop();
         }
     }

@@ -71,7 +71,7 @@ static void pointer_show(struct seat_data *sd, struct wl_pointer *pointer)
     if (surface != NULL)
     {
         wl_pointer_set_cursor(pointer, sd->cursor_serial, surface, hsx, hsy);
-        sd->cursor_deadline = mdate() + sd->cursor_timeout;
+        sd->cursor_deadline = vlc_tick_now() + sd->cursor_timeout;
     }
 }
 
@@ -524,7 +524,7 @@ int seat_next_timeout(const struct wl_list *list)
     if (deadline == INT64_MAX)
         return -1;
 
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
     if (now >= deadline)
         return 0;
 
@@ -534,7 +534,7 @@ int seat_next_timeout(const struct wl_list *list)
 void seat_timeout(struct wl_list *list)
 {
     struct seat_data *sd;
-    vlc_tick_t now = mdate();
+    vlc_tick_t now = vlc_tick_now();
 
     wl_list_for_each(sd, list, node)
         seat_refresh(sd, now);

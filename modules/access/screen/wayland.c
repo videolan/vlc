@@ -253,7 +253,7 @@ static void *Thread(void *data)
         {
             block_t *block = Shoot(demux);
 
-            block->i_pts = block->i_dts = mdate();
+            block->i_pts = block->i_dts = vlc_tick_now();
             es_out_SetPCR(demux->out, block->i_pts);
             es_out_Send(demux->out, sys->es, block);
         }
@@ -289,7 +289,7 @@ static int Control(demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_GET_TIME:
-            *va_arg(args, int64_t *) = mdate() - sys->start;
+            *va_arg(args, int64_t *) = vlc_tick_now() - sys->start;
             break;
 
         case DEMUX_GET_FPS:
@@ -416,7 +416,7 @@ static int Open(vlc_object_t *obj)
         goto error;
 
     /* Initializes demux */
-    sys->start = mdate();
+    sys->start = vlc_tick_now();
 
     if (vlc_clone(&sys->thread, Thread, demux, VLC_THREAD_PRIORITY_INPUT))
         goto error;

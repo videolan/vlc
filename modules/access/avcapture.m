@@ -456,7 +456,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 
         case DEMUX_GET_TIME:
             pi64 = va_arg(args, int64_t *);
-            *pi64 = mdate();
+            *pi64 = vlc_tick_now();
             return VLC_SUCCESS;
 
         default:

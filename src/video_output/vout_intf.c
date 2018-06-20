@@ -334,7 +334,7 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
     /* FIXME SPU_DEFAULT_CHANNEL is not good (used by the text) but
      * hardcoded 0 doesn't seem right */
     p_subpic->i_channel = 0;
-    p_subpic->i_start = mdate();
+    p_subpic->i_start = vlc_tick_now();
     p_subpic->i_stop  = p_subpic->i_start + CLOCK_FREQ*4;
     p_subpic->b_ephemer = true;
     p_subpic->b_fade = true;
