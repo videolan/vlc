@@ -339,7 +339,7 @@ static void Flush(audio_output_t *p_aout, bool wait)
     {
         vlc_tick_t delay;
         if (!TimeGet(p_aout, &delay))
-            msleep(delay);
+            vlc_tick_sleep(delay);
     }
 
     /* reset ringbuffer read and write pointers */

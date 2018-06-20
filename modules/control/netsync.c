@@ -268,7 +268,7 @@ static void *Slave(void *handle)
             vlc_restorecancel(canc);
         }
     wait:
-        msleep(INTF_IDLE_SLEEP);
+        vlc_tick_sleep(INTF_IDLE_SLEEP);
     }
     return NULL;
 }

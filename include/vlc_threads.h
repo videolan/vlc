@@ -833,7 +833,7 @@ VLC_API unsigned long vlc_thread_id(void) VLC_USED;
  *
  * In principles, the clock has a precision of 1 MHz. But the actual resolution
  * may be much lower, especially when it comes to sleeping with vlc_tick_wait() or
- * msleep(). Most general-purpose operating systems provide a resolution of
+ * vlc_tick_sleep(). Most general-purpose operating systems provide a resolution of
  * only 100 to 1000 Hz.
  *
  * \warning The origin date (time value "zero") is not specified. It is
@@ -862,7 +862,7 @@ VLC_API void vlc_tick_wait(vlc_tick_t deadline);
  * \note The delay may be exceeded due to OS scheduling.
  * \note This function is a cancellation point.
  */
-VLC_API void msleep(vlc_tick_t delay);
+VLC_API void vlc_tick_sleep(vlc_tick_t delay);
 
 #define VLC_HARD_MIN_SLEEP  (CLOCK_FREQ/100) /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP  (9*CLOCK_FREQ)   /* 9 seconds */
@@ -917,7 +917,7 @@ vlc_tick_t impossible_deadline( vlc_tick_t deadline )
 # define check_deadline(d) (d)
 #endif
 
-#define msleep(d) msleep(check_delay(d))
+#define vlc_tick_sleep(d) vlc_tick_sleep(check_delay(d))
 #define vlc_tick_wait(d) vlc_tick_wait(check_deadline(d))
 
 /**

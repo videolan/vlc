@@ -821,7 +821,7 @@ known:
     unsigned satno = var_InheritInteger (d->obj, "dvb-satno");
     if (satno > 0)
     {
-#undef msleep /* we know what we are doing! */
+#undef vlc_tick_sleep /* we know what we are doing! */
 
         /* DiSEqC Bus Specification:
  http://www.eutelsat.com/satellites/pdf/Diseqc/Reference%20docs/bus_spec.pdf */
@@ -843,7 +843,7 @@ known:
         cmd.msg[4] = cmd.msg[5] = 0; /* unused */
         cmd.msg_len = 4; /* length */
 
-        msleep (15000); /* wait 15 ms before DiSEqC command */
+        vlc_tick_sleep (15000); /* wait 15 ms before DiSEqC command */
         unsigned uncommitted = var_InheritInteger (d->obj, "dvb-uncommitted");
         if (uncommitted > 0)
         {
@@ -872,7 +872,7 @@ known:
                        vlc_strerror_c(errno));
               return -1;
           }
-          msleep(125000); /* wait 125 ms before committed DiSEqC command */
+          vlc_tick_sleep(125000); /* wait 125 ms before committed DiSEqC command */
         }
         if (ioctl (d->frontend, FE_DISEQC_SEND_MASTER_CMD, &cmd) < 0)
         {
@@ -880,7 +880,7 @@ known:
                      vlc_strerror_c(errno));
             return -1;
         }
-        msleep (54000 + 15000);
+        vlc_tick_sleep (54000 + 15000);
 
         /* Mini-DiSEqC */
         satno &= 1;
@@ -891,7 +891,7 @@ known:
                      vlc_strerror_c(errno));
             return -1;
         }
-        msleep (15000);
+        vlc_tick_sleep (15000);
     }
 
     /* Continuous tone (to select high oscillator frequency) */

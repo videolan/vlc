@@ -271,7 +271,7 @@ vlc_obj_malloc
 vlc_obj_calloc
 vlc_obj_strdup
 vlc_obj_free
-msleep
+vlc_tick_sleep
 vlc_tick_wait
 net_Accept
 net_AcceptSingle

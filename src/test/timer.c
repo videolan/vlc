@@ -28,7 +28,7 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#undef msleep
+#undef vlc_tick_sleep
 
 struct timer_data
 {

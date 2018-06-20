@@ -408,7 +408,7 @@ static int Demux(demux_t *p_demux)
             {
                 /* Nothing to display yet, just forget */
                 block_Release(p_block);
-                msleep(VLC_HARD_MIN_SLEEP);
+                vlc_tick_sleep(VLC_HARD_MIN_SLEEP);
                 return 1;
             }
             else if ( !p_sys->b_es_setup )

@@ -581,7 +581,7 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         if( p_vout )
             break;
 
-        msleep( DECODER_SPU_VOUT_WAIT_DURATION );
+        vlc_tick_sleep( DECODER_SPU_VOUT_WAIT_DURATION );
     }
 
     if( !p_vout )

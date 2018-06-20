@@ -541,11 +541,11 @@ void vlc_tick_wait (vlc_tick_t deadline)
 {
     deadline -= mdate ();
     if (deadline > 0)
-        msleep (deadline);
+        vlc_tick_sleep (deadline);
 }
 
-#undef msleep
-void msleep (vlc_tick_t delay)
+#undef vlc_tick_sleep
+void vlc_tick_sleep (vlc_tick_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 

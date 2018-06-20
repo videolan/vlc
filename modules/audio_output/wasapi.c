@@ -197,7 +197,7 @@ static HRESULT Play(aout_stream_t *s, block_t *block)
             break; /* done */
 
         /* Out of buffer space, sleep */
-        msleep(sys->frames * (CLOCK_FREQ / 2) / sys->rate);
+        vlc_tick_sleep(sys->frames * (CLOCK_FREQ / 2) / sys->rate);
     }
     IAudioRenderClient_Release(render);
 out:

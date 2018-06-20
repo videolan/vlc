@@ -1267,7 +1267,7 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
     }
  
 #ifdef CAPMT_WAIT
-    msleep( CAPMT_WAIT * 1000 );
+    vlc_tick_sleep( CAPMT_WAIT * 1000 );
 #endif
  
     msg_Dbg( p_cam->obj, "adding CAPMT for SID %d on session %d",
@@ -1960,7 +1960,7 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
 
         p_cam->i_timeout = CLOCK_FREQ / 10;
         /* Wait a bit otherwise it doesn't initialize properly... */
-        msleep( CLOCK_FREQ / 10 );
+        vlc_tick_sleep( CLOCK_FREQ / 10 );
         p_cam->i_next_event = 0;
     }
     else

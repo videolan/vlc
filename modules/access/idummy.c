@@ -56,7 +56,7 @@ static int DemuxNoOp( demux_t *demux )
 static int DemuxHold( demux_t *demux )
 {
     (void) demux;
-    msleep( VLC_HARD_MIN_SLEEP ); /* FIXME!!! */
+    vlc_tick_sleep( VLC_HARD_MIN_SLEEP ); /* FIXME!!! */
     return 1;
 }
 
@@ -74,7 +74,7 @@ static int DemuxPause( demux_t *demux )
     if( now >= p_sys->end )
         return 0;
 
-    msleep( VLC_HARD_MIN_SLEEP ); /* FIXME!!! */
+    vlc_tick_sleep( VLC_HARD_MIN_SLEEP ); /* FIXME!!! */
     return 1;
 }
 

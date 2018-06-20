@@ -415,7 +415,7 @@ static void satip_teardown(void *data) {
 
             /* Extra sleep for compatibility with some satip servers, that
              * can't handle new sessions right after teardown */
-            msleep(150000);
+            vlc_tick_sleep(150000);
         }
     }
 }

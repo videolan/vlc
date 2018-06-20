@@ -207,7 +207,7 @@ test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
                                        "Indeterminate non cancellable dialog "
                                        "for %" PRId64 " us", i_dialog_wait);
     assert(p_id != NULL);
-    msleep(i_dialog_wait);
+    vlc_tick_sleep(i_dialog_wait);
     vlc_dialog_release(p_obj, p_id);
     assert(i_ret == VLC_SUCCESS);
 
@@ -220,7 +220,7 @@ test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
                                        "Cancel It!");
     assert(p_id != NULL);
     while(!vlc_dialog_is_cancelled(p_obj, p_id))
-        msleep(i_dialog_wait / 30);
+        vlc_tick_sleep(i_dialog_wait / 30);
     vlc_dialog_release(p_obj, p_id);
 
     set_answer(p_ans, false, NULL, 0);
@@ -229,7 +229,7 @@ test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
     assert(p_id != NULL);
     while (f_position <= 1.0f)
     {
-        msleep(i_dialog_wait / 30);
+        vlc_tick_sleep(i_dialog_wait / 30);
         f_position += 0.02f;
         i_ret = vlc_dialog_update_progress(p_obj, p_id, f_position);
         assert(i_ret == VLC_SUCCESS);
@@ -244,7 +244,7 @@ test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
     assert(p_id != NULL);
     while (f_position <= 1.0f)
     {
-        msleep(i_dialog_wait / 30);
+        vlc_tick_sleep(i_dialog_wait / 30);
         f_position += 0.02f;
         i_ret = vlc_dialog_update_progress_text(p_obj, p_id, f_position,
                                                 "Non cancellable dialog in progress.\n"
@@ -274,7 +274,7 @@ test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
                                      "Error");
     assert(i_ret == 0);
     while(!vlc_dialog_is_cancelled(p_obj, p_id))
-        msleep(i_dialog_wait / 30);
+        vlc_tick_sleep(i_dialog_wait / 30);
     vlc_dialog_release(p_obj, p_id);
 }
 

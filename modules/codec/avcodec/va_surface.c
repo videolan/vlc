@@ -173,7 +173,7 @@ int va_pool_Get(va_pool_t *va_pool, picture_t *pic)
             return VLC_ENOITEM;
         /* Pool empty. Wait for some time as in src/input/decoder.c.
          * XXX: Both this and the core should use a semaphore or a CV. */
-        msleep(VOUT_OUTMEM_SLEEP);
+        vlc_tick_sleep(VOUT_OUTMEM_SLEEP);
     }
     pic->context = field;
     return VLC_SUCCESS;

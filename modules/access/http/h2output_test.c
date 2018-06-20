@@ -34,7 +34,7 @@
 #include "h2frame.h"
 #include "h2output.h"
 
-#undef msleep
+#undef vlc_tick_sleep
 
 static unsigned char counter = 0;
 static bool send_failure = false;
@@ -160,7 +160,7 @@ int main(void)
 
     assert(vlc_h2_output_send(out, frame(10)) == 0);
     for (unsigned char i = 11; vlc_h2_output_send(out, frame(i)) == 0; i++)
-        msleep(CLOCK_FREQ/10); /* eventually, it should start failing */
+        vlc_tick_sleep(CLOCK_FREQ/10); /* eventually, it should start failing */
     assert(vlc_h2_output_send(out, frame(0)) == -1);
     assert(vlc_h2_output_send_prio(out, frame(0)) == -1);
     vlc_h2_output_destroy(out);
@@ -174,7 +174,7 @@ int main(void)
     vlc_sem_wait(&rx);
 
     for (unsigned char i = 1; vlc_h2_output_send_prio(out, frame(i)) == 0; i++)
-        msleep(CLOCK_FREQ/10);
+        vlc_tick_sleep(CLOCK_FREQ/10);
     assert(vlc_h2_output_send(out, frame(0)) == -1);
     assert(vlc_h2_output_send_prio(out, frame(0)) == -1);
     vlc_h2_output_destroy(out);

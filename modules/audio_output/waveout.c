@@ -370,7 +370,7 @@ static void Play( audio_output_t *p_aout, block_t *block, vlc_tick_t date )
 
     {
         msg_Warn( p_aout, "Couln't write frame... sleeping");
-        msleep( block->i_length );
+        vlc_tick_sleep( block->i_length );
     }
 
     WaveOutClean( sys );

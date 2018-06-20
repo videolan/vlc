@@ -302,7 +302,7 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
             {
                 vlc_mutex_unlock(&sys_lock);
                 msg_Info(obj, "Waiting for previous vout module to exit");
-                msleep(CLOCK_FREQ / 10);
+                vlc_tick_sleep(CLOCK_FREQ / 10);
                 vlc_mutex_lock(&sys_lock);
             }
         }
@@ -1094,7 +1094,7 @@ static void Flush (audio_output_t *aout, bool drain)
     if (drain) {
         uint32_t samples;
         sys->p_output->GetBufferedAudioSampleFrameCount(&samples);
-        msleep(CLOCK_FREQ * samples / sys->i_rate);
+        vlc_tick_sleep(CLOCK_FREQ * samples / sys->i_rate);
     } else if (sys->p_output->FlushBufferedAudioSamples() == E_FAIL)
         msg_Err(aout, "Flush failed");
 }

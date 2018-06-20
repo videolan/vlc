@@ -166,11 +166,11 @@ static void *Run( void *data )
         vlc_restorecancel(canc);
         if( i_status == 2 )
         {
-            msleep( 5*CLOCK_FREQ );
+            vlc_tick_sleep( 5*CLOCK_FREQ );
             i_status = 0;
         }
         else
-            msleep( CLOCK_FREQ/2 );
+            vlc_tick_sleep( CLOCK_FREQ/2 );
     }
     return NULL;
 }

@@ -1859,7 +1859,7 @@ bool ReadCommand( intf_thread_t *p_intf, char *p_buffer, int *pi_size )
         return ReadWin32( p_intf, (unsigned char*)p_buffer, pi_size );
     else if( p_intf->p_sys->i_socket == -1 )
     {
-        msleep( INTF_IDLE_SLEEP );
+        vlc_tick_sleep( INTF_IDLE_SLEEP );
         return false;
     }
 #endif

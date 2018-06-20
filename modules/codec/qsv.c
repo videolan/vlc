@@ -835,7 +835,7 @@ static async_task_t *encode_frame(encoder_t *enc, picture_t *pic)
         if (sys->busy_warn_counter++ % 16 == 0)
             msg_Dbg(enc, "Device is busy, let's wait and retry %d", sts);
         if (sts == MFX_WRN_DEVICE_BUSY)
-            msleep(QSV_BUSYWAIT_TIME);
+            vlc_tick_sleep(QSV_BUSYWAIT_TIME);
     }
 
     // msg_Dbg(enc, "Encode async status: %d, Syncpoint = %tx", sts, (ptrdiff_t)task->syncp);

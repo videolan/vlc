@@ -250,7 +250,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
             const vlc_tick_t i_frame_us =
                 FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + 10000;
             lock_unlock(p_sys);
-            msleep(i_frame_us);
+            vlc_tick_sleep(i_frame_us);
             lock_lock(p_sys);
         }
     }
@@ -336,7 +336,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 
             /* Wait for the render buffer to play the remaining data */
             lock_unlock(p_sys);
-            msleep(i_frame_us);
+            vlc_tick_sleep(i_frame_us);
             lock_lock(p_sys);
         }
         else

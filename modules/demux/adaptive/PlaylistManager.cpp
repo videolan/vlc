@@ -300,7 +300,7 @@ void PlaylistManager::drain()
         if(b_drained)
             break;
 
-        msleep(20*1000); /* ugly, but we have no way to get feedback */
+        vlc_tick_sleep(20*1000); /* ugly, but we have no way to get feedback */
     }
     es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
 }

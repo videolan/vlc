@@ -163,7 +163,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     if (wait_and_cancel > 0)
     {
-        msleep(wait_and_cancel * 1000);
+        vlc_tick_sleep(wait_and_cancel * 1000);
         libvlc_MetadataCancel(vlc->p_libvlc_int, vlc);
 
     }

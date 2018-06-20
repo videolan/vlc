@@ -570,7 +570,7 @@ static void Flush(audio_output_t *aout, bool wait)
          * See #18141: drain callback is never received */
         vlc_tick_t delay;
         if (TimeGet(aout, &delay) == 0 && delay <= INT64_C(5000000))
-            msleep(delay);
+            vlc_tick_sleep(delay);
     }
     else
         op = pa_stream_flush(s, NULL, NULL);

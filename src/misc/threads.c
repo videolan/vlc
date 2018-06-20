@@ -96,7 +96,7 @@ void (vlc_tick_wait)(vlc_tick_t deadline)
     vlc_cancel_addr_finish(&value);
 }
 
-void (msleep)(vlc_tick_t delay)
+void (vlc_tick_sleep)(vlc_tick_t delay)
 {
     vlc_tick_wait(mdate() + delay);
 }

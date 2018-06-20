@@ -604,8 +604,8 @@ void vlc_tick_wait (vlc_tick_t deadline)
     while (clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &ts, NULL) == EINTR);
 }
 
-#undef msleep
-void msleep (vlc_tick_t delay)
+#undef vlc_tick_sleep
+void vlc_tick_sleep (vlc_tick_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 

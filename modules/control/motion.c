@@ -137,7 +137,7 @@ static void *RunIntf( void *data )
 
         /* Wait a bit, get orientation, change filter if necessary */
 #warning FIXME: check once (or less) per picture, not once per interval
-        msleep( INTF_IDLE_SLEEP );
+        vlc_tick_sleep( INTF_IDLE_SLEEP );
 
         int canc = vlc_savecancel();
         int i_x = motion_get_angle( p_intf->p_sys->p_motion );

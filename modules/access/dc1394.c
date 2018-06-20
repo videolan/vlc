@@ -470,7 +470,7 @@ static int Demux( demux_t *p_demux )
         /* Sleep so we do not consume all the cpu, 10ms seems
          * like a good value (100fps)
          */
-        msleep( VLC_HARD_MIN_SLEEP );
+        vlc_tick_sleep( VLC_HARD_MIN_SLEEP );
         return 1;
     }
 

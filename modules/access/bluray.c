@@ -2216,7 +2216,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     }
 
     /* avoid busy loops (read returns no data) */
-    msleep( 40000 );
+    vlc_tick_sleep( 40000 );
 }
 
 static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
@@ -2400,7 +2400,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_IDLE:
         /* nothing to do (ex. BD-J is preparing menus, waiting user input or running animation) */
         /* avoid busy loop (bd_read() returns no data) */
-        msleep( 40000 );
+        vlc_tick_sleep( 40000 );
         break;
 
     default:

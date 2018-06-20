@@ -1170,7 +1170,7 @@ static void * PlayedDataEraser( void * data )
 wait:
         vlc_mutex_unlock(&p_sys->lock);
         vlc_restorecancel(canc);
-        msleep(tosleep);
+        vlc_tick_sleep(tosleep);
     }
     return NULL;
 }

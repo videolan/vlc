@@ -336,7 +336,7 @@ static void *Run( void *opaque )
     /* main loop */
     for (;;)
     {
-        msleep( CLOCK_FREQ );
+        vlc_tick_sleep( CLOCK_FREQ );
 
         QueueIncomingRequests( p_sys );
 

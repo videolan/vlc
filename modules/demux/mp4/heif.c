@@ -223,7 +223,7 @@ static int DemuxHEIF( demux_t *p_demux )
         es_out_Control( p_demux->out, ES_OUT_GET_EMPTY, &b_empty );
         if( !b_empty || mdate() <= p_sys->i_end_display_time )
         {
-            msleep( 40 * 1000 );
+            vlc_tick_sleep( 40 * 1000 );
             return VLC_DEMUXER_SUCCESS;
         }
         p_sys->i_end_display_time = 0;

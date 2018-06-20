@@ -710,7 +710,7 @@ static void* update_request_thread( void *obj )
     interval *= 1000; /* ms -> µs */
 
     do
-        msleep( interval );
+        vlc_tick_sleep( interval );
     while( write_update_request( p_filter, true ) );
 
     return NULL;

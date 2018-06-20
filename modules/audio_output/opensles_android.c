@@ -184,7 +184,7 @@ static void Flush(audio_output_t *aout, bool drain)
     if (drain) {
         vlc_tick_t delay;
         if (!TimeGet(aout, &delay))
-            msleep(delay);
+            vlc_tick_sleep(delay);
     } else {
         vlc_mutex_lock(&sys->lock);
         SetPlayState(sys->playerPlay, SL_PLAYSTATE_STOPPED);

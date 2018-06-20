@@ -72,7 +72,7 @@ VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
 VLC_API int vlc_mwait_i11e(vlc_tick_t);
 
 /**
- * Interruptible variant of msleep().
+ * Interruptible variant of vlc_tick_sleep().
  *
  * Waits for a specified timeout duration or, if the calling thread has an
  * interruption context, an interruption.
