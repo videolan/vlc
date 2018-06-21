@@ -206,20 +206,24 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
+    if (unlikely(tinfo.denom == 0))
+        return -1;
+
     lock_lock(p_sys);
 
-    if (tinfo.denom == 0 || p_sys->i_render_host_time == 0)
+    mtime_t i_render_delay;
+    if (likely(p_sys->i_render_host_time != 0))
     {
-        lock_unlock(p_sys);
-        return -1;
+        const uint64_t i_render_time_us = p_sys->i_render_host_time
+                                        * tinfo.numer / tinfo.denom / 1000;
+        i_render_delay = i_render_time_us - mdate();
     }
-
-    const uint64_t i_render_time_us = p_sys->i_render_host_time
-                                    * tinfo.numer / tinfo.denom / 1000;
+    else
+        i_render_delay = 0;
 
     const int64_t i_out_frames = BytesToFrames(p_sys, p_sys->i_out_size);
     *delay = FramesToUs(p_sys, i_out_frames + p_sys->i_render_frames)
-           + p_sys->i_dev_latency_us + i_render_time_us - mdate();
+           + p_sys->i_dev_latency_us + i_render_delay;
 
     lock_unlock(p_sys);
     return 0;
