@@ -578,14 +578,6 @@ static void transcode_video_sar_init( sout_stream_t *p_stream,
                                      sout_stream_id_sys_t *id,
                                      const video_format_t *p_vid_out )
 {
-    int i_src_visible_width = p_vid_out->i_visible_width;
-    int i_src_visible_height = p_vid_out->i_visible_height;
-
-    if (i_src_visible_width == 0)
-        i_src_visible_width = p_vid_out->i_width;
-    if (i_src_visible_height == 0)
-        i_src_visible_height = p_vid_out->i_height;
-
     /* Check whether a particular aspect ratio was requested */
     if( id->p_encoder->fmt_out.video.i_sar_num <= 0 ||
         id->p_encoder->fmt_out.video.i_sar_den <= 0 )
