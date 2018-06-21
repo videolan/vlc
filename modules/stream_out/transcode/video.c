@@ -607,8 +607,8 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     id->p_encoder->fmt_out.i_codec =
         vlc_fourcc_GetCodec( VIDEO_ES, id->p_encoder->fmt_out.i_codec );
 
-    id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
-    if( !id->id )
+    id->downstream_id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
+    if( !id->downstream_id )
     {
         msg_Err( p_stream, "cannot add this stream" );
         return VLC_EGENERIC;

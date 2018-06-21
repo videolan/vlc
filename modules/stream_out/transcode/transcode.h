@@ -64,7 +64,7 @@ struct sout_stream_id_sys_t
     bool            b_error;
 
     /* id of the out stream */
-    void *id;
+    void *downstream_id;
 
     /* Decoder */
     decoder_t       *p_decoder;

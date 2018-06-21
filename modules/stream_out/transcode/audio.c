@@ -321,10 +321,10 @@ int transcode_audio_process( sout_stream_t *p_stream,
             date_Init( &id->next_input_pts, id->audio_dec_out.i_rate, 1 );
             date_Set( &id->next_input_pts, p_audio_buf->i_pts );
 
-            if (!id->id)
+            if (!id->downstream_id)
             {
-                id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
-                if (!id->id)
+                id->downstream_id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
+                if (!id->downstream_id)
                 {
                     vlc_mutex_unlock(&id->fifo.lock);
                     goto error;

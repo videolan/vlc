@@ -498,7 +498,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         goto error;
 
     vlc_mutex_init(&id->fifo.lock);
-    id->id = NULL;
+    id->downstream_id = NULL;
     id->p_decoder = NULL;
     id->p_encoder = NULL;
 
@@ -544,10 +544,10 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&p_fmt->i_codec );
-        id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
+        id->downstream_id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
         id->b_transcode = false;
 
-        success = id->id;
+        success = id->downstream_id;
     }
 
     if(!success)
@@ -583,7 +583,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         }
     }
 
-    if( id->id ) sout_StreamIdDel( p_stream->p_next, id->id );
+    if( id->downstream_id ) sout_StreamIdDel( p_stream->p_next, id->downstream_id );
 
     DeleteSoutStreamID( id );
 }
@@ -598,8 +598,8 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
 
     if( !id->b_transcode )
     {
-        if( id->id )
-            return sout_StreamIdSend( p_stream->p_next, id->id, p_buffer );
+        if( id->downstream_id )
+            return sout_StreamIdSend( p_stream->p_next, id->downstream_id, p_buffer );
         else
             goto error;
     }
@@ -635,7 +635,7 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     }
 
     if( p_out )
-        return sout_StreamIdSend( p_stream->p_next, id->id, p_out );
+        return sout_StreamIdSend( p_stream->p_next, id->downstream_id, p_out );
     return VLC_SUCCESS;
 error:
     if( p_buffer )

@@ -239,10 +239,10 @@ bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
         }
 
         /* open output stream */
-        id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
+        id->downstream_id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
-        if( !id->id )
+        if( !id->downstream_id )
         {
             transcode_spu_close( p_stream, id );
             return false;
