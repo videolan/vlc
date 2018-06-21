@@ -60,12 +60,11 @@ static int video_update_format_decoder( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
-    sout_stream_t        *stream = p_owner->p_stream;
-    sout_stream_sys_t    *sys    = stream->p_sys;
+    vlc_object_t        *p_obj = p_owner->p_obj;
     filter_chain_t       *test_chain;
 
     filter_owner_t filter_owner = {
-        .sys = sys,
+        .sys = id,
     };
 
     if( id->p_encoder->fmt_in.i_codec == p_dec->fmt_out.i_codec ||
@@ -75,15 +74,15 @@ static int video_update_format_decoder( decoder_t *p_dec )
     id->video_dec_out = p_dec->fmt_out.video;
     id->video_dec_out.p_palette = NULL;
 
-    msg_Dbg( stream, "Checking if filter chain %4.4s -> %4.4s is possible",
+    msg_Dbg( p_obj, "Checking if filter chain %4.4s -> %4.4s is possible",
                  (char *)&p_dec->fmt_out.i_codec, (char*)&id->p_encoder->fmt_in.i_codec );
-    test_chain = filter_chain_NewVideo( stream, false, &filter_owner );
+    test_chain = filter_chain_NewVideo( p_obj, false, &filter_owner );
     filter_chain_Reset( test_chain, &p_dec->fmt_out, &p_dec->fmt_out );
 
     int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out,
                                   &id->p_encoder->fmt_in );
     filter_chain_Delete( test_chain );
-    msg_Dbg( stream, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
+    msg_Dbg( p_obj, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
                      (char *)&p_dec->fmt_out.video.i_chroma,
                      chain_works == 0 ? "possible" : "not possible");
     return chain_works;

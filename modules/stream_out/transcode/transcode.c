@@ -506,7 +506,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     struct decoder_owner * p_owner = vlc_object_create( p_stream, sizeof( *p_owner ) );
     if( !p_owner )
         goto error;
-    p_owner->p_stream = p_stream;
+    p_owner->p_obj = VLC_OBJECT(p_stream);
 
     id->p_decoder = &p_owner->dec;
     id->p_decoder->p_module = NULL;
