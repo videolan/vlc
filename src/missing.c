@@ -241,7 +241,7 @@ vlm_message_t *vlm_MessageNew (const char *a, const char *fmt, ...)
 }
 
 #undef vlm_New
-vlm_t *vlm_New (vlc_object_t *obj, const char *file)
+vlm_t *vlm_New (libvlc_int_t *obj, const char *file)
 {
      msg_Err (obj, "VLM not compiled-in!");
      (void) file;
