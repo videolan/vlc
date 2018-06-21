@@ -428,109 +428,96 @@ static void transcode_video_framerate_apply( const video_format_t *p_src,
                   p_dst->i_frame_rate,  p_dst->i_frame_rate_base, 0 );
 }
 
-static void transcode_video_size_init( sout_stream_t *p_stream,
-                                     sout_stream_id_sys_t *id,
-                                     const video_format_t *p_vid_out )
+static void transcode_video_size_apply( vlc_object_t *p_obj,
+                                        const video_format_t *p_src,
+                                        float f_scale,
+                                        unsigned i_maxwidth,
+                                        unsigned i_maxheight,
+                                        video_format_t *p_dst )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /* Calculate scaling
      * width/height of source */
-    int i_src_visible_width = p_vid_out->i_visible_width;
-    int i_src_visible_height = p_vid_out->i_visible_height;
-
-    if (unlikely(i_src_visible_width == 0))
-        i_src_visible_width = p_vid_out->i_width;
-    if (unlikely(i_src_visible_height == 0))
-        i_src_visible_height = p_vid_out->i_height;
-
+    unsigned i_src_width = p_src->i_visible_width ? p_src->i_visible_width : p_src->i_width;
+    unsigned i_src_height = p_src->i_visible_height ? p_src->i_visible_height : p_src->i_height;
 
     /* with/height scaling */
     float f_scale_width = 1;
     float f_scale_height = 1;
 
     /* aspect ratio */
-    float f_aspect = (double)p_vid_out->i_sar_num *
-                     p_vid_out->i_width /
-                     p_vid_out->i_sar_den /
-                     p_vid_out->i_height;
+    float f_aspect = (double)p_src->i_sar_num * p_src->i_width /
+                             p_src->i_sar_den / p_src->i_height;
 
-    msg_Dbg( p_stream, "decoder aspect is %f:1", f_aspect );
+    msg_Dbg( p_obj, "decoder aspect is %f:1", f_aspect );
 
     /* Change f_aspect from source frame to source pixel */
-    f_aspect = f_aspect * i_src_visible_height / i_src_visible_width;
-    msg_Dbg( p_stream, "source pixel aspect is %f:1", f_aspect );
+    f_aspect = f_aspect * i_src_height / i_src_width;
+    msg_Dbg( p_obj, "source pixel aspect is %f:1", f_aspect );
 
     /* Calculate scaling factor for specified parameters */
-    if( id->p_encoder->fmt_out.video.i_visible_width <= 0 &&
-        id->p_encoder->fmt_out.video.i_visible_height <= 0 && p_sys->f_scale )
+    if( p_dst->i_visible_width == 0 && p_dst->i_visible_height == 0 && f_scale )
     {
         /* Global scaling. Make sure width will remain a factor of 16 */
         float f_real_scale;
-        int  i_new_height;
-        int i_new_width = i_src_visible_width * p_sys->f_scale;
+        unsigned i_new_height;
+        unsigned i_new_width = i_src_width * f_scale;
 
         if( i_new_width % 16 <= 7 && i_new_width >= 16 )
             i_new_width -= i_new_width % 16;
         else
             i_new_width += 16 - i_new_width % 16;
 
-        f_real_scale = (float)( i_new_width ) / (float) i_src_visible_width;
+        f_real_scale = (float)( i_new_width ) / (float) i_src_width;
 
-        i_new_height = __MAX( 16, i_src_visible_height * (float)f_real_scale );
+        i_new_height = __MAX( 16, i_src_height * (float)f_real_scale );
 
         f_scale_width = f_real_scale;
-        f_scale_height = (float) i_new_height / (float) i_src_visible_height;
+        f_scale_height = (float) i_new_height / (float) i_src_height;
     }
-    else if( id->p_encoder->fmt_out.video.i_visible_width > 0 &&
-             id->p_encoder->fmt_out.video.i_visible_height <= 0 )
+    else if( p_dst->i_visible_width && p_dst->i_visible_height == 0 )
     {
         /* Only width specified */
-        f_scale_width = (float)id->p_encoder->fmt_out.video.i_visible_width/i_src_visible_width;
+        f_scale_width = (float)p_dst->i_visible_width / i_src_width;
         f_scale_height = f_scale_width;
     }
-    else if( id->p_encoder->fmt_out.video.i_visible_width <= 0 &&
-             id->p_encoder->fmt_out.video.i_visible_height > 0 )
+    else if( p_dst->i_visible_width == 0 && p_dst->i_visible_height )
     {
          /* Only height specified */
-         f_scale_height = (float)id->p_encoder->fmt_out.video.i_visible_height/i_src_visible_height;
+         f_scale_height = (float)p_dst->i_visible_height / i_src_height;
          f_scale_width = f_scale_height;
      }
-     else if( id->p_encoder->fmt_out.video.i_visible_width > 0 &&
-              id->p_encoder->fmt_out.video.i_visible_height > 0 )
+     else if( p_dst->i_visible_width && p_dst->i_visible_height )
      {
          /* Width and height specified */
-         f_scale_width = (float)id->p_encoder->fmt_out.video.i_visible_width/i_src_visible_width;
-         f_scale_height = (float)id->p_encoder->fmt_out.video.i_visible_height/i_src_visible_height;
+         f_scale_width = (float)p_dst->i_visible_width / i_src_width;
+         f_scale_height = (float)p_dst->i_visible_height / i_src_height;
      }
 
      /* check maxwidth and maxheight */
-     if( p_sys->i_maxwidth && f_scale_width > (float)p_sys->i_maxwidth /
-                                                     i_src_visible_width )
+     if( i_maxwidth && f_scale_width > (float)i_maxwidth / i_src_width )
      {
-         f_scale_width = (float)p_sys->i_maxwidth / i_src_visible_width;
+         f_scale_width = (float)i_maxwidth / i_src_width;
      }
 
-     if( p_sys->i_maxheight && f_scale_height > (float)p_sys->i_maxheight /
-                                                       i_src_visible_height )
+     if( i_maxheight && f_scale_height > (float)i_maxheight / i_src_height )
      {
-         f_scale_height = (float)p_sys->i_maxheight / i_src_visible_height;
+         f_scale_height = (float)i_maxheight / i_src_height;
      }
 
 
      /* Change aspect ratio from source pixel to scaled pixel */
      f_aspect = f_aspect * f_scale_height / f_scale_width;
-     msg_Dbg( p_stream, "scaled pixel aspect is %f:1", f_aspect );
+     msg_Dbg( p_obj, "scaled pixel aspect is %f:1", f_aspect );
 
      /* f_scale_width and f_scale_height are now final */
      /* Calculate width, height from scaling
       * Make sure its multiple of 2
       */
      /* width/height of output stream */
-     int i_dst_visible_width =  lroundf(f_scale_width*i_src_visible_width);
-     int i_dst_visible_height = lroundf(f_scale_height*i_src_visible_height);
-     int i_dst_width =  lroundf(f_scale_width*p_vid_out->i_width);
-     int i_dst_height = lroundf(f_scale_height*p_vid_out->i_height);
+     unsigned i_dst_visible_width =  lroundf(f_scale_width*i_src_width);
+     unsigned i_dst_visible_height = lroundf(f_scale_height*i_src_height);
+     unsigned i_dst_width =  lroundf(f_scale_width*p_src->i_width);
+     unsigned i_dst_height = lroundf(f_scale_height*p_src->i_height);
 
      if( i_dst_visible_width & 1 ) ++i_dst_visible_width;
      if( i_dst_visible_height & 1 ) ++i_dst_visible_height;
@@ -538,20 +525,14 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
      if( i_dst_height & 1 ) ++i_dst_height;
 
      /* Store calculated values */
-     id->p_encoder->fmt_out.video.i_width = i_dst_width;
-     id->p_encoder->fmt_out.video.i_visible_width = i_dst_visible_width;
-     id->p_encoder->fmt_out.video.i_height = i_dst_height;
-     id->p_encoder->fmt_out.video.i_visible_height = i_dst_visible_height;
+     p_dst->i_width = i_dst_width;
+     p_dst->i_visible_width = i_dst_visible_width;
+     p_dst->i_height = i_dst_height;
+     p_dst->i_visible_height = i_dst_visible_height;
 
-     id->p_encoder->fmt_in.video.i_width = i_dst_width;
-     id->p_encoder->fmt_in.video.i_visible_width = i_dst_visible_width;
-     id->p_encoder->fmt_in.video.i_height = i_dst_height;
-     id->p_encoder->fmt_in.video.i_visible_height = i_dst_visible_height;
-
-     msg_Dbg( p_stream, "source %ix%i, destination %ix%i",
-         i_src_visible_width, i_src_visible_height,
-         i_dst_visible_width, i_dst_visible_height
-     );
+     msg_Dbg( p_obj, "source %ux%u, destination %ux%u",
+                     i_src_width, i_src_height,
+                     i_dst_visible_width, i_dst_visible_height );
 }
 
 static void transcode_video_sar_apply( const video_format_t *p_src,
@@ -578,6 +559,7 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
                                           sout_stream_id_sys_t *id,
                                           picture_t *p_pic )
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     const video_format_t *p_vid_out = video_output_format( id, p_pic );
     const video_format_t *p_dec_in = &id->p_decoder->fmt_in.video;
     const video_format_t *p_dec_out = &id->p_decoder->fmt_out.video;
@@ -593,7 +575,15 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
              p_dec_out->i_frame_rate, p_dec_out->i_frame_rate_base,
              p_enc_in->i_frame_rate, p_enc_in->i_frame_rate_base );
 
-    transcode_video_size_init( p_stream, id, p_vid_out );
+    transcode_video_size_apply( VLC_OBJECT(p_stream), p_vid_out,
+                                p_sys->f_scale,
+                                p_sys->i_maxwidth,
+                                p_sys->i_maxheight,
+                                p_enc_out );
+    p_enc_in->i_width = p_enc_out->i_width;
+    p_enc_in->i_visible_width = p_enc_out->i_visible_width;
+    p_enc_in->i_height = p_enc_out->i_height;
+    p_enc_in->i_visible_height = p_enc_out->i_visible_height;
 
     transcode_video_sar_apply( p_vid_out, p_enc_out );
     p_enc_in->i_sar_num = p_enc_out->i_sar_num;
