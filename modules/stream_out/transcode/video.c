@@ -599,27 +599,27 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
                                           picture_t *p_pic )
 {
     const video_format_t *p_vid_out = video_output_format( id, p_pic );
+    const video_format_t *p_dec_in = &id->p_decoder->fmt_in.video;
+    const video_format_t *p_dec_out = &id->p_decoder->fmt_out.video;
+    video_format_t *p_enc_in = &id->p_encoder->fmt_in.video;
+    video_format_t *p_enc_out = &id->p_encoder->fmt_out.video;
 
-    id->p_encoder->fmt_in.video.orientation =
-        id->p_encoder->fmt_out.video.orientation =
-        id->p_decoder->fmt_in.video.orientation;
+    p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
 
     transcode_video_framerate_init( p_stream, id, p_vid_out );
 
     transcode_video_size_init( p_stream, id, p_vid_out );
 
-    transcode_video_sar_apply( p_vid_out, &id->p_encoder->fmt_out.video );
-    id->p_encoder->fmt_in.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_num;
-    id->p_encoder->fmt_in.video.i_sar_den = id->p_encoder->fmt_out.video.i_sar_den;
+    transcode_video_sar_apply( p_vid_out, p_enc_out );
+    p_enc_in->i_sar_num = p_enc_out->i_sar_num;
+    p_enc_in->i_sar_den = p_enc_out->i_sar_den;
     msg_Dbg( p_stream, "encoder aspect is %u:%u",
-             id->p_encoder->fmt_out.video.i_sar_num *
-             id->p_encoder->fmt_out.video.i_width,
-             id->p_encoder->fmt_out.video.i_sar_den *
-             id->p_encoder->fmt_out.video.i_height );
+             p_enc_out->i_sar_num * p_enc_out->i_width,
+             p_enc_out->i_sar_den * p_enc_out->i_height );
 
     msg_Dbg( p_stream, "source chroma: %4.4s, destination %4.4s",
-             (const char *)&id->p_decoder->fmt_out.video.i_chroma,
-             (const char *)&id->p_encoder->fmt_in.video.i_chroma);
+             (const char *)&p_dec_out->i_chroma,
+             (const char *)&p_enc_in->i_chroma);
 }
 
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
