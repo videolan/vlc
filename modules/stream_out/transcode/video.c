@@ -314,21 +314,16 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
                                          sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    const es_format_t *p_src = &id->p_decoder->fmt_out;
+    es_format_t *p_dst = &id->p_encoder->fmt_in;
+
+    /* Build chain */
     filter_owner_t owner = {
         .video = &transcode_filter_video_cbs,
         .sys = p_sys,
     };
-    const es_format_t *p_fmt_out = &id->p_decoder->fmt_out;
-
-    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
     id->p_f_chain = filter_chain_NewVideo( p_stream, false, &owner );
-    filter_chain_Reset( id->p_f_chain, p_fmt_out, p_fmt_out );
-
-    /* Check that we have visible_width/height*/
-    if( !id->p_decoder->fmt_out.video.i_visible_height )
-        id->p_decoder->fmt_out.video.i_visible_height = id->p_decoder->fmt_out.video.i_height;
-    if( !id->p_decoder->fmt_out.video.i_visible_width )
-        id->p_decoder->fmt_out.video.i_visible_width = id->p_decoder->fmt_out.video.i_width;
+    filter_chain_Reset( id->p_f_chain, p_src, p_src );
 
     /* Deinterlace */
     if( p_sys->psz_deinterlace != NULL )
@@ -336,56 +331,45 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         filter_chain_AppendFilter( id->p_f_chain,
                                    p_sys->psz_deinterlace,
                                    p_sys->p_deinterlace_cfg,
-                                   &id->p_decoder->fmt_out,
-                                   &id->p_decoder->fmt_out );
-
-        p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
+                                   p_src, p_src );
+        p_src = filter_chain_GetFmtOut( id->p_f_chain );
     }
+
     if( p_sys->b_master_sync )
     {
-        filter_chain_AppendFilter( id->p_f_chain,
-                                   "fps",
-                                   NULL,
-                                   p_fmt_out,
-                                   &id->p_encoder->fmt_in );
-
-        p_fmt_out = filter_chain_GetFmtOut( id->p_f_chain );
+        filter_chain_AppendFilter( id->p_f_chain, "fps", NULL, p_src, p_dst );
+        p_src = filter_chain_GetFmtOut( id->p_f_chain );
     }
 
     if( p_sys->psz_vf2 )
     {
         id->p_uf_chain = filter_chain_NewVideo( p_stream, true, &owner );
-        filter_chain_Reset( id->p_uf_chain, p_fmt_out,
-                            &id->p_encoder->fmt_in );
-        if( p_fmt_out->video.i_chroma != id->p_encoder->fmt_in.video.i_chroma )
+        filter_chain_Reset( id->p_uf_chain, p_src, p_dst );
+        if( p_src->video.i_chroma != p_dst->video.i_chroma )
         {
-            filter_chain_AppendConverter( id->p_uf_chain, p_fmt_out,
-                                           &id->p_encoder->fmt_in );
+            filter_chain_AppendConverter( id->p_uf_chain, p_src, p_dst );
         }
         filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_vf2 );
-        p_fmt_out = filter_chain_GetFmtOut( id->p_uf_chain );
-        es_format_Copy( &id->p_encoder->fmt_in, p_fmt_out );
-        id->p_encoder->fmt_out.video.i_width =
-            id->p_encoder->fmt_in.video.i_width;
-        id->p_encoder->fmt_out.video.i_height =
-            id->p_encoder->fmt_in.video.i_height;
-        id->p_encoder->fmt_out.video.i_sar_num =
-            id->p_encoder->fmt_in.video.i_sar_num;
-        id->p_encoder->fmt_out.video.i_sar_den =
-            id->p_encoder->fmt_in.video.i_sar_den;
+        p_src = filter_chain_GetFmtOut( id->p_uf_chain );
+        es_format_Clean( p_dst );
+        es_format_Copy( p_dst, p_src );
+        id->p_encoder->fmt_out.video.i_width = p_dst->video.i_width;
+        id->p_encoder->fmt_out.video.i_height = p_dst->video.i_height;
+        id->p_encoder->fmt_out.video.i_sar_num = p_dst->video.i_sar_num;
+        id->p_encoder->fmt_out.video.i_sar_den = p_dst->video.i_sar_den;
     }
 
-    if( p_fmt_out )
+    if( p_src )
     {
-        p_sys->i_spu_width = p_fmt_out->video.i_visible_width;
-        p_sys->i_spu_height = p_fmt_out->video.i_visible_height;
+        p_sys->i_spu_width = p_src->video.i_visible_width;
+        p_sys->i_spu_height = p_src->video.i_visible_height;
     }
 
     /* Keep colorspace etc info along */
-    id->p_encoder->fmt_in.video.space     = id->p_decoder->fmt_out.video.space;
-    id->p_encoder->fmt_in.video.transfer  = id->p_decoder->fmt_out.video.transfer;
-    id->p_encoder->fmt_in.video.primaries = id->p_decoder->fmt_out.video.primaries;
-    id->p_encoder->fmt_in.video.b_color_range_full = id->p_decoder->fmt_out.video.b_color_range_full;
+    p_dst->video.space     = p_src->video.space;
+    p_dst->video.transfer  = p_src->video.transfer;
+    p_dst->video.primaries = p_src->video.primaries;
+    p_dst->video.b_color_range_full = p_src->video.b_color_range_full;
 }
 
 /* Take care of the scaling and chroma conversions. */
@@ -567,6 +551,7 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
     video_format_t *p_enc_out = &id->p_encoder->fmt_out.video;
 
     p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
+    p_enc_in->i_chroma = id->p_encoder->fmt_in.i_codec;
 
     transcode_video_framerate_apply( p_vid_out, p_enc_out );
     p_enc_in->i_frame_rate = p_enc_out->i_frame_rate;
