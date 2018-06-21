@@ -407,45 +407,25 @@ static int conversion_video_filter_append( sout_stream_id_sys_t *id,
     return VLC_SUCCESS;
 }
 
-static void transcode_video_framerate_init( sout_stream_t *p_stream,
-                                            sout_stream_id_sys_t *id,
-                                            const video_format_t *p_vid_out )
+static void transcode_video_framerate_apply( const video_format_t *p_src,
+                                             video_format_t *p_dst )
 {
     /* Handle frame rate conversion */
-    if( !id->p_encoder->fmt_out.video.i_frame_rate ||
-        !id->p_encoder->fmt_out.video.i_frame_rate_base )
+    if( !p_dst->i_frame_rate || !p_dst->i_frame_rate_base )
     {
-        if( p_vid_out->i_frame_rate &&
-            p_vid_out->i_frame_rate_base )
-        {
-            id->p_encoder->fmt_out.video.i_frame_rate =
-                p_vid_out->i_frame_rate;
-            id->p_encoder->fmt_out.video.i_frame_rate_base =
-                p_vid_out->i_frame_rate_base;
-        }
-        else
+        p_dst->i_frame_rate = p_src->i_frame_rate;
+        p_dst->i_frame_rate_base = p_src->i_frame_rate_base;
+
+        if( !p_dst->i_frame_rate || !p_dst->i_frame_rate_base )
         {
             /* Pick a sensible default value */
-            id->p_encoder->fmt_out.video.i_frame_rate = ENC_FRAMERATE;
-            id->p_encoder->fmt_out.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
+            p_dst->i_frame_rate = ENC_FRAMERATE;
+            p_dst->i_frame_rate_base = ENC_FRAMERATE_BASE;
         }
     }
 
-    id->p_encoder->fmt_in.video.i_frame_rate =
-        id->p_encoder->fmt_out.video.i_frame_rate;
-    id->p_encoder->fmt_in.video.i_frame_rate_base =
-        id->p_encoder->fmt_out.video.i_frame_rate_base;
-
-    vlc_ureduce( &id->p_encoder->fmt_in.video.i_frame_rate,
-        &id->p_encoder->fmt_in.video.i_frame_rate_base,
-        id->p_encoder->fmt_in.video.i_frame_rate,
-        id->p_encoder->fmt_in.video.i_frame_rate_base,
-        0 );
-     msg_Dbg( p_stream, "source fps %u/%u, destination %u/%u",
-        id->p_decoder->fmt_out.video.i_frame_rate,
-        id->p_decoder->fmt_out.video.i_frame_rate_base,
-        id->p_encoder->fmt_in.video.i_frame_rate,
-        id->p_encoder->fmt_in.video.i_frame_rate_base );
+    vlc_ureduce( &p_dst->i_frame_rate, &p_dst->i_frame_rate_base,
+                  p_dst->i_frame_rate,  p_dst->i_frame_rate_base, 0 );
 }
 
 static void transcode_video_size_init( sout_stream_t *p_stream,
@@ -606,7 +586,12 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
 
     p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
 
-    transcode_video_framerate_init( p_stream, id, p_vid_out );
+    transcode_video_framerate_apply( p_vid_out, p_enc_out );
+    p_enc_in->i_frame_rate = p_enc_out->i_frame_rate;
+    p_enc_in->i_frame_rate_base = p_enc_out->i_frame_rate_base;
+    msg_Dbg( p_stream, "source fps %u/%u, destination %u/%u",
+             p_dec_out->i_frame_rate, p_dec_out->i_frame_rate_base,
+             p_enc_in->i_frame_rate, p_enc_in->i_frame_rate_base );
 
     transcode_video_size_init( p_stream, id, p_vid_out );
 
