@@ -99,11 +99,11 @@ Extension
 ---------
 deactivate(): Deactivate current extension (after the end of the current function).
 
-HTTPd
------
-http( host, port, [cert, key, ca, crl]): create a new HTTP (SSL) daemon.
+HTTPd (only usable for interfaces)
+----------------------------------
+httpd(): create a new HTTP daemon.
 
-local h = vlc.httpd( "localhost", 8080 )
+local h = vlc.httpd()
 h:handler( url, user, password, callback, data ) -- add a handler for given url. If user and password are non nil, they will be used to authenticate connecting clients. callback will be called to handle connections. The callback function takes 7 arguments: data, url, request, type, in, addr, host. It returns the reply as a string.
 h:file( url, mime, user, password, callback, data ) -- add a file for given url with given mime type. If user and password are non nil, they will be used to authenticate connecting clients. callback will be called to handle connections. The callback function takes 2 arguments: data and request. It returns the reply as a string.
 h:redirect( url_dst, url_src ): Redirect all connections from url_src to url_dst.
