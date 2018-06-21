@@ -27,13 +27,19 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <vlc_common.h>
+#include <vlc_meta.h>
+#include <vlc_spu.h>
+#include <vlc_modules.h>
+#include <vlc_sout.h>
 
 #include "transcode.h"
 
 #include <math.h>
-#include <vlc_meta.h>
-#include <vlc_spu.h>
-#include <vlc_modules.h>
 
 #define ENC_FRAMERATE (25 * 1000)
 #define ENC_FRAMERATE_BASE 1000

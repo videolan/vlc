@@ -1,15 +1,6 @@
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <vlc_common.h>
-
-#include <vlc_sout.h>
-#include <vlc_filter.h>
-#include <vlc_es.h>
-#include <vlc_codec.h>
-
 #include <vlc_picture_fifo.h>
+#include <vlc_filter.h>
+#include <vlc_codec.h>
 
 /*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT 100000

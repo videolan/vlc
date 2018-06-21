@@ -27,12 +27,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "transcode.h"
-
+#include <vlc_common.h>
 #include <vlc_meta.h>
 #include <vlc_spu.h>
 #include <vlc_modules.h>
+#include <vlc_sout.h>
+
+#include "transcode.h"
+
 #include <assert.h>
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec,

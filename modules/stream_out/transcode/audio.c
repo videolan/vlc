@@ -27,13 +27,18 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-#include "transcode.h"
-
+#include <vlc_common.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
 #include <vlc_meta.h>
 #include <vlc_modules.h>
+#include <vlc_sout.h>
+
+#include "transcode.h"
 
 static const int pi_channels_maps[9] =
 {
