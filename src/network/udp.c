@@ -87,9 +87,6 @@
 # define UDPLITE_RECV_CSCOV     11
 #endif
 
-extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
-                       int i_protocol );
-
 /* */
 static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
                                  const struct addrinfo *ptr)

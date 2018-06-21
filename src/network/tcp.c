@@ -57,8 +57,6 @@ static int SocksHandshakeTCP( vlc_object_t *,
                               int fd, int i_socks_version,
                               const char *psz_user, const char *psz_passwd,
                               const char *psz_host, int i_port );
-extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
-                       int i_protocol );
 
 #undef net_Connect
 /*****************************************************************************
