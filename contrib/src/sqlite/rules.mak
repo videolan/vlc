@@ -1,21 +1,22 @@
 # sqlite
 
-SQLITE_VERSION := 3.6.20
-SQLITE_URL := http://www.sqlite.org/sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
+SQLITE_VERSION := 3240000
+SQLITE_URL := https://www.sqlite.org/2018/sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
-# PKGS += sqlite
+PKGS += sqlite
 
 ifeq ($(call need_pkg,"sqlite3"),)
 PKGS_FOUND += sqlite
 endif
 
-$(TARBALLS)/sqlite-$(SQLITE_VERSION).tar.gz:
+$(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 	$(call download_pkg,$(SQLITE_URL),sqlite)
 
-.sum-sqlite: sqlite-$(SQLITE_VERSION).tar.gz
+.sum-sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz
 
-sqlite: sqlite-$(SQLITE_VERSION).tar.gz .sum-sqlite
+sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(UNPACK)
+	$(call pkg_static, "sqlite3.pc.in")
 	$(MOVE)
 
 .sqlite: sqlite
