@@ -2,6 +2,7 @@
 ${LangFileString} Name_Section01 "মিডিয় প্লেয়ার (প্রয়োজনীয়)"
 ${LangFileString} Name_Section02a "স্টার্ট মেনু শর্টকাট"
 ${LangFileString} Name_Section02b "ডেস্কটপ শর্টকাট"
+${LangFileString} Name_Section34 "ওয়েব প্লাগইন"
 ${LangFileString} Name_Section03 "মজিলা প্লাগিন"
 ${LangFileString} Name_Section04 "ActiveX প্লাগিন"
 ${LangFileString} Name_Section05 "ডিস্ক প্লেব্যাক"
@@ -51,4 +52,4 @@ ${LangFileString} Name_InstTypeFull "পূর্ণ"
 
 ${LangFileString} Action_OnArrivalDVD "ডিভিডি মুভ্যি চালান"
 ${LangFileString} Action_OnArrivalAudioCD "অডিও সিডি চালান"
-
+  
