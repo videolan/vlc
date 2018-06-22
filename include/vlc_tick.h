@@ -143,6 +143,25 @@ static inline double secf_from_vlc_tick(vlc_tick_t vtk)
 #endif /* CLOCK_FREQ / 1000000000 */
 
 
+/*
+ * msftime_t is a time with 100ns resolutions, typically used by Microsoft
+ */
+typedef int64_t msftime_t;
+
+#define MSFTIME_FROM_SEC(sec)       (INT64_C(10000000) * (sec))  /* seconds in msftime_t */
+
+#if (CLOCK_FREQ % 10000000) == 0
+#define VLC_TICK_FROM_MSFTIME(msft) ((msft) * (CLOCK_FREQ / INT64_C(10000000))
+#define MSFTIME_FROM_VLC_TICK(vtk)  ((vtk)  / (CLOCK_FREQ / INT64_C(10000000))
+#elif (10000000 % CLOCK_FREQ) == 0
+#define VLC_TICK_FROM_MSFTIME(msft) ((msft) / (INT64_C(10000000) / CLOCK_FREQ))
+#define MSFTIME_FROM_VLC_TICK(vtk)  ((vtk)  * (INT64_C(10000000) / CLOCK_FREQ))
+#else /* rounded overflowing conversion */
+#define VLC_TICK_FROM_MSFTIME(msft) (CLOCK_FREQ * (msft) / INT64_C(10000000))
+#define MSFTIME_FROM_VLC_TICK(vtk)  ((vtk)  * INT64_C(10000000) / CLOCK_FREQ)
+#endif /* CLOCK_FREQ / 10000000 */
+
+
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *****************************************************************************
