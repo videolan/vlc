@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Ficheiros de vídeo"
 ${LangFileString} Name_SectionGroupOther "Outros"
 ${LangFileString} Name_Section07 "Menús contextuais"
 ${LangFileString} Name_Section08 "Eliminar as preferencias e a caché"
-${LangFileString} Desc_Section01 "O propio reprodutor multimedia"
-${LangFileString} Desc_Section02a "Engade iconas no seu menú de inicio para un acceso máis fácil"
-${LangFileString} Desc_Section02b "Engade unha icona no seu escritorio para un acceso máis fácil"
-${LangFileString} Desc_Section03 "O plugin de VLC para Mozilla e Mozilla Firefox"
-${LangFileString} Desc_Section04 "O plugin de VLC para ActiveX"
-${LangFileString} Desc_Section05 "O rexistro de reprodución de CD e DVD"
-${LangFileString} Desc_Section06 "Define o reprodutor multimedia VLC como o aplicativo predeterminado para o tipo de ficheiro especificado"
-${LangFileString} Desc_Section07 "Engadir entradas de menú contextual («Reproducir co VLC» e «Engadir á lista de reprodución do VLC»)"
-${LangFileString} Desc_Section08 "Elimina as preferencias e a caché do reprodutor multimedia VLC que pertenzan a versións previas"
+
+${LangFileString} Desc_Section01 \
+    "O propio reprodutor multimedia"
+${LangFileString} Desc_Section02a \
+    "Engade iconas no seu menú de inicio para un acceso máis fácil"
+${LangFileString} Desc_Section02b \
+    "Engade unha icona no seu escritorio para un acceso máis fácil"
+${LangFileString} Desc_Section03 \
+    "O plugin de VLC para Mozilla e Mozilla Firefox"
+${LangFileString} Desc_Section04 \
+    "O plugin de VLC para ActiveX"
+${LangFileString} Desc_Section05 \
+    "O rexistro de reprodución de CD e DVD"
+${LangFileString} Desc_Section06 \
+    "Define o reprodutor multimedia VLC como o aplicativo predeterminado para o tipo de ficheiro especificado"
+${LangFileString} Desc_Section07 \
+    "Engadir entradas de menú contextual («Reproducir co VLC» e «Engadir á lista de reprodución do VLC»)"
+${LangFileString} Desc_Section08 \
+    "Elimina as preferencias e a caché do reprodutor multimedia VLC que pertenzan a versións previas"
+
 ${LangFileString} Name_Section91 "Desinstalar"
 ${LangFileString} Name_Section92 "Eliminar as preferencias e a caché"
-${LangFileString} Desc_Section91 "Desinstalar o reprodutor multimedia VLC e todos os seus compoñentes"
-${LangFileString} Desc_Section92 "Elimina as preferencias do reprodutor multimedia VLC e os ficheiros da caché"
+
+${LangFileString} Desc_Section91 \
+"Desinstalar o reprodutor multimedia VLC e todos os seus compoñentes"
+${LangFileString} Desc_Section92 \
+"Elimina as preferencias do reprodutor multimedia VLC e os ficheiros da caché"
+
 ${LangFileString} ShellAssociation_Play "Reproducir"
 ${LangFileString} ContextMenuEntry_PlayWith "Reproducir co VLC media player"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Engadir á lista de reprodución do VLC media player"
+
 ${LangFileString} Link_VisitWebsite "Visitar a web do reprodutor multimedia VideoLAN VLC"
+
 ${LangFileString} Name_InstTypeRecommended "Recomendada"
 ${LangFileString} Name_InstTypeMinimum "Mínima"
 ${LangFileString} Name_InstTypeFull "Completa"
+
 ${LangFileString} Action_OnArrivalDVD "Reproducir filmes en DVD"
 ${LangFileString} Action_OnArrivalAudioCD "Reproducir os CD de audio"
 ${LangFileString} Action_OnArrivalVCDMovie "Reproducir filmes en VCD"
@@ -39,11 +57,15 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Reproducir filmes en SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Reproducir os ficheiros de vídeo"
 ${LangFileString} Action_OnArrivalMusicFiles "Reproducir os ficheiros de audio"
 ${LangFileString} Action_OnArrivalDVDAudio "Reproducir os DVD de audio"
+${LangFileString} Action_OnArrivalBluray "Reproducir Blu-ray"
+
 ${LangFileString} License_NextText "Agora xa está informado dos seus dereitos. Prema en «Seguinte» para continuar."
+
 ${LangFileString} Detail_CheckProcesses "Verificando os procesos..."
 ${LangFileString} MessageBox_VLCRunning "Semella que o VLC está a ser executado e será pechado agora."
 ${LangFileString} MessageBox_VLCUnableToClose "Este instalador non foi quen de pechar o VLC. Fágao manualmente."
 ${LangFileString} MessageBox_InstallAborted "A instalación foi cancelada!"
+
 ${LangFileString} Reinstall_Headline "Xa está instalado"
 ${LangFileString} Reinstall_HeadlineInstall "Escolla como quere instalar o VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Seleccione a opción de mantemento que quere realizar."
