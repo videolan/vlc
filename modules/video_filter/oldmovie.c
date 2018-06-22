@@ -89,7 +89,7 @@ typedef struct {
     int32_t  i_offset;
     int32_t  i_width;
     uint16_t i_intensity;
-    mtime_t  i_stop_trigger;
+    vlc_tick_t  i_stop_trigger;
 } scratch_t;
 
 typedef struct {
@@ -99,14 +99,14 @@ typedef struct {
     int32_t  i_length;
     int32_t  i_curve;
     uint16_t i_intensity;
-    mtime_t  i_stop_trigger;
+    vlc_tick_t  i_stop_trigger;
 } hair_t;
 
 typedef struct {
     int32_t  i_x, i_y;
     int32_t  i_width;
     uint16_t i_intensity;
-    mtime_t  i_stop_trigger;
+    vlc_tick_t  i_stop_trigger;
 } dust_t;
 
 struct filter_sys_t {
@@ -117,31 +117,31 @@ struct filter_sys_t {
     int32_t *i_height;
     int32_t *i_width;
     int32_t *i_visible_pitch;
-    mtime_t i_start_time;
-    mtime_t i_last_time;
-    mtime_t i_cur_time;
+    vlc_tick_t i_start_time;
+    vlc_tick_t i_last_time;
+    vlc_tick_t i_cur_time;
 
     /* sliding & offset effect */
-    mtime_t  i_offset_trigger;
-    mtime_t  i_sliding_trigger;
-    mtime_t  i_sliding_stop_trig;
+    vlc_tick_t  i_offset_trigger;
+    vlc_tick_t  i_sliding_trigger;
+    vlc_tick_t  i_sliding_stop_trig;
     int32_t  i_offset_ofs;
     int32_t  i_sliding_ofs;
     int32_t  i_sliding_speed;
 
     /* scratch on film */
-    mtime_t    i_scratch_trigger;
+    vlc_tick_t i_scratch_trigger;
     scratch_t *p_scratch[MAX_SCRATCH];
 
     /* hair on lens */
-    mtime_t    i_hair_trigger;
+    vlc_tick_t i_hair_trigger;
     hair_t    *p_hair[MAX_HAIR];
 
     /* blotch on film */
-    mtime_t    i_blotch_trigger;
+    vlc_tick_t i_blotch_trigger;
 
     /* dust on lens */
-    mtime_t    i_dust_trigger;
+    vlc_tick_t i_dust_trigger;
     dust_t    *p_dust[MAX_DUST];
 };
 

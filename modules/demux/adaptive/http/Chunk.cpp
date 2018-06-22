@@ -419,8 +419,8 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     struct
     {
         size_t size;
-        mtime_t time;
-        mtime_t latency;
+        vlc_tick_t time;
+        vlc_tick_t latency;
     } rate = {0,0,0};
 
     ssize_t ret = connection->read(p_block->p_buffer, readsize);

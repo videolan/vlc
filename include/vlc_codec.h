@@ -169,7 +169,7 @@ struct decoder_t
 
     /* Display date
      * XXX use decoder_GetDisplayDate */
-    mtime_t         (*pf_get_display_date)( decoder_t *, mtime_t );
+    vlc_tick_t      (*pf_get_display_date)( decoder_t *, vlc_tick_t );
 
     /* Display rate
      * XXX use decoder_GetDisplayRate */
@@ -409,7 +409,7 @@ VLC_API int decoder_GetInputAttachments( decoder_t *, input_attachment_t ***ppp_
  * to mdate().
  * You MUST use it *only* for gathering statistics about speed.
  */
-VLC_API mtime_t decoder_GetDisplayDate( decoder_t *, mtime_t ) VLC_USED;
+VLC_API vlc_tick_t decoder_GetDisplayDate( decoder_t *, vlc_tick_t ) VLC_USED;
 
 /**
  * This function returns the current input rate.

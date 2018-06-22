@@ -280,19 +280,19 @@ struct encoder_sys_t
     uint64_t         async_depth;         // Number of parallel encoding operations.
     uint64_t         first_task;          // The next sync point to be synchronized.
     async_task_t     *tasks;              // The async encoding tasks.
-    mtime_t          offset_pts;          // The pts of the first frame, to avoid conversion overflow.
-    mtime_t          last_dts;            // The dts of the last frame, to interpolate over buggy dts
+    vlc_tick_t       offset_pts;          // The pts of the first frame, to avoid conversion overflow.
+    vlc_tick_t       last_dts;            // The dts of the last frame, to interpolate over buggy dts
 };
 
 static block_t *Encode(encoder_t *, picture_t *);
 
 
-static inline mtime_t qsv_timestamp_to_mtime(int64_t mfx_ts)
+static inline vlc_tick_t qsv_timestamp_to_mtime(int64_t mfx_ts)
 {
     return mfx_ts / INT64_C(9) * INT64_C(100);
 }
 
-static inline uint64_t qsv_mtime_to_timestamp(mtime_t vlc_ts)
+static inline uint64_t qsv_mtime_to_timestamp(vlc_tick_t vlc_ts)
 {
     return vlc_ts / UINT64_C(100) * UINT64_C(9);
 }

@@ -87,19 +87,19 @@ struct decoder_sys_t
     bool  b_frame;
 
     /* Current frame being built */
-    mtime_t    i_frame_dts;
-    mtime_t    i_frame_pts;
+    vlc_tick_t i_frame_dts;
+    vlc_tick_t i_frame_pts;
     block_t    *p_frame;
     block_t    **pp_last;
 
 
-    mtime_t i_interpolated_dts;
+    vlc_tick_t i_interpolated_dts;
     bool    b_check_startcode;
 
     /* */
     uint32_t i_cc_flags;
-    mtime_t i_cc_pts;
-    mtime_t i_cc_dts;
+    vlc_tick_t i_cc_pts;
+    vlc_tick_t i_cc_dts;
     cc_data_t cc;
 
     cc_data_t cc_next;

@@ -235,7 +235,7 @@ static int Open (vlc_object_t *obj)
     if (!p_sys->rate)
         goto error;
 
-    mtime_t interval = (float)CLOCK_FREQ / p_sys->rate;
+    vlc_tick_t interval = (float)CLOCK_FREQ / p_sys->rate;
     if (!interval)
         goto error;
 

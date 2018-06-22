@@ -173,7 +173,7 @@ static int Decode(decoder_t *dec, block_t *block)
     }
 
     /* Associate packet PTS with decoded frame */
-    mtime_t *pkt_pts = malloc(sizeof(*pkt_pts));
+    vlc_tick_t *pkt_pts = malloc(sizeof(*pkt_pts));
     if (!pkt_pts) {
         block_Release(block);
         return VLCDEC_SUCCESS;
@@ -204,7 +204,7 @@ static int Decode(decoder_t *dec, block_t *block)
 
     /* fetches back the PTS */
     pkt_pts = img->user_priv;
-    mtime_t pts = *pkt_pts;
+    vlc_tick_t pts = *pkt_pts;
     free(pkt_pts);
 
     dec->fmt_out.i_codec = FindVlcChroma(img);

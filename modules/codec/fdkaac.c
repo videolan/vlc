@@ -134,7 +134,7 @@ static const char *const ppsz_enc_options[] = {
 struct encoder_sys_t
 {
     double d_compression_ratio;
-    mtime_t i_pts_last;
+    vlc_tick_t i_pts_last;
     int i_encoderdelay; /* Samples delay introduced by the profile */
     int i_frame_size;
     int i_maxoutputsize; /* Maximum buffer size for encoded output */
@@ -321,18 +321,18 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
 {
     int16_t *p_buffer;
     int i_samples;
-    mtime_t i_pts_out;
+    vlc_tick_t i_pts_out;
 
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     if (likely(p_aout_buf)) {
         p_buffer = (int16_t *)p_aout_buf->p_buffer;
         i_samples = p_aout_buf->i_nb_samples;
-        i_pts_out = p_aout_buf->i_pts - (mtime_t)((double)CLOCK_FREQ *
+        i_pts_out = p_aout_buf->i_pts - (vlc_tick_t)((double)CLOCK_FREQ *
                (double)p_sys->i_encoderdelay /
                (double)p_enc->fmt_out.audio.i_rate);
         if (p_sys->i_pts_last == 0)
-            p_sys->i_pts_last = i_pts_out - (mtime_t)((double)CLOCK_FREQ *
+            p_sys->i_pts_last = i_pts_out - (vlc_tick_t)((double)CLOCK_FREQ *
                (double)(p_sys->i_frame_size) /
                (double)p_enc->fmt_out.audio.i_rate);
     } else {
@@ -395,10 +395,10 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
             if (unlikely(i_samples == 0)) {
                 // I only have the numOutBytes so approximate based on compression factor
                 double d_samples_forward = p_sys->d_compression_ratio*(double)out_args.numOutBytes;
-                i_pts_out += (mtime_t)d_samples_forward;
-                p_block->i_length = (mtime_t)d_samples_forward;
+                i_pts_out += (vlc_tick_t)d_samples_forward;
+                p_block->i_length = (vlc_tick_t)d_samples_forward;
                 // TODO: It would be more precise (a few microseconds) to use d_samples_forward =
-                // (mtime_t)CLOCK_FREQ * (mtime_t)p_sys->i_frame_size/(mtime_t)p_enc->fmt_out.audio.i_rate
+                // (vlc_tick_t)CLOCK_FREQ * (vlc_tick_t)p_sys->i_frame_size/(vlc_tick_t)p_enc->fmt_out.audio.i_rate
                 // but I am not sure if the lib always outputs a full frame when
                 // emptying the internal buffer in the EOF scenario
             } else {
@@ -407,9 +407,9 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
                     // in the library buffer from the prior block
                     double d_samples_delay = (double)p_sys->i_frame_size - (double)out_args.numInSamples /
                                              (double)p_enc->fmt_in.audio.i_channels;
-                    i_pts_out -= (mtime_t)((double)CLOCK_FREQ * d_samples_delay /
+                    i_pts_out -= (vlc_tick_t)((double)CLOCK_FREQ * d_samples_delay /
                                            (double)p_enc->fmt_out.audio.i_rate);
-                    p_block->i_length = (mtime_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size /
+                    p_block->i_length = (vlc_tick_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size /
                         (double)p_enc->fmt_out.audio.i_rate);
                     p_block->i_nb_samples = d_samples_delay;
                     //p_block->i_length = i_pts_out - p_sys->i_pts_last;
@@ -417,8 +417,8 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
                     double d_samples_forward = (double)out_args.numInSamples/(double)p_enc->fmt_in.audio.i_channels;
                     double d_length = ((double)CLOCK_FREQ * d_samples_forward /
                                             (double)p_enc->fmt_out.audio.i_rate);
-                    i_pts_out += (mtime_t) d_length;
-                    p_block->i_length = (mtime_t) d_length;
+                    i_pts_out += (vlc_tick_t) d_length;
+                    p_block->i_length = (vlc_tick_t) d_length;
                     p_block->i_nb_samples = d_samples_forward;
                 }
             }

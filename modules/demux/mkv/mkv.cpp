@@ -88,7 +88,7 @@ struct demux_sys_t;
 
 static int  Demux  ( demux_t * );
 static int  Control( demux_t *, int, va_list );
-static int  Seek   ( demux_t *, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise = true );
+static int  Seek   ( demux_t *, vlc_tick_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise = true );
 
 /*****************************************************************************
  * Open: initializes matroska demux structures
@@ -448,7 +448,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /* Seek */
-static int Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
+static int Seek( demux_t *p_demux, vlc_tick_t i_mk_date, double f_percent, virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     virtual_segment_c  *p_vsegment = p_sys->p_current_vsegment;
@@ -489,7 +489,7 @@ static int Seek( demux_t *p_demux, mtime_t i_mk_date, double f_percent, virtual_
 /* Needed by matroska_segment::Seek() and Seek */
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   KaxBlockAdditions *additions,
-                  mtime_t i_pts, int64_t i_duration, bool b_key_picture,
+                  vlc_tick_t i_pts, int64_t i_duration, bool b_key_picture,
                   bool b_discardable_picture )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
@@ -602,7 +602,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             handle_real_audio(p_demux, &track, p_block, i_pts);
             block_Release(p_block);
             i_pts = ( track.i_default_duration )?
-                i_pts + ( mtime_t )track.i_default_duration:
+                i_pts + ( vlc_tick_t )track.i_default_duration:
                 VLC_TS_INVALID;
             continue;
          }
@@ -634,7 +634,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
          case VLC_CODEC_OPUS:
             {
-                mtime_t i_length = i_duration * track. f_timecodescale *
+                vlc_tick_t i_length = i_duration * track. f_timecodescale *
                         (double) p_segment->i_timescale / 1000.0;
                 if ( i_length < 0 ) i_length = 0;
                 p_block->i_nb_samples = i_length * track.fmt.audio.i_rate
@@ -696,7 +696,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 else if ( track.i_last_dts == VLC_TS_INVALID )
                     p_block->i_dts = i_pts;
                 else
-                    p_block->i_dts = std::min( i_pts, track.i_last_dts + ( mtime_t )track.i_default_duration );
+                    p_block->i_dts = std::min( i_pts, track.i_last_dts + ( vlc_tick_t )track.i_default_duration );
             }
         }
 
@@ -704,7 +704,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
 
         /* use time stamp only for first block */
         i_pts = ( track.i_default_duration )?
-                 i_pts + ( mtime_t )track.i_default_duration:
+                 i_pts + ( vlc_tick_t )track.i_default_duration:
                  ( track.fmt.b_packetized ) ? VLC_TS_INVALID : i_pts + 1;
     }
 }

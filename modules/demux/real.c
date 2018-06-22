@@ -102,12 +102,12 @@ typedef struct
     int         i_subpacket;
     int         i_subpackets;
     block_t     **p_subpackets;
-    mtime_t     *p_subpackets_timecode;
+    vlc_tick_t  *p_subpackets_timecode;
     int         i_out_subpacket;
 
     block_t     *p_sipr_packet;
     int         i_sipr_subpacket_count;
-    mtime_t     i_last_dts;
+    vlc_tick_t  i_last_dts;
 } real_track_t;
 
 typedef struct
@@ -153,11 +153,11 @@ static int Demux( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
 
-static void DemuxVideo( demux_t *, real_track_t *tk, mtime_t i_dts, unsigned i_flags );
-static void DemuxAudio( demux_t *, real_track_t *tk, mtime_t i_pts, unsigned i_flags );
+static void DemuxVideo( demux_t *, real_track_t *tk, vlc_tick_t i_dts, unsigned i_flags );
+static void DemuxAudio( demux_t *, real_track_t *tk, vlc_tick_t i_pts, unsigned i_flags );
 
 static int ControlSeekByte( demux_t *, int64_t i_bytes );
-static int ControlSeekTime( demux_t *, mtime_t i_time );
+static int ControlSeekTime( demux_t *, vlc_tick_t i_time );
 
 static int HeaderRead( demux_t *p_demux );
 static int CodecParse( demux_t *p_demux, int i_len, int i_num );
@@ -343,7 +343,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Update PCR */
-    mtime_t i_pcr = VLC_TS_INVALID;
+    vlc_tick_t i_pcr = VLC_TS_INVALID;
     for( int i = 0; i < p_sys->i_track; i++ )
     {
         tk = p_sys->track[i];
@@ -390,7 +390,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_POSITION:
             pf = va_arg( args, double * );
 
-            /* read stream size maybe failed in rtsp streaming, 
+            /* read stream size maybe failed in rtsp streaming,
                so use duration to determin the position at first  */
             if( p_sys->i_our_duration > 0 )
             {
@@ -457,7 +457,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
- 
+
             if( p_sys->i_our_duration <= 0 )
             {
                 *pi64 = 0;
@@ -495,7 +495,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /*****************************************************************************
  * Helpers: demux
  *****************************************************************************/
-static void CheckPcr( demux_t *p_demux, real_track_t *tk, mtime_t i_dts )
+static void CheckPcr( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_dts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -509,7 +509,7 @@ static void CheckPcr( demux_t *p_demux, real_track_t *tk, mtime_t i_dts )
     es_out_SetPCR( p_demux->out, p_sys->i_pcr );
 }
 
-static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsigned i_flags )
+static void DemuxVideo( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_dts, unsigned i_flags )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -629,7 +629,7 @@ static void DemuxVideo( demux_t *p_demux, real_track_t *tk, mtime_t i_dts, unsig
     }
 }
 
-static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts, unsigned int i_flags )
+static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_pts, unsigned int i_flags )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     uint8_t *p_buf = p_sys->buffer;
@@ -746,7 +746,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     }
 }
 
-static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
+static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_pts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -779,7 +779,7 @@ static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
         es_out_Send( p_demux->out, tk->p_es, p_block );
     }
 }
-static void DemuxAudioMethod3( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
+static void DemuxAudioMethod3( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_pts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -852,7 +852,7 @@ static void SiprPacketReorder(uint8_t *buf, int sub_packet_h, int framesize)
     }
 }
 
-static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
+static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_pts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block = tk->p_sipr_packet;
@@ -886,7 +886,7 @@ static void DemuxAudioSipr( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
     tk->p_sipr_packet = NULL;
 }
 
-static void DemuxAudio( demux_t *p_demux, real_track_t *tk, mtime_t i_pts, unsigned i_flags )
+static void DemuxAudio( demux_t *p_demux, real_track_t *tk, vlc_tick_t i_pts, unsigned i_flags )
 {
     switch( tk->fmt.i_codec )
     {
@@ -920,7 +920,7 @@ static int ControlGoToIndex( demux_t *p_demux, real_index_t *p_index )
         p_sys->track[i]->i_last_dts = 0;
     return vlc_stream_Seek( p_demux->s, p_index->i_file_offset );
 }
-static int ControlSeekTime( demux_t *p_demux, mtime_t i_time )
+static int ControlSeekTime( demux_t *p_demux, vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     real_index_t *p_index = p_sys->p_index;
@@ -1252,7 +1252,7 @@ static void HeaderINDX( demux_t *p_demux )
         }
 
         real_index_t *p_idx = &p_sys->p_index[i];
-        
+
         p_idx->i_time_offset = GetDWBE( &p_entry[2] );
         p_idx->i_file_offset = GetDWBE( &p_entry[6] );
         p_idx->i_frame_index = GetDWBE( &p_entry[10] );

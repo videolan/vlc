@@ -34,7 +34,7 @@ class Timescale
     public:
         Timescale(uint64_t v = 0) : scale(v) {}
 
-        mtime_t ToTime(stime_t t) const
+        vlc_tick_t ToTime(stime_t t) const
         {
             if( !scale ) return 0;
             stime_t v = t / scale;
@@ -42,10 +42,10 @@ class Timescale
             return v * 1000000 + r * 1000000 / scale;
         }
 
-        stime_t ToScaled(mtime_t t) const
+        stime_t ToScaled(vlc_tick_t t) const
         {
-            mtime_t v = t / 1000000;
-            mtime_t r = t % 1000000;
+            vlc_tick_t v = t / 1000000;
+            vlc_tick_t r = t % 1000000;
             return v * scale + r * scale / 1000000;
         }
 
@@ -65,13 +65,13 @@ class SegmentTimes
             media = VLC_TS_INVALID;
             display = VLC_TS_INVALID;
         }
-        SegmentTimes(mtime_t a, mtime_t b, mtime_t c = VLC_TS_INVALID)
+        SegmentTimes(vlc_tick_t a, vlc_tick_t b, vlc_tick_t c = VLC_TS_INVALID)
         {
             demux = a;
             media = b;
             display = c;
         }
-        void offsetBy(mtime_t v)
+        void offsetBy(vlc_tick_t v)
         {
             if(v == 0)
                 return;
@@ -82,9 +82,9 @@ class SegmentTimes
             if(display != VLC_TS_INVALID)
                 display += v;
         }
-        mtime_t demux;
-        mtime_t media;
-        mtime_t display;
+        vlc_tick_t demux;
+        vlc_tick_t media;
+        vlc_tick_t display;
 };
 
 class Times
@@ -94,18 +94,18 @@ class Times
         {
             continuous = VLC_TS_INVALID;
         }
-        Times(const SegmentTimes &s, mtime_t a)
+        Times(const SegmentTimes &s, vlc_tick_t a)
         {
             segment = s;
             continuous = a;
         }
-        void offsetBy(mtime_t v)
+        void offsetBy(vlc_tick_t v)
         {
             if(continuous != VLC_TS_INVALID)
                 continuous += v;
             segment.offsetBy(v);
         }
-        mtime_t continuous;
+        vlc_tick_t continuous;
         SegmentTimes segment;
 };
 
@@ -121,7 +121,7 @@ class SynchronizationReferences
                 if(r.first == seq)
                 {
                     /* update reference when the timestamps are really old to prevent false roll */
-                    constexpr mtime_t quarterroll = (INT64_C(0x1FFFFFFFF) * 100 / 9) >> 2;
+                    constexpr vlc_tick_t quarterroll = (INT64_C(0x1FFFFFFFF) * 100 / 9) >> 2;
                     if(t.continuous - r.second.continuous > quarterroll)
                         r.second = t;
                     return;

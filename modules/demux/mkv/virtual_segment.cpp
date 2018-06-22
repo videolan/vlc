@@ -227,7 +227,7 @@ virtual_edition_c::~virtual_edition_c()
 
 void virtual_edition_c::retimeSubChapters( virtual_chapter_c * p_vchap )
 {
-    mtime_t i_mk_stop_time = p_vchap->i_mk_virtual_stop_time;
+    vlc_tick_t i_mk_stop_time = p_vchap->i_mk_virtual_stop_time;
     for( size_t i = p_vchap->sub_vchapters.size(); i-- > 0; )
     {
         virtual_chapter_c * p_vsubchap = p_vchap->sub_vchapters[i];
@@ -516,7 +516,7 @@ bool virtual_chapter_c::EnterAndLeave( virtual_chapter_c *p_leaving_vchapter, bo
     return p_chapter->EnterAndLeave( p_leaving_vchapter->p_chapter, b_enter );
 }
 
-bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
+bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
                               virtual_chapter_c *p_vchapter, bool b_precise )
 {
     demux_sys_t *p_sys = demuxer.p_sys;
@@ -529,7 +529,7 @@ bool virtual_segment_c::Seek( demux_t & demuxer, mtime_t i_mk_date,
 
     if ( p_vchapter != NULL )
     {
-        mtime_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
+        vlc_tick_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
         if (CurrentEdition()->b_ordered)
             p_sys->i_mk_chapter_time = p_vchapter->i_mk_virtual_start_time - p_vchapter->segment.i_mk_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 ) /* + VLC_TS_0 */;
         if ( p_vchapter->p_chapter && p_vchapter->i_seekpoint_num > 0 )

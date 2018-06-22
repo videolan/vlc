@@ -60,8 +60,8 @@ struct decoder_sys_t
             block_t *p_chain;
             block_t **pp_chain_last;
         } pre, frame, post;
-        mtime_t dts;
-        mtime_t pts;
+        vlc_tick_t dts;
+        vlc_tick_t pts;
     } tu;
     uint32_t i_seen;
     int i_next_block_flags;

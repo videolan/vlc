@@ -1031,7 +1031,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             {
                 int slowdown = 1 << (p_vlm->i_consecutive_errors - 1);
                 /* 100ms, 200ms, 400ms, 800ms, 1.6s, 3.2s */
-                mtime_t deadline = mdate() + slowdown * 100000L; /* usecs */
+                vlc_tick_t deadline = mdate() + slowdown * 100000L; /* usecs */
 
                 /* like a sleep, but interrupted on deletion */
                 vlc_mutex_lock(&p_vlm->lock_delete);

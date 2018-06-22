@@ -62,7 +62,7 @@ struct sout_stream_id_sys_t
 {
     sout_stream_id_sys_t *id;
     es_format_t fmt;
-    mtime_t i_last;
+    vlc_tick_t i_last;
     bool b_error;
 };
 
@@ -145,7 +145,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *p_es,
                  block_t *p_buffer )
 {
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
-    mtime_t i_current = mdate();
+    vlc_tick_t i_current = mdate();
     int i;
 
     p_es->i_last = p_buffer->i_dts;

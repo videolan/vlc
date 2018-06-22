@@ -165,7 +165,7 @@ void stats_Update( counter_t *p_counter, uint64_t val, uint64_t *new_val )
     case STATS_DERIVATIVE:
     {
         counter_sample_t *p_new, *p_old;
-        mtime_t now = mdate();
+        vlc_tick_t now = mdate();
         if( now - p_counter->last_update < CLOCK_FREQ )
             return;
         p_counter->last_update = now;

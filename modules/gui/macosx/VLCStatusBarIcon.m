@@ -108,7 +108,7 @@
 
     [randButton.cell accessibilitySetOverrideValue:_NS("Toggle random order playback")
                                       forAttribute:NSAccessibilityDescriptionAttribute];
-    
+
 
     // Populate menu items with localized strings
     [showMainWindowItem setTitle:_NS("Show Main Window")];
@@ -120,7 +120,7 @@
     // Set our selves up as delegate, to receive menuNeedsUpdate messages, so
     // we can update our menu as needed/before it's drawn
     [_vlcStatusBarIconMenu setDelegate:self];
-    
+
     // Register notifications
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateNowPlayingInfo)
@@ -258,7 +258,7 @@
         remainingTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:input negative:YES];
 
         /* Check item duration */
-        mtime_t dur = input_item_GetDuration(input_GetItem(input));
+        vlc_tick_t dur = input_item_GetDuration(input_GetItem(input));
 
         if (dur == -1) {
             /* Unknown duration, possibly due to buffering */

@@ -72,7 +72,7 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 };
 
 /*****************************************************************************

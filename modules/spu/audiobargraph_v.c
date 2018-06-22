@@ -113,7 +113,7 @@ typedef struct
     int nbChannels;
     int *i_values;
     picture_t *p_pic;
-    mtime_t date;
+    vlc_tick_t date;
     int scale;
     bool alarm;
     int barWidth;
@@ -357,7 +357,7 @@ static int BarGraphCallback(vlc_object_t *p_this, char const *psz_var,
 /**
  * Sub source
  */
-static subpicture_t *FilterSub(filter_t *p_filter, mtime_t date)
+static subpicture_t *FilterSub(filter_t *p_filter, vlc_tick_t date)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     BarGraph_t *p_BarGraph = &(p_sys->p_BarGraph);

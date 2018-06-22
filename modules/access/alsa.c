@@ -128,8 +128,8 @@ struct demux_sys_t
     es_out_id_t *es;
     vlc_thread_t thread;
 
-    mtime_t start;
-    mtime_t caching;
+    vlc_tick_t start;
+    vlc_tick_t caching;
     snd_pcm_uframes_t period_size;
     unsigned rate;
 };
@@ -179,7 +179,7 @@ static void *Thread (void *data)
 
         /* Read data */
         snd_pcm_sframes_t frames, delay;
-        mtime_t pts;
+        vlc_tick_t pts;
 
         frames = snd_pcm_readi (pcm, block->p_buffer, sys->period_size);
         pts = mdate ();

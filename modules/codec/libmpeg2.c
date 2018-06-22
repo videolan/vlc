@@ -71,10 +71,10 @@ struct decoder_sys_t
     /*
      * Input properties
      */
-    mtime_t          i_previous_pts;
-    mtime_t          i_current_pts;
-    mtime_t          i_previous_dts;
-    mtime_t          i_current_dts;
+    vlc_tick_t       i_previous_pts;
+    vlc_tick_t       i_current_pts;
+    vlc_tick_t       i_previous_dts;
+    vlc_tick_t       i_current_dts;
     bool             b_garbage_pic;
     bool             b_after_sequence_header; /* is it the next frame after
                                                * the sequence header ?    */
@@ -92,12 +92,12 @@ struct decoder_sys_t
     decoder_synchro_t *p_synchro;
     int             i_sar_num;
     int             i_sar_den;
-    mtime_t         i_last_frame_pts;
+    vlc_tick_t      i_last_frame_pts;
 
     /* Closed captioning support */
     uint32_t        i_cc_flags;
-    mtime_t         i_cc_pts;
-    mtime_t         i_cc_dts;
+    vlc_tick_t      i_cc_pts;
+    vlc_tick_t      i_cc_dts;
 #if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
     cc_data_t       cc;
 #endif
@@ -324,7 +324,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             const mpeg2_info_t *p_info = p_sys->p_info;
             const mpeg2_picture_t *p_current = p_info->current_picture;
 
-            mtime_t i_pts, i_dts;
+            vlc_tick_t i_pts, i_dts;
 
             if( p_sys->b_after_sequence_header &&
                 (p_current->flags &

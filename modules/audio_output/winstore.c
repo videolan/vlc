@@ -348,7 +348,7 @@ done:
     return SUCCEEDED(hr) ? 0 : -1;
 }
 
-static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
+static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     if( unlikely( sys->client == NULL ) )
@@ -375,7 +375,7 @@ static void Play(audio_output_t *aout, block_t *block)
     ResetInvalidatedClient(aout, hr);
 }
 
-static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
     if( unlikely( sys->client == NULL ) )

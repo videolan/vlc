@@ -188,17 +188,17 @@ static inline int PIDGet( block_t *p )
 {
     return ( (p->p_buffer[1]&0x1f)<<8 )|p->p_buffer[2];
 }
-static mtime_t GetPCR( const block_t * );
+static vlc_tick_t GetPCR( const block_t * );
 
 static block_t * ProcessTSPacket( demux_t *p_demux, ts_pid_t *pid, block_t *p_pkt, int * );
 static bool GatherPESData( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk, size_t );
 static bool GatherSectionsData( demux_t *p_demux, ts_pid_t *, block_t *, size_t );
-static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, mtime_t i_pcr );
+static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_prg, vlc_tick_t i_pcr );
 
 static block_t* ReadTSPacket( demux_t *p_demux );
 static int SeekToTime( demux_t *p_demux, const ts_pmt_t *, int64_t time );
 static void ReadyQueuesPostSeek( demux_t *p_demux );
-static void PCRHandle( demux_t *p_demux, ts_pid_t *, mtime_t );
+static void PCRHandle( demux_t *p_demux, ts_pid_t *, vlc_tick_t );
 static void PCRFixHandle( demux_t *, ts_pmt_t *, block_t * );
 
 #define TS_PACKET_SIZE_188 188
@@ -690,7 +690,7 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Adaptation field cannot be scrambled */
-        mtime_t i_pcr = GetPCR( p_pkt );
+        vlc_tick_t i_pcr = GetPCR( p_pkt );
         if( i_pcr > VLC_TS_INVALID )
             PCRHandle( p_demux, p_pid, i_pcr );
 
@@ -1343,7 +1343,7 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
         {
             /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
              * In this case use the last PCR + 40ms */
-            mtime_t i_pcr = p_es->p_program->pcr.i_current;
+            vlc_tick_t i_pcr = p_es->p_program->pcr.i_current;
             if( i_pcr > VLC_TS_INVALID )
                 p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
         }
@@ -1453,9 +1453,9 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes,
     uint8_t header[34];
     unsigned i_pes_size = 0;
     unsigned i_skip = 0;
-    mtime_t i_dts = -1;
-    mtime_t i_pts = -1;
-    mtime_t i_length = 0;
+    vlc_tick_t i_dts = -1;
+    vlc_tick_t i_pts = -1;
+    vlc_tick_t i_length = 0;
     uint8_t i_stream_id;
     bool b_pes_scrambling = false;
     const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
@@ -1795,11 +1795,11 @@ static block_t* ReadTSPacket( demux_t *p_demux )
     return p_pkt;
 }
 
-static mtime_t GetPCR( const block_t *p_pkt )
+static vlc_tick_t GetPCR( const block_t *p_pkt )
 {
     const uint8_t *p = p_pkt->p_buffer;
 
-    mtime_t i_pcr = -1;
+    vlc_tick_t i_pcr = -1;
 
     if(unlikely(p_pkt->i_buffer < 12))
         return i_pcr;
@@ -1812,11 +1812,11 @@ static mtime_t GetPCR( const block_t *p_pkt )
         ( p[5] & 0x10 ) ) /* PCR carry flag */
     {
         /* PCR is 33 bits */
-        i_pcr = ( (mtime_t)p[6] << 25 ) |
-                ( (mtime_t)p[7] << 17 ) |
-                ( (mtime_t)p[8] << 9 ) |
-                ( (mtime_t)p[9] << 1 ) |
-                ( (mtime_t)p[10] >> 7 );
+        i_pcr = ( (vlc_tick_t)p[6] << 25 ) |
+                ( (vlc_tick_t)p[7] << 17 ) |
+                ( (vlc_tick_t)p[8] << 9 ) |
+                ( (vlc_tick_t)p[9] << 1 ) |
+                ( (vlc_tick_t)p[10] >> 7 );
     }
     return i_pcr;
 }
@@ -1965,8 +1965,8 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, int64_t i_scaled
 
                 if( i_pcr == -1 )
                 {
-                    mtime_t i_dts = -1;
-                    mtime_t i_pts = -1;
+                    vlc_tick_t i_dts = -1;
+                    vlc_tick_t i_pts = -1;
                     uint8_t i_stream_id;
                     if ( VLC_SUCCESS == ParsePESHeader( VLC_OBJECT(p_demux), &p_pkt->p_buffer[i_skip],
                                                         p_pkt->i_buffer - i_skip, &i_skip,
@@ -2048,8 +2048,8 @@ static int ProbeChunk( demux_t *p_demux, int i_program, bool b_end, int64_t *pi_
               )
             {
                 b_pcrresult = false;
-                mtime_t i_dts = -1;
-                mtime_t i_pts = -1;
+                vlc_tick_t i_dts = -1;
+                vlc_tick_t i_pts = -1;
                 uint8_t i_stream_id;
                 unsigned i_skip = 4;
                 if ( b_adaptfield ) // adaptation field
@@ -2113,7 +2113,7 @@ int ProbeStart( demux_t *p_demux, int i_program )
 
     int i_probe_count = 0;
     int64_t i_pos;
-    mtime_t i_pcr = -1;
+    vlc_tick_t i_pcr = -1;
     bool b_found = false;
 
     do
@@ -2145,7 +2145,7 @@ int ProbeEnd( demux_t *p_demux, int i_program )
 
     int i_probe_count = PROBE_CHUNK_COUNT;
     int64_t i_pos;
-    mtime_t i_pcr = -1;
+    vlc_tick_t i_pcr = -1;
     bool b_found = false;
 
     do
@@ -2169,7 +2169,7 @@ int ProbeEnd( demux_t *p_demux, int i_program )
     return (b_found) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
+static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, vlc_tick_t i_pcr )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2177,7 +2177,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr )
        PCR barrier, and then adapt pcr so they have valid PCR when dequeuing */
     if( p_pmt->pcr.i_current == -1 && p_pmt->pcr.b_fix_done )
     {
-        mtime_t i_mindts = -1;
+        vlc_tick_t i_mindts = -1;
 
         ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
         for( int i=0; i< p_pat->programs.i_size; i++ )
@@ -2249,7 +2249,7 @@ static int IsVideoEnd( ts_pid_t *p_pid )
              ( tail[ i_tail - 1 ] == 0xb7 ||  tail[ i_tail - 1 ] == 0x0a ) );
 }
 
-static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
+static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, vlc_tick_t i_pcr)
 {
     for( int i=0; i<p_pmt->e_streams.i_size; i++ )
     {
@@ -2279,8 +2279,8 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
             continue;
 
         unsigned i_skip = 0;
-        mtime_t i_dts = -1;
-        mtime_t i_pts = -1;
+        vlc_tick_t i_dts = -1;
+        vlc_tick_t i_pts = -1;
         uint8_t i_stream_id;
 
         if( ParsePESHeader( VLC_OBJECT(p_demux), (uint8_t*)&header, i_max, &i_skip,
@@ -2312,7 +2312,7 @@ static void PCRCheckDTS( demux_t *p_demux, ts_pmt_t *p_pmt, mtime_t i_pcr)
     }
 }
 
-static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, mtime_t i_pcr )
+static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, vlc_tick_t i_pcr )
 {
     demux_sys_t   *p_sys = p_demux->p_sys;
 
@@ -2331,7 +2331,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, mtime_t i_pcr )
         ts_pmt_t *p_pmt = p_pat->programs.p_elems[i]->u.p_pmt;
         if( p_pmt->pcr.b_disable )
             continue;
-        mtime_t i_program_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
+        vlc_tick_t i_program_pcr = TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
 
         if( p_pmt->i_pid_pcr == 0x1FFF ) /* That program has no dedicated PCR pid ISO/IEC 13818-1 2.4.4.9 */
         {

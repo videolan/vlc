@@ -164,7 +164,7 @@ block_t *MemToBlock( uint8_t *p_mem, size_t i_mem, size_t offset)
 }
 
 
-void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, mtime_t i_pts)
+void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, vlc_tick_t i_pts)
 {
     uint8_t * p_frame = p_blk->p_buffer;
     Cook_PrivateTrackData * p_sys = (Cook_PrivateTrackData *) p_tk->p_sys;
@@ -348,7 +348,7 @@ int UpdatePCR( demux_t * p_demux )
     return VLC_SUCCESS;
 }
 
-void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, mtime_t i_duration )
+void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, vlc_tick_t i_duration )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();

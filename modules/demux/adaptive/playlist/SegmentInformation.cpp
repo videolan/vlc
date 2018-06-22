@@ -155,7 +155,7 @@ void SegmentInformation::updateWith(SegmentInformation *updated)
     /* FIXME: handle difference */
 }
 
-void SegmentInformation::pruneByPlaybackTime(mtime_t time)
+void SegmentInformation::pruneByPlaybackTime(vlc_tick_t time)
 {
     SegmentList *segmentList = static_cast<SegmentList *>(getAttribute(Type::SegmentList));
     if(segmentList)
@@ -195,7 +195,7 @@ void SegmentInformation::setEncryption(const CommonEncryption &enc)
     commonEncryption = enc;
 }
 
-mtime_t SegmentInformation::getPeriodStart() const
+vlc_tick_t SegmentInformation::getPeriodStart() const
 {
     if(parent)
         return parent->getPeriodStart();
@@ -203,7 +203,7 @@ mtime_t SegmentInformation::getPeriodStart() const
         return 0;
 }
 
-mtime_t SegmentInformation::getPeriodDuration() const
+vlc_tick_t SegmentInformation::getPeriodDuration() const
 {
     if(parent)
         return parent->getPeriodDuration();

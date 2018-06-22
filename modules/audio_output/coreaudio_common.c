@@ -44,7 +44,7 @@ FramesToBytes(struct aout_sys_common *p_sys, uint64_t i_frames)
 }
 
 static inline uint64_t
-UsToFrames(struct aout_sys_common *p_sys, mtime_t i_us)
+UsToFrames(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 {
     return i_us * p_sys->i_rate / CLOCK_FREQ;
 }
@@ -56,7 +56,7 @@ HostTimeToTick(struct aout_sys_common *p_sys, uint64_t i_host_time)
 }
 
 static inline uint64_t
-TickToHostTime(struct aout_sys_common *p_sys, mtime_t i_us)
+TickToHostTime(struct aout_sys_common *p_sys, vlc_tick_t i_us)
 {
     return i_us * 1000 * p_sys->tinfo.denom / p_sys->tinfo.numer;
 }
@@ -183,7 +183,7 @@ ca_Render(audio_output_t *p_aout, uint32_t i_frames, uint64_t i_host_time,
         }
 
         /* Write silence to reach the first_render host time */
-        const mtime_t i_silence_us =
+        const vlc_tick_t i_silence_us =
             HostTimeToTick(p_sys, p_sys->i_first_render_host_time - i_host_time);
 
         const uint64_t i_silence_bytes =
@@ -256,7 +256,7 @@ ca_GetLatencyLocked(audio_output_t *p_aout)
 }
 
 int
-ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
+ca_TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -269,9 +269,9 @@ ca_TimeGet(audio_output_t *p_aout, mtime_t *delay)
         return -1;
     }
 
-    const mtime_t i_render_time_us =
+    const vlc_tick_t i_render_time_us =
         HostTimeToTick(p_sys, p_sys->i_render_host_time);
-    const mtime_t i_render_delay = i_render_time_us - mdate();
+    const vlc_tick_t i_render_delay = i_render_time_us - mdate();
 
     *delay = ca_GetLatencyLocked(p_aout) + i_render_delay;
     lock_unlock(p_sys);
@@ -296,7 +296,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
 
             /* Calculate the duration of the circular buffer, in order to wait
              * for the render thread to play it all */
-            const mtime_t i_frame_us =
+            const vlc_tick_t i_frame_us =
                 FramesToUs(p_sys, BytesToFrames(p_sys, p_sys->i_out_size)) + 10000;
             lock_unlock(p_sys);
             msleep(i_frame_us);
@@ -325,7 +325,7 @@ ca_Flush(audio_output_t *p_aout, bool wait)
 }
 
 void
-ca_Pause(audio_output_t * p_aout, bool pause, mtime_t date)
+ca_Pause(audio_output_t * p_aout, bool pause, vlc_tick_t date)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
     VLC_UNUSED(date);
@@ -354,7 +354,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
          * first (non-silence/zero) frame is rendered by the render callback.
          * Once the rendering is truly started, the date can be ignored. */
 
-        const mtime_t first_render_time = p_block->i_pts - ca_GetLatencyLocked(p_aout);
+        const vlc_tick_t first_render_time = p_block->i_pts - ca_GetLatencyLocked(p_aout);
         p_sys->i_first_render_host_time =
             TickToHostTime(p_sys, first_render_time);
     }
@@ -394,7 +394,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
                 return;
             }
 
-            const mtime_t i_frame_us =
+            const vlc_tick_t i_frame_us =
                 FramesToUs(p_sys, BytesToFrames(p_sys, p_block->i_buffer));
 
             /* Wait for the render buffer to play the remaining data */
@@ -423,7 +423,7 @@ ca_Play(audio_output_t * p_aout, block_t * p_block)
 
 int
 ca_Initialize(audio_output_t *p_aout, const audio_sample_format_t *fmt,
-              mtime_t i_dev_latency_us)
+              vlc_tick_t i_dev_latency_us)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -498,7 +498,7 @@ ca_SetAliveState(audio_output_t *p_aout, bool alive)
         vlc_sem_post(&p_sys->flush_sem);
 }
 
-void ca_SetDeviceLatency(audio_output_t *p_aout, mtime_t i_dev_latency_us)
+void ca_SetDeviceLatency(audio_output_t *p_aout, vlc_tick_t i_dev_latency_us)
 {
     struct aout_sys_common *p_sys = (struct aout_sys_common *) p_aout->sys;
 
@@ -829,7 +829,7 @@ MapInputLayout(audio_output_t *p_aout, const audio_sample_format_t *fmt,
 
 int
 au_Initialize(audio_output_t *p_aout, AudioUnit au, audio_sample_format_t *fmt,
-              const AudioChannelLayout *outlayout, mtime_t i_dev_latency_us,
+              const AudioChannelLayout *outlayout, vlc_tick_t i_dev_latency_us,
               bool *warn_configuration)
 {
     int ret;

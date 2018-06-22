@@ -212,10 +212,10 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
             break;
 
         case DEMUX_GET_LENGTH:
-            *va_arg(args, mtime_t *) = (INT64_C(40000) * sys->length) / 3;
+            *va_arg(args, vlc_tick_t *) = (INT64_C(40000) * sys->length) / 3;
             break;
         case DEMUX_GET_TIME:
-            *va_arg(args, mtime_t *) = (INT64_C(40000) * sys->position) / 3;
+            *va_arg(args, vlc_tick_t *) = (INT64_C(40000) * sys->position) / 3;
             break;
         case DEMUX_SET_TIME:
             sys->position = (va_arg(args, mtime_t) * 3) / INT64_C(40000);
@@ -724,8 +724,8 @@ static int ReadDir(stream_t *access, input_item_node_t *node)
            p_toc->i_last_track > sys->i_cdda_last)
             i_last_sector -= CD_ROM_XA_INTERVAL;
 
-        const mtime_t duration =
-            (mtime_t)(i_last_sector - i_first_sector)
+        const vlc_tick_t duration =
+            (vlc_tick_t)(i_last_sector - i_first_sector)
             * CDDA_DATA_SIZE * CLOCK_FREQ / 44100 / 2 / 2;
 
         input_item_t *item = input_item_NewDisc(access->psz_url,

@@ -867,7 +867,7 @@ static void ReleasePicture(decoder_t *p_dec, unsigned i_index, bool b_render)
     p_sys->api.release_out(&p_sys->api, i_index, b_render);
 }
 
-static void ReleasePictureTs(decoder_t *p_dec, unsigned i_index, mtime_t i_ts)
+static void ReleasePictureTs(decoder_t *p_dec, unsigned i_index, vlc_tick_t i_ts)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     assert(p_sys->api.release_out_ts);
@@ -1342,7 +1342,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
             return VLC_EGENERIC;
 
         bool b_config = false;
-        mtime_t i_ts = 0;
+        vlc_tick_t i_ts = 0;
         p_sys->b_input_dequeued = true;
         const void *p_buf = NULL;
         size_t i_size = 0;
@@ -1424,7 +1424,7 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
         /* Wait for the OutThread to stop (and process all remaining output
          * frames. Use a timeout here since we can't know if all decoders will
          * behave correctly. */
-        mtime_t deadline = mdate() + INT64_C(3000000);
+        vlc_tick_t deadline = mdate() + INT64_C(3000000);
         while (!p_sys->b_aborted && !p_sys->b_drained
             && vlc_cond_timedwait(&p_sys->dec_cond, &p_sys->lock, deadline) == 0);
 

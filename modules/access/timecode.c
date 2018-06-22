@@ -55,13 +55,13 @@ struct demux_sys_t
 {
     es_out_id_t *es;
     date_t date;
-    mtime_t next_time;
+    vlc_tick_t next_time;
 };
 
 static int DemuxOnce (demux_t *demux, bool master)
 {
     demux_sys_t *sys = demux->p_sys;
-    mtime_t pts = date_Get (&sys->date);
+    vlc_tick_t pts = date_Get (&sys->date);
     lldiv_t d;
     unsigned h, m, s, f;
 
@@ -134,7 +134,7 @@ static int Control (demux_t *demux, int query, va_list args)
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
         {
-            const mtime_t pts = va_arg (args, int64_t );
+            const vlc_tick_t pts = va_arg (args, int64_t );
 
             if (sys->next_time == VLC_TS_INVALID) /* first invocation? */
             {

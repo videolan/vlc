@@ -326,8 +326,8 @@ static inline void BufferChainClean( sout_buffer_chain_t *c )
 typedef struct
 {
     sout_buffer_chain_t chain_pes;
-    mtime_t             i_pes_dts;
-    mtime_t             i_pes_length;
+    vlc_tick_t          i_pes_dts;
+    vlc_tick_t          i_pes_length;
     int                 i_pes_used;
     bool                b_key_frame;
 
@@ -375,11 +375,11 @@ struct sout_mux_sys_t
     int64_t         i_pcr_delay;
 
     int64_t         i_dts_delay;
-    mtime_t         first_dts;
+    vlc_tick_t      first_dts;
 
     bool            b_use_key_frames;
 
-    mtime_t         i_pcr;  /* last PCR emited */
+    vlc_tick_t      i_pcr;  /* last PCR emited */
 
     csa_t           *csa;
     int             i_csa_pkt_size;
@@ -474,14 +474,14 @@ static int Mux      ( sout_mux_t * );
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo );
 static block_t *Add_ADTS( block_t *, const es_format_t * );
 static void TSSchedule  ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                          mtime_t i_pcr_length, mtime_t i_pcr_dts );
+                          vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts );
 static void TSDate      ( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                          mtime_t i_pcr_length, mtime_t i_pcr_dts );
+                          vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts );
 static void GetPAT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c );
 
 static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream, bool b_pcr );
-static void TSSetPCR( block_t *p_ts, mtime_t i_dts );
+static void TSSetPCR( block_t *p_ts, vlc_tick_t i_dts );
 
 static csa_t *csaSetup( vlc_object_t *p_this )
 {
@@ -1071,7 +1071,7 @@ static void SetBlockDuration( sout_input_t *p_input, block_t *p_data )
         block_FifoCount( p_input->p_fifo ) > 0 )
     {
         block_t *p_next = block_FifoShow( p_input->p_fifo );
-        mtime_t i_diff = p_next->i_dts - p_data->i_dts;
+        vlc_tick_t i_diff = p_next->i_dts - p_data->i_dts;
         if( i_diff > 0 &&
                 (p_next->i_flags & BLOCK_FLAG_DISCONTINUITY) == 0 )
         {
@@ -1198,7 +1198,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
     sout_input_sys_t *p_pcr_stream = (sout_input_sys_t*)p_sys->p_pcr_input->p_sys;
 
     sout_buffer_chain_t chain_ts;
-    mtime_t i_shaping_delay = p_pcr_stream->state.b_key_frame
+    vlc_tick_t i_shaping_delay = p_pcr_stream->state.b_key_frame
         ? p_pcr_stream->state.i_pes_length
         : p_sys->i_shaping_delay;
 
@@ -1453,7 +1453,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
     }
 
     /* save */
-    const mtime_t i_pcr_length = p_pcr_stream->state.i_pes_length;
+    const vlc_tick_t i_pcr_length = p_pcr_stream->state.i_pes_length;
     p_pcr_stream->state.b_key_frame = 0;
 
     /* msg_Dbg( p_mux, "starting muxing %lldms", i_pcr_length / 1000 ); */
@@ -1471,7 +1471,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
             if( p_pes->i_dts + p_pes->i_length >
                 p_pcr_stream->state.i_pes_dts + p_pcr_stream->state.i_pes_length )
             {
-                mtime_t i_frag = p_pcr_stream->state.i_pes_dts +
+                vlc_tick_t i_frag = p_pcr_stream->state.i_pes_dts +
                     p_pcr_stream->state.i_pes_length - p_pes->i_dts;
                 if( i_frag < 0 )
                 {
@@ -1496,11 +1496,11 @@ static bool MuxStreams(sout_mux_t *p_mux )
     i_packet_count += chain_ts.i_depth;
     /* msg_Dbg( p_mux, "estimated pck=%d", i_packet_count ); */
 
-    const mtime_t i_pcr_dts = p_pcr_stream->state.i_pes_dts;
+    const vlc_tick_t i_pcr_dts = p_pcr_stream->state.i_pes_dts;
     for (;;)
     {
         int          i_stream = -1;
-        mtime_t      i_dts = 0;
+        vlc_tick_t   i_dts = 0;
         sout_input_sys_t *p_stream;
 
         /* Select stream (lowest dts) */
@@ -1707,7 +1707,7 @@ static block_t *Add_ADTS( block_t *p_data, const es_format_t *p_fmt )
 }
 
 static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                        mtime_t i_pcr_length, mtime_t i_pcr_dts )
+                        vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     sout_buffer_chain_t new_chain;
@@ -1723,15 +1723,15 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     for (int i = 0; i < i_packet_count; i++ )
     {
         block_t *p_ts = BufferChainGet( p_chain_ts );
-        mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
+        vlc_tick_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
 
         BufferChainAppend( &new_chain, p_ts );
 
         if (!p_ts->i_dts || p_ts->i_dts + p_sys->i_dts_delay * 2/3 >= i_new_dts)
             continue;
 
-        mtime_t i_max_diff = i_new_dts - p_ts->i_dts;
-        mtime_t i_cut_dts = p_ts->i_dts;
+        vlc_tick_t i_max_diff = i_new_dts - p_ts->i_dts;
+        vlc_tick_t i_cut_dts = p_ts->i_dts;
 
         p_ts = BufferChainPeek( p_chain_ts );
         i++;
@@ -1763,7 +1763,7 @@ static void TSSchedule( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 }
 
 static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
-                    mtime_t i_pcr_length, mtime_t i_pcr_dts )
+                    vlc_tick_t i_pcr_length, vlc_tick_t i_pcr_dts )
 {
     sout_mux_sys_t  *p_sys = p_mux->p_sys;
     int i_packet_count = p_chain_ts->i_depth;
@@ -1791,7 +1791,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
     for (int i = 0; i < i_packet_count; i++ )
     {
         block_t *p_ts = BufferChainGet( p_chain_ts );
-        mtime_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
+        vlc_tick_t i_new_dts = i_pcr_dts + i_pcr_length * i / i_packet_count;
 
         p_ts->i_dts    = i_new_dts;
         p_ts->i_length = i_pcr_length / i_packet_count;
@@ -1918,9 +1918,9 @@ static block_t *TSNew( sout_mux_t *p_mux, sout_input_sys_t *p_stream,
     return p_ts;
 }
 
-static void TSSetPCR( block_t *p_ts, mtime_t i_dts )
+static void TSSetPCR( block_t *p_ts, vlc_tick_t i_dts )
 {
-    mtime_t i_pcr = 9 * i_dts / 100;
+    vlc_tick_t i_pcr = 9 * i_dts / 100;
 
     p_ts->p_buffer[6]  = ( i_pcr >> 25 )&0xff;
     p_ts->p_buffer[7]  = ( i_pcr >> 17 )&0xff;

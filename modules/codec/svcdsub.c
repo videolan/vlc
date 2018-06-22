@@ -98,7 +98,7 @@ struct decoder_sys_t
   size_t metadata_offset;          /* offset to data describing the image */
   size_t metadata_length;          /* length of metadata */
 
-  mtime_t i_duration;   /* how long to display the image, 0 stands
+  vlc_tick_t i_duration;   /* how long to display the image, 0 stands
                            for "until next subtitle" */
 
   uint16_t i_x_start, i_y_start; /* position of top leftmost pixel of

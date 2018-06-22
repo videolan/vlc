@@ -447,7 +447,7 @@ void filter_chain_VideoFlush( filter_chain_t *p_chain )
 }
 
 void filter_chain_SubSource( filter_chain_t *p_chain, spu_t *spu,
-                             mtime_t display_date )
+                             vlc_tick_t display_date )
 {
     for( chained_filter_t *f = p_chain->first; f != NULL; f = f->next )
     {

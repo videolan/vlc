@@ -70,7 +70,7 @@ typedef struct audioscrobbler_song_t
     int         i_l;                /**< track length     */
     char        *psz_m;             /**< musicbrainz id   */
     time_t      date;               /**< date since epoch */
-    mtime_t     i_start;            /**< playing start    */
+    vlc_tick_t  i_start;            /**< playing start    */
 } audioscrobbler_song_t;
 
 struct intf_sys_t
@@ -94,8 +94,8 @@ struct intf_sys_t
     /* data about song currently playing */
     audioscrobbler_song_t   p_current_song;     /**< song being played      */
 
-    mtime_t                 time_pause;         /**< time when vlc paused   */
-    mtime_t                 time_total_pauses;  /**< total time in pause    */
+    vlc_tick_t              time_pause;         /**< time when vlc paused   */
+    vlc_tick_t              time_total_pauses;  /**< total time in pause    */
 
     bool                    b_submit_nowp;      /**< do we have to submit ? */
 
@@ -216,7 +216,7 @@ end:
  *****************************************************************************/
 static void AddToQueue (intf_thread_t *p_this)
 {
-    mtime_t                     played_time;
+    vlc_tick_t                  played_time;
     intf_sys_t                  *p_sys = p_this->p_sys;
 
     vlc_mutex_lock(&p_sys->lock);
@@ -647,7 +647,7 @@ proto:
     return VLC_EGENERIC;
 }
 
-static void HandleInterval(mtime_t *next, unsigned int *i_interval)
+static void HandleInterval(vlc_tick_t *next, unsigned int *i_interval)
 {
     if (*i_interval == 0)
     {
@@ -676,7 +676,7 @@ static void *Run(void *data)
     bool                    b_nowp_submission_ongoing = false;
 
     /* data about audioscrobbler session */
-    mtime_t                 next_exchange = 0; /**< when can we send data  */
+    vlc_tick_t              next_exchange = 0; /**< when can we send data  */
     unsigned int            i_interval = 0;     /**< waiting interval (secs)*/
 
     intf_sys_t *p_sys = p_intf->p_sys;

@@ -144,9 +144,9 @@ namespace adaptive
                 bool                prepared;
                 bool                eof;
                 ID                  sourceid;
-                mtime_t             requestStartTime;
-                mtime_t             responseTime;
-                mtime_t             downloadEndTime;
+                vlc_tick_t          requestStartTime;
+                vlc_tick_t          responseTime;
+                vlc_tick_t          downloadEndTime;
 
             private:
                 bool init(const std::string &);

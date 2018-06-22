@@ -396,17 +396,17 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
     vlc_mutex_unlock( &p_i->lock );
 }
 
-mtime_t input_item_GetDuration( input_item_t *p_i )
+vlc_tick_t input_item_GetDuration( input_item_t *p_i )
 {
     vlc_mutex_lock( &p_i->lock );
 
-    mtime_t i_duration = p_i->i_duration;
+    vlc_tick_t i_duration = p_i->i_duration;
 
     vlc_mutex_unlock( &p_i->lock );
     return i_duration;
 }
 
-void input_item_SetDuration( input_item_t *p_i, mtime_t i_duration )
+void input_item_SetDuration( input_item_t *p_i, vlc_tick_t i_duration )
 {
     bool b_send_event = false;
 
@@ -1056,7 +1056,7 @@ void input_item_SetEpgOffline( input_item_t *p_item )
 
 input_item_t *
 input_item_NewExt( const char *psz_uri, const char *psz_name,
-                   mtime_t duration, int type, enum input_item_net_type i_net )
+                   vlc_tick_t duration, int type, enum input_item_net_type i_net )
 {
     input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
     if( unlikely(owner == NULL) )

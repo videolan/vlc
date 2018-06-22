@@ -35,10 +35,10 @@
 
   Exemple input string: "PT0H9M56.46S"
  */
-static mtime_t str_duration( const char *psz_duration )
+static vlc_tick_t str_duration( const char *psz_duration )
 {
     bool        timeDesignatorReached = false;
-    mtime_t  res = 0;
+    vlc_tick_t  res = 0;
     char*       end_ptr;
 
     if ( psz_duration == nullptr )
@@ -91,7 +91,7 @@ IsoTime::IsoTime(const std::string &str)
     time = str_duration(str.c_str());
 }
 
-IsoTime::operator mtime_t () const
+IsoTime::operator vlc_tick_t () const
 {
     return time;
 }
@@ -193,7 +193,7 @@ UTCTime::UTCTime(const std::string &str)
     }
 }
 
-mtime_t UTCTime::mtime() const
+vlc_tick_t UTCTime::mtime() const
 {
     return t;
 }

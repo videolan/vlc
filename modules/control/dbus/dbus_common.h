@@ -105,8 +105,8 @@ struct intf_sys_t
     vlc_thread_t    thread;
     input_thread_t *p_input;
 
-    mtime_t         i_last_input_pos; /* Only access from input thread */
-    mtime_t         i_last_input_pos_event; /* Same as above */
+    vlc_tick_t      i_last_input_pos; /* Only access from input thread */
+    vlc_tick_t      i_last_input_pos_event; /* Same as above */
 };
 
 enum

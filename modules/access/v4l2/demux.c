@@ -57,7 +57,7 @@ struct demux_sys_t
 
     es_out_id_t *es;
     vlc_v4l2_ctrl_t *controls;
-    mtime_t start;
+    vlc_tick_t start;
 
 #ifdef ZVBI_COMPILED
     vlc_v4l2_vbi_t *vbi;

@@ -52,8 +52,8 @@ vlc_module_end()
  * Local definitions/prototypes
  *****************************************************************************/
 typedef struct {
-    mtime_t start;
-    mtime_t stop;
+    vlc_tick_t start;
+    vlc_tick_t stop;
     size_t  blocknumber;
     size_t  count;
 } stl_entry_t;
@@ -240,7 +240,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
     const int cct = ParseInteger(&header[12], 2);
-    const mtime_t program_start = ParseTextTimeCode(&header[256], fps);
+    const vlc_tick_t program_start = ParseTextTimeCode(&header[256], fps);
     const size_t tti_count = ParseInteger(&header[238], 5);
     if (!tti_count)
         return VLC_EGENERIC;

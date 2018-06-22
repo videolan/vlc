@@ -193,7 +193,7 @@ struct  demux_sys_t
     bool                b_menu;
     bool                b_menu_open;
     bool                b_popup_available;
-    mtime_t             i_still_end_time;
+    vlc_tick_t          i_still_end_time;
 
     vlc_mutex_t         bdj_overlay_lock; /* used to lock BD-J overlay open/close while overlays are being sent to vout */
 
@@ -1485,7 +1485,7 @@ static void updater_unlock_overlay(subpicture_updater_sys_t *p_upd_sys)
 static int subpictureUpdaterValidate(subpicture_t *p_subpic,
                                       bool b_fmt_src, const video_format_t *p_fmt_src,
                                       bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                                      mtime_t i_ts)
+                                      vlc_tick_t i_ts)
 {
     VLC_UNUSED(b_fmt_src);
     VLC_UNUSED(b_fmt_dst);
@@ -1510,7 +1510,7 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
 static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
                                     const video_format_t *p_fmt_src,
                                     const video_format_t *p_fmt_dst,
-                                    mtime_t i_ts)
+                                    vlc_tick_t i_ts)
 {
     VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(p_fmt_dst);
@@ -3048,13 +3048,13 @@ struct escape_es_id
 {
     es_out_id_t *es;
     bool drop_first;
-    mtime_t first_dts;
+    vlc_tick_t first_dts;
 };
 
 struct escape_esout_sys
 {
     es_out_t *dst_out;
-    mtime_t   offset_pcr;
+    vlc_tick_t  offset_pcr;
 
     vlc_array_t es_ids; /* escape_es_id */
 };
@@ -3116,7 +3116,7 @@ static int escape_esOutSend(es_out_t *out, es_out_id_t *es, block_t *block)
             if (esc_id->drop_first)
                 block->i_flags |= BLOCK_FLAG_PREROLL;
         }
-        mtime_t offset = esout_sys->offset_pcr - esc_id->first_dts;
+        vlc_tick_t offset = esout_sys->offset_pcr - esc_id->first_dts;
         block->i_pts += offset;
         block->i_dts += offset;
     }
@@ -3157,7 +3157,7 @@ static int escape_esOutControl(es_out_t *p_out, int query, va_list args)
         case ES_OUT_SET_GROUP_PCR:
         {
             int group = va_arg( args, int );
-            mtime_t pcr = va_arg( args, int64_t );
+            vlc_tick_t pcr = va_arg( args, int64_t );
 
             if (esout_sys->offset_pcr == -1)
                 esout_sys->offset_pcr = pcr;

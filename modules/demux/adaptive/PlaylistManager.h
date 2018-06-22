@@ -84,7 +84,7 @@ namespace adaptive
             unsigned getActiveStreamsCount() const;
 
             Times getTimes(bool = false) const;
-            mtime_t getMinAheadTime() const;
+            vlc_tick_t getMinAheadTime() const;
 
             virtual bool reactivateStream(AbstractStream *);
             bool setupPeriod();
@@ -131,12 +131,12 @@ namespace adaptive
             struct
             {
                 bool        b_live;
-                mtime_t     i_time;
+                vlc_tick_t  i_time;
                 double      f_position;
                 mutable vlc_mutex_t lock;
-                mtime_t     playlistStart;
-                mtime_t     playlistEnd;
-                mtime_t     playlistLength;
+                vlc_tick_t  playlistStart;
+                vlc_tick_t  playlistEnd;
+                vlc_tick_t  playlistLength;
                 time_t      lastupdate;
             } cached;
 
@@ -152,7 +152,7 @@ namespace adaptive
             vlc_cond_t   waitcond;
             bool         b_buffering;
             bool         b_canceled;
-            mtime_t      pause_start;
+            vlc_tick_t   pause_start;
     };
 
 }

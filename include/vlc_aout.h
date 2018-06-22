@@ -129,7 +129,7 @@ struct audio_output
     /**< Stops the existing stream (optional, may be NULL).
       * \note A stream must have been started when called.
       */
-    int (*time_get)(audio_output_t *, mtime_t *delay);
+    int (*time_get)(audio_output_t *, vlc_tick_t *delay);
     /**< Estimates playback buffer latency (optional, may be NULL).
       * \param delay pointer to the delay until the next sample to be written
       *              to the playback buffer is rendered [OUT]
@@ -140,7 +140,7 @@ struct audio_output
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
       * \note A stream must have been started when called.
       */
-    void (*pause)( audio_output_t *, bool pause, mtime_t date);
+    void (*pause)( audio_output_t *, bool pause, vlc_tick_t date);
     /**< Pauses or resumes playback (optional, may be NULL).
       * \param pause pause if true, resume from pause if false
       * \param date timestamp when the pause or resume was requested

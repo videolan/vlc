@@ -84,8 +84,8 @@ struct vout_thread_sys_t
     } display;
 
     struct {
-        mtime_t     date;
-        mtime_t     timestamp;
+        vlc_tick_t  date;
+        vlc_tick_t  timestamp;
         bool        is_interlaced;
         picture_t   *decoded;
         picture_t   *current;
@@ -93,25 +93,25 @@ struct vout_thread_sys_t
     } displayed;
 
     struct {
-        mtime_t     last;
-        mtime_t     timestamp;
+        vlc_tick_t  last;
+        vlc_tick_t  timestamp;
     } step;
 
     struct {
         bool        is_on;
-        mtime_t     date;
+        vlc_tick_t  date;
     } pause;
 
     /* OSD title configuration */
     struct {
         bool        show;
-        mtime_t     timeout;
+        vlc_tick_t  timeout;
         int         position;
     } title;
 
     struct {
         bool        is_interlaced;
-        mtime_t     date;
+        vlc_tick_t  date;
     } interlacing;
 
     /* */

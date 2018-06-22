@@ -135,9 +135,9 @@ struct sout_mux_sys_t
     guid_t          fid;    /* file id */
     int             i_packet_size;
     int64_t         i_packet_count;
-    mtime_t         i_dts_first;
-    mtime_t         i_dts_last;
-    mtime_t         i_preroll_time;
+    vlc_tick_t      i_dts_first;
+    vlc_tick_t      i_dts_last;
+    vlc_tick_t      i_preroll_time;
     int64_t         i_bitrate;
     int64_t         i_bitrate_override;
 
@@ -148,7 +148,7 @@ struct sout_mux_sys_t
     block_t         *pk;
     int             i_pk_used;
     int             i_pk_frame;
-    mtime_t         i_pk_dts;
+    vlc_tick_t      i_pk_dts;
 
     bool      b_asf_http;
     int             i_seq;
@@ -693,7 +693,7 @@ static int Mux( sout_mux_t *p_mux )
     {
         sout_input_t  *p_input;
         asf_track_t   *tk;
-        mtime_t       i_dts;
+        vlc_tick_t    i_dts;
         block_t *data;
         block_t *pk;
 
@@ -845,7 +845,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     asf_track_t    *tk;
-    mtime_t i_duration = 0;
+    vlc_tick_t i_duration = 0;
     int i_size, i_header_ext_size;
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
     block_t *out;

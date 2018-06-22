@@ -183,7 +183,7 @@ struct intf_sys_t
     void setPacing(bool do_pace);
     int pace();
     void sendInputEvent(enum cc_input_event event, union cc_input_arg arg);
-    mtime_t getPauseDelay();
+    vlc_tick_t getPauseDelay();
 
     unsigned int getHttpStreamPort() const;
     std::string getHttpStreamPath() const;
@@ -208,11 +208,11 @@ private:
 
     void setMeta( vlc_meta_t *p_meta );
 
-    mtime_t getPlaybackTimestamp();
+    vlc_tick_t getPlaybackTimestamp();
 
     double getPlaybackPosition() const;
 
-    void setInitialTime( mtime_t time );
+    void setInitialTime( vlc_tick_t time );
     // Sets the current state and signal the associated wait cond.
     // This must be called with the lock held
     void setState( States state );
@@ -227,7 +227,7 @@ private:
 private:
     static void* ChromecastThread(void* p_data);
 
-    static mtime_t get_time(void*);
+    static vlc_tick_t get_time(void*);
 
     static int pace(void*);
     static void send_input_event(void *, enum cc_input_event event, union cc_input_arg arg);
@@ -239,8 +239,8 @@ private:
 
     void prepareHttpArtwork();
 
-    static mtime_t      timeCCToVLC(double);
-    static std::string  timeVLCToCC(mtime_t);
+    static vlc_tick_t   timeCCToVLC(double);
+    static std::string  timeVLCToCC(vlc_tick_t);
 
 private:
     vlc_object_t  * const m_module;
@@ -295,9 +295,9 @@ private:
     char             *m_art_url;
     unsigned          m_art_idx;
 
-    mtime_t           m_cc_time_last_request_date;
-    mtime_t           m_cc_time_date;
-    mtime_t           m_cc_time;
+    vlc_tick_t        m_cc_time_last_request_date;
+    vlc_tick_t        m_cc_time_date;
+    vlc_tick_t        m_cc_time;
 
     /* shared structure with the demux-filter */
     chromecast_common      m_common;

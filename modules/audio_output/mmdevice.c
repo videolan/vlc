@@ -130,7 +130,7 @@ static int vlc_FromHR(audio_output_t *aout, HRESULT hr)
 }
 
 /*** VLC audio output callbacks ***/
-static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
+static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;
@@ -154,7 +154,7 @@ static void Play(audio_output_t *aout, block_t *block)
     vlc_FromHR(aout, hr);
 }
 
-static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
     HRESULT hr;

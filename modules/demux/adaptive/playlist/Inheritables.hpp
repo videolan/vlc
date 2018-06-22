@@ -83,7 +83,7 @@ namespace adaptive
                 uint64_t          inheritStartNumber() const;
                 stime_t           inheritDuration() const;
                 Timescale         inheritTimescale() const;
-                mtime_t           inheritAvailabilityTimeOffset() const;
+                vlc_tick_t        inheritAvailabilityTimeOffset() const;
                 bool              inheritAvailabilityTimeComplete() const;
                 SegmentTimeline * inheritSegmentTimeline() const;
                 SegmentTemplate * inheritSegmentTemplate() const;

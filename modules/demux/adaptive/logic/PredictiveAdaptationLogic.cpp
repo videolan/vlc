@@ -153,7 +153,7 @@ BaseRepresentation *PredictiveAdaptationLogic::getNextRepresentation(BaseAdaptat
 }
 
 void PredictiveAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
-                                                   mtime_t time, mtime_t)
+                                                   vlc_tick_t time, mtime_t)
 {
     vlc_mutex_lock(&lock);
     std::map<ID, PredictiveStats>::iterator it = streams.find(id);

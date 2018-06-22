@@ -69,11 +69,11 @@ static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
-static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline, bool b_postpone_seek );
+static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, vlc_tick_t i_deadline, bool b_postpone_seek );
 static void       ControlRelease( int i_type, vlc_value_t val );
 static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, vlc_value_t );
-static void       ControlPause( input_thread_t *, mtime_t );
+static void       ControlPause( input_thread_t *, vlc_tick_t );
 
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
 static void UpdateGenericFromDemux( input_thread_t * );
@@ -656,8 +656,8 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
 static void MainLoopStatistics( input_thread_t *p_input )
 {
     double f_position = 0.0;
-    mtime_t i_time = 0;
-    mtime_t i_length = 0;
+    vlc_tick_t i_time = 0;
+    vlc_tick_t i_length = 0;
 
     /* update input status variables */
     if( demux_Control( input_priv(p_input)->master->p_demux,
@@ -690,8 +690,8 @@ static void MainLoopStatistics( input_thread_t *p_input )
  */
 static void MainLoop( input_thread_t *p_input, bool b_interactive )
 {
-    mtime_t i_intf_update = 0;
-    mtime_t i_last_seek_mdate = 0;
+    vlc_tick_t i_intf_update = 0;
+    vlc_tick_t i_last_seek_mdate = 0;
 
     if( b_interactive && var_InheritBool( p_input, "start-paused" ) )
         ControlPause( p_input, mdate() );
@@ -705,7 +705,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
     while( !input_Stopped( p_input ) && input_priv(p_input)->i_state != ERROR_S )
     {
-        mtime_t i_wakeup = -1;
+        vlc_tick_t i_wakeup = -1;
         bool b_paused = input_priv(p_input)->i_state == PAUSE_S;
         /* FIXME if input_priv(p_input)->i_state == PAUSE_S the access/access_demux
          * is paused -> this may cause problem with some of them
@@ -756,7 +756,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
 
             /* Update interface and statistics */
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
             if( now >= i_intf_update )
             {
                 MainLoopStatistics( p_input );
@@ -767,7 +767,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
         /* Handle control */
         for( ;; )
         {
-            mtime_t i_deadline = i_wakeup;
+            vlc_tick_t i_deadline = i_wakeup;
 
             /* Postpone seeking until ES buffering is complete or at most
              * 125 ms. */
@@ -775,7 +775,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                             && !input_priv(p_input)->master->b_eof;
             if( b_postpone )
             {
-                mtime_t now = mdate();
+                vlc_tick_t now = mdate();
 
                 /* Recheck ES buffer level every 20 ms when seeking */
                 if( now < i_last_seek_mdate + INT64_C(125000)
@@ -1026,7 +1026,7 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetInteger( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
+        var_SetInteger( p_input, "spu-delay", (vlc_tick_t)i_delay * 100000 );
 }
 
 static enum slave_type DeduceSlaveType( input_thread_t *p_input,
@@ -1260,7 +1260,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     input_thread_private_t *p_sys = input_priv(p_input);
 
     /* Get max pts delay from input source */
-    mtime_t i_pts_delay = p_sys->master->i_pts_delay;
+    vlc_tick_t i_pts_delay = p_sys->master->i_pts_delay;
     for( int i = 0; i < p_sys->i_slave; i++ )
         i_pts_delay = __MAX( i_pts_delay, p_sys->slave[i]->i_pts_delay );
 
@@ -1268,9 +1268,9 @@ static void UpdatePtsDelay( input_thread_t *p_input )
         i_pts_delay = 0;
 
     /* Take care of audio/spu delay */
-    const mtime_t i_audio_delay = var_GetInteger( p_input, "audio-delay" );
-    const mtime_t i_spu_delay   = var_GetInteger( p_input, "spu-delay" );
-    const mtime_t i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
+    const vlc_tick_t i_audio_delay = var_GetInteger( p_input, "audio-delay" );
+    const vlc_tick_t i_spu_delay   = var_GetInteger( p_input, "spu-delay" );
+    const vlc_tick_t i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
     if( i_extra_delay < 0 )
         i_pts_delay -= i_extra_delay;
 
@@ -1383,7 +1383,7 @@ static int Init( input_thread_t * p_input )
 
     /* Load master infos */
     /* Init length */
-    mtime_t i_length;
+    vlc_tick_t i_length;
     if( demux_Control( master->p_demux, DEMUX_GET_LENGTH, &i_length ) )
         i_length = 0;
     if( i_length <= 0 )
@@ -1661,7 +1661,7 @@ static int ControlGetReducedIndexLocked( input_thread_t *p_input )
 
 static inline int ControlPop( input_thread_t *p_input,
                               int *pi_type, vlc_value_t *p_val,
-                              mtime_t i_deadline, bool b_postpone_seek )
+                              vlc_tick_t i_deadline, bool b_postpone_seek )
 {
     input_thread_private_t *p_sys = input_priv(p_input);
 
@@ -1759,7 +1759,7 @@ static void ControlRelease( int i_type, vlc_value_t val )
 }
 
 /* Pause input */
-static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
+static void ControlPause( input_thread_t *p_input, vlc_tick_t i_control_date )
 {
     int i_state = PAUSE_S;
 
@@ -1786,7 +1786,7 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
     input_ChangeState( p_input, i_state );
 }
 
-static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
+static void ControlUnpause( input_thread_t *p_input, vlc_tick_t i_control_date )
 {
     if( input_priv(p_input)->b_can_pause )
     {
@@ -1936,7 +1936,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     /* Seek or change volume if the input doesn't have navigation or viewpoint */
     if( seek_direction != 0 )
     {
-        mtime_t it = var_InheritInteger( p_input, "short-jump-size" );
+        vlc_tick_t it = var_InheritInteger( p_input, "short-jump-size" );
         var_SetInteger( p_input, "time-offset", it * seek_direction * CLOCK_FREQ );
         if( i_vout > 0 )
             ControlNavDisplayPosition( pp_vout[0], p_input );
@@ -1994,7 +1994,7 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
 static bool Control( input_thread_t *p_input,
                      int i_type, vlc_value_t val )
 {
-    const mtime_t i_control_date = mdate();
+    const vlc_tick_t i_control_date = mdate();
     /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
 
@@ -2380,7 +2380,7 @@ static bool Control( input_thread_t *p_input,
 
         case INPUT_CONTROL_SET_BOOKMARK:
         {
-            mtime_t time_offset = -1;
+            vlc_tick_t time_offset = -1;
 
             vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
             if( val.i_int >= 0 && val.i_int < input_priv(p_input)->i_bookmark )

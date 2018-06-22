@@ -33,13 +33,13 @@
 
 struct filter_sys_t
 {
-    mtime_t last_pts;
+    vlc_tick_t last_pts;
 };
 
 static picture_t *Deinterlace(filter_t *filter, picture_t *src)
 {
     filter_sys_t *sys = filter->p_sys;
-    mtime_t last_pts = sys->last_pts;
+    vlc_tick_t last_pts = sys->last_pts;
 
     sys->last_pts = src->date;
 

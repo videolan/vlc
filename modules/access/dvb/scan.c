@@ -654,7 +654,7 @@ static int Scan_Next_DVBT( const scan_parameter_t *p_params, scan_enumeration_t 
     const int i_offset_count = 5;
     const int i_mhz = 1000000;
 
-    /* We will probe the whole band divided in all bandwidth possibility trying 
+    /* We will probe the whole band divided in all bandwidth possibility trying
      * i_offset_count offset around the position
      */
     for( ;; p_spectrum->i_index++ )
@@ -812,7 +812,7 @@ static int scan_Next( scan_t *p_scan, scan_tuner_config_t *p_cfg )
     //while( !scan_tuner_config_ParametersValidate( &p_scan->parameter, p_cfg ) );
 
     const size_t i_total_services = scan_CountServices( p_scan );
-    const mtime_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
+    const vlc_tick_t i_eta = f_position > 0.005 ? (mdate() - p_scan->i_time_start) * ( 1.0 / f_position - 1.0 ) : -1;
     char psz_eta[MSTRTIME_MAX_SIZE];
     const char *psz_fmt = _("%.1f MHz (%d services)\n~%s remaining");
 
@@ -876,7 +876,7 @@ int scan_Run( scan_t *p_scan )
     for( ;; )
     {
         unsigned i_timeout = scan_session_GetTablesTimeout( session );
-        mtime_t i_remaining = mdate() - i_scan_start;
+        vlc_tick_t i_remaining = mdate() - i_scan_start;
         if( i_remaining > i_timeout )
             break;
 

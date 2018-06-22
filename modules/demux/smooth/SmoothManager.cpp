@@ -103,7 +103,7 @@ bool SmoothManager::updatePlaylist()
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
-        const mtime_t m = st->getMinAheadTime();
+        const vlc_tick_t m = st->getMinAheadTime();
         if(!st->isValid() || st->isDisabled() || !st->isSelected())
         {
             continue;
@@ -121,7 +121,7 @@ void SmoothManager::scheduleNextUpdate()
 {
     time_t now = time(nullptr);
 
-    mtime_t minbuffer = getMinAheadTime() / 2;
+    vlc_tick_t minbuffer = getMinAheadTime() / 2;
 
     if(playlist->minUpdatePeriod.Get() > minbuffer)
         minbuffer = playlist->minUpdatePeriod.Get();
@@ -131,7 +131,7 @@ void SmoothManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
 }
 
 bool SmoothManager::needsUpdate() const

@@ -763,7 +763,7 @@ static int Flush(mc_api *api)
 /*****************************************************************************
  * DequeueInput
  *****************************************************************************/
-static int DequeueInput(mc_api *api, mtime_t i_timeout)
+static int DequeueInput(mc_api *api, vlc_tick_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;
@@ -789,7 +789,7 @@ static int DequeueInput(mc_api *api, mtime_t i_timeout)
  * QueueInput
  *****************************************************************************/
 static int QueueInput(mc_api *api, int i_index, const void *p_buf,
-                      size_t i_size, mtime_t i_ts, bool b_config)
+                      size_t i_size, vlc_tick_t i_ts, bool b_config)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;
@@ -843,7 +843,7 @@ static int QueueInput(mc_api *api, int i_index, const void *p_buf,
 /*****************************************************************************
  * DequeueOutput
  *****************************************************************************/
-static int DequeueOutput(mc_api *api, mtime_t i_timeout)
+static int DequeueOutput(mc_api *api, vlc_tick_t i_timeout)
 {
     mc_api_sys *p_sys = api->p_sys;
     JNIEnv *env;

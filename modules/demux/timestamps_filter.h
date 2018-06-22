@@ -37,13 +37,13 @@ enum
 struct timestamps_filter_s
 {
     struct moving_average_s mva;
-    mtime_t sequence_offset;
-    mtime_t contiguous_last;
+    vlc_tick_t sequence_offset;
+    vlc_tick_t contiguous_last;
     /**/
     struct name
     {
-        mtime_t stream;
-        mtime_t contiguous;
+        vlc_tick_t stream;
+        vlc_tick_t contiguous;
     } sync;
     /**/
     unsigned sequence;
@@ -54,7 +54,7 @@ struct tf_es_out_id_s
     es_out_id_t *id;
     vlc_fourcc_t fourcc;
     struct timestamps_filter_s tf;
-    mtime_t pcrdiff;
+    vlc_tick_t pcrdiff;
     unsigned pcrpacket;
     unsigned sequence;
     bool contiguous;
@@ -79,7 +79,7 @@ static void timestamps_filter_init(struct timestamps_filter_s *tf)
 }
 
 static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf,
-                                   mtime_t i_dts, mtime_t i_length,
+                                   vlc_tick_t i_dts, vlc_tick_t i_length,
                                    bool b_discontinuity, bool b_contiguous)
 {
     bool b_desync = false;
@@ -110,7 +110,7 @@ static bool timestamps_filter_push(const char *s, struct timestamps_filter_s *tf
         }
 
 #ifdef DEBUG_TIMESTAMPS_FILTER
-        mtime_t next = prev->dts + mva_get(&tf->mva);
+        vlc_tick_t next = prev->dts + mva_get(&tf->mva);
 
         printf("%4.4s expected %ld / %ld , prev %ld+%ld error %ld comp %ld\n",
                s, next, i_dts, prev->dts, mva_get(&tf->mva),
@@ -171,7 +171,7 @@ static int timestamps_filter_es_out_Control(es_out_t *out, int i_query, va_list 
                 /* Handle special start case, there was 1 single PCR before */
                 if(p_sys->pcrtf.mva.i_packet == 2)
                 {
-                    mtime_t max = 0;
+                    vlc_tick_t max = 0;
                     for(int i=0; i<p_sys->es_list.i_size; i++)
                     {
                         struct tf_es_out_id_s *cur = (struct tf_es_out_id_s *)p_sys->es_list.p_elems[i];
@@ -252,7 +252,7 @@ static int timestamps_filter_es_out_Send(es_out_t *out, es_out_id_t *id, block_t
         {
             cur->pcrdiff = mva_getLastDTS(&cur->tf.mva) - mva_getLastDTS(&p_sys->pcrtf.mva);
 
-            mtime_t i_offsetdiff = cur->tf.sequence_offset - p_sys->pcrtf.sequence_offset;
+            vlc_tick_t i_offsetdiff = cur->tf.sequence_offset - p_sys->pcrtf.sequence_offset;
             if(i_offsetdiff != 0)
                 cur->tf.sequence_offset -= i_offsetdiff;
 #ifdef DEBUG_TIMESTAMPS_FILTER

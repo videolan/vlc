@@ -29,16 +29,16 @@ typedef struct
     uint64_t i_pos;
     int      i_size;
 
-    mtime_t  i_pts_dts;
-    mtime_t  i_length;
+    vlc_tick_t  i_pts_dts;
+    vlc_tick_t  i_length;
     unsigned int i_flags;
 } mp4mux_entry_t;
 
 typedef struct
 {
     uint64_t i_duration;
-    mtime_t i_start_time;
-    mtime_t i_start_offset;
+    vlc_tick_t i_start_time;
+    vlc_tick_t i_start_offset;
 } mp4mux_edit_t;
 
 typedef struct
@@ -57,7 +57,7 @@ typedef struct
     /* stats */
     int64_t      i_read_duration;
     uint32_t     i_timescale;
-    mtime_t      i_firstdts; /* the really first packet */
+    vlc_tick_t   i_firstdts; /* the really first packet */
     bool         b_hasbframes;
 
     /* temp stuff */

@@ -41,7 +41,7 @@ typedef struct sout_cycle sout_cycle_t;
 struct sout_cycle
 {
     sout_cycle_t *next;
-    mtime_t offset;
+    vlc_tick_t offset;
     char chain[1];
 };
 
@@ -62,11 +62,11 @@ struct sout_stream_sys_t
 
     sout_cycle_t *start;
     sout_cycle_t *next;
-    mtime_t (*clock)(const block_t *);
-    mtime_t period; /*< Total cycle duration */
+    vlc_tick_t (*clock)(const block_t *);
+    vlc_tick_t period; /*< Total cycle duration */
 };
 
-static mtime_t get_dts(const block_t *block)
+static vlc_tick_t get_dts(const block_t *block)
 {
     return block->i_dts;
 }
@@ -182,7 +182,7 @@ static int Send(sout_stream_t *stream, sout_stream_id_sys_t *id,
 }
 
 static int AppendPhase(sout_cycle_t ***restrict pp,
-                       mtime_t offset, const char *chain)
+                       vlc_tick_t offset, const char *chain)
 {
 
     size_t len = strlen(chain);
@@ -199,7 +199,7 @@ static int AppendPhase(sout_cycle_t ***restrict pp,
     return 0;
 }
 
-static mtime_t ParseTime(const char *str)
+static vlc_tick_t ParseTime(const char *str)
 {
     char *end;
     unsigned long long u = strtoull(str, &end, 0);
@@ -244,7 +244,7 @@ static int Open(vlc_object_t *obj)
     sys->start = NULL;
     sys->clock = get_dts;
 
-    mtime_t offset = 0;
+    vlc_tick_t offset = 0;
     sout_cycle_t **pp = &sys->start;
     const char *chain = "";
 
@@ -258,7 +258,7 @@ static int Open(vlc_object_t *obj)
         }
         else if (!strcmp(cfg->psz_name, "duration"))
         {
-            mtime_t t = ParseTime(cfg->psz_value);
+            vlc_tick_t t = ParseTime(cfg->psz_value);
 
             if (t > 0)
             {
@@ -270,7 +270,7 @@ static int Open(vlc_object_t *obj)
         }
         else if (!strcmp(cfg->psz_name, "offset"))
         {
-            mtime_t t = ParseTime(cfg->psz_value);
+            vlc_tick_t t = ParseTime(cfg->psz_value);
 
             if (t > offset)
             {

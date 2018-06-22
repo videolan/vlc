@@ -60,7 +60,7 @@ typedef struct
 
     void (*pf_set_demux_enabled)(void *, bool enabled, on_paused_changed_itf, void *);
 
-    mtime_t (*pf_get_time)(void*);
+    vlc_tick_t (*pf_get_time)(void*);
 
     int (*pf_pace)(void*);
 

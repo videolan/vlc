@@ -1216,7 +1216,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    mtime_t t_final = VLC_TS_INVALID; /* for custom timestamp mangling */
+    vlc_tick_t t_final = VLC_TS_INVALID; /* for custom timestamp mangling */
 
     picture_t *p_curr = p_sys->context.pp_history[1];
     picture_t *p_next = p_sys->context.pp_history[2];
@@ -1412,7 +1412,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
         {
             /* Approximate field duration from the PTS difference. */
             /* FIXME: use field length as measured by Deinterlace()? */
-            mtime_t i_half_field_dur = ( (p_next->date - p_curr->date)/3 ) / 2;
+            vlc_tick_t i_half_field_dur = ( (p_next->date - p_curr->date)/3 ) / 2;
             t_final = p_curr->date + i_half_field_dur;
         }
         else /* Otherwise, use original PTS of the outgoing frame. */

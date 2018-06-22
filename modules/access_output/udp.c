@@ -107,11 +107,11 @@ static ssize_t Write   ( sout_access_out_t *, block_t * );
 static int Control( sout_access_out_t *, int, va_list );
 
 static void* ThreadWrite( void * );
-static block_t *NewUDPPacket( sout_access_out_t *, mtime_t );
+static block_t *NewUDPPacket( sout_access_out_t *, vlc_tick_t );
 
 struct sout_access_out_sys_t
 {
-    mtime_t       i_caching;
+    vlc_tick_t    i_caching;
     int           i_handle;
     bool          b_mtu_warning;
     size_t        i_mtu;
@@ -277,7 +277,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
     {
         block_t *p_next;
         int i_packets = 0;
-        mtime_t now = mdate();
+        vlc_tick_t now = mdate();
 
         if( !p_sys->b_mtu_warning && p_buffer->i_buffer > p_sys->i_mtu )
         {
@@ -352,7 +352,7 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 /*****************************************************************************
  * NewUDPPacket: allocate a new UDP packet of size p_sys->i_mtu
  *****************************************************************************/
-static block_t *NewUDPPacket( sout_access_out_t *p_access, mtime_t i_dts)
+static block_t *NewUDPPacket( sout_access_out_t *p_access, vlc_tick_t i_dts)
 {
     sout_access_out_sys_t *p_sys = p_access->p_sys;
     block_t *p_buffer;
@@ -387,16 +387,16 @@ static void* ThreadWrite( void *data )
 {
     sout_access_out_t *p_access = data;
     sout_access_out_sys_t *p_sys = p_access->p_sys;
-    mtime_t i_date_last = -1;
+    vlc_tick_t i_date_last = -1;
     const unsigned i_group = var_GetInteger( p_access,
                                              SOUT_CFG_PREFIX "group" );
-    mtime_t i_to_send = i_group;
+    vlc_tick_t i_to_send = i_group;
     unsigned i_dropped_packets = 0;
 
     for (;;)
     {
         block_t *p_pk = block_FifoGet( p_sys->p_fifo );
-        mtime_t       i_date, i_sent;
+        vlc_tick_t    i_date, i_sent;
 
         i_date = p_sys->i_caching + p_pk->i_dts;
         if( i_date_last > 0 )

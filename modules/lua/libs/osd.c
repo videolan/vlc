@@ -116,7 +116,7 @@ static int vlclua_osd_message( lua_State *L )
     const char *psz_message = luaL_checkstring( L, 1 );
     int i_chan = (int)luaL_optinteger( L, 2, VOUT_SPU_CHANNEL_OSD );
     const char *psz_position = luaL_optstring( L, 3, "top-right" );
-    mtime_t duration = (mtime_t)luaL_optinteger( L, 4, 1000000 );
+    vlc_tick_t duration = (vlc_tick_t)luaL_optinteger( L, 4, 1000000 );
 
     input_thread_t *p_input = vlclua_get_input_internal( L );
     if( p_input )

@@ -485,8 +485,8 @@ enum input_query_e
     INPUT_SET_RENDERER,     /* arg1=vlc_renderer_item_t* */
 
     /* External clock managments */
-    INPUT_GET_PCR_SYSTEM,   /* arg1=mtime_t *, arg2=mtime_t *       res=can fail */
-    INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=mtime_t      res=can fail */
+    INPUT_GET_PCR_SYSTEM,   /* arg1=vlc_tick_t *, arg2=vlc_tick_t *       res=can fail */
+    INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=vlc_tick_t   res=can fail */
 };
 
 /** @}*/
@@ -631,14 +631,14 @@ static inline int input_GetEsObjects( input_thread_t *p_input, int i_id,
 /**
  * \see input_clock_GetSystemOrigin
  */
-static inline int input_GetPcrSystem( input_thread_t *p_input, mtime_t *pi_system, mtime_t *pi_delay )
+static inline int input_GetPcrSystem( input_thread_t *p_input, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
 {
     return input_Control( p_input, INPUT_GET_PCR_SYSTEM, pi_system, pi_delay );
 }
 /**
  * \see input_clock_ChangeSystemOrigin
  */
-static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolute, mtime_t i_system )
+static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolute, vlc_tick_t i_system )
 {
     return input_Control( p_input, INPUT_MODIFY_PCR_SYSTEM, b_absolute, i_system );
 }

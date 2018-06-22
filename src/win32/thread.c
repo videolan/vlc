@@ -431,7 +431,7 @@ void vlc_addr_wait(void *addr, unsigned val)
     WaitOnAddress(addr, &val, sizeof (val), -1);
 }
 
-bool vlc_addr_timedwait(void *addr, unsigned val, mtime_t delay)
+bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
     delay = (delay + 999) / 1000;
 
@@ -737,7 +737,7 @@ static union
 #endif
 } clk;
 
-static mtime_t mdate_interrupt (void)
+static vlc_tick_t mdate_interrupt (void)
 {
     ULONGLONG ts;
     BOOL ret;
@@ -755,7 +755,7 @@ static mtime_t mdate_interrupt (void)
     return ts / (10000000 / CLOCK_FREQ);
 }
 
-static mtime_t mdate_tick (void)
+static vlc_tick_t mdate_tick (void)
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_VISTA)
     ULONGLONG ts = GetTickCount64 ();
@@ -768,7 +768,7 @@ static mtime_t mdate_tick (void)
     return ts * (CLOCK_FREQ / 1000);
 }
 #if !VLC_WINSTORE_APP
-static mtime_t mdate_multimedia (void)
+static vlc_tick_t mdate_multimedia (void)
 {
     DWORD ts = clk.multimedia.timeGetTime ();
 
@@ -778,7 +778,7 @@ static mtime_t mdate_multimedia (void)
 }
 #endif
 
-static mtime_t mdate_perf (void)
+static vlc_tick_t mdate_perf (void)
 {
     /* We don't need the real date, just the value of a high precision timer */
     LARGE_INTEGER counter;
@@ -792,7 +792,7 @@ static mtime_t mdate_perf (void)
     return (d.quot * 1000000) + ((d.rem * 1000000) / clk.perf.freq.QuadPart);
 }
 
-static mtime_t mdate_wall (void)
+static vlc_tick_t mdate_wall (void)
 {
     FILETIME ts;
     ULARGE_INTEGER s;
@@ -809,23 +809,23 @@ static mtime_t mdate_wall (void)
     return s.QuadPart / (10000000 / CLOCK_FREQ);
 }
 
-static mtime_t mdate_default(void)
+static vlc_tick_t mdate_default(void)
 {
     vlc_threads_setup(NULL);
     return mdate_perf();
 }
 
-static mtime_t (*mdate_selected) (void) = mdate_default;
+static vlc_tick_t (*mdate_selected) (void) = mdate_default;
 
-mtime_t mdate (void)
+vlc_tick_t mdate (void)
 {
     return mdate_selected ();
 }
 
 #if (_WIN32_WINNT < _WIN32_WINNT_WIN8)
-void (mwait)(mtime_t deadline)
+void (mwait)(vlc_tick_t deadline)
 {
-    mtime_t delay;
+    vlc_tick_t delay;
 
     vlc_testcancel();
     while ((delay = (deadline - mdate())) > 0)
@@ -839,7 +839,7 @@ void (mwait)(mtime_t deadline)
     }
 }
 
-void (msleep)(mtime_t delay)
+void (msleep)(vlc_tick_t delay)
 {
     mwait (mdate () + delay);
 }

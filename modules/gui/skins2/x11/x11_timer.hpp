@@ -48,7 +48,7 @@ public:
     /// Stop the timer
     virtual void stop();
 
-    mtime_t getNextDate() const;
+    vlc_tick_t getNextDate() const;
 
     /// Execute the callback.
     /// Returns false if the timer must be removed after
@@ -60,9 +60,9 @@ private:
     /// Timer loop
     X11TimerLoop *m_pTimerLoop;
     /// Delay between two execute
-    mtime_t m_interval;
+    vlc_tick_t m_interval;
     /// Next date at which the timer must be executed
-    mtime_t m_nextDate;
+    vlc_tick_t m_nextDate;
     /// Flag to tell if the timer must be stopped after the first execution
     bool m_oneShot;
 };

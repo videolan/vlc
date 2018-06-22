@@ -42,9 +42,9 @@ using OutputVal = std::pair<const AbstractFakeESOutID *, block_t *>;
 
 struct context
 {
-    mtime_t dts;
-    mtime_t pts;
-    mtime_t pcr;
+    vlc_tick_t dts;
+    vlc_tick_t pts;
+    vlc_tick_t pcr;
 };
 
 struct dropesout
@@ -83,7 +83,7 @@ static int dummy_callback_control(es_out_t *out, int i_query, va_list args)
         {
             if( i_query == ES_OUT_SET_GROUP_PCR )
                 (void) va_arg( args, int );
-            ctx->pcr = va_arg( args, mtime_t );
+            ctx->pcr = va_arg( args, vlc_tick_t );
             break;
         }
         default:
@@ -98,7 +98,7 @@ static void dummy_callback_destroy(es_out_t *)
 
 }
 
-static void enqueue(es_out_t *out, es_out_id_t *id, mtime_t dts, mtime_t pts)
+static void enqueue(es_out_t *out, es_out_id_t *id, vlc_tick_t dts, vlc_tick_t pts)
 {
     block_t *b = block_Alloc(1);
     if(b)
@@ -122,7 +122,7 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
     es_out_id_t *id = es_out_Add(out, &fmt);
     try
     {
-        mtime_t mediaref = TMS(10000);
+        vlc_tick_t mediaref = TMS(10000);
         SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
 
         /* setExpectedTimestamp check starting from zero every segment (smooth streaming) */
@@ -211,7 +211,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
 
     try
     {
-        mtime_t mediaref = TMS(10000);
+        vlc_tick_t mediaref = TMS(10000);
         SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
         fakees->setSegmentStartTimes(segmentTimes);
 
@@ -228,14 +228,14 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         Expect(mediaref + DMS(5000) == fakees->commandsQueue()->getBufferingLevel().segment.media);
 
         /* Reference has local timestamp < rolled ts */
-        mtime_t reference = TMS(0);
+        vlc_tick_t reference = TMS(0);
         fakees->resetTimestamps();
         fakees->setSegmentStartTimes(segmentTimes);
         fakees->setSynchronizationReference(SynchronizationReference());
         SEND(reference);
         PCR(reference);
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
-        mtime_t ts = TMS(1000) + FROM_MPEGTS(0x1FFFFFFFF);
+        vlc_tick_t ts = TMS(1000) + FROM_MPEGTS(0x1FFFFFFFF);
         ts = fakees->applyTimestampContinuity(ts);
         fprintf(stderr, "timestamp %ld\n", ts);
         Expect(ts == reference + DMS(1000));
@@ -326,7 +326,7 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
     try
     {
 
-        mtime_t mediaref = TMS(10000);
+        vlc_tick_t mediaref = TMS(10000);
         SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
         fakees->setSegmentStartTimes(segmentTimes);
 

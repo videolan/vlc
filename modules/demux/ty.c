@@ -237,15 +237,15 @@ struct demux_sys_t
   int             i_pes_buf_cnt;      /* how many bytes in our buffer */
   size_t          l_ac3_pkt_size;     /* len of ac3 pkt we've seen so far */
   uint64_t        l_last_ty_pts;      /* last TY timestamp we've seen */
-  //mtime_t         l_last_ty_pts_sync; /* audio PTS at time of last TY PTS */
+  //vlc_tick_t      l_last_ty_pts_sync; /* audio PTS at time of last TY PTS */
   uint64_t        l_first_ty_pts;     /* first TY PTS in this master chunk */
   uint64_t        l_final_ty_pts;     /* final TY PTS in this master chunk */
   unsigned        i_seq_table_size;   /* number of entries in SEQ table */
   unsigned        i_bits_per_seq_entry; /* # of bits in SEQ table bitmask */
 
-  mtime_t         firstAudioPTS;
-  mtime_t         lastAudioPTS;
-  mtime_t         lastVideoPTS;
+  vlc_tick_t      firstAudioPTS;
+  vlc_tick_t      lastAudioPTS;
+  vlc_tick_t      lastVideoPTS;
 
   ty_rec_hdr_t    *rec_hdrs;          /* record headers array */
   int             i_cur_rec;          /* current record in this chunk */
@@ -257,7 +257,7 @@ struct demux_sys_t
 };
 
 static int get_chunk_header(demux_t *);
-static mtime_t get_pts( const uint8_t *buf );
+static vlc_tick_t get_pts( const uint8_t *buf );
 static int find_es_header( const uint8_t *header,
                            const uint8_t *buffer, int i_search_len );
 static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct);
@@ -556,15 +556,15 @@ static void Close( vlc_object_t *p_this )
 /* =========================================================================== */
 /* Compute Presentation Time Stamp (PTS)
  * Assume buf points to beginning of PTS */
-static mtime_t get_pts( const uint8_t *buf )
+static vlc_tick_t get_pts( const uint8_t *buf )
 {
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 
-    i_pts = ((mtime_t)(buf[0]&0x0e ) << 29)|
-             (mtime_t)(buf[1] << 22)|
-            ((mtime_t)(buf[2]&0xfe) << 14)|
-             (mtime_t)(buf[3] << 7)|
-             (mtime_t)(buf[4] >> 1);
+    i_pts = ((vlc_tick_t)(buf[0]&0x0e ) << 29)|
+             (vlc_tick_t)(buf[1] << 22)|
+            ((vlc_tick_t)(buf[2]&0xfe) << 14)|
+             (vlc_tick_t)(buf[3] << 7)|
+             (vlc_tick_t)(buf[4] >> 1);
     i_pts *= 100 / 9;   /* convert PTS (90Khz clock) to microseconds */
     return i_pts;
 }

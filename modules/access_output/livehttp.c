@@ -179,10 +179,10 @@ struct sout_access_out_sys_t
     char *psz_indexPath;
     char *psz_indexUrl;
     char *psz_keyfile;
-    mtime_t i_keyfile_modification;
-    mtime_t i_opendts;
-    mtime_t i_dts_offset;
-    mtime_t  i_seglenm;
+    vlc_tick_t i_keyfile_modification;
+    vlc_tick_t i_opendts;
+    vlc_tick_t i_dts_offset;
+    vlc_tick_t  i_seglenm;
     uint32_t i_segment;
     size_t  i_seglen;
     float   f_seglen;
@@ -947,7 +947,7 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
     msg_Dbg( p_access, "Writing all full segments" );
 
     block_t *output = p_sys->full_segments;
-    mtime_t output_last_length = 0;
+    vlc_tick_t output_last_length = 0;
     if( output )
         output_last_length = output->i_length;
     if( *p_sys->full_segments_end )

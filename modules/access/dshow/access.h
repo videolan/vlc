@@ -75,6 +75,6 @@ struct access_sys_t
     int            i_width;
     int            i_height;
     int            i_chroma;
-    mtime_t        i_start;
+    vlc_tick_t     i_start;
 };
 

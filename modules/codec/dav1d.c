@@ -215,7 +215,7 @@ static int Decode(decoder_t *dec, block_t *block)
             block_Release(block);
             return VLCDEC_ECRITICAL;
         }
-        mtime_t pts = block->i_pts == VLC_TS_INVALID ? block->i_dts : block->i_pts;
+        vlc_tick_t pts = block->i_pts == VLC_TS_INVALID ? block->i_dts : block->i_pts;
         p_data->m.timestamp = pts;
         b_eos = (block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
     }

@@ -85,7 +85,7 @@ struct decoder_sys_t
     date_t  end_date;
     bool    b_discontinuity;
 
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     int i_frame_size;
 
     bool         b_mlp;
@@ -427,7 +427,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
                 if( p_sys->mlp.i_rate > 0 )
                 {
-                    const mtime_t i_end_date = date_Get( &p_sys->end_date );
+                    const vlc_tick_t i_end_date = date_Get( &p_sys->end_date );
                     date_Init( &p_sys->end_date, p_sys->mlp.i_rate, 1 );
                     date_Set( &p_sys->end_date, i_end_date );
                 }

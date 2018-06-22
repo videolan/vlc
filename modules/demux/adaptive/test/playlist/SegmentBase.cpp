@@ -52,7 +52,7 @@ int SegmentBase_test()
         uint64_t number; bool discont;
         Expect(segmentBase->getSegmentNumberByTime(1, &number) == false);
         Expect(segmentBase->getNextMediaSegment(0, &number, &discont) == nullptr);
-        mtime_t time, duration;
+        vlc_tick_t time, duration;
         Expect(segmentBase->getPlaybackTimeDurationBySegmentNumber(0, &time, &duration) == false);
 
         /* Create a split range */

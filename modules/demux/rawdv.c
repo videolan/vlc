@@ -108,7 +108,7 @@ struct demux_sys_t
     int    i_bitrate;
 
     /* program clock reference (in units of 90kHz) */
-    mtime_t i_pcr;
+    vlc_tick_t i_pcr;
     bool b_hurry_up;
 };
 

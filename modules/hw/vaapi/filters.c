@@ -253,7 +253,7 @@ struct  deint_data
 
     struct
     {
-        mtime_t date;
+        vlc_tick_t date;
         int     i_nb_fields;
     } meta[METADATA_SIZE];
 
@@ -912,7 +912,7 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
     if (p_deint_data->history.num_pics < p_deint_data->history.sz)
         return NULL;
 
-    mtime_t i_field_dur = 0;
+    vlc_tick_t i_field_dur = 0;
     unsigned int i = 0;
     for ( ; i < METADATA_SIZE-1; i ++)
         if (p_deint_data->meta[i].date > VLC_TS_INVALID)

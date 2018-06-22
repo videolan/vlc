@@ -342,8 +342,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         if( p_sys->b_master_sync )
         {
-            mtime_t i_pts = date_Get( &id->next_input_pts );
-            mtime_t i_drift = 0;
+            vlc_tick_t i_pts = date_Get( &id->next_input_pts );
+            vlc_tick_t i_drift = 0;
 
             if( likely( p_audio_buf->i_pts != VLC_TS_INVALID ) )
                 i_drift = p_audio_buf->i_pts - i_pts;

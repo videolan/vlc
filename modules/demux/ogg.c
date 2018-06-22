@@ -299,7 +299,7 @@ static int Demux( demux_t * p_demux )
         {
             msg_Dbg( p_demux, "end of a group of %d logical streams", p_sys->i_streams );
 
-            mtime_t i_lastpcr = VLC_TS_INVALID;
+            vlc_tick_t i_lastpcr = VLC_TS_INVALID;
             for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
             {
                 logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
@@ -649,7 +649,7 @@ static int Demux( demux_t * p_demux )
     /* We will consider the lowest PCR among tracks, because the audio core badly
      * handles PCR rewind (mute)
      */
-    mtime_t i_pcr_candidate = VLC_TS_INVALID;
+    vlc_tick_t i_pcr_candidate = VLC_TS_INVALID;
     for( i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
@@ -1167,7 +1167,7 @@ static void Ogg_SendOrQueueBlocks( demux_t *p_demux, logical_stream_t *p_stream,
     else
     {
         /* Because ES creation is delayed for preparsing */
-        mtime_t i_firstpts = VLC_TS_UNKNOWN;
+        vlc_tick_t i_firstpts = VLC_TS_UNKNOWN;
         if ( p_stream->p_preparse_block )
         {
             block_t *temp = p_stream->p_preparse_block;
@@ -1543,7 +1543,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                   p_oggpacket->packet[i_header_len + 1] != '\n' &&
                   p_oggpacket->packet[i_header_len + 1] != '\r' ) )
             {
-                p_block->i_length = (mtime_t)lenbytes * 1000;
+                p_block->i_length = (vlc_tick_t)lenbytes * 1000;
             }
         }
 

@@ -74,7 +74,7 @@ int SegmentTemplate_test()
         //Expect(templ->getMediaSegment(11) == nullptr);
         uint64_t number;
         Expect(templ->getSegmentNumberByTime(timescale.ToTime(0), &number) == false);
-        mtime_t time, duration;
+        vlc_tick_t time, duration;
         //Expect(templ->getPlaybackTimeDurationBySegmentNumber(11, &time, &duration) == false);
         Expect(templ->getMinAheadTime(11) == 0);
 
@@ -88,7 +88,7 @@ int SegmentTemplate_test()
         Expect(templ->getMediaSegment(11 + 2) != nullptr);
 
         /* start/end, duration known */
-        mtime_t now = timescale.ToTime(1000000);
+        vlc_tick_t now = timescale.ToTime(1000000);
         pl->availabilityStartTime.Set(now);
         pl->availabilityEndTime.Set(now + timescale.ToTime(100 * 20));
         Expect(templ->getLiveTemplateNumber(now, true) == templ->getStartSegmentNumber());

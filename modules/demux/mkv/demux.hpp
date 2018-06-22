@@ -70,7 +70,7 @@ typedef struct {
 #ifdef WORDS_BIGENDIAN
   unsigned char zero                           : 7; /* 25-31 */
   unsigned char video_pres_mode_change         : 1; /* 24 */
- 
+
   unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
   unsigned char angle_change                   : 1;
   unsigned char subpic_stream_change           : 1;
@@ -79,7 +79,7 @@ typedef struct {
   unsigned char still_off                      : 1;
   unsigned char button_select_or_activate      : 1;
   unsigned char resume                         : 1; /* 16 */
- 
+
   unsigned char chapter_menu_call              : 1; /* 15 */
   unsigned char angle_menu_call                : 1;
   unsigned char audio_menu_call                : 1;
@@ -88,7 +88,7 @@ typedef struct {
   unsigned char title_menu_call                : 1;
   unsigned char backward_scan                  : 1;
   unsigned char forward_scan                   : 1; /* 8 */
- 
+
   unsigned char next_pg_search                 : 1; /* 7 */
   unsigned char prev_or_top_pg_search          : 1;
   unsigned char time_or_chapter_search         : 1;
@@ -100,7 +100,7 @@ typedef struct {
 #else
   unsigned char video_pres_mode_change         : 1; /* 24 */
   unsigned char zero                           : 7; /* 25-31 */
- 
+
   unsigned char resume                         : 1; /* 16 */
   unsigned char button_select_or_activate      : 1;
   unsigned char still_off                      : 1;
@@ -109,7 +109,7 @@ typedef struct {
   unsigned char subpic_stream_change           : 1;
   unsigned char angle_change                   : 1;
   unsigned char karaoke_audio_pres_mode_change : 1; /* 23 */
- 
+
   unsigned char forward_scan                   : 1; /* 8 */
   unsigned char backward_scan                  : 1;
   unsigned char title_menu_call                : 1;
@@ -118,7 +118,7 @@ typedef struct {
   unsigned char audio_menu_call                : 1;
   unsigned char angle_menu_call                : 1;
   unsigned char chapter_menu_call              : 1; /* 15 */
- 
+
   unsigned char title_or_time_play             : 1; /* 0 */
   unsigned char chapter_search_or_play         : 1;
   unsigned char title_play                     : 1;
@@ -351,10 +351,10 @@ public:
     /* current data */
     demux_t                 & demuxer;
 
-    mtime_t                 i_pts;
-    mtime_t                 i_pcr;
-    mtime_t                 i_start_pts;
-    mtime_t                 i_mk_chapter_time;
+    vlc_tick_t              i_pts;
+    vlc_tick_t              i_pcr;
+    vlc_tick_t              i_start_pts;
+    vlc_tick_t              i_mk_chapter_time;
 
     vlc_meta_t              *meta;
 
@@ -383,7 +383,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     bool FreeUnused();
-    bool PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date );
+    bool PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date );
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *, bool b_initial = false );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 

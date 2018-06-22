@@ -52,7 +52,7 @@ int SegmentList_test()
         Expect(segmentList->getMediaSegment(0) == nullptr);
         Expect(segmentList->getNextMediaSegment(0, &number, &discont) == nullptr);
         Expect(segmentList->getMinAheadTime(0) == 0);
-        mtime_t time, duration;
+        vlc_tick_t time, duration;
         Expect(segmentList->getPlaybackTimeDurationBySegmentNumber(0, &time, &duration) == false);
 
         /* Simple elements list */

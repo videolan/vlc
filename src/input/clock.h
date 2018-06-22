@@ -57,7 +57,7 @@ void           input_clock_Delete( input_clock_t * );
 void    input_clock_Update( input_clock_t *, vlc_object_t *p_log,
                             bool *pb_late,
                             bool b_can_pace_control, bool b_buffering_allowed,
-                            mtime_t i_clock, mtime_t i_system );
+                            vlc_tick_t i_clock, vlc_tick_t i_system );
 /**
  * This function will reset the drift of a input_clock_t.
  *
@@ -68,7 +68,7 @@ void    input_clock_Reset( input_clock_t * );
 /**
  * This functions will return a deadline used to control the reading speed.
  */
-mtime_t input_clock_GetWakeup( input_clock_t * );
+vlc_tick_t input_clock_GetWakeup( input_clock_t * );
 
 /**
  * This functions allows changing the actual reading speed.
@@ -78,13 +78,13 @@ void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 /**
  * This function allows changing the pause status.
  */
-void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
+void    input_clock_ChangePause( input_clock_t *, bool b_paused, vlc_tick_t i_date );
 
 /**
  * This function returns the original system value date and the delay for the current
  * reference point (a valid reference point must have been set).
  */
-void    input_clock_GetSystemOrigin( input_clock_t *, mtime_t *pi_system, mtime_t *pi_delay );
+void    input_clock_GetSystemOrigin( input_clock_t *, vlc_tick_t *pi_system, vlc_tick_t *pi_delay );
 
 /**
  * This function allows rebasing the original system value date (a valid
@@ -92,7 +92,7 @@ void    input_clock_GetSystemOrigin( input_clock_t *, mtime_t *pi_system, mtime_
  * When using the absolute mode, it will create a discontinuity unless
  * called imediatly after a input_clock_Update.
  */
-void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, mtime_t i_system );
+void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_tick_t i_system );
 
 /**
  * This function converts a pair of timestamp from stream clock to system clock.
@@ -109,7 +109,7 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, mtime_
  * Otherwise it will return VLC_SUCCESS.
  */
 int input_clock_ConvertTS( vlc_object_t *, input_clock_t *, int *pi_rate,
-                           mtime_t *pi_ts0, mtime_t *pi_ts1, mtime_t i_ts_bound );
+                           vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1, vlc_tick_t i_ts_bound );
 
 /**
  * This function returns the current rate.
@@ -121,19 +121,19 @@ int input_clock_GetRate( input_clock_t * );
  * reference point.
  */
 int input_clock_GetState( input_clock_t *,
-                          mtime_t *pi_stream_start, mtime_t *pi_system_start,
-                          mtime_t *pi_stream_duration, mtime_t *pi_system_duration );
+                          vlc_tick_t *pi_stream_start, vlc_tick_t *pi_system_start,
+                          vlc_tick_t *pi_stream_duration, vlc_tick_t *pi_system_duration );
 
 /**
  * This function allows the set the minimal configuration for the jitter estimation algo.
  */
 void input_clock_SetJitter( input_clock_t *,
-                            mtime_t i_pts_delay, int i_cr_average );
+                            vlc_tick_t i_pts_delay, int i_cr_average );
 
 /**
  * This function returns an estimation of the pts_delay needed to avoid rebufferization.
  * XXX in the current implementation, the pts_delay will never be decreased.
  */
-mtime_t input_clock_GetJitter( input_clock_t * );
+vlc_tick_t input_clock_GetJitter( input_clock_t * );
 
 #endif

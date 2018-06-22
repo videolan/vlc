@@ -177,7 +177,7 @@ struct rtsp_session_t
 {
     rtsp_stream_t *stream;
     uint64_t       id;
-    mtime_t        last_seen; /* for timeouts */
+    vlc_tick_t     last_seen; /* for timeouts */
 
     /* output (id-access) */
     int            trackc;
@@ -303,7 +303,7 @@ static void RtspUpdateTimer( rtsp_stream_t *rtsp )
     if (rtsp->timeout <= 0)
         return;
 
-    mtime_t timeout = 0;
+    vlc_tick_t timeout = 0;
     for (int i = 0; i < rtsp->sessionc; i++)
     {
         if (timeout == 0 || rtsp->sessionv[i]->last_seen < timeout)
@@ -320,7 +320,7 @@ static void RtspTimeOut( void *data )
     rtsp_stream_t *rtsp = data;
 
     vlc_mutex_lock(&rtsp->lock);
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     for (int i = rtsp->sessionc - 1; i >= 0; i--)
     {
         if (rtsp->sessionv[i]->last_seen + rtsp->timeout * CLOCK_FREQ < now)

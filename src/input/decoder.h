@@ -36,12 +36,12 @@ decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, input_clock_t *,
  * The date parameter MUST hold the exact date at which the change has been
  * done for proper vout/aout pausing.
  */
-void input_DecoderChangePause( decoder_t *, bool b_paused, mtime_t i_date );
+void input_DecoderChangePause( decoder_t *, bool b_paused, vlc_tick_t i_date );
 
 /**
  * This function changes the delay.
  */
-void input_DecoderChangeDelay( decoder_t *, mtime_t i_delay );
+void input_DecoderChangeDelay( decoder_t *, vlc_tick_t i_delay );
 
 /**
  * This function makes the decoder start waiting for a valid data block from its fifo.
@@ -83,7 +83,7 @@ void input_DecoderGetCcDesc( decoder_t *, decoder_cc_desc_t * );
  * This function force the display of the next picture and fills the stream
  * time consumed.
  */
-void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration );
+void input_DecoderFrameNext( decoder_t *p_dec, vlc_tick_t *pi_duration );
 
 /**
  * This function will return true if the ES format or meta data have changed since

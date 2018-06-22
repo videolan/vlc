@@ -161,7 +161,7 @@ static int  ProcessHeaders( decoder_t * );
 static int  ProcessInitialHeader ( decoder_t *, ogg_packet * );
 static block_t *ProcessPacket( decoder_t *, ogg_packet *, block_t * );
 
-static block_t *DecodePacket( decoder_t *, ogg_packet *, int, mtime_t );
+static block_t *DecodePacket( decoder_t *, ogg_packet *, int, vlc_tick_t );
 
 /*****************************************************************************
  * OpenDecoder: probe the decoder and return score
@@ -433,7 +433,7 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
  * DecodePacket: decodes a Opus packet.
  *****************************************************************************/
 static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
-                              int i_nb_samples, mtime_t i_duration )
+                              int i_nb_samples, vlc_tick_t i_duration )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -564,9 +564,9 @@ static block_t *Encode(encoder_t *enc, block_t *buf)
     if (!buf)
         return NULL;
 
-    mtime_t i_pts = buf->i_pts -
-                (mtime_t) CLOCK_FREQ * (mtime_t) sys->i_samples_delay /
-                (mtime_t) enc->fmt_in.audio.i_rate;
+    vlc_tick_t i_pts = buf->i_pts -
+                (vlc_tick_t) CLOCK_FREQ * (vlc_tick_t) sys->i_samples_delay /
+                (vlc_tick_t) enc->fmt_in.audio.i_rate;
 
     sys->i_samples_delay += buf->i_nb_samples;
 
@@ -611,8 +611,8 @@ static block_t *Encode(encoder_t *enc, block_t *buf)
         }
         else
         {
-            out_block->i_length = (mtime_t) CLOCK_FREQ *
-                (mtime_t) OPUS_FRAME_SIZE / (mtime_t) enc->fmt_in.audio.i_rate;
+            out_block->i_length = (vlc_tick_t) CLOCK_FREQ *
+                (vlc_tick_t) OPUS_FRAME_SIZE / (vlc_tick_t) enc->fmt_in.audio.i_rate;
 
             out_block->i_dts = out_block->i_pts = i_pts;
 

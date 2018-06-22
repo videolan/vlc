@@ -88,7 +88,7 @@ vlc_module_end ()
 
 typedef struct ValueDate_t {
     float value;
-    mtime_t date;
+    vlc_tick_t date;
     struct ValueDate_t* next;
 } ValueDate_t;
 
@@ -104,7 +104,7 @@ struct filter_sys_t
     ValueDate_t*    first;
     ValueDate_t*    last;
     int             started;
-    mtime_t         lastAlarm;
+    vlc_tick_t      lastAlarm;
 };
 
 /*****************************************************************************

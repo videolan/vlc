@@ -54,7 +54,7 @@ struct decoder_sys_t {
     int     segment_id;
     int     segment_size;
     uint8_t *segment_buffer;
-    mtime_t segment_date;
+    vlc_tick_t segment_date;
 };
 
 typedef struct {
@@ -330,7 +330,7 @@ static subpicture_region_t *DecodeSimpleBitmap(decoder_t *dec,
 
 static subpicture_t *DecodeSubtitleMessage(decoder_t *dec,
                                            const uint8_t *data, int size,
-                                           mtime_t date)
+                                           vlc_tick_t date)
 {
     if (size < 12)
         goto error;

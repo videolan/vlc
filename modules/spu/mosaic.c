@@ -47,7 +47,7 @@
  *****************************************************************************/
 static int  CreateFilter    ( vlc_object_t * );
 static void DestroyFilter   ( vlc_object_t * );
-static subpicture_t *Filter ( filter_t *, mtime_t );
+static subpicture_t *Filter ( filter_t *, vlc_tick_t );
 
 static int MosaicCallback   ( vlc_object_t *, char const *, vlc_value_t,
                               vlc_value_t, void * );
@@ -78,7 +78,7 @@ struct filter_sys_t
     int *pi_y_offsets;        /* List of substreams y offsets */
     int i_offsets_length;
 
-    mtime_t i_delay;
+    vlc_tick_t i_delay;
 };
 
 /*****************************************************************************
@@ -428,7 +428,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 /*****************************************************************************
  * Filter
  *****************************************************************************/
-static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
+static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     bridge_t *p_bridge;

@@ -38,8 +38,8 @@ namespace adaptive
 
             private:
                 size_t  segments_count;
-                mtime_t buffering_level;
-                mtime_t buffering_target;
+                vlc_tick_t buffering_level;
+                vlc_tick_t buffering_target;
                 unsigned last_download_rate;
                 unsigned last_duration;
                 MovingAverage<unsigned> average;

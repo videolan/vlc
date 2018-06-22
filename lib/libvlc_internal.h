@@ -99,12 +99,12 @@ void libvlc_event_send(
         libvlc_event_manager_t * p_em,
         libvlc_event_t * p_event );
 
-static inline libvlc_time_t from_mtime(mtime_t time)
+static inline libvlc_time_t from_mtime(vlc_tick_t time)
 {
     return (time + 500ULL)/ 1000ULL;
 }
 
-static inline mtime_t to_mtime(libvlc_time_t time)
+static inline vlc_tick_t to_mtime(libvlc_time_t time)
 {
     return time * 1000ULL;
 }

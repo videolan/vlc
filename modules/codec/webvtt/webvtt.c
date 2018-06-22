@@ -80,7 +80,7 @@ struct webvtt_text_parser_t
     webvtt_cue_t *p_cue;
 };
 
-static mtime_t MakeTime( unsigned t[4] )
+static vlc_tick_t MakeTime( unsigned t[4] )
 {
     return t[0] * 3600 * CLOCK_FREQ +
            t[1] * 60 * CLOCK_FREQ +
@@ -88,7 +88,7 @@ static mtime_t MakeTime( unsigned t[4] )
            t[3] * 1000;
 }
 
-bool webvtt_scan_time( const char *psz, mtime_t *p_time )
+bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time )
 {
     unsigned t[4];
     if( sscanf( psz, "%2u:%2u.%3u",
@@ -237,7 +237,7 @@ void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line )
         const char *psz_split = strstr( p->reads[1], " --> " );
         if( psz_split )
         {
-            mtime_t i_start, i_stop;
+            vlc_tick_t i_start, i_stop;
 
             if( webvtt_scan_time( p->reads[1], &i_start ) &&
                 webvtt_scan_time( psz_split + 5,  &i_stop ) && i_start <= i_stop )

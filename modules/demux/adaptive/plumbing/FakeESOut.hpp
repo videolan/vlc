@@ -82,17 +82,17 @@ namespace adaptive
             LockedFakeEsOut WithLock();
             AbstractCommandsQueue * commandsQueue();
             CommandsFactory *commandsFactory() const;
-            void setAssociatedTimestamp( mtime_t );
-            void setAssociatedTimestamp( mtime_t, mtime_t );
-            void setExpectedTimestamp( mtime_t );
+            void setAssociatedTimestamp( vlc_tick_t );
+            void setAssociatedTimestamp( mtime_t, vlc_tick_t );
+            void setExpectedTimestamp( vlc_tick_t );
             void resetTimestamps();
             size_t esCount() const;
             bool hasSelectedEs() const;
             bool decodersDrained();
             bool restarting() const;
             void setExtraInfoProvider( ExtraFMTInfoInterface * );
-            mtime_t fixTimestamp(mtime_t);
-            mtime_t applyTimestampContinuity(mtime_t);
+            vlc_tick_t fixTimestamp(vlc_tick_t);
+            vlc_tick_t applyTimestampContinuity(vlc_tick_t);
             void declareEs( const es_format_t * );
 
             virtual void milestoneReached() override;
@@ -131,11 +131,11 @@ namespace adaptive
             CommandsFactory *commandsfactory;
             struct
             {
-                mtime_t timestamp;
+                vlc_tick_t timestamp;
                 bool b_timestamp_set;
                 bool b_offset_calculated;
             } associated, expected;
-            mtime_t timestamps_offset;
+            vlc_tick_t timestamps_offset;
             int priority;
             bool b_in_commands_group;
             std::list<FakeESOutID *> fakeesidlist;

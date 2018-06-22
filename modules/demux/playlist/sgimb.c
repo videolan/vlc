@@ -122,7 +122,7 @@ struct demux_sys_t
     char        *psz_mcast_ip;  /* sgiMulticastAddress= */
     int         i_mcast_port;   /* sgiMulticastPort= */
     int         i_packet_size;  /* sgiPacketSize= */
-    mtime_t     i_duration;     /* sgiDuration= */
+    vlc_tick_t  i_duration;     /* sgiDuration= */
     int         i_port;         /* sgiRtspPort= */
     int         i_sid;          /* sgiSid= */
     bool  b_concert;      /* DeliveryService=cds */
@@ -294,7 +294,7 @@ static int ParseLine ( stream_t *p_demux, char *psz_line )
     else if( !strncasecmp( psz_bol, "sgiDuration=", sizeof("sgiDuration=") - 1 ) )
     {
         psz_bol += sizeof("sgiDuration=") - 1;
-        p_sys->i_duration = (mtime_t) strtol( psz_bol, NULL, 0 );
+        p_sys->i_duration = (vlc_tick_t) strtol( psz_bol, NULL, 0 );
     }
     else if( !strncasecmp( psz_bol, "sgiRtspPort=", sizeof("sgiRtspPort=") - 1 ) )
     {

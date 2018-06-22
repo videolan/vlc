@@ -94,7 +94,7 @@ typedef struct playlist_private_t
      * several EOS are received too quickly.
      */
 #define VLC_PLAYLIST_EOS_BURST_THRESHOLD (CLOCK_FREQ / 4) /* 250 ms */
-    mtime_t  last_eos;
+    vlc_tick_t  last_eos;
     unsigned eos_burst_count;
 
     bool     b_tree; /**< Display as a tree */

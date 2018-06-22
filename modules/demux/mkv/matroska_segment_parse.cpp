@@ -1051,7 +1051,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxDuration, dur )
         {
-            vars.obj->i_duration = mtime_t( static_cast<double>( dur ) );
+            vars.obj->i_duration = vlc_tick_t( static_cast<double>( dur ) );
             debug( vars, "Duration=%" PRId64, vars.obj->i_duration );
         }
         E_CASE( KaxMuxingApp, mapp )
@@ -1148,7 +1148,7 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
     InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), &captures );
 
     if( i_duration != -1 )
-        i_duration = mtime_t( static_cast<double>( i_duration * i_timescale ) / 10e5 );
+        i_duration = vlc_tick_t( static_cast<double>( i_duration * i_timescale ) / 10e5 );
 }
 
 

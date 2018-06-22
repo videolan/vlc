@@ -141,11 +141,11 @@ struct aout_sys_t
 };
 
 static HRESULT Flush( aout_stream_sys_t *sys );
-static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
+static HRESULT TimeGet( aout_stream_sys_t *sys, vlc_tick_t *delay )
 {
     DWORD read, status;
     HRESULT hr;
-    mtime_t size;
+    vlc_tick_t size;
 
     hr = IDirectSoundBuffer_GetStatus( sys->p_dsbuffer, &status );
     if( hr != DS_OK )
@@ -157,7 +157,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     if( hr != DS_OK )
         return hr;
 
-    size = (mtime_t)read - sys->i_last_read;
+    size = (vlc_tick_t)read - sys->i_last_read;
 
     /* GetCurrentPosition cannot be trusted if the return doesn't change
      * Just return an error */
@@ -178,12 +178,12 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     return DS_OK;
 }
 
-static HRESULT StreamTimeGet( aout_stream_t *s, mtime_t *delay )
+static HRESULT StreamTimeGet( aout_stream_t *s, vlc_tick_t *delay )
 {
     return TimeGet( s->sys, delay );
 }
 
-static int OutputTimeGet( audio_output_t *aout, mtime_t *delay )
+static int OutputTimeGet( audio_output_t *aout, vlc_tick_t *delay )
 {
     return (TimeGet( &aout->sys->s, delay ) == DS_OK) ? 0 : -1;
 }
@@ -333,7 +333,7 @@ static HRESULT StreamPause( aout_stream_t *s, bool pause )
     return Pause( s->sys, pause );
 }
 
-static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
+static void OutputPause( audio_output_t *aout, bool pause, vlc_tick_t date )
 {
     Pause( &aout->sys->s, pause );
     (void) date;
@@ -364,7 +364,7 @@ static void OutputFlush( audio_output_t *aout, bool drain )
     aout_sys_t *sys = aout->sys;
     if (drain)
     {   /* Loosy drain emulation */
-        mtime_t delay;
+        vlc_tick_t delay;
 
         if (OutputTimeGet(aout, &delay) == 0 && delay <= INT64_C(5000000))
             Sleep((delay / (CLOCK_FREQ / 1000)) + 1);

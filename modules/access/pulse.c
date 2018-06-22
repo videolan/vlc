@@ -59,7 +59,7 @@ struct demux_sys_t
     es_out_id_t *es;
     bool discontinuity; /**< The next block will not follow the last one */
     unsigned framesize; /**< Byte size of a sample */
-    mtime_t caching; /**< Caching value */
+    vlc_tick_t caching; /**< Caching value */
 };
 
 /* Stream helpers */
@@ -161,7 +161,7 @@ static void stream_read_cb(pa_stream *s, size_t length, void *userdata)
         return;
     }
 
-    mtime_t pts = mdate();
+    vlc_tick_t pts = mdate();
     pa_usec_t latency;
     int negative;
 

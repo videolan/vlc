@@ -73,7 +73,7 @@ struct vod_media_t
     const char *psz_mux;
 
     /* Infos */
-    mtime_t i_length;
+    vlc_tick_t i_length;
 };
 
 struct vod_sys_t

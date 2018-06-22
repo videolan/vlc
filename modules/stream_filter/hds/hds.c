@@ -1131,7 +1131,7 @@ static void* live_thread( void* p )
         }
     }
 
-    mtime_t last_dl_start_time;
+    vlc_tick_t last_dl_start_time;
 
     while( ! sys->closed )
     {

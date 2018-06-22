@@ -70,7 +70,7 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
                 psz_artist = vlc_xml_encode( psz_tmp );
             free( psz_tmp );
 
-            mtime_t i_duration = input_item_GetDuration( p_current->p_input );
+            vlc_tick_t i_duration = input_item_GetDuration( p_current->p_input );
             int min = ( i_duration / 1000000 ) / 60;
             int sec = ( i_duration / 1000000 ) - min * 60;
 

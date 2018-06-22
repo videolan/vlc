@@ -124,12 +124,12 @@ struct decoder_sys_t
     h264_poc_context_t pocctx;
     struct
     {
-        mtime_t pts;
+        vlc_tick_t pts;
         int num;
     } prevdatedpoc;
 
-    mtime_t i_frame_pts;
-    mtime_t i_frame_dts;
+    vlc_tick_t i_frame_pts;
+    vlc_tick_t i_frame_dts;
 
     date_t dts;
 
@@ -624,8 +624,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     block_t *p_pic = NULL;
 
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
-    const mtime_t i_frag_dts = p_frag->i_dts;
-    const mtime_t i_frag_pts = p_frag->i_pts;
+    const vlc_tick_t i_frag_dts = p_frag->i_dts;
+    const vlc_tick_t i_frag_pts = p_frag->i_pts;
 
     if( p_sys->b_slice && (!p_sys->p_active_pps || !p_sys->p_active_sps) )
     {

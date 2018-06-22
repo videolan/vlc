@@ -23,18 +23,18 @@
 
 struct dtsgen_t
 {
-    mtime_t history[DTSGEN_HISTORY_COUNT];
-    mtime_t ordereddts[DTSGEN_HISTORY_COUNT];
-    mtime_t i_startingdts;
-    mtime_t i_startingdiff;
+    vlc_tick_t history[DTSGEN_HISTORY_COUNT];
+    vlc_tick_t ordereddts[DTSGEN_HISTORY_COUNT];
+    vlc_tick_t i_startingdts;
+    vlc_tick_t i_startingdiff;
     unsigned reorderdepth;
     unsigned count;
 };
 
 static int cmpvlctickp(const void *p1, const void *p2)
 {
-    if(*((mtime_t *)p1) >= *((mtime_t *)p2))
-        return *((mtime_t *)p1) > *((mtime_t *)p2) ? 1 : 0;
+    if(*((vlc_tick_t *)p1) >= *((vlc_tick_t *)p2))
+        return *((vlc_tick_t *)p1) > *((vlc_tick_t *)p2) ? 1 : 0;
     else
         return -1;
 }
@@ -97,7 +97,7 @@ static void dtsgen_Resync(struct dtsgen_t *d)
  *  (with mandatory gap/increase in DTS caused by previous step)
  */
 
-static void dtsgen_AddNextPTS(struct dtsgen_t *d, mtime_t i_pts)
+static void dtsgen_AddNextPTS(struct dtsgen_t *d, vlc_tick_t i_pts)
 {
     /* Check saved pts in reception order to find reordering depth */
     if(d->count > 0 && d->count < DTSGEN_HISTORY_COUNT)
@@ -136,9 +136,9 @@ static void dtsgen_AddNextPTS(struct dtsgen_t *d, mtime_t i_pts)
     qsort(&d->ordereddts, d->count, sizeof(d->ordereddts[0]), cmpvlctickp);
 }
 
-static mtime_t dtsgen_GetDTS(struct dtsgen_t *d)
+static vlc_tick_t dtsgen_GetDTS(struct dtsgen_t *d)
 {
-    mtime_t i_dts = VLC_TS_INVALID;
+    vlc_tick_t i_dts = VLC_TS_INVALID;
 
     /* When we have inspected enough packets,
      * use the reorderdepth th packet as dts offset */
@@ -156,7 +156,7 @@ static mtime_t dtsgen_GetDTS(struct dtsgen_t *d)
     }
     else if(d->count > 1)
     {
-        mtime_t i_diff = d->ordereddts[d->count - 1] -
+        vlc_tick_t i_diff = d->ordereddts[d->count - 1] -
                             d->ordereddts[0];
         i_diff = __MIN(d->i_startingdiff, i_diff);
         d->i_startingdts += i_diff / DTSGEN_REORDER_MAX;
@@ -168,7 +168,7 @@ static mtime_t dtsgen_GetDTS(struct dtsgen_t *d)
 
 #ifdef DTSGEN_DEBUG
 static void dtsgen_Debug(vlc_object_t *p_demux, struct dtsgen_t *d,
-                         mtime_t dts, mtime_t pts)
+                         vlc_tick_t dts, vlc_tick_t pts)
 {
     if(pts == VLC_TS_INVALID)
         return;

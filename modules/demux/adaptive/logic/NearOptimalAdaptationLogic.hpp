@@ -37,9 +37,9 @@ namespace adaptive
                 NearOptimalContext();
 
             private:
-                mtime_t buffering_min;
-                mtime_t buffering_level;
-                mtime_t buffering_target;
+                vlc_tick_t buffering_min;
+                vlc_tick_t buffering_level;
+                vlc_tick_t buffering_target;
                 unsigned last_download_rate;
                 MovingAverage<unsigned> average;
         };
@@ -58,8 +58,8 @@ namespace adaptive
 
             private:
                 BaseRepresentation *        getNextQualityIndex( BaseAdaptationSet *, RepresentationSelector &,
-                                                                 float gammaP, mtime_t VD,
-                                                                 mtime_t Q /*current buffer level*/);
+                                                                 float gammaP, vlc_tick_t VD,
+                                                                 vlc_tick_t Q /*current buffer level*/);
                 float                       getUtility(const BaseRepresentation *);
                 unsigned                    getAvailableBw(unsigned, const BaseRepresentation *) const;
                 unsigned                    getMaxCurrentBw() const;

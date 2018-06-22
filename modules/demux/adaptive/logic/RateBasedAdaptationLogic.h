@@ -53,7 +53,7 @@ namespace adaptive
                 MovingAverage<size_t>   average;
 
                 size_t                  dlsize;
-                mtime_t                 dllength;
+                vlc_tick_t              dllength;
 
                 mutable vlc_mutex_t     lock;
         };

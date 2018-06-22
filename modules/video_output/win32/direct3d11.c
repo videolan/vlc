@@ -999,7 +999,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #ifdef HAVE_D3D11_4_H
     if (sys->d3dcontext4)
     {
-        mtime_t render_start;
+        vlc_tick_t render_start;
         if (sys->log_level >= 4)
             render_start = mdate();
         if (sys->renderFence == UINT64_MAX)

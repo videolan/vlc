@@ -152,7 +152,8 @@
  * epoch). Note that date and time intervals can be manipulated using regular
  * arithmetic operators, and that no special functions are required.
  */
-typedef int64_t mtime_t;
+typedef int64_t vlc_tick_t;
+typedef vlc_tick_t mtime_t; /* deprecated, use vlc_tick_t */
 
 /**
  * The vlc_fourcc_t type.

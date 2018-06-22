@@ -68,7 +68,7 @@ namespace hls
                 bool b_live;
                 bool b_loaded;
                 unsigned updateFailureCount;
-                mtime_t lastUpdateTime;
+                vlc_tick_t lastUpdateTime;
                 unsigned channels;
         };
     }

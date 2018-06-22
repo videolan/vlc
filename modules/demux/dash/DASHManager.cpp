@@ -67,7 +67,7 @@ void DASHManager::scheduleNextUpdate()
 {
     time_t now = time(nullptr);
 
-    mtime_t minbuffer = getMinAheadTime() / 2;
+    vlc_tick_t minbuffer = getMinAheadTime() / 2;
 
     if(playlist->minUpdatePeriod.Get() > minbuffer)
         minbuffer = playlist->minUpdatePeriod.Get();
@@ -77,7 +77,7 @@ void DASHManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
 }
 
 bool DASHManager::needsUpdate() const

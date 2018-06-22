@@ -26,9 +26,9 @@
 
 struct mva_packet_s
 {
-    mtime_t duration;
-    mtime_t dts;
-    mtime_t diff;
+    vlc_tick_t duration;
+    vlc_tick_t dts;
+    vlc_tick_t diff;
 };
 
 struct moving_average_s
@@ -42,10 +42,10 @@ static void mva_init(struct moving_average_s *m)
     m->i_packet = 0;
 }
 
-static mtime_t mva_get(const struct moving_average_s *m);
+static vlc_tick_t mva_get(const struct moving_average_s *m);
 
 static void mva_add(struct moving_average_s *m,
-                     mtime_t dts, mtime_t duration)
+                     vlc_tick_t dts, vlc_tick_t duration)
 {
     m->packets[m->i_packet % MVA_PACKETS].dts = dts;
     m->packets[m->i_packet % MVA_PACKETS].duration = duration;
@@ -53,7 +53,7 @@ static void mva_add(struct moving_average_s *m,
     m->i_packet++;
 }
 
-static mtime_t mva_get(const struct moving_average_s *m)
+static vlc_tick_t mva_get(const struct moving_average_s *m)
 {
     unsigned start;
     const struct mva_packet_s *min = NULL, *max = NULL;
@@ -73,13 +73,13 @@ static mtime_t mva_get(const struct moving_average_s *m)
     else start = 0;
 
     unsigned count = 0;
-    mtime_t avgdiff = 0;
+    vlc_tick_t avgdiff = 0;
     for(unsigned i = start; i < m->i_packet; i++)
     {
         if(&m->packets[i % MVA_PACKETS] == min ||
             &m->packets[i % MVA_PACKETS] == max)
             continue;
-        const mtime_t diff = m->packets[i % MVA_PACKETS].diff;
+        const vlc_tick_t diff = m->packets[i % MVA_PACKETS].diff;
         if(diff != 0 || (i+1) < m->i_packet) /* ignore last packet when we have no duration */
         {
             avgdiff += diff;
@@ -95,7 +95,7 @@ static struct mva_packet_s * mva_getLastPacket(struct moving_average_s *m)
     return m->i_packet > 0 ? &m->packets[(m->i_packet - 1) % MVA_PACKETS] : NULL;
 }
 
-static mtime_t mva_getLastDTS(struct moving_average_s *m)
+static vlc_tick_t mva_getLastDTS(struct moving_average_s *m)
 {
     struct mva_packet_s *p = mva_getLastPacket(m);
     return p ? p->dts : 0;

@@ -334,7 +334,7 @@ static int Generate(int16_t *bank, int h_min, int h_max, int v_min, int v_max)
         }
     }
 
-    //mtime_t tmul_0 = mdate();
+    //vlc_tick_t tmul_0 = mdate();
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < N; j++) {
             double v = 0.0;
@@ -357,7 +357,7 @@ static int Generate(int16_t *bank, int h_min, int h_max, int v_min, int v_max)
             bank[i * N + j] = VLC_CLIP(vq, INT16_MIN, INT16_MAX);
         }
     }
-    //mtime_t mul_duration = mdate() - tmul_0;
+    //vlc_tick_t mul_duration = mdate() - tmul_0;
     //fprintf(stderr, "IDCT took %d ms\n", (int)(mul_duration / 1000));
 
     free(workspace);

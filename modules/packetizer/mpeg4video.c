@@ -70,13 +70,13 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    mtime_t i_interpolated_pts;
-    mtime_t i_interpolated_dts;
-    mtime_t i_last_ref_pts;
-    mtime_t i_last_time_ref;
-    mtime_t i_time_ref;
-    mtime_t i_last_time;
-    mtime_t i_last_timeincr;
+    vlc_tick_t i_interpolated_pts;
+    vlc_tick_t i_interpolated_dts;
+    vlc_tick_t i_last_ref_pts;
+    vlc_tick_t i_last_time_ref;
+    vlc_tick_t i_time_ref;
+    vlc_tick_t i_last_time;
+    vlc_tick_t i_last_timeincr;
 
     unsigned int i_flags;
 
@@ -233,8 +233,8 @@ static void PacketizeReset( void *p_private, bool b_broken )
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
     decoder_t *p_dec = p_private;
-    const mtime_t i_dts = p_block->i_dts;
-    const mtime_t i_pts = p_block->i_pts;
+    const vlc_tick_t i_dts = p_block->i_dts;
+    const vlc_tick_t i_pts = p_block->i_pts;
 
     block_t *p_au = ParseMPEGBlock( p_dec, p_block );
 

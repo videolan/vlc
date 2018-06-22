@@ -73,9 +73,9 @@ struct aout_sys_t
 static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Play    ( audio_output_t *_p_aout, block_t *block );
-static void Pause   ( audio_output_t *, bool, mtime_t );
+static void Pause   ( audio_output_t *, bool, vlc_tick_t );
 static void Flush   ( audio_output_t *, bool );
-static int  TimeGet ( audio_output_t *, mtime_t *restrict );
+static int  TimeGet ( audio_output_t *, vlc_tick_t *restrict );
 
 static ULONG APIENTRY KaiCallback ( PVOID, PVOID, ULONG );
 
@@ -297,7 +297,7 @@ static void Close( vlc_object_t *obj )
     free(sys);
 }
 
-static void Pause( audio_output_t *aout, bool pause, mtime_t date )
+static void Pause( audio_output_t *aout, bool pause, vlc_tick_t date )
 {
     VLC_UNUSED( date );
 
@@ -329,7 +329,7 @@ static void Flush( audio_output_t *aout, bool drain )
     vlc_mutex_unlock( &buffer->mutex );
 }
 
-static int TimeGet( audio_output_t *aout, mtime_t *restrict delay )
+static int TimeGet( audio_output_t *aout, vlc_tick_t *restrict delay )
 {
     aout_sys_t            *sys = aout->sys;
     audio_sample_format_t *format = &sys->format;

@@ -289,7 +289,7 @@
 {
     assert(bookmark != NULL);
 
-    mtime_t total = bookmark->i_time_offset;
+    vlc_tick_t total = bookmark->i_time_offset;
     uint64_t hour = ( total / ( CLOCK_FREQ * 3600 ) );
     uint64_t min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
     float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );

@@ -79,7 +79,7 @@ struct picture_t
      * These properties can be modified using the video output thread API,
      * but should never be written directly */
     /**@{*/
-    mtime_t         date;                                  /**< display date */
+    vlc_tick_t      date;                                  /**< display date */
     bool            b_force;
     /**@}*/
 

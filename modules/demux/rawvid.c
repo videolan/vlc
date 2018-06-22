@@ -392,7 +392,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     block_t     *p_block;
-    mtime_t i_pcr = date_Get( &p_sys->pcr );
+    vlc_tick_t i_pcr = date_Get( &p_sys->pcr );
 
     /* Call the pace control */
     es_out_SetPCR( p_demux->out, VLC_TS_0 + i_pcr );

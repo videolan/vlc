@@ -60,7 +60,7 @@ vlc_module_end ()
 struct sout_stream_sys_t
 {
     sout_description_data_t *data;
-    mtime_t i_stream_start;
+    vlc_tick_t i_stream_start;
 };
 
 /*****************************************************************************

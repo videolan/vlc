@@ -45,10 +45,10 @@ namespace adaptive
                 virtual bool                    isLive() const;
                 virtual bool                    isLowLatency() const;
                 void                            setType(const std::string &);
-                void                            setMinBuffering( mtime_t );
-                void                            setMaxBuffering( mtime_t );
-                mtime_t                         getMinBuffering() const;
-                mtime_t                         getMaxBuffering() const;
+                void                            setMinBuffering( vlc_tick_t );
+                void                            setMaxBuffering( vlc_tick_t );
+                vlc_tick_t                      getMinBuffering() const;
+                vlc_tick_t                      getMaxBuffering() const;
                 virtual void                    debug() const;
 
                 void    addPeriod               (BasePeriod *period);
@@ -81,8 +81,8 @@ namespace adaptive
                 std::vector<std::string>            baseUrls;
                 std::string                         playlistUrl;
                 std::string                         type;
-                mtime_t                             minBufferTime;
-                mtime_t                             maxBufferTime;
+                vlc_tick_t                          minBufferTime;
+                vlc_tick_t                          maxBufferTime;
                 bool                                b_needsUpdates;
         };
     }

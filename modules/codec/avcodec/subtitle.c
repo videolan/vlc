@@ -44,7 +44,7 @@ struct decoder_sys_t {
     bool b_need_ephemer; /* Does the format need the ephemer flag (no end time set) */
 };
 
-static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, mtime_t pts,
+static subpicture_t *ConvertSubtitle(decoder_t *, AVSubtitle *, vlc_tick_t pts,
                                      AVCodecContext *avctx);
 static int  DecodeSubtitle(decoder_t *, block_t *);
 static void Flush(decoder_t *);
@@ -288,7 +288,7 @@ static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 /**
  * Convert a libavcodec subtitle to our format.
  */
-static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t pts,
+static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, vlc_tick_t pts,
                                      AVCodecContext *avctx)
 {
     subpicture_t *spu = decoder_NewSubpicture(dec, NULL);

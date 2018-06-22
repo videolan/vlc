@@ -102,7 +102,7 @@ typedef struct
 
 typedef struct
 {
-    mtime_t i_time;
+    vlc_tick_t i_time;
     uint64_t i_pos;
     bs_t br;
 } sync_table_ctx_t;
@@ -130,8 +130,8 @@ struct demux_sys_t
     decoder_t   *p_packetizer;
     block_t     *p_packetized_data;
 
-    mtime_t     i_pts;
-    mtime_t     i_time_offset;
+    vlc_tick_t  i_pts;
+    vlc_tick_t  i_time_offset;
     int64_t     i_bytes;
 
     bool        b_big_endian;
@@ -181,7 +181,7 @@ static int ThdProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MlpInit( demux_t *p_demux );
 
 static bool Parse( demux_t *p_demux, block_t **pp_output );
-static uint64_t SeekByMlltTable( demux_t *p_demux, mtime_t *pi_time );
+static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time );
 
 static const codec_t p_codecs[] = {
     { VLC_CODEC_MP4A, false, "mp4 audio",  AacProbe,  AacInit },
@@ -855,7 +855,7 @@ static double MpgaXingLameConvertPeak( uint32_t x )
     return x / 8388608.0; /* pow(2, 23) */
 }
 
-static uint64_t SeekByMlltTable( demux_t *p_demux, mtime_t *pi_time )
+static uint64_t SeekByMlltTable( demux_t *p_demux, vlc_tick_t *pi_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     sync_table_ctx_t *p_cur = &p_sys->mllt.current;
@@ -872,7 +872,7 @@ static uint64_t SeekByMlltTable( demux_t *p_demux, mtime_t *pi_time )
     {
         const uint32_t i_bytesdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_bytes_dev);
         const uint32_t i_msdev = bs_read(&p_cur->br, p_sys->mllt.i_bits_per_ms_dev);
-        const mtime_t i_deltatime = (p_sys->mllt.i_ms_btw_refs + i_msdev) * INT64_C(1000);
+        const vlc_tick_t i_deltatime = (p_sys->mllt.i_ms_btw_refs + i_msdev) * INT64_C(1000);
         if( p_cur->i_time + i_deltatime > *pi_time )
             break;
         p_cur->i_time += i_deltatime;

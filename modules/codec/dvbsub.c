@@ -256,7 +256,7 @@ struct decoder_sys_t
     /* Decoder internal data */
     int                i_id;
     int                i_ancillary_id;
-    mtime_t            i_pts;
+    vlc_tick_t         i_pts;
 
     bool               b_absolute;
     int                i_spu_position;
@@ -1503,10 +1503,10 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->b_absolute = p_sys->b_absolute;
     /* Set the pf_render callback */
     p_spu->i_start = p_sys->i_pts;
-    //p_spu->i_stop = (mtime_t) 0;
+    //p_spu->i_stop = (vlc_tick_t) 0;
     p_spu->b_ephemer = true;
     //p_spu->b_fade = true;
-    //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
+    //p_spu->i_stop = p_spu->i_start + (vlc_tick_t) (i_timeout * 1000000);
     p_spu->b_subtitle = true;
 
     /* Correct positioning of SPU */
@@ -1691,7 +1691,7 @@ struct encoder_sys_t
     int i_regions;
     encoder_region_t *p_regions;
 
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 
     /* subpicture positioning */
     int i_offset_x;

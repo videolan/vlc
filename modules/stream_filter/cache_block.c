@@ -41,7 +41,7 @@
  *  - ...
  */
 
-/* 
+/*
  * One linked list of data read
  */
 
@@ -110,7 +110,7 @@ static int AStreamRefillBlock(stream_t *s)
     }
 
     /* Now read a new block */
-    const mtime_t start = mdate();
+    const vlc_tick_t start = mdate();
     block_t *b;
 
     for (;;)
@@ -149,7 +149,7 @@ static int AStreamRefillBlock(stream_t *s)
 static void AStreamPrebufferBlock(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
-    mtime_t start = mdate();
+    vlc_tick_t start = mdate();
     bool first = true;
 
     msg_Dbg(s, "starting pre-buffering");

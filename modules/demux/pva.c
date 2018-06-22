@@ -393,8 +393,8 @@ static void ParsePES( demux_t *p_demux )
     uint8_t     hdr[30];
 
     unsigned    i_skip;
-    mtime_t     i_dts = -1;
-    mtime_t     i_pts = -1;
+    vlc_tick_t  i_dts = -1;
+    vlc_tick_t  i_pts = -1;
 
     p_sys->p_pes = NULL;
 
@@ -416,19 +416,19 @@ static void ParsePES( demux_t *p_demux )
     i_skip = hdr[8] + 9;
     if( hdr[7]&0x80 )    /* has pts */
     {
-        i_pts = ((mtime_t)(hdr[ 9]&0x0e ) << 29)|
-                 (mtime_t)(hdr[10] << 22)|
-                ((mtime_t)(hdr[11]&0xfe) << 14)|
-                 (mtime_t)(hdr[12] << 7)|
-                 (mtime_t)(hdr[12] >> 1);
+        i_pts = ((vlc_tick_t)(hdr[ 9]&0x0e ) << 29)|
+                 (vlc_tick_t)(hdr[10] << 22)|
+                ((vlc_tick_t)(hdr[11]&0xfe) << 14)|
+                 (vlc_tick_t)(hdr[12] << 7)|
+                 (vlc_tick_t)(hdr[12] >> 1);
 
         if( hdr[7]&0x40 )    /* has dts */
         {
-             i_dts = ((mtime_t)(hdr[14]&0x0e ) << 29)|
-                     (mtime_t)(hdr[15] << 22)|
-                    ((mtime_t)(hdr[16]&0xfe) << 14)|
-                     (mtime_t)(hdr[17] << 7)|
-                     (mtime_t)(hdr[18] >> 1);
+             i_dts = ((vlc_tick_t)(hdr[14]&0x0e ) << 29)|
+                     (vlc_tick_t)(hdr[15] << 22)|
+                    ((vlc_tick_t)(hdr[16]&0xfe) << 14)|
+                     (vlc_tick_t)(hdr[17] << 7)|
+                     (vlc_tick_t)(hdr[18] >> 1);
         }
     }
 

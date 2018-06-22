@@ -85,12 +85,12 @@ drop:
     block_Release (block);
 }
 
-static int rtp_timeout (mtime_t deadline)
+static int rtp_timeout (vlc_tick_t deadline)
 {
     if (deadline == VLC_TS_INVALID)
         return -1; /* infinite */
 
-    mtime_t t = mdate ();
+    vlc_tick_t t = mdate ();
     if (t >= deadline)
         return 0;
 
@@ -107,7 +107,7 @@ void *rtp_dgram_thread (void *opaque)
 {
     demux_t *demux = opaque;
     demux_sys_t *sys = demux->p_sys;
-    mtime_t deadline = VLC_TS_INVALID;
+    vlc_tick_t deadline = VLC_TS_INVALID;
     int rtp_fd = sys->fd;
 #ifdef __linux__
     const int trunc_flag = MSG_TRUNC;

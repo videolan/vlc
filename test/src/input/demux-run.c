@@ -293,8 +293,8 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
 
             int seekpoint = 0;
             double position = 0.0;
-            mtime_t time = 0;
-            mtime_t length = 0;
+            vlc_tick_t time = 0;
+            vlc_tick_t length = 0;
 
             /* Call controls for increased code coverage */
             demux_Control(demux, DEMUX_GET_SEEKPOINT, &seekpoint);

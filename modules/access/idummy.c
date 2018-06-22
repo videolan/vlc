@@ -62,14 +62,14 @@ static int DemuxHold( demux_t *demux )
 
 struct demux_sys_t
 {
-    mtime_t end;
-    mtime_t length;
+    vlc_tick_t end;
+    vlc_tick_t length;
 };
 
 static int DemuxPause( demux_t *demux )
 {
     demux_sys_t *p_sys = demux->p_sys;
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
 
     if( now >= p_sys->end )
         return 0;
@@ -88,7 +88,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
         {
             double *ppos = va_arg( args, double * );
             double pos;
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
 
             pos = 1. + ((double)(now - p_sys->end) / (double)p_sys->length);
             *ppos = (pos <= 1.) ? pos : 1.;
@@ -98,7 +98,7 @@ static int ControlPause( demux_t *demux, int query, va_list args )
         case DEMUX_SET_POSITION:
         {
             double pos = va_arg( args, double );
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
 
             p_sys->end = now + (p_sys->length * (1. - pos));
             break;
@@ -106,21 +106,21 @@ static int ControlPause( demux_t *demux, int query, va_list args )
 
         case DEMUX_GET_LENGTH:
         {
-            mtime_t *plen = va_arg( args, mtime_t * );
+            vlc_tick_t *plen = va_arg( args, vlc_tick_t * );
             *plen = p_sys->length;
             break;
         }
 
         case DEMUX_GET_TIME:
         {
-            mtime_t *ppos = va_arg( args, mtime_t * );
+            vlc_tick_t *ppos = va_arg( args, vlc_tick_t * );
             *ppos = mdate() + p_sys->length - p_sys->end;
             break;
         }
 
         case DEMUX_SET_TIME:
         {
-            mtime_t pos = va_arg( args, mtime_t );
+            vlc_tick_t pos = va_arg( args, vlc_tick_t );
             p_sys->end = mdate() + p_sys->length - pos;
             break;
         }
@@ -178,7 +178,7 @@ nop:
     if( !strncasecmp( psz_name, "pause:", 6 ) )
     {
         double f = us_atof( psz_name + 6 );
-        mtime_t length = f * CLOCK_FREQ;
+        vlc_tick_t length = f * CLOCK_FREQ;
 
         msg_Info( p_demux, "command `pause %f'", f );
         if( length == 0 )

@@ -212,7 +212,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
     p_sys->i_scr = -1;
     p_sys->i_scr_track_id = 0;
     p_sys->i_length   = i_length;
-    p_sys->i_current_pts = (mtime_t) 0;
+    p_sys->i_current_pts = (vlc_tick_t) 0;
     p_sys->i_time_track_index = -1;
     p_sys->i_aob_mlp_count = 0;
     p_sys->i_start_byte = i_skip;
@@ -392,7 +392,7 @@ static void NotifyDiscontinuity( ps_track_t *p_tk, es_out_t *out )
     }
 }
 
-static void CheckPCR( demux_sys_t *p_sys, es_out_t *out, mtime_t i_scr )
+static void CheckPCR( demux_sys_t *p_sys, es_out_t *out, vlc_tick_t i_scr )
 {
     if( p_sys->i_scr > VLC_TS_INVALID &&
         llabs( p_sys->i_scr - i_scr ) > CLOCK_FREQ )

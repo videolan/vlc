@@ -305,7 +305,7 @@ static int  Open ( vlc_object_t *p_this )
     int i_return;
     int i_error = VLC_EGENERIC;
 
-    /* if the rtsp URL may contain a sat.ip fake DNS, bail-out early and 
+    /* if the rtsp URL may contain a sat.ip fake DNS, bail-out early and
      * let the SAT>IP module handle that */
     if( !strncmp(p_demux->psz_location, "sat.ip", 6) )
     {
@@ -1294,7 +1294,7 @@ static int Play( demux_t *p_demux )
             timeout = 60; /* default value from RFC2326 */
         msg_Dbg( p_demux, "We have a timeout of %d seconds", timeout );
 
-        mtime_t interval = (timeout - 2) * CLOCK_FREQ;
+        vlc_tick_t interval = (timeout - 2) * CLOCK_FREQ;
         vlc_timer_schedule( p_sys->timer, false, interval, interval);
     }
     p_sys->i_pcr = VLC_TS_INVALID;
@@ -1446,7 +1446,7 @@ static int Demux( demux_t *p_demux )
 
     if( b_send_pcr )
     {
-        mtime_t i_minpcr = VLC_TS_INVALID;
+        vlc_tick_t i_minpcr = VLC_TS_INVALID;
         bool b_need_flush = false;
 
         /* Check for gap in pts value */
@@ -2181,7 +2181,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     tk->i_next_block_flags = 0;
                 }
 
-                mtime_t i_pcr = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : p_block->i_pts;
+                vlc_tick_t i_pcr = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : p_block->i_pts;
                 es_out_Send( p_demux->out, tk->p_es, p_block );
                 if( i_pcr > VLC_TS_INVALID )
                 {

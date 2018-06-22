@@ -389,7 +389,7 @@ static bool save_data( track_elem_t *p_track, const char *psz_name,
     else if( !strcmp( psz_name, "Total Time" ) )
     {
         long i_num = atol( psz_value );
-        p_track->duration = (mtime_t) i_num*1000;
+        p_track->duration = (vlc_tick_t) i_num*1000;
     }
 #undef SAVE_INFO
     return true;

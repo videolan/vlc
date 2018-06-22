@@ -1475,7 +1475,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     block_t *p_block_in;
     uint32_t i_status;
     int i_result;
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 
     if( !p_data ) return NULL;
 

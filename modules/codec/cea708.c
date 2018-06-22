@@ -45,7 +45,7 @@ struct cea708_demux_t
    uint8_t i_total_data;
    uint8_t i_data;
    uint8_t data[CEA708_DTVCC_MAX_PKT_SIZE];
-   mtime_t i_time;
+   vlc_tick_t i_time;
    service_data_hdlr_t p_callback;
    void *priv;
 };
@@ -73,7 +73,7 @@ cea708_demux_t * CEA708_DTVCC_Demuxer_New( void *priv, service_data_hdlr_t hdlr 
     return h;
 }
 
-static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, mtime_t i_start,
+static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, vlc_tick_t i_start,
                                               const uint8_t *p_data, size_t i_data )
 {
     while( i_data >= 2 )
@@ -101,7 +101,7 @@ static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, mtime_t i_start
     }
 }
 
-void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, mtime_t i_start, const uint8_t data[3] )
+void CEA708_DTVCC_Demuxer_Push( cea708_demux_t *h, vlc_tick_t i_start, const uint8_t data[3] )
 {
     if( (data[0] & 0x03) == 3 ) /* Header packet */
     {
@@ -440,8 +440,8 @@ struct cea708_t
 
     /* Decoding context */
     cea708_window_t *p_cw; /* current window */
-    mtime_t suspended_deadline; /* > 0 when delay is active */
-    mtime_t i_clock;
+    vlc_tick_t suspended_deadline; /* > 0 when delay is active */
+    vlc_tick_t i_clock;
     bool b_text_waiting;
 };
 
@@ -1662,7 +1662,7 @@ static void CEA708_Decode_ServiceBuffer( cea708_t *h )
     }
 }
 
-void CEA708_Decoder_Push( cea708_t *h, mtime_t i_time,
+void CEA708_Decoder_Push( cea708_t *h, vlc_tick_t i_time,
                           const uint8_t *p_data, size_t i_data )
 {
     /* Set new buffer start time */

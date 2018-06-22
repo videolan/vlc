@@ -267,8 +267,8 @@ SORTFN( SORT_DESCRIPTION, first, second )
 
 SORTFN( SORT_DURATION, first, second )
 {
-    mtime_t time1 = input_item_GetDuration( first->p_input );
-    mtime_t time2 = input_item_GetDuration( second->p_input );
+    vlc_tick_t time1 = input_item_GetDuration( first->p_input );
+    vlc_tick_t time2 = input_item_GetDuration( second->p_input );
     int i_ret = time1 > time2 ? 1 :
                     ( time1 == time2 ? 0 : -1 );
     return i_ret;

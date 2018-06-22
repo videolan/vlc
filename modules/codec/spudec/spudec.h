@@ -28,7 +28,7 @@ struct decoder_sys_t
     bool b_packetizer;
     bool b_disabletrans;
 
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     unsigned int i_spu_size;
     unsigned int i_rle_size;
     unsigned int i_spu;

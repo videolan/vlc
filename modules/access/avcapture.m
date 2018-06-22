@@ -72,7 +72,7 @@ vlc_module_begin ()
    set_callbacks(Open, Close)
 vlc_module_end ()
 
-static mtime_t vlc_CMTime_to_mtime(CMTime timestamp)
+static vlc_tick_t vlc_CMTime_to_mtime(CMTime timestamp)
 {
     CMTime scaled = CMTimeConvertScale(
             timestamp, CLOCK_FREQ,
@@ -91,8 +91,8 @@ static mtime_t vlc_CMTime_to_mtime(CMTime timestamp)
 
     CVImageBufferRef    currentImageBuffer;
 
-    mtime_t             currentPts;
-    mtime_t             previousPts;
+    vlc_tick_t          currentPts;
+    vlc_tick_t          previousPts;
     size_t              bytesPerRow;
 
     long                timeScale;
@@ -105,9 +105,9 @@ static mtime_t vlc_CMTime_to_mtime(CMTime timestamp)
 - (int)width;
 - (int)height;
 - (void)getVideoDimensions:(CMSampleBufferRef)sampleBuffer;
-- (mtime_t)currentPts;
+- (vlc_tick_t)currentPts;
 - (void)captureOutput:(AVCaptureOutput *)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection *)connection;
-- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer;
+- (vlc_tick_t)copyCurrentFrameToBuffer:(void *)buffer;
 @end
 
 @implementation VLCAVDecompressedVideoOutput : AVCaptureVideoDataOutput
@@ -170,9 +170,9 @@ static mtime_t vlc_CMTime_to_mtime(CMTime timestamp)
     }
 }
 
--(mtime_t)currentPts
+-(vlc_tick_t)currentPts
 {
-    mtime_t pts;
+    vlc_tick_t pts;
 
     @synchronized (self)
     {
@@ -207,10 +207,10 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
 }
 
-- (mtime_t)copyCurrentFrameToBuffer:(void *)buffer
+- (vlc_tick_t)copyCurrentFrameToBuffer:(void *)buffer
 {
     CVImageBufferRef imageBuffer;
-    mtime_t pts;
+    vlc_tick_t pts;
 
     void *pixels;
 
@@ -258,7 +258,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (VLCAVCaptureDemux*)init:(demux_t *)demux;
 - (int)demux;
-- (mtime_t)pts;
+- (vlc_tick_t)pts;
 - (void)dealloc;
 @end
 
@@ -339,7 +339,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
            return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            *va_arg(args, mtime_t *) = [demux pts];
+            *va_arg(args, vlc_tick_t *) = [demux pts];
             return VLC_SUCCESS;
 
         default:
@@ -524,7 +524,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
     return 1;
 }
 
-- (mtime_t)pts
+- (vlc_tick_t)pts
 {
     return [_output currentPts];
 }

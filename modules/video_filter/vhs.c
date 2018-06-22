@@ -47,7 +47,7 @@ typedef struct {
     int32_t  i_offset;
     uint16_t i_intensity;
     bool     b_blue_red;
-    mtime_t  i_stop_trigger;
+    vlc_tick_t  i_stop_trigger;
 } blue_red_line_t;
 
 struct filter_sys_t {
@@ -58,9 +58,9 @@ struct filter_sys_t {
     int32_t *i_height; /* note: each plane may have different dimensions */
     int32_t *i_width;
     int32_t *i_visible_pitch;
-    mtime_t  i_start_time;
-    mtime_t  i_last_time;
-    mtime_t  i_cur_time;
+    vlc_tick_t  i_start_time;
+    vlc_tick_t  i_last_time;
+    vlc_tick_t  i_cur_time;
 
     /* sliding & offset effect */
     int32_t  i_phase_speed;
@@ -68,13 +68,13 @@ struct filter_sys_t {
     int32_t  i_offset_ofs;
     int32_t  i_sliding_ofs;
     int32_t  i_sliding_speed;
-    mtime_t  i_offset_trigger;
-    mtime_t  i_sliding_trigger;
-    mtime_t  i_sliding_stop_trig;
+    vlc_tick_t  i_offset_trigger;
+    vlc_tick_t  i_sliding_trigger;
+    vlc_tick_t  i_sliding_stop_trig;
     bool     i_sliding_type_duplicate;
 
     /* blue red lines effect */
-    mtime_t  i_BR_line_trigger;
+    vlc_tick_t  i_BR_line_trigger;
     blue_red_line_t *p_BR_lines[MAX_BLUE_RED_LINES];
 
 };

@@ -80,7 +80,7 @@ struct sout_stream_sys_t
 {
     sout_stream_id_sys_t *id;
     int i_id;
-    mtime_t i_delay;
+    vlc_tick_t i_delay;
 };
 
 /*****************************************************************************

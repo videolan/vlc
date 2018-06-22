@@ -108,7 +108,7 @@ typedef struct aout_stream_sys
 
 
 /*** VLC audio output callbacks ***/
-static HRESULT TimeGet(aout_stream_t *s, mtime_t *restrict delay)
+static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
 {
     aout_stream_sys_t *sys = s->sys;
     void *pv;

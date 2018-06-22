@@ -80,9 +80,9 @@ static void vlc_cancel_addr_finish(void *addr)
 #endif
 
 #ifdef LIBVLC_NEED_SLEEP
-void (mwait)(mtime_t deadline)
+void (mwait)(vlc_tick_t deadline)
 {
-    mtime_t delay;
+    vlc_tick_t delay;
     atomic_int value = ATOMIC_VAR_INIT(0);
 
     vlc_cancel_addr_prepare(&value);
@@ -96,7 +96,7 @@ void (mwait)(mtime_t deadline)
     vlc_cancel_addr_finish(&value);
 }
 
-void (msleep)(mtime_t delay)
+void (msleep)(vlc_tick_t delay)
 {
     mwait(mdate() + delay);
 }
@@ -180,7 +180,7 @@ void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex)
 }
 
 static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               mtime_t delay)
+                               vlc_tick_t delay)
 {
     unsigned value = atomic_load_explicit(vlc_cond_value(cond),
                                           memory_order_relaxed);
@@ -207,7 +207,7 @@ static int vlc_cond_wait_delay(vlc_cond_t *cond, vlc_mutex_t *mutex,
     return value ? 0 : ETIMEDOUT;
 }
 
-int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, mtime_t deadline)
+int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, vlc_tick_t deadline)
 {
     return vlc_cond_wait_delay(cond, mutex, deadline - mdate());
 }

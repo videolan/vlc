@@ -75,7 +75,7 @@ void SegmentTemplate::setSourceUrl( const std::string &url )
     virtualsegment->setSourceUrl(url);
 }
 
-void SegmentTemplate::pruneByPlaybackTime(mtime_t time)
+void SegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
 {
     AbstractAttr *p = getAttribute(Type::Timeline);
     if(p)
@@ -90,7 +90,7 @@ size_t SegmentTemplate::pruneBySequenceNumber(uint64_t number)
     return 0;
 }
 
-uint64_t SegmentTemplate::getLiveTemplateNumber(mtime_t playbacktime, bool abs) const
+uint64_t SegmentTemplate::getLiveTemplateNumber(vlc_tick_t playbacktime, bool abs) const
 {
     uint64_t number = inheritStartNumber();
     /* live streams / templated */
@@ -102,7 +102,7 @@ uint64_t SegmentTemplate::getLiveTemplateNumber(mtime_t playbacktime, bool abs) 
         const Timescale timescale = inheritTimescale();
         if(abs)
         {
-            mtime_t streamstart =
+            vlc_tick_t streamstart =
                     parentSegmentInformation->getPlaylist()->availabilityStartTime.Get();
             streamstart += parentSegmentInformation->getPeriodStart();
             playbacktime -= streamstart;
@@ -125,7 +125,7 @@ void SegmentTemplate::debug(vlc_object_t *obj, int indent) const
         static_cast<const SegmentTimeline *> (p)->debug(obj, indent + 1);
 }
 
-mtime_t SegmentTemplate::getMinAheadTime(uint64_t number) const
+vlc_tick_t SegmentTemplate::getMinAheadTime(uint64_t number) const
 {
     SegmentTimeline *timeline = inheritSegmentTimeline();
     if( timeline )
@@ -187,7 +187,7 @@ Segment *  SegmentTemplate::getNextMediaSegment(uint64_t i_pos,uint64_t *pi_newp
         {
             const Timescale timescale = inheritTimescale();
             const stime_t segmentduration = inheritDuration();
-            mtime_t totalduration = parentSegmentInformation->getPeriodDuration();
+            vlc_tick_t totalduration = parentSegmentInformation->getPeriodDuration();
             if(totalduration == 0)
                 totalduration = playlist->duration.Get();
             if(totalduration && segmentduration)
@@ -215,7 +215,7 @@ uint64_t SegmentTemplate::getStartSegmentNumber() const
     return timeline ? timeline->minElementNumber() : inheritStartNumber();
 }
 
-bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+bool SegmentTemplate::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
 {
     const SegmentTimeline *timeline = inheritSegmentTimeline();
     if(timeline)
@@ -232,7 +232,7 @@ bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
         BasePlaylist *playlist = parent->getPlaylist();
         if( playlist->isLive() )
         {
-            mtime_t now = CLOCK_FREQ * ::time(nullptr);
+            vlc_tick_t now = CLOCK_FREQ * ::time(nullptr);
             if(time >= playlist->availabilityStartTime.Get() && time < now)
                 *ret = getLiveTemplateNumber(time, true);
             else if(now - playlist->availabilityStartTime.Get() > time)
@@ -253,8 +253,8 @@ bool SegmentTemplate::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 
 
 bool SegmentTemplate::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                             mtime_t *time,
-                                                             mtime_t *duration) const
+                                                             vlc_tick_t *time,
+                                                             vlc_tick_t *duration) const
 {
     if(number == std::numeric_limits<uint64_t>::max())
         return false;

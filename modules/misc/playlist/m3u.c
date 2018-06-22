@@ -84,7 +84,7 @@ static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root,
         {
             char *psz_artist = input_item_GetArtist( p_current->p_input );
             if( psz_artist == NULL ) psz_artist = strdup( "" );
-            mtime_t i_duration = input_item_GetDuration( p_current->p_input );
+            vlc_tick_t i_duration = input_item_GetDuration( p_current->p_input );
             if( psz_artist && *psz_artist )
             {
                 /* write EXTINF with artist */

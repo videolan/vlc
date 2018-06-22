@@ -108,7 +108,7 @@
  */
 typedef struct
 {
-    mtime_t i_value;
+    vlc_tick_t i_value;
     int     i_residue;
 
     int     i_count;
@@ -118,18 +118,18 @@ static void    AvgInit( average_t *, int i_divider );
 static void    AvgClean( average_t * );
 
 static void    AvgReset( average_t * );
-static void    AvgUpdate( average_t *, mtime_t i_value );
-static mtime_t AvgGet( average_t * );
+static void    AvgUpdate( average_t *, vlc_tick_t i_value );
+static vlc_tick_t AvgGet( average_t * );
 static void    AvgRescale( average_t *, int i_divider );
 
 /* */
 typedef struct
 {
-    mtime_t i_stream;
-    mtime_t i_system;
+    vlc_tick_t i_stream;
+    vlc_tick_t i_system;
 } clock_point_t;
 
-static inline clock_point_t clock_point_Create( mtime_t i_stream, mtime_t i_system )
+static inline clock_point_t clock_point_Create( vlc_tick_t i_stream, vlc_tick_t i_system )
 {
     clock_point_t p = { .i_stream = i_stream, .i_system = i_system };
     return p;
@@ -149,19 +149,19 @@ struct input_clock_t
     clock_point_t last;
 
     /* Maximal timestamp returned by input_clock_ConvertTS (in system unit) */
-    mtime_t i_ts_max;
+    vlc_tick_t i_ts_max;
 
     /* Amount of extra buffering expressed in stream clock */
-    mtime_t i_buffering_duration;
+    vlc_tick_t i_buffering_duration;
 
     /* Clock drift */
-    mtime_t i_next_drift_update;
+    vlc_tick_t i_next_drift_update;
     average_t drift;
 
     /* Late statistics */
     struct
     {
-        mtime_t  pi_value[INPUT_CLOCK_LATE_COUNT];
+        vlc_tick_t  pi_value[INPUT_CLOCK_LATE_COUNT];
         unsigned i_index;
     } late;
 
@@ -170,20 +170,20 @@ struct input_clock_t
     bool          b_has_reference;
 
     /* External clock drift */
-    mtime_t       i_external_clock;
+    vlc_tick_t    i_external_clock;
     bool          b_has_external_clock;
 
     /* Current modifiers */
     bool    b_paused;
     int     i_rate;
-    mtime_t i_pts_delay;
-    mtime_t i_pause_date;
+    vlc_tick_t i_pts_delay;
+    vlc_tick_t i_pause_date;
 };
 
-static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_stream );
-static mtime_t ClockSystemToStream( input_clock_t *, mtime_t i_system );
+static vlc_tick_t ClockStreamToSystem( input_clock_t *, vlc_tick_t i_stream );
+static vlc_tick_t ClockSystemToStream( input_clock_t *, vlc_tick_t i_system );
 
-static mtime_t ClockGetTsOffset( input_clock_t * );
+static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 
 /*****************************************************************************
  * input_clock_New: create a new clock
@@ -239,7 +239,7 @@ void input_clock_Delete( input_clock_t *cl )
 void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                          bool *pb_late,
                          bool b_can_pace_control, bool b_buffering_allowed,
-                         mtime_t i_ck_stream, mtime_t i_ck_system )
+                         vlc_tick_t i_ck_stream, vlc_tick_t i_ck_system )
 {
     bool b_reset_reference = false;
 
@@ -284,7 +284,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
      * when we don't control the source pace */
     if( !b_can_pace_control && cl->i_next_drift_update < i_ck_system )
     {
-        const mtime_t i_converted = ClockSystemToStream( cl, i_ck_system );
+        const vlc_tick_t i_converted = ClockSystemToStream( cl, i_ck_system );
 
         AvgUpdate( &cl->drift, i_converted - i_ck_stream );
 
@@ -301,7 +301,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* Try to bufferize more than necessary by reading
          * CR_BUFFERING_RATE/256 faster until we have CR_BUFFERING_TARGET.
          */
-        const mtime_t i_duration = __MAX( i_ck_stream - cl->last.i_stream, 0 );
+        const vlc_tick_t i_duration = __MAX( i_ck_stream - cl->last.i_stream, 0 );
 
         cl->i_buffering_duration += ( i_duration * CR_BUFFERING_RATE + 255 ) / 256;
         if( cl->i_buffering_duration > CR_BUFFERING_TARGET )
@@ -314,8 +314,8 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 
     /* It does not take the decoder latency into account but it is not really
      * the goal of the clock here */
-    const mtime_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
-    const mtime_t i_late = ( i_ck_system - cl->i_pts_delay ) - i_system_expected;
+    const vlc_tick_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
+    const vlc_tick_t i_late = ( i_ck_system - cl->i_pts_delay ) - i_system_expected;
     *pb_late = i_late > 0;
     if( i_late > 0 )
     {
@@ -362,14 +362,14 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 /*****************************************************************************
  * input_clock_ChangePause:
  *****************************************************************************/
-void input_clock_ChangePause( input_clock_t *cl, bool b_paused, mtime_t i_date )
+void input_clock_ChangePause( input_clock_t *cl, bool b_paused, vlc_tick_t i_date )
 {
     vlc_mutex_lock( &cl->lock );
     assert( (!cl->b_paused) != (!b_paused) );
 
     if( cl->b_paused )
     {
-        const mtime_t i_duration = i_date - cl->i_pause_date;
+        const vlc_tick_t i_duration = i_date - cl->i_pause_date;
 
         if( cl->b_has_reference && i_duration > 0 )
         {
@@ -386,9 +386,9 @@ void input_clock_ChangePause( input_clock_t *cl, bool b_paused, mtime_t i_date )
 /*****************************************************************************
  * input_clock_GetWakeup
  *****************************************************************************/
-mtime_t input_clock_GetWakeup( input_clock_t *cl )
+vlc_tick_t input_clock_GetWakeup( input_clock_t *cl )
 {
-    mtime_t i_wakeup = 0;
+    vlc_tick_t i_wakeup = 0;
 
     vlc_mutex_lock( &cl->lock );
 
@@ -405,8 +405,8 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
  * input_clock_ConvertTS
  *****************************************************************************/
 int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
-                           int *pi_rate, mtime_t *pi_ts0, mtime_t *pi_ts1,
-                           mtime_t i_ts_bound )
+                           int *pi_rate, vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1,
+                           vlc_tick_t i_ts_bound )
 {
     assert( pi_ts0 );
     vlc_mutex_lock( &cl->lock );
@@ -426,8 +426,8 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     }
 
     /* */
-    const mtime_t i_ts_buffering = cl->i_buffering_duration * cl->i_rate / INPUT_RATE_DEFAULT;
-    const mtime_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
+    const vlc_tick_t i_ts_buffering = cl->i_buffering_duration * cl->i_rate / INPUT_RATE_DEFAULT;
+    const vlc_tick_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
 
     /* */
     if( *pi_ts0 > VLC_TS_INVALID )
@@ -475,8 +475,8 @@ int input_clock_GetRate( input_clock_t *cl )
 }
 
 int input_clock_GetState( input_clock_t *cl,
-                          mtime_t *pi_stream_start, mtime_t *pi_system_start,
-                          mtime_t *pi_stream_duration, mtime_t *pi_system_duration )
+                          vlc_tick_t *pi_stream_start, vlc_tick_t *pi_system_start,
+                          vlc_tick_t *pi_stream_duration, vlc_tick_t *pi_system_duration )
 {
     vlc_mutex_lock( &cl->lock );
 
@@ -497,12 +497,12 @@ int input_clock_GetState( input_clock_t *cl,
     return VLC_SUCCESS;
 }
 
-void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, mtime_t i_system )
+void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, vlc_tick_t i_system )
 {
     vlc_mutex_lock( &cl->lock );
 
     assert( cl->b_has_reference );
-    mtime_t i_offset;
+    vlc_tick_t i_offset;
     if( b_absolute )
     {
         i_offset = i_system - cl->ref.i_system - ClockGetTsOffset( cl );
@@ -523,7 +523,7 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, mtime_t
     vlc_mutex_unlock( &cl->lock );
 }
 
-void input_clock_GetSystemOrigin( input_clock_t *cl, mtime_t *pi_system, mtime_t *pi_delay )
+void input_clock_GetSystemOrigin( input_clock_t *cl, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
 {
     vlc_mutex_lock( &cl->lock );
 
@@ -538,13 +538,13 @@ void input_clock_GetSystemOrigin( input_clock_t *cl, mtime_t *pi_system, mtime_t
 
 #warning "input_clock_SetJitter needs more work"
 void input_clock_SetJitter( input_clock_t *cl,
-                            mtime_t i_pts_delay, int i_cr_average )
+                            vlc_tick_t i_pts_delay, int i_cr_average )
 {
     vlc_mutex_lock( &cl->lock );
 
     /* Update late observations */
-    const mtime_t i_delay_delta = i_pts_delay - cl->i_pts_delay;
-    mtime_t pi_late[INPUT_CLOCK_LATE_COUNT];
+    const vlc_tick_t i_delay_delta = i_pts_delay - cl->i_pts_delay;
+    vlc_tick_t pi_late[INPUT_CLOCK_LATE_COUNT];
     for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
         pi_late[i] = __MAX( cl->late.pi_value[(cl->late.i_index + 1 + i)%INPUT_CLOCK_LATE_COUNT] - i_delay_delta, 0 );
 
@@ -576,7 +576,7 @@ void input_clock_SetJitter( input_clock_t *cl,
     vlc_mutex_unlock( &cl->lock );
 }
 
-mtime_t input_clock_GetJitter( input_clock_t *cl )
+vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
 {
     vlc_mutex_lock( &cl->lock );
 
@@ -589,9 +589,9 @@ mtime_t input_clock_GetJitter( input_clock_t *cl )
      * XXX we only increase pts_delay over time, decreasing it is
      * not that easy if we want to be robust.
      */
-    const mtime_t *p = cl->late.pi_value;
-    mtime_t i_late_median = p[0] + p[1] + p[2] - __MIN(__MIN(p[0],p[1]),p[2]) - __MAX(__MAX(p[0],p[1]),p[2]);
-    mtime_t i_pts_delay = cl->i_pts_delay ;
+    const vlc_tick_t *p = cl->late.pi_value;
+    vlc_tick_t i_late_median = p[0] + p[1] + p[2] - __MIN(__MIN(p[0],p[1]),p[2]) - __MAX(__MAX(p[0],p[1]),p[2]);
+    vlc_tick_t i_pts_delay = cl->i_pts_delay ;
 
     vlc_mutex_unlock( &cl->lock );
 
@@ -601,7 +601,7 @@ mtime_t input_clock_GetJitter( input_clock_t *cl )
 /*****************************************************************************
  * ClockStreamToSystem: converts a movie clock to system date
  *****************************************************************************/
-static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_stream )
+static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
 {
     if( !cl->b_has_reference )
         return VLC_TS_INVALID;
@@ -615,7 +615,7 @@ static mtime_t ClockStreamToSystem( input_clock_t *cl, mtime_t i_stream )
  *****************************************************************************
  * Caution : a valid reference point is needed for this to operate.
  *****************************************************************************/
-static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_system )
+static vlc_tick_t ClockSystemToStream( input_clock_t *cl, vlc_tick_t i_system )
 {
     assert( cl->b_has_reference );
     return ( i_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
@@ -626,7 +626,7 @@ static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_system )
  * It returns timestamp display offset due to ref/last modfied on rate changes
  * It ensures that currently converted dates are not changed.
  */
-static mtime_t ClockGetTsOffset( input_clock_t *cl )
+static vlc_tick_t ClockGetTsOffset( input_clock_t *cl )
 {
     return cl->i_pts_delay * ( cl->i_rate - INPUT_RATE_DEFAULT ) / INPUT_RATE_DEFAULT;
 }
@@ -649,25 +649,25 @@ static void AvgReset( average_t *p_avg )
     p_avg->i_residue = 0;
     p_avg->i_count = 0;
 }
-static void AvgUpdate( average_t *p_avg, mtime_t i_value )
+static void AvgUpdate( average_t *p_avg, vlc_tick_t i_value )
 {
     const int i_f0 = __MIN( p_avg->i_divider - 1, p_avg->i_count );
     const int i_f1 = p_avg->i_divider - i_f0;
 
-    const mtime_t i_tmp = i_f0 * p_avg->i_value + i_f1 * i_value + p_avg->i_residue;
+    const vlc_tick_t i_tmp = i_f0 * p_avg->i_value + i_f1 * i_value + p_avg->i_residue;
 
     p_avg->i_value   = i_tmp / p_avg->i_divider;
     p_avg->i_residue = i_tmp % p_avg->i_divider;
 
     p_avg->i_count++;
 }
-static mtime_t AvgGet( average_t *p_avg )
+static vlc_tick_t AvgGet( average_t *p_avg )
 {
     return p_avg->i_value;
 }
 static void AvgRescale( average_t *p_avg, int i_divider )
 {
-    const mtime_t i_tmp = p_avg->i_value * p_avg->i_divider + p_avg->i_residue;
+    const vlc_tick_t i_tmp = p_avg->i_value * p_avg->i_divider + p_avg->i_residue;
 
     p_avg->i_divider = i_divider;
     p_avg->i_value   = i_tmp / p_avg->i_divider;

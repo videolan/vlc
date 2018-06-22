@@ -63,7 +63,7 @@ VLC_API int vout_OSDEpg( vout_thread_t *, input_item_t * );
  * \param duration Duration of the text being displayed
  * \param text Text to be displayed
  */
-VLC_API void vout_OSDText( vout_thread_t *vout, int channel, int position, mtime_t duration, const char *text );
+VLC_API void vout_OSDText( vout_thread_t *vout, int channel, int position, vlc_tick_t duration, const char *text );
 
 /**
  * \brief Write an informative message at the default location,

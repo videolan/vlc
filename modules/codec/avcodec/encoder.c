@@ -113,9 +113,9 @@ struct encoder_sys_t
     /*
      * Video properties
      */
-    mtime_t i_last_ref_pts;
-    mtime_t i_buggy_pts_detect;
-    mtime_t i_last_pts;
+    vlc_tick_t i_last_ref_pts;
+    vlc_tick_t i_buggy_pts_detect;
+    vlc_tick_t i_last_pts;
     bool    b_inited;
 
     /*
@@ -126,7 +126,7 @@ struct encoder_sys_t
     size_t i_samples_delay; //How much samples in delay buffer
     bool b_planar;
     bool b_variable;    //Encoder can be fed with any size frames not just frame_size
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     date_t  buffer_date;
 
     /* Multichannel (>2) channel reordering */
@@ -1079,7 +1079,7 @@ static void vlc_av_packet_Release(block_t *block)
     free(b);
 }
 
-static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecContext *context )
+static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCodecContext *context )
 {
     if ( packet->data == NULL &&
          packet->flags == 0 &&
@@ -1136,7 +1136,7 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, mtime_t i_length, AVCodecCo
 
 static void check_hurry_up( encoder_sys_t *p_sys, AVFrame *frame, encoder_t *p_enc )
 {
-    mtime_t current_date = mdate();
+    vlc_tick_t current_date = mdate();
 
     if ( current_date + HURRY_UP_GUARD3 > frame->pts )
     {

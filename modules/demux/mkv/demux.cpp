@@ -720,7 +720,7 @@ bool demux_sys_t::FreeUnused()
     return !streams.empty() && !opened_segments.empty();
 }
 
-bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date )
+bool demux_sys_t::PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date )
 {
     if ( p_current_vsegment != &new_vsegment )
     {

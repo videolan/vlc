@@ -179,7 +179,7 @@ static int Decode( decoder_t *, block_t * );
 static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
                                  bool b_text,
                                  int i_columns, int i_rows,
-                                 int i_align, mtime_t i_pts );
+                                 int i_align, vlc_tick_t i_pts );
 
 static void EventHandler( vbi_event *ev, void *user_data );
 static int OpaquePage( picture_t *p_src, const vbi_page *p_page,
@@ -517,7 +517,7 @@ error:
 static subpicture_t *Subpicture( decoder_t *p_dec, video_format_t *p_fmt,
                                  bool b_text,
                                  int i_columns, int i_rows, int i_align,
-                                 mtime_t i_pts )
+                                 vlc_tick_t i_pts )
 {
     video_format_t fmt;
     subpicture_t *p_spu=NULL;

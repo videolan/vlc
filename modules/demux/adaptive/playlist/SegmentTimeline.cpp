@@ -64,7 +64,7 @@ void SegmentTimeline::addElement(uint64_t number, stime_t d, uint64_t r, stime_t
     }
 }
 
-mtime_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
+vlc_tick_t SegmentTimeline::getMinAheadScaledTime(uint64_t number) const
 {
     stime_t totalscaledtime = 0;
 
@@ -182,7 +182,7 @@ uint64_t SegmentTimeline::getElementIndexBySequence(uint64_t number) const
     return std::numeric_limits<uint64_t>::max();
 }
 
-void SegmentTimeline::pruneByPlaybackTime(mtime_t time)
+void SegmentTimeline::pruneByPlaybackTime(vlc_tick_t time)
 {
     const Timescale timescale = inheritTimescale();
     uint64_t num = getElementNumberByScaledPlaybackTime(timescale.ToScaled(time));

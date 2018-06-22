@@ -94,7 +94,7 @@ struct decoder_sys_t
   bool        b_is_subtitle[9];
   char        ppsz_lines[32][128];
   char        psz_prev_text[512];
-  mtime_t     prev_pts;
+  vlc_tick_t  prev_pts;
   int         i_page[9];
   bool        b_erase[9];
   const uint16_t *  pi_active_national_set[9];

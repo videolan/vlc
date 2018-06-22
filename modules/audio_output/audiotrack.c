@@ -107,18 +107,18 @@ struct aout_sys_t {
         jobject p_obj; /* AudioTimestamp ref */
         jlong i_frame_us;
         jlong i_frame_pos;
-        mtime_t i_play_time; /* time when play was called */
-        mtime_t i_last_time;
+        vlc_tick_t i_play_time; /* time when play was called */
+        vlc_tick_t i_last_time;
     } timestamp;
 
     /* Used by AudioTrack_GetSmoothPositionUs */
     struct {
         uint32_t i_idx;
         uint32_t i_count;
-        mtime_t p_us[SMOOTHPOS_SAMPLE_COUNT];
-        mtime_t i_us;
-        mtime_t i_last_time;
-        mtime_t i_latency_us;
+        vlc_tick_t p_us[SMOOTHPOS_SAMPLE_COUNT];
+        vlc_tick_t i_us;
+        vlc_tick_t i_last_time;
+        vlc_tick_t i_latency_us;
     } smoothpos;
 
     uint32_t i_max_audiotrack_samples;
@@ -650,7 +650,7 @@ AudioTrack_GetSmoothPositionUs( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
     uint64_t i_audiotrack_us;
-    mtime_t i_now = mdate();
+    vlc_tick_t i_now = mdate();
 
     /* Fetch an AudioTrack position every SMOOTHPOS_INTERVAL_US (30ms) */
     if( i_now - p_sys->smoothpos.i_last_time >= SMOOTHPOS_INTERVAL_US )
@@ -693,7 +693,7 @@ static mtime_t
 AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    mtime_t i_now;
+    vlc_tick_t i_now;
 
     if( !p_sys->timestamp.p_obj )
         return 0;
@@ -749,10 +749,10 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
 }
 
 static int
-TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
+TimeGet( audio_output_t *p_aout, vlc_tick_t *restrict p_delay )
 {
     aout_sys_t *p_sys = p_aout->sys;
-    mtime_t i_audiotrack_us;
+    vlc_tick_t i_audiotrack_us;
     JNIEnv *env;
 
     if( p_sys->b_passthrough )
@@ -771,9 +771,9 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
 /* Debug log for both delays */
 #if 0
 {
-    mtime_t i_written_us = FRAMES_TO_US( p_sys->i_samples_written );
-    mtime_t i_ts_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
-    mtime_t i_smooth_us = 0;
+    vlc_tick_t i_written_us = FRAMES_TO_US( p_sys->i_samples_written );
+    vlc_tick_t i_ts_us = AudioTrack_GetTimestampPositionUs( env, p_aout );
+    vlc_tick_t i_smooth_us = 0;
 
     if( i_ts_us > 0 )
         i_smooth_us = AudioTrack_GetSmoothPositionUs(env, p_aout );
@@ -791,7 +791,7 @@ TimeGet( audio_output_t *p_aout, mtime_t *restrict p_delay )
     if( i_audiotrack_us > 0 )
     {
         /* AudioTrack delay */
-        mtime_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
+        vlc_tick_t i_delay = FRAMES_TO_US( p_sys->i_samples_written )
                         - i_audiotrack_us;
         if( i_delay >= 0 )
         {
@@ -1732,8 +1732,8 @@ AudioTrack_Thread( void *p_data )
     audio_output_t *p_aout = p_data;
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env = GET_ENV();
-    mtime_t i_play_deadline = 0;
-    mtime_t i_last_time_blocked = 0;
+    vlc_tick_t i_play_deadline = 0;
+    vlc_tick_t i_last_time_blocked = 0;
 
     if( !env )
         return NULL;
@@ -1964,7 +1964,7 @@ bailout:
 }
 
 static void
-Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
+Pause( audio_output_t *p_aout, bool b_pause, vlc_tick_t i_date )
 {
     aout_sys_t *p_sys = p_aout->sys;
     JNIEnv *env;

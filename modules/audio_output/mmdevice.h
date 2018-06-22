@@ -36,7 +36,7 @@ struct aout_stream
     VLC_COMMON_MEMBERS
     void *sys;
 
-    HRESULT (*time_get)(aout_stream_t *, mtime_t *);
+    HRESULT (*time_get)(aout_stream_t *, vlc_tick_t *);
     HRESULT (*play)(aout_stream_t *, block_t *);
     HRESULT (*pause)(aout_stream_t *, bool);
     HRESULT (*flush)(aout_stream_t *);
@@ -62,7 +62,7 @@ typedef HRESULT (*aout_stream_start_t)(aout_stream_t *s,
  */
 typedef HRESULT (*aout_stream_stop_t)(aout_stream_t *);
 
-static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, mtime_t *delay)
+static inline HRESULT aout_stream_TimeGet(aout_stream_t *s, vlc_tick_t *delay)
 {
     return (s->time_get)(s, delay);
 }
@@ -81,7 +81,7 @@ static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
 {
     if (wait)
     {   /* Loosy drain emulation */
-        mtime_t delay;
+        vlc_tick_t delay;
 
         if (SUCCEEDED(aout_stream_TimeGet(s, &delay))
          && delay <= INT64_C(5000000))

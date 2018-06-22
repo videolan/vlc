@@ -102,25 +102,25 @@ struct decoder_sys_t
     /* recovered timestamp from bytesteram for use
      * by synchroniser: should only get reset by the
      * synchronizer upon a discontinuity sentinel */
-    mtime_t i_sync_pts;
-    mtime_t i_sync_dts;
+    vlc_tick_t i_sync_pts;
+    vlc_tick_t i_sync_dts;
 
     /* build encapsulation unit state */
     block_t *p_eu; /*< Current encapsulation unit being built */
     block_t **pp_eu_last;
     uint32_t u_eu_last_npo; /* last next_parse_offset at input to encapsulation */
-    mtime_t i_eu_pts;
-    mtime_t i_eu_dts;
+    vlc_tick_t i_eu_pts;
+    vlc_tick_t i_eu_dts;
 
     /* timestamp generator state */
     date_t dts; /*< timegen decode clock, increments at picture rate */
     bool b_dts; /*< timegen decode clock valid */
 
     bool b_pts; /*< timegen presentation time valid */
-    mtime_t i_pts; /*< timegen presentation time of picture u_pts_picnum */
+    vlc_tick_t i_pts; /*< timegen presentation time of picture u_pts_picnum */
     uint32_t u_pts_picnum; /*< picture number of timegen presentation time */
 
-    mtime_t i_pts_offset; /*< maximum time between pts and dts */
+    vlc_tick_t i_pts_offset; /*< maximum time between pts and dts */
 
     /* p_outqueue is the list of encapsulation units that have been
      * fed to the timegenerator.  the timegenerator stamps them in
@@ -143,8 +143,8 @@ struct decoder_sys_t
     } reorder_buf; /*< reorder buffer, used by timegenerator */
 
     /* packetizer state */
-    mtime_t i_pts_last_out; /*< last output [from packetizer] pts */
-    mtime_t i_dts_last_out; /*< last output [from packetizer] dts */
+    vlc_tick_t i_pts_last_out; /*< last output [from packetizer] pts */
+    vlc_tick_t i_dts_last_out; /*< last output [from packetizer] dts */
 
     struct seq_hdr_t {
         uint32_t u_width;
@@ -1311,7 +1311,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         p_block->i_flags &= ~BLOCK_FLAG_PRIVATE_MASK;
         block_ChainLastAppend( &pp_output, p_block );
 
-        mtime_t i_delay = p_block->i_pts - p_block->i_dts;
+        vlc_tick_t i_delay = p_block->i_pts - p_block->i_dts;
         if( i_delay < 0 )
             msg_Err( p_dec, "pts - dts is negative(%"PRId64"): incorrect RoB size", i_delay );
     }

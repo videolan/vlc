@@ -55,12 +55,12 @@ struct encoder_sys_t
     x265_encoder    *h;
     x265_param      param;
 
-    mtime_t         i_initial_delay;
+    vlc_tick_t      i_initial_delay;
 
-    mtime_t         dts;
-    mtime_t         initial_date;
+    vlc_tick_t      dts;
+    vlc_tick_t      initial_date;
 #ifndef NDEBUG
-    mtime_t         start;
+    vlc_tick_t      start;
 #endif
 };
 

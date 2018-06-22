@@ -40,7 +40,7 @@ namespace adaptive
             };
             AbstractDemuxer();
             virtual ~AbstractDemuxer();
-            virtual Status demux(mtime_t) = 0;
+            virtual Status demux(vlc_tick_t) = 0;
             virtual void drain() = 0;
             virtual bool create() = 0;
             virtual void destroy() = 0;
@@ -64,7 +64,7 @@ namespace adaptive
         public:
             Demuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~Demuxer();
-            virtual Status demux(mtime_t) override;
+            virtual Status demux(vlc_tick_t) override;
             virtual void drain() override;
             virtual bool create() override;
             virtual void destroy() override;
@@ -84,10 +84,10 @@ namespace adaptive
             SlaveDemuxer(vlc_object_t *, const std::string &, es_out_t *, AbstractSourceStream *);
             virtual ~SlaveDemuxer();
             virtual bool create() override;
-            virtual Status demux(mtime_t) override;
+            virtual Status demux(vlc_tick_t) override;
 
         private:
-            mtime_t length;
+            vlc_tick_t length;
     };
 
     class DemuxerFactoryInterface

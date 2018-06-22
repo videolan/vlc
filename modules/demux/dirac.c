@@ -64,9 +64,9 @@ vlc_module_end();
  *****************************************************************************/
 struct demux_sys_t
 {
-    mtime_t i_dts;
-    mtime_t i_dtsoffset;
-    mtime_t i_pts_offset_lowtide;
+    vlc_tick_t i_dts;
+    vlc_tick_t i_dtsoffset;
+    vlc_tick_t i_pts_offset_lowtide;
     es_out_id_t *p_es;
 
     enum {
@@ -199,7 +199,7 @@ static int Demux( demux_t *p_demux)
 
             /* track low watermark for pts_offset -- can be used to show
              * when it is too large */
-            mtime_t i_delay = p_block_out->i_pts - p_block_out->i_dts;
+            vlc_tick_t i_delay = p_block_out->i_pts - p_block_out->i_dts;
             if( p_sys->i_pts_offset_lowtide > i_delay )
             {
                 p_sys->i_pts_offset_lowtide = i_delay;

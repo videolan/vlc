@@ -98,7 +98,7 @@ namespace adaptive
             virtual void Execute() override;
 
         protected:
-            EsOutControlPCRCommand( int, const SegmentTimes &, mtime_t );
+            EsOutControlPCRCommand( int, const SegmentTimes &, vlc_tick_t );
             int group;
     };
 
@@ -169,7 +169,7 @@ namespace adaptive
             virtual EsOutAddCommand * createEsOutAddCommand( AbstractFakeESOutID * ) const;
             virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int,
                                                                            const SegmentTimes &,
-                                                                           mtime_t ) const;
+                                                                           vlc_tick_t ) const;
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
             virtual EsOutMetaCommand * createEsOutMetaCommand( AbstractFakeEsOut *, int, const vlc_meta_t * ) const;

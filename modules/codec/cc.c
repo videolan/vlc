@@ -231,7 +231,7 @@ struct decoder_sys_t
 static int Decode( decoder_t *, block_t * );
 static void Flush( decoder_t * );
 
-static void DTVCC_ServiceData_Handler( void *priv, uint8_t i_sid, mtime_t i_time,
+static void DTVCC_ServiceData_Handler( void *priv, uint8_t i_sid, vlc_tick_t i_time,
                                        const uint8_t *p_data, size_t i_data )
 {
     decoder_t *p_dec = priv;
@@ -340,7 +340,7 @@ static void Flush( decoder_t *p_dec )
  ****************************************************************************/
 static void     Push( decoder_t *, block_t * );
 static block_t *Pop( decoder_t *, bool );
-static void     Convert( decoder_t *, mtime_t, const uint8_t *, size_t );
+static void     Convert( decoder_t *, vlc_tick_t, const uint8_t *, size_t );
 
 static bool DoDecode( decoder_t *p_dec, bool b_drain )
 {
@@ -482,7 +482,7 @@ static block_t *Pop( decoder_t *p_dec, bool b_forced )
     return p_block;
 }
 
-static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
+static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, vlc_tick_t i_pts )
 {
     //decoder_sys_t *p_sys = p_dec->p_sys;
     subpicture_t *p_spu = NULL;
@@ -530,7 +530,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
     return p_spu;
 }
 
-static void Convert( decoder_t *p_dec, mtime_t i_pts,
+static void Convert( decoder_t *p_dec, vlc_tick_t i_pts,
                      const uint8_t *p_buffer, size_t i_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -540,7 +540,7 @@ static void Convert( decoder_t *p_dec, mtime_t i_pts,
     {
         if( (p_buffer[0] & 0x04) /* Valid bit */ )
         {
-            const mtime_t i_spupts = i_pts + i_ticks * CLOCK_FREQ / (1200/3);
+            const vlc_tick_t i_spupts = i_pts + i_ticks * CLOCK_FREQ / (1200/3);
             /* Mask off the specific i_field bit, else some sequences can be lost. */
             if ( p_sys->p_eia608 &&
                 (p_buffer[0] & 0x03) == p_sys->i_field )

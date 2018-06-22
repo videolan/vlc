@@ -1052,10 +1052,10 @@ static bo_t *GetTextBox(void)
 }
 
 static int64_t GetScaledEntryDuration( const mp4mux_entry_t *p_entry, uint32_t i_timescale,
-                                       mtime_t *pi_total_mtime, int64_t *pi_total_scaled )
+                                       vlc_tick_t *pi_total_mtime, int64_t *pi_total_scaled )
 {
-    const mtime_t i_totalscaledtototalmtime = *pi_total_scaled * CLOCK_FREQ / i_timescale;
-    const mtime_t i_diff = *pi_total_mtime - i_totalscaledtototalmtime;
+    const vlc_tick_t i_totalscaledtototalmtime = *pi_total_scaled * CLOCK_FREQ / i_timescale;
+    const vlc_tick_t i_diff = *pi_total_mtime - i_totalscaledtototalmtime;
 
     /* Ensure to compensate the drift due to loss from time, and from scale, conversions */
     int64_t i_scaled = (p_entry->i_length + i_diff) * i_timescale / CLOCK_FREQ;
@@ -1153,7 +1153,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     }
     bo_add_32be(stts, 0);     // entry-count (fixed latter)
 
-    mtime_t i_total_mtime = 0;
+    vlc_tick_t i_total_mtime = 0;
     int64_t i_total_scaled = 0;
     unsigned i_index = 0;
     for (unsigned i = 0; i < p_track->i_entry_count; i_index++) {
@@ -1163,7 +1163,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
                                                   &i_total_mtime, &i_total_scaled);
         for (unsigned j=i+1; j < p_track->i_entry_count; j++)
         {
-            mtime_t i_total_mtime_next = i_total_mtime;
+            vlc_tick_t i_total_mtime_next = i_total_mtime;
             int64_t i_total_scaled_next = i_total_scaled;
             int64_t i_scalednext = GetScaledEntryDuration(&p_track->entry[j], p_track->i_timescale,
                                                           &i_total_mtime_next, &i_total_scaled_next);
@@ -1192,7 +1192,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         for (unsigned i = 0; i < p_track->i_entry_count; i_index++)
         {
             int     i_first = i;
-            mtime_t i_offset = p_track->entry[i].i_pts_dts;
+            vlc_tick_t i_offset = p_track->entry[i].i_pts_dts;
 
             for (; i < p_track->i_entry_count; ++i)
                 if (i == p_track->i_entry_count || p_track->entry[i].i_pts_dts != i_offset)
@@ -1236,7 +1236,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     i_index = 0;
     if ( p_track->fmt.i_cat == VIDEO_ES || p_track->fmt.i_cat == AUDIO_ES )
     {
-        mtime_t i_interval = -1;
+        vlc_tick_t i_interval = -1;
         for (unsigned i = 0; i < p_track->i_entry_count; i++)
         {
             if ( i_interval != -1 )
@@ -1374,7 +1374,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
     for (unsigned int i_trak = 0; i_trak < i_tracks; i_trak++) {
         mp4mux_trackinfo_t *p_stream = pp_tracks[i_trak];
 
-        mtime_t i_stream_duration;
+        vlc_tick_t i_stream_duration;
         if ( !b_fragmented )
             i_stream_duration = p_stream->i_read_duration * i_movie_timescale / CLOCK_FREQ;
         else

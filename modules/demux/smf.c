@@ -96,9 +96,9 @@ struct demux_sys_t
     es_out_id_t *es;
     date_t       pts; /*< Play timestamp */
     uint64_t     pulse; /*< Pulses counter */
-    mtime_t      tick; /*< Last tick timestamp */
+    vlc_tick_t   tick; /*< Last tick timestamp */
 
-    mtime_t      duration; /*< Total duration */
+    vlc_tick_t   duration; /*< Total duration */
     unsigned     ppqn;   /*< Pulses Per Quarter Note */
     /* by the way, "quarter note" is "noire" in French */
 
@@ -469,7 +469,7 @@ static int Demux (demux_t *demux)
     return 1;
 }
 
-static int Seek (demux_t *demux, mtime_t pts)
+static int Seek (demux_t *demux, vlc_tick_t pts)
 {
     demux_sys_t *sys = demux->p_sys;
 

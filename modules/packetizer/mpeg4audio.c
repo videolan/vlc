@@ -128,7 +128,7 @@ struct decoder_sys_t
      * Common properties
      */
     date_t  end_date;
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     bool b_discontuinity;
 
     int i_frame_size;
@@ -991,7 +991,7 @@ static void SetupOutput(decoder_t *p_dec, block_t *p_block)
         msg_Info(p_dec, "AAC channels: %d samplerate: %d",
                   p_sys->i_channels, p_sys->i_rate);
 
-        const mtime_t i_end_date = date_Get(&p_sys->end_date);
+        const vlc_tick_t i_end_date = date_Get(&p_sys->end_date);
         date_Init(&p_sys->end_date, p_sys->i_rate, 1);
         date_Set(&p_sys->end_date, i_end_date);
     }

@@ -137,7 +137,7 @@ std::string Representation::contextualize(size_t number, const std::string &comp
 
 stime_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const SegmentTemplate *templ) const
 {
-    mtime_t time = 0;
+    vlc_tick_t time = 0;
     const SegmentTimeline *tl = templ->inheritSegmentTimeline();
     if(tl)
     {

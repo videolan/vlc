@@ -942,7 +942,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     break;
             }
 
-            mtime_t it = var_InheritInteger( p_input, varname );
+            vlc_tick_t it = var_InheritInteger( p_input, varname );
             if( it < 0 )
                 break;
             var_SetInteger( p_input, "time-offset", it * sign * CLOCK_FREQ );

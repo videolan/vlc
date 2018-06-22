@@ -182,7 +182,7 @@ static void Flush(audio_output_t *aout, bool drain)
     aout_sys_t *sys = aout->sys;
 
     if (drain) {
-        mtime_t delay;
+        vlc_tick_t delay;
         if (!TimeGet(aout, &delay))
             msleep(delay);
     } else {
@@ -231,7 +231,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
 
-static void Pause(audio_output_t *aout, bool pause, mtime_t date)
+static void Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     (void)date;
     aout_sys_t *sys = aout->sys;

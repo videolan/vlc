@@ -724,7 +724,7 @@ struct encoder_sys_t
     /*
      * Common properties
      */
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 };
 
 #define STREAMINFO_SIZE 34
@@ -770,8 +770,8 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
 
     p_sys->i_samples_delay -= samples;
 
-    p_block->i_length = (mtime_t)1000000 *
-        (mtime_t)samples / (mtime_t)p_enc->fmt_in.audio.i_rate;
+    p_block->i_length = (vlc_tick_t)1000000 *
+        (vlc_tick_t)samples / (vlc_tick_t)p_enc->fmt_in.audio.i_rate;
 
     /* Update pts */
     p_sys->i_pts += p_block->i_length;
@@ -880,8 +880,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     if( unlikely( !p_aout_buf ) ) return NULL;
 
     p_sys->i_pts = p_aout_buf->i_pts -
-                (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
-                (mtime_t)p_enc->fmt_in.audio.i_rate;
+                (vlc_tick_t)1000000 * (vlc_tick_t)p_sys->i_samples_delay /
+                (vlc_tick_t)p_enc->fmt_in.audio.i_rate;
 
     p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
 

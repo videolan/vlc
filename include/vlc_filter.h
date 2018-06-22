@@ -95,7 +95,7 @@ struct filter_t
                                  int, int, int );
 
         /** Generate a subpicture (sub source) */
-        subpicture_t *(*pf_sub_source)( filter_t *, mtime_t );
+        subpicture_t *(*pf_sub_source)( filter_t *, vlc_tick_t );
 
         /** Filter a subpicture (sub filter) */
         subpicture_t *(*pf_sub_filter)( filter_t *, subpicture_t * );
@@ -431,7 +431,7 @@ VLC_API void filter_chain_VideoFlush( filter_chain_t * );
  * \param display_date of subpictures
  */
 void filter_chain_SubSource(filter_chain_t *chain, spu_t *,
-                            mtime_t display_date);
+                            vlc_tick_t display_date);
 
 /**
  * Apply filter chain to subpictures.

@@ -49,7 +49,7 @@ HLSStream::~HLSStream()
         vlc_meta_Delete(p_meta);
 }
 
-void HLSStream::setMetadataTimeOffset(mtime_t i_offset)
+void HLSStream::setMetadataTimeOffset(vlc_tick_t i_offset)
 {
     if(i_offset >= 0)
     {
@@ -64,7 +64,7 @@ void HLSStream::setMetadataTimeOffset(mtime_t i_offset)
     }
 }
 
-void HLSStream::setMetadataTimeMapping(mtime_t mpegts, mtime_t muxed)
+void HLSStream::setMetadataTimeMapping(vlc_tick_t mpegts, vlc_tick_t muxed)
 {
     fakeEsOut()->setAssociatedTimestamp(mpegts, muxed);
 }
@@ -150,7 +150,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
             if(eol)
             {
                 uint64_t mpegts = std::numeric_limits<uint64_t>::max();
-                mtime_t local = std::numeric_limits<mtime_t>::max();
+                vlc_tick_t local = std::numeric_limits<mtime_t>::max();
                 std::string str(p + 16, eol - p - 16);
 
                 std::string::size_type pos = str.find("LOCAL:");

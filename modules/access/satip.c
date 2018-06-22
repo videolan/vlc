@@ -424,9 +424,9 @@ static void *satip_thread(void *data) {
     stream_t *access = data;
     access_sys_t *sys = access->p_sys;
     int sock = sys->udp_sock;
-    mtime_t last_recv = mdate();
+    vlc_tick_t last_recv = mdate();
     ssize_t len;
-    mtime_t next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
+    vlc_tick_t next_keepalive = mdate() + sys->keepalive_interval * 1000 * 1000;
 #ifdef HAVE_RECVMMSG
     struct mmsghdr msgs[VLEN];
     struct iovec iovecs[VLEN];

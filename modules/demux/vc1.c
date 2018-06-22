@@ -59,7 +59,7 @@ vlc_module_end ()
  *****************************************************************************/
 struct demux_sys_t
 {
-    mtime_t     i_dts;
+    vlc_tick_t  i_dts;
     es_out_id_t *p_es;
 
     float       f_fps;

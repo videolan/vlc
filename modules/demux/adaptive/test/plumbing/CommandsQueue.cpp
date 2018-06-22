@@ -193,7 +193,7 @@ int CommandsQueue_test()
 
         /* reordering */
         id1 = new TestEsOutID(&esout);
-        const mtime_t OFFSET = vlc_tick_from_sec(100);
+        const vlc_tick_t OFFSET = vlc_tick_from_sec(100);
         for(size_t j=0; j<2; j++)
         {
             TestEsOutID *id = (j % 2) ? id1 : id0;
@@ -217,7 +217,7 @@ int CommandsQueue_test()
         Expect(esout.output.size() == 10);
         for(size_t i=0; i<5; i++)
         {
-            const mtime_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
+            const vlc_tick_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
             OutputVal val = esout.output.front();
             Expect(val.first == id0);
             Expect(val.second->i_dts == now);
@@ -256,7 +256,7 @@ int CommandsQueue_test()
         for(size_t i=0; i<12; i++)
         {
             TestEsOutID *id = (i % 2) ? id1 : id0;
-            const mtime_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i / 2);
+            const vlc_tick_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i / 2);
             OutputVal &val = esout.output.front();
             Expect(val.first == id);
             Expect(val.second->i_dts == now);
@@ -291,7 +291,7 @@ int CommandsQueue_test()
         for(size_t i=0; i<6; i++)
         {
             TestEsOutID *id = (i % 2) ? id1 : id0;
-            const mtime_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i/2);
+            const vlc_tick_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i/2);
             OutputVal val = esout.output.front();
             Expect(val.first == id);
             Expect(val.second->i_dts == now);
@@ -309,7 +309,7 @@ int CommandsQueue_test()
         /* reordering PCR before PTS */
         for(size_t i=0; i<2; i++)
         {
-            const mtime_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
+            const vlc_tick_t now = VLC_TS_0 + OFFSET + vlc_tick_from_sec(i);
             cmd = factory.createEsOutControlPCRCommand(0, SegmentTimes(), now);
             queue.Schedule(cmd);
             block_t *data = block_Alloc(0);

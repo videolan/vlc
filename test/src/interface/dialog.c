@@ -135,7 +135,7 @@ set_answer(struct cb_answer *p_ans, bool b_dismiss, const char *psz_username,
 
 static void
 test_dialogs(vlc_object_t *p_obj, struct cb_answer *p_ans,
-             mtime_t i_dialog_wait)
+             vlc_tick_t i_dialog_wait)
 {
     set_answer(p_ans, false, NULL, 0);
     int i_ret = vlc_dialog_display_error(p_obj, TITLE,

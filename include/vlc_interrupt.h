@@ -71,7 +71,7 @@ VLC_API int vlc_sem_wait_i11e(vlc_sem_t *);
  * @return EINTR if an interruption occurred, otherwise 0 once the timestamp is
  * reached.
  */
-VLC_API int vlc_mwait_i11e(mtime_t);
+VLC_API int vlc_mwait_i11e(vlc_tick_t);
 
 /**
  * Interruptible variant of msleep().
@@ -84,7 +84,7 @@ VLC_API int vlc_mwait_i11e(mtime_t);
  * @return EINTR if an interruption occurred, otherwise 0 once the timeout
  * expired.
  */
-static inline int vlc_msleep_i11e(mtime_t delay)
+static inline int vlc_msleep_i11e(vlc_tick_t delay)
 {
     return vlc_mwait_i11e(mdate() + delay);
 }

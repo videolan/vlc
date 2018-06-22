@@ -147,7 +147,7 @@ struct httpd_client_t
     bool    b_stream_mode;
     uint8_t i_state;
 
-    mtime_t i_timeout_date;
+    vlc_tick_t i_timeout_date;
 
     /* buffer for reading header */
     int     i_buffer_size;
@@ -1713,7 +1713,7 @@ static void httpdLoop(httpd_host_t *host)
         vlc_cleanup_pop();
     }
 
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     int delay = -1;
     int canc = vlc_savecancel();
     for (int i_client = 0; i_client < host->i_client; i_client++) {

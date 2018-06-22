@@ -228,7 +228,7 @@ enum
 typedef struct counter_sample_t
 {
     uint64_t value;
-    mtime_t  date;
+    vlc_tick_t  date;
 } counter_sample_t;
 
 typedef struct counter_t
@@ -237,7 +237,7 @@ typedef struct counter_t
     int                 i_samples;
     counter_sample_t ** pp_samples;
 
-    mtime_t             last_update;
+    vlc_tick_t          last_update;
 } counter_t;
 
 enum

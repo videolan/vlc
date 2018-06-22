@@ -150,18 +150,18 @@ struct sout_stream_sys_t
     vlc_mutex_t *p_lock;
     void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer, size_t size );
     void ( *pf_audio_prerender_callback ) ( void* p_audio_data, uint8_t** pp_pcm_buffer, size_t size );
-    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, size_t size, mtime_t pts );
-    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, size_t size, mtime_t pts );
+    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, size_t size, vlc_tick_t pts );
+    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, size_t size, vlc_tick_t pts );
     bool time_sync;
 };
 
 void VideoPrerenderDefaultCallback( void* p_video_data, uint8_t** pp_pixel_buffer, size_t size );
 void AudioPrerenderDefaultCallback( void* p_audio_data, uint8_t** pp_pcm_buffer, size_t size );
 void VideoPostrenderDefaultCallback( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height,
-                                     int pixel_pitch, size_t size, mtime_t pts );
+                                     int pixel_pitch, size_t size, vlc_tick_t pts );
 void AudioPostrenderDefaultCallback( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels,
                                      unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample,
-                                     size_t size, mtime_t pts );
+                                     size_t size, vlc_tick_t pts );
 
 /*****************************************************************************
  * Default empty callbacks
@@ -178,7 +178,7 @@ void AudioPrerenderDefaultCallback( void* p_audio_data, uint8_t** pp_pcm_buffer,
 }
 
 void VideoPostrenderDefaultCallback( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height,
-                                     int pixel_pitch, size_t size, mtime_t pts )
+                                     int pixel_pitch, size_t size, vlc_tick_t pts )
 {
     VLC_UNUSED( p_video_data ); VLC_UNUSED( p_pixel_buffer );
     VLC_UNUSED( width ); VLC_UNUSED( height );
@@ -187,7 +187,7 @@ void VideoPostrenderDefaultCallback( void* p_video_data, uint8_t* p_pixel_buffer
 
 void AudioPostrenderDefaultCallback( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels,
                                      unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample,
-                                     size_t size, mtime_t pts )
+                                     size_t size, vlc_tick_t pts )
 {
     VLC_UNUSED( p_audio_data ); VLC_UNUSED( p_pcm_buffer );
     VLC_UNUSED( channels ); VLC_UNUSED( rate ); VLC_UNUSED( nb_samples );
@@ -226,13 +226,13 @@ static int Open( vlc_object_t *p_this )
         p_sys->pf_audio_prerender_callback = AudioPrerenderDefaultCallback;
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "postrender-callback" );
-    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, size_t, mtime_t))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, size_t, vlc_tick_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
     if (p_sys->pf_video_postrender_callback == NULL)
         p_sys->pf_video_postrender_callback = VideoPostrenderDefaultCallback;
 
     psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
-    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, size_t, mtime_t))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, size_t, vlc_tick_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
     if (p_sys->pf_audio_postrender_callback == NULL)
         p_sys->pf_audio_postrender_callback = AudioPostrenderDefaultCallback;

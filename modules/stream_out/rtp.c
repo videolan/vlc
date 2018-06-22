@@ -313,7 +313,7 @@ struct sout_stream_sys_t
     rtsp_stream_t *rtsp;
 
     /* RTSP NPT and timestamp computations */
-    mtime_t      i_npt_zero;    /* when NPT=0 packet is sent */
+    vlc_tick_t   i_npt_zero;    /* when NPT=0 packet is sent */
     int64_t      i_pts_zero;    /* predicts PTS of NPT=0 packet */
     int64_t      i_pts_offset;  /* matches actual PTS to prediction */
     vlc_mutex_t  lock_ts;
@@ -1592,7 +1592,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
         return rtp_init_ts(p_media, psz_vod_session);
 
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    mtime_t i_npt_zero;
+    vlc_tick_t i_npt_zero;
     vlc_mutex_lock( &p_sys->lock_ts );
     i_npt_zero = p_sys->i_npt_zero;
     vlc_mutex_unlock( &p_sys->lock_ts );
@@ -1600,7 +1600,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
     if( i_npt_zero == VLC_TS_INVALID )
         return p_sys->i_pts_zero;
 
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     if( now < i_npt_zero )
         return p_sys->i_pts_zero;
 

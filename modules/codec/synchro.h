@@ -44,6 +44,6 @@ bool decoder_SynchroChoose( decoder_synchro_t *, int, int, bool );
 void decoder_SynchroTrash( decoder_synchro_t * );
 void decoder_SynchroDecode( decoder_synchro_t * );
 void decoder_SynchroEnd( decoder_synchro_t *, int, bool );
-mtime_t decoder_SynchroDate( decoder_synchro_t * ) VLC_USED;
-void decoder_SynchroNewPicture( decoder_synchro_t *, int, int, mtime_t, mtime_t, bool );
+vlc_tick_t decoder_SynchroDate( decoder_synchro_t * ) VLC_USED;
+void decoder_SynchroNewPicture( decoder_synchro_t *, int, int, vlc_tick_t, vlc_tick_t, bool );
 

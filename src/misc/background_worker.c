@@ -43,7 +43,7 @@ struct background_worker {
         bool probe_request; /**< true if a probe is requested */
         vlc_cond_t wait; /**< wait for update in terms of head */
         vlc_cond_t worker_wait; /**< wait for probe request or cancelation */
-        mtime_t deadline; /**< deadline of the current task */
+        vlc_tick_t deadline; /**< deadline of the current task */
         void* id; /**< id of the current task */
         bool active; /**< true if there is an active thread */
     } head;
@@ -89,7 +89,7 @@ static void* Thread( void* data )
             else if( worker->head.deadline != VLC_TS_0 )
             {
                 /* Wait 1 seconds for new inputs before terminating */
-                mtime_t deadline = mdate() + INT64_C(1000000);
+                vlc_tick_t deadline = mdate() + INT64_C(1000000);
                 int ret = vlc_cond_timedwait( &worker->tail.wait,
                                               &worker->lock, deadline );
                 if( ret != 0 )

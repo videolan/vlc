@@ -2418,7 +2418,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             continue;
 
         /* convert everything to seconds */
-        mtime_t i_frames = h * 3600 + m * 60 + s;
+        vlc_tick_t i_frames = h * 3600 + m * 60 + s;
 
         if( c == ';' && p_rate->b_drop_allowed ) /* dropframe */
         {

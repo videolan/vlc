@@ -119,8 +119,8 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t     *p_block;
-    mtime_t     i_date;
-    mtime_t     i_delta;
+    vlc_tick_t  i_date;
+    vlc_tick_t  i_delta;
 
     i_delta = INT64_C(1000000) / CDG_FRAME_RATE;
 

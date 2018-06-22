@@ -37,8 +37,8 @@ enum webvtt_header_line_e
 
 typedef struct
 {
-    mtime_t i_start;
-    mtime_t i_stop;
+    vlc_tick_t i_start;
+    vlc_tick_t i_stop;
     char *psz_id;
     char *psz_text;
     char *psz_attrs;
@@ -70,6 +70,6 @@ webvtt_text_parser_t * webvtt_text_parser_New(
 void webvtt_text_parser_Delete( webvtt_text_parser_t *p );
 void webvtt_text_parser_Feed( webvtt_text_parser_t *p, char *psz_line );
 
-bool webvtt_scan_time( const char *psz, mtime_t *p_time );
+bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time );
 
 #endif

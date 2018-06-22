@@ -60,7 +60,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 @interface VLCCoreInteraction () <SPMediaKeyTapDelegate>
 {
     int i_currentPlaybackRate;
-    mtime_t timeA, timeB;
+    vlc_tick_t timeA, timeB;
 
     float f_maxVolume;
 
@@ -403,7 +403,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (b_seekable) {
         long long i_interval = var_InheritInteger( p_input, p_value );
         if (i_interval > 0) {
-            mtime_t val = CLOCK_FREQ * i_interval;
+            vlc_tick_t val = CLOCK_FREQ * i_interval;
             if (!b_value)
                 val = val * -1;
             var_SetInteger( p_input, "time-offset", val );
@@ -452,7 +452,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     [self jumpWithValue:"long-jump-size" forward:NO];
 }
 
-- (BOOL)seekToTime:(mtime_t)time
+- (BOOL)seekToTime:(vlc_tick_t)time
 {
     input_thread_t * p_input_thread = pl_CurrentInput(getIntf());
     if (p_input_thread) {
@@ -586,7 +586,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (timeB) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
-            mtime_t currentTime = var_GetInteger(p_input, "time");
+            vlc_tick_t currentTime = var_GetInteger(p_input, "time");
             if ( currentTime >= timeB || currentTime < timeA)
                 var_SetInteger(p_input, "time", timeA);
             vlc_object_release(p_input);

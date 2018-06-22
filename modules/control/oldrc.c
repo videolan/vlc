@@ -984,7 +984,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            mtime_t t = atoi( newval.psz_string );
+            vlc_tick_t t = atoi( newval.psz_string );
             var_SetInteger( p_input, "time", CLOCK_FREQ * t );
         }
         i_error = VLC_SUCCESS;

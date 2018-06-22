@@ -762,7 +762,7 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
-    mtime_t         i_initial_delay;
+    vlc_tick_t      i_initial_delay;
 
     char            *psz_stat_name;
     int             i_sei_size;

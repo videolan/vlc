@@ -46,17 +46,17 @@ namespace adaptive
                 virtual void            updateWith(AbstractMultipleSegmentBaseType *,
                                                    bool = false) override;
                 void                    pruneBySegmentNumber(uint64_t);
-                void                    pruneByPlaybackTime(mtime_t);
+                void                    pruneByPlaybackTime(vlc_tick_t);
                 stime_t                 getTotalLength() const;
                 bool                    hasRelativeMediaTimes() const;
 
-                virtual mtime_t  getMinAheadTime(uint64_t) const override;
+                virtual vlc_tick_t  getMinAheadTime(uint64_t) const override;
                 virtual Segment * getMediaSegment(uint64_t pos) const override;
                 virtual Segment * getNextMediaSegment(uint64_t, uint64_t *, bool *) const override;
                 virtual uint64_t  getStartSegmentNumber() const override;
-                virtual bool getSegmentNumberByTime(mtime_t time, uint64_t *ret) const override;
+                virtual bool getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const override;
                 virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                            mtime_t *time, mtime_t *duration) const override;
+                                            vlc_tick_t *time, vlc_tick_t *duration) const override;
 
                 virtual void debug(vlc_object_t *, int = 0) const override;
 

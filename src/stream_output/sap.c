@@ -142,7 +142,7 @@ noreturn static void *RunThread (void *self)
     for (;;)
     {
         session_descriptor_t *p_session;
-        mtime_t deadline;
+        vlc_tick_t deadline;
 
         while (addr->first == NULL)
             vlc_cond_wait (&addr->wait, &addr->lock);

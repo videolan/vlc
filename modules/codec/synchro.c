@@ -120,13 +120,13 @@ struct decoder_synchro_t
     bool            b_quiet;
 
     /* date of the beginning of the decoding of the current picture */
-    mtime_t         decoding_start;
+    vlc_tick_t      decoding_start;
 
     /* stream properties */
     unsigned int    i_n_p, i_n_b;
 
     /* decoding values */
-    mtime_t         p_tau[4];                  /* average decoding durations */
+    vlc_tick_t      p_tau[4];                  /* average decoding durations */
     unsigned int    pi_meaningful[4];            /* number of durations read */
 
     /* render_time filled by SynchroChoose() */
@@ -139,7 +139,7 @@ struct decoder_synchro_t
     int             i_trash_nb_ref;    /* Number of reference pictures we'll *
                                         * have if we trash the current pic   */
     unsigned int    i_eta_p, i_eta_b;
-    mtime_t         backward_pts, current_pts;
+    vlc_tick_t      backward_pts, current_pts;
     int             i_current_period;   /* period to add to the next picture */
     int             i_backward_period;  /* period to add after the next
                                          * reference picture
@@ -172,7 +172,7 @@ decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec, int i_frame_rate )
     /* We use a fake stream pattern, which is often right. */
     p_synchro->i_n_p = p_synchro->i_eta_p = DEFAULT_NB_P;
     p_synchro->i_n_b = p_synchro->i_eta_b = DEFAULT_NB_B;
-    memset( p_synchro->p_tau, 0, 4 * sizeof(mtime_t) );
+    memset( p_synchro->p_tau, 0, 4 * sizeof(vlc_tick_t) );
     memset( p_synchro->pi_meaningful, 0, 4 * sizeof(unsigned int) );
     p_synchro->i_nb_ref = 0;
     p_synchro->i_trash_nb_ref = p_synchro->i_dec_nb_ref = 0;
@@ -214,8 +214,8 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
                                     + (p_synchro->p_tau[(coding_type)] >> 1) \
                                     + p_synchro->i_render_time)
 #define S (*p_synchro)
-    mtime_t         now, period;
-    mtime_t         pts;
+    vlc_tick_t      now, period;
+    vlc_tick_t      pts;
     bool      b_decode = 0;
     int       i_current_rate;
 
@@ -367,7 +367,7 @@ void decoder_SynchroDecode( decoder_synchro_t * p_synchro )
 void decoder_SynchroEnd( decoder_synchro_t * p_synchro, int i_coding_type,
                       bool b_garbage )
 {
-    mtime_t     tau;
+    vlc_tick_t  tau;
 
     if( b_garbage )
         return;
@@ -394,7 +394,7 @@ void decoder_SynchroEnd( decoder_synchro_t * p_synchro, int i_coding_type,
 /*****************************************************************************
  * decoder_SynchroDate : When an image has been decoded, ask for its date
  *****************************************************************************/
-mtime_t decoder_SynchroDate( decoder_synchro_t * p_synchro )
+vlc_tick_t decoder_SynchroDate( decoder_synchro_t * p_synchro )
 {
     /* No need to lock, since PTS are only used by the video parser. */
     return p_synchro->current_pts;
@@ -404,12 +404,12 @@ mtime_t decoder_SynchroDate( decoder_synchro_t * p_synchro )
  * decoder_SynchroNewPicture: Update stream structure and PTS
  *****************************************************************************/
 void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type,
-                                int i_repeat_field, mtime_t next_pts,
-                                mtime_t next_dts, bool b_low_delay )
+                                int i_repeat_field, vlc_tick_t next_pts,
+                                vlc_tick_t next_dts, bool b_low_delay )
 {
-    mtime_t         period = 1000000 * 1001 / p_synchro->i_frame_rate;
+    vlc_tick_t      period = 1000000 * 1001 / p_synchro->i_frame_rate;
 #if 0
-    mtime_t         now = mdate();
+    vlc_tick_t      now = mdate();
 #endif
 
     switch( i_coding_type )

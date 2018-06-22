@@ -121,9 +121,9 @@ struct block_t
     uint32_t    i_flags;
     unsigned    i_nb_samples; /* Used for audio */
 
-    mtime_t     i_pts;
-    mtime_t     i_dts;
-    mtime_t     i_length;
+    vlc_tick_t  i_pts;
+    vlc_tick_t  i_dts;
+    vlc_tick_t  i_length;
 
     /* Rudimentary support for overloading block (de)allocation. */
     block_free_t pf_release;
@@ -175,7 +175,7 @@ VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  *
  * @note
  * If the block is in a chain, this function does <b>not</b> release any
- * subsequent block in the chain. Use block_ChainRelease() for that purpose. 
+ * subsequent block in the chain. Use block_ChainRelease() for that purpose.
  *
  * @param block block to release (cannot be NULL)
  */
@@ -364,10 +364,10 @@ static size_t block_ChainExtract( block_t *p_list, void *p_data, size_t i_max )
     return i_total;
 }
 
-static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t *pi_size, mtime_t *pi_length )
+static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t *pi_size, vlc_tick_t *pi_length )
 {
     size_t i_size = 0;
-    mtime_t i_length = 0;
+    vlc_tick_t i_length = 0;
     int i_count = 0;
 
     while( p_list )
@@ -390,7 +390,7 @@ static inline void block_ChainProperties( block_t *p_list, int *pi_count, size_t
 static inline block_t *block_ChainGather( block_t *p_list )
 {
     size_t  i_total = 0;
-    mtime_t i_length = 0;
+    vlc_tick_t i_length = 0;
     block_t *g;
 
     if( p_list->p_next == NULL )
@@ -534,7 +534,7 @@ VLC_API void vlc_fifo_WaitCond(vlc_fifo_t *, vlc_cond_t *);
  * Atomically unlocks the FIFO and waits until one thread signals the FIFO up
  * to a certain date, then locks the FIFO again. See vlc_fifo_Wait().
  */
-int vlc_fifo_TimedWaitCond(vlc_fifo_t *, vlc_cond_t *, mtime_t);
+int vlc_fifo_TimedWaitCond(vlc_fifo_t *, vlc_cond_t *, vlc_tick_t);
 
 /**
  * Queues a linked-list of blocks into a locked FIFO.

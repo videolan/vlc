@@ -155,7 +155,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     [currentlyPlayingTrackInfo setValue:[NSNumber numberWithInt:[toNSStr(psz_trackNumber) intValue]] forKey:MPMediaItemPropertyAlbumTrackNumber];
     free(psz_trackNumber);
 
-    mtime_t duration = input_item_GetDuration(p_input_item) / 1000000;
+    vlc_tick_t duration = input_item_GetDuration(p_input_item) / 1000000;
     [currentlyPlayingTrackInfo setValue:[NSNumber numberWithLongLong:duration] forKey:MPMediaItemPropertyPlaybackDuration];
     if (duration > 0) {
         [currentlyPlayingTrackInfo setValue:[NSNumber numberWithBool:NO] forKey:MPNowPlayingInfoPropertyIsLiveStream];

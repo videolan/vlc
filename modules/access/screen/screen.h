@@ -45,10 +45,10 @@ struct demux_sys_t
     es_out_id_t *es;
 
     float f_fps;
-    mtime_t i_next_date;
+    vlc_tick_t i_next_date;
     int i_incr;
 
-    mtime_t i_start;
+    vlc_tick_t i_start;
 
 #ifdef SCREEN_SUBSCREEN
     bool b_follow_mouse;

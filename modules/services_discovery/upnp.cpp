@@ -932,7 +932,7 @@ namespace
 
         input_item_t *createNewItem(IXML_Element *p_resource)
         {
-            mtime_t i_duration = -1;
+            vlc_tick_t i_duration = -1;
             const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
             if( !psz_resource_url )
                 return NULL;

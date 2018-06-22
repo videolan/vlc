@@ -93,22 +93,22 @@ void BasePlaylist::setType(const std::string &type_)
     type = type_;
 }
 
-void BasePlaylist::setMinBuffering( mtime_t min )
+void BasePlaylist::setMinBuffering( vlc_tick_t min )
 {
     minBufferTime = min;
 }
 
-void BasePlaylist::setMaxBuffering( mtime_t max )
+void BasePlaylist::setMaxBuffering( vlc_tick_t max )
 {
     maxBufferTime = max;
 }
 
-mtime_t BasePlaylist::getMinBuffering() const
+vlc_tick_t BasePlaylist::getMinBuffering() const
 {
     return minBufferTime;
 }
 
-mtime_t BasePlaylist::getMaxBuffering() const
+vlc_tick_t BasePlaylist::getMaxBuffering() const
 {
     return maxBufferTime;
 }

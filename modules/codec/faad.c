@@ -270,7 +270,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
     }
 
-    const mtime_t i_pts = p_block->i_pts;
+    const vlc_tick_t i_pts = p_block->i_pts;
 
     /* Append block as temporary buffer */
     if( p_sys->p_block == NULL )

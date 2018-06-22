@@ -74,7 +74,7 @@
 
 typedef struct
 {
-    mtime_t date;
+    vlc_tick_t date;
 
     uint64_t i_start;
     uint64_t i_end;
@@ -124,7 +124,7 @@ static int AStreamRefillStream(stream_t *s)
                  sys->i_used, i_toread);
 #endif
 
-    mtime_t start = mdate();
+    vlc_tick_t start = mdate();
     while (i_toread > 0)
     {
         int i_off = tk->i_end % STREAM_CACHE_TRACK_SIZE;
@@ -170,14 +170,14 @@ static int AStreamRefillStream(stream_t *s)
 static void AStreamPrebufferStream(stream_t *s)
 {
     stream_sys_t *sys = s->p_sys;
-    mtime_t start = mdate();
+    vlc_tick_t start = mdate();
     bool first = true;
 
     msg_Dbg(s, "starting pre-buffering");
     for (;;)
     {
         stream_track_t *tk = &sys->tk[sys->i_tk];
-        mtime_t now = mdate();
+        vlc_tick_t now = mdate();
 
         int i_read;
         int i_buffered = tk->i_end - tk->i_start;

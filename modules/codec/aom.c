@@ -74,7 +74,7 @@ static void aom_err_msg(vlc_object_t *this, aom_codec_ctx_t *ctx,
  *****************************************************************************/
 struct frame_priv_s
 {
-    mtime_t pts;
+    vlc_tick_t pts;
 };
 
 struct decoder_sys_t

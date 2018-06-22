@@ -122,7 +122,7 @@ using namespace LIBMATROSKA_NAMESPACE;
 
 void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock,
                   KaxBlockAdditions *additions,
-                  mtime_t i_pts, mtime_t i_duration, bool b_key_picture,
+                  vlc_tick_t i_pts, vlc_tick_t i_duration, bool b_key_picture,
                   bool b_discardable_picture );
 
 class attachment_c
@@ -206,7 +206,7 @@ class mkv_track_t
         bool         b_no_duration;
         uint64_t     i_default_duration;
         float        f_timecodescale;
-        mtime_t      i_last_dts;
+        vlc_tick_t   i_last_dts;
         uint64_t     i_skip_until_fpos; /*< any block before this fpos should be ignored */
 
         /* video */
@@ -234,8 +234,8 @@ class mkv_track_t
         KaxContentCompSettings *p_compression_data;
 
         /* Matroska 4 new elements used by Opus */
-        mtime_t i_seek_preroll;
-        mtime_t i_codec_delay;
+        vlc_tick_t i_seek_preroll;
+        vlc_tick_t i_codec_delay;
 };
 
 

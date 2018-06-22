@@ -159,7 +159,7 @@ struct vod_media_t
     rtsp_client_t **rtsp;
 
     /* Infos */
-    mtime_t i_length;
+    vlc_tick_t i_length;
 };
 
 struct vod_sys_t

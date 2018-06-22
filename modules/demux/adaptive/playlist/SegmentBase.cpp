@@ -43,7 +43,7 @@ SegmentBase::~SegmentBase   ()
 {
 }
 
-mtime_t SegmentBase::getMinAheadTime(uint64_t curnum) const
+vlc_tick_t SegmentBase::getMinAheadTime(uint64_t curnum) const
 {
     if(subsegments.size() == 0 || curnum >= subsegments.size() - 1)
         return 0;
@@ -79,7 +79,7 @@ uint64_t SegmentBase::getStartSegmentNumber() const
     return 0;
 }
 
-bool SegmentBase::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+bool SegmentBase::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
 {
     const Timescale timescale = inheritTimescale();
     if(!timescale.isValid())
@@ -90,8 +90,8 @@ bool SegmentBase::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
 }
 
 bool SegmentBase::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                         mtime_t *time,
-                                                         mtime_t *dur) const
+                                                         vlc_tick_t *time,
+                                                         vlc_tick_t *dur) const
 {
     const Timescale timescale = inheritTimescale();
     const ISegment *segment = getMediaSegment(number);

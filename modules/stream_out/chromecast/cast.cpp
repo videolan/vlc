@@ -132,7 +132,7 @@ struct sout_stream_sys_t
     const int i_port;
 
     sout_stream_id_sys_t *             video_proxy_id;
-    mtime_t                            first_video_keyframe_pts;
+    vlc_tick_t                         first_video_keyframe_pts;
 
     bool                               es_changed;
     bool                               cc_has_input;

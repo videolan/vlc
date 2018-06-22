@@ -57,11 +57,11 @@ struct ts_pmt_t
 
     struct
     {
-        mtime_t i_current;
-        mtime_t i_first; // seen <> != -1
+        vlc_tick_t i_current;
+        vlc_tick_t i_first; // seen <> != -1
         /* broken PCR handling */
-        mtime_t i_first_dts;
-        mtime_t i_pcroffset;
+        vlc_tick_t i_first_dts;
+        vlc_tick_t i_pcroffset;
         bool    b_disable; /* ignore PCR field, use dts */
         bool    b_fix_done;
     } pcr;
@@ -72,7 +72,7 @@ struct ts_pmt_t
         time_t i_event_length;
     } eit;
 
-    mtime_t i_last_dts;
+    vlc_tick_t i_last_dts;
     uint64_t i_last_dts_byte;
 
     /* ARIB specific */

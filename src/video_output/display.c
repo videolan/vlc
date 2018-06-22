@@ -380,14 +380,14 @@ typedef struct {
     struct {
         vlc_mouse_t state;
 
-        mtime_t last_pressed;
-        mtime_t last_moved;
+        vlc_tick_t last_pressed;
+        vlc_tick_t last_moved;
         bool    is_hidden;
         bool    ch_activity;
 
         /* */
-        mtime_t double_click_timeout;
-        mtime_t hide_timeout;
+        vlc_tick_t double_click_timeout;
+        vlc_tick_t hide_timeout;
     } mouse;
 
     bool reset_pictures;
@@ -549,7 +549,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     /* Emulate double-click if needed */
     if (!vd->info.has_double_click &&
         vlc_mouse_HasPressed(&osys->mouse.state, &m, MOUSE_BUTTON_LEFT)) {
-        const mtime_t i_date = mdate();
+        const vlc_tick_t i_date = mdate();
 
         if (i_date - osys->mouse.last_pressed < osys->mouse.double_click_timeout ) {
             m.b_double_click = true;
@@ -733,7 +733,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     vout_display_Manage(vd);
 
     /* Handle mouse timeout */
-    const mtime_t date = mdate();
+    const vlc_tick_t date = mdate();
     bool  hide_mouse = false;
 
     vlc_mutex_lock(&osys->lock);
@@ -1125,8 +1125,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_state_t *state,
                                   const char *module, bool is_splitter,
-                                  mtime_t double_click_timeout,
-                                  mtime_t hide_timeout,
+                                  vlc_tick_t double_click_timeout,
+                                  vlc_tick_t hide_timeout,
                                   const vout_display_owner_t *owner_ptr)
 {
     /* */
@@ -1249,8 +1249,8 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const vout_display_state_t *state,
                                 const char *module,
-                                mtime_t double_click_timeout,
-                                mtime_t hide_timeout)
+                                vlc_tick_t double_click_timeout,
+                                vlc_tick_t hide_timeout)
 {
     return DisplayNew(vout, source, state, module, false,
                       double_click_timeout, hide_timeout, NULL);
@@ -1432,8 +1432,8 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                  const vout_display_state_t *state,
                                  const char *module,
                                  const char *splitter_module,
-                                 mtime_t double_click_timeout,
-                                 mtime_t hide_timeout)
+                                 vlc_tick_t double_click_timeout,
+                                 vlc_tick_t hide_timeout)
 {
     video_splitter_t *splitter =
         video_splitter_New(VLC_OBJECT(vout), splitter_module, source);

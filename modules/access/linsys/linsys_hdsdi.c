@@ -147,7 +147,7 @@ struct demux_sys_t
     unsigned int i_frame_rate, i_frame_rate_base;
     unsigned int i_width, i_height, i_aspect, i_forced_aspect;
     unsigned int i_vblock_size, i_ablock_size;
-    mtime_t      i_next_vdate, i_next_adate;
+    vlc_tick_t   i_next_vdate, i_next_adate;
     int          i_incr, i_aincr;
 
     /* ES stuff */
@@ -628,7 +628,7 @@ static int HandleAudio( demux_t *p_demux, const uint8_t *p_buffer )
                         p_audio->i_channel * 2, p_sys->i_max_channel + 1 );
 
             p_block->i_dts = p_block->i_pts
-                = p_sys->i_next_adate + (mtime_t)p_audio->i_delay
+                = p_sys->i_next_adate + (vlc_tick_t)p_audio->i_delay
                    * INT64_C(1000000) / p_sys->i_sample_rate;
             p_block->i_length = p_sys->i_aincr;
             es_out_Send( p_demux->out, p_audio->p_es, p_block );

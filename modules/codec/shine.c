@@ -227,8 +227,8 @@ static block_t *EncodeFrame( encoder_t *p_enc, block_t *p_block )
     block_t *p_pcm_block;
     block_t *p_chain = NULL;
     unsigned int i_samples = p_block->i_buffer >> 2 /* s16l stereo */;
-    mtime_t start_date = p_block->i_pts;
-    start_date -= (mtime_t)i_samples * (mtime_t)1000000 / (mtime_t)p_enc->fmt_out.audio.i_rate;
+    vlc_tick_t start_date = p_block->i_pts;
+    start_date -= (vlc_tick_t)i_samples * (vlc_tick_t)1000000 / (vlc_tick_t)p_enc->fmt_out.audio.i_rate;
 
     VLC_UNUSED(p_enc);
 

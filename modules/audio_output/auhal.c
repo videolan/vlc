@@ -839,7 +839,7 @@ AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id,
          * set. */
         if (i > 0)
         {
-            mtime_t timeout = mdate() + 500000;
+            vlc_tick_t timeout = mdate() + 500000;
             if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
                 msg_Dbg(p_aout, "reached timeout");
         }
@@ -1285,7 +1285,7 @@ StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt)
                 if (ret != VLC_SUCCESS)
                     continue;
 
-                /* 
+                /*
                  * Only the first found format id is accepted. In case of
                  * another id later on, we still use the already saved one.
                  * This can happen if the user plugs in a spdif cable while a
@@ -1603,7 +1603,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
 
     /* get device latency */
     UInt32 i_latency_samples;
-    mtime_t i_latency_us = 0;
+    vlc_tick_t i_latency_us = 0;
     int ret = AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                           kAudioDevicePropertyLatency,
                           kAudioObjectPropertyScopeOutput);

@@ -63,7 +63,7 @@ namespace adaptive
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
-        mtime_t getMinAheadTime() const;
+        vlc_tick_t getMinAheadTime() const;
         Times getFirstTimes() const;
         int esCount() const;
         bool isSelected() const;
@@ -85,8 +85,8 @@ namespace adaptive
         };
         BufferingStatus bufferize(Times, mtime_t, mtime_t,
                                   mtime_t, bool = false);
-        BufferingStatus getBufferAndStatus(const Times &, mtime_t, mtime_t, mtime_t *);
-        mtime_t getDemuxedAmount(Times) const;
+        BufferingStatus getBufferAndStatus(const Times &, vlc_tick_t, vlc_tick_t, vlc_tick_t *);
+        vlc_tick_t getDemuxedAmount(Times) const;
         Status dequeue(Times, Times *);
         bool decodersDrained();
 
@@ -100,8 +100,8 @@ namespace adaptive
         };
         virtual bool reactivate(const StreamPosition &);
         virtual bool setPosition(const StreamPosition &, bool);
-        bool getMediaPlaybackTimes(mtime_t *, mtime_t *, mtime_t *) const;
-        bool getMediaAdvanceAmount(mtime_t *) const;
+        bool getMediaPlaybackTimes(vlc_tick_t *, vlc_tick_t *, vlc_tick_t *) const;
+        bool getMediaAdvanceAmount(vlc_tick_t *) const;
         bool runUpdates(bool = false);
 
         /* Used by demuxers fake streams */
@@ -122,7 +122,7 @@ namespace adaptive
         virtual bool restartDemux();
 
         virtual void prepareRestart(bool = true);
-        bool resetForNewPosition(mtime_t);
+        bool resetForNewPosition(vlc_tick_t);
 
         bool contiguous;
         bool segmentgap;
@@ -159,7 +159,7 @@ namespace adaptive
         SegmentTimes startTimeContext;
         SegmentTimes currentTimeContext;
         SegmentTimes prevEndTimeContext;
-        mtime_t currentDuration;
+        vlc_tick_t currentDuration;
         uint64_t currentSequence;
 
     private:

@@ -93,8 +93,8 @@ enum es_out_query_e
     ES_OUT_SET_META, /* arg1=const vlc_meta_t * */
 
     /* PCR system clock manipulation for external clock synchronization */
-    ES_OUT_GET_PCR_SYSTEM, /* arg1=mtime_t *, arg2=mtime_t * res=can fail */
-    ES_OUT_MODIFY_PCR_SYSTEM, /* arg1=int is_absolute, arg2=mtime_t, res=can fail */
+    ES_OUT_GET_PCR_SYSTEM, /* arg1=vlc_tick_t *, arg2=vlc_tick_t * res=can fail */
+    ES_OUT_MODIFY_PCR_SYSTEM, /* arg1=int is_absolute, arg2=vlc_tick_t, res=can fail */
 
     ES_OUT_POST_SUBNODE, /* arg1=input_item_node_t *, res=can fail */
 
@@ -167,11 +167,11 @@ static inline int es_out_ControlSetMeta( es_out_t *out, const vlc_meta_t *p_meta
     return es_out_Control( out, ES_OUT_SET_META, p_meta );
 }
 
-static inline int es_out_ControlGetPcrSystem( es_out_t *out, mtime_t *pi_system, mtime_t *pi_delay )
+static inline int es_out_ControlGetPcrSystem( es_out_t *out, vlc_tick_t *pi_system, vlc_tick_t *pi_delay )
 {
     return es_out_Control( out, ES_OUT_GET_PCR_SYSTEM, pi_system, pi_delay );
 }
-static inline int es_out_ControlModifyPcrSystem( es_out_t *out, bool b_absolute, mtime_t i_system )
+static inline int es_out_ControlModifyPcrSystem( es_out_t *out, bool b_absolute, vlc_tick_t i_system )
 {
     return es_out_Control( out, ES_OUT_MODIFY_PCR_SYSTEM, b_absolute, i_system );
 }

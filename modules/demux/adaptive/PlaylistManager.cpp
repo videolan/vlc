@@ -205,7 +205,7 @@ void PlaylistManager::stop()
 struct PrioritizedAbstractStream
 {
     AbstractStream::BufferingStatus status;
-    mtime_t demuxed_amount;
+    vlc_tick_t demuxed_amount;
     AbstractStream *st;
 };
 
@@ -222,9 +222,9 @@ static bool streamCompare(const PrioritizedAbstractStream &a,  const Prioritized
 }
 
 AbstractStream::BufferingStatus PlaylistManager::bufferize(Times deadline,
-                                                           mtime_t i_min_buffering,
-                                                           mtime_t i_max_buffering,
-                                                           mtime_t i_target_buffering)
+                                                           vlc_tick_t i_min_buffering,
+                                                           vlc_tick_t i_max_buffering,
+                                                           vlc_tick_t i_target_buffering)
 {
     AbstractStream::BufferingStatus i_return = AbstractStream::BufferingStatus::End;
 
@@ -349,7 +349,7 @@ unsigned PlaylistManager::getActiveStreamsCount() const
     return count;
 }
 
-bool PlaylistManager::setPosition(mtime_t mediatime, double pos, bool accurate)
+bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos, bool accurate)
 {
     bool ret = true;
     bool hasValidStream = false;
@@ -435,14 +435,14 @@ Times PlaylistManager::getTimes(bool b_first) const
     return b_first ? demux.firsttimes : demux.times;
 }
 
-mtime_t PlaylistManager::getMinAheadTime() const
+vlc_tick_t PlaylistManager::getMinAheadTime() const
 {
-    mtime_t minbuffer = 0;
+    vlc_tick_t minbuffer = 0;
     std::for_each(streams.cbegin(), streams.cend(),
         [&minbuffer](const AbstractStream *st) {
             if(st->isValid() && !st->isDisabled() && st->isSelected())
             {
-                const mtime_t m = st->getMinAheadTime();
+                const vlc_tick_t m = st->getMinAheadTime();
                 if(m > 0 && (m < minbuffer || minbuffer == 0))
                     minbuffer = m;
             }
@@ -542,7 +542,7 @@ int PlaylistManager::doDemux(int64_t increment)
         if( demux.times.continuous != VLC_TS_INVALID && barrier.continuous != demux.times.continuous )
         {
             demux.times = barrier;
-            mtime_t pcr = VLC_TS_0 + std::max(INT64_C(0), demux.times.continuous - CLOCK_FREQ/10);
+            vlc_tick_t pcr = VLC_TS_0 + std::max(INT64_C(0), demux.times.continuous - CLOCK_FREQ/10);
             es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, 0, pcr);
         }
         vlc_mutex_unlock(&demux.lock);
@@ -582,7 +582,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             bool b_pause = (bool)va_arg(args, int);
             if(playlist->isLive())
             {
-                mtime_t now = mdate();
+                vlc_tick_t now = mdate();
                 demux.times = Times();
                 cached.lastupdate = 0;
                 if(b_pause)
@@ -616,7 +616,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             vlc_mutex_locker locker(&cached.lock);
             if(cached.b_live && cached.playlistLength == 0)
                 return VLC_EGENERIC;
-            *(va_arg (args, mtime_t *)) = cached.playlistLength;
+            *(va_arg (args, vlc_tick_t *)) = cached.playlistLength;
             break;
         }
 
@@ -642,7 +642,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
 
             double pos = va_arg(args, double);
             bool accurate = va_arg(args, int);
-            mtime_t seekTime = cached.playlistStart + cached.playlistLength * pos;
+            vlc_tick_t seekTime = cached.playlistStart + cached.playlistLength * pos;
 
             SeekDebug(msg_Dbg(p_demux, "Seek %f to %ld plstart %ld duration %ld",
                    pos, seekTime, cached.playlistEnd, cached.playlistLength));
@@ -666,7 +666,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
         {
             setBufferingRunState(false); /* stop downloader first */
 
-            mtime_t time = va_arg(args, mtime_t);
+            vlc_tick_t time = va_arg(args, mtime_t);
             bool accurate = va_arg(args, int);
             if(!setPosition(time, -1, accurate))
             {
@@ -705,9 +705,9 @@ void PlaylistManager::setBufferingRunState(bool b)
 void PlaylistManager::Run()
 {
     vlc_mutex_lock(&lock);
-    const mtime_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
-    const mtime_t i_max_buffering = bufferingLogic->getMaxBuffering(playlist);
-    const mtime_t i_target_buffering = bufferingLogic->getStableBuffering(playlist);
+    const vlc_tick_t i_min_buffering = bufferingLogic->getMinBuffering(playlist);
+    const vlc_tick_t i_max_buffering = bufferingLogic->getMaxBuffering(playlist);
+    const vlc_tick_t i_target_buffering = bufferingLogic->getStableBuffering(playlist);
     while(1)
     {
         while(!b_buffering && !b_canceled)
@@ -732,7 +732,7 @@ void PlaylistManager::Run()
 
         if(i_return != AbstractStream::BufferingStatus::Lessthanmin)
         {
-            mtime_t i_deadline = mdate();
+            vlc_tick_t i_deadline = mdate();
             if(i_return == AbstractStream::BufferingStatus::Ongoing)
                 i_deadline += (CLOCK_FREQ / 100);
             else if(i_return == AbstractStream::BufferingStatus::Full)

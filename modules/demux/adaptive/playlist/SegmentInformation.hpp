@@ -54,8 +54,8 @@ namespace adaptive
                 explicit SegmentInformation( BasePlaylist * );
                 virtual ~SegmentInformation();
 
-                virtual mtime_t getPeriodStart() const;
-                virtual mtime_t getPeriodDuration() const;
+                virtual vlc_tick_t getPeriodStart() const;
+                virtual vlc_tick_t getPeriodDuration() const;
                 virtual BasePlaylist *getPlaylist() const;
 
                 class SplitPoint
@@ -74,7 +74,7 @@ namespace adaptive
 
                 virtual void updateWith(SegmentInformation *);
                 virtual void pruneBySegmentNumber(uint64_t);
-                virtual void pruneByPlaybackTime(mtime_t);
+                virtual void pruneByPlaybackTime(vlc_tick_t);
                 void setEncryption(const CommonEncryption &);
                 const CommonEncryption & intheritEncryption() const;
 

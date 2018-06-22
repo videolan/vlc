@@ -71,8 +71,8 @@ struct event_thread_t
     HCURSOR cursor_arrow;
     HCURSOR cursor_empty;
     unsigned button_pressed;
-    mtime_t hide_timeout;
-    mtime_t last_moved;
+    vlc_tick_t hide_timeout;
+    vlc_tick_t last_moved;
 
     /* Gestures */
     win32_gesture_sys_t *p_gesture;

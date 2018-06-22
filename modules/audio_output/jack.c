@@ -62,7 +62,7 @@ struct aout_sys_t
     jack_nframes_t latency;
     float soft_gain;
     bool soft_mute;
-    mtime_t paused; /**< Time when (last) paused */
+    vlc_tick_t paused; /**< Time when (last) paused */
 };
 
 /*****************************************************************************
@@ -71,9 +71,9 @@ struct aout_sys_t
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( audio_output_t * p_aout, block_t * p_block );
-static void Pause        ( audio_output_t *aout, bool paused, mtime_t date );
+static void Pause        ( audio_output_t *aout, bool paused, vlc_tick_t date );
 static void Flush        ( audio_output_t *p_aout, bool wait );
-static int  TimeGet      ( audio_output_t *, mtime_t * );
+static int  TimeGet      ( audio_output_t *, vlc_tick_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
 static int  GraphChange  ( void *p_arg );
 
@@ -315,7 +315,7 @@ static void Play (audio_output_t * p_aout, block_t * p_block)
 /**
  * Pause or unpause playback
  */
-static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -336,7 +336,7 @@ static void Flush(audio_output_t *p_aout, bool wait)
     /* Sleep if wait was requested */
     if( wait )
     {
-        mtime_t delay;
+        vlc_tick_t delay;
         if (!TimeGet(p_aout, &delay))
             msleep(delay);
     }
@@ -345,7 +345,7 @@ static void Flush(audio_output_t *p_aout, bool wait)
     jack_ringbuffer_reset(rb);
 }
 
-static int TimeGet(audio_output_t *p_aout, mtime_t *delay)
+static int TimeGet(audio_output_t *p_aout, vlc_tick_t *delay)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
     jack_ringbuffer_t *rb = p_sys->p_jack_ringbuffer;

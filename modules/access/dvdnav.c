@@ -170,7 +170,7 @@ struct demux_sys_t
     int           cur_seekpoint;
 
     /* length of program group chain */
-    mtime_t     i_pgc_length;
+    vlc_tick_t  i_pgc_length;
     int         i_vobu_index;
     int         i_vobu_flush;
 };
@@ -612,7 +612,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_GET_TIME:
             if( p_sys->i_pgc_length > 0 )
             {
-                *va_arg( args, mtime_t * ) =
+                *va_arg( args, vlc_tick_t * ) =
                         dvdnav_get_current_time( p_sys->dvdnav ) * 100 / 9;
                 return VLC_SUCCESS;
             }
@@ -620,7 +620,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
         {
-            mtime_t i_time = va_arg( args, mtime_t );
+            vlc_tick_t i_time = va_arg( args, vlc_tick_t );
             if( dvdnav_jump_to_sector_by_time( p_sys->dvdnav,
                                                i_time * 9 / 100,
                                                SEEK_SET ) == DVDNAV_STATUS_OK )
@@ -898,7 +898,7 @@ static int Demux( demux_t *p_demux )
 
             if( event->length != 0xff && p_sys->still.b_created )
             {
-                mtime_t delay = event->length * CLOCK_FREQ;
+                vlc_tick_t delay = event->length * CLOCK_FREQ;
                 vlc_timer_schedule( p_sys->still.timer, false, delay, 0 );
             }
 
@@ -989,7 +989,7 @@ static int Demux( demux_t *p_demux )
             if( tk->b_configured )
             {
                 es_format_Clean( &tk->fmt );
-                if( tk->es ) 
+                if( tk->es )
                 {
                     es_out_Del( p_demux->out, tk->es );
                     tk->es = NULL;

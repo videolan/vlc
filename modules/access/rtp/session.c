@@ -139,11 +139,11 @@ struct rtp_source_t
 {
     uint32_t ssrc;
     uint32_t jitter;  /* interarrival delay jitter estimate */
-    mtime_t  last_rx; /* last received packet local timestamp */
+    vlc_tick_t  last_rx; /* last received packet local timestamp */
     uint32_t last_ts; /* last received packet RTP timestamp */
 
     uint32_t ref_rtp; /* sender RTP timestamp reference */
-    mtime_t  ref_ntp; /* sender NTP timestamp reference */
+    vlc_tick_t  ref_ntp; /* sender NTP timestamp reference */
 
     uint16_t bad_seq; /* tentatively next expected sequence for resync */
     uint16_t max_seq; /* next expected sequence */
@@ -257,7 +257,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
         block->i_buffer -= padding;
     }
 
-    mtime_t        now = mdate ();
+    vlc_tick_t     now = mdate ();
     rtp_source_t  *src  = NULL;
     const uint16_t seq  = rtp_seq (block);
     const uint32_t ssrc = GetDWBE (block->p_buffer + 8);
@@ -392,9 +392,9 @@ static void rtp_decode (demux_t *, const rtp_session_t *, rtp_source_t *);
  * In the later case, *deadlinep is undefined.
  */
 bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
-                  mtime_t *restrict deadlinep)
+                  vlc_tick_t *restrict deadlinep)
 {
-    mtime_t now = mdate ();
+    vlc_tick_t now = mdate ();
     bool pending = false;
 
     *deadlinep = INT64_MAX;
@@ -431,7 +431,7 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
             /* Wait for 3 times the inter-arrival delay variance (about 99.7%
              * match for random gaussian jitter).
              */
-            mtime_t deadline;
+            vlc_tick_t deadline;
             const rtp_pt_t *pt = rtp_find_ptype (session, src, block, NULL);
             if (pt)
                 deadline = CLOCK_FREQ * 3 * src->jitter / pt->frequency;

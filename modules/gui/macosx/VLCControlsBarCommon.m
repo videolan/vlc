@@ -63,7 +63,7 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
+
     _darkInterface = var_InheritBool(getIntf(), "macosx-interfacestyle");
     if (@available(macOS 10_14, *)) {
         NSApplication *app = [NSApplication sharedApplication];
@@ -362,7 +362,7 @@
     var_Get(p_input, "position", &pos);
     [self.timeSlider setFloatValue:(10000. * pos.f_float)];
 
-    mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+    vlc_tick_t dur = input_item_GetDuration(input_GetItem(p_input));
     if (dur == -1) {
         // No duration, disable slider
         [self.timeSlider setEnabled:NO];

@@ -346,7 +346,7 @@ static int vlclua_input_item_name( lua_State *L )
 
 static int vlclua_input_item_duration( lua_State *L )
 {
-    mtime_t duration = input_item_GetDuration( vlclua_input_item_get_internal( L ) );
+    vlc_tick_t duration = input_item_GetDuration( vlclua_input_item_get_internal( L ) );
     lua_pushnumber( L, ((double)duration)/1000000. );
     return 1;
 }

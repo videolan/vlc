@@ -77,7 +77,7 @@ typedef struct
 
     struct
     {
-        mtime_t end; /**< Last seen PTS */
+        vlc_tick_t end; /**< Last seen PTS */
         unsigned resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
         bool discontinuity;
@@ -127,9 +127,9 @@ void aout_Destroy (audio_output_t *);
 
 int aout_OutputNew(audio_output_t *, audio_sample_format_t *,
                    aout_filters_cfg_t *filters_cfg);
-int aout_OutputTimeGet(audio_output_t *, mtime_t *);
+int aout_OutputTimeGet(audio_output_t *, vlc_tick_t *);
 void aout_OutputPlay(audio_output_t *, block_t *);
-void aout_OutputPause( audio_output_t * p_aout, bool, mtime_t );
+void aout_OutputPause( audio_output_t * p_aout, bool, vlc_tick_t );
 void aout_OutputFlush( audio_output_t * p_aout, bool );
 void aout_OutputDelete( audio_output_t * p_aout );
 void aout_OutputLock(audio_output_t *);
@@ -155,7 +155,7 @@ int aout_DecNew(audio_output_t *, const audio_sample_format_t *,
 void aout_DecDelete(audio_output_t *);
 int aout_DecPlay(audio_output_t *, block_t *, int i_input_rate);
 void aout_DecGetResetStats(audio_output_t *, unsigned *, unsigned *);
-void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
+void aout_DecChangePause(audio_output_t *, bool b_paused, vlc_tick_t i_date);
 void aout_DecFlush(audio_output_t *, bool wait);
 void aout_RequestRestart (audio_output_t *, unsigned);
 

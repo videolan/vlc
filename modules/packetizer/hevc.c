@@ -102,7 +102,7 @@ struct decoder_sys_t
     bool b_init_sequence_complete;
 
     date_t dts;
-    mtime_t pts;
+    vlc_tick_t pts;
     bool b_need_ts;
 
     /* */
@@ -840,7 +840,7 @@ static void SetOutputBlockProperties(decoder_t *p_dec, block_t *p_output)
     {
         uint8_t i_num_clock_ts = hevc_get_num_clock_ts(p_sys->p_active_sps,
                                                        p_sys->p_timing);
-        const mtime_t i_start = date_Get(&p_sys->dts);
+        const vlc_tick_t i_start = date_Get(&p_sys->dts);
         if( i_start != VLC_TS_INVALID )
         {
             date_Increment(&p_sys->dts, i_num_clock_ts);
@@ -886,7 +886,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     }
 
     /* Get NALU type */
-    const mtime_t dts = p_frag->i_dts, pts = p_frag->i_pts;
+    const vlc_tick_t dts = p_frag->i_dts, pts = p_frag->i_pts;
     block_t * p_output = NULL;
     uint8_t i_nal_type = hevc_getNALType(&p_frag->p_buffer[4]);
 

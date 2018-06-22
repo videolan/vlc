@@ -92,8 +92,8 @@ FormatChangedEvent::FormatChangedEvent(const StreamFormat *f)
     this->format = f;
 }
 
-SegmentChangedEvent::SegmentChangedEvent(const ID &id, uint64_t sequence, mtime_t starttime,
-                                         mtime_t duration, mtime_t displaytime)
+SegmentChangedEvent::SegmentChangedEvent(const ID &id, uint64_t sequence, vlc_tick_t starttime,
+                                         vlc_tick_t duration, vlc_tick_t displaytime)
     : TrackerEvent(Type::SegmentChange)
 {
     this->id = &id;
@@ -111,8 +111,8 @@ BufferingStateUpdatedEvent::BufferingStateUpdatedEvent(const ID &id, bool enable
 }
 
 BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id,
-                                                       mtime_t minimum, mtime_t maximum,
-                                                       mtime_t current, mtime_t target)
+                                                       vlc_tick_t minimum, vlc_tick_t maximum,
+                                                       vlc_tick_t current, vlc_tick_t target)
     : TrackerEvent(Type::BufferingLevelChange)
 {
     this->id = &id;
@@ -122,7 +122,7 @@ BufferingLevelChangedEvent::BufferingLevelChangedEvent(const ID &id,
     this->target = target;
 }
 
-PositionChangedEvent::PositionChangedEvent(mtime_t r)
+PositionChangedEvent::PositionChangedEvent(vlc_tick_t r)
     : TrackerEvent(Type::PositionChange)
 {
     resumeTime = r;
@@ -235,7 +235,7 @@ SegmentTracker::ChunkEntry::ChunkEntry()
     chunk = nullptr;
 }
 
-SegmentTracker::ChunkEntry::ChunkEntry(SegmentChunk *c, Position p, mtime_t s, mtime_t d, mtime_t dt)
+SegmentTracker::ChunkEntry::ChunkEntry(SegmentChunk *c, Position p, vlc_tick_t s, vlc_tick_t d, vlc_tick_t dt)
 {
     chunk = c;
     pos = p;
@@ -325,9 +325,9 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
     if(segment != datasegment) /* need to set for init */
         segmentChunk->discontinuitySequenceNumber = datasegment->getDiscontinuitySequenceNumber();
 
-    mtime_t startTime = VLC_TS_INVALID;
-    mtime_t duration = 0;
-    mtime_t displayTime = datasegment->getDisplayTime();
+    vlc_tick_t startTime = VLC_TS_INVALID;
+    vlc_tick_t duration = 0;
+    vlc_tick_t displayTime = datasegment->getDisplayTime();
     /* timings belong to timeline and are not set on the segment or need profile timescale */
     if(pos.rep->getPlaybackTimeDurationBySegmentNumber(pos.number, &startTime, &duration))
         startTime += VLC_TS_0;
@@ -441,7 +441,7 @@ ChunkInterface * SegmentTracker::getNextChunk(bool switch_allowed)
     return returnedChunk;
 }
 
-bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonly)
+bool SegmentTracker::setPositionByTime(vlc_tick_t time, bool restarted, bool tryonly)
 {
     Position pos = Position(current.rep, current.number);
     if(!pos.isValid())
@@ -512,9 +512,9 @@ bool SegmentTracker::setStartPosition()
     return true;
 }
 
-mtime_t SegmentTracker::getPlaybackTime(bool b_next) const
+vlc_tick_t SegmentTracker::getPlaybackTime(bool b_next) const
 {
-    mtime_t time, duration;
+    vlc_tick_t time, duration;
 
     BaseRepresentation *rep = current.rep;
     if(!rep)
@@ -528,15 +528,15 @@ mtime_t SegmentTracker::getPlaybackTime(bool b_next) const
     return 0;
 }
 
-bool SegmentTracker::getMediaPlaybackRange(mtime_t *start, mtime_t *end,
-                                           mtime_t *length) const
+bool SegmentTracker::getMediaPlaybackRange(vlc_tick_t *start, vlc_tick_t *end,
+                                           vlc_tick_t *length) const
 {
     if(!current.rep)
         return false;
     return current.rep->getMediaPlaybackRange(start, end, length);
 }
 
-mtime_t SegmentTracker::getMinAheadTime() const
+vlc_tick_t SegmentTracker::getMinAheadTime() const
 {
     BaseRepresentation *rep = current.rep;
     if(!rep)
@@ -561,7 +561,7 @@ mtime_t SegmentTracker::getMinAheadTime() const
 }
 
 bool SegmentTracker::getSynchronizationReference(uint64_t discontinuitysequence,
-                                                 mtime_t time,
+                                                 vlc_tick_t time,
                                                  SynchronizationReference &r) const
 {
     return synchronizationReferences->getReference(discontinuitysequence, time, r);
@@ -578,8 +578,8 @@ void SegmentTracker::notifyBufferingState(bool enabled) const
     notify(BufferingStateUpdatedEvent(adaptationSet->getID(), enabled));
 }
 
-void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t max,
-                                          mtime_t current, mtime_t target) const
+void SegmentTracker::notifyBufferingLevel(vlc_tick_t min, vlc_tick_t max,
+                                          vlc_tick_t current, vlc_tick_t target) const
 {
     notify(BufferingLevelChangedEvent(adaptationSet->getID(), min, max, current, target));
 }

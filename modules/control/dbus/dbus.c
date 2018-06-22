@@ -336,7 +336,7 @@ static dbus_bool_t add_timeout(DBusTimeout *to, void *data)
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
 
-    mtime_t *expiry = malloc(sizeof (*expiry));
+    vlc_tick_t *expiry = malloc(sizeof (*expiry));
     if (unlikely(expiry == NULL))
         return FALSE;
 
@@ -365,7 +365,7 @@ static void toggle_timeout(DBusTimeout *to, void *data)
 {
     intf_thread_t *intf = data;
     intf_sys_t *sys = intf->p_sys;
-    mtime_t *expiry = dbus_timeout_get_data(to);
+    vlc_tick_t *expiry = dbus_timeout_get_data(to);
 
     vlc_mutex_lock(&sys->lock);
     if (dbus_timeout_get_enabled(to))
@@ -384,7 +384,7 @@ static void toggle_timeout(DBusTimeout *to, void *data)
 static int next_timeout(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    mtime_t next_timeout = LAST_MDATE;
+    vlc_tick_t next_timeout = LAST_MDATE;
     unsigned count = vlc_array_count(&sys->timeouts);
 
     for (unsigned i = 0; i < count; i++)
@@ -394,7 +394,7 @@ static int next_timeout(intf_thread_t *intf)
         if (!dbus_timeout_get_enabled(to))
             continue;
 
-        mtime_t *expiry = dbus_timeout_get_data(to);
+        vlc_tick_t *expiry = dbus_timeout_get_data(to);
 
         if (next_timeout > *expiry)
             next_timeout = *expiry;
@@ -427,7 +427,7 @@ static void process_timeouts(intf_thread_t *intf)
         if (!dbus_timeout_get_enabled(to))
             continue;
 
-        mtime_t *expiry = dbus_timeout_get_data(to);
+        vlc_tick_t *expiry = dbus_timeout_get_data(to);
         if (*expiry > mdate())
             continue;
 
@@ -801,7 +801,7 @@ static void *Run( void *data )
 
     int canc = vlc_savecancel();
 
-    mtime_t events_last_date = VLC_TS_INVALID;
+    vlc_tick_t events_last_date = VLC_TS_INVALID;
     int events_poll_timeout = -1;
     for( ;; )
     {
@@ -863,7 +863,7 @@ static void *Run( void *data )
 
         if( i_events > 0 )
         {
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
             if( now - events_last_date > EVENTS_DELAY )
             {
                 /* Send events every EVENTS_DELAY */
@@ -984,7 +984,7 @@ static int InputCallback( vlc_object_t *p_this, const char *psz_var,
             break;
         case INPUT_EVENT_POSITION:
         {
-            mtime_t i_now = mdate(), i_pos, i_projected_pos, i_interval;
+            vlc_tick_t i_now = mdate(), i_pos, i_projected_pos, i_interval;
             float f_current_rate;
 
             /* Detect seeks

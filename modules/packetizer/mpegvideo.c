@@ -129,8 +129,8 @@ struct decoder_sys_t
     block_t    **pp_last;
 
     bool b_frame_slice;
-    mtime_t i_pts;
-    mtime_t i_dts;
+    vlc_tick_t i_pts;
+    vlc_tick_t i_dts;
 
     date_t  dts;
     date_t  prev_iframe_dts;
@@ -152,9 +152,9 @@ struct decoder_sys_t
     int i_repeat_first_field;
     int i_progressive_frame;
 
-    mtime_t i_last_ref_pts;
+    vlc_tick_t i_last_ref_pts;
 
-    mtime_t i_last_frame_pts;
+    vlc_tick_t i_last_frame_pts;
     uint16_t i_last_frame_refid;
 
     bool b_second_field;
@@ -170,8 +170,8 @@ struct decoder_sys_t
     /* */
     bool b_cc_reset;
     uint32_t i_cc_flags;
-    mtime_t i_cc_pts;
-    mtime_t i_cc_dts;
+    vlc_tick_t i_cc_pts;
+    vlc_tick_t i_cc_dts;
     cc_data_t cc;
 };
 
@@ -326,7 +326,7 @@ static block_t *GetCc( decoder_t *p_dec, decoder_cc_desc_t *p_desc )
     if( p_cc )
     {
         memcpy( p_cc->p_buffer, p_sys->cc.p_data, p_sys->cc.i_data );
-        p_cc->i_dts = 
+        p_cc->i_dts =
         p_cc->i_pts = p_sys->cc.b_reorder ? p_sys->i_cc_pts : p_sys->i_cc_dts;
         p_cc->i_flags = p_sys->i_cc_flags & BLOCK_FLAG_TYPE_MASK;
 

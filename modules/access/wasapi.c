@@ -223,7 +223,7 @@ static int vlc_FromWave(const WAVEFORMATEX *restrict wf,
 }
 
 static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
-                             mtime_t caching, size_t *restrict frame_size)
+                             vlc_tick_t caching, size_t *restrict frame_size)
 {
     es_format_t fmt;
     WAVEFORMATEX *pwf;
@@ -273,8 +273,8 @@ struct demux_sys_t
     es_out_id_t *es;
 
     size_t frame_size;
-    mtime_t caching;
-    mtime_t start_time;
+    vlc_tick_t caching;
+    vlc_tick_t start_time;
 
     HANDLE events[2];
     union {
@@ -318,7 +318,7 @@ static unsigned __stdcall Thread(void *data)
         UINT32 frames;
         DWORD flags;
         UINT64 qpc;
-        mtime_t pts;
+        vlc_tick_t pts;
 
         hr = IAudioCaptureClient_GetBuffer(capture, &data, &frames, &flags,
                                            NULL, &qpc);

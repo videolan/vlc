@@ -120,7 +120,7 @@ void EsOutAddCommand::Execute( )
 }
 
 EsOutControlPCRCommand::EsOutControlPCRCommand( int group_,
-                                                const SegmentTimes &t, mtime_t pcr )
+                                                const SegmentTimes &t, vlc_tick_t pcr )
     : AbstractCommand( ES_OUT_SET_GROUP_PCR )
 {
     group = group_;
@@ -216,7 +216,7 @@ EsOutAddCommand * CommandsFactory::createEsOutAddCommand( AbstractFakeESOutID *i
 
 EsOutControlPCRCommand * CommandsFactory::createEsOutControlPCRCommand( int group,
                                                                         const SegmentTimes &t,
-                                                                        mtime_t pcr ) const
+                                                                        vlc_tick_t pcr ) const
 {
     return new (std::nothrow) EsOutControlPCRCommand( group, t, pcr );
 }

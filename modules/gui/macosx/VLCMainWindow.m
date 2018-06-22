@@ -806,7 +806,7 @@ static const float f_min_window_height = 307.;
     playlist_t * p_playlist = pl_Get(getIntf());
     PL_ASSERT_LOCKED;
 
-    mtime_t mt_duration = playlist_GetNodeDuration( node );
+    vlc_tick_t mt_duration = playlist_GetNodeDuration( node );
 
     if (mt_duration < 1)
         return @"";

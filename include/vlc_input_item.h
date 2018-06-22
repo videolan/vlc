@@ -66,7 +66,7 @@ struct input_item_t
     unsigned   optflagc;
     input_item_opaque_t *opaques;    /**< List of opaque pointer values */
 
-    mtime_t    i_duration;           /**< Duration in microseconds */
+    vlc_tick_t i_duration;           /**< Duration in microseconds */
 
 
     int        i_categories;         /**< Number of info categories */
@@ -265,8 +265,8 @@ VLC_API char * input_item_GetTitleFbName( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetURI( input_item_t * p_i ) VLC_USED;
 VLC_API char * input_item_GetNowPlayingFb( input_item_t *p_item ) VLC_USED;
 VLC_API void input_item_SetURI( input_item_t * p_i, const char *psz_uri );
-VLC_API mtime_t input_item_GetDuration( input_item_t * p_i );
-VLC_API void input_item_SetDuration( input_item_t * p_i, mtime_t i_duration );
+VLC_API vlc_tick_t input_item_GetDuration( input_item_t * p_i );
+VLC_API void input_item_SetDuration( input_item_t * p_i, vlc_tick_t i_duration );
 VLC_API bool input_item_IsPreparsed( input_item_t *p_i );
 VLC_API bool input_item_IsArtFetched( input_item_t *p_i );
 
@@ -327,7 +327,7 @@ VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
  */
 VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
                                           const char *psz_name,
-                                          mtime_t i_duration, int i_type,
+                                          vlc_tick_t i_duration, int i_type,
                                           enum input_item_net_type i_net ) VLC_USED;
 
 #define input_item_New( psz_uri, psz_name ) \

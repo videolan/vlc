@@ -62,7 +62,7 @@
 struct avformat_track_s
 {
     es_out_id_t *p_es;
-    mtime_t i_pcr;
+    vlc_tick_t i_pcr;
 };
 
 /*****************************************************************************

@@ -70,8 +70,8 @@ struct decoder_sys_t
 
     /* how many decoded frames are late */
     int     i_late_frames;
-    mtime_t i_late_frames_start;
-    mtime_t i_last_late_delay;
+    vlc_tick_t i_late_frames_start;
+    vlc_tick_t i_last_late_delay;
 
     /* for direct rendering */
     bool        b_direct_rendering;
@@ -697,7 +697,7 @@ static bool check_block_validity( decoder_sys_t *p_sys, block_t *block )
     return true;
 }
 
-static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, mtime_t current_time)
+static bool check_block_being_late( decoder_sys_t *p_sys, block_t *block, vlc_tick_t current_time)
 {
     if( !block )
         return false;
@@ -746,7 +746,7 @@ static bool check_frame_should_be_dropped( decoder_sys_t *p_sys, AVCodecContext 
     return false;
 }
 
-static mtime_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
+static vlc_tick_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
@@ -764,16 +764,16 @@ static mtime_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
 }
 
 static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
-                                     mtime_t current_time, mtime_t i_pts,
-                                     mtime_t i_next_pts )
+                                     vlc_tick_t current_time, vlc_tick_t i_pts,
+                                     vlc_tick_t i_next_pts )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
    /* Update frame late count (except when doing preroll) */
-   mtime_t i_display_date = VLC_TS_INVALID;
+   vlc_tick_t i_display_date = VLC_TS_INVALID;
    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
-   mtime_t i_threshold = i_next_pts != VLC_TS_INVALID ? (i_next_pts - i_pts) / 2 : 20000;
+   vlc_tick_t i_threshold = i_next_pts != VLC_TS_INVALID ? (i_next_pts - i_pts) / 2 : 20000;
 
    if( i_display_date > VLC_TS_INVALID && i_display_date + i_threshold <= current_time )
    {
@@ -924,7 +924,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
 
 
     block_t *p_block;
-    mtime_t current_time;
+    vlc_tick_t current_time;
 
     if( !p_context->extradata_size && p_dec->fmt_in.i_extra )
     {
@@ -1118,12 +1118,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         /* Compute the PTS */
 #if LIBAVCODEC_VERSION_CHECK(57, 24, 0, 61, 100)
 # if LIBAVCODEC_VERSION_MICRO >= 100
-        mtime_t i_pts = frame->best_effort_timestamp;
+        vlc_tick_t i_pts = frame->best_effort_timestamp;
 # else
-        mtime_t i_pts = frame->pts;
+        vlc_tick_t i_pts = frame->pts;
 # endif
 #else
-        mtime_t i_pts = frame->pkt_pts;
+        vlc_tick_t i_pts = frame->pkt_pts;
 #endif
         if (i_pts == AV_NOPTS_VALUE )
             i_pts = frame->pkt_dts;
@@ -1135,7 +1135,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
         if( i_pts > VLC_TS_INVALID )
             date_Set( &p_sys->pts, i_pts );
 
-        const mtime_t i_next_pts = interpolate_next_pts(p_dec, frame);
+        const vlc_tick_t i_next_pts = interpolate_next_pts(p_dec, frame);
 
         update_late_frame_count( p_dec, p_block, current_time, i_pts, i_next_pts);
 

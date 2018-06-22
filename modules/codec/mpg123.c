@@ -203,7 +203,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 {
     int i_err;
     decoder_sys_t *p_sys = p_dec->p_sys;
-    mtime_t i_pts = VLC_TS_INVALID;
+    vlc_tick_t i_pts = VLC_TS_INVALID;
 
     if( !p_sys->b_opened )
     {

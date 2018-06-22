@@ -120,7 +120,7 @@ struct cam
     vlc_object_t *obj;
     int fd;
     int i_ca_type;
-    mtime_t i_timeout, i_next_event;
+    vlc_tick_t i_timeout, i_next_event;
 
     unsigned i_nb_slots;
     bool pb_active_slot[MAX_CI_SLOTS];
@@ -1265,11 +1265,11 @@ static void CAPMTAdd( cam_t * p_cam, int i_session_id,
         CAPMTFirst( p_cam, i_session_id, p_info );
         return;
     }
- 
+
 #ifdef CAPMT_WAIT
     msleep( CAPMT_WAIT * 1000 );
 #endif
- 
+
     msg_Dbg( p_cam->obj, "adding CAPMT for SID %d on session %d",
              p_info->i_program_number, i_session_id );
 
@@ -1404,7 +1404,7 @@ static void ConditionalAccessOpen( cam_t * p_cam, unsigned i_session_id )
 typedef struct
 {
     int i_interval;
-    mtime_t i_last;
+    vlc_tick_t i_last;
 } date_time_t;
 
 /*****************************************************************************
@@ -1488,7 +1488,7 @@ static void DateTimeManage( cam_t * p_cam, int i_session_id )
         (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     if ( p_date->i_interval
-          && mdate() > p_date->i_last + (mtime_t)p_date->i_interval * 1000000 )
+          && mdate() > p_date->i_last + (vlc_tick_t)p_date->i_interval * 1000000 )
     {
         DateTimeSend( p_cam, i_session_id );
     }

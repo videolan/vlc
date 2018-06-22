@@ -66,7 +66,7 @@ static void *vlc_demux_chained_Thread(void *data)
     demux_Control(demux, DEMUX_SET_GROUP, -1, NULL);
 
     /* Main loop */
-    mtime_t next_update = 0;
+    vlc_tick_t next_update = 0;
 
     do
         if (demux_TestAndClearFlags(demux, UINT_MAX) || mdate() >= next_update)

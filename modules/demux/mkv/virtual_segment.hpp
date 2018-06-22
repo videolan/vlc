@@ -68,12 +68,12 @@ public:
         return ( itemA->i_mk_virtual_start_time < itemB->i_mk_virtual_start_time );
     }
 
-    bool ContainsTimestamp( mtime_t i_pts );
+    bool ContainsTimestamp( vlc_tick_t i_pts );
 
     matroska_segment_c  &segment;
     chapter_item_c      *p_chapter;
-    mtime_t             i_mk_virtual_start_time;
-    mtime_t             i_mk_virtual_stop_time;
+    vlc_tick_t          i_mk_virtual_start_time;
+    vlc_tick_t          i_mk_virtual_stop_time;
     int                 i_seekpoint_num;
     std::vector<virtual_chapter_c *> sub_vchapters;
 #ifdef MKV_DEBUG
@@ -98,7 +98,7 @@ public:
                                              const void *p_cookie, size_t i_cookie_size );
 
     bool                b_ordered;
-    mtime_t             i_duration;
+    vlc_tick_t          i_duration;
     chapter_edition_c   *p_edition;
     int                 i_seekpoint_num;
 
@@ -160,7 +160,7 @@ public:
     virtual_chapter_c * FindChapter( int64_t i_find_uid );
 
     bool UpdateCurrentToChapter( demux_t & demux );
-    bool Seek( demux_t & demuxer, mtime_t i_mk_date, virtual_chapter_c *p_vchapter, bool b_precise = true );
+    bool Seek( demux_t & demuxer, vlc_tick_t i_mk_date, virtual_chapter_c *p_vchapter, bool b_precise = true );
 private:
     void KeepTrackSelection( matroska_segment_c & old, matroska_segment_c & next );
 };

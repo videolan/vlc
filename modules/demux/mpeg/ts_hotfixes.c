@@ -82,7 +82,7 @@ void ProbePES( demux_t *p_demux, ts_pid_t *pid, const uint8_t *p_pesstart, size_
         return;
 
     size_t i_pesextoffset = 8;
-    mtime_t i_dts = -1;
+    vlc_tick_t i_dts = -1;
     if( p_pes[7] & 0x80 ) // PTS
     {
         i_pesextoffset += 5;

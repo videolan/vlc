@@ -78,7 +78,7 @@ BaseRepresentation *RateBasedAdaptationLogic::getNextRepresentation(BaseAdaptati
 }
 
 void RateBasedAdaptationLogic::updateDownloadRate(const ID &, size_t size,
-                                                  mtime_t time, mtime_t)
+                                                  vlc_tick_t time, mtime_t)
 {
     if(unlikely(time == 0))
         return;

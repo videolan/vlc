@@ -70,8 +70,8 @@ namespace adaptive
                 virtual void                            debug           (vlc_object_t *,int = 0) const;
                 virtual bool                            contains        (size_t byte) const;
                 void                                    setEncryption   (CommonEncryption &);
-                void                                    setDisplayTime  (mtime_t);
-                mtime_t                                 getDisplayTime  () const;
+                void                                    setDisplayTime  (vlc_tick_t);
+                vlc_tick_t                              getDisplayTime  () const;
                 Property<stime_t>       startTime;
                 Property<stime_t>       duration;
                 bool                    discontinuity;
@@ -87,7 +87,7 @@ namespace adaptive
                 bool                    templated;
                 uint64_t                sequence;
                 uint64_t                discontinuitySequenceNumber;
-                mtime_t                 displayTime;
+                vlc_tick_t              displayTime;
         };
 
         class Segment : public ISegment

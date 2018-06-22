@@ -48,7 +48,7 @@ AbstractConnectionManager::~AbstractConnectionManager()
 }
 
 void AbstractConnectionManager::updateDownloadRate(const adaptive::ID &sourceid, size_t size,
-                                                   mtime_t time, mtime_t latency)
+                                                   vlc_tick_t time, vlc_tick_t latency)
 {
     if(rateObserver)
     {

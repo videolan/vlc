@@ -67,7 +67,7 @@ static int  ParseHeaders( demux_t *, es_format_t * );
 
 typedef struct
 {
-    mtime_t  i_time_offset;
+    vlc_tick_t  i_time_offset;
     uint64_t i_byte_offset;
 } flac_seekpoint_t;
 
@@ -262,7 +262,7 @@ static void Reset( demux_sys_t *p_sys )
     }
 }
 
-static int RefineSeek( demux_t *p_demux, mtime_t i_time, double i_bytemicrorate,
+static int RefineSeek( demux_t *p_demux, vlc_tick_t i_time, double i_bytemicrorate,
                        uint64_t i_lowpos, uint64_t i_highpos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -310,7 +310,7 @@ static int RefineSeek( demux_t *p_demux, mtime_t i_time, double i_bytemicrorate,
         /* If we are further than wanted block */
         if( p_block_out->i_dts >= i_time )
         {
-            mtime_t i_diff = p_block_out->i_dts - i_time;
+            vlc_tick_t i_diff = p_block_out->i_dts - i_time;
             /* Not in acceptable approximation range */
             if( i_diff > CLOCK_FREQ / 10 && i_diff / i_bytemicrorate > i_frame_size )
             {
@@ -322,7 +322,7 @@ static int RefineSeek( demux_t *p_demux, mtime_t i_time, double i_bytemicrorate,
         }
         else if( p_block_out->i_dts < i_time )
         {
-            mtime_t i_diff = i_time - p_block_out->i_dts;
+            vlc_tick_t i_diff = i_time - p_block_out->i_dts;
             /* Not in acceptable NEXT_TIME demux range */
             if( i_diff >= ((b_canfastseek) ? FLAC_MAX_PREROLL : FLAC_MAX_SLOW_PREROLL) &&
                 i_diff / i_bytemicrorate > i_frame_size )
@@ -451,7 +451,7 @@ static int ControlSetTime( demux_t *p_demux, int64_t i_time )
     if( !b_seekable )
         return VLC_EGENERIC;
 
-    const mtime_t i_length = ControlGetLength( p_demux );
+    const vlc_tick_t i_length = ControlGetLength( p_demux );
     if( i_length <= 0 )
         return VLC_EGENERIC;
 

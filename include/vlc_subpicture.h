@@ -127,14 +127,14 @@ typedef struct
     int  (*pf_validate)( subpicture_t *,
                          bool has_src_changed, const video_format_t *p_fmt_src,
                          bool has_dst_changed, const video_format_t *p_fmt_dst,
-                         mtime_t);
+                         vlc_tick_t);
     /** Mandatory callback called after pf_validate and doing
       * the main job of creating the subpicture regions for the
       * current video_format */
     void (*pf_update)  ( subpicture_t *,
                          const video_format_t *p_fmt_src,
                          const video_format_t *p_fmt_dst,
-                         mtime_t );
+                         vlc_tick_t );
     /** Optional callback for subpicture private data cleanup */
     void (*pf_destroy) ( subpicture_t * );
     subpicture_updater_sys_t *p_sys;
@@ -168,8 +168,8 @@ struct subpicture_t
 
     /** \name Date properties */
     /**@{*/
-    mtime_t         i_start;                  /**< beginning of display date */
-    mtime_t         i_stop;                         /**< end of display date */
+    vlc_tick_t      i_start;                  /**< beginning of display date */
+    vlc_tick_t      i_stop;                         /**< end of display date */
     bool            b_ephemer;    /**< If this flag is set to true the subtitle
                                 will be displayed until the next one appear */
     bool            b_fade;                               /**< enable fading */
@@ -218,7 +218,7 @@ VLC_API subpicture_t * subpicture_NewFromPicture( vlc_object_t *, picture_t *, v
  * This function will update the content of a subpicture created with
  * a non NULL subpicture_updater_t.
  */
-VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *, mtime_t );
+VLC_API void subpicture_Update( subpicture_t *, const video_format_t *src, const video_format_t *, vlc_tick_t );
 
 /**
  * This function will blend a given subpicture onto a picture.

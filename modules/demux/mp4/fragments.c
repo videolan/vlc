@@ -101,7 +101,7 @@ void MP4_Fragments_Index_Dump( vlc_object_t *p_obj, const mp4_fragments_index_t 
     {
         char *psz_starts = NULL;
 
-        mtime_t i_end;
+        vlc_tick_t i_end;
         if( i + 1 == p_index->i_entries )
             i_end = p_index->i_last_time;
         else

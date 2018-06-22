@@ -52,7 +52,7 @@ static void callback (void *ptr)
 int main (void)
 {
     struct timer_data data;
-    mtime_t ts;
+    vlc_tick_t ts;
     int val;
 
     vlc_mutex_init (&data.lock);

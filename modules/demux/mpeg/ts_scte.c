@@ -61,7 +61,7 @@ void SCTE18_Section_Callback( dvbpsi_t *p_handle, const dvbpsi_psi_section_t* p_
                 continue;
 
             const ts_pmt_t *p_pmt = p_es->p_program;
-            const mtime_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
+            const vlc_tick_t i_date = TimeStampWrapAround( p_pmt->pcr.i_first, p_pmt->pcr.i_current );
             block_t *p_block = block_Alloc( p_section->p_payload_end - p_section->p_payload_start );
             memcpy( p_block->p_buffer, p_section->p_payload_start, i_payload );
             p_block->i_dts = p_block->i_pts = FROM_SCALE( i_date );
@@ -81,7 +81,7 @@ void SCTE27_Section_Callback( demux_t *p_demux,
     ts_stream_t *p_pes = (ts_stream_t *) p_pes_cb_data;
     assert( p_pes->p_es->fmt.i_codec == VLC_CODEC_SCTE_27 );
     ts_pmt_t *p_pmt = p_pes->p_es->p_program;
-    mtime_t i_date = p_pmt->pcr.i_current;
+    vlc_tick_t i_date = p_pmt->pcr.i_current;
 
     block_t *p_content = block_Alloc( i_sectiondata );
     if( unlikely(!p_content) || unlikely(!p_pes->p_es->id) )
@@ -102,7 +102,7 @@ void SCTE27_Section_Callback( demux_t *p_demux,
         bool is_immediate = p_content->p_buffer[i_offset + 3] & 0x40;
         if( !is_immediate )
         {
-            mtime_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
+            vlc_tick_t i_display_in = GetDWBE( &p_content->p_buffer[i_offset + 4] );
             if( i_display_in < i_date )
                 i_date = i_display_in + (1ll << 32);
             else

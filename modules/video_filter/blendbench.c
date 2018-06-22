@@ -251,7 +251,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    mtime_t time = mdate();
+    vlc_tick_t time = mdate();
     for( int i_iter = 0; i_iter < p_sys->i_loops; ++i_iter )
     {
         p_blend->pf_video_blend( p_blend,

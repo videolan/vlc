@@ -108,7 +108,7 @@ static inline OMX_TICKS ToOmxTicks(int64_t value)
 
 #define OMX_FIFO_GET_TIMEOUT(p_fifo, p_buffer, timeout) \
     do { vlc_mutex_lock( &(p_fifo)->lock ); \
-         mtime_t end = mdate() + timeout; \
+         vlc_tick_t end = mdate() + timeout; \
          if( !(p_fifo)->p_first ) \
              vlc_cond_timedwait( &(p_fifo)->wait, &(p_fifo)->lock, end ); \
          p_buffer = (p_fifo)->p_first; \

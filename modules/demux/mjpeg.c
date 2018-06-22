@@ -71,9 +71,9 @@ struct demux_sys_t
     es_out_id_t     *p_es;
 
     bool            b_still;
-    mtime_t         i_still_end;
-    mtime_t         i_time;
-    mtime_t         i_frame_length;
+    vlc_tick_t      i_still_end;
+    vlc_tick_t      i_time;
+    vlc_tick_t      i_frame_length;
     char            *psz_separator;
     int             i_frame_size_estimate;
     const uint8_t   *p_peek;

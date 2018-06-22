@@ -57,8 +57,8 @@ int vout_OpenWrapper(vout_thread_t *vout,
     sys->display.title = var_InheritString(vout, "video-title");
 
     /* */
-    const mtime_t double_click_timeout = 300000;
-    const mtime_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
+    const vlc_tick_t double_click_timeout = 300000;
+    const vlc_tick_t hide_timeout = var_CreateGetInteger(vout, "mouse-hide-timeout") * 1000;
 
     if (splitter_name) {
         sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, "$vout", splitter_name,

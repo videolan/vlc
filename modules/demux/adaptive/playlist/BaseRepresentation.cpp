@@ -148,14 +148,14 @@ bool BaseRepresentation::canNoLongerUpdate() const
     return false;
 }
 
-void BaseRepresentation::pruneByPlaybackTime(mtime_t time)
+void BaseRepresentation::pruneByPlaybackTime(vlc_tick_t time)
 {
     uint64_t num;
     if(getSegmentNumberByTime(time, &num))
         pruneBySegmentNumber(num);
 }
 
-mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
+vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 {
     AbstractSegmentBaseType *profile = inheritSegmentTemplate();
     if(!profile)
@@ -207,14 +207,14 @@ uint64_t BaseRepresentation::translateSegmentNumber(uint64_t num, const BaseRepr
     return num;
 }
 
-bool BaseRepresentation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+bool BaseRepresentation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
 {
     const AbstractSegmentBaseType *profile = inheritSegmentProfile();
     return profile && profile->getSegmentNumberByTime(time, ret);
 }
 
 bool BaseRepresentation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                                mtime_t *time, mtime_t *duration) const
+                                                                vlc_tick_t *time, vlc_tick_t *duration) const
 {
     if(number == std::numeric_limits<uint64_t>::max())
         return false;
@@ -223,9 +223,9 @@ bool BaseRepresentation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     return profile && profile->getPlaybackTimeDurationBySegmentNumber(number, time, duration);
 }
 
-bool BaseRepresentation::getMediaPlaybackRange(mtime_t *rangeBegin,
-                                               mtime_t *rangeEnd,
-                                               mtime_t *rangeLength) const
+bool BaseRepresentation::getMediaPlaybackRange(vlc_tick_t *rangeBegin,
+                                               vlc_tick_t *rangeEnd,
+                                               vlc_tick_t *rangeLength) const
 {
     SegmentTemplate *mediaSegmentTemplate = inheritSegmentTemplate();
     if( mediaSegmentTemplate )

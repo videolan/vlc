@@ -47,7 +47,7 @@ struct filter_sys_t
     struct
     {
         vlc_vdp_video_field_t *field;
-        mtime_t date;
+        vlc_tick_t date;
         bool force;
     } history[MAX_PAST + 1 + MAX_FUTURE];
 

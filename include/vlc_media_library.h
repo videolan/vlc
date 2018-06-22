@@ -116,7 +116,7 @@ typedef enum
 typedef enum {
     ML_TYPE_INT,        /**< Object is an int */
     ML_TYPE_PSZ,        /**< A string char* */
-    ML_TYPE_TIME,       /**< A timestamp mtime_t */
+    ML_TYPE_TIME,       /**< A timestamp vlc_tick_t */
     ML_TYPE_MEDIA,      /**< A pointer to a media ml_media_t* */
 } ml_result_type_e;
 

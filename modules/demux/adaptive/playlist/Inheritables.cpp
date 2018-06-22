@@ -162,11 +162,11 @@ Timescale AttrsNode::inheritTimescale() const
         return Timescale(1);
 }
 
-mtime_t AttrsNode::inheritAvailabilityTimeOffset() const
+vlc_tick_t AttrsNode::inheritAvailabilityTimeOffset() const
 {
     const AbstractAttr *p = inheritAttribute(Type::AvailabilityTimeOffset);
     if(p && p->isValid())
-        return (const mtime_t &) *(static_cast<const AvailabilityTimeOffsetAttr *>(p));
+        return (const vlc_tick_t &) *(static_cast<const AvailabilityTimeOffsetAttr *>(p));
     return 0;
 }
 

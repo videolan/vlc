@@ -55,7 +55,7 @@ void SmoothSegmentChunk::onDownload(block_t **pp_block)
        as we never update playlist itself */
     if(rep->getPlaylist()->timeShiftBufferDepth.Get())
     {
-        mtime_t start, end, length;
+        vlc_tick_t start, end, length;
         if(rep->getMediaPlaybackRange(&start, &end, &length))
         {
             start = std::max(start, end - rep->getPlaylist()->timeShiftBufferDepth.Get());

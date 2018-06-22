@@ -217,9 +217,9 @@ class SegmentTrackerListener : public SegmentTrackerListenerInterface
         struct
         {
             uint64_t sequence;
-            mtime_t displaytime;
-            mtime_t starttime;
-            mtime_t duration;
+            vlc_tick_t displaytime;
+            vlc_tick_t starttime;
+            vlc_tick_t duration;
         } segmentchanged;
         struct
         {
@@ -233,7 +233,7 @@ class SegmentTrackerListener : public SegmentTrackerListenerInterface
         bool discontinuity;
         struct
         {
-             mtime_t resumeTime;
+             vlc_tick_t resumeTime;
         } positionchanged;
 };
 

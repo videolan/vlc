@@ -40,16 +40,16 @@ namespace adaptive
                 AbstractSegmentBaseType( SegmentInformation *, AttrsNode::Type );
                 virtual ~AbstractSegmentBaseType();
 
-                virtual mtime_t getMinAheadTime(uint64_t) const = 0;
+                virtual vlc_tick_t getMinAheadTime(uint64_t) const = 0;
                 virtual Segment *getMediaSegment(uint64_t pos) const = 0;
                 virtual InitSegment *getInitSegment() const;
                 virtual IndexSegment *getIndexSegment() const;
                 virtual Segment *getNextMediaSegment(uint64_t, uint64_t *, bool *) const = 0;
                 virtual uint64_t getStartSegmentNumber() const = 0;
 
-                virtual bool getSegmentNumberByTime(mtime_t time, uint64_t *ret) const = 0;
+                virtual bool getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const = 0;
                 virtual bool getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                mtime_t *time, mtime_t *duration) const = 0;
+                                                vlc_tick_t *time, vlc_tick_t *duration) const = 0;
 
                 virtual void debug(vlc_object_t *, int = 0) const;
 

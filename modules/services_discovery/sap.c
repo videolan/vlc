@@ -198,8 +198,8 @@ struct attribute_t
 
 struct sap_announce_t
 {
-    mtime_t i_last;
-    mtime_t i_period;
+    vlc_tick_t i_last;
+    vlc_tick_t i_period;
     uint8_t i_period_trust;
 
     uint16_t    i_hash;
@@ -567,7 +567,7 @@ static void *Run( void *data )
             }
         }
 
-        mtime_t now = mdate();
+        vlc_tick_t now = mdate();
 
         /* A 1 hour timeout correspond to the RFC Implicit timeout.
          * This timeout is tuned in the following loop. */
@@ -576,9 +576,9 @@ static void *Run( void *data )
         /* Check for items that need deletion */
         for( int i = 0; i < p_sd->p_sys->i_announces; i++ )
         {
-            mtime_t i_timeout = ( mtime_t ) 1000000 * p_sd->p_sys->i_timeout;
+            vlc_tick_t i_timeout = ( vlc_tick_t ) 1000000 * p_sd->p_sys->i_timeout;
             sap_announce_t * p_announce = p_sd->p_sys->pp_announces[i];
-            mtime_t i_last_period = now - p_announce->i_last;
+            vlc_tick_t i_last_period = now - p_announce->i_last;
 
             /* Remove the announcement, if the last announcement was 1 hour ago
              * or if the last packet emitted was 10 times the average time
@@ -809,7 +809,7 @@ static int ParseSAP( services_discovery_t *p_sd, const uint8_t *buf,
                     p_announce->i_period_trust++;
 
                 /* Compute the average period */
-                mtime_t now = mdate();
+                vlc_tick_t now = mdate();
                 p_announce->i_period = ( p_announce->i_period * (p_announce->i_period_trust-1) + (now - p_announce->i_last) ) / p_announce->i_period_trust;
                 p_announce->i_last = now;
             }

@@ -296,7 +296,7 @@ int M3U8Playlist_test()
 
         uint64_t number = bufferingLogic.getStartSegmentNumber(rep);
         Expect(number == 10);
-        mtime_t mediatime, duration;
+        vlc_tick_t mediatime, duration;
         Expect(rep->getPlaybackTimeDurationBySegmentNumber(std::numeric_limits<uint64_t>::max(),
                                                            &mediatime, &duration) == false);
         Expect(rep->getPlaybackTimeDurationBySegmentNumber(number + 1, &mediatime, &duration) == false);
@@ -311,7 +311,7 @@ int M3U8Playlist_test()
         Expect(seg->getSequenceNumber() == 10);
         Expect(seg->startTime.Get() == (stime_t) 0);
 
-        mtime_t begin, end;
+        vlc_tick_t begin, end;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));
         Expect(begin == vlc_tick_from_sec(0));
         Expect(end == vlc_tick_from_sec(8));
@@ -357,7 +357,7 @@ int M3U8Playlist_test()
         Expect(seg->getSequenceNumber() == 12);
         Expect(seg->startTime.Get() == timescale.ToScaled(vlc_tick_from_sec(20)));
 
-        mtime_t begin, end, duration;
+        vlc_tick_t begin, end, duration;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));
         Expect(begin == vlc_tick_from_sec(0));
         Expect(end == vlc_tick_from_sec(30));
@@ -460,7 +460,7 @@ int M3U8Playlist_test()
         Expect(seg);
         Expect(static_cast<HLSSegment *>(seg)->getDisplayTime() == VLC_TS_0 + vlc_tick_from_sec(7200));
 
-        mtime_t begin, end, duration;
+        vlc_tick_t begin, end, duration;
         Expect(rep->getMediaPlaybackRange(&begin, &end, &duration));
         Expect(begin == vlc_tick_from_sec(0));
         Expect(end == vlc_tick_from_sec(34));

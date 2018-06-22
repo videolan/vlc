@@ -109,9 +109,9 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     char psz_time[MSTRTIME_MAX_SIZE];
     int64_t t = var_GetInteger(p_input, "time");
 
-    mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+    vlc_tick_t dur = input_item_GetDuration(input_GetItem(p_input));
     if (b_negative && dur > 0) {
-        mtime_t remaining = 0;
+        vlc_tick_t remaining = 0;
         if (dur > t)
             remaining = dur - t;
         return [NSString stringWithFormat: @"-%s", secstotimestr(psz_time, (remaining / 1000000))];

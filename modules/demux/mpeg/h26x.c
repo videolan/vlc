@@ -448,12 +448,12 @@ static int Demux( demux_t *p_demux)
             }
 
             /* we only want to use the pts-dts offset and length from packetizer */
-            mtime_t dtsdiff = p_block_out->i_pts > p_block_out->i_dts
+            vlc_tick_t dtsdiff = p_block_out->i_pts > p_block_out->i_dts
                             ? p_block_out->i_pts - p_block_out->i_dts
                             : 0;
             /* Always start frame N=1 so we get PCR on N=0 */
             date_t dtsdate = p_sys->output_dts;
-            mtime_t dts = date_Increment( &dtsdate, 2 );
+            vlc_tick_t dts = date_Increment( &dtsdate, 2 );
 
             p_block_out->i_dts = dts;
             if( p_block_out->i_pts != VLC_TS_INVALID )
@@ -478,7 +478,7 @@ static int Demux( demux_t *p_demux)
 
             /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
             bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
-            const mtime_t i_frame_length = p_block_out->i_length;
+            const vlc_tick_t i_frame_length = p_block_out->i_length;
 
             /* first output */
             if( date_Get( &p_sys->output_dts ) == VLC_TS_0 )
@@ -486,7 +486,7 @@ static int Demux( demux_t *p_demux)
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
-            mtime_t pcr = b_eof ? dts : date_Get( &p_sys->output_dts );
+            vlc_tick_t pcr = b_eof ? dts : date_Get( &p_sys->output_dts );
 
             if( frame )
             {

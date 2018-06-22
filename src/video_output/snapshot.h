@@ -43,7 +43,7 @@ void vout_snapshot_Clean(vout_snapshot_t *);
 void vout_snapshot_End(vout_snapshot_t *);
 
 /* */
-picture_t *vout_snapshot_Get(vout_snapshot_t *, mtime_t timeout);
+picture_t *vout_snapshot_Get(vout_snapshot_t *, vlc_tick_t timeout);
 
 /**
  * It tells if they are pending snapshot request

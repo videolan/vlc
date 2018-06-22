@@ -592,7 +592,7 @@ void aout_OutputDelete (audio_output_t *aout)
         aout->stop (aout);
 }
 
-int aout_OutputTimeGet (audio_output_t *aout, mtime_t *delay)
+int aout_OutputTimeGet (audio_output_t *aout, vlc_tick_t *delay)
 {
     aout_OutputAssertLocked (aout);
 
@@ -619,7 +619,7 @@ void aout_OutputPlay (audio_output_t *aout, block_t *block)
     aout->play (aout, block);
 }
 
-static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
+static void PauseDefault (audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     if (pause)
         aout_OutputFlush (aout, false);
@@ -633,7 +633,7 @@ static void PauseDefault (audio_output_t *aout, bool pause, mtime_t date)
  * \note This can only be called after a successful aout_OutputNew().
  * \warning The caller must hold the audio output lock.
  */
-void aout_OutputPause( audio_output_t *aout, bool pause, mtime_t date )
+void aout_OutputPause( audio_output_t *aout, bool pause, vlc_tick_t date )
 {
     aout_OutputAssertLocked (aout);
     ((aout->pause != NULL) ? aout->pause : PauseDefault) (aout, pause, date);

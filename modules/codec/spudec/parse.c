@@ -45,8 +45,8 @@ typedef struct
     int i_height;
     int i_x;
     int i_y;
-    mtime_t i_start;
-    mtime_t i_stop;
+    vlc_tick_t i_start;
+    vlc_tick_t i_stop;
     bool b_ephemer;
     bool b_subtitle;
 } spu_properties_t;
@@ -70,7 +70,7 @@ typedef struct
 
 } subpicture_data_t;
 
-static int  ParseControlSeq( decoder_t *, mtime_t i_pts,
+static int  ParseControlSeq( decoder_t *, vlc_tick_t i_pts,
                              int(*pf_queue)(decoder_t *, subpicture_t *) );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
                              const spu_properties_t *, uint16_t * );
@@ -218,7 +218,7 @@ static void OutputPicture( decoder_t *p_dec,
     if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
-        p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000;
+        p_spu->i_stop = p_spu->i_start + (vlc_tick_t)500 * 11000;
         p_spu->b_ephemer = true;
     }
 
@@ -334,7 +334,7 @@ void ParsePacket( decoder_t *p_dec, int(*pf_queue)(decoder_t *, subpicture_t *) 
  * information, coordinates, and so on. For more information on the
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
-static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
+static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
                             int(*pf_queue)(decoder_t *, subpicture_t *) )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -347,7 +347,7 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
 
     /* Command and date */
     uint8_t i_command = SPU_CMD_END;
-    mtime_t date = 0;
+    vlc_tick_t date = 0;
     bool b_cmd_offset = false;
     bool b_cmd_alpha = false;
 
@@ -390,7 +390,7 @@ static int ParseControlSeq( decoder_t *p_dec, mtime_t i_pts,
             b_cmd_offset = false;
             b_cmd_alpha = false;
             /* Get the control sequence date */
-            date = (mtime_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
+            date = (vlc_tick_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
 
             /* Next offset */
             i_cur_seq = i_index;

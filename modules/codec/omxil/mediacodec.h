@@ -61,7 +61,7 @@ struct mc_api_out
         struct
         {
             int i_index;
-            mtime_t i_ts;
+            vlc_tick_t i_ts;
             const uint8_t *p_ptr;
             size_t i_size;
         } buf;
@@ -137,13 +137,13 @@ struct mc_api
      * - MC_API_INFO_OUTPUT_FORMAT_CHANGED if output format changed
      * - MC_API_INFO_OUTPUT_BUFFERS_CHANGED if buffers changed
      * - MC_API_ERROR in case of error. */
-    int (*dequeue_in)(mc_api *, mtime_t i_timeout);
-    int (*dequeue_out)(mc_api *, mtime_t i_timeout);
+    int (*dequeue_in)(mc_api *, vlc_tick_t i_timeout);
+    int (*dequeue_out)(mc_api *, vlc_tick_t i_timeout);
 
     /* i_index is the index returned by dequeue_in and should be >= 0
      * Returns 0 if buffer is successfully queued, or MC_API_ERROR */
     int (*queue_in)(mc_api *, int i_index, const void *p_buf, size_t i_size,
-                    mtime_t i_ts, bool b_config);
+                    vlc_tick_t i_ts, bool b_config);
 
     /* i_index is the index returned by dequeue_out and should be >= 0,
      * MC_API_INFO_OUTPUT_FORMAT_CHANGED, or MC_API_INFO_OUTPUT_BUFFERS_CHANGED.

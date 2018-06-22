@@ -102,10 +102,10 @@ struct demux_sys_t
 {
     block_t     *data;
     es_out_id_t *es;
-    mtime_t     duration;
+    vlc_tick_t  duration;
     bool        is_realtime;
-    mtime_t     pts_origin;
-    mtime_t     pts_next;
+    vlc_tick_t  pts_origin;
+    vlc_tick_t  pts_next;
     date_t        pts;
 };
 
@@ -190,13 +190,13 @@ static int Demux(demux_t *demux)
     if (!sys->data)
         return 0;
 
-    mtime_t deadline;
-    const mtime_t pts_first = sys->pts_origin + date_Get(&sys->pts);
+    vlc_tick_t deadline;
+    const vlc_tick_t pts_first = sys->pts_origin + date_Get(&sys->pts);
     if (sys->pts_next > VLC_TS_INVALID) {
         deadline = sys->pts_next;
     } else if (sys->is_realtime) {
         deadline = mdate();
-        const mtime_t max_wait = CLOCK_FREQ / 50;
+        const vlc_tick_t max_wait = CLOCK_FREQ / 50;
         if (deadline + max_wait < pts_first) {
             es_out_SetPCR(demux->out, deadline);
             /* That's ugly, but not yet easily fixable */
@@ -208,7 +208,7 @@ static int Demux(demux_t *demux)
     }
 
     for (;;) {
-        const mtime_t pts = sys->pts_origin + date_Get(&sys->pts);
+        const vlc_tick_t pts = sys->pts_origin + date_Get(&sys->pts);
         if (sys->duration >= 0 && pts >= sys->pts_origin + sys->duration)
             return 0;
 

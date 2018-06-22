@@ -257,7 +257,7 @@ struct subpicture_updater_sys_t {
 static int OSDWidgetValidate(subpicture_t *subpic,
                            bool has_src_changed, const video_format_t *fmt_src,
                            bool has_dst_changed, const video_format_t *fmt_dst,
-                           mtime_t ts)
+                           vlc_tick_t ts)
 {
     VLC_UNUSED(subpic); VLC_UNUSED(ts);
     VLC_UNUSED(fmt_src); VLC_UNUSED(has_src_changed);
@@ -271,7 +271,7 @@ static int OSDWidgetValidate(subpicture_t *subpic,
 static void OSDWidgetUpdate(subpicture_t *subpic,
                           const video_format_t *fmt_src,
                           const video_format_t *fmt_dst,
-                          mtime_t ts)
+                          vlc_tick_t ts)
 {
     subpicture_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);

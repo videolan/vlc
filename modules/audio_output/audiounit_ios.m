@@ -198,7 +198,7 @@ enum port_type
         aout_RestartRequest(p_aout, AOUT_RESTART_OUTPUT);
     else
     {
-        const mtime_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
+        const vlc_tick_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
         ca_SetDeviceLatency(p_aout, latency_us);
         msg_Dbg(p_aout, "Current device has a new latency of %lld us", latency_us);
     }
@@ -428,7 +428,7 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 #pragma mark actual playback
 
 static void
-Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
 {
     struct aout_sys_t * p_sys = p_aout->sys;
 
@@ -625,7 +625,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     if (err != noErr)
         ca_LogWarn("failed to set IO mode");
 
-    const mtime_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
+    const vlc_tick_t latency_us = [p_sys->avInstance outputLatency] * CLOCK_FREQ;
     msg_Dbg(p_aout, "Current device has a latency of %lld us", latency_us);
 
     ret = au_Initialize(p_aout, p_sys->au_unit, fmt, NULL, latency_us, NULL);

@@ -66,7 +66,7 @@ struct decoder_sys_t
      * Common properties
      */
     date_t  end_date;
-    mtime_t i_prev_bytestream_pts;
+    vlc_tick_t i_prev_bytestream_pts;
     bool    b_discontuinity;
 
     vlc_a52_header_t frame;

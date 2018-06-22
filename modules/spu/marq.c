@@ -46,7 +46,7 @@
  *****************************************************************************/
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
-static subpicture_t *Filter( filter_t *, mtime_t );
+static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
 static char *MarqueeReadFile( filter_t *, const char * );
 static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
@@ -81,8 +81,8 @@ struct filter_sys_t
 
     text_style_t *p_style; /* font control */
 
-    mtime_t last_time;
-    mtime_t i_refresh;
+    vlc_tick_t last_time;
+    vlc_tick_t i_refresh;
 };
 
 #define MSG_TEXT N_("Text")
@@ -268,7 +268,7 @@ static void DestroyFilter( vlc_object_t *p_this )
  ****************************************************************************
  * This function outputs subpictures at regular time intervals.
  ****************************************************************************/
-static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
+static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu = NULL;

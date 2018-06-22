@@ -77,9 +77,9 @@ static int Control( demux_t *, int i_query, va_list args );
 
 /* callbacks for packet parser */
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
-                               mtime_t i_time );
-static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, mtime_t i_time);
-static bool Block_Dequeue( demux_t *p_demux, mtime_t i_nexttime );
+                               vlc_tick_t i_time );
+static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, vlc_tick_t i_time);
+static bool Block_Dequeue( demux_t *p_demux, vlc_tick_t i_nexttime );
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,
                                                uint8_t i_stream_number );
 static bool Packet_DoSkip( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number, bool b_packet_keyframe );
@@ -95,7 +95,7 @@ typedef struct
     es_format_t     *p_fmt; /* format backup for video changes */
     bool             b_selected;
 
-    mtime_t          i_time; /* track time*/
+    vlc_tick_t       i_time; /* track time*/
 
     asf_track_info_t info;
 
@@ -109,9 +109,9 @@ typedef struct
 
 struct demux_sys_t
 {
-    mtime_t             i_time;     /* s */
-    mtime_t             i_sendtime;
-    mtime_t             i_length;   /* length of file file */
+    vlc_tick_t          i_time;     /* s */
+    vlc_tick_t          i_sendtime;
+    vlc_tick_t          i_length;   /* length of file file */
     uint64_t            i_bitrate;  /* global file bitrate */
     bool                b_eos;      /* end of current stream */
     bool                b_eof;      /* end of current media */
@@ -132,7 +132,7 @@ struct demux_sys_t
     uint8_t             i_access_selected_track[ES_CATEGORY_COUNT]; /* mms, depends on access algorithm */
     unsigned int        i_wait_keyframe;
 
-    mtime_t             i_preroll_start;
+    vlc_tick_t          i_preroll_start;
 
     asf_packet_sys_t    packet_sys;
 
@@ -360,7 +360,7 @@ static int SeekPercent( demux_t *p_demux, int i_query, va_list args )
                                    i_query, args );
 }
 
-static int SeekIndex( demux_t *p_demux, mtime_t i_date, float f_pos )
+static int SeekIndex( demux_t *p_demux, vlc_tick_t i_date, float f_pos )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     asf_object_index_t *p_index;
@@ -591,13 +591,13 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
     tk->p_fmt->video.i_sar_den = i_ratio_y;
 }
 
-static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, mtime_t i_time )
+static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, vlc_tick_t i_time )
 {
     p_packetsys->p_demux->p_sys->i_sendtime = VLC_TS_0 + i_time;
 }
 
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
-                               mtime_t i_time )
+                               vlc_tick_t i_time )
 {
     asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
     if ( tk )
@@ -668,7 +668,7 @@ static void Packet_Enqueue( asf_packet_sys_t *p_packetsys, uint8_t i_stream_numb
     *pp_frame = NULL;
 }
 
-static bool Block_Dequeue( demux_t *p_demux, mtime_t i_nexttime )
+static bool Block_Dequeue( demux_t *p_demux, vlc_tick_t i_nexttime )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     bool b_tracks_have_data = false;
@@ -1249,9 +1249,9 @@ static int DemuxInit( demux_t *p_demux )
                   p_sys->p_fp->i_min_data_packet_size;
 
         /* calculate the time duration in micro-s */
-        p_sys->i_length = (mtime_t)p_sys->p_fp->i_play_duration / 10 *
-                   (mtime_t)i_count /
-                   (mtime_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll * 1000;
+        p_sys->i_length = (vlc_tick_t)p_sys->p_fp->i_play_duration / 10 *
+                   (vlc_tick_t)i_count /
+                   (vlc_tick_t)p_sys->p_fp->i_data_packets_count - p_sys->p_fp->i_preroll * 1000;
         if( p_sys->i_length < 0 )
             p_sys->i_length = 0;
 

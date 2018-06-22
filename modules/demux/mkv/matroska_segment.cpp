@@ -107,7 +107,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
         if( MKV_IS_ID( el, KaxCuePoint ) )
         {
             uint64_t cue_position = -1;
-            mtime_t  cue_mk_time = -1;
+            vlc_tick_t  cue_mk_time = -1;
 
             unsigned int track_id = 0;
             bool b_invalid_cue = false;
@@ -803,13 +803,13 @@ bool matroska_segment_c::LoadSeekHeadItem( const EbmlCallbacks & ClassInfos, int
     return true;
 }
 
-bool matroska_segment_c::Seek( demux_t &demuxer, mtime_t i_absolute_mk_date, mtime_t i_mk_time_offset, bool b_accurate )
+bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, vlc_tick_t i_mk_time_offset, bool b_accurate )
 {
     SegmentSeeker::tracks_seekpoint_t seekpoints;
 
     SegmentSeeker::fptr_t i_seek_position = std::numeric_limits<SegmentSeeker::fptr_t>::max();
-    mtime_t i_mk_seek_time = -1;
-    mtime_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
+    vlc_tick_t i_mk_seek_time = -1;
+    vlc_tick_t i_mk_date = i_absolute_mk_date - i_mk_time_offset;
     SegmentSeeker::track_ids_t selected_tracks;
     SegmentSeeker::track_ids_t priority;
 

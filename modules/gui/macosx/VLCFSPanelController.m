@@ -277,7 +277,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
 
 
     int64_t t = var_GetInteger(p_input, "time");
-    mtime_t dur = input_item_GetDuration(input_GetItem(p_input));
+    vlc_tick_t dur = input_item_GetDuration(input_GetItem(p_input));
 
     /* Update total duration (right field) */
     if (dur <= 0) {
@@ -285,7 +285,7 @@ static NSString *kAssociatedFullscreenRect = @"VLCFullscreenAssociatedWindowRect
     } else {
         [_remainingOrTotalTime setHidden:NO];
 
-        mtime_t remaining = 0;
+        vlc_tick_t remaining = 0;
         if (dur > t)
             remaining = dur - t;
         NSString *remainingTime = [NSString stringWithFormat:@"-%s", secstotimestr(psz_time, (remaining / 1000000))];

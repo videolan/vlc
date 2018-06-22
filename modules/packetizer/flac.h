@@ -36,7 +36,7 @@ struct flac_stream_info
 
 struct flac_header_info
 {
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     unsigned i_rate;
     unsigned i_channels;
     unsigned i_bits_per_sample;

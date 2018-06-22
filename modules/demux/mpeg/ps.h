@@ -62,8 +62,8 @@ typedef struct
     int         i_next_block_flags;
     es_out_id_t *es;
     es_format_t fmt;
-    mtime_t     i_first_pts;
-    mtime_t     i_last_pts;
+    vlc_tick_t  i_first_pts;
+    vlc_tick_t  i_last_pts;
 
 } ps_track_t;
 
@@ -494,8 +494,8 @@ static inline int ps_pkt_parse_system( block_t *p_pkt, ps_psm_t *p_psm,
 static inline int ps_pkt_parse_pes( vlc_object_t *p_object, block_t *p_pes, int i_skip_extra )
 {
     unsigned int i_skip  = 0;
-    mtime_t i_pts = -1;
-    mtime_t i_dts = -1;
+    vlc_tick_t i_pts = -1;
+    vlc_tick_t i_dts = -1;
     uint8_t i_stream_id = 0;
     bool b_pes_scrambling = false;
 
