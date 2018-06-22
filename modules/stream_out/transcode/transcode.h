@@ -4,6 +4,7 @@
 
 /*100ms is around the limit where people are noticing lipsync issues*/
 #define MASTER_SYNC_MAX_DRIFT VLC_TICK_FROM_MS(100)
+#define FIRSTVALID(a,b,c) ( a ? a : ( b ? b : c ) )
 
 typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 
@@ -116,6 +117,7 @@ struct sout_stream_id_sys_t
     picture_fifo_t *pp_pics;
     vlc_sem_t       picture_pool_has_room;
     vlc_cond_t      cond;
+    es_format_t     encoder_tested_fmt_in;
 
 
     /* Sync */

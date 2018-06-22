@@ -82,6 +82,7 @@ static int video_update_format_decoder( decoder_t *p_dec )
     int chain_works = filter_chain_AppendConverter( test_chain, &p_dec->fmt_out,
                                   &id->p_encoder->fmt_in );
     filter_chain_Delete( test_chain );
+
     msg_Dbg( p_obj, "Filter chain testing done, input chroma %4.4s seems to be %s for transcode",
                      (char *)&p_dec->fmt_out.video.i_chroma,
                      chain_works == 0 ? "possible" : "not possible");
@@ -179,6 +180,71 @@ static picture_t *transcode_dequeue_all_pics( sout_stream_id_sys_t *id )
     return p_pics;
 }
 
+static int transcode_video_encoder_test( sout_stream_t *p_stream,
+                                         const es_format_t *p_dec_fmtin,
+                                         vlc_fourcc_t i_codec_in,
+                                         int i_threads,
+                                         const config_chain_t *p_cfg,
+                                         const es_format_t *p_enc_fmtout,
+                                         es_format_t *p_enc_wanted_in )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    encoder_t *p_encoder = sout_EncoderCreate( p_stream );
+    if( !p_encoder )
+        return VLC_EGENERIC;
+
+    p_encoder->i_threads = i_threads;
+    p_encoder->p_cfg = p_cfg;
+
+    es_format_Init( &p_encoder->fmt_in, VIDEO_ES, i_codec_in );
+    es_format_Copy( &p_encoder->fmt_out, p_enc_fmtout );
+
+    const video_format_t *p_dec_in = &p_dec_fmtin->video;
+    video_format_t *p_vfmt_in = &p_encoder->fmt_in.video;
+    video_format_t *p_vfmt_out = &p_encoder->fmt_out.video;
+
+    p_vfmt_in->i_chroma = i_codec_in;
+
+    /* The dimensions will be set properly later on.
+     * Just put sensible values so we can test an encoder is available. */
+    p_vfmt_in->i_width = FIRSTVALID( p_vfmt_out->i_width, p_dec_in->i_width, 16 ) & ~1;
+    p_vfmt_in->i_height = FIRSTVALID( p_vfmt_out->i_height, p_dec_in->i_height, 16 ) & ~1;
+    p_vfmt_in->i_visible_width = FIRSTVALID( p_vfmt_out->i_visible_width,
+                                             p_dec_in->i_visible_width, p_vfmt_in->i_width ) & ~1;
+    p_vfmt_in->i_visible_height = FIRSTVALID( p_vfmt_out->i_visible_height,
+                                              p_dec_in->i_visible_height, p_vfmt_in->i_height ) & ~1;
+    p_vfmt_in->i_frame_rate = ENC_FRAMERATE;
+    p_vfmt_in->i_frame_rate_base = ENC_FRAMERATE_BASE;
+
+    module_t *p_module = module_need( p_encoder, "encoder", p_sys->psz_venc, true );
+    if( !p_module )
+    {
+        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). "
+                           "Take a look few lines earlier to see possible reason.",
+                 p_sys->psz_venc ? p_sys->psz_venc : "any", (char *)&p_sys->i_vcodec );
+    }
+    else
+    {
+        /* Close the encoder.
+         * We'll open it only when we have the first frame. */
+        module_unneed( p_encoder, p_module );
+    }
+
+    if( likely(!p_encoder->fmt_in.video.i_chroma) ) /* always missing, and required by filter chain */
+        p_encoder->fmt_in.video.i_chroma = p_encoder->fmt_in.i_codec;
+
+    /* output our requested format */
+    es_format_Copy( p_enc_wanted_in, &p_encoder->fmt_in );
+
+    es_format_Clean( &p_encoder->fmt_in );
+    es_format_Clean( &p_encoder->fmt_out );
+
+    vlc_object_release( p_encoder );
+
+    return p_module != NULL ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -219,59 +285,23 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
                     id->p_decoder->fmt_out.i_codec );
-
-    /* The dimensions will be set properly later on.
-     * Just put sensible values so we can test an encoder is available. */
-    id->p_encoder->fmt_in.video.i_width =
-        id->p_encoder->fmt_out.video.i_width
-          ? id->p_encoder->fmt_out.video.i_width
-          : id->p_decoder->fmt_in.video.i_width
-            ? id->p_decoder->fmt_in.video.i_width : 16;
-    id->p_encoder->fmt_in.video.i_height =
-        id->p_encoder->fmt_out.video.i_height
-          ? id->p_encoder->fmt_out.video.i_height
-          : id->p_decoder->fmt_in.video.i_height
-            ? id->p_decoder->fmt_in.video.i_height : 16;
-    id->p_encoder->fmt_in.video.i_visible_width =
-        id->p_encoder->fmt_out.video.i_visible_width
-          ? id->p_encoder->fmt_out.video.i_visible_width
-          : id->p_decoder->fmt_in.video.i_visible_width
-            ? id->p_decoder->fmt_in.video.i_visible_width : id->p_encoder->fmt_in.video.i_width;
-    id->p_encoder->fmt_in.video.i_visible_height =
-        id->p_encoder->fmt_out.video.i_visible_height
-          ? id->p_encoder->fmt_out.video.i_visible_height
-          : id->p_decoder->fmt_in.video.i_visible_height
-            ? id->p_decoder->fmt_in.video.i_visible_height : id->p_encoder->fmt_in.video.i_height;
-    /* The same goes with frame rate. Some encoders need it to be initialized */
-    id->p_encoder->fmt_in.video.i_frame_rate = ENC_FRAMERATE;
-    id->p_encoder->fmt_in.video.i_frame_rate_base = ENC_FRAMERATE_BASE;
+    /* Should be the same format until encoder loads */
+    es_format_Init( &id->encoder_tested_fmt_in, id->p_decoder->fmt_in.i_cat,
+                    id->p_decoder->fmt_out.i_codec );
 
     id->p_encoder->i_threads = p_sys->i_threads;
     id->p_encoder->p_cfg = p_sys->p_video_cfg;
 
-    id->p_encoder->p_module =
-        module_need( id->p_encoder, "encoder", p_sys->psz_venc, true );
-    if( !id->p_encoder->p_module )
-    {
-        msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s). Take a look few lines earlier to see possible reason.",
-                 p_sys->psz_venc ? p_sys->psz_venc : "any",
-                 (char *)&p_sys->i_vcodec );
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = 0;
+    if( transcode_video_encoder_test( p_stream, &id->p_decoder->fmt_in,
+                                                id->p_decoder->fmt_out.i_codec,
+                                                p_sys->i_threads,
+                                                p_sys->p_video_cfg,
+                                                &id->p_encoder->fmt_out,
+                                                &id->encoder_tested_fmt_in ) )
         return VLC_EGENERIC;
-    }
 
-    /* Close the encoder.
-     * We'll open it only when we have the first frame. */
-    module_unneed( id->p_encoder, id->p_encoder->p_module );
-    if( id->p_encoder->fmt_out.p_extra )
-    {
-        free( id->p_encoder->fmt_out.p_extra );
-        id->p_encoder->fmt_out.p_extra = NULL;
-        id->p_encoder->fmt_out.i_extra = 0;
-    }
-    id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
-    id->p_encoder->p_module = NULL;
+    /* Will use this format as encoder input for now */
+    es_format_Copy( &id->p_encoder->fmt_in, &id->encoder_tested_fmt_in );
 
     if( p_sys->i_threads <= 0 )
         return VLC_SUCCESS;
@@ -301,6 +331,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         id->p_decoder->p_module = NULL;
         return VLC_EGENERIC;
     }
+
     return VLC_SUCCESS;
 }
 
@@ -538,9 +569,9 @@ static void transcode_video_sar_apply( const video_format_t *p_src,
     }
 }
 
-static void transcode_video_encoder_init( sout_stream_t *p_stream,
-                                          sout_stream_id_sys_t *id,
-                                          picture_t *p_pic )
+static void transcode_video_encoder_configure( sout_stream_t *p_stream,
+                                               sout_stream_id_sys_t *id,
+                                               picture_t *p_pic )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     const video_format_t *p_src = filtered_video_format( id, p_pic );
@@ -549,6 +580,19 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
     video_format_t *p_enc_in = &id->p_encoder->fmt_in.video;
     video_format_t *p_enc_out = &id->p_encoder->fmt_out.video;
 
+    /* Complete destination format */
+    id->p_encoder->fmt_out.i_codec = p_enc_out->i_chroma = p_sys->i_vcodec;
+    id->p_encoder->fmt_out.i_bitrate = p_sys->i_vbitrate;
+    p_enc_out->i_width = p_enc_out->i_visible_width  = p_sys->i_width & ~1;
+    p_enc_out->i_height = p_enc_out->i_visible_height = p_sys->i_height & ~1;
+    p_enc_out->i_sar_num = p_enc_out->i_sar_den = 0;
+    if( p_sys->fps_num )
+    {
+        p_enc_in->i_frame_rate = p_enc_out->i_frame_rate = p_sys->fps_num;
+        p_enc_in->i_frame_rate_base = p_enc_out->i_frame_rate_base = __MAX(p_sys->fps_den, 1);
+    }
+
+    /* Complete source format */
     p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
     p_enc_in->i_chroma = id->p_encoder->fmt_in.i_codec;
 
@@ -650,6 +694,8 @@ void transcode_video_close( sout_stream_t *p_stream,
     if( id->p_encoder->p_module )
         module_unneed( id->p_encoder, id->p_encoder->p_module );
 
+    es_format_Clean( &id->encoder_tested_fmt_in );
+
     /* Close filters */
     if( id->p_f_chain )
         filter_chain_Delete( id->p_f_chain );
@@ -727,6 +773,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     *out = NULL;
 
+    if( id->p_encoder->p_module == NULL && !id->p_encoder->fmt_in.i_codec )
+        es_format_Copy( &id->p_encoder->fmt_in, &id->encoder_tested_fmt_in );
+
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
@@ -765,12 +814,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 filter_chain_Delete( id->p_uf_chain );
             id->p_uf_chain = NULL;
 
-            /* Reinitialize filters */
-            id->p_encoder->fmt_out.video.i_visible_width  = p_sys->i_width & ~1;
-            id->p_encoder->fmt_out.video.i_visible_height = p_sys->i_height & ~1;
-            id->p_encoder->fmt_out.video.i_sar_num = id->p_encoder->fmt_out.video.i_sar_den = 0;
-
-            transcode_video_encoder_init( p_stream, id, p_pic );
+            transcode_video_encoder_configure( p_stream, id, p_pic );
             transcode_video_filter_init( p_stream, id );
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
@@ -786,7 +830,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 filter_chain_Delete( id->p_uf_chain );
             id->p_f_chain = id->p_uf_chain = NULL;
 
-            transcode_video_encoder_init( p_stream, id, p_pic );
+            transcode_video_encoder_configure( p_stream, id, p_pic );
             transcode_video_filter_init( p_stream, id );
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
@@ -889,12 +933,6 @@ bool transcode_video_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
     id->fifo.pic.first = NULL;
     id->fifo.pic.last = &id->fifo.pic.first;
 
-    /* Complete destination format */
-    id->p_encoder->fmt_out.i_codec = p_sys->i_vcodec;
-    id->p_encoder->fmt_out.video.i_visible_width  = p_sys->i_width & ~1;
-    id->p_encoder->fmt_out.video.i_visible_height = p_sys->i_height & ~1;
-    id->p_encoder->fmt_out.i_bitrate = p_sys->i_vbitrate;
-
     /* Build decoder -> filter -> encoder chain */
     if( transcode_video_new( p_stream, id ) )
     {
@@ -905,12 +943,6 @@ bool transcode_video_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
     /* Stream will be added later on because we don't know
      * all the characteristics of the decoded stream yet */
     id->b_transcode = true;
-
-    if( p_sys->fps_num )
-    {
-        id->p_encoder->fmt_in.video.i_frame_rate = id->p_encoder->fmt_out.video.i_frame_rate = (p_sys->fps_num );
-        id->p_encoder->fmt_in.video.i_frame_rate_base = id->p_encoder->fmt_out.video.i_frame_rate_base = (p_sys->fps_den ? p_sys->fps_den : 1);
-    }
 
     return true;
 }
