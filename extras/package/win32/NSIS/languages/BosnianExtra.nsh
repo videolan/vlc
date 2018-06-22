@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Video Datoteke"
 ${LangFileString} Name_SectionGroupOther "Druge"
 ${LangFileString} Name_Section07 "Kontekstni Meniji"
 ${LangFileString} Name_Section08 "Izbriši postavljanja i predmemoriranje"
-${LangFileString} Desc_Section01 "Sam medijski izvođač"
-${LangFileString} Desc_Section02a "Dodaje ikone na vaš start meni za jednostavan pristup"
-${LangFileString} Desc_Section02b "Dodaje ikonu na vašu radnu površinu za jednostavan pristup"
-${LangFileString} Desc_Section03 "VLC Mozilla i Mozilla Firefox dodatak"
-${LangFileString} Desc_Section04 "VLC ActiveX dodatak"
-${LangFileString} Desc_Section05 "DVD i CD registracija reprodukcije"
-${LangFileString} Desc_Section06 "Postavlja VLC medijski izvođač kao zadanu aplikaciju za naznačene tipove datoteka"
-${LangFileString} Desc_Section07 "Dodaj stavke kontekstnog menija ('Produciraj Sa VLC-om' i 'Dodaj Na Listu izvođenja VLC-a')"
-${LangFileString} Desc_Section08 "Briše postavljanja VLC medijskog izvođača i preostale datoteke predmemoriranja od prethodnih instalacija"
+
+${LangFileString} Desc_Section01 \
+    "Sam medijski izvođač"
+${LangFileString} Desc_Section02a \
+    "Dodaje ikone na vaš start meni za jednostavan pristup"
+${LangFileString} Desc_Section02b \
+    "Dodaje ikonu na vašu radnu površinu za jednostavan pristup"
+${LangFileString} Desc_Section03 \
+    "VLC Mozilla i Mozilla Firefox dodatak"
+${LangFileString} Desc_Section04 \
+    "VLC ActiveX dodatak"
+${LangFileString} Desc_Section05 \
+    "DVD i CD registracija reprodukcije"
+${LangFileString} Desc_Section06 \
+    "Postavlja VLC medijski izvođač kao zadanu aplikaciju za naznačene tipove datoteka"
+${LangFileString} Desc_Section07 \
+    "Dodaj stavke kontekstnog menija ('Produciraj Sa VLC-om' i 'Dodaj Na Listu izvođenja VLC-a')"
+${LangFileString} Desc_Section08 \
+    "Briše postavljanja VLC medijskog izvođača i preostale datoteke predmemoriranja od prethodnih instalacija"
+
 ${LangFileString} Name_Section91 "Deinstaliraj"
 ${LangFileString} Name_Section92 "Izbriši postavljanja i predmemoriranje"
-${LangFileString} Desc_Section91 "Deinstaliraj VLC medijski izvođač i sve njegove komponente"
-${LangFileString} Desc_Section92 "Briše postavljanja VLC medijskog izvođača i datoteke predmemoriranja"
+
+${LangFileString} Desc_Section91 \
+"Deinstaliraj VLC medijski izvođač i sve njegove komponente"
+${LangFileString} Desc_Section92 \
+"Briše postavljanja VLC medijskog izvođača i datoteke predmemoriranja"
+
 ${LangFileString} ShellAssociation_Play "Produciraj"
 ${LangFileString} ContextMenuEntry_PlayWith "Produciraj sa VLC medijskim izvođačom"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Dodaj na listu izvođenja VLC medijskog izvođača"
+
 ${LangFileString} Link_VisitWebsite "Posjetite Web Stranicu VideoLAN VLC medijskog izvođača"
+
 ${LangFileString} Name_InstTypeRecommended "Preporučeno"
 ${LangFileString} Name_InstTypeMinimum "Minimalno"
 ${LangFileString} Name_InstTypeFull "Komplet"
+
 ${LangFileString} Action_OnArrivalDVD "Produciraj DVD film"
 ${LangFileString} Action_OnArrivalAudioCD "Produciraj zvučni CD"
 ${LangFileString} Action_OnArrivalVCDMovie "Produciraj VCD film"
@@ -40,10 +58,12 @@ ${LangFileString} Action_OnArrivalVideoFiles "Produciraj video datoteke"
 ${LangFileString} Action_OnArrivalMusicFiles "Produciraj zvučne datoteke"
 ${LangFileString} Action_OnArrivalDVDAudio "Produciraj zvučni DVD"
 ${LangFileString} License_NextText "Sada ste svjesni svojih prava. Kliknite Sljedeće za nastavak."
+
 ${LangFileString} Detail_CheckProcesses "Provjeravam procese..."
 ${LangFileString} MessageBox_VLCRunning "VLC je izgleda pokrenut i sada će biti zatvoren."
 ${LangFileString} MessageBox_VLCUnableToClose "Instalater nije uspio zatvoriti VLC, molimo da to učinite ručno."
 ${LangFileString} MessageBox_InstallAborted "Instalacija prekinuta!"
+
 ${LangFileString} Reinstall_Headline "Već Instalirano"
 ${LangFileString} Reinstall_HeadlineInstall "Izaberite kako želite instalirati VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Izaberite opciju održavanja za izvedbu."
