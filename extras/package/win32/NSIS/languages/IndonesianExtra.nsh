@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Berkas Video"
 ${LangFileString} Name_SectionGroupOther "Berkas Lainnya"
 ${LangFileString} Name_Section07 "Menu Konteks"
 ${LangFileString} Name_Section08 "Hapus preferensi dan tembolok"
-${LangFileString} Desc_Section01 "Pemutar media itu sendiri"
-${LangFileString} Desc_Section02a "Tambahkan ikon pada menu mulai anda untuk kemudahan akses"
-${LangFileString} Desc_Section02b "Tambahkan ikon ke destop anda untuk kemudahan akses"
-${LangFileString} Desc_Section03 "Pengaya VLC Mozilla dan Mozilla Firefox"
-${LangFileString} Desc_Section04 "Pengaya ActiveX VLC"
-${LangFileString} Desc_Section05 "Registrasi pemutaran CD dan DVD"
-${LangFileString} Desc_Section06 "Setel pemutar media VLC sebagai aplikasi baku untuk jenis berkas tertentu"
-${LangFileString} Desc_Section07 "Tambahkan butir menu konteks ('Putar dengan VLC' dan 'Tambahkan Ke Daftar Putar VLC')"
-${LangFileString} Desc_Section08 "Hapus preferensi  pemutar media dan tembolok VLC yang tertinggal dari pemasangan sebelumya"
+
+${LangFileString} Desc_Section01 \
+    "Pemutar media itu sendiri"
+${LangFileString} Desc_Section02a \
+    "Tambahkan ikon pada menu mulai anda untuk kemudahan akses"
+${LangFileString} Desc_Section02b \
+    "Tambahkan ikon ke destop anda untuk kemudahan akses"
+${LangFileString} Desc_Section03 \
+    "Pengaya VLC Mozilla dan Mozilla Firefox"
+${LangFileString} Desc_Section04 \
+    "Pengaya ActiveX VLC"
+${LangFileString} Desc_Section05 \
+    "Registrasi pemutaran CD dan DVD"
+${LangFileString} Desc_Section06 \
+    "Setel pemutar media VLC sebagai aplikasi baku untuk jenis berkas tertentu"
+${LangFileString} Desc_Section07 \
+    "Tambahkan butir menu konteks ('Putar dengan VLC' dan 'Tambahkan Ke Daftar Putar VLC')"
+${LangFileString} Desc_Section08 \
+    "Hapus preferensi  pemutar media dan tembolok VLC yang tertinggal dari pemasangan sebelumya"
+
 ${LangFileString} Name_Section91 "Copot"
 ${LangFileString} Name_Section92 "Hapus preferensi dan tembolok"
-${LangFileString} Desc_Section91 "Cobot pemasangan pemutar media VLC dan semua komponennya"
-${LangFileString} Desc_Section92 "Hapus berkas preferensi dan tembolok pemutar media VLC"
+
+${LangFileString} Desc_Section91 \
+"Cobot pemasangan pemutar media VLC dan semua komponennya"
+${LangFileString} Desc_Section92 \
+"Hapus berkas preferensi dan tembolok pemutar media VLC"
+
 ${LangFileString} ShellAssociation_Play "Putar"
 ${LangFileString} ContextMenuEntry_PlayWith "Putar dengan pemutar media VLC"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Tambahkan ke daftar putar pemutar media VLC"
+
 ${LangFileString} Link_VisitWebsite "Kunjungi situs web VideoLAN pemutar media VLC"
+
 ${LangFileString} Name_InstTypeRecommended "Direkomendasikan"
 ${LangFileString} Name_InstTypeMinimum "Minimum"
 ${LangFileString} Name_InstTypeFull "Penuh"
+
 ${LangFileString} Action_OnArrivalDVD "Putar film DVD"
 ${LangFileString} Action_OnArrivalAudioCD "Putar CD audio"
 ${LangFileString} Action_OnArrivalVCDMovie "Putar film VCD"
@@ -40,10 +58,12 @@ ${LangFileString} Action_OnArrivalVideoFiles "Putar berkas video"
 ${LangFileString} Action_OnArrivalMusicFiles "Putar berkas audio"
 ${LangFileString} Action_OnArrivalDVDAudio "Putar DVD audio"
 ${LangFileString} License_NextText "Anda sekarang sadar atas hak anda. Klik Lanjut untuk melanjutkan."
+
 ${LangFileString} Detail_CheckProcesses "Memeriksa proses..."
 ${LangFileString} MessageBox_VLCRunning "Tampakkan VLC masih berjalan dan saat ini akan ditutup."
 ${LangFileString} MessageBox_VLCUnableToClose "Pemasang ini tidak dapat menutup VLC, silahkan lakukan secara menual."
 ${LangFileString} MessageBox_InstallAborted "Pemasangan dibatalkan!"
+
 ${LangFileString} Reinstall_Headline "Sudah Dipasang"
 ${LangFileString} Reinstall_HeadlineInstall "Pilih bagaimana anda memasang VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Pilih opsi pemeliharaan untuk dijalankan."
