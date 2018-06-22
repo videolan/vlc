@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Videotiedostot"
 ${LangFileString} Name_SectionGroupOther "Muu"
 ${LangFileString} Name_Section07 "Asiayhteysvalikot"
 ${LangFileString} Name_Section08 "Tyhjää asetukset ja välimuisti"
-${LangFileString} Desc_Section01 "Mediasoitin itsessään"
-${LangFileString} Desc_Section02a "Lisää kuvakkeita käynnistä-valikkoon jotta käyttö on helpompaa"
-${LangFileString} Desc_Section02b "Lisää kuvakkeita työpöydälle jotta käyttö on helpompaa"
-${LangFileString} Desc_Section03 "VLC-, Mozilla- ja Mozilla Firefox-liitännäinen"
-${LangFileString} Desc_Section04 "VLC ActiveX-liitännäinen"
-${LangFileString} Desc_Section05 "DVD- ja CD-toiston rekisteröinti"
-${LangFileString} Desc_Section06 "Asettaa VLC-mediatoistimen oletusohjelmaksi valitulle tiedostotyypille"
-${LangFileString} Desc_Section07 "Lisää asiayhteysvalikkoon kohteet ('Toista VLC:n kanssa' ja 'Lisää VLC:n soittolistaan')"
-${LangFileString} Desc_Section08 "Poistaa vanhat VLC-mediatoistimen asetukset ja välimuistitiedostot edellisistä asennuksista"
+
+${LangFileString} Desc_Section01 \
+    "Mediasoitin itsessään"
+${LangFileString} Desc_Section02a \
+    "Lisää kuvakkeita käynnistä-valikkoon jotta käyttö on helpompaa"
+${LangFileString} Desc_Section02b \
+    "Lisää kuvakkeita työpöydälle jotta käyttö on helpompaa"
+${LangFileString} Desc_Section03 \
+    "VLC-, Mozilla- ja Mozilla Firefox-liitännäinen"
+${LangFileString} Desc_Section04 \
+    "VLC ActiveX-liitännäinen"
+${LangFileString} Desc_Section05 \
+    "DVD- ja CD-toiston rekisteröinti"
+${LangFileString} Desc_Section06 \
+    "Asettaa VLC-mediatoistimen oletusohjelmaksi valitulle tiedostotyypille"
+${LangFileString} Desc_Section07 \
+    "Lisää asiayhteysvalikkoon kohteet ('Toista VLC:n kanssa' ja 'Lisää VLC:n soittolistaan')"
+${LangFileString} Desc_Section08 \
+    "Poistaa vanhat VLC-mediatoistimen asetukset ja välimuistitiedostot edellisistä asennuksista"
+
 ${LangFileString} Name_Section91 "Poista asennus"
 ${LangFileString} Name_Section92 "Tyhjää asetukset ja välimuisti"
-${LangFileString} Desc_Section91 "Poistaa VLC-mediatoistimen ja kaikki sen lisäosat"
-${LangFileString} Desc_Section92 "Poistaa VLC-mediatoistimen asetukset ja välimuistin"
+
+${LangFileString} Desc_Section91 \
+"Poistaa VLC-mediatoistimen ja kaikki sen lisäosat"
+${LangFileString} Desc_Section92 \
+"Poistaa VLC-mediatoistimen asetukset ja välimuistin"
+
 ${LangFileString} ShellAssociation_Play "Toista"
 ${LangFileString} ContextMenuEntry_PlayWith "Toista VLC-mediatoistimella"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Lisää VLC-mediatoistimen soittolistaan"
+
 ${LangFileString} Link_VisitWebsite "Vieraile VideoLAN VLC-mediatoistimen kotisivuilla"
+
 ${LangFileString} Name_InstTypeRecommended "Suositeltava"
 ${LangFileString} Name_InstTypeMinimum "Vähintään"
 ${LangFileString} Name_InstTypeFull "Täysi"
+
 ${LangFileString} Action_OnArrivalDVD "Toista DVD-elokuva"
 ${LangFileString} Action_OnArrivalAudioCD "Toista audio-CD"
 ${LangFileString} Action_OnArrivalVCDMovie "Toista VCD-elokuva"
@@ -40,10 +58,12 @@ ${LangFileString} Action_OnArrivalVideoFiles "Toista videotiedostot"
 ${LangFileString} Action_OnArrivalMusicFiles "Toista äänitiedostot"
 ${LangFileString} Action_OnArrivalDVDAudio "Toista ääni-DVD"
 ${LangFileString} License_NextText "Nyt olet tietoinen oikeuksistasi. Paina Seuraava jatkaaksesi."
+
 ${LangFileString} Detail_CheckProcesses "Tarkistetaan prosessit..."
 ${LangFileString} MessageBox_VLCRunning "VLC näyttäisi olevan käynnissä se suljetaan."
 ${LangFileString} MessageBox_VLCUnableToClose "Asennusohjelma ei kyennyt sulkemaan VLC-mediatoistinta, suljethan sen itse."
 ${LangFileString} MessageBox_InstallAborted "Asennus keskeytettiin!"
+
 ${LangFileString} Reinstall_Headline "On jo asennettu"
 ${LangFileString} Reinstall_HeadlineInstall "Valitse kuinka haluat asentaa VLC:n."
 ${LangFileString} Reinstall_HeadlineMaintenance "Valitse suoritettava huoltotoimenpide."
