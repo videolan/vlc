@@ -45,6 +45,59 @@
 typedef int64_t vlc_tick_t;
 typedef vlc_tick_t mtime_t; /* deprecated, use vlc_tick_t */
 
+
+/*
+ * vlc_tick_t <> seconds (sec) conversions
+ */
+#define VLC_TICK_FROM_SEC(sec)   (CLOCK_FREQ * (sec))
+#define SEC_FROM_VLC_TICK(vtk)   ((vtk) / CLOCK_FREQ)
+
+#ifdef __cplusplus
+static inline vlc_tick_t vlc_tick_from_sec(int64_t sec)
+{
+    return CLOCK_FREQ * sec;
+}
+static inline vlc_tick_t vlc_tick_from_sec(int sec)
+{
+    return CLOCK_FREQ * sec;
+}
+static inline vlc_tick_t vlc_tick_from_sec(long sec)
+{
+    return CLOCK_FREQ * sec;
+}
+static inline vlc_tick_t vlc_tick_from_sec(uint32_t sec)
+{
+    return CLOCK_FREQ * sec;
+}
+/* seconds in floating point */
+static inline vlc_tick_t vlc_tick_from_sec(double secf)
+{
+    return (vlc_tick_t)(CLOCK_FREQ * secf); /* TODO use llround ? */
+}
+#else /* !__cplusplus */
+static inline vlc_tick_t vlc_tick_from_seci(int64_t sec)
+{
+    return CLOCK_FREQ * sec;
+}
+/* seconds in floating point */
+static inline vlc_tick_t vlc_tick_from_secf(double secf)
+{
+    return (vlc_tick_t)(CLOCK_FREQ * secf); /* TODO use llround ? */
+}
+
+#define vlc_tick_from_sec(sec) _Generic((sec), \
+        double:  vlc_tick_from_secf(sec), \
+        float:   vlc_tick_from_secf(sec), \
+        default: vlc_tick_from_seci(sec) )
+#endif /* !__cplusplus */
+
+/* seconds in floating point from vlc_tick_t */
+static inline double secf_from_vlc_tick(vlc_tick_t vtk)
+{
+    return (double)vtk / (double)CLOCK_FREQ;
+}
+
+
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *****************************************************************************
