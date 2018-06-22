@@ -113,6 +113,21 @@ static inline double secf_from_vlc_tick(vlc_tick_t vtk)
 #endif /* CLOCK_FREQ / 1000 */
 
 
+/*
+ * vlc_tick_t <> microseconds (us) conversions
+ */
+#if (CLOCK_FREQ % 1000000) == 0
+#define VLC_TICK_FROM_US(us)    ((CLOCK_FREQ / INT64_C(1000000)) * (us))
+#define US_FROM_VLC_TICK(vtk)   ((vtk) / (CLOCK_FREQ / INT64_C(1000000)))
+#elif (1000000 % CLOCK_FREQ) == 0
+#define VLC_TICK_FROM_US(us)    ((us)  / (INT64_C(1000000) / CLOCK_FREQ))
+#define US_FROM_VLC_TICK(vtk)   ((vtk) * (INT64_C(1000000) / CLOCK_FREQ))
+#else /* rounded overflowing conversion */
+#define VLC_TICK_FROM_US(us)    (CLOCK_FREQ * (us) / INT64_C(1000000))
+#define US_FROM_VLC_TICK(vtk)   ((vtk) * INT64_C(1000000) / CLOCK_FREQ)
+#endif /* CLOCK_FREQ / 1000000 */
+
+
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
  *****************************************************************************
