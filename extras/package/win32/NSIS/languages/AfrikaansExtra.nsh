@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Videolêers"
 ${LangFileString} Name_SectionGroupOther "Ander"
 ${LangFileString} Name_Section07 "Kontekskieslyste"
 ${LangFileString} Name_Section08 "Skrap voorkeure en kas"
-${LangFileString} Desc_Section01 "Die mediaspeler self"
-${LangFileString} Desc_Section02a "Voeg items tot u begin-kieslys toe vir maklike toegang"
-${LangFileString} Desc_Section02b "Plaas ikoon op u werkskerm vir maklike toegang"
-${LangFileString} Desc_Section03 "Die VLc Mozilla- en Mozilla Firefox-inprop"
-${LangFileString} Desc_Section04 "Die VLC ActiveX-inprop"
-${LangFileString} Desc_Section05 "DVD en CD afspeelregistrasie"
-${LangFileString} Desc_Section06 "Stel VLC-mediaspeler in as die verstektoepassing vir die gespesifiseerde lêertipe"
-${LangFileString} Desc_Section07 "Voeg kontekskieslysitems toe (‘Speel af met VLC’ en ‘Voeg toe tot VLC se afspeellys’)"
-${LangFileString} Desc_Section08 "Skrap VLC-mediaspelervoorkeure en kaslêers wat van vorige installasies oorgebly het"
+
+${LangFileString} Desc_Section01 \
+    "Die mediaspeler self"
+${LangFileString} Desc_Section02a \
+    "Voeg items tot u begin-kieslys toe vir maklike toegang"
+${LangFileString} Desc_Section02b \
+    "Plaas ikoon op u werkskerm vir maklike toegang"
+${LangFileString} Desc_Section03 \
+    "Die VLc Mozilla- en Mozilla Firefox-inprop"
+${LangFileString} Desc_Section04 \
+    "Die VLC ActiveX-inprop"
+${LangFileString} Desc_Section05 \
+    "DVD en CD afspeelregistrasie"
+${LangFileString} Desc_Section06 \
+    "Stel VLC-mediaspeler in as die verstektoepassing vir die gespesifiseerde lêertipe"
+${LangFileString} Desc_Section07 \
+    "Voeg kontekskieslysitems toe (‘Speel af met VLC’ en ‘Voeg toe tot VLC se afspeellys’)"
+${LangFileString} Desc_Section08 \
+    "Skrap VLC-mediaspelervoorkeure en kaslêers wat van vorige installasies oorgebly het"
+
 ${LangFileString} Name_Section91 "Deïnstalleer"
 ${LangFileString} Name_Section92 "Skrap voorkeure en kas"
-${LangFileString} Desc_Section91 "Deïnstalleer VLC-mediaspeler en al sy komponente"
-${LangFileString} Desc_Section92 "Skrap VLC-mediaspelervoorkeure en kaslêers"
+
+${LangFileString} Desc_Section91 \
+"Deïnstalleer VLC-mediaspeler en al sy komponente"
+${LangFileString} Desc_Section92 \
+"Skrap VLC-mediaspelervoorkeure en kaslêers"
+
 ${LangFileString} ShellAssociation_Play "Speel"
 ${LangFileString} ContextMenuEntry_PlayWith "Speel af met VLC-mediaspeler"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Voeg toe tot VLC-mediaspeler se afspeellys"
+
 ${LangFileString} Link_VisitWebsite "Besoek die VideoLAN VLC-mediaspelerwebblad"
+
 ${LangFileString} Name_InstTypeRecommended "Aanbeveel"
 ${LangFileString} Name_InstTypeMinimum "Minimum"
 ${LangFileString} Name_InstTypeFull "Vol"
+
 ${LangFileString} Action_OnArrivalDVD "Speel DVD-rolprent"
 ${LangFileString} Action_OnArrivalAudioCD "Speel oudio CD"
 ${LangFileString} Action_OnArrivalVCDMovie "Speel VCD-rolprent"
@@ -40,10 +58,12 @@ ${LangFileString} Action_OnArrivalVideoFiles "Speel videolêers"
 ${LangFileString} Action_OnArrivalMusicFiles "Speel oudiolêers"
 ${LangFileString} Action_OnArrivalDVDAudio "Speel oudio DVD"
 ${LangFileString} License_NextText "U is nou bewus van u regte. Klik Volgende om aan te gaan."
+
 ${LangFileString} Detail_CheckProcesses "Gaan prosesse na…"
 ${LangFileString} MessageBox_VLCRunning "Dit wol voorkom of VLC loop en dit sal nou afgesluit word."
 ${LangFileString} MessageBox_VLCUnableToClose "Die installeerder kon VLC nie afsluit nie, doen dit asb. handmatig."
 ${LangFileString} MessageBox_InstallAborted "Installasie is laat vaar"
+
 ${LangFileString} Reinstall_Headline "Reeds geïnstalleer"
 ${LangFileString} Reinstall_HeadlineInstall "Kies hoe u VLC wil installeer."
 ${LangFileString} Reinstall_HeadlineMaintenance "Kies die onderhoudopsie om uit te voer."
