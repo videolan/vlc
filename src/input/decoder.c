@@ -774,7 +774,7 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
     }
 
     /* Do not create ephemere data because of rounding errors */
-    if( !b_ephemere && pi_ts1 && *pi_ts0 == *pi_ts1 )
+    if( !b_ephemere && pi_ts1 && *pi_ts1 != VLC_TS_INVALID && *pi_ts0 == *pi_ts1 )
         *pi_ts1 += 1;
 
     if( pi_duration )
