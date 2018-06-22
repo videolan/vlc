@@ -100,7 +100,7 @@ bool SmoothManager::updatePlaylist()
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
-        const mtime_t m = st->getMinAheadTime();
+        const vlc_tick_t m = st->getMinAheadTime();
         if(st->isDisabled() || !st->isSelected())
         {
             continue;
@@ -118,14 +118,14 @@ void SmoothManager::scheduleNextUpdate()
 {
     time_t now = time(NULL);
 
-    mtime_t minbuffer = 0;
+    vlc_tick_t minbuffer = 0;
     std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
         if(st->isDisabled() || !st->isSelected())
             continue;
-        const mtime_t m = st->getMinAheadTime();
+        const vlc_tick_t m = st->getMinAheadTime();
         if(m > 0 && (m < minbuffer || minbuffer == 0))
             minbuffer = m;
     }
@@ -140,7 +140,7 @@ void SmoothManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated playlist, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
 }
 
 bool SmoothManager::needsUpdate() const

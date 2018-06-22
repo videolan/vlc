@@ -72,7 +72,7 @@ typedef struct
 
     int         i_ssnd_fsize;
 
-    mtime_t     i_time;
+    vlc_tick_t  i_time;
 } demux_sys_t;
 
 static int Demux  ( demux_t *p_demux );

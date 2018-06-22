@@ -59,7 +59,7 @@ typedef struct
     int32_t height; /*< Actual height */
 
     bool done;
-    mtime_t start;
+    vlc_tick_t start;
 
     vlc_thread_t thread;
 } demux_sys_t;

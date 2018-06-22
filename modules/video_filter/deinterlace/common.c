@@ -70,10 +70,10 @@ void FlushDeinterlacing(struct deinterlace_ctx *p_context)
     }
 }
 
-mtime_t GetFieldDuration(const struct deinterlace_ctx *p_context,
+vlc_tick_t GetFieldDuration(const struct deinterlace_ctx *p_context,
                          const video_format_t *fmt, const picture_t *p_pic )
 {
-    mtime_t i_field_dur = 0;
+    vlc_tick_t i_field_dur = 0;
 
     /* Calculate one field duration. */
     int i = 0;
@@ -308,7 +308,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
             i_frame_offset == CUSTOM_PTS );
     if( i_frame_offset != CUSTOM_PTS )
     {
-        mtime_t i_base_pts = p_context->meta[i_meta_idx].pi_date;
+        vlc_tick_t i_base_pts = p_context->meta[i_meta_idx].pi_date;
 
         /* Note: in the usual case (i_frame_offset = 0  and
                  b_double_rate = false), this effectively does nothing.
@@ -318,7 +318,7 @@ picture_t *DoDeinterlacing( filter_t *p_filter,
 
         if( p_context->settings.b_double_rate )
         {
-            mtime_t i_field_dur = GetFieldDuration( p_context, &p_filter->fmt_out.video, p_pic );
+            vlc_tick_t i_field_dur = GetFieldDuration( p_context, &p_filter->fmt_out.video, p_pic );
             /* Processing all actually allocated output frames. */
             for( int i = 1; i < i_double_rate_alloc_end; ++i )
             {

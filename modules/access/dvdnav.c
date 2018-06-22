@@ -162,7 +162,7 @@ typedef struct
     unsigned      updates;
 
     /* length of program group chain */
-    mtime_t     i_pgc_length;
+    vlc_tick_t  i_pgc_length;
     int         i_vobu_index;
     int         i_vobu_flush;
 } demux_sys_t;
@@ -871,7 +871,7 @@ static int Demux( demux_t *p_demux )
 
             if( event->length != 0xff && p_sys->still.b_created )
             {
-                mtime_t delay = event->length * CLOCK_FREQ;
+                vlc_tick_t delay = event->length * CLOCK_FREQ;
                 vlc_timer_schedule( p_sys->still.timer, false, delay, 0 );
             }
 

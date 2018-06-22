@@ -357,10 +357,10 @@ public:
     bool                    b_seekable;
     bool                    b_fastseekable;
 
-    mtime_t                 i_pts;
-    mtime_t                 i_pcr;
-    mtime_t                 i_start_pts;
-    mtime_t                 i_mk_chapter_time;
+    vlc_tick_t              i_pts;
+    vlc_tick_t              i_pcr;
+    vlc_tick_t              i_start_pts;
+    vlc_tick_t              i_mk_chapter_time;
 
     vlc_meta_t              *meta;
 
@@ -391,7 +391,7 @@ public:
     void PreloadFamily( const matroska_segment_c & of_segment );
     bool PreloadLinked();
     void FreeUnused();
-    bool PreparePlayback( virtual_segment_c & new_vsegment, mtime_t i_mk_date );
+    bool PreparePlayback( virtual_segment_c & new_vsegment, vlc_tick_t i_mk_date );
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 

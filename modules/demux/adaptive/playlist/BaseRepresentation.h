@@ -60,11 +60,11 @@ namespace adaptive
                 const std::list<std::string> & getCodecs    () const;
                 void                addCodec                (const std::string &);
                 bool                consistentSegmentNumber () const;
-                virtual void        pruneByPlaybackTime     (mtime_t);
+                virtual void        pruneByPlaybackTime     (vlc_tick_t);
 
-                virtual mtime_t     getMinAheadTime         (uint64_t) const;
+                virtual vlc_tick_t  getMinAheadTime         (uint64_t) const;
                 virtual bool        needsUpdate             () const;
-                virtual bool        runLocalUpdates         (mtime_t, uint64_t, bool);
+                virtual bool        runLocalUpdates         (vlc_tick_t, uint64_t, bool);
                 virtual void        scheduleNextUpdate      (uint64_t);
 
                 virtual void        debug                   (vlc_object_t *,int = 0) const;

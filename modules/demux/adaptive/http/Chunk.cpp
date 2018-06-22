@@ -192,7 +192,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
         return NULL;
     }
 
-    mtime_t time = mdate();
+    vlc_tick_t time = mdate();
     ssize_t ret = connection->read(p_block->p_buffer, readsize);
     time = mdate() - time;
     if(ret < 0)
@@ -358,7 +358,7 @@ void HTTPChunkBufferedSource::bufferize(size_t readsize)
     struct
     {
         size_t size;
-        mtime_t time;
+        vlc_tick_t time;
     } rate = {0,0};
 
     ssize_t ret = connection->read(p_block->p_buffer, readsize);

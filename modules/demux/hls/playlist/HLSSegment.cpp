@@ -129,7 +129,7 @@ void HLSSegment::onChunkDownload(block_t **pp_block, SegmentChunk *chunk, BaseRe
     }
 }
 
-mtime_t HLSSegment::getUTCTime() const
+vlc_tick_t HLSSegment::getUTCTime() const
 {
     return utcTime;
 }

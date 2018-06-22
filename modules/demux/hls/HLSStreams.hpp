@@ -33,7 +33,7 @@ namespace hls
             virtual ~HLSStream();
 
         protected:
-            virtual void setTimeOffset(mtime_t); /* reimpl */
+            virtual void setTimeOffset(vlc_tick_t); /* reimpl */
             virtual block_t *checkBlock(block_t *, bool); /* reimpl */
             virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
                                                es_out_t *, AbstractSourceStream *) const; /* reimpl */

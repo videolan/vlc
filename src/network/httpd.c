@@ -148,8 +148,8 @@ struct httpd_client_t
     bool    b_stream_mode;
     uint8_t i_state;
 
-    mtime_t i_activity_date;
-    mtime_t i_activity_timeout;
+    vlc_tick_t i_activity_date;
+    vlc_tick_t i_activity_timeout;
 
     /* buffer for reading header */
     int     i_buffer_size;
@@ -1176,7 +1176,7 @@ void httpd_MsgAdd(httpd_message_t *msg, const char *name, const char *psz_value,
     msg->i_headers++;
 }
 
-static void httpd_ClientInit(httpd_client_t *cl, mtime_t now)
+static void httpd_ClientInit(httpd_client_t *cl, vlc_tick_t now)
 {
     cl->i_state = HTTPD_CLIENT_RECEIVING;
     cl->i_activity_date = now;
@@ -1212,7 +1212,7 @@ static void httpd_ClientDestroy(httpd_client_t *cl)
     free(cl);
 }
 
-static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, mtime_t now)
+static httpd_client_t *httpd_ClientNew(vlc_tls_t *sock, vlc_tick_t now)
 {
     httpd_client_t *cl = malloc(sizeof(httpd_client_t));
 
@@ -1692,7 +1692,7 @@ static void httpdLoop(httpd_host_t *host)
         vlc_cleanup_pop();
     }
 
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     bool b_low_delay = false;
     httpd_client_t *cl;
 

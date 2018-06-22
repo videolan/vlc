@@ -52,8 +52,8 @@ vlc_module_end()
  * Local definitions/prototypes
  *****************************************************************************/
 typedef struct {
-    mtime_t start;
-    mtime_t stop;
+    vlc_tick_t start;
+    vlc_tick_t stop;
     size_t  blocknumber;
     size_t  count;
 } stl_entry_t;
@@ -66,7 +66,7 @@ typedef struct
     es_out_id_t *es;
 
     size_t      current;
-    mtime_t     next_date;
+    vlc_tick_t  next_date;
     bool        b_slave;
     bool        b_first_time;
 } demux_sys_t;
@@ -115,7 +115,7 @@ static int Control(demux_t *demux, int query, va_list args)
     }
     case DEMUX_SET_NEXT_DEMUX_TIME: {
         sys->b_slave = true;
-        sys->next_date = va_arg(args, mtime_t);
+        sys->next_date = va_arg(args, vlc_tick_t);
         return VLC_SUCCESS;
     }
     case DEMUX_SET_TIME: {
@@ -179,7 +179,7 @@ static int Demux(demux_t *demux)
 {
     demux_sys_t *sys = demux->p_sys;
 
-    mtime_t i_barrier = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
+    vlc_tick_t i_barrier = sys->next_date - var_GetInteger(demux->obj.parent, "spu-delay");
     if(i_barrier < 0)
         i_barrier = sys->next_date;
 
@@ -247,7 +247,7 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
     const int cct = ParseInteger(&header[12], 2);
-    const mtime_t program_start = ParseTextTimeCode(&header[256], fps);
+    const vlc_tick_t program_start = ParseTextTimeCode(&header[256], fps);
     const size_t tti_count = ParseInteger(&header[238], 5);
     if (!tti_count)
         return VLC_EGENERIC;

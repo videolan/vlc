@@ -93,8 +93,8 @@ struct vout_thread_sys_t
     } display;
 
     struct {
-        mtime_t     date;
-        mtime_t     timestamp;
+        vlc_tick_t  date;
+        vlc_tick_t  timestamp;
         bool        is_interlaced;
         picture_t   *decoded;
         picture_t   *current;
@@ -102,25 +102,25 @@ struct vout_thread_sys_t
     } displayed;
 
     struct {
-        mtime_t     last;
-        mtime_t     timestamp;
+        vlc_tick_t  last;
+        vlc_tick_t  timestamp;
     } step;
 
     struct {
         bool        is_on;
-        mtime_t     date;
+        vlc_tick_t  date;
     } pause;
 
     /* OSD title configuration */
     struct {
         bool        show;
-        mtime_t     timeout;
+        vlc_tick_t  timeout;
         int         position;
     } title;
 
     struct {
         bool        is_interlaced;
-        mtime_t     date;
+        vlc_tick_t  date;
     } interlacing;
 
     /* */
@@ -224,7 +224,7 @@ void spu_ChangeMargin(spu_t *, int);
  * This function will (un)pause the display of pictures.
  * It is thread safe
  */
-void vout_ChangePause( vout_thread_t *, bool b_paused, mtime_t i_date );
+void vout_ChangePause( vout_thread_t *, bool b_paused, vlc_tick_t i_date );
 
 /**
  * Updates the pointing device state.
@@ -234,7 +234,7 @@ void vout_MouseState(vout_thread_t *, const vlc_mouse_t *);
 /**
  * This function will apply an offset on subtitle subpicture.
  */
-void spu_OffsetSubtitleDate( spu_t *p_spu, mtime_t i_duration );
+void spu_OffsetSubtitleDate( spu_t *p_spu, vlc_tick_t i_duration );
 
 /**
  * This function will return and reset internal statistics.
@@ -246,7 +246,7 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
  * This function will ensure that all ready/displayed pictures have at most
  * the provided date.
  */
-void vout_Flush( vout_thread_t *p_vout, mtime_t i_date );
+void vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
 
 /*
  * Cancel the vout, if cancel is true, it won't return any pictures after this
@@ -257,7 +257,7 @@ void vout_Cancel( vout_thread_t *p_vout, bool b_canceled );
 /**
  * This function will force to display the next picture while paused
  */
-void vout_NextPicture( vout_thread_t *p_vout, mtime_t *pi_duration );
+void vout_NextPicture( vout_thread_t *p_vout, vlc_tick_t *pi_duration );
 
 /**
  * This function will ask the display of the input title

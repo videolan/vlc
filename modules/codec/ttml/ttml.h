@@ -106,7 +106,7 @@ static inline void tt_time_Init( tt_time_t *t )
     t->frames = 0;
 }
 
-static inline tt_time_t tt_time_Create( mtime_t i )
+static inline tt_time_t tt_time_Create( vlc_tick_t i )
 {
     tt_time_t t;
     t.base = i;
@@ -119,7 +119,7 @@ static inline bool tt_time_Valid( const tt_time_t *t )
     return t->base != -1;
 }
 
-static inline mtime_t tt_time_Convert( const tt_time_t *t )
+static inline vlc_tick_t tt_time_Convert( const tt_time_t *t )
 {
     if( !tt_time_Valid( t ) )
         return VLC_TS_INVALID;
@@ -129,8 +129,8 @@ static inline mtime_t tt_time_Convert( const tt_time_t *t )
 
 static inline int tt_time_Compare( const tt_time_t *t1, const tt_time_t *t2 )
 {
-    mtime_t ttt1 = tt_time_Convert( t1 );
-    mtime_t ttt2 = tt_time_Convert( t2 );
+    vlc_tick_t ttt1 = tt_time_Convert( t1 );
+    vlc_tick_t ttt2 = tt_time_Convert( t2 );
     if (ttt1 < ttt2)
         return -1;
     return ttt1 > ttt2;

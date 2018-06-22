@@ -94,7 +94,7 @@ struct vout_thread_t {
 VLC_API int vout_GetSnapshot( vout_thread_t *p_vout,
                               block_t **pp_image, picture_t **pp_picture,
                               video_format_t *p_fmt,
-                              const char *psz_format, mtime_t i_timeout );
+                              const char *psz_format, vlc_tick_t i_timeout );
 
 VLC_API void vout_ChangeAspectRatio( vout_thread_t *p_vout,
                                      unsigned int i_num, unsigned int i_den );

@@ -68,8 +68,8 @@ typedef struct
     pa_threaded_mainloop *mainloop; /**< PulseAudio thread */
     pa_time_event *trigger; /**< Deferred stream trigger */
     pa_cvolume cvolume; /**< actual sink input volume */
-    mtime_t first_pts; /**< Play stream timestamp of buffer start */
-    mtime_t first_date; /**< Play system timestamp of buffer start */
+    vlc_tick_t first_pts; /**< Play stream timestamp of buffer start */
+    vlc_tick_t first_date; /**< Play system timestamp of buffer start */
 
     pa_volume_t volume_force; /**< Forced volume (stream must be NULL) */
     pa_stream_flags_t flags_force; /**< Forced flags (stream must be NULL) */
@@ -222,10 +222,10 @@ static void stream_trigger_cb(pa_mainloop_api *api, pa_time_event *e,
  * in order to minimize desync and resampling during early playback.
  * @note PulseAudio lock required.
  */
-static void stream_start(pa_stream *s, audio_output_t *aout, mtime_t date)
+static void stream_start(pa_stream *s, audio_output_t *aout, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
-    mtime_t delta;
+    vlc_tick_t delta;
 
     assert (sys->first_pts != VLC_TS_INVALID);
 
@@ -439,7 +439,7 @@ static void context_cb(pa_context *ctx, pa_subscription_event_type_t type,
 
 /*** VLC audio output callbacks ***/
 
-static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
+static int TimeGet(audio_output_t *aout, vlc_tick_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -448,7 +448,7 @@ static int TimeGet(audio_output_t *aout, mtime_t *restrict delay)
     pa_threaded_mainloop_lock(sys->mainloop);
     if (pa_stream_is_corked(s) <= 0)
     {   /* latency is relevant only if not corked */
-        mtime_t delta = vlc_pa_get_latency(aout, sys->context, s);
+        vlc_tick_t delta = vlc_pa_get_latency(aout, sys->context, s);
         if (delta != VLC_TS_INVALID)
         {
             *delay = delta;
@@ -486,7 +486,7 @@ static void *data_convert(block_t **pp)
 /**
  * Queue one audio frame to the playback stream
  */
-static void Play(audio_output_t *aout, block_t *block, mtime_t date)
+static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -531,7 +531,7 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 /**
  * Cork or uncork the playback stream
  */
-static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
     pa_stream *s = sys->stream;
@@ -568,7 +568,7 @@ static void Flush(audio_output_t *aout, bool wait)
 
         /* XXX: Loosy drain emulation.
          * See #18141: drain callback is never received */
-        mtime_t delay;
+        vlc_tick_t delay;
         if (TimeGet(aout, &delay) == 0 && delay <= INT64_C(5000000))
             msleep(delay);
     }

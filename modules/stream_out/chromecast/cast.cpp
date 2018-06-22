@@ -139,7 +139,7 @@ struct sout_stream_sys_t
     const int i_port;
 
     sout_stream_id_sys_t *             video_proxy_id;
-    mtime_t                            first_video_keyframe_pts;
+    vlc_tick_t                         first_video_keyframe_pts;
 
     bool                               es_changed;
     bool                               cc_has_input;
@@ -329,7 +329,7 @@ static int ProxySend(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
             }
         }
 
-        mtime_t pause_delay = p_sys->p_intf->getPauseDelay();
+        vlc_tick_t pause_delay = p_sys->p_intf->getPauseDelay();
         if( p_buffer->i_pts != VLC_TS_INVALID )
             p_buffer->i_pts -= pause_delay;
         if( p_buffer->i_dts != VLC_TS_INVALID )

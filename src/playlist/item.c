@@ -714,9 +714,9 @@ void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item )
 /**
  * Get the duration of all items in a node.
  */
-mtime_t playlist_GetNodeDuration( playlist_item_t* node )
+vlc_tick_t playlist_GetNodeDuration( playlist_item_t* node )
 {
-    mtime_t duration = input_item_GetDuration( node->p_input );
+    vlc_tick_t duration = input_item_GetDuration( node->p_input );
     if( duration == VLC_TS_INVALID )
         duration = 0;
 

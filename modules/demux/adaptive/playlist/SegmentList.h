@@ -46,9 +46,9 @@ namespace adaptive
                 void                    addSegment(ISegment *seg);
                 void                    mergeWith(SegmentList *, bool = false);
                 void                    pruneBySegmentNumber(uint64_t);
-                void                    pruneByPlaybackTime(mtime_t);
+                void                    pruneByPlaybackTime(vlc_tick_t);
                 bool                    getSegmentNumberByScaledTime(stime_t, uint64_t *) const;
-                bool                    getPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
+                bool                    getPlaybackTimeDurationBySegmentNumber(uint64_t, vlc_tick_t *, vlc_tick_t *) const;
 
             private:
                 std::vector<ISegment *>  segments;

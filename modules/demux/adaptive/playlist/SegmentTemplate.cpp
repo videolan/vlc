@@ -48,7 +48,7 @@ MediaSegmentTemplate::MediaSegmentTemplate( SegmentInformation *parent ) :
     parentSegmentInformation = parent;
 }
 
-void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prunebarrier)
+void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, vlc_tick_t prunebarrier)
 {
     SegmentTimeline *timeline = segmentTimeline.Get();
     if(timeline && updated->segmentTimeline.Get())
@@ -64,7 +64,7 @@ void MediaSegmentTemplate::mergeWith(MediaSegmentTemplate *updated, mtime_t prun
     }
 }
 
-void MediaSegmentTemplate::pruneByPlaybackTime(mtime_t time)
+void MediaSegmentTemplate::pruneByPlaybackTime(vlc_tick_t time)
 {
     if(segmentTimeline.Get())
         return segmentTimeline.Get()->pruneByPlaybackTime(time);

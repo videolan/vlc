@@ -159,7 +159,7 @@ typedef struct bridged_es_t
 
     /* bridge in part */
     sout_stream_id_sys_t *id;
-    mtime_t i_last;
+    vlc_tick_t i_last;
     bool b_changed;
 } bridged_es_t;
 
@@ -354,18 +354,18 @@ static int SendOut( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 typedef struct in_sout_stream_sys_t
 {
     int i_id_offset;
-    mtime_t i_delay;
+    vlc_tick_t i_delay;
 
     char *psz_name;
 
     bool b_placeholder;
     bool b_switch_on_iframe;
     int i_state;
-    mtime_t i_placeholder_delay;
+    vlc_tick_t i_placeholder_delay;
     sout_stream_id_sys_t *id_video;
-    mtime_t i_last_video;
+    vlc_tick_t i_last_video;
     sout_stream_id_sys_t *id_audio;
-    mtime_t i_last_audio;
+    vlc_tick_t i_last_audio;
 } in_sout_stream_sys_t;
 
 enum { placeholder_on, placeholder_off };
@@ -397,7 +397,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_sys->i_id_offset = val.i_int;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "delay", &val );
-    p_sys->i_delay = (mtime_t)val.i_int * 1000;
+    p_sys->i_delay = (vlc_tick_t)val.i_int * 1000;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "name", &val );
     if( asprintf( &p_sys->psz_name, "bridge-struct-%s", val.psz_string )<0 )
@@ -417,7 +417,7 @@ static int OpenIn( vlc_object_t *p_this )
     p_sys->i_state = placeholder_on;
 
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
-    p_sys->i_placeholder_delay = (mtime_t)val.i_int * 1000;
+    p_sys->i_placeholder_delay = (vlc_tick_t)val.i_int * 1000;
 
     p_sys->i_last_video = VLC_TS_INVALID;
     p_sys->i_last_audio = VLC_TS_INVALID;
@@ -508,7 +508,7 @@ static int SendIn( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
     bridge_t *p_bridge;
     bool b_no_es = true;
     int i;
-    mtime_t i_date = mdate();
+    vlc_tick_t i_date = mdate();
 
     /* First forward the packet for our own ES */
     if( !p_sys->b_placeholder )

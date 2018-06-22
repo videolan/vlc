@@ -287,7 +287,7 @@ static int SapSetup( sout_stream_t *p_stream );
 static int FileSetup( sout_stream_t *p_stream );
 static int HttpSetup( sout_stream_t *p_stream, const vlc_url_t * );
 
-static mtime_t rtp_init_ts( const vod_media_t *p_media,
+static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session );
 
 typedef struct
@@ -311,9 +311,9 @@ typedef struct
     rtsp_stream_t *rtsp;
 
     /* RTSP NPT and timestamp computations */
-    mtime_t      i_npt_zero;    /* when NPT=0 packet is sent */
-    mtime_t      i_pts_zero;    /* predicts PTS of NPT=0 packet */
-    mtime_t      i_pts_offset;  /* matches actual PTS to prediction */
+    vlc_tick_t   i_npt_zero;    /* when NPT=0 packet is sent */
+    vlc_tick_t   i_pts_zero;    /* predicts PTS of NPT=0 packet */
+    vlc_tick_t   i_pts_offset;  /* matches actual PTS to prediction */
     vlc_mutex_t  lock_ts;
 
     /* */
@@ -382,7 +382,7 @@ struct sout_stream_id_sys_t
     } listen;
 
     block_fifo_t     *p_fifo;
-    mtime_t           i_caching;
+    vlc_tick_t        i_caching;
 };
 
 /*****************************************************************************
@@ -936,7 +936,7 @@ rtp_set_ptime (sout_stream_id_sys_t *id, unsigned ptime_ms, size_t bytes)
         id->i_mtu = 12 + (((id->i_mtu - 12) / bytes) * bytes);
 }
 
-uint32_t rtp_compute_ts( unsigned i_clock_rate, mtime_t i_pts )
+uint32_t rtp_compute_ts( unsigned i_clock_rate, vlc_tick_t i_pts )
 {
     /* This is an overflow-proof way of doing:
      * return i_pts * (int64_t)i_clock_rate / CLOCK_FREQ;
@@ -1397,7 +1397,7 @@ static void* ThreadSend( void *data )
 # define EWOULDBLOCK  WSAEWOULDBLOCK
 #endif
     sout_stream_id_sys_t *id = data;
-    mtime_t i_caching = id->i_caching;
+    vlc_tick_t i_caching = id->i_caching;
 
     for (;;)
     {
@@ -1554,7 +1554,7 @@ uint16_t rtp_get_seq( sout_stream_id_sys_t *id )
  * feature). In the VoD case, this function is called independently
  * from several parts of the code, so we need to always return the same
  * value. */
-static mtime_t rtp_init_ts( const vod_media_t *p_media,
+static vlc_tick_t rtp_init_ts( const vod_media_t *p_media,
                             const char *psz_vod_session )
 {
     if (p_media == NULL || psz_vod_session == NULL)
@@ -1575,7 +1575,7 @@ static mtime_t rtp_init_ts( const vod_media_t *p_media,
  * Also return the NPT corresponding to this timestamp. If the stream
  * output is not started, the initial timestamp that will be used with
  * the first packets for NPT=0 is returned instead. */
-mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
+vlc_tick_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *id,
                     const vod_media_t *p_media, const char *psz_vod_session,
                     int64_t *p_npt )
 {
@@ -1589,7 +1589,7 @@ mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
         return rtp_init_ts(p_media, psz_vod_session);
 
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    mtime_t i_npt_zero;
+    vlc_tick_t i_npt_zero;
     vlc_mutex_lock( &p_sys->lock_ts );
     i_npt_zero = p_sys->i_npt_zero;
     vlc_mutex_unlock( &p_sys->lock_ts );
@@ -1597,7 +1597,7 @@ mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
     if( i_npt_zero == VLC_TS_INVALID )
         return p_sys->i_pts_zero;
 
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     if( now < i_npt_zero )
         return p_sys->i_pts_zero;
 
@@ -1609,7 +1609,7 @@ mtime_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
 }
 
 void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
-                           bool b_m_bit, mtime_t i_pts )
+                           bool b_m_bit, vlc_tick_t i_pts )
 {
     if( !id->b_ts_init )
     {
@@ -1718,7 +1718,7 @@ static ssize_t AccessOutGrabberWriteBuffer( sout_stream_t *p_stream,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = p_sys->es[0];
 
-    mtime_t  i_dts = p_buffer->i_dts;
+    vlc_tick_t  i_dts = p_buffer->i_dts;
 
     uint8_t         *p_data = p_buffer->p_buffer;
     size_t          i_data  = p_buffer->i_buffer;

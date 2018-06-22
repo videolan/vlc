@@ -34,7 +34,7 @@ typedef struct
 {
     int fd;
     vlc_v4l2_ctrl_t *controls;
-    mtime_t start;
+    vlc_tick_t start;
 } demux_sys_t;
 
 static int RadioControl (demux_t *demux, int query, va_list args)

@@ -59,7 +59,7 @@ typedef struct
      */
     date_t          end_date;
 
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 
     int i_frame_size, i_free_frame_size;
     unsigned int i_channels_conf, i_chan_mode, i_channels;

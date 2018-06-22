@@ -543,7 +543,7 @@ out:
 }
 
 static void vd_prepare(vout_display_t *vd, picture_t *picture,
-                       subpicture_t *subpicture, mtime_t date)
+                       subpicture_t *subpicture, vlc_tick_t date)
 {
     vd_manage(vd);
     VLC_UNUSED(date);

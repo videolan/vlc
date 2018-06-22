@@ -87,7 +87,7 @@ typedef struct
     soxr_t  last_soxr;
     double  f_fixed_ratio;
     size_t  i_last_olen;
-    mtime_t i_last_pts;
+    vlc_tick_t i_last_pts;
 } filter_sys_t;
 
 static block_t *Resample( filter_t *, block_t * );
@@ -290,7 +290,7 @@ static block_t *
 Resample( filter_t *p_filter, block_t *p_in )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
-    const mtime_t i_pts = p_in->i_pts;
+    const vlc_tick_t i_pts = p_in->i_pts;
 
     if( p_sys->vr_soxr )
     {

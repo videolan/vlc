@@ -178,30 +178,30 @@ struct demux_cc
                                          cc_input_arg { false } );
     }
 
-    void setPauseState(bool paused, mtime_t delay)
+    void setPauseState(bool paused, vlc_tick_t delay)
     {
         p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused, delay );
     }
 
-    mtime_t getCCTime()
+    vlc_tick_t getCCTime()
     {
-        mtime_t system, delay;
+        vlc_tick_t system, delay;
         if( es_out_ControlGetPcrSystem( p_demux->p_next->out, &system, &delay ) )
             return VLC_TS_INVALID;
 
-        mtime_t cc_time = p_renderer->pf_get_time( p_renderer->p_opaque );
+        vlc_tick_t cc_time = p_renderer->pf_get_time( p_renderer->p_opaque );
         if( cc_time != VLC_TS_INVALID )
             return cc_time - system + m_pause_delay;
         return VLC_TS_INVALID;
     }
 
-    mtime_t getTime()
+    vlc_tick_t getTime()
     {
         if( m_start_time < 0 )
             return -1;
 
         int64_t time = m_start_time;
-        mtime_t cc_time = getCCTime();
+        vlc_tick_t cc_time = getCCTime();
 
         if( cc_time != VLC_TS_INVALID )
             time += cc_time;
@@ -220,7 +220,7 @@ struct demux_cc
             return -1;
     }
 
-    void seekBack( mtime_t time, double pos )
+    void seekBack( vlc_tick_t time, double pos )
     {
         es_out_Control( p_demux->p_next->out, ES_OUT_RESET_PCR );
 
@@ -318,7 +318,7 @@ struct demux_cc
         }
         case DEMUX_GET_TIME:
         {
-            mtime_t time = getTime();
+            vlc_tick_t time = getTime();
             if( time >= 0 )
             {
                 *va_arg(args, int64_t *) = time;
@@ -370,7 +370,7 @@ struct demux_cc
         {
             m_pause_delay = m_pause_date = VLC_TS_INVALID;
 
-            mtime_t time = va_arg( args, int64_t );
+            vlc_tick_t time = va_arg( args, int64_t );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_TIME, time, false );
             if( ret != VLC_SUCCESS )
@@ -442,16 +442,16 @@ struct demux_cc
 protected:
     demux_t     * const p_demux;
     chromecast_common  * p_renderer;
-    mtime_t       m_length;
+    vlc_tick_t    m_length;
     bool          m_can_seek;
     bool          m_enabled;
     bool          m_demux_eof;
     double        m_start_pos;
     double        m_last_pos;
-    mtime_t       m_start_time;
-    mtime_t       m_last_time;
-    mtime_t       m_pause_date;
-    mtime_t       m_pause_delay;
+    vlc_tick_t    m_start_time;
+    vlc_tick_t    m_last_time;
+    vlc_tick_t    m_pause_date;
+    vlc_tick_t    m_pause_delay;
 };
 
 static void on_paused_changed_cb( void *data, bool paused )

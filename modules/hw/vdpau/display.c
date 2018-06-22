@@ -240,7 +240,7 @@ out:/* Destroy GPU surface */
 }
 
 static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
-                  mtime_t date)
+                  vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *p_sys = pic->p_sys;
@@ -260,7 +260,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
             RenderRegion(vd, surface, subpic, r);
 
     /* Compute picture presentation time */
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     VdpTime pts;
 
     err = vdp_presentation_queue_get_time(sys->vdp, sys->queue, &pts);
@@ -273,7 +273,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
         return;
     }
 
-    mtime_t delay = date - now;
+    vlc_tick_t delay = date - now;
     if (delay < 0)
         delay = 0; /* core bug: date is not updated during pause */
     if (unlikely(delay > CLOCK_FREQ))

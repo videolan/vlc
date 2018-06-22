@@ -60,7 +60,7 @@ vlc_module_end ()
 typedef struct
 {
     sout_description_data_t *data;
-    mtime_t i_stream_start;
+    vlc_tick_t i_stream_start;
 } sout_stream_sys_t;
 
 /*****************************************************************************

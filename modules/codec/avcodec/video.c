@@ -91,7 +91,7 @@ typedef struct
     /* how many decoded frames are late */
     int     i_late_frames;
     int64_t i_last_output_frame;
-    mtime_t i_last_late_delay;
+    vlc_tick_t i_last_late_delay;
 
     /* for direct rendering */
     bool        b_direct_rendering;
@@ -756,11 +756,11 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
 }
 
 static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
-                                     mtime_t current_time, mtime_t i_pts, int64_t i_fnum )
+                                     vlc_tick_t current_time, vlc_tick_t i_pts, int64_t i_fnum )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
    /* Update frame late count (except when doing preroll) */
-   mtime_t i_display_date = VLC_TS_INVALID;
+   vlc_tick_t i_display_date = VLC_TS_INVALID;
    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
@@ -1140,12 +1140,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         /* Compute the PTS */
 #ifdef FF_API_PKT_PTS
-        mtime_t i_pts = frame->pts;
+        vlc_tick_t i_pts = frame->pts;
 
         if (i_pts == AV_NOPTS_VALUE )
             i_pts = frame->pkt_dts;
 #else
-        mtime_t i_pts = frame->pkt_pts;
+        vlc_tick_t i_pts = frame->pkt_pts;
 #endif
         if( i_pts == AV_NOPTS_VALUE )
             i_pts = date_Get( &p_sys->pts );

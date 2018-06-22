@@ -61,7 +61,7 @@ static void vlc_clock_setup_once (void)
     vlc_clock_prec = (res.tv_nsec + 500) / 1000;
 }
 
-static struct timespec mtime_to_ts (mtime_t date)
+static struct timespec mtime_to_ts (vlc_tick_t date)
 {
     lldiv_t d = lldiv (date, CLOCK_FREQ);
     struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
@@ -225,7 +225,7 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 }
 
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
-                        mtime_t deadline)
+                        vlc_tick_t deadline)
 {
     struct timespec ts = mtime_to_ts (deadline);
     int val = pthread_cond_timedwait (p_condvar, p_mutex, &ts);
@@ -578,7 +578,7 @@ void vlc_control_cancel (int cmd, ...)
     vlc_assert_unreachable ();
 }
 
-mtime_t mdate (void)
+vlc_tick_t mdate (void)
 {
     struct timespec ts;
 
@@ -590,7 +590,7 @@ mtime_t mdate (void)
 }
 
 #undef mwait
-void mwait (mtime_t deadline)
+void mwait (vlc_tick_t deadline)
 {
     static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
 
@@ -605,7 +605,7 @@ void mwait (mtime_t deadline)
 }
 
 #undef msleep
-void msleep (mtime_t delay)
+void msleep (vlc_tick_t delay)
 {
     struct timespec ts = mtime_to_ts (delay);
 

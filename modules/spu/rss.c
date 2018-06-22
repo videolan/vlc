@@ -52,7 +52,7 @@
  *****************************************************************************/
 static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
-static subpicture_t *Filter( filter_t *, mtime_t );
+static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
 static struct rss_feed_t *FetchRSS( filter_t * );
 static void FreeRSS( struct rss_feed_t *, int );
@@ -104,14 +104,14 @@ typedef struct
 
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
-    mtime_t i_speed;
+    vlc_tick_t i_speed;
     int i_length;
 
     char *psz_marquee;    /* marquee string */
 
     text_style_t *p_style; /* font control */
 
-    mtime_t last_date;
+    vlc_tick_t last_date;
 
     int i_feeds;
     rss_feed_t *p_feeds;
@@ -304,7 +304,7 @@ static int CreateFilter( vlc_object_t *p_this )
     /* Misc init */
     vlc_mutex_init( &p_sys->lock );
     p_filter->pf_sub_source = Filter;
-    p_sys->last_date = (mtime_t)0;
+    p_sys->last_date = (vlc_tick_t)0;
     p_sys->b_fetched = false;
 
     /* Create and arm the timer */
@@ -314,7 +314,7 @@ static int CreateFilter( vlc_object_t *p_this )
         goto error;
     }
     vlc_timer_schedule( p_sys->timer, false, 1,
-                        (mtime_t)(i_ttl)*CLOCK_FREQ );
+                        (vlc_tick_t)(i_ttl)*CLOCK_FREQ );
 
     free( psz_urls );
     return VLC_SUCCESS;
@@ -349,7 +349,7 @@ static void DestroyFilter( vlc_object_t *p_this )
  ****************************************************************************
  * This function outputs subpictures at regular time intervals.
  ****************************************************************************/
-static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
+static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;

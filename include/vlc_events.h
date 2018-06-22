@@ -142,7 +142,7 @@ typedef struct vlc_event_t
         } input_item_subitem_tree_added;
         struct vlc_input_item_duration_changed
         {
-            mtime_t new_duration;
+            vlc_tick_t new_duration;
         } input_item_duration_changed;
         struct vlc_input_item_preparsed_changed
         {

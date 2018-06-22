@@ -127,7 +127,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
     else if( p_block->i_pts == VLC_TS_INVALID )
         p_block->i_pts = p_block->i_dts;
 
-    mtime_t i_prev_dts = date_Get( &p_sys->date );
+    vlc_tick_t i_prev_dts = date_Get( &p_sys->date );
     if( p_block->i_dts != VLC_TS_INVALID )
     {
         date_Set( &p_sys->date, p_block->i_dts );

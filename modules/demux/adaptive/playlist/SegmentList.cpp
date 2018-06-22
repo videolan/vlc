@@ -100,7 +100,7 @@ void SegmentList::mergeWith(SegmentList *updated, bool b_restamp)
     updated->segments.clear();
 }
 
-void SegmentList::pruneByPlaybackTime(mtime_t time)
+void SegmentList::pruneByPlaybackTime(vlc_tick_t time)
 {
     uint64_t num;
     const Timescale timescale = inheritTimescale();
@@ -140,7 +140,7 @@ bool SegmentList::getSegmentNumberByScaledTime(stime_t time, uint64_t *ret) cons
 }
 
 bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                         mtime_t *time, mtime_t *dur) const
+                                                         vlc_tick_t *time, vlc_tick_t *dur) const
 {
     *time = *dur = VLC_TS_INVALID;
 

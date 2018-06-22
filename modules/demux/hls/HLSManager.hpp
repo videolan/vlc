@@ -40,7 +40,7 @@ namespace hls
             static bool isHTTPLiveStreaming(stream_t *);
 
         protected:
-            virtual mtime_t getFirstPlaybackTime() const;
+            virtual vlc_tick_t getFirstPlaybackTime() const;
     };
 
 }

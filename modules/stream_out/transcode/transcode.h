@@ -53,7 +53,7 @@ typedef struct
     /* Sync */
     bool            b_master_sync;
     /* i_master drift is how much audio buffer is ahead of calculated pts */
-    mtime_t         i_master_drift;
+    vlc_tick_t      i_master_drift;
 } sout_stream_sys_t;
 
 struct aout_filters;

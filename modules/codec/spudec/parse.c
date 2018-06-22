@@ -65,7 +65,7 @@ typedef struct
 } subpicture_data_t;
 
 static int  ParseControlSeq( decoder_t *, subpicture_t *, subpicture_data_t *,
-                             spu_properties_t *, mtime_t i_pts );
+                             spu_properties_t *, vlc_tick_t i_pts );
 static int  ParseRLE       ( decoder_t *, subpicture_data_t *,
                              const spu_properties_t * );
 static void Render         ( decoder_t *, subpicture_t *, subpicture_data_t *,
@@ -156,7 +156,7 @@ subpicture_t * ParsePacket( decoder_t *p_dec )
  * subtitles format, see http://sam.zoy.org/doc/dvd/subtitles/index.html
  *****************************************************************************/
 static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
-                            subpicture_data_t *p_spu_data, spu_properties_t *p_spu_properties, mtime_t i_pts )
+                            subpicture_data_t *p_spu_data, spu_properties_t *p_spu_properties, vlc_tick_t i_pts )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
@@ -168,7 +168,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
 
     /* Command and date */
     uint8_t i_command = SPU_CMD_END;
-    mtime_t date = 0;
+    vlc_tick_t date = 0;
     bool b_cmd_offset = false;
     bool b_cmd_alpha = false;
     subpicture_data_t spu_data_cmd;
@@ -215,7 +215,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
             b_cmd_offset = false;
             b_cmd_alpha = false;
             /* Get the control sequence date */
-            date = (mtime_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
+            date = (vlc_tick_t)GetWBE( &p_sys->buffer[i_index] ) * 11000;
 
             /* Next offset */
             i_cur_seq = i_index;
@@ -425,7 +425,7 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
     if( p_spu->i_stop <= p_spu->i_start && !p_spu->b_ephemer )
     {
         /* This subtitle will live for 5 seconds or until the next subtitle */
-        p_spu->i_stop = p_spu->i_start + (mtime_t)500 * 11000;
+        p_spu->i_stop = p_spu->i_start + (vlc_tick_t)500 * 11000;
         p_spu->b_ephemer = true;
     }
 

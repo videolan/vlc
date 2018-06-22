@@ -211,7 +211,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 }
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
-                    mtime_t date)
+                    vlc_tick_t date)
 {
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;

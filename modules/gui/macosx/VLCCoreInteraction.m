@@ -60,7 +60,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 @interface VLCCoreInteraction ()
 {
     int i_currentPlaybackRate;
-    mtime_t timeA, timeB;
+    vlc_tick_t timeA, timeB;
 
     float f_maxVolume;
 
@@ -359,7 +359,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     int64_t i_interval = var_InheritInteger( p_input, p_value );
     if (i_interval > 0) {
-        mtime_t val = CLOCK_FREQ * i_interval;
+        vlc_tick_t val = CLOCK_FREQ * i_interval;
         if (!b_value)
             val = val * -1;
         var_SetInteger( p_input, "time-offset", val );
@@ -531,7 +531,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (timeB) {
         input_thread_t * p_input = pl_CurrentInput(getIntf());
         if (p_input) {
-            mtime_t currentTime = var_GetInteger(p_input, "time");
+            vlc_tick_t currentTime = var_GetInteger(p_input, "time");
             if ( currentTime >= timeB || currentTime < timeA)
                 var_SetInteger(p_input, "time", timeA);
             vlc_object_release(p_input);
@@ -539,7 +539,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 }
 
-- (void)jumpToTime:(mtime_t)time
+- (void)jumpToTime:(vlc_tick_t)time
 {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     if (p_input) {

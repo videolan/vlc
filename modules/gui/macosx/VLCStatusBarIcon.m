@@ -250,7 +250,7 @@
         remainingTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:input negative:YES];
 
         /* Check item duration */
-        mtime_t dur = input_item_GetDuration(input_GetItem(input));
+        vlc_tick_t dur = input_item_GetDuration(input_GetItem(input));
 
         if (dur == -1) {
             /* Unknown duration, possibly due to buffering */

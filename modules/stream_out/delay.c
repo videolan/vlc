@@ -80,7 +80,7 @@ typedef struct
 {
     void *id;
     int i_id;
-    mtime_t i_delay;
+    vlc_tick_t i_delay;
 } sout_stream_sys_t;
 
 /*****************************************************************************

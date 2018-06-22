@@ -562,15 +562,15 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_PCR_SYSTEM:
         {
-            mtime_t *pi_system = va_arg( args, mtime_t * );
-            mtime_t *pi_delay  = va_arg( args, mtime_t * );
+            vlc_tick_t *pi_system = va_arg( args, vlc_tick_t * );
+            vlc_tick_t *pi_delay  = va_arg( args, vlc_tick_t * );
             return es_out_ControlGetPcrSystem( priv->p_es_out_display, pi_system, pi_delay );
         }
 
         case INPUT_MODIFY_PCR_SYSTEM:
         {
             bool b_absolute = va_arg( args, int );
-            mtime_t i_system = va_arg( args, mtime_t );
+            vlc_tick_t i_system = va_arg( args, vlc_tick_t );
             return es_out_ControlModifyPcrSystem( priv->p_es_out_display, b_absolute, i_system );
         }
 

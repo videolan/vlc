@@ -65,7 +65,7 @@ typedef struct
     date_t  end_date;
     bool    b_date_set;
 
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     bool    b_discontinuity;
 
     vlc_dts_header_t dts;

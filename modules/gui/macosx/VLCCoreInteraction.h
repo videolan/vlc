@@ -56,7 +56,7 @@
 - (void)backwardMedium;
 - (void)forwardLong;
 - (void)backwardLong;
-- (void)jumpToTime:(mtime_t)time;
+- (void)jumpToTime:(vlc_tick_t)time;
 
 - (void)repeatOne;
 - (void)repeatAll;

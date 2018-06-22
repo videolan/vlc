@@ -61,13 +61,13 @@ namespace adaptive
 
         void setLanguage(const std::string &);
         void setDescription(const std::string &);
-        mtime_t getPCR() const;
-        mtime_t getMinAheadTime() const;
-        mtime_t getFirstDTS() const;
+        vlc_tick_t getPCR() const;
+        vlc_tick_t getMinAheadTime() const;
+        vlc_tick_t getFirstDTS() const;
         int esCount() const;
         bool isSelected() const;
         bool canActivate() const;
-        virtual bool reactivate(mtime_t);
+        virtual bool reactivate(vlc_tick_t);
         void setDisabled(bool);
         bool isDisabled() const;
         typedef enum {
@@ -83,13 +83,13 @@ namespace adaptive
             buffering_ongoing,
             buffering_lessthanmin,
         } buffering_status;
-        buffering_status bufferize(mtime_t, mtime_t, mtime_t);
+        buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
         buffering_status getLastBufferStatus() const;
-        mtime_t getDemuxedAmount() const;
-        status dequeue(mtime_t, mtime_t *);
+        vlc_tick_t getDemuxedAmount() const;
+        status dequeue(vlc_tick_t, vlc_tick_t *);
         bool decodersDrained();
-        virtual bool setPosition(mtime_t, bool);
-        mtime_t getPlaybackTime() const;
+        virtual bool setPosition(vlc_tick_t, bool);
+        vlc_tick_t getPlaybackTime() const;
         void runUpdates();
 
         /* Used by demuxers fake streams */
@@ -102,7 +102,7 @@ namespace adaptive
 
     protected:
         bool seekAble() const;
-        virtual void setTimeOffset(mtime_t);
+        virtual void setTimeOffset(vlc_tick_t);
         virtual block_t *checkBlock(block_t *, bool) = 0;
         AbstractDemuxer * createDemux(const StreamFormat &);
         virtual AbstractDemuxer * newDemux(demux_t *, const StreamFormat &,
@@ -134,7 +134,7 @@ namespace adaptive
         vlc_mutex_t lock; /* lock for everything accessed by dequeuing */
 
     private:
-        buffering_status doBufferize(mtime_t, mtime_t, mtime_t);
+        buffering_status doBufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
         buffering_status last_buffer_status;
         bool dead;
         bool disabled;

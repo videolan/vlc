@@ -59,8 +59,8 @@ typedef struct
     unsigned i_size;
     bool b_au_start;
     bool b_au_end;
-    mtime_t i_dts;
-    mtime_t i_pts;
+    vlc_tick_t i_dts;
+    vlc_tick_t i_pts;
 } sl_header_data;
 
 typedef struct es_mpeg4_descriptor_t es_mpeg4_descriptor_t;

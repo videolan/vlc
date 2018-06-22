@@ -200,7 +200,7 @@ void PLSelector::updateTotalDuration( PLSelItem* item, const char* prefix )
 
     /* Get the duration of the playlist item */
     playlist_Lock( THEPL );
-    mtime_t mt_duration = playlist_GetNodeDuration( node );
+    vlc_tick_t mt_duration = playlist_GetNodeDuration( node );
     playlist_Unlock( THEPL );
 
     /* Formatting time */

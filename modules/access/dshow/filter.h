@@ -31,7 +31,7 @@
 struct VLCMediaSample
 {
     ComPtr<IMediaSample> p_sample;
-    mtime_t i_timestamp;
+    vlc_tick_t i_timestamp;
 };
 
 /* */

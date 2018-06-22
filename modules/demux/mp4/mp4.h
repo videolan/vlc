@@ -169,8 +169,8 @@ typedef struct
 
     /* ASF packets handling */
     const MP4_Box_t *p_asf;
-    mtime_t          i_dts_backup;
-    mtime_t          i_pts_backup;
+    vlc_tick_t       i_dts_backup;
+    vlc_tick_t       i_pts_backup;
     asf_track_info_t asfinfo;
 } mp4_track_t;
 

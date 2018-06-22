@@ -560,9 +560,9 @@ int SetupFormat (vlc_object_t *obj, int fd, uint32_t fourcc,
     return 0;
 }
 
-mtime_t GetBufferPTS (const struct v4l2_buffer *buf)
+vlc_tick_t GetBufferPTS (const struct v4l2_buffer *buf)
 {
-    mtime_t pts;
+    vlc_tick_t pts;
 
     switch (buf->flags & V4L2_BUF_FLAG_TIMESTAMP_MASK)
     {

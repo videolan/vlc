@@ -112,7 +112,7 @@ typedef struct
 
     float f_fps;
     int i_frame_interval;
-    mtime_t i_starttime;
+    vlc_tick_t i_starttime;
 
     es_out_id_t *es;
 
@@ -340,7 +340,7 @@ static void *DemuxThread( void *p_data )
     demux_t *p_demux = (demux_t *) p_data;
     demux_sys_t *p_sys = p_demux->p_sys;
     p_sys->i_starttime = mdate();
-    mtime_t i_next_frame_date = mdate() + p_sys->i_frame_interval;
+    vlc_tick_t i_next_frame_date = mdate() + p_sys->i_frame_interval;
     int i_ret;
 
     for(;;)

@@ -340,7 +340,7 @@ ssize_t BDAOutput::Pop(void *buf, size_t len, int ms)
 
     vlc_mutex_locker l( &lock );
 
-    mtime_t i_deadline = mdate() + ms * 1000;
+    vlc_tick_t i_deadline = mdate() + ms * 1000;
     while( !p_first )
     {
         if( vlc_cond_timedwait( &wait, &lock, i_deadline ) )

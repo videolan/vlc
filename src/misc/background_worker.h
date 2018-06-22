@@ -27,7 +27,7 @@ struct background_worker_config {
      * a positive value denotes the maximum number of milliseconds a task can
      * run before \ref pf_stop is called to kill it.
      **/
-    mtime_t default_timeout;
+    vlc_tick_t default_timeout;
 
     /**
      * Release an entity

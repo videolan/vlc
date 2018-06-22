@@ -70,7 +70,7 @@ typedef struct
     /*
      * Common properties
      */
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
 } decoder_sys_t;
 
 /*****************************************************************************

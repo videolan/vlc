@@ -290,10 +290,10 @@ out:
 # define SetupChannels(obj, pcm, mask, tab) (0)
 #endif
 
-static int TimeGet (audio_output_t *aout, mtime_t *);
-static void Play(audio_output_t *, block_t *, mtime_t);
-static void Pause (audio_output_t *, bool, mtime_t);
-static void PauseDummy (audio_output_t *, bool, mtime_t);
+static int TimeGet (audio_output_t *aout, vlc_tick_t *);
+static void Play(audio_output_t *, block_t *, vlc_tick_t);
+static void Pause (audio_output_t *, bool, vlc_tick_t);
+static void PauseDummy (audio_output_t *, bool, vlc_tick_t);
 static void Flush (audio_output_t *, bool);
 
 /** Initializes an ALSA playback stream */
@@ -629,7 +629,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
+static int TimeGet (audio_output_t *aout, vlc_tick_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
     snd_pcm_sframes_t frames;
@@ -647,7 +647,7 @@ static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
 /**
  * Queues one audio buffer to the hardware.
  */
-static void Play(audio_output_t *aout, block_t *block, mtime_t date)
+static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -693,7 +693,7 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
 /**
  * Pauses/resumes the audio playback.
  */
-static void Pause (audio_output_t *aout, bool pause, mtime_t date)
+static void Pause (audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     aout_sys_t *p_sys = aout->sys;
     snd_pcm_t *pcm = p_sys->pcm;
@@ -703,7 +703,7 @@ static void Pause (audio_output_t *aout, bool pause, mtime_t date)
         PauseDummy (aout, pause, date);
 }
 
-static void PauseDummy (audio_output_t *aout, bool pause, mtime_t date)
+static void PauseDummy (audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     aout_sys_t *p_sys = aout->sys;
     snd_pcm_t *pcm = p_sys->pcm;

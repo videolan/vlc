@@ -252,7 +252,7 @@ void vlc_pa_rttime_free (pa_threaded_mainloop *mainloop, pa_time_event *e)
  * Gets latency of a PulseAudio stream.
  * \return the latency or VLC_TS_INVALID on error.
  */
-mtime_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
+vlc_tick_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
 {
     /* NOTE: pa_stream_get_latency() will report 0 rather than negative latency
      * when the write index of a playback stream is behind its read index.

@@ -40,7 +40,7 @@ namespace adaptive
                 virtual ~RateBasedAdaptationLogic   ();
 
                 BaseRepresentation *getNextRepresentation(BaseAdaptationSet *, BaseRepresentation *);
-                virtual void updateDownloadRate(const ID &, size_t, mtime_t); /* reimpl */
+                virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t); /* reimpl */
                 virtual void trackerEvent(const SegmentTrackerEvent &); /* reimpl */
 
             private:
@@ -52,7 +52,7 @@ namespace adaptive
                 MovingAverage<size_t>   average;
 
                 size_t                  dlsize;
-                mtime_t                 dllength;
+                vlc_tick_t              dllength;
 
                 vlc_mutex_t             lock;
         };

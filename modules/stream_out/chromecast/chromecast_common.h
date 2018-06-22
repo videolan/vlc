@@ -60,13 +60,13 @@ typedef struct
 
     void (*pf_set_demux_enabled)(void *, bool enabled, on_paused_changed_itf, void *);
 
-    mtime_t (*pf_get_time)(void*);
+    vlc_tick_t (*pf_get_time)(void*);
 
     int (*pf_pace)(void*);
 
     void (*pf_send_input_event)(void*, enum cc_input_event, union cc_input_arg);
 
-    void (*pf_set_pause_state)(void*, bool paused, mtime_t delay);
+    void (*pf_set_pause_state)(void*, bool paused, vlc_tick_t delay);
 
     void (*pf_set_meta)(void*, vlc_meta_t *p_meta);
 

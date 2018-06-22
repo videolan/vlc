@@ -164,7 +164,7 @@ std::size_t SegmentInformation::getAllSegments(std::vector<ISegment *> &retSegme
 
 uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
 {
-    const mtime_t i_max_buffering = getPlaylist()->getMaxBuffering() +
+    const vlc_tick_t i_max_buffering = getPlaylist()->getMaxBuffering() +
                                     /* FIXME: add dynamic pts-delay */ CLOCK_FREQ;
 
     /* Try to never buffer up to really end */
@@ -198,7 +198,7 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
         /* Else compute, current time and timeshiftdepth based */
         else if( mediaSegmentTemplate->duration.Get() )
         {
-            mtime_t i_delay = getPlaylist()->suggestedPresentationDelay.Get();
+            vlc_tick_t i_delay = getPlaylist()->suggestedPresentationDelay.Get();
 
             if( i_delay == 0 || i_delay > getPlaylist()->timeShiftBufferDepth.Get() )
                  i_delay = getPlaylist()->timeShiftBufferDepth.Get();
@@ -340,7 +340,7 @@ ISegment * SegmentInformation::getSegment(SegmentInfoType type, uint64_t pos) co
     return NULL;
 }
 
-bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) const
+bool SegmentInformation::getSegmentNumberByTime(vlc_tick_t time, uint64_t *ret) const
 {
     if( mediaSegmentTemplate )
     {
@@ -391,7 +391,7 @@ bool SegmentInformation::getSegmentNumberByTime(mtime_t time, uint64_t *ret) con
 }
 
 bool SegmentInformation::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
-                                                                mtime_t *time, mtime_t *duration) const
+                                                                vlc_tick_t *time, vlc_tick_t *duration) const
 {
     SegmentList *segList;
     MediaSegmentTemplate *mediaTemplate;
@@ -445,7 +445,7 @@ SegmentInformation * SegmentInformation::getChildByID(const adaptive::ID &id)
     return NULL;
 }
 
-void SegmentInformation::mergeWith(SegmentInformation *updated, mtime_t prunetime)
+void SegmentInformation::mergeWith(SegmentInformation *updated, vlc_tick_t prunetime)
 {
     /* Support Segment List for now */
     if(segmentList && updated->segmentList)
@@ -476,7 +476,7 @@ void SegmentInformation::mergeWithTimeline(SegmentTimeline *updated)
     }
 }
 
-void SegmentInformation::pruneByPlaybackTime(mtime_t time)
+void SegmentInformation::pruneByPlaybackTime(vlc_tick_t time)
 {
     if(segmentList)
         segmentList->pruneByPlaybackTime(time);
@@ -502,7 +502,7 @@ void SegmentInformation::pruneBySegmentNumber(uint64_t num)
 
 uint64_t SegmentInformation::translateSegmentNumber(uint64_t num, const SegmentInformation *from) const
 {
-    mtime_t time, duration;
+    vlc_tick_t time, duration;
     if( from->getPlaybackTimeDurationBySegmentNumber(num, &time, &duration) )
         getSegmentNumberByTime(time, &num);
     return num;
@@ -516,7 +516,7 @@ SegmentInformation::SwitchPolicy SegmentInformation::getSwitchPolicy() const
         return switchpolicy;
 }
 
-mtime_t SegmentInformation::getPeriodStart() const
+vlc_tick_t SegmentInformation::getPeriodStart() const
 {
     if(parent)
         return parent->getPeriodStart();

@@ -539,7 +539,7 @@ VLC_API void vlc_cond_wait(vlc_cond_t *cond, vlc_mutex_t *mutex);
  * \return 0 if the condition was signaled, an error code in case of timeout.
  */
 VLC_API int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               mtime_t deadline);
+                               vlc_tick_t deadline);
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *, vlc_mutex_t *, time_t);
 
@@ -690,7 +690,7 @@ void vlc_addr_wait(void *addr, unsigned val);
  * \return true if the function was woken up before the time-out,
  * false if the time-out elapsed.
  */
-bool vlc_addr_timedwait(void *addr, unsigned val, mtime_t delay);
+bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay);
 
 /**
  * Wakes up one thread on an address.
@@ -842,7 +842,7 @@ VLC_API unsigned long vlc_thread_id(void) VLC_USED;
  *
  * \return a timestamp in microseconds.
  */
-VLC_API mtime_t mdate(void);
+VLC_API vlc_tick_t mdate(void);
 
 /**
  * Waits until a deadline.
@@ -852,7 +852,7 @@ VLC_API mtime_t mdate(void);
  * \note The deadline may be exceeded due to OS scheduling.
  * \note This function is a cancellation point.
  */
-VLC_API void mwait(mtime_t deadline);
+VLC_API void mwait(vlc_tick_t deadline);
 
 /**
  * Waits for an interval of time.
@@ -862,7 +862,7 @@ VLC_API void mwait(mtime_t deadline);
  * \note The delay may be exceeded due to OS scheduling.
  * \note This function is a cancellation point.
  */
-VLC_API void msleep(mtime_t delay);
+VLC_API void msleep(vlc_tick_t delay);
 
 #define VLC_HARD_MIN_SLEEP  (CLOCK_FREQ/100) /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP  (9*CLOCK_FREQ)   /* 9 seconds */
@@ -877,7 +877,7 @@ static
 __attribute__((unused))
 __attribute__((noinline))
 __attribute__((error("sorry, cannot sleep for such short a time")))
-mtime_t impossible_delay( mtime_t delay )
+vlc_tick_t impossible_delay( vlc_tick_t delay )
 {
     (void) delay;
     return VLC_HARD_MIN_SLEEP;
@@ -887,7 +887,7 @@ static
 __attribute__((unused))
 __attribute__((noinline))
 __attribute__((warning("use proper event handling instead of short delay")))
-mtime_t harmful_delay( mtime_t delay )
+vlc_tick_t harmful_delay( vlc_tick_t delay )
 {
     return delay;
 }
@@ -905,7 +905,7 @@ static
 __attribute__((unused))
 __attribute__((noinline))
 __attribute__((error("deadlines can not be constant")))
-mtime_t impossible_deadline( mtime_t deadline )
+vlc_tick_t impossible_deadline( vlc_tick_t deadline )
 {
     return deadline;
 }
@@ -967,7 +967,7 @@ VLC_API void vlc_timer_destroy(vlc_timer_t timer);
  *                 repetition interval.
  */
 VLC_API void vlc_timer_schedule(vlc_timer_t timer, bool absolute,
-                                mtime_t value, mtime_t interval);
+                                vlc_tick_t value, vlc_tick_t interval);
 
 /**
  * Fetches and resets the overrun counter for a timer.

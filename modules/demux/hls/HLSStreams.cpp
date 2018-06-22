@@ -47,7 +47,7 @@ HLSStream::~HLSStream()
         vlc_meta_Delete(p_meta);
 }
 
-void HLSStream::setTimeOffset(mtime_t i_offset)
+void HLSStream::setTimeOffset(vlc_tick_t i_offset)
 {
     if(i_offset >= 0)
     {
@@ -74,7 +74,7 @@ int HLSStream::ParseID3PrivTag(const uint8_t *p_payload, size_t i_payload)
     {
         if(!b_id3_timestamps_offset_set)
         {
-            const mtime_t i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
+            const vlc_tick_t i_aac_offset = GetQWBE(&p_payload[45]) * 100 / 9;
             setTimeOffset(i_aac_offset);
             b_id3_timestamps_offset_set = true;
         }

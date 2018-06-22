@@ -92,12 +92,12 @@ void date_Change( date_t *p_date, uint32_t i_divider_n, uint32_t i_divider_d )
     p_date->i_divider_den = i_divider_d;
 }
 
-mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
+vlc_tick_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
 {
     if(unlikely(p_date->date == VLC_TS_INVALID))
         return VLC_TS_INVALID;
     assert( p_date->i_divider_num != 0 );
-    mtime_t i_dividend = i_nb_samples * CLOCK_FREQ * p_date->i_divider_den;
+    vlc_tick_t i_dividend = i_nb_samples * CLOCK_FREQ * p_date->i_divider_den;
     lldiv_t d = lldiv( i_dividend, p_date->i_divider_num );
 
     p_date->date += d.quot;
@@ -114,11 +114,11 @@ mtime_t date_Increment( date_t *p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
-mtime_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
+vlc_tick_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
 {
     if(unlikely(p_date->date == VLC_TS_INVALID))
         return VLC_TS_INVALID;
-    mtime_t i_dividend = (mtime_t)i_nb_samples * CLOCK_FREQ * p_date->i_divider_den;
+    vlc_tick_t i_dividend = (vlc_tick_t)i_nb_samples * CLOCK_FREQ * p_date->i_divider_den;
     p_date->date -= i_dividend / p_date->i_divider_num;
     unsigned i_rem_adjust = i_dividend % p_date->i_divider_num;
 

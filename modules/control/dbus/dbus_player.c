@@ -129,7 +129,7 @@ DBUS_METHOD( Seek )
     input_thread_t *p_input = pl_CurrentInput( p_this );
     if( p_input && var_GetBool( p_input, "can-seek" ) )
     {
-        mtime_t i_pos = var_GetInteger( p_input, "time" ) + i_step;
+        vlc_tick_t i_pos = var_GetInteger( p_input, "time" ) + i_step;
         var_SetInteger( p_input, "time", (i_pos >= 0) ? i_pos : 0 );
     }
 

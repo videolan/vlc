@@ -46,7 +46,7 @@ typedef struct
     xml_t*          p_xml;
     xml_reader_t*   p_reader;
     es_out_id_t*    p_es;
-    mtime_t         i_next_demux_time;
+    vlc_tick_t      i_next_demux_time;
     bool            b_slave;
     bool            b_first_time;
 
@@ -233,7 +233,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             }
             break;
         case DEMUX_SET_NEXT_DEMUX_TIME:
-            p_sys->i_next_demux_time = va_arg( args, mtime_t );
+            p_sys->i_next_demux_time = va_arg( args, vlc_tick_t );
             p_sys->b_slave = true;
             return VLC_SUCCESS;
         case DEMUX_GET_LENGTH:
@@ -348,9 +348,9 @@ static int Demux( demux_t* p_demux )
     while( p_sys->times.i_current + 1 < p_sys->times.i_count &&
            tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current] ) <= p_sys->i_next_demux_time )
     {
-        const mtime_t i_playbacktime =
+        const vlc_tick_t i_playbacktime =
                 tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current] );
-        const mtime_t i_playbackendtime =
+        const vlc_tick_t i_playbackendtime =
                 tt_time_Convert( &p_sys->times.p_array[p_sys->times.i_current + 1] ) - 1;
 
         if ( !p_sys->b_slave && p_sys->b_first_time )

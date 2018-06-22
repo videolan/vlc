@@ -1461,7 +1461,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
     unsigned i_skip = 0;
     stime_t i_dts = -1;
     stime_t i_pts = -1;
-    mtime_t i_length = 0;
+    vlc_tick_t i_length = 0;
     uint8_t i_stream_id;
     bool b_pes_scrambling = false;
     const es_mpeg4_descriptor_t *p_mpeg4desc = NULL;
@@ -2171,7 +2171,7 @@ static void ProgramSetPCR( demux_t *p_demux, ts_pmt_t *p_pmt, stime_t i_pcr )
        PCR barrier, and then adapt pcr so they have valid PCR when dequeuing */
     if( p_pmt->pcr.i_current == -1 && p_pmt->pcr.b_fix_done )
     {
-        mtime_t i_mindts = VLC_TS_INVALID;
+        vlc_tick_t i_mindts = VLC_TS_INVALID;
 
         ts_pat_t *p_pat = GetPID(p_sys, 0)->u.p_pat;
         for( int i=0; i< p_pat->programs.i_size; i++ )

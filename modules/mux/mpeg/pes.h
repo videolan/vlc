@@ -38,4 +38,4 @@
 void EStoPES ( block_t **pp_pes,
                    const es_format_t *p_fmt, int i_stream_id,
                    int b_mpeg2, int b_data_alignment, int i_header_size,
-                   int i_max_pes_size, mtime_t ts_offset );
+                   int i_max_pes_size, vlc_tick_t ts_offset );

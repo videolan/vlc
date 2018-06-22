@@ -131,7 +131,7 @@ void MimeDemuxer::drain()
         demuxer->drain();
 }
 
-int MimeDemuxer::demux(mtime_t t)
+int MimeDemuxer::demux(vlc_tick_t t)
 {
     if(!demuxer)
         return VLC_DEMUXER_EOF;
@@ -202,7 +202,7 @@ void Demuxer::drain()
     while(p_demux && demux_Demux(p_demux) == VLC_DEMUXER_SUCCESS);
 }
 
-int Demuxer::demux(mtime_t)
+int Demuxer::demux(vlc_tick_t)
 {
     if(!p_demux || b_eof)
         return VLC_DEMUXER_EOF;
@@ -237,10 +237,10 @@ bool SlaveDemuxer::create()
     return false;
 }
 
-int SlaveDemuxer::demux(mtime_t nz_deadline)
+int SlaveDemuxer::demux(vlc_tick_t nz_deadline)
 {
     /* Always call with increment or buffering will get slow stuck */
-    mtime_t i_next_demux_time = VLC_TS_0 + nz_deadline + CLOCK_FREQ / 4;
+    vlc_tick_t i_next_demux_time = VLC_TS_0 + nz_deadline + CLOCK_FREQ / 4;
     if( demux_Control(p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_next_demux_time ) != VLC_SUCCESS )
     {
         b_eof = true;

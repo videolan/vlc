@@ -50,7 +50,7 @@
  *****************************************************************************/
 static int ReadDir( stream_t *, input_item_node_t * );
 
-static bool ParseTime(xml_reader_t *p_xml_reader, mtime_t* pi_result )
+static bool ParseTime(xml_reader_t *p_xml_reader, vlc_tick_t* pi_result )
 {
     assert( pi_result );
     char *psz_value = NULL;
@@ -62,7 +62,7 @@ static bool ParseTime(xml_reader_t *p_xml_reader, mtime_t* pi_result )
     int i_subfractions = -1;
 
     int i_subresult = 0;
-    mtime_t i_result = 0;
+    vlc_tick_t i_result = 0;
 
     do
     {
@@ -202,8 +202,8 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
     input_item_t *p_entry = NULL;
 
     int i_options;
-    mtime_t i_start = 0;
-    mtime_t i_duration = 0;
+    vlc_tick_t i_start = 0;
+    vlc_tick_t i_duration = 0;
     char *ppsz_options[2];
 
     do

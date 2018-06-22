@@ -54,7 +54,7 @@ void input_SendEventDead( input_thread_t *p_input )
     Trigger( p_input, INPUT_EVENT_DEAD );
 }
 
-void input_SendEventPosition( input_thread_t *p_input, double f_position, mtime_t i_time )
+void input_SendEventPosition( input_thread_t *p_input, double f_position, vlc_tick_t i_time )
 {
     vlc_value_t val;
 
@@ -68,7 +68,7 @@ void input_SendEventPosition( input_thread_t *p_input, double f_position, mtime_
 
     Trigger( p_input, INPUT_EVENT_POSITION );
 }
-void input_SendEventLength( input_thread_t *p_input, mtime_t i_length )
+void input_SendEventLength( input_thread_t *p_input, vlc_tick_t i_length )
 {
     vlc_value_t val;
 
@@ -96,7 +96,7 @@ void input_SendEventRate( input_thread_t *p_input, int i_rate )
 
     Trigger( p_input, INPUT_EVENT_RATE );
 }
-void input_SendEventAudioDelay( input_thread_t *p_input, mtime_t i_delay )
+void input_SendEventAudioDelay( input_thread_t *p_input, vlc_tick_t i_delay )
 {
     vlc_value_t val;
 
@@ -106,7 +106,7 @@ void input_SendEventAudioDelay( input_thread_t *p_input, mtime_t i_delay )
     Trigger( p_input, INPUT_EVENT_AUDIO_DELAY );
 }
 
-void input_SendEventSubtitleDelay( input_thread_t *p_input, mtime_t i_delay )
+void input_SendEventSubtitleDelay( input_thread_t *p_input, vlc_tick_t i_delay )
 {
     vlc_value_t val;
 

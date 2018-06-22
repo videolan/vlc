@@ -34,7 +34,7 @@ namespace adaptive
     class IDownloadRateObserver
     {
         public:
-            virtual void updateDownloadRate(const ID &, size_t, mtime_t) = 0;
+            virtual void updateDownloadRate(const ID &, size_t, vlc_tick_t) = 0;
             virtual ~IDownloadRateObserver(){}
     };
 }

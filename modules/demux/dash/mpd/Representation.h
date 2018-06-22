@@ -71,7 +71,7 @@ namespace dash
                 TrickModeType                       *trickModeType;
 
                 /* for contextualize() */
-                mtime_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
+                vlc_tick_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;
         };
     }
 }

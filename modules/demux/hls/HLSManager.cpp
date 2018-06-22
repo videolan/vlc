@@ -104,7 +104,7 @@ bool HLSManager::isHTTPLiveStreaming(stream_t *s)
     return false;
 }
 
-mtime_t HLSManager::getFirstPlaybackTime() const
+vlc_tick_t HLSManager::getFirstPlaybackTime() const
 {
     return demux.i_firstpcr;
 }

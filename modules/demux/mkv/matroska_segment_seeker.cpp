@@ -66,8 +66,8 @@ SegmentSeeker::add_cluster( KaxCluster * const p_cluster )
 {
     Cluster cinfo = {
         /* fpos     */ p_cluster->GetElementPosition(),
-        /* pts      */ mtime_t( p_cluster->GlobalTimecode() / INT64_C( 1000 ) ),
-        /* duration */ mtime_t( -1 ),
+        /* pts      */ vlc_tick_t( p_cluster->GlobalTimecode() / INT64_C( 1000 ) ),
+        /* duration */ vlc_tick_t( -1 ),
         /* size     */ p_cluster->IsFiniteSize()
             ? p_cluster->GetEndPosition() - p_cluster->GetElementPosition()
             : UINT64_MAX
@@ -131,7 +131,7 @@ SegmentSeeker::add_seekpoint( track_id_t track_id, Seekpoint sp )
 }
 
 SegmentSeeker::tracks_seekpoint_t
-SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end_pts, track_ids_t const& filter_tracks )
+SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, vlc_tick_t end_pts, track_ids_t const& filter_tracks )
 {
     tracks_seekpoint_t tpoints;
 
@@ -172,7 +172,7 @@ SegmentSeeker::find_greatest_seekpoints_in_range( fptr_t start_fpos, mtime_t end
 }
 
 SegmentSeeker::Seekpoint
-SegmentSeeker::get_first_seekpoint_around( mtime_t pts, seekpoints_t const& seekpoints,
+SegmentSeeker::get_first_seekpoint_around( vlc_tick_t pts, seekpoints_t const& seekpoints,
                                            Seekpoint::TrustLevel trust_level )
 {
     if( seekpoints.empty() )
@@ -200,7 +200,7 @@ SegmentSeeker::get_first_seekpoint_around( mtime_t pts, seekpoints_t const& seek
 }
 
 SegmentSeeker::seekpoint_pair_t
-SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoints )
+SegmentSeeker::get_seekpoints_around( vlc_tick_t pts, seekpoints_t const& seekpoints )
 {
     if( seekpoints.empty() )
     {
@@ -228,7 +228,7 @@ SegmentSeeker::get_seekpoints_around( mtime_t pts, seekpoints_t const& seekpoint
 }
 
 SegmentSeeker::seekpoint_pair_t
-SegmentSeeker::get_seekpoints_around( mtime_t target_pts, track_ids_t const& priority_tracks )
+SegmentSeeker::get_seekpoints_around( vlc_tick_t target_pts, track_ids_t const& priority_tracks )
 {
     seekpoint_pair_t points;
 
@@ -285,7 +285,7 @@ SegmentSeeker::get_seekpoints_around( mtime_t target_pts, track_ids_t const& pri
 }
 
 SegmentSeeker::tracks_seekpoint_t
-SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
+SegmentSeeker::get_seekpoints( matroska_segment_c& ms, vlc_tick_t target_pts,
                                track_ids_t const& priority_tracks, track_ids_t const& filter_tracks )
 {
     struct contains_all_of_t {
@@ -300,7 +300,7 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
         }
     };
 
-    for( mtime_t needle_pts = target_pts; ; )
+    for( vlc_tick_t needle_pts = target_pts; ; )
     {
         seekpoint_pair_t seekpoints = get_seekpoints_around( needle_pts, priority_tracks );
 
@@ -326,7 +326,7 @@ SegmentSeeker::get_seekpoints( matroska_segment_c& ms, mtime_t target_pts,
 }
 
 void
-SegmentSeeker::index_range( matroska_segment_c& ms, Range search_area, mtime_t max_pts )
+SegmentSeeker::index_range( matroska_segment_c& ms, Range search_area, vlc_tick_t max_pts )
 {
     ranges_t areas_to_search = get_search_areas( search_area.start, search_area.end );
 
@@ -335,14 +335,14 @@ SegmentSeeker::index_range( matroska_segment_c& ms, Range search_area, mtime_t m
 }
 
 void
-SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area, mtime_t max_pts )
+SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area, vlc_tick_t max_pts )
 {
     mkv_jump_to( ms, search_area.start );
 
     search_area.start = ms.es.I_O().getFilePointer();
 
     fptr_t  block_pos = search_area.start;
-    mtime_t block_pts;
+    vlc_tick_t block_pts;
 
     while( block_pos < search_area.end )
     {

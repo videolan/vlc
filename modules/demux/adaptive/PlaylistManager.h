@@ -57,8 +57,8 @@ namespace adaptive
             bool    start();
             void    stop();
 
-            AbstractStream::buffering_status bufferize(mtime_t, mtime_t, mtime_t);
-            AbstractStream::status dequeue(mtime_t, mtime_t *);
+            AbstractStream::buffering_status bufferize(vlc_tick_t, vlc_tick_t, vlc_tick_t);
+            AbstractStream::status dequeue(vlc_tick_t, vlc_tick_t *);
             void drain();
 
             virtual bool needsUpdate() const;
@@ -72,15 +72,15 @@ namespace adaptive
         protected:
             /* Demux calls */
             virtual int doControl(int, va_list);
-            virtual int doDemux(mtime_t);
+            virtual int doDemux(vlc_tick_t);
 
-            virtual bool    setPosition(mtime_t);
-            virtual mtime_t getDuration() const;
-            mtime_t getResumeTime() const;
-            mtime_t getFirstDTS() const;
+            virtual bool    setPosition(vlc_tick_t);
+            virtual vlc_tick_t getDuration() const;
+            vlc_tick_t getResumeTime() const;
+            vlc_tick_t getFirstDTS() const;
 
-            virtual mtime_t getFirstPlaybackTime() const;
-            mtime_t getCurrentPlaybackTime() const;
+            virtual vlc_tick_t getFirstPlaybackTime() const;
+            vlc_tick_t getCurrentPlaybackTime() const;
 
             void pruneLiveStream();
             virtual bool reactivateStream(AbstractStream *);
@@ -107,8 +107,8 @@ namespace adaptive
             /* shared with demux/buffering */
             struct
             {
-                mtime_t     i_nzpcr;
-                mtime_t     i_firstpcr;
+                vlc_tick_t  i_nzpcr;
+                vlc_tick_t  i_firstpcr;
                 vlc_mutex_t lock;
                 vlc_cond_t  cond;
             } demux;
@@ -121,8 +121,8 @@ namespace adaptive
             struct
             {
                 bool        b_live;
-                mtime_t     i_length;
-                mtime_t     i_time;
+                vlc_tick_t  i_length;
+                vlc_tick_t  i_time;
                 double      f_position;
                 vlc_mutex_t lock;
             } cached;

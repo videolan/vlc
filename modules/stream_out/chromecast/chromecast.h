@@ -180,7 +180,7 @@ struct intf_sys_t
     void setPacing(bool do_pace);
     int pace();
     void sendInputEvent(enum cc_input_event event, union cc_input_arg arg);
-    mtime_t getPauseDelay();
+    vlc_tick_t getPauseDelay();
 
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
@@ -191,7 +191,7 @@ private:
     bool processMessage(const castchannel::CastMessage &msg);
     void queueMessage( QueueableMessages msg );
 
-    void setPauseState(bool paused, mtime_t delay);
+    void setPauseState(bool paused, vlc_tick_t delay);
     bool isFinishedPlaying();
     bool isStateError() const;
     bool isStatePlaying() const;
@@ -201,11 +201,11 @@ private:
 
     void setMeta( vlc_meta_t *p_meta );
 
-    mtime_t getPlaybackTimestamp();
+    vlc_tick_t getPlaybackTimestamp();
 
     double getPlaybackPosition() const;
 
-    void setInitialTime( mtime_t time );
+    void setInitialTime( vlc_tick_t time );
     // Sets the current state and signal the associated wait cond.
     // This must be called with the lock held
     void setState( States state );
@@ -220,20 +220,20 @@ private:
 private:
     static void* ChromecastThread(void* p_data);
 
-    static mtime_t get_time(void*);
+    static vlc_tick_t get_time(void*);
 
     static int pace(void*);
     static void send_input_event(void *, enum cc_input_event event, union cc_input_arg arg);
     static void set_demux_enabled(void *, bool, on_paused_changed_itf, void *);
 
-    static void set_pause_state(void*, bool paused, mtime_t delay);
+    static void set_pause_state(void*, bool paused, vlc_tick_t delay);
 
     static void set_meta(void*, vlc_meta_t *p_meta);
 
     void prepareHttpArtwork();
 
-    static mtime_t      timeCCToVLC(double);
-    static std::string  timeVLCToCC(mtime_t);
+    static vlc_tick_t   timeCCToVLC(double);
+    static std::string  timeVLCToCC(vlc_tick_t);
 
 private:
     vlc_object_t  * const m_module;
@@ -280,10 +280,10 @@ private:
     char             *m_art_url;
     unsigned          m_art_idx;
 
-    mtime_t           m_cc_time_last_request_date;
-    mtime_t           m_cc_time_date;
-    mtime_t           m_cc_time;
-    mtime_t           m_pause_delay;
+    vlc_tick_t        m_cc_time_last_request_date;
+    vlc_tick_t        m_cc_time_date;
+    vlc_tick_t        m_cc_time;
+    vlc_tick_t        m_pause_delay;
 
     /* shared structure with the demux-filter */
     chromecast_common      m_common;

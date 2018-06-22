@@ -83,7 +83,7 @@ typedef struct
     bool     b_audio;
     bool     b_video;
 
-    mtime_t        i_delay;
+    vlc_tick_t     i_delay;
     input_resource_t *p_resource;
 } sout_stream_sys_t;
 

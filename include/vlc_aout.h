@@ -166,7 +166,7 @@ struct audio_output
       * \note This callback needs not be reentrant.
       */
 
-    int (*time_get)(audio_output_t *, mtime_t *delay);
+    int (*time_get)(audio_output_t *, vlc_tick_t *delay);
     /**< Estimates playback buffer latency (mandatory, cannot be NULL).
       *
       * This callback computes an estimation of the delay until the current
@@ -185,7 +185,7 @@ struct audio_output
       * \note This callback cannot be called in stopped state.
       */
 
-    void (*play)(audio_output_t *, block_t *block, mtime_t date);
+    void (*play)(audio_output_t *, block_t *block, vlc_tick_t date);
     /**< Queues a block of samples for playback (mandatory, cannot be NULL).
       *
       * \param block block of audio samples
@@ -194,7 +194,7 @@ struct audio_output
       * \note This callback cannot be called in stopped state.
       */
 
-    void (*pause)( audio_output_t *, bool pause, mtime_t date);
+    void (*pause)( audio_output_t *, bool pause, vlc_tick_t date);
     /**< Pauses or resumes playback (mandatory, cannot be NULL).
       *
       * This callback pauses or resumes audio playback as quickly as possible.
@@ -438,7 +438,7 @@ static inline void aout_RestartRequest(audio_output_t *aout, unsigned mode)
  * Default implementation for audio_output_t.time_get
  */
 static inline int aout_TimeGetDefault(audio_output_t *aout,
-                                      mtime_t *restrict delay)
+                                      vlc_tick_t *restrict delay)
 {
     (void) aout; (void) delay;
     return -1;
@@ -452,7 +452,7 @@ static inline int aout_TimeGetDefault(audio_output_t *aout,
  * Do not use this unless there are really no possible better alternatives.
  */
 static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
-                                     mtime_t date)
+                                     vlc_tick_t date)
 {
     if (paused && aout->flush != NULL)
         aout->flush(aout, false);

@@ -43,8 +43,8 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 vlc_module_end ()
 
-static int TimeGet (audio_output_t *, mtime_t *);
-static void Play(audio_output_t *, block_t *, mtime_t);
+static int TimeGet (audio_output_t *, vlc_tick_t *);
+static void Play(audio_output_t *, block_t *, vlc_tick_t);
 static void Flush (audio_output_t *, bool);
 static int VolumeSet (audio_output_t *, float);
 static int MuteSet (audio_output_t *, bool);
@@ -220,17 +220,17 @@ static void PositionChanged (void *arg, int delta)
     sys->started = 1;
 }
 
-static int TimeGet (audio_output_t *aout, mtime_t *restrict delay)
+static int TimeGet (audio_output_t *aout, vlc_tick_t *restrict delay)
 {
     aout_sys_t *sys = aout->sys;
 
     if (!sys->started)
         return -1;
-    *delay = (mtime_t)sys->delay * CLOCK_FREQ / sys->rate;
+    *delay = (vlc_tick_t)sys->delay * CLOCK_FREQ / sys->rate;
     return 0;
 }
 
-static void Play(audio_output_t *aout, block_t *block, mtime_t date)
+static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
 

@@ -364,7 +364,7 @@ typedef struct {
     struct {
         vlc_mouse_t state;
 
-        mtime_t last_pressed;
+        vlc_tick_t last_pressed;
     } mouse;
 
     atomic_bool reset_pictures;
@@ -511,7 +511,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
     /* Emulate double-click if needed */
     if (!vd->info.has_double_click &&
         vlc_mouse_HasPressed(&osys->mouse.state, &m, MOUSE_BUTTON_LEFT)) {
-        const mtime_t i_date = mdate();
+        const vlc_tick_t i_date = mdate();
 
         if (i_date - osys->mouse.last_pressed < 3*CLOCK_FREQ/10 ) {
             m.b_double_click = true;
@@ -1110,7 +1110,7 @@ static picture_pool_t *SplitterPool(vout_display_t *vd, unsigned count)
 }
 static void SplitterPrepare(vout_display_t *vd,
                             picture_t *picture,
-                            subpicture_t *subpicture, mtime_t date)
+                            subpicture_t *subpicture, vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
 

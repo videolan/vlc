@@ -30,7 +30,7 @@ class Timescale
     public:
         Timescale(uint64_t v = 0) : scale(v) {}
 
-        mtime_t ToTime(stime_t t) const
+        vlc_tick_t ToTime(stime_t t) const
         {
             if( !scale ) return 0;
             stime_t v = t / scale;
@@ -38,10 +38,10 @@ class Timescale
             return v * 1000000 + r * 1000000 / scale;
         }
 
-        stime_t ToScaled(mtime_t t) const
+        stime_t ToScaled(vlc_tick_t t) const
         {
-            mtime_t v = t / 1000000;
-            mtime_t r = t % 1000000;
+            vlc_tick_t v = t / 1000000;
+            vlc_tick_t r = t % 1000000;
             return v * scale + r * scale / 1000000;
         }
 

@@ -55,7 +55,7 @@
 struct avformat_track_s
 {
     es_out_id_t *p_es;
-    mtime_t i_pcr;
+    vlc_tick_t i_pcr;
 };
 
 /*****************************************************************************
@@ -69,7 +69,7 @@ typedef struct
     struct avformat_track_s *tracks;
     unsigned i_tracks;
 
-    mtime_t         i_pcr;
+    vlc_tick_t      i_pcr;
 
     unsigned    i_ssa_order;
 
@@ -873,14 +873,14 @@ static int Demux( demux_t *p_demux )
     if( p_frame->i_dts != VLC_TS_INVALID && p_track->p_es != NULL )
         p_track->i_pcr = p_frame->i_dts;
 
-    mtime_t i_ts_max = INT64_MIN;
+    vlc_tick_t i_ts_max = INT64_MIN;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL )
             i_ts_max = __MAX( i_ts_max, p_sys->tracks[i].i_pcr );
     }
 
-    mtime_t i_ts_min = INT64_MAX;
+    vlc_tick_t i_ts_min = INT64_MAX;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL &&
@@ -926,7 +926,7 @@ static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time )
     }
 }
 
-static void ResetTime( demux_t *p_demux, mtime_t i_time )
+static void ResetTime( demux_t *p_demux, vlc_tick_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 

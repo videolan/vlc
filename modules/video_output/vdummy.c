@@ -148,9 +148,9 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *su
     VLC_UNUSED(vd);
     VLC_UNUSED(subpicture);
 
-    if (vd->fmt.i_width * vd->fmt.i_height >= sizeof (mtime_t)
-     && (p->i_pitch * p->i_lines) >= (ssize_t)sizeof (mtime_t)) {
-        mtime_t date;
+    if (vd->fmt.i_width * vd->fmt.i_height >= sizeof (vlc_tick_t)
+     && (p->i_pitch * p->i_lines) >= (ssize_t)sizeof (vlc_tick_t)) {
+        vlc_tick_t date;
         memcpy(&date, p->p_pixels, sizeof(date));
         msg_Dbg(vd, "VOUT got %"PRIu64" ms offset",
                 (mdate() - date) / 1000 );

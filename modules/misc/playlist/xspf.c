@@ -75,7 +75,7 @@ static void xspf_export_item( playlist_item_t *p_item, FILE *p_file,
 
     input_item_t *p_input = p_item->p_input;
     char *psz;
-    mtime_t i_duration;
+    vlc_tick_t i_duration;
 
     /* leaves can be written directly */
     fputs( "\t\t<track>\n", p_file );

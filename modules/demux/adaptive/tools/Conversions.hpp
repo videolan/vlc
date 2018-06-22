@@ -39,10 +39,10 @@ class UTCTime
     public:
         UTCTime(const std::string&);
         time_t  time() const;
-        mtime_t mtime() const;
+        vlc_tick_t mtime() const;
 
     private:
-        mtime_t t;
+        vlc_tick_t t;
 };
 
 template<typename T> class Integer

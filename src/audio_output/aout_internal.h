@@ -70,9 +70,9 @@ typedef struct
 
     struct
     {
-        mtime_t end; /**< Last seen PTS */
+        vlc_tick_t end; /**< Last seen PTS */
         float rate; /**< Play-out speed rate */
-        mtime_t resamp_start_drift; /**< Resampler drift absolute value */
+        vlc_tick_t resamp_start_drift; /**< Resampler drift absolute value */
         int resamp_type; /**< Resampler mode (FIXME: redundant / resampling) */
         bool discontinuity;
     } sync;
@@ -143,7 +143,7 @@ int aout_DecNew(audio_output_t *, const audio_sample_format_t *,
 void aout_DecDelete(audio_output_t *);
 int aout_DecPlay(audio_output_t *aout, block_t *block);
 void aout_DecGetResetStats(audio_output_t *, unsigned *, unsigned *);
-void aout_DecChangePause(audio_output_t *, bool b_paused, mtime_t i_date);
+void aout_DecChangePause(audio_output_t *, bool b_paused, vlc_tick_t i_date);
 void aout_DecChangeRate(audio_output_t *aout, float rate);
 void aout_DecFlush(audio_output_t *, bool wait);
 void aout_RequestRestart (audio_output_t *, unsigned);

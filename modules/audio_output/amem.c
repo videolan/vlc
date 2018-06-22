@@ -81,7 +81,7 @@ typedef struct
     vlc_mutex_t lock;
 } aout_sys_t;
 
-static void Play(audio_output_t *aout, block_t *block, mtime_t date)
+static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -91,7 +91,7 @@ static void Play(audio_output_t *aout, block_t *block, mtime_t date)
     block_Release (block);
 }
 
-static void Pause (audio_output_t *aout, bool paused, mtime_t date)
+static void Pause (audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
     void (*cb) (void *, int64_t) = paused ? sys->pause : sys->resume;

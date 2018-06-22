@@ -135,7 +135,7 @@ namespace adaptive
                 size_t              buffered; /* read cache size */
                 bool                done;
                 bool                eof;
-                mtime_t             downloadstart;
+                vlc_tick_t          downloadstart;
                 mutable vlc_mutex_t lock;
                 vlc_cond_t          avail;
                 bool                held;

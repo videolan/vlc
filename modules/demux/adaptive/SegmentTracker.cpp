@@ -60,7 +60,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, bool enabled)
     u.buffering.id = &id;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t min, mtime_t current, mtime_t target)
+SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t min, vlc_tick_t current, vlc_tick_t target)
 {
     type = BUFFERING_LEVEL_CHANGE;
     u.buffering_level.minimum = min;
@@ -69,7 +69,7 @@ SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t min, mtime_t curr
     u.buffering.id = &id;
 }
 
-SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, mtime_t duration)
+SegmentTrackerEvent::SegmentTrackerEvent(const ID &id, vlc_tick_t duration)
 {
     type = SEGMENT_CHANGE;
     u.segment.duration = duration;
@@ -278,7 +278,7 @@ SegmentChunk * SegmentTracker::getNextChunk(bool switch_allowed,
     return chunk;
 }
 
-bool SegmentTracker::setPositionByTime(mtime_t time, bool restarted, bool tryonly)
+bool SegmentTracker::setPositionByTime(vlc_tick_t time, bool restarted, bool tryonly)
 {
     uint64_t segnumber;
     BaseRepresentation *rep = curRepresentation;
@@ -306,9 +306,9 @@ void SegmentTracker::setPositionByNumber(uint64_t segnumber, bool restarted)
     curNumber = next = segnumber;
 }
 
-mtime_t SegmentTracker::getPlaybackTime() const
+vlc_tick_t SegmentTracker::getPlaybackTime() const
 {
-    mtime_t time, duration;
+    vlc_tick_t time, duration;
 
     BaseRepresentation *rep = curRepresentation;
     if(!rep)
@@ -322,7 +322,7 @@ mtime_t SegmentTracker::getPlaybackTime() const
     return 0;
 }
 
-mtime_t SegmentTracker::getMinAheadTime() const
+vlc_tick_t SegmentTracker::getMinAheadTime() const
 {
     BaseRepresentation *rep = curRepresentation;
     if(!rep)
@@ -337,7 +337,7 @@ void SegmentTracker::notifyBufferingState(bool enabled) const
     notify(SegmentTrackerEvent(adaptationSet->getID(), enabled));
 }
 
-void SegmentTracker::notifyBufferingLevel(mtime_t min, mtime_t current, mtime_t target) const
+void SegmentTracker::notifyBufferingLevel(vlc_tick_t min, vlc_tick_t current, vlc_tick_t target) const
 {
     notify(SegmentTrackerEvent(adaptationSet->getID(), min, current, target));
 }

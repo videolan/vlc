@@ -89,7 +89,7 @@ static demux_index_entry_t *index_entry_new( void )
 /* We insert into index, sorting by pagepos (as a page can match multiple
    time stamps) */
 const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
-                                             mtime_t i_timestamp,
+                                             vlc_tick_t i_timestamp,
                                              int64_t i_pagepos )
 {
     demux_index_entry_t *idx;
@@ -144,7 +144,7 @@ const demux_index_entry_t *OggSeek_IndexAdd ( logical_stream_t *p_stream,
     return idx;
 }
 
-static bool OggSeekIndexFind ( logical_stream_t *p_stream, mtime_t i_timestamp,
+static bool OggSeekIndexFind ( logical_stream_t *p_stream, vlc_tick_t i_timestamp,
                                int64_t *pi_pos_lower, int64_t *pi_pos_upper )
 {
     demux_index_entry_t *idx = p_stream->idx;
@@ -627,7 +627,7 @@ restart:
 
 /* returns pos */
 static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stream,
-            mtime_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
+            vlc_tick_t i_targettime, int64_t i_pos_lower, int64_t i_pos_upper)
 {
     int64_t i_start_pos;
     int64_t i_end_pos;
@@ -636,7 +636,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
     struct
     {
         int64_t i_pos;
-        mtime_t i_timestamp;
+        vlc_tick_t i_timestamp;
         int64_t i_granule;
     } bestlower = { p_stream->i_data_start, VLC_TS_INVALID, -1 },
       current = { -1, VLC_TS_INVALID, -1 },
@@ -772,7 +772,7 @@ static int64_t OggBisectSearchByTime( demux_t *p_demux, logical_stream_t *p_stre
  *************************************************************************/
 
 int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_stream,
-                                     mtime_t i_time, bool b_fastseek )
+                                     vlc_tick_t i_time, bool b_fastseek )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
     int64_t i_lowerpos = -1;
@@ -868,7 +868,7 @@ int Oggseek_BlindSeektoPosition( demux_t *p_demux, logical_stream_t *p_stream,
 }
 
 int Oggseek_SeektoAbsolutetime( demux_t *p_demux, logical_stream_t *p_stream,
-                                mtime_t i_time )
+                                vlc_tick_t i_time )
 {
     demux_sys_t *p_sys  = p_demux->p_sys;
 

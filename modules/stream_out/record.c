@@ -99,17 +99,17 @@ typedef struct
 
     sout_stream_t *p_out;
 
-    mtime_t     i_date_start;
+    vlc_tick_t  i_date_start;
     size_t      i_size;
 
-    mtime_t     i_max_wait;
+    vlc_tick_t  i_max_wait;
     size_t      i_max_size;
 
     bool        b_drop;
 
     int              i_id;
     sout_stream_id_sys_t **id;
-    mtime_t     i_dts_start;
+    vlc_tick_t  i_dts_start;
 } sout_stream_sys_t;
 
 static void OutputStart( sout_stream_t *p_stream );
@@ -504,7 +504,7 @@ static void OutputStart( sout_stream_t *p_stream )
 
     /* Compute highest timestamp of first I over all streams */
     p_sys->i_dts_start = 0;
-    mtime_t i_highest_head_dts = 0;
+    vlc_tick_t i_highest_head_dts = 0;
     for( int i = 0; i < p_sys->i_id; i++ )
     {
         sout_stream_id_sys_t *id = p_sys->id[i];
@@ -513,7 +513,7 @@ static void OutputStart( sout_stream_t *p_stream )
             continue;
 
         const block_t *p_block = id->p_first;
-        mtime_t i_dts = p_block->i_dts;
+        vlc_tick_t i_dts = p_block->i_dts;
 
         if( i_dts > i_highest_head_dts &&
            ( id->fmt.i_cat == AUDIO_ES || id->fmt.i_cat == VIDEO_ES ) )

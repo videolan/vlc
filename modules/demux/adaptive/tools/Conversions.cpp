@@ -174,7 +174,7 @@ time_t UTCTime::time() const
     return t / CLOCK_FREQ;
 }
 
-mtime_t UTCTime::mtime() const
+vlc_tick_t UTCTime::mtime() const
 {
     return t;
 }

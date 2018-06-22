@@ -315,9 +315,9 @@ static void *Thread (void *data)
         .events = POLLIN,
     };
     xcb_cursor_t cursor = CursorCreate(conn, p_sys->root); /* blank cursor */
-    mtime_t lifetime = var_InheritInteger(wnd, "mouse-hide-timeout")
+    vlc_tick_t lifetime = var_InheritInteger(wnd, "mouse-hide-timeout")
                        * (CLOCK_FREQ / 1000);
-    mtime_t deadline = INT64_MAX;
+    vlc_tick_t deadline = INT64_MAX;
 
     if (ufd.fd == -1)
         return NULL;
@@ -328,7 +328,7 @@ static void *Thread (void *data)
 
         if (deadline != INT64_MAX)
         {
-            mtime_t delay = deadline - mdate();
+            vlc_tick_t delay = deadline - mdate();
             timeout = (delay > 0) ? delay / (CLOCK_FREQ / 1000) : 0;
         }
 

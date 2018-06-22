@@ -265,7 +265,7 @@ Stop( audio_output_t *p_aout )
 }
 
 static void
-Play( audio_output_t *p_aout, block_t *p_block, mtime_t date )
+Play( audio_output_t *p_aout, block_t *p_block, vlc_tick_t date )
 {
     aout_sys_t *p_sys = p_aout->sys;
 
@@ -299,7 +299,7 @@ Play( audio_output_t *p_aout, block_t *p_block, mtime_t date )
 }
 
 static void
-Pause( audio_output_t *p_aout, bool b_pause, mtime_t i_date )
+Pause( audio_output_t *p_aout, bool b_pause, vlc_tick_t i_date )
 {
     aout_sys_t *p_sys = p_aout->sys;
     (void) i_date;

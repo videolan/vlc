@@ -76,7 +76,7 @@ static void TTML_ImageSpuAppendRegion(ttml_image_updater_sys_t *p_sys,
 static int TTML_ImageSpuValidate(subpicture_t *p_spu,
                                  bool b_src_changed, const video_format_t *p_fmt_src,
                                  bool b_dst_changed, const video_format_t *p_fmt_dst,
-                                 mtime_t ts)
+                                 vlc_tick_t ts)
 {
     VLC_UNUSED(p_spu);
     VLC_UNUSED(b_src_changed); VLC_UNUSED(p_fmt_src);
@@ -88,7 +88,7 @@ static int TTML_ImageSpuValidate(subpicture_t *p_spu,
 static void TTML_ImageSpuUpdate(subpicture_t *p_spu,
                                 const video_format_t *p_fmt_src,
                                 const video_format_t *p_fmt_dst,
-                                mtime_t i_ts)
+                                vlc_tick_t i_ts)
 {
     VLC_UNUSED(p_fmt_src); VLC_UNUSED(p_fmt_dst);
     VLC_UNUSED(i_ts);

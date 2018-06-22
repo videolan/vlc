@@ -215,7 +215,7 @@ struct demux_sys_t
     bool             b_real;
 
     /* */
-    mtime_t          i_pcr; /* The clock */
+    vlc_tick_t       i_pcr; /* The clock */
     bool             b_rtcp_sync; /* At least one track received sync */
     double           f_npt;
     double           f_npt_length;
@@ -1267,7 +1267,7 @@ static int Play( demux_t *p_demux )
             timeout = 60; /* default value from RFC2326 */
         msg_Dbg( p_demux, "We have a timeout of %d seconds", timeout );
 
-        mtime_t interval = (timeout - 2) * CLOCK_FREQ;
+        vlc_tick_t interval = (timeout - 2) * CLOCK_FREQ;
         vlc_timer_schedule( p_sys->timer, false, interval, interval);
     }
     p_sys->i_pcr = VLC_TS_INVALID;
@@ -1419,7 +1419,7 @@ static int Demux( demux_t *p_demux )
 
     if( b_send_pcr )
     {
-        mtime_t i_minpcr = VLC_TS_INVALID;
+        vlc_tick_t i_minpcr = VLC_TS_INVALID;
         bool b_need_flush = false;
 
         /* Check for gap in pts value */

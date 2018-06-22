@@ -58,7 +58,7 @@ VLC_API char * secstotimestr( char *psz_buffer, int32_t secs );
  */
 struct date_t
 {
-    mtime_t  date;
+    vlc_tick_t  date;
     uint32_t i_divider_num;
     uint32_t i_divider_den;
     uint32_t i_remainder;
@@ -88,7 +88,7 @@ VLC_API void date_Change(date_t *restrict date, uint32_t num, uint32_t den);
  * \param date date to set the timestamp into
  * \param value date value
  */
-static inline void date_Set(date_t *restrict date, mtime_t value)
+static inline void date_Set(date_t *restrict date, vlc_tick_t value)
 {
     date->date = value;
     date->i_remainder = 0;
@@ -100,7 +100,7 @@ static inline void date_Set(date_t *restrict date, mtime_t value)
  * \param date date to fetch the timestamp from
  * \return date value
  */
-VLC_USED static inline mtime_t date_Get(const date_t *restrict date)
+VLC_USED static inline vlc_tick_t date_Get(const date_t *restrict date)
 {
     return date->date;
 }
@@ -114,7 +114,7 @@ VLC_USED static inline mtime_t date_Get(const date_t *restrict date)
  * \param count number of samples
  * \return timestamp value after incrementing
  */
-VLC_API mtime_t date_Increment(date_t *restrict date, uint32_t count);
+VLC_API vlc_tick_t date_Increment(date_t *restrict date, uint32_t count);
 
 /**
  * Decrements a date.
@@ -125,7 +125,7 @@ VLC_API mtime_t date_Increment(date_t *restrict date, uint32_t count);
  * \param count number of samples
  * \return date value
  */
-VLC_API mtime_t date_Decrement(date_t *restrict date, uint32_t count);
+VLC_API vlc_tick_t date_Decrement(date_t *restrict date, uint32_t count);
 
 /** @} */
 

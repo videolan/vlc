@@ -197,9 +197,9 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
     rep->setTimescale(100);
     rep->b_loaded = true;
 
-    mtime_t totalduration = 0;
-    mtime_t nzStartTime = 0;
-    mtime_t absReferenceTime = VLC_TS_INVALID;
+    vlc_tick_t totalduration = 0;
+    vlc_tick_t nzStartTime = 0;
+    vlc_tick_t absReferenceTime = VLC_TS_INVALID;
     uint64_t sequenceNumber = 0;
     bool discontinuity = false;
     std::size_t prevbyterangeoffset = 0;
@@ -253,7 +253,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                         duration = durAttribute->floatingPoint();
                     ctx_extinf = NULL;
                 }
-                const mtime_t nzDuration = CLOCK_FREQ * duration;
+                const vlc_tick_t nzDuration = CLOCK_FREQ * duration;
                 segment->duration.Set(duration * (uint64_t) rep->getTimescale());
                 segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
                 nzStartTime += nzDuration;

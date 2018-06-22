@@ -205,7 +205,7 @@ static void aout_StopResampling (audio_output_t *aout)
     aout_FiltersAdjustResampling (owner->filters, 0);
 }
 
-static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
+static void aout_DecSilence (audio_output_t *aout, vlc_tick_t length, vlc_tick_t pts)
 {
     aout_owner_t *owner = aout_owner (aout);
     const audio_sample_format_t *fmt = &owner->mixer_format;
@@ -225,11 +225,11 @@ static void aout_DecSilence (audio_output_t *aout, mtime_t length, mtime_t pts)
     aout->play(aout, block, pts);
 }
 
-static void aout_DecSynchronize(audio_output_t *aout, mtime_t dec_pts)
+static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
 {
     aout_owner_t *owner = aout_owner (aout);
     const float rate = owner->sync.rate;
-    mtime_t drift;
+    vlc_tick_t drift;
 
     /**
      * Depending on the drift between the actual and intended playback times,
@@ -405,7 +405,7 @@ void aout_DecGetResetStats(audio_output_t *aout, unsigned *restrict lost,
                                        memory_order_relaxed);
 }
 
-void aout_DecChangePause (audio_output_t *aout, bool paused, mtime_t date)
+void aout_DecChangePause (audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_owner_t *owner = aout_owner (aout);
 

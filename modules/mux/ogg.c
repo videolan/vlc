@@ -147,8 +147,8 @@ typedef struct
 
     int b_new;
 
-    mtime_t i_dts;
-    mtime_t i_length;
+    vlc_tick_t i_dts;
+    vlc_tick_t i_length;
     int     i_packet_no;
     int     i_serial_no;
     int     i_keyframe_granule_shift; /* Theora and Daala only */
@@ -182,7 +182,7 @@ typedef struct
 
     int             i_dirac_last_pt;
     int             i_dirac_last_dt;
-    mtime_t         i_baseptsdelay;
+    vlc_tick_t      i_baseptsdelay;
 
 } ogg_stream_t;
 
@@ -190,7 +190,7 @@ typedef struct
 {
     int     i_streams;
 
-    mtime_t i_start_dts;
+    vlc_tick_t i_start_dts;
     int     i_next_serial_no;
 
     /* number of logical streams pending to be added */
@@ -221,8 +221,8 @@ typedef struct
     ssize_t i_segment_start;
 } sout_mux_sys_t;
 
-static void OggSetDate( block_t *, mtime_t , mtime_t  );
-static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *, mtime_t );
+static void OggSetDate( block_t *, vlc_tick_t , vlc_tick_t );
+static block_t *OggStreamFlush( sout_mux_t *, ogg_stream_state *, vlc_tick_t );
 static void OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream );
 static void OggRewriteFisheadPage( sout_mux_t *p_mux );
 static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input );
@@ -670,7 +670,7 @@ static bool AddIndexEntry( sout_mux_t *p_mux, uint64_t i_time, sout_input_t *p_i
  * Ogg bitstream manipulation routines
  *****************************************************************************/
 static block_t *OggStreamGetPage( sout_mux_t *p_mux,
-                                  ogg_stream_state *p_os, mtime_t i_pts,
+                                  ogg_stream_state *p_os, vlc_tick_t i_pts,
                                   bool flush )
 {
     (void)p_mux;
@@ -698,13 +698,13 @@ static block_t *OggStreamGetPage( sout_mux_t *p_mux,
 }
 
 static block_t *OggStreamFlush( sout_mux_t *p_mux,
-                                ogg_stream_state *p_os, mtime_t i_pts )
+                                ogg_stream_state *p_os, vlc_tick_t i_pts )
 {
     return OggStreamGetPage( p_mux, p_os, i_pts, true );
 }
 
 static block_t *OggStreamPageOut( sout_mux_t *p_mux,
-                                  ogg_stream_state *p_os, mtime_t i_pts )
+                                  ogg_stream_state *p_os, vlc_tick_t i_pts )
 {
     return OggStreamGetPage( p_mux, p_os, i_pts, false );
 }
@@ -1374,11 +1374,11 @@ static void OggCreateStreamFooter( sout_mux_t *p_mux, ogg_stream_t *p_stream )
     ogg_stream_clear( &p_stream->os );
 }
 
-static void OggSetDate( block_t *p_og, mtime_t i_dts, mtime_t i_length )
+static void OggSetDate( block_t *p_og, vlc_tick_t i_dts, vlc_tick_t i_length )
 {
     int i_count;
     block_t *p_tmp;
-    mtime_t i_delta;
+    vlc_tick_t i_delta;
 
     for( p_tmp = p_og, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->p_next )
     {
@@ -1484,7 +1484,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    mtime_t        i_dts;
+    vlc_tick_t     i_dts;
 
     /* End any stream that ends in that group */
     if ( p_sys->i_del_streams )
@@ -1585,7 +1585,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     block_t *p_data = block_FifoGet( p_input->p_fifo );
     block_t *p_og = NULL;
     ogg_packet op;
-    mtime_t i_time;
+    vlc_tick_t i_time;
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_FLAC &&
@@ -1620,7 +1620,7 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
             /* number of sample from begining + current packet */
             op.granulepos =
                 ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
-                (mtime_t)p_input->p_fmt->audio.i_rate / CLOCK_FREQ;
+                (vlc_tick_t)p_input->p_fmt->audio.i_rate / CLOCK_FREQ;
 
             i_time = p_data->i_dts - p_sys->i_start_dts;
             AddIndexEntry( p_mux, i_time, p_input );

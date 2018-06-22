@@ -277,11 +277,11 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static mtime_t Ogg_GetLastDTS( demux_t * p_demux )
+static vlc_tick_t Ogg_GetLastDTS( demux_t * p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    mtime_t i_dts = VLC_TS_INVALID;
+    vlc_tick_t i_dts = VLC_TS_INVALID;
     for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
@@ -294,13 +294,13 @@ static mtime_t Ogg_GetLastDTS( demux_t * p_demux )
     return i_dts;
 }
 
-static mtime_t Ogg_GeneratePCR( demux_t * p_demux, bool b_drain )
+static vlc_tick_t Ogg_GeneratePCR( demux_t * p_demux, bool b_drain )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     /* We will consider the lowest PCR among tracks, because the audio core badly
      * handles PCR rewind (mute)
      */
-    mtime_t i_pcr_candidate = VLC_TS_INVALID;
+    vlc_tick_t i_pcr_candidate = VLC_TS_INVALID;
     for( int i_stream = 0; i_stream < p_sys->i_streams; i_stream++ )
     {
         logical_stream_t *p_stream = p_sys->pp_stream[i_stream];
@@ -325,7 +325,7 @@ static mtime_t Ogg_GeneratePCR( demux_t * p_demux, bool b_drain )
 static void Ogg_OutputQueues( demux_t *p_demux, bool b_drain )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    mtime_t i_pcr;
+    vlc_tick_t i_pcr;
 
     /* Generate First PCR */
     if( p_sys->i_pcr == VLC_TS_INVALID )
@@ -393,7 +393,7 @@ static int Demux( demux_t * p_demux )
 
             Ogg_OutputQueues( p_demux, true );
 
-            mtime_t i_lastdts = Ogg_GetLastDTS( p_demux );
+            vlc_tick_t i_lastdts = Ogg_GetLastDTS( p_demux );
 
             /* We keep the ES to try reusing it in Ogg_BeginningOfStream
              * only 1 ES is supported (common case for ogg web radio) */
@@ -925,7 +925,7 @@ static void Ogg_SetNextFrame( demux_t *p_demux, logical_stream_t *p_stream,
 
     if( Ogg_GranuleIsValid( p_stream, i_granule ) )
     {
-        mtime_t i_endtime = Ogg_GranuleToTime( p_stream, i_granule, false, false );
+        vlc_tick_t i_endtime = Ogg_GranuleToTime( p_stream, i_granule, false, false );
         assert( !p_stream->b_contiguous || i_endtime != VLC_TS_INVALID );
         if( i_endtime != VLC_TS_INVALID )
         {
@@ -982,9 +982,9 @@ static void Ogg_SetNextFrame( demux_t *p_demux, logical_stream_t *p_stream,
     }
 }
 
-static mtime_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_stream )
+static vlc_tick_t Ogg_FixupOutputQueue( demux_t *p_demux, logical_stream_t *p_stream )
 {
-    mtime_t i_enddts = VLC_TS_INVALID;
+    vlc_tick_t i_enddts = VLC_TS_INVALID;
 
 #ifdef HAVE_LIBVORBIS
     long i_prev_blocksize = 0;
@@ -1337,8 +1337,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->b_initializing = false;
     }
 
-    mtime_t i_dts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, true, false );
-    mtime_t i_expected_dts = date_Get( &p_stream->dts ); /* Interpolated or previous end time */
+    vlc_tick_t i_dts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, true, false );
+    vlc_tick_t i_expected_dts = date_Get( &p_stream->dts ); /* Interpolated or previous end time */
     if( i_dts == VLC_TS_INVALID )
         i_dts = i_expected_dts;
     else
@@ -1355,7 +1355,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
          * but we did need to store its pcr as it might be selected later on */
         if( !b_header && !p_stream->b_initializing )
         {
-            mtime_t i_pcr = date_Get( &p_stream->dts );
+            vlc_tick_t i_pcr = date_Get( &p_stream->dts );
             if( i_pcr != VLC_TS_INVALID )
                 p_stream->i_pcr = p_sys->i_nzpcr_offset + i_pcr;
         }
@@ -1372,7 +1372,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     /* Vorbis and Opus can trim the end of a stream using granule positions. */
     if( p_oggpacket->e_o_s )
     {
-        mtime_t i_endtime = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, false, false );
+        vlc_tick_t i_endtime = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, false, false );
         if( i_endtime != VLC_TS_INVALID && i_expected_dts != VLC_TS_INVALID )
         {
                 p_block->i_length = i_endtime - i_expected_dts;
@@ -1453,7 +1453,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                   p_oggpacket->packet[i_header_len + 1] != '\n' &&
                   p_oggpacket->packet[i_header_len + 1] != '\r' ) )
             {
-                p_block->i_length = (mtime_t)lenbytes * 1000;
+                p_block->i_length = (vlc_tick_t)lenbytes * 1000;
             }
         }
 
@@ -3245,7 +3245,7 @@ static void Ogg_ApplySkeleton( logical_stream_t *p_stream )
 }
 
 /* Return true if there's a skeleton exact match */
-bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, mtime_t i_time,
+bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_time,
                                       int64_t *pi_lower, int64_t *pi_upper )
 {
     if ( !p_stream || !p_stream->p_skel || !p_stream->p_skel->p_index ||

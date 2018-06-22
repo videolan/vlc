@@ -330,7 +330,7 @@ static int FrameSpanAddDescription( demux_t *p_demux, uint64_t i_desc_offset, fr
 
 /* FrameSpanGetTime returns the time span represented by the frame span. */
 
-static inline mtime_t FrameSpanGetTime( frame_span_t *span, uint32_t i_sample_rate )
+static inline vlc_tick_t FrameSpanGetTime( frame_span_t *span, uint32_t i_sample_rate )
 {
     if( !i_sample_rate )
         return VLC_TS_INVALID;

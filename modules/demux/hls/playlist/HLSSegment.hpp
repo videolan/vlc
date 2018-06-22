@@ -54,11 +54,11 @@ namespace hls
                 HLSSegment( ICanonicalUrl *parent, uint64_t sequence );
                 virtual ~HLSSegment();
                 void setEncryption(SegmentEncryption &);
-                mtime_t getUTCTime() const;
+                vlc_tick_t getUTCTime() const;
                 virtual int compare(ISegment *) const; /* reimpl */
 
             protected:
-                mtime_t utcTime;
+                vlc_tick_t utcTime;
                 virtual void onChunkDownload(block_t **, SegmentChunk *, BaseRepresentation *); /* reimpl */
 
                 SegmentEncryption encryption;

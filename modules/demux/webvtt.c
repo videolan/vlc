@@ -48,8 +48,8 @@ typedef struct
     bool         b_slave;
     bool         b_first_time;
     int          i_next_block_flags;
-    mtime_t      i_next_demux_time;
-    mtime_t      i_length;
+    vlc_tick_t   i_next_demux_time;
+    vlc_tick_t   i_length;
     struct
     {
         void    *p_data;
@@ -305,7 +305,7 @@ static int index_Compare( const void *a_, const void *b_ )
     else return a->time < b->time ? -1 : 1;
 }
 
-static size_t getIndexByTime( demux_sys_t *p_sys, mtime_t i_time )
+static size_t getIndexByTime( demux_sys_t *p_sys, vlc_tick_t i_time )
 {
     for( size_t i=0; i<p_sys->index.i_count; i++ )
     {
@@ -340,7 +340,7 @@ static void BuildIndex( demux_t *p_demux )
     }
 }
 
-static block_t *demux_From( demux_t *p_demux, mtime_t i_start )
+static block_t *demux_From( demux_t *p_demux, vlc_tick_t i_start )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -483,7 +483,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_time = va_arg( args, mtime_t ) - VLC_TS_0;
+            p_sys->i_next_demux_time = va_arg( args, vlc_tick_t ) - VLC_TS_0;
             return VLC_SUCCESS;
 
         case DEMUX_CAN_PAUSE:
@@ -533,14 +533,14 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    mtime_t i_barrier = p_sys->i_next_demux_time;
+    vlc_tick_t i_barrier = p_sys->i_next_demux_time;
 
     while( p_sys->index.i_current < p_sys->index.i_count &&
            p_sys->index.p_array[p_sys->index.i_current].time <= i_barrier )
     {
         /* Find start and end of our interval */
-        mtime_t i_start_time = p_sys->index.p_array[p_sys->index.i_current].time;
-        mtime_t i_end_time = i_start_time;
+        vlc_tick_t i_start_time = p_sys->index.p_array[p_sys->index.i_current].time;
+        vlc_tick_t i_end_time = i_start_time;
         /* use next interval time as end time */
         while( ++p_sys->index.i_current < p_sys->index.i_count )
         {

@@ -541,8 +541,8 @@ typedef struct
     /*
      * Dirac properties
      */
-    mtime_t i_lastpts;
-    mtime_t i_frame_pts_delta;
+    vlc_tick_t i_lastpts;
+    vlc_tick_t i_frame_pts_delta;
     SchroDecoder *p_schro;
     SchroVideoFormat *p_format;
 } decoder_sys_t;
@@ -783,7 +783,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         p_schrobuffer->free = SchroBufferFree;
         p_schrobuffer->priv = p_block;
         if( p_block->i_pts != VLC_TS_INVALID ) {
-            mtime_t *p_pts = malloc( sizeof(*p_pts) );
+            vlc_tick_t *p_pts = malloc( sizeof(*p_pts) );
             if( p_pts ) {
                 *p_pts = p_block->i_pts;
                 /* if this call fails, p_pts is freed automatically */
@@ -841,7 +841,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             if( p_tag )
             {
                 /* free is handled by schro_frame_unref */
-                p_pic->date = *(mtime_t*) p_tag->value;
+                p_pic->date = *(vlc_tick_t*) p_tag->value;
                 schro_tag_free( p_tag );
             }
             else if( p_sys->i_lastpts != VLC_TS_INVALID )
@@ -882,7 +882,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict );
  *****************************************************************************/
 struct picture_pts_t
 {
-   mtime_t i_pts;    /* associated pts */
+   vlc_tick_t i_pts;    /* associated pts */
    uint32_t u_pnum;  /* dirac picture number */
    bool b_empty;     /* entry is invalid */
 };
@@ -957,7 +957,7 @@ static void ResetPTStlb( encoder_t *p_enc )
 /*****************************************************************************
  * StorePicturePTS: Store the PTS value for a particular picture number
  *****************************************************************************/
-static void StorePicturePTS( encoder_t *p_enc, uint32_t u_pnum, mtime_t i_pts )
+static void StorePicturePTS( encoder_t *p_enc, uint32_t u_pnum, vlc_tick_t i_pts )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
 
@@ -979,7 +979,7 @@ static void StorePicturePTS( encoder_t *p_enc, uint32_t u_pnum, mtime_t i_pts )
 /*****************************************************************************
  * GetPicturePTS: Retrieve the PTS value for a particular picture number
  *****************************************************************************/
-static mtime_t GetPicturePTS( encoder_t *p_enc, uint32_t u_pnum )
+static vlc_tick_t GetPicturePTS( encoder_t *p_enc, uint32_t u_pnum )
 {
     encoder_sys_t *p_sys = p_enc->p_sys;
 

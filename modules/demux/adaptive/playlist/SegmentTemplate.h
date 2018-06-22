@@ -50,11 +50,11 @@ namespace adaptive
             public:
                 MediaSegmentTemplate( SegmentInformation * = NULL );
                 virtual void setSourceUrl( const std::string &url ); /* reimpl */
-                void mergeWith( MediaSegmentTemplate *, mtime_t );
+                void mergeWith( MediaSegmentTemplate *, vlc_tick_t );
                 virtual uint64_t getSequenceNumber() const; /* reimpl */
                 uint64_t getCurrentLiveTemplateNumber() const;
                 stime_t getMinAheadScaledTime(uint64_t) const;
-                void pruneByPlaybackTime(mtime_t);
+                void pruneByPlaybackTime(vlc_tick_t);
                 size_t pruneBySequenceNumber(uint64_t);
                 virtual void debug(vlc_object_t *, int = 0) const; /* reimpl */
                 Property<size_t>        startNumber;

@@ -89,7 +89,7 @@ void BasePeriod::debug(vlc_object_t *obj, int indent) const
         (*k)->debug(obj, indent + 1);
 }
 
-mtime_t BasePeriod::getPeriodStart() const
+vlc_tick_t BasePeriod::getPeriodStart() const
 {
     return startTime.Get();
 }

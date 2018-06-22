@@ -45,7 +45,7 @@
 typedef struct
 {
     char *name, *artist, *album, *genre, *trackNum, *location;
-    mtime_t duration;
+    vlc_tick_t duration;
 } track_elem_t;
 
 struct xml_elem_hnd

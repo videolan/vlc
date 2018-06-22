@@ -83,7 +83,7 @@ bool BaseRepresentation::needsUpdate() const
     return false;
 }
 
-bool BaseRepresentation::runLocalUpdates(mtime_t, uint64_t, bool)
+bool BaseRepresentation::runLocalUpdates(vlc_tick_t, uint64_t, bool)
 {
     return false;
 }
@@ -98,14 +98,14 @@ bool BaseRepresentation::consistentSegmentNumber() const
     return b_consistent;
 }
 
-void BaseRepresentation::pruneByPlaybackTime(mtime_t time)
+void BaseRepresentation::pruneByPlaybackTime(vlc_tick_t time)
 {
     uint64_t num;
     if(getSegmentNumberByTime(time, &num))
         pruneBySegmentNumber(num);
 }
 
-mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
+vlc_tick_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
 {
     std::vector<ISegment *> seglist;
     getSegments(INFOTYPE_MEDIA, seglist);
@@ -124,7 +124,7 @@ mtime_t BaseRepresentation::getMinAheadTime(uint64_t curnum) const
         return CLOCK_FREQ;
     }
 
-    mtime_t minTime = 0;
+    vlc_tick_t minTime = 0;
     const Timescale timescale = inheritTimescale();
     std::vector<ISegment *>::const_iterator it;
     for(it = seglist.begin(); it != seglist.end(); ++it)

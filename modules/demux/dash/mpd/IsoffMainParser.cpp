@@ -104,7 +104,7 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
     {
-        mtime_t minupdate = IsoTime(it->second) * CLOCK_FREQ;
+        vlc_tick_t minupdate = IsoTime(it->second) * CLOCK_FREQ;
         if(minupdate > 0)
             mpd->minUpdatePeriod.Set(minupdate);
     }

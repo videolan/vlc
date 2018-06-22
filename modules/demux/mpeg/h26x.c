@@ -450,8 +450,8 @@ static int Demux( demux_t *p_demux)
 
             /* h264 packetizer does merge multiple NAL into AU, but slice flag persists */
             bool frame = p_block_out->i_flags & BLOCK_FLAG_TYPE_MASK;
-            const mtime_t i_frame_dts = p_block_out->i_dts;
-            const mtime_t i_frame_length = p_block_out->i_length;
+            const vlc_tick_t i_frame_dts = p_block_out->i_dts;
+            const vlc_tick_t i_frame_length = p_block_out->i_length;
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
             if( frame )
             {

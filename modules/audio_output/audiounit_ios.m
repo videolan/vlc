@@ -364,7 +364,7 @@ avas_SetActive(audio_output_t *p_aout, bool active, NSUInteger options)
 #pragma mark actual playback
 
 static void
-Pause (audio_output_t *p_aout, bool pause, mtime_t date)
+Pause (audio_output_t *p_aout, bool pause, vlc_tick_t date)
 {
     aout_sys_t * p_sys = p_aout->sys;
 
@@ -429,7 +429,7 @@ MuteSet(audio_output_t *p_aout, bool mute)
 }
 
 static void
-Play(audio_output_t * p_aout, block_t * p_block, mtime_t date)
+Play(audio_output_t * p_aout, block_t * p_block, vlc_tick_t date)
 {
     aout_sys_t * p_sys = p_aout->sys;
 

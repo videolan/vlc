@@ -86,8 +86,8 @@ typedef struct
     /*
      * Common properties
      */
-    mtime_t i_pts;
-    mtime_t i_max_stop;
+    vlc_tick_t i_pts;
+    vlc_tick_t i_max_stop;
 
     /* decoder_sys_t is shared between decoder and spu units */
     vlc_mutex_t lock;
@@ -118,7 +118,7 @@ typedef struct
 typedef struct
 {
     decoder_sys_t *p_dec_sys;
-    mtime_t        i_start;
+    vlc_tick_t     i_start;
 } kate_spu_updater_sys_t;
 
 
@@ -805,7 +805,7 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
 static int TigerValidateSubpicture( subpicture_t *p_subpic,
                                     bool b_fmt_src, const video_format_t *p_fmt_src,
                                     bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                                    mtime_t ts )
+                                    vlc_tick_t ts )
 {
     VLC_UNUSED(p_fmt_src); VLC_UNUSED(p_fmt_dst);
 
@@ -849,7 +849,7 @@ exit:
 static void TigerUpdateSubpicture( subpicture_t *p_subpic,
                                    const video_format_t *p_fmt_src,
                                    const video_format_t *p_fmt_dst,
-                                   mtime_t ts )
+                                   vlc_tick_t ts )
 {
     kate_spu_updater_sys_t *p_spusys = p_subpic->updater.p_sys;
     decoder_sys_t *p_sys = p_spusys->p_dec_sys;

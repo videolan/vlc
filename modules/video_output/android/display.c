@@ -82,7 +82,7 @@ static const vlc_fourcc_t subpicture_chromas[] =
 };
 
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
-static void             Prepare(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
+static void             Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
@@ -941,7 +941,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture, mtime_t date)
+                    subpicture_t *subpicture, vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
@@ -988,7 +988,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     if (sys->p_window->b_opaque
      && AndroidOpaquePicture_CanReleaseAtTime(picture->p_sys))
     {
-        mtime_t now = mdate();
+        vlc_tick_t now = mdate();
         if (date > now)
         {
             if (date - now <= 1*CLOCK_FREQ)

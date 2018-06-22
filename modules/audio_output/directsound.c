@@ -139,7 +139,7 @@ typedef struct
 } aout_sys_t;
 
 static HRESULT Flush( aout_stream_sys_t *sys, bool drain);
-static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
+static HRESULT TimeGet( aout_stream_sys_t *sys, vlc_tick_t *delay )
 {
     DWORD read, status;
     HRESULT hr;
@@ -176,12 +176,12 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, mtime_t *delay )
     return DS_OK;
 }
 
-static HRESULT StreamTimeGet( aout_stream_t *s, mtime_t *delay )
+static HRESULT StreamTimeGet( aout_stream_t *s, vlc_tick_t *delay )
 {
     return TimeGet( s->sys, delay );
 }
 
-static int OutputTimeGet( audio_output_t *aout, mtime_t *delay )
+static int OutputTimeGet( audio_output_t *aout, vlc_tick_t *delay )
 {
     aout_sys_t *sys = aout->sys;
     return (TimeGet( &sys->s, delay ) == DS_OK) ? 0 : -1;
@@ -303,7 +303,7 @@ static HRESULT StreamPlay( aout_stream_t *s, block_t *block )
     return Play( VLC_OBJECT(s), s->sys, block );
 }
 
-static void OutputPlay( audio_output_t *aout, block_t *block, mtime_t date )
+static void OutputPlay( audio_output_t *aout, block_t *block, vlc_tick_t date )
 {
     aout_sys_t *sys = aout->sys;
     Play( VLC_OBJECT(aout), &sys->s, block );
@@ -334,7 +334,7 @@ static HRESULT StreamPause( aout_stream_t *s, bool pause )
     return Pause( s->sys, pause );
 }
 
-static void OutputPause( audio_output_t *aout, bool pause, mtime_t date )
+static void OutputPause( audio_output_t *aout, bool pause, vlc_tick_t date )
 {
     aout_sys_t *sys = aout->sys;
     Pause( &sys->s, pause );

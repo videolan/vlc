@@ -42,13 +42,13 @@ vlc_module_end ()
 
 #define A52_FRAME_NB 1536
 
-static void Play(audio_output_t *aout, block_t *block, mtime_t date)
+static void Play(audio_output_t *aout, block_t *block, vlc_tick_t date)
 {
     block_Release( block );
     (void) aout; (void) date;
 }
 
-static void Pause(audio_output_t *aout, bool paused, mtime_t date)
+static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     (void) aout; (void) paused; (void) date;
 }

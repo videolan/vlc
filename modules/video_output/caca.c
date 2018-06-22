@@ -57,8 +57,8 @@ struct vout_display_sys_t {
     block_fifo_t *fifo;
     vlc_thread_t thread;
 
-    mtime_t cursor_timeout;
-    mtime_t cursor_deadline;
+    vlc_tick_t cursor_timeout;
+    vlc_tick_t cursor_deadline;
 };
 
 noreturn static void *VoutDisplayEventKeyDispatch(void *data)
@@ -133,7 +133,7 @@ static void Manage(vout_display_t *vd);
 /**
  * Prepare a picture for display */
 static void Prepare(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture, mtime_t date)
+                    subpicture_t *subpicture, vlc_tick_t date)
 {
     Manage(vd);
     VLC_UNUSED(date);

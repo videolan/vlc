@@ -42,7 +42,7 @@ static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned cou
 static inline void vout_display_Prepare(vout_display_t *vd,
                                         picture_t *picture,
                                         subpicture_t *subpicture,
-                                        mtime_t date)
+                                        vlc_tick_t date)
 {
     if (vd->prepare)
         vd->prepare(vd, picture, subpicture, date);

@@ -842,7 +842,7 @@ AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id,
          * set. */
         if (i > 0)
         {
-            mtime_t timeout = mdate() + CLOCK_FREQ/2;
+            vlc_tick_t timeout = mdate() + CLOCK_FREQ/2;
             if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
                 msg_Dbg(p_aout, "reached timeout");
         }
@@ -1064,7 +1064,7 @@ WarnConfiguration(audio_output_t *p_aout)
  */
 static int
 StartAnalog(audio_output_t *p_aout, audio_sample_format_t *fmt,
-            mtime_t i_latency_us)
+            vlc_tick_t i_latency_us)
 {
     aout_sys_t                  *p_sys = p_aout->sys;
     OSStatus                    err = noErr;
@@ -1152,7 +1152,7 @@ error:
  */
 static int
 StartSPDIF(audio_output_t * p_aout, audio_sample_format_t *fmt,
-           mtime_t i_latency_us)
+           vlc_tick_t i_latency_us)
 {
     aout_sys_t *p_sys = p_aout->sys;
     int ret;
@@ -1609,7 +1609,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     UInt32 i_latency_samples;
     AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    mtime_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
+    vlc_tick_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
 
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)

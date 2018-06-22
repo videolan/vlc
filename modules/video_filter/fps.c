@@ -64,7 +64,7 @@ typedef struct
 {
     date_t          next_output_pts; /**< output calculated PTS */
     picture_t       *p_previous_pic;
-    mtime_t         i_output_frame_interval;
+    vlc_tick_t      i_output_frame_interval;
 } filter_sys_t;
 
 static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)

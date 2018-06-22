@@ -66,12 +66,12 @@ void DASHManager::scheduleNextUpdate()
 {
     time_t now = time(NULL);
 
-    mtime_t minbuffer = 0;
+    vlc_tick_t minbuffer = 0;
     std::vector<AbstractStream *>::const_iterator it;
     for(it=streams.begin(); it!=streams.end(); ++it)
     {
         const AbstractStream *st = *it;
-        const mtime_t m = st->getMinAheadTime();
+        const vlc_tick_t m = st->getMinAheadTime();
         if(m > 0 && (m < minbuffer || minbuffer == 0))
             minbuffer = m;
     }
@@ -85,7 +85,7 @@ void DASHManager::scheduleNextUpdate()
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 
-    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (mtime_t) nextPlaylistupdate - now );
+    msg_Dbg(p_demux, "Updated MPD, next update in %" PRId64 "s", (vlc_tick_t) nextPlaylistupdate - now );
 }
 
 bool DASHManager::needsUpdate() const
@@ -122,11 +122,11 @@ bool DASHManager::updatePlaylist()
             return false;
         }
 
-        mtime_t minsegmentTime = 0;
+        vlc_tick_t minsegmentTime = 0;
         std::vector<AbstractStream *>::iterator it;
         for(it=streams.begin(); it!=streams.end(); it++)
         {
-            mtime_t segmentTime = (*it)->getPlaybackTime();
+            vlc_tick_t segmentTime = (*it)->getPlaybackTime();
             if(!minsegmentTime || segmentTime < minsegmentTime)
                 minsegmentTime = segmentTime;
         }

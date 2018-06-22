@@ -151,7 +151,7 @@ vlc_module_end ()
 typedef struct filter_sys_t filter_sys_t;
 
 /* subsource functions */
-static subpicture_t *Filter( filter_t *, mtime_t );
+static subpicture_t *Filter( filter_t *, vlc_tick_t );
 
 static int MouseEvent( filter_t *,
                        const vlc_mouse_t *,
@@ -702,7 +702,7 @@ static void* update_request_thread( void *obj )
 {
     filter_t* p_filter = (filter_t*)obj;
     int canc = vlc_savecancel();
-    mtime_t interval = var_InheritInteger( p_filter, RMTOSD_CFG "update" );
+    vlc_tick_t interval = var_InheritInteger( p_filter, RMTOSD_CFG "update" );
     vlc_restorecancel(canc);
 
     if( interval < 100 )
@@ -974,7 +974,7 @@ static bool process_server_message ( filter_t *p_filter,
  ****************************************************************************
  * This function outputs subpictures at regular time intervals.
  ****************************************************************************/
-static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
+static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     subpicture_t *p_spu;

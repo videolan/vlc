@@ -48,7 +48,7 @@ typedef struct ogg_skeleton_t ogg_skeleton_t;
 typedef struct backup_queue
 {
     block_t *p_block;
-    mtime_t i_duration;
+    vlc_tick_t i_duration;
 } backup_queue_t;
 
 typedef struct logical_stream_s
@@ -75,7 +75,7 @@ typedef struct logical_stream_s
 
     /* program clock reference (in units of 90kHz) derived from the previous
      * granulepos */
-    mtime_t          i_pcr;
+    vlc_tick_t       i_pcr;
 
     /* Misc */
     bool b_initializing;
@@ -171,8 +171,8 @@ typedef struct
 
     /* program clock reference (in units of 90kHz) derived from the pcr of
      * the sub-streams */
-    mtime_t i_pcr;
-    mtime_t i_nzpcr_offset;
+    vlc_tick_t i_pcr;
+    vlc_tick_t i_nzpcr_offset;
 
     /* new stream or starting from a chain */
     bool b_chained_boundary;
@@ -229,5 +229,5 @@ typedef struct
 unsigned const char * Read7BitsVariableLE( unsigned const char *,
                                            unsigned const char *,
                                            uint64_t * );
-bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, mtime_t i_time,
+bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_time,
                                       int64_t *pi_lower, int64_t *pi_upper );

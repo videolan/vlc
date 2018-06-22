@@ -129,8 +129,8 @@ typedef struct
     block_t    **pp_last;
 
     bool b_frame_slice;
-    mtime_t i_pts;
-    mtime_t i_dts;
+    vlc_tick_t i_pts;
+    vlc_tick_t i_dts;
 
     date_t  dts;
     date_t  prev_iframe_dts;
@@ -152,9 +152,9 @@ typedef struct
     int i_repeat_first_field;
     int i_progressive_frame;
 
-    mtime_t i_last_ref_pts;
+    vlc_tick_t i_last_ref_pts;
 
-    mtime_t i_last_frame_pts;
+    vlc_tick_t i_last_frame_pts;
     uint16_t i_last_frame_refid;
 
     bool b_second_field;
@@ -170,8 +170,8 @@ typedef struct
     /* */
     bool b_cc_reset;
     uint32_t i_cc_flags;
-    mtime_t i_cc_pts;
-    mtime_t i_cc_dts;
+    vlc_tick_t i_cc_pts;
+    vlc_tick_t i_cc_dts;
     cc_data_t cc;
 } decoder_sys_t;
 

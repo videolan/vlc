@@ -55,15 +55,15 @@ namespace adaptive
                     SWITCH_BITSWITCHEABLE
                 } SwitchPolicy;
                 SwitchPolicy getSwitchPolicy() const;
-                virtual mtime_t getPeriodStart() const;
+                virtual vlc_tick_t getPeriodStart() const;
                 virtual AbstractPlaylist *getPlaylist() const;
 
                 class SplitPoint
                 {
                     public:
                         size_t offset;
-                        mtime_t time;
-                        mtime_t duration;
+                        vlc_tick_t time;
+                        vlc_tick_t duration;
                 };
                 void SplitUsingIndex(std::vector<SplitPoint>&);
 
@@ -77,13 +77,13 @@ namespace adaptive
 
                 ISegment * getSegment(SegmentInfoType, uint64_t = 0) const;
                 ISegment * getNextSegment(SegmentInfoType, uint64_t, uint64_t *, bool *) const;
-                bool getSegmentNumberByTime(mtime_t, uint64_t *) const;
-                bool getPlaybackTimeDurationBySegmentNumber(uint64_t, mtime_t *, mtime_t *) const;
+                bool getSegmentNumberByTime(vlc_tick_t, uint64_t *) const;
+                bool getPlaybackTimeDurationBySegmentNumber(uint64_t, vlc_tick_t *, vlc_tick_t *) const;
                 uint64_t getLiveStartSegmentNumber(uint64_t) const;
-                virtual void mergeWith(SegmentInformation *, mtime_t);
+                virtual void mergeWith(SegmentInformation *, vlc_tick_t);
                 virtual void mergeWithTimeline(SegmentTimeline *); /* ! don't use with global merge */
                 virtual void pruneBySegmentNumber(uint64_t);
-                virtual void pruneByPlaybackTime(mtime_t);
+                virtual void pruneByPlaybackTime(vlc_tick_t);
                 virtual uint64_t translateSegmentNumber(uint64_t, const SegmentInformation *) const;
 
             protected:

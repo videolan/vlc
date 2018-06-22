@@ -217,9 +217,9 @@ typedef struct {
 
     es_out_id_t  *es;
 
-    mtime_t      dts;
+    vlc_tick_t   dts;
 
-    mtime_t      deadline;
+    vlc_tick_t   deadline;
 } imem_sys_t;
 
 static void ParseMRL(vlc_object_t *, const char *);
@@ -549,7 +549,7 @@ static int ControlDemux(demux_t *demux, int i_query, va_list args)
         return VLC_SUCCESS;
     }
     case DEMUX_SET_NEXT_DEMUX_TIME:
-        sys->deadline = va_arg(args, mtime_t);
+        sys->deadline = va_arg(args, vlc_tick_t);
         return VLC_SUCCESS;
 
     /* */

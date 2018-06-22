@@ -150,7 +150,7 @@ static inline int bytesPerSample(void)
     return 2 /* S16 */ * 2 /* stereo */;
 }
 
-static int TimeGet(audio_output_t* aout, mtime_t* restrict drift)
+static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
 {
     aout_sys_t *sys = aout->sys;
 
@@ -182,7 +182,7 @@ static void Flush(audio_output_t *aout, bool drain)
     aout_sys_t *sys = aout->sys;
 
     if (drain) {
-        mtime_t delay;
+        vlc_tick_t delay;
         if (!TimeGet(aout, &delay))
             msleep(delay);
     } else {
@@ -233,7 +233,7 @@ static int MuteSet(audio_output_t *aout, bool mute)
     return (r == SL_RESULT_SUCCESS) ? 0 : -1;
 }
 
-static void Pause(audio_output_t *aout, bool pause, mtime_t date)
+static void Pause(audio_output_t *aout, bool pause, vlc_tick_t date)
 {
     (void)date;
     aout_sys_t *sys = aout->sys;
@@ -323,7 +323,7 @@ static int WriteBuffer(audio_output_t *aout)
 /*****************************************************************************
  * Play: play a sound
  *****************************************************************************/
-static void Play(audio_output_t *aout, block_t *p_buffer, mtime_t date)
+static void Play(audio_output_t *aout, block_t *p_buffer, vlc_tick_t date)
 {
     aout_sys_t *sys = aout->sys;
 

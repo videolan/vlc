@@ -499,7 +499,7 @@ static subpicture_region_t * vout_BuildOSDEpg(epg_spu_updater_sys_t *p_sys,
 static int OSDEpgValidate(subpicture_t *subpic,
                           bool has_src_changed, const video_format_t *fmt_src,
                           bool has_dst_changed, const video_format_t *fmt_dst,
-                          mtime_t ts)
+                          vlc_tick_t ts)
 {
     VLC_UNUSED(subpic); VLC_UNUSED(ts);
     VLC_UNUSED(fmt_src); VLC_UNUSED(has_src_changed);
@@ -513,7 +513,7 @@ static int OSDEpgValidate(subpicture_t *subpic,
 static void OSDEpgUpdate(subpicture_t *subpic,
                          const video_format_t *fmt_src,
                          const video_format_t *fmt_dst,
-                         mtime_t ts)
+                         vlc_tick_t ts)
 {
     epg_spu_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(ts);
@@ -636,7 +636,7 @@ int vout_OSDEpg(vout_thread_t *vout, input_item_t *input )
         .p_sys       = sys
     };
 
-    const mtime_t now = mdate();
+    const vlc_tick_t now = mdate();
     subpicture_t *subpic = subpicture_New(&updater);
     if (!subpic) {
         vlc_epg_Delete(sys->epg);

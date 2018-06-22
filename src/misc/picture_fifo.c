@@ -102,7 +102,7 @@ picture_t *picture_fifo_Peek(picture_fifo_t *fifo)
 
     return picture;
 }
-void picture_fifo_Flush(picture_fifo_t *fifo, mtime_t date, bool flush_before)
+void picture_fifo_Flush(picture_fifo_t *fifo, vlc_tick_t date, bool flush_before)
 {
     picture_t *picture;
 
@@ -130,7 +130,7 @@ void picture_fifo_Flush(picture_fifo_t *fifo, mtime_t date, bool flush_before)
     while ((picture = PictureFifoPop(&tmp)) != NULL)
         picture_Release(picture);
 }
-void picture_fifo_OffsetDate(picture_fifo_t *fifo, mtime_t delta)
+void picture_fifo_OffsetDate(picture_fifo_t *fifo, vlc_tick_t delta)
 {
     vlc_mutex_lock(&fifo->lock);
     for (picture_t *picture = fifo->first; picture != NULL;) {

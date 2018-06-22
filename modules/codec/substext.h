@@ -62,7 +62,7 @@ typedef struct
     /* styling */
     text_style_t *p_default_style; /* decoder (full or partial) defaults */
     float margin_ratio;
-    mtime_t i_next_update;
+    vlc_tick_t i_next_update;
     bool b_blink_even;
 } subtext_updater_sys_t;
 
@@ -98,7 +98,7 @@ static inline void SubpictureUpdaterSysRegionAdd(substext_updater_region_t *p_pr
 static int SubpictureTextValidate(subpicture_t *subpic,
                                   bool has_src_changed, const video_format_t *fmt_src,
                                   bool has_dst_changed, const video_format_t *fmt_dst,
-                                  mtime_t ts)
+                                  vlc_tick_t ts)
 {
     subtext_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
@@ -129,7 +129,7 @@ static int SubpictureTextValidate(subpicture_t *subpic,
 static void SubpictureTextUpdate(subpicture_t *subpic,
                                  const video_format_t *fmt_src,
                                  const video_format_t *fmt_dst,
-                                 mtime_t ts)
+                                 vlc_tick_t ts)
 {
     subtext_updater_sys_t *sys = subpic->updater.p_sys;
     VLC_UNUSED(fmt_src);

@@ -57,8 +57,8 @@ namespace adaptive
             SegmentTrackerEvent(BaseRepresentation *, BaseRepresentation *);
             SegmentTrackerEvent(const StreamFormat *);
             SegmentTrackerEvent(const ID &, bool);
-            SegmentTrackerEvent(const ID &, mtime_t, mtime_t, mtime_t);
-            SegmentTrackerEvent(const ID &, mtime_t);
+            SegmentTrackerEvent(const ID &, vlc_tick_t, vlc_tick_t, vlc_tick_t);
+            SegmentTrackerEvent(const ID &, vlc_tick_t);
             enum
             {
                 DISCONTINUITY,
@@ -91,14 +91,14 @@ namespace adaptive
                struct
                {
                    const ID *id;
-                   mtime_t minimum;
-                   mtime_t current;
-                   mtime_t target;
+                   vlc_tick_t minimum;
+                   vlc_tick_t current;
+                   vlc_tick_t target;
                } buffering_level;
                struct
                {
                     const ID *id;
-                   mtime_t duration;
+                   vlc_tick_t duration;
                } segment;
             } u;
     };
@@ -119,12 +119,12 @@ namespace adaptive
             bool segmentsListReady() const;
             void reset();
             SegmentChunk* getNextChunk(bool, AbstractConnectionManager *);
-            bool setPositionByTime(mtime_t, bool, bool);
+            bool setPositionByTime(vlc_tick_t, bool, bool);
             void setPositionByNumber(uint64_t, bool);
-            mtime_t getPlaybackTime() const; /* Current segment start time if selected */
-            mtime_t getMinAheadTime() const;
+            vlc_tick_t getPlaybackTime() const; /* Current segment start time if selected */
+            vlc_tick_t getMinAheadTime() const;
             void notifyBufferingState(bool) const;
-            void notifyBufferingLevel(mtime_t, mtime_t, mtime_t) const;
+            void notifyBufferingLevel(vlc_tick_t, vlc_tick_t, vlc_tick_t) const;
             void registerListener(SegmentTrackerListenerInterface *);
             void updateSelected();
 

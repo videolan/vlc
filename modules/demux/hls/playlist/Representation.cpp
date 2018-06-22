@@ -105,7 +105,7 @@ void Representation::scheduleNextUpdate(uint64_t number)
     const time_t now = time(NULL);
 
     /* Compute new update time */
-    mtime_t minbuffer = getMinAheadTime(number);
+    vlc_tick_t minbuffer = getMinAheadTime(number);
 
     /* Update frequency must always be at least targetDuration (if any)
      * but we need to update before reaching that last segment, thus -1 */
@@ -127,7 +127,7 @@ void Representation::scheduleNextUpdate(uint64_t number)
     nextUpdateTime = now + minbuffer / CLOCK_FREQ;
 
     msg_Dbg(playlist->getVLCObject(), "Updated playlist ID %s, next update in %" PRId64 "s",
-            getID().str().c_str(), (mtime_t) nextUpdateTime - now);
+            getID().str().c_str(), (vlc_tick_t) nextUpdateTime - now);
 
     debug(playlist->getVLCObject(), 0);
 }
@@ -137,7 +137,7 @@ bool Representation::needsUpdate() const
     return !b_loaded || (isLive() && nextUpdateTime < time(NULL));
 }
 
-bool Representation::runLocalUpdates(mtime_t, uint64_t number, bool prune)
+bool Representation::runLocalUpdates(vlc_tick_t, uint64_t number, bool prune)
 {
     const time_t now = time(NULL);
     AbstractPlaylist *playlist = getPlaylist();
@@ -167,7 +167,7 @@ uint64_t Representation::translateSegmentNumber(uint64_t num, const SegmentInfor
     HLSSegment *fromHlsSeg = dynamic_cast<HLSSegment *>(fromSeg);
     if(!fromHlsSeg)
         return 1;
-    const mtime_t utcTime = fromHlsSeg->getUTCTime();
+    const vlc_tick_t utcTime = fromHlsSeg->getUTCTime();
 
     std::vector<ISegment *> list;
     std::vector<ISegment *>::const_iterator it;

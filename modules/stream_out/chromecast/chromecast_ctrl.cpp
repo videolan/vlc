@@ -492,7 +492,7 @@ int intf_sys_t::pace()
     m_interrupted = false;
     vlc_interrupt_register( interrupt_wake_up_cb, this );
     int ret = 0;
-    mtime_t deadline = mdate() + CLOCK_FREQ/2;
+    vlc_tick_t deadline = mdate() + CLOCK_FREQ/2;
 
     /* Wait for the sout to send more data via http (m_pace), or wait for the
      * CC to finish. In case the demux filter is EOF, we always wait for
@@ -860,7 +860,7 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
             }
             else if (newPlayerState == "PLAYING")
             {
-                mtime_t currentTime = timeCCToVLC((double) status[0]["currentTime"]);
+                vlc_tick_t currentTime = timeCCToVLC((double) status[0]["currentTime"]);
                 m_cc_time = currentTime;
                 m_cc_time_date = mdate();
 
@@ -947,7 +947,7 @@ bool intf_sys_t::handleMessages()
     size_t i_payloadSize = 0;
     size_t i_received = 0;
     bool b_timeout = false;
-    mtime_t i_begin_time = mdate();
+    vlc_tick_t i_begin_time = mdate();
 
     /* Packet structure:
      * +------------------------------------+------------------------------+
@@ -1051,12 +1051,12 @@ States intf_sys_t::state() const
     return m_state;
 }
 
-mtime_t intf_sys_t::timeCCToVLC(double time)
+vlc_tick_t intf_sys_t::timeCCToVLC(double time)
 {
-    return mtime_t(time * (double)CLOCK_FREQ);
+    return vlc_tick_t(time * (double)CLOCK_FREQ);
 }
 
-std::string intf_sys_t::timeVLCToCC(mtime_t time)
+std::string intf_sys_t::timeVLCToCC(vlc_tick_t time)
 {
     std::stringstream ss;
     ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
@@ -1087,7 +1087,7 @@ void intf_sys_t::setDemuxEnabled(bool enabled,
     }
 }
 
-void intf_sys_t::setPauseState(bool paused, mtime_t delay)
+void intf_sys_t::setPauseState(bool paused, vlc_tick_t delay)
 {
     vlc_mutex_locker locker( &m_lock );
     if ( m_mediaSessionId == 0 || paused == m_paused || !m_communication )
@@ -1106,7 +1106,7 @@ void intf_sys_t::setPauseState(bool paused, mtime_t delay)
             m_communication->msgPlayerPause( m_appTransportId, m_mediaSessionId );
 }
 
-mtime_t intf_sys_t::getPauseDelay()
+vlc_tick_t intf_sys_t::getPauseDelay()
 {
     vlc_mutex_locker locker( &m_lock );
     return m_pause_delay;
@@ -1125,7 +1125,7 @@ void intf_sys_t::setMeta(vlc_meta_t *p_meta)
     m_meta = p_meta;
 }
 
-mtime_t intf_sys_t::getPlaybackTimestamp()
+vlc_tick_t intf_sys_t::getPlaybackTimestamp()
 {
     vlc_mutex_locker locker( &m_lock );
     switch( m_state )
@@ -1138,7 +1138,7 @@ mtime_t intf_sys_t::getPlaybackTimestamp()
         case Playing:
         {
             assert( m_communication );
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
             if( m_state == Playing && m_last_request_id == 0
              && now - m_cc_time_last_request_date > INT64_C(4000000) )
             {
@@ -1185,7 +1185,7 @@ void intf_sys_t::setState( States state )
     }
 }
 
-mtime_t intf_sys_t::get_time(void *pt)
+vlc_tick_t intf_sys_t::get_time(void *pt)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     return p_this->getPlaybackTimestamp();
@@ -1210,7 +1210,7 @@ void intf_sys_t::send_input_event(void *pt, enum cc_input_event event, union cc_
     return p_this->sendInputEvent(event, arg);
 }
 
-void intf_sys_t::set_pause_state(void *pt, bool paused, mtime_t delay)
+void intf_sys_t::set_pause_state(void *pt, bool paused, vlc_tick_t delay)
 {
     intf_sys_t *p_this = static_cast<intf_sys_t*>(pt);
     p_this->setPauseState( paused, delay );

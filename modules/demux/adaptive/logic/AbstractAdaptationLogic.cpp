@@ -41,7 +41,7 @@ AbstractAdaptationLogic::~AbstractAdaptationLogic   ()
 {
 }
 
-void AbstractAdaptationLogic::updateDownloadRate    (const adaptive::ID &, size_t, mtime_t)
+void AbstractAdaptationLogic::updateDownloadRate    (const adaptive::ID &, size_t, vlc_tick_t)
 {
 }
 

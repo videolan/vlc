@@ -177,7 +177,7 @@ typedef struct
     bool                b_menu;
     bool                b_menu_open;
     bool                b_popup_available;
-    mtime_t             i_still_end_time;
+    vlc_tick_t          i_still_end_time;
 
     vlc_mutex_t         bdj_overlay_lock; /* used to lock BD-J overlay open/close while overlays are being sent to vout */
 
@@ -1159,7 +1159,7 @@ static void updater_unlock_overlay(bluray_spu_updater_sys_t *p_upd_sys)
 static int subpictureUpdaterValidate(subpicture_t *p_subpic,
                                       bool b_fmt_src, const video_format_t *p_fmt_src,
                                       bool b_fmt_dst, const video_format_t *p_fmt_dst,
-                                      mtime_t i_ts)
+                                      vlc_tick_t i_ts)
 {
     VLC_UNUSED(b_fmt_src);
     VLC_UNUSED(b_fmt_dst);
@@ -1184,7 +1184,7 @@ static int subpictureUpdaterValidate(subpicture_t *p_subpic,
 static void subpictureUpdaterUpdate(subpicture_t *p_subpic,
                                     const video_format_t *p_fmt_src,
                                     const video_format_t *p_fmt_dst,
-                                    mtime_t i_ts)
+                                    vlc_tick_t i_ts)
 {
     VLC_UNUSED(p_fmt_src);
     VLC_UNUSED(p_fmt_dst);

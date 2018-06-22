@@ -34,8 +34,8 @@
 struct cc_storage_t
 {
     uint32_t i_flags;
-    mtime_t i_dts;
-    mtime_t i_pts;
+    vlc_tick_t i_dts;
+    vlc_tick_t i_pts;
     cc_data_t current;
     cc_data_t next;
 };

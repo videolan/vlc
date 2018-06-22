@@ -128,7 +128,7 @@ typedef struct
      * Common properties
      */
     date_t  end_date;
-    mtime_t i_pts;
+    vlc_tick_t i_pts;
     bool b_discontuinity;
 
     int i_frame_size;
@@ -330,7 +330,7 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
     p_block = *pp_block;
     *pp_block = NULL; /* Don't reuse this block */
 
-    mtime_t i_diff = 0;
+    vlc_tick_t i_diff = 0;
     if (p_block->i_pts != VLC_TS_INVALID &&
         p_block->i_pts != date_Get(&p_sys->end_date))
     {

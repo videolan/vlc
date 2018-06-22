@@ -85,10 +85,10 @@ typedef struct
     es_format_t     fmt;
     es_out_id_t     *es;
 
-    mtime_t         i_time;
+    vlc_tick_t      i_time;
 
     int             i_frame_size;
-    mtime_t         i_frame_length;
+    vlc_tick_t      i_frame_length;
 
     uint32_t        i_header_size;
 } demux_sys_t;
@@ -289,8 +289,8 @@ static int Open( vlc_object_t *p_this )
         }
     }
     p_sys->i_frame_length = CLOCK_FREQ *
-                            (mtime_t)i_samples /
-                            (mtime_t)p_sys->fmt.audio.i_rate;
+                            (vlc_tick_t)i_samples /
+                            (vlc_tick_t)p_sys->fmt.audio.i_rate;
 
     p_demux->p_sys = p_sys;
     p_demux->pf_demux = Demux;

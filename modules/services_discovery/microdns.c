@@ -112,7 +112,7 @@ struct item
     char *              psz_uri;
     input_item_t *      p_input_item;
     vlc_renderer_item_t*p_renderer_item;
-    mtime_t             i_last_seen;
+    vlc_tick_t          i_last_seen;
 };
 
 struct srv
@@ -250,7 +250,7 @@ items_timeout( struct discovery_sys *p_sys, services_discovery_t *p_sd,
                vlc_renderer_discovery_t *p_rd )
 {
     assert( p_rd != NULL || p_sd != NULL );
-    mtime_t i_now = mdate();
+    vlc_tick_t i_now = mdate();
 
     /* Remove items that are not seen since TIMEOUT */
     for( size_t i = 0; i < vlc_array_count( &p_sys->items ); ++i )

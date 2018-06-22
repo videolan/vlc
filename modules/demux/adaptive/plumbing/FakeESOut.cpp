@@ -75,7 +75,7 @@ FakeESOut::~FakeESOut()
     vlc_mutex_destroy(&lock);
 }
 
-void FakeESOut::setExpectedTimestampOffset(mtime_t offset)
+void FakeESOut::setExpectedTimestampOffset(vlc_tick_t offset)
 {
     vlc_mutex_lock(&lock);
     timestamps_offset = 0;
@@ -84,7 +84,7 @@ void FakeESOut::setExpectedTimestampOffset(mtime_t offset)
     vlc_mutex_unlock(&lock);
 }
 
-void FakeESOut::setTimestampOffset(mtime_t offset)
+void FakeESOut::setTimestampOffset(vlc_tick_t offset)
 {
     vlc_mutex_lock(&lock);
     timestamps_offset = offset;
@@ -173,10 +173,10 @@ void FakeESOut::createOrRecycleRealEsID( FakeESOutID *es_id )
     vlc_mutex_unlock(&lock);
 }
 
-mtime_t FakeESOut::getTimestampOffset() const
+vlc_tick_t FakeESOut::getTimestampOffset() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t time = timestamps_offset;
+    vlc_tick_t time = timestamps_offset;
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return time;
 }
@@ -320,7 +320,7 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
     return NULL;
 }
 
-void FakeESOut::checkTimestampsStart(mtime_t i_start)
+void FakeESOut::checkTimestampsStart(vlc_tick_t i_start)
 {
     if( i_start == VLC_TS_INVALID )
         return;
@@ -343,7 +343,7 @@ int FakeESOut::esOutSend_Callback(es_out_t *fakees, es_out_id_t *p_es, block_t *
 
     me->checkTimestampsStart( p_block->i_dts );
 
-    mtime_t offset = me->getTimestampOffset();
+    vlc_tick_t offset = me->getTimestampOffset();
     if( p_block->i_dts != VLC_TS_INVALID )
     {
         p_block->i_dts += offset;
@@ -385,7 +385,7 @@ int FakeESOut::esOutControl_Callback(es_out_t *fakees, int i_query, va_list args
                 i_group = va_arg( args, int );
             else
                 i_group = 0;
-            mtime_t  pcr = va_arg( args, mtime_t );
+            vlc_tick_t  pcr = va_arg( args, vlc_tick_t );
             me->checkTimestampsStart( pcr );
             pcr += me->getTimestampOffset();
             AbstractCommand *command = me->commandsqueue->factory()->createEsOutControlPCRCommand( i_group, pcr );

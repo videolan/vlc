@@ -72,7 +72,7 @@ typedef struct
     double f_fps;
 
     /* */
-    mtime_t i_pts_delay;
+    vlc_tick_t i_pts_delay;
 
     bool       b_eof;   /* eof of demuxer */
 
@@ -103,9 +103,9 @@ typedef struct input_thread_private_t
     int         i_rate;
 
     /* Playtime configuration and state */
-    mtime_t     i_start;    /* :start-time,0 by default */
-    mtime_t     i_stop;     /* :stop-time, 0 if none */
-    mtime_t     i_time;     /* Current time */
+    vlc_tick_t  i_start;    /* :start-time,0 by default */
+    vlc_tick_t  i_stop;     /* :stop-time, 0 if none */
+    vlc_tick_t  i_time;     /* Current time */
     bool        b_fast_seek;/* :input-fast-seek */
 
     /* Output */
@@ -269,8 +269,8 @@ typedef struct input_rate_t
     uintmax_t value;
     struct
     {
-        uintmax_t value;
-        mtime_t   date;
+        uintmax_t  value;
+        vlc_tick_t date;
     } samples[2];
 } input_rate_t;
 

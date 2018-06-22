@@ -67,7 +67,7 @@ struct vout_display_sys_t
 };
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
-static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, mtime_t);
+static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static void           Manage (vout_display_t *);
 
@@ -210,7 +210,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture,
-                    mtime_t date)
+                    vlc_tick_t date)
 {
     Manage(vd);
     VLC_UNUSED(date);

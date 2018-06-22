@@ -47,8 +47,8 @@ struct seat_data
     struct wl_seat *seat;
 
     struct wl_pointer *pointer;
-    mtime_t cursor_timeout;
-    mtime_t cursor_deadline;
+    vlc_tick_t cursor_timeout;
+    vlc_tick_t cursor_deadline;
     uint32_t cursor_serial;
 
 #ifdef HAVE_XKBCOMMON
@@ -453,12 +453,12 @@ int seat_create(vout_window_t *wnd, struct wl_registry *registry,
     return 0;
 }
 
-static mtime_t seat_next_deadline(const struct seat_data *sd)
+static vlc_tick_t seat_next_deadline(const struct seat_data *sd)
 {
     return (sd->pointer != NULL) ? sd->cursor_deadline : INT64_MAX;
 }
 
-static void seat_refresh(struct seat_data *sd, mtime_t now)
+static void seat_refresh(struct seat_data *sd, vlc_tick_t now)
 {
     if (sd->pointer != NULL && sd->cursor_deadline <= now)
     {   /* Hide cursor */
@@ -512,11 +512,11 @@ void seat_destroy_all(struct wl_list *list)
 int seat_next_timeout(const struct wl_list *list)
 {
     struct seat_data *sd;
-    mtime_t deadline = INT64_MAX;
+    vlc_tick_t deadline = INT64_MAX;
 
     wl_list_for_each(sd, list, node)
     {
-        mtime_t d = seat_next_deadline(sd);
+        vlc_tick_t d = seat_next_deadline(sd);
         if (deadline > d)
             deadline = d;
     }
@@ -524,7 +524,7 @@ int seat_next_timeout(const struct wl_list *list)
     if (deadline == INT64_MAX)
         return -1;
 
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
     if (now >= deadline)
         return 0;
 
@@ -534,7 +534,7 @@ int seat_next_timeout(const struct wl_list *list)
 void seat_timeout(struct wl_list *list)
 {
     struct seat_data *sd;
-    mtime_t now = mdate();
+    vlc_tick_t now = mdate();
 
     wl_list_for_each(sd, list, node)
         seat_refresh(sd, now);

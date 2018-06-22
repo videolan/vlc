@@ -122,8 +122,8 @@ struct filter_spatialaudio
     CAmbisonicSpeaker *speakers;
 
     std::vector<float> inputSamples;
-    mtime_t i_inputPTS;
-    mtime_t i_last_input_pts;
+    vlc_tick_t i_inputPTS;
+    vlc_tick_t i_last_input_pts;
     unsigned i_order;
     unsigned i_nondiegetic;
     unsigned i_lr_channels; // number of physical left/right channel pairs
@@ -169,7 +169,7 @@ static block_t *Mix( filter_t *p_filter, block_t *p_buf )
     filter_spatialaudio *p_sys = reinterpret_cast<filter_spatialaudio *>(p_filter->p_sys);
 
     /* Detect discontinuity due to a pause */
-    static const mtime_t rounding_error = 10;
+    static const vlc_tick_t rounding_error = 10;
     if( p_sys->i_inputPTS != 0
      && p_buf->i_pts - p_sys->i_last_input_pts > rounding_error )
         Flush( p_filter );

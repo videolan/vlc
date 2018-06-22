@@ -68,7 +68,7 @@ vlc_module_end ()
 typedef struct
 {
     double  f_angle;
-    mtime_t last_date;
+    vlc_tick_t last_date;
 } filter_sys_t;
 
 /*****************************************************************************
@@ -110,7 +110,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     double f_angle;
-    mtime_t new_date = mdate();
+    vlc_tick_t new_date = mdate();
 
     if( !p_pic ) return NULL;
 

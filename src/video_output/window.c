@@ -131,7 +131,7 @@ typedef struct vout_display_window
 {
     vout_display_t *vd;
     vlc_mouse_t mouse;
-    mtime_t last_left_press;
+    vlc_tick_t last_left_press;
 } vout_display_window_t;
 
 static void vout_display_window_ResizeNotify(vout_window_t *window,
@@ -201,7 +201,7 @@ static void vout_display_window_MouseEvent(vout_window_t *window,
              && ev->button_mask == MOUSE_BUTTON_LEFT
              && !vlc_mouse_IsLeftPressed(m))
             {
-                const mtime_t now = mdate();
+                const vlc_tick_t now = mdate();
 
                 if (state->last_left_press != INT64_MIN
                  && now - state->last_left_press < DOUBLE_CLICK_TIME)

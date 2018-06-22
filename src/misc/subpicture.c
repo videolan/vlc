@@ -150,7 +150,7 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
 void subpicture_Update( subpicture_t *p_subpicture,
                         const video_format_t *p_fmt_src,
                         const video_format_t *p_fmt_dst,
-                        mtime_t i_ts )
+                        vlc_tick_t i_ts )
 {
     subpicture_updater_t *p_upd = &p_subpicture->updater;
     subpicture_private_t *p_private = p_subpicture->p_private;

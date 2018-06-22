@@ -93,7 +93,7 @@ typedef struct avi_stream_s
 
     char fcc[4];
 
-    mtime_t i_duration;       // in µs
+    vlc_tick_t i_duration;       // in µs
 
     int     i_frames;        // total frame count
     int64_t i_totalsize;    // total stream size

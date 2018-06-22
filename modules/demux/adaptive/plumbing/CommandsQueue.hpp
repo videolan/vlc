@@ -37,7 +37,7 @@ namespace adaptive
         public:
             virtual ~AbstractCommand();
             virtual void Execute( es_out_t * ) = 0;
-            virtual mtime_t getTime() const;
+            virtual vlc_tick_t getTime() const;
             int getType() const;
 
         protected:
@@ -58,7 +58,7 @@ namespace adaptive
         public:
             virtual ~EsOutSendCommand();
             virtual void Execute( es_out_t *out );
-            virtual mtime_t getTime() const;
+            virtual vlc_tick_t getTime() const;
             const void * esIdentifier() const;
 
         protected:
@@ -92,12 +92,12 @@ namespace adaptive
         friend class CommandsFactory;
         public:
             virtual void Execute( es_out_t *out );
-            virtual mtime_t getTime() const;
+            virtual vlc_tick_t getTime() const;
 
         protected:
-            EsOutControlPCRCommand( int, mtime_t );
+            EsOutControlPCRCommand( int, vlc_tick_t );
             int group;
-            mtime_t pcr;
+            vlc_tick_t pcr;
     };
 
     class EsOutDestroyCommand : public AbstractCommand
@@ -141,7 +141,7 @@ namespace adaptive
             virtual EsOutSendCommand * createEsOutSendCommand( FakeESOutID *, block_t * ) const;
             virtual EsOutDelCommand * createEsOutDelCommand( FakeESOutID * ) const;
             virtual EsOutAddCommand * createEsOutAddCommand( FakeESOutID * ) const;
-            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, mtime_t ) const;
+            virtual EsOutControlPCRCommand * createEsOutControlPCRCommand( int, vlc_tick_t ) const;
             virtual EsOutControlResetPCRCommand * creatEsOutControlResetPCRCommand() const;
             virtual EsOutDestroyCommand * createEsOutDestroyCommand() const;
             virtual EsOutMetaCommand * createEsOutMetaCommand( int, const vlc_meta_t * ) const;
@@ -155,7 +155,7 @@ namespace adaptive
             ~CommandsQueue();
             const CommandsFactory * factory() const;
             void Schedule( AbstractCommand * );
-            mtime_t Process( es_out_t *out, mtime_t );
+            vlc_tick_t Process( es_out_t *out, vlc_tick_t );
             void Abort( bool b_reset );
             void Commit();
             bool isEmpty() const;
@@ -164,10 +164,10 @@ namespace adaptive
             void setEOF( bool );
             bool isDraining() const;
             bool isEOF() const;
-            mtime_t getDemuxedAmount() const;
-            mtime_t getBufferingLevel() const;
-            mtime_t getFirstDTS() const;
-            mtime_t getPCR() const;
+            vlc_tick_t getDemuxedAmount() const;
+            vlc_tick_t getBufferingLevel() const;
+            vlc_tick_t getFirstDTS() const;
+            vlc_tick_t getPCR() const;
 
         private:
             CommandsFactory *commandsFactory;
@@ -176,8 +176,8 @@ namespace adaptive
             void LockedSetDraining();
             std::list<AbstractCommand *> incoming;
             std::list<AbstractCommand *> commands;
-            mtime_t bufferinglevel;
-            mtime_t pcr;
+            vlc_tick_t bufferinglevel;
+            vlc_tick_t pcr;
             bool b_draining;
             bool b_drop;
             bool b_eof;

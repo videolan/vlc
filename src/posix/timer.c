@@ -46,7 +46,7 @@ struct vlc_timer
     vlc_mutex_t  lock;
     void       (*func) (void *);
     void        *data;
-    mtime_t      value, interval;
+    vlc_tick_t   value, interval;
     atomic_uint  overruns;
 };
 
@@ -67,7 +67,7 @@ noreturn static void *vlc_timer_thread (void *data)
 
         if (timer->interval != 0)
         {
-            mtime_t now = mdate();
+            vlc_tick_t now = mdate();
 
             if (now > timer->value)
             {   /* Update overrun counter */
@@ -80,7 +80,7 @@ noreturn static void *vlc_timer_thread (void *data)
             }
         }
 
-        mtime_t value = timer->value;
+        vlc_tick_t value = timer->value;
 
         if (vlc_cond_timedwait(&timer->reschedule, &timer->lock, value) == 0)
             continue;
@@ -144,7 +144,7 @@ void vlc_timer_destroy (vlc_timer_t timer)
 }
 
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
-                         mtime_t value, mtime_t interval)
+                         vlc_tick_t value, vlc_tick_t interval)
 {
     if (value == 0)
         interval = 0;

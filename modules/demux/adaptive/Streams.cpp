@@ -144,24 +144,24 @@ void AbstractStream::setDescription(const std::string &desc)
     description = desc;
 }
 
-mtime_t AbstractStream::getPCR() const
+vlc_tick_t AbstractStream::getPCR() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    mtime_t pcr = isDisabled() ? VLC_TS_INVALID : commandsqueue->getPCR();
+    vlc_tick_t pcr = isDisabled() ? VLC_TS_INVALID : commandsqueue->getPCR();
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return pcr;
 }
 
-mtime_t AbstractStream::getMinAheadTime() const
+vlc_tick_t AbstractStream::getMinAheadTime() const
 {
     if(!segmentTracker)
         return 0;
     return segmentTracker->getMinAheadTime();
 }
 
-mtime_t AbstractStream::getFirstDTS() const
+vlc_tick_t AbstractStream::getFirstDTS() const
 {
-    mtime_t dts;
+    vlc_tick_t dts;
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     if(isDisabled())
     {
@@ -208,7 +208,7 @@ bool AbstractStream::isSelected() const
     return fakeesout->hasSelectedEs();
 }
 
-bool AbstractStream::reactivate(mtime_t basetime)
+bool AbstractStream::reactivate(vlc_tick_t basetime)
 {
     if(setPosition(basetime, false))
     {
@@ -289,20 +289,20 @@ AbstractStream::buffering_status AbstractStream::getLastBufferStatus() const
     return last_buffer_status;
 }
 
-mtime_t AbstractStream::getDemuxedAmount() const
+vlc_tick_t AbstractStream::getDemuxedAmount() const
 {
     return commandsqueue->getDemuxedAmount();
 }
 
-AbstractStream::buffering_status AbstractStream::bufferize(mtime_t nz_deadline,
-                                                           mtime_t i_min_buffering, mtime_t i_extra_buffering)
+AbstractStream::buffering_status AbstractStream::bufferize(vlc_tick_t nz_deadline,
+                                                           vlc_tick_t i_min_buffering, vlc_tick_t i_extra_buffering)
 {
     last_buffer_status = doBufferize(nz_deadline, i_min_buffering, i_extra_buffering);
     return last_buffer_status;
 }
 
-AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline,
-                                                             mtime_t i_min_buffering, mtime_t i_extra_buffering)
+AbstractStream::buffering_status AbstractStream::doBufferize(vlc_tick_t nz_deadline,
+                                                             vlc_tick_t i_min_buffering, vlc_tick_t i_extra_buffering)
 {
     vlc_mutex_lock(&lock);
 
@@ -353,9 +353,9 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
         }
     }
 
-    const mtime_t i_total_buffering = i_min_buffering + i_extra_buffering;
+    const vlc_tick_t i_total_buffering = i_min_buffering + i_extra_buffering;
 
-    mtime_t i_demuxed = commandsqueue->getDemuxedAmount();
+    vlc_tick_t i_demuxed = commandsqueue->getDemuxedAmount();
     segmentTracker->notifyBufferingLevel(i_min_buffering, i_demuxed, i_total_buffering);
     if(i_demuxed < i_total_buffering) /* not already demuxed */
     {
@@ -365,7 +365,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
             return AbstractStream::buffering_suspended;
         }
 
-        mtime_t nz_extdeadline = commandsqueue->getBufferingLevel() +
+        vlc_tick_t nz_extdeadline = commandsqueue->getBufferingLevel() +
                                 (i_total_buffering - commandsqueue->getDemuxedAmount()) / 4;
         nz_deadline = std::max(nz_deadline, nz_extdeadline);
 
@@ -407,7 +407,7 @@ AbstractStream::buffering_status AbstractStream::doBufferize(mtime_t nz_deadline
     return AbstractStream::buffering_full;
 }
 
-AbstractStream::status AbstractStream::dequeue(mtime_t nz_deadline, mtime_t *pi_pcr)
+AbstractStream::status AbstractStream::dequeue(vlc_tick_t nz_deadline, vlc_tick_t *pi_pcr)
 {
     vlc_mutex_locker locker(&lock);
 
@@ -498,7 +498,7 @@ block_t * AbstractStream::readNextBlock()
     return block;
 }
 
-bool AbstractStream::setPosition(mtime_t time, bool tryonly)
+bool AbstractStream::setPosition(vlc_tick_t time, bool tryonly)
 {
     if(!seekAble())
         return false;
@@ -538,7 +538,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
     return ret;
 }
 
-mtime_t AbstractStream::getPlaybackTime() const
+vlc_tick_t AbstractStream::getPlaybackTime() const
 {
     return segmentTracker->getPlaybackTime();
 }
@@ -557,7 +557,7 @@ void AbstractStream::fillExtraFMTInfo( es_format_t *p_fmt ) const
         p_fmt->psz_description = strdup(description.c_str());
 }
 
-void AbstractStream::setTimeOffset(mtime_t i_offset)
+void AbstractStream::setTimeOffset(vlc_tick_t i_offset)
 {
     /* Check if we need to set an offset as the demuxer
      * will start from zero from seek point */

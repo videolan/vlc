@@ -172,7 +172,7 @@ typedef struct
     bool        b_slave;
     bool        b_first_time;
 
-    mtime_t     i_next_demux_date;
+    vlc_tick_t  i_next_demux_date;
 
     struct
     {
@@ -822,7 +822,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_date = va_arg( args, mtime_t ) - VLC_TS_0;
+            p_sys->i_next_demux_date = va_arg( args, vlc_tick_t ) - VLC_TS_0;
             return VLC_SUCCESS;
 
         case DEMUX_CAN_PAUSE:
@@ -851,7 +851,7 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    mtime_t i_barrier = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
+    vlc_tick_t i_barrier = p_sys->i_next_demux_date - var_GetInteger( p_demux->obj.parent, "spu-delay" );
     if( i_barrier < 0 )
         i_barrier = p_sys->i_next_demux_date;
 
@@ -2424,7 +2424,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             continue;
 
         /* convert everything to seconds */
-        mtime_t i_frames = h * 3600 + m * 60 + s;
+        vlc_tick_t i_frames = h * 3600 + m * 60 + s;
 
         if( c == ';' && p_rate->b_drop_allowed ) /* dropframe */
         {

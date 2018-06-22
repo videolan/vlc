@@ -162,7 +162,7 @@ static int64_t Ogg_ShiftPacketSample( const logical_stream_t *p_stream,
     return i_sample;
 }
 
-mtime_t Ogg_SampleToTime( const logical_stream_t *p_stream, int64_t i_sample, bool b_start )
+vlc_tick_t Ogg_SampleToTime( const logical_stream_t *p_stream, int64_t i_sample, bool b_start )
 {
     i_sample = Ogg_ShiftPacketSample( p_stream, i_sample, b_start );
     if( i_sample < 0 )
@@ -179,7 +179,7 @@ bool Ogg_GranuleIsValid( const logical_stream_t *p_stream, int64_t i_granule )
     return !( i_granule < 1 - !!p_stream->b_oggds );
 }
 
-mtime_t Ogg_GranuleToTime( const logical_stream_t *p_stream, int64_t i_granule,
+vlc_tick_t Ogg_GranuleToTime( const logical_stream_t *p_stream, int64_t i_granule,
                            bool b_start, bool b_pts )
 {
     if( !Ogg_GranuleIsValid( p_stream, i_granule ) )

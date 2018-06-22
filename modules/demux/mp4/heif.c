@@ -38,9 +38,9 @@ struct heif_private_t
 {
     MP4_Box_t *p_root;
     es_out_id_t *id;
-    mtime_t i_pcr;
-    mtime_t i_end_display_time;
-    mtime_t i_image_duration;
+    vlc_tick_t i_pcr;
+    vlc_tick_t i_end_display_time;
+    vlc_tick_t i_image_duration;
     bool b_seekpoint_changed;
     uint32_t i_seekpoint;
     input_title_t *p_title;

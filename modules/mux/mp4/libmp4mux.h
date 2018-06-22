@@ -29,16 +29,16 @@ typedef struct
     uint64_t i_pos;
     int      i_size;
 
-    mtime_t  i_pts_dts;
-    mtime_t  i_length;
+    vlc_tick_t  i_pts_dts;
+    vlc_tick_t  i_length;
     unsigned int i_flags;
 } mp4mux_entry_t;
 
 typedef struct
 {
-    mtime_t i_duration;
-    mtime_t i_start_time;
-    mtime_t i_start_offset;
+    vlc_tick_t i_duration;
+    vlc_tick_t i_start_time;
+    vlc_tick_t i_start_offset;
 } mp4mux_edit_t;
 
 typedef struct
@@ -55,9 +55,9 @@ typedef struct
     block_t      *a52_frame;
 
     /* stats */
-    mtime_t      i_read_duration;
+    vlc_tick_t   i_read_duration;
     uint32_t     i_timescale;
-    mtime_t      i_firstdts; /* the really first packet */
+    vlc_tick_t   i_firstdts; /* the really first packet */
     bool         b_hasbframes;
 
     /* temp stuff */
@@ -65,7 +65,7 @@ typedef struct
     uint64_t     i_stco_pos;
 
     /* frags */
-    mtime_t      i_trex_default_length;
+    vlc_tick_t   i_trex_default_length;
     uint32_t     i_trex_default_size;
 
     /* edit list */
@@ -85,5 +85,5 @@ void  box_gather  (bo_t *box, bo_t *box2);
 bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
 bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
 bo_t *mp4mux_GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
-                        mtime_t i_movie_duration,
+                        vlc_tick_t i_movie_duration,
                         bool b_fragmented, bool b_mov, bool b_64ext, bool b_stco64);
