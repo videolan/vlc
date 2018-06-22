@@ -12,26 +12,44 @@ ${LangFileString} Name_SectionGroupVideo "Video datoteke"
 ${LangFileString} Name_SectionGroupOther "Drugo"
 ${LangFileString} Name_Section07 "Vsebinski meniji"
 ${LangFileString} Name_Section08 "Izbriši nastavitve in predpomnilnik"
-${LangFileString} Desc_Section01 "Sam predvajalnik datotek"
-${LangFileString} Desc_Section02a "Za lažji dostop v začetni meni postavi ikone"
-${LangFileString} Desc_Section02b "Za lažji dostop na vaše namizje postavi ikono"
-${LangFileString} Desc_Section03 "Dodatek VLC Mozilla in Mozilla Firefox"
-${LangFileString} Desc_Section04 "Vstavek ActiveX VLC"
-${LangFileString} Desc_Section05 "Registracija predvajanja DVD in CD"
-${LangFileString} Desc_Section06 "Predvajalnik VLC naj bo privzeti program za navedeno vrsto datotek"
-${LangFileString} Desc_Section07 "Dodaj ukaze v vsebinski meni (»Predvajaj z VLC« in »Dodaj v predvajalni seznam VLC«)"
-${LangFileString} Desc_Section08 "Izbriše nastavitve predvajalnika VLC in datoteke v predpomnilniku, ki so tam ostale od prejšnjih namestitev"
+
+${LangFileString} Desc_Section01 \
+    "Sam predvajalnik datotek"
+${LangFileString} Desc_Section02a \
+    "Za lažji dostop v začetni meni postavi ikone"
+${LangFileString} Desc_Section02b \
+    "Za lažji dostop na vaše namizje postavi ikono"
+${LangFileString} Desc_Section03 \
+    "Dodatek VLC Mozilla in Mozilla Firefox"
+${LangFileString} Desc_Section04 \
+    "Vstavek ActiveX VLC"
+${LangFileString} Desc_Section05 \
+    "Registracija predvajanja DVD in CD"
+${LangFileString} Desc_Section06 \
+    "Predvajalnik VLC naj bo privzeti program za navedeno vrsto datotek"
+${LangFileString} Desc_Section07 \
+    "Dodaj ukaze v vsebinski meni (»Predvajaj z VLC« in »Dodaj v predvajalni seznam VLC«)"
+${LangFileString} Desc_Section08 \
+    "Izbriše nastavitve predvajalnika VLC in datoteke v predpomnilniku, ki so tam ostale od prejšnjih namestitev"
+
 ${LangFileString} Name_Section91 "Odstrani namestitev"
 ${LangFileString} Name_Section92 "Izbriši nastavitve in predpomnilnik"
-${LangFileString} Desc_Section91 "Odstrani predvajalnik VLC in vse njegove dele"
-${LangFileString} Desc_Section92 "Izbriše nastavitve predvajalnika VLC in datoteke predpomnilnika"
+
+${LangFileString} Desc_Section91 \
+"Odstrani predvajalnik VLC in vse njegove dele"
+${LangFileString} Desc_Section92 \
+"Izbriše nastavitve predvajalnika VLC in datoteke predpomnilnika"
+
 ${LangFileString} ShellAssociation_Play "Predvajaj"
 ${LangFileString} ContextMenuEntry_PlayWith "Predvajaj s predvajalnikom VLC"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Dodaj na seznam predvajanja programa VLC"
+
 ${LangFileString} Link_VisitWebsite "Obišči spletišče predvajalnika VideoLAN VLC"
+
 ${LangFileString} Name_InstTypeRecommended "Priporočena"
 ${LangFileString} Name_InstTypeMinimum "Osnovna"
 ${LangFileString} Name_InstTypeFull "Polna"
+
 ${LangFileString} Action_OnArrivalDVD "Predvajaj filmski DVD"
 ${LangFileString} Action_OnArrivalAudioCD "Predvajaj zvočni CD"
 ${LangFileString} Action_OnArrivalVCDMovie "Predvajaj film VCD"
@@ -40,10 +58,12 @@ ${LangFileString} Action_OnArrivalVideoFiles "Predvajaj video datoteke"
 ${LangFileString} Action_OnArrivalMusicFiles "Predvajaj zvokovne datoteke"
 ${LangFileString} Action_OnArrivalDVDAudio "Predvajaj zvočni DVD"
 ${LangFileString} License_NextText "Sedaj ste seznanjeni z dovoljenji in vašimi pravicami in lahko nadaljujete."
+
 ${LangFileString} Detail_CheckProcesses "Preverjanje opravil ..."
 ${LangFileString} MessageBox_VLCRunning "VLC je zagnan in bo zdaj zaprt."
 ${LangFileString} MessageBox_VLCUnableToClose "Namestitvenega programa VLC ni mogoče samodejno zapreti. To je treba storiti ročno."
 ${LangFileString} MessageBox_InstallAborted "Namestitev je prekinjena!"
+
 ${LangFileString} Reinstall_Headline "Že nameščeno"
 ${LangFileString} Reinstall_HeadlineInstall "Izberite vrsto namestitve VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Izberite funkcijo vzdrževanja, ki nej se izvede."
