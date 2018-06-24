@@ -110,7 +110,6 @@ struct sout_stream_id_sys_t
 
     /* Encoder */
     encoder_t       *p_encoder;
-    block_t         *p_buffers;
     vlc_thread_t    thread;
     vlc_mutex_t     lock_out;
     bool            b_abort;
@@ -119,6 +118,8 @@ struct sout_stream_id_sys_t
     vlc_cond_t      cond;
     es_format_t     encoder_tested_fmt_in;
 
+    /* output buffers */
+    block_t         *p_buffers;
 
     /* Sync */
     date_t          next_input_pts; /**< Incoming calculated PTS */

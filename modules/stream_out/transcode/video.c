@@ -283,6 +283,16 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
      * of the encoder here.
      */
 
+    p_sys->id_video = id;
+    id->pp_pics = picture_fifo_New();
+    if( id->pp_pics == NULL )
+    {
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        video_format_Clean( &id->fmt_input_video );
+        return VLC_ENOMEM;
+    }
+
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
                     id->p_decoder->fmt_out.i_codec );
@@ -299,39 +309,18 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
                                                 p_sys->p_video_cfg,
                                                 &id->p_encoder->fmt_out,
                                                 &id->encoder_tested_fmt_in ) )
+    {
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        video_format_Clean( &id->fmt_input_video );
+        es_format_Clean( &id->encoder_tested_fmt_in );
+        picture_fifo_Delete( id->pp_pics );
         return VLC_EGENERIC;
+    }
 
     /* Will use this format as encoder input for now */
+    es_format_Clean( &id->p_encoder->fmt_in );
     es_format_Copy( &id->p_encoder->fmt_in, &id->encoder_tested_fmt_in );
-
-    if( p_sys->i_threads <= 0 )
-        return VLC_SUCCESS;
-
-    p_sys->id_video = id;
-    id->pp_pics = picture_fifo_New();
-    if( id->pp_pics == NULL )
-    {
-        msg_Err( p_stream, "cannot create picture fifo" );
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        return VLC_ENOMEM;
-    }
-
-    vlc_sem_init( &id->picture_pool_has_room, p_sys->pool_size );
-    vlc_mutex_init( &id->lock_out );
-    vlc_cond_init( &id->cond );
-    id->p_buffers = NULL;
-    id->b_abort = false;
-    if( vlc_clone( &id->thread, EncoderThread, id, p_sys->i_thread_priority ) )
-    {
-        msg_Err( p_stream, "cannot spawn encoder thread" );
-        vlc_mutex_destroy( &id->lock_out );
-        vlc_cond_destroy( &id->cond );
-        picture_fifo_Delete( id->pp_pics );
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-        id->p_decoder->p_module = NULL;
-        return VLC_EGENERIC;
-    }
 
     return VLC_SUCCESS;
 }
@@ -630,6 +619,10 @@ static void transcode_video_encoder_close( sout_stream_t *p_stream,
                                            sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    if( id->p_encoder->p_module == NULL )
+        return;
+
     if( p_sys->i_threads >= 1 && !id->b_abort )
     {
         vlc_mutex_lock( &id->lock_out );
@@ -641,11 +634,14 @@ static void transcode_video_encoder_close( sout_stream_t *p_stream,
     }
 
     /* Close encoder */
-    if( id->p_encoder->p_module )
-    {
-        module_unneed( id->p_encoder, id->p_encoder->p_module );
-        id->p_encoder->p_module = NULL;
-    }
+    module_unneed( id->p_encoder, id->p_encoder->p_module );
+    id->p_encoder->p_module = NULL;
+
+    vlc_mutex_destroy( &id->lock_out );
+    vlc_cond_destroy( &id->cond );
+    vlc_sem_destroy( &id->picture_pool_has_room );
+
+    es_format_Clean( &id->encoder_tested_fmt_in );
 }
 
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
@@ -678,6 +674,26 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
     if( !id->downstream_id )
     {
         msg_Err( p_stream, "cannot add this stream" );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
+        id->p_encoder->p_module = NULL;
+        return VLC_EGENERIC;
+    }
+
+    vlc_sem_init( &id->picture_pool_has_room, p_sys->pool_size );
+    vlc_mutex_init( &id->lock_out );
+    vlc_cond_init( &id->cond );
+    id->p_buffers = NULL;
+    id->b_abort = false;
+
+    if( p_sys->i_threads > 0  &&
+        vlc_clone( &id->thread, EncoderThread, id, p_sys->i_thread_priority ) )
+    {
+        msg_Err( p_stream, "cannot spawn encoder thread" );
+        vlc_cond_destroy( &id->cond );
+        vlc_mutex_destroy( &id->lock_out );
+        vlc_sem_destroy( &id->picture_pool_has_room );
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
+        id->p_encoder->p_module = NULL;
         return VLC_EGENERIC;
     }
 
@@ -687,8 +703,6 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
 void transcode_video_close( sout_stream_t *p_stream,
                                    sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -699,17 +713,8 @@ void transcode_video_close( sout_stream_t *p_stream,
 
     /* Close encoder */
     transcode_video_encoder_close( p_stream, id );
-
-    if( p_sys->i_threads >= 1 )
-    {
-        picture_fifo_Delete( id->pp_pics );
-        block_ChainRelease( id->p_buffers );
-
-        vlc_mutex_destroy( &id->lock_out );
-        vlc_cond_destroy( &id->cond );
-    }
-
-    es_format_Clean( &id->encoder_tested_fmt_in );
+    block_ChainRelease( id->p_buffers );
+    picture_fifo_Delete( id->pp_pics );
 
     /* Close filters */
     if( id->p_f_chain )
@@ -896,33 +901,22 @@ error:
 
 end:
     /* Drain encoder */
-    if( unlikely( !id->b_error && in == NULL ) )
+    if( unlikely( !id->b_error && in == NULL ) && id->p_encoder->p_module )
     {
         if( p_sys->i_threads == 0 )
         {
-            if( id->p_encoder->p_module )
-            {
-                block_t *p_block;
-                do {
-                    p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
-                    block_ChainAppend( out, p_block );
-                } while( p_block );
-            }
+            block_t *p_block;
+            do {
+                p_block = id->p_encoder->pf_encode_video(id->p_encoder, NULL );
+                block_ChainAppend( out, p_block );
+            } while( p_block );
         }
         else
         {
             msg_Dbg( p_stream, "Flushing thread and waiting that");
-            vlc_mutex_lock( &id->lock_out );
-            id->b_abort = true;
-            vlc_cond_signal( &id->cond );
-            vlc_mutex_unlock( &id->lock_out );
-
-            vlc_join( id->thread, NULL );
-            vlc_mutex_lock( &id->lock_out );
+            transcode_video_encoder_close( p_stream, id );
             *out = id->p_buffers;
             id->p_buffers = NULL;
-            vlc_mutex_unlock( &id->lock_out );
-
             msg_Dbg( p_stream, "Flushing done");
         }
     }
