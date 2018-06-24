@@ -625,6 +625,28 @@ static void transcode_video_encoder_configure( sout_stream_t *p_stream,
              (const char *)&p_enc_in->i_chroma);
 }
 
+static void transcode_video_encoder_close( sout_stream_t *p_stream,
+                                           sout_stream_id_sys_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    if( p_sys->i_threads >= 1 && !id->b_abort )
+    {
+        vlc_mutex_lock( &id->lock_out );
+        id->b_abort = true;
+        vlc_cond_signal( &id->cond );
+        vlc_mutex_unlock( &id->lock_out );
+
+        vlc_join( id->thread, NULL );
+    }
+
+    /* Close encoder */
+    if( id->p_encoder->p_module )
+    {
+        module_unneed( id->p_encoder, id->p_encoder->p_module );
+        id->p_encoder->p_module = NULL;
+    }
+}
+
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
                                          sout_stream_id_sys_t *id )
 {
@@ -665,15 +687,15 @@ void transcode_video_close( sout_stream_t *p_stream,
                                    sout_stream_id_sys_t *id )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    if( p_sys->i_threads >= 1 && !id->b_abort )
-    {
-        vlc_mutex_lock( &id->lock_out );
-        id->b_abort = true;
-        vlc_cond_signal( &id->cond );
-        vlc_mutex_unlock( &id->lock_out );
 
-        vlc_join( id->thread, NULL );
-    }
+    /* Close decoder */
+    if( id->p_decoder->p_module )
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+    if( id->p_decoder->p_description )
+        vlc_meta_Delete( id->p_decoder->p_description );
+
+    /* Close encoder */
+    transcode_video_encoder_close( p_stream, id );
 
     if( p_sys->i_threads >= 1 )
     {
@@ -683,16 +705,6 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_mutex_destroy( &id->lock_out );
         vlc_cond_destroy( &id->cond );
     }
-
-    /* Close decoder */
-    if( id->p_decoder->p_module )
-        module_unneed( id->p_decoder, id->p_decoder->p_module );
-    if( id->p_decoder->p_description )
-        vlc_meta_Delete( id->p_decoder->p_description );
-
-    /* Close encoder */
-    if( id->p_encoder->p_module )
-        module_unneed( id->p_encoder, id->p_encoder->p_module );
 
     es_format_Clean( &id->encoder_tested_fmt_in );
 
