@@ -1,5 +1,5 @@
 !insertmacro LANGFILE_EXT French
-${LangFileString} Name_Section01 "Lecteur de médias (requis)"
+${LangFileString} Name_Section01 "Lecteur multimédia (requis)"
 ${LangFileString} Name_Section02a "Ajouter au menu Démarrer"
 ${LangFileString} Name_Section02b "Placer un raccourci sur le bureau"
 ${LangFileString} Name_Section34 "Greffons web"
@@ -12,38 +12,61 @@ ${LangFileString} Name_SectionGroupVideo "Fichiers vidéo"
 ${LangFileString} Name_SectionGroupOther "Autres"
 ${LangFileString} Name_Section07 "Menus contextuels"
 ${LangFileString} Name_Section08 "Effacer les préférences et le cache"
-${LangFileString} Desc_Section01 "Le lecteur multimédia"
-${LangFileString} Desc_Section02a "Ajoute des icônes au menu Démarrer pour un accès facile"
-${LangFileString} Desc_Section02b "Ajoute une icône sur votre bureau pour un accès facile"
-${LangFileString} Desc_Section03 "Le greffon VLC pour Mozilla et Mozilla Firefox"
-${LangFileString} Desc_Section04 "Le greffon VLC ActiveX"
-${LangFileString} Desc_Section05 "Enregistrement de la lecture des DVD et CD"
-${LangFileString} Desc_Section06 "Définit le lecteur média VLC comme application par défaut pour les fichiers du type spécifié"
-${LangFileString} Desc_Section07 "Ajoute des entrées de menu contextuel (« Lire avec VLC » et « Ajouter à la liste de lecture de VLC »)"
-${LangFileString} Desc_Section08 "Efface les préférences de VLC et les fichiers cache laissés par une précédente installation"
+
+${LangFileString} Desc_Section01 \
+    "Le lecteur multimédia"
+${LangFileString} Desc_Section02a \
+    "Ajoute des icônes au menu Démarrer pour un accès facile"
+${LangFileString} Desc_Section02b \
+    "Ajoute une icône sur votre bureau pour un accès facile"
+${LangFileString} Desc_Section03 \
+    "Le greffon VLC pour Mozilla et Mozilla Firefox"
+${LangFileString} Desc_Section04 \
+    "Le greffon VLC ActiveX"
+${LangFileString} Desc_Section05 \
+    "Enregistrement de la lecture des DVD et CD"
+${LangFileString} Desc_Section06 \
+    "Définit le lecteur multimédia VLC comme application par défaut pour les fichiers du type spécifié"
+${LangFileString} Desc_Section07 \
+    "Ajoute des entrées de menu contextuel (« Lire avec VLC » et « Ajouter à la liste de lecture de VLC »)"
+${LangFileString} Desc_Section08 \
+    "Efface les préférences de VLC et les fichiers cache laissés par une précédente installation"
+
 ${LangFileString} Name_Section91 "Désinstaller"
 ${LangFileString} Name_Section92 "Effacer les préférences et le cache"
-${LangFileString} Desc_Section91 "Désinstalle VLC et tout ses composants"
-${LangFileString} Desc_Section92 "Efface les préférences de VLC et les fichiers cache"
+
+${LangFileString} Desc_Section91 \
+"Désinstalle VLC et tous ses composants"
+${LangFileString} Desc_Section92 \
+"Efface les préférences de VLC et les fichiers cache"
+
 ${LangFileString} ShellAssociation_Play "Lire"
 ${LangFileString} ContextMenuEntry_PlayWith "Lire avec VLC"
 ${LangFileString} ContextMenuEntry_AddToPlaylist "Ajouter à la liste de lecture de VLC"
-${LangFileString} Link_VisitWebsite "Visitez le site du lecteur de médias VLC"
+
+${LangFileString} Link_VisitWebsite "Voir le site web du lecteur multimédia VLC de VideoLAN"
+
 ${LangFileString} Name_InstTypeRecommended "Recommandée"
 ${LangFileString} Name_InstTypeMinimum "Minimale"
 ${LangFileString} Name_InstTypeFull "Complète"
-${LangFileString} Action_OnArrivalDVD "Lecture DVD"
-${LangFileString} Action_OnArrivalAudioCD "Lecture CD Audio"
-${LangFileString} Action_OnArrivalVCDMovie "Lecture VCD"
-${LangFileString} Action_OnArrivalSVCDMovie "Lecture SVCD"
-${LangFileString} Action_OnArrivalVideoFiles "Lecture des fichiers vidéo"
-${LangFileString} Action_OnArrivalMusicFiles "Lecture des fichiers audio"
-${LangFileString} Action_OnArrivalDVDAudio "Lecture DVD audio"
+
+${LangFileString} Action_OnArrivalDVD "Lecture de DVD"
+${LangFileString} Action_OnArrivalAudioCD "Lecture de CD audio"
+${LangFileString} Action_OnArrivalVCDMovie "Lecture de film VCD"
+${LangFileString} Action_OnArrivalSVCDMovie "Lecture de film SVCD"
+${LangFileString} Action_OnArrivalVideoFiles "Lecture de fichiers vidéo"
+${LangFileString} Action_OnArrivalMusicFiles "Lecture de fichiers audio"
+${LangFileString} Action_OnArrivalDVDAudio "Lecture de DVD audio"
+${LangFileString} Action_OnArrivalBluray "Lecture de Blu-ray
+"
+
 ${LangFileString} License_NextText "Vous connnaissez  maintenant vos droits. Cliquez sur [Suivant] pour continuer."
+
 ${LangFileString} Detail_CheckProcesses "Vérification des processus…"
 ${LangFileString} MessageBox_VLCRunning "VLC est en cours d'exécution. Il va être fermé."
 ${LangFileString} MessageBox_VLCUnableToClose "L'installateur n'a pas pu fermer VLC. Veuillez le faire manuellement."
 ${LangFileString} MessageBox_InstallAborted "Arrêt de l'installation !"
+
 ${LangFileString} Reinstall_Headline "Déjà installé"
 ${LangFileString} Reinstall_HeadlineInstall "Choisir comment vous voulez installer VLC."
 ${LangFileString} Reinstall_HeadlineMaintenance "Choisir l'option de maintenance."
