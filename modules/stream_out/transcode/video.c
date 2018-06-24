@@ -274,6 +274,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         msg_Err( p_stream, "cannot find video decoder" );
         return VLC_EGENERIC;
     }
+    video_format_Init( &id->fmt_input_video, 0 );
 
     /*
      * Open encoder.
@@ -694,6 +695,8 @@ void transcode_video_close( sout_stream_t *p_stream,
     if( id->p_decoder->p_description )
         vlc_meta_Delete( id->p_decoder->p_description );
 
+    video_format_Clean( &id->fmt_input_video );
+
     /* Close encoder */
     transcode_video_encoder_close( p_stream, id );
 
@@ -808,47 +811,41 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             continue;
         }
 
-        if( unlikely (
-             id->p_encoder->p_module && p_pic &&
-             !video_format_IsSimilar( &id->fmt_input_video, &p_pic->format )
-            )
-          )
+        if( p_pic &&
+            ( unlikely(id->p_encoder->p_module == NULL) ||
+              !video_format_IsSimilar( &id->fmt_input_video, &p_pic->format ) ) )
         {
-            msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
-                        id->fmt_input_video.i_sar_num, p_pic->format.i_sar_num,
-                        id->fmt_input_video.i_sar_den, p_pic->format.i_sar_den
-                    );
-            /* Close filters */
-            if( id->p_f_chain )
-                filter_chain_Delete( id->p_f_chain );
-            id->p_f_chain = NULL;
-            if( id->p_uf_chain )
-                filter_chain_Delete( id->p_uf_chain );
-            id->p_uf_chain = NULL;
+            if( id->p_encoder->p_module == NULL ) /* Configure Encoder input/output */
+            {
+                transcode_video_encoder_configure( p_stream, id, p_pic );
+                /* will be opened below */
+            }
+            else /* picture format has changed */
+            {
+                msg_Info( p_stream, "aspect-ratio changed, reiniting. %i -> %i : %i -> %i.",
+                            id->fmt_input_video.i_sar_num, p_pic->format.i_sar_num,
+                            id->fmt_input_video.i_sar_den, p_pic->format.i_sar_den
+                        );
+                /* Close filters, encoder format input can't change */
+                if( id->p_f_chain )
+                    filter_chain_Delete( id->p_f_chain );
+                id->p_f_chain = NULL;
+                if( id->p_uf_chain )
+                    filter_chain_Delete( id->p_uf_chain );
+                id->p_uf_chain = NULL;
 
-            transcode_video_encoder_configure( p_stream, id, p_pic );
+                video_format_Clean( &id->fmt_input_video );
+            }
+
+            video_format_Copy( &id->fmt_input_video, &p_pic->format );
+
             transcode_video_filter_init( p_stream, id );
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
-            memcpy( &id->fmt_input_video, &p_pic->format, sizeof(video_format_t));
-        }
 
-
-        if( unlikely( !id->p_encoder->p_module && p_pic ) )
-        {
-            if( id->p_f_chain )
-                filter_chain_Delete( id->p_f_chain );
-            if( id->p_uf_chain )
-                filter_chain_Delete( id->p_uf_chain );
-            id->p_f_chain = id->p_uf_chain = NULL;
-
-            transcode_video_encoder_configure( p_stream, id, p_pic );
-            transcode_video_filter_init( p_stream, id );
-            if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
-                goto error;
-            memcpy( &id->fmt_input_video, &p_pic->format, sizeof(video_format_t));
-
-            if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
+            /* Start missing encoder */
+            if( id->p_encoder->p_module == NULL &&
+                transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
                 goto error;
         }
 
