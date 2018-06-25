@@ -505,7 +505,14 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     if (FAILED(hr))
         return VLC_EGENERIC;
 
-    if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId, input))
+    UINT driverBuild = identifier.DriverVersion.LowPart & 0xFFFF;
+    if (identifier.VendorId == GPU_MANUFACTURER_INTEL && (identifier.DriverVersion.LowPart >> 16) >= 100)
+    {
+        /* new Intel driver format */
+        driverBuild += ((identifier.DriverVersion.LowPart >> 16) - 100) * 1000;
+    }
+    if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId,
+                                  input, driverBuild))
     {
         msg_Warn(va, "GPU blacklisted for %s codec", directx_va_GetDecoderName(input));
         return VLC_EGENERIC;
