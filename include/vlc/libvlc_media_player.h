@@ -785,9 +785,12 @@ LIBVLC_API libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_
  * Not all formats and protocols support this.
  *
  * \param p_mi the Media Player
+ * \param b_fast prefer fast seeking or precise seeking
  * \param i_time the movie time (in ms).
+ * \return 0 on success, -1 on error
  */
-LIBVLC_API void libvlc_media_player_set_time( libvlc_media_player_t *p_mi, libvlc_time_t i_time );
+LIBVLC_API int libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
+                                             libvlc_time_t i_time, bool b_fast );
 
 /**
  * Get movie position as percentage between 0.0 and 1.0.
@@ -803,9 +806,12 @@ LIBVLC_API float libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
  * This might not work depending on the underlying input format and protocol.
  *
  * \param p_mi the Media Player
+ * \param b_fast prefer fast seeking or precise seeking
  * \param f_pos the position
+ * \return 0 on success, -1 on error
  */
-LIBVLC_API void libvlc_media_player_set_position( libvlc_media_player_t *p_mi, float f_pos );
+LIBVLC_API int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
+                                                 float f_pos, bool b_fast );
 
 /**
  * Set movie chapter (if applicable).

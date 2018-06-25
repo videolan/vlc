@@ -1325,30 +1325,32 @@ libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_mi )
     return i_time;
 }
 
-void libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
-                                   libvlc_time_t i_time )
+int libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
+                                   libvlc_time_t i_time, bool b_fast )
 {
     input_thread_t *p_input_thread;
 
     p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
-        return;
+        return -1;
 
-    var_SetInteger( p_input_thread, "time", to_mtime(i_time) );
+    input_SetTime( p_input_thread, to_mtime(i_time), b_fast );
     vlc_object_release( p_input_thread );
+    return 0;
 }
 
-void libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
-                                       float position )
+int libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
+                                       float position, bool b_fast )
 {
     input_thread_t *p_input_thread;
 
     p_input_thread = libvlc_get_input_thread ( p_mi );
     if( !p_input_thread )
-        return;
+        return -1;
 
-    var_SetFloat( p_input_thread, "position", position );
+    input_SetPosition( p_input_thread, position, b_fast );
     vlc_object_release( p_input_thread );
+    return 0;
 }
 
 float libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
