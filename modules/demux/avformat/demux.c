@@ -926,23 +926,39 @@ static void UpdateSeekPoint( demux_t *p_demux, int64_t i_time )
     }
 }
 
-static void ResetTime( demux_t *p_demux, vlc_tick_t i_time )
+static void ResetTime( demux_t *p_demux, int64_t i_time )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+    vlc_tick_t t;
 
     if( p_sys->ic->start_time == (int64_t)AV_NOPTS_VALUE || i_time < 0 )
-        i_time = VLC_TS_INVALID;
-    else if( i_time == 0 )
-        i_time = 1;
+    {
+        t = VLC_TS_INVALID;
+    }
+    else
+    {
+        if( CLOCK_FREQ == AV_TIME_BASE )
+        {
+            t = i_time;
+        }
+        else
+        {
+            lldiv_t q = lldiv( i_time, AV_TIME_BASE );
+            t = q.quot * CLOCK_FREQ + q.rem * CLOCK_FREQ / AV_TIME_BASE;
+        }
 
-    p_sys->i_pcr = i_time;
+        if( t == VLC_TS_INVALID )
+            t = VLC_TS_0;
+    }
+
+    p_sys->i_pcr = t;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
         p_sys->tracks[i].i_pcr = VLC_TS_INVALID;
 
-    if( i_time != VLC_TS_INVALID )
+    if( t != VLC_TS_INVALID )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_time );
-        UpdateSeekPoint( p_demux, i_time );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, t );
+        UpdateSeekPoint( p_demux, t );
     }
 }
 
