@@ -10,8 +10,75 @@ typedef struct sout_stream_id_sys_t sout_stream_id_sys_t;
 
 typedef struct
 {
+    char *psz_filters;
+    union
+    {
+        struct
+        {
+            char            *psz_deinterlace;
+            config_chain_t  *p_deinterlace_cfg;
+        } video;
+    };
+} sout_filters_config_t;
+
+static inline
+void sout_filters_config_init( sout_filters_config_t *p_cfg )
+{
+    memset( p_cfg, 0, sizeof(*p_cfg) );
+}
+
+static inline
+void sout_filters_config_clean( sout_filters_config_t *p_cfg )
+{
+    free( p_cfg->psz_filters );
+    if( p_cfg->video.psz_deinterlace )
+    {
+        free( p_cfg->video.psz_deinterlace );
+        config_ChainDestroy( p_cfg->video.p_deinterlace_cfg );
+    }
+}
+
+typedef struct
+{
+    vlc_fourcc_t i_codec; /* (0 if not transcode) */
+    char         *psz_name;
+    config_chain_t *p_config_chain;
+    union
+    {
+        struct
+        {
+            unsigned int    i_bitrate;
+            float           f_scale;
+            unsigned int    i_width, i_maxwidth;
+            unsigned int    i_height, i_maxheight;
+            bool            b_hurry_up;
+            vlc_rational_t  fps;
+            struct
+            {
+                unsigned int i_count;
+                int          i_priority;
+                uint32_t     pool_size;
+            } threads;
+        } video;
+    };
+} sout_encoder_config_t;
+
+static inline
+void sout_encoder_config_init( sout_encoder_config_t *p_cfg )
+{
+    memset( p_cfg, 0, sizeof(*p_cfg) );
+}
+
+static inline
+void sout_encoder_config_clean( sout_encoder_config_t *p_cfg )
+{
+    free( p_cfg->psz_name );
+    config_ChainDestroy( p_cfg->p_config_chain );
+}
+
+typedef struct
+{
     sout_stream_id_sys_t *id_video;
-    uint32_t        pool_size;
 
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
@@ -25,21 +92,8 @@ typedef struct
     char            *psz_af;
 
     /* Video */
-    vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
-    char            *psz_venc;
-    config_chain_t  *p_video_cfg;
-    int             i_vbitrate;
-    float           f_scale;
-    unsigned int    i_width, i_maxwidth;
-    unsigned int    i_height, i_maxheight;
-    char            *psz_deinterlace;
-    config_chain_t  *p_deinterlace_cfg;
-    int             i_threads;
-    int             i_thread_priority;
-    bool            b_hurry_up;
-    unsigned int    fps_num,fps_den;
-
-    char            *psz_vf2;
+    sout_encoder_config_t venc_cfg;
+    sout_filters_config_t vfilters_cfg;
 
     /* SPU */
     vlc_fourcc_t    i_scodec;   /* codec spu (0 if not transcode) */

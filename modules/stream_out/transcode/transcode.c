@@ -235,6 +235,54 @@ static void *Add( sout_stream_t *, const es_format_t * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 
+static void SetVideoEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+{
+    char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
+    if( psz_string && *psz_string )
+    {
+        char *psz_next;
+        psz_next = config_ChainCreate( &p_cfg->psz_name,
+                                       &p_cfg->p_config_chain,
+                                       psz_string );
+        free( psz_next );
+    }
+    free( psz_string );
+
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vcodec" );
+    if( psz_string && *psz_string )
+    {
+        char fcc[5] = "    \0";
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( VIDEO_ES, fcc );
+        msg_Dbg( p_stream, "Checking video codec mapping for %s got %4.4s ",
+                 fcc, (char*)&p_cfg->i_codec);
+    }
+    free( psz_string );
+
+    p_cfg->video.i_bitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "vb" );
+    if( p_cfg->video.i_bitrate < 16000 )
+        p_cfg->video.i_bitrate *= 1000;
+
+    p_cfg->video.f_scale = var_GetFloat( p_stream, SOUT_CFG_PREFIX "scale" );
+
+    var_InheritURational( p_stream, &p_cfg->video.fps.num,
+                                    &p_cfg->video.fps.den,
+                                    SOUT_CFG_PREFIX "fps" );
+
+    p_cfg->video.i_width = var_GetInteger( p_stream, SOUT_CFG_PREFIX "width" );
+    p_cfg->video.i_height = var_GetInteger( p_stream, SOUT_CFG_PREFIX "height" );
+    p_cfg->video.i_maxwidth = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxwidth" );
+    p_cfg->video.i_maxheight = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxheight" );
+
+    p_cfg->video.threads.i_count = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
+    p_cfg->video.threads.pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
+
+    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" ) )
+        p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_OUTPUT;
+    else
+        p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_VIDEO;
+}
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -311,74 +359,37 @@ static int Open( vlc_object_t *p_this )
     free( psz_string );
 
     /* Video transcoding parameters */
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
-    p_sys->psz_venc = NULL;
-    p_sys->p_video_cfg = NULL;
-    if( psz_string && *psz_string )
+    sout_encoder_config_init( &p_sys->venc_cfg );
+
+    SetVideoEncoderConfig( p_stream, &p_sys->venc_cfg );
+    p_sys->b_master_sync = (p_sys->venc_cfg.video.fps.num > 0);
+    if( p_sys->venc_cfg.i_codec )
     {
-        char *psz_next;
-        psz_next = config_ChainCreate( &p_sys->psz_venc, &p_sys->p_video_cfg,
-                                   psz_string );
-        free( psz_next );
+        msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
+                 (char *)&p_sys->venc_cfg.i_codec,
+                 p_sys->venc_cfg.video.i_width,
+                 p_sys->venc_cfg.video.i_height,
+                 p_sys->venc_cfg.video.f_scale,
+                 p_sys->venc_cfg.video.i_bitrate / 1000 );
     }
-    free( psz_string );
 
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vcodec" );
-    p_sys->i_vcodec = 0;
-    if( psz_string && *psz_string )
-    {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_sys->i_vcodec = vlc_fourcc_GetCodecFromString( VIDEO_ES, fcc );
-        msg_Dbg( p_stream, "Checking video codec mapping for %s got %4.4s ", fcc, (char*)&p_sys->i_vcodec);
-    }
-    free( psz_string );
-
-    p_sys->i_vbitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "vb" );
-    if( p_sys->i_vbitrate < 16000 ) p_sys->i_vbitrate *= 1000;
-
-    p_sys->f_scale = var_GetFloat( p_stream, SOUT_CFG_PREFIX "scale" );
-
-    p_sys->b_master_sync = var_InheritURational( p_stream, &p_sys->fps_num, &p_sys->fps_den, SOUT_CFG_PREFIX "fps" ) == VLC_SUCCESS;
-
-    p_sys->i_width = var_GetInteger( p_stream, SOUT_CFG_PREFIX "width" );
-
-    p_sys->i_height = var_GetInteger( p_stream, SOUT_CFG_PREFIX "height" );
-
-    p_sys->i_maxwidth = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxwidth" );
-
-    p_sys->i_maxheight = var_GetInteger( p_stream, SOUT_CFG_PREFIX "maxheight" );
+    /* Video Filter Parameters */
+    sout_filters_config_init( &p_sys->vfilters_cfg );
 
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "vfilter" );
     if( psz_string && *psz_string )
-        p_sys->psz_vf2 = strdup(psz_string );
+        p_sys->vfilters_cfg.psz_filters = psz_string;
     else
-        p_sys->psz_vf2 = NULL;
-    free( psz_string );
+        free( psz_string );
 
     if( var_GetBool( p_stream, SOUT_CFG_PREFIX "deinterlace" ) )
+    {
         psz_string = var_GetString( p_stream,
                                     SOUT_CFG_PREFIX "deinterlace-module" );
-    else
-        psz_string = NULL;
-
-    free( config_ChainCreate( &p_sys->psz_deinterlace,
-                              &p_sys->p_deinterlace_cfg, psz_string ) );
-    free( psz_string );
-
-    p_sys->i_threads = var_GetInteger( p_stream, SOUT_CFG_PREFIX "threads" );
-    p_sys->pool_size = var_GetInteger( p_stream, SOUT_CFG_PREFIX "pool-size" );
-
-    if( var_GetBool( p_stream, SOUT_CFG_PREFIX "high-priority" ) )
-        p_sys->i_thread_priority = VLC_THREAD_PRIORITY_OUTPUT;
-    else
-        p_sys->i_thread_priority = VLC_THREAD_PRIORITY_VIDEO;
-
-    if( p_sys->i_vcodec )
-    {
-        msg_Dbg( p_stream, "codec video=%4.4s %dx%d scaling: %f %dkb/s",
-                 (char *)&p_sys->i_vcodec, p_sys->i_width, p_sys->i_height,
-                 p_sys->f_scale, p_sys->i_vbitrate / 1000 );
+        if( psz_string )
+            free( config_ChainCreate( &p_sys->vfilters_cfg.video.psz_deinterlace,
+                                      &p_sys->vfilters_cfg.video.p_deinterlace_cfg, psz_string ) );
+        free( psz_string );
     }
 
     /* Subpictures transcoding parameters */
@@ -415,8 +426,8 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_soverlay = var_GetBool( p_stream, SOUT_CFG_PREFIX "soverlay" );
     /* Set default size for TEXT spu non overlay conversion / updater */
-    p_sys->i_spu_width = (p_sys->i_width) ? p_sys->i_width : 1280;
-    p_sys->i_spu_height = (p_sys->i_height) ? p_sys->i_height : 720;
+    p_sys->i_spu_width = (p_sys->venc_cfg.video.i_width) ? p_sys->venc_cfg.video.i_width : 1280;
+    p_sys->i_spu_height = (p_sys->venc_cfg.video.i_height) ? p_sys->venc_cfg.video.i_height : 720;
 
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
     if( psz_string && *psz_string )
@@ -443,19 +454,14 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
+    sout_encoder_config_clean( &p_sys->venc_cfg );
+    sout_filters_config_clean( &p_sys->vfilters_cfg );
+
     free( p_sys->psz_af );
 
     config_ChainDestroy( p_sys->p_audio_cfg );
     free( p_sys->psz_aenc );
     free( p_sys->psz_alang );
-
-    free( p_sys->psz_vf2 );
-
-    config_ChainDestroy( p_sys->p_video_cfg );
-    free( p_sys->psz_venc );
-
-    config_ChainDestroy( p_sys->p_deinterlace_cfg );
-    free( p_sys->psz_deinterlace );
 
     config_ChainDestroy( p_sys->p_spu_cfg );
     free( p_sys->psz_senc );
@@ -536,7 +542,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec )
         success = transcode_audio_add(p_stream, p_fmt, id);
-    else if( p_fmt->i_cat == VIDEO_ES && p_sys->i_vcodec )
+    else if( p_fmt->i_cat == VIDEO_ES && p_sys->venc_cfg.i_codec )
         success = transcode_video_add(p_stream, p_fmt, id);
     else if( ( p_fmt->i_cat == SPU_ES ) &&
              ( p_sys->i_scodec || p_sys->b_soverlay ) )
