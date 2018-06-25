@@ -1,6 +1,28 @@
 Changes between 3.0.3 and 3.0.4:
 --------------------------------
 
+Decoder:
+ * Blacklist some intel GPU when decoding HEVC
+ * Decode AV1 streams
+
+Demux:
+ * Improve FLV fps detection
+ * Fix some ogg/flac
+
+Audio Output:
+ * Improve iOS session management
+ * Improve macOS audio performance
+
+Video Output:
+ * Fix some crash in Direct3D11/Direct3D9 because of sensors
+ * Fix some broken DVD subtitles rendering
+
+Text renderer:
+ * Fix rendering of arabic fonts fallback on macOS
+
+Misc:
+ * Fix live555, macOS-UI, crash
+ * Change the extension registration
 
 
 Changes between 3.0.2 and 3.0.3:
