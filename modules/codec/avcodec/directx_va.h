@@ -82,6 +82,6 @@ int directx_va_Open(vlc_va_t *, directx_sys_t *);
 void directx_va_Close(vlc_va_t *, directx_sys_t *);
 int directx_va_Setup(vlc_va_t *, directx_sys_t *, const AVCodecContext *avctx, const es_format_t *, int flag_xbox);
 char *directx_va_GetDecoderName(const GUID *guid);
-bool directx_va_canUseHevc(vlc_va_t *, UINT VendorId, UINT DeviceId);
+bool directx_va_canUseDecoder(vlc_va_t *, UINT VendorId, UINT DeviceId, const GUID *pCodec);
 
 #endif /* AVCODEC_DIRECTX_VA_H */
