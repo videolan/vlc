@@ -514,6 +514,10 @@ VLC_API int input_Control( input_thread_t *, int i_query, ...  );
 
 VLC_API void input_Close( input_thread_t * );
 
+VLC_API void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
+
+VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
+
 /**
  * Create a new input_thread_t and start it.
  *

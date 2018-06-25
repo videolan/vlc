@@ -227,6 +227,24 @@ void input_Close( input_thread_t *p_input )
     vlc_object_release( p_input );
 }
 
+void input_SetTime( input_thread_t *p_input, vlc_tick_t i_time, bool b_fast )
+{
+    input_control_param_t param;
+
+    param.time.i_val = i_time;
+    param.time.b_fast_seek = b_fast;
+    input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &param );
+}
+
+void input_SetPosition( input_thread_t *p_input, float f_position, bool b_fast )
+{
+    input_control_param_t param;
+
+    param.pos.f_val = f_position;
+    param.pos.b_fast_seek = b_fast;
+    input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &param );
+}
+
 /**
  * Input destructor (called when the object's refcount reaches 0).
  */
@@ -616,31 +634,25 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
         var_SetInteger( p_input, "input-repeat", i_repeat );
     }
 
+    input_thread_private_t *priv = input_priv(p_input);
     /* Seek to start title/seekpoint */
-    val.i_int = input_priv(p_input)->master->i_title_start -
-        input_priv(p_input)->master->i_title_offset;
-    if( val.i_int < 0 || val.i_int >= input_priv(p_input)->master->i_title )
+    val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
+    if( val.i_int < 0 || val.i_int >= priv->master->i_title )
         val.i_int = 0;
     input_ControlPushHelper( p_input,
                        INPUT_CONTROL_SET_TITLE, &val );
 
-    val.i_int = input_priv(p_input)->master->i_seekpoint_start -
-        input_priv(p_input)->master->i_seekpoint_offset;
+    val.i_int = priv->master->i_seekpoint_start -
+                priv->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
         input_ControlPushHelper( p_input,
                            INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Seek to start position */
-    if( input_priv(p_input)->i_start > 0 )
-    {
-        val.i_int = input_priv(p_input)->i_start;
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &val );
-    }
+    if( priv->i_start > 0 )
+        input_SetTime( p_input, priv->i_start, false );
     else
-    {
-        val.f_float = 0.f;
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_POSITION, &val );
-    }
+        input_SetPosition( p_input, 0.0f, false );
 
     return VLC_SUCCESS;
 }
@@ -917,20 +929,16 @@ static void StartTitle( input_thread_t * p_input )
 
     if( priv->i_start > 0 )
     {
-        vlc_value_t s;
-
         msg_Dbg( p_input, "starting at time: %"PRId64"s",
                  priv->i_start / CLOCK_FREQ );
 
-        s.i_int = priv->i_start;
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &s );
+        input_SetTime( p_input, priv->i_start, false );
     }
     if( priv->i_stop > 0 && priv->i_stop <= priv->i_start )
     {
         msg_Warn( p_input, "invalid stop-time ignored" );
         priv->i_stop = 0;
     }
-    priv->b_fast_seek = var_GetBool( p_input, "input-fast-seek" );
 }
 
 static int SlaveCompare(const void *a, const void *b)
@@ -1849,7 +1857,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            float f_pos = param.val.f_float;
+            float f_pos = param.pos.f_val;
             if( f_pos < 0.f )
                 f_pos = 0.f;
             else if( f_pos > 1.f )
@@ -1857,7 +1865,7 @@ static bool Control( input_thread_t *p_input,
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( input_priv(p_input)->p_es_out, ES_OUT_RESET_PCR );
             if( demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_POSITION,
-                               (double) f_pos, !input_priv(p_input)->b_fast_seek ) )
+                               (double) f_pos, !param.pos.b_fast_seek ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
                          "%2.1f%% failed", (double)(f_pos * 100.f) );
@@ -1884,7 +1892,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            i_time = param.val.i_int;
+            i_time = param.time.i_val;
             if( i_time < 0 )
                 i_time = 0;
 
@@ -1893,7 +1901,7 @@ static bool Control( input_thread_t *p_input,
 
             i_ret = demux_Control( input_priv(p_input)->master->p_demux,
                                    DEMUX_SET_TIME, i_time,
-                                   !input_priv(p_input)->b_fast_seek );
+                                   !param.time.b_fast_seek );
             if( i_ret )
             {
                 int64_t i_length;
@@ -1905,7 +1913,7 @@ static bool Control( input_thread_t *p_input,
                     double f_pos = (double)i_time / (double)i_length;
                     i_ret = demux_Control( input_priv(p_input)->master->p_demux,
                                             DEMUX_SET_POSITION, f_pos,
-                                            !input_priv(p_input)->b_fast_seek );
+                                            !param.time.b_fast_seek );
                 }
             }
             if( i_ret )
@@ -2239,7 +2247,8 @@ static bool Control( input_thread_t *p_input,
             }
 
             input_control_param_t param;
-            param.val.i_int = time_offset;
+            param.time.i_val = time_offset;
+            param.time.b_fast_seek = false;
             b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, param );
             break;
         }

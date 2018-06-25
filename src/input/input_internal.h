@@ -82,6 +82,14 @@ typedef union
 {
     vlc_value_t val;
     vlc_viewpoint_t viewpoint;
+    struct {
+        bool b_fast_seek;
+        vlc_tick_t i_val;
+    } time;
+    struct {
+        bool b_fast_seek;
+        float f_val;
+    } pos;
 } input_control_param_t;
 
 typedef struct
@@ -112,7 +120,6 @@ typedef struct input_thread_private_t
     vlc_tick_t  i_start;    /* :start-time,0 by default */
     vlc_tick_t  i_stop;     /* :stop-time, 0 if none */
     vlc_tick_t  i_time;     /* Current time */
-    bool        b_fast_seek;/* :input-fast-seek */
 
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */

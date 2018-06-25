@@ -593,7 +593,8 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Change( p_input, "time", VLC_VAR_SETVALUE, val );
     }
 
-    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_POSITION, &newval );
+    input_SetPosition( p_input, newval.f_float,
+                       var_GetBool( p_input, "input-fast-seek" ) );
     return VLC_SUCCESS;
 }
 
@@ -618,7 +619,8 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_SetInteger( p_input, "intf-event", INPUT_EVENT_POSITION );
     }
 
-    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &newval );
+    input_SetTime( p_input, newval.i_int,
+                   var_GetBool( p_input, "input-fast-seek" ) );
     return VLC_SUCCESS;
 }
 
