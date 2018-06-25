@@ -34,6 +34,7 @@ gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UNPACK)
 	$(APPLY) $(SRC)/gmp/ppc64.patch
 	$(APPLY) $(SRC)/gmp/win-arm64.patch
+	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
 	$(MOVE)
 
 # GMP requires either GPLv2 or LGPLv3

@@ -1,0 +1,11 @@
+--- gmp/configure.ac.asm	2018-06-25 13:50:38.561396100 +0200
++++ gmp/configure.ac	2018-06-25 14:02:43.731673800 +0200
+@@ -3592,7 +3592,7 @@ if test $found_asm = yes; then
+ fi
+ 
+ # Only do the GMP_ASM checks if there's a .S or .asm wanting them.
+-if test $found_asm = no && test $found_S = no; then
++if test $found_asm = no || test $enable_assembly = no ; then
+   gmp_asm_syntax_testing=no
+ fi
+ 
