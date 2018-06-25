@@ -551,20 +551,20 @@ static void transcode_video_sar_apply( const video_format_t *p_src,
     }
 }
 
-static void transcode_video_encoder_configure( sout_stream_t *p_stream,
-                                               sout_stream_id_sys_t *id,
+static void transcode_video_encoder_configure( vlc_object_t *p_obj,
+                                               const decoder_t *p_dec,
                                                const sout_encoder_config_t *p_cfg,
-                                               picture_t *p_pic )
+                                               const video_format_t *p_src,
+                                               encoder_t *p_enc )
 {
-    const video_format_t *p_src = filtered_video_format( id, p_pic );
-    const video_format_t *p_dec_in = &id->p_decoder->fmt_in.video;
-    const video_format_t *p_dec_out = &id->p_decoder->fmt_out.video;
-    video_format_t *p_enc_in = &id->p_encoder->fmt_in.video;
-    video_format_t *p_enc_out = &id->p_encoder->fmt_out.video;
+    const video_format_t *p_dec_in = &p_dec->fmt_in.video;
+    const video_format_t *p_dec_out = &p_dec->fmt_out.video;
+    video_format_t *p_enc_in = &p_enc->fmt_in.video;
+    video_format_t *p_enc_out = &p_enc->fmt_out.video;
 
     /* Complete destination format */
-    id->p_encoder->fmt_out.i_codec = p_enc_out->i_chroma = p_cfg->i_codec;
-    id->p_encoder->fmt_out.i_bitrate = p_cfg->video.i_bitrate;
+    p_enc->fmt_out.i_codec = p_enc_out->i_chroma = p_cfg->i_codec;
+    p_enc->fmt_out.i_bitrate = p_cfg->video.i_bitrate;
     p_enc_out->i_width = p_enc_out->i_visible_width  = p_cfg->video.i_width & ~1;
     p_enc_out->i_height = p_enc_out->i_visible_height = p_cfg->video.i_height & ~1;
     p_enc_out->i_sar_num = p_enc_out->i_sar_den = 0;
@@ -578,16 +578,16 @@ static void transcode_video_encoder_configure( sout_stream_t *p_stream,
 
     /* Complete source format */
     p_enc_in->orientation = p_enc_out->orientation = p_dec_in->orientation;
-    p_enc_in->i_chroma = id->p_encoder->fmt_in.i_codec;
+    p_enc_in->i_chroma = p_enc->fmt_in.i_codec;
 
     transcode_video_framerate_apply( p_src, p_enc_out );
     p_enc_in->i_frame_rate = p_enc_out->i_frame_rate;
     p_enc_in->i_frame_rate_base = p_enc_out->i_frame_rate_base;
-    msg_Dbg( p_stream, "source fps %u/%u, destination %u/%u",
+    msg_Dbg( p_obj, "source fps %u/%u, destination %u/%u",
              p_dec_out->i_frame_rate, p_dec_out->i_frame_rate_base,
              p_enc_in->i_frame_rate, p_enc_in->i_frame_rate_base );
 
-    transcode_video_size_apply( VLC_OBJECT(p_stream), p_src,
+    transcode_video_size_apply( p_obj, p_src,
                                 p_cfg->video.f_scale,
                                 p_cfg->video.i_maxwidth,
                                 p_cfg->video.i_maxheight,
@@ -600,11 +600,11 @@ static void transcode_video_encoder_configure( sout_stream_t *p_stream,
     transcode_video_sar_apply( p_src, p_enc_out );
     p_enc_in->i_sar_num = p_enc_out->i_sar_num;
     p_enc_in->i_sar_den = p_enc_out->i_sar_den;
-    msg_Dbg( p_stream, "encoder aspect is %u:%u",
+    msg_Dbg( p_obj, "encoder aspect is %u:%u",
              p_enc_out->i_sar_num * p_enc_out->i_width,
              p_enc_out->i_sar_den * p_enc_out->i_height );
 
-    msg_Dbg( p_stream, "source chroma: %4.4s, destination %4.4s",
+    msg_Dbg( p_obj, "source chroma: %4.4s, destination %4.4s",
              (const char *)&p_dec_out->i_chroma,
              (const char *)&p_enc_in->i_chroma);
 }
@@ -816,7 +816,11 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         {
             if( id->p_encoder->p_module == NULL ) /* Configure Encoder input/output */
             {
-                transcode_video_encoder_configure( p_stream, id, &p_sys->venc_cfg, p_pic );
+                transcode_video_encoder_configure( VLC_OBJECT(p_stream),
+                                                   id->p_decoder,
+                                                   &p_sys->venc_cfg,
+                                                   filtered_video_format( id, p_pic ),
+                                                   id->p_encoder );
                 /* will be opened below */
             }
             else /* picture format has changed */
