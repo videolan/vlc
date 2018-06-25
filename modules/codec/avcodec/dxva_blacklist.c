@@ -27,6 +27,8 @@
 #include <vlc_codecs.h>
 #include <vlc_codec.h>
 
+#include "../../video_chroma/dxgi_fmt.h"
+
 #define D3D_DecoderType     IUnknown
 #define D3D_DecoderDevice   IUnknown
 #define D3D_DecoderSurface  IUnknown
@@ -38,7 +40,7 @@ struct picture_sys_t
 
 #include "directx_va.h"
 
-static UINT hevc_blacklist[] = {
+static UINT IntelDevices[] = {
     /* Intel Broadwell GPUs with hybrid HEVC */
     0x1606, /* HD Graphics */
     0x160E, /* HD Graphics */
@@ -68,19 +70,36 @@ static UINT hevc_blacklist[] = {
 
     0x0D22, /* Iris(TM) Pro Graphics 5200 */
     0x0D26, /* Iris(TM) Pro Graphics 5200 */
+    0
 };
 
-bool directx_va_canUseHevc(vlc_va_t *va, UINT DeviceId)
+static struct {
+    UINT vendor;
+    const UINT *devices;
+} hevc_blacklist[] = {
+    { .vendor = GPU_MANUFACTURER_INTEL, .devices = IntelDevices },
+};
+
+bool directx_va_canUseHevc(vlc_va_t *va, UINT VendorId, UINT DeviceId)
 {
     if (va->obj.force)
         return true;
 
     for (size_t i=0; i<ARRAY_SIZE(hevc_blacklist); i++)
     {
-        if (hevc_blacklist[i] == DeviceId)
+        if (hevc_blacklist[i].vendor == VendorId)
         {
-            msg_Warn(va, "Intel Hybrid HEVC detected, disabling hardware decoding");
-            return false;
+            const UINT *pDevice = hevc_blacklist[i].devices;
+            while (*pDevice != 0)
+            {
+                if (*pDevice == DeviceId)
+                {
+                    msg_Warn(va, "Intel Hybrid HEVC detected, disabling hardware decoding");
+                    return false;
+                }
+                pDevice++;
+            }
+            break;
         }
     }
 
