@@ -1,6 +1,6 @@
 # aom
-AOM_VERSION := git
-AOM_HASH := 6f49b5a214fa48c226be3bc28f5c597edb81ed8c
+AOM_HASH := 3715bf25db5cdedbd8b49560903bad02d911c62f
+AOM_VERSION := v1.0.0-$(AOM_HASH)
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
 
 # Default disabled for now
@@ -32,6 +32,7 @@ AOM_CONF := \
 	-DENABLE_EXAMPLES=OFF \
 	-DENABLE_TOOLS=OFF \
 	-DCONFIG_UNIT_TESTS=0 \
+	-DENABLE_TESTS=OFF \
 	-DCONFIG_INSTALL_BINS=0 \
 	-DCONFIG_INSTALL_DOCS=0 \
 	-DCONFIG_DEPENDENCY_TRACKING=0
