@@ -93,6 +93,12 @@ static char* CFStringCopyASCIICString(CFStringRef cfString)
     maxSize++;
 
     char *buffer = (char *)malloc(maxSize);
+
+    if (unlikely(buffer == NULL)) {
+        return NULL;
+    }
+
+    // Copy CFString in requested encoding to buffer
     Boolean success = CFStringGetCString(cfString, buffer, maxSize, kCFStringEncodingASCII);
 
     if (!success)
