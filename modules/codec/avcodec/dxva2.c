@@ -506,10 +506,7 @@ static bool CanUseIntelHEVC(vlc_va_t *va)
     if (FAILED(hr))
         return false;
 
-    if (identifier.VendorId != GPU_MANUFACTURER_INTEL)
-        return true;
-
-    return directx_va_canUseHevc( va, identifier.DeviceId );
+    return directx_va_canUseHevc( va, identifier.VendorId, identifier.DeviceId );
 }
 
 static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *fmt)
