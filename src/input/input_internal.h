@@ -78,10 +78,16 @@ typedef struct
 
 } input_source_t;
 
+typedef union
+{
+    vlc_value_t val;
+    vlc_viewpoint_t viewpoint;
+} input_control_param_t;
+
 typedef struct
 {
     int         i_type;
-    vlc_value_t val;
+    input_control_param_t param;
 } input_control_t;
 
 /** Private input fields */
@@ -221,10 +227,23 @@ enum input_control_e
 
 /* Internal helpers */
 
+void input_ControlPush( input_thread_t *, int, input_control_param_t * );
+
 /* XXX for string value you have to allocate it before calling
- * input_ControlPush
+ * input_ControlPushHelper
  */
-void input_ControlPush( input_thread_t *, int i_type, vlc_value_t * );
+static inline void input_ControlPushHelper( input_thread_t *p_input, int i_type, vlc_value_t *val )
+{
+    if( val != NULL )
+    {
+        input_control_param_t param = { .val = *val };
+        input_ControlPush( p_input, i_type, &param );
+    }
+    else
+    {
+        input_ControlPush( p_input, i_type, NULL );
+    }
+}
 
 bool input_Stopped( input_thread_t * );
 

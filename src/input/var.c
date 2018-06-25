@@ -556,7 +556,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( newval.i_int == PLAYING_S || newval.i_int == PAUSE_S )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_STATE, &newval );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_STATE, &newval );
         return VLC_SUCCESS;
     }
 
@@ -570,7 +570,7 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_cmd);
 
     newval.i_int = INPUT_RATE_DEFAULT / newval.f_float;
-    input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_RATE, &newval );
 
     return VLC_SUCCESS;
 }
@@ -593,7 +593,7 @@ static int PositionCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Change( p_input, "time", VLC_VAR_SETVALUE, val );
     }
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_POSITION, &newval );
     return VLC_SUCCESS;
 }
 
@@ -618,7 +618,7 @@ static int TimeCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_SetInteger( p_input, "intf-event", INPUT_EVENT_POSITION );
     }
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &newval );
     return VLC_SUCCESS;
 }
 
@@ -641,7 +641,7 @@ static int ProgramCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_PROGRAM, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_PROGRAM, &newval );
 
     return VLC_SUCCESS;
 }
@@ -657,7 +657,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "next-title" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE_NEXT, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE_NEXT, NULL );
 
         val.i_int = var_GetInteger( p_input, "title" ) + 1;
         var_Change( p_input, "title", VLC_VAR_CHOICESCOUNT, &count );
@@ -666,7 +666,7 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "prev-title" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE_PREV, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE_PREV, NULL );
 
         val.i_int = var_GetInteger( p_input, "title" ) - 1;
         if( val.i_int >= 0 )
@@ -674,15 +674,15 @@ static int TitleCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "menu-title" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_NAV_MENU, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_NAV_MENU, NULL );
     }
     else if( !strcmp( psz_cmd, "menu-popup" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_NAV_POPUP, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_NAV_POPUP, NULL );
     }
     else
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &newval );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &newval );
     }
 
     return VLC_SUCCESS;
@@ -699,7 +699,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "next-chapter" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT_NEXT, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT_NEXT, NULL );
 
         val.i_int = var_GetInteger( p_input, "chapter" ) + 1;
         var_Change( p_input, "chapter", VLC_VAR_CHOICESCOUNT, &count );
@@ -708,7 +708,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "prev-chapter" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT_PREV, NULL );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT_PREV, NULL );
 
         val.i_int = var_GetInteger( p_input, "chapter" ) - 1;
         if( val.i_int >= 0 )
@@ -716,7 +716,7 @@ static int SeekpointCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
     }
 
     return VLC_SUCCESS;
@@ -732,12 +732,12 @@ static int NavigationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* Issue a title change */
     val.i_int = (intptr_t)p_data;
-    input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
     var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
 
     /* And a chapter change */
-    input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &newval );
 
     var_Change( p_input, "chapter", VLC_VAR_SETVALUE, newval );
 
@@ -755,7 +755,7 @@ static int EsVideoCallback( vlc_object_t *p_this, char const *psz_cmd,
     else
         var_SetBool( p_input, "video", true );
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
 
     return VLC_SUCCESS;
 }
@@ -771,7 +771,7 @@ static int EsAudioCallback( vlc_object_t *p_this, char const *psz_cmd,
     else
         var_SetBool( p_input, "audio", true );
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
 
     return VLC_SUCCESS;
 }
@@ -787,7 +787,7 @@ static int EsSpuCallback( vlc_object_t *p_this, char const *psz_cmd,
     else
         var_SetBool( p_input, "spu", true );
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
 
     return VLC_SUCCESS;
 }
@@ -800,11 +800,11 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
 
     if( !strcmp( psz_cmd, "audio-delay" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
     }
     else if( !strcmp( psz_cmd, "spu-delay" ) )
     {
-        input_ControlPush( p_input, INPUT_CONTROL_SET_SPU_DELAY, &newval );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SPU_DELAY, &newval );
     }
     return VLC_SUCCESS;
 }
@@ -816,7 +816,7 @@ static int BookmarkCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_BOOKMARK, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_BOOKMARK, &newval );
 
     return VLC_SUCCESS;
 }
@@ -828,7 +828,7 @@ static int RecordCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_RECORD_STATE, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_RECORD_STATE, &newval );
 
     return VLC_SUCCESS;
 }
@@ -841,7 +841,7 @@ static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     VLC_UNUSED(newval);
 
-    input_ControlPush( p_input, INPUT_CONTROL_SET_FRAME_NEXT, NULL );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_FRAME_NEXT, NULL );
 
     return VLC_SUCCESS;
 }

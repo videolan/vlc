@@ -1030,7 +1030,7 @@ static void *TsRun( void *p_data )
                 /* Warn back input
                  * FIXME it is perfectly safe BUT it is ugly as it may hide a
                  * rate change requested by user */
-                input_ControlPush( p_ts->p_input, INPUT_CONTROL_SET_RATE, &val );
+                input_ControlPushHelper( p_ts->p_input, INPUT_CONTROL_SET_RATE, &val );
             }
 
             vlc_restorecancel( canc );

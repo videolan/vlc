@@ -69,10 +69,10 @@ static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
-static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, vlc_tick_t i_deadline, bool b_postpone_seek );
-static void       ControlRelease( int i_type, vlc_value_t val );
+static inline int ControlPop( input_thread_t *, int *, input_control_param_t *, vlc_tick_t i_deadline, bool b_postpone_seek );
+static void       ControlRelease( int i_type, input_control_param_t *p_param );
 static bool       ControlIsSeekRequest( int i_type );
-static bool       Control( input_thread_t *, int, vlc_value_t );
+static bool       Control( input_thread_t *, int, input_control_param_t );
 static void       ControlPause( input_thread_t *, vlc_tick_t );
 
 static int  UpdateTitleSeekpointFromDemux( input_thread_t * );
@@ -205,7 +205,7 @@ void input_Stop( input_thread_t *p_input )
     for( int i = 0; i < sys->i_control; i++ )
     {
         input_control_t *ctrl = &sys->control[i];
-        ControlRelease( ctrl->i_type, ctrl->val );
+        ControlRelease( ctrl->i_type, &ctrl->param );
     }
     sys->i_control = 0;
     sys->is_stopped = true;
@@ -258,7 +258,7 @@ static void input_Destructor( vlc_object_t *obj )
     for( int i = 0; i < priv->i_control; i++ )
     {
         input_control_t *p_ctrl = &priv->control[i];
-        ControlRelease( p_ctrl->i_type, p_ctrl->val );
+        ControlRelease( p_ctrl->i_type, &p_ctrl->param );
     }
 
     vlc_cond_destroy( &priv->wait_control );
@@ -621,25 +621,25 @@ static int MainLoopTryRepeat( input_thread_t *p_input )
         input_priv(p_input)->master->i_title_offset;
     if( val.i_int < 0 || val.i_int >= input_priv(p_input)->master->i_title )
         val.i_int = 0;
-    input_ControlPush( p_input,
+    input_ControlPushHelper( p_input,
                        INPUT_CONTROL_SET_TITLE, &val );
 
     val.i_int = input_priv(p_input)->master->i_seekpoint_start -
         input_priv(p_input)->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
-        input_ControlPush( p_input,
+        input_ControlPushHelper( p_input,
                            INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Seek to start position */
     if( input_priv(p_input)->i_start > 0 )
     {
         val.i_int = input_priv(p_input)->i_start;
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &val );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &val );
     }
     else
     {
         val.f_float = 0.f;
-        input_ControlPush( p_input, INPUT_CONTROL_SET_POSITION, &val );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_POSITION, &val );
     }
 
     return VLC_SUCCESS;
@@ -737,10 +737,11 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 if( b_paused_at_eof )
                     break;
 
-                vlc_value_t val = { .i_int = PAUSE_S };
+                input_control_param_t param;
+                param.val.i_int = PAUSE_S;
 
                 msg_Dbg( p_input, "pausing at EOF (pause after each)");
-                Control( p_input, INPUT_CONTROL_SET_STATE, val );
+                Control( p_input, INPUT_CONTROL_SET_STATE, param );
 
                 b_paused = true;
                 b_paused_at_eof = true;
@@ -782,9 +783,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             }
 
             int i_type;
-            vlc_value_t val;
+            input_control_param_t param;
 
-            if( ControlPop( p_input, &i_type, &val, i_deadline, b_postpone ) )
+            if( ControlPop( p_input, &i_type, &param, i_deadline, b_postpone ) )
             {
                 if( b_postpone )
                     continue;
@@ -794,7 +795,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 #ifndef NDEBUG
             msg_Dbg( p_input, "control type=%d", i_type );
 #endif
-            if( Control( p_input, i_type, val ) )
+            if( Control( p_input, i_type, param ) )
             {
                 if( ControlIsSeekRequest( i_type ) )
                     i_last_seek_mdate = vlc_tick_now();
@@ -889,12 +890,12 @@ static void StartTitle( input_thread_t * p_input )
     /* Start title/chapter */
     val.i_int = priv->master->i_title_start - priv->master->i_title_offset;
     if( val.i_int > 0 && val.i_int < priv->master->i_title )
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TITLE, &val );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TITLE, &val );
 
     val.i_int = priv->master->i_seekpoint_start -
                 priv->master->i_seekpoint_offset;
     if( val.i_int > 0 /* TODO: check upper boundary */ )
-        input_ControlPush( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SEEKPOINT, &val );
 
     /* Start/stop/run time */
     priv->i_start = llroundf((float)CLOCK_FREQ
@@ -922,7 +923,7 @@ static void StartTitle( input_thread_t * p_input )
                  priv->i_start / CLOCK_FREQ );
 
         s.i_int = priv->i_start;
-        input_ControlPush( p_input, INPUT_CONTROL_SET_TIME, &s );
+        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_TIME, &s );
     }
     if( priv->i_stop > 0 && priv->i_stop <= priv->i_start )
     {
@@ -1342,7 +1343,7 @@ static int Init( input_thread_t * p_input )
         if( f_rate != 0.0 && f_rate != 1.0 )
         {
             vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / f_rate };
-            input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_SET_RATE, &val );
         }
     }
 
@@ -1473,7 +1474,7 @@ static void End( input_thread_t * p_input )
  * Control
  *****************************************************************************/
 void input_ControlPush( input_thread_t *p_input,
-                        int i_type, vlc_value_t *p_val )
+                        int i_type, input_control_param_t *p_param )
 {
     input_thread_private_t *sys = input_priv(p_input);
 
@@ -1486,17 +1487,17 @@ void input_ControlPush( input_thread_t *p_input,
         else
             msg_Err( p_input, "input control fifo overflow, trashing type=%d",
                      i_type );
-        if( p_val )
-            ControlRelease( i_type, *p_val );
+        if( p_param )
+            ControlRelease( i_type, p_param );
     }
     else
     {
         input_control_t c;
         c.i_type = i_type;
-        if( p_val )
-            c.val = *p_val;
+        if( p_param )
+            c.param = *p_param;
         else
-            memset( &c.val, 0, sizeof(c.val) );
+            memset( &c.param, 0, sizeof(c.param) );
 
         sys->control[sys->i_control++] = c;
 
@@ -1541,7 +1542,7 @@ static int ControlGetReducedIndexLocked( input_thread_t *p_input )
 
 
 static inline int ControlPop( input_thread_t *p_input,
-                              int *pi_type, vlc_value_t *p_val,
+                              int *pi_type, input_control_param_t *p_param,
                               vlc_tick_t i_deadline, bool b_postpone_seek )
 {
     input_thread_private_t *p_sys = input_priv(p_input);
@@ -1575,12 +1576,12 @@ static inline int ControlPop( input_thread_t *p_input,
     for( int i = 0; i < i_index; ++i )
     {
         /* Release Reduced controls */
-        ControlRelease( p_sys->control[i].i_type, p_sys->control[i].val );
+        ControlRelease( p_sys->control[i].i_type, &p_sys->control[i].param );
     }
 
     /* */
     *pi_type = p_sys->control[i_index].i_type;
-    *p_val   = p_sys->control[i_index].val;
+    *p_param   = p_sys->control[i_index].param;
 
     p_sys->i_control -= i_index + 1;
     if( p_sys->i_control > 0 )
@@ -1616,22 +1617,20 @@ static bool ControlIsSeekRequest( int i_type )
     }
 }
 
-static void ControlRelease( int i_type, vlc_value_t val )
+static void ControlRelease( int i_type, input_control_param_t *p_param )
 {
+    if( p_param == NULL )
+        return;
+
     switch( i_type )
     {
     case INPUT_CONTROL_ADD_SLAVE:
-        if( val.p_address )
-            input_item_slave_Delete( val.p_address );
-        break;
-    case INPUT_CONTROL_SET_VIEWPOINT:
-    case INPUT_CONTROL_SET_INITIAL_VIEWPOINT:
-    case INPUT_CONTROL_UPDATE_VIEWPOINT:
-        free( val.p_address );
+        if( p_param->val.p_address )
+            input_item_slave_Delete( p_param->val.p_address );
         break;
     case INPUT_CONTROL_SET_RENDERER:
-        if( val.p_address )
-            vlc_renderer_item_release( val.p_address );
+        if( p_param->val.p_address )
+            vlc_renderer_item_release( p_param->val.p_address );
         break;
 
     default:
@@ -1830,11 +1829,12 @@ static void ControlInsertDemuxFilter( input_thread_t* p_input, const char* psz_d
 }
 
 static bool Control( input_thread_t *p_input,
-                     int i_type, vlc_value_t val )
+                     int i_type, input_control_param_t param )
 {
     const vlc_tick_t i_control_date = vlc_tick_now();
     /* FIXME b_force_update is abused, it should be carefully checked */
     bool b_force_update = false;
+    vlc_value_t val;
 
     if( !p_input )
         return b_force_update;
@@ -1849,7 +1849,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            float f_pos = val.f_float;
+            float f_pos = param.val.f_float;
             if( f_pos < 0.f )
                 f_pos = 0.f;
             else if( f_pos > 1.f )
@@ -1884,7 +1884,7 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            i_time = val.i_int;
+            i_time = param.val.i_int;
             if( i_time < 0 )
                 i_time = 0;
 
@@ -1925,7 +1925,7 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_STATE:
-            switch( val.i_int )
+            switch( param.val.i_int )
             {
                 case PLAYING_S:
                     if( input_priv(p_input)->i_state == PAUSE_S )
@@ -1949,8 +1949,8 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_RATE:
         {
             /* Get rate and direction */
-            long long i_rate = llabs( val.i_int );
-            int i_rate_sign = val.i_int < 0 ? -1 : 1;
+            long long i_rate = llabs( param.val.i_int );
+            int i_rate_sign = param.val.i_int < 0 ? -1 : 1;
 
             /* Check rate bound */
             if( i_rate < INPUT_RATE_MIN )
@@ -2020,28 +2020,29 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_PROGRAM:
             /* No need to force update, es_out does it if needed */
             es_out_Control( input_priv(p_input)->p_es_out,
-                            ES_OUT_SET_GROUP, val.i_int );
+                            ES_OUT_SET_GROUP, (int)param.val.i_int );
 
-            if( val.i_int == 0 )
+            if( param.val.i_int == 0 )
                 demux_Control( input_priv(p_input)->master->p_demux,
                                DEMUX_SET_GROUP_DEFAULT );
             else
                 demux_Control( input_priv(p_input)->master->p_demux,
                                DEMUX_SET_GROUP_LIST,
-                               (size_t)1, &(const int){ val.i_int });
+                               (size_t)1, &(const int){ param.val.i_int });
             break;
 
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
             es_out_Control( input_priv(p_input)->p_es_out_display,
-                            ES_OUT_SET_ES_BY_ID, (int)val.i_int );
+                            ES_OUT_SET_ES_BY_ID, (int)param.val.i_int );
 
-            demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES, (int)val.i_int );
+            demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
+                    (int)param.val.i_int );
             break;
 
         case INPUT_CONTROL_RESTART_ES:
             es_out_Control( input_priv(p_input)->p_es_out_display,
-                            ES_OUT_RESTART_ES_BY_ID, (int)val.i_int );
+                            ES_OUT_RESTART_ES_BY_ID, (int)param.val.i_int );
             break;
 
         case INPUT_CONTROL_SET_VIEWPOINT:
@@ -2049,7 +2050,6 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_UPDATE_VIEWPOINT:
         {
             input_thread_private_t *priv = input_priv(p_input);
-            const vlc_viewpoint_t *p_vp = val.p_address;
 
             if ( i_type == INPUT_CONTROL_SET_INITIAL_VIEWPOINT )
             {
@@ -2057,21 +2057,21 @@ static bool Control( input_thread_t *p_input,
                 /* Set the initial viewpoint if it had not been changed by the
                  * user. */
                 if( !priv->viewpoint_changed )
-                    priv->viewpoint = *p_vp;
+                    priv->viewpoint = param.viewpoint;
                 /* Update viewpoints of aout and every vouts in all cases. */
             }
             else if ( i_type == INPUT_CONTROL_SET_VIEWPOINT)
             {
                 priv->viewpoint_changed = true;
-                priv->viewpoint = *p_vp;
+                priv->viewpoint = param.viewpoint;
             }
             else
             {
                 priv->viewpoint_changed = true;
-                priv->viewpoint.yaw   += p_vp->yaw;
-                priv->viewpoint.pitch += p_vp->pitch;
-                priv->viewpoint.roll  += p_vp->roll;
-                priv->viewpoint.fov   += p_vp->fov;
+                priv->viewpoint.yaw   += param.viewpoint.yaw;
+                priv->viewpoint.pitch += param.viewpoint.pitch;
+                priv->viewpoint.roll  += param.viewpoint.roll;
+                priv->viewpoint.fov   += param.viewpoint.fov;
             }
 
             ViewpointApply( p_input );
@@ -2079,12 +2079,12 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            input_SendEventAudioDelay( p_input, val.i_int );
+            input_SendEventAudioDelay( p_input, param.val.i_int );
             UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            input_SendEventSubtitleDelay( p_input, val.i_int );
+            input_SendEventSubtitleDelay( p_input, param.val.i_int );
             UpdatePtsDelay( p_input );
             break;
 
@@ -2106,7 +2106,7 @@ static bool Control( input_thread_t *p_input,
             else if( i_type == INPUT_CONTROL_SET_TITLE_NEXT )
                 i_title++;
             else
-                i_title = val.i_int;
+                i_title = param.val.i_int;
             if( i_title < 0 || i_title >= input_priv(p_input)->master->i_title )
                 break;
 
@@ -2148,7 +2148,7 @@ static bool Control( input_thread_t *p_input,
             else if( i_type == INPUT_CONTROL_SET_SEEKPOINT_NEXT )
                 i_seekpoint++;
             else
-                i_seekpoint = val.i_int;
+                i_seekpoint = param.val.i_int;
             if( i_seekpoint < 0
              || i_seekpoint >= input_priv(p_input)->master->title[i_title]->i_seekpoint )
                 break;
@@ -2161,9 +2161,9 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_ADD_SLAVE:
-            if( val.p_address )
+            if( param.val.p_address )
             {
-                input_item_slave_t *p_item_slave  = val.p_address;
+                input_item_slave_t *p_item_slave  = param.val.p_address;
                 unsigned i_flags = SLAVE_ADD_CANFAIL | SLAVE_ADD_SET_TIME;
                 if( p_item_slave->b_forced )
                     i_flags |= SLAVE_ADD_FORCED;
@@ -2175,12 +2175,13 @@ static bool Control( input_thread_t *p_input,
                     /* Update item slaves */
                     input_item_AddSlave( input_priv(p_input)->p_item, p_item_slave );
                     /* The slave is now owned by the item */
-                    val.p_address = NULL;
+                    param.val.p_address = NULL;
                 }
             }
             break;
 
         case INPUT_CONTROL_SET_RECORD_STATE:
+            val = param.val;
             if( !!input_priv(p_input)->b_recording != !!val.b_bool )
             {
                 if( input_priv(p_input)->master->b_can_stream_record )
@@ -2221,29 +2222,31 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_BOOKMARK:
         {
             vlc_tick_t time_offset = -1;
+            int bookmark = param.val.i_int;
 
             vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-            if( val.i_int >= 0 && val.i_int < input_priv(p_input)->i_bookmark )
+            if( bookmark >= 0 && bookmark < input_priv(p_input)->i_bookmark )
             {
-                const seekpoint_t *p_bookmark = input_priv(p_input)->pp_bookmark[val.i_int];
+                const seekpoint_t *p_bookmark = input_priv(p_input)->pp_bookmark[bookmark];
                 time_offset = p_bookmark->i_time_offset;
             }
             vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
 
             if( time_offset < 0 )
             {
-                msg_Err( p_input, "invalid bookmark %"PRId64, val.i_int );
+                msg_Err( p_input, "invalid bookmark %d", bookmark );
                 break;
             }
 
-            val.i_int = time_offset;
-            b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, val );
+            input_control_param_t param;
+            param.val.i_int = time_offset;
+            b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, param );
             break;
         }
         case INPUT_CONTROL_SET_RENDERER:
         {
 #ifdef ENABLE_SOUT
-            vlc_renderer_item_t *p_item = val.p_address;
+            vlc_renderer_item_t *p_item = param.val.p_address;
             input_thread_private_t *p_priv = input_priv( p_input );
             // We do not support switching from a renderer to another for now
             if ( p_item == NULL && p_priv->p_renderer == NULL )
@@ -2295,7 +2298,7 @@ static bool Control( input_thread_t *p_input,
             break;
     }
 
-    ControlRelease( i_type, val );
+    ControlRelease( i_type, &param );
     return b_force_update;
 }
 

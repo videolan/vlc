@@ -146,7 +146,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_NAV_RIGHT:
         case INPUT_NAV_POPUP:
         case INPUT_NAV_MENU:
-            input_ControlPush( p_input, i_query - INPUT_NAV_ACTIVATE
+            input_ControlPushHelper( p_input, i_query - INPUT_NAV_ACTIVATE
                                + INPUT_CONTROL_NAV_ACTIVATE, NULL );
             return VLC_SUCCESS;
 
@@ -305,7 +305,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             i_bkmk = va_arg( args, int );
 
             val.i_int = i_bkmk;
-            input_ControlPush( p_input, INPUT_CONTROL_SET_BOOKMARK, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_SET_BOOKMARK, &val );
 
             return VLC_SUCCESS;
 
@@ -428,7 +428,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             p_slave->b_forced = b_bool;
 
             val.p_address = p_slave;
-            input_ControlPush( p_input, INPUT_CONTROL_ADD_SLAVE, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_ADD_SLAVE, &val );
             if( b_notify )
             {
                 vout_thread_t *p_vout = input_GetVout( p_input );
@@ -505,24 +505,21 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_RESTART_ES:
             val.i_int = va_arg( args, int );
-            input_ControlPush( p_input, INPUT_CONTROL_RESTART_ES, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_RESTART_ES, &val );
             return VLC_SUCCESS;
 
         case INPUT_UPDATE_VIEWPOINT:
         case INPUT_SET_INITIAL_VIEWPOINT:
         {
-            vlc_viewpoint_t *p_viewpoint = malloc( sizeof(*p_viewpoint) );
-            if( unlikely(p_viewpoint == NULL) )
-                return VLC_ENOMEM;
-            val.p_address = p_viewpoint;
-            *p_viewpoint = *va_arg( args, const vlc_viewpoint_t* );
+            input_control_param_t param;
+            param.viewpoint = *va_arg( args, const vlc_viewpoint_t* );
             if ( i_query == INPUT_SET_INITIAL_VIEWPOINT )
                 input_ControlPush( p_input, INPUT_CONTROL_SET_INITIAL_VIEWPOINT,
-                                   &val );
+                                   &param );
             else if ( va_arg( args, int ) )
-                input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &val );
+                input_ControlPush( p_input, INPUT_CONTROL_SET_VIEWPOINT, &param);
             else
-                input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &val );
+                input_ControlPush( p_input, INPUT_CONTROL_UPDATE_VIEWPOINT, &param );
             return VLC_SUCCESS;
         }
 
@@ -578,7 +575,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         {
             vlc_renderer_item_t* p_item = va_arg( args, vlc_renderer_item_t* );
             val.p_address = p_item ? vlc_renderer_item_hold( p_item ) : NULL;
-            input_ControlPush( p_input, INPUT_CONTROL_SET_RENDERER, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_SET_RENDERER, &val );
             return VLC_SUCCESS;
         }
 
