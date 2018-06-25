@@ -30,6 +30,7 @@ gmp: gmp-$(GMP_VERSION).tar.bz2 .sum-gmp
 	$(UPDATE_AUTOCONFIG)
 	$(APPLY) $(SRC)/gmp/ppc64.patch
 	$(APPLY) $(SRC)/gmp/win-arm64.patch
+	$(APPLY) $(SRC)/gmp/gmp-fix-asm-detection.patch
 	$(APPLY) $(SRC)/gmp/arm64-Add-GSYM_PREFIX-to-function-calls-in-assembly.patch
 ifdef HAVE_DARWIN_OS
 	$(APPLY) $(SRC)/gmp/arm64-Change-adrp-add-relocations-to-darwin-style.patch
