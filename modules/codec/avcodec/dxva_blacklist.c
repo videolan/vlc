@@ -40,62 +40,82 @@ struct picture_sys_t
 
 #include "directx_va.h"
 
-static UINT IntelDevices[] = {
+extern const GUID DXVA_ModeHEVC_VLD_Main;
+extern const GUID DXVA_ModeHEVC_VLD_Main10;
+
+struct decoders {
+    const UINT deviceID;
+    const GUID **decoder_list;
+};
+
+static const GUID *NoHEVC[] = {
+    &DXVA_ModeHEVC_VLD_Main,
+    &DXVA_ModeHEVC_VLD_Main10,
+    NULL,
+};
+
+static struct decoders IntelDevices[] = {
     /* Intel Broadwell GPUs with hybrid HEVC */
-    0x1606, /* HD Graphics */
-    0x160E, /* HD Graphics */
-    0x1612, /* HD Graphics 5600 */
-    0x1616, /* HD Graphics 5500 */
-    0x161A, /* HD Graphics P5700 */
-    0x161E, /* HD Graphics 5300 */
-    0x1622, /* Iris Pro Graphics 6200 */
-    0x1626, /* HD Graphics 6000 */
-    0x162A, /* Iris Pro Graphics P6300 */
-    0x162B, /* Iris Graphics 6100 */
+    { 0x1606, NoHEVC }, /* HD Graphics */
+    { 0x160E, NoHEVC }, /* HD Graphics */
+    { 0x1612, NoHEVC }, /* HD Graphics 5600 */
+    { 0x1616, NoHEVC }, /* HD Graphics 5500 */
+    { 0x161A, NoHEVC }, /* HD Graphics P5700 */
+    { 0x161E, NoHEVC }, /* HD Graphics 5300 */
+    { 0x1622, NoHEVC }, /* Iris Pro Graphics 6200 */
+    { 0x1626, NoHEVC }, /* HD Graphics 6000 */
+    { 0x162A, NoHEVC }, /* Iris Pro Graphics P6300 */
+    { 0x162B, NoHEVC }, /* Iris Graphics 6100 */
 
-    0x0402, /* HD Graphics */
-    0x0406, /* HD Graphics */
-    0x040A, /* HD Graphics */
-    0x0412, /* HD Graphics 4600 */
-    0x0416, /* HD Graphics 4600 */
-    0x041E, /* HD Graphics 4400 */
-    0x041A, /* HD Graphics P4600/P4700 */
+    { 0x0402, NoHEVC }, /* HD Graphics */
+    { 0x0406, NoHEVC }, /* HD Graphics */
+    { 0x040A, NoHEVC }, /* HD Graphics */
+    { 0x0412, NoHEVC }, /* HD Graphics 4600 */
+    { 0x0416, NoHEVC }, /* HD Graphics 4600 */
+    { 0x041E, NoHEVC }, /* HD Graphics 4400 */
+    { 0x041A, NoHEVC }, /* HD Graphics P4600/P4700 */
 
-    0x0A06, /* HD Graphics */
-    0x0A0E, /* HD Graphics */
-    0x0A16, /* HD Graphics Family */
-    0x0A1E, /* HD Graphics Family */
-    0x0A26, /* HD Graphics 5000 */
-    0x0A2E, /* Iris(TM) Graphics 5100 */
+    { 0x0A06, NoHEVC }, /* HD Graphics */
+    { 0x0A0E, NoHEVC }, /* HD Graphics */
+    { 0x0A16, NoHEVC }, /* HD Graphics Family */
+    { 0x0A1E, NoHEVC }, /* HD Graphics Family */
+    { 0x0A26, NoHEVC }, /* HD Graphics 5000 */
+    { 0x0A2E, NoHEVC }, /* Iris(TM) Graphics 5100 */
 
-    0x0D22, /* Iris(TM) Pro Graphics 5200 */
-    0x0D26, /* Iris(TM) Pro Graphics 5200 */
-    0
+    { 0x0D22, NoHEVC }, /* Iris(TM) Pro Graphics 5200 */
+    { 0x0D26, NoHEVC }, /* Iris(TM) Pro Graphics 5200 */
+    {0, NULL}
 };
 
 static struct {
-    UINT vendor;
-    const UINT *devices;
-} hevc_blacklist[] = {
+    const UINT vendor;
+    const struct decoders *devices;
+} gpu_blacklist[] = {
     { .vendor = GPU_MANUFACTURER_INTEL, .devices = IntelDevices },
 };
 
-bool directx_va_canUseHevc(vlc_va_t *va, UINT VendorId, UINT DeviceId)
+bool directx_va_canUseDecoder(vlc_va_t *va, UINT VendorId, UINT DeviceId, const GUID *pCodec)
 {
     if (va->obj.force)
         return true;
 
-    for (size_t i=0; i<ARRAY_SIZE(hevc_blacklist); i++)
+    for (size_t i=0; i<ARRAY_SIZE(gpu_blacklist); i++)
     {
-        if (hevc_blacklist[i].vendor == VendorId)
+        if (gpu_blacklist[i].vendor == VendorId)
         {
-            const UINT *pDevice = hevc_blacklist[i].devices;
-            while (*pDevice != 0)
+            const struct decoders *pDevice = gpu_blacklist[i].devices;
+            while (pDevice->deviceID != 0)
             {
-                if (*pDevice == DeviceId)
+                if (pDevice->deviceID == DeviceId)
                 {
-                    msg_Warn(va, "Intel Hybrid HEVC detected, disabling hardware decoding");
-                    return false;
+                    const GUID **pGuid = pDevice->decoder_list;
+                    while (*pGuid != NULL)
+                    {
+                        if (IsEqualGUID(pCodec, *pGuid))
+                            return false;
+                        pGuid++;
+                    }
+                    return true;
                 }
                 pDevice++;
             }
