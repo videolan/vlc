@@ -159,7 +159,7 @@ end:
 }
 
 /* */
-int playlist_FindArtInCache( input_item_t *p_item )
+int input_FindArtInCache( input_item_t *p_item )
 {
     char *psz_path = ArtCachePath( p_item );
 
@@ -228,7 +228,7 @@ static char * GetFileByItemUID( char *psz_dir, const char *psz_type )
     return psz_file;
 }
 
-int playlist_FindArtInCacheUsingItemUID( input_item_t *p_item )
+int input_FindArtInCacheUsingItemUID( input_item_t *p_item )
 {
     char *uid = input_item_GetInfo( p_item, "uid", "md5" );
     if ( ! *uid )
@@ -265,8 +265,8 @@ int playlist_FindArtInCacheUsingItemUID( input_item_t *p_item )
 }
 
 /* */
-int playlist_SaveArt( vlc_object_t *obj, input_item_t *p_item,
-                      const void *data, size_t length, const char *psz_type )
+int input_SaveArt( vlc_object_t *obj, input_item_t *p_item,
+                   const void *data, size_t length, const char *psz_type )
 {
     char *psz_filename = ArtCacheName( p_item, psz_type );
 

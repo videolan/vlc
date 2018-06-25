@@ -36,7 +36,7 @@
 #include <vlc_charset.h>
 
 #include "input_internal.h"
-#include "../playlist/art.h"
+#include "../preparser/art.h"
 
 struct vlc_meta_t
 {
@@ -212,7 +212,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
     {   /* XXX Weird, we should not end up with attachment:// art URL
          * unless there is a race condition */
         msg_Warn( p_input, "art already fetched" );
-        if( likely(playlist_FindArtInCache( p_item ) == VLC_SUCCESS) )
+        if( likely(input_FindArtInCache( p_item ) == VLC_SUCCESS) )
             return;
     }
 
@@ -248,8 +248,8 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
     else if( !strcmp( p_attachment->psz_mime, "image/x-pict" ) )
         psz_type = ".pct";
 
-    playlist_SaveArt( VLC_OBJECT(p_input), p_item,
-                      p_attachment->p_data, p_attachment->i_data, psz_type );
+    input_SaveArt( VLC_OBJECT(p_input), p_item,
+                   p_attachment->p_data, p_attachment->i_data, psz_type );
     vlc_input_attachment_Delete( p_attachment );
 }
 

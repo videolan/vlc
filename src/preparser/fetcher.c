@@ -41,7 +41,7 @@
 #include "misc/background_worker.h"
 #include "misc/interrupt.h"
 
-struct playlist_fetcher_t {
+struct input_fetcher_t {
     struct background_worker* local;
     struct background_worker* network;
     struct background_worker* downloader;
@@ -59,11 +59,11 @@ struct fetcher_request {
 };
 
 struct fetcher_thread {
-    void (*pf_worker)( playlist_fetcher_t*, struct fetcher_request* );
+    void (*pf_worker)( input_fetcher_t*, struct fetcher_request* );
 
     struct background_worker* worker;
     struct fetcher_request* req;
-    playlist_fetcher_t* fetcher;
+    input_fetcher_t* fetcher;
 
     vlc_interrupt_t interrupt;
     vlc_thread_t thread;
@@ -104,7 +104,7 @@ static void FreeCacheEntry( void* data, void* obj )
     VLC_UNUSED( obj );
 }
 
-static int ReadAlbumCache( playlist_fetcher_t* fetcher, input_item_t* item )
+static int ReadAlbumCache( input_fetcher_t* fetcher, input_item_t* item )
 {
     char* key = CreateCacheKey( item );
 
@@ -122,8 +122,8 @@ static int ReadAlbumCache( playlist_fetcher_t* fetcher, input_item_t* item )
     return art ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void AddAlbumCache( playlist_fetcher_t* fetcher, input_item_t* item,
-                          bool overwrite )
+static void AddAlbumCache( input_fetcher_t* fetcher, input_item_t* item,
+                           bool overwrite )
 {
     char* art = input_item_GetArtURL( item );
     char* key = CreateCacheKey( item );
@@ -143,7 +143,7 @@ static void AddAlbumCache( playlist_fetcher_t* fetcher, input_item_t* item,
     free( key );
 }
 
-static int InvokeModule( playlist_fetcher_t* fetcher, input_item_t* item,
+static int InvokeModule( input_fetcher_t* fetcher, input_item_t* item,
                          int scope, char const* type )
 {
     meta_fetcher_t* mf = vlc_custom_create( fetcher->owner,
@@ -184,13 +184,13 @@ static int CheckArt( input_item_t* item )
     return error;
 }
 
-static int SearchArt( playlist_fetcher_t* fetcher, input_item_t* item, int scope)
+static int SearchArt( input_fetcher_t* fetcher, input_item_t* item, int scope)
 {
     InvokeModule( fetcher, item, scope, "art finder" );
     return CheckArt( item );
 }
 
-static int SearchByScope( playlist_fetcher_t* fetcher,
+static int SearchByScope( input_fetcher_t* fetcher,
     struct fetcher_request* req, int scope )
 {
     input_item_t* item = req->item;
@@ -201,10 +201,10 @@ static int SearchByScope( playlist_fetcher_t* fetcher,
         return VLC_EGENERIC;
     }
 
-    if( ! CheckArt( item )                            ||
-        ! ReadAlbumCache( fetcher, item )             ||
-        ! playlist_FindArtInCacheUsingItemUID( item ) ||
-        ! playlist_FindArtInCache( item )             ||
+    if( ! CheckArt( item )                         ||
+        ! ReadAlbumCache( fetcher, item )          ||
+        ! input_FindArtInCacheUsingItemUID( item ) ||
+        ! input_FindArtInCache( item )             ||
         ! SearchArt( fetcher, item, scope ) )
     {
         AddAlbumCache( fetcher, req->item, false );
@@ -224,7 +224,7 @@ static void SetPreparsed( struct fetcher_request* req )
     }
 }
 
-static void Downloader( playlist_fetcher_t* fetcher,
+static void Downloader( input_fetcher_t* fetcher,
     struct fetcher_request* req )
 {
     ReadAlbumCache( fetcher, req->item );
@@ -268,8 +268,8 @@ static void Downloader( playlist_fetcher_t* fetcher,
         goto error;
     }
 
-    playlist_SaveArt( fetcher->owner, req->item, output_stream.ptr,
-                      output_stream.length, NULL );
+    input_SaveArt( fetcher->owner, req->item, output_stream.ptr,
+                   output_stream.length, NULL );
 
     free( output_stream.ptr );
     AddAlbumCache( fetcher, req->item, true );
@@ -290,7 +290,7 @@ error:
     goto out;
 }
 
-static void SearchLocal( playlist_fetcher_t* fetcher, struct fetcher_request* req )
+static void SearchLocal( input_fetcher_t* fetcher, struct fetcher_request* req )
 {
     if( SearchByScope( fetcher, req, FETCHER_SCOPE_LOCAL ) == VLC_SUCCESS )
         return; /* done */
@@ -308,7 +308,7 @@ static void SearchLocal( playlist_fetcher_t* fetcher, struct fetcher_request* re
     }
 }
 
-static void SearchNetwork( playlist_fetcher_t* fetcher, struct fetcher_request* req )
+static void SearchNetwork( input_fetcher_t* fetcher, struct fetcher_request* req )
 {
     if( SearchByScope( fetcher, req, FETCHER_SCOPE_NETWORK ) )
     {
@@ -346,8 +346,8 @@ static void* FetcherThread( void* handle )
     return NULL;
 }
 
-static int StartWorker( playlist_fetcher_t* fetcher,
-    void( *pf_worker )( playlist_fetcher_t*, struct fetcher_request* ),
+static int StartWorker( input_fetcher_t* fetcher,
+    void( *pf_worker )( input_fetcher_t*, struct fetcher_request* ),
     struct background_worker* bg, struct fetcher_request* req, void** handle )
 {
     struct fetcher_thread* th = malloc( sizeof *th );
@@ -393,14 +393,14 @@ static void CloseWorker( void* fetcher_, void* th_ )
 
 #define DEF_STARTER(name, worker) \
 static int Start ## name( void* fetcher_, void* req_, void** out ) { \
-    playlist_fetcher_t* fetcher = fetcher_; \
+    input_fetcher_t* fetcher = fetcher_; \
     return StartWorker( fetcher, name, worker, req_, out ); }
 
 DEF_STARTER(  SearchLocal, fetcher->local )
 DEF_STARTER(SearchNetwork, fetcher->network )
 DEF_STARTER(   Downloader, fetcher->downloader )
 
-static void WorkerInit( playlist_fetcher_t* fetcher,
+static void WorkerInit( input_fetcher_t* fetcher,
     struct background_worker** worker, int( *starter )( void*, void*, void** ) )
 {
     struct background_worker_config conf = {
@@ -414,9 +414,9 @@ static void WorkerInit( playlist_fetcher_t* fetcher,
     *worker = background_worker_New( fetcher, &conf );
 }
 
-playlist_fetcher_t* playlist_fetcher_New( vlc_object_t* owner )
+input_fetcher_t* input_fetcher_New( vlc_object_t* owner )
 {
-    playlist_fetcher_t* fetcher = malloc( sizeof( *fetcher ) );
+    input_fetcher_t* fetcher = malloc( sizeof( *fetcher ) );
 
     if( unlikely( !fetcher ) )
         return NULL;
@@ -448,7 +448,7 @@ playlist_fetcher_t* playlist_fetcher_New( vlc_object_t* owner )
     return fetcher;
 }
 
-int playlist_fetcher_Push( playlist_fetcher_t* fetcher, input_item_t* item,
+int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
     input_item_meta_request_option_t options, int preparse_status )
 {
     struct fetcher_request* req = malloc( sizeof *req );
@@ -470,7 +470,7 @@ int playlist_fetcher_Push( playlist_fetcher_t* fetcher, input_item_t* item,
     return VLC_SUCCESS;
 }
 
-void playlist_fetcher_Delete( playlist_fetcher_t* fetcher )
+void input_fetcher_Delete( input_fetcher_t* fetcher )
 {
     background_worker_Delete( fetcher->local );
     background_worker_Delete( fetcher->network );

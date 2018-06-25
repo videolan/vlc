@@ -42,7 +42,7 @@
 
 #include "modules/modules.h"
 #include "config/configuration.h"
-#include "playlist/preparser.h"
+#include "preparser/preparser.h"
 
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
@@ -226,7 +226,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Meta data handling
      */
-    priv->parser = playlist_preparser_New(VLC_OBJECT(p_libvlc));
+    priv->parser = input_preparser_New(VLC_OBJECT(p_libvlc));
     if( !priv->parser )
         goto error;
 
@@ -357,7 +357,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
 
     if (priv->parser != NULL)
-        playlist_preparser_Deactivate(priv->parser);
+        input_preparser_Deactivate(priv->parser);
 
     /* Ask the interfaces to stop and destroy them */
     msg_Dbg( p_libvlc, "removing all interfaces" );
@@ -387,7 +387,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 #endif
 
     if (priv->parser != NULL)
-        playlist_preparser_Delete(priv->parser);
+        input_preparser_Delete(priv->parser);
 
     libvlc_InternalActionsClean( p_libvlc );
 
@@ -479,7 +479,7 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
     if( i_options & META_REQUEST_OPTION_DO_INTERACT )
         item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
-    playlist_preparser_Push( priv->parser, item, i_options, timeout, id );
+    input_preparser_Push( priv->parser, item, i_options, timeout, id );
     return VLC_SUCCESS;
 }
 
@@ -495,7 +495,7 @@ int libvlc_ArtRequest(libvlc_int_t *libvlc, input_item_t *item,
     if (unlikely(priv->parser == NULL))
         return VLC_ENOMEM;
 
-    playlist_preparser_fetcher_Push(priv->parser, item, i_options);
+    input_preparser_fetcher_Push(priv->parser, item, i_options);
     return VLC_SUCCESS;
 }
 
@@ -512,5 +512,5 @@ void libvlc_MetadataCancel(libvlc_int_t *libvlc, void *id)
     if (unlikely(priv->parser == NULL))
         return;
 
-    playlist_preparser_Cancel(priv->parser, id);
+    input_preparser_Cancel(priv->parser, id);
 }

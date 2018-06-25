@@ -1,5 +1,5 @@
 /*****************************************************************************
- * art.h:
+ * art.h
  *****************************************************************************
  * Copyright (C) 1999-2008 VLC authors and VideoLAN
  * $Id$
@@ -22,14 +22,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _PLAYLIST_ART_H
-#define _PLAYLIST_ART_H 1
+#ifndef _INPUT_ART_H
+#define _INPUT_ART_H 1
 
-int playlist_FindArtInCache( input_item_t * );
-int playlist_FindArtInCacheUsingItemUID( input_item_t * );
+int input_FindArtInCache( input_item_t * );
+int input_FindArtInCacheUsingItemUID( input_item_t * );
 
-int playlist_SaveArt( vlc_object_t *, input_item_t *,
-                      const void *, size_t, const char *psz_type );
+int input_SaveArt( vlc_object_t *, input_item_t *,
+                   const void *, size_t, const char *psz_type );
 
 #endif
 

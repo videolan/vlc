@@ -37,8 +37,7 @@
 #include "input/input_interface.h"
 #include <assert.h>
 
-#include "art.h"
-#include "preparser.h"
+#include "preparser/preparser.h"
 
 void playlist_ServicesDiscoveryKillAll( playlist_t *p_playlist );
 

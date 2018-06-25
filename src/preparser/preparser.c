@@ -31,10 +31,10 @@
 #include "preparser.h"
 #include "fetcher.h"
 
-struct playlist_preparser_t
+struct input_preparser_t
 {
     vlc_object_t* owner;
-    playlist_fetcher_t* fetcher;
+    input_fetcher_t* fetcher;
     struct background_worker* worker;
     atomic_bool deactivated;
 };
@@ -52,7 +52,7 @@ static int InputEvent( vlc_object_t* obj, const char* varname,
 
 static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 {
-    playlist_preparser_t* preparser = preparser_;
+    input_preparser_t* preparser = preparser_;
 
     input_thread_t* input = input_CreatePreparser( preparser->owner, item_ );
     if( !input )
@@ -83,7 +83,7 @@ static int PreparserProbeInput( void* preparser_, void* input_ )
 
 static void PreparserCloseInput( void* preparser_, void* input_ )
 {
-    playlist_preparser_t* preparser = preparser_;
+    input_preparser_t* preparser = preparser_;
     input_thread_t* input = input_;
     input_item_t* item = input_priv(input)->p_item;
 
@@ -107,7 +107,7 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
 
     if( preparser->fetcher )
     {
-        if( !playlist_fetcher_Push( preparser->fetcher, item, 0, status ) )
+        if( !input_fetcher_Push( preparser->fetcher, item, 0, status ) )
             return;
     }
 
@@ -118,9 +118,9 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
 static void InputItemRelease( void* item ) { input_item_Release( item ); }
 static void InputItemHold( void* item ) { input_item_Hold( item ); }
 
-playlist_preparser_t* playlist_preparser_New( vlc_object_t *parent )
+input_preparser_t* input_preparser_New( vlc_object_t *parent )
 {
-    playlist_preparser_t* preparser = malloc( sizeof *preparser );
+    input_preparser_t* preparser = malloc( sizeof *preparser );
 
     struct background_worker_config conf = {
         .default_timeout = var_InheritInteger( parent, "preparse-timeout" ),
@@ -141,7 +141,7 @@ playlist_preparser_t* playlist_preparser_New( vlc_object_t *parent )
     }
 
     preparser->owner = parent;
-    preparser->fetcher = playlist_fetcher_New( parent );
+    preparser->fetcher = input_fetcher_New( parent );
     atomic_init( &preparser->deactivated, false );
 
     if( unlikely( !preparser->fetcher ) )
@@ -150,7 +150,7 @@ playlist_preparser_t* playlist_preparser_New( vlc_object_t *parent )
     return preparser;
 }
 
-void playlist_preparser_Push( playlist_preparser_t *preparser,
+void input_preparser_Push( input_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
     int timeout, void *id )
 {
@@ -180,30 +180,30 @@ void playlist_preparser_Push( playlist_preparser_t *preparser,
         input_item_SignalPreparseEnded( item, ITEM_PREPARSE_FAILED );
 }
 
-void playlist_preparser_fetcher_Push( playlist_preparser_t *preparser,
+void input_preparser_fetcher_Push( input_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t options )
 {
     if( preparser->fetcher )
-        playlist_fetcher_Push( preparser->fetcher, item, options, -1 );
+        input_fetcher_Push( preparser->fetcher, item, options, -1 );
 }
 
-void playlist_preparser_Cancel( playlist_preparser_t *preparser, void *id )
+void input_preparser_Cancel( input_preparser_t *preparser, void *id )
 {
     background_worker_Cancel( preparser->worker, id );
 }
 
-void playlist_preparser_Deactivate( playlist_preparser_t* preparser )
+void input_preparser_Deactivate( input_preparser_t* preparser )
 {
     atomic_store( &preparser->deactivated, true );
     background_worker_Cancel( preparser->worker, NULL );
 }
 
-void playlist_preparser_Delete( playlist_preparser_t *preparser )
+void input_preparser_Delete( input_preparser_t *preparser )
 {
     background_worker_Delete( preparser->worker );
 
     if( preparser->fetcher )
-        playlist_fetcher_Delete( preparser->fetcher );
+        input_fetcher_Delete( preparser->fetcher );
 
     free( preparser );
 }

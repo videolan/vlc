@@ -212,23 +212,23 @@ libvlccore_la_SOURCES = \
 	interface/dialog.c \
 	interface/interface.c \
 	playlist/playlist_internal.h \
-	playlist/art.c \
-	playlist/art.h \
 	playlist/aout.c \
 	playlist/thread.c \
 	playlist/control.c \
 	playlist/engine.c \
-	playlist/fetcher.c \
-	playlist/fetcher.h \
 	playlist/sort.c \
 	playlist/loadsave.c \
-	playlist/preparser.c \
-	playlist/preparser.h \
 	playlist/tree.c \
 	playlist/item.c \
 	playlist/search.c \
 	playlist/services_discovery.c \
 	playlist/renderer.c \
+	preparser/art.c \
+	preparser/art.h \
+	preparser/fetcher.c \
+	preparser/fetcher.h \
+	preparser/preparser.c \
+	preparser/preparser.h \
 	input/item.c \
 	input/access.c \
 	clock/clock_internal.c \

@@ -183,7 +183,7 @@ typedef struct libvlc_priv_t
     vlc_dialog_provider *p_dialog_provider; ///< dialog provider
     vlc_keystore      *p_memory_keystore; ///< memory keystore
     struct playlist_t *playlist; ///< Playlist for interfaces
-    struct playlist_preparser_t *parser; ///< Input item meta data handler
+    struct input_preparser_t *parser; ///< Input item meta data handler
     vlc_actions_t *actions; ///< Hotkeys handler
 
     /* Exit callback */
