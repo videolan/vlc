@@ -105,31 +105,30 @@ static int transcode_audio_initialize_filters( sout_stream_t *p_stream, sout_str
 static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    audio_format_t *p_enc_in = &id->p_encoder->fmt_in.audio;
+    audio_format_t *p_enc_out = &id->p_encoder->fmt_out.audio;
 
     /* Complete destination format */
     id->p_encoder->fmt_out.i_codec = p_sys->i_acodec;
-    id->p_encoder->fmt_out.audio.i_rate = p_sys->i_sample_rate > 0 ?
-        p_sys->i_sample_rate : id->audio_dec_out.i_rate;
     id->p_encoder->fmt_out.i_bitrate = p_sys->i_abitrate;
-    id->p_encoder->fmt_out.audio.i_bitspersample = id->audio_dec_out.i_bitspersample;
-    id->p_encoder->fmt_out.audio.i_channels = p_sys->i_channels > 0 ?
-        p_sys->i_channels : id->audio_dec_out.i_channels;
-    assert(id->p_encoder->fmt_out.audio.i_channels > 0);
-    if( id->p_encoder->fmt_out.audio.i_channels >= ARRAY_SIZE(pi_channels_maps) )
-        id->p_encoder->fmt_out.audio.i_channels = ARRAY_SIZE(pi_channels_maps) - 1;
+    p_enc_out->i_rate = p_sys->i_sample_rate ? p_sys->i_sample_rate
+                                             : id->audio_dec_out.i_rate;
+    p_enc_out->i_bitspersample = id->audio_dec_out.i_bitspersample;
+    p_enc_out->i_channels = p_sys->i_channels ? p_sys->i_channels
+                                              : id->audio_dec_out.i_channels;
+    assert(p_enc_out->i_channels > 0);
+    if( p_enc_out->i_channels >= ARRAY_SIZE(pi_channels_maps) )
+        p_enc_out->i_channels = ARRAY_SIZE(pi_channels_maps) - 1;
 
-    id->p_encoder->fmt_in.audio.i_physical_channels =
-    id->p_encoder->fmt_out.audio.i_physical_channels =
-        pi_channels_maps[id->p_encoder->fmt_out.audio.i_channels];
+    p_enc_in->i_physical_channels =
+    p_enc_out->i_physical_channels = pi_channels_maps[p_enc_out->i_channels];
 
     /* Initialization of encoder format structures */
-    es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
-                    id->audio_dec_out.i_format );
-    id->p_encoder->fmt_in.audio.i_format = id->audio_dec_out.i_format;
-    id->p_encoder->fmt_in.audio.i_rate = id->p_encoder->fmt_out.audio.i_rate;
-    id->p_encoder->fmt_in.audio.i_physical_channels =
-        id->p_encoder->fmt_out.audio.i_physical_channels;
-    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
+    es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, id->audio_dec_out.i_format );
+    p_enc_in->i_format = id->audio_dec_out.i_format;
+    p_enc_in->i_rate = p_enc_out->i_rate;
+    p_enc_in->i_physical_channels = p_enc_out->i_physical_channels;
+    aout_FormatPrepare( p_enc_in );
 
     id->p_encoder->p_cfg = p_sys->p_audio_cfg;
     id->p_encoder->p_module =
@@ -150,14 +149,13 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
         vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
 
     /* Fix input format */
-    id->p_encoder->fmt_in.audio.i_format = id->p_encoder->fmt_in.i_codec;
-    if( !id->p_encoder->fmt_in.audio.i_physical_channels )
+    p_enc_in->i_format = id->p_encoder->fmt_in.i_codec;
+    if( !p_enc_in->i_physical_channels )
     {
-        if( id->p_encoder->fmt_in.audio.i_channels < (sizeof(pi_channels_maps) / sizeof(*pi_channels_maps)) )
-            id->p_encoder->fmt_in.audio.i_physical_channels =
-                      pi_channels_maps[id->p_encoder->fmt_in.audio.i_channels];
+        if( p_enc_in->i_channels < (sizeof(pi_channels_maps) / sizeof(*pi_channels_maps)) )
+            p_enc_in->i_physical_channels = pi_channels_maps[p_enc_in->i_channels];
     }
-    aout_FormatPrepare( &id->p_encoder->fmt_in.audio );
+    aout_FormatPrepare( p_enc_in );
 
     return VLC_SUCCESS;
 }
