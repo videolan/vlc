@@ -152,7 +152,7 @@ static int transcode_audio_initialize_encoder( sout_stream_id_sys_t *id, sout_st
     p_enc_in->i_format = id->p_encoder->fmt_in.i_codec;
     if( !p_enc_in->i_physical_channels )
     {
-        if( p_enc_in->i_channels < (sizeof(pi_channels_maps) / sizeof(*pi_channels_maps)) )
+        if( p_enc_in->i_channels < ARRAY_SIZE(pi_channels_maps) )
             p_enc_in->i_physical_channels = pi_channels_maps[p_enc_in->i_channels];
     }
     aout_FormatPrepare( p_enc_in );
