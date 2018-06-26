@@ -449,10 +449,12 @@ static void* Manage( void* p_object )
 
             if( vlm->schedule[i]->b_enabled )
             {
+                bool b_now = false;
                 if( vlm->schedule[i]->date == 0 ) // now !
                 {
                     vlm->schedule[i]->date = now;
                     real_date = now;
+                    b_now = true;
                 }
                 else if( vlm->schedule[i]->period != 0 )
                 {
@@ -471,7 +473,7 @@ static void* Manage( void* p_object )
 
                 if( real_date <= now )
                 {
-                    if( real_date > lastcheck )
+                    if( real_date > lastcheck || b_now )
                     {
                         for( int j = 0; j < vlm->schedule[i]->i_command; j++ )
                         {
