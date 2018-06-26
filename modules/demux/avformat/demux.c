@@ -1013,7 +1013,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
+        {
             f = va_arg( args, double );
+            bool precise = va_arg( args, int );
             i64 = p_sys->ic->duration * f + i_start_time;
 
             msg_Warn( p_demux, "DEMUX_SET_POSITION: %"PRId64, i64 );
@@ -1034,9 +1036,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
             {
-                ResetTime( p_demux, i64 - i_start_time );
+                if( precise )
+                    ResetTime( p_demux, i64 - i_start_time );
+                else
+                    ResetTime( p_demux, -1 );
             }
             return VLC_SUCCESS;
+        }
 
         case DEMUX_GET_LENGTH:
             pi64 = va_arg( args, int64_t * );
@@ -1054,6 +1060,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_TIME:
         {
             i64 = va_arg( args, int64_t );
+            bool precise = va_arg( args, int );
             i64 = i64 * AV_TIME_BASE / CLOCK_FREQ + i_start_time;
 
             msg_Warn( p_demux, "DEMUX_SET_TIME: %"PRId64, i64 );
@@ -1062,7 +1069,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 return VLC_EGENERIC;
             }
-            ResetTime( p_demux, i64 - i_start_time );
+            if( precise )
+                ResetTime( p_demux, i64 - i_start_time );
+            else
+                ResetTime( p_demux, -1 );
             return VLC_SUCCESS;
         }
 
