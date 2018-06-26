@@ -156,7 +156,7 @@ struct sout_stream_id_sys_t
          struct
          {
              struct aout_filters    *p_af_chain; /**< Audio filters */
-             audio_format_t  fmt_audio;
+             audio_format_t  fmt_input_audio;
              audio_format_t  audio_dec_out; /* only rw from pf_aout_format_update() */
          };
 
