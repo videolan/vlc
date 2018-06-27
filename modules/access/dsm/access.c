@@ -524,8 +524,10 @@ static int add_item( stream_t *p_access, struct vlc_readdir_helper *p_rdh,
     if( i_ret == -1 )
         return VLC_ENOMEM;
 
-    return vlc_readdir_helper_additem( p_rdh, psz_uri, NULL, psz_name, i_type,
-                                       ITEM_NET );
+    i_ret = vlc_readdir_helper_additem( p_rdh, psz_uri, NULL, psz_name, i_type,
+                                        ITEM_NET );
+    free( psz_uri );
+    return i_ret;
 }
 
 static int BrowseShare( stream_t *p_access, input_item_node_t *p_node )
