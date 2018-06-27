@@ -910,17 +910,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
                                        vlc_tls_creds_t *p_tls)
 {
     httpd_host_t *host;
-    char *hostname = var_InheritString(p_this, hostvar);
     unsigned port = var_InheritInteger(p_this, portvar);
-
-    vlc_url_t url;
-    vlc_UrlParse(&url, hostname);
-    free(hostname);
-    if (url.i_port != 0) {
-        msg_Err(p_this, "Ignoring port %d (using %d)", url.i_port, port);
-        msg_Info(p_this, "Specify port %d separately with the "
-                          "%s option instead.", url.i_port, portvar);
-    }
 
     /* to be sure to avoid multiple creation */
     vlc_mutex_lock(&httpd.mutex);
@@ -943,7 +933,6 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
         vlc_mutex_unlock(&host->lock);
 
         vlc_mutex_unlock(&httpd.mutex);
-        vlc_UrlClean(&url);
         vlc_tls_Delete(p_tls);
         return host;
     }
@@ -958,7 +947,11 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     vlc_cond_init(&host->wait);
     host->i_ref = 1;
 
-    host->fds = net_ListenTCP(p_this, url.psz_host, port);
+    char *hostname = var_InheritString(p_this, hostvar);
+
+    host->fds = net_ListenTCP(p_this, hostname, port);
+    free(hostname);
+
     if (!host->fds) {
         msg_Err(p_this, "cannot create socket(s) for HTTP host");
         goto error;
@@ -983,8 +976,6 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
     TAB_APPEND(httpd.i_host, httpd.host, host);
     vlc_mutex_unlock(&httpd.mutex);
 
-    vlc_UrlClean(&url);
-
     return host;
 
 error:
@@ -997,7 +988,6 @@ error:
         vlc_object_release(host);
     }
 
-    vlc_UrlClean(&url);
     vlc_tls_Delete(p_tls);
     return NULL;
 }
