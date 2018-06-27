@@ -1452,10 +1452,12 @@ static void httpd_ClientRecv(httpd_client_t *cl)
                         }
                     }
 
-                    cl->query.psz_url = strdup(p);
-                    if ((p3 = strchr(cl->query.psz_url, '?')) ) {
-                        *p3++ = '\0';
-                        cl->query.psz_args = (uint8_t *)strdup(p3);
+                    if(cl->query.psz_url == NULL) {
+                        cl->query.psz_url = strdup(p);
+                        if ((p3 = strchr(cl->query.psz_url, '?')) ) {
+                            *p3++ = '\0';
+                            cl->query.psz_args = (uint8_t *)strdup(p3);
+                        }
                     }
                     p = p2;
                 }
