@@ -372,13 +372,13 @@ int transcode_audio_process( sout_stream_t *p_stream,
         return VLC_EGENERIC;
 
     block_t *p_audio_bufs = transcode_dequeue_all_audios( id );
-    if( p_audio_bufs == NULL )
-        goto end;
 
     do
     {
         block_t *p_audio_buf = p_audio_bufs;
-        p_audio_bufs = p_audio_bufs->p_next;
+        if( p_audio_buf == NULL )
+            break;
+        p_audio_bufs = p_audio_buf->p_next;
         p_audio_buf->p_next = NULL;
 
         if( id->b_error )
@@ -470,7 +470,6 @@ error:
         id->b_error = true;
     } while( p_audio_bufs );
 
-end:
     /* Drain encoder */
     if( unlikely( !id->b_error && in == NULL ) && id->p_encoder->p_module )
     {
