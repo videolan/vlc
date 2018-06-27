@@ -795,23 +795,23 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         return VLC_EGENERIC;
 
     picture_t *p_pics = transcode_dequeue_all_pics( id );
-    if( p_pics == NULL )
-        goto end;
 
     do
     {
         picture_t *p_pic = p_pics;
-        p_pics = p_pics->p_next;
-        p_pic->p_next = NULL;
+        if( p_pic )
+        {
+            p_pics = p_pic->p_next;
+            p_pic->p_next = NULL;
+        }
 
-        if( id->b_error )
+        if( id->b_error && p_pic )
         {
             picture_Release( p_pic );
             continue;
         }
 
-        if( p_pic &&
-            ( unlikely(id->p_encoder->p_module == NULL) ||
+        if( p_pic && ( unlikely(id->p_encoder->p_module == NULL) ||
               !video_format_IsSimilar( &id->fmt_input_video, &p_pic->format ) ) )
         {
             if( id->p_encoder->p_module == NULL ) /* Configure Encoder input/output */
@@ -900,7 +900,6 @@ error:
         vlc_mutex_unlock( &id->lock_out );
     }
 
-end:
     /* Drain encoder */
     if( unlikely( !id->b_error && in == NULL ) && id->p_encoder->p_module )
     {
