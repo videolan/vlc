@@ -23,81 +23,17 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include "upnp-wrapper.hpp"
 
 #include <vector>
 #include <string>
-#include <memory>
 
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>
 #endif
-#include <upnp/upnp.h>
-#include <upnp/upnptools.h>
 
-#include <vlc_common.h>
 #include <vlc_url.h>
-
-#if UPNP_VERSION < 10800
-typedef void* UpnpEventPtr;
-#else
-typedef const void* UpnpEventPtr;
-#endif
-
-namespace SD
-{
-    class MediaServerList;
-}
-
-/*
- * libUpnp allows only one instance per process, so we have to share one for
- * both SD & Access module
- * Since the callback is bound to the UpnpClient_Handle, we have to register
- * a wrapper callback, in order for the access module to be able to initialize
- * libUpnp first.
- * When a SD wishes to use libUpnp, it will provide its own callback, that the
- * wrapper will forward.
- * This way, we always have a register callback & a client handle.
- */
-class UpnpInstanceWrapper
-{
-public:
-    class Listener
-    {
-        public:
-        virtual ~Listener() {}
-        virtual int onEvent( Upnp_EventType event_type,
-                             UpnpEventPtr p_event,
-                             void* p_user_data ) = 0;
-    };
-
-private:
-    static UpnpInstanceWrapper* s_instance;
-    static vlc_mutex_t s_lock;
-    UpnpClient_Handle m_handle;
-    int m_refcount;
-    typedef std::shared_ptr<Listener> ListenerPtr;
-    typedef std::vector<ListenerPtr> Listeners;
-    static Listeners s_listeners;
-
-public:
-    // This increases the refcount before returning the instance
-    static UpnpInstanceWrapper* get( vlc_object_t* p_obj );
-    void release();
-    UpnpClient_Handle handle() const;
-    void addListener(ListenerPtr listener);
-    void removeListener(ListenerPtr listener);
-
-private:
-    static int Callback( Upnp_EventType event_type, UpnpEventPtr p_event, void* p_user_data );
-
-    UpnpInstanceWrapper();
-    ~UpnpInstanceWrapper();
-};
 
 namespace SD
 {
