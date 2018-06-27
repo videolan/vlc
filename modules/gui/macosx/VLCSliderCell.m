@@ -203,6 +203,11 @@ static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     [NSGraphicsContext restoreGraphicsState];
 }
 
+- (NSRect)barRectFlipped:(BOOL)flipped
+{
+    return [[self controlView] bounds];
+}
+
 - (void)drawBarInside:(NSRect)rect flipped:(BOOL)flipped
 {
     // Inset rect
