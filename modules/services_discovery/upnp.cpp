@@ -73,14 +73,14 @@ struct access_sys_t
  */
 namespace SD
 {
-    static int Open( vlc_object_t* );
-    static void Close( vlc_object_t* );
+    static int OpenSD( vlc_object_t* );
+    static void CloseSD( vlc_object_t* );
 }
 
 namespace Access
 {
-    static int Open( vlc_object_t* );
-    static void Close( vlc_object_t* );
+    static int OpenAccess( vlc_object_t* );
+    static void CloseAccess( vlc_object_t* );
 }
 
 VLC_SD_PROBE_HELPER( "upnp", N_("Universal Plug'n'Play"), SD_CAT_LAN )
@@ -94,7 +94,7 @@ vlc_module_begin()
     set_category( CAT_PLAYLIST );
     set_subcategory( SUBCAT_PLAYLIST_SD );
     set_capability( "services_discovery", 0 );
-    set_callbacks( SD::Open, SD::Close );
+    set_callbacks( SD::OpenSD, SD::CloseSD );
 
     add_string( "satip-channelist", "ASTRA_19_2E", SATIP_CHANNEL_LIST,
                 SATIP_CHANNEL_LIST, false )
@@ -105,7 +105,7 @@ vlc_module_begin()
     add_submodule()
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_ACCESS )
-        set_callbacks( Access::Open, Access::Close )
+        set_callbacks( Access::OpenAccess, Access::CloseAccess )
         set_capability( "access", 0 )
 
     VLC_SD_PROBE_SUBMODULE
@@ -193,7 +193,7 @@ SearchThread( void *p_data )
 /*
  * Initializes UPNP instance.
  */
-static int Open( vlc_object_t *p_this )
+static int OpenSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
@@ -242,7 +242,7 @@ static int Open( vlc_object_t *p_this )
 /*
  * Releases resources.
  */
-static void Close( vlc_object_t *p_this )
+static void CloseSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     services_discovery_sys_t *p_sys = reinterpret_cast<services_discovery_sys_t *>( p_sd->p_sys );
@@ -1229,7 +1229,7 @@ static int ReadDirectory( stream_t *p_access, input_item_node_t* p_node )
     return VLC_SUCCESS;
 }
 
-static int Open( vlc_object_t *p_this )
+static int OpenAccess( vlc_object_t *p_this )
 {
     stream_t* p_access = (stream_t*)p_this;
     access_sys_t* p_sys = new(std::nothrow) access_sys_t;
@@ -1250,7 +1250,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_object_t* p_this )
+static void CloseAccess( vlc_object_t* p_this )
 {
     stream_t* p_access = (stream_t*)p_this;
     access_sys_t *sys = (access_sys_t *)p_access->p_sys;
