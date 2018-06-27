@@ -107,7 +107,6 @@ static ssize_t Write   ( sout_access_out_t *, block_t * );
 static int Control( sout_access_out_t *, int, va_list );
 
 static void* ThreadWrite( void * );
-static block_t *NewUDPPacket( sout_access_out_t *, vlc_tick_t );
 
 typedef struct
 {
@@ -117,7 +116,6 @@ typedef struct
     size_t        i_mtu;
 
     block_fifo_t *p_fifo;
-    block_fifo_t *p_empty_blocks;
     block_t      *p_buffer;
 
     vlc_thread_t  thread;
@@ -210,7 +208,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_mtu = var_CreateGetInteger( p_this, "mtu" );
     p_sys->b_mtu_warning = false;
     p_sys->p_fifo = block_FifoNew();
-    p_sys->p_empty_blocks = block_FifoNew();
     p_sys->p_buffer = NULL;
 
     if( vlc_clone( &p_sys->thread, ThreadWrite, p_access,
@@ -218,7 +215,6 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Err( p_access, "cannot spawn sout access thread" );
         block_FifoRelease( p_sys->p_fifo );
-        block_FifoRelease( p_sys->p_empty_blocks );
         net_Close (i_handle);
         free (p_sys);
         return VLC_EGENERIC;
@@ -241,7 +237,6 @@ static void Close( vlc_object_t * p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
     block_FifoRelease( p_sys->p_fifo );
-    block_FifoRelease( p_sys->p_empty_blocks );
 
     if( p_sys->p_buffer ) block_Release( p_sys->p_buffer );
 
@@ -310,8 +305,10 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 
             if( !p_sys->p_buffer )
             {
-                p_sys->p_buffer = NewUDPPacket( p_access, p_buffer->i_dts );
+                p_sys->p_buffer = block_Alloc( p_sys->i_mtu );
                 if( !p_sys->p_buffer ) break;
+                p_sys->p_buffer->i_dts = p_buffer->i_dts;
+                p_sys->p_buffer->i_buffer = 0;
             }
 
             memcpy( p_sys->p_buffer->p_buffer + p_sys->p_buffer->i_buffer,
@@ -350,37 +347,6 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
 }
 
 /*****************************************************************************
- * NewUDPPacket: allocate a new UDP packet of size p_sys->i_mtu
- *****************************************************************************/
-static block_t *NewUDPPacket( sout_access_out_t *p_access, vlc_tick_t i_dts)
-{
-    sout_access_out_sys_t *p_sys = p_access->p_sys;
-    block_t *p_buffer;
-
-    while ( block_FifoCount( p_sys->p_empty_blocks ) > MAX_EMPTY_BLOCKS )
-    {
-        p_buffer = block_FifoGet( p_sys->p_empty_blocks );
-        block_Release( p_buffer );
-    }
-
-    if( block_FifoCount( p_sys->p_empty_blocks ) == 0 )
-    {
-        p_buffer = block_Alloc( p_sys->i_mtu );
-    }
-    else
-    {
-        p_buffer = block_FifoGet(p_sys->p_empty_blocks );
-        p_buffer->i_flags = 0;
-        p_buffer = block_Realloc( p_buffer, 0, p_sys->i_mtu );
-    }
-
-    p_buffer->i_dts = i_dts;
-    p_buffer->i_buffer = 0;
-
-    return p_buffer;
-}
-
-/*****************************************************************************
  * ThreadWrite: Write a packet on the network at the good time.
  *****************************************************************************/
 static void* ThreadWrite( void *data )
@@ -407,7 +373,7 @@ static void* ThreadWrite( void *data )
                     msg_Dbg( p_access, "mmh, hole (%"PRId64" > 2s) -> drop",
                              i_date - i_date_last );
 
-                block_FifoPut( p_sys->p_empty_blocks, p_pk );
+                block_Release( p_pk );
 
                 i_date_last = i_date;
                 i_dropped_packets++;
@@ -447,7 +413,7 @@ static void* ThreadWrite( void *data )
         }
 #endif
 
-        block_FifoPut( p_sys->p_empty_blocks, p_pk );
+        block_Release( p_pk );
 
         i_date_last = i_date;
     }
