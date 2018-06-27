@@ -162,12 +162,13 @@ int transcode_spu_process( sout_stream_t *p_stream,
         return VLC_EGENERIC;
 
     subpicture_t *p_subpics = transcode_dequeue_all_subs( id );
-    if( p_subpics == NULL )
-        return VLC_SUCCESS;
+
     do
     {
         subpicture_t *p_subpic = p_subpics;
-        p_subpics = p_subpics->p_next;
+        if( p_subpic == NULL )
+            break;
+        p_subpics = p_subpic->p_next;
         p_subpic->p_next = NULL;
 
         if( b_error )
