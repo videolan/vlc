@@ -3125,11 +3125,11 @@ dnl
 dnl  Wayland
 dnl
 AC_ARG_ENABLE(wayland,
-  [AS_HELP_STRING([--enable-wayland], [Wayland support (default auto)])])
+  [AS_HELP_STRING([--enable-wayland], [Incomplete Wayland support (default disabled)])])
 have_wayland="no"
 have_wayland_egl="no"
 
-AS_IF([test "${enable_wayland}" != "no"], [
+AS_IF([test "${enable_wayland}" = "yes"], [
   PKG_CHECK_MODULES([WAYLAND_CLIENT], [wayland-client >= 1.5.91], [
     AC_MSG_CHECKING([for the Wayland protocols])
     PKG_CHECK_EXISTS([wayland-protocols >= 1.4], [
