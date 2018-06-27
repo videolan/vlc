@@ -24,9 +24,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include <vlc_charset.h>
 
 #include <memory>
 #include <vector>
@@ -35,9 +33,6 @@
 
 #include <upnp/upnp.h>
 #include <upnp/upnptools.h>
-
-#include <vlc_common.h>
-#include <vlc_charset.h>
 
 #if UPNP_VERSION < 10800
 typedef void* UpnpEventPtr;
