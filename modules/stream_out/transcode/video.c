@@ -552,6 +552,8 @@ static void transcode_video_size_init( sout_stream_t *p_stream,
      int i_dst_width =  lroundf(f_scale_width*p_vid_out->i_width);
      int i_dst_height = lroundf(f_scale_height*p_vid_out->i_height);
 
+     if( i_dst_visible_width & 1 ) ++i_dst_visible_width;
+     if( i_dst_visible_height & 1 ) ++i_dst_visible_height;
      if( i_dst_width & 1 ) ++i_dst_width;
      if( i_dst_height & 1 ) ++i_dst_height;
 
