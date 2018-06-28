@@ -2281,7 +2281,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 i_mode == ES_OUT_MODE_AUTO || i_mode == ES_OUT_MODE_PARTIAL ||
                 i_mode == ES_OUT_MODE_END );
 
-        if (i_mode != ES_OUT_MODE_NONE && !p_sys->b_active)
+        if (i_mode != ES_OUT_MODE_NONE && !p_sys->b_active && !vlc_list_is_empty(&p_sys->es))
         {
             /* XXX Terminate vout if there are tracks but no video one.
              * This one is not mandatory but is he earliest place where it
