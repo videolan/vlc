@@ -514,7 +514,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, mtime_t i_pts )
     p_spu_sys->p_default_style->i_style_flags |= STYLE_MONOSPACED;
     if( p_dec->p_sys->b_opaque )
     {
-        p_spu_sys->p_default_style->i_background_alpha = STYLE_ALPHA_OPAQUE >> 1;
+        p_spu_sys->p_default_style->i_background_alpha = STYLE_ALPHA_OPAQUE;
         p_spu_sys->p_default_style->i_features |= STYLE_HAS_BACKGROUND_ALPHA;
         p_spu_sys->p_default_style->i_style_flags |= STYLE_BACKGROUND;
     }
