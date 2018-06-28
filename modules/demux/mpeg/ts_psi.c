@@ -1598,7 +1598,8 @@ static void FillPESFromDvbpsiES( demux_t *p_demux,
         {
             p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
         }
-        else if( p_dvbpsies->i_pid > 0x19ff )
+        else if( (p_dvbpsies->i_pid >= 0x1a00 && p_dvbpsies->i_pid <= 0x1a1f) ||
+                 (p_dvbpsies->i_pid >= 0x1b00 && p_dvbpsies->i_pid <= 0x1b1f) )
         {
             /* We might just want to prio, but it will trigger multiple videos es */
             p_pes->p_es->fmt.i_priority = ES_PRIORITY_NOT_DEFAULTABLE;
