@@ -787,9 +787,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     *out = NULL;
 
-    if( id->p_encoder->p_module == NULL && !id->p_encoder->fmt_in.i_codec )
-        es_format_Copy( &id->p_encoder->fmt_in, &id->encoder_tested_fmt_in );
-
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
     if( ret != VLCDEC_SUCCESS )
         return VLC_EGENERIC;
