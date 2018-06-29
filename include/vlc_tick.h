@@ -61,10 +61,6 @@ static inline vlc_tick_t vlc_tick_from_sec(int sec)
 {
     return CLOCK_FREQ * sec;
 }
-static inline vlc_tick_t vlc_tick_from_sec(long sec)
-{
-    return CLOCK_FREQ * sec;
-}
 static inline vlc_tick_t vlc_tick_from_sec(uint32_t sec)
 {
     return CLOCK_FREQ * sec;
