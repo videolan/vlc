@@ -139,7 +139,7 @@ static int Decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
     }
 
-    *pkt_pts = block->i_pts ? block->i_pts : block->i_dts;
+    *pkt_pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
 
     aom_codec_err_t err;
     err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts);
