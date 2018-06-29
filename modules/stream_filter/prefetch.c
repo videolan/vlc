@@ -378,6 +378,7 @@ static int Control(stream_t *stream, int query, va_list args)
             *va_arg(args, char **) = strdup(sys->content_type);
             return VLC_SUCCESS;
         case STREAM_GET_SIGNAL:
+        case STREAM_GET_TAGS:
             return VLC_EGENERIC;
         case STREAM_SET_PAUSE_STATE:
         {
