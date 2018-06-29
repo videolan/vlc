@@ -53,18 +53,15 @@ typedef vlc_tick_t mtime_t; /* deprecated, use vlc_tick_t */
 #define SEC_FROM_VLC_TICK(vtk)   ((vtk) / CLOCK_FREQ)
 
 #ifdef __cplusplus
-static inline vlc_tick_t vlc_tick_from_sec(int64_t sec)
+#include <type_traits>
+
+template <typename T>
+static inline auto vlc_tick_from_sec(T sec)
+    -> typename std::enable_if<std::is_integral<T>::value, vlc_tick_t>::type
 {
     return CLOCK_FREQ * sec;
 }
-static inline vlc_tick_t vlc_tick_from_sec(int sec)
-{
-    return CLOCK_FREQ * sec;
-}
-static inline vlc_tick_t vlc_tick_from_sec(uint32_t sec)
-{
-    return CLOCK_FREQ * sec;
-}
+
 /* seconds in floating point */
 static inline vlc_tick_t vlc_tick_from_sec(double secf)
 {
