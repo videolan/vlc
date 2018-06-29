@@ -764,9 +764,9 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
 
         p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         block_ChainAppend( out, p_block );
+        picture_Release( p_pic );
     }
-
-    if( p_sys->i_threads )
+    else
     {
         vlc_sem_wait( &id->picture_pool_has_room );
         vlc_mutex_lock( &id->lock_out );
@@ -774,9 +774,6 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
         vlc_cond_signal( &id->cond );
         vlc_mutex_unlock( &id->lock_out );
     }
-
-    if ( p_sys->i_threads == 0 )
-        picture_Release( p_pic );
 }
 
 int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
