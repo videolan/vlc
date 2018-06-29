@@ -2207,7 +2207,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
                     input_SendEventEsSelect(p_sys->p_input, es->fmt.i_cat,
                                             other->i_id);
                     if( p_esprops->p_main_es == NULL )
-                        p_esprops->p_main_es = es;
+                        p_esprops->p_main_es = other;
                 }
                 else
                     EsOutSelect(out, other, false);
