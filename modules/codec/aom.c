@@ -173,8 +173,8 @@ static int Decode(decoder_t *dec, block_t *block)
     video_format_t *v = &dec->fmt_out.video;
 
     if (img->d_w != v->i_visible_width || img->d_h != v->i_visible_height) {
-        v->i_visible_width = img->d_w;
-        v->i_visible_height = img->d_h;
+        v->i_visible_width = dec->fmt_out.video.i_width = img->d_w;
+        v->i_visible_height = dec->fmt_out.video.i_height = img->d_h;
     }
 
     if( !dec->fmt_out.video.i_sar_num || !dec->fmt_out.video.i_sar_den )
