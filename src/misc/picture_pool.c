@@ -53,9 +53,10 @@ struct picture_pool_t {
 
 static void picture_pool_Destroy(picture_pool_t *pool)
 {
-    if (atomic_fetch_sub(&pool->refs, 1) != 1)
+    if (atomic_fetch_sub_explicit(&pool->refs, 1, memory_order_release) != 1)
         return;
 
+    atomic_thread_fence(memory_order_acquire);
     vlc_cond_destroy(&pool->wait);
     vlc_mutex_destroy(&pool->lock);
     aligned_free(pool);
@@ -231,7 +232,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         picture_t *clone = picture_pool_ClonePicture(pool, i);
         if (clone != NULL) {
             assert(clone->p_next == NULL);
-            atomic_fetch_add(&pool->refs, 1);
+            atomic_fetch_add_explicit(&pool->refs, 1, memory_order_relaxed);
         }
         return clone;
     }
@@ -272,7 +273,7 @@ picture_t *picture_pool_Wait(picture_pool_t *pool)
     picture_t *clone = picture_pool_ClonePicture(pool, i);
     if (clone != NULL) {
         assert(clone->p_next == NULL);
-        atomic_fetch_add(&pool->refs, 1);
+        atomic_fetch_add_explicit(&pool->refs, 1, memory_order_relaxed);
     }
     return clone;
 }
