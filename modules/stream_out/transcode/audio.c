@@ -121,21 +121,23 @@ static int transcode_audio_encoder_open( sout_stream_t *p_stream, sout_stream_id
     return VLC_SUCCESS;
 }
 
-static int transcode_audio_encoder_configure( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static int transcode_audio_encoder_configure( sout_stream_t *p_stream,
+                                              const audio_format_t *p_dec_out,
+                                              encoder_t *p_encoder )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    audio_format_t *p_enc_in = &id->p_encoder->fmt_in.audio;
-    audio_format_t *p_enc_out = &id->p_encoder->fmt_out.audio;
+    audio_format_t *p_enc_in = &p_encoder->fmt_in.audio;
+    audio_format_t *p_enc_out = &p_encoder->fmt_out.audio;
 
     /* Complete destination format */
-    id->p_encoder->fmt_out.i_codec = p_sys->i_acodec;
-    id->p_encoder->fmt_out.audio.i_format = p_sys->i_acodec;
-    id->p_encoder->fmt_out.i_bitrate = p_sys->i_abitrate;
+    p_encoder->fmt_out.i_codec = p_sys->i_acodec;
+    p_encoder->fmt_out.audio.i_format = p_sys->i_acodec;
+    p_encoder->fmt_out.i_bitrate = p_sys->i_abitrate;
     p_enc_out->i_rate = p_sys->i_sample_rate ? p_sys->i_sample_rate
-                                             : id->audio_dec_out.i_rate;
-    p_enc_out->i_bitspersample = id->audio_dec_out.i_bitspersample;
+                                             : p_dec_out->i_rate;
+    p_enc_out->i_bitspersample = p_dec_out->i_bitspersample;
     p_enc_out->i_channels = p_sys->i_channels ? p_sys->i_channels
-                                              : id->audio_dec_out.i_channels;
+                                              : p_dec_out->i_channels;
     aout_FormatPrepare( p_enc_out );
     assert(p_enc_out->i_channels > 0);
     if( p_enc_out->i_channels >= ARRAY_SIZE(pi_channels_maps) )
@@ -145,25 +147,22 @@ static int transcode_audio_encoder_configure( sout_stream_t *p_stream, sout_stre
     p_enc_out->i_physical_channels = pi_channels_maps[p_enc_out->i_channels];
 
     /* Initialization of encoder format structures */
-    es_format_Init( &id->p_encoder->fmt_in, AUDIO_ES, id->audio_dec_out.i_format );
-    p_enc_in->i_format = id->audio_dec_out.i_format;
+    es_format_Init( &p_encoder->fmt_in, AUDIO_ES, p_dec_out->i_format );
+    p_enc_in->i_format = p_dec_out->i_format;
     p_enc_in->i_rate = p_enc_out->i_rate;
     p_enc_in->i_physical_channels = p_enc_out->i_physical_channels;
     aout_FormatPrepare( p_enc_in );
 
-    id->p_encoder->p_cfg = p_sys->p_audio_cfg;
+    p_encoder->p_cfg = p_sys->p_audio_cfg;
 
     /* Fix input format */
-    p_enc_in->i_format = id->p_encoder->fmt_in.i_codec;
+    p_enc_in->i_format = p_encoder->fmt_in.i_codec;
     if( !p_enc_in->i_physical_channels )
     {
         if( p_enc_in->i_channels < ARRAY_SIZE(pi_channels_maps) )
             p_enc_in->i_physical_channels = pi_channels_maps[p_enc_in->i_channels];
     }
     aout_FormatPrepare( p_enc_in );
-
-    id->fmt_input_audio.i_rate = id->audio_dec_out.i_rate;
-    id->fmt_input_audio.i_physical_channels = id->audio_dec_out.i_physical_channels;
 
     return VLC_SUCCESS;
 }
@@ -396,7 +395,10 @@ int transcode_audio_process( sout_stream_t *p_stream,
         {
             if( id->p_encoder->p_module == NULL )
             {
-                transcode_audio_encoder_configure( p_stream, id );
+                transcode_audio_encoder_configure( p_stream, &id->audio_dec_out, id->p_encoder );
+                id->fmt_input_audio.i_rate = id->audio_dec_out.i_rate;
+                id->fmt_input_audio.i_physical_channels = id->audio_dec_out.i_physical_channels;
+
             }
             else
             {
