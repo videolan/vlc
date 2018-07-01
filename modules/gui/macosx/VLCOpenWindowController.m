@@ -365,6 +365,10 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_fileSubFontBox setTitle: _NS("Font Properties")];
     [_fileSubFileBox setTitle: _NS("Subtitle File")];
 
+    [[_fileSubDelayTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("s")]];
+    [[_fileSubFPSTextField formatter] setFormat:[NSString stringWithFormat:@"#,##0.000 %@", _NS("fps")]];
+    self.fileSubFps = 1.0;
+
     p_item = config_FindConfig("subsdec-encoding");
 
     if (p_item) {
