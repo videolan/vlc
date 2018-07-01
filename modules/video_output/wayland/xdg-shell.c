@@ -487,6 +487,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->set.height = cfg->height;
     wl_list_init(&sys->outputs);
     wl_list_init(&sys->seats);
+    sys->cursor_theme = NULL;
+    sys->cursor_surface = NULL;
     vlc_mutex_init(&sys->lock);
     wnd->sys = sys;
     wnd->handle.wl = NULL;
