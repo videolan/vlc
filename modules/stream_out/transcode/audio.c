@@ -75,7 +75,10 @@ static int audio_update_format( decoder_t *p_dec )
     return ( p_dec->fmt_out.audio.i_bitspersample > 0 ) ? 0 : -1;
 }
 
-static int transcode_audio_filters_init( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static int transcode_audio_filters_init( sout_stream_t *p_stream,
+                                         const audio_format_t *p_dec_out,
+                                         const audio_format_t *p_enc_in,
+                                         aout_filters_t **pp_chain )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     /* Load user specified audio filters */
@@ -84,11 +87,10 @@ static int transcode_audio_filters_init( sout_stream_t *p_stream, sout_stream_id
     var_Create( p_stream, "audio-filter", VLC_VAR_STRING );
     if( p_sys->psz_af )
         var_SetString( p_stream, "audio-filter", p_sys->psz_af );
-    id->p_af_chain = aout_FiltersNew( p_stream, &id->audio_dec_out,
-                                      &id->p_encoder->fmt_in.audio, NULL, NULL );
+    *pp_chain = aout_FiltersNew( p_stream, p_dec_out, p_enc_in, NULL, NULL );
     var_Destroy( p_stream, "audio-filter" );
     var_Destroy( p_stream, "audio-time-stretch" );
-    return ( id->p_af_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;
+    return ( *pp_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static int transcode_audio_encoder_open( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
@@ -411,7 +413,9 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 }
             }
 
-            if( transcode_audio_filters_init( p_stream, id ) )
+            if( transcode_audio_filters_init( p_stream, &id->audio_dec_out,
+                                              &id->p_encoder->fmt_in.audio,
+                                              &id->p_af_chain ) )
             {
                 vlc_mutex_unlock(&id->fifo.lock);
                 goto error;
