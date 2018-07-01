@@ -403,9 +403,6 @@ failed:
     {
         if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
         if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
-
-        vlc_obj_free( p_this, p_sys );
-        p_access->p_sys = NULL;
     }
 
     return VLC_EGENERIC;
@@ -423,9 +420,6 @@ static void Close( vlc_object_t * p_this )
         srt_epoll_remove_usock( p_sys->i_poll_id, p_sys->sock );
         srt_close( p_sys->sock );
         srt_epoll_release( p_sys->i_poll_id );
-
-        vlc_obj_free( p_this, p_sys );
-        p_access->p_sys = NULL;
     }
 
     srt_cleanup();
