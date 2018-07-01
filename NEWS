@@ -24,6 +24,9 @@ Misc:
  * Fix live555, macOS-UI, crash
  * Change the extension registration
 
+macOS:
+ * Fix delay and fps setting in subtitle dialog
+
 
 Changes between 3.0.2 and 3.0.3:
 --------------------------------
