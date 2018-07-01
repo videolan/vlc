@@ -351,9 +351,6 @@ failed:
         if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
 
         free( p_sys->psz_host );
-
-        vlc_obj_free( p_this, p_sys );
-        p_stream->p_sys = NULL;
     }
 
     return VLC_EGENERIC;
@@ -373,9 +370,6 @@ static void Close(vlc_object_t *p_this)
         srt_epoll_release( p_sys->i_poll_id );
 
         free( p_sys->psz_host );
-
-        vlc_obj_free( p_this, p_sys );
-        p_stream->p_sys = NULL;
     }
 
     srt_cleanup();
