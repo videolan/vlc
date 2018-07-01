@@ -318,7 +318,7 @@ static int Open(vlc_object_t *p_this)
         goto failed;
     }
 
-    p_sys->psz_host = strdup( parsed_url.psz_host );
+    p_sys->psz_host = vlc_obj_strdup( p_this, parsed_url.psz_host );
     p_sys->i_port = parsed_url.i_port;
 
     vlc_UrlClean( &parsed_url );
@@ -348,8 +348,6 @@ failed:
     if ( p_sys->sock != -1 ) srt_close( p_sys->sock );
     if ( p_sys->i_poll_id != -1 ) srt_epoll_release( p_sys->i_poll_id );
 
-    free( p_sys->psz_host );
-
     return VLC_EGENERIC;
 }
 
@@ -364,7 +362,6 @@ static void Close(vlc_object_t *p_this)
     srt_close( p_sys->sock );
     srt_epoll_release( p_sys->i_poll_id );
 
-    free( p_sys->psz_host );
     srt_cleanup();
 }
 
