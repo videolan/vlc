@@ -27,9 +27,6 @@ ifeq ($(ARCH),aarch64)
 	$(APPLY) $(SRC)/vpx/libvpx-darwin-aarch64.patch
 endif
 endif
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/vpx/libvpx-pthread-w32.patch
-endif
 	$(MOVE)
 
 DEPS_vpx =
