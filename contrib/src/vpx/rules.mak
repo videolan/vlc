@@ -23,9 +23,6 @@ endif
 	$(APPLY) $(SRC)/vpx/0001-ads2gas-Add-a-noelf-option.patch
 	$(APPLY) $(SRC)/vpx/0002-configure-Add-an-armv7-win32-gcc-target.patch
 	$(APPLY) $(SRC)/vpx/0003-configure-Add-an-arm64-win64-gcc-target.patch
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/vpx/libvpx-pthread-w32.patch
-endif
 	$(MOVE)
 
 DEPS_vpx =
