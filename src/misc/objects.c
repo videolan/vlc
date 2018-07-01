@@ -415,12 +415,11 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
 void * vlc_object_hold( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
-#ifndef NDEBUG
-    unsigned refs = atomic_fetch_add (&internals->refs, 1);
+    unsigned refs = atomic_fetch_add_explicit(&internals->refs, 1,
+                                              memory_order_relaxed);
+
     assert (refs > 0); /* Avoid obvious freed object uses */
-#else
-    atomic_fetch_add (&internals->refs, 1);
-#endif
+    (void) refs;
     return p_this;
 }
 
@@ -432,12 +431,13 @@ void * vlc_object_hold( vlc_object_t *p_this )
 void vlc_object_release (vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
-    unsigned refs = atomic_load (&priv->refs);
+    unsigned refs = atomic_load_explicit(&priv->refs, memory_order_relaxed);
 
     /* Fast path */
     while (refs > 1)
     {
-        if (atomic_compare_exchange_weak (&priv->refs, &refs, refs - 1))
+        if (atomic_compare_exchange_weak_explicit(&priv->refs, &refs, refs - 1,
+                                   memory_order_release, memory_order_relaxed))
             return; /* There are still other references to the object */
 
         assert (refs > 0);
@@ -447,7 +447,7 @@ void vlc_object_release (vlc_object_t *obj)
 
     if (unlikely(parent == NULL))
     {   /* Destroying the root object */
-        refs = atomic_fetch_sub (&priv->refs, 1);
+        refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_relaxed);
         assert (refs == 1); /* nobody to race against in this case */
         /* no children can be left */
         assert(vlc_list_is_empty(&priv->children));
@@ -462,7 +462,7 @@ void vlc_object_release (vlc_object_t *obj)
     vlc_object_internals_t *papriv = vlc_internals (parent);
 
     vlc_mutex_lock (&papriv->tree_lock);
-    refs = atomic_fetch_sub (&priv->refs, 1);
+    refs = atomic_fetch_sub_explicit(&priv->refs, 1, memory_order_release);
     assert (refs > 0);
 
     if (likely(refs == 1))
@@ -472,6 +472,7 @@ void vlc_object_release (vlc_object_t *obj)
 
     if (likely(refs == 1))
     {
+        atomic_thread_fence(memory_order_acquire);
         /* no children can be left (because children reference their parent) */
         assert(vlc_list_is_empty(&priv->children));
 
