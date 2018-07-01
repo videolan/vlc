@@ -1,0 +1,89 @@
+From de5a4653d73aa601af9d08c91d4de2e09c430c1e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Sun, 1 Jul 2018 23:16:00 +0300
+Subject: [PATCH] Add WindowsPhone and WindowsStore platform modules for
+ Clang/GNU C/CXX
+
+Just like the existing WindowsPhone and WindowsStore platform modules
+for MSVC, just include the corresponding Windows platform modules.
+
+MinGW tools (both with GCC and Clang) can be used for building for
+Windows Store, even though it isn't a very common or simple setup.
+---
+ Modules/Platform/WindowsPhone-Clang-C.cmake   | 1 +
+ Modules/Platform/WindowsPhone-Clang-CXX.cmake | 1 +
+ Modules/Platform/WindowsPhone-GNU-C.cmake     | 1 +
+ Modules/Platform/WindowsPhone-GNU-CXX.cmake   | 1 +
+ Modules/Platform/WindowsStore-Clang-C.cmake   | 1 +
+ Modules/Platform/WindowsStore-Clang-CXX.cmake | 1 +
+ Modules/Platform/WindowsStore-GNU-C.cmake     | 1 +
+ Modules/Platform/WindowsStore-GNU-CXX.cmake   | 1 +
+ 8 files changed, 8 insertions(+)
+ create mode 100644 Modules/Platform/WindowsPhone-Clang-C.cmake
+ create mode 100644 Modules/Platform/WindowsPhone-Clang-CXX.cmake
+ create mode 100644 Modules/Platform/WindowsPhone-GNU-C.cmake
+ create mode 100644 Modules/Platform/WindowsPhone-GNU-CXX.cmake
+ create mode 100644 Modules/Platform/WindowsStore-Clang-C.cmake
+ create mode 100644 Modules/Platform/WindowsStore-Clang-CXX.cmake
+ create mode 100644 Modules/Platform/WindowsStore-GNU-C.cmake
+ create mode 100644 Modules/Platform/WindowsStore-GNU-CXX.cmake
+
+diff --git a/Modules/Platform/WindowsPhone-Clang-C.cmake b/Modules/Platform/WindowsPhone-Clang-C.cmake
+new file mode 100644
+index 000000000..6e38572cd
+--- /dev/null
++++ b/Modules/Platform/WindowsPhone-Clang-C.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-Clang-C)
+diff --git a/Modules/Platform/WindowsPhone-Clang-CXX.cmake b/Modules/Platform/WindowsPhone-Clang-CXX.cmake
+new file mode 100644
+index 000000000..bf47978c4
+--- /dev/null
++++ b/Modules/Platform/WindowsPhone-Clang-CXX.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-Clang-CXX)
+diff --git a/Modules/Platform/WindowsPhone-GNU-C.cmake b/Modules/Platform/WindowsPhone-GNU-C.cmake
+new file mode 100644
+index 000000000..ff6acd56d
+--- /dev/null
++++ b/Modules/Platform/WindowsPhone-GNU-C.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-GNU-C)
+diff --git a/Modules/Platform/WindowsPhone-GNU-CXX.cmake b/Modules/Platform/WindowsPhone-GNU-CXX.cmake
+new file mode 100644
+index 000000000..6adab6af3
+--- /dev/null
++++ b/Modules/Platform/WindowsPhone-GNU-CXX.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-GNU-CXX)
+diff --git a/Modules/Platform/WindowsStore-Clang-C.cmake b/Modules/Platform/WindowsStore-Clang-C.cmake
+new file mode 100644
+index 000000000..6e38572cd
+--- /dev/null
++++ b/Modules/Platform/WindowsStore-Clang-C.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-Clang-C)
+diff --git a/Modules/Platform/WindowsStore-Clang-CXX.cmake b/Modules/Platform/WindowsStore-Clang-CXX.cmake
+new file mode 100644
+index 000000000..bf47978c4
+--- /dev/null
++++ b/Modules/Platform/WindowsStore-Clang-CXX.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-Clang-CXX)
+diff --git a/Modules/Platform/WindowsStore-GNU-C.cmake b/Modules/Platform/WindowsStore-GNU-C.cmake
+new file mode 100644
+index 000000000..ff6acd56d
+--- /dev/null
++++ b/Modules/Platform/WindowsStore-GNU-C.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-GNU-C)
+diff --git a/Modules/Platform/WindowsStore-GNU-CXX.cmake b/Modules/Platform/WindowsStore-GNU-CXX.cmake
+new file mode 100644
+index 000000000..6adab6af3
+--- /dev/null
++++ b/Modules/Platform/WindowsStore-GNU-CXX.cmake
+@@ -0,0 +1 @@
++include(Platform/Windows-GNU-CXX)
+-- 
+2.15.2 (Apple Git-101.1)
+
