@@ -235,6 +235,56 @@ static void *Add( sout_stream_t *, const es_format_t * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 
+static void SetAudioEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+{
+    char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "aenc" );
+    if( psz_string && *psz_string )
+    {
+        char *psz_next = config_ChainCreate( &p_cfg->psz_name,
+                                            &p_cfg->p_config_chain,
+                                            psz_string );
+        free( psz_next );
+    }
+    free( psz_string );
+
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "acodec" );
+    p_cfg->i_codec = 0;
+    if( psz_string && *psz_string )
+    {
+        char fcc[5] = "    \0";
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( AUDIO_ES, fcc );
+        msg_Dbg( p_stream, "Checking codec mapping for %s got %4.4s ",
+                            fcc, (char*)&p_cfg->i_codec);
+    }
+    free( psz_string );
+
+    p_cfg->audio.i_bitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ab" );
+    if( p_cfg->audio.i_bitrate < 4000 )
+        p_cfg->audio.i_bitrate *= 1000;
+
+    p_cfg->audio.i_sample_rate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "samplerate" );
+    p_cfg->audio.i_channels = var_GetInteger( p_stream, SOUT_CFG_PREFIX "channels" );
+
+    if( p_cfg->i_codec )
+    {
+        if( ( p_cfg->i_codec == VLC_CODEC_MP3 ||
+              p_cfg->i_codec == VLC_CODEC_MP2 ||
+              p_cfg->i_codec == VLC_CODEC_MPGA ) &&
+              p_cfg->audio.i_channels > 2 )
+        {
+            msg_Warn( p_stream, "%d channels invalid for mp2/mp3, forcing to 2",
+                      p_cfg->audio.i_channels );
+            p_cfg->audio.i_channels = 2;
+        }
+        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
+                 (char *)&p_cfg->i_codec, p_cfg->audio.i_sample_rate,
+                 p_cfg->audio.i_channels, p_cfg->audio.i_bitrate / 1000 );
+    }
+
+    p_cfg->psz_lang = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "alang" );
+}
+
 static void SetVideoEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
@@ -304,59 +354,17 @@ static int Open( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     /* Audio transcoding parameters */
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "aenc" );
-    p_sys->psz_aenc = NULL;
-    p_sys->p_audio_cfg = NULL;
-    if( psz_string && *psz_string )
-    {
-        char *psz_next;
-        psz_next = config_ChainCreate( &p_sys->psz_aenc, &p_sys->p_audio_cfg,
-                                       psz_string );
-        free( psz_next );
-    }
-    free( psz_string );
+    sout_encoder_config_init( &p_sys->aenc_cfg );
+    SetAudioEncoderConfig( p_stream, &p_sys->aenc_cfg );
 
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "acodec" );
-    p_sys->i_acodec = 0;
-    if( psz_string && *psz_string )
-    {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_sys->i_acodec = vlc_fourcc_GetCodecFromString( AUDIO_ES, fcc );
-        msg_Dbg( p_stream, "Checking codec mapping for %s got %4.4s ", fcc, (char*)&p_sys->i_acodec);
-    }
-    free( psz_string );
-
-    p_sys->psz_alang = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "alang" );
-
-    p_sys->i_abitrate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "ab" );
-    if( p_sys->i_abitrate < 4000 ) p_sys->i_abitrate *= 1000;
-
-    p_sys->i_sample_rate = var_GetInteger( p_stream, SOUT_CFG_PREFIX "samplerate" );
-
-    p_sys->i_channels = var_GetInteger( p_stream, SOUT_CFG_PREFIX "channels" );
-
-    if( p_sys->i_acodec )
-    {
-        if( ( p_sys->i_acodec == VLC_CODEC_MP3 ||
-              p_sys->i_acodec == VLC_CODEC_MP2 ||
-              p_sys->i_acodec == VLC_CODEC_MPGA ) && p_sys->i_channels > 2 )
-        {
-            msg_Warn( p_stream, "%d channels invalid for mp2/mp3, forcing to 2",
-                      p_sys->i_channels );
-            p_sys->i_channels = 2;
-        }
-        msg_Dbg( p_stream, "codec audio=%4.4s %dHz %d channels %dKb/s",
-                 (char *)&p_sys->i_acodec, p_sys->i_sample_rate,
-                 p_sys->i_channels, p_sys->i_abitrate / 1000 );
-    }
+    /* Audio Filter Parameters */
+    sout_filters_config_init( &p_sys->afilters_cfg );
 
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "afilter" );
     if( psz_string && *psz_string )
-        p_sys->psz_af = strdup( psz_string );
+        p_sys->afilters_cfg.psz_filters = psz_string;
     else
-        p_sys->psz_af = NULL;
-    free( psz_string );
+        free( psz_string );
 
     /* Video transcoding parameters */
     sout_encoder_config_init( &p_sys->venc_cfg );
@@ -457,11 +465,8 @@ static void Close( vlc_object_t * p_this )
     sout_encoder_config_clean( &p_sys->venc_cfg );
     sout_filters_config_clean( &p_sys->vfilters_cfg );
 
-    free( p_sys->psz_af );
-
-    config_ChainDestroy( p_sys->p_audio_cfg );
-    free( p_sys->psz_aenc );
-    free( p_sys->psz_alang );
+    sout_encoder_config_clean( &p_sys->aenc_cfg );
+    sout_filters_config_clean( &p_sys->afilters_cfg );
 
     config_ChainDestroy( p_sys->p_spu_cfg );
     free( p_sys->psz_senc );
@@ -533,14 +538,14 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->p_encoder->fmt_out.i_id    = p_fmt->i_id;
     id->p_encoder->fmt_out.i_group = p_fmt->i_group;
 
-    if( p_sys->psz_alang )
-        id->p_encoder->fmt_out.psz_language = strdup( p_sys->psz_alang );
+    if( p_sys->aenc_cfg.psz_lang )
+        id->p_encoder->fmt_out.psz_language = strdup( p_sys->aenc_cfg.psz_lang );
     else if( p_fmt->psz_language )
         id->p_encoder->fmt_out.psz_language = strdup( p_fmt->psz_language );
 
     bool success;
 
-    if( p_fmt->i_cat == AUDIO_ES && p_sys->i_acodec )
+    if( p_fmt->i_cat == AUDIO_ES && p_sys->aenc_cfg.i_codec )
         success = transcode_audio_add(p_stream, p_fmt, id);
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->venc_cfg.i_codec )
         success = transcode_video_add(p_stream, p_fmt, id);

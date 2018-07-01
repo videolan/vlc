@@ -42,6 +42,7 @@ typedef struct
 {
     vlc_fourcc_t i_codec; /* (0 if not transcode) */
     char         *psz_name;
+    char         *psz_lang;
     config_chain_t *p_config_chain;
     union
     {
@@ -60,6 +61,12 @@ typedef struct
                 uint32_t     pool_size;
             } threads;
         } video;
+        struct
+        {
+            unsigned int    i_bitrate;
+            uint32_t        i_sample_rate;
+            uint32_t        i_channels;
+        } audio;
     };
 } sout_encoder_config_t;
 
@@ -73,6 +80,7 @@ static inline
 void sout_encoder_config_clean( sout_encoder_config_t *p_cfg )
 {
     free( p_cfg->psz_name );
+    free( p_cfg->psz_lang );
     config_ChainDestroy( p_cfg->p_config_chain );
 }
 
@@ -81,15 +89,8 @@ typedef struct
     sout_stream_id_sys_t *id_video;
 
     /* Audio */
-    vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
-    char            *psz_aenc;
-    char            *psz_alang;
-    config_chain_t  *p_audio_cfg;
-    uint32_t        i_sample_rate;
-    uint32_t        i_channels;
-    int             i_abitrate;
-
-    char            *psz_af;
+    sout_encoder_config_t aenc_cfg;
+    sout_filters_config_t afilters_cfg;
 
     /* Video */
     sout_encoder_config_t venc_cfg;
