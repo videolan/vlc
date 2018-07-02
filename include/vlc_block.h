@@ -49,7 +49,7 @@
  * - i_flags may not always be set (ie could be 0, even for a key frame
  *      it depends where you receive the buffer (before/after a packetizer
  *      and the demux/packetizer implementations.
- * - i_dts/i_pts could be VLC_TS_INVALID, it means no pts/dts
+ * - i_dts/i_pts could be VLC_TICK_INVALID, it means no pts/dts
  * - i_length: length in microseond of the packet, can be null except in the
  *      sout where it is mandatory.
  *

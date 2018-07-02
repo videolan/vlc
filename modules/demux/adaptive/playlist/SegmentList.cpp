@@ -142,7 +142,7 @@ bool SegmentList::getSegmentNumberByScaledTime(stime_t time, uint64_t *ret) cons
 bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
                                                          vlc_tick_t *time, vlc_tick_t *dur) const
 {
-    *time = *dur = VLC_TS_INVALID;
+    *time = *dur = VLC_TICK_INVALID;
 
     if(segments.empty())
         return false;

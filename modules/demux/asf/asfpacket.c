@@ -93,7 +93,7 @@ static int DemuxSubPayload( asf_packet_sys_t *p_packetsys,
         return -1;
     }
 
-    p_frag->i_pts = (b_ignore_pts) ? VLC_TS_INVALID : VLC_TS_0 + i_pts;
+    p_frag->i_pts = (b_ignore_pts) ? VLC_TICK_INVALID : VLC_TS_0 + i_pts;
     p_frag->i_dts = VLC_TS_0 + i_dts;
     if ( b_keyframe )
         p_frag->i_flags |= BLOCK_FLAG_TYPE_I;

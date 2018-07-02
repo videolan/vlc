@@ -237,7 +237,7 @@ static int Demux( demux_t *p_demux )
                 p_sys->b_eof = true;
         }
 
-        if ( p_sys->i_time == VLC_TS_INVALID )
+        if ( p_sys->i_time == VLC_TICK_INVALID )
             p_sys->i_time = p_sys->i_sendtime;
     }
 
@@ -392,7 +392,7 @@ static void SeekPrepare( demux_t *p_demux )
 
     p_sys->b_eof = false;
     p_sys->b_eos = false;
-    p_sys->i_time = VLC_TS_INVALID;
+    p_sys->i_time = VLC_TICK_INVALID;
     p_sys->i_sendtime = -1;
     p_sys->i_preroll_start = ASFPACKET_PREROLL_FROM_CURRENT;
 
@@ -402,7 +402,7 @@ static void SeekPrepare( demux_t *p_demux )
         if( tk )
         {
             FlushQueue( tk );
-            tk->i_time = VLC_TS_INVALID;
+            tk->i_time = VLC_TICK_INVALID;
         }
     }
 
@@ -429,7 +429,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
     case DEMUX_GET_TIME:
         pi64 = va_arg( args, int64_t * );
-        if( p_sys->i_time == VLC_TS_INVALID ) return VLC_EGENERIC;
+        if( p_sys->i_time == VLC_TICK_INVALID ) return VLC_EGENERIC;
         *pi64 = p_sys->i_time;
         return VLC_SUCCESS;
 
@@ -485,7 +485,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     if( !tk || !tk->p_fmt || tk->i_cat != -1 * i )
                         continue;
                     FlushQueue( tk );
-                    tk->i_time = VLC_TS_INVALID;
+                    tk->i_time = VLC_TICK_INVALID;
                 }
             }
 
@@ -497,7 +497,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     }
 
     case DEMUX_GET_POSITION:
-        if( p_sys->i_time == VLC_TS_INVALID ) return VLC_EGENERIC;
+        if( p_sys->i_time == VLC_TICK_INVALID ) return VLC_EGENERIC;
         if( p_sys->i_length > 0 )
         {
             pf = va_arg( args, double * );
@@ -687,7 +687,7 @@ static bool Block_Dequeue( demux_t *p_demux, vlc_tick_t i_nexttime )
             else
                 p_block->p_next = NULL;
 
-            if( p_sys->i_time == VLC_TS_INVALID )
+            if( p_sys->i_time == VLC_TICK_INVALID )
             {
                 es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
 #ifdef ASF_DEBUG
@@ -785,7 +785,7 @@ static int DemuxInit( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* init context */
-    p_sys->i_time   = VLC_TS_INVALID;
+    p_sys->i_time   = VLC_TICK_INVALID;
     p_sys->i_sendtime    = -1;
     p_sys->i_length = 0;
     p_sys->b_eos = false;
@@ -890,7 +890,7 @@ static int DemuxInit( demux_t *p_demux )
             goto error;
         memset( tk, 0, sizeof( asf_track_t ) );
 
-        tk->i_time = VLC_TS_INVALID;
+        tk->i_time = VLC_TICK_INVALID;
         tk->info.p_sp = p_sp;
         tk->p_es = NULL;
         tk->info.p_esp = NULL;

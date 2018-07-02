@@ -412,7 +412,7 @@ static int DemuxHEIF( demux_t *p_demux )
     if( !p_block )
         return VLC_DEMUXER_SUCCESS; /* Goto next picture */
 
-    if( p_sys->i_pcr == VLC_TS_INVALID )
+    if( p_sys->i_pcr == VLC_TICK_INVALID )
     {
         p_sys->i_pcr = VLC_TS_0;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );

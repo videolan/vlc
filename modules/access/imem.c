@@ -279,7 +279,7 @@ static int OpenCommon(vlc_object_t *object, imem_sys_t **sys_ptr, const char *ps
 
     /* */
     sys->dts       = 0;
-    sys->deadline  = VLC_TS_INVALID;
+    sys->deadline  = VLC_TICK_INVALID;
 
     *sys_ptr = sys;
     return VLC_SUCCESS;
@@ -571,7 +571,7 @@ static int Demux(demux_t *demux)
 {
     imem_sys_t *sys = (imem_sys_t*)demux->p_sys;
 
-    if (sys->deadline == VLC_TS_INVALID)
+    if (sys->deadline == VLC_TICK_INVALID)
         sys->deadline = sys->dts + 1;
 
     for (;;) {
@@ -594,8 +594,8 @@ static int Demux(demux_t *demux)
         if (buffer_size > 0) {
             block_t *block = block_Alloc(buffer_size);
             if (block) {
-                block->i_dts = dts >= 0 ? (1 + dts) : VLC_TS_INVALID;
-                block->i_pts = pts >= 0 ? (1 + pts) : VLC_TS_INVALID;
+                block->i_dts = dts >= 0 ? (1 + dts) : VLC_TICK_INVALID;
+                block->i_pts = pts >= 0 ? (1 + pts) : VLC_TICK_INVALID;
                 memcpy(block->p_buffer, buffer, buffer_size);
 
                 es_out_SetPCR(demux->out, block->i_dts);
@@ -608,7 +608,7 @@ static int Demux(demux_t *demux)
         sys->source.release(sys->source.data, sys->source.cookie,
                             buffer_size, buffer);
     }
-    sys->deadline = VLC_TS_INVALID;
+    sys->deadline = VLC_TICK_INVALID;
     return 1;
 }
 

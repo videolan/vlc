@@ -90,7 +90,7 @@ static inline void timestamp_FifoPut(timestamp_fifo_t *fifo, int64_t ts)
 static inline int64_t timestamp_FifoGet(timestamp_fifo_t *fifo)
 {
     if (timestamp_FifoIsEmpty(fifo))
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
 
     int64_t result = fifo->buffer[fifo->begin];
     fifo->begin = (fifo->begin + 1) % fifo->capacity;

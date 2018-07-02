@@ -78,9 +78,9 @@ static void PacketizeFlush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     p_sys->b_discontuinity = true;
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
     p_sys->i_state = STATE_NOSYNC;
-    p_sys->i_prev_bytestream_pts = VLC_TS_INVALID;
+    p_sys->i_prev_bytestream_pts = VLC_TICK_INVALID;
     block_BytestreamEmpty( &p_sys->bytestream );
 }
 
@@ -105,14 +105,14 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
     }
 
     if( p_sys->bytestream.p_block->i_pts != date_Get( &p_sys->end_date ) &&
-        p_sys->bytestream.p_block->i_pts != VLC_TS_INVALID )
+        p_sys->bytestream.p_block->i_pts != VLC_TICK_INVALID )
     {
         /* Make sure we don't reuse the same pts twice
          * as A/52 in PES sends multiple times the same pts */
         if( p_sys->bytestream.p_block->i_pts != p_sys->i_prev_bytestream_pts )
             date_Set( &p_sys->end_date, p_sys->bytestream.p_block->i_pts );
         p_sys->i_prev_bytestream_pts = p_sys->bytestream.p_block->i_pts;
-        p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+        p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
     }
 
     p_dec->fmt_out.audio.i_rate     = p_sys->frame.i_rate;
@@ -128,7 +128,7 @@ static block_t *GetOutBuffer( decoder_t *p_dec )
 
     p_block->i_nb_samples = p_sys->frame.i_samples;
     p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
-    if( p_block->i_pts != VLC_TS_INVALID )
+    if( p_block->i_pts != VLC_TICK_INVALID )
         p_block->i_length = date_Increment( &p_sys->end_date,
                                             p_block->i_nb_samples ) - p_block->i_pts;
 
@@ -288,7 +288,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
             p_sys->i_state = STATE_NOSYNC;
 
-            if( p_out_buffer->i_dts == VLC_TS_INVALID )
+            if( p_out_buffer->i_dts == VLC_TICK_INVALID )
             {
                 block_Release( p_out_buffer );
                 return NULL;
@@ -340,9 +340,9 @@ static int Open( vlc_object_t *p_this )
 
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
     p_sys->b_discontuinity = false;
-    p_sys->i_prev_bytestream_pts = VLC_TS_INVALID;
+    p_sys->i_prev_bytestream_pts = VLC_TICK_INVALID;
     memset(&p_sys->frame, 0, sizeof(vlc_a52_header_t));
 
     block_BytestreamInit( &p_sys->bytestream );

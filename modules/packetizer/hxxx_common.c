@@ -45,8 +45,8 @@ cc_storage_t * cc_storage_new( void )
     cc_storage_t *p_ccs = malloc( sizeof(*p_ccs) );
     if( likely(p_ccs) )
     {
-        p_ccs->i_pts = VLC_TS_INVALID;
-        p_ccs->i_dts = VLC_TS_INVALID;
+        p_ccs->i_pts = VLC_TICK_INVALID;
+        p_ccs->i_dts = VLC_TICK_INVALID;
         p_ccs->i_flags = 0;
         cc_Init( &p_ccs->current );
         cc_Init( &p_ccs->next );

@@ -669,7 +669,7 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
-    date_Set(&p_sys->pts, VLC_TS_INVALID); /* To make sure we recover properly */
+    date_Set(&p_sys->pts, VLC_TICK_INVALID); /* To make sure we recover properly */
     p_sys->i_late_frames = 0;
     p_sys->framedrop = FRAMEDROP_NONE;
     cc_Flush( &p_sys->cc );
@@ -728,7 +728,7 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
                             "dropping frame (computer too slow ?)",
                      p_sys->p_context->reordered_opaque - p_sys->i_last_output_frame );
 
-            date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
+            date_Set( &p_sys->pts, VLC_TICK_INVALID ); /* To make sure we recover properly */
             block_Release( block );
             p_sys->i_late_frames--;
             return NULL;
@@ -744,7 +744,7 @@ static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
     AVCodecContext *p_context = p_sys->p_context;
 
     if( p_sys->pts.i_divider_num == 0 ||
-        date_Get( &p_sys->pts ) == VLC_TS_INVALID )
+        date_Get( &p_sys->pts ) == VLC_TICK_INVALID )
         return;
 
     int i_tick = p_context->ticks_per_frame;
@@ -760,11 +760,11 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
    /* Update frame late count (except when doing preroll) */
-   vlc_tick_t i_display_date = VLC_TS_INVALID;
+   vlc_tick_t i_display_date = VLC_TICK_INVALID;
    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
-   if( i_display_date != VLC_TS_INVALID && i_display_date <= current_time )
+   if( i_display_date != VLC_TICK_INVALID && i_display_date <= current_time )
    {
        /* Out of preroll, consider only late frames on rising delay */
        if( p_sys->b_from_preroll )
@@ -1036,8 +1036,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 pkt.data = p_block->p_buffer;
                 pkt.size = p_block->i_buffer;
-                pkt.pts = p_block->i_pts != VLC_TS_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
-                pkt.dts = p_block->i_dts != VLC_TS_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
+                pkt.pts = p_block->i_pts != VLC_TICK_INVALID ? p_block->i_pts : AV_NOPTS_VALUE;
+                pkt.dts = p_block->i_dts != VLC_TICK_INVALID ? p_block->i_dts : AV_NOPTS_VALUE;
             }
             else
             {
@@ -1061,7 +1061,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_block )
             {
                 p_block->i_pts =
-                p_block->i_dts = VLC_TS_INVALID;
+                p_block->i_dts = VLC_TICK_INVALID;
             }
 
 #if LIBAVCODEC_VERSION_CHECK( 57, 0, 0xFFFFFFFFU, 64, 101 )
@@ -1151,7 +1151,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             i_pts = date_Get( &p_sys->pts );
 
         /* Interpolate the next PTS */
-        if( i_pts != VLC_TS_INVALID )
+        if( i_pts != VLC_TICK_INVALID )
             date_Set( &p_sys->pts, i_pts );
 
         interpolate_next_pts( p_dec, frame );
@@ -1266,12 +1266,12 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_pic->b_top_field_first = frame->top_field_first;
 
         if (DecodeSidedata(p_dec, frame, p_pic))
-            i_pts = VLC_TS_INVALID;
+            i_pts = VLC_TICK_INVALID;
 
         av_frame_free(&frame);
 
         /* Send decoded frame to vout */
-        if (i_pts != VLC_TS_INVALID)
+        if (i_pts != VLC_TICK_INVALID)
         {
             p_sys->b_first_frame = false;
             decoder_QueueVideo( p_dec, p_pic );
@@ -1305,7 +1305,7 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
         p_sys->i_last_output_frame = -1;
         p_sys->framedrop = FRAMEDROP_NONE;
 
-        date_Set( &p_sys->pts, VLC_TS_INVALID ); /* To make sure we recover properly */
+        date_Set( &p_sys->pts, VLC_TICK_INVALID ); /* To make sure we recover properly */
         cc_Flush( &p_sys->cc );
 
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )

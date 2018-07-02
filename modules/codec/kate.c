@@ -360,7 +360,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 #endif
     p_sys->b_ready = false;
     p_sys->i_pts =
-    p_sys->i_max_stop = VLC_TS_INVALID;
+    p_sys->i_max_stop = VLC_TICK_INVALID;
 
     kate_comment_init( &p_sys->kc );
     kate_info_init( &p_sys->ki );
@@ -455,7 +455,7 @@ static void Flush( decoder_t *p_dec )
     tiger_renderer_seek( p_sys->p_tr, 0 );
     vlc_mutex_unlock( &p_sys->lock );
 #endif
-    p_sys->i_max_stop = VLC_TS_INVALID;
+    p_sys->i_max_stop = VLC_TICK_INVALID;
 }
 
 /****************************************************************************
@@ -481,7 +481,7 @@ static void *DecodeBlock( decoder_t *p_dec, block_t *p_block )
 #endif
         if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
         {
-            p_sys->i_max_stop = VLC_TS_INVALID;
+            p_sys->i_max_stop = VLC_TICK_INVALID;
             block_Release( p_block );
             return NULL;
         }
@@ -618,7 +618,7 @@ static void *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     /* Date management */
-    if( p_block->i_pts != VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts )
+    if( p_block->i_pts != VLC_TICK_INVALID && p_block->i_pts != p_sys->i_pts )
     {
         p_sys->i_pts = p_block->i_pts;
     }

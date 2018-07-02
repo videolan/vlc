@@ -45,8 +45,8 @@ struct demux_cc
         :p_demux(demux)
         ,p_renderer(renderer)
         ,m_enabled( true )
-        ,m_pause_date( VLC_TS_INVALID )
-        ,m_pause_delay( VLC_TS_INVALID )
+        ,m_pause_date( VLC_TICK_INVALID )
+        ,m_pause_delay( VLC_TICK_INVALID )
     {
         init();
     }
@@ -187,12 +187,12 @@ struct demux_cc
     {
         vlc_tick_t system, delay;
         if( es_out_ControlGetPcrSystem( p_demux->p_next->out, &system, &delay ) )
-            return VLC_TS_INVALID;
+            return VLC_TICK_INVALID;
 
         vlc_tick_t cc_time = p_renderer->pf_get_time( p_renderer->p_opaque );
-        if( cc_time != VLC_TS_INVALID )
+        if( cc_time != VLC_TICK_INVALID )
             return cc_time - system + m_pause_delay;
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
     }
 
     vlc_tick_t getTime()
@@ -203,7 +203,7 @@ struct demux_cc
         int64_t time = m_start_time;
         vlc_tick_t cc_time = getCCTime();
 
-        if( cc_time != VLC_TS_INVALID )
+        if( cc_time != VLC_TICK_INVALID )
             time += cc_time;
         m_last_time = time;
         return time;
@@ -354,7 +354,7 @@ struct demux_cc
 
         case DEMUX_SET_POSITION:
         {
-            m_pause_delay = m_pause_date = VLC_TS_INVALID;
+            m_pause_delay = m_pause_date = VLC_TICK_INVALID;
 
             double pos = va_arg( args, double );
             /* Force unprecise seek */
@@ -368,7 +368,7 @@ struct demux_cc
         }
         case DEMUX_SET_TIME:
         {
-            m_pause_delay = m_pause_date = VLC_TS_INVALID;
+            m_pause_delay = m_pause_date = VLC_TICK_INVALID;
 
             vlc_tick_t time = va_arg( args, int64_t );
             /* Force unprecise seek */
@@ -390,15 +390,15 @@ struct demux_cc
 
             if (paused)
             {
-                if (m_pause_date == VLC_TS_INVALID)
+                if (m_pause_date == VLC_TICK_INVALID)
                     m_pause_date = vlc_tick_now();
             }
             else
             {
-                if (m_pause_date != VLC_TS_INVALID)
+                if (m_pause_date != VLC_TICK_INVALID)
                 {
                     m_pause_delay += vlc_tick_now() - m_pause_date;
-                    m_pause_date = VLC_TS_INVALID;
+                    m_pause_date = VLC_TICK_INVALID;
                 }
             }
 

@@ -434,7 +434,7 @@ static int Demux( demux_t *p_demux)
             if( p_block_in )
             {
                 p_block_in->i_dts = date_Get( &p_sys->dts );
-                p_block_in->i_pts = VLC_TS_INVALID;
+                p_block_in->i_pts = VLC_TICK_INVALID;
             }
 
             if( p_sys->p_es == NULL )

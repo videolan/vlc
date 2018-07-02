@@ -444,7 +444,7 @@ static inline vlc_tick_t decoder_GetDisplayDate( decoder_t *dec, vlc_tick_t i_ts
     vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
 
     if( !dec->cbs->video.get_display_date )
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
 
     return dec->cbs->video.get_display_date( dec, i_ts );
 }

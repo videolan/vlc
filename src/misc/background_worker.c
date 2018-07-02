@@ -74,7 +74,7 @@ static void* Thread( void* data )
                 vlc_array_remove( &worker->tail.data, 0 );
             }
 
-            if( worker->head.deadline == VLC_TS_INVALID && item == NULL )
+            if( worker->head.deadline == VLC_TICK_INVALID && item == NULL )
                 worker->head.active = false;
             worker->head.id = item ? item->id : NULL;
             vlc_cond_broadcast( &worker->head.wait );
@@ -86,7 +86,7 @@ static void* Thread( void* data )
                 else
                     worker->head.deadline = INT64_MAX;
             }
-            else if( worker->head.deadline != VLC_TS_INVALID )
+            else if( worker->head.deadline != VLC_TICK_INVALID )
             {
                 /* Wait 1 seconds for new inputs before terminating */
                 vlc_tick_t deadline = vlc_tick_now() + 1*CLOCK_FREQ;
@@ -96,7 +96,7 @@ static void* Thread( void* data )
                 {
                     /* Timeout: if there is still no items, the thread will be
                      * terminated at next loop iteration (active = false). */
-                    worker->head.deadline = VLC_TS_INVALID;
+                    worker->head.deadline = VLC_TICK_INVALID;
                 }
                 continue;
             }
@@ -173,7 +173,7 @@ static void BackgroundWorkerCancel( struct background_worker* worker, void* id)
     while( ( id == NULL && worker->head.active )
         || ( id != NULL && worker->head.id == id ) )
     {
-        worker->head.deadline = VLC_TS_INVALID;
+        worker->head.deadline = VLC_TICK_INVALID;
         vlc_cond_signal( &worker->head.worker_wait );
         vlc_cond_signal( &worker->tail.wait );
         vlc_cond_wait( &worker->head.wait, &worker->lock );
@@ -193,7 +193,7 @@ struct background_worker* background_worker_New( void* owner,
     worker->owner = owner;
     worker->head.id = NULL;
     worker->head.active = false;
-    worker->head.deadline = VLC_TS_INVALID;
+    worker->head.deadline = VLC_TICK_INVALID;
 
     vlc_mutex_init( &worker->lock );
     vlc_cond_init( &worker->head.wait );

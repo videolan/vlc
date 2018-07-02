@@ -53,7 +53,7 @@ AbstractCommand::~AbstractCommand()
 
 vlc_tick_t AbstractCommand::getTime() const
 {
-    return VLC_TS_INVALID;
+    return VLC_TICK_INVALID;
 }
 
 int AbstractCommand::getType() const
@@ -242,8 +242,8 @@ std::ostream& operator<<(std::ostream& ostr, const std::list<AbstractCommand *>&
 
 CommandsQueue::CommandsQueue( CommandsFactory *f )
 {
-    bufferinglevel = VLC_TS_INVALID;
-    pcr = VLC_TS_INVALID;
+    bufferinglevel = VLC_TICK_INVALID;
+    pcr = VLC_TICK_INVALID;
     b_drop = false;
     b_draining = false;
     b_eof = false;
@@ -269,7 +269,7 @@ static bool compareCommands( AbstractCommand *a, AbstractCommand *b )
             return false;
         return true;
     }
-    else return (a->getTime() < b->getTime() && a->getTime() != VLC_TS_INVALID);
+    else return (a->getTime() < b->getTime() && a->getTime() != VLC_TICK_INVALID);
 }
 
 void CommandsQueue::Schedule( AbstractCommand *command )
@@ -347,7 +347,7 @@ vlc_tick_t CommandsQueue::Process( es_out_t *out, vlc_tick_t barrier )
                 disabled_esids.insert( id );
                 commands.push_back( command );
             }
-            else if( command->getTime() == VLC_TS_INVALID )
+            else if( command->getTime() == VLC_TICK_INVALID )
             {
                 if( disabled_esids.find( id ) == disabled_esids.end() )
                     output.push_back( command );
@@ -377,7 +377,7 @@ vlc_tick_t CommandsQueue::Process( es_out_t *out, vlc_tick_t barrier )
         if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND )
         {
             vlc_tick_t dts = command->getTime();
-            if( dts != VLC_TS_INVALID )
+            if( dts != VLC_TICK_INVALID )
                 lastdts = dts;
         }
 
@@ -417,8 +417,8 @@ void CommandsQueue::Abort( bool b_reset )
 
     if( b_reset )
     {
-        bufferinglevel = VLC_TS_INVALID;
-        pcr = VLC_TS_INVALID;
+        bufferinglevel = VLC_TICK_INVALID;
+        pcr = VLC_TICK_INVALID;
         b_draining = false;
         b_eof = false;
     }
@@ -496,9 +496,9 @@ vlc_tick_t CommandsQueue::getFirstDTS() const
     for( it = commands.begin(); it != commands.end(); ++it )
     {
         const vlc_tick_t i_dts = (*it)->getTime();
-        if( i_dts != VLC_TS_INVALID )
+        if( i_dts != VLC_TICK_INVALID )
         {
-            if( i_dts < i_firstdts || i_firstdts == VLC_TS_INVALID )
+            if( i_dts < i_firstdts || i_firstdts == VLC_TICK_INVALID )
                 i_firstdts = i_dts;
             break;
         }

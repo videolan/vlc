@@ -158,7 +158,7 @@ static int Demux( demux_t *p_demux )
     if( p_block_in )
     {
         p_block_in->i_pts =
-        p_block_in->i_dts = ( p_sys->b_start ) ? VLC_TS_0 : VLC_TS_INVALID;
+        p_block_in->i_dts = ( p_sys->b_start ) ? VLC_TS_0 : VLC_TICK_INVALID;
     }
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer,

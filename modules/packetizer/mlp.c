@@ -260,7 +260,7 @@ static void Flush( decoder_t *p_dec )
     p_sys->i_state = STATE_NOSYNC;
     p_sys->b_discontinuity = true;
     block_BytestreamEmpty( &p_sys->bytestream );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 }
 
 static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
@@ -289,8 +289,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
-        if( p_block->i_pts == VLC_TS_INVALID &&
-            date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+        if( p_block->i_pts == VLC_TICK_INVALID &&
+            date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
             msg_Dbg( p_dec, "waiting for PTS" );
@@ -332,7 +332,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts != VLC_TS_INVALID &&
+            if( p_sys->i_pts != VLC_TICK_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
                 date_Set( &p_sys->end_date, p_sys->i_pts );
@@ -444,7 +444,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
-                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
 
             if( p_sys->b_discontinuity )
             {

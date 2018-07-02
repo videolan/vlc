@@ -445,7 +445,7 @@ void codec_decode (demux_t *demux, void *data, block_t *block)
 {
     if (data)
     {
-        block->i_dts = VLC_TS_INVALID; /* RTP does not specify this */
+        block->i_dts = VLC_TICK_INVALID; /* RTP does not specify this */
         es_out_SetPCR(demux->out, block->i_pts);
         es_out_Send (demux->out, (es_out_id_t *)data, block);
     }

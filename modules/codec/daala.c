@@ -172,7 +172,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_dec->p_sys = p_sys;
     p_dec->p_sys->b_packetizer = b_packetizer;
     p_sys->b_has_headers = false;
-    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_decoded_first_keyframe = false;
     p_sys->dcx = NULL;
 
@@ -430,7 +430,7 @@ static void *ProcessPacket( decoder_t *p_dec, daala_packet *p_dpacket,
     }
 
     /* Date management */
-    if( p_block->i_pts != VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts )
+    if( p_block->i_pts != VLC_TICK_INVALID && p_block->i_pts != p_sys->i_pts )
     {
         p_sys->i_pts = p_block->i_pts;
     }

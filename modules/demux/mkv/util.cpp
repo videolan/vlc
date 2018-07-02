@@ -168,7 +168,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
     Cook_PrivateTrackData * p_sys = (Cook_PrivateTrackData *) p_tk->p_sys;
     size_t size = p_blk->i_buffer;
 
-    if( p_tk->i_last_dts == VLC_TS_INVALID )
+    if( p_tk->i_last_dts == VLC_TICK_INVALID )
     {
         for( size_t i = 0; i < p_sys->i_subpackets; i++)
             if( p_sys->p_subpackets[i] )
@@ -207,8 +207,8 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, v
                 return;
 
             memcpy( p_block->p_buffer, p_frame, p_sys->i_subpacket_size );
-            p_block->i_dts = VLC_TS_INVALID;
-            p_block->i_pts = VLC_TS_INVALID;
+            p_block->i_dts = VLC_TICK_INVALID;
+            p_block->i_pts = VLC_TICK_INVALID;
             if( !p_sys->i_subpacket )
             {
                 p_tk->i_last_dts =
@@ -249,7 +249,7 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
                              p_tk->pi_chan_table, p_tk->fmt.i_codec );
     }
 
-    if( p_block->i_dts != VLC_TS_INVALID &&
+    if( p_block->i_dts != VLC_TICK_INVALID &&
         ( p_tk->fmt.i_cat == VIDEO_ES || p_tk->fmt.i_cat == AUDIO_ES ) )
     {
         p_tk->i_last_dts = p_block->i_dts;

@@ -1471,7 +1471,7 @@ int DecodeAudio ( decoder_t *p_dec, block_t *p_block )
     if( p_block->i_flags & BLOCK_FLAG_CORRUPTED )
     {
         block_Release( p_block );
-        date_Set( &p_sys->end_date, VLC_TS_INVALID );
+        date_Set( &p_sys->end_date, VLC_TICK_INVALID );
         if(!p_sys->in.b_flushed)
         {
             msg_Dbg(p_dec, "flushing");
@@ -1482,7 +1482,7 @@ int DecodeAudio ( decoder_t *p_dec, block_t *p_block )
         return VLCDEC_SUCCESS;
     }
 
-    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+    if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
     {
         if( !p_block->i_pts )
         {

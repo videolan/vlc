@@ -215,7 +215,7 @@ int Demuxer::demux(vlc_tick_t)
 SlaveDemuxer::SlaveDemuxer(demux_t *p_realdemux, const std::string &name, es_out_t *out, AbstractSourceStream *source)
     : Demuxer(p_realdemux, name, out, source)
 {
-    length = VLC_TS_INVALID;
+    length = VLC_TICK_INVALID;
     b_reinitsonseek = false;
     b_startsfromzero = false;
 }
@@ -229,7 +229,7 @@ bool SlaveDemuxer::create()
 {
     if(Demuxer::create())
     {
-        length = VLC_TS_INVALID;
+        length = VLC_TICK_INVALID;
         if(demux_Control(p_demux, DEMUX_GET_LENGTH, &length) != VLC_SUCCESS)
             b_eof = true;
         return true;

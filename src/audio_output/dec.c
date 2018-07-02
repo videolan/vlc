@@ -101,7 +101,7 @@ error:
     }
 
     owner->sync.rate = 1.f;
-    owner->sync.end = VLC_TS_INVALID;
+    owner->sync.end = VLC_TICK_INVALID;
     owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
     owner->sync.discontinuity = true;
 
@@ -160,7 +160,7 @@ static int aout_CheckReady (audio_output_t *aout)
         }
 
         msg_Dbg (aout, "restarting filters...");
-        owner->sync.end = VLC_TS_INVALID;
+        owner->sync.end = VLC_TICK_INVALID;
         owner->sync.resamp_type = AOUT_RESAMPLING_NONE;
 
         if (owner->mixer_format.i_format)
@@ -269,7 +269,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
         aout->flush(aout, false);
 
         aout_StopResampling (aout);
-        owner->sync.end = VLC_TS_INVALID;
+        owner->sync.end = VLC_TICK_INVALID;
         owner->sync.discontinuity = true;
 
         /* Now the output might be too early... Recheck. */
@@ -350,7 +350,7 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    assert (block->i_pts != VLC_TS_INVALID);
+    assert (block->i_pts != VLC_TICK_INVALID);
 
     block->i_length = CLOCK_FREQ * block->i_nb_samples
                                  / owner->input_format.i_rate;
@@ -409,7 +409,7 @@ void aout_DecChangePause (audio_output_t *aout, bool paused, vlc_tick_t date)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    if (owner->sync.end != VLC_TS_INVALID)
+    if (owner->sync.end != VLC_TICK_INVALID)
     {
         if (paused)
             owner->sync.end -= date;
@@ -432,7 +432,7 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
 {
     aout_owner_t *owner = aout_owner (aout);
 
-    owner->sync.end = VLC_TS_INVALID;
+    owner->sync.end = VLC_TICK_INVALID;
     if (owner->mixer_format.i_format)
     {
         if (wait)

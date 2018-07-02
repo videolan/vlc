@@ -87,7 +87,7 @@ drop:
 
 static int rtp_timeout (vlc_tick_t deadline)
 {
-    if (deadline == VLC_TS_INVALID)
+    if (deadline == VLC_TICK_INVALID)
         return -1; /* infinite */
 
     vlc_tick_t t = vlc_tick_now ();
@@ -107,7 +107,7 @@ void *rtp_dgram_thread (void *opaque)
 {
     demux_t *demux = opaque;
     demux_sys_t *sys = demux->p_sys;
-    vlc_tick_t deadline = VLC_TS_INVALID;
+    vlc_tick_t deadline = VLC_TICK_INVALID;
     int rtp_fd = sys->fd;
     struct iovec iov =
     {
@@ -182,7 +182,7 @@ void *rtp_dgram_thread (void *opaque)
 
     dequeue:
         if (!rtp_dequeue (demux, sys->session, &deadline))
-            deadline = VLC_TS_INVALID;
+            deadline = VLC_TICK_INVALID;
         vlc_restorecancel (canc);
     }
     return NULL;

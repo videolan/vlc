@@ -207,7 +207,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     p_sys->rtp_rate = p_dec->fmt_in.audio.i_rate;
     p_sys->b_has_headers = false;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 
     if( b_packetizer )
     {
@@ -555,7 +555,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 }
 
 /*****************************************************************************
@@ -568,13 +568,13 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     block_t *p_block = *pp_block;
 
     /* Date management */
-    if( p_block && p_block->i_pts != VLC_TS_INVALID &&
+    if( p_block && p_block->i_pts != VLC_TICK_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
-    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+    if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         if( p_block ) block_Release( p_block );
@@ -671,7 +671,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
     int i_decode_ret;
     unsigned int i_speex_frame_size;
 
-    if ( !p_speex_bit_block || p_speex_bit_block->i_pts == VLC_TS_INVALID )
+    if ( !p_speex_bit_block || p_speex_bit_block->i_pts == VLC_TICK_INVALID )
         return VLCDEC_SUCCESS;
 
     /*
@@ -735,7 +735,7 @@ static int DecodeRtpSpeexPacket( decoder_t *p_dec, block_t *p_speex_bit_block )
         return VLCDEC_SUCCESS;
     }
 
-    if ( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+    if ( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
         date_Set( &p_sys->end_date, p_speex_bit_block->i_dts );
 
     /*

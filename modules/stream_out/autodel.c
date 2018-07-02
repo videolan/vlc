@@ -122,7 +122,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     es_format_Copy( &p_es->fmt, p_fmt );
 
     p_es->id = NULL;
-    p_es->i_last = VLC_TS_INVALID;
+    p_es->i_last = VLC_TICK_INVALID;
     p_es->b_error = false;
     TAB_APPEND( p_sys->i_es_num, p_sys->pp_es, p_es );
 

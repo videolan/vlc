@@ -569,7 +569,7 @@ static vlc_tick_t webvtt_domnode_GetPlaybackTime( const webvtt_dom_node_t *p_nod
     if( p_node )
         return b_end ? ((const webvtt_dom_cue_t *) p_node)->i_stop:
                        ((const webvtt_dom_cue_t *) p_node)->i_start;
-    return VLC_TS_INVALID;
+    return VLC_TICK_INVALID;
 }
 
 #ifdef HAVE_CSS

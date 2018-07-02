@@ -250,7 +250,7 @@ void vlc_pa_rttime_free (pa_threaded_mainloop *mainloop, pa_time_event *e)
 #undef vlc_pa_get_latency
 /**
  * Gets latency of a PulseAudio stream.
- * \return the latency or VLC_TS_INVALID on error.
+ * \return the latency or VLC_TICK_INVALID on error.
  */
 vlc_tick_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
 {
@@ -268,12 +268,12 @@ vlc_tick_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
 
     if (ti == NULL) {
         msg_Dbg(obj, "no timing infos");
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
     }
 
     if (ti->write_index_corrupt) {
         msg_Dbg(obj, "write index corrupt");
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
     }
 
     pa_usec_t wt = pa_bytes_to_usec((uint64_t)ti->write_index, ss);
@@ -282,7 +282,7 @@ vlc_tick_t vlc_pa_get_latency(vlc_object_t *obj, pa_context *ctx, pa_stream *s)
     if (pa_stream_get_time(s, &rt)) {
         if (pa_context_errno(ctx) != PA_ERR_NODATA)
             vlc_pa_error(obj, "unknown time", ctx);
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
     }
 
     union { uint64_t u; int64_t s; } d;

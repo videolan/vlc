@@ -203,8 +203,8 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
                 p_pic = p_pack->pf_parse( p_pack->p_private, &b_used_ts, p_pic );
                 if( b_used_ts )
                 {
-                    p_block_bytestream->i_dts = VLC_TS_INVALID;
-                    p_block_bytestream->i_pts = VLC_TS_INVALID;
+                    p_block_bytestream->i_dts = VLC_TICK_INVALID;
+                    p_block_bytestream->i_pts = VLC_TICK_INVALID;
                 }
             }
 

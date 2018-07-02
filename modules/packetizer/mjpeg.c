@@ -72,7 +72,7 @@ static void PacketizeFlush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->date, VLC_TS_INVALID );
+    date_Set( &p_sys->date, VLC_TICK_INVALID );
     p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
     packetizer_Flush( &p_sys->packetizer );
 }
@@ -86,7 +86,7 @@ static void PacketizeReset( void *p_private, bool b_broken )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->date, VLC_TS_INVALID );
+    date_Set( &p_sys->date, VLC_TICK_INVALID );
     p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
 }
 
@@ -122,13 +122,13 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
         p_buf += i_size;
     }
 
-    if( p_block->i_dts == VLC_TS_INVALID )
+    if( p_block->i_dts == VLC_TICK_INVALID )
         p_block->i_dts = p_block->i_pts;
-    else if( p_block->i_pts == VLC_TS_INVALID )
+    else if( p_block->i_pts == VLC_TICK_INVALID )
         p_block->i_pts = p_block->i_dts;
 
     vlc_tick_t i_prev_dts = date_Get( &p_sys->date );
-    if( p_block->i_dts != VLC_TS_INVALID )
+    if( p_block->i_dts != VLC_TICK_INVALID )
     {
         date_Set( &p_sys->date, p_block->i_dts );
     }
@@ -139,7 +139,7 @@ static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_bl
         p_block->i_dts = p_block->i_pts = date_Get( &p_sys->date );
     }
 
-    if( i_prev_dts != VLC_TS_INVALID && p_block->i_dts != VLC_TS_INVALID )
+    if( i_prev_dts != VLC_TICK_INVALID && p_block->i_dts != VLC_TICK_INVALID )
         p_block->i_length = p_block->i_dts - i_prev_dts;
 
     *pb_ts_used = true;

@@ -147,7 +147,7 @@ void AbstractStream::setDescription(const std::string &desc)
 vlc_tick_t AbstractStream::getPCR() const
 {
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
-    vlc_tick_t pcr = isDisabled() ? VLC_TS_INVALID : commandsqueue->getPCR();
+    vlc_tick_t pcr = isDisabled() ? VLC_TICK_INVALID : commandsqueue->getPCR();
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));
     return pcr;
 }
@@ -165,12 +165,12 @@ vlc_tick_t AbstractStream::getFirstDTS() const
     vlc_mutex_lock(const_cast<vlc_mutex_t *>(&lock));
     if(isDisabled())
     {
-        dts = VLC_TS_INVALID;
+        dts = VLC_TICK_INVALID;
     }
     else
     {
         dts = commandsqueue->getFirstDTS();
-        if(dts == VLC_TS_INVALID)
+        if(dts == VLC_TICK_INVALID)
             dts = commandsqueue->getPCR();
     }
     vlc_mutex_unlock(const_cast<vlc_mutex_t *>(&lock));

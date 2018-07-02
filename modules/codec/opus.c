@@ -178,7 +178,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->b_has_headers = false;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
@@ -400,7 +400,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 }
 
 /*****************************************************************************
@@ -422,13 +422,13 @@ static block_t *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
 
     /* Date management */
-    if( p_block->i_pts != VLC_TS_INVALID &&
+    if( p_block->i_pts != VLC_TICK_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
-    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+    if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

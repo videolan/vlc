@@ -277,7 +277,7 @@ static void Flush(decoder_t *p_dec)
 
     p_sys->i_state = STATE_NOSYNC;
     p_sys->i_offset = 0;
-    date_Set( &p_sys->pts, VLC_TS_INVALID );
+    date_Set( &p_sys->pts, VLC_TICK_INVALID );
     block_BytestreamEmpty(&p_sys->bytestream);
 }
 
@@ -487,11 +487,11 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
         p_dec->fmt_out.audio.i_physical_channels = pi_channels_maps[p_sys->stream_info.channels];
 
         if( p_sys->bytestream.p_block->i_pts > date_Get( &p_sys->pts ) &&
-            p_sys->bytestream.p_block->i_pts != VLC_TS_INVALID )
+            p_sys->bytestream.p_block->i_pts != VLC_TICK_INVALID )
         {
             date_Init( &p_sys->pts, p_sys->headerinfo.i_rate, 1 );
             date_Set( &p_sys->pts, p_sys->bytestream.p_block->i_pts );
-            p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+            p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
         }
 
 
@@ -546,7 +546,7 @@ static int Open(vlc_object_t *p_this)
     p_sys->b_stream_info = false;
     p_sys->i_last_frame_size = FLAC_FRAME_SIZE_MIN;
     p_sys->i_frame_size  = 0;
-    p_sys->headerinfo.i_pts  = VLC_TS_INVALID;
+    p_sys->headerinfo.i_pts  = VLC_TICK_INVALID;
     p_sys->i_buf         = 0;
     p_sys->p_buf         = NULL;
     p_sys->i_next_block_flags = 0;
