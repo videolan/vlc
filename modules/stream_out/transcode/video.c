@@ -376,12 +376,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
         id->p_encoder->fmt_out.video.i_sar_num = p_dst->video.i_sar_num;
         id->p_encoder->fmt_out.video.i_sar_den = p_dst->video.i_sar_den;
     }
-
-    /* Keep colorspace etc info along */
-    p_dst->video.space     = p_src->video.space;
-    p_dst->video.transfer  = p_src->video.transfer;
-    p_dst->video.primaries = p_src->video.primaries;
-    p_dst->video.b_color_range_full = p_src->video.b_color_range_full;
 }
 
 /* Take care of the scaling and chroma conversions. */
@@ -603,6 +597,12 @@ static void transcode_video_encoder_configure( vlc_object_t *p_obj,
     msg_Dbg( p_obj, "encoder aspect is %u:%u",
              p_enc_out->i_sar_num * p_enc_out->i_width,
              p_enc_out->i_sar_den * p_enc_out->i_height );
+
+    /* Keep colorspace etc info along */
+    p_enc_out->space     = p_src->space;
+    p_enc_out->transfer  = p_src->transfer;
+    p_enc_out->primaries = p_src->primaries;
+    p_enc_out->b_color_range_full = p_src->b_color_range_full;
 
     msg_Dbg( p_obj, "source chroma: %4.4s, destination %4.4s",
              (const char *)&p_dec_out->i_chroma,
