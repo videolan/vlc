@@ -511,7 +511,7 @@ static int Demux( demux_t *p_demux )
         p_sys->i_silence_countdown -= i_read_frames;
     }
 
-    p_block->i_dts = p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
+    p_block->i_dts = p_block->i_pts = VLC_TICK_0 + date_Get( &p_sys->pts );
     p_block->i_nb_samples = i_read_frames * p_sys->fmt.audio.i_frame_length;
     date_Increment( &p_sys->pts, p_block->i_nb_samples );
     es_out_SetPCR( p_demux->out, p_block->i_pts );

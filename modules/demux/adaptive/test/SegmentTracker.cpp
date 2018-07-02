@@ -323,7 +323,7 @@ static int SegmentTracker_check_formats(BaseAdaptationSet *adaptSet,
         Expect(currentChunk);
         Expect(events.occured(TrackerEvent::Type::SegmentChange) == true);
         Expect(events.occured(TrackerEvent::Type::FormatChange) == true);
-        Expect(events.segmentchanged.starttime == timescale.ToTime(START) + VLC_TS_0);
+        Expect(events.segmentchanged.starttime == timescale.ToTime(START) + VLC_TICK_0);
         Expect(events.segmentchanged.duration == timescale.ToTime(100));
         Expect(events.segmentchanged.sequence == 456);
         Expect(events.formatchanged.format == StreamFormat::Type::PackedAAC);
@@ -333,7 +333,7 @@ static int SegmentTracker_check_formats(BaseAdaptationSet *adaptSet,
         events.reset();
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
-        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 1) + VLC_TS_0);
+        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 1) + VLC_TICK_0);
         Expect(events.segmentchanged.duration == timescale.ToTime(100));
         Expect(events.occured(TrackerEvent::Type::FormatChange) == false);
         Expect(events.occured(TrackerEvent::Type::SegmentChange) == true);
@@ -343,7 +343,7 @@ static int SegmentTracker_check_formats(BaseAdaptationSet *adaptSet,
         events.reset();
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
-        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TS_0);
+        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TICK_0);
         Expect(events.segmentchanged.duration == timescale.ToTime(100));
         Expect(events.occured(TrackerEvent::Type::FormatChange) == true);
         Expect(events.occured(TrackerEvent::Type::SegmentChange) == true);
@@ -403,12 +403,12 @@ static int SegmentTracker_check_seeks(BaseAdaptationSet *adaptSet,
         rep0->addAttribute(segmentList);
 
         events.reset();
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START + 250), false, true) == true);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START + 250), false, true) == true);
         Expect(events.occured(TrackerEvent::Type::PositionChange) == false);
         Expect(tracker->getPlaybackTime() == 0);
 
         events.reset();
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START + 250), false, false) == true);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START + 250), false, false) == true);
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
         Expect(events.occured(TrackerEvent::Type::PositionChange) == true);
@@ -419,7 +419,7 @@ static int SegmentTracker_check_seeks(BaseAdaptationSet *adaptSet,
 
         /* past playlist, align to end */
         events.reset();
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START + 9999), false, false) == true);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START + 9999), false, false) == true);
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
         Expect(events.occured(TrackerEvent::Type::PositionChange) == true);
@@ -427,8 +427,8 @@ static int SegmentTracker_check_seeks(BaseAdaptationSet *adaptSet,
         currentChunk = nullptr;
 
         /* out of playlist, we need to fail */
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START / 2), false, true) == false);
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START / 2), false, false) == false);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START / 2), false, true) == false);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START / 2), false, false) == false);
 
         /* restart playlist from startpos */
         events.reset();
@@ -445,7 +445,7 @@ static int SegmentTracker_check_seeks(BaseAdaptationSet *adaptSet,
 
         /* go to unaligned pos */
         events.reset();
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START + 250), false, false) == true);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START + 250), false, false) == true);
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
         Expect(events.occured(TrackerEvent::Type::PositionChange) == true);
@@ -562,7 +562,7 @@ static int SegmentTracker_check_switches(BaseAdaptationSet *adaptSet,
         Expect(events.representationchanged.next == rep1);
         /* check returned init */
         Expect(currentChunk->getContentType() == "sample/aacinit");
-        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TS_0);
+        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TICK_0);
         Expect(events.segmentchanged.duration == timescale.ToTime(100));
         Expect(events.segmentchanged.sequence == 456);
         delete currentChunk;
@@ -575,7 +575,7 @@ static int SegmentTracker_check_switches(BaseAdaptationSet *adaptSet,
         Expect(events.occured(TrackerEvent::Type::RepresentationSwitch) == false);
         Expect(currentChunk->getContentType() == "sample/aac");
         /* time should remain the same */
-        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TS_0);
+        Expect(events.segmentchanged.starttime == timescale.ToTime(START + 100 * 2) + VLC_TICK_0);
         Expect(events.segmentchanged.duration == timescale.ToTime(100));
         Expect(events.segmentchanged.sequence == 456);
         delete currentChunk;
@@ -704,7 +704,7 @@ static int SegmentTracker_check_HLSseeks(BaseAdaptationSet *adaptSet,
         rep1->addAttribute(segmentList);
 
         /* on rep0 */
-        Expect(tracker->setPositionByTime(VLC_TS_0 + timescale.ToTime(START + 300), false, false) == true);
+        Expect(tracker->setPositionByTime(VLC_TICK_0 + timescale.ToTime(START + 300), false, false) == true);
         currentChunk = tracker->getNextChunk(true);
         Expect(currentChunk);
         Expect(events.occured(TrackerEvent::Type::PositionChange) == true);

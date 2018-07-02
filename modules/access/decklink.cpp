@@ -334,7 +334,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         BMDTimeValue stream_time, frame_duration;
         videoFrame->GetStreamTime(&stream_time, &frame_duration, CLOCK_FREQ);
         video_frame->i_flags = BLOCK_FLAG_TYPE_I | sys->dominance_flags;
-        video_frame->i_pts = video_frame->i_dts = VLC_TS_0 + stream_time;
+        video_frame->i_pts = video_frame->i_dts = VLC_TICK_0 + stream_time;
 
         if (sys->video_fmt.i_codec == VLC_CODEC_I422_10L) {
             v210_convert((uint16_t*)video_frame->p_buffer, frame_bytes, width, height);
@@ -349,7 +349,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
                     block_t *cc = vanc_to_cc(demux_, dec, width * 2);
                     if (!cc)
                         continue;
-                    cc->i_pts = cc->i_dts = VLC_TS_0 + stream_time;
+                    cc->i_pts = cc->i_dts = VLC_TICK_0 + stream_time;
 
                     if (!sys->cc_es) {
                         es_format_t fmt;
@@ -401,7 +401,7 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
 
         BMDTimeValue packet_time;
         audioFrame->GetPacketTime(&packet_time, CLOCK_FREQ);
-        audio_frame->i_pts = audio_frame->i_dts = VLC_TS_0 + packet_time;
+        audio_frame->i_pts = audio_frame->i_dts = VLC_TICK_0 + packet_time;
 
         vlc_mutex_lock(&sys->pts_lock);
         if (audio_frame->i_pts > sys->last_pts)

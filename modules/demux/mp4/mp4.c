@@ -1319,12 +1319,12 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
             /* !important! Ensure clock is set before sending data */
             if( p_demux->p_sys->i_pcr == VLC_TICK_INVALID )
             {
-                es_out_SetPCR( p_demux->out, VLC_TS_0 + i_current_nzdts );
-                p_demux->p_sys->i_pcr = VLC_TS_0 + i_current_nzdts;
+                es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_current_nzdts );
+                p_demux->p_sys->i_pcr = VLC_TICK_0 + i_current_nzdts;
             }
 
             /* dts */
-            p_block->i_dts = VLC_TS_0 + i_current_nzdts;
+            p_block->i_dts = VLC_TICK_0 + i_current_nzdts;
             /* pts */
             if( MP4_TrackGetPTSDelta( p_demux, tk, &i_delta ) )
                 p_block->i_pts = p_block->i_dts + i_delta;
@@ -1468,7 +1468,7 @@ static int DemuxMoov( demux_t *p_demux )
     p_sys->i_nztime += DEMUX_INCREMENT;
     if( p_sys->i_pcr > VLC_TICK_INVALID )
     {
-        p_sys->i_pcr = VLC_TS_0 + p_sys->i_nztime;
+        p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
     }
 
@@ -1821,7 +1821,7 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
     MP4ASF_ResetFrames( p_sys );
     /* And set next display time in that trun/fragment */
     if( b_accurate )
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_nztime );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TICK_0 + i_nztime );
     return VLC_SUCCESS;
 }
 
@@ -4421,17 +4421,17 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
 
 #if 0
         msg_Dbg( p_demux, "tk(%i)=%"PRId64" mv=%"PRId64" pos=%"PRIu64, p_track->i_track_ID,
-                 VLC_TS_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ ),
-                 VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ ),
+                 VLC_TICK_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ ),
+                 VLC_TICK_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ ),
                  p_track->context.i_trun_sample_pos - i_read );
 #endif
         if ( p_track->p_es )
         {
-            p_block->i_dts = VLC_TS_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
+            p_block->i_dts = VLC_TICK_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
             if( p_track->fmt.i_cat == VIDEO_ES && !( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET ) )
                 p_block->i_pts = VLC_TICK_INVALID;
             else
-                p_block->i_pts = VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ );
+                p_block->i_pts = VLC_TICK_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ );
             p_block->i_length = MP4_rescale( dur, p_track->i_timescale, CLOCK_FREQ );
             MP4_Block_Send( p_demux, p_track, p_block );
         }
@@ -4462,7 +4462,7 @@ static int DemuxMoof( demux_t *p_demux )
 
     /* !important! Ensure clock is set before sending data */
     if( p_sys->i_pcr == VLC_TICK_INVALID )
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + i_nztime );
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_nztime );
 
     /* Set per track read state */
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
@@ -4536,7 +4536,7 @@ static int DemuxMoof( demux_t *p_demux )
     if( i_status != VLC_DEMUXER_EOS )
     {
         p_sys->i_nztime += DEMUX_INCREMENT;
-        p_sys->i_pcr = VLC_TS_0 + p_sys->i_nztime;
+        p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
     }
     else
@@ -4555,7 +4555,7 @@ static int DemuxMoof( demux_t *p_demux )
         if( i_segment_end != INT64_MAX )
         {
             p_sys->i_nztime = i_segment_end;
-            p_sys->i_pcr = VLC_TS_0 + p_sys->i_nztime;
+            p_sys->i_pcr = VLC_TICK_0 + p_sys->i_nztime;
             es_out_SetPCR( p_demux->out, p_sys->i_pcr );
         }
     }
@@ -5071,7 +5071,7 @@ end:
                 i_demux_end = i_track_end;
         }
         if( i_demux_end != INT64_MIN )
-            es_out_SetPCR( p_demux->out, VLC_TS_0 + i_demux_end );
+            es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_demux_end );
     }
 
     return i_status;

@@ -151,7 +151,7 @@ static vlc_tick_t dtsgen_GetDTS(struct dtsgen_t *d)
     else if(d->count == 1)
     {
         d->i_startingdts =
-        i_dts = __MAX(d->history[0] - 150000, VLC_TS_0);
+        i_dts = __MAX(d->history[0] - 150000, VLC_TICK_0);
         d->i_startingdiff = d->history[0] - i_dts;
     }
     else if(d->count > 1)

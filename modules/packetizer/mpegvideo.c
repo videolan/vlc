@@ -437,7 +437,7 @@ static block_t *OutputFrame( decoder_t *p_dec )
                 {
                     if( date_Get( &p_sys->dts ) == VLC_TICK_INVALID )
                     {
-                        date_Set( &p_sys->dts, VLC_TS_0 );
+                        date_Set( &p_sys->dts, VLC_TICK_0 );
                     }
                 }
             }

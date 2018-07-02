@@ -382,7 +382,7 @@ bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos, bool accurat
         ret = false;
     }
 
-    if(accurate && ret && streampos.times.continuous >= VLC_TS_0)
+    if(accurate && ret && streampos.times.continuous >= VLC_TICK_0)
     {
         es_out_Control(p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
                        streampos.times.continuous);
@@ -542,7 +542,7 @@ int PlaylistManager::doDemux(int64_t increment)
         if( demux.times.continuous != VLC_TICK_INVALID && barrier.continuous != demux.times.continuous )
         {
             demux.times = barrier;
-            vlc_tick_t pcr = VLC_TS_0 + std::max(INT64_C(0), demux.times.continuous - CLOCK_FREQ/10);
+            vlc_tick_t pcr = VLC_TICK_0 + std::max(INT64_C(0), demux.times.continuous - CLOCK_FREQ/10);
             es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, 0, pcr);
         }
         vlc_mutex_unlock(&demux.lock);
@@ -820,10 +820,10 @@ void PlaylistManager::updateControlsPosition()
             }
         }
 
-        if(cached.i_time > VLC_TS_0 + cached.playlistStart &&
-           cached.i_time <= VLC_TS_0 + cached.playlistEnd && cached.playlistLength)
+        if(cached.i_time > VLC_TICK_0 + cached.playlistStart &&
+           cached.i_time <= VLC_TICK_0 + cached.playlistEnd && cached.playlistLength)
         {
-            cached.f_position = ((double)(cached.i_time - VLC_TS_0 - cached.playlistStart)) / cached.playlistLength;
+            cached.f_position = ((double)(cached.i_time - VLC_TICK_0 - cached.playlistStart)) / cached.playlistLength;
         }
         else
         {
@@ -838,7 +838,7 @@ void PlaylistManager::updateControlsPosition()
         if(cached.playlistLength && currentTimes.segment.media != VLC_TICK_INVALID)
         {
             cached.i_time = currentTimes.segment.media;
-            cached.f_position = (double) (cached.i_time - VLC_TS_0 - cached.playlistStart) / cached.playlistLength;
+            cached.f_position = (double) (cached.i_time - VLC_TICK_0 - cached.playlistStart) / cached.playlistLength;
         }
         else
         {

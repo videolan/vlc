@@ -277,16 +277,16 @@ static void StreamParserCueDoneHandler( void *priv, webvtt_cue_t *p_cue )
         {
             if ( p_sys->b_first_time )
             {
-                es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TS_0 );
+                es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TICK_0 );
                 p_sys->b_first_time = false;
             }
             p_sys->i_next_demux_time = p_cue->i_start;
             p_block->i_dts =
-                    p_block->i_pts = VLC_TS_0 + p_cue->i_start;
+                    p_block->i_pts = VLC_TICK_0 + p_cue->i_start;
             if( p_cue->i_stop >= 0 && p_cue->i_stop >= p_cue->i_start )
                 p_block->i_length = p_cue->i_stop - p_cue->i_start;
             es_out_Send( p_demux->out, p_sys->es, p_block );
-            es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TS_0 );
+            es_out_SetPCR( p_demux->out, p_cue->i_start + VLC_TICK_0 );
         }
     }
     webvtt_cue_Clean( p_cue );
@@ -497,7 +497,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_time = va_arg( args, int64_t ) - VLC_TS_0;
+            p_sys->i_next_demux_time = va_arg( args, int64_t ) - VLC_TICK_0;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
@@ -564,7 +564,7 @@ static int Demux( demux_t *p_demux )
         if( p_block )
         {
             p_block->i_length = i_end_time - i_start_time;
-            p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_start_time;
+            p_block->i_dts = p_block->i_pts = VLC_TICK_0 + i_start_time;
 
             if( p_sys->i_next_block_flags )
             {
@@ -591,7 +591,7 @@ static int Demux( demux_t *p_demux )
 
     if ( !p_sys->b_slave )
     {
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + i_barrier );
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_barrier );
         p_sys->i_next_demux_time += CLOCK_FREQ;
     }
 

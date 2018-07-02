@@ -168,7 +168,7 @@ block_t * HLSStream::checkBlock(block_t *p_block, bool b_first)
                 if(mpegts != std::numeric_limits<uint64_t>::max() &&
                    local != std::numeric_limits<mtime_t>::max())
                 {
-                    setMetadataTimeMapping(VLC_TS_0 + mpegts * 100/9, VLC_TS_0 + local);
+                    setMetadataTimeMapping(VLC_TICK_0 + mpegts * 100/9, VLC_TICK_0 + local);
                 }
             }
         }

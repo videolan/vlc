@@ -602,7 +602,7 @@ sl_header_data DecodeSLHeader( unsigned i_data, const uint8_t *p_data,
                     i_read |= bs_read( &s, i_bits );
                 }
                 if( sl->i_timestamp_resolution )
-                    *(timestamps[i].p_t) = VLC_TS_0 + CLOCK_FREQ * i_read / sl->i_timestamp_resolution;
+                    *(timestamps[i].p_t) = VLC_TICK_0 + CLOCK_FREQ * i_read / sl->i_timestamp_resolution;
             }
 
             bs_read( &s, sl->i_AU_length );

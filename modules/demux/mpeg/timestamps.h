@@ -22,8 +22,8 @@
 #define FROM_SCALE_NZ(x) ((x) * 100 / 9)
 #define TO_SCALE_NZ(x)   ((x) * 9 / 100)
 
-#define FROM_SCALE(x) (VLC_TS_0 + FROM_SCALE_NZ(x))
-#define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TS_0)
+#define FROM_SCALE(x) (VLC_TICK_0 + FROM_SCALE_NZ(x))
+#define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TICK_0)
 
 static inline int64_t TimeStampWrapAround( int64_t i_first_pcr, int64_t i_time )
 {

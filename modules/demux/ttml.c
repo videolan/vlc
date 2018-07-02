@@ -238,7 +238,7 @@ static int Control( demux_t* p_demux, int i_query, va_list args )
             i64 = va_arg( args, int64_t );
             if( p_sys->times.i_count )
             {
-                tt_time_t t = tt_time_Create( i64 - VLC_TS_0 );
+                tt_time_t t = tt_time_Create( i64 - VLC_TICK_0 );
                 size_t i_index = tt_timings_FindLowerIndex( p_sys->times.p_array,
                                                             p_sys->times.i_count, t, &b );
                 p_sys->times.i_current = i_index;
@@ -365,7 +365,7 @@ static int Demux( demux_t* p_demux )
 
         if ( !p_sys->b_slave && p_sys->b_first_time )
         {
-            es_out_SetPCR( p_demux->out, VLC_TS_0 + i_playbacktime );
+            es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_playbacktime );
             p_sys->b_first_time = false;
         }
 
@@ -383,7 +383,7 @@ static int Demux( demux_t* p_demux )
             if( p_block )
             {
                 p_block->i_dts =
-                    p_block->i_pts = VLC_TS_0 + i_playbacktime;
+                    p_block->i_pts = VLC_TICK_0 + i_playbacktime;
                 p_block->i_length = i_playbackendtime - i_playbacktime;
 
                 es_out_Send( p_demux->out, p_sys->p_es, p_block );
@@ -395,7 +395,7 @@ static int Demux( demux_t* p_demux )
 
     if ( !p_sys->b_slave )
     {
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_next_demux_time );
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_next_demux_time );
         p_sys->i_next_demux_time += CLOCK_FREQ / 8;
     }
 

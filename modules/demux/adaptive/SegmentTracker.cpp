@@ -330,7 +330,7 @@ SegmentTracker::prepareChunk(bool switch_allowed, Position pos) const
     vlc_tick_t displayTime = datasegment->getDisplayTime();
     /* timings belong to timeline and are not set on the segment or need profile timescale */
     if(pos.rep->getPlaybackTimeDurationBySegmentNumber(pos.number, &startTime, &duration))
-        startTime += VLC_TS_0;
+        startTime += VLC_TICK_0;
 
     return ChunkEntry(segmentChunk, pos, startTime, duration, displayTime);
 }

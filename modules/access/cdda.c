@@ -171,11 +171,11 @@ static int Demux(demux_t *demux)
     sys->position += count;
 
     block->i_nb_samples = block->i_buffer / 4;
-    block->i_dts = block->i_pts = VLC_TS_0 + date_Get(&sys->pts);
+    block->i_dts = block->i_pts = VLC_TICK_0 + date_Get(&sys->pts);
     date_Increment(&sys->pts, block->i_nb_samples);
 
     es_out_Send(demux->out, sys->es, block);
-    es_out_SetPCR(demux->out, VLC_TS_0 + date_Get(&sys->pts));
+    es_out_SetPCR(demux->out, VLC_TICK_0 + date_Get(&sys->pts));
     return VLC_DEMUXER_SUCCESS;
 }
 

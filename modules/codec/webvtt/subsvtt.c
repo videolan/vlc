@@ -1808,8 +1808,8 @@ static void RenderRegions( decoder_t *p_dec, vlc_tick_t i_nzstart, vlc_tick_t i_
 
     if( p_spu )
     {
-        p_spu->i_start = VLC_TS_0 + i_nzstart;
-        p_spu->i_stop = VLC_TS_0 + i_nzstop;
+        p_spu->i_start = VLC_TICK_0 + i_nzstart;
+        p_spu->i_stop = VLC_TICK_0 + i_nzstop;
         p_spu->b_ephemer  = true; /* !important */
         p_spu->b_absolute = false; /* can't be absolute as snap to lines can overlap ! */
 
@@ -2061,7 +2061,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     if( p_block == NULL ) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    vlc_tick_t i_nzstart = p_block->i_pts - VLC_TS_0;
+    vlc_tick_t i_nzstart = p_block->i_pts - VLC_TICK_0;
     vlc_tick_t i_nzstop = i_nzstart + p_block->i_length;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )

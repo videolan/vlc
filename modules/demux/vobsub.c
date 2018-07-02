@@ -411,7 +411,7 @@ static int Demux( demux_t *p_demux )
             p_block->i_buffer = i_read;
 
             /* pts */
-            p_block->i_pts = VLC_TS_0 + tk.p_subtitles[tk.i_current_subtitle].i_start;
+            p_block->i_pts = VLC_TICK_0 + tk.p_subtitles[tk.i_current_subtitle].i_start;
 
             /* demux this block */
             DemuxVobSub( p_demux, p_block );

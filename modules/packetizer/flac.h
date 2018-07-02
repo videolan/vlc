@@ -290,10 +290,10 @@ static inline int FLAC_ParseSyncInfo(const uint8_t *p_buf, unsigned i_buf,
     if ( (p_buf[1] & 0x01) == 0  ) /* Fixed blocksize stream / Frames */
     {
         const unsigned fixedblocksize = stream_info ? stream_info->min_blocksize : blocksize;
-        h->i_pts = VLC_TS_0 + CLOCK_FREQ * fixedblocksize * i_fsnumber / samplerate;
+        h->i_pts = VLC_TICK_0 + CLOCK_FREQ * fixedblocksize * i_fsnumber / samplerate;
     }
     else /* Variable blocksize stream / Samples */
-        h->i_pts = VLC_TS_0 + CLOCK_FREQ * i_fsnumber / samplerate;
+        h->i_pts = VLC_TICK_0 + CLOCK_FREQ * i_fsnumber / samplerate;
 
     h->i_bits_per_sample = bits_per_sample;
     h->i_rate = samplerate;

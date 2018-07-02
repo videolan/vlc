@@ -1160,7 +1160,7 @@ static int Demux_Seekable( demux_t *p_demux )
     }
 
     /* wait for the good time */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
     p_sys->i_time += p_sys->i_read_increment;
 
     /* init toread */
@@ -1380,7 +1380,7 @@ static int Demux_Seekable( demux_t *p_demux )
             continue;
         }
 
-        p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( tk );
+        p_frame->i_pts = VLC_TICK_0 + AVI_GetPTS( tk );
         if( tk->idx.p_entry[tk->i_idxposc].i_flags&AVIIF_KEYFRAME )
         {
             p_frame->i_flags = BLOCK_FLAG_TYPE_I;
@@ -1450,7 +1450,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
     unsigned int i_stream;
     unsigned int i_packet;
 
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
 
     /* *** find master stream for data packet skipping algo *** */
     /* *** -> first video, if any, or first audio ES *** */
@@ -1550,7 +1550,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 {
                     return VLC_DEMUXER_EGENERIC;
                 }
-                p_frame->i_pts = VLC_TS_0 + AVI_GetPTS( p_stream );
+                p_frame->i_pts = VLC_TICK_0 + AVI_GetPTS( p_stream );
 
                 AVI_SendFrame( p_demux, p_stream, p_frame );
             }
@@ -1716,9 +1716,9 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, int i_percent, bool b_accu
             }
         }
         p_sys->i_time = i_start;
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time );
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time );
         if( b_accurate )
-            es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
+            es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TICK_0 + i_date );
         msg_Dbg( p_demux, "seek: %"PRId64" seconds", p_sys->i_time /CLOCK_FREQ );
         return VLC_SUCCESS;
 

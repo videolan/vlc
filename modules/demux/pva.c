@@ -234,7 +234,7 @@ static int Demux( demux_t *p_demux )
                 p_frame->p_buffer += i_skip;
                 p_frame->i_buffer -= i_skip;
                 if( i_pts >= 0 )
-                    p_frame->i_pts = VLC_TS_0 + i_pts * 100 / 9;
+                    p_frame->i_pts = VLC_TICK_0 + i_pts * 100 / 9;
                 block_ChainAppend( &p_sys->p_es, p_frame );
             }
             break;
@@ -445,9 +445,9 @@ static void ParsePES( demux_t *p_demux )
     p_pes->p_buffer += i_skip;
 
     if( i_dts >= 0 )
-        p_pes->i_dts = VLC_TS_0 + i_dts * 100 / 9;
+        p_pes->i_dts = VLC_TICK_0 + i_dts * 100 / 9;
     if( i_pts >= 0 )
-        p_pes->i_pts = VLC_TS_0 + i_pts * 100 / 9;
+        p_pes->i_pts = VLC_TICK_0 + i_pts * 100 / 9;
 
     /* Set PCR */
     if( p_pes->i_pts > 0 )

@@ -388,20 +388,20 @@ static int Demux( demux_t *p_demux )
     if( ( p_data = vlc_stream_Block( p_demux->s, fh.i_length ) ) == NULL )
         return VLC_DEMUXER_EOF;
 
-    p_data->i_dts = VLC_TS_0 + (int64_t)fh.i_timecode * 1000;
+    p_data->i_dts = VLC_TICK_0 + (int64_t)fh.i_timecode * 1000;
     p_data->i_pts = (fh.i_type == 'V') ? VLC_TICK_INVALID : p_data->i_dts;
 
     /* only add keyframes to index */
     if( !fh.i_keyframe && !p_sys->b_index )
         demux_IndexAppend( &p_sys->idx,
-                           p_data->i_dts - VLC_TS_0,
+                           p_data->i_dts - VLC_TICK_0,
                            vlc_stream_Tell(p_demux->s) - NUV_FH_SIZE );
 
     /* */
-    if( p_sys->i_pcr < 0 || p_sys->i_pcr < p_data->i_dts - VLC_TS_0 )
+    if( p_sys->i_pcr < 0 || p_sys->i_pcr < p_data->i_dts - VLC_TICK_0 )
     {
-        p_sys->i_pcr = p_data->i_dts - VLC_TS_0;
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
+        p_sys->i_pcr = p_data->i_dts - VLC_TICK_0;
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_pcr );
     }
 
     if( fh.i_type == 'A' && p_sys->p_es_audio )

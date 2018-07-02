@@ -889,9 +889,9 @@ bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, 
     // propogate seek information //
 
     sys.i_pcr           = VLC_TICK_INVALID;
-    sys.i_pts           = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
+    sys.i_pts           = VLC_TICK_0 + i_mk_seek_time + i_mk_time_offset;
     if (b_accurate)
-        sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;
+        sys.i_start_pts = VLC_TICK_0 + i_absolute_mk_date;
     else
         sys.i_start_pts = sys.i_pts;
 

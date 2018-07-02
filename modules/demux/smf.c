@@ -372,9 +372,9 @@ static int SeekSet0 (demux_t *demux)
 
     /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
     date_Init (&sys->pts, sys->ppqn * 2, 1);
-    date_Set (&sys->pts, VLC_TS_0);
+    date_Set (&sys->pts, VLC_TICK_0);
     sys->pulse = 0;
-    sys->tick = VLC_TS_0;
+    sys->tick = VLC_TICK_0;
 
     for (unsigned i = 0; i < sys->trackc; i++)
     {
@@ -489,7 +489,7 @@ static int Seek (demux_t *demux, vlc_tick_t pts)
     }
 
     sys->pulse = pulse;
-    sys->tick = ((date_Get (&sys->pts) - VLC_TS_0) / TICK) * TICK + VLC_TS_0;
+    sys->tick = ((date_Get (&sys->pts) - VLC_TICK_0) / TICK) * TICK + VLC_TICK_0;
     return VLC_SUCCESS;
 }
 
@@ -508,7 +508,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
         case DEMUX_GET_POSITION:
             if (!sys->duration)
                 return VLC_EGENERIC;
-            *va_arg (args, double *) = (sys->tick - (double)VLC_TS_0)
+            *va_arg (args, double *) = (sys->tick - (double)VLC_TICK_0)
                                      / sys->duration;
             break;
         case DEMUX_SET_POSITION:
@@ -517,7 +517,7 @@ static int Control (demux_t *demux, int i_query, va_list args)
             *va_arg (args, int64_t *) = sys->duration;
             break;
         case DEMUX_GET_TIME:
-            *va_arg (args, int64_t *) = sys->tick - VLC_TS_0;
+            *va_arg (args, int64_t *) = sys->tick - VLC_TICK_0;
             break;
         case DEMUX_SET_TIME:
             return Seek (demux, va_arg (args, int64_t));

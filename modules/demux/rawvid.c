@@ -395,7 +395,7 @@ static int Demux( demux_t *p_demux )
     vlc_tick_t i_pcr = date_Get( &p_sys->pcr );
 
     /* Call the pace control */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + i_pcr );
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_pcr );
 
     if( p_sys->b_y4m )
     {
@@ -421,7 +421,7 @@ static int Demux( demux_t *p_demux )
         return 0;
     }
 
-    p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_pcr;
+    p_block->i_dts = p_block->i_pts = VLC_TICK_0 + i_pcr;
     es_out_Send( p_demux->out, p_sys->p_es_video, p_block );
 
     date_Increment( &p_sys->pcr, 1 );

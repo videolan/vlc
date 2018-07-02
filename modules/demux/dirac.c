@@ -179,7 +179,7 @@ static int Demux( demux_t *p_demux)
             p_sys->i_state++;
             /* by default, timestamps are invalid.
              * Except when we need an anchor point */
-            p_block_in->i_dts = VLC_TS_0;
+            p_block_in->i_dts = VLC_TICK_0;
         }
     }
 

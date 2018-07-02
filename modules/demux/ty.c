@@ -628,7 +628,7 @@ static int check_sync_pes( demux_t *p_demux, block_t *p_block,
         return -1;    /* partial PES, no audio data */
     }
     /* full PES header present, extract PTS */
-    p_sys->lastAudioPTS = VLC_TS_0 + get_pts( &p_block->p_buffer[ offset +
+    p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block->p_buffer[ offset +
                                    p_sys->i_Pts_Offset ] );
     if (p_sys->firstAudioPTS < 0)
         p_sys->firstAudioPTS = p_sys->lastAudioPTS;
@@ -691,7 +691,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         {
             //msg_Dbg(p_demux, "Video PES hdr in pkt type 0x%02x at offset %d",
                 //subrec_type, esOffset1);
-            p_sys->lastVideoPTS = VLC_TS_0 + get_pts(
+            p_sys->lastVideoPTS = VLC_TICK_0 + get_pts(
                     &p_block_in->p_buffer[ esOffset1 + VIDEO_PTS_OFFSET ] );
             /*msg_Dbg(p_demux, "Video rec %d PTS %"PRId64, p_sys->i_cur_rec,
                         p_sys->lastVideoPTS );*/
@@ -868,7 +868,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             }
             else
             {
-                p_sys->lastAudioPTS = VLC_TS_0 + get_pts(
+                p_sys->lastAudioPTS = VLC_TICK_0 + get_pts(
                     &p_sys->pes_buffer[ esOffset1 + p_sys->i_Pts_Offset ] );
                 p_block_in->i_pts = p_sys->lastAudioPTS;
             }
@@ -907,7 +907,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /* ================================================ */
         if ( ( esOffset1 == 0 ) && ( l_rec_size == 16 ) )
         {
-            p_sys->lastAudioPTS = VLC_TS_0 + get_pts( &p_block_in->p_buffer[
+            p_sys->lastAudioPTS = VLC_TICK_0 + get_pts( &p_block_in->p_buffer[
                         SA_PTS_OFFSET ] );
             if (p_sys->firstAudioPTS < 0)
                 p_sys->firstAudioPTS = p_sys->lastAudioPTS;

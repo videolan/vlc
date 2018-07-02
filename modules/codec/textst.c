@@ -236,8 +236,8 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
     {
         p_sub->i_start = ((int64_t) (p_block->p_buffer[3] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[4]);
         p_sub->i_stop = ((int64_t) (p_block->p_buffer[8] & 0x01) << 32) | GetDWBE(&p_block->p_buffer[9]);
-        p_sub->i_start = VLC_TS_0 + p_sub->i_start * 100 / 9;
-        p_sub->i_stop = VLC_TS_0 + p_sub->i_stop * 100 / 9;
+        p_sub->i_start = VLC_TICK_0 + p_sub->i_start * 100 / 9;
+        p_sub->i_stop = VLC_TICK_0 + p_sub->i_stop * 100 / 9;
         if (p_sub->i_start < p_block->i_dts)
         {
             p_sub->i_stop += p_block->i_dts - p_sub->i_start;

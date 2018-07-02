@@ -413,8 +413,8 @@ static int Decode(decoder_t *p_dec, block_t *p_block)
 
                 if(p_group->i_end && p_group->i_start >= p_block->i_dts)
                 {
-                    p_sub->i_start = VLC_TS_0 + p_group->i_start;
-                    p_sub->i_stop =  VLC_TS_0 + p_group->i_end;
+                    p_sub->i_start = VLC_TICK_0 + p_group->i_start;
+                    p_sub->i_stop =  VLC_TICK_0 + p_group->i_end;
                 }
                 else
                 {

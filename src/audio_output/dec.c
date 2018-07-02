@@ -360,7 +360,7 @@ int aout_DecPlay (audio_output_t *aout, block_t *block, int input_rate)
 
     assert (input_rate >= INPUT_RATE_DEFAULT / AOUT_MAX_INPUT_RATE);
     assert (input_rate <= INPUT_RATE_DEFAULT * AOUT_MAX_INPUT_RATE);
-    assert (block->i_pts >= VLC_TS_0);
+    assert (block->i_pts >= VLC_TICK_0);
 
     block->i_length = CLOCK_FREQ * block->i_nb_samples
                                  / owner->input_format.i_rate;

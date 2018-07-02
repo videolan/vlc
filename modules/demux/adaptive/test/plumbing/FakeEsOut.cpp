@@ -110,7 +110,7 @@ static void enqueue(es_out_t *out, es_out_id_t *id, vlc_tick_t dts, vlc_tick_t p
 }
 
 #define DMS(t) ((t)*INT64_C(1000))
-#define TMS(t) (VLC_TS_0 + DMS(t))
+#define TMS(t) (VLC_TICK_0 + DMS(t))
 #define SEND(t) enqueue(out, id, t, t)
 #define PCR(t) es_out_SetPCR(out, t)
 #define FROM_MPEGTS(x) (INT64_C(x) * 100 / 9)
@@ -241,7 +241,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         Expect(ts == reference + DMS(1000));
 
         /* Reference has local multiple rolled timestamp < multiple rolled ts */
-        reference = VLC_TS_0 + FROM_MPEGTS(0x1FFFFFFFF) * 2;
+        reference = VLC_TICK_0 + FROM_MPEGTS(0x1FFFFFFFF) * 2;
         fakees->resetTimestamps();
         fakees->setSegmentStartTimes(segmentTimes);
         fakees->setSynchronizationReference(SynchronizationReference());
@@ -254,34 +254,34 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
 
 
         /* Reference has local timestamp rolled > ts */
-        reference = VLC_TS_0 + FROM_MPEGTS(0x1FFFFFFFF);
+        reference = VLC_TICK_0 + FROM_MPEGTS(0x1FFFFFFFF);
         fakees->resetTimestamps();
         fakees->setSegmentStartTimes(segmentTimes);
         fakees->setSynchronizationReference(SynchronizationReference());
         SEND(reference);
         PCR(reference);
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
-        ts = VLC_TS_0 + 1;
+        ts = VLC_TICK_0 + 1;
         ts = fakees->applyTimestampContinuity(ts);
         fprintf(stderr, "timestamp %ld\n", ts);
         Expect(ts == reference + 1);
 
         /* Reference has local timestamp mutiple rolled > multiple rolled ts */
-        reference = VLC_TS_0 + FROM_MPEGTS(0x1FFFFFFFF) * 5;
+        reference = VLC_TICK_0 + FROM_MPEGTS(0x1FFFFFFFF) * 5;
         fakees->resetTimestamps();
         fakees->setSegmentStartTimes(segmentTimes);
         fakees->setSynchronizationReference(SynchronizationReference());
         SEND(reference);
         PCR(reference);
         Expect(fakees->commandsQueue()->getBufferingLevel().continuous == reference);
-        ts = VLC_TS_0 + 1 + FROM_MPEGTS(0x1FFFFFFFF) * 2;
+        ts = VLC_TICK_0 + 1 + FROM_MPEGTS(0x1FFFFFFFF) * 2;
         ts = fakees->applyTimestampContinuity(ts);
         fprintf(stderr, "timestamp %ld\n", ts);
         Expect(ts == reference + 1);
 
         /* Do not trigger unwanted roll on long playbacks due to
          * initial reference value */
-        reference = VLC_TS_0 + FROM_MPEGTS(0x00000FFFF);
+        reference = VLC_TICK_0 + FROM_MPEGTS(0x00000FFFF);
         fakees->resetTimestamps();
         fakees->setSegmentStartTimes(segmentTimes);
         fakees->setSynchronizationReference(SynchronizationReference());
@@ -301,7 +301,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         SEND(ts);
         PCR(ts);
         fakees->commandsQueue()->Process(drainTimes);
-        ts = VLC_TS_0 + 100; /* next ts has rolled */
+        ts = VLC_TICK_0 + 100; /* next ts has rolled */
         SEND(ts);
         PCR(ts);
         fakees->commandsQueue()->Process(drainTimes);

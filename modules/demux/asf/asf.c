@@ -390,7 +390,7 @@ static int SeekIndex( demux_t *p_demux, vlc_tick_t i_date, float f_pos )
 
     if ( vlc_stream_Seek( p_demux->s, i_offset + p_sys->i_data_begin ) == VLC_SUCCESS )
     {
-        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TS_0 + i_date );
+        es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, VLC_TICK_0 + i_date );
         return VLC_SUCCESS;
     }
     else return VLC_EGENERIC;
@@ -593,7 +593,7 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
 
 static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, vlc_tick_t i_time )
 {
-    p_packetsys->p_demux->p_sys->i_sendtime = VLC_TS_0 + i_time;
+    p_packetsys->p_demux->p_sys->i_sendtime = VLC_TICK_0 + i_time;
 }
 
 static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number,
@@ -601,7 +601,7 @@ static void Packet_UpdateTime( asf_packet_sys_t *p_packetsys, uint8_t i_stream_n
 {
     asf_track_t *tk = p_packetsys->p_demux->p_sys->track[i_stream_number];
     if ( tk )
-        tk->i_time = VLC_TS_0 + i_time;
+        tk->i_time = VLC_TICK_0 + i_time;
 }
 
 static asf_track_info_t * Packet_GetTrackInfo( asf_packet_sys_t *p_packetsys,

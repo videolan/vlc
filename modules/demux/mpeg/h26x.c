@@ -351,7 +351,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
     }
     else
         date_Init( &p_sys->feed_dts, 25000, 1000 );
-    date_Set( &p_sys->feed_dts, VLC_TS_0 );
+    date_Set( &p_sys->feed_dts, VLC_TICK_0 );
     p_sys->output_dts = p_sys->feed_dts;
 
     /* Load the mpegvideo packetizer */
@@ -481,7 +481,7 @@ static int Demux( demux_t *p_demux)
             const vlc_tick_t i_frame_length = p_block_out->i_length;
 
             /* first output */
-            if( date_Get( &p_sys->output_dts ) == VLC_TS_0 )
+            if( date_Get( &p_sys->output_dts ) == VLC_TICK_0 )
                 es_out_SetPCR( p_demux->out, date_Get( &p_sys->output_dts ) );
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );

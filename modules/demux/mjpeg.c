@@ -309,7 +309,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys;
     p_sys->p_es         = NULL;
-    p_sys->i_time       = VLC_TS_0;
+    p_sys->i_time       = VLC_TICK_0;
     p_sys->i_level      = 0;
 
     p_sys->psz_separator = NULL;

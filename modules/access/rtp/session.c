@@ -169,7 +169,7 @@ rtp_source_create (demux_t *demux, const rtp_session_t *session,
     source->ssrc = ssrc;
     source->jitter = 0;
     source->ref_rtp = 0;
-    /* TODO: use VLC_TS_0, but VLC does not like negative PTS at the moment */
+    /* TODO: use VLC_TICK_0, but VLC does not like negative PTS at the moment */
     source->ref_ntp = UINT64_C (1) << 62;
     source->max_seq = source->bad_seq = init_seq;
     source->last_seq = init_seq - 1;

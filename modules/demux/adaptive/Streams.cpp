@@ -95,7 +95,7 @@ bool AbstractStream::init(const StreamFormat &format_, SegmentTracker *tracker)
                 segmentTracker->registerListener(this);
                 segmentTracker->notifyBufferingState(true);
                 if(mightalwaysstartfromzero)
-                    fakeesout->setExpectedTimestamp(VLC_TS_0 + segmentTracker->getPlaybackTime());
+                    fakeesout->setExpectedTimestamp(VLC_TICK_0 + segmentTracker->getPlaybackTime());
                 declaredCodecs();
                 return true;
             }
@@ -167,7 +167,7 @@ bool AbstractStream::resetForNewPosition(vlc_tick_t seekMediaTime)
         prevEndTimeContext = SegmentTimes();
         currentChunk = getNextChunk();
         if(mightalwaysstartfromzero)
-            fakeEsOut()->setExpectedTimestamp(VLC_TS_0 + seekMediaTime);
+            fakeEsOut()->setExpectedTimestamp(VLC_TICK_0 + seekMediaTime);
         if( !restartDemux() )
         {
             msg_Info(p_realdemux, "Restart demux failed");
@@ -708,7 +708,7 @@ bool AbstractStream::setPosition(const StreamPosition &pos, bool tryonly)
     {
 // in some cases, media time seek != sent dts
 //        es_out_Control(p_realdemux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-//                       VLC_TS_0 + time);
+//                       VLC_TICK_0 + time);
     }
     return ret;
 }

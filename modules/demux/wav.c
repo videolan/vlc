@@ -474,7 +474,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
+    p_block->i_pts = VLC_TICK_0 + date_Get( &p_sys->pts );
 
     /* set PCR */
     es_out_SetPCR( p_demux->out, p_block->i_pts );

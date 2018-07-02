@@ -73,7 +73,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_picture)
     /* If input picture doesn't have actual valid timestamp,
         we don't really have currently a way to know what else
         to do with it other than drop it for now*/
-    if( unlikely( p_picture->date < VLC_TS_0) )
+    if( unlikely( p_picture->date < VLC_TICK_0) )
     {
         msg_Dbg( p_filter, "skipping non-dated picture");
         picture_Release( p_picture );

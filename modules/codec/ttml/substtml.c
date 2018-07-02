@@ -1060,18 +1060,18 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
     for( size_t i=0; i+1 < i_timings_count; i++ )
     {
         /* We Only support absolute timings (2) */
-        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 < p_block->i_dts )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TICK_0 < p_block->i_dts )
             continue;
 
-        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 > p_block->i_dts + p_block->i_length )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TICK_0 > p_block->i_dts + p_block->i_length )
             break;
 
         subpicture_t *p_spu = NULL;
         ttml_region_t *p_regions = GenerateRegions( p_rootnode, p_timings_array[i] );
         if( p_regions && ( p_spu = decoder_NewSubpictureText( p_dec ) ) )
         {
-            p_spu->i_start    = VLC_TS_0 + tt_time_Convert( &p_timings_array[i] );
-            p_spu->i_stop     = VLC_TS_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
+            p_spu->i_start    = VLC_TICK_0 + tt_time_Convert( &p_timings_array[i] );
+            p_spu->i_stop     = VLC_TICK_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = true;
 

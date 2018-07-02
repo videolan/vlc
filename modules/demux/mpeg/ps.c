@@ -582,7 +582,7 @@ static int Demux( demux_t *p_demux )
                     p_sys->i_first_scr = -1;
                 }
                 else
-                    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pack_scr );
+                    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_pack_scr );
             }
 
             if( tk->b_configured && tk->es &&
@@ -623,7 +623,7 @@ static int Demux( demux_t *p_demux )
                 {
                     /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
                      * In this case use the last SCR + 40ms */
-                    p_pkt->i_pts = VLC_TS_0 + p_sys->i_scr + 40000;
+                    p_pkt->i_pts = VLC_TICK_0 + p_sys->i_scr + 40000;
                 }
 
                 if( (int64_t)p_pkt->i_pts > p_sys->i_current_pts )

@@ -828,7 +828,7 @@ static int Demux( demux_t *p_demux )
         p_frame->i_dts = q.quot * CLOCK_FREQ *
             p_stream->time_base.num + q.rem * CLOCK_FREQ *
             p_stream->time_base.num /
-            p_stream->time_base.den - i_start_time + VLC_TS_0;
+            p_stream->time_base.den - i_start_time + VLC_TICK_0;
     }
 
     if( pkt.pts == (int64_t)AV_NOPTS_VALUE )
@@ -839,7 +839,7 @@ static int Demux( demux_t *p_demux )
         p_frame->i_pts = q.quot * CLOCK_FREQ *
             p_stream->time_base.num + q.rem * CLOCK_FREQ *
             p_stream->time_base.num /
-            p_stream->time_base.den - i_start_time + VLC_TS_0;
+            p_stream->time_base.den - i_start_time + VLC_TICK_0;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
         p_frame->i_length = pkt.duration * CLOCK_FREQ *

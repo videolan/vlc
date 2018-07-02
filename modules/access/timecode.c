@@ -185,7 +185,7 @@ static int Open (vlc_object_t *obj)
     }
 
     date_Init (&sys->date, num, den);
-    date_Set (&sys->date, VLC_TS_0);
+    date_Set (&sys->date, VLC_TICK_0);
     sys->next_time = VLC_TICK_INVALID;
 
     demux->p_sys = sys;

@@ -263,7 +263,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Call the pace control */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_pcr );
     p_block = vlc_stream_Block( p_demux->s, p_sys->frame_size );
     if( p_block == NULL )
     {
@@ -278,7 +278,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + p_sys->i_pcr;
+    p_block->i_pts = VLC_TICK_0 + p_sys->i_pcr;
 
     if( b_audio )
     {
