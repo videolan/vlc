@@ -259,7 +259,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = (pts - now) > (TAU_PRIME(I_CODING_TYPE) + DELTA);
         }
-        if( pts <= VLC_TS_INVALID )
+        if( pts <= VLC_TICK_INVALID )
             b_decode = 1;
 
         if( !b_decode && !p_synchro->b_quiet )
@@ -310,7 +310,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = 0;
         }
-        if( p_synchro->i_nb_ref >= 1 && pts <= VLC_TS_INVALID )
+        if( p_synchro->i_nb_ref >= 1 && pts <= VLC_TICK_INVALID )
             b_decode = 1;
         break;
 
@@ -329,7 +329,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
         {
             b_decode = 0;
         }
-        if( p_synchro->i_nb_ref >= 2 && pts <= VLC_TS_INVALID )
+        if( p_synchro->i_nb_ref >= 2 && pts <= VLC_TICK_INVALID )
             b_decode = 1;
         break;
     }

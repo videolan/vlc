@@ -1231,7 +1231,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         /* Set the pts of the frame being encoded
          * avcodec likes pts to be in time_base units
          * frame number */
-        if( likely( p_pict->date > VLC_TS_INVALID ) )
+        if( likely( p_pict->date > VLC_TICK_INVALID ) )
             frame->pts = p_pict->date * p_sys->p_context->time_base.den /
                           CLOCK_FREQ / p_sys->p_context->time_base.num;
         else
@@ -1240,7 +1240,7 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
         if ( p_sys->b_hurry_up && frame->pts != AV_NOPTS_VALUE )
             check_hurry_up( p_sys, frame, p_enc );
 
-        if ( ( frame->pts != AV_NOPTS_VALUE ) && ( frame->pts != VLC_TS_INVALID ) )
+        if ( ( frame->pts != AV_NOPTS_VALUE ) && ( frame->pts != VLC_TICK_INVALID ) )
         {
             if ( p_sys->i_last_pts == frame->pts )
             {
@@ -1349,7 +1349,7 @@ static block_t *EncodeAudio( encoder_t *p_enc, block_t *p_aout_buf )
     //Calculate how many bytes we would need from current buffer to fill frame
     size_t leftover_samples = __MAX(0,__MIN((ssize_t)i_samples_left, (ssize_t)(p_sys->i_frame_size - p_sys->i_samples_delay)));
 
-    if( p_aout_buf && ( p_aout_buf->i_pts > VLC_TS_INVALID ) )
+    if( p_aout_buf && ( p_aout_buf->i_pts > VLC_TICK_INVALID ) )
     {
         date_Set( &p_sys->buffer_date, p_aout_buf->i_pts );
         /* take back amount we have leftover from previous buffer*/

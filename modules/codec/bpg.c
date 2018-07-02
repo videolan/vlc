@@ -149,7 +149,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
     }
 
-    p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
+    p_pic->date = p_block->i_pts > VLC_TICK_INVALID ? p_block->i_pts : p_block->i_dts;
 
     decoder_QueueVideo( p_dec, p_pic );
 error:

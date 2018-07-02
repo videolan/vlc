@@ -145,7 +145,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_packetizer = NULL;
     p_sys->p_meta = NULL;
     p_sys->i_length = 0;
-    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_stream_info = false;
     p_sys->p_es = NULL;
     p_sys->p_current_block = NULL;
@@ -227,7 +227,7 @@ static block_t *GetPacketizedBlock( decoder_t *p_packetizer,
     {
         if( p_block->i_buffer >= FLAC_HEADER_SIZE_MIN && p_block->i_buffer < INT_MAX )
         {
-            struct flac_header_info headerinfo = { .i_pts = VLC_TS_INVALID };
+            struct flac_header_info headerinfo = { .i_pts = VLC_TICK_INVALID };
             int i_ret = FLAC_ParseSyncInfo( p_block->p_buffer, p_block->i_buffer,
                                             streaminfo, NULL, &headerinfo );
             assert( i_ret != 0 ); /* Same as packetizer */
@@ -252,7 +252,7 @@ static void FlushPacketizer( decoder_t *p_packetizer )
 
 static void Reset( demux_sys_t *p_sys )
 {
-    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->i_pts = VLC_TICK_INVALID;
 
     FlushPacketizer( p_sys->p_packetizer );
     if( p_sys->p_current_block )
@@ -372,7 +372,7 @@ static int Demux( demux_t *p_demux )
         p_sys->p_current_block->i_flags = p_sys->i_next_block_flags;
         p_sys->i_next_block_flags = 0;
         p_sys->p_current_block->i_pts =
-        p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
+        p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TICK_INVALID;
     }
 
     while( (p_block_out = GetPacketizedBlock( p_sys->p_packetizer,
@@ -388,7 +388,7 @@ static int Demux( demux_t *p_demux )
             p_block_out->p_next = NULL;
 
             /* set PCR */
-            if( unlikely(p_sys->i_pts == VLC_TS_INVALID) )
+            if( unlikely(p_sys->i_pts == VLC_TICK_INVALID) )
                 es_out_SetPCR( p_demux->out, __MAX(p_block_out->i_dts - 1, VLC_TS_0) );
 
             p_sys->i_pts = p_block_out->i_dts;

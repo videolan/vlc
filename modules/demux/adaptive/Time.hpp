@@ -61,11 +61,11 @@ class SegmentTimes
     public:
         SegmentTimes()
         {
-            demux = VLC_TS_INVALID;
-            media = VLC_TS_INVALID;
-            display = VLC_TS_INVALID;
+            demux = VLC_TICK_INVALID;
+            media = VLC_TICK_INVALID;
+            display = VLC_TICK_INVALID;
         }
-        SegmentTimes(vlc_tick_t a, vlc_tick_t b, vlc_tick_t c = VLC_TS_INVALID)
+        SegmentTimes(vlc_tick_t a, vlc_tick_t b, vlc_tick_t c = VLC_TICK_INVALID)
         {
             demux = a;
             media = b;
@@ -75,11 +75,11 @@ class SegmentTimes
         {
             if(v == 0)
                 return;
-            if(demux != VLC_TS_INVALID)
+            if(demux != VLC_TICK_INVALID)
                 demux += v;
-            if(media != VLC_TS_INVALID)
+            if(media != VLC_TICK_INVALID)
                 media += v;
-            if(display != VLC_TS_INVALID)
+            if(display != VLC_TICK_INVALID)
                 display += v;
         }
         vlc_tick_t demux;
@@ -92,7 +92,7 @@ class Times
     public:
         Times()
         {
-            continuous = VLC_TS_INVALID;
+            continuous = VLC_TICK_INVALID;
         }
         Times(const SegmentTimes &s, vlc_tick_t a)
         {
@@ -101,7 +101,7 @@ class Times
         }
         void offsetBy(vlc_tick_t v)
         {
-            if(continuous != VLC_TS_INVALID)
+            if(continuous != VLC_TICK_INVALID)
                 continuous += v;
             segment.offsetBy(v);
         }

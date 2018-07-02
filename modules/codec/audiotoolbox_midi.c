@@ -310,7 +310,7 @@ static void Flush (decoder_t *p_dec)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set(&p_sys->end_date, VLC_TS_INVALID);
+    date_Set(&p_sys->end_date, VLC_TICK_INVALID);
 
     // Turn all sound on all channels off
     // else 'old' notes could still be playing
@@ -336,7 +336,7 @@ static int DecodeBlock (decoder_t *p_dec, block_t *p_block)
         }
     }
 
-    if (p_block->i_pts > VLC_TS_INVALID && !date_Get(&p_sys->end_date)) {
+    if (p_block->i_pts > VLC_TICK_INVALID && !date_Get(&p_sys->end_date)) {
         date_Set(&p_sys->end_date, p_block->i_pts);
     } else if (p_block->i_pts < date_Get(&p_sys->end_date)) {
         msg_Warn(p_dec, "MIDI message in the past?");

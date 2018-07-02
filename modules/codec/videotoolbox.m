@@ -869,7 +869,7 @@ static picture_t * RemoveOneFrameFromDPB(decoder_sys_t *p_sys)
         picture_t *p_field = p_info->p_picture;
 
         /* Compute time if missing */
-        if (p_field->date == VLC_TS_INVALID)
+        if (p_field->date == VLC_TICK_INVALID)
             p_field->date = date_Get(&p_sys->pts);
         else
             date_Set(&p_sys->pts, p_field->date);
@@ -952,7 +952,7 @@ static frame_info_t * CreateReorderInfo(decoder_t *p_dec, const block_t *p_block
     /* required for still pictures/menus */
     p_info->b_forced = (p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
 
-    if (date_Get(&p_sys->pts) == VLC_TS_INVALID)
+    if (date_Get(&p_sys->pts) == VLC_TICK_INVALID)
         date_Set(&p_sys->pts, p_block->i_dts);
 
     return p_info;
@@ -978,7 +978,7 @@ static void OnDecodedFrame(decoder_t *p_dec, frame_info_t *p_info)
                 break;
             }
             else if (!p_sys->b_poc_based_reorder &&
-                     p_info->p_picture->date > VLC_TS_INVALID &&
+                     p_info->p_picture->date > VLC_TICK_INVALID &&
                      p_sys->p_pic_reorder->p_picture->date > p_info->p_picture->date)
             {
                 p_sys->b_invalid_pic_reorder_max = true;
@@ -1689,7 +1689,7 @@ static CMSampleBufferRef VTSampleBufferCreate(decoder_t *p_dec,
     CMBlockBufferRef  block_buf = NULL;
     CMSampleBufferRef sample_buf = NULL;
     CMTime pts;
-    if(!p_dec->p_sys->b_poc_based_reorder && p_block->i_pts == VLC_TS_INVALID)
+    if(!p_dec->p_sys->b_poc_based_reorder && p_block->i_pts == VLC_TICK_INVALID)
         pts = CMTimeMake(p_block->i_dts, CLOCK_FREQ);
     else
         pts = CMTimeMake(p_block->i_pts, CLOCK_FREQ);

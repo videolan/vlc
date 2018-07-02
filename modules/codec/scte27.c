@@ -446,7 +446,7 @@ static int Decode(decoder_t *dec, block_t *b)
             if (index == 0) {
                 sys->segment_id = id;
                 sys->segment_size = 0;
-                sys->segment_date = b->i_pts > VLC_TS_INVALID ? b->i_pts : b->i_dts;
+                sys->segment_date = b->i_pts > VLC_TICK_INVALID ? b->i_pts : b->i_dts;
             } else {
                 if (sys->segment_id != id || sys->segment_size <= 0) {
                     sys->segment_id = -1;
@@ -473,7 +473,7 @@ static int Decode(decoder_t *dec, block_t *b)
             sub = DecodeSubtitleMessage(dec,
                                         &b->p_buffer[4],
                                         section_length - 1 - 4,
-                                        b->i_pts > VLC_TS_INVALID ? b->i_pts : b->i_dts);
+                                        b->i_pts > VLC_TICK_INVALID ? b->i_pts : b->i_dts);
         }
         if (sub != NULL)
             decoder_QueueSub(dec, sub);

@@ -171,14 +171,14 @@ FakeESOut::~FakeESOut()
 
 void FakeESOut::resetTimestamps()
 {
-    setExpectedTimestamp(VLC_TS_INVALID);
-    setAssociatedTimestamp(VLC_TS_INVALID);
+    setExpectedTimestamp(VLC_TICK_INVALID);
+    setAssociatedTimestamp(VLC_TICK_INVALID);
     startTimes = SegmentTimes();
 }
 
 void FakeESOut::setExpectedTimestamp(vlc_tick_t ts)
 {
-    if(ts == VLC_TS_INVALID)
+    if(ts == VLC_TICK_INVALID)
     {
         expected.b_timestamp_set = false;
         timestamps_offset = 0;
@@ -193,7 +193,7 @@ void FakeESOut::setExpectedTimestamp(vlc_tick_t ts)
 
 void FakeESOut::setAssociatedTimestamp(vlc_tick_t ts)
 {
-    if(ts == VLC_TS_INVALID)
+    if(ts == VLC_TICK_INVALID)
     {
         associated.b_timestamp_set = false;
         timestamps_offset = 0;
@@ -208,7 +208,7 @@ void FakeESOut::setAssociatedTimestamp(vlc_tick_t ts)
 
 void FakeESOut::setAssociatedTimestamp(vlc_tick_t mpegts, vlc_tick_t muxed)
 {
-    if(mpegts == VLC_TS_INVALID)
+    if(mpegts == VLC_TICK_INVALID)
     {
         setAssociatedTimestamp(mpegts);
     }
@@ -333,7 +333,7 @@ size_t FakeESOut::esCount() const
 
 bool FakeESOut::hasSegmentStartTimes() const
 {
-    return startTimes.media != VLC_TS_INVALID;
+    return startTimes.media != VLC_TICK_INVALID;
 }
 
 void FakeESOut::setSegmentStartTimes(const SegmentTimes &t)
@@ -350,7 +350,7 @@ void FakeESOut::setSegmentProgressTimes(const SegmentTimes &t)
 
 bool FakeESOut::hasSynchronizationReference() const
 {
-    return synchronizationReference.second.continuous != VLC_TS_INVALID;
+    return synchronizationReference.second.continuous != VLC_TICK_INVALID;
 }
 
 void FakeESOut::setSynchronizationReference(const SynchronizationReference &r)
@@ -469,7 +469,7 @@ void FakeESOut::scheduleNecessaryMilestone()
 
 vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
 {
-    if(ts != VLC_TS_INVALID)
+    if(ts != VLC_TICK_INVALID)
     {
         if(associated.b_timestamp_set)
         {
@@ -503,12 +503,12 @@ vlc_tick_t FakeESOut::fixTimestamp(vlc_tick_t ts)
 
 vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
 {
-    if(ts == VLC_TS_INVALID)
+    if(ts == VLC_TICK_INVALID)
         return ts;
 
     constexpr vlc_tick_t rollover = INT64_C(0x1FFFFFFFF) * 100 / 9;
     constexpr vlc_tick_t halfroll = INT64_C(0x0FFFFFFFF) * 100 / 9;
-    if(synchronizationReference.second.segment.demux != VLC_TS_INVALID)
+    if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID)
     {
         while(ts - synchronizationReference.second.segment.demux > halfroll)
         {
@@ -520,8 +520,8 @@ vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
         }
     }
 
-    if(synchronizationReference.second.segment.demux != VLC_TS_INVALID &&
-       synchronizationReference.second.continuous != VLC_TS_INVALID)
+    if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID &&
+       synchronizationReference.second.continuous != VLC_TICK_INVALID)
     {
         vlc_tick_t continuityoffset = synchronizationReference.second.continuous -
                                    synchronizationReference.second.segment.demux;
@@ -531,7 +531,7 @@ vlc_tick_t FakeESOut::applyTimestampContinuity(vlc_tick_t ts)
             synchronizationReference.second.offsetBy(halfroll / 2);
 
         ts += continuityoffset;
-        assert(ts >= VLC_TS_INVALID);
+        assert(ts >= VLC_TICK_INVALID);
     }
     else /* First synchronization point */
     {
@@ -610,7 +610,7 @@ int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
     p_block->i_dts = fixTimestamp( p_block->i_dts );
     p_block->i_pts = fixTimestamp( p_block->i_pts );
 
-    if(!hasSynchronizationReference() && p_block->i_dts != VLC_TS_INVALID)
+    if(!hasSynchronizationReference() && p_block->i_dts != VLC_TICK_INVALID)
     {
         synchronizationReference.second.segment = startTimes;
         synchronizationReference.second.continuous = p_block->i_dts;
@@ -622,11 +622,11 @@ int FakeESOut::esOutSend(es_out_id_t *p_es, block_t *p_block)
     p_block->i_pts = applyTimestampContinuity( p_block->i_pts );
 
     SegmentTimes times;
-    if(p_block->i_dts != VLC_TS_INVALID)
+    if(p_block->i_dts != VLC_TICK_INVALID)
     {
         times = synchronizationReference.second.segment;
         times.offsetBy(p_block->i_dts - times.demux);
-        assert(times.media != VLC_TS_INVALID);
+        assert(times.media != VLC_TICK_INVALID);
     }
 
    AbstractCommand *command = commandsfactory->createEsOutSendCommand( es_id, times, p_block );
@@ -672,7 +672,7 @@ int FakeESOut::esOutControl(int i_query, va_list args)
 
             SegmentTimes times;
 
-            if(synchronizationReference.second.segment.demux != VLC_TS_INVALID)
+            if(synchronizationReference.second.segment.demux != VLC_TICK_INVALID)
             {
                 pcr = fixTimestamp( pcr );
 
@@ -681,7 +681,7 @@ int FakeESOut::esOutControl(int i_query, va_list args)
                 times = synchronizationReference.second.segment;
                 times.offsetBy(pcr - times.demux);
             }
-            else pcr = VLC_TS_INVALID;
+            else pcr = VLC_TICK_INVALID;
 
             AbstractCommand *command = commandsfactory->createEsOutControlPCRCommand( i_group, times, pcr );
             if( likely(command) )

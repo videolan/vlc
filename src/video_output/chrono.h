@@ -46,7 +46,7 @@ static inline void vout_chrono_Init(vout_chrono_t *chrono, int shift, vlc_tick_t
     chrono->shift_var   = shift+1;
     chrono->var         = avg_initial / 2;
 
-    chrono->start = VLC_TS_INVALID;
+    chrono->start = VLC_TICK_INVALID;
 }
 static inline void vout_chrono_Clean(vout_chrono_t *chrono)
 {
@@ -67,7 +67,7 @@ static inline vlc_tick_t vout_chrono_GetLow(vout_chrono_t *chrono)
 
 static inline void vout_chrono_Stop(vout_chrono_t *chrono)
 {
-    assert(chrono->start != VLC_TS_INVALID);
+    assert(chrono->start != VLC_TICK_INVALID);
 
     /* */
     const vlc_tick_t duration = mdate() - chrono->start;
@@ -80,7 +80,7 @@ static inline void vout_chrono_Stop(vout_chrono_t *chrono)
     chrono->var = (((1 << chrono->shift_var) - 1) * chrono->var + var) >> chrono->shift_var;
 
     /* For assert */
-    chrono->start = VLC_TS_INVALID;
+    chrono->start = VLC_TICK_INVALID;
 }
 static inline void vout_chrono_Reset(vout_chrono_t *chrono)
 {

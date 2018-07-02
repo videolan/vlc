@@ -89,7 +89,7 @@ static bool block_Differs(const block_t *a, const block_t *b)
 #define PUSHQ(name,b) \
 {\
     block_ChainLastAppend(&p_sys->name.pp_chain_last, b);\
-    if(p_sys->tu.dts == VLC_TS_INVALID)\
+    if(p_sys->tu.dts == VLC_TICK_INVALID)\
         p_sys->tu.dts = b->i_dts; p_sys->tu.pts = b->i_pts;\
 }
 
@@ -202,8 +202,8 @@ static block_t * OutputQueues(decoder_t *p_dec, bool b_valid)
     }
 
     p_sys->tu.b_has_visible_frame = false;
-    p_sys->tu.dts = VLC_TS_INVALID;
-    p_sys->tu.pts = VLC_TS_INVALID;
+    p_sys->tu.dts = VLC_TICK_INVALID;
+    p_sys->tu.pts = VLC_TICK_INVALID;
     p_sys->i_seen = 0;
 
     return p_output;
@@ -390,8 +390,8 @@ static void PacketizeFlush(decoder_t *p_dec)
     block_ChainRelease(p_sys->obus.p_chain);
     INITQ(obus);
 
-    p_sys->tu.dts = VLC_TS_INVALID;
-    p_sys->tu.pts = VLC_TS_INVALID;
+    p_sys->tu.dts = VLC_TICK_INVALID;
+    p_sys->tu.pts = VLC_TICK_INVALID;
     p_sys->tu.b_has_visible_frame = false;
     p_sys->i_seen = 0;
     p_sys->i_next_block_flags = BLOCK_FLAG_DISCONTINUITY;
@@ -475,8 +475,8 @@ static block_t *PacketizeOBU(decoder_t *p_dec, block_t **pp_block)
             p_obublock->i_pts = p_frag->i_pts;
             p_obublock->i_flags = p_frag->i_flags;
             p_frag->i_flags = 0;
-            p_frag->i_dts = VLC_TS_INVALID;
-            p_frag->i_pts = VLC_TS_INVALID;
+            p_frag->i_dts = VLC_TICK_INVALID;
+            p_frag->i_pts = VLC_TICK_INVALID;
         }
 
         p_output = ParseOBUBlock(p_dec, p_obublock);
@@ -529,8 +529,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->p_sequence_header_block = NULL;
     p_sys->p_sequence_header = NULL;
     p_sys->tu.b_has_visible_frame = false;
-    p_sys->tu.dts = VLC_TS_INVALID;
-    p_sys->tu.pts = VLC_TS_INVALID;
+    p_sys->tu.dts = VLC_TICK_INVALID;
+    p_sys->tu.pts = VLC_TICK_INVALID;
     p_sys->i_seen = 0;
     p_sys->i_next_block_flags = 0;
     INITQ(tu.pre);

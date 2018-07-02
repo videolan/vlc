@@ -97,7 +97,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty( &p_sys->bytestream );
     p_sys->b_discontinuity = true;
@@ -111,7 +111,7 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, block_t **pp_out_buffer )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     if( p_dec->fmt_out.audio.i_rate != p_sys->i_rate ||
-        date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+        date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
     {
         msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
@@ -309,7 +309,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             }
         }
 
-        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TICK_INVALID )
         {
             /* We've just started the stream, wait for the first PTS. */
             msg_Dbg( p_dec, "waiting for PTS" );
@@ -349,12 +349,12 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts > VLC_TS_INVALID &&
+            if( p_sys->i_pts > VLC_TICK_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
                 if( p_dec->fmt_in.i_original_fourcc == VLC_FOURCC( 'D','V','R',' ') )
                 {
-                    if( date_Get( &p_sys->end_date ) == VLC_TS_INVALID )
+                    if( date_Get( &p_sys->end_date ) == VLC_TICK_INVALID )
                         date_Set( &p_sys->end_date, p_sys->i_pts );
                 }
                 else if ( p_sys->i_pts != date_Get( &p_sys->end_date ) )
@@ -572,7 +572,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
-                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
 
             if( p_sys->b_discontinuity )
             {
@@ -629,9 +629,9 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
     p_sys->i_state = STATE_NOSYNC;
     date_Init( &p_sys->end_date, 1, 1 );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
     block_BytestreamInit( &p_sys->bytestream );
-    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->i_pts = VLC_TICK_INVALID;
     p_sys->b_discontinuity = false;
     p_sys->i_frame_size = 0;
 

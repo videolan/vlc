@@ -384,9 +384,9 @@ void EStoPES ( block_t **pp_pes,
 
     vlc_tick_t i_dts = 0;
     vlc_tick_t i_pts = 0;
-    if (p_es->i_pts > VLC_TS_INVALID)
+    if (p_es->i_pts > VLC_TICK_INVALID)
         i_pts = (p_es->i_pts - ts_offset) * 9 / 100;
-    if (p_es->i_dts > VLC_TS_INVALID)
+    if (p_es->i_dts > VLC_TICK_INVALID)
         i_dts = (p_es->i_dts - ts_offset) * 9 / 100;
 
     i_size = p_es->i_buffer;

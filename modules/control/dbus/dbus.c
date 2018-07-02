@@ -801,7 +801,7 @@ static void *Run( void *data )
 
     int canc = vlc_savecancel();
 
-    vlc_tick_t events_last_date = VLC_TS_INVALID;
+    vlc_tick_t events_last_date = VLC_TICK_INVALID;
     int events_poll_timeout = -1;
     for( ;; )
     {

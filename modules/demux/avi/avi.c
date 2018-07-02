@@ -1054,7 +1054,7 @@ static void AVI_SendFrame( demux_t *p_demux, avi_track_t *tk, block_t *p_frame )
     else
     {
         p_frame->i_dts = p_frame->i_pts;
-        p_frame->i_pts = VLC_TS_INVALID;
+        p_frame->i_pts = VLC_TICK_INVALID;
     }
 
     if( tk->i_dv_audio_rate )

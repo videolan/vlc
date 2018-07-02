@@ -129,7 +129,7 @@ static void picture_Destroy( picture_t *p_picture )
 void picture_Reset( picture_t *p_picture )
 {
     /* */
-    p_picture->date = VLC_TS_INVALID;
+    p_picture->date = VLC_TICK_INVALID;
     p_picture->b_force = false;
     p_picture->b_progressive = false;
     p_picture->i_nb_fields = 2;

@@ -456,13 +456,13 @@ static int Demux( demux_t *p_demux)
             vlc_tick_t dts = date_Increment( &dtsdate, 2 );
 
             p_block_out->i_dts = dts;
-            if( p_block_out->i_pts != VLC_TS_INVALID )
+            if( p_block_out->i_pts != VLC_TICK_INVALID )
                 p_block_out->i_pts = dts + dtsdiff;
 
             if( p_block_in )
             {
                 p_block_in->i_dts = date_Get( &p_sys->feed_dts );
-                p_block_in->i_pts = VLC_TS_INVALID;
+                p_block_in->i_pts = VLC_TICK_INVALID;
             }
 
             if( p_sys->p_es == NULL )

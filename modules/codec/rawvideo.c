@@ -137,7 +137,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->pts, VLC_TS_INVALID );
+    date_Set( &p_sys->pts, VLC_TICK_INVALID );
 }
 
 /****************************************************************************
@@ -159,7 +159,7 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t *p_block )
         }
     }
 
-    if( p_block->i_pts <= VLC_TS_INVALID && p_block->i_dts <= VLC_TS_INVALID &&
+    if( p_block->i_pts <= VLC_TICK_INVALID && p_block->i_dts <= VLC_TICK_INVALID &&
         !date_Get( &p_sys->pts ) )
     {
         /* We've just started the stream, wait for the first PTS. */
@@ -168,11 +168,11 @@ static block_t *DecodeBlock( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Date management: If there is a pts avaliable, use that. */
-    if( p_block->i_pts > VLC_TS_INVALID )
+    if( p_block->i_pts > VLC_TICK_INVALID )
     {
         date_Set( &p_sys->pts, p_block->i_pts );
     }
-    else if( p_block->i_dts > VLC_TS_INVALID )
+    else if( p_block->i_dts > VLC_TICK_INVALID )
     {
         /* NB, davidf doesn't quite agree with this in general, it is ok
          * for rawvideo since it is in order (ie pts=dts), however, it

@@ -820,9 +820,9 @@ bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, 
         mkv_track_t &track = *it->second;
 
         track.i_skip_until_fpos = std::numeric_limits<uint64_t>::max();
-        if( track.i_last_dts > VLC_TS_INVALID )
+        if( track.i_last_dts > VLC_TICK_INVALID )
             track.b_discontinuity = true;
-        track.i_last_dts        = VLC_TS_INVALID;
+        track.i_last_dts        = VLC_TICK_INVALID;
 
         bool selected;
         if (track.p_es == NULL)
@@ -888,7 +888,7 @@ bool matroska_segment_c::Seek( demux_t &demuxer, vlc_tick_t i_absolute_mk_date, 
 
     // propogate seek information //
 
-    sys.i_pcr           = VLC_TS_INVALID;
+    sys.i_pcr           = VLC_TICK_INVALID;
     sys.i_pts           = VLC_TS_0 + i_mk_seek_time + i_mk_time_offset;
     if (b_accurate)
         sys.i_start_pts = VLC_TS_0 + i_absolute_mk_date;

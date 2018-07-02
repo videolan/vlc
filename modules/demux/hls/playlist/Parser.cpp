@@ -292,7 +292,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
 
     vlc_tick_t totalduration = 0;
     vlc_tick_t nzStartTime = 0;
-    vlc_tick_t absReferenceTime = VLC_TS_INVALID;
+    vlc_tick_t absReferenceTime = VLC_TICK_INVALID;
     uint64_t sequenceNumber = 0;
     uint64_t discontinuitySequence = 0;
     bool discontinuity = false;
@@ -351,7 +351,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 segment->startTime.Set(timescale.ToScaled(nzStartTime));
                 nzStartTime += nzDuration;
                 totalduration += nzDuration;
-                if(absReferenceTime > VLC_TS_INVALID)
+                if(absReferenceTime > VLC_TICK_INVALID)
                 {
                     segment->setDisplayTime(absReferenceTime);
                     absReferenceTime += nzDuration;
@@ -393,7 +393,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, HLSRepresentation *rep, const std
                 absReferenceTime = VLC_TS_0 +
                         UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
                 /* Reverse apply UTC timespec from first discont */
-                if(segmentstoappend.size() && segmentstoappend.back()->getDisplayTime() == VLC_TS_INVALID)
+                if(segmentstoappend.size() && segmentstoappend.back()->getDisplayTime() == VLC_TICK_INVALID)
                 {
                     vlc_tick_t tempTime = absReferenceTime;
                     for(auto it = segmentstoappend.crbegin(); it != segmentstoappend.crend(); ++it)

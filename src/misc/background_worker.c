@@ -193,7 +193,7 @@ struct background_worker* background_worker_New( void* owner,
     worker->owner = owner;
     worker->head.id = NULL;
     worker->head.active = false;
-    worker->head.deadline = VLC_TS_INVALID;
+    worker->head.deadline = VLC_TICK_INVALID;
 
     vlc_mutex_init( &worker->lock );
     vlc_cond_init( &worker->head.wait );

@@ -196,16 +196,16 @@ input_clock_t *input_clock_New( int i_rate )
 
     vlc_mutex_init( &cl->lock );
     cl->b_has_reference = false;
-    cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
 
-    cl->last = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->last = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
 
-    cl->i_ts_max = VLC_TS_INVALID;
+    cl->i_ts_max = VLC_TICK_INVALID;
 
     cl->i_buffering_duration = 0;
 
-    cl->i_next_drift_update = VLC_TS_INVALID;
+    cl->i_next_drift_update = VLC_TICK_INVALID;
     AvgInit( &cl->drift, 10 );
 
     cl->late.i_index = 0;
@@ -215,7 +215,7 @@ input_clock_t *input_clock_New( int i_rate )
     cl->i_rate = i_rate;
     cl->i_pts_delay = 0;
     cl->b_paused = false;
-    cl->i_pause_date = VLC_TS_INVALID;
+    cl->i_pause_date = VLC_TICK_INVALID;
 
     return cl;
 }
@@ -243,7 +243,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 {
     bool b_reset_reference = false;
 
-    assert( i_ck_stream > VLC_TS_INVALID && i_ck_system > VLC_TS_INVALID );
+    assert( i_ck_stream > VLC_TICK_INVALID && i_ck_system > VLC_TICK_INVALID );
 
     vlc_mutex_lock( &cl->lock );
 
@@ -252,7 +252,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         /* */
         b_reset_reference= true;
     }
-    else if( cl->last.i_stream > VLC_TS_INVALID &&
+    else if( cl->last.i_stream > VLC_TICK_INVALID &&
              ( (cl->last.i_stream - i_ck_stream) > CR_MAX_GAP ||
                (cl->last.i_stream - i_ck_stream) < -CR_MAX_GAP ) )
     {
@@ -260,7 +260,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
          * warning from the stream control facilities (dd-edited
          * stream ?). */
         msg_Warn( p_log, "clock gap, unexpected stream discontinuity" );
-        cl->i_ts_max = VLC_TS_INVALID;
+        cl->i_ts_max = VLC_TICK_INVALID;
 
         /* */
         msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
@@ -270,7 +270,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     /* */
     if( b_reset_reference )
     {
-        cl->i_next_drift_update = VLC_TS_INVALID;
+        cl->i_next_drift_update = VLC_TICK_INVALID;
         AvgReset( &cl->drift );
 
         /* Feed synchro with a new reference point. */
@@ -334,9 +334,9 @@ void input_clock_Reset( input_clock_t *cl )
     vlc_mutex_lock( &cl->lock );
 
     cl->b_has_reference = false;
-    cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->ref = clock_point_Create( VLC_TICK_INVALID, VLC_TICK_INVALID );
     cl->b_has_external_clock = false;
-    cl->i_ts_max = VLC_TS_INVALID;
+    cl->i_ts_max = VLC_TICK_INVALID;
 
     vlc_mutex_unlock( &cl->lock );
 }
@@ -419,9 +419,9 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
         vlc_mutex_unlock( &cl->lock );
         msg_Err(p_object, "Timestamp conversion failed for %"PRId64": "
                 "no reference clock", *pi_ts0);
-        *pi_ts0 = VLC_TS_INVALID;
+        *pi_ts0 = VLC_TICK_INVALID;
         if( pi_ts1 )
-            *pi_ts1 = VLC_TS_INVALID;
+            *pi_ts1 = VLC_TICK_INVALID;
         return VLC_EGENERIC;
     }
 
@@ -430,7 +430,7 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     const vlc_tick_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
 
     /* */
-    if( *pi_ts0 > VLC_TS_INVALID )
+    if( *pi_ts0 > VLC_TICK_INVALID )
     {
         *pi_ts0 = ClockStreamToSystem( cl, *pi_ts0 + AvgGet( &cl->drift ) );
         if( *pi_ts0 > cl->i_ts_max )
@@ -439,7 +439,7 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     }
 
     /* XXX we do not update i_ts_max on purpose */
-    if( pi_ts1 && *pi_ts1 > VLC_TS_INVALID )
+    if( pi_ts1 && *pi_ts1 > VLC_TICK_INVALID )
     {
         *pi_ts1 = ClockStreamToSystem( cl, *pi_ts1 + AvgGet( &cl->drift ) ) +
                   i_ts_delay;
@@ -448,7 +448,7 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     vlc_mutex_unlock( &cl->lock );
 
     /* Check ts validity */
-    if (i_ts_bound != INT64_MAX && *pi_ts0 > VLC_TS_INVALID) {
+    if (i_ts_bound != INT64_MAX && *pi_ts0 > VLC_TICK_INVALID) {
         if (*pi_ts0 >= mdate() + i_ts_delay + i_ts_buffering + i_ts_bound) {
             msg_Err(p_object,
                 "Timestamp conversion failed (delay %"PRId64", buffering "
@@ -604,7 +604,7 @@ vlc_tick_t input_clock_GetJitter( input_clock_t *cl )
 static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
 {
     if( !cl->b_has_reference )
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
 
     return ( i_stream - cl->ref.i_stream ) * cl->i_rate / INPUT_RATE_DEFAULT +
            cl->ref.i_system;

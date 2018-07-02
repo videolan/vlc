@@ -229,7 +229,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->date, VLC_TS_INVALID );
+    date_Set( &p_sys->date, VLC_TICK_INVALID );
     FlushBuffer( p_sys, SIZE_MAX );
 }
 
@@ -329,7 +329,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
-    if( i_pts > VLC_TS_INVALID && i_pts != date_Get( &p_sys->date ) )
+    if( i_pts > VLC_TICK_INVALID && i_pts != date_Get( &p_sys->date ) )
     {
         if( p_sys->i_last_length == 0 ||
             /* We need to be permissive and rebase dts when it's really way off */

@@ -284,7 +284,7 @@ static sout_stream_id_sys_t * AddOut( sout_stream_t *p_stream, const es_format_t
     p_es->b_empty = false;
 
     p_es->id = NULL;
-    p_es->i_last = VLC_TS_INVALID;
+    p_es->i_last = VLC_TICK_INVALID;
     p_es->b_changed = true;
 
     msg_Dbg( p_stream, "bridging out input codec=%4.4s id=%d pos=%d",
@@ -418,8 +418,8 @@ static int OpenIn( vlc_object_t *p_this )
     var_Get( p_stream, SOUT_CFG_PREFIX_IN "placeholder-delay", &val );
     p_sys->i_placeholder_delay = (vlc_tick_t)val.i_int * 1000;
 
-    p_sys->i_last_video = VLC_TS_INVALID;
-    p_sys->i_last_audio = VLC_TS_INVALID;
+    p_sys->i_last_video = VLC_TICK_INVALID;
+    p_sys->i_last_audio = VLC_TICK_INVALID;
     p_sys->id_video = NULL;
     p_sys->id_audio = NULL;
 

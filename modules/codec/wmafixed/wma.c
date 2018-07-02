@@ -197,7 +197,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 }
 
 /*****************************************************************************
@@ -222,12 +222,12 @@ static int DecodeFrame( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Date management */
-    if( p_block->i_pts > VLC_TS_INVALID &&
+    if( p_block->i_pts > VLC_TICK_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
         /* don't reuse the same pts */
-        p_block->i_pts = VLC_TS_INVALID;
+        p_block->i_pts = VLC_TICK_INVALID;
     }
     else if( !date_Get( &p_sys->end_date ) )
     {

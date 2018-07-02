@@ -67,7 +67,7 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
     picture_CopyProperties(dst, src);
     dst->context = &f2->context;
 
-    if (last_pts != VLC_TS_INVALID)
+    if (last_pts != VLC_TICK_INVALID)
         dst->date = (3 * src->date - last_pts) / 2;
     else
     if (filter->fmt_in.video.i_frame_rate != 0)
@@ -114,7 +114,7 @@ static int Open(vlc_object_t *obj)
     /* NOTE: Only weave and bob are mandatory for the hardware to implement.
      * The other modes and IVTC should be checked. */
 
-    sys->last_pts = VLC_TS_INVALID;
+    sys->last_pts = VLC_TICK_INVALID;
 
     filter->pf_video_filter = Deinterlace;
     filter->p_sys = sys;

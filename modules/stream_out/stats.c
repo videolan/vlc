@@ -175,7 +175,7 @@ static sout_stream_id_sys_t * Add( sout_stream_t *p_stream, const es_format_t *p
     }
     id->next_id = NULL;
     id->segment_number = 0;
-    id->previous_dts = VLC_TS_INVALID;
+    id->previous_dts = VLC_TICK_INVALID;
     id->track_duration = 0;
     InitMD5( &id->hash );
 
@@ -227,8 +227,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
         /* We could just set p_sys->output to stdout and remove user of msg_Dbg
          * if we don't need ability to output info to gui modules (like qt messages window
          */
-        vlc_tick_t dts_difference = VLC_TS_INVALID;
-        if( likely( id->previous_dts != VLC_TS_INVALID ) )
+        vlc_tick_t dts_difference = VLC_TICK_INVALID;
+        if( likely( id->previous_dts != VLC_TICK_INVALID ) )
             dts_difference = p_block->i_dts - id->previous_dts;
         if( p_sys->output )
         {

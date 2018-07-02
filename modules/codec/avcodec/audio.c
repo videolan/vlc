@@ -251,7 +251,7 @@ int InitAudioDec( vlc_object_t *obj )
     /* Try to set as much information as possible but do not trust it */
     SetupOutputFormat( p_dec, false );
 
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
     if( !p_dec->fmt_out.audio.i_rate )
         p_dec->fmt_out.audio.i_rate = p_dec->fmt_in.audio.i_rate;
     if( p_dec->fmt_out.audio.i_rate )
@@ -280,7 +280,7 @@ static void Flush( decoder_t *p_dec )
 
     if( avcodec_is_open( ctx ) )
         avcodec_flush_buffers( ctx );
-    date_Set( &p_sys->end_date, VLC_TS_INVALID );
+    date_Set( &p_sys->end_date, VLC_TICK_INVALID );
 
     if( ctx->codec_id == AV_CODEC_ID_MP2 ||
         ctx->codec_id == AV_CODEC_ID_MP3 )
@@ -332,11 +332,11 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 
         if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
         {
-            date_Set( &p_sys->end_date, VLC_TS_INVALID );
+            date_Set( &p_sys->end_date, VLC_TICK_INVALID );
         }
 
         /* We've just started the stream, wait for the first PTS. */
-        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
+        if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TICK_INVALID )
             goto drop;
 
         if( p_block->i_buffer <= 0 )

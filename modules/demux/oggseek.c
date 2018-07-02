@@ -87,7 +87,7 @@ void oggseek_index_entries_free ( demux_index_entry_t *idx )
 
 static demux_index_entry_t *index_entry_new( int64_t i_timestamp, int64_t i_pagepos )
 {
-    if ( i_timestamp == VLC_TS_INVALID || i_pagepos < 1 )
+    if ( i_timestamp == VLC_TICK_INVALID || i_pagepos < 1 )
         return NULL;
 
     demux_index_entry_t *idx = malloc( sizeof(*idx) );
@@ -697,14 +697,14 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
     }
     case VLC_CODEC_OPUS:
     {
-        if ( b_presentation ) return VLC_TS_INVALID;
+        if ( b_presentation ) return VLC_TICK_INVALID;
         i_timestamp = ( i_granule - p_stream->i_pre_skip ) * CLOCK_FREQ / 48000;
         break;
     }
     case VLC_CODEC_VORBIS:
     case VLC_CODEC_FLAC:
     {
-        if ( b_presentation ) return VLC_TS_INVALID;
+        if ( b_presentation ) return VLC_TICK_INVALID;
         i_timestamp = i_granule * CLOCK_FREQ / p_stream->f_rate;
         break;
     }
@@ -718,7 +718,7 @@ int64_t Oggseek_GranuleToAbsTimestamp( logical_stream_t *p_stream,
     }
     case VLC_CODEC_OGGSPOTS:
     {
-        if ( b_presentation ) return VLC_TS_INVALID;
+        if ( b_presentation ) return VLC_TICK_INVALID;
         i_timestamp = ( i_granule >> p_stream->i_granule_shift )
                 * CLOCK_FREQ / p_stream->f_rate;
         break;

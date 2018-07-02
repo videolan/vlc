@@ -340,7 +340,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_pts          = VLC_TS_INVALID;
+    p_sys->i_pts          = VLC_TICK_INVALID;
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
     p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
 
@@ -397,7 +397,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_sys->i_pts = VLC_TS_INVALID;
+    p_sys->i_pts = VLC_TICK_INVALID;
 }
 
 /*****************************************************************************
@@ -426,7 +426,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
         default_dds_init( p_dec );
 
     p_sys->i_pts = p_block->i_pts;
-    if( p_sys->i_pts <= VLC_TS_INVALID )
+    if( p_sys->i_pts <= VLC_TICK_INVALID )
     {
 #ifdef DEBUG_DVBSUB
         /* Some DVB channels send stuffing segments in non-dated packets so

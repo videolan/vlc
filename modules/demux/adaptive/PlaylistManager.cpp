@@ -78,7 +78,7 @@ PlaylistManager::PlaylistManager( demux_t *p_demux_,
     vlc_mutex_init(&cached.lock);
     cached.b_live = false;
     cached.f_position = 0.0;
-    cached.i_time = VLC_TS_INVALID;
+    cached.i_time = VLC_TICK_INVALID;
     cached.playlistStart = 0;
     cached.playlistEnd = 0;
     cached.playlistLength = 0;
@@ -276,7 +276,7 @@ AbstractStream::BufferingStatus PlaylistManager::bufferize(Times deadline,
     }
 
     vlc_mutex_lock(&demux.lock);
-    if(demux.times.continuous == VLC_TS_INVALID &&
+    if(demux.times.continuous == VLC_TICK_INVALID &&
         /* don't wait minbuffer on simple discontinuity or restart */
        (demux.pcr_syncpoint == TimestampSynchronizationPoint::Discontinuity ||
         /* prevents starting before buffering is reached */
@@ -328,9 +328,9 @@ Times PlaylistManager::getFirstTimes() const
     for(const AbstractStream *stream : streams)
     {
         const Times dts = stream->getFirstTimes();
-        if(mindts.continuous == VLC_TS_INVALID)
+        if(mindts.continuous == VLC_TICK_INVALID)
             mindts = dts;
-        else if(dts.continuous != VLC_TS_INVALID &&
+        else if(dts.continuous != VLC_TICK_INVALID &&
                 dts.continuous < mindts.continuous)
             mindts = dts;
     }
@@ -355,7 +355,7 @@ bool PlaylistManager::setPosition(vlc_tick_t mediatime, double pos, bool accurat
     bool hasValidStream = false;
     StreamPosition streampos;
     streampos.times = demux.firsttimes;
-    if(streampos.times.continuous != VLC_TS_INVALID)
+    if(streampos.times.continuous != VLC_TICK_INVALID)
         streampos.times.offsetBy(mediatime - streampos.times.segment.media);
     else
         streampos.times.segment.media = mediatime;
@@ -467,7 +467,7 @@ int PlaylistManager::demux_callback(demux_t *p_demux)
 int PlaylistManager::doDemux(int64_t increment)
 {
     vlc_mutex_lock(&demux.lock);
-    if(demux.times.continuous == VLC_TS_INVALID)
+    if(demux.times.continuous == VLC_TICK_INVALID)
     {
         bool b_dead = true;
         bool b_all_disabled = true;
@@ -491,10 +491,10 @@ int PlaylistManager::doDemux(int64_t increment)
     AbstractStream::Status status = dequeue(demux.times, &barrier);
 
     vlc_mutex_lock(&demux.lock);
-    if(demux.firsttimes.continuous == VLC_TS_INVALID && barrier.continuous != VLC_TS_INVALID)
+    if(demux.firsttimes.continuous == VLC_TICK_INVALID && barrier.continuous != VLC_TICK_INVALID)
     {
         demux.firsttimes = barrier;
-        assert(barrier.segment.media != VLC_TS_INVALID);
+        assert(barrier.segment.media != VLC_TICK_INVALID);
     }
     vlc_mutex_unlock(&demux.lock);
 
@@ -539,7 +539,7 @@ int PlaylistManager::doDemux(int64_t increment)
         break;
     case AbstractStream::Status::Demuxed:
         vlc_mutex_lock(&demux.lock);
-        if( demux.times.continuous != VLC_TS_INVALID && barrier.continuous != demux.times.continuous )
+        if( demux.times.continuous != VLC_TICK_INVALID && barrier.continuous != demux.times.continuous )
         {
             demux.times = barrier;
             vlc_tick_t pcr = VLC_TS_0 + std::max(INT64_C(0), demux.times.continuous - CLOCK_FREQ/10);
@@ -657,7 +657,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             demux.times = Times();
             demux.firsttimes = Times();
             cached.lastupdate = 0;
-            cached.i_time = VLC_TS_INVALID;
+            cached.i_time = VLC_TICK_INVALID;
             setBufferingRunState(true);
             break;
         }
@@ -679,7 +679,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
             demux.times = Times();
             demux.firsttimes = Times();
             cached.lastupdate = 0;
-            cached.i_time = VLC_TS_INVALID;
+            cached.i_time = VLC_TICK_INVALID;
             setBufferingRunState(true);
             break;
         }
@@ -835,7 +835,7 @@ void PlaylistManager::updateControlsPosition()
         if(playlist->duration.Get() > cached.playlistLength)
             cached.playlistLength = playlist->duration.Get();
 
-        if(cached.playlistLength && currentTimes.segment.media != VLC_TS_INVALID)
+        if(cached.playlistLength && currentTimes.segment.media != VLC_TICK_INVALID)
         {
             cached.i_time = currentTimes.segment.media;
             cached.f_position = (double) (cached.i_time - VLC_TS_0 - cached.playlistStart) / cached.playlistLength;

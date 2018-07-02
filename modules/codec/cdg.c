@@ -177,7 +177,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             goto exit;
 
         Render( p_sys, p_pic );
-        p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
+        p_pic->date = p_block->i_pts > VLC_TICK_INVALID ? p_block->i_pts : p_block->i_dts;
     }
 
 exit:

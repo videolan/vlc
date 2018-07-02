@@ -161,7 +161,7 @@ int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
             }
 
             struct pollfd ufd;
-            vlc_tick_t deadline = VLC_TS_INVALID;
+            vlc_tick_t deadline = VLC_TICK_INVALID;
 
             ufd.fd = fd;
             ufd.events = POLLOUT;

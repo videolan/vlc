@@ -150,7 +150,7 @@ static int PushFrame(decoder_t *dec, block_t *block)
     {
         p_buffer = block->p_buffer;
         i_buffer = block->i_buffer;
-        p_sys->frame_priv[priv_index].pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
+        p_sys->frame_priv[priv_index].pts = (block->i_pts != VLC_TICK_INVALID) ? block->i_pts : block->i_dts;
     }
     else
     {

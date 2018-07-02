@@ -66,7 +66,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         *(vlc_tick_t *)(p_pic->p->p_pixels) = mdate();
     }
 
-    p_pic->date = p_block->i_pts > VLC_TS_INVALID ?
+    p_pic->date = p_block->i_pts > VLC_TICK_INVALID ?
             p_block->i_pts : p_block->i_dts;
     p_pic->b_force = true;
 

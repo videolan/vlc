@@ -143,7 +143,7 @@ namespace adaptive
         public:
             SegmentChangedEvent() = delete;
             SegmentChangedEvent(const ID &, uint64_t,
-                                mtime_t, mtime_t, vlc_tick_t = VLC_TS_INVALID);
+                                mtime_t, mtime_t, vlc_tick_t = VLC_TICK_INVALID);
             virtual ~SegmentChangedEvent() = default;
 
             const ID *id;

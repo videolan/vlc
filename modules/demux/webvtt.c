@@ -523,7 +523,7 @@ static int ControlStream( demux_t *p_demux, int i_query, va_list args )
     {
         case DEMUX_GET_TIME:
             pi64 = va_arg( args, int64_t * );
-            if( p_sys->i_next_demux_time != VLC_TS_INVALID )
+            if( p_sys->i_next_demux_time != VLC_TICK_INVALID )
             {
                 *pi64 = p_sys->i_next_demux_time;
                 return VLC_SUCCESS;

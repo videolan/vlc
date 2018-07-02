@@ -150,7 +150,7 @@ static int Create( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     p_sys->i_refcount = 1;
     memset( &p_sys->fmt, 0, sizeof(p_sys->fmt) );
-    p_sys->i_max_stop = VLC_TS_INVALID;
+    p_sys->i_max_stop = VLC_TICK_INVALID;
     p_sys->p_library  = NULL;
     p_sys->p_renderer = NULL;
     p_sys->p_track    = NULL;
@@ -333,7 +333,7 @@ static void Flush( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    p_sys->i_max_stop = VLC_TS_INVALID;
+    p_sys->i_max_stop = VLC_TICK_INVALID;
 }
 
 /****************************************************************************

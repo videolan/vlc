@@ -580,7 +580,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->p_sys = p_sys;
     p_sys->p_schro = p_schro;
     p_sys->p_format = NULL;
-    p_sys->i_lastpts = VLC_TS_INVALID;
+    p_sys->i_lastpts = VLC_TICK_INVALID;
     p_sys->i_frame_pts_delta = 0;
 
     /* Set output properties */
@@ -749,7 +749,7 @@ static void Flush( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     schro_decoder_reset( p_sys->p_schro );
-    p_sys->i_lastpts = VLC_TS_INVALID;
+    p_sys->i_lastpts = VLC_TICK_INVALID;
 }
 
 /****************************************************************************
@@ -782,7 +782,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
         p_schrobuffer = schro_buffer_new_with_data( p_block->p_buffer, p_block->i_buffer );
         p_schrobuffer->free = SchroBufferFree;
         p_schrobuffer->priv = p_block;
-        if( p_block->i_pts > VLC_TS_INVALID ) {
+        if( p_block->i_pts > VLC_TICK_INVALID ) {
             vlc_tick_t *p_pts = malloc( sizeof(*p_pts) );
             if( p_pts ) {
                 *p_pts = p_block->i_pts;
@@ -844,7 +844,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
                 p_pic->date = *(mtime_t*) p_tag->value;
                 schro_tag_free( p_tag );
             }
-            else if( p_sys->i_lastpts > VLC_TS_INVALID )
+            else if( p_sys->i_lastpts > VLC_TICK_INVALID )
             {
                 /* NB, this shouldn't happen since the packetizer does a
                  * very thorough job of inventing timestamps.  The

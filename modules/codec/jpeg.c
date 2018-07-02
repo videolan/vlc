@@ -573,7 +573,7 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
     jpeg_destroy_decompress(&p_sys->p_jpeg);
     free(p_row_pointers);
 
-    p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
+    p_pic->date = p_block->i_pts > VLC_TICK_INVALID ? p_block->i_pts : p_block->i_dts;
 
     block_Release(p_block);
     decoder_QueueVideo( p_dec, p_pic );

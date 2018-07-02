@@ -821,7 +821,7 @@ static int Demux( demux_t *p_demux )
         i_start_time = 0;
 
     if( pkt.dts == (int64_t)AV_NOPTS_VALUE )
-        p_frame->i_dts = VLC_TS_INVALID;
+        p_frame->i_dts = VLC_TICK_INVALID;
     else
     {
         q = lldiv( pkt.dts, p_stream->time_base.den );
@@ -832,7 +832,7 @@ static int Demux( demux_t *p_demux )
     }
 
     if( pkt.pts == (int64_t)AV_NOPTS_VALUE )
-        p_frame->i_pts = VLC_TS_INVALID;
+        p_frame->i_pts = VLC_TICK_INVALID;
     else
     {
         q = lldiv( pkt.pts, p_stream->time_base.den );
@@ -852,14 +852,14 @@ static int Demux( demux_t *p_demux )
         /* FLV and video PTS */
         if( p_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO &&
             pkt.dts != (int64_t)AV_NOPTS_VALUE && pkt.dts == pkt.pts )
-                p_frame->i_pts = VLC_TS_INVALID;
+                p_frame->i_pts = VLC_TICK_INVALID;
 
         /* Handle broken dts/pts increase with AAC. Duration is correct.
          * sky_the80s_aacplus.flv #8195 */
         if( p_stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO &&
             p_stream->codecpar->codec_id == AV_CODEC_ID_AAC )
         {
-            if( p_track->i_pcr != VLC_TS_INVALID &&
+            if( p_track->i_pcr != VLC_TICK_INVALID &&
                 p_track->i_pcr + p_frame->i_length > p_frame->i_dts )
             {
                 p_frame->i_dts = p_frame->i_pts = p_track->i_pcr + p_frame->i_length;
@@ -870,7 +870,7 @@ static int Demux( demux_t *p_demux )
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 #endif
-    if( p_frame->i_dts > VLC_TS_INVALID && p_track->p_es != NULL )
+    if( p_frame->i_dts > VLC_TICK_INVALID && p_track->p_es != NULL )
         p_track->i_pcr = p_frame->i_dts;
 
     int64_t i_ts_max = INT64_MIN;
@@ -884,7 +884,7 @@ static int Demux( demux_t *p_demux )
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
     {
         if( p_sys->tracks[i].p_es != NULL &&
-                p_sys->tracks[i].i_pcr > VLC_TS_INVALID &&
+                p_sys->tracks[i].i_pcr > VLC_TICK_INVALID &&
                 p_sys->tracks[i].i_pcr + 10 * CLOCK_FREQ >= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tracks[i].i_pcr );
     }
@@ -931,15 +931,15 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     if( p_sys->ic->start_time == (int64_t)AV_NOPTS_VALUE || i_time < 0 )
-        i_time = VLC_TS_INVALID;
+        i_time = VLC_TICK_INVALID;
     else if( i_time == 0 )
         i_time = 1;
 
     p_sys->i_pcr = i_time;
     for( unsigned i = 0; i < p_sys->i_tracks; i++ )
-        p_sys->tracks[i].i_pcr = VLC_TS_INVALID;
+        p_sys->tracks[i].i_pcr = VLC_TICK_INVALID;
 
-    if( i_time > VLC_TS_INVALID )
+    if( i_time > VLC_TICK_INVALID )
     {
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_time );
         UpdateSeekPoint( p_demux, i_time );

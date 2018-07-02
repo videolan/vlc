@@ -138,7 +138,7 @@ static void dtsgen_AddNextPTS(struct dtsgen_t *d, vlc_tick_t i_pts)
 
 static vlc_tick_t dtsgen_GetDTS(struct dtsgen_t *d)
 {
-    vlc_tick_t i_dts = VLC_TS_INVALID;
+    vlc_tick_t i_dts = VLC_TICK_INVALID;
 
     /* When we have inspected enough packets,
      * use the reorderdepth th packet as dts offset */
@@ -170,7 +170,7 @@ static vlc_tick_t dtsgen_GetDTS(struct dtsgen_t *d)
 static void dtsgen_Debug(vlc_object_t *p_demux, struct dtsgen_t *d,
                          vlc_tick_t dts, vlc_tick_t pts)
 {
-    if(pts == VLC_TS_INVALID)
+    if(pts == VLC_TICK_INVALID)
         return;
     msg_Dbg(p_demux, "dtsgen %" PRId64 " / pts %" PRId64 " diff %" PRId64 ", "
                      "pkt count %u, reorder %u",

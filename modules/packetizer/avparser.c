@@ -204,7 +204,7 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
         memcpy( p_ret->p_buffer, p_outdata, i_outlen );
         p_ret->i_pts = p_block->i_pts;
         p_ret->i_dts = p_block->i_dts;
-        p_block->i_pts = p_block->i_dts = VLC_TS_INVALID;
+        p_block->i_pts = p_block->i_dts = VLC_TICK_INVALID;
     }
     else /* as-is block is now used */
     {

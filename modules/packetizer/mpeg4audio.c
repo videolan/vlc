@@ -330,10 +330,10 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
     *pp_block = NULL; /* Don't reuse this block */
 
     int64_t i_diff = 0;
-    if (p_block->i_pts > VLC_TS_INVALID &&
+    if (p_block->i_pts > VLC_TICK_INVALID &&
         p_block->i_pts != date_Get(&p_sys->end_date))
     {
-        if(date_Get(&p_sys->end_date) > VLC_TS_INVALID)
+        if(date_Get(&p_sys->end_date) > VLC_TICK_INVALID)
             i_diff = llabs( date_Get(&p_sys->end_date) - p_block->i_pts );
         date_Set(&p_sys->end_date, p_block->i_pts);
     }
@@ -342,7 +342,7 @@ static block_t *ForwardRawBlock(decoder_t *p_dec, block_t **pp_block)
 
     /* Might not be known due to missing extradata,
        will be set to block pts above */
-    if(p_dec->fmt_out.audio.i_frame_length && p_block->i_pts != VLC_TS_INVALID)
+    if(p_dec->fmt_out.audio.i_frame_length && p_block->i_pts != VLC_TICK_INVALID)
     {
         p_block->i_length = date_Increment(&p_sys->end_date,
             p_dec->fmt_out.audio.i_frame_length) - p_block->i_pts;
@@ -1020,7 +1020,7 @@ static void Flush(decoder_t *p_dec)
 
     p_sys->i_state = STATE_NOSYNC;
     block_BytestreamEmpty(&p_sys->bytestream);
-    date_Set(&p_sys->end_date, VLC_TS_INVALID);
+    date_Set(&p_sys->end_date, VLC_TICK_INVALID);
     p_sys->b_discontuinity = true;
 }
 
@@ -1089,7 +1089,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
     case STATE_SYNC:
         /* New frame, set the Presentation Time Stamp */
         p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-        if (p_sys->i_pts > VLC_TS_INVALID &&
+        if (p_sys->i_pts > VLC_TICK_INVALID &&
             p_sys->i_pts != date_Get(&p_sys->end_date))
             date_Set(&p_sys->end_date, p_sys->i_pts);
         p_sys->i_state = STATE_HEADER;
@@ -1217,7 +1217,7 @@ static block_t *PacketizeStreamBlock(decoder_t *p_dec, block_t **pp_block)
         SetupOutput(p_dec, p_out_buffer);
         /* Make sure we don't reuse the same pts twice */
         if (p_sys->i_pts == p_sys->bytestream.p_block->i_pts)
-            p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
+            p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TICK_INVALID;
 
         /* So p_block doesn't get re-added several times */
         if( pp_block )
@@ -1261,7 +1261,7 @@ static block_t *Packetize(decoder_t *p_dec, block_t **pp_block)
             }
         }
 
-        if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TS_INVALID)
+        if (!date_Get(&p_sys->end_date) && p_block->i_pts <= VLC_TICK_INVALID)
         {
             /* We've just started the stream, wait for the first PTS. */
             block_Release(p_block);

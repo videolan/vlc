@@ -239,7 +239,7 @@ static int Demux( demux_t *p_demux )
                 p_sys->b_eof = true;
         }
 
-        if ( p_sys->i_time == VLC_TS_INVALID )
+        if ( p_sys->i_time == VLC_TICK_INVALID )
             p_sys->i_time = p_sys->i_sendtime;
     }
 
@@ -249,7 +249,7 @@ static int Demux( demux_t *p_demux )
     {
         bool b_data = Block_Dequeue( p_demux, p_sys->i_time + CHUNK );
 
-        if( p_sys->i_time != VLC_TS_INVALID )
+        if( p_sys->i_time != VLC_TICK_INVALID )
         {
             p_sys->i_time += CHUNK;
             p_sys->b_pcr_sent = true;
@@ -261,7 +261,7 @@ static int Demux( demux_t *p_demux )
 
         if ( !b_data && p_sys->b_eos )
         {
-            if( p_sys->i_time != VLC_TS_INVALID )
+            if( p_sys->i_time != VLC_TICK_INVALID )
                 es_out_SetPCR( p_demux->out, p_sys->i_time );
 
             /* We end this stream */
@@ -403,8 +403,8 @@ static void SeekPrepare( demux_t *p_demux )
     p_sys->b_eof = false;
     p_sys->b_eos = false;
     p_sys->b_pcr_sent = false;
-    p_sys->i_time = VLC_TS_INVALID;
-    p_sys->i_sendtime = VLC_TS_INVALID;
+    p_sys->i_time = VLC_TICK_INVALID;
+    p_sys->i_sendtime = VLC_TICK_INVALID;
     p_sys->i_preroll_start = ASFPACKET_PREROLL_FROM_CURRENT;
 
     for( int i = 0; i < MAX_ASF_TRACKS ; i++ )
@@ -687,7 +687,7 @@ static bool Block_Dequeue( demux_t *p_demux, vlc_tick_t i_nexttime )
             else
                 p_block->p_next = NULL;
 
-            if( !p_sys->b_pcr_sent && p_sys->i_time != VLC_TS_INVALID )
+            if( !p_sys->b_pcr_sent && p_sys->i_time != VLC_TICK_INVALID )
             {
                 p_sys->b_pcr_sent = true;
                 es_out_SetPCR( p_demux->out, p_sys->i_time );
@@ -786,8 +786,8 @@ static int DemuxInit( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* init context */
-    p_sys->i_time   = VLC_TS_INVALID;
-    p_sys->i_sendtime    = VLC_TS_INVALID;
+    p_sys->i_time   = VLC_TICK_INVALID;
+    p_sys->i_sendtime    = VLC_TICK_INVALID;
     p_sys->i_length = 0;
     p_sys->b_eos = false;
     p_sys->b_eof = false;

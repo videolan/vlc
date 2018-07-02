@@ -915,7 +915,7 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
     vlc_tick_t i_field_dur = 0;
     unsigned int i = 0;
     for ( ; i < METADATA_SIZE-1; i ++)
-        if (p_deint_data->meta[i].date > VLC_TS_INVALID)
+        if (p_deint_data->meta[i].date > VLC_TICK_INVALID)
             break;
     if (i < METADATA_SIZE-1) {
         unsigned int i_fields_total = 0;
@@ -943,10 +943,10 @@ DeinterlaceX2(filter_t * filter, picture_t * src)
 
     dest[0]->p_next = dest[1];
     dest[0]->date = cur->date;
-    if (dest[0]->date > VLC_TS_INVALID)
+    if (dest[0]->date > VLC_TICK_INVALID)
         dest[1]->date = dest[0]->date + i_field_dur;
     else
-        dest[1]->date = VLC_TS_INVALID;
+        dest[1]->date = VLC_TICK_INVALID;
 
     return dest[0];
 
@@ -972,7 +972,7 @@ Deinterlace_Flush(filter_t *filter)
 
     for (unsigned int i = 0; i < METADATA_SIZE; ++i)
     {
-        p_deint_data->meta[i].date = VLC_TS_INVALID;
+        p_deint_data->meta[i].date = VLC_TICK_INVALID;
         p_deint_data->meta[i].i_nb_fields = 2;
     }
 }
@@ -1143,7 +1143,7 @@ OpenDeinterlace(vlc_object_t * obj)
 
     for (unsigned int i = 0; i < METADATA_SIZE; ++i)
     {
-        p_data->meta[i].date = VLC_TS_INVALID;
+        p_data->meta[i].date = VLC_TICK_INVALID;
         p_data->meta[i].i_nb_fields = 2;
     }
 

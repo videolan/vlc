@@ -331,8 +331,8 @@ struct demux_sys_t
 public:
     demux_sys_t( demux_t & demux )
         :demuxer(demux)
-        ,i_pts(VLC_TS_INVALID)
-        ,i_pcr(VLC_TS_INVALID)
+        ,i_pts(VLC_TICK_INVALID)
+        ,i_pcr(VLC_TICK_INVALID)
         ,i_start_pts(VLC_TS_0)
         ,i_mk_chapter_time(0)
         ,meta(NULL)

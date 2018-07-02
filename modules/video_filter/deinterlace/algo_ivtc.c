@@ -1216,7 +1216,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     ivtc_sys_t *p_ivtc  = &p_sys->ivtc;
-    vlc_tick_t t_final = VLC_TS_INVALID; /* for custom timestamp mangling */
+    vlc_tick_t t_final = VLC_TICK_INVALID; /* for custom timestamp mangling */
 
     picture_t *p_curr = p_sys->context.pp_history[1];
     picture_t *p_next = p_sys->context.pp_history[2];
@@ -1458,7 +1458,7 @@ static bool IVTCOutputOrDropFrame( filter_t *p_filter, picture_t *p_dst )
     /* Note that picture_Copy() copies the PTS, too. Apply timestamp mangling
        now, if any was needed.
     */
-    if( t_final > VLC_TS_INVALID )
+    if( t_final > VLC_TICK_INVALID )
         p_dst->date = t_final;
 
     return true;

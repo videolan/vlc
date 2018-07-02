@@ -185,7 +185,7 @@ void EsOutMilestoneCommand::Execute()
 EsOutMediaProgressCommand::EsOutMediaProgressCommand(const SegmentTimes &t)
     : AbstractCommand( ES_OUT_PRIVATE_COMMAND_PROGRESS )
 {
-    times = Times(t, VLC_TS_INVALID);
+    times = Times(t, VLC_TICK_INVALID);
 }
 
 void EsOutMediaProgressCommand::Execute()
@@ -334,8 +334,8 @@ static bool compareCommands( const Queueentry &a, const Queueentry &b )
 
         return a.first < b.first;
     }
-    else if (a.second->getTimes().continuous == VLC_TS_INVALID ||
-             b.second->getTimes().continuous == VLC_TS_INVALID)
+    else if (a.second->getTimes().continuous == VLC_TICK_INVALID ||
+             b.second->getTimes().continuous == VLC_TICK_INVALID)
     {
         return a.first < b.first;
     }
@@ -359,7 +359,7 @@ void CommandsQueue::Schedule( AbstractCommand *command, EsType )
     }
     else if( command->getType() == ES_OUT_SET_GROUP_PCR )
     {
-        if(command->getTimes().continuous != VLC_TS_INVALID)
+        if(command->getTimes().continuous != VLC_TICK_INVALID)
             bufferinglevel = command->getTimes();
         LockedCommit();
         commands.push_back( Queueentry(nextsequence++, command) );
@@ -420,7 +420,7 @@ Times CommandsQueue::Process( Times barrier )
                 disabled_esids.insert( id );
                 commands.push_back( entry );
             }
-            else if( command->getTimes().continuous == VLC_TS_INVALID )
+            else if( command->getTimes().continuous == VLC_TICK_INVALID )
             {
                 if( disabled_esids.find( id ) == disabled_esids.end() )
                     output.push_back( entry );
@@ -450,7 +450,7 @@ Times CommandsQueue::Process( Times barrier )
         if( command->getType() == ES_OUT_PRIVATE_COMMAND_SEND )
         {
             Times times = command->getTimes();
-            if( times.continuous != VLC_TS_INVALID )
+            if( times.continuous != VLC_TICK_INVALID )
                 lastdts = times;
         }
 
@@ -507,9 +507,9 @@ void CommandsQueue::setDraining()
 Times CommandsQueue::getDemuxedAmount(Times from) const
 {
     Times bufferingstart = getFirstTimes();
-    if( bufferinglevel.continuous == VLC_TS_INVALID ||
-        bufferingstart.continuous == VLC_TS_INVALID ||
-        from.continuous == VLC_TS_INVALID ||
+    if( bufferinglevel.continuous == VLC_TICK_INVALID ||
+        bufferingstart.continuous == VLC_TICK_INVALID ||
+        from.continuous == VLC_TICK_INVALID ||
         from.continuous > bufferinglevel.continuous )
         return Times(SegmentTimes(0,0),0); /* durations */
 
@@ -520,8 +520,8 @@ Times CommandsQueue::getDemuxedAmount(Times from) const
 
 Times CommandsQueue::getDemuxedMediaAmount(const Times &from) const
 {
-    if(from.continuous == VLC_TS_INVALID ||
-       bufferinglevel_media.media == VLC_TS_INVALID ||
+    if(from.continuous == VLC_TICK_INVALID ||
+       bufferinglevel_media.media == VLC_TICK_INVALID ||
        from.segment.media > bufferinglevel_media.media)
         return Times(SegmentTimes(0,0),0);  /* durations */
     Times t = from;
@@ -541,9 +541,9 @@ Times CommandsQueue::getFirstTimes() const
     for( it = commands.begin(); it != commands.end(); ++it )
     {
         const Times times = (*it).second->getTimes();
-        if( times.continuous != VLC_TS_INVALID )
+        if( times.continuous != VLC_TICK_INVALID )
         {
-            if( times.continuous < first.continuous || first.continuous == VLC_TS_INVALID )
+            if( times.continuous < first.continuous || first.continuous == VLC_TICK_INVALID )
                 first = times;
             break;
         }

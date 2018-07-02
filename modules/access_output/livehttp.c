@@ -254,7 +254,7 @@ static int Open( vlc_object_t *p_this )
     vlc_array_init( &p_sys->segments_t );
 
     p_sys->stuffing_size = 0;
-    p_sys->i_opendts = VLC_TS_INVALID;
+    p_sys->i_opendts = VLC_TICK_INVALID;
     p_sys->i_dts_offset  = 0;
 
     p_sys->psz_indexPath = NULL;

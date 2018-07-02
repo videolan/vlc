@@ -437,7 +437,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
             return true;
     }
 
-    if ( sys.i_pts != VLC_TS_INVALID )
+    if ( sys.i_pts != VLC_TICK_INVALID )
     {
         if ( p_current_vchapter != NULL && p_current_vchapter->ContainsTimestamp( sys.i_pts - VLC_TS_0 ))
             p_cur_vchapter = p_current_vchapter;

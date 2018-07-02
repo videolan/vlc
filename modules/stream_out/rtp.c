@@ -524,7 +524,7 @@ static int Open( vlc_object_t *p_this )
      * without waiting (and already did in the VoD case). So until then,
      * we use an arbitrary reference PTS for timestamp computations, and
      * then actual PTS will catch up using offsets. */
-    p_sys->i_npt_zero = VLC_TS_INVALID;
+    p_sys->i_npt_zero = VLC_TICK_INVALID;
     p_sys->i_pts_zero = rtp_init_ts(p_sys->p_vod_media,
                                     p_sys->psz_vod_session);
     p_sys->i_es = 0;
@@ -1172,7 +1172,7 @@ static sout_stream_id_sys_t *Add( sout_stream_t *p_stream,
 #endif
 
     vlc_mutex_lock( &p_sys->lock_ts );
-    id->b_ts_init = ( p_sys->i_npt_zero != VLC_TS_INVALID );
+    id->b_ts_init = ( p_sys->i_npt_zero != VLC_TICK_INVALID );
     vlc_mutex_unlock( &p_sys->lock_ts );
     if( id->b_ts_init )
         id->i_ts_offset = rtp_compute_ts( id->rtp_fmt.clock_rate,
@@ -1597,7 +1597,7 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream, const sout_stream_id_sys_t *i
     i_npt_zero = p_sys->i_npt_zero;
     vlc_mutex_unlock( &p_sys->lock_ts );
 
-    if( i_npt_zero == VLC_TS_INVALID )
+    if( i_npt_zero == VLC_TICK_INVALID )
         return p_sys->i_pts_zero;
 
     vlc_tick_t now = mdate();
@@ -1618,7 +1618,7 @@ void rtp_packetize_common( sout_stream_id_sys_t *id, block_t *out,
     {
         sout_stream_sys_t *p_sys = id->p_stream->p_sys;
         vlc_mutex_lock( &p_sys->lock_ts );
-        if( p_sys->i_npt_zero == VLC_TS_INVALID )
+        if( p_sys->i_npt_zero == VLC_TICK_INVALID )
         {
             /* This is the first packet of any ES. We initialize the
              * NPT=0 time reference, and the offset to match the

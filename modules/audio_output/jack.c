@@ -125,7 +125,7 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         return VLC_EGENERIC;
 
     p_sys->latency = 0;
-    p_sys->paused = VLC_TS_INVALID;
+    p_sys->paused = VLC_TICK_INVALID;
 
     /* Connect to the JACK server */
     psz_name = var_InheritString( p_aout, "jack-name" );
@@ -324,7 +324,7 @@ static void Pause(audio_output_t *aout, bool paused, vlc_tick_t date)
     } else {
         date -= sys->paused;
         msg_Dbg(aout, "resuming after %"PRId64" us", date);
-        sys->paused = VLC_TS_INVALID;
+        sys->paused = VLC_TICK_INVALID;
     }
 }
 
@@ -371,7 +371,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
 
     /* Get the next audio data buffer unless paused */
 
-    if( p_sys->paused == VLC_TS_INVALID )
+    if( p_sys->paused == VLC_TICK_INVALID )
         frames_from_rb = i_frames;
 
     /* Get the JACK buffers to write to */

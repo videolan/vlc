@@ -206,8 +206,8 @@ static int Open(vlc_object_t *p_this)
                                 p_dec->fmt_in.video.i_frame_rate_base );
     else
         date_Init( &p_sys->dts, 2 * 30000, 1001 );
-    date_Set( &p_sys->dts, VLC_TS_INVALID );
-    p_sys->pts = VLC_TS_INVALID;
+    date_Set( &p_sys->dts, VLC_TICK_INVALID );
+    p_sys->pts = VLC_TICK_INVALID;
     p_sys->b_need_ts = true;
 
     /* Set callbacks */
@@ -339,7 +339,7 @@ static void PacketizeReset(void *p_private, bool b_broken)
 
     p_sys->b_init_sequence_complete = false;
     p_sys->b_need_ts = true;
-    date_Set(&p_sys->dts, VLC_TS_INVALID);
+    date_Set(&p_sys->dts, VLC_TICK_INVALID);
 }
 
 static bool InsertXPS(decoder_t *p_dec, uint8_t i_nal_type, uint8_t i_id,
@@ -841,12 +841,12 @@ static void SetOutputBlockProperties(decoder_t *p_dec, block_t *p_output)
         uint8_t i_num_clock_ts = hevc_get_num_clock_ts(p_sys->p_active_sps,
                                                        p_sys->p_timing);
         const vlc_tick_t i_start = date_Get(&p_sys->dts);
-        if( i_start != VLC_TS_INVALID )
+        if( i_start != VLC_TICK_INVALID )
         {
             date_Increment(&p_sys->dts, i_num_clock_ts);
             p_output->i_length = date_Get(&p_sys->dts) - i_start;
         }
-        p_sys->pts = VLC_TS_INVALID;
+        p_sys->pts = VLC_TICK_INVALID;
     }
     hevc_release_sei_pic_timing(p_sys->p_timing);
     p_sys->p_timing = NULL;
@@ -863,10 +863,10 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 
     if(p_sys->b_need_ts)
     {
-        if(p_frag->i_dts > VLC_TS_INVALID)
+        if(p_frag->i_dts > VLC_TICK_INVALID)
             date_Set(&p_sys->dts, p_frag->i_dts);
         p_sys->pts = p_frag->i_pts;
-        if(date_Get( &p_sys->dts ) != VLC_TS_INVALID)
+        if(date_Get( &p_sys->dts ) != VLC_TICK_INVALID)
             p_sys->b_need_ts = false;
         *pb_ts_used = true;
     }
@@ -906,7 +906,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     if(p_output)
     {
         SetOutputBlockProperties( p_dec, p_output );
-        if (dts > VLC_TS_INVALID)
+        if (dts > VLC_TICK_INVALID)
             date_Set(&p_sys->dts, dts);
         p_sys->pts = pts;
         *pb_ts_used = true;

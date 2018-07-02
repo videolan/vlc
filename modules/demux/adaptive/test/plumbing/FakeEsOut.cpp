@@ -123,7 +123,7 @@ static int check2(es_out_t *out, struct context *, FakeESOut *fakees)
     try
     {
         vlc_tick_t mediaref = TMS(10000);
-        SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
+        SegmentTimes segmentTimes(VLC_TICK_INVALID, mediaref, mediaref);
 
         /* setExpectedTimestamp check starting from zero every segment (smooth streaming) */
         fakees->setSegmentStartTimes(segmentTimes);
@@ -212,7 +212,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
     try
     {
         vlc_tick_t mediaref = TMS(10000);
-        SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
+        SegmentTimes segmentTimes(VLC_TICK_INVALID, mediaref, mediaref);
         fakees->setSegmentStartTimes(segmentTimes);
 
         PCR(TMS(0));
@@ -221,7 +221,7 @@ static int check1(es_out_t *out, struct context *ctx, FakeESOut *fakees)
         PCR(TMS(5000));
 
         Times first = fakees->commandsQueue()->getFirstTimes();
-        Expect(first.continuous != VLC_TS_INVALID);
+        Expect(first.continuous != VLC_TICK_INVALID);
         Expect(first.continuous == TMS(0));
         Expect(first.segment.media == mediaref);
 
@@ -327,10 +327,10 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
     {
 
         vlc_tick_t mediaref = TMS(10000);
-        SegmentTimes segmentTimes(VLC_TS_INVALID, mediaref, mediaref);
+        SegmentTimes segmentTimes(VLC_TICK_INVALID, mediaref, mediaref);
         fakees->setSegmentStartTimes(segmentTimes);
 
-        Expect(fakees->commandsQueue()->getBufferingLevel().segment.media == VLC_TS_INVALID);
+        Expect(fakees->commandsQueue()->getBufferingLevel().segment.media == VLC_TICK_INVALID);
 
         PCR(TMS(0));
         for(int i=0; i<=5000; i += 1000)
@@ -338,7 +338,7 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
         PCR(TMS(5000));
 
         Times first = fakees->commandsQueue()->getFirstTimes();
-        Expect(first.continuous != VLC_TS_INVALID);
+        Expect(first.continuous != VLC_TICK_INVALID);
         Expect(first.continuous == TMS(0));
         Expect(first.segment.media == mediaref);
         Expect(mediaref + DMS(5000) == fakees->commandsQueue()->getBufferingLevel().segment.media);
@@ -351,7 +351,7 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
         //    assert(fakees->commandsQueue()->getBufferingLevel().continuous == TMS(6000));
 
         //    first = fakees->commandsQueue()->getFirstTimes();
-        //    assert(first.continuous != VLC_TS_INVALID);
+        //    assert(first.continuous != VLC_TICK_INVALID);
         //    assert(first.continuous == TMS(0));
         //    assert(first.segment.media == mediaref);
 
@@ -364,7 +364,7 @@ static int check0(es_out_t *out, struct context *, FakeESOut *fakees)
 
 int FakeEsOut_test()
 {
-    struct context ctx = {VLC_TS_INVALID,VLC_TS_INVALID,VLC_TS_INVALID};
+    struct context ctx = {VLC_TICK_INVALID,VLC_TICK_INVALID,VLC_TICK_INVALID};
     struct dropesout dummy = {
             .ctx = &ctx,
             .esout = {

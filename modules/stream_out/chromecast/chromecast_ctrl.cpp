@@ -113,8 +113,8 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_httpd_file(NULL)
  , m_art_url(NULL)
  , m_art_idx(0)
- , m_cc_time_date( VLC_TS_INVALID )
- , m_cc_time( VLC_TS_INVALID )
+ , m_cc_time_date( VLC_TICK_INVALID )
+ , m_cc_time( VLC_TICK_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
     m_communication = new ChromecastCommunication( p_this,
@@ -405,9 +405,9 @@ void intf_sys_t::setHasInput( const std::string mime_type )
     m_paused = false;
     m_cc_eof = false;
     m_request_load = true;
-    m_cc_time_last_request_date = VLC_TS_INVALID;
-    m_cc_time_date = VLC_TS_INVALID;
-    m_cc_time = VLC_TS_INVALID;
+    m_cc_time_last_request_date = VLC_TICK_INVALID;
+    m_cc_time_date = VLC_TICK_INVALID;
+    m_cc_time = VLC_TICK_INVALID;
     m_mediaSessionId = 0;
 
     tryLoad();
@@ -1169,7 +1169,7 @@ vlc_tick_t intf_sys_t::getPlaybackTimestamp()
         case Buffering:
         case Paused:
             if( !m_played_once )
-                return VLC_TS_INVALID;
+                return VLC_TICK_INVALID;
             /* fallthrough */
         case Playing:
         {
@@ -1185,7 +1185,7 @@ vlc_tick_t intf_sys_t::getPlaybackTimestamp()
             return m_cc_time + now - m_cc_time_date;
         }
         default:
-            return VLC_TS_INVALID;
+            return VLC_TICK_INVALID;
     }
 }
 

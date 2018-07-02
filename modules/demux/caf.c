@@ -333,7 +333,7 @@ static int FrameSpanAddDescription( demux_t *p_demux, uint64_t i_desc_offset, fr
 static inline vlc_tick_t FrameSpanGetTime( frame_span_t *span, uint32_t i_sample_rate )
 {
     if( !i_sample_rate )
-        return VLC_TS_INVALID;
+        return VLC_TICK_INVALID;
 
     return ( span->i_samples * CLOCK_FREQ ) / i_sample_rate + VLC_TS_0;
 }

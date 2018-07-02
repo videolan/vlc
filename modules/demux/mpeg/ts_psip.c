@@ -373,7 +373,7 @@ static vlc_epg_event_t * ATSC_CreateVLCEPGEvent( demux_t *p_demux, ts_psip_conte
                                                              p_ett->p_etm_data, p_ett->i_etm_length );
     }
 
-    if( i_start > VLC_TS_INVALID && psz_title )
+    if( i_start > VLC_TICK_INVALID && psz_title )
     {
 #ifdef ATSC_DEBUG_EIT
         msg_Dbg( p_demux, "EIT Event time %ld +%d %s id 0x%x",
@@ -407,7 +407,7 @@ static time_t ATSC_AddVLCEPGEvent( demux_t *p_demux, ts_psip_context_t *p_basect
             return p_evt->i_start;
         vlc_epg_event_Delete( p_evt );
     }
-    return VLC_TS_INVALID;
+    return VLC_TICK_INVALID;
 }
 
 

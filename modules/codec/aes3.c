@@ -340,7 +340,7 @@ static block_t * Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
     }
 
     /* Date management */
-    if( p_block->i_pts > VLC_TS_INVALID &&
+    if( p_block->i_pts > VLC_TICK_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );

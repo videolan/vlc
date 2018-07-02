@@ -104,7 +104,7 @@ static int SubpictureTextValidate(subpicture_t *subpic,
     VLC_UNUSED(fmt_src); VLC_UNUSED(fmt_dst);
 
     if (!has_src_changed && !has_dst_changed &&
-        (sys->i_next_update == VLC_TS_INVALID || sys->i_next_update > ts))
+        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update > ts))
         return VLC_SUCCESS;
 
     subpicture_updater_sys_region_t *p_updtregion = &sys->region;
@@ -259,7 +259,7 @@ static void SubpictureTextUpdate(subpicture_t *subpic,
     }
 
     if( b_schedule_blink_update &&
-        (sys->i_next_update == VLC_TS_INVALID || sys->i_next_update < ts) )
+        (sys->i_next_update == VLC_TICK_INVALID || sys->i_next_update < ts) )
     {
         sys->i_next_update = ts + CLOCK_FREQ;
         sys->b_blink_even = !sys->b_blink_even;

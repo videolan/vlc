@@ -334,7 +334,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->f_duration > 0.0 )
                 *pi64 = static_cast<int64_t>( p_sys->f_duration * 1000 );
             else
-                *pi64 = VLC_TS_INVALID;
+                *pi64 = VLC_TICK_INVALID;
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:
@@ -512,7 +512,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         return;
     }
 
-    if (i_pts != VLC_TS_INVALID)
+    if (i_pts != VLC_TICK_INVALID)
         i_pts += p_segment->pcr_shift - track.i_codec_delay;
 
     if ( track.fmt.i_cat != DATA_ES )
@@ -523,7 +523,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         if( !b )
         {
             if( track.fmt.i_cat == VIDEO_ES || track.fmt.i_cat == AUDIO_ES )
-                track.i_last_dts = VLC_TS_INVALID;
+                track.i_last_dts = VLC_TICK_INVALID;
             return;
         }
     }
@@ -603,7 +603,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             block_Release(p_block);
             i_pts = ( track.i_default_duration )?
                 i_pts + ( vlc_tick_t )track.i_default_duration:
-                VLC_TS_INVALID;
+                VLC_TICK_INVALID;
             continue;
          }
 
@@ -679,7 +679,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             // correct timestamping when B frames are used
             if( track.b_dts_only )
             {
-                p_block->i_pts = VLC_TS_INVALID;
+                p_block->i_pts = VLC_TICK_INVALID;
                 p_block->i_dts = i_pts;
             }
             else if( track.b_pts_only )
@@ -693,7 +693,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 // condition when the DTS is correct (keyframe or B frame == NOT P frame)
                 if ( b_key_picture || b_discardable_picture )
                         p_block->i_dts = p_block->i_pts;
-                else if ( track.i_last_dts == VLC_TS_INVALID )
+                else if ( track.i_last_dts == VLC_TICK_INVALID )
                     p_block->i_dts = i_pts;
                 else
                     p_block->i_dts = std::min( i_pts, track.i_last_dts + ( vlc_tick_t )track.i_default_duration );
@@ -705,7 +705,7 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
         /* use time stamp only for first block */
         i_pts = ( track.i_default_duration )?
                  i_pts + ( vlc_tick_t )track.i_default_duration:
-                 ( track.fmt.b_packetized ) ? VLC_TS_INVALID : i_pts + 1;
+                 ( track.fmt.b_packetized ) ? VLC_TICK_INVALID : i_pts + 1;
     }
 }
 
@@ -839,7 +839,7 @@ mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
   ,b_no_duration(false)
   ,i_default_duration(0)
   ,f_timecodescale(1.0)
-  ,i_last_dts(VLC_TS_INVALID)
+  ,i_last_dts(VLC_TICK_INVALID)
   ,i_skip_until_fpos(std::numeric_limits<uint64_t>::max())
   ,f_fps(0)
   ,p_es(NULL)

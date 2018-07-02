@@ -440,7 +440,7 @@ static void Push( decoder_t *p_dec, block_t *p_block )
     /* find insertion point */
     for( pp_block = &p_sys->p_queue; *pp_block ; pp_block = &((*pp_block)->p_next) )
     {
-        if( p_block->i_pts == VLC_TS_INVALID || (*pp_block)->i_pts == VLC_TS_INVALID )
+        if( p_block->i_pts == VLC_TICK_INVALID || (*pp_block)->i_pts == VLC_TICK_INVALID )
             continue;
         if( p_block->i_pts < (*pp_block)->i_pts )
         {
@@ -488,7 +488,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, eia608_t *h, vlc_tick_t i_pts )
     subpicture_t *p_spu = NULL;
 
     /* We cannot display a subpicture with no date */
-    if( i_pts <= VLC_TS_INVALID )
+    if( i_pts <= VLC_TICK_INVALID )
         return NULL;
 
     /* Create the subpicture unit */

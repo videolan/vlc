@@ -190,7 +190,7 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
             if( p_cea->alert_message_time_remaining )
                 p_spu->i_stop = p_spu->i_start + CLOCK_FREQ * p_cea->alert_message_time_remaining;
             else
-                p_spu->i_stop = VLC_TS_INVALID;
+                p_spu->i_stop = VLC_TICK_INVALID;
 
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = false;

@@ -62,7 +62,7 @@ static int Decode (decoder_t *dec, block_t *block)
     if (block == NULL) /* No Drain */
         return VLCDEC_SUCCESS;
 
-    if (block->i_pts <= VLC_TS_INVALID)
+    if (block->i_pts <= VLC_TICK_INVALID)
         goto drop; /* undated block, should never happen */
     if (block->i_buffer < sz_XWDheader)
         goto drop;

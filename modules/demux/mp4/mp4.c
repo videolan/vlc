@@ -1317,7 +1317,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
             }
 
             /* !important! Ensure clock is set before sending data */
-            if( p_demux->p_sys->i_pcr == VLC_TS_INVALID )
+            if( p_demux->p_sys->i_pcr == VLC_TICK_INVALID )
             {
                 es_out_SetPCR( p_demux->out, VLC_TS_0 + i_current_nzdts );
                 p_demux->p_sys->i_pcr = VLC_TS_0 + i_current_nzdts;
@@ -1331,7 +1331,7 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
             else if( tk->fmt.i_cat != VIDEO_ES )
                 p_block->i_pts = p_block->i_dts;
             else
-                p_block->i_pts = VLC_TS_INVALID;
+                p_block->i_pts = VLC_TICK_INVALID;
 
             MP4_Block_Send( p_demux, tk, p_block );
         }
@@ -1388,7 +1388,7 @@ static int DemuxMoov( demux_t *p_demux )
     const vlc_tick_t i_nztime = MP4_GetMoviePTS( p_sys );
 
     /* We demux/set pcr, even without selected tracks, (empty edits, ...) */
-    if( p_sys->i_pcr != VLC_TS_INVALID /* not after a seek */ )
+    if( p_sys->i_pcr != VLC_TICK_INVALID /* not after a seek */ )
     {
         bool b_eof = true;
         for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
@@ -1466,7 +1466,7 @@ static int DemuxMoov( demux_t *p_demux )
     }
 
     p_sys->i_nztime += DEMUX_INCREMENT;
-    if( p_sys->i_pcr > VLC_TS_INVALID )
+    if( p_sys->i_pcr > VLC_TICK_INVALID )
     {
         p_sys->i_pcr = VLC_TS_0 + p_sys->i_nztime;
         es_out_SetPCR( p_demux->out, p_sys->i_pcr );
@@ -1551,7 +1551,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, bool b_accurate )
     MP4ASF_ResetFrames( p_sys );
     /* update global time */
     p_sys->i_nztime = i_start;
-    p_sys->i_pcr  = VLC_TS_INVALID;
+    p_sys->i_pcr  = VLC_TICK_INVALID;
 
     if( b_accurate )
         es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME, i_date );
@@ -1645,7 +1645,7 @@ static int FragSeekLoadFragment( demux_t *p_demux, uint32_t i_moox, stime_t i_mo
         p_sys->context.i_lastseqnumber = FragGetMoofSequenceNumber( p_moox );
 
         p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
-        p_sys->i_pcr = VLC_TS_INVALID;
+        p_sys->i_pcr = VLC_TICK_INVALID;
     }
 
     msg_Dbg( p_demux, "seeked to %4.4s at pos %" PRIu64, (char *) &i_moox, p_moox->i_pos );
@@ -1800,7 +1800,7 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
         return VLC_EGENERIC;
     }
 
-    p_sys->i_pcr  = VLC_TS_INVALID;
+    p_sys->i_pcr  = VLC_TICK_INVALID;
 
     for( unsigned i=0; i<p_sys->i_tracks; i++ )
     {
@@ -1808,7 +1808,7 @@ static int FragSeekToTime( demux_t *p_demux, vlc_tick_t i_nztime, bool b_accurat
         {
             MP4_TrackSeek( p_demux, &p_sys->track[i], i_sync_time );
             p_sys->i_nztime = i_sync_time;
-            p_sys->i_pcr  = VLC_TS_INVALID;
+            p_sys->i_pcr  = VLC_TICK_INVALID;
         }
         else
         {
@@ -4429,7 +4429,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
         {
             p_block->i_dts = VLC_TS_0 + MP4_rescale( i_dts, p_track->i_timescale, CLOCK_FREQ );
             if( p_track->fmt.i_cat == VIDEO_ES && !( p_trun->i_flags & MP4_TRUN_SAMPLE_TIME_OFFSET ) )
-                p_block->i_pts = VLC_TS_INVALID;
+                p_block->i_pts = VLC_TICK_INVALID;
             else
                 p_block->i_pts = VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ );
             p_block->i_length = MP4_rescale( dur, p_track->i_timescale, CLOCK_FREQ );
@@ -4461,7 +4461,7 @@ static int DemuxMoof( demux_t *p_demux )
     const vlc_tick_t i_nztime = MP4_GetMoviePTS( p_sys );
 
     /* !important! Ensure clock is set before sending data */
-    if( p_sys->i_pcr == VLC_TS_INVALID )
+    if( p_sys->i_pcr == VLC_TICK_INVALID )
         es_out_SetPCR( p_demux->out, VLC_TS_0 + i_nztime );
 
     /* Set per track read state */
@@ -5003,7 +5003,7 @@ static int DemuxFrag( demux_t *p_demux )
                     if( b_discontinuity )
                     {
                         p_sys->i_nztime = FragGetDemuxTimeFromTracksTime( p_sys );
-                        p_sys->i_pcr = VLC_TS_INVALID;
+                        p_sys->i_pcr = VLC_TICK_INVALID;
                     }
                     /* !Prepare chunk */
                 }

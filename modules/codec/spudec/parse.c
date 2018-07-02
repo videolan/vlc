@@ -293,7 +293,7 @@ static int Validate( decoder_t *p_dec, unsigned i_index,
         return VLC_EGENERIC;
     }
 
-    if( p_spu_properties->i_start == VLC_TS_INVALID )
+    if( p_spu_properties->i_start == VLC_TICK_INVALID )
     {
         msg_Err( p_dec, "no `start display' command" );
         return VLC_EGENERIC;
@@ -370,8 +370,8 @@ static int ParseControlSeq( decoder_t *p_dec, vlc_tick_t i_pts,
     /* Initialize the structure */
     spu_properties_t spu_properties;
     memset( &spu_properties, 0, sizeof(spu_properties) );
-    spu_properties.i_start = VLC_TS_INVALID;
-    spu_properties.i_stop = VLC_TS_INVALID;
+    spu_properties.i_start = VLC_TICK_INVALID;
+    spu_properties.i_stop = VLC_TICK_INVALID;
     spu_properties.b_subtitle = true;
 
     for( i_index = 4 + p_sys->i_rle_size; i_index < p_sys->i_spu_size ; )

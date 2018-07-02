@@ -167,14 +167,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_entry_point = false;
     p_sys->ep.p_ep = NULL;
 
-    p_sys->i_frame_dts = VLC_TS_INVALID;
-    p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->i_frame_dts = VLC_TICK_INVALID;
+    p_sys->i_frame_pts = VLC_TICK_INVALID;
 
     p_sys->b_frame = false;
     p_sys->p_frame = NULL;
     p_sys->pp_last = &p_sys->p_frame;
 
-    p_sys->i_interpolated_dts = VLC_TS_INVALID;
+    p_sys->i_interpolated_dts = VLC_TICK_INVALID;
     p_sys->b_check_startcode = p_dec->fmt_in.b_packetized;
 
     if( p_dec->fmt_out.i_extra > 0 )
@@ -195,8 +195,8 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    p_sys->i_cc_pts = VLC_TS_INVALID;
-    p_sys->i_cc_dts = VLC_TS_INVALID;
+    p_sys->i_cc_pts = VLC_TICK_INVALID;
+    p_sys->i_cc_dts = VLC_TICK_INVALID;
     p_sys->i_cc_flags = 0;
     cc_Init( &p_sys->cc );
     cc_Init( &p_sys->cc_next );
@@ -287,9 +287,9 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->b_frame = false;
     }
 
-    p_sys->i_frame_dts = VLC_TS_INVALID;
-    p_sys->i_frame_pts = VLC_TS_INVALID;
-    p_sys->i_interpolated_dts = VLC_TS_INVALID;
+    p_sys->i_frame_dts = VLC_TICK_INVALID;
+    p_sys->i_frame_pts = VLC_TICK_INVALID;
+    p_sys->i_interpolated_dts = VLC_TICK_INVALID;
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
@@ -303,7 +303,7 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
     decoder_t *p_dec = p_private;
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    if( p_sys->i_interpolated_dts <= VLC_TS_INVALID )
+    if( p_sys->i_interpolated_dts <= VLC_TICK_INVALID )
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
@@ -381,23 +381,23 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         p_pic->i_pts = p_sys->i_frame_pts;
 
         /* */
-        if( p_pic->i_dts > VLC_TS_INVALID )
+        if( p_pic->i_dts > VLC_TICK_INVALID )
             p_sys->i_interpolated_dts = p_pic->i_dts;
 
         /* We can interpolate dts/pts only if we have a frame rate */
         if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
         {
-            if( p_sys->i_interpolated_dts > VLC_TS_INVALID )
+            if( p_sys->i_interpolated_dts > VLC_TICK_INVALID )
                 p_sys->i_interpolated_dts += INT64_C(1000000) *
                                              p_dec->fmt_out.video.i_frame_rate_base /
                                              p_dec->fmt_out.video.i_frame_rate;
 
             //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
             //         p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );
-            if( p_pic->i_dts <= VLC_TS_INVALID )
+            if( p_pic->i_dts <= VLC_TICK_INVALID )
                 p_pic->i_dts = p_sys->i_interpolated_dts;
 
-            if( p_pic->i_pts <= VLC_TS_INVALID )
+            if( p_pic->i_pts <= VLC_TICK_INVALID )
             {
                 if( !p_sys->sh.b_has_bframe || (p_pic->i_flags & BLOCK_FLAG_TYPE_B ) )
                     p_pic->i_pts = p_pic->i_dts;
@@ -417,14 +417,14 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 
         /* Reset context */
         p_sys->b_frame = false;
-        p_sys->i_frame_dts = VLC_TS_INVALID;
-        p_sys->i_frame_pts = VLC_TS_INVALID;
+        p_sys->i_frame_dts = VLC_TICK_INVALID;
+        p_sys->i_frame_pts = VLC_TICK_INVALID;
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
     }
 
     /*  */
-    if( p_sys->i_frame_dts <= VLC_TS_INVALID && p_sys->i_frame_pts <= VLC_TS_INVALID )
+    if( p_sys->i_frame_dts <= VLC_TICK_INVALID && p_sys->i_frame_pts <= VLC_TICK_INVALID )
     {
         p_sys->i_frame_dts = p_frag->i_dts;
         p_sys->i_frame_pts = p_frag->i_pts;

@@ -389,7 +389,7 @@ static int Demux( demux_t *p_demux )
         return VLC_DEMUXER_EOF;
 
     p_data->i_dts = VLC_TS_0 + (int64_t)fh.i_timecode * 1000;
-    p_data->i_pts = (fh.i_type == 'V') ? VLC_TS_INVALID : p_data->i_dts;
+    p_data->i_pts = (fh.i_type == 'V') ? VLC_TICK_INVALID : p_data->i_dts;
 
     /* only add keyframes to index */
     if( !fh.i_keyframe && !p_sys->b_index )

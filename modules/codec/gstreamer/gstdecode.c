@@ -693,17 +693,17 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
             return VLCDEC_ECRITICAL;
         }
 
-        if( p_block->i_dts > VLC_TS_INVALID )
+        if( p_block->i_dts > VLC_TICK_INVALID )
             GST_BUFFER_DTS( p_buf ) = gst_util_uint64_scale( p_block->i_dts,
                     GST_SECOND, GST_MSECOND );
 
-        if( p_block->i_pts <= VLC_TS_INVALID )
+        if( p_block->i_pts <= VLC_TICK_INVALID )
             GST_BUFFER_PTS( p_buf ) = GST_BUFFER_DTS( p_buf );
         else
             GST_BUFFER_PTS( p_buf ) = gst_util_uint64_scale( p_block->i_pts,
                     GST_SECOND, GST_MSECOND );
 
-        if( p_block->i_length > VLC_TS_INVALID )
+        if( p_block->i_length > VLC_TICK_INVALID )
             GST_BUFFER_DURATION( p_buf ) = gst_util_uint64_scale(
                     p_block->i_length, GST_SECOND, GST_MSECOND );
 

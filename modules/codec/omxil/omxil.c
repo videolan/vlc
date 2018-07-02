@@ -1631,7 +1631,7 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
             if( !decoder_UpdateVideoFormat(p_dec))
                 invalid_picture = decoder_NewPicture(p_dec);
             if (invalid_picture) {
-                invalid_picture->date = VLC_TS_INVALID;
+                invalid_picture->date = VLC_TICK_INVALID;
                 picture_sys_t *p_picsys = invalid_picture->p_sys;
                 p_picsys->hw.p_dec = NULL;
                 p_picsys->hw.i_index = -1;

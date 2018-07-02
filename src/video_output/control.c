@@ -185,7 +185,7 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
         vlc_cond_broadcast(&ctrl->wait_acknowledge);
 
         /* Spurious wakeups are perfectly fine */
-        if (deadline > VLC_TS_INVALID && ctrl->can_sleep)
+        if (deadline > VLC_TICK_INVALID && ctrl->can_sleep)
             vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
     }
 

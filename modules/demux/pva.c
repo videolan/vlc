@@ -215,7 +215,7 @@ static int Demux( demux_t *p_demux )
                 if( ( p_frame = p_sys->p_es ) )
                 {
 
-                    if( p_frame->i_pts > VLC_TS_INVALID && !p_sys->b_pcr_audio )
+                    if( p_frame->i_pts > VLC_TICK_INVALID && !p_sys->b_pcr_audio )
                     {
                         es_out_SetPCR( p_demux->out, p_frame->i_pts);
                     }

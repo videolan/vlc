@@ -131,7 +131,7 @@ ts_pmt_t *ts_pmt_New( demux_t *p_demux )
     pmt->pcr.i_current = -1;
     pmt->pcr.i_first  = -1;
     pmt->pcr.b_disable = false;
-    pmt->pcr.i_first_dts = VLC_TS_INVALID;
+    pmt->pcr.i_first_dts = VLC_TICK_INVALID;
     pmt->pcr.i_pcroffset = -1;
 
     pmt->pcr.b_fix_done = false;
@@ -286,7 +286,7 @@ ts_stream_t *ts_stream_New( demux_t *p_demux, ts_pmt_t *p_program )
     pes->gather.p_data = NULL;
     pes->gather.pp_last = &pes->gather.p_data;
     pes->gather.i_saved = 0;
-    pes->gather.i_append_pcr = VLC_TS_INVALID;
+    pes->gather.i_append_pcr = VLC_TICK_INVALID;
     pes->b_broken_PUSI_conformance = false;
     pes->b_always_receive = false;
     pes->p_sections_proc = NULL;

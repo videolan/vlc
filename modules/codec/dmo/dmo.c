@@ -838,11 +838,11 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
 
     /* Won't work with streams with B-frames, but do we have any ? */
-    if( p_block && p_block->i_pts <= VLC_TS_INVALID )
+    if( p_block && p_block->i_pts <= VLC_TICK_INVALID )
         p_block->i_pts = p_block->i_dts;
 
     /* Date management */
-    if( p_block && p_block->i_pts > VLC_TS_INVALID &&
+    if( p_block && p_block->i_pts > VLC_TICK_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );

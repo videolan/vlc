@@ -1038,7 +1038,7 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
         return VLCDEC_SUCCESS;
 
     /* We cannot display a subpicture with no date */
-    if( p_block->i_pts <= VLC_TS_INVALID )
+    if( p_block->i_pts <= VLC_TICK_INVALID )
     {
         msg_Warn( p_dec, "subtitle without a date" );
         return VLCDEC_SUCCESS;

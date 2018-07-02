@@ -200,7 +200,7 @@ static inline block_t *dv_extract_audio( block_t *p_frame_block )
         }
     }
 
-    p_block->i_pts = p_frame_block->i_pts > VLC_TS_INVALID ? p_frame_block->i_pts
+    p_block->i_pts = p_frame_block->i_pts > VLC_TICK_INVALID ? p_frame_block->i_pts
                                                            : p_frame_block->i_dts;
     p_block->i_dts = p_frame_block->i_dts;
     return p_block;

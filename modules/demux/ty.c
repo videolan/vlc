@@ -334,8 +334,8 @@ static int Open(vlc_object_t *p_this)
     p_sys->b_first_chunk = true;
     p_sys->b_have_master = (U32_AT(p_peek) == TIVO_PES_FILEID);
     p_sys->firstAudioPTS = -1;
-    p_sys->lastAudioPTS  = VLC_TS_INVALID;
-    p_sys->lastVideoPTS  = VLC_TS_INVALID;
+    p_sys->lastAudioPTS  = VLC_TICK_INVALID;
+    p_sys->lastVideoPTS  = VLC_TICK_INVALID;
     p_sys->i_stream_size = stream_Size(p_demux->s);
     p_sys->tivo_type = TIVO_TYPE_UNKNOWN;
     p_sys->audio_type = TIVO_AUDIO_UNKNOWN;
@@ -446,7 +446,7 @@ static int Demux( demux_t *p_demux )
 
         /* set these as 'unknown' for now */
         p_block_in->i_pts =
-        p_block_in->i_dts = VLC_TS_INVALID;
+        p_block_in->i_dts = VLC_TICK_INVALID;
     }
     /*else
     {
@@ -748,13 +748,13 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
             //p_sys->l_last_ty_pts += 33366667;
         }
         /* set PTS for this block before we send */
-        if (p_sys->lastVideoPTS > VLC_TS_INVALID)
+        if (p_sys->lastVideoPTS > VLC_TICK_INVALID)
         {
             p_block_in->i_pts = p_sys->lastVideoPTS;
             /* PTS gets used ONCE.
              * Any subsequent frames we get BEFORE next PES
              * header will have their PTS computed in the codec */
-            p_sys->lastVideoPTS = VLC_TS_INVALID;
+            p_sys->lastVideoPTS = VLC_TICK_INVALID;
         }
     }
 
@@ -784,7 +784,7 @@ static int DemuxRecVideo( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
 
     }
     /* Send the CC data */
-    if( p_block_in->i_pts > VLC_TS_INVALID && p_sys->cc.i_data > 0 )
+    if( p_block_in->i_pts > VLC_TICK_INVALID && p_sys->cc.i_data > 0 )
     {
         for( i = 0; i < 4; i++ )
         {
@@ -949,7 +949,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
         /*msg_Dbg(p_demux,
                 "Adding SA Audio Packet Size %ld", l_rec_size ); */
 
-        if (p_sys->lastAudioPTS > VLC_TS_INVALID )
+        if (p_sys->lastAudioPTS > VLC_TICK_INVALID )
             p_block_in->i_pts = p_sys->lastAudioPTS;
     }
     else if( subrec_type == 0x09 )
@@ -1000,7 +1000,7 @@ static int DemuxRecAudio( demux_t *p_demux, ty_rec_hdr_t *rec_hdr, block_t *p_bl
     }
 
     /* set PCR before we send (if PTS found) */
-    if( p_block_in->i_pts > VLC_TS_INVALID )
+    if( p_block_in->i_pts > VLC_TICK_INVALID )
         es_out_Control( p_demux->out, ES_OUT_SET_PCR,
                         p_block_in->i_pts );
     /* Send data */
@@ -1084,7 +1084,7 @@ static int ty_stream_seek_pct(demux_t *p_demux, double seek_pct)
                  (p_sys->i_num_recs * 16) + l_skip_amt + 4);
 
     /* to hell with syncing any audio or video, just start reading records... :) */
-    /*p_sys->lastAudioPTS = p_sys->lastVideoPTS = VLC_TS_INVALID;*/
+    /*p_sys->lastAudioPTS = p_sys->lastVideoPTS = VLC_TICK_INVALID;*/
     return VLC_SUCCESS;
 }
 

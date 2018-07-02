@@ -1460,7 +1460,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
                     tk->i_next_block_flags = 0;
                     if( i_next_block_flags & BLOCK_FLAG_CELL_DISCONTINUITY )
                     {
-                        if( p_pkt->i_dts >= VLC_TS_INVALID )
+                        if( p_pkt->i_dts >= VLC_TICK_INVALID )
                         {
                             i_next_block_flags &= ~BLOCK_FLAG_CELL_DISCONTINUITY;
                             i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
