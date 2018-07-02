@@ -271,7 +271,8 @@ struct encoder_t
 VLC_USED
 static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+
     if( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs->video.format_update != NULL )
         return dec->cbs->video.format_update( dec );
     else
@@ -298,7 +299,7 @@ static inline int decoder_UpdateVideoFormat( decoder_t *dec )
 VLC_USED
 static inline picture_t *decoder_NewPicture( decoder_t *dec )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
     return dec->cbs->video.buffer_new( dec );
 }
 
@@ -321,9 +322,9 @@ VLC_API void decoder_AbortPictures( decoder_t *dec, bool b_abort );
  */
 static inline void decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
-    assert( p_pic->p_next == NULL );
-    assert( dec->cbs->video.queue != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( p_pic->p_next == NULL );
+    vlc_assert( dec->cbs->video.queue != NULL );
     dec->cbs->video.queue( dec, p_pic );
 }
 
@@ -337,7 +338,8 @@ static inline void decoder_QueueVideo( decoder_t *dec, picture_t *p_pic )
 static inline void decoder_QueueCc( decoder_t *dec, block_t *p_cc,
                                    const decoder_cc_desc_t *p_desc )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+
     if( dec->cbs->video.queue_cc == NULL )
         block_Release( p_cc );
     else
@@ -353,9 +355,9 @@ static inline void decoder_QueueCc( decoder_t *dec, block_t *p_cc,
  */
 static inline void decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
 {
-    assert( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs != NULL );
-    assert( p_aout_buf->p_next == NULL );
-    assert( dec->cbs->audio.queue != NULL );
+    vlc_assert( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs != NULL );
+    vlc_assert( p_aout_buf->p_next == NULL );
+    vlc_assert( dec->cbs->audio.queue != NULL );
     dec->cbs->audio.queue( dec, p_aout_buf );
 }
 
@@ -368,9 +370,9 @@ static inline void decoder_QueueAudio( decoder_t *dec, block_t *p_aout_buf )
  */
 static inline void decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
 {
-    assert( dec->fmt_in.i_cat == SPU_ES && dec->cbs != NULL );
-    assert( p_spu->p_next == NULL );
-    assert( dec->cbs->spu.queue != NULL );
+    vlc_assert( dec->fmt_in.i_cat == SPU_ES && dec->cbs != NULL );
+    vlc_assert( p_spu->p_next == NULL );
+    vlc_assert( dec->cbs->spu.queue != NULL );
     dec->cbs->spu.queue( dec, p_spu );
 }
 
@@ -382,7 +384,8 @@ static inline void decoder_QueueSub( decoder_t *dec, subpicture_t *p_spu )
 VLC_USED
 static inline int decoder_UpdateAudioFormat( decoder_t *dec )
 {
-    assert( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs != NULL );
+
     if( dec->fmt_in.i_cat == AUDIO_ES && dec->cbs->audio.format_update != NULL )
         return dec->cbs->audio.format_update( dec );
     else
@@ -405,7 +408,8 @@ VLC_USED
 static inline subpicture_t *decoder_NewSubpicture( decoder_t *dec,
                                                    const subpicture_updater_t *p_dyn )
 {
-    assert( dec->fmt_in.i_cat == SPU_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == SPU_ES && dec->cbs != NULL );
+
     subpicture_t *p_subpicture = dec->cbs->spu.buffer_new( dec, p_dyn );
     if( !p_subpicture )
         msg_Warn( dec, "can't get output subpicture" );
@@ -421,7 +425,8 @@ static inline int decoder_GetInputAttachments( decoder_t *dec,
                                                input_attachment_t ***ppp_attachment,
                                                int *pi_attachment )
 {
-    assert( dec->cbs != NULL );
+    vlc_assert( dec->cbs != NULL );
+
     if( !dec->cbs->get_attachments )
         return VLC_EGENERIC;
 
@@ -436,7 +441,8 @@ static inline int decoder_GetInputAttachments( decoder_t *dec,
 VLC_USED
 static inline vlc_tick_t decoder_GetDisplayDate( decoder_t *dec, vlc_tick_t i_ts )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+
     if( !dec->cbs->video.get_display_date )
         return VLC_TS_INVALID;
 
@@ -450,7 +456,8 @@ static inline vlc_tick_t decoder_GetDisplayDate( decoder_t *dec, vlc_tick_t i_ts
 VLC_USED
 static inline float decoder_GetDisplayRate( decoder_t *dec )
 {
-    assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+    vlc_assert( dec->fmt_in.i_cat == VIDEO_ES && dec->cbs != NULL );
+
     if( !dec->cbs->video.get_display_rate )
         return 1.f;
 

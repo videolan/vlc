@@ -246,7 +246,26 @@
  * If the branch is reached in a non-debug build, this macro is equivalent to
  * \ref unreachable and the behaviour is undefined.
  */
-#define vlc_assert_unreachable() (assert(!"unreachable"), unreachable())
+#define vlc_assert_unreachable() (vlc_assert(!"unreachable"), unreachable())
+
+/**
+ * Run-time assertion
+ *
+ * This macro performs a run-time assertion if C assertions are enabled
+ * and the following preprocessor symbol is defined:
+ * @verbatim __LIBVLC__ @endverbatim
+ * That restriction ensures that assertions in public header files are not
+ * unwittingly <i>leaked</i> to externally-compiled plug-ins
+ * including those header files.
+ *
+ * Within the LibVLC code base, this is exactly the same as assert(), which can
+ * and probably should be used directly instead.
+ */
+#ifdef __LIBVLC__
+# define vlc_assert(pred) assert(pred)
+#else
+# define vlc_assert(pred) ((void)0)
+#endif
 
 /* Linkage */
 #ifdef __cplusplus

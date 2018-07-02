@@ -263,7 +263,7 @@ enum
  */
 static inline void picture_SwapUV(picture_t *picture)
 {
-    assert(picture->i_planes == 3);
+    vlc_assert(picture->i_planes == 3);
 
     plane_t tmp_plane   = picture->p[U_PLANE];
     picture->p[U_PLANE] = picture->p[V_PLANE];
