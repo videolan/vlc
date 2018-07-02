@@ -1466,6 +1466,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
         }
     }
 
+    vlc_mutex_lock( &p_owner->lock );
 #ifdef ENABLE_SOUT
     if ( p_owner->p_sout_input != NULL )
     {
@@ -1488,7 +1489,6 @@ static void DecoderProcessFlush( decoder_t *p_dec )
             vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
     }
 
-    vlc_mutex_lock( &p_owner->lock );
     p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
     vlc_mutex_unlock( &p_owner->lock );
 }
@@ -1582,7 +1582,9 @@ static void *DecoderThread( void *p_data )
             paused = p_owner->paused;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
+            vlc_mutex_lock( &p_owner->lock );
             OutputChangePause( p_dec, paused, date );
+            vlc_mutex_unlock( &p_owner->lock );
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
@@ -1596,7 +1598,9 @@ static void *DecoderThread( void *p_data )
             rate = p_owner->rate;
             vlc_fifo_Unlock( p_owner->p_fifo );
 
+            vlc_mutex_lock( &p_owner->lock );
             OutputChangeRate( p_dec, rate );
+            vlc_mutex_unlock( &p_owner->lock );
 
             vlc_restorecancel( canc );
             vlc_fifo_Lock( p_owner->p_fifo );
