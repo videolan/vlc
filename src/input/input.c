@@ -2246,10 +2246,10 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            input_control_param_t param;
-            param.time.i_val = time_offset;
-            param.time.b_fast_seek = false;
-            b_force_update = Control( p_input, INPUT_CONTROL_SET_TIME, param );
+            b_force_update =
+                Control( p_input, INPUT_CONTROL_SET_TIME,
+                         (input_control_param_t) { .time.i_val = time_offset,
+                                                   .time.b_fast_seek = false } );
             break;
         }
         case INPUT_CONTROL_SET_RENDERER:
