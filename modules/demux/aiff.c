@@ -235,7 +235,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Set PCR */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_time);
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_time);
 
     /* we will read 100ms at once */
     i_read = p_sys->i_ssnd_fsize * ( p_sys->fmt.audio.i_rate / 10 );
@@ -249,7 +249,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = VLC_TS_0 + p_sys->i_time;
+    p_block->i_pts = VLC_TICK_0 + p_sys->i_time;
 
     p_sys->i_time += CLOCK_FREQ *
                      p_block->i_buffer /

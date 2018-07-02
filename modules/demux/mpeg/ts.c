@@ -1005,7 +1005,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             ReadyQueuesPostSeek( p_demux );
             es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                            FROM_SCALE(p_pmt->pcr.i_first) + i64 - VLC_TS_0 );
+                            FROM_SCALE(p_pmt->pcr.i_first) + i64 - VLC_TICK_0 );
             return VLC_SUCCESS;
         }
         break;
@@ -1978,7 +1978,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, stime_t i_scaled
                 stime_t i_diff = i_scaledtime - TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
                 if ( i_diff < 0 )
                     i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
-                else if( i_diff < TO_SCALE(VLC_TS_0 + CLOCK_FREQ / 2) ) // 500ms
+                else if( i_diff < TO_SCALE(VLC_TICK_0 + CLOCK_FREQ / 2) ) // 500ms
                     b_found = true;
                 else
                     i_head_pos = i_pos;

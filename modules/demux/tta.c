@@ -208,7 +208,7 @@ static int Demux( demux_t *p_demux )
                                p_sys->pi_seektable[p_sys->i_currentframe] );
     if( p_data == NULL )
         return VLC_DEMUXER_EOF;
-    p_data->i_dts = p_data->i_pts = VLC_TS_0 + CLOCK_FREQ * p_sys->i_currentframe * TTA_FRAMETIME;
+    p_data->i_dts = p_data->i_pts = VLC_TICK_0 + CLOCK_FREQ * p_sys->i_currentframe * TTA_FRAMETIME;
 
     p_sys->i_currentframe++;
 

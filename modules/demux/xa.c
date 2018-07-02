@@ -146,7 +146,7 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     date_Init( &p_sys->pts, fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, VLC_TS_0 );
+    date_Set( &p_sys->pts, VLC_TICK_0 );
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;

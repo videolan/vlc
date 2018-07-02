@@ -305,7 +305,7 @@ static int Demux( demux_t *p_demux )
     //const int i_version = GetWBE( &header[0] );
     const size_t  i_size = GetWBE( &header[2] ) - 12;
     const int     i_id   = GetWBE( &header[4] );
-    const int64_t i_pts  = VLC_TS_0 + 1000 * GetDWBE( &header[6] );
+    const int64_t i_pts  = VLC_TICK_0 + 1000 * GetDWBE( &header[6] );
     const int     i_flags= header[11]; /* flags 0x02 -> keyframe */
 
     p_sys->i_data_packets++;
@@ -442,9 +442,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 /* it is a rtsp stream , it is specials in access/rtsp/... */
                 msg_Dbg(p_demux, "Seek in real rtsp stream!");
-                p_sys->i_pcr = VLC_TS_0 + INT64_C(1000) * ( p_sys->i_our_duration * f  );
+                p_sys->i_pcr = VLC_TICK_0 + INT64_C(1000) * ( p_sys->i_our_duration * f  );
                 p_sys->b_seek = true;
-                return vlc_stream_Seek( p_demux->s, p_sys->i_pcr - VLC_TS_0 );
+                return vlc_stream_Seek( p_demux->s, p_sys->i_pcr - VLC_TICK_0 );
             }
             return ControlSeekByte( p_demux, i64 );
 

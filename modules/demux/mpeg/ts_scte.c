@@ -111,7 +111,7 @@ void SCTE27_Section_Callback( demux_t *p_demux,
 
     }
 
-    p_content->i_dts = p_content->i_pts = VLC_TS_0 + i_date * 100 / 9;
+    p_content->i_dts = p_content->i_pts = VLC_TICK_0 + i_date * 100 / 9;
     //PCRFixHandle( p_demux, p_pmt, p_content );
 
     if( p_pes->p_es->id )

@@ -1252,10 +1252,10 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
     for( size_t i=0; i+1 < i_timings_count; i++ )
     {
         /* We Only support absolute timings (2) */
-        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 < p_block->i_dts )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TICK_0 < p_block->i_dts )
             continue;
 
-        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TS_0 > p_block->i_dts + p_block->i_length )
+        if( tt_time_Convert( &p_timings_array[i] ) + VLC_TICK_0 > p_block->i_dts + p_block->i_length )
             break;
 
         bool b_bitmap_regions = false;
@@ -1276,8 +1276,8 @@ static int ParseBlock( decoder_t *p_dec, const block_t *p_block )
 
         if( p_regions && p_spu )
         {
-            p_spu->i_start    = VLC_TS_0 + tt_time_Convert( &p_timings_array[i] );
-            p_spu->i_stop     = VLC_TS_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
+            p_spu->i_start    = VLC_TICK_0 + tt_time_Convert( &p_timings_array[i] );
+            p_spu->i_stop     = VLC_TICK_0 + tt_time_Convert( &p_timings_array[i+1] ) - 1;
             p_spu->b_ephemer  = true;
             p_spu->b_absolute = true;
 

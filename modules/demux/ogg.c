@@ -410,7 +410,7 @@ static int Demux( demux_t * p_demux )
 
             if( i_lastdts != VLC_TICK_INVALID )
             {
-                p_sys->i_nzpcr_offset = i_lastdts - VLC_TS_0;
+                p_sys->i_nzpcr_offset = i_lastdts - VLC_TICK_0;
                 if( likely( !p_sys->b_slave ) )
                     es_out_SetPCR( p_demux->out, i_lastdts );
             }
@@ -502,7 +502,7 @@ static int Demux( demux_t * p_demux )
                 msg_Err( p_demux, "Broken Ogg stream (serialno) mismatch" );
                 Ogg_ResetStream( p_stream );
                 if( p_stream->i_pcr != VLC_TICK_INVALID )
-                    p_sys->i_nzpcr_offset = p_stream->i_pcr - VLC_TS_0;
+                    p_sys->i_nzpcr_offset = p_stream->i_pcr - VLC_TICK_0;
                 ogg_stream_reset_serialno( &p_stream->os, ogg_page_serialno( &p_sys->current_page ) );
             }
 
@@ -714,12 +714,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
-            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TS_0 + i64, b ) )
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TICK_0 + i64, b ) )
             {
                 Ogg_PreparePostSeek( p_sys );
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                    VLC_TS_0 + i64 );
+                                    VLC_TICK_0 + i64 );
                 return VLC_SUCCESS;
             }
             else
@@ -788,11 +788,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             assert( p_sys->i_length > 0 );
             i64 = CLOCK_FREQ * p_sys->i_length * f;
             Ogg_PreparePostSeek( p_sys );
-            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TS_0 + i64 ) >= 0 )
+            if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 ) >= 0 )
             {
                 if( acc )
                     es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                    VLC_TS_0 + i64 );
+                                    VLC_TICK_0 + i64 );
                 return VLC_SUCCESS;
             }
 
@@ -859,11 +859,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b );
-            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TS_0 + i64, b ) )
+            if ( Oggseek_BlindSeektoAbsoluteTime( p_demux, p_stream, VLC_TICK_0 + i64, b ) )
             {
                 Ogg_PreparePostSeek( p_sys );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                VLC_TS_0 + i64 );
+                                VLC_TICK_0 + i64 );
                 p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
                 p_sys->cur_seekpoint = i_seekpoint;
                 return VLC_SUCCESS;
@@ -3252,7 +3252,7 @@ bool Ogg_GetBoundsUsingSkeletonIndex( logical_stream_t *p_stream, vlc_tick_t i_t
          i_time == VLC_TICK_INVALID )
         return false;
 
-    i_time -= VLC_TS_0;
+    i_time -= VLC_TICK_0;
 
     /* Validate range */
     if ( i_time < p_stream->p_skel->i_indexfirstnum

@@ -1890,7 +1890,7 @@ static int Demux( demux_t *p_demux )
             if( i_pts != VLC_TICK_INVALID ) {
                 i_pts += 5;
                 i_pts /= 10; /* 100-ns to µs conversion */
-                i_pts += VLC_TS_0;
+                i_pts += VLC_TICK_0;
             }
 #if 0
             msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %" PRId64,

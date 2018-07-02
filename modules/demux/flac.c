@@ -372,7 +372,7 @@ static int Demux( demux_t *p_demux )
         p_sys->p_current_block->i_flags = p_sys->i_next_block_flags;
         p_sys->i_next_block_flags = 0;
         p_sys->p_current_block->i_pts =
-        p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TICK_INVALID;
+        p_sys->p_current_block->i_dts = p_sys->b_start ? VLC_TICK_0 : VLC_TICK_INVALID;
     }
 
     while( (p_block_out = GetPacketizedBlock( p_sys->p_packetizer,
@@ -389,7 +389,7 @@ static int Demux( demux_t *p_demux )
 
             /* set PCR */
             if( unlikely(p_sys->i_pts == VLC_TICK_INVALID) )
-                es_out_SetPCR( p_demux->out, __MAX(p_block_out->i_dts - 1, VLC_TS_0) );
+                es_out_SetPCR( p_demux->out, __MAX(p_block_out->i_dts - 1, VLC_TICK_0) );
 
             p_sys->i_pts = p_block_out->i_dts;
 

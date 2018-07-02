@@ -178,7 +178,7 @@ bool SegmentList::getPlaybackTimeDurationBySegmentNumber(uint64_t number,
     if(!found)
         return false;
 
-    *time = VLC_TS_0 + timescale.ToTime(seg_start);
-    *dur = VLC_TS_0 + timescale.ToTime(seg_dura);
+    *time = VLC_TICK_0 + timescale.ToTime(seg_start);
+    *dur = VLC_TICK_0 + timescale.ToTime(seg_dura);
     return true;
 }

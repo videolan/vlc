@@ -100,7 +100,7 @@ static int Open( vlc_object_t * p_this )
 
     /* There is CDG_FRAME_RATE frames per second */
     date_Init( &p_sys->pts, CDG_FRAME_RATE, 1 );
-    date_Set( &p_sys->pts, VLC_TS_0 );
+    date_Set( &p_sys->pts, VLC_TICK_0 );
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = Control;
@@ -132,12 +132,12 @@ static int Demux( demux_t *p_demux )
     i_date = vlc_stream_Tell( p_demux->s ) / CDG_FRAME_SIZE * i_delta;
     if( i_date >= date_Get( &p_sys->pts ) + i_delta )
     {
-        p_block->i_dts = p_block->i_pts = VLC_TS_0 + i_date;
-        date_Set( &p_sys->pts, VLC_TS_0 + i_date );
+        p_block->i_dts = p_block->i_pts = VLC_TICK_0 + i_date;
+        date_Set( &p_sys->pts, VLC_TICK_0 + i_date );
     }
     else
     {
-        p_block->i_dts = VLC_TS_0 + i_date;
+        p_block->i_dts = VLC_TICK_0 + i_date;
         p_block->i_pts = date_Get( &p_sys->pts );
     }
 

@@ -207,7 +207,7 @@ static int Demux( demux_t *p_demux )
     }
 
     /* Set PCR */
-    es_out_SetPCR( p_demux->out, VLC_TS_0 + p_sys->i_pcr );
+    es_out_SetPCR( p_demux->out, VLC_TICK_0 + p_sys->i_pcr );
 
     /* Read video */
     i_size = ( header[0] >> 4 ) | ( header[1] << 4 ) | ( header[2] << 12 );
@@ -257,8 +257,8 @@ static int Demux( demux_t *p_demux )
                     }
 
                     /* Skip the first part (it is the language name) */
-                    p_frame->i_pts = VLC_TS_0 + p_sys->i_pcr;
-                    p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr + 4 * CLOCK_FREQ;
+                    p_frame->i_pts = VLC_TICK_0 + p_sys->i_pcr;
+                    p_frame->i_dts = VLC_TICK_0 + p_sys->i_pcr + 4 * CLOCK_FREQ;
 
                     if( p_sys->p_sub )
                         es_out_Send( p_demux->out, p_sys->p_sub, p_frame );
@@ -281,7 +281,7 @@ static int Demux( demux_t *p_demux )
         /* msg_Dbg( p_demux, "frame video size=%d", i_size ); */
         if( i_size > 0 && ( p_frame = vlc_stream_Block( p_demux->s, i_size ) ) )
         {
-            p_frame->i_dts = VLC_TS_0 + p_sys->i_pcr;
+            p_frame->i_dts = VLC_TICK_0 + p_sys->i_pcr;
 
             if( p_sys->p_video )
                 es_out_Send( p_demux->out, p_sys->p_video, p_frame );
@@ -318,7 +318,7 @@ static int Demux( demux_t *p_demux )
         if( ( p_frame = vlc_stream_Block( p_demux->s, i_size ) ) )
         {
             p_frame->i_dts =
-            p_frame->i_pts = VLC_TS_0 + p_sys->i_pcr;
+            p_frame->i_pts = VLC_TICK_0 + p_sys->i_pcr;
 
             if( p_sys->p_audio )
                 es_out_Send( p_demux->out, p_sys->p_audio, p_frame );

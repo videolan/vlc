@@ -1456,16 +1456,16 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         }
 
         date_Init( &date, p_enc->fmt_in.video.i_frame_rate * 2, p_enc->fmt_in.video.i_frame_rate_base );
-        date_Set( &date, VLC_TS_0 );
+        date_Set( &date, VLC_TICK_0 );
         /* FIXME - Unlike dirac-research codec Schro doesn't have a function that returns the delay in pics yet.
          *   Use a default of 1
          */
         date_Increment( &date, 2 /* 2 fields, 1 frame */ );
-        p_sys->i_pts_offset = date_Get( &date ) - VLC_TS_0;
+        p_sys->i_pts_offset = date_Get( &date ) - VLC_TICK_0;
         if( schro_encoder_setting_get_double( p_sys->p_schro, "interlaced_coding" ) > 0.0 ) {
-            date_Set( &date, VLC_TS_0 );
+            date_Set( &date, VLC_TICK_0 );
             date_Increment( &date, 1 /* field */ );
-            p_sys->i_field_duration = date_Get( &date ) - VLC_TS_0;
+            p_sys->i_field_duration = date_Get( &date ) - VLC_TICK_0;
         }
 
         schro_video_format_set_std_signal_range( p_sys->p_format, SCHRO_SIGNAL_RANGE_8BIT_VIDEO );

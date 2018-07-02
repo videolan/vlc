@@ -65,7 +65,7 @@ static int DemuxOnce (demux_t *demux, bool master)
     lldiv_t d;
     unsigned h, m, s, f;
 
-    d = lldiv (pts - VLC_TS_0, CLOCK_FREQ);
+    d = lldiv (pts - VLC_TICK_0, CLOCK_FREQ);
     f = d.rem * sys->date.i_divider_num / sys->date.i_divider_den / CLOCK_FREQ;
     d = lldiv (d.quot, 60);
     s = d.rem;
@@ -187,7 +187,7 @@ static int Open (vlc_object_t *obj)
     }
 
     date_Init (&sys->date, num, den);
-    date_Set (&sys->date, VLC_TS_0);
+    date_Set (&sys->date, VLC_TICK_0);
     sys->next_time = VLC_TICK_INVALID;
 
     demux->p_sys = sys;

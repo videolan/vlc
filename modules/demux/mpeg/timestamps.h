@@ -22,8 +22,8 @@
 #define FROM_SCALE_NZ(x) ((x) * 100 / 9)
 #define TO_SCALE_NZ(x)   ((x) * 9 / 100)
 
-#define FROM_SCALE(x) (VLC_TS_0 + FROM_SCALE_NZ(x))
-#define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TS_0)
+#define FROM_SCALE(x) (VLC_TICK_0 + FROM_SCALE_NZ(x))
+#define TO_SCALE(x)   TO_SCALE_NZ((x) - VLC_TICK_0)
 
 typedef int64_t stime_t;
 

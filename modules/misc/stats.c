@@ -189,7 +189,7 @@ static int OpenDemux ( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     date_Init( &p_sys->pts, 1, 1 );
-    date_Set( &p_sys->pts, VLC_TS_0 );
+    date_Set( &p_sys->pts, VLC_TICK_0 );
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, VLC_FOURCC('s','t','a','t') );
     p_sys->fmt.video.i_width = 720;

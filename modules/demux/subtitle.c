@@ -815,14 +815,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             f = va_arg( args, double );
             if( p_sys->subtitles.i_count && p_sys->i_length )
             {
-                i64 = VLC_TS_0 + f * p_sys->i_length;
+                i64 = VLC_TICK_0 + f * p_sys->i_length;
                 return demux_Control( p_demux, DEMUX_SET_TIME, i64 );
             }
             break;
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
-            p_sys->i_next_demux_date = va_arg( args, vlc_tick_t ) - VLC_TS_0;
+            p_sys->i_next_demux_date = va_arg( args, vlc_tick_t ) - VLC_TICK_0;
             return VLC_SUCCESS;
 
         case DEMUX_CAN_PAUSE:
@@ -862,7 +862,7 @@ static int Demux( demux_t *p_demux )
 
         if ( !p_sys->b_slave && p_sys->b_first_time )
         {
-            es_out_SetPCR( p_demux->out, VLC_TS_0 + i_barrier );
+            es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_barrier );
             p_sys->b_first_time = false;
         }
 
@@ -872,7 +872,7 @@ static int Demux( demux_t *p_demux )
             if( p_block )
             {
                 p_block->i_dts =
-                p_block->i_pts = VLC_TS_0 + p_subtitle->i_start;
+                p_block->i_pts = VLC_TICK_0 + p_subtitle->i_start;
                 if( p_subtitle->i_stop >= 0 && p_subtitle->i_stop >= p_subtitle->i_start )
                     p_block->i_length = p_subtitle->i_stop - p_subtitle->i_start;
 
@@ -885,7 +885,7 @@ static int Demux( demux_t *p_demux )
 
     if ( !p_sys->b_slave )
     {
-        es_out_SetPCR( p_demux->out, VLC_TS_0 + i_barrier );
+        es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_barrier );
         p_sys->i_next_demux_date += CLOCK_FREQ / 8;
     }
 
@@ -2439,7 +2439,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
             /* convert to frame # at 29.97 */
             i_frames = i_frames * framerates[3].rate.num / framerates[3].rate.den + f;
         }
-        p_subtitle->i_start = VLC_TS_0 + i_frames * CLOCK_FREQ *
+        p_subtitle->i_start = VLC_TICK_0 + i_frames * CLOCK_FREQ *
                                          p_rate->rate.den / p_rate->rate.num;
         p_subtitle->i_stop = -1;
 

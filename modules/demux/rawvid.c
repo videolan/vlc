@@ -341,7 +341,7 @@ valid:
                  u_fps_num, u_fps_den, 0);
     date_Init( &p_sys->pcr, p_sys->fmt_video.video.i_frame_rate,
                p_sys->fmt_video.video.i_frame_rate_base );
-    date_Set( &p_sys->pcr, VLC_TS_0 );
+    date_Set( &p_sys->pcr, VLC_TICK_0 );
 
     if( !p_sys->fmt_video.video.i_bits_per_pixel )
     {

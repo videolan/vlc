@@ -301,7 +301,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
 
             case SingleValueTag::EXTXPROGRAMDATETIME:
                 rep->b_consistent = false;
-                absReferenceTime = VLC_TS_0 +
+                absReferenceTime = VLC_TICK_0 +
                         UTCTime(static_cast<const SingleValueTag *>(tag)->getValue().value).mtime();
                 break;
 

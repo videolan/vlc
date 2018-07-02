@@ -285,7 +285,7 @@ void Oggseek_ProbeEnd( demux_t *p_demux )
                     i_length = Ogg_GranuleToTime( p_sys->pp_stream[i], i_granule,
                                                   !p_sys->pp_stream[i]->b_contiguous, false );
                     if( i_length > VLC_TICK_INVALID )
-                        p_sys->i_length = __MAX( p_sys->i_length, (i_length - VLC_TS_0) / 1000000 );
+                        p_sys->i_length = __MAX( p_sys->i_length, (i_length - VLC_TICK_0) / 1000000 );
                     break;
                 }
             }
@@ -795,7 +795,7 @@ int Oggseek_BlindSeektoAbsoluteTime( demux_t *p_demux, logical_stream_t *p_strea
     {
         /* But only if there's no keyframe/preload requirements */
         /* FIXME: add function to get preload time by codec, ex: opus */
-        i_lowerpos = VLC_TS_0 + (i_time - VLC_TS_0) * p_sys->i_bitrate / INT64_C(8000000);
+        i_lowerpos = VLC_TICK_0 + (i_time - VLC_TICK_0) * p_sys->i_bitrate / INT64_C(8000000);
         b_found = true;
     }
 

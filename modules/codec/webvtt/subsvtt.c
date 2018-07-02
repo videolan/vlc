@@ -2061,7 +2061,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    vlc_tick_t i_start = p_block->i_pts - VLC_TS_0;
+    vlc_tick_t i_start = p_block->i_pts - VLC_TICK_0;
     vlc_tick_t i_stop = i_start + p_block->i_length;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )

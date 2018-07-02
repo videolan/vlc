@@ -275,7 +275,7 @@ AbstractStream::status PlaylistManager::dequeue(vlc_tick_t i_floor, vlc_tick_t *
             i_return = i_ret;
 
         if( i_pcr > i_floor )
-            *pi_nzbarrier = std::min( *pi_nzbarrier, i_pcr - VLC_TS_0 );
+            *pi_nzbarrier = std::min( *pi_nzbarrier, i_pcr - VLC_TICK_0 );
     }
 
     return i_return;
@@ -479,7 +479,7 @@ int PlaylistManager::doDemux(vlc_tick_t increment)
         if( demux.i_nzpcr != VLC_TICK_INVALID && i_nzbarrier != demux.i_nzpcr )
         {
             demux.i_nzpcr = i_nzbarrier;
-            vlc_tick_t pcr = VLC_TS_0 + std::max(INT64_C(0), demux.i_nzpcr - CLOCK_FREQ / 10);
+            vlc_tick_t pcr = VLC_TICK_0 + std::max(INT64_C(0), demux.i_nzpcr - CLOCK_FREQ / 10);
             es_out_Control(p_demux->out, ES_OUT_SET_GROUP_PCR, 0, pcr);
         }
         vlc_mutex_unlock(&demux.lock);

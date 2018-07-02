@@ -350,7 +350,7 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
     }
     else
         date_Init( &p_sys->dts, 25000, 1000 );
-    date_Set( &p_sys->dts, VLC_TS_0 );
+    date_Set( &p_sys->dts, VLC_TICK_0 );
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, i_codec );
@@ -470,7 +470,7 @@ static int Demux( demux_t *p_demux)
                         p_sys->frame_rate_den = 1000;
                     }
                     date_Init( &p_sys->dts, 2 * p_sys->frame_rate_num, p_sys->frame_rate_den );
-                    date_Set( &p_sys->dts, VLC_TS_0 );
+                    date_Set( &p_sys->dts, VLC_TICK_0 );
                     msg_Dbg( p_demux, "using %.2f fps", (double) p_sys->frame_rate_num / p_sys->frame_rate_den );
                 }
 
