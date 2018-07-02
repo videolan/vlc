@@ -2068,7 +2068,7 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     /* Mark preroll blocks */
     if( p_sys->i_preroll_end >= 0 )
     {
-        int64_t i_date = p_block->i_pts;
+        vlc_tick_t i_date = p_block->i_pts;
         if( p_block->i_pts == VLC_TS_INVALID )
             i_date = p_block->i_dts;
 
