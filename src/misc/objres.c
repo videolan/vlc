@@ -142,29 +142,19 @@ void *vlc_obj_malloc(vlc_object_t *obj, size_t size)
     return ptr;
 }
 
-static void *vlc_obj_alloc_common(vlc_object_t *obj, size_t nmemb, size_t size,
-                                  bool do_memset)
+void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
 {
     size_t tabsize;
-    if (mul_overflow(nmemb, size, &tabsize))
+    if (unlikely(mul_overflow(nmemb, size, &tabsize)))
     {
         errno = ENOMEM;
         return NULL;
     }
 
-    void *ptr = vlc_objres_new(tabsize, dummy_release);
+    void *ptr = vlc_obj_malloc(obj, tabsize);
     if (likely(ptr != NULL))
-    {
-        if (do_memset)
-            memset(ptr, 0, tabsize);
-        vlc_objres_push(obj, ptr);
-    }
+        memset(ptr, 0, tabsize);
     return ptr;
-}
-
-void *vlc_obj_calloc(vlc_object_t *obj, size_t nmemb, size_t size)
-{
-    return vlc_obj_alloc_common(obj, nmemb, size, true);
 }
 
 static void *vlc_obj_memdup(vlc_object_t *obj, const void *base, size_t len)
