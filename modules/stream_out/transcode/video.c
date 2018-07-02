@@ -715,6 +715,8 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_chain_Delete( id->p_f_chain );
     if( id->p_uf_chain )
         filter_chain_Delete( id->p_uf_chain );
+    if( id->p_spu_blender )
+        filter_DeleteBlend( id->p_spu_blender );
 }
 
 static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id, block_t **out )
@@ -755,10 +757,10 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
                     p_pic = p_tmp;
                 }
             }
-            if( unlikely( !p_sys->p_spu_blend ) )
-                p_sys->p_spu_blend = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
-            if( likely( p_sys->p_spu_blend ) )
-                picture_BlendSubpicture( p_pic, p_sys->p_spu_blend, p_subpic );
+            if( unlikely( !id->p_spu_blender ) )
+                id->p_spu_blender = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
+            if( likely( id->p_spu_blender ) )
+                picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
             subpicture_Delete( p_subpic );
         }
     }
@@ -833,6 +835,9 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 if( id->p_uf_chain )
                     filter_chain_Delete( id->p_uf_chain );
                 id->p_uf_chain = NULL;
+                if( id->p_spu_blender )
+                    filter_DeleteBlend( id->p_spu_blender );
+                id->p_spu_blender = NULL;
 
                 video_format_Clean( &id->fmt_input_video );
             }

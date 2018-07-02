@@ -402,7 +402,6 @@ static int Open( vlc_object_t *p_this )
 
     /* Subpictures transcoding parameters */
     p_sys->p_spu = NULL;
-    p_sys->p_spu_blend = NULL;
     p_sys->psz_senc = NULL;
     p_sys->p_spu_cfg = NULL;
     p_sys->i_scodec = 0;
@@ -472,7 +471,6 @@ static void Close( vlc_object_t * p_this )
     free( p_sys->psz_senc );
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
-    if( p_sys->p_spu_blend ) filter_DeleteBlend( p_sys->p_spu_blend );
 
     free( p_sys );
 }

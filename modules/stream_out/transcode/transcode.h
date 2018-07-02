@@ -102,7 +102,6 @@ typedef struct
     bool            b_soverlay;
     config_chain_t  *p_spu_cfg;
     spu_t           *p_spu;
-    filter_t        *p_spu_blend;
     unsigned int     i_spu_width; /* render width */
     unsigned int     i_spu_height;
 
@@ -151,6 +150,7 @@ struct sout_stream_id_sys_t
          {
              filter_chain_t  *p_f_chain; /**< Video filters */
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
+             filter_t        *p_spu_blender;
              video_format_t  fmt_input_video;
              video_format_t  video_dec_out; /* only rw from pf_vout_format_update() */
          };
