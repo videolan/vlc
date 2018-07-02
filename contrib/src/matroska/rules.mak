@@ -22,6 +22,9 @@ libmatroska: libmatroska-$(MATROSKA_VERSION).tar.xz .sum-matroska
 	$(MOVE)
 
 MATROSKA_CXXFLAGS := $(CXXFLAGS) $(PIC) -fvisibility=hidden
+ifdef HAVE_IOS
+MATROSKA_CXXFLAGS += " -O2"
+endif
 
 .matroska: libmatroska toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) CXXFLAGS="$(MATROSKA_CXXFLAGS)" $(CMAKE) -DBUILD_SHARED_LIBS=OFF
