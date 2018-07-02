@@ -67,6 +67,11 @@ typedef struct
             uint32_t        i_sample_rate;
             uint32_t        i_channels;
         } audio;
+        struct
+        {
+            unsigned int    i_width; /* render width */
+            unsigned int    i_height;
+        } spu;
     };
 } sout_encoder_config_t;
 
@@ -87,6 +92,8 @@ void sout_encoder_config_clean( sout_encoder_config_t *p_cfg )
 typedef struct
 {
     sout_stream_id_sys_t *id_video;
+    spu_t                *p_spu;
+    bool                  b_soverlay;
 
     /* Audio */
     sout_encoder_config_t aenc_cfg;
@@ -97,13 +104,7 @@ typedef struct
     sout_filters_config_t vfilters_cfg;
 
     /* SPU */
-    vlc_fourcc_t    i_scodec;   /* codec spu (0 if not transcode) */
-    char            *psz_senc;
-    bool            b_soverlay;
-    config_chain_t  *p_spu_cfg;
-    spu_t           *p_spu;
-    unsigned int     i_spu_width; /* render width */
-    unsigned int     i_spu_height;
+    sout_encoder_config_t senc_cfg;
 
     /* Sync */
     bool            b_master_sync;
@@ -160,7 +161,6 @@ struct sout_stream_id_sys_t
              audio_format_t  fmt_input_audio;
              audio_format_t  audio_dec_out; /* only rw from pf_aout_format_update() */
          };
-
     };
 
     /* Encoder */

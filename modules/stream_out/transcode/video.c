@@ -848,8 +848,8 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
 
-            p_sys->i_spu_width = p_pic->format.i_visible_width;
-            p_sys->i_spu_height = p_pic->format.i_visible_height;
+            p_sys->senc_cfg.spu.i_width = p_pic->format.i_visible_width;
+            p_sys->senc_cfg.spu.i_height = p_pic->format.i_visible_height;
 
             /* Start missing encoder */
             if( id->p_encoder->p_module == NULL &&

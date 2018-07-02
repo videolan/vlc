@@ -333,6 +333,30 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_
         p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_VIDEO;
 }
 
+static void SetSPUEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+{
+    char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "senc" );
+    if( psz_string && *psz_string )
+    {
+        char *psz_next;
+        psz_next = config_ChainCreate( &p_cfg->psz_name, &p_cfg->p_config_chain,
+                                       psz_string );
+        free( psz_next );
+    }
+    free( psz_string );
+
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "scodec" );
+    if( psz_string && *psz_string )
+    {
+        char fcc[5] = "    \0";
+        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
+        p_cfg->i_codec = vlc_fourcc_GetCodecFromString( SPU_ES, fcc );
+        msg_Dbg( p_stream, "Checking spu codec mapping for %s got %4.4s ", fcc, (char*)&p_cfg->i_codec);
+    }
+    free( psz_string );
+
+}
+
 /*****************************************************************************
  * Open:
  *****************************************************************************/
@@ -401,46 +425,24 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Subpictures transcoding parameters */
-    p_sys->p_spu = NULL;
-    p_sys->psz_senc = NULL;
-    p_sys->p_spu_cfg = NULL;
-    p_sys->i_scodec = 0;
+    sout_encoder_config_init( &p_sys->senc_cfg );
 
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "senc" );
-    if( psz_string && *psz_string )
-    {
-        char *psz_next;
-        psz_next = config_ChainCreate( &p_sys->psz_senc, &p_sys->p_spu_cfg,
-                                   psz_string );
-        free( psz_next );
-    }
-    free( psz_string );
-
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "scodec" );
-    if( psz_string && *psz_string )
-    {
-        char fcc[5] = "    \0";
-        memcpy( fcc, psz_string, __MIN( strlen( psz_string ), 4 ) );
-        p_sys->i_scodec = vlc_fourcc_GetCodecFromString( SPU_ES, fcc );
-        msg_Dbg( p_stream, "Checking spu codec mapping for %s got %4.4s ", fcc, (char*)&p_sys->i_scodec);
-    }
-    free( psz_string );
-
-    if( p_sys->i_scodec )
-    {
-        msg_Dbg( p_stream, "codec spu=%4.4s", (char *)&p_sys->i_scodec );
-    }
+    SetSPUEncoderConfig( p_stream, &p_sys->senc_cfg );
+    if( p_sys->senc_cfg.i_codec )
+        msg_Dbg( p_stream, "codec spu=%4.4s", (char *)&p_sys->senc_cfg.i_codec );
 
     p_sys->b_soverlay = var_GetBool( p_stream, SOUT_CFG_PREFIX "soverlay" );
     /* Set default size for TEXT spu non overlay conversion / updater */
-    p_sys->i_spu_width = (p_sys->venc_cfg.video.i_width) ? p_sys->venc_cfg.video.i_width : 1280;
-    p_sys->i_spu_height = (p_sys->venc_cfg.video.i_height) ? p_sys->venc_cfg.video.i_height : 720;
+    p_sys->senc_cfg.spu.i_width = (p_sys->venc_cfg.video.i_width) ? p_sys->venc_cfg.video.i_width : 1280;
+    p_sys->senc_cfg.spu.i_height = (p_sys->venc_cfg.video.i_height) ? p_sys->venc_cfg.video.i_height : 720;
+    if( p_sys->b_soverlay )
+        p_sys->p_spu = spu_Create( p_stream, NULL );
 
+    /* Subpictures SOURCES parameters (not releated to SPU stream) */
     psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
     if( psz_string && *psz_string )
     {
-        p_sys->p_spu = spu_Create( p_stream, NULL );
-        if( p_sys->p_spu )
+        if( !p_sys->p_spu || (p_sys->p_spu = spu_Create( p_stream, NULL )) )
             spu_ChangeSources( p_sys->p_spu, psz_string );
     }
     free( psz_string );
@@ -467,8 +469,7 @@ static void Close( vlc_object_t * p_this )
     sout_encoder_config_clean( &p_sys->aenc_cfg );
     sout_filters_config_clean( &p_sys->afilters_cfg );
 
-    config_ChainDestroy( p_sys->p_spu_cfg );
-    free( p_sys->psz_senc );
+    sout_encoder_config_clean( &p_sys->senc_cfg );
 
     if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
 
@@ -548,7 +549,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->venc_cfg.i_codec )
         success = transcode_video_add(p_stream, p_fmt, id);
     else if( ( p_fmt->i_cat == SPU_ES ) &&
-             ( p_sys->i_scodec || p_sys->b_soverlay ) )
+             ( p_sys->senc_cfg.i_codec || p_sys->b_soverlay ) )
         success = transcode_spu_add(p_stream, p_fmt, id);
     else
     {
