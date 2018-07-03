@@ -719,7 +719,7 @@ static vlc_tick_t mdate_tick (void)
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
-    return ts * (CLOCK_FREQ / 1000);
+    return VLC_TICK_FROM_MS( ts );
 }
 #if !VLC_WINSTORE_APP
 static vlc_tick_t mdate_multimedia (void)
@@ -728,7 +728,7 @@ static vlc_tick_t mdate_multimedia (void)
 
     /* milliseconds */
     static_assert ((CLOCK_FREQ % 1000) == 0, "Broken frequencies ratio");
-    return ts * (CLOCK_FREQ / 1000);
+    return VLC_TICK_FROM_MS( ts );
 }
 #endif
 
