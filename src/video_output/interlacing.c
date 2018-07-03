@@ -180,7 +180,7 @@ void vout_SetInterlacingState(vout_thread_t *vout, bool is_interlaced)
                                  - (!!vout->p->interlacing.is_interlaced);
     if (interlacing_change == 1 ||
         (interlacing_change == -1 &&
-        vout->p->interlacing.date + CLOCK_FREQ*30 < vlc_tick_now()))
+        vout->p->interlacing.date + VLC_TICK_FROM_SEC(30) < vlc_tick_now()))
     {
         msg_Dbg(vout, "Detected %s video",
                  is_interlaced ? "interlaced" : "progressive");

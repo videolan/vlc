@@ -126,7 +126,7 @@ void input_rate_Add(input_rate_t *counter, uintmax_t val)
     /* Ignore samples within a second of another */
     vlc_tick_t now = vlc_tick_now();
     if (counter->samples[0].date != VLC_TICK_INVALID
-     && (now - counter->samples[0].date) < 1*CLOCK_FREQ)
+     && (now - counter->samples[0].date) < VLC_TICK_FROM_SEC(1))
         return;
 
     memcpy(counter->samples + 1, counter->samples,
