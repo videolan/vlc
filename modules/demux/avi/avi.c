@@ -798,8 +798,8 @@ aviindex:
             i_idx_totalframes = __MAX(i_idx_totalframes, tk->idx.i_size);
     }
     if( i_idx_totalframes != p_avih->i_totalframes &&
-        p_sys->i_length < (vlc_tick_t)p_avih->i_totalframes *
-                          (vlc_tick_t)p_avih->i_microsecperframe /
+        p_sys->i_length < VLC_TICK_FROM_US( p_avih->i_totalframes *
+                                            p_avih->i_microsecperframe ) /
                           CLOCK_FREQ )
     {
         msg_Warn( p_demux, "broken or missing index, 'seek' will be "
@@ -872,8 +872,8 @@ aviindex:
             int64_t i_track_length =
                 tk->idx.p_entry[tk->idx.i_size-1].i_length +
                 tk->idx.p_entry[tk->idx.i_size-1].i_lengthtotal;
-            vlc_tick_t i_length = (vlc_tick_t)p_avih->i_totalframes *
-                               (vlc_tick_t)p_avih->i_microsecperframe;
+            vlc_tick_t i_length = VLC_TICK_FROM_US( p_avih->i_totalframes *
+                                                    p_avih->i_microsecperframe );
 
             if( i_length == 0 )
             {
