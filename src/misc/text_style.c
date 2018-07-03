@@ -312,7 +312,7 @@ unsigned int vlc_html_color( const char *psz_value, bool* ok )
         (*psz_hex >= '0' && *psz_hex <= '9') ||
         (*psz_hex >= 'A' && *psz_hex <= 'F') )
     {
-        uint32_t i_value = strtol( psz_hex, &psz_end, 16 );
+        uint32_t i_value = (uint32_t)strtoul( psz_hex, &psz_end, 16 );
         if( *psz_end == 0 || isspace( *psz_end ) )
         {
             switch( psz_end - psz_hex )
