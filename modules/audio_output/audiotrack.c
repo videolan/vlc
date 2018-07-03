@@ -702,7 +702,7 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
     if( p_sys->timestamp.i_frame_us != 0 && p_sys->timestamp.i_frame_pos != 0
      && p_sys->timestamp.i_frame_us > p_sys->timestamp.i_play_time
      && i_now > p_sys->timestamp.i_frame_us
-     && ( i_now - p_sys->timestamp.i_frame_us ) <= INT64_C(10000000) )
+     && ( i_now - p_sys->timestamp.i_frame_us ) <= VLC_TICK_FROM_SEC(10) )
     {
         jlong i_time_diff = i_now - p_sys->timestamp.i_frame_us;
         jlong i_frames_diff = i_time_diff * p_sys->fmt.i_rate / CLOCK_FREQ;
