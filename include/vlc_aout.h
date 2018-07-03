@@ -48,11 +48,11 @@
 /* Tolerance values from EBU Recommendation 37 */
 /** Maximum advance of actual audio playback time to coded PTS,
  * above which downsampling will be performed */
-#define AOUT_MAX_PTS_ADVANCE            (CLOCK_FREQ / 25)
+#define AOUT_MAX_PTS_ADVANCE            VLC_TICK_FROM_MS(40)
 
 /** Maximum delay of actual audio playback time from coded PTS,
  * above which upsampling will be performed */
-#define AOUT_MAX_PTS_DELAY              (3 * CLOCK_FREQ / 50)
+#define AOUT_MAX_PTS_DELAY              VLC_TICK_FROM_MS(60)
 
 /* Max acceptable resampling (in %) */
 #define AOUT_MAX_RESAMPLING             10

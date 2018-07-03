@@ -65,7 +65,7 @@
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (3*CLOCK_FREQ/10)
+#define DEFAULT_PTS_DELAY               VLC_TICK_FROM_MS(300)
 
 /*****************************************************************************
  * SPU configuration
@@ -73,7 +73,7 @@
 
 /* Buffer must avoid arriving more than SPU_MAX_PREPARE_TIME in advanced to
  * the SPU */
-#define SPU_MAX_PREPARE_TIME            (CLOCK_FREQ/2)
+#define SPU_MAX_PREPARE_TIME            VLC_TICK_FROM_MS(500)
 
 /*****************************************************************************
  * Video configuration
@@ -101,7 +101,7 @@
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
-#define VOUT_OUTMEM_SLEEP               (CLOCK_FREQ/50)
+#define VOUT_OUTMEM_SLEEP               VLC_TICK_FROM_MS(20)
 
 /* The default video output window title */
 #define VOUT_TITLE                      "VLC"
