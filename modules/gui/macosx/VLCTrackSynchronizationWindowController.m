@@ -118,8 +118,8 @@
     input_thread_t * p_input = pl_CurrentInput(getIntf());
 
     if (p_input) {
-        var_SetInteger(p_input, "audio-delay", 0.0);
-        var_SetInteger(p_input, "spu-delay", 0.0);
+        var_SetInteger(p_input, "audio-delay", 0);
+        var_SetInteger(p_input, "spu-delay", 0);
         var_SetFloat(p_input, "sub-fps", 1.0);
         [self svDurationValueChanged:nil];
         vlc_object_release(p_input);
