@@ -64,15 +64,15 @@ static void VoutDestructor(vlc_object_t *);
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
  */
-#define VOUT_REDISPLAY_DELAY (4*CLOCK_FREQ/50)
+#define VOUT_REDISPLAY_DELAY VLC_TICK_FROM_MS(80)
 
 /**
  * Late pictures having a delay higher than this value are thrashed.
  */
-#define VOUT_DISPLAY_LATE_THRESHOLD (CLOCK_FREQ/50)
+#define VOUT_DISPLAY_LATE_THRESHOLD VLC_TICK_FROM_MS(20)
 
 /* Better be in advance when awakening than late... */
-#define VOUT_MWAIT_TOLERANCE (CLOCK_FREQ/250)
+#define VOUT_MWAIT_TOLERANCE VLC_TICK_FROM_MS(4)
 
 /* */
 static int VoutValidateFormat(video_format_t *dst,
@@ -1578,7 +1578,7 @@ static void ThreadInit(vout_thread_t *vout)
     vout->p->pause.is_on     = false;
     vout->p->pause.date      = VLC_TICK_INVALID;
 
-    vout_chrono_Init(&vout->p->render, 5, CLOCK_FREQ/100); /* Arbitrary initial time */
+    vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
 }
 
 static void ThreadClean(vout_thread_t *vout)
@@ -1781,7 +1781,7 @@ static void *Thread(void *object)
 
         if (wait)
         {
-            const vlc_tick_t max_deadline = vlc_tick_now() + CLOCK_FREQ/10;
+            const vlc_tick_t max_deadline = vlc_tick_now() + VLC_TICK_FROM_MS(100);
             deadline = deadline == VLC_TICK_INVALID ? max_deadline : __MIN(deadline, max_deadline);
         } else {
             deadline = VLC_TICK_INVALID;

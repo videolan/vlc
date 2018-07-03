@@ -377,7 +377,7 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
 
     /* 500ms timeout
      * XXX it will cause trouble with low fps video (< 2fps) */
-    if( vout_GetSnapshot( p_vout, &p_image, &p_picture, NULL, psz_format, CLOCK_FREQ/2 ) )
+    if( vout_GetSnapshot( p_vout, &p_image, &p_picture, NULL, psz_format, VLC_TICK_FROM_MS(500) ) )
     {
         p_picture = NULL;
         p_image = NULL;

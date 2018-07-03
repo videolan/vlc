@@ -125,7 +125,7 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 #include "window.h"
 #include "vout_internal.h"
 
-#define DOUBLE_CLICK_TIME (3 * CLOCK_FREQ / 10)
+#define DOUBLE_CLICK_TIME VLC_TICK_FROM_MS(300)
 
 typedef struct vout_display_window
 {

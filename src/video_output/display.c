@@ -513,7 +513,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         vlc_mouse_HasPressed(&osys->mouse.state, &m, MOUSE_BUTTON_LEFT)) {
         const vlc_tick_t i_date = vlc_tick_now();
 
-        if (i_date - osys->mouse.last_pressed < 3*CLOCK_FREQ/10 ) {
+        if (i_date - osys->mouse.last_pressed < VLC_TICK_FROM_MS(300) ) {
             m.b_double_click = true;
             osys->mouse.last_pressed = 0;
         } else {

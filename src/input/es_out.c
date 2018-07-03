@@ -703,7 +703,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     input_resource_TerminateVout( input_priv(p_sys->p_input)->p_resource );
 
     /* */
-    const vlc_tick_t i_wakeup_delay = CLOCK_FREQ/100; /* FIXME CLEANUP thread wake up time*/
+    const vlc_tick_t i_wakeup_delay = VLC_TICK_FROM_MS(10); /* FIXME CLEANUP thread wake up time*/
     const vlc_tick_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : vlc_tick_now();
 
     input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_input_clock, true,
@@ -825,7 +825,7 @@ static void EsOutFrameNext( es_out_t *out )
     msg_Dbg( p_sys->p_input, "EsOutFrameNext consummed %d ms", (int)(i_duration/1000) );
 
     if( i_duration <= 0 )
-        i_duration = CLOCK_FREQ/25;
+        i_duration = VLC_TICK_FROM_MS(40);
 
     /* FIXME it is not a clean way ? */
     if( p_sys->i_buffering_extra_initial <= 0 )
@@ -2163,7 +2163,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
                 break;
             /* FIXME there should be a way to have auto deleted es, but there will be
              * a problem when another codec of the same type is created (mainly video) */
-            vlc_tick_sleep( CLOCK_FREQ/50 );
+            vlc_tick_sleep(VLC_TICK_FROM_MS(20));
         }
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
     }

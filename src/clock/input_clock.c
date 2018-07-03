@@ -252,7 +252,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 
         AvgUpdate( &cl->drift, i_converted - i_ck_stream );
 
-        cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
+        cl->i_next_drift_update = i_ck_system + VLC_TICK_FROM_MS(200); /* FIXME why that */
     }
 
     /* Update the extra buffering value */

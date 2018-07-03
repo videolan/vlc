@@ -769,7 +769,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
             if( now >= i_intf_update )
             {
                 MainLoopStatistics( p_input );
-                i_intf_update = now + CLOCK_FREQ/4;
+                i_intf_update = now + VLC_TICK_FROM_MS(250);
             }
         }
 
@@ -787,9 +787,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 vlc_tick_t now = vlc_tick_now();
 
                 /* Recheck ES buffer level every 20 ms when seeking */
-                if( now < i_last_seek_mdate + CLOCK_FREQ/8
-                 && (i_deadline < 0 || i_deadline > now + CLOCK_FREQ/50) )
-                    i_deadline = now + CLOCK_FREQ/50;
+                if( now < i_last_seek_mdate + VLC_TICK_FROM_MS(125)
+                 && (i_deadline < 0 || i_deadline > now + VLC_TICK_FROM_MS(20)) )
+                    i_deadline = now + VLC_TICK_FROM_MS(20);
                 else
                     b_postpone = false;
             }
