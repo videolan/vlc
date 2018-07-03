@@ -1089,7 +1089,7 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             toread[i_track].i_toread = AVI_PTSToByte( tk, i_dpts );
         }
-        else if ( i_dpts > -2 * CLOCK_FREQ ) /* don't send a too early dts (low fps video) */
+        else if ( i_dpts > VLC_TICK_FROM_SEC(-2) ) /* don't send a too early dts (low fps video) */
         {
             toread[i_track].i_toread = AVI_PTSToChunk( tk, i_dpts );
         }
@@ -1456,7 +1456,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
             /* check for time */
             if( p_stream == p_stream_master ||
                 llabs( AVI_GetPTS( p_stream ) -
-                        AVI_GetPTS( p_stream_master ) )< 2 * CLOCK_FREQ )
+                        AVI_GetPTS( p_stream_master ) )< VLC_TICK_FROM_SEC(2) )
             {
                 /* load it and send to decoder */
                 block_t *p_frame = ReadFrame( p_demux, p_stream, 8, avi_pk.i_size + 8 ) ;
