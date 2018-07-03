@@ -273,7 +273,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         else
         {
             msg_Dbg( p_resource->p_parent, "saving a free vout" );
-            vout_Flush( p_vout, 1 );
+            vout_FlushAll( p_vout );
             vout_FlushSubpictureChannel( p_vout, -1 );
 
             vout_configuration_t cfg = {
