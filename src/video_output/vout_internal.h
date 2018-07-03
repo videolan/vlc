@@ -248,6 +248,11 @@ void vout_GetResetStatistic( vout_thread_t *p_vout, unsigned *pi_displayed,
  */
 void vout_Flush( vout_thread_t *p_vout, vlc_tick_t i_date );
 
+/**
+ * Empty all the pending pictures in the vout
+ */
+#define vout_FlushAll( vout )  vout_Flush( vout, VLC_TICK_INVALID )
+
 /*
  * Cancel the vout, if cancel is true, it won't return any pictures after this
  * call.

@@ -1311,7 +1311,8 @@ static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
 
     picture_t *last = vout->p->displayed.decoded;
     if (last) {
-        if (( below && last->date <= date) ||
+        if ((date == VLC_TICK_INVALID) ||
+            ( below && last->date <= date) ||
             (!below && last->date >= date)) {
             picture_Release(last);
 
