@@ -107,7 +107,7 @@ typedef struct
     /* Used by AudioTrack_GetTimestampPositionUs */
     struct {
         jobject p_obj; /* AudioTimestamp ref */
-        jlong i_frame_us;
+        vlc_tick_t i_frame_us;
         jlong i_frame_pos;
         vlc_tick_t i_play_time; /* time when play was called */
         vlc_tick_t i_last_time;
