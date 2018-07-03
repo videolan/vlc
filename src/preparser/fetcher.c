@@ -404,6 +404,7 @@ static void WorkerInit( input_fetcher_t* fetcher,
 {
     struct background_worker_config conf = {
         .default_timeout = 0,
+        .max_threads = var_InheritInteger( fetcher->owner, "fetch-art-threads" ),
         .pf_start = starter,
         .pf_probe = ProbeWorker,
         .pf_stop = CloseWorker,

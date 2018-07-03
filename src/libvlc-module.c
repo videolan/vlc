@@ -1125,6 +1125,14 @@ static const char *const ppsz_prefres[] = {
 #define PREPARSE_TIMEOUT_LONGTEXT N_( \
     "Maximum time allowed to preparse an item, in milliseconds" )
 
+#define PREPARSE_THREADS_TEXT N_( "Preparsing threads" )
+#define PREPARSE_THREADS_LONGTEXT N_( \
+    "Maximum number of threads used to preparse items" )
+
+#define FETCH_ART_THREADS_TEXT N_( "Fetch-art threads" )
+#define FETCH_ART_THREADS_LONGTEXT N_( \
+    "Maximum number of threads used to fetch art" )
+
 #define METADATA_NETWORK_TEXT N_( "Allow metadata network access" )
 
 static const char *const psz_recursive_list[] = {
@@ -2109,6 +2117,12 @@ vlc_module_begin ()
 
     add_integer( "preparse-timeout", 5000, PREPARSE_TIMEOUT_TEXT,
                  PREPARSE_TIMEOUT_LONGTEXT, false )
+
+    add_integer( "preparse-threads", 1, PREPARSE_THREADS_TEXT,
+                 PREPARSE_THREADS_LONGTEXT, false )
+
+    add_integer( "fetch-art-threads", 1, FETCH_ART_THREADS_TEXT,
+                 FETCH_ART_THREADS_LONGTEXT, false )
 
     add_obsolete_integer( "album-art" )
     add_bool( "metadata-network-access", false, METADATA_NETWORK_TEXT,
