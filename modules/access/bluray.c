@@ -1040,7 +1040,7 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         ;
     }
 
-    es_out_id_t *p_es = es_out_Add(p_demux->out, &fmt);
+    es_out_id_t *p_es = es_out_Add(es_out_sys->p_dst_out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
         int idx = findEsPairIndex(p_sys, p_fmt->i_id);
