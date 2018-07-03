@@ -151,8 +151,6 @@ struct decoder_owner
 #define DECODER_SPU_VOUT_WAIT_DURATION   VLC_TICK_FROM_MS(200)
 #define BLOCK_FLAG_CORE_PRIVATE_RELOADED (1 << BLOCK_FLAG_CORE_PRIVATE_SHIFT)
 
-#define VLC_TS_OLDEST  (VLC_TICK_INVALID + 1)
-
 static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 {
     return container_of( p_dec, struct decoder_owner, dec );
@@ -977,7 +975,7 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
         msg_Dbg( p_dec, "end of video preroll" );
 
         if( p_vout )
-            vout_Flush( p_vout, VLC_TS_OLDEST );
+            vout_FlushAll( p_vout );
     }
 
     if( p_picture->date == VLC_TICK_INVALID )
@@ -1465,7 +1463,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     else if( p_dec->fmt_out.i_cat == VIDEO_ES )
     {
         if( p_owner->p_vout )
-            vout_Flush( p_owner->p_vout, VLC_TS_OLDEST );
+            vout_FlushAll( p_owner->p_vout );
     }
     else if( p_dec->fmt_out.i_cat == SPU_ES )
     {
