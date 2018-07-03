@@ -743,7 +743,7 @@ static vlc_tick_t mdate_perf (void)
     /* We need to split the division to avoid 63-bits overflow */
     lldiv_t d = lldiv (counter.QuadPart, clk.perf.freq.QuadPart);
 
-    return (d.quot * CLOCK_FREQ) + ((d.rem * CLOCK_FREQ) / clk.perf.freq.QuadPart);
+    return vlc_tick_from_sec( d.quot ) + ((d.rem * CLOCK_FREQ) / clk.perf.freq.QuadPart);
 }
 
 static vlc_tick_t mdate_wall (void)

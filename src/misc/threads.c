@@ -218,7 +218,7 @@ int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
     struct timespec ts;
 
     timespec_get(&ts, TIME_UTC);
-    deadline -= ts.tv_sec * CLOCK_FREQ;
+    deadline -= vlc_tick_from_sec( ts.tv_sec );
     deadline -= ts.tv_nsec / (1000000000 / CLOCK_FREQ);
 
     return vlc_cond_wait_delay(cond, mutex, deadline);
