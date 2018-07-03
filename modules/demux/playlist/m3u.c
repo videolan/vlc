@@ -255,7 +255,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
                 FREENULL( psz_artist );
                 parseEXTINF( psz_parse, &psz_artist, &psz_name, &i_parsed_duration );
                 if( i_parsed_duration >= 0 )
-                    i_duration = i_parsed_duration * CLOCK_FREQ;
+                    i_duration = vlc_tick_from_sec( i_parsed_duration );
                 if( psz_name )
                     psz_name = pf_dup( psz_name );
                 if( psz_artist )

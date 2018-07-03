@@ -1932,7 +1932,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
-    int64_t i_pts = (int64_t)pts.tv_sec * CLOCK_FREQ +
+    vlc_tick_t i_pts = vlc_tick_from_sec( pts.tv_sec ) +
         (int64_t)pts.tv_usec;
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */

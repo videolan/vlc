@@ -253,7 +253,7 @@ void M3U8Parser::parseSegments(vlc_object_t *, Representation *rep, const std::l
                         duration = durAttribute->floatingPoint();
                     ctx_extinf = NULL;
                 }
-                const vlc_tick_t nzDuration = CLOCK_FREQ * duration;
+                const vlc_tick_t nzDuration = vlc_tick_from_sec( duration );
                 segment->duration.Set(duration * (uint64_t) rep->getTimescale());
                 segment->startTime.Set(rep->getTimescale().ToScaled(nzStartTime));
                 nzStartTime += nzDuration;

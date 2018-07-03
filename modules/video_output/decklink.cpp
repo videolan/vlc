@@ -898,7 +898,7 @@ static void PrepareVideo(vout_display_t *vd, picture_t *picture, subpicture_t *,
     if (!picture)
         return;
 
-    if (now - date > sys->video.nosignal_delay * CLOCK_FREQ) {
+    if (now - date > vlc_tick_from_sec( sys->video.nosignal_delay )) {
         msg_Dbg(vd, "no signal");
         if (sys->video.pic_nosignal) {
             picture = sys->video.pic_nosignal;

@@ -132,7 +132,7 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     }
     if (event.command == cc.changePlaybackPositionCommand) {
         MPChangePlaybackPositionCommandEvent *positionEvent = (MPChangePlaybackPositionCommandEvent *)event;
-        [coreInteraction jumpToTime:positionEvent.positionTime * CLOCK_FREQ];
+        [coreInteraction jumpToTime: vlc_tick_from_sec( positionEvent.positionTime )];
         return MPRemoteCommandHandlerStatusSuccess;
     }
     if (event.command == cc.changeRepeatModeCommand) {

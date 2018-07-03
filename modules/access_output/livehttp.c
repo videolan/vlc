@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
     /* Try to get within asked segment length */
     p_sys->i_seglen = var_GetInteger( p_access, SOUT_CFG_PREFIX "seglen" );
 
-    p_sys->i_seglenm = CLOCK_FREQ * p_sys->i_seglen;
+    p_sys->i_seglenm = vlc_tick_from_sec( p_sys->i_seglen );
     p_sys->full_segments = NULL;
     p_sys->full_segments_end = &p_sys->full_segments;
 

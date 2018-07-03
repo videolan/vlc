@@ -2201,7 +2201,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     if (!p_sys->i_still_end_time) {
         if (i_timeout) {
             msg_Dbg(p_demux, "Still image (%d seconds)", i_timeout);
-            p_sys->i_still_end_time = vlc_tick_now() + i_timeout * CLOCK_FREQ;
+            p_sys->i_still_end_time = vlc_tick_now() + vlc_tick_from_sec( i_timeout );
         } else {
             msg_Dbg(p_demux, "Still image (infinite)");
             p_sys->i_still_end_time = -1;

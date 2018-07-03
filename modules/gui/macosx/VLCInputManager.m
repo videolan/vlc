@@ -670,7 +670,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (result == RESUME_RESTART)
             return;
 
-        vlc_tick_t lastPos = (vlc_tick_t)lastPosition.intValue * CLOCK_FREQ;
+        vlc_tick_t lastPos = vlc_tick_from_sec( lastPosition.intValue );
         msg_Dbg(getIntf(), "continuing playback at %lld", lastPos);
         var_SetInteger(p_input_thread, "time", lastPos);
     };

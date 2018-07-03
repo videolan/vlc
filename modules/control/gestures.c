@@ -201,7 +201,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
-                var_SetInteger( p_input, "time-offset", -CLOCK_FREQ * it );
+                var_SetInteger( p_input, "time-offset", vlc_tick_from_sec( -it ) );
             vlc_object_release( p_input );
             break;
         }
@@ -216,7 +216,7 @@ static void ProcessGesture( intf_thread_t *p_intf )
 
             int it = var_InheritInteger( p_intf , "short-jump-size" );
             if( it > 0 )
-                var_SetInteger( p_input, "time-offset", CLOCK_FREQ * it );
+                var_SetInteger( p_input, "time-offset", vlc_tick_from_sec( it ) );
             vlc_object_release( p_input );
             break;
         }
@@ -479,7 +479,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_var,
         /* intf-event is serialized against itself and is the sole user of
          * p_sys->p_vout. So there is no need to acquire the lock currently. */
         if( p_sys->p_vout != NULL )
-        {   /* /!\ Beware of lock inversion with var_DelCallback() /!\ */
+        {   /* /!\ Beware of lock inversion with var_DelCallback() /!\ */
             var_DelCallback( p_sys->p_vout, "mouse-moved", MovedEvent,
                              p_intf );
             var_DelCallback( p_sys->p_vout, "mouse-button-down", ButtonEvent,

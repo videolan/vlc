@@ -927,7 +927,7 @@ void InputManager::jumpFwd()
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 && hasInput() )
     {
-        vlc_tick_t val = CLOCK_FREQ * i_interval;
+        vlc_tick_t val = vlc_tick_from_sec( i_interval );
         var_SetInteger( p_input, "time-offset", val );
     }
 }
@@ -937,7 +937,7 @@ void InputManager::jumpBwd()
     int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 && hasInput() )
     {
-        vlc_tick_t val = -CLOCK_FREQ * i_interval;
+        vlc_tick_t val = vlc_tick_from_sec( -i_interval );
         var_SetInteger( p_input, "time-offset", val );
     }
 }

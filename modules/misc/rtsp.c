@@ -928,7 +928,7 @@ static int64_t ParseNPT (const char *str)
         uselocale (oldloc);
         freelocale (loc);
     }
-    return sec * CLOCK_FREQ;
+    return vlc_tick_from_sec( sec );
 }
 
 

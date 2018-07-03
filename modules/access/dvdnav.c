@@ -871,7 +871,7 @@ static int Demux( demux_t *p_demux )
 
             if( event->length != 0xff && p_sys->still.b_created )
             {
-                vlc_tick_t delay = event->length * CLOCK_FREQ;
+                vlc_tick_t delay = vlc_tick_from_sec( event->length );
                 vlc_timer_schedule( p_sys->still.timer, false, delay, 0 );
             }
 

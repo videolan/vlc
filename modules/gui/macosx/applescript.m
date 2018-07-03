@@ -243,7 +243,7 @@
         if (!p_input)
             return;
 
-        input_Control(p_input, INPUT_SET_TIME, (int64_t)(i64_value * CLOCK_FREQ));
+        input_Control(p_input, INPUT_SET_TIME, vlc_tick_from_sec( i64_value ));
         vlc_object_release(p_input);
     }
 }

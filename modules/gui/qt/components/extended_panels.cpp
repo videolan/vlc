@@ -1509,7 +1509,7 @@ void SyncControls::advanceAudio( double f_advance )
 {
     if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = f_advance * CLOCK_FREQ;
+        vlc_tick_t i_delay = vlc_tick_from_sec( f_advance );
         var_SetInteger( THEMIM->getInput(), "audio-delay", i_delay );
     }
 }
@@ -1518,7 +1518,7 @@ void SyncControls::advanceSubs( double f_advance )
 {
     if( THEMIM->getInput() && b_userAction )
     {
-        int64_t i_delay = f_advance * CLOCK_FREQ;
+        vlc_tick_t i_delay = vlc_tick_from_sec( f_advance );
         var_SetInteger( THEMIM->getInput(), "spu-delay", i_delay );
     }
 }

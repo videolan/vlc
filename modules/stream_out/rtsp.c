@@ -310,7 +310,7 @@ static void RtspUpdateTimer( rtsp_stream_t *rtsp )
             timeout = rtsp->sessionv[i]->last_seen;
     }
     if (timeout != 0)
-        timeout += rtsp->timeout * CLOCK_FREQ;
+        timeout += vlc_tick_from_sec( rtsp->timeout );
     vlc_timer_schedule(rtsp->timer, true, timeout, 0);
 }
 
@@ -323,7 +323,7 @@ static void RtspTimeOut( void *data )
     vlc_tick_t now = vlc_tick_now();
     for (int i = rtsp->sessionc - 1; i >= 0; i--)
     {
-        if (rtsp->sessionv[i]->last_seen + rtsp->timeout * CLOCK_FREQ < now)
+        if (rtsp->sessionv[i]->last_seen + vlc_tick_from_sec( rtsp->timeout ) < now)
         {
             if (rtsp->vod_media != NULL)
             {
@@ -588,7 +588,7 @@ static int64_t ParseNPT (const char *str)
         uselocale (oldloc);
         freelocale (loc);
     }
-    return sec < 0 ? -1 : sec * CLOCK_FREQ;
+    return sec < 0 ? -1 : vlc_tick_from_sec( sec );
 }
 
 

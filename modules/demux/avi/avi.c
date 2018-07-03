@@ -1047,7 +1047,7 @@ static int Demux_Seekable( demux_t *p_demux )
 
     if( i_track_count <= 0 )
     {
-        int64_t i_length = p_sys->i_length * CLOCK_FREQ;
+        int64_t i_length = vlc_tick_from_sec( p_sys->i_length );
 
         p_sys->i_time += p_sys->i_read_increment;
         if( i_length > 0 )
@@ -1710,7 +1710,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else
             {
-                i64 = (vlc_tick_t)(f * CLOCK_FREQ * p_sys->i_length);
+                i64 = vlc_tick_from_sec( f * p_sys->i_length );
                 return Seek( p_demux, i64, f, b );
             }
 
@@ -1798,7 +1798,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  * Function to convert pts to chunk or byte
  *****************************************************************************/
 
-static int64_t AVI_Rescale( int64_t i_value, uint32_t i_timescale, uint32_t i_newscale )
+static int64_t AVI_Rescale( vlc_tick_t i_value, uint32_t i_timescale, uint32_t i_newscale )
 {
     /* TODO: replace (and mp4) with better global helper (recursive checks) */
     if( i_timescale == i_newscale )
@@ -1840,7 +1840,7 @@ static vlc_tick_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
         return i_dpts;
 
     if( tk->i_scale )
-        i_dpts = AVI_Rescale( CLOCK_FREQ * i_count, tk->i_rate, tk->i_scale );
+        i_dpts = AVI_Rescale( vlc_tick_from_sec( i_count ), tk->i_rate, tk->i_scale );
 
     if( tk->i_samplesize )
     {

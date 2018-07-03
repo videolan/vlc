@@ -150,7 +150,7 @@ static inline tt_time_t tt_time_Sub( tt_time_t t1, tt_time_t t2 )
     if( t2.frames > t1.frames )
     {
         unsigned diff = 1 + (t2.frames - t1.frames) / TT_FRAME_RATE;
-        t1.base -= diff * CLOCK_FREQ;
+        t1.base -= vlc_tick_from_sec( diff );
         t1.frames += diff * TT_FRAME_RATE;
     }
     t1.frames -= t2.frames;

@@ -961,11 +961,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             time_t i_time, i_length;
             if( !EITCurrentEventTime( p_pmt, p_sys, &i_time, &i_length ) &&
-                 i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE(i_length * CLOCK_FREQ) * f) ) )
+                 i_length > 0 && !SeekToTime( p_demux, p_pmt, (int64_t)(TO_SCALE( vlc_tick_from_sec( i_length * f ))) ) )
             {
                 ReadyQueuesPostSeek( p_demux );
                 es_out_Control( p_demux->out, ES_OUT_SET_NEXT_DISPLAY_TIME,
-                                (int64_t)(TO_SCALE(i_length * CLOCK_FREQ) * f) );
+                                (int64_t)(TO_SCALE( vlc_tick_from_sec( i_length * f ))) );
                 return VLC_SUCCESS;
             }
         }
@@ -1018,7 +1018,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             time_t i_event_start;
             if( !EITCurrentEventTime( p_pmt, p_sys, &i_event_start, NULL ) )
             {
-                *pi64 = i_event_start * CLOCK_FREQ;
+                *pi64 = vlc_tick_from_sec( i_event_start );
                 return VLC_SUCCESS;
             }
         }
@@ -1039,7 +1039,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             time_t i_event_duration;
             if( !EITCurrentEventTime( p_pmt, p_sys, NULL, &i_event_duration ) )
             {
-                *pi64 = i_event_duration * CLOCK_FREQ;
+                *pi64 = vlc_tick_from_sec( i_event_duration );
                 return VLC_SUCCESS;
             }
         }

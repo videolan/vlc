@@ -178,7 +178,7 @@ nop:
     if( !strncasecmp( psz_name, "pause:", 6 ) )
     {
         double f = us_atof( psz_name + 6 );
-        vlc_tick_t length = f * CLOCK_FREQ;
+        vlc_tick_t length = vlc_tick_from_sec( f );
 
         msg_Info( p_demux, "command `pause %f'", f );
         if( length == 0 )

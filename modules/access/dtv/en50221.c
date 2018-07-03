@@ -1488,7 +1488,7 @@ static void DateTimeManage( cam_t * p_cam, int i_session_id )
         (date_time_t *)p_cam->p_sessions[i_session_id - 1].p_sys;
 
     if ( p_date->i_interval
-          && vlc_tick_now() > p_date->i_last + (vlc_tick_t)p_date->i_interval * CLOCK_FREQ )
+          && vlc_tick_now() > p_date->i_last + vlc_tick_from_sec( p_date->i_interval ) )
     {
         DateTimeSend( p_cam, i_session_id );
     }

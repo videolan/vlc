@@ -359,7 +359,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     int64_t i_interval = var_InheritInteger( p_input, p_value );
     if (i_interval > 0) {
-        vlc_tick_t val = CLOCK_FREQ * i_interval;
+        vlc_tick_t val = vlc_tick_from_sec( i_interval );
         if (!b_value)
             val = val * -1;
         var_SetInteger( p_input, "time-offset", val );

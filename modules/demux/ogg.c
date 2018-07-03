@@ -786,7 +786,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
 
             assert( p_sys->i_length > 0 );
-            i64 = CLOCK_FREQ * p_sys->i_length * f;
+            i64 = vlc_tick_from_sec( f * p_sys->i_length );
             Ogg_PreparePostSeek( p_sys );
             if ( Oggseek_SeektoAbsolutetime( p_demux, p_stream, VLC_TICK_0 + i64 ) >= 0 )
             {

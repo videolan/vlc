@@ -731,7 +731,7 @@ static int Open(vlc_object_t *object)
 
     sys->data        = data;
     sys->es          = es_out_Add(demux->out, &fmt);
-    sys->duration    = CLOCK_FREQ * var_InheritFloat(demux, "image-duration");
+    sys->duration    = vlc_tick_from_sec( var_InheritFloat(demux, "image-duration") );
     sys->is_realtime = var_InheritBool(demux, "image-realtime");
     sys->pts_offset  = sys->is_realtime ? vlc_tick_now() : 0;
     sys->pts_next    = VLC_TICK_INVALID;

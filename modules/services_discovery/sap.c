@@ -579,7 +579,7 @@ static void *Run( void *data )
         /* Check for items that need deletion */
         for( int i = 0; i < p_sys->i_announces; i++ )
         {
-            vlc_tick_t i_timeout = CLOCK_FREQ * p_sys->i_timeout;
+            vlc_tick_t i_timeout = vlc_tick_from_sec( p_sys->i_timeout );
             sap_announce_t * p_announce = p_sys->pp_announces[i];
             vlc_tick_t i_last_period = now - p_announce->i_last;
 

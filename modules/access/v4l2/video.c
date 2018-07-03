@@ -567,7 +567,7 @@ vlc_tick_t GetBufferPTS (const struct v4l2_buffer *buf)
     switch (buf->flags & V4L2_BUF_FLAG_TIMESTAMP_MASK)
     {
         case V4L2_BUF_FLAG_TIMESTAMP_MONOTONIC:
-            pts = (buf->timestamp.tv_sec * CLOCK_FREQ)
+            pts = vlc_tick_from_sec( buf->timestamp.tv_sec )
                  + buf->timestamp.tv_usec;
             static_assert (CLOCK_FREQ == 1000000, "Clock unit mismatch");
             break;

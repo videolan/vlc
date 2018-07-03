@@ -313,8 +313,7 @@ static int CreateFilter( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_sys->lock );
         goto error;
     }
-    vlc_timer_schedule( p_sys->timer, false, 1,
-                        (vlc_tick_t)(i_ttl)*CLOCK_FREQ );
+    vlc_timer_schedule( p_sys->timer, false, 1, vlc_tick_from_sec(i_ttl) );
 
     free( psz_urls );
     return VLC_SUCCESS;
