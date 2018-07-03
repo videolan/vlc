@@ -67,12 +67,20 @@ static int video_update_format_decoder( decoder_t *p_dec )
         .sys = id,
     };
 
+    vlc_mutex_lock( &id->fifo.lock );
+
     if( id->p_encoder->fmt_in.i_codec == p_dec->fmt_out.i_codec ||
         video_format_IsSimilar( &id->video_dec_out,
                                 &p_dec->fmt_out.video ) )
+    {
+        vlc_mutex_unlock( &id->fifo.lock );
         return 0;
-    id->video_dec_out = p_dec->fmt_out.video;
-    id->video_dec_out.p_palette = NULL;
+    }
+
+    video_format_Clean( &id->video_dec_out );
+    video_format_Copy( &id->video_dec_out, &p_dec->fmt_out.video );
+
+    vlc_mutex_unlock( &id->fifo.lock );
 
     msg_Dbg( p_obj, "Checking if filter chain %4.4s -> %4.4s is possible",
                  (char *)&p_dec->fmt_out.i_codec, (char*)&id->p_encoder->fmt_in.i_codec );
@@ -273,6 +281,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         return VLC_EGENERIC;
     }
     video_format_Init( &id->fmt_input_video, 0 );
+    video_format_Init( &id->video_dec_out, 0 );
 
     /*
      * Open encoder.
@@ -288,6 +297,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
         video_format_Clean( &id->fmt_input_video );
+        video_format_Clean( &id->video_dec_out );
         return VLC_ENOMEM;
     }
 
@@ -310,6 +320,7 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
         video_format_Clean( &id->fmt_input_video );
+        video_format_Clean( &id->video_dec_out );
         es_format_Clean( &id->encoder_tested_fmt_in );
         picture_fifo_Delete( id->pp_pics );
         return VLC_EGENERIC;
@@ -704,6 +715,7 @@ void transcode_video_close( sout_stream_t *p_stream,
         vlc_meta_Delete( id->p_decoder->p_description );
 
     video_format_Clean( &id->fmt_input_video );
+    video_format_Clean( &id->video_dec_out );
 
     /* Close encoder */
     transcode_video_encoder_close( p_stream, id );
@@ -729,7 +741,11 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
     /* Check if we have a subpicture to overlay */
     if( p_sys->p_spu )
     {
-        video_format_t fmt = id->p_encoder->fmt_in.video;
+        video_format_t fmt, outfmt;
+        vlc_mutex_lock( &id->fifo.lock );
+        video_format_Copy( &outfmt, &id->video_dec_out );
+        vlc_mutex_unlock( &id->fifo.lock );
+        video_format_Copy( &fmt, &p_pic->format );
         if( fmt.i_visible_width <= 0 || fmt.i_visible_height <= 0 )
         {
             fmt.i_visible_width  = fmt.i_width;
@@ -739,7 +755,7 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
         }
 
         subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt,
-                                             &id->p_decoder->fmt_out.video,
+                                             &outfmt,
                                              p_pic->date, p_pic->date, false );
 
         /* Overlay subpicture */
@@ -763,6 +779,8 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
                 picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
             subpicture_Delete( p_subpic );
         }
+        video_format_Clean( &fmt );
+        video_format_Clean( &outfmt );
     }
 
     if( p_sys->venc_cfg.video.threads.i_count == 0 )
