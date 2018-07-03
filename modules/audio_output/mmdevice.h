@@ -85,7 +85,7 @@ static inline HRESULT aout_stream_Flush(aout_stream_t *s, bool wait)
 
         if (SUCCEEDED(aout_stream_TimeGet(s, &delay))
          && delay <= INT64_C(5000000))
-            Sleep((delay / (CLOCK_FREQ / 1000)) + 1);
+            Sleep(MS_FROM_VLC_TICK( delay ) + 1);
         return S_OK;
     }
     else
