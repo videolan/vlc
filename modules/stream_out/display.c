@@ -111,8 +111,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_audio = var_GetBool( p_stream, SOUT_CFG_PREFIX"audio" );
     p_sys->b_video = var_GetBool( p_stream, SOUT_CFG_PREFIX "video" );
-    p_sys->i_delay = var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" );
-    p_sys->i_delay = p_sys->i_delay * CLOCK_FREQ / 1000;
+    p_sys->i_delay = VLC_TICK_FROM_MS( var_GetInteger( p_stream, SOUT_CFG_PREFIX "delay" ) );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
