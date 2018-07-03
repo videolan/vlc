@@ -1978,7 +1978,7 @@ static int SeekToTime( demux_t *p_demux, const ts_pmt_t *p_pmt, stime_t i_scaled
                 stime_t i_diff = i_scaledtime - TimeStampWrapAround( p_pmt->pcr.i_first, i_pcr );
                 if ( i_diff < 0 )
                     i_tail_pos = (i_splitpos >= p_sys->i_packet_size) ? i_splitpos - p_sys->i_packet_size : 0;
-                else if( i_diff < TO_SCALE(VLC_TICK_0 + CLOCK_FREQ / 2) ) // 500ms
+                else if( i_diff < TO_SCALE(VLC_TICK_0 + VLC_TICK_FROM_MS(500)) )
                     b_found = true;
                 else
                     i_head_pos = i_pos;
@@ -2401,7 +2401,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
     {
         p_pmt->pcr.i_first_dts = TO_SCALE(p_block->i_dts);
     }
-    else if( p_block->i_dts - FROM_SCALE(p_pmt->pcr.i_first_dts) > CLOCK_FREQ / 2 ) /* "PCR repeat rate shall not exceed 100ms" */
+    else if( p_block->i_dts - FROM_SCALE(p_pmt->pcr.i_first_dts) > VLC_TICK_FROM_MS(500) ) /* "PCR repeat rate shall not exceed 100ms" */
     {
         if( p_pmt->pcr.i_current < 0 &&
             GetPID( p_sys, p_pmt->i_pid_pcr )->probed.i_pcr_count == 0 )

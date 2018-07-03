@@ -886,7 +886,7 @@ static int Demux( demux_t *p_demux )
     if ( !p_sys->b_slave )
     {
         es_out_SetPCR( p_demux->out, VLC_TICK_0 + i_barrier );
-        p_sys->i_next_demux_date += CLOCK_FREQ / 8;
+        p_sys->i_next_demux_date += VLC_TICK_FROM_MS(125);
     }
 
     if( p_sys->subtitles.i_current >= p_sys->subtitles.i_count )

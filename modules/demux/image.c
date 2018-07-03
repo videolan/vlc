@@ -196,7 +196,7 @@ static int Demux(demux_t *demux)
         deadline = sys->pts_next;
     } else if (sys->is_realtime) {
         deadline = vlc_tick_now();
-        const vlc_tick_t max_wait = CLOCK_FREQ / 50;
+        const vlc_tick_t max_wait = VLC_TICK_FROM_MS(20);
         if (deadline + max_wait < pts_first) {
             es_out_SetPCR(demux->out, deadline);
             /* That's ugly, but not yet easily fixable */

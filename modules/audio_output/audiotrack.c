@@ -38,7 +38,7 @@
 #define SMOOTHPOS_SAMPLE_COUNT 10
 #define SMOOTHPOS_INTERVAL_US INT64_C(30000) // 30ms
 
-#define AUDIOTIMESTAMP_INTERVAL_US (CLOCK_FREQ/2) // 500ms
+#define AUDIOTIMESTAMP_INTERVAL_US VLC_TICK_FROM_MS(500) // 500ms
 
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );

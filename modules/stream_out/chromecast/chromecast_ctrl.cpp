@@ -492,7 +492,7 @@ int intf_sys_t::pace()
     m_interrupted = false;
     vlc_interrupt_register( interrupt_wake_up_cb, this );
     int ret = 0;
-    vlc_tick_t deadline = vlc_tick_now() + CLOCK_FREQ/2;
+    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(500);
 
     /* Wait for the sout to send more data via http (m_pace), or wait for the
      * CC to finish. In case the demux filter is EOF, we always wait for

@@ -1256,7 +1256,7 @@ static bool MuxStreams(sout_mux_t *p_mux )
                     continue;
 
                 if ( ( i_spu_delay >= 100 * CLOCK_FREQ ) ||
-                     ( i_spu_delay < CLOCK_FREQ / 100 ) )
+                     ( i_spu_delay < VLC_TICK_FROM_MS(10) ) )
                 {
                     BufferChainClean( &p_stream->state.chain_pes );
                     p_stream->state.i_pes_dts = 0;

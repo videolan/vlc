@@ -170,7 +170,7 @@ static void *Run( void *data )
             i_status = 0;
         }
         else
-            vlc_tick_sleep( CLOCK_FREQ/2 );
+            vlc_tick_sleep( VLC_TICK_FROM_MS(500) );
     }
     return NULL;
 }

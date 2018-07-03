@@ -186,7 +186,7 @@ static int Demux( demux_t *p_demux)
             else if( p_sys->f_fps > 0.001f )
                 p_sys->i_dts += (int64_t)((float) CLOCK_FREQ / p_sys->f_fps);
             else
-                p_sys->i_dts += CLOCK_FREQ / 25;
+                p_sys->i_dts += VLC_TICK_FROM_MS(40);
         }
     }
 

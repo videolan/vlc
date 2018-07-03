@@ -310,7 +310,7 @@ static int RefineSeek( demux_t *p_demux, vlc_tick_t i_time, double i_bytemicrora
         {
             vlc_tick_t i_diff = p_block_out->i_dts - i_time;
             /* Not in acceptable approximation range */
-            if( i_diff > CLOCK_FREQ / 10 && i_diff / i_bytemicrorate > i_frame_size )
+            if( i_diff > VLC_TICK_FROM_MS(100) && i_diff / i_bytemicrorate > i_frame_size )
             {
                 i_highpos = i_start_pos;
                 i_start_pos -= ( i_diff / i_bytemicrorate );

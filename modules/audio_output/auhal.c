@@ -842,7 +842,7 @@ AudioStreamChangeFormat(audio_output_t *p_aout, AudioStreamID i_stream_id,
          * set. */
         if (i > 0)
         {
-            vlc_tick_t timeout = vlc_tick_now() + CLOCK_FREQ/2;
+            vlc_tick_t timeout = vlc_tick_now() + VLC_TICK_FROM_MS(500);
             if (vlc_cond_timedwait(&w.cond, &w.lock, timeout))
                 msg_Dbg(p_aout, "reached timeout");
         }

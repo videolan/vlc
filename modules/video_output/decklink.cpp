@@ -302,7 +302,7 @@ static decklink_sys_t *HoldDLSys(vlc_object_t *obj, int i_cat)
             {
                 vlc_mutex_unlock(&sys_lock);
                 msg_Info(obj, "Waiting for previous vout module to exit");
-                vlc_tick_sleep(CLOCK_FREQ / 10);
+                vlc_tick_sleep(VLC_TICK_FROM_MS(100));
                 vlc_mutex_lock(&sys_lock);
             }
         }

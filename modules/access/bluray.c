@@ -414,7 +414,7 @@ static void startBackground(demux_t *p_demux)
     }
 
     // XXX TODO: what would be correct timestamp ???
-    p_block->i_dts = p_block->i_pts = vlc_tick_now() + CLOCK_FREQ/25;
+    p_block->i_dts = p_block->i_pts = vlc_tick_now() + VLC_TICK_FROM_MS(40);
 
     uint8_t *p = p_block->p_buffer;
     memset(p, 0, fmt.video.i_width * fmt.video.i_height);

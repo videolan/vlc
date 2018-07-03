@@ -221,7 +221,7 @@ static int Demux(demux_t *demux)
     if (!sys->b_slave)
     {
         es_out_SetPCR(demux->out, VLC_TICK_0 + i_barrier);
-        sys->next_date += CLOCK_FREQ / 8;
+        sys->next_date += VLC_TICK_FROM_MS(125);
     }
 
     return sys->current < sys->count ? VLC_DEMUXER_SUCCESS : VLC_DEMUXER_EOF;

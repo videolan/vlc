@@ -438,8 +438,8 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
                 deadline = 0; /* no jitter estimate with no frequency :( */
 
             /* Make sure we wait at least for 25 msec */
-            if (deadline < (CLOCK_FREQ / 40))
-                deadline = CLOCK_FREQ / 40;
+            if (deadline < VLC_TICK_FROM_MS(25))
+                deadline = VLC_TICK_FROM_MS(25);
 
             /* Additionnaly, we implicitly wait for the packetization time
              * multiplied by the number of missing packets. block is the first

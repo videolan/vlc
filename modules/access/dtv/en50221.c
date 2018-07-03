@@ -1884,7 +1884,7 @@ static int InitSlot( cam_t * p_cam, int i_slot )
 
     if ( p_cam->pb_active_slot[i_slot] )
     {
-        p_cam->i_timeout = CLOCK_FREQ / 10;
+        p_cam->i_timeout = VLC_TICK_FROM_MS(100);
         return VLC_SUCCESS;
     }
 
@@ -1958,9 +1958,9 @@ cam_t *en50221_Init( vlc_object_t *obj, int fd )
             }
         }
 
-        p_cam->i_timeout = CLOCK_FREQ / 10;
+        p_cam->i_timeout = VLC_TICK_FROM_MS(100);
         /* Wait a bit otherwise it doesn't initialize properly... */
-        vlc_tick_sleep( CLOCK_FREQ / 10 );
+        vlc_tick_sleep( VLC_TICK_FROM_MS(100) );
         p_cam->i_next_event = 0;
     }
     else

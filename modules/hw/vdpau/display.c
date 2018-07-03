@@ -279,7 +279,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     if (unlikely(delay > CLOCK_FREQ))
     {   /* We would get stuck if the delay was too long. */
         msg_Dbg(vd, "picture date corrupt: delay of %"PRId64" us", delay);
-        delay = CLOCK_FREQ / 50;
+        delay = VLC_TICK_FROM_MS(20);
     }
     pts += delay * 1000;
 
