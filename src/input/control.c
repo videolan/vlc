@@ -122,7 +122,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return var_SetInteger( p_input, "state", i_int );
 
         case INPUT_GET_AUDIO_DELAY:
-            pi_64 = va_arg( args, int64_t * );
+            pi_64 = va_arg( args, vlc_tick_t * );
             *pi_64 = var_GetInteger( p_input, "audio-delay" );
             return VLC_SUCCESS;
 
@@ -132,7 +132,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case INPUT_SET_AUDIO_DELAY:
-            i_64 = va_arg( args, int64_t );
+            i_64 = va_arg( args, vlc_tick_t );
             return var_SetInteger( p_input, "audio-delay", i_64 );
 
         case INPUT_SET_SPU_DELAY:

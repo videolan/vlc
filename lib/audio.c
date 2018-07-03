@@ -450,7 +450,7 @@ int64_t libvlc_audio_get_delay( libvlc_media_player_t *p_mi )
     int64_t val = 0;
     if( p_input_thread != NULL )
     {
-      val = var_GetInteger( p_input_thread, "audio-delay" );
+      val = US_FROM_VLC_TICK( var_GetInteger( p_input_thread, "audio-delay" ) );
       vlc_object_release( p_input_thread );
     }
     return val;
@@ -465,7 +465,7 @@ int libvlc_audio_set_delay( libvlc_media_player_t *p_mi, int64_t i_delay )
     int ret = 0;
     if( p_input_thread != NULL )
     {
-      var_SetInteger( p_input_thread, "audio-delay", i_delay );
+      var_SetInteger( p_input_thread, "audio-delay", VLC_TICK_FROM_US( i_delay ) );
       vlc_object_release( p_input_thread );
     }
     else

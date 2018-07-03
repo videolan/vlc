@@ -173,7 +173,7 @@ void input_ControlVarInit ( input_thread_t *p_input )
     /* Delay */
     var_Create( p_input, "audio-delay", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "audio-delay",
-                    1000 * var_GetInteger( p_input, "audio-desync" ) );
+                    VLC_TICK_FROM_MS( var_GetInteger( p_input, "audio-desync" ) ) );
     var_Create( p_input, "spu-delay", VLC_VAR_INTEGER );
 
     val.i_int = -1;

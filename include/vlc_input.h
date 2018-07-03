@@ -413,8 +413,8 @@ enum input_query_e
     INPUT_SET_STATE,            /* arg1= int            res=can fail    */
 
     /* input variable "audio-delay" and "sub-delay" */
-    INPUT_GET_AUDIO_DELAY,      /* arg1 = int* res=can fail */
-    INPUT_SET_AUDIO_DELAY,      /* arg1 = int  res=can fail */
+    INPUT_GET_AUDIO_DELAY,      /* arg1 = vlc_tick_t* res=can fail */
+    INPUT_SET_AUDIO_DELAY,      /* arg1 = vlc_tick_t  res=can fail */
     INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
     INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
 

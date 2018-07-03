@@ -202,15 +202,15 @@
 
 - (int) audioDesync {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
-    int i_delay = -1;
+    vlc_tick_t i_delay;
 
     if(!p_input)
-        return i_delay;
+        return -1;
 
-    i_delay = (int)var_GetInteger(p_input, "audio-delay");
+    i_delay = var_GetInteger(p_input, "audio-delay");
     vlc_object_release(p_input);
 
-    return (i_delay / 1000);
+    return MS_FROM_VLC_TICK( i_delay );
 }
 
 - (void) setAudioDesync:(int)i_audioDesync {
@@ -218,7 +218,7 @@
     if(!p_input)
         return;
 
-    var_SetInteger(p_input, "audio-delay", i_audioDesync * 1000);
+    var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( i_audioDesync ));
     vlc_object_release(p_input);
 }
 
