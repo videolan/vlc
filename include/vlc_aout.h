@@ -35,7 +35,7 @@
 
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
-#define AOUT_MAX_ADVANCE_TIME           (AOUT_MAX_PREPARE_TIME + CLOCK_FREQ)
+#define AOUT_MAX_ADVANCE_TIME           (AOUT_MAX_PREPARE_TIME + VLC_TICK_FROM_SEC(1))
 
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
