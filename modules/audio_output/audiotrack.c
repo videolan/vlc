@@ -686,7 +686,7 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
 
         if( JNI_AT_CALL_BOOL( getTimestamp, p_sys->timestamp.p_obj ) )
         {
-            p_sys->timestamp.i_frame_us = JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ) / 1000;
+            p_sys->timestamp.i_frame_us = VLC_TICK_FROM_NS(JNI_AUDIOTIMESTAMP_GET_LONG( nanoTime ));
             p_sys->timestamp.i_frame_pos = JNI_AUDIOTIMESTAMP_GET_LONG( framePosition );
         }
         else
