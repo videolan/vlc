@@ -581,7 +581,7 @@ static int Demux( demux_t *p_demux )
             if( p_sys->i_pack_scr >= 0 && !p_sys->b_bad_scr )
             {
                 if( (tk->fmt.i_cat == AUDIO_ES || tk->fmt.i_cat == VIDEO_ES) &&
-                    tk->i_first_pts != VLC_TICK_INVALID && tk->i_first_pts - p_sys->i_pack_scr > 2 * CLOCK_FREQ )
+                    tk->i_first_pts != VLC_TICK_INVALID && tk->i_first_pts - p_sys->i_pack_scr > VLC_TICK_FROM_SEC(2))
                 {
                     msg_Warn( p_demux, "Incorrect SCR timing offset by of %"PRId64 "ms, disabling",
                                        tk->i_first_pts - p_sys->i_pack_scr / 1000 );

@@ -97,8 +97,8 @@ static char *FromACP( const char *str )
 }
 
 #define IGNORE_ES DATA_ES
-#define READ_LENGTH (25 * 1000) // 25ms
-#define READ_LENGTH_NONINTERLEAVED (CLOCK_FREQ * 3 / 2)
+#define READ_LENGTH                VLC_TICK_FROM_MS(25)
+#define READ_LENGTH_NONINTERLEAVED VLC_TICK_FROM_MS(1500)
 
 //#define AVI_DEBUG
 

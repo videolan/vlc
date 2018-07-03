@@ -576,7 +576,7 @@ static int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_ou
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define SCRATCH_GENERATOR_PERIOD VLC_TICK_FROM_SEC(2)
-#define SCRATCH_DURATION         ( CLOCK_FREQ * 1 / 2)
+#define SCRATCH_DURATION         VLC_TICK_FROM_MS(500)
 
     /* generate new scratch */
     if ( p_sys->i_scratch_trigger <= p_sys->i_cur_time ) {

@@ -264,7 +264,7 @@ static int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) 
     filter_sys_t *p_sys = p_filter->p_sys;
 
 #define BR_LINES_GENERATOR_PERIOD VLC_TICK_FROM_SEC(50)
-#define BR_LINES_DURATION         ( CLOCK_FREQ * 1/50 )
+#define BR_LINES_DURATION         VLC_TICK_FROM_MS(20)
 
     /* generate new blue or red lines */
     if ( p_sys->i_BR_line_trigger <= p_sys->i_cur_time ) {

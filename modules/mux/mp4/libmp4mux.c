@@ -1350,7 +1350,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             if ( i_interval != -1 )
             {
                 i_interval += p_track->entry[i].i_length + p_track->entry[i].i_pts_dts;
-                if ( i_interval < CLOCK_FREQ * 2 )
+                if ( i_interval < VLC_TICK_FROM_SEC(2) )
                     continue;
             }
 

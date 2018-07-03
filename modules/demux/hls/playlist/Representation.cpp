@@ -118,8 +118,8 @@ void Representation::scheduleNextUpdate(uint64_t number)
     }
     else
     {
-        if(minbuffer < 10 * CLOCK_FREQ)
-            minbuffer = 4 * CLOCK_FREQ;
+        if(minbuffer < VLC_TICK_FROM_SEC(10))
+            minbuffer = VLC_TICK_FROM_SEC(4);
         else
             minbuffer /= 2;
     }

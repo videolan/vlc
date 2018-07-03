@@ -885,7 +885,7 @@ static int Demux( demux_t *p_demux )
     {
         if( p_sys->tracks[i].p_es != NULL &&
                 p_sys->tracks[i].i_pcr != VLC_TICK_INVALID &&
-                p_sys->tracks[i].i_pcr + 10 * CLOCK_FREQ >= i_ts_max )
+                p_sys->tracks[i].i_pcr + VLC_TICK_FROM_SEC(10)>= i_ts_max )
             i_ts_min = __MIN( i_ts_min, p_sys->tracks[i].i_pcr );
     }
     if( i_ts_min >= p_sys->i_pcr && likely(i_ts_min != INT64_MAX) )

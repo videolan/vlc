@@ -660,7 +660,7 @@ static void HandleInterval(vlc_tick_t *next, unsigned int *i_interval)
         if (*i_interval > 120)
             *i_interval = 120;
     }
-    *next = vlc_tick_now() + (*i_interval * CLOCK_FREQ * 60);
+    *next = vlc_tick_now() + (*i_interval * VLC_TICK_FROM_SEC(60));
 }
 
 /*****************************************************************************

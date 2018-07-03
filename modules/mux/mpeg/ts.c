@@ -1252,10 +1252,10 @@ static bool MuxStreams(sout_mux_t *p_mux )
 
                 int64_t i_spu_delay = p_spu->i_dts - p_pcr_stream->state.i_pes_dts;
                 if( ( i_spu_delay > i_shaping_delay ) &&
-                    ( i_spu_delay < 100 * CLOCK_FREQ ) )
+                    ( i_spu_delay < VLC_TICK_FROM_SEC(100)) )
                     continue;
 
-                if ( ( i_spu_delay >= 100 * CLOCK_FREQ ) ||
+                if ( ( i_spu_delay >= VLC_TICK_FROM_SEC(100)) ||
                      ( i_spu_delay < VLC_TICK_FROM_MS(10) ) )
                 {
                     BufferChainClean( &p_stream->state.chain_pes );
@@ -1314,12 +1314,12 @@ static bool MuxStreams(sout_mux_t *p_mux )
         }
 
         if( ( p_pcr_stream->state.i_pes_dts > 0 &&
-              p_data->i_dts - 10 * CLOCK_FREQ > p_pcr_stream->state.i_pes_dts +
+              p_data->i_dts - VLC_TICK_FROM_SEC(10)> p_pcr_stream->state.i_pes_dts +
               p_pcr_stream->state.i_pes_length ) ||
             p_data->i_dts + i_shaping_delay < p_stream->state.i_pes_dts ||
             ( p_stream->state.i_pes_dts > 0 &&
               p_input->p_fmt->i_cat != SPU_ES &&
-              p_data->i_dts - 10 * CLOCK_FREQ > p_stream->state.i_pes_dts +
+              p_data->i_dts - VLC_TICK_FROM_SEC(10)> p_stream->state.i_pes_dts +
               p_stream->state.i_pes_length ) )
         {
             msg_Warn( p_mux, "packet with too strange dts on pid %d (%4.4s)"

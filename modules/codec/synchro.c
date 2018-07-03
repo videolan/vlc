@@ -150,8 +150,8 @@ struct decoder_synchro_t
 };
 
 /* Error margins */
-#define DELTA                   ((CLOCK_FREQ * 3) / 40)
-#define MAX_VALID_TAU           ((CLOCK_FREQ * 3) / 10)
+#define DELTA                   VLC_TICK_FROM_MS(75)  /* 3s/40 */
+#define MAX_VALID_TAU           VLC_TICK_FROM_MS(300)
 
 #define DEFAULT_NB_P            5
 #define DEFAULT_NB_B            1

@@ -86,13 +86,13 @@ void AbstractPlaylist::setMinBuffering( vlc_tick_t min )
 
 vlc_tick_t AbstractPlaylist::getMinBuffering() const
 {
-    return std::max(minBufferTime, 6*CLOCK_FREQ);
+    return std::max(minBufferTime, VLC_TICK_FROM_SEC(6));
 }
 
 vlc_tick_t AbstractPlaylist::getMaxBuffering() const
 {
     const vlc_tick_t minbuf = getMinBuffering();
-    return std::max(minbuf, 60 * CLOCK_FREQ);
+    return std::max(minbuf, VLC_TICK_FROM_SEC(60));
 }
 
 Url AbstractPlaylist::getUrlSegment() const

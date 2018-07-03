@@ -80,8 +80,8 @@ void DASHManager::scheduleNextUpdate()
     if(playlist->minUpdatePeriod.Get() > minbuffer)
         minbuffer = playlist->minUpdatePeriod.Get();
 
-    if(minbuffer < 5 * CLOCK_FREQ)
-        minbuffer = 5 * CLOCK_FREQ;
+    if(minbuffer < VLC_TICK_FROM_SEC(5))
+        minbuffer = VLC_TICK_FROM_SEC(5);
 
     nextPlaylistupdate = now + minbuffer / CLOCK_FREQ;
 

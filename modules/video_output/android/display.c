@@ -991,7 +991,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         vlc_tick_t now = vlc_tick_now();
         if (date > now)
         {
-            if (date - now <= 1*CLOCK_FREQ)
+            if (date - now <= VLC_TICK_FROM_SEC(1))
                 AndroidOpaquePicture_ReleaseAtTime(picture->p_sys, date);
             else /* The picture will be displayed from the Display callback */
                 msg_Warn(vd, "picture way too early to release at time");

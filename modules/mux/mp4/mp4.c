@@ -848,7 +848,7 @@ static void box_send(sout_mux_t *p_mux,  bo_t *box)
 /***************************************************************************
     MP4 Live submodule
 ****************************************************************************/
-#define FRAGMENT_LENGTH  (CLOCK_FREQ * 3/2)
+#define FRAGMENT_LENGTH  VLC_TICK_FROM_MS(1500)
 
 #define ENQUEUE_ENTRY(object, entry) \
     do {\
@@ -890,7 +890,7 @@ static void AddKeyframeEntry(mp4_stream_t *p_stream, const uint64_t i_moof_pos,
     else
         i_last_entry_time = 0;
 
-    if (p_entries && i_time - i_last_entry_time >= CLOCK_FREQ * 2)
+    if (p_entries && i_time - i_last_entry_time >= VLC_TICK_FROM_SEC(2))
     {
         mp4_fragindex_t *p_indexentry = &p_stream->p_indexentries[p_stream->i_indexentries];
         p_indexentry->i_time = i_time;

@@ -89,10 +89,10 @@ struct webvtt_text_parser_t
 
 static vlc_tick_t MakeTime( unsigned t[4] )
 {
-    return t[0] * 3600 * CLOCK_FREQ +
-           t[1] * 60 * CLOCK_FREQ +
-           t[2] * CLOCK_FREQ +
-           t[3] * 1000;
+    return VLC_TICK_FROM_SEC(t[0] * 3600)+
+           VLC_TICK_FROM_SEC(t[1] * 60)+
+           VLC_TICK_FROM_SEC(t[2]) +
+           VLC_TICK_FROM_MS(t[3]);
 }
 
 bool webvtt_scan_time( const char *psz, vlc_tick_t *p_time )

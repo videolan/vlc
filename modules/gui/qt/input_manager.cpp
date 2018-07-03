@@ -165,7 +165,7 @@ void InputManager::delInput()
         int64_t i_time = -1;
 
         if( f_pos >= 0.05f && f_pos <= 0.95f
-         && var_GetInteger( p_input, "length" ) >= 60 * CLOCK_FREQ )
+         && var_GetInteger( p_input, "length" ) >= VLC_TICK_FROM_SEC(60))
             i_time = var_GetInteger( p_input, "time");
 
         RecentsMRL::getInstance( p_intf )->setTime( qfu(uri), i_time );
