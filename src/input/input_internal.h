@@ -255,7 +255,7 @@ static inline void input_ControlPushHelper( input_thread_t *p_input, int i_type,
 bool input_Stopped( input_thread_t * );
 
 /* Bound pts_delay */
-#define INPUT_PTS_DELAY_MAX (CLOCK_FREQ*60)
+#define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)
 
 /**********************************************************************
  * Item metadata
