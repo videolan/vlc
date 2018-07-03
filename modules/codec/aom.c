@@ -289,6 +289,13 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_t *dec = (decoder_t *)p_this;
     decoder_sys_t *sys = dec->p_sys;
 
+    /* Flush decoder */
+    aom_codec_err_t err = aom_codec_decode(&sys->ctx, NULL, 0, NULL);
+    if (err != AOM_CODEC_OK)
+    {
+        AOM_ERR(p_this, &sys->ctx, "Failed to flush decoder");
+    }
+
     /* Free our PTS */
     const void *iter = NULL;
     for (;;) {
