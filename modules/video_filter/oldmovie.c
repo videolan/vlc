@@ -401,7 +401,7 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
     * one shot offset section
     */
 
-#define OFFSET_AVERAGE_PERIOD   (10 * CLOCK_FREQ)
+#define OFFSET_AVERAGE_PERIOD   VLC_TICK_FROM_SEC(10)
 
     /* start trigger to be (re)initialized */
     if ( p_sys->i_offset_trigger == 0
@@ -424,8 +424,8 @@ static int oldmovie_sliding_offset_effect( filter_t *p_filter, picture_t *p_pic_
     * sliding section
     */
 
-#define SLIDING_AVERAGE_PERIOD   (20 * CLOCK_FREQ)
-#define SLIDING_AVERAGE_DURATION ( 3 * CLOCK_FREQ)
+#define SLIDING_AVERAGE_PERIOD   VLC_TICK_FROM_SEC(20)
+#define SLIDING_AVERAGE_DURATION VLC_TICK_FROM_SEC(3)
 
     /* start trigger to be (re)initialized */
     if (    ( p_sys->i_sliding_stop_trig  == 0 )
@@ -575,7 +575,7 @@ static int oldmovie_film_scratch_effect( filter_t *p_filter, picture_t *p_pic_ou
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define SCRATCH_GENERATOR_PERIOD ( CLOCK_FREQ * 2 )
+#define SCRATCH_GENERATOR_PERIOD VLC_TICK_FROM_SEC(2)
 #define SCRATCH_DURATION         ( CLOCK_FREQ * 1 / 2)
 
     /* generate new scratch */
@@ -636,7 +636,7 @@ static void oldmovie_film_blotch_effect( filter_t *p_filter, picture_t *p_pic_ou
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define BLOTCH_GENERATOR_PERIOD ( CLOCK_FREQ * 5 )
+#define BLOTCH_GENERATOR_PERIOD VLC_TICK_FROM_SEC(5)
 
     /* generate blotch */
     if ( p_sys->i_blotch_trigger <= p_sys->i_cur_time ) {
@@ -693,10 +693,10 @@ static void oldmovie_film_dust_effect( filter_t *p_filter, picture_t *p_pic_out 
  * Hair and dust on projector lens
  *
  */
-#define HAIR_GENERATOR_PERIOD ( CLOCK_FREQ * 50  )
-#define HAIR_DURATION         ( CLOCK_FREQ * 50  )
-#define DUST_GENERATOR_PERIOD ( CLOCK_FREQ * 100 )
-#define DUST_DURATION         ( CLOCK_FREQ * 4   )
+#define HAIR_GENERATOR_PERIOD VLC_TICK_FROM_SEC(50)
+#define HAIR_DURATION         VLC_TICK_FROM_SEC(50)
+#define DUST_GENERATOR_PERIOD VLC_TICK_FROM_SEC(100)
+#define DUST_DURATION         VLC_TICK_FROM_SEC(4)
 
 /**
  * Define hair location on the lens and timeout

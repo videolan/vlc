@@ -107,7 +107,7 @@ static int Control( stream_t *, int, va_list );
 
 static block_t *BlockScan( stream_t *, bool * );
 
-#define DVB_SCAN_MAX_LOCK_TIME (2*CLOCK_FREQ)
+#define DVB_SCAN_MAX_LOCK_TIME VLC_TICK_FROM_SEC(2)
 
 static void FilterUnset( stream_t *, int i_max );
 static void FilterSet( stream_t *, int i_pid, int i_type );

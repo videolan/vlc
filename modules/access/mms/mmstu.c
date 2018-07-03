@@ -1611,7 +1611,7 @@ noreturn static void *KeepAliveThread( void *p_data )
 
         vlc_restorecancel( canc );
 
-        vlc_tick_sleep( 10 * CLOCK_FREQ );
+        vlc_tick_sleep( VLC_TICK_FROM_SEC(10) );
     }
     vlc_assert_unreachable();
 }

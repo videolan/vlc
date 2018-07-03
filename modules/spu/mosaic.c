@@ -40,7 +40,7 @@
 
 #include "mosaic.h"
 
-#define BLANK_DELAY  (1*CLOCK_FREQ)
+#define BLANK_DELAY  VLC_TICK_FROM_SEC(1)
 
 /*****************************************************************************
  * Local prototypes

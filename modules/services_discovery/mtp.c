@@ -166,7 +166,7 @@ static void *Run( void *data )
         vlc_restorecancel(canc);
         if( i_status == 2 )
         {
-            vlc_tick_sleep( 5*CLOCK_FREQ );
+            vlc_tick_sleep( VLC_TICK_FROM_SEC(5) );
             i_status = 0;
         }
         else

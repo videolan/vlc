@@ -263,7 +263,7 @@ static void vhs_free_allocated_data( filter_t *p_filter ) {
 static int vhs_blue_red_line_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-#define BR_LINES_GENERATOR_PERIOD ( CLOCK_FREQ * 50 )
+#define BR_LINES_GENERATOR_PERIOD VLC_TICK_FROM_SEC(50)
 #define BR_LINES_DURATION         ( CLOCK_FREQ * 1/50 )
 
     /* generate new blue or red lines */
@@ -394,7 +394,7 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     * one shot offset section
     */
 
-#define OFFSET_AVERAGE_PERIOD   (10 * CLOCK_FREQ)
+#define OFFSET_AVERAGE_PERIOD   VLC_TICK_FROM_SEC(10)
 
     /* start trigger to be (re)initialized */
     if ( p_sys->i_offset_trigger == 0
@@ -432,8 +432,8 @@ static int vhs_sliding_effect( filter_t *p_filter, picture_t *p_pic_out ) {
     * sliding section
     */
 
-#define SLIDING_AVERAGE_PERIOD   (20 * CLOCK_FREQ)
-#define SLIDING_AVERAGE_DURATION ( 3 * CLOCK_FREQ)
+#define SLIDING_AVERAGE_PERIOD   VLC_TICK_FROM_SEC(20)
+#define SLIDING_AVERAGE_DURATION VLC_TICK_FROM_SEC(3)
 
     /* start trigger to be (re)initialized */
     if ( ( p_sys->i_sliding_stop_trig  == 0 ) &&

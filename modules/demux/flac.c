@@ -105,8 +105,8 @@ typedef struct
 } demux_sys_t;
 
 #define FLAC_PACKET_SIZE 16384
-#define FLAC_MAX_PREROLL      (CLOCK_FREQ * 4)
-#define FLAC_MAX_SLOW_PREROLL (CLOCK_FREQ * 45)
+#define FLAC_MAX_PREROLL      VLC_TICK_FROM_SEC(4)
+#define FLAC_MAX_SLOW_PREROLL VLC_TICK_FROM_SEC(45)
 
 /*****************************************************************************
  * Open: initializes ES structures

@@ -40,8 +40,8 @@ using namespace adaptive;
  * http://arxiv.org/abs/1601.06748
  */
 
-#define minimumBufferS (CLOCK_FREQ * 6)  /* Qmin */
-#define bufferTargetS  (CLOCK_FREQ * 30) /* Qmax */
+#define minimumBufferS VLC_TICK_FROM_SEC(6)  /* Qmin */
+#define bufferTargetS  VLC_TICK_FROM_SEC(30) /* Qmax */
 
 NearOptimalContext::NearOptimalContext()
     : buffering_min( minimumBufferS )

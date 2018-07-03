@@ -304,9 +304,9 @@ clear:
     assert(bookmark != NULL);
 
     vlc_tick_t total = bookmark->i_time_offset;
-    uint64_t hour = ( total / ( CLOCK_FREQ * 3600 ) );
-    uint64_t min = ( total % ( CLOCK_FREQ * 3600 ) ) / ( CLOCK_FREQ * 60 );
-    float    sec = ( total % ( CLOCK_FREQ * 60 ) ) / ( CLOCK_FREQ * 1. );
+    uint64_t hour = ( total / VLC_TICK_FROM_SEC(3600) );
+    uint64_t min = ( total % VLC_TICK_FROM_SEC(3600) ) / VLC_TICK_FROM_SEC(60);
+    float    sec = ( total % VLC_TICK_FROM_SEC(60) ) / ( CLOCK_FREQ * 1. );
 
     return [NSString stringWithFormat:@"%02llu:%02llu:%06.3f", hour, min, sec];
 }

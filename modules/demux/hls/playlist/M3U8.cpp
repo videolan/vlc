@@ -37,7 +37,7 @@ M3U8::M3U8 (vlc_object_t *p_object, AuthStorage *auth_) :
     AbstractPlaylist(p_object)
 {
     auth = auth_;
-    minUpdatePeriod.Set( 5 * CLOCK_FREQ );
+    minUpdatePeriod.Set( VLC_TICK_FROM_SEC(5) );
     vlc_mutex_init(&keystore_lock);
 }
 

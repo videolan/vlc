@@ -41,7 +41,7 @@ AbstractPlaylist::AbstractPlaylist (vlc_object_t *p_object_) :
     availabilityStartTime.Set( 0 );
     availabilityEndTime.Set( 0 );
     duration.Set( 0 );
-    minUpdatePeriod.Set( 2 * CLOCK_FREQ );
+    minUpdatePeriod.Set( VLC_TICK_FROM_SEC(2) );
     maxSegmentDuration.Set( 0 );
     minBufferTime = 0;
     timeShiftBufferDepth.Set( 0 );

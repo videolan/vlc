@@ -28,7 +28,7 @@
 #include <vlc_arrays.h>
 #include <vlc_dialog.h>
 
-#define WATCH_TIMER_PERIOD    (10 * CLOCK_FREQ) ///< 10s period for the timer
+#define WATCH_TIMER_PERIOD    VLC_TICK_FROM_SEC(10) ///< 10s period for the timer
 
 /* List of available commands */
 typedef enum
