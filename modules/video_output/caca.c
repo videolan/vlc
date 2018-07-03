@@ -470,8 +470,7 @@ static int Open(vlc_object_t *object)
         }
     }
 
-    sys->cursor_timeout = var_InheritInteger(vd, "mouse-hide-timeout")
-                          * (CLOCK_FREQ / 1000);
+    sys->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(vd, "mouse-hide-timeout") );
     sys->cursor_deadline = INT64_MAX;
 
     /* Fix format */

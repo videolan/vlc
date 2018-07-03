@@ -217,8 +217,7 @@ static void pointer_create(struct seat_data *sd)
     if (likely(sd->pointer != NULL))
         wl_pointer_add_listener(sd->pointer, &pointer_cbs, sd);
 
-    sd->cursor_timeout = var_InheritInteger(sd->owner, "mouse-hide-timeout")
-                         * (CLOCK_FREQ / 1000);
+    sd->cursor_timeout = VLC_TICK_FROM_MS( var_InheritInteger(sd->owner, "mouse-hide-timeout") );
     sd->cursor_deadline = INT64_MAX;
 }
 

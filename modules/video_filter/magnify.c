@@ -73,7 +73,7 @@ typedef struct
 {
     image_handler_t *p_image;
 
-    int64_t i_hide_timeout;
+    vlc_tick_t i_hide_timeout;
 
     int i_zoom; /* zoom level in percent */
     int i_x, i_y; /* top left corner coordinates in original image */
@@ -127,7 +127,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_zoom = 2*ZOOM_FACTOR;
     p_sys->b_visible = true;
     p_sys->i_last_activity = vlc_tick_now();
-    p_sys->i_hide_timeout = 1000 * var_InheritInteger( p_filter, "mouse-hide-timeout" );
+    p_sys->i_hide_timeout = VLC_TICK_FROM_MS( var_InheritInteger( p_filter, "mouse-hide-timeout" ) );
 
     /* */
     p_filter->pf_video_filter = Filter;

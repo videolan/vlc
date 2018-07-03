@@ -315,8 +315,7 @@ static void *Thread (void *data)
         .events = POLLIN,
     };
     xcb_cursor_t cursor = CursorCreate(conn, p_sys->root); /* blank cursor */
-    vlc_tick_t lifetime = var_InheritInteger(wnd, "mouse-hide-timeout")
-                       * (CLOCK_FREQ / 1000);
+    vlc_tick_t lifetime = VLC_TICK_FROM_MS( var_InheritInteger(wnd, "mouse-hide-timeout") );
     vlc_tick_t deadline = INT64_MAX;
 
     if (ufd.fd == -1)
