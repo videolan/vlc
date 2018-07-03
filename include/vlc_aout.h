@@ -39,7 +39,7 @@
 
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
-#define AOUT_MAX_PREPARE_TIME           (2 * CLOCK_FREQ)
+#define AOUT_MAX_PREPARE_TIME           VLC_TICK_FROM_SEC(2)
 
 /* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
  * to avoid too heavy resampling */
