@@ -1016,26 +1016,22 @@ static std::string GetVencAvcodecVTOption( sout_stream_t * /* p_stream */,
                                            const video_format_t * p_vid,
                                            int i_quality )
 {
-    const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
     std::stringstream ssout;
     ssout << "venc=avcodec{codec=h264_videotoolbox,options{realtime=1}}";
-    if( b_hdres )
+    switch( i_quality )
     {
-        switch( i_quality )
-        {
-            /* Here, performances issues won't come from videotoolbox but from
-             * some old chromecast devices */
+        /* Here, performances issues won't come from videotoolbox but from
+         * some old chromecast devices */
 
-            case CONVERSION_QUALITY_HIGH:
-                break;
-            case CONVERSION_QUALITY_MEDIUM:
-                ssout << ",vb=8000000";
-                break;
-            case CONVERSION_QUALITY_LOW:
-            case CONVERSION_QUALITY_LOWCPU:
-                ssout << ",vb=3000000";
-                break;
-        }
+        case CONVERSION_QUALITY_HIGH:
+            break;
+        case CONVERSION_QUALITY_MEDIUM:
+            ssout << ",vb=8000000";
+            break;
+        case CONVERSION_QUALITY_LOW:
+        case CONVERSION_QUALITY_LOWCPU:
+            ssout << ",vb=3000000";
+            break;
     }
 
     return ssout.str();
