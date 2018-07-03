@@ -294,7 +294,7 @@ static int ParseLine ( stream_t *p_demux, char *psz_line )
     else if( !strncasecmp( psz_bol, "sgiDuration=", sizeof("sgiDuration=") - 1 ) )
     {
         psz_bol += sizeof("sgiDuration=") - 1;
-        p_sys->i_duration = (vlc_tick_t) strtol( psz_bol, NULL, 0 );
+        p_sys->i_duration = VLC_TICK_FROM_US( strtol( psz_bol, NULL, 0 ) );
     }
     else if( !strncasecmp( psz_bol, "sgiRtspPort=", sizeof("sgiRtspPort=") - 1 ) )
     {
