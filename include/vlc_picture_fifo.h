@@ -74,6 +74,7 @@ VLC_API void picture_fifo_Push( picture_fifo_t *, picture_t * );
 /**
  * It release all picture inside the fifo that have a lower or equal date
  * if flush_before or higher or equal to if not flush_before than the given one.
+ * Passing VLC_TICK_INVALID on the date releases all the pictures.
  *
  * All pictures inside the fifo will be released by picture_Release.
  */
