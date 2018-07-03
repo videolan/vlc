@@ -85,7 +85,7 @@ int main (void)
     printf ("%u iterations in %"PRId64" us\n", data.count, ts);
     data.count = 0;
     vlc_mutex_unlock (&data.lock);
-    assert(ts >= (CLOCK_FREQ / 10));
+    assert(ts >= VLC_TICK_FROM_MS(100));
 
     vlc_timer_schedule (data.timer, false, 0, 0);
 

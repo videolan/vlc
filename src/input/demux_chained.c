@@ -87,7 +87,7 @@ static void *vlc_demux_chained_Thread(void *data)
             dc->stats.time = newtime;
             vlc_mutex_unlock(&dc->lock);
 
-            next_update = vlc_tick_now() + (CLOCK_FREQ / 4);
+            next_update = vlc_tick_now() + VLC_TICK_FROM_MS(250);
         }
     while (demux_Demux(demux) > 0);
 
