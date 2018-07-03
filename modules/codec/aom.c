@@ -149,7 +149,10 @@ static int Decode(decoder_t *dec, block_t *block)
     if (err != AOM_CODEC_OK) {
         free(pkt_pts);
         AOM_ERR(dec, ctx, "Failed to decode frame");
-        return VLCDEC_SUCCESS;
+        if (err == AOM_CODEC_UNSUP_BITSTREAM)
+            return VLCDEC_ECRITICAL;
+        else
+            return VLCDEC_SUCCESS;
     }
 
     const void *iter = NULL;
