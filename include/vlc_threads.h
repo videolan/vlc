@@ -864,7 +864,7 @@ VLC_API void vlc_tick_wait(vlc_tick_t deadline);
  */
 VLC_API void vlc_tick_sleep(vlc_tick_t delay);
 
-#define VLC_HARD_MIN_SLEEP  (CLOCK_FREQ/100) /* 10 milliseconds = 1 tick at 100Hz */
+#define VLC_HARD_MIN_SLEEP  VLC_TICK_FROM_MS(10)   /* 10 milliseconds = 1 tick at 100Hz */
 #define VLC_SOFT_MIN_SLEEP  VLC_TICK_FROM_SEC(9)   /* 9 seconds */
 
 #if defined (__GNUC__) && !defined (__clang__)

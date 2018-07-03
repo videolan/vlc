@@ -50,14 +50,14 @@
  *****************************************************************************/
 
 /* Base delay in micro second for interface sleeps */
-#define INTF_IDLE_SLEEP                 (CLOCK_FREQ/20)
+#define INTF_IDLE_SLEEP                 VLC_TICK_FROM_MS(50)
 
 /*****************************************************************************
  * Input thread configuration
  *****************************************************************************/
 
 /* Used in ErrorThread */
-#define INPUT_IDLE_SLEEP                (CLOCK_FREQ/10)
+#define INPUT_IDLE_SLEEP                VLC_TICK_FROM_MS(100)
 
 /*
  * General limitations
