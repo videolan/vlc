@@ -405,7 +405,7 @@ bool PlaylistManager::reactivateStream(AbstractStream *stream)
     return stream->reactivate(getResumeTime());
 }
 
-#define DEMUX_INCREMENT (CLOCK_FREQ / 20)
+#define DEMUX_INCREMENT VLC_TICK_FROM_MS(50)
 int PlaylistManager::demux_callback(demux_t *p_demux)
 {
     PlaylistManager *manager = reinterpret_cast<PlaylistManager *>(p_demux->p_sys);
@@ -649,13 +649,13 @@ void PlaylistManager::Run()
         {
             vlc_tick_t i_deadline = vlc_tick_now();
             if(i_return == AbstractStream::buffering_ongoing)
-                i_deadline += (CLOCK_FREQ / 100);
+                i_deadline += VLC_TICK_FROM_MS(10);
             else if(i_return == AbstractStream::buffering_full)
-                i_deadline += (CLOCK_FREQ / 10);
+                i_deadline += VLC_TICK_FROM_MS(100);
             else if(i_return == AbstractStream::buffering_end)
                 i_deadline += (CLOCK_FREQ);
             else /*if(i_return == AbstractStream::buffering_suspended)*/
-                i_deadline += (CLOCK_FREQ / 4);
+                i_deadline += VLC_TICK_FROM_MS(250);
 
             vlc_mutex_lock(&demux.lock);
             vlc_cond_signal(&demux.cond);

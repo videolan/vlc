@@ -285,7 +285,7 @@ static unsigned char* parseVorbisConfigStr( char const* configStr,
 
 static char *passwordLessURL( vlc_url_t *url );
 
-#define PCR_OBS (CLOCK_FREQ / 4)
+#define PCR_OBS VLC_TICK_FROM_MS(250)
 #define PCR_OFF PCR_OBS
 
 /*****************************************************************************

@@ -431,7 +431,7 @@ static int ReadEvents (demux_t *demux, uint64_t *restrict pulse,
     return 0;
 }
 
-#define TICK (CLOCK_FREQ / 100)
+#define TICK VLC_TICK_FROM_MS(10)
 
 /*****************************************************************************
  * Demux: read chunks and send them to the synthesizer

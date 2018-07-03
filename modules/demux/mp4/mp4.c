@@ -143,7 +143,7 @@ typedef struct
     mp4_fragments_index_t *p_fragsindex;
 } demux_sys_t;
 
-#define DEMUX_INCREMENT (CLOCK_FREQ / 4) /* How far the pcr will go, each round */
+#define DEMUX_INCREMENT VLC_TICK_FROM_MS(250) /* How far the pcr will go, each round */
 #define DEMUX_TRACK_MAX_PRELOAD VLC_TICK_FROM_SEC(15) /* maximum preloading, to deal with interleaving */
 
 #define VLC_DEMUXER_EOS (VLC_DEMUXER_EGENERIC - 1)

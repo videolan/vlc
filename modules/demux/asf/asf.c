@@ -186,7 +186,7 @@ static int Open( vlc_object_t * p_this )
 /*****************************************************************************
  * Demux: read packet and send them to decoders
  *****************************************************************************/
-#define CHUNK (CLOCK_FREQ / 10)
+#define CHUNK VLC_TICK_FROM_MS(100)
 static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
