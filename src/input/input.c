@@ -1791,7 +1791,7 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     /* Seek or change volume if the input doesn't have navigation or viewpoint */
     if( seek_direction != 0 )
     {
-        vlc_tick_t it = CLOCK_FREQ * seek_direction * var_InheritInteger( p_input, "short-jump-size" );
+        vlc_tick_t it = vlc_tick_from_sec( seek_direction * var_InheritInteger( p_input, "short-jump-size" ) );
         var_SetInteger( p_input, "time-offset", it );
     }
     else
