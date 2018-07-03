@@ -1498,7 +1498,7 @@ void SyncControls::update()
         i_delay = var_GetInteger( THEMIM->getInput(), "audio-delay" );
         AVSpin->setValue( secf_from_vlc_tick( i_delay ) );
         i_delay = var_GetInteger( THEMIM->getInput(), "spu-delay" );
-        subsSpin->setValue( ( (double)i_delay ) / CLOCK_FREQ );
+        subsSpin->setValue( secf_from_vlc_tick( i_delay ) );
         subSpeedSpin->setValue( var_GetFloat( THEMIM->getInput(), "sub-fps" ) );
         subDurationSpin->setValue( var_InheritFloat( p_intf, SUBSDELAY_CFG_FACTOR ) );
     }

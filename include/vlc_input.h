@@ -415,8 +415,8 @@ enum input_query_e
     /* input variable "audio-delay" and "sub-delay" */
     INPUT_GET_AUDIO_DELAY,      /* arg1 = vlc_tick_t* res=can fail */
     INPUT_SET_AUDIO_DELAY,      /* arg1 = vlc_tick_t  res=can fail */
-    INPUT_GET_SPU_DELAY,        /* arg1 = int* res=can fail */
-    INPUT_SET_SPU_DELAY,        /* arg1 = int  res=can fail */
+    INPUT_GET_SPU_DELAY,        /* arg1 = vlc_tick_t* res=can fail */
+    INPUT_SET_SPU_DELAY,        /* arg1 = vlc_tick_t  res=can fail */
 
     /* Menu (VCD/DVD/BD) Navigation */
     /** Activate the navigation item selected. res=can fail */
