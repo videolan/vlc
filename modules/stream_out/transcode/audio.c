@@ -356,6 +356,14 @@ void transcode_audio_close( sout_stream_id_sys_t *id )
         aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
 }
 
+static bool transcode_audio_format_IsSimilar( const audio_format_t *a,
+                                              const audio_format_t *b )
+{
+    return
+    a->i_rate == b->i_rate &&
+    a->i_physical_channels == b->i_physical_channels;
+}
+
 int transcode_audio_process( sout_stream_t *p_stream,
                                     sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
@@ -385,18 +393,14 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         vlc_mutex_lock(&id->fifo.lock);
 
-        if( p_audio_buf &&
-            ( unlikely(id->p_encoder->p_module == NULL) ||
-              id->audio_dec_out.i_rate != id->fmt_input_audio.i_rate ||
-              id->audio_dec_out.i_physical_channels != id->fmt_input_audio.i_physical_channels ) )
+        if( p_audio_buf && ( unlikely(id->p_encoder->p_module == NULL) ||
+              !transcode_audio_format_IsSimilar( &id->fmt_input_audio, &id->audio_dec_out ) ) )
         {
             if( id->p_encoder->p_module == NULL )
             {
                 transcode_audio_encoder_configure( VLC_OBJECT(p_stream), &p_sys->aenc_cfg,
                                                    &id->audio_dec_out, id->p_encoder );
-                id->fmt_input_audio.i_rate = id->audio_dec_out.i_rate;
-                id->fmt_input_audio.i_physical_channels = id->audio_dec_out.i_physical_channels;
-
+                id->fmt_input_audio = id->audio_dec_out;
             }
             else
             {
