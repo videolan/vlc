@@ -32,6 +32,12 @@
 #ifndef __VLC_MTIME_H
 # define __VLC_MTIME_H 1
 
+#ifdef _WIN32
+#include <winsock2.h>
+#else
+#include <sys/time.h>
+#endif
+
 /**
  * High precision date or time interval
  *
