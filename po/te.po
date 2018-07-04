@@ -5,14 +5,14 @@
 # Translators:
 # rohitharikiran <rohithharikiran@gmail.com>, 2014
 # ప్రవీణ్ ఇళ్ళ <mail2ipn@gmail.com>, 2013-2014
-# వీవెన్ వీరపనేని <veeven@gmail.com>, 2013
+# వీవెన్ వీరపనేని <veeven@gmail.com>, 2013,2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-04 21:15+0200\n"
+"Last-Translator: వీవెన్ వీరపనేని <veeven@gmail.com>, 2018\n"
 "Language-Team: Telugu (https://www.transifex.com/yaron/teams/16553/te/)\n"
 "Language: te\n"
 "MIME-Version: 1.0\n"
@@ -15863,9 +15863,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "పూర్తితెరను వదిలివెళ్ళు"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
