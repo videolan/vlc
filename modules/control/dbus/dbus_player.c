@@ -51,7 +51,7 @@ MarshalPosition( intf_thread_t *p_intf, DBusMessageIter *container )
         i_pos = 0;
     else
     {
-        i_pos = var_GetInteger( p_input, "time" );
+        i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
         vlc_object_release( p_input );
     }
 
@@ -99,7 +99,7 @@ DBUS_METHOD( SetPosition )
 
     if( input != NULL )
     {
-        var_SetInteger( input, "time", i_pos );
+        var_SetInteger( input, "time", VLC_TICK_FROM_US(i_pos) );
         vlc_object_release( input );
     }
 
@@ -130,7 +130,7 @@ DBUS_METHOD( Seek )
     if( p_input && var_GetBool( p_input, "can-seek" ) )
     {
         vlc_tick_t i_pos = var_GetInteger( p_input, "time" ) + i_step;
-        var_SetInteger( p_input, "time", (i_pos >= 0) ? i_pos : 0 );
+        var_SetInteger( p_input, "time", (i_pos >= 0) ? VLC_TICK_FROM_US(i_pos) : 0 );
     }
 
     if( p_input )
@@ -547,7 +547,7 @@ DBUS_SIGNAL( SeekedSignal )
 
     if( p_input )
     {
-        i_pos = var_GetInteger( p_input, "time" );
+        i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
         vlc_object_release( p_input );
     }
 
