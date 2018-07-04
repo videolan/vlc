@@ -1509,7 +1509,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     /* Feed input to the DMO */
     p_in = CMediaBufferCreate( p_block_in, p_block_in->i_buffer, true );
     i_result = p_sys->p_dmo->vt->ProcessInput( p_sys->p_dmo, 0,
-       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_TIME, i_pts * 10, 0 );
+       (IMediaBuffer *)p_in, DMO_INPUT_DATA_BUFFERF_TIME, MSFTIME_FROM_VLC_TICK(i_pts), 0 );
 
     p_in->vt->Release( (IUnknown *)p_in );
     if( i_result == S_FALSE )
@@ -1579,14 +1579,14 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         {
 #ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): pts: %"PRId64", %"PRId64,
-                     i_pts, db.rtTimestamp / 10 );
+                     i_pts, VLC_TICK_FROM_MSFTIME(db.rtTimestamp) );
 #endif
-            i_pts = db.rtTimestamp / 10;
+            i_pts = VLC_TICK_FROM_MSFTIME(db.rtTimestamp);
         }
 
         if( db.dwStatus & DMO_OUTPUT_DATA_BUFFERF_TIMELENGTH )
         {
-            p_block_out->i_length = db.rtTimelength / 10;
+            p_block_out->i_length = VLC_TICK_FROM_MSFTIME(db.rtTimelength);
 #ifdef DMO_DEBUG
             msg_Dbg( p_enc, "ProcessOutput(): length: %"PRId64,
                      p_block_out->i_length );
