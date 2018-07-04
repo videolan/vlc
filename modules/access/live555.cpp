@@ -1932,8 +1932,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     //msg_Dbg( p_demux, "pts: %d", pts.tv_sec );
 
-    vlc_tick_t i_pts = vlc_tick_from_sec( pts.tv_sec ) +
-        VLC_TICK_FROM_US( pts.tv_usec );
+    vlc_tick_t i_pts = vlc_tick_from_timeval( &pts );
 
     /* XXX Beurk beurk beurk Avoid having negative value XXX */
     i_pts &= INT64_C(0x00ffffffffffffff);
@@ -2005,8 +2004,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
 #if 0
     fprintf( stderr, "StreamRead size=%d pts=%lld\n",
-             i_size,
-             pts.tv_sec * 1000000LL + pts.tv_usec );
+             i_size, vlc_tick_from_timeval( &pts) );
 #endif
 
     /* grow buffer if it looks like buffer is too small, but don't eat
