@@ -895,7 +895,7 @@ error:
     {
         /* Pick up any return data the encoder thread wants to output. */
         vlc_mutex_lock( &id->lock_out );
-        *out = id->p_buffers;
+        block_ChainAppend( out, id->p_buffers );
         id->p_buffers = NULL;
         vlc_mutex_unlock( &id->lock_out );
     }
@@ -915,7 +915,7 @@ error:
         {
             msg_Dbg( p_stream, "Flushing thread and waiting that");
             transcode_video_encoder_close( p_stream, id );
-            *out = id->p_buffers;
+            block_ChainAppend( out, id->p_buffers );
             id->p_buffers = NULL;
             msg_Dbg( p_stream, "Flushing done");
         }
