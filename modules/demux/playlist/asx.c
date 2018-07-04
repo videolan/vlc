@@ -113,7 +113,7 @@ static bool ParseTime(xml_reader_t *p_xml_reader, vlc_tick_t* pi_result )
     }
     i_result = i_result * CLOCK_FREQ;
     if( i_subfractions != -1)
-        i_result += i_subresult;
+        i_result += VLC_TICK_FROM_US( i_subresult );
 
     free( psz_start );
     *pi_result = i_result;
