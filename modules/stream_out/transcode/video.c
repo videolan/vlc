@@ -731,65 +731,68 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_DeleteBlend( id->p_spu_blender );
 }
 
-static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id, block_t **out )
+static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
+                                       picture_t *p_pic )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
-    /*
-     * Encoding
-     */
     /* Check if we have a subpicture to overlay */
-    if( p_sys->p_spu )
+    if( !p_sys->p_spu )
+        return p_pic;
+
+    video_format_t fmt, outfmt;
+    vlc_mutex_lock( &id->fifo.lock );
+    video_format_Copy( &outfmt, &id->video_dec_out );
+    vlc_mutex_unlock( &id->fifo.lock );
+    video_format_Copy( &fmt, &p_pic->format );
+    if( fmt.i_visible_width <= 0 || fmt.i_visible_height <= 0 )
     {
-        video_format_t fmt, outfmt;
-        vlc_mutex_lock( &id->fifo.lock );
-        video_format_Copy( &outfmt, &id->video_dec_out );
-        vlc_mutex_unlock( &id->fifo.lock );
-        video_format_Copy( &fmt, &p_pic->format );
-        if( fmt.i_visible_width <= 0 || fmt.i_visible_height <= 0 )
-        {
-            fmt.i_visible_width  = fmt.i_width;
-            fmt.i_visible_height = fmt.i_height;
-            fmt.i_x_offset       = 0;
-            fmt.i_y_offset       = 0;
-        }
-
-        subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt,
-                                             &outfmt,
-                                             p_pic->date, p_pic->date, false );
-
-        /* Overlay subpicture */
-        if( p_subpic )
-        {
-            if( filter_chain_IsEmpty( id->p_f_chain ) )
-            {
-                /* We can't modify the picture, we need to duplicate it,
-                 * in this point the picture is already p_encoder->fmt.in format*/
-                picture_t *p_tmp = video_new_buffer_encoder( id->p_encoder );
-                if( likely( p_tmp ) )
-                {
-                    picture_Copy( p_tmp, p_pic );
-                    picture_Release( p_pic );
-                    p_pic = p_tmp;
-                }
-            }
-            if( unlikely( !id->p_spu_blender ) )
-                id->p_spu_blender = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
-            if( likely( id->p_spu_blender ) )
-                picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
-            subpicture_Delete( p_subpic );
-        }
-        video_format_Clean( &fmt );
-        video_format_Clean( &outfmt );
+        fmt.i_visible_width  = fmt.i_width;
+        fmt.i_visible_height = fmt.i_height;
+        fmt.i_x_offset       = 0;
+        fmt.i_y_offset       = 0;
     }
+
+    subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt,
+                                         &outfmt,
+                                         p_pic->date, p_pic->date, false );
+
+    /* Overlay subpicture */
+    if( p_subpic )
+    {
+        if( filter_chain_IsEmpty( id->p_f_chain ) )
+        {
+            /* We can't modify the picture, we need to duplicate it,
+                 * in this point the picture is already p_encoder->fmt.in format*/
+            picture_t *p_tmp = video_new_buffer_encoder( id->p_encoder );
+            if( likely( p_tmp ) )
+            {
+                picture_Copy( p_tmp, p_pic );
+                picture_Release( p_pic );
+                p_pic = p_tmp;
+            }
+        }
+        if( unlikely( !id->p_spu_blender ) )
+            id->p_spu_blender = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
+        if( likely( id->p_spu_blender ) )
+            picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
+        subpicture_Delete( p_subpic );
+    }
+    video_format_Clean( &fmt );
+    video_format_Clean( &outfmt );
+
+    return p_pic;
+}
+
+static block_t * EncodeFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->venc_cfg.video.threads.i_count == 0 )
     {
-        block_t *p_block;
-
-        p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
-        block_ChainAppend( out, p_block );
+        block_t *p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         picture_Release( p_pic );
+        return p_block;
     }
     else
     {
@@ -798,6 +801,7 @@ static void OutputFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_
         picture_fifo_Push( id->pp_pics, p_pic );
         vlc_cond_signal( &id->cond );
         vlc_mutex_unlock( &id->lock_out );
+        return NULL;
     }
 }
 
@@ -879,30 +883,34 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
          * and then with NULL as many times as we need until they
          * stop outputting frames.
          */
-        for ( ;; ) {
-            picture_t *p_filtered_pic = p_pic;
-
+        for ( picture_t *p_in = p_pic; ; p_in = NULL /* drain second time */ )
+        {
             /* Run filter chain */
             if( id->p_f_chain )
-                p_filtered_pic = filter_chain_VideoFilter( id->p_f_chain, p_filtered_pic );
-            if( !p_filtered_pic )
+                p_in = filter_chain_VideoFilter( id->p_f_chain, p_in );
+
+            if( !p_in )
                 break;
 
-            for ( ;; ) {
-                picture_t *p_user_filtered_pic = p_filtered_pic;
-
+            for ( ;; p_in = NULL /* drain second time */ )
+            {
                 /* Run user specified filter chain */
                 if( id->p_uf_chain )
-                    p_user_filtered_pic = filter_chain_VideoFilter( id->p_uf_chain, p_user_filtered_pic );
-                if( !p_user_filtered_pic )
+                    p_in = filter_chain_VideoFilter( id->p_uf_chain, p_in );
+
+                if( !p_in )
                     break;
 
-                OutputFrame( p_stream, p_user_filtered_pic, id, out );
+                /* Blend subpictures */
+                p_in = RenderSubpictures( p_stream, id, p_in );
 
-                p_filtered_pic = NULL;
+                if( p_in )
+                {
+                    block_t *p_encoded = EncodeFrame( p_stream, p_in, id );
+                    if( p_encoded )
+                        block_ChainAppend( out, p_encoded );
+                }
             }
-
-            p_pic = NULL;
         }
         continue;
 error:
