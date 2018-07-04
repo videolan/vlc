@@ -1884,25 +1884,24 @@ static int Demux( demux_t *p_demux )
                     p_stream->b_pts = true;
                 }
                 else
-                    i_pts = VLC_TICK_INVALID;
+                    i_pts = LONG_MIN;
             }
 
-            if( i_pts != VLC_TICK_INVALID ) {
+            if( i_pts != LONG_MIN ) {
                 i_pts += 5;
-                i_pts /= 10; /* 100-ns to µs conversion */
-                i_pts += VLC_TICK_0;
             }
 #if 0
             msg_Dbg( p_demux, "Read() stream: %i, size: %i, PTS: %" PRId64,
-                     i_stream, i_data_size, i_pts );
+                     i_stream, i_data_size, VLC_TICK_FROM_MSFTIME(i_pts) );
 #endif
 
             p_block = block_Alloc( i_data_size );
             memcpy( p_block->p_buffer, p_data, i_data_size );
-            p_block->i_pts = p_block->i_dts = i_pts;
+            p_block->i_pts = p_block->i_dts = i_pts == LONG_MIN ?
+                        VLC_TICK_INVALID : (VLC_TICK_FROM_MSFTIME(i_pts) + VLC_TICK_0);
 
-            if( i_pts != VLC_TICK_INVALID )
-                es_out_SetPCR( p_demux->out, i_pts );
+            if( p_block->i_pts != VLC_TICK_INVALID )
+                es_out_SetPCR( p_demux->out, p_block->i_pts );
             es_out_Send( p_demux->out, p_stream->p_es, p_block );
 
             i_samples--;
