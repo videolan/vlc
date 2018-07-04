@@ -55,14 +55,6 @@ static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
 #define vlc_clock_setup() \
     pthread_once(&vlc_clock_once, vlc_clock_setup_once)
 
-static struct timespec mtime_to_ts (vlc_tick_t date)
-{
-    lldiv_t d = lldiv (date, CLOCK_FREQ);
-    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
-
-    return ts;
-}
-
 /* Print a backtrace to the standard error for debugging purpose. */
 void vlc_trace (const char *fn, const char *file, unsigned line)
 {

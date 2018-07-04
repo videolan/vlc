@@ -37,6 +37,7 @@
 #include <assert.h>
 
 #include <time.h>
+#include <stdlib.h>
 
 /**
  * Convert seconds to a time in the format h:mm:ss.
@@ -153,4 +154,12 @@ uint64_t NTPtime64(void)
      */
     t |= ((UINT64_C(70) * 365 + 17) * 24 * 60 * 60 + ts.tv_sec) << 32;
     return t;
+}
+
+struct timespec mtime_to_ts (vlc_tick_t date)
+{
+    lldiv_t d = lldiv (date, CLOCK_FREQ);
+    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
+
+    return ts;
 }
