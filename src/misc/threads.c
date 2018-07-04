@@ -213,13 +213,13 @@ int vlc_cond_timedwait(vlc_cond_t *cond, vlc_mutex_t *mutex, vlc_tick_t deadline
 }
 
 int vlc_cond_timedwait_daytime(vlc_cond_t *cond, vlc_mutex_t *mutex,
-                               time_t deadline)
+                               time_t deadline_daytime)
 {
     struct timespec ts;
+    vlc_tick_t deadline = vlc_tick_from_sec( deadline_daytime );
 
     timespec_get(&ts, TIME_UTC);
-    deadline -= vlc_tick_from_sec( ts.tv_sec );
-    deadline -= VLC_TICK_FROM_NS( ts.tv_nsec );
+    deadline -= vlc_tick_from_sec( ts.tv_sec ) + VLC_TICK_FROM_NS( ts.tv_nsec );
 
     return vlc_cond_wait_delay(cond, mutex, deadline);
 }
