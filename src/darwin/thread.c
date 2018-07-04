@@ -285,7 +285,7 @@ int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
      * time deadline is passed, even if the real time is adjusted in between.
      * This is not fulfilled, as described above.
      */
-    struct timespec ts = mtime_to_ts(deadline);
+    struct timespec ts = { deadline, 0 };
     int val = pthread_cond_timedwait(p_condvar, p_mutex, &ts);
 
     if (val != ETIMEDOUT)
