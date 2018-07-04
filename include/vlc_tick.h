@@ -154,6 +154,11 @@ typedef int64_t msftime_t;
 #define MSFTIME_FROM_VLC_TICK(vtk)  ((vtk)  * INT64_C(10000000) / CLOCK_FREQ)
 #endif /* CLOCK_FREQ / 10000000 */
 
+static inline vlc_tick_t vlc_tick_from_timeval(const struct timeval *tv)
+{
+    return vlc_tick_from_sec( tv->tv_sec ) + VLC_TICK_FROM_US( tv->tv_usec );
+}
+
 
 /*****************************************************************************
  * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
