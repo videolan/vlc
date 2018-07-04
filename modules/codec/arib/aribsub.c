@@ -264,7 +264,7 @@ static subpicture_t *render( decoder_t *p_dec, arib_parser_t *p_parser,
     }
 
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = p_block->i_pts + arib_decoder_get_time( p_arib_decoder );
+    p_spu->i_stop = p_block->i_pts + VLC_TICK_FROM_US(arib_decoder_get_time( p_arib_decoder ));
     p_spu->b_ephemer  = (p_spu->i_start == p_spu->i_stop);
     p_spu->b_absolute = true;
 
