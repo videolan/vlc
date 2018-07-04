@@ -416,7 +416,6 @@ vlc_tick_t vlc_tick_now (void)
     if (unlikely(clock_gettime (CLOCK_MONOTONIC, &ts) != 0))
         abort ();
 
-    static_assert(INT64_C(1000000) == CLOCK_FREQ, "CLOCK_FREQ mismatch");
     return vlc_tick_from_timeval( &ts );
 }
 
