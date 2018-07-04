@@ -254,7 +254,7 @@ static es_out_id_t *CreateES(demux_t *demux, IAudioClient *client, bool loop,
         flags |= AUDCLNT_STREAMFLAGS_LOOPBACK;
 
     /* Request at least thrice the PTS delay */
-    REFERENCE_TIME bufsize = caching * INT64_C(10) * 3;
+    REFERENCE_TIME bufsize = MSFTIME_FROM_VLC_TICK( caching ) * 3;
 
     hr = IAudioClient_Initialize(client, AUDCLNT_SHAREMODE_SHARED, flags,
                                  bufsize, 0, pwf, NULL);
