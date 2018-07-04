@@ -524,7 +524,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         else
         {
             vlc_ToWave(pwfe, &fmt);
-            buffer_duration = AOUT_MAX_PREPARE_TIME * 10;
+            buffer_duration = MSFTIME_FROM_VLC_TICK(AOUT_MAX_PREPARE_TIME);
         }
     }
     else
