@@ -577,7 +577,7 @@ vlc_tick_t vlc_tick_now (void)
     if (unlikely(clock_gettime(CLOCK_MONOTONIC, &ts) != 0))
         abort ();
 
-    return vlc_tick_from_timeval( &ts );
+    return vlc_tick_from_timespec( &ts );
 }
 
 #undef vlc_tick_wait
