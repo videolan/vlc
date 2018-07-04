@@ -1880,7 +1880,7 @@ static int Demux( demux_t *p_demux )
                 if( p_stream->mt.majortype == MEDIATYPE_Video || !p_stream->b_pts )
                 {
                     /* Use our data timestamp */
-                    i_pts = sample.i_timestamp;
+                    i_pts = MSFTIME_FROM_VLC_TICK(sample.i_timestamp);
                     p_stream->b_pts = true;
                 }
                 else
