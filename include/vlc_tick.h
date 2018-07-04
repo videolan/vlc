@@ -32,12 +32,6 @@
 #ifndef __VLC_MTIME_H
 # define __VLC_MTIME_H 1
 
-#ifdef _WIN32
-#include <winsock2.h>
-#else
-#include <sys/time.h>
-#endif
-
 /**
  * High precision date or time interval
  *
@@ -161,10 +155,8 @@ typedef int64_t msftime_t;
 #define MSFTIME_FROM_VLC_TICK(vtk)  ((vtk)  * INT64_C(10000000) / CLOCK_FREQ)
 #endif /* CLOCK_FREQ / 10000000 */
 
-static inline vlc_tick_t vlc_tick_from_timeval(const struct timeval *tv)
-{
-    return vlc_tick_from_sec( tv->tv_sec ) + VLC_TICK_FROM_US( tv->tv_usec );
-}
+#define vlc_tick_from_timeval(tv) \
+    (vlc_tick_from_sec( (tv)->tv_sec ) + VLC_TICK_FROM_US( (tv)->tv_usec ))
 
 static inline vlc_tick_t vlc_tick_from_timespec(const struct timespec *tv)
 {
