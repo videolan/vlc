@@ -78,10 +78,17 @@ void vlc_addr_wait(void *addr, unsigned val)
     vlc_futex_wait(addr, val, NULL);
 }
 
+static struct timespec mtime_to_ts (vlc_tick_t date)
+{
+    lldiv_t d = lldiv (date, CLOCK_FREQ);
+    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
+
+    return ts;
+}
+
 bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
-    lldiv_t d = lldiv(delay, CLOCK_FREQ);
-    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
+    struct timespec ts = mtime_to_ts(delay);
 
     return (vlc_futex_wait(addr, val, &ts) == 0 || errno != ETIMEDOUT);
 }
