@@ -289,6 +289,7 @@ done:
     CFRelease(codepointString);
     CFRelease(fallbackFont);
     CFRelease(fallbackFontFamilyName);
+    free(psz_fallbackFamilyName);
     free(psz_lc_fallback);
     free(psz_fontPath);
     if (postScriptFallbackFontname != NULL)
