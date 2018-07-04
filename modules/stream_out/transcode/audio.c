@@ -408,7 +408,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 msg_Info( p_stream, "Audio changed, trying to reinitialize filters" );
                 if( id->p_af_chain != NULL )
                 {
-                    aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
+                    aout_FiltersDelete( p_stream, id->p_af_chain );
                     id->p_af_chain = NULL;
                 }
             }
