@@ -148,6 +148,7 @@ static inline double secf_from_vlc_tick(vlc_tick_t vtk)
 typedef int64_t msftime_t;
 
 #define MSFTIME_FROM_SEC(sec)       (INT64_C(10000000) * (sec))  /* seconds in msftime_t */
+#define MSFTIME_FROM_MS(sec)        (INT64_C(10000) * (sec))     /* milliseconds in msftime_t */
 
 #if (CLOCK_FREQ % 10000000) == 0
 #define VLC_TICK_FROM_MSFTIME(msft) ((msft) * (CLOCK_FREQ / INT64_C(10000000))
