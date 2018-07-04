@@ -418,7 +418,7 @@ int vlc_cond_timedwait_daytime (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 
     gettimeofday (&tv, NULL);
 
-    total = vlc_tick_from_sec( tv.tv_sec ) + VLC_TICK_FROM_US( tv.tv_usec );
+    total = vlc_tick_from_timeval( &tv );
     total = (deadline - total) / 1000;
     if( total < 0 )
         total = 0;

@@ -417,7 +417,7 @@ vlc_tick_t vlc_tick_now (void)
         abort ();
 
     static_assert(INT64_C(1000000) == CLOCK_FREQ, "CLOCK_FREQ mismatch");
-    return vlc_tick_from_sec( ts.tv_sec ) + VLC_TICK_FROM_NS( ts.tv_nsec );
+    return vlc_tick_from_timeval( &ts );
 }
 
 /* cpu */
