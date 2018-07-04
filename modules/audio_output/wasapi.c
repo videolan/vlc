@@ -493,14 +493,14 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
         vlc_SpdifToWave(pwfe, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
         /* The max buffer duration in exclusive mode is 200ms */
-        buffer_duration = AOUT_MAX_PREPARE_TIME;
+        buffer_duration = MSFTIME_FROM_MS(200);
     }
     else if (b_hdmi)
     {
         vlc_HdmiToWave(&wf_iec61937, &fmt);
         shared_mode = AUDCLNT_SHAREMODE_EXCLUSIVE;
         /* The max buffer duration in exclusive mode is 200ms */
-        buffer_duration = AOUT_MAX_PREPARE_TIME;
+        buffer_duration = MSFTIME_FROM_MS(200);
     }
     else if (AOUT_FMT_LINEAR(&fmt))
     {
@@ -519,7 +519,7 @@ static HRESULT Start(aout_stream_t *s, audio_sample_format_t *restrict pfmt,
 
             /* Setup low latency in order to quickly react to ambisonics filters
              * viewpoint changes. */
-            buffer_duration = AOUT_MIN_PREPARE_TIME;
+            buffer_duration = MSFTIME_FROM_MS(200);
         }
         else
         {
