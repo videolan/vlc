@@ -81,7 +81,7 @@ void vlc_addr_wait(void *addr, unsigned val)
 bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
     lldiv_t d = lldiv(delay, CLOCK_FREQ);
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
 
     return (vlc_futex_wait(addr, val, &ts) == 0 || errno != ETIMEDOUT);
 }

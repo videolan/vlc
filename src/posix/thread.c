@@ -64,7 +64,7 @@ static void vlc_clock_setup_once (void)
 static struct timespec mtime_to_ts (vlc_tick_t date)
 {
     lldiv_t d = lldiv (date, CLOCK_FREQ);
-    struct timespec ts = { d.quot, d.rem * (1000000000 / CLOCK_FREQ) };
+    struct timespec ts = { d.quot, NS_FROM_VLC_TICK( d.rem ) };
 
     return ts;
 }
