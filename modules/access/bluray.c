@@ -2477,13 +2477,14 @@ static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
 
 #define BD_TS_PACKET_SIZE (192)
 #define NB_TS_PACKETS (200)
+#define BD_READ_SIZE (NB_TS_PACKETS * BD_TS_PACKET_SIZE)
 
 static int blurayDemux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     BD_EVENT e;
 
-    block_t *p_block = block_Alloc(NB_TS_PACKETS * (int64_t)BD_TS_PACKET_SIZE);
+    block_t *p_block = block_Alloc(BD_READ_SIZE);
     if (!p_block)
         return VLC_DEMUXER_EGENERIC;
 
@@ -2493,11 +2494,9 @@ static int blurayDemux(demux_t *p_demux)
         while (bd_get_event(p_sys->bluray, &e))
             blurayHandleEvent(p_demux, &e);
 
-        nread = bd_read(p_sys->bluray, p_block->p_buffer,
-                        NB_TS_PACKETS * BD_TS_PACKET_SIZE);
+        nread = bd_read(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE);
     } else {
-        nread = bd_read_ext(p_sys->bluray, p_block->p_buffer,
-                            NB_TS_PACKETS * BD_TS_PACKET_SIZE, &e);
+        nread = bd_read_ext(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE, &e);
         while (e.event != BD_EVENT_NONE) {
             blurayHandleEvent(p_demux, &e);
             bd_get_event(p_sys->bluray, &e);
