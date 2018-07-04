@@ -251,7 +251,7 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     if (deadline < 0)
         deadline = 0;
 
-    struct timespec ts = mtime_to_ts(deadline);
+    struct timespec ts = timespec_from_vlc_tick(deadline);
     int val = pthread_cond_timedwait_relative_np(p_condvar, p_mutex, &ts);
     if (val != ETIMEDOUT)
         VLC_THREAD_ASSERT ("timed-waiting on condition");
@@ -539,7 +539,7 @@ void vlc_tick_wait (vlc_tick_t deadline)
 #undef vlc_tick_sleep
 void vlc_tick_sleep (vlc_tick_t delay)
 {
-    struct timespec ts = mtime_to_ts (delay);
+    struct timespec ts = timespec_from_vlc_tick (delay);
 
     /* nanosleep uses mach_absolute_time and mach_wait_until internally,
        but also handles kernel errors. Thus we use just this. */

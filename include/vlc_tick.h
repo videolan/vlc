@@ -165,7 +165,7 @@ static inline vlc_tick_t vlc_tick_from_timeval(const struct timeval *tv)
     return vlc_tick_from_sec( tv->tv_sec ) + VLC_TICK_FROM_US( tv->tv_usec );
 }
 
-struct timespec mtime_to_ts (vlc_tick_t date);
+struct timespec timespec_from_vlc_tick(vlc_tick_t date);
 
 
 /*****************************************************************************

@@ -80,7 +80,7 @@ void vlc_addr_wait(void *addr, unsigned val)
 
 bool vlc_addr_timedwait(void *addr, unsigned val, vlc_tick_t delay)
 {
-    struct timespec ts = mtime_to_ts(delay);
+    struct timespec ts = timespec_from_vlc_tick(delay);
 
     return (vlc_futex_wait(addr, val, &ts) == 0 || errno != ETIMEDOUT);
 }
