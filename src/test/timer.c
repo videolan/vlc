@@ -87,7 +87,7 @@ int main (void)
     vlc_mutex_unlock (&data.lock);
     assert(ts >= VLC_TICK_FROM_MS(100));
 
-    vlc_timer_schedule (data.timer, false, 0, 0);
+    vlc_timer_disarm (data.timer);
 
     /* Absolute timer */
     ts = vlc_tick_now ();

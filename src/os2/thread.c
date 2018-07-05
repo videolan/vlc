@@ -1010,7 +1010,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         timer->interval = 0;
     }
 
-    if (value == 0)
+    if (value == VLC_TIMER_DISARM)
         return; /* Disarm */
 
     if (absolute)

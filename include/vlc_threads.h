@@ -948,6 +948,8 @@ VLC_USED;
  */
 VLC_API void vlc_timer_destroy(vlc_timer_t timer);
 
+#define VLC_TIMER_DISARM    (0)
+
 /**
  * Arms or disarms an initialized timer.
  *
@@ -968,6 +970,11 @@ VLC_API void vlc_timer_destroy(vlc_timer_t timer);
  */
 VLC_API void vlc_timer_schedule(vlc_timer_t timer, bool absolute,
                                 vlc_tick_t value, vlc_tick_t interval);
+
+static inline void vlc_timer_disarm(vlc_timer_t timer)
+{
+    vlc_timer_schedule( timer, false, VLC_TIMER_DISARM, 0 );
+}
 
 /**
  * Fetches and resets the overrun counter for a timer.

@@ -146,7 +146,7 @@ void vlc_timer_destroy (vlc_timer_t timer)
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          vlc_tick_t value, vlc_tick_t interval)
 {
-    if (value == 0)
+    if (value == VLC_TIMER_DISARM)
         interval = 0;
     else
     if (!absolute)

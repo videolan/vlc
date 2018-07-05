@@ -70,7 +70,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
         timer->handle = INVALID_HANDLE_VALUE;
     }
-    if (value == 0)
+    if (value == VLC_TIMER_DISARM)
         return; /* Disarm */
 
     if (absolute)
