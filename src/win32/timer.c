@@ -83,7 +83,8 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     interval = (interval + 999) / 1000;
 
     if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
-                                value, interval, WT_EXECUTEDEFAULT))
+                                MS_FROM_VLC_TICK(value), MS_FROM_VLC_TICK(interval),
+                                WT_EXECUTEDEFAULT))
         abort ();
 }
 
