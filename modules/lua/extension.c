@@ -1097,7 +1097,8 @@ int vlclua_extension_keep_alive( lua_State *L )
         vlc_dialog_release( p_ext->p_sys->p_mgr, p_ext->p_sys->p_progress_id );
         p_ext->p_sys->p_progress_id = NULL;
     }
-    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
+    vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD,
+                        VLC_TIMER_FIRE_ONCE );
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
     return 1;
@@ -1201,7 +1202,8 @@ static void WatchTimerCallback( void *data )
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             return;
         }
-        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100), 0 );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100),
+                            VLC_TIMER_FIRE_ONCE );
     }
     else
     {
@@ -1213,7 +1215,8 @@ static void WatchTimerCallback( void *data )
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             return;
         }
-        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100), 0 );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100),
+                            VLC_TIMER_FIRE_ONCE );
     }
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 }

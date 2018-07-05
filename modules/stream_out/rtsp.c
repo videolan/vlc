@@ -311,7 +311,7 @@ static void RtspUpdateTimer( rtsp_stream_t *rtsp )
     }
     if (timeout != 0)
         timeout += vlc_tick_from_sec( rtsp->timeout );
-    vlc_timer_schedule(rtsp->timer, true, timeout, 0);
+    vlc_timer_schedule(rtsp->timer, true, timeout, VLC_TIMER_FIRE_ONCE);
 }
 
 

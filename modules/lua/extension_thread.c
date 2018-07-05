@@ -282,7 +282,8 @@ static void* Run( void *data )
         p_ext->p_sys->command = cmd->next;
         cmd->next = NULL; /* unlink command (for FreeCommands()) */
         // Create watch timer
-        vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD, 0 );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, WATCH_TIMER_PERIOD,
+                            VLC_TIMER_FIRE_ONCE );
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 
         /* Run command */
