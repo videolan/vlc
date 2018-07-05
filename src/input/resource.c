@@ -28,10 +28,10 @@
 # include "config.h"
 #endif
 
-#include <stdatomic.h>
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_vout.h>
 #include <vlc_spu.h>
 #include <vlc_aout.h>
@@ -45,7 +45,7 @@
 
 struct input_resource_t
 {
-    atomic_uint    refs;
+    vlc_atomic_rc_t rc;
 
     vlc_object_t   *p_parent;
 
@@ -422,7 +422,7 @@ input_resource_t *input_resource_New( vlc_object_t *p_parent )
     if( !p_resource )
         return NULL;
 
-    atomic_init( &p_resource->refs, 1 );
+    vlc_atomic_rc_init( &p_resource->rc );
     p_resource->p_parent = p_parent;
     vlc_mutex_init( &p_resource->lock );
     vlc_mutex_init( &p_resource->lock_hold );
@@ -431,7 +431,7 @@ input_resource_t *input_resource_New( vlc_object_t *p_parent )
 
 void input_resource_Release( input_resource_t *p_resource )
 {
-    if( atomic_fetch_sub( &p_resource->refs, 1 ) != 1 )
+    if( !vlc_atomic_rc_dec( &p_resource->rc ) )
         return;
 
     DestroySout( p_resource );
@@ -446,7 +446,7 @@ void input_resource_Release( input_resource_t *p_resource )
 
 input_resource_t *input_resource_Hold( input_resource_t *p_resource )
 {
-    atomic_fetch_add( &p_resource->refs, 1 );
+    vlc_atomic_rc_inc( &p_resource->rc );
     return p_resource;
 }
 
