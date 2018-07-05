@@ -385,7 +385,7 @@ static void* Run( void *data )
             vlc_dialog_release( p_mgr, p_ext->p_sys->p_progress_id );
             p_ext->p_sys->p_progress_id = NULL;
         }
-        vlc_timer_schedule( p_ext->p_sys->timer, false, 0, 0 );
+        vlc_timer_disarm( p_ext->p_sys->timer );
     }
 
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );

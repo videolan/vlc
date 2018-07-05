@@ -1777,7 +1777,7 @@ static int RollOverTcp( demux_t *p_demux )
     var_SetBool( p_demux, "rtsp-tcp", true );
 
     /* We close the old RTSP session */
-    vlc_timer_schedule(p_sys->timer, false, 0, 0);
+    vlc_timer_disarm(p_sys->timer);
     p_sys->rtsp->sendTeardownCommand( *p_sys->ms, NULL );
     Medium::close( p_sys->ms );
     RTSPClient::close( p_sys->rtsp );

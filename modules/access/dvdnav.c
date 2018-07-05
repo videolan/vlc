@@ -836,7 +836,7 @@ static int Demux( demux_t *p_demux )
     {
     case DVDNAV_BLOCK_OK:   /* mpeg block */
         vlc_mutex_lock( &p_sys->still.lock );
-        vlc_timer_schedule( p_sys->still.timer, false, 0, 0 );
+        vlc_timer_disarm( p_sys->still.timer );
         p_sys->still.b_enabled = false;
         vlc_mutex_unlock( &p_sys->still.lock );
         if( p_sys->b_reset_pcr )
