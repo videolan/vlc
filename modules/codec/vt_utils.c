@@ -22,7 +22,7 @@
 # include "config.h"
 #endif
 
-#include <stdatomic.h>
+#include <vlc_atomic.h>
 
 #include "vt_utils.h"
 
@@ -48,7 +48,7 @@ struct cvpxpic_ctx
     CVPixelBufferRef cvpx;
     unsigned nb_fields;
 
-    atomic_uint ref_count;
+    vlc_atomic_rc_t rc;
     void (*on_released_cb)(CVPixelBufferRef, void *, unsigned);
     void *on_released_data;
 };
@@ -58,7 +58,7 @@ cvpxpic_destroy_cb(picture_context_t *opaque)
 {
     struct cvpxpic_ctx *ctx = (struct cvpxpic_ctx *)opaque;
 
-    if (atomic_fetch_sub(&ctx->ref_count, 1) == 1)
+    if (vlc_atomic_rc_dec(&ctx->rc))
     {
         CFRelease(ctx->cvpx);
         if (ctx->on_released_cb)
@@ -71,7 +71,7 @@ static picture_context_t *
 cvpxpic_copy_cb(struct picture_context_t *opaque)
 {
     struct cvpxpic_ctx *ctx = (struct cvpxpic_ctx *)opaque;
-    atomic_fetch_add(&ctx->ref_count, 1);
+    vlc_atomic_rc_inc(&ctx->rc);
     return opaque;
 }
 
