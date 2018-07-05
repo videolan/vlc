@@ -949,6 +949,7 @@ VLC_USED;
 VLC_API void vlc_timer_destroy(vlc_timer_t timer);
 
 #define VLC_TIMER_DISARM    (0)
+#define VLC_TIMER_FIRE_ONCE (0)
 
 /**
  * Arms or disarms an initialized timer.
