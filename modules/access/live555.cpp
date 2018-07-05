@@ -1267,7 +1267,7 @@ static int Play( demux_t *p_demux )
             timeout = 60; /* default value from RFC2326 */
         msg_Dbg( p_demux, "We have a timeout of %d seconds", timeout );
 
-        vlc_tick_t interval = (timeout - 2) * CLOCK_FREQ;
+        vlc_tick_t interval = vlc_tick_from_sec(timeout - 2);
         vlc_timer_schedule( p_sys->timer, false, interval, interval);
     }
     p_sys->i_pcr = VLC_TICK_INVALID;
