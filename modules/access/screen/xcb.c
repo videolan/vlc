@@ -247,7 +247,7 @@ static int Open (vlc_object_t *obj)
     p_sys->es = NULL;
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
-    vlc_timer_schedule (p_sys->timer, false, 1, interval);
+    vlc_timer_schedule_asap (p_sys->timer, interval);
 
     /* Initializes demux */
     demux->pf_demux   = NULL;

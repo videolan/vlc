@@ -901,7 +901,7 @@ static void WaveOutPause( audio_output_t * p_aout, bool pause, vlc_tick_t date)
 
     if(pause)
     {
-        vlc_timer_schedule( sys->volume_poll_timer, false, 1, VLC_TICK_FROM_MS(200) );
+        vlc_timer_schedule_asap( sys->volume_poll_timer, VLC_TICK_FROM_MS(200) );
         res = waveOutPause( sys->h_waveout );
         if( res != MMSYSERR_NOERROR )
         {
