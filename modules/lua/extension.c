@@ -1201,7 +1201,7 @@ static void WatchTimerCallback( void *data )
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             return;
         }
-        vlc_timer_schedule( p_ext->p_sys->timer, false, 100000, 0 );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100), 0 );
     }
     else
     {
@@ -1213,7 +1213,7 @@ static void WatchTimerCallback( void *data )
             vlc_mutex_unlock( &p_ext->p_sys->command_lock );
             return;
         }
-        vlc_timer_schedule( p_ext->p_sys->timer, false, 100000, 0 );
+        vlc_timer_schedule( p_ext->p_sys->timer, false, VLC_TICK_FROM_MS(100), 0 );
     }
     vlc_mutex_unlock( &p_ext->p_sys->command_lock );
 }
