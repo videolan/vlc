@@ -424,6 +424,13 @@ static int Open( vlc_object_t *p_this )
         free( psz_string );
     }
 
+    /* Subpictures SOURCES parameters (not releated to subtitles stream) */
+    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
+    if( psz_string && *psz_string )
+        p_sys->vfilters_cfg.video.psz_spu_sources = psz_string;
+    else
+        free( psz_string );
+
     /* Subpictures transcoding parameters */
     sout_encoder_config_init( &p_sys->senc_cfg );
 
@@ -435,17 +442,6 @@ static int Open( vlc_object_t *p_this )
     /* Set default size for TEXT spu non overlay conversion / updater */
     p_sys->senc_cfg.spu.i_width = (p_sys->venc_cfg.video.i_width) ? p_sys->venc_cfg.video.i_width : 1280;
     p_sys->senc_cfg.spu.i_height = (p_sys->venc_cfg.video.i_height) ? p_sys->venc_cfg.video.i_height : 720;
-    if( p_sys->b_soverlay )
-        p_sys->p_spu = spu_Create( p_stream, NULL );
-
-    /* Subpictures SOURCES parameters (not releated to SPU stream) */
-    psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "sfilter" );
-    if( psz_string && *psz_string )
-    {
-        if( !p_sys->p_spu || (p_sys->p_spu = spu_Create( p_stream, NULL )) )
-            spu_ChangeSources( p_sys->p_spu, psz_string );
-    }
-    free( psz_string );
 
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -471,8 +467,6 @@ static void Close( vlc_object_t * p_this )
 
     sout_encoder_config_clean( &p_sys->senc_cfg );
 
-    if( p_sys->p_spu ) spu_Destroy( p_sys->p_spu );
-
     free( p_sys );
 }
 
@@ -497,6 +491,17 @@ static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
         vlc_mutex_destroy(&id->fifo.lock);
         free( id );
     }
+}
+
+static void SendSpuToVideoCallback( void *cbdata, subpicture_t *p_subpicture )
+{
+    sout_stream_t *p_stream = cbdata;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    if( !p_sys->id_video )
+        subpicture_Delete( p_subpicture );
+    else
+        transcode_video_push_spu( p_stream,
+                                  p_sys->id_video, p_subpicture );
 }
 
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
@@ -525,6 +530,16 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     es_format_Copy( &id->p_decoder->fmt_in, p_fmt );
     id->p_decoder->b_frame_drop_allowed = false;
 
+    switch( p_fmt->i_cat )
+    {
+        case SPU_ES:
+            id->pf_send_subpicture = SendSpuToVideoCallback;
+            id->callback_data = p_stream;
+            break;
+        default:
+            break;
+    }
+
     /* Create encoder object */
     id->p_encoder = sout_EncoderCreate( p_stream );
     if( !id->p_encoder )
@@ -547,7 +562,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     if( p_fmt->i_cat == AUDIO_ES && p_sys->aenc_cfg.i_codec )
         success = transcode_audio_add(p_stream, p_fmt, id);
     else if( p_fmt->i_cat == VIDEO_ES && p_sys->venc_cfg.i_codec )
+    {
         success = transcode_video_add(p_stream, p_fmt, id);
+        if( success && !p_sys->id_video )
+            p_sys->id_video = id;
+    }
     else if( ( p_fmt->i_cat == SPU_ES ) &&
              ( p_sys->senc_cfg.i_codec || p_sys->b_soverlay ) )
         success = transcode_spu_add(p_stream, p_fmt, id);
@@ -573,6 +592,7 @@ error:
 
 static void Del( sout_stream_t *p_stream, void *_id )
 {
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_sys_t *id = (sout_stream_id_sys_t *)_id;
     if( id->b_transcode )
     {
@@ -584,6 +604,8 @@ static void Del( sout_stream_t *p_stream, void *_id )
             break;
         case VIDEO_ES:
             Send( p_stream, id, NULL );
+            if( id == p_sys->id_video )
+                p_sys->id_video = NULL;
             transcode_video_close( p_stream, id );
             break;
         case SPU_ES:

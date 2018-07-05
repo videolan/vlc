@@ -189,7 +189,14 @@ int transcode_spu_process( sout_stream_t *p_stream,
         }
 
         if( p_sys->b_soverlay )
-            spu_PutSubpicture( p_sys->p_spu, p_subpic );
+        {
+            if( !id->pf_send_subpicture )
+            {
+                subpicture_Delete( p_subpic );
+                b_error = true;
+            }
+            else id->pf_send_subpicture( id->callback_data, p_subpic );
+        }
         else
         {
             block_t *p_block;

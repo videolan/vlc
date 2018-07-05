@@ -17,6 +17,7 @@ typedef struct
         {
             char            *psz_deinterlace;
             config_chain_t  *p_deinterlace_cfg;
+            char            *psz_spu_sources;
         } video;
     };
 } sout_filters_config_t;
@@ -36,6 +37,7 @@ void sout_filters_config_clean( sout_filters_config_t *p_cfg )
         free( p_cfg->video.psz_deinterlace );
         config_ChainDestroy( p_cfg->video.p_deinterlace_cfg );
     }
+    free( p_cfg->video.psz_spu_sources );
 }
 
 typedef struct
@@ -92,7 +94,7 @@ void sout_encoder_config_clean( sout_encoder_config_t *p_cfg )
 typedef struct
 {
     sout_stream_id_sys_t *id_video;
-    spu_t                *p_spu;
+
     bool                  b_soverlay;
 
     /* Audio */
@@ -147,11 +149,18 @@ struct sout_stream_id_sys_t
 
     union
     {
+        void (*pf_send_subpicture)(void *cbdata, subpicture_t *);
+    };
+    void *callback_data;
+
+    union
+    {
          struct
          {
              filter_chain_t  *p_f_chain; /**< Video filters */
              filter_chain_t  *p_uf_chain; /**< User-specified video filters */
              filter_t        *p_spu_blender;
+             spu_t           *p_spu;
              video_format_t  fmt_input_video;
              video_format_t  video_dec_out; /* only rw from pf_vout_format_update() */
          };
@@ -214,5 +223,6 @@ bool transcode_audio_add    ( sout_stream_t *, const es_format_t *,
 void transcode_video_close  ( sout_stream_t *, sout_stream_id_sys_t * );
 int  transcode_video_process( sout_stream_t *, sout_stream_id_sys_t *,
                                      block_t *, block_t ** );
+void transcode_video_push_spu( sout_stream_t *, sout_stream_id_sys_t *, subpicture_t * );
 bool transcode_video_add    ( sout_stream_t *, const es_format_t *,
                                 sout_stream_id_sys_t *);

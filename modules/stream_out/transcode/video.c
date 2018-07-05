@@ -290,7 +290,6 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
      * of the encoder here.
      */
 
-    p_sys->id_video = id;
     id->pp_pics = picture_fifo_New();
     if( id->pp_pics == NULL )
     {
@@ -362,6 +361,13 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
                                    p_cfg->video.p_deinterlace_cfg,
                                    p_src, p_src );
         p_src = filter_chain_GetFmtOut( id->p_f_chain );
+    }
+
+    /* SPU Sources */
+    if( p_cfg->video.psz_spu_sources )
+    {
+        if( id->p_spu || (id->p_spu = spu_Create( p_stream, NULL )) )
+            spu_ChangeSources( id->p_spu, p_cfg->video.psz_spu_sources );
     }
 
     if( b_master_sync )
@@ -729,17 +735,30 @@ void transcode_video_close( sout_stream_t *p_stream,
         filter_chain_Delete( id->p_uf_chain );
     if( id->p_spu_blender )
         filter_DeleteBlend( id->p_spu_blender );
+    if( id->p_spu )
+        spu_Destroy( id->p_spu );
+}
+
+void transcode_video_push_spu( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
+                               subpicture_t *p_subpicture )
+{
+    if( !id->p_spu )
+        id->p_spu = spu_Create( p_stream, NULL );
+    if( !id->p_spu )
+        subpicture_Delete( p_subpicture );
+    else
+        spu_PutSubpicture( id->p_spu, p_subpicture );
 }
 
 static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                        picture_t *p_pic )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    VLC_UNUSED(p_stream);
 
-    /* Check if we have a subpicture to overlay */
-    if( !p_sys->p_spu )
+    if( !id->p_spu )
         return p_pic;
 
+    /* Check if we have a subpicture to overlay */
     video_format_t fmt, outfmt;
     vlc_mutex_lock( &id->fifo.lock );
     video_format_Copy( &outfmt, &id->video_dec_out );
@@ -753,7 +772,7 @@ static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sy
         fmt.i_y_offset       = 0;
     }
 
-    subpicture_t *p_subpic = spu_Render( p_sys->p_spu, NULL, &fmt,
+    subpicture_t *p_subpic = spu_Render( id->p_spu, NULL, &fmt,
                                          &outfmt,
                                          p_pic->date, p_pic->date, false );
 
@@ -773,7 +792,7 @@ static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sy
             }
         }
         if( unlikely( !id->p_spu_blender ) )
-            id->p_spu_blender = filter_NewBlend( VLC_OBJECT( p_sys->p_spu ), &fmt );
+            id->p_spu_blender = filter_NewBlend( VLC_OBJECT( id->p_spu ), &fmt );
         if( likely( id->p_spu_blender ) )
             picture_BlendSubpicture( p_pic, id->p_spu_blender, p_subpic );
         subpicture_Delete( p_subpic );
