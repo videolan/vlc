@@ -22,9 +22,8 @@
 #include "config.h"
 #endif
 
-#include <stdatomic.h>
-
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_modules.h>
 #include <vlc_arrays.h>
 #include <vlc_interrupt.h>
@@ -39,7 +38,7 @@
 typedef struct addon_entry_owner
 {
     addon_entry_t entry;
-    atomic_uint refs;
+    vlc_atomic_rc_t rc;
 } addon_entry_owner_t;
 
 struct addons_manager_private_t
@@ -81,7 +80,7 @@ addon_entry_t * addon_entry_New(void)
     if( unlikely(owner == NULL) )
         return NULL;
 
-    atomic_init( &owner->refs, 1 );
+    vlc_atomic_rc_init( &owner->rc );
 
     addon_entry_t *p_entry = &owner->entry;
     vlc_mutex_init( &p_entry->lock );
@@ -93,7 +92,7 @@ addon_entry_t * addon_entry_Hold( addon_entry_t * p_entry )
 {
     addon_entry_owner_t *owner = (addon_entry_owner_t *) p_entry;
 
-    atomic_fetch_add( &owner->refs, 1 );
+    vlc_atomic_rc_inc( &owner->rc );
     return p_entry;
 }
 
@@ -101,7 +100,7 @@ void addon_entry_Release( addon_entry_t * p_entry )
 {
     addon_entry_owner_t *owner = (addon_entry_owner_t *) p_entry;
 
-    if( atomic_fetch_sub(&owner->refs, 1) != 1 )
+    if( !vlc_atomic_rc_dec( &owner->rc ) )
         return;
 
     free( p_entry->psz_name );
