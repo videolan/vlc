@@ -1018,8 +1018,8 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
 
-    timer->interval = interval;
-    if (DosAsyncTimer (value, (HSEM)timer->hev, &timer->htimer))
+    timer->interval = MS_FROM_VLC_TICK(interval);
+    if (DosAsyncTimer (MS_FROM_VLC_TICK(value), (HSEM)timer->hev, &timer->htimer))
         abort ();
 }
 
