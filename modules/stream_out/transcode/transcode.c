@@ -532,7 +532,17 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     switch( p_fmt->i_cat )
     {
+        case AUDIO_ES:
+            id->p_filterscfg = &p_sys->afilters_cfg;
+            id->p_enccfg = &p_sys->aenc_cfg;
+            break;
+        case VIDEO_ES:
+            id->p_filterscfg = &p_sys->vfilters_cfg;
+            id->p_enccfg = &p_sys->venc_cfg;
+            break;
         case SPU_ES:
+            id->p_filterscfg = NULL;
+            id->p_enccfg = &p_sys->senc_cfg;
             id->pf_send_subpicture = SendSpuToVideoCallback;
             id->callback_data = p_stream;
             break;
@@ -559,16 +569,16 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     bool success;
 
-    if( p_fmt->i_cat == AUDIO_ES && p_sys->aenc_cfg.i_codec )
+    if( p_fmt->i_cat == AUDIO_ES && id->p_enccfg->i_codec )
         success = transcode_audio_add(p_stream, p_fmt, id);
-    else if( p_fmt->i_cat == VIDEO_ES && p_sys->venc_cfg.i_codec )
+    else if( p_fmt->i_cat == VIDEO_ES && id->p_enccfg->i_codec )
     {
         success = transcode_video_add(p_stream, p_fmt, id);
         if( success && !p_sys->id_video )
             p_sys->id_video = id;
     }
     else if( ( p_fmt->i_cat == SPU_ES ) &&
-             ( p_sys->senc_cfg.i_codec || p_sys->b_soverlay ) )
+             ( id->p_enccfg->i_codec || p_sys->b_soverlay ) )
         success = transcode_spu_add(p_stream, p_fmt, id);
     else
     {

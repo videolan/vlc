@@ -93,19 +93,18 @@ static int transcode_audio_filters_init( sout_stream_t *p_stream,
     return ( *pp_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static int transcode_audio_encoder_open( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+static int transcode_audio_encoder_open( sout_stream_t *p_stream,
+                                         sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     id->p_encoder->p_module = module_need( id->p_encoder, "encoder",
-                                           p_sys->aenc_cfg.psz_name, true );
+                                           id->p_enccfg->psz_name, true );
     /* p_sys->i_acodec = 0 if there isn't acodec defined */
     if( !id->p_encoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). "
                            "Take a look few lines earlier to see possible reason.",
-                           p_sys->aenc_cfg.psz_name ? p_sys->aenc_cfg.psz_name : "any",
-                           (char *)&p_sys->aenc_cfg.i_codec );
+                           id->p_enccfg->psz_name ? id->p_enccfg->psz_name : "any",
+                           (char *)&id->p_enccfg->i_codec );
         return VLC_EGENERIC;
     }
 
@@ -258,8 +257,6 @@ static block_t *transcode_dequeue_all_audios( sout_stream_id_sys_t *id )
 static int transcode_audio_new( sout_stream_t *p_stream,
                                 sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /*
      * Open decoder
      */
@@ -275,7 +272,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     id->p_decoder->cbs = &dec_cbs;
 
     id->p_decoder->pf_decode = NULL;
-    /* id->p_decoder->p_cfg = p_sys->p_audio_cfg; */
+    /* id->p_decoder->p_cfg = id->p_enccfg->p_config_chain; */
     id->p_decoder->p_module =
         module_need_var( id->p_decoder, "audio decoder", "codec" );
     if( !id->p_decoder->p_module )
@@ -319,7 +316,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     if( transcode_audio_encoder_test( VLC_OBJECT(p_stream),
                                                 &id->audio_dec_out,
                                                 id->p_decoder->fmt_out.i_codec,
-                                                &p_sys->aenc_cfg,
+                                                id->p_enccfg,
                                                 &id->p_encoder->fmt_out,
                                                 &id->encoder_tested_fmt_in ) != VLC_SUCCESS )
     {
@@ -398,7 +395,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
         {
             if( id->p_encoder->p_module == NULL )
             {
-                transcode_audio_encoder_configure( VLC_OBJECT(p_stream), &p_sys->aenc_cfg,
+                transcode_audio_encoder_configure( VLC_OBJECT(p_stream), id->p_enccfg,
                                                    &id->audio_dec_out, id->p_encoder );
                 id->fmt_input_audio = id->audio_dec_out;
             }
@@ -414,7 +411,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
             }
 
             if( transcode_audio_filters_init( p_stream,
-                                              &p_sys->afilters_cfg,
+                                              id->p_filterscfg,
                                               &id->audio_dec_out,
                                               &id->p_encoder->fmt_in.audio,
                                               &id->p_af_chain ) )
@@ -494,11 +491,9 @@ error:
 bool transcode_audio_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
             sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     msg_Dbg( p_stream,
              "creating audio transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-             (char*)&p_fmt->i_codec, (char*)&p_sys->aenc_cfg.i_codec );
+             (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
     id->fifo.audio.first = NULL;
     id->fifo.audio.last = &id->fifo.audio.first;

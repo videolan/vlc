@@ -171,8 +171,10 @@ struct sout_stream_id_sys_t
              audio_format_t  audio_dec_out; /* only rw from pf_aout_format_update() */
          };
     };
+    const sout_filters_config_t *p_filterscfg;
 
     /* Encoder */
+    const sout_encoder_config_t *p_enccfg;
     encoder_t       *p_encoder;
     vlc_thread_t    thread;
     vlc_mutex_t     lock_out;

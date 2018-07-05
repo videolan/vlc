@@ -253,8 +253,6 @@ static int transcode_video_encoder_test( sout_stream_t *p_stream,
 
 static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /* Open decoder
      */
     dec_get_owner( id->p_decoder )->id = id;
@@ -307,10 +305,10 @@ static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_sys_t *i
     es_format_Init( &id->encoder_tested_fmt_in, id->p_decoder->fmt_in.i_cat,
                     id->p_decoder->fmt_out.i_codec );
 
-    id->p_encoder->i_threads = p_sys->venc_cfg.video.threads.i_count;
-    id->p_encoder->p_cfg = p_sys->venc_cfg.p_config_chain;
+    id->p_encoder->i_threads = id->p_enccfg->video.threads.i_count;
+    id->p_encoder->p_cfg = id->p_enccfg->p_config_chain;
 
-    if( transcode_video_encoder_test( p_stream, &p_sys->venc_cfg,
+    if( transcode_video_encoder_test( p_stream, id->p_enccfg,
                                                 &id->p_decoder->fmt_in,
                                                 id->p_decoder->fmt_out.i_codec,
                                                 &id->p_encoder->fmt_out,
@@ -629,12 +627,12 @@ static void transcode_video_encoder_configure( vlc_object_t *p_obj,
 static void transcode_video_encoder_close( sout_stream_t *p_stream,
                                            sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    VLC_UNUSED(p_stream);
 
     if( id->p_encoder->p_module == NULL )
         return;
 
-    if( p_sys->venc_cfg.video.threads.i_count >= 1 && !id->b_abort )
+    if( id->p_enccfg->video.threads.i_count >= 1 && !id->b_abort )
     {
         vlc_mutex_lock( &id->lock_out );
         id->b_abort = true;
@@ -658,20 +656,17 @@ static void transcode_video_encoder_close( sout_stream_t *p_stream,
 static int transcode_video_encoder_open( sout_stream_t *p_stream,
                                          sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-
     msg_Dbg( p_stream, "destination (after video filters) %ix%i",
              id->p_encoder->fmt_in.video.i_width,
              id->p_encoder->fmt_in.video.i_height );
 
     id->p_encoder->p_module =
-        module_need( id->p_encoder, "encoder", p_sys->venc_cfg.psz_name, true );
+        module_need( id->p_encoder, "encoder", id->p_enccfg->psz_name, true );
     if( !id->p_encoder->p_module )
     {
         msg_Err( p_stream, "cannot find video encoder (module:%s fourcc:%4.4s)",
-                 p_sys->venc_cfg.psz_name ? p_sys->venc_cfg.psz_name : "any",
-                 (char *)&p_sys->venc_cfg.i_codec );
+                 id->p_enccfg->psz_name ? id->p_enccfg->psz_name : "any",
+                 (char *)&id->p_enccfg->i_codec );
         return VLC_EGENERIC;
     }
 
@@ -690,14 +685,14 @@ static int transcode_video_encoder_open( sout_stream_t *p_stream,
         return VLC_EGENERIC;
     }
 
-    vlc_sem_init( &id->picture_pool_has_room, p_sys->venc_cfg.video.threads.pool_size );
+    vlc_sem_init( &id->picture_pool_has_room, id->p_enccfg->video.threads.pool_size );
     vlc_mutex_init( &id->lock_out );
     vlc_cond_init( &id->cond );
     id->p_buffers = NULL;
     id->b_abort = false;
 
-    if( p_sys->venc_cfg.video.threads.i_count > 0  &&
-        vlc_clone( &id->thread, EncoderThread, id, p_sys->venc_cfg.video.threads.i_priority ) )
+    if( id->p_enccfg->video.threads.i_count > 0  &&
+        vlc_clone( &id->thread, EncoderThread, id, id->p_enccfg->video.threads.i_priority ) )
     {
         msg_Err( p_stream, "cannot spawn encoder thread" );
         vlc_cond_destroy( &id->cond );
@@ -805,9 +800,9 @@ static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sy
 
 static block_t * EncodeFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    VLC_UNUSED(p_stream);
 
-    if( p_sys->venc_cfg.video.threads.i_count == 0 )
+    if( id->p_enccfg->video.threads.i_count == 0 )
     {
         block_t *p_block = id->p_encoder->pf_encode_video( id->p_encoder, p_pic );
         picture_Release( p_pic );
@@ -858,7 +853,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
             {
                 transcode_video_encoder_configure( VLC_OBJECT(p_stream),
                                                    id->p_decoder,
-                                                   &p_sys->venc_cfg,
+                                                   id->p_enccfg,
                                                    filtered_video_format( id, p_pic ),
                                                    id->p_encoder );
                 /* will be opened below */
@@ -885,7 +880,7 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             video_format_Copy( &id->fmt_input_video, &p_pic->format );
 
-            transcode_video_filter_init( p_stream, &p_sys->vfilters_cfg, p_sys->b_master_sync, id );
+            transcode_video_filter_init( p_stream, id->p_filterscfg, p_sys->b_master_sync, id );
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
 
@@ -938,7 +933,7 @@ error:
         id->b_error = true;
     } while( p_pics );
 
-    if( p_sys->venc_cfg.video.threads.i_count >= 1 )
+    if( id->p_enccfg->video.threads.i_count >= 1 )
     {
         /* Pick up any return data the encoder thread wants to output. */
         vlc_mutex_lock( &id->lock_out );
@@ -950,7 +945,7 @@ error:
     /* Drain encoder */
     if( unlikely( !id->b_error && in == NULL ) && id->p_encoder->p_module )
     {
-        if( p_sys->venc_cfg.video.threads.i_count == 0 )
+        if( id->p_enccfg->video.threads.i_count == 0 )
         {
             block_t *p_block;
             do {
@@ -974,11 +969,9 @@ error:
 bool transcode_video_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
                                 sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     msg_Dbg( p_stream,
              "creating video transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-             (char*)&p_fmt->i_codec, (char*)&p_sys->venc_cfg.i_codec );
+             (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
 
     id->fifo.pic.first = NULL;
     id->fifo.pic.last = &id->fifo.pic.first;

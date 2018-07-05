@@ -82,12 +82,11 @@ static void transcode_spu_encoder_close( sout_stream_t *p_stream, sout_stream_id
 
 static int transcode_spu_encoder_open( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    id->p_encoder->p_cfg = p_sys->senc_cfg.p_config_chain;
+    VLC_UNUSED(p_stream);
+    id->p_encoder->p_cfg = id->p_enccfg->p_config_chain;
 
     id->p_encoder->p_module = module_need( id->p_encoder, "encoder",
-                                           p_sys->senc_cfg.psz_name, true );
+                                           id->p_enccfg->psz_name, true );
 
     return ( id->p_encoder->p_module ) ? VLC_SUCCESS: VLC_EGENERIC;
 }
@@ -134,7 +133,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
             es_format_Clean( &id->p_encoder->fmt_in );
             module_unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = NULL;
-            msg_Err( p_stream, "cannot find spu encoder (%s)", p_sys->senc_cfg.psz_name );
+            msg_Err( p_stream, "cannot find spu encoder (%s)", id->p_enccfg->psz_name );
             return VLC_EGENERIC;
         }
     }
@@ -206,11 +205,11 @@ int transcode_spu_process( sout_stream_t *p_stream,
 
             fmt.video.i_sar_num =
             fmt.video.i_visible_width =
-            fmt.video.i_width = p_sys->senc_cfg.spu.i_width;
+            fmt.video.i_width = id->p_enccfg->spu.i_width;
 
             fmt.video.i_sar_den =
             fmt.video.i_visible_height =
-            fmt.video.i_height =p_sys->senc_cfg.spu.i_height;
+            fmt.video.i_height =id->p_enccfg->spu.i_height;
 
             subpicture_Update( p_subpic, &fmt.video, &fmt.video, p_subpic->i_start );
             es_format_Clean( &fmt );
@@ -235,14 +234,14 @@ bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
     id->fifo.spu.first = NULL;
     id->fifo.spu.last = &id->fifo.spu.first;
 
-    if( p_sys->senc_cfg.i_codec )
+    if( id->p_enccfg->i_codec )
     {
         msg_Dbg( p_stream, "creating subtitle transcoding from fcc=`%4.4s' "
                  "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
-                 (char*)&p_sys->senc_cfg.i_codec );
+                 (char*)&id->p_enccfg->i_codec );
 
         /* Complete destination format */
-        id->p_encoder->fmt_out.i_codec = p_sys->senc_cfg.i_codec;
+        id->p_encoder->fmt_out.i_codec = id->p_enccfg->i_codec;
 
         /* build decoder -> filter -> encoder */
         if( transcode_spu_new( p_stream, id ) )
