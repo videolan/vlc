@@ -112,6 +112,7 @@ struct decoder_owner
     /* Preroll */
     vlc_tick_t i_preroll_end;
     /* Pause & Rate */
+    bool reset_out_state;
     vlc_tick_t pause_date;
     float rate;
     unsigned frames_countdown;
@@ -421,6 +422,10 @@ static int aout_update_format( decoder_t *p_dec )
             p_owner->fmt.audio.i_bytes_per_frame;
         p_dec->fmt_out.audio.i_frame_length =
             p_owner->fmt.audio.i_frame_length;
+
+        vlc_fifo_Lock( p_owner->p_fifo );
+        p_owner->reset_out_state = true;
+        vlc_fifo_Unlock( p_owner->p_fifo );
     }
     return 0;
 }
@@ -555,6 +560,10 @@ static int vout_update_format( decoder_t *p_dec )
             msg_Err( p_dec, "failed to create video output" );
             return -1;
         }
+
+        vlc_fifo_Lock( p_owner->p_fifo );
+        p_owner->reset_out_state = true;
+        vlc_fifo_Unlock( p_owner->p_fifo );
     }
 
     if ( memcmp( &p_dec->fmt_out.video.mastering,
@@ -1574,6 +1583,16 @@ static void *DecoderThread( void *p_data )
             continue;
         }
 
+        /* Reset the original pause/rate state when a new aout/vout is created:
+         * this will trigger the OutputChangePause/OutputChangeRate code path
+         * if needed. */
+        if( p_owner->reset_out_state )
+        {
+            rate = 1.f;
+            paused = false;
+            p_owner->reset_out_state = false;
+        }
+
         if( paused != p_owner->paused )
         {   /* Update playing/paused status of the output */
             int canc = vlc_savecancel();
@@ -1727,6 +1746,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_fmt_description = false;
     p_owner->p_description = NULL;
 
+    p_owner->reset_out_state = false;
     p_owner->rate = 1.f;
     p_owner->paused = false;
     p_owner->pause_date = VLC_TICK_INVALID;
