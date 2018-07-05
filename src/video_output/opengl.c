@@ -23,10 +23,10 @@
 #endif
 
 #include <assert.h>
-#include <stdatomic.h>
 #include <stdlib.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_opengl.h>
 #include "libvlc.h"
 #include <vlc_modules.h>
@@ -34,7 +34,7 @@
 struct vlc_gl_priv_t
 {
     vlc_gl_t gl;
-    atomic_uint ref_count;
+    vlc_atomic_rc_t rc;
 };
 #undef vlc_gl_Create
 /**
@@ -80,7 +80,7 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
     }
     assert(gl->makeCurrent && gl->releaseCurrent && gl->swap
         && gl->getProcAddress);
-    atomic_init(&glpriv->ref_count, 1);
+    vlc_atomic_rc_init(&glpriv->rc);
 
     return &glpriv->gl;
 }
@@ -88,13 +88,13 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
 void vlc_gl_Hold(vlc_gl_t *gl)
 {
     struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
-    atomic_fetch_add(&glpriv->ref_count, 1);
+    vlc_atomic_rc_inc(&glpriv->rc);
 }
 
 void vlc_gl_Release(vlc_gl_t *gl)
 {
     struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
-    if (atomic_fetch_sub(&glpriv->ref_count, 1) != 1)
+    if (!vlc_atomic_rc_dec(&glpriv->rc))
         return;
     module_unneed(gl, gl->module);
     vlc_object_release(gl);
