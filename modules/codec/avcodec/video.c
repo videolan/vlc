@@ -1300,7 +1300,8 @@ static int DecodeVideo( decoder_t *p_dec, block_t *p_block )
         p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
         /* Drain */
-        DecodeBlock( p_dec, NULL );
+        if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
+            DecodeBlock( p_dec, NULL );
         p_sys->i_late_frames = 0;
         p_sys->i_last_output_frame = -1;
         p_sys->framedrop = FRAMEDROP_NONE;
