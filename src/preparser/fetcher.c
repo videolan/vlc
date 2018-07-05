@@ -23,9 +23,8 @@
 # include "config.h"
 #endif
 
-#include <stdatomic.h>
-
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_stream.h>
 #include <vlc_modules.h>
 #include <vlc_interrupt.h>
@@ -53,7 +52,7 @@ struct input_fetcher_t {
 
 struct fetcher_request {
     input_item_t* item;
-    atomic_uint refs;
+    vlc_atomic_rc_t rc;
     int preparse_status;
     int options;
 };
@@ -321,7 +320,7 @@ static void RequestRelease( void* req_ )
 {
     struct fetcher_request* req = req_;
 
-    if( atomic_fetch_sub( &req->refs, 1 ) != 1 )
+    if( !vlc_atomic_rc_dec( &req->rc ) )
         return;
 
     input_item_Release( req->item );
@@ -331,7 +330,7 @@ static void RequestRelease( void* req_ )
 static void RequestHold( void* req_ )
 {
     struct fetcher_request* req = req_;
-    atomic_fetch_add_explicit( &req->refs, 1, memory_order_relaxed );
+    vlc_atomic_rc_inc( &req->rc );
 }
 
 static void* FetcherThread( void* handle )
@@ -460,7 +459,7 @@ int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
     req->options = options;
     req->preparse_status = preparse_status;
 
-    atomic_init( &req->refs, 1 );
+    vlc_atomic_rc_init( &req->rc );
     input_item_Hold( item );
 
     if( background_worker_Push( fetcher->local, req, NULL, 0 ) )
