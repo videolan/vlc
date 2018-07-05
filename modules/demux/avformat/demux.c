@@ -654,7 +654,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
                     es_fmt.p_extra = NULL;
                 }
             }
-            else if( cp->extradata_size > 0 )
+            else if( cp->extradata_size > 0 && !es_fmt.i_extra )
             {
                 es_fmt.p_extra = malloc( i_extra );
                 if( es_fmt.p_extra )
