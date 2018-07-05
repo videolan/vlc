@@ -1531,6 +1531,7 @@ static int Seek( demux_t *p_demux, vlc_tick_t i_date, bool b_accurate )
     for( i_track = 0; i_track < p_sys->i_tracks; i_track++ )
     {
         mp4_track_t *tk = &p_sys->track[i_track];
+        tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
         if( tk->fmt.i_cat == VIDEO_ES )
             continue;
         MP4_TrackSeek( p_demux, tk, i_start );
@@ -3674,8 +3675,6 @@ static int MP4_TrackSeek( demux_t *p_demux, mp4_track_t *p_track,
     p_track->b_selected = true;
     if( !TrackGotoChunkSample( p_demux, p_track, i_chunk, i_sample ) )
         p_track->b_selected = true;
-
-    p_track->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
 
     return p_track->b_selected ? VLC_SUCCESS : VLC_EGENERIC;
 }
