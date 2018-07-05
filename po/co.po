@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Patriccollu <Patrick.Santa-Maria@laposte.net>, 2018\n"
+"PO-Revision-Date: 2018-07-05 11:16+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Corsican (https://www.transifex.com/yaron/teams/16553/co/)\n"
 "Language: co\n"
 "MIME-Version: 1.0\n"
@@ -15536,7 +15536,6 @@ msgstr ""
 "Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15548,13 +15547,14 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player hè un lettore, cudificatore è 'streamer', gratisi è "
-"scrittu in codice apertu da i vulinteri di a cummunità <a href=\"http://www."
+"scrittu in codice apertu da i vulinteri di a cummunità <a href=\"https://www."
 "videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>.</p><p>Grazia à i so cudechi interni, VLC s'impiega "
 "nantu à ogni systema populare, è pò sunà guasi tutti i schedarii, CD, DVD, "
 "flussi nantu à a reta, 'capture cards' è altri furmati di media !</p><p><a "
-"href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-"underline; color:#0057ae;\">Aiutateci è raghjunghjiteci !</span></a>"
+"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">Aiutateci è raghjunghjiteci !</"
+"span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16184,9 +16184,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Abbandunà Screnu Sanu"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
