@@ -977,6 +977,11 @@ static inline void vlc_timer_disarm(vlc_timer_t timer)
     vlc_timer_schedule( timer, false, VLC_TIMER_DISARM, 0 );
 }
 
+static inline void vlc_timer_schedule_asap(vlc_timer_t timer, vlc_tick_t interval)
+{
+    vlc_timer_schedule(timer, false, 1, interval);
+}
+
 /**
  * Fetches and resets the overrun counter for a timer.
  *
