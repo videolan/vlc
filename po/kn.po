@@ -18,14 +18,14 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-05 22:23+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Kannada (https://www.transifex.com/yaron/teams/16553/kn/)\n"
 "Language: kn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -906,7 +906,7 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"ಮುಂದುವರೆಯಲು RETURN ಕೀಲಿಯನ್ನು ಒತ್ತಿರಿ... \n"
+"ಮುಂದುವರೆಯಲು RETURN ಕೀಲಿಯನ್ನು ಒತ್ತಿರಿ...\n"
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
@@ -16185,7 +16185,6 @@ msgid ""
 msgstr "VLC ಮಾಧ್ಯಮ ಪ್ಲೇಯರ್ ಮತ್ತು VideoLAN Videolan ಸಂಘದ ವ್ಯಾಪಾರ ಮುದ್ರೆಯಾಗಿದೆ."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16196,15 +16195,6 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"&lt;p&gt;VLC media player is a free and open source media player, encoder, "
-"and streamer made by the volunteers of the &lt;a href=\"http://www.videolan."
-"org/\"&gt;&lt;span style=\" text-decoration: underline; color:#0057ae;\"&gt;"
-"VideoLAN&lt;/span&gt;&lt;/a&gt; community.&lt;/p&gt;&lt;p&gt;VLC uses its "
-"internal codecs, works on essentially every popular platform, and can read "
-"almost all files, CDs, DVDs, network streams, capture cards and other media "
-"formats!&lt;/p&gt;&lt;p&gt;&lt;a href=\"http://www.videolan.org/contribute/"
-"\"&gt;&lt;span style=\" text-decoration: underline; color:#0057ae;\"&gt;Help "
-"and join us!&lt;/span&gt;&lt;/a&gt;"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16841,9 +16831,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "ಪೂರ್ಣಪರದೆಯನ್ನು ಬಿಡಿ"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -20271,15 +20260,6 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"&lt;p&gt;VLC media player is a free and open source media player, encoder, "
-"and streamer made by the volunteers of the &lt;a href=\"http://www.videolan."
-"org/\"&gt;&lt;span style=\" text-decoration: underline; color:#0057ae;\"&gt;"
-"VideoLAN&lt;/span&gt;&lt;/a&gt; community.&lt;/p&gt;&lt;p&gt;VLC uses its "
-"internal codecs, works on essentially every popular platform, and can read "
-"almost all files, CDs, DVDs, network streams, capture cards and other media "
-"formats!&lt;/p&gt;&lt;p&gt;&lt;a href=\"http://www.videolan.org/contribute/"
-"\"&gt;&lt;span style=\" text-decoration: underline; color:#0057ae;\"&gt;Help "
-"and join us!&lt;/span&gt;&lt;/a&gt;"
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
