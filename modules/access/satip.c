@@ -427,7 +427,7 @@ static void *satip_thread(void *data) {
     int sock = sys->udp_sock;
     vlc_tick_t last_recv = vlc_tick_now();
     ssize_t len;
-    vlc_tick_t next_keepalive = vlc_tick_now() + sys->keepalive_interval * 1000 * 1000;
+    vlc_tick_t next_keepalive = vlc_tick_now() + vlc_tick_from_sec(sys->keepalive_interval);
 #ifdef HAVE_RECVMMSG
     struct mmsghdr msgs[VLEN];
     struct iovec iovecs[VLEN];
@@ -519,7 +519,7 @@ static void *satip_thread(void *data) {
             if (rtsp_handle(access, NULL) != RTSP_RESULT_OK)
                 msg_Warn(access, "Failed to keepalive RTSP session");
 
-            next_keepalive = vlc_tick_now() + sys->keepalive_interval * 1000 * 1000;
+            next_keepalive = vlc_tick_now() + vlc_tick_from_sec(sys->keepalive_interval);
         }
     }
 
