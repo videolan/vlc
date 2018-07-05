@@ -2096,7 +2096,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
         if( tk->i_pcr != VLC_TICK_INVALID )
         {
             tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
-            const int64_t i_max_diff = CLOCK_FREQ * (( tk->fmt.i_cat == SPU_ES ) ? 60 : 1);
+            const vlc_tick_t i_max_diff = vlc_tick_from_sec(( tk->fmt.i_cat == SPU_ES ) ? 60 : 1);
             tk->b_flushing_discontinuity = (llabs(i_pts - tk->i_pcr) > i_max_diff);
             tk->i_pcr = i_pts;
         }
