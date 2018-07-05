@@ -22,10 +22,10 @@
 # include "config.h"
 #endif
 
-#include <stdatomic.h>
 #include <assert.h>
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 #include <vlc_renderer_discovery.h>
 #include <vlc_probe.h>
 #include <vlc_modules.h>
@@ -39,7 +39,7 @@ struct vlc_renderer_item_t
     char *psz_icon_uri;
     char *psz_demux_filter;
     int i_flags;
-    atomic_uint refs;
+    vlc_atomic_rc_t rc;
 };
 
 static void
@@ -95,7 +95,7 @@ vlc_renderer_item_new(const char *psz_type, const char *psz_name,
         goto error;
 
     p_item->i_flags = i_flags;
-    atomic_init(&p_item->refs, 1);
+    vlc_atomic_rc_init(&p_item->rc);
     vlc_UrlClean(&url);
     return p_item;
 
@@ -159,7 +159,7 @@ vlc_renderer_item_hold(vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
-    atomic_fetch_add(&p_item->refs, 1);
+    vlc_atomic_rc_inc(&p_item->rc);
     return p_item;
 }
 
@@ -168,11 +168,8 @@ vlc_renderer_item_release(vlc_renderer_item_t *p_item)
 {
     assert(p_item != NULL);
 
-    int refs = atomic_fetch_sub(&p_item->refs, 1);
-    assert(refs != 0 );
-    if( refs != 1 )
-        return;
-    item_free(p_item);
+    if (vlc_atomic_rc_dec(&p_item->rc))
+        item_free(p_item);
 }
 
 struct vlc_rd_probe
