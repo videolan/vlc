@@ -141,7 +141,7 @@ void BookmarksDialog::update()
         vlc_tick_t total = pp_bookmarks[i]->i_time_offset;
         unsigned hours   = ( total / VLC_TICK_FROM_SEC(3600) );
         unsigned minutes = ( total % VLC_TICK_FROM_SEC(3600) ) / VLC_TICK_FROM_SEC(60);
-        float    seconds = ( total % VLC_TICK_FROM_SEC(60) ) / ( CLOCK_FREQ * 1. );
+        float    seconds = secf_from_vlc_tick( total % VLC_TICK_FROM_SEC(60) );
 
         QStringList row;
         row << QString( qfu( pp_bookmarks[i]->psz_name ) );
