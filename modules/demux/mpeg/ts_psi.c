@@ -1140,12 +1140,6 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
     {
         es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_A52 );
     }
-    else if( (desc = PMTEsFindDescriptor( p_dvbpsies, 0x7f ) ) &&
-             desc->i_length >= 2 && desc->p_data[0] == 0x80 &&
-              PMTEsHasRegistration(p_demux, p_dvbpsies, "Opus"))
-    {
-        OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
-    }
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS1" ) || /* 512 Bpf */
              PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS2" ) || /* 1024 Bpf */
              PMTEsHasRegistration( p_demux, p_dvbpsies, "DTS3" ) || /* 2048 Bpf */
@@ -1164,6 +1158,20 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
     else if( PMTEsHasRegistration( p_demux, p_dvbpsies, "HEVC" ) )
     {
         es_format_Change( p_fmt, VIDEO_ES, VLC_CODEC_HEVC );
+    }
+    else if( (desc = PMTEsFindDescriptor( p_dvbpsies, 0x7f )) &&
+             desc->i_length >= 2 )
+    {
+        /* extended_descriptor on PMT (DVB Bluebook A038) */
+        switch( desc->p_data[0] )
+        {
+            case 0x80: /* User Defined */
+                 /* non finalized Opus in TS Draft. Can't really tell...
+                  * So ffmpeg produced mixes with System-A reg */
+                if( PMTEsHasRegistration(p_demux, p_dvbpsies, "Opus") )
+                    OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
+                break;
+        }
     }
     else if( p_sys->standard == TS_STANDARD_ARIB )
     {
