@@ -28,8 +28,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:28+0200\n"
-"Last-Translator: وجدي أبو سلطان, 2018\n"
+"PO-Revision-Date: 2018-07-05 21:33+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
@@ -10490,7 +10490,7 @@ msgstr ""
 "16 no padding\n"
 "32 ac vlc\n"
 "64 Qpel chroma.\n"
-"،   هكذا يجب ان يكون مجموع قيم.على سبيل المثال، \n"
+"،   هكذا يجب ان يكون مجموع قيم.على سبيل المثال،\n"
 " to fix \"ac vlc\" and \"ump4\", enter 40."
 
 #: modules/codec/avcodec/avcodec.h:82 modules/codec/avcodec/avcodec.h:177
@@ -10503,8 +10503,7 @@ msgid ""
 "The decoder can partially decode or skip frame(s) when there is not enough "
 "time. It's useful with low CPU power but it can produce distorted pictures."
 msgstr ""
-".  المرمز يمكن ان يُتَرجم جزئيا او يهمل الإطار عندما لا يوجد ما يكفي من "
-"الوقت. \n"
+"المرمز يمكن ان يُتَرجم جزئيا او يهمل الإطار عندما لا يوجد ما يكفي من الوقت.\n"
 "ومن المفيد مع وحدة المعالجه المركزية منخفض الطاقة لكنها يمكن ان تنتج صورا "
 "مشوهه."
 
@@ -16313,9 +16312,8 @@ msgstr "انتقل إلى العنصر السابق"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "غادر ملء الشاشة"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
