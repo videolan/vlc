@@ -12,15 +12,16 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Mindaugas <opensuse.lietuviu.kalba@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-05 22:27+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Lithuanian (https://www.transifex.com/yaron/teams/16553/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < "
+"11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? "
+"1 : n % 1 != 0 ? 2: 3);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -30,9 +31,9 @@ msgid ""
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 "Ši programa pateikiama be JOKIŲ GARANTIJŲ, kiek tai leidžia įstatymai.\n"
-"Galite ją modifikuoti GNU bendrosios viešosios licencijos sąlygomis; \n"
-"jas rasite COPYING faile. \n"
-"Sukūrė VideoLAN komanda; žiūrėkite AUTHORS failą. \n"
+"Galite ją modifikuoti GNU bendrosios viešosios licencijos sąlygomis;\n"
+"jas rasite COPYING faile.\n"
+"Sukūrė VideoLAN komanda; žiūrėkite AUTHORS failą.\n"
 
 #: include/vlc_config_cat.h:33
 msgid "VLC preferences"
@@ -336,7 +337,7 @@ msgid ""
 msgstr ""
 "Įpaketintuvai naudojami elementariųjų srautų paruošimui prieš sutankinimą. "
 "Ši parinktis leidžia jums visuomet priverstinai naudoti pasirinktą "
-"įpaketintuvą. Greičiausiai jums nederėtų to daryti. \n"
+"įpaketintuvą. Greičiausiai jums nederėtų to daryti.\n"
 "Taip pat galite nustatyti kiekvieno įpaketintuvo numatytuosius parametrus."
 
 #: include/vlc_config_cat.h:162
@@ -15672,7 +15673,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15683,15 +15683,16 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC leistuvė yra <a href=\"http://www.videolan.org/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">VideoLAN</span></a> bendruomenės "
-"kuriama ir nemokamai platinama atviro kodo programa, galinti groti bei "
-"rodyti, perkoduoti ir transliuoti įvairialypės terpės kūrinius.</p><p>VLC "
-"naudoja nuosavas kodavimo priemones, veikia kiekvienoje populiaresnėje "
-"platformoje ir nuskaito praktiškų visų formatų kūrinius, taip pat "
-"kompaktinius diskus, tinklo srautus, nuskaito kortas ir pan.!</p><p><a href="
-"\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-"underline; color:#0057ae;\">Prisidėkite prie mūsų veiklos!</span></a>"
+"<p>VLC leistuvė yra <a href=\"https://www.videolan.org/\"><span style=\" "
+"text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
+"bendruomenės kuriama ir nemokamai platinama atviro kodo programa, galinti "
+"groti bei rodyti, perkoduoti ir transliuoti įvairialypės terpės kūrinius.</"
+"p><p>VLC naudoja nuosavas kodavimo priemones, veikia kiekvienoje "
+"populiaresnėje platformoje ir nuskaito praktiškų visų formatų kūrinius, taip "
+"pat kompaktinius diskus, tinklo srautus, nuskaito kortas ir pan.!</p><p><a "
+"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">Prisidėkite prie mūsų veiklos!</"
+"span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16326,9 +16327,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Palikti viso ekrano veikseną"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
