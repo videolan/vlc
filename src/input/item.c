@@ -471,7 +471,7 @@ input_item_t *input_item_Hold( input_item_t *p_item )
 {
     input_item_owner_t *owner = item_owner(p_item);
 
-    atomic_fetch_add( &owner->refs, 1 );
+    vlc_atomic_rc_inc( &owner->rc );
     return p_item;
 }
 
@@ -479,7 +479,7 @@ void input_item_Release( input_item_t *p_item )
 {
     input_item_owner_t *owner = item_owner(p_item);
 
-    if( atomic_fetch_sub(&owner->refs, 1) != 1 )
+    if( !vlc_atomic_rc_dec( &owner->rc ) )
         return;
 
     vlc_event_manager_fini( &p_item->event_manager );
@@ -1060,7 +1060,7 @@ input_item_NewExt( const char *psz_uri, const char *psz_name,
     if( unlikely(owner == NULL) )
         return NULL;
 
-    atomic_init( &owner->refs, 1 );
+    vlc_atomic_rc_init( &owner->rc );
 
     input_item_t *p_input = &owner->item;
     vlc_event_manager_t * p_em = &p_input->event_manager;
