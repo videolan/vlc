@@ -1171,6 +1171,16 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
                 if( PMTEsHasRegistration(p_demux, p_dvbpsies, "Opus") )
                     OpusSetup(p_demux, desc->p_data, desc->i_length, p_fmt);
                 break;
+            case 0x0E: /* DTS HD */
+                es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_DTS );
+                p_fmt->i_profile = PROFILE_DTS_HD;
+                break;
+            case 0x0F: /* DTS Neural */
+                es_format_Change( p_fmt, AUDIO_ES, VLC_CODEC_DTS );
+                break;
+            case 0x15: /* AC4, unsupported for now */
+                es_format_Change( p_fmt, AUDIO_ES, VLC_FOURCC('A', 'C', '-', '4') );
+                break;
         }
     }
     else if( p_sys->standard == TS_STANDARD_ARIB )
