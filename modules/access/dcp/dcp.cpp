@@ -831,7 +831,7 @@ static int Control( demux_t *p_demux, int query, va_list args )
         case DEMUX_GET_PTS_DELAY:
             pi64 = va_arg( args, int64_t * );
             *pi64 =
-                INT64_C(1000) * var_InheritInteger( p_demux, "file-caching" );
+                VLC_TICK_FROM_MS(var_InheritInteger( p_demux, "file-caching" ));
             return VLC_SUCCESS;
 
 

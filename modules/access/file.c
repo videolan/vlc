@@ -345,7 +345,8 @@ static int FileControl( stream_t *p_access, int i_query, va_list args )
                 *pi_64 = VLC_TICK_FROM_MS(
                         var_InheritInteger (p_access, "network-caching") );
             else
-                *pi_64 = var_InheritInteger (p_access, "file-caching") * 1000;
+                *pi_64 = VLC_TICK_FROM_MS(
+                        var_InheritInteger (p_access, "file-caching") );
             break;
 
         case STREAM_SET_PAUSE_STATE:
