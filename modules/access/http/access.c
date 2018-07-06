@@ -93,8 +93,8 @@ static int FileControl(stream_t *access, int query, va_list args)
         }
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(access, "network-caching");
+            *va_arg(args, int64_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger(access, "network-caching") );
             break;
 
         case STREAM_GET_CONTENT_TYPE:
@@ -141,8 +141,8 @@ static int LiveControl(stream_t *access, int query, va_list args)
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(access, "network-caching");
+            *va_arg(args, int64_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger(access, "network-caching") );
             break;
 
         case STREAM_GET_CONTENT_TYPE:

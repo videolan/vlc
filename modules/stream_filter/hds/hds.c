@@ -1893,8 +1893,8 @@ static int Control( stream_t *s, int i_query, va_list args )
             *(va_arg( args, bool * )) = true;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = INT64_C(1000) *
-                var_InheritInteger(s, "network-caching");
+            *va_arg (args, int64_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger(s, "network-caching") );
              break;
         case STREAM_GET_SIZE:
             *(va_arg (args, uint64_t *)) = get_stream_size(s);

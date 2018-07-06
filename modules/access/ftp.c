@@ -1049,8 +1049,8 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 
         case STREAM_GET_PTS_DELAY:
             pi_64 = va_arg( args, int64_t * );
-            *pi_64 = INT64_C(1000)
-                   * var_InheritInteger( p_access, "network-caching" );
+            *pi_64 = VLC_TICK_FROM_MS(
+                   var_InheritInteger( p_access, "network-caching" ) );
             break;
 
         case STREAM_SET_PAUSE_STATE:

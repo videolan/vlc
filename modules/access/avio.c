@@ -334,7 +334,7 @@ static int Control(stream_t *access, int query, va_list args)
         return VLC_SUCCESS;
     case STREAM_GET_PTS_DELAY: {
         int64_t *delay = va_arg(args, int64_t *);
-        *delay = INT64_C(1000) * var_InheritInteger(access, "network-caching");
+        *delay = VLC_TICK_FROM_MS(var_InheritInteger(access, "network-caching"));
         return VLC_SUCCESS;
     }
     case STREAM_SET_PAUSE_STATE: {

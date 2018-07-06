@@ -98,8 +98,8 @@ static int Control(stream_t *p_stream, int i_query, va_list args)
             *va_arg( args, bool * ) = false;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = INT64_C(1000)
-                   * var_InheritInteger(p_stream, "network-caching");
+            *va_arg( args, int64_t * ) = VLC_TICK_FROM_MS(
+                   var_InheritInteger(p_stream, "network-caching") );
             break;
         default:
             i_ret = VLC_EGENERIC;
