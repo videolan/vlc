@@ -485,7 +485,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     /* Remove 'Now playing' info as it is probably outdated */
     input_item_SetNowPlaying( p_item, NULL );
     input_item_SetESNowPlaying( p_item, NULL );
-    input_SendEventMeta( p_input );
 
     /* */
     if( !priv->b_preparsing && var_InheritBool( p_input, "stats" ) )
