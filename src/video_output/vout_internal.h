@@ -114,7 +114,7 @@ struct vout_thread_sys_t
     /* OSD title configuration */
     struct {
         bool        show;
-        vlc_tick_t  timeout;
+        int         timeout;
         int         position;
     } title;
 

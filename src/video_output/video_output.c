@@ -1254,7 +1254,7 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
         return;
 
     vout_OSDText(vout, VOUT_SPU_CHANNEL_OSD,
-                 vout->p->title.position, INT64_C(1000) * vout->p->title.timeout,
+                 vout->p->title.position, VLC_TICK_FROM_MS(vout->p->title.timeout),
                  string);
 }
 
