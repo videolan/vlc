@@ -210,6 +210,18 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main thread
  *****************************************************************************/
+static input_thread_t *InputCreateAndStart( services_discovery_t *sd,
+                                            input_item_t *item )
+{
+    input_thread_t *input = input_Create( sd, item, NULL, NULL, NULL );
+    if( input != NULL && input_Start( input ) )
+    {
+        vlc_object_release( input );
+        input = NULL;
+    }
+    return input;
+}
+
 noreturn static void *Run( void *data )
 {
     services_discovery_t *p_sd = data;
@@ -329,7 +341,7 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
             services_discovery_AddItem( p_sd, p_input );
 
             TAB_APPEND( p_sys->i_input, p_sys->pp_input,
-                         input_CreateAndStart( p_sd, p_input, NULL ) );
+                         InputCreateAndStart( p_sd, p_input ) );
         }
         else
         {
@@ -404,7 +416,7 @@ static void ParseRequest( services_discovery_t *p_sd )
             services_discovery_AddItem( p_sd, p_input );
 
             TAB_APPEND( p_sys->i_input, p_sys->pp_input,
-                        input_CreateAndStart( p_sd, p_input, NULL ) );
+                        InputCreateAndStart( p_sd, p_input ) );
             SaveUrls( p_sd );
         }
     }
