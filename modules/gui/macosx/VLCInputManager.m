@@ -541,7 +541,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     NSMutableDictionary *currentlyPlayingTrackInfo = [NSMutableDictionary dictionary];
 
-    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(input_item_GetDuration(p_input_item) / CLOCK_FREQ);
+    currentlyPlayingTrackInfo[MPMediaItemPropertyPlaybackDuration] = @(SEC_FROM_VLC_TICK(input_item_GetDuration(p_input_item)));
     currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyElapsedPlaybackTime] = @(var_GetInteger(p_current_input, "time"));
     currentlyPlayingTrackInfo[MPNowPlayingInfoPropertyPlaybackRate] = @(var_GetFloat(p_current_input, "rate"));
 
@@ -708,8 +708,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
     NSMutableDictionary *mutDict = [[NSMutableDictionary alloc] initWithDictionary:[defaults objectForKey:@"recentlyPlayedMedia"]];
 
     float relativePos = var_GetFloat(p_input_thread, "position");
-    vlc_tick_t pos = var_GetInteger(p_input_thread, "time") / CLOCK_FREQ;
-    vlc_tick_t dur = input_item_GetDuration(p_item) / CLOCK_FREQ;
+    int pos = SEC_FROM_VLC_TICK(var_GetInteger(p_input_thread, "time"));
+    int dur = SEC_FROM_VLC_TICK(input_item_GetDuration(p_item));
 
     NSMutableArray *mediaList = [[defaults objectForKey:@"recentlyPlayedMediaList"] mutableCopy];
 
