@@ -2188,7 +2188,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if ( (p_load = MP4_BoxGet( p_sys->track[i].p_track, "load" )) &&
                      BOXDATA(p_load)->i_duration > 0 )
                 {
-                    *va_arg(args, int64_t *) =
+                    *va_arg(args, vlc_tick_t *) =
                             MP4_rescale( BOXDATA(p_load)->i_duration,
                                          p_sys->track[i].i_timescale, CLOCK_FREQ );
                     return VLC_SUCCESS;

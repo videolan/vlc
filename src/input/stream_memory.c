@@ -97,7 +97,7 @@ static int Control( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = 0;
+            *va_arg( args, vlc_tick_t * ) = 0;
             break;
 
         case STREAM_GET_TITLE_INFO:

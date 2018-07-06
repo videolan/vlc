@@ -65,7 +65,7 @@ typedef struct
     bool         can_pace;
     bool         can_pause;
     uint64_t     size;
-    int64_t      pts_delay;
+    vlc_tick_t   pts_delay;
     char        *content_type;
 
     uint64_t     buffer_offset;
@@ -370,7 +370,7 @@ static int Control(stream_t *stream, int query, va_list args)
             *va_arg(args, uint64_t *) = sys->size;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = sys->pts_delay;
+            *va_arg(args, vlc_tick_t *) = sys->pts_delay;
             break;
         case STREAM_GET_TITLE_INFO:
         case STREAM_GET_TITLE:

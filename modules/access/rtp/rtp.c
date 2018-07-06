@@ -383,8 +383,8 @@ static int Control (demux_t *demux, int query, va_list args)
     {
         case DEMUX_GET_PTS_DELAY:
         {
-            int64_t *v = va_arg (args, int64_t *);
-            *v = VLC_TICK_FROM_MS( var_InheritInteger (demux, "network-caching") );
+            *va_arg (args, vlc_tick_t *) =
+                VLC_TICK_FROM_MS( var_InheritInteger (demux, "network-caching") );
             return VLC_SUCCESS;
         }
 

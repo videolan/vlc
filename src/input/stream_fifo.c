@@ -94,7 +94,7 @@ static int vlc_stream_fifo_Control(stream_t *s, int query, va_list ap)
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(ap, int64_t *) = DEFAULT_PTS_DELAY;
+            *va_arg(ap, vlc_tick_t *) = DEFAULT_PTS_DELAY;
             break;
 
         default:

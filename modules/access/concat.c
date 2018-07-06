@@ -45,7 +45,7 @@ typedef struct
     bool can_pause;
     bool can_control_pace;
     uint64_t size;
-    int64_t caching;
+    vlc_tick_t caching;
 } access_sys_t;
 
 static stream_t *GetAccess(stream_t *access)
@@ -167,7 +167,7 @@ static int Control(stream_t *access, int query, va_list args)
             *va_arg(args, uint64_t *) = sys->size;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = sys->caching;
+            *va_arg(args, vlc_tick_t *) = sys->caching;
             break;
 
         case STREAM_GET_SIGNAL:
@@ -261,7 +261,7 @@ static int Open(vlc_object_t *obj)
                 sys->size += size;
         }
 
-        int64_t caching;
+        vlc_tick_t caching;
         vlc_stream_Control(a, STREAM_GET_PTS_DELAY, &caching);
         if (caching > sys->caching)
             sys->caching = caching;

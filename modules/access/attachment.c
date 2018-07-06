@@ -152,7 +152,7 @@ static int Control(stream_t *access, int query, va_list args)
         *va_arg(args, uint64_t *) = sys->attachment->i_data;
         break;
     case STREAM_GET_PTS_DELAY:
-        *va_arg(args, int64_t *) = DEFAULT_PTS_DELAY;
+        *va_arg(args, vlc_tick_t *) = DEFAULT_PTS_DELAY;
         break;
     case STREAM_SET_PAUSE_STATE:
         return VLC_SUCCESS;

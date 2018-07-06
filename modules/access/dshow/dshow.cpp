@@ -1918,7 +1918,6 @@ static int AccessControl( stream_t *p_access, int i_query, va_list args )
 {
     access_sys_t *sys = (access_sys_t *)p_access->p_sys;
     bool    *pb_bool;
-    int64_t *pi_64;
 
     switch( i_query )
     {
@@ -1931,8 +1930,7 @@ static int AccessControl( stream_t *p_access, int i_query, va_list args )
         break;
 
     case STREAM_GET_PTS_DELAY:
-        pi_64 = va_arg( args, int64_t * );
-        *pi_64 =
+        *va_arg( args, vlc_tick_t * ) =
             VLC_TICK_FROM_MS( var_InheritInteger( p_access, "live-caching" ) );
         break;
 
@@ -1980,8 +1978,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
         return VLC_SUCCESS;
 
     case DEMUX_GET_PTS_DELAY:
-        pi64 = va_arg( args, int64_t * );
-        *pi64 =
+        *va_arg( args, vlc_tick_t * ) =
             VLC_TICK_FROM_MS( var_InheritInteger( p_demux, "live-caching" ) );
         return VLC_SUCCESS;
 

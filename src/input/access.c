@@ -174,7 +174,7 @@ int access_vaDirectoryControlHelper( stream_t *p_access, int i_query, va_list ar
             *va_arg( args, bool* ) = false;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg( args, int64_t * ) = 0;
+            *va_arg( args, vlc_tick_t * ) = 0;
             break;
         default:
             return VLC_EGENERIC;

@@ -404,8 +404,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_GET_PTS_DELAY:
-            pi_64 = va_arg( args, int64_t * );
-            *pi_64 = DEFAULT_PTS_DELAY;
+            *va_arg( args, vlc_tick_t * ) = DEFAULT_PTS_DELAY;
             break;
 
         case STREAM_GET_SIGNAL:

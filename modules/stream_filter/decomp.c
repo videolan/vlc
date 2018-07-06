@@ -89,7 +89,7 @@ typedef struct
     int          read_fd;
     bool         can_pace;
     bool         can_pause;
-    int64_t      pts_delay;
+    vlc_tick_t   pts_delay;
 } stream_sys_t;
 
 extern char **environ;
@@ -222,7 +222,7 @@ static int Control (stream_t *stream, int query, va_list args)
             *(va_arg (args, uint64_t *)) = 0;
             break;
         case STREAM_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = p_sys->pts_delay;
+            *va_arg (args, vlc_tick_t *) = p_sys->pts_delay;
             break;
         case STREAM_SET_PAUSE_STATE:
         {

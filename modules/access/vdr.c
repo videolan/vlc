@@ -267,7 +267,6 @@ static int Control( stream_t *p_access, int i_query, va_list args )
     access_sys_t *p_sys = p_access->p_sys;
     input_title_t ***ppp_title;
     int i;
-    int64_t *pi64;
     vlc_meta_t *p_meta;
 
     switch( i_query )
@@ -284,9 +283,8 @@ static int Control( stream_t *p_access, int i_query, va_list args )
             break;
 
         case STREAM_GET_PTS_DELAY:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = VLC_TICK_FROM_MS(
-                  var_InheritInteger( p_access, "file-caching" ) );
+            *va_arg( args, vlc_tick_t * ) =
+                VLC_TICK_FROM_MS(var_InheritInteger( p_access, "file-caching" ));
             break;
 
         case STREAM_SET_PAUSE_STATE:

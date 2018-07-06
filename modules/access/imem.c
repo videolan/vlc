@@ -346,11 +346,10 @@ static int ControlAccess(stream_t *access, int i_query, va_list args)
         *s = var_InheritInteger(access, "imem-size");
         return *s ? VLC_SUCCESS : VLC_EGENERIC;
     }
-    case STREAM_GET_PTS_DELAY: {
-        int64_t *delay = va_arg(args, int64_t *);
-        *delay = DEFAULT_PTS_DELAY; /* FIXME? */
+    case STREAM_GET_PTS_DELAY:
+        *va_arg(args, vlc_tick_t *) = DEFAULT_PTS_DELAY; /* FIXME? */
         return VLC_SUCCESS;
-    }
+
     case STREAM_SET_PAUSE_STATE:
         return VLC_SUCCESS;
 
@@ -529,8 +528,7 @@ static int ControlDemux(demux_t *demux, int i_query, va_list args)
         return VLC_SUCCESS;
 
     case DEMUX_GET_PTS_DELAY: {
-        int64_t *delay = va_arg(args, int64_t *);
-        *delay = DEFAULT_PTS_DELAY; /* FIXME? */
+        *va_arg(args, vlc_tick_t *) = DEFAULT_PTS_DELAY; /* FIXME? */
         return VLC_SUCCESS;
     }
     case DEMUX_GET_POSITION: {

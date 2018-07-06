@@ -597,7 +597,7 @@ int PlaylistManager::doControl(int i_query, va_list args)
         }
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg (args, int64_t *) = VLC_TICK_FROM_SEC(1);
+            *va_arg (args, vlc_tick_t *) = VLC_TICK_FROM_SEC(1);
             break;
 
         default:

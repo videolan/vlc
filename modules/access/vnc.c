@@ -299,9 +299,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = va_arg( args, int64_t * );
-            *pi64 = VLC_TICK_FROM_MS(
-                  var_InheritInteger( p_demux, "network-caching" ) );
+            *va_arg( args, vlc_tick_t * ) =
+                VLC_TICK_FROM_MS(var_InheritInteger( p_demux, "network-caching" ));
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

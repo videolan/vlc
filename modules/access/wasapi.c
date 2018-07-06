@@ -360,7 +360,7 @@ static int Control(demux_t *demux, int query, va_list ap)
             break;
 
         case DEMUX_GET_PTS_DELAY:
-            *(va_arg(ap, int64_t *)) = sys->caching;
+            *(va_arg(ap, vlc_tick_t *)) = sys->caching;
             break;
 
         case DEMUX_HAS_UNSUPPORTED_META:

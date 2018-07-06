@@ -180,7 +180,7 @@ static int DemuxControl(demux_t *demux, int query, va_list args)
             *va_arg(args, bool*) = true;
             break;
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) =
+            *va_arg(args, vlc_tick_t *) =
                 VLC_TICK_FROM_MS( var_InheritInteger(demux, "disc-caching") );
             break;
 

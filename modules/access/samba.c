@@ -203,7 +203,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
         break;
 
     case STREAM_GET_PTS_DELAY:
-        *va_arg( args, int64_t * ) = VLC_TICK_FROM_MS(
+        *va_arg( args, vlc_tick_t * ) = VLC_TICK_FROM_MS(
             var_InheritInteger( p_access, "network-caching" ) );
         break;
 

@@ -105,7 +105,7 @@ enum demux_query_e
      * Can fail only if synchronous and <b>not</b> an access-demuxer. The
      * underlying input stream then determines the PTS delay.
      *
-     * arg1= int64_t * */
+     * arg1= vlc_tick_t * */
     DEMUX_GET_PTS_DELAY = 0x101,
 
     /** Retrieves stream meta-data.

@@ -741,8 +741,8 @@ static int Control(demux_t *demux, int query, va_list args)
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = va_arg(args, int64_t *);
-            *pi64 = VLC_TICK_FROM_MS(var_InheritInteger(demux, "live-caching"));
+            *va_arg(args, vlc_tick_t *) =
+                VLC_TICK_FROM_MS(var_InheritInteger(demux, "live-caching"));
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:

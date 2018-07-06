@@ -59,7 +59,7 @@ int main(void)
     assert(val == VLC_SUCCESS && !b);
     val = vlc_stream_GetSize(s, &(uint64_t){ 0 });
     assert(val < 0);
-    val = vlc_stream_Control(s, STREAM_GET_PTS_DELAY, &(int64_t){ 0 });
+    val = vlc_stream_Control(s, STREAM_GET_PTS_DELAY, &(vlc_tick_t){ 0 });
     assert(val == VLC_SUCCESS);
     vlc_stream_Delete(s);
     vlc_stream_fifo_Close(s);

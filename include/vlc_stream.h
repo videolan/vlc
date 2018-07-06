@@ -163,7 +163,7 @@ enum stream_query_e
     STREAM_GET_SIZE=6,          /**< arg1= uint64_t *     res=can fail */
 
     /* */
-    STREAM_GET_PTS_DELAY = 0x101,/**< arg1= int64_t* res=cannot fail */
+    STREAM_GET_PTS_DELAY = 0x101,/**< arg1= vlc_tick_t* res=cannot fail */
     STREAM_GET_TITLE_INFO, /**< arg1=input_title_t*** arg2=int* res=can fail */
     STREAM_GET_TITLE,       /**< arg1=unsigned * res=can fail */
     STREAM_GET_SEEKPOINT,   /**< arg1=unsigned * res=can fail */

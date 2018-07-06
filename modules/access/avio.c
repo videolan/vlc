@@ -332,11 +332,11 @@ static int Control(stream_t *access, int query, va_list args)
             return VLC_EGENERIC;
         *va_arg(args, uint64_t *) = sys->size;
         return VLC_SUCCESS;
-    case STREAM_GET_PTS_DELAY: {
-        int64_t *delay = va_arg(args, int64_t *);
-        *delay = VLC_TICK_FROM_MS(var_InheritInteger(access, "network-caching"));
+    case STREAM_GET_PTS_DELAY:
+        *va_arg(args, vlc_tick_t *) =
+            VLC_TICK_FROM_MS(var_InheritInteger(access, "network-caching"));
         return VLC_SUCCESS;
-    }
+
     case STREAM_SET_PAUSE_STATE: {
         bool is_paused = va_arg(args, int);
         if (avio_pause(sys->context, is_paused)< 0)
