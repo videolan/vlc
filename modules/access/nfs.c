@@ -293,8 +293,8 @@ FileControl(stream_t *p_access, int i_query, va_list args)
         }
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = var_InheritInteger(p_access,
-                                                          "network-caching");
+            *va_arg(args, int64_t *) = VLC_TICK_FROM_MS(
+                    var_InheritInteger(p_access, "network-caching") );
             break;
 
         case STREAM_SET_PAUSE_STATE:
