@@ -519,27 +519,6 @@ VLC_API void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
 VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
 
 /**
- * Create a new input_thread_t and start it.
- *
- * Provided for convenience.
- *
- * \see input_Create
- */
-static inline
-input_thread_t *input_CreateAndStart( vlc_object_t *parent,
-                                      input_item_t *item, const char *log )
-{
-    input_thread_t *input = input_Create( parent, item, log, NULL, NULL );
-    if( input != NULL && input_Start( input ) )
-    {
-        vlc_object_release( input );
-        input = NULL;
-    }
-    return input;
-}
-#define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
-
-/**
  * Get the input item for an input thread
  *
  * You have to keep a reference to the input or to the input_item_t until
