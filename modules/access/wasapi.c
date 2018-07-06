@@ -396,7 +396,7 @@ static int Open(vlc_object_t *obj)
 
     sys->client = NULL;
     sys->es = NULL;
-    sys->caching = INT64_C(1000) * var_InheritInteger(obj, "live-caching");
+    sys->caching = VLC_TICK_FROM_MS( var_InheritInteger(obj, "live-caching") );
     sys->start_time = vlc_tick_now();
     for (unsigned i = 0; i < 2; i++)
         sys->events[i] = NULL;

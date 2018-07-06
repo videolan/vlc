@@ -269,7 +269,7 @@ static int Open(vlc_object_t *obj)
     sys->stream = NULL;
     sys->es = NULL;
     sys->discontinuity = false;
-    sys->caching = INT64_C(1000) * var_InheritInteger(obj, "live-caching");
+    sys->caching = VLC_TICK_FROM_MS( var_InheritInteger(obj, "live-caching") );
     demux->p_sys = sys;
 
     /* Stream parameters */

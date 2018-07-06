@@ -459,7 +459,7 @@ static int Open (vlc_object_t *obj)
     sys->rate = param;
 
     sys->start = vlc_tick_now ();
-    sys->caching = INT64_C(1000) * var_InheritInteger (demux, "live-caching");
+    sys->caching = VLC_TICK_FROM_MS(var_InheritInteger (demux, "live-caching"));
     param = sys->caching;
     val = snd_pcm_hw_params_set_buffer_time_near (pcm, hw, &param, NULL);
     if (val)

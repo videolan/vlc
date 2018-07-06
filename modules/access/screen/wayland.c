@@ -303,8 +303,8 @@ static int Control(demux_t *demux, int query, va_list args)
         //    break;
 
         case DEMUX_GET_PTS_DELAY:
-            *va_arg(args, int64_t *) = INT64_C(1000)
-                * var_InheritInteger(demux, "live-caching");
+            *va_arg(args, int64_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger(demux, "live-caching") );
             break;
 
         case DEMUX_CAN_CONTROL_PACE:

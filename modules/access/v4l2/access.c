@@ -263,8 +263,8 @@ static int AccessControl( stream_t *access, int query, va_list args )
             break;
 
         case STREAM_GET_PTS_DELAY:
-            *va_arg(args,int64_t *) = INT64_C(1000)
-                * var_InheritInteger( access, "live-caching" );
+            *va_arg(args,int64_t *) = VLC_TICK_FROM_MS(
+                var_InheritInteger( access, "live-caching" ) );
             break;
 
         case STREAM_SET_PAUSE_STATE:
