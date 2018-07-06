@@ -188,6 +188,7 @@ static void Close( vlc_object_t *p_this )
         if( !p_input )
             continue;
 
+        input_LegacyVarStop( p_input );
         input_Stop( p_input );
         input_Close( p_input );
 
@@ -213,9 +214,10 @@ static void Close( vlc_object_t *p_this )
 static input_thread_t *InputCreateAndStart( services_discovery_t *sd,
                                             input_item_t *item )
 {
-    input_thread_t *input = input_Create( sd, item, NULL, NULL, NULL );
+    input_thread_t *input = input_Create( sd, input_LegacyEvents, NULL, item, NULL, NULL, NULL );
     if( input != NULL && input_Start( input ) )
     {
+        input_LegacyVarInit( input );
         vlc_object_release( input );
         input = NULL;
     }
@@ -256,6 +258,7 @@ noreturn static void *Run( void *data )
 
             if( state == END_S || state == ERROR_S )
             {
+                input_LegacyVarStop( p_input );
                 input_Stop( p_input );
                 input_Close( p_input );
 

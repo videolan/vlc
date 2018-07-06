@@ -26,7 +26,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_memstream.h>
 #include <vlc_renderer_discovery.h>
 
 #include <stdio.h>
@@ -37,9 +36,6 @@
 #include "event.h"
 #include "resource.h"
 #include "es_out.h"
-
-
-static void UpdateBookmarksOption( input_thread_t * );
 
 /****************************************************************************
  * input_Control
@@ -151,7 +147,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             }
             vlc_mutex_unlock( &priv->p_item->lock );
 
-            UpdateBookmarksOption( p_input );
+            input_SendEventBookmark( p_input );
 
             return p_bkmk ? VLC_SUCCESS : VLC_EGENERIC;
 
@@ -172,7 +168,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             else p_bkmk = NULL;
             vlc_mutex_unlock( &priv->p_item->lock );
 
-            UpdateBookmarksOption( p_input );
+            input_SendEventBookmark( p_input );
 
             return p_bkmk ? VLC_SUCCESS : VLC_EGENERIC;
 
@@ -188,7 +184,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
                 vlc_mutex_unlock( &priv->p_item->lock );
 
-                UpdateBookmarksOption( p_input );
+                input_SendEventBookmark( p_input );
 
                 return VLC_SUCCESS;
             }
@@ -234,7 +230,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             TAB_CLEAN( priv->i_bookmark, priv->pp_bookmark );
             vlc_mutex_unlock( &priv->p_item->lock );
 
-            UpdateBookmarksOption( p_input );
+            input_SendEventBookmark( p_input );
             return VLC_SUCCESS;
 
         case INPUT_SET_BOOKMARK:
@@ -442,58 +438,3 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_EGENERIC;
     }
 }
-
-static void UpdateBookmarksOption( input_thread_t *p_input )
-{
-    input_thread_private_t *priv = input_priv(p_input);
-    struct vlc_memstream vstr;
-
-    vlc_memstream_open( &vstr );
-    vlc_memstream_puts( &vstr, "bookmarks=" );
-
-    vlc_mutex_lock( &priv->p_item->lock );
-    var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES );
-
-    for( int i = 0; i < priv->i_bookmark; i++ )
-    {
-        seekpoint_t const* sp = priv->pp_bookmark[i];
-
-        /* Add bookmark to choice-list */
-        var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
-                    (vlc_value_t){ .i_int = i }, sp->psz_name );
-
-        /* Append bookmark to option-buffer */
-        /* TODO: escape inappropriate values */
-        vlc_memstream_printf( &vstr, "%s{name=%s,time=%.3f}",
-            i > 0 ? "," : "", sp->psz_name, ( 1. * sp->i_time_offset ) / CLOCK_FREQ );
-    }
-
-    vlc_mutex_unlock( &priv->p_item->lock );
-
-    if( vlc_memstream_close( &vstr ) == VLC_SUCCESS )
-    {
-        bool b_overwritten = false;
-
-        for( int i = 0; i < priv->p_item->i_options; ++i )
-        {
-            char** ppsz_option = &priv->p_item->ppsz_options[i];
-
-            if( strncmp( *ppsz_option, "bookmarks=", 10 ) == 0 )
-            {
-                free( *ppsz_option );
-                *ppsz_option = vstr.ptr;
-                b_overwritten = true;
-            }
-        }
-
-        if( !b_overwritten )
-        {
-            input_item_AddOption( priv->p_item, vstr.ptr,
-                                  VLC_INPUT_OPTION_UNIQUE );
-            free( vstr.ptr );
-        }
-    }
-
-    input_SendEventBookmark( p_input );
-}
-

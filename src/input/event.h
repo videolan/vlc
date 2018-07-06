@@ -34,6 +34,7 @@ void input_SendEventPosition( input_thread_t *p_input, double f_position, vlc_ti
 void input_SendEventLength( input_thread_t *p_input, vlc_tick_t i_length );
 void input_SendEventStatistics( input_thread_t *p_input );
 void input_SendEventRate( input_thread_t *p_input, int i_rate );
+void input_SendEventCapabilities( input_thread_t *p_input, int capabilities );
 void input_SendEventAudioDelay( input_thread_t *p_input, vlc_tick_t i_delay );
 void input_SendEventSubtitleDelay( input_thread_t *p_input, vlc_tick_t i_delay );
 void input_SendEventRecord( input_thread_t *p_input, bool b_recording );

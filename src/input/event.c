@@ -34,174 +34,144 @@
 #include "event.h"
 #include <assert.h>
 
-/* */
-static void Trigger( input_thread_t *, int i_type );
-static void VarListAdd( input_thread_t *,
-                        const char *psz_variable, int i_event,
-                        int i_value, const char *psz_text );
-static void VarListDel( input_thread_t *,
-                        const char *psz_variable, int i_event,
-                        int i_value );
-static void VarListSelect( input_thread_t *,
-                           const char *psz_variable, int i_event,
-                           int i_value );
-
-/*****************************************************************************
- * Event for input.c
- *****************************************************************************/
-void input_SendEventDead( input_thread_t *p_input )
+static void input_SendEvent( input_thread_t *p_input,
+                             const struct vlc_input_event *event )
 {
-    Trigger( p_input, INPUT_EVENT_DEAD );
+    input_thread_private_t *priv = input_priv(p_input);
+    if( priv->events_cb )
+        priv->events_cb( p_input, priv->events_data, event );
 }
 
-void input_SendEventPosition( input_thread_t *p_input, double f_position, vlc_tick_t i_time )
+void input_SendEventDead( input_thread_t *p_input )
 {
-    vlc_value_t val;
+fprintf(stderr, "input_SendEventDead\n");
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_DEAD,
+    });
+}
 
-    /* */
-    val.f_float = f_position;
-    var_Change( p_input, "position", VLC_VAR_SETVALUE, val );
-
-    /* */
-    val.i_int = i_time;
-    var_Change( p_input, "time", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_POSITION );
+void input_SendEventCapabilities( input_thread_t *p_input, int i_capabilities )
+{
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_CAPABILITIES,
+        .capabilities = i_capabilities
+    });
+}
+void input_SendEventPosition( input_thread_t *p_input, double f_position,
+                              vlc_tick_t i_time )
+{
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_POSITION,
+        .position = { f_position, i_time }
+    });
 }
 void input_SendEventLength( input_thread_t *p_input, vlc_tick_t i_length )
 {
-    vlc_value_t val;
-
-    /* FIXME ugly + what about meta change event ? */
-    if( var_GetInteger( p_input, "length" ) == i_length )
-        return;
-
     input_item_SetDuration( input_priv(p_input)->p_item, i_length );
-
-    val.i_int = i_length;
-    var_Change( p_input, "length", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_LENGTH );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_LENGTH,
+        .length = i_length,
+    });
 }
 void input_SendEventStatistics( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_STATISTICS );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_STATISTICS,
+    });
 }
 void input_SendEventRate( input_thread_t *p_input, int i_rate )
 {
-    vlc_value_t val;
-
-    val.f_float = (float)INPUT_RATE_DEFAULT / (float)i_rate;
-    var_Change( p_input, "rate", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_RATE );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_RATE,
+        .rate = (float)INPUT_RATE_DEFAULT / (float)i_rate,
+    });
 }
 void input_SendEventAudioDelay( input_thread_t *p_input, vlc_tick_t i_delay )
 {
-    vlc_value_t val;
-
-    val.i_int = i_delay;
-    var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_AUDIO_DELAY );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_AUDIO_DELAY,
+        .audio_delay = i_delay,
+    });
 }
 
 void input_SendEventSubtitleDelay( input_thread_t *p_input, vlc_tick_t i_delay )
 {
-    vlc_value_t val;
-
-    val.i_int = i_delay;
-    var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_SUBTITLE_DELAY );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_SUBTITLE_DELAY,
+        .subtitle_delay = i_delay,
+    });
 }
 
 /* TODO and file name ? */
 void input_SendEventRecord( input_thread_t *p_input, bool b_recording )
 {
-    vlc_value_t val;
-
-    val.b_bool = b_recording;
-    var_Change( p_input, "record", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_RECORD );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_RECORD,
+        .record = b_recording
+    });
 }
 
 void input_SendEventTitle( input_thread_t *p_input, int i_title )
 {
-    vlc_value_t val;
-
-    val.i_int = i_title;
-    var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
-
-    input_ControlVarTitle( p_input, i_title );
-
-    Trigger( p_input, INPUT_EVENT_TITLE );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_TITLE,
+        .title = i_title
+    });
 }
 
 void input_SendEventSeekpoint( input_thread_t *p_input, int i_title, int i_seekpoint )
 {
-    vlc_value_t val;
-
-    /* "chapter" */
-    val.i_int = i_seekpoint;
-    var_Change( p_input, "chapter", VLC_VAR_SETVALUE, val );
-
-    /* "title %2u" */
-    char psz_title[sizeof ("title ") + 3 * sizeof (int)];
-    sprintf( psz_title, "title %2u", i_title );
-    var_Change( p_input, psz_title, VLC_VAR_SETVALUE, val );
-
-    /* */
-    Trigger( p_input, INPUT_EVENT_CHAPTER );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_CHAPTER,
+        .chapter = { i_title, i_seekpoint }
+    });
 }
 
-void input_SendEventSignal( input_thread_t *p_input, double f_quality, double f_strength )
+void input_SendEventSignal( input_thread_t *p_input, double f_quality,
+                            double f_strength )
 {
-    vlc_value_t val;
-
-    val.f_float = f_quality;
-    var_Change( p_input, "signal-quality", VLC_VAR_SETVALUE, val );
-
-    val.f_float = f_strength;
-    var_Change( p_input, "signal-strength", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_SIGNAL );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_SIGNAL,
+        .signal = { f_quality, f_strength }
+    });
 }
 
 void input_SendEventState( input_thread_t *p_input, int i_state )
 {
-    vlc_value_t val;
-
-    val.i_int = i_state;
-    var_Change( p_input, "state", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_STATE );
+fprintf(stderr, "input_SendEventState: %d\n", i_state);
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_STATE,
+        .state = i_state
+    });
 }
 
 void input_SendEventCache( input_thread_t *p_input, double f_level )
 {
-    vlc_value_t val;
-
-    val.f_float = f_level;
-    var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, INPUT_EVENT_CACHE );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_CACHE,
+        .cache = f_level
+    });
 }
 
 void input_SendEventMeta( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_ITEM_META );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ITEM_META,
+    });
 }
 
 void input_SendEventMetaInfo( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_ITEM_INFO );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ITEM_INFO,
+    });
 }
 
 void input_SendEventMetaEpg( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_ITEM_EPG );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ITEM_EPG,
+    });
 }
 /*****************************************************************************
  * Event for es_out.c
@@ -209,138 +179,136 @@ void input_SendEventMetaEpg( input_thread_t *p_input )
 void input_SendEventProgramAdd( input_thread_t *p_input,
                                 int i_program, const char *psz_text )
 {
-    VarListAdd( p_input, "program", INPUT_EVENT_PROGRAM, i_program, psz_text );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_PROGRAM,
+        .program = {
+            .action = VLC_INPUT_PROGRAM_ADDED,
+            .id = i_program,
+            .title = psz_text
+        }
+    });
 }
 void input_SendEventProgramDel( input_thread_t *p_input, int i_program )
 {
-    VarListDel( p_input, "program", INPUT_EVENT_PROGRAM, i_program );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_PROGRAM, 
+        .program = {
+            .action = VLC_INPUT_PROGRAM_DELETED,
+            .id = i_program
+        }
+    });
 }
 void input_SendEventProgramSelect( input_thread_t *p_input, int i_program )
 {
-    VarListSelect( p_input, "program", INPUT_EVENT_PROGRAM, i_program );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_PROGRAM, 
+        .program = {
+            .action = VLC_INPUT_PROGRAM_SELECTED,
+            .id = i_program
+        }
+    });
 }
 void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool b_scrambled )
 {
-    if( var_GetInteger( p_input, "program" ) != i_group )
-        return;
-
-    var_SetBool( p_input, "program-scrambled", b_scrambled );
-    Trigger( p_input, INPUT_EVENT_PROGRAM );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_PROGRAM, 
+        .program = {
+            .action = VLC_INPUT_PROGRAM_SCRAMBLED,
+            .id = i_group,
+            .scrambled = b_scrambled 
+        }
+    });
 }
 
-static const char *GetEsVarName( enum es_format_category_e i_cat )
+void input_SendEventEsAdd( input_thread_t *p_input,
+                           enum es_format_category_e i_cat, int i_id,
+                           const char *psz_text )
 {
-    switch( i_cat )
-    {
-    case VIDEO_ES:
-        return "video-es";
-    case AUDIO_ES:
-        return "audio-es";
-    case SPU_ES:
-        return "spu-es";
-    default:
-        return NULL;
-    }
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ES,
+        .es = {
+            .action = VLC_INPUT_ES_ADDED,
+            .cat = i_cat,
+            .id = i_id,
+            .title = psz_text
+        }
+    });
 }
-void input_SendEventEsAdd( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id, const char *psz_text )
+void input_SendEventEsDel( input_thread_t *p_input,
+                           enum es_format_category_e i_cat, int i_id )
 {
-    const char *psz_varname = GetEsVarName( i_cat );
-    if( psz_varname )
-        VarListAdd( p_input, psz_varname, INPUT_EVENT_ES, i_id, psz_text );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ES,
+        .es = {
+            .action = VLC_INPUT_ES_DELETED,
+            .cat = i_cat,
+            .id = i_id,
+        }
+    });
 }
-void input_SendEventEsDel( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id )
+void input_SendEventEsSelect( input_thread_t *p_input,
+                              enum es_format_category_e i_cat, int i_id )
 {
-    const char *psz_varname = GetEsVarName( i_cat );
-    if( psz_varname )
-        VarListDel( p_input, psz_varname, INPUT_EVENT_ES, i_id );
-}
-/* i_id == -1 will unselect */
-void input_SendEventEsSelect( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id )
-{
-    const char *psz_varname = GetEsVarName( i_cat );
-    if( psz_varname )
-        VarListSelect( p_input, psz_varname, INPUT_EVENT_ES, i_id );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ES,
+        .es = {
+            .action = VLC_INPUT_ES_SELECTED,
+            .cat = i_cat,
+            .id = i_id,
+        }
+    });
 }
 
 void input_SendEventTeletextAdd( input_thread_t *p_input,
                                  int i_teletext, const char *psz_text )
 {
-    VarListAdd( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext, psz_text );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_TELETEXT,
+        .teletext = {
+            .action = VLC_INPUT_TELETEXT_ADDED,
+            .id = i_teletext,
+            .title = psz_text
+        }
+    });
 }
 void input_SendEventTeletextDel( input_thread_t *p_input, int i_teletext )
 {
-    VarListDel( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_TELETEXT,
+        .teletext = {
+            .action = VLC_INPUT_TELETEXT_DELETED,
+            .id = i_teletext,
+        }
+    });
 }
 void input_SendEventTeletextSelect( input_thread_t *p_input, int i_teletext )
 {
-    VarListSelect( p_input, "teletext-es", INPUT_EVENT_TELETEXT, i_teletext );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_TELETEXT,
+        .teletext = {
+            .action = VLC_INPUT_TELETEXT_SELECTED,
+            .id = i_teletext,
+        }
+    });
 }
 
 void input_SendEventVout( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_VOUT );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_VOUT
+    });
 }
 
 void input_SendEventAout( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_AOUT );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_AOUT
+    });
 }
 
-/*****************************************************************************
- * Event for control.c/input.c
- *****************************************************************************/
 void input_SendEventBookmark( input_thread_t *p_input )
 {
-    Trigger( p_input, INPUT_EVENT_BOOKMARK );
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_BOOKMARK
+    });
 }
-
-/*****************************************************************************
- *
- *****************************************************************************/
-static void Trigger( input_thread_t *p_input, int i_type )
-{
-    var_SetInteger( p_input, "intf-event", i_type );
-}
-static void VarListAdd( input_thread_t *p_input,
-                        const char *psz_variable, int i_event,
-                        int i_value, const char *psz_text )
-{
-    vlc_value_t val;
-
-    val.i_int = i_value;
-
-    var_Change( p_input, psz_variable, VLC_VAR_ADDCHOICE, val, psz_text );
-
-    Trigger( p_input, i_event );
-}
-static void VarListDel( input_thread_t *p_input,
-                        const char *psz_variable, int i_event,
-                        int i_value )
-{
-    vlc_value_t val;
-
-    if( i_value >= 0 )
-    {
-        val.i_int = i_value;
-        var_Change( p_input, psz_variable, VLC_VAR_DELCHOICE, val );
-    }
-    else
-    {
-        var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES );
-    }
-
-    Trigger( p_input, i_event );
-}
-static void VarListSelect( input_thread_t *p_input,
-                           const char *psz_variable, int i_event,
-                           int i_value )
-{
-    vlc_value_t val;
-
-    val.i_int = i_value;
-    var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, i_event );
-}
-
-

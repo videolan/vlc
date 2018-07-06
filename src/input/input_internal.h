@@ -103,6 +103,9 @@ typedef struct input_thread_private_t
 {
     struct input_thread_t input;
 
+    input_thread_events_cb events_cb;
+    void *events_data;
+
     /* Global properties */
     bool        b_preparsing;
     bool        b_can_pause;
@@ -269,10 +272,6 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *, const char *name );
  ***************************************************************************/
 
 /* var.c */
-void input_ControlVarInit ( input_thread_t * );
-void input_ControlVarStop( input_thread_t * );
-void input_ControlVarNavigation( input_thread_t * );
-void input_ControlVarTitle( input_thread_t *, int i_title );
 
 void input_ConfigVarInit ( input_thread_t * );
 

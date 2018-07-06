@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_memstream.h>
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
@@ -75,6 +76,8 @@ static int RecordCallback( vlc_object_t *p_this, char const *psz_cmd,
 static int FrameNextCallback( vlc_object_t *p_this, char const *psz_cmd,
                               vlc_value_t oldval, vlc_value_t newval,
                               void *p_data );
+static void input_LegacyVarTitle( input_thread_t *p_input, int i_title );
+static void input_LegacyVarNavigation( input_thread_t *p_input );
 
 typedef struct
 {
@@ -122,13 +125,326 @@ static const vlc_input_callback_t p_input_title_navigation_callbacks[] =
 };
 #undef CALLBACK
 
-/*****************************************************************************
- * input_ControlVarInit:
- *  Create all control object variables with their callbacks
- *****************************************************************************/
-void input_ControlVarInit ( input_thread_t *p_input )
+static void Trigger( input_thread_t *p_input, int i_type )
+{
+    var_SetInteger( p_input, "intf-event", i_type );
+}
+static void VarListAdd( input_thread_t *p_input,
+                        const char *psz_variable, int i_event,
+                        int i_value, const char *psz_text )
 {
     vlc_value_t val;
+
+    val.i_int = i_value;
+
+    var_Change( p_input, psz_variable, VLC_VAR_ADDCHOICE, val, psz_text );
+
+    Trigger( p_input, i_event );
+}
+static void VarListDel( input_thread_t *p_input,
+                        const char *psz_variable, int i_event,
+                        int i_value )
+{
+    vlc_value_t val;
+
+    if( i_value >= 0 )
+    {
+        val.i_int = i_value;
+        var_Change( p_input, psz_variable, VLC_VAR_DELCHOICE, val );
+    }
+    else
+    {
+        var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES );
+    }
+
+    Trigger( p_input, i_event );
+}
+static void VarListSelect( input_thread_t *p_input,
+                           const char *psz_variable, int i_event,
+                           int i_value )
+{
+    vlc_value_t val;
+
+    val.i_int = i_value;
+    var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, val );
+
+    Trigger( p_input, i_event );
+}
+static const char *GetEsVarName( enum es_format_category_e i_cat )
+{
+    switch( i_cat )
+    {
+    case VIDEO_ES:
+        return "video-es";
+    case AUDIO_ES:
+        return "audio-es";
+    case SPU_ES:
+        return "spu-es";
+    default:
+        return NULL;
+    }
+}
+
+static void UpdateBookmarksOption( input_thread_t *p_input )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+    struct vlc_memstream vstr;
+
+    vlc_memstream_open( &vstr );
+    vlc_memstream_puts( &vstr, "bookmarks=" );
+
+    vlc_mutex_lock( &priv->p_item->lock );
+    var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES );
+
+    for( int i = 0; i < priv->i_bookmark; i++ )
+    {
+        seekpoint_t const* sp = priv->pp_bookmark[i];
+
+        /* Add bookmark to choice-list */
+        var_Change( p_input, "bookmark", VLC_VAR_ADDCHOICE,
+                    (vlc_value_t){ .i_int = i }, sp->psz_name );
+
+        /* Append bookmark to option-buffer */
+        /* TODO: escape inappropriate values */
+        vlc_memstream_printf( &vstr, "%s{name=%s,time=%.3f}",
+            i > 0 ? "," : "", sp->psz_name, ( 1. * sp->i_time_offset ) / CLOCK_FREQ );
+    }
+
+    vlc_mutex_unlock( &priv->p_item->lock );
+
+    if( vlc_memstream_close( &vstr ) == VLC_SUCCESS )
+    {
+        bool b_overwritten = false;
+
+        for( int i = 0; i < priv->p_item->i_options; ++i )
+        {
+            char** ppsz_option = &priv->p_item->ppsz_options[i];
+
+            if( strncmp( *ppsz_option, "bookmarks=", 10 ) == 0 )
+            {
+                free( *ppsz_option );
+                *ppsz_option = vstr.ptr;
+                b_overwritten = true;
+            }
+        }
+
+        if( !b_overwritten )
+        {
+            input_item_AddOption( priv->p_item, vstr.ptr,
+                                  VLC_INPUT_OPTION_UNIQUE );
+            free( vstr.ptr );
+        }
+    }
+}
+
+void input_LegacyEvents( input_thread_t *p_input, void *user_data,
+                         const struct vlc_input_event *event )
+{
+    (void) user_data;
+    vlc_value_t val;
+
+    switch( event->type )
+    {
+        case INPUT_EVENT_STATE:
+            val.i_int = event->state;
+            var_Change( p_input, "state", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_DEAD:
+            break;
+        case INPUT_EVENT_RATE:
+            val.f_float = event->rate;
+            var_Change( p_input, "rate", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_CAPABILITIES:
+            var_SetBool( p_input, "can-seek",
+                         event->capabilities | VLC_INPUT_CAPABILITIES_SEEKABLE );
+            var_SetBool( p_input, "can-pause",
+                         event->capabilities | VLC_INPUT_CAPABILITIES_PAUSEABLE );
+            var_SetBool( p_input, "can-rate",
+                         event->capabilities | VLC_INPUT_CAPABILITIES_CHANGE_RATE );
+            var_SetBool( p_input, "can-rewind",
+                         event->capabilities | VLC_INPUT_CAPABILITIES_REWINDABLE );
+            var_SetBool( p_input, "can-record",
+                         event->capabilities | VLC_INPUT_CAPABILITIES_RECORDABLE );
+            break;
+        case INPUT_EVENT_POSITION:
+            val.f_float = event->position.percentage;
+            var_Change( p_input, "position", VLC_VAR_SETVALUE, val );
+            val.i_int = event->position.ms;
+            var_Change( p_input, "time", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_LENGTH:
+            /* FIXME ugly + what about meta change event ? */
+            if( var_GetInteger( p_input, "length" ) == event->length )
+                return;
+            val.i_int = event->length;
+            var_Change( p_input, "length", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_TITLE:
+            val.i_int = event->title;
+            var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
+            input_LegacyVarNavigation( p_input );
+            input_LegacyVarTitle( p_input, event->title );
+            break;
+        case INPUT_EVENT_CHAPTER:
+            /* "chapter" */
+            val.i_int = event->chapter.seekpoint;
+            var_Change( p_input, "chapter", VLC_VAR_SETVALUE, val );
+
+            /* "title %2u" */
+            char psz_title[sizeof ("title ") + 3 * sizeof (int)];
+            sprintf( psz_title, "title %2u", event->chapter.title );
+            var_Change( p_input, psz_title, VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_PROGRAM:
+            switch (event->program.action)
+            {
+                case VLC_INPUT_PROGRAM_ADDED:
+                    VarListAdd( p_input, "program", INPUT_EVENT_PROGRAM,
+                                event->program.id, event->program.title );
+                    break;
+                case VLC_INPUT_PROGRAM_DELETED:
+                    VarListDel( p_input, "program", INPUT_EVENT_PROGRAM,
+                                event->program.id );
+                    break;
+                case VLC_INPUT_PROGRAM_SELECTED:
+                    VarListSelect( p_input, "program", INPUT_EVENT_PROGRAM,
+                                   event->program.id );
+                    break;
+                case VLC_INPUT_PROGRAM_SCRAMBLED:
+                    if( var_GetInteger( p_input, "program" ) != event->program.id  )
+                        return;
+                    var_SetBool( p_input, "program-scrambled", event->program.scrambled );
+                    break;
+            }
+            break;
+        case INPUT_EVENT_ES:
+            switch (event->es.action)
+            {
+                case VLC_INPUT_ES_ADDED:
+                {
+                    const char *varname = GetEsVarName( event->es.cat );
+                    if( varname )
+                        VarListAdd( p_input, varname, INPUT_EVENT_ES,
+                                    event->es.id, event->es.title );
+                    break;
+                }
+                case VLC_INPUT_ES_DELETED:
+                {
+                    const char *varname = GetEsVarName( event->es.cat );
+                    if( varname )
+                        VarListDel( p_input, varname, INPUT_EVENT_ES,
+                                    event->es.id );
+                    break;
+                }
+                case VLC_INPUT_ES_SELECTED:
+                {
+                    const char *varname = GetEsVarName( event->es.cat );
+                    if( varname )
+                        VarListSelect( p_input, varname, INPUT_EVENT_ES,
+                                       event->es.id );
+                    break;
+                }
+            }
+            break;
+        case INPUT_EVENT_TELETEXT:
+            switch (event->teletext.action)
+            {
+                case VLC_INPUT_TELETEXT_ADDED:
+                    VarListAdd( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
+                                event->teletext.id, event->teletext.title );
+                    break;
+                case VLC_INPUT_TELETEXT_DELETED:
+                    VarListDel( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
+                                event->teletext.id );
+                    break;
+                case VLC_INPUT_TELETEXT_SELECTED:
+                    VarListSelect( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
+                                   event->teletext.id );
+                    break;
+            }
+            break;
+        case INPUT_EVENT_RECORD:
+            val.b_bool = event->record;
+            var_Change( p_input, "record", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_ITEM_META:
+            break;
+        case INPUT_EVENT_ITEM_INFO:
+            break;
+        case INPUT_EVENT_ITEM_EPG:
+            break;
+        case INPUT_EVENT_STATISTICS:
+            break;
+        case INPUT_EVENT_SIGNAL:
+            val.f_float = event->signal.quality;
+            var_Change( p_input, "signal-quality", VLC_VAR_SETVALUE, val );
+            val.f_float = event->signal.strength;
+            var_Change( p_input, "signal-strength", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_AUDIO_DELAY:
+            val.i_int = event->audio_delay;
+            var_Change( p_input, "audio-delay", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_SUBTITLE_DELAY:
+            val.i_int = event->subtitle_delay;
+            var_Change( p_input, "spu-delay", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_BOOKMARK:
+            UpdateBookmarksOption( p_input );
+            break;
+        case INPUT_EVENT_CACHE:
+            val.f_float = event->cache;
+            var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
+            break;
+        case INPUT_EVENT_AOUT:
+            break;
+        case INPUT_EVENT_VOUT:
+            break;
+    }
+    Trigger( p_input, event->type );
+}
+
+/*****************************************************************************
+ * input_LegacyVarInit:
+ * Create all control object variables with their callbacks
+ *****************************************************************************/
+void input_LegacyVarInit ( input_thread_t *p_input )
+{
+    vlc_value_t val;
+
+    var_Create( p_input, "can-seek", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-seek", true ); /* Fixed later*/
+
+    var_Create( p_input, "can-pause", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-pause", true ); /* Fixed later*/
+
+    var_Create( p_input, "can-rate", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-rate", false );
+
+    var_Create( p_input, "can-rewind", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-rewind", false );
+
+    var_Create( p_input, "can-record", VLC_VAR_BOOL );
+    var_SetBool( p_input, "can-record", false ); /* Fixed later*/
+
+    var_Create( p_input, "record", VLC_VAR_BOOL );
+    var_SetBool( p_input, "record", false );
+
+    var_Create( p_input, "teletext-es", VLC_VAR_INTEGER );
+    var_SetInteger( p_input, "teletext-es", -1 );
+
+    var_Create( p_input, "cache", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "cache", 0.0 );
+
+    var_Create( p_input, "signal-quality", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "signal-quality", -1 );
+
+    var_Create( p_input, "signal-strength", VLC_VAR_FLOAT );
+    var_SetFloat( p_input, "signal-strength", -1 );
+
+    var_Create( p_input, "program-scrambled", VLC_VAR_BOOL );
+    var_SetBool( p_input, "program-scrambled", false );
 
     /* State */
     var_Create( p_input, "state", VLC_VAR_INTEGER );
@@ -214,9 +530,9 @@ void input_ControlVarInit ( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * input_ControlVarStop:
+ * input_LegacyVarStop:
  *****************************************************************************/
-void input_ControlVarStop( input_thread_t *p_input )
+void input_LegacyVarStop( input_thread_t *p_input )
 {
     if( !input_priv(p_input)->b_preparsing )
         InputDelCallbacks( p_input, p_input_callbacks );
@@ -241,10 +557,10 @@ void input_ControlVarStop( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * input_ControlVarNavigation:
+ * input_LegacyVarNavigation:
  *  Create all remaining control object variables
  *****************************************************************************/
-void input_ControlVarNavigation( input_thread_t *p_input )
+static void input_LegacyVarNavigation( input_thread_t *p_input )
 {
     /* Create more command variables */
     if( input_priv(p_input)->i_title > 1 )
@@ -352,10 +668,10 @@ void input_ControlVarNavigation( input_thread_t *p_input )
 }
 
 /*****************************************************************************
- * input_ControlVarTitle:
+ * input_LegacyVarTitle:
  *  Create all variables for a title
  *****************************************************************************/
-void input_ControlVarTitle( input_thread_t *p_input, int i_title )
+static void input_LegacyVarTitle( input_thread_t *p_input, int i_title )
 {
     const input_title_t *t = input_priv(p_input)->title[i_title];
     vlc_value_t text;
@@ -467,39 +783,6 @@ void input_ConfigVarInit ( input_thread_t *p_input )
         var_Create( p_input, "clock-synchro",
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     }
-
-    var_Create( p_input, "can-seek", VLC_VAR_BOOL );
-    var_SetBool( p_input, "can-seek", true ); /* Fixed later*/
-
-    var_Create( p_input, "can-pause", VLC_VAR_BOOL );
-    var_SetBool( p_input, "can-pause", true ); /* Fixed later*/
-
-    var_Create( p_input, "can-rate", VLC_VAR_BOOL );
-    var_SetBool( p_input, "can-rate", false );
-
-    var_Create( p_input, "can-rewind", VLC_VAR_BOOL );
-    var_SetBool( p_input, "can-rewind", false );
-
-    var_Create( p_input, "can-record", VLC_VAR_BOOL );
-    var_SetBool( p_input, "can-record", false ); /* Fixed later*/
-
-    var_Create( p_input, "record", VLC_VAR_BOOL );
-    var_SetBool( p_input, "record", false );
-
-    var_Create( p_input, "teletext-es", VLC_VAR_INTEGER );
-    var_SetInteger( p_input, "teletext-es", -1 );
-
-    var_Create( p_input, "signal-quality", VLC_VAR_FLOAT );
-    var_SetFloat( p_input, "signal-quality", -1 );
-
-    var_Create( p_input, "signal-strength", VLC_VAR_FLOAT );
-    var_SetFloat( p_input, "signal-strength", -1 );
-
-    var_Create( p_input, "program-scrambled", VLC_VAR_BOOL );
-    var_SetBool( p_input, "program-scrambled", false );
-
-    var_Create( p_input, "cache", VLC_VAR_FLOAT );
-    var_SetFloat( p_input, "cache", 0.0 );
 
     /* */
     var_Create( p_input, "input-record-native", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );

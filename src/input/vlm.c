@@ -623,7 +623,8 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             sout_description_data_t data;
             TAB_INIT(data.i_es, data.es);
 
-            p_input = input_Create( p_vlm->p_vod, p_media->vod.p_item, psz_header, NULL, NULL );
+            p_input = input_Create( p_vlm->p_vod, input_LegacyEvents, NULL,
+                                    p_media->vod.p_item, psz_header, NULL, NULL );
             if( p_input )
             {
                 vlc_sem_t sem_preparse;
@@ -631,6 +632,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
                 preparse_data_t preparse = { .p_sem = &sem_preparse,
                                     .b_mux = (p_cfg->vod.psz_mux != NULL) };
+                input_LegacyVarInit( p_input );
                 var_AddCallback( p_input, "intf-event", InputEventPreparse,
                                  &preparse );
 
@@ -643,6 +645,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
                 var_DelCallback( p_input, "intf-event", InputEventPreparse,
                                  &preparse );
+                input_LegacyVarStop( p_input );
 
                 input_Stop( p_input );
                 input_Close( p_input );
@@ -883,6 +886,7 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
     {
+        input_LegacyVarStop( p_input );
         input_Stop( p_input );
         input_Close( p_input );
 
@@ -971,6 +975,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             return VLC_SUCCESS;
         }
 
+        input_LegacyVarStop( p_input );
         input_Stop( p_input );
         input_Close( p_input );
 
@@ -996,16 +1001,19 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
         p_instance->p_input = input_Create( p_instance->p_parent,
+                                            input_LegacyEvents, NULL,
                                             p_instance->p_item, psz_log,
                                             p_instance->p_input_resource,
                                             NULL );
         if( p_instance->p_input )
         {
+            input_LegacyVarInit( p_instance->p_input );
             var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
 
             if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
             {
                 var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+                input_LegacyVarStop( p_instance->p_input );
                 input_Close( p_instance->p_input );
                 p_instance->p_input = NULL;
             }

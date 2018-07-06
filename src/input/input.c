@@ -62,9 +62,9 @@
 static  void *Run( void * );
 static  void *Preparse( void * );
 
-static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
-                                  const char *, bool, input_resource_t *,
-                                  vlc_renderer_item_t * );
+static input_thread_t * Create  ( vlc_object_t *, input_thread_events_cb, void *,
+                                  input_item_t *, const char *, bool,
+                                  input_resource_t *, vlc_renderer_item_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
@@ -126,11 +126,13 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  * \return a pointer to the spawned input thread
  */
 input_thread_t *input_Create( vlc_object_t *p_parent,
+                              input_thread_events_cb events_cb, void *events_data,
                               input_item_t *p_item,
                               const char *psz_log, input_resource_t *p_resource,
                               vlc_renderer_item_t *p_renderer )
 {
-    return Create( p_parent, p_item, psz_log, false, p_resource, p_renderer );
+    return Create( p_parent, events_cb, events_data, p_item, psz_log, false,
+                   p_resource, p_renderer );
 }
 
 #undef input_Read
@@ -143,7 +145,8 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
  */
 int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 {
-    input_thread_t *p_input = Create( p_parent, p_item, NULL, false, NULL, NULL );
+    input_thread_t *p_input = Create( p_parent, NULL, NULL, p_item, NULL, false,
+                                      NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
@@ -158,9 +161,10 @@ int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 }
 
 input_thread_t *input_CreatePreparser( vlc_object_t *parent,
-                                       input_item_t *item )
+                                       input_thread_events_cb events_cb,
+                                       void *events_data, input_item_t *item )
 {
-    return Create( parent, item, NULL, true, NULL, NULL );
+    return Create( parent, events_cb, events_data, item, NULL, true, NULL, NULL );
 }
 
 /**
@@ -301,9 +305,10 @@ input_item_t *input_GetItem( input_thread_t *p_input )
  *
  * XXX Do not forget to update vlc_input.h if you add new variables.
  *****************************************************************************/
-static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
-                               const char *psz_header, bool b_preparsing,
-                               input_resource_t *p_resource,
+static input_thread_t *Create( vlc_object_t *p_parent,
+                               input_thread_events_cb events_cb, void *events_data,
+                               input_item_t *p_item, const char *psz_header,
+                               bool b_preparsing, input_resource_t *p_resource,
                                vlc_renderer_item_t *p_renderer )
 {
     /* Allocate descriptor */
@@ -326,6 +331,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     p_input->obj.header = psz_header ? strdup( psz_header ) : NULL;
 
     /* Init Common fields */
+    priv->events_cb = events_cb;
+    priv->events_data = events_data;
     priv->b_preparsing = b_preparsing;
     priv->b_can_pace_control = true;
     priv->i_start = 0;
@@ -425,9 +432,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
-
-    /* Create Objects variables for public Get and Set */
-    input_ControlVarInit( p_input );
 
     /* */
     if( !priv->b_preparsing )
@@ -880,11 +884,7 @@ static void InitTitle( input_thread_t * p_input )
     priv->i_title_offset = p_master->i_title_offset;
     priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
     if( priv->i_title > 0 )
-    {
-        /* Setup variables */
-        input_ControlVarNavigation( p_input );
         input_SendEventTitle( p_input, 0 );
-    }
 
     /* Global flag */
     priv->b_can_pace_control = p_master->b_can_pace_control;
@@ -1419,9 +1419,6 @@ static void End( input_thread_t * p_input )
 
     /* We are at the end */
     input_ChangeState( p_input, END_S );
-
-    /* Clean control variables */
-    input_ControlVarStop( p_input );
 
     /* Stop es out activity */
     es_out_SetMode( priv->p_es_out, ES_OUT_MODE_NONE );
@@ -2619,10 +2616,12 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     }
 
     /* Get infos from (access_)demux */
+    int capabilites = 0;
     bool b_can_seek;
     if( demux_Control( in->p_demux, DEMUX_CAN_SEEK, &b_can_seek ) )
         b_can_seek = false;
-    var_SetBool( p_input, "can-seek", b_can_seek );
+    if( b_can_seek )
+        capabilites |= VLC_INPUT_CAPABILITIES_SEEKABLE;
 
     if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_PACE,
                        &in->b_can_pace_control ) )
@@ -2649,9 +2648,12 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     demux_Control( in->p_demux, DEMUX_CAN_PAUSE, &in->b_can_pause );
 
-    var_SetBool( p_input, "can-pause", in->b_can_pause || !in->b_can_pace_control ); /* XXX temporary because of es_out_timeshift*/
-    var_SetBool( p_input, "can-rate", !in->b_can_pace_control || in->b_can_rate_control ); /* XXX temporary because of es_out_timeshift*/
-    var_SetBool( p_input, "can-rewind", !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control );
+    if( in->b_can_pause || !in->b_can_pace_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_PAUSEABLE;
+    if( !in->b_can_pace_control || in->b_can_rate_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_CHANGE_RATE;
+    if( !in->b_rescale_ts && !in->b_can_pace_control && in->b_can_rate_control )
+        capabilites |= VLC_INPUT_CAPABILITIES_REWINDABLE;
 
     /* Set record capabilities */
     if( demux_Control( in->p_demux, DEMUX_CAN_RECORD, &in->b_can_stream_record ) )
@@ -2659,10 +2661,13 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 #ifdef ENABLE_SOUT
     if( !var_GetBool( p_input, "input-record-native" ) )
         in->b_can_stream_record = false;
-    var_SetBool( p_input, "can-record", true );
+    capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
 #else
-    var_SetBool( p_input, "can-record", in->b_can_stream_record );
+    if( in->b_can_stream_record )
+        capabilites |= VLC_INPUT_CAPABILITIES_RECORDABLE;
 #endif
+
+    input_SendEventCapabilities( p_input, capabilites );
 
     /* get attachment
      * FIXME improve for b_preparsing: move it after GET_META and check psz_arturl */

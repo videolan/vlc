@@ -50,7 +50,9 @@ void input_item_SetEpgOffline( input_item_t * );
  * @param item input item to preparse
  * @return an input thread or NULL on error
  */
-input_thread_t *input_CreatePreparser(vlc_object_t *obj, input_item_t *item)
+input_thread_t *input_CreatePreparser(vlc_object_t *obj,
+                                      input_thread_events_cb events_cb,
+                                      void *events_data, input_item_t *item)
 VLC_USED;
 
 /**

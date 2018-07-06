@@ -54,17 +54,21 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 {
     input_preparser_t* preparser = preparser_;
 
-    input_thread_t* input = input_CreatePreparser( preparser->owner, item_ );
+    input_thread_t* input = input_CreatePreparser( preparser->owner,
+                                                   input_LegacyEvents, NULL,
+                                                   item_ );
     if( !input )
     {
         input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
         return VLC_EGENERIC;
     }
 
+    input_LegacyVarInit( input );
     var_AddCallback( input, "intf-event", InputEvent, preparser->worker );
     if( input_Start( input ) )
     {
         var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
+        input_LegacyVarStop( input );
         input_Close( input );
         input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
         return VLC_EGENERIC;
@@ -89,6 +93,7 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
     input_item_t* item = input_priv(input)->p_item;
 
     var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
+    input_LegacyVarStop( input );
 
     int status;
     switch( var_GetInteger( input, "state" ) )

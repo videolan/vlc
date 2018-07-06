@@ -179,6 +179,7 @@ static void release_input_thread( libvlc_media_player_t *p_mi )
     var_DelCallback( p_input_thread, "intf-event",
                      input_event_changed, p_mi );
     del_es_callbacks( p_input_thread, p_mi );
+    input_LegacyVarStop( p_input_thread );
 
     /* We owned this one */
     input_Stop( p_input_thread );
@@ -984,7 +985,8 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
 
     media_attach_preparsed_event( p_mi->p_md );
 
-    p_input_thread = input_Create( p_mi, p_mi->p_md->p_input_item, NULL,
+    p_input_thread = input_Create( p_mi, input_LegacyEvents, NULL,
+                                   p_mi->p_md->p_input_item, NULL,
                                    p_mi->input.p_resource,
                                    p_mi->input.p_renderer );
     unlock(p_mi);
@@ -996,6 +998,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         return -1;
     }
 
+    input_LegacyVarInit( p_input_thread );
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
     var_AddCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
@@ -1010,6 +1013,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
         var_DelCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
         var_DelCallback( p_input_thread, "program-scrambled", input_scrambled_changed, p_mi );
         var_DelCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
+        input_LegacyVarStop( p_input_thread );
         input_Close( p_input_thread );
         media_detach_preparsed_event( p_mi->p_md );
         libvlc_printerr( "Input initialization failure" );

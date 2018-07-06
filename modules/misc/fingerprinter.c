@@ -128,17 +128,14 @@ static void ApplyResult( fingerprint_request_t *p_r, size_t i_resultid )
     vlc_mutex_unlock( &p_item->lock );
 }
 
-static int InputEventHandler( vlc_object_t *p_this, char const *psz_cmd,
-                              vlc_value_t oldval, vlc_value_t newval,
-                              void *p_data )
+static void InputEvent( input_thread_t *p_input, void *p_user_data,
+                        const struct vlc_input_event *p_event )
 {
-    VLC_UNUSED( psz_cmd );
-    VLC_UNUSED( oldval );
-    input_thread_t *p_input = (input_thread_t *) p_this;
-    fingerprinter_sys_t *p_sys = (fingerprinter_sys_t *) p_data;
-    if( newval.i_int == INPUT_EVENT_STATE )
+    VLC_UNUSED( p_input );
+    fingerprinter_sys_t *p_sys = p_user_data;
+    if( p_event->type == INPUT_EVENT_STATE )
     {
-        if( var_GetInteger( p_input, "state" ) >= PAUSE_S )
+        if( p_event->state >= PAUSE_S )
         {
             vlc_mutex_lock( &p_sys->processing.lock );
             p_sys->processing.b_working = false;
@@ -146,7 +143,6 @@ static int InputEventHandler( vlc_object_t *p_this, char const *psz_cmd,
             vlc_mutex_unlock( &p_sys->processing.lock );
         }
     }
-    return VLC_SUCCESS;
 }
 
 static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
@@ -185,7 +181,9 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
     }
     input_item_SetURI( p_item, psz_uri ) ;
 
-    input_thread_t *p_input = input_Create( p_fingerprinter, p_item, "fingerprinter", NULL, NULL );
+    input_thread_t *p_input = input_Create( p_fingerprinter, InputEvent,
+                                            p_fingerprinter->p_sys,
+                                            p_item, "fingerprinter", NULL, NULL );
     input_item_Release( p_item );
 
     if( p_input == NULL )
@@ -199,13 +197,8 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
     var_Create( p_input, "fingerprint-data", VLC_VAR_ADDRESS );
     var_SetAddress( p_input, "fingerprint-data", &chroma_fingerprint );
 
-    var_AddCallback( p_input, "intf-event", InputEventHandler, p_fingerprinter->p_sys );
-
     if( input_Start( p_input ) != VLC_SUCCESS )
-    {
-        var_DelCallback( p_input, "intf-event", InputEventHandler, p_fingerprinter->p_sys );
         input_Close( p_input );
-    }
     else
     {
         p_fingerprinter->p_sys->processing.b_working = true;
@@ -214,7 +207,6 @@ static void DoFingerprint( fingerprinter_thread_t *p_fingerprinter,
             vlc_cond_wait( &p_fingerprinter->p_sys->processing.cond,
                            &p_fingerprinter->p_sys->processing.lock );
         }
-        var_DelCallback( p_input, "intf-event", InputEventHandler, p_fingerprinter->p_sys );
         input_Stop( p_input );
         input_Close( p_input );
 

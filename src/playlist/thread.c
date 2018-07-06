@@ -35,6 +35,7 @@
 #include <vlc_rand.h>
 #include <vlc_renderer_discovery.h>
 #include "playlist_internal.h"
+#include "../input/input_internal.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -214,20 +215,23 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
 
     libvlc_MetadataCancel( p_playlist->obj.libvlc, p_item );
 
-    input_thread_t *p_input_thread = input_Create( p_playlist, p_input, NULL,
+    input_thread_t *p_input_thread = input_Create( p_playlist,
+                                                   input_LegacyEvents, NULL,
+                                                   p_input, NULL,
                                                    p_sys->p_input_resource,
                                                    p_renderer );
     if( p_renderer )
         vlc_renderer_item_release( p_renderer );
     if( likely(p_input_thread != NULL) )
     {
+        input_LegacyVarInit( p_input_thread );
         var_AddCallback( p_input_thread, "intf-event",
                          InputEvent, p_playlist );
-
         if( input_Start( p_input_thread ) )
         {
             var_DelCallback( p_input_thread, "intf-event",
                              InputEvent, p_playlist );
+            input_LegacyVarStop( p_input_thread );
             vlc_object_release( p_input_thread );
             p_input_thread = NULL;
         }
@@ -452,7 +456,7 @@ static void LoopInput( playlist_t *p_playlist )
     if( !var_InheritBool( p_input, "sout-keep" ) )
         input_resource_TerminateSout( p_sys->p_input_resource );
     var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
-
+    input_LegacyVarStop( p_input );
     input_Close( p_input );
     PL_LOCK;
 }

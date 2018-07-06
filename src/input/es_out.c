@@ -1040,9 +1040,6 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_SendEventTeletextDel( p_input, -1 );
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, p_pgrm->b_scrambled );
 
-    /* TODO event */
-    var_SetInteger( p_input, "teletext-es", -1 );
-
     foreach_es_then_es_slaves(es)
     {
         if (es->p_pgrm == p_sys->p_pgrm)
