@@ -93,8 +93,6 @@ static int transcode_spu_encoder_open( sout_stream_t *p_stream, sout_stream_id_s
 
 static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     /*
      * Open decoder
      */
@@ -121,7 +119,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
         return VLC_EGENERIC;
     }
 
-    if( !p_sys->b_soverlay )
+    if( id->p_enccfg->i_codec /* !overlay */ )
     {
         /* Open encoder */
         /* Initialization of encoder format structures */
@@ -157,7 +155,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
                                   sout_stream_id_sys_t *id,
                                   block_t *in, block_t **out )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    VLC_UNUSED(p_stream);
     *out = NULL;
     bool b_error = false;
 
@@ -190,7 +188,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
                 p_subpic->i_stop -= drift;
         }
 
-        if( p_sys->b_soverlay )
+        if( id->p_enccfg->i_codec == 0 /* overlay */ )
         {
             if( !id->pf_send_subpicture )
             {
@@ -241,8 +239,6 @@ int transcode_spu_process( sout_stream_t *p_stream,
 bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
                         sout_stream_id_sys_t *id )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
     id->fifo.spu.first = NULL;
     id->fifo.spu.last = &id->fifo.spu.first;
 
@@ -274,7 +270,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
     }
     else
     {
-        assert( p_sys->b_soverlay );
+        assert( id->p_enccfg->i_codec == 0 /* !overlay */ );
         msg_Dbg( p_stream, "subtitle (fcc=`%4.4s') overlaying",
                  (char*)&p_fmt->i_codec );
 
