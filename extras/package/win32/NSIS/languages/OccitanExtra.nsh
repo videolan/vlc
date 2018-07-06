@@ -51,3 +51,12 @@ ${LangFileString} Name_InstTypeFull "Entièr"
 
 ${LangFileString} Action_OnArrivalDVD "Legir un film en DVD"
 ${LangFileString} Action_OnArrivalAudioCD "Legir un CD àudio"
+${LangFileString} Action_OnArrivalVCDMovie "Lectura VCD"
+${LangFileString} Action_OnArrivalSVCDMovie "Lectura SVCD"
+${LangFileString} Action_OnArrivalVideoFiles "Lectura dels fichièrs vidèo"
+${LangFileString} Action_OnArrivalMusicFiles "Lectura dels fichièrs àudio"
+${LangFileString} Action_OnArrivalDVDAudio "Lectura DVD àudio"
+${LangFileString} MessageBox_InstallAborted "Arrèst de l'installacion !"
+
+${LangFileString} Reinstall_Headline "Ja installat"
+${LangFileString} Reinstall_OptionUninstall "Desinstallar VLC"
