@@ -1832,7 +1832,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
 
     case DEMUX_GET_PTS_DELAY:
         pi_64 = va_arg(args, int64_t *);
-        *pi_64 = INT64_C(1000) * var_InheritInteger(p_demux, "disc-caching");
+        *pi_64 = VLC_TICK_FROM_MS(var_InheritInteger(p_demux, "disc-caching"));
         break;
 
     case DEMUX_SET_PAUSE_STATE:
