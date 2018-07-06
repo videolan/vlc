@@ -2518,7 +2518,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 vlc_tick_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_input_clock );
 
                 /* Avoid dangerously high value */
-                const vlc_tick_t i_jitter_max = INT64_C(1000) * var_InheritInteger( p_sys->p_input, "clock-jitter" );
+                const vlc_tick_t i_jitter_max =
+                        VLC_TICK_FROM_MS(var_InheritInteger( p_sys->p_input, "clock-jitter" ));
                 if( i_pts_delay > __MIN( i_pts_delay_base + i_jitter_max, INPUT_PTS_DELAY_MAX ) )
                 {
                     es_out_pgrm_t *pgrm;
