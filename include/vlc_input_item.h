@@ -109,6 +109,7 @@ struct input_item_t
 
 #define INPUT_DURATION_INVALID   VLC_TICK_INVALID
 #define INPUT_DURATION_ZERO      0
+#define INPUT_DURATION_UNKNOWN   (-1)
 
 enum input_item_type_e
 {
