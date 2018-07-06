@@ -690,7 +690,7 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                     vlc_tick_t i_total_subdelay = i_current_subdelay + i_additional_subdelay;
                     var_SetInteger( p_input, "spu-delay", i_total_subdelay);
                     ClearChannels( p_vout, slider_chan );
-                    DisplayMessage( p_vout, _( "Sub sync: corrected %i ms (total delay = %i ms)" ),
+                    DisplayMessage( p_vout, _( "Sub sync: corrected %"PRId64" ms (total delay = %"PRId64" ms)" ),
                                             MS_FROM_VLC_TICK( i_additional_subdelay ),
                                             MS_FROM_VLC_TICK( i_total_subdelay ) );
                     p_sys->subtitle_delaybookmarks.i_time_audio = 0;
