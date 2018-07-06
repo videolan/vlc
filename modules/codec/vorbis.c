@@ -802,7 +802,9 @@ static int OpenEncoder( vlc_object_t *p_this )
         {
             vorbis_info_clear( &p_sys->vi );
             free( p_enc->p_sys );
-            msg_Err( p_enc, "VBR mode initialisation failed" );
+            msg_Err( p_enc, "VBR mode initialisation failed %"PRIu8"x(%uHz,q=%d)",
+                     p_enc->fmt_in.audio.i_channels,
+                     p_enc->fmt_in.audio.i_rate, i_quality );
             return VLC_EGENERIC;
         }
 
@@ -834,7 +836,10 @@ static int OpenEncoder( vlc_object_t *p_this )
               i_max_bitrate > 0 ? i_max_bitrate * 1000: -1 ) )
           {
               vorbis_info_clear( &p_sys->vi );
-              msg_Err( p_enc, "CBR mode initialisation failed" );
+              msg_Err( p_enc, "CBR mode initialisation failed %"PRIu8"x(%uHz,r=%u)",
+                       p_enc->fmt_in.audio.i_channels,
+                       p_enc->fmt_in.audio.i_rate,
+                       p_enc->fmt_out.i_bitrate);
               free( p_enc->p_sys );
               return VLC_EGENERIC;
           }
