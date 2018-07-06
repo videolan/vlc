@@ -181,10 +181,13 @@ int transcode_spu_process( sout_stream_t *p_stream,
             continue;
         }
 
-        if( p_sys->b_master_sync && p_sys->i_master_drift )
+        vlc_tick_t drift;
+        if( id->pf_get_master_drift &&
+            (drift = id->pf_get_master_drift( id->callback_data )) )
         {
-            p_subpic->i_start -= p_sys->i_master_drift;
-            if( p_subpic->i_stop ) p_subpic->i_stop -= p_sys->i_master_drift;
+            p_subpic->i_start -= drift;
+            if( p_subpic->i_stop )
+                p_subpic->i_stop -= drift;
         }
 
         if( p_sys->b_soverlay )
@@ -203,13 +206,22 @@ int transcode_spu_process( sout_stream_t *p_stream,
             es_format_t fmt;
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_TEXT );
 
+            unsigned w, h;
+            if( id->pf_get_output_dimensions == NULL ||
+                id->pf_get_output_dimensions( id->callback_data,
+                                              &w, &h ) != VLC_SUCCESS )
+            {
+                w = id->p_enccfg->spu.i_width;
+                h = id->p_enccfg->spu.i_height;
+            }
+
             fmt.video.i_sar_num =
             fmt.video.i_visible_width =
-            fmt.video.i_width = id->p_enccfg->spu.i_width;
+            fmt.video.i_width = w;
 
             fmt.video.i_sar_den =
             fmt.video.i_visible_height =
-            fmt.video.i_height =id->p_enccfg->spu.i_height;
+            fmt.video.i_height = h;
 
             subpicture_Update( p_subpic, &fmt.video, &fmt.video, p_subpic->i_start );
             es_format_Clean( &fmt );

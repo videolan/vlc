@@ -372,7 +372,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     p_sys = calloc( 1, sizeof( *p_sys ) );
-    p_sys->i_master_drift = 0;
 
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
@@ -504,6 +503,40 @@ static void SendSpuToVideoCallback( void *cbdata, subpicture_t *p_subpicture )
                                   p_sys->id_video, p_subpicture );
 }
 
+static int GetVideoDimensions( void *cbdata, unsigned *w, unsigned *h )
+{
+    sout_stream_t *p_stream = cbdata;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    if( !p_sys->id_video )
+        return VLC_EGENERIC;
+    return transcode_video_get_output_dimensions( p_stream,
+                                                  p_sys->id_video, w, h );
+}
+
+static vlc_tick_t GetMasterDrift( void *cbdata )
+{
+    sout_stream_t *p_stream = cbdata;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    if( p_sys->id_master_sync )
+    {
+        return p_sys->id_master_sync->i_drift;
+    }
+    return 0;
+}
+
+static int ValidateDrift( void *cbdata, vlc_tick_t i_drift )
+{
+    sout_stream_t *p_stream = cbdata;
+    if( unlikely(i_drift > MASTER_SYNC_MAX_DRIFT ||
+                 i_drift < -MASTER_SYNC_MAX_DRIFT) )
+    {
+        msg_Dbg( p_stream, "drift is too high (%"PRId64"), resetting master sync",
+                            i_drift );
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -535,6 +568,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
         case AUDIO_ES:
             id->p_filterscfg = &p_sys->afilters_cfg;
             id->p_enccfg = &p_sys->aenc_cfg;
+            if( p_sys->b_master_sync )
+            {
+                id->pf_drift_validate = ValidateDrift;
+                id->callback_data = p_sys;
+            }
             break;
         case VIDEO_ES:
             id->p_filterscfg = &p_sys->vfilters_cfg;
@@ -544,6 +582,9 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
             id->p_filterscfg = NULL;
             id->p_enccfg = &p_sys->senc_cfg;
             id->pf_send_subpicture = SendSpuToVideoCallback;
+            id->pf_get_output_dimensions = GetVideoDimensions;
+            if( p_sys->b_master_sync )
+                id->pf_get_master_drift = GetMasterDrift;
             id->callback_data = p_stream;
             break;
         default:
@@ -570,7 +611,11 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     bool success;
 
     if( p_fmt->i_cat == AUDIO_ES && id->p_enccfg->i_codec )
+    {
         success = transcode_audio_add(p_stream, p_fmt, id);
+        if( success && p_sys->b_master_sync && !p_sys->id_master_sync )
+            p_sys->id_master_sync = id;
+    }
     else if( p_fmt->i_cat == VIDEO_ES && id->p_enccfg->i_codec )
     {
         success = transcode_video_add(p_stream, p_fmt, id);
@@ -611,6 +656,8 @@ static void Del( sout_stream_t *p_stream, void *_id )
         case AUDIO_ES:
             Send( p_stream, id, NULL );
             transcode_audio_close( id );
+            if( id == p_sys->id_master_sync )
+                p_sys->id_master_sync = NULL;
             break;
         case VIDEO_ES:
             Send( p_stream, id, NULL );

@@ -745,6 +745,22 @@ void transcode_video_push_spu( sout_stream_t *p_stream, sout_stream_id_sys_t *id
         spu_PutSubpicture( id->p_spu, p_subpicture );
 }
 
+int transcode_video_get_output_dimensions( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
+                                           unsigned *w, unsigned *h )
+{
+    VLC_UNUSED(p_stream);
+    vlc_mutex_lock( &id->fifo.lock );
+    *w = id->fmt_input_video.i_visible_width;
+    *h = id->fmt_input_video.i_visible_height;
+    if( !*w || !*h )
+    {
+        *w = id->video_dec_out.i_visible_width;
+        *h = id->video_dec_out.i_visible_height;
+    }
+    vlc_mutex_unlock( &id->fifo.lock );
+    return (*w && *h) ? VLC_SUCCESS : VLC_EGENERIC;
+}
+
 static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                        picture_t *p_pic )
 {
@@ -822,7 +838,6 @@ static block_t * EncodeFrame( sout_stream_t *p_stream, picture_t *p_pic, sout_st
 int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     *out = NULL;
 
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
@@ -880,12 +895,10 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
 
             video_format_Copy( &id->fmt_input_video, &p_pic->format );
 
-            transcode_video_filter_init( p_stream, id->p_filterscfg, p_sys->b_master_sync, id );
+            transcode_video_filter_init( p_stream, id->p_filterscfg,
+                                         (id->p_enccfg->video.fps.num > 0), id );
             if( conversion_video_filter_append( id, p_pic ) != VLC_SUCCESS )
                 goto error;
-
-            p_sys->senc_cfg.spu.i_width = p_pic->format.i_visible_width;
-            p_sys->senc_cfg.spu.i_height = p_pic->format.i_visible_height;
 
             /* Start missing encoder */
             if( id->p_encoder->p_module == NULL &&

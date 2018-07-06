@@ -110,8 +110,8 @@ typedef struct
 
     /* Sync */
     bool            b_master_sync;
-    /* i_master drift is how much audio buffer is ahead of calculated pts */
-    vlc_tick_t      i_master_drift;
+    sout_stream_id_sys_t *id_master_sync;
+
 } sout_stream_sys_t;
 
 struct aout_filters;
@@ -149,7 +149,16 @@ struct sout_stream_id_sys_t
 
     union
     {
-        void (*pf_send_subpicture)(void *cbdata, subpicture_t *);
+        struct
+        {
+            int (*pf_drift_validate)(void *cbdata, vlc_tick_t);
+        };
+        struct
+        {
+            void (*pf_send_subpicture)(void *cbdata, subpicture_t *);
+            int (*pf_get_output_dimensions)(void *cbdata, unsigned *, unsigned *);
+            vlc_tick_t (*pf_get_master_drift)(void *cbdata);
+        };
     };
     void *callback_data;
 
@@ -189,8 +198,7 @@ struct sout_stream_id_sys_t
 
     /* Sync */
     date_t          next_input_pts; /**< Incoming calculated PTS */
-    date_t          next_output_pts; /**< output calculated PTS */
-
+    vlc_tick_t      i_drift; /** how much buffer is ahead of calculated PTS */
 };
 
 struct decoder_owner
@@ -225,6 +233,8 @@ bool transcode_audio_add    ( sout_stream_t *, const es_format_t *,
 void transcode_video_close  ( sout_stream_t *, sout_stream_id_sys_t * );
 int  transcode_video_process( sout_stream_t *, sout_stream_id_sys_t *,
                                      block_t *, block_t ** );
+int transcode_video_get_output_dimensions( sout_stream_t *, sout_stream_id_sys_t *,
+                                           unsigned *w, unsigned *h );
 void transcode_video_push_spu( sout_stream_t *, sout_stream_id_sys_t *, subpicture_t * );
 bool transcode_video_add    ( sout_stream_t *, const es_format_t *,
                                 sout_stream_id_sys_t *);

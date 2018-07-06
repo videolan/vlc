@@ -365,7 +365,6 @@ int transcode_audio_process( sout_stream_t *p_stream,
                                     sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     *out = NULL;
 
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
@@ -433,25 +432,22 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         vlc_mutex_unlock(&id->fifo.lock);
 
-        if( p_sys->b_master_sync )
+        if( id->pf_drift_validate )
         {
             vlc_tick_t i_pts = date_Get( &id->next_input_pts );
             vlc_tick_t i_drift = 0;
 
             if( likely( p_audio_buf->i_pts != VLC_TICK_INVALID ) )
                 i_drift = p_audio_buf->i_pts - i_pts;
-
-            if ( unlikely(i_drift > MASTER_SYNC_MAX_DRIFT
-                 || i_drift < -MASTER_SYNC_MAX_DRIFT) )
+            if( id->pf_drift_validate( id->callback_data, i_drift ) != VLC_SUCCESS )
             {
-                msg_Dbg( p_stream,
-                    "audio drift is too high (%"PRId64"), resetting master sync",
-                    i_drift );
                 date_Set( &id->next_input_pts, p_audio_buf->i_pts );
-                if( likely(p_audio_buf->i_pts != VLC_TICK_INVALID ) )
-                    i_drift = 0;
+                i_drift = 0;
             }
-            p_sys->i_master_drift = i_drift;
+
+            vlc_mutex_lock(&id->fifo.lock);
+            id->i_drift = i_drift;
+            vlc_mutex_unlock(&id->fifo.lock);
             date_Increment( &id->next_input_pts, p_audio_buf->i_nb_samples );
         }
 
