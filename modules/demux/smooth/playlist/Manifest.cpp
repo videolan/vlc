@@ -32,7 +32,7 @@ Manifest::Manifest (vlc_object_t *p_object) :
     AbstractPlaylist(p_object), TimescaleAble()
 {
     minUpdatePeriod.Set( VLC_TICK_FROM_SEC(5) );
-    setTimescale( 10000000 );
+    setTimescale( 10000000 ); // 100ns
     b_live = false;
 }
 
