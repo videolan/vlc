@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 
 #include "playlist.h"
 
@@ -76,11 +77,26 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     char          *psz_value;
     int            i_item = -1;
     input_item_t *p_input;
+    bool ascii = true;
+    bool unicode = true;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     while( ( psz_line = vlc_stream_ReadLine( p_demux->s ) ) )
     {
+        if (ascii && !IsASCII(psz_line))
+        {
+            unicode = IsUTF8(psz_line);
+            ascii = false;
+        }
+
+        if (!unicode)
+        {
+            char *latin = FromLatin1(psz_line);
+            free(psz_line);
+            psz_line = latin;
+        }
+
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
             !strncasecmp( psz_line, "[Reference]", sizeof("[Reference]")-1 ) )
         {
