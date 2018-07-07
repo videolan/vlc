@@ -74,6 +74,27 @@ VLC_USED static inline const char *IsUTF8(const char *str)
 }
 
 /**
+ * Checks ASCII validity.
+ *
+ * Checks whether a null-terminated string is a valid ASCII bytes sequence
+ * (non-printable ASCII characters 1-31 are permitted).
+ *
+ * \param str string to check
+ *
+ * \retval str the string is a valid null-terminated ASCII sequence
+ * \retval NULL the string is not an ASCII sequence
+ */
+VLC_USED static inline const char *IsASCII(const char *str)
+{
+    unsigned char c;
+
+    for (const char *p = str; (c = *p) != '\0'; p++)
+        if (c >= 0x80)
+            return NULL;
+    return str;
+}
+
+/**
  * Removes non-UTF-8 sequences.
  *
  * Replaces invalid or <i>over-long</i> UTF-8 bytes sequences within a

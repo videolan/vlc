@@ -576,15 +576,6 @@ static void FeaturesCheck( void *opaque, const char *feature )
         features->b_mlst = true;
 }
 
-static const char *IsASCII( const char *str )
-{
-    int8_t c;
-    for( const char *p = str; (c = *p) != '\0'; p++ )
-        if( c < 0 )
-            return NULL;
-    return str;
-}
-
 static int Connect( vlc_object_t *p_access, access_sys_t *p_sys, const char *path )
 {
     if( Login( p_access, p_sys, path ) < 0 )
