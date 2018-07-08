@@ -19,11 +19,11 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-08 22:41+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Bengali (Bangladesh) (https://www.transifex.com/yaron/"
 "teams/16553/bn_BD/)\n"
-"Language: bn\n"
+"Language: bn_BD\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12924,7 +12924,7 @@ msgstr ""
 "বন্ধ GOP কে আটকে রাখে না কারন একটি P-ফ্রেমকে অনেকগুলো ফ্রেম দিয়ে অনুমান করা যায়, "
 "শুধুমাত্র এর আগের ফ্রেম দিয়ে করতে হয় না (রেফারেন্স ফ্রেম বিকল্পও দেখুন)। ফলে, I-"
 "ফ্রেমগুলো সবসময় খুঁজে পাওয়া যায়না। IDR-ফ্রেমগুলো ধারাবাহিক P-ফ্রেমগুলোকে IDR-ফ্রেমের "
-"আগের কোনো ফ্রেমকে রেফার করতে বাধা দেয়।\n"
+"আগের কোনো ফ্রেমকে রেফার করতে বাধা দেয়। \n"
 "যদি বিরতির মধ্যে সিনকাট থাকে, তাহলেও তাদেরকে I-ফ্রেম হিসেবে এনকোড করা হয়, কিন্তু "
 "কোনো নতুন GOP শুরু করা হয়না।"
 
@@ -16468,9 +16468,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "পর্দা জুড়ে প্রদর্শন হতে প্রস্থান করুন"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -19471,7 +19470,7 @@ msgid ""
 "You can define a unique one or configure them \n"
 "individually in the advanced preferences."
 msgstr ""
-"যদি এই বৈশিষ্ট্যটি ফাঁকা থাকে তাহলে DVD, VCD, \n"
+"যদি এই বৈশিষ্ট্যটি ফাঁকা থাকে তাহলে DVD, VCD,\n"
 "এবং CDDA এর জন্য পৃথক মান নির্ধারণ করা হয়।\n"
 "আপনি একটি স্বতন্ত্র মান নির্ধারণ করতে পারেন বা এদেরকে\n"
 "পৃথকভাবে উন্নততর পছন্দসমূহে কনফিগার করতে পারেন।"
