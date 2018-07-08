@@ -20,8 +20,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:33+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -13481,7 +13481,7 @@ msgstr ""
 "yerine bir çok kareden öngörülen bir P karesine izin verilebilir (referans "
 "karesi seçeneğine de bakın). Bu nedenle I karelerinin aranabilir olması "
 "gerekmez. IDR kareleri,kendisinden önce gelen herhangi bir kareyi referans "
-"göstererek, sonradan gelen P karelerini kısıtlar.\n"
+"göstererek, sonradan gelen P karelerini kısıtlar. \n"
 "Bu aralıkta sahneler kesintiye uğruyorsa, bunlar hala I kareleri olarak "
 "kodlanır fakat yeni bir GOP başlatmaz."
 
@@ -16530,7 +16530,6 @@ msgstr ""
 "VLC ortam oynatıcısı ve VideoLAN, VideoLAN birliğinin ticari markalarıdır."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16541,15 +16540,15 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"http://www.videolan."
+"<p>VLC ortam oynatıcısı, gönüllülerden oluşan <a href=\"https://www.videolan."
 "org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
 "span></a> topluluğu tarafından geliştirilen, özgür ve açık kaynaklı bir "
-"ortam oynatma, kodlama ve akış sunma yazılımıdır.</p><p>VLC kendi içsel "
+"ortam oynatma, kodlama ve akış sağlama yazılımıdır.</p><p>VLC kendi içsel "
 "kodlayıcı/çözücülerini kullanır, yaygın kullanılan tüm platformlarda çalışır "
 "ve neredeyse tüm dosya biçimlerini, CD, DVD, ağ akışları, yakalama kartları "
-"ve diğer ortam biçimlerini oynatabilir!</p><p><a href=\"http://www.videolan."
+"ve diğer ortam biçimlerini oynatabilir!</p><p><a href=\"https://www.videolan."
 "org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">Siz de bize katılarak yardımcı olabilirsiniz!</span></a>"
+"\">Bize katılarak yardımcı olabilirsiniz!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17187,9 +17186,8 @@ msgstr "Önceki Ögeye Git"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Tam Ekrandan Çıkın"
+msgstr "Tam Ekrandan Çık"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
