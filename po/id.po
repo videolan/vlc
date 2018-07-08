@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 00:44+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Indonesian (https://www.transifex.com/yaron/teams/16553/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -16620,9 +16620,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Tinggalkan Layar penuh"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -26423,7 +26422,7 @@ msgid ""
 "1: hb, 2-4: hb+vb, 5-6: hb+vb+dr"
 msgstr ""
 "Kualitas setelah pemrosesan. Nilai valid adalah 0 (dimatikan) hingga 6 "
-"(tertinggi). \n"
+"(tertinggi).\n"
 "Level yang lebih tinggi membutuhkan daya CPU yang lebih besar, tetapi "
 "menghasilkan gambar lebih baik.\n"
 "Dengan rantai filter default, nilai-nilai tersebut terpetakan pada filter "
