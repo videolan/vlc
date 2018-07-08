@@ -6,13 +6,13 @@
 # Alexander Henket <ahenket at xs4all dot nl>, 2009
 # Derk-Jan Hartman <hartman at videolan dot org>, 2004-2005
 # Myckel Habets <myckel at sdf dot lonestar dot org>, 2007-2010
-# Thomas De Rocker, 2008-2018
+# Thomas De Rocker <thomasderocker at outlook dot com>, 2008-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-07-09 01:09+0200\n"
 "Last-Translator: Thomas De Rocker, 2018\n"
 "Language-Team: Dutch (https://www.transifex.com/yaron/teams/16553/nl/)\n"
 "Language: nl\n"
@@ -4007,7 +4007,7 @@ msgstr ""
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/ui/sprefs_video.h:318
 msgid "Fullscreen"
-msgstr "Schermvullend"
+msgstr "Volledig scherm"
 
 #: src/libvlc-module.c:1227
 msgid "Select the hotkey to use to swap fullscreen state."
@@ -13482,7 +13482,7 @@ msgstr ""
 "per sé een gesloten GOP, omdat een P-beeld voorspeld mag worden meer beelden "
 "dan het beeld ervoor (zie ook optie referentiebeeld). Daarom zijn I-beelden "
 "niet per sé zoekbaar. P-beelden na IDR-beelden kunnen niet verwijzen naar "
-"ieder beeld voor het IDR-beeld.\n"
+"ieder beeld voor het IDR-beeld. \n"
 "Als scène-cuts binnen deze interval plaatsvinden, worden ze nog steeds als I-"
 "beelden gecodeerd, maar starten ze geen nieuwe GOP."
 
@@ -16522,7 +16522,6 @@ msgstr ""
 "VLC media player en VideoLAN zijn handelsmerken van de VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16534,13 +16533,13 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC media player is een gratis en opensource mediaspeler, encoder en "
-"streamer, gemaakt door de vrijwilligers van de <a href=\"http://www.videolan."
-"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-"span></a>-gemeenschap.</p><p>VLC gebruikt zijn eigen interne codecs, werkt "
-"op vrijwel elk populair platform en kan bijna alle bestanden, cd's, dvd's, "
-"netwerkstreams, opnamekaarten en andere mediaformaten lezen!</p><p><a href="
-"\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-"underline; color:#0057ae;\">Help ons en doe mee!</span></a>"
+"streamer, gemaakt door de vrijwilligers van de <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">VideoLAN</span></a>-gemeenschap.</p><p>VLC gebruikt zijn eigen interne "
+"codecs, werkt op vrijwel elk populair platform en kan bijna alle bestanden, "
+"cd's, dvd's, netwerkstreams, opnamekaarten en andere mediaformaten lezen!</"
+"p><p><a href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">Help ons en doe mee!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17180,9 +17179,8 @@ msgstr "Naar het vorige item gaan"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Schermvullende modus verlaten"
+msgstr "Volledig scherm verlaten"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -19818,7 +19816,7 @@ msgstr "Opmerkingen"
 
 #: modules/gui/qt/components/info_panels.cpp:376
 msgid "Extra metadata and other information are shown in this panel.\n"
-msgstr "Extra metagegevens en andere informatie worden hier weergegeven. \n"
+msgstr "Extra metagegevens en andere informatie worden hier weergegeven.\n"
 
 #: modules/gui/qt/components/info_panels.cpp:473
 msgid ""
