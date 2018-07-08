@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-08 23:09+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Croatian (https://www.transifex.com/yaron/teams/16553/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -16881,9 +16881,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Napusti prikaz cijelim zaslonom"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -28215,7 +28214,7 @@ msgid ""
 "Current effects include: dummy, scope, spectrum, spectrometer and vuMeter."
 msgstr ""
 "Popis vizualnih učinaka, razdvajan zarezima.\n"
-"Trenutni učinci obuhvaćaju: prividni učinak, \n"
+"Trenutni učinci obuhvaćaju: prividni učinak,\n"
 "spektrometar i pokazatelj razine glasnoće."
 
 #: modules/visualization/visual/visual.c:55
