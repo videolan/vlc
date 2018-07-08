@@ -89,17 +89,27 @@ static int CorksCallback( vlc_object_t *obj, char const *var,
     if( !var_InheritBool( obj, "playlist-cork" ) )
         return VLC_SUCCESS;
 
+    playlist_Lock(pl);
+
     if( cur.i_int )
     {
-        msg_Dbg( obj, "corked" );
-        playlist_Pause( pl );
+        bool effective = playlist_Status(pl) == PLAYLIST_RUNNING;
+
+        msg_Dbg(obj, "corked (%seffective)", effective ? "" : "in");
+        pl_priv(pl)->cork_effective = effective;
+        playlist_Control(pl, PLAYLIST_PAUSE, pl_Locked);
     }
     else
     {
-        msg_Dbg( obj, "uncorked" );
-        playlist_Resume( pl );
+        bool effective = pl_priv(pl)->cork_effective;
+
+        msg_Dbg(obj, "uncorked (%seffective)", effective ? "" : "in");
+
+        if (effective)
+            playlist_Control(pl, PLAYLIST_RESUME, pl_Locked);
     }
 
+    playlist_Unlock(pl);
     (void) var; (void) dummy;
     return VLC_SUCCESS;
 }
