@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Benny Beat <bennybeat@gmail.com>, 2016
+# Benny Beat <bennybeat@gmail.com>, 2016-2018
 # Eva Castillo <evac1295@gmail.com>, 2013
 # Jaume Ferrer <jaumeferrerg@msn.com>, 2016
 # jmontane <joan@montane.cat>, 2013-2015
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Jordi Serratosa <jordis@softcatala.cat>, 2018\n"
+"PO-Revision-Date: 2018-07-08 22:45+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Catalan (https://www.transifex.com/yaron/teams/16553/ca/)\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -288,7 +288,7 @@ msgid ""
 "duplicating...)."
 msgstr ""
 "Els paràmetres de sortida de flux s'utilitzen quan els fluxos actuen com a "
-"servidor de transmissió o per desar fluxos d'entrada. \n"
+"servidor de transmissió o per desar fluxos d'entrada.\n"
 "Primer es multiplexen els fluxos i després s'envien mitjançant un mòdul de "
 "«sortida d'accés» que pot desar el flux en un fitxer o transmetre'l (UDP, "
 "HTTP, RTP/RTSP).\n"
@@ -2108,7 +2108,7 @@ msgstr "Comença en mode de pantalla completa"
 
 #: src/libvlc-module.c:315 src/video_output/vout_intf.c:253
 msgid "Always on top"
-msgstr "Sempre a dalt"
+msgstr "Sempre visible"
 
 #: src/libvlc-module.c:317
 msgid "Always place the video window on top of other windows."
@@ -12171,7 +12171,7 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
 msgstr ""
-"Espereu mentre s'acaba de reconstruir la memòria cau de la lletra. \n"
+"Espereu mentre s'acaba de reconstruir la memòria cau de la lletra.\n"
 "No triga més d'un minut."
 
 #: modules/codec/libmpeg2.c:137
@@ -13555,9 +13555,9 @@ msgstr ""
 "poden ser predits per més d'un fotograma anterior (vegeu també l'opció "
 "fotograma de referència). Per tant els fotogrames I no es troben "
 "necessàriament. Els fotogrames IDR fan que els fotogrames P posteriors no "
-"puguin referir-se a cap fotograma anterior al fotograma IDR. Si els talls "
-"d'escena apareixen dins l'interval, encara es poden codificar com a "
-"fotogrames I, però no es pot iniciar un GOP nou."
+"puguin referir-se a cap fotograma anterior al fotograma IDR. \n"
+"Si els talls d'escena apareixen dins l'interval, encara es poden codificar "
+"com a fotogrames I, però no es pot iniciar un GOP nou."
 
 #: modules/codec/x264.c:86
 msgid "Use recovery points to close GOPs"
@@ -16566,7 +16566,6 @@ msgstr ""
 "VLC media player i VideoLAN són marques registrades de l'associació VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16579,11 +16578,11 @@ msgid ""
 msgstr ""
 "<p>El reproductor multimèdia VLC és un reproductor multimèdia, codificador i "
 "reproductor de fluxos en xarxa  gratuït i obert fet per voluntaris de la "
-"comunitat <a href=\"http://www.videolan.org/\"><span style=\" text-"
+"comunitat <a href=\"https://www.videolan.org/\"><span style=\" text-"
 "decoration: underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>El VLC fa "
 "servir còdecs interns, funciona pràcticament a totes les plataformes, pot "
 "llegir gairebé tots els fitxers, CD, DVD, fluxos de xarxa, capturar targetes "
-"i altres formats multimèdia!</p><p><a href=\"http://www.videolan.org/"
+"i altres formats multimèdia!</p><p><a href=\"https://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Ajudeu i uniu-vos!</span></a>"
 
@@ -17226,9 +17225,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Abandona la pantalla completa"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -19862,7 +19860,7 @@ msgid ""
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
 "Informació sobre els elements que formen el vostre element multimèdia o el "
-"vostre flux. \n"
+"vostre flux.\n"
 "També es mostra el multiplexor, els còdecs d'àudio i vídeo i els subtítols."
 
 #: modules/gui/qt/components/info_panels.cpp:548
@@ -21042,10 +21040,10 @@ msgid ""
 "This is automatically generated when you change the above settings,\n"
 "but you can change it manually."
 msgstr ""
-"Cadena de la sortida de flux. \n"
+"Cadena de la sortida de flux.\n"
 "Es genera automàticament quan es canvien els paràmetres que apareixen a "
 "dalt,\n"
-" però podeu canviar-la manualment."
+"però podeu canviar-la manualment."
 
 #: modules/gui/qt/dialogs/sout.cpp:91
 msgid "Back"
@@ -21335,7 +21333,7 @@ msgstr "Sub&títol"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "Ei&nes"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21431,7 +21429,7 @@ msgstr "Llista de reproducció acoblada"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "Sempre &visible"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -26047,6 +26045,8 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a few minutes."
 msgstr ""
+"Espereu mentre s'acaba de reconstruir la memòria cau de la lletra.\n"
+"Aquesta acció només trigarà un minuts."
 
 #: modules/text_renderer/freetype/freetype.c:81
 msgid "Monospace Font"
@@ -26823,7 +26823,7 @@ msgstr ""
 "\n"
 "L'últim: agafa la crominància només del camps nous (lluminosos). És "
 "l'adequat per a les entrades entrellaçades, com per exemple els vídeos "
-"enregistrats amb una càmera.\n"
+"enregistrats amb una càmera. \n"
 "\n"
 "AltLine: agafa la línia 1 de crominància del camp superior, la línia 2 del "
 "camp inferior, etc. \n"
