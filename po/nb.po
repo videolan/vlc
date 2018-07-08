@@ -11,7 +11,7 @@
 # Christian, 2015
 # Harald H. <haarektrans@gmail.com>, 2014,2015
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
-#  Kim Malmo <berencamlost@msn.com>, 2018
+# Kim Malmo <berencamlost@msn.com>, 2018
 # Kristoffer Berge <kristoffer.berge@gmail.com>, 2015
 # Kurt-Håkon Eilertsen <kurt@kheds.com>, 2014,2016
 # Mathias Stang <mathias.stang@gmail.com>, 2015
@@ -23,18 +23,17 @@
 # Torstein Husebø <torstein.huseboe@gmail.com>, 2017
 # Tronn Dyrstad <translate@dyrstad.no>, 2016
 # tyler moss <tls@tutanota.com>, 2015,2016
-# _erty_ <inactive+_erty_@transifex.com>, 2014
 # Yomawaru, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Kim Malmo <berencamlost@msn.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:07+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Norwegian Bokmål (Norway) (https://www.transifex.com/yaron/"
 "teams/16553/nb_NO/)\n"
-"Language: nb\n"
+"Language: nb_NO\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -16289,7 +16288,6 @@ msgid ""
 msgstr "VLC media player og VideoLAN er varemerket av VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16301,12 +16299,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC er en friprog-mediespiller, mediekoder og kringkaster, laget av de "
-"frivillige i <a href=\"http://www.videolan.org/\"><span style=\" text-"
+"frivillige i <a href=\"https://www.videolan.org/\"><span style=\" text-"
 "decoration: underline; color:#0057ae;\">VideoLAN</span></a>-samfunnet.</p>\n"
 "<p>VLC bruker sine egne kodek, virker på praktisk talt alle populære "
 "plattformer, og kan lese nesten alle filer, CD-er, DVD-er, "
 "nettverksstrømmer, opptakskort og andre medieformater!</p><p><a href="
-"\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
+"\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Bli med og hjelp oss da vel!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
@@ -16946,9 +16944,8 @@ msgstr "Gå til forrige element"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Forlat fullskjerm"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -26535,18 +26532,18 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Velg handlingen til fargene i disse utdatarammene som faller i mellom "
-"inndatarammegrenser.\n"
+"inndatarammegrenser. \n"
 "\n"
 "Seneste: Hent krominansen kun fra det nye (lyse) feltet. Dette er bra for "
-"sammenflettet inndata, slik som videoer fra et opptakskamera.\n"
+"sammenflettet inndata, slik som videoer fra et opptakskamera. \n"
 "\n"
 "Alternativ linje: Hent krominansen fra linje 1 i toppfeltet, linje 2 i "
-"bunnfeltet, osv.\n"
+"bunnfeltet, osv. \n"
 "Dette er standarden, og er bra for NTSC-telecinet inndata (Anime-DVD-er, "
-"osv.)\n"
+"osv.). \n"
 "\n"
 "Bland: Gjennomsnittet til inndatafeltets krominanser. Det kan også forstyrre "
-"fargene til det nye (lyse) feltet.\n"
+"fargene til det nye (lyse) feltet. \n"
 "\n"
 "Oppskaler: Utdata i 4:2:2-format (Forskjellige krominanser for hvert felt). "
 "Den beste simuleringen, men krever mere prosessor- og minne-båndbredde."
