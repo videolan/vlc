@@ -7,7 +7,7 @@
 # janezm.74, 2014
 # Damir Jerovšek <jierro@windowslive.com>, 2014
 # Martin Srebotnjak <miles@filmsi.net>, 2013-2018
-# Matej Urbančič, 2005-2010, 2014-2017
+# Matej Urbančič <mateju@svn.gnome.org>, 2005-2010, 2014-2018
 # Peter Klofutar, 2014-2016
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 msgid ""
@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Martin Srebotnjak <miles@filmsi.net>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:29+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Slovenian (https://www.transifex.com/yaron/teams/16553/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -6342,12 +6342,12 @@ msgstr "Prvo predvajanje"
 #: modules/access/cdda.c:480
 #, c-format
 msgid "Audio CD - Track %02i"
-msgstr "Zvokovni CD - Sled %02i"
+msgstr "Zvokovni CD – Sled %02i"
 
 #: modules/access/cdda.c:720 modules/gui/macosx/VLCOpenWindowController.m:169
 #: modules/gui/qt/ui/open_disk.h:300
 msgid "Audio CD"
-msgstr "Glasbeni CD"
+msgstr "Zvokovni CD"
 
 #: modules/access/cdda.c:721
 msgid "Audio CD input"
@@ -9510,15 +9510,15 @@ msgstr ""
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16-bajtno"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24-bajtno"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32-bajtno"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -9526,7 +9526,7 @@ msgstr "Odvod pretoka SRT"
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Geslo za šifriranje pretoka"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -10683,7 +10683,7 @@ msgstr "Onemogočeno"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Omogočeno (le za AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -15168,7 +15168,7 @@ msgstr "Prednostna pasovna širina za neprilagodljive pretoke"
 
 #: modules/demux/adaptive/adaptive.cpp:74
 msgid "Adaptive Logic"
-msgstr ""
+msgstr "Prilagodljiva logika"
 
 #: modules/demux/adaptive/adaptive.cpp:76
 msgid "Use regular HTTP modules"
@@ -16433,7 +16433,6 @@ msgid ""
 msgstr "Predvajalnik VLC in Video LAN sta blagovni znamki združenja VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16444,16 +16443,15 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>Predvajalnik VLC je brezplačen odprtokodni predvajalnik, kodirnik in "
-"orodje za pretakanje, ki so ga ustvarili prostovoljci skupnosti <a href="
-"\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a>.</p><p>Predvajalnik uporablja lastne "
-"kodeke, deluje pravzaprav v vsakem sistemskem okolju in predvaja skoraj vse "
-"zapise predstavnih datotek, vsebino nosilcev CD in DVD, omrežne pretoke, "
-"podpira kartice za zajem zvoka in slike ter omogoča še marsikaj drugega!</"
-"p><p><a href=\"http://www.videolan.org/contribute/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">Pridružite se skupnosti in sodelujte "
-"pri razvoju!</span></a>"
+"<p>Predvajalnik VLC je brezplačni odprtokodni predstavni predvajalnik, "
+"kodirnik in orodje za pretakanje, ki so ga ustvarili prostovoljci skupnosti "
+"<a href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC uporablja svoje "
+"vgrajene kodeke, deluje pravzaprav v vsakem okolju in lahko bere skoraj vse "
+"vrste datotek, CD-je, DVD-je, omrežne pretoke, kartice za zajem in druge "
+"oblike predstavnih vsebin!</p><p><a href=\"https://www.videolan.org/"
+"contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Pomagajte in se nam pridružite!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17089,7 +17087,6 @@ msgstr "Skoči na predhodni predmet"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Zapusti celozaslonski način"
 
@@ -17602,7 +17599,7 @@ msgstr "Skoči na čas"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Izrisovalnik"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
