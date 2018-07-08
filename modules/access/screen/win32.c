@@ -264,8 +264,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
     int i_stride =
         ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
     i_buffer = i_stride * p_sys->fmt.video.i_height;
-    block_Init( &p_block->self, p_buffer, i_buffer );
-    p_block->self.cbs = &CaptureBlockCallbacks;
+    block_Init( &p_block->self, &CaptureBlockCallbacks, p_buffer, i_buffer );
     p_block->hbmp            = hbmp;
 
     return &p_block->self;

@@ -188,9 +188,9 @@ static block_t *vlc_av_frame_Wrap(AVFrame *frame)
 
     block_t *block = &b->self;
 
-    block_Init(block, frame->extended_data[0], frame->linesize[0]);
+    block_Init(block, &vlc_av_frame_cbs,
+               frame->extended_data[0], frame->linesize[0]);
     block->i_nb_samples = frame->nb_samples;
-    block->cbs = &vlc_av_frame_cbs;
     b->frame = frame;
     return block;
 }

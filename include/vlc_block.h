@@ -131,7 +131,25 @@ struct block_t
     const struct vlc_block_callbacks *cbs;
 };
 
-VLC_API void block_Init( block_t *, void *, size_t );
+/**
+ * Initializes a custom block.
+ *
+ * This function initialize a block of timed data allocated by custom means.
+ * This allows passing data with copying even if the data has been allocated
+ * with unusual means or outside of LibVLC.
+ *
+ * Normally, blocks are allocated and initialized by block_Alloc() instead.
+ *
+ * @param block allocated block structure to initialize
+ * @param cbs structure of custom callbacks to handle the block [IN]
+ * @param base start address of the block data
+ * @param length byte length of the block data
+ *
+ * @return @c block (this function cannot fail)
+ */
+VLC_API block_t *block_Init(block_t *block,
+                            const struct vlc_block_callbacks *cbs,
+                            void *base, size_t length);
 
 /**
  * Allocates a block.

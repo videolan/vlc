@@ -78,7 +78,8 @@ static void block_Invalidate (block_t *block)
 # define block_Invalidate(b) ((void)(b))
 #endif
 
-void block_Init( block_t *restrict b, void *buf, size_t size )
+block_t *block_Init(block_t *restrict b, const struct vlc_block_callbacks *cbs,
+                    void *buf, size_t size)
 {
     /* Fill all fields to their default */
     b->p_next = NULL;
@@ -91,9 +92,8 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
     b->i_pts =
     b->i_dts = VLC_TICK_INVALID;
     b->i_length = 0;
-#ifndef NDEBUG
-    b->cbs = &block_invalid_cbs;
-#endif
+    b->cbs = cbs;
+    return b;
 }
 
 static void block_generic_Release (block_t *block)
@@ -145,13 +145,12 @@ block_t *block_Alloc (size_t size)
     if (unlikely(b == NULL))
         return NULL;
 
-    block_Init (b, b + 1, alloc - sizeof (*b));
+    block_Init(b, &block_generic_cbs, b + 1, alloc - sizeof (*b));
     static_assert ((BLOCK_PADDING % BLOCK_ALIGN) == 0,
                    "BLOCK_PADDING must be a multiple of BLOCK_ALIGN");
     b->p_buffer += BLOCK_PADDING + BLOCK_ALIGN - 1;
     b->p_buffer = (void *)(((uintptr_t)b->p_buffer) & ~(BLOCK_ALIGN - 1));
     b->i_buffer = size;
-    b->cbs = &block_generic_cbs;
     return b;
 }
 
@@ -275,9 +274,7 @@ block_t *block_heap_Alloc (void *addr, size_t length)
         return NULL;
     }
 
-    block_Init (block, addr, length);
-    block->cbs = &block_heap_cbs;
-    return block;
+    return block_Init(block, &block_heap_cbs, addr, length);
 }
 
 #ifdef HAVE_MMAP
@@ -311,10 +308,10 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
         return NULL;
     }
 
-    block_Init (block, ((char *)addr) - left, left + length + right);
+    block_Init(block, &block_mmap_cbs,
+               ((char *)addr) - left, left + length + right);
     block->p_buffer = addr;
     block->i_buffer = length;
-    block->cbs = &block_mmap_cbs;
     return block;
 }
 #else
@@ -355,10 +352,8 @@ block_t *block_shm_Alloc (void *addr, size_t length)
         return NULL;
     }
 
-    block_Init (&block->self, (uint8_t *)addr, length);
-    block->self.cbs = &block_shm_cbs;
     block->base_addr = addr;
-    return &block->self;
+    return block_Init(&block->self, &block_shm_cbs, (uint8_t *)addr, length);
 }
 #else
 block_t *block_shm_Alloc (void *addr, size_t length)

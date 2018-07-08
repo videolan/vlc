@@ -1088,7 +1088,7 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCode
 
     block_t *p_block = &b->self;
 
-    block_Init( p_block, packet->data, packet->size );
+    block_Init( p_block, &vlc_av_packet_cbs, packet->data, packet->size );
     p_block->i_nb_samples = 0;
     p_block->cbs = &vlc_av_packet_cbs;
     b->packet = *packet;
