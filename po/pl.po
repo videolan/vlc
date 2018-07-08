@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-17 22:51+0200\n"
+"PO-Revision-Date: 2018-07-09 01:16+0200\n"
 "Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
@@ -820,18 +820,18 @@ msgstr ""
 "  Określone mogą być wielokrotne wartości :opcja=para.\n"
 "\n"
 "Składnia adresu URL:\n"
-"  plik://ścieżka/plik\t\tzwykły plik multimedialny\n"
+"  file://ścieżka/plik\t\tzwykły plik multimedialny\n"
 "  http://host[:port]/plik\tHTTP URL\n"
 "  ftp://host[:port]/plik\tFTP URL\n"
 "  mms://host[:port]/plik\tMMS URL\n"
-"  ekran://\t\t\tZrzut ekranu\n"
+"  screen://\t\t\tZrzut ekranu\n"
 "  dvd://[urządzenie]\turządzenie DVD\n"
 "  vcd://[urządzenie]\t\turządzenie VCD\n"
 "  cdda://[urządzenie]\turządzenie CD Audio\n"
 "  udp://[[<adres źródłowy>]@[<adres związania>][:<port związania>]]\n"
 "\t\t\tStrumień UDP wysyłany przez serwer strumieniowy\n"
-"  vlc://pauza:<sekundy>\tWstrzymuje listę odtwarzania przez pewien czas\n"
-"  vlc://zamknij\t\tSpecjalny element, aby zamknąć VLC\n"
+"  vlc://pause:<sekundy>\tWstrzymuje listę odtwarzania przez pewien czas\n"
+"  vlc://quit\t\tSpecjalny element, aby zamknąć VLC\n"
 
 #: src/config/help.c:490
 msgid "(default enabled)"
@@ -2665,7 +2665,7 @@ msgid ""
 "language)."
 msgstr ""
 "Używany język ścieżki dźwiękowej (dwu- lub trzy-literowy kod kraju, dzielony "
-"przecinkiem, możesz użyć 'brak', aby uniknąć zmiany na inny język)."
+"przecinkiem, możesz użyć 'none', aby uniknąć zmiany na inny język)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
@@ -2677,7 +2677,7 @@ msgid ""
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
 "Używany język ścieżki napisów (dwu- lub trzy-literowy kod kraju, dzielony "
-"przecinkiem, możesz użyć 'każdy' na automatyczny wybór)."
+"przecinkiem, możesz użyć 'any' na automatyczny wybór)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2689,7 +2689,7 @@ msgid ""
 "or three letters country code, you may use 'any' as a fallback)."
 msgstr ""
 "Używany język menu DVD/Blu-ray (dwu- lub trzy-literowy kod kraju, dzielony "
-"przecinkiem, możesz użyć 'każdy' na automatyczny wybór)."
+"przecinkiem, możesz użyć 'any' na automatyczny wybór)."
 
 #: src/libvlc-module.c:604
 msgid "Audio track ID"
@@ -10882,7 +10882,7 @@ msgstr "Bezpośredni rendering"
 
 #: modules/codec/avcodec/avcodec.h:59
 msgid "Show corrupted frames"
-msgstr "Pokaż uszkodzone ramki"
+msgstr "Pokaż uszkodzone klatki"
 
 #: modules/codec/avcodec/avcodec.h:60
 msgid "Prefer visual artifacts instead of missing frames"
@@ -10977,8 +10977,8 @@ msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Wymuś pomijanie informacji idct, aby przyspieszyć dekodowanie dla typów "
-"ramki (-1=Żadne, 0=Domyślne, 1=Klatki B, 2=Klatki P, 3=Klatki B+P, "
+"Wymuś pomijanie informacji idct, aby przyspieszyć dekodowanie dla typu "
+"klatek (-1=Żadne, 0=Domyślne, 1=Klatki B, 2=Klatki P, 3=Klatki B+P, "
 "4=wszystkie klatki)."
 
 #: modules/codec/avcodec/avcodec.h:102
@@ -12122,7 +12122,7 @@ msgid ""
 msgstr ""
 "Liczba obrazów w bieżącej GOP (grupa obrazów), jeśli GopPicSize=0, to "
 "rozmiar grupy obrazów jest nieokreślony. Jeśli GopPicSize=1, używane są "
-"tylko I-ramki."
+"tylko I-klatki."
 
 #: modules/codec/qsv.c:79
 msgid "Group of Picture Reference Distance"
@@ -12285,7 +12285,7 @@ msgid ""
 "partitioning allowed by the codec standard."
 msgstr ""
 "Liczba kawałków w każdej klatce obrazu; każdy kawałek zawiera jeden lub "
-"więcej wierszy makro-bloków. Jeśli liczba nie jest ustawiona, koder może "
+"więcej wierszy makro-bloków. Jeśli liczba nie jest ustawiona, koder może "
 "wybrać dowolny podział kawałku dozwolonego przez standard kodeka."
 
 #: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:143
@@ -13606,13 +13606,13 @@ msgid ""
 " 4: top bottom - L is on top, R on bottom\n"
 " 5: frame alternation - one view per frame"
 msgstr ""
-"Dla stereoskopowych filmów określić układ ramek:\\n\n"
-"0: szachownica - piksele  są na przemian z L i R\\n\n"
-"1: naprzemienne kolumny - L i R są przeplatane przez kolumny\\n\n"
-"2: naprzemienne wiersze - L i R są przeplatane przez wiersze\\n\n"
-"3: obok siebie - L jest po lewej stronie, R po prawej\\n\n"
-"4: góra dół - L jest na górze, R na dole\\n\n"
-"5: naprzemienne klatki - jeden widok na klatkę"
+"Określa układ klatek dla filmów stereoskopowych:\n"
+" 0: szachownica - L i R są przeplatane pikselami\n"
+" 1: przeplot kolumn - L i R są przeplatane w kolumnach\n"
+" 2: przeplot rzędów - L i R są przeplatane w rzędach\n"
+" 3: obok siebie - L jest po lewej stronie, R po prawej\n"
+" 4: jedna pod drugą - L jest na górze, R na dole\n"
+" 5: przeplot klatek - L i R są przeplatane klatkami"
 
 #: modules/codec/x264.c:182
 msgid "Use Periodic Intra Refresh"
@@ -14275,11 +14275,11 @@ msgstr "szachownica"
 
 #: modules/codec/x264.c:445
 msgid "column alternation"
-msgstr "naprzemienne kolumny"
+msgstr "przeplot kolumn"
 
 #: modules/codec/x264.c:445
 msgid "row alternation"
-msgstr "naprzemienne wiersze"
+msgstr "przeplot rzędów"
 
 #: modules/codec/x264.c:445
 msgid "side by side"
@@ -14287,11 +14287,11 @@ msgstr "obok siebie"
 
 #: modules/codec/x264.c:445
 msgid "top bottom"
-msgstr "góra dół"
+msgstr "jedna pod drugą"
 
 #: modules/codec/x264.c:445
 msgid "frame alternation"
-msgstr "naprzemienne klatki"
+msgstr "przeplot klatek"
 
 #: modules/codec/x264.c:445
 msgid "2D"
@@ -18883,7 +18883,7 @@ msgstr "Gra w puzzle"
 #: modules/gui/qt/ui/video_effects.h:1259
 #: modules/gui/qt/ui/video_effects.h:1265
 msgid "Rows"
-msgstr "Wiersze"
+msgstr "Rzędy"
 
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:244
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:249
@@ -24477,22 +24477,22 @@ msgid ""
 "columns. offsets: use the user-defined offsets for each image."
 msgstr ""
 "Metoda pozycjonowania mozaiki. automatycznie: automatycznie wybiera "
-"najlepszą liczbę wierszy i kolumn. stała: wykorzystuje określoną przez "
-"użytkownika liczbę wierszy i kolumn. offsetowa: wykorzystuje określone przez "
-"użytkownika przesunięcia dla każdego obrazu."
+"najlepszą liczbę rzędów i kolumn. stała: używa określoną przez użytkownika "
+"liczbę rzędów i kolumn. offsetowa: używa określony przez użytkownika odstęp "
+"dla każdego obrazu."
 
 #: modules/spu/mosaic.c:124 modules/video_splitter/panoramix.c:64
 #: modules/video_splitter/wall.c:50
 msgid "Number of rows"
-msgstr "Liczba wierszy"
+msgstr "Liczba rzędów"
 
 #: modules/spu/mosaic.c:126
 msgid ""
 "Number of image rows in the mosaic (only used if positioning method is set "
 "to \"fixed\")."
 msgstr ""
-"Liczba wierszy obrazów w mozaice (tylko w użytku, jeśli metoda "
-"pozycjonowania ustawiona jest na \"stała\")."
+"Liczba rzędów obrazów w mozaice (tylko w użytku, jeśli metoda pozycjonowania "
+"ustawiona jest na \"stała\")."
 
 #: modules/spu/mosaic.c:129 modules/video_splitter/panoramix.c:60
 #: modules/video_splitter/wall.c:46
@@ -24514,8 +24514,7 @@ msgstr "Zachowaj proporcje"
 #: modules/spu/mosaic.c:136
 msgid "Keep the original aspect ratio when resizing mosaic elements."
 msgstr ""
-"Zachowaj oryginalny stosunek rozmiarów podczas zmieniania rozmiarów "
-"elementów mozaiki."
+"Zachowaj oryginalne proporcje podczas zmiany rozmiaru elementów mozaiki."
 
 #: modules/spu/mosaic.c:138
 msgid "Keep original size"
@@ -24907,7 +24906,7 @@ msgstr "Dekompresja LZMA"
 
 #: modules/stream_filter/decomp.c:66
 msgid "Burrows-Wheeler decompression"
-msgstr "Dekompresja Burrows-Wheeler"
+msgstr "Dekompresja Burrowsa-Wheelera"
 
 #: modules/stream_filter/decomp.c:71
 msgid "gzip decompression"
@@ -26752,16 +26751,16 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Wybierz obsługę barw dla klatek wyjściowych, które nadchodzą granice klatek "
-"wejściowych.\n"
+"wejściowych. \n"
 "\n"
 "Ostatnie: weź tylko barwy z nowego (jasnego) pola. Dobre dla wejścia z "
-"przeplotem, np. filmów z kamery.\n"
+"przeplotem, np. filmów z kamery. \n"
 "\n"
 "AltLine: weź barwy linii 1 z górnego pola, linii 2 z dolnego pola itd. \n"
-"Domyślnie dobre dla ztelecinowanego wejścia NTSC (anime DVD itp.). \n"
+"Wartość domyślna dobra dla ztelecinowanego wejścia NTSC (anime DVD itp.). \n"
 "\n"
 "Mieszane: średnie barwy pola wejściowego. Mogą zniekształcać też barwy "
-"nowego (jasnego) pola.\n"
+"nowego (jasnego) pola. \n"
 "\n"
 "Upconvert: wyjście w formacie 4:2:2 (niezależne barwy dla każdego pola). "
 "Najlepsza symulacja, ale wymaga większej mocy obliczeniowej procesora i "
@@ -26769,7 +26768,7 @@ msgstr ""
 
 #: modules/video_filter/deinterlace/deinterlace.c:291
 msgid "Phosphor old field dimmer strength"
-msgstr "Fosforowa intensywność starego pola"
+msgstr "Siła ściemniania starego pola fosforu"
 
 #: modules/video_filter/deinterlace/deinterlace.c:292
 msgid ""
@@ -26777,9 +26776,9 @@ msgid ""
 "phosphor light decay for the old field in the Phosphor framerate doubler. "
 "Default: Low."
 msgstr ""
-"Kontroluje to siłę filtra zaciemniania symulującego rozkład światła "
-"fosforowego telewizji CRT dla starego pola w podwajaczu fosforu liczby "
-"klatek. Domyślnie: Niski."
+"Kontroluje to siłę filtra przyciemniającego, który symuluje zanikanie "
+"światła fosforowego w telewizorze CRT dla starego pola w podwajaczu fosforu "
+"liczby klatek. Domyślnie: niski."
 
 #: modules/video_filter/deinterlace/deinterlace.c:299
 msgid "Deinterlacing video filter"
@@ -27231,7 +27230,7 @@ msgstr "Psychodeliczny filtr obrazu"
 
 #: modules/video_filter/puzzle.c:53 modules/video_filter/puzzle.c:54
 msgid "Number of puzzle rows"
-msgstr "Liczba wierszy puzzli"
+msgstr "Liczba rzędów puzzli"
 
 #: modules/video_filter/puzzle.c:55 modules/video_filter/puzzle.c:56
 msgid "Number of puzzle columns"
@@ -28803,7 +28802,7 @@ msgstr "Przedwzmacniacz:"
 
 #: share/lua/http/dialogs/mosaic_window.html:104
 msgid "Row border"
-msgstr "Ramka wiersza"
+msgstr "Ramka rzędu"
 
 #: share/lua/http/dialogs/mosaic_window.html:122
 msgid "Column border"
