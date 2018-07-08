@@ -154,6 +154,11 @@ block_t *block_Alloc (size_t size)
     return b;
 }
 
+void block_Release(block_t *block)
+{
+    block->cbs->free(block);
+}
+
 block_t *block_TryRealloc (block_t *p_block, ssize_t i_prebody, size_t i_body)
 {
     block_Check( p_block );

@@ -42,6 +42,7 @@ block_Init
 block_mmap_Alloc
 block_shm_Alloc
 block_Realloc
+block_Release
 block_TryRealloc
 config_AddIntf
 config_ChainCreate

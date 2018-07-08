@@ -199,10 +199,7 @@ VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  *
  * @param block block to release (cannot be NULL)
  */
-static inline void block_Release(block_t *block)
-{
-    block->cbs->free(block);
-}
+VLC_API void block_Release(block_t *block);
 
 static inline void block_CopyProperties( block_t *dst, block_t *src )
 {
