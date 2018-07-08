@@ -3226,12 +3226,12 @@ AC_ARG_WITH([default-monospace-font],
 
 AC_ARG_WITH([default-font-family],
     AS_HELP_STRING([--with-default-font-family=NAME],
-        [Path to the default font family]),
+        [Name of the default font family]),
         [AC_DEFINE_UNQUOTED([DEFAULT_FAMILY],
             "$withval", [Default font family])])
 AC_ARG_WITH([default-monospace-font-family],
     AS_HELP_STRING([--with-default-monospace-font-family=NAME],
-        [Path to the default font family]),
+        [Name of the default font family]),
         [AC_DEFINE_UNQUOTED([DEFAULT_MONOSPACE_FAMILY],
             "$withval", [Default monospace font family])])
 
