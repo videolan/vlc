@@ -10,8 +10,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: ssdoria <ssdoria@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:17+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/yaron/"
 "teams/16553/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -16510,7 +16510,6 @@ msgstr ""
 "O reprodutor de mídias VLC e VideoLAN são marcas da Associação VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16522,11 +16521,11 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>O Reprodutor de Mídias VLC é um reprodutor, codificador gerador de fluxos "
-"livre, feito por voluntários da comunidade <a href=\"http://www.videolan.org/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"livre, feito por voluntários da comunidade <a href=\"https://www.videolan."
+"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
 "span></a>.</p><p>O VLC usa codificadores próprios, trabalha com plataformas "
 "populares e pode ler quase todos os arquivos, CDs, DVDs, fluxos de rede, "
-"placas de captura e outros formatos de mídia!</p><p><a href=\"http://www."
+"placas de captura e outros formatos de mídia!</p><p><a href=\"https://www."
 "videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
 "#0057ae;\">Junte-se a nós e Contribua!</span></a>"
 
@@ -17167,9 +17166,8 @@ msgstr "Ir ao item anterior"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Desabilitar Tela Inteira"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
