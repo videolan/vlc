@@ -694,39 +694,30 @@ static int Send( sout_stream_t *p_stream, void *_id, block_t *p_buffer )
             goto error;
     }
 
+    int i_ret;
     switch( id->p_decoder->fmt_in.i_cat )
     {
     case AUDIO_ES:
-        if( transcode_audio_process( p_stream, id, p_buffer, &p_out )
-            != VLC_SUCCESS )
-        {
-            return VLC_EGENERIC;
-        }
+        i_ret = transcode_audio_process( p_stream, id, p_buffer, &p_out );
         break;
 
     case VIDEO_ES:
-        if( transcode_video_process( p_stream, id, p_buffer, &p_out )
-            != VLC_SUCCESS )
-        {
-            return VLC_EGENERIC;
-        }
+        i_ret = transcode_video_process( p_stream, id, p_buffer, &p_out );
         break;
 
     case SPU_ES:
-        if ( transcode_spu_process( p_stream, id, p_buffer, &p_out ) !=
-            VLC_SUCCESS )
-        {
-            return VLC_EGENERIC;
-        }
+        i_ret = transcode_spu_process( p_stream, id, p_buffer, &p_out );
         break;
 
     default:
         goto error;
     }
 
-    if( p_out )
-        return sout_StreamIdSend( p_stream->p_next, id->downstream_id, p_out );
-    return VLC_SUCCESS;
+    if( p_out &&
+        sout_StreamIdSend( p_stream->p_next, id->downstream_id, p_out ) )
+        i_ret = VLC_EGENERIC;
+
+    return i_ret;
 error:
     if( p_buffer )
         block_Release( p_buffer );
