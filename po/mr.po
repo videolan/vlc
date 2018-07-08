@@ -13,8 +13,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Rajnikant Kumbhar <rajnikant.kumbhar@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:04+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Marathi (https://www.transifex.com/yaron/teams/16553/mr/)\n"
 "Language: mr\n"
 "MIME-Version: 1.0\n"
@@ -16065,7 +16065,6 @@ msgid ""
 msgstr "व्हीएलसी मीडिया प्लेअर व व्हीडिओलॅन हे व्हीडीओलॅन संघटनेची व्यापारचिन्हे आहेत."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16077,13 +16076,13 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>व्हीएलसी मीडिया प्लेअर हा मुक्त स्रोत मीडिया प्लेअर, संकेतक व प्रवाहक असून, तो <a "
-"href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a> समुदायाच्या स्वयंसेवकांनी तयार केला आहे.</"
-"p><p>व्हीएलसी त्याचे अंतर्गत कोडेक्स वापरतो, व प्रत्येक लोकप्रिय प्लॅटफॉर्मवर कार्य करतो, व "
-"जवळपास सर्व धारिका, सीडी, डीव्हीडी, नेटवर्क प्रवाह, ग्रहण कार्ड व इतर माध्यम प्रारुपे "
-"वाचू शकतो!</p><p><a href=\"http://www.videolan.org/contribute/\"><span style="
-"\" text-decoration: underline; color:#0057ae;\">मदत करा व आमच्यात सहभागी व्हा!"
-"</span></a>"
+"href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a> समुदायाच्या स्वयंसेवकांनी तयार केला "
+"आहे.</p><p>व्हीएलसी त्याचे अंतर्गत कोडेक्स वापरतो, व प्रत्येक लोकप्रिय प्लॅटफॉर्मवर कार्य "
+"करतो, व जवळपास सर्व धारिका, सीडी, डीव्हीडी, नेटवर्क प्रवाह, ग्रहण कार्ड व इतर माध्यम "
+"प्रारुपे वाचू शकतो!</p><p><a href=\"https://www.videolan.org/contribute/\"><span "
+"style=\" text-decoration: underline; color:#0057ae;\">मदत करा व आमच्यात "
+"सहभागी व्हा!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16721,9 +16720,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "पूर्णपटल सोडा"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
