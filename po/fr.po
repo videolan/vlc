@@ -13,7 +13,7 @@
 # Emmanuel Simond <emmanuel.simond@gmail.com>, 2013
 # Damien Erambert <damien.erambert@me.com>, 2013
 # Eric Lassauge <lassauge@users.sourceforge.net>, 2013-2015
-# Fan, 2018
+# Pierre Ynard <linkfanel@yahoo.fr>, 2018
 # Freddydelanuit Dec <fred.dec@free.fr>, 2014
 # Rafaël Carré <funman@videolan.org>, 2014
 # chouquette <hugo@beauzee.fr>, 2015
@@ -32,8 +32,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-17 22:50+0200\n"
-"Last-Translator: Irriep Nala Novram <allannkorh@yahoo.fr>, 2018\n"
+"PO-Revision-Date: 2018-07-08 22:58+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: French (https://www.transifex.com/yaron/teams/16553/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -4267,11 +4267,11 @@ msgstr "Longeur du « saut court », en secondes."
 
 #: src/libvlc-module.c:1288
 msgid "Medium jump length"
-msgstr "Longueur du saut"
+msgstr "Longueur du saut moyen"
 
 #: src/libvlc-module.c:1289
 msgid "Medium jump length, in seconds."
-msgstr "Longueur du saut, en secondes"
+msgstr "Longueur du « saut moyen », en secondes."
 
 #: src/libvlc-module.c:1290
 msgid "Long jump length"
@@ -26917,18 +26917,18 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Choisir la gestion des couleurs dans les images de sortie qui tombent dans "
-"les limites de l'image d'entrée.\n"
+"les limites de l'image d'entrée. \n"
 "\n"
 "Dernier : prend la chrominance d'une nouvelle trame (lumineuse) seulement. "
-"Adapté pour une entrée entrelacée, comme les vidéos d'une caméra.\n"
+"Adapté pour une entrée entrelacée, comme les vidéos d'une caméra. \n"
 "\n"
 "AlternLig : prend la chrominance de la ligne 1 de la trame du haut, ligne 2 "
-"de la la trame du bas, etc.\n"
+"de la la trame du bas, etc. \n"
 "Prédéfini et adapté pour les entrée de téléciné NTSC (DVD de dessins animés, "
-"etc.).\n"
+"etc.). \n"
 "\n"
 "Mélange : fait la moyenne des chrominances des trames d'entrée. Aussi, peut "
-"distordre les couleurs d'une nouvelle trame (lumineuse).\n"
+"distordre les couleurs d'une nouvelle trame (lumineuse). \n"
 "\n"
 "ConvertHaut : sortie en format 4:2:2 (chrominance indépendante pour chaque "
 "trame). Meilleure simulation mais nécessite plus de CPU et de débit mémoire."
