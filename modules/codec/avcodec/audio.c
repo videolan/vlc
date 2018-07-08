@@ -169,6 +169,11 @@ static void vlc_av_frame_Release(block_t *block)
     free(b);
 }
 
+static const struct vlc_block_callbacks vlc_av_frame_cbs =
+{
+    vlc_av_frame_Release,
+};
+
 static block_t *vlc_av_frame_Wrap(AVFrame *frame)
 {
     for (unsigned i = 1; i < AV_NUM_DATA_POINTERS; i++)
@@ -185,7 +190,7 @@ static block_t *vlc_av_frame_Wrap(AVFrame *frame)
 
     block_Init(block, frame->extended_data[0], frame->linesize[0]);
     block->i_nb_samples = frame->nb_samples;
-    block->pf_release = vlc_av_frame_Release;
+    block->cbs = &vlc_av_frame_cbs;
     b->frame = frame;
     return block;
 }

@@ -107,7 +107,10 @@
 #define BLOCK_FLAG_PRIVATE_MASK  0xff000000
 #define BLOCK_FLAG_PRIVATE_SHIFT 24
 
-typedef void (*block_free_t) (block_t *);
+struct vlc_block_callbacks
+{
+    void (*free)(block_t *);
+};
 
 struct block_t
 {
@@ -125,8 +128,7 @@ struct block_t
     vlc_tick_t  i_dts;
     vlc_tick_t  i_length;
 
-    /* Rudimentary support for overloading block (de)allocation. */
-    block_free_t pf_release;
+    const struct vlc_block_callbacks *cbs;
 };
 
 VLC_API void block_Init( block_t *, void *, size_t );
@@ -181,7 +183,7 @@ VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  */
 static inline void block_Release(block_t *block)
 {
-    block->pf_release(block);
+    block->cbs->free(block);
 }
 
 static inline void block_CopyProperties( block_t *dst, block_t *src )

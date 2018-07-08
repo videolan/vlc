@@ -193,6 +193,11 @@ static void CaptureBlockRelease( block_t *p_block )
     free( p_block );
 }
 
+static const struct vlc_block_callbacks CaptureBlockCallbacks =
+{
+    CaptureBlockRelease,
+};
+
 static block_t *CaptureBlockNew( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -260,7 +265,7 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         ( ( ( ( p_sys->fmt.video.i_width * p_sys->fmt.video.i_bits_per_pixel ) + 31 ) & ~31 ) >> 3 );
     i_buffer = i_stride * p_sys->fmt.video.i_height;
     block_Init( &p_block->self, p_buffer, i_buffer );
-    p_block->self.pf_release = CaptureBlockRelease;
+    p_block->self.cbs = &CaptureBlockCallbacks;
     p_block->hbmp            = hbmp;
 
     return &p_block->self;

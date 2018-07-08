@@ -1069,6 +1069,11 @@ static void vlc_av_packet_Release(block_t *block)
     free(b);
 }
 
+static const struct vlc_block_callbacks vlc_av_packet_cbs =
+{
+    vlc_av_packet_Release,
+};
+
 static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCodecContext *context )
 {
     if ( packet->data == NULL &&
@@ -1085,7 +1090,7 @@ static block_t *vlc_av_packet_Wrap(AVPacket *packet, vlc_tick_t i_length, AVCode
 
     block_Init( p_block, packet->data, packet->size );
     p_block->i_nb_samples = 0;
-    p_block->pf_release = vlc_av_packet_Release;
+    p_block->cbs = &vlc_av_packet_cbs;
     b->packet = *packet;
 
     p_block->i_length = i_length;
