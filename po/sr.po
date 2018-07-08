@@ -16,8 +16,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Предраг Љубеновић <predragljubenovic@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:30+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Serbian (https://www.transifex.com/yaron/teams/16553/sr/)\n"
 "Language: sr\n"
 "MIME-Version: 1.0\n"
@@ -15688,7 +15688,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15700,11 +15699,11 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC медија плејер је бесплатан плејер отвореног кода, енкодер и стример "
-"направљен од стране волонтера <a href=\"http://www.videolan.org/\"><span "
+"направљен од стране волонтера <a href=\"https://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
 "заједнице.</p><p>VLC користи своје интерне кодеке, ради на свим популарним "
 "платформама и може да отвори скоро све фајлове, CD-ове, DVD-ове, мрежне "
-"токове, картице за гребовање и друге медиjа формате!</p><p><a href=\"http://"
+"токове, картице за гребовање и друге медиjа формате!</p><p><a href=\"https://"
 "www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
 "color:#0057ae;\">Помозите и придружите нам се!</span></a>"
 
@@ -16338,9 +16337,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Искључи приказ преко целог екрана"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
