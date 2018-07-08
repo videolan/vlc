@@ -76,13 +76,17 @@ char *vlc_uri_decode (char *str)
     return str;
 }
 
-static bool isurisafe (int c)
+static bool isurialnum(int c)
 {
-    /* These are the _unreserved_ URI characters (RFC3986 §2.3) */
     return ((unsigned char)(c - 'a') < 26)
         || ((unsigned char)(c - 'A') < 26)
-        || ((unsigned char)(c - '0') < 10)
-        || (strchr ("-._~", c) != NULL);
+        || ((unsigned char)(c - '0') < 10);
+}
+
+static bool isurisafe(int c)
+{
+    /* These are the _unreserved_ URI characters (RFC3986 §2.3) */
+    return isurialnum(c) || (strchr ("-._~", c) != NULL);
 }
 
 static bool isurisubdelim(int c)
@@ -429,8 +433,7 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
 
     /* URI scheme */
     next = buf;
-    while ((*next >= 'A' && *next <= 'Z') || (*next >= 'a' && *next <= 'z')
-        || (*next >= '0' && *next <= '9') || memchr ("+-.", *next, 3) != NULL)
+    while (isurialnum(*next) || memchr ("+-.", *next, 3) != NULL)
         next++;
 
     if (*next == ':')
