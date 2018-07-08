@@ -153,11 +153,6 @@ static void test_rfc3986(const char *reference, const char *expected)
     test(vlc_uri_resolve_rfc3986_test, reference, expected);
 }
 
-static void test_fixup_noop(const char *expected)
-{
-    test(vlc_uri_fixup, expected, expected);
-}
-
 int main (void)
 {
     (void)setvbuf (stdout, NULL, _IONBF, 0);
@@ -383,7 +378,21 @@ int main (void)
     };
 
     for (size_t i = 0; i < ARRAY_SIZE(valid_uris); i++)
-        test_fixup_noop(valid_uris[i]);
+        test(vlc_uri_fixup, valid_uris[i], valid_uris[i]);
+
+    /* Check how invalid URIs are fixed up */
+    static const char *invalid_uris[][2] =
+    {
+        { "Hello world.txt", "Hello%20world.txt" },
+        { "Café", "Caf%C3%A9" },
+        { "100%", "100%25" },
+        { "//[1.2.3.4]/[Foo]", "//[1.2.3.4]/%5BFoo%5D" },
+        { "/[Bar]", "/%5BBar%5D" },
+        { "http://localhost/[Baz]", "http://localhost/%5BBaz%5D" },
+    };
+
+    for (size_t i = 0; i < ARRAY_SIZE(invalid_uris); i++)
+        test(vlc_uri_fixup, invalid_uris[i][0], invalid_uris[i][1]);
 
     return exitcode;
 }
