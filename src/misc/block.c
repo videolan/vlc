@@ -36,18 +36,6 @@
 #include <vlc_fs.h>
 
 #ifndef NDEBUG
-static void BlockNoRelease( block_t *b )
-{
-    fprintf( stderr, "block %p has no release callback! This is a bug!\n",
-             (void *) b );
-    abort();
-}
-
-static const struct vlc_block_callbacks block_invalid_cbs =
-{
-    BlockNoRelease,
-};
-
 static void block_Check (block_t *block)
 {
     while (block != NULL)
@@ -57,7 +45,6 @@ static void block_Check (block_t *block)
         unsigned char *bufstart = block->p_buffer;
         unsigned char *bufend = block->p_buffer + block->i_buffer;
 
-        assert(block->cbs != &block_invalid_cbs);
         assert (start <= end);
         assert (bufstart <= bufend);
         assert (bufstart >= start);
@@ -66,16 +53,8 @@ static void block_Check (block_t *block)
         block = block->p_next;
     }
 }
-
-static void block_Invalidate (block_t *block)
-{
-    block->p_next = NULL;
-    block_Check (block);
-    block->cbs = &block_invalid_cbs;
-}
 #else
 # define block_Check(b) ((void)(b))
-# define block_Invalidate(b) ((void)(b))
 #endif
 
 block_t *block_Init(block_t *restrict b, const struct vlc_block_callbacks *cbs,
@@ -100,7 +79,6 @@ static void block_generic_Release (block_t *block)
 {
     /* That is always true for blocks allocated with block_Alloc(). */
     assert (block->p_start == (unsigned char *)(block + 1));
-    block_Invalidate (block);
     free (block);
 }
 
@@ -156,6 +134,10 @@ block_t *block_Alloc (size_t size)
 
 void block_Release(block_t *block)
 {
+#ifndef NDEBUG
+    block->p_next = NULL;
+    block_Check (block);
+#endif
     block->cbs->free(block);
 }
 
@@ -260,7 +242,6 @@ block_t *block_Realloc (block_t *block, ssize_t prebody, size_t body)
 
 static void block_heap_Release (block_t *block)
 {
-    block_Invalidate (block);
     free (block->p_start);
     free (block);
 }
@@ -287,7 +268,6 @@ block_t *block_heap_Alloc (void *addr, size_t length)
 
 static void block_mmap_Release (block_t *block)
 {
-    block_Invalidate (block);
     munmap (block->p_start, block->i_size);
     free (block);
 }
