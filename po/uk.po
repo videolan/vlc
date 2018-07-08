@@ -11,15 +11,17 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 01:34+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Ukrainian (https://www.transifex.com/yaron/teams/16553/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != "
+"11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % "
+"100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || "
+"(n % 100 >=11 && n % 100 <=14 )) ? 2: 3);\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -304,7 +306,7 @@ msgstr ""
 "Мультиплексори створюють інкапсульовані формати, які використовуються для "
 "поєднання всіх простих потоків (відео, звуку тощо) в один. Ці установки "
 "дають змогу примусово використовувати певний формат мультиплексора. Зазвичай "
-"цього робити не потрібно. \n"
+"цього робити не потрібно.\n"
 "Також можна встановити типові параметри для кожного мультиплексора."
 
 #: include/vlc_config_cat.h:147
@@ -13403,7 +13405,7 @@ msgstr ""
 "P-кадр буде отриманий з декількох кадрів, а не тільки з одного кадру перед "
 "ним (див. референсні кадри). Звідси випливає, що I-кадри не обов'язково "
 "можуть бути ключовими для позиціонування. P-кадри не можуть посилатися на "
-"кадри за IDR-кадрами.\n"
+"кадри за IDR-кадрами. \n"
 "Якщо виникає зміна сцени в цьому інтервалі, то I-кадр буде вставлений, не "
 "починаючи нову GOP."
 
@@ -16469,7 +16471,6 @@ msgid ""
 msgstr "VLC media player та VideoLAN є торговими марками VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16482,11 +16483,11 @@ msgid ""
 msgstr ""
 "<p>Медіапрогравач VLC є безкоштовним медіапрогравачем з відкритим вихідним "
 "кодом, кодером та потоковим транслятором, розроблений добровольцями <a href="
-"\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
+"\"https://www.videolan.org/\"><span style=\" text-decoration: underline; "
 "color:#0057ae;\">VideoLAN</span></a> спільноти.</p><p>VLC використовує "
 "власні внутрішні кодеки, працює по суті на кожній популярній платформі і "
 "може читати майже всі файли медіа, CD, DVD, мережеві потоки, карти "
-"захоплення та інші формати медіа!</p><p><a href=\"http://www.videolan.org/"
+"захоплення та інші формати медіа!</p><p><a href=\"https://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Допоможіть та приєднайтеся до нас!</span></a>"
 
@@ -17124,9 +17125,8 @@ msgstr "Перехід до попереднього елемента"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Залишити повноекранний режим"
+msgstr "Вийти з повноекранного режиму"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
