@@ -324,18 +324,10 @@ block_t *block_mmap_Alloc (void *addr, size_t length)
 #ifdef HAVE_SYS_SHM_H
 # include <sys/shm.h>
 
-typedef struct block_shm_t
-{
-    block_t     self;
-    void       *base_addr;
-} block_shm_t;
-
 static void block_shm_Release (block_t *block)
 {
-    block_shm_t *p_sys = (block_shm_t *)block;
-
-    shmdt (p_sys->base_addr);
-    free (p_sys);
+    shmdt(block->p_start);
+    free(block);
 }
 
 static const struct vlc_block_callbacks block_shm_cbs =
@@ -345,15 +337,14 @@ static const struct vlc_block_callbacks block_shm_cbs =
 
 block_t *block_shm_Alloc (void *addr, size_t length)
 {
-    block_shm_t *block = malloc (sizeof (*block));
+    block_t *block = malloc (sizeof (*block));
     if (unlikely(block == NULL))
     {
         shmdt (addr);
         return NULL;
     }
 
-    block->base_addr = addr;
-    return block_Init(&block->self, &block_shm_cbs, (uint8_t *)addr, length);
+    return block_Init(block, &block_shm_cbs, (uint8_t *)addr, length);
 }
 #else
 block_t *block_shm_Alloc (void *addr, size_t length)
