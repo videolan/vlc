@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-09 00:53+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Khmer (https://www.transifex.com/yaron/teams/16553/km/)\n"
 "Language: km\n"
 "MIME-Version: 1.0\n"
@@ -15859,7 +15859,6 @@ msgid ""
 msgstr "កម្មវិធី​ចាក់​មេឌៀ VLC និង VideoLAN គឺជា​ស្លាក​សញ្ញា​របស់​សម្ព័ន្ធ VideoLAN ។"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15871,12 +15870,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>កម្មវិធី​ចាក់​មេឌៀ VLC គឺជា​កម្មវិធី​ស្ទ្រីម កម្មវិធី​ដាក់​លេខ​កូដ និង​ជា​កម្មវិធី​ចាក់​មេឌៀ​កូដ​ចំហ​ឥត​បង់​ថ្លៃ "
-"ដែល​បាន​បង្កើត​ដោយ​អ្នក​ស្ម័គ្រចិត្ត​របស់​សហគមន៍ <a href=\"http://www.videolan.org/\"><span "
+"ដែល​បាន​បង្កើត​ដោយ​អ្នក​ស្ម័គ្រចិត្ត​របស់​សហគមន៍ <a href=\"https://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> ។</"
 "p><p>VLC ប្រើ​ការ​បម្លែង​កូដ​ខាងក្នុង​របស់​វា ដែល​ដំណើរការ​ជាមួយ​កម្មវិធី​​ពេញ​និយម​ជាច្រើន និង​អាច​អាន​"
 "ឯកសារ​ជាច្រើន​ដូចជា ស៊ីឌី ឌីវីឌី ស្ទ្រីម​បណ្ដាញ កាត​ចាប់​យក និង​ទ្រង់ទ្រាយ​មេឌៀ​ផ្សេងទៀត!</p><p><a "
-"href=\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
-"underline; color:#0057ae;\">ជួយ​គាំទ្រ និង​ចូលរួម​ជាមួយ​ពួក​យើង!</span></a>"
+"href=\"https://www.videolan.org/contribute/\"><span style=\" text-"
+"decoration: underline; color:#0057ae;\">ជួយ​គាំទ្រ និង​ចូលរួម​ជាមួយ​ពួក​យើង!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16509,9 +16508,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "ចេញពី​ពេញ​អេក្រង់"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -25912,7 +25910,7 @@ msgid ""
 "Upconvert: output in 4:2:2 format (independent chroma for each field). Best "
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
-"ជ្រើសរើស​ការ​ប្រើ​ពណ៌​នៅ​ក្នុង​ស៊ុម​លទ្ធផល​ទាំងនោះ​ដែល​ធ្លាក់​កាត់តាម​ព្រំដែន​ស៊ុម​បញ្ចូល ។\n"
+"ជ្រើសរើស​ការ​ប្រើ​ពណ៌​នៅ​ក្នុង​ស៊ុម​លទ្ធផល​ទាំងនោះ​ដែល​ធ្លាក់​កាត់តាម​ព្រំដែន​ស៊ុម​បញ្ចូល ។ \n"
 "\n"
 "ចុងក្រោយ​បំផុត ៖ យក​ក្រូម៉ា​ពី​វាល​ថ្មី (ភ្លឺ) តែប៉ុណ្ណោះ ។ ល្អ​សម្រាប់​ការ​បញ្ចូល​ត្របាញ់ មាន​ដូចជា​វីដេអូ​ពី​ឧបករណ៍​"
 "ថត ។ \n"
