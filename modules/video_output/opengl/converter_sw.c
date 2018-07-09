@@ -592,21 +592,22 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     {
         bool supports_map_persistent = false;
 
-        const bool has_pbo =
-            vlc_gl_StrHasToken(tc->glexts, "GL_ARB_pixel_buffer_object") ||
-            vlc_gl_StrHasToken(tc->glexts, "GL_EXT_pixel_buffer_object");
-
-        const bool has_bs =
-            vlc_gl_StrHasToken(tc->glexts, "GL_ARB_buffer_storage") ||
-            vlc_gl_StrHasToken(tc->glexts, "GL_EXT_buffer_storage");
-
-        /* Ensure we do direct rendering with OpenGL 3.0 or higher. Indeed,
-         * persistent mapped buffers seems to be slow with OpenGL 2.1 drivers
-         * and bellow. This may be caused by OpenGL compatibility layer. */
+        /* Ensure we do direct rendering / PBO with OpenGL 3.0 or higher.
+         * Indeed, persistent mapped buffers or PBO seems to be slow with
+         * OpenGL 2.1 drivers and bellow. This may be caused by OpenGL
+         * compatibility layer. */
         const unsigned char *ogl_version = tc->vt->GetString(GL_VERSION);
         const bool glver_ok = strverscmp((const char *)ogl_version, "3.0") >= 0;
 
-        supports_map_persistent = glver_ok && has_pbo && has_bs && tc->gl->module
+        const bool has_pbo = glver_ok &&
+            (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_pixel_buffer_object") ||
+             vlc_gl_StrHasToken(tc->glexts, "GL_EXT_pixel_buffer_object"));
+
+        const bool has_bs = has_pbo &&
+            (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_buffer_storage") ||
+             vlc_gl_StrHasToken(tc->glexts, "GL_EXT_buffer_storage"));
+
+        supports_map_persistent = has_bs && tc->gl->module
             && tc->vt->BufferStorage && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
             && tc->vt->UnmapBuffer && tc->vt->FenceSync && tc->vt->DeleteSync
             && tc->vt->ClientWaitSync;
