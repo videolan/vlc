@@ -15,8 +15,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Dimitrios Glentadakis <dglent@free.fr>, 2018\n"
+"PO-Revision-Date: 2018-07-09 02:59+0200\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Greek (https://www.transifex.com/yaron/teams/16553/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -16620,7 +16620,6 @@ msgstr ""
 "συλλόγου VideoLAN"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16633,14 +16632,14 @@ msgid ""
 msgstr ""
 "<p>Ο αναπαραγωγός πολυμέσων VLC είναι ένας δωρεάν αναπαραγωγός πολυμέσων "
 "ανοιχτού κώδικα, κωδικοποιητής και πάροχος ροών δεδομένων που δημιουργήθηκε "
-"από εθελοντές της κοινότητας <a href=\"http://www.videolan.org/\"><span "
+"από εθελοντές της κοινότητας <a href=\"https://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a>.</"
 "p><p>Ο VLC χρησιμοποιεί τους δικούς του εσωτερικούς codecs, δουλεύει "
 "ουσιαστικά σε κάθε δημοφιλή πλατφόρμα και μπορεί να διαβάσει σχεδόν όλα τα "
 "αρχεία, CD, DVD, ροές δεδομένων δικτύου, κάρτες σύλληψης και άλλους τύπους "
-"πολυμέσων!</p><p><a href=\"http://www.videolan.org/contribute/\"><span style="
-"\" text-decoration: underline; color:#0057ae;\">Βοηθήστε και ελάτε μαζί μας!"
-"</span></a>"
+"πολυμέσων!</p><p><a href=\"https://www.videolan.org/contribute/\"><span "
+"style=\" text-decoration: underline; color:#0057ae;\">Βοηθήστε και ελάτε "
+"μαζί μας!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17281,9 +17280,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Εγκατάλειψη πλήρους οθόνης"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -27003,7 +27001,7 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Επιλογή διαχείρισης για χρώματα σε αυτά τα πλαίσια εξόδου τα οποία εμπίπτουν "
-"μέσα στα όρια του πλαισίου εισόδου \n"
+"μέσα στα όρια του πλαισίου εισόδου. \n"
 "\n"
 "Πιο πρόσφατα: Λήψη χρώματος από το νέο (φωτεινό) πεδίο μόνο. Είναι καλό για "
 "διαπλεγμένη είσοδο, όπως βίντεο από κάμερα εγγραφής. \n"
