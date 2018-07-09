@@ -515,7 +515,12 @@ static int StartMediaCodec(decoder_t *p_dec)
         args.audio.i_channel_count  = p_sys->audio.i_channels;
     }
 
-    return p_sys->api.start(&p_sys->api, &args);
+    if (p_sys->api.configure_decoder(&p_sys->api, &args) != 0)
+    {
+        return MC_API_ERROR;
+    }
+
+    return p_sys->api.start(&p_sys->api);
 }
 
 /*****************************************************************************

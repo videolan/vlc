@@ -126,7 +126,8 @@ struct mc_api
 
     void (*clean)(mc_api *);
     int (*prepare)(mc_api *, int i_profile);
-    int (*start)(mc_api *, union mc_api_args *p_args);
+    int (*configure_decoder)(mc_api *, union mc_api_args* p_args);
+    int (*start)(mc_api *);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
 

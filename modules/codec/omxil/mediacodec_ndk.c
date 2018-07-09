@@ -279,41 +279,11 @@ struct mc_api_sys
 };
 
 /*****************************************************************************
- * Stop
+ * ConfigureDecoder
  *****************************************************************************/
-static int Stop(mc_api *api)
+static int ConfigureDecoder(mc_api *api, union mc_api_args *p_args)
 {
     mc_api_sys *p_sys = api->p_sys;
-
-    api->b_direct_rendering = false;
-
-    if (p_sys->p_codec)
-    {
-        if (api->b_started)
-        {
-            syms.AMediaCodec.stop(p_sys->p_codec);
-            api->b_started = false;
-        }
-        syms.AMediaCodec.delete(p_sys->p_codec);
-        p_sys->p_codec = NULL;
-    }
-    if (p_sys->p_format)
-    {
-        syms.AMediaFormat.delete(p_sys->p_format);
-        p_sys->p_format = NULL;
-    }
-
-    msg_Dbg(api->p_obj, "MediaCodec via NDK closed");
-    return 0;
-}
-
-/*****************************************************************************
- * Start
- *****************************************************************************/
-static int Start(mc_api *api, union mc_api_args *p_args)
-{
-    mc_api_sys *p_sys = api->p_sys;
-    int i_ret = MC_API_ERROR;
     ANativeWindow *p_anw = NULL;
 
     assert(api->psz_mime && api->psz_name);
@@ -323,14 +293,14 @@ static int Start(mc_api *api, union mc_api_args *p_args)
     {
         msg_Err(api->p_obj, "AMediaCodec.createCodecByName for %s failed",
                 api->psz_name);
-        goto error;
+        return MC_API_ERROR;
     }
 
     p_sys->p_format = syms.AMediaFormat.new();
     if (!p_sys->p_format)
     {
         msg_Err(api->p_obj, "AMediaFormat.new failed");
-        goto error;
+        return MC_API_ERROR;
     }
 
     syms.AMediaFormat.setInt32(p_sys->p_format, "encoder", 0);
@@ -363,8 +333,51 @@ static int Start(mc_api *api, union mc_api_args *p_args)
                                    p_anw, NULL, 0) != AMEDIA_OK)
     {
         msg_Err(api->p_obj, "AMediaCodec.configure failed");
-        goto error;
+        return MC_API_ERROR;
     }
+
+    api->b_direct_rendering = !!p_anw;
+
+    return 0;
+}
+
+/*****************************************************************************
+ * Stop
+ *****************************************************************************/
+static int Stop(mc_api *api)
+{
+    mc_api_sys *p_sys = api->p_sys;
+
+    api->b_direct_rendering = false;
+
+    if (p_sys->p_codec)
+    {
+        if (api->b_started)
+        {
+            syms.AMediaCodec.stop(p_sys->p_codec);
+            api->b_started = false;
+        }
+        syms.AMediaCodec.delete(p_sys->p_codec);
+        p_sys->p_codec = NULL;
+    }
+    if (p_sys->p_format)
+    {
+        syms.AMediaFormat.delete(p_sys->p_format);
+        p_sys->p_format = NULL;
+    }
+
+    msg_Dbg(api->p_obj, "MediaCodec via NDK closed");
+    return 0;
+}
+
+/*****************************************************************************
+ * Start
+ *****************************************************************************/
+static int Start(mc_api *api)
+{
+    mc_api_sys *p_sys = api->p_sys;
+    int i_ret = MC_API_ERROR;
+
     if (syms.AMediaCodec.start(p_sys->p_codec) != AMEDIA_OK)
     {
         msg_Err(api->p_obj, "AMediaCodec.start failed");
@@ -372,7 +385,6 @@ static int Start(mc_api *api, union mc_api_args *p_args)
     }
 
     api->b_started = true;
-    api->b_direct_rendering = !!p_anw;
     i_ret = 0;
 
     msg_Dbg(api->p_obj, "MediaCodec via NDK opened");
@@ -634,6 +646,7 @@ int MediaCodecNdk_Init(mc_api *api)
 
     api->clean = Clean;
     api->prepare = Prepare;
+    api->configure_decoder = ConfigureDecoder;
     api->start = Start;
     api->stop = Stop;
     api->flush = Flush;
