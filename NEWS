@@ -24,6 +24,9 @@ Codecs:
  * WebP image decoding
  * Support for SMPTE-TT image profile
 
+Access:
+ * Enable SMB2 / SMB3 support on mobile ports with libsmb2
+
 Video output:
  * Remove aa plugin
  * Remove evas plugin
