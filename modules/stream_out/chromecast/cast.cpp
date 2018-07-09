@@ -324,7 +324,7 @@ static int ProxySend(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
             if (p_buffer->i_pts < p_sys->first_video_keyframe_pts
              || p_sys->first_video_keyframe_pts == -1)
             {
-                block_Release(p_buffer);
+                block_ChainRelease(p_buffer);
                 return VLC_SUCCESS;
             }
         }
@@ -347,7 +347,7 @@ static int ProxySend(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
     }
     else
     {
-        block_Release(p_buffer);
+        block_ChainRelease(p_buffer);
         return VLC_SUCCESS;
     }
 }
@@ -1409,14 +1409,14 @@ static int Send(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
 
     if( p_sys->isFlushing( p_stream ) )
     {
-        block_Release( p_buffer );
+        block_ChainRelease( p_buffer );
         return VLC_SUCCESS;
     }
 
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id );
     if ( next_id == NULL )
     {
-        block_Release( p_buffer );
+        block_ChainRelease( p_buffer );
         return VLC_EGENERIC;
     }
 
