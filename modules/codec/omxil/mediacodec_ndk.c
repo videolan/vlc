@@ -601,9 +601,9 @@ static void Clean(mc_api *api)
 }
 
 /*****************************************************************************
- * Configure
+ * Prepare
  *****************************************************************************/
-static int Configure(mc_api * api, int i_profile)
+static int Prepare(mc_api * api, int i_profile)
 {
     free(api->psz_name);
     bool b_adaptive;
@@ -633,7 +633,7 @@ int MediaCodecNdk_Init(mc_api *api)
         return MC_API_ERROR;
 
     api->clean = Clean;
-    api->configure = Configure;
+    api->prepare = Prepare;
     api->start = Start;
     api->stop = Stop;
     api->flush = Flush;

@@ -643,14 +643,14 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         free(p_sys);
         return VLC_EGENERIC;
     }
-    if (p_sys->api.configure(&p_sys->api, i_profile) != 0)
+    if (p_sys->api.prepare(&p_sys->api, i_profile) != 0)
     {
         /* If the device can't handle video/wvc1,
          * it can probably handle video/x-ms-wmv */
         if (!strcmp(mime, "video/wvc1") && p_dec->fmt_in.i_codec == VLC_CODEC_VC1)
         {
             p_sys->api.psz_mime = "video/x-ms-wmv";
-            if (p_sys->api.configure(&p_sys->api, i_profile) != 0)
+            if (p_sys->api.prepare(&p_sys->api, i_profile) != 0)
             {
                 p_sys->api.clean(&p_sys->api);
                 free(p_sys);

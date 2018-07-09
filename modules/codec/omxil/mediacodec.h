@@ -116,7 +116,7 @@ struct mc_api
     enum es_format_category_e i_cat;
     vlc_fourcc_t    i_codec;
 
-    /* Set after configure */
+    /* Set after prepare */
     int  i_quirks;
     char *psz_name;
     bool b_support_rotation;
@@ -125,7 +125,7 @@ struct mc_api
     bool b_direct_rendering;
 
     void (*clean)(mc_api *);
-    int (*configure)(mc_api *, int i_profile);
+    int (*prepare)(mc_api *, int i_profile);
     int (*start)(mc_api *, union mc_api_args *p_args);
     int (*stop)(mc_api *);
     int (*flush)(mc_api *);
