@@ -91,7 +91,7 @@ cvpxpic_attach_common(picture_t *p_pic, CVPixelBufferRef cvpx,
     ctx->s.copy = cvpxpic_copy_cb;
     ctx->cvpx = CVPixelBufferRetain(cvpx);
     ctx->nb_fields = p_pic->i_nb_fields;
-    atomic_init(&ctx->ref_count, 1);
+    vlc_atomic_rc_init(&ctx->rc);
 
     ctx->on_released_cb = on_released_cb;
     ctx->on_released_data = on_released_data;
