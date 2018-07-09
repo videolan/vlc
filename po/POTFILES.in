@@ -211,6 +211,7 @@ modules/access/sdp.c
 modules/access/sftp.c
 modules/access/shm.c
 modules/access/smb_common.h
+modules/access/smb2.c
 modules/access/srt.c
 modules/access/tcp.c
 modules/access/timecode.c
