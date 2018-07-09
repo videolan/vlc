@@ -73,26 +73,21 @@ static subpicture_t *transcode_dequeue_all_subs( sout_stream_id_sys_t *id )
     return p_subpics;
 }
 
-static void transcode_spu_encoder_close( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
+int transcode_spu_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
+                        sout_stream_id_sys_t *id )
 {
-    VLC_UNUSED(p_stream);
-    if( id->p_encoder->p_module )
-        module_unneed( id->p_encoder, id->p_encoder->p_module );
-}
+    if( id->p_enccfg->i_codec )
+        msg_Dbg( p_stream, "creating subtitle transcoding from fcc=`%4.4s' "
+                 "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
+                 (char*)&id->p_enccfg->i_codec );
+    else
+        msg_Dbg( p_stream, "subtitle (fcc=`%4.4s') overlaying",
+                 (char*)&p_fmt->i_codec );
 
-static int transcode_spu_encoder_open( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
-{
-    VLC_UNUSED(p_stream);
-    id->p_encoder->p_cfg = id->p_enccfg->p_config_chain;
+    id->fifo.spu.first = NULL;
+    id->fifo.spu.last = &id->fifo.spu.first;
+    id->b_transcode = true;
 
-    id->p_encoder->p_module = module_need( id->p_encoder, "encoder",
-                                           id->p_enccfg->psz_name, true );
-
-    return ( id->p_encoder->p_module ) ? VLC_SUCCESS: VLC_EGENERIC;
-}
-
-static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
-{
     /*
      * Open decoder
      */
@@ -106,10 +101,7 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
         },
     };
     id->p_decoder->cbs = &dec_cbs;
-
     id->p_decoder->pf_decode = NULL;
-    /* id->p_decoder->p_cfg = p_sys->p_spu_cfg; */
-
     id->p_decoder->p_module =
         module_need_var( id->p_decoder, "spu decoder", "codec" );
 
@@ -123,24 +115,51 @@ static int transcode_spu_new( sout_stream_t *p_stream, sout_stream_id_sys_t *id 
     {
         /* Open encoder */
         /* Initialization of encoder format structures */
-        es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
-                        id->p_decoder->fmt_in.i_codec );
-
-        if( transcode_spu_encoder_open( p_stream, id ) )
+        assert(!id->encoder);
+        id->encoder = transcode_encoder_new( VLC_OBJECT(p_stream), &id->p_decoder->fmt_in );
+        if( !id->encoder )
         {
-            es_format_Clean( &id->p_encoder->fmt_in );
             module_unneed( id->p_decoder, id->p_decoder->p_module );
             id->p_decoder->p_module = NULL;
-            msg_Err( p_stream, "cannot find spu encoder (%s)", id->p_enccfg->psz_name );
             return VLC_EGENERIC;
         }
+
+        if( transcode_encoder_open( id->encoder, id->p_enccfg ) )
+        {
+            msg_Err( p_stream, "cannot find spu encoder (%s)", id->p_enccfg->psz_name );
+            transcode_encoder_delete( id->encoder );
+            module_unneed( id->p_decoder, id->p_decoder->p_module );
+            id->p_decoder->p_module = NULL;
+            return VLC_EGENERIC;
+        }
+
+        /* open output stream */
+        id->downstream_id =
+                id->pf_transcode_downstream_add( p_stream,
+                                                 &id->p_decoder->fmt_in,
+                                                 transcode_encoder_format_out( id->encoder ) );
+        if( !id->downstream_id )
+        {
+            msg_Err( p_stream, "cannot output transcoded stream %4.4s",
+                               (char *) &id->p_enccfg->i_codec );
+            transcode_encoder_close( id->encoder );
+            transcode_encoder_delete( id->encoder );
+            module_unneed( id->p_decoder, id->p_decoder->p_module );
+            id->p_decoder->p_module = NULL;
+            return VLC_EGENERIC;
+        }
+    }
+    else
+    {
+        assert( id->p_enccfg->i_codec == 0 /* !overlay */ );
     }
 
     return VLC_SUCCESS;
 }
 
-void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_sys_t *id)
+void transcode_spu_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id)
 {
+    VLC_UNUSED(p_stream);
     /* Close decoder */
     if( id->p_decoder->p_module )
         module_unneed( id->p_decoder, id->p_decoder->p_module );
@@ -148,7 +167,11 @@ void transcode_spu_close( sout_stream_t *p_stream, sout_stream_id_sys_t *id)
         vlc_meta_Delete( id->p_decoder->p_description );
 
     /* Close encoder */
-    transcode_spu_encoder_close( p_stream, id );
+    if( id->encoder )
+    {
+        transcode_encoder_close( id->encoder );
+        transcode_encoder_delete( id->encoder );
+    }
 }
 
 int transcode_spu_process( sout_stream_t *p_stream,
@@ -224,7 +247,7 @@ int transcode_spu_process( sout_stream_t *p_stream,
             subpicture_Update( p_subpic, &fmt.video, &fmt.video, p_subpic->i_start );
             es_format_Clean( &fmt );
 
-            p_block = id->p_encoder->pf_encode_sub( id->p_encoder, p_subpic );
+            p_block = transcode_encoder_encode( id->encoder, p_subpic );
             subpicture_Delete( p_subpic );
             if( p_block )
                 block_ChainAppend( out, p_block );
@@ -234,55 +257,4 @@ int transcode_spu_process( sout_stream_t *p_stream,
     } while( p_subpics );
 
     return b_error ? VLC_EGENERIC : VLC_SUCCESS;
-}
-
-bool transcode_spu_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
-                        sout_stream_id_sys_t *id )
-{
-    id->fifo.spu.first = NULL;
-    id->fifo.spu.last = &id->fifo.spu.first;
-
-    if( id->p_enccfg->i_codec )
-    {
-        msg_Dbg( p_stream, "creating subtitle transcoding from fcc=`%4.4s' "
-                 "to fcc=`%4.4s'", (char*)&p_fmt->i_codec,
-                 (char*)&id->p_enccfg->i_codec );
-
-        /* Complete destination format */
-        id->p_encoder->fmt_out.i_codec = id->p_enccfg->i_codec;
-
-        /* build decoder -> filter -> encoder */
-        if( transcode_spu_new( p_stream, id ) )
-        {
-            msg_Err( p_stream, "cannot create subtitle chain" );
-            return false;
-        }
-
-        /* open output stream */
-        id->downstream_id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
-        id->b_transcode = true;
-
-        if( !id->downstream_id )
-        {
-            transcode_spu_close( p_stream, id );
-            return false;
-        }
-    }
-    else
-    {
-        assert( id->p_enccfg->i_codec == 0 /* !overlay */ );
-        msg_Dbg( p_stream, "subtitle (fcc=`%4.4s') overlaying",
-                 (char*)&p_fmt->i_codec );
-
-        id->b_transcode = true;
-
-        /* Build decoder -> filter -> overlaying chain */
-        if( transcode_spu_new( p_stream, id ) )
-        {
-            msg_Err( p_stream, "cannot create subtitle chain" );
-            return false;
-        }
-    }
-
-    return true;
 }

@@ -40,26 +40,6 @@
 
 #include "transcode.h"
 
-static const int pi_channels_maps[9] =
-{
-    0,
-    AOUT_CHAN_CENTER,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LFE  | AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARLEFT | AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER
-     | AOUT_CHAN_REARCENTER | AOUT_CHAN_MIDDLELEFT
-     | AOUT_CHAN_MIDDLERIGHT | AOUT_CHAN_LFE,
-    AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT | AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT
-     | AOUT_CHAN_REARRIGHT | AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT
-     | AOUT_CHAN_LFE,
-};
-
 static int audio_update_format( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -69,7 +49,8 @@ static int audio_update_format( decoder_t *p_dec )
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
     vlc_mutex_lock(&id->fifo.lock);
-    id->audio_dec_out = p_dec->fmt_out.audio;
+    es_format_Clean( &id->decoder_out );
+    es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
     vlc_mutex_unlock(&id->fifo.lock);
 
     return ( p_dec->fmt_out.audio.i_bitspersample > 0 ) ? 0 : -1;
@@ -91,145 +72,6 @@ static int transcode_audio_filters_init( sout_stream_t *p_stream,
     var_Destroy( p_stream, "audio-filter" );
     var_Destroy( p_stream, "audio-time-stretch" );
     return ( *pp_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;
-}
-
-static int transcode_audio_encoder_open( sout_stream_t *p_stream,
-                                         sout_stream_id_sys_t *id )
-{
-    id->p_encoder->p_module = module_need( id->p_encoder, "encoder",
-                                           id->p_enccfg->psz_name, true );
-    /* p_sys->i_acodec = 0 if there isn't acodec defined */
-    if( !id->p_encoder->p_module )
-    {
-        msg_Err( p_stream, "cannot find audio encoder (module:%s fourcc:%4.4s). "
-                           "Take a look few lines earlier to see possible reason.",
-                           id->p_enccfg->psz_name ? id->p_enccfg->psz_name : "any",
-                           (char *)&id->p_enccfg->i_codec );
-        return VLC_EGENERIC;
-    }
-
-    id->downstream_id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
-    if ( !id->downstream_id )
-    {
-        msg_Err( p_stream, "cannot add this stream" );
-        module_unneed( id->p_encoder, id->p_encoder->p_module );
-        id->p_encoder->p_module = NULL;
-        return VLC_EGENERIC;
-    }
-
-    id->p_encoder->fmt_out.i_codec =
-            vlc_fourcc_GetCodec( AUDIO_ES, id->p_encoder->fmt_out.i_codec );
-
-    return VLC_SUCCESS;
-}
-
-static int transcode_audio_encoder_configure( vlc_object_t *p_obj,
-                                              const sout_encoder_config_t *p_cfg,
-                                              const audio_format_t *p_dec_out,
-                                              encoder_t *p_encoder )
-{
-    VLC_UNUSED(p_obj);
-    audio_format_t *p_enc_in = &p_encoder->fmt_in.audio;
-    audio_format_t *p_enc_out = &p_encoder->fmt_out.audio;
-
-    /* Complete destination format */
-    p_encoder->fmt_out.i_codec = p_cfg->i_codec;
-    p_encoder->fmt_out.audio.i_format = p_cfg->i_codec;
-    p_encoder->fmt_out.i_bitrate = p_cfg->audio.i_bitrate;
-    p_enc_out->i_rate = p_cfg->audio.i_sample_rate ? p_cfg->audio.i_sample_rate
-                                                   : p_dec_out->i_rate;
-    p_enc_out->i_bitspersample = p_dec_out->i_bitspersample;
-    p_enc_out->i_channels = p_cfg->audio.i_channels ? p_cfg->audio.i_channels
-                                                    : p_dec_out->i_channels;
-    aout_FormatPrepare( p_enc_out );
-    assert(p_enc_out->i_channels > 0);
-    if( p_enc_out->i_channels >= ARRAY_SIZE(pi_channels_maps) )
-        p_enc_out->i_channels = ARRAY_SIZE(pi_channels_maps) - 1;
-
-    p_enc_in->i_physical_channels =
-    p_enc_out->i_physical_channels = pi_channels_maps[p_enc_out->i_channels];
-
-    /* Initialization of encoder format structures */
-    es_format_Init( &p_encoder->fmt_in, AUDIO_ES, p_dec_out->i_format );
-    p_enc_in->i_format = p_dec_out->i_format;
-    p_enc_in->i_rate = p_enc_out->i_rate;
-    p_enc_in->i_physical_channels = p_enc_out->i_physical_channels;
-    aout_FormatPrepare( p_enc_in );
-
-    p_encoder->p_cfg = p_cfg->p_config_chain;
-
-    /* Fix input format */
-    p_enc_in->i_format = p_encoder->fmt_in.i_codec;
-    if( !p_enc_in->i_physical_channels )
-    {
-        if( p_enc_in->i_channels < ARRAY_SIZE(pi_channels_maps) )
-            p_enc_in->i_physical_channels = pi_channels_maps[p_enc_in->i_channels];
-    }
-    aout_FormatPrepare( p_enc_in );
-
-    return VLC_SUCCESS;
-}
-
-static int transcode_audio_encoder_test( vlc_object_t *p_obj,
-                                         const audio_format_t *p_dec_out,
-                                         vlc_fourcc_t i_codec_in,
-                                         const sout_encoder_config_t *p_cfg,
-                                         const es_format_t *p_enc_fmtout,
-                                         es_format_t *p_enc_wanted_in )
-{
-    encoder_t *p_encoder = sout_EncoderCreate( p_obj );
-    if( !p_encoder )
-        return VLC_EGENERIC;
-
-    p_encoder->p_cfg = p_cfg->p_config_chain;
-
-    es_format_Init( &p_encoder->fmt_in, AUDIO_ES, i_codec_in );
-    p_encoder->fmt_in.audio = *p_dec_out;
-    es_format_Init( &p_encoder->fmt_out, AUDIO_ES, 0 );
-    es_format_Copy( &p_encoder->fmt_out, p_enc_fmtout );
-
-    audio_format_t *p_afmt_out = &p_encoder->fmt_out.audio;
-
-    if( transcode_audio_encoder_configure( p_obj, p_cfg, p_dec_out, p_encoder ) )
-    {
-        es_format_Clean( &p_encoder->fmt_in );
-        es_format_Clean( &p_encoder->fmt_out );
-        vlc_object_release( p_encoder );
-        return VLC_EGENERIC;
-    }
-
-    p_encoder->fmt_in.audio.i_format = i_codec_in;
-
-    if( p_afmt_out->i_channels == 0 )
-    {
-        p_afmt_out->i_channels = 2;
-        p_afmt_out->i_physical_channels = AOUT_CHANS_STEREO;
-    }
-
-    module_t *p_module = module_need( p_encoder, "encoder", p_cfg->psz_name, true );
-    if( !p_module )
-    {
-        msg_Err( p_obj, "cannot find audio encoder (module:%s fourcc:%4.4s). "
-                           "Take a look few lines earlier to see possible reason.",
-                           p_cfg->psz_name ? p_cfg->psz_name : "any",
-                           (char *)&p_cfg->i_codec );
-    }
-    else
-    {
-        /* Close the encoder.
-         * We'll open it only when we have the first frame. */
-        module_unneed( p_encoder, p_module );
-    }
-
-    /* copy our requested format */
-    es_format_Copy( p_enc_wanted_in, &p_encoder->fmt_in );
-
-    es_format_Clean( &p_encoder->fmt_in );
-    es_format_Clean( &p_encoder->fmt_out );
-
-    vlc_object_release( p_encoder );
-
-    return p_module != NULL ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
 static void decoder_queue_audio( decoder_t *p_dec, block_t *p_audio )
@@ -254,9 +96,18 @@ static block_t *transcode_dequeue_all_audios( sout_stream_id_sys_t *id )
     return p_audio_bufs;
 }
 
-static int transcode_audio_new( sout_stream_t *p_stream,
-                                sout_stream_id_sys_t *id )
+int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
+                          sout_stream_id_sys_t *id )
 {
+    msg_Dbg( p_stream,
+             "creating audio transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
+             (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
+
+    id->fifo.audio.first = NULL;
+    id->fifo.audio.last = &id->fifo.audio.first;
+    id->b_transcode = true;
+    es_format_Init( &id->decoder_out, AUDIO_ES, 0 );
+
     /*
      * Open decoder
      */
@@ -270,69 +121,83 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         },
     };
     id->p_decoder->cbs = &dec_cbs;
-
     id->p_decoder->pf_decode = NULL;
-    /* id->p_decoder->p_cfg = id->p_enccfg->p_config_chain; */
-    id->p_decoder->p_module =
-        module_need_var( id->p_decoder, "audio decoder", "codec" );
+    id->p_decoder->p_module = module_need_var( id->p_decoder, "audio decoder", "codec" );
     if( !id->p_decoder->p_module )
     {
         msg_Err( p_stream, "cannot find audio decoder" );
+        es_format_Clean( &id->decoder_out );
         return VLC_EGENERIC;
+    }
+
+    if( id->decoder_out.i_codec == 0 ) /* format_update can happen on open() */
+    {
+        es_format_Clean( &id->decoder_out );
+        es_format_Copy( &id->decoder_out, &id->p_decoder->fmt_out );
     }
 
     vlc_mutex_lock(&id->fifo.lock);
 
-    id->audio_dec_out = id->p_decoder->fmt_out.audio;
     /* The decoder fmt_out can be uninitialized here (since it can initialized
-     * asynchronously). Fix audio_dec_out with default values in that case.
+     * asynchronously). Fix decoder_out with default values in that case.
      * This should be enough to initialize the encoder for the first time (it
      * will be reloaded when all informations from the decoder are available).
      * */
-    id->audio_dec_out.i_format = FIRSTVALID( id->audio_dec_out.i_format,
-                                             id->p_decoder->fmt_out.i_codec,
-                                             VLC_CODEC_FL32 );
-    id->audio_dec_out.i_rate = FIRSTVALID( id->audio_dec_out.i_rate,
-                                           id->p_decoder->fmt_in.audio.i_rate,
-                                           48000 );
-    id->audio_dec_out.i_physical_channels =
-            FIRSTVALID( id->audio_dec_out.i_physical_channels,
+    id->decoder_out.audio.i_format = FIRSTVALID( id->decoder_out.audio.i_format,
+                                                 id->p_decoder->fmt_out.i_codec,
+                                                 VLC_CODEC_FL32 );
+    id->decoder_out.audio.i_rate = FIRSTVALID( id->decoder_out.audio.i_rate,
+                                               id->p_decoder->fmt_in.audio.i_rate,
+                                               48000 );
+    id->decoder_out.audio.i_physical_channels =
+            FIRSTVALID( id->decoder_out.audio.i_physical_channels,
                         id->p_decoder->fmt_in.audio.i_physical_channels,
                         AOUT_CHANS_STEREO );
-    aout_FormatPrepare( &id->audio_dec_out );
+    aout_FormatPrepare( &id->decoder_out.audio );
 
-    /* Initialization of encoder format structures */
-    es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
-                    id->p_decoder->fmt_out.i_codec );
     /* Should be the same format until encoder loads */
-    es_format_Init( &id->encoder_tested_fmt_in, id->p_decoder->fmt_in.i_cat,
-                    id->p_decoder->fmt_out.i_codec );
+    es_format_t encoder_tested_fmt_in;
+    es_format_Init( &encoder_tested_fmt_in, id->decoder_out.i_cat, 0 );
 
     /* The decoder fmt_out can be uninitialized here (since it can initialized
      * asynchronously). Fix audio_dec_out with default values in that case.
      * This should be enough to initialize the encoder for the first time (it
      * will be reloaded when all informations from the decoder are available).
      * */
-    if( transcode_audio_encoder_test( VLC_OBJECT(p_stream),
-                                                &id->audio_dec_out,
-                                                id->p_decoder->fmt_out.i_codec,
-                                                id->p_enccfg,
-                                                &id->p_encoder->fmt_out,
-                                                &id->encoder_tested_fmt_in ) != VLC_SUCCESS )
+    if( transcode_encoder_test( VLC_OBJECT(p_stream),
+                                id->p_enccfg,
+                                &id->decoder_out,
+                                id->p_decoder->fmt_out.i_codec,
+                                &encoder_tested_fmt_in ) )
     {
         vlc_mutex_unlock(&id->fifo.lock);
         module_unneed( id->p_decoder, id->p_decoder->p_module );
         id->p_decoder->p_module = NULL;
-        es_format_Clean( &id->encoder_tested_fmt_in );
+        es_format_Clean( &id->decoder_out );
+        es_format_Clean( &encoder_tested_fmt_in );
         return VLC_EGENERIC;
     }
 
+    es_format_SetMeta( &encoder_tested_fmt_in, p_fmt );
+
     vlc_mutex_unlock(&id->fifo.lock);
+
+    id->encoder = transcode_encoder_new( VLC_OBJECT(p_stream), &encoder_tested_fmt_in );
+    if( !id->encoder )
+    {
+        module_unneed( id->p_decoder, id->p_decoder->p_module );
+        id->p_decoder->p_module = NULL;
+        es_format_Clean( &id->decoder_out );
+        es_format_Clean( &encoder_tested_fmt_in );
+        return VLC_EGENERIC;
+    }
+
+    es_format_Clean( &encoder_tested_fmt_in );
 
     return VLC_SUCCESS;
 }
 
-void transcode_audio_close( sout_stream_id_sys_t *id )
+void transcode_audio_clean( sout_stream_id_sys_t *id )
 {
     /* Close decoder */
     if( id->p_decoder->p_module )
@@ -344,9 +209,10 @@ void transcode_audio_close( sout_stream_id_sys_t *id )
     id->p_decoder->p_description = NULL;
 
     /* Close encoder */
-    if( id->p_encoder->p_module )
-        module_unneed( id->p_encoder, id->p_encoder->p_module );
-    id->p_encoder->p_module = NULL;
+    transcode_encoder_close( id->encoder );
+    transcode_encoder_delete( id->encoder );
+
+    es_format_Clean( &id->decoder_out );
 
     /* Close filters */
     if( id->p_af_chain != NULL )
@@ -389,14 +255,14 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         vlc_mutex_lock(&id->fifo.lock);
 
-        if( p_audio_buf && ( unlikely(id->p_encoder->p_module == NULL) ||
-              !transcode_audio_format_IsSimilar( &id->fmt_input_audio, &id->audio_dec_out ) ) )
+        if( p_audio_buf && ( unlikely(!transcode_encoder_opened( id->encoder )) ||
+            !transcode_audio_format_IsSimilar( &id->fmt_input_audio, &id->decoder_out.audio ) ) )
         {
-            if( id->p_encoder->p_module == NULL )
+            if( !transcode_encoder_opened( id->encoder ) )
             {
-                transcode_audio_encoder_configure( VLC_OBJECT(p_stream), id->p_enccfg,
-                                                   &id->audio_dec_out, id->p_encoder );
-                id->fmt_input_audio = id->audio_dec_out;
+                transcode_encoder_audio_configure( VLC_OBJECT(p_stream), id->p_enccfg,
+                                                   &id->decoder_out.audio, id->encoder );
+                id->fmt_input_audio = id->decoder_out.audio;
             }
             else
             {
@@ -411,20 +277,32 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
             if( transcode_audio_filters_init( p_stream,
                                               id->p_filterscfg,
-                                              &id->audio_dec_out,
-                                              &id->p_encoder->fmt_in.audio,
+                                              &id->decoder_out.audio,
+                                              &transcode_encoder_format_in( id->encoder )->audio,
                                               &id->p_af_chain ) )
             {
                 vlc_mutex_unlock(&id->fifo.lock);
                 goto error;
             }
 
-            date_Init( &id->next_input_pts, id->audio_dec_out.i_rate, 1 );
+            date_Init( &id->next_input_pts, id->decoder_out.audio.i_rate, 1 );
             date_Set( &id->next_input_pts, p_audio_buf->i_pts );
 
-            if( id->p_encoder->p_module == NULL &&
-                transcode_audio_encoder_open( p_stream, id ) )
+            if( !transcode_encoder_opened( id->encoder ) &&
+                transcode_encoder_open( id->encoder, id->p_enccfg ) )
             {
+                vlc_mutex_unlock(&id->fifo.lock);
+                goto error;
+            }
+
+            id->downstream_id =
+                    id->pf_transcode_downstream_add( p_stream,
+                                                     &id->p_decoder->fmt_in,
+                                                     transcode_encoder_format_out( id->encoder ) );
+            if( !id->downstream_id )
+            {
+                msg_Err( p_stream, "cannot output transcoded stream %4.4s",
+                                   (char *) &id->p_enccfg->i_codec );
                 vlc_mutex_unlock(&id->fifo.lock);
                 goto error;
             }
@@ -460,8 +338,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
 
         p_audio_buf->i_dts = p_audio_buf->i_pts;
 
-        block_t *p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );
-
+        block_t *p_block = transcode_encoder_encode( id->encoder, p_audio_buf );
         block_ChainAppend( out, p_block );
         block_Release( p_audio_buf );
         continue;
@@ -472,37 +349,14 @@ error:
     } while( p_audio_bufs );
 
     /* Drain encoder */
-    if( unlikely( !id->b_error && in == NULL ) && id->p_encoder->p_module )
+    if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
         block_t *p_block;
         do {
-            p_block = id->p_encoder->pf_encode_audio(id->p_encoder, NULL );
+            p_block = transcode_encoder_encode( id->encoder, NULL );
             block_ChainAppend( out, p_block );
         } while( p_block );
     }
 
     return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;
-}
-
-bool transcode_audio_add( sout_stream_t *p_stream, const es_format_t *p_fmt,
-            sout_stream_id_sys_t *id )
-{
-    msg_Dbg( p_stream,
-             "creating audio transcoding from fcc=`%4.4s' to fcc=`%4.4s'",
-             (char*)&p_fmt->i_codec, (char*)&id->p_enccfg->i_codec );
-
-    id->fifo.audio.first = NULL;
-    id->fifo.audio.last = &id->fifo.audio.first;
-
-    /* Build decoder -> filter -> encoder chain */
-    if( transcode_audio_new( p_stream, id ) == VLC_EGENERIC )
-    {
-        msg_Err( p_stream, "cannot create audio chain" );
-        return false;
-    }
-
-    /* Open output stream */
-    id->b_transcode = true;
-
-    return true;
 }

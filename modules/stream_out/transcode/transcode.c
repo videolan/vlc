@@ -235,7 +235,7 @@ static void *Add( sout_stream_t *, const es_format_t * );
 static void  Del( sout_stream_t *, void * );
 static int   Send( sout_stream_t *, void *, block_t * );
 
-static void SetAudioEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+static void SetAudioEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "aenc" );
     if( psz_string && *psz_string )
@@ -285,7 +285,7 @@ static void SetAudioEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_
     p_cfg->psz_lang = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "alang" );
 }
 
-static void SetVideoEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+static void SetVideoEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "venc" );
     if( psz_string && *psz_string )
@@ -333,7 +333,7 @@ static void SetVideoEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_
         p_cfg->video.threads.i_priority = VLC_THREAD_PRIORITY_VIDEO;
 }
 
-static void SetSPUEncoderConfig( sout_stream_t *p_stream, sout_encoder_config_t *p_cfg )
+static void SetSPUEncoderConfig( sout_stream_t *p_stream, transcode_encoder_config_t *p_cfg )
 {
     char *psz_string = var_GetString( p_stream, SOUT_CFG_PREFIX "senc" );
     if( psz_string && *psz_string )
@@ -377,7 +377,7 @@ static int Open( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     /* Audio transcoding parameters */
-    sout_encoder_config_init( &p_sys->aenc_cfg );
+    transcode_encoder_config_init( &p_sys->aenc_cfg );
     SetAudioEncoderConfig( p_stream, &p_sys->aenc_cfg );
 
     /* Audio Filter Parameters */
@@ -390,7 +390,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_string );
 
     /* Video transcoding parameters */
-    sout_encoder_config_init( &p_sys->venc_cfg );
+    transcode_encoder_config_init( &p_sys->venc_cfg );
 
     SetVideoEncoderConfig( p_stream, &p_sys->venc_cfg );
     p_sys->b_master_sync = (p_sys->venc_cfg.video.fps.num > 0);
@@ -431,7 +431,7 @@ static int Open( vlc_object_t *p_this )
         free( psz_string );
 
     /* Subpictures transcoding parameters */
-    sout_encoder_config_init( &p_sys->senc_cfg );
+    transcode_encoder_config_init( &p_sys->senc_cfg );
 
     SetSPUEncoderConfig( p_stream, &p_sys->senc_cfg );
     if( p_sys->senc_cfg.i_codec )
@@ -458,13 +458,13 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
-    sout_encoder_config_clean( &p_sys->venc_cfg );
+    transcode_encoder_config_clean( &p_sys->venc_cfg );
     sout_filters_config_clean( &p_sys->vfilters_cfg );
 
-    sout_encoder_config_clean( &p_sys->aenc_cfg );
+    transcode_encoder_config_clean( &p_sys->aenc_cfg );
     sout_filters_config_clean( &p_sys->afilters_cfg );
 
-    sout_encoder_config_clean( &p_sys->senc_cfg );
+    transcode_encoder_config_clean( &p_sys->senc_cfg );
 
     free( p_sys );
 }
@@ -478,13 +478,6 @@ static void DeleteSoutStreamID( sout_stream_id_sys_t *id )
             es_format_Clean( &id->p_decoder->fmt_in );
             es_format_Clean( &id->p_decoder->fmt_out );
             vlc_object_release( id->p_decoder );
-        }
-
-        if( id->p_encoder )
-        {
-            es_format_Clean( &id->p_encoder->fmt_in );
-            es_format_Clean( &id->p_encoder->fmt_out );
-            vlc_object_release( id->p_encoder );
         }
 
         vlc_mutex_destroy(&id->fifo.lock);
@@ -537,6 +530,34 @@ static int ValidateDrift( void *cbdata, vlc_tick_t i_drift )
     return VLC_SUCCESS;
 }
 
+static void *transcode_downstream_Add( sout_stream_t *p_stream,
+                                       const es_format_t *fmt_orig,
+                                       const es_format_t *fmt)
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+
+    es_format_t tmp;
+    es_format_Init( &tmp, fmt->i_cat, fmt->i_codec );
+    es_format_Copy( &tmp, fmt );
+
+    if( !fmt->psz_language )
+    {
+        if( p_sys->aenc_cfg.psz_lang )
+            tmp.psz_language = strdup( p_sys->aenc_cfg.psz_lang );
+        else if( fmt_orig->psz_language )
+            tmp.psz_language = strdup( fmt_orig->psz_language );
+    }
+
+    if( tmp.i_id != fmt_orig->i_id )
+        tmp.i_id = fmt_orig->i_id;
+    if( tmp.i_group != fmt_orig->i_group )
+        tmp.i_group = fmt_orig->i_group;
+
+    void *downstream = sout_StreamIdAdd( p_stream->p_next, &tmp );
+    es_format_Clean( &tmp );
+    return downstream;
+}
+
 static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -544,12 +565,10 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
 
     id = calloc( 1, sizeof( sout_stream_id_sys_t ) );
     if( !id )
-        goto error;
+        return NULL;
 
     vlc_mutex_init(&id->fifo.lock);
-    id->downstream_id = NULL;
-    id->p_decoder = NULL;
-    id->p_encoder = NULL;
+    id->pf_transcode_downstream_add = transcode_downstream_Add;
 
     /* Create decoder object */
     struct decoder_owner * p_owner = vlc_object_create( p_stream, sizeof( *p_owner ) );
@@ -561,6 +580,7 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
     id->p_decoder->p_module = NULL;
     es_format_Init( &id->p_decoder->fmt_out, p_fmt->i_cat, 0 );
     es_format_Copy( &id->p_decoder->fmt_in, p_fmt );
+    es_format_SetMeta( &id->p_decoder->fmt_out, &id->p_decoder->fmt_in );
     id->p_decoder->b_frame_drop_allowed = false;
 
     switch( p_fmt->i_cat )
@@ -591,45 +611,28 @@ static void *Add( sout_stream_t *p_stream, const es_format_t *p_fmt )
             break;
     }
 
-    /* Create encoder object */
-    id->p_encoder = sout_EncoderCreate( p_stream );
-    if( !id->p_encoder )
-        goto error;
-    id->p_encoder->p_module = NULL;
-
-    /* Create destination format */
-    es_format_Init( &id->p_encoder->fmt_in, p_fmt->i_cat, 0 );
-    es_format_Init( &id->p_encoder->fmt_out, p_fmt->i_cat, 0 );
-    id->p_encoder->fmt_out.i_id    = p_fmt->i_id;
-    id->p_encoder->fmt_out.i_group = p_fmt->i_group;
-
-    if( p_sys->aenc_cfg.psz_lang )
-        id->p_encoder->fmt_out.psz_language = strdup( p_sys->aenc_cfg.psz_lang );
-    else if( p_fmt->psz_language )
-        id->p_encoder->fmt_out.psz_language = strdup( p_fmt->psz_language );
-
     bool success;
 
     if( p_fmt->i_cat == AUDIO_ES && id->p_enccfg->i_codec )
     {
-        success = transcode_audio_add(p_stream, p_fmt, id);
+        success = !transcode_audio_init(p_stream, p_fmt, id);
         if( success && p_sys->b_master_sync && !p_sys->id_master_sync )
             p_sys->id_master_sync = id;
     }
     else if( p_fmt->i_cat == VIDEO_ES && id->p_enccfg->i_codec )
     {
-        success = transcode_video_add(p_stream, p_fmt, id);
+        success = !transcode_video_init(p_stream, p_fmt, id);
         if( success && !p_sys->id_video )
             p_sys->id_video = id;
     }
     else if( ( p_fmt->i_cat == SPU_ES ) &&
              ( id->p_enccfg->i_codec || p_sys->b_soverlay ) )
-        success = transcode_spu_add(p_stream, p_fmt, id);
+        success = !transcode_spu_init(p_stream, p_fmt, id);
     else
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&p_fmt->i_codec );
-        id->downstream_id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
+        id->downstream_id = transcode_downstream_Add( p_stream, p_fmt, p_fmt );
         id->b_transcode = false;
 
         success = id->downstream_id;
@@ -655,7 +658,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         {
         case AUDIO_ES:
             Send( p_stream, id, NULL );
-            transcode_audio_close( id );
+            transcode_audio_clean( id );
             if( id == p_sys->id_master_sync )
                 p_sys->id_master_sync = NULL;
             break;
@@ -663,10 +666,10 @@ static void Del( sout_stream_t *p_stream, void *_id )
             Send( p_stream, id, NULL );
             if( id == p_sys->id_video )
                 p_sys->id_video = NULL;
-            transcode_video_close( p_stream, id );
+            transcode_video_clean( p_stream, id );
             break;
         case SPU_ES:
-            transcode_spu_close( p_stream, id );
+            transcode_spu_clean( p_stream, id );
             break;
         default:
             break;
