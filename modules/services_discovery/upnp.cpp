@@ -202,8 +202,7 @@ SearchThread( void *p_data )
 static int OpenSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
-    services_discovery_sys_t *p_sys  = ( services_discovery_sys_t * )
-            calloc( 1, sizeof( services_discovery_sys_t ) );
+    services_discovery_sys_t *p_sys = new (std::nothrow) services_discovery_sys_t();
 
     if( !( p_sd->p_sys = p_sys ) )
         return VLC_ENOMEM;
@@ -213,7 +212,7 @@ static int OpenSD( vlc_object_t *p_this )
     p_sys->p_upnp = UpnpInstanceWrapper::get( p_this );
     if ( !p_sys->p_upnp )
     {
-        free(p_sys);
+        delete p_sys;
         return VLC_EGENERIC;
     }
 
@@ -225,7 +224,7 @@ static int OpenSD( vlc_object_t *p_this )
     {
         msg_Err( p_sd, "Failed to create a MediaServerList");
         p_sys->p_upnp->release();
-        free(p_sys);
+        delete p_sys;
         return VLC_EGENERIC;
     }
     p_sys->p_upnp->addListener( p_sys->p_server_list );
@@ -238,7 +237,7 @@ static int OpenSD( vlc_object_t *p_this )
     {
         p_sys->p_upnp->removeListener( p_sys->p_server_list );
         p_sys->p_upnp->release();
-        free(p_sys);
+        delete p_sys;
         return VLC_EGENERIC;
     }
 
@@ -256,7 +255,7 @@ static void CloseSD( vlc_object_t *p_this )
     vlc_join( p_sys->thread, NULL );
     p_sys->p_upnp->removeListener( p_sys->p_server_list );
     p_sys->p_upnp->release();
-    free( p_sys );
+    delete p_sys;
 }
 
 MediaServerDesc::MediaServerDesc( const std::string& udn, const std::string& fName,
