@@ -1,19 +1,19 @@
 # libvpx
 
-VPX_VERSION := 1.6.1
-VPX_URL := http://storage.googleapis.com/downloads.webmproject.org/releases/webm/libvpx-$(VPX_VERSION).tar.bz2
+VPX_VERSION := 1.7.0
+VPX_URL := http://github.com/webmproject/libvpx/archive/v${VPX_VERSION}.tar.gz
 
 PKGS += vpx
 ifeq ($(call need_pkg,"vpx >= 1.5.0"),)
 PKGS_FOUND += vpx
 endif
 
-$(TARBALLS)/libvpx-$(VPX_VERSION).tar.bz2:
+$(TARBALLS)/libvpx-$(VPX_VERSION).tar.gz:
 	$(call download_pkg,$(VPX_URL),vpx)
 
-.sum-vpx: libvpx-$(VPX_VERSION).tar.bz2
+.sum-vpx: libvpx-$(VPX_VERSION).tar.gz
 
-libvpx: libvpx-$(VPX_VERSION).tar.bz2 .sum-vpx
+libvpx: libvpx-$(VPX_VERSION).tar.gz .sum-vpx
 	$(UNPACK)
 	$(APPLY) $(SRC)/vpx/libvpx-mac.patch
 	$(APPLY) $(SRC)/vpx/libvpx-ios.patch

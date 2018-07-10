@@ -1,6 +1,6 @@
---- libvpx-1.6.0/build/make/configure.sh.orig	2016-08-07 11:44:05.793613059 +0200
-+++ libvpx-1.6.0/build/make/configure.sh	2016-08-07 11:45:57.893608065 +0200
-@@ -789,80 +789,6 @@
+--- libvpx/build/make/configure.sh.orig	2018-07-09 18:57:29.774826691 -0400
++++ libvpx/build/make/configure.sh	2018-07-09 19:00:34.427868074 -0400
+@@ -818,84 +818,6 @@
    # PIC is probably what we want when building shared libs
    enabled shared && soft_enable pic
  
@@ -66,6 +66,10 @@
 -    *-darwin15-*)
 -      add_cflags  "-mmacosx-version-min=10.11"
 -      add_ldflags "-mmacosx-version-min=10.11"
+-      ;;
+-    *-darwin16-*)
+-      add_cflags  "-mmacosx-version-min=10.12"
+-      add_ldflags "-mmacosx-version-min=10.12"
 -      ;;
 -    *-iphonesimulator-*)
 -      add_cflags  "-miphoneos-version-min=${IOS_VERSION_MIN}"
