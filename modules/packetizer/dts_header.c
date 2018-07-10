@@ -45,7 +45,8 @@ static void BufLeToBe( uint8_t *p_out, const uint8_t *p_in, int i_in )
     }
 }
 
-static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
+static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le,
+                      int i_out_le )
 {
     unsigned char tmp, cur = 0;
     int bits_in, bits_out = 0;
@@ -77,7 +78,10 @@ static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
 
         if( bits_out == 8 )
         {
-            p_out[i_out] = cur;
+            if( i_out % 2 )
+                p_out[i_out - i_out_le] = cur;
+            else
+                p_out[i_out + i_out_le] = cur;
             cur = 0;
             bits_out = 0;
             i_out++;
@@ -286,6 +290,7 @@ static int dts_header_ParseCore( vlc_dts_header_t *p_header,
     bool b_lfe = i_lff == 1 || i_lff == 2;
 
     p_header->b_substream = false;
+    p_header->b_14b = b_14b;
     p_header->i_rate = dca_get_samplerate( i_sfreq );
     p_header->i_bitrate = dca_get_bitrate( i_rate );
     p_header->i_frame_size = !b_14b ? ( i_fsize + 1 )
@@ -301,6 +306,27 @@ static int dts_header_ParseCore( vlc_dts_header_t *p_header,
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
+}
+
+ssize_t vlc_dts_header_Convert14b16b( void *p_dst, size_t i_dst,
+                                      const void *p_src, size_t i_src,
+                                      bool b_out_le )
+{
+    size_t i_size = i_src * 14 / 16;
+    if( i_src <= VLC_DTS_HEADER_SIZE || i_size > i_dst )
+        return -1;
+
+    enum dts_bitsteam_type bitstream_type;
+    if( !dts_header_IsSync( p_src, &bitstream_type ) )
+        return -1;
+
+    if( bitstream_type != DTS_SYNC_CORE_14BITS_BE
+     && bitstream_type != DTS_SYNC_CORE_14BITS_LE )
+        return -1;
+
+    int i_ret = Buf14To16( p_dst, p_src, i_src,
+                           bitstream_type == DTS_SYNC_CORE_14BITS_LE, b_out_le );
+    return i_ret;
 }
 
 int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
@@ -329,7 +355,7 @@ int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
         {
             uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
             Buf14To16( conv_buf, p_buffer, VLC_DTS_HEADER_SIZE,
-                       bitstream_type == DTS_SYNC_CORE_14BITS_LE );
+                       bitstream_type == DTS_SYNC_CORE_14BITS_LE, 0 );
             return dts_header_ParseCore( p_header, conv_buf, true );
         }
         case DTS_SYNC_SUBSTREAM:
