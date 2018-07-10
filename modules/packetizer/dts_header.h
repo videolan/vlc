@@ -31,6 +31,7 @@
 typedef struct
 {
     bool            b_substream;
+    bool            b_14b;
     unsigned int    i_rate;
     unsigned int    i_bitrate;
     unsigned int    i_frame_size;
@@ -43,3 +44,7 @@ int     vlc_dts_header_Parse( vlc_dts_header_t *p_header,
                               const void *p_buffer, size_t i_buffer);
 
 bool    vlc_dts_header_IsSync( const void *p_buffer, size_t i_buffer );
+
+ssize_t vlc_dts_header_Convert14b16b( void *p_dst, size_t i_dst,
+                                      const void *p_src, size_t i_src,
+                                      bool b_out_le );
