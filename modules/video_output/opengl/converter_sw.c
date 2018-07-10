@@ -590,6 +590,17 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
     priv->has_unpack_subimage =
         !tc->is_gles || HasExtension(tc->glexts, "GL_EXT_unpack_subimage");
 
+    if (allow_dr)
+    {
+        const char *glrenderer = (const char *) tc->vt->GetString(GL_RENDERER);
+        assert(glrenderer);
+        if (strcmp(glrenderer, "Intel HD Graphics 3000 OpenGL Engine") == 0)
+        {
+            msg_Warn(tc->gl, "Disabling direct rendering because of buggy GPU/Driver");
+            allow_dr = false;
+        }
+    }
+
     if (allow_dr && priv->has_unpack_subimage)
     {
         bool supports_map_persistent = false;
