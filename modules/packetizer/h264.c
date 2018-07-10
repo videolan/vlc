@@ -749,6 +749,17 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     return p_pic;
 }
 
+static bool CanSwapPTSwithDTS( const h264_slice_t *p_slice,
+                               const h264_sequence_parameter_set_t *p_sps )
+{
+    if( p_slice->i_nal_ref_idc == 0 && p_slice->type == H264_SLICE_TYPE_B )
+        return true;
+    else if( p_sps->vui.b_valid )
+        return p_sps->vui.i_max_num_reorder_frames == 0;
+    else
+        return p_sps->i_profile == PROFILE_H264_CAVLC_INTRA;
+}
+
 static block_t *OutputPicture( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -929,8 +940,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
             p_pic->i_pts = date_Get( &pts );
         }
         /* In case there's no PTS at all */
-        else if( p_sys->slice.i_nal_ref_idc == 0 &&
-                 p_sys->slice.type == H264_SLICE_TYPE_B )
+        else if( CanSwapPTSwithDTS( &p_sys->slice, p_sps ) )
         {
             p_pic->i_pts = p_pic->i_dts;
         }
@@ -942,6 +952,13 @@ static block_t *OutputPicture( decoder_t *p_dec )
             date_Increment( &pts, 2 );
             p_pic->i_pts = date_Get( &pts );
         }
+    }
+    else if( p_pic->i_dts == VLC_TICK_INVALID &&
+             CanSwapPTSwithDTS( &p_sys->slice, p_sps ) )
+    {
+        p_pic->i_dts = p_pic->i_pts;
+        if( date_Get( &p_sys->dts ) == VLC_TICK_INVALID )
+            date_Set( &p_sys->dts, p_pic->i_pts );
     }
 
     if( p_pic->i_pts != VLC_TICK_INVALID )
