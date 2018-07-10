@@ -543,7 +543,10 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
                       current_date - i_dts );
     }
 
-    if( p_mux->b_waiting_stream )
+    if( i_dts == VLC_TICK_INVALID )
+        i_dts = p_buffer->i_pts;
+
+    if( p_mux->b_waiting_stream && i_dts != VLC_TICK_INVALID )
     {
         const vlc_tick_t i_caching = VLC_TICK_FROM_MS(var_GetInteger( p_mux->p_sout, "sout-mux-caching" ));
 
@@ -551,8 +554,7 @@ int sout_MuxSendBuffer( sout_mux_t *p_mux, sout_input_t *p_input,
             p_mux->i_add_stream_start = i_dts;
 
         /* Wait until we have enough data before muxing */
-        if( p_mux->i_add_stream_start == VLC_TICK_INVALID ||
-            i_dts < p_mux->i_add_stream_start + i_caching )
+        if( llabs( i_dts - p_mux->i_add_stream_start ) < i_caching )
             return VLC_SUCCESS;
         p_mux->b_waiting_stream = false;
     }
