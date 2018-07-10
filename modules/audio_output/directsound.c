@@ -833,20 +833,26 @@ static HRESULT StreamStart( aout_stream_t *s,
     if( unlikely(sys == NULL) )
         return E_OUTOFMEMORY;
 
-    DIRECTX_AUDIO_ACTIVATION_PARAMS params = {
-        .cbDirectXAudioActivationParams = sizeof( params ),
-        .guidAudioSession = *sid,
-        .dwAudioStreamFlags = 0,
-    };
-    PROPVARIANT prop;
-
-    PropVariantInit( &prop );
-    prop.vt = VT_BLOB;
-    prop.blob.cbSize = sizeof( params );
-    prop.blob.pBlobData = (BYTE *)&params;
-
     void *pv;
-    HRESULT hr = aout_stream_Activate( s, &IID_IDirectSound, &prop, &pv );
+    HRESULT hr;
+    if( sid )
+    {
+        DIRECTX_AUDIO_ACTIVATION_PARAMS params = {
+            .cbDirectXAudioActivationParams = sizeof( params ),
+            .guidAudioSession = *sid,
+            .dwAudioStreamFlags = 0,
+        };
+        PROPVARIANT prop;
+
+        PropVariantInit( &prop );
+        prop.vt = VT_BLOB;
+        prop.blob.cbSize = sizeof( params );
+        prop.blob.pBlobData = (BYTE *)&params;
+
+        hr = aout_stream_Activate( s, &IID_IDirectSound, &prop, &pv );
+    }
+    else
+        hr = aout_stream_Activate( s, &IID_IDirectSound, NULL, &pv );
     if( FAILED(hr) )
         goto error;
 
