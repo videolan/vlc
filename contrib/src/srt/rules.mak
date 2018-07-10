@@ -1,13 +1,13 @@
 # srt
 
-SRT_VERSION := 1.2.3
+SRT_VERSION := 1.3.1
 SRT_URL := $(GITHUB)/Haivision/srt/archive/v$(SRT_VERSION).tar.gz
 
 ifdef BUILD_NETWORK
 PKGS += srt
 endif
 
-ifeq ($(call need_pkg,"srt >= 1.2.2"),)
+ifeq ($(call need_pkg,"srt >= 1.3.1"),)
 PKGS_FOUND += srt
 endif
 
@@ -30,18 +30,13 @@ $(TARBALLS)/srt-$(SRT_VERSION).tar.gz:
 
 srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(UNPACK)
-	$(APPLY) $(SRC)/srt/add-implicit-link-libraries.patch 
-	$(APPLY) $(SRC)/srt/0001-CMakeLists.txt-substitute-link-flags-for-package-nam.patch
-	$(APPLY) $(SRC)/srt/srt-fix-non-gnu-detection.patch 
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/srt/0002-CMakeLists.txt-let-cmake-find-pthread.patch
-	$(APPLY) $(SRC)/srt/srt-no-implicit-libs.patch 
-endif
-	$(call pkg_static,"scripts/haisrt.pc.in")
+	$(APPLY) $(SRC)/srt/0001-api-Don-t-use-inet_ntop.patch
+	$(APPLY) $(SRC)/srt/0002-win32-Only-include-inttypes.h-with-MSVC.patch
+	$(APPLY) $(SRC)/srt/0003-cmake-Only-install-Windows-headers-in-win-subdir.patch
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
 .srt: srt toolchain.cmake
 	cd $< && $(HOSTVARS_PIC) CFLAGS="$(SRT_CFLAGS)" CXXFLAGS="$(SRT_CXXFLAGS)" $(CMAKE) \
-		-DENABLE_SHARED=OFF -DUSE_GNUTLS=ON -DENABLE_CXX11=OFF
+		-DENABLE_SHARED=OFF -DUSE_GNUTLS=ON -DENABLE_CXX11=OFF -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_INSTALL_BINDIR=bin -DCMAKE_INSTALL_INCLUDEDIR=include
 	cd $< && $(MAKE) install
 	touch $@

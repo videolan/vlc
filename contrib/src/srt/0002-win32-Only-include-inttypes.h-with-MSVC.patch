@@ -1,0 +1,27 @@
+From e4d6b4d7f26d8d839889ae8508856d5a108cc258 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Olivier=20Cr=C3=AAte?= <olivier.crete@collabora.com>
+Date: Mon, 9 Jul 2018 18:04:44 -0400
+Subject: [PATCH 2/3] win32: Only include inttypes.h with MSVC
+
+---
+ srtcore/platform_sys.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/srtcore/platform_sys.h b/srtcore/platform_sys.h
+index 33c4d9b..ce546d2 100644
+--- a/srtcore/platform_sys.h
++++ b/srtcore/platform_sys.h
+@@ -15,9 +15,9 @@
+    #include <ws2tcpip.h>
+    #include <ws2ipdef.h>
+    #include <windows.h>
+-   #include <inttypes.h>
+    #include <stdint.h>
+    #if defined(_MSC_VER)
++      #include <inttypes.h>
+       #pragma warning(disable:4251)
+    #endif
+ #else
+-- 
+2.17.1
+

@@ -1,0 +1,41 @@
+From cfc7871bad28737e5b0480c90643e7d09bf6f5cb Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Olivier=20Cr=C3=AAte?= <olivier.crete@collabora.com>
+Date: Mon, 9 Jul 2018 18:16:28 -0400
+Subject: [PATCH 3/3] cmake: Only install Windows headers in win subdir
+
+---
+ CMakeLists.txt         | 1 -
+ srtcore/platform_sys.h | 4 ++--
+ 2 files changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index daec198..b197c19 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -450,7 +450,6 @@ endif()
+ # will now apply to the dependent library.
+ #list(APPEND SOURCES_srt ${SOURCES_haicrypt})
+ set (VIRTUAL_srt $<TARGET_OBJECTS:srt_virtual> $<TARGET_OBJECTS:haicrypt_virtual>)
+-set (HEADERS_srt ${HEADERS_srt} ${HEADERS_srt_win32})
+ 
+ if (srt_libspec_shared)
+ 	add_library(${TARGET_srt}_shared SHARED ${VIRTUAL_srt})
+diff --git a/srtcore/platform_sys.h b/srtcore/platform_sys.h
+index ce546d2..e8e6927 100644
+--- a/srtcore/platform_sys.h
++++ b/srtcore/platform_sys.h
+@@ -15,9 +15,9 @@
+    #include <ws2tcpip.h>
+    #include <ws2ipdef.h>
+    #include <windows.h>
+-   #include <stdint.h>
+    #if defined(_MSC_VER)
+-      #include <inttypes.h>
++      #include <win/stdint.h>
++      #include <win/inttypes.h>
+       #pragma warning(disable:4251)
+    #endif
+ #else
+-- 
+2.17.1
+
