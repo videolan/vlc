@@ -129,7 +129,7 @@ int vout_InitWrapper(vout_thread_t *vout)
 
 #ifndef NDEBUG
     if ( picture_pool_GetSize(display_pool) < display_pool_size )
-        msg_Warn(vout, "Not enough display buffers in the pool, requested %d got %d",
+        msg_Warn(vout, "Not enough display buffers in the pool, requested %u got %u",
                  display_pool_size, picture_pool_GetSize(display_pool));
 #endif
 
