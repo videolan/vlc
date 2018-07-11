@@ -53,9 +53,6 @@
 
 #include "../src/win32/mta_holder.h"
 
-#define INSTANCEDATA_OF_PROPERTY_PTR(x) ((PKSPROPERTY((x))) + 1)
-#define INSTANCEDATA_OF_PROPERTY_SIZE(x) (sizeof((x)) - sizeof(KSPROPERTY))
-
 namespace dshow {
 
 /*****************************************************************************
@@ -103,31 +100,6 @@ static const char *const ppsz_amtuner_mode_text[] = { N_("Default"),
                                           N_("AM radio"),
                                           N_("DSS") };
 
-static const int i_standards_list[] =
-    {
-        KS_AnalogVideo_None,
-        KS_AnalogVideo_NTSC_M, KS_AnalogVideo_NTSC_M_J, KS_AnalogVideo_NTSC_433,
-        KS_AnalogVideo_PAL_B, KS_AnalogVideo_PAL_D, KS_AnalogVideo_PAL_G,
-        KS_AnalogVideo_PAL_H, KS_AnalogVideo_PAL_I, KS_AnalogVideo_PAL_M,
-        KS_AnalogVideo_PAL_N, KS_AnalogVideo_PAL_60,
-        KS_AnalogVideo_SECAM_B, KS_AnalogVideo_SECAM_D, KS_AnalogVideo_SECAM_G,
-        KS_AnalogVideo_SECAM_H, KS_AnalogVideo_SECAM_K, KS_AnalogVideo_SECAM_K1,
-        KS_AnalogVideo_SECAM_L, KS_AnalogVideo_SECAM_L1,
-        KS_AnalogVideo_PAL_N_COMBO
-    };
-static const char *const ppsz_standards_list_text[] =
-    {
-        N_("Default"),
-        "NTSC_M", "NTSC_M_J", "NTSC_443",
-        "PAL_B", "PAL_D", "PAL_G",
-        "PAL_H", "PAL_I", "PAL_M",
-        "PAL_N", "PAL_60",
-        "SECAM_B", "SECAM_D", "SECAM_G",
-        "SECAM_H", "SECAM_K", "SECAM_K1",
-        "SECAM_L", "SECAM_L1",
-        "PAL_N_COMBO"
-    };
-
 #define VDEV_TEXT N_("Video device name")
 #define VDEV_LONGTEXT N_( \
     "Name of the video device that will be used by the " \
@@ -164,9 +136,6 @@ static const char *const ppsz_standards_list_text[] =
 #define CHANNEL_LONGTEXT N_( \
     "Set the TV channel the tuner will set to " \
     "(0 means default)." )
-#define TVFREQ_TEXT N_("Tuner Frequency")
-#define TVFREQ_LONGTEXT N_(  "This overrides the channel. Measured in Hz." )
-#define STANDARD_TEXT N_( "Video standard" )
 #define COUNTRY_TEXT N_("Tuner country code")
 #define COUNTRY_LONGTEXT N_( \
     "Set the tuner country code that establishes the current " \
@@ -251,17 +220,8 @@ vlc_module_begin ()
                 true )
         change_safe()
 
-    add_integer( "dshow-tuner-frequency", 0, TVFREQ_TEXT, TVFREQ_LONGTEXT,
-                true )
-        change_safe()
-
     add_integer( "dshow-tuner-country", 0, COUNTRY_TEXT, COUNTRY_LONGTEXT,
                 true )
-
-    add_integer( "dshow-tuner-standard", 0, STANDARD_TEXT, STANDARD_TEXT,
-                false )
-        change_integer_list( i_standards_list, ppsz_standards_list_text )
-        change_safe()
 
     add_integer( "dshow-tuner-input", 0, TUNER_INPUT_TEXT,
                  TUNER_INPUT_LONGTEXT, true )
@@ -487,10 +447,6 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     var_Create( p_this, "dshow-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner-channel",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-frequency",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-tuner-standard",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner-country",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -2239,7 +2195,7 @@ static void ShowTunerProperties( vlc_object_t *p_this,
 static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
                          IBaseFilter *p_device_filter )
 {
-    int i_channel, i_country, i_input, i_amtuner_mode, i_standard;
+    int i_channel, i_country, i_input, i_amtuner_mode;
     long l_modes = 0;
     unsigned i_frequency;
     ComPtr<IAMTVTuner> p_TV;
@@ -2251,15 +2207,11 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
     i_country = var_GetInteger( p_this, "dshow-tuner-country" );
     i_input = var_GetInteger( p_this, "dshow-tuner-input" );
     i_amtuner_mode = var_GetInteger( p_this, "dshow-amtuner-mode" );
-    i_frequency = var_GetInteger( p_this, "dshow-tuner-frequency" );
-    i_standard =
-        i_standards_list[var_CreateGetInteger( p_this, "dshow-tuner-standard" )];
 
-    if( !i_channel && !i_frequency && !i_country && !i_input ) return; /* Nothing to do */
+    if( !i_channel && !i_country && !i_input ) return; /* Nothing to do */
 
-    msg_Dbg( p_this, "tuner config: channel %i, frequency %i, country %i, input type %i, standard %s",
-             i_channel, i_frequency, i_country, i_input, ppsz_standards_list_text[i_standard] );
-
+    msg_Dbg( p_this, "tuner config: channel %i, country %i, input type %i",
+             i_channel, i_country, i_input );
 
     hr = p_graph->FindInterface( &PIN_CATEGORY_CAPTURE, &MEDIATYPE_Interleaved,
                                  p_device_filter, IID_IAMTVTuner,
@@ -2294,107 +2246,9 @@ static void ConfigTuner( vlc_object_t *p_this, ICaptureGraphBuilder2 *p_graph,
     else if( i_input == 2 ) p_TV->put_InputType( 0, TunerInputAntenna );
 
     p_TV->put_CountryCode( i_country );
-
-    if( i_frequency <= 0 ) p_TV->put_Channel( i_channel, AMTUNER_SUBCHAN_NO_TUNE,
+    p_TV->put_Channel( i_channel, AMTUNER_SUBCHAN_NO_TUNE,
                        AMTUNER_SUBCHAN_NO_TUNE );
-
-    if( i_frequency > 0 || i_standard > 0) {
-        ComPtr<IKsPropertySet> pKs;
-        DWORD dw_supported = 0;
-        KSPROPERTY_TUNER_MODE_CAPS_S ModeCaps;
-        KSPROPERTY_TUNER_FREQUENCY_S Frequency;
-        KSPROPERTY_TUNER_STANDARD_S Standard;
-
-        hr = p_TV->QueryInterface(IID_IKsPropertySet,(void **)pKs.GetAddressOf());
-        if (FAILED(hr))
-        {
-            msg_Dbg( p_this, "Couldn't QI for IKsPropertySet" );
-            return;
-        }
-
-        memset(&ModeCaps,0,sizeof(KSPROPERTY_TUNER_MODE_CAPS_S));
-        memset(&Frequency,0,sizeof(KSPROPERTY_TUNER_FREQUENCY_S));
-        memset(&Standard,0,sizeof(KSPROPERTY_TUNER_STANDARD_S));
-        ModeCaps.Mode = AMTUNER_MODE_TV;
-
-        hr = pKs->QuerySupported(PROPSETID_TUNER,
-                KSPROPERTY_TUNER_MODE_CAPS,&dw_supported);
-        if(SUCCEEDED(hr) && dw_supported&KSPROPERTY_SUPPORT_GET)
-        {
-            DWORD cbBytes=0;
-            hr = pKs->Get(PROPSETID_TUNER,KSPROPERTY_TUNER_MODE_CAPS,
-                INSTANCEDATA_OF_PROPERTY_PTR(&ModeCaps),
-                INSTANCEDATA_OF_PROPERTY_SIZE(ModeCaps),
-                &ModeCaps,
-                sizeof(ModeCaps),
-                &cbBytes);
-        }
-        else
-        {
-            msg_Dbg( p_this, "KSPROPERTY_TUNER_MODE_CAPS not supported!" );
-            return;
-        }
-
-        msg_Dbg( p_this, "Frequency range supported from %ld to %ld.",
-                 ModeCaps.MinFrequency, ModeCaps.MaxFrequency);
-        msg_Dbg( p_this, "Video standards supported by the tuner: ");
-        for(size_t i = 0 ; i < ARRAY_SIZE(ppsz_standards_list_text); i++) {
-            if(ModeCaps.StandardsSupported & i_standards_list[i])
-                msg_Dbg( p_this, "%s, ", ppsz_standards_list_text[i]);
-        }
-
-        if(i_frequency > 0) {
-            Frequency.Frequency=i_frequency;
-            if(ModeCaps.Strategy==KS_TUNER_STRATEGY_DRIVER_TUNES)
-                Frequency.TuningFlags=KS_TUNER_TUNING_FINE;
-            else
-                Frequency.TuningFlags=KS_TUNER_TUNING_EXACT;
-
-            if(i_frequency>=ModeCaps.MinFrequency && i_frequency<=ModeCaps.MaxFrequency)
-            {
-
-                hr = pKs->Set(PROPSETID_TUNER,
-                    KSPROPERTY_TUNER_FREQUENCY,
-                    INSTANCEDATA_OF_PROPERTY_PTR(&Frequency),
-                    INSTANCEDATA_OF_PROPERTY_SIZE(Frequency),
-                    &Frequency,
-                    sizeof(Frequency));
-                if(FAILED(hr))
-                {
-                    msg_Dbg( p_this, "Couldn't set KSPROPERTY_TUNER_FREQUENCY!" );
-                    return;
-                }
-            }
-            else
-            {
-                msg_Dbg( p_this, "Requested frequency exceeds the supported range!" );
-                return;
-            }
-        }
-
-        if(i_standard > 0) {
-            if(i_standard & ModeCaps.StandardsSupported )
-            {
-                Standard.Standard = i_standard;
-                hr = pKs->Set(PROPSETID_TUNER,
-                    KSPROPERTY_TUNER_STANDARD,
-                    INSTANCEDATA_OF_PROPERTY_PTR(&Standard),
-                    INSTANCEDATA_OF_PROPERTY_SIZE(Standard),
-                    &Standard,
-                    sizeof(Standard));
-                if(FAILED(hr))
-                {
-                    msg_Dbg( p_this, "Couldn't set KSPROPERTY_TUNER_STANDARD!" );
-                    return;
-                }
-            }
-            else
-            {
-                msg_Dbg( p_this, "Requested video standard is not supported by the tuner!" );
-                return;
-            }
-        }
-    }
+    p_TV->Release();
 }
 
 } // namespace
