@@ -150,11 +150,11 @@ static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, int port,
     return net_ConnectDgram (obj, host, port, hlim, IPPROTO_UDP);
 }
 
-VLC_API int net_OpenDgram( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int proto );
+VLC_API int net_OpenDgram( vlc_object_t *p_this, const char *psz_bind, unsigned i_bind, const char *psz_server, unsigned i_server, int proto );
 #define net_OpenDgram( a, b, c, d, e, g ) \
         net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g)
 
-static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
+static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, unsigned port)
 {
     return net_OpenDgram (obj, host, port, NULL, 0, IPPROTO_UDP);
 }

@@ -139,7 +139,7 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
 }
 
 /* */
-static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
+static int net_ListenSingle (vlc_object_t *obj, const char *host, unsigned port,
                              int protocol)
 {
     struct addrinfo hints = {
@@ -598,8 +598,8 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
  *****************************************************************************
  * OpenDgram a datagram socket and return a handle
  *****************************************************************************/
-int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
-                   const char *psz_server, int i_server, int protocol )
+int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, unsigned i_bind,
+                   const char *psz_server, unsigned i_server, int protocol )
 {
     if ((psz_server == NULL) || (psz_server[0] == '\0'))
         return net_ListenSingle (obj, psz_bind, i_bind, protocol);
