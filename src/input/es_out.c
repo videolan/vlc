@@ -3340,12 +3340,12 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
        }
        if ( fmt->video.lighting.MaxCLL )
        {
-           info_category_AddInfo( p_cat, "MaxCLL", "%d cd/m²",
+           info_category_AddInfo( p_cat, "MaxCLL", "%" PRIu16 " cd/m²",
                                   fmt->video.lighting.MaxCLL );
        }
        if ( fmt->video.lighting.MaxFALL )
        {
-           info_category_AddInfo( p_cat, "MaxFALL", "%d cd/m²",
+           info_category_AddInfo( p_cat, "MaxFALL", "%" PRIu16 " cd/m²",
                                   fmt->video.lighting.MaxFALL );
        }
        break;
