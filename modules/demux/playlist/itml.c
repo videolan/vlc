@@ -282,8 +282,8 @@ static bool parse_tracks_dict( stream_t *p_demux, input_item_node_t *p_input_nod
     parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                 "dict", tracks_elements );
 
-    msg_Info( p_demux, "added %zi tracks successfully",
-              (size_t)p_demux->p_sys );
+    msg_Info( p_demux, "added %" PRIiPTR " tracks successfully",
+              p_demux->p_sys );
 
     return true;
 }
