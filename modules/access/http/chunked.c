@@ -83,7 +83,7 @@ static block_t *vlc_chunked_read(struct vlc_http_stream *stream)
 
         int end;
 
-        if (sscanf(line, "%jx%n", &s->chunk_length, &end) < 1
+        if (sscanf(line, "%" SCNxMAX "%n", &s->chunk_length, &end) < 1
          || (line[end] != '\0' && line[end] != ';' /* ignore extension(s) */))
             s->chunk_length = UINTMAX_MAX;
 
