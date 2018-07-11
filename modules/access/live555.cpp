@@ -2133,9 +2133,9 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     case VLC_CODEC_MPGV:
                     case VLC_CODEC_H264:
                     case VLC_CODEC_HEVC:
-                    case VLC_CODEC_VP8:
                         p_block->i_dts = VLC_TS_INVALID;
                         break;
+                    case VLC_CODEC_VP8:
                     default:
                         p_block->i_dts = VLC_TS_0 + i_pts;
                         break;
