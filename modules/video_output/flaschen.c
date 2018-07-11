@@ -92,7 +92,7 @@ static int Open(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
     int fd;
-    unsigned port = 1337;
+    const unsigned port = 1337;
 
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
