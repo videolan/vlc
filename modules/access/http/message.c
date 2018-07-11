@@ -876,7 +876,7 @@ uintmax_t vlc_http_msg_get_size(const struct vlc_http_msg *m)
 
     uintmax_t length;
 
-    if (sscanf(str, "%ju", &length) == 1)
+    if (sscanf(str, "%" SCNuMAX, &length) == 1)
         return length;
 
     errno = EINVAL;
