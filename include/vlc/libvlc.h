@@ -346,13 +346,6 @@ LIBVLC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                                          libvlc_callback_t f_callback,
                                          void *p_user_data );
 
-/**
- * Get an event's type name.
- *
- * \param event_type the desired event
- */
-LIBVLC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type );
-
 /** @} */
 
 /** \defgroup libvlc_log LibVLC logging

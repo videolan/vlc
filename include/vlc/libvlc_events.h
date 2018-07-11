@@ -47,7 +47,7 @@ typedef struct libvlc_renderer_item_t libvlc_renderer_item_t;
 enum libvlc_event_e {
     /* Append new event types at the end of a category.
      * Do not remove, insert or re-order any entry.
-     * Keep this in sync with lib/event.c:libvlc_event_type_name(). */
+     */
 
     /**
      * Metadata of a \link #libvlc_media_t media item\endlink changed
