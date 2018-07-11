@@ -387,12 +387,14 @@ block_t *block_File(int fd, bool write)
         return NULL;
     }
 
+//#if sizeof(uintmax_t) > sizeof(size_t)
     /* Prevent an integer overflow in mmap() and malloc() */
     if ((uintmax_t)st.st_size >= SIZE_MAX)
     {
         errno = ENOMEM;
         return NULL;
     }
+//#endif
     length = (size_t)st.st_size;
 
 #ifdef HAVE_MMAP
