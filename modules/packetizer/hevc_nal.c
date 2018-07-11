@@ -1247,6 +1247,8 @@ static bool hevc_parse_slice_segment_header_rbsp( bs_t *p_bs,
 
         if( p_pps->output_flag_present_flag )
             p_sl->pic_output_flag = bs_read1( p_bs );
+        else
+            p_sl->pic_output_flag = 1;
     }
 
     if( p_sps->separate_colour_plane_flag )
