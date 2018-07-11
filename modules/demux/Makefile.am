@@ -41,9 +41,6 @@ demux_LTLIBRARIES += libwav_plugin.la
 libnsv_plugin_la_SOURCES = demux/nsv.c
 demux_LTLIBRARIES += libnsv_plugin.la
 
-libreal_plugin_la_SOURCES = demux/real.c
-demux_LTLIBRARIES += libreal_plugin.la
-
 libps_plugin_la_SOURCES = demux/mpeg/ps.c demux/mpeg/ps.h demux/mpeg/pes.h
 demux_LTLIBRARIES += libps_plugin.la
 

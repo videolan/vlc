@@ -31,7 +31,8 @@ Video output:
  * Remove aa plugin
  * Remove evas plugin
  * Remove omxil_vout plugin
- * Remove of RealRTSP plugin
+ * Remove RealRTSP plugin
+ * Remove Real demuxer plugin
 
 macOS:
  * Remove Growl notification support

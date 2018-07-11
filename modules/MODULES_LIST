@@ -318,7 +318,6 @@ $Id$
  * rawvid: raw video input module for vlc
  * rawvideo: Pseudo audio-decoder for raw video
  * rdp: Remote Desktop view only access
- * real: partial Real audio/video demuxer
  * record: record any stream instantly
  * remap: audio channel remapping filter
  * remoteosd: Remote-OSD over VNC
