@@ -141,11 +141,11 @@ VLC_API int net_Accept( vlc_object_t *, int * );
 #define net_Accept(a, b) \
         net_Accept(VLC_OBJECT(a), b)
 
-VLC_API int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto );
+VLC_API int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, unsigned i_port, int hlim, int proto );
 #define net_ConnectDgram(a, b, c, d, e ) \
         net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
 
-static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, int port, int hlim)
+static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, unsigned port, int hlim)
 {
     return net_ConnectDgram (obj, host, port, hlim, IPPROTO_UDP);
 }

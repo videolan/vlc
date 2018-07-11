@@ -513,7 +513,7 @@ static int net_SetDSCP( int fd, uint8_t dscp )
  * Open a datagram socket to send data to a defined destination, with an
  * optional hop limit.
  *****************************************************************************/
-int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
+int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, unsigned i_port,
                       int i_hlim, int proto )
 {
     struct addrinfo hints = {
