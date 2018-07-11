@@ -1560,7 +1560,7 @@ static void httpd_ClientSend(httpd_client_t *cl)
         }
         p = (char *)cl->p_buffer;
 
-        p += sprintf(p, "%s.%u %d %s\r\n",
+        p += sprintf(p, "%s.%" PRIu8 " %d %s\r\n",
                       cl->answer.i_proto ==  HTTPD_PROTO_HTTP ? "HTTP/1" : "RTSP/1",
                       cl->answer.i_version,
                       cl->answer.i_status, psz_status);
