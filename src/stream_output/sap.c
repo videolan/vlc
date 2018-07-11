@@ -260,7 +260,7 @@ sout_AnnounceRegisterSDP (vlc_object_t *obj, const char *sdp,
         }
 
         default:
-            msg_Err (obj, "Address family %d not supported by SAP",
+            msg_Err (obj, "Address family %hu not supported by SAP",
                      addr.a.sa_family);
             return NULL;
     }
