@@ -328,7 +328,6 @@ $Id$
  * rtp: rtp demux module
  * rtpvideo: encoder for raw video over RTP
  * rv32: RV32 image format conversion module
- * samba: Samba / libsmbclient input
  * samplerate: Secret Rabbit Code (libsamplerate) audio resampler
  * sap: Interface module to read SAP/SDP announcements
  * sapi: Windows Text to Speech Synthetizer using the SAPI 5.1 API
@@ -356,6 +355,7 @@ $Id$
  * skins2: Skinnable interface, new generation
  * skiptags: APE & ID3 tags-skipping stream filter
  * smb2: SMB2/3 access module
+ * smbc: Samba / libsmbclient input
  * smf: Standard MIDI file demuxer
  * sndio: OpenBSD sndio audio output
  * soxr: SoX Resampler library audio filter
