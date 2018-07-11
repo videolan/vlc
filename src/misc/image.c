@@ -188,7 +188,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
         if( lostcount > 0 )
             msg_Warn( p_image->p_parent, "Image decoder output more than one "
-                      "picture (%d)", lostcount );
+                      "picture (%u)", lostcount );
     }
 
     if( p_pic == NULL )
