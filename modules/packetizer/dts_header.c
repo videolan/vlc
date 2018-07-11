@@ -45,7 +45,8 @@ static void BufLeToBe( uint8_t *p_out, const uint8_t *p_in, int i_in )
     }
 }
 
-static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
+static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le,
+                      int i_out_le )
 {
     unsigned char tmp, cur = 0;
     int bits_in, bits_out = 0;
@@ -77,7 +78,10 @@ static int Buf14To16( uint8_t *p_out, const uint8_t *p_in, int i_in, int i_le )
 
         if( bits_out == 8 )
         {
-            p_out[i_out] = cur;
+            if( i_out % 2 )
+                p_out[i_out - i_out_le] = cur;
+            else
+                p_out[i_out + i_out_le] = cur;
             cur = 0;
             bits_out = 0;
             i_out++;
@@ -321,9 +325,7 @@ ssize_t vlc_dts_header_Convert14b16b( void *p_dst, size_t i_dst,
         return -1;
 
     int i_ret = Buf14To16( p_dst, p_src, i_src,
-                           bitstream_type == DTS_SYNC_CORE_14BITS_LE );
-    if( b_out_le ) /* since Buf14To16 convert to BE */
-        swab( p_dst, p_dst, i_ret );
+                           bitstream_type == DTS_SYNC_CORE_14BITS_LE, b_out_le );
     return i_ret;
 }
 
@@ -353,7 +355,7 @@ int vlc_dts_header_Parse( vlc_dts_header_t *p_header,
         {
             uint8_t conv_buf[VLC_DTS_HEADER_SIZE];
             Buf14To16( conv_buf, p_buffer, VLC_DTS_HEADER_SIZE,
-                       bitstream_type == DTS_SYNC_CORE_14BITS_LE );
+                       bitstream_type == DTS_SYNC_CORE_14BITS_LE, 0 );
             return dts_header_ParseCore( p_header, conv_buf, true );
         }
         case DTS_SYNC_SUBSTREAM:
