@@ -329,7 +329,7 @@ static int demux_process_stream(const struct vlc_run_args *args, stream_t *s)
     demux_Delete(demux);
     es_out_Delete(out);
 
-    debug("Completed with %ju iteration(s).\n", i);
+    debug("Completed with %" PRIuMAX " iteration(s).\n", i);
 
     return val == VLC_DEMUXER_EOF ? 0 : -1;
 }
