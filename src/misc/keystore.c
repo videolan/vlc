@@ -247,7 +247,7 @@ protocol_set_port(const vlc_url_t *p_url, char *psz_port)
     }
     if (i_port != -1)
     {
-        sprintf(psz_port, "%u", (uint16_t) i_port);
+        sprintf(psz_port, "%" PRIu16, (uint16_t) i_port);
         return true;
     }
     return false;
