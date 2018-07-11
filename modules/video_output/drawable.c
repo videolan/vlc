@@ -79,7 +79,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         for (/*n = 0*/; used[n]; n++)
             if (used[n] == val)
             {
-                msg_Warn (wnd, "HWND 0x%zX is busy", val);
+                msg_Warn (wnd, "HWND 0x%" PRIXPTR " is busy", val);
                 val = 0;
                 goto skip;
             }
