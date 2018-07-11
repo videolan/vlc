@@ -25,7 +25,6 @@ OPTIONS="
         --enable-shout
         --enable-ncurses
         --enable-twolame
-        --enable-realrtsp
         --enable-libass
         --enable-macosx-qtkit
         --enable-macosx-avfoundation

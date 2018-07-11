@@ -13,7 +13,6 @@ OPTIONS="
       --enable-libass
       --enable-x264
       --enable-schroedinger
-      --enable-realrtsp
       --enable-live555
       --enable-dvdread
       --enable-shout

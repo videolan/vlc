@@ -17,7 +17,6 @@ $Id$
  * access_output_srt: SRT (Secure Reliable Transport) access_output module
  * access_output_udp: UDP Network access_output module
  * access_qtsound: Quicktime Audio Capture
- * access_realrtsp: Real RTSP access
  * access_srt: SRT(Secure Reliable Transport) access module
  * access_wasapi: WASAPI audio input
  * accesstweaks: access control tweaking module (dev tool)

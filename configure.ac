@@ -2008,15 +2008,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
 
 dnl
-dnl  Real RTSP plugin
-dnl
-AC_ARG_ENABLE(realrtsp,
-  [  --enable-realrtsp       Real RTSP module (default disabled)])
-if test "${enable_realrtsp}" = "yes"; then
-  VLC_ADD_PLUGIN([access_realrtsp])
-fi
-
-dnl
 dnl QTKit
 AC_ARG_ENABLE(macosx-qtkit,
   [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)])

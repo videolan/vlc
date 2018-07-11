@@ -394,19 +394,6 @@ libnfs_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
 access_LTLIBRARIES += $(LTLIBnfs)
 EXTRA_LTLIBRARIES += libnfs_plugin.la
 
-libaccess_realrtsp_plugin_la_SOURCES = \
-	access/rtsp/access.c \
-	access/rtsp/rtsp.c access/rtsp/rtsp.h \
-	access/rtsp/real.c access/rtsp/real.h \
-	access/rtsp/real_rmff.c access/rtsp/real_rmff.h \
-	access/rtsp/real_sdpplin.c access/rtsp/real_sdpplin.h \
-	access/rtsp/real_asmrp.c
-libaccess_realrtsp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS)
-libaccess_realrtsp_plugin_la_LIBADD = $(SOCKET_LIBS)
-libaccess_realrtsp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)'
-access_LTLIBRARIES += $(LTLIBaccess_realrtsp)
-EXTRA_LTLIBRARIES += libaccess_realrtsp_plugin.la
-
 libavio_plugin_la_SOURCES = access/avio.c access/avio.h
 libavio_plugin_la_CFLAGS = $(AM_CFLAGS) $(AVFORMAT_CFLAGS) $(AVUTIL_CFLAGS)
 libavio_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(SYMBOLIC_LDFLAGS)
