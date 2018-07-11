@@ -207,7 +207,6 @@ modules/access/pulse.c
 modules/access/rdp.c
 modules/access/rist.c
 modules/access/rtp/rtp.c
-modules/access/rtsp/access.c
 modules/access/satip.c
 modules/access/screen/screen.c
 modules/access/screen/xcb.c

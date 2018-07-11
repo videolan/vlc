@@ -44,7 +44,7 @@
 #include "dbus_common.h"
 
 static const char ppsz_supported_uri_schemes[][9] = {
-    "file", "http", "https", "rtsp", "realrtsp", "pnm", "ftp", "mtp", "smb",
+    "file", "http", "https", "rtsp", "ftp", "mtp", "smb",
     "mms", "mmsu", "mmst", "mmsh", "unsv", "itpc", "icyx", "rtmp", "rtp",
     "dccp", "dvd", "vcd"
 };
