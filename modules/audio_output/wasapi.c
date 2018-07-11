@@ -43,6 +43,11 @@ DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DOLBY_DIGITAL,
             WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00,
             0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
 
+/* 00000001-0000-0010-8000-00aa00389b71 */
+DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_WAVEFORMATEX,
+            WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00,
+            0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71);
+
 /* 00000008-0000-0010-8000-00aa00389b71 */
 DEFINE_GUID(_KSDATAFORMAT_SUBTYPE_IEC61937_DTS,
             WAVE_FORMAT_DTS_MS, 0x0000, 0x0010, 0x80, 0x00,
@@ -306,7 +311,13 @@ static void vlc_SpdifToWave(WAVEFORMATEXTENSIBLE *restrict wf,
     switch (audio->i_format)
     {
     case VLC_CODEC_DTS:
-        wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DTS;
+        if (audio->i_rate < 48000)
+        {
+            /* Wasapi doesn't accept DTS @ 44.1kHz but accept IEC 60958 PCM */
+            wf->SubFormat = _KSDATAFORMAT_SUBTYPE_WAVEFORMATEX;
+        }
+        else
+            wf->SubFormat = _KSDATAFORMAT_SUBTYPE_IEC61937_DTS;
         break;
     case VLC_CODEC_SPDIFL:
     case VLC_CODEC_SPDIFB:
