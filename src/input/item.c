@@ -371,7 +371,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         if( url.psz_protocol )
         {
             if( url.i_port > 0 )
-                r=asprintf( &p_i->psz_name, "%s://%s:%d%s", url.psz_protocol,
+                r=asprintf( &p_i->psz_name, "%s://%s:%u%s", url.psz_protocol,
                           url.psz_host, url.i_port,
                           url.psz_path ? url.psz_path : "" );
             else
@@ -382,7 +382,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         else
         {
             if( url.i_port > 0 )
-                r=asprintf( &p_i->psz_name, "%s:%d%s", url.psz_host, url.i_port,
+                r=asprintf( &p_i->psz_name, "%s:%u%s", url.psz_host, url.i_port,
                           url.psz_path ? url.psz_path : "" );
             else
                 r=asprintf( &p_i->psz_name, "%s%s", url.psz_host,

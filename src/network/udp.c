@@ -151,13 +151,13 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, unsigned port,
     if (host && !*host)
         host = NULL;
 
-    msg_Dbg (obj, "net: opening %s datagram port %d",
+    msg_Dbg (obj, "net: opening %s datagram port %u",
              host ? host : "any", port);
 
     int val = vlc_getaddrinfo (host, port, &hints, &res);
     if (val)
     {
-        msg_Err (obj, "Cannot resolve %s port %d : %s", host, port,
+        msg_Err (obj, "Cannot resolve %s port %u : %s", host, port,
                  gai_strerror (val));
         return -1;
     }
@@ -527,12 +527,12 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, unsigned i_por
     if( i_hlim < 0 )
         i_hlim = var_InheritInteger( p_this, "ttl" );
 
-    msg_Dbg( p_this, "net: connecting to [%s]:%d", psz_host, i_port );
+    msg_Dbg( p_this, "net: connecting to [%s]:%u", psz_host, i_port );
 
     int val = vlc_getaddrinfo (psz_host, i_port, &hints, &res);
     if (val)
     {
-        msg_Err (p_this, "cannot resolve [%s]:%d : %s", psz_host, i_port,
+        msg_Err (p_this, "cannot resolve [%s]:%u : %s", psz_host, i_port,
                  gai_strerror (val));
         return -1;
     }
@@ -574,7 +574,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, unsigned i_por
 #endif
             b_unreach = true;
         else
-            msg_Warn( p_this, "%s port %d : %s", psz_host, i_port,
+            msg_Warn( p_this, "%s port %u : %s", psz_host, i_port,
                       vlc_strerror_c(errno) );
         net_Close( fd );
     }
@@ -584,7 +584,7 @@ int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, unsigned i_por
     if( i_handle == -1 )
     {
         if( b_unreach )
-            msg_Err( p_this, "Host %s port %d is unreachable", psz_host,
+            msg_Err( p_this, "Host %s port %u is unreachable", psz_host,
                      i_port );
         return -1;
     }
@@ -604,7 +604,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, unsigned i_bind,
     if ((psz_server == NULL) || (psz_server[0] == '\0'))
         return net_ListenSingle (obj, psz_bind, i_bind, protocol);
 
-    msg_Dbg (obj, "net: connecting to [%s]:%d from [%s]:%d",
+    msg_Dbg (obj, "net: connecting to [%s]:%u from [%s]:%u",
              psz_server, i_server, psz_bind, i_bind);
 
     struct addrinfo hints = {
@@ -616,7 +616,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, unsigned i_bind,
     int val = vlc_getaddrinfo (psz_server, i_server, &hints, &rem);
     if (val)
     {
-        msg_Err (obj, "cannot resolve %s port %d : %s", psz_server, i_server,
+        msg_Err (obj, "cannot resolve %s port %u : %s", psz_server, i_server,
                  gai_strerror (val));
         return -1;
     }
@@ -625,7 +625,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, unsigned i_bind,
     val = vlc_getaddrinfo (psz_bind, i_bind, &hints, &loc);
     if (val)
     {
-        msg_Err (obj, "cannot resolve %s port %d : %s", psz_bind, i_bind,
+        msg_Err (obj, "cannot resolve %s port %u : %s", psz_bind, i_bind,
                  gai_strerror (val));
         freeaddrinfo (rem);
         return -1;
@@ -656,7 +656,7 @@ int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, unsigned i_bind,
                                      ptr->ai_addr, ptr->ai_addrlen)
               : connect (fd, ptr2->ai_addr, ptr2->ai_addrlen))
             {
-                msg_Err (obj, "cannot connect to %s port %d: %s",
+                msg_Err (obj, "cannot connect to %s port %u: %s",
                          psz_server, i_server, vlc_strerror_c(net_errno));
                 continue;
             }

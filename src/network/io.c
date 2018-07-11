@@ -112,13 +112,13 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         .ai_flags = AI_PASSIVE | AI_NUMERICSERV | AI_IDN,
     }, *res;
 
-    msg_Dbg (p_this, "net: listening to %s port %d",
+    msg_Dbg (p_this, "net: listening to %s port %u",
              (psz_host != NULL) ? psz_host : "*", i_port);
 
     int i_val = vlc_getaddrinfo (psz_host, i_port, &hints, &res);
     if (i_val)
     {
-        msg_Err (p_this, "Cannot resolve %s port %d : %s",
+        msg_Err (p_this, "Cannot resolve %s port %u : %s",
                  (psz_host != NULL) ? psz_host : "", i_port,
                  gai_strerror (i_val));
         return NULL;
