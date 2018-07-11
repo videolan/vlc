@@ -195,21 +195,19 @@ static void write_finalize( filter_t *p_filter, uint16_t i_data_type,
 {
     filter_sys_t *p_sys = p_filter->p_sys;
     assert( p_sys->p_out_buf != NULL );
+    assert( i_data_type != 0 );
     uint8_t *p_out = p_sys->p_out_buf->p_buffer;
 
     /* S/PDIF header */
-    if( i_data_type != 0 )
-    {
-        assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
-        assert( i_length_mul == 1 || i_length_mul == 8 );
+    assert( p_sys->i_out_offset > SPDIF_HEADER_SIZE );
+    assert( i_length_mul == 1 || i_length_mul == 8 );
 
-        set_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
-        set_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
-        set_16( p_filter, &p_out[4], i_data_type ); /* data type */
-        /* length in bits or bytes */
-        set_16( p_filter, &p_out[6],
-                  ( p_sys->i_out_offset - SPDIF_HEADER_SIZE ) * i_length_mul );
-    }
+    set_16( p_filter, &p_out[0], 0xf872 ); /* syncword 1 */
+    set_16( p_filter, &p_out[2], 0x4e1f ); /* syncword 2 */
+    set_16( p_filter, &p_out[4], i_data_type ); /* data type */
+    /* length in bits or bytes */
+    set_16( p_filter, &p_out[6],
+              ( p_sys->i_out_offset - SPDIF_HEADER_SIZE ) * i_length_mul );
 
     /* 0 padding */
     if( p_sys->i_out_offset < p_sys->p_out_buf->i_buffer )
@@ -417,23 +415,36 @@ static int write_buffer_dts( filter_t *p_filter, block_t *p_in_buf )
         return SPDIF_ERROR;
     }
 
-    if( p_in_buf->i_buffer == p_in_buf->i_nb_samples * 4 )
+    if( core.b_14b )
     {
-        /* No enough room to put the S/PDIF header. This is the case for DTS
-         * inside WAV. */
-        i_data_type = 0;
+        if( p_in_buf->i_buffer > p_in_buf->i_nb_samples * 4 )
+            return SPDIF_ERROR;
+        if( write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
+                        p_in_buf->i_nb_samples ) )
+            return SPDIF_ERROR;
+
+        uint8_t *p_out = &p_sys->p_out_buf->p_buffer[p_sys->i_out_offset];
+        ssize_t i_size = vlc_dts_header_Convert14b16b( p_out,
+                            p_sys->p_out_buf->i_buffer - p_sys->i_out_offset,
+                            p_in_buf->p_buffer, p_in_buf->i_buffer,
+                            p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFL );
+        if( i_size < 0 )
+            return SPDIF_ERROR;
+
+        p_sys->i_out_offset += i_size;
+        p_sys->p_out_buf->i_length += p_in_buf->i_length;
     }
-    else if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > p_in_buf->i_nb_samples * 4 )
-        return SPDIF_ERROR;
+    else
+    {
+        if( p_in_buf->i_buffer + SPDIF_HEADER_SIZE > p_in_buf->i_nb_samples * 4 )
+            return SPDIF_ERROR;
 
-    if( write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
-                    p_in_buf->i_nb_samples ) )
-        return SPDIF_ERROR;
+        if( write_init( p_filter, p_in_buf, p_in_buf->i_nb_samples * 4,
+                        p_in_buf->i_nb_samples ) )
+            return SPDIF_ERROR;
+        write_buffer( p_filter, p_in_buf );
+    }
 
-    if( i_data_type == 0 )
-        p_sys->i_out_offset = 0;
-
-    write_buffer( p_filter, p_in_buf );
     write_finalize( p_filter, i_data_type, 8 /* in bits */ );
     return SPDIF_SUCCESS;
 }
