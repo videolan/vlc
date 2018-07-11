@@ -219,7 +219,6 @@ $Id$
  * linsys_sdi: Linsys SDI cards access module
  * lirc: Linux infrared control module
  * live555: rtp demux based on liveMedia (live555.com)
- * logger: file logger plugin
  * logo: video filter to put a logo on the video
  * lpcm: LPCM decoder
  * lua: Lua scripting inteface

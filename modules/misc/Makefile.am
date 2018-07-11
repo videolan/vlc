@@ -1,9 +1,8 @@
 miscdir = $(pluginsdir)/misc
 
-liblogger_plugin_la_SOURCES = misc/logger.c
 libstats_plugin_la_SOURCES = misc/stats.c
 
-misc_LTLIBRARIES = liblogger_plugin.la libstats_plugin.la
+misc_LTLIBRARIES = libstats_plugin.la
 
 libaudioscrobbler_plugin_la_SOURCES = misc/audioscrobbler.c
 libaudioscrobbler_plugin_la_LIBADD = $(SOCKET_LIBS)
