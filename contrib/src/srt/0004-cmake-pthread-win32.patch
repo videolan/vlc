@@ -1,0 +1,11 @@
+--- srt/CMakeLists.txt.old	2018-07-11 22:41:30.169381997 +0200
++++ srt/CMakeLists.txt	2018-07-11 22:41:40.324958847 +0200
+@@ -338,7 +338,7 @@
+ endif()
+ 
+ if (MINGW)
+-	set (PTHREAD_LIBRARY -lpthreadGC2)
++	set (PTHREAD_LIBRARY -lpthread)
+ 	# XXX CONSIDER THIS. It came from a merged previous master version
+ 	# and was under an if(NOT MINGW)...elseif(THREADS_FOUND) condition.
+ 	# Might be that the current form still suffices; resolve this and remove comment.
