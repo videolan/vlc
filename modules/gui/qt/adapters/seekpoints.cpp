@@ -35,13 +35,14 @@ SeekPoints::SeekPoints( QObject *parent, intf_thread_t *p_intf_ ) :
 
 void SeekPoints::update()
 {
-    input_title_t *p_title = NULL;
     input_thread_t *p_input_thread = playlist_CurrentInput( THEPL );
-    int i_title_id = -1;
     if( !p_input_thread ) { pointsList.clear(); return; }
 
-    if ( input_Control( p_input_thread, INPUT_GET_TITLE_INFO, &p_title, &i_title_id )
-        != VLC_SUCCESS )
+    input_title_t **pp_title = NULL, *p_title = NULL;
+    int i_title_count = 0;
+    int i_title_id = var_GetInteger( p_input_thread, "title" );
+    if ( input_Control( p_input_thread, INPUT_GET_FULL_TITLE_INFO, &pp_title,
+                        &i_title_count ) != VLC_SUCCESS )
     {
         vlc_object_release( p_input_thread );
         pointsList.clear();
@@ -50,23 +51,28 @@ void SeekPoints::update()
 
     vlc_object_release( p_input_thread );
 
-    if( !p_title )
-        return;
+    if( i_title_id < i_title_count )
+        p_title = pp_title[i_title_id];
 
     /* lock here too, as update event is triggered by an external thread */
-    if ( !access() ) return;
-    pointsList.clear();
-    if ( p_title->i_seekpoint > 0 )
+    if( p_title && access() )
     {
-        /* first check the last point to see if we have filled time offsets (> 0) */
-        if ( p_title->seekpoint[p_title->i_seekpoint - 1]->i_time_offset > 0 )
+        pointsList.clear();
+        if ( p_title->i_seekpoint > 0 )
         {
-            for ( int i=0; i<p_title->i_seekpoint ; i++ )
-                pointsList << SeekPoint( p_title->seekpoint[i] );
+            /* first check the last point to see if we have filled time offsets (> 0) */
+            if ( p_title->seekpoint[p_title->i_seekpoint - 1]->i_time_offset > 0 )
+            {
+                for ( int i=0; i<p_title->i_seekpoint ; i++ )
+                    pointsList << SeekPoint( p_title->seekpoint[i] );
+            }
         }
+        release();
     }
-    vlc_input_title_Delete( p_title );
-    release();
+
+    for( int i = 0; i < i_title_count; i++ )
+        vlc_input_title_Delete( pp_title[i] );
+    free( pp_title ) ;
 }
 
 QList<SeekPoint> const SeekPoints::getPoints()
