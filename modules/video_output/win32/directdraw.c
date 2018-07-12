@@ -163,17 +163,6 @@ struct vout_display_sys_t
     bool           wallpaper_requested;
 };
 
-/*****************************************************************************
- * DirectDraw GUIDs.
- * Defining them here allows us to get rid of the dxguid library during
- * the linking stage.
- *****************************************************************************/
-#include <initguid.h>
-#undef GUID_EXT
-#define GUID_EXT
-DEFINE_GUID(IID_IDirectDraw2, 0xB3A6F3E0,0x2B43,0x11CF,0xA2,0xDE,0x00,0xAA,0x00,0xB9,0x33,0x56);
-DEFINE_GUID(IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x23,0x03,0xc1,0x0e,0x27);
-
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *);
 static int            Control(vout_display_t *, int, va_list);
