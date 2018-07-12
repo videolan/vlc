@@ -393,31 +393,6 @@ typedef enum input_event_type_e
  */
 enum input_query_e
 {
-    /* input variable "position" */
-    INPUT_GET_POSITION,         /* arg1= double *       res=    */
-    INPUT_SET_POSITION,         /* arg1= double         res=can fail    */
-
-    /* input variable "length" */
-    INPUT_GET_LENGTH,           /* arg1= int64_t *      res=can fail    */
-
-    /* input variable "time" */
-    INPUT_GET_TIME,             /* arg1= int64_t *      res=    */
-    INPUT_SET_TIME,             /* arg1= int64_t        res=can fail    */
-
-    /* input variable "rate" (nominal is INPUT_RATE_DEFAULT) */
-    INPUT_GET_RATE,             /* arg1= int *          res=    */
-    INPUT_SET_RATE,             /* arg1= int            res=can fail    */
-
-    /* input variable "state" */
-    INPUT_GET_STATE,            /* arg1= int *          res=    */
-    INPUT_SET_STATE,            /* arg1= int            res=can fail    */
-
-    /* input variable "audio-delay" and "sub-delay" */
-    INPUT_GET_AUDIO_DELAY,      /* arg1 = vlc_tick_t* res=can fail */
-    INPUT_SET_AUDIO_DELAY,      /* arg1 = vlc_tick_t  res=can fail */
-    INPUT_GET_SPU_DELAY,        /* arg1 = vlc_tick_t* res=can fail */
-    INPUT_SET_SPU_DELAY,        /* arg1 = vlc_tick_t  res=can fail */
-
     /* Menu (VCD/DVD/BD) Navigation */
     /** Activate the navigation item selected. res=can fail */
     INPUT_NAV_ACTIVATE,
@@ -450,11 +425,7 @@ enum input_query_e
     INPUT_SET_BOOKMARK,    /* arg1= int  res=can fail    */
 
     /* titles */
-    INPUT_GET_TITLE_INFO,     /* arg1=input_title_t** arg2= int * res=can fail */
     INPUT_GET_FULL_TITLE_INFO,     /* arg1=input_title_t*** arg2= int * res=can fail */
-
-    /* seekpoints */
-    INPUT_GET_SEEKPOINTS,  /* arg1=seekpoint_t*** arg2= int * res=can fail */
 
     /* Attachments */
     INPUT_GET_ATTACHMENTS, /* arg1=input_attachment_t***, arg2=int*  res=can fail */
@@ -464,10 +435,6 @@ enum input_query_e
     INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
                             * arg3= bool forced, arg4= bool notify,
                             * arg5= bool check_extension */
-
-    /* On the fly record while playing */
-    INPUT_SET_RECORD_STATE, /* arg1=bool    res=can fail */
-    INPUT_GET_RECORD_STATE, /* arg1=bool*   res=can fail */
 
     /* ES */
     INPUT_RESTART_ES,       /* arg1=int (-AUDIO/VIDEO/SPU_ES for the whole category) */
@@ -525,17 +492,6 @@ VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast 
  * you do not need it anymore.
  */
 VLC_API input_item_t* input_GetItem( input_thread_t * ) VLC_USED;
-
-/**
- * It will return the current state of the input.
- * Provided for convenience.
- */
-static inline input_state_e input_GetState( input_thread_t * p_input )
-{
-    input_state_e state = INIT_S;
-    input_Control( p_input, INPUT_GET_STATE, &state );
-    return state;
-}
 
 /**
  * Return one of the video output (if any). If possible, you should use

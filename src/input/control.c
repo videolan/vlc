@@ -68,77 +68,13 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
     seekpoint_t *p_bkmk, ***ppp_bkmk;
     int i_bkmk = 0;
     int *pi_bkmk;
-
-    int i_int, *pi_int;
-    bool b_bool, *pb_bool;
-    double f, *pf;
-    int64_t i_64, *pi_64;
+    bool b_bool;
 
     char *psz;
     vlc_value_t val;
 
     switch( i_query )
     {
-        case INPUT_GET_POSITION:
-            pf = va_arg( args, double * );
-            *pf = var_GetFloat( p_input, "position" );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_POSITION:
-            f = va_arg( args, double );
-            return var_SetFloat( p_input, "position", f );
-
-        case INPUT_GET_LENGTH:
-            pi_64 = va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_input, "length" );
-            return VLC_SUCCESS;
-
-        case INPUT_GET_TIME:
-            pi_64 = va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_input, "time" );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_TIME:
-            i_64 = va_arg( args, int64_t );
-            return var_SetInteger( p_input, "time", i_64 );
-
-        case INPUT_GET_RATE:
-            pi_int = va_arg( args, int * );
-            *pi_int = INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_RATE:
-            i_int = va_arg( args, int );
-            return var_SetFloat( p_input, "rate",
-                                 (float)INPUT_RATE_DEFAULT / (float)i_int );
-
-        case INPUT_GET_STATE:
-            pi_int = va_arg( args, int * );
-            *pi_int = var_GetInteger( p_input, "state" );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_STATE:
-            i_int = va_arg( args, int );
-            return var_SetInteger( p_input, "state", i_int );
-
-        case INPUT_GET_AUDIO_DELAY:
-            pi_64 = va_arg( args, vlc_tick_t * );
-            *pi_64 = var_GetInteger( p_input, "audio-delay" );
-            return VLC_SUCCESS;
-
-        case INPUT_GET_SPU_DELAY:
-            pi_64 = va_arg( args, vlc_tick_t * );
-            *pi_64 = var_GetInteger( p_input, "spu-delay" );
-            return VLC_SUCCESS;
-
-        case INPUT_SET_AUDIO_DELAY:
-            i_64 = va_arg( args, vlc_tick_t );
-            return var_SetInteger( p_input, "audio-delay", i_64 );
-
-        case INPUT_SET_SPU_DELAY:
-            i_64 = va_arg( args, vlc_tick_t );
-            return var_SetInteger( p_input, "spu-delay", i_64 );
-
         case INPUT_NAV_ACTIVATE:
         case INPUT_NAV_UP:
         case INPUT_NAV_DOWN:
@@ -317,30 +253,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &priv->p_item->lock );
             return VLC_SUCCESS;
 
-        case INPUT_GET_TITLE_INFO:
-        {
-            input_title_t **p_title = va_arg( args, input_title_t ** );
-            int *pi_req_title_offset = va_arg( args, int * );
-
-            vlc_mutex_lock( &priv->p_item->lock );
-
-            int i_current_title = var_GetInteger( p_input, "title" );
-            if ( *pi_req_title_offset < 0 ) /* return current title if -1 */
-                *pi_req_title_offset = i_current_title;
-
-            if( priv->i_title && priv->i_title > *pi_req_title_offset )
-            {
-                *p_title = vlc_input_title_Duplicate( priv->title[*pi_req_title_offset] );
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_SUCCESS;
-            }
-            else
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_EGENERIC;
-            }
-        }
-
         case INPUT_GET_FULL_TITLE_INFO:
         {
             vlc_mutex_lock( &priv->p_item->lock );
@@ -360,50 +272,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
             *va_arg( args, input_title_t *** ) = array;
             *va_arg( args, int * ) = count;
-            return VLC_SUCCESS;
-        }
-
-        case INPUT_GET_SEEKPOINTS:
-        {
-            seekpoint_t ***array = va_arg( args, seekpoint_t *** );
-            int *pi_title_to_fetch = va_arg( args, int * );
-
-            vlc_mutex_lock( &priv->p_item->lock );
-
-            if ( *pi_title_to_fetch < 0 ) /* query current title if -1 */
-                *pi_title_to_fetch = var_GetInteger( p_input, "title" );
-
-            if( priv->i_title == 0 || priv->i_title <= *pi_title_to_fetch )
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_EGENERIC;
-            }
-
-            const input_title_t *p_title = priv->title[*pi_title_to_fetch];
-
-            /* set arg2 to the number of seekpoints we found */
-            const int i_chapters = p_title->i_seekpoint;
-            *pi_title_to_fetch = i_chapters;
-
-            if ( i_chapters == 0 )
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_SUCCESS;
-            }
-
-            *array = calloc( p_title->i_seekpoint, sizeof(**array) );
-            if( unlikely(*array == NULL) )
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                return VLC_ENOMEM;
-            }
-            for( int i = 0; i < i_chapters; i++ )
-            {
-                (*array)[i] = vlc_seekpoint_Duplicate( p_title->seekpoint[i] );
-            }
-
-            vlc_mutex_unlock( &priv->p_item->lock );
-
             return VLC_SUCCESS;
         }
 
@@ -492,16 +360,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             vlc_mutex_unlock( &priv->p_item->lock );
             return VLC_EGENERIC;
         }
-
-        case INPUT_SET_RECORD_STATE:
-            b_bool = va_arg( args, int );
-            var_SetBool( p_input, "record", b_bool );
-            return VLC_SUCCESS;
-
-        case INPUT_GET_RECORD_STATE:
-            pb_bool = va_arg( args, bool* );
-            *pb_bool = var_GetBool( p_input, "record" );
-            return VLC_SUCCESS;
 
         case INPUT_RESTART_ES:
             val.i_int = va_arg( args, int );
