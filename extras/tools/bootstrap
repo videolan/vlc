@@ -17,6 +17,7 @@
 
 export LC_ALL=
 NEEDED=
+FOUND=
 
 if [ ! -f tools.mak ]
 then
@@ -39,7 +40,9 @@ check_version() {
          -o "$needmajor" -eq "$gotmajor" -a "$needminor" -eq "$gotminor" -a "$needmicro" -gt "$gotmicro" ]
     then
         echo "$1 too old"
-        NEEDED="$NEEDED .$1"
+        NEEDED="$NEEDED $1"
+    else
+        FOUND="$FOUND $1"
     fi
 
 }
@@ -54,7 +57,9 @@ check_version_majmin() {
          -o "$needminor" -ne "$gotminor" ]
     then
         echo "$1 not compatible"
-        NEEDED="$NEEDED .$1"
+        NEEDED="$NEEDED $1"
+    else
+        FOUND="$FOUND $1"
     fi
 
 }
@@ -63,7 +68,9 @@ check_tar() {
 if ! tar PcJ /dev/null >/dev/null 2>&1 && ! tar PcJf /dev/null /dev/null 2>&1
 then
     echo "tar doesn't support xz (J option)"
-    NEEDED="$NEEDED .tar .xz"
+    NEEDED="$NEEDED tar xz"
+else
+    FOUND="$FOUND tar xz"
 fi
 }
 
@@ -74,7 +81,9 @@ echo "test file for GNU sed" > $tmp
 if ! sed -i -e 's/sed//' $tmp >/dev/null 2>&1
 then
     echo "sed doesn't do in-place editing (-i option)"
-    NEEDED="$NEEDED .sed"
+    NEEDED="$NEEDED sed"
+else
+    FOUND="$FOUND sed"
 fi
 }
 
@@ -82,7 +91,7 @@ check_nasm() {
 if ! nasm -v >/dev/null 2>&1
 then
     echo "nasm not found"
-    NEEDED="$NEEDED .nasm"
+    NEEDED="$NEEDED nasm"
 else
     # found, need to check version ?
     [ -z "$1" ] && return # no
@@ -95,7 +104,7 @@ check() {
 if ! $1 --version >/dev/null 2>&1 && ! $1 -version >/dev/null 2>&1
 then
     echo "$1 not found"
-    NEEDED="$NEEDED .$1"
+    NEEDED="$NEEDED $1"
 else
     # found, need to check version ?
     [ -z "$2" ] && return # no
@@ -108,7 +117,7 @@ check_majmin() {
 if ! $1 --version >/dev/null 2>&1 && ! $1 -version >/dev/null 2>&1 && ! $1 --version 2>/dev/null
 then
     echo "$1 not found"
-    NEEDED="$NEEDED .$1"
+    NEEDED="$NEEDED $1"
 else
     # found, need to check version ?
     [ -z "$2" ] && return # no
@@ -136,7 +145,7 @@ check_nasm 2.13.01
 check gettext
 check help2man
 
-[ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
+[ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: $NEEDED"
 
 CPUS=
 case `uname` in
@@ -162,8 +171,19 @@ cat > Makefile << EOF
 MAKEFLAGS += -j$CPUS
 CMAKEFLAGS += --parallel=$CPUS
 PREFIX=\$(abspath ./build)
+EOF
 
-all: $NEEDED
+for t in $FOUND; do
+    echo ".$t:" >> Makefile
+done
+
+for t in $NEEDED; do
+    echo .$t: .build$t >> Makefile
+    TARGETS="$TARGETS .build$t"
+done
+
+cat >> Makefile << EOF
+all: $TARGETS
 	@echo "You are ready to build VLC and its contribs"
 
 include tools.mak
