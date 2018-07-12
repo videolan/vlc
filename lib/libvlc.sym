@@ -88,7 +88,6 @@ libvlc_media_library_media_list
 libvlc_media_library_new
 libvlc_media_library_release
 libvlc_media_library_retain
-libvlc_media_list_add_file_content
 libvlc_media_list_add_media
 libvlc_media_list_count
 libvlc_media_list_event_manager

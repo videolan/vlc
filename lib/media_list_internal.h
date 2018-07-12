@@ -65,4 +65,8 @@ int libvlc_media_list_internal_remove_index(
 
 void libvlc_media_list_internal_end_reached(
         libvlc_media_list_t * p_mlist );
+
+int libvlc_media_list_add_file_content( libvlc_media_list_t *p_ml,
+                                        const char *psz_uri );
+
 #endif

@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 
 #include "libvlc_internal.h"
+#include "media_list_internal.h"
 
 struct libvlc_media_library_t
 {

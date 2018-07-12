@@ -144,17 +144,6 @@ int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
 /** @}*/
 
 /**
- * \ingroup libvlc libvlc_media_list
- * @{
- */
-
-LIBVLC_DEPRECATED int
-    libvlc_media_list_add_file_content( libvlc_media_list_t * p_ml,
-                                        const char * psz_uri );
-
-/** @}*/
-
-/**
  * \ingroup libvlc
  * \defgroup libvlc_playlist LibVLC playlist (legacy)
  * @deprecated Use @ref libvlc_media_list instead.
