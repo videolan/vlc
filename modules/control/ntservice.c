@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
+#include <vlc_memstream.h>
 
 #define VLCSERVICENAME "VLC media player"
 
@@ -180,7 +181,8 @@ static void *Run( void *data )
 static int NTServiceInstall( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys  = p_intf->p_sys;
-    char psz_path[10*MAX_PATH], *psz_extra;
+    char *psz_extra;
+    struct vlc_memstream path_stream;
     TCHAR psz_pathtmp[MAX_PATH];
 
     SC_HANDLE handle = OpenSCManager( NULL, NULL, SC_MANAGER_ALL_ACCESS );
@@ -191,39 +193,53 @@ static int NTServiceInstall( intf_thread_t *p_intf )
         return VLC_EGENERIC;
     }
 
+    if( vlc_memstream_open(&path_stream) != 0 )
+    {
+        CloseServiceHandle( handle );
+        return VLC_ENOMEM;
+    }
+
     /* Find out the filename of ourselves so we can install it to the
      * service control manager */
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
-    sprintf( psz_path, "\"%s\" -I ntservice", FromT(psz_pathtmp) );
+    psz_extra = FromT( psz_pathtmp );
+    if ( !psz_extra )
+    {
+        CloseServiceHandle( handle );
+        return VLC_ENOMEM;
+    }
+    vlc_memstream_printf( &path_stream, "\"%s\" -I ntservice", psz_extra );
+    free(psz_extra);
 
     psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
     if( psz_extra && *psz_extra )
-    {
-        strcat( psz_path, " --ntservice-extraintf " );
-        strncat( psz_path, psz_extra, MAX_PATH - strlen( psz_path ) - 1 );
-    }
+        vlc_memstream_printf( &path_stream, " --ntservice-extraintf %s", psz_extra );
     free( psz_extra );
 
     psz_extra = var_InheritString( p_intf, "ntservice-options" );
     if( psz_extra && *psz_extra )
-    {
-        strcat( psz_path, " " );
-        strncat( psz_path, psz_extra, MAX_PATH - strlen( psz_path ) - 1 );
-    }
+        vlc_memstream_printf( &path_stream, " %s", psz_extra );
     free( psz_extra );
+
+    if ( vlc_memstream_close( &path_stream ) != 0 )
+    {
+        CloseServiceHandle( handle );
+        return VLC_ENOMEM;
+    }
 
     SC_HANDLE service =
         CreateServiceA( handle, p_sys->psz_service, p_sys->psz_service,
                        GENERIC_READ | GENERIC_EXECUTE,
                        SERVICE_WIN32_OWN_PROCESS,
                        SERVICE_AUTO_START, SERVICE_ERROR_IGNORE,
-                       psz_path, NULL, NULL, NULL, NULL, NULL );
+                       path_stream.ptr, NULL, NULL, NULL, NULL, NULL );
     if( service == NULL )
     {
         if( GetLastError() != ERROR_SERVICE_EXISTS )
         {
             msg_Err( p_intf, "could not create new service: \"%s\" (%s)",
-                     p_sys->psz_service ,psz_path );
+                     p_sys->psz_service, path_stream.ptr );
+            free( path_stream.ptr );
             CloseServiceHandle( handle );
             return VLC_EGENERIC;
         }
@@ -237,6 +253,8 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     {
         msg_Warn( p_intf, "service successfuly created" );
     }
+
+    free( path_stream.ptr );
 
     if( service ) CloseServiceHandle( service );
     CloseServiceHandle( handle );
