@@ -259,7 +259,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (!p_input)
         return i_duration;
 
-    input_Control(p_input, INPUT_GET_LENGTH, &i_duration);
+    i_duration = var_GetInteger(p_input, "length");
     vlc_object_release(p_input);
 
     return (i_duration / 1000000);

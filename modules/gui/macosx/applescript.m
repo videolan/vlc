@@ -185,8 +185,7 @@
     if (!p_input)
         return NO;
 
-    input_state_e i_state = ERROR_S;
-    input_Control(p_input, INPUT_GET_STATE, &i_state);
+    input_state_e i_state = var_GetInteger(p_input, "state");
     vlc_object_release(p_input);
 
     return ((i_state == OPENING_S) || (i_state == PLAYING_S));
@@ -229,7 +228,7 @@
     if (!p_input)
         return i_currentTime;
 
-    input_Control(p_input, INPUT_GET_TIME, &i_currentTime);
+    i_currentTime = var_GetInteger(p_input, "time");
     vlc_object_release(p_input);
 
     return (int)SEC_FROM_VLC_TICK(i_currentTime);
@@ -243,7 +242,8 @@
         if (!p_input)
             return;
 
-        input_Control(p_input, INPUT_SET_TIME, vlc_tick_from_sec( i64_value ));
+        input_SetTime(p_input, vlc_tick_from_sec(i64_value),
+                      var_GetBool(p_input, "input-fast-seek"));
         vlc_object_release(p_input);
     }
 }

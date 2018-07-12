@@ -307,7 +307,7 @@
         // No duration, disable slider
         [self.timeSlider setEnabled:NO];
     } else {
-        input_state_e inputState = input_GetState(p_input);
+        input_state_e inputState = var_GetInteger(p_input, "state");
         bool buffering = (inputState == INIT_S || inputState == OPENING_S);
         [self.timeSlider setIndefinite:buffering];
     }
