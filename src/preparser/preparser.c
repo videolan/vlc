@@ -64,8 +64,8 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
     var_AddCallback( input, "intf-event", InputEvent, preparser->worker );
     if( input_Start( input ) )
     {
-        input_Close( input );
         var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
+        input_Close( input );
         input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
         return VLC_EGENERIC;
     }
