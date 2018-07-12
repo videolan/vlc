@@ -963,7 +963,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
     if( p_input_thread )
     {
         /* A thread already exists, send it a play message */
-        input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
+        var_SetInteger( p_input_thread, "state", PLAYING_S );
         unlock_input( p_mi );
         return 0;
     }
@@ -1029,13 +1029,13 @@ void libvlc_media_player_set_pause( libvlc_media_player_t *p_mi, int paused )
     if( paused )
     {
         if( libvlc_media_player_can_pause( p_mi ) )
-            input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
+            var_SetInteger( p_input_thread, "state", PAUSE_S );
         else
             input_Stop( p_input_thread );
     }
     else
     {
-        input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
+        var_SetInteger( p_input_thread, "state", PLAYING_S );
     }
 
     vlc_object_release( p_input_thread );
