@@ -36,39 +36,47 @@ struct input_preparser_t
     vlc_object_t* owner;
     input_fetcher_t* fetcher;
     struct background_worker* worker;
+    atomic_int  state;
+    atomic_bool ended;
     atomic_bool deactivated;
 };
 
-static int InputEvent( vlc_object_t* obj, const char* varname,
-    vlc_value_t old, vlc_value_t cur, void* worker )
+static void InputEvent( input_thread_t *input, void *preparser_,
+                        const struct vlc_input_event *event )
 {
-    VLC_UNUSED( obj ); VLC_UNUSED( varname ); VLC_UNUSED( old );
+    VLC_UNUSED( input );
+    input_preparser_t *preparser = preparser_;
 
-    if( cur.i_int == INPUT_EVENT_DEAD )
-        background_worker_RequestProbe( worker );
-
-    return VLC_SUCCESS;
+    switch( event->type )
+    {
+        case INPUT_EVENT_STATE:
+            atomic_store( &preparser->state, event->state );
+            break;
+        case INPUT_EVENT_DEAD:
+            atomic_store( &preparser->ended, true );
+            background_worker_RequestProbe( preparser->worker );
+            break;
+        default:
+            break;
+    }
 }
 
 static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 {
     input_preparser_t* preparser = preparser_;
 
-    input_thread_t* input = input_CreatePreparser( preparser->owner,
-                                                   input_LegacyEvents, NULL,
-                                                   item_ );
+    atomic_store( &preparser->state, INIT_S );
+    atomic_store( &preparser->ended, false );
+    input_thread_t* input = input_CreatePreparser( preparser->owner, InputEvent,
+                                                   preparser, item_ );
     if( !input )
     {
         input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
         return VLC_EGENERIC;
     }
 
-    input_LegacyVarInit( input );
-    var_AddCallback( input, "intf-event", InputEvent, preparser->worker );
     if( input_Start( input ) )
     {
-        var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
-        input_LegacyVarStop( input );
         input_Close( input );
         input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
         return VLC_EGENERIC;
@@ -80,10 +88,9 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 
 static int PreparserProbeInput( void* preparser_, void* input_ )
 {
-    input_thread_t* input = input_;
-    int state = var_GetInteger( input, "state" );
-    return state == END_S || state == ERROR_S;
-    VLC_UNUSED( preparser_ );
+    input_preparser_t* preparser = preparser_;
+    return atomic_load( &preparser->ended );
+    VLC_UNUSED( input_ );
 }
 
 static void PreparserCloseInput( void* preparser_, void* input_ )
@@ -92,11 +99,8 @@ static void PreparserCloseInput( void* preparser_, void* input_ )
     input_thread_t* input = input_;
     input_item_t* item = input_priv(input)->p_item;
 
-    var_DelCallback( input, "intf-event", InputEvent, preparser->worker );
-    input_LegacyVarStop( input );
-
     int status;
-    switch( var_GetInteger( input, "state" ) )
+    switch( atomic_load( &preparser->state ) )
     {
         case END_S:
             status = ITEM_PREPARSE_DONE;
@@ -148,7 +152,9 @@ input_preparser_t* input_preparser_New( vlc_object_t *parent )
 
     preparser->owner = parent;
     preparser->fetcher = input_fetcher_New( parent );
+    atomic_init( &preparser->state, INIT_S );
     atomic_init( &preparser->deactivated, false );
+    atomic_init( &preparser->ended, false );
 
     if( unlikely( !preparser->fetcher ) )
         msg_Warn( parent, "unable to create art fetcher" );
