@@ -69,7 +69,11 @@ typedef struct
 
 #include "../codec/avcodec/va_surface.h"
 
-picture_sys_t *ActivePictureSys(picture_t *p_pic);
+static inline picture_sys_t *ActivePictureSys(picture_t *p_pic)
+{
+    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
+    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
+}
 
 static inline void AcquirePictureSys(picture_sys_t *p_sys)
 {

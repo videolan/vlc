@@ -29,12 +29,6 @@
 
 #include "../codec/avcodec/va_surface.h"
 
-picture_sys_t *ActivePictureSys(picture_t *p_pic)
-{
-    struct va_pic_context *pic_ctx = (struct va_pic_context*)p_pic->context;
-    return pic_ctx ? &pic_ctx->picsys : p_pic->p_sys;
-}
-
 #undef D3D9_CreateDevice
 HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
                           const video_format_t *source, d3d9_device_t *out)
