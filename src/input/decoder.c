@@ -840,7 +840,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
 
             if( p_owner->p_sout_input == NULL )
             {
-                msg_Err( p_dec, "cannot create packetizer output (%4.4s)",
+                msg_Err( p_dec, "cannot create packetized sout output (%4.4s)",
                          (char *)&p_owner->fmt.i_codec );
                 p_owner->error = true;
 
