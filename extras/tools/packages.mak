@@ -56,3 +56,6 @@ FLEX_URL=https://github.com/westes/flex/releases/download/v$(FLEX_VERSION)/flex-
 
 GETTEXT_VERSION=0.19.8.1
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
+
+HELP2MAN_VERSION=1.47.6
+HELP2MAN_URL=$(GNU)/help2man/help2man-$(HELP2MAN_VERSION).tar.xz

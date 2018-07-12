@@ -92,6 +92,22 @@ CLEAN_FILE += .cmake
 CLEAN_PKG += cmake
 DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 
+# help2man
+help2man-$(HELP2MAN_VERSION).tar.xz:
+	$(call download_pkg,$(HELP2MAN_URL),help2man)
+
+help2man: help2man-$(HELP2MAN_VERSION).tar.xz
+	$(UNPACK)
+	$(MOVE)
+
+.help2man: help2man
+	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
+	touch $@
+
+CLEAN_FILE += .help2man
+CLEAN_PKG += help2man
+DISTCLEAN_PKG += help2man-$(HELP2MAN_VERSION).tar.xz
+
 # libtool
 
 libtool-$(LIBTOOL_VERSION).tar.gz:
@@ -104,7 +120,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) libtool-2.4.6-clang-libs.patch
 	$(MOVE)
 
-.libtool: libtool .automake
+.libtool: libtool .automake .help2man
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize

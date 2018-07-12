@@ -134,6 +134,7 @@ check bison 3.0.0
 check flex
 check_nasm 2.13.01
 check gettext
+check help2man
 
 [ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
