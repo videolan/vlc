@@ -51,11 +51,11 @@ yasm: yasm-$(YASM_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.yasm: yasm
+.buildyasm: yasm
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .yasm
+CLEAN_FILE += .buildyasm
 CLEAN_PKG += yasm
 DISTCLEAN_PKG += yasm-$(YASM_VERSION).tar.gz
 
@@ -66,11 +66,11 @@ nasm: nasm-$(NASM_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.nasm: nasm
+.buildnasm: nasm
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .nasm
+CLEAN_FILE += .buildnasm
 CLEAN_PKG += nasm
 DISTCLEAN_PKG += nasm-$(NASM_VERSION).tar.gz
 
@@ -84,11 +84,11 @@ cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(APPLY) cmake-msys-FindPkg.patch
 	$(MOVE)
 
-.cmake: cmake
+.buildcmake: cmake
 	(cd $<; ./configure --prefix=$(PREFIX) $(CMAKEFLAGS) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .cmake
+CLEAN_FILE += .buildcmake
 CLEAN_PKG += cmake
 DISTCLEAN_PKG += cmake-$(CMAKE_VERSION).tar.gz
 
@@ -100,11 +100,11 @@ help2man: help2man-$(HELP2MAN_VERSION).tar.xz
 	$(UNPACK)
 	$(MOVE)
 
-.help2man: help2man
+.buildhelp2man: help2man
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .help2man
+CLEAN_FILE += .buildhelp2man
 CLEAN_PKG += help2man
 DISTCLEAN_PKG += help2man-$(HELP2MAN_VERSION).tar.xz
 
@@ -120,7 +120,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) libtool-2.4.6-clang-libs.patch
 	$(MOVE)
 
-.libtool: libtool .automake .help2man
+.buildlibtool: libtool .automake .help2man
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	ln -sf libtool $(PREFIX)/bin/glibtool
 	ln -sf libtoolize $(PREFIX)/bin/glibtoolize
@@ -128,7 +128,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 
 CLEAN_PKG += libtool
 DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
-CLEAN_FILE += .libtool
+CLEAN_FILE += .buildlibtool
 
 # GNU tar (with xz support)
 
@@ -139,13 +139,13 @@ tar: tar-$(TAR_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.tar: tar
+.buildtar: tar
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += tar
 DISTCLEAN_PKG += tar-$(TAR_VERSION).tar.bz2
-CLEAN_FILE += .tar
+CLEAN_FILE += .buildtar
 
 # xz
 
@@ -156,13 +156,13 @@ xz: xz-$(XZ_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.xz: xz
+.buildxz: xz
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install && rm $(PREFIX)/lib/pkgconfig/liblzma.pc)
 	touch $@
 
 CLEAN_PKG += xz
 DISTCLEAN_PKG += xz-$(XZ_VERSION).tar.bz2
-CLEAN_FILE += .xz
+CLEAN_FILE += .buildxz
 
 # autoconf
 
@@ -173,11 +173,11 @@ autoconf: autoconf-$(AUTOCONF_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.autoconf: autoconf .pkg-config
+.buildautoconf: autoconf .pkg-config
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .autoconf
+CLEAN_FILE += .buildautoconf
 CLEAN_PKG += autoconf
 DISTCLEAN_PKG += autoconf-$(AUTOCONF_VERSION).tar.gz
 
@@ -190,11 +190,11 @@ automake: automake-$(AUTOMAKE_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.automake: automake .autoconf
+.buildautomake: automake .autoconf
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .automake
+CLEAN_FILE += .buildautomake
 CLEAN_PKG += automake
 DISTCLEAN_PKG += automake-$(AUTOMAKE_VERSION).tar.gz
 
@@ -209,11 +209,11 @@ m4: m4-$(M4_VERSION).tar.gz
 	$(APPLY) bison-macOS-7df04f9.patch
 	$(MOVE)
 
-.m4: m4
+.buildm4: m4
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .m4
+CLEAN_FILE += .buildm4
 CLEAN_PKG += m4
 DISTCLEAN_PKG += m4-$(M4_VERSION).tar.gz
 
@@ -227,11 +227,11 @@ pkgconfig: pkg-config-$(PKGCFG_VERSION).tar.gz
 	mv pkg-config-lite-$(PKGCFG_VERSION) pkg-config-$(PKGCFG_VERSION)
 	$(MOVE)
 
-.pkg-config: pkgconfig
+.buildpkg-config: pkgconfig
 	(cd pkgconfig; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .pkg-config
+CLEAN_FILE += .buildpkg-config
 CLEAN_PKG += pkgconfig
 DISTCLEAN_PKG += pkg-config-$(PKGCFG_VERSION).tar.gz
 
@@ -243,12 +243,12 @@ gas: gas-preprocessor-$(GAS_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.gas: gas
+.buildgas: gas
 	mkdir -p $(PREFIX)/bin
 	cp gas/gas-preprocessor.pl $(PREFIX)/bin/
 	touch $@
 
-CLEAN_FILE += .gas
+CLEAN_FILE += .buildgas
 CLEAN_PKG += gas
 DISTCLEAN_PKG += gas-preprocessor-$(GAS_VERSION).tar.gz
 
@@ -262,11 +262,11 @@ ragel: ragel-$(RAGEL_VERSION).tar.gz
 	$(MOVE)
 
 
-.ragel: ragel
+.buildragel: ragel
 	(cd ragel; ./configure --prefix=$(PREFIX) --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	touch $@
 
-CLEAN_FILE += .ragel
+CLEAN_FILE += .buildragel
 CLEAN_PKG += ragel
 DISTCLEAN_PKG += ragel-$(RAGEL_VERSION).tar.gz
 
@@ -279,13 +279,13 @@ sed: sed-$(SED_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.sed: sed
+.buildsed: sed
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += sed
 DISTCLEAN_PKG += sed-$(SED_VERSION).tar.bz2
-CLEAN_FILE += .sed
+CLEAN_FILE += .buildsed
 
 # Apache ANT
 
@@ -296,14 +296,14 @@ ant: apache-ant-$(ANT_VERSION).tar.bz2
 	$(UNPACK)
 	$(MOVE)
 
-.ant: ant
+.buildant: ant
 	(mkdir -p $(PREFIX)/bin && cp $</bin/* $(PREFIX)/bin/)
 	(mkdir -p $(PREFIX)/lib && cp $</lib/* $(PREFIX)/lib/)
 	touch $@
 
 CLEAN_PKG += ant
 DISTCLEAN_PKG += apache-ant-$(ANT_VERSION).tar.bz2
-CLEAN_FILE += .ant
+CLEAN_FILE += .buildant
 
 
 # Protobuf Protoc
@@ -315,14 +315,14 @@ protobuf: protobuf-$(PROTOBUF_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.protoc: protobuf
+.buildprotoc: protobuf
 	(cd $< && ./configure --prefix="$(PREFIX)" --disable-shared --enable-static && $(MAKE) && $(MAKE) install)
 	(find $(PREFIX) -name 'protobuf*.pc' -exec rm -f {} \;)
 	touch $@
 
 CLEAN_PKG += protobuf
 DISTCLEAN_PKG += protobuf-$(PROTOBUF_VERSION).tar.gz
-CLEAN_FILE += .protoc
+CLEAN_FILE += .buildprotoc
 
 #
 # GNU bison
@@ -337,13 +337,13 @@ bison: bison-$(BISON_VERSION).tar.xz
 	$(APPLY) bison-macOS-7df04f9.patch
 	$(MOVE)
 
-.bison: bison
+.buildbison: bison
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += bison
 DISTCLEAN_PKG += bison-$(BISON_VERSION).tar.xz
-CLEAN_FILE += .bison
+CLEAN_FILE += .buildbison
 
 #
 # GNU flex
@@ -356,13 +356,13 @@ flex: flex-$(FLEX_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.flex: flex
+.buildflex: flex
 	(cd $<; ./configure --prefix=$(PREFIX) && $(MAKE) && $(MAKE) install)
 	touch $@
 
 CLEAN_PKG += flex
 DISTCLEAN_PKG += flex-$(FLEX_VERSION).tar.gz
-CLEAN_FILE += .flex
+CLEAN_FILE += .buildflex
 
 #
 # meson build
@@ -375,14 +375,14 @@ meson: meson-$(MESON_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.meson: meson
+.buildmeson: meson
 	printf "#!/bin/sh\n\npython3 $(abspath .)/meson/meson.py \"\$$@\"\n" >> $(PREFIX)/bin/meson
 	chmod +x $(PREFIX)/bin/meson
 	touch $@
 
 CLEAN_PKG += meson
 DISTCLEAN_PKG += meson-$(MESON_VERSION).tar.gz
-CLEAN_FILE += .meson
+CLEAN_FILE += .buildmeson
 
 #
 # ninja build
@@ -395,13 +395,13 @@ ninja: ninja-$(NINJA_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.ninja: ninja
+.buildninja: ninja
 	(cd $<; ./configure.py --bootstrap && mv ninja $(PREFIX)/bin/)
 	touch $@
 
 CLEAN_PKG += ninja
 DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
-CLEAN_FILE += .ninja
+CLEAN_FILE += .buildninja
 
 #
 #
