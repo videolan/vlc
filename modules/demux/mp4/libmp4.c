@@ -4958,13 +4958,14 @@ static const struct
     { ATOM_mp4s,    MP4_ReadBox_sample_mp4s,  ATOM_stsd },
 
     /* XXX there is 2 box where we could find this entry stbl and tref*/
-    { ATOM_hint,    MP4_ReadBox_default,      0 },
+    { ATOM_hint,    MP4_ReadBox_default,      ATOM_tref },
+    { ATOM_hint,    MP4_ReadBox_default,      ATOM_stbl },
 
     /* found in tref box */
-    { ATOM_dpnd,    MP4_ReadBox_default,      0 },
-    { ATOM_ipir,    MP4_ReadBox_default,      0 },
-    { ATOM_mpod,    MP4_ReadBox_default,      0 },
-    { ATOM_chap,    MP4_ReadBox_tref_generic, 0 },
+    { ATOM_dpnd,    MP4_ReadBox_default,      ATOM_tref },
+    { ATOM_ipir,    MP4_ReadBox_default,      ATOM_tref },
+    { ATOM_mpod,    MP4_ReadBox_default,      ATOM_tref },
+    { ATOM_chap,    MP4_ReadBox_tref_generic, ATOM_tref },
 
     /* found in hnti */
     { ATOM_rtp,     MP4_ReadBox_rtp,          ATOM_hnti },
