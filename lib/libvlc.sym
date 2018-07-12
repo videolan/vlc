@@ -80,7 +80,6 @@ libvlc_media_get_state
 libvlc_media_get_stats
 libvlc_media_get_type
 libvlc_media_get_user_data
-libvlc_media_get_tracks_info
 libvlc_media_is_parsed
 libvlc_media_get_parsed_status
 libvlc_media_library_load

@@ -58,7 +58,6 @@ void libvlc_track_description_release( libvlc_track_description_t *p_track_descr
  *
  * \see libvlc_media_parse_with_options
  * \see libvlc_media_get_meta
- * \see libvlc_media_get_tracks_info
  *
  * \param p_md media descriptor object
  */
@@ -82,7 +81,6 @@ libvlc_media_parse( libvlc_media_t *p_md );
  * \see libvlc_media_parse
  * \see libvlc_MediaParsedChanged
  * \see libvlc_media_get_meta
- * \see libvlc_media_get_tracks_info
  *
  * \param p_md media descriptor object
  */
@@ -104,25 +102,6 @@ libvlc_media_parse_async( libvlc_media_t *p_md );
  */
 LIBVLC_DEPRECATED LIBVLC_API int
    libvlc_media_is_parsed( libvlc_media_t *p_md );
-
-/**
- * Get media descriptor's elementary streams description
- *
- * Note, you need to call libvlc_media_parse() or play the media at least once
- * before calling this function.
- * Not doing this will result in an empty array.
- *
- * \deprecated Use libvlc_media_tracks_get() instead
- *
- * \param p_md media descriptor object
- * \param tracks address to store an allocated array of Elementary Streams
- *        descriptions (must be freed by the caller) [OUT]
- *
- * \return the number of Elementary Streams
- */
-LIBVLC_DEPRECATED LIBVLC_API
-int libvlc_media_get_tracks_info( libvlc_media_t *p_md,
-                                  libvlc_media_track_info_t **tracks );
 
 /** @}*/
 

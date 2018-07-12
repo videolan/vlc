@@ -139,33 +139,6 @@ typedef struct libvlc_media_stats_t
     float       f_send_bitrate;
 } libvlc_media_stats_t;
 
-typedef struct libvlc_media_track_info_t
-{
-    /* Codec fourcc */
-    uint32_t    i_codec;
-    int         i_id;
-    libvlc_track_type_t i_type;
-
-    /* Codec specific */
-    int         i_profile;
-    int         i_level;
-
-    union {
-        struct {
-            /* Audio specific */
-            unsigned    i_channels;
-            unsigned    i_rate;
-        } audio;
-        struct {
-            /* Video specific */
-            unsigned    i_height;
-            unsigned    i_width;
-        } video;
-    } u;
-
-} libvlc_media_track_info_t;
-
-
 typedef struct libvlc_audio_track_t
 {
     unsigned    i_channels;
