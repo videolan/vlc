@@ -172,23 +172,22 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, unsigned num,
 int libvlc_video_get_size( libvlc_media_player_t *p_mi, unsigned num,
                            unsigned *restrict px, unsigned *restrict py )
 {
-    libvlc_media_track_info_t *info;
-    int ret = -1;
-    if (!p_mi->p_md)
-        return ret;
-    int infos = libvlc_media_get_tracks_info(p_mi->p_md, &info);
-    if (infos <= 0)
-        return ret;
+    if (p_mi->p_md == NULL)
+        return -1;
 
-    for (int i = 0; i < infos; i++)
-        if (info[i].i_type == libvlc_track_video && num-- == 0) {
-            *px = info[i].u.video.i_width;
-            *py = info[i].u.video.i_height;
+    libvlc_media_track_t **tracks;
+    unsigned count = libvlc_media_tracks_get(p_mi->p_md, &tracks);
+    int ret = -1;
+
+    for (unsigned i = 0; i < count; i++)
+        if (tracks[i]->i_type == libvlc_track_video && num-- == 0) {
+            *px = tracks[i]->video->i_width;
+            *py = tracks[i]->video->i_height;
             ret = 0;
             break;
         }
 
-    free(info);
+    libvlc_media_tracks_release(tracks, count);
     return ret;
 }
 
