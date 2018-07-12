@@ -18,7 +18,6 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_list.h \
 	../include/vlc/libvlc_media_list_player.h \
 	../include/vlc/libvlc_media_player.h \
-	../include/vlc/libvlc_vlm.h \
 	../include/vlc/libvlc_renderer_discoverer.h \
 	../include/vlc/vlc.h
 
@@ -42,7 +41,6 @@ libvlc_la_SOURCES = \
 	error.c \
 	log.c \
 	playlist.c \
-	vlm.c \
 	video.c \
 	audio.c \
 	event.c \

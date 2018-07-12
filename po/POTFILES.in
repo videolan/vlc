@@ -160,7 +160,6 @@ lib/media_list_player.c
 lib/media_player.c
 lib/playlist.c
 lib/video.c
-lib/vlm.c
 
 # modules
 modules/access/alsa.c

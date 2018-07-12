@@ -60,7 +60,6 @@ VLC_API void libvlc_SetExitHandler( libvlc_int_t *, void (*) (void *), void * );
 struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
-    struct libvlc_vlm_t *vlm;
     unsigned      ref_count;
     vlc_mutex_t   instance_lock;
     struct libvlc_callback_entry_list_t *p_callback_list;

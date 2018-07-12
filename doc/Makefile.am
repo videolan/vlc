@@ -2,7 +2,6 @@ NULL =
 
 LIBVLC_SAMPLES = \
 	libvlc/gtk_player.c \
-	libvlc/libvlc_DVD_ripper.c \
 	libvlc/QtPlayer/LICENSE \
 	libvlc/QtPlayer/main.cpp \
 	libvlc/QtPlayer/player.cpp \
