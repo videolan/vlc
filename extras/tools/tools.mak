@@ -8,9 +8,6 @@ include packages.mak
 # common rules
 #
 
-AUTOCONF=$(PREFIX)/bin/autoconf
-export AUTOCONF
-
 ifeq ($(shell curl --version >/dev/null 2>&1 || echo FAIL),)
 download = curl -f -L -- "$(1)" > "$@.tmp" && touch $@.tmp && mv $@.tmp $@
 else ifeq ($(shell wget --version >/dev/null 2>&1 || echo FAIL),)
