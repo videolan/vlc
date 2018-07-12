@@ -231,7 +231,6 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         {
             var_DelCallback( p_input_thread, "intf-event",
                              InputEvent, p_playlist );
-            input_LegacyVarStop( p_input_thread );
             vlc_object_release( p_input_thread );
             p_input_thread = NULL;
         }
@@ -456,7 +455,6 @@ static void LoopInput( playlist_t *p_playlist )
     if( !var_InheritBool( p_input, "sout-keep" ) )
         input_resource_TerminateSout( p_sys->p_input_resource );
     var_DelCallback( p_input, "intf-event", InputEvent, p_playlist );
-    input_LegacyVarStop( p_input );
     input_Close( p_input );
     PL_LOCK;
 }

@@ -114,15 +114,6 @@ static const vlc_input_callback_t p_input_callbacks[] =
 
     CALLBACK( NULL, NULL )
 };
-static const vlc_input_callback_t p_input_title_navigation_callbacks[] =
-{
-    CALLBACK( "next-title", TitleCallback ),
-    CALLBACK( "prev-title", TitleCallback ),
-    CALLBACK( "menu-popup", TitleCallback ),
-    CALLBACK( "menu-title", TitleCallback ),
-
-    CALLBACK( NULL, NULL )
-};
 #undef CALLBACK
 
 static void Trigger( input_thread_t *p_input, int i_type )
@@ -527,33 +518,6 @@ void input_LegacyVarInit ( input_thread_t *p_input )
      * unless someone want to check all var_Get/var_Change return value ... */
     if( !input_priv(p_input)->b_preparsing )
         InputAddCallbacks( p_input, p_input_callbacks );
-}
-
-/*****************************************************************************
- * input_LegacyVarStop:
- *****************************************************************************/
-void input_LegacyVarStop( input_thread_t *p_input )
-{
-    if( !input_priv(p_input)->b_preparsing )
-        InputDelCallbacks( p_input, p_input_callbacks );
-
-    if( input_priv(p_input)->i_title > 1 )
-        InputDelCallbacks( p_input, p_input_title_navigation_callbacks );
-
-    for( int i = 0; i < input_priv(p_input)->i_title; i++ )
-    {
-        char name[sizeof("title ") + 3 * sizeof (int)];
-
-        sprintf( name, "title %2u", i );
-        var_DelCallback( p_input, name, NavigationCallback, (void *)(intptr_t)i );
-    }
-
-    if( var_Type( p_input, "next-chapter" ) != 0 )
-    {
-        assert( var_Type( p_input, "prev-chapter" ) != 0 );
-        var_Destroy( p_input, "next-chapter" );
-        var_Destroy( p_input, "prev-chapter" );
-    }
 }
 
 /*****************************************************************************

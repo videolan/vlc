@@ -188,7 +188,6 @@ static void Close( vlc_object_t *p_this )
         if( !p_input )
             continue;
 
-        input_LegacyVarStop( p_input );
         input_Stop( p_input );
         input_Close( p_input );
 
@@ -258,7 +257,6 @@ noreturn static void *Run( void *data )
 
             if( state == END_S || state == ERROR_S )
             {
-                input_LegacyVarStop( p_input );
                 input_Stop( p_input );
                 input_Close( p_input );
 
