@@ -460,7 +460,7 @@ static void on_paused_changed_cb( void *data, bool paused )
 
     input_thread_t *p_input = p_demux->p_next->p_input;
     if( p_input )
-        input_Control( p_input, INPUT_SET_STATE, paused ? PAUSE_S : PLAYING_S );
+        var_SetInteger( p_input, "state", paused ? PAUSE_S : PLAYING_S );
 }
 
 static int Demux( demux_t *p_demux_filter )
