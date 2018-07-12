@@ -127,9 +127,9 @@ vlc_module_end ()
 
 static int Control(demux_t *, int, va_list);
 
-class DeckLinkCaptureDelegate;
-
 namespace {
+
+class DeckLinkCaptureDelegate;
 
 struct demux_sys_t
 {
