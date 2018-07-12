@@ -30,19 +30,6 @@ extern "C" {
 # endif
 
 /**
- * \ingroup libvlc libvlc_media_player
- * @{
- */
-
-/**
- * \deprecated Use libvlc_track_description_list_release() instead
- */
-LIBVLC_DEPRECATED LIBVLC_API
-void libvlc_track_description_release( libvlc_track_description_t *p_track_description );
-
-/** @}*/
-
-/**
  * \ingroup libvlc libvlc_media
  * @{
  */

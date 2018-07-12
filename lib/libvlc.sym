@@ -216,7 +216,6 @@ libvlc_set_user_agent
 libvlc_set_app_id
 libvlc_title_descriptions_release
 libvlc_toggle_fullscreen
-libvlc_track_description_release
 libvlc_track_description_list_release
 libvlc_video_get_adjust_float
 libvlc_video_get_adjust_int

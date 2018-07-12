@@ -1788,12 +1788,6 @@ libvlc_track_description_t *
     return ret;
 }
 
-// Deprecated alias for libvlc_track_description_list_release
-void libvlc_track_description_release( libvlc_track_description_t *p_td )
-{
-    libvlc_track_description_list_release( p_td );
-}
-
 void libvlc_track_description_list_release( libvlc_track_description_t *p_td )
 {
     libvlc_track_description_t *p_actual, *p_before;
