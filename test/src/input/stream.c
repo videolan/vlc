@@ -33,7 +33,7 @@
 #include <unistd.h>
 
 #ifndef TEST_NET
-#define RAND_FILE_SIZE (25 * 1024 * 1024)
+#define RAND_FILE_SIZE (1024 * 1024)
 #else
 #define HTTP_URL "http://streams.videolan.org/streams/ogm/MJPEG.ogm"
 #define HTTP_MD5 "4eaf9e8837759b670694398a33f02bc0"
@@ -374,9 +374,10 @@ main( void )
     char *psz_url;
     int i_tmp_fd;
 
-    log( "Test random file with libc, and stream\n" );
+    log( "Generating random file...\n" );
     i_tmp_fd = vlc_mkstemp( psz_tmp_path );
     fill_rand( i_tmp_fd, RAND_FILE_SIZE );
+    log( "Testing random file with libc, and stream...\n" );
     assert( i_tmp_fd != -1 );
     assert( asprintf( &psz_url, "file://%s", psz_tmp_path ) != -1 );
 
@@ -391,7 +392,7 @@ main( void )
     close( i_tmp_fd );
 #else
 
-    log( "Test http url with stream\n" );
+    log( "Testing http url with stream...\n" );
     alarm( 0 );
     if( !( pp_readers[0] = stream_open( HTTP_URL ) ) )
     {
