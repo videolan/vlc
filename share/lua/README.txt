@@ -482,3 +482,9 @@ reader:node_empty(): queries whether the previous invocation of reader:read()
   1 if the node is empty, and 0 if it is not.
 
 The simplexml module can also be used to parse XML documents easily.
+
+Random number & bytes
+---------------------
+vlc.rand.number(): Returns a random number between 0 and 2^31 - 1
+vlc.rand.bytes(size): Returns <size> random bytes
+

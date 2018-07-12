@@ -47,6 +47,7 @@ void luaopen_xml( lua_State *L );
 void luaopen_equalizer( lua_State *L );
 void luaopen_vlcio( lua_State *L );
 void luaopen_errno( lua_State *L );
+void luaopen_rand( lua_State *L );
 #ifdef _WIN32
 void luaopen_win( lua_State *L );
 #endif

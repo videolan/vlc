@@ -43,6 +43,7 @@
 #include <vlc_interface.h>
 #include <vlc_actions.h>
 #include <vlc_interrupt.h>
+#include <vlc_rand.h>
 
 #include "../vlc.h"
 #include "../libs.h"
