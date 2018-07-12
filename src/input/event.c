@@ -44,7 +44,6 @@ static void input_SendEvent( input_thread_t *p_input,
 
 void input_SendEventDead( input_thread_t *p_input )
 {
-fprintf(stderr, "input_SendEventDead\n");
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_DEAD,
     });
@@ -138,7 +137,6 @@ void input_SendEventSignal( input_thread_t *p_input, double f_quality,
 
 void input_SendEventState( input_thread_t *p_input, int i_state )
 {
-fprintf(stderr, "input_SendEventState: %d\n", i_state);
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_STATE,
         .state = i_state
