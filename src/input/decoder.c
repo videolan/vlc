@@ -1635,12 +1635,12 @@ static void *DecoderThread( void *p_data )
 
         /* TODO? Wait for draining instead of polling. */
         vlc_mutex_lock( &p_owner->lock );
+        vlc_fifo_Lock( p_owner->p_fifo );
         if( p_owner->b_draining && (p_block == NULL) )
         {
             p_owner->b_draining = false;
             p_owner->drained = true;
         }
-        vlc_fifo_Lock( p_owner->p_fifo );
         vlc_cond_signal( &p_owner->wait_acknowledge );
         vlc_mutex_unlock( &p_owner->lock );
     }
