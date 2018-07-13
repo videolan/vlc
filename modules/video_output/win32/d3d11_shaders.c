@@ -699,3 +699,41 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
         vlc_assert_unreachable();
     }
 }
+
+#undef D3D11_CompileFlatVertexShader
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
+                                      d3d11_device_t *d3d_dev, d3d_quad_t *quad)
+{
+    HRESULT hr;
+    ID3DBlob *pVSBlob = D3D11_CompileShader(obj, hd3d, d3d_dev, globVertexShaderFlat, false);
+    if (!pVSBlob)
+        goto error;
+
+    hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+                                         ID3D10Blob_GetBufferSize(pVSBlob), NULL, &quad->d3dvertexShader);
+
+    if(FAILED(hr)) {
+        msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
+        goto error;
+    }
+
+    static D3D11_INPUT_ELEMENT_DESC layout[] = {
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    };
+
+    hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
+                                        ID3D10Blob_GetBufferSize(pVSBlob), &quad->pVertexLayout);
+
+    ID3D10Blob_Release(pVSBlob);
+    pVSBlob = NULL;
+    if(FAILED(hr)) {
+        msg_Err(obj, "Failed to create the vertex input layout. (hr=0x%lX)", hr);
+        goto error;
+    }
+
+    return S_OK;
+error:
+    return hr;
+}
+

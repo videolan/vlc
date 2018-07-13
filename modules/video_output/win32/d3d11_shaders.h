@@ -114,6 +114,9 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_s
 #define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h) \
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h)
 
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_quad_t *);
+#define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
+
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
 
