@@ -68,6 +68,7 @@ public:
         RandomChanged,
         LoopOrRepeatChanged, /* 20 */
         EPGEvent,
+        CapabilitiesChanged,
     /*    SignalChanged, */
 
         FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 50,
@@ -167,6 +168,7 @@ private:
     void UpdateName();
     void UpdateStatus();
     void UpdateNavigation();
+    void UpdateCapabilities();
     void UpdatePosition();
     void UpdateTeletext();
     void UpdateArt();

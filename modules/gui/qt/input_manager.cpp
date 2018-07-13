@@ -230,6 +230,9 @@ void InputManager::customEvent( QEvent *event )
     /* Actions */
     switch( i_type )
     {
+    case IMEvent::CapabilitiesChanged:
+        UpdateCapabilities();
+        break;
     case IMEvent::PositionUpdate:
         UpdatePosition();
         break;
@@ -339,6 +342,9 @@ static int InputEvent( vlc_object_t *, const char *,
         break;
     case INPUT_EVENT_RATE:
         event = new IMEvent( IMEvent::ItemRateChanged );
+        break;
+    case INPUT_EVENT_CAPABILITIES:
+        event = new IMEvent( IMEvent::CapabilitiesChanged );
         break;
     case INPUT_EVENT_POSITION:
     //case INPUT_EVENT_LENGTH:
@@ -474,6 +480,11 @@ void InputManager::UpdateNavigation()
         emit inputCanSeek( var_GetBool( p_input, "can-seek" ) );
     else
         emit inputCanSeek( false );
+}
+
+void InputManager::UpdateCapabilities()
+{
+    emit inputCanSeek( var_GetBool( p_input, "can-seek" ) );
 }
 
 void InputManager::UpdateStatus()
