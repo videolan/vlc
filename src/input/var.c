@@ -248,15 +248,15 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
             break;
         case INPUT_EVENT_CAPABILITIES:
             var_SetBool( p_input, "can-seek",
-                         event->capabilities | VLC_INPUT_CAPABILITIES_SEEKABLE );
+                         event->capabilities & VLC_INPUT_CAPABILITIES_SEEKABLE );
             var_SetBool( p_input, "can-pause",
-                         event->capabilities | VLC_INPUT_CAPABILITIES_PAUSEABLE );
+                         event->capabilities & VLC_INPUT_CAPABILITIES_PAUSEABLE );
             var_SetBool( p_input, "can-rate",
-                         event->capabilities | VLC_INPUT_CAPABILITIES_CHANGE_RATE );
+                         event->capabilities & VLC_INPUT_CAPABILITIES_CHANGE_RATE );
             var_SetBool( p_input, "can-rewind",
-                         event->capabilities | VLC_INPUT_CAPABILITIES_REWINDABLE );
+                         event->capabilities & VLC_INPUT_CAPABILITIES_REWINDABLE );
             var_SetBool( p_input, "can-record",
-                         event->capabilities | VLC_INPUT_CAPABILITIES_RECORDABLE );
+                         event->capabilities & VLC_INPUT_CAPABILITIES_RECORDABLE );
             break;
         case INPUT_EVENT_POSITION:
             val.f_float = event->position.percentage;
