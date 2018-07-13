@@ -75,6 +75,12 @@ typedef struct {
 const char* globVertexShaderFlat;
 const char* globVertexShaderProjection;
 
+/* Vertex Shader compiled sructures */
+typedef struct {
+    ID3D11VertexShader        *shader;
+    ID3D11InputLayout         *layout;
+} d3d_vshader_t;
+
 /* A Quad is texture that can be displayed in a rectangle */
 typedef struct
 {
@@ -84,7 +90,6 @@ typedef struct
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;
     UINT                      vertexStride;
-    ID3D11VertexShader        *d3dvertexShader;
     ID3D11Buffer              *pIndexBuffer;
     UINT                      indexCount;
     ID3D11Buffer              *pVertexShaderConstants;
@@ -92,7 +97,7 @@ typedef struct
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
     ID3D11SamplerState        *d3dsampState[2];
-    ID3D11InputLayout         *pVertexLayout;
+    d3d_vshader_t             vertexShader;
     D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
     unsigned int              i_width;
     unsigned int              i_height;
@@ -114,10 +119,10 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_s
 #define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h) \
     D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h)
 
-HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_quad_t *);
+HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_vshader_t *);
 #define D3D11_CompileFlatVertexShader(a,b,c,d) D3D11_CompileFlatVertexShader(VLC_OBJECT(a),b,c,d)
 
-HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_quad_t *);
+HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *, d3d11_handle_t *, d3d11_device_t *, d3d_vshader_t *);
 #define D3D11_CompileProjectionVertexShader(a,b,c,d) D3D11_CompileProjectionVertexShader(VLC_OBJECT(a),b,c,d)
 
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
@@ -128,5 +133,8 @@ HRESULT D3D11_CreateRenderTargets(d3d11_device_t *, ID3D11Resource *, const d3d_
 
 void D3D11_ClearRenderTargets(d3d11_device_t *, const d3d_format_t *,
                               ID3D11RenderTargetView *targets[D3D11_MAX_SHADER_VIEW]);
+
+void D3D11_SetVertexShader(d3d_vshader_t *dst, d3d_vshader_t *src);
+void D3D11_ReleaseVertexShader(d3d_vshader_t *);
 
 #endif /* VLC_D3D11_SHADERS_H */

@@ -701,7 +701,8 @@ void D3D11_ClearRenderTargets(d3d11_device_t *d3d_dev, const d3d_format_t *cfg,
 }
 
 static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
-                                         d3d11_device_t *d3d_dev, const char *psz_shader, d3d_quad_t *quad)
+                                         d3d11_device_t *d3d_dev, const char *psz_shader,
+                                         d3d_vshader_t *output)
 {
    HRESULT hr;
    ID3DBlob *pVSBlob = D3D11_CompileShader(obj, hd3d, d3d_dev, psz_shader, false);
@@ -709,7 +710,7 @@ static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d
        goto error;
 
    hr = ID3D11Device_CreateVertexShader(d3d_dev->d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &quad->d3dvertexShader);
+                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &output->shader);
 
    if(FAILED(hr)) {
        msg_Err(obj, "Failed to create the flat vertex shader. (hr=0x%lX)", hr);
@@ -722,7 +723,7 @@ static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d
    };
 
    hr = ID3D11Device_CreateInputLayout(d3d_dev->d3ddevice, layout, 2, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                       ID3D10Blob_GetBufferSize(pVSBlob), &quad->pVertexLayout);
+                                       ID3D10Blob_GetBufferSize(pVSBlob), &output->layout);
 
    ID3D10Blob_Release(pVSBlob);
    pVSBlob = NULL;
@@ -736,16 +737,38 @@ error:
    return hr;
 }
 
+void D3D11_SetVertexShader(d3d_vshader_t *dst, d3d_vshader_t *src)
+{
+    dst->layout = src->layout;
+    ID3D11InputLayout_AddRef(dst->layout);
+    dst->shader = src->shader;
+    ID3D11VertexShader_AddRef(dst->shader);
+}
+
+void D3D11_ReleaseVertexShader(d3d_vshader_t *shader)
+{
+    if (shader->layout)
+    {
+        ID3D11InputLayout_Release(shader->layout);
+        shader->layout = NULL;
+    }
+    if (shader->shader)
+    {
+        ID3D11VertexShader_Release(shader->shader);
+        shader->shader = NULL;
+    }
+}
+
 #undef D3D11_CompileFlatVertexShader
 HRESULT D3D11_CompileFlatVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
-                                      d3d11_device_t *d3d_dev, d3d_quad_t *quad)
+                                      d3d11_device_t *d3d_dev, d3d_vshader_t *output)
 {
-    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderFlat, quad);
+    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderFlat, output);
 }
 
 #undef D3D11_CompileProjectionVertexShader
 HRESULT D3D11_CompileProjectionVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d,
-                                            d3d11_device_t *d3d_dev, d3d_quad_t *quad)
+                                            d3d11_device_t *d3d_dev, d3d_vshader_t *output)
 {
-    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderProjection, quad);
+    return D3D11_CompileVertexShader(obj, hd3d, d3d_dev, globVertexShaderProjection, output);
 }
