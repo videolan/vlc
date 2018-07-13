@@ -1529,20 +1529,11 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
       return VLC_EGENERIC;
     }
 
-    ID3DBlob *pVSBlob;
-    pVSBlob = D3D11_CompileShader(vd, &sys->hd3d, &sys->d3d_dev, globVertexShaderProjection, false);
-    if (!pVSBlob)
-        return VLC_EGENERIC;
-
-    hr = ID3D11Device_CreateVertexShader(sys->d3d_dev.d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionQuad.d3dvertexShader);
-
+    hr = D3D11_CompileProjectionVertexShader(vd, &sys->hd3d, &sys->d3d_dev, &sys->projectionQuad);
     if(FAILED(hr)) {
-      ID3D10Blob_Release(pVSBlob);
       msg_Err(vd, "Failed to create the projection vertex shader. (hr=0x%lX)", hr);
       return VLC_EGENERIC;
     }
-    ID3D10Blob_Release(pVSBlob);
 
     UpdatePicQuadPosition(vd);
 
