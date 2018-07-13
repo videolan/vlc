@@ -97,7 +97,6 @@ typedef struct
     UINT                       PSConstantsCount;
     ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
     ID3D11SamplerState        *d3dsampState[2];
-    d3d_vshader_t             vertexShader;
     D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
     unsigned int              i_width;
     unsigned int              i_height;

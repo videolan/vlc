@@ -360,7 +360,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
                    vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
@@ -908,12 +907,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 
     /* Render the quad */
+    ID3D11ShaderResourceView **resourceView;
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
-        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, sys->stagingSys.resourceView, sys->d3drenderTargetView);
+        resourceView = sys->stagingSys.resourceView;
     else {
         picture_sys_t *p_sys = ActivePictureSys(picture);
-        D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad, p_sys->resourceView, sys->d3drenderTargetView);
+        resourceView = p_sys->resourceView;
     }
+    D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
+                     vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                     resourceView, sys->d3drenderTargetView);
 
     if (subpicture) {
         // draw the additional vertices
@@ -921,7 +924,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                D3D11_RenderQuad(&sys->d3d_dev, quad, quad->picSys.resourceView, sys->d3drenderTargetView);
+                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.resourceView, sys->d3drenderTargetView);
             }
         }
     }
@@ -1681,7 +1684,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             }
 
             err = D3D11_SetupQuad( vd, &sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
-                                   &sys->flatVShader, ORIENT_NORMAL );
+                                   ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
                 msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);

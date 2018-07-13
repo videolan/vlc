@@ -45,7 +45,7 @@ typedef struct d3d_vertex_t {
     } texture;
 } d3d_vertex_t;
 
-void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *,
+void D3D11_RenderQuad(d3d11_device_t *, d3d_quad_t *, d3d_vshader_t *,
                       ID3D11ShaderResourceView *resourceViews[D3D11_MAX_SHADER_VIEW],
                       ID3D11RenderTargetView *renderTarget[D3D11_MAX_SHADER_VIEW]);
 
@@ -56,9 +56,8 @@ void D3D11_ReleaseQuad(d3d_quad_t *);
 
 int D3D11_SetupQuad(vlc_object_t *, d3d11_device_t *, const video_format_t *, d3d_quad_t *,
                     const display_info_t *, const RECT *,
-                    d3d_vshader_t *,
                     video_orientation_t);
-#define D3D11_SetupQuad(a,b,c,d,e,f,g,h)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e,f,g,h)
+#define D3D11_SetupQuad(a,b,c,d,e,f,g)  D3D11_SetupQuad(VLC_OBJECT(a),b,c,d,e,f,g)
 
 bool D3D11_UpdateQuadPosition( vlc_object_t *, d3d11_device_t *, d3d_quad_t *,
                                const RECT *output, video_orientation_t );

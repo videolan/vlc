@@ -41,7 +41,7 @@
 #define nbLatBands SPHERE_SLICES
 #define nbLonBands SPHERE_SLICES
 
-void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
+void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *vsshader,
                       ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW],
                       ID3D11RenderTargetView *d3drenderTargetView[D3D11_MAX_SHADER_VIEW])
 {
@@ -51,13 +51,13 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad,
     ID3D11DeviceContext_IASetPrimitiveTopology(d3d_dev->d3dcontext, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     /* vertex shader */
-    ID3D11DeviceContext_IASetInputLayout(d3d_dev->d3dcontext, quad->vertexShader.layout);
+    ID3D11DeviceContext_IASetInputLayout(d3d_dev->d3dcontext, vsshader->layout);
     ID3D11DeviceContext_IASetVertexBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexBuffer, &quad->vertexStride, &offset);
     ID3D11DeviceContext_IASetIndexBuffer(d3d_dev->d3dcontext, quad->pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
     if ( quad->pVertexShaderConstants )
         ID3D11DeviceContext_VSSetConstantBuffers(d3d_dev->d3dcontext, 0, 1, &quad->pVertexShaderConstants);
 
-    ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, quad->vertexShader.shader, NULL, 0);
+    ID3D11DeviceContext_VSSetShader(d3d_dev->d3dcontext, vsshader->shader, NULL, 0);
 
     if (quad->d3dsampState[0])
         ID3D11DeviceContext_PSSetSamplers(d3d_dev->d3dcontext, 0, 2, quad->d3dsampState);
@@ -156,7 +156,6 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexBuffer);
         quad->pVertexBuffer = NULL;
     }
-    D3D11_ReleaseVertexShader(&quad->vertexShader);
     if (quad->pIndexBuffer)
     {
         ID3D11Buffer_Release(quad->pIndexBuffer);
@@ -690,7 +689,6 @@ error:
 #undef D3D11_SetupQuad
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat, const RECT *output,
-                    d3d_vshader_t *shader,
                     video_orientation_t orientation)
 {
     const bool RGB_shader = IsRGBShader(quad->formatInfo);
@@ -841,8 +839,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         quad->cropViewport[i].MinDepth = 0.0f;
         quad->cropViewport[i].MaxDepth = 1.0f;
     }
-    D3D11_ReleaseVertexShader(&quad->vertexShader);
-    D3D11_SetVertexShader(&quad->vertexShader, shader);
     quad->resourceCount = DxgiResourceCount(quad->formatInfo);
 
     return VLC_SUCCESS;
