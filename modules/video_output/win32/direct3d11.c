@@ -1401,8 +1401,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                  sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->b_color_range_full,
-                                  sys->picQuad.d3dpixelShader, sys->picQuad.d3dsampState);
+                                  &sys->display, fmt->transfer, fmt->b_color_range_full,
+                                  &sys->picQuad);
     if (FAILED(hr))
     {
         msg_Err(vd, "Failed to create the pixel shader. (hr=0x%lX)", hr);
@@ -1508,8 +1508,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (sys->regionQuad.formatInfo != NULL)
     {
         hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                      sys->regionQuad.formatInfo, &sys->display, TRANSFER_FUNC_SRGB, true,
-                                      sys->regionQuad.d3dpixelShader, NULL);
+                                      &sys->display, TRANSFER_FUNC_SRGB, true,
+                                      &sys->regionQuad);
         if (FAILED(hr))
         {
             for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)

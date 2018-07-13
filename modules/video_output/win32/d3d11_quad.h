@@ -32,31 +32,6 @@
 #define PS_CONST_COLORSPACE  1
 #define PS_CONST_COUNT       2
 
-/* A Quad is texture that can be displayed in a rectangle */
-typedef struct
-{
-    picture_sys_t             picSys;
-    const d3d_format_t        *formatInfo;
-    UINT                      resourceCount;
-    ID3D11Buffer              *pVertexBuffer;
-    UINT                      vertexCount;
-    UINT                      vertexStride;
-    ID3D11VertexShader        *d3dvertexShader;
-    ID3D11Buffer              *pIndexBuffer;
-    UINT                      indexCount;
-    ID3D11Buffer              *pVertexShaderConstants;
-    ID3D11Buffer              *pPixelShaderConstants[PS_CONST_COUNT];
-    ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
-    ID3D11SamplerState        *d3dsampState[2];
-    ID3D11InputLayout         *pVertexLayout;
-    D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
-    unsigned int              i_width;
-    unsigned int              i_height;
-    video_projection_mode_t   projection;
-
-    PS_CONSTANT_BUFFER        shaderConstants;
-} d3d_quad_t;
-
 /* matches the D3D11_INPUT_ELEMENT_DESC we setup */
 typedef struct d3d_vertex_t {
     struct {

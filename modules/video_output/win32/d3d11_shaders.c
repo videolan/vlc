@@ -243,10 +243,9 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
 #undef D3D11_CompilePixelShader
 HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
                                  d3d11_device_t *d3d_dev,
-                                 const d3d_format_t *format, const display_info_t *display,
+                                 const display_info_t *display,
                                  video_transfer_func_t transfer, bool src_full_range,
-                                 ID3D11PixelShader *output[D3D11_MAX_SHADER_VIEW],
-                                 ID3D11SamplerState *d3dsampState[2])
+                                 d3d_quad_t *quad)
 {
     static const char *DEFAULT_NOOP = "return rgb";
     const char *psz_sampler[2] = {NULL, NULL};
@@ -257,39 +256,36 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     const char *psz_move_planes[2]    = {DEFAULT_NOOP, DEFAULT_NOOP};
     char *psz_range = NULL;
 
-    if (d3dsampState)
-    {
-        D3D11_SAMPLER_DESC sampDesc;
-        memset(&sampDesc, 0, sizeof(sampDesc));
-        sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
-        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-        sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-        sampDesc.MinLOD = 0;
-        sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+    D3D11_SAMPLER_DESC sampDesc;
+    memset(&sampDesc, 0, sizeof(sampDesc));
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+    sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+    sampDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+    sampDesc.MinLOD = 0;
+    sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-        HRESULT hr;
-        hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &d3dsampState[0]);
-        if (FAILED(hr)) {
-            msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-            return hr;
-        }
+    HRESULT hr;
+    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->d3dsampState[0]);
+    if (FAILED(hr)) {
+        msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+        return hr;
+    }
 
-        sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-        hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &d3dsampState[1]);
-        if (FAILED(hr)) {
-            msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
-            ID3D11SamplerState_Release(d3dsampState[0]);
-            return hr;
-        }
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    hr = ID3D11Device_CreateSamplerState(d3d_dev->d3ddevice, &sampDesc, &quad->d3dsampState[1]);
+    if (FAILED(hr)) {
+        msg_Err(o, "Could not Create the D3d11 Sampler State. (hr=0x%lX)", hr);
+        ID3D11SamplerState_Release(quad->d3dsampState[0]);
+        return hr;
     }
 
     if ( display->pixelFormat->formatTexture == DXGI_FORMAT_NV12 ||
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
     {
         /* we need 2 shaders, one for the Y target, one for the UV target */
-        switch (format->formatTexture)
+        switch (quad->formatInfo->formatTexture)
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
@@ -322,7 +318,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     "return rgb";
             break;
         case DXGI_FORMAT_UNKNOWN:
-            switch (format->fourcc)
+            switch (quad->formatInfo->fourcc)
             {
             case VLC_CODEC_YUVA:
                 /* Y */
@@ -348,7 +344,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
     else
     {
-        switch (format->formatTexture)
+        switch (quad->formatInfo->formatTexture)
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
@@ -380,7 +376,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     "sample = shaderTexture[0].Sample(samplerState, coords);";
             break;
         case DXGI_FORMAT_UNKNOWN:
-            switch (format->fourcc)
+            switch (quad->formatInfo->fourcc)
             {
             case VLC_CODEC_I420_10L:
                 psz_sampler[0] =
@@ -506,7 +502,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         if (src_full_range)
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!IsRGBShader(format) && !src_full_range)
+    if (!IsRGBShader(quad->formatInfo) && !src_full_range)
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
     if (range_adjust != 0)
@@ -517,7 +513,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
             FLOAT itu_black_level;
             FLOAT itu_range_factor;
             FLOAT itu_white_level;
-            switch (format->bitsPerChannel)
+            switch (quad->formatInfo->bitsPerChannel)
             {
             case 8:
                 /* Rec. ITU-R BT.709-6 §4.6 */
@@ -573,15 +569,15 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         }
     }
 
-    HRESULT hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
+    hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                      psz_sampler[0], psz_src_transform,
                                      psz_display_transform, psz_tone_mapping,
-                                     psz_adjust_range, psz_move_planes[0], &output[0]);
+                                     psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
         hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                  psz_sampler[1], psz_src_transform,
                                  psz_display_transform, psz_tone_mapping,
-                                 psz_adjust_range, psz_move_planes[1], &output[1]);
+                                 psz_adjust_range, psz_move_planes[1], &quad->d3dpixelShader[1]);
     free(psz_range);
 
     return hr;

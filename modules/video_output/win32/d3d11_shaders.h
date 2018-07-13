@@ -75,6 +75,32 @@ typedef struct {
 const char* globVertexShaderFlat;
 const char* globVertexShaderProjection;
 
+/* A Quad is texture that can be displayed in a rectangle */
+typedef struct
+{
+    picture_sys_t             picSys;
+    const d3d_format_t        *formatInfo;
+    UINT                      resourceCount;
+    ID3D11Buffer              *pVertexBuffer;
+    UINT                      vertexCount;
+    UINT                      vertexStride;
+    ID3D11VertexShader        *d3dvertexShader;
+    ID3D11Buffer              *pIndexBuffer;
+    UINT                      indexCount;
+    ID3D11Buffer              *pVertexShaderConstants;
+    ID3D11Buffer              *pPixelShaderConstants[2];
+    UINT                       PSConstantsCount;
+    ID3D11PixelShader         *d3dpixelShader[D3D11_MAX_SHADER_VIEW];
+    ID3D11SamplerState        *d3dsampState[2];
+    ID3D11InputLayout         *pVertexLayout;
+    D3D11_VIEWPORT            cropViewport[D3D11_MAX_SHADER_VIEW];
+    unsigned int              i_width;
+    unsigned int              i_height;
+    video_projection_mode_t   projection;
+
+    PS_CONSTANT_BUFFER        shaderConstants;
+} d3d_quad_t;
+
 ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
 #define D3D11_CompileShader(a,b,c,d,e)  D3D11_CompileShader(VLC_OBJECT(a),b,c,d,e)
@@ -82,12 +108,11 @@ ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d1
 bool IsRGBShader(const d3d_format_t *);
 
 HRESULT D3D11_CompilePixelShader(vlc_object_t *, d3d11_handle_t *, bool legacy_shader,
-                                 d3d11_device_t *, const d3d_format_t *, const display_info_t *,
+                                 d3d11_device_t *, const display_info_t *,
                                  video_transfer_func_t, bool src_full_range,
-                                 ID3D11PixelShader *output[D3D11_MAX_SHADER_VIEW],
-                                 ID3D11SamplerState *d3dsampState[2]);
-#define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h,i,j) \
-    D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h,i,j)
+                                 d3d_quad_t *);
+#define D3D11_CompilePixelShader(a,b,c,d,e,f,g,h) \
+    D3D11_CompilePixelShader(VLC_OBJECT(a),b,c,d,e,f,g,h)
 
 float GetFormatLuminance(vlc_object_t *, const video_format_t *);
 #define GetFormatLuminance(a,b)  GetFormatLuminance(VLC_OBJECT(a),b)
