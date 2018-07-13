@@ -46,6 +46,7 @@
  * Video subtitle region spu core private
  */
 typedef struct subpicture_region_private_t subpicture_region_private_t;
+typedef struct vlc_spu_highlight_t vlc_spu_highlight_t;
 
 /**
  * Video subtitle region
@@ -75,6 +76,15 @@ struct subpicture_region_t
 
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
+};
+
+struct vlc_spu_highlight_t
+{
+    int x_start;
+    int x_end;
+    int y_start;
+    int y_end;
+    video_palette_t palette;
 };
 
 /* Subpicture region position flags */

@@ -223,6 +223,7 @@ void vout_ManageWrapper(vout_thread_t *);
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
 void spu_Attach( spu_t *, vlc_object_t *input, bool );
 void spu_ChangeMargin(spu_t *, int);
+void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
 
 /**
  * This function will (un)pause the display of pictures.
@@ -277,5 +278,7 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title );
  * This function will return true if no more pictures are to be displayed.
  */
 bool vout_IsEmpty( vout_thread_t *p_vout );
+
+void vout_SetSpuHighlight( vout_thread_t *p_vout, const vlc_spu_highlight_t * );
 
 #endif

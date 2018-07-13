@@ -676,6 +676,13 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         return es_out_Control( p_sys->p_out, ES_OUT_VOUT_FLUSH_OVERLAY,
                                p_es->p_es, channel );
     }
+    case ES_OUT_SPU_SET_HIGHLIGHT:
+    {
+        es_out_id_t *p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        const vlc_spu_highlight_t *p_hl = va_arg( args, const vlc_spu_highlight_t * );
+        return es_out_Control( p_sys->p_out, ES_OUT_SPU_SET_HIGHLIGHT,
+                               p_es->p_es, p_hl );
+    }
     /* Special internal input control */
     case ES_OUT_GET_EMPTY:
     {

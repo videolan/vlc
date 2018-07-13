@@ -80,8 +80,7 @@ struct spu_private_t {
     } crop;                                                  /**< cropping */
 
     int     margin;                    /**< force position of a subpicture */
-    bool    force_palette;                /**< force palette of subpicture */
-    uint8_t palette[4][4];                             /**< forced palette */
+    video_palette_t palette;              /**< force palette of subpicture */
 
     /* Subpiture filters */
     char           *source_chain_current;
@@ -695,7 +694,7 @@ static void SpuRenderRegion(spu_t *spu,
      * instead of only the right one (being the dvd spu).
      */
     const bool using_palette = region->fmt.i_chroma == VLC_CODEC_YUVP;
-    const bool force_palette = using_palette && sys->force_palette;
+    const bool force_palette = using_palette && sys->palette.i_entries > 0;
     const bool crop_requested = (force_palette && sys->force_crop) ||
                                 region->i_max_width || region->i_max_height;
     bool changed_palette     = false;
@@ -754,7 +753,7 @@ static void SpuRenderRegion(spu_t *spu,
         for (int i = 0; i < 4; i++)
         {
             for (int j = 0; j < 4; j++)
-                new_palette.palette[i][j] = sys->palette[i][j];
+                new_palette.palette[i][j] = sys->palette.palette[i][j];
             b_opaque |= (new_palette.palette[i][3] > 0x00);
         }
 
@@ -1141,55 +1140,35 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
 
 /*****************************************************************************
  * UpdateSPU: update subpicture settings
- *****************************************************************************
- * This function is called from CropCallback and at initialization time, to
- * retrieve crop information from the input.
  *****************************************************************************/
-static void UpdateSPU(spu_t *spu, vlc_object_t *object)
+static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
 {
     spu_private_t *sys = spu->p;
-    vlc_value_t val;
 
     vlc_mutex_lock(&sys->lock);
 
-    sys->force_palette = false;
+    sys->palette.i_entries = 0;
     sys->force_crop = false;
 
-    if (var_Get(object, "highlight", &val) || !val.b_bool) {
+    if (hl == NULL) {
         vlc_mutex_unlock(&sys->lock);
         return;
     }
 
     sys->force_crop = true;
-    sys->crop.x      = var_GetInteger(object, "x-start");
-    sys->crop.y      = var_GetInteger(object, "y-start");
-    sys->crop.width  = var_GetInteger(object, "x-end") - sys->crop.x;
-    sys->crop.height = var_GetInteger(object, "y-end") - sys->crop.y;
+    sys->crop.x      = hl->x_start;
+    sys->crop.y      = hl->y_start;
+    sys->crop.width  = hl->x_end - sys->crop.x;
+    sys->crop.height = hl->y_end - sys->crop.y;
 
-    if (var_Get(object, "menu-palette", &val) == VLC_SUCCESS) {
-        memcpy(sys->palette, val.p_address, 16);
-        sys->force_palette = true;
-    }
+    if (hl->palette.i_entries == 4) /* XXX: Only DVD palette for now */
+        memcpy(&sys->palette, &hl->palette, sizeof(sys->palette));
     vlc_mutex_unlock(&sys->lock);
 
-    msg_Dbg(object, "crop: %i,%i,%i,%i, palette forced: %i",
+    msg_Dbg(spu, "crop: %i,%i,%i,%i, palette forced: %i",
             sys->crop.x, sys->crop.y,
             sys->crop.width, sys->crop.height,
-            sys->force_palette);
-}
-
-/*****************************************************************************
- * CropCallback: called when the highlight properties are changed
- *****************************************************************************
- * This callback is called from the input thread when we need cropping
- *****************************************************************************/
-static int CropCallback(vlc_object_t *object, char const *var,
-                        vlc_value_t oldval, vlc_value_t newval, void *data)
-{
-    VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(var);
-
-    UpdateSPU((spu_t *)data, object);
-    return VLC_SUCCESS;
+            sys->palette.i_entries);
 }
 
 /*****************************************************************************
@@ -1390,9 +1369,7 @@ void spu_Destroy(spu_t *spu)
 void spu_Attach(spu_t *spu, vlc_object_t *input, bool attach)
 {
     if (attach) {
-        UpdateSPU(spu, input);
-        var_Create(input, "highlight", VLC_VAR_BOOL);
-        var_AddCallback(input, "highlight", CropCallback, spu);
+        UpdateSPU(spu, NULL);
 
         vlc_mutex_lock(&spu->p->lock);
         spu->p->input = input;
@@ -1406,10 +1383,6 @@ void spu_Attach(spu_t *spu, vlc_object_t *input, bool attach)
         vlc_mutex_lock(&spu->p->lock);
         spu->p->input = NULL;
         vlc_mutex_unlock(&spu->p->lock);
-
-        /* Delete callbacks */
-        var_DelCallback(input, "highlight", CropCallback, spu);
-        var_Destroy(input, "highlight");
     }
 }
 
@@ -1714,3 +1687,7 @@ void spu_ChangeMargin(spu_t *spu, int margin)
     vlc_mutex_unlock(&sys->lock);
 }
 
+void spu_SetHighlight(spu_t *spu, const vlc_spu_highlight_t *hl)
+{
+    UpdateSPU(spu, hl);
+}

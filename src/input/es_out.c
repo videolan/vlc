@@ -2958,6 +2958,15 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             return input_DecoderFlushVoutOverlay( p_es->p_dec, channel );
         return VLC_EGENERIC;
     }
+    case ES_OUT_SPU_SET_HIGHLIGHT:
+    {
+        es_out_id_t *p_es = va_arg( args, es_out_id_t * );
+        const vlc_spu_highlight_t *spu_hl =
+            va_arg( args, const vlc_spu_highlight_t * );
+        if( p_es && p_es->fmt.i_cat == SPU_ES && p_es->p_dec )
+            return input_DecoderSetSpuHighlight( p_es->p_dec, spu_hl );
+        return VLC_EGENERIC;
+    }
 
     default:
         msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,

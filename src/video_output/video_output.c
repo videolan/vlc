@@ -398,6 +398,14 @@ void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
     vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_FLUSH_SUBPICTURE,
                              channel);
 }
+void vout_SetSpuHighlight( vout_thread_t *vout,
+                        const vlc_spu_highlight_t *spu_hl )
+{
+    vlc_mutex_lock(&vout->p->spu_lock);
+    if (vout->p->spu)
+        spu_SetHighlight(vout->p->spu, spu_hl);
+    vlc_mutex_unlock(&vout->p->spu_lock);
+}
 
 /**
  * Allocates a video output picture buffer.

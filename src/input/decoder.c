@@ -2523,3 +2523,22 @@ int input_DecoderFlushVoutOverlay( decoder_t *dec, int channel )
     vlc_mutex_unlock( &owner->lock );
     return VLC_SUCCESS;
 }
+
+int input_DecoderSetSpuHighlight( decoder_t *dec,
+                                  const vlc_spu_highlight_t *spu_hl )
+{
+    struct decoder_owner *p_owner = dec_get_owner( dec );
+    assert( dec->fmt_out.i_cat == SPU_ES );
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( !p_owner->p_vout )
+    {
+        vlc_mutex_unlock( &p_owner->lock );
+        return VLC_EGENERIC;
+    }
+
+    vout_SetSpuHighlight( p_owner->p_vout, spu_hl );
+
+    vlc_mutex_unlock( &p_owner->lock );
+    return VLC_SUCCESS;
+}
