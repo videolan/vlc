@@ -42,8 +42,8 @@
 void AcquirePictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (p_sys->resourceView[i])
-            ID3D11ShaderResourceView_AddRef(p_sys->resourceView[i]);
+        if (p_sys->renderSrc[i])
+            ID3D11ShaderResourceView_AddRef(p_sys->renderSrc[i]);
         if (p_sys->texture[i])
             ID3D11Texture2D_AddRef(p_sys->texture[i]);
     }
@@ -60,8 +60,8 @@ void AcquirePictureSys(picture_sys_t *p_sys)
 void ReleasePictureSys(picture_sys_t *p_sys)
 {
     for (int i=0; i<D3D11_MAX_SHADER_VIEW; i++) {
-        if (p_sys->resourceView[i])
-            ID3D11ShaderResourceView_Release(p_sys->resourceView[i]);
+        if (p_sys->renderSrc[i])
+            ID3D11ShaderResourceView_Release(p_sys->renderSrc[i]);
         if (p_sys->texture[i])
             ID3D11Texture2D_Release(p_sys->texture[i]);
     }
@@ -76,11 +76,11 @@ void ReleasePictureSys(picture_sys_t *p_sys)
 }
 
 /* map texture planes to resource views */
-#undef D3D11_AllocateShaderView
-int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
+#undef D3D11_AllocateResourceView
+int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
                               const d3d_format_t *format,
                               ID3D11Texture2D *p_texture[D3D11_MAX_SHADER_VIEW], UINT slice_index,
-                              ID3D11ShaderResourceView *resourceView[D3D11_MAX_SHADER_VIEW])
+                              ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW])
 {
     HRESULT hr;
     int i;
@@ -106,10 +106,10 @@ int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     {
         resviewDesc.Format = format->resourceFormat[i];
         if (resviewDesc.Format == DXGI_FORMAT_UNKNOWN)
-            resourceView[i] = NULL;
+            renderSrc[i] = NULL;
         else
         {
-            hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture[i], &resviewDesc, &resourceView[i]);
+            hr = ID3D11Device_CreateShaderResourceView(d3ddevice, (ID3D11Resource*)p_texture[i], &resviewDesc, &renderSrc[i]);
             if (FAILED(hr)) {
                 msg_Err(obj, "Could not Create the Texture ResourceView %d slice %d. (hr=0x%lX)", i, slice_index, hr);
                 break;
@@ -121,8 +121,8 @@ int D3D11_AllocateShaderView(vlc_object_t *obj, ID3D11Device *d3ddevice,
     {
         while (--i >= 0)
         {
-            ID3D11ShaderResourceView_Release(resourceView[i]);
-            resourceView[i] = NULL;
+            ID3D11ShaderResourceView_Release(renderSrc[i]);
+            renderSrc[i] = NULL;
         }
         return VLC_EGENERIC;
     }

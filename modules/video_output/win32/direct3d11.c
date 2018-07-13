@@ -434,9 +434,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
                 picture_sys_t *p_sys = pictures[picture_count]->p_sys;
                 if (!p_sys->texture[0])
                     continue;
-                if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
+                if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
                                              p_sys->texture, picture_count,
-                                             p_sys->resourceView))
+                                             p_sys->renderSrc))
                     goto error;
             }
         }
@@ -856,7 +856,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             {
                 /* for performance reason we don't want to allocate this during
                  * display, do it preferrably when creating the texture */
-                assert(p_sys->resourceView[0]!=NULL);
+                assert(p_sys->renderSrc[0]!=NULL);
             }
             if ( sys->picQuad.i_height != texDesc.Height ||
                  sys->picQuad.i_width != texDesc.Width )
@@ -907,16 +907,16 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 
     /* Render the quad */
-    ID3D11ShaderResourceView **resourceView;
+    ID3D11ShaderResourceView **renderSrc;
     if (!is_d3d11_opaque(picture->format.i_chroma) || sys->legacy_shader)
-        resourceView = sys->stagingSys.resourceView;
+        renderSrc = sys->stagingSys.renderSrc;
     else {
         picture_sys_t *p_sys = ActivePictureSys(picture);
-        resourceView = p_sys->resourceView;
+        renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
                      vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                     resourceView, sys->swapchainTargetView);
+                     renderSrc, sys->swapchainTargetView);
 
     if (subpicture) {
         // draw the additional vertices
@@ -924,7 +924,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.resourceView, sys->swapchainTargetView);
+                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.renderSrc, sys->swapchainTargetView);
             }
         }
     }
@@ -1442,8 +1442,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
             return VLC_EGENERIC;
         }
 
-        if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
-                                     textures, 0, sys->stagingSys.resourceView))
+        if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->picQuad.textureFormat,
+                                     textures, 0, sys->stagingSys.renderSrc))
         {
             msg_Err(vd, "Failed to allocate the staging shader view");
             return VLC_EGENERIC;
@@ -1662,9 +1662,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->regionQuad.textureFormat,
-                                         d3dquad->picSys.texture, 0,
-                                         d3dquad->picSys.resourceView)) {
+            if (D3D11_AllocateResourceView(vd, sys->d3d_dev.d3ddevice, sys->regionQuad.textureFormat,
+                                           d3dquad->picSys.texture, 0,
+                                           d3dquad->picSys.renderSrc)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 free(d3dquad);
