@@ -114,8 +114,7 @@ struct vout_display_sys_t
 
     // SPU
     vlc_fourcc_t             pSubpictureChromas[2];
-    ID3D11PixelShader        *pSPUPixelShader[D3D11_MAX_SHADER_VIEW];
-    const d3d_format_t       *d3dregion_format;
+    d3d_quad_t               regionQuad;
     int                      d3dregion_count;
     picture_t                **d3dregions;
 };
@@ -302,9 +301,9 @@ static int Open(vlc_object_t *object)
     vd->info.has_pictures_invalid = vd->info.is_slow;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
-        vd->sys->d3dregion_format != NULL)
+        vd->sys->regionQuad.formatInfo != NULL)
     {
-        vd->sys->pSubpictureChromas[0] = vd->sys->d3dregion_format->fourcc;
+        vd->sys->pSubpictureChromas[0] = vd->sys->regionQuad.formatInfo->fourcc;
         vd->sys->pSubpictureChromas[1] = 0;
         vd->info.subpicture_chromas = vd->sys->pSubpictureChromas;
     }
@@ -1324,9 +1323,9 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
     DxgiFormatMask( sys->picQuad.formatInfo->formatTexture, fmt );
 
     /* check the region pixel format */
-    sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_RGBA);
-    if (!sys->d3dregion_format)
-        sys->d3dregion_format = GetBlendableFormat(vd, VLC_CODEC_BGRA);
+    sys->regionQuad.formatInfo = GetBlendableFormat(vd, VLC_CODEC_RGBA);
+    if (!sys->regionQuad.formatInfo)
+        sys->regionQuad.formatInfo = GetBlendableFormat(vd, VLC_CODEC_BGRA);
 
     if (Direct3D11CreateFormatResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate format resources");
@@ -1506,11 +1505,11 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
        return VLC_EGENERIC;
     }
 
-    if (sys->d3dregion_format != NULL)
+    if (sys->regionQuad.formatInfo != NULL)
     {
         hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                      sys->d3dregion_format, &sys->display, TRANSFER_FUNC_SRGB, true,
-                                      sys->pSPUPixelShader, NULL);
+                                      sys->regionQuad.formatInfo, &sys->display, TRANSFER_FUNC_SRGB, true,
+                                      sys->regionQuad.d3dpixelShader, NULL);
         if (FAILED(hr))
         {
             for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
@@ -1616,10 +1615,10 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
             ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
             sys->d3drenderTargetView[i] = NULL;
         }
-        if (sys->pSPUPixelShader[i])
+        if (sys->regionQuad.d3dpixelShader[i])
         {
-            ID3D11PixelShader_Release(sys->pSPUPixelShader[i]);
-            sys->pSPUPixelShader[i] = NULL;
+            ID3D11PixelShader_Release(sys->regionQuad.d3dpixelShader[i]);
+            sys->regionQuad.d3dpixelShader[i] = NULL;
         }
     }
 
@@ -1651,7 +1650,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
     HRESULT hr;
     int err;
 
-    if (sys->d3dregion_format == NULL)
+    if (sys->regionQuad.formatInfo == NULL)
         return VLC_EGENERIC;
 
     int count = 0;
@@ -1672,7 +1671,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             picture_t *cache = sys->d3dregions[j];
             if (cache != NULL && ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX]) {
                 ID3D11Texture2D_GetDesc( ((d3d_quad_t *) cache->p_sys)->picSys.texture[KNOWN_DXGI_INDEX], &texDesc );
-                if (texDesc.Format == sys->d3dregion_format->formatTexture &&
+                if (texDesc.Format == sys->regionQuad.formatInfo->formatTexture &&
                     texDesc.Width  == r->p_picture->format.i_width &&
                     texDesc.Height == r->p_picture->format.i_height) {
                     (*region)[i] = cache;
@@ -1694,7 +1693,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             if (unlikely(d3dquad==NULL)) {
                 continue;
             }
-            if (AllocateTextures(vd, &sys->d3d_dev, sys->d3dregion_format, &r->p_picture->format, 1, d3dquad->picSys.texture)) {
+            if (AllocateTextures(vd, &sys->d3d_dev, sys->regionQuad.formatInfo, &r->p_picture->format, 1, d3dquad->picSys.texture)) {
                 msg_Err(vd, "Failed to allocate %dx%d texture for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 for (int j=0; j<D3D11_MAX_SHADER_VIEW; j++)
@@ -1704,7 +1703,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                 continue;
             }
 
-            if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->d3dregion_format,
+            if (D3D11_AllocateShaderView(vd, sys->d3d_dev.d3ddevice, sys->regionQuad.formatInfo,
                                          d3dquad->picSys.texture, 0,
                                          d3dquad->picSys.resourceView)) {
                 msg_Err(vd, "Failed to create %dx%d shader view for OSD",
@@ -1715,7 +1714,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_width    = r->fmt.i_width;
             d3dquad->i_height   = r->fmt.i_height;
 
-            d3dquad->formatInfo = sys->d3dregion_format;
+            d3dquad->formatInfo = sys->regionQuad.formatInfo;
             err = D3D11_AllocateQuad(vd, &sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
             if (err != VLC_SUCCESS)
             {
@@ -1748,9 +1747,9 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             for (size_t j=0; j<D3D11_MAX_SHADER_VIEW; j++)
             {
                 /* TODO use something more accurate if we have different formats */
-                if (sys->pSPUPixelShader[j])
+                if (sys->regionQuad.d3dpixelShader[j])
                 {
-                    d3dquad->d3dpixelShader[j] = sys->pSPUPixelShader[j];
+                    d3dquad->d3dpixelShader[j] = sys->regionQuad.d3dpixelShader[j];
                     ID3D11PixelShader_AddRef(d3dquad->d3dpixelShader[j]);
                 }
             }
