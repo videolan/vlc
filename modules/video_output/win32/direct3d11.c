@@ -102,7 +102,7 @@ struct vout_display_sys_t
 
     picture_sys_t            stagingSys;
 
-    ID3D11RenderTargetView   *d3drenderTargetView[D3D11_MAX_SHADER_VIEW];
+    ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_SHADER_VIEW];
 
     d3d_vshader_t            projectionVShader;
     d3d_vshader_t            flatVShader;
@@ -511,9 +511,9 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     uint32_t i_height = RECTHeight(rect);
     D3D11_TEXTURE2D_DESC dsc = { 0 };
 
-    if (sys->d3drenderTargetView[0]) {
+    if (sys->swapchainTargetView[0]) {
         ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource(sys->d3drenderTargetView[0], &res);
+        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
         if (res)
         {
             ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
@@ -526,9 +526,9 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
 
     for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
     {
-        if (sys->d3drenderTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
-            sys->d3drenderTargetView[i] = NULL;
+        if (sys->swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
+            sys->swapchainTargetView[i] = NULL;
         }
     }
 
@@ -547,14 +547,14 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
     }
 
     hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
-                                    sys->display.pixelFormat, sys->d3drenderTargetView );
+                                    sys->display.pixelFormat, sys->swapchainTargetView );
     ID3D11Texture2D_Release(pBackBuffer);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
         return hr;
     }
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->d3drenderTargetView );
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
 
     return S_OK;
 }
@@ -881,7 +881,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         sys->d3dregions      = subpicture_regions;
     }
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->d3drenderTargetView );
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
 
     if (picture->format.mastering.max_luminance)
     {
@@ -916,7 +916,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
                      vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                     resourceView, sys->d3drenderTargetView);
+                     resourceView, sys->swapchainTargetView);
 
     if (subpicture) {
         // draw the additional vertices
@@ -924,7 +924,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.resourceView, sys->d3drenderTargetView);
+                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.resourceView, sys->swapchainTargetView);
             }
         }
     }
@@ -1570,9 +1570,9 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
 
     for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
     {
-        if (sys->d3drenderTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->d3drenderTargetView[i]);
-            sys->d3drenderTargetView[i] = NULL;
+        if (sys->swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
+            sys->swapchainTargetView[i] = NULL;
         }
         if (sys->regionQuad.d3dpixelShader[i])
         {
