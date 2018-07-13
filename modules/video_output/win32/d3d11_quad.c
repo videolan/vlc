@@ -691,7 +691,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
                     const display_info_t *displayFormat, const RECT *output,
                     video_orientation_t orientation)
 {
-    const bool RGB_shader = IsRGBShader(quad->formatInfo);
+    const bool RGB_shader = IsRGBShader(quad->textureFormat);
 
     quad->shaderConstants.LuminanceScale = GetFormatLuminance(o, fmt) / (float)displayFormat->luminance_peak;
 
@@ -712,7 +712,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     FLOAT itu_achromacy   = 0.f;
     if (!RGB_shader)
     {
-        switch (quad->formatInfo->bitsPerChannel)
+        switch (quad->textureFormat->bitsPerChannel)
         {
         case 8:
             /* Rec. ITU-R BT.709-6 ¶4.6 */
@@ -827,7 +827,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);
 
 
-    quad->picSys.formatTexture = quad->formatInfo->formatTexture;
+    quad->picSys.formatTexture = quad->textureFormat->formatTexture;
     quad->picSys.context = d3d_dev->d3dcontext;
     ID3D11DeviceContext_AddRef(quad->picSys.context);
 
@@ -839,7 +839,7 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
         quad->cropViewport[i].MinDepth = 0.0f;
         quad->cropViewport[i].MaxDepth = 1.0f;
     }
-    quad->resourceCount = DxgiResourceCount(quad->formatInfo);
+    quad->resourceCount = DxgiResourceCount(quad->textureFormat);
 
     return VLC_SUCCESS;
 }
@@ -851,7 +851,7 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
     quad->cropViewport[0].Width    = rect->right  - rect->left;
     quad->cropViewport[0].Height   = rect->bottom - rect->top;
 
-    switch ( quad->formatInfo->formatTexture )
+    switch ( quad->textureFormat->formatTexture )
     {
     case DXGI_FORMAT_NV12:
     case DXGI_FORMAT_P010:
@@ -875,7 +875,7 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
         }
         break;
     case DXGI_FORMAT_UNKNOWN:
-        switch ( quad->formatInfo->fourcc )
+        switch ( quad->textureFormat->fourcc )
         {
         case VLC_CODEC_YUVA:
             if ( display->formatTexture != DXGI_FORMAT_NV12 &&

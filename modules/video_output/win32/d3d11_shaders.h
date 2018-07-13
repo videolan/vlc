@@ -85,7 +85,7 @@ typedef struct {
 typedef struct
 {
     picture_sys_t             picSys;
-    const d3d_format_t        *formatInfo;
+    const d3d_format_t        *textureFormat;
     UINT                      resourceCount;
     ID3D11Buffer              *pVertexBuffer;
     UINT                      vertexCount;

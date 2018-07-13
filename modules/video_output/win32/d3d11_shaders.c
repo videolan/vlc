@@ -285,7 +285,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
          display->pixelFormat->formatTexture == DXGI_FORMAT_P010 )
     {
         /* we need 2 shaders, one for the Y target, one for the UV target */
-        switch (quad->formatInfo->formatTexture)
+        switch (quad->textureFormat->formatTexture)
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
@@ -318,7 +318,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     "return rgb";
             break;
         case DXGI_FORMAT_UNKNOWN:
-            switch (quad->formatInfo->fourcc)
+            switch (quad->textureFormat->fourcc)
             {
             case VLC_CODEC_YUVA:
                 /* Y */
@@ -344,7 +344,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
     else
     {
-        switch (quad->formatInfo->formatTexture)
+        switch (quad->textureFormat->formatTexture)
         {
         case DXGI_FORMAT_NV12:
         case DXGI_FORMAT_P010:
@@ -376,7 +376,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     "sample = shaderTexture[0].Sample(samplerState, coords);";
             break;
         case DXGI_FORMAT_UNKNOWN:
-            switch (quad->formatInfo->fourcc)
+            switch (quad->textureFormat->fourcc)
             {
             case VLC_CODEC_I420_10L:
                 psz_sampler[0] =
@@ -502,7 +502,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
         if (src_full_range)
             range_adjust = -1; /* lower the source to studio range */
     }
-    if (!IsRGBShader(quad->formatInfo) && !src_full_range)
+    if (!IsRGBShader(quad->textureFormat) && !src_full_range)
         range_adjust--; /* the YUV->RGB conversion already output full range */
 
     if (range_adjust != 0)
@@ -513,7 +513,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
             FLOAT itu_black_level;
             FLOAT itu_range_factor;
             FLOAT itu_white_level;
-            switch (quad->formatInfo->bitsPerChannel)
+            switch (quad->textureFormat->bitsPerChannel)
             {
             case 8:
                 /* Rec. ITU-R BT.709-6 §4.6 */
