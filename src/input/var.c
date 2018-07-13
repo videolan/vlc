@@ -86,7 +86,6 @@ typedef struct
 } vlc_input_callback_t;
 
 static void InputAddCallbacks( input_thread_t *, const vlc_input_callback_t * );
-static void InputDelCallbacks( input_thread_t *, const vlc_input_callback_t * );
 
 #ifdef CALLBACK /* For windows */
 # undef CALLBACK /* We don't care of this one here */
@@ -777,16 +776,6 @@ static void InputAddCallbacks( input_thread_t *p_input,
     int i;
     for( i = 0; p_callbacks[i].psz_name != NULL; i++ )
         var_AddCallback( p_input,
-                         p_callbacks[i].psz_name,
-                         p_callbacks[i].callback, NULL );
-}
-
-static void InputDelCallbacks( input_thread_t *p_input,
-                               const vlc_input_callback_t *p_callbacks )
-{
-    int i;
-    for( i = 0; p_callbacks[i].psz_name != NULL; i++ )
-        var_DelCallback( p_input,
                          p_callbacks[i].psz_name,
                          p_callbacks[i].callback, NULL );
 }
