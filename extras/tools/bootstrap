@@ -146,7 +146,7 @@ check help2man
 check meson 0.51.1
 check ninja
 
-[ -n "$NEEDED" ] && mkdir -p build/bin && echo "To-be-built packages: $NEEDED"
+DEPS_ONLY="help2man"
 
 CPUS=
 case `uname` in
@@ -180,8 +180,17 @@ done
 
 for t in $NEEDED; do
     echo .$t: .build$t >> Makefile
-    TARGETS="$TARGETS .build$t"
+    case "$t" in
+        *$DEPS_ONLY*)
+            ;; # Dependency only, not build by default
+        *)
+            PACKAGES="$PACKAGES $t"
+            TARGETS="$TARGETS .build$t"
+            ;;
+    esac
 done
+
+[ -n "$PACKAGES" ] && mkdir -p build/bin && echo "To-be-built packages: $PACKAGES"
 
 cat >> Makefile << EOF
 all: $TARGETS
