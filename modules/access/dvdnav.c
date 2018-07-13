@@ -140,9 +140,11 @@ typedef struct
     ps_track_t  tk[PS_TK_COUNT];
     int         i_mux_rate;
 
+    vlc_mutex_t event_lock;
+    es_out_id_t *spu_es;
+
     /* palette for menus */
     uint32_t clut[16];
-    uint8_t  palette[4][4];
     bool b_spu_change;
 
     /* Aspect ration */
@@ -205,6 +207,7 @@ static int CommonOpen( vlc_object_t *p_this,
     p_sys->b_reset_pcr = false;
 
     ps_track_init( p_sys->tk );
+    p_sys->spu_es = NULL;
     p_sys->sar.i_num = 0;
     p_sys->sar.i_den = 0;
     p_sys->i_mux_rate = 0;
@@ -313,18 +316,9 @@ static int CommonOpen( vlc_object_t *p_this,
     i_angle = var_CreateGetInteger( p_demux, "dvdnav-angle" );
     if( i_angle <= 0 ) i_angle = 1;
 
-    /* FIXME hack hack hack hack FIXME */
-    /* Get p_input and create variable */
-    var_Create( p_demux->p_input, "x-start", VLC_VAR_INTEGER );
-    var_Create( p_demux->p_input, "y-start", VLC_VAR_INTEGER );
-    var_Create( p_demux->p_input, "x-end", VLC_VAR_INTEGER );
-    var_Create( p_demux->p_input, "y-end", VLC_VAR_INTEGER );
-    var_Create( p_demux->p_input, "color", VLC_VAR_ADDRESS );
-    var_Create( p_demux->p_input, "menu-palette", VLC_VAR_ADDRESS );
-    var_Create( p_demux->p_input, "highlight", VLC_VAR_BOOL );
-
     p_sys->still.b_enabled = false;
     vlc_mutex_init( &p_sys->still.lock );
+    vlc_mutex_init( &p_sys->event_lock );
     if( !vlc_timer_create( &p_sys->still.timer, StillTimer, p_sys ) )
         p_sys->still.b_created = true;
 
@@ -505,14 +499,7 @@ static void Close( vlc_object_t *p_this )
     if( p_sys->still.b_created )
         vlc_timer_destroy( p_sys->still.timer );
     vlc_mutex_destroy( &p_sys->still.lock );
-
-    var_Destroy( p_demux->p_input, "highlight" );
-    var_Destroy( p_demux->p_input, "x-start" );
-    var_Destroy( p_demux->p_input, "x-end" );
-    var_Destroy( p_demux->p_input, "y-start" );
-    var_Destroy( p_demux->p_input, "y-end" );
-    var_Destroy( p_demux->p_input, "color" );
-    var_Destroy( p_demux->p_input, "menu-palette" );
+    vlc_mutex_destroy( &p_sys->event_lock );
 
     for( int i = 0; i < PS_TK_COUNT; i++ )
     {
@@ -947,7 +934,16 @@ static int Demux( demux_t *p_demux )
             if( tk->b_configured )
             {
                 es_format_Clean( &tk->fmt );
-                if( tk->es ) es_out_Del( p_demux->out, tk->es );
+                if( tk->es )
+                {
+                    if( tk->es == p_sys->spu_es )
+                    {
+                        vlc_mutex_lock( &p_sys->event_lock );
+                        p_sys->spu_es = NULL;
+                        vlc_mutex_unlock( &p_sys->event_lock );
+                    }
+                    es_out_Del( p_demux->out, tk->es );
+                }
             }
             tk->b_configured = false;
         }
@@ -1239,6 +1235,9 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
     demux_sys_t *p_sys = p_demux->p_sys;
     int32_t i_title, i_part;
 
+    if( !p_sys->spu_es )
+        return;
+
     dvdnav_current_title_info( p_sys->dvdnav, &i_title, &i_part );
 
     dvdnav_highlight_area_t hl;
@@ -1263,25 +1262,29 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
 
     if( b_button_ok )
     {
+        vlc_spu_highlight_t spu_hl = {
+            .x_start = hl.sx,
+            .x_end = hl.ex,
+            .y_start = hl.sy,
+            .y_end = hl.ey,
+            .palette = {
+                .i_entries = 4,
+            }
+        };
+
         for( unsigned i = 0; i < 4; i++ )
         {
             uint32_t i_yuv = p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
             uint8_t i_alpha = ( (hl.palette>>(i*4))&0x0f ) * 0xff / 0xf;
 
-            p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
-            p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
-            p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
-            p_sys->palette[i][3] = i_alpha;
+            spu_hl.palette.palette[i][0] = (i_yuv >> 16) & 0xff;
+            spu_hl.palette.palette[i][1] = (i_yuv >> 0) & 0xff;
+            spu_hl.palette.palette[i][2] = (i_yuv >> 8) & 0xff;
+            spu_hl.palette.palette[i][3] = i_alpha;
         }
 
-        vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-        var_SetInteger( p_demux->p_input, "x-start", hl.sx );
-        var_SetInteger( p_demux->p_input, "x-end",  hl.ex );
-        var_SetInteger( p_demux->p_input, "y-start", hl.sy );
-        var_SetInteger( p_demux->p_input, "y-end", hl.ey );
-
-        var_SetAddress( p_demux->p_input, "menu-palette", p_sys->palette );
-        var_SetBool( p_demux->p_input, "highlight", true );
+        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, p_sys->spu_es,
+                        &spu_hl );
 
         msg_Dbg( p_demux, "buttonUpdate %d", i_button );
     }
@@ -1290,11 +1293,9 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
         msg_Dbg( p_demux, "buttonUpdate not done b=%d t=%d",
                  i_button, i_title );
 
-        /* Show all */
-        vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-        var_SetBool( p_demux->p_input, "highlight", false );
+        es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, p_sys->spu_es,
+                        NULL );
     }
-    vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
 }
 
 static void ESSubtitleUpdate( demux_t *p_demux )
@@ -1323,6 +1324,14 @@ static void ESSubtitleUpdate( demux_t *p_demux )
 
             /* now select it */
             es_out_Control( p_demux->out, ES_OUT_SET_ES, tk->es );
+
+            if( tk->fmt.i_cat == SPU_ES )
+            {
+                vlc_mutex_lock( &p_sys->event_lock );
+                p_sys->spu_es = tk->es;
+                vlc_mutex_unlock( &p_sys->event_lock );
+                ButtonUpdate( p_demux, false );
+            }
         }
     }
     else
@@ -1591,7 +1600,9 @@ static void EventMouse( const vlc_mouse_t *newmouse, void *p_data )
         dvdnav_mouse_select( p_sys->dvdnav, pci, newmouse->i_x, newmouse->i_y );
     if( vlc_mouse_HasPressed( &p_sys->oldmouse, newmouse, MOUSE_BUTTON_LEFT ) )
     {
+        vlc_mutex_lock( &p_sys->event_lock );
         ButtonUpdate( p_demux, true );
+        vlc_mutex_unlock( &p_sys->event_lock );
         dvdnav_mouse_activate( p_sys->dvdnav, pci, newmouse->i_x, newmouse->i_y );
     }
     p_sys->oldmouse = *newmouse;
