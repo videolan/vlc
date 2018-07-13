@@ -104,7 +104,7 @@ struct vout_display_sys_t
 
     ID3D11RenderTargetView   *d3drenderTargetView[D3D11_MAX_SHADER_VIEW];
 
-    ID3D11VertexShader        *projectionVSShader;
+    d3d_quad_t               projectionQuad;
 
     /* copy from the decoder pool into picSquad before display
      * Uses a Texture2D with slices rather than a Texture2DArray for the decoder */
@@ -359,7 +359,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     }
 
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->regionQuad.d3dvertexShader : sys->projectionVSShader,
+                   vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->regionQuad.d3dvertexShader : sys->projectionQuad.d3dvertexShader,
                    sys->regionQuad.pVertexLayout,
                    vd->fmt.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
@@ -1535,7 +1535,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         return VLC_EGENERIC;
 
     hr = ID3D11Device_CreateVertexShader(sys->d3d_dev.d3ddevice, (void *)ID3D10Blob_GetBufferPointer(pVSBlob),
-                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionVSShader);
+                                        ID3D10Blob_GetBufferSize(pVSBlob), NULL, &sys->projectionQuad.d3dvertexShader);
 
     if(FAILED(hr)) {
       ID3D10Blob_Release(pVSBlob);
@@ -1581,10 +1581,10 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
         ID3D11VertexShader_Release(sys->regionQuad.d3dvertexShader);
         sys->regionQuad.d3dvertexShader = NULL;
     }
-    if (sys->projectionVSShader)
+    if (sys->projectionQuad.d3dvertexShader)
     {
-        ID3D11VertexShader_Release(sys->projectionVSShader);
-        sys->projectionVSShader = NULL;
+        ID3D11VertexShader_Release(sys->projectionQuad.d3dvertexShader);
+        sys->projectionQuad.d3dvertexShader = NULL;
     }
     for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
     {
