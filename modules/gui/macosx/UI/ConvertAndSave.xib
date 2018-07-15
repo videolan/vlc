@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="17G65" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <development version="7000" identifier="xcode"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
@@ -347,9 +347,9 @@ DQ
                     </constraints>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="generic" id="29"/>
                 </imageView>
-                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="27">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="27">
                     <rect key="frame" x="189" y="20" width="100" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="bla bla bla.mov" id="28">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="center" title="bla bla bla.mov" usesSingleLineMode="YES" id="28">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -360,7 +360,9 @@ DQ
                 <constraint firstItem="26" firstAttribute="top" secondItem="25" secondAttribute="top" constant="20" id="1Fz-Hf-Vrp"/>
                 <constraint firstItem="26" firstAttribute="centerX" secondItem="25" secondAttribute="centerX" id="Coe-0J-gwn"/>
                 <constraint firstItem="26" firstAttribute="centerX" secondItem="27" secondAttribute="centerX" id="NMY-G0-yfW"/>
+                <constraint firstItem="27" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="25" secondAttribute="leading" constant="20" symbolic="YES" id="Nb6-Op-t3A"/>
                 <constraint firstItem="27" firstAttribute="top" secondItem="26" secondAttribute="bottom" constant="8" id="glF-9v-Aot"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="27" secondAttribute="trailing" constant="20" symbolic="YES" id="jaa-Mx-So8"/>
             </constraints>
         </customView>
         <window title="Customize Profile" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="131" userLabel="Custom Profile">
@@ -775,7 +777,7 @@ DQ
                                                 <action selector="audioSettingsChanged:" target="-2" id="638"/>
                                             </connections>
                                         </button>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="208">
+                                        <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="208">
                                             <rect key="frame" x="15" y="248" width="153" height="18"/>
                                             <buttonCell key="cell" type="check" title="Keep original audio track" bezelStyle="regularSquare" imagePosition="left" alignment="left" controlSize="small" state="on" inset="2" id="209">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
@@ -1232,9 +1234,9 @@ Gw
                                         <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
-                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="342">
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="342">
                                     <rect key="frame" x="15" y="17" width="48" height="13"/>
-                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="SDP URL" id="349">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="SDP URL" usesSingleLineMode="YES" id="349">
                                         <font key="font" metaFont="label"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1313,9 +1315,9 @@ Gw
                                         <action selector="sdpFileLocationSelector:" target="-2" id="644"/>
                                     </connections>
                                 </button>
-                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="343">
+                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="343">
                                     <rect key="frame" x="15" y="89" width="78" height="13"/>
-                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Channel Name:" id="348">
+                                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="left" title="Channel Name:" usesSingleLineMode="YES" id="348">
                                         <font key="font" metaFont="label"/>
                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1424,9 +1426,9 @@ Gw
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="50">
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="50">
                     <rect key="frame" x="57" y="28" width="96" height="17"/>
-                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="bla bla bla.mov" id="51">
+                    <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="bla bla bla.mov" usesSingleLineMode="YES" id="51">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1434,6 +1436,7 @@ Gw
                 </textField>
             </subviews>
             <constraints>
+                <constraint firstItem="47" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="50" secondAttribute="trailing" constant="8" symbolic="YES" id="Bqx-YR-Xnr"/>
                 <constraint firstItem="48" firstAttribute="leading" secondItem="387" secondAttribute="leading" constant="20" id="Btn-S1-8F6"/>
                 <constraint firstItem="47" firstAttribute="centerY" secondItem="387" secondAttribute="centerY" id="DlY-yu-eKj"/>
                 <constraint firstAttribute="trailing" secondItem="47" secondAttribute="trailing" constant="20" id="QFd-Fp-EyV"/>
@@ -1441,6 +1444,7 @@ Gw
                 <constraint firstItem="49" firstAttribute="centerY" secondItem="48" secondAttribute="centerY" id="ckN-oZ-KCu"/>
                 <constraint firstItem="50" firstAttribute="leading" secondItem="48" secondAttribute="trailing" constant="7" id="fag-RQ-WLb"/>
                 <constraint firstItem="49" firstAttribute="leading" secondItem="48" secondAttribute="trailing" constant="7" id="oD8-n4-bYt"/>
+                <constraint firstItem="47" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="49" secondAttribute="trailing" constant="8" symbolic="YES" id="oPS-Gk-Afi"/>
                 <constraint firstItem="48" firstAttribute="centerY" secondItem="387" secondAttribute="centerY" id="s1X-WI-lHw"/>
             </constraints>
         </customView>
