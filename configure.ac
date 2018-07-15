@@ -1890,7 +1890,7 @@ AC_ARG_ENABLE([decklink],
     [disable Blackmagic DeckLink SDI input (default auto)]))
 AC_ARG_WITH([decklink_sdk],
   AS_HELP_STRING([--with-decklink-sdk=DIR],
-    [                        location of Blackmagic DeckLink SDI SDK]))
+    [location of Blackmagic DeckLink SDI SDK]))
 have_decklink=no
 if test "${enable_decklink}" != "no"
 then
