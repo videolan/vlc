@@ -2014,7 +2014,7 @@ PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop
 dnl
 dnl QTKit
 AC_ARG_ENABLE(macosx-qtkit,
-  [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)])
+  AS_HELP_STRING([--enable-macosx-qtkit], [Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)]))
 if test "x${enable_macosx_qtkit}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
 then
@@ -2029,7 +2029,7 @@ dnl
 dnl AVFoundation
 AC_SUBST(have_avfoundation, ["no"])
 AC_ARG_ENABLE(macosx-avfoundation,
-  [  --enable-macosx-avfoundation Mac OS X avcapture (video) module (default enabled on Mac OS X)])
+  AS_HELP_STRING([--enable-macosx-avfoundation], [Mac OS X avcapture (video) module (default enabled on Mac OS X)]))
 if test "x${enable_macosx_avfoundation}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_avfoundation}" = "yes")
 then
@@ -2185,7 +2185,7 @@ dnl
 dnl wmafixed plugin
 dnl
 AC_ARG_ENABLE(wma-fixed,
-  [  --enable-wma-fixed      libwma-fixed module (default disabled)])
+  AS_HELP_STRING([--enable-wma-fixed], [libwma-fixed module (default disabled)]))
 if test "${enable_wma_fixed}" = "yes"
 then
   VLC_ADD_PLUGIN([wma_fixed])
@@ -2201,7 +2201,7 @@ dnl
 dnl openmax il codec plugin
 dnl
 AC_ARG_ENABLE(omxil,
-  [  --enable-omxil          openmax il codec module (default disabled)])
+  AS_HELP_STRING([--enable-omxil], [openmax il codec module (default disabled)]))
 if test "${enable_omxil}" = "yes"
 then
   VLC_ADD_PLUGIN([omxil])
@@ -2211,7 +2211,7 @@ dnl
 dnl raspberry pi openmax il configuration
 dnl
 AC_ARG_ENABLE(rpi-omxil,
-  [  --enable-rpi-omxil     openmax il configured for raspberry pi (default disabled)])
+  AS_HELP_STRING([--enable-rpi-omxil], [openmax il configured for raspberry pi (default disabled)]))
 if test "${enable_rpi_omxil}" = "yes"
 then
   VLC_ADD_PLUGIN([omxil])
@@ -2222,7 +2222,7 @@ dnl
 dnl CrystalHD codec plugin
 dnl
 AC_ARG_ENABLE(crystalhd,
-  [  --enable-crystalhd      crystalhd codec plugin (default auto)])
+  AS_HELP_STRING([--enable-crystalhd], [crystalhd codec plugin (default auto)]))
 if test "${enable_crystalhd}" != "no"; then
     AC_CHECK_HEADER(libcrystalhd/libcrystalhd_if.h, [
       VLC_ADD_PLUGIN([crystalhd])
@@ -2254,7 +2254,7 @@ have_mad="no"
 MAD_CFLAGS=""
 MAD_LIBS=""
 
-AC_ARG_WITH(mad, [  --with-mad=PATH         path to libmad], [
+AC_ARG_WITH(mad, AS_HELP_STRING([--with-mad=PATH], [path to libmad]), [
   enable_mad="yes"
 ], [
   with_mad="no"
@@ -2265,7 +2265,7 @@ AS_IF([test "${with_mad}" != "no"], [
 ])
 
 AC_ARG_ENABLE(mad,
-  [  --enable-mad            libmad module (default enabled)])
+  AS_HELP_STRING([--enable-mad], [libmad module (default enabled)]))
 AS_IF([test "${enable_mad}" != "no"], [
   VLC_SAVE_FLAGS
   CPPFLAGS="${CPPFLAGS} ${MAD_CFLAGS}"
@@ -2294,7 +2294,7 @@ dnl
 dnl gstreamer stuff
 dnl
 AC_ARG_ENABLE(gst-decode,
-  [  --enable-gst-decode     GStreamer based decoding support (currently supports only video decoding) (default auto)])
+  AS_HELP_STRING([--enable-gst-decode], [GStreamer based decoding support (currently supports only video decoding) (default auto)]))
 
 have_gst_decode="no"
 AS_IF([test "${enable_gst_decode}" != "no"], [
@@ -2314,7 +2314,7 @@ dnl
 dnl  avcodec decoder/encoder plugin
 dnl
 AC_ARG_ENABLE(merge-ffmpeg,
-[  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [
+AS_HELP_STRING([--enable-merge-ffmpeg], [merge FFmpeg-based plugins (default disabled)]),, [
   enable_merge_ffmpeg="no"
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
@@ -2334,7 +2334,7 @@ PKG_CHECK_EXISTS([libavutil], [
 AC_MSG_RESULT([${avfork}])
 
 AC_ARG_ENABLE(avcodec,
-[  --enable-avcodec        libavcodec codec (default enabled)])
+AS_HELP_STRING([--enable-avcodec], [libavcodec codec (default enabled)]))
 AS_IF([test "${enable_avcodec}" != "no"], [
   dnl We need >=57.16.0 from libav or >=57.37.100 from ffmpeg
   case "${avfork}" in
@@ -2364,7 +2364,7 @@ dnl
 dnl libva needs avcodec
 dnl
 AC_ARG_ENABLE(libva,
-  [  --enable-libva          VAAPI GPU decoding support (libVA) (default auto)])
+  AS_HELP_STRING([--enable-libva], [VAAPI GPU decoding support (libVA) (default auto)]))
 
 AS_IF([test "${enable_libva}" = "yes" -a "${have_avcodec}" != "yes" ], [
   AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive. Use --enable-avcodec.])
@@ -2428,7 +2428,7 @@ dnl
 dnl dxva2 needs avcodec
 dnl
 AC_ARG_ENABLE(dxva2,
-  [  --enable-dxva2          DxVA2 GPU decoding support (default auto)])
+  AS_HELP_STRING([--enable-dxva2], [DxVA2 GPU decoding support (default auto)]))
 
 have_avcodec_dxva2="no"
 AS_IF([test "${enable_dxva2}" != "no"], [
@@ -2464,7 +2464,7 @@ dnl
 dnl d3d11va needs avcodec
 dnl
 AC_ARG_ENABLE(d3d11va,
-  [  --enable-d3d11va          D3D11 GPU decoding support (default auto)])
+  AS_HELP_STRING([--enable-d3d11va], [D3D11 GPU decoding support (default auto)]))
 
 have_avcodec_d3d11va="no"
 AS_IF([test "${enable_d3d11va}" != "no"], [
@@ -2514,7 +2514,7 @@ dnl  avformat demuxer/muxer plugin
 dnl
 
 AC_ARG_ENABLE(avformat,
-[  --enable-avformat       libavformat containers (default enabled)],, [
+AS_HELP_STRING([--enable-avformat], [libavformat containers (default enabled)]),, [
   enable_avformat="${have_avcodec}"
 ])
 have_avformat="no"
@@ -2570,7 +2570,7 @@ dnl  postproc plugin
 dnl
 
 AC_ARG_ENABLE(postproc,
-[  --enable-postproc       libpostproc image post-processing (default auto)])
+AS_HELP_STRING([--enable-postproc], [libpostproc image post-processing (default auto)]))
 if test "${enable_postproc}" != "no"
 then
   PKG_CHECK_MODULES(POSTPROC,[libpostproc libavutil],
@@ -2590,7 +2590,7 @@ dnl
 dnl  faad decoder plugin
 dnl
 AC_ARG_ENABLE(faad,
-[  --enable-faad           faad codec (default auto)])
+AS_HELP_STRING([--enable-faad], [faad codec (default auto)]))
 have_faad="no"
 AS_IF([test "${enable_faad}" != "no"], [
   AC_CHECK_HEADERS([neaacdec.h], [
@@ -2657,11 +2657,11 @@ dnl
 dnl A52/AC3 decoder plugin
 dnl
 AC_ARG_ENABLE(a52,
-  [  --enable-a52            A/52 support with liba52 (default enabled)])
+  AS_HELP_STRING([--enable-a52], [A/52 support with liba52 (default enabled)]))
 if test "${enable_a52}" != "no"
 then
   AC_ARG_WITH(a52,
-    [  --with-a52=PATH         a52 headers and libraries])
+    AS_HELP_STRING([--with-a52=PATH], [a52 headers and libraries]))
     if test -z "${with_a52}"
     then
       LDFLAGS_test=""
@@ -2711,7 +2711,7 @@ dnl
 dnl  Tremor plugin
 dnl
 AC_ARG_ENABLE(tremor,
-  [  --enable-tremor         Tremor decoder support (default disabled)])
+  AS_HELP_STRING([--enable-tremor], [Tremor decoder support (default disabled)]))
 if test "${enable_tremor}" = "yes"
 then
   AC_CHECK_HEADERS(tremor/ivorbiscodec.h, [
@@ -2767,7 +2767,7 @@ dnl
 dnl  PNG decoder module
 dnl
 AC_ARG_ENABLE(png,
-  [  --enable-png            PNG support (default enabled)])
+  AS_HELP_STRING([--enable-png], [PNG support (default enabled)]))
 AS_IF([test "${enable_png}" != "no"], [
 AC_CHECK_HEADERS(png.h, [
   VLC_SAVE_FLAGS
@@ -2783,7 +2783,7 @@ dnl
 dnl  JPEG decoder module
 dnl
 AC_ARG_ENABLE(jpeg,
-  [  --enable-jpeg           JPEG support (default enabled)])
+  AS_HELP_STRING([--enable-jpeg], [JPEG support (default enabled)]))
 AS_IF([test "${enable_jpeg}" != "no"], [
 AC_CHECK_HEADERS(jpeglib.h, [
   VLC_ADD_PLUGIN([jpeg])
@@ -2794,7 +2794,7 @@ dnl
 dnl  BPG decoder module
 dnl
 AC_ARG_ENABLE(bpg,
-  [  --enable-bpg           BPG support (default disabled)])
+  AS_HELP_STRING([--enable-bpg], [BPG support (default disabled)]))
 AS_IF([test "${enable_bpg}" != "no"], [
 AC_CHECK_HEADERS(libbpg.h, [
   VLC_ADD_PLUGIN([bpg])
@@ -2805,7 +2805,7 @@ dnl
 dnl H262 encoder plugin (lib262)
 dnl
 AC_ARG_ENABLE(x262,
-  [  --enable-x262           H262 encoding support with static libx262 (default disabled)])
+  AS_HELP_STRING([--enable-x262], [H262 encoding support with static libx262 (default disabled)]))
 if test "${enable_x262}" != "no"; then
     PKG_CHECK_MODULES(X262, x262, [
         VLC_ADD_PLUGIN([x262])
@@ -2831,7 +2831,7 @@ dnl
 dnl H264 encoder plugin (using libx264)
 dnl
 AC_ARG_ENABLE(x264,
-  [  --enable-x264           H264 encoding support with libx264 (default enabled)])
+  AS_HELP_STRING([--enable-x264], [H264 encoding support with libx264 (default enabled)]))
 if test "${enable_x264}" != "no"; then
       PKG_CHECK_MODULES(X264,x264 >= 0.148, [
         VLC_ADD_PLUGIN([x264])
@@ -2856,7 +2856,7 @@ dnl
 dnl H264 encoder plugin (libx264 > 153)
 dnl
 AC_ARG_ENABLE(x26410b,
-  [  --enable-x26410b           H264 10-bit encoding support with libx264 (default enabled)])
+  AS_HELP_STRING([--enable-x26410b], [H264 10-bit encoding support with libx264 (default enabled)]))
 if test "${enable_x26410b}" != "no"; then
       PKG_CHECK_MODULES(X26410b,x264 >= 0.153, [
         VLC_ADD_PLUGIN([x26410b])
@@ -2923,7 +2923,7 @@ dnl
 dnl ARIB subtitles rendering module
 dnl
 AC_ARG_ENABLE(aribsub,
-  [  --enable-aribsub        ARIB Subtitles support (default enabled)])
+  AS_HELP_STRING([--enable-aribsub],[ARIB Subtitles support (default enabled)]))
 AS_IF( [test "${enable_aribsub}" != "no" ],[
   PKG_CHECK_MODULES(ARIBB24, [aribb24 >= 1.0.1], [
       have_aribb24="yes"
@@ -2951,7 +2951,7 @@ dnl
 dnl  tiger rendering for kate decoder plugin
 dnl
 AC_ARG_ENABLE(tiger,
-[  --enable-tiger          Tiger rendering library for Kate streams (default auto)])
+AS_HELP_STRING([--enable-tiger], [Tiger rendering library for Kate streams (default auto)]))
 AS_IF([test "${enable_tiger}" != "no"], [
   PKG_CHECK_MODULES(TIGER,[tiger >= 0.3.1], [
       AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])],[
@@ -2965,7 +2965,7 @@ dnl
 dnl  check if we can build the css selector engine 
 dnl
 AC_ARG_ENABLE(css,
-[  --enable-css            CSS selector engine (default auto)])
+AS_HELP_STRING([--enable-css], [CSS selector engine (default auto)]))
 AS_IF([test "${enable_css}" != "no"], [
   with_css="yes"
   AC_DEFINE(HAVE_CSS, 1, [Define if CSS engine is built])
@@ -3031,7 +3031,7 @@ dnl
 dnl  X C Bindings modules
 dnl
 AC_ARG_ENABLE(xcb,
-  [  --enable-xcb            X11 support with XCB (default enabled)],, [
+  AS_HELP_STRING([--enable-xcb], [X11 support with XCB (default enabled)]),, [
   AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "darwin"], [
     enable_xcb="yes"
   ], [
@@ -3188,7 +3188,7 @@ dnl
 dnl  SDL image decoder module
 dnl
 AC_ARG_ENABLE(sdl-image,
-  [  --enable-sdl-image      SDL image support (default enabled)])
+  AS_HELP_STRING([--enable-sdl-image], [SDL image support (default enabled)]))
 AS_IF([test "${enable_sdl_image}" != "no"],[
   PKG_CHECK_MODULES(SDL_IMAGE, [SDL_image >= 1.2.10], [
     VLC_ADD_PLUGIN([sdl_image])
@@ -3201,13 +3201,13 @@ dnl
 dnl  freetype module
 dnl
 AC_ARG_ENABLE(freetype,
-  [  --enable-freetype       freetype support   (default auto)])
+  AS_HELP_STRING([--enable-freetype],   [freetype support   (default auto)]))
 AC_ARG_ENABLE(fribidi,
-  [  --enable-fribidi        fribidi support    (default auto)])
+  AS_HELP_STRING([--enable-fribidi],    [fribidi support    (default auto)]))
 AC_ARG_ENABLE(harfbuzz,
-  [  --enable-harfbuzz       harfbuzz support   (default auto)])
+  AS_HELP_STRING([--enable-harfbuzz],   [harfbuzz support   (default auto)]))
 AC_ARG_ENABLE(fontconfig,
-  [  --enable-fontconfig     fontconfig support (default auto)])
+  AS_HELP_STRING([--enable-fontconfig], [fontconfig support (default auto)]))
 
 AC_ARG_WITH([default-font],
     AS_HELP_STRING([--with-default-font=PATH],
@@ -3286,7 +3286,7 @@ dnl
 dnl libass subtitle rendering module
 dnl
 AC_ARG_ENABLE(libass,
-  [  --enable-libass         Subtitle support using libass (default enabled)])
+  AS_HELP_STRING([--enable-libass], [Subtitle support using libass (default enabled)]))
 AS_IF( [test "${enable_libass}" != "no"], [
   PKG_CHECK_MODULES(LIBASS, [libass >= 0.9.8],
       [
@@ -3576,7 +3576,7 @@ dnl
 dnl  OpenSLES Android
 dnl
 AC_ARG_ENABLE(opensles,
-  [  --enable-opensles       Android OpenSL ES audio module (default disabled)])
+  AS_HELP_STRING([--enable-opensles], [Android OpenSL ES audio module (default disabled)]))
 if test "${HAVE_ANDROID}" = "1"; then
   if test "${enable_opensles}" = "yes"; then
       AC_CHECK_HEADERS(SLES/OpenSLES.h,
@@ -3780,7 +3780,7 @@ AS_IF([test "${enable_skins2}" != "no"], [
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes"])
 
 AC_ARG_ENABLE(libtar,
-  [  --enable-libtar         libtar support for skins2 (default auto)])
+  AS_HELP_STRING([--enable-libtar], [libtar support for skins2 (default auto)]))
 AS_IF([test "${enable_skins2}" = "yes" && test "${enable_libtar}" != "no"], [
   AC_CHECK_HEADERS(libtar.h, [
     VLC_ADD_LIBS([skins2],[-ltar])
@@ -3791,7 +3791,7 @@ dnl
 dnl  MacOS X gui module
 dnl
 AC_ARG_ENABLE(macosx,
-  [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
+  AS_HELP_STRING([--enable-macosx], [Mac OS X gui support (default enabled on Mac OS X)]))
 if test "x${enable_macosx}" != "xno" -a "${SYS}" = "darwin"
 then
 
@@ -3821,7 +3821,7 @@ dnl
 dnl  MacOS X sparkle update support
 dnl
 AC_ARG_ENABLE(sparkle,
-  [  --enable-sparkle        Sparkle update support for OS X (default enabled on Mac OS X)])
+  AS_HELP_STRING([--enable-sparkle], [Sparkle update support for OS X (default enabled on Mac OS X)]))
 if test "x${enable_sparkle}" != "xno" -a "${HAVE_OSX}" = "1"
 then
   if test ! -d ${CONTRIB_DIR}/Sparkle.framework -a ! -d ${CONTRIB_DIR}/Frameworks/Sparkle.framework
@@ -3873,7 +3873,7 @@ dnl
 dnl  Minimal Mac OS X module
 dnl
 AC_ARG_ENABLE(minimal-macosx,
-  [  --enable-minimal-macosx Minimal Mac OS X support (default disabled)])
+  AS_HELP_STRING([--enable-minimal-macosx], [Minimal Mac OS X support (default disabled)]))
 if test "${enable_minimal_macosx}" = "yes" -a "${SYS}" = "darwin"
 then
   VLC_ADD_PLUGIN([minimal_macosx])
@@ -3926,7 +3926,7 @@ dnl
 dnl  Lirc plugin
 dnl
 AC_ARG_ENABLE(lirc,
-  [  --enable-lirc           lirc support (default disabled)])
+  AS_HELP_STRING([--enable-lirc], [lirc support (default disabled)]))
 have_lirc="no"
 AS_IF([test "${enable_lirc}" = "yes"], [
   AC_CHECK_HEADER(lirc/lirc_client.h, [
@@ -3952,7 +3952,7 @@ dnl
 dnl libprojectM visualization plugin
 dnl
 AC_ARG_ENABLE(projectm,
-  [  --enable-projectm       projectM visualization plugin (default enabled)])
+  AS_HELP_STRING([--enable-projectm], [projectM visualization plugin (default enabled)]))
 AS_IF([test "${enable_projectm}" != "no"],
   [
     PKG_CHECK_MODULES(PROJECTM, libprojectM,
@@ -3971,7 +3971,7 @@ dnl
 dnl Vovoid VSXu visualization plugin
 dnl
 AC_ARG_ENABLE(vsxu,
-  [  --enable-vsxu           Vovoid VSXu visualization plugin (default auto)])
+  AS_HELP_STRING([--enable-vsxu], [Vovoid VSXu visualization plugin (default auto)]))
 AS_IF([test "${enable_vsxu}" != "no"],
   [
     PKG_CHECK_MODULES(VSXU, libvsxu,
@@ -4018,7 +4018,7 @@ dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
-  [  --disable-libgcrypt     gcrypt support (default enabled)])
+  AS_HELP_STRING([--disable-libgcrypt], [gcrypt support (default enabled)]))
 AC_ARG_VAR([GCRYPT_CFLAGS], [C compiler flags for gcrypt])
 AC_ARG_VAR([GCRYPT_LIBS], [linker flags flags for gcrypt])
 
@@ -4060,7 +4060,7 @@ dnl
 dnl TLS/SSL
 dnl
 AC_ARG_ENABLE(gnutls,
-  [  --enable-gnutls         GNU TLS TLS/SSL support (default enabled)])
+  AS_HELP_STRING([--enable-gnutls], [GNU TLS TLS/SSL support (default enabled)]))
 AS_IF([test "${enable_gnutls}" != "no"], [
   PKG_CHECK_MODULES(GNUTLS, [gnutls >= 3.3.6], [
     VLC_ADD_PLUGIN([gnutls])
@@ -4104,7 +4104,7 @@ dnl
 dnl update checking system
 dnl
 AC_ARG_ENABLE(update-check,
-  [  --enable-update-check   update checking system (default disabled)])
+  AS_HELP_STRING([--enable-update-check], [update checking system (default disabled)]))
 if test "${enable_update_check}" = "yes"
 then
  AS_IF([test "${ac_cv_lib_gcrypt}" != "yes"],[
@@ -4234,7 +4234,7 @@ dnl
 dnl  the VLC binary
 dnl
 AC_ARG_ENABLE(vlc,
-  [  --enable-vlc            build the VLC media player (default enabled)])
+  AS_HELP_STRING([--enable-vlc], [build the VLC media player (default enabled)]))
 AM_CONDITIONAL(BUILD_VLC, [test "${enable_vlc}" != "no"])
 
 dnl
