@@ -392,6 +392,21 @@
     [_okButton setTitle:_NS("Stream")];
 }
 
+- (void)resetDestination
+{
+    [self setOutputDestination:@""];
+
+    // File panel
+    [[_fileDestinationFileName animator] setHidden: YES];
+    [[_fileDestinationFileNameStub animator] setHidden: NO];
+
+    // Stream panel
+    [_streamDestinationURLLabel setStringValue:_NS("Select Streaming Method")];
+    b_streaming = NO;
+
+    [self updateOKButton];
+}
+
 - (IBAction)cancelDestination:(id)sender
 {
     if ([_streamDestinationView superview] != nil)
@@ -402,7 +417,8 @@
     [_destinationCancelBtn setHidden:YES];
     [[_destinationFileButton animator] setHidden: NO];
     [[_destinationStreamButton animator] setHidden: NO];
-    b_streaming = NO;
+
+    [self resetDestination];
 }
 
 - (IBAction)browseFileDestination:(id)sender
@@ -418,11 +434,8 @@
             [_fileDestinationFileName setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
             [[_fileDestinationFileNameStub animator] setHidden: YES];
             [[_fileDestinationFileName animator] setHidden: NO];
-        } else {
-            [self setOutputDestination:@""];
-            [[_fileDestinationFileName animator] setHidden: YES];
-            [[_fileDestinationFileNameStub animator] setHidden: NO];
         }
+
         [self updateOKButton];
     }];
 }
