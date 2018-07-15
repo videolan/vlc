@@ -523,7 +523,7 @@ bool virtual_segment_c::Seek( demux_t & demuxer, vlc_tick_t i_mk_date,
         /* 1st, we need to know in which chapter we are */
         p_vchapter = CurrentEdition()->getChapterbyTimecode( i_mk_date );
 
-    if ( p_vchapter != NULL )
+    if ( p_vchapter != NULL && CurrentEdition() )
     {
         vlc_tick_t i_mk_time_offset = p_vchapter->i_mk_virtual_start_time - ( ( p_vchapter->p_chapter )? p_vchapter->p_chapter->i_start_time : 0 );
         if (CurrentEdition()->b_ordered)
@@ -605,6 +605,9 @@ int virtual_chapter_c::PublishChapters( input_title_t & title, int & i_user_chap
         {
             seekpoint_t *sk = vlc_seekpoint_New();
 
+            if( unlikely( !sk ) )
+                return 0;
+
             sk->i_time_offset = i_mk_virtual_start_time;
             if (chap_name != "")
                 sk->psz_name = strdup( chap_name.c_str() );
@@ -635,6 +638,10 @@ int virtual_edition_c::PublishChapters( input_title_t & title, int & i_user_chap
         vchapters[0]->i_mk_virtual_start_time && p_edition && !p_edition->b_hidden )
     {
         seekpoint_t *sk = vlc_seekpoint_New();
+
+        if( unlikely( !sk ) )
+            return 0;
+
         sk->i_time_offset = 0;
         sk->psz_name = strdup( p_edition->str_name.c_str() );
 
