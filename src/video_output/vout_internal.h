@@ -50,6 +50,8 @@ typedef struct {
     bool                 change_fmt;
     const video_format_t *fmt;
     unsigned             dpb_size;
+    vlc_mouse_event      mouse_event;
+    void                 *opaque;
 } vout_configuration_t;
 #include "control.h"
 
@@ -138,6 +140,8 @@ struct vout_thread_sys_t
 
     /* */
     vlc_mouse_t     mouse;
+    vlc_mouse_event mouse_event;
+    void            *opaque;
 
     /* */
     picture_pool_t  *private_pool;

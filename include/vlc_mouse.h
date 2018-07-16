@@ -53,6 +53,14 @@ typedef struct vlc_mouse_t
     bool b_double_click;
 } vlc_mouse_t;
 
+/**
+ * Mouse event callback
+ * @param mouse new mouse event to process, can be NULL for an invalidate state
+ * (a new vout is created or restarted).
+ * @param user_data
+ */
+typedef void (*vlc_mouse_event)(const vlc_mouse_t *mouse, void *user_data);
+
 static inline void vlc_mouse_Init( vlc_mouse_t *p_mouse )
 {
     p_mouse->i_x = 0;

@@ -134,6 +134,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     vout->p->original = original;
     vout->p->dpb_size = cfg->dpb_size;
+    vout->p->mouse_event = cfg->mouse_event;
+    vout->p->opaque = cfg->opaque;
 
     vout_control_Init(&vout->p->control);
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
@@ -242,15 +244,14 @@ vout_thread_t *vout_Request(vlc_object_t *object,
                 spu_Attach(vout->p->spu, vout->p->input, true);
         }
 
-        if (cfg->change_fmt) {
-            vout_control_cmd_t cmd;
-            vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-            cmd.cfg = cfg;
+        vout_control_cmd_t cmd;
+        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+        cmd.cfg = cfg;
+        vout_control_Push(&vout->p->control, &cmd);
+        vout_control_WaitEmpty(&vout->p->control);
 
-            vout_control_Push(&vout->p->control, &cmd);
-            vout_control_WaitEmpty(&vout->p->control);
+        if (cfg->change_fmt)
             vout_IntfReinit(vout);
-        }
 
         if (!vout->p->dead) {
             msg_Dbg(object, "reusing provided vout");
@@ -1570,6 +1571,9 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
     if (vout->p->decoder_fifo)
         picture_fifo_Delete(vout->p->decoder_fifo);
     assert(!vout->p->decoder_pool);
+
+    if (vout->p->mouse_event)
+        vout->p->mouse_event(NULL, vout->p->opaque);
 }
 
 static void ThreadInit(vout_thread_t *vout)
@@ -1593,6 +1597,16 @@ static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
     video_format_t original;
+
+    if (!cfg->change_fmt)
+    {
+        vout->p->mouse_event = NULL;
+        vout->p->opaque = NULL;
+        return VLC_SUCCESS;
+    }
+
+    vout->p->mouse_event = cfg->mouse_event;
+    vout->p->opaque = cfg->opaque;
 
     vout->p->pause.is_on = false;
     vout->p->pause.date  = VLC_TICK_INVALID;
