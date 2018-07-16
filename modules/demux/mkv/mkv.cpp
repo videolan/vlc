@@ -770,7 +770,7 @@ static int Demux( demux_t *p_demux)
             msg_Err( p_demux, "invalid track number" );
             delete block;
             delete additions;
-            return VLC_DEMUXER_EOF;
+            return VLC_DEMUXER_EGENERIC;
         }
 
         mkv_track_t &track = *p_track;
