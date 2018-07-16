@@ -753,7 +753,7 @@ static int Demux( demux_t *p_demux)
         {
             msg_Err( p_demux, "invalid track number" );
             delete block;
-            return VLC_DEMUXER_EOF;
+            return VLC_DEMUXER_EGENERIC;
         }
 
         mkv_track_t &track = *p_track;
@@ -801,7 +801,7 @@ static int Demux( demux_t *p_demux)
             if( es_out_SetPCR( p_demux->out, i_pcr ) )
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
-                return VLC_DEMUXER_EOF;
+                return VLC_DEMUXER_EGENERIC;
             }
 
             p_sys->i_pcr = i_pcr;
