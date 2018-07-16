@@ -485,6 +485,7 @@ bool virtual_segment_c::UpdateCurrentToChapter( demux_t & demux )
         {
             if ( !p_current_vchapter->Leave( ) )
             {
+                p_current_vchapter->segment.ESDestroy();
                 p_current_vchapter = NULL;
                 b_current_vchapter_entered = false;
             }
