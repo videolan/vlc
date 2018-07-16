@@ -806,7 +806,8 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     vout.clear();
 
-    setWindowFlags( Qt::ToolTip );
+    setWindowFlags( Qt::Tool | Qt::FramelessWindowHint );
+    setAttribute( Qt::WA_ShowWithoutActivating );
     setMinimumWidth( FSC_WIDTH );
     isWideFSC = false;
 
