@@ -110,6 +110,9 @@ struct es_out_id_t
     int         i_meta_id;
 
     struct vlc_list node;
+
+    vlc_mouse_event mouse_event_cb;
+    void* mouse_event_userdata;
 };
 
 typedef struct
@@ -1625,6 +1628,8 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     es->cc.type = 0;
     es->cc.i_bitmap = 0;
     es->p_master = p_master;
+    es->mouse_event_cb = NULL;
+    es->mouse_event_userdata = NULL;
 
     vlc_list_append(&es->node, es->p_master ? &p_sys->es_slaves : &p_sys->es);
 
@@ -1693,6 +1698,10 @@ static void EsCreateDecoder( es_out_t *out, es_out_id_t *p_es )
             if( p_es->p_dec_record && p_sys->b_buffering )
                 input_DecoderStartWait( p_es->p_dec_record );
         }
+
+        if( p_es->mouse_event_cb && p_es->fmt.i_cat == VIDEO_ES )
+            input_DecoderSetVoutMouseEvent( dec, p_es->mouse_event_cb,
+                                            p_es->mouse_event_userdata );
     }
     p_es->p_dec = dec;
 
@@ -2913,6 +2922,23 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
     {
         input_item_node_t *node = va_arg(args, input_item_node_t *);
         input_item_node_PostAndDelete(node);
+        return VLC_SUCCESS;
+    }
+
+    case ES_OUT_VOUT_SET_MOUSE_EVENT:
+    {
+        es_out_id_t *p_es = va_arg( args, es_out_id_t * );
+
+        if( !p_es || p_es->fmt.i_cat != VIDEO_ES )
+            return VLC_EGENERIC;
+
+        p_es->mouse_event_cb = va_arg( args, vlc_mouse_event );
+        p_es->mouse_event_userdata = va_arg( args, void * );
+
+        if( p_es->p_dec )
+            input_DecoderSetVoutMouseEvent( p_es->p_dec,
+                p_es->mouse_event_cb, p_es->mouse_event_userdata );
+
         return VLC_SUCCESS;
     }
 

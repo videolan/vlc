@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
+#include <vlc_mouse.h>
 
 decoder_t *input_DecoderNew( input_thread_t *, es_format_t *, input_clock_t *,
                              sout_instance_t * ) VLC_USED;
@@ -115,5 +116,7 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec );
  * They must be released using vlc_object_release().
  */
 void input_DecoderGetObjects( decoder_t *, vout_thread_t **, audio_output_t ** );
+
+void input_DecoderSetVoutMouseEvent( decoder_t *, vlc_mouse_event, void * );
 
 #endif

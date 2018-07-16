@@ -40,6 +40,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_mouse.h>
 #ifdef _WIN32
 #  include <vlc_charset.h>
 #endif
@@ -651,6 +652,14 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
             return VLC_SUCCESS;
         }
         return es_out_Control( p_sys->p_out, ES_OUT_GET_ES_STATE, p_es->p_es, pb_enabled );
+    }
+    case ES_OUT_VOUT_SET_MOUSE_EVENT:
+    {
+        es_out_id_t *p_es = va_arg( args, es_out_id_t * );
+        vlc_mouse_event cb = va_arg( args, vlc_mouse_event );
+        void *user_data = va_arg( args, void * );
+        return es_out_Control( p_sys->p_out, ES_OUT_VOUT_SET_MOUSE_EVENT,
+                               p_es->p_es, cb, user_data );
     }
     /* Special internal input control */
     case ES_OUT_GET_EMPTY:

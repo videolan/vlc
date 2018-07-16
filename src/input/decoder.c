@@ -141,6 +141,11 @@ struct decoder_owner
 
     /* Delay */
     vlc_tick_t i_ts_delay;
+
+    /* Mouse event */
+    vlc_mutex_t     mouse_lock;
+    vlc_mouse_event mouse_event;
+    void           *opaque;
 };
 
 /* Pictures which are DECODER_BOGUS_VIDEO_DELAY or more in advance probably have
@@ -277,6 +282,17 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
     }
 
     p_owner->b_fmt_description = true;
+}
+
+static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
+{
+    decoder_t *dec = user_data;
+    struct decoder_owner *owner = dec_get_owner( dec );
+
+    vlc_mutex_lock( &owner->mouse_lock );
+    if( owner->mouse_event )
+        owner->mouse_event( newmouse, owner->opaque);
+    vlc_mutex_unlock( &owner->mouse_lock );
 }
 
 /*****************************************************************************
@@ -521,7 +537,7 @@ static int vout_update_format( decoder_t *p_dec )
                                              p_vout, &fmt,
                                              dpb_size +
                                              p_dec->i_extra_picture_buffers + 1,
-                                             NULL, NULL, true );
+                                             MouseEvent, p_dec, true );
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
 
@@ -1731,6 +1747,9 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     atomic_init( &p_owner->reload, RELOAD_NO_REQUEST );
     p_owner->b_idle = false;
 
+    p_owner->mouse_event = NULL;
+    p_owner->opaque = NULL;
+
     es_format_Init( &p_owner->fmt, fmt->i_cat, 0 );
 
     /* decoder fifo */
@@ -1742,6 +1761,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     }
 
     vlc_mutex_init( &p_owner->lock );
+    vlc_mutex_init( &p_owner->mouse_lock );
     vlc_cond_init( &p_owner->wait_request );
     vlc_cond_init( &p_owner->wait_acknowledge );
     vlc_cond_init( &p_owner->wait_fifo );
@@ -1908,6 +1928,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_cond_destroy( &p_owner->wait_acknowledge );
     vlc_cond_destroy( &p_owner->wait_request );
     vlc_mutex_destroy( &p_owner->lock );
+    vlc_mutex_destroy( &p_owner->mouse_lock );
 
     vlc_object_release( p_dec );
 }
@@ -2445,4 +2466,18 @@ void input_DecoderGetObjects( decoder_t *p_dec,
         *pp_aout = p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout ?
             vlc_object_hold( p_owner->p_aout ) : NULL;
     vlc_mutex_unlock( &p_owner->lock );
+}
+
+void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event,
+                                    void *user_data )
+{
+    struct decoder_owner *owner = dec_get_owner( dec );
+    assert( dec->fmt_out.i_cat == VIDEO_ES );
+
+    vlc_mutex_lock( &owner->mouse_lock );
+
+    owner->mouse_event = mouse_event;
+    owner->opaque = user_data;
+
+    vlc_mutex_unlock( &owner->mouse_lock );
 }

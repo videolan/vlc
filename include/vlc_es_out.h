@@ -98,6 +98,10 @@ enum es_out_query_e
 
     ES_OUT_POST_SUBNODE, /* arg1=input_item_node_t *, res=can fail */
 
+    ES_OUT_VOUT_SET_MOUSE_EVENT, /* arg1= es_out_id_t* (video es),
+                                    arg2=vlc_mouse_event, arg3=void *(user_data),
+                                    res=can fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };
