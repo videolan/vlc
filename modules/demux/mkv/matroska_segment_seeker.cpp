@@ -359,16 +359,13 @@ SegmentSeeker::index_unsearched_range( matroska_segment_c& ms, Range search_area
         if( ms.BlockGet( block, simpleblock, &b_key_picture, &b_discardable_picture, &i_block_duration ) )
             break;
 
-        if( simpleblock ) {
-            block_pos = simpleblock->GetElementPosition();
-            block_pts = simpleblock->GlobalTimecode() / 1000;
-            track_id  = simpleblock->TrackNum();
-        }
-        else {
-            block_pos = block->GetElementPosition();
-            block_pts = block->GlobalTimecode() / 1000;
-            track_id  = block->TrackNum();
-        }
+        KaxInternalBlock& internal_block = simpleblock
+            ? static_cast<KaxInternalBlock&>( *simpleblock )
+            : static_cast<KaxInternalBlock&>( *block );
+
+        block_pos = internal_block.GetElementPosition();
+        block_pts = internal_block.GlobalTimecode() / 1000;
+        track_id  = internal_block.TrackNum();
 
         bool const b_valid_track = ms.FindTrackByBlock( block, simpleblock ) != NULL;
 

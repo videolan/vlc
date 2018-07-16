@@ -517,6 +517,10 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     demux_sys_t *p_sys = (demux_sys_t *)p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
 
+    KaxInternalBlock& internal_block = simpleblock
+        ? static_cast<KaxInternalBlock&>( *simpleblock )
+        : static_cast<KaxInternalBlock&>( *block );
+
     if( !p_segment ) return;
 
     mkv_track_t *p_track = p_segment->FindTrackByBlock( block, simpleblock );
@@ -550,28 +554,14 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
     }
 
     size_t frame_size = 0;
-    size_t block_size = 0;
-
-    if( simpleblock != NULL )
-        block_size = simpleblock->GetSize();
-    else
-        block_size = block->GetSize();
-
-    const unsigned int i_number_frames = block != NULL ? block->NumberFrames() :
-            ( simpleblock != NULL ? simpleblock->NumberFrames() : 0 );
+    size_t block_size = internal_block.GetSize();
+    const unsigned i_number_frames = internal_block.NumberFrames();
 
     for( unsigned int i_frame = 0; i_frame < i_number_frames; i_frame++ )
     {
         block_t *p_block;
-        DataBuffer *data;
-        if( simpleblock != NULL )
-        {
-            data = &simpleblock->GetBuffer(i_frame);
-        }
-        else
-        {
-            data = &block->GetBuffer(i_frame);
-        }
+        DataBuffer *data = &internal_block.GetBuffer(i_frame);
+
         frame_size += data->Size();
         if( !data->Buffer() || data->Size() > frame_size || frame_size > block_size  )
         {
@@ -746,6 +736,10 @@ static int Demux( demux_t *p_demux)
         return VLC_DEMUXER_EOF;
     }
 
+    KaxInternalBlock& internal_block = block
+        ? static_cast<KaxInternalBlock&>( *block )
+        : static_cast<KaxInternalBlock&>( *simpleblock );
+
     {
         mkv_track_t *p_track = p_segment->FindTrackByBlock( block, simpleblock );
 
@@ -761,10 +755,7 @@ static int Demux( demux_t *p_demux)
 
         if( track.i_skip_until_fpos != std::numeric_limits<uint64_t>::max() ) {
 
-            uint64_t block_fpos = 0;
-
-            if( block ) block_fpos = block->GetElementPosition();
-            else        block_fpos = simpleblock->GetElementPosition();
+            uint64_t block_fpos = internal_block.GetElementPosition();
 
             if ( track.i_skip_until_fpos > block_fpos )
             {
@@ -811,9 +802,7 @@ static int Demux( demux_t *p_demux)
     /* set pts */
     {
         p_sys->i_pts = p_sys->i_mk_chapter_time + VLC_TICK_0;
-
-        if( simpleblock != NULL ) p_sys->i_pts += simpleblock->GlobalTimecode() / INT64_C( 1000 );
-        else                      p_sys->i_pts +=       block->GlobalTimecode() / INT64_C( 1000 );
+        p_sys->i_pts += internal_block.GlobalTimecode() / INT64_C( 1000 );
     }
 
     if ( p_vsegment->CurrentEdition() &&
