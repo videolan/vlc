@@ -1412,8 +1412,6 @@ static int Demux_UnSeekable( demux_t *p_demux )
 
     for( i_packet = 0; i_packet < 10; i_packet++)
     {
-#define p_stream    p_sys->track[avi_pk.i_stream]
-
         avi_packet_t    avi_pk;
 
         if( AVI_PacketGetHeader( p_demux, &avi_pk ) )
@@ -1453,6 +1451,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
         }
         else
         {
+            avi_track_t *p_stream = p_sys->track[avi_pk.i_stream];
             /* check for time */
             if( p_stream == p_stream_master ||
                 llabs( AVI_GetPTS( p_stream ) -
@@ -1505,7 +1504,6 @@ static int Demux_UnSeekable( demux_t *p_demux )
             }
 
         }
-#undef p_stream
     }
 
     return VLC_DEMUXER_SUCCESS;
