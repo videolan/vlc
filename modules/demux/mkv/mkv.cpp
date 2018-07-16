@@ -639,6 +639,19 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                         / CLOCK_FREQ;
             }
             break;
+
+         case VLC_CODEC_DVBS:
+            {
+                p_block = block_Realloc( p_block, 2, p_block->i_buffer + 1);
+
+                if( unlikely( !p_block ) )
+                    continue;
+
+                p_block->p_buffer[0] = 0x20; // data identifier
+                p_block->p_buffer[1] = 0x00; // subtitle stream id
+                p_block->p_buffer[ p_block->i_buffer - 1 ] = 0x3f; // end marker
+            }
+            break;
         }
 
         if( track.fmt.i_cat != VIDEO_ES )
