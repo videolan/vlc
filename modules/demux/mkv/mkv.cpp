@@ -711,13 +711,13 @@ static int Demux( demux_t *p_demux)
     if( p_sys->i_pts >= p_sys->i_start_pts )
     {
         if ( p_vsegment->UpdateCurrentToChapter( *p_demux ) )
-            return 1;
+            return VLC_DEMUXER_SUCCESS;
         p_vsegment = p_sys->p_current_vsegment;
     }
 
     matroska_segment_c *p_segment = p_vsegment->CurrentSegment();
     if ( p_segment == NULL )
-        return 0;
+        return VLC_DEMUXER_EOF;
 
     KaxBlock *block;
     KaxSimpleBlock *simpleblock;
@@ -738,12 +738,12 @@ static int Demux( demux_t *p_demux)
                 p_sys->i_pts = p_chap->i_mk_virtual_stop_time + VLC_TICK_0;
                 p_sys->i_pts++; // trick to avoid staying on segments with no duration and no content
 
-                return 1;
+                return VLC_DEMUXER_SUCCESS;
             }
         }
 
         msg_Warn( p_demux, "cannot get block EOF?" );
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     {
@@ -753,7 +753,7 @@ static int Demux( demux_t *p_demux)
         {
             msg_Err( p_demux, "invalid track number" );
             delete block;
-            return 0;
+            return VLC_DEMUXER_EOF;
         }
 
         mkv_track_t &track = *p_track;
@@ -769,7 +769,7 @@ static int Demux( demux_t *p_demux)
             if ( track.i_skip_until_fpos > block_fpos )
             {
                 delete block;
-                return 1; // this block shall be ignored
+                return VLC_DEMUXER_SUCCESS; // this block shall be ignored
             }
         }
     }
@@ -801,7 +801,7 @@ static int Demux( demux_t *p_demux)
             if( es_out_SetPCR( p_demux->out, i_pcr ) )
             {
                 msg_Err( p_demux, "ES_OUT_SET_PCR failed, aborting." );
-                return 0;
+                return VLC_DEMUXER_EOF;
             }
 
             p_sys->i_pcr = i_pcr;
@@ -822,14 +822,14 @@ static int Demux( demux_t *p_demux)
     {
         /* nothing left to read in this ordered edition */
         delete block;
-        return 0;
+        return VLC_DEMUXER_EOF;
     }
 
     BlockDecode( p_demux, block, simpleblock, p_sys->i_pts, i_block_duration, b_key_picture, b_discardable_picture );
 
     delete block;
 
-    return 1;
+    return VLC_DEMUXER_SUCCESS;
 }
 
 mkv_track_t::mkv_track_t(enum es_format_category_e es_cat) :
