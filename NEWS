@@ -24,6 +24,7 @@ Codecs:
  * Remove iomx support for Android
  * WebP image decoding
  * Support for SMPTE-TT image profile
+ * Support for 16-bit greyscale
 
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
