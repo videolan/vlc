@@ -810,6 +810,12 @@ static const staticentry_t p_list_video[] = {
         A("Y800"),
         A("Y8  "),
 
+    B(VLC_CODEC_GREY_16L, "16 bits greyscale"),
+        A("GRFL"),
+
+    B(VLC_CODEC_GREY_16B, "16 bits greyscale"),
+        A("GRFB"),
+
     B(VLC_CODEC_UYVY, "Packed YUV 4:2:2, U:Y:V:Y"),
         A("UYVY"),
         A("UYNV"),

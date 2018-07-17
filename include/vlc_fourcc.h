@@ -350,6 +350,9 @@
 
 /* 8 bits grey */
 #define VLC_CODEC_GREY            VLC_FOURCC('G','R','E','Y')
+/* 16 bits grey */
+#define VLC_CODEC_GREY_16L        VLC_FOURCC('G','R','F','L')
+#define VLC_CODEC_GREY_16B        VLC_FOURCC('G','R','F','B')
 
 /* VDPAU video surface YCbCr 4:2:0 */
 #define VLC_CODEC_VDPAU_VIDEO_420 VLC_FOURCC('V','D','V','0')
