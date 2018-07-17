@@ -114,7 +114,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->p_sys      = p_sys = new demux_sys_t( *p_demux );
 
     vlc_stream_Control( p_demux->s, STREAM_CAN_SEEK, &p_sys->b_seekable );
-    if ( vlc_stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable ) )
+    if ( !p_sys->b_seekable || vlc_stream_Control(
+          p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_fastseekable ) )
         p_sys->b_fastseekable = false;
 
     es_out_Control( p_demux->out, ES_OUT_SET_ES_CAT_POLICY, VIDEO_ES,
