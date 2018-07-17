@@ -42,6 +42,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_mouse.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>                      /* demux_t */
 #include <vlc_input.h>                      /* Seekpoints, chapters */
@@ -183,6 +184,7 @@ typedef struct
 
     /* */
     vout_thread_t       *p_vout;
+    vlc_mouse_t         oldmouse;
 
     es_out_id_t         *p_dummy_video;
 
@@ -280,11 +282,9 @@ static int   bluraySetTitle(demux_t *p_demux, int i_title);
 static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
 static void  blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY * const overlay);
 
-static int   onMouseEvent(vlc_object_t *p_vout, const char *psz_var,
-                          vlc_value_t old, vlc_value_t val, void *p_data);
+static void  onMouseEvent(const vlc_mouse_t *mouse, void *user_data);
 static int   onIntfEvent(vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void *);
-
 static void  blurayResetParser(demux_t *p_demux);
 static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
@@ -349,9 +349,6 @@ static void blurayReleaseVout(demux_t *p_demux)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     if (p_sys->p_vout != NULL) {
-        var_DelCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-        var_DelCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-
         for (int i = 0; i < MAX_OVERLAY; i++) {
             bluray_overlay_t *p_ov = p_sys->p_overlays[i];
             if (p_ov) {
@@ -422,6 +419,9 @@ static void startBackground(demux_t *p_demux)
     memset(p, 0x80, fmt.video.i_width * fmt.video.i_height / 2);
 
     es_out_Send(p_demux->out, p_sys->p_dummy_video, p_block);
+
+    es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT,
+                    p_sys->p_dummy_video, onMouseEvent, p_demux );
 
  out:
     es_format_Clean(&fmt);
@@ -679,6 +679,8 @@ static int blurayOpen(vlc_object_t *object)
 
     TAB_INIT(p_sys->i_title, p_sys->pp_title);
     TAB_INIT(p_sys->i_attachments, p_sys->attachments);
+
+    vlc_mouse_Init(&p_sys->oldmouse);
 
     vlc_mutex_init(&p_sys->pl_info_lock);
     vlc_mutex_init(&p_sys->bdj_overlay_lock);
@@ -1057,6 +1059,9 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             }
         }
     }
+    if (p_es && fmt.i_cat == VIDEO_ES)
+        es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, p_es,
+                        onMouseEvent, p_demux );
     es_format_Clean(&fmt);
     return p_es;
 }
@@ -1269,23 +1274,20 @@ static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
 /*****************************************************************************
  * User input events:
  *****************************************************************************/
-static int onMouseEvent(vlc_object_t *p_vout, const char *psz_var, vlc_value_t old,
-                        vlc_value_t val, void *p_data)
+static void onMouseEvent(const vlc_mouse_t *newmouse, void *user_data)
 {
-    demux_t     *p_demux = (demux_t*)p_data;
+    demux_t     *p_demux = user_data;
     demux_sys_t *p_sys   = p_demux->p_sys;
-    VLC_UNUSED(old);
-    VLC_UNUSED(p_vout);
 
-    if (psz_var[6] == 'm')   //Mouse moved
-        bd_mouse_select(p_sys->bluray, -1, val.coords.x, val.coords.y);
-    else if (psz_var[6] == 'c') {
-        bd_mouse_select(p_sys->bluray, -1, val.coords.x, val.coords.y);
+    if (!newmouse)
+        vlc_mouse_Init(&p_sys->oldmouse);
+
+    if (vlc_mouse_HasMoved(&p_sys->oldmouse, newmouse))
+        bd_mouse_select(p_sys->bluray, -1, newmouse->i_x, newmouse->i_y);
+
+    if (vlc_mouse_HasPressed( &p_sys->oldmouse, newmouse, MOUSE_BUTTON_LEFT))
         bd_user_input(p_sys->bluray, -1, BD_VK_MOUSE_ACTIVATE);
-    } else {
-        vlc_assert_unreachable();
-    }
-    return VLC_SUCCESS;
+    p_sys->oldmouse = *newmouse;
 }
 
 static int sendKeyEvent(demux_sys_t *p_sys, unsigned int key)
@@ -2439,13 +2441,8 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
         if (display) {
-            if (p_sys->p_vout == NULL) {
+            if (p_sys->p_vout == NULL)
                 p_sys->p_vout = input_GetVout(p_demux->p_input);
-                if (p_sys->p_vout != NULL) {
-                    var_AddCallback(p_sys->p_vout, "mouse-moved", onMouseEvent, p_demux);
-                    var_AddCallback(p_sys->p_vout, "mouse-clicked", onMouseEvent, p_demux);
-                }
-            }
 
             /* NOTE: we might want to enable background video always when there's no video stream playing.
                Now, with some discs, there are perioids (even seconds) during which the video window
