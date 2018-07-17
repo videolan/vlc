@@ -108,7 +108,7 @@ private:
     void retimeChapters();
     void retimeSubChapters( virtual_chapter_c * p_vchap );
 #ifdef MKV_DEBUG
-    void print(){ for( size_t i = 0; i<chapters.size(); i++ ) chapters[i]->print(); }
+    void print(){ for( size_t i = 0; i<vchapters.size(); i++ ) vchapters[i]->print(); }
 #endif
 
 };
