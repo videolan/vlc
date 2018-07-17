@@ -47,7 +47,6 @@
 #include <vlc_demux.h>                      /* demux_t */
 #include <vlc_input.h>                      /* Seekpoints, chapters */
 #include <vlc_dialog.h>                     /* BD+/AACS warnings */
-#include <vlc_vout.h>                       /* vout_PutSubpicture / subpicture_t */
 #include <vlc_url.h>                        /* vlc_path2uri */
 #include <vlc_iso_lang.h>
 #include <vlc_fs.h>
@@ -183,10 +182,10 @@ typedef struct
     vlc_mutex_t         bdj_overlay_lock; /* used to lock BD-J overlay open/close while overlays are being sent to vout */
 
     /* */
-    vout_thread_t       *p_vout;
     vlc_mouse_t         oldmouse;
 
     es_out_id_t         *p_dummy_video;
+    es_out_id_t         *p_video_es;
 
     /* TS stream */
     es_out_t            *p_out;
@@ -283,8 +282,6 @@ static void  blurayOverlayProc(void *ptr, const BD_OVERLAY * const overlay);
 static void  blurayArgbOverlayProc(void *ptr, const BD_ARGB_OVERLAY * const overlay);
 
 static void  onMouseEvent(const vlc_mouse_t *mouse, void *user_data);
-static int   onIntfEvent(vlc_object_t *, char const *,
-                         vlc_value_t, vlc_value_t, void *);
 static void  blurayResetParser(demux_t *p_demux);
 static void  notifyDiscontinuity( demux_sys_t *p_sys );
 
@@ -344,18 +341,19 @@ static void FindMountPoint(char **file)
 #endif
 }
 
-static void blurayReleaseVout(demux_t *p_demux)
+static void blurayReleaseVideoES(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if (p_sys->p_vout != NULL) {
+    if (p_sys->p_video_es != NULL) {
         for (int i = 0; i < MAX_OVERLAY; i++) {
             bluray_overlay_t *p_ov = p_sys->p_overlays[i];
             if (p_ov) {
                 vlc_mutex_lock(&p_ov->lock);
                 if (p_ov->i_channel != -1) {
                     msg_Err(p_demux, "blurayReleaseVout: subpicture channel exists\n");
-                    vout_FlushSubpictureChannel(p_sys->p_vout, p_ov->i_channel);
+                    es_out_Control( p_demux->out, ES_OUT_VOUT_FLUSH_OVERLAY,
+                                    p_sys->p_video_es, p_ov->i_channel );
                 }
                 p_ov->i_channel = -1;
                 p_ov->status = ToDisplay;
@@ -367,9 +365,7 @@ static void blurayReleaseVout(demux_t *p_demux)
                 }
             }
         }
-
-        vlc_object_release(p_sys->p_vout);
-        p_sys->p_vout = NULL;
+        p_sys->p_video_es = NULL;
     }
 }
 
@@ -423,6 +419,9 @@ static void startBackground(demux_t *p_demux)
     es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT,
                     p_sys->p_dummy_video, onMouseEvent, p_demux );
 
+    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+    p_sys->p_video_es = p_sys->p_dummy_video;
+    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
  out:
     es_format_Clean(&fmt);
 }
@@ -438,6 +437,12 @@ static void stopBackground(demux_t *p_demux)
     msg_Info(p_demux, "Stop background");
 
     es_out_Del(p_demux->out, p_sys->p_dummy_video);
+
+    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+    if (p_sys->p_video_es == p_sys->p_dummy_video)
+        blurayReleaseVideoES(p_demux);
+    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+
     p_sys->p_dummy_video = NULL;
 }
 
@@ -691,8 +696,6 @@ static int blurayOpen(vlc_object_t *object)
     var_Create( p_demux, "ts-cc-check", VLC_VAR_BOOL );
     var_SetBool( p_demux, "ts-cc-check", false );
 
-    var_AddCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
-
     /* Open BluRay */
 #ifdef BLURAY_DEMUX
     if (p_demux->s) {
@@ -883,8 +886,6 @@ static void blurayClose(vlc_object_t *object)
     demux_t *p_demux = (demux_t*)object;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    var_DelCallback( p_demux->p_input, "intf-event", onIntfEvent, p_demux );
-
     setTitleInfo(p_sys, NULL);
 
     /*
@@ -896,7 +897,9 @@ static void blurayClose(vlc_object_t *object)
         bd_close(p_sys->bluray);
     }
 
-    blurayReleaseVout(p_demux);
+    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+    blurayReleaseVideoES(p_demux);
+    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
 
     if (p_sys->p_parser)
         vlc_demux_chained_Delete(p_sys->p_parser);
@@ -1060,8 +1063,13 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         }
     }
     if (p_es && fmt.i_cat == VIDEO_ES)
+    {
         es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, p_es,
                         onMouseEvent, p_demux );
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+        p_sys->p_video_es = p_es;
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+    }
     es_format_Clean(&fmt);
     return p_es;
 }
@@ -1084,6 +1092,12 @@ static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
         free(vlc_array_item_at_index(&p_sys->es, idx));
         vlc_array_remove(&p_sys->es, idx);
     }
+
+    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+    if (p_es == p_sys->p_video_es)
+        p_sys->p_video_es = NULL;
+    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
+
     es_out_Del(es_out_sys->p_dst_out, p_es);
 }
 
@@ -1260,7 +1274,6 @@ static subpicture_t *bluraySubpictureCreate(bluray_overlay_t *p_ov)
 
     p_pic->i_original_picture_width = p_ov->width;
     p_pic->i_original_picture_height = p_ov->height;
-    p_pic->b_ephemer = true;
     p_pic->b_absolute = true;
 
     vlc_mutex_init(&p_upd_sys->lock);
@@ -1314,8 +1327,9 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
             unref_subpicture_updater(ov->p_updater);
         }
         /* no references to this overlay exist in vo anymore */
-        if (p_sys->p_vout && ov->i_channel != -1) {
-            vout_FlushSubpictureChannel(p_sys->p_vout, ov->i_channel);
+        if (p_sys->p_video_es && ov->i_channel != -1) {
+            es_out_Control( p_demux->out, ES_OUT_VOUT_FLUSH_OVERLAY,
+                            p_sys->p_video_es, ov->i_channel );
         }
 
         vlc_mutex_destroy(&ov->lock);
@@ -1330,7 +1344,7 @@ static void blurayCloseOverlay(demux_t *p_demux, int plane)
             return;
 
     /* All overlays have been closed */
-    blurayReleaseVout(p_demux);
+    blurayReleaseVideoES(p_demux);
 }
 
 /*
@@ -1350,7 +1364,7 @@ static void blurayActivateOverlay(demux_t *p_demux, int plane)
      * We must NOT use vout_PutSubpicture if a picture is already displayed.
      */
     vlc_mutex_lock(&ov->lock);
-    if (ov->status >= Displayed && p_sys->p_vout) {
+    if (ov->status >= Displayed && p_sys->p_video_es) {
         ov->status = Outdated;
         vlc_mutex_unlock(&ov->lock);
         return;
@@ -1492,9 +1506,11 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
 
     if (!overlay) {
         msg_Info(p_demux, "Closing overlays.");
-        if (p_sys->p_vout)
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
+        if (p_sys->p_video_es)
             for (int i = 0; i < MAX_OVERLAY; i++)
                 blurayCloseOverlay(p_demux, i);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         return;
     }
 
@@ -1515,7 +1531,9 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         blurayClearOverlay(p_demux, overlay->plane);
         break;
     case BD_OVERLAY_FLUSH:
+        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
         blurayActivateOverlay(p_demux, overlay->plane);
+        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
         break;
     case BD_OVERLAY_DRAW:
     case BD_OVERLAY_WIPE:
@@ -1631,17 +1649,21 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
         return;
     }
 
-    p_pic->i_start = p_pic->i_stop = vlc_tick_now();
-    p_pic->i_channel = vout_RegisterSubpictureChannel(p_sys->p_vout);
-    p_ov->i_channel = p_pic->i_channel;
-
     /*
      * After this point, the picture should not be accessed from the demux thread,
      * as it is held by the vout thread.
      * This must be done only once per subpicture, ie. only once between each
      * blurayInitOverlay & blurayCloseOverlay call.
      */
-    vout_PutSubpicture(p_sys->p_vout, p_pic);
+    int ret = es_out_Control( p_demux->out, ES_OUT_VOUT_ADD_OVERLAY,
+                              p_sys->p_video_es, p_pic, &p_ov->i_channel);
+    if (ret != VLC_SUCCESS)
+    {
+        unref_subpicture_updater(p_ov->p_updater);
+        p_ov->p_updater = NULL;
+        subpicture_Delete(p_pic);
+        return;
+    }
 
     /*
      * Mark the picture as Outdated, as it contains no region for now.
@@ -2441,15 +2463,12 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
         if (display) {
-            if (p_sys->p_vout == NULL)
-                p_sys->p_vout = input_GetVout(p_demux->p_input);
-
             /* NOTE: we might want to enable background video always when there's no video stream playing.
                Now, with some discs, there are perioids (even seconds) during which the video window
                disappears and just playlist is shown.
                (sometimes BD-J runs slowly ...)
             */
-            if (!p_sys->p_vout && !p_sys->p_dummy_video && p_sys->b_menu &&
+            if (!p_sys->p_video_es && !p_sys->p_dummy_video && p_sys->b_menu &&
                 !p_sys->p_pl_info && nread == 0 &&
                 blurayIsBdjTitle(p_demux)) {
 
@@ -2458,34 +2477,13 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
                 startBackground(p_demux);
             }
 
-            if (p_sys->p_vout != NULL) {
+            if (p_sys->p_video_es != NULL) {
                 bluraySendOverlayToVout(p_demux, ov);
             }
         }
     }
 
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
-}
-
-static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
-                        vlc_value_t oldval, vlc_value_t val, void *p_data )
-{
-    (void)p_input; (void) psz_var; (void) oldval;
-    demux_t *p_demux = p_data;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if (val.i_int == INPUT_EVENT_VOUT) {
-
-        vlc_mutex_lock(&p_sys->bdj_overlay_lock);
-        if( p_sys->p_vout != NULL ) {
-            blurayReleaseVout(p_demux);
-        }
-        vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
-
-        blurayHandleOverlays(p_demux, 1);
-    }
-
-    return VLC_SUCCESS;
 }
 
 #define BD_TS_PACKET_SIZE (192)
