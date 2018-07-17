@@ -369,6 +369,26 @@ static int lavc_UpdateVideoFormat(decoder_t *dec, AVCodecContext *ctx,
     return decoder_UpdateVideoFormat(dec);
 }
 
+static bool chroma_compatible(vlc_fourcc_t a, vlc_fourcc_t b)
+{
+    static const vlc_fourcc_t compat_lists[][2] = {
+        {VLC_CODEC_J420, VLC_CODEC_I420},
+        {VLC_CODEC_J422, VLC_CODEC_I422},
+        {VLC_CODEC_J440, VLC_CODEC_I440},
+        {VLC_CODEC_J444, VLC_CODEC_I444},
+    };
+
+    if (a == b)
+        return true;
+
+    for (size_t i = 0; i < ARRAY_SIZE(compat_lists); i++) {
+        if ((a == compat_lists[i][0] || a == compat_lists[i][1]) &&
+            (b == compat_lists[i][0] || b == compat_lists[i][1]))
+            return true;
+    }
+    return false;
+}
+
 /**
  * Copies a picture from the libavcodec-allocate buffer to a picture_t.
  * This is used when not in direct rendering mode.
@@ -385,7 +405,7 @@ static int lavc_CopyPicture(decoder_t *dec, picture_t *pic, AVFrame *frame)
         msg_Err(dec, "Unsupported decoded output format %d (%s)",
                 sys->p_context->pix_fmt, (name != NULL) ? name : "unknown");
         return VLC_EGENERIC;
-    } else if (fourcc != pic->format.i_chroma
+    } else if (!chroma_compatible(fourcc, pic->format.i_chroma)
      || frame->width > (int) pic->format.i_width
      || frame->height > (int) pic->format.i_height)
     {
