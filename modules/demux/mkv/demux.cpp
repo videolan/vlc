@@ -132,10 +132,7 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
 
         EbmlElement* p_l0_prev = p_l0;
 
-        bool b_seekable;
-        vlc_stream_Control( demuxer.s, STREAM_CAN_SEEK, &b_seekable );
-
-        if (p_l0->IsFiniteSize() && b_seekable )
+        if (p_l0->IsFiniteSize() )
         {
             p_l0->SkipData(p_stream1->estream, KaxMatroska_Context);
             p_l0 = p_stream1->estream.FindNextID(EBML_INFO(KaxSegment), UINT64_MAX);
