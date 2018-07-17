@@ -2481,3 +2481,45 @@ void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event
 
     vlc_mutex_unlock( &owner->mouse_lock );
 }
+
+int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
+                                 int *channel )
+{
+    struct decoder_owner *owner = dec_get_owner( dec );
+    assert( dec->fmt_out.i_cat == VIDEO_ES );
+    assert( sub && channel );
+
+    vlc_mutex_lock( &owner->lock );
+
+    if( !owner->p_vout )
+    {
+        vlc_mutex_unlock( &owner->lock );
+        return VLC_EGENERIC;
+    }
+    sub->i_start = sub->i_stop = vlc_tick_now();
+    sub->i_channel = *channel = vout_RegisterSubpictureChannel( owner->p_vout );
+    sub->i_order = 0;
+    sub->b_ephemer = true;
+    vout_PutSubpicture( owner->p_vout, sub );
+
+    vlc_mutex_unlock( &owner->lock );
+    return VLC_SUCCESS;
+}
+
+int input_DecoderFlushVoutOverlay( decoder_t *dec, int channel )
+{
+    struct decoder_owner *owner = dec_get_owner( dec );
+    assert( dec->fmt_out.i_cat == VIDEO_ES );
+
+    vlc_mutex_lock( &owner->lock );
+
+    if( !owner->p_vout )
+    {
+        vlc_mutex_unlock( &owner->lock );
+        return VLC_EGENERIC;
+    }
+    vout_FlushSubpictureChannel( owner->p_vout, channel );
+
+    vlc_mutex_unlock( &owner->lock );
+    return VLC_SUCCESS;
+}

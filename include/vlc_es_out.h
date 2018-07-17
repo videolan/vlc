@@ -102,6 +102,13 @@ enum es_out_query_e
                                     arg2=vlc_mouse_event, arg3=void *(user_data),
                                     res=can fail */
 
+    ES_OUT_VOUT_ADD_OVERLAY, /* arg1= es_out_id_t* (video es),
+                              * arg2= subpicture_t *,
+                              * arg3= int * (channel id), res= can fail */
+
+    ES_OUT_VOUT_FLUSH_OVERLAY, /* arg1= es_out_id_t* (video es),
+                                * arg2= int (channel id), res= can fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };
