@@ -978,16 +978,9 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
     const float f_fps = input_priv(p_input)->master->f_fps;
     if( f_fps > 1.f )
     {
-        var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
-        var_SetFloat( p_input, "sub-original-fps", f_fps );
-
         float f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
-        if( f_requested_fps != f_fps )
-        {
-            var_Create( p_input, "sub-fps", VLC_VAR_FLOAT|
-                                            VLC_VAR_DOINHERIT );
-            var_SetFloat( p_input, "sub-fps", f_requested_fps );
-        }
+        if( f_requested_fps <= 1.f )
+            var_SetFloat( p_input, "sub-fps", f_fps );
     }
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
