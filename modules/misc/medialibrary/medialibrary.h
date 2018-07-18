@@ -172,17 +172,19 @@ bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output );
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output );
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output );
 
-template <typename To, typename From>
+template <typename To, typename ItemType, typename From>
 To* ml_convert_list( const std::vector<std::shared_ptr<From>>& input )
 {
     // This function uses duck typing and assumes all lists have a p_items member
     static_assert( std::is_pointer<To>::value == false,
                    "Destination type must not be a pointer" );
-    static_assert( std::is_array<decltype(To::p_items)>::value == true,
-                   "Missing or invalid p_items member" );
+    // If decltype( To::p_items ) doesn't yield an array type, we can't deduce
+    // the items type. however if it does, we can ensure To and ItemType are coherent
+    static_assert( std::is_array<decltype(To::p_items)>::value == false ||
+                    ( std::is_same<typename std::remove_extent<decltype(To::p_items)>::type,
+                        ItemType>::value ), "Invalid/mismatching list/item types" );
 
     // Allocate the ml_*_list_t
-    using ItemType = typename std::remove_extent<decltype(To::p_items)>::type;
     auto list = vlc::wrap_cptr(
         static_cast<To*>( malloc( sizeof( To ) + input.size() * sizeof( ItemType ) ) ),
         static_cast<void(*)(To*)>( &vlc_ml_release_obj ) );

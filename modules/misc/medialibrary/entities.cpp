@@ -241,7 +241,7 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
         return false;
 
     auto files = input->files();
-    output.p_files = ml_convert_list<vlc_ml_file_list_t>( files );
+    output.p_files = ml_convert_list<vlc_ml_file_list_t, vlc_ml_file_t>( files );
     if ( output.p_files == nullptr )
         return false;
 
