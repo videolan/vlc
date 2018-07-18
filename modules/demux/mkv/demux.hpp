@@ -106,9 +106,6 @@ public:
     bool AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c * );
     void JumpTo( virtual_segment_c & vsegment, virtual_chapter_c & vchapter );
 
-    void InitUi();
-    void CleanUi();
-
     /* for spu variables */
     input_thread_t *p_input;
     uint8_t        palette[4][4];

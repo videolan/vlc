@@ -33,7 +33,6 @@ namespace mkv {
 
 demux_sys_t::~demux_sys_t()
 {
-    CleanUi();
     size_t i;
     for ( i=0; i<streams.size(); i++ )
         delete streams[i];
@@ -154,20 +153,6 @@ bool demux_sys_t::AnalyseAllSegmentsFound( demux_t *p_demux, matroska_stream_c *
         return false;
 
     return true;
-}
-
-void demux_sys_t::InitUi()
-{
-    msg_Dbg( &demuxer, "Starting the UI Hook" );
-
-    /* FIXME hack hack hack hack FIXME */
-    /* Get p_input and create variable */
-    p_input = demuxer.p_input;
-}
-
-void demux_sys_t::CleanUi()
-{
-    msg_Dbg( &demuxer, "Stopping the UI Hook" );
 }
 
 void demux_sys_t::PreloadFamily( const matroska_segment_c & of_segment )
