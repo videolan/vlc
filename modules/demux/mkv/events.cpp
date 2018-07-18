@@ -358,6 +358,15 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
             // select new button
             if ( best != i_curr_button )
             {
+                // TODO: make sure we do not overflow in the conversion
+                vlc_spu_highlight_t spu_hl = vlc_spu_highlight_t();
+
+                spu_hl.x_start = (int)button_ptr.x_start;
+                spu_hl.y_start = (int)button_ptr.y_start;
+
+                spu_hl.x_end = (int)button_ptr.x_end;
+                spu_hl.y_end = (int)button_ptr.y_end;
+
                 uint32_t i_palette;
 
                 if(button_ptr.btn_coln != 0) {
@@ -372,25 +381,20 @@ void event_thread_t::HandleMouseEvent( EventInfo const& event )
                     uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
                     i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
 
-                    p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
-                    p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
-                    p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
-                    p_sys->palette[i][3] = i_alpha;
+                    spu_hl.palette.palette[i][0] = (i_yuv >> 16) & 0xff;
+                    spu_hl.palette.palette[i][1] = (i_yuv >> 0) & 0xff;
+                    spu_hl.palette.palette[i][2] = (i_yuv >> 8) & 0xff;
+                    spu_hl.palette.palette[i][3] = i_alpha;
                 }
 
-                vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-                var_SetInteger( p_demux->p_input, "x-start",
-                                button_ptr.x_start );
-                var_SetInteger( p_demux->p_input, "x-end",
-                                button_ptr.x_end );
-                var_SetInteger( p_demux->p_input, "y-start",
-                                button_ptr.y_start );
-                var_SetInteger( p_demux->p_input, "y-end",
-                                button_ptr.y_end );
-                var_SetAddress( p_demux->p_input, "menu-palette",
-                                p_sys->palette );
-                var_SetBool( p_demux->p_input, "highlight", true );
-                vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
+                /* TODO: only control relevant SPU_ES given who fired the event */
+                for( es_list_t::iterator it = es_list.begin(); it != es_list.end(); ++it )
+                {
+                    if( it->category != SPU_ES )
+                        continue;
+
+                    es_out_Control( p_demux->out, ES_OUT_SPU_SET_HIGHLIGHT, it->es, &spu_hl );
+                }
             }
             vlc_mutex_unlock( &p_sys->lock_demuxer );
             vlc_mutex_lock( &lock );

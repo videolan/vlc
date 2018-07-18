@@ -1139,7 +1139,6 @@ bool matroska_segment_c::ESCreate()
             if( !default_track || track.b_default )
                 default_track = &track;
         }
-
     }
 
     for( mkv_track_t *track : default_tracks )

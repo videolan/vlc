@@ -163,31 +163,10 @@ void demux_sys_t::InitUi()
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
     p_input = demuxer.p_input;
-    if( p_input )
-    {
-        var_Create( p_input, "x-start", VLC_VAR_INTEGER );
-        var_Create( p_input, "y-start", VLC_VAR_INTEGER );
-        var_Create( p_input, "x-end", VLC_VAR_INTEGER );
-        var_Create( p_input, "y-end", VLC_VAR_INTEGER );
-        var_Create( p_input, "color", VLC_VAR_ADDRESS );
-        var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
-        var_Create( p_input, "highlight", VLC_VAR_BOOL );
-    }
 }
 
 void demux_sys_t::CleanUi()
 {
-    if( p_input )
-    {
-        var_Destroy( p_input, "highlight" );
-        var_Destroy( p_input, "x-start" );
-        var_Destroy( p_input, "x-end" );
-        var_Destroy( p_input, "y-start" );
-        var_Destroy( p_input, "y-end" );
-        var_Destroy( p_input, "color" );
-        var_Destroy( p_input, "menu-palette" );
-    }
-
     msg_Dbg( &demuxer, "Stopping the UI Hook" );
 }
 
