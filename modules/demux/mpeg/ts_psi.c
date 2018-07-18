@@ -1181,6 +1181,9 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
             case 0x15: /* AC4, unsupported for now */
                 es_format_Change( p_fmt, AUDIO_ES, VLC_FOURCC('A', 'C', '-', '4') );
                 break;
+            case 0x20:
+                es_format_Change( p_fmt, SPU_ES, VLC_CODEC_TTML_TS );
+                break;
         }
     }
     else if( p_sys->standard == TS_STANDARD_ARIB )
