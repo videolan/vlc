@@ -810,6 +810,8 @@ int MediaLibrary::controlMedia( int query, va_list args )
                 case VLC_ML_FILE_TYPE_SUBTITLE:
                     mlType = medialibrary::IFile::Type::Subtitles;
                     break;
+                default:
+                    vlc_assert_unreachable();
             }
             if ( m->addExternalMrl( mrl, mlType ) == nullptr )
                 return VLC_EGENERIC;
