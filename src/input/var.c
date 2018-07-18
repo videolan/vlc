@@ -120,7 +120,7 @@ static void Trigger( input_thread_t *p_input, int i_type )
     var_SetInteger( p_input, "intf-event", i_type );
 }
 static void VarListAdd( input_thread_t *p_input,
-                        const char *psz_variable, int i_event,
+                        const char *psz_variable,
                         int i_value, const char *psz_text )
 {
     vlc_value_t val;
@@ -128,11 +128,9 @@ static void VarListAdd( input_thread_t *p_input,
     val.i_int = i_value;
 
     var_Change( p_input, psz_variable, VLC_VAR_ADDCHOICE, val, psz_text );
-
-    Trigger( p_input, i_event );
 }
 static void VarListDel( input_thread_t *p_input,
-                        const char *psz_variable, int i_event,
+                        const char *psz_variable,
                         int i_value )
 {
     vlc_value_t val;
@@ -146,19 +144,15 @@ static void VarListDel( input_thread_t *p_input,
     {
         var_Change( p_input, psz_variable, VLC_VAR_CLEARCHOICES );
     }
-
-    Trigger( p_input, i_event );
 }
 static void VarListSelect( input_thread_t *p_input,
-                           const char *psz_variable, int i_event,
+                           const char *psz_variable,
                            int i_value )
 {
     vlc_value_t val;
 
     val.i_int = i_value;
     var_Change( p_input, psz_variable, VLC_VAR_SETVALUE, val );
-
-    Trigger( p_input, i_event );
 }
 static const char *GetEsVarName( enum es_format_category_e i_cat )
 {
@@ -290,16 +284,14 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
             switch (event->program.action)
             {
                 case VLC_INPUT_PROGRAM_ADDED:
-                    VarListAdd( p_input, "program", INPUT_EVENT_PROGRAM,
-                                event->program.id, event->program.title );
+                    VarListAdd( p_input, "program", event->program.id,
+                                event->program.title );
                     break;
                 case VLC_INPUT_PROGRAM_DELETED:
-                    VarListDel( p_input, "program", INPUT_EVENT_PROGRAM,
-                                event->program.id );
+                    VarListDel( p_input, "program", event->program.id );
                     break;
                 case VLC_INPUT_PROGRAM_SELECTED:
-                    VarListSelect( p_input, "program", INPUT_EVENT_PROGRAM,
-                                   event->program.id );
+                    VarListSelect( p_input, "program", event->program.id );
                     break;
                 case VLC_INPUT_PROGRAM_SCRAMBLED:
                     if( var_GetInteger( p_input, "program" ) != event->program.id  )
@@ -315,24 +307,22 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
                 {
                     const char *varname = GetEsVarName( event->es.cat );
                     if( varname )
-                        VarListAdd( p_input, varname, INPUT_EVENT_ES,
-                                    event->es.id, event->es.title );
+                        VarListAdd( p_input, varname, event->es.id,
+                                    event->es.title );
                     break;
                 }
                 case VLC_INPUT_ES_DELETED:
                 {
                     const char *varname = GetEsVarName( event->es.cat );
                     if( varname )
-                        VarListDel( p_input, varname, INPUT_EVENT_ES,
-                                    event->es.id );
+                        VarListDel( p_input, varname, event->es.id );
                     break;
                 }
                 case VLC_INPUT_ES_SELECTED:
                 {
                     const char *varname = GetEsVarName( event->es.cat );
                     if( varname )
-                        VarListSelect( p_input, varname, INPUT_EVENT_ES,
-                                       event->es.id );
+                        VarListSelect( p_input, varname, event->es.id );
                     break;
                 }
             }
@@ -341,16 +331,14 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
             switch (event->teletext.action)
             {
                 case VLC_INPUT_TELETEXT_ADDED:
-                    VarListAdd( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
-                                event->teletext.id, event->teletext.title );
+                    VarListAdd( p_input, "teletext-es", event->teletext.id,
+                                event->teletext.title );
                     break;
                 case VLC_INPUT_TELETEXT_DELETED:
-                    VarListDel( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
-                                event->teletext.id );
+                    VarListDel( p_input, "teletext-es", event->teletext.id );
                     break;
                 case VLC_INPUT_TELETEXT_SELECTED:
-                    VarListSelect( p_input, "teletext-es", INPUT_EVENT_TELETEXT,
-                                   event->teletext.id );
+                    VarListSelect( p_input, "teletext-es", event->teletext.id );
                     break;
             }
             break;
