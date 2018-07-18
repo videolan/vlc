@@ -224,6 +224,9 @@ static inline void *realloc_or_free( void *p, size_t sz )
     }                                                                       \
 }
 
+#define ARRAY_FIND(array, p, idx)                                           \
+  TAB_FIND((array).i_size, (array).p_elems, p, idx)
+
 #define ARRAY_REMOVE(array,pos)                                             \
   do {                                                                      \
     if( (array).i_size - (pos) - 1 )                                        \

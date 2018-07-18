@@ -77,6 +77,46 @@ static void test_array_foreach(void)
     ARRAY_RESET(array);
 }
 
+static void test_array_find(void)
+{
+    DECL_ARRAY(int) array;
+    ARRAY_INIT(array);
+
+    ARRAY_APPEND(array, 17);
+    ARRAY_APPEND(array, 52);
+    ARRAY_APPEND(array, 26);
+    ARRAY_APPEND(array, 13);
+    ARRAY_APPEND(array, 40);
+    ARRAY_APPEND(array, 20);
+    ARRAY_APPEND(array, 10);
+    ARRAY_APPEND(array, 5);
+
+    int index;
+
+    ARRAY_FIND(array, 17, index);
+    assert(index == 0);
+
+    ARRAY_FIND(array, 52, index);
+    assert(index == 1);
+
+    ARRAY_FIND(array, 26, index);
+    assert(index == 2);
+
+    ARRAY_FIND(array, 13, index);
+    assert(index == 3);
+
+    ARRAY_FIND(array, 10, index);
+    assert(index == 6);
+
+    ARRAY_FIND(array, 5, index);
+    assert(index == 7);
+
+    ARRAY_FIND(array, 14, index);
+    assert(index == -1);
+
+    ARRAY_RESET(array);
+}
+
 static void test_array_bsearch(void)
 {
     struct item {
@@ -122,5 +162,6 @@ int main(void)
 {
     test_array_insert_remove();
     test_array_foreach();
+    test_array_find();
     test_array_bsearch();
 }
