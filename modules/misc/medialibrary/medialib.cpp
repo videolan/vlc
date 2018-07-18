@@ -203,8 +203,7 @@ bool MediaLibrary::Start()
     }
 
     ml->addParserService( std::make_shared<MetadataExtractor>( m_obj ) );
-    auto res = ml->start();
-    if ( res == false )
+    if ( ml->start() == false )
     {
         msg_Err( m_obj, "Failed to start the MediaLibrary" );
         return false;
