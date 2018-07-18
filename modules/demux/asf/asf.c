@@ -567,19 +567,10 @@ static void Packet_SetAR( asf_packet_sys_t *p_packetsys, uint8_t i_stream_number
     if ( !tk->p_fmt || (tk->p_fmt->video.i_sar_num == i_ratio_x && tk->p_fmt->video.i_sar_den == i_ratio_y ) )
         return;
 
-    /* Only apply if origin pixel size >= 1x1, due to broken yacast */
-    if ( tk->p_fmt->video.i_height * i_ratio_x > tk->p_fmt->video.i_width * i_ratio_y )
-    {
-        vout_thread_t *p_vout = input_GetVout( p_demux->p_input );
-        if ( p_vout )
-        {
-            msg_Info( p_demux, "Changing aspect ratio to %i/%i", i_ratio_x, i_ratio_y );
-            vout_ChangeAspectRatio( p_vout, i_ratio_x, i_ratio_y );
-            vlc_object_release( p_vout );
-        }
-    }
     tk->p_fmt->video.i_sar_num = i_ratio_x;
     tk->p_fmt->video.i_sar_den = i_ratio_y;
+    if( tk->p_es )
+        es_out_Control( p_demux->out, ES_OUT_SET_ES_FMT, tk->p_es, tk->p_fmt );
 }
 
 static void Packet_SetSendTime( asf_packet_sys_t *p_packetsys, vlc_tick_t i_time )
