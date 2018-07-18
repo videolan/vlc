@@ -188,6 +188,9 @@ HAVE_FPU = 1
 endif
 
 ACLOCAL_AMFLAGS += -I$(PREFIX)/share/aclocal
+ifneq ($(wildcard $(TOPSRC)/../extras/tools/build/share/aclocal/*),)
+ACLOCAL_AMFLAGS += -I$(abspath $(TOPSRC)/../extras/tools/build/share/aclocal)
+endif
 export ACLOCAL_AMFLAGS
 
 #########
