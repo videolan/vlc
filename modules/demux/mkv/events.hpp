@@ -52,6 +52,7 @@ private:
     static int EventInput( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
     void HandleKeyEvent();
+    void HandleMouseEvent( vlc_object_t* p_vout );
 
     demux_t      *p_demux;
 

@@ -171,110 +171,7 @@ void event_thread_t::EventThread()
 
         /* MOUSE part */
         if( p_vout && ( b_moved || b_clicked ) )
-        {
-            int x, y;
-
-            var_GetCoords( p_vout, "mouse-moved", &x, &y );
-            pci_t *pci = &pci_packet;
-
-            if( b_clicked )
-            {
-                int32_t button;
-                int32_t best,dist,d;
-                int32_t mx,my,dx,dy;
-
-                msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
-
-                // get current button
-                best = 0;
-                dist = 0x08000000; /* >> than  (720*720)+(567*567); */
-                for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++)
-                {
-                    btni_t *button_ptr = &(pci->hli.btnit[button-1]);
-
-                    if(((unsigned)x >= button_ptr->x_start)
-                     && ((unsigned)x <= button_ptr->x_end)
-                     && ((unsigned)y >= button_ptr->y_start)
-                     && ((unsigned)y <= button_ptr->y_end))
-                    {
-                        mx = (button_ptr->x_start + button_ptr->x_end)/2;
-                        my = (button_ptr->y_start + button_ptr->y_end)/2;
-                        dx = mx - x;
-                        dy = my - y;
-                        d = (dx*dx) + (dy*dy);
-                        /* If the mouse is within the button and the mouse is closer
-                        * to the center of this button then it is the best choice. */
-                        if(d < dist) {
-                            dist = d;
-                            best = button;
-                        }
-                    }
-                }
-
-                if ( best != 0)
-                {
-                    btni_t button_ptr = pci->hli.btnit[best-1];
-                    uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
-
-                    msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
-                    vlc_mutex_unlock( &lock );
-                    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-                    // process the button action
-                    p_sys->dvd_interpretor.SetSPRM( 0x88, best );
-                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
-
-                    msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
-
-                    // select new button
-                    if ( best != i_curr_button )
-                    {
-                        uint32_t i_palette;
-
-                        if(button_ptr.btn_coln != 0) {
-                            i_palette = pci->hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
-                        } else {
-                            i_palette = 0;
-                        }
-
-                        for( int i = 0; i < 4; i++ )
-                        {
-                            uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
-                            uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
-                            i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
-
-                            p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
-                            p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
-                            p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
-                            p_sys->palette[i][3] = i_alpha;
-                        }
-
-                        vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
-                        var_SetInteger( p_demux->p_input, "x-start",
-                                        button_ptr.x_start );
-                        var_SetInteger( p_demux->p_input, "x-end",
-                                        button_ptr.x_end );
-                        var_SetInteger( p_demux->p_input, "y-start",
-                                        button_ptr.y_start );
-                        var_SetInteger( p_demux->p_input, "y-end",
-                                        button_ptr.y_end );
-                        var_SetAddress( p_demux->p_input, "menu-palette",
-                                        p_sys->palette );
-                        var_SetBool( p_demux->p_input, "highlight", true );
-                        vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
-                    }
-                    vlc_mutex_unlock( &p_sys->lock_demuxer );
-                    vlc_mutex_lock( &lock );
-                }
-            }
-            else if( b_moved )
-            {
-//                dvdnav_mouse_select( NULL, pci, x, y );
-            }
-
-            b_moved = false;
-            b_clicked = false;
-        }
+            HandleMouseEvent( p_vout );
 
         b_vout = false;
         vlc_mutex_unlock( &lock );
@@ -432,6 +329,113 @@ void event_thread_t::HandleKeyEvent()
         break;
     }
     i_key_action = 0;
+}
+
+void event_thread_t::HandleMouseEvent( vlc_object_t* p_vout )
+{
+    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
+    int x, y;
+
+    var_GetCoords( p_vout, "mouse-moved", &x, &y );
+    pci_t *pci = &pci_packet;
+
+    if( b_clicked )
+    {
+        int32_t button;
+        int32_t best,dist,d;
+        int32_t mx,my,dx,dy;
+
+        msg_Dbg( p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
+
+        // get current button
+        best = 0;
+        dist = 0x08000000; /* >> than  (720*720)+(567*567); */
+        for(button = 1; button <= pci->hli.hl_gi.btn_ns; button++)
+        {
+            btni_t *button_ptr = &(pci->hli.btnit[button-1]);
+
+            if(((unsigned)x >= button_ptr->x_start)
+             && ((unsigned)x <= button_ptr->x_end)
+             && ((unsigned)y >= button_ptr->y_start)
+             && ((unsigned)y <= button_ptr->y_end))
+            {
+                mx = (button_ptr->x_start + button_ptr->x_end)/2;
+                my = (button_ptr->y_start + button_ptr->y_end)/2;
+                dx = mx - x;
+                dy = my - y;
+                d = (dx*dx) + (dy*dy);
+                /* If the mouse is within the button and the mouse is closer
+                * to the center of this button then it is the best choice. */
+                if(d < dist) {
+                    dist = d;
+                    best = button;
+                }
+            }
+        }
+
+        if ( best != 0)
+        {
+            btni_t button_ptr = pci->hli.btnit[best-1];
+            uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
+
+            msg_Dbg( &p_sys->demuxer, "Clicked button %d", best );
+            vlc_mutex_unlock( &lock );
+            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+            // process the button action
+            p_sys->dvd_interpretor.SetSPRM( 0x88, best );
+            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+            msg_Dbg( &p_sys->demuxer, "Processed button %d", best );
+
+            // select new button
+            if ( best != i_curr_button )
+            {
+                uint32_t i_palette;
+
+                if(button_ptr.btn_coln != 0) {
+                    i_palette = pci->hli.btn_colit.btn_coli[button_ptr.btn_coln-1][1];
+                } else {
+                    i_palette = 0;
+                }
+
+                for( int i = 0; i < 4; i++ )
+                {
+                    uint32_t i_yuv = 0xFF;//p_sys->clut[(hl.palette>>(16+i*4))&0x0f];
+                    uint8_t i_alpha = (i_palette>>(i*4))&0x0f;
+                    i_alpha = i_alpha == 0xf ? 0xff : i_alpha << 4;
+
+                    p_sys->palette[i][0] = (i_yuv >> 16) & 0xff;
+                    p_sys->palette[i][1] = (i_yuv >> 0) & 0xff;
+                    p_sys->palette[i][2] = (i_yuv >> 8) & 0xff;
+                    p_sys->palette[i][3] = i_alpha;
+                }
+
+                vlc_global_lock( VLC_HIGHLIGHT_MUTEX );
+                var_SetInteger( p_demux->p_input, "x-start",
+                                button_ptr.x_start );
+                var_SetInteger( p_demux->p_input, "x-end",
+                                button_ptr.x_end );
+                var_SetInteger( p_demux->p_input, "y-start",
+                                button_ptr.y_start );
+                var_SetInteger( p_demux->p_input, "y-end",
+                                button_ptr.y_end );
+                var_SetAddress( p_demux->p_input, "menu-palette",
+                                p_sys->palette );
+                var_SetBool( p_demux->p_input, "highlight", true );
+                vlc_global_unlock( VLC_HIGHLIGHT_MUTEX );
+            }
+            vlc_mutex_unlock( &p_sys->lock_demuxer );
+            vlc_mutex_lock( &lock );
+        }
+    }
+    else if( b_moved )
+    {
+//                dvdnav_mouse_select( NULL, pci, x, y );
+    }
+
+    b_moved = false;
+    b_clicked = false;
 }
 
 } // namespace
