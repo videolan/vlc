@@ -441,9 +441,6 @@ void input_LegacyVarInit ( input_thread_t *p_input )
     val.i_int = input_priv(p_input)->i_state;
     var_Change( p_input, "state", VLC_VAR_SETVALUE, val );
 
-    /* Rate */
-    var_Create( p_input, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-
     var_Create( p_input, "frame-next", VLC_VAR_VOID );
 
     /* Position */
@@ -458,14 +455,12 @@ void input_LegacyVarInit ( input_thread_t *p_input )
     var_Change( p_input, "bookmark", VLC_VAR_SETTEXT, _("Bookmark") );
 
     /* Program */
-    var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Get( p_input, "program", &val );
     if( val.i_int <= 0 )
         var_Change( p_input, "program", VLC_VAR_DELCHOICE, val );
     var_Change( p_input, "program", VLC_VAR_SETTEXT, _("Program") );
 
     /* Programs */
-    var_Create( p_input, "programs", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Change( p_input, "programs", VLC_VAR_SETTEXT, _("Programs") );
 
     /* Title */
@@ -500,9 +495,6 @@ void input_LegacyVarInit ( input_thread_t *p_input )
 
     var_Create( p_input, "spu-choice", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "spu-choice", -1 );
-
-    /* Special read only objects variables for intf */
-    var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     var_Create( p_input, "length", VLC_VAR_INTEGER );
 
@@ -745,6 +737,11 @@ void input_ConfigVarInit ( input_thread_t *p_input )
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
         var_Create( p_input, "clock-synchro",
                     VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+
+        var_Create( p_input, "bookmarks", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "programs", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "program", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+        var_Create( p_input, "rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     }
 
     /* */

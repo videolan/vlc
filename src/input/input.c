@@ -1339,7 +1339,7 @@ static int Init( input_thread_t * p_input )
         LoadSlaves( p_input );
         InitPrograms( p_input );
 
-        double f_rate = var_InheritFloat( p_input, "rate" );
+        double f_rate = var_GetFloat( p_input, "rate" );
         if( f_rate != 0.0 && f_rate != 1.0 )
         {
             vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / f_rate };
