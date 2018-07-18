@@ -183,6 +183,7 @@ typedef struct
     es_out_t out;
 } es_out_sys_t;
 
+static void         EsOutDelLocked( es_out_t *, es_out_id_t * );
 static void         EsOutDel    ( es_out_t *, es_out_id_t * );
 
 static void         EsOutTerminate( es_out_t * );
@@ -302,7 +303,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->out.cbs = &es_out_cbs;
 
-    vlc_mutex_init_recursive( &p_sys->lock );
+    vlc_mutex_init( &p_sys->lock );
     p_sys->p_input = p_input;
 
     p_sys->b_active = false;
@@ -1518,7 +1519,8 @@ static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
                (p_sys->p_pgrm && p_sys->p_pgrm->p_meta) ? p_sys->p_pgrm->p_meta : NULL );
 }
 
-static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out_id_t *p_master )
+static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
+                                         es_out_id_t *p_master )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
@@ -1536,13 +1538,10 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     if( !es )
         return NULL;
 
-    vlc_mutex_lock( &p_sys->lock );
-
     /* Search the program */
     p_pgrm = EsOutProgramFind( out, fmt->i_group );
     if( !p_pgrm )
     {
-        vlc_mutex_unlock( &p_sys->lock );
         free( es );
         return NULL;
     }
@@ -1638,8 +1637,6 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     if( es->b_scrambled )
         EsOutProgramUpdateScrambled( out, es->p_pgrm );
 
-    vlc_mutex_unlock( &p_sys->lock );
-
     return es;
 }
 
@@ -1648,7 +1645,11 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
  */
 static es_out_id_t *EsOutAdd( es_out_t *out, const es_format_t *fmt )
 {
-    return EsOutAddSlave( out, fmt, NULL );
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    vlc_mutex_lock( &p_sys->lock );
+    es_out_id_t *es = EsOutAddSlaveLocked( out, fmt, NULL );
+    vlc_mutex_unlock( &p_sys->lock );
+    return es;
 }
 
 static bool EsIsSelected( es_out_id_t *es )
@@ -1807,7 +1808,7 @@ static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
             /* Force unselection of the CC */
             input_SendEventEsSelect( p_input, SPU_ES, -1 );
         }
-        EsOutDel( out, parent->cc.pp_es[i] );
+        EsOutDelLocked( out, parent->cc.pp_es[i] );
     }
 
     parent->cc.i_bitmap = 0;
@@ -2023,7 +2024,7 @@ static void EsOutCreateCCChannels( es_out_t *out, vlc_fourcc_t codec, uint64_t i
             fmt.psz_description = NULL;
 
         es_out_id_t **pp_es = &parent->cc.pp_es[i];
-        *pp_es = EsOutAddSlave( out, &fmt, parent );
+        *pp_es = EsOutAddSlaveLocked( out, &fmt, parent );
         es_format_Clean( &fmt );
 
         /* */
@@ -2142,14 +2143,12 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
 }
 
 /*****************************************************************************
- * EsOutDel:
+ * EsOutDelLocked:
  *****************************************************************************/
-static void EsOutDel( es_out_t *out, es_out_id_t *es )
+static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     bool b_reselect = false;
-
-    vlc_mutex_lock( &p_sys->lock );
 
     es_out_es_props_t *p_esprops = GetPropsByCat( p_sys, es->fmt.i_cat );
 
@@ -2222,9 +2221,26 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 
     es_format_Clean( &es->fmt );
 
-    vlc_mutex_unlock( &p_sys->lock );
-
     free( es );
+}
+
+static void EsOutDel( es_out_t *out, es_out_id_t *es )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    vlc_mutex_lock( &p_sys->lock );
+    EsOutDelLocked( out, es );
+    vlc_mutex_unlock( &p_sys->lock );
+}
+
+static int EsOutVaControlLocked( es_out_t *, int, va_list );
+static int EsOutControlLocked( es_out_t *out, int i_query, ... )
+{
+    va_list args;
+
+    va_start( args, i_query );
+    int ret = EsOutVaControlLocked( out, i_query, args );
+    va_end( args );
+    return ret;
 }
 
 /**
@@ -2235,7 +2251,7 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
  * \param args a variable list of arguments for the query
  * \return VLC_SUCCESS or an error code
  */
-static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
+static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
 
@@ -2546,7 +2562,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
                     /* It is not really good, as we throw away already buffered data
                      * TODO have a mean to correctly reenter bufferization */
-                    es_out_Control( out, ES_OUT_RESET_PCR );
+                    EsOutControlLocked( out, ES_OUT_RESET_PCR );
                 }
 
                 es_out_SetJitter( out, i_pts_delay_base, i_pts_delay - i_pts_delay_base, p_sys->i_cr_average );
@@ -2691,8 +2707,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         default:
           vlc_assert_unreachable();
         }
-        /* TODO if the lock is made non recursive it should be changed */
-        int i_ret = es_out_Control( out, i_new_query, p_es );
+        int i_ret = EsOutControlLocked( out, i_new_query, p_es );
 
         /* Clean up vout after user action (in active mode only).
          * FIXME it does not work well with multiple video windows */
@@ -2896,7 +2911,7 @@ static int EsOutControl( es_out_t *out, int i_query, va_list args )
     int i_ret;
 
     vlc_mutex_lock( &p_sys->lock );
-    i_ret = EsOutControlLocked( out, i_query, args );
+    i_ret = EsOutVaControlLocked( out, i_query, args );
     vlc_mutex_unlock( &p_sys->lock );
 
     return i_ret;
