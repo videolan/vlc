@@ -307,8 +307,17 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
                 {
                     const char *varname = GetEsVarName( event->es.cat );
                     if( varname )
+                    {
+                        size_t count;
+                        var_Change( p_input, varname, VLC_VAR_CHOICESCOUNT, &count );
+                        if( count == 0 )
+                        {
+                            /* First one, we need to add the "Disable" choice */
+                            VarListAdd( p_input, varname, -1, _("Disable") );
+                        }
                         VarListAdd( p_input, varname, event->es.id,
                                     event->es.title );
+                    }
                     break;
                 }
                 case VLC_INPUT_ES_DELETED:

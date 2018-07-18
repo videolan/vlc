@@ -924,7 +924,8 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t    *p_input = p_sys->p_input;
     vlc_value_t       text;
-    size_t count;
+    es_out_id_t       *es;
+    size_t count = 0;
 
     if( b_delete )
     {
@@ -936,24 +937,9 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     }
 
     /* Get the number of ES already added */
-    const char *psz_var;
-    if( fmt->i_cat == AUDIO_ES )
-        psz_var = "audio-es";
-    else if( fmt->i_cat == VIDEO_ES )
-        psz_var = "video-es";
-    else
-        psz_var = "spu-es";
-
-    var_Change( p_input, psz_var, VLC_VAR_CHOICESCOUNT, &count );
-    if( count == 0 )
-    {
-        vlc_value_t val2;
-
-        /* First one, we need to add the "Disable" choice */
-        val2.i_int = -1;
-        var_Change( p_input, psz_var, VLC_VAR_ADDCHOICE, val2, _("Disable") );
-        count++;
-    }
+    foreach_es_then_es_slaves(es)
+        if( es->fmt.i_cat == fmt->i_cat )
+            count++;
 
     /* Take care of the ES description */
     if( fmt->psz_description && *fmt->psz_description )
