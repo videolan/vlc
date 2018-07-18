@@ -38,6 +38,14 @@
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
 
+static auto const strdup_helper = []( std::string const& src, char*& dst )
+{
+    dst = nullptr;
+    if( !src.empty() && !( dst = strdup( src.c_str() ) ) )
+        return false;
+    return true;
+};
+
 bool Convert( const medialibrary::IAlbumTrack* input, vlc_ml_album_track_t& output )
 {
     output.i_artist_id = input->artistId();
@@ -52,75 +60,28 @@ bool Convert( const medialibrary::IShowEpisode* input, vlc_ml_show_episode_t& ou
 {
     output.i_episode_nb = input->episodeNumber();
     output.i_season_number = input->seasonNumber();
-    if ( input->shortSummary().empty() == false )
-    {
-        output.psz_summary = strdup( input->shortSummary().c_str() );
-        if ( unlikely( output.psz_summary == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_summary = nullptr;
-    if ( input->tvdbId().empty() == false )
-    {
-        output.psz_tvdb_id = strdup( input->tvdbId().c_str() );
-        if ( unlikely( output.psz_tvdb_id == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_tvdb_id = nullptr;
+
+    if( !strdup_helper( input->shortSummary(), output.psz_summary ) ||
+        !strdup_helper( input->tvdbId(), output.psz_tvdb_id ) )
+        return false;
     return true;
 }
 
 bool Convert( const medialibrary::IMovie* input, vlc_ml_movie_t& output )
 {
-    if ( input->imdbId().empty() == false )
-    {
-        output.psz_imdb_id = strdup( input->imdbId().c_str() );
-        if ( unlikely( output.psz_imdb_id == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_imdb_id = nullptr;
-    if ( input->shortSummary().empty() == false )
-    {
-        output.psz_summary = strdup( input->shortSummary().c_str() );
-        if ( unlikely( output.psz_summary == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_summary = nullptr;
+    if( !strdup_helper( input->imdbId(), output.psz_imdb_id ) ||
+        !strdup_helper( input->shortSummary(), output.psz_summary ) )
+        return false;
     return true;
 }
 
 static bool convertTracksCommon( vlc_ml_media_track_t* output, const std::string& codec,
                                  const std::string& language, const std::string& desc )
 {
-    if ( codec.empty() == false )
-    {
-        output->psz_codec = strdup( codec.c_str() );
-        if ( unlikely( output->psz_codec == nullptr ) )
-            return false;
-    }
-    else
-        output->psz_codec = nullptr;
-
-    if ( language.empty() == false )
-    {
-        output->psz_language = strdup( language.c_str() );
-        if ( unlikely( output->psz_language == nullptr ) )
-            return false;
-    }
-    else
-        output->psz_language = nullptr;
-
-    if ( desc.empty() == false )
-    {
-        output->psz_description = strdup( desc.c_str() );
-        if ( unlikely( output->psz_description == nullptr ) )
-            return false;
-    }
-    else
-        output->psz_description = nullptr;
+    if( strdup_helper( codec, output->psz_codec ) ||
+        strdup_helper( language, output->psz_language ) ||
+        strdup_helper( desc, output->psz_description ) )
+        return false;
     return true;
 }
 
@@ -282,9 +243,10 @@ bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output )
         default:
             vlc_assert_unreachable();
     }
-    output.psz_mrl = strdup( input->mrl().c_str() );
-    if ( unlikely( output.psz_mrl == nullptr ) )
+
+    if( !strdup_helper( input->mrl(), output.psz_mrl ) )
         return false;
+
     output.b_external = input->isExternal();
     return true;
 }
@@ -295,30 +257,12 @@ bool Convert( const medialibrary::IAlbum* input, vlc_ml_album_t& output )
     output.i_nb_tracks = input->nbTracks();
     output.i_duration = input->duration();
     output.i_year = input->releaseYear();
-    if ( input->title().empty() == false )
-    {
-        output.psz_title = strdup( input->title().c_str() );
-        if ( unlikely( output.psz_title == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_title = nullptr;
-    if ( input->shortSummary().empty() == false )
-    {
-        output.psz_summary = strdup( input->shortSummary().c_str() );
-        if ( unlikely( output.psz_summary == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_summary = nullptr;
-    if ( input->artworkMrl().empty() == false )
-    {
-        output.psz_artwork_mrl = strdup( input->artworkMrl().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_artwork_mrl = nullptr;
+
+    if( !strdup_helper( input->title(), output.psz_title ) ||
+        !strdup_helper( input->shortSummary(), output.psz_summary ) ||
+        !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) )
+        return false;
+
     auto artist = input->albumArtist();
     if ( artist != nullptr )
     {
@@ -360,36 +304,12 @@ bool Convert( const medialibrary::IArtist* input, vlc_ml_artist_t& output )
     }
     if ( unlikely( output.psz_name == nullptr ) )
         return false;
-    if ( input->shortBio().empty() == false )
-    {
-        output.psz_shortbio = strdup( input->shortBio().c_str() );
-        if ( unlikely( output.psz_shortbio == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_shortbio = nullptr;
-    if ( input->artworkMrl().empty() == false )
-    {
-        output.psz_artwork_mrl = strdup( input->artworkMrl().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_artwork_mrl = nullptr;
-    if ( input->musicBrainzId().empty() == false )
-    {
-        output.psz_mb_id = strdup( input->musicBrainzId().c_str() );
-        if ( unlikely( output.psz_mb_id == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_mb_id = nullptr;
-    return true;
-}
 
-void Release( vlc_ml_genre_t& genre )
-{
-    free( genre.psz_name );
+    if( !strdup_helper( input->shortBio(), output.psz_shortbio ) ||
+        !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) ||
+        !strdup_helper( input->musicBrainzId(), output.psz_mb_id ) )
+        return false;
+    return true;
 }
 
 bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output )
@@ -397,10 +317,7 @@ bool Convert( const medialibrary::IGenre* input, vlc_ml_genre_t& output )
     output.i_id = input->id();
     output.i_nb_tracks = input->nbTracks();
     assert( input->name().empty() == false );
-    output.psz_name = strdup( input->name().c_str() );
-    if ( unlikely( output.psz_name == nullptr ) )
-        return false;
-    return true;
+    return strdup_helper( input->name(), output.psz_name );
 }
 
 bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output )
@@ -409,69 +326,27 @@ bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output )
     output.i_release_year = input->releaseDate();
     output.i_nb_episodes = input->nbEpisodes();
     output.i_nb_seasons = input->nbSeasons();
-    if ( input->title().empty() == false )
-    {
-        output.psz_name = strdup( input->title().c_str() );
-        if ( output.psz_name == nullptr )
-            return false;
-    }
-    else
-        output.psz_name = nullptr;
-    if ( input->artworkMrl().empty() == false )
-    {
-        output.psz_artwork_mrl = strdup( input->artworkMrl().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_artwork_mrl = nullptr;
-    if ( input->tvdbId().empty() == false )
-    {
-        output.psz_tvdb_id = strdup( input->tvdbId().c_str() );
-        if ( unlikely( output.psz_tvdb_id == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_tvdb_id = nullptr;
-    if ( input->shortSummary().empty() == false )
-    {
-        output.psz_summary = strdup( input->shortSummary().c_str() );
-        if ( unlikely( output.psz_summary == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_summary = nullptr;
+
+    if( !strdup_helper( input->title(), output.psz_name ) ||
+        !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) ||
+        !strdup_helper( input->tvdbId(), output.psz_tvdb_id ) ||
+        !strdup_helper( input->shortSummary(), output.psz_summary ) )
+        return false;
     return true;
 }
 
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output )
 {
     assert( input->name().empty() == false );
-    output.psz_name = strdup( input->name().c_str() );
-    if ( unlikely( output.psz_name == nullptr ) )
-        return false;
-    return true;
+    return strdup_helper( input->name(), output.psz_name );
 }
 
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 {
     output.i_id = input->id();
-    if ( input->name().empty() == false )
-    {
-        output.psz_name = strdup( input->name().c_str() );
-        if ( unlikely( output.psz_name == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_name = nullptr;
-    if ( input->artworkMrl().empty() != false )
-    {
-        output.psz_artwork_mrl = strdup( input->artworkMrl().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
-    }
-    else
-        output.psz_artwork_mrl = nullptr;
-    output.i_creation_date = input->creationDate();
+
+    if( !strdup_helper( input->name(), output.psz_name ) ||
+        !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) )
+        return false;
     return true;
 }
