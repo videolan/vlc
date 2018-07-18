@@ -56,7 +56,7 @@ public:
         ,dvd_interpretor( *this )
         ,f_duration(-1.0)
         ,p_input(NULL)
-        ,p_ev(NULL)
+        ,ev(&demux)
     {
         vlc_mutex_init( &lock_demuxer );
     }
@@ -115,7 +115,7 @@ public:
     vlc_mutex_t    lock_demuxer;
 
     /* event */
-    event_thread_t *p_ev;
+    event_thread_t ev;
 };
 
 } // namespace

@@ -1148,7 +1148,7 @@ bool matroska_segment_c::ESCreate()
 
 void matroska_segment_c::ESDestroy( )
 {
-    sys.p_ev->ResetPci();
+    sys.ev.ResetPci();
 
     for( tracks_map_t::iterator it = tracks.begin(); it != tracks.end(); ++it )
     {

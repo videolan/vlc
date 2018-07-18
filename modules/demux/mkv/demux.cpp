@@ -173,16 +173,10 @@ void demux_sys_t::InitUi()
         var_Create( p_input, "menu-palette", VLC_VAR_ADDRESS );
         var_Create( p_input, "highlight", VLC_VAR_BOOL );
     }
-
-    /* Now create our event thread catcher */
-    p_ev = new event_thread_t(&demuxer);
 }
 
 void demux_sys_t::CleanUi()
 {
-    delete p_ev;
-    p_ev = NULL;
-
     if( p_input )
     {
         var_Destroy( p_input, "highlight" );
