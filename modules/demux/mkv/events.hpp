@@ -51,6 +51,8 @@ private:
     static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
     static int EventInput( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
+    void HandleKeyEvent();
+
     demux_t      *p_demux;
 
     bool         is_running;
