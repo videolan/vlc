@@ -41,15 +41,14 @@
 # Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, 2017-2018
 # Marco Esposito <antani125@yahoo.it>, 2013
 # Veronica Di Giorgio <verodigiorgio@gmail.com>, 2013
-# Vincenzo Reale <vinx.reale@gmail.com>, 2014-2018
+# Vincenzo Reale <smart2128@baslug.org>, 2014-2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Sebastiano Pistore <SebastianoPistore.info@protonmail.ch>, "
-"2018\n"
+"PO-Revision-Date: 2018-07-18 05:26+0200\n"
+"Last-Translator: Vincenzo Reale <smart2128@baslug.org>, 2018\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -13591,7 +13590,7 @@ msgstr ""
 "anziché solamente da quella precedente (vedi anche le opzioni dei "
 "fotogrammi).  Pertanto, i fotogrammi I non sono necessariamente ricercabili. "
 "I fotogrammi IDR limitano che i fotogrammi P consecutivi vengano trattati da "
-"qualunque fotogramma precedente ai fotogrammi IDR.\n"
+"qualunque fotogramma precedente ai fotogrammi IDR. \n"
 "Se avvengono dei cambi di scena in questo intervallo, essi vengono comunque "
 "codificati come fotogrammi I, ma non iniziano un nuovo GOP"
 
@@ -16638,7 +16637,6 @@ msgid ""
 msgstr "VLC media player e VideoLAN sono marchi dell'Associazione VideoLAN."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16651,13 +16649,13 @@ msgid ""
 msgstr ""
 "<p>VLC è un lettore multimediale, decodificatore e fonte di trasmissione "
 "libero e a sorgente aperto sviluppato dai volontari della comunità di <a "
-"href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utilizza i suoi codificatori "
-"interni, funziona su tutte le piattaforme più conosciute e può leggere quasi "
-"tutti i file, CD, DVD, flussi di rete, schede di acquisizione e altri "
-"formati multimediali!</p><p><a href=\"http://www.videolan.org/contribute/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join "
-"us!</span></a>"
+"href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a>.</p><p>VLC utilizza i suoi "
+"codificatori interni, funziona su tutte le piattaforme più conosciute e può "
+"leggere quasi tutti i file, CD, DVD, flussi di rete, schede di acquisizione "
+"e altri formati multimediali!</p><p><a href=\"https://www.videolan.org/"
+"contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Unisciti a noi e aiutaci!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -17296,7 +17294,6 @@ msgstr "Vai all'elemento precedente"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Abbandona schermo intero"
 
@@ -17524,6 +17521,8 @@ msgstr "Blocca proporzioni"
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
 msgstr ""
+"Riduci la retroilluminazione della tastiera durante la riproduzione a "
+"schermo intero"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -20785,8 +20784,8 @@ msgstr ""
 "interni, funziona su tutte le piattaforme più conosciute e può leggere quasi "
 "tutti i file, CD, DVD, flussi di rete, schede di acquisizione e altri "
 "formati multimediali!</p><p><a href=\"http://www.videolan.org/contribute/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">Help and join "
-"us!</span></a>"
+"\"><span style=\" text-decoration: underline; color:#0057ae;\">Contribuisci "
+"e unisciti a noi!</span></a>"
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
@@ -21723,7 +21722,7 @@ msgstr "&Svuota"
 
 #: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
-msgstr ""
+msgstr "&Renderer"
 
 #: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
@@ -22190,6 +22189,8 @@ msgstr "Usa QPU per il deinterlacciamento HD avanzato."
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"Utilizza i QPU per consentire un deinterlacciamento di qualità più alta del "
+"contenuto HD."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
@@ -22232,6 +22233,8 @@ msgid ""
 "Force the HDMI output into an interlaced video mode for interlaced video "
 "content."
 msgstr ""
+"Forza l'uscita HDMI in una modalità video interlacciata per il contenuto "
+"video interlacciato."
 
 #: modules/hw/mmal/vout.c:75
 msgid "MMAL vout"
@@ -23381,6 +23384,12 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
+"Hai provato a raggiungere %s.  %s\n"
+"Questo problema potrebbe derivare da un tentativo di violazione della tua "
+"sicurezza, compromissione della tua riservatezza o da un errore di "
+"configurazione.\n"
+"\n"
+"Se hai dubbi, interrompi subito.\n"
 
 #: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
@@ -26997,17 +27006,17 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Scegli la gestione dei colori nei fotogrammi in uscita che cadono ai bordi "
-"dei fotogrammi in ingresso.\n"
+"dei fotogrammi in ingresso. \n"
 "\n"
 "Più recente: prende la crominanza solo dal nuovo campo (luminoso). Buono per "
-"un ingresso interlacciato, come i video da una videocamera.\n"
+"un ingresso interlacciato, come i video da una videocamera. \n"
 "\n"
 "AltLine: prende la riga 1 di crominanza dal campo superiore, la riga 2 dal "
-"campo inferiore, ecc.\n"
-"Predefinito, buono per un ingresso di film NTSC (DVD anime, ecc.)\n"
+"campo inferiore, ecc. \n"
+"Predefinito, buono per un ingresso di film NTSC (DVD anime, ecc.). \n"
 "\n"
 "Miscela: crominanze medie dei campi. Potrebbe anche distorcere i colori del "
-"nuovo campo (luminoso).\n"
+"nuovo campo (luminoso). \n"
 "\n"
 "Upconvert: uscita nel formato 4:2:2 (crominanza indipendente per ogni "
 "campo). Miglior simulazione, ma richiede più CPU e ampiezza di banda."
