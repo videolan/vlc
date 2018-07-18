@@ -84,6 +84,7 @@ struct es_out_id_t
 
     /* */
     bool b_scrambled;
+    bool b_forced; /* if true, bypass variables when selecting this track */
 
     /* Channel in the track type */
     int         i_channel;
@@ -1562,6 +1563,7 @@ static es_out_id_t *EsOutAddSlave( es_out_t *out, const es_format_t *fmt, es_out
     es->i_id = es->fmt.i_id;
     es->i_meta_id = p_sys->i_id++; /* always incremented */
     es->b_scrambled = false;
+    es->b_forced = false;
 
     switch( es->fmt.i_cat )
     {
@@ -1741,7 +1743,12 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     else
     {
         const bool b_sout = input_priv(p_input)->p_sout != NULL;
-        if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
+        if( es->b_forced )
+        {
+            /* ES specifically requested by the user: bypass the following vars
+             * check. */
+        }
+        else if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
         {
             if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
             {
@@ -2677,7 +2684,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         switch( i_query )
         {
-        case ES_OUT_SET_ES_BY_ID:         i_new_query = ES_OUT_SET_ES; break;
+        case ES_OUT_SET_ES_BY_ID:         i_new_query = ES_OUT_SET_ES;
+            if( i_id >= 0 )
+                p_es->b_forced = true;
+            break;
         case ES_OUT_RESTART_ES_BY_ID:     i_new_query = ES_OUT_RESTART_ES; break;
         case ES_OUT_SET_ES_DEFAULT_BY_ID: i_new_query = ES_OUT_SET_ES_DEFAULT; break;
         default:

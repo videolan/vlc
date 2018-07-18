@@ -2031,7 +2031,7 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_ES:
             /* No need to force update, es_out does it if needed */
             es_out_Control( input_priv(p_input)->p_es_out_display,
-                            ES_OUT_SET_ES_BY_ID, (int)param.val.i_int );
+                            ES_OUT_SET_ES_BY_ID, (int)param.val.i_int, true );
 
             demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
                     (int)param.val.i_int );
@@ -3303,7 +3303,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         const int i_id = list[count].i_int;
 
         es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
-        es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id );
+        es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id, false );
     }
     free(list);
 
