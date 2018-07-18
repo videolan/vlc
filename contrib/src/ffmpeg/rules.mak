@@ -11,14 +11,12 @@ FFMPEG_REVISION := 5
 FFMPEG_VERSION := $(FFMPEG_MAJVERSION).$(FFMPEG_REVISION)
 FFMPEG_BRANCH=release/$(FFMPEG_MAJVERSION)
 FFMPEG_URL := https://ffmpeg.org/releases/ffmpeg-$(FFMPEG_VERSION).tar.xz
-FFMPEG_SNAPURL := http://git.videolan.org/?p=ffmpeg.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := http://git.videolan.org/git/ffmpeg.git
 FFMPEG_LAVC_MIN := 57.37.100
 USE_FFMPEG := 1
 else
 FFMPEG_HASH=e5afa1b556542fd7a52a0a9b409c80f2e6e1e9bb
 FFMPEG_BRANCH=
-FFMPEG_SNAPURL := http://git.libav.org/?p=libav.git;a=snapshot;h=$(FFMPEG_HASH);sf=tgz
 FFMPEG_GITURL := git://git.libav.org/libav.git
 FFMPEG_LAVC_MIN := 57.16.0
 endif
