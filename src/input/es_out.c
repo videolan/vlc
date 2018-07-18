@@ -2151,6 +2151,27 @@ static int EsOutSend( es_out_t *out, es_out_id_t *es, block_t *p_block )
     return VLC_SUCCESS;
 }
 
+static void
+EsDrainDecoder( es_out_t *out, es_out_id_t *es )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    assert( es->p_dec );
+
+    /* FIXME: This might hold the ES output caller (i.e. the demux), and
+     * the corresponding thread (typically the input thread), for a little
+     * bit too long if the ES is deleted in the middle of a stream. */
+    input_DecoderDrain( es->p_dec );
+    while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
+    {
+        if( input_DecoderIsEmpty( es->p_dec ) &&
+            ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))
+            break;
+        /* FIXME there should be a way to have auto deleted es, but there will be
+         * a problem when another codec of the same type is created (mainly video) */
+        vlc_tick_sleep(VLC_TICK_FROM_MS(20));
+    }
+}
+
 /*****************************************************************************
  * EsOutDelLocked:
  *****************************************************************************/
@@ -2163,19 +2184,8 @@ static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
 
     /* We don't try to reselect */
     if( es->p_dec )
-    {   /* FIXME: This might hold the ES output caller (i.e. the demux), and
-         * the corresponding thread (typically the input thread), for a little
-         * bit too long if the ES is deleted in the middle of a stream. */
-        input_DecoderDrain( es->p_dec );
-        while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
-        {
-            if( input_DecoderIsEmpty( es->p_dec ) &&
-                ( !es->p_dec_record || input_DecoderIsEmpty( es->p_dec_record ) ))
-                break;
-            /* FIXME there should be a way to have auto deleted es, but there will be
-             * a problem when another codec of the same type is created (mainly video) */
-            vlc_tick_sleep(VLC_TICK_FROM_MS(20));
-        }
+    {
+        EsDrainDecoder( out, es );
         EsUnselect( out, es, es->p_pgrm == p_sys->p_pgrm );
     }
 
@@ -2618,11 +2628,9 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_ES_FMT:
     {
-        /* This ain't pretty but is need by some demuxers (eg. Ogg )
-         * to update the p_extra data */
         es_out_id_t *es = va_arg( args, es_out_id_t * );
         es_format_t *p_fmt = va_arg( args, es_format_t * );
-        if( es == NULL )
+        if( es == NULL || es->fmt.i_cat != p_fmt->i_cat )
             return VLC_EGENERIC;
 
         es_format_Clean( &es->fmt );
@@ -2630,6 +2638,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
         if( es->p_dec )
         {
+            EsDrainDecoder( out, es );
             EsDestroyDecoder( out, es );
             EsCreateDecoder( out, es );
         }
