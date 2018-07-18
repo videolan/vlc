@@ -30,44 +30,12 @@
 #include "chapter_command.hpp"
 #include "virtual_segment.hpp"
 #include "dvd_types.hpp"
+#include "events.hpp"
 
 namespace mkv {
 
 class virtual_segment_c;
 class chapter_item_c;
-
-class event_thread_t
-{
-public:
-    event_thread_t(demux_t *);
-    virtual ~event_thread_t();
-
-    void SetPci(const pci_t *data);
-    void ResetPci();
-
-private:
-    void EventThread();
-    static void *EventThread(void *);
-
-    static int EventMouse( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-    static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-    static int EventInput( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-
-    demux_t      *p_demux;
-
-    bool         is_running;
-    vlc_thread_t thread;
-
-    vlc_mutex_t  lock;
-    vlc_cond_t   wait;
-    bool         b_abort;
-    bool         b_moved;
-    bool         b_clicked;
-    int          i_key_action;
-    bool         b_vout;
-    pci_t        pci_packet;
-};
-
 
 struct demux_sys_t
 {
