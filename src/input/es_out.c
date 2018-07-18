@@ -430,6 +430,18 @@ static es_out_id_t *EsOutGetFromID( es_out_t *out, int i_id )
     return NULL;
 }
 
+static es_out_id_t *EsOutGetSelectedCat( es_out_t *out,
+                                         enum es_format_category_e cat )
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    es_out_id_t *es;
+
+    foreach_es_then_es_slaves( es )
+        if( es->fmt.i_cat == cat && EsIsSelected( es ) )
+            return es;
+    return NULL;
+}
+
 static bool EsOutDecodersIsEmpty( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -1795,7 +1807,8 @@ static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
     if( parent->cc.type == 0 )
         return;
 
-    const int i_spu_id = var_GetInteger( p_input, "spu-es");
+    es_out_id_t *spu_es = EsOutGetSelectedCat( out, SPU_ES );
+    const int i_spu_id = spu_es ? spu_es->i_id : -1;
 
     uint64_t i_bitmap = parent->cc.i_bitmap;
     for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1 )
