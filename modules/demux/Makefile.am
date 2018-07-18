@@ -172,6 +172,7 @@ demux_LTLIBRARIES += libh26x_plugin.la
 
 libmkv_plugin_la_SOURCES = \
 	demux/mkv/util.hpp demux/mkv/util.cpp \
+	demux/mkv/dvd_types.hpp \
 	demux/mkv/virtual_segment.hpp demux/mkv/virtual_segment.cpp \
 	demux/mkv/matroska_segment.hpp demux/mkv/matroska_segment.cpp \
 	demux/mkv/matroska_segment_parse.cpp \
