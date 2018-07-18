@@ -566,6 +566,7 @@
 #define VLC_CODEC_CEA608    VLC_FOURCC('c','6','0','8')
 #define VLC_CODEC_CEA708    VLC_FOURCC('c','7','0','8')
 #define VLC_CODEC_TTML      VLC_FOURCC('T','T','M','L')
+#define VLC_CODEC_TTML_TS   VLC_FOURCC('T','s','M','L') /* special for EN.303.560 */
 #define VLC_CODEC_WEBVTT    VLC_FOURCC('w','v','t','t')
 
 /* XYZ colorspace 12 bits packed in 16 bits, organisation |XXX0|YYY0|ZZZ0| */
