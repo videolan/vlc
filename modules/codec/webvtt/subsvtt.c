@@ -2052,6 +2052,15 @@ static void LoadExtradata( decoder_t *p_dec )
 }
 
 /****************************************************************************
+ * Flush:
+ ****************************************************************************/
+static void Flush( decoder_t *p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    ClearCuesByTime( &p_sys->p_root->p_child, INT64_MAX );
+}
+
+/****************************************************************************
  * DecodeBlock: decoder data entry point
  ****************************************************************************/
 static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
@@ -2065,7 +2074,7 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     vlc_tick_t i_stop = i_start + p_block->i_length;
 
     if( p_block->i_flags & BLOCK_FLAG_DISCONTINUITY )
-        ClearCuesByTime( &p_sys->p_root->p_child, INT64_MAX );
+        Flush( p_dec );
     else
         ClearCuesByTime( &p_sys->p_root->p_child, i_start );
 
@@ -2120,6 +2129,7 @@ int webvtt_OpenDecoder( vlc_object_t *p_this )
     p_sys->p_root->psz_tag = strdup( "video" );
 
     p_dec->pf_decode = DecodeBlock;
+    p_dec->pf_flush  = Flush;
 
     if( p_dec->fmt_in.i_extra )
         LoadExtradata( p_dec );
