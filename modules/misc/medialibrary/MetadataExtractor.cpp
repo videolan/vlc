@@ -58,32 +58,29 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
         return psz != nullptr ? std::string{ psz } : std::string{};
     };
 
+    using metadata_t = medialibrary::parser::IItem::Metadata;
+
+    static const std::pair<metadata_t, vlc_meta_type_t> fields[] =
+    {
+        { metadata_t::Title, vlc_meta_Title },
+        { metadata_t::ArtworkUrl, vlc_meta_ArtworkURL },
+        { metadata_t::ShowName, vlc_meta_ShowName },
+        { metadata_t::Episode, vlc_meta_Episode },
+        { metadata_t::Album, vlc_meta_Album },
+        { metadata_t::Genre, vlc_meta_Genre },
+        { metadata_t::Date, vlc_meta_Date },
+        { metadata_t::AlbumArtist, vlc_meta_AlbumArtist },
+        { metadata_t::Artist, vlc_meta_Artist },
+        { metadata_t::TrackNumber, vlc_meta_TrackNumber },
+        { metadata_t::DiscNumber, vlc_meta_DiscNumber },
+        { metadata_t::DiscTotal, vlc_meta_DiscTotal }
+    };
+
     if ( inputItem->p_meta != nullptr )
     {
-        item.setMeta( medialibrary::parser::IItem::Metadata::Title,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Title ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::ArtworkUrl,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_ArtworkURL) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::ShowName,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_ShowName ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::Episode,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Episode) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::Album,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Album) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::Genre,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Genre ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::Date,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Date ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::AlbumArtist,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_AlbumArtist ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::Artist,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_Artist ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::TrackNumber,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_TrackNumber ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::DiscNumber,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_DiscNumber ) ) );
-        item.setMeta( medialibrary::parser::IItem::Metadata::DiscTotal,
-                      emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, vlc_meta_DiscTotal ) ) );
+        for( auto pair : fields )
+            item.setMeta( pair.first,
+                emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, pair.second ) ) );
     }
 
     item.setDuration( inputItem->i_duration );
