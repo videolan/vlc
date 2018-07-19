@@ -1031,7 +1031,7 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     case SPU_ES:
         if (p_sys->i_spu_stream_idx != -1) {
             if (blurayEsPid(p_sys, SPU_ES, p_sys->i_spu_stream_idx) == p_fmt->i_id)
-                b_select = true;
+                b_select = p_sys->b_spu_enable;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         }
         setStreamLang(p_sys, &fmt);
@@ -1052,13 +1052,8 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
                 msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
                 vlc_array_append_or_abort(&p_sys->es, p_pair);
 
-                if (b_select) {
-                    if (fmt.i_cat == AUDIO_ES) {
-                        var_SetInteger( p_demux->p_input, "audio-es", p_fmt->i_id );
-                    } else if (fmt.i_cat == SPU_ES) {
-                        var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? p_fmt->i_id : -1 );
-                    }
-                }
+                if (b_select)
+                    es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
             }
         }
     }
@@ -2237,10 +2232,15 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     if (i_pid > 0) {
         int i_idx = findEsPairIndex(p_sys, i_pid);
         if (i_idx >= 0) {
-            if (i_type == BD_EVENT_AUDIO_STREAM) {
-                var_SetInteger( p_demux->p_input, "audio-es", i_pid );
-            } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
-                var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? i_pid : -1 );
+            fmt_es_pair_t *p_pair = vlc_array_item_at_index(&p_sys->es, i_idx);
+            assert(p_pair->p_es);
+
+            if (i_type == BD_EVENT_PG_TEXTST_STREAM && !p_sys->b_spu_enable)
+                es_out_Control(p_demux->out, ES_OUT_UNSET_ES, p_pair->p_es);
+            else
+            {
+                es_out_Control(p_demux->out, ES_OUT_SET_ES, p_pair->p_es);
+                blurayStreamSelected(p_sys, i_pid);
             }
         }
     }
