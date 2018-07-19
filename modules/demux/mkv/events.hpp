@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_mouse.h>
 
 #include "dvd_types.hpp"
 
@@ -63,27 +64,40 @@ private:
         es_out_id_t* es;
         int category;
         event_thread_t& owner;
+        vlc_mouse_t mouse_state;
     };
 
     struct EventInfo {
         enum {
-            /* XXX: event type */
+            ESMouseEvent,
+            ActionEvent,
         } type;
 
+        EventInfo( ESInfo* info, vlc_mouse_t state_old, vlc_mouse_t state_new )
+            : type( ESMouseEvent )
+        {
+            mouse.es_info = info;
+            mouse.state_old = state_old;
+            mouse.state_new = state_new;
+        }
+
         union {
-            /* XXX: event specific data */
+            struct {
+                ESInfo* es_info;
+                vlc_mouse_t state_old;
+                vlc_mouse_t state_new;
+            } mouse;
         };
     };
 
     void EventThread();
     static void *EventThread(void *);
 
-    static int EventMouse( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
+    static void EventMouse( vlc_mouse_t const* state, void* userdata );
     static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
-    static int EventInput( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
     void HandleKeyEvent();
-    void HandleMouseEvent( vlc_object_t* p_vout );
+    void HandleMouseEvent( EventInfo const& );
 
     demux_t      *p_demux;
 
@@ -93,10 +107,7 @@ private:
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_abort;
-    bool         b_moved;
-    bool         b_clicked;
     int          i_key_action;
-    bool         b_vout;
     pci_t        pci_packet;
 
     typedef std::list<ESInfo> es_list_t;
