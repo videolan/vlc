@@ -262,7 +262,8 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
     }
 }
 
-static int PopFrames(decoder_t *dec)
+static int PopFrames(decoder_t *dec,
+                     void(*pf_output)(decoder_t *, const struct aom_image *))
 {
     decoder_sys_t *p_sys = dec->p_sys;
     aom_codec_ctx_t *ctx = &p_sys->ctx;
@@ -279,12 +280,32 @@ static int PopFrames(decoder_t *dec)
             continue;
         }
 
-        OutputFrame(dec, img);
+        pf_output(dec, img);
     }
 
     return VLCDEC_SUCCESS;
 }
 
+/****************************************************************************
+ * Flush: clears decoder between seeks
+ ****************************************************************************/
+static void DropFrame(decoder_t *dec, const struct aom_image *img)
+{
+    VLC_UNUSED(dec);
+    VLC_UNUSED(img);
+    /* do nothing for now */
+}
+
+static void FlushDecoder(decoder_t *dec)
+{
+    decoder_sys_t *p_sys = dec->p_sys;
+    aom_codec_ctx_t *ctx = &p_sys->ctx;
+
+    if(PushFrame(dec, NULL) != VLCDEC_SUCCESS)
+        AOM_ERR(dec, ctx, "Failed to flush decoder");
+    else
+        PopFrames(dec, DropFrame);
+}
 
 /****************************************************************************
  * Decode: the whole thing
@@ -299,7 +320,7 @@ static int Decode(decoder_t *dec, block_t *block)
 
     int i_ret = PushFrame(dec, block);
 
-    PopFrames(dec);
+    PopFrames(dec, OutputFrame);
 
     return i_ret;
 }
@@ -341,6 +362,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     }
 
     dec->pf_decode = Decode;
+    dec->pf_flush = FlushDecoder;
 
     dec->fmt_out.video.i_width = dec->fmt_in.video.i_width;
     dec->fmt_out.video.i_height = dec->fmt_in.video.i_height;
@@ -363,10 +385,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *sys = dec->p_sys;
 
     /* Flush decoder */
-    if(PushFrame(dec, NULL) != VLCDEC_SUCCESS)
-        AOM_ERR(p_this, &sys->ctx, "Failed to flush decoder");
-    else
-        PopFrames(dec);
+    FlushDecoder(dec);
 
     aom_codec_destroy(&sys->ctx);
 
