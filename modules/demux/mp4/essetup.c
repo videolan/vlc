@@ -611,6 +611,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
             if( p_avcC && BOXDATA(p_avcC) )
             {
+                p_track->fmt.i_profile = BOXDATA(p_avcC)->i_profile;
+                p_track->fmt.i_level = BOXDATA(p_avcC)->i_level;
                 p_track->fmt.i_extra = BOXDATA(p_avcC)->i_avcC;
                 if( p_track->fmt.i_extra > 0 )
                 {
