@@ -139,16 +139,29 @@ static int PushFrame(decoder_t *dec, block_t *block)
 {
     decoder_sys_t *p_sys = dec->p_sys;
     aom_codec_ctx_t *ctx = &p_sys->ctx;
+    const uint8_t *p_buffer;
+    size_t i_buffer;
 
     /* Associate packet PTS with decoded frame */
-    struct frame_priv_s *priv = &dec->p_sys->frame_priv[dec->p_sys->i_next_frame_priv++ 
-                                                        % AOM_MAX_FRAMES_DEPTH];
-    priv->pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
+    struct frame_priv_s *priv = &p_sys->frame_priv[p_sys->i_next_frame_priv++ % AOM_MAX_FRAMES_DEPTH];
+
+    if(likely(block))
+    {
+        p_buffer = block->p_buffer;
+        i_buffer = block->i_buffer;
+        priv->pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
+    }
+    else
+    {
+        p_buffer = NULL;
+        i_buffer = 0;
+    }
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, priv);
+    err = aom_codec_decode(ctx, p_buffer, i_buffer, priv);
 
-    block_Release(block);
+    if(block)
+        block_Release(block);
 
     if (err != AOM_CODEC_OK) {
         AOM_ERR(dec, ctx, "Failed to decode frame");
@@ -244,10 +257,8 @@ static int PopFrames(decoder_t *dec)
  ****************************************************************************/
 static int Decode(decoder_t *dec, block_t *block)
 {
-    if (!block) /* No Drain */
-        return VLCDEC_SUCCESS;
-
-    if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
+    if (block && block->i_flags & (BLOCK_FLAG_CORRUPTED))
+    {
         block_Release(block);
         return VLCDEC_SUCCESS;
     }
@@ -318,13 +329,10 @@ static void CloseDecoder(vlc_object_t *p_this)
     decoder_sys_t *sys = dec->p_sys;
 
     /* Flush decoder */
-    aom_codec_err_t err = aom_codec_decode(&sys->ctx, NULL, 0, NULL);
-    if (err != AOM_CODEC_OK)
-    {
+    if(PushFrame(dec, NULL) != VLCDEC_SUCCESS)
         AOM_ERR(p_this, &sys->ctx, "Failed to flush decoder");
-    }
-
-    PopFrames(dec);
+    else
+        PopFrames(dec);
 
     aom_codec_destroy(&sys->ctx);
 
