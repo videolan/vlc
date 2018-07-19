@@ -129,18 +129,13 @@ void event_thread_t::EventThread()
     /* catch all key event */
     var_AddCallback( p_demux->obj.libvlc, "key-action", EventKey, this );
 
-    /* main loop */
-    for( ;; )
+    for( vlc_mutex_locker guard( &lock );; )
     {
-        vlc_mutex_lock( &lock );
         while( !b_abort && pending_events.empty() )
             vlc_cond_wait( &wait, &lock );
 
         if( b_abort )
-        {
-            vlc_mutex_unlock( &lock );
             break;
-        }
 
         while( !pending_events.empty() )
         {
@@ -159,8 +154,6 @@ void event_thread_t::EventThread()
 
             pending_events.pop_front();
         }
-
-        vlc_mutex_unlock( &lock );
     }
 
     var_DelCallback( p_demux->obj.libvlc, "key-action", EventKey, this );
