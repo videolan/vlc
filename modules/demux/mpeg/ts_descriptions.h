@@ -22,7 +22,6 @@
 
 /* Audio tracks descriptions */
 #define DESC_CLEAN_EFFECTS                  N_("clean effects")
-#define DESC_HEARING_IMPAIRED               N_("hearing impaired")
 #define DESC_VISUAL_IMPAIRED_COMMENTS       N_("visual impaired commentary")
 
 #define DESC_MAIN_AUDIO                     N_("Main audio")

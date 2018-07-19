@@ -462,7 +462,7 @@ static char *GetIso639AudioTypeDesc( uint8_t type )
     static const char *audio_type[] = {
         /* "Main audio", */
         DESC_CLEAN_EFFECTS,
-        DESC_HEARING_IMPAIRED,
+        DESC_CLEAN_AUDIO_HEARING_IMPAIRED,
         DESC_VISUAL_IMPAIRED_COMMENTS,
     };
 
