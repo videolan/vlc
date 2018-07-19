@@ -1764,7 +1764,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
                 return;
             }
         }
-        if( es->fmt.i_cat == SPU_ES )
+        if( !es->b_forced && es->fmt.i_cat == SPU_ES )
         {
             if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
             {
@@ -2684,8 +2684,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         switch( i_query )
         {
         case ES_OUT_SET_ES_BY_ID:         i_new_query = ES_OUT_SET_ES;
-            if( i_id >= 0 )
-                p_es->b_forced = true;
+            p_es->b_forced = va_arg( args, int );
             break;
         case ES_OUT_RESTART_ES_BY_ID:     i_new_query = ES_OUT_RESTART_ES; break;
         case ES_OUT_SET_ES_DEFAULT_BY_ID: i_new_query = ES_OUT_SET_ES_DEFAULT; break;
