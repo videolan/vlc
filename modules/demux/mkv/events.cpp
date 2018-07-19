@@ -29,6 +29,8 @@
 #include <vlc_actions.h>
 #include <vlc_threads.h>
 
+#include <algorithm>
+
 namespace mkv {
 
 event_thread_t::event_thread_t(demux_t *p_demux) : p_demux(p_demux)
@@ -172,6 +174,13 @@ void event_thread_t::EventThread()
         /* MOUSE part */
         if( p_vout && ( b_moved || b_clicked ) )
             HandleMouseEvent( p_vout );
+
+        while( !pending_events.empty() )
+        {
+            /* TODO: handle events here */
+            pending_events.pop_front();
+        }
+
 
         b_vout = false;
         vlc_mutex_unlock( &lock );
@@ -436,6 +445,27 @@ void event_thread_t::HandleMouseEvent( vlc_object_t* p_vout )
 
     b_moved = false;
     b_clicked = false;
+}
+
+void event_thread_t::AddES( es_out_id_t* es, int category )
+{
+    vlc_mutex_locker lock_guard( &lock );
+
+    es_list.push_back( ESInfo( es, category, *this ) );
+    es_list_t::reverse_iterator info = es_list.rbegin();
+
+    /* TODO:
+     *  - subscribe to events if required,
+     *  - use &*info as callback data if necessary
+     **/
+
+    VLC_UNUSED( info );
+}
+
+void event_thread_t::DelES( es_out_id_t* es )
+{
+    vlc_mutex_locker lock_guard( &lock );
+    es_list.erase( std::find( es_list.begin(), es_list.end(), es ) );
 }
 
 } // namespace

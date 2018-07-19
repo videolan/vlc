@@ -1121,7 +1121,12 @@ bool matroska_segment_c::ESCreate()
         }
 
         if( !track.p_es )
+        {
             track.p_es = es_out_Add( sys.demuxer.out, &track.fmt );
+
+            if( track.p_es )
+                sys.ev.AddES( track.p_es, track.fmt.i_cat );
+        }
 
         /* Turn on a subtitles track if it has been flagged as default -
          * but only do this if no subtitles track has already been engaged,
@@ -1157,6 +1162,7 @@ void matroska_segment_c::ESDestroy( )
         if( track.p_es != NULL )
         {
             es_out_Del( sys.demuxer.out, track.p_es );
+            sys.ev.DelES( track.p_es );
             track.p_es = NULL;
         }
     }

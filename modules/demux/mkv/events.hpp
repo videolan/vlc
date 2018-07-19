@@ -30,6 +30,8 @@
 
 #include "dvd_types.hpp"
 
+#include <list>
+
 namespace mkv {
 
 struct demux_sys_t;
@@ -43,7 +45,36 @@ public:
     void SetPci(const pci_t *data);
     void ResetPci();
 
+    void AddES( es_out_id_t* es, int category );
+    void DelES( es_out_id_t* es );
+
 private:
+    struct ESInfo {
+        ESInfo( es_out_id_t* es, int category, event_thread_t& owner )
+            : es( es )
+            , category( category )
+            , owner( owner )
+        { }
+
+        bool operator==( es_out_id_t* es ) const {
+            return this->es == es;
+        }
+
+        es_out_id_t* es;
+        int category;
+        event_thread_t& owner;
+    };
+
+    struct EventInfo {
+        enum {
+            /* XXX: event type */
+        } type;
+
+        union {
+            /* XXX: event specific data */
+        };
+    };
+
     void EventThread();
     static void *EventThread(void *);
 
@@ -67,6 +98,12 @@ private:
     int          i_key_action;
     bool         b_vout;
     pci_t        pci_packet;
+
+    typedef std::list<ESInfo> es_list_t;
+    es_list_t es_list;
+
+    typedef std::list<EventInfo> pending_events_t;
+    pending_events_t pending_events;
 };
 } // namespace
 
