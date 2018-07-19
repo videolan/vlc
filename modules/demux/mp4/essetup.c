@@ -594,6 +594,23 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             break;
         }
 
+        case ATOM_av01:
+        {
+            static_assert(ATOM_av01 == VLC_CODEC_AV1, "VLC_CODEC_AV1 != ATOM_av01");
+            MP4_Box_t *p_av1C = MP4_BoxGet( p_sample, "av1C" );
+            if( p_av1C && p_av1C->data.p_binary && p_av1C->data.p_binary->i_blob )
+            {
+                p_track->fmt.p_extra = malloc( p_av1C->data.p_binary->i_blob );
+                if( p_track->fmt.p_extra )
+                {
+                    p_track->fmt.i_extra = p_av1C->data.p_binary->i_blob;
+                    memcpy( p_track->fmt.p_extra, p_av1C->data.p_binary->p_blob,
+                            p_av1C->data.p_binary->i_blob );
+                }
+            }
+            break;
+        }
+
         /* avc1: send avcC (h264 without annexe B, ie without start code)*/
         case VLC_FOURCC( 'a', 'v', 'c', '3' ):
         case VLC_FOURCC( 'a', 'v', 'c', '1' ):
