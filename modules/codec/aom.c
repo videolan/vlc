@@ -125,20 +125,20 @@ static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
     return 0;
 }
 
-/****************************************************************************
- * Decode: the whole thing
- ****************************************************************************/
-static int Decode(decoder_t *dec, block_t *block)
+static void CopyPicture(const struct aom_image *img, picture_t *pic)
 {
-    aom_codec_ctx_t *ctx = &dec->p_sys->ctx;
-
-    if (!block) /* No Drain */
-        return VLCDEC_SUCCESS;
-
-    if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
-        block_Release(block);
-        return VLCDEC_SUCCESS;
+    for (int plane = 0; plane < pic->i_planes; plane++ ) {
+        plane_t src_plane = pic->p[plane];
+        src_plane.p_pixels = img->planes[plane];
+        src_plane.i_pitch = img->stride[plane];
+        plane_CopyPixels(&pic->p[plane], &src_plane);
     }
+}
+
+static int PushFrame(decoder_t *dec, block_t *block)
+{
+    decoder_sys_t *p_sys = dec->p_sys;
+    aom_codec_ctx_t *ctx = &p_sys->ctx;
 
     /* Associate packet PTS with decoded frame */
     struct frame_priv_s *priv = &dec->p_sys->frame_priv[dec->p_sys->i_next_frame_priv++ 
@@ -154,27 +154,16 @@ static int Decode(decoder_t *dec, block_t *block)
         AOM_ERR(dec, ctx, "Failed to decode frame");
         if (err == AOM_CODEC_UNSUP_BITSTREAM)
             return VLCDEC_ECRITICAL;
-        else
-            return VLCDEC_SUCCESS;
-    }
+	}
+    return VLCDEC_SUCCESS;
+}
 
-    const void *iter = NULL;
-    struct aom_image *img = aom_codec_get_frame(ctx, &iter);
-    if (!img)
-        return VLCDEC_SUCCESS;
-
-    /* fetches back the PTS */
-    mtime_t pts = ((struct frame_priv_s *) img->user_priv)->pts;
-
-    dec->fmt_out.i_codec = FindVlcChroma(img);
-    if (dec->fmt_out.i_codec == 0) {
-        msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
-        return VLCDEC_SUCCESS;
-    }
-
+static void OutputFrame(decoder_t *dec, const struct aom_image *img)
+{
     video_format_t *v = &dec->fmt_out.video;
 
-    if (img->d_w != v->i_visible_width || img->d_h != v->i_visible_height) {
+    if (img->d_w != v->i_visible_width || img->d_h != v->i_visible_height)
+    {
         v->i_visible_width = dec->fmt_out.video.i_width = img->d_w;
         v->i_visible_height = dec->fmt_out.video.i_height = img->d_h;
     }
@@ -208,31 +197,66 @@ static int Decode(decoder_t *dec, block_t *block)
     dec->fmt_out.video.multiview_mode = dec->fmt_in.video.multiview_mode;
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
 
-    if (decoder_UpdateVideoFormat(dec))
-        return VLCDEC_SUCCESS;
-    picture_t *pic = decoder_NewPicture(dec);
-    if (!pic)
-        return VLCDEC_SUCCESS;
+    if (decoder_UpdateVideoFormat(dec) == VLC_SUCCESS)
+    {
+        picture_t *pic = decoder_NewPicture(dec);
+        if (pic)
+        {
+            CopyPicture(img, pic);
 
-    for (int plane = 0; plane < pic->i_planes; plane++ ) {
-        uint8_t *src = img->planes[plane];
-        uint8_t *dst = pic->p[plane].p_pixels;
-        int src_stride = img->stride[plane];
-        int dst_stride = pic->p[plane].i_pitch;
+            /* fetches back the PTS */
+            mtime_t pts = ((struct frame_priv_s *) img->user_priv)->pts;
 
-        int size = __MIN( src_stride, dst_stride );
-        for( int line = 0; line < pic->p[plane].i_visible_lines; line++ ) {
-            memcpy( dst, src, size );
-            src += src_stride;
-            dst += dst_stride;
+            pic->b_progressive = true; /* codec does not support interlacing */
+            pic->date = pts;
+
+            decoder_QueueVideo(dec, pic);
         }
     }
+}
 
-    pic->b_progressive = true; /* codec does not support interlacing */
-    pic->date = pts;
+static int PopFrames(decoder_t *dec)
+{
+    decoder_sys_t *p_sys = dec->p_sys;
+    aom_codec_ctx_t *ctx = &p_sys->ctx;
 
-    decoder_QueueVideo(dec, pic);
+    for(const void *iter = NULL;; )
+    {
+        struct aom_image *img = aom_codec_get_frame(ctx, &iter);
+        if (!img)
+            break;
+
+        dec->fmt_out.i_codec = FindVlcChroma(img);
+        if (dec->fmt_out.i_codec == 0) {
+            msg_Err(dec, "Unsupported output colorspace %d", img->fmt);
+            continue;
+        }
+
+        OutputFrame(dec, img);
+    }
+
     return VLCDEC_SUCCESS;
+}
+
+
+/****************************************************************************
+ * Decode: the whole thing
+ ****************************************************************************/
+static int Decode(decoder_t *dec, block_t *block)
+{
+    if (!block) /* No Drain */
+        return VLCDEC_SUCCESS;
+
+    if (block->i_flags & (BLOCK_FLAG_CORRUPTED)) {
+        block_Release(block);
+        return VLCDEC_SUCCESS;
+    }
+
+    int i_ret = PushFrame(dec, block);
+
+    PopFrames(dec);
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -300,13 +324,7 @@ static void CloseDecoder(vlc_object_t *p_this)
         AOM_ERR(p_this, &sys->ctx, "Failed to flush decoder");
     }
 
-    /* Free our PTS */
-    const void *iter = NULL;
-    for (;;) {
-        struct aom_image *img = aom_codec_get_frame(&sys->ctx, &iter);
-        if (!img)
-            break;
-    }
+    PopFrames(dec);
 
     aom_codec_destroy(&sys->ctx);
 
