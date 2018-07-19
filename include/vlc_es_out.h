@@ -37,6 +37,7 @@ enum es_out_query_e
 {
     /* set or change the selected ES in its category (audio/video/spu) */
     ES_OUT_SET_ES,      /* arg1= es_out_id_t*                   */
+    ES_OUT_UNSET_ES,    /* arg1= es_out_id_t* res=can fail      */
     ES_OUT_RESTART_ES,  /* arg1= es_out_id_t*                   */
 
     /* set 'default' tag on ES (copied across from container) */

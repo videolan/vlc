@@ -2403,6 +2403,23 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
         return VLC_SUCCESS;
     }
+    case ES_OUT_UNSET_ES:
+    {
+        es_out_id_t *es = va_arg( args, es_out_id_t * ), *other;
+        foreach_es_then_es_slaves(other)
+        {
+            if (es == other)
+            {
+                if (EsIsSelected(other))
+                {
+                    EsUnselect(out, other, other->p_pgrm == p_sys->p_pgrm);
+                    return VLC_SUCCESS;
+                }
+                break;
+            }
+        }
+        return VLC_EGENERIC;
+    }
     case ES_OUT_STOP_ALL_ES:
     {
         es_out_id_t *es;

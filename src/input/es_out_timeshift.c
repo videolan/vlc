@@ -618,6 +618,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_DEL_GROUP:
     case ES_OUT_SET_META:
     case ES_OUT_SET_ES:
+    case ES_OUT_UNSET_ES:
     case ES_OUT_RESTART_ES:
     case ES_OUT_SET_ES_DEFAULT:
     case ES_OUT_SET_ES_STATE:
@@ -1447,6 +1448,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
+    case ES_OUT_UNSET_ES:    /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
         p_cmd->u.control.u.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
@@ -1558,6 +1560,7 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
+    case ES_OUT_UNSET_ES:    /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
         return es_out_Control( p_out, i_query, !p_cmd->u.control.u.p_es ? NULL :
