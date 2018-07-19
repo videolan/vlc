@@ -1,0 +1,42 @@
+From bd7beffef507a2162d22d2735f5aec2d67f81e27 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Olivier=20Cr=C3=AAte?= <olivier.crete@collabora.com>
+Date: Tue, 17 Jul 2018 17:07:46 -0400
+Subject: [PATCH 6/6] cmake: Don't confuse libs and requires
+
+---
+ CMakeLists.txt | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 74edd20..9cfc475 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -165,10 +165,12 @@ if ( USE_GNUTLS )
+ 	)
+ 	message(STATUS "SSL Dependency: using GNUTLS with Nettle, as requested")
+ else()
+-	set (SSL_REQUIRED_MODULES "openssl libcrypto zlib")
+ 
+ 	if (USE_OPENSSL_PC)
+ 
++	        # Only use the .pc files if we actually try to find them
++	        set (SSL_REQUIRED_MODULES "openssl libcrypto zlib")
++
+ 		pkg_check_modules(SSL REQUIRED ${SSL_REQUIRED_MODULES})
+ 
+ 		# We have some cases when pkg-config is improperly configured
+@@ -492,7 +494,10 @@ endif()
+ 
+ target_include_directories(haicrypt_virtual PRIVATE  ${SSL_INCLUDE_DIRS})
+ 
+-set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
++# Only set the libraries directly if they're in the Requires.private
++if (NOT SSL_REQUIRED_MODULES)
++  set (SRT_LIBS_PRIVATE ${SSL_LIBRARIES})
++endif()
+ 
+ if (MICROSOFT)
+ 	set (SRT_LIBS_PRIVATE ${SRT_LIBS_PRIVATE} ws2_32.lib)
+-- 
+2.17.1
+

@@ -1,0 +1,26 @@
+From 60af57d2e045ba80174aa0bb0a89807040be6d3f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Olivier=20Cr=C3=AAte?= <olivier.crete@collabora.com>
+Date: Tue, 17 Jul 2018 11:24:39 -0400
+Subject: [PATCH 5/5] cmake: Prefer -lpthread for now because clang++ and VLC
+
+It seems that clang doesn't support -pthread at the linking stage, but
+only at the compilation, so putting it into the .pc file causes issues.
+---
+ CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 34c8c87..74edd20 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -358,7 +358,6 @@ elseif (WIN32)
+ 		message(FATAL_ERROR "Failed to find pthread library. Specify PTHREAD_LIBRARY.")
+ 	endif()
+ else ()
+-	set(THREADS_PREFER_PTHREAD_FLAG ON)
+ 	find_package(Threads REQUIRED)
+ 	set(PTHREAD_LIBRARY ${CMAKE_THREAD_LIBS_INIT})
+ endif()
+-- 
+2.17.1
+
