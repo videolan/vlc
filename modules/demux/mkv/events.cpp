@@ -110,11 +110,13 @@ void event_thread_t::EventMouse( vlc_mouse_t const* new_state, void* userdata )
 int event_thread_t::EventKey( vlc_object_t *p_this, char const *,
                               vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    event_thread_t *p_ev = (event_thread_t *) p_data;
-    vlc_mutex_lock( &p_ev->lock );
-    p_ev->i_key_action = newval.i_int;
-    vlc_cond_signal( &p_ev->wait );
-    vlc_mutex_unlock( &p_ev->lock );
+    event_thread_t* owner = static_cast<event_thread_t*>( p_data );
+    vlc_mutex_locker lock_guard( &owner->lock );
+
+    owner->pending_events.push_back(
+        EventInfo( static_cast<vlc_action_id_t>( newval.i_int ) ) );
+
+    vlc_cond_signal( &owner->wait );
     msg_Dbg( p_this, "Event Key");
 
     return VLC_SUCCESS;
@@ -124,8 +126,6 @@ void event_thread_t::EventThread()
 {
     int canc = vlc_savecancel ();
 
-    i_key_action = 0;
-
     /* catch all key event */
     var_AddCallback( p_demux->obj.libvlc, "key-action", EventKey, this );
 
@@ -133,7 +133,7 @@ void event_thread_t::EventThread()
     for( ;; )
     {
         vlc_mutex_lock( &lock );
-        while( !b_abort && !i_key_action && pending_events.empty() )
+        while( !b_abort && pending_events.empty() )
             vlc_cond_wait( &wait, &lock );
 
         if( b_abort )
@@ -141,10 +141,6 @@ void event_thread_t::EventThread()
             vlc_mutex_unlock( &lock );
             break;
         }
-
-        /* KEY part */
-        if( i_key_action )
-            HandleKeyEvent();
 
         while( !pending_events.empty() )
         {
@@ -154,6 +150,10 @@ void event_thread_t::EventThread()
             {
                 case EventInfo::ESMouseEvent:
                     HandleMouseEvent( ev );
+                    break;
+
+                case EventInfo::ActionEvent:
+                    HandleKeyEvent( ev );
                     break;
             }
 
@@ -173,7 +173,7 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
-void event_thread_t::HandleKeyEvent()
+void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 {
     msg_Dbg( p_demux, "Handle Key Event");
 
@@ -182,7 +182,7 @@ void event_thread_t::HandleKeyEvent()
 
     uint16 i_curr_button = p_sys->dvd_interpretor.GetSPRM( 0x88 );
 
-    switch( i_key_action )
+    switch( ev.action.id )
     {
     case ACTIONID_NAV_LEFT:
         if ( i_curr_button > 0 && i_curr_button <= pci->hli.hl_gi.btn_ns )
@@ -294,7 +294,6 @@ void event_thread_t::HandleKeyEvent()
     default:
         break;
     }
-    i_key_action = 0;
 }
 
 void event_thread_t::HandleMouseEvent( EventInfo const& event )

@@ -27,6 +27,7 @@
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
+#include <vlc_actions.h>
 #include <vlc_mouse.h>
 
 #include "dvd_types.hpp"
@@ -81,12 +82,22 @@ private:
             mouse.state_new = state_new;
         }
 
+        EventInfo( vlc_action_id_t id )
+            : type( ActionEvent )
+        {
+            action.id = id;
+        }
+
         union {
             struct {
                 ESInfo* es_info;
                 vlc_mouse_t state_old;
                 vlc_mouse_t state_new;
             } mouse;
+
+            struct {
+                vlc_action_id_t id;
+            } action;
         };
     };
 
@@ -96,7 +107,7 @@ private:
     static void EventMouse( vlc_mouse_t const* state, void* userdata );
     static int EventKey( vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void * );
 
-    void HandleKeyEvent();
+    void HandleKeyEvent( EventInfo const& );
     void HandleMouseEvent( EventInfo const& );
 
     demux_t      *p_demux;
@@ -107,7 +118,6 @@ private:
     vlc_mutex_t  lock;
     vlc_cond_t   wait;
     bool         b_abort;
-    int          i_key_action;
     pci_t        pci_packet;
 
     typedef std::list<ESInfo> es_list_t;
