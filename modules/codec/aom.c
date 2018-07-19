@@ -65,13 +65,21 @@ static void aom_err_msg(vlc_object_t *this, aom_codec_ctx_t *ctx,
 }
 
 #define AOM_ERR(this, ctx, msg) aom_err_msg(VLC_OBJECT(this), ctx, msg ": %s (%s)")
+#define AOM_MAX_FRAMES_DEPTH 64
 
 /*****************************************************************************
  * decoder_sys_t: libaom decoder descriptor
  *****************************************************************************/
+struct frame_priv_s
+{
+    mtime_t pts;
+};
+
 struct decoder_sys_t
 {
     aom_codec_ctx_t ctx;
+    struct frame_priv_s frame_priv[AOM_MAX_FRAMES_DEPTH];
+    unsigned i_next_frame_priv;
 };
 
 static const struct
@@ -133,21 +141,16 @@ static int Decode(decoder_t *dec, block_t *block)
     }
 
     /* Associate packet PTS with decoded frame */
-    mtime_t *pkt_pts = malloc(sizeof(*pkt_pts));
-    if (!pkt_pts) {
-        block_Release(block);
-        return VLCDEC_SUCCESS;
-    }
-
-    *pkt_pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
+    struct frame_priv_s *priv = &dec->p_sys->frame_priv[dec->p_sys->i_next_frame_priv++ 
+                                                        % AOM_MAX_FRAMES_DEPTH];
+    priv->pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, pkt_pts);
+    err = aom_codec_decode(ctx, block->p_buffer, block->i_buffer, priv);
 
     block_Release(block);
 
     if (err != AOM_CODEC_OK) {
-        free(pkt_pts);
         AOM_ERR(dec, ctx, "Failed to decode frame");
         if (err == AOM_CODEC_UNSUP_BITSTREAM)
             return VLCDEC_ECRITICAL;
@@ -157,15 +160,11 @@ static int Decode(decoder_t *dec, block_t *block)
 
     const void *iter = NULL;
     struct aom_image *img = aom_codec_get_frame(ctx, &iter);
-    if (!img) {
-        free(pkt_pts);
+    if (!img)
         return VLCDEC_SUCCESS;
-    }
 
     /* fetches back the PTS */
-    pkt_pts = img->user_priv;
-    mtime_t pts = *pkt_pts;
-    free(pkt_pts);
+    mtime_t pts = ((struct frame_priv_s *) img->user_priv)->pts;
 
     dec->fmt_out.i_codec = FindVlcChroma(img);
     if (dec->fmt_out.i_codec == 0) {
@@ -256,6 +255,8 @@ static int OpenDecoder(vlc_object_t *p_this)
         return VLC_ENOMEM;
     dec->p_sys = sys;
 
+    sys->i_next_frame_priv = 0;
+
     struct aom_codec_dec_cfg deccfg = {
         .threads = __MIN(vlc_GetCPUCount(), 16),
         .allow_lowbitdepth = 1
@@ -305,7 +306,6 @@ static void CloseDecoder(vlc_object_t *p_this)
         struct aom_image *img = aom_codec_get_frame(&sys->ctx, &iter);
         if (!img)
             break;
-        free(img->user_priv);
     }
 
     aom_codec_destroy(&sys->ctx);
