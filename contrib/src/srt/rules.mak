@@ -34,6 +34,9 @@ srt: srt-$(SRT_VERSION).tar.gz .sum-srt
 	$(APPLY) $(SRC)/srt/0002-win32-Only-include-inttypes.h-with-MSVC.patch
 	$(APPLY) $(SRC)/srt/0003-cmake-Only-install-Windows-headers-in-win-subdir.patch
 	$(APPLY) $(SRC)/srt/0004-cmake-pthread-win32.patch
+	$(APPLY) $(SRC)/srt/0005-cmake-Prefer-lpthread-for-now-because-clang-and-VLC.patch
+	$(APPLY) $(SRC)/srt/0006-cmake-Don-t-confuse-libs-and-requires.patch
+	$(call pkg_static,"scripts/srt.pc.in")
 	mv srt-$(SRT_VERSION) $@ && touch $@
 
 .srt: srt toolchain.cmake
