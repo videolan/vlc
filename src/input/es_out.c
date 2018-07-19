@@ -1741,36 +1741,36 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     else
     {
         const bool b_sout = input_priv(p_input)->p_sout != NULL;
-        if( es->b_forced )
+        /* If b_forced, the ES is specifically requested by the user, so bypass
+         * the following vars check. */
+        if( !es->b_forced )
         {
-            /* ES specifically requested by the user: bypass the following vars
-             * check. */
-        }
-        else if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
-        {
-            if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
+            if( es->fmt.i_cat == VIDEO_ES || es->fmt.i_cat == SPU_ES )
             {
-                msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
-                         es->i_id );
-                return;
+                if( !var_GetBool( p_input, b_sout ? "sout-video" : "video" ) )
+                {
+                    msg_Dbg( p_input, "video is disabled, not selecting ES 0x%x",
+                             es->i_id );
+                    return;
+                }
             }
-        }
-        else if( es->fmt.i_cat == AUDIO_ES )
-        {
-            if( !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
+            else if( es->fmt.i_cat == AUDIO_ES )
             {
-                msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
-                         es->i_id );
-                return;
+                if( !var_GetBool( p_input, b_sout ? "sout-audio" : "audio" ) )
+                {
+                    msg_Dbg( p_input, "audio is disabled, not selecting ES 0x%x",
+                             es->i_id );
+                    return;
+                }
             }
-        }
-        if( !es->b_forced && es->fmt.i_cat == SPU_ES )
-        {
-            if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
+            if( es->fmt.i_cat == SPU_ES )
             {
-                msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
-                         es->i_id );
-                return;
+                if( !var_GetBool( p_input, b_sout ? "sout-spu" : "spu" ) )
+                {
+                    msg_Dbg( p_input, "spu is disabled, not selecting ES 0x%x",
+                             es->i_id );
+                    return;
+                }
             }
         }
 
