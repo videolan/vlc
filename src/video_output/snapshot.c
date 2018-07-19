@@ -150,7 +150,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
     /* */
     char *prefix = NULL;
     if (cfg->prefix_fmt)
-        prefix = str_format(input, cfg->prefix_fmt);
+        prefix = str_format(input, NULL, cfg->prefix_fmt);
     if (prefix)
         filename_sanitize(prefix);
     else {

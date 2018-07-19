@@ -3347,7 +3347,7 @@ char *input_CreateFilename(input_thread_t *input, const char *dir,
                            const char *filenamefmt, const char *ext)
 {
     char *path;
-    char *filename = str_format(input, filenamefmt);
+    char *filename = str_format(input, NULL, filenamefmt);
     if (unlikely(filename == NULL))
         return NULL;
 

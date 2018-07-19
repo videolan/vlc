@@ -538,17 +538,18 @@ static int write_meta(struct vlc_memstream *stream, input_item_t *item,
     return 0;
 }
 
-char *vlc_strfinput(input_thread_t *input, const char *s)
+char *vlc_strfinput(input_thread_t *input, input_item_t *item, const char *s)
 {
     struct vlc_memstream stream[1];
-
-    input_item_t *item = (input != NULL) ? input_GetItem(input) : NULL;
 
     char c;
     bool b_is_format = false;
     bool b_empty_if_na = false;
 
     assert(s != NULL);
+
+    if (!item && input)
+        item = input_GetItem(input);
 
     vlc_memstream_open(stream);
 

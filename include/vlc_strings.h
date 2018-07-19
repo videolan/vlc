@@ -139,12 +139,13 @@ VLC_API char *vlc_strftime( const char * );
  *
  * Formats input and input item meta-informations into a heap-allocated string.
  */
-VLC_API char *vlc_strfinput( input_thread_t *, const char * );
+VLC_API char *vlc_strfinput( input_thread_t *, input_item_t *, const char * );
 
-static inline char *str_format( input_thread_t *input, const char *fmt )
+static inline char *str_format( input_thread_t *input, input_item_t *item,
+                                const char *fmt )
 {
     char *s1 = vlc_strftime( fmt );
-    char *s2 = vlc_strfinput( input, s1 );
+    char *s2 = vlc_strfinput( input, item, s1 );
     free( s1 );
     return s2;
 }

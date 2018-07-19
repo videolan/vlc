@@ -729,7 +729,7 @@ void VlcProc::update_current_input()
         char *psz_name = NULL;
         if( psz_fmt != NULL )
         {
-            psz_name = vlc_strfinput( pInput, psz_fmt );
+            psz_name = vlc_strfinput( pInput, NULL, psz_fmt );
             free( psz_fmt );
         }
 

@@ -520,7 +520,7 @@ void InputManager::UpdateName()
     char *formatted = NULL;
     if (format != NULL)
     {
-        formatted = vlc_strfinput( p_input, format );
+        formatted = vlc_strfinput( p_input, NULL, format );
         free( format );
         if( formatted != NULL )
         {
