@@ -54,6 +54,7 @@
 #include "ts_psip.h"
 #include "ts_si.h"
 #include "ts_metadata.h"
+#include "ts_descriptions.h"
 
 #include "../access/dtv/en50221_capmt.h"
 
@@ -421,10 +422,10 @@ static void SetupAudioExtendedDescriptors( demux_t *p_demux, ts_es_t *p_es,
         if( p_dr && p_dr->i_length > 1 && p_dr->p_data[0] == 0x06 /* Tag extension */ )
         {
             static const char *editorial_classification_coding[] = {
-                N_("Main audio"),
-                N_("Audio description for the visually impaired"),
-                N_("Clean audio for the hearing impaired"),
-                N_("Spoken subtitles for the visually impaired"),
+                DESC_MAIN_AUDIO,
+                DESC_AUDIO_DESC_VISUALLY_IMPAIRED,
+                DESC_CLEAN_AUDIO_HEARING_IMPAIRED,
+                DESC_SPOKEN_SUBTITLES_VISUAL_IMP,
             };
 
             uint8_t i_audio_type = (p_dr->p_data[1] & 0x7F) >> 2;
@@ -460,9 +461,9 @@ static char *GetIso639AudioTypeDesc( uint8_t type )
 {
     static const char *audio_type[] = {
         /* "Main audio", */
-        N_("clean effects"),
-        N_("hearing impaired"),
-        N_("visual impaired commentary"),
+        DESC_CLEAN_EFFECTS,
+        DESC_HEARING_IMPAIRED,
+        DESC_VISUAL_IMPAIRED_COMMENTS,
     };
 
     if ( type == 0 || type >= ARRAY_SIZE(audio_type) )
@@ -695,11 +696,11 @@ typedef struct
 
 static const char *const ppsz_teletext_type[] = {
  "",
- N_("Teletext"),
- N_("Teletext subtitles"),
- N_("Teletext: additional information"),
- N_("Teletext: program schedule"),
- N_("Teletext subtitles: hearing impaired")
+ DESC_TELETEXT,
+ DESC_TELETEXT_SUBTITLES,
+ DESC_TELETEXT_ADDTNL_INFO,
+ DESC_TELETEXT_SCHEDULE,
+ DESC_TELETEXT_SUBS_HEARING_IMPAIRED
 };
 
 static void PMTSetupEsTeletext( demux_t *p_demux, ts_stream_t *p_pes,
