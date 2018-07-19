@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-19 16:11+0200\n"
+"Last-Translator: GunChleoc, 2018\n"
 "Language-Team: Gaelic, Scottish (https://www.transifex.com/yaron/teams/16553/"
 "gd/)\n"
 "Language: gd\n"
@@ -16033,9 +16033,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Fàg an làn-sgrìn"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -20037,7 +20036,7 @@ msgstr "A bheil thu airson leantainn air far an do stad thu roimhe?"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
-msgstr ""
+msgstr "&Lean air adhart"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -22586,13 +22585,13 @@ msgstr ""
 #: modules/services_discovery/mediadirs.c:133
 #: modules/services_discovery/mediadirs.c:357
 msgid "My Videos"
-msgstr "Na videothan agam"
+msgstr "Videothan"
 
 #: modules/services_discovery/mediadirs.c:78
 #: modules/services_discovery/mediadirs.c:141
 #: modules/services_discovery/mediadirs.c:358
 msgid "My Music"
-msgstr "Mo cheòl"
+msgstr "Ceòl"
 
 #: modules/services_discovery/mediadirs.c:84
 msgid "Picture"
@@ -22602,7 +22601,7 @@ msgstr "Dealbh"
 #: modules/services_discovery/mediadirs.c:149
 #: modules/services_discovery/mediadirs.c:359
 msgid "My Pictures"
-msgstr "Na dealbhan agam"
+msgstr "Dealbhan"
 
 #: modules/services_discovery/microdns.c:44
 #: modules/services_discovery/microdns.c:57
