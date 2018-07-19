@@ -1269,20 +1269,7 @@ typedef struct
     uint8_t i_profile_compatibility;
     uint8_t i_level;
 
-    uint8_t i_reserved1;     /* 6 bits */
-    uint8_t i_length_size;
-
-    uint8_t i_reserved2;    /* 3 bits */
-    uint8_t  i_sps;
-    uint16_t *i_sps_length;
-    uint8_t  **sps;
-
-    uint8_t  i_pps;
-    uint16_t *i_pps_length;
-    uint8_t  **pps;
-
-    /* XXX: Hack raw avcC atom payload */
-    int     i_avcC;
+    size_t   i_avcC;
     uint8_t *p_avcC;
 
 } MP4_Box_data_avcC_t;
