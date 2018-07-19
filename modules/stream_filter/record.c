@@ -180,7 +180,7 @@ static int Start( stream_t *s, const char *psz_extension )
 
     /* Create file name
      * TODO allow prefix configuration */
-    psz_file = input_CreateFilename( s->p_input, psz_path, INPUT_RECORD_PREFIX, psz_extension );
+    psz_file = input_CreateFilename( s->p_input, NULL, psz_path, INPUT_RECORD_PREFIX, psz_extension );
 
     free( psz_path );
 

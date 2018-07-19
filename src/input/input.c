@@ -3343,11 +3343,12 @@ static char *input_SubtitleFile2Uri( input_thread_t *p_input,
 
 /**/
 /* TODO FIXME nearly the same logic that snapshot code */
-char *input_CreateFilename(input_thread_t *input, const char *dir,
-                           const char *filenamefmt, const char *ext)
+char *input_CreateFilename(input_thread_t *input, input_item_t *item,
+                           const char *dir, const char *filenamefmt,
+                           const char *ext)
 {
     char *path;
-    char *filename = str_format(input, NULL, filenamefmt);
+    char *filename = str_format(input, item, filenamefmt);
     if (unlikely(filename == NULL))
         return NULL;
 
