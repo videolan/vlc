@@ -686,6 +686,82 @@ static void SetupJ2KDescriptors( demux_t *p_demux, ts_es_t *p_es, const dvbpsi_p
     }
 }
 
+static void SetupTTMLExtendedDescriptor( demux_t *p_demux,
+                                         const dvbpsi_descriptor_t *p_dr, es_format_t *p_fmt )
+{
+    static const struct
+    {
+        uint8_t val;
+        const char * psz;
+    } subtitle_purpose[] = {
+        { 0x00, DESC_SUBS_SAME_LANG },
+        { 0x01, DESC_SUBS_FOREIGN_LANG },
+        { 0x02, DESC_SUBS_ALL_LANG },
+        { 0x10, DESC_SUBS_HEARING_IMPAIRED },
+        { 0x11, DESC_SUBS_HEARING_IMPAIRED },
+        { 0x12, DESC_SUBS_HEARING_IMPAIRED },
+        { 0x30, DESC_SUBS_AUDIO_DESCRIPTION_TRANS },
+        { 0x31, DESC_SUBS_COMMENTARY },
+    };
+
+    if( p_dr->i_length < 9 )
+        return;
+
+    msg_Dbg( p_demux, "     - found TTML_descriptor" );
+    if( !p_fmt->psz_language )
+    {
+        p_fmt->psz_language = strndup( (const char *)&p_dr->p_data[1], 3 );
+        msg_Dbg( p_demux, "       language: %s", p_fmt->psz_language );
+    }
+
+    /* variable members */
+    const uint8_t *p_data = &p_dr->p_data[6];
+    size_t i_data = p_dr->i_length - 6;
+
+    /* profiles */
+    uint8_t i_profiles_count = (p_dr->p_data[5] & 0x0F);
+    if( i_data <= i_profiles_count )
+        goto end;
+    p_data += i_profiles_count;
+    i_data -= i_profiles_count;
+
+    /* qualifier */
+    if( p_dr->p_data[5] & 0x40 )
+    {
+        if( i_data <= 4 )
+            goto end;
+        p_data += 4;
+        i_data -= 4;
+    }
+
+    /* font usage */
+    if( p_dr->p_data[5] & 0x80 )
+    {
+        if( i_data <= 1U || i_data <= 1U + p_data[0] )
+            goto end;
+        p_data += 1 + p_data[0];
+        i_data -= 1 + p_data[0];
+    }
+
+    /* text... finally */
+    if( i_data < 1U || i_data < 1U + p_data[0] )
+        goto end;
+    if( !p_fmt->psz_description )
+        p_fmt->psz_description = strndup( (const char*) &p_data[1], p_data[0] );
+
+end:
+    /* Apply */
+    for( size_t i=0; i<ARRAY_SIZE(subtitle_purpose); i++ )
+    {
+        if( subtitle_purpose[i].val == (p_dr->p_data[4] >> 2) )
+        {
+            if( !p_fmt->psz_description )
+                p_fmt->psz_description = strdup( subtitle_purpose[i].psz );
+            break;
+        }
+    }
+}
+
 typedef struct
 {
     int  i_type;
@@ -1184,6 +1260,7 @@ static void PMTSetupEs0x06( demux_t *p_demux, ts_stream_t *p_pes,
                 break;
             case 0x20:
                 es_format_Change( p_fmt, SPU_ES, VLC_CODEC_TTML_TS );
+                SetupTTMLExtendedDescriptor( p_demux, desc, p_fmt );
                 break;
         }
     }

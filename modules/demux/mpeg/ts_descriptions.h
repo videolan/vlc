@@ -36,5 +36,11 @@
 #define DESC_TELETEXT_SCHEDULE              N_("Teletext: program schedule")
 #define DESC_TELETEXT_SUBS_HEARING_IMPAIRED N_("Teletext subtitles: hearing impaired")
 
+#define DESC_SUBS_SAME_LANG                 N_("Same language dialogues")
+#define DESC_SUBS_FOREIGN_LANG              N_("Foreign language dialogues")
+#define DESC_SUBS_ALL_LANG                  N_("All dialogues")
+#define DESC_SUBS_HEARING_IMPAIRED          N_("Description for the hearing impaired")
+#define DESC_SUBS_AUDIO_DESCRIPTION_TRANS   N_("Transcripted audio description")
+#define DESC_SUBS_COMMENTARY                N_("Commentary")
 
 #endif
