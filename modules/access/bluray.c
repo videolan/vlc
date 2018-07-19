@@ -639,7 +639,7 @@ static int blurayOpen(vlc_object_t *object)
     const char *error_msg = NULL;
 #define BLURAY_ERROR(s) do { error_msg = s; goto error; } while(0)
 
-    if (p_demux->out == NULL || unlikely(p_demux->p_input == NULL))
+    if (p_demux->out == NULL)
         return VLC_EGENERIC;
 
     forced = !strncasecmp(p_demux->psz_url, "bluray:", 7);
