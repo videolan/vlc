@@ -166,8 +166,9 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
     if ( ctx.input == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemSubItemTreeAdded,
-                      &MetadataExtractor::onSubItemAdded, std::addressof( ctx ) );
+    if( vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemSubItemTreeAdded,
+                          &MetadataExtractor::onSubItemAdded, std::addressof( ctx ) ) )
+        return medialibrary::parser::Status::Fatal;
 
     input_Start( ctx.input.get() );
 
