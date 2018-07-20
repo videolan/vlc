@@ -36,7 +36,6 @@ void vlc_global_mutex (unsigned n, bool acquire)
         VLC_STATIC_MUTEX,
         VLC_STATIC_MUTEX,
         VLC_STATIC_MUTEX,
-        VLC_STATIC_MUTEX,
 #ifdef _WIN32
         VLC_STATIC_MUTEX, // For MTA holder
 #endif
