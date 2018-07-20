@@ -25,6 +25,7 @@
 # include "config.h"
 #endif
 
+#include <vlc_input.h>
 #include "stream.h"
 
 struct vlc_stream_memory_private
@@ -32,6 +33,12 @@ struct vlc_stream_memory_private
     size_t    i_pos;      /* Current reading offset */
     size_t    i_size;
     uint8_t  *p_buffer;
+};
+
+struct vlc_stream_attachment_private
+{
+    struct vlc_stream_memory_private memory;
+    input_attachment_t *attachment;
 };
 
 static ssize_t Read( stream_t *, void *p_read, size_t i_read );
@@ -50,6 +57,14 @@ static void stream_MemoryDelete(stream_t *s)
     free(sys->p_buffer);
 }
 
+static void stream_AttachmentDelete(stream_t *s)
+{
+    struct vlc_stream_attachment_private *sys = vlc_stream_Private(s);
+
+    vlc_input_attachment_Delete(sys->attachment);
+    free(s->psz_name);
+}
+
 stream_t *(vlc_stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
                                  size_t i_size, bool preserve)
 {
@@ -65,6 +80,35 @@ stream_t *(vlc_stream_MemoryNew)(vlc_object_t *p_this, uint8_t *p_buffer,
     p_sys->i_pos = 0;
     p_sys->i_size = i_size;
     p_sys->p_buffer = p_buffer;
+
+    s->pf_read    = Read;
+    s->pf_seek    = Seek;
+    s->pf_control = Control;
+
+    return s;
+}
+
+stream_t *vlc_stream_AttachmentNew(vlc_object_t *p_this,
+                                   input_attachment_t *attachment)
+{
+    struct vlc_stream_attachment_private *p_sys;
+    stream_t *s = vlc_stream_CustomNew(p_this, stream_AttachmentDelete,
+                                       sizeof (*p_sys), "stream");
+    if (unlikely(s == NULL))
+        return NULL;
+
+    s->psz_name = strdup("attachment");
+    if (unlikely(s->psz_name == NULL))
+    {
+        stream_CommonDelete(s);
+        return NULL;
+    }
+
+    p_sys = vlc_stream_Private(s);
+    p_sys->memory.i_pos = 0;
+    p_sys->memory.i_size = attachment->i_data;
+    p_sys->memory.p_buffer = attachment->p_data;
+    p_sys->attachment = attachment;
 
     s->pf_read    = Read;
     s->pf_seek    = Seek;

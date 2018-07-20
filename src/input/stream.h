@@ -36,6 +36,9 @@ void *vlc_stream_Private(stream_t *stream);
 /* */
 void stream_CommonDelete( stream_t *s );
 
+stream_t *vlc_stream_AttachmentNew(vlc_object_t *p_this,
+                                   input_attachment_t *attachement);
+
 /**
  * This function creates a raw stream_t from an URL.
  */
