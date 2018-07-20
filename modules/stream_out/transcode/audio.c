@@ -45,6 +45,9 @@ static int audio_update_format( decoder_t *p_dec )
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     sout_stream_id_sys_t *id = p_owner->id;
 
+    if( !AOUT_FMT_LINEAR(&p_dec->fmt_out.audio) )
+        return VLC_EGENERIC;
+
     p_dec->fmt_out.audio.i_format = p_dec->fmt_out.i_codec;
     aout_FormatPrepare( &p_dec->fmt_out.audio );
 
@@ -53,7 +56,7 @@ static int audio_update_format( decoder_t *p_dec )
     es_format_Copy( &id->decoder_out, &p_dec->fmt_out );
     vlc_mutex_unlock(&id->fifo.lock);
 
-    return ( p_dec->fmt_out.audio.i_bitspersample > 0 ) ? 0 : -1;
+    return VLC_SUCCESS;
 }
 
 static int transcode_audio_filters_init( sout_stream_t *p_stream,
