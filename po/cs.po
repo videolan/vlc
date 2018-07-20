@@ -20,26 +20,28 @@
 # Roman Ondráček <ondracek.roman@centrum.cz>, 2014-2015
 # sifkka <sifkka@gmail.com>, 2014
 # Sofartin <hrubymar10@gmail.com>, 2014
-# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2016
+# Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
 # Václav Pavlíček <v.pavlicek@centrum.cz>, 2012
 # Vít Pelčák, 2012,2015,2016,2018
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009
 # Zuzana Wolfová <painteddreaming@gmail.com>, 2014
 # Lukáš Spurný <lukasspurny8@gmail.com>, 2018
+# Pavel Řehák <pavel-rehak@email.cz>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Lukáš Spurný <lukasspurny8@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-20 11:34+0200\n"
+"Last-Translator: Tomáš Chvátal <tomas.chvatal@gmail.com>, 2018\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n "
+"<= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 #: include/vlc_common.h:1044
 msgid ""
@@ -872,8 +874,10 @@ msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] "%u modul nebyl zobrazen, protože má pouze pokročilé možnosti.\n"
 msgstr[1] "%u moduly nebyly zobrazen, protože mají pouze pokročilé možnosti.\n"
-msgstr[2] "%u modul; nebylo zobrazen, protože mají pouze pokročilé možnosti.\n"
-msgstr[3] "%u modul; nebylo zobrazen, protože mají pouze pokročilé možnosti.\n"
+msgstr[2] ""
+"%u modulů nebylo zobrazeno, protože mají pouze pokročilé možnosti.\n"
+msgstr[3] ""
+"%u modulů nebylo zobrazeno, protože mají pouze pokročilé možnosti.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -3687,7 +3691,7 @@ msgid ""
 "instance. Use a comma-separated list of extensions."
 msgstr ""
 "Soubory s těmito příponami nebudou přidány do seznamu skladeb při otevírání "
-"adresáře. \n"
+"adresáře.\n"
 "Užitečné při přidávání adresářů, které obsahují soubory se seznamem skladeb. "
 "Jednotlivé přípony oddělujte čárkou."
 
@@ -16284,9 +16288,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Opustit režim celé obrazovky"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -18556,7 +18559,7 @@ msgstr "Otevřít titulky"
 
 #: modules/gui/qt/components/controller.hpp:113
 msgid "Dock fullscreen controller"
-msgstr ""
+msgstr "Zámek ovladače v režimu celé obrazovky"
 
 #: modules/gui/qt/components/controller.hpp:116
 msgid "Stop playback"
@@ -18861,7 +18864,7 @@ msgstr "Velikost dat média"
 
 #: modules/gui/qt/components/info_panels.cpp:582
 msgid "Demuxed data size"
-msgstr ""
+msgstr "Velikost demultiplexovaných dat"
 
 #: modules/gui/qt/components/info_panels.cpp:583
 msgid "Content bitrate"
@@ -18873,7 +18876,7 @@ msgstr "Zahozeno (poškozené)"
 
 #: modules/gui/qt/components/info_panels.cpp:587
 msgid "Dropped (discontinued)"
-msgstr ""
+msgstr "Zahozeno (přerušeno)"
 
 #: modules/gui/qt/components/info_panels.cpp:590
 #: modules/gui/qt/components/info_panels.cpp:597
@@ -20092,7 +20095,7 @@ msgstr "Mezera"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:430
 msgid "Expanding Spacer"
-msgstr ""
+msgstr "Rozšiřující se mezera"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:462
 msgid "Splitter"
