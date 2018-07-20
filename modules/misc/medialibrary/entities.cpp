@@ -78,9 +78,9 @@ bool Convert( const medialibrary::IMovie* input, vlc_ml_movie_t& output )
 static bool convertTracksCommon( vlc_ml_media_track_t* output, const std::string& codec,
                                  const std::string& language, const std::string& desc )
 {
-    if( strdup_helper( codec, output->psz_codec ) ||
-        strdup_helper( language, output->psz_language ) ||
-        strdup_helper( desc, output->psz_description ) )
+    if( !strdup_helper( codec, output->psz_codec ) ||
+        !strdup_helper( language, output->psz_language ) ||
+        !strdup_helper( desc, output->psz_description ) )
         return false;
     return true;
 }
