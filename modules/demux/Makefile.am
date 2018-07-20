@@ -256,6 +256,7 @@ libts_plugin_la_SOURCES = demux/mpeg/ts.c demux/mpeg/ts.h \
         demux/mpeg/ts_strings.h demux/mpeg/ts_streams_private.h \
         demux/mpeg/pes.h \
         demux/mpeg/timestamps.h \
+	demux/mpeg/ts_descriptions.h \
         demux/dvb-text.h \
         demux/opus.h \
 	mux/mpeg/csa.c \
