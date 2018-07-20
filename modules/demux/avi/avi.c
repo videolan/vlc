@@ -462,7 +462,7 @@ static int Open( vlc_object_t * p_this )
         tk->i_samplesize = p_strh->i_samplesize;
         msg_Dbg( p_demux, "stream[%u] rate:%u scale:%u samplesize:%u",
                 i, tk->i_rate, tk->i_scale, tk->i_samplesize );
-        if( tk->i_scale > tk->i_rate || !tk->i_scale || !tk->i_rate )
+        if( !tk->i_scale || !tk->i_rate || !(tk->i_rate * CLOCK_FREQ / tk->i_scale) )
         {
             free( tk );
             continue;
