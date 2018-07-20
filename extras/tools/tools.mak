@@ -24,9 +24,19 @@ else
 download = $(error Neither curl nor wget found!)
 endif
 
+ifeq ($(shell sha512sum --version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = sha512sum --check
+else ifeq ($(shell shasum --version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = shasum -a 512 --check
+else ifeq ($(shell openssl version >/dev/null 2>&1 || echo FAIL),)
+SHA512SUM = openssl dgst -sha512
+else
+SHA512SUM = $(error SHA-512 checksumming not found!)
+endif
+
 download_pkg = $(call download,$(VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) || \
 	( $(call download,$(1)) && echo "Please upload package $(lastword $(subst /, ,$(@))) to our FTP" )  \
-	&& grep $(@) SHA512SUMS| shasum -a 512 -c
+	&& grep $(@) SHA512SUMS| $(SHA512SUM)
 
 UNPACK = $(RM) -R $@ \
     $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
