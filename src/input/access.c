@@ -70,6 +70,31 @@ static void vlc_access_Destroy(stream_t *access)
 
 #define MAX_REDIR 5
 
+static stream_t *accessNewAttachment(vlc_object_t *parent,
+                                     input_thread_t *input, const char *mrl)
+{
+    if (!input)
+        return NULL;
+
+    input_attachment_t *attachment;
+    if (input_Control(input, INPUT_GET_ATTACHMENT, &attachment, mrl + 13))
+        return NULL;
+    stream_t *stream = vlc_stream_AttachmentNew(parent, attachment);
+    if (!stream)
+    {
+        vlc_input_attachment_Delete(attachment);
+        return NULL;
+    }
+    stream->psz_url = strdup(mrl);
+    if (!stream->psz_url)
+    {
+        vlc_stream_Delete(stream);
+        return NULL;
+    }
+    stream->psz_location = stream->psz_url + 13;
+    return stream;
+}
+
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
@@ -79,6 +104,9 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
     struct vlc_access_private *priv;
     char *redirv[MAX_REDIR];
     unsigned redirc = 0;
+
+    if (strncmp(mrl, "attachment://", 13) == 0)
+        return accessNewAttachment(parent, input, mrl);
 
     stream_t *access = vlc_stream_CustomNew(parent, vlc_access_Destroy,
                                             sizeof (*priv), "access");
