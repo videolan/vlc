@@ -204,6 +204,8 @@ static void Close (vlc_object_t *obj)
 
     if (sys->display != EGL_NO_DISPLAY)
     {
+        if (sys->context != EGL_NO_CONTEXT)
+            eglDestroyContext(sys->display, sys->context);
         if (sys->surface != EGL_NO_SURFACE)
             eglDestroySurface(sys->display, sys->surface);
         eglTerminate(sys->display);
