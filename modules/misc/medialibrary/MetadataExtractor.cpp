@@ -148,48 +148,49 @@ void MetadataExtractor::onSubItemAdded( const vlc_event_t* event, void* data )
 
 medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem& item )
 {
-    const std::unique_ptr<ParseContext> ctx( new ParseContext{ this, item } );
-    ctx->inputItem = {
+    ParseContext ctx( this, item );
+
+    ctx.inputItem = {
         input_item_New( item.mrl().c_str(), NULL ),
         &input_item_Release
     };
-    if ( ctx->inputItem == nullptr )
+    if ( ctx.inputItem == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    ctx->inputItem->i_preparse_depth = 1;
-    ctx->input = {
+    ctx.inputItem->i_preparse_depth = 1;
+    ctx.input = {
         input_CreatePreparser( m_obj, &MetadataExtractor::onInputEvent,
-                               ctx.get(), ctx->inputItem.get() ),
+                               std::addressof( ctx ), ctx.inputItem.get() ),
         &input_Close
     };
-    if ( ctx->input == nullptr )
+    if ( ctx.input == nullptr )
         return medialibrary::parser::Status::Fatal;
 
-    vlc_event_attach( &ctx->inputItem->event_manager, vlc_InputItemSubItemTreeAdded,
-                      &MetadataExtractor::onSubItemAdded, ctx.get() );
+    vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemSubItemTreeAdded,
+                      &MetadataExtractor::onSubItemAdded, std::addressof( ctx ) );
 
-    input_Start( ctx->input.get() );
+    input_Start( ctx.input.get() );
 
     {
-        vlc_mutex_locker lock( &ctx->m_mutex );
-        while ( ctx->needsProbing == false )
+        vlc_mutex_locker lock( &ctx.m_mutex );
+        while ( ctx.needsProbing == false )
         {
-            vlc_cond_wait( &ctx->m_cond, &ctx->m_mutex );
-            if ( ctx->needsProbing == true )
+            vlc_cond_wait( &ctx.m_cond, &ctx.m_mutex );
+            if ( ctx.needsProbing == true )
             {
-                if ( ctx->state == END_S || ctx->state == ERROR_S )
+                if ( ctx.state == END_S || ctx.state == ERROR_S )
                     break;
                 // Reset the probing flag for next event
-                ctx->needsProbing = false;
+                ctx.needsProbing = false;
             }
         }
     }
 
-    if ( ctx->state == ERROR_S )
+    if ( ctx.state == ERROR_S )
         return medialibrary::parser::Status::Fatal;
-    assert( ctx->state == END_S );
+    assert( ctx.state == END_S );
 
-    populateItem( item, ctx->inputItem.get() );
+    populateItem( item, ctx.inputItem.get() );
 
     return medialibrary::parser::Status::Success;
 }
