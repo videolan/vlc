@@ -45,7 +45,6 @@ $Id$
  * aribcam: ARIB STD-B25 decoder/virtual CAM
  * aribsub: ARIB subtitles decoder
  * asf: ASF demuxer
- * attachment: Attachment access module
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
  * audiobargraph_a: audiobargraph audio plugin

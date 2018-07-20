@@ -5,9 +5,6 @@ AM_CPPFLAGS += -I$(srcdir)/access
 
 ### Files ###
 
-libattachment_plugin_la_SOURCES = access/attachment.c
-access_LTLIBRARIES += libattachment_plugin.la
-
 libdcp_plugin_la_SOURCES = access/dcp/dcpparser.h access/dcp/dcp.cpp access/dcp/dcpparser.cpp access/dcp/dcpdecrypt.cpp
 if HAVE_ASDCP
 libdcp_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) $(ASDCP_CFLAGS)
