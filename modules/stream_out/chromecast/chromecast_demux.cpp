@@ -457,10 +457,21 @@ protected:
 static void on_paused_changed_cb( void *data, bool paused )
 {
     demux_t *p_demux = reinterpret_cast<demux_t*>(data);
+    vlc_object_t *obj = p_demux->p_next->obj.parent;
 
-    input_thread_t *p_input = p_demux->p_next->p_input;
-    if( p_input )
-        var_SetInteger( p_input, "state", paused ? PAUSE_S : PLAYING_S );
+    /* XXX: Ugly: Notify the parent of the input_thread_t that the corks state
+     * changed */
+    while( obj != NULL )
+    {
+        /* Try to find the playlist or the mediaplayer that handle the corks
+         * state */
+        if( var_Type( obj, "corks" ) != 0 )
+        {
+            ( paused ? var_IncInteger : var_DecInteger )( obj, "corks" );
+            return;
+        }
+        obj = obj->obj.parent;
+    }
 }
 
 static int Demux( demux_t *p_demux_filter )
