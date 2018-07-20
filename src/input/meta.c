@@ -218,21 +218,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
 
     /* */
     input_attachment_t *p_attachment = NULL;
-
-    vlc_mutex_lock( &p_item->lock );
-    for( int i_idx = 0; i_idx < input_priv(p_input)->i_attachment; i_idx++ )
-    {
-        input_attachment_t *a = input_priv(p_input)->attachment[i_idx];
-
-        if( !strcmp( a->psz_name, name ) )
-        {
-            p_attachment = vlc_input_attachment_Duplicate( a );
-            break;
-        }
-    }
-    vlc_mutex_unlock( &p_item->lock );
-
-    if( p_attachment == NULL )
+    if( input_Control( p_input, INPUT_GET_ATTACHMENT, &p_attachment, name ) )
     {
         msg_Warn( p_input, "art attachment %s not found", name );
         return;
