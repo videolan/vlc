@@ -217,7 +217,7 @@ bool MediaLibrary::Start()
     auto folders = vlc::wrap_cptr( var_InheritString( m_obj, "ml-folders" ) );
     if ( folders != nullptr && strlen( folders.get() ) > 0 )
     {
-        std::stringstream ss( folders.get() );
+        std::istringstream ss( folders.get() );
         std::string folder;
         while ( std::getline( ss, folder, ';' ) )
             ml->discover( folder );
