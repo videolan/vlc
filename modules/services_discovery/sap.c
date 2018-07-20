@@ -616,18 +616,13 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     sdp_t *p_sdp = p_sys->p_sdp;
-    input_thread_t *p_input = p_demux->p_input;
-    input_item_t *p_parent_input;
+    input_item_t *p_parent_input = p_demux->p_input_item;
 
-    if( !p_input )
+    if( !p_parent_input )
     {
         msg_Err( p_demux, "parent input could not be found" );
         return VLC_EGENERIC;
     }
-
-    /* This item hasn't been held by input_GetItem
-     * don't release it */
-    p_parent_input = input_GetItem( p_input );
 
     input_item_SetURI( p_parent_input, p_sdp->psz_uri );
     input_item_SetName( p_parent_input, p_sdp->psz_sessionname );

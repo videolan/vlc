@@ -521,13 +521,9 @@ static int ReadICYMeta( stream_t *p_access )
                 free( psz_tmp );
 
             msg_Dbg( p_access, "New Icy-Title=%s", p_sys->psz_icy_title );
-            input_thread_t *p_input = p_access->p_input;
-            if( p_input )
-            {
-                input_item_t *p_input_item = input_GetItem( p_access->p_input );
-                if( p_input_item )
-                    input_item_SetMeta( p_input_item, vlc_meta_NowPlaying, p_sys->psz_icy_title );
-            }
+            if( p_access->p_input_item )
+                input_item_SetMeta( p_access->p_input_item, vlc_meta_NowPlaying,
+                                    p_sys->psz_icy_title );
         }
     }
     free( psz_meta );
@@ -892,13 +888,9 @@ static int Connect( stream_t *p_access )
             else
                 vlc_xml_decode( p_sys->psz_icy_name );
             msg_Dbg( p_access, "Icy-Name: %s", p_sys->psz_icy_name );
-            input_thread_t *p_input = p_access->p_input;
-            if ( p_input )
-            {
-                input_item_t *p_input_item = input_GetItem( p_access->p_input );
-                if ( p_input_item )
-                    input_item_SetMeta( p_input_item, vlc_meta_Title, p_sys->psz_icy_name );
-            }
+            if ( p_access->p_input_item )
+                input_item_SetMeta( p_access->p_input_item, vlc_meta_Title,
+                                    p_sys->psz_icy_name );
 
             p_sys->b_icecast = true; /* be on the safeside. set it here as well. */
             p_sys->b_reconnect = true;
@@ -913,13 +905,9 @@ static int Connect( stream_t *p_access )
             else
                 vlc_xml_decode( p_sys->psz_icy_genre );
             msg_Dbg( p_access, "Icy-Genre: %s", p_sys->psz_icy_genre );
-            input_thread_t *p_input = p_access->p_input;
-            if( p_input )
-            {
-                input_item_t *p_input_item = input_GetItem( p_access->p_input );
-                if( p_input_item )
-                    input_item_SetMeta( p_input_item, vlc_meta_Genre, p_sys->psz_icy_genre );
-            }
+            if( p_access->p_input_item )
+                input_item_SetMeta( p_access->p_input_item, vlc_meta_Genre,
+                                    p_sys->psz_icy_genre );
         }
         else if( !strncasecmp( psz, "Icy-Notice", 10 ) )
         {

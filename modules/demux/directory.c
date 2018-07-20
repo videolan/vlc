@@ -32,8 +32,7 @@
 
 static int Demux( demux_t *p_demux )
 {
-    input_item_t *p_input = input_GetItem( p_demux->p_input );
-    input_item_node_t *p_node = input_item_node_Create( p_input );
+    input_item_node_t *p_node = input_item_node_Create( p_demux->p_input_item );
 
     if( vlc_stream_ReadDir( p_demux->s, p_node ) )
     {
@@ -78,7 +77,7 @@ static int Import_Dir( vlc_object_t *p_this )
 
     if( p_demux->s->pf_readdir == NULL )
         return VLC_EGENERIC;
-    if( p_demux->p_input == NULL )
+    if( p_demux->p_input_item == NULL )
         return VLC_ETIMEOUT;
 
     p_demux->pf_demux = Demux;

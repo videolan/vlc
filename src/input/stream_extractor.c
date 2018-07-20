@@ -265,7 +265,7 @@ se_AttachWrapper( struct stream_extractor_private* priv, stream_t* source )
     }
 
     priv->wrapper = s;
-    priv->wrapper->p_input = source->p_input;
+    priv->wrapper->p_input_item = source->p_input_item;
     priv->wrapper->p_sys = priv;
 
     priv->source = source;

@@ -58,8 +58,7 @@ struct demux_cc
         vlc_meta_t *p_meta = vlc_meta_New();
         if( likely(p_meta != NULL) )
         {
-            input_item_t *p_item = p_demux->p_next->p_input ?
-                                   input_GetItem( p_demux->p_next->p_input ) : NULL;
+            input_item_t *p_item = p_demux->p_next->p_input_item;
             if( p_item )
             {
                 /* Favor Meta from the input item of the input_thread since

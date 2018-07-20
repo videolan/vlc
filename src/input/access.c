@@ -118,7 +118,7 @@ static stream_t *access_New(vlc_object_t *parent, input_thread_t *input,
     if (unlikely(access == NULL))
         return NULL;
 
-    access->p_input = input;
+    access->p_input_item = input ? input_GetItem(input) : NULL;
     access->out = out;
     access->psz_name = NULL;
     access->psz_url = strdup(mrl);
@@ -312,7 +312,7 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
         priv = vlc_stream_Private(s);
         priv->input = input;
 
-        s->p_input = input;
+        s->p_input_item = input ? input_GetItem(input) : NULL;
         s->psz_url = strdup(access->psz_url);
 
         if (access->pf_block != NULL)

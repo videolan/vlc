@@ -60,7 +60,7 @@ stream_t *vlc_stream_FilterNew( stream_t *p_source,
         return NULL;
 
     priv = vlc_stream_Private(s);
-    s->p_input = p_source->p_input;
+    s->p_input_item = p_source->p_input_item;
 
     if( p_source->psz_url != NULL )
     {

@@ -32,6 +32,7 @@
 #include <libvlc.h>
 #include <vlc_codec.h>
 #include <vlc_meta.h>
+#include <vlc_input.h>
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_strings.h>
@@ -178,7 +179,7 @@ static int demux_Probe(void *func, va_list ap)
     return probe(VLC_OBJECT(demux));
 }
 
-demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
+demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_input,
                             const char *psz_demux, const char *url,
                             stream_t *s, es_out_t *out, bool b_preparsing )
 {
@@ -202,7 +203,7 @@ demux_t *demux_NewAdvanced( vlc_object_t *p_obj, input_thread_t *p_parent_input,
         }
     }
 
-    p_demux->p_input = p_parent_input;
+    p_demux->p_input_item = p_input ? input_GetItem(p_input) : NULL;
     p_demux->psz_name = strdup( psz_demux );
     if (unlikely(p_demux->psz_name == NULL))
         goto error;
@@ -485,7 +486,7 @@ static demux_t *demux_FilterNew( demux_t *p_next, const char *p_name )
 
     priv = vlc_stream_Private(p_demux);
     p_demux->p_next       = p_next;
-    p_demux->p_input      = NULL;
+    p_demux->p_input_item = NULL;
     p_demux->p_sys        = NULL;
     p_demux->psz_name     = NULL;
     p_demux->psz_url      = NULL;

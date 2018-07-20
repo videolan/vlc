@@ -52,6 +52,7 @@ struct stream_t
     const char  *psz_location; /**< Location (URL with the scheme stripped) */
     char        *psz_filepath; /**< Local file path (if applicable) */
     bool         b_preparsing; /**< True if this access is used to preparse */
+    input_item_t *p_input_item;/**< Input item (can be NULL) */
 
     union {
         /**
@@ -144,9 +145,6 @@ struct stream_t
      * Private data pointer
      */
     void *p_sys;
-
-    /* Weak link to parent input */
-    input_thread_t *p_input;
 };
 
 /**

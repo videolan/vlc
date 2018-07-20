@@ -851,15 +851,14 @@ static int Open( vlc_object_t * p_this )
     }
 
     MP4_Box_t *p_rmra = MP4_BoxGet( p_sys->p_root, "/moov/rmra" );
-    if( p_rmra != NULL && p_demux->p_input != NULL )
+    if( p_rmra != NULL && p_demux->p_input_item != NULL )
     {
         int        i_count = MP4_BoxCount( p_rmra, "rmda" );
         int        i;
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
-        input_thread_t *p_input = p_demux->p_input;
-        input_item_t *p_current = input_GetItem( p_input );
+        input_item_t *p_current = p_demux->p_input_item;
 
         input_item_node_t *p_subitems = input_item_node_Create( p_current );
 
