@@ -38,6 +38,7 @@
 #include <medialibrary/IPlaylist.h>
 
 #include <sstream>
+#include <initializer_list>
 
 class Logger : public medialibrary::ILogger
 {
@@ -224,25 +225,19 @@ bool MediaLibrary::Start()
     }
     else
     {
-        auto videoFolder = vlc::wrap_cptr( config_GetUserDir( VLC_VIDEOS_DIR ) );
         std::string varValue;
-        if ( videoFolder != nullptr )
+        for( auto&& target : { VLC_VIDEOS_DIR, VLC_MUSIC_DIR } )
         {
-            auto mrl = std::string{ "file://" } + videoFolder.get();
+            auto folder = vlc::wrap_cptr( config_GetUserDir( target ) );
+            if( folder == nullptr )
+                continue;
+
+            auto mrl = std::string{ "file://" } + folder.get();
             ml->discover( mrl );
-            varValue = mrl;
-        }
-        auto musicFolder = vlc::wrap_cptr( config_GetUserDir( VLC_MUSIC_DIR ) );
-        if ( musicFolder != nullptr )
-        {
-            auto mrl = std::string{ "file://" } + musicFolder.get();
-            ml->discover( mrl );
-            if ( varValue.empty() == false )
-                varValue += ";";
-            varValue += mrl;
+            varValue += ";" + mrl;
         }
         if ( varValue.empty() == false )
-            config_PutPsz( "ml-folders", varValue.c_str() );
+            config_PutPsz( "ml-folders", varValue.c_str()+1 ); /* skip initial ';' */
     }
     m_ml = std::move( ml );
     return true;
