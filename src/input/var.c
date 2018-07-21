@@ -172,12 +172,13 @@ static const char *GetEsVarName( enum es_format_category_e i_cat )
 static void UpdateBookmarksOption( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
+    input_item_t* item = priv->p_item;
     struct vlc_memstream vstr;
 
     vlc_memstream_open( &vstr );
     vlc_memstream_puts( &vstr, "bookmarks=" );
 
-    vlc_mutex_lock( &priv->p_item->lock );
+    vlc_mutex_lock( &item->lock );
     var_Change( p_input, "bookmark", VLC_VAR_CLEARCHOICES );
 
     for( int i = 0; i < priv->i_bookmark; i++ )
@@ -194,30 +195,48 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
             i > 0 ? "," : "", sp->psz_name, ( 1. * sp->i_time_offset ) / CLOCK_FREQ );
     }
 
-    vlc_mutex_unlock( &priv->p_item->lock );
-
-    if( vlc_memstream_close( &vstr ) == VLC_SUCCESS )
+    if( vlc_memstream_close( &vstr ) )
     {
-        bool b_overwritten = false;
+        vlc_mutex_unlock( &item->lock );
+        return;
+    }
 
-        for( int i = 0; i < priv->p_item->i_options; ++i )
+    /* XXX: The below is ugly and should be fixed elsewhere, but in order to
+     * not have more than one "bookmarks=" option associated with the item, we
+     * need to remove any existing ones before adding the new one. This logic
+     * should exist in input_item_AddOption with "OPTION_UNIQUE & <an overwrite
+     * flag>, but until then we handle it here. */
+
+    char** const orig_beg = &item->ppsz_options[0];
+    char** const orig_end = orig_beg + item->i_options;
+    char** end = orig_end;
+
+    for( char** option = orig_beg; option != end; )
+    {
+        if( strncmp( *option, "bookmarks=", 10 ) )
+            ++option;
+        else
         {
-            char** ppsz_option = &priv->p_item->ppsz_options[i];
-
-            if( strncmp( *ppsz_option, "bookmarks=", 10 ) == 0 )
-            {
-                free( *ppsz_option );
-                *ppsz_option = vstr.ptr;
-                b_overwritten = true;
-            }
+            free( *option );
+            /* It might be tempting to optimize the below by overwriting
+             * *option with the value of the last element, however; we want to
+             * preserve the order of the other options (as behavior might
+             * depend on it) */
+            memmove( option, option + 1, ( --end - option ) * sizeof *end );
         }
+    }
 
-        if( !b_overwritten )
-        {
-            input_item_AddOption( priv->p_item, vstr.ptr,
-                                  VLC_INPUT_OPTION_UNIQUE );
-            free( vstr.ptr );
-        }
+    if( end != orig_end ) /* we removed at least 1 option */
+    {
+        *end = vstr.ptr;
+        item->i_options = end - orig_beg + 1;
+        vlc_mutex_unlock( &priv->p_item->lock );
+    }
+    else /* nothing removed, add the usual way */
+    {
+        vlc_mutex_unlock( &priv->p_item->lock );
+        input_item_AddOption( item, vstr.ptr, VLC_INPUT_OPTION_UNIQUE );
+        free( vstr.ptr );
     }
 }
 
