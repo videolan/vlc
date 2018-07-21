@@ -582,15 +582,22 @@ bool input_Stopped( input_thread_t *input )
  */
 static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed )
 {
-    int i_ret;
     input_thread_private_t* p_priv = input_priv(p_input);
     demux_t *p_demux = p_priv->master->p_demux;
+    int i_ret = VLC_DEMUXER_SUCCESS;
 
     *pb_changed = false;
 
-    if( p_priv->i_stop > 0 && p_priv->i_time >= p_priv->i_stop )
-        i_ret = VLC_DEMUXER_EOF;
-    else
+    if( p_priv->i_stop > 0 )
+    {
+        if( demux_Control( p_demux, DEMUX_GET_TIME, &p_priv->i_time ) )
+            p_priv->i_time = 0;
+
+        if( p_priv->i_stop <= p_priv->i_time )
+            i_ret = VLC_DEMUXER_EOF;
+    }
+
+    if( i_ret == VLC_DEMUXER_SUCCESS )
         i_ret = demux_Demux( p_demux );
 
     i_ret = i_ret > 0 ? VLC_DEMUXER_SUCCESS : ( i_ret < 0 ? VLC_DEMUXER_EGENERIC : VLC_DEMUXER_EOF);
