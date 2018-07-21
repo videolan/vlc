@@ -470,6 +470,7 @@ static int AnalyzeParagraph( paragraph_t *p_paragraph )
     for( int i = 0; i < p_paragraph->i_size; ++i )
         p_paragraph->p_scripts[ i ] =
             hb_unicode_script( p_funcs, p_paragraph->p_code_points[ i ] );
+    hb_unicode_funcs_destroy( p_funcs );
 
     hb_script_t i_last_script;
     int i_last_script_index = -1;
