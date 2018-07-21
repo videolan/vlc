@@ -56,7 +56,9 @@ private:
             : es( es )
             , category( category )
             , owner( owner )
-        { }
+        {
+            vlc_mouse_Init( &mouse_state );
+        }
 
         bool operator==( es_out_id_t* es ) const {
             return this->es == es;
