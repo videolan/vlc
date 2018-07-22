@@ -166,6 +166,28 @@ void *event_thread_t::EventThread(void *data)
     return NULL;
 }
 
+void event_thread_t::ProcessNavAction( uint16 button, pci_t* pci )
+{
+    demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
+
+    if ( button > 0 && button <= pci->hli.hl_gi.btn_ns )
+    {
+        p_sys->dvd_interpretor.SetSPRM( 0x88, button );
+        btni_t button_ptr = pci->hli.btnit[button-1];
+        if ( button_ptr.auto_action_mode )
+        {
+            vlc_mutex_unlock( &lock );
+            vlc_mutex_lock( &p_sys->lock_demuxer );
+
+            // process the button action
+            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+
+            vlc_mutex_unlock( &p_sys->lock_demuxer );
+            vlc_mutex_lock( &lock );
+        }
+    }
+}
+
 void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 {
     msg_Dbg( p_demux, "Handle Key Event");
@@ -182,90 +204,10 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
 
     switch( ev.action.id )
     {
-    case ACTIONID_NAV_LEFT:
-        {
-            if ( button_ptr.left > 0 && button_ptr.left <= pci->hli.hl_gi.btn_ns )
-            {
-                i_curr_button = button_ptr.left;
-                p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
-                btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
-                if ( button_ptr.auto_action_mode )
-                {
-                    vlc_mutex_unlock( &lock );
-                    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-                    // process the button action
-                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
-
-                    vlc_mutex_unlock( &p_sys->lock_demuxer );
-                    vlc_mutex_lock( &lock );
-                }
-            }
-        }
-        break;
-    case ACTIONID_NAV_RIGHT:
-        {
-            if ( button_ptr.right > 0 && button_ptr.right <= pci->hli.hl_gi.btn_ns )
-            {
-                i_curr_button = button_ptr.right;
-                p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
-                btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
-                if ( button_ptr.auto_action_mode )
-                {
-                    vlc_mutex_unlock( &lock );
-                    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-                    // process the button action
-                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
-
-                    vlc_mutex_unlock( &p_sys->lock_demuxer );
-                    vlc_mutex_lock( &lock );
-                }
-            }
-        }
-        break;
-    case ACTIONID_NAV_UP:
-        {
-            if ( button_ptr.up > 0 && button_ptr.up <= pci->hli.hl_gi.btn_ns )
-            {
-                i_curr_button = button_ptr.up;
-                p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
-                btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
-                if ( button_ptr.auto_action_mode )
-                {
-                    vlc_mutex_unlock( &lock );
-                    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-                    // process the button action
-                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
-
-                    vlc_mutex_unlock( &p_sys->lock_demuxer );
-                    vlc_mutex_lock( &lock );
-                }
-            }
-        }
-        break;
-    case ACTIONID_NAV_DOWN:
-        {
-            if ( button_ptr.down > 0 && button_ptr.down <= pci->hli.hl_gi.btn_ns )
-            {
-                i_curr_button = button_ptr.down;
-                p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
-                btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
-                if ( button_ptr.auto_action_mode )
-                {
-                    vlc_mutex_unlock( &lock );
-                    vlc_mutex_lock( &p_sys->lock_demuxer );
-
-                    // process the button action
-                    p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
-
-                    vlc_mutex_unlock( &p_sys->lock_demuxer );
-                    vlc_mutex_lock( &lock );
-                }
-            }
-        }
-        break;
+    case ACTIONID_NAV_LEFT: return ProcessNavAction( button_ptr.left, pci );
+    case ACTIONID_NAV_RIGHT: return ProcessNavAction( button_ptr.right, pci );
+    case ACTIONID_NAV_UP: return ProcessNavAction( button_ptr.up, pci );
+    case ACTIONID_NAV_DOWN: return ProcessNavAction( button_ptr.down, pci );
     case ACTIONID_NAV_ACTIVATE:
         {
             vlc_mutex_unlock( &lock );
