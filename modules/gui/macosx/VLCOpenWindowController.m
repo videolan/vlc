@@ -1197,19 +1197,19 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (IBAction)qtkChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkVideoDevicePopup indexOfSelectedItem];
-    if (_avvideoDevices.count >= 1) {
-        _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    }
+    if (selectedDevice >= _avvideoDevices.count)
+        return;
+
+    _avCurrentDeviceUID = [[(AVCaptureDevice *)[_avvideoDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
 - (IBAction)qtkAudioChanged:(id)sender
 {
     NSInteger selectedDevice = [_qtkAudioDevicePopup indexOfSelectedItem];
-    if (_avaudioDevices.count >= 1) {
-        _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    }
-    [_screenqtkAudioPopup selectItemAtIndex: selectedDevice];
-    [_qtkAudioDevicePopup selectItemAtIndex: selectedDevice];
+    if (selectedDevice >= _avaudioDevices.count)
+        return;
+
+    _avCurrentAudioDeviceUID = [[(AVCaptureDevice *)[_avaudioDevices objectAtIndex:selectedDevice] uniqueID] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 }
 
 - (IBAction)qtkToggleUIElements:(id)sender
