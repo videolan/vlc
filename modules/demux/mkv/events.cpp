@@ -178,14 +178,15 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
     if( i_curr_button <= 0 || i_curr_button > pci->hli.hl_gi.btn_ns )
         return;
 
+    btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
+
     switch( ev.action.id )
     {
     case ACTIONID_NAV_LEFT:
         {
-            btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-            if ( p_button_ptr->left > 0 && p_button_ptr->left <= pci->hli.hl_gi.btn_ns )
+            if ( button_ptr.left > 0 && button_ptr.left <= pci->hli.hl_gi.btn_ns )
             {
-                i_curr_button = p_button_ptr->left;
+                i_curr_button = button_ptr.left;
                 p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
                 btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
                 if ( button_ptr.auto_action_mode )
@@ -204,10 +205,9 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
         break;
     case ACTIONID_NAV_RIGHT:
         {
-            btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-            if ( p_button_ptr->right > 0 && p_button_ptr->right <= pci->hli.hl_gi.btn_ns )
+            if ( button_ptr.right > 0 && button_ptr.right <= pci->hli.hl_gi.btn_ns )
             {
-                i_curr_button = p_button_ptr->right;
+                i_curr_button = button_ptr.right;
                 p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
                 btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
                 if ( button_ptr.auto_action_mode )
@@ -226,10 +226,9 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
         break;
     case ACTIONID_NAV_UP:
         {
-            btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-            if ( p_button_ptr->up > 0 && p_button_ptr->up <= pci->hli.hl_gi.btn_ns )
+            if ( button_ptr.up > 0 && button_ptr.up <= pci->hli.hl_gi.btn_ns )
             {
-                i_curr_button = p_button_ptr->up;
+                i_curr_button = button_ptr.up;
                 p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
                 btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
                 if ( button_ptr.auto_action_mode )
@@ -248,10 +247,9 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
         break;
     case ACTIONID_NAV_DOWN:
         {
-            btni_t *p_button_ptr = &(pci->hli.btnit[i_curr_button-1]);
-            if ( p_button_ptr->down > 0 && p_button_ptr->down <= pci->hli.hl_gi.btn_ns )
+            if ( button_ptr.down > 0 && button_ptr.down <= pci->hli.hl_gi.btn_ns )
             {
-                i_curr_button = p_button_ptr->down;
+                i_curr_button = button_ptr.down;
                 p_sys->dvd_interpretor.SetSPRM( 0x88, i_curr_button );
                 btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
                 if ( button_ptr.auto_action_mode )
@@ -270,8 +268,6 @@ void event_thread_t::HandleKeyEvent( EventInfo const& ev )
         break;
     case ACTIONID_NAV_ACTIVATE:
         {
-            btni_t button_ptr = pci->hli.btnit[i_curr_button-1];
-
             vlc_mutex_unlock( &lock );
             vlc_mutex_lock( &p_sys->lock_demuxer );
 
