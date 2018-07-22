@@ -170,21 +170,21 @@ void event_thread_t::ProcessNavAction( uint16 button, pci_t* pci )
 {
     demux_sys_t* p_sys = (demux_sys_t*)p_demux->p_sys;
 
-    if ( button > 0 && button <= pci->hli.hl_gi.btn_ns )
+    if( button <= 0 || button > pci->hli.hl_gi.btn_ns )
+        return;
+
+    p_sys->dvd_interpretor.SetSPRM( 0x88, button );
+    btni_t button_ptr = pci->hli.btnit[button-1];
+    if ( button_ptr.auto_action_mode )
     {
-        p_sys->dvd_interpretor.SetSPRM( 0x88, button );
-        btni_t button_ptr = pci->hli.btnit[button-1];
-        if ( button_ptr.auto_action_mode )
-        {
-            vlc_mutex_unlock( &lock );
-            vlc_mutex_lock( &p_sys->lock_demuxer );
+        vlc_mutex_unlock( &lock );
+        vlc_mutex_lock( &p_sys->lock_demuxer );
 
-            // process the button action
-            p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
+        // process the button action
+        p_sys->dvd_interpretor.Interpret( button_ptr.cmd.bytes, 8 );
 
-            vlc_mutex_unlock( &p_sys->lock_demuxer );
-            vlc_mutex_lock( &lock );
-        }
+        vlc_mutex_unlock( &p_sys->lock_demuxer );
+        vlc_mutex_lock( &lock );
     }
 }
 
