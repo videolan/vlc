@@ -53,8 +53,7 @@ namespace {
 
 struct sout_access_out_sys_t
 {
-    sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf,
-                          const char *psz_url);
+    sout_access_out_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf);
     ~sout_access_out_sys_t();
 
     void clear();
@@ -90,7 +89,7 @@ struct sout_stream_sys_t
 {
     sout_stream_sys_t(httpd_host_t *httpd_host, intf_sys_t * const intf, bool has_video, int port)
         : httpd_host(httpd_host)
-        , access_out_live(httpd_host, intf, "/stream")
+        , access_out_live(httpd_host, intf)
         , p_out(NULL)
         , p_intf(intf)
         , b_supports_video(has_video)
@@ -386,8 +385,7 @@ static int httpd_url_cb(httpd_callback_sys_t *data, httpd_client_t *cl,
 }
 
 sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
-                                             intf_sys_t * const intf,
-                                             const char *psz_url)
+                                             intf_sys_t * const intf)
     : m_intf(intf)
     , m_client(NULL)
     , m_header(NULL)
@@ -397,7 +395,7 @@ sout_access_out_sys_t::sout_access_out_sys_t(httpd_host_t *httpd_host,
     m_fifo = block_FifoNew();
     if (!m_fifo)
         throw std::runtime_error( "block_FifoNew failed" );
-    m_url = httpd_UrlNew(httpd_host, psz_url, NULL, NULL);
+    m_url = httpd_UrlNew(httpd_host, intf->getHttpStreamPath().c_str(), NULL, NULL);
     if (m_url == NULL)
     {
         block_FifoRelease(m_fifo);
