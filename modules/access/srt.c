@@ -212,6 +212,8 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
     stream_sys_t *p_sys = p_stream->p_sys;
     int i_chunk_size = var_InheritInteger( p_stream, "chunk-size" );
     int i_poll_timeout = var_InheritInteger( p_stream, "poll-timeout" );
+    /* SRT doesn't have a concept of EOF for live streams. */
+    VLC_UNUSED(eof);
 
     if ( vlc_killed() )
     {
@@ -265,10 +267,7 @@ static block_t *BlockSRT(stream_t *p_stream, bool *restrict eof)
             goto out;
         }
 
-        msg_Err( p_stream, "failed to receive packet, set EOS (reason: %s)",
-            srt_getlasterror_str() );
-        *eof = true;
-        break;
+        goto out;
     }
 
     /* if the poll reports errors for any reason at all
