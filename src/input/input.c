@@ -3221,6 +3221,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
                                  enum slave_type i_type, const char *psz_uri,
                                  unsigned i_flags )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     size_t count;
     const char *psz_es;
     const char *psz_forced_demux;
@@ -3268,8 +3269,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
             int64_t i_time;
 
             /* Set position */
-            if( demux_Control( input_priv(p_input)->master->p_demux,
-                               DEMUX_GET_TIME, &i_time ) )
+            if( demux_Control( priv->master->p_demux, DEMUX_GET_TIME, &i_time ) )
             {
                 msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
                 InputSourceDestroy( p_source );
@@ -3289,7 +3289,7 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         InputUpdateMeta( p_input, p_source->p_demux );
     }
 
-    TAB_APPEND( input_priv(p_input)->i_slave, input_priv(p_input)->slave, p_source );
+    TAB_APPEND( priv->i_slave, priv->slave, p_source );
 
     if( !b_forced )
         return VLC_SUCCESS;
@@ -3310,8 +3310,10 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
     {
         const int i_id = list[count].i_int;
 
-        es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID, i_id );
-        es_out_Control( input_priv(p_input)->p_es_out_display, ES_OUT_SET_ES_BY_ID, i_id, false );
+        es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID,
+                        i_id );
+        es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_BY_ID,
+                        i_id, false );
     }
     free(list);
 
