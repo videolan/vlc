@@ -222,6 +222,10 @@ void input_SendEventEsAdd( input_thread_t *p_input,
                            enum es_format_category_e i_cat, int i_id,
                            const char *psz_text )
 {
+    input_thread_private_t *priv = input_priv(p_input);
+    priv->i_last_es_cat = i_cat;
+    priv->i_last_es_id = i_id;
+
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_ES,
         .es = {

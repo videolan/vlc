@@ -161,6 +161,10 @@ typedef struct input_thread_private_t
     int            i_slave;
     input_source_t **slave;
 
+    /* Last ES added */
+    enum es_format_category_e i_last_es_cat;
+    int                       i_last_es_id;
+
     /* Resources */
     input_resource_t *p_resource;
     input_resource_t *p_resource_private;

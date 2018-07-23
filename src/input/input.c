@@ -363,6 +363,8 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     else
         vlc_viewpoint_init( &priv->viewpoint );
 
+    priv->i_last_es_cat = UNKNOWN_ES;
+
     input_item_Hold( p_item ); /* Released in Destructor() */
     priv->p_item = p_item;
 
@@ -3222,32 +3224,30 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
                                  unsigned i_flags )
 {
     input_thread_private_t *priv = input_priv(p_input);
-    size_t count;
-    const char *psz_es;
     const char *psz_forced_demux;
     const bool b_can_fail = i_flags & SLAVE_ADD_CANFAIL;
     const bool b_forced = i_flags & SLAVE_ADD_FORCED;
     const bool b_set_time = i_flags & SLAVE_ADD_SET_TIME;
+    enum es_format_category_e i_cat;
 
     switch( i_type )
     {
     case SLAVE_TYPE_SPU:
-        psz_es = "spu-es";
         psz_forced_demux = "subtitle";
+        i_cat = SPU_ES;
         break;
     case SLAVE_TYPE_AUDIO:
-        psz_es = "audio-es";
         psz_forced_demux = NULL;
+        i_cat = AUDIO_ES;
         break;
     default:
         vlc_assert_unreachable();
     }
 
-    if( b_forced )
-        var_Change( p_input, psz_es, VLC_VAR_CHOICESCOUNT, &count );
+    msg_Dbg( p_input, "loading %s slave: %s (forced: %d)",
+             i_cat == SPU_ES ? "spu" : "audio", psz_uri, b_forced );
 
-    msg_Dbg( p_input, "loading %s slave: %s (forced: %d)", psz_es, psz_uri,
-             b_forced );
+    priv->i_last_es_cat = UNKNOWN_ES;
 
     input_source_t *p_source = InputSourceNew( p_input, psz_uri,
                                                psz_forced_demux,
@@ -3291,31 +3291,15 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
 
     TAB_APPEND( priv->i_slave, priv->slave, p_source );
 
-    if( !b_forced )
+    if( !b_forced || priv->i_last_es_cat != i_cat )
         return VLC_SUCCESS;
 
-    /* Select the ES */
-    vlc_value_t *list;
-    size_t entries;
+    assert( priv->i_last_es_id != -1 );
 
-    if( var_Change( p_input, psz_es, VLC_VAR_GETCHOICES,
-                    &entries, &list, (char ***)NULL ) )
-        return VLC_SUCCESS;
-
-    if( count == 0 )
-        count++;
-    /* if it was first one, there is disable too */
-
-    if( count < entries )
-    {
-        const int i_id = list[count].i_int;
-
-        es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID,
-                        i_id );
-        es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_BY_ID,
-                        i_id, false );
-    }
-    free(list);
+    es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_DEFAULT_BY_ID,
+                    priv->i_last_es_id );
+    es_out_Control( priv->p_es_out_display, ES_OUT_SET_ES_BY_ID,
+                    priv->i_last_es_id, false );
 
     return VLC_SUCCESS;
 }
