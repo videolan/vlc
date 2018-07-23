@@ -35,15 +35,22 @@ namespace sdi_sout
             AbstractStreamOutputBuffer();
             virtual ~AbstractStreamOutputBuffer();
             virtual void FlushQueued() = 0;
-            void Enqueue(void *);
-            void * Dequeue();
+            virtual void Enqueue(void *) = 0;
+            virtual void * Dequeue() = 0;
+    };
+
+    class AbstractQueueStreamOutputBuffer : public AbstractStreamOutputBuffer
+    {
+        public:
+            virtual void Enqueue(void *);
+            virtual void * Dequeue();
 
         private:
             std::mutex queue_mutex;
             std::queue<void *> queued;
     };
 
-    class BlockStreamOutputBuffer : public AbstractStreamOutputBuffer
+    class BlockStreamOutputBuffer : public AbstractQueueStreamOutputBuffer
     {
         public:
             BlockStreamOutputBuffer();
@@ -51,7 +58,7 @@ namespace sdi_sout
             virtual void FlushQueued();
     };
 
-    class PictureStreamOutputBuffer : public AbstractStreamOutputBuffer
+    class PictureStreamOutputBuffer : public AbstractQueueStreamOutputBuffer
     {
         public:
             PictureStreamOutputBuffer();
@@ -134,7 +141,6 @@ namespace sdi_sout
             AbstractStreamOutputBuffer *captionsOutputBuffer;
     };
 
-#   define FRAME_SIZE 1920
     class AudioDecodedStream : public AbstractDecodedStream
     {
         public:

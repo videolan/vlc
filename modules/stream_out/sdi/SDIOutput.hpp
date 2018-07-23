@@ -22,9 +22,12 @@
 
 #include "SDIStream.hpp"
 #include <vlc_common.h>
+#include <list>
 
 namespace sdi_sout
 {
+    class SDIAudioMultiplex;
+
     class SDIOutput
     {
         public:
@@ -45,11 +48,11 @@ namespace sdi_sout
             virtual int ConfigureAudio(const audio_format_t *) = 0;
             sout_stream_t *p_stream;
             VideoDecodedStream *videoStream;
-            AudioDecodedStream *audioStream;
+            std::list<AudioDecodedStream *> audioStreams;
             CaptionsStream *captionsStream;
             PictureStreamOutputBuffer videoBuffer;
-            BlockStreamOutputBuffer audioBuffer;
             BlockStreamOutputBuffer captionsBuffer;
+            SDIAudioMultiplex *audioMultiplex;
 
             struct
             {

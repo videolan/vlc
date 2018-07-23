@@ -23,6 +23,7 @@
 
 #include "SDIOutput.hpp"
 #include "SDIStream.hpp"
+#include "SDIAudioMultiplex.hpp"
 #include "sdiout.hpp"
 
 #include <vlc_sout.h>
@@ -51,15 +52,20 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     ancillary.afd_line = var_InheritInteger(p_stream, CFG_PREFIX "afd-line");
     ancillary.captions_line = 15;
     videoStream = NULL;
-    audioStream = NULL;
     captionsStream = NULL;
+    audioMultiplex = new SDIAudioMultiplex( var_InheritInteger(p_stream, CFG_PREFIX "channels") );
 }
 
 SDIOutput::~SDIOutput()
 {
     videoBuffer.FlushQueued();
-    audioBuffer.FlushQueued();
     captionsBuffer.FlushQueued();
+    while(!audioStreams.empty())
+    {
+        delete audioStreams.front();
+        audioStreams.pop_front();
+    }
+    delete audioMultiplex;
     if(video.pic_nosignal)
         picture_Release(video.pic_nosignal);
     es_format_Clean(&video.configuredfmt);
@@ -80,12 +86,33 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
             videoStream->setCaptionsOutputBuffer(&captionsBuffer);
         }
     }
-    else if(fmt->i_cat == AUDIO_ES && audio.i_channels && !audioStream)
+    else if(fmt->i_cat == AUDIO_ES && audio.i_channels)
     {
-        if(ConfigureAudio(&fmt->audio) == VLC_SUCCESS)
-            s = audioStream = dynamic_cast<AudioDecodedStream *>(createStream(id, fmt, &audioBuffer));
-        if(audioStream)
-            audioStream->setOutputFormat(&audio.configuredfmt);
+        if(audio.configuredfmt.i_codec || ConfigureAudio(&fmt->audio) == VLC_SUCCESS)
+        {
+            std::vector<uint8_t> slots = audioMultiplex->config.getFreeSubFrameSlots();
+            if(slots.size() < 2)
+                return NULL;
+            slots.resize(2);
+            if(!audioMultiplex->config.addMapping(id, slots))
+                return NULL;
+            SDIAudioMultiplexBuffer *buffer = audioMultiplex->config.getBufferForStream(id);
+            if(!buffer)
+                return NULL;
+
+            AudioDecodedStream *audioStream;
+            s = audioStream = dynamic_cast<AudioDecodedStream *>(createStream(id, fmt, buffer));
+            if(audioStream)
+            {
+                audioStream->setOutputFormat(&audio.configuredfmt);
+                audioStreams.push_back(audioStream);
+                for(size_t i=0; i<slots.size(); i++)
+                {
+                    audioMultiplex->config.setSubFrameSlotUsed(slots[i]);
+                    audioMultiplex->SetSubFrameSource(slots[i], buffer, AES3AudioSubFrameIndex(i));
+                }
+            }
+        }
     }
     else if(fmt->i_cat == SPU_ES && !captionsStream)
     {
@@ -107,8 +134,10 @@ void SDIOutput::Del(AbstractStream *s)
     Process();
     if(videoStream == s)
         videoStream = NULL;
-    else if(audioStream == s)
-        audioStream = NULL;
+    else if(dynamic_cast<AudioDecodedStream *>(s))
+    {
+        audioStreams.remove(static_cast<AudioDecodedStream *>(s));
+    }
     else if(captionsStream == s)
         captionsStream = NULL;
     delete s;

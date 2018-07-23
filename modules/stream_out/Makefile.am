@@ -57,8 +57,12 @@ libstream_out_sdi_plugin_la_SOURCES = stream_out/sdi/sdiout.cpp \
         stream_out/sdi/sdiout.hpp \
         stream_out/sdi/Ancillary.cpp \
         stream_out/sdi/Ancillary.hpp \
+        stream_out/sdi/AES3Audio.cpp \
+        stream_out/sdi/AES3Audio.hpp \
         stream_out/sdi/DBMSDIOutput.cpp \
         stream_out/sdi/DBMSDIOutput.hpp \
+        stream_out/sdi/SDIAudioMultiplex.cpp \
+        stream_out/sdi/SDIAudioMultiplex.hpp \
         stream_out/sdi/SDIOutput.cpp \
         stream_out/sdi/SDIOutput.hpp \
         stream_out/sdi/SDIStream.cpp \
