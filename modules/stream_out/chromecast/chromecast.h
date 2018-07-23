@@ -244,7 +244,6 @@ private:
 
 private:
     vlc_object_t  * const m_module;
-    const int      m_streaming_port;
     const int      m_device_port;
     std::string    m_mime;
     std::string    m_device_addr;
@@ -281,7 +280,16 @@ private:
 
     vlc_interrupt_t *m_ctl_thread_interrupt;
 
-    httpd_host_t     *m_httpd_host;
+    struct httpd_info_t {
+        httpd_info_t( httpd_host_t* host, int port );
+        ~httpd_info_t();
+
+        httpd_host_t *m_host;
+        int           m_port;
+        httpd_url_t  *m_url;
+        std::string   m_root;
+    } const m_httpd;
+
     httpd_file_t     *m_httpd_file;
     std::string       m_art_http_ip;
     char             *m_art_url;
