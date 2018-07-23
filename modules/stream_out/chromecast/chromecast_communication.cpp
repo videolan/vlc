@@ -34,12 +34,15 @@
 
 #include <iomanip>
 
-ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module, const char* targetIP, unsigned int devicePort )
+ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
+    std::string serverPath, unsigned int serverPort, const char* targetIP, unsigned int devicePort )
     : m_module( p_module )
     , m_creds( NULL )
     , m_tls( NULL )
     , m_receiver_requestId( 1 )
     , m_requestId( 1 )
+    , m_serverPath( serverPath )
+    , m_serverPort( serverPort )
 {
     if (devicePort == 0)
         devicePort = CHROMECAST_CONTROL_PORT;
@@ -278,8 +281,7 @@ static std::string meta_get_escaped(const vlc_meta_t *p_meta, vlc_meta_type_t ty
     return escape_json(std::string(psz));
 }
 
-std::string ChromecastCommunication::GetMedia( unsigned int i_port,
-                                               const std::string& mime,
+std::string ChromecastCommunication::GetMedia( const std::string& mime,
                                                const vlc_meta_t *p_meta )
 {
     std::stringstream ss;
@@ -341,7 +343,7 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
     }
 
     std::stringstream chromecast_url;
-    chromecast_url << "http://" << m_serverIp << ":" << i_port << "/stream";
+    chromecast_url << "http://" << m_serverIp << ":" << m_serverPort << m_serverPath;
 
     msg_Dbg( m_module, "s_chromecast_url: %s", chromecast_url.str().c_str());
 
@@ -352,13 +354,13 @@ std::string ChromecastCommunication::GetMedia( unsigned int i_port,
     return ss.str();
 }
 
-unsigned ChromecastCommunication::msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
+unsigned ChromecastCommunication::msgPlayerLoad( const std::string& destinationId,
                                              const std::string& mime, const vlc_meta_t *p_meta )
 {
     unsigned id = getNextRequestId();
     std::stringstream ss;
     ss << "{\"type\":\"LOAD\","
-       <<  "\"media\":{" << GetMedia( i_port, mime, p_meta ) << "},"
+       <<  "\"media\":{" << GetMedia( mime, p_meta ) << "},"
        <<  "\"autoplay\":\"false\","
        <<  "\"requestId\":" << id
        << "}";

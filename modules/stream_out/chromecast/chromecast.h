@@ -97,7 +97,9 @@ enum States
 class ChromecastCommunication
 {
 public:
-    ChromecastCommunication( vlc_object_t* module, const char* targetIP, unsigned int devicePort );
+    ChromecastCommunication( vlc_object_t* module,
+                             std::string serverPath, unsigned int serverPort,
+                             const char* targetIP, unsigned int devicePort );
     ~ChromecastCommunication();
     /**
      * @brief disconnect close the connection with the chromecast
@@ -117,7 +119,7 @@ public:
     unsigned msgReceiverGetStatus();
     unsigned msgReceiverClose(const std::string& destinationId);
     unsigned msgAuth();
-    unsigned msgPlayerLoad( const std::string& destinationId, unsigned int i_port,
+    unsigned msgPlayerLoad( const std::string& destinationId,
                             const std::string& mime, const vlc_meta_t *p_meta );
     unsigned msgPlayerPlay( const std::string& destinationId, int64_t mediaSessionId );
     unsigned msgPlayerStop( const std::string& destinationId, int64_t mediaSessionId );
@@ -141,8 +143,7 @@ private:
                      const std::string & destinationId = DEFAULT_CHOMECAST_RECEIVER,
                      castchannel::CastMessage_PayloadType payloadType = castchannel::CastMessage_PayloadType_STRING);
     int pushMediaPlayerMessage( const std::string& destinationId, const std::stringstream & payload );
-    std::string GetMedia( unsigned int i_port, const std::string& mime,
-                          const vlc_meta_t *p_meta );
+    std::string GetMedia( const std::string& mime, const vlc_meta_t *p_meta );
     unsigned getNextReceiverRequestId();
     unsigned getNextRequestId();
 
@@ -153,6 +154,8 @@ private:
     unsigned m_receiver_requestId;
     unsigned m_requestId;
     std::string m_serverIp;
+    const std::string m_serverPath;
+    const unsigned m_serverPort;
 };
 
 /*****************************************************************************
