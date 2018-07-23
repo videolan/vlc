@@ -1112,6 +1112,21 @@ mtime_t intf_sys_t::getPauseDelay()
     return m_pause_delay;
 }
 
+unsigned int intf_sys_t::getHttpStreamPort() const
+{
+    return m_streaming_port;
+}
+
+std::string intf_sys_t::getHttpStreamPath() const
+{
+    return "/stream";
+}
+
+std::string intf_sys_t::getHttpArtRoot() const
+{
+    return "/art";
+}
+
 bool intf_sys_t::isFinishedPlaying()
 {
     return m_cc_eof || isStateError() || m_state == Stopped;
