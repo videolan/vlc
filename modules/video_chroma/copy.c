@@ -473,7 +473,7 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
 
     /* If SSE4.1: CopyFromUswc is faster than memcpy */
     if (!vlc_CPU_SSE4_1() && bitshift == 0 && src_pitch == dst_pitch)
-        memcpy(dst, src, src_pitch * height);
+        memcpy(dst, src, copy_pitch * height);
     else
     for (unsigned y = 0; y < height; y += hstep) {
         const unsigned hblock =  __MIN(hstep, height - y);
@@ -498,6 +498,7 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
                      unsigned int height, uint8_t pixel_size, int bitshift)
 {
     assert(srcu_pitch == srcv_pitch);
+    size_t copy_pitch = __MIN(dst_pitch / 2, srcu_pitch);
     unsigned int const  w16 = (srcu_pitch+15) & ~15;
     unsigned int const  hstep = (cache_size) / (2*w16);
     assert(hstep > 0);
@@ -514,7 +515,7 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
         /* Copy from our cache to the destination */
         SSE_InterleaveUV(dst, dst_pitch, cache, w16,
                          cache + w16 * hblock, w16,
-                         srcu_pitch, hblock, pixel_size);
+                         copy_pitch, hblock, pixel_size);
 
         /* */
         srcu += hblock * srcu_pitch;
@@ -529,6 +530,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
                             uint8_t *cache, size_t cache_size,
                             unsigned height, uint8_t pixel_size, int bitshift)
 {
+    size_t copy_pitch = __MIN(__MIN(src_pitch / 2, dstu_pitch), dstv_pitch);
     const unsigned w16 = (src_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
     assert(hstep > 0);
@@ -541,7 +543,7 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
 
         /* Copy from our cache to the destination */
         SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
-                    cache, w16, src_pitch / 2, hblock, pixel_size);
+                    cache, w16, copy_pitch, hblock, pixel_size);
 
         /* */
         src  += src_pitch  * hblock;
@@ -676,8 +678,9 @@ void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
 }
 
 #define SPLIT_PLANES(type, pitch_den) do { \
+    size_t copy_pitch = __MIN(__MIN(src_pitch / pitch_den, dstu_pitch), dstv_pitch); \
     for (unsigned y = 0; y < height; y++) { \
-        for (unsigned x = 0; x < src_pitch / pitch_den; x++) { \
+        for (unsigned x = 0; x < copy_pitch; x++) { \
             ((type *) dstu)[x] = ((const type *) src)[2*x+0]; \
             ((type *) dstv)[x] = ((const type *) src)[2*x+1]; \
         } \
@@ -688,8 +691,9 @@ void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
 } while(0)
 
 #define SPLIT_PLANES_SHIFTR(type, pitch_den, bitshift) do { \
+    size_t copy_pitch = __MIN(__MIN(src_pitch / pitch_den, dstu_pitch), dstv_pitch); \
     for (unsigned y = 0; y < height; y++) { \
-        for (unsigned x = 0; x < src_pitch / pitch_den; x++) { \
+        for (unsigned x = 0; x < copy_pitch; x++) { \
             ((type *) dstu)[x] = (((const type *) src)[2*x+0]) >> (bitshift); \
             ((type *) dstv)[x] = (((const type *) src)[2*x+1]) >> (bitshift); \
         } \
@@ -700,8 +704,9 @@ void Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
 } while(0)
 
 #define SPLIT_PLANES_SHIFTL(type, pitch_den, bitshift) do { \
+    size_t copy_pitch = __MIN(__MIN(src_pitch / pitch_den, dstu_pitch), dstv_pitch); \
     for (unsigned y = 0; y < height; y++) { \
-        for (unsigned x = 0; x < src_pitch / pitch_den; x++) { \
+        for (unsigned x = 0; x < copy_pitch; x++) { \
             ((type *) dstu)[x] = (((const type *) src)[2*x+0]) << (bitshift); \
             ((type *) dstv)[x] = (((const type *) src)[2*x+1]) << (bitshift); \
         } \
@@ -823,7 +828,7 @@ void Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
               src[0], src_pitch[0], height, 0);
 
     const unsigned copy_lines = (height+1) / 2;
-    const unsigned copy_pitch = src_pitch[1];
+    const unsigned copy_pitch = __MIN(src_pitch[1], dst->p[1].i_pitch / 2);
 
     const int i_extra_pitch_uv = dst->p[1].i_pitch - 2 * copy_pitch;
     const int i_extra_pitch_u  = src_pitch[U_PLANE] - copy_pitch;
