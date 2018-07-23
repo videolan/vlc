@@ -182,6 +182,10 @@ struct intf_sys_t
     void sendInputEvent(enum cc_input_event event, union cc_input_arg arg);
     vlc_tick_t getPauseDelay();
 
+    unsigned int getHttpStreamPort() const;
+    std::string getHttpStreamPath() const;
+    std::string getHttpArtRoot() const;
+
     int httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *pi_data );
     void interrupt_wake_up();
 private:
