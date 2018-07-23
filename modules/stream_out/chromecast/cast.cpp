@@ -1499,7 +1499,6 @@ static int Open(vlc_object_t *p_this)
     sout_stream_sys_t *p_sys = NULL;
     intf_sys_t *p_intf = NULL;
     char *psz_ip = NULL;
-    sout_stream_t *p_sout = NULL;
     httpd_host_t *httpd_host = NULL;
     bool b_supports_video = true;
     int i_local_server_port;
@@ -1541,15 +1540,6 @@ static int Open(vlc_object_t *p_this)
         p_intf = NULL;
         goto error;
     }
-
-    /* check if we can open the proper sout */
-    ss << "http{mux=" << DEFAULT_MUXER << "}";
-    p_sout = sout_StreamChainNew( p_stream->p_sout, ss.str().c_str(), NULL, NULL);
-    if (p_sout == NULL) {
-        msg_Dbg(p_stream, "could not create sout chain:%s", ss.str().c_str());
-        goto error;
-    }
-    sout_StreamChainDelete( p_sout, NULL );
 
     b_supports_video = var_GetBool(p_stream, SOUT_CFG_PREFIX "video");
 
