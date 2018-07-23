@@ -118,8 +118,9 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_pause_delay( VLC_TS_INVALID )
  , m_pingRetriesLeft( PING_WAIT_RETRIES )
 {
-    m_communication = new ChromecastCommunication( p_this, m_device_addr.c_str(),
-                                                   m_device_port );
+    m_communication = new ChromecastCommunication( p_this,
+        getHttpStreamPath(), getHttpStreamPort(),
+        m_device_addr.c_str(), m_device_port );
 
     m_ctl_thread_interrupt = vlc_interrupt_create();
     if( unlikely(m_ctl_thread_interrupt == NULL) )
@@ -223,6 +224,8 @@ void intf_sys_t::reinit()
     try
     {
         m_communication = new ChromecastCommunication( m_module,
+                                                       getHttpStreamPath(),
+                                                       getHttpStreamPort(),
                                                        m_device_addr.c_str(),
                                                        m_device_port );
     } catch (const std::runtime_error& err )
@@ -371,8 +374,7 @@ void intf_sys_t::tryLoad()
     // Reset the mediaSessionID to allow the new session to become the current one.
     // we cannot start a new load when the last one is still processing
     m_last_request_id =
-        m_communication->msgPlayerLoad( m_appTransportId, m_streaming_port,
-                                       m_mime, m_meta );
+        m_communication->msgPlayerLoad( m_appTransportId, m_mime, m_meta );
     if( m_last_request_id != ChromecastCommunication::kInvalidId )
         m_state = Loading;
 }
