@@ -38,6 +38,7 @@
 #include <iomanip>
 
 #include <vlc_stream.h>
+#include <vlc_rand.h>
 
 #include "../../misc/webservices/json.h"
 
@@ -90,7 +91,6 @@ static const char* StateToStr( States s )
 intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device_addr,
                        int device_port, httpd_host_t *httpd_host)
  : m_module(p_this)
- , m_streaming_port(port)
  , m_device_port(device_port)
  , m_device_addr(device_addr)
  , m_last_request_id( 0 )
@@ -109,7 +109,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_cc_eof( false )
  , m_pace( false )
  , m_meta( NULL )
- , m_httpd_host(httpd_host)
+ , m_httpd( httpd_host, port )
  , m_httpd_file(NULL)
  , m_art_url(NULL)
  , m_art_idx(0)
@@ -327,7 +327,7 @@ void intf_sys_t::prepareHttpArtwork()
 
         if( m_httpd_file )
             httpd_FileDelete( m_httpd_file );
-        m_httpd_file = httpd_FileNew( m_httpd_host, ss_art_idx.str().c_str(),
+        m_httpd_file = httpd_FileNew( m_httpd.m_host, ss_art_idx.str().c_str(),
                                       "application/octet-stream", NULL, NULL,
                                       httpd_file_fill_cb, (httpd_file_sys_t *) this );
 
@@ -582,6 +582,34 @@ void intf_sys_t::queueMessage( QueueableMessages msg )
     // Assume lock is held by the called
     m_msgQueue.push( msg );
     vlc_interrupt_raise( m_ctl_thread_interrupt );
+}
+
+intf_sys_t::httpd_info_t::httpd_info_t( httpd_host_t* host, int port )
+    : m_host( host )
+    , m_port( port )
+{
+    for( int i = 0; i < 3; ++i )
+    {
+        std::ostringstream ss;
+        ss << "/chromecast"
+           << "/" << mdate()
+           << "/" << static_cast<uint64_t>( vlc_mrand48() );
+
+        m_root = ss.str();
+        m_url = httpd_UrlNew( m_host, m_root.c_str(), NULL, NULL );
+        if( m_url )
+            break;
+    }
+
+    if( m_url == NULL )
+        throw std::runtime_error( "unable to bind to http path" );
+}
+
+intf_sys_t::httpd_info_t::~httpd_info_t()
+
+{
+    if( m_url )
+        httpd_UrlDelete( m_url );
 }
 
 /*****************************************************************************
@@ -1116,17 +1144,17 @@ mtime_t intf_sys_t::getPauseDelay()
 
 unsigned int intf_sys_t::getHttpStreamPort() const
 {
-    return m_streaming_port;
+    return m_httpd.m_port;
 }
 
 std::string intf_sys_t::getHttpStreamPath() const
 {
-    return "/stream";
+    return m_httpd.m_root + "/stream";
 }
 
 std::string intf_sys_t::getHttpArtRoot() const
 {
-    return "/art";
+    return m_httpd.m_root + "/art";
 }
 
 bool intf_sys_t::isFinishedPlaying()
