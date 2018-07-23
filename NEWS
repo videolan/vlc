@@ -4,25 +4,44 @@ Changes between 3.0.3 and 3.0.4:
 Decoder:
  * Blacklist some intel GPU when decoding HEVC
  * Decode AV1 streams
+ * Fix crashes with LPCM streams
+ * Fix hardware decoding of low-latency sliced H.264 streams on macOS
+ * Fix seeking with streams containing WebVTT subtitles
 
 Demux:
  * Improve FLV fps detection
  * Fix some ogg/flac
+ * Improve support for broken HEVC inside MKV
+ * Fix some AVI regression for broken files
+ * Support files splitted in the .mts%d pattern
+ * Fixes for MKV seeking
+ * Fix for MP4 disabled track selection
 
 Audio Output:
  * Improve iOS session management
  * Improve macOS audio performance
+ * Support 44.1kHz DTS passthrough
+ * Fix crashes on DirectSound output
 
 Video Output:
  * Fix some crash in Direct3D11/Direct3D9 because of sensors
- * Fix some broken DVD subtitles rendering
+ * Fix some broken DVD subtitles rendering (OpenGL, notably)
+ * Fix crashes on old mac machines, after some time
+ * Fix memleaks on the EGL output (Android notably)
 
 Text renderer:
  * Fix rendering of arabic fonts fallback on macOS
+ * Fix head buffer overflow on macOS with some fonts
+ * Fix rendering of fonts with specific fonts
+ * Fix some RTL rendering
 
 Misc:
  * Fix live555, macOS-UI, crash
  * Change the extension registration
+ * Fix VLM 'now' date
+ * Fixes on the HTTPD server
+ * Fix on ntservice registration
+ * Fix --stop-time option
 
 macOS:
  * Fix delay and fps setting in subtitle dialog
