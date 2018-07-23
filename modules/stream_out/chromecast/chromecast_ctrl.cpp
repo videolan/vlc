@@ -310,14 +310,14 @@ void intf_sys_t::prepareHttpArtwork()
     {
         /* Same art: use the previous cached artwork url */
         assert( m_art_idx != 0 );
-        ss_art_idx << "/art" << (m_art_idx - 1);
+        ss_art_idx << getHttpArtRoot() << "/" << (m_art_idx - 1);
     }
     else
     {
         /* New art: create a new httpd file instance with a new url. The
          * artwork has to be different since the CC will cache the content. */
 
-        ss_art_idx << "/art" << m_art_idx;
+        ss_art_idx << getHttpArtRoot() << "/" << m_art_idx;
         m_art_idx++;
 
         vlc_mutex_unlock( &m_lock );
