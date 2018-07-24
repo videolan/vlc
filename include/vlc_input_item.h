@@ -124,9 +124,9 @@ struct input_item_t
 
 #define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */
 
-#define INPUT_DURATION_INVALID   VLC_TICK_INVALID
-#define INPUT_DURATION_ZERO      0
-#define INPUT_DURATION_UNKNOWN   (-1)
+#define INPUT_DURATION_INVALID   VLC_TICK_INVALID /* an item with no duration, like a node/directory */
+#define INPUT_DURATION_ZERO      0     /* an item with a zero duration */
+#define INPUT_DURATION_UNKNOWN   (-1)  /* an item with no duration (live/continuous source) */
 
 enum input_item_net_type
 {
