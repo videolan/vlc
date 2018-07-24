@@ -384,6 +384,21 @@ static int archive_seek_subentry( private_sys_t* p_sys, char const* psz_subentry
     return VLC_SUCCESS;
 }
 
+static int archive_extractor_reset( stream_extractor_t* p_extractor )
+{
+    private_sys_t* p_sys = p_extractor->p_sys;
+
+    if( vlc_stream_Seek( p_extractor->source, 0 )
+        || archive_clean( p_sys )
+        || archive_init( p_sys, p_extractor->source )
+        || archive_seek_subentry( p_sys, p_extractor->identifier ) )
+        return VLC_EGENERIC;
+
+    p_sys->i_offset = 0;
+    p_sys->b_dead = false;
+    return VLC_SUCCESS;
+}
+
 /* ------------------------------------------------------------------------- */
 
 static private_sys_t* setup( vlc_object_t* obj, stream_t* source )
@@ -619,13 +634,9 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 
         if( i_req < i_offset )
         {
-            if( archive_clean( p_sys ) )
-                return VLC_EGENERIC;
-
-            if( archive_init( p_sys, p_extractor->source ) ||
-                archive_seek_subentry( p_sys, p_extractor->identifier ) )
+            if( archive_extractor_reset( p_extractor ) )
             {
-                msg_Err( p_extractor, "unable to recreate libarchive handle" );
+                msg_Err( p_extractor, "unable to reset libarchive handle" );
                 return VLC_EGENERIC;
             }
 
