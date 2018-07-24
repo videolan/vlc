@@ -469,6 +469,7 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
     const size_t copy_pitch = __MIN(src_pitch, dst_pitch);
     const unsigned w16 = (copy_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
+    const unsigned cache_width = __MIN(src_pitch, hstep);
     assert(hstep > 0);
 
     /* If SSE4.1: CopyFromUswc is faster than memcpy */
@@ -479,7 +480,7 @@ static void SSE_CopyPlane(uint8_t *dst, size_t dst_pitch,
         const unsigned hblock =  __MIN(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
-        CopyFromUswc(cache, w16, src, src_pitch, src_pitch, hblock, bitshift);
+        CopyFromUswc(cache, w16, src, src_pitch, cache_width, hblock, bitshift);
 
         /* Copy from our cache to the destination */
         Copy2d(dst, dst_pitch, cache, w16, copy_pitch, hblock);
@@ -501,6 +502,8 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
     size_t copy_pitch = __MIN(dst_pitch / 2, srcu_pitch);
     unsigned int const  w16 = (srcu_pitch+15) & ~15;
     unsigned int const  hstep = (cache_size) / (2*w16);
+    const unsigned cacheu_width = __MIN(srcu_pitch, hstep);
+    const unsigned cachev_width = __MIN(srcv_pitch, hstep);
     assert(hstep > 0);
 
     for (unsigned int y = 0; y < height; y += hstep)
@@ -508,9 +511,9 @@ SSE_InterleavePlanes(uint8_t *dst, size_t dst_pitch,
         unsigned int const      hblock = __MIN(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
-        CopyFromUswc(cache, w16, srcu, srcu_pitch, srcu_pitch, hblock, bitshift);
+        CopyFromUswc(cache, w16, srcu, srcu_pitch, cacheu_width, hblock, bitshift);
         CopyFromUswc(cache+w16*hblock, w16, srcv, srcv_pitch,
-                     srcv_pitch, hblock, bitshift);
+                     cachev_width, hblock, bitshift);
 
         /* Copy from our cache to the destination */
         SSE_InterleaveUV(dst, dst_pitch, cache, w16,
@@ -533,13 +536,14 @@ static void SSE_SplitPlanes(uint8_t *dstu, size_t dstu_pitch,
     size_t copy_pitch = __MIN(__MIN(src_pitch / 2, dstu_pitch), dstv_pitch);
     const unsigned w16 = (src_pitch+15) & ~15;
     const unsigned hstep = cache_size / w16;
+    const unsigned cache_width = __MIN(src_pitch, hstep);
     assert(hstep > 0);
 
     for (unsigned y = 0; y < height; y += hstep) {
         const unsigned hblock =  __MIN(hstep, height - y);
 
         /* Copy a bunch of line into our cache */
-        CopyFromUswc(cache, w16, src, src_pitch, src_pitch, hblock, bitshift);
+        CopyFromUswc(cache, w16, src, src_pitch, cache_width, hblock, bitshift);
 
         /* Copy from our cache to the destination */
         SSE_SplitUV(dstu, dstu_pitch, dstv, dstv_pitch,
