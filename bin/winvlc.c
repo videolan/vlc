@@ -111,6 +111,10 @@ static void PrioritizeSystem32(void)
     SetProcessMitigationPolicy( 10 /* ProcessImageLoadPolicy */, &m, sizeof( m ) );
 }
 
+/*
+ * Export WinMain to force GNU ld to generate a .reloc section
+ */
+__declspec(dllexport)
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
                     LPSTR lpCmdLine,
                     int nCmdShow )
