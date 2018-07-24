@@ -419,6 +419,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_sys->b_access_control = true;
     p_sys->b_access_control = ( VLC_SUCCESS == SetPIDFilter( p_sys, patpid, true ) );
 
     p_sys->i_pmt_es = 0;
