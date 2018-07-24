@@ -134,7 +134,7 @@ struct aout_sys_t
     /* The AudioUnit we use */
     AudioUnit au_unit;
     bool      b_muted;
-    bool      b_paused;
+    bool      b_stopped;
     bool      b_preferred_channels_set;
     enum au_dev au_dev;
 
@@ -375,7 +375,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
      * multi-tasking, the multi-tasking view would still show a playing state
      * despite we are paused, same for lock screen */
 
-    if (pause == p_sys->b_paused)
+    if (pause == p_sys->b_stopped)
         return;
 
     OSStatus err;
@@ -401,7 +401,7 @@ Pause (audio_output_t *p_aout, bool pause, mtime_t date)
             }
         }
     }
-    p_sys->b_paused = pause;
+    p_sys->b_stopped = pause;
     ca_Pause(p_aout, pause, date);
 }
 
@@ -450,7 +450,7 @@ Stop(audio_output_t *p_aout)
 
     [[NSNotificationCenter defaultCenter] removeObserver:p_sys->aoutWrapper];
 
-    if (!p_sys->b_paused)
+    if (!p_sys->b_stopped)
     {
         err = AudioOutputUnitStop(p_sys->au_unit);
         if (err != noErr)
