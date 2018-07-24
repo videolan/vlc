@@ -505,6 +505,9 @@ static int Control( stream_extractor_t* p_extractor, int i_query, va_list args )
             if( p_sys->p_entry == NULL )
                 return VLC_EGENERIC;
 
+            if( !archive_entry_size_is_set( p_sys->p_entry ) )
+                return VLC_EGENERIC;
+
             *va_arg( args, uint64_t* ) = archive_entry_size( p_sys->p_entry );
             break;
 
