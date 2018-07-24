@@ -363,7 +363,7 @@ static int archive_seek_subentry( private_sys_t* p_sys, char const* psz_subentry
         case ARCHIVE_WARN:
             msg_Warn( p_sys->p_obj,
               "libarchive: %s", archive_error_string( p_arc ) );
-
+            /* fall through */
         case ARCHIVE_EOF:
         case ARCHIVE_FATAL:
         case ARCHIVE_RETRY:
