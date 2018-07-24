@@ -162,9 +162,10 @@ static const char *const ppsz_encoding_names[] = {
     N_("Vietnamese (Windows-1258)"),
 };
 
-static const int  pi_justification[] = { 0, 1, 2 };
+static const int  pi_justification[] = { -1, 0, 1, 2 };
 static const char *const ppsz_justification_text[] = {
-    N_("Center"),N_("Left"),N_("Right")};
+    N_("Auto"),N_("Center"),N_("Left"),N_("Right")
+};
 
 #define ENCODING_TEXT N_("Subtitle text encoding")
 #define ENCODING_LONGTEXT N_("Set the encoding used in text subtitles")
@@ -242,7 +243,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = 0;
 
     /* init of p_sys */
-    p_sys->i_align = 0;
+    p_sys->i_align = -1;
     p_sys->iconv_handle = (vlc_iconv_t)-1;
     p_sys->b_autodetect_utf8 = false;
 
@@ -461,11 +462,24 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
     subpicture_updater_sys_t *p_spu_sys = p_spu->updater.p_sys;
 
-    p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
-    p_spu_sys->region.inner_align = SUBPICTURE_ALIGN_BOTTOM;
-    p_spu_sys->region.p_segments = ParseSubtitles( &p_spu_sys->region.align, psz_subtitle );
-
+    int i_inline_align = -1;
+    p_spu_sys->region.p_segments = ParseSubtitles( &i_inline_align, psz_subtitle );
     free( psz_subtitle );
+    if( p_sys->i_align >= 0 ) /* bottom ; left, right or centered */
+    {
+        p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM | p_sys->i_align;
+        p_spu_sys->region.inner_align = p_sys->i_align;
+    }
+    else if( i_inline_align >= 0 )
+    {
+        p_spu_sys->region.align = i_inline_align;
+        p_spu_sys->region.inner_align = i_inline_align;
+    }
+    else /* default, bottom ; centered */
+    {
+        p_spu_sys->region.align = SUBPICTURE_ALIGN_BOTTOM;
+        p_spu_sys->region.inner_align = 0;
+    }
 
     return p_spu;
 }
@@ -738,7 +752,7 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
     //FIXME: Remove initial allocation? Might make the below code more complicated
     p_first_segment = p_segment = text_segment_New( "" );
 
-    bool b_has_align = false;
+    *pi_align = -1;
 
     /* */
     while( *psz_subtitle )
@@ -938,14 +952,13 @@ static text_segment_t* ParseSubtitles( int *pi_align, const char *psz_subtitle )
                  strchr( psz_subtitle, '}' ) )
         {
             /* Check for forced alignment */
-            if( !b_has_align &&
+            if( *pi_align < 0 &&
                 !strncmp( psz_subtitle, "{\\an", 4 ) && psz_subtitle[4] >= '1' && psz_subtitle[4] <= '9' && psz_subtitle[5] == '}' )
             {
                 static const int pi_vertical[3] = { SUBPICTURE_ALIGN_BOTTOM, 0, SUBPICTURE_ALIGN_TOP };
                 static const int pi_horizontal[3] = { SUBPICTURE_ALIGN_LEFT, 0, SUBPICTURE_ALIGN_RIGHT };
                 const int i_id = psz_subtitle[4] - '1';
 
-                b_has_align = true;
                 *pi_align = pi_vertical[i_id/3] | pi_horizontal[i_id%3];
             }
             /* TODO fr -> rotation */
