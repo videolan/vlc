@@ -203,11 +203,12 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
 
     int i_options;
     vlc_tick_t i_start = 0;
-    vlc_tick_t i_duration = INPUT_DURATION_ZERO;
+    vlc_tick_t i_duration;
     char *ppsz_options[2];
 
     do
     {
+        i_duration = INPUT_DURATION_ZERO;
         i_type = xml_ReaderNextNode( p_xml_reader, &psz_node );
 
         if( i_type == XML_READER_ERROR || i_type == XML_READER_NONE )
