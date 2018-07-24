@@ -577,6 +577,21 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
     return i_ret;
 }
 
+static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t i_skip )
+{
+    while( i_skip )
+    {
+        ssize_t i_read = Read( p_extractor, NULL, i_skip );
+
+        if( i_read < 1 )
+            return VLC_EGENERIC;
+
+        i_skip -= i_read;
+    }
+
+    return VLC_SUCCESS;
+}
+
 static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 {
     private_sys_t* p_sys = p_extractor->p_sys;
@@ -618,18 +633,8 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
             i_offset = 0;
         }
 
-        /* SKIP _DECOMPRESSED_ DATA */
-
-        while( i_skip )
-        {
-            ssize_t i_read = Read( p_extractor, NULL, i_skip );
-
-            if( i_read < 1 )
-                return VLC_EGENERIC;
-
-            i_offset += i_read;
-            i_skip   -= i_read;
-        }
+        if( archive_skip_decompressed( p_extractor, i_skip ) )
+            return VLC_EGENERIC;
     }
 
     p_sys->i_offset = i_req;
