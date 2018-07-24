@@ -341,7 +341,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
             FREENULL( psz_artist );
             FREENULL( psz_album_art );
             i_parsed_duration = 0;
-            i_duration = INPUT_DURATION_INVALID;
+            i_duration = INPUT_DURATION_INDEFINITE;
 
             b_cleanup = false;
         }
