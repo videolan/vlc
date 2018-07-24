@@ -1901,11 +1901,6 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
             /* Session will be started by Late Start code block */
             StopVideoToolbox(p_dec);
-            if (p_dec->fmt_in.i_extra == 0)
-            {
-                /* Clean old parameter sets since they may be corrupt */
-                hxxx_helper_clean(&p_sys->hh);
-            }
 
             vlc_mutex_lock(&p_sys->lock);
             p_sys->vtsession_status = VTSESSION_STATUS_OK;
