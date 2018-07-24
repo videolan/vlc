@@ -610,6 +610,7 @@ static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t 
 static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 {
     private_sys_t* p_sys = p_extractor->p_sys;
+    uint64_t i_orig_offset = p_sys->i_offset;
 
     if( p_sys->b_dead )
         return VLC_EGENERIC;
@@ -645,7 +646,12 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
         }
 
         if( archive_skip_decompressed( p_extractor, i_skip ) )
+        {
+            if( archive_extractor_reset( p_extractor ) ||
+                archive_skip_decompressed( p_extractor, i_orig_offset ) )
+                msg_Err( p_extractor, "unable to reset original offset" );
             return VLC_EGENERIC;
+        }
     }
 
     p_sys->i_offset = i_req;
