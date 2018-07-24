@@ -403,6 +403,8 @@ vlc_tick_t input_item_GetDuration( input_item_t *p_i )
     vlc_tick_t i_duration = p_i->i_duration;
 
     vlc_mutex_unlock( &p_i->lock );
+    if (i_duration == INPUT_DURATION_INDEFINITE)
+        i_duration = 0;
     return i_duration;
 }
 
