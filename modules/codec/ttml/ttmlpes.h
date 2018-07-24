@@ -30,7 +30,7 @@ enum
 
 struct ttml_in_pes_ctx
 {
-    int64_t i_offset; /* relative segment offset to apply */
+    vlc_tick_t i_offset; /* relative segment offset to apply */
     vlc_tick_t i_prev_block_time; /* because blocks are duplicated */
     vlc_tick_t i_prev_segment_start_time; /* because content can overlap */
 };
