@@ -40,7 +40,8 @@ enum
 {
     PROP_0,
     PROP_ALLOCATOR,
-    PROP_ID
+    PROP_ID,
+    PROP_USE_POOL
 };
 
 static guint gst_vlc_video_sink_signals[ LAST_SIGNAL ] = { 0 };
@@ -83,6 +84,11 @@ static void gst_vlc_video_sink_class_init( GstVlcVideoSinkClass *p_klass )
     p_gobject_class->set_property = gst_vlc_video_sink_set_property;
     p_gobject_class->get_property = gst_vlc_video_sink_get_property;
     p_gobject_class->finalize = gst_vlc_video_sink_finalize;
+
+    g_object_class_install_property( G_OBJECT_CLASS( p_klass ), PROP_USE_POOL,
+            g_param_spec_boolean( "use-pool", "Use-Pool", "Use downstream VLC video output pool",
+                FALSE, G_PARAM_READWRITE | GST_PARAM_MUTABLE_READY |
+                G_PARAM_STATIC_STRINGS ));
 
     g_object_class_install_property( G_OBJECT_CLASS( p_klass ), PROP_ALLOCATOR,
             g_param_spec_pointer( "allocator", "Allocator", "VlcPictureAllocator",
@@ -162,6 +168,7 @@ static gboolean gst_vlc_video_sink_setcaps( GstBaseSink *p_basesink,
 
 static void gst_vlc_video_sink_init( GstVlcVideoSink *p_vlc_video_sink )
 {
+    p_vlc_video_sink->b_use_pool = FALSE;
     gst_base_sink_set_sync( GST_BASE_SINK( p_vlc_video_sink), FALSE );
 }
 
@@ -211,7 +218,7 @@ static gboolean gst_vlc_video_sink_propose_allocation( GstBaseSink* p_bsink,
     if( p_caps == NULL )
         goto no_caps;
 
-    if( b_need_pool )
+    if( p_vsink->b_use_pool && b_need_pool )
     {
         GstVideoInfo info;
 
@@ -294,6 +301,12 @@ static void gst_vlc_video_sink_set_property( GObject *p_object, guint i_prop_id,
         }
         break;
 
+        case PROP_USE_POOL:
+        {
+            p_vsink->b_use_pool = g_value_get_boolean( p_value );
+        }
+        break;
+
         default:
         break;
     }
@@ -310,6 +323,10 @@ static void gst_vlc_video_sink_get_property( GObject *p_object, guint i_prop_id,
     {
         case PROP_ALLOCATOR:
             g_value_set_pointer( p_value, p_vsink->p_allocator );
+        break;
+
+        case PROP_USE_POOL:
+            g_value_set_boolean( p_value, p_vsink->b_use_pool );
         break;
 
         default:

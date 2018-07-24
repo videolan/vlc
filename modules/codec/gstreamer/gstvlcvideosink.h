@@ -58,6 +58,7 @@ struct _GstVlcVideoSink
 
     GstAllocator *p_allocator;
     GstVideoInfo vinfo;
+    gboolean b_use_pool;
 
     decoder_t *p_dec;
 
