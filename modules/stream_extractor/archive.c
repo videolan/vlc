@@ -624,6 +624,10 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
     if( !p_sys->b_seekable_source )
         return VLC_EGENERIC;
 
+    if( archive_entry_size_is_set( p_sys->p_entry ) &&
+        (uint64_t)archive_entry_size( p_sys->p_entry ) < i_req )
+        return VLC_EGENERIC;
+
     if( !p_sys->b_seekable_archive
       || archive_seek_data( p_sys->p_archive, i_req, SEEK_SET ) < 0 )
     {
