@@ -497,7 +497,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
         img.stride[plane] = p_pict->p[plane].i_pitch;
     }
 
-    aom_codec_err_t res = aom_codec_encode(ctx, &img, p_pict->date, 1, 0);
+    aom_codec_err_t res = aom_codec_encode(ctx, &img, US_FROM_VLC_TICK(p_pict->date), 1, 0);
     if (res != AOM_CODEC_OK) {
         AOM_ERR(p_enc, ctx, "Failed to encode frame");
         aom_img_free(&img);
@@ -521,7 +521,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
 
             /* FIXME: do this in-place */
             memcpy(p_block->p_buffer, pkt->data.frame.buf, pkt->data.frame.sz);
-            p_block->i_dts = p_block->i_pts = pkt->data.frame.pts;
+            p_block->i_dts = p_block->i_pts = VLC_TICK_FROM_US(pkt->data.frame.pts);
             if (keyframe)
                 p_block->i_flags |= BLOCK_FLAG_TYPE_I;
             block_ChainAppend(&p_out, p_block);
