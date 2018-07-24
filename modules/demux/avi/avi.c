@@ -2891,13 +2891,15 @@ static void AVI_DvHandleAudio( demux_t *p_demux, avi_track_t *tk, block_t *p_fra
     if( tk->p_es_dv_audio && tk->i_dv_audio_rate != (int)fmt.audio.i_rate )
     {
         es_out_Del( p_demux->out, tk->p_es_dv_audio );
-        tk->p_es_dv_audio = es_out_Add( p_demux->out, &fmt );
+        tk->p_es_dv_audio = NULL;
     }
-    else if( !tk->p_es_dv_audio )
+
+    if( !tk->p_es_dv_audio )
     {
         tk->p_es_dv_audio = es_out_Add( p_demux->out, &fmt );
+        tk->i_dv_audio_rate = fmt.audio.i_rate;
     }
-    tk->i_dv_audio_rate = fmt.audio.i_rate;
+
     es_format_Clean( &fmt );
 
     block_t *p_frame_audio = dv_extract_audio( p_frame );
