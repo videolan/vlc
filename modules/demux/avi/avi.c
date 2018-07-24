@@ -749,9 +749,9 @@ static int Open( vlc_object_t * p_this )
             case( AVIFOURCC_iavs):
             case( AVIFOURCC_ivas):
                 msg_Dbg( p_demux, "stream[%u] iavs with handler %4.4s", i, (char *)&p_strh->i_handler );
-                es_format_Init( &tk->fmt, VIDEO_ES, p_strh->i_handler );
+                es_format_Init( &tk->fmt, VIDEO_ES, AVI_FourccGetCodec( VIDEO_ES, p_strh->i_handler ) );
                 tk->i_samplesize = 0;
-                tk->i_dv_audio_rate = p_strh->i_handler == VLC_CODEC_DV ? -1 : 0;
+                tk->i_dv_audio_rate = tk->fmt.i_codec == VLC_CODEC_DV ? -1 : 0;
 
                 tk->fmt.video.i_visible_width =
                 tk->fmt.video.i_width  = p_avih->i_width;
