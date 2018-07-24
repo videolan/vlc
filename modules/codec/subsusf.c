@@ -437,11 +437,16 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
             }
         }
 
+        /* Set default or user align/magin.
+         * Style overriden if no user value. */
+        p_text_region->i_x = i_sys_align > 0 ? 20 : 0;
+        p_text_region->i_y = 10;
+        p_text_region->i_align = SUBPICTURE_ALIGN_BOTTOM |
+                                 ((i_sys_align > 0) ? i_sys_align : 0);
+
         if( p_ssa_style )
         {
             msg_Dbg( p_dec, "style is: %s", p_ssa_style->psz_stylename );
-
-            p_text_region->i_align = p_ssa_style->i_align;
 
             /* TODO: Setup % based offsets properly, without adversely affecting
              *       everything else in vlc. Will address with separate patch,
@@ -450,15 +455,16 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
                      * p_ssa_style->i_margin_percent_h;
                      * p_ssa_style->i_margin_percent_v;
              */
-            p_text_region->i_x         = p_ssa_style->i_margin_h;
-            p_text_region->i_y         = p_ssa_style->i_margin_v;
+            if( i_sys_align == -1 )
+            {
+                p_text_region->i_align     = p_ssa_style->i_align;
+                p_text_region->i_x         = p_ssa_style->i_margin_h;
+                p_text_region->i_y         = p_ssa_style->i_margin_v;
+            }
             p_text_region->p_text = text_segment_NewInheritStyle( p_ssa_style->p_style );
         }
         else
         {
-            p_text_region->i_align = SUBPICTURE_ALIGN_BOTTOM | i_sys_align;
-            p_text_region->i_x = i_sys_align ? 20 : 0;
-            p_text_region->i_y = 10;
             p_text_region->p_text = text_segment_New( NULL );
         }
         /* Look for position arguments which may override the style-based
