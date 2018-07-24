@@ -628,12 +628,11 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
                               " '%s' (falling back to dumb seek)",
             archive_error_string( p_sys->p_archive ) );
 
-        uint64_t i_offset = p_sys->i_offset;
-        uint64_t i_skip   = i_req - i_offset;
+        uint64_t i_skip = i_req - p_sys->i_offset;
 
         /* RECREATE LIBARCHIVE HANDLE IF WE ARE SEEKING BACKWARDS */
 
-        if( i_req < i_offset )
+        if( i_req < p_sys->i_offset )
         {
             if( archive_extractor_reset( p_extractor ) )
             {
@@ -642,7 +641,6 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
             }
 
             i_skip = i_req;
-            i_offset = 0;
         }
 
         if( archive_skip_decompressed( p_extractor, i_skip ) )
