@@ -600,7 +600,7 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
         uint64_t i_offset = p_sys->i_offset;
         uint64_t i_skip   = i_req - i_offset;
 
-        /* RECREATE LIBARCHIE HANDLE IF WE ARE SEEKING BACKWARDS */
+        /* RECREATE LIBARCHIVE HANDLE IF WE ARE SEEKING BACKWARDS */
 
         if( i_req < i_offset )
         {
