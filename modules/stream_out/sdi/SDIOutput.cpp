@@ -49,14 +49,17 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     ancillary.afd = var_InheritInteger(p_stream, CFG_PREFIX "afd");
     ancillary.ar = var_InheritInteger(p_stream, CFG_PREFIX "ar");
     ancillary.afd_line = var_InheritInteger(p_stream, CFG_PREFIX "afd-line");
+    ancillary.captions_line = 15;
     videoStream = NULL;
     audioStream = NULL;
+    captionsStream = NULL;
 }
 
 SDIOutput::~SDIOutput()
 {
     videoBuffer.FlushQueued();
     audioBuffer.FlushQueued();
+    captionsBuffer.FlushQueued();
     if(video.pic_nosignal)
         picture_Release(video.pic_nosignal);
     es_format_Clean(&video.configuredfmt);
@@ -72,7 +75,10 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
         if(ConfigureVideo(&fmt->video) == VLC_SUCCESS)
             s = videoStream = dynamic_cast<VideoDecodedStream *>(createStream(id, fmt, &videoBuffer));
         if(videoStream)
+        {
             videoStream->setOutputFormat(&video.configuredfmt);
+            videoStream->setCaptionsOutputBuffer(&captionsBuffer);
+        }
     }
     else if(fmt->i_cat == AUDIO_ES && audio.i_channels && !audioStream)
     {
@@ -80,6 +86,10 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
             s = audioStream = dynamic_cast<AudioDecodedStream *>(createStream(id, fmt, &audioBuffer));
         if(audioStream)
             audioStream->setOutputFormat(&audio.configuredfmt);
+    }
+    else if(fmt->i_cat == SPU_ES && !captionsStream)
+    {
+        s = captionsStream = dynamic_cast<CaptionsStream *>(createStream(id, fmt, &captionsBuffer));
     }
     return s;
 }
@@ -99,6 +109,8 @@ void SDIOutput::Del(AbstractStream *s)
         videoStream = NULL;
     else if(audioStream == s)
         audioStream = NULL;
+    else if(captionsStream == s)
+        captionsStream = NULL;
     delete s;
 }
 
@@ -116,6 +128,8 @@ AbstractStream *SDIOutput::createStream(const StreamID &id,
         s = new VideoDecodedStream(VLC_OBJECT(p_stream), id, buffer);
     else if(fmt->i_cat == AUDIO_ES)
         s = new AudioDecodedStream(VLC_OBJECT(p_stream), id, buffer);
+    else if(fmt->i_cat == SPU_ES)
+        s = new CaptionsStream(VLC_OBJECT(p_stream), id, buffer);
     else
         s = NULL;
 

@@ -44,6 +44,18 @@ namespace sdi
             uint8_t ar;
     };
 
+    class Captions : public Ancillary
+    {
+        public:
+            Captions(const uint8_t *, size_t, unsigned, unsigned);
+            virtual ~Captions();
+            virtual void FillBuffer(uint8_t *, size_t);
+
+        private:
+            const uint8_t *p_data;
+            size_t i_data;
+            unsigned rate;
+    };
 }
 
 #endif // ANCILLARY_HPP

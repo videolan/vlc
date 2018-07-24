@@ -39,7 +39,7 @@ namespace sdi_sout
             virtual int Process(); /* impl */
 
         protected:
-            int ProcessVideo(picture_t *);
+            int ProcessVideo(picture_t *, block_t *);
             int ProcessAudio(block_t *);
             virtual int ConfigureVideo(const video_format_t *); /* impl */
             virtual int ConfigureAudio(const audio_format_t *); /* impl */
@@ -59,7 +59,7 @@ namespace sdi_sout
             const char *ErrorToString(long i_code);
             IDeckLinkDisplayMode * MatchDisplayMode(const video_format_t *,
                                                     BMDDisplayMode = bmdDisplayModeNotSupported);
-            int doProcessVideo(picture_t *);
+            int doProcessVideo(picture_t *, block_t *);
             picture_t * CreateNoSignalPicture(const char*, const video_format_t *);
     };
 }

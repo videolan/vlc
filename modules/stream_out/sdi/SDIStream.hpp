@@ -23,6 +23,7 @@
 #include <vlc_common.h>
 #include <vlc_filter.h>
 #include <vlc_aout.h>
+#include <vlc_codec.h>
 #include <queue>
 #include <mutex>
 
@@ -118,14 +119,19 @@ namespace sdi_sout
                                AbstractStreamOutputBuffer *);
             virtual ~VideoDecodedStream();
             virtual void setCallbacks();
+            void setCaptionsOutputBuffer(AbstractStreamOutputBuffer *);
 
         private:
             static void VideoDecCallback_queue(decoder_t *, picture_t *);
+            static void VideoDecCallback_queue_cc( decoder_t *, block_t *,
+                                                   const decoder_cc_desc_t * );
             static int VideoDecCallback_update_format(decoder_t *);
             static picture_t *VideoDecCallback_new_buffer(decoder_t *);
             filter_chain_t * VideoFilterCreate(const es_format_t *);
             void Output(picture_t *);
+            void QueueCC(block_t *);
             filter_chain_t *p_filters_chain;
+            AbstractStreamOutputBuffer *captionsOutputBuffer;
     };
 
 #   define FRAME_SIZE 1920
@@ -143,6 +149,24 @@ namespace sdi_sout
             aout_filters_t *AudioFiltersCreate(const es_format_t *);
             void Output(block_t *);
             aout_filters_t *p_filters;
+    };
+
+    class CaptionsStream : public AbstractStream
+    {
+        public:
+            CaptionsStream(vlc_object_t *, const StreamID &,
+                           AbstractStreamOutputBuffer *);
+            virtual ~CaptionsStream();
+            virtual bool init(const es_format_t *); /* impl */
+            virtual int Send(block_t*);
+            virtual void Flush();
+            virtual void Drain();
+
+        protected:
+            void FlushQueued();
+
+        private:
+            void Output(block_t *);
     };
 }
 

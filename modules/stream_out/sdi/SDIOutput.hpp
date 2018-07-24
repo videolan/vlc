@@ -46,8 +46,10 @@ namespace sdi_sout
             sout_stream_t *p_stream;
             VideoDecodedStream *videoStream;
             AudioDecodedStream *audioStream;
+            CaptionsStream *captionsStream;
             PictureStreamOutputBuffer videoBuffer;
             BlockStreamOutputBuffer audioBuffer;
+            BlockStreamOutputBuffer captionsBuffer;
 
             struct
             {
@@ -67,6 +69,7 @@ namespace sdi_sout
             {
                 uint8_t afd, ar;
                 unsigned afd_line;
+                unsigned captions_line;
             } ancillary;
 
         private:
