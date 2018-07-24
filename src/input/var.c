@@ -230,11 +230,11 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     {
         *end = vstr.ptr;
         item->i_options = end - orig_beg + 1;
-        vlc_mutex_unlock( &priv->p_item->lock );
+        vlc_mutex_unlock( &item->lock );
     }
     else /* nothing removed, add the usual way */
     {
-        vlc_mutex_unlock( &priv->p_item->lock );
+        vlc_mutex_unlock( &item->lock );
         input_item_AddOption( item, vstr.ptr, VLC_INPUT_OPTION_UNIQUE );
         free( vstr.ptr );
     }
