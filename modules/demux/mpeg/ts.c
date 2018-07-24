@@ -1876,6 +1876,7 @@ static void ReadyQueuesPostSeek( demux_t *p_demux )
                 p_es->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
 
             pid->i_cc = 0xff;
+            pid->i_dup = 0;
 
             if( pid->u.p_stream->prepcr.p_head )
             {
