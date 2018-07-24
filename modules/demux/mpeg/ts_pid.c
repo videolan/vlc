@@ -175,6 +175,7 @@ static void PIDReset( ts_pid_t *pid )
     pid->i_dup      = 0;
     pid->i_flags    &= ~FLAG_SCRAMBLED;
     pid->type = TYPE_FREE;
+    memset(pid->prevpktbytes, 0, PREVPKTKEEPBYTES);
 }
 
 bool PIDSetup( demux_t *p_demux, ts_pid_type_t i_type, ts_pid_t *pid, ts_pid_t *p_parent )

@@ -49,6 +49,7 @@ enum
 
 #define SEEN(x) ((x)->i_flags & FLAG_SEEN)
 #define SCRAMBLED(x) ((x).i_flags & FLAG_SCRAMBLED)
+#define PREVPKTKEEPBYTES 16
 
 struct ts_pid_t
 {
@@ -58,6 +59,7 @@ struct ts_pid_t
     uint8_t     i_cc;   /* countinuity counter */
     uint8_t     i_dup;  /* duplicate counter */
     uint8_t     type;
+    uint8_t     prevpktbytes[PREVPKTKEEPBYTES];
 
     uint16_t    i_refcount;
 
