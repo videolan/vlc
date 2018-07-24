@@ -186,7 +186,7 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
 
-    add_integer( "subsdec-align", 0, ALIGN_TEXT, ALIGN_LONGTEXT,
+    add_integer( "subsdec-align", -1, ALIGN_TEXT, ALIGN_LONGTEXT,
                  false )
         change_integer_list( pi_justification, ppsz_justification_text )
     add_string( "subsdec-encoding", "",
