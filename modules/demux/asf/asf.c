@@ -263,9 +263,6 @@ static int Demux( demux_t *p_demux )
                 if( DemuxInit( p_demux ) )
                 {
                     msg_Err( p_demux, "failed to load the new header" );
-                    vlc_dialog_display_error( p_demux,
-                        _("Could not demux ASF stream"), "%s",
-                        _("VLC failed to load the ASF header.") );
                     return VLC_DEMUXER_EOF;
                 }
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
