@@ -486,6 +486,26 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
     }
 }
 
+int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
+                        input_item_meta_request_option_t i_options,
+                        int timeout, void *id)
+{
+    libvlc_priv_t *priv = libvlc_priv(libvlc);
+
+    if (unlikely(priv->parser == NULL))
+        return VLC_ENOMEM;
+
+    if( i_options & META_REQUEST_OPTION_DO_INTERACT )
+    {
+        vlc_mutex_lock( &item->lock );
+        item->b_preparse_interact = true;
+        vlc_mutex_unlock( &item->lock );
+    }
+    playlist_preparser_Push( priv->parser, item, i_options, timeout, id );
+    return VLC_SUCCESS;
+
+}
+
 /**
  * Requests extraction of the meta data for an input item (a.k.a. preparsing).
  * The actual extraction is asynchronous. It can be cancelled with
