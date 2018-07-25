@@ -1286,26 +1286,22 @@ static void DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     assert( p_spu );
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    if( p_owner->p_vout )
+    /* The vout must be created from a previous decoder_NewSubpicture call. */
+    assert( p_owner->p_vout );
+
+    /* Preroll does not work very well with subtitle */
+    vlc_mutex_lock( &p_owner->lock );
+    if( p_spu->i_start != VLC_TICK_INVALID &&
+        p_spu->i_start < p_owner->i_preroll_end &&
+        ( p_spu->i_stop == VLC_TICK_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
     {
-        /* Preroll does not work very well with subtitle */
-        vlc_mutex_lock( &p_owner->lock );
-        if( p_spu->i_start != VLC_TICK_INVALID &&
-            p_spu->i_start < p_owner->i_preroll_end &&
-            ( p_spu->i_stop == VLC_TICK_INVALID || p_spu->i_stop < p_owner->i_preroll_end ) )
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            subpicture_Delete( p_spu );
-        }
-        else
-        {
-            vlc_mutex_unlock( &p_owner->lock );
-            DecoderPlaySpu( p_dec, p_spu );
-        }
+        vlc_mutex_unlock( &p_owner->lock );
+        subpicture_Delete( p_spu );
     }
     else
     {
-        subpicture_Delete( p_spu );
+        vlc_mutex_unlock( &p_owner->lock );
+        DecoderPlaySpu( p_dec, p_spu );
     }
 }
 
