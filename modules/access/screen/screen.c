@@ -263,6 +263,11 @@ static void Close( vlc_object_t *p_this )
 #ifdef SCREEN_MOUSE
     if( p_sys->p_mouse )
         picture_Release( p_sys->p_mouse );
+    if( p_sys->p_blend )
+    {
+        module_unneed( p_sys->p_blend, p_sys->p_blend->p_module );
+        vlc_object_release( p_sys->p_blend );
+    }
 #endif
     free( p_sys );
 }
