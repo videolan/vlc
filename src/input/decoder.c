@@ -1857,7 +1857,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     msg_Dbg( p_dec, "killing decoder fourcc `%4.4s'",
              (char*)&p_dec->fmt_in.i_codec );
 
-    const enum es_format_category_e i_cat =p_dec->fmt_out.i_cat;
+    const enum es_format_category_e i_cat =p_dec->fmt_in.i_cat;
     UnloadDecoder( p_dec );
 
     /* Free all packets still in the decoder fifo. */
@@ -1985,9 +1985,9 @@ static decoder_t *decoder_New( vlc_object_t *p_parent, input_thread_t *p_input,
 
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     p_owner->p_clock = p_clock;
-    assert( p_dec->fmt_out.i_cat != UNKNOWN_ES );
+    assert( p_dec->fmt_in.i_cat != UNKNOWN_ES );
 
-    if( p_dec->fmt_out.i_cat == AUDIO_ES )
+    if( p_dec->fmt_in.i_cat == AUDIO_ES )
         i_priority = VLC_THREAD_PRIORITY_AUDIO;
     else
         i_priority = VLC_THREAD_PRIORITY_VIDEO;
@@ -2075,7 +2075,7 @@ void input_DecoderDelete( decoder_t *p_dec )
      *
      * This unblocks the thread, allowing the decoder module to join all its
      * worker threads (if any) and the decoder thread to terminate. */
-    if( p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
+    if( p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout != NULL )
         vout_Cancel( p_owner->p_vout, true );
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -2464,10 +2464,10 @@ void input_DecoderGetObjects( decoder_t *p_dec,
 
     vlc_mutex_lock( &p_owner->lock );
     if( pp_vout )
-        *pp_vout = p_dec->fmt_out.i_cat == VIDEO_ES && p_owner->p_vout ?
+        *pp_vout = p_dec->fmt_in.i_cat == VIDEO_ES && p_owner->p_vout ?
             vlc_object_hold( p_owner->p_vout ) : NULL;
     if( pp_aout )
-        *pp_aout = p_dec->fmt_out.i_cat == AUDIO_ES && p_owner->p_aout ?
+        *pp_aout = p_dec->fmt_in.i_cat == AUDIO_ES && p_owner->p_aout ?
             vlc_object_hold( p_owner->p_aout ) : NULL;
     vlc_mutex_unlock( &p_owner->lock );
 }
@@ -2476,7 +2476,7 @@ void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event
                                     void *user_data )
 {
     struct decoder_owner *owner = dec_get_owner( dec );
-    assert( dec->fmt_out.i_cat == VIDEO_ES );
+    assert( dec->fmt_in.i_cat == VIDEO_ES );
 
     vlc_mutex_lock( &owner->mouse_lock );
 
@@ -2490,7 +2490,7 @@ int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
                                  int *channel )
 {
     struct decoder_owner *owner = dec_get_owner( dec );
-    assert( dec->fmt_out.i_cat == VIDEO_ES );
+    assert( dec->fmt_in.i_cat == VIDEO_ES );
     assert( sub && channel );
 
     vlc_mutex_lock( &owner->lock );
@@ -2513,7 +2513,7 @@ int input_DecoderAddVoutOverlay( decoder_t *dec, subpicture_t *sub,
 int input_DecoderFlushVoutOverlay( decoder_t *dec, int channel )
 {
     struct decoder_owner *owner = dec_get_owner( dec );
-    assert( dec->fmt_out.i_cat == VIDEO_ES );
+    assert( dec->fmt_in.i_cat == VIDEO_ES );
 
     vlc_mutex_lock( &owner->lock );
 
@@ -2532,7 +2532,7 @@ int input_DecoderSetSpuHighlight( decoder_t *dec,
                                   const vlc_spu_highlight_t *spu_hl )
 {
     struct decoder_owner *p_owner = dec_get_owner( dec );
-    assert( dec->fmt_out.i_cat == SPU_ES );
+    assert( dec->fmt_in.i_cat == SPU_ES );
 
     vlc_mutex_lock( &p_owner->lock );
     if( !p_owner->p_vout )
