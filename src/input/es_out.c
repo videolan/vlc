@@ -2602,7 +2602,9 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
                     EsOutControlLocked( out, ES_OUT_RESET_PCR );
                 }
 
-                es_out_SetJitter( out, i_pts_delay_base, i_pts_delay - i_pts_delay_base, p_sys->i_cr_average );
+                EsOutControlLocked( out, ES_OUT_SET_JITTER, i_pts_delay_base,
+                                    i_pts_delay - i_pts_delay_base,
+                                    p_sys->i_cr_average );
             }
         }
         return VLC_SUCCESS;
