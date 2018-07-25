@@ -26,6 +26,7 @@
 
 #include <vlc_common.h>
 #include <vlc_mouse.h>
+#include "../video_output/vout_internal.h"
 
 /**
  * This function set the associated input.
@@ -40,10 +41,8 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t
 /**
  * This function handles vout request.
  */
-vout_thread_t *input_resource_RequestVout( input_resource_t *, vout_thread_t *,
-                                           const video_format_t *, unsigned dpb_size,
-                                           vlc_mouse_event  mouse_event,
-                                           void *mouse_event_data, bool b_recycle );
+vout_thread_t *input_resource_RequestVout( input_resource_t *,
+                                           const vout_configuration_t *, bool );
 
 /**
  * This function returns one of the current vout if any.
