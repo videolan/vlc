@@ -625,6 +625,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     /* Video */
     var_Create (mp, "vout", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     var_Create (mp, "window", VLC_VAR_STRING);
+    var_Create (mp, "gl", VLC_VAR_STRING);
+    var_Create (mp, "gles2", VLC_VAR_STRING);
     var_Create (mp, "vmem-lock", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-unlock", VLC_VAR_ADDRESS);
     var_Create (mp, "vmem-display", VLC_VAR_ADDRESS);
@@ -635,6 +637,15 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "vmem-width", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-height", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
     var_Create (mp, "vmem-pitch", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+
+    var_Create( mp, "vgl-opaque", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-setup-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-cleanup-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-resize-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-swap-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-get-proc-address-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vgl-make-current-cb", VLC_VAR_ADDRESS );
+
     var_Create (mp, "avcodec-hw", VLC_VAR_STRING);
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #if defined (_WIN32) || defined (__OS2__)
@@ -1147,6 +1158,44 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
     var_SetInteger( mp, "vmem-height", height );
     var_SetInteger( mp, "vmem-pitch", pitch );
 }
+
+void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_gl_engine_t gl_engine,
+                                        libvlc_gl_setup_cb setup_cb,
+                                        libvlc_gl_cleanup_cb cleanup_cb,
+                                        libvlc_gl_resize_cb resize_cb,
+                                        libvlc_gl_swap_cb swap_cb,
+                                        libvlc_gl_makeCurrent_cb makeCurrent_cb,
+                                        libvlc_gl_getProcAddress_cb getProcAddress_cb,
+                                        void* opaque )
+{
+#ifdef __ANDROID__
+    //use the default android window
+    var_SetString( mp, "window", "");
+#else
+    var_SetString( mp, "window", "wdummy");
+#endif
+
+    if( gl_engine == libvlc_gl_engine_gles2 )
+    {
+        var_SetString ( mp, "vout", "gles2" );
+        var_SetString ( mp, "gles2", "vgl" );
+    }
+    else
+    {
+        var_SetString ( mp, "vout", "gl" );
+        var_SetString ( mp, "gl", "vgl");
+    }
+
+    var_SetAddress( mp, "vgl-opaque", opaque );
+    var_SetAddress( mp, "vgl-setup-cb", setup_cb );
+    var_SetAddress( mp, "vgl-cleanup-cb", cleanup_cb );
+    var_SetAddress( mp, "vgl-resize-cb", resize_cb );
+    var_SetAddress( mp, "vgl-swap-cb", swap_cb );
+    var_SetAddress( mp, "vgl-get-proc-address-cb", getProcAddress_cb );
+    var_SetAddress( mp, "vgl-make-current-cb", makeCurrent_cb );
+}
+
 
 /**************************************************************************
  * set_nsobject

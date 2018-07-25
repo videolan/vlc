@@ -243,6 +243,7 @@ libvlc_video_set_crop_geometry
 libvlc_video_set_deinterlace
 libvlc_video_set_format
 libvlc_video_set_format_callbacks
+libvlc_video_set_opengl_callbacks
 libvlc_video_set_key_input
 libvlc_video_set_logo_int
 libvlc_video_set_logo_string
