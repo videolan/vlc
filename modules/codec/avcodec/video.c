@@ -462,6 +462,13 @@ static int OpenVideoCodec( decoder_t *p_dec )
     cc_Init( &p_sys->cc );
 
     set_video_color_settings( &p_dec->fmt_in.video, ctx );
+    if( p_dec->fmt_in.video.i_frame_rate_base &&
+        p_dec->fmt_in.video.i_frame_rate &&
+        (double) p_dec->fmt_in.video.i_frame_rate /
+                 p_dec->fmt_in.video.i_frame_rate_base < 6 )
+    {
+        ctx->flags |= AV_CODEC_FLAG_LOW_DELAY;
+    }
 
     post_mt( p_sys );
     ret = ffmpeg_OpenCodec( p_dec, ctx, codec );
