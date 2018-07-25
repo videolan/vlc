@@ -25,6 +25,8 @@
 #ifndef LIBVLC_LIBVLC_H
 # define LIBVLC_LIBVLC_H 1
 
+#include <vlc_input_item.h>
+
 extern const char psz_vlc_changeset[];
 
 typedef struct variable_t variable_t;
@@ -199,6 +201,10 @@ static inline libvlc_priv_t *libvlc_priv (libvlc_int_t *libvlc)
 int intf_InsertItem(libvlc_int_t *, const char *mrl, unsigned optc,
                     const char * const *optv, unsigned flags);
 void intf_DestroyAll( libvlc_int_t * );
+
+int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
+                        input_item_meta_request_option_t i_options,
+                        int timeout, void *id);
 
 /*
  * Variables stuff
