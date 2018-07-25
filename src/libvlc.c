@@ -507,11 +507,9 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
     vlc_mutex_lock( &item->lock );
     if( item->i_preparse_depth == 0 )
         item->i_preparse_depth = 1;
-    if( i_options & META_REQUEST_OPTION_DO_INTERACT )
-        item->b_preparse_interact = true;
     vlc_mutex_unlock( &item->lock );
-    input_preparser_Push( priv->parser, item, i_options, timeout, id );
-    return VLC_SUCCESS;
+
+    return vlc_MetadataRequest(libvlc, item, i_options, timeout, id);
 }
 
 /**
