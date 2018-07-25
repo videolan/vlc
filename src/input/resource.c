@@ -234,7 +234,6 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         /* */
         vout_configuration_t cfg = {
             .vout       = p_vout,
-            .change_fmt = true,
             .fmt        = p_fmt,
             .dpb_size   = dpb_size,
             .mouse_event= mouse_event,
@@ -280,7 +279,6 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 
             vout_configuration_t cfg = {
                 .vout       = p_vout,
-                .change_fmt = false,
                 .fmt        = NULL,
                 .dpb_size   = 0,
                 .mouse_event= NULL,

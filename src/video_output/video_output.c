@@ -230,11 +230,6 @@ vout_thread_t *vout_Request(vlc_object_t *object,
                             input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
-    if (cfg->change_fmt && !cfg->fmt) {
-        if (vout)
-            vout_CloseAndRelease(vout);
-        return NULL;
-    }
 
     /* If a vout is provided, try reusing it */
     if (vout) {
@@ -252,7 +247,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_control_Push(&vout->p->control, &cmd);
         vout_control_WaitEmpty(&vout->p->control);
 
-        if (cfg->change_fmt)
+        if (cfg->fmt)
             vout_IntfReinit(vout);
 
         if (!vout->p->dead) {
@@ -1608,7 +1603,7 @@ static int ThreadReinit(vout_thread_t *vout,
 {
     video_format_t original;
 
-    if (!cfg->change_fmt)
+    if (!cfg->fmt)
     {
         vout->p->mouse_event = NULL;
         vout->p->opaque = NULL;

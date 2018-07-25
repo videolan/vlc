@@ -46,7 +46,6 @@
  */
 typedef struct {
     vout_thread_t        *vout;
-    bool                 change_fmt;
     const video_format_t *fmt;
     unsigned             dpb_size;
     vlc_mouse_event      mouse_event;
