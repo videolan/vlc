@@ -73,6 +73,7 @@ struct private_sys_t
 
     struct archive_entry* p_entry;
     bool b_dead;
+    bool b_eof;
 
     uint64_t i_offset;
 
@@ -395,6 +396,7 @@ static int archive_extractor_reset( stream_extractor_t* p_extractor )
         return VLC_EGENERIC;
 
     p_sys->i_offset = 0;
+    p_sys->b_eof = false;
     p_sys->b_dead = false;
     return VLC_SUCCESS;
 }
@@ -570,6 +572,9 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
     if( p_sys->b_dead || p_sys->p_entry == NULL )
         return 0;
 
+    if( p_sys->b_eof )
+        return 0;
+
     i_ret = archive_read_data( p_arc,
       p_data ? p_data :                        dummy_buffer,
       p_data ? i_size : __MIN( i_size, sizeof( dummy_buffer ) ) );
@@ -579,20 +584,26 @@ static ssize_t Read( stream_extractor_t *p_extractor, void* p_data, size_t i_siz
         case ARCHIVE_RETRY:
         case ARCHIVE_FAILED:
             msg_Dbg( p_extractor, "libarchive: %s", archive_error_string( p_arc ) );
-            return -1;
+            goto eof;
 
         case ARCHIVE_WARN:
             msg_Warn( p_extractor, "libarchive: %s", archive_error_string( p_arc ) );
-            return -1;
+            goto eof;
 
         case ARCHIVE_FATAL:
-            p_sys->b_dead = true;
             msg_Err( p_extractor, "libarchive: %s", archive_error_string( p_arc ) );
-            return 0;
+            goto fatal_error;
     }
 
     p_sys->i_offset += i_ret;
     return i_ret;
+
+fatal_error:
+    p_sys->b_dead = true;
+
+eof:
+    p_sys->b_eof = true;
+    return 0;
 }
 
 static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t i_skip )
