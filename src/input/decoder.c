@@ -611,8 +611,15 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     {
         p_owner->i_spu_channel = vout_RegisterSubpictureChannel( p_vout );
         p_owner->i_spu_order = 0;
+
+        vlc_mutex_lock( &p_owner->lock );
+        if( p_owner->p_vout )
+            vlc_object_release( p_owner->p_vout );
         p_owner->p_vout = p_vout;
+        vlc_mutex_unlock( &p_owner->lock );
     }
+    else
+        vlc_object_release( p_vout );
 
     p_subpic = subpicture_New( p_updater );
     if( p_subpic )
@@ -621,8 +628,6 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
         p_subpic->i_order = p_owner->i_spu_order++;
         p_subpic->b_subtitle = true;
     }
-
-    vlc_object_release( p_vout );
 
     return p_subpic;
 }
@@ -1281,8 +1286,7 @@ static void DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     assert( p_spu );
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
-    if( p_vout && p_owner->p_vout == p_vout )
+    if( p_owner->p_vout )
     {
         /* Preroll does not work very well with subtitle */
         vlc_mutex_lock( &p_owner->lock );
@@ -1303,8 +1307,6 @@ static void DecoderQueueSpu( decoder_t *p_dec, subpicture_t *p_spu )
     {
         subpicture_Delete( p_spu );
     }
-    if( p_vout )
-        vlc_object_release( p_vout );
 }
 
 static void DecoderProcess( decoder_t *p_dec, block_t *p_block );
@@ -1487,15 +1489,7 @@ static void DecoderProcessFlush( decoder_t *p_dec )
     else if( p_dec->fmt_out.i_cat == SPU_ES )
     {
         if( p_owner->p_vout )
-        {
-            vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
-
-            if( p_vout && p_owner->p_vout == p_vout )
-                vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
-
-            if( p_vout )
-                vlc_object_release( p_vout );
-        }
+            vout_FlushSubpictureChannel( p_owner->p_vout, p_owner->i_spu_channel );
     }
 
     vlc_mutex_lock( &p_owner->lock );
@@ -1900,12 +1894,11 @@ static void DeleteDecoder( decoder_t * p_dec )
             break;
         case SPU_ES:
         {
-            vout_thread_t *p_vout = input_resource_HoldVout( p_owner->p_resource );
-            if( p_vout )
+            if( p_owner->p_vout )
             {
-                if( p_owner->p_vout == p_vout )
-                    vout_FlushSubpictureChannel( p_vout, p_owner->i_spu_channel );
-                vlc_object_release( p_vout );
+                vout_FlushSubpictureChannel( p_owner->p_vout,
+                                             p_owner->i_spu_channel );
+                vlc_object_release( p_owner->p_vout );
             }
             break;
         }
