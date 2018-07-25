@@ -13,7 +13,7 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-07-25 13:21+0200\n"
 "Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2018\n"
 "Language-Team: Norwegian Nynorsk (https://www.transifex.com/yaron/"
 "teams/16553/nn/)\n"
@@ -1038,7 +1038,7 @@ msgstr "Videooppløysing"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
-msgstr ""
+msgstr "Bufferdimensjonar"
 
 #: src/input/es_out.c:3183 src/input/es_out.c:3186 modules/access/imem.c:93
 #: modules/access/rdp.c:73 modules/access/screen/screen.c:43
@@ -2018,7 +2018,7 @@ msgstr "Innebygd video"
 
 #: src/libvlc-module.c:309
 msgid "Embed the video output in the main interface."
-msgstr "Innebygg videoutdata i hovudgrensesnittet."
+msgstr "Bygg inn videoutdata i hovudgrensesnittet."
 
 #: src/libvlc-module.c:311
 msgid "Fullscreen video output"
@@ -6223,7 +6223,7 @@ msgstr "Kompositt"
 
 #: modules/access/decklink.cpp:82
 msgid "S-Video"
-msgstr ""
+msgstr "S-Video"
 
 #: modules/access/decklink.cpp:89
 msgid "Embedded"
@@ -6982,7 +6982,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:76
 msgid "Use NIT for scanning services"
-msgstr ""
+msgstr "Bruk NIT for skannetenester"
 
 #: modules/access/dvb/access.c:79
 msgid "DVB"
@@ -7001,7 +7001,7 @@ msgstr ""
 
 #: modules/access/dvb/scan.c:827
 msgid "Scanning DVB"
-msgstr ""
+msgstr "Skannar DVB"
 
 #: modules/access/dvdnav.c:69 modules/access/dvdread.c:68
 msgid "DVD angle"
@@ -8599,7 +8599,7 @@ msgstr "NTSC M Japan"
 
 #: modules/access/v4l2/v4l2.c:256
 msgid "NTSC M South Korea"
-msgstr ""
+msgstr "NTSC M Sør-Korea"
 
 #: modules/access/v4l2/v4l2.c:269
 msgid "Primary language"
@@ -10154,15 +10154,15 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
-msgstr ""
+msgstr "Slått av"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Slått på (berre AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "Slått på"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
@@ -10262,7 +10262,7 @@ msgstr "AES3/SMPTE 302M-lydførpakkar"
 
 #: modules/codec/aom.c:50
 msgid "AOM video decoder"
-msgstr ""
+msgstr "AOM videodekodar"
 
 #: modules/codec/araw.c:51
 msgid "Raw/Log Audio decoder"
@@ -10286,7 +10286,7 @@ msgstr ""
 
 #: modules/codec/audiotoolbox_midi.c:59
 msgid "AUMIDI"
-msgstr ""
+msgstr "AUMIDI"
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
@@ -10298,7 +10298,7 @@ msgstr ""
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
-msgstr ""
+msgstr "Bruk Core Text-oppteiknaren"
 
 #: modules/codec/arib/aribsub.c:49
 msgid "Use Core Text renderer in the subtitle."
@@ -10306,12 +10306,12 @@ msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
-msgstr ""
+msgstr "ARIB undertekstdekodar"
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
 msgid "ARIB subtitles"
-msgstr ""
+msgstr "ARIB-undertekstar"
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10763,11 +10763,11 @@ msgstr "VA-API-videodekodar gjennom DRM"
 
 #: modules/codec/avcodec/vaapi.c:357
 msgid "VA-API video decoder"
-msgstr ""
+msgstr "VA-API-videodekodar"
 
 #: modules/codec/bpg.c:49
 msgid "BPG image decoder"
-msgstr ""
+msgstr "BPG-bildedekodar"
 
 #: modules/codec/cc.c:51 modules/codec/zvbi.c:65
 #: modules/gui/macosx/VLCSimplePrefsController.m:347 modules/spu/marq.c:108
@@ -10950,7 +10950,7 @@ msgstr ""
 
 #: modules/codec/fdkaac.c:68
 msgid "Encoder Algorithm to use."
-msgstr ""
+msgstr "Kodaralgoritme å bruke."
 
 #: modules/codec/fdkaac.c:70
 msgid "Enable spectral band replication"
@@ -12605,7 +12605,7 @@ msgstr "Vorbis audio-kodar"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Kvalitetsmodus"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -14504,7 +14504,7 @@ msgstr ""
 
 #: modules/demux/image.c:61
 msgid "Duration in seconds"
-msgstr ""
+msgstr "Varigheit i sekund"
 
 #: modules/demux/image.c:63
 msgid ""
@@ -15463,7 +15463,6 @@ msgid ""
 msgstr ""
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15474,14 +15473,14 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player er ein fri og open kjeldekode-mediespelar, kodar og "
-"strøymar/kringkastar, som er laga av frivillige i<a href=\"http://www."
-"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
-"\">VideoLAN</span></a>-samfunnet.</p><p>VLC brukar interne kodekar, fungerer "
-"på praktisk talt alle populære platformer, og kan lese nesten alle typar "
-"filer, CD-ar, DVD-ar, nettverksstraumar, opptakskort og adre medieformat!</"
-"p><p><a href=\"http://www.videolan.org/contribute/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">Bli med oss og hjelp til!</span></a>"
+"<p>VLC media player er ein fri og open-kjelde mediespelar, straumkodar og "
+"kringkastar som er lagd av dei frivillige i<a href=\"https://www.videolan."
+"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
+"span></a>-samfunnet.</p><p>VLC brukar sine interne kodeker, fungerer på "
+"praktisk talt alle filar, CDar, DVDar, nettverksstraumar, opptakskort og "
+"anna medieformater!</p><p><a href=\"https://www.videolan.org/contribute/"
+"\"><span style=\" text-decoration: underline; color:#0057ae;\">Bli med oss "
+"og hjelp!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
@@ -16111,9 +16110,8 @@ msgstr "Gå til førre element"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "Avslutt fullskjermmodus"
+msgstr "Avslutt fullskjerm"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16594,11 +16592,11 @@ msgstr "Hopp til tid"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Oppteiknar"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "Ingen oppteiknar"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -18233,7 +18231,7 @@ msgstr ""
 
 #: modules/gui/ncurses.c:920
 msgid " .                      Show/Hide hidden files"
-msgstr ""
+msgstr " .                      Vis/Gøym skjulte filer"
 
 #: modules/gui/ncurses.c:924
 msgid "[Player]"
@@ -18493,7 +18491,7 @@ msgstr "Bildeforhold"
 
 #: modules/gui/qt/components/epg/EPGWidget.cpp:65
 msgid "No EPG Data Available"
-msgstr ""
+msgstr "Ingen EPG-data tilgjengelege"
 
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
@@ -18668,6 +18666,8 @@ msgid ""
 "Information about what your media or stream is made of.\n"
 "Muxer, Audio and Video Codecs, Subtitles are shown."
 msgstr ""
+"Informasjon om kva mediet eller straumen er laga av. Multipleksarar, lyd- og "
+"video-kodek og undertekstar vert viste."
 
 #: modules/gui/qt/components/info_panels.cpp:548
 msgid "Current media / stream statistics"
@@ -18873,7 +18873,7 @@ msgstr ""
 #. xgettext: frames per second
 #: modules/gui/qt/components/open_panels.cpp:1117
 msgid " f/s"
-msgstr ""
+msgstr " b/s"
 
 #: modules/gui/qt/components/open_panels.cpp:1332
 msgid "Advanced Options"
@@ -19119,7 +19119,7 @@ msgstr "Høgare ventetid"
 
 #: modules/gui/qt/components/simple_preferences.cpp:737
 msgid "This is VLC's skinnable interface. You can download other skins at"
-msgstr ""
+msgstr "Dette er VLC i draktform. Du kan laste ned fleire drakter på"
 
 #: modules/gui/qt/components/simple_preferences.cpp:739
 msgid "VLC skins website"
@@ -19190,6 +19190,7 @@ msgstr ""
 #: modules/gui/qt/components/sout/profile_selector.cpp:634
 msgid "This muxer is missing. Using this profile will fail"
 msgstr ""
+"Denne multipleksaren manglar. Det vil ikkje fungere å bruka denne profilen"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:779
 msgid " Profile Name Missing"
@@ -19399,7 +19400,7 @@ msgstr "Justeringar og effektar"
 
 #: modules/gui/qt/dialogs/extended.cpp:80
 msgid "Stereo Widener"
-msgstr ""
+msgstr "Stereo-utvidar"
 
 #: modules/gui/qt/dialogs/extended.cpp:111
 msgid "Synchronization"
@@ -19407,7 +19408,7 @@ msgstr "Synkronisering"
 
 #: modules/gui/qt/dialogs/extended.cpp:116
 msgid "v4l2 controls"
-msgstr ""
+msgstr "v4l2-kontrollar"
 
 #: modules/gui/qt/dialogs/extended.cpp:125
 #: modules/gui/qt/dialogs/preferences.cpp:95
@@ -19416,7 +19417,7 @@ msgstr "&Lagra"
 
 #: modules/gui/qt/dialogs/external.cpp:216
 msgid "Store the Password"
-msgstr ""
+msgstr "Lagra passordet"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19477,8 +19478,8 @@ msgstr ""
 "strøymar/kringkastar, som er laga av frivillige i<a href=\"http://www."
 "videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">VideoLAN</span></a>-samfunnet.</p><p>VLC brukar interne kodekar, fungerer "
-"på praktisk talt alle populære platformer, og kan lese nesten alle typar "
-"filer, CD-ar, DVD-ar, nettverksstraumar, opptakskort og adre medieformat!</"
+"på praktisk talt alle populære platformer, og kan lesa nesten alle typar "
+"filer, CD-ar, DVD-ar, nettverksstraumar, opptakskort og andre medieformat!</"
 "p><p><a href=\"http://www.videolan.org/contribute/\"><span style=\" text-"
 "decoration: underline; color:#0057ae;\">Bli med oss og hjelp til!</span></a>"
 
@@ -19492,7 +19493,7 @@ msgstr "&Ja"
 
 #: modules/gui/qt/dialogs/help.cpp:219
 msgid "&No"
-msgstr ""
+msgstr "&Nei"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:147
 msgid "VLC media player updates"
@@ -19565,14 +19566,16 @@ msgid ""
 "Cannot write to file %1:\n"
 "%2."
 msgstr ""
+"Klarer ikkje å skriva til fila %1:\n"
+"%2."
 
 #: modules/gui/qt/dialogs/messages.cpp:334
 msgid "Update the tree"
-msgstr ""
+msgstr "Oppdater treet"
 
 #: modules/gui/qt/dialogs/messages.cpp:335
 msgid "Clear the messages"
-msgstr ""
+msgstr "Slett meldingane"
 
 #: modules/gui/qt/dialogs/open.cpp:78 modules/gui/qt/menus.cpp:934
 #: modules/gui/qt/menus.cpp:1131
@@ -20073,7 +20076,7 @@ msgstr ""
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
-msgstr ""
+msgstr "&Hald fram"
 
 #: modules/gui/qt/main_interface.cpp:1412
 msgid "Control menu for the player"
@@ -20105,11 +20108,11 @@ msgstr "U&ndertekst"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "V&erktøy"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
-msgstr "&Vis"
+msgstr "Vi&s"
 
 #: modules/gui/qt/menus.cpp:344 modules/gui/qt/menus.cpp:787
 msgid "&Help"
@@ -20145,11 +20148,11 @@ msgstr "Opna &nylege media"
 
 #: modules/gui/qt/menus.cpp:387
 msgid "Conve&rt / Save..."
-msgstr "&Konverter/lagra …"
+msgstr "&Konverter/lagra…"
 
 #: modules/gui/qt/menus.cpp:389
 msgid "&Stream..."
-msgstr "&Strøym"
+msgstr "&Strøym…"
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
@@ -20225,7 +20228,7 @@ msgstr "Statuslinje"
 
 #: modules/gui/qt/menus.cpp:538
 msgid "Visualizations selector"
-msgstr ""
+msgstr "Visualiseringsveljar"
 
 #: modules/gui/qt/menus.cpp:596
 msgid "&Increase Volume"
@@ -20233,7 +20236,7 @@ msgstr "&Høgare lyd"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "&Lågare lyd"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20377,11 +20380,11 @@ msgstr "&Avspeling"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr ""
+msgstr "&Gøym VLC-mediaspelar i oppgåvelinja"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr ""
+msgstr "&Vis VLC-mediaspelar"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
@@ -20393,15 +20396,15 @@ msgstr "&Tøm"
 
 #: modules/gui/qt/menus.cpp:1641
 msgid "&Renderer"
-msgstr ""
+msgstr "&Oppteiknar"
 
 #: modules/gui/qt/menus.cpp:1645
 msgid "<Local>"
-msgstr ""
+msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1658
 msgid "Scanning..."
-msgstr ""
+msgstr "Skannar…"
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -20432,7 +20435,7 @@ msgstr "Start VLC med berre systemtrauikon"
 
 #: modules/gui/qt/qt.cpp:92
 msgid "VLC will start with just an icon in your taskbar."
-msgstr ""
+msgstr "VLC vil starte med berre eit ikon i oppgåvelinja di."
 
 #: modules/gui/qt/qt.cpp:101
 msgid "Show playing item name in window title"
@@ -20456,7 +20459,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:110
 msgid "Windows opacity between 0.1 and 1"
-msgstr ""
+msgstr "Vindaugs-opasitet mellom 0.1 og 1"
 
 #: modules/gui/qt/qt.cpp:111
 msgid ""
@@ -20470,7 +20473,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:116
 msgid "Fullscreen controller opacity between 0.1 and 1"
-msgstr ""
+msgstr "Fullskjermkontrollsenter-opasitet mellom 0.1 og 1"
 
 #: modules/gui/qt/qt.cpp:117
 msgid ""
@@ -20497,11 +20500,11 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:128
 msgid "Number of days between two update checks"
-msgstr ""
+msgstr "Tal på dagar mellom to oppdaterings-sjekk"
 
 #: modules/gui/qt/qt.cpp:130
 msgid "Ask for network policy at start"
-msgstr ""
+msgstr "Spør om nettverkspraksis ved oppstart"
 
 #: modules/gui/qt/qt.cpp:132
 msgid "Save the recently played items in the menu"
@@ -20509,7 +20512,7 @@ msgstr "Lagre nyleg spelte element i menyen"
 
 #: modules/gui/qt/qt.cpp:134
 msgid "List of words separated by | to filter"
-msgstr ""
+msgstr "Liste av ord skilde av | å filtrere"
 
 #: modules/gui/qt/qt.cpp:135
 msgid ""
@@ -20618,7 +20621,7 @@ msgstr "Når minimert"
 
 #: modules/gui/qt/qt.cpp:218
 msgid "Qt interface"
-msgstr ""
+msgstr "Qt-grensesnitt"
 
 #: modules/gui/qt/util/customwidgets.cpp:81
 msgid "errors"
@@ -20647,11 +20650,11 @@ msgstr "Draktfiler |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr "Spelelistefiler |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
-msgstr ""
+msgstr "|Alle filer |*"
 
 #: modules/gui/skins2/src/dialogs.cpp:222
 msgid "Open playlist"
@@ -20705,7 +20708,7 @@ msgstr ""
 #: modules/gui/skins2/src/skin_main.cpp:507
 #: modules/gui/skins2/src/skin_main.cpp:508
 msgid "Use a skinned playlist"
-msgstr ""
+msgstr "Bruk ei draktspeleliste"
 
 #: modules/gui/skins2/src/skin_main.cpp:509
 msgid "Display video in a skinned window if any"
@@ -20727,7 +20730,7 @@ msgstr "Vel drakt"
 
 #: modules/gui/skins2/src/theme_repository.cpp:116
 msgid "Open skin..."
-msgstr ""
+msgstr "Opna drakt..."
 
 #: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
@@ -20882,7 +20885,7 @@ msgstr ""
 
 #: modules/hw/vdpau/avcodec.c:220
 msgid "VDPAU video decoder"
-msgstr ""
+msgstr "VDPAU-videodekodar"
 
 #: modules/hw/vdpau/chroma.c:883
 msgid "Temporal-spatial"
@@ -20890,7 +20893,7 @@ msgstr ""
 
 #: modules/hw/vdpau/chroma.c:887 modules/hw/vdpau/display.c:45
 msgid "VDPAU"
-msgstr ""
+msgstr "VDPAU"
 
 #: modules/hw/vdpau/chroma.c:888
 msgid "VDPAU surface conversions"
@@ -21043,11 +21046,11 @@ msgstr ""
 
 #: modules/logger/android.c:85
 msgid "Android log"
-msgstr ""
+msgstr "Android-logg"
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
-msgstr ""
+msgstr "Android-log med logcat"
 
 #: modules/logger/console.c:114
 msgid "Be quiet"
@@ -21055,7 +21058,7 @@ msgstr "Ingen meldingar"
 
 #: modules/logger/console.c:115
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Slå av alle meldingar i konsollen."
 
 #: modules/logger/console.c:118
 msgid "Console log"
@@ -21099,7 +21102,7 @@ msgstr "Loggformat"
 
 #: modules/logger/file.c:212
 msgid "Specify the logging format."
-msgstr ""
+msgstr "Spesifiser loggeformatet."
 
 #: modules/logger/file.c:214
 msgid "Verbosity"
@@ -21207,7 +21210,7 @@ msgstr ""
 
 #: modules/lua/vlc.c:55 modules/lua/vlc.c:71
 msgid "A single password restricts access to this interface."
-msgstr ""
+msgstr "Eit enkelt passord avgrensar tilgangen til dette grensesnittet."
 
 #: modules/lua/vlc.c:57 modules/lua/vlc.c:58
 msgid "Source directory"
@@ -21219,7 +21222,7 @@ msgstr "Katalogindeks"
 
 #: modules/lua/vlc.c:60
 msgid "Allow to build directory index"
-msgstr ""
+msgstr "Tillat å byggja katalogindeks"
 
 #: modules/lua/vlc.c:63
 msgid ""
@@ -21659,7 +21662,7 @@ msgstr "Sym,fonisk rock"
 
 #: modules/meta_engine/ID3Genres.h:128
 msgid "Slow Rock"
-msgstr ""
+msgstr "Sakte rock"
 
 #: modules/meta_engine/ID3Genres.h:129
 msgid "Big Band"
@@ -21739,15 +21742,15 @@ msgstr "Ballade"
 
 #: modules/meta_engine/ID3Genres.h:150
 msgid "Power Ballad"
-msgstr ""
+msgstr "Powerballade"
 
 #: modules/meta_engine/ID3Genres.h:151
 msgid "Rhythmic Soul"
-msgstr ""
+msgstr "Rytmisk soul"
 
 #: modules/meta_engine/ID3Genres.h:152
 msgid "Freestyle"
-msgstr ""
+msgstr "Fristil"
 
 #: modules/meta_engine/ID3Genres.h:153
 msgid "Duet"
@@ -21767,7 +21770,7 @@ msgstr "Acapella"
 
 #: modules/meta_engine/ID3Genres.h:157
 msgid "Euro-House"
-msgstr ""
+msgstr "Euro-House"
 
 #: modules/meta_engine/ID3Genres.h:158
 msgid "Dance Hall"
@@ -21775,11 +21778,11 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:159
 msgid "Goa"
-msgstr ""
+msgstr "Goa"
 
 #: modules/meta_engine/ID3Genres.h:160
 msgid "Drum & Bass"
-msgstr ""
+msgstr "Trommer og bass"
 
 #: modules/meta_engine/ID3Genres.h:161
 msgid "Club - House"
@@ -21787,7 +21790,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:162
 msgid "Hardcore"
-msgstr ""
+msgstr "Hardkjerne"
 
 #: modules/meta_engine/ID3Genres.h:163
 msgid "Terror"
@@ -21819,7 +21822,7 @@ msgstr "Kristen gangsta-rap"
 
 #: modules/meta_engine/ID3Genres.h:170
 msgid "Heavy Metal"
-msgstr ""
+msgstr "Heavy Metal"
 
 #: modules/meta_engine/ID3Genres.h:171
 msgid "Black Metal"
@@ -22157,15 +22160,15 @@ msgstr "Statistikk"
 
 #: modules/misc/stats.c:216
 msgid "Stats encoder function"
-msgstr ""
+msgstr "Statistikk-kodarfunksjon"
 
 #: modules/misc/stats.c:222 modules/misc/stats.c:228 modules/misc/stats.c:234
 msgid "Stats decoder"
-msgstr ""
+msgstr "Statistikk-dekodar"
 
 #: modules/misc/stats.c:223 modules/misc/stats.c:229 modules/misc/stats.c:235
 msgid "Stats decoder function"
-msgstr ""
+msgstr "Statistikk-dekodarfunksjon"
 
 #: modules/misc/stats.c:240
 msgid "Stats demux"
@@ -22232,7 +22235,7 @@ msgstr "Ukjend video"
 
 #: modules/mux/avi.c:55
 msgid "Subject"
-msgstr ""
+msgstr "Emne"
 
 #: modules/mux/avi.c:56
 msgid "Encoder"
@@ -22248,7 +22251,7 @@ msgstr "Dummy/Raw-multipleksar"
 
 #: modules/mux/mp4/mp4.c:50
 msgid "Create \"Fast Start\" files"
-msgstr ""
+msgstr "Opprett «kjappstart»-filer"
 
 #: modules/mux/mp4/mp4.c:52
 msgid ""
@@ -22259,11 +22262,11 @@ msgstr ""
 
 #: modules/mux/mp4/mp4.c:64
 msgid "MP4/MOV muxer"
-msgstr ""
+msgstr "MP4/MOV-multipleksar"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Fragmentert og strøymbar MP4-multipleksar"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23889,27 +23892,27 @@ msgstr ""
 
 #: modules/stream_out/es.c:53 modules/stream_out/standard.c:45
 msgid "Output muxer"
-msgstr ""
+msgstr "Utgangs-multipleksar"
 
 #: modules/stream_out/es.c:55
 msgid "This is the default muxer method that will be used."
-msgstr ""
+msgstr "Dette er standard multipleksar-metoden som vil bli brukt."
 
 #: modules/stream_out/es.c:56
 msgid "Audio output muxer"
-msgstr ""
+msgstr "Lyd ut-multipleksar"
 
 #: modules/stream_out/es.c:58
 msgid "This is the muxer that will be used for audio."
-msgstr ""
+msgstr "Dette er multipleksaren som vil bli brukt for lyd."
 
 #: modules/stream_out/es.c:59
 msgid "Video output muxer"
-msgstr ""
+msgstr "Video ut-multipleksar"
 
 #: modules/stream_out/es.c:61
 msgid "This is the muxer that will be used for video."
-msgstr ""
+msgstr "Dette er multipleksaren som vil bli brukt for video."
 
 #: modules/stream_out/es.c:63
 msgid "Output URL"
@@ -24306,7 +24309,7 @@ msgstr ""
 
 #: modules/stream_out/standard.c:47
 msgid "Muxer to use for the stream."
-msgstr ""
+msgstr "Multiplexar å bruke for strøyming."
 
 #: modules/stream_out/standard.c:48
 #: share/lua/http/dialogs/create_stream.html:334
@@ -24638,7 +24641,7 @@ msgstr ""
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
-msgstr "Bruk YUVP-teiknaren"
+msgstr "Bruk YUVP-oppteiknaren"
 
 #: modules/text_renderer/freetype/freetype.c:126
 msgid ""
@@ -24664,11 +24667,11 @@ msgstr "Høgre til venstre"
 
 #: modules/text_renderer/freetype/freetype.c:156
 msgid "Text renderer"
-msgstr "Tekstteiknar"
+msgstr "Tekstoppteiknar"
 
 #: modules/text_renderer/freetype/freetype.c:157
 msgid "Freetype2 font renderer"
-msgstr "Freetype2-skriftteiknar"
+msgstr "Freetype2-skriftoppteiknar"
 
 #: modules/text_renderer/nsspeechsynthesizer.m:47
 msgid "Speech synthesis for Mac OS X"
@@ -24689,7 +24692,7 @@ msgstr ""
 
 #: modules/text_renderer/tdummy.c:36
 msgid "Dummy font renderer"
-msgstr "Stumtenar-tekstteiknar"
+msgstr "Stumtenar-tekstoppteiknar"
 
 #: modules/video_chroma/chain.c:46
 msgid "Video filtering using a chain of video filter modules"
