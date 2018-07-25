@@ -773,7 +773,7 @@ static int OpenVCDImage( vlc_object_t * p_this, const char *psz_dev,
 
     /* Check if we are dealing with a .cue file */
     p_pos = strrchr( psz_dev, '.' );
-    if( p_pos && !strcmp( p_pos, ".cue" ) )
+    if( p_pos && !strcasecmp( p_pos, ".cue" ) )
     {
         /* psz_dev must be the cue file. Let's assume there's a .bin
          * file with the same filename */
