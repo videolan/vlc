@@ -493,9 +493,6 @@ static int Control( stream_extractor_t* p_extractor, int i_query, va_list args )
 {
     private_sys_t* p_sys = p_extractor->p_sys;
 
-    if( p_sys->b_dead )
-        return VLC_EGENERIC;
-
     switch( i_query )
     {
         case STREAM_CAN_FASTSEEK:
@@ -627,9 +624,6 @@ static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t 
 static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 {
     private_sys_t* p_sys = p_extractor->p_sys;
-
-    if( p_sys->b_dead )
-        return VLC_EGENERIC;
 
     if( !p_sys->p_entry || !p_sys->b_seekable_source )
         return VLC_EGENERIC;
