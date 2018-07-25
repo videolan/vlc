@@ -393,7 +393,10 @@ static int archive_extractor_reset( stream_extractor_t* p_extractor )
         || archive_clean( p_sys )
         || archive_init( p_sys, p_extractor->source )
         || archive_seek_subentry( p_sys, p_extractor->identifier ) )
+    {
+        p_sys->b_dead = true;
         return VLC_EGENERIC;
+    }
 
     p_sys->i_offset = 0;
     p_sys->b_eof = false;
