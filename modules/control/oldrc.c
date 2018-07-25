@@ -1422,22 +1422,7 @@ static int Volume( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
     int i_error = VLC_EGENERIC;
-
-    if( !p_input )
-        return VLC_ENOOBJ;
-
-    if( p_input )
-    {
-        int state = var_GetInteger( p_input, "state" );
-        vlc_object_release( p_input );
-        if( state == PAUSE_S )
-        {
-            msg_rc( "%s", _("Type 'pause' to continue.") );
-            return VLC_EGENERIC;
-        }
-    }
 
     if ( *newval.psz_string )
     {
@@ -1466,21 +1451,8 @@ static int VolumeMove( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     float volume;
-    input_thread_t *p_input =
-        playlist_CurrentInput( p_intf->p_sys->p_playlist );
     int i_nb_steps = atoi(newval.psz_string);
     int i_error = VLC_SUCCESS;
-
-    if( !p_input )
-        return VLC_ENOOBJ;
-
-    int state = var_GetInteger( p_input, "state" );
-    vlc_object_release( p_input );
-    if( state == PAUSE_S )
-    {
-        msg_rc( "%s", _("Type 'pause' to continue.") );
-        return VLC_EGENERIC;
-    }
 
     if( !strcmp(psz_cmd, "voldown") )
         i_nb_steps *= -1;
