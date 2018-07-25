@@ -627,26 +627,27 @@ static int archive_skip_decompressed( stream_extractor_t* p_extractor, uint64_t 
 static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
 {
     private_sys_t* p_sys = p_extractor->p_sys;
-    uint64_t i_orig_offset = p_sys->i_offset;
 
     if( p_sys->b_dead )
         return VLC_EGENERIC;
 
-    if( !p_sys->p_entry )
-        return VLC_EGENERIC;
-
-    if( !p_sys->b_seekable_source )
+    if( !p_sys->p_entry || !p_sys->b_seekable_source )
         return VLC_EGENERIC;
 
     if( archive_entry_size_is_set( p_sys->p_entry ) &&
-        (uint64_t)archive_entry_size( p_sys->p_entry ) < i_req )
-        return VLC_EGENERIC;
+        (uint64_t)archive_entry_size( p_sys->p_entry ) <= i_req )
+    {
+        p_sys->b_eof = true;
+        return VLC_SUCCESS;
+    }
 
-    if( !p_sys->b_seekable_archive
+    p_sys->b_eof = false;
+
+    if( !p_sys->b_seekable_archive || p_sys->b_dead
       || archive_seek_data( p_sys->p_archive, i_req, SEEK_SET ) < 0 )
     {
-        msg_Dbg( p_extractor, "libarchive intrinsic seek failed:"
-                              " '%s' (falling back to dumb seek)",
+        msg_Dbg( p_extractor,
+            "intrinsic seek failed: '%s' (falling back to dumb seek)",
             archive_error_string( p_sys->p_archive ) );
 
         uint64_t i_offset = p_sys->i_offset;
@@ -667,12 +668,7 @@ static int Seek( stream_extractor_t* p_extractor, uint64_t i_req )
         }
 
         if( archive_skip_decompressed( p_extractor, i_skip ) )
-        {
-            if( archive_extractor_reset( p_extractor ) ||
-                archive_skip_decompressed( p_extractor, i_orig_offset ) )
-                msg_Err( p_extractor, "unable to reset original offset" );
-            return VLC_EGENERIC;
-        }
+            msg_Dbg( p_extractor, "failed to skip to seek position" );
     }
 
     p_sys->i_offset = i_req;
