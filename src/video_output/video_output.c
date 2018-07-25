@@ -114,7 +114,8 @@ static bool VideoFormatIsCropArEqual(video_format_t *dst,
 }
 
 static vout_thread_t *VoutCreate(vlc_object_t *object,
-                                 const vout_configuration_t *cfg)
+                                 const vout_configuration_t *cfg,
+                                 input_thread_t *input)
 {
     video_format_t original;
     if (VoutValidateFormat(&original, cfg->fmt))
@@ -216,16 +217,17 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         return NULL;
     }
 
-    vout->p->input = cfg->input;
+    vout->p->input = input;
     if (vout->p->input)
-        spu_Attach(vout->p->spu, vout->p->input, true);
+        spu_Attach(vout->p->spu, input, true);
 
     return vout;
 }
 
 #undef vout_Request
 vout_thread_t *vout_Request(vlc_object_t *object,
-                              const vout_configuration_t *cfg)
+                            const vout_configuration_t *cfg,
+                            input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
     if (cfg->change_fmt && !cfg->fmt) {
@@ -236,10 +238,10 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
-        if (vout->p->input != cfg->input) {
+        if (vout->p->input != input) {
             if (vout->p->input)
                 spu_Attach(vout->p->spu, vout->p->input, false);
-            vout->p->input = cfg->input;
+            vout->p->input = input;
             if (vout->p->input)
                 spu_Attach(vout->p->spu, vout->p->input, true);
         }
@@ -261,7 +263,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
         msg_Warn(object, "cannot reuse provided vout");
     }
-    return VoutCreate(object, cfg);
+    return VoutCreate(object, cfg, input);
 }
 
 void vout_Close(vout_thread_t *vout)

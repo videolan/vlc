@@ -46,7 +46,6 @@
  */
 typedef struct {
     vout_thread_t        *vout;
-    vlc_object_t         *input;
     bool                 change_fmt;
     const video_format_t *fmt;
     unsigned             dpb_size;
@@ -61,8 +60,8 @@ struct vout_thread_sys_t
     /* Splitter module if used */
     char            *splitter_name;
 
-    /* Input thread for dvd menu interactions */
-    vlc_object_t    *input;
+    /* Input thread for spu attachments */
+    input_thread_t    *input;
 
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
@@ -163,10 +162,12 @@ struct vout_thread_sys_t
  *
  * \param object a vlc object
  * \param cfg the video configuration requested.
+ * \param input used to get attachments for spu filters
  * \return a vout
  */
-vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *cfg );
-#define vout_Request(a,b) vout_Request(VLC_OBJECT(a),b)
+vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *cfg,
+                              input_thread_t *input );
+#define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
 
 /**
  * This function will close a vout created by vout_Request.
@@ -221,7 +222,7 @@ void vout_ManageWrapper(vout_thread_t *);
 
 /* */
 int spu_ProcessMouse(spu_t *, const vlc_mouse_t *, const video_format_t *);
-void spu_Attach( spu_t *, vlc_object_t *input, bool );
+void spu_Attach( spu_t *, input_thread_t *input, bool );
 void spu_ChangeMargin(spu_t *, int);
 void spu_SetHighlight(spu_t *, const vlc_spu_highlight_t*);
 

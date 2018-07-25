@@ -234,14 +234,13 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         /* */
         vout_configuration_t cfg = {
             .vout       = p_vout,
-            .input      = VLC_OBJECT(p_resource->p_input),
             .change_fmt = true,
             .fmt        = p_fmt,
             .dpb_size   = dpb_size,
             .mouse_event= mouse_event,
             .opaque = opaque,
         };
-        p_vout = vout_Request( p_resource->p_parent, &cfg );
+        p_vout = vout_Request( p_resource->p_parent, &cfg, p_resource->p_input );
         if( !p_vout )
             return NULL;
 
@@ -281,14 +280,14 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 
             vout_configuration_t cfg = {
                 .vout       = p_vout,
-                .input      = NULL,
                 .change_fmt = false,
                 .fmt        = NULL,
                 .dpb_size   = 0,
                 .mouse_event= NULL,
                 .opaque = NULL,
             };
-            p_resource->p_vout_free = vout_Request( p_resource->p_parent, &cfg );
+            p_resource->p_vout_free = vout_Request( p_resource->p_parent, &cfg,
+                                                    NULL );
         }
         return NULL;
     }

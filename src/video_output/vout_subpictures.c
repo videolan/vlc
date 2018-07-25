@@ -63,7 +63,7 @@ typedef struct {
 
 struct spu_private_t {
     vlc_mutex_t  lock;            /* lock to protect all followings fields */
-    vlc_object_t *input;
+    input_thread_t *input;
 
     spu_heap_t   heap;
 
@@ -180,7 +180,7 @@ static int spu_get_attachments(filter_t *filter,
 
     int ret = VLC_EGENERIC;
     if (spu->p->input)
-        ret = input_Control((input_thread_t*)spu->p->input,
+        ret = input_Control(spu->p->input,
                             INPUT_GET_ATTACHMENTS,
                             attachment_ptr, attachment_count);
     return ret;
@@ -1366,7 +1366,7 @@ void spu_Destroy(spu_t *spu)
  * \param p_this the object in which to destroy the subpicture unit
  * \param b_attach to select attach or detach
  */
-void spu_Attach(spu_t *spu, vlc_object_t *input, bool attach)
+void spu_Attach(spu_t *spu, input_thread_t *input, bool attach)
 {
     if (attach) {
         UpdateSPU(spu, NULL);
