@@ -1683,30 +1683,30 @@ static void *DecoderThread( void *p_data )
 static const struct decoder_owner_callbacks dec_video_cbs =
 {
     .video = {
-        vout_update_format,
-        vout_new_buffer,
-        DecoderQueueVideo,
-        DecoderQueueCc,
-        DecoderGetDisplayDate,
-        DecoderGetDisplayRate
+        .format_update = vout_update_format,
+        .buffer_new = vout_new_buffer,
+        .queue = DecoderQueueVideo,
+        .queue_cc = DecoderQueueCc,
+        .get_display_date = DecoderGetDisplayDate,
+        .get_display_rate = DecoderGetDisplayRate,
     },
-    DecoderGetInputAttachments,
+    .get_attachments = DecoderGetInputAttachments,
 };
 static const struct decoder_owner_callbacks dec_audio_cbs =
 {
     .audio = {
-        aout_update_format,
-        DecoderQueueAudio,
+        .format_update = aout_update_format,
+        .queue = DecoderQueueAudio,
     },
-    DecoderGetInputAttachments,
+    .get_attachments = DecoderGetInputAttachments,
 };
 static const struct decoder_owner_callbacks dec_spu_cbs =
 {
     .spu = {
-        spu_new_buffer,
-        DecoderQueueSpu
+        .buffer_new = spu_new_buffer,
+        .queue = DecoderQueueSpu,
     },
-    DecoderGetInputAttachments,
+    .get_attachments = DecoderGetInputAttachments,
 };
 
 /**
