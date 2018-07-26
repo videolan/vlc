@@ -1169,50 +1169,31 @@
 
     if ([savePanel runModal] == NSFileHandlingPanelOKButton) {
         NSString *filename = [[savePanel URL] path];
+        NSString *ext;
+        char const* psz_module;
 
-        if ([_playlistSaveAccessoryPopup indexOfSelectedItem] == 0) {
-            NSString *actualFilename;
-            NSRange range;
-            range.location = [filename length] - [@".m3u" length];
-            range.length = [@".m3u" length];
-
-            if ([filename compare:@".m3u" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                actualFilename = [NSString stringWithFormat: @"%@.m3u", filename];
-            else
-                actualFilename = filename;
-
-            playlist_Export(p_playlist,
-                            [actualFilename fileSystemRepresentation],
-                            "export-m3u");
-        } else if ([_playlistSaveAccessoryPopup indexOfSelectedItem] == 1) {
-            NSString *actualFilename;
-            NSRange range;
-            range.location = [filename length] - [@".xspf" length];
-            range.length = [@".xspf" length];
-
-            if ([filename compare:@".xspf" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                actualFilename = [NSString stringWithFormat: @"%@.xspf", filename];
-            else
-                actualFilename = filename;
-
-            playlist_Export(p_playlist,
-                            [actualFilename fileSystemRepresentation],
-                            "export-xspf");
-        } else {
-            NSString *actualFilename;
-            NSRange range;
-            range.location = [filename length] - [@".html" length];
-            range.length = [@".html" length];
-
-            if ([filename compare:@".html" options: NSCaseInsensitiveSearch range: range] != NSOrderedSame)
-                actualFilename = [NSString stringWithFormat: @"%@.html", filename];
-            else
-                actualFilename = filename;
-
-            playlist_Export(p_playlist,
-                            [actualFilename fileSystemRepresentation],
-                            "export-html");
+        switch ([_playlistSaveAccessoryPopup indexOfSelectedItem]) {
+            case 0: psz_module = "export-m3u";
+                    ext = @"m3u";
+                    break;
+            case 1: psz_module = "export-xspf";
+                    ext = @"xspf";
+                    break;
+            case 2: psz_module = "export-html";
+                    ext = @"html";
+                    break;
+            default:
+                    return;
         }
+
+        NSString *actualFilename = filename;
+
+        if ([[filename pathExtension] caseInsensitiveCompare:ext] != NSOrderedSame)
+            actualFilename = [NSString stringWithFormat: @"%@.%@", filename, ext];
+
+        playlist_Export(p_playlist,
+                        [actualFilename fileSystemRepresentation],
+                        psz_module);
     }
 }
 
