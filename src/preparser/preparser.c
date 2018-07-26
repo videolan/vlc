@@ -170,7 +170,7 @@ void input_preparser_Push( input_preparser_t *preparser,
         return;
 
     vlc_mutex_lock( &item->lock );
-    int i_type = item->i_type;
+    enum input_item_type_e i_type = item->i_type;
     int b_net = item->b_net;
     vlc_mutex_unlock( &item->lock );
 

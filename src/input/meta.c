@@ -247,7 +247,7 @@ int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )
         return VLC_ENOMEM;
     p_export->p_item = p_item;
 
-    int type;
+    enum input_item_type_e type;
     vlc_mutex_lock( &p_item->lock );
     type = p_item->i_type;
     vlc_mutex_unlock( &p_item->lock );

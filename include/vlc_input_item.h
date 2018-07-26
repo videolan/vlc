@@ -55,6 +55,21 @@ struct info_category_t
     struct vlc_list infos; /**< Infos in the category */
 };
 
+enum input_item_type_e
+{
+    ITEM_TYPE_UNKNOWN,
+    ITEM_TYPE_FILE,
+    ITEM_TYPE_DIRECTORY,
+    ITEM_TYPE_DISC,
+    ITEM_TYPE_CARD,
+    ITEM_TYPE_STREAM,
+    ITEM_TYPE_PLAYLIST,
+    ITEM_TYPE_NODE,
+
+    /* This one is not a real type but the number of input_item types. */
+    ITEM_TYPE_NUMBER
+};
+
 /**
  * Describes an input and is used to spawn input_thread_t objects.
  */
@@ -95,7 +110,7 @@ struct input_item_t
 
     vlc_mutex_t lock;                 /**< Lock for the item */
 
-    uint8_t     i_type;              /**< Type (file, disc, ... see input_item_type_e) */
+    enum input_item_type_e i_type;   /**< Type (file, disc, ... see input_item_type_e) */
     bool        b_net;               /**< Net: always true for TYPE_STREAM, it
                                           depends for others types */
     bool        b_error_when_reading;/**< Error When Reading */
@@ -110,21 +125,6 @@ struct input_item_t
 #define INPUT_DURATION_INVALID   VLC_TICK_INVALID
 #define INPUT_DURATION_ZERO      0
 #define INPUT_DURATION_UNKNOWN   (-1)
-
-enum input_item_type_e
-{
-    ITEM_TYPE_UNKNOWN,
-    ITEM_TYPE_FILE,
-    ITEM_TYPE_DIRECTORY,
-    ITEM_TYPE_DISC,
-    ITEM_TYPE_CARD,
-    ITEM_TYPE_STREAM,
-    ITEM_TYPE_PLAYLIST,
-    ITEM_TYPE_NODE,
-
-    /* This one is not a real type but the number of input_item types. */
-    ITEM_TYPE_NUMBER
-};
 
 enum input_item_net_type
 {
@@ -335,7 +335,7 @@ VLC_API void input_item_MergeInfos( input_item_t *, info_category_t * );
  */
 VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
                                           const char *psz_name,
-                                          vlc_tick_t i_duration, int i_type,
+                                          vlc_tick_t i_duration, enum input_item_type_e i_type,
                                           enum input_item_net_type i_net ) VLC_USED;
 
 #define input_item_New( psz_uri, psz_name ) \

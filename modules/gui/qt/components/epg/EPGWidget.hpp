@@ -27,6 +27,7 @@
 #include "qt.hpp"
 
 #include <vlc_epg.h>
+#include <vlc_input_item.h>
 
 #include <QWidget>
 #include <QStackedWidget>
@@ -59,7 +60,7 @@ private:
     EPGChannels *m_channelsWidget;
     QStackedWidget *rootWidget;
 
-    uint8_t i_event_source_type;
+    enum input_item_type_e i_event_source_type;
     bool b_input_type_known;
 
 signals:

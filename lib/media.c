@@ -1070,7 +1070,7 @@ libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md )
 {
     assert( p_md );
 
-    int i_type;
+    enum input_item_type_e i_type;
     input_item_t *p_input_item = p_md->p_input_item;
 
     vlc_mutex_lock( &p_input_item->lock );

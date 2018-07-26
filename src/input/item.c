@@ -1054,7 +1054,7 @@ void input_item_SetEpgOffline( input_item_t *p_item )
 
 input_item_t *
 input_item_NewExt( const char *psz_uri, const char *psz_name,
-                   vlc_tick_t duration, int type, enum input_item_net_type i_net )
+                   vlc_tick_t duration, enum input_item_type_e type, enum input_item_net_type i_net )
 {
     input_item_owner_t *owner = calloc( 1, sizeof( *owner ) );
     if( unlikely(owner == NULL) )
