@@ -122,6 +122,8 @@ struct input_item_t
                                           preparsing.*/
 };
 
+#define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */
+
 #define INPUT_DURATION_INVALID   VLC_TICK_INVALID
 #define INPUT_DURATION_ZERO      0
 #define INPUT_DURATION_UNKNOWN   (-1)

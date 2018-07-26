@@ -449,7 +449,7 @@ static bool parse_track_node COMPLEX_INTERFACE
         /* Make sure we have a URI */
         char *psz_uri = input_item_GetURI(p_new_input);
         if (!psz_uri)
-            input_item_SetURI(p_new_input, "vlc://nop");
+            input_item_SetURI(p_new_input, INPUT_ITEM_URI_NOP);
         else
             free(psz_uri);
 
@@ -602,7 +602,7 @@ static bool parse_vlcnode_node COMPLEX_INTERFACE
         return false;
     }
     input_item_t *p_new_input =
-        input_item_NewDirectory("vlc://nop", psz_title, ITEM_NET_UNKNOWN);
+        input_item_NewDirectory(INPUT_ITEM_URI_NOP, psz_title, ITEM_NET_UNKNOWN);
     free(psz_title);
     if (p_new_input)
     {

@@ -503,7 +503,7 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
     libvlc_media_t * p_md;
     libvlc_media_list_t * p_subitems;
 
-    p_input_item = input_item_New( "vlc://nop", psz_name );
+    p_input_item = input_item_New( INPUT_ITEM_URI_NOP, psz_name );
 
     if (!p_input_item)
     {

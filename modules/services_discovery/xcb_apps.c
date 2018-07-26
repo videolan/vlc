@@ -164,7 +164,7 @@ static int Open (vlc_object_t *obj)
     }
 
     p_sys->apps = NULL;
-    p_sys->apps_root = input_item_NewExt("vlc://nop", _("Applications"), INPUT_DURATION_UNKNOWN,
+    p_sys->apps_root = input_item_NewExt(INPUT_ITEM_URI_NOP, _("Applications"), INPUT_DURATION_UNKNOWN,
                                          ITEM_TYPE_NODE, ITEM_LOCAL);
     if (likely(p_sys->apps_root != NULL))
         services_discovery_AddItem(sd, p_sys->apps_root);

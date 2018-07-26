@@ -1666,7 +1666,7 @@ static int rdh_unflatten(struct vlc_readdir_helper *p_rdh,
                 psz_subpathname = p_rdh_dir->psz_path;
 
             input_item_t *p_item =
-                input_item_NewExt("vlc://nop", psz_subpathname, INPUT_DURATION_INVALID,
+                input_item_NewExt(INPUT_ITEM_URI_NOP, psz_subpathname, INPUT_DURATION_INVALID,
                                   ITEM_TYPE_DIRECTORY, i_net);
             if (p_item == NULL)
             {
