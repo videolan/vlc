@@ -689,9 +689,9 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const video_format_t 
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
-            video_update_format,
-            video_new_buffer,
-            ImageQueueVideo,
+            .format_update = video_update_format,
+            .buffer_new = video_new_buffer,
+            .queue = ImageQueueVideo,
         },
     };
     p_dec->cbs = &dec_cbs;
