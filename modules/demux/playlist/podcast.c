@@ -385,6 +385,6 @@ static vlc_tick_t strTimeToMTime( const char *psz )
     case 2:
         return (vlc_tick_t)( h*60 + m ) * CLOCK_FREQ;
     default:
-        return INPUT_DURATION_UNKNOWN;
+        return INPUT_DURATION_UNSET;
     }
 }
