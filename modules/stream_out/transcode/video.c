@@ -155,9 +155,9 @@ int transcode_video_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .video = {
-            video_update_format_decoder,
-            video_new_buffer_decoder,
-            decoder_queue_video,
+            .format_update = video_update_format_decoder,
+            .buffer_new = video_new_buffer_decoder,
+            .queue = decoder_queue_video,
         },
     };
     id->p_decoder->cbs = &dec_cbs;

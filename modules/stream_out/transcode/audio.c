@@ -119,8 +119,8 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .audio = {
-            audio_update_format,
-            decoder_queue_audio,
+            .format_update = audio_update_format,
+            .queue = decoder_queue_audio,
         },
     };
     id->p_decoder->cbs = &dec_cbs;

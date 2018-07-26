@@ -96,8 +96,8 @@ int transcode_spu_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     static const struct decoder_owner_callbacks dec_cbs =
     {
         .spu = {
-            spu_new_buffer,
-            decoder_queue_sub,
+            .buffer_new = spu_new_buffer,
+            .queue = decoder_queue_sub,
         },
     };
     id->p_decoder->cbs = &dec_cbs;
