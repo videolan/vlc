@@ -127,7 +127,6 @@ struct input_item_t
 /* placeholder duration for items with no known duration at time of creation
  * it may remain the duration for items like a node/directory */
 #define INPUT_DURATION_UNSET      VLC_TICK_INVALID
-#define INPUT_DURATION_ZERO      0     /* an item with a zero duration */
 #define INPUT_DURATION_INDEFINITE (-1) /* item with a known indefinite duration (live/continuous source) */
 
 enum input_item_net_type
