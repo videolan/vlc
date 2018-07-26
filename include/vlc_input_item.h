@@ -345,7 +345,7 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
     input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_UNSET, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
 
 #define input_item_NewCard( psz_uri, psz_name ) \
-    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_INVALID, ITEM_TYPE_CARD, ITEM_LOCAL )
+    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_INDEFINITE, ITEM_TYPE_CARD, ITEM_LOCAL )
 
 #define input_item_NewDisc( psz_uri, psz_name, i_duration ) \
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_DISC, ITEM_LOCAL )
