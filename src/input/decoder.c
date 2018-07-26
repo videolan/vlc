@@ -138,6 +138,8 @@ struct decoder_owner
         bool b_supported;
         decoder_cc_desc_t desc;
         decoder_t *pp_decoder[MAX_CC_DECODERS];
+        bool b_sout_created;
+        sout_packetizer_input_t *p_sout_input;
     } cc;
 
     /* Delay */
@@ -893,6 +895,35 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
             block_t *p_next = p_sout_block->p_next;
 
             p_sout_block->p_next = NULL;
+
+            if( p_owner->p_sout->b_wants_substreams && p_dec->pf_get_cc )
+            {
+                if( p_owner->cc.p_sout_input ||
+                    !p_owner->cc.b_sout_created )
+                {
+                    decoder_cc_desc_t desc;
+                    block_t *p_cc = p_dec->pf_get_cc( p_dec, &desc );
+                    if( p_cc )
+                    {
+                        if(!p_owner->cc.b_sout_created)
+                        {
+                            es_format_t ccfmt;
+                            es_format_Init(&ccfmt, SPU_ES, VLC_CODEC_CEA608);
+                            ccfmt.i_group = p_owner->fmt.i_group;
+                            ccfmt.subs.cc.i_reorder_depth = desc.i_reorder_depth;
+                            p_owner->cc.p_sout_input = sout_InputNew( p_owner->p_sout, &ccfmt );
+                            es_format_Clean(&ccfmt);
+                            p_owner->cc.b_sout_created = true;
+                        }
+
+                        if( !p_owner->cc.p_sout_input ||
+                            sout_InputSendBuffer( p_owner->cc.p_sout_input, p_cc ) )
+                        {
+                            block_Release( p_cc );
+                        }
+                    }
+                }
+            }
 
             if( DecoderPlaySout( p_dec, p_sout_block ) == VLC_EGENERIC )
             {
@@ -1857,6 +1888,8 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->cc.desc.i_708_channels = 0;
     for( unsigned i = 0; i < MAX_CC_DECODERS; i++ )
         p_owner->cc.pp_decoder[i] = NULL;
+    p_owner->cc.p_sout_input = NULL;
+    p_owner->cc.b_sout_created = false;
     p_owner->i_ts_delay = 0;
     return p_dec;
 }
@@ -1885,6 +1918,8 @@ static void DeleteDecoder( decoder_t * p_dec )
     if( p_owner->p_sout_input )
     {
         sout_InputDelete( p_owner->p_sout_input );
+        if( p_owner->cc.p_sout_input )
+            sout_InputDelete( p_owner->cc.p_sout_input );
     }
 #endif
 

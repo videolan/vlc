@@ -110,6 +110,7 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     /* *** init descriptor *** */
     p_sout->psz_sout    = strdup( psz_dest );
     p_sout->i_out_pace_nocontrol = 0;
+    p_sout->b_wants_substreams = false;
 
     vlc_mutex_init( &p_sout->lock );
     p_sout->p_stream = NULL;
@@ -120,6 +121,9 @@ sout_instance_t *sout_NewInstance( vlc_object_t *p_parent, const char *psz_dest 
     if( p_sout->p_stream )
     {
         free( psz_chain );
+        sout_StreamControl( p_sout->p_stream,
+                            SOUT_STREAM_WANTS_SUBSTREAMS,
+                            &p_sout->b_wants_substreams );
         return p_sout;
     }
 
