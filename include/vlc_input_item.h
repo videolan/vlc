@@ -124,7 +124,9 @@ struct input_item_t
 
 #define INPUT_ITEM_URI_NOP "vlc://nop" /* dummy URI for node/directory items */
 
-#define INPUT_DURATION_INVALID   VLC_TICK_INVALID /* an item with no duration, like a node/directory */
+/* placeholder duration for items with no known duration at time of creation
+ * it may remain the duration for items like a node/directory */
+#define INPUT_DURATION_UNSET      VLC_TICK_INVALID
 #define INPUT_DURATION_ZERO      0     /* an item with a zero duration */
 #define INPUT_DURATION_UNKNOWN   (-1)  /* an item with no duration (live/continuous source) */
 
@@ -341,7 +343,7 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
                                           enum input_item_net_type i_net ) VLC_USED;
 
 #define input_item_New( psz_uri, psz_name ) \
-    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_INVALID, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
+    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_UNSET, ITEM_TYPE_UNKNOWN, ITEM_NET_UNKNOWN )
 
 #define input_item_NewCard( psz_uri, psz_name ) \
     input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_INVALID, ITEM_TYPE_CARD, ITEM_LOCAL )
@@ -353,7 +355,7 @@ VLC_API input_item_t * input_item_NewExt( const char *psz_uri,
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_STREAM, ITEM_NET )
 
 #define input_item_NewDirectory( psz_uri, psz_name, i_net ) \
-    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_INVALID, ITEM_TYPE_DIRECTORY, i_net )
+    input_item_NewExt( psz_uri, psz_name, INPUT_DURATION_UNSET, ITEM_TYPE_DIRECTORY, i_net )
 
 #define input_item_NewFile( psz_uri, psz_name, i_duration, i_net ) \
     input_item_NewExt( psz_uri, psz_name, i_duration, ITEM_TYPE_FILE, i_net )

@@ -1666,7 +1666,7 @@ static int rdh_unflatten(struct vlc_readdir_helper *p_rdh,
                 psz_subpathname = p_rdh_dir->psz_path;
 
             input_item_t *p_item =
-                input_item_NewExt(INPUT_ITEM_URI_NOP, psz_subpathname, INPUT_DURATION_INVALID,
+                input_item_NewExt(INPUT_ITEM_URI_NOP, psz_subpathname, INPUT_DURATION_UNSET,
                                   ITEM_TYPE_DIRECTORY, i_net);
             if (p_item == NULL)
             {
@@ -1806,7 +1806,7 @@ int vlc_readdir_helper_additem(struct vlc_readdir_helper *p_rdh,
             return i_ret;
     }
 
-    input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, INPUT_DURATION_INVALID, i_type,
+    input_item_t *p_item = input_item_NewExt(psz_uri, psz_filename, INPUT_DURATION_UNSET, i_type,
                                              i_net);
     if (p_item == NULL)
         return VLC_ENOMEM;
