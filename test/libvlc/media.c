@@ -148,7 +148,7 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
 
     char psz_fd_uri[strlen("fd://") + 11];
     sprintf(psz_fd_uri, "fd://%u", (unsigned) p_pipe[1]);
-    input_item_t *p_item = input_item_NewFile(psz_fd_uri, "test timeout", INPUT_DURATION_ZERO,
+    input_item_t *p_item = input_item_NewFile(psz_fd_uri, "test timeout", 0,
                                               ITEM_LOCAL);
     assert(p_item != NULL);
 
