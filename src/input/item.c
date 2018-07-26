@@ -46,7 +46,7 @@ struct input_item_opaque
     char name[1];
 };
 
-static int GuessType( const input_item_t *p_item, bool *p_net );
+static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net );
 
 void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
 {
@@ -1136,7 +1136,7 @@ input_item_t *input_item_Copy( input_item_t *p_input )
 struct item_type_entry
 {
     const char *psz_scheme;
-    uint8_t    i_type;
+    enum input_item_type_e i_type;
     bool       b_net;
 };
 
@@ -1149,7 +1149,7 @@ static int typecmp( const void *key, const void *entry )
 }
 
 /* Guess the type of the item using the beginning of the mrl */
-static int GuessType( const input_item_t *p_item, bool *p_net )
+static enum input_item_type_e GuessType( const input_item_t *p_item, bool *p_net )
 {
     static const struct item_type_entry tab[] =
     {   /* /!\ Alphabetical order /!\ */
