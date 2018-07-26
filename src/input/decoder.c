@@ -613,6 +613,13 @@ static subpicture_t *spu_new_buffer( decoder_t *p_dec,
     if( !p_vout )
     {
         msg_Warn( p_dec, "no vout found, dropping subpicture" );
+        if( p_owner->p_vout )
+        {
+            vlc_mutex_lock( &p_owner->lock );
+            vlc_object_release( p_owner->p_vout );
+            p_owner->p_vout = NULL;
+            vlc_mutex_unlock( &p_owner->lock );
+        }
         return NULL;
     }
 
