@@ -372,6 +372,16 @@ error:
 
 }
 
+static mtime_t BlockTick( const block_t *p_block )
+{
+    if( unlikely(!p_block) )
+        return 0;
+    else if( likely(p_block->i_dts != 0) )
+        return p_block->i_dts;
+    else
+        return p_block->i_pts;
+}
+
 static void OutputStart( sout_stream_t *p_stream )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
@@ -513,7 +523,7 @@ static void OutputStart( sout_stream_t *p_stream )
             continue;
 
         const block_t *p_block = id->p_first;
-        mtime_t i_dts = p_block->i_dts;
+        mtime_t i_dts = BlockTick( p_block );
 
         if( i_dts > i_highest_head_dts &&
            ( id->fmt.i_cat == AUDIO_ES || id->fmt.i_cat == VIDEO_ES ) )
@@ -525,7 +535,7 @@ static void OutputStart( sout_stream_t *p_stream )
         {
             if( p_block->i_flags & BLOCK_FLAG_TYPE_I )
             {
-                i_dts = p_block->i_dts;
+                i_dts = BlockTick( p_block );
                 break;
             }
         }
@@ -538,10 +548,12 @@ static void OutputStart( sout_stream_t *p_stream )
         p_sys->i_dts_start = i_highest_head_dts;
 
     sout_stream_id_sys_t *p_cand;
+    mtime_t canddts;
     do
     {
         /* dequeue candidate */
         p_cand = NULL;
+        canddts = 0;
 
         /* Send buffered data in dts order */
         for( int i = 0; i < p_sys->i_id; i++ )
@@ -551,8 +563,27 @@ static void OutputStart( sout_stream_t *p_stream )
             if( !id->id || id->p_first == NULL )
                 continue;
 
-            if( p_cand == NULL || id->p_first->i_dts < p_cand->p_first->i_dts )
+            block_t *p_id_block;
+            mtime_t id_dts = 0;
+            for( p_id_block = id->p_first; p_id_block; p_id_block = p_id_block->p_next )
+            {
+                id_dts = BlockTick( p_id_block );
+                if( id_dts != 0 )
+                    break;
+            }
+
+            if( !id_dts == 0 )
+            {
                 p_cand = id;
+                canddts = 0;
+                break;
+            }
+
+            if( p_cand == NULL || canddts > id_dts )
+            {
+                p_cand = id;
+                canddts = id_dts;
+            }
         }
 
         if( p_cand != NULL )
@@ -563,7 +594,7 @@ static void OutputStart( sout_stream_t *p_stream )
                 p_cand->pp_last = &p_cand->p_first;
             p_block->p_next = NULL;
 
-            if( p_block->i_dts >= p_sys->i_dts_start )
+            if( BlockTick( p_block ) >= p_sys->i_dts_start )
                 OutputSend( p_stream, p_cand, p_block );
             else
                 block_Release( p_block );
