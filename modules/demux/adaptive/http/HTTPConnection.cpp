@@ -89,7 +89,7 @@ HTTPConnection::~HTTPConnection()
 
 bool HTTPConnection::canReuse(const ConnectionParams &params_) const
 {
-    if( !available )
+    if( !available || params_.usesAccess() )
         return false;
 
     char *psz_proxy_url = vlc_getProxyUrl(params_.getUrl().c_str());
@@ -481,9 +481,9 @@ void StreamUrlConnection::reset()
     bytesRange = BytesRange();
 }
 
-bool StreamUrlConnection::canReuse(const ConnectionParams &) const
+bool StreamUrlConnection::canReuse(const ConnectionParams &params) const
 {
-    return available;
+    return available && params.usesAccess();
 }
 
 int StreamUrlConnection::request(const std::string &path, const BytesRange &range)
@@ -622,4 +622,32 @@ AbstractConnection * StreamUrlConnectionFactory::createConnection(vlc_object_t *
                                                                   const ConnectionParams &)
 {
     return new (std::nothrow) StreamUrlConnection(p_object);
+}
+
+ConnectionFactory::ConnectionFactory( AuthStorage *authstorage )
+{
+    native = new NativeConnectionFactory( authstorage );
+    streamurl = new StreamUrlConnectionFactory();
+}
+
+ConnectionFactory::~ConnectionFactory()
+{
+    delete native;
+    delete streamurl;
+}
+
+AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
+                                                         const ConnectionParams &params)
+{
+    bool b_streamurl = var_InheritBool(p_object, "adaptive-use-access");
+    if(!b_streamurl && !params.usesAccess())
+    {
+        return native->createConnection(p_object, params);
+    }
+    else
+    {
+        ConnectionParams paramsaccess = params;
+        paramsaccess.setUseAccess(true);
+        return streamurl->createConnection(p_object, paramsaccess);
+    }
 }
