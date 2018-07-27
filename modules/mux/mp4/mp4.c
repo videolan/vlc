@@ -537,12 +537,12 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
     if(p_stream->mux.i_edits_count == 0)
     {
         p_newedit->i_start_time = 0;
-        p_newedit->i_start_offset = p_stream->i_first_dts - i_mux_start_dts;
+        p_newedit->i_start_offset = __MAX(0, p_stream->i_first_dts - i_mux_start_dts);
     }
     else
     {
         const mp4mux_edit_t *p_lastedit = &p_realloc[p_stream->mux.i_edits_count - 1];
-        p_newedit->i_start_time = p_lastedit->i_start_time + p_lastedit->i_duration;
+        p_newedit->i_start_time = __MAX(0, p_lastedit->i_start_time + p_lastedit->i_duration);
         p_newedit->i_start_offset = 0;
     }
 
