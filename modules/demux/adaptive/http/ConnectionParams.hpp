@@ -29,7 +29,19 @@ namespace adaptive
     {
         class Transport;
 
-        class ConnectionParams
+        class BackendPrefInterface
+        {
+            /* Design Hack for now to force fallback on regular access
+             * through hybrid connection factory */
+            public:
+                BackendPrefInterface() { useaccess = false; }
+                bool usesAccess() const { return useaccess; }
+                void setUseAccess(bool b) { useaccess = b; }
+            private:
+                bool useaccess;
+        };
+
+        class ConnectionParams : public BackendPrefInterface
         {
             public:
                 ConnectionParams();

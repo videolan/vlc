@@ -73,10 +73,7 @@ HTTPConnectionManager::HTTPConnectionManager    (vlc_object_t *p_object_, AuthSt
     vlc_mutex_init(&lock);
     downloader = new (std::nothrow) Downloader();
     downloader->start();
-    if(var_InheritBool(p_object, "adaptive-use-access"))
-        factory = new (std::nothrow) StreamUrlConnectionFactory();
-    else
-        factory = new (std::nothrow) NativeConnectionFactory( storage );
+    factory = new ConnectionFactory(storage);
 }
 
 HTTPConnectionManager::~HTTPConnectionManager   ()

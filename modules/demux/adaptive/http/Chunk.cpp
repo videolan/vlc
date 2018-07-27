@@ -127,7 +127,7 @@ block_t * AbstractChunk::read(size_t size)
 }
 
 HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManager *manager,
-                                 const adaptive::ID &id) :
+                                 const adaptive::ID &id, bool access) :
     AbstractChunkSource(),
     connection   (NULL),
     connManager  (manager),
@@ -136,6 +136,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManag
     prepared = false;
     eof = false;
     sourceid = id;
+    setUseAccess(access);
     if(!init(url))
         eof = true;
 }
@@ -149,6 +150,7 @@ HTTPChunkSource::~HTTPChunkSource()
 bool HTTPChunkSource::init(const std::string &url)
 {
     params = ConnectionParams(url);
+    params.setUseAccess(usesAccess());
 
     if(params.getScheme() != "http" && params.getScheme() != "https")
         return false;
@@ -272,8 +274,8 @@ block_t * HTTPChunkSource::readBlock()
 }
 
 HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, AbstractConnectionManager *manager,
-                                                 const adaptive::ID &sourceid) :
-    HTTPChunkSource(url, manager, sourceid),
+                                                 const adaptive::ID &sourceid, bool access) :
+    HTTPChunkSource(url, manager, sourceid, access),
     p_head     (NULL),
     pp_tail    (&p_head),
     buffered     (0)
@@ -490,8 +492,8 @@ block_t * HTTPChunkBufferedSource::read(size_t readsize)
 }
 
 HTTPChunk::HTTPChunk(const std::string &url, AbstractConnectionManager *manager,
-                     const adaptive::ID &id):
-    AbstractChunk(new HTTPChunkSource(url, manager, id))
+                     const adaptive::ID &id, bool access):
+    AbstractChunk(new HTTPChunkSource(url, manager, id, access))
 {
 
 }
