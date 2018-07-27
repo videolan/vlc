@@ -42,7 +42,7 @@ block_t * Retrieve::HTTP(vlc_object_t *obj, AuthStorage *auth, const std::string
         return NULL;
     }
 
-    block_t *block = datachunk->read(1<<21);
+    block_t *block = datachunk->read(1<<25);
     delete datachunk;
     return block;
 }
