@@ -880,7 +880,7 @@ namespace
 
         input_item_t *createNewItem(IXML_Element *p_resource)
         {
-            vlc_tick_t i_duration = INPUT_DURATION_UNKNOWN;
+            vlc_tick_t i_duration = INPUT_DURATION_INDEFINITE;
             const char* psz_resource_url = xml_getChildElementValue( p_resource, "res" );
             if( !psz_resource_url )
                 return NULL;

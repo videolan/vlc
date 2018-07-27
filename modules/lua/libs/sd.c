@@ -295,7 +295,8 @@ static input_item_t *vlclua_sd_create_node( services_discovery_t *p_sd,
     }
 
     const char *psz_name = lua_tostring( L, -1 );
-    input_item_t *p_input = input_item_NewExt( INPUT_ITEM_URI_NOP, psz_name, INPUT_DURATION_UNKNOWN,
+    input_item_t *p_input = input_item_NewExt( INPUT_ITEM_URI_NOP, psz_name,
+                                               INPUT_DURATION_INDEFINITE,
                                                ITEM_TYPE_NODE,
                                                ITEM_NET_UNKNOWN );
     lua_pop( L, 1 );

@@ -76,7 +76,7 @@ static int Open (vlc_object_t *obj)
             continue;
 
         mrl[8] = name[0] = letter;
-        item = input_item_NewDisc (mrl, name, INPUT_DURATION_UNKNOWN);
+        item = input_item_NewDisc (mrl, name, INPUT_DURATION_INDEFINITE);
         msg_Dbg (sd, "adding %s (%s)", mrl, name);
         if (item == NULL)
             break;

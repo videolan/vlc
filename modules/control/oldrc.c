@@ -1156,7 +1156,7 @@ static void print_playlist( intf_thread_t *p_intf, playlist_item_t *p_item, int 
     char psz_buffer[MSTRTIME_MAX_SIZE];
     for( int i = 0; i< p_item->i_children; i++ )
     {
-        if( p_item->pp_children[i]->p_input->i_duration != INPUT_DURATION_UNKNOWN )
+        if( p_item->pp_children[i]->p_input->i_duration != INPUT_DURATION_INDEFINITE )
         {
             secstotimestr( psz_buffer, p_item->pp_children[i]->p_input->i_duration / CLOCK_FREQ );
             msg_rc( "|%*s- %s (%s)", 2 * i_level, "", p_item->pp_children[i]->p_input->psz_name, psz_buffer );

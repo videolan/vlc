@@ -850,7 +850,7 @@ sap_announce_t *CreateAnnounce( services_discovery_t *p_sd, uint32_t *i_source, 
 
     /* Released in RemoveAnnounce */
     p_input = input_item_NewStream( p_sap->p_sdp->psz_uri, p_sdp->psz_sessionname,
-                                    INPUT_DURATION_UNKNOWN );
+                                    INPUT_DURATION_INDEFINITE );
     if( unlikely(p_input == NULL) )
     {
         free( p_sap );

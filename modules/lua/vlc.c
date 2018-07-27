@@ -484,7 +484,7 @@ input_item_t *vlclua_read_input_item(vlc_object_t *obj, lua_State *L)
         msg_Warn(obj, "Playlist item name should be a string" );
 
     /* Read duration */
-    vlc_tick_t duration = INPUT_DURATION_UNKNOWN;
+    vlc_tick_t duration = INPUT_DURATION_INDEFINITE;
 
     lua_getfield( L, -3, "duration" );
     if (lua_isnumber(L, -1))
