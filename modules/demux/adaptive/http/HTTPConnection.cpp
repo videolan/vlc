@@ -567,16 +567,17 @@ void StreamUrlConnection::setUsed( bool b )
        reset();
 }
 
-ConnectionFactory::ConnectionFactory( AuthStorage *auth )
+NativeConnectionFactory::NativeConnectionFactory( AuthStorage *auth )
+    : AbstractConnectionFactory()
 {
     authStorage = auth;
 }
 
-ConnectionFactory::~ConnectionFactory()
+NativeConnectionFactory::~NativeConnectionFactory()
 {
 }
 
-AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
+AbstractConnection * NativeConnectionFactory::createConnection(vlc_object_t *p_object,
                                                          const ConnectionParams &params)
 {
     if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
@@ -612,7 +613,7 @@ AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
 }
 
 StreamUrlConnectionFactory::StreamUrlConnectionFactory()
-    : ConnectionFactory( NULL )
+    : AbstractConnectionFactory()
 {
 
 }
