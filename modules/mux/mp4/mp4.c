@@ -528,6 +528,9 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
     if(p_stream->mux.i_edits_count && b_fragmented)
         return true;
 
+    if(p_stream->mux.i_entry_count == 0)
+        return true;
+
     mp4mux_edit_t *p_realloc = realloc( p_stream->mux.p_edits, sizeof(mp4mux_edit_t) *
                                        (p_stream->mux.i_edits_count + 1) );
     if(unlikely(!p_realloc))
