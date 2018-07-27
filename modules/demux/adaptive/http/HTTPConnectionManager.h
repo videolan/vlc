@@ -37,7 +37,7 @@ namespace adaptive
     namespace http
     {
         class ConnectionParams;
-        class ConnectionFactory;
+        class AbstractConnectionFactory;
         class AbstractConnection;
         class AuthStorage;
         class Downloader;
@@ -66,7 +66,7 @@ namespace adaptive
         class HTTPConnectionManager : public AbstractConnectionManager
         {
             public:
-                HTTPConnectionManager           (vlc_object_t *p_object, ConnectionFactory *);
+                HTTPConnectionManager           (vlc_object_t *p_object, AbstractConnectionFactory *);
                 HTTPConnectionManager           (vlc_object_t *p_object, AuthStorage *);
                 virtual ~HTTPConnectionManager  ();
 
@@ -81,7 +81,7 @@ namespace adaptive
                 Downloader                                         *downloader;
                 vlc_mutex_t                                         lock;
                 std::vector<AbstractConnection *>                   connectionPool;
-                ConnectionFactory                                  *factory;
+                AbstractConnectionFactory                          *factory;
                 AbstractConnection * reuseConnection(ConnectionParams &);
         };
     }
