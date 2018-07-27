@@ -34,8 +34,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: Mikkel <scheike@outlook.com>, 2018\n"
+"PO-Revision-Date: 2018-07-27 18:20+0200\n"
+"Last-Translator: scootergrisen, 2018\n"
 "Language-Team: Danish (https://www.transifex.com/yaron/teams/16553/da/)\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -622,17 +622,17 @@ msgid ""
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
-"charset=utf-8\" /></head><body><h2>Velkommen til VLC medieafspiller-hjælp</"
+"charset=utf-8\" /></head><body><h2>Velkommen til VLC media player-hjælp</"
 "h2><h3>Vejledning</h3><p>Du kan finde manualen til VLC på <a href=\"http://"
 "wiki.videolan.org\">VideoLAN's wiki-websted</a>.</p><p>Hvis du er ny bruger "
-"af VLC medieafspiller, så læs <br><a href=\"http://wiki.videolan.org/"
-"Documentation:VLC_for_dummies\"><em>Introduktion til VLC medieafspiller</"
-"em></a>.</p><p>Du kan finde oplysninger til at bruge medieafspilleren i <br>"
-"\"<a href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>How to "
-"play files with VLC media player</em></a>\".</p><p>Du kan finde nyttige "
+"af VLC media player, så læs <br><a href=\"http://wiki.videolan.org/"
+"Documentation:VLC_for_dummies\"><em>Introduktion til VLC media player</em></"
+"a>.</p><p>Du kan finde oplysninger til at bruge medieafspilleren i <br>\"<a "
+"href=\"http://wiki.videolan.org/Documentation:Play_HowTo\"><em>Afspilning af "
+"filer med VLC media player</em></a>\".</p><p>Du kan finde nyttige "
 "oplysninger til at gemme, konvertere, omkode, kode, muxe og streame i <a "
-"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming "
-"Documentation</a>.</p><p>Kender du ikke betegnelserne, så kig i <a href="
+"href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo\">Streaming-"
+"dokumentation</a>.</p><p>Kender du ikke betegnelserne, så kig i <a href="
 "\"http://wiki.videolan.org/Knowledge_Base\">knowledge base</a>.</p><p>Læs <a "
 "href=\"http://wiki.videolan.org/Hotkeys\">shortcuts</a> for at lære de "
 "primære tastaturgenveje.</p><h3>Hjælp</h3><p>Inden du stiller spørgsmål, så "
@@ -644,7 +644,7 @@ msgstr ""
 "projektet ved at bruger tid på at hjælpe fællesskabet, designe skins, "
 "oversætte manualen, teste og programmere. Du kan også hjælpe ved at donere "
 "penge og materialer til os. Og så kan du selvfølgelig <b>udbrede kendskabet</"
-"b> til VLC medieafspiller.</p></body></html>"
+"b> til VLC media player.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -1004,7 +1004,7 @@ msgstr "Ja"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC tekster for hørehæmmede %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1156,11 +1156,11 @@ msgstr "Udefineret"
 
 #: src/input/es_out.c:3212
 msgid "ITU-R BT.601 (525 lines, 60 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (525 linjer, 60 Hz)"
 
 #: src/input/es_out.c:3214
 msgid "ITU-R BT.601 (625 lines, 50 Hz)"
-msgstr ""
+msgstr "ITU-R BT.601 (625 linjer, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
@@ -1177,7 +1177,7 @@ msgstr ""
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Farveoverførselsfunktion"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -1186,7 +1186,7 @@ msgstr "Farverum"
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s område"
 
 #: src/input/es_out.c:3255
 msgid "Full"
@@ -1225,7 +1225,7 @@ msgstr ""
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Rektangulær"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
@@ -1237,17 +1237,17 @@ msgstr ""
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Projektion"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Drejning"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr ""
+msgstr "Højdepunkt"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1257,15 +1257,15 @@ msgstr "Rulning"
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Synsfelt"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
-msgstr ""
+msgstr "Maks. lysstyrke"
 
 #: src/input/es_out.c:3310
 msgid "Min. luminance"
-msgstr ""
+msgstr "Min. lysstyrke"
 
 #: src/input/es_out.c:3318
 msgid "Primary R"
@@ -2719,7 +2719,7 @@ msgstr "Stream-ID på det undertekstspor, der skal bruges."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "Foretrukne tekster for hørehæmmede-dekoder"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2851,7 +2851,7 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "Optagemappe"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
@@ -2940,7 +2940,7 @@ msgstr "Underteksts skaleringsfaktor"
 
 #: src/libvlc-module.c:711
 msgid "Changes the subtitles size where possible"
-msgstr ""
+msgstr "Ændre underteksternes størrelse hvor det er muligt"
 
 #: src/libvlc-module.c:713
 msgid "Enable sub-pictures"
@@ -3113,7 +3113,7 @@ msgstr "Tidsudløb for TCP-forbindelse"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "Standardtidsudløb for TCP-forbindelse (i millisekunder)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3635,7 +3635,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "Søg efter nye plugins"
 
 #: src/libvlc-module.c:1055
 msgid ""
@@ -3818,11 +3818,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Vis skjulte filer"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Ignorer filer som begynder med '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3947,35 +3947,39 @@ msgstr "Ignorer"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Lydstyrkekontrol"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "Positionskontrol"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "Omvendt positionskontrol"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
-msgstr ""
+msgstr "Musehjulskontrol for lodret-akse"
 
 #: src/libvlc-module.c:1220
 msgid ""
 "The mouse wheel vertical (up/down) axis can control volume, position or be "
 "ignored."
 msgstr ""
+"Musehjulets lodrette-akse (op/ned) kan styre lydstyrke, position eller kan "
+"ignoreres."
 
 #: src/libvlc-module.c:1222
 msgid "Mouse wheel horizontal axis control"
-msgstr ""
+msgstr "Musehjulskontrol for vandret-akse"
 
 #: src/libvlc-module.c:1224
 msgid ""
 "The mouse wheel horizontal (left/right) axis can control volume, position or "
 "be ignored."
 msgstr ""
+"Musehjulets vandrette-akse (venstre/højre) kan styre lydstyrke, position "
+"eller kan ignoreres."
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
 #: modules/gui/macosx/VLCControlsBarCommon.m:81
@@ -4365,15 +4369,15 @@ msgstr "Vælg genvejstasten der formindsker undertekstforsinkelsen."
 
 #: src/libvlc-module.c:1325
 msgid "Reset subtitles text scale"
-msgstr ""
+msgstr "Nulstil skalering af undertekster"
 
 #: src/libvlc-module.c:1326
 msgid "Scale up subtitles text"
-msgstr ""
+msgstr "Opskaler undertekster"
 
 #: src/libvlc-module.c:1327
 msgid "Scale down subtitles text"
-msgstr ""
+msgstr "Nedskaler undertekster"
 
 #: src/libvlc-module.c:1328
 msgid "Select the key to change subtitles text scaling"
@@ -4622,7 +4626,7 @@ msgstr "Slå undertekster til/fra"
 
 #: src/libvlc-module.c:1396
 msgid "Toggle subtitle track visibility."
-msgstr ""
+msgstr "Undertekstspor synlighed til/fra."
 
 #: src/libvlc-module.c:1397
 msgid "Cycle next program Service ID"
@@ -5331,8 +5335,8 @@ msgid ""
 "It was not possible to download a cryptographic signature for the downloaded "
 "file \"%s\". Thus, it was deleted."
 msgstr ""
-"Det var ikke muligt at hente en kryptografisk signatur for den downloadede "
-"fil \"%s\". Derfor blev den slettet."
+"Det var ikke muligt at downloade en kryptografisk signatur for den "
+"downloadede fil \"%s\". Derfor blev den slettet."
 
 #: src/misc/update.c:661 src/misc/update.c:673
 msgid "Invalid signature"
@@ -5367,7 +5371,7 @@ msgstr "Filen er ødelagt"
 #: src/misc/update.c:699 src/misc/update.c:711
 #, c-format
 msgid "Downloaded file \"%s\" was corrupted. Thus, it was deleted."
-msgstr "Den hentede fil \"%s\" var beskadiget. Derfor blev den slettet."
+msgstr "Den downloadede fil \"%s\" var beskadiget. Derfor blev den slettet."
 
 #: src/misc/update.c:723
 msgid ""
@@ -5383,7 +5387,7 @@ msgstr "Installer"
 
 #: src/misc/update.c:727
 msgid "Update VLC media player"
-msgstr "Opdater VLC medieafspiller"
+msgstr "Opdater VLC media player"
 
 #: src/playlist/engine.c:237 src/playlist/loadsave.c:159 lib/media_list.c:237
 #: modules/gui/macosx/VLCMainWindow.m:296
@@ -6269,7 +6273,7 @@ msgstr ""
 
 #: modules/access/bluray.c:799
 msgid "Java required"
-msgstr ""
+msgstr "Kræver Java"
 
 #: modules/access/bluray.c:800
 #, c-format
@@ -6280,7 +6284,7 @@ msgstr ""
 
 #: modules/access/bluray.c:801
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "Java blev ikke fundet på dit system."
 
 #: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
@@ -6337,7 +6341,7 @@ msgstr "CDDB-server-port der skal bruges."
 
 #: modules/access/concat.c:303
 msgid "Inputs list"
-msgstr ""
+msgstr "Inputliste"
 
 #: modules/access/concat.c:305
 msgid "Comma-separated list of input URLs to concatenate."
@@ -6556,6 +6560,8 @@ msgid ""
 "Name of the audio device that will be used by the DirectShow plugin. If you "
 "don't specify anything, the default device will be used."
 msgstr ""
+"Navnet på den lydenhed, der skal bruges af DirectShow-pluginet. Hvis du ikke "
+"angiver noget, vil standardenheden blive brugt."
 
 #: modules/access/dshow/dshow.cpp:140
 #: modules/gui/qt/components/open_panels.cpp:798
@@ -6716,6 +6722,8 @@ msgid ""
 "AM Tuner mode. Can be one of Default (0), TV (1), AM Radio (2), FM Radio (3) "
 "or DSS (4)."
 msgstr ""
+"AM-tunertilstand. Kan være én af standard (0), TV (1), AM-radio (2), FM-"
+"radio (3) eller DSS (4)."
 
 #: modules/access/dshow/dshow.cpp:199
 msgid ""
@@ -6778,7 +6786,7 @@ msgstr "Optagerenheden \"%s\" understøtter ikke de krævede parametre."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 msgid "Windows networks"
-msgstr ""
+msgstr "Windows-netværk"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
@@ -6786,7 +6794,7 @@ msgstr ""
 
 #: modules/access/dsm/access.c:67
 msgid "libdsm SMB input"
-msgstr ""
+msgstr "libdsm SMB-input"
 
 #: modules/access/dsm/access.c:80
 msgid "libdsm NETBIOS discovery module"
@@ -7284,7 +7292,7 @@ msgstr "Konfiguration af sattellitskanning"
 
 #: modules/access/dvb/access.c:71
 msgid "Filename of config file in share/dvb/dvb-s."
-msgstr ""
+msgstr "Filnavn for konfigurationsfil i share/dvb/dvb-s."
 
 #: modules/access/dvb/access.c:73
 msgid "Scan tuning list"
@@ -7413,7 +7421,7 @@ msgstr "Mappe"
 
 #: modules/access/fs.c:53
 msgid "List special files"
-msgstr ""
+msgstr "List specialfiler"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
@@ -7560,7 +7568,7 @@ msgstr ""
 
 #: modules/access/http/access.c:307
 msgid "User agent"
-msgstr ""
+msgstr "User agent"
 
 #: modules/access/http/access.c:308
 msgid ""
@@ -9138,7 +9146,7 @@ msgstr "VNC-klientadgang"
 
 #: modules/access/wasapi.c:485
 msgid "Loopback mode"
-msgstr ""
+msgstr "Loopback-tilstand"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
@@ -9408,7 +9416,7 @@ msgstr ""
 
 #: modules/access_output/shout.c:96
 msgid "Samplerate information of the transcoded stream."
-msgstr ""
+msgstr "Samplinghastighed informationen på det omkodede stream."
 
 #: modules/access_output/shout.c:98
 msgid "Number of channels"
@@ -9446,19 +9454,19 @@ msgstr "IceCAST-output"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Længde på krypteringsnøgle i byte"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
-msgstr ""
+msgstr "16 byte"
 
 #: modules/access_output/srt.c:57
 msgid "24 bytes"
-msgstr ""
+msgstr "24 byte"
 
 #: modules/access_output/srt.c:57
 msgid "32 bytes"
-msgstr ""
+msgstr "32 byte"
 
 #: modules/access_output/srt.c:437
 msgid "SRT stream output"
@@ -9466,7 +9474,7 @@ msgstr ""
 
 #: modules/access_output/srt.c:446
 msgid "Password for stream encryption"
-msgstr ""
+msgstr "Adgangskode til streamkryptering"
 
 #: modules/access_output/udp.c:62 modules/stream_out/rtp.c:135
 msgid "Caching value (ms)"
@@ -9612,7 +9620,7 @@ msgstr ""
 "Denne effekt gør at du føler du står i et rum med 7.1 højttaleropsætning, så "
 "du får en mere realistisk lydoplevelse selvom du kun bruger et headset. "
 "Dette bør være mere afslappende og komfortabelt når man lytter til musik i "
-"lang tid. \n"
+"lang tid.\n"
 "Det virker med alle lydformater fra mono til 7.1."
 
 #: modules/audio_filter/channel_mixer/headphone.c:60
@@ -9872,7 +9880,7 @@ msgstr "Knee-radius"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "Angiv knee-radius i dB."
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -10629,7 +10637,7 @@ msgstr "Slået fra"
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "Aktiveret (kun AC3/DTS)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
@@ -11283,7 +11291,7 @@ msgstr ""
 "Hvis du ikke ved, hvordan du skal ordne det, så bed om hjælp fra din "
 "distribution.\n"
 "\n"
-"Dette er ikke en fejl i VLC medieafspiller.\n"
+"Dette er ikke en fejl i VLC media player.\n"
 "Undlad at kontakte VideoLAN-projektet vedrørende dette problem.\n"
 
 #: modules/codec/avcodec/encoder.c:883
@@ -12659,7 +12667,7 @@ msgstr ""
 
 #: modules/codec/scte27.c:43
 msgid "SCTE-27"
-msgstr ""
+msgstr "SCTE-27"
 
 #: modules/codec/sdl_image.c:60
 msgid "SDL Image decoder"
@@ -13150,7 +13158,7 @@ msgstr "Theora video-koder"
 
 #: modules/codec/ttml/ttml.c:45
 msgid "TTML decoder"
-msgstr ""
+msgstr "TTML-afkoder"
 
 #: modules/codec/ttml/ttml.c:46
 msgid "TTML subtitles decoder"
@@ -13255,7 +13263,7 @@ msgstr "Vorbis-lyd-koder"
 
 #: modules/codec/vpx.c:53
 msgid "Quality mode"
-msgstr ""
+msgstr "Kvalitetstilstand"
 
 #: modules/codec/vpx.c:54
 msgid ""
@@ -13275,7 +13283,7 @@ msgstr "Webm-videokoder"
 
 #: modules/codec/webvtt/webvtt.c:40
 msgid "WEBVTT decoder"
-msgstr ""
+msgstr "WEBVTT-afkoder"
 
 #: modules/codec/webvtt/webvtt.c:41
 msgid "WEBVTT subtitles decoder"
@@ -13321,7 +13329,7 @@ msgstr ""
 "blot det ene billede foran sig (se også referencebillede-tilvalget). Derfor "
 "er I-billeder ikke nødvendigvis søgbare. IDR-billeder begrænser "
 "efterfølgende P-billeder fra at henvise til alle billeder som kommer for IDR-"
-"billedet.\n"
+"billedet. \n"
 "Hvis sceneopdelinger forekommer indenfor dette interval, så er de stadig "
 "kodet som I-billeder, men starter ikke en ny GOP/gruppe af billeder."
 
@@ -14293,7 +14301,7 @@ msgstr "D-Bus-kontrolgrænseflade"
 #: modules/video_output/wayland/xdg-shell.c:291
 #: modules/video_output/xcb/window.c:464
 msgid "VLC media player"
-msgstr "VLC medieafspiller"
+msgstr "VLC media player"
 
 #: modules/control/dummy.c:38 modules/control/oldrc.c:176
 msgid "Do not open a DOS command box interface"
@@ -15061,7 +15069,7 @@ msgstr ""
 
 #: modules/demux/adaptive/adaptive.cpp:99
 msgid "Near Optimal"
-msgstr ""
+msgstr "Nær optimal"
 
 #: modules/demux/adaptive/adaptive.cpp:100
 msgid "Bandwidth Adaptive"
@@ -16270,7 +16278,7 @@ msgstr "Dias (billeder)"
 #: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/macosx/VLCMainMenu.m:339
 msgid "About VLC media player"
-msgstr "Om VLC medieafspiller"
+msgstr "Om VLC media player"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:102
 #: modules/gui/qt/dialogs/help.cpp:125
@@ -16291,10 +16299,9 @@ msgstr "Udviklere"
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
 msgstr ""
-"VLC medieafspiller og VideoLAN er varemærker tilhørende VideoLAN Association."
+"VLC media player og VideoLAN er varemærker tilhørende VideoLAN Association."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16305,12 +16312,12 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC medieafspiller er en fri og open source medieafspiller, koder og "
-"streamer lavet af frivillige fra <a href=\"http://www.videolan.org/\"><span "
+"<p>VLC media player er en fri og open source medieafspiller, koder og "
+"streamer lavet af frivillige fra <a href=\"https://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a>-"
 "fællesskabet.</p><p>VLC bruger sine egne interne codecs, virker på stort set "
 "alle populære platforme og kan afspille næsten alle filer, CD'er, DVD'er, "
-"netværksstreams og andre medieformater!</p><p><a href=\"http://www.videolan."
+"netværksstreams og andre medieformater!</p><p><a href=\"https://www.videolan."
 "org/contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Hjælp os og vær med!</span></a>"
 
@@ -16394,7 +16401,7 @@ msgstr "Skins"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Anvend profil ved næste opstart"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -16953,7 +16960,6 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Forlad fuldskærm"
 
@@ -17458,7 +17464,7 @@ msgstr "Gå til tidspunkt"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Optegner"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -17599,7 +17605,7 @@ msgstr "Hjælp"
 
 #: modules/gui/macosx/VLCMainMenu.m:489
 msgid "VLC media player Help..."
-msgstr "VLC medieafspiller-hjælp..."
+msgstr "VLC media player-hjælp..."
 
 #: modules/gui/macosx/VLCMainMenu.m:491
 msgid "Online Documentation..."
@@ -18459,7 +18465,7 @@ msgid ""
 "\n"
 "Are you sure you want to continue?"
 msgstr ""
-"VLC medieafspillers indstillinger vil blive nulstillet.\n"
+"VLC media player's indstillinger vil blive nulstillet.\n"
 "\n"
 "Bemærk at VLC genstarter under forløbet, så din nuværende spilleliste vil "
 "blive tømt og eventuel afspilning, streaming eller transcoding vil stoppe "
@@ -19659,15 +19665,15 @@ msgstr "Gendan normal afspilningshastighed"
 
 #: modules/gui/qt/components/interface_widgets.cpp:819
 msgid "Download cover art"
-msgstr "Download cover-billede"
+msgstr "Download coverbillede"
 
 #: modules/gui/qt/components/interface_widgets.cpp:823
 msgid "Add cover art from file"
-msgstr "Tilføj cover-billede fra fil"
+msgstr "Tilføj coverbillede fra fil"
 
 #: modules/gui/qt/components/interface_widgets.cpp:889
 msgid "Choose Cover Art"
-msgstr "Vælg cover-billede"
+msgstr "Vælg coverbillede"
 
 #: modules/gui/qt/components/interface_widgets.cpp:890
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
@@ -20341,7 +20347,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
 msgid "Privacy and Network Access Policy"
-msgstr "Privatliv og netværksadgang politik"
+msgstr "Privatlivs- og netværksadgangspolitik"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:69
 msgid ""
@@ -20356,12 +20362,12 @@ msgid ""
 "express consent for the media player to access the Internet automatically.</"
 "p>\n"
 msgstr ""
-"<p>For at beskytte dit privatliv, indsamler <i>VLC medieafspiller</i> "
-"<b>ikke</b> personlige data og videregiver dem heller ikke, selv i anonym "
-"form, til andre.</p>\n"
+"<p>For at beskytte dit privatliv, indsamler <i>VLC media player</i> <b>ikke</"
+"b> personlige data og videregiver dem heller ikke, selv i anonym form, til "
+"andre.</p>\n"
 "<p>Ikke desto mindre, er <i>VLC</i> i stand til automatisk at hente "
 "oplysninger om medierne i din spilleliste fra internet-baseret "
-"tredjepartstjenester. Det inkludere cover-billede, spornavne, kunstnernavne "
+"tredjepartstjenester. Det inkludere coverbillede, spornavne, kunstnernavne "
 "og andet metadata.</p>\n"
 "<p>Som følge heraf, kan nogle af dine mediefiler identificeres af "
 "tredjepart. Derfor har <i>VLC</i>-udviklerne valgte at du udtrykkeligt skal "
@@ -20370,7 +20376,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:88
 msgid "Network Access Policy"
-msgstr "Netværksadgang politik"
+msgstr "Netværksadgangspolitik"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
@@ -20404,7 +20410,7 @@ msgid ""
 "\"http://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC medieafspiller er en fri og open source medieafspiller, koder og "
+"<p>VLC media player er en fri og open source medieafspiller, koder og "
 "streamer lavet af frivillige fra <a href=\"http://www.videolan.org/\"><span "
 "style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</span></a>-"
 "fællesskabet.</p><p>VLC bruger sine egne interne codecs, virker på stort set "
@@ -20427,7 +20433,7 @@ msgstr "&Nej"
 
 #: modules/gui/qt/dialogs/help.cpp:222 modules/gui/qt/ui/update.h:147
 msgid "VLC media player updates"
-msgstr "VLC medieafspiller-opdateringer"
+msgstr "Opdatering af VLC media player"
 
 #: modules/gui/qt/dialogs/help.cpp:294
 msgid "A new version of VLC (%1.%2.%3%4) is available."
@@ -20435,7 +20441,7 @@ msgstr "Der findes en ny version af VLC (%1.%2.%3%4)."
 
 #: modules/gui/qt/dialogs/help.cpp:319
 msgid "You have the latest version of VLC media player."
-msgstr "Du har den seneste version af VLC medieafspiller."
+msgstr "Du har den seneste version af VLC media player."
 
 #: modules/gui/qt/dialogs/help.cpp:326
 msgid "An error occurred while checking for updates..."
@@ -20741,7 +20747,7 @@ msgstr "Fil med indstillinger kunne ikke blive gemt"
 #: modules/gui/qt/dialogs/preferences.cpp:337
 msgid "Are you sure you want to reset your VLC media player preferences?"
 msgstr ""
-"Er du sikker på, at du vil nulstille dine VLC medieafspiller-indstillinger?"
+"Er du sikker på, at du vil nulstille dine VLC media player-indstillinger?"
 
 #: modules/gui/qt/dialogs/sout.cpp:45 modules/gui/qt/ui/sout.h:201
 msgid "Stream Output"
@@ -21329,11 +21335,11 @@ msgstr "&Afspilning"
 
 #: modules/gui/qt/menus.cpp:1174
 msgid "&Hide VLC media player in taskbar"
-msgstr "&Skjul VLC medieafspiller i proceslinje"
+msgstr "&Skjul VLC media player i proceslinje"
 
 #: modules/gui/qt/menus.cpp:1180
 msgid "Sho&w VLC media player"
-msgstr "&Vis VLC medieafspiller"
+msgstr "&Vis VLC media player"
 
 #: modules/gui/qt/menus.cpp:1191
 msgid "&Open Media"
@@ -21353,7 +21359,7 @@ msgstr "<Local>"
 
 #: modules/gui/qt/menus.cpp:1658
 msgid "Scanning..."
-msgstr ""
+msgstr "Skanner..."
 
 #: modules/gui/qt/qt.cpp:81
 msgid "Show advanced preferences over simple ones"
@@ -21377,7 +21383,7 @@ msgid ""
 "basic actions."
 msgstr ""
 "Vis et ikon i proceslinjen, der giver dig grundlæggende kontrol med VLC "
-"medieafspiller."
+"media player."
 
 #: modules/gui/qt/qt.cpp:91
 msgid "Start VLC with only a systray icon"
@@ -24894,11 +24900,11 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:191
 #: modules/stream_out/chromecast/cast.cpp:1202
 msgid "Performance warning"
-msgstr ""
+msgstr "Advarsel om ydelse"
 
 #: modules/stream_out/chromecast/cast.cpp:192
 msgid "Display a performance warning when transcoding"
-msgstr ""
+msgstr "Viser en advarsel om ydelse ved transkodning"
 
 #: modules/stream_out/chromecast/cast.cpp:193
 msgid "Enable Audio passthrough"
@@ -24926,7 +24932,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:222
 msgid "Conversion quality"
-msgstr ""
+msgstr "Konverteringskvalitet"
 
 #: modules/stream_out/chromecast/cast.cpp:223
 msgid "Change this option to increase conversion speed or quality."
@@ -26532,17 +26538,17 @@ msgid ""
 "simulation, but requires more CPU and memory bandwidth."
 msgstr ""
 "Vælg handling af farver i de output-frames som falde henover input-frame "
-"afgrænsninger.\n"
+"afgrænsninger. \n"
 "\n"
 "Latest: tag kun chroma fra nyt (lyst) field. God til interlaced-input, såsom "
-"videoer fra camcorder.\n"
+"videoer fra camcorder. \n"
 "\n"
 "AltLine: tag chroma linje 1 from øverste field, linje 2 from nederste field, "
-"osv.\n"
-"Standard, god til NTSC telecined input (anime DVD'er, osv.).\n"
+"osv. \n"
+"Standard, god til NTSC telecined input (anime DVD'er, osv.). \n"
 "\n"
 "Blend gennemsnit input field chromaer. Kan også forvrænge farverne på nye "
-"(lyse) field.\n"
+"(lyse) field. \n"
 "\n"
 "Upconvert: output i 4:2:2-format (uafhængig chroma for hver field). Bedste "
 "simulation, men kræver mere CPU- og hukommelsesbåndbredde."
@@ -27843,7 +27849,7 @@ msgstr ""
 #: modules/video_output/xcb/window.c:433
 msgctxt "ASCII"
 msgid "VLC media player"
-msgstr "VLC medieafspiller"
+msgstr "VLC media player"
 
 #. xgettext: This is a plain ASCII spelling of "VLC"
 #. for the ICCCM window name. This must be pure ASCII.
@@ -28228,7 +28234,7 @@ msgstr "Bredden på visualiseringsvinduet, i pixels."
 
 #: modules/visualization/glspectrum.c:59
 msgid "The height of the visualization window, in pixels."
-msgstr ""
+msgstr "Højden på visualiseringsvinduet, i pixels."
 
 #: modules/visualization/glspectrum.c:62
 msgid "glSpectrum"
@@ -28390,7 +28396,7 @@ msgstr "Vis 80 bånd i stedet for 20"
 
 #: modules/visualization/visual/visual.c:72
 msgid "More bands for the spectrometer: 80 if enabled, else 20."
-msgstr ""
+msgstr "Flere bånd til spektrometeret: 80 hvis den er aktiveret, ellers 20."
 
 #: modules/visualization/visual/visual.c:74
 msgid "Number of blank pixels between bands."
@@ -28603,7 +28609,7 @@ msgstr "Tid:"
 #: share/lua/http/index.html:26 share/lua/http/mobile_browse.html:25
 #: share/lua/http/mobile_equalizer.html:25 share/lua/http/mobile_view.html:25
 msgid "VLC media player - Web Interface"
-msgstr "VLC medieafspiller-webbrugerflade"
+msgstr "VLC media player - webgrænseflade"
 
 #: share/lua/http/index.html:215
 msgid "Hide / Show Library"
@@ -28643,7 +28649,7 @@ msgstr "Afspil markerede"
 
 #: share/lua/http/index.html:245
 msgid "Refresh List"
-msgstr "Opdatér liste"
+msgstr "Opdater liste"
 
 #: share/lua/http/index.html:252
 msgid "Loading flowplayer..."
@@ -28772,7 +28778,7 @@ msgstr "Starttidspunkt"
 
 #: modules/gui/qt/ui/open.h:273
 msgid "Stop Time"
-msgstr ""
+msgstr "Stoptidspunkt"
 
 #: modules/gui/qt/ui/open.h:274
 msgid "Edit Options"
@@ -28800,7 +28806,7 @@ msgstr "HH'H':mm'm':ss's'.zzz"
 
 #: modules/gui/qt/ui/open.h:288
 msgid "Change the stop time for the media"
-msgstr ""
+msgstr "Skift stoptidspunktet for mediet"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
