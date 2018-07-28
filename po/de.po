@@ -23,8 +23,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-17 22:50+0200\n"
-"Last-Translator: Mario Siegmann <mario_siegmann@web.de>, 2018\n"
+"PO-Revision-Date: 2018-07-28 11:49+0200\n"
+"Last-Translator: porschm, 2018\n"
 "Language-Team: German (https://www.transifex.com/yaron/teams/16553/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -2694,8 +2694,8 @@ msgid ""
 "language)."
 msgstr ""
 "Sprache der zu benutzenden Audiospur (durch Kommata getrennte 2er- oder 3er-"
-"Landescodes). Sie können 'nichts' angeben um den Wechsel in eine andere "
-"Sprache zu verhindern"
+"Landescodes. Sie können 'none' (nichts) angeben um den Wechsel in eine "
+"andere Sprache zu verhindern)."
 
 #: src/libvlc-module.c:593
 msgid "Subtitle language"
@@ -2707,7 +2707,8 @@ msgid ""
 "three letters country code, you may use 'any' as a fallback)."
 msgstr ""
 "Sprache der zu benutzenden Untertitelspur (durch Kommata getrennte 2er- oder "
-"3er-Landescodes). Sie können als Ausweichmöglichkeit 'beliebig' verwenden."
+"3er-Landescodes. Sie können als Ausweichmöglichkeit 'any' (beliebig) "
+"verwenden)."
 
 #: src/libvlc-module.c:598
 msgid "Menu language"
@@ -2871,7 +2872,7 @@ msgid ""
 msgstr ""
 "Sie können manuell eine Liste mit Lesezeichen für einen Stream in der Form "
 "\"{Name = Lesezeichenname, Uhrzeit = optionaler Zeitversatz, Bytes = "
-"optional-Byte-Offset}, {...}\" angeben."
+"optionaler Byte-Versatz}, {...}\" angeben."
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
@@ -9763,7 +9764,7 @@ msgstr ""
 "Dieser Effekt gibt Ihnen das Gefühl in einem Raum mit komplettem 7.1-"
 "Soundsystem zu stehen wenn Sie nur einen Kopfhörer benutzen und hat so ein "
 "realistischeres Klangerlebnis zur Folge. Dies sollte außerdem komfortabler "
-"und weniger ermüdend sein, wenn Sie für längere Zeit Musik hören. \n"
+"und weniger ermüdend sein, wenn Sie für längere Zeit Musik hören.\n"
 "Dieser Effekt funktioniert mit jedem Format von Mono bis hin zu 7.1."
 
 #: modules/audio_filter/channel_mixer/headphone.c:60
@@ -11105,8 +11106,8 @@ msgid ""
 "Force skipping of idct to speed up decoding for frame types (-1=None, "
 "0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)."
 msgstr ""
-"Überspringen von idct zum Beschleunigen der Decodierung von Bild-Typen "
-"erzwingen (-1=Keine, 0=Standard, 1=B-Frames, 2=P-Frames, 3=B+P-Frames, "
+"Überspringen von idct erzwingen, um die Decodierung für Bild-Typen zu "
+"beschleunigen (-1=Keine, 0=Standard, 1=B-Frames, 2=P-Frames, 3=B+P-Frames, "
 "4=Alle Frames)."
 
 #: modules/codec/avcodec/avcodec.h:102
@@ -13533,7 +13534,7 @@ msgstr ""
 "P-Frame von mehr als einem Frame davor vorhergesagt werden darf (siehe "
 "Referenzframe-Option). Deshalb sind I-Frames nicht notwendigerweise "
 "durchsuchbar. IDR-Frames schränken aufeinanderfolgende P-Frames ein, sodass "
-"diese sich nicht auf einen Frame vor dem IDR-Frame beziehen können.\n"
+"diese sich nicht auf einen Frame vor dem IDR-Frame beziehen können. \n"
 "Wenn Szenenschnitte innerhalb dieses Intervalls auftreten, werden sie immer "
 "noch als I-Frames encodiert, aber starten kein neues GOP."
 
@@ -24688,10 +24689,10 @@ msgid ""
 "number of rows and columns. fixed: use the user-defined number of rows and "
 "columns. offsets: use the user-defined offsets for each image."
 msgstr ""
-"Positionierungsmethode für das Mosaik. auto: automatisch die beste Anzahl "
-"von Zeilen und Spalten wählen. fixed: die benutzerdefinierte Anzahl von "
-"Zeilen und Spalten benutzen. offsets: die benutzerdefinierten Abstände für "
-"jedes Bild benutzen."
+"Positionierungsmethode für das Mosaik. automatisch: die beste Anzahl der "
+"Zeilen und Spalten automatisch wählen. fest: benutzerdefinierte Anzahl von "
+"Zeilen und Spalten verwenden. versetzt: benutzerdefinierte Abstände für "
+"jedes Bild verwenden."
 
 #: modules/spu/mosaic.c:124 modules/video_splitter/panoramix.c:64
 #: modules/video_splitter/wall.c:50
@@ -24704,7 +24705,7 @@ msgid ""
 "to \"fixed\")."
 msgstr ""
 "Anzahl der Bildzeilen des Mosaiks (wird nur benutzt, wenn die "
-"Positionierungsmethode auf \"fixed\" gesetzt ist)."
+"Positionierungsmethode auf \"fest\" gesetzt ist)."
 
 #: modules/spu/mosaic.c:129 modules/video_splitter/panoramix.c:60
 #: modules/video_splitter/wall.c:46
@@ -24717,7 +24718,7 @@ msgid ""
 "set to \"fixed\")."
 msgstr ""
 "Anzahl der Bildspalten des Mosaiks (wird nur benutzt, wenn die "
-"Positionierungsmethode auf \"fixed\" gesetzt ist)."
+"Positionierungsmethode auf \"fest\" gesetzt ist)."
 
 #: modules/spu/mosaic.c:134
 msgid "Keep aspect ratio"
@@ -24753,7 +24754,7 @@ msgstr ""
 
 #: modules/spu/mosaic.c:148
 msgid "Offsets in order"
-msgstr "Versatz der Reihenfolge"
+msgstr "Versatz in der Reihenfolge"
 
 #: modules/spu/mosaic.c:150
 msgid ""
@@ -24762,8 +24763,8 @@ msgid ""
 "separated list of coordinates (eg: 10,10,150,10)."
 msgstr ""
 "Sie können den X-/Y-Versatz der Mosaikelemente festlegen, falls die "
-"Positionierungsmethode \"offset\" ist. Diese Liste muss durch Kommata "
-"getrennt sein (z.B.: 10,10,150,10)."
+"Positionierungsmethode auf \"versetzt\" gesetzt ist. Diese Liste muss durch "
+"Kommata getrennt sein (z.B.: 10,10,150,10)."
 
 #: modules/spu/mosaic.c:156
 msgid ""
@@ -24785,7 +24786,7 @@ msgstr "fest"
 
 #: modules/spu/mosaic.c:166
 msgid "offsets"
-msgstr "Versatz"
+msgstr "versetzt"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
