@@ -31,8 +31,8 @@
 #include <algorithm>
 #include <assert.h>
 
-#include <upnp/upnp.h>
-#include <upnp/upnptools.h>
+#include <upnp.h>
+#include <upnptools.h>
 
 #if UPNP_VERSION < 10800
 typedef void* UpnpEventPtr;
