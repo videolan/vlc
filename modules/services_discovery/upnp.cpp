@@ -56,7 +56,7 @@ static const char *const ppsz_satip_channel_lists[] = {
     "Auto", "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "MasterList", "ServerList", "CustomList"
 };
 static const char *const ppsz_readible_satip_channel_lists[] = {
-    N_("Auto"), "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", N_("Master List"), N_("Server List"), N_("Custom List")
+    N_("Auto"), "Astra 19.2°E", "Astra 28.2°E", "Astra 23.5°E", N_("SAT>IP Main List"), N_("Device List"), N_("Custom List")
 };
 
 namespace {
@@ -106,7 +106,7 @@ vlc_module_begin()
     set_capability( "services_discovery", 0 );
     set_callbacks( SD::OpenSD, SD::CloseSD );
 
-    add_string( "satip-channelist", "ASTRA_19_2E", SATIP_CHANNEL_LIST,
+    add_string( "satip-channelist", "auto", SATIP_CHANNEL_LIST,
                 SATIP_CHANNEL_LIST, false )
     change_string_list( ppsz_satip_channel_lists, ppsz_readible_satip_channel_lists )
     add_string( "satip-channellist-url", NULL, SATIP_CHANNEL_LIST_URL,
