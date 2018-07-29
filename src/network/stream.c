@@ -69,7 +69,7 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
             return -1;
         }
 
-        ssize_t val = session->readv(session, &iov, 1);
+        ssize_t val = session->ops->readv(session, &iov, 1);
         if (val > 0)
         {
             if (!waitall)
@@ -110,7 +110,7 @@ ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
             return -1;
         }
 
-        ssize_t val = session->writev(session, &iov, 1);
+        ssize_t val = session->ops->writev(session, &iov, 1);
         if (val > 0)
         {
             iov.iov_base = ((char *)iov.iov_base) + val;
@@ -212,6 +212,15 @@ static void vlc_tls_SocketClose(vlc_tls_t *tls)
     free(tls);
 }
 
+static const struct vlc_tls_operations vlc_tls_socket_ops =
+{
+    vlc_tls_SocketGetFD,
+    vlc_tls_SocketRead,
+    vlc_tls_SocketWrite,
+    vlc_tls_SocketShutdown,
+    vlc_tls_SocketClose,
+};
+
 static vlc_tls_t *vlc_tls_SocketAlloc(int fd,
                                       const struct sockaddr *restrict peer,
                                       socklen_t peerlen)
@@ -222,11 +231,7 @@ static vlc_tls_t *vlc_tls_SocketAlloc(int fd,
 
     vlc_tls_t *tls = &sock->tls;
 
-    tls->get_fd = vlc_tls_SocketGetFD;
-    tls->readv = vlc_tls_SocketRead;
-    tls->writev = vlc_tls_SocketWrite;
-    tls->shutdown = vlc_tls_SocketShutdown;
-    tls->close = vlc_tls_SocketClose;
+    tls->ops = &vlc_tls_socket_ops;
     tls->p = NULL;
 
     sock->fd = fd;
@@ -346,6 +351,9 @@ static ssize_t vlc_tls_Connect(vlc_tls_t *tls)
 static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
                                     const struct iovec *iov,unsigned count)
 {
+    /* Next time, write directly. Do not retry to connect. */
+    tls->ops = &vlc_tls_socket_ops;
+
 #ifdef MSG_FASTOPEN
     vlc_tls_socket_t *sock = (vlc_tls_socket_t *)tls;
     const struct msghdr msg =
@@ -356,9 +364,6 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
         .msg_iovlen = count,
     };
     ssize_t ret;
-
-    /* Next time, write directly. Do not retry to connect. */
-    tls->writev = vlc_tls_SocketWrite;
 
     ret = sendmsg(vlc_tls_SocketGetFD(tls), &msg, MSG_NOSIGNAL|MSG_FASTOPEN);
     if (ret >= 0)
@@ -375,8 +380,6 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
     if (errno != EOPNOTSUPP)
         return -1;
     /* Fast open not supported or disabled... fallback to normal mode */
-#else
-    tls->writev = vlc_tls_SocketWrite;
 #endif
 
     if (vlc_tls_Connect(tls))
@@ -384,6 +387,15 @@ static ssize_t vlc_tls_ConnectWrite(vlc_tls_t *tls,
 
     return vlc_tls_SocketWrite(tls, iov, count);
 }
+
+static const struct vlc_tls_operations vlc_tls_socket_fastopen_ops =
+{
+    vlc_tls_SocketGetFD,
+    vlc_tls_SocketRead,
+    vlc_tls_ConnectWrite,
+    vlc_tls_SocketShutdown,
+    vlc_tls_SocketClose,
+};
 
 vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *restrict info,
                                       bool defer_connect)
@@ -395,7 +407,7 @@ vlc_tls_t *vlc_tls_SocketOpenAddrInfo(const struct addrinfo *restrict info,
     if (defer_connect)
     {   /* The socket is not connected yet.
          * The connection will be triggered on the first send. */
-        sock->writev = vlc_tls_ConnectWrite;
+        sock->ops = &vlc_tls_socket_fastopen_ops;
     }
     else
     {

@@ -135,7 +135,7 @@ ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_
      * connection as dead. */
     do
     {
-        ssize_t i_ret = m_tls->readv( m_tls, &iov, 1 );
+        ssize_t i_ret = m_tls->ops->readv( m_tls, &iov, 1 );
         if ( i_ret < 0 )
         {
 #ifdef _WIN32

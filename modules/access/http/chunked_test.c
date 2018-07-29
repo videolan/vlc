@@ -76,11 +76,16 @@ static void close_callback(struct vlc_tls *tls)
     (void) tls;
 }
 
-static struct vlc_tls chunked_tls =
+static const struct vlc_tls_operations chunked_ops =
 {
     .get_fd = fd_callback,
     .readv = recv_callback,
     .close = close_callback,
+};
+
+static struct vlc_tls chunked_tls =
+{
+    .ops = &chunked_ops,
 };
 
 static void stream_close_callback(struct vlc_http_stream *stream, bool bad)

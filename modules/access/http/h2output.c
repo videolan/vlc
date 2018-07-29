@@ -204,7 +204,7 @@ static ssize_t vlc_https_send(vlc_tls_t *tls, const void *buf, size_t len)
     while (count < len)
     {
         int canc = vlc_savecancel();
-        ssize_t val = tls->writev(tls, &iov, 1);
+        ssize_t val = tls->ops->writev(tls, &iov, 1);
 
         vlc_restorecancel(canc);
 

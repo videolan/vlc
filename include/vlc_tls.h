@@ -42,14 +42,18 @@
 /** Transport layer socket */
 typedef struct vlc_tls
 {
+    const struct vlc_tls_operations *ops;
+    struct vlc_tls *p;
+} vlc_tls_t;
+
+struct vlc_tls_operations
+{
     int (*get_fd)(struct vlc_tls *);
     ssize_t (*readv)(struct vlc_tls *, struct iovec *, unsigned);
     ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
     int (*shutdown)(struct vlc_tls *, bool duplex);
     void (*close)(struct vlc_tls *);
-
-    struct vlc_tls *p;
-} vlc_tls_t;
+};
 
 /**
  * \defgroup tls Transport Layer Security
@@ -186,7 +190,7 @@ VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
 static inline int vlc_tls_GetFD(vlc_tls_t *tls)
 {
-    return tls->get_fd(tls);
+    return tls->ops->get_fd(tls);
 }
 
 /**
@@ -240,7 +244,7 @@ VLC_API ssize_t vlc_tls_Write(vlc_tls_t *, const void *buf, size_t len);
  */
 static inline int vlc_tls_Shutdown(vlc_tls_t *tls, bool duplex)
 {
-    return tls->shutdown(tls, duplex);
+    return tls->ops->shutdown(tls, duplex);
 }
 
 /**

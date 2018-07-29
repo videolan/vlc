@@ -107,7 +107,7 @@ static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,
     vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
     vlc_tls_t *sock = proxy->sock;
 
-    return sock->readv(sock, iov, count);
+    return sock->ops->readv(sock, iov, count);
 }
 
 static ssize_t vlc_tls_ProxyWrite(vlc_tls_t *tls, const struct iovec *iov,
@@ -116,7 +116,7 @@ static ssize_t vlc_tls_ProxyWrite(vlc_tls_t *tls, const struct iovec *iov,
     vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
     vlc_tls_t *sock = proxy->sock;
 
-    return sock->writev(sock, iov, count);
+    return sock->ops->writev(sock, iov, count);
 }
 
 static int vlc_tls_ProxyShutdown(vlc_tls_t *tls, bool duplex)
@@ -132,6 +132,15 @@ static void vlc_tls_ProxyClose(vlc_tls_t *tls)
 
     free(proxy);
 }
+
+static const struct vlc_tls_operations vlc_tls_proxy_ops =
+{
+    vlc_tls_ProxyGetFD,
+    vlc_tls_ProxyRead,
+    vlc_tls_ProxyWrite,
+    vlc_tls_ProxyShutdown,
+    vlc_tls_ProxyClose,
+};
 
 vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
                                    const char *hostname, unsigned port,
@@ -181,11 +190,7 @@ vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
         goto error;
     }
 
-    psock->tls.get_fd = vlc_tls_ProxyGetFD;
-    psock->tls.readv = vlc_tls_ProxyRead;
-    psock->tls.writev = vlc_tls_ProxyWrite;
-    psock->tls.shutdown = vlc_tls_ProxyShutdown;
-    psock->tls.close = vlc_tls_ProxyClose;
+    psock->tls.ops = &vlc_tls_proxy_ops;
     psock->tls.p = NULL;
     psock->sock = sock;
 

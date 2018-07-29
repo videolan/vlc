@@ -102,7 +102,7 @@ static ssize_t vlc_gnutls_read(gnutls_transport_ptr_t ptr, void *buf,
         .iov_len = length,
     };
 
-    return sock->readv(sock, &iov, 1);
+    return sock->ops->readv(sock, &iov, 1);
 }
 
 static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
@@ -130,7 +130,7 @@ static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
         iov[i].iov_len = giov[i].iov_len;
     }
 
-    return sock->writev(sock, iov, iovcnt);
+    return sock->ops->writev(sock, iov, iovcnt);
 }
 
 static int gnutls_GetFD(vlc_tls_t *tls)
@@ -217,6 +217,15 @@ static void gnutls_Close (vlc_tls_t *tls)
     free(priv);
 }
 
+static const struct vlc_tls_operations gnutls_ops =
+{
+    gnutls_GetFD,
+    gnutls_Recv,
+    gnutls_Send,
+    gnutls_Shutdown,
+    gnutls_Close,
+};
+
 static vlc_tls_gnutls_t *gnutls_SessionOpen(vlc_tls_creds_t *creds, int type,
                                          gnutls_certificate_credentials_t x509,
                                            vlc_tls_t *sock,
@@ -298,11 +307,7 @@ static vlc_tls_gnutls_t *gnutls_SessionOpen(vlc_tls_creds_t *creds, int type,
 
     vlc_tls_t *tls = &priv->tls;
 
-    tls->get_fd = gnutls_GetFD;
-    tls->readv = gnutls_Recv;
-    tls->writev = gnutls_Send;
-    tls->shutdown = gnutls_Shutdown;
-    tls->close = gnutls_Close;
+    tls->ops = &gnutls_ops;
     return priv;
 
 error:

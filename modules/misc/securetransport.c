@@ -220,7 +220,7 @@ static OSStatus st_SocketReadFunc (SSLConnectionRef connection,
     OSStatus retValue = noErr;
 
     while (iov.iov_len > 0) {
-        ssize_t val = sys->sock->readv(sys->sock, &iov, 1);
+        ssize_t val = sys->sock->ops->readv(sys->sock, &iov, 1);
         if (val <= 0) {
             if (val == 0) {
                 msg_Dbg(sys->obj, "found eof");
@@ -274,7 +274,7 @@ static OSStatus st_SocketWriteFunc (SSLConnectionRef connection,
     OSStatus retValue = noErr;
 
     while (iov.iov_len > 0) {
-        ssize_t val = sys->sock->writev(sys->sock, &iov, 1);
+        ssize_t val = sys->sock->ops->writev(sys->sock, &iov, 1);
         if (val < 0) {
             switch (errno) {
                 case EAGAIN:
@@ -691,6 +691,15 @@ static void st_SessionClose (vlc_tls_t *session) {
     free(sys);
 }
 
+static const struct vlc_tls_operations st_ops =
+{
+    st_GetFD,
+    st_Recv,
+    st_Send,
+    st_SessionShutdown,
+    st_SessionClose,
+};
+
 /**
  * Initializes a client-side TLS session.
  */
@@ -714,11 +723,7 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
 
     vlc_tls_t *tls = &sys->tls;
 
-    tls->get_fd = st_GetFD;
-    tls->readv = st_Recv;
-    tls->writev = st_Send;
-    tls->shutdown = st_SessionShutdown;
-    tls->close = st_SessionClose;
+    tls->ops = &st_ops;
     crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;
