@@ -8,7 +8,7 @@
 # Hsiu-Ming Chang <cges30901@gmail.com>, 2016
 # Ethan Chan <yunsangc207@gmail.com>, 2015
 # Ethan <ethan42411@gmail.com>, 2014
-# Frank Chao <frank0624@gmail.com>, 2013,2015
+# Frank Chao <frank0624@gmail.com>, 2013,2015,2018
 # jakech <jake83@gmail.com>, 2014
 # Jeff Huang <s8321414@gmail.com>, 2014
 # ljkTransifex <lingk12345@hotmail.com>, 2015
@@ -26,8 +26,8 @@ msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
-"Last-Translator: 洪嘉鴻 <jerry9030@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-07-29 12:07+0200\n"
+"Last-Translator: cges30901, 2018\n"
 "Language-Team: Chinese (Taiwan) (https://www.transifex.com/yaron/teams/16553/"
 "zh_TW/)\n"
 "Language: zh_TW\n"
@@ -131,7 +131,7 @@ msgstr "音效重取樣器"
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
 msgid "Visualizations"
-msgstr "視覺效果"
+msgstr "視覺化"
 
 #: include/vlc_config_cat.h:64 src/audio_output/output.c:321
 #: src/libvlc-module.c:206
@@ -695,7 +695,7 @@ msgstr "立體聲"
 #: modules/gui/qt/ui/video_effects.h:1273
 #: modules/gui/qt/ui/video_effects.h:1283
 msgid "Left"
-msgstr "左邊"
+msgstr "左"
 
 #: src/audio_output/output.c:448 src/libvlc-module.c:197
 #: src/libvlc-module.c:295 src/libvlc-module.c:368 src/misc/actions.c:109
@@ -710,7 +710,7 @@ msgstr "左邊"
 #: modules/spu/marq.c:129 modules/spu/mosaic.c:170 modules/spu/rss.c:171
 #: modules/gui/qt/ui/video_effects.h:1232
 msgid "Right"
-msgstr "右邊"
+msgstr "右"
 
 #: src/audio_output/output.c:452 src/libvlc-module.c:196
 msgid "Reverse stereo"
@@ -997,7 +997,7 @@ msgstr "語言"
 #: modules/gui/macosx/VLCPlaylist.m:112 modules/gui/qt/dialogs/bookmarks.cpp:75
 #: modules/gui/qt/dialogs/epg.cpp:55
 msgid "Description"
-msgstr "說明"
+msgstr "描述"
 
 #: src/input/es_out.c:3120 src/input/es_out.c:3164 src/input/es_out.c:3354
 #: modules/gui/macosx/VLCAddonsWindowController.m:132
@@ -15391,7 +15391,6 @@ msgid ""
 msgstr "VLC 媒體播放器與 VideoLAN 係為 VideoLAN Association 的註冊商標。"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -15403,32 +15402,32 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC 媒體播放器是自由且開放原始碼的媒體播放器、編碼器與串流伺服器，由 <a "
-"href=\"http://www.videolan.org/\"><span style=\" text-decoration: underline; "
-"color:#0057ae;\">VideoLAN</span></a> 志願者社群所開發。 </p><p>VLC 使用內建的"
-"編解碼器並且能在所有熱門的平台上運作，它可以讀取檔案、CD、DVD、網路串流、擷取"
-"卡甚至更多其他來源！ </p><p><a href=\"http://www.videolan.org/contribute/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">幫助並加入我"
-"們！</span></a>"
+"href=\"https://www.videolan.org/\"><span style=\" text-decoration: "
+"underline; color:#0057ae;\">VideoLAN</span></a> 志願者社群所開發。 </"
+"p><p>VLC 使用內建的編解碼器並且能在所有熱門的平台上運作，它可以讀取檔案、CD、"
+"DVD、網路串流、擷取卡甚至更多其他來源！ </p><p><a href=\"https://www."
+"videolan.org/contribute/\"><span style=\" text-decoration: underline; color:"
+"#0057ae;\">幫助並加入我們！</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:104
 #: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:381
 #: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
-msgstr ""
+msgstr "播放清單分析器"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:106
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:385
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
-msgstr ""
+msgstr "服務探索"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:108
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
-msgstr ""
+msgstr "介面"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:110
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15451,18 +15450,18 @@ msgstr ""
 #: modules/gui/macosx/VLCAddonsWindowController.m:117
 #: modules/gui/qt/dialogs/plugins.cpp:423
 msgid "Find more addons online"
-msgstr ""
+msgstr "線上尋找更多附加元件"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:127
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
-msgstr ""
+msgstr "附加元件管理員"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:129
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
 msgid "Installed"
-msgstr ""
+msgstr "已安裝"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
@@ -15478,7 +15477,7 @@ msgstr "作者"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:196
 msgid "Uninstall"
-msgstr ""
+msgstr "移除"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:353
 #: modules/gui/qt/dialogs/plugins.cpp:377
@@ -16037,9 +16036,8 @@ msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
-msgstr "離開全螢幕"
+msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:76
@@ -16787,7 +16785,7 @@ msgstr "顯示/隱藏播放清單"
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:67
 #: modules/gui/qt/dialogs/vlm.cpp:548 share/lua/http/index.html:241
 msgid "Repeat"
-msgstr ""
+msgstr "重複"
 
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:68
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
@@ -18426,7 +18424,7 @@ msgstr ""
 #: modules/gui/qt/components/extended_panels.cpp:380
 #: modules/gui/qt/components/extended_panels.cpp:393
 msgid "Image Files"
-msgstr ""
+msgstr "影像檔"
 
 #: modules/gui/qt/components/extended_panels.cpp:382 modules/spu/logo.c:49
 msgid "Logo filenames"
@@ -18549,7 +18547,7 @@ msgstr "8 KHz"
 #: modules/gui/qt/components/extended_panels.cpp:1296
 #: modules/gui/qt/components/extended_panels.cpp:1297
 msgid "ms"
-msgstr ""
+msgstr " 毫秒"
 
 #: modules/gui/qt/components/extended_panels.cpp:1300
 msgid ""
@@ -18565,7 +18563,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
 msgid "Adjust pitch"
-msgstr ""
+msgstr "調整音調"
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -18666,11 +18664,11 @@ msgstr "個緩衝物件"
 
 #: modules/gui/qt/components/info_panels.cpp:622
 msgid "Last 60 seconds"
-msgstr ""
+msgstr "最後 60 秒"
 
 #: modules/gui/qt/components/info_panels.cpp:623
 msgid "Overall"
-msgstr ""
+msgstr "整體"
 
 #: modules/gui/qt/components/interface_widgets.cpp:639
 msgid ""
@@ -18698,7 +18696,7 @@ msgstr ""
 
 #: modules/gui/qt/components/interface_widgets.cpp:890
 msgid "Image Files (*.gif *.jpg *.jpeg *.png)"
-msgstr ""
+msgstr "影像檔 (*.gif *.jpg *.jpeg *.png)"
 
 #: modules/gui/qt/components/interface_widgets.cpp:917
 #: modules/gui/qt/dialogs/toolbar.cpp:573
@@ -18770,7 +18768,7 @@ msgstr "使用 VLC 的步調"
 
 #: modules/gui/qt/components/open_panels.cpp:919
 msgid "TV - digital"
-msgstr ""
+msgstr "TV - 數位"
 
 #: modules/gui/qt/components/open_panels.cpp:922
 msgid "Tuner card"
@@ -18794,7 +18792,7 @@ msgstr "頻寬"
 
 #: modules/gui/qt/components/open_panels.cpp:1040
 msgid "TV - analog"
-msgstr ""
+msgstr "TV - 類比"
 
 #: modules/gui/qt/components/open_panels.cpp:1043
 msgid "Device name"
@@ -18851,7 +18849,7 @@ msgstr "您真的要取消訂閱 %1？"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
 msgid "Cover"
-msgstr ""
+msgstr "封面"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -18871,19 +18869,19 @@ msgstr "輸入新資料夾名稱："
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Directory"
-msgstr ""
+msgstr "重新命名目錄"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Folder"
-msgstr ""
+msgstr "重新命名資料夾"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
-msgstr ""
+msgstr "輸入目錄的新名稱："
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:59
 msgid "Enter a new name for the folder:"
-msgstr ""
+msgstr "輸入資料夾的新名稱："
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:254
 msgid "Sort by"
@@ -18995,11 +18993,11 @@ msgstr "按新的鍵或組合鍵為了"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1427
 msgid "Assign"
-msgstr ""
+msgstr "指定"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1462
 msgid "Warning: this key or combination is already assigned to "
-msgstr ""
+msgstr "警告：這個按鍵或組合已經指定為"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1474
 msgid "Warning: <b>%1</b> is already an application menu shortcut"
@@ -19007,11 +19005,11 @@ msgstr ""
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1497
 msgid "Key or combination: "
-msgstr ""
+msgstr "按鍵或組合"
 
 #: modules/gui/qt/components/preferences_widgets.cpp:1506
 msgid "Key: "
-msgstr ""
+msgstr "按鍵"
 
 #: modules/gui/qt/components/simple_preferences.cpp:239
 #: modules/gui/qt/components/simple_preferences.cpp:612
@@ -19256,7 +19254,7 @@ msgstr "轉換"
 
 #: modules/gui/qt/dialogs/convert.cpp:61
 msgid "Multiple files selected."
-msgstr ""
+msgstr "已選取多個檔案。"
 
 #: modules/gui/qt/dialogs/convert.cpp:68 modules/stream_out/rtp.c:76
 msgid "Destination"
@@ -19272,7 +19270,7 @@ msgstr "瀏覽"
 
 #: modules/gui/qt/dialogs/convert.cpp:90
 msgid "Multiple Files Selected."
-msgstr ""
+msgstr "已選取多個檔案。"
 
 #: modules/gui/qt/dialogs/convert.cpp:92
 msgid "Files will be placed in the same directory with the same name."
@@ -19300,7 +19298,7 @@ msgstr "開始(&S)"
 
 #: modules/gui/qt/dialogs/convert.cpp:163
 msgid "Containers"
-msgstr ""
+msgstr "容器"
 
 #: modules/gui/qt/dialogs/epg.cpp:49 modules/gui/qt/menus.cpp:431
 msgid "Program Guide"
@@ -19350,7 +19348,7 @@ msgstr "儲存(&S)"
 
 #: modules/gui/qt/dialogs/external.cpp:216
 msgid "Store the Password"
-msgstr ""
+msgstr "儲存密碼"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19377,7 +19375,7 @@ msgstr "網路存取方針"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr ""
+msgstr "經常檢查 VLC 更新"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -19457,7 +19455,7 @@ msgstr "詮釋資料(&M)"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:68
 msgid "Co&dec"
-msgstr ""
+msgstr "編解碼器(&D)"
 
 #: modules/gui/qt/dialogs/mediainfo.cpp:72
 msgid "S&tatistics"
@@ -19487,7 +19485,7 @@ msgstr "另存記錄檔..."
 
 #: modules/gui/qt/dialogs/messages.cpp:261
 msgid "Texts/Logs (*.log *.txt);; All (*.*)"
-msgstr ""
+msgstr "文字/記錄(*.log *.txt);; 所有檔案(*.*)"
 
 #: modules/gui/qt/dialogs/messages.cpp:267
 msgid "Application"
@@ -19507,7 +19505,7 @@ msgstr "更新樹狀結構"
 
 #: modules/gui/qt/dialogs/messages.cpp:335
 msgid "Clear the messages"
-msgstr ""
+msgstr "清除訊息"
 
 #: modules/gui/qt/dialogs/open.cpp:78 modules/gui/qt/menus.cpp:934
 #: modules/gui/qt/menus.cpp:1131
@@ -19550,11 +19548,11 @@ msgstr "串流(&S)"
 
 #: modules/gui/qt/dialogs/open.cpp:121
 msgid "C&onvert"
-msgstr ""
+msgstr "轉換(&O)"
 
 #: modules/gui/qt/dialogs/open.cpp:207
 msgid "C&onvert / Save"
-msgstr ""
+msgstr "轉換 / 儲存(&O)"
 
 #: modules/gui/qt/dialogs/openurl.cpp:47
 msgid "Open URL"
@@ -19566,7 +19564,7 @@ msgstr "請輸入網址..."
 
 #: modules/gui/qt/dialogs/openurl.cpp:67
 msgid "Please enter the URL or path to the media you want to play."
-msgstr ""
+msgstr "請輸入您想播放的網址或路徑。"
 
 #: modules/gui/qt/dialogs/openurl.cpp:71
 msgid ""
@@ -19641,27 +19639,27 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/plugins.cpp:534
 msgid "No addons found"
-msgstr ""
+msgstr "找不到附加元件"
 
 #: modules/gui/qt/dialogs/plugins.cpp:813
 msgid "This addon has been installed manually. VLC can't manage it by itself."
-msgstr ""
+msgstr "這個附加元件已手動安裝。VLC 無法自行管理。"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1196
 msgid "Version %1"
-msgstr ""
+msgstr "版本 %1"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1224
 msgid "%1 downloads"
-msgstr ""
+msgstr "%1 個下載"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1293
 msgid "&Uninstall"
-msgstr ""
+msgstr "移除(&U)"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1296
 msgid "&Install"
-msgstr ""
+msgstr "安裝(&I)"
 
 #: modules/gui/qt/dialogs/plugins.cpp:1391
 #: modules/gui/qt/dialogs/plugins.cpp:1494
@@ -19707,11 +19705,11 @@ msgstr "重置偏好設定(&R)"
 
 #: modules/gui/qt/dialogs/preferences.cpp:167
 msgid "Only show current"
-msgstr ""
+msgstr "只顯示目前的"
 
 #: modules/gui/qt/dialogs/preferences.cpp:169
 msgid "Only show modules related to current playback"
-msgstr ""
+msgstr "只顯示與目前播放內容有關的模組"
 
 #: modules/gui/qt/dialogs/preferences.cpp:206
 msgid "Advanced Preferences"
@@ -19757,7 +19755,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/sout.cpp:91
 msgid "Back"
-msgstr ""
+msgstr "上一步"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:64
 msgid "Toolbars Editor"
@@ -19773,7 +19771,7 @@ msgstr "扁平按鈕"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
 msgid "Next widget style"
-msgstr ""
+msgstr "下一個視窗元件風格"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -19829,7 +19827,7 @@ msgstr "選擇設定檔："
 
 #: modules/gui/qt/dialogs/toolbar.cpp:187
 msgid "Preview"
-msgstr ""
+msgstr "預覽"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:196
 msgid "Cl&ose"
@@ -19881,11 +19879,11 @@ msgstr "播放按鈕"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:565
 msgid "Aspect ratio selector"
-msgstr ""
+msgstr "長寬比例選擇器"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:569
 msgid "Speed selector"
-msgstr ""
+msgstr "速度選擇器"
 
 #: modules/gui/qt/dialogs/vlm.cpp:73
 msgid "Broadcast"
@@ -19933,7 +19931,7 @@ msgstr "另存 VLM 組態檔..."
 
 #: modules/gui/qt/dialogs/vlm.cpp:266 modules/gui/qt/dialogs/vlm.cpp:335
 msgid "VLM conf (*.vlm);;All (*)"
-msgstr ""
+msgstr "VLM 組態檔 (*.vlm);;所有檔案 (*)"
 
 #: modules/gui/qt/dialogs/vlm.cpp:333
 msgid "Open VLM configuration..."
