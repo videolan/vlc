@@ -70,6 +70,7 @@ public:
 
 private:
     void parseNewServer( IXML_Document* doc, const std::string& location );
+    void parseSatipServer( IXML_Element* p_device_elem, const char *psz_base_url, const char *psz_udn, const char *psz_friendly_name, std::string iconUrl );
     std::string getIconURL( IXML_Element* p_device_elem , const char* psz_base_url );
 
 private:
