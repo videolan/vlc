@@ -572,7 +572,7 @@ static void OutputStart( sout_stream_t *p_stream )
                     break;
             }
 
-            if( !id_dts == 0 )
+            if( id_dts == 0 )
             {
                 p_cand = id;
                 canddts = 0;
