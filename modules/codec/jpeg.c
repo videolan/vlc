@@ -178,6 +178,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_dec->pf_decode = DecodeBlock;
 
     p_dec->fmt_out.i_codec = VLC_CODEC_RGB24;
+    p_dec->fmt_out.video.transfer = TRANSFER_FUNC_SRGB;
 
     return VLC_SUCCESS;
 }
