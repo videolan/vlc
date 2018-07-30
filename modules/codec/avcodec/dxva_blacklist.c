@@ -40,8 +40,19 @@ typedef struct
 
 #include "directx_va.h"
 
-extern const GUID DXVA_ModeHEVC_VLD_Main;
+extern const GUID DXVA2_ModeMPEG2_VLD;
+extern const GUID DXVA2_ModeMPEG2and1_VLD;
+extern const GUID DXVA2_ModeH264_E;
+extern const GUID DXVA2_ModeH264_F;
+extern const GUID DXVA_Intel_H264_NoFGT_ClearVideo;
+extern const GUID DXVA_ModeH264_VLD_WithFMOASO_NoFGT;
+extern const GUID DXVA_ModeH264_VLD_NoFGT_Flash;
+extern const GUID DXVA2_ModeVC1_D;
+extern const GUID DXVA2_ModeVC1_D2010;
 extern const GUID DXVA_ModeHEVC_VLD_Main10;
+extern const GUID DXVA_ModeHEVC_VLD_Main;
+extern const GUID DXVA_ModeVP9_VLD_Profile0;
+extern const GUID DXVA_ModeVP9_VLD_10bit_Profile2;
 
 enum DriverTestCommand {
     BLAnyDriver,
@@ -58,6 +69,23 @@ struct decoders {
 static const GUID *NoHEVC[] = {
     &DXVA_ModeHEVC_VLD_Main,
     &DXVA_ModeHEVC_VLD_Main10,
+    NULL,
+};
+
+static const GUID *AnyDecoder[] = {
+    &DXVA2_ModeMPEG2_VLD,
+    &DXVA2_ModeMPEG2and1_VLD,
+    &DXVA2_ModeH264_E,
+    &DXVA2_ModeH264_F,
+    &DXVA_Intel_H264_NoFGT_ClearVideo,
+    &DXVA_ModeH264_VLD_WithFMOASO_NoFGT,
+    &DXVA_ModeH264_VLD_NoFGT_Flash,
+    &DXVA2_ModeVC1_D,
+    &DXVA2_ModeVC1_D2010,
+    &DXVA_ModeHEVC_VLD_Main,
+    &DXVA_ModeHEVC_VLD_Main10,
+    &DXVA_ModeVP9_VLD_Profile0,
+    &DXVA_ModeVP9_VLD_10bit_Profile2,
     NULL,
 };
 
@@ -91,6 +119,22 @@ static struct decoders IntelDevices[] = {
 
     { 0x0D22, NoHEVC, BLAnyDriver, 0 }, /* Iris(TM) Pro Graphics 5200 */
     { 0x0D26, NoHEVC, BLAnyDriver, 0 }, /* Iris(TM) Pro Graphics 5200 */
+
+    /* Intel Eaglelake/GMA X4500 too old to decode properly */
+    { 0x2A42, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 4 Series Express Chipset Family */
+    { 0x2A43, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 4 Series Express Chipset Family */
+    { 0x2E02, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) 4 Series Internal Chipset */
+    { 0x2E03, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) 4 Series Internal Chipset */
+    { 0x2E12, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q45/Q43 Express Chipset */
+    { 0x2E13, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q45/Q43 Express Chipset */
+    { 0x2E22, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G45/G43 Express Chipset */
+    { 0x2E23, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G45/G43 Express Chipset */
+    { 0x2E32, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G41 Express Chipset */
+    { 0x2E33, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G41 Express Chipset */
+    { 0x2E42, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
+    { 0x2E43, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
+    { 0x2E92, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
+    { 0x2E93, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
 
     {0, NULL, BLAnyDriver, 0}
 };
