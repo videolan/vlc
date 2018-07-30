@@ -572,7 +572,7 @@ static void OutputStart( sout_stream_t *p_stream )
                     break;
             }
 
-            if( !id_dts == VLC_TICK_INVALID )
+            if( id_dts == VLC_TICK_INVALID )
             {
                 p_cand = id;
                 canddts = VLC_TICK_INVALID;
