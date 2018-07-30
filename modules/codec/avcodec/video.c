@@ -1627,25 +1627,40 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_context,
             can_hwaccel = true;
     }
 
+    if (p_sys->pix_fmt == AV_PIX_FMT_NONE)
+        goto no_reuse;
+
     /* If the format did not actually change (e.g. seeking), try to reuse the
      * existing output format, and if present, hardware acceleration back-end.
      * This avoids resetting the pipeline downstream. This also avoids
      * needlessly probing for hardware acceleration support. */
-    if (p_sys->pix_fmt != AV_PIX_FMT_NONE
-     && lavc_GetVideoFormat(p_dec, &fmt, p_context, p_sys->pix_fmt, swfmt) == 0
-     && fmt.i_width == p_dec->fmt_out.video.i_width
-     && fmt.i_height == p_dec->fmt_out.video.i_height
-     && p_context->profile == p_sys->profile
-     && p_context->level <= p_sys->level)
-    {
-        for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
-            if (pi_fmt[i] == p_sys->pix_fmt)
-            {
-                msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
-                return p_sys->pix_fmt;
-            }
-    }
+     if (lavc_GetVideoFormat(p_dec, &fmt, p_context, p_sys->pix_fmt, swfmt) != 0)
+     {
+         msg_Dbg(p_dec, "get format failed");
+         goto no_reuse;
+     }
+     if (fmt.i_width  != p_dec->fmt_out.video.i_width ||
+         fmt.i_height != p_dec->fmt_out.video.i_height)
+     {
+         msg_Dbg(p_dec, "mismatched dimensions %ux%u was %ux%u", fmt.i_width, fmt.i_height,
+                 p_dec->fmt_out.video.i_width, p_dec->fmt_out.video.i_height);
+         goto no_reuse;
+     }
+     if (p_context->profile != p_sys->profile || p_context->level > p_sys->level)
+     {
+         msg_Dbg(p_dec, "mismatched profile level %d/%d was %d/%d", p_context->profile,
+                 p_context->level, p_sys->profile, p_sys->level);
+         goto no_reuse;
+     }
 
+     for (size_t i = 0; pi_fmt[i] != AV_PIX_FMT_NONE; i++)
+        if (pi_fmt[i] == p_sys->pix_fmt)
+        {
+            msg_Dbg(p_dec, "reusing decoder output format %d", pi_fmt[i]);
+            return p_sys->pix_fmt;
+        }
+
+no_reuse:
     if (p_sys->p_va != NULL)
     {
         msg_Err(p_dec, "existing hardware acceleration cannot be reused");
