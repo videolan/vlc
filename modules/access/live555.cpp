@@ -62,6 +62,7 @@
 
 extern "C" {
 #include "../access/mms/asf.h"  /* Who said ugly ? */
+#include "live555_dtsgen.h"
 }
 
 /*****************************************************************************
@@ -173,9 +174,11 @@ typedef struct
     bool            b_flushing_discontinuity;
     int             i_next_block_flags;
     char            waiting;
-    int64_t         i_lastpts;
+    int64_t         i_prevpts;
     int64_t         i_pcr;
     double          f_npt;
+
+    struct dtsgen_t dtsgen;
 
     enum
     {
@@ -490,6 +493,7 @@ static void Close( vlc_object_t *p_this )
         if( tk->p_out_muxed )
             vlc_demux_chained_Delete( tk->p_out_muxed );
         es_format_Clean( &tk->fmt );
+        dtsgen_Clean( &tk->dtsgen );
         free( tk->p_buffer );
         free( tk );
     }
@@ -868,9 +872,10 @@ static int SessionsSetup( demux_t *p_demux )
             tk->b_rtcp_sync = false;
             tk->b_flushing_discontinuity = false;
             tk->i_next_block_flags = 0;
-            tk->i_lastpts   = VLC_TS_INVALID;
+            tk->i_prevpts   = VLC_TS_INVALID;
             tk->i_pcr       = VLC_TS_INVALID;
             tk->f_npt       = 0.;
+            dtsgen_Init( &tk->dtsgen );
             tk->state       = live_track_t::STATE_SELECTED;
             tk->i_buffer    = i_frame_buffer;
             tk->p_buffer    = (uint8_t *)malloc( i_frame_buffer );
@@ -1452,7 +1457,7 @@ static int Demux( demux_t *p_demux )
             for( i = 0; i < p_sys->i_track; i++ )
             {
                 live_track_t *tk = p_sys->track[i];
-                tk->i_lastpts = VLC_TS_INVALID;
+                tk->i_prevpts = VLC_TS_INVALID;
                 tk->i_pcr = VLC_TS_INVALID;
                 tk->f_npt = 0.;
                 tk->b_flushing_discontinuity = false;
@@ -1600,8 +1605,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 for( int i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
-                    p_sys->track[i]->i_lastpts = VLC_TS_INVALID;
+                    p_sys->track[i]->i_prevpts = VLC_TS_INVALID;
                     p_sys->track[i]->i_pcr = VLC_TS_INVALID;
+                    dtsgen_Resync( &p_sys->track[i]->dtsgen );
                 }
 
                 /* Retrieve the starttime if possible */
@@ -1732,7 +1738,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     tk->b_rtcp_sync = false;
                     tk->b_flushing_discontinuity = false;
                     tk->i_next_block_flags |= BLOCK_FLAG_DISCONTINUITY;
-                    tk->i_lastpts = VLC_TS_INVALID;
+                    tk->i_prevpts = VLC_TS_INVALID;
                     tk->i_pcr = VLC_TS_INVALID;
                 }
                 p_sys->i_pcr = VLC_TS_INVALID;
@@ -2106,6 +2112,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             const int64_t i_max_diff = CLOCK_FREQ * (( tk->fmt.i_cat == SPU_ES ) ? 60 : 1);
             tk->b_flushing_discontinuity = (llabs(i_pts - tk->i_pcr) > i_max_diff);
             tk->i_pcr = i_pts;
+            tk->dtsgen.count = 0;
         }
     }
 
@@ -2125,15 +2132,22 @@ static void StreamRead( void *p_private, unsigned int i_size,
                 vlc_demux_chained_Send( tk->p_out_muxed, p_block );
                 break;
             default:
-                if( i_pts != tk->i_lastpts )
+                if( i_pts != tk->i_prevpts )
+                {
                     p_block->i_pts = VLC_TS_0 + i_pts;
+                    tk->i_prevpts = i_pts;
+
+                    dtsgen_AddNextPTS( &tk->dtsgen, i_pts );
+                }
+
                 /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
                 switch( tk->fmt.i_codec )
                 {
                     case VLC_CODEC_MPGV:
                     case VLC_CODEC_H264:
                     case VLC_CODEC_HEVC:
-                        p_block->i_dts = VLC_TS_INVALID;
+                        p_block->i_dts = dtsgen_GetDTS( &tk->dtsgen );
+                        dtsgen_Debug( VLC_OBJECT(p_demux), &tk->dtsgen, p_block->i_dts, p_block->i_pts );
                         break;
                     case VLC_CODEC_VP8:
                     default:
@@ -2149,12 +2163,13 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     p_block->i_flags |= tk->i_next_block_flags;
                     tk->i_next_block_flags = 0;
                 }
+
+                mtime_t i_pcr = p_block->i_dts > VLC_TS_INVALID ? p_block->i_dts : p_block->i_pts;
                 es_out_Send( p_demux->out, tk->p_es, p_block );
-                if( i_pts > 0 )
+                if( i_pcr > VLC_TS_INVALID )
                 {
-                    if( tk->i_pcr < i_pts )
-                        tk->i_pcr = i_pts;
-                    tk->i_lastpts = i_pts;
+                    if( tk->i_pcr < i_pcr )
+                        tk->i_pcr = i_pcr;
                 }
                 break;
         }

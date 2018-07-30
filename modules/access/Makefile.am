@@ -306,7 +306,8 @@ libhttp_plugin_la_SOURCES = access/http.c
 libhttp_plugin_la_LIBADD = $(SOCKET_LIBS)
 access_LTLIBRARIES += libhttp_plugin.la
 
-liblive555_plugin_la_SOURCES = access/live555.cpp access/mms/asf.c access/mms/buffer.c
+liblive555_plugin_la_SOURCES = access/live555.cpp access/mms/asf.c access/mms/buffer.c \
+                               access/live555_dtsgen.h
 liblive555_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(CXXFLAGS_live555)
 liblive555_plugin_la_LIBADD = $(LIBS_live555) $(SOCKET_LIBS)
 liblive555_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' \
