@@ -564,13 +564,16 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
 {
     SD::MediaServerDesc* p_server = NULL;
 
-    vlc_url_t url;
-    vlc_UrlParse( &url, psz_base_url );
-
     char *psz_satip_channellist = config_GetPsz("satip-channelist");
     if( !psz_satip_channellist ) {
         psz_satip_channellist = strdup("Auto");
     }
+
+    if( unlikely( !psz_satip_channellist ) )
+        return;
+
+    vlc_url_t url;
+    vlc_UrlParse( &url, psz_base_url );
 
     /* Part 1: a user may have provided a custom playlist url */
     if (strncmp(psz_satip_channellist, "CustomList", 10) == 0) {
