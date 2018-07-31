@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <versionhelpers.h>
 
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
@@ -246,6 +247,10 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+
+    /* Allow using D3D11 automatically starting from Windows 8.1 */
+    if (!vd->obj.force && !IsWindows8Point1OrGreater())
+        return VLC_EGENERIC;
 
 #if !VLC_WINSTORE_APP
     int ret = OpenHwnd(vd);
