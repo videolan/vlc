@@ -587,6 +587,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
             }
 
             /* to comply with the SAT>IP specification, we don't fall back on another channel list if this path failed */
+            free( psz_satip_channellist );
             free( psz_satip_playlist_url );
             vlc_UrlClean( &url );
             return;
