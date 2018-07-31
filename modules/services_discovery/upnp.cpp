@@ -596,7 +596,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
     /* Part 2: device playlist
      * In Automatic mode, or if requested by the user, check for a SAT>IP m3u list on the device */
     if (strncmp(psz_satip_channellist, "ServerList", 10) == 0 ||
-        strncmp(psz_satip_channellist, "Auto", strlen ("Auto") == 0 )) {
+        strncmp(psz_satip_channellist, "Auto", strlen ("Auto")) == 0 ) {
         const char* psz_m3u_url = xml_getChildElementValue( p_device_element, "satip:X_SATIPM3U" );
         if ( psz_m3u_url ) {
             if ( strncmp( "http", psz_m3u_url, 4) )
@@ -641,7 +641,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
      * MasterList is a list of usual Satellites */
 
     /* In Auto mode, default to MasterList list from satip.info */
-    if( strncmp(psz_satip_channellist, "Auto", strlen ("Auto") == 0 ) ) {
+    if( strncmp(psz_satip_channellist, "Auto", strlen ("Auto")) == 0 ) {
         psz_satip_channellist = strdup( "MasterList" );
     }
 
