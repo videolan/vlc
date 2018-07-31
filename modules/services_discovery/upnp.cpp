@@ -642,6 +642,7 @@ MediaServerList::parseSatipServer( IXML_Element* p_device_element, const char *p
 
     /* In Auto mode, default to MasterList list from satip.info */
     if( strncmp(psz_satip_channellist, "Auto", strlen ("Auto")) == 0 ) {
+        free(psz_satip_channellist);
         psz_satip_channellist = strdup( "MasterList" );
     }
 
