@@ -33,6 +33,7 @@
 #include "TrickModeType.h"
 #include "../adaptive/playlist/SegmentTemplate.h"
 #include "../adaptive/playlist/SegmentTimeline.h"
+#include "TemplatedUri.hpp"
 
 using namespace dash::mpd;
 
@@ -91,87 +92,49 @@ void Representation::addDependency(const Representation *dep)
 std::string Representation::contextualize(size_t number, const std::string &component,
                                           const BaseSegmentTemplate *basetempl) const
 {
-    std::string ret(component);
-    size_t pos;
+    std::string str(component);
 
     const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
 
-    bool replaced;
-    do
+    std::string::size_type pos = 0;
+    while(pos < str.length())
     {
-        replaced = false;
-        if(templ)
+        TemplatedUri::Token token;
+        if(str[pos] == '$' && TemplatedUri::IsDASHToken(str, pos, token))
         {
-            pos = ret.find("$Time$");
-            if(pos != std::string::npos)
+            TemplatedUri::TokenReplacement replparam;
+            switch(token.type)
             {
-                std::stringstream ss;
-                ss.imbue(std::locale("C"));
-                ss << getScaledTimeBySegmentNumber(number, templ);
-                ret.replace(pos, std::string("$Time$").length(), ss.str());
-                replaced = true;
+                case TemplatedUri::Token::TOKEN_TIME:
+                    replparam.value = templ ? getScaledTimeBySegmentNumber(number, templ) : 0;
+                    break;
+                case TemplatedUri::Token::TOKEN_BANDWIDTH:
+                    replparam.value = getBandwidth();
+                    break;
+                case TemplatedUri::Token::TOKEN_NUMBER:
+                    replparam.value = number;
+                    break;
+                case TemplatedUri::Token::TOKEN_REPRESENTATION:
+                    replparam.str = id.str();
+                    break;
+                case TemplatedUri::Token::TOKEN_ESCAPE:
+                    break;
+
+                default:
+                    pos += token.fulllength;
+                    continue;
             }
-
-            pos = ret.find("$Number$");
-            if(pos != std::string::npos)
-            {
-                std::stringstream ss;
-                ss.imbue(std::locale("C"));
-                ss << number;
-                ret.replace(pos, std::string("$Number$").length(), ss.str());
-                replaced = true;
-            }
-            else
-            {
-                pos = ret.find("$Number%");
-                size_t tokenlength = std::string("$Number%").length();
-                size_t fmtstart = pos + tokenlength;
-                if(pos != std::string::npos && fmtstart < ret.length())
-                {
-                    size_t fmtend = ret.find('$', fmtstart);
-                    if(fmtend != std::string::npos)
-                    {
-                        std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
-                        iss.imbue(std::locale("C"));
-                        try
-                        {
-                            size_t width;
-                            iss >> width;
-                            if (iss.peek() != '$' && iss.peek() != 'd')
-                                throw VLC_EGENERIC;
-                            std::stringstream oss;
-                            oss.imbue(std::locale("C"));
-                            oss.width(width); /* set format string length */
-                            oss.fill('0');
-                            oss << number;
-                            ret.replace(pos, fmtend - pos + 1, oss.str());
-                            replaced = true;
-                        } catch(int) {}
-                    }
-                }
-            }
+            /* Replace with newvalue */
+            std::string::size_type newlen = TemplatedUri::ReplaceDASHToken(
+                                                    str, pos, token, replparam);
+            if(newlen == std::string::npos)
+                newlen = token.fulllength;
+            pos += newlen;
         }
+        else pos++;
+    }
 
-        pos = ret.find("$Bandwidth$");
-        if(pos != std::string::npos)
-        {
-            std::stringstream ss;
-            ss.imbue(std::locale("C"));
-            ss << getBandwidth();
-            ret.replace(pos, std::string("$Bandwidth$").length(), ss.str());
-            replaced = true;
-        }
-
-        pos = ret.find("$RepresentationID$");
-        if(pos != std::string::npos)
-        {
-            ret.replace(pos, std::string("$RepresentationID$").length(), id.str());
-            replaced = true;
-        }
-
-    } while(replaced);
-
-    return ret;
+    return str;
 }
 
 vlc_tick_t Representation::getScaledTimeBySegmentNumber(uint64_t index, const MediaSegmentTemplate *templ) const
