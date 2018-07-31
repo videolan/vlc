@@ -56,6 +56,7 @@
 #include "builtin_shaders.h"
 
 #include <assert.h>
+#include <versionhelpers.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -253,9 +254,8 @@ static int Open(vlc_object_t *object)
     if ( !vd->obj.force && vd->source.mastering.max_luminance != 0)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if(GetVersionEx(&winVer) && winVer.dwMajorVersion < 6 && !object->obj.force)
+    /* do not use D3D9 on XP unless forced */
+    if(!object->obj.force && !IsWindowsVistaOrGreater())
         return VLC_EGENERIC;
 
     /* Allocate structure */
