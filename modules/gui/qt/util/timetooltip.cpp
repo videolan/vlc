@@ -73,7 +73,7 @@ void TimeTooltip::adjustPosition()
 #if defined( Q_OS_WIN )
         mTarget.y() - 2 * size.height() - TIP_HEIGHT / 2 );
 #else
-        mTarget.y() - size.height() + TIP_HEIGHT / 2 );
+        mTarget.y() - size.height() - TIP_HEIGHT / 2 );
 #endif
 
     // Keep the tooltip on the same screen if possible
