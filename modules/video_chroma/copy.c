@@ -1075,7 +1075,7 @@ static void piccheck(picture_t *pic, const vlc_chroma_description_t *dsc,
                 vlc_assert_unreachable();
         }
 
-        uint32_t color_16_UV = (colors_16_P[2] << 16) | colors_16_P[1];
+        uint32_t color_16_UV = GetDWLE( &colors_16_P[1] );
 
         PICCHECK(uint16_t, uint32_t, colors_16_P, color_16_UV, 2);
     }
