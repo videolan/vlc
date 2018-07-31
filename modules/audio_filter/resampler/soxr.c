@@ -167,7 +167,7 @@ Open( vlc_object_t *p_obj, bool b_change_ratio )
      * up a delay).  */
     if( b_change_ratio )
     {
-        soxr_quality_spec_t q_spec = soxr_quality_spec( SOXR_LQ, SOXR_VR );
+        q_spec = soxr_quality_spec( SOXR_LQ, SOXR_VR );
         p_sys->vr_soxr = soxr_create( 1, f_ratio, i_channels,
                                       &error, &io_spec, &q_spec, NULL );
         if( error )
