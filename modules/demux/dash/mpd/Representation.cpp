@@ -96,67 +96,80 @@ std::string Representation::contextualize(size_t number, const std::string &comp
 
     const MediaSegmentTemplate *templ = dynamic_cast<const MediaSegmentTemplate *>(basetempl);
 
-    if(templ)
+    bool replaced;
+    do
     {
-        pos = ret.find("$Time$");
-        if(pos != std::string::npos)
+        replaced = false;
+        if(templ)
         {
-            std::stringstream ss;
-            ss.imbue(std::locale("C"));
-            ss << getScaledTimeBySegmentNumber(number, templ);
-            ret.replace(pos, std::string("$Time$").length(), ss.str());
-        }
-
-        pos = ret.find("$Number$");
-        if(pos != std::string::npos)
-        {
-            std::stringstream ss;
-            ss.imbue(std::locale("C"));
-            ss << number;
-            ret.replace(pos, std::string("$Number$").length(), ss.str());
-        }
-        else
-        {
-            pos = ret.find("$Number%");
-            size_t tokenlength = std::string("$Number%").length();
-            size_t fmtstart = pos + tokenlength;
-            if(pos != std::string::npos && fmtstart < ret.length())
+            pos = ret.find("$Time$");
+            if(pos != std::string::npos)
             {
-                size_t fmtend = ret.find('$', fmtstart);
-                if(fmtend != std::string::npos)
+                std::stringstream ss;
+                ss.imbue(std::locale("C"));
+                ss << getScaledTimeBySegmentNumber(number, templ);
+                ret.replace(pos, std::string("$Time$").length(), ss.str());
+                replaced = true;
+            }
+
+            pos = ret.find("$Number$");
+            if(pos != std::string::npos)
+            {
+                std::stringstream ss;
+                ss.imbue(std::locale("C"));
+                ss << number;
+                ret.replace(pos, std::string("$Number$").length(), ss.str());
+                replaced = true;
+            }
+            else
+            {
+                pos = ret.find("$Number%");
+                size_t tokenlength = std::string("$Number%").length();
+                size_t fmtstart = pos + tokenlength;
+                if(pos != std::string::npos && fmtstart < ret.length())
                 {
-                    std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
-                    iss.imbue(std::locale("C"));
-                    try
+                    size_t fmtend = ret.find('$', fmtstart);
+                    if(fmtend != std::string::npos)
                     {
-                        size_t width;
-                        iss >> width;
-                        if (iss.peek() != '$' && iss.peek() != 'd')
-                            throw VLC_EGENERIC;
-                        std::stringstream oss;
-                        oss.imbue(std::locale("C"));
-                        oss.width(width); /* set format string length */
-                        oss.fill('0');
-                        oss << number;
-                        ret.replace(pos, fmtend - pos + 1, oss.str());
-                    } catch(int) {}
+                        std::istringstream iss(ret.substr(fmtstart, fmtend - fmtstart + 1));
+                        iss.imbue(std::locale("C"));
+                        try
+                        {
+                            size_t width;
+                            iss >> width;
+                            if (iss.peek() != '$' && iss.peek() != 'd')
+                                throw VLC_EGENERIC;
+                            std::stringstream oss;
+                            oss.imbue(std::locale("C"));
+                            oss.width(width); /* set format string length */
+                            oss.fill('0');
+                            oss << number;
+                            ret.replace(pos, fmtend - pos + 1, oss.str());
+                            replaced = true;
+                        } catch(int) {}
+                    }
                 }
             }
         }
-    }
 
-    pos = ret.find("$Bandwidth$");
-    if(pos != std::string::npos)
-    {
-        std::stringstream ss;
-        ss.imbue(std::locale("C"));
-        ss << getBandwidth();
-        ret.replace(pos, std::string("$Bandwidth$").length(), ss.str());
-    }
+        pos = ret.find("$Bandwidth$");
+        if(pos != std::string::npos)
+        {
+            std::stringstream ss;
+            ss.imbue(std::locale("C"));
+            ss << getBandwidth();
+            ret.replace(pos, std::string("$Bandwidth$").length(), ss.str());
+            replaced = true;
+        }
 
-    pos = ret.find("$RepresentationID$");
-    if(pos != std::string::npos)
-        ret.replace(pos, std::string("$RepresentationID$").length(), id.str());
+        pos = ret.find("$RepresentationID$");
+        if(pos != std::string::npos)
+        {
+            ret.replace(pos, std::string("$RepresentationID$").length(), id.str());
+            replaced = true;
+        }
+
+    } while(replaced);
 
     return ret;
 }
