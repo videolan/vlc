@@ -157,6 +157,7 @@ static block_t *Extract( filter_t *p_filter, block_t *p_in_buf )
                          p_in_buf->i_nb_samples, pi_selections,
                          p_filter->fmt_out.audio.i_bitspersample );
 
+    block_Release( p_in_buf );
     return p_out_buf;
 }
 
