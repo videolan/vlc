@@ -36,6 +36,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <versionhelpers.h>
 
 #define COBJMACROS
 #include <initguid.h>
@@ -512,6 +513,10 @@ static unsigned int GetPictureHeight(const vout_display_t *vd)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+
+    /* Allow using D3D11 automatically starting from Windows 8.1 */
+    if (!vd->obj.force && !IsWindows8Point1OrGreater())
+        return VLC_EGENERIC;
 
 #if !VLC_WINSTORE_APP
     int ret = OpenHwnd(vd);
