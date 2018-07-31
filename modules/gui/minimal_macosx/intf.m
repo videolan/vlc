@@ -105,10 +105,13 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
     @autoreleasepool {
+        VLCMinimalVoutWindow __block *o_window;
         NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
 
-        VLCMinimalVoutWindow *o_window = [[VLCMinimalVoutWindow alloc] initWithContentRect:proposedVideoViewPosition];
-        [o_window makeKeyAndOrderFront:nil];
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            o_window = [[VLCMinimalVoutWindow alloc] initWithContentRect:proposedVideoViewPosition];
+            [o_window makeKeyAndOrderFront:nil];
+        });
 
         if (!o_window) {
             msg_Err(p_wnd, "window creation failed");
