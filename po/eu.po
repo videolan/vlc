@@ -9,12 +9,13 @@
 # Ixiar Iza <i.iza@elhuyar.com>, 2015
 # julen <julenx@gmail.com>, 2012-2014
 # LEIRE LÓPEZ GOIBURU <leirerentzat@gmail.com>, 2015
+# Txopi <txopi@ikusimakusi.eus>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-05-17 16:51+0200\n"
-"PO-Revision-Date: 2018-05-16 23:29+0200\n"
+"PO-Revision-Date: 2018-07-31 17:06+0200\n"
 "Last-Translator: Txopi <txopi@ikusimakusi.eus>, 2018\n"
 "Language-Team: Basque (https://www.transifex.com/yaron/teams/16553/eu/)\n"
 "Language: eu\n"
@@ -6397,7 +6398,8 @@ msgstr "Ez da Java aurkitu zure sisteman."
 #: modules/access/bluray.c:824
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr ""
-"Bluray erreprodukzio-hasierak huts egin du. Saiatu menuaren laguntzarik gabe."
+"Blu-ray erreprodukzio-hasierak huts egin du. Saiatu menuaren laguntzarik "
+"gabe."
 
 #: modules/access/bluray.c:852 modules/access/bluray.c:2287
 #: modules/access/bluray.c:2292
@@ -6484,7 +6486,7 @@ msgstr "DCP"
 
 #: modules/access/dcp/dcp.cpp:80
 msgid "Digital Cinema Package module"
-msgstr "Digital Cinema Package moduua"
+msgstr "Digital Cinema Package modulua"
 
 #: modules/access/decklink.cpp:44
 msgid "Input card to use"
@@ -16657,7 +16659,6 @@ msgstr ""
 "erregistratuak dira."
 
 #: modules/gui/macosx/VLCAboutWindowController.m:134
-#, fuzzy
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16669,12 +16670,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC multimedia erreproduzigailua askea eta iturburu irekikoa, kodetzailea "
-"eta transmisorea d  <a href=\"http://www.videolan.org/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">VideoLAN</span></a> komunitateko "
-"boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen ditu, "
-"plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur ditzake, "
-"CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta beste "
-"multimedia formatu batzuk!</p><p><a href=\"http://www.videolan.org/"
+"eta transmisorea da <a href=\"https://www.videolan.org/\"><span style=\" "
+"text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
+"komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
+"ditu, plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur "
+"ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta "
+"beste multimedia formatu batzuk!</p><p><a href=\"https://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Lagundu eta kide bihurtu!</span></a>"
 
@@ -17315,7 +17316,6 @@ msgstr "Joan aurreko elementura"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
-#, fuzzy
 msgid "Leave fullscreen"
 msgstr "Irten pantaila osotik"
 
@@ -20519,7 +20519,7 @@ msgstr " Profilaren izena falta da"
 
 #: modules/gui/qt/components/sout/profile_selector.cpp:780
 msgid "You must set a name for the profile."
-msgstr "]Profilaren izena adierazi behar duzu."
+msgstr "Profilaren izena ezarri behar duzu."
 
 #: modules/gui/qt/components/sout/sout_widgets.cpp:40
 msgid "File/Directory"
@@ -20825,12 +20825,12 @@ msgid ""
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
 "<p>VLC multimedia erreproduzigailua askea eta iturburu irekikoa, kodetzailea "
-"eta transmisorea d  <a href=\"http://www.videolan.org/\"><span style=\" text-"
-"decoration: underline; color:#0057ae;\">VideoLAN</span></a> komunitateko "
-"boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen ditu, "
-"plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur ditzake, "
-"CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta beste "
-"multimedia formatu batzuk!</p><p><a href=\"http://www.videolan.org/"
+"eta transmisorea da  <a href=\"http://www.videolan.org/\"><span style=\" "
+"text-decoration: underline; color:#0057ae;\">VideoLAN</span></a> "
+"komunitateko boluntarioek egina.</p><p>VLC-k bere barruko kodekak erabiltzen "
+"ditu, plataforma ezagun guztietan lan egiten du eta agiri gehienak irakur "
+"ditzake, CD-ak, DVD-ak, sare transmisio-jarraituak, kaptura-txartelak eta "
+"beste multimedia formatu batzuk!</p><p><a href=\"http://www.videolan.org/"
 "contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
 "\">Lagundu eta kide bihurtu!</span></a>"
 
@@ -27081,7 +27081,7 @@ msgstr ""
 "direnak. \n"
 "\n"
 "Azkena: hartu krominantzia (argia) eremu berritik soilik. Ona elkarlotutako "
-"sarreretarako, adibidez, bideokamera bideoentzako . \n"
+"sarreretarako, adibidez, bideokamera bideoentzako. \n"
 "\n"
 "AltLine: hartu goiko eremutik 1 krominantzia lerroa, 2 lerroa beheko "
 "eremutik, etab. \n"
