@@ -578,7 +578,10 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
     block_t *p_out_buf = block_Alloc( i_outsize );
     if( p_out_buf == NULL )
+    {
+        block_Release( p_in_buf );
         return NULL;
+    }
 
     size_t bytes_out = transform_buffer( p_filter,
         p_in_buf->p_buffer, p_in_buf->i_buffer,
