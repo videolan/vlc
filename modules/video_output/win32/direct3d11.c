@@ -1691,7 +1691,6 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
-    vd->fmt = *fmt;
 
     return VLC_SUCCESS;
 }
