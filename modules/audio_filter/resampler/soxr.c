@@ -336,7 +336,7 @@ Resample( filter_t *p_filter, block_t *p_in )
             assert( !p_out );
             p_out = SoXR_Resample( p_filter, soxr, p_in, i_olen );
             if( !p_out )
-                return NULL;
+                goto error;
         }
 
         if( p_flushed_out )
@@ -348,7 +348,7 @@ Resample( filter_t *p_filter, block_t *p_in )
             block_ChainAppend( &p_flushed_out, p_out );
             p_out = block_ChainGather( p_flushed_out );
             if( !p_out )
-                return NULL;
+                goto error;
             p_out->i_nb_samples = i_nb_samples;
         }
         p_out->i_pts = i_pts;
@@ -365,6 +365,9 @@ Resample( filter_t *p_filter, block_t *p_in )
             p_out->i_pts = i_pts;
         return p_out;
     }
+error:
+    block_Release( p_in );
+    return NULL;
 }
 
 static block_t *
