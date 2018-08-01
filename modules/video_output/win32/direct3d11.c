@@ -31,7 +31,6 @@
 
 #include <assert.h>
 #include <math.h>
-#include <versionhelpers.h>
 
 #if !defined(_WIN32_WINNT) || _WIN32_WINNT < _WIN32_WINNT_WIN7
 # undef _WIN32_WINNT
@@ -248,9 +247,18 @@ static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
 
+#if !VLC_WINSTORE_APP
     /* Allow using D3D11 automatically starting from Windows 8.1 */
-    if (!vd->obj.force && !IsWindows8Point1OrGreater())
-        return VLC_EGENERIC;
+    if (!vd->obj.force)
+    {
+        bool isWin81OrGreater = false;
+        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        if (likely(hKernel32 != NULL))
+            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+        if (!isWin81OrGreater)
+            return VLC_EGENERIC;
+    }
+#endif
 
 #if !VLC_WINSTORE_APP
     int ret = OpenHwnd(vd);
