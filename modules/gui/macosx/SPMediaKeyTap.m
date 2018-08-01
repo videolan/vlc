@@ -55,6 +55,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 #pragma mark -
 #pragma mark Setup and teardown
+
 - (id)initWithDelegate:(id)delegate
 {
     self = [super init];
@@ -125,22 +126,23 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 - (void)stopWatchingMediaKeys
 {
-    // TODO<nevyn>: Shut down thread, remove event tap port and source
-
+    // Shut down tap thread
     if(_tapThreadRL){
         CFRunLoopStop(_tapThreadRL);
-        _tapThreadRL=nil;
+        _tapThreadRL = nil;
     }
 
+    // Remove tap port
     if(_eventPort){
         CFMachPortInvalidate(_eventPort);
         CFRelease(_eventPort);
-        _eventPort=nil;
+        _eventPort = nil;
     }
 
+    // Remove tap source
     if(_eventPortSource){
         CFRelease(_eventPortSource);
-        _eventPortSource=nil;
+        _eventPortSource = nil;
     }
 }
 
