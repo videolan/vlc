@@ -56,7 +56,6 @@
 #include "builtin_shaders.h"
 
 #include <assert.h>
-#include <versionhelpers.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -252,9 +251,18 @@ static int Open(vlc_object_t *object)
     if ( !vd->obj.force && vd->source.mastering.max_luminance != 0)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
+#if !VLC_WINSTORE_APP
     /* do not use D3D9 on XP unless forced */
-    if(!object->obj.force && !IsWindowsVistaOrGreater())
-        return VLC_EGENERIC;
+    if (!vd->obj.force)
+    {
+        bool isVistaOrGreater = false;
+        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        if (likely(hKernel32 != NULL))
+            isVistaOrGreater = GetProcAddress(hKernel32, "EnumResourceLanguagesExW") != NULL;
+        if (!isVistaOrGreater)
+            return VLC_EGENERIC;
+    }
+#endif
 
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(vout_display_sys_t));
