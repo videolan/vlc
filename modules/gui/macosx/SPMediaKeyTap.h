@@ -33,7 +33,7 @@
 -(id)initWithDelegate:(id)delegate;
 
 +(BOOL)usesGlobalMediaKeyTap;
--(void)startWatchingMediaKeys;
+-(BOOL)startWatchingMediaKeys;
 -(void)stopWatchingMediaKeys;
 -(void)handleAndReleaseMediaKeyEvent:(NSEvent *)event;
 @end
