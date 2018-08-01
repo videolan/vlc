@@ -1217,7 +1217,8 @@ static int Direct3D11Open(vout_display_t *vd)
 
     D3D11SetColorSpace(vd);
 
-    video_format_t fmt = vd->source;
+    video_format_t fmt;
+    video_format_Copy(&fmt, &vd->source);
     int err = SetupOutputFormat(vd, &fmt);
     if (err != VLC_SUCCESS)
     {
@@ -1248,6 +1249,9 @@ static int Direct3D11Open(vout_display_t *vd)
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
+
+    video_format_Clean(&vd->fmt);
+    vd->fmt = fmt;
 
     return VLC_SUCCESS;
 }
@@ -1322,8 +1326,7 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
         Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
-    video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, fmt);
+    vd->fmt = *fmt;
 
     return VLC_SUCCESS;
 }
