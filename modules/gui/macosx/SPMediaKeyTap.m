@@ -2,11 +2,23 @@
  Copyright (c) 2011, Joachim Bengtsson
  All rights reserved.
 
- Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+ Redistribution and use in source and binary forms, with or without modification,
+ are permitted provided that the following conditions are met:
 
- * Neither the name of the organization nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+ * Neither the name of the organization nor the names of its contributors may
+   be used to endorse or promote products derived from this software without
+   specific prior written permission.
 
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 // Copyright (c) 2010 Spotify AB
@@ -14,11 +26,11 @@
 #import "SPInvocationGrabbing.h"
 
 @interface SPMediaKeyTap ()
--(BOOL)shouldInterceptMediaKeyEvents;
--(void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting;
--(void)startWatchingAppSwitching;
--(void)stopWatchingAppSwitching;
--(void)eventTapThread;
+- (BOOL)shouldInterceptMediaKeyEvents;
+- (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting;
+- (void)startWatchingAppSwitching;
+- (void)stopWatchingAppSwitching;
+- (void)eventTapThread;
 @end
 static SPMediaKeyTap *singleton = nil;
 
@@ -33,7 +45,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
 #pragma mark -
 #pragma mark Setup and teardown
--(id)initWithDelegate:(id)delegate;
+- (id)initWithDelegate:(id)delegate
 {
     _delegate = delegate;
     [self startWatchingAppSwitching];
@@ -44,13 +56,14 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     _eventPortSource=nil;
     return self;
 }
--(void)dealloc;
+
+- (void)dealloc
 {
     [self stopWatchingMediaKeys];
     [self stopWatchingAppSwitching];
 }
 
--(void)startWatchingAppSwitching;
+- (void)startWatchingAppSwitching
 {
     // Listen to "app switched" event, so that we don't intercept media keys if we
     // weren't the last "media key listening" app to be active
@@ -62,14 +75,16 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     err = InstallApplicationEventHandler(NewEventHandlerUPP(appTerminated), 1, &eventType, (__bridge void *)(self), &_app_terminating_ref);
     assert(err == noErr);
 }
--(void)stopWatchingAppSwitching;
+
+- (void)stopWatchingAppSwitching
 {
     if(!_app_switching_ref) return;
     RemoveEventHandler(_app_switching_ref);
     _app_switching_ref = NULL;
 }
 
--(BOOL)startWatchingMediaKeys;{
+- (BOOL)startWatchingMediaKeys
+{
     // Prevent having multiple mediaKeys threads
     [self stopWatchingMediaKeys];
 
@@ -98,7 +113,8 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 
     return YES;
 }
--(void)stopWatchingMediaKeys;
+
+- (void)stopWatchingMediaKeys
 {
     // TODO<nevyn>: Shut down thread, remove event tap port and source
 
@@ -122,7 +138,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #pragma mark -
 #pragma mark Accessors
 
-+(BOOL)usesGlobalMediaKeyTap
++ (BOOL)usesGlobalMediaKeyTap
 {
 #ifdef _DEBUG
     // breaking in gdb with a key tap inserted sometimes locks up all mouse and keyboard input forever, forcing reboot
@@ -135,7 +151,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #endif
 }
 
-+ (NSArray*)defaultMediaKeyUserBundleIdentifiers;
++ (NSArray*)defaultMediaKeyUserBundleIdentifiers
 {
     return [NSArray arrayWithObjects:
             [[NSBundle mainBundle] bundleIdentifier], // your app
@@ -174,7 +190,7 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 }
 
 
--(BOOL)shouldInterceptMediaKeyEvents;
+- (BOOL)shouldInterceptMediaKeyEvents
 {
     BOOL shouldIntercept = NO;
     @synchronized(self) {
@@ -183,11 +199,12 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     return shouldIntercept;
 }
 
--(void)pauseTapOnTapThread:(BOOL)yeahno;
+- (void)pauseTapOnTapThread:(BOOL)yeahno
 {
     CGEventTapEnable(self->_eventPort, yeahno);
 }
--(void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting;
+
+- (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting
 {
     BOOL oldSetting;
     @synchronized(self) {
@@ -253,11 +270,12 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     }
 }
 
--(void)handleAndReleaseMediaKeyEvent:(NSEvent *)event {
+- (void)handleAndReleaseMediaKeyEvent:(NSEvent *)event
+{
     [_delegate mediaKeyTap:self receivedMediaKeyEvent:event];
 }
 
--(void)eventTapThread;
+- (void)eventTapThread
 {
     _tapThreadRL = CFRunLoopGetCurrent();
     CFRunLoopAddSource(_tapThreadRL, _eventPortSource, kCFRunLoopCommonModes);
@@ -271,7 +289,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
 
 
 
--(void)mediaKeyAppListChanged;
+- (void)mediaKeyAppListChanged
 {
     if([_mediaKeyAppList count] == 0) return;
 
@@ -295,7 +313,8 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
     OSErr err = SameProcess(&mySerial, &topSerial, &same);
     [self setShouldInterceptMediaKeyEvents:(err == noErr && same)];
 }
--(void)appIsNowFrontmost:(ProcessSerialNumber)psn;
+
+- (void)appIsNowFrontmost:(ProcessSerialNumber)psn
 {
     NSValue *psnv = [NSValue valueWithBytes:&psn objCType:@encode(ProcessSerialNumber)];
 
@@ -312,7 +331,8 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
     [_mediaKeyAppList insertObject:psnv atIndex:0];
     [self mediaKeyAppListChanged];
 }
--(void)appTerminated:(ProcessSerialNumber)psn;
+
+- (void)appTerminated:(ProcessSerialNumber)psn
 {
     NSValue *psnv = [NSValue valueWithBytes:&psn objCType:@encode(ProcessSerialNumber)];
     [_mediaKeyAppList removeObject:psnv];
