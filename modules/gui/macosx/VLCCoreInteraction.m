@@ -121,6 +121,11 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)dealloc
 {
+    #warning BUG! This class is a singleton, so dealloc is never called!
+    // Dealloc is never called, which not only means the below code is never
+    // run, but it means that the SPMediaKeyTap object and the AppleRemote object
+    // is not deallocated properly either.
+
     intf_thread_t *p_intf = getIntf();
     var_DelCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
