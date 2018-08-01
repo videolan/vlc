@@ -903,14 +903,18 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (b_mediaKeySupport && ([[[main playlist] model] hasChildren] ||
                               [[main inputManager] hasInput])) {
         if (!b_mediaKeyTrapEnabled) {
-            b_mediaKeyTrapEnabled = YES;
-            msg_Dbg(p_intf, "Enable media key support");
-            [_mediaKeyController startWatchingMediaKeys];
+            msg_Dbg(p_intf, "Enabling media key support");
+            if ([_mediaKeyController startWatchingMediaKeys]) {
+                b_mediaKeyTrapEnabled = YES;
+            } else {
+                msg_Warn(p_intf, "Failed to enable media key support, likely "
+                    "app needs to be whitelisted in Security Settings.");
+            }
         }
     } else {
         if (b_mediaKeyTrapEnabled) {
             b_mediaKeyTrapEnabled = NO;
-            msg_Dbg(p_intf, "Disable media key support");
+            msg_Dbg(p_intf, "Disabling media key support");
             [_mediaKeyController stopWatchingMediaKeys];
         }
     }
