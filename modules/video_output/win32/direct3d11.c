@@ -1613,7 +1613,6 @@ static int Direct3D11Open(vout_display_t *vd)
 
     if (Direct3D11CreateGenericResources(vd)) {
         msg_Err(vd, "Failed to allocate resources");
-        Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
 
@@ -1688,7 +1687,6 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
 
     if (Direct3D11CreateFormatResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate format resources");
-        Direct3D11DestroyResources(vd);
         return VLC_EGENERIC;
     }
 
