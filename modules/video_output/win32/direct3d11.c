@@ -499,6 +499,16 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 }
 #endif
 
+static unsigned int GetPictureWidth(const vout_display_t *vd)
+{
+    return vd->sys->picQuad.i_width;
+}
+
+static unsigned int GetPictureHeight(const vout_display_t *vd)
+{
+    return vd->sys->picQuad.i_height;
+}
+
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
@@ -518,6 +528,8 @@ static int Open(vlc_object_t *object)
 #if VLC_WINSTORE_APP
     vd->sys->sys.pf_GetRect = GetRect;
 #endif
+    vd->sys->sys.pf_GetPictureWidth  = GetPictureWidth;
+    vd->sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
     if (Direct3D11Open(vd)) {
         msg_Err(vd, "Direct3D11 could not be opened");
@@ -999,15 +1011,6 @@ static inline bool RectEquals(const RECT *r1, const RECT *r2)
            r1->left == r2->left && r1->right == r2->right;
 }
 
-#define BEFORE_UPDATE_RECTS \
-    unsigned int i_outside_width  = vd->fmt.i_width; \
-    unsigned int i_outside_height = vd->fmt.i_height; \
-    vd->fmt.i_width  = vd->sys->picQuad.i_width; \
-    vd->fmt.i_height = vd->sys->picQuad.i_height;
-#define AFTER_UPDATE_RECTS \
-    vd->fmt.i_width  = i_outside_width; \
-    vd->fmt.i_height = i_outside_height;
-
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1015,9 +1018,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
-    BEFORE_UPDATE_RECTS;
     int res = CommonControl( vd, query, args );
-    AFTER_UPDATE_RECTS;
 
     if (query == VOUT_DISPLAY_CHANGE_VIEWPOINT)
     {
@@ -1046,9 +1047,7 @@ static void Manage(vout_display_t *vd)
     RECT before_dest_clipped = sys->sys.rect_dest_clipped;
     RECT before_dest         = sys->sys.rect_dest;
 
-    BEFORE_UPDATE_RECTS;
     CommonManage(vd);
-    AFTER_UPDATE_RECTS;
 
     if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
         !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
@@ -1218,9 +1217,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                BEFORE_UPDATE_RECTS;
                 UpdateRects(vd, NULL, true);
-                AFTER_UPDATE_RECTS;
                 UpdateSize(vd);
             }
         }
@@ -2086,9 +2083,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    BEFORE_UPDATE_RECTS;
     UpdateRects(vd, NULL, true);
-    AFTER_UPDATE_RECTS;
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
@@ -2171,6 +2166,8 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DeviceContext_OMSetDepthStencilState(sys->d3d_dev.d3dcontext, pDepthStencilState, 0);
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
+
+    UpdateRects(vd, NULL, true);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
