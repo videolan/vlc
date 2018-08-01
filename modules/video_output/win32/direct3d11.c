@@ -123,7 +123,7 @@ struct vout_display_sys_t
 #define RECTWidth(r)   (int)((r).right - (r).left)
 #define RECTHeight(r)  (int)((r).bottom - (r).top)
 
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count);
+static picture_pool_t *Pool(vout_display_t *, unsigned);
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
 static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
@@ -147,7 +147,7 @@ static int Direct3D11MapSubpicture(vout_display_t *, int *, picture_t ***, subpi
 static void SetQuadVSProjection(vout_display_t *, d3d_quad_t *, const vlc_viewpoint_t *);
 static void UpdatePicQuadPosition(vout_display_t *);
 
-static int Control(vout_display_t *vd, int query, va_list args);
+static int Control(vout_display_t *, int, va_list);
 
 static int Direct3D11MapPoolTexture(picture_t *picture)
 {
