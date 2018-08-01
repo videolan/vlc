@@ -877,7 +877,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
                     return VLC_ML_LIST_ALBUM_ARTISTS;
-                case VLC_ML_PARENT_ARTIST:
+                case VLC_ML_PARENT_GENRE:
                     return VLC_ML_LIST_GENRE_ARTISTS;
                 default:
                     vlc_assert_unreachable();
@@ -887,7 +887,7 @@ int MediaLibrary::filterListChildrenQuery( int query, int parentType )
             {
                 case VLC_ML_PARENT_ALBUM:
                     return VLC_ML_COUNT_ALBUM_ARTISTS;
-                case VLC_ML_PARENT_ARTIST:
+                case VLC_ML_PARENT_GENRE:
                     return VLC_ML_COUNT_GENRE_ARTISTS;
                 default:
                     vlc_assert_unreachable();
