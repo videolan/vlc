@@ -58,13 +58,13 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 #pragma mark Setup and teardown
 - (id)initWithDelegate:(id)delegate
 {
-    _delegate = delegate;
-    [self startWatchingAppSwitching];
-    singleton = self;
-    _mediaKeyAppList = [NSMutableArray new];
-    _tapThreadRL=nil;
-    _eventPort=nil;
-    _eventPortSource=nil;
+    self = [super init];
+    if (self) {
+        _delegate = delegate;
+        [self startWatchingAppSwitching];
+        singleton = self;
+        _mediaKeyAppList = [NSMutableArray new];
+    }
     return self;
 }
 
