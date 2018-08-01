@@ -354,7 +354,9 @@ typedef struct {
 
     /* */
     video_format_t source;
-    filter_chain_t *filters;
+     /* filters to convert the vout source to fmt, NULL means no conversion
+      * can be done and nothing will be displayed */
+    filter_chain_t *converters;
 
     /* Lock protecting the variables used by
      * VoutDisplayEvent(ie vout_display_SendEvent) */
@@ -382,8 +384,8 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
         .sys = vd,
     };
 
-    osys->filters = filter_chain_NewVideo(vd, false, &owner);
-    if (unlikely(osys->filters == NULL))
+    osys->converters = filter_chain_NewVideo(vd, false, &owner);
+    if (unlikely(osys->converters == NULL))
         return -1;
 
     video_format_t v_src = vd->source;
@@ -420,8 +422,8 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
         es_format_InitFromVideo(&dst, i == 0 ? &v_dst : &v_dst_cmp);
 
-        filter_chain_Reset(osys->filters, &src, &dst);
-        ret = filter_chain_AppendConverter(osys->filters, &src, &dst);
+        filter_chain_Reset(osys->converters, &src, &dst);
+        ret = filter_chain_AppendConverter(osys->converters, &src, &dst);
         es_format_Clean(&dst);
         if (ret == 0)
             break;
@@ -430,8 +432,8 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
     if (ret != 0) {
         msg_Err(vd, "Failed to adapt decoder format to display");
-        filter_chain_Delete(osys->filters);
-        osys->filters = NULL;
+        filter_chain_Delete(osys->converters);
+        osys->converters = NULL;
     }
     return ret;
 }
@@ -440,8 +442,8 @@ static void VoutDisplayDestroyRender(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->filters)
-        filter_chain_Delete(osys->filters);
+    if (osys->converters)
+        filter_chain_Delete(osys->converters);
 }
 
 static int VoutDisplayResetRender(vout_display_t *vd)
@@ -776,27 +778,27 @@ bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    return osys->filters == NULL || !filter_chain_IsEmpty(osys->filters);
+    return osys->converters == NULL || !filter_chain_IsEmpty(osys->converters);
 }
 
 picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->filters == NULL) {
+    if (osys->converters == NULL) {
         picture_Release(picture);
         return NULL;
     }
 
-    return filter_chain_VideoFilter(osys->filters, picture);
+    return filter_chain_VideoFilter(osys->converters, picture);
 }
 
 void vout_FilterFlush(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->filters != NULL)
-        filter_chain_VideoFlush(osys->filters);
+    if (osys->converters != NULL)
+        filter_chain_VideoFlush(osys->converters);
 }
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
