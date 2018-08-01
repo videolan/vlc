@@ -345,7 +345,7 @@ static int Activate( vlc_object_t *p_this )
     {
         if ( !filter_chain_AppendFromString( p_sys->p_chain, psz_croppadd ) )
         {
-            msg_Err( p_filter, "Could not append cropadd filter" );
+            msg_Err( p_filter, "Could not append croppadd filter" );
             filter_chain_Delete( p_sys->p_chain );
             free( p_sys );
             return VLC_EGENERIC;
