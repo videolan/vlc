@@ -21,7 +21,7 @@
 # include "config.h"
 #endif
 
-#include "../modules/demux/dash/mpd/TemplatedUri.hpp"
+#include "../modules/demux/dash/mpd/TemplatedUri.cpp"
 
 #include <iostream>
 #include <cstring>

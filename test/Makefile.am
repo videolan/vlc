@@ -133,9 +133,7 @@ test_modules_keystore_SOURCES = modules/keystore/test.c
 test_modules_keystore_LDADD = $(LIBVLCCORE) $(LIBVLC)
 test_modules_tls_SOURCES = modules/misc/tls.c
 test_modules_tls_LDADD = $(LIBVLCCORE) $(LIBVLC)
-test_modules_demux_dashuri_SOURCES = modules/demux/dashuri.cpp \
-                                  ../modules/demux/dash/mpd/TemplatedUri.cpp \
-                                  ../modules/demux/dash/mpd/TemplatedUri.hpp
+test_modules_demux_dashuri_SOURCES = modules/demux/dashuri.cpp
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check
