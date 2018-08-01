@@ -43,7 +43,6 @@
 - (void)stopWatchingAppSwitching;
 - (void)eventTapThread;
 @end
-static SPMediaKeyTap *singleton = nil;
 
 static pascal OSStatus appSwitched (EventHandlerCallRef nextHandler, EventRef evt, void* userData);
 static pascal OSStatus appTerminated (EventHandlerCallRef nextHandler, EventRef evt, void* userData);
@@ -63,7 +62,6 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     if (self) {
         _delegate = delegate;
         [self startWatchingAppSwitching];
-        singleton = self;
         _mediaKeyAppList = [NSMutableArray new];
     }
     return self;
