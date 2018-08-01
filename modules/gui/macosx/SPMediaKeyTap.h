@@ -31,8 +31,6 @@
 
 @interface SPMediaKeyTap : NSObject
 
-+ (NSArray*)defaultMediaKeyUserBundleIdentifiers;
-
 - (id)initWithDelegate:(id)delegate;
 
 + (BOOL)usesGlobalMediaKeyTap;
@@ -49,7 +47,6 @@
 extern "C" {
 #endif
 
-extern NSString *kMediaKeyUsingBundleIdentifiersDefaultsKey;
 extern NSString *kIgnoreMediaKeysDefaultsKey;
 
 #ifdef __cplusplus
