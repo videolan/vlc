@@ -929,10 +929,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         }
     }
 
+    ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
+
     if (is_d3d11_opaque(picture->format.i_chroma))
         d3d11_device_unlock( &sys->d3d_dev );
-
-    ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
