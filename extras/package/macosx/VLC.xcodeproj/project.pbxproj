@@ -68,7 +68,6 @@
 		1C3114031E508C8800D4DD76 /* AppleRemote.m in Sources */ = {isa = PBXBuildFile; fileRef = CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */; };
 		1C3114051E508C8800D4DD76 /* SideBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = CCCDDEF013E870BB00A35661 /* SideBarItem.m */; };
 		1C3114071E508C8800D4DD76 /* PXSourceList.m in Sources */ = {isa = PBXBuildFile; fileRef = CC0CD0E013DE0EAE00B0D90D /* PXSourceList.m */; };
-		1C31140B1E508C8800D4DD76 /* SPInvocationGrabbing.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */; };
 		1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */ = {isa = PBXBuildFile; fileRef = CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */; };
 		1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */ = {isa = PBXBuildFile; fileRef = 1C5716AB1F5B142200678627 /* coreaudio_common.c */; };
 		1C69FDF61EAB30C7007724ED /* Windows.m in Sources */ = {isa = PBXBuildFile; fileRef = E06CF7F516020F6200C698B7 /* Windows.m */; };
@@ -750,8 +749,6 @@
 		CCDBA3B313D32E200006127B /* macosx.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = macosx.m; path = ../../../modules/video_output/macosx.m; sourceTree = "<group>"; };
 		CCDDF1AC172FF4C4007729A1 /* netconf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = netconf.c; path = ../../../src/darwin/netconf.c; sourceTree = "<group>"; };
 		CCDDF1AD172FF4C4007729A1 /* dirs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = dirs.c; path = ../../../src/darwin/dirs.c; sourceTree = "<group>"; };
-		CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPInvocationGrabbing.h; sourceTree = "<group>"; };
-		CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPInvocationGrabbing.m; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPMediaKeyTap.h; sourceTree = "<group>"; };
 		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPMediaKeyTap.m; sourceTree = "<group>"; };
 		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
@@ -1602,8 +1599,6 @@
 		CC78DA4A13DE0E0100E9603C /* SPMediaKeyTap */ = {
 			isa = PBXGroup;
 			children = (
-				CCF0777913659A8000AF19FD /* SPInvocationGrabbing.h */,
-				CCF0777A13659A8000AF19FD /* SPInvocationGrabbing.m */,
 				CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */,
 				CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */,
 			);
@@ -1760,7 +1755,6 @@
 				6B4D50961E7A7D16004479B5 /* NSSound+VLCAdditions.m in Sources */,
 				6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */,
 				1C3114071E508C8800D4DD76 /* PXSourceList.m in Sources */,
-				1C31140B1E508C8800D4DD76 /* SPInvocationGrabbing.m in Sources */,
 				1C31140D1E508C8800D4DD76 /* SPMediaKeyTap.m in Sources */,
 				1C3113EF1E508C7600D4DD76 /* VLCRendererDiscovery.m in Sources */,
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
