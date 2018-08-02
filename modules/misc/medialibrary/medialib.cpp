@@ -171,8 +171,8 @@ void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr, bool )
 {
 }
 
-MediaLibrary::MediaLibrary( vlc_object_t* obj )
-    : m_obj( obj )
+MediaLibrary::MediaLibrary( vlc_medialibrary_t* ml )
+    : m_vlc_ml( ml )
 {
 }
 
@@ -183,7 +183,7 @@ bool MediaLibrary::Start()
 
     std::unique_ptr<medialibrary::IMediaLibrary> ml( NewMediaLibrary() );
 
-    m_logger.reset( new Logger( m_obj ) );
+    m_logger.reset( new Logger( VLC_OBJECT( m_vlc_ml ) ) );
     ml->setVerbosity( medialibrary::LogLevel::Info );
     ml->setLogger( m_logger.get() );
 
@@ -194,23 +194,23 @@ bool MediaLibrary::Start()
     switch ( initStatus )
     {
         case medialibrary::InitializeResult::AlreadyInitialized:
-            msg_Info( m_obj, "MediaLibrary was already initialized" );
+            msg_Info( m_vlc_ml, "MediaLibrary was already initialized" );
             return true;
         case medialibrary::InitializeResult::Failed:
-            msg_Err( m_obj, "Medialibrary failed to initialize" );
+            msg_Err( m_vlc_ml, "Medialibrary failed to initialize" );
             return false;
         case medialibrary::InitializeResult::DbReset:
-            msg_Info( m_obj, "Database was reset" );
+            msg_Info( m_vlc_ml, "Database was reset" );
             break;
         case medialibrary::InitializeResult::Success:
-            msg_Dbg( m_obj, "MediaLibrary successfully initialized" );
+            msg_Dbg( m_vlc_ml, "MediaLibrary successfully initialized" );
             break;
     }
 
-    ml->addParserService( std::make_shared<MetadataExtractor>( m_obj ) );
+    ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
     if ( ml->start() == false )
     {
-        msg_Err( m_obj, "Failed to start the MediaLibrary" );
+        msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
         return false;
     }
 
@@ -219,7 +219,7 @@ bool MediaLibrary::Start()
     // twice, as we start discovering the new folders, then reload them.
     ml->reload();
 
-    auto folders = vlc::wrap_cptr( var_InheritString( m_obj, "ml-folders" ) );
+    auto folders = vlc::wrap_cptr( var_InheritString( m_vlc_ml, "ml-folders" ) );
     if ( folders != nullptr && strlen( folders.get() ) > 0 )
     {
         std::istringstream ss( folders.get() );
@@ -1177,20 +1177,20 @@ static int Control( vlc_medialibrary_t* module, int query, ... )
 
 static int Open( vlc_object_t* obj )
 {
-    vlc_medialibrary_t* p_module = reinterpret_cast<vlc_medialibrary_t*>( obj );
+    vlc_medialibrary_t* p_ml = reinterpret_cast<vlc_medialibrary_t*>( obj );
 
     try
     {
-        p_module->p_sys = new MediaLibrary( obj );
+        p_ml->p_sys = new MediaLibrary( p_ml );
     }
     catch ( const std::exception& ex )
     {
         msg_Err( obj, "Failed to instantiate/initialize medialibrary: %s", ex.what() );
         return VLC_EGENERIC;
     }
-    p_module->pf_control = Control;
-    p_module->pf_get = Get;
-    p_module->pf_list = List;
+    p_ml->pf_control = Control;
+    p_ml->pf_get = Get;
+    p_ml->pf_list = List;
     return VLC_SUCCESS;
 }
 
