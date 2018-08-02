@@ -355,6 +355,12 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
+    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->fmt.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    {
+        msg_Err(vd, "Could not allocate quad buffers.");
+        return NULL;
+    }
+
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
                    vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? sys->flatVSShader : sys->projectionVSShader,
                    sys->pVertexLayout,
@@ -1721,10 +1727,19 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
             d3dquad->i_height   = r->fmt.i_height;
 
             d3dquad->formatInfo = sys->d3dregion_format;
+            err = D3D11_AllocateQuad(vd, &sys->d3d_dev, PROJECTION_MODE_RECTANGULAR, d3dquad);
+            if (err != VLC_SUCCESS)
+            {
+                msg_Err(vd, "Failed to allocate %dx%d quad for OSD",
+                             r->fmt.i_visible_width, r->fmt.i_visible_height);
+                free(d3dquad);
+                continue;
+            }
+
             err = D3D11_SetupQuad( vd, &sys->d3d_dev, &r->fmt, d3dquad, &sys->display, &output,
                              sys->flatVSShader, sys->pVertexLayout, PROJECTION_MODE_RECTANGULAR, ORIENT_NORMAL );
             if (err != VLC_SUCCESS) {
-                msg_Err(vd, "Failed to create %dx%d quad for OSD",
+                msg_Err(vd, "Failed to setup %dx%d quad for OSD",
                         r->fmt.i_visible_width, r->fmt.i_visible_height);
                 free(d3dquad);
                 continue;

@@ -693,9 +693,6 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
                     ID3D11VertexShader *d3dvertexShader, ID3D11InputLayout *pVertexLayout,
                     video_projection_mode_t projection, video_orientation_t orientation)
 {
-    if (D3D11_AllocateQuad(o, d3d_dev, projection, quad) != VLC_SUCCESS)
-        return VLC_EGENERIC;
-
     const bool RGB_shader = IsRGBShader(quad->formatInfo);
 
     quad->shaderConstants.LuminanceScale = GetFormatLuminance(o, fmt) / (float)displayFormat->luminance_peak;
