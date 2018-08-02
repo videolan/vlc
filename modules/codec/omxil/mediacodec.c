@@ -222,7 +222,7 @@ static void CSDFree(decoder_t *p_dec)
 static void CSDInit(decoder_t *p_dec, block_t *p_blocks, size_t i_count)
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    assert(i_count >= 0 && i_count <= 3);
+    assert(i_count <= MAX_CSD_COUNT);
 
     CSDFree(p_dec);
 
