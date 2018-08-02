@@ -691,7 +691,7 @@ error:
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat, const RECT *output,
                     ID3D11VertexShader *d3dvertexShader, ID3D11InputLayout *pVertexLayout,
-                    video_projection_mode_t projection, video_orientation_t orientation)
+                    video_orientation_t orientation)
 {
     const bool RGB_shader = IsRGBShader(quad->formatInfo);
 
