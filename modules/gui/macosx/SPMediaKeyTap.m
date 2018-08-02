@@ -23,7 +23,6 @@
 
 // Copyright (c) 2010 Spotify AB
 #import "SPMediaKeyTap.h"
-#import "SPInvocationGrabbing.h"
 
 // Define to enable app list debug output
 // #define DEBUG_SPMEDIAKEY_APPLIST 1
@@ -34,6 +33,7 @@ NSString *kIgnoreMediaKeysDefaultsKey = @"SPIgnoreMediaKeys";
     CFMachPortRef _eventPort;
     CFRunLoopSourceRef _eventPortSource;
     CFRunLoopRef _tapThreadRL;
+    NSThread *_tapThread;
     BOOL _shouldInterceptMediaKeyEvents;
     id _delegate;
     // The app that is frontmost in this list owns media keys
@@ -122,7 +122,10 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
         return NO;
 
     // Let's do this in a separate thread so that a slow app doesn't lag the event tap
-    [NSThread detachNewThreadSelector:@selector(eventTapThread) toTarget:self withObject:nil];
+    _tapThread = [[NSThread alloc] initWithTarget:self
+                                         selector:@selector(eventTapThread)
+                                           object:nil];
+    [_tapThread start];
 
     return YES;
 }
@@ -218,9 +221,9 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     return shouldIntercept;
 }
 
-- (void)pauseTapOnTapThread:(BOOL)yeahno
+- (void)pauseTapOnTapThread:(NSNumber *)yeahno
 {
-    CGEventTapEnable(self->_eventPort, yeahno);
+    CGEventTapEnable(self->_eventPort, [yeahno boolValue]);
 }
 
 - (void)setShouldInterceptMediaKeyEvents:(BOOL)newSetting
@@ -231,10 +234,11 @@ static CGEventRef tapEventCallback(CGEventTapProxy proxy, CGEventType type, CGEv
         _shouldInterceptMediaKeyEvents = newSetting;
     }
     if(_tapThreadRL && oldSetting != newSetting) {
-        id grab = [self grab];
-        [grab pauseTapOnTapThread:newSetting];
-        NSTimer *timer = [NSTimer timerWithTimeInterval:0 invocation:[grab invocation] repeats:NO];
-        CFRunLoopAddTimer(_tapThreadRL, (CFRunLoopTimerRef)CFBridgingRetain(timer), kCFRunLoopCommonModes);
+        [self performSelector:@selector(pauseTapOnTapThread:)
+                     onThread:_tapThread
+                   withObject:@(newSetting)
+                waitUntilDone:NO];
+
     }
 }
 
