@@ -46,6 +46,7 @@ Misc:
 macOS:
  * Fix delay and fps setting in subtitle dialog
  * macOS 10.7.5 is required now. VLC will no longer launch on earlier releases.
+ * Modernized and improved support for media keys
 
 
 Changes between 3.0.2 and 3.0.3:
