@@ -49,6 +49,8 @@ void input_SendEventMeta( input_thread_t *p_input );
 void input_SendEventMetaInfo( input_thread_t *p_input );
 void input_SendEventMetaEpg( input_thread_t *p_input );
 
+void input_SendEventParsing( input_thread_t *p_input, input_item_node_t *p_root );
+
 /*****************************************************************************
  * Event for es_out.c
  *****************************************************************************/

@@ -289,3 +289,11 @@ void input_SendEventBookmark( input_thread_t *p_input )
         .type = INPUT_EVENT_BOOKMARK
     });
 }
+
+void input_SendEventParsing( input_thread_t *p_input, input_item_node_t *p_root )
+{
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_SUBITEMS,
+        .subitems = p_root,
+    });
+}

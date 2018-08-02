@@ -415,6 +415,8 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
             break;
         case INPUT_EVENT_VOUT:
             break;
+        case INPUT_EVENT_SUBITEMS:
+            break;
     }
     Trigger( p_input, event->type );
 }
