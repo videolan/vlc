@@ -565,7 +565,7 @@ static int vout_update_format( decoder_t *p_dec )
         p_owner->reset_out_state = true;
         vlc_fifo_Unlock( p_owner->p_fifo );
     }
-
+    else
     if ( memcmp( &p_dec->fmt_out.video.mastering,
                  &p_owner->fmt.video.mastering,
                  sizeof(p_owner->fmt.video.mastering)) ||
