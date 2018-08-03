@@ -2337,10 +2337,12 @@ AS_IF([test "${enable_avcodec}" != "no"], [
   dnl We need >=57.16.0 from libav or >=57.37.100 from ffmpeg
   case "${avfork}" in
     libav) av_codec_ver="57.16.0" ;;
+    dnl 05f66706d182eb0c36af54d72614bf4c33e957a9  includes libavutil 55.9.0
     ffmpeg) av_codec_ver="57.37.100" ;;
+    dnl 7fc329e2dd6226dfecaa4a1d7adf353bf2773726  include libavutil 55.22.101
     *) AC_MSG_ERROR([Missing libav or FFmpeg. Pass --disable-avcodec to ignore this error.])
   esac
-  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 52.0.0], [
+  PKG_CHECK_MODULES(AVCODEC,[libavcodec >= ${av_codec_ver} libavutil >= 55.9.0], [
     VLC_SAVE_FLAGS
     CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
     CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
