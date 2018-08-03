@@ -72,8 +72,8 @@ typedef struct {
     FLOAT Projection[4*4];
 } VS_PROJECTION_CONST;
 
-const char* globVertexShaderFlat;
-const char* globVertexShaderProjection;
+extern const char* globVertexShaderFlat;
+extern const char* globVertexShaderProjection;
 
 /* Vertex Shader compiled sructures */
 typedef struct {
