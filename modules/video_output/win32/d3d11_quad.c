@@ -865,6 +865,7 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
     case DXGI_FORMAT_B8G8R8X8_UNORM:
     case DXGI_FORMAT_B5G6R5_UNORM:
     case DXGI_FORMAT_R10G10B10A2_UNORM:
+    case DXGI_FORMAT_R16G16B16A16_UNORM:
         if ( display->formatTexture == DXGI_FORMAT_NV12 ||
              display->formatTexture == DXGI_FORMAT_P010 )
         {
