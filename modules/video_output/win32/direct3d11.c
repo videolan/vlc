@@ -1317,10 +1317,10 @@ static int SetupOutputFormat(vout_display_t *vd, video_format_t *fmt)
        return VLC_EGENERIC;
     }
 
-    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.textureFormat->fourcc;
-
     msg_Dbg( vd, "Using pixel format %s for chroma %4.4s", sys->picQuad.textureFormat->name,
                  (char *)&fmt->i_chroma );
+
+    fmt->i_chroma = decoder_format ? decoder_format->fourcc : sys->picQuad.textureFormat->fourcc;
     DxgiFormatMask( sys->picQuad.textureFormat->formatTexture, fmt );
 
     /* check the region pixel format */
