@@ -481,8 +481,8 @@ static int Demux( demux_t *p_demux)
                 unsigned i_nb_fields;
                 if( i_frame_length > 0 )
                 {
-                    i_nb_fields = i_frame_length * 2 * p_sys->frame_rate_num /
-                                  ( p_sys->frame_rate_den * CLOCK_FREQ );
+                    i_nb_fields = round( (double)i_frame_length * 2 * p_sys->frame_rate_num /
+                                  ( p_sys->frame_rate_den * CLOCK_FREQ ) );
                 }
                 else i_nb_fields = 2;
                 if( i_nb_fields <= 6 ) /* in the legit range */
