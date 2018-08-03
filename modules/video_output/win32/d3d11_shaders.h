@@ -73,8 +73,8 @@ typedef struct {
     FLOAT Projection[4*4];
 } VS_PROJECTION_CONST;
 
-const char* globVertexShaderFlat;
-const char* globVertexShaderProjection;
+extern const char* globVertexShaderFlat;
+extern const char* globVertexShaderProjection;
 
 ID3DBlob* D3D11_CompileShader(vlc_object_t *, const d3d11_handle_t *, const d3d11_device_t *,
                               const char *psz_shader, bool pixel);
