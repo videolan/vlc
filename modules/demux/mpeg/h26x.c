@@ -354,8 +354,11 @@ static int GenericOpen( demux_t *p_demux, const char *psz_module,
 
     /* Load the mpegvideo packetizer */
     es_format_Init( &fmt, VIDEO_ES, i_codec );
-    fmt.video.i_frame_rate = p_sys->dts.i_divider_num;
-    fmt.video.i_frame_rate_base = p_sys->dts.i_divider_den;
+    if( f_fps )
+    {
+        fmt.video.i_frame_rate = p_sys->dts.i_divider_num;
+        fmt.video.i_frame_rate_base = p_sys->dts.i_divider_den;
+    }
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, psz_module );
     if( !p_sys->p_packetizer )
     {
