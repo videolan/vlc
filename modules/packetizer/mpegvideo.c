@@ -725,10 +725,16 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         if( num && den && num <= UINT_MAX/2 &&
            ( p_sys->i_frame_rate != num || p_sys->i_frame_rate_base != den ) )
         {
-            date_Change( &p_sys->dts, 2 * num, den ); /* fields / den */
-            date_Change( &p_sys->prev_iframe_dts, 2 * num, den );
-            p_dec->fmt_out.video.i_frame_rate = num;
-            p_dec->fmt_out.video.i_frame_rate_base = den;
+            /* Only of not specified by container */
+            if ( !p_dec->fmt_in.video.i_frame_rate ||
+                 !p_dec->fmt_in.video.i_frame_rate_base )
+            {
+                date_Change( &p_sys->dts, 2 * num, den ); /* fields / den */
+                date_Change( &p_sys->prev_iframe_dts, 2 * num, den );
+                p_dec->fmt_out.video.i_frame_rate = num;
+                p_dec->fmt_out.video.i_frame_rate_base = den;
+            }
+            /* store internal values */
             p_sys->i_frame_rate = num;
             p_sys->i_frame_rate_base = den;
         }
