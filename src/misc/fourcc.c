@@ -717,6 +717,12 @@ static const struct
         VLC_CODEC_GBR_PLANAR_14B },            PLANAR_16(3, 1, 1, 14) },
     { { VLC_CODEC_GBR_PLANAR_16L,
         VLC_CODEC_GBR_PLANAR_16B },            PLANAR_16(3, 1, 1, 16) },
+    { { VLC_CODEC_GBRA_PLANAR_10L,
+        VLC_CODEC_GBRA_PLANAR_10B },           PLANAR_16(4, 1, 1, 10) },
+    { { VLC_CODEC_GBRA_PLANAR_12L,
+        VLC_CODEC_GBRA_PLANAR_12B },           PLANAR_16(4, 1, 1, 12) },
+    { { VLC_CODEC_GBRA_PLANAR_16L,
+        VLC_CODEC_GBRA_PLANAR_16B },           PLANAR_16(4, 1, 1, 16) },
 
     { { VLC_CODEC_I420_16L,
         VLC_CODEC_I420_16B },                  PLANAR_16(3, 2, 2, 16) },
