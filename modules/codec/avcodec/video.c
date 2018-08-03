@@ -40,16 +40,14 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/mem.h>
 #include <libavutil/pixdesc.h>
-#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#if (LIBAVUTIL_VERSION_MICRO >= 100)
 #include <libavutil/mastering_display_metadata.h>
 #endif
 
 #include "avcodec.h"
 #include "va.h"
 
-#if LIBAVUTIL_VERSION_CHECK( 52, 20, 0, 58, 100 )
 #include <libavutil/stereo3d.h>
-#endif
 
 #include "../codec/cc.h"
 #define FRAME_INFO_DEPTH 64
@@ -819,7 +817,7 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     decoder_sys_t *p_sys = p_dec->p_sys;
     bool format_changed = false;
 
-#if (LIBAVUTIL_VERSION_MICRO >= 100 && LIBAVUTIL_VERSION_INT >= AV_VERSION_INT( 55, 16, 101 ) )
+#if (LIBAVUTIL_VERSION_MICRO >= 100)
 #define FROM_AVRAT(default_factor, avrat) \
 (uint64_t)(default_factor) * (avrat).num / (avrat).den
     const AVFrameSideData *metadata =
@@ -894,7 +892,6 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     }
 #endif
 
-#if LIBAVUTIL_VERSION_CHECK( 52, 20, 0, 58, 100 )
     const AVFrameSideData *p_stereo3d_data =
             av_frame_get_side_data( frame,
                                     AV_FRAME_DATA_STEREO3D );
@@ -942,7 +939,6 @@ static int DecodeSidedata( decoder_t *p_dec, const AVFrame *frame, picture_t *p_
     }
     else
         p_pic->format.multiview_mode = p_dec->fmt_out.video.multiview_mode;
-#endif
 
     if (format_changed && decoder_UpdateVideoFormat( p_dec ))
         return -1;
@@ -1689,15 +1685,11 @@ no_reuse:
     static const enum PixelFormat hwfmts[] =
     {
 #ifdef _WIN32
-#if LIBAVUTIL_VERSION_CHECK(54, 13, 1, 24, 100)
         AV_PIX_FMT_D3D11VA_VLD,
-#endif
         AV_PIX_FMT_DXVA2_VLD,
 #endif
         AV_PIX_FMT_VAAPI_VLD,
-#if (LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(52, 4, 0))
         AV_PIX_FMT_VDPAU,
-#endif
         AV_PIX_FMT_NONE,
     };
 

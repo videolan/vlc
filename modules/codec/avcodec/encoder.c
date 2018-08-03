@@ -48,9 +48,7 @@
 #include "avcodec.h"
 #include "avcommon.h"
 
-#if LIBAVUTIL_VERSION_CHECK( 52,2,6,0,0 )
-# include <libavutil/channel_layout.h>
-#endif
+#include <libavutil/channel_layout.h>
 
 #define HURRY_UP_GUARD1 (450000)
 #define HURRY_UP_GUARD2 (300000)
@@ -730,7 +728,6 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_context->time_base.num = 1;
         p_context->time_base.den = p_context->sample_rate;
         p_context->channels      = p_enc->fmt_out.audio.i_channels;
-#if LIBAVUTIL_VERSION_CHECK( 52, 2, 6, 0, 0)
         p_context->channel_layout = channel_mask[p_context->channels][1];
 
         /* Setup Channel ordering for multichannel audio
@@ -780,7 +777,6 @@ int InitVideoEnc( vlc_object_t *p_this )
         p_sys->i_channels_to_reorder =
             aout_CheckChannelReorder( NULL, pi_order_dst, order_mask,
                                       p_sys->pi_reorder_layout );
-#endif
 
         if ( p_enc->fmt_out.i_codec == VLC_CODEC_MP4A )
         {
