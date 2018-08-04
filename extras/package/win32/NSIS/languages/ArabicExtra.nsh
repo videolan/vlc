@@ -9,7 +9,8 @@ ${LangFileString} Name_Section05 "تشغيل الأقراص"
 ${LangFileString} Name_Section06 "ارتباطات أنواع الملفات"
 ${LangFileString} Name_SectionGroupAudio "الملفات الصوتية"
 ${LangFileString} Name_SectionGroupVideo "الملفات المرئية"
-${LangFileString} Name_Section07 "قوائم السياق"
+${LangFileString} Name_SectionGroupOther "أخرى"
+${LangFileString} Name_Section07 "قوائم المحتوى"
 ${LangFileString} Name_Section08 "احذف التفضيلات والخبيئة"
 
 ${LangFileString} Desc_Section01 \
@@ -56,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "شغّل فيلم SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "شغّل ملفات الفيديو"
 ${LangFileString} Action_OnArrivalMusicFiles "شغّل الملفات الصوتية"
 ${LangFileString} Action_OnArrivalDVDAudio "شغّل DVD صوتي"
+${LangFileString} Action_OnArrivalBluray "تشغيل بلو-ري"
+
 ${LangFileString} License_NextText "أصبحت على علم بحقوقك. انقر ”التالي“ للمتابعة."
 
 ${LangFileString} Detail_CheckProcesses "يتحقق من العمليات..."
@@ -70,7 +73,7 @@ ${LangFileString} Reinstall_MessageOlder "ثمة نسخة أقدم من VLC مث
 ${LangFileString} Reinstall_MessageNewer "ثمة نسخة أحدث من VLC مثبّتة! ليس مستحسنا العودة إلى نسخة أقدم. اختر العملية التي تريد إجراءها وانقر ”التالي“ للمتابعة."
 ${LangFileString} Reinstall_MessageSame "النسخة ${VERSION} من VLC مثبتة بالفعل. اختر العملية التي تريد إجراءها وانقر ”التالي“ للمتابعة."
 ${LangFileString} Reinstall_OptionUpgrade "رقِّ VLC مستخدما الإعدادات السابقة (مستحسن)"
-${LangFileString} Reinstall_OptionDowngrade "أنزِل نسخة VLC مستخدما الإعدادات السابقة (مستحسن)"
+${LangFileString} Reinstall_OptionDowngrade "أنزِل نسخة VLC مستخدماً الإعدادات السابقة (مستحسن)"
 ${LangFileString} Reinstall_OptionComponents "أضِف/أزِل/أعِد تثبيت المكوّنات"
 ${LangFileString} Reinstall_OptionAdvanced "غيّر الإعدادات (متقدم)"
 ${LangFileString} Reinstall_OptionUninstall "أزِل تثبيت VLC"
