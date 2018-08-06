@@ -34,7 +34,6 @@ namespace dash
     namespace mpd
     {
         class AdaptationSet;
-        class TrickModeType;
         class MPD;
 
         using namespace adaptive;
@@ -48,27 +47,12 @@ namespace dash
                 virtual ~Representation ();
 
                 virtual StreamFormat getStreamFormat() const; /* reimpl */
-                int                 getQualityRanking       () const;
-                void                setQualityRanking       ( int qualityRanking );
-                const std::list<const Representation*>&     getDependencies() const;
-                void                addDependency           ( const Representation* dep );
-                /**
-                 * @return  This SegmentInfo for this Representation.
-                 *          It cannot be NULL, or without any Segments in it.
-                 *          It can however have a NULL InitSegment
-                 */
-                TrickModeType*      getTrickModeType        () const;
-
-                void                setTrickMode( TrickModeType *trickModeType );
 
                 /* for segment templates */
                 virtual std::string contextualize(size_t, const std::string &,
                                                   const BaseSegmentTemplate *) const; // reimpl
 
             private:
-                int                                 qualityRanking;
-                std::list<const Representation*>    dependencies;
-                TrickModeType                       *trickModeType;
 
                 /* for contextualize() */
                 vlc_tick_t getScaledTimeBySegmentNumber(uint64_t, const MediaSegmentTemplate *) const;

@@ -30,7 +30,6 @@
 #include "Representation.h"
 #include "AdaptationSet.h"
 #include "MPD.h"
-#include "TrickModeType.h"
 #include "../adaptive/playlist/SegmentTemplate.h"
 #include "../adaptive/playlist/SegmentTimeline.h"
 #include "TemplatedUri.hpp"
@@ -38,15 +37,12 @@
 using namespace dash::mpd;
 
 Representation::Representation  ( AdaptationSet *set ) :
-                BaseRepresentation( set ),
-                qualityRanking  ( -1 ),
-                trickModeType   ( NULL )
+                BaseRepresentation( set )
 {
 }
 
 Representation::~Representation ()
 {
-    delete(this->trickModeType);
 }
 
 StreamFormat Representation::getStreamFormat() const
@@ -55,38 +51,6 @@ StreamFormat Representation::getStreamFormat() const
         return StreamFormat(adaptationSet->getMimeType());
     else
         return StreamFormat(getMimeType());
-}
-
-TrickModeType*      Representation::getTrickModeType        () const
-{
-    return this->trickModeType;
-}
-
-void                Representation::setTrickMode        (TrickModeType *trickModeType)
-{
-    this->trickModeType = trickModeType;
-}
-
-int Representation::getQualityRanking() const
-{
-    return this->qualityRanking;
-}
-
-void Representation::setQualityRanking( int qualityRanking )
-{
-    if ( qualityRanking > 0 )
-        this->qualityRanking = qualityRanking;
-}
-
-const std::list<const Representation*>&     Representation::getDependencies() const
-{
-    return this->dependencies;
-}
-
-void Representation::addDependency(const Representation *dep)
-{
-    if ( dep != NULL )
-        this->dependencies.push_back( dep );
 }
 
 std::string Representation::contextualize(size_t number, const std::string &component,

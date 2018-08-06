@@ -405,8 +405,6 @@ libadaptive_dash_SOURCES = \
     demux/dash/mpd/Representation.h \
     demux/dash/mpd/TemplatedUri.cpp \
     demux/dash/mpd/TemplatedUri.hpp \
-    demux/dash/mpd/TrickModeType.cpp \
-    demux/dash/mpd/TrickModeType.h \
     demux/dash/mp4/IndexReader.cpp \
     demux/dash/mp4/IndexReader.hpp \
     demux/dash/DASHManager.cpp \
