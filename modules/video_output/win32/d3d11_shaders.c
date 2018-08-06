@@ -706,7 +706,7 @@ static HRESULT D3D11_CompileVertexShader(vlc_object_t *obj, d3d11_handle_t *hd3d
                                          d3d11_device_t *d3d_dev, const char *psz_shader,
                                          d3d_vshader_t *output)
 {
-   HRESULT hr;
+   HRESULT hr = E_FAIL;
    ID3DBlob *pVSBlob = D3D11_CompileShader(obj, hd3d, d3d_dev, psz_shader, false);
    if (!pVSBlob)
        goto error;
