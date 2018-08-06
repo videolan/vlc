@@ -233,6 +233,8 @@ int vlclua_dir_list(const char *luadirname, char ***restrict listp)
     /* Source Lua Scripts in architecture-independent data directory */
     if (both || libdir == NULL)
         list = vlclua_dir_list_append(list, datadir, luadirname);
+    else
+        free(datadir);
 
     *list = NULL;
     return VLC_SUCCESS;
