@@ -846,10 +846,19 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
 
 void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t *display)
 {
+#define RECTWidth(r)   (LONG)((r)->right - (r)->left)
+#define RECTHeight(r)  (LONG)((r)->bottom - (r)->top)
+    LONG srcAreaWidth, srcAreaHeight;
+
+    srcAreaWidth  = RECTWidth(rect);
+    srcAreaHeight = RECTHeight(rect);
+#undef RECTWidth
+#undef RECTHeight
+
     quad->cropViewport[0].TopLeftX = rect->left;
     quad->cropViewport[0].TopLeftY = rect->top;
-    quad->cropViewport[0].Width    = rect->right  - rect->left;
-    quad->cropViewport[0].Height   = rect->bottom - rect->top;
+    quad->cropViewport[0].Width    = srcAreaWidth;
+    quad->cropViewport[0].Height   = srcAreaHeight;
 
     switch ( quad->textureFormat->formatTexture )
     {
@@ -857,8 +866,8 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
     case DXGI_FORMAT_P010:
         quad->cropViewport[1].TopLeftX = rect->left / 2;
         quad->cropViewport[1].TopLeftY = rect->top / 2;
-        quad->cropViewport[1].Width    = (rect->right  - rect->left) / 2;
-        quad->cropViewport[1].Height   = (rect->bottom - rect->top) / 2;
+        quad->cropViewport[1].Width    = srcAreaWidth / 2;
+        quad->cropViewport[1].Height   = srcAreaHeight / 2;
         break;
     case DXGI_FORMAT_R8G8B8A8_UNORM:
     case DXGI_FORMAT_B8G8R8A8_UNORM:
@@ -873,8 +882,8 @@ void D3D11_UpdateViewport(d3d_quad_t *quad, const RECT *rect, const d3d_format_t
         {
             quad->cropViewport[1].TopLeftX = rect->left / 2;
             quad->cropViewport[1].TopLeftY = rect->top / 2;
-            quad->cropViewport[1].Width    = (rect->right  - rect->left) / 2;
-            quad->cropViewport[1].Height   = (rect->bottom - rect->top) / 2;
+            quad->cropViewport[1].Width    = srcAreaWidth / 2;
+            quad->cropViewport[1].Height   = srcAreaHeight / 2;
         }
         break;
     case DXGI_FORMAT_UNKNOWN:
