@@ -342,6 +342,9 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_pic->i_pts = p_sys->i_interpolated_pts;
         p_pic->i_dts = p_sys->i_interpolated_dts;
 
+#if 0
+    msg_Err( p_dec, "output dts/pts (%"PRId64",%"PRId64")", p_pic->i_dts, p_pic->i_pts );
+#endif
         /* Reset context */
         p_sys->p_frame = NULL;
         p_sys->pp_last = &p_sys->p_frame;
@@ -529,11 +532,6 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
             (i_modulo_time_base * p_sys->i_fps_num);
     }
 
-#if 0
-    msg_Err( p_dec, "interp pts/dts (%lli,%lli), pts/dts (%lli,%lli)",
-             p_sys->i_interpolated_pts, p_sys->i_interpolated_dts,
-             p_vop->i_pts, p_vop->i_dts );
-#endif
 
     if( p_sys->i_fps_num < 5 && /* Work-around buggy streams */
         p_dec->fmt_in.video.i_frame_rate > 0 &&
@@ -548,6 +546,12 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
             ( CLOCK_FREQ * (i_time_ref + i_time_increment -
               p_sys->i_last_time - p_sys->i_last_timeincr) /
               p_sys->i_fps_num );
+
+#if 0
+    msg_Err( p_dec, "interp dts/pts (%"PRId64",%"PRId64"), dts/pts (%"PRId64",%"PRId64") %"PRId64" mod %d inc %"PRId64,
+             p_sys->i_interpolated_dts, p_sys->i_interpolated_pts,
+             p_vop->i_dts, p_vop->i_pts, p_sys->i_time_ref, i_modulo_time_base, i_time_increment );
+#endif
 
     p_sys->i_last_time = i_time_ref;
     p_sys->i_last_timeincr = i_time_increment;
