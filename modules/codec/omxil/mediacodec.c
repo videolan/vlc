@@ -705,7 +705,7 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
 
             if (p_sys->api.b_support_rotation)
             {
-                switch (p_dec->fmt_out.video.orientation)
+                switch (p_dec->fmt_in.video.orientation)
                 {
                     case ORIENT_ROTATED_90:
                         p_sys->video.i_angle = 90;
