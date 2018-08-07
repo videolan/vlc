@@ -56,6 +56,7 @@ $Id$
  * audiounit_ios: AudioUnit output plugin for iOS
  * auhal: Audio output for Mac OS X based on the AUHAL API
  * avahi: Zeroconf services discovery
+ * avaudiocapture: AVFoundation based audio capture module
  * avcapture: AVFoundation based video capture module
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer

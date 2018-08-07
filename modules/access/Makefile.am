@@ -76,6 +76,13 @@ libaccess_qtsound_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' -Wl,-f
 access_LTLIBRARIES += $(LTLIBaccess_qtsound)
 EXTRA_LTLIBRARIES += libaccess_qtsound_plugin.la
 
+libavaudiocapture_plugin_la_SOURCES = access/avaudiocapture.m
+libavaudiocapture_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-arc
+libavaudiocapture_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' -Wl,-framework,Foundation -Wl,-framework,AVFoundation -Wl,-framework,CoreMedia
+if HAVE_AVFOUNDATION
+access_LTLIBRARIES += libavaudiocapture_plugin.la
+endif
+
 libaccess_wasapi_plugin_la_SOURCES = access/wasapi.c
 libaccess_wasapi_plugin_la_LIBADD = $(LIBCOM) -lksuser
 if HAVE_WASAPI

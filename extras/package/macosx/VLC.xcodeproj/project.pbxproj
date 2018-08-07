@@ -87,6 +87,7 @@
 		1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224131E4D2A9000833BE1 /* StreamOutput.xib */; };
 		1CCC89052078A3D500E5626F /* TextfieldPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224151E4D2A9000833BE1 /* TextfieldPanel.xib */; };
 		1CCC89062078A3D500E5626F /* TimeSelectionPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */; };
+		1CCD8FA02117957700407114 /* avaudiocapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD8F9F2117957600407114 /* avaudiocapture.m */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
@@ -167,6 +168,7 @@
 		1CAEBC001E1EC0A400A99E49 /* VLCFSPanelDraggableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCFSPanelDraggableView.m; sourceTree = "<group>"; };
 		1CC25CA71B2C585D0003F994 /* darwinvlc.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = darwinvlc.m; path = ../../../bin/darwinvlc.m; sourceTree = "<group>"; };
 		1CCB5F2F1A62A6A5004C3E90 /* Pseudo-VLC.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Pseudo-VLC.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1CCD8F9F2117957600407114 /* avaudiocapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avaudiocapture.m; path = ../../../modules/access/avaudiocapture.m; sourceTree = "<group>"; };
 		1CD366791B7A242E0054E39F /* VLCTimeSelectionPanelController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCTimeSelectionPanelController.h; sourceTree = "<group>"; };
 		1CD3667A1B7A242E0054E39F /* VLCTimeSelectionPanelController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCTimeSelectionPanelController.m; sourceTree = "<group>"; };
 		1CFE8D561EA0D3D300E94451 /* ErrorPanel.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ErrorPanel.xib; sourceTree = "<group>"; };
@@ -1472,6 +1474,7 @@
 		CCDDF1B0172FF4E2007729A1 /* access */ = {
 			isa = PBXGroup;
 			children = (
+				1CCD8F9F2117957600407114 /* avaudiocapture.m */,
 				DCC8017816FCA036007FE736 /* avcapture.m */,
 				DC1A176914E2778A001477C6 /* qtsound.m */,
 			);
@@ -1628,6 +1631,7 @@
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
 				6B8A6B0121279D2600DC29F3 /* PXSourceListTableCellView.m in Sources */,
 				1C3113981E508C6900D4DD76 /* VLCAudioEffectsWindowController.m in Sources */,
+				1CCD8FA02117957700407114 /* avaudiocapture.m in Sources */,
 				6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */,
 				1C31139A1E508C6900D4DD76 /* VLCBookmarksWindowController.m in Sources */,
 				6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */,
