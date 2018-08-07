@@ -31,6 +31,7 @@
 #include <vlc_vout_display.h>
 
 #include <windows.h>
+#include <versionhelpers.h>
 
 #define GLEW_STATIC
 #include "../opengl/vout_helper.h"
@@ -112,6 +113,10 @@ static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
+
+    /* do not use OpenGL on XP unless forced */
+    if(!object->obj.force && !IsWindowsVistaOrGreater())
+        return VLC_EGENERIC;
 
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(*sys));
