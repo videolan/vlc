@@ -169,6 +169,7 @@ lib/vlm.c
 # modules
 modules/access/alsa.c
 modules/access/attachment.c
+modules/access/avaudiocapture.m
 modules/access/avcapture.m
 modules/access/avio.h
 modules/access/bluray.c
