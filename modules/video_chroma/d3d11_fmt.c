@@ -428,7 +428,9 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     return VLC_SUCCESS;
 }
 
-const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
+#undef FindD3D11Format
+const d3d_format_t *FindD3D11Format(vlc_object_t *o,
+                                    d3d11_device_t *d3d_dev,
                                     vlc_fourcc_t i_src_chroma,
                                     bool rgb_only,
                                     uint8_t bits_per_channel,
@@ -454,7 +456,7 @@ const d3d_format_t *FindD3D11Format(ID3D11Device *d3ddevice,
         else
             textureFormat = output_format->formatTexture;
 
-        if( DeviceSupportsFormat( d3ddevice, textureFormat, supportFlags ) )
+        if( DeviceSupportsFormat( d3d_dev->d3ddevice, textureFormat, supportFlags ) )
             return output_format;
     }
     return NULL;

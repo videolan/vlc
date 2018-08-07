@@ -205,10 +205,10 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
     texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
     texDesc.BindFlags = 0;
 
-    ID3D11Device *p_device;
-    ID3D11DeviceContext_GetDevice(p_sys->context, &p_device);
+    d3d11_device_t d3d_dev = { .d3dcontext = p_sys->context };
+    ID3D11DeviceContext_GetDevice(d3d_dev.d3dcontext, &d3d_dev.d3ddevice);
     sys->staging = NULL;
-    hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->staging);
+    hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->staging);
     /* test if mapping the texture works ref #18746 */
     if (SUCCEEDED(hr) && FAILED(hr = can_map(sys, p_sys->context)))
         msg_Dbg(p_filter, "can't map default staging texture (hr=0x%0lx)", hr);
@@ -217,21 +217,21 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
         /* failed with the this format, try a different one */
         UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
         const d3d_format_t *new_fmt =
-                FindD3D11Format( p_device, 0, false, 0, false, supportFlags );
+                FindD3D11Format( p_filter, &d3d_dev, 0, false, 0, false, supportFlags );
         if (new_fmt && texDesc.Format != new_fmt->formatTexture)
         {
             DXGI_FORMAT srcFormat = texDesc.Format;
             texDesc.Format = new_fmt->formatTexture;
-            hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->staging);
+            hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->staging);
             if (SUCCEEDED(hr))
             {
                 texDesc.Usage = D3D11_USAGE_DEFAULT;
                 texDesc.CPUAccessFlags = 0;
                 texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-                hr = ID3D11Device_CreateTexture2D( p_device, &texDesc, NULL, &sys->procOutTexture);
+                hr = ID3D11Device_CreateTexture2D( d3d_dev.d3ddevice, &texDesc, NULL, &sys->procOutTexture);
                 if (SUCCEEDED(hr) && SUCCEEDED(hr = can_map(sys, p_sys->context)))
                 {
-                    if (SetupProcessor(p_filter, p_device, p_sys->context, srcFormat, new_fmt->formatTexture))
+                    if (SetupProcessor(p_filter, d3d_dev.d3ddevice, p_sys->context, srcFormat, new_fmt->formatTexture))
                     {
                         ID3D11Texture2D_Release(sys->procOutTexture);
                         ID3D11Texture2D_Release(sys->staging);
@@ -251,7 +251,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
         }
     }
 #endif
-    ID3D11Device_Release(p_device);
+    ID3D11Device_Release(d3d_dev.d3ddevice);
     if (FAILED(hr)) {
         msg_Err(p_filter, "Failed to create a %s staging texture to extract surface pixels (hr=0x%0lx)", DxgiFormatToStr(texDesc.Format), hr );
         return VLC_EGENERIC;

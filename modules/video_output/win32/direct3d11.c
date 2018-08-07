@@ -335,7 +335,7 @@ static const char* globPixelShaderDefault = "\
       const float B67_a = 0.17883277;\
       const float B67_b = 0.28466892;\
       const float B67_c = 0.55991073;\
-      const float B67_inv_r2 = 4.0; /* 1/0.5Â² */\
+      const float B67_inv_r2 = 4.0; /* 1/0.5² */\
       if (x <= 0.5)\
           x = x * x * B67_inv_r2;\
       else\
@@ -1522,13 +1522,13 @@ static const d3d_format_t *GetDirectRenderingFormat(vout_display_t *vd, vlc_four
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (is_d3d11_opaque(i_src_chroma))
         supportFlags |= D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
 }
 
 static const d3d_format_t *GetDirectDecoderFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_DECODER_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, is_d3d11_opaque(i_src_chroma), supportFlags );
 }
 
 static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t bit_depth, bool from_processor, bool rgb_only)
@@ -1536,13 +1536,13 @@ static const d3d_format_t *GetDisplayFormatByDepth(vout_display_t *vd, uint8_t b
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD;
     if (from_processor)
         supportFlags |= D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, 0, rgb_only, bit_depth, false, supportFlags );
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, 0, rgb_only, bit_depth, false, supportFlags );
 }
 
 static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i_src_chroma)
 {
     UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_BLENDABLE;
-    return FindD3D11Format( vd->sys->d3d_dev.d3ddevice, i_src_chroma, false, 0, false, supportFlags );
+    return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, false, supportFlags );
 }
 
 static int Direct3D11Open(vout_display_t *vd)
@@ -1953,13 +1953,13 @@ static HRESULT CompilePixelShader(vout_display_t *vd, const d3d_format_t *format
             switch (format->bitsPerChannel)
             {
             case 8:
-                /* Rec. ITU-R BT.709-6 Â§4.6 */
+                /* Rec. ITU-R BT.709-6 §4.6 */
                 itu_black_level  =              16.f / 255.f;
                 itu_white_level  =             235.f / 255.f;
                 itu_range_factor = (float)(235 - 16) / 255.f;
                 break;
             case 10:
-                /* Rec. ITU-R BT.709-6 Â§4.6 */
+                /* Rec. ITU-R BT.709-6 §4.6 */
                 itu_black_level  =              64.f / 1023.f;
                 itu_white_level  =             940.f / 1023.f;
                 itu_range_factor = (float)(940 - 64) / 1023.f;
@@ -2373,7 +2373,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
      * the rest of the visible area must correspond to -1,1 */
     switch (orientation)
     {
-    case ORIENT_ROTATED_90: /* 90Â° anti clockwise */
+    case ORIENT_ROTATED_90: /* 90° anti clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -2382,7 +2382,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   =  (MidX - src_height) / (MidX - output->left);
         right  =                 MidX / (MidX - (src_width - output->right));
         break;
-    case ORIENT_ROTATED_180: /* 180Â° */
+    case ORIENT_ROTATED_180: /* 180° */
         /* right/top aligned */
         MidY = (output->top + output->bottom) / 2.f;
         MidX = (output->left + output->right) / 2.f;
@@ -2391,7 +2391,7 @@ static void SetupQuadFlat(d3d_vertex_t *dst_data, const RECT *output,
         left   = -MidX / (MidX - output->left);
         right  =  (src_width  - MidX) / (output->right - MidX);
         break;
-    case ORIENT_ROTATED_270: /* 90Â° clockwise */
+    case ORIENT_ROTATED_270: /* 90° clockwise */
         /* right/top aligned */
         MidY = (output->left + output->right) / 2.f;
         MidX = (output->top + output->bottom) / 2.f;
@@ -2805,12 +2805,12 @@ static int SetupQuad(vout_display_t *vd, const video_format_t *fmt, d3d_quad_t *
         switch (cfg->bitsPerChannel)
         {
         case 8:
-            /* Rec. ITU-R BT.709-6 Â§4.6 */
+            /* Rec. ITU-R BT.709-6 §4.6 */
             itu_black_level  =              16.f / 255.f;
             itu_achromacy    =             128.f / 255.f;
             break;
         case 10:
-            /* Rec. ITU-R BT.709-6 Â§4.6 */
+            /* Rec. ITU-R BT.709-6 §4.6 */
             itu_black_level  =              64.f / 1023.f;
             itu_achromacy    =             512.f / 1023.f;
             break;
