@@ -43,8 +43,6 @@
 #include <vlc_charset.h>
 #include <vlc_codec.h>
 
-#include <versionhelpers.h>
-
 #define COBJMACROS
 #include <initguid.h>
 #include <d3d11.h>
@@ -320,9 +318,18 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (pix_fmt != AV_PIX_FMT_D3D11VA_VLD)
         return VLC_EGENERIC;
 
+#if !VLC_WINSTORE_APP
     /* Allow using D3D11VA automatically starting from Windows 8.1 */
-    if (!va->obj.force && !IsWindows8Point1OrGreater())
-        return VLC_EGENERIC;
+    if (!va->obj.force)
+    {
+        bool isWin81OrGreater = false;
+        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+        if (likely(hKernel32 != NULL))
+            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
+        if (!isWin81OrGreater)
+            return VLC_EGENERIC;
+    }
+#endif
 
     vlc_va_sys_t *sys = calloc(1, sizeof (*sys));
     if (unlikely(sys == NULL))
