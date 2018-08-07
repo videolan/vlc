@@ -2018,9 +2018,11 @@ AC_ARG_ENABLE(macosx-qtkit,
 if test "x${enable_macosx_qtkit}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
 then
+  AC_LANG_PUSH([Objective C])
   AC_CHECK_HEADERS(QTKit/QTKit.h, [
-      VLC_ADD_PLUGIN([qtsound])
+      VLC_ADD_PLUGIN([access_qtsound])
     ])
+  AC_LANG_POP([Objective C])
 fi
 
 dnl
