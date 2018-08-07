@@ -1,0 +1,26 @@
+From 48a9948b341f2b38cf6c88d275dbb1ad52e18f79 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Tue, 7 Aug 2018 17:26:05 +0200
+Subject: [PATCH 2/2] really reset packet counter
+
+---
+ src/dvbpsi.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/dvbpsi.c b/src/dvbpsi.c
+index 7a844f0..cf63702 100644
+--- a/src/dvbpsi.c
++++ b/src/dvbpsi.c
+@@ -113,6 +113,9 @@ void dvbpsi_decoder_reset(dvbpsi_decoder_t* p_decoder, const bool b_force)
+     if (b_force)
+         p_decoder->b_current_valid = false;
+ 
++    p_decoder->i_continuity_counter = DVBPSI_INVALID_CC;
++    p_decoder->prevpacket[0] = 0;
++
+     /* Clear the section array */
+     dvbpsi_DeletePSISections(p_decoder->p_sections);
+     p_decoder->p_sections = NULL;
+-- 
+2.14.4
+
