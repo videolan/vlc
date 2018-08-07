@@ -1,0 +1,71 @@
+From 6f7ae04fdcdc52c98003b51318be152c9f51709b Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Tue, 7 Aug 2018 17:25:52 +0200
+Subject: [PATCH 1/2] really identify duplicates
+
+---
+ src/dvbpsi.c | 21 ++++++++++++++++-----
+ src/dvbpsi.h |  1 +
+ 2 files changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/src/dvbpsi.c b/src/dvbpsi.c
+index b74587f..7a844f0 100644
+--- a/src/dvbpsi.c
++++ b/src/dvbpsi.c
+@@ -91,6 +91,7 @@ void *dvbpsi_decoder_new(dvbpsi_callback_gather_t pf_gather,
+     p_decoder->i_section_max_size = i_section_max_size;
+     p_decoder->b_discontinuity = b_discontinuity;
+     p_decoder->i_continuity_counter = DVBPSI_INVALID_CC;
++    p_decoder->prevpacket[0] = 0;
+     p_decoder->p_current_section = NULL;
+     p_decoder->b_current_valid = false;
+ 
+@@ -285,11 +286,19 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, const uint8_t* p_data)
+         if (i_expected_counter == ((p_decoder->i_continuity_counter + 1) & 0xf)
+             && !p_decoder->b_discontinuity)
+         {
+-            dvbpsi_error(p_dvbpsi, "PSI decoder",
+-                     "TS duplicate (received %d, expected %d) for PID %d",
+-                     p_decoder->i_continuity_counter, i_expected_counter,
+-                     ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
+-            return false;
++            if(!memcmp(p_decoder->prevpacket, p_data, 188))
++            {
++                dvbpsi_debug(p_dvbpsi, "PSI decoder",
++                             "TS duplicate (received %d, expected %d) for PID %d",
++                             p_decoder->i_continuity_counter, i_expected_counter,
++                             ((uint16_t)(p_data[1] & 0x1f) << 8) | p_data[2]);
++                return false;
++            }
++            else /* Fake duplicate */
++            {
++                /* force discontinuity */
++                i_expected_counter = p_decoder->i_continuity_counter + 1;
++            }
+         }
+ 
+         if (i_expected_counter != p_decoder->i_continuity_counter)
+@@ -307,6 +316,8 @@ bool dvbpsi_packet_push(dvbpsi_t *p_dvbpsi, const uint8_t* p_data)
+         }
+     }
+ 
++    memcpy(p_decoder->prevpacket, p_data, 188);
++
+     /* Return if no payload in the TS packet */
+     if (!(p_data[3] & 0x10))
+         return false;
+diff --git a/src/dvbpsi.h b/src/dvbpsi.h
+index 061b928..a0446ba 100644
+--- a/src/dvbpsi.h
++++ b/src/dvbpsi.h
+@@ -239,6 +239,7 @@ typedef void (* dvbpsi_callback_gather_t)(dvbpsi_t *p_dvbpsi,  /*!< pointer to d
+     bool     b_discontinuity;      /*!< Discontinuity flag */                     \
+     bool     b_current_valid;      /*!< Current valid indicator */                \
+     uint8_t  i_continuity_counter; /*!< Continuity counter */                     \
++    uint8_t  prevpacket[188];      /*!< Previous packet data */                   \
+     uint8_t  i_last_section_number;/*!< Last received section number */           \
+     dvbpsi_psi_section_t *p_current_section; /*!< Current section */              \
+     dvbpsi_psi_section_t *p_sections; /*!< List of received PSI sections */       \
+-- 
+2.14.4
+
