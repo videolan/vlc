@@ -103,8 +103,7 @@ static void IPCHelperThread( void *arg )
                                  ( char const ** )
                                      ( i_options ? &ppsz_argv[ i_opt + 1 ] :
                                                    NULL ),
-                                 VLC_INPUT_OPTION_TRUSTED,
-                                 true );
+                                 VLC_INPUT_OPTION_TRUSTED );
             }
 
             for( ; i_options >= 0; i_options-- )
