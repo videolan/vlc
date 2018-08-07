@@ -18,8 +18,7 @@ ${LangFileString} Desc_Section01 \
 ${LangFileString} Desc_Section02a \
     "Vieglākai piekļuvei pievieno ikonas jūsu sākuma izvēlnei"
 ${LangFileString} Desc_Section02b \
-    "Vieglākai piekļuvei pievieno ikonu jūsu darbvirsmai
-"
+    "Vieglākai piekļuvei pievieno ikonu jūsu darbvirsmai"
 ${LangFileString} Desc_Section03 \
     "VLC Mozilla un Mozilla Firefox spraudnis"
 ${LangFileString} Desc_Section04 \
