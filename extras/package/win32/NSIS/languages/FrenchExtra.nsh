@@ -57,8 +57,7 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Lecture de film SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Lecture de fichiers vidéo"
 ${LangFileString} Action_OnArrivalMusicFiles "Lecture de fichiers audio"
 ${LangFileString} Action_OnArrivalDVDAudio "Lecture de DVD audio"
-${LangFileString} Action_OnArrivalBluray "Lecture de Blu-ray
-"
+${LangFileString} Action_OnArrivalBluray "Lecture de Blu-ray"
 
 ${LangFileString} License_NextText "Vous connnaissez  maintenant vos droits. Cliquez sur [Suivant] pour continuer."
 
