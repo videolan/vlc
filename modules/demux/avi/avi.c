@@ -274,6 +274,30 @@ static void Close ( vlc_object_t * p_this )
     free( p_sys );
 }
 
+static void Set_BMP_RGB_Masks( es_format_t *fmt )
+{
+    switch( fmt->i_codec )
+    {
+        case VLC_CODEC_RGB32:
+            fmt->video.i_bmask = 0xff000000;
+            fmt->video.i_gmask = 0x00ff0000;
+            fmt->video.i_rmask = 0x0000ff00;
+            break;
+        case VLC_CODEC_RGB24: /* BGR (see biBitCount) */
+            fmt->video.i_bmask = 0x00ff0000;
+            fmt->video.i_gmask = 0x0000ff00;
+            fmt->video.i_rmask = 0x000000ff;
+            break;
+        case VLC_CODEC_RGB15:
+            fmt->video.i_rmask = 0x7c00;
+            fmt->video.i_gmask = 0x03e0;
+            fmt->video.i_bmask = 0x001f;
+            break;
+        default:
+            break;
+    }
+}
+
 /*****************************************************************************
  * Open: check file and initializes AVI structures
  *****************************************************************************/
@@ -596,22 +620,16 @@ static int Open( vlc_object_t * p_this )
                     {
                         case 32:
                             tk->fmt.i_codec = VLC_CODEC_RGB32;
-                            tk->fmt.video.i_bmask = 0xff000000;
-                            tk->fmt.video.i_gmask = 0x00ff0000;
-                            tk->fmt.video.i_rmask = 0x0000ff00;
+                            Set_BMP_RGB_Masks( &tk->fmt );
                             break;
                         case 24:
                             tk->fmt.i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
-                            tk->fmt.video.i_bmask = 0x00ff0000;
-                            tk->fmt.video.i_gmask = 0x0000ff00;
-                            tk->fmt.video.i_rmask = 0x000000ff;
+                            Set_BMP_RGB_Masks( &tk->fmt );
                             break;
                         case 16: /* Yes it is RV15 */
                         case 15: /* RGB (B least 5 bits) */
                             tk->fmt.i_codec = VLC_CODEC_RGB15;
-                            tk->fmt.video.i_rmask = 0x7c00;
-                            tk->fmt.video.i_gmask = 0x03e0;
-                            tk->fmt.video.i_bmask = 0x001f;
+                            Set_BMP_RGB_Masks( &tk->fmt );
                             break;
                         case 9: /* <- TODO check that */
                             tk->fmt.i_codec = VLC_CODEC_I410;
@@ -686,6 +704,9 @@ static int Open( vlc_object_t * p_this )
                         tk->fmt.i_extra = i_bihextra;
                         memcpy( tk->fmt.p_extra, p_bihextra, i_bihextra );
                     }
+
+                    /* Shitty files storing chroma in biCompression */
+                    Set_BMP_RGB_Masks( &tk->fmt );
                 }
                 tk->i_samplesize = 0;
 
