@@ -428,6 +428,73 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     return VLC_SUCCESS;
 }
 
+/* test formats that should work but sometimes have issues on some platforms */
+static bool CanReallyUseFormat(vlc_object_t *obj, d3d11_device_t *d3d_dev,
+                               vlc_fourcc_t i_chroma, DXGI_FORMAT dxgi)
+{
+    bool result = true;
+    if (dxgi == DXGI_FORMAT_UNKNOWN)
+        return true;
+
+    if (is_d3d11_opaque(i_chroma))
+        return true;
+
+    ID3D11Texture2D *texture = NULL;
+    D3D11_TEXTURE2D_DESC texDesc;
+    ZeroMemory(&texDesc, sizeof(texDesc));
+    texDesc.MipLevels = 1;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.MiscFlags = 0; //D3D11_RESOURCE_MISC_SHARED;
+    texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    texDesc.Usage = D3D11_USAGE_DYNAMIC;
+    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    texDesc.ArraySize = 1;
+    texDesc.Format = dxgi;
+    texDesc.Height = 144;
+    texDesc.Width = 176;
+    HRESULT hr = ID3D11Device_CreateTexture2D( d3d_dev->d3ddevice, &texDesc, NULL, &texture );
+    if (FAILED(hr))
+    {
+        msg_Dbg(obj, "cannot allocate a writable texture type %s. (hr=0x%lX)", DxgiFormatToStr(dxgi), hr);
+        return false;
+    }
+
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource*)texture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(hr))
+    {
+        msg_Err(obj, "The texture type %s cannot be mapped. (hr=0x%lX)", DxgiFormatToStr(dxgi), hr);
+        result = false;
+        goto done;
+    }
+    ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource*)texture, 0);
+
+    if (dxgi == DXGI_FORMAT_YUY2)
+    {
+        const vlc_chroma_description_t *p_chroma_desc = vlc_fourcc_GetChromaDescription( i_chroma );
+        if( !p_chroma_desc )
+        {
+            msg_Err(obj, "No pixel format for %4.4s", (const char*)&i_chroma);
+            result = false;
+            goto done;
+        }
+
+        if (mappedResource.RowPitch >= 2 * (texDesc.Width * p_chroma_desc->p[0].w.num / p_chroma_desc->p[0].w.den * p_chroma_desc->pixel_size))
+        {
+            msg_Err(obj, "Bogus %4.4s pitch detected type %s. %d should be %d", (const char*)&i_chroma,
+                          DxgiFormatToStr(dxgi), mappedResource.RowPitch,
+                          (texDesc.Width * p_chroma_desc->p[0].w.num / p_chroma_desc->p[0].w.den * p_chroma_desc->pixel_size));
+            result = false;
+            goto done;
+        }
+
+    }
+done:
+    ID3D11Texture2D_Release(texture);
+
+    return result;
+}
+
 #undef FindD3D11Format
 const d3d_format_t *FindD3D11Format(vlc_object_t *o,
                                     d3d11_device_t *d3d_dev,
@@ -456,7 +523,8 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
         else
             textureFormat = output_format->formatTexture;
 
-        if( DeviceSupportsFormat( d3d_dev->d3ddevice, textureFormat, supportFlags ) )
+        if( DeviceSupportsFormat( d3d_dev->d3ddevice, textureFormat, supportFlags ) &&
+            CanReallyUseFormat(o, d3d_dev, output_format->fourcc, output_format->formatTexture) )
             return output_format;
     }
     return NULL;
@@ -550,30 +618,6 @@ int AllocateTextures( vlc_object_t *obj, d3d11_device_t *d3d_dev,
                 textures[picture_count * D3D11_MAX_SHADER_VIEW + plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW];
                 ID3D11Texture2D_AddRef(textures[picture_count * D3D11_MAX_SHADER_VIEW + plane]);
             }
-        }
-    }
-
-    if (!is_d3d11_opaque(fmt->i_chroma) && cfg->formatTexture != DXGI_FORMAT_UNKNOWN) {
-        D3D11_MAPPED_SUBRESOURCE mappedResource;
-        hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource*)textures[0], 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-        if( FAILED(hr) ) {
-            msg_Err(obj, "The texture cannot be mapped. (hr=0x%lX)", hr);
-            goto error;
-        }
-        ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource*)textures[0], 0);
-        if (mappedResource.RowPitch < p_chroma_desc->pixel_size * texDesc.Width) {
-            msg_Err( obj, "The texture row pitch is too small (%d instead of %d)", mappedResource.RowPitch,
-                     p_chroma_desc->pixel_size * texDesc.Width );
-            goto error;
-        }
-        if ( fmt->i_width > 64 &&
-             mappedResource.RowPitch >=
-             2* (fmt->i_width * p_chroma_desc->p[0].w.num / p_chroma_desc->p[0].w.den * p_chroma_desc->pixel_size) )
-        {
-            msg_Err(obj, "Bogus %4.4s pitch detected. %d vs %d", (const char*)&fmt->i_chroma,
-                    mappedResource.RowPitch,
-                    (fmt->i_width * p_chroma_desc->p[0].w.num / p_chroma_desc->p[0].w.den * p_chroma_desc->pixel_size));
-            goto error;
         }
     }
 
