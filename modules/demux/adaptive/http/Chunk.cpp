@@ -272,7 +272,6 @@ bool HTTPChunkSource::prepare()
 
 block_t * HTTPChunkSource::readBlock()
 {
-    printf("READ\n");
     return read(HTTPChunkSource::CHUNK_SIZE);
 }
 
