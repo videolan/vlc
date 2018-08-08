@@ -35,7 +35,7 @@
 #include <aom/aom_decoder.h>
 #include <aom/aomdx.h>
 
-#include "demux/mp4/color_config.h"
+#include "../packetizer/iso_color_tables.h"
 
 /****************************************************************************
 * Local prototypes
