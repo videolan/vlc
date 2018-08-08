@@ -82,8 +82,6 @@ struct decoder_sys_t
 
     int         i_fps_num;
     int         i_fps_den;
-    int         i_last_incr;
-    int         i_last_incr_diff;
 
     bool  b_frame;
 
