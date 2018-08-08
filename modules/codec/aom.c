@@ -41,6 +41,8 @@
 # define SOUT_CFG_PREFIX "sout-aom-"
 #endif
 
+#include "../packetizer/iso_color_tables.h"
+
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -221,23 +223,12 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         dec->fmt_out.video.i_sar_den = 1;
     }
 
-    v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
-
-    switch( img->mc )
+    if(dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
     {
-        case AOM_CICP_MC_BT_709:
-            v->space = COLOR_SPACE_BT709;
-            break;
-        case AOM_CICP_MC_BT_601:
-        case AOM_CICP_MC_SMPTE_240:
-            v->space = COLOR_SPACE_BT601;
-            break;
-        case AOM_CICP_MC_BT_2020_CL:
-        case AOM_CICP_MC_BT_2020_NCL:
-            v->space = COLOR_SPACE_BT2020;
-            break;
-        default:
-            break;
+        v->primaries = iso_23001_8_cp_to_vlc_primaries(img->cp);
+        v->transfer = iso_23001_8_tc_to_vlc_xfer(img->tc);
+        v->space = iso_23001_8_mc_to_vlc_coeffs(img->mc);
+        v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
     }
 
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;
