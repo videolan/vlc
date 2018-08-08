@@ -27,7 +27,7 @@
 
 #include "av1.h"
 #include "av1_obu.h"
-#include "demux/mp4/color_config.h"
+#include "iso_color_tables.h"
 
 #include <assert.h>
 

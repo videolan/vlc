@@ -28,7 +28,7 @@
 #include "avci.h"
 #include "../xiph.h"
 #include "../../packetizer/dts_header.h"
-#include "color_config.h"
+#include "../../packetizer/iso_color_tables.h"
 
 #include <vlc_demux.h>
 #include <vlc_aout.h>
