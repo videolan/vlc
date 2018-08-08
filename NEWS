@@ -53,9 +53,12 @@ Misc:
  * Fix detection SAT>IP servers
 
 macOS:
+ * macOS 10.7.5 is required now, VLC will no longer launch on earlier releases
  * Fix delay and fps setting in subtitle dialog
- * macOS 10.7.5 is required now. VLC will no longer launch on earlier releases.
  * Modernized and improved support for media keys
+ * Fix issues with drag and drop of playlist items
+ * Fix support for audio capturing with qtsound module
+ * Fix layout issues in the Convert and Save panel
 
 Translations:
  * Update of most translations
