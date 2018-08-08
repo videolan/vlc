@@ -41,7 +41,7 @@
 #include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
-#include "hxxx_nal.h" /* colour values/mappings */
+#include "iso_color_tables.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -472,9 +472,9 @@ static int ParseVO( decoder_t *p_dec, block_t *p_vo )
 
         if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
         {
-            p_dec->fmt_out.video.primaries = hxxx_colour_primaries_to_vlc( colour_primaries );
-            p_dec->fmt_out.video.transfer = hxxx_transfer_characteristics_to_vlc( colour_xfer );
-            p_dec->fmt_out.video.space = hxxx_matrix_coeffs_to_vlc( colour_matrix_coeff );
+            p_dec->fmt_out.video.primaries = iso_23001_8_cp_to_vlc_primaries( colour_primaries );
+            p_dec->fmt_out.video.transfer = iso_23001_8_tc_to_vlc_xfer( colour_xfer );
+            p_dec->fmt_out.video.space = iso_23001_8_mc_to_vlc_coeffs( colour_matrix_coeff );
             p_dec->fmt_out.video.b_color_range_full = full_range;
         }
     }

@@ -54,6 +54,7 @@
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
 #include "startcode_helper.h"
+#include "iso_color_tables.h"
 
 #include <limits.h>
 
@@ -813,56 +814,12 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
 
             if( contains_color_description && p_frag->i_buffer > 11 )
             {
-                uint8_t color_primaries = p_frag->p_buffer[5];
-                uint8_t color_transfer  = p_frag->p_buffer[6];
-                uint8_t color_matrix    = p_frag->p_buffer[7];
-                switch( color_primaries )
-                {
-                    case 1:
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT709;
-                        break;
-                    case 4: /* BT.470M    */
-                    case 5: /* BT.470BG   */
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_625;
-                        break;
-                    case 6: /* SMPTE 170M */
-                    case 7: /* SMPTE 240M */
-                        p_dec->fmt_out.video.primaries = COLOR_PRIMARIES_BT601_525;
-                        break;
-                    default:
-                        break;
-                }
-                switch( color_transfer )
-                {
-                    case 1:
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT709;
-                        break;
-                    case 4: /* BT.470M assumed gamma 2.2  */
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_SRGB;
-                        break;
-                    case 5: /* BT.470BG */
-                    case 6: /* SMPTE 170M */
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_BT2020;
-                        break;
-                    case 8: /* Linear */
-                        p_dec->fmt_out.video.transfer = TRANSFER_FUNC_LINEAR;
-                        break;
-                    default:
-                        break;
-                }
-                switch( color_matrix )
-                {
-                    case 1:
-                        p_dec->fmt_out.video.space = COLOR_SPACE_BT709;
-                        break;
-                    case 5: /* BT.470BG */
-                    case 6: /* SMPTE 170 M */
-                    case 7: /* SMPTE 240 M */
-                        p_dec->fmt_out.video.space = COLOR_SPACE_BT601;
-                        break;
-                    default:
-                        break;
-                }
+                p_dec->fmt_out.video.primaries =
+                        iso_23001_8_cp_to_vlc_primaries( p_frag->p_buffer[5] );
+                p_dec->fmt_out.video.transfer =
+                        iso_23001_8_tc_to_vlc_xfer( p_frag->p_buffer[6] );
+                p_dec->fmt_out.video.space =
+                        iso_23001_8_mc_to_vlc_coeffs( p_frag->p_buffer[7] );
             }
 
         }

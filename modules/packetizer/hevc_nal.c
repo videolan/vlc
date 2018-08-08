@@ -23,6 +23,7 @@
 
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
+#include "iso_color_tables.h"
 
 #include <vlc_common.h>
 #include <vlc_bits.h>
@@ -472,9 +473,9 @@ static bool hevc_parse_vui_parameters_rbsp( bs_t *p_bs, hevc_vui_parameters_t *p
         }
         else
         {
-            p_vui->vs.colour.colour_primaries = HXXX_PRIMARIES_UNSPECIFIED;
-            p_vui->vs.colour.transfer_characteristics = HXXX_TRANSFER_UNSPECIFIED;
-            p_vui->vs.colour.matrix_coeffs = HXXX_MATRIX_UNSPECIFIED;
+            p_vui->vs.colour.colour_primaries = ISO_23001_8_CP_UNSPECIFIED;
+            p_vui->vs.colour.transfer_characteristics = ISO_23001_8_TC_UNSPECIFIED;
+            p_vui->vs.colour.matrix_coeffs = ISO_23001_8_MC_UNSPECIFIED;
         }
     }
 
@@ -1179,11 +1180,11 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
     if( !p_sps->vui_parameters_present_flag )
         return false;
     *p_primaries =
-        hxxx_colour_primaries_to_vlc( p_sps->vui.vs.colour.colour_primaries );
+        iso_23001_8_cp_to_vlc_primaries( p_sps->vui.vs.colour.colour_primaries );
     *p_transfer =
-        hxxx_transfer_characteristics_to_vlc( p_sps->vui.vs.colour.transfer_characteristics );
+        iso_23001_8_tc_to_vlc_xfer( p_sps->vui.vs.colour.transfer_characteristics );
     *p_colorspace =
-        hxxx_matrix_coeffs_to_vlc( p_sps->vui.vs.colour.matrix_coeffs );
+        iso_23001_8_mc_to_vlc_coeffs( p_sps->vui.vs.colour.matrix_coeffs );
     *p_full_range = p_sps->vui.vs.video_full_range_flag;
     return true;
 }
