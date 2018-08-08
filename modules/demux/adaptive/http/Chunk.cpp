@@ -218,7 +218,10 @@ block_t * HTTPChunkSource::read(size_t readsize)
 
 std::string HTTPChunkSource::getContentType() const
 {
-    return connection->getContentType();
+    if(connection)
+        return connection->getContentType();
+    else
+        return std::string();
 }
 
 bool HTTPChunkSource::prepare()
