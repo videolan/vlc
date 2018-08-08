@@ -133,6 +133,7 @@ HTTPChunkSource::HTTPChunkSource(const std::string& url, AbstractConnectionManag
     connManager  (manager),
     consumed     (0)
 {
+    vlc_mutex_init(&lock);
     prepared = false;
     eof = false;
     sourceid = id;
@@ -145,10 +146,12 @@ HTTPChunkSource::~HTTPChunkSource()
 {
     if(connection)
         connection->setUsed(false);
+    vlc_mutex_destroy(&lock);
 }
 
 bool HTTPChunkSource::init(const std::string &url)
 {
+    vlc_mutex_locker locker(&lock);
     params = ConnectionParams(url);
     params.setUseAccess(usesAccess());
 
@@ -163,6 +166,7 @@ bool HTTPChunkSource::init(const std::string &url)
 
 bool HTTPChunkSource::hasMoreData() const
 {
+    vlc_mutex_locker locker(&lock);
     if(eof)
         return false;
     else if(contentLength)
@@ -172,6 +176,7 @@ bool HTTPChunkSource::hasMoreData() const
 
 block_t * HTTPChunkSource::read(size_t readsize)
 {
+    vlc_mutex_locker locker(&lock);
     if(!prepare())
     {
         eof = true;
@@ -218,6 +223,7 @@ block_t * HTTPChunkSource::read(size_t readsize)
 
 std::string HTTPChunkSource::getContentType() const
 {
+    vlc_mutex_locker locker(&lock);
     if(connection)
         return connection->getContentType();
     else
@@ -282,7 +288,6 @@ HTTPChunkBufferedSource::HTTPChunkBufferedSource(const std::string& url, Abstrac
     pp_tail    (&p_head),
     buffered     (0)
 {
-    vlc_mutex_init(&lock);
     vlc_cond_init(&avail);
     done = false;
     eof = false;
@@ -310,7 +315,6 @@ HTTPChunkBufferedSource::~HTTPChunkBufferedSource()
     vlc_mutex_unlock(&lock);
 
     vlc_cond_destroy(&avail);
-    vlc_mutex_destroy(&lock);
 }
 
 bool HTTPChunkBufferedSource::isDone() const

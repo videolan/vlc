@@ -101,6 +101,7 @@ namespace adaptive
                 virtual bool        prepare();
                 AbstractConnection    *connection;
                 AbstractConnectionManager *connManager;
+                mutable vlc_mutex_t lock;
                 size_t              consumed; /* read pointer */
                 bool                prepared;
                 bool                eof;
@@ -137,7 +138,6 @@ namespace adaptive
                 bool                done;
                 bool                eof;
                 mtime_t             downloadstart;
-                mutable vlc_mutex_t lock;
                 vlc_cond_t          avail;
                 bool                held;
         };
