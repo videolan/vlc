@@ -17,12 +17,13 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-#ifndef VLC_MP4_COLOR_CONFIG_H_
-#define VLC_MP4_COLOR_CONFIG_H_
+#ifndef VLC_ISO_23001_8_COLOR_TABLES_H_
+#define VLC_ISO_23001_8_COLOR_TABLES_H_
 
 #include <vlc_es.h>
 
 /* no free spec, grabbed from av1 bitstream spec */
+/* superset of h26x, see T-REC H262 2007 amd2 and H264/HEVC specs */
 
 enum iso_23001_8_cp
 {
@@ -60,7 +61,7 @@ static const uint8_t iso_23001_8_cp_to_vlc_primaries_table[] =
     /* [ISO_23001_8_CP_EBU_3213]       = COLOR_PRIMARIES_EBU_3213, see below */
 };
 
-static inline uint8_t iso_23001_8_cp_to_vlc_primaries( uint8_t v )
+static inline video_color_primaries_t iso_23001_8_cp_to_vlc_primaries( uint8_t v )
 {
     if( v == ISO_23001_8_CP_EBU_3213 )
         return COLOR_PRIMARIES_EBU_3213;
@@ -115,7 +116,7 @@ static const uint8_t iso_23001_8_tc_to_vlc_xfer_table[] =
     [ISO_23001_8_TC_HLG]            = TRANSFER_FUNC_HLG,
 };
 
-static inline uint8_t iso_23001_8_tc_to_vlc_xfer( uint8_t v )
+static inline video_transfer_func_t iso_23001_8_tc_to_vlc_xfer( uint8_t v )
 {
     return v < ARRAY_SIZE(iso_23001_8_tc_to_vlc_xfer_table)
            ? iso_23001_8_tc_to_vlc_xfer_table[v]
@@ -160,11 +161,11 @@ static const uint8_t iso_23001_8_mc_to_vlc_coeffs_table[] =
     [ISO_23001_8_MC_ICTCP]       = COLOR_SPACE_UNDEF,
 };
 
-static inline uint8_t iso_23001_8_mc_to_vlc_coeffs( uint8_t v )
+static inline video_color_space_t iso_23001_8_mc_to_vlc_coeffs( uint8_t v )
 {
     return v < ARRAY_SIZE(iso_23001_8_mc_to_vlc_coeffs_table)
            ? iso_23001_8_mc_to_vlc_coeffs_table[v]
            : COLOR_SPACE_UNDEF;
 }
 
-#endif /* VLC_MP4_COLOR_CONFIG_H_ */
+#endif /* VLC_ISO_23001_8_COLOR_TABLES_H_ */

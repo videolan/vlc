@@ -32,7 +32,7 @@
 
 #include "libmp4.h"
 #include "heif.h"
-#include "color_config.h"
+#include "../../packetizer/iso_color_tables.h"
 
 struct heif_private_t
 {
