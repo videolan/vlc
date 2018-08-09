@@ -439,7 +439,7 @@ static int D3dCreateDevice(vlc_va_t *va)
             msg_Err(va, "D3D11CreateDevice failed. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
-	}
+    }
 
     void *d3dvidctx = NULL;
     hr = ID3D11DeviceContext_QueryInterface(sys->d3d_dev.d3dcontext, &IID_ID3D11VideoContext, &d3dvidctx);
