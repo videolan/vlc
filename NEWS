@@ -10,6 +10,7 @@ Decoder:
  * Fix decoding some CC-608 streams with roll-up
  * Fix crashes with LPCM streams
  * Fix colorspace of JPEG, PNG and screen inputs
+ * Fix MediaCodec rotation handling
 
 Demux:
  * Improve FLV fps detection
@@ -33,6 +34,7 @@ Video Output:
  * Fix crashes on old mac machines, after some time
  * Fix memleaks on the EGL output (Android notably)
  * Fix misc display in Direct3D11 due to broken drivers
+ * Fix potential green screen on Windows XP
 
 Text renderer:
  * Fix rendering of arabic fonts fallback on macOS
@@ -51,6 +53,9 @@ Misc:
  * Fix subtitles alignment
  * Fix infinite recursion on directory playback
  * Fix detection SAT>IP servers
+
+Qt:
+ * Fix tooltip display when using Wayland
 
 macOS:
  * macOS 10.7.5 is required now, VLC will no longer launch on earlier releases
