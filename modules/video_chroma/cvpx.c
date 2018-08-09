@@ -78,7 +78,8 @@ vlc_module_end ()
  * CVPX to/from I420 conversion *
  ********************************/
 
-static void Copy(filter_t *p_filter, picture_t *dst, picture_t *src)
+static void Copy(filter_t *p_filter, picture_t *dst, picture_t *src,
+                 unsigned height)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -90,11 +91,11 @@ static void Copy(filter_t *p_filter, picture_t *dst, picture_t *src)
                                     src->p[2].i_pitch };
 
 #define DO(x) \
-    x(dst, src_planes, src_pitches, src->format.i_visible_height, &p_sys->sw.cache)
+    x(dst, src_planes, src_pitches, height, &p_sys->sw.cache)
 #define DO_S(x, shift) \
-    x(dst, src_planes, src_pitches, src->format.i_visible_height, shift, &p_sys->sw.cache)
+    x(dst, src_planes, src_pitches, height, shift, &p_sys->sw.cache)
 #define DO_P(x) \
-    x(dst, src_planes[0], src_pitches[0], src->format.i_visible_height, &p_sys->sw.cache)
+    x(dst, src_planes[0], src_pitches[0], height, &p_sys->sw.cache)
 
     const vlc_fourcc_t infcc = src->format.i_chroma;
     const vlc_fourcc_t outfcc = dst->format.i_chroma;
@@ -153,8 +154,8 @@ static picture_t *CVPX_TO_SW_Filter(filter_t *p_filter, picture_t *src)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    picture_t *src_sw =
-        cvpxpic_create_mapped(&p_sys->sw.fmt, cvpxpic_get_ref(src), true);
+    CVPixelBufferRef cvpx = cvpxpic_get_ref(src);
+    picture_t *src_sw = cvpxpic_create_mapped(&p_sys->sw.fmt, cvpx, true);
     if (!src_sw)
     {
         picture_Release(src);
@@ -169,7 +170,9 @@ static picture_t *CVPX_TO_SW_Filter(filter_t *p_filter, picture_t *src)
         return NULL;
     }
 
-    Copy(p_filter, dst, src_sw);
+    size_t height = CVPixelBufferGetHeight(cvpx);
+    Copy(p_filter, dst, src_sw, __MIN(height, dst->format.i_visible_height));
+
     picture_Release(src_sw);
 
     picture_CopyProperties(dst, src);
@@ -208,7 +211,8 @@ static picture_t *SW_TO_CVPX_Filter(filter_t *p_filter, picture_t *src)
         return NULL;
     }
 
-    Copy(p_filter, mapped_dst, src);
+    size_t height = CVPixelBufferGetHeight(cvpx);
+    Copy(p_filter, mapped_dst, src, __MIN(height, src->format.i_visible_height));
 
     /* Attach the CVPX to a new opaque picture */
     cvpxpic_attach(dst, cvpxpic_get_ref(mapped_dst));
