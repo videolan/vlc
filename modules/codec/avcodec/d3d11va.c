@@ -582,10 +582,13 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     if (FAILED(hr))
         return VLC_EGENERIC;
 
+    char *psz_decoder_name = directx_va_GetDecoderName(input);
+
     if (!directx_va_canUseDecoder(va, adapterDesc.VendorId, adapterDesc.DeviceId,
                                   input, sys->d3d_dev.WDDM.build))
     {
-        msg_Warn(va, "GPU blacklisted for %s codec", directx_va_GetDecoderName(input));
+        msg_Warn(va, "GPU blacklisted for %s codec", psz_decoder_name);
+        free(psz_decoder_name);
         return VLC_EGENERIC;
     }
 
@@ -598,8 +601,6 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     processorInput[idx++] = DXGI_FORMAT_NV12;
     processorInput[idx++] = DXGI_FORMAT_420_OPAQUE;
     processorInput[idx++] = DXGI_FORMAT_UNKNOWN;
-
-    char *psz_decoder_name = directx_va_GetDecoderName(input);
 
     /* */
     for (idx = 0; processorInput[idx] != DXGI_FORMAT_UNKNOWN; ++idx)
