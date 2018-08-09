@@ -1820,6 +1820,48 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 #undef es_descriptor
 }
 
+static void MP4_FreeBox_av1C( MP4_Box_t *p_box )
+{
+    MP4_Box_data_av1C_t *p_av1C = p_box->data.p_av1C;
+    free( p_av1C->p_av1C );
+}
+
+static int MP4_ReadBox_av1C( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_av1C_t *p_av1C;
+
+    MP4_READBOX_ENTER( MP4_Box_data_av1C_t, MP4_FreeBox_av1C );
+    p_av1C = p_box->data.p_av1C;
+
+    if( i_read < 4 ||
+       p_peek[0] != 0x81 ) /* marker / version */
+        MP4_READBOX_EXIT( 0 );
+
+    p_av1C->p_av1C = malloc( i_read );
+    if( p_av1C->p_av1C )
+    {
+        memcpy( p_av1C->p_av1C, p_peek, i_read );
+        p_av1C->i_av1C = i_read;
+    }
+
+    uint8_t i_8b;
+    MP4_GET1BYTE( i_8b ); /* marker / version */
+
+    MP4_GET1BYTE( i_8b );
+    p_av1C->i_profile = i_8b >> 5;
+    p_av1C->i_level = i_8b & 0x1F;
+
+    MP4_GET1BYTE( i_8b );
+    MP4_GET1BYTE( i_8b );
+
+    if( i_8b & 0x10 ) /* delay flag */
+        p_av1C->i_presentation_delay = 1 + (i_8b & 0x0F);
+    else
+        p_av1C->i_presentation_delay = 0;
+
+    MP4_READBOX_EXIT( 1 );
+}
+
 static void MP4_FreeBox_avcC( MP4_Box_t *p_box )
 {
     MP4_Box_data_avcC_t *p_avcC = p_box->data.p_avcC;
@@ -4763,7 +4805,7 @@ static const struct
     { ATOM_dcom,    MP4_ReadBox_dcom,         0 },
     { ATOM_dfLa,    MP4_ReadBox_Binary,       ATOM_fLaC },
     { ATOM_cmvd,    MP4_ReadBox_cmvd,         0 },
-    { ATOM_av1C,    MP4_ReadBox_Binary,       ATOM_av01 },
+    { ATOM_av1C,    MP4_ReadBox_av1C,         ATOM_av01 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc1 },
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
     { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
