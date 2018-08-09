@@ -332,7 +332,8 @@ void plane_CopyPixels( plane_t *p_dst, const plane_t *p_src )
 {
     const unsigned i_width  = __MIN( p_dst->i_visible_pitch,
                                      p_src->i_visible_pitch );
-    const unsigned i_height = __MIN( p_dst->i_lines, p_src->i_lines );
+    const unsigned i_height = __MIN( p_dst->i_visible_lines,
+                                     p_src->i_visible_lines );
 
     /* The 2x visible pitch check does two things:
        1) Makes field plane_t's work correctly (see the deinterlacer module)
