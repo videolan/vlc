@@ -38,16 +38,30 @@ void HxxxParse_AnnexB_SEI(const uint8_t *p_buf, size_t i_buf,
 void HxxxParseSEI(const uint8_t *p_buf, size_t i_buf,
                   uint8_t i_header, pf_hxxx_sei_callback pf_callback, void *cbdata)
 {
+    bs_t s_ep3b;
     bs_t s;
     unsigned i_bitflow = 0;
     bool b_continue = true;
+    char buf[256];
+    int i = 0;
 
     if( i_buf <= i_header )
         return;
 
-    bs_init( &s, &p_buf[i_header], i_buf - i_header ); /* skip nal unit header */
-    s.p_fwpriv = &i_bitflow;
-    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+    bs_init( &s_ep3b, &p_buf[i_header], i_buf - i_header ); /* skip nal unit header */
+    s_ep3b.p_fwpriv = &i_bitflow;
+    s_ep3b.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+
+    /* While a NAL can technically be up to 65535 bytes, an SEI NAL
+       will never be anywhere near that size */
+    if (bs_remain(&s_ep3b) / 8 > sizeof(buf))
+        return;
+
+    while (bs_remain(&s_ep3b) > 0)
+        buf[i++] = bs_read(&s_ep3b, 8);
+
+    /* Parse the resulting RBSP bytes as SEI */
+    bs_init( &s, buf, i);
 
     while( bs_remain( &s ) >= 8 && bs_aligned( &s ) && b_continue )
     {
