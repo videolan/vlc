@@ -587,7 +587,6 @@ static int
 Open(vlc_object_t *obj, char const *psz_filter)
 {
     filter_t *filter = (filter_t *)obj;
-    filter_sys_t *p_sys = filter->p_sys;
 
     switch (filter->fmt_in.video.i_chroma)
     {
@@ -605,7 +604,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
             return VLC_EGENERIC;
     }
 
-    filter->p_sys = calloc(1, sizeof(filter_sys_t));
+    filter_sys_t *p_sys = filter->p_sys = calloc(1, sizeof(filter_sys_t));
     if (!filter->p_sys)
         return VLC_ENOMEM;
 
