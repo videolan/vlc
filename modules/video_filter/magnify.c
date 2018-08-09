@@ -148,6 +148,53 @@ static void Destroy( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static void plane_CopyVisiblePixels( plane_t *p_dst, const plane_t *p_src )
+{
+    const unsigned i_width  = __MIN( p_dst->i_visible_pitch,
+                                     p_src->i_visible_pitch );
+    const unsigned i_height = __MIN( p_dst->i_visible_lines,
+                                     p_src->i_visible_lines );
+
+    /* The 2x visible pitch check does two things:
+       1) Makes field plane_t's work correctly (see the deinterlacer module)
+       2) Moves less data if the pitch and visible pitch differ much.
+    */
+    if( p_src->i_pitch == p_dst->i_pitch  &&
+        p_src->i_pitch < 2*p_src->i_visible_pitch )
+    {
+        /* There are margins, but with the same width : perfect ! */
+        memcpy( p_dst->p_pixels, p_src->p_pixels,
+                    p_src->i_pitch * i_height );
+    }
+    else
+    {
+        /* We need to proceed line by line */
+        uint8_t *p_in = p_src->p_pixels;
+        uint8_t *p_out = p_dst->p_pixels;
+
+        assert( p_in );
+        assert( p_out );
+
+        for( int i_line = i_height; i_line--; )
+        {
+            memcpy( p_out, p_in, i_width );
+            p_in += p_src->i_pitch;
+            p_out += p_dst->i_pitch;
+        }
+    }
+}
+
+static void picture_CopyVisiblePixels( picture_t *p_dst, const picture_t *p_src )
+{
+    for( int i = 0; i < p_src->i_planes ; i++ )
+        plane_CopyVisiblePixels( p_dst->p+i, p_src->p+i );
+
+    assert( p_dst->context == NULL );
+
+    if( p_src->context != NULL )
+        p_dst->context = p_src->context->copy( p_src->context );
+}
+
 /*****************************************************************************
  * Render: displays previously rendered output
  *****************************************************************************/
@@ -222,7 +269,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                                      &p_pic->format, &fmt_out );
 
         /* It will put only what can be copied at the top left */
-        picture_CopyPixels( p_outpic, p_converted );
+        picture_CopyVisiblePixels( p_outpic, p_converted );
 
         picture_Release( p_converted );
 
