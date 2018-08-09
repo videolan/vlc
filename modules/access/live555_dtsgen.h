@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 #define DTSGEN_REORDER_MAX   4 /* should be enough */
-#define DTSGEN_HISTORY_COUNT (DTSGEN_REORDER_MAX + 1)
+#define DTSGEN_HISTORY_COUNT (DTSGEN_REORDER_MAX + 2)
 //#define DTSGEN_DEBUG
 
 struct dtsgen_t
