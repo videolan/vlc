@@ -514,7 +514,9 @@ static int DxSetupOutput(vlc_va_t *va, const GUID *input, const video_format_t *
     if (!directx_va_canUseDecoder(va, identifier.VendorId, identifier.DeviceId,
                                   input, driverBuild))
     {
-        msg_Warn(va, "GPU blacklisted for %s codec", directx_va_GetDecoderName(input));
+        char* psz_decoder_name = directx_va_GetDecoderName(input);
+        msg_Warn(va, "GPU blacklisted for %s codec", psz_decoder_name);
+        free(psz_decoder_name);
         return VLC_EGENERIC;
     }
 
