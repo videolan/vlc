@@ -778,11 +778,14 @@ static void Manage(vout_display_t *vd)
     }
 }
 
-static void Prepare(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture, vlc_tick_t date)
+static void DisplayPicture(vout_display_sys_t *sys, d3d_quad_t *quad, d3d_vshader_t *vs_shader,
+                           ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW])
 {
-    Manage(vd);
-    VLC_UNUSED(date);
+    D3D11_RenderQuad(&sys->d3d_dev, quad, vs_shader, renderSrc, sys->swapchainTargetView);
+}
+
+static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+{
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
@@ -881,8 +884,6 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         sys->d3dregions      = subpicture_regions;
     }
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
-
     if (picture->format.mastering.max_luminance)
     {
         D3D11_UpdateQuadLuminanceScale(vd, &sys->d3d_dev, &sys->picQuad, GetFormatLuminance(VLC_OBJECT(vd), &picture->format) / (float)sys->display.luminance_peak);
@@ -914,9 +915,9 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
         picture_sys_t *p_sys = ActivePictureSys(picture);
         renderSrc = p_sys->renderSrc;
     }
-    D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
-                     vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                     renderSrc, sys->swapchainTargetView);
+    DisplayPicture(sys, &sys->picQuad,
+                   vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                   renderSrc);
 
     if (subpicture) {
         // draw the additional vertices
@@ -924,7 +925,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader, quad->picSys.renderSrc, sys->swapchainTargetView);
+                DisplayPicture(sys, quad, &sys->flatVShader, quad->picSys.renderSrc);
             }
         }
     }
@@ -933,6 +934,19 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 
     if (is_d3d11_opaque(picture->format.i_chroma))
         d3d11_device_unlock( &sys->d3d_dev );
+}
+
+static void Prepare(vout_display_t *vd, picture_t *picture,
+                    subpicture_t *subpicture, vlc_tick_t date)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    Manage(vd);
+    VLC_UNUSED(date);
+
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+
+    PreparePicture(vd, picture, subpicture);
 }
 
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
