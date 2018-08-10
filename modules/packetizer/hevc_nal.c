@@ -1066,7 +1066,7 @@ bool hevc_get_picture_size( const hevc_sequence_parameter_set_t *p_sps,
     if( p_sps->conformance_window_flag )
     {
         *p_vh -= p_sps->conf_win.bottom_offset + p_sps->conf_win.top_offset;
-        *p_vh -= p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset;
+        *p_vw -= p_sps->conf_win.left_offset +  p_sps->conf_win.right_offset;
     }
     return true;
 }
