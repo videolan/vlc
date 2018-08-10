@@ -32,22 +32,28 @@ MetadataExtractor::MetadataExtractor( vlc_object_t* parent )
 void MetadataExtractor::onInputEvent( const vlc_input_event* ev,
                                       ParseContext& ctx )
 {
-    if ( ev->type != INPUT_EVENT_DEAD && ev->type != INPUT_EVENT_STATE )
-        return;
-
-    if ( ev->type == INPUT_EVENT_STATE )
+    switch ( ev->type )
     {
-        vlc_mutex_locker lock( &ctx.m_mutex );
-        ctx.state = ev->state;
-        return;
+        case INPUT_EVENT_SUBITEMS:
+            addSubtree( ctx, ev->subitems );
+            break;
+        case INPUT_EVENT_STATE:
+            {
+                vlc_mutex_locker lock( &ctx.m_mutex );
+                ctx.state = ev->state;
+            }
+            break;
+        case INPUT_EVENT_DEAD:
+            {
+                vlc_mutex_locker lock( &ctx.m_mutex );
+                // We need to probe the item now, but not from the input thread
+                ctx.needsProbing = true;
+            }
+            vlc_cond_signal( &ctx.m_cond );
+            break;
+        default:
+            break;
     }
-
-    {
-        vlc_mutex_locker lock( &ctx.m_mutex );
-        // We need to probe the item now, but not from the input thread
-        ctx.needsProbing = true;
-    }
-    vlc_cond_signal( &ctx.m_cond );
 }
 
 void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_item_t* inputItem )
@@ -129,21 +135,14 @@ void MetadataExtractor::onInputEvent( input_thread_t*, void *data,
     ctx->mde->onInputEvent( event, *ctx );
 }
 
-void MetadataExtractor::onSubItemAdded( const vlc_event_t* event, ParseContext& ctx )
+void MetadataExtractor::addSubtree( ParseContext& ctx, input_item_node_t *root )
 {
-    auto root = event->u.input_item_subitem_tree_added.p_root;
     for ( auto i = 0; i < root->i_children; ++i )
     {
         auto it = root->pp_children[i]->p_item;
         auto& subItem = ctx.item.createSubItem( it->psz_uri, i );
         populateItem( subItem, it );
     }
-}
-
-void MetadataExtractor::onSubItemAdded( const vlc_event_t* event, void* data )
-{
-    auto* ctx = static_cast<ParseContext*>( data );
-    ctx->mde->onSubItemAdded( event, *ctx );
 }
 
 medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem& item )
@@ -164,10 +163,6 @@ medialibrary::parser::Status MetadataExtractor::run( medialibrary::parser::IItem
         &input_Close
     };
     if ( ctx.input == nullptr )
-        return medialibrary::parser::Status::Fatal;
-
-    if( vlc_event_attach( &ctx.inputItem->event_manager, vlc_InputItemSubItemTreeAdded,
-                          &MetadataExtractor::onSubItemAdded, std::addressof( ctx ) ) )
         return medialibrary::parser::Status::Fatal;
 
     input_Start( ctx.input.get() );
