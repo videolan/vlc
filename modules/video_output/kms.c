@@ -45,7 +45,7 @@
 #include <vlc_fs.h>
 
 /*****************************************************************************
- * Module descriptor
+ * Local prototypes
  *****************************************************************************/
 #define KMS_VAR "kms"
 
@@ -58,28 +58,6 @@
 
 #define DRM_CHROMA_TEXT "Image format used by DRM"
 #define DRM_CHROMA_LONGTEXT "Chroma fourcc override for DRM framebuffer format selection"
-
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
-
-vlc_module_begin ()
-    set_shortname("kms")
-    set_category(CAT_VIDEO)
-    set_subcategory(SUBCAT_VIDEO_VOUT)
-    add_loadfile(KMS_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
-
-    add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT,
-                true)
-    add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT,
-                true)
-    set_description("Linux kernel mode setting video output")
-    set_capability("vout display", 30)
-    set_callbacks(Open, Close)
-vlc_module_end ()
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
 
 /*
  * how many hw buffers are allocated for page flipping. I think
@@ -144,14 +122,14 @@ static void DestroyFB(vout_display_sys_t const *sys, uint32_t const buf)
 static deviceRval CreateFB(vout_display_t *vd, const int buf)
 {
     vout_display_sys_t *sys = vd->sys;
-    struct drm_mode_create_dumb create_req = { .width = sys->width*2,
+    struct drm_mode_create_dumb create_req = { .width = sys->width,
                                                .height = sys->height,
-                                               .bpp = 16 };
+                                               .bpp = 32 };
     struct drm_mode_destroy_dumb destroy_req;
     struct drm_mode_map_dumb modify_req = {};
     unsigned int tile_width = 512, tile_height = 16;
     deviceRval ret;
-    int i;
+    uint32_t i;
     uint32_t offsets[] = {0,0,0,0}, handles[] = {0,0,0,0},
             pitches[] = {0,0,0,0};
 
@@ -168,16 +146,16 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
 #if defined(DRM_FORMAT_P010) || defined(DRM_FORMAT_P012) || defined(DRM_FORMAT_P016)
         sys->stride = ALIGN(sys->width*2, tile_width);
         sys->offsets[1] = sys->stride*ALIGN(sys->height, tile_height);
-        create_req.height = ALIGN(sys->height*2, tile_height);
+        create_req.height = 2*ALIGN(sys->height, tile_height);
         break;
 #endif
     case DRM_FORMAT_NV12:
         sys->stride = ALIGN(sys->width, tile_width);
         sys->offsets[1] = sys->stride*ALIGN(sys->height, tile_height);
-        create_req.height = ALIGN(sys->height*2, tile_height);
+        create_req.height = 2*ALIGN(sys->height, tile_height);
         break;
     default:
-        create_req.height = ALIGN(sys->height*2, tile_height);
+        create_req.height = ALIGN(sys->height, tile_height);
 
         /*
          * width *4 so there's enough space for anything.
@@ -199,14 +177,14 @@ static deviceRval CreateFB(vout_display_t *vd, const int buf)
      * create framebuffer object for the dumb-buffer
      * index 0 has to be filled in any case.
      */
-    for (i = 0; i < 4 && (sys->offsets[i] || i < 1); i++) {
+    for (i = 0; i < ARRAY_SIZE(handles) && (sys->offsets[i] || i < 1); i++) {
         handles[i] = create_req.handle;
         pitches[i] = sys->stride;
         offsets[i] = sys->offsets[i];
     }
 
     ret = drmModeAddFB2(sys->drm_fd, sys->width, sys->height, sys->drm_fourcc,
-                        handles, pitches, offsets, &sys->fb[buf], 1<<1);
+                        handles, pitches, offsets, &sys->fb[buf], 0);
 
     if (ret) {
         msg_Err(vd, "Cannot create frame buffer");
@@ -471,7 +449,6 @@ static bool ChromaNegotiation(vout_display_t *vd)
      * favor yuv format according to YUVFormat flag.
      * check for exact match first, then YUVFormat and then !YUVFormat
      */
-    YUVFormat = vlc_fourcc_IsYUV(sys->vlc_fourcc);
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (fourccmatching[c].vlc == sys->vlc_fourcc) {
             if (!sys->forced_drm_fourcc && fourccmatching[c].present) {
@@ -488,6 +465,7 @@ static bool ChromaNegotiation(vout_display_t *vd)
         }
     }
 
+    YUVFormat = vlc_fourcc_IsYUV(sys->vlc_fourcc);
     for (c = i = 0; c < ARRAY_SIZE(fourccmatching); c++) {
         if (fourccmatching[c].isYUV == YUVFormat
                 && fourccmatching[c].present) {
@@ -548,12 +526,8 @@ static int OpenDisplay(vout_display_t *vd)
 
     drmSetClientCap(sys->drm_fd, DRM_CLIENT_CAP_UNIVERSAL_PLANES, 1);
 
-    if (!ChromaNegotiation(vd)) {
-        drmDropMaster(sys->drm_fd);
-        vlc_close(sys->drm_fd);
-        sys->drm_fd = 0;
-        return VLC_EGENERIC;
-    }
+    if (!ChromaNegotiation(vd))
+        goto err_out;
 
     msg_Dbg(vd, "Using VLC chroma '%.4s', DRM chroma '%.4s'",
             (char*)&sys->vlc_fourcc, (char*)&sys->drm_fourcc);
@@ -561,19 +535,13 @@ static int OpenDisplay(vout_display_t *vd)
     ret = drmGetCap(sys->drm_fd, DRM_CAP_DUMB_BUFFER, &dumbRet);
     if (ret < 0 || !dumbRet) {
         msg_Err(vd, "Device '%s' does not support dumb buffers", psz_device);
-        drmDropMaster(sys->drm_fd);
-        vlc_close(sys->drm_fd);
-        sys->drm_fd = 0;
-        return VLC_EGENERIC;
+        goto err_out;
     }
 
     modeRes = drmModeGetResources(sys->drm_fd);
     if (modeRes == NULL) {
         msg_Err(vd, "Didn't get DRM resources");
-        vlc_close(sys->drm_fd);
-        drmDropMaster(sys->drm_fd);
-        sys->drm_fd = 0;
-        return VLC_EGENERIC;
+        goto err_out;
     }
 
     for (c = 0; c < modeRes->count_connectors && sys->crtc == 0; c++) {
@@ -592,10 +560,7 @@ static int OpenDisplay(vout_display_t *vd)
 
                 drmModeFreeConnector(conn);
                 drmModeFreeResources(modeRes);
-                drmDropMaster(sys->drm_fd);
-                vlc_close(sys->drm_fd);
-                sys->drm_fd = 0;
-                return VLC_EGENERIC;
+                goto err_out;
             }
             drmModeFreeConnector(conn);
             found_connector = false;
@@ -604,14 +569,16 @@ static int OpenDisplay(vout_display_t *vd)
         drmModeFreeConnector(conn);
     }
     drmModeFreeResources(modeRes);
-    if (!found_connector) {
-        drmModeFreeResources(modeRes);
-        drmDropMaster(sys->drm_fd);
-        vlc_close(sys->drm_fd);
-        sys->drm_fd = 0;
-        return VLC_EGENERIC;
-    }
+
+    if (!found_connector)
+        goto err_out;
+
     return VLC_SUCCESS;
+err_out:
+    drmDropMaster(sys->drm_fd);
+    vlc_close(sys->drm_fd);
+    sys->drm_fd = 0;
+    return VLC_EGENERIC;
 }
 
 
@@ -691,10 +658,9 @@ static void Display(vout_display_t *vd, picture_t *picture,
     int i;
 
     if (drmModeSetPlane(sys->drm_fd, sys->plane_id, sys->crtc,
-                         sys->fb[sys->front_buf], 1<<1,
+                         sys->fb[sys->front_buf], 0,
                          0, 0, sys->width, sys->height,
-                         0, 0, sys->width << 16, sys->height << 16))
-    {
+                         0, 0, sys->width << 16, sys->height << 16)) {
         msg_Err(vd, "Cannot do set plane for plane id %u, fb %x",
                 sys->plane_id,
                 sys->fb[sys->front_buf]);
@@ -707,6 +673,31 @@ static void Display(vout_display_t *vd, picture_t *picture,
                     sys->map[sys->front_buf]+sys->offsets[i];
     }
     picture_Release(picture);
+}
+
+
+static void CloseDisplay(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->pool)
+        picture_pool_Release(sys->pool);
+
+    if (sys->drm_fd)
+        drmDropMaster(sys->drm_fd);
+
+    vlc_obj_free((vlc_object_t*)vd, sys);
+}
+
+
+/**
+ * Terminate an output method created by Open
+ */
+static void Close(vlc_object_t *object)
+{
+    vout_display_t *vd = (vout_display_t *)object;
+
+    CloseDisplay(vd);
 }
 
 
@@ -728,13 +719,9 @@ static int Open(vlc_object_t *object)
     /*
      * Allocate instance and initialize some members
      */
-    vd->sys = sys = calloc(1, sizeof(*sys));
+    vd->sys = sys = vlc_obj_calloc(object, 1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-
-    sys->pool = NULL;
-    sys->drm_fourcc = 0;
-    sys->vlc_fourcc = 0;
 
     chroma = var_InheritString(vd, "kms-vlc-chroma");
     if (chroma) {
@@ -772,7 +759,7 @@ static int Open(vlc_object_t *object)
         chroma = NULL;
     }
 
-    if (OpenDisplay(vd)) {
+    if (OpenDisplay(vd) != VLC_SUCCESS) {
         Close(VLC_OBJECT(vd));
         return VLC_EGENERIC;
     }
@@ -794,26 +781,20 @@ static int Open(vlc_object_t *object)
 }
 
 
-static void CloseDisplay(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
+/*****************************************************************************
+ * Module descriptor
+ *****************************************************************************/
+vlc_module_begin ()
+    set_shortname("kms")
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_loadfile(KMS_VAR, "/dev/dri/card0", DEVICE_TEXT, DEVICE_LONGTEXT)
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
-
-    if (sys->drm_fd)
-        drmDropMaster(sys->drm_fd);
-
-    free(sys);
-}
-
-
-/**
- * Terminate an output method created by Open
- */
-static void Close(vlc_object_t *object)
-{
-    vout_display_t *vd = (vout_display_t *)object;
-
-    CloseDisplay(vd);
-}
+    add_string( "kms-vlc-chroma", NULL, VLC_CHROMA_TEXT, VLC_CHROMA_LONGTEXT,
+                true)
+    add_string( "kms-drm-chroma", NULL, DRM_CHROMA_TEXT, DRM_CHROMA_LONGTEXT,
+                true)
+    set_description("Linux kernel mode setting video output")
+    set_capability("vout display", 30)
+    set_callbacks(Open, Close)
+vlc_module_end ()
