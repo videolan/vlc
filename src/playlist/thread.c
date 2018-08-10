@@ -185,6 +185,18 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist,
     p_sys->b_reset_currently_playing = false;
 }
 
+static void on_input_event(input_thread_t *input, void *userdata,
+                           const struct vlc_input_event *event)
+{
+    if (event->type == INPUT_EVENT_SUBITEMS)
+    {
+        playlist_t *playlist = userdata;
+        input_item_t *item = input_GetItem(input);
+        playlist_AddSubtree(playlist, item, event->subitems);
+    }
+
+    input_LegacyEvents(input, userdata, event);
+}
 
 /**
  * Start the input for an item
@@ -216,7 +228,7 @@ static bool PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
     libvlc_MetadataCancel( p_playlist->obj.libvlc, p_item );
 
     input_thread_t *p_input_thread = input_Create( p_playlist,
-                                                   input_LegacyEvents, NULL,
+                                                   on_input_event, p_playlist,
                                                    p_input, NULL,
                                                    p_sys->p_input_resource,
                                                    p_renderer );

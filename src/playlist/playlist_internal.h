@@ -118,6 +118,8 @@ void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item );
 int playlist_InsertInputItemTree ( playlist_t *,
         playlist_item_t *, input_item_node_t *, int, bool );
 
+void playlist_AddSubtree(playlist_t *, input_item_t *, input_item_node_t *);
+
 /* Tree walking */
 int playlist_NodeInsert(playlist_item_t*, playlist_item_t *, int);
 
