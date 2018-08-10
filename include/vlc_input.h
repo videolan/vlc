@@ -581,8 +581,9 @@ VLC_API int input_Start( input_thread_t * );
 
 VLC_API void input_Stop( input_thread_t * );
 
-VLC_API int input_Read( vlc_object_t *, input_item_t * );
-#define input_Read(a,b) input_Read(VLC_OBJECT(a),b)
+VLC_API int input_Read( vlc_object_t *, input_item_t *,
+                        input_thread_events_cb, void * );
+#define input_Read(a,b,c,d) input_Read(VLC_OBJECT(a),b,c,d)
 
 VLC_API int input_vaControl( input_thread_t *, int i_query, va_list  );
 

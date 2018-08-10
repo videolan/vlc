@@ -209,7 +209,7 @@ static void *Run( void *data )
         vlc_event_attach( p_em, vlc_InputItemSubItemTreeAdded,
                           input_subnode_added, p_sd );
 
-        input_Read( p_sd, p_root );
+        input_Read( p_sd, p_root, NULL, NULL );
 
         vlc_event_detach( p_em, vlc_InputItemSubItemTreeAdded,
                           input_subnode_added, p_sd );

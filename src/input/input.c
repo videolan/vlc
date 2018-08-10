@@ -143,10 +143,11 @@ input_thread_t *input_Create( vlc_object_t *p_parent,
  * \param p_item an input item
  * \return an error code, VLC_SUCCESS on success
  */
-int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
+int input_Read( vlc_object_t *p_parent, input_item_t *p_item,
+                input_thread_events_cb events_cb, void *events_data )
 {
-    input_thread_t *p_input = Create( p_parent, NULL, NULL, p_item, NULL, false,
-                                      NULL, NULL );
+    input_thread_t *p_input = Create( p_parent, events_cb, events_data, p_item,
+                                      NULL, false, NULL, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 

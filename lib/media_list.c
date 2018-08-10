@@ -257,7 +257,8 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
         return -1;
     }
 
-    input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item );
+    input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item,
+                NULL, NULL );
     return 0;
 }
 
