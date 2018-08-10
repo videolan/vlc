@@ -116,8 +116,8 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad
 
     hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &bd, NULL, &quad->pVertexBuffer);
     if(FAILED(hr)) {
-      msg_Err(o, "Failed to create vertex buffer. (hr=%lX)", hr);
-      return false;
+        msg_Err(o, "Failed to create vertex buffer. (hr=%lX)", hr);
+        goto fail;
     }
 
     /* create the index of the vertices */
@@ -131,12 +131,22 @@ static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad
     hr = ID3D11Device_CreateBuffer(d3d_dev->d3ddevice, &quadDesc, NULL, &quad->pIndexBuffer);
     if(FAILED(hr)) {
         msg_Err(o, "Could not create the quad indices. (hr=0x%lX)", hr);
-        ID3D11Buffer_Release(quad->pVertexBuffer);
-        quad->pVertexBuffer = NULL;
-        return false;
+        goto fail;
     }
 
     return true;
+fail:
+    if (quad->pVertexBuffer)
+    {
+        ID3D11Buffer_Release(quad->pVertexBuffer);
+        quad->pVertexBuffer = NULL;
+    }
+    if (quad->pVertexBuffer)
+    {
+        ID3D11Buffer_Release(quad->pIndexBuffer);
+        quad->pIndexBuffer = NULL;
+    }
+    return false;
 }
 
 void D3D11_ReleaseQuad(d3d_quad_t *quad)
@@ -553,6 +563,7 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
     bool result = true;
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
+    d3d_vertex_t *dst_data;
 
     if (unlikely(quad->pVertexBuffer == NULL))
         return false;
@@ -563,7 +574,7 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
         msg_Err(o, "Failed to lock the vertex buffer (hr=0x%lX)", hr);
         return false;
     }
-    d3d_vertex_t *dst_data = mappedResource.pData;
+    dst_data = mappedResource.pData;
 
     /* create the vertex indices */
     hr = ID3D11DeviceContext_Map(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pIndexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -572,18 +583,17 @@ bool D3D11_UpdateQuadPosition( vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_qua
         ID3D11DeviceContext_Unmap(d3d_dev->d3dcontext, (ID3D11Resource *)quad->pVertexBuffer, 0);
         return false;
     }
-    WORD *triangle_pos = mappedResource.pData;
 
     switch (quad->projection)
     {
     case PROJECTION_MODE_RECTANGULAR:
-        SetupQuadFlat(dst_data, output, quad, triangle_pos, orientation);
+        SetupQuadFlat(dst_data, output, quad, mappedResource.pData, orientation);
         break;
     case PROJECTION_MODE_EQUIRECTANGULAR:
-        SetupQuadSphere(dst_data, output, quad, triangle_pos);
+        SetupQuadSphere(dst_data, output, quad, mappedResource.pData);
         break;
     case PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD:
-        SetupQuadCube(dst_data, output, quad, triangle_pos);
+        SetupQuadCube(dst_data, output, quad, mappedResource.pData);
         break;
     default:
         msg_Warn(o, "Projection mode %d not handled", quad->projection);
