@@ -97,7 +97,9 @@ vlc_module_end ()
 
 static void* Run( void* );
 
-static void input_subnode_added( const vlc_event_t*, void* );
+static void on_input_thread_event(input_thread_t *input, void *userdata,
+                                  const struct vlc_input_event *event);
+
 static int onNewFileAdded( vlc_object_t*, char const *,
                            vlc_value_t, vlc_value_t, void *);
 
@@ -204,15 +206,7 @@ static void *Run( void *data )
         input_item_AddOption( p_root, "recursive=collapse",
                               VLC_INPUT_OPTION_TRUSTED|VLC_INPUT_OPTION_UNIQUE );
 
-
-        vlc_event_manager_t *p_em = &p_root->event_manager;
-        vlc_event_attach( p_em, vlc_InputItemSubItemTreeAdded,
-                          input_subnode_added, p_sd );
-
-        input_Read( p_sd, p_root, NULL, NULL );
-
-        vlc_event_detach( p_em, vlc_InputItemSubItemTreeAdded,
-                          input_subnode_added, p_sd );
+        input_Read( p_sd, p_root, on_input_thread_event, p_sd );
 
         input_item_Release( p_root );
         free( psz_uri );
@@ -242,11 +236,13 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Callbacks and helper functions
  *****************************************************************************/
-static void input_subnode_added( const vlc_event_t *p_event, void *user_data )
+static void input_item_subtree_added(input_item_t *input_item,
+                                     input_item_node_t *root,
+                                     void *user_data)
 {
+    VLC_UNUSED(input_item);
     services_discovery_t *p_sd = user_data;
     services_discovery_sys_t *p_sys = p_sd->p_sys;
-    input_item_node_t *root = p_event->u.input_item_subitem_tree_added.p_root;
 
     for( int i = 0; i < root->i_children; i++ )
     {
@@ -258,6 +254,13 @@ static void input_subnode_added( const vlc_event_t *p_event, void *user_data )
 
         services_discovery_AddItem( p_sd, item );
     }
+}
+
+static void on_input_thread_event(input_thread_t *input, void *userdata,
+                                  const struct vlc_input_event *event)
+{
+    if (event->type == INPUT_EVENT_SUBITEMS)
+        input_item_subtree_added(input_GetItem(input), event->subitems, userdata);
 }
 
 static int onNewFileAdded( vlc_object_t *p_this, char const *psz_var,
