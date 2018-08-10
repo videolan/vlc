@@ -505,12 +505,10 @@ static int OpenCommon(vout_display_t *vd)
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
-    /* Fallback to normal projection in case of soft decoding/display (the
-     * openGL vout, with a higher priority, should be used when the projection
-     * need to be handled). */
-    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE
-     && vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
-        return VLC_EGENERIC;
+    /* There are three cases:
+     * 1. the projection_mode is PROJECTION_MODE_RECTANGULAR
+     * 2. gles2 vout failed
+     * 3. the module is forced */
     vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     vout_window_t *embed =
@@ -621,8 +619,6 @@ static int Open(vlc_object_t *p_this)
     if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
 
-    /* At this point, gles2 vout failed (old Android device) */
-    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
     return OpenCommon(vd);
 }
 
@@ -630,9 +626,12 @@ static int OpenOpaque(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t*)p_this;
 
-    if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
-     || vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
-     || vd->fmt.orientation != ORIENT_NORMAL)
+    if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE)
+        return VLC_EGENERIC;
+
+    if (!vd->obj.force
+        && (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
+            || vd->fmt.orientation != ORIENT_NORMAL))
     {
         /* Let the gles2 vout handle orientation and projection */
         return VLC_EGENERIC;
