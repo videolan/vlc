@@ -40,6 +40,7 @@
 #include "../codec/cc.h"
 #include "packetizer_helper.h"
 #include "hxxx_nal.h"
+#include "hxxx_ep3b.h"
 #include "startcode_helper.h"
 
 /*****************************************************************************
@@ -327,6 +328,7 @@ static void BuildExtraData( decoder_t *p_dec )
     memcpy( (uint8_t*)p_es->p_extra + p_sys->sh.p_sh->i_buffer,
             p_sys->ep.p_ep->p_buffer, p_sys->ep.p_ep->i_buffer );
 }
+
 /* ParseIDU: parse an Independent Decoding Unit */
 static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
 {
@@ -438,7 +440,6 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     {
         es_format_t *p_es = &p_dec->fmt_out;
         bs_t s;
-        unsigned i_bitflow = 0;
         int i_profile;
 
         /* */
@@ -473,9 +474,10 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         }
 
         /* Parse it */
-        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
-        s.p_fwpriv = &i_bitflow;
-        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+        struct hxxx_bsfw_ep3b_ctx_s bsctx;
+        hxxx_bsfw_ep3b_ctx_init( &bsctx );
+        bs_init_custom( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4,
+                        &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
         i_profile = bs_read( &s, 2 );
         if( i_profile == 3 )
@@ -645,12 +647,12 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     else if( idu == IDU_TYPE_FRAME )
     {
         bs_t s;
-        unsigned i_bitflow = 0;
 
         /* Parse it + interpolate pts/dts if possible */
-        bs_init( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
-        s.p_fwpriv = &i_bitflow;
-        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+        struct hxxx_bsfw_ep3b_ctx_s bsctx;
+        hxxx_bsfw_ep3b_ctx_init( &bsctx );
+        bs_init_custom( &s, &p_frag->p_buffer[4], p_frag->i_buffer - 4,
+                        &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
         if( p_sys->sh.b_advanced_profile )
         {
@@ -724,11 +726,10 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
     else if( idu == IDU_TYPE_FRAME_USER_DATA )
     {
         bs_t s;
-        unsigned i_bitflow = 0;
         const size_t i_size = p_frag->i_buffer - 4;
-        bs_init( &s, &p_frag->p_buffer[4], i_size );
-        s.p_fwpriv = &i_bitflow;
-        s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+        struct hxxx_bsfw_ep3b_ctx_s bsctx;
+        hxxx_bsfw_ep3b_ctx_init( &bsctx );
+        bs_init_custom( &s, &p_frag->p_buffer[4], i_size, &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
         unsigned i_data;
         uint8_t *p_data = malloc( i_size );

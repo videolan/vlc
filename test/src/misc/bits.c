@@ -29,16 +29,24 @@
         return 1; \
     } } while( 0 )
 
-static uint8_t *skip1( uint8_t *p, uint8_t *end, void *priv, size_t i_count )
+static size_t skip1( bs_t *s, size_t i_count )
 {
-    (void) priv;
-    for( size_t i=0; i<i_count; i++ )
+    if( s->p == NULL )
     {
-        p += 2;
-        if( p >= end )
-            return p;
+        s->p = s->p_start;
+        return 1 + skip1( s, i_count - 1 );
     }
-    return p;
+
+    if( s->p_end - s->p > (ssize_t) i_count * 2 )
+    {
+        s->p += i_count * 2;
+        return i_count;
+    }
+    else
+    {
+        s->p = s->p_end;
+        return 0;
+    }
 }
 
 int main( void )
@@ -126,7 +134,7 @@ int main( void )
     const uint8_t ok[6] = { 0xAA, 0xCC, 0xEE, /* ovfw fillers */ 0, 0, 0 };
     uint8_t work[6] = { 0 };
     bs_init( &bs, &abc, 6 );
-    bs.pf_forward = skip1;
+    bs.cb.pf_byte_forward = skip1;
     for( unsigned i=0; i<6 && !bs_eof( &bs ); i++ )
         work[i] = bs_read( &bs, 8 );
     test_assert(memcmp( &work, &ok, 6 ), 0);

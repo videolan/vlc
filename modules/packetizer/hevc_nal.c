@@ -23,6 +23,7 @@
 
 #include "hevc_nal.h"
 #include "hxxx_nal.h"
+#include "hxxx_ep3b.h"
 #include "iso_color_tables.h"
 
 #include <vlc_common.h>
@@ -700,14 +701,13 @@ void hevc_rbsp_release_vps( hevc_video_parameter_set_t *p_vps )
         if(likely(p_hevctype)) \
         { \
             bs_t bs; \
-            bs_init( &bs, p_buf, i_buf ); \
-            unsigned i_bitflow = 0; \
+            struct hxxx_bsfw_ep3b_ctx_s bsctx; \
             if( b_escaped ) \
             { \
-                bs.p_fwpriv = &i_bitflow; \
-                bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */ \
+                hxxx_bsfw_ep3b_ctx_init( &bsctx ); \
+                bs_init_custom( &bs, p_buf, i_buf, &hxxx_bsfw_ep3b_callbacks, &bsctx );\
             } \
-            else (void) i_bitflow;\
+            else bs_init( &bs, p_buf, i_buf ); \
             bs_skip( &bs, 7 ); /* nal_unit_header */ \
             uint8_t i_nuh_layer_id = bs_read( &bs, 6 ); \
             bs_skip( &bs, 3 ); /* !nal_unit_header */ \
@@ -762,7 +762,7 @@ static bool hevc_parse_st_ref_pic_set( bs_t *p_bs, unsigned stRpsIdx,
     {
         nal_ue_t num_negative_pics = bs_read_ue( p_bs );
         nal_ue_t num_positive_pics = bs_read_ue( p_bs );
-        if( bs_remain( p_bs ) < ((int64_t)num_negative_pics + num_positive_pics) * 2 )
+        if( bs_remain( p_bs ) < (num_negative_pics + num_positive_pics) * 2 )
             return false;
         for(unsigned int i=0; i<num_negative_pics; i++)
         {
@@ -977,8 +977,8 @@ static bool hevc_parse_pic_parameter_set_rbsp( bs_t *p_bs,
         p_pps->uniform_spacing_flag = bs_read1( p_bs );
         if( !p_pps->uniform_spacing_flag )
         {
-            if( bs_remain( p_bs ) < (int64_t) p_pps->num_tile_columns_minus1 +
-                                               p_pps->num_tile_rows_minus1 + 1 )
+            if( bs_remain( p_bs ) < p_pps->num_tile_columns_minus1 +
+                                    p_pps->num_tile_rows_minus1 + 1 )
                 return false;
             for( unsigned i=0; i< p_pps->num_tile_columns_minus1; i++ )
                 (void) bs_read_ue( p_bs );
@@ -1296,14 +1296,13 @@ hevc_slice_segment_header_t * hevc_decode_slice_header( const uint8_t *p_buf, si
     if(likely(p_sh))
     {
         bs_t bs;
-        bs_init( &bs, p_buf, i_buf );
-        unsigned i_bitflow = 0;
+        struct hxxx_bsfw_ep3b_ctx_s bsctx;
         if( b_escaped )
         {
-            bs.p_fwpriv = &i_bitflow;
-            bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+            hxxx_bsfw_ep3b_ctx_init( &bsctx );
+            bs_init_custom( &bs, p_buf, i_buf, &hxxx_bsfw_ep3b_callbacks, &bsctx );
         }
-        else (void) i_bitflow;
+        else bs_init( &bs, p_buf, i_buf );
         bs_skip( &bs, 1 );
         p_sh->nal_type = bs_read( &bs, 6 );
         p_sh->nuh_layer_id = bs_read( &bs, 6 );
@@ -1359,10 +1358,9 @@ static void hevc_dcr_params_from_vps( const uint8_t * p_buffer, size_t i_buffer,
         return;
 
     bs_t bs;
-    bs_init( &bs, p_buffer, i_buffer );
-    unsigned i_bitflow = 0;
-    bs.p_fwpriv = &i_bitflow;
-    bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+    struct hxxx_bsfw_ep3b_ctx_s bsctx;
+    hxxx_bsfw_ep3b_ctx_init( &bsctx );
+    bs_init_custom( &bs, p_buffer, i_buffer, &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
     /* first two bytes are the NAL header, 3rd and 4th are:
         vps_video_parameter_set_id(4)

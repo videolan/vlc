@@ -53,54 +53,6 @@ static inline bool hxxx_strip_AnnexB_startcode( const uint8_t **pp_data, size_t 
     return false;
 }
 
-/* vlc_bits's bs_t forward callback for stripping emulation prevention three bytes */
-static inline uint8_t *hxxx_bsfw_ep3b_to_rbsp( uint8_t *p, uint8_t *end, void *priv, size_t i_count )
-{
-    unsigned *pi_prev = (unsigned *) priv;
-    for( size_t i=0; i<i_count; i++ )
-    {
-        if( ++p >= end )
-            return p;
-
-        *pi_prev = (*pi_prev << 1) | (!*p);
-
-        if( *p == 0x03 &&
-           ( p + 1 ) != end ) /* Never escape sequence if no next byte */
-        {
-            if( (*pi_prev & 0x06) == 0x06 )
-            {
-                ++p;
-                *pi_prev = ((*pi_prev >> 1) << 1) | (!*p);
-            }
-        }
-    }
-    return p;
-}
-
-#if 0
-/* Discards emulation prevention three bytes */
-static inline uint8_t * hxxx_ep3b_to_rbsp(const uint8_t *p_src, size_t i_src, size_t *pi_ret)
-{
-    uint8_t *p_dst;
-    if(!p_src || !(p_dst = malloc(i_src)))
-        return NULL;
-
-    size_t j = 0;
-    for (size_t i = 0; i < i_src; i++) {
-        if (i < i_src - 3 &&
-            p_src[i] == 0 && p_src[i+1] == 0 && p_src[i+2] == 3) {
-            p_dst[j++] = 0;
-            p_dst[j++] = 0;
-            i += 2;
-            continue;
-        }
-        p_dst[j++] = p_src[i];
-    }
-    *pi_ret = j;
-    return p_dst;
-}
-#endif
-
 /* Declarations */
 
 typedef struct

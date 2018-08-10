@@ -27,6 +27,7 @@
 #include "h264_nal.h"
 #include "h264_slice.h"
 #include "hxxx_nal.h"
+#include "hxxx_ep3b.h"
 
 bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
                         void (* get_sps_pps)(uint8_t, void *,
@@ -37,10 +38,9 @@ bool h264_decode_slice( const uint8_t *p_buffer, size_t i_buffer,
     int i_slice_type;
     h264_slice_init( p_slice );
     bs_t s;
-    unsigned i_bitflow = 0;
-    bs_init( &s, p_buffer, i_buffer );
-    s.p_fwpriv = &i_bitflow;
-    s.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */
+    struct hxxx_bsfw_ep3b_ctx_s bsctx;
+    hxxx_bsfw_ep3b_ctx_init( &bsctx );
+    bs_init_custom( &s, p_buffer, i_buffer, &hxxx_bsfw_ep3b_callbacks, &bsctx );
 
     /* nal unit header */
     bs_skip( &s, 1 );

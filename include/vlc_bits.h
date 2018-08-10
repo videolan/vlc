@@ -32,59 +32,140 @@
  * This file defines functions, structures for handling streams of bits in vlc
  */
 
+typedef struct bs_s bs_t;
+
+typedef struct
+{
+    /* forward read modifier (p_start, p_end, p_fwpriv, count, pos, remain) */
+    size_t (*pf_byte_forward)(bs_t *, size_t);
+    size_t (*pf_byte_pos)(const bs_t *);
+    size_t (*pf_byte_remain)(const bs_t *);
+} bs_byte_callbacks_t;
+
 typedef struct bs_s
 {
     uint8_t *p_start;
-    uint8_t *p;
+    uint8_t *p;         /* points to currently read/written byte */
     uint8_t *p_end;
 
-    ssize_t  i_left;    /* i_count number of available bits */
+    uint8_t  i_left;    /* i_count number of available bits */
     bool     b_read_only;
 
-     /* forward read modifier (p_start, p_end, p_fwpriv, count) */
-    uint8_t *(*pf_forward)(uint8_t *, uint8_t *, void *, size_t);
-    void    *p_fwpriv;
+    bs_byte_callbacks_t cb;
+    void    *p_priv;
 } bs_t;
 
-static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
+static size_t bs_impl_bytes_forward( bs_t *s, size_t i_count )
+{
+    if( s->p == NULL )
+    {
+        s->p = s->p_start;
+        return 1;
+    }
+
+    if( s->p >= s->p_end )
+        return 0;
+
+    if( (size_t) (s->p_end - s->p) < i_count )
+        i_count = s->p_end - s->p;
+    s->p += i_count;
+    return i_count;
+}
+
+static size_t bs_impl_bytes_remain( const bs_t *s )
+{
+    if( s->p )
+        return s->p < s->p_end ? s->p_end - s->p - 1: 0;
+    else
+        return s->p_end - s->p_start;
+}
+
+static size_t bs_impl_bytes_pos( const bs_t *s )
+{
+    if( s->p )
+        return s->p < s->p_end ? s->p - s->p_start + 1 : s->p - s->p_start;
+    else
+        return 0;
+}
+
+static inline void bs_init_custom( bs_t *s, const void *p_data, size_t i_data,
+                                   const bs_byte_callbacks_t *cb, void *priv )
 {
     s->p_start = (uint8_t *)p_data;
-    s->p       = s->p_start;
+    s->p       = NULL;
     s->p_end   = s->p_start + i_data;
-    s->i_left  = 8;
-    s->b_read_only = false;
-    s->p_fwpriv = NULL;
-    s->pf_forward = NULL;
+    s->i_left  = 0;
+    s->b_read_only = true;
+    s->p_priv = priv;
+    s->cb = *cb;
 }
 
 static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
 {
-    bs_write_init( s, (void*) p_data, i_data );
-    s->b_read_only = true;
+    bs_byte_callbacks_t cb = {
+        bs_impl_bytes_forward,
+        bs_impl_bytes_pos,
+        bs_impl_bytes_remain,
+    };
+    bs_init_custom( s, p_data, i_data, &cb, NULL );
 }
 
-static inline int bs_pos( const bs_t *s )
+static inline void bs_write_init( bs_t *s, void *p_data, size_t i_data )
 {
-    return( 8 * ( s->p - s->p_start ) + 8 - s->i_left );
+    bs_init( s, (const void *) p_data, i_data );
+    s->b_read_only = false;
 }
 
-static inline int bs_remain( const bs_t *s )
+static inline int bs_refill( bs_t *s )
 {
-    if( s->p >= s->p_end )
-        return 0;
-    else
-    return( 8 * ( s->p_end - s->p ) - 8 + s->i_left );
+    if( s->i_left == 0 )
+    {
+       if( s->cb.pf_byte_forward( s, 1 ) != 1 )
+           return -1;
+
+       if( s->p < s->p_end )
+            s->i_left = 8;
+    }
+    return s->i_left > 0 ? 0 : 1;
 }
 
-static inline int bs_eof( const bs_t *s )
+static inline bool bs_eof( bs_t *s )
 {
-    return( s->p >= s->p_end ? 1: 0 );
+    return bs_refill( s ) != 0;
 }
 
-#define bs_forward( s, i ) \
-    s->p = s->pf_forward ? s->pf_forward( s->p, s->p_end, s->p_fwpriv, i ) : s->p + i
+static inline size_t bs_pos( const bs_t *s )
+{
+    return 8 * s->cb.pf_byte_pos( s ) - s->i_left;
+}
 
-static inline uint32_t bs_read( bs_t *s, int i_count )
+static inline size_t bs_remain( const bs_t *s )
+{
+    return 8 * s->cb.pf_byte_remain( s ) + s->i_left;
+}
+
+static inline void bs_skip( bs_t *s, size_t i_count )
+{
+    if( i_count == 0 )
+        return;
+
+    if( bs_refill( s ) )
+        return;
+
+    if( i_count > s->i_left )
+    {
+        i_count -= s->i_left;
+        s->i_left = 0;
+        if( i_count / 8 )
+            s->cb.pf_byte_forward( s, i_count / 8 );
+        i_count = i_count % 8;
+        if( i_count > 0 && !bs_refill( s ) )
+            s->i_left = 8 - i_count;
+    }
+    else s->i_left -= i_count;
+}
+
+static inline uint32_t bs_read( bs_t *s, uint8_t i_count )
 {
      static const uint32_t i_mask[33] =
      {  0x00,
@@ -96,7 +177,7 @@ static inline uint32_t bs_read( bs_t *s, int i_count )
         0x1fffff,  0x3fffff,  0x7fffff,  0xffffff,
         0x1ffffff, 0x3ffffff, 0x7ffffff, 0xfffffff,
         0x1fffffff,0x3fffffff,0x7fffffff,0xffffffff};
-    int      i_shr, i_drop = 0;
+    uint8_t  i_shr, i_drop = 0;
     uint32_t i_result = 0;
 
     if( i_count > 32 )
@@ -107,87 +188,53 @@ static inline uint32_t bs_read( bs_t *s, int i_count )
 
     while( i_count > 0 )
     {
-        if( s->p >= s->p_end )
-        {
+        if( bs_refill( s ) )
             break;
-        }
 
-        if( ( i_shr = s->i_left - i_count ) >= 0 )
+        if( s->i_left > i_count )
         {
+            i_shr = s->i_left - i_count;
             /* more in the buffer than requested */
             i_result |= ( *s->p >> i_shr )&i_mask[i_count];
             s->i_left -= i_count;
-            if( s->i_left == 0 )
-            {
-                bs_forward( s, 1 );
-                s->i_left = 8;
-            }
             break;
         }
         else
         {
+            i_shr = i_count - s->i_left;
             /* less in the buffer than requested */
-           if( -i_shr == 32 )
+           if( i_shr >= 32 )
                i_result = 0;
            else
-               i_result |= (*s->p&i_mask[s->i_left]) << -i_shr;
+               i_result |= (*s->p&i_mask[s->i_left]) << i_shr;
            i_count  -= s->i_left;
-           bs_forward( s, 1);
-           s->i_left = 8;
+           s->i_left = 0;
         }
     }
 
     if( i_drop )
-        bs_forward( s, i_drop );
+        bs_skip( s, i_drop );
 
     return( i_result );
 }
 
 static inline uint32_t bs_read1( bs_t *s )
 {
-    if( s->p < s->p_end )
-    {
-        unsigned int i_result;
-
-        s->i_left--;
-        i_result = ( *s->p >> s->i_left )&0x01;
-        if( s->i_left == 0 )
-        {
-            bs_forward( s, 1 );
-            s->i_left = 8;
-        }
-        return i_result;
-    }
-
-    return 0;
+    if( bs_refill( s ) )
+        return 0;
+    s->i_left--;
+    return ( *s->p >> s->i_left )&0x01;
 }
 
-static inline void bs_skip( bs_t *s, ssize_t i_count )
-{
-    s->i_left -= i_count;
-
-    if( s->i_left <= 0 )
-    {
-        const size_t i_bytes = 1 + s->i_left / -8;
-        bs_forward( s, i_bytes );
-        if( i_bytes * 8 < i_bytes /* ofw */ )
-            s->i_left = i_bytes;
-        else
-            s->i_left += 8 * i_bytes;
-    }
-}
-
-static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
+static inline void bs_write( bs_t *s, uint8_t i_count, uint32_t i_bits )
 {
     if( s->b_read_only )
         return;
 
     while( i_count > 0 )
     {
-        if( s->p >= s->p_end )
-        {
+        if( bs_refill( s ) )
             break;
-        }
 
         i_count--;
 
@@ -200,11 +247,6 @@ static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
             *s->p &= ~( 1 << ( s->i_left - 1 ) );
         }
         s->i_left--;
-        if( s->i_left == 0 )
-        {
-            bs_forward( s, 1 );
-            s->i_left = 8;
-        }
     }
 }
 
@@ -215,28 +257,18 @@ static inline bool bs_aligned( bs_t *s )
 
 static inline void bs_align( bs_t *s )
 {
-    if( s->i_left != 8 )
-    {
-        s->i_left = 8;
-        s->p++;
-    }
+    if( s->i_left % 8 )
+        s->i_left = 0;
 }
 
-static inline void bs_align_0( bs_t *s )
+static inline void bs_write_align( bs_t *s, uint8_t v )
 {
-    if( s->i_left != 8 )
-    {
-        bs_write( s, s->i_left, 0 );
-    }
+    if( !s->b_read_only && (s->i_left % 8) )
+        bs_write( s, s->i_left, v ? 0xFF : 0 );
 }
 
-static inline void bs_align_1( bs_t *s )
-{
-    while( !s->b_read_only && s->i_left != 8 )
-    {
-        bs_write( s, 1, 1 );
-    }
-}
+#define bs_align_0( s ) bs_write_align( s, 0 )
+#define bs_align_1( s ) bs_write_align( s, 1 )
 
 /* Read unsigned Exp-Golomb code */
 static inline uint_fast32_t bs_read_ue( bs_t * bs )

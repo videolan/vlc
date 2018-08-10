@@ -25,6 +25,7 @@
 
 #include "h264_nal.h"
 #include "hxxx_nal.h"
+#include "hxxx_ep3b.h"
 #include "iso_color_tables.h"
 
 #include <vlc_bits.h>
@@ -615,14 +616,13 @@ static bool h264_parse_picture_parameter_set_rbsp( bs_t *p_bs,
         if(likely(p_h264type)) \
         { \
             bs_t bs; \
-            bs_init( &bs, p_buf, i_buf ); \
-            unsigned i_bitflow = 0; \
+            struct hxxx_bsfw_ep3b_ctx_s bsctx; \
             if( b_escaped ) \
             { \
-                bs.p_fwpriv = &i_bitflow; \
-                bs.pf_forward = hxxx_bsfw_ep3b_to_rbsp;  /* Does the emulated 3bytes conversion to rbsp */ \
+                hxxx_bsfw_ep3b_ctx_init( &bsctx ); \
+                bs_init_custom( &bs, p_buf, i_buf, &hxxx_bsfw_ep3b_callbacks, &bsctx );\
             } \
-            else (void) i_bitflow;\
+            else bs_init( &bs, p_buf, i_buf ); \
             bs_skip( &bs, 8 ); /* Skip nal_unit_header */ \
             if( !decode( &bs, p_h264type ) ) \
             { \
