@@ -19,11 +19,15 @@
  *****************************************************************************/
 
 #include "../../libvlc/test.h"
-#ifdef NDEBUG
- #undef NDEBUG
-#endif
 #include <vlc_bits.h>
-#include <assert.h>
+
+#define test_assert(foo, bar) do {\
+    ssize_t a = (foo); \
+    ssize_t b = (bar); \
+    if(a != b) { \
+        printf("FAILED line %d : %ld != %ld\n", __LINE__, a, b ); \
+        return 1; \
+    } } while( 0 )
 
 static uint8_t *skip1( uint8_t *p, uint8_t *end, void *priv, size_t i_count )
 {
@@ -45,78 +49,78 @@ int main( void )
     bs_t bs;
 
     bs_init( &bs, NULL, 0 );
-    assert( bs_remain(&bs) == 0 );
-    assert( bs_pos(&bs) == 0 );
+    test_assert( bs_remain(&bs), 0 );
+    test_assert( bs_pos(&bs), 0 );
 
     bs_init( &bs, &z, 0 );
-    assert( bs_remain(&bs) == 0 );
-    assert( bs_pos(&bs) == 0 );
+    test_assert( bs_remain(&bs), 0 );
+    test_assert( bs_pos(&bs), 0 );
 
     bs_init( &bs, &z, 1 );
-    assert( bs_remain(&bs) == 8 );
-    assert( bs_pos(&bs) == 0 );
+    test_assert( bs_remain(&bs), 8 );
+    test_assert( bs_pos(&bs), 0 );
 
     bs_skip( &bs, 3 );
-    assert( bs_remain(&bs) == 5 );
-    assert( bs_pos(&bs) == 3 );
+    test_assert( bs_remain(&bs), 5 );
+    test_assert( bs_pos(&bs), 3 );
 
     bs_init( &bs, &z, 2 );
-    assert( bs_remain(&bs) == 16 );
+    test_assert( bs_remain(&bs), 16 );
 
     bs_write( &bs, 1, 0 );
-    assert( bs_remain(&bs) == 16 );
+    test_assert( bs_remain(&bs), 16 );
 
     bs_read1( &bs );
-    assert( bs_remain(&bs) == 15 );
-    assert( bs_pos(&bs) == 1 );
+    test_assert( bs_remain(&bs), 15 );
+    test_assert( bs_pos(&bs), 1 );
 
     bs_read( &bs, 7 );
-    assert( bs_remain(&bs) == 8 );
-    assert( bs_pos(&bs) == 8 );
+    test_assert( bs_remain(&bs), 8 );
+    test_assert( bs_pos(&bs), 8 );
 
     bs_read1( &bs );
-    assert( bs_remain(&bs) == 7 );
-    assert( bs_pos(&bs) == 9 );
+    test_assert( bs_remain(&bs), 7 );
+    test_assert( bs_pos(&bs), 9 );
 
     bs_align( &bs );
-    assert( bs_remain(&bs) == 0 );
-    assert( bs_pos(&bs) == 16 );
+    test_assert( bs_remain(&bs), 0 );
+    test_assert( bs_pos(&bs), 16 );
 
     z[0] = 0xAA;
     z[1] = 0x55;
     bs_init( &bs, &z, 2 );
-    assert( bs_read(&bs, 4) == 0x0A );
-    assert( bs_read(&bs, 12) == ((0x0A << 8) | 0x55) );
+    test_assert( bs_read(&bs, 4), 0x0A );
+    test_assert( bs_read(&bs, 12), ((0x0A << 8) | 0x55) );
 
     z[0] = 0x15;
     z[1] = 0x23;
     bs_init( &bs, &z, 2 );
-    assert( bs_read_ue(&bs) == 0x09 );
-    assert( bs_remain(&bs) == 9 );
-    assert( bs_read1(&bs)  == 1 );
-    assert( bs_read_se(&bs) == 2 );
-    assert( bs_remain(&bs) == 3 );
-    assert( bs_read_se(&bs) == -1 );
-    assert( bs_eof(&bs) );
+    test_assert( bs_read_ue(&bs), 0x09 );
+    test_assert( bs_remain(&bs), 9 );
+    test_assert( bs_read1(&bs), 1 );
+    test_assert( bs_read_se(&bs), 2 );
+    test_assert( bs_remain(&bs), 3 );
+    test_assert( bs_read_se(&bs), -1 );
+    test_assert( bs_eof(&bs), !0 );
 
     const uint8_t abc[6] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
     bs_init( &bs, &abc, 6 );
     bs_skip( &bs, 24 );
-    assert( bs_read( &bs, 8 ) == 0xDD );
-    assert( bs_read( &bs, 4 ) == 0x0E );
-    assert( bs_read( &bs, 8 ) == 0xEF );
-    assert( bs_remain( &bs ) == 4 );
+    test_assert( bs_read( &bs, 8 ), 0xDD );
+    test_assert( bs_read( &bs, 4 ), 0x0E );
+    test_assert( bs_read( &bs, 8 ), 0xEF );
+    test_assert( bs_remain( &bs ), 4 );
 
     bs_init( &bs, &abc, 6 );
     bs_skip( &bs, 40 );
-    assert( bs_read( &bs, 8 ) == 0xFF );
+    test_assert( bs_read( &bs, 8 ), 0xFF );
 
     bs_init( &bs, &abc, 6 );
     bs_skip( &bs, 20 );
-    assert( bs_read( &bs, 8 ) == 0xCD );
-    assert( bs_read( &bs, 4 ) == 0x0D );
-    assert( bs_read( &bs, 8 ) == 0xEE );
-    assert( bs_remain( &bs ) == 8 );
+    test_assert( bs_read( &bs, 8 ), 0xCD );
+    test_assert( bs_read( &bs, 4 ), 0x0D );
+    test_assert( bs_read( &bs, 8 ), 0xEE );
+    test_assert( bs_remain( &bs ), 8 );
 
     /* Check forwarding by correctly decoding a 1 byte skip sequence */
     const uint8_t ok[6] = { 0xAA, 0xCC, 0xEE, /* ovfw fillers */ 0, 0, 0 };
@@ -125,7 +129,7 @@ int main( void )
     bs.pf_forward = skip1;
     for( unsigned i=0; i<6 && !bs_eof( &bs ); i++ )
         work[i] = bs_read( &bs, 8 );
-    assert(!memcmp( &work, &ok, 6 ));
+    test_assert(memcmp( &work, &ok, 6 ), 0);
 
     return 0;
 }
