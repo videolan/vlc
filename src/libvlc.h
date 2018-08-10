@@ -204,6 +204,8 @@ void intf_DestroyAll( libvlc_int_t * );
 
 int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                         input_item_meta_request_option_t i_options,
+                        const input_preparser_callbacks_t *cbs,
+                        void *cbs_userdata,
                         int timeout, void *id);
 
 /*

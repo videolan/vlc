@@ -158,7 +158,8 @@ static void test_input_metadata_timeout(libvlc_instance_t *vlc, int timeout,
                              input_item_preparse_timeout, &sem);
     assert(i_ret == 0);
     i_ret = libvlc_MetadataRequest(vlc->p_libvlc_int, p_item,
-                                   META_REQUEST_OPTION_SCOPE_LOCAL, timeout, vlc);
+                                   META_REQUEST_OPTION_SCOPE_LOCAL,
+                                   NULL, NULL, timeout, vlc);
     assert(i_ret == 0);
 
     if (wait_and_cancel > 0)

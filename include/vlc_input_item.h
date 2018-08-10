@@ -39,6 +39,7 @@
 
 typedef struct input_item_opaque input_item_opaque_t;
 typedef struct input_item_slave input_item_slave_t;
+typedef struct input_preparser_callbacks_t input_preparser_callbacks_t;
 
 struct info_t
 {
@@ -379,7 +380,7 @@ typedef enum input_item_meta_request_option_t
     META_REQUEST_OPTION_DO_INTERACT   = 0x04
 } input_item_meta_request_option_t;
 
-/* status of the vlc_InputItemPreparseEnded event */
+/* status of the on_preparse_ended() callback */
 enum input_item_preparse_status
 {
     ITEM_PREPARSE_SKIPPED,
@@ -388,8 +389,15 @@ enum input_item_preparse_status
     ITEM_PREPARSE_DONE
 };
 
+typedef struct input_preparser_callbacks_t {
+    void (*on_preparse_ended)(input_item_t *, enum input_item_preparse_status status, void *userdata);
+    void (*on_subtree_added)(input_item_t *, input_item_node_t *subtree, void *userdata);
+} input_preparser_callbacks_t;
+
 VLC_API int libvlc_MetadataRequest( libvlc_int_t *, input_item_t *,
                                     input_item_meta_request_option_t,
+                                    const input_preparser_callbacks_t *cbs,
+                                    void *cbs_userdata,
                                     int, void * );
 VLC_API int libvlc_ArtRequest(libvlc_int_t *, input_item_t *,
                               input_item_meta_request_option_t );

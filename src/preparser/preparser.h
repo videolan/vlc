@@ -45,8 +45,6 @@ input_preparser_t *input_preparser_New( vlc_object_t * );
  *
  * The input item is retained until the preparsing is done or until the
  * preparser object is deleted.
- * Listen to vlc_InputItemPreparseEnded event to get notified when item is
- * preparsed.
  *
  * @param timeout maximum time allowed to preparse the item. If -1, the default
  * "preparse-timeout" option will be used as a timeout. If 0, it will wait
@@ -56,6 +54,8 @@ input_preparser_t *input_preparser_New( vlc_object_t * );
  */
 void input_preparser_Push( input_preparser_t *, input_item_t *,
                            input_item_meta_request_option_t,
+                           const input_preparser_callbacks_t *cbs,
+                           void *cbs_userdata,
                            int timeout, void *id );
 
 void input_preparser_fetcher_Push( input_preparser_t *, input_item_t *,

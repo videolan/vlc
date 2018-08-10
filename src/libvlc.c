@@ -472,6 +472,8 @@ static void GetFilenames( libvlc_int_t *p_vlc, unsigned n,
 
 int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                         input_item_meta_request_option_t i_options,
+                        const input_preparser_callbacks_t *cbs,
+                        void *cbs_userdata,
                         int timeout, void *id)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
@@ -485,7 +487,7 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
         item->b_preparse_interact = true;
         vlc_mutex_unlock( &item->lock );
     }
-    input_preparser_Push( priv->parser, item, i_options, timeout, id );
+    input_preparser_Push( priv->parser, item, i_options, cbs, cbs_userdata, timeout, id );
     return VLC_SUCCESS;
 
 }
@@ -497,6 +499,8 @@ int vlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
  */
 int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
                            input_item_meta_request_option_t i_options,
+                           const input_preparser_callbacks_t *cbs,
+                           void *cbs_userdata,
                            int timeout, void *id)
 {
     libvlc_priv_t *priv = libvlc_priv(libvlc);
@@ -509,7 +513,7 @@ int libvlc_MetadataRequest(libvlc_int_t *libvlc, input_item_t *item,
         item->i_preparse_depth = 1;
     vlc_mutex_unlock( &item->lock );
 
-    return vlc_MetadataRequest(libvlc, item, i_options, timeout, id);
+    return vlc_MetadataRequest(libvlc, item, i_options, cbs, cbs_userdata, timeout, id);
 }
 
 /**

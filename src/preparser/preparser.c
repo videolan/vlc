@@ -24,6 +24,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_atomic.h>
 
 #include "misc/background_worker.h"
 #include "input/input_interface.h"
@@ -39,14 +40,54 @@ struct input_preparser_t
     atomic_bool deactivated;
 };
 
+typedef struct input_preparser_req_t
+{
+    input_item_t *item;
+    const input_preparser_callbacks_t *cbs;
+    void *userdata;
+    vlc_atomic_rc_t rc;
+} input_preparser_req_t;
+
 typedef struct input_preparser_task_t
 {
+    input_preparser_req_t *req;
     input_preparser_t* preparser;
     input_thread_t* input;
     atomic_int state;
     atomic_bool done;
-
 } input_preparser_task_t;
+
+static input_preparser_req_t *ReqCreate(input_item_t *item,
+                                        const input_preparser_callbacks_t *cbs,
+                                        void *userdata)
+{
+    input_preparser_req_t *req = malloc(sizeof(*req));
+    if (unlikely(!req))
+        return NULL;
+
+    req->item = item;
+    req->cbs = cbs;
+    req->userdata = userdata;
+    vlc_atomic_rc_init(&req->rc);
+
+    input_item_Hold(item);
+
+    return req;
+}
+
+static void ReqHold(input_preparser_req_t *req)
+{
+    vlc_atomic_rc_inc(&req->rc);
+}
+
+static void ReqRelease(input_preparser_req_t *req)
+{
+    if (vlc_atomic_rc_dec(&req->rc))
+    {
+        input_item_Release(req->item);
+        free(req);
+    }
+}
 
 static void InputEvent( input_thread_t *input, void *task_,
                         const struct vlc_input_event *event )
@@ -64,13 +105,21 @@ static void InputEvent( input_thread_t *input, void *task_,
             atomic_store( &task->done, true );
             background_worker_RequestProbe( task->preparser->worker );
             break;
+        case INPUT_EVENT_SUBITEMS:
+        {
+            input_preparser_req_t *req = task->req;
+            if (req->cbs && req->cbs->on_subtree_added)
+                req->cbs->on_subtree_added(req->item, event->subitems, req->userdata);
+            break;
+        }
         default: ;
     }
 }
 
-static int PreparserOpenInput( void* preparser_, void* item_, void** out )
+static int PreparserOpenInput( void* preparser_, void* req_, void** out )
 {
     input_preparser_t* preparser = preparser_;
+    input_preparser_req_t *req = req_;
     input_preparser_task_t* task = malloc( sizeof *task );
 
     if( unlikely( !task ) )
@@ -81,9 +130,11 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 
     task->preparser = preparser_;
     task->input = input_CreatePreparser( preparser->owner, InputEvent,
-                                         task, item_ );
+                                         task, req->item );
     if( !task->input )
         goto error;
+
+    task->req = req;
 
     if( input_Start( task->input ) )
     {
@@ -97,7 +148,10 @@ static int PreparserOpenInput( void* preparser_, void* item_, void** out )
 
 error:
     free( task );
-    input_item_SignalPreparseEnded( item_, ITEM_PREPARSE_FAILED );
+    /* TODO remove legacy input_item_SignalPreparseEnded() */
+    input_item_SignalPreparseEnded(req->item, ITEM_PREPARSE_FAILED);
+    if (req->cbs && req->cbs->on_preparse_ended)
+        req->cbs->on_preparse_ended(req->item, ITEM_PREPARSE_FAILED, req->userdata);
     return VLC_EGENERIC;
 }
 
@@ -111,6 +165,7 @@ static int PreparserProbeInput( void* preparser_, void* task_ )
 static void PreparserCloseInput( void* preparser_, void* task_ )
 {
     input_preparser_task_t* task = task_;
+    input_preparser_req_t *req = task->req;
 
     input_preparser_t* preparser = preparser_;
     input_thread_t* input = task->input;
@@ -141,11 +196,14 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
     }
 
     input_item_SetPreparsed( item, true );
+    /* TODO remove legacy input_item_SignalPreparseEnded() */
     input_item_SignalPreparseEnded( item, status );
+    if (req->cbs && req->cbs->on_preparse_ended)
+        req->cbs->on_preparse_ended(req->item, status, req->userdata);
 }
 
-static void InputItemRelease( void* item ) { input_item_Release( item ); }
-static void InputItemHold( void* item ) { input_item_Hold( item ); }
+static void ReqHoldVoid(void *item) { ReqHold(item); }
+static void ReqReleaseVoid(void *item) { ReqRelease(item); }
 
 input_preparser_t* input_preparser_New( vlc_object_t *parent )
 {
@@ -157,8 +215,9 @@ input_preparser_t* input_preparser_New( vlc_object_t *parent )
         .pf_start = PreparserOpenInput,
         .pf_probe = PreparserProbeInput,
         .pf_stop = PreparserCloseInput,
-        .pf_release = InputItemRelease,
-        .pf_hold = InputItemHold };
+        .pf_release = ReqReleaseVoid,
+        .pf_hold = ReqHoldVoid
+    };
 
 
     if( likely( preparser ) )
@@ -182,6 +241,7 @@ input_preparser_t* input_preparser_New( vlc_object_t *parent )
 
 void input_preparser_Push( input_preparser_t *preparser,
     input_item_t *item, input_item_meta_request_option_t i_options,
+    const input_preparser_callbacks_t *cbs, void *cbs_userdata,
     int timeout, void *id )
 {
     if( atomic_load( &preparser->deactivated ) )
@@ -202,12 +262,24 @@ void input_preparser_Push( input_preparser_t *preparser,
                 break;
             /* fallthrough */
         default:
+            /* TODO remove legacy input_item_SignalPreparseEnded() */
             input_item_SignalPreparseEnded( item, ITEM_PREPARSE_SKIPPED );
+            if (cbs && cbs->on_preparse_ended)
+                cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
             return;
     }
 
-    if( background_worker_Push( preparser->worker, item, id, timeout ) )
+    struct input_preparser_req_t *req = ReqCreate(item, cbs, cbs_userdata);
+
+    if (background_worker_Push(preparser->worker, req, id, timeout))
+    {
+        /* TODO remove legacy input_item_SignalPreparseEnded() */
         input_item_SignalPreparseEnded( item, ITEM_PREPARSE_FAILED );
+        if (req->cbs && cbs->on_preparse_ended)
+            cbs->on_preparse_ended(item, ITEM_PREPARSE_FAILED, cbs_userdata);
+    }
+
+    ReqRelease(req);
 }
 
 void input_preparser_fetcher_Push( input_preparser_t *preparser,
