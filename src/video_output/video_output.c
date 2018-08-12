@@ -137,13 +137,17 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p->dpb_size = cfg->dpb_size;
     vout->p->mouse_event = cfg->mouse_event;
     vout->p->opaque = cfg->opaque;
+    vout->p->dead = false;
+    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
+    vout->p->pause.is_on = false;
+    vout->p->pause.date = VLC_TICK_INVALID;
 
     vout_control_Init(&vout->p->control);
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
 
     vout_statistic_Init(&vout->p->statistic);
-
     vout_snapshot_Init(&vout->p->snapshot);
+    vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
 
     /* Initialize locks */
     vlc_mutex_init(&vout->p->filter.lock);
@@ -1583,16 +1587,6 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
         vout->p->mouse_event(NULL, vout->p->opaque);
 }
 
-static void ThreadInit(vout_thread_t *vout)
-{
-    vout->p->dead            = false;
-    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
-    vout->p->pause.is_on     = false;
-    vout->p->pause.date      = VLC_TICK_INVALID;
-
-    vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
-}
-
 static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
@@ -1674,7 +1668,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_INIT:
-        ThreadInit(vout);
         if (ThreadStart(vout, NULL))
             return 1;
         break;
