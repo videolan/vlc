@@ -273,6 +273,8 @@ void vout_Close(vout_thread_t *vout)
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
     vlc_join(vout->p->thread, NULL);
 
+    vout_chrono_Clean(&vout->p->render);
+
     if (vout->p->window != NULL)
         vout_display_window_Delete(vout->p->window);
 
@@ -1591,13 +1593,6 @@ static void ThreadInit(vout_thread_t *vout)
     vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
 }
 
-static void ThreadClean(vout_thread_t *vout)
-{
-    vout_chrono_Clean(&vout->p->render);
-    vout->p->dead = true;
-    vout_control_Dead(&vout->p->control);
-}
-
 static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
@@ -1618,7 +1613,6 @@ static int ThreadReinit(vout_thread_t *vout,
 
     if (VoutValidateFormat(&original, cfg->fmt)) {
         ThreadStop(vout, NULL);
-        ThreadClean(vout);
         return VLC_EGENERIC;
     }
 
@@ -1665,10 +1659,9 @@ static int ThreadReinit(vout_thread_t *vout,
 
     vout->p->original = original;
     vout->p->dpb_size = cfg->dpb_size;
-    if (ThreadStart(vout, &state)) {
-        ThreadClean(vout);
+    if (ThreadStart(vout, &state))
         return VLC_EGENERIC;
-    }
+
     return VLC_SUCCESS;
 }
 
@@ -1683,14 +1676,10 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_INIT:
         ThreadInit(vout);
         if (ThreadStart(vout, NULL))
-        {
-            ThreadClean(vout);
             return 1;
-        }
         break;
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout, NULL);
-        ThreadClean(vout);
         return 1;
     case VOUT_CONTROL_REINIT:
         if (ThreadReinit(vout, cmd.cfg))
@@ -1808,7 +1797,7 @@ static void *Thread(void *object)
         }
         while (!vout_control_Pop(&sys->control, &cmd, deadline))
             if (ThreadControl(vout, cmd))
-                return NULL;
+                goto out;
 
         deadline = VLC_TICK_INVALID;
         wait = ThreadDisplayPicture(vout, &deadline) != VLC_SUCCESS;
@@ -1818,4 +1807,9 @@ static void *Thread(void *object)
         vout_SetInterlacingState(vout, picture_interlaced);
         vout_ManageWrapper(vout);
     }
+
+out:
+    vout->p->dead = true;
+    vout_control_Dead(&vout->p->control);
+    return NULL;
 }
