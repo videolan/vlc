@@ -703,12 +703,10 @@ static int DemuxOpen( vlc_object_t *p_this )
             /* Setup rgb mask for RGB formats */
             if( p_stream->i_fourcc == VLC_CODEC_RGB24 )
             {
-                /* This is in RGB format
-            http://msdn.microsoft.com/en-us/library/dd407253%28VS.85%29.aspx?ppud=4
-                 */
-                fmt.video.i_rmask = 0x00ff0000;
+                /* This is in BGR format */
+                fmt.video.i_bmask = 0x00ff0000;
                 fmt.video.i_gmask = 0x0000ff00;
-                fmt.video.i_bmask = 0x000000ff;
+                fmt.video.i_rmask = 0x000000ff;
             }
 
             if( p_stream->header.video.AvgTimePerFrame )
