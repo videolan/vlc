@@ -25,14 +25,31 @@
 #include <vlc_common.h>
 #include <vlc_media_library.h>
 #include <vlc_modules.h>
+#include <vlc_list.h>
+#include <vlc_threads.h>
 #include <libvlc.h>
 
 #include <assert.h>
 
+struct vlc_ml_event_callback_t
+{
+    vlc_ml_callback_t pf_cb;
+    void* p_data;
+    struct vlc_list node;
+};
+
 struct vlc_medialibrary_t
 {
     vlc_medialibrary_module_t m;
+
+    vlc_mutex_t lock;
+    struct vlc_list cbs;
 };
+
+static vlc_medialibrary_t* ml_priv( vlc_medialibrary_module_t* p_ml )
+{
+    return container_of( p_ml, struct vlc_medialibrary_t, m );
+}
 
 void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items )
 {
@@ -43,16 +60,60 @@ void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items 
     free( p_list );
 }
 
+static void vlc_ml_event_send( vlc_medialibrary_module_t* p_ml, const vlc_ml_event_t* p_event )
+{
+    vlc_medialibrary_t* p_priv = ml_priv( p_ml );
+    vlc_mutex_lock( &p_priv->lock );
+    struct vlc_ml_event_callback_t* p_cb;
+    vlc_list_foreach( p_cb, &p_priv->cbs, node )
+    {
+        p_cb->pf_cb( p_cb->p_data, p_event );
+    }
+    vlc_mutex_unlock( &p_priv->lock );
+}
+
+vlc_ml_event_callback_t*
+vlc_ml_event_register_callback( vlc_medialibrary_t* p_ml, vlc_ml_callback_t cb,
+                                void* p_data )
+{
+    struct vlc_ml_event_callback_t* p_cb = malloc( sizeof( *p_cb ) );
+    if ( unlikely( p_cb == NULL ) )
+        return NULL;
+    p_cb->pf_cb = cb;
+    p_cb->p_data = p_data;
+    vlc_mutex_lock( &p_ml->lock );
+    vlc_list_append( &p_cb->node, &p_ml->cbs );
+    vlc_mutex_unlock( &p_ml->lock );
+    return p_cb;
+}
+
+void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
+                                       vlc_ml_event_callback_t* p_cb )
+{
+    vlc_mutex_lock( &p_ml->lock );
+    vlc_list_remove( &p_cb->node );
+    vlc_mutex_unlock( &p_ml->lock );
+    free( p_cb );
+}
+
+static const vlc_medialibrary_callbacks_t callbacks = {
+    .pf_send_event = &vlc_ml_event_send
+};
+
 vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc  )
 {
     vlc_medialibrary_t *p_ml = vlc_custom_create( VLC_OBJECT( p_libvlc ),
                                                   sizeof( *p_ml ), "medialibrary" );
     if ( unlikely( p_ml == NULL ) )
         return NULL;
+    vlc_mutex_init( &p_ml->lock );
+    vlc_list_init( &p_ml->cbs );
+    p_ml->m.cbs = &callbacks;
     p_ml->m.p_module = module_need( &p_ml->m, "medialibrary", NULL, false );
     if ( p_ml->m.p_module == NULL )
     {
         vlc_object_release( &p_ml->m );
+        vlc_mutex_destroy( &p_ml->lock );
         return NULL;
     }
     return p_ml;
@@ -62,6 +123,8 @@ void libvlc_MlRelease( vlc_medialibrary_t* p_ml )
 {
     assert( p_ml != NULL );
     module_unneed( &p_ml->m, p_ml->m.p_module );
+    assert( vlc_list_is_empty( &p_ml->cbs ) );
+    vlc_mutex_destroy( &p_ml->lock );
     vlc_object_release( &p_ml->m );
 }
 

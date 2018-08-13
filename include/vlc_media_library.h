@@ -280,6 +280,8 @@ struct vlc_ml_entrypoint_t
 typedef struct vlc_medialibrary_t vlc_medialibrary_t;
 /* "Private" medialibrary pointer, to be used by the core & medialibrary modules */
 typedef struct vlc_medialibrary_module_t vlc_medialibrary_module_t;
+/* Opaque event callback type */
+typedef struct vlc_ml_event_callback_t vlc_ml_event_callback_t;
 
 typedef enum vlc_ml_sorting_criteria_t
 {
@@ -460,6 +462,181 @@ enum vlc_ml_playback_pref
     VLC_ML_PLAYBACK_PREF_APP_SPECIFIC,
 };
 
+enum vlc_ml_event_type
+{
+    /**
+     * Entity modification callbacks. The affected entity will be passed:
+     * - As a vlc_ml_<type>_t, depending on the type of the modified/inserted
+     * entity, in vlc_ml_event_t::modification::p_<type>
+     * for ADDED and UPDATED variants.
+     * - as an id, in vlc_ml_event_t::deletion::i_entity_id
+     * When _DELETED callbacks get invoked, the entity will already have been
+     * deleted from the database, and cannot be retrieved anymore
+     */
+    VLC_ML_EVENT_MEDIA_ADDED,
+    VLC_ML_EVENT_MEDIA_UPDATED,
+    VLC_ML_EVENT_MEDIA_DELETED,
+    VLC_ML_EVENT_ARTIST_ADDED,
+    VLC_ML_EVENT_ARTIST_UPDATED,
+    VLC_ML_EVENT_ARTIST_DELETED,
+    VLC_ML_EVENT_ALBUM_ADDED,
+    VLC_ML_EVENT_ALBUM_UPDATED,
+    VLC_ML_EVENT_ALBUM_DELETED,
+    VLC_ML_EVENT_PLAYLIST_ADDED,
+    VLC_ML_EVENT_PLAYLIST_UPDATED,
+    VLC_ML_EVENT_PLAYLIST_DELETED,
+    VLC_ML_EVENT_GENRE_ADDED,
+    VLC_ML_EVENT_GENRE_UPDATED,
+    VLC_ML_EVENT_GENRE_DELETED,
+    /**
+     * A discovery started.
+     * For each VLC_ML_EVENT_DISCOVERY_STARTED event, there will be
+     * 1 VLC_ML_EVENT_DISCOVERY_COMPLETED event, and N
+     * VLC_ML_EVENT_DISCOVERY_COMPLETED events.
+     * The entry point being discovered is stored in
+     * vlc_ml_event_t::discovery_started::psz_entry_point.
+     */
+    VLC_ML_EVENT_DISCOVERY_STARTED,
+    /**
+     * Sent when a discovery or reload operation starts analyzing a new folder.
+     * The discovered entry point is stored in
+     * vlc_ml_event_t::discovery_progress::psz_entry_point.
+     */
+    VLC_ML_EVENT_DISCOVERY_PROGRESS,
+    /**
+     * Sent when an entry point discovery is completed.
+     * The entry point that was being discovered is stored in
+     * vlc_ml_event_t::discovery_completed::psz_entry_point.
+     * The success or failure state is stored in
+     * vlc_ml_event_t::discovery_completed::b_success
+     */
+    VLC_ML_EVENT_DISCOVERY_COMPLETED,
+    /**
+     * An entry point reload operation started.
+     * For all the entry points being reloaded, N VLC_EVENT_DISCOVERY_PROGRESS
+     * and 1 VLC_EVENT_RELOAD_COMPLETED event will be sent.
+     * The entry point being reloaded is stored in
+     * vlc_ml_event_t::reload_started::psz_entry_point.
+     */
+    VLC_ML_EVENT_RELOAD_STARTED,
+    /**
+     * Sent when an entry point reload is completed.
+     * The entry point that was being reloaded is stored in
+     * vlc_ml_event_t::reload_completed::psz_entry_point.
+     * The success or failure state is stored in
+     * vlc_ml_event_t::reload_completed::b_success
+     */
+    VLC_ML_EVENT_RELOAD_COMPLETED,
+    /**
+     * Sent when an entry point removal request has been processed.
+     * The removed entry point is stored in
+     * vlc_ml_event_t::entry_point_removed::psz_entry_point and the success or failure
+     * state is stored in vlc_ml_event_t::entry_point_removed::b_success
+     */
+    VLC_ML_EVENT_ENTRY_POINT_REMOVED,
+    /**
+     * Sent when an entry point ban request has been processed.
+     * The banned entry point is stored in
+     * vlc_ml_event_t::entry_point_banned::psz_entry_point and the operation success
+     * state is stored in vlc_ml_event_t::entry_point_banned::b_success
+     */
+    VLC_ML_EVENT_ENTRY_POINT_BANNED,
+    /**
+     * Sent when an entry point unban request has been processed.
+     * The unbanned entry point is stored in
+     * vlc_ml_event_t::entry_point_unbanned::psz_entry_point and the operation success
+     * state is stored in vlc_ml_event_t::entry_point_unbanned::b_success
+     */
+    VLC_ML_EVENT_ENTRY_POINT_UNBANNED,
+    /**
+     * Sent when a discoverer or parser threads changes its idle state.
+     * The idle state is stored in vlc_ml_event_t::background_idle_changed.b_idle.
+     * False means at least one background thread is in running, true means
+     * both discoverer & parser threads are paused.
+     */
+    VLC_ML_EVENT_BACKGROUND_IDLE_CHANGED,
+    /**
+     * Sent when the parsing progress percentage gets updated.
+     * The percentage is stored as a [0;100] integer, in
+     * vlc_ml_event_t::parsing_progress::i_percent
+     * This value might decrease as more media get discovered, but it will only
+     * increase once all discovery operations are completed.
+     */
+    VLC_ML_EVENT_PARSING_PROGRESS_UPDATED,
+};
+
+typedef struct vlc_ml_event_t
+{
+    int i_type;
+    union
+    {
+        struct
+        {
+            const char* psz_entry_point;
+        } discovery_started;
+        struct
+        {
+            const char* psz_entry_point;
+        } discovery_progress;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
+        } discovery_completed;
+        struct
+        {
+            const char* psz_entry_point;
+        } reload_started;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
+        } reload_completed;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
+        } entry_point_removed;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
+        } entry_point_banned;
+        struct
+        {
+            const char* psz_entry_point;
+            bool b_success;
+        } entry_point_unbanned;
+        struct
+        {
+            uint8_t i_percent;
+        } parsing_progress;
+        union
+        {
+            const vlc_ml_media_t* p_media;
+            const vlc_ml_artist_t* p_artist;
+            const vlc_ml_album_t* p_album;
+            const vlc_ml_playlist_t* p_playlist;
+            const vlc_ml_genre_t* p_genre;
+        } modification;
+        struct
+        {
+            int64_t i_entity_id;
+        } deletion;
+        struct
+        {
+            bool b_idle;
+        } background_idle_changed;
+    };
+} vlc_ml_event_t;
+
+typedef void (*vlc_ml_callback_t)( void* p_data, const vlc_ml_event_t* p_event );
+
+typedef struct vlc_medialibrary_callbacks_t
+{
+    void (*pf_send_event)( vlc_medialibrary_module_t* p_ml, const vlc_ml_event_t* p_event );
+} vlc_medialibrary_callbacks_t;
+
 struct vlc_medialibrary_module_t
 {
     struct vlc_common_members obj;
@@ -493,6 +670,8 @@ struct vlc_medialibrary_module_t
      * Refer to the list of queries for the specific return type
      */
     void* (*pf_get)( struct vlc_medialibrary_module_t* p_ml, int i_query, int64_t i_id );
+
+    const vlc_medialibrary_callbacks_t* cbs;
 };
 
 vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc );
@@ -505,6 +684,22 @@ VLC_API void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id ) 
 VLC_API int vlc_ml_control( vlc_medialibrary_t* p_ml, int i_query, ... ) VLC_USED;
 VLC_API int vlc_ml_list( vlc_medialibrary_t* p_ml, int i_query,
                              const vlc_ml_query_params_t* p_params, ... );
+
+/**
+ * \brief Registers a medialibrary callback.
+ * \returns A handle to the callback, to be passed to vlc_ml_event_unregister_callback
+ */
+VLC_API vlc_ml_event_callback_t*
+vlc_ml_event_register_callback( vlc_medialibrary_t* p_ml, vlc_ml_callback_t cb, void* p_data );
+
+/**
+ * \brief Unregisters a medialibrary callback
+ * \param p_handle The handled returned by vlc_ml_register_callback
+ */
+VLC_API void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
+                                               vlc_ml_event_callback_t* p_callback );
+
+
 VLC_API void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items );
 
 VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );

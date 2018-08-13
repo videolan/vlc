@@ -596,6 +596,8 @@ vlc_ml_instance_get
 vlc_ml_get
 vlc_ml_control
 vlc_ml_list
+vlc_ml_event_register_callback
+vlc_ml_event_unregister_callback
 vlc_ml_entrypoints_release
 vlc_ml_show_release
 vlc_ml_artist_release
