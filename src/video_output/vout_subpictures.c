@@ -32,6 +32,7 @@
 
 #include <assert.h>
 #include <limits.h>
+#include <stdatomic.h>
 
 #include <vlc_common.h>
 #include <vlc_modules.h>
@@ -79,7 +80,7 @@ struct spu_private_t {
         int height;
     } crop;                                                  /**< cropping */
 
-    int     margin;                    /**< force position of a subpicture */
+    atomic_int margin;                 /**< force position of a subpicture */
     video_palette_t palette;              /**< force palette of subpicture */
 
     /* Subpiture filters */
@@ -704,7 +705,7 @@ static void SpuRenderRegion(spu_t *spu,
      * requested (dvd menu) */
     int y_margin = 0;
     if (!crop_requested && subpic->b_subtitle)
-        y_margin = spu_invscale_h(sys->margin, scale_size);
+        y_margin = spu_invscale_h(atomic_load(&sys->margin), scale_size);
 
     /* Place the picture
      * We compute the position in the rendered size */
@@ -1286,7 +1287,7 @@ spu_t *spu_Create(vlc_object_t *object, vout_thread_t *vout)
     sys->scale = NULL;
     sys->scale_yuvp = NULL;
 
-    sys->margin = var_InheritInteger(spu, "sub-margin");
+    atomic_init(&sys->margin, var_InheritInteger(spu, "sub-margin"));
 
     /* Register the default subpicture channel */
     sys->channel = VOUT_SPU_CHANNEL_AVAIL_FIRST;
@@ -1682,9 +1683,7 @@ void spu_ChangeMargin(spu_t *spu, int margin)
 {
     spu_private_t *sys = spu->p;
 
-    vlc_mutex_lock(&sys->lock);
-    sys->margin = margin;
-    vlc_mutex_unlock(&sys->lock);
+    atomic_store(&sys->margin, margin);
 }
 
 void spu_SetHighlight(spu_t *spu, const vlc_spu_highlight_t *hl)
