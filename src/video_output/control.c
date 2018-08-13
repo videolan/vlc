@@ -60,7 +60,7 @@ void vout_control_Init(vout_control_t *ctrl)
 
     ctrl->is_dead = false;
     ctrl->can_sleep = true;
-    ctrl->is_processing = false;
+    ctrl->is_processing = true;
     ARRAY_INIT(ctrl->cmd);
 }
 

@@ -143,8 +143,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout->p->pause.date = VLC_TICK_INVALID;
 
     vout_control_Init(&vout->p->control);
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_INIT);
-
     vout_statistic_Init(&vout->p->statistic);
     vout_snapshot_Init(&vout->p->snapshot);
     vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
@@ -1665,10 +1663,6 @@ static void ThreadCancel(vout_thread_t *vout, bool canceled)
 static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
-    case VOUT_CONTROL_INIT:
-        if (ThreadStart(vout, NULL))
-            return 1;
-        break;
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout, NULL);
         return 1;
@@ -1755,6 +1749,10 @@ static void *Thread(void *object)
 
     vlc_tick_t deadline = VLC_TICK_INVALID;
     bool wait = false;
+
+    if (ThreadStart(vout, NULL))
+        goto out;
+
     for (;;) {
         vout_control_cmd_t cmd;
 
