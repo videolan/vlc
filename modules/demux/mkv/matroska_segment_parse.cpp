@@ -555,6 +555,32 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoStereoMode, stereo ) // UNUSED
         {
+            vars.tk->fmt.video.b_multiview_right_eye_first = false;
+            switch (static_cast<uint8>( stereo ))
+            {
+            case 0: vars.tk->fmt.video.multiview_mode = MULTIVIEW_2D;         break;
+            case 1: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_SBS; break;
+            case 2: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_TB;  break;
+            case 3: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_TB;
+                    vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            case 4: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_CHECKERBOARD;
+                    vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            case 5: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_CHECKERBOARD; break;
+            case 6: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_ROW;
+                    vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            case 7: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_ROW; break;
+            case 8: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_COL;
+                    vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            case 9: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_COL; break;
+            case 11: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_SBS;
+                     vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            case 13: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_FRAME; break;
+            case 14: vars.tk->fmt.video.multiview_mode = MULTIVIEW_STEREO_FRAME;
+                    vars.tk->fmt.video.b_multiview_right_eye_first = true;    break;
+            default:
+            case 10: case 12:
+                debug( vars, " unsupported Stereo Mode=%u", static_cast<uint8>( stereo ) ) ;
+            }
             debug( vars, "Track Video Stereo Mode=%u", static_cast<uint8>( stereo ) ) ;
         }
         E_CASE( KaxVideoPixelWidth, vwidth )
