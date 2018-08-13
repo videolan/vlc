@@ -152,6 +152,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* Initialize locks */
     vlc_mutex_init(&vout->p->filter.lock);
     vlc_mutex_init(&vout->p->spu_lock);
+    vlc_mutex_init(&vout->p->window_lock);
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit(vout);
@@ -279,8 +280,12 @@ void vout_Close(vout_thread_t *vout)
 
     vout_chrono_Clean(&vout->p->render);
 
-    if (vout->p->window != NULL)
+    vlc_mutex_lock(&vout->p->window_lock);
+    if (vout->p->window != NULL) {
         vout_display_window_Delete(vout->p->window);
+        vout->p->window = NULL;
+    }
+    vlc_mutex_unlock(&vout->p->window_lock);
 
     vlc_mutex_lock(&vout->p->spu_lock);
     spu_Destroy(vout->p->spu);
@@ -299,6 +304,7 @@ static void VoutDestructor(vlc_object_t *object)
     free(vout->p->splitter_name);
 
     /* Destroy the locks */
+    vlc_mutex_destroy(&vout->p->window_lock);
     vlc_mutex_destroy(&vout->p->spu_lock);
     vlc_mutex_destroy(&vout->p->filter.lock);
     vout_control_Clean(&vout->p->control);
@@ -643,12 +649,15 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
 void vout_SetDisplayWindowSize(vout_thread_t *vout,
                                unsigned width, unsigned height)
 {
-    vout_window_t *window = vout->p->window;
+    vout_window_t *window;
 
+    vlc_mutex_lock(&vout->p->window_lock);
+    window = vout->p->window;
     if (window != NULL)
     /* Request a resize of the window. If it fails, there is nothing to do.
      * If it succeeds, the window will emit a resize event later. */
         vout_window_SetSize(window, width, height);
+    vlc_mutex_unlock(&vout->p->window_lock);
 }
 
 /* */

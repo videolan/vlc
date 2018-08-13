@@ -80,6 +80,7 @@ struct vout_thread_sys_t
 
     /* Video output window */
     vout_window_t   *window;
+    vlc_mutex_t     window_lock;
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
