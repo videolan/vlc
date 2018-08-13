@@ -71,7 +71,7 @@ void MediaLibrary::onMediaAdded( std::vector<medialibrary::MediaPtr> )
 {
 }
 
-void MediaLibrary::onMediaUpdated( std::vector<medialibrary::MediaPtr> )
+void MediaLibrary::onMediaModified( std::vector<medialibrary::MediaPtr> )
 {
 }
 
@@ -103,14 +103,6 @@ void MediaLibrary::onAlbumsDeleted( std::vector<int64_t> )
 {
 }
 
-void MediaLibrary::onTracksAdded( std::vector<medialibrary::AlbumTrackPtr> )
-{
-}
-
-void MediaLibrary::onTracksDeleted( std::vector<int64_t> )
-{
-}
-
 void MediaLibrary::onPlaylistsAdded( std::vector<medialibrary::PlaylistPtr> )
 {
 }
@@ -123,6 +115,18 @@ void MediaLibrary::onPlaylistsDeleted( std::vector<int64_t> )
 {
 }
 
+void MediaLibrary::onGenresAdded( std::vector<medialibrary::GenrePtr> )
+{
+}
+
+void MediaLibrary::onGenresModified( std::vector<medialibrary::GenrePtr> )
+{
+}
+
+void MediaLibrary::onGenresDeleted( std::vector<int64_t> )
+{
+}
+
 void MediaLibrary::onDiscoveryStarted( const std::string& )
 {
 }
@@ -131,7 +135,7 @@ void MediaLibrary::onDiscoveryProgress( const std::string& )
 {
 }
 
-void MediaLibrary::onDiscoveryCompleted( const std::string& )
+void MediaLibrary::onDiscoveryCompleted( const std::string&, bool )
 {
 }
 
@@ -139,7 +143,7 @@ void MediaLibrary::onReloadStarted( const std::string& )
 {
 }
 
-void MediaLibrary::onReloadCompleted( const std::string& )
+void MediaLibrary::onReloadCompleted(const std::string&, bool )
 {
 }
 
