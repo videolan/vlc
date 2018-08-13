@@ -395,6 +395,48 @@ typedef enum input_event_type_e
 #define VLC_INPUT_CAPABILITIES_REWINDABLE (1<<3)
 #define VLC_INPUT_CAPABILITIES_RECORDABLE (1<<4)
 
+struct vlc_input_event_position
+{
+    float percentage;
+    vlc_tick_t ms;
+};
+
+struct vlc_input_event_chapter
+{
+    int title;
+    int seekpoint;
+};
+
+struct vlc_input_event_program {
+    enum {
+        VLC_INPUT_PROGRAM_ADDED,
+        VLC_INPUT_PROGRAM_DELETED,
+        VLC_INPUT_PROGRAM_SELECTED,
+        VLC_INPUT_PROGRAM_SCRAMBLED,
+    } action;
+    int id;
+    union {
+        const char *title;
+        bool scrambled;
+    };
+};
+
+struct vlc_input_event_es {
+    enum {
+        VLC_INPUT_ES_ADDED,
+        VLC_INPUT_ES_DELETED,
+        VLC_INPUT_ES_SELECTED,
+        VLC_INPUT_ES_UNSELECTED,
+    } action;
+    const char *title;
+    const es_format_t *fmt;
+};
+
+struct vlc_input_event_signal {
+    float quality;
+    float strength;
+};
+
 struct vlc_input_event
 {
     input_event_type_e type;
@@ -407,51 +449,21 @@ struct vlc_input_event
         /* INPUT_EVENT_CAPABILITIES */
         int capabilities; /**< cf. VLC_INPUT_CAPABILITIES_* bitwise flags */
         /* INPUT_EVENT_POSITION */
-        struct {
-            float     percentage;
-            vlc_tick_t ms;
-        } position;
+        struct vlc_input_event_position position;
         /* INPUT_EVENT_LENGTH */
         vlc_tick_t length;
         /* INPUT_EVENT_TITLE */
         int title;
         /* INPUT_EVENT_CHAPTER */
-        struct {
-            int title;
-            int seekpoint;
-        } chapter;
+        struct vlc_input_event_chapter chapter;
         /* INPUT_EVENT_PROGRAM */
-        struct {
-            enum {
-                VLC_INPUT_PROGRAM_ADDED,
-                VLC_INPUT_PROGRAM_DELETED,
-                VLC_INPUT_PROGRAM_SELECTED,
-                VLC_INPUT_PROGRAM_SCRAMBLED,
-            } action;
-            int id;
-            union {
-                const char *title;
-                bool scrambled;
-            };
-        } program;
+        struct vlc_input_event_program program;
         /* INPUT_EVENT_ES */
-        struct {
-            enum {
-                VLC_INPUT_ES_ADDED,
-                VLC_INPUT_ES_DELETED,
-                VLC_INPUT_ES_SELECTED,
-                VLC_INPUT_ES_UNSELECTED,
-            } action;
-            const char *title;
-            const es_format_t *fmt;
-        } es;
+        struct vlc_input_event_es es;
         /* INPUT_EVENT_RECORD */
         bool record;
         /* INPUT_EVENT_SIGNAL */
-        struct {
-            float quality;
-            float strength;
-        } signal;
+        struct vlc_input_event_signal signal;
         /* INPUT_EVENT_AUDIO_DELAY */
         vlc_tick_t audio_delay;
         /* INPUT_EVENT_SUBTITLE_DELAY */
