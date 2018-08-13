@@ -685,8 +685,6 @@ static void CloseDisplay(vout_display_t *vd)
 
     if (sys->drm_fd)
         drmDropMaster(sys->drm_fd);
-
-    vlc_obj_free((vlc_object_t*)vd, sys);
 }
 
 
