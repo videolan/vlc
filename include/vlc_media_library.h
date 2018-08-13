@@ -401,6 +401,12 @@ enum vlc_ml_control
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entrypoint_t**); arg2: nb results(size_t*), res: can fail */
+    /**
+     * Reload a specific folder, or all.
+     * arg1: mrl (const char*), NULL to reload all folders
+     * res: can't fail
+     */
+    VLC_ML_RELOAD_FOLDER,
 
     /* Pause/resume background operations, such as media discovery & media analysis */
     VLC_ML_PAUSE_BACKGROUND,        /**< no args; can't fail */
@@ -552,6 +558,11 @@ static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
                                       vlc_ml_entrypoint_t** pp_entrypoints, size_t* p_nb_items )
 {
     return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints, p_nb_items );
+}
+
+static inline int vlc_ml_reload_folder( vlc_medialibrary_t* p_ml, const char* psz_mrl )
+{
+    return vlc_ml_control( p_ml, VLC_ML_RELOAD_FOLDER, psz_mrl );
 }
 
 static inline int vlc_ml_pause_background( vlc_medialibrary_t* p_ml )

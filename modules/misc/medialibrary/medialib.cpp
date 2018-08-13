@@ -309,6 +309,15 @@ int MediaLibrary::Control( int query, va_list args )
             *(va_arg( args, size_t*) ) = entryPoints.size();
             break;
         }
+        case VLC_ML_RELOAD_FOLDER:
+        {
+            auto mrl = va_arg( args, const char* );
+            if ( mrl == nullptr )
+                m_ml->reload();
+            else
+                m_ml->reload( mrl );
+            break;
+        }
         case VLC_ML_PAUSE_BACKGROUND:
             m_ml->pauseBackgroundOperations();
             break;
