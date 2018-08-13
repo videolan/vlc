@@ -29,6 +29,7 @@
 # define VLC_MEDIA_LIBRARY_H
 
 #include <assert.h>
+#include <vlc_common.h>
 
 # ifdef __cplusplus
 extern "C" {
