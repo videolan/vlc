@@ -53,3 +53,6 @@ BISON_URL=$(GNU)/bison/bison-$(BISON_VERSION).tar.xz
 
 FLEX_VERSION=2.6.4
 FLEX_URL=https://github.com/westes/flex/releases/download/v$(FLEX_VERSION)/flex-$(FLEX_VERSION).tar.gz
+
+MESON_VERSION=0.48.1
+MESON_URL=https://github.com/mesonbuild/meson/releases/download/$(MESON_VERSION)/meson-$(MESON_VERSION).tar.gz
