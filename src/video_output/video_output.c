@@ -370,7 +370,12 @@ void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
 void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 {
     assert(title);
-    vout_control_PushString(&vout->p->control, VOUT_CONTROL_OSD_TITLE, title);
+
+    if (!vout->p->title.show)
+        return;
+
+    vout_OSDText(vout, VOUT_SPU_CHANNEL_OSD, vout->p->title.position,
+                 VLC_TICK_FROM_MS(vout->p->title.timeout), title);
 }
 
 void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
@@ -1308,16 +1313,6 @@ static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
     spu_ClearChannel(vout->p->spu, channel);
 }
 
-static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
-{
-    if (!vout->p->title.show)
-        return;
-
-    vout_OSDText(vout, VOUT_SPU_CHANNEL_OSD,
-                 vout->p->title.position, VLC_TICK_FROM_MS(vout->p->title.timeout),
-                 string);
-}
-
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     assert(!vout->p->pause.is_on || !is_paused);
@@ -1690,9 +1685,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_FLUSH_SUBPICTURE:
         ThreadFlushSubpicture(vout, cmd.integer);
-        break;
-    case VOUT_CONTROL_OSD_TITLE:
-        ThreadDisplayOsdTitle(vout, cmd.string);
         break;
     case VOUT_CONTROL_CHANGE_FILTERS:
         ThreadChangeFilters(vout, NULL,

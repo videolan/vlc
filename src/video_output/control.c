@@ -43,7 +43,6 @@ void vout_control_cmd_Clean(vout_control_cmd_t *cmd)
         if (cmd->subpicture)
             subpicture_Delete(cmd->subpicture);
         break;
-    case VOUT_CONTROL_OSD_TITLE:
     case VOUT_CONTROL_CHANGE_FILTERS:
         free(cmd->string);
         break;

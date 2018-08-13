@@ -40,7 +40,6 @@ enum {
 #endif
     VOUT_CONTROL_SUBPICTURE,            /* subpicture */
     VOUT_CONTROL_FLUSH_SUBPICTURE,      /* integer */
-    VOUT_CONTROL_OSD_TITLE,             /* string */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
