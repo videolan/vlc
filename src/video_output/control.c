@@ -146,15 +146,6 @@ void vout_control_PushTime(vout_control_t *ctrl, int type, vlc_tick_t time)
     cmd.time = time;
     vout_control_Push(ctrl, &cmd);
 }
-void vout_control_PushMessage(vout_control_t *ctrl, int type, int channel, const char *string)
-{
-    vout_control_cmd_t cmd;
-
-    vout_control_cmd_Init(&cmd, type);
-    cmd.message.channel = channel;
-    cmd.message.string = strdup(string);
-    vout_control_Push(ctrl, &cmd);
-}
 void vout_control_PushPair(vout_control_t *ctrl, int type, int a, int b)
 {
     vout_control_cmd_t cmd;

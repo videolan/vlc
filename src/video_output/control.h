@@ -76,10 +76,6 @@ typedef struct {
             vlc_tick_t date;
         } pause;
         struct {
-            int channel;
-            char *string;
-        } message;
-        struct {
             unsigned left;
             unsigned top;
             unsigned right;
@@ -125,7 +121,6 @@ void vout_control_PushVoid(vout_control_t *, int type);
 void vout_control_PushBool(vout_control_t *, int type, bool boolean);
 void vout_control_PushInteger(vout_control_t *, int type, int integer);
 void vout_control_PushTime(vout_control_t *, int type, vlc_tick_t time);
-void vout_control_PushMessage(vout_control_t *, int type, int channel, const char *string);
 void vout_control_PushPair(vout_control_t *, int type, int a, int b);
 void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
