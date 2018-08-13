@@ -277,30 +277,6 @@ struct vlc_ml_entrypoint_t
 
 typedef struct vlc_medialibrary_t vlc_medialibrary_t;
 
-vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc );
-void libvlc_MlRelease( vlc_medialibrary_t* p_ml );
-
-VLC_API vlc_medialibrary_t* vlc_ml_get( vlc_object_t* p_obj ) VLC_USED;
-#define vlc_ml_get(x) vlc_ml_get( VLC_OBJECT(x) )
-
-VLC_API void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items );
-
-VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );
-VLC_API void vlc_ml_artist_release( vlc_ml_artist_t* p_artist );
-VLC_API void vlc_ml_genre_release( vlc_ml_genre_t* p_genre );
-VLC_API void vlc_ml_media_release( vlc_ml_media_t* p_media );
-VLC_API void vlc_ml_album_release( vlc_ml_album_t* p_album );
-VLC_API void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist );
-
-VLC_API void vlc_ml_label_list_release( vlc_ml_label_list_t* p_list );
-VLC_API void vlc_ml_file_list_release( vlc_ml_file_list_t* p_list );
-VLC_API void vlc_ml_artist_list_release( vlc_ml_artist_list_t* p_list );
-VLC_API void vlc_ml_media_list_release( vlc_ml_media_list_t* p_list );
-VLC_API void vlc_ml_album_list_release( vlc_ml_album_list_t* p_list );
-VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
-VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
-VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
-
 typedef enum vlc_ml_sorting_criteria_t
 {
     /*
@@ -332,50 +308,85 @@ struct vlc_ml_query_params_t
     bool b_desc;
 };
 
-static inline vlc_ml_query_params_t vlc_ml_query_params_create()
+enum vlc_ml_get_queries
 {
-    return (vlc_ml_query_params_t) {
-        .psz_pattern = NULL,
-        .i_nbResults = 0,
-        .i_offset = 0,
-        .i_sort = VLC_ML_SORTING_DEFAULT,
-        .b_desc = false
-    };
-}
+    VLC_ML_GET_MEDIA,           /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
+    VLC_ML_GET_ALBUM,           /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
+    VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
+    VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
+    VLC_ML_GET_SHOW,            /**< arg1: Show     ID; ret: vlc_ml_show_t*     */
+    VLC_ML_GET_PLAYLIST,        /**< arg1: Playlist ID; ret: vlc_ml_playlist_t* */
+};
 
-struct vlc_medialibrary_t
+enum vlc_ml_list_queries
 {
-    struct vlc_common_members obj;
+    /* General listing: */
 
-    module_t *p_module;
+    VLC_ML_LIST_VIDEOS,           /**< arg1 (out): vlc_ml_media_list_t**                            */
+    VLC_ML_COUNT_VIDEOS,          /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_AUDIOS,           /**< arg1 (out): vlc_ml_media_list_t**                            */
+    VLC_ML_COUNT_AUDIOS,          /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_ALBUMS,           /**< arg1 (out): vlc_ml_album_list_t**                            */
+    VLC_ML_COUNT_ALBUMS,          /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_GENRES,           /**< arg1 (out): vlc_ml_genre_list_t**                            */
+    VLC_ML_COUNT_GENRES,          /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_ARTISTS,          /**< arg1 bool: includeAll; arg2 (out): vlc_ml_genre_list_t**     */
+    VLC_ML_COUNT_ARTISTS,         /**< arg1 bool: includeAll; arg2 (out): size_t*                   */
+    VLC_ML_LIST_SHOWS,            /**< arg1 (out): vlc_ml_show_list_t**                             */
+    VLC_ML_COUNT_SHOWS,           /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_PLAYLISTS,        /**< arg1 (out): vlc_ml_playlist_list_t**                         */
+    VLC_ML_COUNT_PLAYLISTS,       /**< arg1 (out): size_t*                                          */
+    VLC_ML_LIST_HISTORY,          /**< arg1 (out): vlc_ml_media_list_t**                            */
+    VLC_ML_LIST_STREAM_HISTORY,   /**< arg1 (out): vlc_ml_media_list_t**                            */
 
-    void* p_sys;
+    /* Album specific listings */
+    VLC_ML_LIST_ALBUM_TRACKS,     /**< arg1: The album id. arg2 (out): vlc_ml_media_list_t**  */
+    VLC_ML_COUNT_ALBUM_TRACKS,    /**< arg1: The album id. arg2 (out): size_t*  */
+    VLC_ML_LIST_ALBUM_ARTISTS,    /**< arg1: The album id. arg2 (out): vlc_ml_album_list_t**  */
+    VLC_ML_COUNT_ALBUM_ARTISTS,    /**< arg1: The album id. arg2 (out): size_t*  */
 
-    int (*pf_control)( vlc_medialibrary_t* p_ml, int i_query, ... );
-    /**
-     * List some entities from the medialibrary.
-     *
-     * \param p_ml The medialibrary module instance.
-     * \param i_query The type search to be performed. \see vlc_ml_list enumeration
-     * \param p_params A pointer to a vlc_ml_query_params_t structure, or NULL for
-     * the default parameters (alphabetical ascending sort, no pagination)
-     *
-     * \return VLC_SUCCESS or an error code
-     *
-     * Refer to the individual list of vlc_ml_list requests for the additional
-     * per-query input/ouput parameters values & types
-     */
-    int (*pf_list)( vlc_medialibrary_t* p_ml, int i_query,
-                    const vlc_ml_query_params_t* p_params, ... );
+    /* Artist specific listings */
+    VLC_ML_LIST_ARTIST_ALBUMS,  /**< arg1: The artist id. arg2(out): vlc_ml_album_list_t**    */
+    VLC_ML_COUNT_ARTIST_ALBUMS, /**< arg1: The artist id. arg2(out): size_t*              */
+    VLC_ML_LIST_ARTIST_TRACKS,  /**< arg1: The artist id. arg2(out): vlc_ml_media_list_t**    */
+    VLC_ML_COUNT_ARTIST_TRACKS, /**< arg1: The artist id. arg2(out): size_t*              */
 
-    /**
-     * Get a specific entity by its id.
-     *
-     * \return The required entity, or a NULL pointer if couldn't be found.
-     *
-     * Refer to the list of queries for the specific return type
-     */
-    void* (*pf_get)( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id );
+    /* Genre specific listings */
+    VLC_ML_LIST_GENRE_ARTISTS,    /**< arg1: genre id;  arg2 (out): vlc_ml_artist_list_t**  */
+    VLC_ML_COUNT_GENRE_ARTISTS,   /**< arg1: genre id;  arg2 (out): size_t*             */
+    VLC_ML_LIST_GENRE_TRACKS,     /**< arg1: genre id;  arg2 (out): vlc_ml_media_list_t**   */
+    VLC_ML_COUNT_GENRE_TRACKS,    /**< arg1: genre id;  arg2 (out): size_t*             */
+    VLC_ML_LIST_GENRE_ALBUMS,     /**< arg1: genre id;  arg2 (out): vlc_ml_album_list_t**   */
+    VLC_ML_COUNT_GENRE_ALBUMS,    /**< arg1: genre id;  arg2 (out): size_t*             */
+
+    /* Show specific listings */
+    VLC_ML_LIST_SHOW_EPISODES,    /**< arg1: show id; arg2(out): vlc_ml_media_list_t**  */
+    VLC_ML_COUNT_SHOW_EPISODES,   /**< arg1: show id; arg2(out): size_t*                */
+
+    /* Media specific listings */
+    VLC_ML_LIST_MEDIA_LABELS,     /**< arg1: media id;  arg2 (out): vlc_ml_label_list_t**    */
+    VLC_ML_COUNT_MEDIA_LABELS,    /**< arg1: media id;  arg2 (out): size_t*              */
+
+    /* Playlist specific listings */
+    VLC_ML_LIST_PLAYLIST_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t** */
+    VLC_ML_COUNT_PLAYLIST_MEDIA,  /**< arg1: playlist id; arg2 (out): size_t* */
+
+    /* Children entities listing */
+    VLC_ML_LIST_MEDIA_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_media_list_t* */
+    VLC_ML_COUNT_MEDIA_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
+    VLC_ML_LIST_ARTISTS_OF,       /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_artist_list_t* */
+    VLC_ML_COUNT_ARTISTS_OF,      /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
+    VLC_ML_LIST_ALBUMS_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_album_list_t* */
+    VLC_ML_COUNT_ALBUMS_OF,       /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
+};
+
+enum vlc_ml_parent_type
+{
+    VLC_ML_PARENT_ALBUM,
+    VLC_ML_PARENT_ARTIST,
+    VLC_ML_PARENT_SHOW,
+    VLC_ML_PARENT_GENRE,
+    VLC_ML_PARENT_PLAYLIST,
 };
 
 enum vlc_ml_control
@@ -438,6 +449,76 @@ enum vlc_ml_playback_pref
     VLC_ML_PLAYBACK_PREF_SUBTITLE_DELAY,
     VLC_ML_PLAYBACK_PREF_APP_SPECIFIC,
 };
+
+struct vlc_medialibrary_t
+{
+    struct vlc_common_members obj;
+
+    module_t *p_module;
+
+    void* p_sys;
+
+    int (*pf_control)( vlc_medialibrary_t* p_ml, int i_query, ... );
+    /**
+     * List some entities from the medialibrary.
+     *
+     * \param p_ml The medialibrary module instance.
+     * \param i_query The type search to be performed. \see vlc_ml_list enumeration
+     * \param p_params A pointer to a vlc_ml_query_params_t structure, or NULL for
+     * the default parameters (alphabetical ascending sort, no pagination)
+     *
+     * \return VLC_SUCCESS or an error code
+     *
+     * Refer to the individual list of vlc_ml_list requests for the additional
+     * per-query input/ouput parameters values & types
+     */
+    int (*pf_list)( vlc_medialibrary_t* p_ml, int i_query,
+                    const vlc_ml_query_params_t* p_params, ... );
+
+    /**
+     * Get a specific entity by its id.
+     *
+     * \return The required entity, or a NULL pointer if couldn't be found.
+     *
+     * Refer to the list of queries for the specific return type
+     */
+    void* (*pf_get)( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id );
+};
+
+vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc );
+void libvlc_MlRelease( vlc_medialibrary_t* p_ml );
+
+VLC_API vlc_medialibrary_t* vlc_ml_get( vlc_object_t* p_obj ) VLC_USED;
+#define vlc_ml_get(x) vlc_ml_get( VLC_OBJECT(x) )
+
+VLC_API void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items );
+
+VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );
+VLC_API void vlc_ml_artist_release( vlc_ml_artist_t* p_artist );
+VLC_API void vlc_ml_genre_release( vlc_ml_genre_t* p_genre );
+VLC_API void vlc_ml_media_release( vlc_ml_media_t* p_media );
+VLC_API void vlc_ml_album_release( vlc_ml_album_t* p_album );
+VLC_API void vlc_ml_playlist_release( vlc_ml_playlist_t* p_playlist );
+
+VLC_API void vlc_ml_label_list_release( vlc_ml_label_list_t* p_list );
+VLC_API void vlc_ml_file_list_release( vlc_ml_file_list_t* p_list );
+VLC_API void vlc_ml_artist_list_release( vlc_ml_artist_list_t* p_list );
+VLC_API void vlc_ml_media_list_release( vlc_ml_media_list_t* p_list );
+VLC_API void vlc_ml_album_list_release( vlc_ml_album_list_t* p_list );
+VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
+VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
+VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
+
+static inline vlc_ml_query_params_t vlc_ml_query_params_create()
+{
+    return (vlc_ml_query_params_t) {
+        .psz_pattern = NULL,
+        .i_nbResults = 0,
+        .i_offset = 0,
+        .i_sort = VLC_ML_SORTING_DEFAULT,
+        .b_desc = false
+    };
+}
 
 static inline int vlc_ml_add_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
 {
@@ -522,16 +603,6 @@ static inline int vlc_ml_media_add_external_mrl( vlc_medialibrary_t* p_ml, int64
     return p_ml->pf_control( p_ml, VLC_ML_MEDIA_ADD_EXTERNAL_MRL, i_media_id, psz_mrl, i_type );
 }
 
-enum vlc_ml_get_queries
-{
-    VLC_ML_GET_MEDIA,           /**< arg1: Media    ID; ret: vlc_ml_media_t*    */
-    VLC_ML_GET_ALBUM,           /**< arg1: Album    ID; ret: vlc_ml_album_t*    */
-    VLC_ML_GET_ARTIST,          /**< arg1: Artist   ID; ret: vlc_ml_artist_t*   */
-    VLC_ML_GET_GENRE,           /**< arg1: Genre    ID; ret: vlc_ml_genre_t*    */
-    VLC_ML_GET_SHOW,            /**< arg1: Show     ID; ret: vlc_ml_show_t*     */
-    VLC_ML_GET_PLAYLIST,        /**< arg1: Playlist ID; ret: vlc_ml_playlist_t* */
-};
-
 static inline vlc_ml_media_t* vlc_ml_get_media( vlc_medialibrary_t* p_ml, int64_t i_media_id )
 {
     return (vlc_ml_media_t*)p_ml->pf_get( p_ml, VLC_ML_GET_MEDIA, i_media_id );
@@ -561,77 +632,6 @@ static inline vlc_ml_playlist_t* vlc_ml_get_playlist( vlc_medialibrary_t* p_ml, 
 {
     return (vlc_ml_playlist_t*)p_ml->pf_get( p_ml, VLC_ML_GET_PLAYLIST, i_playlist_id );
 }
-
-enum vlc_ml_list_queries
-{
-    /* General listing: */
-
-    VLC_ML_LIST_VIDEOS,           /**< arg1 (out): vlc_ml_media_list_t**                            */
-    VLC_ML_COUNT_VIDEOS,          /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_AUDIOS,           /**< arg1 (out): vlc_ml_media_list_t**                            */
-    VLC_ML_COUNT_AUDIOS,          /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_ALBUMS,           /**< arg1 (out): vlc_ml_album_list_t**                            */
-    VLC_ML_COUNT_ALBUMS,          /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_GENRES,           /**< arg1 (out): vlc_ml_genre_list_t**                            */
-    VLC_ML_COUNT_GENRES,          /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_ARTISTS,          /**< arg1 bool: includeAll; arg2 (out): vlc_ml_genre_list_t**     */
-    VLC_ML_COUNT_ARTISTS,         /**< arg1 bool: includeAll; arg2 (out): size_t*                   */
-    VLC_ML_LIST_SHOWS,            /**< arg1 (out): vlc_ml_show_list_t**                             */
-    VLC_ML_COUNT_SHOWS,           /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_PLAYLISTS,        /**< arg1 (out): vlc_ml_playlist_list_t**                         */
-    VLC_ML_COUNT_PLAYLISTS,       /**< arg1 (out): size_t*                                          */
-    VLC_ML_LIST_HISTORY,          /**< arg1 (out): vlc_ml_media_list_t**                            */
-    VLC_ML_LIST_STREAM_HISTORY,   /**< arg1 (out): vlc_ml_media_list_t**                            */
-
-    /* Album specific listings */
-    VLC_ML_LIST_ALBUM_TRACKS,     /**< arg1: The album id. arg2 (out): vlc_ml_media_list_t**  */
-    VLC_ML_COUNT_ALBUM_TRACKS,    /**< arg1: The album id. arg2 (out): size_t*  */
-    VLC_ML_LIST_ALBUM_ARTISTS,    /**< arg1: The album id. arg2 (out): vlc_ml_album_list_t**  */
-    VLC_ML_COUNT_ALBUM_ARTISTS,    /**< arg1: The album id. arg2 (out): size_t*  */
-
-    /* Artist specific listings */
-    VLC_ML_LIST_ARTIST_ALBUMS,  /**< arg1: The artist id. arg2(out): vlc_ml_album_list_t**    */
-    VLC_ML_COUNT_ARTIST_ALBUMS, /**< arg1: The artist id. arg2(out): size_t*              */
-    VLC_ML_LIST_ARTIST_TRACKS,  /**< arg1: The artist id. arg2(out): vlc_ml_media_list_t**    */
-    VLC_ML_COUNT_ARTIST_TRACKS, /**< arg1: The artist id. arg2(out): size_t*              */
-
-    /* Genre specific listings */
-    VLC_ML_LIST_GENRE_ARTISTS,    /**< arg1: genre id;  arg2 (out): vlc_ml_artist_list_t**  */
-    VLC_ML_COUNT_GENRE_ARTISTS,   /**< arg1: genre id;  arg2 (out): size_t*             */
-    VLC_ML_LIST_GENRE_TRACKS,     /**< arg1: genre id;  arg2 (out): vlc_ml_media_list_t**   */
-    VLC_ML_COUNT_GENRE_TRACKS,    /**< arg1: genre id;  arg2 (out): size_t*             */
-    VLC_ML_LIST_GENRE_ALBUMS,     /**< arg1: genre id;  arg2 (out): vlc_ml_album_list_t**   */
-    VLC_ML_COUNT_GENRE_ALBUMS,    /**< arg1: genre id;  arg2 (out): size_t*             */
-
-    /* Show specific listings */
-    VLC_ML_LIST_SHOW_EPISODES,    /**< arg1: show id; arg2(out): vlc_ml_media_list_t**  */
-    VLC_ML_COUNT_SHOW_EPISODES,   /**< arg1: show id; arg2(out): size_t*                */
-
-    /* Media specific listings */
-    VLC_ML_LIST_MEDIA_LABELS,     /**< arg1: media id;  arg2 (out): vlc_ml_label_list_t**    */
-    VLC_ML_COUNT_MEDIA_LABELS,    /**< arg1: media id;  arg2 (out): size_t*              */
-
-    /* Playlist specific listings */
-    VLC_ML_LIST_PLAYLIST_MEDIA,   /**< arg1: playlist id; arg2 (out): vlc_ml_media_list_t** */
-    VLC_ML_COUNT_PLAYLIST_MEDIA,  /**< arg1: playlist id; arg2 (out): size_t* */
-
-    /* Children entities listing */
-    VLC_ML_LIST_MEDIA_OF,         /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_media_list_t* */
-    VLC_ML_COUNT_MEDIA_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
-    VLC_ML_LIST_ARTISTS_OF,       /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_artist_list_t* */
-    VLC_ML_COUNT_ARTISTS_OF,      /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
-    VLC_ML_LIST_ALBUMS_OF,        /**< arg1: parent entity type; arg2: parent entity id; arg3(out): ml_album_list_t* */
-    VLC_ML_COUNT_ALBUMS_OF,       /**< arg1: parent entity type; arg2: parent entity id; arg3(out): size_t* */
-};
-
-enum vlc_ml_parent_type
-{
-    VLC_ML_PARENT_ALBUM,
-    VLC_ML_PARENT_ARTIST,
-    VLC_ML_PARENT_SHOW,
-    VLC_ML_PARENT_GENRE,
-    VLC_ML_PARENT_PLAYLIST,
-};
 
 static inline vlc_ml_media_list_t* vlc_ml_list_media_of( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int i_parent_type, int64_t i_parent_id )
 {
