@@ -601,20 +601,29 @@ void vout_ControlChangeFilters(vout_thread_t *vout, const char *filters)
     vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_FILTERS,
                             filters);
 }
+
 void vout_ControlChangeSubSources(vout_thread_t *vout, const char *filters)
 {
-    vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_SOURCES,
-                            filters);
+    vlc_mutex_lock(&vout->p->spu_lock);
+    if (likely(vout->p->spu != NULL))
+        spu_ChangeSources(vout->p->spu, filters);
+    vlc_mutex_unlock(&vout->p->spu_lock);
 }
+
 void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
 {
-    vout_control_PushString(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_FILTERS,
-                            filters);
+    vlc_mutex_lock(&vout->p->spu_lock);
+    if (likely(vout->p->spu != NULL))
+        spu_ChangeFilters(vout->p->spu, filters);
+    vlc_mutex_unlock(&vout->p->spu_lock);
 }
+
 void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
 {
-    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_CHANGE_SUB_MARGIN,
-                             margin);
+    vlc_mutex_lock(&vout->p->spu_lock);
+    if (likely(vout->p->spu != NULL))
+        spu_ChangeMargin(vout->p->spu, margin);
+    vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
 void vout_ControlChangeViewpoint(vout_thread_t *vout,
@@ -1309,21 +1318,6 @@ static void ThreadDisplayOsdTitle(vout_thread_t *vout, const char *string)
                  string);
 }
 
-static void ThreadChangeSubSources(vout_thread_t *vout, const char *filters)
-{
-    spu_ChangeSources(vout->p->spu, filters);
-}
-
-static void ThreadChangeSubFilters(vout_thread_t *vout, const char *filters)
-{
-    spu_ChangeFilters(vout->p->spu, filters);
-}
-
-static void ThreadChangeSubMargin(vout_thread_t *vout, int margin)
-{
-    spu_ChangeMargin(vout->p->spu, margin);
-}
-
 static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     assert(!vout->p->pause.is_on || !is_paused);
@@ -1709,15 +1703,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
                             cmd.boolean ? 1 : 0, false);
-        break;
-    case VOUT_CONTROL_CHANGE_SUB_SOURCES:
-        ThreadChangeSubSources(vout, cmd.string);
-        break;
-    case VOUT_CONTROL_CHANGE_SUB_FILTERS:
-        ThreadChangeSubFilters(vout, cmd.string);
-        break;
-    case VOUT_CONTROL_CHANGE_SUB_MARGIN:
-        ThreadChangeSubMargin(vout, cmd.integer);
         break;
     case VOUT_CONTROL_PAUSE:
         ThreadChangePause(vout, cmd.pause.is_on, cmd.pause.date);
