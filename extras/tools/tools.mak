@@ -397,6 +397,25 @@ CLEAN_PKG += gettext
 DISTCLEAN_PKG += gettext-$(GETTEXT_VERSION).tar.gz
 CLEAN_FILE += .buildgettext
 
+#
+# meson build
+#
+
+meson-$(MESON_VERSION).tar.gz:
+	$(call download_pkg,$(MESON_URL),meson)
+
+meson: meson-$(MESON_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.buildmeson: meson
+	printf "#!/bin/sh\n\npython3 $(abspath .)/meson/meson.py \"\$$@\"\n" >> $(PREFIX)/bin/meson
+	chmod +x $(PREFIX)/bin/meson
+	touch $@
+
+CLEAN_PKG += meson
+DISTCLEAN_PKG += meson-$(MESON_VERSION).tar.gz
+CLEAN_FILE += .buildmeson
 
 #
 #
