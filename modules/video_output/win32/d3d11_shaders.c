@@ -585,6 +585,18 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     return hr;
 }
 
+void D3D11_ReleasePixelShader(d3d_quad_t *quad)
+{
+    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
+    {
+        if (quad->d3dpixelShader[i])
+        {
+            ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
+            quad->d3dpixelShader[i] = NULL;
+        }
+    }
+}
+
 #undef D3D11_CompileShader
 ID3DBlob* D3D11_CompileShader(vlc_object_t *obj, const d3d11_handle_t *hd3d, const d3d11_device_t *d3d_dev,
                               const char *psz_shader, bool pixel)

@@ -1527,14 +1527,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
                                       &sys->regionQuad);
         if (FAILED(hr))
         {
-            for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-            {
-                if (sys->picQuad.d3dpixelShader[i])
-                {
-                    ID3D11PixelShader_Release(sys->picQuad.d3dpixelShader[i]);
-                    sys->picQuad.d3dpixelShader[i] = NULL;
-                }
-            }
+            D3D11_ReleasePixelShader(&sys->picQuad);
             msg_Err(vd, "Failed to create the SPU pixel shader. (hr=0x%lX)", hr);
             return VLC_EGENERIC;
         }
@@ -1582,16 +1575,12 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
     D3D11_ReleaseVertexShader(&sys->flatVShader);
     D3D11_ReleaseVertexShader(&sys->projectionVShader);
 
+    D3D11_ReleasePixelShader(&sys->regionQuad);
     for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
     {
         if (sys->swapchainTargetView[i]) {
             ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
             sys->swapchainTargetView[i] = NULL;
-        }
-        if (sys->regionQuad.d3dpixelShader[i])
-        {
-            ID3D11PixelShader_Release(sys->regionQuad.d3dpixelShader[i]);
-            sys->regionQuad.d3dpixelShader[i] = NULL;
         }
     }
 

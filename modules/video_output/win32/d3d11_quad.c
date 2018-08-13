@@ -176,14 +176,7 @@ void D3D11_ReleaseQuad(d3d_quad_t *quad)
         ID3D11Buffer_Release(quad->pVertexShaderConstants);
         quad->pVertexShaderConstants = NULL;
     }
-    for (size_t i=0; i<D3D11_MAX_SHADER_VIEW; i++)
-    {
-        if (quad->d3dpixelShader[i])
-        {
-            ID3D11PixelShader_Release(quad->d3dpixelShader[i]);
-            quad->d3dpixelShader[i] = NULL;
-        }
-    }
+    D3D11_ReleasePixelShader(quad);
     for (size_t i=0; i<2; i++)
     {
         if (quad->d3dsampState[i])
