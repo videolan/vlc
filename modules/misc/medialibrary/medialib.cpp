@@ -171,7 +171,7 @@ void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr, bool )
 {
 }
 
-MediaLibrary::MediaLibrary( vlc_medialibrary_t* ml )
+MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
     : m_vlc_ml( ml )
 {
 }
@@ -1148,36 +1148,28 @@ int MediaLibrary::listPlaylist( int listQuery, const medialibrary::QueryParamete
     }
 }
 
-static void* Get( vlc_medialibrary_t* module, int query, int64_t id )
+static void* Get( vlc_medialibrary_module_t* module, int query, int64_t id )
 {
     auto ml = static_cast<MediaLibrary*>( module->p_sys );
     return ml->Get( query, id );
 }
 
-static int List( vlc_medialibrary_t* module, int query,
-                   const vlc_ml_query_params_t* params, ... )
+static int List( vlc_medialibrary_module_t* module, int query,
+                   const vlc_ml_query_params_t* params, va_list args )
 {
-    va_list args;
-    va_start( args, params );
     auto ml = static_cast<MediaLibrary*>( module->p_sys );
-    auto res = ml->List( query, params, args );
-    va_end( args );
-    return res;
+    return ml->List( query, params, args );
 }
 
-static int Control( vlc_medialibrary_t* module, int query, ... )
+static int Control( vlc_medialibrary_module_t* module, int query, va_list args )
 {
-    va_list args;
-    va_start( args, query );
     auto ml = static_cast<MediaLibrary*>( module->p_sys );
-    int res = ml->Control( query, args );
-    va_end( args );
-    return res;
+    return ml->Control( query, args );
 }
 
 static int Open( vlc_object_t* obj )
 {
-    vlc_medialibrary_t* p_ml = reinterpret_cast<vlc_medialibrary_t*>( obj );
+    auto* p_ml = reinterpret_cast<vlc_medialibrary_module_t*>( obj );
 
     try
     {
@@ -1194,7 +1186,7 @@ static int Open( vlc_object_t* obj )
     return VLC_SUCCESS;
 }
 
-static void Close( vlc_medialibrary_t* module )
+static void Close( vlc_medialibrary_module_t* module )
 {
     MediaLibrary* p_ml = static_cast<MediaLibrary*>( module->p_sys );
     delete p_ml;

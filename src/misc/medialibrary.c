@@ -29,6 +29,11 @@
 
 #include <assert.h>
 
+struct vlc_medialibrary_t
+{
+    vlc_medialibrary_module_t m;
+};
+
 void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items )
 {
     for ( size_t i = 0; i < i_nb_items; ++i )
@@ -44,10 +49,10 @@ vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc  )
                                                   sizeof( *p_ml ), "medialibrary" );
     if ( unlikely( p_ml == NULL ) )
         return NULL;
-    p_ml->p_module = module_need( p_ml, "medialibrary", NULL, false );
-    if ( p_ml->p_module == NULL )
+    p_ml->m.p_module = module_need( &p_ml->m, "medialibrary", NULL, false );
+    if ( p_ml->m.p_module == NULL )
     {
-        vlc_object_release( p_ml );
+        vlc_object_release( &p_ml->m );
         return NULL;
     }
     return p_ml;
@@ -56,8 +61,8 @@ vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc  )
 void libvlc_MlRelease( vlc_medialibrary_t* p_ml )
 {
     assert( p_ml != NULL );
-    module_unneed( p_ml, p_ml->p_module );
-    vlc_object_release( p_ml );
+    module_unneed( &p_ml->m, p_ml->m.p_module );
+    vlc_object_release( &p_ml->m );
 }
 
 #undef vlc_ml_instance_get
@@ -255,4 +260,29 @@ void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list )
     for ( size_t i = 0; i < p_list->i_nb_items; ++i )
         vlc_ml_playlist_release_inner( &p_list->p_items[i] );
     free( p_list );
+}
+
+void* vlc_ml_get( vlc_medialibrary_t* p_ml, int i_query, int64_t i_id )
+{
+    assert( p_ml != NULL );
+    return p_ml->m.pf_get( &p_ml->m, i_query, i_id );
+}
+
+int vlc_ml_control( vlc_medialibrary_t* p_ml, int i_query, ... )
+{
+    va_list args;
+    va_start( args, i_query );
+    int i_res = p_ml->m.pf_control( &p_ml->m, i_query, args );
+    va_end( args );
+    return i_res;
+}
+
+int vlc_ml_list( vlc_medialibrary_t* p_ml, int i_query,
+                             const vlc_ml_query_params_t* p_params, ... )
+{
+    va_list args;
+    va_start( args, p_params );
+    int i_res = p_ml->m.pf_list( &p_ml->m, i_query, p_params, args );
+    va_end( args );
+    return i_res;
 }
