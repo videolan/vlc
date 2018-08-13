@@ -45,6 +45,7 @@
 
 #include "libavi.h"
 #include "../rawdv.h"
+#include "bitmapinfoheader.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -146,8 +147,7 @@ typedef struct
     unsigned int    i_scale;
     unsigned int    i_samplesize;
 
-    unsigned int    i_width_bytes;
-    bool            b_flipped;
+    struct bitmapinfoheader_properties bihprops;
 
     es_format_t     fmt;
     es_out_id_t     *p_es;
@@ -272,30 +272,6 @@ static void Close ( vlc_object_t * p_this )
     free(p_sys->attachment);
 
     free( p_sys );
-}
-
-static void Set_BMP_RGB_Masks( es_format_t *fmt )
-{
-    switch( fmt->i_codec )
-    {
-        case VLC_CODEC_RGB32:
-            fmt->video.i_bmask = 0xff000000;
-            fmt->video.i_gmask = 0x00ff0000;
-            fmt->video.i_rmask = 0x0000ff00;
-            break;
-        case VLC_CODEC_RGB24: /* BGR (see biBitCount) */
-            fmt->video.i_bmask = 0x00ff0000;
-            fmt->video.i_gmask = 0x0000ff00;
-            fmt->video.i_rmask = 0x000000ff;
-            break;
-        case VLC_CODEC_RGB15:
-            fmt->video.i_rmask = 0x7c00;
-            fmt->video.i_gmask = 0x03e0;
-            fmt->video.i_bmask = 0x001f;
-            break;
-        default:
-            break;
-    }
 }
 
 /*****************************************************************************
@@ -605,123 +581,24 @@ static int Open( vlc_object_t * p_this )
                 es_format_Init( &tk->fmt, VIDEO_ES,
                         AVI_FourccGetCodec( VIDEO_ES, p_vids->p_bih->biCompression ) );
 
-                /* Extradata is the remainder of the chunk less the BIH */
-                const uint8_t *p_bihextra = (const uint8_t *) &p_vids->p_bih[1];
-                size_t i_bihextra;
-                if( p_vids->i_chunk_size <= INT_MAX - sizeof(VLC_BITMAPINFOHEADER) )
-                    i_bihextra = p_vids->i_chunk_size - sizeof(VLC_BITMAPINFOHEADER);
-                else
-                    i_bihextra = 0;
-
-                if( p_vids->p_bih->biCompression == BI_RGB ||
-                    p_vids->p_bih->biCompression == BI_BITFIELDS )
+                if( ParseBitmapInfoHeader( p_vids->p_bih, p_vids->i_chunk_size, &tk->fmt,
+                                           &tk->bihprops ) != VLC_SUCCESS )
                 {
-                    switch( p_vids->p_bih->biBitCount )
-                    {
-                        case 32:
-                            tk->fmt.i_codec = VLC_CODEC_RGB32;
-                            Set_BMP_RGB_Masks( &tk->fmt );
-                            break;
-                        case 24:
-                            tk->fmt.i_codec = VLC_CODEC_RGB24; /* BGR (see biBitCount) */
-                            Set_BMP_RGB_Masks( &tk->fmt );
-                            break;
-                        case 16: /* Yes it is RV15 */
-                        case 15: /* RGB (B least 5 bits) */
-                            tk->fmt.i_codec = VLC_CODEC_RGB15;
-                            Set_BMP_RGB_Masks( &tk->fmt );
-                            break;
-                        case 9: /* <- TODO check that */
-                            tk->fmt.i_codec = VLC_CODEC_I410;
-                            break;
-                        case 8:
-                            if ( p_vids->p_bih->biClrUsed )
-                                tk->fmt.i_codec = VLC_CODEC_RGBP;
-                            else
-                                tk->fmt.i_codec = VLC_CODEC_GREY;
-                            break;
-                        default:
-                            if( p_vids->p_bih->biClrUsed < 8 )
-                                tk->fmt.i_codec = VLC_CODEC_RGBP;
-                            break;
-                    }
-
-                    if( p_vids->p_bih->biCompression == BI_BITFIELDS ) /* Only 16 & 32 */
-                    {
-                        if( i_bihextra >= 3 * sizeof(uint32_t) )
-                        {
-                            tk->fmt.video.i_rmask = GetDWLE( &p_bihextra[0] );
-                            tk->fmt.video.i_gmask = GetDWLE( &p_bihextra[4] );
-                            tk->fmt.video.i_bmask = GetDWLE( &p_bihextra[8] );
-                            if( i_bihextra >= 4 * sizeof(uint32_t) ) /* Alpha channel ? */
-                            {
-                                uint32_t i_alpha = GetDWLE( &p_bihextra[8] );
-                                if( tk->fmt.i_codec == VLC_CODEC_RGB32 && i_alpha == 0xFF )
-                                    tk->fmt.i_codec = VLC_CODEC_BGRA;
-                            }
-                        }
-                    }
-                    else if( tk->fmt.i_codec == VLC_CODEC_RGBP )
-                    {
-                        /* The palette should not be included in biSize, but come
-                         * directly after BITMAPINFORHEADER in the BITMAPINFO structure */
-                        tk->fmt.video.p_palette = malloc( sizeof(video_palette_t) );
-                        if ( tk->fmt.video.p_palette )
-                        {
-                            tk->fmt.video.p_palette->i_entries = __MIN(i_bihextra/4, 256);
-                            for( int k = 0; k < tk->fmt.video.p_palette->i_entries; k++ )
-                            {
-                                for( int j = 0; j < 4; j++ )
-                                    tk->fmt.video.p_palette->palette[k][j] = p_bihextra[4*k+j];
-                            }
-                        }
-                    }
-
-                    tk->i_width_bytes = p_vids->p_bih->biWidth * (p_vids->p_bih->biBitCount >> 3);
-                    /* RGB DIB are coded from bottom to top */
-                    if ( p_vids->p_bih->biHeight < INT32_MAX ) tk->b_flipped = true;
+                    es_format_Clean( &tk->fmt );
+                    free( tk );
+                    goto error;
                 }
-                else /* Compressed codecs */
+
+                if( tk->fmt.i_codec == VLC_CODEC_MP4V &&
+                    !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
                 {
-                    tk->fmt.i_codec = p_vids->p_bih->biCompression;
-                    if( tk->fmt.i_codec == VLC_CODEC_MP4V &&
-                        !strncasecmp( (char*)&p_strh->i_handler, "XVID", 4 ) )
-                    {
-                        tk->fmt.i_codec           =
-                        tk->fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
-                    }
-
-                    /* Cop extradata if any */
-                    if( i_bihextra > 0 )
-                    {
-                        tk->fmt.p_extra = malloc( i_bihextra );
-                        if( unlikely(tk->fmt.p_extra == NULL) )
-                        {
-                            es_format_Clean( &tk->fmt );
-                            free( tk );
-                            goto error;
-                        }
-                        tk->fmt.i_extra = i_bihextra;
-                        memcpy( tk->fmt.p_extra, p_bihextra, i_bihextra );
-                    }
-
-                    /* Shitty files storing chroma in biCompression */
-                    Set_BMP_RGB_Masks( &tk->fmt );
+                    tk->fmt.i_codec           =
+                    tk->fmt.i_original_fourcc = VLC_FOURCC( 'X', 'V', 'I', 'D' );
                 }
+
                 tk->i_samplesize = 0;
-
-                tk->fmt.video.i_visible_width =
-                tk->fmt.video.i_width  = p_vids->p_bih->biWidth;
-                tk->fmt.video.i_visible_height =
-                tk->fmt.video.i_height = p_vids->p_bih->biHeight;
-                tk->fmt.video.i_bits_per_pixel = p_vids->p_bih->biBitCount;
                 tk->fmt.video.i_frame_rate = tk->i_rate;
                 tk->fmt.video.i_frame_rate_base = tk->i_scale;
-
-                 /* Uncompresse Bitmap or YUV, YUV being always topdown */
-                if ( tk->fmt.video.i_height > INT32_MAX )
-                    tk->fmt.video.i_height =
-                        (unsigned int)(-(int)p_vids->p_bih->biHeight);
 
                 avi_chunk_vprp_t *p_vprp = AVI_ChunkFind( p_strl, AVIFOURCC_vprp, 0, false );
                 if( p_vprp )
@@ -950,9 +827,9 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
     p_frame->p_buffer += i_header;
     p_frame->i_buffer -= i_header;
 
-    const unsigned int i_stride_bytes = ((( (tk->i_width_bytes << 3) + 31) & ~31) >> 3);
+    const unsigned int i_stride_bytes = ((( (tk->bihprops.i_stride << 3) + 31) & ~31) >> 3);
 
-    if ( !tk->i_width_bytes || !i_stride_bytes )
+    if ( !tk->bihprops.i_stride || !i_stride_bytes )
         return p_frame;
 
     if( p_frame->i_buffer < i_stride_bytes )
@@ -961,20 +838,20 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
         return p_frame;
     }
 
-    if( !tk->b_flipped )
+    if( !tk->bihprops.b_flipped )
     {
         const uint8_t *p_src = p_frame->p_buffer + i_stride_bytes;
         const uint8_t *p_end = p_frame->p_buffer + p_frame->i_buffer;
-        uint8_t *p_dst = p_frame->p_buffer + tk->i_width_bytes;
+        uint8_t *p_dst = p_frame->p_buffer + tk->bihprops.i_stride;
 
-        p_frame->i_buffer = tk->i_width_bytes;
+        p_frame->i_buffer = tk->bihprops.i_stride;
 
         while ( p_src + i_stride_bytes <= p_end )
         {
-            memmove( p_dst, p_src, tk->i_width_bytes );
+            memmove( p_dst, p_src, tk->bihprops.i_stride );
             p_src += i_stride_bytes;
-            p_dst += tk->i_width_bytes;
-            p_frame->i_buffer += tk->i_width_bytes;
+            p_dst += tk->bihprops.i_stride;
+            p_frame->i_buffer += tk->bihprops.i_stride;
         }
     }
     else
@@ -995,9 +872,9 @@ static block_t * ReadFrame( demux_t *p_demux, const avi_track_t *tk,
         while ( i_lines-- > 0 )
         {
             p_src -= i_stride_bytes;
-            memcpy( p_dst, p_src, tk->i_width_bytes );
-            p_dst += tk->i_width_bytes;
-            p_flippedframe->i_buffer += tk->i_width_bytes;
+            memcpy( p_dst, p_src, tk->bihprops.i_stride );
+            p_dst += tk->bihprops.i_stride;
+            p_flippedframe->i_buffer += tk->bihprops.i_stride;
         }
 
         block_Release( p_frame );

@@ -128,7 +128,8 @@ libasf_plugin_la_SOURCES = demux/asf/asf.c demux/asf/libasf.c demux/asf/libasf.h
                            demux/asf/libasf_guid.h
 demux_LTLIBRARIES += libasf_plugin.la
 
-libavi_plugin_la_SOURCES = demux/avi/avi.c demux/avi/libavi.c demux/avi/libavi.h
+libavi_plugin_la_SOURCES = demux/avi/avi.c demux/avi/libavi.c demux/avi/libavi.h \
+                           demux/avi/bitmapinfoheader.h
 demux_LTLIBRARIES += libavi_plugin.la
 
 libcaf_plugin_la_SOURCES = demux/caf.c
