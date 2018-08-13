@@ -439,24 +439,24 @@ enum vlc_ml_playback_pref
     VLC_ML_PLAYBACK_PREF_APP_SPECIFIC,
 };
 
-static inline void vlc_ml_add_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
+static inline int vlc_ml_add_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
 {
-    p_ml->pf_control( p_ml, VLC_ML_ADD_FOLDER, psz_folder );
+    return p_ml->pf_control( p_ml, VLC_ML_ADD_FOLDER, psz_folder );
 }
 
-static inline void vlc_ml_remove_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
+static inline int vlc_ml_remove_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
 {
-    p_ml->pf_control( p_ml, VLC_ML_REMOVE_FOLDER, psz_folder );
+    return p_ml->pf_control( p_ml, VLC_ML_REMOVE_FOLDER, psz_folder );
 }
 
-static inline void vlc_ml_ban_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
+static inline int vlc_ml_ban_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
 {
-    p_ml->pf_control( p_ml, VLC_ML_BAN_FOLDER, psz_folder );
+    return p_ml->pf_control( p_ml, VLC_ML_BAN_FOLDER, psz_folder );
 }
 
-static inline void vlc_ml_unban_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
+static inline int vlc_ml_unban_folder( vlc_medialibrary_t* p_ml, const char* psz_folder )
 {
-    p_ml->pf_control( p_ml, VLC_ML_UNBAN_FOLDER, psz_folder );
+    return p_ml->pf_control( p_ml, VLC_ML_UNBAN_FOLDER, psz_folder );
 }
 
 static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
@@ -465,19 +465,19 @@ static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
     return p_ml->pf_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints, p_nb_items );
 }
 
-static inline void vlc_ml_pause_background( vlc_medialibrary_t* p_ml )
+static inline int vlc_ml_pause_background( vlc_medialibrary_t* p_ml )
 {
-    p_ml->pf_control( p_ml, VLC_ML_PAUSE_BACKGROUND );
+    return p_ml->pf_control( p_ml, VLC_ML_PAUSE_BACKGROUND );
 }
 
-static inline void vlc_ml_resume_background( vlc_medialibrary_t* p_ml )
+static inline int vlc_ml_resume_background( vlc_medialibrary_t* p_ml )
 {
-    p_ml->pf_control( p_ml, VLC_ML_RESUME_BACKGROUND );
+    return p_ml->pf_control( p_ml, VLC_ML_RESUME_BACKGROUND );
 }
 
-static inline void vlc_ml_clear_history( vlc_medialibrary_t* p_ml )
+static inline int vlc_ml_clear_history( vlc_medialibrary_t* p_ml )
 {
-    p_ml->pf_control( p_ml, VLC_ML_CLEAR_HISTORY );
+    return p_ml->pf_control( p_ml, VLC_ML_CLEAR_HISTORY );
 }
 
 static inline vlc_ml_media_t* vlc_ml_new_external_media( vlc_medialibrary_t* p_ml, const char* psz_mrl )
