@@ -60,8 +60,8 @@ void libvlc_MlRelease( vlc_medialibrary_t* p_ml )
     vlc_object_release( p_ml );
 }
 
-#undef vlc_ml_get
-vlc_medialibrary_t* vlc_ml_get( vlc_object_t* p_obj )
+#undef vlc_ml_instance_get
+vlc_medialibrary_t* vlc_ml_instance_get( vlc_object_t* p_obj )
 {
     libvlc_priv_t* p_priv = libvlc_priv( p_obj->obj.libvlc );
     return p_priv->p_media_library;

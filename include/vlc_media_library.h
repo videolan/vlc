@@ -489,8 +489,8 @@ struct vlc_medialibrary_t
 vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc );
 void libvlc_MlRelease( vlc_medialibrary_t* p_ml );
 
-VLC_API vlc_medialibrary_t* vlc_ml_get( vlc_object_t* p_obj ) VLC_USED;
-#define vlc_ml_get(x) vlc_ml_get( VLC_OBJECT(x) )
+VLC_API vlc_medialibrary_t* vlc_ml_instance_get( vlc_object_t* p_obj ) VLC_USED;
+#define vlc_ml_instance_get(x) vlc_ml_instance_get( VLC_OBJECT(x) )
 
 VLC_API void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items );
 
@@ -1005,7 +1005,7 @@ static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc
 #endif /* C++ */
 
 #ifndef __cplusplus
-# define vlc_ml_release_obj( OBJ ) _Generic( ( OBJ ), \
+# define vlc_ml_release( OBJ ) _Generic( ( OBJ ), \
     vlc_ml_show_t*: vlc_ml_show_release, \
     vlc_ml_artist_t*: vlc_ml_artist_release, \
     vlc_ml_album_t*: vlc_ml_album_release, \
@@ -1022,20 +1022,20 @@ static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc
     vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release \
     )( OBJ )
 #else
-static inline void vlc_ml_release_obj( vlc_ml_show_t* show ) { vlc_ml_show_release( show ); }
-static inline void vlc_ml_release_obj( vlc_ml_artist_t* artist ) { vlc_ml_artist_release( artist ); }
-static inline void vlc_ml_release_obj( vlc_ml_album_t* album ) { vlc_ml_album_release( album ); }
-static inline void vlc_ml_release_obj( vlc_ml_genre_t* genre ) { vlc_ml_genre_release( genre ); }
-static inline void vlc_ml_release_obj( vlc_ml_media_t* media ) { vlc_ml_media_release( media ); }
-static inline void vlc_ml_release_obj( vlc_ml_playlist_t* playlist ) { vlc_ml_playlist_release( playlist ); }
-static inline void vlc_ml_release_obj( vlc_ml_label_list_t* list ) { vlc_ml_label_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_file_list_t* list ) { vlc_ml_file_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_artist_list_t* list ) { vlc_ml_artist_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_media_list_t* list ) { vlc_ml_media_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_album_list_t* list ) { vlc_ml_album_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_show_list_t* list ) { vlc_ml_show_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
-static inline void vlc_ml_release_obj( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_show_t* show ) { vlc_ml_show_release( show ); }
+static inline void vlc_ml_release( vlc_ml_artist_t* artist ) { vlc_ml_artist_release( artist ); }
+static inline void vlc_ml_release( vlc_ml_album_t* album ) { vlc_ml_album_release( album ); }
+static inline void vlc_ml_release( vlc_ml_genre_t* genre ) { vlc_ml_genre_release( genre ); }
+static inline void vlc_ml_release( vlc_ml_media_t* media ) { vlc_ml_media_release( media ); }
+static inline void vlc_ml_release( vlc_ml_playlist_t* playlist ) { vlc_ml_playlist_release( playlist ); }
+static inline void vlc_ml_release( vlc_ml_label_list_t* list ) { vlc_ml_label_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_file_list_t* list ) { vlc_ml_file_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_artist_list_t* list ) { vlc_ml_artist_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_media_list_t* list ) { vlc_ml_media_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_album_list_t* list ) { vlc_ml_album_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_show_list_t* list ) { vlc_ml_show_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
 #endif
 
 #endif /* VLC_MEDIA_LIBRARY_H */
