@@ -504,18 +504,40 @@ void vout_ChangeAspectRatio( vout_thread_t *p_vout,
 /* vout_Control* are usable by anyone at anytime */
 void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
 {
-    vout_control_PushString(&vout->p->control, VOUT_CONTROL_FULLSCREEN, id);
+    vout_window_t *window;
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    window = vout->p->window;
+    /* Window is NULL if the output is a splitter,
+     * or if the output was already closed by its owner.
+     */
+    if (window != NULL)
+        vout_window_SetFullScreen(window, id);
+    vlc_mutex_unlock(&vout->p->window_lock);
 }
 
 void vout_ControlChangeWindowed(vout_thread_t *vout)
 {
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_WINDOWED);
+    vout_window_t *window;
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    window = vout->p->window;
+    if (window != NULL)
+        vout_window_UnsetFullScreen(window);
+    vlc_mutex_unlock(&vout->p->window_lock);
 }
 
 void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
 {
-    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_WINDOW_STATE, st);
+    vout_window_t *window;
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    window = vout->p->window;
+    if (window != NULL)
+        vout_window_SetState(window, st);
+    vlc_mutex_unlock(&vout->p->window_lock);
 }
+
 void vout_ControlChangeDisplaySize(vout_thread_t *vout,
                                    unsigned width, unsigned height)
 {
@@ -651,6 +673,12 @@ void vout_SetDisplayWindowSize(vout_thread_t *vout,
 {
     vout_window_t *window;
 
+    /* BEWARE of lock inversion and infinite recursion!
+     * This acquires the window lock but gets called from the display code.
+     * This function should raelly not exist. Instead, the window size should
+     * be adjusted on A.R., crop, fill and zoom changes *before*, and
+     * separately from, the corresponding display update controls.
+     */
     vlc_mutex_lock(&vout->p->window_lock);
     window = vout->p->window;
     if (window != NULL)
@@ -1369,36 +1397,6 @@ static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
     }
 }
 
-static void ThreadChangeFullscreen(vout_thread_t *vout, const char *id)
-{
-    vout_window_t *window = vout->p->window;
-
-    if (window == NULL)
-        return; /* splitter! */
-
-    vout_window_SetFullScreen(window, id);
-}
-
-static void ThreadChangeWindow(vout_thread_t *vout)
-{
-    vout_window_t *window = vout->p->window;
-
-    if (window == NULL)
-        return; /* splitter! */
-
-    vout_window_UnsetFullScreen(window);
-}
-
-static void ThreadChangeWindowState(vout_thread_t *vout, unsigned state)
-{
-    vout_window_t *window = vout->p->window;
-
-    if (window == NULL)
-        return; /* splitter! */
-
-    vout_window_SetState(window, state);
-}
-
 static void ThreadTranslateMouseState(vout_thread_t *vout,
                                       const vlc_mouse_t *win_mouse)
 {
@@ -1729,15 +1727,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_STEP:
         ThreadStep(vout, cmd.time_ptr);
-        break;
-    case VOUT_CONTROL_FULLSCREEN:
-        ThreadChangeFullscreen(vout, cmd.string);
-        break;
-    case VOUT_CONTROL_WINDOWED:
-        ThreadChangeWindow(vout);
-        break;
-    case VOUT_CONTROL_WINDOW_STATE:
-        ThreadChangeWindowState(vout, cmd.integer);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadTranslateMouseState(vout, &cmd.mouse);
