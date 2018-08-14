@@ -53,7 +53,6 @@ struct input_fetcher_t {
 struct fetcher_request {
     input_item_t* item;
     vlc_atomic_rc_t rc;
-    int preparse_status;
     int options;
     const input_fetcher_callbacks_t *cbs;
     void *userdata;
@@ -218,13 +217,6 @@ static int SearchByScope( input_fetcher_t* fetcher,
 
 static void NotifyArtFetchEnded( struct fetcher_request* req, bool fetched )
 {
-    if( req->preparse_status != -1 )
-    {
-        input_item_SetPreparsed( req->item, true );
-        /* TODO remove legacy input_item_SignalPreparseEnded() */
-        input_item_SignalPreparseEnded( req->item, req->preparse_status );
-    }
-
     if (req->cbs && req->cbs->on_art_fetch_ended)
         req->cbs->on_art_fetch_ended(req->item, fetched, req->userdata);
 }
@@ -455,7 +447,7 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner )
 }
 
 int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
-    input_item_meta_request_option_t options, int preparse_status,
+    input_item_meta_request_option_t options,
     const input_fetcher_callbacks_t *cbs, void *cbs_userdata )
 {
     struct fetcher_request* req = malloc( sizeof *req );
@@ -465,7 +457,6 @@ int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
 
     req->item = item;
     req->options = options;
-    req->preparse_status = preparse_status;
     req->cbs = cbs;
     req->userdata = cbs_userdata;
 

@@ -52,6 +52,7 @@ typedef struct input_preparser_task_t
 {
     input_preparser_req_t *req;
     input_preparser_t* preparser;
+    int preparse_status;
     input_thread_t* input;
     atomic_int state;
     atomic_bool done;
@@ -135,6 +136,7 @@ static int PreparserOpenInput( void* preparser_, void* req_, void** out )
         goto error;
 
     task->req = req;
+    task->preparse_status = -1;
 
     if( input_Start( task->input ) )
     {
@@ -162,6 +164,28 @@ static int PreparserProbeInput( void* preparser_, void* task_ )
     VLC_UNUSED( preparser_ );
 }
 
+static void on_art_fetch_ended(input_item_t *item, bool fetched, void *userdata)
+{
+    VLC_UNUSED(item);
+    VLC_UNUSED(fetched);
+    input_preparser_task_t *task = userdata;
+    input_preparser_req_t *req = task->req;
+
+    input_item_SetPreparsed(req->item, true);
+    /* TODO remove legacy input_item_SignalPreparseEnded() */
+    input_item_SignalPreparseEnded(req->item, task->preparse_status);
+
+    if (req->cbs && req->cbs->on_preparse_ended)
+        req->cbs->on_preparse_ended(req->item, task->preparse_status, req->userdata);
+
+    ReqRelease(req);
+    free(task);
+}
+
+static const input_fetcher_callbacks_t input_fetcher_callbacks = {
+    .on_art_fetch_ended = on_art_fetch_ended,
+};
+
 static void PreparserCloseInput( void* preparser_, void* task_ )
 {
     input_preparser_task_t* task = task_;
@@ -187,14 +211,18 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
     input_Stop( input );
     input_Close( input );
 
-    free( task );
-
     if( preparser->fetcher )
     {
-        if( !input_fetcher_Push( preparser->fetcher, item, 0, status,
-                                 NULL, NULL ) )
+        task->preparse_status = status;
+        if (!input_fetcher_Push(preparser->fetcher, item, 0,
+                               &input_fetcher_callbacks, task))
+        {
+            ReqHold(task->req);
             return;
+        }
     }
+
+    free(task);
 
     input_item_SetPreparsed( item, true );
     /* TODO remove legacy input_item_SignalPreparseEnded() */
@@ -288,7 +316,7 @@ void input_preparser_fetcher_Push( input_preparser_t *preparser,
     const input_fetcher_callbacks_t *cbs, void *cbs_userdata )
 {
     if( preparser->fetcher )
-        input_fetcher_Push( preparser->fetcher, item, options, -1,
+        input_fetcher_Push( preparser->fetcher, item, options,
                             cbs, cbs_userdata );
 }
 
