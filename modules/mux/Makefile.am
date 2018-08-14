@@ -3,7 +3,7 @@ muxdir = $(pluginsdir)/mux
 libmux_dummy_plugin_la_SOURCES = mux/dummy.c
 
 libmux_asf_plugin_la_SOURCES = mux/asf.c demux/asf/libasf_guid.h
-libmux_avi_plugin_la_SOURCES = mux/avi.c
+libmux_avi_plugin_la_SOURCES = mux/avi.c demux/avi/bitmapinfoheader.h
 libmux_mp4_plugin_la_SOURCES = mux/mp4/mp4.c \
 	mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \
        demux/mp4/libmp4.h \
