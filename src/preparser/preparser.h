@@ -59,7 +59,9 @@ void input_preparser_Push( input_preparser_t *, input_item_t *,
                            int timeout, void *id );
 
 void input_preparser_fetcher_Push( input_preparser_t *, input_item_t *,
-                                   input_item_meta_request_option_t );
+                                   input_item_meta_request_option_t,
+                                   const input_fetcher_callbacks_t *cbs,
+                                   void *cbs_userdata );
 
 /**
  * This function cancel all preparsing requests for a given id

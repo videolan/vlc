@@ -55,6 +55,8 @@ struct fetcher_request {
     vlc_atomic_rc_t rc;
     int preparse_status;
     int options;
+    const input_fetcher_callbacks_t *cbs;
+    void *userdata;
 };
 
 struct fetcher_thread {
@@ -214,13 +216,17 @@ static int SearchByScope( input_fetcher_t* fetcher,
     return VLC_EGENERIC;
 }
 
-static void SetPreparsed( struct fetcher_request* req )
+static void NotifyArtFetchEnded( struct fetcher_request* req, bool fetched )
 {
     if( req->preparse_status != -1 )
     {
         input_item_SetPreparsed( req->item, true );
+        /* TODO remove legacy input_item_SignalPreparseEnded() */
         input_item_SignalPreparseEnded( req->item, req->preparse_status );
     }
+
+    if (req->cbs && req->cbs->on_art_fetch_ended)
+        req->cbs->on_art_fetch_ended(req->item, fetched, req->userdata);
 }
 
 static void Downloader( input_fetcher_t* fetcher,
@@ -281,7 +287,7 @@ out:
     }
 
     free( psz_arturl );
-    SetPreparsed( req );
+    NotifyArtFetchEnded(req, psz_arturl != NULL);
     return;
 
 error:
@@ -298,12 +304,12 @@ static void SearchLocal( input_fetcher_t* fetcher, struct fetcher_request* req )
         req->options & META_REQUEST_OPTION_SCOPE_NETWORK )
     {
         if( background_worker_Push( fetcher->network, req, NULL, 0 ) )
-            SetPreparsed( req );
+            NotifyArtFetchEnded(req, false);
     }
     else
     {
         input_item_SetArtNotFound( req->item, true );
-        SetPreparsed( req );
+        NotifyArtFetchEnded(req, false);
     }
 }
 
@@ -312,7 +318,7 @@ static void SearchNetwork( input_fetcher_t* fetcher, struct fetcher_request* req
     if( SearchByScope( fetcher, req, FETCHER_SCOPE_NETWORK ) )
     {
         input_item_SetArtNotFound( req->item, true );
-        SetPreparsed( req );
+        NotifyArtFetchEnded(req, false);
     }
 }
 
@@ -449,7 +455,8 @@ input_fetcher_t* input_fetcher_New( vlc_object_t* owner )
 }
 
 int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
-    input_item_meta_request_option_t options, int preparse_status )
+    input_item_meta_request_option_t options, int preparse_status,
+    const input_fetcher_callbacks_t *cbs, void *cbs_userdata )
 {
     struct fetcher_request* req = malloc( sizeof *req );
 
@@ -459,12 +466,14 @@ int input_fetcher_Push( input_fetcher_t* fetcher, input_item_t* item,
     req->item = item;
     req->options = options;
     req->preparse_status = preparse_status;
+    req->cbs = cbs;
+    req->userdata = cbs_userdata;
 
     vlc_atomic_rc_init( &req->rc );
     input_item_Hold( item );
 
     if( background_worker_Push( fetcher->local, req, NULL, 0 ) )
-        SetPreparsed( req );
+        NotifyArtFetchEnded(req, false);
 
     RequestRelease( req );
     return VLC_SUCCESS;

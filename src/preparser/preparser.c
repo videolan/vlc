@@ -191,7 +191,8 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
 
     if( preparser->fetcher )
     {
-        if( !input_fetcher_Push( preparser->fetcher, item, 0, status ) )
+        if( !input_fetcher_Push( preparser->fetcher, item, 0, status,
+                                 NULL, NULL ) )
             return;
     }
 
@@ -283,10 +284,12 @@ void input_preparser_Push( input_preparser_t *preparser,
 }
 
 void input_preparser_fetcher_Push( input_preparser_t *preparser,
-    input_item_t *item, input_item_meta_request_option_t options )
+    input_item_t *item, input_item_meta_request_option_t options,
+    const input_fetcher_callbacks_t *cbs, void *cbs_userdata )
 {
     if( preparser->fetcher )
-        input_fetcher_Push( preparser->fetcher, item, options, -1 );
+        input_fetcher_Push( preparser->fetcher, item, options, -1,
+                            cbs, cbs_userdata );
 }
 
 void input_preparser_Cancel( input_preparser_t *preparser, void *id )

@@ -692,7 +692,8 @@ void InputManager::requestArtUpdate( input_item_t *p_item, bool b_forced )
         }
         libvlc_ArtRequest( p_intf->obj.libvlc, p_item,
                            (b_forced) ? META_REQUEST_OPTION_SCOPE_ANY
-                                      : META_REQUEST_OPTION_NONE );
+                                      : META_REQUEST_OPTION_NONE,
+                           NULL, NULL );
         /* No input will signal the cover art to update,
              * let's do it ourself */
         if ( b_current_item )

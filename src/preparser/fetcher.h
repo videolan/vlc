@@ -47,7 +47,8 @@ input_fetcher_t *input_fetcher_New( vlc_object_t * );
  * fetcher object is destroyed.
  */
 int input_fetcher_Push( input_fetcher_t *, input_item_t *,
-                        input_item_meta_request_option_t, int );
+                        input_item_meta_request_option_t, int,
+                        const input_fetcher_callbacks_t *, void * );
 
 /**
  * This function destroys the fetcher object and thread.

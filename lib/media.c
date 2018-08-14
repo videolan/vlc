@@ -802,7 +802,8 @@ static int media_parse(libvlc_media_t *media, bool b_async,
         if (parse_flag & libvlc_media_fetch_network)
         {
             ret = libvlc_ArtRequest(libvlc, item,
-                                    META_REQUEST_OPTION_SCOPE_NETWORK);
+                                    META_REQUEST_OPTION_SCOPE_NETWORK,
+                                    NULL, NULL);
             if (ret != VLC_SUCCESS)
                 return ret;
         }

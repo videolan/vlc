@@ -367,7 +367,8 @@ FREENULL( psz_##foo );
 - (IBAction)downloadCoverArt:(id)sender
 {
     if (p_item)
-        libvlc_ArtRequest(getIntf()->obj.libvlc, p_item, META_REQUEST_OPTION_NONE);
+        libvlc_ArtRequest(getIntf()->obj.libvlc, p_item, META_REQUEST_OPTION_NONE,
+                          NULL, NULL);
 }
 
 @end
