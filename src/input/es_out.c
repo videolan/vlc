@@ -3370,6 +3370,25 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
            info_category_AddInfo( p_cat, _("Chroma location"), "%s",
                vlc_gettext(c_loc_names[fmt->video.chroma_location]) );
        }
+       if( fmt->video.multiview_mode != MULTIVIEW_2D )
+       {
+           static const char c_multiview_names[][18] = {
+               [MULTIVIEW_2D] = N_("2D"),
+               [MULTIVIEW_STEREO_SBS] = N_("Side-By-Side"),
+               [MULTIVIEW_STEREO_TB] = N_("Top-Bottom"),
+               [MULTIVIEW_STEREO_ROW] = N_("Row Sequential"),
+               [MULTIVIEW_STEREO_COL] = N_("Column Sequential"),
+               [MULTIVIEW_STEREO_FRAME] =N_("Frame Sequential"),
+               [MULTIVIEW_STEREO_CHECKERBOARD] = N_("Checkboard"),
+           };
+           static_assert(ARRAY_SIZE(c_multiview_names) == MULTIVIEW_STEREO_CHECKERBOARD+1,
+                         "Multiview format table mismatch");
+           info_category_AddInfo( p_cat, _("Stereo Mode"), "%s",
+               vlc_gettext(c_multiview_names[fmt->video.multiview_mode]) );
+           info_category_AddInfo( p_cat, _("First Stereo Eye"),
+                                  vlc_gettext(fmt->video.b_multiview_right_eye_first ?
+                                      N_("Right") : N_("Left")) );
+       }
        if( fmt->video.projection_mode != PROJECTION_MODE_RECTANGULAR )
        {
            const char *psz_loc_name = NULL;
