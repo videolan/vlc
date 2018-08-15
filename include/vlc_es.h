@@ -244,6 +244,8 @@ typedef enum video_multiview_mode_t
 
     /* Checkerboard pattern with left eye first. */
     MULTIVIEW_STEREO_CHECKERBOARD,
+
+#define MULTIVIEW_STEREO_MAX  MULTIVIEW_STEREO_CHECKERBOARD
 } video_multiview_mode_t;
 
 /**

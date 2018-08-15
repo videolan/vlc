@@ -3381,7 +3381,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                [MULTIVIEW_STEREO_FRAME] =N_("Frame Sequential"),
                [MULTIVIEW_STEREO_CHECKERBOARD] = N_("Checkboard"),
            };
-           static_assert(ARRAY_SIZE(c_multiview_names) == MULTIVIEW_STEREO_CHECKERBOARD+1,
+           static_assert(ARRAY_SIZE(c_multiview_names) == MULTIVIEW_STEREO_MAX+1,
                          "Multiview format table mismatch");
            info_category_AddInfo( p_cat, _("Stereo Mode"), "%s",
                vlc_gettext(c_multiview_names[fmt->video.multiview_mode]) );
