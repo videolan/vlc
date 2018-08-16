@@ -952,6 +952,19 @@ static void del_es_callbacks( input_thread_t *p_input_thread, libvlc_media_playe
     var_DelListCallback( p_input_thread, "spu-es", input_es_changed, p_mi );
 }
 
+static void on_input_event(input_thread_t *input, void *userdata,
+                           const struct vlc_input_event *event)
+{
+    if (event->type == INPUT_EVENT_SUBITEMS)
+    {
+        libvlc_media_player_t *media_player = userdata;
+        libvlc_media_t *media = media_player->p_md;
+        libvlc_media_add_subtree(media, event->subitems);
+    }
+
+    input_LegacyEvents(input, userdata, event);
+}
+
 /**************************************************************************
  * Tell media player to start playing.
  **************************************************************************/
@@ -984,7 +997,7 @@ int libvlc_media_player_play( libvlc_media_player_t *p_mi )
 
     media_attach_preparsed_event( p_mi->p_md );
 
-    p_input_thread = input_Create( p_mi, input_LegacyEvents, NULL,
+    p_input_thread = input_Create( p_mi, on_input_event, p_mi,
                                    p_mi->p_md->p_input_item, NULL,
                                    p_mi->input.p_resource,
                                    p_mi->input.p_renderer );
