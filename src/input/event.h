@@ -63,6 +63,7 @@ void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool
 void input_SendEventEsDel( input_thread_t *p_input, const es_format_t *fmt );
 void input_SendEventEsAdd( input_thread_t *p_input,
                            const es_format_t *fmt, const char *psz_title );
+void input_SendEventEsUpdate( input_thread_t *p_input, const es_format_t *fmt );
 void input_SendEventEsSelect( input_thread_t *p_input, const es_format_t *fmt );
 void input_SendEventEsUnselect( input_thread_t *p_input, const es_format_t *fmt );
 

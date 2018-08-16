@@ -234,6 +234,16 @@ void input_SendEventEsAdd( input_thread_t *p_input, const es_format_t *p_fmt,
         }
     });
 }
+void input_SendEventEsUpdate( input_thread_t *p_input, const es_format_t *p_fmt )
+{
+    input_SendEvent( p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_ES,
+        .es = {
+            .action = VLC_INPUT_ES_UPDATED,
+            .fmt = p_fmt,
+        }
+    });
+}
 void input_SendEventEsDel( input_thread_t *p_input,
                            const es_format_t *p_fmt )
 {

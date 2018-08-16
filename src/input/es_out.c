@@ -3134,7 +3134,6 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     if( es->fmt.i_cat == fmt->i_cat )
     {
         es_format_t update = *fmt;
-        update.i_id = es->i_meta_id;
         update.i_codec = es->fmt.i_codec;
         update.i_original_fourcc = es->fmt.i_original_fourcc;
 
@@ -3160,6 +3159,9 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         update.i_extra = 0;
         update.p_extra = NULL;
 
+        input_SendEventEsUpdate(p_input, &update);
+
+        update.i_id = es->i_meta_id;
         input_item_UpdateTracksInfo(input_GetItem(p_input), &update);
     }
 

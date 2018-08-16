@@ -428,6 +428,7 @@ struct vlc_input_event_es {
     enum {
         VLC_INPUT_ES_ADDED,
         VLC_INPUT_ES_DELETED,
+        VLC_INPUT_ES_UPDATED,
         VLC_INPUT_ES_SELECTED,
         VLC_INPUT_ES_UNSELECTED,
     } action;

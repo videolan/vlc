@@ -376,6 +376,8 @@ void input_LegacyEvents( input_thread_t *p_input,
                         VarListSelect( p_input, "teletext-es", i_id );
                     break;
                 }
+                case VLC_INPUT_ES_UPDATED:
+                    break;
             }
             break;
         case INPUT_EVENT_RECORD:
