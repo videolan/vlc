@@ -4948,19 +4948,38 @@ static int DemuxFrag( demux_t *p_demux )
         }
 
         p_sys->context.i_current_box_type = VLC_FOURCC( p_peek[4], p_peek[5], p_peek[6], p_peek[7] );
-        if( p_sys->context.i_current_box_type == ATOM_mdat )
+        if( p_sys->context.i_current_box_type != ATOM_moof &&
+            p_sys->context.i_current_box_type != ATOM_moov )
         {
-            uint64_t size = GetDWBE( p_peek );
-            if ( size == 1 )
+            uint64_t i_pos = vlc_stream_Tell( p_demux->s );
+            uint64_t i_size = GetDWBE( p_peek );
+            if ( i_size == 1 )
             {
                 if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) != 16 )
                 {
                     i_status = VLC_DEMUXER_EOF;
                     goto end;
                 }
-                size = GetQWBE( p_peek + 8 );
+                i_size = GetQWBE( p_peek + 8 );
             }
-            p_sys->context.i_post_mdat_offset = vlc_stream_Tell( p_demux->s ) + size;
+
+            if( UINT64_MAX - i_pos < i_size )
+            {
+                i_status = VLC_DEMUXER_EOF;
+                goto end;
+            }
+
+            if( p_sys->context.i_current_box_type == ATOM_mdat )
+            {
+                /* We'll now read mdat using context atom,
+                 * but we'll need post mdat offset, as we'll never seek backward */
+                p_sys->context.i_post_mdat_offset = i_pos + i_size;
+            }
+            else if( MP4_Seek( p_demux->s, i_pos + i_size ) != VLC_SUCCESS ) /* skip other atoms */
+            {
+                i_status = VLC_DEMUXER_EOF;
+                goto end;
+            }
         }
         else
         {
