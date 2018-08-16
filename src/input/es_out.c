@@ -2916,9 +2916,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         input_thread_t *input = p_sys->p_input;
         input_item_node_t *node = va_arg(args, input_item_node_t *);
         input_SendEventParsing(input, node);
-
-        /* TODO remove "PostAnd" once InputItemSubItemTreeAdded is not needed */
-        input_item_node_PostAndDelete(node);
+        input_item_node_Delete(node);
 
         return VLC_SUCCESS;
     }

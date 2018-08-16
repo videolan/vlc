@@ -150,8 +150,6 @@ static int PreparserOpenInput( void* preparser_, void* req_, void** out )
 
 error:
     free( task );
-    /* TODO remove legacy input_item_SignalPreparseEnded() */
-    input_item_SignalPreparseEnded(req->item, ITEM_PREPARSE_FAILED);
     if (req->cbs && req->cbs->on_preparse_ended)
         req->cbs->on_preparse_ended(req->item, ITEM_PREPARSE_FAILED, req->userdata);
     return VLC_EGENERIC;
@@ -172,8 +170,6 @@ static void on_art_fetch_ended(input_item_t *item, bool fetched, void *userdata)
     input_preparser_req_t *req = task->req;
 
     input_item_SetPreparsed(req->item, true);
-    /* TODO remove legacy input_item_SignalPreparseEnded() */
-    input_item_SignalPreparseEnded(req->item, task->preparse_status);
 
     if (req->cbs && req->cbs->on_preparse_ended)
         req->cbs->on_preparse_ended(req->item, task->preparse_status, req->userdata);
@@ -225,8 +221,6 @@ static void PreparserCloseInput( void* preparser_, void* task_ )
     free(task);
 
     input_item_SetPreparsed( item, true );
-    /* TODO remove legacy input_item_SignalPreparseEnded() */
-    input_item_SignalPreparseEnded( item, status );
     if (req->cbs && req->cbs->on_preparse_ended)
         req->cbs->on_preparse_ended(req->item, status, req->userdata);
 }
@@ -291,8 +285,6 @@ void input_preparser_Push( input_preparser_t *preparser,
                 break;
             /* fallthrough */
         default:
-            /* TODO remove legacy input_item_SignalPreparseEnded() */
-            input_item_SignalPreparseEnded( item, ITEM_PREPARSE_SKIPPED );
             if (cbs && cbs->on_preparse_ended)
                 cbs->on_preparse_ended(item, ITEM_PREPARSE_SKIPPED, cbs_userdata);
             return;
@@ -301,12 +293,8 @@ void input_preparser_Push( input_preparser_t *preparser,
     struct input_preparser_req_t *req = ReqCreate(item, cbs, cbs_userdata);
 
     if (background_worker_Push(preparser->worker, req, id, timeout))
-    {
-        /* TODO remove legacy input_item_SignalPreparseEnded() */
-        input_item_SignalPreparseEnded( item, ITEM_PREPARSE_FAILED );
         if (req->cbs && cbs->on_preparse_ended)
             cbs->on_preparse_ended(item, ITEM_PREPARSE_FAILED, cbs_userdata);
-    }
 
     ReqRelease(req);
 }
