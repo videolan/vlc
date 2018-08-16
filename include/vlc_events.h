@@ -98,13 +98,11 @@
 typedef enum vlc_event_type_t {
     /* Input item events */
     vlc_InputItemMetaChanged,
-    vlc_InputItemSubItemTreeAdded,
     vlc_InputItemDurationChanged,
     vlc_InputItemPreparsedChanged,
     vlc_InputItemNameChanged,
     vlc_InputItemInfoChanged,
     vlc_InputItemErrorWhenReadingChanged,
-    vlc_InputItemPreparseEnded,
 } vlc_event_type_t;
 
 typedef struct vlc_event_listeners_group_t
@@ -117,7 +115,7 @@ typedef struct vlc_event_manager_t
 {
     void * p_obj;
     vlc_mutex_t lock;
-    vlc_event_listeners_group_t events[vlc_InputItemPreparseEnded + 1];
+    vlc_event_listeners_group_t events[vlc_InputItemErrorWhenReadingChanged + 1];
 } vlc_event_manager_t;
 
 /* Event definition */

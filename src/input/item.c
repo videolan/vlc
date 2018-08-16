@@ -66,13 +66,6 @@ void input_item_SetErrorWhenReading( input_item_t *p_i, bool b_error )
             .u.input_item_error_when_reading_changed.new_value = b_error } );
     }
 }
-void input_item_SignalPreparseEnded( input_item_t *p_i, int status )
-{
-    vlc_event_send( &p_i->event_manager, &(vlc_event_t) {
-        .type = vlc_InputItemPreparseEnded,
-        .u.input_item_preparse_ended.new_status = status } );
-}
-
 void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
 {
     bool b_send_event = false;
@@ -1299,15 +1292,6 @@ void input_item_node_RemoveNode( input_item_node_t *parent,
                                  input_item_node_t *child )
 {
     TAB_REMOVE(parent->i_children, parent->pp_children, child);
-}
-
-void input_item_node_PostAndDelete( input_item_node_t *p_root )
-{
-    vlc_event_send( &p_root->p_item->event_manager, &(vlc_event_t) {
-        .type = vlc_InputItemSubItemTreeAdded,
-        .u.input_item_subitem_tree_added.p_root = p_root } );
-
-    input_item_node_Delete( p_root );
 }
 
 /* Called by es_out when a new Elementary Stream is added or updated. */

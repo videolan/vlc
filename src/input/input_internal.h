@@ -287,9 +287,6 @@ int subtitles_Filter( const char *);
 void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
                                           const vlc_meta_t *p_meta );
 
-/* item.c */
-void input_item_node_PostAndDelete( input_item_node_t *p_node );
-
 /* stats.c */
 typedef struct input_rate_t
 {
