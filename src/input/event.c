@@ -218,78 +218,53 @@ void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool
     });
 }
 
-void input_SendEventEsAdd( input_thread_t *p_input,
-                           enum es_format_category_e i_cat, int i_id,
-                           const char *psz_text )
+void input_SendEventEsAdd( input_thread_t *p_input, const es_format_t *p_fmt,
+                           const char *psz_title)
 {
     input_thread_private_t *priv = input_priv(p_input);
-    priv->i_last_es_cat = i_cat;
-    priv->i_last_es_id = i_id;
+    priv->i_last_es_cat = p_fmt->i_cat;
+    priv->i_last_es_id = p_fmt->i_id;
 
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_ES,
         .es = {
             .action = VLC_INPUT_ES_ADDED,
-            .cat = i_cat,
-            .id = i_id,
-            .title = psz_text
+            .title = psz_title,
+            .fmt = p_fmt,
         }
     });
 }
 void input_SendEventEsDel( input_thread_t *p_input,
-                           enum es_format_category_e i_cat, int i_id )
+                           const es_format_t *p_fmt )
 {
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_ES,
         .es = {
             .action = VLC_INPUT_ES_DELETED,
-            .cat = i_cat,
-            .id = i_id,
+            .fmt = p_fmt,
         }
     });
 }
 void input_SendEventEsSelect( input_thread_t *p_input,
-                              enum es_format_category_e i_cat, int i_id )
+                              const es_format_t *p_fmt )
 {
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_ES,
         .es = {
             .action = VLC_INPUT_ES_SELECTED,
-            .cat = i_cat,
-            .id = i_id,
+            .fmt = p_fmt,
         }
     });
 }
 
-void input_SendEventTeletextAdd( input_thread_t *p_input,
-                                 int i_teletext, const char *psz_text )
+void input_SendEventEsUnselect( input_thread_t *p_input,
+                                const es_format_t *p_fmt )
 {
     input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_TELETEXT,
-        .teletext = {
-            .action = VLC_INPUT_TELETEXT_ADDED,
-            .id = i_teletext,
-            .title = psz_text
-        }
-    });
-}
-void input_SendEventTeletextDel( input_thread_t *p_input, int i_teletext )
-{
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_TELETEXT,
-        .teletext = {
-            .action = VLC_INPUT_TELETEXT_DELETED,
-            .id = i_teletext,
-        }
-    });
-}
-void input_SendEventTeletextSelect( input_thread_t *p_input, int i_teletext )
-{
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_TELETEXT,
-        .teletext = {
-            .action = VLC_INPUT_TELETEXT_SELECTED,
-            .id = i_teletext,
+        .type = INPUT_EVENT_ES,
+        .es = {
+            .action = VLC_INPUT_ES_UNSELECTED,
+            .fmt = p_fmt,
         }
     });
 }

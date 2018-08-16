@@ -58,14 +58,11 @@ void input_SendEventProgramDel( input_thread_t *p_input, int i_program );
 void input_SendEventProgramSelect( input_thread_t *p_input, int i_program );
 void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool b_scrambled );
 
-void input_SendEventEsDel( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id );
-void input_SendEventEsAdd( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id, const char *psz_text );
-void input_SendEventEsSelect( input_thread_t *p_input, enum es_format_category_e i_cat, int i_id ); /* i_id == -1 will unselect */
-
-void input_SendEventTeletextAdd( input_thread_t *p_input,
-                                 int i_teletext, const char *psz_text );
-void input_SendEventTeletextDel( input_thread_t *p_input, int i_teletext );
-void input_SendEventTeletextSelect( input_thread_t *p_input, int i_teletext );
+void input_SendEventEsDel( input_thread_t *p_input, const es_format_t *fmt );
+void input_SendEventEsAdd( input_thread_t *p_input,
+                           const es_format_t *fmt, const char *psz_title );
+void input_SendEventEsSelect( input_thread_t *p_input, const es_format_t *fmt );
+void input_SendEventEsUnselect( input_thread_t *p_input, const es_format_t *fmt );
 
 /*****************************************************************************
  * Event for decoder.c

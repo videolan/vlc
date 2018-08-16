@@ -240,6 +240,11 @@ static void UpdateBookmarksOption( input_thread_t *p_input )
     }
 }
 
+static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
+{
+    return p_fmt->i_cat == SPU_ES && p_fmt->i_codec == VLC_CODEC_TELETEXT;
+}
+
 void input_LegacyEvents( input_thread_t *p_input, void *user_data,
                          const struct vlc_input_event *event )
 {
@@ -324,7 +329,7 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
             {
                 case VLC_INPUT_ES_ADDED:
                 {
-                    const char *varname = GetEsVarName( event->es.cat );
+                    const char *varname = GetEsVarName( event->es.fmt->i_cat );
                     if( varname )
                     {
                         size_t count;
@@ -334,40 +339,43 @@ void input_LegacyEvents( input_thread_t *p_input, void *user_data,
                             /* First one, we need to add the "Disable" choice */
                             VarListAdd( p_input, varname, -1, _("Disable") );
                         }
-                        VarListAdd( p_input, varname, event->es.id,
+                        VarListAdd( p_input, varname, event->es.fmt->i_id,
                                     event->es.title );
+                    }
+
+                    if( EsFmtIsTeletext( event->es.fmt ) )
+                    {
+                        char psz_page[3+1];
+                        snprintf( psz_page, sizeof(psz_page), "%d%2.2x",
+                                  event->es.fmt->subs.teletext.i_magazine,
+                                  event->es.fmt->subs.teletext.i_page );
+                        VarListAdd( p_input, "teletext-es", event->es.fmt->i_id,
+                                    event->es.fmt->subs.teletext.i_magazine >= 0 ? psz_page : "" );
                     }
                     break;
                 }
                 case VLC_INPUT_ES_DELETED:
                 {
-                    const char *varname = GetEsVarName( event->es.cat );
+                    const char *varname = GetEsVarName( event->es.fmt->i_cat );
                     if( varname )
-                        VarListDel( p_input, varname, event->es.id );
+                        VarListDel( p_input, varname, event->es.fmt->i_id );
+
+                    if( EsFmtIsTeletext( event->es.fmt ) )
+                        VarListDel( p_input, "teletext-es", event->es.fmt->i_id );
                     break;
                 }
                 case VLC_INPUT_ES_SELECTED:
+                case VLC_INPUT_ES_UNSELECTED:
                 {
-                    const char *varname = GetEsVarName( event->es.cat );
+                    int i_id = event->es.action == VLC_INPUT_ES_SELECTED
+                             ? event->es.fmt->i_id : -1;
+                    const char *varname = GetEsVarName( event->es.fmt->i_cat );
                     if( varname )
-                        VarListSelect( p_input, varname, event->es.id );
+                        VarListSelect( p_input, varname, i_id );
+                    if( EsFmtIsTeletext( event->es.fmt ) )
+                        VarListSelect( p_input, "teletext-es", i_id );
                     break;
                 }
-            }
-            break;
-        case INPUT_EVENT_TELETEXT:
-            switch (event->teletext.action)
-            {
-                case VLC_INPUT_TELETEXT_ADDED:
-                    VarListAdd( p_input, "teletext-es", event->teletext.id,
-                                event->teletext.title );
-                    break;
-                case VLC_INPUT_TELETEXT_DELETED:
-                    VarListDel( p_input, "teletext-es", event->teletext.id );
-                    break;
-                case VLC_INPUT_TELETEXT_SELECTED:
-                    VarListSelect( p_input, "teletext-es", event->teletext.id );
-                    break;
             }
             break;
         case INPUT_EVENT_RECORD:

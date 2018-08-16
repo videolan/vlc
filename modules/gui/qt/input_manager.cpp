@@ -270,10 +270,6 @@ void InputManager::customEvent( QEvent *event )
         break;
     case IMEvent::ItemEsChanged:
         UpdateTeletext();
-        // We don't do anything ES related. Why ?
-        break;
-    case IMEvent::ItemTeletextChanged:
-        UpdateTeletext();
         break;
     case IMEvent::InterfaceVoutUpdate:
         UpdateVout();
@@ -359,9 +355,6 @@ static int InputEvent( vlc_object_t *, const char *,
     case INPUT_EVENT_ES:
         event = new IMEvent( IMEvent::ItemEsChanged );
         break;
-    case INPUT_EVENT_TELETEXT:
-        event = new IMEvent( IMEvent::ItemTeletextChanged );
-        break;
 
     case INPUT_EVENT_STATISTICS:
         event = new IMEvent( IMEvent::StatisticsUpdate );
@@ -426,7 +419,7 @@ static int VbiEvent( vlc_object_t *, const char *,
                      vlc_value_t, vlc_value_t, void *param )
 {
     InputManager *im = (InputManager*)param;
-    IMEvent *event = new IMEvent( IMEvent::ItemTeletextChanged );
+    IMEvent *event = new IMEvent( IMEvent::ItemEsChanged );
 
     QApplication::postEvent( im, event );
     return VLC_SUCCESS;

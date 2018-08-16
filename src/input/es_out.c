@@ -225,10 +225,6 @@ static inline int EsOutGetClosedCaptionsChannel( const es_format_t *p_fmt )
         i_channel = -1;
     return i_channel;
 }
-static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
-{
-    return p_fmt->i_cat == SPU_ES && p_fmt->i_codec == VLC_CODEC_TELETEXT;
-}
 
 #define foreach_es_then_es_slaves( pos ) \
     for( int fetes_i=0; fetes_i<2; fetes_i++ ) \
@@ -934,10 +930,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
 
     if( b_delete )
     {
-        if( EsFmtIsTeletext( fmt ) )
-            input_SendEventTeletextDel( p_sys->p_input, i_id );
-
-        input_SendEventEsDel( p_input, fmt->i_cat, i_id );
+        input_SendEventEsDel( p_input, fmt );
         return;
     }
 
@@ -972,16 +965,7 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
         }
     }
 
-    input_SendEventEsAdd( p_input, fmt->i_cat, i_id, text.psz_string );
-    if( EsFmtIsTeletext( fmt ) )
-    {
-        char psz_page[3+1];
-        snprintf( psz_page, sizeof(psz_page), "%d%2.2x",
-                  fmt->subs.teletext.i_magazine,
-                  fmt->subs.teletext.i_page );
-        input_SendEventTeletextAdd( p_sys->p_input,
-                                    i_id, fmt->subs.teletext.i_magazine >= 0 ? psz_page : NULL );
-    }
+    input_SendEventEsAdd( p_input, fmt, text.psz_string );
 
     free( text.psz_string );
 }
@@ -1017,9 +1001,13 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
         msg_Dbg( p_input, "unselecting program id=%d", old->i_id );
 
         foreach_es_then_es_slaves(es)
+        {
             if (es->p_pgrm == old && EsIsSelected(es)
              && p_sys->i_mode != ES_OUT_MODE_ALL)
                 EsUnselect(out, es, true);
+            if (es->p_pgrm == old)
+                input_SendEventEsDel( p_input, &es->fmt );
+        }
 
         p_sys->audio.p_main_es = NULL;
         p_sys->video.p_main_es = NULL;
@@ -1038,10 +1026,6 @@ static void EsOutProgramSelect( es_out_t *out, es_out_pgrm_t *p_pgrm )
     input_SendEventProgramSelect( p_input, p_pgrm->i_id );
 
     /* Update "es-*" */
-    input_SendEventEsDel( p_input, AUDIO_ES, -1 );
-    input_SendEventEsDel( p_input, VIDEO_ES, -1 );
-    input_SendEventEsDel( p_input, SPU_ES, -1 );
-    input_SendEventTeletextDel( p_input, -1 );
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, p_pgrm->b_scrambled );
 
     foreach_es_then_es_slaves(es)
@@ -1792,8 +1776,7 @@ static void EsSelect( es_out_t *out, es_out_id_t *es )
     }
 
     /* Mark it as selected */
-    input_SendEventEsSelect( p_input, es->fmt.i_cat, es->i_id );
-    input_SendEventTeletextSelect( p_input, EsFmtIsTeletext( &es->fmt ) ? es->i_id : -1 );
+    input_SendEventEsSelect( p_input, &es->fmt );
 }
 
 static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
@@ -1816,7 +1799,7 @@ static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
         if( i_spu_id == parent->cc.pp_es[i]->i_id )
         {
             /* Force unselection of the CC */
-            input_SendEventEsSelect( p_input, SPU_ES, -1 );
+            input_SendEventEsUnselect( p_input, &parent->cc.pp_es[i]->fmt );
         }
         EsOutDelLocked( out, parent->cc.pp_es[i] );
     }
@@ -1856,9 +1839,7 @@ static void EsUnselect( es_out_t *out, es_out_id_t *es, bool b_update )
         return;
 
     /* Mark it as unselected */
-    input_SendEventEsSelect( p_input, es->fmt.i_cat, -1 );
-    if( EsFmtIsTeletext( &es->fmt ) )
-        input_SendEventTeletextSelect( p_input, -1 );
+    input_SendEventEsUnselect( p_input, &es->fmt );
 }
 
 /**
@@ -2226,8 +2207,7 @@ static void EsOutDelLocked( es_out_t *out, es_out_id_t *es )
             {
                 if (EsIsSelected(other))
                 {
-                    input_SendEventEsSelect(p_sys->p_input, es->fmt.i_cat,
-                                            other->i_id);
+                    input_SendEventEsSelect(p_sys->p_input, &es->fmt);
                     if( p_esprops->p_main_es == NULL )
                         p_esprops->p_main_es = other;
                 }

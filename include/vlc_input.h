@@ -355,8 +355,6 @@ typedef enum input_event_type_e
     INPUT_EVENT_PROGRAM,
     /* A ES has been added or removed or selected */
     INPUT_EVENT_ES,
-    /* "teletext-es" has changed */
-    INPUT_EVENT_TELETEXT,
 
     /* "record" has changed */
     INPUT_EVENT_RECORD,
@@ -442,21 +440,11 @@ struct vlc_input_event
                 VLC_INPUT_ES_ADDED,
                 VLC_INPUT_ES_DELETED,
                 VLC_INPUT_ES_SELECTED,
+                VLC_INPUT_ES_UNSELECTED,
             } action;
-            enum es_format_category_e cat;
-            int id; /**< id == -1 will unselect */
             const char *title;
+            const es_format_t *fmt;
         } es;
-        /* INPUT_EVENT_TELETEXT */
-        struct {
-            enum {
-                VLC_INPUT_TELETEXT_ADDED,
-                VLC_INPUT_TELETEXT_DELETED,
-                VLC_INPUT_TELETEXT_SELECTED,
-            } action;
-            int id; /**< id == -1 will unselect */
-            const char *title;
-        } teletext;
         /* INPUT_EVENT_RECORD */
         bool record;
         /* INPUT_EVENT_SIGNAL */
