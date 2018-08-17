@@ -193,7 +193,7 @@
         NSString *columnName = column[0];
         NSNumber *columnWidth = column[1];
 
-        if ([columnName isEqualToString:@"status"])
+        if ([columnName isEqualToString:STATUS_COLUMN])
             continue;
 
         // Memorize if we custom set always-enabled title item
