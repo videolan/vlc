@@ -202,18 +202,18 @@
     [self setupPlaylistTableColumnsForMenu:[[[VLCMain sharedInstance] mainMenu] playlistTableColumnsMenu]];
 
     NSArray * columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
-    NSUInteger columnCount = [columnArray count];
-    NSString * column;
 
-    for (NSUInteger i = 0; i < columnCount; i++) {
-        column = [[columnArray objectAtIndex:i] firstObject];
-        if ([column isEqualToString:@"status"])
+    for (NSArray *column in columnArray) {
+        NSString *columnName = column[0];
+        NSNumber *columnWidth = column[1];
+
+        if ([columnName isEqualToString:@"status"])
             continue;
 
-        if(![self setPlaylistColumnTableState: NSOnState forColumn:column])
+        if(![self setPlaylistColumnTableState: NSOnState forColumn:columnName])
             continue;
 
-        [[_outlineView tableColumnWithIdentifier: column] setWidth: [[[columnArray objectAtIndex:i] objectAtIndex:1] floatValue]];
+        [[_outlineView tableColumnWithIdentifier: columnName] setWidth: [columnWidth floatValue]];
     }
 }
 
