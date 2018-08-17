@@ -1099,6 +1099,7 @@ class vlc_mutex_locker
             vlc_mutex_unlock (lock);
         }
 };
+
 #endif
 
 enum

@@ -33,6 +33,13 @@
 #include <utility>
 #include <type_traits>
 
+#ifdef VLC_THREADS_H_
+// Ensure we can use vlc_sem_wait_i11e. We can't declare different versions
+// of the semaphore helper based on vlc_interrupt inclusion, as it would
+// violate ODR
+# include <vlc_interrupt.h>
+#endif
+
 namespace vlc
 {
 
@@ -114,6 +121,143 @@ inline std::unique_ptr<T[], void (*)(void*)> wrap_carray( T* ptr ) noexcept
 }
 
 } // anonymous namespace
+
+#ifdef VLC_THREADS_H_
+
+namespace threads
+{
+
+class mutex
+{
+public:
+    mutex() noexcept
+    {
+        vlc_mutex_init( &m_mutex );
+    }
+    ~mutex()
+    {
+        vlc_mutex_destroy( &m_mutex );
+    }
+
+    mutex( const mutex& ) = delete;
+    mutex& operator=( const mutex& ) = delete;
+    mutex( mutex&& ) = delete;
+    mutex& operator=( mutex&& ) = delete;
+
+    void lock() noexcept
+    {
+        vlc_mutex_lock( &m_mutex );
+    }
+    void unlock() noexcept
+    {
+        vlc_mutex_unlock( &m_mutex );
+    }
+
+private:
+    vlc_mutex_t m_mutex;
+    friend class condition_variable;
+    friend class mutex_locker;
+};
+
+class condition_variable
+{
+public:
+    condition_variable() noexcept
+    {
+        vlc_cond_init( &m_cond );
+    }
+    ~condition_variable()
+    {
+        vlc_cond_destroy( &m_cond );
+    }
+    void signal() noexcept
+    {
+        vlc_cond_signal( &m_cond );
+    }
+    void broadcast() noexcept
+    {
+        vlc_cond_broadcast( &m_cond );
+    }
+    void wait( mutex& mutex ) noexcept
+    {
+        vlc_cond_wait( &m_cond, &mutex.m_mutex );
+    }
+    int timedwait( mutex& mutex, vlc_tick_t deadline ) noexcept
+    {
+        return vlc_cond_timedwait( &m_cond, &mutex.m_mutex, deadline );
+    }
+
+private:
+    vlc_cond_t m_cond;
+};
+
+class mutex_locker
+{
+public:
+    mutex_locker( vlc_mutex_t* m ) noexcept
+        : m_mutex( m )
+    {
+        vlc_mutex_lock( m_mutex );
+    }
+    mutex_locker( mutex& m ) noexcept
+        : mutex_locker( &m.m_mutex )
+    {
+    }
+    ~mutex_locker()
+    {
+        vlc_mutex_unlock( m_mutex );
+    }
+    mutex_locker( const mutex_locker& ) = delete;
+    mutex_locker& operator=( const mutex_locker& ) = delete;
+    mutex_locker( mutex_locker&& ) = delete;
+    mutex_locker& operator=( mutex_locker&& ) = delete;
+
+private:
+    vlc_mutex_t* m_mutex;
+};
+
+class semaphore
+{
+public:
+    semaphore() noexcept
+    {
+        vlc_sem_init( &m_sem, 0 );
+    }
+    semaphore( unsigned int count ) noexcept
+    {
+        vlc_sem_init( &m_sem, count );
+    }
+    ~semaphore()
+    {
+        vlc_sem_destroy( &m_sem );
+    }
+
+    semaphore( const semaphore& ) = delete;
+    semaphore& operator=( const semaphore& ) = delete;
+    semaphore( semaphore&& ) = delete;
+    semaphore& operator=( semaphore&& ) = delete;
+
+    int post() noexcept
+    {
+        return vlc_sem_post( &m_sem );
+    }
+    void wait() noexcept
+    {
+        vlc_sem_wait( &m_sem );
+    }
+
+    int wait_i11e() noexcept
+    {
+        return vlc_sem_wait_i11e( &m_sem );
+    }
+
+private:
+    vlc_sem_t m_sem;
+};
+
+}
+
+#endif // VLC_THREADS_H_
 
 } // namespace vlc
 
