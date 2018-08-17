@@ -197,10 +197,10 @@
     // Setup playlist table column selection for both context and main menu
     NSMenu *contextMenu = [[NSMenu alloc] init];
     [self setupPlaylistTableColumnsForMenu:contextMenu];
-    [_playlistHeaderView setMenu: contextMenu];
+    [_playlistHeaderView setMenu:contextMenu];
     [self setupPlaylistTableColumnsForMenu:[[[VLCMain sharedInstance] mainMenu] playlistTableColumnsMenu]];
 
-    NSArray * columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
+    NSArray *columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
 
     for (NSArray *column in columnArray) {
         NSString *columnName = column[0];
@@ -212,7 +212,7 @@
         if(![self setPlaylistColumnTableState: NSOnState forColumn:columnName])
             continue;
 
-        [[_outlineView tableColumnWithIdentifier: columnName] setWidth: [columnWidth floatValue]];
+        [[_outlineView tableColumnWithIdentifier:columnName] setWidth:[columnWidth floatValue]];
     }
 }
 
