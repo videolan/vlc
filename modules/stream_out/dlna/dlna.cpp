@@ -68,8 +68,9 @@ struct sout_stream_sys_t
     std::shared_ptr<MediaRenderer> renderer;
     UpnpInstanceWrapper *p_upnp;
 
-    bool canDecodeAudio( vlc_fourcc_t i_codec ) const;
-    bool canDecodeVideo( vlc_fourcc_t i_codec ) const;
+    ProtocolPtr canDecodeAudio( vlc_fourcc_t i_codec ) const;
+    ProtocolPtr canDecodeVideo( vlc_fourcc_t audio_codec,
+                         vlc_fourcc_t video_codec ) const;
     bool startSoutChain( sout_stream_t* p_stream,
                          const std::vector<sout_stream_id_sys_t*> &new_streams,
                          const std::string &sout );
@@ -86,6 +87,7 @@ struct sout_stream_sys_t
     int                                 http_port;
     std::vector<sout_stream_id_sys_t*>  streams;
     std::vector<sout_stream_id_sys_t*>  out_streams;
+    std::vector<protocol_info_t>        device_protocols;
 
 private:
     std::string GetAcodecOption( sout_stream_t *, vlc_fourcc_t *, const audio_format_t *, int );
@@ -153,14 +155,67 @@ char *getServerIPAddress() {
     return ip;
 }
 
-bool sout_stream_sys_t::canDecodeAudio(vlc_fourcc_t i_codec) const
+std::string dlna_write_protocol_info (const protocol_info_t info)
 {
-    return i_codec == VLC_CODEC_MP4A;
+    std::ostringstream protocol;
+    char dlna_info[448];
+
+    if (info.transport == DLNA_TRANSPORT_PROTOCOL_HTTP)
+        protocol << "http-get:*:";
+
+    protocol << info.profile.mime;
+    protocol << ":";
+
+    if (info.profile.name != "*")
+        protocol << "DLNA.ORG_PN=" << info.profile.name.c_str() << ";";
+
+    dlna_org_flags_t flags = DLNA_ORG_FLAG_STREAMING_TRANSFER_MODE |
+                             DLNA_ORG_FLAG_BACKGROUND_TRANSFERT_MODE |
+                             DLNA_ORG_FLAG_CONNECTION_STALL |
+                             DLNA_ORG_FLAG_DLNA_V15;
+    sprintf (dlna_info, "%s=%.2x;%s=%d;%s=%.8x%.24x",
+               "DLNA.ORG_OP", DLNA_ORG_OPERATION_RANGE,
+               "DLNA.ORG_CI", info.ci,
+               "DLNA.ORG_FLAGS", flags, 0);
+    protocol << dlna_info;
+
+    return protocol.str();
 }
 
-bool sout_stream_sys_t::canDecodeVideo(vlc_fourcc_t i_codec) const
+std::vector<std::string> split(const std::string &s, char delim) {
+    std::stringstream ss(s);
+    std::string item;
+    std::vector<std::string> elems;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(std::move(item));
+    }
+    return elems;
+}
+
+ProtocolPtr sout_stream_sys_t::canDecodeAudio(vlc_fourcc_t audio_codec) const
 {
-    return i_codec == VLC_CODEC_H264;
+    for (protocol_info_t protocol : device_protocols) {
+        if (protocol.profile.media == DLNA_CLASS_AUDIO
+                && protocol.profile.audio_codec == audio_codec)
+        {
+            return std::unique_ptr<protocol_info_t>(new protocol_info_t(protocol));
+        }
+    }
+    return nullptr;
+}
+
+ProtocolPtr sout_stream_sys_t::canDecodeVideo(vlc_fourcc_t audio_codec,
+                vlc_fourcc_t video_codec) const
+{
+    for (protocol_info_t protocol : device_protocols) {
+        if (protocol.profile.media == DLNA_CLASS_AV
+                && protocol.profile.audio_codec == audio_codec
+                && protocol.profile.video_codec == video_codec)
+        {
+            return std::unique_ptr<protocol_info_t>(new protocol_info_t(protocol));
+        }
+    }
+    return nullptr;
 }
 
 bool sout_stream_sys_t::startSoutChain(sout_stream_t *p_stream,
@@ -279,38 +334,74 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         const es_format_t *p_es = &stream->fmt;
         if (p_es->i_cat == AUDIO_ES)
         {
-            if (!canDecodeAudio( p_es->i_codec ))
-            {
-                msg_Dbg( p_stream, "can't remux audio track %d codec %4.4s",
-                        p_es->i_id, (const char*)&p_es->i_codec );
-                p_original_audio = p_es;
-                canRemux = false;
-            }
-            else if (i_codec_audio == 0)
-            {
-                i_codec_audio = p_es->i_codec;
-            }
+            p_original_audio = p_es;
             new_streams.push_back(stream);
         }
         else if (b_supports_video && p_es->i_cat == VIDEO_ES)
         {
-            if (!canDecodeVideo( p_es->i_codec ))
-            {
-                msg_Dbg( p_stream, "can't remux video track %d codec %4.4s",
-                        p_es->i_id, (const char*)&p_es->i_codec );
-                p_original_video = p_es;
-                canRemux = false;
-            }
-            else if (i_codec_video == 0)
-            {
-                i_codec_video = p_es->i_codec;
-            }
+            p_original_video = p_es;
             new_streams.push_back(stream);
         }
     }
 
     if (new_streams.empty())
         return VLC_SUCCESS;
+
+    ProtocolPtr stream_protocol;
+    // check if we have an audio only stream
+    if (!p_original_video && p_original_audio)
+    {
+        if( !(stream_protocol = canDecodeAudio(p_original_audio->i_codec)) )
+        {
+            msg_Dbg( p_stream, "can't remux audio track %d codec %4.4s",
+                p_original_audio->i_id, (const char*)&p_original_audio->i_codec );
+            stream_protocol = make_protocol(default_audio_protocol);
+            canRemux = false;
+        }
+        else
+            i_codec_audio = p_original_audio->i_codec;
+    }
+    // video only stream
+    else if (p_original_video && !p_original_audio)
+    {
+        if( !(stream_protocol = canDecodeVideo(VLC_CODEC_NONE,
+                        p_original_video->i_codec)) )
+        {
+            msg_Dbg(p_stream, "can't remux video track %d codec: %4.4s",
+                p_original_video->i_id, (const char*)&p_original_video->i_codec);
+            stream_protocol = make_protocol(default_video_protocol);
+            canRemux = false;
+        }
+        else
+            i_codec_video = p_original_video->i_codec;
+    }
+    else
+    {
+        if( !(stream_protocol = canDecodeVideo( p_original_audio->i_codec,
+                        p_original_video->i_codec)) )
+        {
+            msg_Dbg(p_stream, "can't remux video track %d with audio: %4.4s and video: %4.4s",
+                p_original_video->i_id, (const char*)&p_original_audio->i_codec,
+                    (const char*)&p_original_video->i_codec);
+            stream_protocol = make_protocol(default_video_protocol);
+            canRemux = false;
+
+            // check which codec needs transcoding
+            if (stream_protocol->profile.audio_codec == p_original_audio->i_codec)
+                i_codec_audio = p_original_audio->i_codec;
+            if (stream_protocol->profile.video_codec == p_original_video->i_codec)
+                i_codec_video = p_original_video->i_codec;
+        }
+        else
+        {
+            i_codec_audio = p_original_audio->i_codec;
+            i_codec_video = p_original_video->i_codec;
+        }
+    }
+
+    msg_Dbg( p_stream, "using DLNA profile %s:%s",
+                stream_protocol->profile.mime.c_str(),
+                stream_protocol->profile.name.c_str() );
 
     std::ostringstream ssout;
     if ( !canRemux )
@@ -338,13 +429,13 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         ssout << "transcode{";
         if ( i_codec_audio == 0 && p_original_audio )
         {
-            i_codec_audio = VLC_CODEC_MP4A;
+            i_codec_audio = stream_protocol->profile.audio_codec;
             ssout << GetAcodecOption( p_stream, &i_codec_audio,
                                       &p_original_audio->audio, i_quality );
         }
         if ( i_codec_video == 0 && p_original_video )
         {
-            i_codec_video = VLC_CODEC_H264;
+            i_codec_video = stream_protocol->profile.video_codec;
             try {
                 ssout << vlc_sout_renderer_GetVcodecOption( p_stream,
                                         { i_codec_video },
@@ -364,8 +455,8 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     std::string root_url = ss.str();
 
     ssout << "http{dst=:" << http_port << root_url
-          << ",mux=" << "mp4stream"
-          << ",access=http{mime=" << "video/mp4" << "}}";
+          << ",mux=" << stream_protocol->profile.mux
+          << ",access=http{mime=" << stream_protocol->profile.mime << "}}";
 
     auto ip = vlc::wrap_cptr<char>(getServerIPAddress());
     if (ip == nullptr)
@@ -386,7 +477,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
 
     msg_Dbg(p_stream, "AVTransportURI: %s", uri);
     renderer->Stop();
-    renderer->SetAVTransportURI(uri);
+    renderer->SetAVTransportURI(uri, *stream_protocol);
     renderer->Play("1");
 
     free(uri);
@@ -506,16 +597,121 @@ int MediaRenderer::Stop()
     return VLC_SUCCESS;
 }
 
-int MediaRenderer::SetAVTransportURI(const char* uri)
+std::vector<protocol_info_t> MediaRenderer::GetProtocolInfo()
 {
+    std::string protocol_csv;
+    std::vector<protocol_info_t> supported_protocols;
+    std::list<std::pair<const char*, const char*>> arg_list;
+
+    IXML_Document *response = SendAction("GetProtocolInfo",
+                                CONNECTION_MANAGER_SERVICE_TYPE, arg_list);
+    if(!response)
+    {
+        return supported_protocols;
+    }
+
+    // Get the CSV list of protocols/profiles supported by the device
+    IXML_NodeList *protocol_list = ixmlDocument_getElementsByTagName( response , "Sink" );
+    if( protocol_list )
+    {
+        IXML_Node* protocol_node = ixmlNodeList_item( protocol_list, 0 );
+        if ( protocol_node )
+        {
+            IXML_Node* p_text_node = ixmlNode_getFirstChild( protocol_node );
+            if ( p_text_node )
+            {
+                protocol_csv.assign(ixmlNode_getNodeValue( p_text_node ));
+            }
+        }
+        ixmlNodeList_free( protocol_list);
+    }
+    ixmlDocument_free(response);
+
+    msg_Dbg(parent, "Device supports protocols: %s", protocol_csv.c_str());
+    // parse the CSV list
+    // format: <transportProtocol>:<network>:<mime>:<additionalInfo>
+    std::vector<std::string> protocols = split(protocol_csv, ',');
+    for (std::string protocol : protocols ) {
+        std::vector<std::string> protocol_info = split(protocol, ':');
+
+        // We only support http transport for now.
+        if (protocol_info.size() == 4 && protocol_info.at(0) == "http-get")
+        {
+            protocol_info_t proto;
+
+            // Get the DLNA profile name
+            std::string profile_name;
+            std::string tag = "DLNA.ORG_PN=";
+            std::size_t index = protocol_info.at(3).find(tag);
+
+            if (protocol_info.at(3) == "*")
+            {
+               profile_name = "*";
+            }
+            else if (index != std::string::npos)
+            {
+                std::size_t end = protocol_info.at(3).find(';', index + 1);
+                int start = index + tag.length() - 1;
+                int length = end - start;
+                profile_name = protocol_info.at(3).substr(start, length);
+            }
+
+            // Match our supported profiles to device profiles
+            for (dlna_profile_t profile : dlna_profile_list) {
+                if (protocol_info.at(2) == profile.mime
+                        && (profile_name == profile.name || profile_name == "*"))
+                {
+                    proto.profile = std::move(profile);
+                    supported_protocols.push_back(proto);
+                    // we do not break here to account for wildcards
+                    // as protocolInfo's fourth field aka <additionalInfo>
+                }
+            }
+        }
+    }
+
+    msg_Dbg( parent , "Got %zu supported profiles", supported_protocols.size() );
+    return supported_protocols;
+}
+
+int MediaRenderer::SetAVTransportURI(const char* uri, const protocol_info_t& proto)
+{
+    static const char didl[] =
+        "<DIDL-Lite "
+        "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
+        "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
+        "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" "
+        "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+        "<item id=\"f-0\" parentID=\"0\" restricted=\"0\">"
+        "<dc:title>%s</dc:title>"
+        "<upnp:class>%s</upnp:class>"
+        "<res protocolInfo=\"%s\">%s</res>"
+        "</item>"
+        "</DIDL-Lite>";
+
+    bool audio = proto.profile.media == DLNA_CLASS_AUDIO;
+    std::string dlna_protocol = dlna_write_protocol_info(proto);
+
+    char *meta_data;
+    if (asprintf(&meta_data, didl,
+                audio ? "Audio" : "Video",
+                audio ? "object.item.audioItem" : "object.item.videoItem",
+                dlna_protocol.c_str(),
+                uri) < 0) {
+        return VLC_ENOMEM;
+    }
+
+    msg_Dbg(parent, "didl: %s", meta_data);
     std::list<std::pair<const char*, const char*>> arg_list = {
         {"InstanceID", "0"},
         {"CurrentURI", uri},
-        {"CurrentURIMetaData", ""}, // NOT_IMPLEMENTED
+        {"CurrentURIMetaData", meta_data},
     };
 
     IXML_Document *p_response = SendAction("SetAVTransportURI",
                                     AV_TRANSPORT_SERVICE_TYPE, arg_list);
+
+    free(meta_data);
     if(!p_response)
     {
         return VLC_EGENERIC;
@@ -650,6 +846,8 @@ int OpenSout( vlc_object_t *p_this )
         p_sys->p_upnp->release();
         goto error;
     }
+
+    p_sys->device_protocols = p_sys->renderer->GetProtocolInfo();
 
     p_stream->pf_add     = Add;
     p_stream->pf_del     = Del;

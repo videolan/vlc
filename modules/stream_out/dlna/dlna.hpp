@@ -26,6 +26,44 @@
 
 #include "../../services_discovery/upnp-wrapper.hpp"
 #include "dlna_common.hpp"
+#include "profile_names.hpp"
+
+struct protocol_info_t {
+    protocol_info_t() = default;
+    protocol_info_t(const protocol_info_t&) = default;
+
+    // aggreate initializers do not work in c++11
+    // for class types with default member initializers
+    protocol_info_t(dlna_transport_protocol_t transport,
+            dlna_org_conversion_t ci,
+            dlna_profile_t profile)
+        : transport(transport)
+        , ci(ci)
+        , profile(profile)
+        {}
+
+    dlna_transport_protocol_t transport = DLNA_TRANSPORT_PROTOCOL_HTTP;
+    dlna_org_conversion_t ci = DLNA_ORG_CONVERSION_NONE;
+    dlna_profile_t profile;
+};
+
+using ProtocolPtr = std::unique_ptr<protocol_info_t>;
+static inline ProtocolPtr make_protocol(protocol_info_t a)
+{
+    return std::unique_ptr<protocol_info_t>(new protocol_info_t(a));
+}
+
+const protocol_info_t default_audio_protocol = {
+    DLNA_TRANSPORT_PROTOCOL_HTTP,
+    DLNA_ORG_CONVERSION_TRANSCODED,
+    default_audio_profile,
+};
+
+const protocol_info_t default_video_protocol = {
+    DLNA_TRANSPORT_PROTOCOL_HTTP,
+    DLNA_ORG_CONVERSION_TRANSCODED,
+    default_video_profile,
+};
 
 namespace DLNA
 {
@@ -53,7 +91,8 @@ public:
 
     int Play(const char *speed);
     int Stop();
-    int SetAVTransportURI(const char* uri);
+    std::vector<protocol_info_t> GetProtocolInfo();
+    int SetAVTransportURI(const char* uri, const protocol_info_t& proto);
 };
 
 }

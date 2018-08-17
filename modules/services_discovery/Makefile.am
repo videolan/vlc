@@ -31,6 +31,7 @@ libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.
 			    services_discovery/upnp-wrapper.cpp \
 			    stream_out/renderer_common.hpp \
 			    stream_out/renderer_common.cpp \
+			    stream_out/dlna/profile_names.hpp \
 			    stream_out/dlna/dlna_common.hpp \
 			    stream_out/dlna/dlna.hpp \
 			    stream_out/dlna/dlna.cpp
