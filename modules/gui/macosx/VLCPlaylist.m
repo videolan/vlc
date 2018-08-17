@@ -52,19 +52,6 @@
 #import <vlc_interface.h>
 #include <vlc_url.h>
 
-/*****************************************************************************
- * An extension to NSOutlineView's interface to fix compilation warnings
- * and let us access these 2 functions properly.
- * This uses a private API, but works fine on all current OSX releases.
- * Radar ID 11739459 request a public API for this. However, it is probably
- * easier and faster to recreate similar looking bitmaps ourselves.
- *****************************************************************************/
-
-@interface NSOutlineView (UndocumentedSortImages)
-+ (NSImage *)_defaultTableHeaderSortImage;
-+ (NSImage *)_defaultTableHeaderReverseSortImage;
-@end
-
 @interface VLCPlaylist ()
 {
     NSImage *_descendingSortingImage;
@@ -93,11 +80,8 @@
 {
     self = [super init];
     if (self) {
-        /* This uses a private API, but works fine on all current OSX releases.
-         * Radar ID 11739459 request a public API for this. However, it is probably
-         * easier and faster to recreate similar looking bitmaps ourselves. */
-        _ascendingSortingImage = [[NSOutlineView class] _defaultTableHeaderSortImage];
-        _descendingSortingImage = [[NSOutlineView class] _defaultTableHeaderReverseSortImage];
+        _ascendingSortingImage = [NSImage imageNamed:@"NSAscendingSortIndicator"];
+        _descendingSortingImage = [NSImage imageNamed:@"NSDescendingSortIndicator"];
 
         [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
 
