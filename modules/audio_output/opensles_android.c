@@ -417,7 +417,7 @@ static int Start(audio_output_t *aout, audio_sample_format_t *restrict fmt)
     const SLInterfaceID ids2[] = { sys->SL_IID_ANDROIDSIMPLEBUFFERQUEUE, sys->SL_IID_VOLUME };
     static const SLboolean req2[] = { SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE };
 
-    if (aout_get_native_sample_rate(aout) >= fmt->i_rate) {
+    if (aout_get_native_sample_rate(aout) >= (int)fmt->i_rate) {
         result = CreateAudioPlayer(sys->engineEngine, &sys->playerObject, &audioSrc,
                                     &audioSnk, sizeof(ids2) / sizeof(*ids2),
                                     ids2, req2);
