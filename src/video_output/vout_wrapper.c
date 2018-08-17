@@ -98,10 +98,8 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
 /* Minimum number of display picture */
 #define DISPLAY_PICTURE_COUNT (1)
 
-static void NoDrInit(vout_thread_t *vout)
+static void NoDrInit(vout_thread_sys_t *sys)
 {
-    vout_thread_sys_t *sys = vout->p;
-
     if (sys->display.use_dr)
         sys->display_pool = vout_display_Pool(sys->display.vd, 3);
     else
@@ -151,7 +149,7 @@ int vout_InitWrapper(vout_thread_t *vout)
         } else {
             sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
-        NoDrInit(vout);
+        NoDrInit(sys);
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
     if (!sys->private_pool)
@@ -192,7 +190,7 @@ void vout_ManageWrapper(vout_thread_t *vout)
 
     if (reset_display_pool) {
         sys->display.use_dr = !vout_IsDisplayFiltered(vd);
-        NoDrInit(vout);
+        NoDrInit(sys);
     }
 }
 
