@@ -35,6 +35,8 @@
 #include "upnp-wrapper.hpp"
 
 #include <vlc_url.h>
+#include <vlc_interrupt.h>
+#include <vlc_threads.h>
 
 namespace SD
 {
@@ -87,13 +89,13 @@ class Upnp_i11e_cb
 {
 public:
     Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie );
-    ~Upnp_i11e_cb();
+    ~Upnp_i11e_cb() = default;
     void waitAndRelease( void );
     static int run( Upnp_EventType, UpnpEventPtr, void *);
 
 private:
-    vlc_sem_t       m_sem;
-    vlc_mutex_t     m_lock;
+    vlc::threads::semaphore m_sem;
+    vlc::threads::mutex m_lock;
     int             m_refCount;
     Upnp_FunPtr     m_callback;
     void*           m_cookie;

@@ -29,6 +29,8 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_threads.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include "upnp.hpp"
 
@@ -923,51 +925,43 @@ Upnp_i11e_cb::Upnp_i11e_cb( Upnp_FunPtr callback, void *cookie )
     , m_cookie( cookie )
 
 {
-    vlc_mutex_init( &m_lock );
-    vlc_sem_init( &m_sem, 0 );
-}
-
-Upnp_i11e_cb::~Upnp_i11e_cb()
-{
-    vlc_mutex_destroy( &m_lock );
-    vlc_sem_destroy( &m_sem );
 }
 
 void Upnp_i11e_cb::waitAndRelease( void )
 {
-    vlc_sem_wait_i11e( &m_sem );
+    m_sem.wait_i11e();
 
-    vlc_mutex_lock( &m_lock );
-    if ( --m_refCount == 0 )
+    int refCount;
+    {
+        vlc::threads::mutex_locker lock( m_lock );
+        refCount = --m_refCount;
+    }
+    if ( refCount == 0 )
     {
         /* The run callback is processed, we can destroy this object */
-        vlc_mutex_unlock( &m_lock );
         delete this;
-    } else
-    {
-        /* Interrupted, let the run callback destroy this object */
-        vlc_mutex_unlock( &m_lock );
     }
+    /* Otherwise interrupted, let the run callback destroy this object */
 }
 
 int Upnp_i11e_cb::run( Upnp_EventType eventType, UpnpEventPtr p_event, void *p_cookie )
 {
     Upnp_i11e_cb *self = static_cast<Upnp_i11e_cb*>( p_cookie );
 
-    vlc_mutex_lock( &self->m_lock );
+    self->m_lock.lock();
     if ( --self->m_refCount == 0 )
     {
         /* Interrupted, we can destroy self */
-        vlc_mutex_unlock( &self->m_lock );
+        self->m_lock.unlock();
         delete self;
         return 0;
     }
     /* Process the user callback_ */
     self->m_callback( eventType, p_event, self->m_cookie);
-    vlc_mutex_unlock( &self->m_lock );
+    self->m_lock.unlock();
 
     /* Signal that the callback is processed */
-    vlc_sem_post( &self->m_sem );
+    self->m_sem.post();
     return 0;
 }
 
