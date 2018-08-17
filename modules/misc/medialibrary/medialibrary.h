@@ -54,19 +54,15 @@ private:
             , mde( mde )
             , item( item )
         {
-            vlc_mutex_init( &m_mutex );
-            vlc_cond_init( &m_cond );
         }
         ~ParseContext()
         {
-            vlc_cond_destroy( &m_cond );
-            vlc_mutex_destroy( &m_mutex );
         }
 
         std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
         std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
-        vlc_cond_t m_cond;
-        vlc_mutex_t m_mutex;
+        vlc::threads::condition_variable m_cond;
+        vlc::threads::mutex m_mutex;
         bool needsProbing;
         input_state_e state;
         MetadataExtractor* mde;
