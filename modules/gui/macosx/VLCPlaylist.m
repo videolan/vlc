@@ -202,6 +202,8 @@
 
     NSArray *columnArray = [[NSUserDefaults standardUserDefaults] arrayForKey:@"PlaylistColumnSelection"];
 
+    BOOL hasTitleItem = NO;
+
     for (NSArray *column in columnArray) {
         NSString *columnName = column[0];
         NSNumber *columnWidth = column[1];
@@ -209,11 +211,20 @@
         if ([columnName isEqualToString:@"status"])
             continue;
 
+        // Memorize if we custom set always-enabled title item
+        if ([columnName isEqualToString:TITLE_COLUMN]) {
+            hasTitleItem = YES;
+        }
+
         if(![self setPlaylistColumnTableState: NSOnState forColumn:columnName])
             continue;
 
         [[_outlineView tableColumnWithIdentifier:columnName] setWidth:[columnWidth floatValue]];
     }
+
+    // Set the always enabled title item if not already done
+    if (!hasTitleItem)
+        [self setPlaylistColumnTableState:NSOnState forColumn:TITLE_COLUMN];
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification
