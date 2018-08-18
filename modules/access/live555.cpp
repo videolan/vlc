@@ -342,12 +342,12 @@ static int  Open ( vlc_object_t *p_this )
 
     p_demux->pf_demux  = Demux;
     p_demux->pf_control= Control;
-    p_demux->p_sys     = p_sys = (demux_sys_t*)calloc( 1, sizeof( demux_sys_t ) );
+    p_demux->p_sys     = p_sys = new (std::nothrow)demux_sys_t();
     if( !p_sys ) return VLC_ENOMEM;
 
     if( vlc_timer_create(&p_sys->timer, TimeoutPrevention, p_demux) )
     {
-        free( p_sys );
+        delete p_sys;
         return VLC_ENOMEM;
     }
 
@@ -506,7 +506,7 @@ static void Close( vlc_object_t *p_this )
     vlc_UrlClean( &p_sys->url );
     vlc_mutex_destroy(&p_sys->timeout_mutex);
 
-    free( p_sys );
+    delete p_sys;
 }
 
 static inline Boolean toBool( bool b ) { return b?True:False; } // silly, no?
