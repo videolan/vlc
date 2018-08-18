@@ -43,6 +43,8 @@
 #include <vlc_strings.h>
 #include <vlc_interrupt.h>
 #include <vlc_keystore.h>
+#include <vlc_threads.h>
+#include <vlc_cxx_helpers.hpp>
 
 #include <limits.h>
 #include <assert.h>
@@ -228,7 +230,7 @@ struct demux_sys_t
 
     /* timeout thread information */
     vlc_timer_t      timer;
-    vlc_mutex_t      timeout_mutex; /* Serialise calls to live555 in timeout thread w.r.t. Demux()/Control() */
+    vlc::threads::mutex timeout_mutex; /* Serialise calls to live555 in timeout thread w.r.t. Demux()/Control() */
 
     /* */
     bool             b_force_mcast;
@@ -364,7 +366,6 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_no_data = true;
     p_sys->b_force_mcast = var_InheritBool( p_demux, "rtsp-mcast" );
     p_sys->f_seek_request = -1;
-    vlc_mutex_init(&p_sys->timeout_mutex);
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_demux->psz_url );
@@ -504,7 +505,6 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_pl_url );
 
     vlc_UrlClean( &p_sys->url );
-    vlc_mutex_destroy(&p_sys->timeout_mutex);
 
     delete p_sys;
 }
@@ -1365,7 +1365,7 @@ static int Demux( demux_t *p_demux )
 
     /* Protect Live555 from simultaneous calls in TimeoutPrevention()
        during pause */
-    vlc_mutex_locker locker(&p_sys->timeout_mutex);
+    vlc::threads::mutex_locker locker( p_sys->timeout_mutex );
 
     for( i = 0; i < p_sys->i_track; i++ )
     {
@@ -1522,7 +1522,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     double  *pf, f;
     bool *pb;
 
-    vlc_mutex_locker locker(&p_sys->timeout_mutex); /* (see same in Demux) */
+    vlc::threads::mutex_locker locker( p_sys->timeout_mutex ); /* (see same in Demux) */
 
     switch( i_query )
     {
@@ -2242,7 +2242,7 @@ static void TimeoutPrevention( void *p_data )
 
     /* Protect Live555 from us calling their functions simultaneously
         with Demux() or Control() */
-    vlc_mutex_locker locker(&p_sys->timeout_mutex);
+    vlc::threads::mutex_locker locker( p_sys->timeout_mutex );
 
     /* If the timer fires while the demuxer owns the lock, and the demuxer
      * then torns the session down, the pointers will become NULL. By the time
