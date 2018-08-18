@@ -81,7 +81,7 @@
                                                                                 <outlet property="textField" destination="WaJ-bS-EIG" id="8lv-jw-399"/>
                                                                             </connections>
                                                                         </tableCellView>
-                                                                        <tableCellView identifier="DataCell" id="xB8-ec-7Yv" customClass="PXSourceListTableCellView">
+                                                                        <tableCellView identifier="DataCell" id="xB8-ec-7Yv" customClass="VLCSourceListTableCellView">
                                                                             <rect key="frame" x="1" y="20" width="233" height="17"/>
                                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                             <subviews>
@@ -92,32 +92,38 @@
                                                                                     </constraints>
                                                                                     <imageCell key="cell" refusesFirstResponder="YES" imageScaling="proportionallyUpOrDown" image="NSActionTemplate" id="sFV-eO-qxM"/>
                                                                                 </imageView>
-                                                                                <textField horizontalHuggingPriority="1000" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0ju-Z4-RED">
-                                                                                    <rect key="frame" x="22" y="0.0" width="96" height="17"/>
+                                                                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="0ju-Z4-RED">
+                                                                                    <rect key="frame" x="22" y="0.0" width="190" height="17"/>
                                                                                     <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="oiO-3f-qfh">
                                                                                         <font key="font" metaFont="system"/>
                                                                                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                     </textFieldCell>
                                                                                 </textField>
-                                                                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="581-8x-wSd" customClass="PXSourceListBadgeView">
-                                                                                    <rect key="frame" x="117" y="0.0" width="113" height="17"/>
-                                                                                </customView>
+                                                                                <button hidden="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZtM-n7-Nyl" customClass="VLCSourceListBadgeButton">
+                                                                                    <rect key="frame" x="212" y="-1" width="20" height="17"/>
+                                                                                    <buttonCell key="cell" type="inline" title="0" bezelStyle="inline" alignment="center" refusesFirstResponder="YES" state="on" borderStyle="border" inset="2" id="ZsW-rM-biz">
+                                                                                        <behavior key="behavior" lightByContents="YES"/>
+                                                                                        <font key="font" metaFont="smallSystemBold"/>
+                                                                                    </buttonCell>
+                                                                                    <userDefinedRuntimeAttributes>
+                                                                                        <userDefinedRuntimeAttribute type="boolean" keyPath="hideWhenZero" value="YES"/>
+                                                                                    </userDefinedRuntimeAttributes>
+                                                                                </button>
                                                                             </subviews>
                                                                             <constraints>
-                                                                                <constraint firstAttribute="bottom" secondItem="581-8x-wSd" secondAttribute="bottom" id="2Q3-wj-d1S"/>
-                                                                                <constraint firstItem="581-8x-wSd" firstAttribute="leading" secondItem="0ju-Z4-RED" secondAttribute="trailing" constant="1" id="6WD-xB-kFQ"/>
                                                                                 <constraint firstItem="xTO-W7-AeC" firstAttribute="centerY" secondItem="xB8-ec-7Yv" secondAttribute="centerY" id="Cby-pa-mb0"/>
                                                                                 <constraint firstItem="xTO-W7-AeC" firstAttribute="top" secondItem="xB8-ec-7Yv" secondAttribute="top" constant="1" id="Mdd-rm-8bF"/>
+                                                                                <constraint firstAttribute="trailing" secondItem="ZtM-n7-Nyl" secondAttribute="trailing" constant="1" id="RBP-b5-dRm"/>
                                                                                 <constraint firstItem="xTO-W7-AeC" firstAttribute="leading" secondItem="xB8-ec-7Yv" secondAttribute="leading" constant="3" id="TLD-5C-SXg"/>
-                                                                                <constraint firstAttribute="trailing" secondItem="581-8x-wSd" secondAttribute="trailing" constant="3" id="YNk-XC-3aD"/>
-                                                                                <constraint firstItem="581-8x-wSd" firstAttribute="top" secondItem="xB8-ec-7Yv" secondAttribute="top" id="hHf-BC-6Cf"/>
+                                                                                <constraint firstItem="ZtM-n7-Nyl" firstAttribute="centerY" secondItem="xB8-ec-7Yv" secondAttribute="centerY" id="dd7-wK-AY9"/>
                                                                                 <constraint firstAttribute="bottom" secondItem="xTO-W7-AeC" secondAttribute="bottom" constant="1" id="hUY-JB-o3u"/>
                                                                                 <constraint firstItem="0ju-Z4-RED" firstAttribute="centerY" secondItem="xTO-W7-AeC" secondAttribute="centerY" id="oDe-uz-van"/>
+                                                                                <constraint firstItem="ZtM-n7-Nyl" firstAttribute="leading" secondItem="0ju-Z4-RED" secondAttribute="trailing" constant="2" id="rGB-F0-G1W"/>
                                                                                 <constraint firstItem="0ju-Z4-RED" firstAttribute="leading" secondItem="xTO-W7-AeC" secondAttribute="trailing" constant="7" id="tNX-nJ-GgZ"/>
                                                                             </constraints>
                                                                             <connections>
-                                                                                <outlet property="badgeView" destination="581-8x-wSd" id="2mh-uw-UwM"/>
+                                                                                <outlet property="badgeView" destination="ZtM-n7-Nyl" id="bsQ-mM-b7K"/>
                                                                                 <outlet property="imageView" destination="xTO-W7-AeC" id="XKu-Yf-XVN"/>
                                                                                 <outlet property="textField" destination="0ju-Z4-RED" id="e8e-hp-hAG"/>
                                                                             </connections>
