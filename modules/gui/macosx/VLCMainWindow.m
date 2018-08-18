@@ -45,6 +45,8 @@
 #import "PXSourceList/PXSourceList.h"
 #import "PXSourceList/PXSourceListDataSource.h"
 
+#import "VLCSourceListTableCellView.h"
+
 #import "VLCMainWindowControlsBar.h"
 #import "VLCVoutView.h"
 #import "VLCVoutWindowController.h"
@@ -1128,7 +1130,7 @@ static const float f_min_window_height = 307.;
 
 - (NSView *)sourceList:(PXSourceList *)aSourceList viewForItem:(id)item
 {
-    PXSourceListTableCellView *cellView = nil;
+    VLCSourceListTableCellView *cellView = nil;
     if ([aSourceList levelForItem:item] == 0)
         cellView = [aSourceList makeViewWithIdentifier:@"HeaderCell" owner:nil];
     else
@@ -1151,12 +1153,10 @@ static const float f_min_window_height = 307.;
         i_playlist_size = p_playlist->p_playing->i_children;
         PL_UNLOCK;
 
-        cellView.badgeView.badgeValue = i_playlist_size;
+        cellView.badgeView.integerValue = i_playlist_size;
     } else {
-        cellView.badgeView.badgeValue = sourceListItem.badgeValue.integerValue;
+        cellView.badgeView.integerValue = sourceListItem.badgeValue.integerValue;
     }
-
-    cellView.badgeView.hidden = cellView.badgeView.badgeValue == 0;
 
     return cellView;
 }
