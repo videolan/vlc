@@ -984,6 +984,10 @@ static const float f_min_window_height = 307.;
     playlist_t * p_playlist = pl_Get(getIntf());
 
     NSIndexSet *selectedIndexes = [_sidebarView selectedRowIndexes];
+
+    if (selectedIndexes.count == 0)
+        return;
+
     id item = [_sidebarView itemAtRow:[selectedIndexes firstIndex]];
 
     //Set the label text to represent the new selection
