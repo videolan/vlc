@@ -190,8 +190,8 @@
     BOOL hasTitleItem = NO;
 
     for (NSArray *column in columnArray) {
-        NSString *columnName = column[0];
-        NSNumber *columnWidth = column[1];
+        NSString *columnName = [column objectAtIndex:0];
+        NSNumber *columnWidth = [column objectAtIndex:1];
 
         if ([columnName isEqualToString:STATUS_COLUMN])
             continue;
