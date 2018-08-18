@@ -48,6 +48,8 @@
 #import "VLCResumeDialogController.h"
 #import "VLCOpenWindowController.h"
 
+#import "PXSourceList/PXSourceList.h"
+
 #include <vlc_actions.h>
 #import <vlc_interface.h>
 #include <vlc_url.h>
@@ -363,6 +365,7 @@
 - (IBAction)deleteItem:(id)sender
 {
     [_model deleteSelectedItem];
+    [[[[VLCMain sharedInstance] mainWindow] sidebarView] performSelector:@selector(reloadData) withObject:nil afterDelay:0.15];
 }
 
 // Actions for playlist column selections
@@ -645,6 +648,7 @@
         input_item_Release(p_input);
     }
     PL_UNLOCK;
+    [[[[VLCMain sharedInstance] mainWindow] sidebarView] performSelector:@selector(reloadData) withObject:nil afterDelay:0.15];
 }
 
 - (IBAction)recursiveExpandOrCollapseNode:(id)sender
