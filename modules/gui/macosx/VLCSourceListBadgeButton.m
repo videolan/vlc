@@ -33,6 +33,17 @@
     return nil;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super initWithCoder:coder];
+    if (self) {
+        [(NSButtonCell*)[self cell] setShowsStateBy:0];
+        [(NSButtonCell*)[self cell] setHighlightsBy:0];
+    }
+
+    return self;
+}
+
 /* Our badges show integer values so make it easier to set those by setting
  * the title depending on the integer value.
  */
