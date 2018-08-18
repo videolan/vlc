@@ -878,58 +878,9 @@ static const float f_min_window_height = 307.;
         return [[item children] objectAtIndex:index];
 }
 
-
-- (id)sourceList:(PXSourceList*)aSourceList objectValueForItem:(id)item
-{
-    return [item title];
-}
-
-- (void)sourceList:(PXSourceList*)aSourceList setObjectValue:(id)object forItem:(id)item
-{
-    [item setTitle:object];
-}
-
 - (BOOL)sourceList:(PXSourceList*)aSourceList isItemExpandable:(id)item
 {
     return [item hasChildren];
-}
-
-
-- (BOOL)sourceList:(PXSourceList*)aSourceList itemHasBadge:(id)item
-{
-    if ([[item identifier] isEqualToString: @"playlist"])
-        return YES;
-
-    return ([(VLCSourceListItem*)item badgeValue] != nil);
-}
-
-
-- (NSInteger)sourceList:(PXSourceList*)aSourceList badgeValueForItem:(id)item
-{
-    playlist_t * p_playlist = pl_Get(getIntf());
-    NSInteger i_playlist_size = 0;
-
-    if ([[item identifier] isEqualToString: @"playlist"]) {
-        PL_LOCK;
-        i_playlist_size = p_playlist->p_playing->i_children;
-        PL_UNLOCK;
-
-        return i_playlist_size;
-    }
-
-    return [[(VLCSourceListItem*)item badgeValue] integerValue];
-}
-
-
-- (BOOL)sourceList:(PXSourceList*)aSourceList itemHasIcon:(id)item
-{
-    return ([item icon] != nil);
-}
-
-
-- (NSImage*)sourceList:(PXSourceList*)aSourceList iconForItem:(id)item
-{
-    return [item icon];
 }
 
 - (NSMenu*)sourceList:(PXSourceList*)aSourceList menuForEvent:(NSEvent*)theEvent item:(id)item
@@ -1035,6 +986,41 @@ static const float f_min_window_height = 307.;
     [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
                                                         object: nil
                                                       userInfo: nil];
+}
+
+- (NSView *)sourceList:(PXSourceList *)aSourceList viewForItem:(id)item
+{
+    PXSourceListTableCellView *cellView = nil;
+    if ([aSourceList levelForItem:item] == 0)
+        cellView = [aSourceList makeViewWithIdentifier:@"HeaderCell" owner:nil];
+    else
+        cellView = [aSourceList makeViewWithIdentifier:@"DataCell" owner:nil];
+
+    PXSourceListItem *sourceListItem = item;
+
+    cellView.textField.editable = NO;
+    cellView.textField.selectable = NO;
+
+    cellView.textField.stringValue = sourceListItem.title ? sourceListItem.title : @"";
+    cellView.imageView.image = [item icon];
+
+    // Badge count
+    if ([[item identifier] isEqualToString: @"playlist"]) {
+        playlist_t * p_playlist = pl_Get(getIntf());
+        NSInteger i_playlist_size = 0;
+
+        PL_LOCK;
+        i_playlist_size = p_playlist->p_playing->i_children;
+        PL_UNLOCK;
+
+        cellView.badgeView.badgeValue = i_playlist_size;
+    } else {
+        cellView.badgeView.badgeValue = sourceListItem.badgeValue.integerValue;
+    }
+
+    cellView.badgeView.hidden = cellView.badgeView.badgeValue == 0;
+
+    return cellView;
 }
 
 - (NSDragOperation)sourceList:(PXSourceList *)aSourceList validateDrop:(id <NSDraggingInfo>)info proposedItem:(id)item proposedChildIndex:(NSInteger)index
