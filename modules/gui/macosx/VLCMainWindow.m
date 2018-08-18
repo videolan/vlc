@@ -34,7 +34,7 @@
 #import "VLCMainMenu.h"
 #import "VLCOpenWindowController.h"
 #import "VLCPlaylist.h"
-#import "SideBarItem.h"
+#import "VLCSourceListItem.h"
 #import <math.h>
 #import <vlc_playlist.h>
 #import <vlc_url.h>
@@ -42,8 +42,8 @@
 #import <vlc_services_discovery.h>
 #import "VLCPLModel.h"
 
-#import "PXSourceList.h"
-#import "PXSourceListDataSource.h"
+#import "PXSourceList/PXSourceList.h"
+#import "PXSourceList/PXSourceListDataSource.h"
 
 #import "VLCMainWindowControlsBar.h"
 #import "VLCVoutView.h"
@@ -274,13 +274,13 @@ static const float f_min_window_height = 307.;
         isAReload = YES;
 
     o_sidebaritems = [[NSMutableArray alloc] init];
-    SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
-    SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
+    VLCSourceListItem *libraryItem = [VLCSourceListItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
+    VLCSourceListItem *playlistItem = [VLCSourceListItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
     [playlistItem setIcon: imageFromRes(@"sidebar-playlist")];
-    SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
-    SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
-    SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
-    SideBarItem *internetItem = [SideBarItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
+    VLCSourceListItem *mycompItem = [VLCSourceListItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
+    VLCSourceListItem *devicesItem = [VLCSourceListItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
+    VLCSourceListItem *lanItem = [VLCSourceListItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
+    VLCSourceListItem *internetItem = [VLCSourceListItem itemWithTitle:_NS("INTERNET") identifier:@"internet"];
 
     /* SD subnodes, inspired by the Qt intf */
     char **ppsz_longnames = NULL;
@@ -299,22 +299,22 @@ static const float f_min_window_height = 307.;
         o_identifier = toNSStr(*ppsz_name);
         switch (*p_category) {
             case SD_CAT_INTERNET:
-                [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [internetItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
                 break;
             case SD_CAT_DEVICES:
-                [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [devicesItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
                 break;
             case SD_CAT_LAN:
-                [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [lanItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
                 [[lanItems lastObject] setSdtype: SD_CAT_LAN];
                 break;
             case SD_CAT_MYCOMPUTER:
-                [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
+                [mycompItems addObject: [VLCSourceListItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 if (!strncmp(*ppsz_name, "video_dir", 9))
                     [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-movie")];
                 else if (!strncmp(*ppsz_name, "audio_dir", 9))
@@ -900,7 +900,7 @@ static const float f_min_window_height = 307.;
     if ([[item identifier] isEqualToString: @"playlist"])
         return YES;
 
-    return [item hasBadge];
+    return ([(VLCSourceListItem*)item badgeValue] != nil);
 }
 
 
@@ -917,13 +917,13 @@ static const float f_min_window_height = 307.;
         return i_playlist_size;
     }
 
-    return [item badgeValue];
+    return [[(VLCSourceListItem*)item badgeValue] integerValue];
 }
 
 
 - (BOOL)sourceList:(PXSourceList*)aSourceList itemHasIcon:(id)item
 {
-    return [item hasIcon];
+    return ([item icon] != nil);
 }
 
 
