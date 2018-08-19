@@ -963,7 +963,7 @@
         else if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"MMSH"])
             [composedOptions appendFormat:@":standard{mux=asfh,dst=%@,port=%@,access=mmsh", _outputDestination, [_streamPortField stringValue]];
         else
-            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile firstObject], [_streamPortField stringValue], _outputDestination];
+            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile firstObject], _outputDestination, [_streamPortField stringValue]];
 
         if ([_streamSAPCheckbox state])
             [composedOptions appendFormat:@",sap,name=\"%@\"", [_streamChannelField stringValue]];
