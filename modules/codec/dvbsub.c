@@ -305,11 +305,11 @@ typedef struct
  * Local prototypes
  *****************************************************************************/
 static void decode_segment( decoder_t *, bs_t * );
-static void decode_page_composition( decoder_t *, bs_t * );
-static void decode_region_composition( decoder_t *, bs_t * );
-static void decode_object( decoder_t *, bs_t * );
-static void decode_display_definition( decoder_t *, bs_t * );
-static void decode_clut( decoder_t *, bs_t * );
+static void decode_page_composition( decoder_t *, bs_t *, uint16_t );
+static void decode_region_composition( decoder_t *, bs_t *, uint16_t );
+static void decode_object( decoder_t *, bs_t *, uint16_t );
+static void decode_display_definition( decoder_t *, bs_t *, uint16_t );
+static void decode_clut( decoder_t *, bs_t *, uint16_t );
 static void free_all( decoder_t * );
 
 static void default_clut_init( decoder_t * );
@@ -458,12 +458,15 @@ static int Decode( decoder_t *p_dec, block_t *p_block )
 #endif
 
     p_sys->b_page = false;
-    while( bs_show( &p_sys->bs, 8 ) == 0x0f ) /* Sync byte */
+
+    uint8_t i_sync_byte = bs_read( &p_sys->bs, 8 );
+    while( i_sync_byte == 0x0f ) /* Sync byte */
     {
         decode_segment( p_dec, &p_sys->bs );
+        i_sync_byte = bs_read( &p_sys->bs, 8 );
     }
 
-    if( ( bs_read( &p_sys->bs, 8 ) & 0x3f ) != 0x3f ) /* End marker */
+    if( ( i_sync_byte & 0x3f ) != 0x3f ) /* End marker */
     {
         msg_Warn( p_dec, "end marker not found (corrupted subtitle ?)" );
         block_Release( p_block );
@@ -556,7 +559,7 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
     int i_size;
 
     /* sync_byte (already checked) */
-    bs_skip( s, 8 );
+    //bs_skip( s, 8 );
 
     /* segment type */
     i_type = bs_read( s, 8 );
@@ -565,7 +568,7 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
     i_page_id = bs_read( s, 16 );
 
     /* segment size */
-    i_size = bs_show( s, 16 );
+    i_size = bs_read( s, 16 );
 
     if( ( i_page_id != p_sys->i_id ) &&
         ( i_page_id != p_sys->i_ancillary_id ) )
@@ -574,7 +577,7 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
         msg_Dbg( p_dec, "subtitle skipped (page id: %i, %i)",
                  i_page_id, p_sys->i_id );
 #endif
-        bs_skip( s,  8 * ( 2 + i_size ) );
+        bs_skip( s,  8 * i_size );
         return;
     }
 
@@ -585,7 +588,7 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "skipped invalid ancillary subtitle packet" );
 #endif
-        bs_skip( s,  8 * ( 2 + i_size ) );
+        bs_skip( s,  8 * i_size );
         return;
     }
 
@@ -602,67 +605,65 @@ static void decode_segment( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "decode_page_composition" );
 #endif
-        decode_page_composition( p_dec, s );
+        decode_page_composition( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_REGION_COMPOSITION:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "decode_region_composition" );
 #endif
-        decode_region_composition( p_dec, s );
+        decode_region_composition( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_CLUT_DEFINITION:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "decode_clut" );
 #endif
-        decode_clut( p_dec, s );
+        decode_clut( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_OBJECT_DATA:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "decode_object" );
 #endif
-        decode_object( p_dec, s );
+        decode_object( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_DISPLAY_DEFINITION:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "decode_display_definition" );
 #endif
-        decode_display_definition( p_dec, s );
+        decode_display_definition( p_dec, s, i_size );
         break;
 
     case DVBSUB_ST_ENDOFDISPLAY:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "end of display" );
 #endif
-        bs_skip( s,  8 * ( 2 + i_size ) );
+        bs_skip( s,  8 * i_size );
         break;
 
     case DVBSUB_ST_STUFFING:
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "skip stuffing" );
 #endif
-        bs_skip( s,  8 * ( 2 + i_size ) );
+        bs_skip( s,  8 * i_size );
         break;
 
     default:
         msg_Warn( p_dec, "unsupported segment type: (%04x)", i_type );
-        bs_skip( s,  8 * ( 2 + i_size ) );
+        bs_skip( s,  8 * i_size );
         break;
     }
 }
 
-static void decode_clut( decoder_t *p_dec, bs_t *s )
+static void decode_clut( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint16_t      i_segment_length;
     uint16_t      i_processed_length;
     dvbsub_clut_t *p_clut, *p_next;
     int           i_id, i_version;
 
-    i_segment_length = bs_read( s, 16 );
     i_id             = bs_read( s, 8 );
     i_version        = bs_read( s, 4 );
 
@@ -763,13 +764,12 @@ static void decode_clut( decoder_t *p_dec, bs_t *s )
     }
 }
 
-static void decode_page_composition( decoder_t *p_dec, bs_t *s )
+static void decode_page_composition( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    int i_version, i_state, i_segment_length, i_timeout, i;
+    int i_version, i_state, i_timeout, i;
 
     /* A page is composed by 0 or more region */
-    i_segment_length = bs_read( s, 16 );
     i_timeout = bs_read( s, 8 );
     i_version = bs_read( s, 4 );
     i_state = bs_read( s, 2 );
@@ -855,16 +855,15 @@ static void decode_page_composition( decoder_t *p_dec, bs_t *s )
     }
 }
 
-static void decode_region_composition( decoder_t *p_dec, bs_t *s )
+static void decode_region_composition( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     dvbsub_region_t *p_region, **pp_region = &p_sys->p_regions;
-    int i_segment_length, i_processed_length, i_id, i_version;
+    int i_processed_length, i_id, i_version;
     int i_width, i_height, i_level_comp, i_depth, i_clut;
     int i_8_bg, i_4_bg, i_2_bg;
     bool b_fill;
 
-    i_segment_length = bs_read( s, 16 );
     i_id = bs_read( s, 8 );
     i_version = bs_read( s, 4 );
 
@@ -995,14 +994,12 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 }
 
 /* ETSI 300 743 [7.2.1] */
-static void decode_display_definition( decoder_t *p_dec, bs_t *s )
+static void decode_display_definition( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    uint16_t      i_segment_length;
     uint16_t      i_processed_length = 40;
     int           i_version;
 
-    i_segment_length = bs_read( s, 16 );
     i_version        = bs_read( s, 4 );
 
     /* Check version number */
@@ -1067,16 +1064,15 @@ static void dvbsub_pdata2bpp( bs_t *, uint8_t *, int, int * );
 static void dvbsub_pdata4bpp( bs_t *, uint8_t *, int, int * );
 static void dvbsub_pdata8bpp( bs_t *, uint8_t *, int, int * );
 
-static void decode_object( decoder_t *p_dec, bs_t *s )
+static void decode_object( decoder_t *p_dec, bs_t *s, uint16_t i_segment_length )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     dvbsub_region_t *p_region;
-    int i_segment_length, i_coding_method, i_id, i;
+    int i_coding_method, i_id, i;
 
     /* ETSI 300-743 paragraph 7.2.4
      * sync_byte, segment_type and page_id have already been processed.
      */
-    i_segment_length = bs_read( s, 16 );
     i_id             = bs_read( s, 16 );
     bs_skip( s, 4 ); /* version */
     i_coding_method  = bs_read( s, 2 );
@@ -1348,15 +1344,12 @@ static void dvbsub_pdata4bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
         {
             if( bs_read( s, 1 ) == 0x00 )           // Switch1
             {
-                if( bs_show( s, 3 ) != 0x00 )
+                i_count = bs_read( s, 3 );
+                if( i_count != 0x00 )
                 {
-                    i_count = 2 + bs_read( s, 3 );
+                    i_count += 2;
                 }
-                else
-                {
-                    bs_skip( s, 3 );
-                    b_stop = true;
-                }
+                else b_stop = true;
             }
             else
             {
@@ -1420,15 +1413,9 @@ static void dvbsub_pdata8bpp( bs_t *s, uint8_t *p, int i_width, int *pi_off )
         {
             if( bs_read( s, 1 ) == 0x00 )           // Switch1
             {
-                if( bs_show( s, 7 ) != 0x00 )
-                {
-                    i_count = bs_read( s, 7 );
-                }
-                else
-                {
-                    bs_skip( s, 7 );
+                i_count = bs_read( s, 7 );
+                if( i_count == 0x00 )
                     b_stop = true;
-                }
             }
             else
             {
