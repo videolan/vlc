@@ -427,7 +427,7 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
 #ifdef Q_OS_MAC
     /* Run mainloop on the main thread as Cocoa requires */
     libvlc_SetExitHandler( p_intf->obj.libvlc, Abort, p_intf );
-    thread( (void *)p_intf );
+    Thread( (void *)p_intf );
 #else
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
