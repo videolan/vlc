@@ -772,6 +772,7 @@ bool intf_sys_t::processReceiverMessage( const castchannel::CastMessage& msg )
             if ( p_app == NULL )
                 break;
             // else: fall through and warn
+            /* fall-through */
         default:
             msg_Warn( m_module, "Unexpected RECEIVER_STATUS with state %s. "
                       "Checking media status",
