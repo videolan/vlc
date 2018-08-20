@@ -218,64 +218,12 @@ void input_SendEventProgramScrambled( input_thread_t *p_input, int i_group, bool
     });
 }
 
-void input_SendEventEsAdd( input_thread_t *p_input, const es_format_t *p_fmt,
-                           const char *psz_title)
-{
-    input_thread_private_t *priv = input_priv(p_input);
-    priv->i_last_es_cat = p_fmt->i_cat;
-    priv->i_last_es_id = p_fmt->i_id;
-
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_ES,
-        .es = {
-            .action = VLC_INPUT_ES_ADDED,
-            .title = psz_title,
-            .fmt = p_fmt,
-        }
-    });
-}
-void input_SendEventEsUpdate( input_thread_t *p_input, const es_format_t *p_fmt )
+void input_SendEventEs( input_thread_t *p_input,
+                        const struct vlc_input_event_es *es_event )
 {
     input_SendEvent( p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_ES,
-        .es = {
-            .action = VLC_INPUT_ES_UPDATED,
-            .fmt = p_fmt,
-        }
-    });
-}
-void input_SendEventEsDel( input_thread_t *p_input,
-                           const es_format_t *p_fmt )
-{
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_ES,
-        .es = {
-            .action = VLC_INPUT_ES_DELETED,
-            .fmt = p_fmt,
-        }
-    });
-}
-void input_SendEventEsSelect( input_thread_t *p_input,
-                              const es_format_t *p_fmt )
-{
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_ES,
-        .es = {
-            .action = VLC_INPUT_ES_SELECTED,
-            .fmt = p_fmt,
-        }
-    });
-}
-
-void input_SendEventEsUnselect( input_thread_t *p_input,
-                                const es_format_t *p_fmt )
-{
-    input_SendEvent( p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_ES,
-        .es = {
-            .action = VLC_INPUT_ES_UNSELECTED,
-            .fmt = p_fmt,
-        }
+        .es = *es_event,
     });
 }
 

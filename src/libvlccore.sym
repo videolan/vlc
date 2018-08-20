@@ -779,3 +779,7 @@ vlc_rd_get_names
 vlc_rd_new
 vlc_rd_release
 vlc_rd_probe_add
+vlc_es_id_Hold
+vlc_es_id_Release
+vlc_es_id_GetInputId
+vlc_es_id_GetCat

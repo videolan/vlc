@@ -339,8 +339,7 @@ void input_LegacyEvents( input_thread_t *p_input,
                             /* First one, we need to add the "Disable" choice */
                             VarListAdd( p_input, varname, -1, _("Disable") );
                         }
-                        VarListAdd( p_input, varname, event->es.fmt->i_id,
-                                    event->es.title );
+                        VarListAdd( p_input, varname, event->es.fmt->i_id, event->es.title );
                     }
 
                     if( EsFmtIsTeletext( event->es.fmt ) )

@@ -680,4 +680,41 @@ static inline void es_format_Change( es_format_t *fmt, int i_cat, vlc_fourcc_t i
     es_format_Init( fmt, i_cat, i_codec );
 }
 
+/**
+ * Increase the ES track id reference count.
+ *
+ * Any held ES tracks must be released with vlc_es_id_Release().
+ *
+ * @param id pointer to the ES id
+ * @return the same ES pointer, for convenience
+ */
+VLC_API vlc_es_id_t *
+vlc_es_id_Hold(vlc_es_id_t *es);
+
+/**
+ * Decrease the ES track id reference count.
+ *
+ * @param id pointer to the ES track id
+ */
+VLC_API void
+vlc_es_id_Release(vlc_es_id_t *id);
+
+/**
+ * Get the ES track input id
+ *
+ * @param id pointer to the ES track id
+ * @return the ES track input id (always valid)
+ */
+VLC_API int
+vlc_es_id_GetInputId(vlc_es_id_t *id);
+
+/**
+ * Get the ES category
+ *
+ * @param id pointer to the ES track id
+ * @return the es track category (always valid)
+ */
+VLC_API enum es_format_category_e
+vlc_es_id_GetCat(vlc_es_id_t *id);
+
 #endif
