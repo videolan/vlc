@@ -162,12 +162,6 @@ static inline uint32_t bs_read1( bs_t *s )
     return 0;
 }
 
-static inline uint32_t bs_show( bs_t *s, int i_count )
-{
-    bs_t     s_tmp = *s;
-    return bs_read( &s_tmp, i_count );
-}
-
 static inline void bs_skip( bs_t *s, ssize_t i_count )
 {
     s->i_left -= i_count;
