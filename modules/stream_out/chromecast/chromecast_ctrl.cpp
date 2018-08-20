@@ -240,12 +240,12 @@ int intf_sys_t::httpd_file_fill( uint8_t *psz_request, uint8_t **pp_data, int *p
 
     char *psz_art;
     {
-    vlc::threads::mutex_locker lock( m_lock );
-    if( !m_art_url )
-    {
-        return VLC_EGENERIC;
-    }
-    psz_art = strdup( m_art_url );
+        vlc::threads::mutex_locker lock( m_lock );
+        if( !m_art_url )
+        {
+            return VLC_EGENERIC;
+        }
+        psz_art = strdup( m_art_url );
     }
 
     stream_t *s = vlc_stream_NewURL( m_module, psz_art );
@@ -455,10 +455,10 @@ bool intf_sys_t::isStateReady() const
 void intf_sys_t::setPacing(bool do_pace)
 {
     {
-    vlc::threads::mutex_locker locker( m_lock );
-    if( m_pace == do_pace )
-        return;
-    m_pace = do_pace;
+        vlc::threads::mutex_locker locker( m_lock );
+        if( m_pace == do_pace )
+            return;
+        m_pace = do_pace;
     }
     m_pace_cond.signal();
 }
@@ -513,25 +513,25 @@ void intf_sys_t::sendInputEvent(enum cc_input_event event, union cc_input_arg ar
     on_input_event_itf on_input_event;
     void *data;
     {
-    vlc::threads::mutex_locker locker( m_lock );
-    on_input_event = m_on_input_event;
-    data = m_on_input_event_data;
+        vlc::threads::mutex_locker locker( m_lock );
+        on_input_event = m_on_input_event;
+        data = m_on_input_event_data;
 
-    switch (event)
-    {
-        case CC_INPUT_EVENT_EOF:
-            if (m_input_eof != arg.eof)
-                m_input_eof = arg.eof;
-            else
-            {
-                /* Don't send twice the same event */
-                on_input_event = NULL;
-                data = NULL;
-            }
-            break;
-        default:
-            break;
-    }
+        switch (event)
+        {
+            case CC_INPUT_EVENT_EOF:
+                if (m_input_eof != arg.eof)
+                    m_input_eof = arg.eof;
+                else
+                {
+                    /* Don't send twice the same event */
+                    on_input_event = NULL;
+                    data = NULL;
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     if (on_input_event)
