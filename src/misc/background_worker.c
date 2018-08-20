@@ -175,7 +175,7 @@ static void background_worker_Destroy(struct background_worker *worker)
     free(worker);
 }
 
-static void EndTask(struct background_thread *thread, struct task *task)
+static void TerminateTask(struct background_thread *thread, struct task *task)
 {
     struct background_worker *worker = thread->owner;
     task_Destroy(worker, task);
@@ -233,7 +233,7 @@ static void* Thread( void* data )
         void *handle;
         if (worker->conf.pf_start(worker->owner, task->entity, &handle))
         {
-            EndTask(thread, task);
+            TerminateTask(thread, task);
             continue;
         }
 
@@ -255,7 +255,7 @@ static void* Thread( void* data )
                     || worker->conf.pf_probe(worker->owner, handle))
             {
                 worker->conf.pf_stop(worker->owner, handle);
-                EndTask(thread, task);
+                TerminateTask(thread, task);
                 break;
             }
         }
