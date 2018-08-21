@@ -294,7 +294,12 @@ static void ReadDir(intf_thread_t *intf)
             continue;
 
         dir_entry->file = IsFile(sys->current_dir, entry);
-        dir_entry->path = xstrdup(entry);
+        dir_entry->path = strdup(entry);
+        if (unlikely(dir_entry->path == NULL))
+        {
+            free(dir_entry);
+            continue;
+        }
         TAB_APPEND(sys->n_dir_entries, sys->dir_entries, dir_entry);
         continue;
     }
