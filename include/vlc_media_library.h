@@ -268,13 +268,18 @@ typedef struct vlc_ml_playlist_list_t
     vlc_ml_playlist_t p_items[];
 } vlc_ml_playlist_list_t;
 
-typedef struct vlc_ml_entrypoint_t vlc_ml_entrypoint_t;
-struct vlc_ml_entrypoint_t
+typedef struct vlc_ml_entry_point_t
 {
     char* psz_mrl; /**< This entrypoint's MRL. Will be NULL if b_present is false */
     bool b_present; /**< The presence state for this entrypoint. */
     bool b_banned; /**< Will be true if the user required this entrypoint to be excluded */
-};
+} vlc_ml_entry_point_t;
+
+typedef struct vlc_ml_entry_point_list_t
+{
+    size_t i_nb_items;
+    vlc_ml_entry_point_t p_items[];
+} vlc_ml_entry_point_list_t;
 
 /* Opaque medialibrary pointer, to be used by any non-medialibrary module */
 typedef struct vlc_medialibrary_t vlc_medialibrary_t;
@@ -402,7 +407,7 @@ enum vlc_ml_control
     VLC_ML_REMOVE_FOLDER,           /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
-    VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entrypoint_t**); arg2: nb results(size_t*), res: can fail */
+    VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entry_point_list_t**); res: can fail */
     /**
      * Reload a specific folder, or all.
      * arg1: mrl (const char*), NULL to reload all folders
@@ -700,8 +705,6 @@ VLC_API void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
                                                vlc_ml_event_callback_t* p_callback );
 
 
-VLC_API void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items );
-
 VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );
 VLC_API void vlc_ml_artist_release( vlc_ml_artist_t* p_artist );
 VLC_API void vlc_ml_genre_release( vlc_ml_genre_t* p_genre );
@@ -717,6 +720,7 @@ VLC_API void vlc_ml_album_list_release( vlc_ml_album_list_t* p_list );
 VLC_API void vlc_ml_show_list_release( vlc_ml_show_list_t* p_list );
 VLC_API void vlc_ml_genre_list_release( vlc_ml_genre_list_t* p_list );
 VLC_API void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list );
+VLC_API void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list );
 
 static inline vlc_ml_query_params_t vlc_ml_query_params_create()
 {
@@ -750,9 +754,9 @@ static inline int vlc_ml_unban_folder( vlc_medialibrary_t* p_ml, const char* psz
 }
 
 static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
-                                      vlc_ml_entrypoint_t** pp_entrypoints, size_t* p_nb_items )
+                                      vlc_ml_entry_point_list_t** pp_entrypoints )
 {
-    return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints, p_nb_items );
+    return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints );
 }
 
 static inline int vlc_ml_reload_folder( vlc_medialibrary_t* p_ml, const char* psz_mrl )
@@ -1232,7 +1236,8 @@ static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc
     vlc_ml_album_list_t*: vlc_ml_album_list_release, \
     vlc_ml_show_list_t*: vlc_ml_show_list_release, \
     vlc_ml_genre_list_t*: vlc_ml_genre_list_release, \
-    vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release \
+    vlc_ml_playlist_list_t*: vlc_ml_playlist_list_release, \
+    vlc_ml_entry_point_list_t*: vlc_ml_entry_point_list_release \
     )( OBJ )
 #else
 static inline void vlc_ml_release( vlc_ml_show_t* show ) { vlc_ml_show_release( show ); }
@@ -1249,6 +1254,7 @@ static inline void vlc_ml_release( vlc_ml_album_list_t* list ) { vlc_ml_album_li
 static inline void vlc_ml_release( vlc_ml_show_list_t* list ) { vlc_ml_show_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_genre_list_t* list ) { vlc_ml_genre_list_release( list ); }
 static inline void vlc_ml_release( vlc_ml_playlist_list_t* list ) { vlc_ml_playlist_list_release( list ); }
+static inline void vlc_ml_release( vlc_ml_entry_point_list_t* list ) { vlc_ml_entry_point_list_release( list ); }
 #endif
 
 #endif /* VLC_MEDIA_LIBRARY_H */

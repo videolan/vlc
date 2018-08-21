@@ -27,7 +27,6 @@
 #include <vlc_media_library.h>
 #include "medialibrary.h"
 
-#include <medialibrary/IFolder.h>
 #include <medialibrary/IMedia.h>
 #include <medialibrary/IAlbumTrack.h>
 #include <medialibrary/IAlbum.h>
@@ -382,33 +381,9 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_LIST_FOLDERS:
         {
             auto entryPoints = m_ml->entryPoints()->all();
-            auto nbItem = entryPoints.size();
-            auto list = vlc::wrap_carray( static_cast<vlc_ml_entrypoint_t*>(
-                    calloc( entryPoints.size(), sizeof( vlc_ml_entrypoint_t ) ) ),
-                    [nbItem]( vlc_ml_entrypoint_t* ptr ) {
-                        vlc_ml_entrypoints_release( ptr, nbItem );
-                    });
-            if ( unlikely( list == nullptr ) )
-                return VLC_ENOMEM;
-            for ( auto i = 0u; i < entryPoints.size(); ++i )
-            {
-                const auto ep = entryPoints[i].get();
-                if ( ep->isPresent() == true )
-                {
-                    list[i].psz_mrl = strdup( ep->mrl().c_str() );
-                    if ( unlikely( list[i].psz_mrl == nullptr ) )
-                        return VLC_ENOMEM;
-                    list[i].b_present = true;
-                }
-                else
-                {
-                    list[i].psz_mrl = nullptr;
-                    list[i].b_present = false;
-                }
-                list[i].b_banned = ep->isBanned();
-            }
-            *(va_arg( args, vlc_ml_entrypoint_t**) ) = list.release();
-            *(va_arg( args, size_t*) ) = entryPoints.size();
+            auto res = ml_convert_list<vlc_ml_entry_point_list_t,
+                                         vlc_ml_entry_point_t>( entryPoints );
+            *(va_arg( args, vlc_ml_entry_point_list_t**) ) = res;
             break;
         }
         case VLC_ML_RELOAD_FOLDER:

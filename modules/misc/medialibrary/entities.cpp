@@ -37,6 +37,7 @@
 #include <medialibrary/IPlaylist.h>
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
+#include <medialibrary/IFolder.h>
 
 static auto const strdup_helper = []( std::string const& src, char*& dst )
 {
@@ -351,5 +352,22 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
     if( !strdup_helper( input->name(), output.psz_name ) ||
         !strdup_helper( input->artworkMrl(), output.psz_artwork_mrl ) )
         return false;
+    return true;
+}
+
+bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
+{
+    if ( input->isPresent() == true )
+    {
+        if ( strdup_helper( input->mrl(), output.psz_mrl ) == false )
+            return false;
+        output.b_present = true;
+    }
+    else
+    {
+        output.psz_mrl = nullptr;
+        output.b_present = false;
+    }
+    output.b_banned = input->isBanned();
     return true;
 }

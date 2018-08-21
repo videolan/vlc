@@ -51,15 +51,6 @@ static vlc_medialibrary_t* ml_priv( vlc_medialibrary_module_t* p_ml )
     return container_of( p_ml, struct vlc_medialibrary_t, m );
 }
 
-void vlc_ml_entrypoints_release( vlc_ml_entrypoint_t* p_list, size_t i_nb_items )
-{
-    for ( size_t i = 0; i < i_nb_items; ++i )
-    {
-        free( p_list[i].psz_mrl );
-    }
-    free( p_list );
-}
-
 static void vlc_ml_event_send( vlc_medialibrary_module_t* p_ml, const vlc_ml_event_t* p_event )
 {
     vlc_medialibrary_t* p_priv = ml_priv( p_ml );
@@ -322,6 +313,15 @@ void vlc_ml_playlist_list_release( vlc_ml_playlist_list_t* p_list )
         return;
     for ( size_t i = 0; i < p_list->i_nb_items; ++i )
         vlc_ml_playlist_release_inner( &p_list->p_items[i] );
+    free( p_list );
+}
+
+void vlc_ml_entry_point_list_release( vlc_ml_entry_point_list_t* p_list )
+{
+    if ( p_list == NULL )
+        return;
+    for ( size_t i = 0; i < p_list->i_nb_items; ++i )
+        free( p_list->p_items[i].psz_mrl );
     free( p_list );
 }
 
