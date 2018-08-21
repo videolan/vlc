@@ -880,35 +880,67 @@ static BOOL SelectClockSource(void *data)
 int EnumClockSource(const char *var, char ***vp, char ***np)
 {
     const size_t max = 6;
-    char **values = xmalloc (sizeof (*values) * max);
-    char **names = xmalloc (sizeof (*names) * max);
+    char **values = malloc (sizeof (*values) * max);
+    char **names = malloc (sizeof (*names) * max);
+    if (!values || !names)
+    {
+        free(values);
+        free(names);
+        *vp = NULL;
+        *np = NULL;
+        return -1;
+    }
     int n = 0;
 
-    values[n] = xstrdup ("");
-    names[n] = xstrdup (_("Auto"));
+    values[n] = strdup ("");
+    names[n] = strdup (_("Auto"));
+    if (!values[n] || !names[n])
+        goto error;
     n++;
-    values[n] = xstrdup ("interrupt");
-    names[n] = xstrdup ("Interrupt time");
+    values[n] = strdup ("interrupt");
+    names[n] = strdup ("Interrupt time");
+    if (!values[n] || !names[n])
+        goto error;
     n++;
-    values[n] = xstrdup ("tick");
-    names[n] = xstrdup ("Windows time");
+    values[n] = strdup ("tick");
+    names[n] = strdup ("Windows time");
+    if (!values[n] || !names[n])
+        goto error;
     n++;
 #if !VLC_WINSTORE_APP
-    values[n] = xstrdup ("multimedia");
-    names[n] = xstrdup ("Multimedia timers");
+    values[n] = strdup ("multimedia");
+    names[n] = strdup ("Multimedia timers");
+    if (!values[n] || !names[n])
+        goto error;
     n++;
 #endif
-    values[n] = xstrdup ("perf");
-    names[n] = xstrdup ("Performance counters");
+    values[n] = strdup ("perf");
+    names[n] = strdup ("Performance counters");
+    if (!values[n] || !names[n])
+        goto error;
     n++;
-    values[n] = xstrdup ("wall");
-    names[n] = xstrdup ("System time (DANGEROUS!)");
+    values[n] = strdup ("wall");
+    names[n] = strdup ("System time (DANGEROUS!)");
+    if (!values[n] || !names[n])
+        goto error;
     n++;
 
     *vp = values;
     *np = names;
     (void) var;
     return n;
+
+error:
+    for (int i = 0; i <= n; ++i)
+    {
+        free (values[i]);
+        free (names[i]);
+    }
+    free( values );
+    free( names);
+    *vp = NULL;
+    *np = NULL;
+    return -1;
 }
 
 
