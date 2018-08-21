@@ -671,7 +671,7 @@ VLC_INT_FUNC(popcount)
     _Generic((x), \
         unsigned char: (vlc_clz(x) - (sizeof (unsigned) - 1) * 8), \
         unsigned short: (vlc_clz(x) \
-		- (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
+        - (sizeof (unsigned) - sizeof (unsigned short)) * 8), \
         unsigned: vlc_clz(x), \
         unsigned long: vlc_clzl(x), \
         unsigned long long: vlc_clzll(x))
