@@ -890,6 +890,7 @@ static void SetOutputBlockProperties(decoder_t *p_dec, block_t *p_output)
         }
         p_sys->pts = VLC_TICK_INVALID;
     }
+    p_output->i_flags &= ~BLOCK_FLAG_AU_END;
     hevc_release_sei_pic_timing(p_sys->p_timing);
     p_sys->p_timing = NULL;
 }
@@ -902,6 +903,7 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     *pb_ts_used = false;
+    bool b_au_end = p_frag->i_flags & BLOCK_FLAG_AU_END;
 
     if(p_sys->b_need_ts)
     {
@@ -943,6 +945,10 @@ static block_t *ParseNALBlock(decoder_t *p_dec, bool *pb_ts_used, block_t *p_fra
     {
         p_output = ParseNonVCL(p_dec, i_nal_type, p_frag);
     }
+
+    if( !p_output && b_au_end )
+        p_output = OutputQueues(p_sys, p_sys->sets != MISSING &&
+                                       p_sys->b_recovery_point);
 
     p_output = GatherAndValidateChain(p_output);
     if(p_output)
