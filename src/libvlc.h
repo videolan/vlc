@@ -39,7 +39,7 @@ void system_Configure ( libvlc_int_t *, int, const char *const [] );
 #if defined(_WIN32) || defined(__OS2__)
 void system_End(void);
 #ifndef __OS2__
-size_t EnumClockSource( const char *, char ***, char *** );
+int EnumClockSource( const char *, char ***, char *** );
 #endif
 #endif
 void vlc_CPU_dump(vlc_object_t *);

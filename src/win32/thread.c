@@ -877,12 +877,12 @@ static BOOL SelectClockSource(void *data)
     return TRUE;
 }
 
-size_t EnumClockSource(const char *var, char ***vp, char ***np)
+int EnumClockSource(const char *var, char ***vp, char ***np)
 {
     const size_t max = 6;
     char **values = xmalloc (sizeof (*values) * max);
     char **names = xmalloc (sizeof (*names) * max);
-    size_t n = 0;
+    int n = 0;
 
     values[n] = xstrdup ("");
     names[n] = xstrdup (_("Auto"));
