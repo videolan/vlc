@@ -735,6 +735,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 }
 
                 const MP4_Box_t *p_SmDm = MP4_BoxGet( p_sample, "SmDm" );
+                if( !p_SmDm )
+                    p_SmDm = MP4_BoxGet( p_sample, "mdcv" );
                 if( p_SmDm && BOXDATA(p_SmDm) )
                 {
                     memcpy( p_track->fmt.video.mastering.primaries,
@@ -746,6 +748,8 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 }
 
                 const MP4_Box_t *p_CoLL = MP4_BoxGet( p_sample, "CoLL" );
+                if( !p_CoLL )
+                    p_CoLL = MP4_BoxGet( p_sample, "clli" );
                 if( p_CoLL && BOXDATA(p_CoLL) )
                 {
                     p_track->fmt.video.lighting.MaxCLL = BOXDATA(p_CoLL)->i_maxCLL;
