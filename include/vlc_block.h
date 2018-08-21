@@ -84,12 +84,14 @@
 #define BLOCK_FLAG_PREROLL       0x0200
 /** This block is corrupted and/or there is data loss  */
 #define BLOCK_FLAG_CORRUPTED     0x0400
+/** This block is last of its access unit */
+#define BLOCK_FLAG_AU_END        0x0800
 /** This block contains an interlaced picture with top field stored first */
-#define BLOCK_FLAG_TOP_FIELD_FIRST 0x0800
+#define BLOCK_FLAG_TOP_FIELD_FIRST 0x1000
 /** This block contains an interlaced picture with bottom field stored first */
-#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x1000
+#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x2000
 /** This block contains a single field from interlaced picture. */
-#define BLOCK_FLAG_SINGLE_FIELD  0x2000
+#define BLOCK_FLAG_SINGLE_FIELD  0x4000
 
 /** This block contains an interlaced picture */
 #define BLOCK_FLAG_INTERLACED_MASK \
