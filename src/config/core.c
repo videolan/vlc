@@ -349,20 +349,41 @@ ssize_t config_GetPszChoices(const char *name,
         return cfg->list.psz_cb(name, values, texts);
     }
 
-    char **vals = xmalloc (sizeof (*vals) * count);
-    char **txts = xmalloc (sizeof (*txts) * count);
-
-    for (size_t i = 0; i < count; i++)
+    char **vals = malloc (sizeof (*vals) * count);
+    char **txts = malloc (sizeof (*txts) * count);
+    if (!vals || !txts)
     {
-        vals[i] = xstrdup ((cfg->list.psz[i] != NULL) ? cfg->list.psz[i] : "");
+        free (vals);
+        free (txts);
+        errno = ENOMEM;
+        return -1;
+    }
+
+    size_t i;
+    for (i = 0; i < count; i++)
+    {
+        vals[i] = strdup ((cfg->list.psz[i] != NULL) ? cfg->list.psz[i] : "");
         /* FIXME: use module_gettext() instead */
-        txts[i] = xstrdup ((cfg->list_text[i] != NULL)
+        txts[i] = strdup ((cfg->list_text[i] != NULL)
                                        ? vlc_gettext (cfg->list_text[i]) : "");
+        if (!vals[i] || !txts[i])
+            goto error;
     }
 
     *values = vals;
     *texts = txts;
     return count;
+
+error:
+    for (size_t j = 0; j <= i; ++j)
+    {
+        free (vals[j]);
+        free (txts[j]);
+    }
+    free(vals);
+    free(txts);
+    errno = ENOMEM;
+    return -1;
 }
 
 static int confcmp (const void *a, const void *b)
