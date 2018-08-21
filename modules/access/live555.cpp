@@ -2241,6 +2241,9 @@ static void TimeoutPrevention( void *p_data )
     demux_sys_t *p_sys = p_demux->p_sys;
     char *bye = NULL;
 
+    if( var_GetBool( p_demux, "rtsp-tcp" ) )
+        return;
+
     /* Protect Live555 from us calling their functions simultaneously
         with Demux() or Control() */
     vlc_mutex_locker locker(&p_sys->timeout_mutex);
