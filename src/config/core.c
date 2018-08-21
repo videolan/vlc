@@ -262,26 +262,52 @@ static ssize_t config_ListModules (const char *cap, char ***restrict values,
         return n;
     }
 
-    char **vals = xmalloc ((n + 2) * sizeof (*vals));
-    char **txts = xmalloc ((n + 2) * sizeof (*txts));
-
-    vals[0] = xstrdup ("any");
-    txts[0] = xstrdup (_("Automatic"));
-
-    for (ssize_t i = 0; i < n; i++)
+    char **vals = malloc ((n + 2) * sizeof (*vals));
+    char **txts = malloc ((n + 2) * sizeof (*txts));
+    if (!vals || !txts)
     {
-        vals[i + 1] = xstrdup (module_get_object (list[i]));
-        txts[i + 1] = xstrdup (module_gettext (list[i],
-                               module_get_name (list[i], true)));
+        free (vals);
+        free (txts);
+        *values = *texts = NULL;
+        return -1;
     }
 
-    vals[n + 1] = xstrdup ("none");
-    txts[n + 1] = xstrdup (_("Disable"));
+    ssize_t i = 0;
+
+    vals[i] = strdup ("any");
+    txts[i] = strdup (_("Automatic"));
+    if (!vals[i] || !txts[i])
+        goto error;
+
+    ++i;
+    for (; i <= n; i++)
+    {
+        vals[i] = strdup (module_get_object (list[i - 1]));
+        txts[i] = strdup (module_gettext (list[i - 1],
+                               module_get_name (list[i - 1], true)));
+        if( !vals[i] || !txts[i])
+            goto error;
+    }
+    vals[i] = strdup ("none");
+    txts[i] = strdup (_("Disable"));
+    if( !vals[i] || !txts[i])
+        goto error;
 
     *values = vals;
     *texts = txts;
     module_list_free (list);
-    return n + 2;
+    return i + 1;
+
+error:
+    for (ssize_t j = 0; j <= i; ++j)
+    {
+        free (vals[j]);
+        free (txts[j]);
+    }
+    free(vals);
+    free(txts);
+    *values = *texts = NULL;
+    return -1;
 }
 
 ssize_t config_GetPszChoices(const char *name,
