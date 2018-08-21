@@ -143,7 +143,7 @@ static vlc_tick_t dtsgen_GetDTS(struct dtsgen_t *d)
      * use the reorderdepth th packet as dts offset */
     if(d->count > DTSGEN_REORDER_MAX)
     {
-        i_dts = d->ordereddts[(d->count - 1) - (d->reorderdepth + 1)];
+        i_dts = d->ordereddts[d->count - d->reorderdepth - 1];
     }
     /* When starting, we craft a slow incrementing DTS to ensure
        we can't go backward due to reorder need */
