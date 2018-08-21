@@ -265,7 +265,7 @@ end:
     }
     return VLC_SUCCESS;
 }
- 
+
 #if (!defined(HAVE_FLOCK) && defined (HAVE_FCNTL) && defined (F_SETLKW))
 static int
 posix_lock_fd(int fd)

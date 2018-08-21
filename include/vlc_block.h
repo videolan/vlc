@@ -195,7 +195,7 @@ VLC_API block_t *block_Realloc(block_t *, ssize_t pre, size_t body) VLC_USED;
  *
  * @note
  * If the block is in a chain, this function does <b>not</b> release any
- * subsequent block in the chain. Use block_ChainRelease() for that purpose. 
+ * subsequent block in the chain. Use block_ChainRelease() for that purpose.
  *
  * @param block block to release (cannot be NULL)
  */

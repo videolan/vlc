@@ -633,7 +633,7 @@ int D3D11OpenConverter( vlc_object_t *obj )
     filter_t *p_filter = (filter_t *)obj;
 
     if ( p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE &&
-         p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B && 
+         p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_10B &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_RGBA &&
          p_filter->fmt_in.video.i_chroma != VLC_CODEC_D3D11_OPAQUE_BGRA )
         return VLC_EGENERIC;

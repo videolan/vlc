@@ -90,7 +90,7 @@ static unsigned ConsoleWidth(void)
  * Checks for help command line options such as --help or --version.
  * If one is found, print the corresponding text.
  * \return true if a command line options caused some help message to be
- * printed, false otherwise. 
+ * printed, false otherwise.
  */
 bool config_PrintHelp (vlc_object_t *obj)
 {
