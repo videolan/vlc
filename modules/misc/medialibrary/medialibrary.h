@@ -55,9 +55,6 @@ private:
             , item( item )
         {
         }
-        ~ParseContext()
-        {
-        }
 
         std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
         std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
