@@ -65,7 +65,7 @@ static void ReleaseCurrent(vlc_gl_t *gl)
     sys->makeCurrentCb(sys->opaque, false);
 }
 
-static void SwapBuffers(vlc_gl_t *gl)
+static void VglSwapBuffers(vlc_gl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
     sys->swapCb(sys->opaque);
@@ -126,7 +126,7 @@ static int Open(vlc_object_t *object)
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;
     gl->resize = Resize;
-    gl->swap = SwapBuffers;
+    gl->swap = VglSwapBuffers;
     gl->getProcAddress = OurGetProcAddress;
 
     if( sys->setupCb )
