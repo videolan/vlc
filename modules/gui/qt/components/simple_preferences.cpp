@@ -32,6 +32,7 @@
 
 #include <vlc_config_cat.h>
 #include <vlc_configuration.h>
+#include <vlc_aout.h>
 
 #include <QString>
 #include <QFont>
