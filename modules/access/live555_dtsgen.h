@@ -48,6 +48,7 @@ static void dtsgen_Init(struct dtsgen_t *d)
 static void dtsgen_Resync(struct dtsgen_t *d)
 {
     d->count = 0;
+    d->reorderdepth = 0;
 }
 
 #define dtsgen_Clean(d)
