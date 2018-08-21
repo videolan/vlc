@@ -1915,8 +1915,17 @@ static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_SmDm_t, NULL );
     MP4_Box_data_SmDm_t *p_SmDm = p_box->data.p_SmDm;
 
+    uint8_t i_version;
+    uint32_t i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags );
+    VLC_UNUSED(i_flags);
+    if( i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+
+    const uint8_t RGB2GBR[3] = {2,0,1};
     for(int i=0; i<6; i++)
-        MP4_GET2BYTES( p_SmDm->primaries[i] );
+        MP4_GET2BYTES( p_SmDm->primaries[RGB2GBR[i/2] + i%2] );
     for(int i=0; i<2; i++)
         MP4_GET2BYTES( p_SmDm->white_point[i] );
     MP4_GET4BYTES( p_SmDm->i_luminanceMax );
@@ -1929,6 +1938,15 @@ static int MP4_ReadBox_CoLL( stream_t *p_stream, MP4_Box_t *p_box )
 {
     MP4_READBOX_ENTER( MP4_Box_data_CoLL_t, NULL );
     MP4_Box_data_CoLL_t *p_CoLL = p_box->data.p_CoLL;
+
+    uint8_t i_version;
+    uint32_t i_flags;
+    MP4_GET1BYTE( i_version );
+    MP4_GET3BYTES( i_flags );
+    VLC_UNUSED(i_flags);
+    if( i_version != 0 )
+        MP4_READBOX_EXIT( 0 );
+
     MP4_GET2BYTES( p_CoLL->i_maxCLL );
     MP4_GET2BYTES( p_CoLL->i_maxFALL );
     MP4_READBOX_EXIT( 1 );
