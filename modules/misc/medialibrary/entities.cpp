@@ -145,6 +145,9 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
                         return false;
                     break;
                 }
+                case medialibrary::IMedia::SubType::Unknown:
+                    output.i_subtype = VLC_ML_MEDIA_SUBTYPE_UNKNOWN;
+                    break;
                 default:
                     vlc_assert_unreachable();
             }
