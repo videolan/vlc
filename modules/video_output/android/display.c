@@ -505,12 +505,6 @@ static int OpenCommon(vout_display_t *vd)
     vout_display_sys_t *sys;
     video_format_t sub_fmt;
 
-    /* There are three cases:
-     * 1. the projection_mode is PROJECTION_MODE_RECTANGULAR
-     * 2. gles2 vout failed
-     * 3. the module is forced */
-    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
-
     vout_window_t *embed =
         vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
 
@@ -618,6 +612,11 @@ static int Open(vlc_object_t *p_this)
 
     if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
+
+    /* There are two cases:
+     * 1. the projection_mode is PROJECTION_MODE_RECTANGULAR
+     * 2. gles2 vout failed */
+    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     return OpenCommon(vd);
 }
