@@ -65,6 +65,9 @@ QT_CONFIG += -release
 	cd $< && $(MAKE) -C src/plugins sub-platforms-install_subtargets
 ifdef HAVE_WIN32
 	mv $(PREFIX)/plugins/platforms/libqwindows.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
+	# Vista styling
+	cd $< && $(MAKE) -C src -C plugins sub-styles-install_subtargets
+	mv $(PREFIX)/plugins/styles/libqwindowsvistastyle.a $(PREFIX)/lib/ && rm -rf $(PREFIX)/plugins
 	# Move includes to match what VLC expects
 	mkdir -p $(PREFIX)/include/QtGui/qpa
 	cp $(PREFIX)/include/QtGui/$(QT_VERSION)/QtGui/qpa/qplatformnativeinterface.h $(PREFIX)/include/QtGui/qpa
@@ -73,7 +76,9 @@ ifdef HAVE_WIN32
 	# Fix .pc files to remove debug version (d)
 	cd $(PREFIX)/lib/pkgconfig; for i in Qt5Core.pc Qt5Gui.pc Qt5Widgets.pc; do sed -i.orig -e 's/d\.a/.a/g' -e 's/d $$/ /' $$i; done
 	# Fix Qt5Gui.pc file to include qwindows (QWindowsIntegrationPlugin) and platform support libraries
-	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Gui/ -lqwindows -ldwmapi -lQt5ThemeSupport -lQt5FontDatabaseSupport -lQt5EventDispatcherSupport -lQt5WindowsUIAutomationSupport -lqtfreetype -lQt5Gui/g' Qt5Gui.pc
+	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Gui/ -lqwindows -luxtheme -ldwmapi -lQt5ThemeSupport -lQt5FontDatabaseSupport -lQt5EventDispatcherSupport -lQt5WindowsUIAutomationSupport -lqtfreetype -lQt5Gui/g' Qt5Gui.pc
+	# Fix Qt5Widget.pc file to include qwindowsvistastyle before Qt5Widget, as it depends on it
+	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Widget/ -lqwindowsvistastyle -lQt5Widget/' Qt5Widgets.pc
 endif
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
