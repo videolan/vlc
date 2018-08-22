@@ -2008,11 +2008,22 @@ static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
 
     const uint8_t RGB2GBR[3] = {2,0,1};
     for(int i=0; i<6; i++)
-        MP4_GET2BYTES( p_SmDm->primaries[RGB2GBR[i/2] + i%2] );
+    {
+        int index = RGB2GBR[i/2] + i%2;
+        MP4_GET2BYTES( p_SmDm->primaries[index] );
+        p_SmDm->primaries[index] = 50000 * (double)p_SmDm->primaries[index] / (double)(1<<16);
+    }
+
     for(int i=0; i<2; i++)
+    {
         MP4_GET2BYTES( p_SmDm->white_point[i] );
+        p_SmDm->white_point[i] = 50000 * (double)p_SmDm->white_point[i] / (double)(1<<16);
+    }
+
     MP4_GET4BYTES( p_SmDm->i_luminanceMax );
     MP4_GET4BYTES( p_SmDm->i_luminanceMin );
+    p_SmDm->i_luminanceMax = 10000 * (double)p_SmDm->i_luminanceMax / (double) (1<<8);
+    p_SmDm->i_luminanceMin = 10000 * (double)p_SmDm->i_luminanceMin / (double) (1<<14);
 
     MP4_READBOX_EXIT( 1 );
 }
