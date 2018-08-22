@@ -76,6 +76,9 @@ extern "C" char **environ;
   #if !HAS_QT56
    Q_IMPORT_PLUGIN(AccessibleFactory)
   #endif
+  #ifdef _WIN32
+   Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
+  #endif
  #endif
 #endif
 
