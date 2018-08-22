@@ -1916,7 +1916,7 @@ static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_Box_data_SmDm_t *p_SmDm = p_box->data.p_SmDm;
 
     /* SmDm: version/flags RGB */
-    /* mdcv: version/flags GBR */
+    /* mdcv: version/flags GBR or not */
     if( p_box->i_type != ATOM_mdcv )
     {
         uint8_t i_version;
@@ -1933,11 +1933,29 @@ static int MP4_ReadBox_SmDm( stream_t *p_stream, MP4_Box_t *p_box )
     {
         int index = (p_box->i_type != ATOM_mdcv) ? RGB2GBR[i/2] + i%2 : i;
         MP4_GET2BYTES( p_SmDm->primaries[index] );
+
+        /* convert from fixed point to 0.00002 resolution */
+        if(p_box->i_type != ATOM_mdcv)
+            p_SmDm->primaries[index] = 50000 *
+                    (double)p_SmDm->primaries[index] / (double)(1<<16);
     }
     for(int i=0; i<2; i++)
+    {
         MP4_GET2BYTES( p_SmDm->white_point[i] );
+        if(p_box->i_type != ATOM_mdcv)
+            p_SmDm->white_point[i] = 50000 *
+                    (double)p_SmDm->white_point[i] / (double)(1<<16);
+    }
+
     MP4_GET4BYTES( p_SmDm->i_luminanceMax );
     MP4_GET4BYTES( p_SmDm->i_luminanceMin );
+    if(p_box->i_type != ATOM_mdcv)
+    {
+        p_SmDm->i_luminanceMax = 10000 *
+                (double)p_SmDm->i_luminanceMax / (double) (1<<8);
+        p_SmDm->i_luminanceMin = 10000 *
+                (double)p_SmDm->i_luminanceMin / (double) (1<<14);
+    }
 
     MP4_READBOX_EXIT( 1 );
 }
