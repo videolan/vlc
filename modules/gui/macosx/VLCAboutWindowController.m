@@ -156,7 +156,6 @@
     [o_credits_scrollview setDrawsBackground: NO];
     [[self window] setExcludedFromWindowsMenu:YES];
     [[self window] setMenu:nil];
-    [[self window] setBackgroundColor: [NSColor colorWithCalibratedWhite:.96 alpha:1.]];
 
     if (config_GetInt(getIntf(), "macosx-icon-change")) {
         /* After day 354 of the year, the usual VLC cone is replaced by another cone

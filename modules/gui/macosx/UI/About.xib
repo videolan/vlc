@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment version="1070" identifier="macosx"/>
-        <development version="7000" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
-        <capability name="box content view" minToolsVersion="7.0"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.13.2"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="VLCAboutWindowController">
@@ -30,7 +29,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="173" y="74" width="721" height="356"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
             <value key="minSize" type="size" width="231.86799999999999" height="107"/>
             <view key="contentView" id="1344">
                 <rect key="frame" x="0.0" y="0.0" width="721" height="356"/>
@@ -38,13 +37,14 @@
                 <subviews>
                     <scrollView borderType="none" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1348">
                         <rect key="frame" x="271" y="88" width="430" height="204"/>
-                        <clipView key="contentView" id="jyJ-3H-cal" customClass="VLCScrollingClipView">
+                        <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="jyJ-3H-cal" customClass="VLCScrollingClipView">
                             <rect key="frame" x="0.0" y="0.0" width="430" height="204"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textView editable="NO" selectable="NO" importsGraphics="NO" richText="NO" usesFontPanel="YES" usesRuler="YES" smartInsertDelete="YES" id="1342">
+                                <textView editable="NO" selectable="NO" importsGraphics="NO" richText="NO" verticallyResizable="YES" usesFontPanel="YES" usesRuler="YES" smartInsertDelete="YES" id="1342">
                                     <rect key="frame" x="0.0" y="0.0" width="415" height="204"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="calibratedRGB"/>
                                     <size key="minSize" width="415" height="204"/>
                                     <size key="maxSize" width="564" height="10000000"/>
@@ -59,11 +59,11 @@
                         <constraints>
                             <constraint firstAttribute="height" constant="204" id="Toy-9Z-Tp5"/>
                         </constraints>
-                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="2279">
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="2279">
                             <rect key="frame" x="-100" y="-100" width="430" height="16"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
-                        <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2278">
+                        <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="2278">
                             <rect key="frame" x="414" y="0.0" width="16" height="204"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
@@ -76,31 +76,31 @@
                         </constraints>
                         <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="VLC" id="2269"/>
                     </imageView>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2232">
+                    <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2232">
                         <rect key="frame" x="269" y="274" width="248" height="16"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" alignment="left" title="Version 0.9.0-svn Grischenko (PPC/x86)" id="2270">
                             <font key="font" metaFont="systemBold" size="12"/>
-                            <color key="textColor" red="0.15702499" green="0.15702499" blue="0.15702499" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2233">
+                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2233">
                         <rect key="frame" x="269" y="255" width="221" height="13"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" alignment="left" title="Copyright (c) 1997-2008 the VideoLAN team" id="2271">
                             <font key="font" metaFont="label"/>
-                            <color key="textColor" red="0.15702499" green="0.15702499" blue="0.15702499" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2234">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2234">
                         <rect key="frame" x="269" y="241" width="338" height="13"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" state="on" alignment="left" title="Compiled by fpk with llvm-gcc 4.2.1 (Based on Apple Inc. build 5658)" id="2272">
                             <font key="font" metaFont="label"/>
-                            <color key="textColor" red="0.15702499" green="0.15702499" blue="0.15702499" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2235">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2235">
                         <rect key="frame" x="269" y="304" width="192" height="29"/>
                         <textFieldCell key="cell" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="VLC media player" id="2273">
                             <font key="font" metaFont="system" size="24"/>
@@ -108,7 +108,7 @@
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
-                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="2284">
+                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2284">
                         <rect key="frame" x="271" y="88" width="430" height="145"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="426" id="cDV-g3-FXM"/>
@@ -119,18 +119,18 @@
                             <string key="title">VLC media player is a free and open source media player, encoder and streamer made by the volunteers of the VideoLAN community.
 VLC uses its internal codecs and works on essentially every popular platform and can read almost every files, CDs, DVDs, network streams, capture cards and other media formats!
 Help and join us!.</string>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
                     <box autoresizesSubviews="NO" borderType="line" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="2313">
                         <rect key="frame" x="-13" y="-9" width="747" height="90"/>
                         <view key="contentView" id="Ioe-L7-TBi">
-                            <rect key="frame" x="1" y="1" width="745" height="88"/>
+                            <rect key="frame" x="3" y="3" width="741" height="84"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="2290">
-                                    <rect key="frame" x="509" y="55" width="48" height="17"/>
+                                <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2290">
+                                    <rect key="frame" x="509" y="51" width="48" height="17"/>
                                     <buttonCell key="cell" type="smallSquare" title="Credits" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="2291">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -139,8 +139,8 @@ Help and join us!.</string>
                                         <action selector="buttonAction:" target="-2" id="2330"/>
                                     </connections>
                                 </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="2286">
-                                    <rect key="frame" x="184" y="55" width="52" height="17"/>
+                                <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2286">
+                                    <rect key="frame" x="184" y="51" width="52" height="17"/>
                                     <buttonCell key="cell" type="smallSquare" title="Authors" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="2287">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -149,8 +149,8 @@ Help and join us!.</string>
                                         <action selector="buttonAction:" target="-2" id="2328"/>
                                     </connections>
                                 </button>
-                                <button translatesAutoresizingMaskIntoConstraints="NO" id="2288">
-                                    <rect key="frame" x="347" y="55" width="51" height="17"/>
+                                <button misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2288">
+                                    <rect key="frame" x="347" y="51" width="51" height="17"/>
                                     <buttonCell key="cell" type="smallSquare" title="License" bezelStyle="smallSquare" imagePosition="overlaps" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="2289">
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="system"/>
@@ -159,11 +159,11 @@ Help and join us!.</string>
                                         <action selector="buttonAction:" target="-2" id="2329"/>
                                     </connections>
                                 </button>
-                                <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2314">
-                                    <rect key="frame" x="181" y="24" width="383" height="13"/>
+                                <textField verticalHuggingPriority="750" misplaced="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2314">
+                                    <rect key="frame" x="181" y="20" width="383" height="13"/>
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="VLC media player and VideoLAN are trademarks of the VideoLAN Association." id="2315">
                                         <font key="font" metaFont="system" size="10"/>
-                                        <color key="textColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                        <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                     </textFieldCell>
                                 </textField>
