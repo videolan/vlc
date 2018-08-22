@@ -1833,12 +1833,14 @@ static int MP4_ReadBox_avcC( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_ENTER( MP4_Box_data_avcC_t, MP4_FreeBox_avcC );
     p_avcC = p_box->data.p_avcC;
 
-    p_avcC->i_avcC = i_read;
-    if( p_avcC->i_avcC > 0 )
+    if( i_read > 0 )
     {
-        uint8_t * p = p_avcC->p_avcC = malloc( p_avcC->i_avcC );
-        if( p )
-            memcpy( p, p_peek, i_read );
+        p_avcC->p_avcC = malloc( i_read );
+        if( p_avcC->p_avcC )
+        {
+            memcpy( p_avcC->p_avcC, p_peek, i_read );
+            p_avcC->i_avcC = i_read;
+        }
     }
 
     MP4_GET1BYTE( p_avcC->i_version );
