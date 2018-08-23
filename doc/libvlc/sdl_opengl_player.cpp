@@ -35,7 +35,6 @@ const GLchar* vertexSource =
     "}                             \n";
 
 const GLchar* fragmentSource =
-    "precision mediump float;      \n"
     "uniform sampler2D u_videotex; \n"
     "varying vec2 v_TexCoordinate; \n"
     "void main()                   \n"
