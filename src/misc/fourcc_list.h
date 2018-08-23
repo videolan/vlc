@@ -1151,6 +1151,9 @@ static const staticentry_t p_list_video[] = {
         A("M8Y2"),
         A("M8Y4"),
         A("M8YA"),
+
+    B(VLC_CODEC_IMM4, "Infinity IMM4"),
+        A("IMM4"),
 };
 
 static const staticentry_t p_list_audio[] = {
