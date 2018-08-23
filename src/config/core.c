@@ -306,6 +306,7 @@ error:
     }
     free(vals);
     free(txts);
+    module_list_free (list);
     *values = *texts = NULL;
     return -1;
 }
