@@ -99,7 +99,7 @@ static void Close(vlc_object_t *object)
         var = var_InheritAddress(gl, varname);                     \
         if( !var ) {                                               \
             msg_Err( gl, "%s address is missing", varname );       \
-            goto error;                                            \
+            return VLC_EGENERIC;                                   \
         }                                                          \
     } while( 0 )
 
@@ -131,14 +131,10 @@ static int Open(vlc_object_t *object)
         if( !sys->setupCb(sys->opaque) )
         {
             msg_Err( gl, "user setup failed" );
-            goto error;
+            return VLC_EGENERIC;
         }
 
     return VLC_SUCCESS;
-
-error:
-    Close(object);
-    return VLC_EGENERIC;
 }
 
 #undef SET_CALLBACK_ADDR
