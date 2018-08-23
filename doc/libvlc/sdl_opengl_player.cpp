@@ -3,9 +3,12 @@
 /* Licence WTFPL  */
 /* Written by Pierre Lamot */
 
+#include <stdio.h>
+#include <stdlib.h>
+
 #include <exception>
 #include <mutex>
-#include <iostream>
+#include <vector>
 
 #include <SDL2/SDL.h>
 #define GL_GLEXT_PROTOTYPES 1
@@ -271,11 +274,56 @@ int main(int argc, char** argv)
     glShaderSource(fragmentShader, 1, &fragmentSource, NULL);
     glCompileShader(fragmentShader);
 
+    {
+        GLuint shader[] = {vertexShader, fragmentShader};
+        const char *shaderName[] = {"vertex", "fragment"};
+        for (int i = 0; i < 2; i++) {
+            int len;
+            glGetShaderiv(shader[i], GL_INFO_LOG_LENGTH, &len);
+            if (len <= 1)
+                continue;
+            std::vector<char> infoLog(len);
+            int charsWritten;
+            glGetShaderInfoLog(shader[i], len, &charsWritten, infoLog.data());
+            fprintf(stderr, "%s shader info log: %s\n", shaderName[i], infoLog.data());
+
+            GLint status = GL_TRUE;
+            glGetShaderiv(shader[i], GL_COMPILE_STATUS, &status);
+            if (status == GL_FALSE) {
+                fprintf(stderr, "compile %s shader failed\n", shaderName[i]);
+                SDL_DestroyWindow(wnd);
+                SDL_Quit();
+                return 1;
+            }
+        }
+    }
+
     // Link the vertex and fragment shader into a shader program
     GLuint shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
+
+    {
+        int len;
+        glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &len);
+        if (len > 1) {
+            std::vector<char> infoLog(len);
+            int charsWritten;
+            glGetProgramInfoLog(shaderProgram, len, &charsWritten, infoLog.data());
+            fprintf(stderr, "shader program: %s\n", infoLog.data());
+        }
+
+        GLint status = GL_TRUE;
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &status);
+        if (status == GL_FALSE) {
+            fprintf(stderr, "unable to use program\n");
+            SDL_DestroyWindow(wnd);
+            SDL_Quit();
+            return 1;
+        }
+    }
+
     glUseProgram(shaderProgram);
 
     // Specify the layout of the vertex data
