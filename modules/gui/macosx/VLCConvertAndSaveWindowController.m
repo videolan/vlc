@@ -944,10 +944,13 @@
             [composedOptions appendFormat:@",soverlay"];
     }
 
+    // Close transcode
+    [composedOptions appendString:@"}"];
+
     if (!b_streaming) {
         /* file transcoding */
         // add muxer
-        [composedOptions appendFormat:@"}:standard{mux=%@", [self.currentProfile firstObject]];
+        [composedOptions appendFormat:@":standard{mux=%@", [self.currentProfile firstObject]];
 
 
         // add output destination
@@ -983,7 +986,7 @@
             }
         }
 
-        [composedOptions appendString:@"} :sout-keep"];
+        [composedOptions appendString:@"}"];
     }
 
     return [NSString stringWithString:composedOptions];
