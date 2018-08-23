@@ -31,8 +31,6 @@
 
 struct vout_display_sys_t
 {
-    vlc_gl_t              *gl;
-
     void (*cleanupCb)(void* opaque);
     bool (*setupCb)(void* opaque);
     void (*resizeCb)(void* opaque, unsigned, unsigned);
