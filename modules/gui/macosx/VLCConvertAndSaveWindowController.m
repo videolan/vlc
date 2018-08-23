@@ -958,15 +958,17 @@
                                                                            withString:@"\\\""];
         [composedOptions appendFormat:@",access=file{no-overwrite},dst=\"%@\"}", _outputDestination];
     } else {
+        NSString *destination = [NSString stringWithFormat:@"\"%@:%@\"", _outputDestination, [_streamPortField stringValue]];
+
         /* streaming */
         if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"RTP"])
             [composedOptions appendFormat:@":rtp{mux=ts,dst=%@,port=%@", _outputDestination, [_streamPortField stringValue]];
         else if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"UDP"])
-            [composedOptions appendFormat:@":standard{mux=ts,dst=%@,port=%@,access=udp", _outputDestination, [_streamPortField stringValue]];
+            [composedOptions appendFormat:@":standard{mux=ts,dst=%@,access=udp", destination];
         else if ([[[_streamTypePopup selectedItem] title] isEqualToString:@"MMSH"])
-            [composedOptions appendFormat:@":standard{mux=asfh,dst=%@,port=%@,access=mmsh", _outputDestination, [_streamPortField stringValue]];
+            [composedOptions appendFormat:@":standard{mux=asfh,dst=%@,access=mmsh", destination];
         else
-            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,port=%@,access=http", [self.currentProfile firstObject], _outputDestination, [_streamPortField stringValue]];
+            [composedOptions appendFormat:@":standard{mux=%@,dst=%@,access=http", [self.currentProfile firstObject], destination];
 
         if ([_streamSAPCheckbox state])
             [composedOptions appendFormat:@",sap,name=\"%@\"", [_streamChannelField stringValue]];
