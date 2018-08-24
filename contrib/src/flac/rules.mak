@@ -57,6 +57,7 @@ endif
 DEPS_flac = ogg $(DEPS_ogg)
 
 .flac: flac
+	cd $< && $(AUTORECONF)
 	cd $< && $(HOSTVARS) CFLAGS="$(FLAC_CFLAGS)" ./configure $(FLACCONF)
 	cd $</include && $(MAKE) install
 	cd $</src && $(MAKE) -C libFLAC install && $(MAKE) -C share install
