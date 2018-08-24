@@ -48,7 +48,7 @@ endif
 endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
-	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -no-opengl -no-dbus \
+	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -opengl desktop -no-dbus \
 	-no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples -qt-zlib
 
