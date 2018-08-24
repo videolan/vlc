@@ -100,8 +100,6 @@ void UpdateRects (vout_display_t *,
                   bool is_forced);
 void AlignRect(RECT *, int align_boundary, int align_size);
 
-picture_pool_t *CommonPool(vout_display_t *, unsigned);
-
 /*****************************************************************************
  * Constants
  *****************************************************************************/

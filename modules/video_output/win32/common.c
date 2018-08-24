@@ -132,13 +132,6 @@ int CommonInit(vout_display_t *vd)
     return VLC_SUCCESS;
 }
 
-/* */
-picture_pool_t *CommonPool(vout_display_t *vd, unsigned count)
-{
-    VLC_UNUSED(count);
-    return vd->sys->pool;
-}
-
 /*****************************************************************************
 * UpdateRects: update clipping rectangles
 *****************************************************************************
