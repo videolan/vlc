@@ -108,77 +108,77 @@ void wrapEntityDeletedEventCallback( vlc_medialibrary_module_t* ml,
 
 } // end of anonymous namespace
 
-void MediaLibrary::onMediaAdded( const std::vector<medialibrary::MediaPtr>& media )
+void MediaLibrary::onMediaAdded( std::vector<medialibrary::MediaPtr> media )
 {
     wrapEntityEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_ADDED );
 }
 
-void MediaLibrary::onMediaModified( const std::vector<medialibrary::MediaPtr>& media )
+void MediaLibrary::onMediaModified( std::vector<medialibrary::MediaPtr> media )
 {
     wrapEntityEventCallback<vlc_ml_media_t>( m_vlc_ml, media, VLC_ML_EVENT_MEDIA_UPDATED );
 }
 
-void MediaLibrary::onMediaDeleted( const std::vector<int64_t>& mediaIds )
+void MediaLibrary::onMediaDeleted( std::vector<int64_t> mediaIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, mediaIds, VLC_ML_EVENT_MEDIA_DELETED );
 }
 
-void MediaLibrary::onArtistsAdded( const std::vector<medialibrary::ArtistPtr>& artists )
+void MediaLibrary::onArtistsAdded( std::vector<medialibrary::ArtistPtr> artists )
 {
     wrapEntityEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_ADDED );
 }
 
-void MediaLibrary::onArtistsModified( const std::vector<medialibrary::ArtistPtr>& artists )
+void MediaLibrary::onArtistsModified( std::vector<medialibrary::ArtistPtr> artists )
 {
     wrapEntityEventCallback<vlc_ml_artist_t>( m_vlc_ml, artists, VLC_ML_EVENT_ARTIST_UPDATED );
 }
 
-void MediaLibrary::onArtistsDeleted( const std::vector<int64_t>& artistIds )
+void MediaLibrary::onArtistsDeleted( std::vector<int64_t> artistIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, artistIds, VLC_ML_EVENT_ARTIST_DELETED );
 }
 
-void MediaLibrary::onAlbumsAdded( const std::vector<medialibrary::AlbumPtr>& albums )
+void MediaLibrary::onAlbumsAdded( std::vector<medialibrary::AlbumPtr> albums )
 {
     wrapEntityEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_ADDED );
 }
 
-void MediaLibrary::onAlbumsModified( const std::vector<medialibrary::AlbumPtr>& albums )
+void MediaLibrary::onAlbumsModified( std::vector<medialibrary::AlbumPtr> albums )
 {
     wrapEntityEventCallback<vlc_ml_album_t>( m_vlc_ml, albums, VLC_ML_EVENT_ALBUM_UPDATED );
 }
 
-void MediaLibrary::onAlbumsDeleted( const std::vector<int64_t>& albumIds )
+void MediaLibrary::onAlbumsDeleted( std::vector<int64_t> albumIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, albumIds, VLC_ML_EVENT_ALBUM_DELETED );
 }
 
-void MediaLibrary::onPlaylistsAdded( const std::vector<medialibrary::PlaylistPtr>& playlists )
+void MediaLibrary::onPlaylistsAdded( std::vector<medialibrary::PlaylistPtr> playlists )
 {
     wrapEntityEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_ADDED );
 }
 
-void MediaLibrary::onPlaylistsModified( const std::vector<medialibrary::PlaylistPtr>& playlists )
+void MediaLibrary::onPlaylistsModified( std::vector<medialibrary::PlaylistPtr> playlists )
 {
     wrapEntityEventCallback<vlc_ml_playlist_t>( m_vlc_ml, playlists, VLC_ML_EVENT_PLAYLIST_UPDATED );
 }
 
-void MediaLibrary::onPlaylistsDeleted( const std::vector<int64_t>& playlistIds )
+void MediaLibrary::onPlaylistsDeleted( std::vector<int64_t> playlistIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, playlistIds, VLC_ML_EVENT_PLAYLIST_DELETED );
 }
 
-void MediaLibrary::onGenresAdded( const std::vector<medialibrary::GenrePtr>& genres )
+void MediaLibrary::onGenresAdded( std::vector<medialibrary::GenrePtr> genres )
 {
     wrapEntityEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_ADDED );
 }
 
-void MediaLibrary::onGenresModified( const std::vector<medialibrary::GenrePtr>& genres )
+void MediaLibrary::onGenresModified( std::vector<medialibrary::GenrePtr> genres )
 {
     wrapEntityEventCallback<vlc_ml_genre_t>( m_vlc_ml, genres, VLC_ML_EVENT_GENRE_UPDATED );
 }
 
-void MediaLibrary::onGenresDeleted( const std::vector<int64_t>& genreIds )
+void MediaLibrary::onGenresDeleted( std::vector<int64_t> genreIds )
 {
     wrapEntityDeletedEventCallback( m_vlc_ml, genreIds, VLC_ML_EVENT_GENRE_DELETED );
 }
