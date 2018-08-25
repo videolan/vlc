@@ -5,7 +5,7 @@ QTQC_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC_VERSION)/subm
 QTQC2_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC_VERSION)/submodules/qtquickcontrols2-everywhere-src-$(QTQC_VERSION).tar.xz
 
 ifdef HAVE_WIN32
-PKGS += qtquickcontrols qtquickcontrols2
+PKGS += qtquickcontrols2
 endif
 
 ifeq ($(call need_pkg,"Qt5QuickControls2"),)
@@ -13,8 +13,7 @@ PKGS_FOUND += qtquickcontrols2
 endif
 # QtQuickControl(1) doesn't provide a .pc
 
-DEPS_qtquickcontrols = qtdeclarative $(DEPS_qtdeclarative)
-DEPS_qtquickcontrols2 = qtquickcontrols $(DEPS_qtquickcontrols)
+DEPS_qtquickcontrols2 = qtdeclarative $(DEPS_qtdeclarative)
 
 $(TARBALLS)/qtquickcontrols-$(QTQC_VERSION).tar.xz:
 	$(call download,$(QTQC_URL))
@@ -22,10 +21,9 @@ $(TARBALLS)/qtquickcontrols-$(QTQC_VERSION).tar.xz:
 $(TARBALLS)/qtquickcontrols2-$(QTQC_VERSION).tar.xz:
 	$(call download,$(QTQC2_URL))
 
-.sum-qtquickcontrols: qtquickcontrols-$(QTQC_VERSION).tar.xz
-.sum-qtquickcontrols2: qtquickcontrols2-$(QTQC_VERSION).tar.xz
+.sum-qtquickcontrols2: qtquickcontrols-$(QTQC_VERSION).tar.xz qtquickcontrols2-$(QTQC_VERSION).tar.xz
 
-qtquickcontrols: qtquickcontrols-$(QTQC_VERSION).tar.xz .sum-qtquickcontrols
+qtquickcontrols: qtquickcontrols-$(QTQC_VERSION).tar.xz .sum-qtquickcontrols2
 	$(UNPACK)
 	mv qtquickcontrols-everywhere-src-$(QTQC_VERSION) qtquickcontrols-$(QTQC_VERSION)
 	$(MOVE)
