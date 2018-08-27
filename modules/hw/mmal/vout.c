@@ -449,7 +449,6 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     vout_display_sys_t *sys = vd->sys;
     picture_resource_t picture_res;
     picture_pool_configuration_t picture_pool_cfg;
-    video_format_t fmt = vd->fmt;
     MMAL_STATUS_T status;
     unsigned i;
 
@@ -516,7 +515,7 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
         picture_res.p_sys->owner = (vlc_object_t *)vd;
         picture_res.p_sys->buffer = mmal_queue_get(sys->pool->queue);
 
-        sys->pictures[i] = picture_NewFromResource(&fmt, &picture_res);
+        sys->pictures[i] = picture_NewFromResource(&vd->fmt, &picture_res);
         if (!sys->pictures[i]) {
             msg_Err(vd, "Failed to create picture");
             free(picture_res.p_sys);
