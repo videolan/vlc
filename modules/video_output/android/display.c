@@ -332,7 +332,7 @@ static int AndroidWindow_ConnectSurface(vout_display_sys_t *sys,
 }
 
 static android_window *AndroidWindow_New(vout_display_t *vd,
-                                         video_format_t *p_fmt,
+                                         const video_format_t *p_fmt,
                                          enum AWindow_ID id)
 {
     vout_display_sys_t *sys = vd->sys;
