@@ -1016,29 +1016,29 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
 static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 {
     vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = vout->p->display.vd;
+    vout_display_t *vd = sys->display.vd;
 
-    picture_t *torender = picture_Hold(vout->p->displayed.current);
+    picture_t *torender = picture_Hold(sys->displayed.current);
 
-    vout_chrono_Start(&vout->p->render);
+    vout_chrono_Start(&sys->render);
 
-    vlc_mutex_lock(&vout->p->filter.lock);
-    picture_t *filtered = filter_chain_VideoFilter(vout->p->filter.chain_interactive, torender);
-    vlc_mutex_unlock(&vout->p->filter.lock);
+    vlc_mutex_lock(&sys->filter.lock);
+    picture_t *filtered = filter_chain_VideoFilter(sys->filter.chain_interactive, torender);
+    vlc_mutex_unlock(&sys->filter.lock);
 
     if (!filtered)
         return VLC_EGENERIC;
 
-    if (filtered->date != vout->p->displayed.current->date)
+    if (filtered->date != sys->displayed.current->date)
         msg_Warn(vout, "Unsupported timestamp modifications done by chain_interactive");
 
     /*
      * Get the subpicture to be displayed
      */
-    const bool do_snapshot = vout_snapshot_IsRequested(&vout->p->snapshot);
+    const bool do_snapshot = vout_snapshot_IsRequested(&sys->snapshot);
     vlc_tick_t render_subtitle_date;
-    if (vout->p->pause.is_on)
-        render_subtitle_date = vout->p->pause.date;
+    if (sys->pause.is_on)
+        render_subtitle_date = sys->pause.date;
     else
         render_subtitle_date = filtered->date > 1 ? filtered->date : vlc_tick_now();
     vlc_tick_t render_osd_date = vlc_tick_now(); /* FIXME wrong */
@@ -1087,23 +1087,23 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         }
         subpicture_chromas = NULL;
 
-        if (vout->p->spu_blend &&
-            vout->p->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
-            filter_DeleteBlend(vout->p->spu_blend);
-            vout->p->spu_blend = NULL;
-            vout->p->spu_blend_chroma = 0;
+        if (sys->spu_blend &&
+            sys->spu_blend->fmt_out.video.i_chroma != fmt_spu.i_chroma) {
+            filter_DeleteBlend(sys->spu_blend);
+            sys->spu_blend = NULL;
+            sys->spu_blend_chroma = 0;
         }
-        if (!vout->p->spu_blend && vout->p->spu_blend_chroma != fmt_spu.i_chroma) {
-            vout->p->spu_blend_chroma = fmt_spu.i_chroma;
-            vout->p->spu_blend = filter_NewBlend(VLC_OBJECT(vout), &fmt_spu);
-            if (!vout->p->spu_blend)
+        if (!sys->spu_blend && sys->spu_blend_chroma != fmt_spu.i_chroma) {
+            sys->spu_blend_chroma = fmt_spu.i_chroma;
+            sys->spu_blend = filter_NewBlend(VLC_OBJECT(vout), &fmt_spu);
+            if (!sys->spu_blend)
                 msg_Err(vout, "Failed to create blending filter, OSD/Subtitles will not work");
         }
     }
 
     video_format_t fmt_spu_rot;
     video_format_ApplyRotation(&fmt_spu_rot, &fmt_spu);
-    subpicture_t *subpic = spu_Render(vout->p->spu,
+    subpicture_t *subpic = spu_Render(sys->spu,
                                       subpicture_chromas, &fmt_spu_rot,
                                       &vd->source,
                                       render_subtitle_date, render_osd_date,
@@ -1115,16 +1115,16 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
      * - be sure to end up with a direct buffer.
      * - blend subtitles, and in a fast access buffer
      */
-    bool is_direct = vout->p->decoder_pool == vout->p->display_pool;
+    bool is_direct = sys->decoder_pool == sys->display_pool;
     picture_t *todisplay = filtered;
     picture_t *snap_pic = todisplay;
     if (do_early_spu && subpic) {
-        if (vout->p->spu_blend) {
-            picture_t *blent = picture_pool_Get(vout->p->private_pool);
+        if (sys->spu_blend) {
+            picture_t *blent = picture_pool_Get(sys->private_pool);
             if (blent) {
                 VideoFormatCopyCropAr(&blent->format, &filtered->format);
                 picture_Copy(blent, filtered);
-                if (picture_BlendSubpicture(blent, vout->p->spu_blend, subpic)) {
+                if (picture_BlendSubpicture(blent, sys->spu_blend, subpic)) {
                     picture_Release(todisplay);
                     snap_pic = todisplay = blent;
                 } else
@@ -1149,8 +1149,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     assert(vout_IsDisplayFiltered(vd) == !sys->display.use_dr);
     if (sys->display.use_dr && !is_direct) {
         picture_t *direct = NULL;
-        if (likely(vout->p->display_pool != NULL))
-            direct = picture_pool_Get(vout->p->display_pool);
+        if (likely(sys->display_pool != NULL))
+            direct = picture_pool_Get(sys->display_pool);
         if (!direct) {
             picture_Release(todisplay);
             if (subpic)
@@ -1174,7 +1174,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (do_snapshot)
     {
         assert(snap_pic);
-        vout_snapshot_Set(&vout->p->snapshot, &vd->source, snap_pic);
+        vout_snapshot_Set(&sys->snapshot, &vd->source, snap_pic);
         if (snap_pic != todisplay)
             picture_Release(snap_pic);
     }
@@ -1192,8 +1192,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (sys->display.use_dr) {
         vout_display_Prepare(vd, todisplay, subpic, todisplay->date);
     } else {
-        if (!do_dr_spu && !do_early_spu && vout->p->spu_blend && subpic)
-            picture_BlendSubpicture(todisplay, vout->p->spu_blend, subpic);
+        if (!do_dr_spu && !do_early_spu && sys->spu_blend && subpic)
+            picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
         vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL,
                              todisplay->date);
 
@@ -1204,13 +1204,13 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         }
     }
 
-    vout_chrono_Stop(&vout->p->render);
+    vout_chrono_Stop(&sys->render);
 #if 0
         {
         static int i = 0;
         if (((i++)%10) == 0)
             msg_Info(vout, "render: avg %d ms var %d ms",
-                     (int)(vout->p->render.avg/1000), (int)(vout->p->render.var/1000));
+                     (int)(sys->render.avg/1000), (int)(sys->render.var/1000));
         }
 #endif
 
@@ -1224,35 +1224,36 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         vlc_tick_wait(todisplay->date);
 
     /* Display the direct buffer returned by vout_RenderPicture */
-    vout->p->displayed.date = vlc_tick_now();
+    sys->displayed.date = vlc_tick_now();
     vout_display_Display(vd, todisplay, subpic);
 
-    vout_statistic_AddDisplayed(&vout->p->statistic, 1);
+    vout_statistic_AddDisplayed(&sys->statistic, 1);
 
     return VLC_SUCCESS;
 }
 
 static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
 {
+    vout_thread_sys_t *sys = vout->p;
     bool frame_by_frame = !deadline;
-    bool paused = vout->p->pause.is_on;
-    bool first = !vout->p->displayed.current;
+    bool paused = sys->pause.is_on;
+    bool first = !sys->displayed.current;
 
     if (first)
         if (ThreadDisplayPreparePicture(vout, true, frame_by_frame)) /* FIXME not sure it is ok */
             return VLC_EGENERIC;
 
     if (!paused || frame_by_frame)
-        while (!vout->p->displayed.next && !ThreadDisplayPreparePicture(vout, false, frame_by_frame))
+        while (!sys->displayed.next && !ThreadDisplayPreparePicture(vout, false, frame_by_frame))
             ;
 
     const vlc_tick_t date = vlc_tick_now();
-    const vlc_tick_t render_delay = vout_chrono_GetHigh(&vout->p->render) + VOUT_MWAIT_TOLERANCE;
+    const vlc_tick_t render_delay = vout_chrono_GetHigh(&sys->render) + VOUT_MWAIT_TOLERANCE;
 
     bool drop_next_frame = frame_by_frame;
     vlc_tick_t date_next = VLC_TICK_INVALID;
-    if (!paused && vout->p->displayed.next) {
-        date_next = vout->p->displayed.next->date - render_delay;
+    if (!paused && sys->displayed.next) {
+        date_next = sys->displayed.next->date - render_delay;
         if (date_next /* + 0 FIXME */ <= date)
             drop_next_frame = true;
     }
@@ -1269,8 +1270,8 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     bool refresh = false;
 
     vlc_tick_t date_refresh = VLC_TICK_INVALID;
-    if (vout->p->displayed.date != VLC_TICK_INVALID) {
-        date_refresh = vout->p->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
+    if (sys->displayed.date != VLC_TICK_INVALID) {
+        date_refresh = sys->displayed.date + VOUT_REDISPLAY_DELAY - render_delay;
         refresh = date_refresh <= date;
     }
     bool force_refresh = !drop_next_frame && refresh;
@@ -1286,16 +1287,16 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     }
 
     if (drop_next_frame) {
-        picture_Release(vout->p->displayed.current);
-        vout->p->displayed.current = vout->p->displayed.next;
-        vout->p->displayed.next    = NULL;
+        picture_Release(sys->displayed.current);
+        sys->displayed.current = sys->displayed.next;
+        sys->displayed.next    = NULL;
     }
 
-    if (!vout->p->displayed.current)
+    if (!sys->displayed.current)
         return VLC_EGENERIC;
 
     /* display the picture immediately */
-    bool is_forced = frame_by_frame || force_refresh || vout->p->displayed.current->b_force;
+    bool is_forced = frame_by_frame || force_refresh || sys->displayed.current->b_force;
     int ret = ThreadDisplayRenderPicture(vout, is_forced);
     return force_refresh ? VLC_EGENERIC : ret;
 }
