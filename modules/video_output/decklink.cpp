@@ -662,58 +662,56 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         msg_Err(vd, "Could not negociate a compatible display mode");
         goto error;
     }
-    else
+
+    BMDDisplayMode mode_id = p_display_mode->GetDisplayMode();
+    BMDDisplayMode modenl = htonl(mode_id);
+    msg_Dbg(vd, "Selected mode '%4.4s'", (char *) &modenl);
+
+    BMDVideoOutputFlags flags = bmdVideoOutputVANC;
+    if (mode_id == bmdModeNTSC ||
+        mode_id == bmdModeNTSC2398 ||
+        mode_id == bmdModePAL)
     {
-        BMDDisplayMode mode_id = p_display_mode->GetDisplayMode();
-        BMDDisplayMode modenl = htonl(mode_id);
-        msg_Dbg(vd, "Selected mode '%4.4s'", (char *) &modenl);
-
-        BMDVideoOutputFlags flags = bmdVideoOutputVANC;
-        if (mode_id == bmdModeNTSC ||
-            mode_id == bmdModeNTSC2398 ||
-            mode_id == bmdModePAL)
-        {
-            flags = bmdVideoOutputVITC;
-        }
-
-        BMDDisplayModeSupport support;
-        IDeckLinkDisplayMode *resultMode;
-
-        result = sys->p_output->DoesSupportVideoMode(mode_id,
-                                                              sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV,
-                                                              flags, &support, &resultMode);
-        CHECK("Does not support video mode");
-        if (support == bmdDisplayModeNotSupported)
-        {
-            msg_Err(vd, "Video mode not supported");
-            goto error;
-        }
-
-        if (p_display_mode->GetWidth() <= 0 || p_display_mode->GetWidth() & 1)
-        {
-             msg_Err(vd, "Unknown video mode specified.");
-             goto error;
-        }
-
-        result = p_display_mode->GetFrameRate(&sys->frameduration,
-                                              &sys->timescale);
-        CHECK("Could not read frame rate");
-
-        result = sys->p_output->EnableVideoOutput(mode_id, flags);
-        CHECK("Could not enable video output");
-
-        video_format_t *fmt = &sys->video.currentfmt;
-        video_format_Copy(fmt, &vd->fmt);
-        fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
-        fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
-        fmt->i_x_offset = 0;
-        fmt->i_y_offset = 0;
-        fmt->i_sar_num = 0;
-        fmt->i_sar_den = 0;
-        fmt->i_chroma = !sys->video.tenbits ? VLC_CODEC_UYVY : VLC_CODEC_I422_10L; /* we will convert to v210 */
-        fmt->i_frame_rate = (unsigned) sys->frameduration;
-        fmt->i_frame_rate_base = (unsigned) sys->timescale;
+        flags = bmdVideoOutputVITC;
     }
+
+    BMDDisplayModeSupport support;
+    IDeckLinkDisplayMode *resultMode;
+
+    result = sys->p_output->DoesSupportVideoMode(mode_id,
+                                                          sys->video.tenbits ? bmdFormat10BitYUV : bmdFormat8BitYUV,
+                                                          flags, &support, &resultMode);
+    CHECK("Does not support video mode");
+    if (support == bmdDisplayModeNotSupported)
+    {
+        msg_Err(vd, "Video mode not supported");
+        goto error;
+    }
+
+    if (p_display_mode->GetWidth() <= 0 || p_display_mode->GetWidth() & 1)
+    {
+         msg_Err(vd, "Unknown video mode specified.");
+         goto error;
+    }
+
+    result = p_display_mode->GetFrameRate(&sys->frameduration,
+                                          &sys->timescale);
+    CHECK("Could not read frame rate");
+
+    result = sys->p_output->EnableVideoOutput(mode_id, flags);
+    CHECK("Could not enable video output");
+
+    video_format_t *fmt = &sys->video.currentfmt;
+    video_format_Copy(fmt, &vd->fmt);
+    fmt->i_width = fmt->i_visible_width = p_display_mode->GetWidth();
+    fmt->i_height = fmt->i_visible_height = p_display_mode->GetHeight();
+    fmt->i_x_offset = 0;
+    fmt->i_y_offset = 0;
+    fmt->i_sar_num = 0;
+    fmt->i_sar_den = 0;
+    fmt->i_chroma = !sys->video.tenbits ? VLC_CODEC_UYVY : VLC_CODEC_I422_10L; /* we will convert to v210 */
+    fmt->i_frame_rate = (unsigned) sys->frameduration;
+    fmt->i_frame_rate_base = (unsigned) sys->timescale;
 
     if (/*decklink_sys->i_channels > 0 &&*/ sys->i_rate > 0)
     {
