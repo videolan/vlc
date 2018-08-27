@@ -811,7 +811,7 @@ static int  Open ( vlc_object_t *p_this )
 #else
     p_enc->fmt_out.i_codec = VLC_CODEC_H264;
 #endif
-    p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
+    p_enc->p_sys = p_sys = vlc_obj_malloc( p_this, sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -847,6 +847,7 @@ static int  Open ( vlc_object_t *p_this )
         else
         {
             msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
+            free( psz_profile );
             return VLC_EGENERIC;
         }
 # endif
@@ -854,8 +855,8 @@ static int  Open ( vlc_object_t *p_this )
 # ifdef MODULE_NAME_IS_x26410b
     else
     {
-            msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
-            return VLC_EGENERIC;
+        msg_Err( p_enc, "Only high-profiles and 10-bit are supported");
+        return VLC_EGENERIC;
     }
 # endif
     free( psz_profile );
@@ -1583,6 +1584,4 @@ static void Close( vlc_object_t *p_this )
 
     vlc_mutex_unlock( &pthread_win32_mutex );
 #endif
-
-    free( p_sys );
 }
