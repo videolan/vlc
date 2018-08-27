@@ -81,7 +81,7 @@ static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
 static int            Control(vout_display_t *, int, va_list);
 
-static int            Init(vout_display_t *, video_format_t *, int, int);
+static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
 
 /* */
@@ -102,7 +102,7 @@ static int Open(vlc_object_t *object)
 
     /* */
     video_format_t fmt = vd->fmt;
-    if (Init(vd, &fmt, fmt.i_width, fmt.i_height))
+    if (Init(vd, &fmt))
         goto error;
 
     vout_display_info_t info = vd->info;
@@ -201,8 +201,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
 }
 
-static int Init(vout_display_t *vd,
-                video_format_t *fmt, int width, int height)
+static int Init(vout_display_t *vd, video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -256,8 +255,6 @@ static int Init(vout_display_t *vd,
         msg_Err(vd, "screen depth %i not supported", sys->i_depth);
         return VLC_EGENERIC;
     }
-    fmt->i_width  = width;
-    fmt->i_height = height;
 
     void *p_pic_buffer;
     int     i_pic_pitch;
