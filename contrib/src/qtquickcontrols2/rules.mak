@@ -1,8 +1,7 @@
-# QtQuickControls 1 & 2
+# QtQuickControls 2
 
-QTQC_VERSION := 5.11.0
-QTQC_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC_VERSION)/submodules/qtquickcontrols-everywhere-src-$(QTQC_VERSION).tar.xz
-QTQC2_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC_VERSION)/submodules/qtquickcontrols2-everywhere-src-$(QTQC_VERSION).tar.xz
+QTQC2_VERSION := 5.11.0
+QTQC2_URL := http://download.qt.io/official_releases/qt/5.11/$(QTQC2_VERSION)/submodules/qtquickcontrols2-everywhere-src-$(QTQC2_VERSION).tar.xz
 
 ifdef HAVE_WIN32
 PKGS += qtquickcontrols2
@@ -15,22 +14,14 @@ endif
 
 DEPS_qtquickcontrols2 = qtdeclarative $(DEPS_qtdeclarative)
 
-$(TARBALLS)/qtquickcontrols-$(QTQC_VERSION).tar.xz:
-	$(call download,$(QTQC_URL))
-
-$(TARBALLS)/qtquickcontrols2-$(QTQC_VERSION).tar.xz:
+$(TARBALLS)/qtquickcontrols2-$(QTQC2_VERSION).tar.xz:
 	$(call download,$(QTQC2_URL))
 
-.sum-qtquickcontrols2: qtquickcontrols-$(QTQC_VERSION).tar.xz qtquickcontrols2-$(QTQC_VERSION).tar.xz
+.sum-qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz
 
-qtquickcontrols: qtquickcontrols-$(QTQC_VERSION).tar.xz .sum-qtquickcontrols2
+qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz .sum-qtquickcontrols2
 	$(UNPACK)
-	mv qtquickcontrols-everywhere-src-$(QTQC_VERSION) qtquickcontrols-$(QTQC_VERSION)
-	$(MOVE)
-
-qtquickcontrols2: qtquickcontrols2-$(QTQC_VERSION).tar.xz .sum-qtquickcontrols2
-	$(UNPACK)
-	mv qtquickcontrols2-everywhere-src-$(QTQC_VERSION) qtquickcontrols2-$(QTQC_VERSION)
+	mv qtquickcontrols2-everywhere-src-$(QTQC2_VERSION) qtquickcontrols2-$(QTQC2_VERSION)
 	$(MOVE)
 
 
@@ -40,17 +31,13 @@ else
 QMAKE=../qt/bin/qmake
 endif
 
-.qtquickcontrols: qtquickcontrols
-	cd $< && $(QMAKE)
-	# Make && Install libraries
-	cd $< && $(MAKE)
-	cd $< && $(MAKE) -C src sub-controls-install_subtargets
-	cp $(PREFIX)/qml/QtQuick/Controls/libqtquickcontrolsplugin.a $(PREFIX)/lib/
-	rm -rf $(PREFIX)/qml
-	touch $@
 
-.qtquickcontrols2: qtquickcontrols2 .qtquickcontrols
-	cd $< && $(QMAKE)
+.qtquickcontrols2: qtquickcontrols2
+ifdef HAVE_CROSS_COMPILE
+	cd $< && $(PREFIX)/bin/qmake
+else
+	cd $< && ../qt/bin/qmake
+endif
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-quickcontrols2-install_subtargets sub-imports-install_subtargets
@@ -62,6 +49,5 @@ endif
 		-e 's/-lQt\([^ ]*\)d/-lQt\1/g' \
 		-e 's/ -lQt5QuickControls2/ -lqtquickcontrolsplugin -lqtquickcontrols2plugin -lqtquicktemplates2plugin -lQt5QuickControls2/' \
 		Qt5QuickControls2.pc
-
 	touch $@
 
