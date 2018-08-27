@@ -762,8 +762,6 @@ typedef struct
     x264_t          *h;
     x264_param_t    param;
 
-    vlc_tick_t      i_initial_delay;
-
     char            *psz_stat_name;
     int             i_sei_size;
     uint32_t         i_colorspace;
@@ -864,7 +862,6 @@ static int  Open ( vlc_object_t *p_this )
 
     p_enc->pf_encode_video = Encode;
     p_enc->pf_encode_audio = NULL;
-    p_sys->i_initial_delay = 0;
     p_sys->psz_stat_name = NULL;
     p_sys->i_sei_size = 0;
     p_sys->p_sei = NULL;
