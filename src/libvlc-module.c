@@ -577,6 +577,11 @@ static const char *const ppsz_clock_descriptions[] =
     "(like DVB streams for example)." )
 
 /// \todo Document how to find it
+#define INPUT_VIDEOTRACK_TEXT N_("Video track")
+#define INPUT_VIDEOTRACK_LONGTEXT N_( \
+    "Stream number of the video track to use " \
+    "(from 0 to n).")
+
 #define INPUT_AUDIOTRACK_TEXT N_("Audio track")
 #define INPUT_AUDIOTRACK_LONGTEXT N_( \
     "Stream number of the audio track to use " \
@@ -603,6 +608,10 @@ static const char *const ppsz_clock_descriptions[] =
     "(comma separated, two or three letters country code, you may use 'any' as a fallback).")
 
 /// \todo Document how to find it
+#define INPUT_VIDEOTRACK_ID_TEXT N_("Video track ID")
+#define INPUT_VIDEOTRACK_ID_LONGTEXT N_( \
+    "Stream ID of the video track to use.")
+
 #define INPUT_AUDIOTRACK_ID_TEXT N_("Audio track ID")
 #define INPUT_AUDIOTRACK_ID_LONGTEXT N_( \
     "Stream ID of the audio track to use.")
@@ -1728,6 +1737,9 @@ vlc_module_begin ()
     add_string( "programs", "",
                 INPUT_PROGRAMS_TEXT, INPUT_PROGRAMS_LONGTEXT, true )
         change_safe ()
+    add_integer( "video-track", -1,
+                 INPUT_VIDEOTRACK_TEXT, INPUT_VIDEOTRACK_LONGTEXT, true )
+        change_safe ()
     add_integer( "audio-track", -1,
                  INPUT_AUDIOTRACK_TEXT, INPUT_AUDIOTRACK_LONGTEXT, true )
         change_safe ()
@@ -1745,6 +1757,9 @@ vlc_module_begin ()
     add_string( "menu-language", "",
                  INPUT_MENUTRACK_LANG_TEXT, INPUT_MENUTRACK_LANG_LONGTEXT,
                   false )
+        change_safe ()
+    add_integer( "video-track-id", -1, INPUT_VIDEOTRACK_ID_TEXT,
+                 INPUT_VIDEOTRACK_ID_LONGTEXT, true )
         change_safe ()
     add_integer( "audio-track-id", -1, INPUT_AUDIOTRACK_ID_TEXT,
                  INPUT_AUDIOTRACK_ID_LONGTEXT, true )
