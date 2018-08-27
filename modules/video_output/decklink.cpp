@@ -1045,7 +1045,6 @@ static int OpenVideo(vlc_object_t *p_this)
         sys->video.ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
         sys->video.pic_nosignal = NULL;
         sys->video.pool = NULL;
-        video_format_Init( &sys->video.currentfmt, 0 );
 
         if (OpenDecklink(vd, sys) != VLC_SUCCESS)
         {
