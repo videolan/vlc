@@ -589,6 +589,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
     const int i_nal_type = p_frag->p_buffer[4]&0x1f;
     const vlc_tick_t i_frag_dts = p_frag->i_dts;
     const vlc_tick_t i_frag_pts = p_frag->i_pts;
+    bool b_au_end = p_frag->i_flags & BLOCK_FLAG_AU_END;
+    p_frag->i_flags &= ~BLOCK_FLAG_AU_END;
 
     if( p_sys->b_slice && (!p_sys->p_active_pps || !p_sys->p_active_sps) )
     {
@@ -739,6 +741,11 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_ts_used, block_t *p_fr
         *pb_ts_used = true;
         if( i_frag_dts != VLC_TICK_INVALID )
             date_Set( &p_sys->dts, i_frag_dts );
+    }
+
+    if( p_sys->b_slice && b_au_end && !p_pic )
+    {
+        p_pic = OutputPicture( p_dec );
     }
 
     if( p_pic && (p_pic->i_flags & BLOCK_FLAG_DROP) )
