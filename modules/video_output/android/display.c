@@ -505,6 +505,8 @@ static int OpenCommon(vout_display_t *vd)
     vout_display_sys_t *sys;
     video_format_t fmt, sub_fmt;
 
+    fmt = vd->fmt;
+
     vout_window_t *embed =
         vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
 
