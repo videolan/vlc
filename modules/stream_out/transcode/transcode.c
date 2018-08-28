@@ -366,6 +366,16 @@ static int Control( sout_stream_t *p_stream, int i_query, va_list args )
         case SOUT_STREAM_EMPTY:
             if( p_stream->p_next )
                 return sout_StreamControlVa( p_stream->p_next, i_query, args );
+            break;
+        case SOUT_STREAM_ID_SPU_HIGHLIGHT:
+        {
+            sout_stream_id_sys_t *id = (sout_stream_id_sys_t *) va_arg(args, void *);
+            void *spu_hl = va_arg(args, void *);
+            if( p_stream->p_next && id->downstream_id )
+                return sout_StreamControl( p_stream->p_next, i_query,
+                                           id->downstream_id, spu_hl );
+            break;
+        }
     }
     return VLC_EGENERIC;
 }
