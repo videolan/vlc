@@ -2077,6 +2077,8 @@ static void StreamRead( void *p_private, unsigned int i_size,
             p_block->p_buffer[2] = 0x00;
             p_block->p_buffer[3] = 0x01;
             memcpy( &p_block->p_buffer[4], tk->p_buffer, i_size );
+            if( tk->sub->rtpSource()->curPacketMarkerBit() )
+                p_block->i_flags |= BLOCK_FLAG_AU_END;
         }
     }
     else if( tk->format == live_track_t::ASF_STREAM )
