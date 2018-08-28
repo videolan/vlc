@@ -485,10 +485,10 @@ static int FindDesignated( addons_finder_t *p_finder )
     if ( ParseCategoriesInfo( p_finder, p_stream ) )
     {
         /* Do archive uri fixup */
-        FOREACH_ARRAY( addon_entry_t *p_entry, p_finder->entries )
-        if ( likely( !p_entry->psz_archive_uri ) )
+        addon_entry_t *p_entry;
+        ARRAY_FOREACH( p_entry, p_finder->entries )
+            if ( likely( !p_entry->psz_archive_uri ) )
                 p_entry->psz_archive_uri = strdup( p_finder->psz_uri );
-        FOREACH_END()
     }
     else
     {

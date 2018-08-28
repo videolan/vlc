@@ -706,12 +706,11 @@ void ExtensionListModel::updateList()
 
     vlc_mutex_lock( &p_mgr->lock );
     extension_t *p_ext;
-    FOREACH_ARRAY( p_ext, p_mgr->extensions )
+    ARRAY_FOREACH( p_ext, p_mgr->extensions )
     {
         ext = new ExtensionCopy( p_ext );
         extensions.append( ext );
     }
-    FOREACH_END()
     vlc_mutex_unlock( &p_mgr->lock );
     vlc_object_release( p_mgr );
 
@@ -850,9 +849,9 @@ QVariant AddonsListModel::Addon::data( int role ) const
     case FilenameRole:
     {
         QList<QString> list;
-        FOREACH_ARRAY( addon_file_t *p_file, p_entry->files )
-        list << qfu( p_file->psz_filename );
-        FOREACH_END();
+        addon_file_t *p_file;
+        ARRAY_FOREACH( p_file, p_entry->files )
+            list << qfu( p_file->psz_filename );
         returnval = QVariant( list );
         break;
     }

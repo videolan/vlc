@@ -479,7 +479,7 @@ void ExtensionDialog::UpdateWidgets()
 {
     assert( p_dialog );
     extension_widget_t *p_widget;
-    FOREACH_ARRAY( p_widget, p_dialog->widgets )
+    ARRAY_FOREACH( p_widget, p_dialog->widgets )
     {
         if( !p_widget ) continue; /* Some widgets may be NULL at this point */
         QWidget *widget;
@@ -539,7 +539,6 @@ void ExtensionDialog::UpdateWidgets()
             this->resize( sizeHint() );
         }
     }
-    FOREACH_END()
 }
 
 QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )

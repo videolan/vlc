@@ -243,13 +243,10 @@ static inline void *realloc_or_free( void *p, size_t sz )
 #define ARRAY_BSEARCH(array, elem, zetype, key, answer) \
     BSEARCH( (array).p_elems, (array).i_size, elem, zetype, key, answer)
 
-#define FOREACH_ARRAY( item, array ) { \
-    int fe_idx; \
-    for( fe_idx = 0 ; fe_idx < (array).i_size ; fe_idx++ ) \
-    { \
-        item = (array).p_elems[fe_idx];
-
-#define FOREACH_END() } }
+#define ARRAY_FOREACH(item, array) \
+    for (int fe_idx = 0; \
+         fe_idx < (array).i_size && ((item) = (array).p_elems[fe_idx], 1); \
+         ++fe_idx)
 
 
 /************************************************************************

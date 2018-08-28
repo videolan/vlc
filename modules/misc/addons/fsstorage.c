@@ -276,15 +276,19 @@ static bool FileBelongsToManagedAddon( addons_finder_t *p_finder,
                                        const addon_type_t e_type,
                                        const char *psz_file )
 {
-    FOREACH_ARRAY( const addon_entry_t *p_entry, p_finder->entries )
+    const addon_entry_t *p_entry;
+    ARRAY_FOREACH( p_entry, p_finder->entries )
+    {
         if ( ( p_entry->e_flags & ADDON_MANAGEABLE ) == 0 )
             continue;
-        FOREACH_ARRAY( const addon_file_t *p_file, p_entry->files )
+        const addon_file_t *p_file;
+        ARRAY_FOREACH( p_file, p_entry->files )
+        {
             if ( p_file->e_filetype == e_type
                  && !strcmp( p_file->psz_filename, psz_file ) )
                 return true;
-        FOREACH_END();
-    FOREACH_END();
+        }
+    }
     return false;
 }
 
@@ -440,55 +444,54 @@ static int InstallAllFiles( addons_storage_t *p_this, const addon_entry_t *p_ent
     if ( p_entry->files.i_size < 1 )
         return VLC_EGENERIC;
 
-    FOREACH_ARRAY( p_file, p_entry->files )
-
-    switch( p_file->e_filetype )
+    ARRAY_FOREACH( p_file, p_entry->files )
     {
-        case ADDON_EXTENSION:
-        case ADDON_PLAYLIST_PARSER:
-        case ADDON_SERVICE_DISCOVERY:
-        case ADDON_INTERFACE:
-        case ADDON_META:
-        case ADDON_SKIN2:
+        switch( p_file->e_filetype )
         {
-            if ( strstr( p_file->psz_filename, ".." ) )
-                return VLC_EGENERIC;
-
-            char *psz_translated_filename = strdup( p_file->psz_filename );
-            if ( !psz_translated_filename )
-                return VLC_ENOMEM;
-            char *tmp = psz_translated_filename;
-            while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
-
-            char *psz_dir = getAddonInstallDir( p_file->e_filetype );
-            if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
-                           psz_translated_filename ) < 1 )
+            case ADDON_EXTENSION:
+            case ADDON_PLAYLIST_PARSER:
+            case ADDON_SERVICE_DISCOVERY:
+            case ADDON_INTERFACE:
+            case ADDON_META:
+            case ADDON_SKIN2:
             {
-                free( psz_dir );
+                if ( strstr( p_file->psz_filename, ".." ) )
+                    return VLC_EGENERIC;
+
+                char *psz_translated_filename = strdup( p_file->psz_filename );
+                if ( !psz_translated_filename )
+                    return VLC_ENOMEM;
+                char *tmp = psz_translated_filename;
+                while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
+
+                char *psz_dir = getAddonInstallDir( p_file->e_filetype );
+                if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
+                               psz_translated_filename ) < 1 )
+                {
+                    free( psz_dir );
+                    free( psz_translated_filename );
+                    return VLC_EGENERIC;
+                }
                 free( psz_translated_filename );
-                return VLC_EGENERIC;
-            }
-            free( psz_translated_filename );
-            free( psz_dir );
+                free( psz_dir );
 
-            if ( InstallFile( p_this, p_file->psz_download_uri, psz_dest ) != VLC_SUCCESS )
-            {
+                if ( InstallFile( p_this, p_file->psz_download_uri, psz_dest ) != VLC_SUCCESS )
+                {
+                    free( psz_dest );
+                    return VLC_EGENERIC;
+                }
+
                 free( psz_dest );
-                return VLC_EGENERIC;
+                break;
             }
-
-            free( psz_dest );
-            break;
+            /* Ignore all other unhandled files */
+            case ADDON_UNKNOWN:
+            case ADDON_PLUGIN:
+            case ADDON_OTHER:
+            default:
+                break;
         }
-        /* Ignore all other unhandled files */
-        case ADDON_UNKNOWN:
-        case ADDON_PLUGIN:
-        case ADDON_OTHER:
-        default:
-            break;
     }
-
-    FOREACH_END()
 
     return VLC_SUCCESS;
 }
@@ -638,12 +641,14 @@ static int WriteCatalog( addons_storage_t *p_storage,
         WRITE_WITH_ENTITIES( "\t\t\t\t<sourceurl>%s</sourceurl>\n", p_entry->psz_source_uri )
         fprintf( p_catalog, "\t\t\t</authorship>\n" );
 
-        FOREACH_ARRAY( addon_file_t *p_file, p_entry->files )
+        addon_file_t *p_file;
+        ARRAY_FOREACH( p_file, p_entry->files )
+        {
             psz_tempstring = vlc_xml_encode( p_file->psz_filename );
             fprintf( p_catalog, "\t\t\t<resource type=\"%s\">%s</resource>\n",
                      getTypePsz( p_file->e_filetype ), psz_tempstring );
             free( psz_tempstring );
-        FOREACH_END();
+        }
 
         fprintf( p_catalog, "\t\t</addon>\n" );
 
@@ -863,56 +868,59 @@ end:
 static int Remove( addons_storage_t *p_storage, addon_entry_t *p_entry )
 {
     vlc_mutex_lock( &p_entry->lock );
-    FOREACH_ARRAY( addon_file_t *p_file, p_entry->files )
-    switch( p_file->e_filetype )
+    addon_file_t *p_file;
+    ARRAY_FOREACH( p_file, p_entry->files )
     {
-        case ADDON_EXTENSION:
-        case ADDON_PLAYLIST_PARSER:
-        case ADDON_SERVICE_DISCOVERY:
-        case ADDON_INTERFACE:
-        case ADDON_META:
-        case ADDON_SKIN2:
+        switch( p_file->e_filetype )
         {
-            char *psz_dest;
-
-            char *psz_translated_filename = strdup( p_file->psz_filename );
-            if ( !psz_translated_filename )
-                return VLC_ENOMEM;
-            char *tmp = psz_translated_filename;
-            while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
-
-            char *psz_dir = getAddonInstallDir( p_file->e_filetype );
-            if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
-                                       psz_translated_filename ) < 1 )
+            case ADDON_EXTENSION:
+            case ADDON_PLAYLIST_PARSER:
+            case ADDON_SERVICE_DISCOVERY:
+            case ADDON_INTERFACE:
+            case ADDON_META:
+            case ADDON_SKIN2:
             {
+                char *psz_dest;
+
+                char *psz_translated_filename = strdup( p_file->psz_filename );
+                if ( !psz_translated_filename )
+                    return VLC_ENOMEM;
+                char *tmp = psz_translated_filename;
+                while (*tmp++) if ( *tmp == '/' ) *tmp = DIR_SEP_CHAR;
+
+                char *psz_dir = getAddonInstallDir( p_file->e_filetype );
+                if ( !psz_dir || asprintf( &psz_dest, "%s"DIR_SEP"%s", psz_dir,
+                                           psz_translated_filename ) < 1 )
+                {
+                    free( psz_dir );
+                    free( psz_translated_filename );
+                    return VLC_EGENERIC;
+                }
                 free( psz_dir );
                 free( psz_translated_filename );
-                return VLC_EGENERIC;
+
+                vlc_unlink( psz_dest );
+                msg_Dbg( p_storage, "removing %s", psz_dest );
+
+                free( psz_dest );
+                break;
             }
-            free( psz_dir );
-            free( psz_translated_filename );
-
-            vlc_unlink( psz_dest );
-            msg_Dbg( p_storage, "removing %s", psz_dest );
-
-            free( psz_dest );
-            break;
+                /* Ignore all other unhandled files */
+            case ADDON_UNKNOWN:
+            case ADDON_PLUGIN:
+            case ADDON_OTHER:
+            default:
+                break;
         }
-            /* Ignore all other unhandled files */
-        case ADDON_UNKNOWN:
-        case ADDON_PLUGIN:
-        case ADDON_OTHER:
-        default:
-            break;
     }
-    FOREACH_END()
 
     /* Remove file info on success */
-    FOREACH_ARRAY( addon_file_t *p_file, p_entry->files )
-    free( p_file->psz_filename );
-    free( p_file->psz_download_uri );
-    free( p_file );
-    FOREACH_END()
+    ARRAY_FOREACH( p_file, p_entry->files )
+    {
+        free( p_file->psz_filename );
+        free( p_file->psz_download_uri );
+        free( p_file );
+    }
     ARRAY_RESET( p_entry->files );
 
     vlc_mutex_unlock( &p_entry->lock );

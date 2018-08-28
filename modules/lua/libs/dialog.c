@@ -268,7 +268,7 @@ static int vlclua_dialog_delete( lua_State *L )
 
     /* Destroy widgets */
     extension_widget_t *p_widget;
-    FOREACH_ARRAY( p_widget, p_dlg->widgets )
+    ARRAY_FOREACH( p_widget, p_dlg->widgets )
     {
         if( !p_widget )
             continue;
@@ -284,7 +284,6 @@ static int vlclua_dialog_delete( lua_State *L )
         }
         free( p_widget );
     }
-    FOREACH_END()
 
     ARRAY_RESET( p_dlg->widgets );
 
@@ -1058,7 +1057,7 @@ static int DeleteWidget( extension_dialog_t *p_dialog,
     int pos = -1;
     bool found = false;
     extension_widget_t *p_iter;
-    FOREACH_ARRAY( p_iter, p_dialog->widgets )
+    ARRAY_FOREACH( p_iter, p_dialog->widgets )
     {
         pos++;
         if( p_iter == p_widget )
@@ -1067,7 +1066,6 @@ static int DeleteWidget( extension_dialog_t *p_dialog,
             break;
         }
     }
-    FOREACH_END()
 
     if( !found )
         return VLC_EGENERIC;

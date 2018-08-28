@@ -377,7 +377,7 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
     extension_widget_t *widget;
     VLCDialogWindow *dialogWindow = (__bridge VLCDialogWindow *)(dialog->p_sys_intf);
 
-    FOREACH_ARRAY(widget, dialog->widgets) {
+    ARRAY_FOREACH(widget, dialog->widgets) {
         if (!widget)
             continue; /* Some widgets may be NULL@this point */
 
@@ -432,7 +432,6 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
             }
         }
     }
-    FOREACH_END()
 }
 
 /** Create a dialog

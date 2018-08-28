@@ -1470,7 +1470,9 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     char *psz_bookmark = var_CreateGetString( p_intf, psz_bookmark_name );
 
     PL_LOCK;
-    FOREACH_ARRAY( playlist_item_t *p_item, p_playlist->items )
+    playlist_item_t *p_item;
+    ARRAY_FOREACH( p_item, p_playlist->items )
+    {
         char *psz_uri = input_item_GetURI( p_item->p_input );
         if( !strcmp( psz_bookmark, psz_uri ) )
         {
@@ -1480,7 +1482,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
         }
         else
             free( psz_uri );
-    FOREACH_END();
+    }
     PL_UNLOCK;
 
     free( psz_bookmark );

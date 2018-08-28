@@ -68,10 +68,11 @@ static void test_array_foreach(void)
 
     int count = 0;
     int item;
-    FOREACH_ARRAY(item, array)
+    ARRAY_FOREACH(item, array)
+    {
         assert(item == count);
         count++;
-    FOREACH_END()
+    }
     assert(count == 10);
 
     ARRAY_RESET(array);

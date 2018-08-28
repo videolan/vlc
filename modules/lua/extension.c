@@ -137,7 +137,7 @@ void Close_Extension( vlc_object_t *p_this )
     extension_t *p_ext = NULL;
 
     /* Free extensions' memory */
-    FOREACH_ARRAY( p_ext, p_mgr->extensions )
+    ARRAY_FOREACH( p_ext, p_mgr->extensions )
     {
         if( !p_ext )
             break;
@@ -186,7 +186,6 @@ void Close_Extension( vlc_object_t *p_this )
         free( p_ext->p_sys );
         free( p_ext );
     }
-    FOREACH_END()
 
     vlc_mutex_destroy( &p_mgr->lock );
 

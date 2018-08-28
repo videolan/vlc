@@ -116,11 +116,12 @@ void addon_entry_Release( addon_entry_t * p_entry )
     free( p_entry->p_custom );
 
     addon_file_t *p_file;
-    FOREACH_ARRAY( p_file, p_entry->files )
-    free( p_file->psz_filename );
-    free( p_file->psz_download_uri );
-    free( p_file );
-    FOREACH_END()
+    ARRAY_FOREACH( p_file, p_entry->files )
+    {
+        free( p_file->psz_filename );
+        free( p_file->psz_download_uri );
+        free( p_file );
+    }
     ARRAY_RESET( p_entry->files );
 
     vlc_mutex_destroy( &p_entry->lock );
@@ -192,10 +193,11 @@ void addons_manager_Delete( addons_manager_t *p_manager )
         vlc_join( p_manager->p_priv->installer.thread, NULL );
     }
 
+    addon_entry_t *p_entry;
+
 #define FREE_QUEUE( name ) \
-    FOREACH_ARRAY( addon_entry_t *p_entry, p_manager->p_priv->name.entries )\
+    ARRAY_FOREACH( p_entry, p_manager->p_priv->name.entries )\
         addon_entry_Release( p_entry );\
-    FOREACH_END();\
     ARRAY_RESET( p_manager->p_priv->name.entries );\
     vlc_mutex_destroy( &p_manager->p_priv->name.lock );\
     vlc_cond_destroy( &p_manager->p_priv->name.waitcond );\
@@ -203,9 +205,10 @@ void addons_manager_Delete( addons_manager_t *p_manager )
 
     FREE_QUEUE( finder )
     FREE_QUEUE( installer )
-    FOREACH_ARRAY( char *psz_uri, p_manager->p_priv->finder.uris )
+
+    char *psz_uri;
+    ARRAY_FOREACH( psz_uri, p_manager->p_priv->finder.uris )
        free( psz_uri );
-    FOREACH_END();
     ARRAY_RESET( p_manager->p_priv->finder.uris );
 
     free( p_manager->p_priv );
@@ -247,14 +250,16 @@ static addon_entry_t * getHeldEntryByUUID( addons_manager_t *p_manager,
 {
     addon_entry_t *p_return = NULL;
     vlc_mutex_lock( &p_manager->p_priv->finder.lock );
-    FOREACH_ARRAY( addon_entry_t *p_entry, p_manager->p_priv->finder.entries )
-    if ( !memcmp( p_entry->uuid, uuid, sizeof( addon_uuid_t ) ) )
+    addon_entry_t *p_entry;
+    ARRAY_FOREACH( p_entry, p_manager->p_priv->finder.entries )
     {
-        p_return = p_entry;
-        addon_entry_Hold( p_return );
-        break;
+        if ( !memcmp( p_entry->uuid, uuid, sizeof( addon_uuid_t ) ) )
+        {
+            p_return = p_entry;
+            addon_entry_Hold( p_return );
+            break;
+        }
     }
-    FOREACH_END()
     vlc_mutex_unlock( &p_manager->p_priv->finder.lock );
     return p_return;
 }

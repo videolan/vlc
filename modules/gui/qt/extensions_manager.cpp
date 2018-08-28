@@ -147,7 +147,7 @@ void ExtensionsManager::menu( QMenu *current )
     QAction *action;
     extension_t *p_ext = NULL;
     int i_ext = 0;
-    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
     {
         bool b_Active = extension_IsActivated( p_extensions_manager, p_ext );
 
@@ -213,7 +213,6 @@ void ExtensionsManager::menu( QMenu *current )
         }
         i_ext++;
     }
-    FOREACH_END()
 
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
@@ -273,14 +272,13 @@ void ExtensionsManager::inputChanged( )
     vlc_mutex_lock( &p_extensions_manager->lock );
 
     extension_t *p_ext;
-    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
     {
         if( extension_IsActivated( p_extensions_manager, p_ext ) )
         {
             extension_SetInput( p_extensions_manager, p_ext, p_input );
         }
     }
-    FOREACH_END()
 
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
@@ -293,14 +291,13 @@ void ExtensionsManager::playingChanged( int state )
     vlc_mutex_lock( &p_extensions_manager->lock );
 
     extension_t *p_ext;
-    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
     {
         if( extension_IsActivated( p_extensions_manager, p_ext ) )
         {
             extension_PlayingChanged( p_extensions_manager, p_ext, state );
         }
     }
-    FOREACH_END()
 
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
@@ -312,13 +309,12 @@ void ExtensionsManager::metaChanged( input_item_t* )
         return ;
     vlc_mutex_lock( &p_extensions_manager->lock );
     extension_t *p_ext;
-    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    ARRAY_FOREACH( p_ext, p_extensions_manager->extensions )
     {
         if( extension_IsActivated( p_extensions_manager, p_ext ) )
         {
             extension_MetaChanged( p_extensions_manager, p_ext );
         }
     }
-    FOREACH_END()
     vlc_mutex_unlock( &p_extensions_manager->lock );
 }
