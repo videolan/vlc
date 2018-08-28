@@ -195,7 +195,7 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
         case VLC_VAR_INTEGER:
             if (val->i_int < var->min.i_int)
                val->i_int = var->min.i_int;
-            if (val->i_int > var->max.i_int)
+            else if (val->i_int > var->max.i_int)
                 val->i_int = var->max.i_int;
             if (var->step.i_int != 0 && (val->i_int % var->step.i_int))
             {
@@ -211,7 +211,7 @@ static void CheckValue(variable_t *var, vlc_value_t *val)
         case VLC_VAR_FLOAT:
             if (isless(val->f_float, var->min.f_float))
                 val->f_float = var->min.f_float;
-            if (isgreater(val->f_float, var->max.f_float))
+            else if (isgreater(val->f_float, var->max.f_float))
                 val->f_float = var->max.f_float;
             if (var->step.f_float != 0.f)
                 val->f_float = var->step.f_float
