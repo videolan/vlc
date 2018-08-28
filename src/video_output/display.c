@@ -109,11 +109,13 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
             vlc_object_release(vd);
             return NULL;
         }
+
+        vout_window_SetSize(cfg->window,
+                            cfg->display.width, cfg->display.height);
     } else {
         vd->module = NULL;
     }
 
-    vout_window_SetSize(cfg->window, cfg->display.width, cfg->display.height);
     return vd;
 }
 
