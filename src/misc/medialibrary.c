@@ -103,8 +103,8 @@ vlc_medialibrary_t* libvlc_MlCreate( libvlc_int_t* p_libvlc  )
     p_ml->m.p_module = module_need( &p_ml->m, "medialibrary", NULL, false );
     if ( p_ml->m.p_module == NULL )
     {
-        vlc_object_release( &p_ml->m );
         vlc_mutex_destroy( &p_ml->lock );
+        vlc_object_release( &p_ml->m );
         return NULL;
     }
     return p_ml;
