@@ -171,7 +171,8 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
                                        NULL, &p_pack->i_offset, NULL );
                 p_pack->i_offset -= p_pack->bytestream.i_block_offset;
 
-                if( p_pack->i_offset <= (size_t)p_pack->i_startcode )
+                if( p_pack->i_offset <= (size_t)p_pack->i_startcode &&
+                    (p_pack->bytestream.p_block->i_flags & BLOCK_FLAG_AU_END) == 0 )
                     return NULL;
             }
 
@@ -183,6 +184,13 @@ static inline block_t *packetizer_Packetize( packetizer_t *p_pack, block_t **pp_
             p_pic = block_Alloc( p_pack->i_offset + p_pack->i_au_prepend );
             p_pic->i_pts = p_block_bytestream->i_pts;
             p_pic->i_dts = p_block_bytestream->i_dts;
+
+            /* Do not wait for next sync code if notified block ends AU */
+            if( (p_block_bytestream->i_flags & BLOCK_FLAG_AU_END) &&
+                 p_block_bytestream->i_buffer == p_pack->i_offset )
+            {
+                p_pic->i_flags |= BLOCK_FLAG_AU_END;
+            }
 
             block_GetBytes( &p_pack->bytestream, &p_pic->p_buffer[p_pack->i_au_prepend],
                             p_pic->i_buffer - p_pack->i_au_prepend );
