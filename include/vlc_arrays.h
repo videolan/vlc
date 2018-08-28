@@ -210,9 +210,9 @@ static inline void *realloc_or_free( void *p, size_t sz )
 #define ARRAY_INSERT(array,elem,pos)                                        \
   do {                                                                      \
     _ARRAY_GROW1(array);                                                    \
-    if( (array).i_size - pos ) {                                            \
-        memmove( (array).p_elems + pos + 1, (array).p_elems + pos,          \
-                 ((array).i_size-pos) * sizeof(*(array).p_elems) );         \
+    if( (array).i_size - (pos) ) {                                          \
+        memmove( (array).p_elems + (pos) + 1, (array).p_elems + (pos),      \
+                 ((array).i_size-(pos)) * sizeof(*(array).p_elems) );       \
     }                                                                       \
     (array).p_elems[pos] = elem;                                            \
     (array).i_size++;                                                       \
@@ -231,8 +231,8 @@ static inline void *realloc_or_free( void *p, size_t sz )
   do {                                                                      \
     if( (array).i_size - (pos) - 1 )                                        \
     {                                                                       \
-        memmove( (array).p_elems + pos, (array).p_elems + pos + 1,          \
-                 ( (array).i_size - pos - 1 ) *sizeof(*(array).p_elems) );  \
+        memmove( (array).p_elems + (pos), (array).p_elems + (pos) + 1,      \
+                 ( (array).i_size - (pos) - 1 ) *sizeof(*(array).p_elems) );\
     }                                                                       \
     (array).i_size--;                                                       \
     _ARRAY_SHRINK(array);                                                   \
