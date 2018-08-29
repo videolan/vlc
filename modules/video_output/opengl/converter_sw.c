@@ -233,7 +233,7 @@ tc_pbo_update(const opengl_tex_converter_t *tc, GLuint *textures,
         tc->vt->BindTexture(tc->tex_target, textures[i]);
 
         tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pic->p[i].i_pitch
-                                * tex_width[i] / (pic->p[i].i_visible_pitch ?: 1));
+            * tex_width[i] / (pic->p[i].i_visible_pitch ? pic->p[i].i_visible_pitch : 1));
 
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, tex_width[i], tex_height[i],
                               tc->texs[i].format, tc->texs[i].type, NULL);
@@ -488,7 +488,7 @@ upload_plane(const opengl_tex_converter_t *tc, unsigned tex_idx,
     }
     else
     {
-        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ?: 1));
+        tc->vt->PixelStorei(GL_UNPACK_ROW_LENGTH, pitch * width / (visible_pitch ? visible_pitch : 1));
         tc->vt->TexSubImage2D(tc->tex_target, 0, 0, 0, width, height,
                               tex_format, tex_type, pixels);
     }
