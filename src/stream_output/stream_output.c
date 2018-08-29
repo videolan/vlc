@@ -215,6 +215,22 @@ bool sout_InputIsEmpty( sout_packetizer_input_t *p_input )
     return b;
 }
 
+static int sout_InputControlVa( sout_packetizer_input_t *p_input, int i_query, va_list args )
+{
+    return VLC_EGENERIC;
+}
+
+int sout_InputControl( sout_packetizer_input_t *p_input, int i_query, ... )
+{
+    va_list args;
+    int     i_result;
+
+    va_start( args, i_query );
+    i_result = sout_InputControlVa( p_input, i_query, args );
+    va_end( args );
+    return i_result;
+}
+
 void sout_InputFlush( sout_packetizer_input_t *p_input )
 {
     sout_instance_t     *p_sout = p_input->p_sout;
