@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_url.h>
 #include <vlc_media_library.h>
 #include "medialibrary.h"
 
@@ -336,10 +337,9 @@ bool MediaLibrary::Start()
             auto folder = vlc::wrap_cptr( config_GetUserDir( target ) );
             if( folder == nullptr )
                 continue;
-
-            auto mrl = std::string{ "file://" } + folder.get();
-            ml->discover( mrl );
-            varValue += ";" + mrl;
+            auto folderMrl = vlc::wrap_cptr( vlc_path2uri( folder.get(), nullptr ) );
+            ml->discover( folderMrl.get() );
+            varValue += std::string{ ";" } + folderMrl.get();
         }
         if ( varValue.empty() == false )
             config_PutPsz( "ml-folders", varValue.c_str()+1 ); /* skip initial ';' */
