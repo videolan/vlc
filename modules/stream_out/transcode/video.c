@@ -435,10 +435,23 @@ static picture_t * RenderSubpictures( sout_stream_t *p_stream, sout_stream_id_sy
     return p_pic;
 }
 
+static void tag_last_block_with_flag( block_t **out, int i_flag )
+{
+    block_t *p_last = *out;
+    if( p_last )
+    {
+        while( p_last->p_next )
+            p_last = p_last->p_next;
+        p_last->i_flags |= i_flag;
+    }
+}
+
 int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                                     block_t *in, block_t **out )
 {
     *out = NULL;
+
+    const bool b_eos = in && (in->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
 
     int ret = id->p_decoder->pf_decode( id->p_decoder, in );
     if( ret != VLCDEC_SUCCESS )
@@ -566,6 +579,17 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_sys_t *id,
                 }
             }
         }
+
+        if( b_eos )
+        {
+            msg_Info( p_stream, "Drain/restart on EOS" );
+            if( transcode_encoder_drain( id->encoder, out ) != VLC_SUCCESS )
+                goto error;
+            transcode_encoder_close( id->encoder );
+            if( b_eos )
+                tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
+        }
+
         continue;
 error:
         if( p_pic )
@@ -588,6 +612,9 @@ error:
         else
             msg_Warn( p_stream, "Flushing failed");
     }
+
+    if( b_eos )
+        tag_last_block_with_flag( out, BLOCK_FLAG_END_OF_SEQUENCE );
 
     return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;
 }
