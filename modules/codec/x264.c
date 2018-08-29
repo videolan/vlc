@@ -1501,7 +1501,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
        x264_encoder_encode( p_sys->h, &nal, &i_nal, &pic, &pic );
     } else {
-       if( x264_encoder_delayed_frames( p_sys->h ) ) {
+       while( x264_encoder_delayed_frames( p_sys->h ) && i_nal == 0 ) {
            x264_encoder_encode( p_sys->h, &nal, &i_nal, NULL, &pic );
        }
     }
