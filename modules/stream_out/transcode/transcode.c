@@ -356,6 +356,19 @@ static void SetSPUEncoderConfig( sout_stream_t *p_stream, transcode_encoder_conf
     free( psz_string );
 
 }
+/*****************************************************************************
+ * Control
+ *****************************************************************************/
+static int Control( sout_stream_t *p_stream, int i_query, va_list args )
+{
+    switch( i_query )
+    {
+        case SOUT_STREAM_EMPTY:
+            if( p_stream->p_next )
+                return sout_StreamControlVa( p_stream->p_next, i_query, args );
+    }
+    return VLC_EGENERIC;
+}
 
 /*****************************************************************************
  * Open:
@@ -445,6 +458,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
     p_stream->pf_send   = Send;
+    p_stream->pf_control = Control;
     p_stream->p_sys     = p_sys;
 
     return VLC_SUCCESS;
