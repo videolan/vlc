@@ -220,8 +220,8 @@ enum input_control_e
     INPUT_CONTROL_NAV_POPUP,
     INPUT_CONTROL_NAV_MENU,
 
-    INPUT_CONTROL_SET_ES,
-    INPUT_CONTROL_RESTART_ES,
+    INPUT_CONTROL_SET_ES_BY_ID,
+    INPUT_CONTROL_RESTART_ES_BY_ID,
 
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)

@@ -1019,7 +1019,7 @@ static int EsVideoCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( newval.i_int < 0 )
         newval.i_int = -VIDEO_ES; /* disable video es */
 
-    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES_BY_ID, &newval );
 
     return VLC_SUCCESS;
 }
@@ -1033,7 +1033,7 @@ static int EsAudioCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( newval.i_int < 0 )
         newval.i_int = -AUDIO_ES; /* disable audio es */
 
-    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES_BY_ID, &newval );
 
     return VLC_SUCCESS;
 }
@@ -1047,7 +1047,7 @@ static int EsSpuCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( newval.i_int < 0 )
         newval.i_int = -SPU_ES; /* disable spu es */
 
-    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES, &newval );
+    input_ControlPushHelper( p_input, INPUT_CONTROL_SET_ES_BY_ID, &newval );
 
     return VLC_SUCCESS;
 }

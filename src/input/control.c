@@ -357,9 +357,9 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_EGENERIC;
         }
 
-        case INPUT_RESTART_ES:
+        case INPUT_RESTART_ES_BY_ID:
             val.i_int = va_arg( args, int );
-            input_ControlPushHelper( p_input, INPUT_CONTROL_RESTART_ES, &val );
+            input_ControlPushHelper( p_input, INPUT_CONTROL_RESTART_ES_BY_ID, &val );
             return VLC_SUCCESS;
 
         case INPUT_UPDATE_VIEWPOINT:

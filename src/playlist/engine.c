@@ -179,7 +179,7 @@ static int VideoSplitterCallback( vlc_object_t *p_this, char const *psz_cmd,
     if( p_input )
     {
         const double f_position = var_GetFloat( p_input, "position" );
-        input_Control( p_input, INPUT_RESTART_ES, -VIDEO_ES );
+        input_Control( p_input, INPUT_RESTART_ES_BY_ID, -VIDEO_ES );
         var_SetFloat( p_input, "position", f_position );
     }
 
