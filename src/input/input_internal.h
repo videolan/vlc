@@ -82,6 +82,7 @@ typedef union
 {
     vlc_value_t val;
     vlc_viewpoint_t viewpoint;
+    vlc_es_id_t *id;
     struct {
         bool b_fast_seek;
         vlc_tick_t i_val;
@@ -233,6 +234,10 @@ enum input_control_e
     INPUT_CONTROL_SET_ES_BY_ID,
     INPUT_CONTROL_RESTART_ES_BY_ID,
 
+    INPUT_CONTROL_SET_ES,
+    INPUT_CONTROL_UNSET_ES,
+    INPUT_CONTROL_RESTART_ES,
+
     INPUT_CONTROL_SET_VIEWPOINT,    // new absolute viewpoint
     INPUT_CONTROL_SET_INITIAL_VIEWPOINT, // set initial viewpoint (generally from video)
     INPUT_CONTROL_UPDATE_VIEWPOINT, // update viewpoint relative to current
@@ -267,6 +272,16 @@ static inline void input_ControlPushHelper( input_thread_t *p_input, int i_type,
     {
         input_ControlPush( p_input, i_type, NULL );
     }
+}
+
+static inline void input_ControlPushEsHelper( input_thread_t *p_input, int i_type,
+                                              vlc_es_id_t *id )
+{
+    assert( i_type == INPUT_CONTROL_SET_ES || i_type == INPUT_CONTROL_UNSET_ES ||
+            i_type == INPUT_CONTROL_RESTART_ES );
+    input_ControlPush( p_input, i_type, &(input_control_param_t) {
+        .id = vlc_es_id_Hold( id ),
+    } );
 }
 
 bool input_Stopped( input_thread_t * );

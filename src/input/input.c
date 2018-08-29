@@ -1655,6 +1655,11 @@ static void ControlRelease( int i_type, const input_control_param_t *p_param )
         if( p_param->val.p_address )
             vlc_renderer_item_release( p_param->val.p_address );
         break;
+    case INPUT_CONTROL_SET_ES:
+    case INPUT_CONTROL_UNSET_ES:
+    case INPUT_CONTROL_RESTART_ES:
+        vlc_es_id_Release( p_param->id );
+        break;
 
     default:
         break;
@@ -2062,6 +2067,21 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_RESTART_ES_BY_ID:
             es_out_Control( priv->p_es_out_display,
                             ES_OUT_RESTART_ES_BY_ID, (int)param.val.i_int );
+            break;
+
+        case INPUT_CONTROL_SET_ES:
+            if( es_out_Control( input_priv(p_input)->p_es_out_display,
+                                ES_OUT_SET_ES, param.id ) == VLC_SUCCESS )
+                demux_Control( input_priv(p_input)->master->p_demux, DEMUX_SET_ES,
+                               vlc_es_id_GetInputId( param.id ) );
+            break;
+        case INPUT_CONTROL_UNSET_ES:
+            es_out_Control( input_priv(p_input)->p_es_out_display,
+                            ES_OUT_UNSET_ES, param.id );
+            break;
+        case INPUT_CONTROL_RESTART_ES:
+            es_out_Control( input_priv(p_input)->p_es_out_display,
+                            ES_OUT_RESTART_ES, param.id );
             break;
 
         case INPUT_CONTROL_SET_VIEWPOINT:
