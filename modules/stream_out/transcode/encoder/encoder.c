@@ -201,6 +201,24 @@ int transcode_encoder_open( transcode_encoder_t *p_enc,
     }
 }
 
+int transcode_encoder_drain( transcode_encoder_t *p_enc, block_t **out )
+{
+    if( !transcode_encoder_opened( p_enc ) )
+        return VLC_EGENERIC;
+
+    switch( p_enc->p_encoder->fmt_in.i_cat )
+    {
+        case VIDEO_ES:
+            return transcode_encoder_video_drain( p_enc, out );
+        case AUDIO_ES:
+            return transcode_encoder_audio_drain( p_enc, out );
+        case SPU_ES:
+            return VLC_SUCCESS;
+        default:
+            return VLC_EGENERIC;
+    }
+}
+
 int transcode_encoder_test( vlc_object_t *p_obj,
                             const transcode_encoder_config_t *p_cfg,
                             const es_format_t *p_dec_fmtin,

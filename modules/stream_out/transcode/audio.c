@@ -354,11 +354,7 @@ error:
     /* Drain encoder */
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
-        block_t *p_block;
-        do {
-            p_block = transcode_encoder_encode( id->encoder, NULL );
-            block_ChainAppend( out, p_block );
-        } while( p_block );
+        transcode_encoder_drain( id->encoder, out );
     }
 
     return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;

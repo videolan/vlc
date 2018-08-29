@@ -76,6 +76,7 @@ void transcode_encoder_close( transcode_encoder_t * );
 
 bool transcode_encoder_opened( const transcode_encoder_t * );
 int transcode_encoder_open( transcode_encoder_t *, const transcode_encoder_config_t * );
+int transcode_encoder_drain( transcode_encoder_t *, block_t ** );
 
 int transcode_encoder_test( vlc_object_t *p_obj,
                             const transcode_encoder_config_t *p_cfg,

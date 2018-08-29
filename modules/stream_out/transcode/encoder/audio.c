@@ -201,3 +201,13 @@ block_t * transcode_encoder_audio_encode( transcode_encoder_t *p_enc, block_t *p
 {
     return p_enc->p_encoder->pf_encode_audio( p_enc->p_encoder, p_block );
 }
+
+int transcode_encoder_audio_drain( transcode_encoder_t *p_enc, block_t **out )
+{
+    block_t *p_block;
+    do {
+        p_block = transcode_encoder_audio_encode( p_enc, NULL );
+        block_ChainAppend( out, p_block );
+    } while( p_block );
+    return VLC_SUCCESS;
+}

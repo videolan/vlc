@@ -578,21 +578,11 @@ error:
     /* Drain encoder */
     if( unlikely( !id->b_error && in == NULL ) && transcode_encoder_opened( id->encoder ) )
     {
-        if( id->p_enccfg->video.threads.i_count == 0 )
-        {
-            block_t *p_block;
-            do {
-                p_block = transcode_encoder_encode( id->encoder, NULL );
-                block_ChainAppend( out, p_block );
-            } while( p_block );
-        }
-        else
-        {
-            msg_Dbg( p_stream, "Flushing thread and waiting that");
-            transcode_encoder_close( id->encoder );
-            block_ChainAppend( out, transcode_encoder_get_output_async( id->encoder ) );
+        msg_Dbg( p_stream, "Flushing thread and waiting that");
+        if( transcode_encoder_drain( id->encoder, out ) == VLC_SUCCESS )
             msg_Dbg( p_stream, "Flushing done");
-        }
+        else
+            msg_Warn( p_stream, "Flushing failed");
     }
 
     return id->b_error ? VLC_EGENERIC : VLC_SUCCESS;

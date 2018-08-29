@@ -46,6 +46,9 @@ block_t * transcode_encoder_video_encode( transcode_encoder_t *p_enc, picture_t 
 block_t * transcode_encoder_audio_encode( transcode_encoder_t *p_enc, block_t *p_block );
 block_t * transcode_encoder_spu_encode( transcode_encoder_t *p_enc, subpicture_t *p_spu );
 
+int transcode_encoder_audio_drain( transcode_encoder_t *p_enc, block_t **out );
+int transcode_encoder_video_drain( transcode_encoder_t *p_enc, block_t **out );
+
 int transcode_encoder_video_test( vlc_object_t *p_obj,
                                   const transcode_encoder_config_t *p_cfg,
                                   const es_format_t *p_dec_fmtin,

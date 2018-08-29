@@ -373,6 +373,31 @@ static void* EncoderThread( void *obj )
     return NULL;
 }
 
+int transcode_encoder_video_drain( transcode_encoder_t *p_enc, block_t **out )
+{
+    if( !p_enc->b_threaded )
+    {
+        block_t *p_block;
+        do {
+            p_block = transcode_encoder_encode( p_enc, NULL );
+            block_ChainAppend( out, p_block );
+        } while( p_block );
+    }
+    else
+    {
+        if( p_enc->b_threaded && !p_enc->b_abort )
+        {
+            vlc_mutex_lock( &p_enc->lock_out );
+            p_enc->b_abort = true;
+            vlc_cond_signal( &p_enc->cond );
+            vlc_mutex_unlock( &p_enc->lock_out );
+            vlc_join( p_enc->thread, NULL );
+        }
+        block_ChainAppend( out, transcode_encoder_get_output_async( p_enc ) );
+    }
+    return VLC_SUCCESS;
+}
+
 void transcode_encoder_video_close( transcode_encoder_t *p_enc )
 {
     if( p_enc->b_threaded && !p_enc->b_abort )
