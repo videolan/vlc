@@ -561,7 +561,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             else
             {
                 tk->psz_name = _("Unknown Video");
-                tk->i_fourcc = p_fmt->i_original_fourcc ?: p_fmt->i_codec;
+                tk->i_fourcc = p_fmt->i_original_fourcc ? p_fmt->i_original_fourcc : p_fmt->i_codec;
             }
             if( !i_codec_extra && p_fmt->i_extra > 0 )
             {
