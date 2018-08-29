@@ -278,7 +278,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 }
             }
 
-            if( transcode_audio_filters_init( p_stream,
+            if( !id->p_af_chain &&
+                transcode_audio_filters_init( p_stream,
                                               id->p_filterscfg,
                                               &id->decoder_out.audio,
                                               &transcode_encoder_format_in( id->encoder )->audio,
@@ -298,7 +299,8 @@ int transcode_audio_process( sout_stream_t *p_stream,
                 goto error;
             }
 
-            id->downstream_id =
+            if( !id->downstream_id )
+                id->downstream_id =
                     id->pf_transcode_downstream_add( p_stream,
                                                      &id->p_decoder->fmt_in,
                                                      transcode_encoder_format_out( id->encoder ) );
