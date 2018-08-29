@@ -120,6 +120,5 @@ void input_DecoderGetObjects( decoder_t *, vout_thread_t **, audio_output_t ** )
 void input_DecoderSetVoutMouseEvent( decoder_t *, vlc_mouse_event, void * );
 int  input_DecoderAddVoutOverlay( decoder_t *, subpicture_t *, int * );
 int  input_DecoderFlushVoutOverlay( decoder_t *, int );
-int  input_DecoderSetSpuHighlight( decoder_t *, const vlc_spu_highlight_t * );
 
 #endif
