@@ -217,6 +217,16 @@ bool sout_InputIsEmpty( sout_packetizer_input_t *p_input )
 
 static int sout_InputControlVa( sout_packetizer_input_t *p_input, int i_query, va_list args )
 {
+    sout_instance_t *p_sout = p_input->p_sout;
+    if( i_query == SOUT_INPUT_SET_SPU_HIGHLIGHT )
+    {
+        vlc_mutex_lock( &p_sout->lock );
+        int i_ret = sout_StreamControl( p_sout->p_stream,
+                                        SOUT_STREAM_ID_SPU_HIGHLIGHT,
+                                        p_input->id, va_arg(args, void *) );
+        vlc_mutex_unlock( &p_sout->lock );
+        return i_ret;
+    }
     return VLC_EGENERIC;
 }
 
