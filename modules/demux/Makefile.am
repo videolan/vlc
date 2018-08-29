@@ -169,6 +169,7 @@ demux_LTLIBRARIES += libes_plugin.la
 
 libh26x_plugin_la_SOURCES = demux/mpeg/h26x.c \
                             packetizer/h264_nal.c packetizer/hevc_nal.h
+libh26x_plugin_la_LIBADD = $(LIBM)
 demux_LTLIBRARIES += libh26x_plugin.la
 
 libmkv_plugin_la_SOURCES = \
