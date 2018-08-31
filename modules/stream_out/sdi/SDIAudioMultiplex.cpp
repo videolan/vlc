@@ -22,7 +22,10 @@
 #endif
 
 #include "SDIAudioMultiplex.hpp"
+#include <vlc_es.h>
 #include <limits>
+#include <cstring>
+#include <algorithm>
 
 using namespace sdi_sout;
 
@@ -52,10 +55,39 @@ void * SDIAudioMultiplexBuffer::Dequeue()
     return NULL;
 }
 
+static void ConfigureChannels(unsigned i, es_format_t *fmt)
+{
+    if( i>=8 )
+    {
+        i = 8;
+        fmt->audio.i_physical_channels = AOUT_CHANS_7_1;
+    }
+    else if( i>2 )
+    {
+        i = 6;
+        fmt->audio.i_physical_channels = AOUT_CHANS_5_1;
+    }
+    else
+    {
+        fmt->audio.i_physical_channels = AOUT_CHANS_STEREO;
+    }
+    fmt->audio.i_channels = i;
+    fmt->audio.i_blockalign = i * 16 / 8;
+}
+
 SDIAudioMultiplexConfig::Mapping::Mapping(const StreamID &id)
     : id(id)
 {
+    es_format_Init(&fmt, AUDIO_ES, VLC_CODEC_S16N);
+    fmt.audio.i_format = VLC_CODEC_S16N;
+    fmt.audio.i_rate = 48000;
+    fmt.audio.i_bitspersample = 16;
+    ConfigureChannels(2, &fmt);
+}
 
+SDIAudioMultiplexConfig::Mapping::~Mapping()
+{
+    es_format_Clean(&fmt);
 }
 
 SDIAudioMultiplexConfig::SDIAudioMultiplexConfig(uint8_t channels)
@@ -67,6 +99,7 @@ SDIAudioMultiplexConfig::SDIAudioMultiplexConfig(uint8_t channels)
         framewidth = 4;
     else
         framewidth = 1;
+    b_accept_any = true;
 }
 
 SDIAudioMultiplexConfig::~SDIAudioMultiplexConfig()
@@ -85,6 +118,98 @@ void SDIAudioMultiplexConfig::setSubFrameSlotUsed(uint8_t i)
     subframeslotbitmap |= (1 << i);
 }
 
+void SDIAudioMultiplexConfig::parseConfiguration(vlc_object_t *obj, const char *psz)
+{
+    char *name = NULL;
+    char *psz_in = (char*)psz;
+    config_chain_t *p_config_chain = NULL;
+    while(psz_in)
+    {
+        char *psz_next = config_ChainCreate(&name, &p_config_chain, psz_in);
+        if(name)
+        {
+            if(!std::strcmp(name, "only"))
+            {
+                b_accept_any = false;
+                msg_Dbg(obj, "only accepting declared streams");
+            }
+            else /* try mapping decl */
+            {
+                int i_id = -1;
+                int i_seqid = -1;
+                int *pi_id = &i_seqid;
+                const char *psz_id = name;
+                if(psz_id[0]=='#')
+                {
+                    psz_id++;
+                    pi_id = &i_id;
+                }
+                if(*psz_id)
+                {
+                    char *end = NULL;
+                    int i_val = std::strtol(psz_id, &end, 10);
+                    if(end != NULL && *end == '\0')
+                        *pi_id = i_val;
+                }
+                if(i_id != -1 || i_seqid != -1)
+                {
+                    msg_Dbg(obj,"found declaration for ES %s %d",
+                                (i_id > -1) ? "pid #" : "seq", *pi_id);
+                    int i_reserved_chans = 0;
+                    std::vector<uint8_t> subframeslots;
+                    for(config_chain_t *p = p_config_chain; p; p = p->p_next)
+                    {
+                        if(!std::strcmp("chans", p->psz_name) && subframeslots.empty())
+                        {
+                            char *end = NULL;
+                            int i_val = std::strtol(p->psz_value, &end, 10);
+                            if(end != NULL && *end == '\0')
+                            {
+                                i_reserved_chans = i_val;
+                                msg_Dbg(obj," * provisioned %d channels", i_val);
+                            }
+                            else msg_Warn(obj, " * ignoring channels count declaration %d", i_val);
+                        }
+                        else if(i_reserved_chans == 0)
+                        {
+                            char *end = NULL;
+                            int i_slot = std::strtol(p->psz_name, &end, 10);
+                            if(end != NULL && *end == '\0')
+                            {
+                                if(i_slot < MAX_AES3_AUDIO_SUBFRAMES && i_slot < (2 * framewidth) &&
+                                   std::find(subframeslots.begin(), subframeslots.end(), i_slot) == subframeslots.end())
+                                {
+                                    subframeslots.push_back(i_slot);
+                                    msg_Dbg(obj," * mapped channel %zd to subframe %d",
+                                                    subframeslots.size(), i_slot);
+                                }
+                                else msg_Warn(obj, " * ignoring invalid subframe declaration %d", i_slot);
+                            }
+                            else msg_Warn(obj, " * ignoring unknown/invalid token %s", p->psz_name);
+                        }
+                    }
+
+                    bool b_success = false;
+                    if(subframeslots.empty() && i_reserved_chans)
+                        b_success = addMapping(StreamID(i_id, i_seqid), i_reserved_chans);
+                    else if(!subframeslots.empty())
+                        b_success = addMapping(StreamID(i_id, i_seqid), subframeslots);
+
+                    if(b_success)
+                        msg_Dbg(obj, " * successfully configured");
+                    else
+                        msg_Warn(obj, " * configuration rejected (duplicate or not enough subframes ?)");
+                }
+            }
+            free(name);
+        }
+        config_ChainDestroy(p_config_chain);
+        if(psz != psz_in)
+            free(psz_in);
+        psz_in = psz_next;
+    }
+}
+
 std::vector<uint8_t> SDIAudioMultiplexConfig::getFreeSubFrameSlots() const
 {
     std::vector<uint8_t> slots;
@@ -95,6 +220,32 @@ std::vector<uint8_t> SDIAudioMultiplexConfig::getFreeSubFrameSlots() const
     }
 
     return slots;
+}
+
+std::vector<uint8_t> SDIAudioMultiplexConfig::getConfiguredSlots(const StreamID &id) const
+{
+    for(size_t i=0; i<mappings.size(); i++)
+    {
+        if(mappings[i]->id == id)
+            return mappings[i]->subframesslots;
+    }
+    return std::vector<uint8_t>();
+}
+
+bool SDIAudioMultiplexConfig::addMapping(const StreamID &id, const es_format_t *fmt)
+{
+    if(!fmt->audio.i_channels || !b_accept_any)
+        return false;
+    return addMapping(id, fmt->audio.i_channels);
+}
+
+bool SDIAudioMultiplexConfig::addMapping(const StreamID &id, unsigned channels)
+{
+    std::vector<uint8_t> slots = getFreeSubFrameSlots();
+    if(slots.size() < channels)
+        return false;
+    slots.resize(channels);
+    return addMapping(id, slots);
 }
 
 bool SDIAudioMultiplexConfig::addMapping(const StreamID &id, std::vector<uint8_t> subframeslots)
@@ -110,6 +261,9 @@ bool SDIAudioMultiplexConfig::addMapping(const StreamID &id, std::vector<uint8_t
     assoc->subframesslots = subframeslots;
 
     mappings.push_back(assoc);
+
+    for(size_t i=0; i<subframeslots.size(); i++)
+        setSubFrameSlotUsed(subframeslots[i]);
 
     return true;
 }
@@ -127,6 +281,31 @@ SDIAudioMultiplexBuffer *
         if(mappings[i]->id == id)
             return &mappings[i]->buffer;
     }
+    return NULL;
+}
+
+const es_format_t * SDIAudioMultiplexConfig::getConfigurationForStream(const StreamID &id) const
+{
+    auto it = std::find_if(mappings.begin(), mappings.end(),
+                           [&id](Mapping *e) { return e->id == id; });
+    return (it != mappings.end()) ? &(*it)->fmt : NULL;
+}
+
+const es_format_t *
+    SDIAudioMultiplexConfig::updateFromRealESConfig(const StreamID &id,
+                                                    const es_format_t *fmt)
+{
+    auto it = std::find_if(mappings.begin(), mappings.end(),
+                           [&id](Mapping *e) { return e->id == id; });
+    if(it != mappings.end())
+    {
+        Mapping *mapping = (*it);
+        if(mapping->subframesslots.size() > 2 && fmt->audio.i_channels > 2)
+            ConfigureChannels(fmt->audio.i_channels, &mapping->fmt);
+        mapping->buffer.setSubFramesCount(mapping->fmt.audio.i_channels);
+        return &mapping->fmt;
+    }
+    assert(0);
     return NULL;
 }
 

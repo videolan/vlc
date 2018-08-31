@@ -75,6 +75,15 @@
 #define VIDEO_TENBITS_LONGTEXT N_(\
     "Use 10 bits per pixel for video frames.")
 
+#define AUDIO_TEXT "Audio channels configuration (Default, single, auto)"
+#define AUDIO_LONGTEXT "Configuration string SEL{CHANS} tokens, ':' separated. " \
+                       "SEL selectors being #145 for ES id 145, or 1 for second created ES. " \
+                       "CHANS being {n,n+1,..} channels to subframe mapping. " \
+                       "{chans=6} shortcut to request 6 channels in same order. " \
+                       "Use 'only' to accept only declared ES. " \
+                       "ex: only:#145{0,1}:#142{2,3}:2{chans=6} "
+
+
 /* Video Connections */
 static const char *const ppsz_videoconns[] = {
     "sdi",
@@ -201,5 +210,6 @@ vlc_module_begin ()
     set_section(N_("DeckLink Audio Options"), NULL)
     add_integer_with_range(CFG_PREFIX "channels", 2, 0, 16,
                 CHANNELS_TEXT, CHANNELS_LONGTEXT, true)
+    add_string(CFG_PREFIX "audio", "", AUDIO_TEXT, AUDIO_LONGTEXT, true)
 
 vlc_module_end ()

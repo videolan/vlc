@@ -42,11 +42,11 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     p_stream->pace_nocontrol = true;
 
     es_format_Init(&video.configuredfmt, VIDEO_ES, 0);
-    es_format_Init(&audio.configuredfmt, AUDIO_ES, 0);
     video.tenbits = var_InheritBool(p_stream, CFG_PREFIX "tenbits");
     video.nosignal_delay = var_InheritInteger(p_stream, CFG_PREFIX "nosignal-delay");
     video.pic_nosignal = NULL;
     audio.i_channels = var_InheritInteger(p_stream, CFG_PREFIX "channels");;
+    audio.b_configured = false;
     ancillary.afd = var_InheritInteger(p_stream, CFG_PREFIX "afd");
     ancillary.ar = var_InheritInteger(p_stream, CFG_PREFIX "ar");
     ancillary.afd_line = var_InheritInteger(p_stream, CFG_PREFIX "afd-line");
@@ -54,6 +54,12 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     videoStream = NULL;
     captionsStream = NULL;
     audioMultiplex = new SDIAudioMultiplex( var_InheritInteger(p_stream, CFG_PREFIX "channels") );
+    char *psz_channelsconf = var_InheritString(p_stream, CFG_PREFIX "audio");
+    if(psz_channelsconf)
+    {
+        audioMultiplex->config.parseConfiguration(VLC_OBJECT(p_stream), psz_channelsconf);
+        free(psz_channelsconf);
+    }
 }
 
 SDIOutput::~SDIOutput()
@@ -69,7 +75,6 @@ SDIOutput::~SDIOutput()
     if(video.pic_nosignal)
         picture_Release(video.pic_nosignal);
     es_format_Clean(&video.configuredfmt);
-    es_format_Clean(&audio.configuredfmt);
 }
 
 AbstractStream *SDIOutput::Add(const es_format_t *fmt)
@@ -88,27 +93,29 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
     }
     else if(fmt->i_cat == AUDIO_ES && audio.i_channels)
     {
-        if(audio.configuredfmt.i_codec || ConfigureAudio(&fmt->audio) == VLC_SUCCESS)
+        if(audio.b_configured || ConfigureAudio(&fmt->audio) == VLC_SUCCESS)
         {
-            std::vector<uint8_t> slots = audioMultiplex->config.getFreeSubFrameSlots();
-            if(slots.size() < 2)
-                return NULL;
-            slots.resize(2);
-            if(!audioMultiplex->config.addMapping(id, slots))
-                return NULL;
+            const es_format_t *cfgfmt = audioMultiplex->config.getConfigurationForStream(id);
+            if(!cfgfmt)
+            {
+                if(!audioMultiplex->config.addMapping(id, fmt))
+                    return NULL;
+            }
+            cfgfmt = audioMultiplex->config.updateFromRealESConfig(id, fmt);
             SDIAudioMultiplexBuffer *buffer = audioMultiplex->config.getBufferForStream(id);
             if(!buffer)
                 return NULL;
-
             AudioDecodedStream *audioStream;
             s = audioStream = dynamic_cast<AudioDecodedStream *>(createStream(id, fmt, buffer));
             if(audioStream)
             {
-                audioStream->setOutputFormat(&audio.configuredfmt);
+                audioStream->setOutputFormat(cfgfmt);
                 audioStreams.push_back(audioStream);
+                std::vector<uint8_t> slots = audioMultiplex->config.getConfiguredSlots(id);
                 for(size_t i=0; i<slots.size(); i++)
                 {
-                    audioMultiplex->config.setSubFrameSlotUsed(slots[i]);
+                    msg_Dbg(p_stream, "%s slot %d to read from channel %zd",
+                                      id.toString().c_str(), slots[i], i);
                     audioMultiplex->SetSubFrameSource(slots[i], buffer, AES3AudioSubFrameIndex(i));
                 }
             }

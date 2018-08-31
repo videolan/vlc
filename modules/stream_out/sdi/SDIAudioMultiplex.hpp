@@ -46,26 +46,36 @@ namespace sdi_sout
             SDIAudioMultiplexConfig(uint8_t channels = 2);
             ~SDIAudioMultiplexConfig();
             SDIAudioMultiplexBuffer *getBufferForStream(const StreamID &);
+            const es_format_t * getConfigurationForStream(const StreamID &) const;
+            const es_format_t * updateFromRealESConfig(const StreamID &,
+                                                       const es_format_t *);
             bool SubFrameSlotUsed(uint8_t) const;
             void setSubFrameSlotUsed(uint8_t);
+            void parseConfiguration(vlc_object_t *, const char *);
             uint8_t getMultiplexedFramesCount() const { return framewidth; }
             std::vector<uint8_t> getFreeSubFrameSlots() const;
+            std::vector<uint8_t> getConfiguredSlots(const StreamID &) const;
 
+            bool addMapping(const StreamID &, const es_format_t *);
             bool addMapping(const StreamID &, std::vector<uint8_t>);
             unsigned getMaxSamplesForBlockSize(size_t) const;
 
         private:
+            bool addMapping(const StreamID &, unsigned);
             class Mapping
             {
                 public:
                     Mapping(const StreamID &);
+                    ~Mapping();
                     StreamID id;
+                    es_format_t fmt;
                     SDIAudioMultiplexBuffer buffer;
                     std::vector<uint8_t> subframesslots;
             };
             std::vector<Mapping *> mappings;
             unsigned subframeslotbitmap;
             uint8_t framewidth;
+            bool b_accept_any;
     };
 
     class SDIAudioMultiplex

@@ -53,7 +53,6 @@ namespace sdi_sout
             vlc_tick_t lasttimestamp;
             /* XXX: workaround card clock drift */
             vlc_tick_t offset;
-
             bool b_running;
             int Start();
             const char *ErrorToString(long i_code);

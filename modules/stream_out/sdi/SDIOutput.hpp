@@ -64,8 +64,8 @@ namespace sdi_sout
 
             struct
             {
-                es_format_t configuredfmt;
                 uint8_t i_channels;
+                bool b_configured;
             } audio;
 
             struct

@@ -54,7 +54,6 @@ DBMSDIOutput::~DBMSDIOutput()
     if(video.pic_nosignal)
         picture_Release(video.pic_nosignal);
     es_format_Clean(&video.configuredfmt);
-    es_format_Clean(&audio.configuredfmt);
     if(p_output)
     {
         BMDTimeValue out;
@@ -274,15 +273,6 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
 {
     HRESULT result;
 
-    audio.configuredfmt.i_codec =
-    audio.configuredfmt.audio.i_format = VLC_CODEC_S16N;
-    audio.configuredfmt.audio.i_channels = 2;
-    audio.configuredfmt.audio.i_physical_channels = AOUT_CHANS_STEREO;
-    audio.configuredfmt.audio.i_rate = 48000;
-    audio.configuredfmt.audio.i_bitspersample = 16;
-    audio.configuredfmt.audio.i_blockalign = 2 * 16 / 8;
-    //audio.configuredfmt.audio.i_frame_length = BLOCK_SIZE_BYTES;
-
     if(FAKE_DRIVER)
         return VLC_SUCCESS;
 
@@ -302,6 +292,7 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
                     maxchannels,
                     bmdAudioOutputStreamTimestamped);
         CHECK("Could not start audio output");
+        audio.b_configured = true;
     }
     return VLC_SUCCESS;
 
