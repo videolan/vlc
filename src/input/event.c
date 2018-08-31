@@ -39,7 +39,7 @@ static void input_SendEvent( input_thread_t *p_input,
 {
     input_thread_private_t *priv = input_priv(p_input);
     if( priv->events_cb )
-        priv->events_cb( p_input, priv->events_data, event );
+        priv->events_cb( p_input, event, priv->events_data );
 }
 
 void input_SendEventDead( input_thread_t *p_input )

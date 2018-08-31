@@ -85,8 +85,8 @@ private:
     void addSubtree( ParseContext& ctx, input_item_node_t *root );
     void populateItem( medialibrary::parser::IItem& item, input_item_t* inputItem );
 
-    static void onInputEvent( input_thread_t *input, void *user_data,
-                               const struct vlc_input_event *event );
+    static void onInputEvent( input_thread_t *input,
+                              const struct vlc_input_event *event, void *user_data );
 
 private:
     vlc_object_t* m_obj;

@@ -90,8 +90,8 @@ static void ReqRelease(input_preparser_req_t *req)
     }
 }
 
-static void InputEvent( input_thread_t *input, void *task_,
-                        const struct vlc_input_event *event )
+static void InputEvent( input_thread_t *input,
+                        const struct vlc_input_event *event, void *task_ )
 {
     VLC_UNUSED( input );
     input_preparser_task_t* task = task_;

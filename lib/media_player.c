@@ -963,8 +963,8 @@ static void del_es_callbacks( input_thread_t *p_input_thread, libvlc_media_playe
     var_DelListCallback( p_input_thread, "spu-es", input_es_changed, p_mi );
 }
 
-static void on_input_event(input_thread_t *input, void *userdata,
-                           const struct vlc_input_event *event)
+static void on_input_event(input_thread_t *input,
+                           const struct vlc_input_event *event, void *userdata)
 {
     if (event->type == INPUT_EVENT_SUBITEMS)
     {
@@ -973,7 +973,7 @@ static void on_input_event(input_thread_t *input, void *userdata,
         libvlc_media_add_subtree(media, event->subitems);
     }
 
-    input_LegacyEvents(input, userdata, event);
+    input_LegacyEvents(input, event, userdata);
 }
 
 /**************************************************************************

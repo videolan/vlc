@@ -97,8 +97,8 @@ vlc_module_end ()
 
 static void* Run( void* );
 
-static void on_input_thread_event(input_thread_t *input, void *userdata,
-                                  const struct vlc_input_event *event);
+static void on_input_thread_event(input_thread_t *input,
+                                  const struct vlc_input_event *event, void *userdata);
 
 static int onNewFileAdded( vlc_object_t*, char const *,
                            vlc_value_t, vlc_value_t, void *);
@@ -256,8 +256,9 @@ static void input_item_subtree_added(input_item_t *input_item,
     }
 }
 
-static void on_input_thread_event(input_thread_t *input, void *userdata,
-                                  const struct vlc_input_event *event)
+static void on_input_thread_event(input_thread_t *input,
+                                  const struct vlc_input_event *event,
+                                  void *userdata)
 {
     if (event->type == INPUT_EVENT_SUBITEMS)
         input_item_subtree_added(input_GetItem(input), event->subitems, userdata);

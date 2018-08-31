@@ -245,8 +245,8 @@ static inline bool EsFmtIsTeletext( const es_format_t *p_fmt )
     return p_fmt->i_cat == SPU_ES && p_fmt->i_codec == VLC_CODEC_TELETEXT;
 }
 
-void input_LegacyEvents( input_thread_t *p_input, void *user_data,
-                         const struct vlc_input_event *event )
+void input_LegacyEvents( input_thread_t *p_input,
+                         const struct vlc_input_event *event, void *user_data )
 {
     (void) user_data;
     vlc_value_t val;

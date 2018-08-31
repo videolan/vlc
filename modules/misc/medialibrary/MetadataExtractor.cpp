@@ -128,8 +128,9 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
     }
 }
 
-void MetadataExtractor::onInputEvent( input_thread_t*, void *data,
-                                     const struct vlc_input_event *event )
+void MetadataExtractor::onInputEvent( input_thread_t*,
+                                      const struct vlc_input_event *event,
+                                      void *data )
 {
     auto* ctx = static_cast<ParseContext*>( data );
     ctx->mde->onInputEvent( event, *ctx );

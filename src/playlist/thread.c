@@ -185,8 +185,8 @@ void ResetCurrentlyPlaying( playlist_t *p_playlist,
     p_sys->b_reset_currently_playing = false;
 }
 
-static void on_input_event(input_thread_t *input, void *userdata,
-                           const struct vlc_input_event *event)
+static void on_input_event(input_thread_t *input,
+                           const struct vlc_input_event *event, void *userdata)
 {
     if (event->type == INPUT_EVENT_SUBITEMS)
     {
@@ -195,7 +195,7 @@ static void on_input_event(input_thread_t *input, void *userdata,
         playlist_AddSubtree(playlist, item, event->subitems);
     }
 
-    input_LegacyEvents(input, userdata, event);
+    input_LegacyEvents(input, event, userdata);
 }
 
 /**

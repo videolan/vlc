@@ -478,8 +478,9 @@ struct vlc_input_event
     };
 };
 
-typedef void (*input_thread_events_cb)( input_thread_t *input, void *user_data,
-                                        const struct vlc_input_event *event );
+typedef void (*input_thread_events_cb)( input_thread_t *input,
+                                        const struct vlc_input_event *event,
+                                        void *userdata);
 
 /**
  * Input queries
@@ -595,7 +596,7 @@ VLC_API void input_SetTime( input_thread_t *, vlc_tick_t i_time, bool b_fast );
 
 VLC_API void input_SetPosition( input_thread_t *, float f_position, bool b_fast );
 
-VLC_API void input_LegacyEvents(input_thread_t *, void *, const struct vlc_input_event * );
+VLC_API void input_LegacyEvents(input_thread_t *, const struct vlc_input_event *, void * );
 VLC_API void input_LegacyVarInit ( input_thread_t * );
 
 /**

@@ -128,8 +128,8 @@ static void ApplyResult( fingerprint_request_t *p_r, size_t i_resultid )
     vlc_mutex_unlock( &p_item->lock );
 }
 
-static void InputEvent( input_thread_t *p_input, void *p_user_data,
-                        const struct vlc_input_event *p_event )
+static void InputEvent( input_thread_t *p_input,
+                        const struct vlc_input_event *p_event, void *p_user_data )
 {
     VLC_UNUSED( p_input );
     fingerprinter_sys_t *p_sys = p_user_data;
