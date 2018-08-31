@@ -189,7 +189,6 @@ int input_Start( input_thread_t *p_input )
                                    VLC_THREAD_PRIORITY_INPUT );
     if( !priv->is_running )
     {
-        input_ChangeState( p_input, ERROR_S );
         msg_Err( p_input, "cannot create input thread" );
         return VLC_EGENERIC;
     }
