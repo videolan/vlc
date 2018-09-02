@@ -701,26 +701,6 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
         cfg->align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
 
-void vout_SetDisplayWindowSize(vout_thread_t *vout,
-                               unsigned width, unsigned height)
-{
-    vout_window_t *window;
-
-    /* BEWARE of lock inversion and infinite recursion!
-     * This acquires the window lock but gets called from the display code.
-     * This function should raelly not exist. Instead, the window size should
-     * be adjusted on A.R., crop, fill and zoom changes *before*, and
-     * separately from, the corresponding display update controls.
-     */
-    vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->window;
-    if (window != NULL)
-    /* Request a resize of the window. If it fails, there is nothing to do.
-     * If it succeeds, the window will emit a resize event later. */
-        vout_window_SetSize(window, width, height);
-    vlc_mutex_unlock(&vout->p->window_lock);
-}
-
 /* */
 static int FilterRestartCallback(vlc_object_t *p_this, char const *psz_var,
                                  vlc_value_t oldval, vlc_value_t newval,
