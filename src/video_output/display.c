@@ -334,8 +334,6 @@ typedef struct {
 
     /* */
 #if defined(_WIN32) || defined(__OS2__)
-    unsigned width_saved;
-    unsigned height_saved;
     bool ch_fullscreen;
     bool is_fullscreen;
     bool ch_wm_state;
@@ -803,10 +801,6 @@ void vout_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-#if defined(_WIN32) || defined(__OS2__)
-    osys->width_saved  = osys->cfg.display.width;
-    osys->height_saved = osys->cfg.display.height;
-#endif
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
     vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg);
@@ -939,18 +933,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = cfg->is_fullscreen;
-    osys->width_saved    = cfg->display.width;
-    osys->height_saved   = cfg->display.height;
-    if (osys->is_fullscreen) {
-        vout_display_cfg_t cfg_windowed = *cfg;
-        cfg_windowed.is_fullscreen  = false;
-        cfg_windowed.display.width  = 0;
-        cfg_windowed.display.height = 0;
-        vout_display_GetDefaultDisplaySize(&osys->width_saved,
-                                           &osys->height_saved,
-                                           source, &cfg_windowed);
-    }
-
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
 #endif
