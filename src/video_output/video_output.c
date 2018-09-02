@@ -569,6 +569,13 @@ void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 
 void vout_ControlChangeZoom(vout_thread_t *vout, int num, int den)
 {
+    if (num * 10 < den) {
+        num = den;
+        den *= 10;
+    } else if (num > den * 10) {
+        num = den * 10;
+    }
+
     vout_ControlUpdateWindowSize(vout);
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
                           num, den);
@@ -1426,13 +1433,6 @@ static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 
 static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
 {
-    if (num * 10 < den) {
-        num = den;
-        den *= 10;
-    } else if (num > den * 10) {
-        num = den * 10;
-    }
-
     vout_SetDisplayZoom(vout->p->display.vd, num, den);
 }
 
