@@ -1420,58 +1420,6 @@ static void ThreadTranslateMouseState(vout_thread_t *vout,
     vout_SendDisplayEventMouse(vout, &vid_mouse);
 }
 
-static void ThreadChangeDisplaySize(vout_thread_t *vout,
-                                    unsigned width, unsigned height)
-{
-    vout_SetDisplaySize(vout->p->display.vd, width, height);
-}
-
-static void ThreadChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
-{
-    vout_SetDisplayFilled(vout->p->display.vd, is_filled);
-}
-
-static void ThreadChangeZoom(vout_thread_t *vout, int num, int den)
-{
-    vout_SetDisplayZoom(vout->p->display.vd, num, den);
-}
-
-static void ThreadChangeAspectRatio(vout_thread_t *vout,
-                                    unsigned num, unsigned den)
-{
-    vout_SetDisplayAspect(vout->p->display.vd, num, den);
-}
-
-
-static void ThreadExecuteCropWindow(vout_thread_t *vout,
-                                    unsigned x, unsigned y,
-                                    unsigned width, unsigned height)
-{
-    vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
-                        x, y, width, height);
-}
-static void ThreadExecuteCropBorder(vout_thread_t *vout,
-                                    unsigned left, unsigned top,
-                                    unsigned right, unsigned bottom)
-{
-    msg_Dbg(vout, "ThreadExecuteCropBorder %u.%u %ux%u", left, top, right, bottom);
-    vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
-                        left, top, -(int)right, -(int)bottom);
-}
-
-static void ThreadExecuteCropRatio(vout_thread_t *vout,
-                                   unsigned num, unsigned den)
-{
-    vout_SetDisplayCrop(vout->p->display.vd, num, den,
-                        0, 0, 0, 0);
-}
-
-static void ThreadExecuteViewpoint(vout_thread_t *vout,
-                                   const vlc_viewpoint_t *p_viewpoint)
-{
-    vout_SetDisplayViewpoint(vout->p->display.vd, p_viewpoint);
-}
-
 static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
 {
     vlc_mouse_Init(&vout->p->mouse);
@@ -1705,30 +1653,34 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadTranslateMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_SIZE:
-        ThreadChangeDisplaySize(vout, cmd.window.width, cmd.window.height);
+        vout_SetDisplaySize(vout->p->display.vd,
+                            cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
-        ThreadChangeDisplayFilled(vout, cmd.boolean);
+        vout_SetDisplayFilled(vout->p->display.vd, cmd.boolean);
         break;
     case VOUT_CONTROL_ZOOM:
-        ThreadChangeZoom(vout, cmd.pair.a, cmd.pair.b);
+        vout_SetDisplayZoom(vout->p->display.vd, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_ASPECT_RATIO:
-        ThreadChangeAspectRatio(vout, cmd.pair.a, cmd.pair.b);
+        vout_SetDisplayAspect(vout->p->display.vd, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_CROP_RATIO:
-        ThreadExecuteCropRatio(vout, cmd.pair.a, cmd.pair.b);
+        vout_SetDisplayCrop(vout->p->display.vd, cmd.pair.a, cmd.pair.b,
+                            0, 0, 0, 0);
         break;
     case VOUT_CONTROL_CROP_WINDOW:
-        ThreadExecuteCropWindow(vout, cmd.window.x, cmd.window.y,
-                                cmd.window.width, cmd.window.height);
+        vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+                            cmd.window.x, cmd.window.y,
+                            cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_CROP_BORDER:
-        ThreadExecuteCropBorder(vout, cmd.border.left, cmd.border.top,
-                                cmd.border.right, cmd.border.bottom);
+        vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+                            cmd.border.left, cmd.border.top,
+                            -(int)cmd.border.right, -(int)cmd.border.bottom);
         break;
     case VOUT_CONTROL_VIEWPOINT:
-        ThreadExecuteViewpoint(vout, &cmd.viewpoint);
+        vout_SetDisplayViewpoint(vout->p->display.vd, &cmd.viewpoint);
         break;
     default:
         break;
