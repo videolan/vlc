@@ -2616,7 +2616,9 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_EGENERIC;
 
         es_format_Clean( &es->fmt );
-        es_format_Copy( &es->fmt, p_fmt );
+        int ret = es_format_Copy( &es->fmt, p_fmt );
+        if( ret != VLC_SUCCESS )
+            return ret;
 
         if( es->p_dec )
         {
