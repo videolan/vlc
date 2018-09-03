@@ -1525,10 +1525,21 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     if( !es )
         return NULL;
 
+    if( es_format_Copy( &es->fmt, fmt ) != VLC_SUCCESS )
+    {
+        free( es );
+        return NULL;
+    }
+    if( es->fmt.i_id < 0 )
+        es->fmt.i_id = p_sys->i_id;
+    if( !es->fmt.i_original_fourcc )
+        es->fmt.i_original_fourcc = es->fmt.i_codec;
+
     /* Search the program */
     p_pgrm = EsOutProgramFind( out, fmt->i_group );
     if( !p_pgrm )
     {
+        es_format_Clean( &es->fmt );
         free( es );
         return NULL;
     }
@@ -1538,11 +1549,6 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
 
     /* Set up ES */
     es->p_pgrm = p_pgrm;
-    es_format_Copy( &es->fmt, fmt );
-    if( es->fmt.i_id < 0 )
-        es->fmt.i_id = p_sys->i_id;
-    if( !es->fmt.i_original_fourcc )
-        es->fmt.i_original_fourcc = es->fmt.i_codec;
 
     es->i_meta_id = p_sys->i_id++; /* always incremented */
     es->b_scrambled = false;
