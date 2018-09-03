@@ -1844,9 +1844,6 @@ static bool Control( input_thread_t *p_input,
     bool b_force_update = false;
     vlc_value_t val;
 
-    if( !p_input )
-        return b_force_update;
-
     switch( i_type )
     {
         case INPUT_CONTROL_SET_POSITION:
