@@ -1147,7 +1147,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     [o_open_panel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSModalResponseOK) {
             NSString *o_path = [[[o_open_panel URLs] firstObject] path];
-            [o_textfield setStringValue: o_path];
+            [self->o_textfield setStringValue: o_path];
         }
     }];
 }

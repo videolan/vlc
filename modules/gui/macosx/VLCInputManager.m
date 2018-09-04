@@ -278,7 +278,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
      * The serial queue ensures that changed inputs are propagated in the same order as they arrive.
      */
     dispatch_async(informInputChangedQueue, ^{
-        [[o_main extensionsManager] inputChanged:p_input_changed];
+        [[self->o_main extensionsManager] inputChanged:p_input_changed];
         if (p_input_changed)
             vlc_object_release(p_input_changed);
     });

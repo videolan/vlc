@@ -787,7 +787,7 @@
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
         if (returnCode != NSModalResponseOK) {
-            [_profilePopup selectItemAtIndex:currentProfileIndex];
+            [self->_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
 
@@ -796,7 +796,7 @@
 
         // duplicate names are not allowed in the popup control
         if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
-            [_profilePopup selectItemAtIndex:currentProfileIndex];
+            [self->_profilePopup selectItemAtIndex:currentProfileIndex];
 
             NSAlert *alert = [[NSAlert alloc] init];
             [alert setAlertStyle:NSCriticalAlertStyle];
@@ -848,7 +848,7 @@
         NSInteger activeProfileIndex = [_self currentProfileIndex];
 
         if (returnCode != NSModalResponseOK) {
-            [_profilePopup selectItemAtIndex:activeProfileIndex];
+            [self->_profilePopup selectItemAtIndex:activeProfileIndex];
             return;
         }
 

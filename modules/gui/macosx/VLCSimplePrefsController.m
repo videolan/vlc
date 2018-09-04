@@ -823,7 +823,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
             [self resetControls];
 
             /* force config file creation, since libvlc won't exit normally */
-            config_SaveConfigFile(p_intf);
+            config_SaveConfigFile(self->p_intf);
 
             /* reset OS X defaults */
             [[VLCMain sharedInstance] resetAndReinitializeUserDefaults];
@@ -1149,7 +1149,7 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel setPrompt: _NS("Choose")];
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
             if (returnCode == NSModalResponseOK) {
-                [_video_snap_folderTextField setStringValue: [[_selectFolderPanel URL] path]];
+                [self->_video_snap_folderTextField setStringValue: [[self->_selectFolderPanel URL] path]];
             }
         }];
     }
@@ -1253,8 +1253,8 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         [_selectFolderPanel beginSheetModalForWindow:self.window completionHandler: ^(NSInteger returnCode) {
             if (returnCode == NSModalResponseOK)
             {
-                [_input_recordTextField setStringValue: [[_selectFolderPanel URL] path]];
-                _inputSettingChanged = YES;
+                [self->_input_recordTextField setStringValue: [[self->_selectFolderPanel URL] path]];
+                self->_inputSettingChanged = YES;
             }
         }];
 

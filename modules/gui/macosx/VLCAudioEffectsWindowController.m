@@ -516,7 +516,7 @@
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
         if (returnCode != NSModalResponseOK) {
-            [_profilePopup selectItemAtIndex:currentProfileIndex];
+            [self->_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
 
@@ -525,7 +525,7 @@
 
         // duplicate names are not allowed in the popup control
         if ([resultingText length] == 0 || [profileNames containsObject:resultingText]) {
-            [_profilePopup selectItemAtIndex:currentProfileIndex];
+            [self->_profilePopup selectItemAtIndex:currentProfileIndex];
 
             NSAlert *alert = [[NSAlert alloc] init];
             [alert setAlertStyle:NSCriticalAlertStyle];
@@ -571,7 +571,7 @@
 
         NSInteger currentProfileIndex = [_self currentProfileIndex];
         if (returnCode != NSModalResponseOK) {
-            [_profilePopup selectItemAtIndex:currentProfileIndex];
+            [self->_profilePopup selectItemAtIndex:currentProfileIndex];
             return;
         }
 
@@ -836,7 +836,7 @@ static bool GetEqualizerStatus(intf_thread_t *p_custom_intf,
         [workArray addObject:resultingText];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQTitles"];
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQPreampValues"]];
-        [workArray addObject:[NSString stringWithFormat:@"%.1f", [_equalizerPreampSlider floatValue]]];
+        [workArray addObject:[NSString stringWithFormat:@"%.1f", [self->_equalizerPreampSlider floatValue]]];
         [defaults setObject:[NSArray arrayWithArray:workArray] forKey:@"EQPreampValues"];
         workArray = [[NSMutableArray alloc] initWithArray:[defaults objectForKey:@"EQNames"]];
         [workArray addObject:decomposedStringWithCanonicalMapping];

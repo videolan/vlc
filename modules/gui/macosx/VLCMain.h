@@ -48,7 +48,7 @@
  * Local prototypes.
  *****************************************************************************/
 
-intf_thread_t *getIntf();
+intf_thread_t *getIntf(void);
 
 static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 static NSString * VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";

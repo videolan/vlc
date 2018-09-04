@@ -434,9 +434,9 @@
     [saveFilePanel beginSheetModalForWindow:self.window completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSModalResponseOK) {
             [self setOutputDestination:[[saveFilePanel URL] path]];
-            [_fileDestinationFileName setStringValue: [[NSFileManager defaultManager] displayNameAtPath:_outputDestination]];
-            [[_fileDestinationFileNameStub animator] setHidden: YES];
-            [[_fileDestinationFileName animator] setHidden: NO];
+            [self->_fileDestinationFileName setStringValue: [[NSFileManager defaultManager] displayNameAtPath:self->_outputDestination]];
+            [[self->_fileDestinationFileNameStub animator] setHidden: YES];
+            [[self->_fileDestinationFileName animator] setHidden: NO];
         }
 
         [self updateOKButton];
@@ -508,7 +508,7 @@
 
         /* update UI */
         [_self recreateProfilePopup];
-        [_profilePopup selectItemWithTitle:resultingText];
+        [self->_profilePopup selectItemWithTitle:resultingText];
 
         /* update internals */
         [_self switchProfile:self];
@@ -617,7 +617,7 @@
     [saveFilePanel setAllowedFileTypes:[NSArray arrayWithObject:@"sdp"]];
     [saveFilePanel beginSheetModalForWindow:_streamPanel completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSModalResponseOK)
-            [_streamSDPField setStringValue:[[saveFilePanel URL] path]];
+            [self->_streamSDPField setStringValue:[[saveFilePanel URL] path]];
     }];
 }
 

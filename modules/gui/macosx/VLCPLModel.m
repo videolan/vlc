@@ -206,16 +206,16 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         _retainedRowSelection = 0;
 
     [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-        VLCPLItem *item = [_outlineView itemAtRow: idx];
+        VLCPLItem *item = [self->_outlineView itemAtRow: idx];
         if (!item)
             return;
 
         // model deletion is done via callback
-        PL_LOCK;
-        playlist_item_t *p_root = playlist_ItemGetById(p_playlist, [item plItemId]);
+        playlist_Lock( self->p_playlist );
+        playlist_item_t *p_root = playlist_ItemGetById(self->p_playlist, [item plItemId]);
         if( p_root != NULL )
-            playlist_NodeDelete(p_playlist, p_root);
-        PL_UNLOCK;
+            playlist_NodeDelete(self->p_playlist, p_root);
+        playlist_Unlock( self->p_playlist );
     }];
 }
 

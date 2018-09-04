@@ -428,7 +428,7 @@
 
     [NSAnimationContext runAnimationGroup:^(NSAnimationContext *context) {
         [context setDuration:0.5 * duration];
-        [[window animator] setFrame:frameBeforeLionFullscreen display:YES animate:YES];
+        [[window animator] setFrame:self->frameBeforeLionFullscreen display:YES animate:YES];
     } completionHandler:nil];
 }
 

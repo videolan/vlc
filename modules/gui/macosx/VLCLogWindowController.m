@@ -200,7 +200,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
         }
         NSMutableString *string = [[NSMutableString alloc] init];
 
-        for (VLCLogMessage *message in _messagesArray) {
+        for (VLCLogMessage *message in self->_messagesArray) {
             [string appendFormat:@"%@\r\n", message.fullMessage];
         }
         NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];

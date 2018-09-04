@@ -668,7 +668,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [openPanel setPrompt: _NS("Open")];
     [openPanel beginSheetModalForWindow:[sender window] completionHandler:^(NSInteger returnCode) {
         if (returnCode == NSFileHandlingPanelOKButton) {
-            _filePath = [[[openPanel URLs] firstObject] path];
+            self->_filePath = [[[openPanel URLs] firstObject] path];
             [self openFilePathChanged: nil];
         }
     }];
