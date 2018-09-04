@@ -1,3 +1,16 @@
+Changes between 3.0.4 and 3.0.5:
+--------------------------------
+
+Access:
+ * Improve RTSP playback
+
+Demux:
+ * MP4: Fix reading some HDR metadata
+
+Audio output:
+ * Fix corking when the play is paused
+
+
 Changes between 3.0.3 and 3.0.4:
 --------------------------------
 
