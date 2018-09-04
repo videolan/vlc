@@ -59,6 +59,9 @@ extern "C" char **environ;
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 #include "components/playlist_legacy/playlist_model.hpp" /* for ~PLModel() */
 
+#include <QVector>
+#include "components/playlist/playlist_item.hpp"
+
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 #include <vlc_cxx_helpers.hpp>
@@ -497,6 +500,13 @@ static void Close( vlc_object_t *p_this )
     busy = false;
 }
 
+static inline void qRegisterMetaTypes()
+{
+    // register all types used by signal/slots
+    qRegisterMetaType<size_t>("size_t");
+    qRegisterMetaType<ssize_t>("ssize_t");
+}
+
 static void *Thread( void *obj )
 {
     intf_thread_t *p_intf = (intf_thread_t *)obj;
@@ -656,6 +666,8 @@ static void *Thread( void *obj )
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();
     if( s_style.compare("") != 0 )
         QApplication::setStyle( s_style );
+
+    qRegisterMetaTypes();
 
     /* Launch */
     app.exec();

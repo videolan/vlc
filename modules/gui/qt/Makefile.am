@@ -126,6 +126,17 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/playlist_legacy/selector.cpp \
 	gui/qt/components/playlist_legacy/selector.hpp \
 	gui/qt/components/playlist_legacy/sorting.h \
+	gui/qt/components/playlist/media.hpp \
+	gui/qt/components/playlist/playlist_common.cpp \
+	gui/qt/components/playlist/playlist_common.hpp \
+	gui/qt/components/playlist/playlist_controller.cpp \
+	gui/qt/components/playlist/playlist_controller.hpp \
+	gui/qt/components/playlist/playlist_controller_p.hpp \
+	gui/qt/components/playlist/playlist_item.cpp \
+	gui/qt/components/playlist/playlist_item.hpp \
+	gui/qt/components/playlist/playlist_model.cpp \
+	gui/qt/components/playlist/playlist_model.hpp \
+	gui/qt/components/playlist/playlist_model_p.hpp \
 	gui/qt/components/sout/profile_selector.cpp \
 	gui/qt/components/sout/profile_selector.hpp \
 	gui/qt/components/sout/sout_widgets.cpp \
@@ -232,6 +243,10 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/playlist_legacy/playlist.moc.cpp \
 	gui/qt/components/playlist_legacy/standardpanel.moc.cpp \
 	gui/qt/components/playlist_legacy/selector.moc.cpp \
+	gui/qt/components/playlist/playlist_common.moc.cpp \
+	gui/qt/components/playlist/playlist_item.moc.cpp \
+	gui/qt/components/playlist/playlist_model.moc.cpp \
+	gui/qt/components/playlist/playlist_controller.moc.cpp \
 	gui/qt/components/sout/profile_selector.moc.cpp \
 	gui/qt/components/sout/sout_widgets.moc.cpp \
 	gui/qt/util/animators.moc.cpp \
