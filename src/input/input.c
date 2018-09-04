@@ -70,7 +70,7 @@ static void             End     ( input_thread_t *p_input );
 static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
 static inline int ControlPop( input_thread_t *, int *, input_control_param_t *, vlc_tick_t i_deadline, bool b_postpone_seek );
-static void       ControlRelease( int i_type, input_control_param_t *p_param );
+static void       ControlRelease( int i_type, const input_control_param_t *p_param );
 static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, input_control_param_t );
 static void       ControlPause( input_thread_t *, vlc_tick_t );
@@ -1481,7 +1481,7 @@ static void End( input_thread_t * p_input )
  * Control
  *****************************************************************************/
 void input_ControlPush( input_thread_t *p_input,
-                        int i_type, input_control_param_t *p_param )
+                        int i_type, const input_control_param_t *p_param )
 {
     input_thread_private_t *sys = input_priv(p_input);
 
@@ -1624,7 +1624,7 @@ static bool ControlIsSeekRequest( int i_type )
     }
 }
 
-static void ControlRelease( int i_type, input_control_param_t *p_param )
+static void ControlRelease( int i_type, const input_control_param_t *p_param )
 {
     if( p_param == NULL )
         return;

@@ -241,7 +241,7 @@ enum input_control_e
 
 /* Internal helpers */
 
-void input_ControlPush( input_thread_t *, int, input_control_param_t * );
+void input_ControlPush( input_thread_t *, int, const input_control_param_t * );
 
 /* XXX for string value you have to allocate it before calling
  * input_ControlPushHelper
