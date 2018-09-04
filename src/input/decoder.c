@@ -657,8 +657,12 @@ static int DecoderGetInputAttachments( decoder_t *p_dec,
 
     if( unlikely(p_input == NULL) )
         return VLC_ENOOBJ;
-    return input_Control( p_input, INPUT_GET_ATTACHMENTS,
-                          ppp_attachment, pi_attachment );
+
+    int ret = input_GetAttachments( p_input, ppp_attachment );
+    if (ret < 0)
+        return VLC_EGENERIC;
+    *pi_attachment = ret;
+    return VLC_SUCCESS;
 }
 
 static vlc_tick_t DecoderGetDisplayDate( decoder_t *p_dec, vlc_tick_t i_ts )

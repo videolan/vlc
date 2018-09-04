@@ -315,48 +315,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
-        case INPUT_GET_ATTACHMENTS: /* arg1=input_attachment_t***, arg2=int*  res=can fail */
-        {
-            input_attachment_t ***ppp_attachment = va_arg( args, input_attachment_t *** );
-            int *pi_attachment = va_arg( args, int * );
-
-            vlc_mutex_lock( &priv->p_item->lock );
-            if( priv->i_attachment <= 0 )
-            {
-                vlc_mutex_unlock( &priv->p_item->lock );
-                *ppp_attachment = NULL;
-                *pi_attachment = 0;
-                return VLC_EGENERIC;
-            }
-            *pi_attachment = priv->i_attachment;
-            *ppp_attachment = vlc_alloc( priv->i_attachment, sizeof(input_attachment_t*));
-            for( int i = 0; i < priv->i_attachment; i++ )
-                (*ppp_attachment)[i] = vlc_input_attachment_Duplicate( priv->attachment[i] );
-
-            vlc_mutex_unlock( &priv->p_item->lock );
-            return VLC_SUCCESS;
-        }
-
-        case INPUT_GET_ATTACHMENT:  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
-        {
-            input_attachment_t **pp_attachment = va_arg( args, input_attachment_t ** );
-            const char *psz_name = va_arg( args, const char * );
-
-            vlc_mutex_lock( &priv->p_item->lock );
-            for( int i = 0; i < priv->i_attachment; i++ )
-            {
-                if( !strcmp( priv->attachment[i]->psz_name, psz_name ) )
-                {
-                    *pp_attachment = vlc_input_attachment_Duplicate(priv->attachment[i] );
-                    vlc_mutex_unlock( &priv->p_item->lock );
-                    return VLC_SUCCESS;
-                }
-            }
-            *pp_attachment = NULL;
-            vlc_mutex_unlock( &priv->p_item->lock );
-            return VLC_EGENERIC;
-        }
-
         case INPUT_RESTART_ES_BY_ID:
             val.i_int = va_arg( args, int );
             input_ControlPushHelper( p_input, INPUT_CONTROL_RESTART_ES_BY_ID, &val );

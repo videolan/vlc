@@ -3350,3 +3350,46 @@ char *input_CreateFilename(input_thread_t *input, input_item_t *item,
     free(filename);
     return path;
 }
+
+int input_GetAttachments(input_thread_t *input,
+                         input_attachment_t ***attachments)
+{
+    input_thread_private_t *priv = input_priv(input);
+
+    vlc_mutex_lock(&priv->p_item->lock);
+    int attachments_count = priv->i_attachment;
+    if (attachments_count <= 0)
+    {
+        vlc_mutex_unlock(&priv->p_item->lock);
+        return 0;
+    }
+
+    *attachments = vlc_alloc(attachments_count, sizeof(input_attachment_t*));
+    if (!*attachments)
+        return -1;
+
+    for (int i = 0; i < attachments_count; i++)
+        (*attachments)[i] = vlc_input_attachment_Duplicate(priv->attachment[i]);
+
+    vlc_mutex_unlock(&priv->p_item->lock);
+    return attachments_count;
+}
+
+input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name)
+{
+    input_thread_private_t *priv = input_priv(input);
+
+    vlc_mutex_lock(&priv->p_item->lock);
+    for (int i = 0; i < priv->i_attachment; i++)
+    {
+        if (!strcmp( priv->attachment[i]->psz_name, name))
+        {
+            input_attachment_t *attachment =
+                vlc_input_attachment_Duplicate(priv->attachment[i] );
+            vlc_mutex_unlock( &priv->p_item->lock );
+            return attachment;
+        }
+    }
+    vlc_mutex_unlock( &priv->p_item->lock );
+    return NULL;
+}

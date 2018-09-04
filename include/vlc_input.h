@@ -532,10 +532,6 @@ enum input_query_e
     /* titles */
     INPUT_GET_FULL_TITLE_INFO,     /* arg1=input_title_t*** arg2= int * res=can fail */
 
-    /* Attachments */
-    INPUT_GET_ATTACHMENTS, /* arg1=input_attachment_t***, arg2=int*  res=can fail */
-    INPUT_GET_ATTACHMENT,  /* arg1=input_attachment_t**, arg2=char*  res=can fail */
-
     /* On the fly input slave */
     INPUT_ADD_SLAVE,       /* arg1= enum slave_type, arg2= const char *,
                             * arg3= bool forced, arg4= bool notify,

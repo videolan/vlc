@@ -44,6 +44,7 @@
 #include "../libvlc.h"
 #include "vout_internal.h"
 #include "../misc/subpicture.h"
+#include "../input/input_internal.h"
 
 /*****************************************************************************
  * Local prototypes
@@ -179,12 +180,16 @@ static int spu_get_attachments(filter_t *filter,
 {
     spu_t *spu = filter->owner.sys;
 
-    int ret = VLC_EGENERIC;
     if (spu->p->input)
-        ret = input_Control(spu->p->input,
-                            INPUT_GET_ATTACHMENTS,
-                            attachment_ptr, attachment_count);
-    return ret;
+    {
+        int count = input_GetAttachments(spu->p->input, attachment_ptr);
+        if (count < 0)
+            return VLC_EGENERIC;
+        *attachment_count = count;
+        return VLC_SUCCESS;
+    }
+
+    return VLC_EGENERIC;
 }
 
 static filter_t *SpuRenderCreateAndLoadText(spu_t *spu)

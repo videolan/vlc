@@ -81,8 +81,8 @@ static stream_t *accessNewAttachment(vlc_object_t *parent,
     if (!input)
         return NULL;
 
-    input_attachment_t *attachment;
-    if (input_Control(input, INPUT_GET_ATTACHMENT, &attachment, mrl + 13))
+    input_attachment_t *attachment = input_GetAttachment(input, mrl + 13);
+    if (!attachment)
         return NULL;
     stream_t *stream = vlc_stream_AttachmentNew(parent, attachment);
     if (!stream)

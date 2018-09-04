@@ -217,8 +217,8 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input,
     }
 
     /* */
-    input_attachment_t *p_attachment = NULL;
-    if( input_Control( p_input, INPUT_GET_ATTACHMENT, &p_attachment, name ) )
+    input_attachment_t *p_attachment = input_GetAttachment( p_input, name );
+    if( !p_attachment )
     {
         msg_Warn( p_input, "art attachment %s not found", name );
         return;

@@ -261,6 +261,10 @@ static inline void input_ControlPushHelper( input_thread_t *p_input, int i_type,
 
 bool input_Stopped( input_thread_t * );
 
+int input_GetAttachments(input_thread_t *input, input_attachment_t ***attachments);
+
+input_attachment_t *input_GetAttachment(input_thread_t *input, const char *name);
+
 /* Bound pts_delay */
 #define INPUT_PTS_DELAY_MAX VLC_TICK_FROM_SEC(60)
 
