@@ -1535,7 +1535,7 @@ Gw
 
 To open a stream using a different protocol, just press Cancel to close this sheet.
 </string>
-                            <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -1543,7 +1543,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <rect key="frame" x="34" y="213" width="55" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Protocol" usesSingleLineMode="YES" id="2987">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -1551,7 +1551,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <rect key="frame" x="166" y="213" width="124" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Mode" usesSingleLineMode="YES" id="2988">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
@@ -1559,7 +1559,7 @@ To open a stream using a different protocol, just press Cancel to close this she
                         <rect key="frame" x="353" y="213" width="54" height="17"/>
                         <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" alignment="right" title="Address" usesSingleLineMode="YES" id="2989">
                             <font key="font" metaFont="system"/>
-                            <color key="textColor" white="0.25" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <color key="textColor" name="tertiaryLabelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
