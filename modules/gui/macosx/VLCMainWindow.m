@@ -1042,6 +1042,10 @@ static const float f_min_window_height = 307.;
 
     if ([[item identifier] isEqualToString:@"playlist"])
         p_node = p_playlist->p_playing;
+    else {
+        msg_Warn(p_playlist, "dragging non-playlist items is not supported");
+        return NO;
+    }
 
     if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
         NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
