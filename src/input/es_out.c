@@ -1243,9 +1243,11 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_pgrm_t     *p_pgrm;
     input_thread_t    *p_input = p_sys->p_input;
+    input_item_t      *p_item = input_priv(p_input)->p_item;
     const char        *psz_title = NULL;
     const char        *psz_provider = NULL;
     int i;
+    bool               b_has_new_infos = false;
 
     msg_Dbg( p_input, "EsOutProgramMeta: number=%d", i_group );
 
@@ -1280,7 +1282,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         {
             /* Remove old entries */
             char *psz_oldinfokey = EsOutProgramGetMetaName( p_pgrm );
-            input_Control( p_input, INPUT_DEL_INFO, psz_oldinfokey, NULL );
+
+            if( !input_item_DelInfo( p_item, psz_oldinfokey, NULL ) )
+                b_has_new_infos = true;
             /* TODO update epg name ?
              * TODO update scrambled info name ? */
             free( psz_oldinfokey );
@@ -1357,7 +1361,12 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
                                    "%s",psz_provider );
     }
     if( p_cat )
-        input_Control( p_input, INPUT_MERGE_INFOS, p_cat );
+    {
+        input_item_MergeInfos( p_item, p_cat );
+        b_has_new_infos = true;
+    }
+    if( !input_priv(p_input)->b_preparsing && b_has_new_infos )
+        input_SendEventMetaInfo( p_input );
 }
 
 static void EsOutProgramEpgEvent( es_out_t *out, int i_group, const vlc_epg_event_t *p_event )
@@ -1440,16 +1449,17 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
         input_item_SetESNowPlaying( input_priv(p_input)->p_item, psz_nowplaying );
         input_SendEventMeta( p_input );
 
+        const char *now_playing_tr =
+            vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying);
+        int ret;
         if( psz_nowplaying )
-        {
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying), "%s", psz_nowplaying );
-        }
+            ret = input_item_AddInfo( p_item, psz_cat, now_playing_tr,
+                                      "%s", psz_nowplaying );
         else
-        {
-            input_Control( p_input, INPUT_DEL_INFO, psz_cat,
-                vlc_meta_TypeToLocalizedString(vlc_meta_ESNowPlaying) );
-        }
+            ret = input_item_DelInfo( p_item, psz_cat, now_playing_tr );
+
+        if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+            input_SendEventMetaInfo( p_input );
     }
 
     free( psz_cat );
@@ -1468,6 +1478,7 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
 {
     es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
     input_thread_t  *p_input = p_sys->p_input;
+    input_item_t    *p_item = input_priv(p_input)->p_item;
     es_out_id_t *es;
     bool b_scrambled = false;
 
@@ -1484,12 +1495,15 @@ static void EsOutProgramUpdateScrambled( es_out_t *p_out, es_out_pgrm_t *p_pgrm 
     p_pgrm->b_scrambled = b_scrambled;
     char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
 
+    int ret;
     if( b_scrambled )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Scrambled"), _("Yes") );
+        ret = input_item_AddInfo( p_item, psz_cat, _("Scrambled"), _("Yes") );
     else
-        input_Control( p_input, INPUT_DEL_INFO, psz_cat, _("Scrambled") );
+        ret = input_item_DelInfo( p_item, psz_cat, _("Scrambled") );
     free( psz_cat );
 
+    if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+        input_SendEventMetaInfo( p_input );
     input_SendEventProgramScrambled( p_input, p_pgrm->i_id, b_scrambled );
 }
 
@@ -3241,6 +3255,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     input_thread_t *p_input = p_sys->p_input;
+    input_item_t   *p_item = input_priv(p_input)->p_item;
     const es_format_t *p_fmt_es = &es->fmt;
     const es_format_t *fmt = es->fmt_out.i_cat != UNKNOWN_ES ? &es->fmt_out : &es->fmt;
 
@@ -3559,20 +3574,25 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
         free( ppsz_all_keys );
     }
     /* */
-    input_Control( p_input, INPUT_REPLACE_INFOS, p_cat );
+    input_item_ReplaceInfos( p_item, p_cat );
+    if( !input_priv(p_input)->b_preparsing  )
+        input_SendEventMetaInfo( p_input );
 }
 
 static void EsOutDeleteInfoEs( es_out_t *out, es_out_id_t *es )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    input_thread_t *p_input = p_sys->p_input;
+    input_item_t   *p_item = input_priv(p_input)->p_item;
     char* psz_info_category;
 
     if( likely( psz_info_category = EsInfoCategoryName( es ) ) )
     {
-        input_Control( p_sys->p_input, INPUT_DEL_INFO,
-          psz_info_category, NULL );
-
+        int ret = input_item_DelInfo( p_item, psz_info_category, NULL );
         free( psz_info_category );
+
+        if( ret == VLC_SUCCESS && !input_priv(p_input)->b_preparsing  )
+            input_SendEventMetaInfo( p_input );
     }
 }
 

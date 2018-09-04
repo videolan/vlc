@@ -82,50 +82,6 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                + INPUT_CONTROL_NAV_ACTIVATE, NULL );
             return VLC_SUCCESS;
 
-        case INPUT_ADD_INFO:
-        {
-            char *psz_cat = va_arg( args, char * );
-            char *psz_name = va_arg( args, char * );
-            char *psz_format = va_arg( args, char * );
-
-            char *psz_value;
-
-            if( vasprintf( &psz_value, psz_format, args ) == -1 )
-                return VLC_EGENERIC;
-
-            int i_ret = input_item_AddInfo( priv->p_item, psz_cat, psz_name,
-                                            "%s", psz_value );
-            free( psz_value );
-
-            if( !priv->b_preparsing && !i_ret )
-                input_SendEventMetaInfo( p_input );
-            return i_ret;
-        }
-        case INPUT_REPLACE_INFOS:
-        case INPUT_MERGE_INFOS:
-        {
-            info_category_t *p_cat = va_arg( args, info_category_t * );
-
-            if( i_query == INPUT_REPLACE_INFOS )
-                input_item_ReplaceInfos( priv->p_item, p_cat );
-            else
-                input_item_MergeInfos( priv->p_item, p_cat );
-
-            if( !priv->b_preparsing )
-                input_SendEventMetaInfo( p_input );
-            return VLC_SUCCESS;
-        }
-        case INPUT_DEL_INFO:
-        {
-            char *psz_cat = va_arg( args, char * );
-            char *psz_name = va_arg( args, char * );
-
-            int i_ret = input_item_DelInfo( priv->p_item, psz_cat, psz_name );
-
-            if( !priv->b_preparsing && !i_ret )
-                input_SendEventMetaInfo( p_input );
-            return i_ret;
-        }
         case INPUT_ADD_BOOKMARK:
             p_bkmk = va_arg( args, seekpoint_t * );
             p_bkmk = vlc_seekpoint_Duplicate( p_bkmk );
