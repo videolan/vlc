@@ -206,7 +206,7 @@ void input_Stop( input_thread_t *p_input )
 
     vlc_mutex_lock( &sys->lock_control );
     /* Discard all pending controls */
-    for( int i = 0; i < sys->i_control; i++ )
+    for( size_t i = 0; i < sys->i_control; i++ )
     {
         input_control_t *ctrl = &sys->control[i];
         ControlRelease( ctrl->i_type, &ctrl->param );
@@ -277,7 +277,7 @@ static void input_Destructor( vlc_object_t *obj )
     if( priv->stats != NULL )
         input_stats_Destroy( priv->stats );
 
-    for( int i = 0; i < priv->i_control; i++ )
+    for( size_t i = 0; i < priv->i_control; i++ )
     {
         input_control_t *p_ctrl = &priv->control[i];
         ControlRelease( p_ctrl->i_type, &p_ctrl->param );
@@ -1513,10 +1513,10 @@ void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_unlock( &sys->lock_control );
 }
 
-static int ControlGetReducedIndexLocked( input_thread_t *p_input )
+static size_t ControlGetReducedIndexLocked( input_thread_t *p_input )
 {
     const int i_lt = input_priv(p_input)->control[0].i_type;
-    int i;
+    size_t i;
     for( i = 1; i < input_priv(p_input)->i_control; i++ )
     {
         const int i_ct = input_priv(p_input)->control[i].i_type;
@@ -1578,9 +1578,9 @@ static inline int ControlPop( input_thread_t *p_input,
     }
 
     /* */
-    const int i_index = ControlGetReducedIndexLocked( p_input );
+    const size_t i_index = ControlGetReducedIndexLocked( p_input );
 
-    for( int i = 0; i < i_index; ++i )
+    for( size_t i = 0; i < i_index; ++i )
     {
         /* Release Reduced controls */
         ControlRelease( p_sys->control[i].i_type, &p_sys->control[i].param );

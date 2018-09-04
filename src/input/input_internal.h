@@ -175,7 +175,7 @@ typedef struct input_thread_private_t
     /* Buffer of pending actions */
     vlc_mutex_t lock_control;
     vlc_cond_t  wait_control;
-    int i_control;
+    size_t i_control;
     input_control_t control[INPUT_CONTROL_FIFO_SIZE];
 
     vlc_thread_t thread;
