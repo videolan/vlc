@@ -226,8 +226,9 @@ static void addonChangedCallback( addons_manager_t *manager,
     // Parse HTML description properly
     NSMutableString *htmlDescription = [NSMutableString stringWithFormat:@"<style>body{ font-family: -apple-system-body, -apple-system, HelveticaNeue, Arial, sans-serif; }</style>%@", [currentItem description]];
     [htmlDescription replaceOccurrencesOfString:@"\n" withString:@"<br />" options:NSLiteralSearch range:NSMakeRange(0, [htmlDescription length])];
-    NSAttributedString *attributedDescription = [[NSAttributedString alloc] initWithHTML:[htmlDescription dataUsingEncoding:NSUTF8StringEncoding]
+    NSMutableAttributedString *attributedDescription = [[NSMutableAttributedString alloc] initWithHTML:[htmlDescription dataUsingEncoding:NSUTF8StringEncoding]
                                                                       documentAttributes:NULL];
+    [attributedDescription setAttributes:@{NSForegroundColorAttributeName : [NSColor secondaryLabelColor], NSFontAttributeName : [NSFont systemFontOfSize:11.]} range:NSMakeRange(0, attributedDescription.length)];
     [[_description textStorage] setAttributedString:attributedDescription];
 
     [self updateInstallButton:[currentItem isInstalled]];
