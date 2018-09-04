@@ -152,7 +152,10 @@ static int Open( vlc_object_t *p_this )
         p_access->pf_block = BlockScan;
     }
     else
+    {
+        free( p_sys );
         return VLC_EGENERIC; /* let the DTV plugin do the work */
+    }
 
     /* Getting frontend info */
     if( FrontendOpen( p_this, &p_sys->dvb, p_access->psz_name ) )
