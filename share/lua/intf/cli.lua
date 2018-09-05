@@ -177,6 +177,10 @@ function add(name,client,arg)
     local f
     if name == "enqueue" then
         f = vlc.playlist.enqueue
+	elseif name == "open" then
+		vlc.playlist.clear()
+		f = vlc.playlist.add
+
     else
         f = vlc.playlist.add
     end
@@ -557,6 +561,7 @@ end
 commands_ordered = {
     { "add"; { func = add; args = "XYZ"; help = "add XYZ to playlist" } };
     { "enqueue"; { func = add; args = "XYZ"; help = "queue XYZ to playlist" } };
+	{ "open"; { func = add; args = "XYZ"; help = "clear playlist then add XYZ to playlist" } };
     { "playlist"; { func = playlist; help = "show items currently in playlist" } };
     { "search"; { func = playlist; args = "[string]"; help = "search for items in playlist (or reset search)" } };
     { "delete"; { func = skip2(vlc.playlist.delete); args = "[X]"; help = "delete item X in playlist" } };
