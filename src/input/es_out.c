@@ -3214,6 +3214,7 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     update.i_id = es->fmt.i_id;
     update.i_group = es->fmt.i_group;
     update.i_priority = es->fmt.i_priority;
+    update.i_codec = es->fmt.i_codec;
     update.i_original_fourcc = es->fmt.i_original_fourcc;
 
     if (update.psz_language == NULL)
@@ -3258,6 +3259,8 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
     input_item_t   *p_item = input_priv(p_input)->p_item;
     const es_format_t *p_fmt_es = &es->fmt;
     const es_format_t *fmt = es->fmt_out.i_cat != UNKNOWN_ES ? &es->fmt_out : &es->fmt;
+
+    input_item_UpdateTracksInfo( p_item , fmt );
 
     /* Create category */
     char* psz_cat = EsInfoCategoryName( es );
