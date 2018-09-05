@@ -835,15 +835,7 @@ static int ReadMeta( vlc_object_t* p_this)
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
 
-    char *psz_path = vlc_uri2path( psz_uri );
 #if VLC_WINSTORE_APP && TAGLIB_VERSION >= TAGLIB_VERSION_1_11
-    if( psz_path == NULL )
-    {
-        free( psz_uri );
-        return VLC_EGENERIC;
-    }
-    free( psz_path );
-
     stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
     free( psz_uri );
     if( p_stream == NULL )
@@ -852,6 +844,7 @@ static int ReadMeta( vlc_object_t* p_this)
     VlcIostream s( p_stream );
     f = FileRef( &s );
 #else /* VLC_WINSTORE_APP */
+    char *psz_path = vlc_uri2path( psz_uri );
     free( psz_uri );
     if( psz_path == NULL )
         return VLC_EGENERIC;
