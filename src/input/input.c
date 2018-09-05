@@ -1847,25 +1847,19 @@ static bool Control( input_thread_t *p_input,
     switch( i_type )
     {
         case INPUT_CONTROL_SET_POSITION:
-        {
             if( priv->b_recording )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION ignored while recording" );
                 break;
             }
 
-            float f_pos = param.pos.f_val;
-            if( f_pos < 0.f )
-                f_pos = 0.f;
-            else if( f_pos > 1.f )
-                f_pos = 1.f;
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
-            if( demux_Control( priv->master->p_demux, DEMUX_SET_POSITION,
-                               (double) f_pos, !param.pos.b_fast_seek ) )
+            if( demux_SetPosition( priv->master->p_demux, (double)param.pos.f_val,
+                                   !param.pos.b_fast_seek, true ) )
             {
                 msg_Err( p_input, "INPUT_CONTROL_SET_POSITION "
-                         "%2.1f%% failed", (double)(f_pos * 100.f) );
+                         "%2.1f%% failed", param.pos.f_val * 100.f );
             }
             else
             {
@@ -1876,11 +1870,9 @@ static bool Control( input_thread_t *p_input,
                 b_force_update = true;
             }
             break;
-        }
 
         case INPUT_CONTROL_SET_TIME:
         {
-            int64_t i_time;
             int i_ret;
 
             if( priv->b_recording )
@@ -1889,16 +1881,12 @@ static bool Control( input_thread_t *p_input,
                 break;
             }
 
-            i_time = param.time.i_val;
-            if( i_time < 0 )
-                i_time = 0;
-
             /* Reset the decoders states and clock sync (before calling the demuxer */
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
 
-            i_ret = demux_Control( priv->master->p_demux,
-                                   DEMUX_SET_TIME, i_time,
-                                   !param.time.b_fast_seek );
+            i_ret = demux_SetTime( priv->master->p_demux, param.time.i_val,
+                                   !param.time.b_fast_seek,
+                                   true );
             if( i_ret )
             {
                 int64_t i_length;
@@ -1907,16 +1895,16 @@ static bool Control( input_thread_t *p_input,
                 if( !demux_Control( priv->master->p_demux,
                                     DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
                 {
-                    double f_pos = (double)i_time / (double)i_length;
-                    i_ret = demux_Control( priv->master->p_demux,
-                                           DEMUX_SET_POSITION, f_pos,
-                                           !param.time.b_fast_seek );
+                    double f_pos = (double)param.time.i_val / (double)i_length;
+                    i_ret = demux_SetPosition( priv->master->p_demux, f_pos,
+                                               !param.time.b_fast_seek,
+                                               true );
                 }
             }
             if( i_ret )
             {
                 msg_Warn( p_input, "INPUT_CONTROL_SET_TIME %"PRId64
-                         " failed or not possible", i_time );
+                         " failed or not possible", param.time.i_val );
             }
             else
             {
