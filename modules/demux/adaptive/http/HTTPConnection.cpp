@@ -356,7 +356,7 @@ void HTTPConnection::setUsed( bool b )
     available = !b;
     if(available)
     {
-        if(!connectionClose && contentLength == bytesRead )
+        if(!connectionClose && contentLength == bytesRead && (!chunked || chunked_eof))
         {
             queryOk = false;
             bytesRead = 0;
