@@ -73,6 +73,8 @@ namespace sdi_sout
                     std::vector<uint8_t> subframesslots;
             };
             std::vector<Mapping *> mappings;
+            Mapping *getMappingByID(const StreamID &);
+            const Mapping *getMappingByID(const StreamID &) const;
             unsigned subframeslotbitmap;
             uint8_t framewidth;
             bool b_accept_any;

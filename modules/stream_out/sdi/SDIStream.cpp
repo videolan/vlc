@@ -129,7 +129,7 @@ StreamID& StreamID::operator=(const StreamID &other)
     return *this;
 }
 
-bool StreamID::operator==(const StreamID &other)
+bool StreamID::operator==(const StreamID &other) const
 {
     if(stream_id == -1 || other.stream_id == -1)
         return sequence_id == other.sequence_id;

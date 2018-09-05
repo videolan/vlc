@@ -73,7 +73,7 @@ namespace sdi_sout
             StreamID(int);
             StreamID(int, int);
             StreamID& operator=(const StreamID &);
-            bool      operator==(const StreamID &);
+            bool      operator==(const StreamID &) const;
             std::string toString() const;
 
         private:

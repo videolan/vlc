@@ -268,6 +268,22 @@ bool SDIAudioMultiplexConfig::addMapping(const StreamID &id, std::vector<uint8_t
     return true;
 }
 
+SDIAudioMultiplexConfig::Mapping *
+    SDIAudioMultiplexConfig::getMappingByID(const StreamID &id)
+{
+    auto it = std::find_if(mappings.begin(), mappings.end(),
+                           [&id](Mapping *e) { return e->id == id; });
+    return (it != mappings.end()) ? *it : NULL;
+}
+
+const SDIAudioMultiplexConfig::Mapping *
+    SDIAudioMultiplexConfig::getMappingByID(const StreamID &id) const
+{
+    auto it = std::find_if(mappings.begin(), mappings.end(),
+                           [&id](const Mapping *e) { return e->id == id; });
+    return (it != mappings.end()) ? *it : NULL;
+}
+
 unsigned SDIAudioMultiplexConfig::getMaxSamplesForBlockSize(size_t s) const
 {
     return s / (2 * sizeof(uint16_t) * getMultiplexedFramesCount());
@@ -276,30 +292,23 @@ unsigned SDIAudioMultiplexConfig::getMaxSamplesForBlockSize(size_t s) const
 SDIAudioMultiplexBuffer *
     SDIAudioMultiplexConfig::getBufferForStream(const StreamID &id)
 {
-    for(size_t i=0; i<mappings.size(); i++)
-    {
-        if(mappings[i]->id == id)
-            return &mappings[i]->buffer;
-    }
-    return NULL;
+    Mapping *map = getMappingByID(id);
+    return map ? &map->buffer : NULL;
 }
 
 const es_format_t * SDIAudioMultiplexConfig::getConfigurationForStream(const StreamID &id) const
 {
-    auto it = std::find_if(mappings.begin(), mappings.end(),
-                           [&id](Mapping *e) { return e->id == id; });
-    return (it != mappings.end()) ? &(*it)->fmt : NULL;
+    const Mapping *map = getMappingByID(id);
+    return map ? &map->fmt : NULL;
 }
 
 const es_format_t *
     SDIAudioMultiplexConfig::updateFromRealESConfig(const StreamID &id,
                                                     const es_format_t *fmt)
 {
-    auto it = std::find_if(mappings.begin(), mappings.end(),
-                           [&id](Mapping *e) { return e->id == id; });
-    if(it != mappings.end())
+    Mapping *mapping = getMappingByID(id);
+    if(mapping)
     {
-        Mapping *mapping = (*it);
         if(mapping->subframesslots.size() > 2 && fmt->audio.i_channels > 2)
             ConfigureChannels(fmt->audio.i_channels, &mapping->fmt);
         mapping->buffer.setSubFramesCount(mapping->fmt.audio.i_channels);
