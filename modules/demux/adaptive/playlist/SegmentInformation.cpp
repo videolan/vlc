@@ -215,8 +215,11 @@ uint64_t SegmentInformation::getLiveStartSegmentNumber(uint64_t def) const
             else
                 start = end - count;
 
-            const uint64_t bufcount = ( OFFSET_FROM_END + timescale.ToScaled(i_max_buffering) /
-                                        mediaSegmentTemplate->duration.Get() );
+            uint64_t bufcount = ( OFFSET_FROM_END + timescale.ToScaled(i_max_buffering) /
+                                  mediaSegmentTemplate->duration.Get() );
+            /* Ensure we always pick > start # of availability window as this segment might no longer be avail */
+            if( end - start <= bufcount )
+                bufcount = end - start - 1;
 
             return ( end - start > bufcount ) ? end - bufcount : start;
         }
