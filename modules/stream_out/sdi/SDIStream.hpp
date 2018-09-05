@@ -158,22 +158,27 @@ namespace sdi_sout
             aout_filters_t *p_filters;
     };
 
-    class CaptionsStream : public AbstractStream
+    class AbstractRawStream : public AbstractStream
+    {
+        public:
+            AbstractRawStream(vlc_object_t *, const StreamID &,
+                              AbstractStreamOutputBuffer *);
+            virtual ~AbstractRawStream();
+            virtual int Send(block_t*); /* impl */
+            virtual void Flush(); /* impl */
+            virtual void Drain(); /* impl */
+
+        protected:
+            void FlushQueued();
+    };
+
+    class CaptionsStream : public AbstractRawStream
     {
         public:
             CaptionsStream(vlc_object_t *, const StreamID &,
                            AbstractStreamOutputBuffer *);
             virtual ~CaptionsStream();
             virtual bool init(const es_format_t *); /* impl */
-            virtual int Send(block_t*);
-            virtual void Flush();
-            virtual void Drain();
-
-        protected:
-            void FlushQueued();
-
-        private:
-            void Output(block_t *);
     };
 }
 

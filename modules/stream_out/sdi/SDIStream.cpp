@@ -527,24 +527,20 @@ void AudioDecodedStream::setCallbacks()
     p_decoder->cbs = &dec_cbs;
 }
 
-CaptionsStream::CaptionsStream(vlc_object_t *p_obj, const StreamID &id,
+
+AbstractRawStream::AbstractRawStream(vlc_object_t *p_obj, const StreamID &id,
                                AbstractStreamOutputBuffer *buffer)
     : AbstractStream(p_obj, id, buffer)
 {
 
 }
 
-CaptionsStream::~CaptionsStream()
+AbstractRawStream::~AbstractRawStream()
 {
     FlushQueued();
 }
 
-bool CaptionsStream::init(const es_format_t *fmt)
-{
-    return (fmt->i_codec == VLC_CODEC_CEA608);
-}
-
-int CaptionsStream::Send(block_t *p_block)
+int AbstractRawStream::Send(block_t *p_block)
 {
     if(p_block->i_buffer)
         outputbuffer->Enqueue(p_block);
@@ -553,19 +549,35 @@ int CaptionsStream::Send(block_t *p_block)
     return VLC_SUCCESS;
 }
 
-void CaptionsStream::Flush()
+void AbstractRawStream::Flush()
+{
+    FlushQueued();
+}
+
+void AbstractRawStream::Drain()
 {
 
 }
 
-void CaptionsStream::Drain()
-{
-
-}
-
-void CaptionsStream::FlushQueued()
+void AbstractRawStream::FlushQueued()
 {
     block_t *p;
     while((p = reinterpret_cast<block_t *>(outputbuffer->Dequeue())))
         block_Release(p);
+}
+
+
+CaptionsStream::CaptionsStream(vlc_object_t *p_obj, const StreamID &id,
+                               AbstractStreamOutputBuffer *buffer)
+    : AbstractRawStream(p_obj, id, buffer)
+{
+}
+
+CaptionsStream::~CaptionsStream()
+{
+}
+
+bool CaptionsStream::init(const es_format_t *fmt)
+{
+    return (fmt->i_codec == VLC_CODEC_CEA608);
 }
