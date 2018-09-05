@@ -84,10 +84,12 @@ typedef union
     vlc_viewpoint_t viewpoint;
     struct {
         bool b_fast_seek;
+        bool b_absolute;
         vlc_tick_t i_val;
     } time;
     struct {
         bool b_fast_seek;
+        bool b_absolute;
         float f_val;
     } pos;
 } input_control_param_t;
