@@ -80,6 +80,7 @@
                        "SEL selectors being #145 for ES id 145, or 1 for second created ES. " \
                        "CHANS being {n,n+1,..} channels to subframe mapping. " \
                        "{chans=6} shortcut to request 6 channels in same order. " \
+                       "{embed} to request compressed passthrough in PCM (hack). " \
                        "Use 'only' to accept only declared ES. " \
                        "ex: only:#145{0,1}:#142{2,3}:2{chans=6} "
 

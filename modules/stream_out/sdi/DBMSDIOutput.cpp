@@ -505,13 +505,28 @@ int DBMSDIOutput::Process()
     while((p = reinterpret_cast<picture_t *>(videoBuffer.Dequeue())))
     {
         vlc_tick_t bufferStart = audioMultiplex->bufferStart();
+        unsigned i_samples_per_frame =
+                audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
+
+#ifdef SDI_MULTIPLEX_DEBUG
+        audioMultiplex->Debug();
+#endif
+
         while(bufferStart <= p->date &&
-              audioMultiplex->availableSamples(bufferStart) >= SAMPLES_PER_FRAME)
+              audioMultiplex->availableVirtualSamples(bufferStart) >= i_samples_per_frame)
         {
-              block_t *out = audioMultiplex->Extract(SAMPLES_PER_FRAME);
+            block_t *out = audioMultiplex->Extract(i_samples_per_frame);
             if(out)
+            {
+#ifdef SDI_MULTIPLEX_DEBUG
+                  msg_Dbg(p_stream, "extracted %u samples pts %ld i_samples_per_frame %u",
+                          out->i_nb_samples, out->i_dts, i_samples_per_frame);
+#endif
                   ProcessAudio(out);
+            }
             else break;
+            bufferStart = audioMultiplex->bufferStart();
+            i_samples_per_frame = audioMultiplex->alignedInterleaveInSamples(bufferStart, SAMPLES_PER_FRAME);
         }
 
         ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));

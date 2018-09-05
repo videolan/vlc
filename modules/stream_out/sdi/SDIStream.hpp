@@ -172,6 +172,16 @@ namespace sdi_sout
             void FlushQueued();
     };
 
+    class AudioCompressedStream : public AbstractRawStream
+    {
+        public:
+            AudioCompressedStream(vlc_object_t *, const StreamID &,
+                                  AbstractStreamOutputBuffer *);
+            virtual ~AudioCompressedStream();
+            virtual int Send(block_t*); /* reimpl */
+            virtual bool init(const es_format_t *); /* impl */
+    };
+
     class CaptionsStream : public AbstractRawStream
     {
         public:

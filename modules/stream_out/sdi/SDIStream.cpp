@@ -566,6 +566,39 @@ void AbstractRawStream::FlushQueued()
         block_Release(p);
 }
 
+AudioCompressedStream::AudioCompressedStream(vlc_object_t *p_obj, const StreamID &id,
+                                             AbstractStreamOutputBuffer *buffer)
+    : AbstractRawStream(p_obj, id, buffer)
+{
+}
+
+AudioCompressedStream::~AudioCompressedStream()
+{
+}
+
+int AudioCompressedStream::Send(block_t *p_block)
+{
+    const size_t i_payload = p_block->i_buffer;
+    const size_t i_pad = (p_block->i_buffer & 1) ? 1 : 0;
+    p_block = block_Realloc(p_block, 12, p_block->i_buffer + i_pad);
+    if(!p_block)
+        return VLC_EGENERIC;
+    /* Convert to AES3 Payload */
+    SetWBE(&p_block->p_buffer[0], 0x0000); /* Extra 0000 */
+    SetWBE(&p_block->p_buffer[2], 0x0000); /* see S337 Annex B */
+    SetWBE(&p_block->p_buffer[4], 0xF872); /* Pa Start code/Preamble */
+    SetWBE(&p_block->p_buffer[6], 0x4E1F); /* Pb Start code/Preamble */
+    SetWBE(&p_block->p_buffer[8], 0x0001); /* A52 Burst code */
+    SetWBE(&p_block->p_buffer[10], i_payload);
+    if(i_pad)
+        p_block->p_buffer[p_block->i_buffer - 1] = 0x00;
+    return AbstractRawStream::Send(p_block);
+}
+
+bool AudioCompressedStream::init(const es_format_t *fmt)
+{
+    return (fmt->i_codec == VLC_CODEC_A52);
+}
 
 CaptionsStream::CaptionsStream(vlc_object_t *p_obj, const StreamID &id,
                                AbstractStreamOutputBuffer *buffer)

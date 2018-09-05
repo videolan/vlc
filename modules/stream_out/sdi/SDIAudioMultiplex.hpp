@@ -22,6 +22,7 @@
 
 #include "AES3Audio.hpp"
 #include "SDIStream.hpp"
+#include "sdiout.hpp"
 
 #include <vector>
 
@@ -33,7 +34,7 @@ namespace sdi_sout
                                     public AbstractStreamOutputBuffer
     {
         public:
-            SDIAudioMultiplexBuffer();
+            SDIAudioMultiplexBuffer(vlc_object_t *);
             virtual ~SDIAudioMultiplexBuffer();
             virtual void FlushQueued(); /* impl */
             virtual void Enqueue(void *); /* impl */
@@ -43,21 +44,23 @@ namespace sdi_sout
     class SDIAudioMultiplexConfig
     {
         public:
-            SDIAudioMultiplexConfig(uint8_t channels = 2);
+            SDIAudioMultiplexConfig(vlc_object_t *obj, uint8_t channels = 2);
             ~SDIAudioMultiplexConfig();
             SDIAudioMultiplexBuffer *getBufferForStream(const StreamID &);
             const es_format_t * getConfigurationForStream(const StreamID &) const;
             const es_format_t * updateFromRealESConfig(const StreamID &,
                                                        const es_format_t *);
+            bool decode(const StreamID &) const;
             bool SubFrameSlotUsed(uint8_t) const;
             void setSubFrameSlotUsed(uint8_t);
             void parseConfiguration(vlc_object_t *, const char *);
             uint8_t getMultiplexedFramesCount() const { return framewidth; }
-            std::vector<uint8_t> getFreeSubFrameSlots() const;
+            std::vector<uint8_t> getFreeSubFrameSlots(bool = false) const;
             std::vector<uint8_t> getConfiguredSlots(const StreamID &) const;
 
             bool addMapping(const StreamID &, const es_format_t *);
             bool addMapping(const StreamID &, std::vector<uint8_t>);
+            bool addMappingEmbed(const StreamID &, std::vector<uint8_t> = std::vector<uint8_t>());
             unsigned getMaxSamplesForBlockSize(size_t) const;
 
         private:
@@ -65,10 +68,11 @@ namespace sdi_sout
             class Mapping
             {
                 public:
-                    Mapping(const StreamID &);
+                    Mapping(vlc_object_t *, const StreamID &);
                     ~Mapping();
                     StreamID id;
                     es_format_t fmt;
+                    bool b_decode;
                     SDIAudioMultiplexBuffer buffer;
                     std::vector<uint8_t> subframesslots;
             };
@@ -78,24 +82,29 @@ namespace sdi_sout
             unsigned subframeslotbitmap;
             uint8_t framewidth;
             bool b_accept_any;
+            vlc_object_t *obj;
     };
 
     class SDIAudioMultiplex
     {
         public:
-            SDIAudioMultiplex(uint8_t channels);
+            SDIAudioMultiplex(vlc_object_t *, uint8_t channels);
             ~SDIAudioMultiplex();
             vlc_tick_t bufferStart() const;
-            unsigned availableSamples(vlc_tick_t) const;
+            unsigned availableVirtualSamples(vlc_tick_t) const;
+            unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
             block_t * Extract(unsigned);
             unsigned getFreeSubFrameSlots() const;
             void SetSubFrameSource(uint8_t, AES3AudioBuffer *, AES3AudioSubFrameIndex);
-            void Debug(vlc_object_t *) const;
+#ifdef SDI_MULTIPLEX_DEBUG
+            void Debug() const;
+#endif
 
             SDIAudioMultiplexConfig config;
             vlc_tick_t head;
 
         private:
+            vlc_object_t *p_obj;
             unsigned count;
             AES3AudioFrameSource framesources[MAX_AES3_AUDIO_FRAMES];
     };

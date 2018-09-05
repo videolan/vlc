@@ -24,6 +24,7 @@
 #include <vlc_block.h>
 #include <vlc_block_helper.h>
 #include <mutex>
+#include <vlc_es.h>
 
 #define MAX_AES3_AUDIO_FRAMES     8
 #define MAX_AES3_AUDIO_SUBFRAMES (MAX_AES3_AUDIO_FRAMES * 2)
@@ -43,29 +44,36 @@ namespace sdi_sout
     class AES3AudioBuffer
     {
         public:
-            AES3AudioBuffer(unsigned = 0);
+            AES3AudioBuffer(vlc_object_t *, unsigned = 0);
             ~AES3AudioBuffer();
             void setSubFramesCount(uint8_t);
             vlc_tick_t bufferStart() const;
             vlc_tick_t bufferEnd() const;
-            unsigned availableSamples(vlc_tick_t) const;
+            unsigned availableVirtualSamples(vlc_tick_t) const;
+            unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
             void push(block_t *);
-            void read(void *, unsigned, unsigned,
-                      const AES3AudioSubFrameIndex &,
-                      const AES3AudioSubFrameIndex &, unsigned);
+            unsigned read(void *, unsigned, vlc_tick_t,
+                          const AES3AudioSubFrameIndex &,
+                          const AES3AudioSubFrameIndex &, unsigned);
             void flushConsumed();
-            void tagConsumed(unsigned);
+            void tagVirtualConsumed(vlc_tick_t, unsigned);
             void forwardTo(vlc_tick_t);
+            void setCodec(vlc_fourcc_t);
+            vlc_fourcc_t getCodec() const;
 
         private:
+            vlc_object_t *obj;
+            void tagConsumed(unsigned);
             size_t   FramesToBytes(unsigned) const;
             vlc_tick_t FramesToDuration(unsigned) const;
+            int OffsetToBufferStart(vlc_tick_t t) const;
             unsigned BytesToFrames(size_t) const;
             unsigned TicksDurationToFrames(vlc_tick_t) const;
             block_bytestream_t bytestream;
             mutable std::mutex bytestream_mutex;
             uint8_t buffersubframes;
             unsigned toconsume;
+            vlc_fourcc_t i_codec;
     };
 
     class AES3AudioSubFrameSource
@@ -74,14 +82,16 @@ namespace sdi_sout
             AES3AudioSubFrameSource();
             AES3AudioSubFrameSource(AES3AudioBuffer *, AES3AudioSubFrameIndex);
             vlc_tick_t bufferStartTime() const;
-            void copy(void *, unsigned count, unsigned,
-                      const AES3AudioSubFrameIndex &, unsigned width);
+            unsigned copy(void *, unsigned count, vlc_tick_t,
+                          const AES3AudioSubFrameIndex &, unsigned width);
             void flushConsumed();
-            void tagConsumed(unsigned);
+            void tagVirtualConsumed(vlc_tick_t, unsigned);
             void forwardTo(vlc_tick_t t);
-            unsigned availableSamples(vlc_tick_t) const;
+            unsigned availableVirtualSamples(vlc_tick_t) const;
+            unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
             const AES3AudioSubFrameIndex & index() const;
             bool available() const;
+            vlc_fourcc_t getCodec() const;
 
         private:
             AES3AudioBuffer *aes3AudioBuffer;
@@ -94,9 +104,10 @@ namespace sdi_sout
             AES3AudioFrameSource();
             vlc_tick_t bufferStartTime() const;
             unsigned samplesUpToTime(vlc_tick_t) const;
-            unsigned availableSamples(vlc_tick_t) const;
+            unsigned availableVirtualSamples(vlc_tick_t) const;
+            unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
             void flushConsumed();
-            void tagConsumed(unsigned);
+            void tagVirtualConsumed(vlc_tick_t, unsigned);
             void forwardTo(vlc_tick_t t);
             AES3AudioSubFrameSource subframe0;
             AES3AudioSubFrameSource subframe1;

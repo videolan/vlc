@@ -43,12 +43,13 @@ namespace sdi_sout
         protected:
             virtual AbstractStream * createStream(const StreamID &,
                                                   const es_format_t *,
-                                                  AbstractStreamOutputBuffer *);
+                                                  AbstractStreamOutputBuffer *,
+                                                  bool = true);
             virtual int ConfigureVideo(const video_format_t *) = 0;
             virtual int ConfigureAudio(const audio_format_t *) = 0;
             sout_stream_t *p_stream;
             VideoDecodedStream *videoStream;
-            std::list<AudioDecodedStream *> audioStreams;
+            std::list<AbstractStream *> audioStreams;
             CaptionsStream *captionsStream;
             PictureStreamOutputBuffer videoBuffer;
             BlockStreamOutputBuffer captionsBuffer;
