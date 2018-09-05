@@ -183,7 +183,7 @@ static int spu_get_attachments(filter_t *filter,
     if (spu->p->input)
     {
         int count = input_GetAttachments(spu->p->input, attachment_ptr);
-        if (count < 0)
+        if (count <= 0)
             return VLC_EGENERIC;
         *attachment_count = count;
         return VLC_SUCCESS;
