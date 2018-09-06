@@ -1057,14 +1057,16 @@ static int EsDelayCallback ( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
+    input_control_param_t param = {
+        .delay = {
+            .b_absolute = true,
+            .i_val = newval.i_int,
+        },
+    };
     if( !strcmp( psz_cmd, "audio-delay" ) )
-    {
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &newval );
-    }
+        input_ControlPush( p_input, INPUT_CONTROL_SET_AUDIO_DELAY, &param );
     else if( !strcmp( psz_cmd, "spu-delay" ) )
-    {
-        input_ControlPushHelper( p_input, INPUT_CONTROL_SET_SPU_DELAY, &newval );
-    }
+        input_ControlPush( p_input, INPUT_CONTROL_SET_SPU_DELAY, &param );
     return VLC_SUCCESS;
 }
 

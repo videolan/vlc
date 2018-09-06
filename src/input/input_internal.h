@@ -92,6 +92,10 @@ typedef union
         bool b_absolute;
         float f_val;
     } pos;
+    struct {
+        bool b_absolute;
+        vlc_tick_t i_val;
+    } delay;
 } input_control_param_t;
 
 typedef struct

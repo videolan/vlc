@@ -2082,14 +2082,20 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            priv->i_audio_delay = param.val.i_int;
-            input_SendEventAudioDelay( p_input, param.val.i_int );
+            if( param.delay.b_absolute )
+                priv->i_audio_delay = param.delay.i_val;
+            else
+                priv->i_audio_delay += param.delay.i_val;
+            input_SendEventAudioDelay( p_input, priv->i_audio_delay );
             UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            priv->i_spu_delay = param.val.i_int;
-            input_SendEventSubtitleDelay( p_input, param.val.i_int );
+            if( param.delay.b_absolute )
+                priv->i_spu_delay = param.delay.i_val;
+            else
+                priv->i_spu_delay += param.delay.i_val;
+            input_SendEventSubtitleDelay( p_input, priv->i_spu_delay );
             UpdatePtsDelay( p_input );
             break;
 
