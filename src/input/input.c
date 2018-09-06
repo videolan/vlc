@@ -437,6 +437,10 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     /* Create Object Variables for private use only */
     input_ConfigVarInit( p_input );
 
+    priv->i_audio_delay =
+        VLC_TICK_FROM_MS( var_GetInteger( p_input, "audio-desync" ) );
+    priv->i_spu_delay = 0;
+
     /* */
     if( !priv->b_preparsing )
     {
@@ -1217,9 +1221,7 @@ static void UpdatePtsDelay( input_thread_t *p_input )
         i_pts_delay = 0;
 
     /* Take care of audio/spu delay */
-    const vlc_tick_t i_audio_delay = var_GetInteger( p_input, "audio-delay" );
-    const vlc_tick_t i_spu_delay   = var_GetInteger( p_input, "spu-delay" );
-    const vlc_tick_t i_extra_delay = __MIN( i_audio_delay, i_spu_delay );
+    const vlc_tick_t i_extra_delay = __MIN( p_sys->i_audio_delay, p_sys->i_spu_delay );
     if( i_extra_delay < 0 )
         i_pts_delay -= i_extra_delay;
 
@@ -1227,8 +1229,10 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     const int i_cr_average = var_GetInteger( p_input, "cr-average" ) * i_pts_delay / DEFAULT_PTS_DELAY;
 
     /* */
-    es_out_SetDelay( input_priv(p_input)->p_es_out_display, AUDIO_ES, i_audio_delay );
-    es_out_SetDelay( input_priv(p_input)->p_es_out_display, SPU_ES, i_spu_delay );
+    es_out_SetDelay( input_priv(p_input)->p_es_out_display, AUDIO_ES,
+                     p_sys->i_audio_delay );
+    es_out_SetDelay( input_priv(p_input)->p_es_out_display, SPU_ES,
+                     p_sys->i_spu_delay );
     es_out_SetJitter( input_priv(p_input)->p_es_out, i_pts_delay, 0, i_cr_average );
 }
 
@@ -2078,11 +2082,13 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
+            priv->i_audio_delay = param.val.i_int;
             input_SendEventAudioDelay( p_input, param.val.i_int );
             UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
+            priv->i_spu_delay = param.val.i_int;
             input_SendEventSubtitleDelay( p_input, param.val.i_int );
             UpdatePtsDelay( p_input );
             break;

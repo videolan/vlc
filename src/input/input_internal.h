@@ -126,6 +126,10 @@ typedef struct input_thread_private_t
     vlc_tick_t  i_stop;     /* :stop-time, 0 if none */
     vlc_tick_t  i_time;     /* Current time */
 
+    /* Delays */
+    vlc_tick_t  i_audio_delay;
+    vlc_tick_t  i_spu_delay;
+
     /* Output */
     bool            b_out_pace_control; /* XXX Move it ot es_sout ? */
     sout_instance_t *p_sout;            /* Idem ? */
