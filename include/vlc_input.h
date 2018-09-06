@@ -476,6 +476,8 @@ struct vlc_input_event
         struct vlc_input_event_es es;
         /* INPUT_EVENT_RECORD */
         bool record;
+        /* INPUT_EVENT_STATISTICS */
+        const struct input_stats_t *stats;
         /* INPUT_EVENT_SIGNAL */
         struct vlc_input_event_signal signal;
         /* INPUT_EVENT_AUDIO_DELAY */

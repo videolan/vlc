@@ -74,10 +74,12 @@ static inline void input_SendEventLength(input_thread_t *p_input,
     });
 }
 
-static inline void input_SendEventStatistics(input_thread_t *p_input)
+static inline void input_SendEventStatistics(input_thread_t *p_input,
+                                             const struct input_stats_t *stats)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_STATISTICS,
+        .stats = stats,
     });
 }
 

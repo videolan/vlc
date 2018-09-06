@@ -696,15 +696,18 @@ static void MainLoopStatistics( input_thread_t *p_input )
 
     es_out_SetTimes( priv->p_es_out, f_position, i_time, i_length );
 
+    struct input_stats_t new_stats;
+    if( priv->stats != NULL )
+        input_stats_Compute( priv->stats, &new_stats );
+
     /* update current bookmark */
     vlc_mutex_lock( &priv->p_item->lock );
     priv->bookmark.i_time_offset = i_time;
-
     if( priv->stats != NULL )
-        input_stats_Compute( priv->stats, priv->p_item->p_stats );
+        *priv->p_item->p_stats = new_stats;
     vlc_mutex_unlock( &priv->p_item->lock );
 
-    input_SendEventStatistics( p_input );
+    input_SendEventStatistics( p_input, &new_stats );
 }
 
 /**
