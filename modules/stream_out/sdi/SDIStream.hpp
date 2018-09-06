@@ -26,6 +26,7 @@
 #include <vlc_codec.h>
 #include <queue>
 #include <mutex>
+#include <string>
 
 namespace sdi_sout
 {
