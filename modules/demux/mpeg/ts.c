@@ -926,7 +926,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         if( !p_sys->b_ignore_time_for_positions &&
              p_pmt &&
-             p_pmt->pcr.i_first > -1 && p_pmt->i_last_dts != VLC_TICK_INVALID &&
+             p_pmt->pcr.i_first > -1 && SETANDVALID(p_pmt->i_last_dts) &&
              p_pmt->pcr.i_current > -1 )
         {
             double i_length = TimeStampWrapAround( p_pmt->pcr.i_first,
@@ -971,7 +971,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         }
 
         if( !p_sys->b_ignore_time_for_positions && b_bool && p_pmt &&
-             p_pmt->pcr.i_first > -1 && p_pmt->i_last_dts != VLC_TICK_INVALID &&
+             p_pmt->pcr.i_first > -1 && SETANDVALID(p_pmt->i_last_dts) &&
              p_pmt->pcr.i_current > -1 )
         {
             stime_t i_length = TimeStampWrapAround( p_pmt->pcr.i_first,
@@ -1351,7 +1351,7 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
             /* Teletext may have missing PTS (ETSI EN 300 472 Annexe A)
              * In this case use the last PCR + 40ms */
             stime_t i_pcr = p_es->p_program->pcr.i_current;
-            if( i_pcr != VLC_TICK_INVALID )
+            if( SETANDVALID(i_pcr) )
                 p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
         }
     }
@@ -1614,7 +1614,7 @@ static void ParsePESDataChain( demux_t *p_demux, ts_pid_t *pid, block_t *p_pes )
 
                 /* Compute PCR/DTS offset if any */
                 if( p_pmt->pcr.i_pcroffset == -1 && p_block->i_dts != VLC_TICK_INVALID &&
-                    p_pmt->pcr.i_current != VLC_TICK_INVALID &&
+                    SETANDVALID(p_pmt->pcr.i_current) &&
                    (p_es->fmt.i_cat == VIDEO_ES || p_es->fmt.i_cat == AUDIO_ES) )
                 {
                     stime_t i_dts27 = TO_SCALE(p_block->i_dts);

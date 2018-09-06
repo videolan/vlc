@@ -28,6 +28,7 @@ typedef struct csa_t csa_t;
 #define TS_USER_PMT_NUMBER (0)
 
 #define TS_PSI_PAT_PID 0x00
+#define SETANDVALID(a) (a != -1 && a != VLC_TICK_INVALID)
 
 typedef enum ts_standards_e
 {
