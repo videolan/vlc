@@ -449,6 +449,15 @@ struct vlc_input_event_signal {
     float strength;
 };
 
+struct vlc_input_event_vout
+{
+    enum {
+        VLC_INPUT_EVENT_VOUT_ADDED,
+        VLC_INPUT_EVENT_VOUT_REMOVED,
+    } action;
+    vout_thread_t *vout;
+};
+
 struct vlc_input_event
 {
     input_event_type_e type;
@@ -484,6 +493,8 @@ struct vlc_input_event
         vlc_tick_t subtitle_delay;
         /* INPUT_EVENT_CACHE */
         float cache;
+        /* INPUT_EVENT_VOUT */
+        struct vlc_input_event_vout vout;
         /* INPUT_EVENT_SUBITEMS */
         input_item_node_t *subitems;
     };

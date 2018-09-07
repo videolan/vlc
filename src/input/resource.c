@@ -41,6 +41,7 @@
 #include "../audio_output/aout_internal.h"
 #include "../video_output/vout_internal.h"
 #include "input_interface.h"
+#include "event.h"
 #include "resource.h"
 
 struct input_resource_t
@@ -247,6 +248,13 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         TAB_APPEND( p_resource->i_vout, p_resource->pp_vout, p_vout );
         vlc_mutex_unlock( &p_resource->lock_hold );
 
+        if( p_resource->p_input && cfg.vout != p_vout )
+            input_SendEventVout( p_resource->p_input,
+                &(struct vlc_input_event_vout) {
+                    .action = VLC_INPUT_EVENT_VOUT_ADDED,
+                    .vout = p_vout,
+                });
+
         return p_vout;
     }
     else
@@ -257,6 +265,13 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         TAB_REMOVE( p_resource->i_vout, p_resource->pp_vout, cfg.vout );
         const int i_vout_active = p_resource->i_vout;
         vlc_mutex_unlock( &p_resource->lock_hold );
+
+        if( p_resource->p_input )
+            input_SendEventVout( p_resource->p_input,
+                &(struct vlc_input_event_vout) {
+                    .action = VLC_INPUT_EVENT_VOUT_REMOVED,
+                    .vout = cfg.vout,
+                });
 
         if( p_resource->p_vout_free || i_vout_active > 0 || !b_recycle )
         {

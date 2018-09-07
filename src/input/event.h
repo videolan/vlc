@@ -250,12 +250,14 @@ static inline void input_SendEventParsing(input_thread_t *p_input,
 }
 
 /*****************************************************************************
- * Event for decoder.c
+ * Event for resource.c
  *****************************************************************************/
-static inline void input_SendEventVout(input_thread_t *p_input)
+static inline void input_SendEventVout(input_thread_t *p_input,
+                                       const struct vlc_input_event_vout *event)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
-        .type = INPUT_EVENT_VOUT
+        .type = INPUT_EVENT_VOUT,
+        .vout = *event,
     });
 }
 

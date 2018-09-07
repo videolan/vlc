@@ -305,13 +305,10 @@ static vout_thread_t *aout_request_vout( void *p_private,
 {
     decoder_t *p_dec = p_private;
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    input_thread_t *p_input = p_owner->p_input;
 
     p_vout = input_resource_RequestVout( p_owner->p_resource,
         &(vout_configuration_t){ .vout = p_vout, .fmt = p_fmt, .dpb_size = 1 },
         b_recyle );
-    if( p_input != NULL )
-        input_SendEventVout( p_input );
 
     return p_vout;
 }
@@ -550,8 +547,6 @@ static int vout_update_format( decoder_t *p_dec )
         p_owner->fmt.video.i_chroma = p_dec->fmt_out.i_codec;
         vlc_mutex_unlock( &p_owner->lock );
 
-        if( p_owner->p_input != NULL )
-            input_SendEventVout( p_owner->p_input );
         if( p_vout == NULL )
         {
             msg_Err( p_dec, "failed to create video output" );
@@ -1913,9 +1908,6 @@ static void DeleteDecoder( decoder_t * p_dec )
 
                 input_resource_RequestVout( p_owner->p_resource,
                     &(vout_configuration_t) { .vout = p_owner->p_vout }, true );
-
-                if( p_owner->p_input != NULL )
-                    input_SendEventVout( p_owner->p_input );
             }
             break;
         case SPU_ES:

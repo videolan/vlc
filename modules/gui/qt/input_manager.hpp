@@ -66,8 +66,8 @@ public:
         ProgramChanged,
         RandomChanged,
         LoopOrRepeatChanged,
-        EPGEvent, /* 20 */
-        CapabilitiesChanged,
+        EPGEvent,
+        CapabilitiesChanged, /* 20 */
     /*    SignalChanged, */
 
         FullscreenControlToggle = QEvent::User + IMEventTypeOffset + 50,
