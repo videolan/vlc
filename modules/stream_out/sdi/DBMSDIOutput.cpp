@@ -107,11 +107,15 @@ IDeckLinkDisplayMode * DBMSDIOutput::MatchDisplayMode(const video_format_t *fmt,
                 BMDTimeValue frameduration;
                 BMDTimeScale timescale;
                 const char *psz_mode_name;
+                DECKLINK_STR tmp_name;
 
                 if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
-                        p_mode->GetName(&psz_mode_name) == S_OK)
+                        p_mode->GetName(&tmp_name) == S_OK)
                 {
                     BMDDisplayMode modenl = htonl(mode_id);
+                    psz_mode_name = DECKLINK_STRDUP(tmp_name);
+                    DECKLINK_FREE(tmp_name);
+
                     if(i==0)
                     {
                         BMDFieldDominance field = htonl(p_mode->GetFieldDominance());
@@ -239,9 +243,12 @@ int DBMSDIOutput::Open()
         CHECK("Card not found");
     }
 
+    DECKLINK_STR tmp_name;
     const char *psz_model_name;
-    result = p_card->GetModelName(&psz_model_name);
+    result = p_card->GetModelName(&tmp_name);
     CHECK("Unknown model name");
+    psz_model_name = DECKLINK_STRDUP(tmp_name);
+    DECKLINK_FREE(tmp_name);
 
     msg_Dbg(p_stream, "Opened DeckLink PCI card %s", psz_model_name);
 

@@ -24,8 +24,7 @@
 #include "SDIOutput.hpp"
 
 #include <vlc_es.h>
-
-#include <DeckLinkAPI.h>
+#include "../../access/vlc_decklink.h"
 
 namespace sdi_sout
 {

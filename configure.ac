@@ -1903,6 +1903,9 @@ then
   AC_LANG_PUSH([C++])
   AC_CHECK_HEADERS([DeckLinkAPIDispatch.cpp], [
       have_decklink=yes
+      AS_IF([test "${SYS}" = "darwin"], [
+        VLC_ADD_LIBS([decklink decklinkoutput],[-Wl,-framework,CoreFoundation])
+      ])
   ], [
       AS_IF([test "${enable_decklink}" = "yes"], [
         AC_MSG_ERROR([Blackmagic DeckLink SDI include files not found!])
