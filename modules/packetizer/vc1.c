@@ -215,6 +215,10 @@ static void Close( vlc_object_t *p_this )
     packetizer_Clean( &p_sys->packetizer );
     if( p_sys->p_frame )
         block_Release( p_sys->p_frame );
+    if( p_sys->sh.p_sh )
+        block_Release( p_sys->sh.p_sh );
+    if( p_sys->ep.p_ep )
+        block_Release( p_sys->ep.p_ep );
 
     cc_Exit( &p_sys->cc_next );
     cc_Exit( &p_sys->cc );
