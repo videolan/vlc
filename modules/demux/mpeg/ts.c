@@ -2398,7 +2398,7 @@ static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
         return;
     }
     /* Record the first data packet timestamp in case there wont be any PCR */
-    else if( !p_pmt->pcr.i_first_dts )
+    else if( p_pmt->pcr.i_first_dts == TS_TICK_UNKNOWN )
     {
         p_pmt->pcr.i_first_dts = TO_SCALE(p_block->i_dts);
     }
