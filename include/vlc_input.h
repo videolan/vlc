@@ -382,8 +382,6 @@ typedef enum input_event_type_e
     /* cache" has changed */
     INPUT_EVENT_CACHE,
 
-    /* A audio_output_t object has been created/deleted by *the input* */
-    INPUT_EVENT_AOUT,
     /* A vout_thread_t object has been created/deleted by *the input* */
     INPUT_EVENT_VOUT,
 

@@ -100,8 +100,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 break;
             case INPUT_EVENT_ES:
                 break;
-            case INPUT_EVENT_AOUT:
-                break;
             case INPUT_EVENT_VOUT:
                 break;
             case INPUT_EVENT_ITEM_META:

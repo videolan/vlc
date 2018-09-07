@@ -412,8 +412,6 @@ void input_LegacyEvents( input_thread_t *p_input,
             val.f_float = event->cache;
             var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
             break;
-        case INPUT_EVENT_AOUT:
-            break;
         case INPUT_EVENT_VOUT:
             break;
         case INPUT_EVENT_SUBITEMS:

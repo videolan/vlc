@@ -283,9 +283,6 @@ void InputManager::customEvent( QEvent *event )
     case IMEvent::BookmarksChanged:
         emit bookmarksChanged();
         break;
-    case IMEvent::InterfaceAoutUpdate:
-        UpdateAout();
-        break;
     case IMEvent::RecordingEvent:
         UpdateRecord();
         break;
@@ -362,9 +359,6 @@ static int InputEvent( vlc_object_t *, const char *,
 
     case INPUT_EVENT_VOUT:
         event = new IMEvent( IMEvent::InterfaceVoutUpdate );
-        break;
-    case INPUT_EVENT_AOUT:
-        event = new IMEvent( IMEvent::InterfaceAoutUpdate );
         break;
 
     case INPUT_EVENT_ITEM_META: /* Codec MetaData + Art */
@@ -654,11 +648,6 @@ void InputManager::UpdateVout()
     for( size_t i = 0; i < i_vout; i++ )
         vlc_object_release( (vlc_object_t*)pp_vout[i] );
     free( pp_vout );
-}
-
-void InputManager::UpdateAout()
-{
-    /* TODO */
 }
 
 void InputManager::UpdateCaching()

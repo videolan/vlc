@@ -57,8 +57,7 @@ public:
         ItemTeletextChanged,
         InterfaceVoutUpdate,
         StatisticsUpdate,
-        InterfaceAoutUpdate, /* 10 */
-        MetaChanged,
+        MetaChanged, /* 10 */
         InfoChanged,
         SynchroChanged,
         CachingEvent,
@@ -66,8 +65,8 @@ public:
         RecordingEvent,
         ProgramChanged,
         RandomChanged,
-        LoopOrRepeatChanged, /* 20 */
-        EPGEvent,
+        LoopOrRepeatChanged,
+        EPGEvent, /* 20 */
         CapabilitiesChanged,
     /*    SignalChanged, */
 
@@ -176,7 +175,6 @@ private:
     void UpdateMeta();
     void UpdateMeta(input_item_t *);
     void UpdateVout();
-    void UpdateAout();
     void UpdateStats();
     void UpdateCaching();
     void UpdateRecord();

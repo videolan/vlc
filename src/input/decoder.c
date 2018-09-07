@@ -409,9 +409,6 @@ static int aout_update_format( decoder_t *p_dec )
         aout_FormatPrepare( &p_owner->fmt.audio );
         vlc_mutex_unlock( &p_owner->lock );
 
-        if( p_owner->p_input != NULL )
-            input_SendEventAout( p_owner->p_input );
-
         if( p_aout == NULL )
         {
             msg_Err( p_dec, "failed to create audio output" );
@@ -1905,8 +1902,6 @@ static void DeleteDecoder( decoder_t * p_dec )
                 aout_DecFlush( p_owner->p_aout, false );
                 aout_DecDelete( p_owner->p_aout );
                 input_resource_PutAout( p_owner->p_resource, p_owner->p_aout );
-                if( p_owner->p_input != NULL )
-                    input_SendEventAout( p_owner->p_input );
             }
             break;
         case VIDEO_ES:
