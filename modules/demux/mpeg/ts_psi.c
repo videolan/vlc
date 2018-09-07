@@ -2143,7 +2143,7 @@ static void PMTCallBack( void *data, dvbpsi_pmt_t *p_dvbpsipmt )
     UpdatePESFilters( p_demux, p_sys->seltype == PROGRAM_ALL );
 
     /* Probe Boundaries */
-    if( p_sys->b_canfastseek && p_pmt->i_last_dts == -1 )
+    if( p_sys->b_canfastseek && p_pmt->i_last_dts == TS_TICK_UNKNOWN )
     {
         p_pmt->i_last_dts = 0;
         ProbeStart( p_demux, p_pmt->i_number );

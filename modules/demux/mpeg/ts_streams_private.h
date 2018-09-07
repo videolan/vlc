@@ -59,7 +59,7 @@ struct ts_pmt_t
     struct
     {
         stime_t i_current;
-        stime_t i_first; // seen <> != -1
+        stime_t i_first; // seen <> != TS_TICK_UNKNOWN
         /* broken PCR handling */
         stime_t i_first_dts;
         stime_t i_pcroffset;
