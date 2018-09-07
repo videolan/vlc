@@ -28,7 +28,12 @@ typedef struct csa_t csa_t;
 #define TS_USER_PMT_NUMBER (0)
 
 #define TS_PSI_PAT_PID 0x00
-#define TS_TICK_UNKNOWN -1
+
+#if (VLC_TICK_INVALID + 1 != VLC_TICK_0)
+#   error "can't define TS_UNKNOWN reference"
+#else
+#   define TS_TICK_UNKNOWN (VLC_TICK_INVALID - 1)
+#endif
 #define SETANDVALID(a) (a != TS_TICK_UNKNOWN && a != VLC_TICK_INVALID)
 
 typedef enum ts_standards_e
