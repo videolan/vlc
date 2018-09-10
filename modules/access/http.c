@@ -271,6 +271,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->url.psz_username = (char *) credential.psz_username;
         p_sys->url.psz_password = (char *) credential.psz_password;
     }
+    vlc_http_auth_Init( &p_sys->auth );
+    vlc_http_auth_Init( &p_sys->proxy_auth );
 
 connect:
     /* Connect */
@@ -358,6 +360,8 @@ error:
     free( p_sys->psz_referrer );
     free( p_sys->psz_username );
     free( p_sys->psz_password );
+    vlc_http_auth_Deinit( &p_sys->auth );
+    vlc_http_auth_Deinit( &p_sys->proxy_auth );
 
     return ret;
 }
@@ -385,6 +389,9 @@ static void Close( vlc_object_t *p_this )
     free( p_sys->psz_referrer );
     free( p_sys->psz_username );
     free( p_sys->psz_password );
+
+    vlc_http_auth_Deinit( &p_sys->auth );
+    vlc_http_auth_Deinit( &p_sys->proxy_auth );
 
     Disconnect( p_access );
 }
@@ -624,8 +631,6 @@ static int Connect( stream_t *p_access )
     free( p_sys->psz_icy_name );
     free( p_sys->psz_icy_title );
 
-    vlc_http_auth_Init( &p_sys->auth );
-    vlc_http_auth_Init( &p_sys->proxy_auth );
     p_sys->psz_location = NULL;
     p_sys->psz_mime = NULL;
     p_sys->i_icy_meta = 0;
