@@ -222,7 +222,10 @@ void vlc_http_auth_ParseWwwAuthenticateHeader(
         /* 2 Basic Authentication Scheme */
         msg_Dbg( p_this, "Using Basic Authentication" );
         psz_header += sizeof( psz_basic_prefix ) - 1;
+
+        free( p_auth->psz_realm );
         p_auth->psz_realm = AuthGetParam( psz_header, "realm" );
+
         if ( p_auth->psz_realm == NULL )
             msg_Warn( p_this, "Basic Authentication: "
                       "Mandatory 'realm' parameter is missing" );
@@ -238,12 +241,24 @@ void vlc_http_auth_ParseWwwAuthenticateHeader(
             return;
 
         psz_header += sizeof( psz_digest_prefix ) - 1;
-        p_auth->psz_realm = AuthGetParam( psz_header, "realm" );
-        p_auth->psz_domain = AuthGetParam( psz_header, "domain" );
         p_auth->psz_nonce = AuthGetParam( psz_header, "nonce" );
+
+        free( p_auth->psz_realm );
+        p_auth->psz_realm = AuthGetParam( psz_header, "realm" );
+
+        free( p_auth->psz_domain );
+        p_auth->psz_domain = AuthGetParam( psz_header, "domain" );
+
+        free( p_auth->psz_opaque );
         p_auth->psz_opaque = AuthGetParam( psz_header, "opaque" );
+
+        free( p_auth->psz_stale );
         p_auth->psz_stale = AuthGetParamNoQuotes( psz_header, "stale" );
+
+        free( p_auth->psz_algorithm );
         p_auth->psz_algorithm = AuthGetParamNoQuotes( psz_header, "algorithm" );
+
+        free( p_auth->psz_qop );
         p_auth->psz_qop = AuthGetParam( psz_header, "qop" );
         p_auth->i_nonce = 0;
 
