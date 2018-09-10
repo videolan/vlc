@@ -453,7 +453,7 @@ struct vlc_input_event_vout
 {
     enum {
         VLC_INPUT_EVENT_VOUT_ADDED,
-        VLC_INPUT_EVENT_VOUT_REMOVED,
+        VLC_INPUT_EVENT_VOUT_DELETED,
     } action;
     vout_thread_t *vout;
 };

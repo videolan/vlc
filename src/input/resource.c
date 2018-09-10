@@ -269,7 +269,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
         if( p_resource->p_input )
             input_SendEventVout( p_resource->p_input,
                 &(struct vlc_input_event_vout) {
-                    .action = VLC_INPUT_EVENT_VOUT_REMOVED,
+                    .action = VLC_INPUT_EVENT_VOUT_DELETED,
                     .vout = cfg.vout,
                 });
 
