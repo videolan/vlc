@@ -76,6 +76,12 @@ endif
 	$(APPLY) $(SRC)/live555/add-pkgconfig-file.patch
 	# Expose Server:
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
+ifdef HAVE_ANDROID
+ifneq ($(LEGACY_NDK), 1)
+	# Always access in_addr.s_addr field
+	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
+endif
+endif
 
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 

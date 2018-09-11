@@ -1,0 +1,42 @@
+diff --git a/groupsock/GroupsockHelper.cpp b/groupsock/GroupsockHelper.cpp
+index 0ba2aa5..c675275 100644
+--- a/groupsock/GroupsockHelper.cpp
++++ b/groupsock/GroupsockHelper.cpp
+@@ -515,15 +515,9 @@ Boolean socketJoinGroupSSM(UsageEnvironment& env, int socket,
+   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
+ 
+   struct ip_mreq_source imr;
+-#ifdef __ANDROID__
+-    imr.imr_multiaddr = groupAddress;
+-    imr.imr_sourceaddr = sourceFilterAddr;
+-    imr.imr_interface = ReceivingInterfaceAddr;
+-#else
+-    imr.imr_multiaddr.s_addr = groupAddress;
+-    imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+-    imr.imr_interface.s_addr = ReceivingInterfaceAddr;
+-#endif
++  imr.imr_multiaddr.s_addr = groupAddress;
++  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
++  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
+   if (setsockopt(socket, IPPROTO_IP, IP_ADD_SOURCE_MEMBERSHIP,
+ 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
+     socketErr(env, "setsockopt(IP_ADD_SOURCE_MEMBERSHIP) error: ");
+@@ -541,15 +535,9 @@ Boolean socketLeaveGroupSSM(UsageEnvironment& /*env*/, int socket,
+   if (!IsMulticastAddress(groupAddress)) return True; // ignore this case
+ 
+   struct ip_mreq_source imr;
+-#ifdef __ANDROID__
+-    imr.imr_multiaddr = groupAddress;
+-    imr.imr_sourceaddr = sourceFilterAddr;
+-    imr.imr_interface = ReceivingInterfaceAddr;
+-#else
+-    imr.imr_multiaddr.s_addr = groupAddress;
+-    imr.imr_sourceaddr.s_addr = sourceFilterAddr;
+-    imr.imr_interface.s_addr = ReceivingInterfaceAddr;
+-#endif
++  imr.imr_multiaddr.s_addr = groupAddress;
++  imr.imr_sourceaddr.s_addr = sourceFilterAddr;
++  imr.imr_interface.s_addr = ReceivingInterfaceAddr;
+   if (setsockopt(socket, IPPROTO_IP, IP_DROP_SOURCE_MEMBERSHIP,
+ 		 (const char*)&imr, sizeof (struct ip_mreq_source)) < 0) {
+     return False;
