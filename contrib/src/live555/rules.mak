@@ -79,6 +79,10 @@ endif
 	$(APPLY) $(SRC)/live555/expose_server_string.patch
 	# Fix creating static libs on mingw
 	$(APPLY) $(SRC)/live555/mingw-static-libs.patch
+ifdef HAVE_ANDROID
+	# Fix in_addr.s_addr field access
+	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
+endif
 
 	mv live.$(LIVE555_VERSION) $@ && touch $@
 
