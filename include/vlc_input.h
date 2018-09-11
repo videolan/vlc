@@ -402,6 +402,23 @@ struct vlc_input_event_position
     vlc_tick_t ms;
 };
 
+struct vlc_input_event_title
+{
+    enum {
+        VLC_INPUT_TITLE_NEW_LIST,
+        VLC_INPUT_TITLE_SELECTED,
+    } action;
+    union
+    {
+        struct
+        {
+            const input_title_t **array;
+            size_t count;
+        } list;
+        size_t selected_idx;
+    };
+};
+
 struct vlc_input_event_chapter
 {
     int title;
@@ -474,7 +491,7 @@ struct vlc_input_event
         /* INPUT_EVENT_LENGTH */
         vlc_tick_t length;
         /* INPUT_EVENT_TITLE */
-        int title;
+        struct vlc_input_event_title title;
         /* INPUT_EVENT_CHAPTER */
         struct vlc_input_event_chapter chapter;
         /* INPUT_EVENT_PROGRAM */

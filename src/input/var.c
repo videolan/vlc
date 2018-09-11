@@ -289,10 +289,10 @@ void input_LegacyEvents( input_thread_t *p_input,
             var_Change( p_input, "length", VLC_VAR_SETVALUE, val );
             break;
         case INPUT_EVENT_TITLE:
-            val.i_int = event->title;
+            val.i_int = event->title.action == VLC_INPUT_TITLE_NEW_LIST ? 0 : event->title.selected_idx;
             var_Change( p_input, "title", VLC_VAR_SETVALUE, val );
             input_LegacyVarNavigation( p_input );
-            input_LegacyVarTitle( p_input, event->title );
+            input_LegacyVarTitle( p_input, val.i_int );
             break;
         case INPUT_EVENT_CHAPTER:
             /* "chapter" */

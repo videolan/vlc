@@ -888,7 +888,7 @@ static int InitSout( input_thread_t * p_input )
 }
 #endif
 
-static void InitTitle( input_thread_t * p_input )
+static void InitTitle( input_thread_t * p_input, bool had_titles )
 {
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *p_master = priv->master;
@@ -902,14 +902,22 @@ static void InitTitle( input_thread_t * p_input )
     priv->title   = p_master->title;
     priv->i_title_offset = p_master->i_title_offset;
     priv->i_seekpoint_offset = p_master->i_seekpoint_offset;
-    if( priv->i_title > 0 )
-        input_SendEventTitle( p_input, 0 );
 
     /* Global flag */
     priv->b_can_pace_control = p_master->b_can_pace_control;
     priv->b_can_pause        = p_master->b_can_pause;
     priv->b_can_rate_control = p_master->b_can_rate_control;
     vlc_mutex_unlock( &priv->p_item->lock );
+
+    /* Send event only if the count is valid or if titles are gone */
+    if (had_titles || p_master->i_title > 0)
+        input_SendEventTitle( p_input, &(struct vlc_input_event_title) {
+            .action = VLC_INPUT_TITLE_NEW_LIST,
+            .list = {
+                .array = p_master->title,
+                .count = p_master->i_title,
+            },
+        });
 }
 
 static void StartTitle( input_thread_t * p_input )
@@ -1338,7 +1346,7 @@ static int Init( input_thread_t * p_input )
         goto error;
     priv->master = master;
 
-    InitTitle( p_input );
+    InitTitle( p_input, false );
 
     /* Load master infos */
     /* Init length */
@@ -2124,7 +2132,10 @@ static bool Control( input_thread_t *p_input,
             es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
             demux_Control( priv->master->p_demux,
                            DEMUX_SET_TITLE, i_title );
-            input_SendEventTitle( p_input, i_title );
+            input_SendEventTitle( p_input, &(struct vlc_input_event_title) {
+                .action = VLC_INPUT_TITLE_SELECTED,
+                .selected_idx = i_title,
+            });
             break;
         }
         case INPUT_CONTROL_SET_SEEKPOINT:
@@ -2352,7 +2363,10 @@ static int UpdateTitleSeekpointFromDemux( input_thread_t *p_input )
 
     /* TODO event-like */
     if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_TITLE ) )
-        input_SendEventTitle( p_input, demux_GetTitle( p_demux ) );
+        input_SendEventTitle( p_input, &(struct vlc_input_event_title) {
+            .action = VLC_INPUT_TITLE_SELECTED,
+            .selected_idx = demux_GetTitle( p_demux ),
+        });
 
     if( demux_TestAndClearFlags( p_demux, INPUT_UPDATE_SEEKPOINT ) )
         input_SendEventSeekpoint( p_input, demux_GetTitle( p_demux ),
@@ -2385,8 +2399,10 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     input_source_t *in = priv->master;
 
     /* Delete the preexisting titles */
+    bool had_titles = false;
     if( in->i_title > 0 )
     {
+        had_titles = true;
         for( int i = 0; i < in->i_title; i++ )
             vlc_input_title_Delete( in->title[i] );
         TAB_CLEAN( in->i_title, in->title );
@@ -2403,7 +2419,7 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
     else
         in->b_title_demux = true;
 
-    InitTitle( p_input );
+    InitTitle( p_input, had_titles );
 }
 
 static int

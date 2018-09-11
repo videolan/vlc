@@ -118,11 +118,12 @@ static inline void input_SendEventRecord(input_thread_t *p_input,
     });
 }
 
-static inline void input_SendEventTitle(input_thread_t *p_input, int i_title)
+static inline void input_SendEventTitle(input_thread_t *p_input,
+                                        const struct vlc_input_event_title *title)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_TITLE,
-        .title = i_title
+        .title = *title
     });
 }
 
