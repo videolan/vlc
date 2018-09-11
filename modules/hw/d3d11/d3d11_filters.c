@@ -151,6 +151,9 @@ static bool ApplyFilter( filter_sys_t *p_sys,
                                                      filter,
                                                      TRUE,
                                                      level);
+    ID3D11VideoContext_VideoProcessorSetStreamAutoProcessingMode(p_sys->d3dvidctx,
+                                                                 p_sys->videoProcessor,
+                                                                 0, FALSE);
 
     RECT srcRect;
     srcRect.left   = fmt->i_x_offset;
