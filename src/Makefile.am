@@ -535,7 +535,8 @@ check_PROGRAMS = \
 	test_headers \
 	test_mrl_helpers \
 	test_arrays \
-	test_vector
+	test_vector \
+	test_shared_data_ptr
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -559,6 +560,7 @@ test_headers_SOURCES = test/headers.c
 test_mrl_helpers_SOURCES = test/mrl_helpers.c
 test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
+test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \
