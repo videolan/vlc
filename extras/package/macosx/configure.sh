@@ -41,4 +41,4 @@ OPTIONS="
 export CFLAGS
 export LDFLAGS
 
-sh "$(dirname $0)"/../../../configure ${OPTIONS} $*
+sh "$(dirname $0)"/../../../configure ${OPTIONS} "$@"
