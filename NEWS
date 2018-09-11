@@ -44,6 +44,8 @@ Stream output:
 macOS:
  * Remove Growl notification support
 
+appleOS:
+ * Improved proxy configuration handling
 
 
 Changes between 3.0.2 and 3.0.3:
