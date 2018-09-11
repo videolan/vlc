@@ -43,6 +43,7 @@
 #else /* !defined (__APPLE__) */
 # if defined (USE_OPENGL_ES2)
 #  include <GLES2/gl2.h>
+#  include <GLES2/gl2ext.h>
 # else
 #  ifdef _WIN32
 #   include <GL/glew.h>

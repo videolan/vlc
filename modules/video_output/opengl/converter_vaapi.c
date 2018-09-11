@@ -47,10 +47,6 @@
 # include <fcntl.h>
 #endif
 
-#if defined(USE_OPENGL_ES2)
-#   include <GLES2/gl2ext.h>
-#endif
-
 struct priv
 {
     struct vlc_vaapi_instance *vainst;
