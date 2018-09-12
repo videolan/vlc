@@ -1,0 +1,10 @@
+--- aom/av1/av1_dx_iface.c.userpriv	2018-06-27 11:19:42.000000000 +0200
++++ aom/av1/av1_dx_iface.c	2018-09-12 11:28:11.342088000 +0200
+@@ -610,6 +610,7 @@ aom_image_t *add_grain_if_needed(aom_ima
+   }
+ 
+   av1_add_film_grain(grain_params, img, grain_img_buf);
++  grain_img_buf->user_priv = img->user_priv;
+ 
+   return grain_img_buf;
+ }
