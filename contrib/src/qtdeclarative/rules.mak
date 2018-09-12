@@ -6,7 +6,13 @@ QTDECLARATIVE_URL := http://download.qt.io/official_releases/qt/5.11/$(QTDECLARA
 DEPS_qtdeclarative += qt $(DEPS_qt)
 
 ifdef HAVE_WIN32
+ifeq ($(findstring $(ARCH), arm aarch64),)
+# There is no opengl available on windows on these architectures.
+# QtDeclarative in itself should be usable without opengl though, but
+# our current build rules requires opengl (the "particles" feature
+# is unavailable if opengl is disabled).
 PKGS += qtdeclarative
+endif
 endif
 
 ifeq ($(call need_pkg,"Qt5Quick"),)

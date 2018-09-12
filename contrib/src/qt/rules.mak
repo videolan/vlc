@@ -31,6 +31,8 @@ endif
 endif
 	$(MOVE)
 
+QT_OPENGL := -opengl desktop
+
 ifdef HAVE_MACOSX
 QT_PLATFORM := -platform darwin-g++
 endif
@@ -45,10 +47,14 @@ QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 else
 QT_PLATFORM := -platform $(QT_SPEC)
 endif
+ifneq ($(findstring $(ARCH), arm aarch64),)
+# There is no opengl available on windows on these architectures.
+QT_OPENGL := -no-opengl
+endif
 endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
-	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl -opengl desktop -no-dbus \
+	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
 	-no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples -qt-zlib
 
