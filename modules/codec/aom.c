@@ -1,29 +1,29 @@
 /*****************************************************************************
- * aom.c: libaom decoder (AV1) module
- *****************************************************************************
- * Copyright (C) 2016 VLC authors and VideoLAN
- *
- * Authors: Tristan Matthews <tmatth@videolan.org>
- * Based on vpx.c by: Rafaël Carré <funman@videolan.org>
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation; either version 2.1 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
- *****************************************************************************/
+* aom.c: libaom decoder (AV1) module
+*****************************************************************************
+* Copyright (C) 2016 VLC authors and VideoLAN
+*
+* Authors: Tristan Matthews <tmatth@videolan.org>
+* Based on vpx.c by: Rafaël Carré <funman@videolan.org>
+*
+* This program is free software; you can redistribute it and/or modify it
+* under the terms of the GNU Lesser General Public License as published by
+* the Free Software Foundation; either version 2.1 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+* GNU Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public License
+* along with this program; if not, write to the Free Software Foundation,
+* Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+*****************************************************************************/
 
 /*****************************************************************************
- * Preamble
- *****************************************************************************/
+* Preamble
+*****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -38,120 +38,120 @@
 #include "demux/mp4/color_config.h"
 
 /****************************************************************************
- * Local prototypes
- ****************************************************************************/
+* Local prototypes
+****************************************************************************/
 static int OpenDecoder(vlc_object_t *);
 static void CloseDecoder(vlc_object_t *);
 
 /*****************************************************************************
- * Module descriptor
- *****************************************************************************/
+* Module descriptor
+*****************************************************************************/
 
 vlc_module_begin ()
-    set_shortname("aom")
-    set_description(N_("AOM video decoder"))
-    set_capability("video decoder", 100)
-    set_callbacks(OpenDecoder, CloseDecoder)
-    set_category(CAT_INPUT)
-    set_subcategory(SUBCAT_INPUT_VCODEC)
+set_shortname("aom")
+set_description(N_("AOM video decoder"))
+set_capability("video decoder", 100)
+set_callbacks(OpenDecoder, CloseDecoder)
+set_category(CAT_INPUT)
+set_subcategory(SUBCAT_INPUT_VCODEC)
 vlc_module_end ()
 
 static void aom_err_msg(vlc_object_t *this, aom_codec_ctx_t *ctx,
-                        const char *msg)
+                    const char *msg)
 {
-    const char *error  = aom_codec_error(ctx);
-    const char *detail = aom_codec_error_detail(ctx);
-    if (!detail)
-        detail = "no specific information";
-    msg_Err(this, msg, error, detail);
+const char *error  = aom_codec_error(ctx);
+const char *detail = aom_codec_error_detail(ctx);
+if (!detail)
+    detail = "no specific information";
+msg_Err(this, msg, error, detail);
 }
 
 #define AOM_ERR(this, ctx, msg) aom_err_msg(VLC_OBJECT(this), ctx, msg ": %s (%s)")
 #define AOM_MAX_FRAMES_DEPTH 64
 
 /*****************************************************************************
- * decoder_sys_t: libaom decoder descriptor
- *****************************************************************************/
+* decoder_sys_t: libaom decoder descriptor
+*****************************************************************************/
 struct frame_priv_s
 {
-    mtime_t pts;
+mtime_t pts;
 };
 
 struct decoder_sys_t
 {
-    aom_codec_ctx_t ctx;
-    struct frame_priv_s frame_priv[AOM_MAX_FRAMES_DEPTH];
-    unsigned i_next_frame_priv;
+aom_codec_ctx_t ctx;
+struct frame_priv_s frame_priv[AOM_MAX_FRAMES_DEPTH];
+unsigned i_next_frame_priv;
 };
 
 static const struct
 {
-    vlc_fourcc_t     i_chroma;
-    enum aom_img_fmt i_chroma_id;
-    uint8_t          i_bitdepth;
-    uint8_t          i_needs_hack;
+vlc_fourcc_t     i_chroma;
+enum aom_img_fmt i_chroma_id;
+uint8_t          i_bitdepth;
+uint8_t          i_needs_hack;
 
 } chroma_table[] =
 {
-    { VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, 0 },
-    { VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, 0 },
-    { VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, 0 },
+{ VLC_CODEC_I420, AOM_IMG_FMT_I420, 8, 0 },
+{ VLC_CODEC_I422, AOM_IMG_FMT_I422, 8, 0 },
+{ VLC_CODEC_I444, AOM_IMG_FMT_I444, 8, 0 },
 
-    { VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, 0 },
-    { VLC_CODEC_YUVA, AOM_IMG_FMT_444A, 8, 0 },
+{ VLC_CODEC_YV12, AOM_IMG_FMT_YV12, 8, 0 },
+{ VLC_CODEC_YUVA, AOM_IMG_FMT_444A, 8, 0 },
 
-    { VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, 1 },
-    { VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, 1 },
+{ VLC_CODEC_GBR_PLANAR, AOM_IMG_FMT_I444, 8, 1 },
+{ VLC_CODEC_GBR_PLANAR_10L, AOM_IMG_FMT_I44416, 10, 1 },
 
-    { VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, 0 },
-    { VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, 0 },
-    { VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, 0 },
+{ VLC_CODEC_I420_10L, AOM_IMG_FMT_I42016, 10, 0 },
+{ VLC_CODEC_I422_10L, AOM_IMG_FMT_I42216, 10, 0 },
+{ VLC_CODEC_I444_10L, AOM_IMG_FMT_I44416, 10, 0 },
 
-    { VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, 0 },
-    { VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, 0 },
-    { VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, 0 },
+{ VLC_CODEC_I420_12L, AOM_IMG_FMT_I42016, 12, 0 },
+{ VLC_CODEC_I422_12L, AOM_IMG_FMT_I42216, 12, 0 },
+{ VLC_CODEC_I444_12L, AOM_IMG_FMT_I44416, 12, 0 },
 
-    { VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, 0 },
+{ VLC_CODEC_I444_16L, AOM_IMG_FMT_I44416, 16, 0 },
 };
 
 static vlc_fourcc_t FindVlcChroma( struct aom_image *img )
 {
-    uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->tc == AOM_CICP_TC_SRGB);
+uint8_t hack = (img->fmt & AOM_IMG_FMT_I444) && (img->tc == AOM_CICP_TC_SRGB);
 
-    for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
-        if( chroma_table[i].i_chroma_id == img->fmt &&
-            chroma_table[i].i_bitdepth == img->bit_depth &&
-            chroma_table[i].i_needs_hack == hack )
-            return chroma_table[i].i_chroma;
+for( unsigned int i = 0; i < ARRAY_SIZE(chroma_table); i++ )
+    if( chroma_table[i].i_chroma_id == img->fmt &&
+        chroma_table[i].i_bitdepth == img->bit_depth &&
+        chroma_table[i].i_needs_hack == hack )
+        return chroma_table[i].i_chroma;
 
-    return 0;
+return 0;
 }
 
 static void CopyPicture(const struct aom_image *img, picture_t *pic)
 {
-    for (int plane = 0; plane < pic->i_planes; plane++ ) {
-        plane_t src_plane = pic->p[plane];
-        src_plane.p_pixels = img->planes[plane];
-        src_plane.i_pitch = img->stride[plane];
-        plane_CopyPixels(&pic->p[plane], &src_plane);
-    }
+for (int plane = 0; plane < pic->i_planes; plane++ ) {
+    plane_t src_plane = pic->p[plane];
+    src_plane.p_pixels = img->planes[plane];
+    src_plane.i_pitch = img->stride[plane];
+    plane_CopyPixels(&pic->p[plane], &src_plane);
+}
 }
 
 static int PushFrame(decoder_t *dec, block_t *block)
 {
-    decoder_sys_t *p_sys = dec->p_sys;
-    aom_codec_ctx_t *ctx = &p_sys->ctx;
-    const uint8_t *p_buffer;
-    size_t i_buffer;
+decoder_sys_t *p_sys = dec->p_sys;
+aom_codec_ctx_t *ctx = &p_sys->ctx;
+const uint8_t *p_buffer;
+size_t i_buffer;
 
-    /* Associate packet PTS with decoded frame */
-    struct frame_priv_s *priv = &p_sys->frame_priv[p_sys->i_next_frame_priv++ % AOM_MAX_FRAMES_DEPTH];
+/* Associate packet PTS with decoded frame */
+uintptr_t priv_index = p_sys->i_next_frame_priv++ % AOM_MAX_FRAMES_DEPTH;
 
-    if(likely(block))
-    {
-        p_buffer = block->p_buffer;
-        i_buffer = block->i_buffer;
-        priv->pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
+if(likely(block))
+{
+    p_buffer = block->p_buffer;
+    i_buffer = block->i_buffer;
+        p_sys->frame_priv[priv_index].pts = (block->i_pts != VLC_TS_INVALID) ? block->i_pts : block->i_dts;
     }
     else
     {
@@ -160,7 +160,7 @@ static int PushFrame(decoder_t *dec, block_t *block)
     }
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, p_buffer, i_buffer, priv);
+    err = aom_codec_decode(ctx, p_buffer, i_buffer, (void*)priv_index);
 
     if(block)
         block_Release(block);
@@ -206,13 +206,11 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         picture_t *pic = decoder_NewPicture(dec);
         if (pic)
         {
+            decoder_sys_t *p_sys = dec->p_sys;
             CopyPicture(img, pic);
 
-            /* fetches back the PTS */
-            mtime_t pts = ((struct frame_priv_s *) img->user_priv)->pts;
-
             pic->b_progressive = true; /* codec does not support interlacing */
-            pic->date = pts;
+            pic->date = p_sys->frame_priv[(uintptr_t)img->user_priv].pts;
 
             decoder_QueueVideo(dec, pic);
         }
