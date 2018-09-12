@@ -413,11 +413,13 @@ int poll (struct pollfd *, unsigned, int);
 
 #ifndef HAVE_IF_NAMEINDEX
 #include <errno.h>
+# ifndef HAVE_STRUCT_IF_NAMEINDEX
 struct if_nameindex
 {
     unsigned if_index;
     char    *if_name;
 };
+# endif
 # define if_nameindex()         (errno = ENOBUFS, NULL)
 # define if_freenameindex(list) (void)0
 #endif
