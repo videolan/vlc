@@ -172,13 +172,13 @@ static int PushFrame(decoder_t *dec, block_t *block)
     size_t i_buffer;
 
     /* Associate packet PTS with decoded frame */
-    struct frame_priv_s *priv = &p_sys->frame_priv[p_sys->i_next_frame_priv++ % AOM_MAX_FRAMES_DEPTH];
+    uintptr_t priv_index = p_sys->i_next_frame_priv++ % AOM_MAX_FRAMES_DEPTH;
 
     if(likely(block))
     {
         p_buffer = block->p_buffer;
         i_buffer = block->i_buffer;
-        priv->pts = (block->i_pts != VLC_TICK_INVALID) ? block->i_pts : block->i_dts;
+        p_sys->frame_priv[priv_index].pts = (block->i_pts != VLC_TICK_INVALID) ? block->i_pts : block->i_dts;
     }
     else
     {
@@ -187,7 +187,7 @@ static int PushFrame(decoder_t *dec, block_t *block)
     }
 
     aom_codec_err_t err;
-    err = aom_codec_decode(ctx, p_buffer, i_buffer, priv);
+    err = aom_codec_decode(ctx, p_buffer, i_buffer, (void*)priv_index);
 
     if(block)
         block_Release(block);
@@ -233,13 +233,13 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         picture_t *pic = decoder_NewPicture(dec);
         if (pic)
         {
+            decoder_sys_t *p_sys = dec->p_sys;
             CopyPicture(img, pic);
 
             /* fetches back the PTS */
-            vlc_tick_t pts = ((struct frame_priv_s *) img->user_priv)->pts;
 
             pic->b_progressive = true; /* codec does not support interlacing */
-            pic->date = pts;
+            pic->date = p_sys->frame_priv[(uintptr_t)img->user_priv].pts;
 
             decoder_QueueVideo(dec, pic);
         }
