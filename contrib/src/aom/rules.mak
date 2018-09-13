@@ -1,5 +1,5 @@
 # aom
-AOM_HASH := 3715bf25db5cdedbd8b49560903bad02d911c62f
+AOM_HASH := ce4cce47bd0eda6871cfba278f50ef82b0b5e1b0
 AOM_VERSION := v1.0.0-$(AOM_HASH)
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
 
@@ -19,6 +19,7 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $@-$(AOM_VERSION) $@
 	mkdir -p $@-$(AOM_VERSION)
 	tar xvzf "$<" -C $@-$(AOM_VERSION)
+	$(APPLY) $(SRC)/aom/0001-film-grain-copy-user_priv-from-the-source-img.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
 endif
