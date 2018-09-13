@@ -1,0 +1,11 @@
+--- aom/av1/av1_dx_iface.c.grain_odd	2018-09-13 10:21:03.995541200 +0200
++++ aom/av1/av1_dx_iface.c	2018-09-13 10:21:32.212545400 +0200
+@@ -598,7 +598,7 @@ aom_image_t *add_grain_if_needed(aom_ima
+ 
+   if (grain_img_buf &&
+       (img->d_w != grain_img_buf->d_w || img->d_h != grain_img_buf->d_h ||
+-       img->fmt != grain_img_buf->fmt || !(img->d_h % 2) || !(img->d_w % 2))) {
++       img->fmt != grain_img_buf->fmt || (img->d_h % 2) || (img->d_w % 2))) {
+     aom_img_free(grain_img_buf);
+     grain_img_buf = NULL;
+   }

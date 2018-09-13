@@ -21,6 +21,7 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	tar xvzf "$<" -C $@-$(AOM_VERSION)
 	$(APPLY) $(SRC)/aom/film-grain-copy-the-user_priv-from-the-img.patch
 	$(APPLY) $(SRC)/aom/aom-film-grain-leak.patch
+	$(APPLY) $(SRC)/aom/aom-film-grain-realloc-fix.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
 endif
