@@ -1,0 +1,22 @@
+--- aom/av1/av1_dx_iface.c.grain_leak	2018-09-13 10:16:19.944607200 +0200
++++ aom/av1/av1_dx_iface.c	2018-09-13 10:14:57.707231900 +0200
+@@ -618,6 +618,7 @@ aom_image_t *add_grain_if_needed(aom_ima
+ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
+                                       aom_codec_iter_t *iter) {
+   aom_image_t *img = NULL;
++  aom_image_t *decoded = NULL;
+ 
+   if (!iter) {
+     return NULL;
+@@ -704,7 +705,10 @@ static aom_image_t *decoder_get_frame(ao
+           img = &ctx->img;
+           img->temporal_id = cm->temporal_layer_id;
+           img->spatial_id = cm->spatial_layer_id;
+-          return add_grain_if_needed(img, ctx->image_with_grain, grain_params);
++          decoded = add_grain_if_needed(img, ctx->image_with_grain, grain_params);
++          if (decoded != img)
++              ctx->image_with_grain = decoded;
++          return decoded;
+         }
+       } else {
+         // Decoding failed. Release the worker thread.
