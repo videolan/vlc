@@ -70,6 +70,8 @@ char *vlc_getProxyUrl(const char *url)
         } else {
             return NULL;
         }
+        if (proxyHost == NULL)
+            return NULL;
 
         NSString *returnValue = [[NSString alloc] initWithFormat:@"%@://%@:%i", scheme, proxyHost, proxyPort.intValue];
         return strdup([returnValue UTF8String]);
