@@ -30,7 +30,7 @@ ${LangFileString} Desc_Section06 \
 ${LangFileString} Desc_Section07 \
     "Pievienot konteksta izvēlnes vienumus ('Atskaņot ar VLC' un 'Pievienot VLC atskaņošanas sarakstam')"
 ${LangFileString} Desc_Section08 \
-    "Dzēš VLC mediju atskaņotāja iestatījumus un kešatmiņas datnes no iepriekšējām instalācijām"
+    "Dzēš VLC mediju atskaņotāja iestatījumus un kešatmiņas datņu atlikumus no iepriekšējām instalācijām"
 
 ${LangFileString} Name_Section91 "Atinstalēt"
 ${LangFileString} Name_Section92 "Dzēst iestatījumus un kešatmiņu"
@@ -63,17 +63,17 @@ ${LangFileString} License_NextText "Tagad jūs esat apzinājies savas tiesības.
 
 ${LangFileString} Detail_CheckProcesses "Pārbauda processus..."
 ${LangFileString} MessageBox_VLCRunning "Izskatās, ka VLC darbojas, un nu tiks aizvērts."
-${LangFileString} MessageBox_VLCUnableToClose "Instalācija nespēj aizvērt VLC. Lūdzu izdariet to manuāli."
+${LangFileString} MessageBox_VLCUnableToClose "Instalētājs nespēja aizvērt VLC. Lūdzu, izdariet to pašrocīgi."
 ${LangFileString} MessageBox_InstallAborted "Instalācija pārtraukta!"
 
 ${LangFileString} Reinstall_Headline "Jau instalēts"
-${LangFileString} Reinstall_HeadlineInstall "Izvēlieties kur jūs vēlaties instalēt VLC."
-${LangFileString} Reinstall_HeadlineMaintenance "Atlasiet darbību, kuru vēlaties izpildīt."
-${LangFileString} Reinstall_MessageOlder "Sistēmā ir instalēta vecāka VLC versija. Atlasiet darbību, ko vēlaties darīt, un nospiediet Tālāk."
-${LangFileString} Reinstall_MessageNewer "VLC jaunāka versija jau ir instalēta! Nav ieteicams izmantot vecāku versiju. Atlasiet darbību, kuru vēlaties veikt, un noklikšķiniet uz Tālāk, lai turpinātu."
-${LangFileString} Reinstall_MessageSame "VLC ${VERSION} ir jau instalēts. Izvēlies opciju, kuru vēlies izpildīt, un spied Nākamais, lai turpinātu."
+${LangFileString} Reinstall_HeadlineInstall "Izvēlieties, kā jūs vēlaties instalēt VLC."
+${LangFileString} Reinstall_HeadlineMaintenance "Izvēlieties izpildāmo uzturēšanas opciju."
+${LangFileString} Reinstall_MessageOlder "Jūsu sistēmā ir instalēta vecāka VLC versija. Atlasiet darbību, ko jūs vēlaties izpildīt, un klikšķiniet Tālāk, lai turpinātu."
+${LangFileString} Reinstall_MessageNewer "Jaunāka VLC versija jau ir instalēta! Nav ieteicams, ka jūs pazemināt uz vecāku VLC versiju. Atlasiet darbību, ko jūs vēlaties izpildīt, un klikšķiniet Tālāk, lai turpinātu."
+${LangFileString} Reinstall_MessageSame "VLC ${VERSION} ir jau instalēts. Atlasiet darbību, ko jūs vēlaties izpildīt, un klikšķiniet Tālāk, lai turpinātu."
 ${LangFileString} Reinstall_OptionUpgrade "Jaunināt VLC, izmantojot iepriekšējos iestatījumus (ieteicams)"
 ${LangFileString} Reinstall_OptionDowngrade "Pazemināt VLC versiju, izmantojot iepriekšējos iestatījumus (ieteicams)"
-${LangFileString} Reinstall_OptionComponents "Pievienot, noņemt, atkārtoti instalēt komponentus"
+${LangFileString} Reinstall_OptionComponents "Pievienot/noņemt/atkārtoti instalēt komponentus"
 ${LangFileString} Reinstall_OptionAdvanced "Mainīt iestatījumus (pieredzējušiem)"
 ${LangFileString} Reinstall_OptionUninstall "Noņemt VLC"
