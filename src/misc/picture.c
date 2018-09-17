@@ -92,6 +92,11 @@ static int LCM( int a, int b )
 
 int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 {
+    const vlc_chroma_description_t *p_dsc =
+        vlc_fourcc_GetChromaDescription( fmt->i_chroma );
+    if( unlikely(!p_dsc) )
+        return VLC_EGENERIC;
+
     /* Store default values */
     p_picture->i_planes = 0;
     for( unsigned i = 0; i < VOUT_MAX_PLANES; i++ )
@@ -111,11 +116,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
         fmt->i_visible_width  > 0 && fmt->i_x_offset + fmt->i_visible_width  <= fmt->i_width &&
         fmt->i_visible_height > 0 && fmt->i_y_offset + fmt->i_visible_height <= fmt->i_height )
         video_format_CopyCrop( &p_picture->format, fmt );
-
-    const vlc_chroma_description_t *p_dsc =
-        vlc_fourcc_GetChromaDescription( p_picture->format.i_chroma );
-    if( !p_dsc )
-        return VLC_EGENERIC;
 
     /* We want V (width/height) to respect:
         (V * p_dsc->p[i].w.i_num) % p_dsc->p[i].w.i_den == 0
