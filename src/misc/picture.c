@@ -180,19 +180,6 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
 
 static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
 {
-    video_format_t fmt = *p_fmt;
-
-    /* It is needed to be sure all information are filled */
-    video_format_Setup( &fmt, p_fmt->i_chroma,
-                              p_fmt->i_width, p_fmt->i_height,
-                              p_fmt->i_visible_width, p_fmt->i_visible_height,
-                              p_fmt->i_sar_num, p_fmt->i_sar_den );
-    if( p_fmt->i_x_offset < p_fmt->i_width &&
-        p_fmt->i_y_offset < p_fmt->i_height &&
-        p_fmt->i_visible_width  > 0 && p_fmt->i_x_offset + p_fmt->i_visible_width  <= p_fmt->i_width &&
-        p_fmt->i_visible_height > 0 && p_fmt->i_y_offset + p_fmt->i_visible_height <= p_fmt->i_height )
-        video_format_CopyCrop( &fmt, p_fmt );
-
     /* */
     picture_priv_t *priv = malloc( sizeof (*priv) );
     if( unlikely(priv == NULL) )
@@ -201,10 +188,9 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
     picture_t *p_picture = &priv->picture;
 
     memset( p_picture, 0, sizeof( *p_picture ) );
-    p_picture->format = fmt;
 
     /* Make sure the real dimensions are a multiple of 16 */
-    if( picture_Setup( p_picture, &fmt ) )
+    if( picture_Setup( p_picture, p_fmt ) )
     {
         free( p_picture );
         return NULL;
