@@ -182,8 +182,24 @@ static int lavc_GetVideoFormat(decoder_t *dec, video_format_t *restrict fmt,
 
     fmt->i_width = width;
     fmt->i_height = height;
-    fmt->i_visible_width = ctx->width;
-    fmt->i_visible_height = ctx->height;
+    if ( dec->fmt_in.video.i_visible_width != 0 &&
+         dec->fmt_in.video.i_visible_width <= ctx->width &&
+         dec->fmt_in.video.i_visible_height != 0 &&
+         dec->fmt_in.video.i_visible_height <= ctx->height )
+    {
+        /* the demuxer/packetizer provided crop info that are lost in lavc */
+        fmt->i_visible_width  = dec->fmt_in.video.i_visible_width;
+        fmt->i_visible_height = dec->fmt_in.video.i_visible_height;
+        fmt->i_x_offset       = dec->fmt_in.video.i_x_offset;
+        fmt->i_y_offset       = dec->fmt_in.video.i_y_offset;
+    }
+    else
+    {
+        fmt->i_visible_width = ctx->width;
+        fmt->i_visible_height = ctx->height;
+        fmt->i_x_offset       = 0;
+        fmt->i_y_offset       = 0;
+    }
 
     /* If an aspect-ratio was specified in the input format then force it */
     if (dec->fmt_in.video.i_sar_num > 0 && dec->fmt_in.video.i_sar_den > 0)
