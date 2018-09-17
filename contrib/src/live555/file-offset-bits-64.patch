@@ -1,0 +1,22 @@
+diff --git a/liveMedia/InputFile.cpp b/liveMedia/InputFile.cpp
+index 57bd262..fe1a73b 100644
+--- a/liveMedia/InputFile.cpp
++++ b/liveMedia/InputFile.cpp
+@@ -78,7 +78,7 @@ int64_t SeekFile64(FILE *fid, int64_t offset, int whence) {
+ #if (defined(__WIN32__) || defined(_WIN32)) && !defined(_WIN32_WCE)
+   return _lseeki64(_fileno(fid), offset, whence) == (int64_t)-1 ? -1 : 0;
+ #else
+-#if defined(_WIN32_WCE)
++#if defined(_WIN32_WCE) || (defined(__ANDROID__) && __ANDROID_API__ < 24)
+   return fseek(fid, (long)(offset), whence);
+ #else
+   return fseeko(fid, (off_t)(offset), whence);
+@@ -94,7 +94,7 @@ int64_t TellFile64(FILE *fid) {
+ #if (defined(__WIN32__) || defined(_WIN32)) && !defined(_WIN32_WCE)
+   return _telli64(_fileno(fid));
+ #else
+-#if defined(_WIN32_WCE)
++#if defined(_WIN32_WCE) || (defined(__ANDROID__) && __ANDROID_API__ < 24)
+   return ftell(fid);
+ #else
+   return ftello(fid);
