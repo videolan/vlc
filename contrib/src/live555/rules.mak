@@ -80,6 +80,8 @@ ifdef HAVE_ANDROID
 ifneq ($(LEGACY_NDK), 1)
 	# Always access in_addr.s_addr field
 	$(APPLY) $(SRC)/live555/in_addr-s_addr-field.patch
+	# Don't use unavailable off64_t functions
+	$(APPLY) $(SRC)/live555/file-offset-bits-64.patch
 endif
 endif
 
