@@ -135,7 +135,7 @@ ifdef HAVE_ANDROID
 # uses that path to look for the compiler (which we already know)
 VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-clang))
 # broken text relocations
-ifeq ($(ARCH),x86_64)
+ifneq ($(filter i386 x86_64,$(ARCH)),)
 VPX_CONF += --disable-mmx
 endif
 endif
