@@ -106,6 +106,11 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
     video_format_Setup( &p_picture->format, fmt->i_chroma, fmt->i_width, fmt->i_height,
                         fmt->i_visible_width, fmt->i_visible_height,
                         fmt->i_sar_num, fmt->i_sar_den );
+    if( fmt->i_x_offset < fmt->i_width &&
+        fmt->i_y_offset < fmt->i_height &&
+        fmt->i_visible_width  > 0 && fmt->i_x_offset + fmt->i_visible_width  <= fmt->i_width &&
+        fmt->i_visible_height > 0 && fmt->i_y_offset + fmt->i_visible_height <= fmt->i_height )
+        video_format_CopyCrop( &p_picture->format, fmt );
 
     const vlc_chroma_description_t *p_dsc =
         vlc_fourcc_GetChromaDescription( p_picture->format.i_chroma );
