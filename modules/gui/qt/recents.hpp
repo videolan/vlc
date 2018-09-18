@@ -59,8 +59,8 @@ public:
     QStringList recentList();
     QSignalMapper *signalMapper;
 
-    int time( const QString &mrl );
-    void setTime( const QString &mrl, const int64_t time );
+    vlc_tick_t time( const QString &mrl );
+    void setTime( const QString &mrl, const vlc_tick_t time );
 
 private:
     RecentsMRL( intf_thread_t* _p_intf );

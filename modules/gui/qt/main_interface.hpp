@@ -157,7 +157,7 @@ protected:
     /* resume panel */
     QWidget             *resumePanel;
     QTimer              *resumeTimer;
-    int64_t             i_resumeTime;
+    vlc_tick_t          i_resumeTime;
 
     /* Status Bar */
     QLabel              *nameLabel;
@@ -266,7 +266,7 @@ protected slots:
     void setRaise();
     void voutReleaseMouseEvents();
 
-    void showResumePanel( int64_t);
+    void showResumePanel( vlc_tick_t);
     void hideResumePanel();
     void resumePlayback();
     void onInputChanged( bool );

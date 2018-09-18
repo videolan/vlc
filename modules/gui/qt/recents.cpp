@@ -161,23 +161,23 @@ void RecentsMRL::playMRL( const QString &mrl )
     Open::openMRL( p_intf, mrl );
 }
 
-int RecentsMRL::time( const QString &mrl )
+vlc_tick_t RecentsMRL::time( const QString &mrl )
 {
     if( !isActive )
         return -1;
 
     int i_index = recents.indexOf( mrl );
     if( i_index != -1 )
-        return times.value(i_index, "-1").toInt();
+        return VLC_TICK_FROM_MS(times.value(i_index, "-1").toInt());
     else
         return -1;
 }
 
-void RecentsMRL::setTime( const QString &mrl, const int64_t time )
+void RecentsMRL::setTime( const QString &mrl, const vlc_tick_t time )
 {
     int i_index = recents.indexOf( mrl );
     if( i_index != -1 )
-        times[i_index] = QString::number( time / 1000 );
+        times[i_index] = QString::number( MS_FROM_VLC_TICK( time ) );
 }
 
 int Open::openMRL( intf_thread_t *p_intf,

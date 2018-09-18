@@ -119,13 +119,13 @@ void InputManager::setInput( input_thread_t *_p_input )
         {
             char *uri = input_item_GetURI( p_item );
 
-            int i_time = RecentsMRL::getInstance( p_intf )->time( qfu(uri) );
+            vlc_tick_t i_time = RecentsMRL::getInstance( p_intf )->time( qfu(uri) );
             if( i_time > 0 && qfu( uri ) != lastURI &&
                     !var_GetFloat( p_input, "run-time" ) &&
                     !var_GetFloat( p_input, "start-time" ) &&
                     !var_GetFloat( p_input, "stop-time" ) )
             {
-                emit resumePlayback( (int64_t)i_time * 1000 );
+                emit resumePlayback( i_time );
             }
             playlist_Lock( THEPL );
             // Add root items only

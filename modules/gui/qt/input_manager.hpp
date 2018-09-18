@@ -225,7 +225,7 @@ signals:
     void chapterChanged( bool );
     void inputCanSeek( bool );
     /// You can resume playback
-    void resumePlayback( int64_t );
+    void resumePlayback( vlc_tick_t );
     /// Statistics are updated
     void statisticsUpdated( input_item_t* );
     void infoChanged( input_item_t* );
