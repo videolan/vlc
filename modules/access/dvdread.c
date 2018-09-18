@@ -290,19 +290,19 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static int64_t dvdtime_to_time( dvd_time_t *dtime, uint8_t still_time )
+static vlc_tick_t dvdtime_to_time( dvd_time_t *dtime, uint8_t still_time )
 {
 /* Macro to convert Binary Coded Decimal to Decimal */
 #define BCD2D(__x__) (((__x__ & 0xf0) >> 4) * 10 + (__x__ & 0x0f))
 
     double f_fps, f_ms;
-    int64_t i_micro_second = 0;
+    vlc_tick_t i_micro_second;
 
     if (still_time == 0 || still_time == 0xFF)
     {
-        i_micro_second += (int64_t)(BCD2D(dtime->hour)) * 60 * 60 * 1000000;
-        i_micro_second += (int64_t)(BCD2D(dtime->minute)) * 60 * 1000000;
-        i_micro_second += (int64_t)(BCD2D(dtime->second)) * 1000000;
+        int64_t sec = (int64_t)(BCD2D(dtime->hour)) * 60 * 60;
+        sec += (int64_t)(BCD2D(dtime->minute)) * 60;
+        sec += (int64_t)(BCD2D(dtime->second));
 
         switch((dtime->frame_u & 0xc0) >> 6)
         {
@@ -317,12 +317,11 @@ static int64_t dvdtime_to_time( dvd_time_t *dtime, uint8_t still_time )
             break;
         }
         f_ms = BCD2D(dtime->frame_u&0x3f) * 1000.0 / f_fps;
-        i_micro_second += (int64_t)(f_ms * 1000.0);
+        i_micro_second = vlc_tick_from_sec(sec) + VLC_TICK_FROM_MS(f_ms);
     }
     else
     {
-        i_micro_second = still_time;
-        i_micro_second = (int64_t)((double)i_micro_second * 1000000.0);
+        i_micro_second = vlc_tick_from_sec(still_time);
     }
 
     return i_micro_second;
@@ -1186,7 +1185,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
      * Store the timecodes so we can get the current time
      */
     p_sys->i_title_cur_time = (vlc_tick_t) p_sys->dsi_pack.dsi_gi.nv_pck_scr / 90 * 1000;
-    p_sys->i_cell_cur_time = (vlc_tick_t) dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
+    p_sys->i_cell_cur_time = dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 );
 
     /*
      * If we're not at the end of this cell, we can determine the next
@@ -1255,7 +1254,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
         p_sys->i_next_vobu =
             p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].first_sector;
 
-        p_sys->i_cell_duration = (vlc_tick_t)dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time, 0 );
+        p_sys->i_cell_duration = dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time, 0 );
     }
 
 
@@ -1269,7 +1268,7 @@ static void DvdReadHandleDSI( demux_t *p_demux, uint8_t *p_data )
              dvdtime_to_time( &p_sys->dsi_pack.dsi_gi.c_eltm, 0 ) );
 
     msg_Dbg( p_demux, "cell duration: %lld",
-             (vlc_tick_t)dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time, 0 ) );
+             dvdtime_to_time( &p_sys->p_cur_pgc->cell_playback[p_sys->i_cur_cell].playback_time, 0 ) );
 
     msg_Dbg( p_demux, "cat 0x%02x ilvu_ea %d ilvu_sa %d size %d",
              p_sys->dsi_pack.sml_pbi.category,
