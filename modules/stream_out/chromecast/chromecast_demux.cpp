@@ -104,7 +104,7 @@ struct demux_cc
                               &i_nb_titles, &i_title_offset,
                               &i_chapter_offset ) == VLC_SUCCESS )
             {
-                int64_t i_longest_duration = 0;
+                vlc_tick_t i_longest_duration = 0;
                 int i_longest_title = 0;
                 bool b_is_interactive = false;
                 for( int i = 0 ; i < i_nb_titles; ++i )
