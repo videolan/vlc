@@ -372,7 +372,7 @@ typedef struct
     int64_t         i_bitrate_min;
     int64_t         i_bitrate_max;
 
-    int64_t         i_shaping_delay;
+    vlc_tick_t      i_shaping_delay;
     int64_t         i_pcr_delay;
 
     vlc_tick_t      i_dts_delay;
@@ -708,13 +708,16 @@ static int Open( vlc_object_t *p_this )
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "shaping", &val );
-    p_sys->i_shaping_delay = val.i_int * 1000;
-    if( p_sys->i_shaping_delay <= 0 )
+    if( val.i_int <= 0 )
     {
         msg_Err( p_mux,
                  "invalid shaping (%"PRId64"ms) resetting to 200ms",
-                 p_sys->i_shaping_delay / 1000 );
+                 val.i_int );
         p_sys->i_shaping_delay = VLC_TICK_FROM_MS(200);
+    }
+    else
+    {
+        p_sys->i_shaping_delay = VLC_TICK_FROM_MS(val.i_int);
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val );
