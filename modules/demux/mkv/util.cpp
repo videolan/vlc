@@ -353,7 +353,7 @@ int UpdatePCR( demux_t * p_demux )
     return VLC_SUCCESS;
 }
 
-void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, vlc_tick_t i_duration )
+void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsigned int i_number_frames, int64_t i_duration )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
     matroska_segment_c *p_segment = p_sys->p_current_vsegment->CurrentSegment();
@@ -373,8 +373,8 @@ void send_Block( demux_t * p_demux, mkv_track_t * p_tk, block_t * p_block, unsig
 
     if( !p_tk->b_no_duration )
     {
-        p_block->i_length = i_duration * p_tk->f_timecodescale *
-            (double) p_segment->i_timescale / ( 1000.0 * i_number_frames );
+        p_block->i_length = VLC_TICK_FROM_NS(i_duration * p_tk->f_timecodescale *
+                                             p_segment->i_timescale) / i_number_frames;
     }
 
     if( p_tk->b_discontinuity )

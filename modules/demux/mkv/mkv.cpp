@@ -623,8 +623,8 @@ static void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simp
 
          case VLC_CODEC_OPUS:
             {
-                vlc_tick_t i_length = i_duration * track. f_timecodescale *
-                        (double) p_segment->i_timescale / 1000.0;
+                vlc_tick_t i_length = VLC_TICK_FROM_NS(i_duration * track.f_timecodescale *
+                                                       p_segment->i_timescale);
                 if ( i_length < 0 ) i_length = 0;
                 p_block->i_nb_samples = i_length * track.fmt.audio.i_rate
                         / CLOCK_FREQ;
