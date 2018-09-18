@@ -436,14 +436,14 @@ static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr,
     uint8_t *p = p_pkt->p_buffer;
     if( p_pkt->i_buffer >= 14 && (p[4] >> 6) == 0x01 )
     {
-        *pi_scr = FROM_SCALE_NZ( ExtractPackHeaderTimestamp( &p[4] ) );
+        *pi_scr = FROM_SCALE( ExtractPackHeaderTimestamp( &p[4] ) );
         *pi_mux_rate = ( p[10] << 14 )|( p[11] << 6 )|( p[12] >> 2);
     }
     else if( p_pkt->i_buffer >= 12 && (p[4] >> 4) == 0x02 ) /* MPEG-1 Pack SCR, same bits as PES/PTS */
     {
         if(!ExtractPESTimestamp( &p[4], 0x02, pi_scr ))
             return VLC_EGENERIC;
-        *pi_scr = FROM_SCALE_NZ( *pi_scr );
+        *pi_scr = FROM_SCALE( *pi_scr );
         *pi_mux_rate = ( ( p[9]&0x7f )<< 15 )|( p[10] << 7 )|( p[11] >> 1);
     }
     else
