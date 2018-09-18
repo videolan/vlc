@@ -23,6 +23,9 @@ aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
 endif
+ifdef HAVE_ANDROID
+	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
+endif
 	$(MOVE)
 
 DEPS_aom =
