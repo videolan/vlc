@@ -73,7 +73,7 @@ typedef struct
 
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
-    int i_timeout;
+    vlc_tick_t i_timeout;
 
     char *format; /**< marquee text format */
     char *filepath; /**< marquee file path */
@@ -210,7 +210,9 @@ static int CreateFilter( vlc_object_t *p_this )
 
     CREATE_VAR( i_xoff, Integer, "marq-x" );
     CREATE_VAR( i_yoff, Integer, "marq-y" );
-    CREATE_VAR( i_timeout,Integer, "marq-timeout" );
+    p_sys->i_timeout = VLC_TICK_FROM_MS(var_CreateGetIntegerCommand( p_filter,
+                                                              "marq-timeout" ));
+    var_AddCallback( p_filter, "marq-timeout", MarqueeCallback, p_sys );
     p_sys->i_refresh = VLC_TICK_FROM_MS(var_CreateGetIntegerCommand( p_filter,
                                                               "marq-refresh" ));
     var_AddCallback( p_filter, "marq-refresh", MarqueeCallback, p_sys );
@@ -316,7 +318,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
 
     p_spu->p_region->p_text = text_segment_New( msg );
     p_spu->i_start = date;
-    p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout * 1000;
+    p_spu->i_stop  = p_sys->i_timeout == 0 ? 0 : date + p_sys->i_timeout;
     p_spu->b_ephemer = true;
 
     /*  where to locate the string: */
@@ -406,7 +408,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strcmp( psz_var, "marq-timeout" ) )
     {
-        p_sys->i_timeout = newval.i_int;
+        p_sys->i_timeout = VLC_TICK_FROM_MS(newval.i_int);
     }
     else if ( !strcmp( psz_var, "marq-refresh" ) )
     {
