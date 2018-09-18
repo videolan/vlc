@@ -373,7 +373,7 @@ typedef struct
     int64_t         i_bitrate_max;
 
     vlc_tick_t      i_shaping_delay;
-    int64_t         i_pcr_delay;
+    vlc_tick_t      i_pcr_delay;
 
     vlc_tick_t      i_dts_delay;
     vlc_tick_t      first_dts;
@@ -605,7 +605,7 @@ static int Open( vlc_object_t *p_this )
     vlc_rand_bytes(subi, sizeof(subi));
     p_sys->i_pat_version_number = nrand48(subi) & 0x1f;
 
-    vlc_value_t val;
+    vlc_value_t val,val2;
     var_Get( p_mux, SOUT_CFG_PREFIX "tsid", &val );
     if ( val.i_int )
         p_sys->i_tsid = val.i_int;
@@ -720,15 +720,17 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_shaping_delay = VLC_TICK_FROM_MS(val.i_int);
     }
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val );
-    p_sys->i_pcr_delay = val.i_int * 1000;
-    if( p_sys->i_pcr_delay <= 0 ||
-        p_sys->i_pcr_delay >= p_sys->i_shaping_delay )
+    var_Get( p_mux, SOUT_CFG_PREFIX "pcr", &val2 );
+    if( val2.i_int <= 0 || val2.i_int >= val.i_int )
     {
         msg_Err( p_mux,
                  "invalid pcr delay (%"PRId64"ms) resetting to 70ms",
-                 p_sys->i_pcr_delay / 1000 );
+                 val2.i_int );
         p_sys->i_pcr_delay = VLC_TICK_FROM_MS(70);
+    }
+    else
+    {
+        p_sys->i_pcr_delay = VLC_TICK_FROM_MS(val2.i_int);
     }
 
     var_Get( p_mux, SOUT_CFG_PREFIX "dts-delay", &val );
