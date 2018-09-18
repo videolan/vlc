@@ -211,7 +211,7 @@ typedef struct
         bool b_head_done;
         /* backup values for rewriting fishead page later */
         uint64_t i_fishead_offset;  /* sout offset of the fishead page */
-        int i_index_intvl;
+        vlc_tick_t i_index_intvl;
         float i_index_ratio;
     } skeleton;
 
@@ -249,7 +249,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->skeleton.b_create = false;
     p_sys->skeleton.b_head_done = false;
     p_sys->skeleton.i_index_intvl =
-            var_InheritInteger( p_this, SOUT_CFG_PREFIX "indexintvl" );
+            VLC_TICK_FROM_MS(var_InheritInteger( p_this, SOUT_CFG_PREFIX "indexintvl" ));
     p_sys->skeleton.i_index_ratio =
             var_InheritFloat( p_this, SOUT_CFG_PREFIX "indexratio" );
     p_sys->i_data_start = 0;
@@ -639,8 +639,7 @@ static bool AddIndexEntry( sout_mux_t *p_mux, vlc_tick_t i_time, sout_input_t *p
     i_posdelta = p_sys->i_pos - p_stream->skeleton.i_last_keyframe_pos;
     i_timedelta = i_time - p_stream->skeleton.i_last_keyframe_time;
 
-    if ( i_timedelta <= ( (uint64_t) p_sys->skeleton.i_index_intvl * 1000 )
-         || i_posdelta <= 0xFFFF )
+    if ( i_timedelta <= p_sys->skeleton.i_index_intvl || i_posdelta <= 0xFFFF )
         return false;
 
     /* do inserts */
@@ -1430,7 +1429,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
 
     if ( p_stream->i_length )
     {
-        uint64_t i_interval = (uint64_t)p_sys->skeleton.i_index_intvl * 1000;
+        vlc_tick_t i_interval = p_sys->skeleton.i_index_intvl;
         uint64_t i;
 
         if( p_input->p_fmt->i_cat == VIDEO_ES &&
@@ -1465,7 +1464,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
     }
     else
     {
-        i_size = ( INT64_C(3600) * 11.2 * 1000 / p_sys->skeleton.i_index_intvl )
+        i_size = ( INT64_C(3600) * 11.2 * CLOCK_FREQ / p_sys->skeleton.i_index_intvl )
                 * p_sys->skeleton.i_index_ratio;
         msg_Dbg( p_mux, "No stream length, using default allocation for index" );
     }
