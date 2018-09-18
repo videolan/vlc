@@ -69,7 +69,7 @@ struct rtsp_stream_t
     int             sessionc;
     rtsp_session_t **sessionv;
 
-    unsigned        timeout;
+    vlc_tick_t      timeout;
     vlc_timer_t     timer;
 };
 
@@ -96,7 +96,7 @@ rtsp_stream_t *RtspSetup( vlc_object_t *owner, vod_media_t *media,
     rtsp->vod_media = media;
     vlc_mutex_init( &rtsp->lock );
 
-    rtsp->timeout = __MAX(0,var_InheritInteger(owner, "rtsp-timeout"));
+    rtsp->timeout = vlc_tick_from_sec(__MAX(0,var_InheritInteger(owner, "rtsp-timeout")));
     if (rtsp->timeout != 0)
     {
         if (vlc_timer_create(&rtsp->timer, RtspTimeOut, rtsp))
@@ -311,7 +311,7 @@ static void RtspUpdateTimer( rtsp_stream_t *rtsp )
     }
     if (timeout != 0)
     {
-        timeout += vlc_tick_from_sec( rtsp->timeout );
+        timeout += rtsp->timeout;
         vlc_timer_schedule(rtsp->timer, true, timeout, VLC_TIMER_FIRE_ONCE);
     }
     else
@@ -329,7 +329,7 @@ static void RtspTimeOut( void *data )
     vlc_tick_t now = vlc_tick_now();
     for (int i = rtsp->sessionc - 1; i >= 0; i--)
     {
-        if (rtsp->sessionv[i]->last_seen + vlc_tick_from_sec( rtsp->timeout ) < now)
+        if (rtsp->sessionv[i]->last_seen + rtsp->timeout < now)
         {
             if (rtsp->vod_media != NULL)
             {
@@ -1201,8 +1201,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
     if( psz_session )
     {
         if (rtsp->timeout != 0)
-            httpd_MsgAdd( answer, "Session", "%s;timeout=%u", psz_session,
-                                                              rtsp->timeout );
+            httpd_MsgAdd( answer, "Session", "%s;timeout=%" PRIu64, psz_session,
+                                                              SEC_FROM_VLC_TICK(rtsp->timeout) );
         else
             httpd_MsgAdd( answer, "Session", "%s", psz_session );
     }
