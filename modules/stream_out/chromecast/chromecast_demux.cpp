@@ -199,7 +199,7 @@ struct demux_cc
         if( m_start_time < 0 )
             return -1;
 
-        int64_t time = m_start_time;
+        vlc_tick_t time = m_start_time;
         vlc_tick_t cc_time = getCCTime();
 
         if( cc_time != VLC_TICK_INVALID )
