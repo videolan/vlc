@@ -177,7 +177,7 @@ typedef struct
          int i_index_pageno;
          /* index creation tracking values */
          uint64_t i_last_keyframe_pos;
-         uint64_t i_last_keyframe_time;
+         vlc_tick_t i_last_keyframe_time;
     } skeleton;
 
     int             i_dirac_last_pt;
@@ -624,12 +624,12 @@ static int WriteQWVariableLE( uint64_t i_64, uint64_t i_offset,
     }
 }
 
-static bool AddIndexEntry( sout_mux_t *p_mux, uint64_t i_time, sout_input_t *p_input )
+static bool AddIndexEntry( sout_mux_t *p_mux, vlc_tick_t i_time, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
     uint64_t i_posdelta;
-    uint64_t i_timedelta;
+    vlc_tick_t i_timedelta;
     if ( !p_sys->skeleton.b_create || p_sys->skeleton.i_index_intvl == 0
          || !p_stream->skeleton.p_index )
         return false;
