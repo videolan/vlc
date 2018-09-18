@@ -208,7 +208,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         return -1;
 
     int64_t i_pkt_time;
-    uint8_t i_pkt_time_delta = 0;
+    vlc_tick_t i_pkt_time_delta = 0;
     uint32_t i_payload_data_length = 0;
     uint32_t i_temp_payload_length = 0;
     *p_packetsys->pi_preroll = __MIN( *p_packetsys->pi_preroll, INT64_MAX );
@@ -250,7 +250,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
     {
         /* i_media_object_offset is *media* presentation time */
         /* Next byte is *media* Presentation Time Delta */
-        i_pkt_time_delta = pkt->p_peek[pkt->i_skip];
+        i_pkt_time_delta = VLC_TICK_FROM_MS(pkt->p_peek[pkt->i_skip]);
         b_ignore_pts = false;
         i_pkt_time = (vlc_tick_t)i_media_object_offset;
         i_pkt_time -= *p_packetsys->pi_preroll;
@@ -335,7 +335,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
         SkipBytes( p_demux->s, pkt->i_skip );
 
         vlc_tick_t i_payload_pts;
-        i_payload_pts = i_pkt_time + (vlc_tick_t)i_pkt_time_delta * i_subpayload_count * 1000;
+        i_payload_pts = i_pkt_time + i_pkt_time_delta * i_subpayload_count;
         if ( p_tkinfo->p_sp )
             i_payload_pts -= VLC_TICK_FROM_MSFTIME(p_tkinfo->p_sp->i_time_offset);
 
