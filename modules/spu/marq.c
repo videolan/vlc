@@ -211,8 +211,8 @@ static int CreateFilter( vlc_object_t *p_this )
     CREATE_VAR( i_xoff, Integer, "marq-x" );
     CREATE_VAR( i_yoff, Integer, "marq-y" );
     CREATE_VAR( i_timeout,Integer, "marq-timeout" );
-    p_sys->i_refresh = 1000 * var_CreateGetIntegerCommand( p_filter,
-                                                           "marq-refresh" );
+    p_sys->i_refresh = VLC_TICK_FROM_MS(var_CreateGetIntegerCommand( p_filter,
+                                                              "marq-refresh" ));
     var_AddCallback( p_filter, "marq-refresh", MarqueeCallback, p_sys );
     CREATE_VAR( i_pos, Integer, "marq-position" );
     CREATE_VAR( format, String, "marq-marquee" );
@@ -410,7 +410,7 @@ static int MarqueeCallback( vlc_object_t *p_this, char const *psz_var,
     }
     else if ( !strcmp( psz_var, "marq-refresh" ) )
     {
-        p_sys->i_refresh = newval.i_int * 1000;
+        p_sys->i_refresh = VLC_TICK_FROM_MS(newval.i_int);
     }
     else if ( !strcmp( psz_var, "marq-position" ) )
     /* willing to accept a match against marq-pos */
