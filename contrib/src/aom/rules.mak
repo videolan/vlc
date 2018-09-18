@@ -77,6 +77,16 @@ AOM_CONF += -DAOM_TARGET_CPU=armv7
 endif
 endif
 
+# Force cpu detection
+ifdef HAVE_ANDROID
+ifeq ($(ARCH),arm)
+AOM_CONF += -DAOM_TARGET_CPU=armv7
+endif
+ifeq ($(ARCH),aarch64)
+AOM_CONF += -DAOM_TARGET_CPU=arm64
+endif
+endif
+
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
 	cd $< && mkdir -p aom_build
