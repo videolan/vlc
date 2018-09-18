@@ -367,7 +367,7 @@ static int Open( vlc_object_t *p_this )
         if ( i_ret != SHOUTERR_CONNECTED )
         {
             msg_Warn( p_access, "unable to establish connection, retrying..." );
-            vlc_tick_sleep( 30000000 );
+            vlc_tick_sleep( VLC_TICK_FROM_SEC(30) );
         }
     }
 
