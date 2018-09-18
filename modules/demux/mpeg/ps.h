@@ -430,7 +430,7 @@ static inline int ps_pkt_size( const uint8_t *p, int i_peek )
 }
 
 /* parse a PACK PES */
-static inline int ps_pkt_parse_pack( block_t *p_pkt, int64_t *pi_scr,
+static inline int ps_pkt_parse_pack( block_t *p_pkt, vlc_tick_t *pi_scr,
                                      int *pi_mux_rate )
 {
     uint8_t *p = p_pkt->p_buffer;

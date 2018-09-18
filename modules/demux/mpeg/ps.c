@@ -87,8 +87,8 @@ typedef struct
     ps_psm_t    psm;
     ps_track_t  tk[PS_TK_COUNT];
 
-    int64_t     i_pack_scr; /* current read pack scr value, temp */
-    int64_t     i_first_scr; /* media offset */
+    vlc_tick_t  i_pack_scr; /* current read pack scr value, temp */
+    vlc_tick_t  i_first_scr; /* media offset */
     int64_t     i_scr; /* committed, current position */
     int64_t     i_scr_track_id;
     int         i_mux_rate;
@@ -322,7 +322,7 @@ static int Probe( demux_t *p_demux, bool b_end )
     }
     else if( i_id == PS_STREAM_ID_PACK_HEADER )
     {
-        int64_t i_scr; int dummy;
+        vlc_tick_t i_scr; int dummy;
         if( !b_end && !ps_pkt_parse_pack( p_pkt, &i_scr, &dummy ) )
         {
             if( p_sys->i_first_scr == -1 )

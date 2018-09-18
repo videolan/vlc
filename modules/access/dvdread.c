@@ -618,7 +618,7 @@ static int DemuxBlock( demux_t *p_demux, const uint8_t *p, int len )
 
         case 0x1ba:
         {
-            int64_t i_scr;
+            vlc_tick_t i_scr;
             int i_mux_rate;
             if( !ps_pkt_parse_pack( p_pkt, &i_scr, &i_mux_rate ) )
             {
