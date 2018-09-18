@@ -50,7 +50,7 @@ virtual_chapter_c * virtual_chapter_c::CreateVirtualChapter( chapter_item_c * p_
     if( !p_chap )
     {
         /* Dummy chapter use the whole segment */
-        return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration * 1000, sub_chapters );
+        return new (std::nothrow) virtual_chapter_c( main_segment, NULL, 0, main_segment.i_duration, sub_chapters );
     }
 
     matroska_segment_c * p_segment = &main_segment;
@@ -252,7 +252,7 @@ void virtual_edition_c::retimeChapters()
         virtual_chapter_c * p_vchap = vchapters[i];
 
         p_vchap->i_mk_virtual_start_time = i_duration;
-        i_duration += p_vchap->segment.i_duration * 1000;
+        i_duration += p_vchap->segment.i_duration;
         p_vchap->i_mk_virtual_stop_time = i_duration;
 
         retimeSubChapters( p_vchap );

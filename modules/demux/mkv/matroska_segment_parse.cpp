@@ -988,9 +988,10 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         matroska_segment_c * obj;
         EbmlElement       *&  el;
         EbmlMaster        *&   m;
+        double             f_duration;
         int& i_upper_level;
 
-    } captures = { &sys.demuxer, this, el, m, i_upper_level };
+    } captures = { &sys.demuxer, this, el, m, -1., i_upper_level };
 
     MKV_SWITCH_CREATE(EbmlTypeDispatcher, InfoHandlers, InfoHandlerPayload)
     {
@@ -1035,8 +1036,8 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
         }
         E_CASE( KaxDuration, dur )
         {
-            vars.obj->i_duration = vlc_tick_t( static_cast<double>( dur ) );
-            debug( vars, "Duration=%" PRId64, vars.obj->i_duration );
+            vars.f_duration = static_cast<double>( dur );
+            debug( vars, "Duration=%.0f", vars.f_duration );
         }
         E_CASE( KaxMuxingApp, mapp )
         {
@@ -1131,8 +1132,8 @@ void matroska_segment_c::ParseInfo( KaxInfo *info )
 
     InfoHandlers::Dispatcher().iterate( m->begin(), m->end(), &captures );
 
-    if( i_duration != -1 )
-        i_duration = vlc_tick_t( static_cast<double>( i_duration * i_timescale ) / 10e5 );
+    if( captures.f_duration != -1. )
+        i_duration = VLC_TICK_FROM_NS( captures.f_duration * i_timescale );
 }
 
 

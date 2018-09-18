@@ -1094,8 +1094,8 @@ void matroska_segment_c::EnsureDuration()
             }
         }
 
-        i_duration = ( i_last_timecode - cluster->GlobalTimecode() ) / CLOCK_FREQ;
-        msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, i_duration );
+        i_duration = VLC_TICK_FROM_NS( i_last_timecode - cluster->GlobalTimecode() );
+        msg_Dbg( &sys.demuxer, " extracted Duration=%" PRId64, SEC_FROM_VLC_TICK(i_duration) );
     }
 
     // get back to the reading position we were at before looking for a duration
