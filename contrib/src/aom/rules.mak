@@ -25,8 +25,12 @@ ifdef HAVE_WINSTORE
 endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/aom/aom-android-pthreads.patch
+	$(APPLY) $(SRC)/aom/aom-android-cpufeatures.patch
 endif
 	$(MOVE)
+ifdef HAVE_ANDROID
+	cp $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.c $(ANDROID_NDK)/sources/android/cpufeatures/cpu-features.h aom/aom_ports/
+endif
 
 DEPS_aom =
 ifdef HAVE_WIN32
