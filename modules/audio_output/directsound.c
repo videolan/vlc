@@ -1117,6 +1117,7 @@ static void * PlayedDataEraser( void * data )
     unsigned long l_bytes1, l_bytes2;
     DWORD i_read;
     int64_t toerase, tosleep;
+    vlc_tick_t ticksleep;
     HRESULT dsresult;
 
     for(;;)
@@ -1141,10 +1142,10 @@ static void * PlayedDataEraser( void * data )
             else
                 tosleep += DS_BUF_SIZE;
             toerase = max;
-            tosleep = ( tosleep / p_sys->i_bytes_per_sample ) * CLOCK_FREQ / p_sys->i_rate;
+            ticksleep = vlc_tick_from_sec( tosleep / p_sys->i_bytes_per_sample ) / p_sys->i_rate;
         }
 
-        tosleep = __MAX( tosleep, VLC_TICK_FROM_MS(20) );
+        ticksleep = __MAX( ticksleep, VLC_TICK_FROM_MS(20) );
         dsresult = IDirectSoundBuffer_Lock( p_sys->p_dsbuffer,
                                             p_sys->i_write,
                                             toerase,
@@ -1176,7 +1177,7 @@ static void * PlayedDataEraser( void * data )
 wait:
         vlc_mutex_unlock(&p_sys->lock);
         vlc_restorecancel(canc);
-        vlc_tick_sleep(tosleep);
+        vlc_tick_sleep(ticksleep);
     }
     return NULL;
 }
