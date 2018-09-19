@@ -1,0 +1,15 @@
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index a658544..86db9b9 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -988,10 +988,6 @@ EOF
+               add_ldflags "--sysroot=${alt_libc}"
+             fi
+ 
+-            # linker flag that routes around a CPU bug in some
+-            # Cortex-A8 implementations (NDK Dev Guide)
+-            add_ldflags "-Wl,--fix-cortex-a8"
+-
+             enable_feature pic
+             soft_enable realtime_only
+             if [ ${tgt_isa} = "armv7" ]; then
