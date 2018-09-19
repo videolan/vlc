@@ -33,7 +33,7 @@ struct task {
     struct vlc_list node;
     void* id; /**< id associated with entity */
     void* entity; /**< the entity to process */
-    vlc_tick_t timeout; /**< timeout duration in milliseconds */
+    int timeout; /**< timeout duration in milliseconds */
 };
 
 struct background_worker;
@@ -73,7 +73,7 @@ static struct task *task_Create(struct background_worker *worker, void *id,
 
     task->id = id;
     task->entity = entity;
-    task->timeout = timeout < 0 ? worker->conf.default_timeout : VLC_TICK_FROM_MS(timeout);
+    task->timeout = timeout < 0 ? worker->conf.default_timeout : timeout;
     worker->conf.pf_hold(task->entity);
     return task;
 }
@@ -84,17 +84,17 @@ static void task_Destroy(struct background_worker *worker, struct task *task)
     free(task);
 }
 
-static struct task *QueueTake(struct background_worker *worker, vlc_tick_t timeout)
+static struct task *QueueTake(struct background_worker *worker, int timeout_ms)
 {
     vlc_assert_locked(&worker->lock);
 
-    vlc_tick_t deadline = vlc_tick_now() + timeout;
-    bool has_timeout = false;
-    while (!has_timeout && !worker->closing && vlc_list_is_empty(&worker->queue))
-        has_timeout = vlc_cond_timedwait(&worker->queue_wait,
+    vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(timeout_ms);
+    bool timeout = false;
+    while (!timeout && !worker->closing && vlc_list_is_empty(&worker->queue))
+        timeout = vlc_cond_timedwait(&worker->queue_wait,
                                      &worker->lock, deadline) != 0;
 
-    if (worker->closing || has_timeout)
+    if (worker->closing || timeout)
         return NULL;
 
     struct task *task = vlc_list_first_entry_or_null(&worker->queue,
@@ -212,7 +212,7 @@ static void* Thread( void* data )
     for (;;)
     {
         vlc_mutex_lock(&worker->lock);
-        struct task *task = QueueTake(worker, VLC_TICK_FROM_SEC(5));
+        struct task *task = QueueTake(worker, 5000);
         if (!task)
         {
             vlc_mutex_unlock(&worker->lock);
