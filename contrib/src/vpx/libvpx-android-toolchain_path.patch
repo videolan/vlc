@@ -1,0 +1,21 @@
+diff --git a/build/make/configure.sh b/build/make/configure.sh
+index 2e0b239..8853d18 100644
+--- a/build/make/configure.sh
++++ b/build/make/configure.sh
+@@ -951,9 +951,14 @@ EOF
+         android*)
+           if [ -n "${sdk_path}" ]; then
+             SDK_PATH=${sdk_path}
++            if [ ${tgt_isa} != "arm64" ]; then
++                tools_prefix=arm-linux-androideabi-
++            else
++                tools_prefix=aarch64-linux-android-
++            fi
+             COMPILER_LOCATION=`find "${SDK_PATH}" \
+-              -name "arm-linux-androideabi-gcc*" -print -quit`
+-            TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/arm-linux-androideabi-
++              -name "${tools_prefix}gcc*" -print -quit`
++            TOOLCHAIN_PATH=${COMPILER_LOCATION%/*}/${tools_prefix}
+             CC=clang
+             CXX=clang++
+             AR=${TOOLCHAIN_PATH}ar
