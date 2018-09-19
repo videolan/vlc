@@ -937,15 +937,12 @@ static void ResetTime( demux_t *p_demux, int64_t i_time )
     }
     else
     {
-        if( CLOCK_FREQ == AV_TIME_BASE )
-        {
-            t = i_time;
-        }
-        else
-        {
-            lldiv_t q = lldiv( i_time, AV_TIME_BASE );
-            t = q.quot * CLOCK_FREQ + q.rem * CLOCK_FREQ / AV_TIME_BASE;
-        }
+#if CLOCK_FREQ == AV_TIME_BASE
+        t = FROM_AV_TS(i_time);
+#else
+        lldiv_t q = lldiv( i_time, AV_TIME_BASE );
+        t = vlc_tick_from_sec(q.quot) + FROM_AV_TS(q.rem);
+#endif
 
         if( t == VLC_TICK_INVALID )
             t = VLC_TICK_0;
