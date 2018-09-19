@@ -946,10 +946,10 @@ static ssize_t writeSegment( sout_access_out_t *p_access )
 
     block_t *output = p_sys->full_segments;
     vlc_tick_t output_last_length;
-    if( output )
-        output_last_length = output->i_length;
-    else if( *p_sys->full_segments_end )
+    if( *p_sys->full_segments_end )
         output_last_length = (*p_sys->full_segments_end)->i_length;
+    else if( output )
+        output_last_length = output->i_length;
     else
         output_last_length = 0;
     p_sys->full_segments = NULL;
