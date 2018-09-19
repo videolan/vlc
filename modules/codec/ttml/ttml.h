@@ -35,7 +35,7 @@ enum
 
 typedef struct
 {
-    int64_t base;
+    vlc_tick_t base;
     unsigned frames;
     //unsigned ticks;
 } tt_time_t;
