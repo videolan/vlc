@@ -80,6 +80,10 @@ vlc_module_begin ()
             change_integer_range( 0, 3 )
         add_integer( SOUT_CFG_PREFIX "bitdepth", 8, "Bit Depth", NULL, true )
             change_integer_list( pi_enc_bitdepth_values_list, ppsz_enc_bitdepth_text )
+        add_integer( SOUT_CFG_PREFIX "tile-rows", 0, "Tile Rows (in log2 units)", NULL, true )
+            change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_ROWS */
+        add_integer( SOUT_CFG_PREFIX "tile-columns", 0, "Tile Columns (in log2 units)", NULL, true )
+            change_integer_range( 0, 6 ) /* 1 << 6 == MAX_TILE_COLS */
 #endif
 vlc_module_end ()
 
@@ -360,6 +364,12 @@ static int OpenDecoder(vlc_object_t *p_this)
     return VLC_SUCCESS;
 }
 
+static void destroy_context(vlc_object_t *p_this, aom_codec_ctx_t *context)
+{
+    if (aom_codec_destroy(context))
+        AOM_ERR(p_this, context, "Failed to destroy codec context");
+}
+
 /*****************************************************************************
  * CloseDecoder: decoder destruction
  *****************************************************************************/
@@ -371,7 +381,7 @@ static void CloseDecoder(vlc_object_t *p_this)
     /* Flush decoder */
     FlushDecoder(dec);
 
-    aom_codec_destroy(&sys->ctx);
+    destroy_context(p_this, &sys->ctx);
 
     free(sys);
 }
@@ -417,6 +427,8 @@ static int OpenEncoder(vlc_object_t *p_this)
     int enc_flags;
     int i_profile = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "profile" );
     int i_bit_depth = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "bitdepth" );
+    int i_tile_rows = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-rows" );
+    int i_tile_columns = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "tile-columns" );
 
     /* TODO: implement higher profiles, bit depths and other pixformats. */
     switch( i_profile )
@@ -461,6 +473,24 @@ static int OpenEncoder(vlc_object_t *p_this)
     if (aom_codec_enc_init(ctx, iface, &enccfg, enc_flags) != AOM_CODEC_OK)
     {
         AOM_ERR(p_this, ctx, "Failed to initialize encoder");
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+
+    if (i_tile_rows >= 0 &&
+        aom_codec_control(ctx, AV1E_SET_TILE_ROWS, i_tile_rows))
+    {
+        AOM_ERR(p_this, ctx, "Failed to set tile rows");
+        destroy_context(p_this, ctx);
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+
+    if (i_tile_columns >= 0 &&
+        aom_codec_control(ctx, AV1E_SET_TILE_COLUMNS, i_tile_columns))
+    {
+        AOM_ERR(p_this, ctx, "Failed to set tile columns");
+        destroy_context(p_this, ctx);
         free(p_sys);
         return VLC_EGENERIC;
     }
@@ -540,8 +570,7 @@ static void CloseEncoder(vlc_object_t *p_this)
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-    if (aom_codec_destroy(&p_sys->ctx))
-        AOM_ERR(p_this, &p_sys->ctx, "Failed to destroy codec");
+    destroy_context(p_this, &p_sys->ctx);
     free(p_sys);
 }
 
