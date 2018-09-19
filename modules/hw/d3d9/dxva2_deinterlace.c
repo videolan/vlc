@@ -149,7 +149,7 @@ static void FillSample( DXVA2_VideoSample *p_sample,
                 DXVA2_SampleFieldInterleavedOddFirst;
     FillExtendedFormat(p_fmt, &p_sample->SampleFormat);
     p_sample->Start = 0;
-    p_sample->End = GetFieldDuration(p_context, p_fmt, p_pic) * 10;
+    p_sample->End = MSFTIME_FROM_VLC_TICK(GetFieldDuration(p_context, p_fmt, p_pic));
     p_sample->SampleData = DXVA2_SampleData_RFF_TFF_Present;
     if (!i_field)
         p_sample->SampleData |= DXVA2_SampleData_TFF;
