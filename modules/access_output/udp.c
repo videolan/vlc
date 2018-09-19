@@ -404,6 +404,8 @@ static void* ThreadWrite( void *data )
             i_dropped_packets = 0;
         }
 
+        i_date_last = i_date;
+
 #if 1
         i_sent = vlc_tick_now();
         if ( i_sent > i_date + VLC_TICK_FROM_MS(20) )
@@ -415,7 +417,6 @@ static void* ThreadWrite( void *data )
 
         block_Release( p_pk );
 
-        i_date_last = i_date;
     }
     return NULL;
 }
