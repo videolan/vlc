@@ -288,7 +288,7 @@ static int Demux( demux_t *p_demux )
 
     if( !p_sys->b_hurry_up )
     {
-        p_sys->i_pcr += CLOCK_FREQ / p_sys->f_rate;
+        p_sys->i_pcr += vlc_tick_rate_duration( p_sys->f_rate );
     }
 
     return VLC_DEMUXER_SUCCESS;

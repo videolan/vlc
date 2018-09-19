@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->f_fps = var_CreateGetFloat( p_demux, "screen-fps" );
-    p_sys->i_incr = CLOCK_FREQ / p_sys->f_fps;
+    p_sys->i_incr = vlc_tick_rate_duration( p_sys->f_fps );
     p_sys->i_next_date = 0;
 
 #ifdef SCREEN_SUBSCREEN

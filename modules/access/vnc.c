@@ -395,7 +395,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->f_fps = var_InheritFloat( p_demux, CFG_PREFIX "fps" );
     if ( p_sys->f_fps <= 0 ) p_sys->f_fps = 1.0;
-    p_sys->i_frame_interval = CLOCK_FREQ / p_sys->f_fps ;
+    p_sys->i_frame_interval = vlc_tick_rate_duration( p_sys->f_fps );
 
     char *psz_chroma = var_InheritString( p_demux, CFG_PREFIX "chroma" );
     vlc_fourcc_t i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
