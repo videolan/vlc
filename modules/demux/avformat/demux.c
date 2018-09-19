@@ -251,7 +251,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
     demux_t       *p_demux = (demux_t*)p_this;
     demux_sys_t   *p_sys;
     AVInputFormat *fmt = NULL;
-    int64_t       i_start_time = -1;
+    vlc_tick_t    i_start_time = VLC_TICK_INVALID;
     bool          b_can_seek;
     const char    *psz_url;
     int           error;
@@ -705,7 +705,7 @@ int avformat_OpenDemux( vlc_object_t *p_this )
         s->i_time_offset = p_sys->ic->chapters[i]->start * CLOCK_FREQ *
             p_sys->ic->chapters[i]->time_base.num /
             p_sys->ic->chapters[i]->time_base.den -
-            (i_start_time != -1 ? i_start_time : 0 );
+            (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 );
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
 
