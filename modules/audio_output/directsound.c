@@ -1130,6 +1130,7 @@ static void * PlayedDataEraser( void * data )
 
         toerase = 0;
         tosleep = 0;
+        ticksleep = VLC_TICK_FROM_MS(20);
 
         dsresult = IDirectSoundBuffer_GetCurrentPosition( p_sys->p_dsbuffer,
                                                           &i_read, NULL );
