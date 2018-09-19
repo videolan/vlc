@@ -33,7 +33,7 @@ struct task {
     struct vlc_list node;
     void* id; /**< id associated with entity */
     void* entity; /**< the entity to process */
-    int timeout; /**< timeout duration in milliseconds */
+    vlc_tick_t timeout; /**< timeout duration in vlc_tick_t */
 };
 
 struct background_worker;
@@ -73,7 +73,7 @@ static struct task *task_Create(struct background_worker *worker, void *id,
 
     task->id = id;
     task->entity = entity;
-    task->timeout = timeout < 0 ? worker->conf.default_timeout : timeout;
+    task->timeout = timeout < 0 ? worker->conf.default_timeout : VLC_TICK_FROM_MS(timeout);
     worker->conf.pf_hold(task->entity);
     return task;
 }
@@ -225,7 +225,7 @@ static void* Thread( void* data )
         thread->probe = false;
         vlc_tick_t deadline;
         if (task->timeout > 0)
-            deadline = vlc_tick_now() + VLC_TICK_FROM_MS(task->timeout);
+            deadline = vlc_tick_now() + task->timeout;
         else
             deadline = INT64_MAX; /* no deadline */
         vlc_mutex_unlock(&worker->lock);

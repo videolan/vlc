@@ -233,7 +233,7 @@ input_preparser_t* input_preparser_New( vlc_object_t *parent )
     input_preparser_t* preparser = malloc( sizeof *preparser );
 
     struct background_worker_config conf = {
-        .default_timeout = var_InheritInteger( parent, "preparse-timeout" ),
+        .default_timeout = VLC_TICK_FROM_MS(var_InheritInteger( parent, "preparse-timeout" )),
         .max_threads = var_InheritInteger( parent, "preparse-threads" ),
         .pf_start = PreparserOpenInput,
         .pf_probe = PreparserProbeInput,
