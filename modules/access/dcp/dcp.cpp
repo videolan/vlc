@@ -703,8 +703,8 @@ static int Demux( demux_t *p_demux )
             goto error;
     }
 
-    p_video_frame->i_length = CLOCK_FREQ * p_sys->frame_rate_denom / p_sys->frame_rate_num;
-    p_video_frame->i_pts = CLOCK_FREQ * p_sys->frame_no * p_sys->frame_rate_denom / p_sys->frame_rate_num;
+    p_video_frame->i_length = vlc_tick_from_samples(p_sys->frame_rate_denom, p_sys->frame_rate_num);
+    p_video_frame->i_pts = vlc_tick_from_samples(p_sys->frame_no * p_sys->frame_rate_denom, p_sys->frame_rate_num);
 
     if( !p_sys->p_dcp->audio_reels.empty() )
     {
@@ -741,8 +741,8 @@ static int Demux( demux_t *p_demux )
                     p_sys->pi_chan_table, VLC_CODEC_S24L );
 
         p_audio_frame->i_buffer = AudioFrameBuff.Size();
-        p_audio_frame->i_length = CLOCK_FREQ * p_sys->frame_rate_denom / p_sys->frame_rate_num;
-        p_audio_frame->i_pts = CLOCK_FREQ * p_sys->frame_no * p_sys->frame_rate_denom / p_sys->frame_rate_num;
+        p_audio_frame->i_length = vlc_tick_from_samples(p_sys->frame_rate_denom, p_sys->frame_rate_num);
+        p_audio_frame->i_pts = vlc_tick_from_samples(p_sys->frame_no * p_sys->frame_rate_denom, p_sys->frame_rate_num);
         /* Video is the main pts */
         if ( p_audio_frame->i_pts != p_video_frame->i_pts ) {
             msg_Err( p_demux, "Audio and video frame pts are not in sync" );

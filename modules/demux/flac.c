@@ -784,7 +784,7 @@ static void ParseSeekTable( demux_t *p_demux, const uint8_t *p_data, size_t i_da
             break;
 
         s = xmalloc( sizeof (*s) );
-        s->i_time_offset = i_sample * CLOCK_FREQ / i_sample_rate;
+        s->i_time_offset = vlc_tick_from_samples(i_sample, i_sample_rate);
         s->i_byte_offset = GetQWBE( &p_data[4+18*i+8] );
 
         /* Check for duplicate entry */

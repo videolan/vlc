@@ -222,12 +222,12 @@ static void *Thread (void *data)
         if (snd_pcm_delay (pcm, &delay))
             delay = 0;
         delay += frames;
-        pts -= (CLOCK_FREQ * delay) / sys->rate;
+        pts -= vlc_tick_from_samples(delay,  sys->rate);
 
         block->i_buffer = snd_pcm_frames_to_bytes (pcm, frames);
         block->i_nb_samples = frames;
         block->i_pts = pts;
-        block->i_length = (CLOCK_FREQ * frames) / sys->rate;
+        block->i_length = vlc_tick_from_samples(frames, sys->rate);
 
         es_out_SetPCR(demux->out, block->i_pts);
         es_out_Send (demux->out, sys->es, block);

@@ -45,7 +45,7 @@ BytesToFrames(struct aout_sys_common *p_sys, size_t i_bytes)
 static inline vlc_tick_t
 FramesToUs(struct aout_sys_common *p_sys, uint64_t i_nb_frames)
 {
-    return i_nb_frames * CLOCK_FREQ / p_sys->i_rate;
+    return vlc_tick_from_samples(i_nb_frames, p_sys->i_rate);
 }
 
 static void

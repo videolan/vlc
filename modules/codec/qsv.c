@@ -720,9 +720,8 @@ static block_t *qsv_synchronize_block(encoder_t *enc, async_task_t *task)
     /*         task->bs.FrameType, task->bs.TimeStamp, block->i_pts, task->bs.DecodeTimeStamp, *task->syncp); */
 
     /* Copied from x264.c: This isn't really valid for streams with B-frames */
-    block->i_length = CLOCK_FREQ *
-        enc->fmt_in.video.i_frame_rate_base /
-        enc->fmt_in.video.i_frame_rate;
+    block->i_length = vlc_tick_from_samples( enc->fmt_in.video.i_frame_rate_base,
+                                             enc->fmt_in.video.i_frame_rate );
 
     // Buggy DTS (value comes from experiments)
     if (task->bs.DecodeTimeStamp < -10000)

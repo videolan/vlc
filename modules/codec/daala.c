@@ -451,7 +451,7 @@ static void *ProcessPacket( decoder_t *p_dec, daala_packet *p_dpacket,
     }
 
     /* Date management */
-    p_sys->i_pts += ( CLOCK_FREQ * p_sys->di.timebase_denominator /
+    p_sys->i_pts += vlc_tick_from_samples( p_sys->di.timebase_denominator,
                       p_sys->di.timebase_numerator ); /* 1 frame per packet */
 
     return p_buf;

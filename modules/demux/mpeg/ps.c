@@ -157,7 +157,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_force )
         msg_Info( p_demux, "Detected PSMF-PS header");
         i_mux_rate = GetDWBE( &p_peek[96] );
         if( GetDWBE( &p_peek[86] ) > 0 )
-            i_length = CLOCK_FREQ * GetDWBE( &p_peek[92] ) / GetDWBE( &p_peek[86] );
+            i_length = vlc_tick_from_samples( GetDWBE( &p_peek[92] ), GetDWBE( &p_peek[86] ));
     }
     else if( !memcmp( p_peek, "RIFF", 4 ) && !memcmp( &p_peek[8], "CDXA", 4 ) )
     {
@@ -741,7 +741,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 if( p_sys->i_mux_rate > 0 && p_sys->b_have_pack )
                 {
                     uint64_t i_offset = vlc_stream_Tell( p_demux->s ) - p_sys->i_lastpack_byte;
-                    i_time += CLOCK_FREQ * i_offset / (p_sys->i_mux_rate * 50);
+                    i_time += vlc_tick_from_samples(i_offset, p_sys->i_mux_rate * 50);
                 }
                 *va_arg( args, vlc_tick_t * ) = i_time;
                 return VLC_SUCCESS;
@@ -757,8 +757,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             else if( p_sys->i_mux_rate > 0 )
             {
-                *va_arg( args, vlc_tick_t * ) = CLOCK_FREQ * ( stream_Size( p_demux->s ) - p_sys->i_start_byte / 50 ) /
-                    p_sys->i_mux_rate;
+                *va_arg( args, vlc_tick_t * ) = vlc_tick_from_samples( stream_Size( p_demux->s ) - p_sys->i_start_byte / 50,
+                    p_sys->i_mux_rate );
                 return VLC_SUCCESS;
             }
             *va_arg( args, vlc_tick_t * ) = 0;

@@ -289,8 +289,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         if( !p_block )
             return NULL;
         memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
-        p_block->i_length = CLOCK_FREQ *
-                (vlc_tick_t)MPEG_FRAME_SIZE / (vlc_tick_t)p_enc->fmt_out.audio.i_rate;
+        p_block->i_length = vlc_tick_from_samples( MPEG_FRAME_SIZE,
+                                                   p_enc->fmt_out.audio.i_rate );
         p_block->i_dts = p_block->i_pts = p_sys->i_pts;
         p_sys->i_pts += p_block->i_length;
 
@@ -301,8 +301,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     int i_nb_samples = p_aout_buf->i_nb_samples;
 
     p_sys->i_pts = p_aout_buf->i_pts -
-                CLOCK_FREQ * (vlc_tick_t)p_sys->i_nb_samples /
-                (vlc_tick_t)p_enc->fmt_out.audio.i_rate;
+                vlc_tick_from_samples( p_sys->i_nb_samples,
+                                       p_enc->fmt_out.audio.i_rate );
 
     while ( p_sys->i_nb_samples + i_nb_samples >= MPEG_FRAME_SIZE )
     {
@@ -332,8 +332,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
             return NULL;
         }
         memcpy( p_block->p_buffer, p_sys->p_out_buffer, i_used );
-        p_block->i_length = CLOCK_FREQ *
-                (vlc_tick_t)MPEG_FRAME_SIZE / (vlc_tick_t)p_enc->fmt_out.audio.i_rate;
+        p_block->i_length = vlc_tick_from_samples( MPEG_FRAME_SIZE,
+                                                   p_enc->fmt_out.audio.i_rate );
         p_block->i_dts = p_block->i_pts = p_sys->i_pts;
         p_sys->i_pts += p_block->i_length;
         block_ChainAppend( &p_chain, p_block );

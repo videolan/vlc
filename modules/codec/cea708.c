@@ -1660,7 +1660,7 @@ static void CEA708_Decode_ServiceBuffer( cea708_t *h )
         /* Update internal clock */
         const uint8_t i_consumed = i_in - cea708_input_buffer_size( &h->input_buffer );
         if( i_consumed )
-            h->i_clock += CLOCK_FREQ / 9600 * i_consumed;
+            h->i_clock += vlc_tick_from_samples(1, 9600) * i_consumed;
     }
 }
 
@@ -1692,7 +1692,7 @@ void CEA708_Decoder_Push( cea708_t *h, vlc_tick_t i_time,
             {
                 /* Increase internal clock */
                 if( i_push )
-                    h->i_clock += CLOCK_FREQ / 1200 * i_push;
+                    h->i_clock += vlc_tick_from_samples(1, 1200) * i_push;
                 continue;
             }
             h->suspended_deadline = VLC_TICK_INVALID;

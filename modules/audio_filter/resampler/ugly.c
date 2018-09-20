@@ -111,8 +111,7 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     p_out_buf->i_nb_samples = i_out_nb;
     p_out_buf->i_buffer = i_out_nb * framesize;
     p_out_buf->i_pts = p_in_buf->i_pts;
-    p_out_buf->i_length = p_out_buf->i_nb_samples *
-        CLOCK_FREQ / p_filter->fmt_out.audio.i_rate;
+    p_out_buf->i_length = vlc_tick_from_samples(p_out_buf->i_nb_samples, p_filter->fmt_out.audio.i_rate);
 
     while( i_out_nb )
     {

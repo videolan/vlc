@@ -1542,9 +1542,9 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     if( !p_sys->param.b_vfr_input )
     {
         /* This isn't really valid for streams with B-frames */
-        p_block->i_length = CLOCK_FREQ *
-            p_enc->fmt_in.video.i_frame_rate_base /
-                p_enc->fmt_in.video.i_frame_rate;
+        p_block->i_length = vlc_tick_from_samples(
+                    p_enc->fmt_in.video.i_frame_rate_base,
+                    p_enc->fmt_in.video.i_frame_rate );
     }
 
     /* scale pts-values back*/

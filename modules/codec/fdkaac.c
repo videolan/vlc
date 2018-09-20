@@ -328,13 +328,11 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
     if (likely(p_aout_buf)) {
         p_buffer = (int16_t *)p_aout_buf->p_buffer;
         i_samples = p_aout_buf->i_nb_samples;
-        i_pts_out = p_aout_buf->i_pts - (vlc_tick_t)((double)CLOCK_FREQ *
-               (double)p_sys->i_encoderdelay /
-               (double)p_enc->fmt_out.audio.i_rate);
+        i_pts_out = p_aout_buf->i_pts - vlc_tick_from_samples(p_sys->i_encoderdelay,
+                                                   p_enc->fmt_out.audio.i_rate);
         if (p_sys->i_pts_last == 0)
-            p_sys->i_pts_last = i_pts_out - (vlc_tick_t)((double)CLOCK_FREQ *
-               (double)(p_sys->i_frame_size) /
-               (double)p_enc->fmt_out.audio.i_rate);
+            p_sys->i_pts_last = i_pts_out - vlc_tick_from_samples(p_sys->i_frame_size,
+                                                   p_enc->fmt_out.audio.i_rate);
     } else {
         i_samples = 0;
         i_pts_out = p_sys->i_pts_last;
@@ -407,10 +405,10 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
                     // in the library buffer from the prior block
                     double d_samples_delay = (double)p_sys->i_frame_size - (double)out_args.numInSamples /
                                              (double)p_enc->fmt_in.audio.i_channels;
-                    i_pts_out -= (vlc_tick_t)((double)CLOCK_FREQ * d_samples_delay /
-                                           (double)p_enc->fmt_out.audio.i_rate);
-                    p_block->i_length = (vlc_tick_t)((double)CLOCK_FREQ * (double)p_sys->i_frame_size /
-                        (double)p_enc->fmt_out.audio.i_rate);
+                    i_pts_out -= vlc_tick_from_samples( d_samples_delay,
+                                                   p_enc->fmt_out.audio.i_rate);
+                    p_block->i_length = vlc_tick_from_samples(p_sys->i_frame_size,
+                                p_enc->fmt_out.audio.i_rate);
                     p_block->i_nb_samples = d_samples_delay;
                     //p_block->i_length = i_pts_out - p_sys->i_pts_last;
                 } else {

@@ -226,7 +226,7 @@ static int TimeGet (audio_output_t *aout, vlc_tick_t *restrict delay)
 
     if (!sys->started)
         return -1;
-    *delay = (vlc_tick_t)sys->delay * CLOCK_FREQ / sys->rate;
+    *delay = vlc_tick_from_samples(sys->delay, sys->rate);
     return 0;
 }
 

@@ -702,9 +702,9 @@ int avformat_OpenDemux( vlc_object_t *p_this )
             EnsureUTF8( s->psz_name );
             msg_Dbg( p_demux, "    - chapter %d: %s", i, s->psz_name );
         }
-        s->i_time_offset = p_sys->ic->chapters[i]->start * CLOCK_FREQ *
-            p_sys->ic->chapters[i]->time_base.num /
-            p_sys->ic->chapters[i]->time_base.den -
+        s->i_time_offset = vlc_tick_from_samples( p_sys->ic->chapters[i]->start *
+            p_sys->ic->chapters[i]->time_base.num,
+            p_sys->ic->chapters[i]->time_base.den ) -
             (i_start_time != VLC_TICK_INVALID ? i_start_time : 0 );
         TAB_APPEND( p_sys->p_title->i_seekpoint, p_sys->p_title->seekpoint, s );
     }
@@ -842,9 +842,9 @@ static int Demux( demux_t *p_demux )
             p_stream->time_base.den - i_start_time + VLC_TICK_0;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
-        p_frame->i_length = pkt.duration * CLOCK_FREQ *
-            p_stream->time_base.num /
-            p_stream->time_base.den;
+        p_frame->i_length = vlc_tick_from_samples(pkt.duration *
+            p_stream->time_base.num,
+            p_stream->time_base.den );
 
     /* Add here notoriously bugged file formats/samples */
     if( !strcmp( p_sys->fmt->name, "flv" ) )

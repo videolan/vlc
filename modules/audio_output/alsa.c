@@ -640,7 +640,7 @@ static int TimeGet (audio_output_t *aout, vlc_tick_t *restrict delay)
         msg_Err (aout, "cannot estimate delay: %s", snd_strerror (val));
         return -1;
     }
-    *delay = frames * CLOCK_FREQ / sys->rate;
+    *delay = vlc_tick_from_samples(frames, sys->rate);
     return 0;
 }
 

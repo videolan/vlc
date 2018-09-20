@@ -1095,8 +1095,8 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
     int i_samples_delay = p_sys->i_samples_delay;
 
     vlc_tick_t i_pts = p_aout_buf->i_pts -
-                CLOCK_FREQ * (vlc_tick_t)p_sys->i_samples_delay /
-                (vlc_tick_t)p_enc->fmt_in.audio.i_rate;
+                vlc_tick_from_samples( p_sys->i_samples_delay,
+                            p_enc->fmt_in.audio.i_rate );
 
     p_sys->i_samples_delay += i_samples;
 
@@ -1154,9 +1154,9 @@ static block_t *Encode( encoder_t *p_enc, block_t *p_aout_buf )
         p_block = block_Alloc( i_out );
         memcpy( p_block->p_buffer, p_sys->p_buffer_out, i_out );
 
-        p_block->i_length = CLOCK_FREQ *
-            (vlc_tick_t)p_sys->i_frame_length * p_sys->header.frames_per_packet /
-            (vlc_tick_t)p_enc->fmt_in.audio.i_rate;
+        p_block->i_length = vlc_tick_from_samples(
+            p_sys->i_frame_length * p_sys->header.frames_per_packet,
+            p_enc->fmt_in.audio.i_rate );
 
         p_block->i_dts = p_block->i_pts = i_pts;
 

@@ -502,7 +502,7 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
 static inline vlc_tick_t
 frames_to_us( aout_sys_t *p_sys, uint64_t i_nb_frames )
 {
-    return  i_nb_frames * CLOCK_FREQ / p_sys->fmt.i_rate;
+    return  vlc_tick_from_samples(i_nb_frames, p_sys->fmt.i_rate);
 }
 #define FRAMES_TO_US(x) frames_to_us( p_sys, (x) )
 

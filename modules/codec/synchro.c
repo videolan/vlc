@@ -225,7 +225,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
     i_current_rate = decoder_GetDisplayRate( p_synchro->p_dec );
 
     now = vlc_tick_now();
-    period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate * i_current_rate;
+    period = vlc_tick_from_samples(1001, p_synchro->i_frame_rate) * i_current_rate;
 
     p_synchro->i_render_time = i_render_time;
 
@@ -406,7 +406,7 @@ void decoder_SynchroNewPicture( decoder_synchro_t * p_synchro, int i_coding_type
                                 int i_repeat_field, vlc_tick_t next_pts,
                                 vlc_tick_t next_dts, bool b_low_delay )
 {
-    vlc_tick_t      period = CLOCK_FREQ * 1001 / p_synchro->i_frame_rate;
+    vlc_tick_t    period = vlc_tick_from_samples(1001, p_synchro->i_frame_rate);
 #if 0
     vlc_tick_t      now = vlc_tick_now();
 #endif

@@ -547,7 +547,7 @@ static void Convert( decoder_t *p_dec, vlc_tick_t i_pts,
     {
         if( (p_buffer[0] & 0x04) /* Valid bit */ )
         {
-            const vlc_tick_t i_spupts = i_pts + i_ticks * CLOCK_FREQ / (1200/3);
+            const vlc_tick_t i_spupts = i_pts + vlc_tick_from_samples(i_ticks, 1200/3);
             /* Mask off the specific i_field bit, else some sequences can be lost. */
             if ( p_sys->p_eia608 &&
                 (p_buffer[0] & 0x03) == p_sys->i_field )

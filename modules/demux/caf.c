@@ -1017,12 +1017,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_LENGTH:
             *va_arg( args, vlc_tick_t * ) =
-                CLOCK_FREQ * ( i_num_samples / p_sys->fmt.audio.i_rate );
+                vlc_tick_from_samples( i_num_samples, p_sys->fmt.audio.i_rate );
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
             *va_arg( args, vlc_tick_t * ) =
-                CLOCK_FREQ * ( p_sys->position.i_samples / p_sys->fmt.audio.i_rate );
+                vlc_tick_from_samples( p_sys->position.i_samples, p_sys->fmt.audio.i_rate );
             return VLC_SUCCESS;
 
         case DEMUX_GET_POSITION:

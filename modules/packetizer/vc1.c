@@ -389,9 +389,9 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_ts_used, block_t *p_frag )
         if( p_dec->fmt_out.video.i_frame_rate != 0 && p_dec->fmt_out.video.i_frame_rate_base != 0 )
         {
             if( p_sys->i_interpolated_dts != VLC_TICK_INVALID )
-                p_sys->i_interpolated_dts += CLOCK_FREQ *
-                                             p_dec->fmt_out.video.i_frame_rate_base /
-                                             p_dec->fmt_out.video.i_frame_rate;
+                p_sys->i_interpolated_dts += vlc_tick_from_samples(
+                                             p_dec->fmt_out.video.i_frame_rate_base,
+                                             p_dec->fmt_out.video.i_frame_rate);
 
             //msg_Dbg( p_dec, "-------------- XXX0 dts=%"PRId64" pts=%"PRId64" interpolated=%"PRId64,
             //         p_pic->i_dts, p_pic->i_pts, p_sys->i_interpolated_dts );

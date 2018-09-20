@@ -1643,9 +1643,9 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->i_last_keyframe = p_stream->i_num_frames;
 
                 /* presentation time */
-                i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
-                        p_stream->fmt.video.i_frame_rate_base /
-                        p_stream->fmt.video.i_frame_rate;
+                i_time = vlc_tick_from_samples( (p_stream->i_num_frames - 1 ) *
+                        p_stream->fmt.video.i_frame_rate_base,
+                        p_stream->fmt.video.i_frame_rate );
                 AddIndexEntry( p_mux, i_time, p_input );
             }
 
@@ -1713,8 +1713,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
                 p_stream->i_last_keyframe = p_stream->i_num_frames;
 
                 /* presentation time */
-                i_time = CLOCK_FREQ * ( p_stream->i_num_frames - 1 ) *
-                         p_stream->fmt.video.i_frame_rate_base / p_stream->fmt.video.i_frame_rate;
+                i_time = vlc_tick_from_samples( ( p_stream->i_num_frames - 1 ) *
+                         p_stream->fmt.video.i_frame_rate_base, p_stream->fmt.video.i_frame_rate );
                 AddIndexEntry( p_mux, i_time, p_input );
             }
             op.granulepos = ( ((int64_t)p_stream->i_num_frames) << 32 ) |

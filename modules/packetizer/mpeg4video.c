@@ -544,14 +544,14 @@ static int ParseVOP( decoder_t *p_dec, block_t *p_vop )
         p_dec->fmt_in.video.i_frame_rate > 0 &&
         p_dec->fmt_in.video.i_frame_rate_base > 0 )
     {
-        p_sys->i_interpolated_pts += CLOCK_FREQ *
-        p_dec->fmt_in.video.i_frame_rate_base /
-        p_dec->fmt_in.video.i_frame_rate;
+        p_sys->i_interpolated_pts += vlc_tick_from_samples(
+        p_dec->fmt_in.video.i_frame_rate_base,
+        p_dec->fmt_in.video.i_frame_rate);
     }
     else if( p_sys->i_fps_num )
     {
         i_time_diff = (i_time_ref + i_time_increment) - (p_sys->i_last_time + p_sys->i_last_timeincr);
-        p_sys->i_interpolated_pts += ( CLOCK_FREQ * i_time_diff / p_sys->i_fps_num );
+        p_sys->i_interpolated_pts += vlc_tick_from_samples( i_time_diff, p_sys->i_fps_num );
     }
 
 #if 0

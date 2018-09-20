@@ -1609,7 +1609,7 @@ Start(audio_output_t *p_aout, audio_sample_format_t *restrict fmt)
     UInt32 i_latency_samples;
     AO_GET1PROP(p_sys->i_selected_dev, UInt32, &i_latency_samples,
                 kAudioDevicePropertyLatency, kAudioObjectPropertyScopeOutput);
-    vlc_tick_t i_latency_us = i_latency_samples * CLOCK_FREQ / fmt->i_rate;
+    vlc_tick_t i_latency_us = vlc_tick_from_samples(i_latency_samples, fmt->i_rate);
 
     /* Check for Digital mode or Analog output mode */
     if (do_spdif)

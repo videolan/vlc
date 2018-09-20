@@ -98,7 +98,7 @@ static tt_time_t tt_ParseTime( const char *s )
             unsigned i_den = 1;
             for( const char *p = strchr( s, '.' ) + 1; *p && (i_den < UINT_MAX / 10); p++ )
                 i_den *= 10;
-            t.base += vlc_tick_from_sec(d1) / i_den;
+            t.base += vlc_tick_from_samples(d1, i_den);
         }
         else if( c == ':' )
         {

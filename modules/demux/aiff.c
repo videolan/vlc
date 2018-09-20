@@ -251,9 +251,8 @@ static int Demux( demux_t *p_demux )
     p_block->i_dts =
     p_block->i_pts = VLC_TICK_0 + p_sys->i_time;
 
-    p_sys->i_time += CLOCK_FREQ *
-                     p_block->i_buffer /
-                     p_sys->i_ssnd_fsize /
+    p_sys->i_time += vlc_tick_from_samples(p_block->i_buffer,
+                                           p_sys->i_ssnd_fsize) /
                      p_sys->fmt.audio.i_rate;
 
     /* */
@@ -306,7 +305,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     return VLC_EGENERIC;
                 }
-                p_sys->i_time = CLOCK_FREQ * i_frame / p_sys->fmt.audio.i_rate;
+                p_sys->i_time = vlc_tick_from_samples( i_frame, p_sys->fmt.audio.i_rate );
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -323,7 +322,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             if( p_sys->i_ssnd_start < i_end )
             {
                 *va_arg( args, vlc_tick_t * ) =
-                    CLOCK_FREQ * ( i_end - p_sys->i_ssnd_start ) / p_sys->i_ssnd_fsize / p_sys->fmt.audio.i_rate;
+                    vlc_tick_from_samples( i_end - p_sys->i_ssnd_start, p_sys->i_ssnd_fsize) / p_sys->fmt.audio.i_rate;
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;

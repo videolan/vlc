@@ -1167,7 +1167,9 @@ static void* live_thread( void* p )
             vlc_stream_Delete( download_stream );
         }
 
-        vlc_tick_wait( last_dl_start_time + (CLOCK_FREQ * hds_stream->fragment_runs[hds_stream->fragment_run_count-1].fragment_duration) / hds_stream->afrt_timescale);
+        vlc_tick_wait( last_dl_start_time +
+                       vlc_tick_from_samples(hds_stream->fragment_runs[hds_stream->fragment_run_count-1].fragment_duration,
+                                             hds_stream->afrt_timescale) );
 
 
     }

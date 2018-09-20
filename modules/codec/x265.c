@@ -104,9 +104,9 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     memcpy(p_block->p_buffer, nal[0].payload, i_out);
 
     /* This isn't really valid for streams with B-frames */
-    p_block->i_length = CLOCK_FREQ *
-        p_enc->fmt_in.video.i_frame_rate_base /
-            p_enc->fmt_in.video.i_frame_rate;
+    p_block->i_length = vlc_tick_from_samples(
+                p_enc->fmt_in.video.i_frame_rate_base,
+                p_enc->fmt_in.video.i_frame_rate );
 
     p_block->i_pts = p_sys->initial_date + pic.poc * p_block->i_length;
     p_block->i_dts = p_sys->initial_date + p_sys->frame_count++ * p_block->i_length;

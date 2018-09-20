@@ -865,7 +865,7 @@ static int WaveOutTimeGet(audio_output_t * p_aout, vlc_tick_t *delay)
         return -1;
     }
 
-    vlc_tick_t i_pos = (vlc_tick_t) mmtime.u.sample * CLOCK_FREQ / sys->i_rate;
+    vlc_tick_t i_pos = vlc_tick_from_samples(mmtime.u.sample, sys->i_rate);
     *delay = sys->i_played_length - i_pos;
     return 0;
 }

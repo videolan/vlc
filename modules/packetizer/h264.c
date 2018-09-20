@@ -971,8 +971,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     {
         if( p_sps->vui.i_time_scale )
         {
-            p_pic->i_length = CLOCK_FREQ * i_num_clock_ts *
-                              p_sps->vui.i_num_units_in_tick / p_sps->vui.i_time_scale;
+            p_pic->i_length = vlc_tick_from_samples(i_num_clock_ts *
+                              p_sps->vui.i_num_units_in_tick, p_sps->vui.i_time_scale);
         }
         else
         {

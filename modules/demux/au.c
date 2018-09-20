@@ -288,9 +288,8 @@ static int Open( vlc_object_t *p_this )
             p_sys->i_frame_size += p_sys->fmt.audio.i_blockalign - mod;
         }
     }
-    p_sys->i_frame_length = CLOCK_FREQ *
-                            (vlc_tick_t)i_samples /
-                            (vlc_tick_t)p_sys->fmt.audio.i_rate;
+    p_sys->i_frame_length = vlc_tick_from_samples( i_samples,
+                                                   p_sys->fmt.audio.i_rate );
 
     p_demux->p_sys = p_sys;
     p_demux->pf_demux = Demux;

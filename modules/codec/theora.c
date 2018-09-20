@@ -487,7 +487,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
 
     /* Date management */
-    p_sys->i_pts += ( CLOCK_FREQ * p_sys->ti.fps_denominator /
+    p_sys->i_pts += vlc_tick_from_samples( p_sys->ti.fps_denominator,
                       p_sys->ti.fps_numerator ); /* 1 frame per packet */
 
     return p_buf;

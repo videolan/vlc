@@ -652,9 +652,9 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             { /* we have no way to know real length except by decoding */
                 if ( p_stream->mux.fmt.i_cat == VIDEO_ES )
                 {
-                    p_data->i_length = CLOCK_FREQ *
-                            p_stream->mux.fmt.video.i_frame_rate_base /
-                            p_stream->mux.fmt.video.i_frame_rate;
+                    p_data->i_length = vlc_tick_from_samples(
+                            p_stream->mux.fmt.video.i_frame_rate_base,
+                            p_stream->mux.fmt.video.i_frame_rate );
                     if( p_data->i_flags & BLOCK_FLAG_SINGLE_FIELD )
                         p_data->i_length >>= 1;
                     msg_Dbg( p_mux, "video track %u fixup to %"PRId64" for sample %u",
@@ -664,8 +664,8 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
                           p_stream->mux.fmt.audio.i_rate &&
                           p_data->i_nb_samples )
                 {
-                    p_data->i_length = CLOCK_FREQ * p_data->i_nb_samples /
-                            p_stream->mux.fmt.audio.i_rate;
+                    p_data->i_length = vlc_tick_from_samples(p_data->i_nb_samples,
+                            p_stream->mux.fmt.audio.i_rate);
                     msg_Dbg( p_mux, "audio track %u fixup to %"PRId64" for sample %u",
                              p_stream->mux.i_track_id, p_data->i_length, p_stream->mux.i_entry_count );
                 }
@@ -1315,9 +1315,9 @@ static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, bl
 {
     if ( p_stream->mux.fmt.i_cat == VIDEO_ES && p_stream->mux.fmt.video.i_frame_rate )
     {
-        p_entrydata->i_length = CLOCK_FREQ *
-                p_stream->mux.fmt.video.i_frame_rate_base /
-                p_stream->mux.fmt.video.i_frame_rate;
+        p_entrydata->i_length = vlc_tick_from_samples(
+                p_stream->mux.fmt.video.i_frame_rate_base,
+                p_stream->mux.fmt.video.i_frame_rate);
         msg_Dbg(p_mux, "video track %d fixup to %"PRId64" for sample %u",
                 p_stream->mux.i_track_id, p_entrydata->i_length, p_stream->mux.i_entry_count - 1);
     }
@@ -1325,8 +1325,8 @@ static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, bl
              p_stream->mux.fmt.audio.i_rate &&
              p_entrydata->i_nb_samples && p_stream->mux.fmt.audio.i_rate)
     {
-        p_entrydata->i_length = CLOCK_FREQ * p_entrydata->i_nb_samples /
-                p_stream->mux.fmt.audio.i_rate;
+        p_entrydata->i_length = vlc_tick_from_samples(p_entrydata->i_nb_samples,
+                p_stream->mux.fmt.audio.i_rate);
         msg_Dbg(p_mux, "audio track %d fixup to %"PRId64" for sample %u",
                 p_stream->mux.i_track_id, p_entrydata->i_length, p_stream->mux.i_entry_count - 1);
     }
