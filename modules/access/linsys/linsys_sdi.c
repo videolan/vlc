@@ -365,7 +365,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     bool *pb;
-    int64_t *pi64;
 
     switch( i_query )
     {
