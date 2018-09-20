@@ -676,12 +676,6 @@ static int Open ( vlc_object_t *p_this )
 
     msg_Dbg(p_demux, "loaded %zu subtitles", p_sys->subtitles.i_count );
 
-    /* Fix subtitle (order and time) *** */
-    p_sys->subtitles.i_current = 0;
-    p_sys->i_length = 0;
-    if( p_sys->subtitles.i_count > 0 )
-        p_sys->i_length = p_sys->subtitles.p_array[p_sys->subtitles.i_count-1].i_stop;
-
     /* *** add subtitle ES *** */
     if( p_sys->props.i_type == SUB_TYPE_SSA1 ||
              p_sys->props.i_type == SUB_TYPE_SSA2_4 ||
@@ -697,6 +691,11 @@ static int Open ( vlc_object_t *p_this )
     }
     else
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
+
+    p_sys->subtitles.i_current = 0;
+    p_sys->i_length = 0;
+    if( p_sys->subtitles.i_count > 0 )
+        p_sys->i_length = p_sys->subtitles.p_array[p_sys->subtitles.i_count-1].i_stop;
 
     /* Stupid language detection in the filename */
     char * psz_language = get_language_from_filename( p_demux->psz_filepath );
