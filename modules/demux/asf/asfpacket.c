@@ -294,7 +294,7 @@ static int DemuxPayload(asf_packet_sys_t *p_packetsys, asf_packet_t *pkt, int i_
               i_payload + 1, i_stream_number, i_media_object_number,
               i_media_object_offset, i_replicated_data_length, i_payload_data_length );
      msg_Dbg( p_demux,
-              "  pkttime=%"PRId64" st=%"PRIu32,
+              "  pkttime=%"PRId64" st=%"PRId64,
               i_pkt_time, MS_FROM_VLC_TICK(pkt->send_time) );
 #endif
 
