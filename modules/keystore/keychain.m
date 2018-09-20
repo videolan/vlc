@@ -34,10 +34,8 @@
 
 #if TARGET_OS_IPHONE
   #import <Foundation/Foundation.h>
-  #define OSX_MAVERICKS 1
 #else
   #import <Cocoa/Cocoa.h>
-  #define OSX_MAVERICKS (NSAppKitVersionNumber >= 1265)
 #endif
 
 #import <Security/Security.h>
@@ -74,48 +72,6 @@ static const char *const accessibility_list_text[] = {
 #define ACCESS_GROUP_TEXT N_("Keychain access group")
 #define ACCESS_GROUP_LONGTEXT N_("Keychain access group as defined by the app entitlements.")
 
-/* VLC can be compiled against older SDKs (like before OS X 10.10)
- * but newer features should still be available.
- * Hence, re-define things as needed */
-#ifndef kSecAttrSynchronizable
-#define kSecAttrSynchronizable CFSTR("sync")
-#endif
-
-#ifndef kSecAttrSynchronizableAny
-#define kSecAttrSynchronizableAny CFSTR("syna")
-#endif
-
-#ifndef kSecAttrAccessGroup
-#define kSecAttrAccessGroup CFSTR("agrp")
-#endif
-
-#ifndef kSecAttrAccessibleAfterFirstUnlock
-#define kSecAttrAccessibleAfterFirstUnlock CFSTR("ck")
-#endif
-
-#ifndef kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-#define kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly CFSTR("cku")
-#endif
-
-#ifndef kSecAttrAccessibleAlways
-#define kSecAttrAccessibleAlways CFSTR("dk")
-#endif
-
-#ifndef kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly
-#define kSecAttrAccessibleWhenPasscodeSetThisDeviceOnly CFSTR("akpu")
-#endif
-
-#ifndef kSecAttrAccessibleAlwaysThisDeviceOnly
-#define kSecAttrAccessibleAlwaysThisDeviceOnly CFSTR("dku")
-#endif
-
-#ifndef kSecAttrAccessibleWhenUnlocked
-#define kSecAttrAccessibleWhenUnlocked CFSTR("ak")
-#endif
-
-#ifndef kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-#define kSecAttrAccessibleWhenUnlockedThisDeviceOnly CFSTR("aku")
-#endif
 
 vlc_module_begin()
     set_shortname(N_("Keychain keystore"))
@@ -217,16 +173,10 @@ static NSString * ErrorForStatus(OSStatus status)
     return message;
 }
 
-extern const CFStringRef kSecAttrAccessible;
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
 static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
                                      NSMutableDictionary *query)
 {
-    if (!OSX_MAVERICKS)
-	return;
-
     int accessibilityType = var_InheritInteger(p_keystore, "keychain-accessibility-type");
     switch (accessibilityType) {
         case 1:
@@ -254,7 +204,6 @@ static void SetAccessibilityForQuery(vlc_keystore *p_keystore,
             break;
     }
 }
-#pragma clang diagnostic pop
 
 static void SetAttributesForQuery(const char *const ppsz_values[KEY_MAX], NSMutableDictionary *query, const char *psz_label)
 {
