@@ -705,7 +705,7 @@ AudioTrack_GetTimestampPositionUs( JNIEnv *env, audio_output_t *p_aout )
      && ( i_now - p_sys->timestamp.i_frame_us ) <= VLC_TICK_FROM_SEC(10) )
     {
         vlc_tick_t i_time_diff = i_now - p_sys->timestamp.i_frame_us;
-        jlong i_frames_diff = i_time_diff * p_sys->fmt.i_rate / CLOCK_FREQ;
+        jlong i_frames_diff = samples_from_vlc_tick(i_time_diff, p_sys->fmt.i_rate);
         return FRAMES_TO_US( p_sys->timestamp.i_frame_pos + i_frames_diff );
     } else
         return 0;
@@ -1247,8 +1247,7 @@ Start( audio_output_t *p_aout, audio_sample_format_t *restrict p_fmt )
     else
     {
         /* 2 seconds of buffering */
-        p_sys->circular.i_size = p_sys->circular.i_size * AOUT_MAX_PREPARE_TIME
-                               / CLOCK_FREQ;
+        p_sys->circular.i_size = samples_from_vlc_tick(AOUT_MAX_PREPARE_TIME, p_sys->circular.i_size);
     }
 
     /* Allocate circular buffer */

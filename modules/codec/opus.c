@@ -484,7 +484,7 @@ static block_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     if( i_duration > 0 && spp > 0 &&
         i_duration < i_nb_samples * CLOCK_FREQ / 48000 )
     {
-        i_end_trim = spp - VLC_CLIP(i_duration * 48000 / CLOCK_FREQ, 0, spp);
+        i_end_trim = spp - VLC_CLIP(samples_from_vlc_tick(i_duration, 48000), 0, spp);
     }
 
     if( spp < 0 || i_nb_samples <= 0 || i_end_trim >= i_nb_samples)

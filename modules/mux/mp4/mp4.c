@@ -992,7 +992,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
         /* set the local sample duration default */
         if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION)
-            bo_add_32be(tfhd, p_stream->read.p_first->p_block->i_length * p_stream->mux.i_timescale / CLOCK_FREQ);
+            bo_add_32be(tfhd, samples_from_vlc_tick(p_stream->read.p_first->p_block->i_length, p_stream->mux.i_timescale));
 
         /* set the local sample size default */
         if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE)
@@ -1007,7 +1007,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
             bo_free(traf);
             continue;
         }
-        bo_add_64be(tfdt, p_stream->i_written_duration * p_stream->mux.i_timescale / CLOCK_FREQ );
+        bo_add_64be(tfdt, samples_from_vlc_tick(p_stream->i_written_duration, p_stream->mux.i_timescale) );
         box_gather(traf, tfdt);
 
         /* *** add /moof/traf/trun *** */
@@ -1067,7 +1067,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                 DEQUEUE_ENTRY(p_stream->read, p_entry);
 
                 if (i_trun_flags & MP4_TRUN_SAMPLE_DURATION)
-                    bo_add_32be(trun, p_entry->p_block->i_length * p_stream->mux.i_timescale / CLOCK_FREQ); // sample duration
+                    bo_add_32be(trun, samples_from_vlc_tick(p_entry->p_block->i_length, p_stream->mux.i_timescale)); // sample duration
 
                 if (i_trun_flags & MP4_TRUN_SAMPLE_SIZE)
                     bo_add_32be(trun, p_entry->p_block->i_buffer); // sample size
@@ -1080,7 +1080,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                     {
                         i_diff = p_entry->p_block->i_pts - p_entry->p_block->i_dts;
                     }
-                    bo_add_32be(trun, i_diff * p_stream->mux.i_timescale / CLOCK_FREQ); // ctts
+                    bo_add_32be(trun, samples_from_vlc_tick(i_diff, p_stream->mux.i_timescale)); // ctts
                 }
 
                 *pi_mdat_total_size += p_entry->p_block->i_buffer;

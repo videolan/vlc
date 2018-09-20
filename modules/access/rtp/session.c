@@ -313,7 +313,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
              * It is independent of RTP sequence. */
             uint32_t freq = pt->frequency;
             int64_t ts = rtp_timestamp (block);
-            int64_t d = SEC_FROM_VLC_TICK((now - src->last_rx) * freq);
+            int64_t d = samples_from_vlc_tick(now - src->last_rx, freq);
             d        -=    ts - src->last_ts;
             if (d < 0) d = -d;
             src->jitter += ((d - src->jitter) + 8) >> 4;

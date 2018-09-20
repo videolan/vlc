@@ -1446,7 +1446,7 @@ static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
         /* estimate length of pos value */
         if ( p_input->p_fmt->i_bitrate )
         {
-            i = i_interval * p_input->p_fmt->i_bitrate / CLOCK_FREQ;
+            i = samples_from_vlc_tick(i_interval, p_input->p_fmt->i_bitrate);
             while ( i <<= 1 ) i_tuple_size++;
         }
         else
@@ -1618,8 +1618,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         {
             /* number of sample from begining + current packet */
             op.granulepos =
-                ( p_data->i_dts - p_sys->i_start_dts + p_data->i_length ) *
-                (vlc_tick_t)p_input->p_fmt->audio.i_rate / CLOCK_FREQ;
+                samples_from_vlc_tick( p_data->i_dts - p_sys->i_start_dts + p_data->i_length,
+                                       p_input->p_fmt->audio.i_rate );
 
             i_time = p_data->i_dts - p_sys->i_start_dts;
             AddIndexEntry( p_mux, i_time, p_input );
@@ -1627,8 +1627,8 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
         else if( p_stream->p_oggds_header )
         {
             /* number of sample from begining */
-            op.granulepos = ( p_data->i_dts - p_sys->i_start_dts ) *
-                p_stream->p_oggds_header->i_samples_per_unit / CLOCK_FREQ;
+            op.granulepos = samples_from_vlc_tick( p_data->i_dts - p_sys->i_start_dts,
+                                  p_stream->p_oggds_header->i_samples_per_unit );
         }
     }
     else if( p_stream->fmt.i_cat == VIDEO_ES )

@@ -487,7 +487,7 @@ int DBMSDIOutput::Start()
     if(b_running)
         return VLC_EGENERIC;
     result = p_output->StartScheduledPlayback(
-                     SEC_FROM_VLC_TICK(vlc_tick_now() * timescale), timescale, 1.0);
+                     samples_from_vlc_tick(vlc_tick_now(), timescale), timescale, 1.0);
     CHECK("Could not start playback");
     b_running = true;
     return VLC_SUCCESS;

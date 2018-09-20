@@ -203,15 +203,15 @@ static bo_t *GetEDTS( mp4mux_trackinfo_t *p_track, uint32_t i_movietimescale, bo
         if(p_track->p_edits[i].i_start_offset != 0)
         {
             AddEdit(elst,
-                    p_track->p_edits[i].i_start_offset * i_movietimescale / CLOCK_FREQ,
+                    samples_from_vlc_tick(p_track->p_edits[i].i_start_offset, i_movietimescale),
                     -1,
                     b_64_ext);
         }
 
         /* !WARN AGAIN! Uses different Timescales ! */
         AddEdit(elst,
-                p_track->p_edits[i].i_duration * i_movietimescale / CLOCK_FREQ,
-                p_track->p_edits[i].i_start_time * p_track->i_timescale / CLOCK_FREQ,
+                samples_from_vlc_tick(p_track->p_edits[i].i_duration, i_movietimescale),
+                samples_from_vlc_tick(p_track->p_edits[i].i_start_time, p_track->i_timescale),
                 b_64_ext);
     }
 
@@ -1166,7 +1166,7 @@ static int64_t GetScaledEntryDuration( const mp4mux_entry_t *p_entry, uint32_t i
     const vlc_tick_t i_diff = *pi_total_mtime - i_totalscaledtototalmtime;
 
     /* Ensure to compensate the drift due to loss from time, and from scale, conversions */
-    int64_t i_scaled = (p_entry->i_length + i_diff) * i_timescale / CLOCK_FREQ;
+    int64_t i_scaled = samples_from_vlc_tick(p_entry->i_length + i_diff, i_timescale);
     *pi_total_mtime += p_entry->i_length;
     *pi_total_scaled += i_scaled;
 
@@ -1307,7 +1307,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
                     break;
 
             bo_add_32be(ctts, i - i_first); // sample-count
-            bo_add_32be(ctts, i_offset * p_track->i_timescale / CLOCK_FREQ ); // sample-offset
+            bo_add_32be(ctts, samples_from_vlc_tick(i_offset, p_track->i_timescale) ); // sample-offset
         }
         bo_swap_32be(ctts, 12, i_index);
     }
@@ -1424,7 +1424,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
         if(p_obj)
             msg_Dbg(p_obj, "movie duration %"PRId64"s", SEC_FROM_VLC_TICK(i_duration));
     }
-    int64_t i_movie_duration = i_duration * i_movie_timescale / CLOCK_FREQ;
+    int64_t i_movie_duration = samples_from_vlc_tick(i_duration, i_movie_timescale);
 
     /* *** add /moov/mvhd *** */
     if (!b_64_ext) {
@@ -1473,7 +1473,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
 
         int64_t i_stream_duration;
         if ( !b_fragmented )
-            i_stream_duration = p_stream->i_read_duration * i_movie_timescale / CLOCK_FREQ;
+            i_stream_duration = samples_from_vlc_tick(p_stream->i_read_duration, i_movie_timescale);
         else
             i_stream_duration = 0;
 
@@ -1817,7 +1817,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
                 bo_t *trex = box_full_new("trex", 0, 0);
                 bo_add_32be(trex, p_stream->i_track_id);
                 bo_add_32be(trex, 1); // sample desc index
-                bo_add_32be(trex, (uint64_t)p_stream->i_trex_default_length * p_stream->i_timescale / CLOCK_FREQ); // sample duration
+                bo_add_32be(trex, samples_from_vlc_tick(p_stream->i_trex_default_length, p_stream->i_timescale)); // sample duration
                 bo_add_32be(trex, p_stream->i_trex_default_size); // sample size
                 bo_add_32be(trex, 0); // sample flags
                 box_gather(mvex, trex);

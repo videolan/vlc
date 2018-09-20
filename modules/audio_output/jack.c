@@ -180,8 +180,8 @@ static int Start( audio_output_t *p_aout, audio_sample_format_t *restrict fmt )
         goto error_out;
     }
 
-    const size_t buf_sz = AOUT_MAX_ADVANCE_TIME * fmt->i_rate *
-        fmt->i_bytes_per_frame / CLOCK_FREQ;
+    const size_t buf_sz =
+        samples_from_vlc_tick(AOUT_MAX_ADVANCE_TIME, fmt->i_rate * fmt->i_bytes_per_frame);
     p_sys->p_jack_ringbuffer = jack_ringbuffer_create( buf_sz );
 
     if( p_sys->p_jack_ringbuffer == NULL )
