@@ -1169,7 +1169,7 @@ static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_ent
 
     if( i_mode == SUBSDELAY_MODE_ABSOLUTE )
     {
-        return ( p_entry->p_source->i_stop - p_entry->p_source->i_start + (vlc_tick_t)( CLOCK_FREQ * p_sys->f_factor ) );
+        return ( p_entry->p_source->i_stop - p_entry->p_source->i_start + vlc_tick_from_sec( p_sys->f_factor ) );
     }
 
     if( i_mode == SUBSDELAY_MODE_RELATIVE_SOURCE_CONTENT )
@@ -1179,7 +1179,7 @@ static vlc_tick_t SubsdelayEstimateDelay( filter_t *p_filter, subsdelay_heap_ent
             //FIXME: We only use a single segment here
             i_rank = SubsdelayGetTextRank( p_entry->p_subpic->p_region->p_text->psz_text );
 
-            return (vlc_tick_t)( i_rank * CLOCK_FREQ * p_sys->f_factor );
+            return vlc_tick_from_sec( p_sys->f_factor * i_rank );
         }
 
         /* content is unavailable, calculation mode should be based on source delay */

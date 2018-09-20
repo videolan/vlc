@@ -476,10 +476,9 @@ int OpenHEIF( vlc_object_t * p_this )
         return VLC_ENOMEM;
     }
 
-    p_sys->i_image_duration = var_InheritFloat( p_demux, "heif-image-duration" );
+    p_sys->i_image_duration = vlc_tick_from_sec(var_InheritFloat( p_demux, "heif-image-duration" ));
     if( p_sys->i_image_duration <= 0 )
-        p_sys->i_image_duration = HEIF_DEFAULT_DURATION;
-    p_sys->i_image_duration *= CLOCK_FREQ;
+        p_sys->i_image_duration = VLC_TICK_FROM_SEC(HEIF_DEFAULT_DURATION);
 
     MP4_Box_t *p_infe = NULL;
     while( (p_infe = NextAtom( p_root, ATOM_infe, "meta/iinf/infe", p_infe )) )

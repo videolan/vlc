@@ -1076,7 +1076,7 @@ States intf_sys_t::state() const
 
 vlc_tick_t intf_sys_t::timeCCToVLC(double time)
 {
-    return vlc_tick_t(time * (double)CLOCK_FREQ);
+    return vlc_tick_from_sec(time);
 }
 
 std::string intf_sys_t::timeVLCToCC(vlc_tick_t time)
