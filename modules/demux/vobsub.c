@@ -312,19 +312,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_POSITION:
             f = va_arg( args, double );
             i64 = (vlc_tick_t) f * p_sys->i_length;
-
-            for( i = 0; i < p_sys->i_tracks; i++ )
-            {
-                p_sys->track[i].i_current_subtitle = 0;
-                while( p_sys->track[i].i_current_subtitle < p_sys->track[i].i_subtitles &&
-                       p_sys->track[i].p_subtitles[p_sys->track[i].i_current_subtitle].i_start < i64 )
-                {
-                    p_sys->track[i].i_current_subtitle++;
-                }
-                if( p_sys->track[i].i_current_subtitle >= p_sys->track[i].i_subtitles )
-                    return VLC_EGENERIC;
-            }
-            return VLC_SUCCESS;
+            return demux_Control(p_demux, DEMUX_SET_TIME, i64, false);
 
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->i_next_demux_date = va_arg( args, vlc_tick_t );
