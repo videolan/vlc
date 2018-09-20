@@ -298,14 +298,14 @@ static void ProcessEntry( int *pi_n_entry, xml_reader_t *p_xml_reader,
                 if( i_start )
                 {
                     if( asprintf( ppsz_options, ":start-time=%"PRId64 ,
-                                  i_start / CLOCK_FREQ ) != -1)
+                                  SEC_FROM_VLC_TICK(i_start) ) != -1)
                         i_options++;
                 }
                 if( i_duration)
                 {
                     if( asprintf( ppsz_options + i_options,
                                   ":stop-time=%"PRId64,
-                                  (i_start + i_duration) / CLOCK_FREQ ) != -1)
+                                  SEC_FROM_VLC_TICK(i_start + i_duration) ) != -1)
                         i_options++;
                 }
 

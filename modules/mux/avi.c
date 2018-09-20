@@ -244,7 +244,7 @@ static void Close( vlc_object_t * p_this )
         msg_Info( p_mux, "stream[%d] duration:%"PRId64" totalsize:%"PRId64
                   " frames:%d fps:%f KiB/s:%d",
                   i_stream,
-                  (int64_t)p_stream->i_duration / CLOCK_FREQ,
+                  SEC_FROM_VLC_TICK(p_stream->i_duration),
                   p_stream->i_totalsize,
                   p_stream->i_frames,
                   p_stream->f_fps, p_stream->i_bitrate/1024 );

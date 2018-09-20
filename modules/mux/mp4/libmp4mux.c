@@ -1422,7 +1422,7 @@ bo_t * mp4mux_GetMoovBox(vlc_object_t *p_obj, mp4mux_trackinfo_t **pp_tracks, un
             i_duration = __MAX(i_duration, p_stream->i_read_duration);
         }
         if(p_obj)
-            msg_Dbg(p_obj, "movie duration %"PRId64"s", i_duration / CLOCK_FREQ);
+            msg_Dbg(p_obj, "movie duration %"PRId64"s", SEC_FROM_VLC_TICK(i_duration));
     }
     int64_t i_movie_duration = i_duration * i_movie_timescale / CLOCK_FREQ;
 

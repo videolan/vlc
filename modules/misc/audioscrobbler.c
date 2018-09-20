@@ -198,7 +198,7 @@ static void ReadMetaData(intf_thread_t *p_this, input_thread_t *p_input)
     ALLOC_ITEM_META(p_sys->p_current_song.psz_m, TrackID);
     ALLOC_ITEM_META(p_sys->p_current_song.psz_n, TrackNum);
 
-    p_sys->p_current_song.i_l = input_item_GetDuration(p_item) / CLOCK_FREQ;
+    p_sys->p_current_song.i_l = SEC_FROM_VLC_TICK(input_item_GetDuration(p_item));
 
 #undef ALLOC_ITEM_META
 
