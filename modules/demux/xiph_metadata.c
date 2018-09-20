@@ -296,7 +296,7 @@ static void xiph_ParseCueSheetMeta( unsigned *pi_flags, vlc_meta_t *p_meta,
         unsigned m, s, f;
         if( sscanf( &psz_line[13], "%u:%u:%u", &m, &s, &f ) == 3 )
         {
-            p_seekpoint->i_time_offset = vlc_tick_from_sec(m * 60 + s) + f * CLOCK_FREQ/75;
+            p_seekpoint->i_time_offset = vlc_tick_from_sec(m * 60 + s) + vlc_tick_from_samples(f, 75);
             *pb_valid = true;
         }
     }

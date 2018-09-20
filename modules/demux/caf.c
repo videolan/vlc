@@ -335,7 +335,7 @@ static inline vlc_tick_t FrameSpanGetTime( frame_span_t *span, uint32_t i_sample
     if( !i_sample_rate )
         return VLC_TICK_INVALID;
 
-    return ( span->i_samples * CLOCK_FREQ ) / i_sample_rate + VLC_TICK_0;
+    return vlc_tick_from_samples( span->i_samples, i_sample_rate) + VLC_TICK_0;
 }
 
 /* SetSpanWithSample returns the span from the beginning of the file up to and

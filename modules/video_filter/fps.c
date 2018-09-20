@@ -164,7 +164,8 @@ static int Open( vlc_object_t *p_this)
             p_filter->fmt_in.video.i_frame_rate, p_filter->fmt_in.video.i_frame_rate_base,
             p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );
 
-    p_sys->i_output_frame_interval = p_filter->fmt_out.video.i_frame_rate_base * CLOCK_FREQ / p_filter->fmt_out.video.i_frame_rate;
+    p_sys->i_output_frame_interval = vlc_tick_from_samples(p_filter->fmt_out.video.i_frame_rate_base,
+                                                           p_filter->fmt_out.video.i_frame_rate);
 
     date_Init( &p_sys->next_output_pts,
                p_filter->fmt_out.video.i_frame_rate, p_filter->fmt_out.video.i_frame_rate_base );

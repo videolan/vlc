@@ -1162,7 +1162,7 @@ static bo_t *GetTextBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
 static int64_t GetScaledEntryDuration( const mp4mux_entry_t *p_entry, uint32_t i_timescale,
                                        vlc_tick_t *pi_total_mtime, int64_t *pi_total_scaled )
 {
-    const vlc_tick_t i_totalscaledtototalmtime = *pi_total_scaled * CLOCK_FREQ / i_timescale;
+    const vlc_tick_t i_totalscaledtototalmtime = vlc_tick_from_samples(*pi_total_scaled, i_timescale);
     const vlc_tick_t i_diff = *pi_total_mtime - i_totalscaledtototalmtime;
 
     /* Ensure to compensate the drift due to loss from time, and from scale, conversions */

@@ -629,8 +629,8 @@ static int HandleAudio( demux_t *p_demux, const uint8_t *p_buffer )
                         p_audio->i_channel * 2, p_sys->i_max_channel + 1 );
 
             p_block->i_dts = p_block->i_pts
-                = p_sys->i_next_adate + (vlc_tick_t)p_audio->i_delay
-                   * CLOCK_FREQ / p_sys->i_sample_rate;
+                = p_sys->i_next_adate + vlc_tick_from_samples(p_audio->i_delay,
+                                                              p_sys->i_sample_rate);
             p_block->i_length = p_sys->i_aincr;
             es_out_Send( p_demux->out, p_audio->p_es, p_block );
         }

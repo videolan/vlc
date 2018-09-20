@@ -169,7 +169,7 @@ static int TimeGet(audio_output_t* aout, vlc_tick_t* restrict drift)
         return -1;
 
     *drift = (CLOCK_FREQ * OPENSLES_BUFLEN * st.count / 1000)
-        + sys->samples * CLOCK_FREQ / sys->rate;
+        + vlc_tick_from_samples(sys->samples, sys->rate);
 
     /* msg_Dbg(aout, "latency %"PRId64" ms, %d/%d buffers", *drift / 1000,
         (int)st.count, OPENSLES_BUFFERS); */

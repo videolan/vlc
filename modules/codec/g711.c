@@ -1209,8 +1209,8 @@ static block_t *EncoderEncode( encoder_t *p_enc, block_t *p_aout_buf )
     }
 
     p_block->i_dts = p_block->i_pts = p_aout_buf->i_pts;
-    p_block->i_length = (int64_t)p_aout_buf->i_nb_samples *
-                        CLOCK_FREQ / p_enc->fmt_in.audio.i_rate;
+    p_block->i_length = vlc_tick_from_samples(p_aout_buf->i_nb_samples,
+                                              p_enc->fmt_in.audio.i_rate);
     return p_block;
 }
 #endif /* ENABLE_SOUT */

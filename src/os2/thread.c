@@ -909,7 +909,7 @@ vlc_tick_t vlc_tick_now (void)
     /* We need to split the division to avoid 63-bits overflow */
     lldiv_t d = lldiv (Q2LL(counter), freq);
 
-    return vlc_tick_from_sec( d.quot ) + ((d.rem * CLOCK_FREQ) / freq);
+    return vlc_tick_from_sec( d.quot ) + vlc_tick_from_samples(d.rem, freq);
 }
 
 #undef vlc_tick_wait

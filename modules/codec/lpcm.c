@@ -662,9 +662,9 @@ static block_t *EncodeFrames( encoder_t *p_enc, block_t *p_aout_buf )
 
         /* We need to find i_length by means of next_pts due to possible roundoff errors. */
         vlc_tick_t this_pts = p_aout_buf->i_pts +
-            (i * p_sys->i_frame_samples + i_start_offset) * CLOCK_FREQ / p_sys->i_rate;
+            vlc_tick_from_samples(i * p_sys->i_frame_samples + i_start_offset, p_sys->i_rate);
         vlc_tick_t next_pts = p_aout_buf->i_pts +
-            ((i + 1) * p_sys->i_frame_samples + i_start_offset) * CLOCK_FREQ / p_sys->i_rate;
+            vlc_tick_from_samples((i + 1) * p_sys->i_frame_samples + i_start_offset, p_sys->i_rate);
 
         p_block->i_pts = p_block->i_dts = this_pts;
         p_block->i_length = next_pts - this_pts;

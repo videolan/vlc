@@ -71,8 +71,8 @@ static picture_t *Deinterlace(filter_t *filter, picture_t *src)
         dst->date = (3 * src->date - last_pts) / 2;
     else
     if (filter->fmt_in.video.i_frame_rate != 0)
-        dst->date = src->date + ((filter->fmt_in.video.i_frame_rate_base
-                            * CLOCK_FREQ) / filter->fmt_in.video.i_frame_rate);
+        dst->date = src->date + vlc_tick_from_samples(filter->fmt_in.video.i_frame_rate_base
+                            ,filter->fmt_in.video.i_frame_rate);
     dst->b_top_field_first = !src->b_top_field_first;
     dst->i_nb_fields = 1;
     src->i_nb_fields = 1;

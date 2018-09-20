@@ -171,7 +171,7 @@ static HRESULT TimeGet( aout_stream_sys_t *sys, vlc_tick_t *delay )
         /* underrun */
         Flush(sys, false);
 
-    *delay = ( sys->i_data / sys->i_bytes_per_sample ) * CLOCK_FREQ / sys->i_rate;
+    *delay = vlc_tick_from_samples( sys->i_data / sys->i_bytes_per_sample, sys->i_rate );
 
     return DS_OK;
 }

@@ -339,8 +339,8 @@ static int TimeGet( audio_output_t *aout, vlc_tick_t *restrict delay )
 
     vlc_mutex_lock( &buffer->mutex );
 
-    *delay = ( buffer->length / format->i_bytes_per_frame ) * CLOCK_FREQ /
-             format->i_rate;
+    *delay = vlc_tick_from_samples( buffer->length / format->i_bytes_per_frame,
+                                    format->i_rate );
 
     vlc_mutex_unlock( &buffer->mutex );
 
