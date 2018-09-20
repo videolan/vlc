@@ -197,12 +197,12 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 
 static int Control( sout_stream_t *p_stream, int i_query, va_list args )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
     if( i_query == SOUT_STREAM_ID_SPU_HIGHLIGHT )
     {
         decoder_t *p_dec = va_arg(args, void *);
         void *spu_hl = va_arg(args, void *);
         return input_DecoderSetSpuHighlight( p_dec, spu_hl );
     }
+    (void) p_stream;
     return VLC_EGENERIC;
 }
