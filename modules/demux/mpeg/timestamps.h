@@ -19,7 +19,7 @@
 #ifndef VLC_MPEG_TIMESTAMPS_H
 #define VLC_MPEG_TIMESTAMPS_H
 
-#define FROM_SCALE_NZ(x) ((x) * 100 / 9)
+#define FROM_SCALE_NZ(x) ((vlc_tick_t)((x) * 100 / 9))
 #define TO_SCALE_NZ(x)   ((x) * 9 / 100)
 
 #define FROM_SCALE(x) (VLC_TICK_0 + FROM_SCALE_NZ(x))

@@ -1953,7 +1953,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         if(p_sys->cur_title < p_sys->i_title &&
            (CURRENT_TITLE->i_flags & INPUT_TITLE_INTERACTIVE))
                 return VLC_EGENERIC;
-        *pi_time = (vlc_tick_t)FROM_SCALE_NZ(bd_tell_time(p_sys->bluray));
+        *pi_time = FROM_SCALE_NZ(bd_tell_time(p_sys->bluray));
         return VLC_SUCCESS;
     }
 
