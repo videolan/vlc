@@ -161,7 +161,7 @@ static picture_context_t *GetSurface(va_pool_t *va_pool)
 
 int va_pool_Get(va_pool_t *va_pool, picture_t *pic)
 {
-    unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
+    unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
     picture_context_t *field;
 
     if (va_pool->surface_count == 0)

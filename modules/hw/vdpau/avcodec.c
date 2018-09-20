@@ -92,7 +92,7 @@ static vlc_vdp_video_field_t *GetSurface(vlc_va_t *va)
 static int Lock(vlc_va_t *va, picture_t *pic, uint8_t **data)
 {
     vlc_vdp_video_field_t *field;
-    unsigned tries = (CLOCK_FREQ + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
+    unsigned tries = (VLC_TICK_FROM_SEC(1) + VOUT_OUTMEM_SLEEP) / VOUT_OUTMEM_SLEEP;
 
     while ((field = GetSurface(va)) == NULL)
     {
