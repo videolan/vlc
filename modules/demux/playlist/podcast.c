@@ -381,9 +381,9 @@ static vlc_tick_t strTimeToMTime( const char *psz )
     switch( sscanf( psz, "%u:%u:%u", &h, &m, &s ) )
     {
     case 3:
-        return (vlc_tick_t)( ( h*60 + m )*60 + s ) * CLOCK_FREQ;
+        return vlc_tick_from_sec( ( h*60 + m )*60 + s );
     case 2:
-        return (vlc_tick_t)( h*60 + m ) * CLOCK_FREQ;
+        return vlc_tick_from_sec( h*60 + m );
     default:
         return INPUT_DURATION_UNSET;
     }
