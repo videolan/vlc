@@ -181,7 +181,7 @@ typedef struct
         size_t      i_current;
     } subtitles;
 
-    int64_t     i_length;
+    vlc_tick_t  i_length;
 
     /* */
     subs_properties_t props;
