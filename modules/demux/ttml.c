@@ -207,7 +207,7 @@ static void tt_node_ToText( struct vlc_memstream *p_stream, const tt_basenode_t 
 static int Control( demux_t* p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i64;
+    vlc_tick_t i64;
     double *pf, f;
     bool b;
 
