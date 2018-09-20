@@ -42,6 +42,9 @@
 
 #import <Security/Security.h>
 
+// Marker to recognize changed format in vlc 4: secret does not have \0 cut off anymore.
+int kVlc4Creator = 'vlc4';
+
 static int Open(vlc_object_t *);
 
 static const int sync_list[] =
@@ -318,6 +321,7 @@ static int Store(vlc_keystore *p_keystore,
 
         /* just set the secret data */
         [query setObject:secretData forKey:(__bridge id)kSecValueData];
+        [query setObject:@(kVlc4Creator) forKey:(__bridge id)kSecAttrCreator];
 
         status = SecItemUpdate((__bridge CFDictionaryRef)(searchQuery), (__bridge CFDictionaryRef)(query));
     } else if (status == errSecItemNotFound) {
@@ -333,6 +337,7 @@ static int Store(vlc_keystore *p_keystore,
 
         /* set secret data */
         [query setObject:secretData forKey:(__bridge id)kSecValueData];
+        [query setObject:@(kVlc4Creator) forKey:(__bridge id)kSecAttrCreator];
 
         status = SecItemAdd((__bridge CFDictionaryRef)query, NULL);
     }
@@ -385,6 +390,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
         }
 
         NSDictionary *keychainItem = [listOfResults objectAtIndex:i];
+
         NSString *accountName = [keychainItem objectForKey:(__bridge id)kSecAttrAccount];
         NSMutableDictionary *passwordFetchQuery = [baseLookupQuery mutableCopy];
         [passwordFetchQuery setObject:(__bridge id)kCFBooleanTrue forKey:(__bridge id)kSecReturnData];
@@ -405,6 +411,22 @@ static unsigned int Find(vlc_keystore *p_keystore,
         }
 
         NSData *secretData = (__bridge_transfer NSData *)secretResult;
+        NSNumber *creator = [keychainItem objectForKey:(__bridge id)kSecAttrCreator];
+        if (creator && [creator isEqual:@(kVlc4Creator)]) {
+            msg_Dbg(p_keystore, "Found keychain entry in vlc4 format");
+            vlc_keystore_entry_set_secret(p_entry, secretData.bytes, secretData.length);
+
+        } else {
+            msg_Dbg(p_keystore, "Found keychain entry in vlc3 format");
+
+            /* we need to do some padding here, as string is expected to be 0 terminated */
+            NSUInteger secretDataLength = secretData.length;
+            uint8_t *paddedSecretData = calloc(1, secretDataLength + 1);
+            memcpy(paddedSecretData, secretData.bytes, secretDataLength);
+            vlc_keystore_entry_set_secret(p_entry, paddedSecretData, secretDataLength + 1);
+            free(paddedSecretData);
+        }
+
         vlc_keystore_entry_set_secret(p_entry, secretData.bytes, secretData.length);
     }
 
