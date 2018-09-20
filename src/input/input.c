@@ -1011,7 +1011,7 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
 
     const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
     if( i_delay != 0 )
-        var_SetInteger( p_input, "spu-delay", VLC_TICK_FROM_SEC(i_delay) / 10);
+        var_SetInteger( p_input, "spu-delay", vlc_tick_from_samples(i_delay, 10) );
 }
 
 static void GetVarSlaves( input_thread_t *p_input,
