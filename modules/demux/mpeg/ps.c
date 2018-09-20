@@ -736,13 +736,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             if( p_sys->i_first_scr != VLC_TICK_INVALID && p_sys->i_scr != VLC_TICK_INVALID )
             {
-                *va_arg( args, vlc_tick_t * ) = p_sys->i_scr - p_sys->i_first_scr;
+                vlc_tick_t i_time = p_sys->i_scr - p_sys->i_first_scr;
                 /* H.222 2.5.2.2 */
                 if( p_sys->i_mux_rate > 0 && p_sys->b_have_pack )
                 {
                     uint64_t i_offset = vlc_stream_Tell( p_demux->s ) - p_sys->i_lastpack_byte;
-                    *va_arg( args, vlc_tick_t * ) += CLOCK_FREQ * i_offset / (p_sys->i_mux_rate * 50);
+                    i_time += CLOCK_FREQ * i_offset / (p_sys->i_mux_rate * 50);
                 }
+                *va_arg( args, vlc_tick_t * ) = i_time;
                 return VLC_SUCCESS;
             }
             *va_arg( args, vlc_tick_t * ) = 0;
