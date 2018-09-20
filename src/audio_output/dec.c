@@ -352,8 +352,8 @@ int aout_DecPlay(audio_output_t *aout, block_t *block)
 
     assert (block->i_pts != VLC_TICK_INVALID);
 
-    block->i_length = CLOCK_FREQ * block->i_nb_samples
-                                 / owner->input_format.i_rate;
+    block->i_length = vlc_tick_from_samples( block->i_nb_samples,
+                                   owner->input_format.i_rate );
 
     int ret = aout_CheckReady (aout);
     if (unlikely(ret == AOUT_DEC_FAILED))
