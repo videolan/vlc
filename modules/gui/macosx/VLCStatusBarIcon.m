@@ -168,10 +168,8 @@
         // Attach pull-down menu
         [self.statusItem setMenu:_vlcStatusBarIconMenu];
 
-        // Visibility is 10.12+
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        if (OSX_SIERRA_AND_HIGHER) {
+
+        if (@available(macOS 10.12, *)) {
             [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];
             [self.statusItem setAutosaveName:@"statusBarItem"];
             [self.statusItem addObserver:self forKeyPath:NSStringFromSelector(@selector(isVisible))
@@ -179,7 +177,7 @@
         }
     }
 
-    if (OSX_SIERRA_AND_HIGHER) {
+    if (@available(macOS 10.12, *)) {
         // Sync VLC setting with status bar visibility setting (10.12 runtime only)
         [self.statusItem setVisible:YES];
     }
@@ -191,13 +189,12 @@
         return;
 
     // Lets keep alive the object in Sierra, and destroy it in older OS versions
-    if (OSX_SIERRA_AND_HIGHER) {
+    if (@available(macOS 10.12, *)) {
         self.statusItem.visible = NO;
     } else {
         [[NSStatusBar systemStatusBar] removeStatusItem:self.statusItem];
         self.statusItem = nil;
     }
-#pragma clang diagnostic pop
 }
 
 - (void)dealloc

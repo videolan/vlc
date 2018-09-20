@@ -56,10 +56,6 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
 
 - (void)subscribeToRemoteCommands
 {
-    if (!OSX_SIERRA_DOT_TWO_AND_HIGHER) {
-        return;
-    }
-
     MPRemoteCommandCenter *commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
 
     //Enable when you want to support these
@@ -78,14 +74,11 @@ static inline NSArray * RemoteCommandCenterCommandsToHandle()
     for (MPRemoteCommand *command in RemoteCommandCenterCommandsToHandle()) {
         [command addTarget:self action:@selector(remoteCommandEvent:)];
     }
+
 }
 
 - (void)unsubscribeFromRemoteCommands
 {
-    if (!OSX_SIERRA_DOT_TWO_AND_HIGHER) {
-        return;
-    }
-
     [MPNowPlayingInfoCenter defaultCenter].nowPlayingInfo = nil;
 
     for (MPRemoteCommand *command in RemoteCommandCenterCommandsToHandle()) {

@@ -25,11 +25,4 @@
 #import <Cocoa/Cocoa.h>
 
 #pragma mark -
-#pragma OS detection code
-#define OSX_EL_CAPITAN_AND_HIGHER (NSAppKitVersionNumber >= 1404)
-#define OSX_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1485)
-#define OSX_SIERRA_DOT_TWO_AND_HIGHER (NSAppKitVersionNumber >= 1504.76) // this is needed to check for MPRemoteCommandCenter
-#define OSX_HIGH_SIERRA_AND_HIGHER (NSAppKitVersionNumber >= 1560)
-#define OSX_MOJAVE_AND_HIGHER (NSAppKitVersionNumber >= 1639.10)
-
 void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);

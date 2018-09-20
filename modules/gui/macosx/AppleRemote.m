@@ -89,7 +89,7 @@ const NSTimeInterval HOLD_RECOGNITION_TIME_INTERVAL=0.4;
         [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:k2009RemoteButtonFullscreen] forKey:@"33_21_20_3_2_33_21_20_3_2_"];
         [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteControl_Switched]     forKey:@"42_33_23_21_20_2_33_23_21_20_2_"];
 
-        if (OSX_HIGH_SIERRA_AND_HIGHER) {
+        if (@available(macOS 10.13, *)) {
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Plus]    forKey:@"33_21_20_15_12_2_"];
             [mutableCookieToButtonMapping setObject:[NSNumber numberWithInt:kRemoteButtonVolume_Minus]   forKey:@"33_21_20_16_12_2_"];
         }
