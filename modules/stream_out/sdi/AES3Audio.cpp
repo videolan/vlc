@@ -77,7 +77,7 @@ size_t AES3AudioBuffer::FramesToBytes(unsigned f) const
     return (size_t) f * sizeof(uint16_t) * buffersubframes;
 }
 
-int64_t AES3AudioBuffer::FramesToDuration(unsigned f) const
+vlc_tick_t AES3AudioBuffer::FramesToDuration(unsigned f) const
 {
     return CLOCK_FREQ * f / 48000;
 }
