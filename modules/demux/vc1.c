@@ -184,7 +184,7 @@ static int Demux( demux_t *p_demux)
                     p_sys->p_packetizer->fmt_out.video.i_frame_rate_base,
                     p_sys->p_packetizer->fmt_out.video.i_frame_rate );
             else if( p_sys->f_fps > 0.001f )
-                p_sys->i_dts += (int64_t)((float) CLOCK_FREQ / p_sys->f_fps);
+                p_sys->i_dts += (vlc_tick_t)((float) CLOCK_FREQ / p_sys->f_fps);
             else
                 p_sys->i_dts += VLC_TICK_FROM_MS(40);
         }
