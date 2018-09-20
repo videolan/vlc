@@ -1123,7 +1123,7 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
         if( p_instance->p_input )
         {
             p_idsc->i_time = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "time" ));
-            p_idsc->i_length = var_GetInteger( p_instance->p_input, "length" );
+            p_idsc->i_length = US_FROM_VLC_TICK(var_GetInteger( p_instance->p_input, "length" ));
             p_idsc->d_position = var_GetFloat( p_instance->p_input, "position" );
             if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
                 p_idsc->b_paused = true;

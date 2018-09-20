@@ -260,14 +260,14 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return 0;
 
     input_thread_t * p_input = pl_CurrentInput(p_intf);
-    int64_t i_duration = -1;
+    vlc_tick_t i_duration;
     if (!p_input)
-        return i_duration;
+        return -1;
 
     i_duration = var_GetInteger(p_input, "length");
     vlc_object_release(p_input);
 
-    return (i_duration / 1000000);
+    return SEC_FROM_VLC_TICK(i_duration);
 }
 
 - (NSURL*)URLOfCurrentPlaylistItem

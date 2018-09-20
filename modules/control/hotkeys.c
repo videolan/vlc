@@ -1526,7 +1526,7 @@ static void DisplayPosition( vout_thread_t *p_vout, int slider_chan,
     ClearChannels( p_vout, slider_chan );
 
     int64_t t = SEC_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
-    int64_t l = var_GetInteger( p_input, "length" ) / CLOCK_FREQ;
+    int64_t l = SEC_FROM_VLC_TICK(var_GetInteger( p_input, "length" ));
 
     secstotimestr( psz_time, t );
 
