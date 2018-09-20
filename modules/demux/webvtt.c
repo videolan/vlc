@@ -421,8 +421,7 @@ static void MakeExtradata( demux_sys_t *p_sys, void **p_extra, size_t *pi_extra 
 static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    int64_t i64;
-    double *pf, f;
+    double *pf;
 
     switch( i_query )
     {
@@ -464,11 +463,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_SET_POSITION:
-            f = va_arg( args, double );
             if( p_sys->cues.i_count )
             {
-                i64 = f * p_sys->i_length;
-                p_sys->index.i_current = getIndexByTime( p_sys, i64 );
+                double f = va_arg( args, double );
+                p_sys->index.i_current = getIndexByTime( p_sys, p_sys->i_length * f );
                 p_sys->b_first_time = true;
                 p_sys->i_next_demux_time =
                         p_sys->index.p_array[p_sys->index.i_current].time;
