@@ -1349,7 +1349,7 @@ static block_t * ConvertPESBlock( demux_t *p_demux, ts_es_t *p_es,
              * In this case use the last PCR + 40ms */
             stime_t i_pcr = p_es->p_program->pcr.i_current;
             if( SETANDVALID(i_pcr) )
-                p_block->i_pts = FROM_SCALE(i_pcr) + 40000;
+                p_block->i_pts = FROM_SCALE(i_pcr) + VLC_TICK_FROM_MS(40);
         }
     }
     else if( p_es->fmt.i_codec == VLC_CODEC_ARIB_A ||
