@@ -127,7 +127,7 @@ static block_t *Encode(encoder_t *p_enc, picture_t *p_pict)
     }
 
 #ifndef NDEBUG
-    msg_Dbg(p_enc, "%zu bytes (frame %"PRId64", %.2ffps)", p_block->i_buffer,
+    msg_Dbg(p_enc, "%zu bytes (frame %u, %.2ffps)", p_block->i_buffer,
         p_sys->frame_count, (float)p_sys->frame_count * CLOCK_FREQ / (vlc_tick_now() - p_sys->start));
 #endif
 
