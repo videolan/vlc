@@ -293,6 +293,8 @@ static int Store(vlc_keystore *p_keystore,
         return VLC_EGENERIC;
     }
 
+    msg_Dbg(p_keystore, "Store keychain entry for server %s", ppsz_values[KEY_SERVER]);
+
     NSMutableDictionary *query = nil;
     NSMutableDictionary *searchQuery = CreateQuery(p_keystore);
 
@@ -307,7 +309,7 @@ static int Store(vlc_keystore *p_keystore,
     /* search */
     status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, &result);
     /* create storage unit */
-    NSData *secretData = [[NSString stringWithFormat:@"%s", p_secret] dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *secretData = [NSData dataWithBytes:p_secret length:i_secret_len];
 
     if (status == errSecSuccess) {
         msg_Dbg(p_keystore, "the item was already known to keychain, so it will be updated");
@@ -349,6 +351,8 @@ static unsigned int Find(vlc_keystore *p_keystore,
     CFTypeRef result = NULL;
     NSMutableDictionary *baseLookupQuery = CreateQuery(p_keystore);
     OSStatus status;
+
+    msg_Dbg(p_keystore, "Lookup keychain entry for server %s", ppsz_values[KEY_SERVER]);
 
     /* set attributes */
     SetAttributesForQuery(ppsz_values, baseLookupQuery, NULL);
@@ -401,13 +405,7 @@ static unsigned int Find(vlc_keystore *p_keystore,
         }
 
         NSData *secretData = (__bridge_transfer NSData *)secretResult;
-        NSUInteger secretDataLength = secretData.length;
-
-        /* we need to do some padding here, as string is expected to be 0 terminated */
-        uint8_t *paddedSecretData = calloc(1, secretDataLength + 1);
-        memcpy(paddedSecretData, secretData.bytes, secretDataLength);
-        vlc_keystore_entry_set_secret(p_entry, paddedSecretData, secretDataLength + 1);
-        free(paddedSecretData);
+        vlc_keystore_entry_set_secret(p_entry, secretData.bytes, secretData.length);
     }
 
     *pp_entries = p_entries;
