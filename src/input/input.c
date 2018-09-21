@@ -3386,6 +3386,7 @@ int input_GetAttachments(input_thread_t *input,
     if (attachments_count <= 0)
     {
         vlc_mutex_unlock(&priv->p_item->lock);
+        *attachments = NULL;
         return 0;
     }
 
