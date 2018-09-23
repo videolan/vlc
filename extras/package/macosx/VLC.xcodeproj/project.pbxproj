@@ -1538,7 +1538,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1830,7 +1830,7 @@
 					../../../modules/codec/,
 				);
 				LIBRARY_SEARCH_PATHS = "${VLC_SRC_DIR}/build/vlc_install_dir/lib";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = YES;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
@@ -1879,7 +1879,7 @@
 					../../../modules/codec/,
 				);
 				LIBRARY_SEARCH_PATHS = "${VLC_SRC_DIR}/build/vlc_install_dir/lib";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
 				VLC_BUILD_TRIPLET = "x86_64-apple-darwin17";
@@ -1927,7 +1927,7 @@
 					../../../modules/codec/,
 				);
 				LIBRARY_SEARCH_PATHS = "${VLC_SRC_DIR}/build/vlc_install_dir/lib";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PATH = $VLC_PATH;
 				PRODUCT_NAME = VLC;
 				VLC_BUILD_TRIPLET = "x86_64-apple-darwin17";
@@ -1949,7 +1949,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,

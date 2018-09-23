@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ARCH="x86_64"
-MINIMAL_OSX_VERSION="10.10"
+MINIMAL_OSX_VERSION="10.11"
 
 
 vlcGetTriplet() {

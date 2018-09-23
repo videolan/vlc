@@ -34,7 +34,7 @@ OPTIONS="
         --disable-pulse
         --disable-sdl-image
         --disable-vnc
-        --with-macosx-version-min=10.10
+        --with-macosx-version-min=10.11
 "
 
 export CFLAGS

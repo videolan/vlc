@@ -9,7 +9,7 @@ xib_verbose__0 = $(xib_verbose_0)
 	$(AM_V_at)mkdir -p -- gui/macosx/UI
 	$(xib_verbose)$(XIB) --errors --warnings --notices \
 	  --module VLC --auto-activate-custom-fonts --target-device mac \
-	  --minimum-deployment-target 10.10 --output-format human-readable-text \
+	  --minimum-deployment-target 10.11 --output-format human-readable-text \
 	  --compile $@ $<
 
 libmacosx_plugin_la_OBJCFLAGS = $(AM_OBJCFLAGS) -fobjc-exceptions -fobjc-arc
