@@ -408,6 +408,8 @@ static int OpenEncoder(vlc_object_t *p_this)
 
     struct aom_codec_enc_cfg enccfg = {};
     aom_codec_enc_config_default(iface, &enccfg, 0);
+    enccfg.g_timebase.num = p_enc->fmt_in.video.i_frame_rate_base;
+    enccfg.g_timebase.den = p_enc->fmt_in.video.i_frame_rate;
     enccfg.g_threads = __MIN(vlc_GetCPUCount(), 4);
     enccfg.g_w = p_enc->fmt_in.video.i_visible_width;
     enccfg.g_h = p_enc->fmt_in.video.i_visible_height;
