@@ -58,3 +58,8 @@ typedef NSUInteger NSWindowStyleMask;
 
 void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
 
+@interface NSColor(VLCAdditions)
+
+@property(class, strong, readonly) NSColor * _Nonnull VLCSecondaryLabelColor;
+
+@end

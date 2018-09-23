@@ -2208,7 +2208,6 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
                       [pb propertyListForType:@"VLC media player module"]) != NULL) {
         NSEnumerator *iter = nil;
         id val;
-        BOOL isCopy = (srcMask & NSDragOperationMove) ? NO:YES;
         // Move the modules
         iter = [array objectEnumerator];
         while ((val = [iter nextObject]) != NULL) {

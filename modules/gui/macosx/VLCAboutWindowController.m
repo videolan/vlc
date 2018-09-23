@@ -94,7 +94,7 @@
 
     /* l10n */
     [[self window] setTitle: _NS("About VLC media player")];
-    NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor secondaryLabelColor], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
+    NSDictionary *stringAttributes = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:NSUnderlineStyleSingle], NSUnderlineStyleAttributeName, [NSColor VLCSecondaryLabelColor], NSForegroundColorAttributeName, [NSFont systemFontOfSize:13], NSFontAttributeName, nil];
     NSAttributedString *attrStr;
     attrStr = [[NSAttributedString alloc] initWithString:_NS("Credits") attributes:stringAttributes];
     [o_credits_btn setAttributedTitle:attrStr];
@@ -141,7 +141,7 @@
     NSMutableAttributedString *joinus_readytorender = [[NSMutableAttributedString alloc] initWithHTML:[joinUsWithStyle dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:YES]
                                                                                               options:@{NSCharacterEncodingDocumentOption : [NSNumber numberWithInt:NSUTF8StringEncoding]}
                                                                                    documentAttributes:NULL];
-    [joinus_readytorender setAttributes:@{NSForegroundColorAttributeName : [NSColor secondaryLabelColor],
+    [joinus_readytorender setAttributes:@{NSForegroundColorAttributeName : [NSColor VLCSecondaryLabelColor],
                                           NSFontAttributeName : [NSFont systemFontOfSize:12.]}
                                   range:NSMakeRange(0, joinus_readytorender.length)];
     [o_joinus_txt setAllowsEditingTextAttributes: YES];
@@ -199,7 +199,7 @@
         stringToDisplay = toNSStr(psz_license);
 
     NSAttributedString *attributedString = [[NSAttributedString alloc] initWithString:stringToDisplay
-                                                                           attributes:@{NSForegroundColorAttributeName : [NSColor secondaryLabelColor],
+                                                                           attributes:@{NSForegroundColorAttributeName : [NSColor VLCSecondaryLabelColor],
                                                                                         NSFontAttributeName : [NSFont systemFontOfSize:12.]}];
     [[o_credits_textview textStorage] setAttributedString:attributedString];
 

@@ -26,6 +26,7 @@
 #import "VLCMain.h"
 #import "VLCMainWindow.h"
 #import "VLCAddonListItem.h"
+#import "CompatibilityFixes.h"
 
 @interface VLCAddonsWindowController() <NSTableViewDataSource, NSTableViewDelegate>
 {
@@ -228,7 +229,7 @@ static void addonChangedCallback( addons_manager_t *manager,
     [htmlDescription replaceOccurrencesOfString:@"\n" withString:@"<br />" options:NSLiteralSearch range:NSMakeRange(0, [htmlDescription length])];
     NSMutableAttributedString *attributedDescription = [[NSMutableAttributedString alloc] initWithHTML:[htmlDescription dataUsingEncoding:NSUTF8StringEncoding]
                                                                       documentAttributes:NULL];
-    [attributedDescription setAttributes:@{NSForegroundColorAttributeName : [NSColor secondaryLabelColor], NSFontAttributeName : [NSFont systemFontOfSize:11.]} range:NSMakeRange(0, attributedDescription.length)];
+    [attributedDescription setAttributes:@{NSForegroundColorAttributeName : [NSColor VLCSecondaryLabelColor], NSFontAttributeName : [NSFont systemFontOfSize:11.]} range:NSMakeRange(0, attributedDescription.length)];
     [[_description textStorage] setAttributedString:attributedDescription];
 
     [self updateInstallButton:[currentItem isInstalled]];

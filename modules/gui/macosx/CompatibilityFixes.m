@@ -43,3 +43,17 @@ void swapoutOverride(Class cls, SEL selector)
     if (subclassMeth && baseImp)
         method_setImplementation(subclassMeth, baseImp);
 }
+
+@implementation NSColor (VLCAdditions)
+
++ (NSColor *)VLCSecondaryLabelColor
+{
+    SEL secondaryColorSelector = @selector(secondaryLabelColor);
+    if ([super respondsToSelector:secondaryColorSelector]) {
+        return [super performSelector:secondaryColorSelector];
+    } else {
+        return [NSColor colorWithCalibratedWhite:NSDarkGray alpha:1.];
+    }
+}
+
+@end
