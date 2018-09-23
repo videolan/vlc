@@ -42,6 +42,8 @@
 @property NSGradient *trackGradient;
 @property NSGradient *highlightGradient;
 @property NSGradient *knobGradient;
+@property CGFloat knobGradientAngle;
+@property CGFloat knobGradientAngleHighlighted;
 
 // Shadows
 @property NSShadow *knobShadow;
