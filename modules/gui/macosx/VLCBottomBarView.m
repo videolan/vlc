@@ -1,10 +1,11 @@
 /*****************************************************************************
  * VLCBottomBarView.m
  *****************************************************************************
- * Copyright (C) 2017 VLC authors and VideoLAN
+ * Copyright (C) 2017-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Marvin Scholz <epirat07 at gmail dot com>
+ *          Felix Paul Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +23,7 @@
  *****************************************************************************/
 
 #import "VLCBottomBarView.h"
+#import "CompatibilityFixes.h"
 
 @interface VLCBottomBarView () {
     NSBezierPath *_rectanglePath;
@@ -72,9 +74,19 @@
                                                    endingColor:[NSColor colorWithSRGBRed:0.82 green:0.82 blue:0.82 alpha:1.0]];
     _lightStroke = [NSColor colorWithSRGBRed:0.65 green:0.65 blue:0.65 alpha:1.0];
 
-    _darkGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithSRGBRed:0.24 green:0.24 blue:0.24 alpha:1.0]
-                                                  endingColor:[NSColor colorWithSRGBRed:0.07 green:0.07 blue:0.07 alpha:1.0]];
-    _darkStroke = [NSColor blackColor];
+    if (OSX_MOJAVE_AND_HIGHER) {
+        _darkGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithSRGBRed:0.27 green:0.27 blue:0.27 alpha:1.0]
+                                                      endingColor:[NSColor colorWithSRGBRed:0.22 green:0.22 blue:0.22 alpha:1.0]];
+        _darkStroke = [NSColor colorWithSRGBRed:0.17 green:0.17 blue:0.18 alpha:1.0];
+    } else {
+        _darkGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithSRGBRed:0.24 green:0.24 blue:0.24 alpha:1.0]
+                                                      endingColor:[NSColor colorWithSRGBRed:0.07 green:0.07 blue:0.07 alpha:1.0]];
+        _darkStroke = [NSColor blackColor];
+    }
+
+    if (@available(macOS 10.14, *)) {
+        [self viewDidChangeEffectiveAppearance];
+    }
 }
 
 - (void)calculatePaths
@@ -128,6 +140,18 @@
 - (BOOL)isFlipped
 {
     return NO;
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    if (@available(macOS 10_14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua])
+            [self setDark:YES];
+        else
+            [self setDark:NO];
+
+        [self setNeedsDisplay:YES];
+    }
 }
 
 @end
