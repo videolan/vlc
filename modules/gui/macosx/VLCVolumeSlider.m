@@ -34,6 +34,11 @@
     if (self) {
         NSAssert([self.cell isKindOfClass:[VLCVolumeSliderCell class]],
                  @"VLCVolumeSlider cell is not VLCVolumeSliderCell");
+        if (@available(macOS 10.14, *)) {
+            [self viewDidChangeEffectiveAppearance];
+        } else {
+            [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
+        }
     }
     return self;
 }
@@ -49,12 +54,14 @@
     [super setNeedsDisplayInRect:[self bounds]];
 }
 
-- (void)setUsesBrightArtwork:(BOOL)brightArtwork
+- (void)viewDidChangeEffectiveAppearance
 {
-    if (brightArtwork) {
-        [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
-    } else {
-        [(VLCVolumeSliderCell*)self.cell setSliderStyleDark];
+    if (@available(macOS 10_14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            [(VLCVolumeSliderCell*)self.cell setSliderStyleDark];
+        } else {
+            [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
+        }
     }
 }
 

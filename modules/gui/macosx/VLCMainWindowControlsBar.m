@@ -104,7 +104,6 @@
 
     [self.volumeDownButton setImage: imageFromRes(@"volume-low")];
     [self.volumeUpButton setImage: imageFromRes(@"volume-high")];
-    [self.volumeSlider setUsesBrightArtwork: YES];
 
     if (self.nativeFullscreenMode) {
         [self.effectsButton setImage: imageFromRes(@"effects-one-button")];

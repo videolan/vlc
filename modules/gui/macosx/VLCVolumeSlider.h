@@ -26,6 +26,4 @@
 
 @interface VLCVolumeSlider : VLCDefaultValueSlider
 
-- (void)setUsesBrightArtwork:(BOOL)brightArtwork;
-
 @end
