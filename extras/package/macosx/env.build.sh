@@ -1,17 +1,16 @@
 #!/bin/bash
 
+ARCH="x86_64"
+MINIMAL_OSX_VERSION="10.10"
+
+
 vlcGetTriplet() {
     local OSX_KERNELVERSION=$(uname -r | cut -d. -f1)
     if [ ! -z "$VLC_FORCE_KERNELVERSION" ]; then
         OSX_KERNELVERSION="$VLC_FORCE_KERNELVERSION"
     fi
 
-    local LOCAL_ARCH="x86_64"
-    if [ -n "$ARCH" ]; then
-        LOCAL_ARCH="$ARCH"
-    fi
-
-    echo "$LOCAL_ARCH-apple-darwin$OSX_KERNELVERSION"
+    echo "$ARCH-apple-darwin$OSX_KERNELVERSION"
 }
 
 # Gets VLCs root dir based on location of this file, also follow symlinks
@@ -119,6 +118,7 @@ vlcUnsetContribEnvironment() {
 
 # Parameter handling
 
+
 # First parameter: mode to use this script:
 # vlc (default): auto-setup environment suitable for building vlc itself
 # contrib: auto-setup environment suitable for building vlc contribs
@@ -134,7 +134,7 @@ fi
 if [ "$VLC_ENV_MODE" = "contrib" ]; then
     vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
-    vlcSetContribEnvironment "10.10"
+    vlcSetContribEnvironment "$MINIMAL_OSX_VERSION"
 elif [ "$VLC_ENV_MODE" = "vlc" ]; then
     vlcSetBaseEnvironment
     vlcSetSymbolEnvironment
