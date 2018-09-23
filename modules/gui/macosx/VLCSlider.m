@@ -34,6 +34,11 @@
         NSAssert([self.cell isKindOfClass:[VLCSliderCell class]],
                  @"VLCSlider cell is not VLCSliderCell");
         _isScrollable = YES;
+        if (@available(macOS 10.14, *)) {
+            [self viewDidChangeEffectiveAppearance];
+        } else {
+            [self setSliderStyleLight];
+        }
     }
     return self;
 }
@@ -107,6 +112,16 @@
 - (void)setSliderStyleDark
 {
     [(VLCSliderCell*)[self cell] setSliderStyleDark];
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    if (@available(macOS 10_14, *)) {
+        if ([self.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua])
+            [self setSliderStyleDark];
+        else
+            [self setSliderStyleLight];
+    }
 }
 
 @end
