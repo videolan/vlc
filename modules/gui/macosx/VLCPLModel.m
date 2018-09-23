@@ -524,7 +524,7 @@ static int VolumeUpdated(vlc_object_t *p_this, const char *psz_var,
         char psz_duration[MSTRTIME_MAX_SIZE];
         vlc_tick_t dur = input_item_GetDuration(p_input);
         if (dur != -1) {
-            secstotimestr(psz_duration, SEC_FROM_VLC_TICK(dur));
+            secstotimestr(psz_duration, (int32_t)SEC_FROM_VLC_TICK(dur));
             o_value = toNSStr(psz_duration);
         }
         else

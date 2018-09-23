@@ -199,11 +199,11 @@
     [[VLCCoreInteraction sharedInstance] setVolume:(int)i_audioVolume];
 }
 
-- (int) audioDesync {
+- (long long) audioDesync {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
     vlc_tick_t i_delay;
 
-    if(!p_input)
+    if (!p_input)
         return -1;
 
     i_delay = var_GetInteger(p_input, "audio-delay");
@@ -212,9 +212,9 @@
     return MS_FROM_VLC_TICK( i_delay );
 }
 
-- (void) setAudioDesync:(int)i_audioDesync {
+- (void) setAudioDesync:(long long)i_audioDesync {
     input_thread_t * p_input = pl_CurrentInput(getIntf());
-    if(!p_input)
+    if (!p_input)
         return;
 
     var_SetInteger(p_input, "audio-delay", VLC_TICK_FROM_MS( i_audioDesync ));
