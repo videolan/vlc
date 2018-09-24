@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_block.h>
 #include <vlc_sout.h>
+#include <vlc_es.h>
 
 #include <libavformat/avformat.h>
 
@@ -285,6 +286,15 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         stream->sample_aspect_ratio.num = codecpar->sample_aspect_ratio.num;
         stream->time_base.den = i_frame_rate;
         stream->time_base.num = i_frame_rate_base;
+        if(i_codec_id == AV_CODEC_ID_RAWVIDEO)
+        {
+            video_format_t vfmt;
+            video_format_Copy(&vfmt, &fmt->video);
+            video_format_FixRgb(&vfmt);
+            if(GetFfmpegChroma(&codecpar->format, &vfmt))
+                msg_Warn(p_mux, "can't match format RAW video %4.4s", &vfmt.i_chroma);
+            video_format_Clean(&vfmt);
+        }
         if (fmt->i_bitrate == 0) {
             msg_Warn( p_mux, "Missing video bitrate, assuming 512k" );
             i_bitrate = 512000;

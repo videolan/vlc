@@ -62,7 +62,12 @@ static const struct vlc_avcodec_fourcc video_codecs[] =
     { VLC_CODEC_SP5X, AV_CODEC_ID_SP5X },
     { VLC_CODEC_JPEGLS, AV_CODEC_ID_JPEGLS },
     { VLC_CODEC_MP4V, AV_CODEC_ID_MPEG4 },
-    /* AV_CODEC_ID_RAWVIDEO */
+    { VLC_CODEC_RGB32, AV_CODEC_ID_RAWVIDEO },
+    { VLC_CODEC_RGB24, AV_CODEC_ID_RAWVIDEO },
+    { VLC_CODEC_RGB16, AV_CODEC_ID_RAWVIDEO },
+    { VLC_CODEC_RGB8, AV_CODEC_ID_RAWVIDEO },
+    { VLC_CODEC_RGBA, AV_CODEC_ID_RAWVIDEO },
+    { VLC_CODEC_ARGB, AV_CODEC_ID_RAWVIDEO },
     { VLC_CODEC_DIV1, AV_CODEC_ID_MSMPEG4V1 },
     { VLC_CODEC_DIV2, AV_CODEC_ID_MSMPEG4V2 },
     { VLC_CODEC_DIV3, AV_CODEC_ID_MSMPEG4V3 },
@@ -559,6 +564,8 @@ vlc_fourcc_t GetVlcFourcc( unsigned i_ffmpeg_codec )
 {
     for( size_t i = 0; i < ARRAY_SIZE(video_codecs); i++ )
     {
+        if( i_ffmpeg_codec == AV_CODEC_ID_RAWVIDEO )
+            return VLC_CODEC_UNKNOWN;
         if( video_codecs[i].i_codec == i_ffmpeg_codec )
             return video_codecs[i].i_fourcc;
     }
