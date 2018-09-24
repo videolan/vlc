@@ -24,6 +24,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 #pragma mark -
 #pragma OS detection code
 #define OSX_LION_AND_HIGHER (NSAppKitVersionNumber >= 1115.2)
@@ -63,3 +65,11 @@ void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
 @property(class, strong, readonly) NSColor * _Nonnull VLCSecondaryLabelColor;
 
 @end
+
+#ifndef MAC_OS_X_VERSION_10_14
+
+extern NSString *const NSAppearanceNameDarkAqua;
+
+#endif
+
+NS_ASSUME_NONNULL_END

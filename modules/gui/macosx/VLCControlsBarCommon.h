@@ -71,4 +71,7 @@
 - (void)setPlay;
 - (void)setFullscreenState:(BOOL)b_fullscreen;
 
+- (void)setBrightButtonImageSet;
+- (void)setDarkButtonImageSet;
+
 @end

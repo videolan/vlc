@@ -23,6 +23,7 @@
 
 #import "VLCSlider.h"
 #import "VLCSliderCell.h"
+#import "CompatibilityFixes.h"
 
 @implementation VLCSlider
 

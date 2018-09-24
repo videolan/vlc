@@ -57,3 +57,9 @@ void swapoutOverride(Class cls, SEL selector)
 }
 
 @end
+
+#ifndef MAC_OS_X_VERSION_10_14
+
+NSString *const NSAppearanceNameDarkAqua = @"NSAppearanceNameDarkAqua";
+
+#endif

@@ -1259,21 +1259,25 @@ static const float f_min_window_height = 307.;
     [super awakeFromNib];
     [self setAcceptsMouseMovedEvents: YES];
 
-    BOOL darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
-
-    if (darkInterface) {
-        [self setBackgroundColor: [NSColor clearColor]];
-
-        [self setOpaque: NO];
-        [self display];
-        [self setHasShadow:NO];
-        [self setHasShadow:YES];
-
-        [self setTitle: _NS("VLC media player")];
-
-        [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height] + [self.titlebarView frame].size.height)];
-    } else {
+    if (@available(macOS 10.14, *)) {
         [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
+    } else {
+        BOOL darkInterface = config_GetInt(getIntf(), "macosx-interfacestyle");
+
+        if (darkInterface) {
+            [self setBackgroundColor: [NSColor clearColor]];
+
+            [self setOpaque: NO];
+            [self display];
+            [self setHasShadow:NO];
+            [self setHasShadow:YES];
+
+            [self setTitle: _NS("VLC media player")];
+
+            [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height] + [self.titlebarView frame].size.height)];
+        } else {
+            [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
+        }
     }
 }
 
