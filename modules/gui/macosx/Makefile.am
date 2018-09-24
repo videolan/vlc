@@ -567,6 +567,8 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-high_dark@2x.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-low_dark.png \
 	gui/macosx/Resources/mainwindow_dark_yosemite/ys-volume-low_dark@2x.png \
+	gui/macosx/Resources/mainwindow_mojave_dark/mj-dropzone-dark.png \
+	gui/macosx/Resources/mainwindow_mojave_dark/mj-dropzone-dark@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow_yosemite/ys-backward-3btns.png \

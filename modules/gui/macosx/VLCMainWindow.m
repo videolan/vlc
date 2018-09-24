@@ -135,6 +135,9 @@ static const float f_min_window_height = 307.;
 - (void)dealloc
 {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
 }
 
 - (void)awakeFromNib
@@ -189,7 +192,20 @@ static const float f_min_window_height = 307.;
 
     // Dropzone
     [_dropzoneLabel setStringValue:_NS("Drop media here")];
-    [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
+    if (@available(macOS 10.14, *)) {
+        NSApplication *app = [NSApplication sharedApplication];
+        if ([app.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            [_dropzoneImageView setImage:[NSImage imageNamed:@"mj-dropzone-dark"]];
+        } else {
+            [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
+        }
+        [app addObserver:self
+              forKeyPath:@"effectiveAppearance"
+                 options:0
+                 context:nil];
+    } else {
+        [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
+    }
     [_dropzoneButton setTitle:_NS("Open media...")];
     [_dropzoneButton.cell accessibilitySetOverrideValue:_NS("Open a dialog to select the media to play")
                                            forAttribute:NSAccessibilityDescriptionAttribute];
@@ -728,6 +744,20 @@ static const float f_min_window_height = 307.;
 {
     [(VLCMainWindowControlsBar *)[self controlsBar] updateVolumeSlider];
     [self.fspanel setVolumeLevel:[[VLCCoreInteraction sharedInstance] volume]];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
+                       context:(void *)context
+{
+    if (@available(macOS 10_14, *)) {
+        if ([[[NSApplication sharedApplication] effectiveAppearance].name isEqualToString:NSAppearanceNameDarkAqua]) {
+            [_dropzoneImageView setImage:[NSImage imageNamed:@"mj-dropzone-dark"]];
+        } else {
+            [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
+        }
+    }
 }
 
 #pragma mark -
