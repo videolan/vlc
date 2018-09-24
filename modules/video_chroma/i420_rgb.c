@@ -211,30 +211,26 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     p_filter->p_sys = p_sys;
 
+    p_sys->i_buffer_size = 0;
+    p_sys->p_buffer = NULL;
     switch( p_filter->fmt_out.video.i_chroma )
     {
 #ifdef PLAIN
         case VLC_CODEC_RGB8:
-            p_sys->p_buffer = malloc( VOUT_MAX_WIDTH );
+            p_sys->i_bytespp = 1;
             break;
 #endif
         case VLC_CODEC_RGB15:
         case VLC_CODEC_RGB16:
-            p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 2 );
+            p_sys->i_bytespp = 2;
             break;
         case VLC_CODEC_RGB24:
         case VLC_CODEC_RGB32:
-            p_sys->p_buffer = malloc( VOUT_MAX_WIDTH * 4 );
+            p_sys->i_bytespp = 4;
             break;
         default:
-            p_sys->p_buffer = NULL;
-            break;
-    }
-
-    if( p_sys->p_buffer == NULL )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
+            free( p_sys );
+            return VLC_EGENERIC;
     }
 
     p_sys->p_offset = malloc( p_filter->fmt_out.video.i_width
@@ -243,7 +239,6 @@ static int Activate( vlc_object_t *p_this )
                     * sizeof( int ) );
     if( p_sys->p_offset == NULL )
     {
-        free( p_sys->p_buffer );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -267,7 +262,6 @@ static int Activate( vlc_object_t *p_this )
     if( p_sys->p_base == NULL )
     {
         free( p_sys->p_offset );
-        free( p_sys->p_buffer );
         free( p_sys );
         return -1;
     }
