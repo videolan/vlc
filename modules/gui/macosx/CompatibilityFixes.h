@@ -70,6 +70,14 @@ void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
 
 extern NSString *const NSAppearanceNameDarkAqua;
 
+@interface NSApplication (NSAppearanceCustomization)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability"
+@property (nullable, strong) NSAppearance *appearance;
+@property (readonly, strong) NSAppearance *effectiveAppearance;
+#pragma clang diagnostic pop
+@end
+
 #endif
 
 NS_ASSUME_NONNULL_END
