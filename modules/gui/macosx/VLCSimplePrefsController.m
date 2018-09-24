@@ -1,7 +1,7 @@
 /*****************************************************************************
 * VLCSimplePrefsController.m: Simple Preferences for Mac OS X
 *****************************************************************************
-* Copyright (C) 2008-2014 VLC authors and VideoLAN
+* Copyright (C) 2008-2018 VLC authors and VideoLAN
 * $Id$
 *
 * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
@@ -579,12 +579,25 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
     [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
 
-    if (config_GetInt(p_intf, "macosx-interfacestyle")) {
-        [_intf_style_darkButtonCell setState: YES];
-        [_intf_style_brightButtonCell setState: NO];
+    if (@available(macOS 10.14, *)) {
+        _intf_style_darkButtonCell.enabled = NO;
+        _intf_style_brightButtonCell.enabled = NO;
+
+        if ([self.contentView.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            [_intf_style_darkButtonCell setState: YES];
+            [_intf_style_brightButtonCell setState: NO];
+        } else {
+            [_intf_style_darkButtonCell setState: NO];
+            [_intf_style_brightButtonCell setState: YES];
+        }
     } else {
-        [_intf_style_darkButtonCell setState: NO];
-        [_intf_style_brightButtonCell setState: YES];
+        if (config_GetInt(p_intf, "macosx-interfacestyle")) {
+            [_intf_style_darkButtonCell setState: YES];
+            [_intf_style_brightButtonCell setState: NO];
+        } else {
+            [_intf_style_darkButtonCell setState: NO];
+            [_intf_style_brightButtonCell setState: YES];
+        }
     }
 
     BOOL httpEnabled = [self hasModule:@"http" inConfig:@"extraintf"];
