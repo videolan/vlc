@@ -24,5 +24,15 @@
 
 #import <Cocoa/Cocoa.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 #pragma mark -
 void swapoutOverride(Class _Nonnull cls, SEL _Nonnull selector);
+
+#ifndef MAC_OS_X_VERSION_10_14
+
+extern NSString *const NSAppearanceNameDarkAqua;
+
+#endif
+
+NS_ASSUME_NONNULL_END

@@ -43,3 +43,9 @@ void swapoutOverride(Class cls, SEL selector)
     if (subclassMeth && baseImp)
         method_setImplementation(subclassMeth, baseImp);
 }
+
+#ifndef MAC_OS_X_VERSION_10_14
+
+NSString *const NSAppearanceNameDarkAqua = @"NSAppearanceNameDarkAqua";
+
+#endif

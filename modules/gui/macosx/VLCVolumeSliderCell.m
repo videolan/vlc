@@ -89,7 +89,7 @@
 - (void)setSliderStyleDark
 {
     // Color Declarations
-    if (OSX_MOJAVE_AND_HIGHER) {
+    if (@available(macOS 10.14, *)) {
         _gradientColor = [NSColor colorWithCalibratedRed: 0.20 green: 0.20 blue: 0.20 alpha: 1];
         _knobFillColor = [NSColor colorWithCalibratedRed: 0.81 green: 0.81 blue: 0.81 alpha: 1];
         _activeKnobFillColor = [NSColor colorWithCalibratedRed: 0.76 green: 0.76 blue: 0.76 alpha: 1];

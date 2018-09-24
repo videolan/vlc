@@ -74,18 +74,15 @@
                                                    endingColor:[NSColor colorWithSRGBRed:0.82 green:0.82 blue:0.82 alpha:1.0]];
     _lightStroke = [NSColor colorWithSRGBRed:0.65 green:0.65 blue:0.65 alpha:1.0];
 
-    if (OSX_MOJAVE_AND_HIGHER) {
+    if (@available(macOS 10.14, *)) {
         _darkGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithSRGBRed:0.27 green:0.27 blue:0.27 alpha:1.0]
                                                       endingColor:[NSColor colorWithSRGBRed:0.22 green:0.22 blue:0.22 alpha:1.0]];
         _darkStroke = [NSColor colorWithSRGBRed:0.17 green:0.17 blue:0.18 alpha:1.0];
+        [self viewDidChangeEffectiveAppearance];
     } else {
         _darkGradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithSRGBRed:0.24 green:0.24 blue:0.24 alpha:1.0]
                                                       endingColor:[NSColor colorWithSRGBRed:0.07 green:0.07 blue:0.07 alpha:1.0]];
         _darkStroke = [NSColor blackColor];
-    }
-
-    if (@available(macOS 10.14, *)) {
-        [self viewDidChangeEffectiveAppearance];
     }
 }
 
