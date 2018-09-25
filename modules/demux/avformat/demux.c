@@ -814,8 +814,7 @@ static int Demux( demux_t *p_demux )
     lldiv_t q;
     if( p_sys->ic->start_time != (int64_t)AV_NOPTS_VALUE )
     {
-        q = lldiv( p_sys->ic->start_time, AV_TIME_BASE);
-        i_start_time = q.quot * CLOCK_FREQ + FROM_AV_TS(q.rem);
+        i_start_time = vlc_tick_from_frac(p_sys->ic->start_time, AV_TIME_BASE);
     }
     else
         i_start_time = 0;
@@ -824,22 +823,16 @@ static int Demux( demux_t *p_demux )
         p_frame->i_dts = VLC_TICK_INVALID;
     else
     {
-        q = lldiv( pkt.dts, p_stream->time_base.den );
-        p_frame->i_dts = q.quot * CLOCK_FREQ *
-            p_stream->time_base.num + q.rem * CLOCK_FREQ *
-            p_stream->time_base.num /
-            p_stream->time_base.den - i_start_time + VLC_TICK_0;
+        p_frame->i_dts = vlc_tick_from_frac( pkt.dts * p_stream->time_base.num, p_stream->time_base.den )
+                - i_start_time;
     }
 
     if( pkt.pts == (int64_t)AV_NOPTS_VALUE )
         p_frame->i_pts = VLC_TICK_INVALID;
     else
     {
-        q = lldiv( pkt.pts, p_stream->time_base.den );
-        p_frame->i_pts = q.quot * CLOCK_FREQ *
-            p_stream->time_base.num + q.rem * CLOCK_FREQ *
-            p_stream->time_base.num /
-            p_stream->time_base.den - i_start_time + VLC_TICK_0;
+        p_frame->i_pts = vlc_tick_from_frac( pkt.dts * p_stream->time_base.num, p_stream->time_base.den )
+                - i_start_time;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
         p_frame->i_length = vlc_tick_from_samples(pkt.duration *
