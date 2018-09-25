@@ -1727,7 +1727,7 @@ static int64_t AVI_PTSToByte( avi_track_t *tk, vlc_tick_t i_pts )
         return 0;
 
     i_pts = AVI_Rescale( i_pts, tk->i_scale, tk->i_rate );
-    return i_pts / CLOCK_FREQ * tk->i_samplesize;
+    return samples_from_vlc_tick(i_pts, tk->i_samplesize);
 }
 
 static vlc_tick_t AVI_GetDPTS( avi_track_t *tk, int64_t i_count )
