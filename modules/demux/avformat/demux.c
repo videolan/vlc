@@ -824,7 +824,7 @@ static int Demux( demux_t *p_demux )
     else
     {
         p_frame->i_dts = vlc_tick_from_frac( pkt.dts * p_stream->time_base.num, p_stream->time_base.den )
-                - i_start_time;
+                - i_start_time + VLC_TICK_0;
     }
 
     if( pkt.pts == (int64_t)AV_NOPTS_VALUE )
@@ -832,7 +832,7 @@ static int Demux( demux_t *p_demux )
     else
     {
         p_frame->i_pts = vlc_tick_from_frac( pkt.dts * p_stream->time_base.num, p_stream->time_base.den )
-                - i_start_time;
+                - i_start_time + VLC_TICK_0;
     }
     if( pkt.duration > 0 && p_frame->i_length <= 0 )
         p_frame->i_length = vlc_tick_from_samples(pkt.duration *
