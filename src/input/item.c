@@ -251,20 +251,22 @@ bool input_item_MetaMatch( input_item_t *p_i,
     return b_ret;
 }
 
+const char *input_item_GetMetaLocked(input_item_t *item,
+                                     vlc_meta_type_t meta_type)
+{
+    vlc_mutex_assert(&item->lock);
+
+    if (!item->p_meta)
+        return NULL;
+
+    return vlc_meta_Get(item->p_meta, meta_type);
+}
+
 char *input_item_GetMeta( input_item_t *p_i, vlc_meta_type_t meta_type )
 {
     vlc_mutex_lock( &p_i->lock );
-
-    if( !p_i->p_meta )
-    {
-        vlc_mutex_unlock( &p_i->lock );
-        return NULL;
-    }
-
-    char *psz = NULL;
-    if( vlc_meta_Get( p_i->p_meta, meta_type ) )
-        psz = strdup( vlc_meta_Get( p_i->p_meta, meta_type ) );
-
+    const char *value = input_item_GetMetaLocked( p_i, meta_type );
+    char *psz = value ? strdup( value ) : NULL;
     vlc_mutex_unlock( &p_i->lock );
     return psz;
 }
