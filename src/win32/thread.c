@@ -760,7 +760,7 @@ static vlc_tick_t mdate_wall (void)
     s.HighPart = ts.dwHighDateTime;
     /* hundreds of nanoseconds */
     static_assert ((10000000 % CLOCK_FREQ) == 0, "Broken frequencies ratio");
-    return s.QuadPart / (10000000 / CLOCK_FREQ);
+    return VLC_TICK_FROM_MSFTIME(s.QuadPart);
 }
 
 static vlc_tick_t mdate_default(void)
