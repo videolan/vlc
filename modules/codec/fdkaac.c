@@ -412,12 +412,11 @@ static block_t *EncodeAudio(encoder_t *p_enc, block_t *p_aout_buf)
                     p_block->i_nb_samples = d_samples_delay;
                     //p_block->i_length = i_pts_out - p_sys->i_pts_last;
                 } else {
-                    double d_samples_forward = (double)out_args.numInSamples/(double)p_enc->fmt_in.audio.i_channels;
-                    double d_length = ((double)CLOCK_FREQ * d_samples_forward /
-                                            (double)p_enc->fmt_out.audio.i_rate);
-                    i_pts_out += (vlc_tick_t) d_length;
-                    p_block->i_length = (vlc_tick_t) d_length;
-                    p_block->i_nb_samples = d_samples_forward;
+                    vlc_tick_t d_length = vlc_tick_from_samples(out_args.numInSamples,
+                                                    p_enc->fmt_out.audio.i_rate * p_enc->fmt_in.audio.i_channels);
+                    i_pts_out += d_length;
+                    p_block->i_length = d_length;
+                    p_block->i_nb_samples = out_args.numInSamples / p_enc->fmt_in.audio.i_channels;
                 }
             }
             p_block->i_dts = p_block->i_pts = i_pts_out;

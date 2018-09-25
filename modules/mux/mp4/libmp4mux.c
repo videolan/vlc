@@ -1289,7 +1289,7 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     bo_swap_32be(stts, 12, i_index);
 
     //msg_Dbg(p_obj, "total sout duration %"PRId64" reconverted from scaled %"PRId64,
-    //                i_total_mtime, i_total_scaled * CLOCK_FREQ / p_track->i_timescale );
+    //                i_total_mtime, vlc_tick_from_samples(i_total_scaled, p_track->i_timescale) );
 
     /* composition time handling */
     bo_t *ctts = NULL;
