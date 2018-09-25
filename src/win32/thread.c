@@ -741,9 +741,7 @@ static vlc_tick_t mdate_perf (void)
 
     /* Convert to from (1/freq) to microsecond resolution */
     /* We need to split the division to avoid 63-bits overflow */
-    lldiv_t d = lldiv (counter.QuadPart, clk.perf.freq.QuadPart);
-
-    return vlc_tick_from_sec( d.quot ) + ((d.rem * CLOCK_FREQ) / clk.perf.freq.QuadPart);
+    return vlc_tick_from_frac(counter.QuadPart, clk.perf.freq.QuadPart);
 }
 
 static vlc_tick_t mdate_wall (void)

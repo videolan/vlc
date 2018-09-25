@@ -520,12 +520,10 @@ vlc_tick_t vlc_tick_now (void)
     uint64_t denom = vlc_clock_conversion_factor.denom;
 
     /* Switch to microsecs */
-    denom *= 1000LL;
+    denom *= UINT64_C(1000);
 
     /* Split the division to prevent overflow */
-    lldiv_t d = lldiv (vlc_clock_conversion_factor.numer, denom);
-
-    return (d.quot * date) + ((d.rem * date) / denom);
+    return vlc_tick_from_frac( date * vlc_clock_conversion_factor.numer, denom );
 }
 
 #undef vlc_tick_wait
