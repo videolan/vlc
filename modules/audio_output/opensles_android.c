@@ -45,7 +45,7 @@
 JNIEnv *android_getEnv(vlc_object_t *p_obj, const char *psz_thread_name);
 
 #define OPENSLES_BUFFERS 255 /* maximum number of buffers */
-#define VLC_TICK_FROM_MS(OPENSLES_BUFLEN)  10   /* ms */
+#define OPENSLES_BUFLEN  VLC_TICK_FROM_MS(10)
 /*
  * 10ms of precision when mesasuring latency should be enough,
  * with 255 buffers we can buffer 2.55s of audio.
