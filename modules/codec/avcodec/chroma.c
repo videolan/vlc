@@ -226,7 +226,6 @@ vlc_fourcc_t FindVlcChroma( int i_ffmpeg_id )
 
 int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
 {
-    /* TODO FIXME for rgb format we HAVE to set rgb mask/shift */
     for( int i = 0; chroma_table[i].i_chroma != 0; i++ )
     {
         if( chroma_table[i].i_chroma_id == i_ffmpeg_chroma )
@@ -235,6 +234,7 @@ int GetVlcChroma( video_format_t *fmt, int i_ffmpeg_chroma )
             fmt->i_gmask = chroma_table[i].i_gmask;
             fmt->i_bmask = chroma_table[i].i_bmask;
             fmt->i_chroma = chroma_table[i].i_chroma;
+            video_format_FixRgb( fmt );
             return VLC_SUCCESS;
         }
     }
