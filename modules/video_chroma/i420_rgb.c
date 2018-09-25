@@ -46,7 +46,7 @@ static picture_t *I420_RGB16_Filter( filter_t *, picture_t * );
 static picture_t *I420_RGB32_Filter( filter_t *, picture_t * );
 
 static void SetGammaTable( int *pi_table, double f_gamma );
-static void SetYUV( filter_t * );
+static void SetYUV( filter_t *, const video_format_t * );
 static void Set8bppPalette( filter_t *, uint8_t * );
 #else
 static picture_t *I420_R5G5B5_Filter( filter_t *, picture_t * );
@@ -61,12 +61,12 @@ static picture_t *I420_A8B8G8R8_Filter( filter_t *, picture_t * );
  * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
  *****************************************************************************/
 #define RGB2PIXEL( p_filter, i_r, i_g, i_b )                 \
-    (((((uint32_t)i_r) >> p_filter->fmt_out.video.i_rrshift) \
-                       << p_filter->fmt_out.video.i_lrshift) \
-   | ((((uint32_t)i_g) >> p_filter->fmt_out.video.i_rgshift) \
-                       << p_filter->fmt_out.video.i_lgshift) \
-   | ((((uint32_t)i_b) >> p_filter->fmt_out.video.i_rbshift) \
-                       << p_filter->fmt_out.video.i_lbshift))
+    (((((uint32_t)i_r) >> vfmt->i_rrshift) \
+                       << vfmt->i_lrshift) \
+   | ((((uint32_t)i_g) >> vfmt->i_rgshift) \
+                       << vfmt->i_lgshift) \
+   | ((((uint32_t)i_b) >> vfmt->i_rbshift) \
+                       << vfmt->i_lbshift))
 
 /*****************************************************************************
  * Module descriptor.
@@ -266,7 +266,14 @@ static int Activate( vlc_object_t *p_this )
         return -1;
     }
 
-    SetYUV( p_filter );
+    video_format_t vfmt;
+    video_format_Init( &vfmt, p_filter->fmt_out.video.i_chroma );
+    video_format_Copy( &vfmt, &p_filter->fmt_out.video );
+    if( !vfmt.i_bmask || !vfmt.i_gmask || !vfmt.i_bmask )
+        msg_Warn( p_filter, "source did not set proper target RGB masks, using default" );
+    video_format_FixRgb( &vfmt );
+    SetYUV( p_filter, &vfmt );
+    video_format_Clean( &vfmt );
 #endif
 
     return 0;
@@ -324,7 +331,7 @@ static void SetGammaTable( int *pi_table, double f_gamma )
 /*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
-static void SetYUV( filter_t *p_filter )
+static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 {
     int          pi_gamma[256];                               /* gamma table */
     volatile int i_index;                                 /* index in tables */
