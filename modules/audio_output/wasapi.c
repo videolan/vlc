@@ -129,14 +129,12 @@ static HRESULT TimeGet(aout_stream_t *s, vlc_tick_t *restrict delay)
         return hr;
     }
 
-    lldiv_t w = lldiv(sys->written, sys->rate);
-    lldiv_t r = lldiv(pos, freq);
+    vlc_tick_t written = vlc_tick_from_frac(sys->written, sys->rate);
+    vlc_tick_t tick_pos = vlc_tick_from_frac(pos, freq);
 
     static_assert((10000000 % CLOCK_FREQ) == 0, "Frequency conversion broken");
 
-    *delay = vlc_tick_from_sec(w.quot - r.quot)
-           + (vlc_tick_from_sec(w.rem) / sys->rate)
-           - (vlc_tick_from_sec(r.rem) / freq)
+    *delay = written - tick_pos
            - VLC_TICK_FROM_MSFTIME(GetQPC() - qpcpos);
 
     return hr;
