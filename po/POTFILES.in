@@ -1020,6 +1020,7 @@ modules/notify/osx_notifications.m
 modules/notify/notify.c
 modules/packetizer/a52.c
 modules/packetizer/avparser.h
+modules/packetizer/av1.c
 modules/packetizer/copy.c
 modules/packetizer/dirac.c
 modules/packetizer/dts.c

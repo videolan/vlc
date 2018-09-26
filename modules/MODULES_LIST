@@ -61,6 +61,7 @@ $Id$
  * avcodec: libavcodec audio/video decoder
  * avformat: libavformat demuxer
  * avi: AVI file stream demuxer
+ * av1: AV1 packetizer
  * avio: Access and Stream output module using libavformat network
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
