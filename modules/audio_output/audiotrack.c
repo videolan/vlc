@@ -204,6 +204,7 @@ static struct
     struct {
         jclass clazz;
         jmethodID ctor;
+        bool has_ctor_21;
         jmethodID release;
         jmethodID getState;
         jmethodID play;
@@ -226,6 +227,12 @@ static struct
         jint ERROR_INVALID_OPERATION;
         jint WRITE_NON_BLOCKING;
     } AudioTrack;
+    struct {
+        jclass clazz;
+        jmethodID ctor;
+        jmethodID build;
+        jmethodID setLegacyStreamType;
+    } AudioAttributes_Builder;
     struct {
         jint ENCODING_PCM_8BIT;
         jint ENCODING_PCM_16BIT;
@@ -257,6 +264,14 @@ static struct
         jint CHANNEL_OUT_SIDE_RIGHT;
         bool has_CHANNEL_OUT_SIDE;
     } AudioFormat;
+    struct {
+        jclass clazz;
+        jmethodID ctor;
+        jmethodID build;
+        jmethodID setChannelMask;
+        jmethodID setEncoding;
+        jmethodID setSampleRate;
+    } AudioFormat_Builder;
     struct {
         jint ERROR_DEAD_OBJECT;
         bool has_ERROR_DEAD_OBJECT;
@@ -326,7 +341,11 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     jfields.AudioTrack.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
     CHECK_EXCEPTION( "NewGlobalRef", true );
 
-    GET_ID( GetMethodID, AudioTrack.ctor, "<init>", "(IIIIIII)V", true );
+    GET_ID( GetMethodID, AudioTrack.ctor, "<init>",
+            "(Landroid/media/AudioAttributes;Landroid/media/AudioFormat;III)V", false );
+    jfields.AudioTrack.has_ctor_21 = jfields.AudioTrack.ctor != NULL;
+    if( !jfields.AudioTrack.has_ctor_21 )
+        GET_ID( GetMethodID, AudioTrack.ctor, "<init>", "(IIIIIII)V", true );
     GET_ID( GetMethodID, AudioTrack.release, "release", "()V", true );
     GET_ID( GetMethodID, AudioTrack.getState, "getState", "()I", true );
     GET_ID( GetMethodID, AudioTrack.play, "play", "()V", true );
@@ -365,6 +384,35 @@ InitJNIFields( audio_output_t *p_aout, JNIEnv* env )
     GET_CONST_INT( AudioTrack.ERROR_BAD_VALUE , "ERROR_BAD_VALUE", true );
     GET_CONST_INT( AudioTrack.ERROR_INVALID_OPERATION,
                    "ERROR_INVALID_OPERATION", true );
+
+    if( jfields.AudioTrack.has_ctor_21 )
+    {
+        /* AudioAttributes_Builder class init */
+        GET_CLASS( "android/media/AudioAttributes$Builder", true );
+        jfields.AudioAttributes_Builder.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
+        CHECK_EXCEPTION( "NewGlobalRef", true );
+        GET_ID( GetMethodID, AudioAttributes_Builder.ctor, "<init>",
+                "()V", true );
+        GET_ID( GetMethodID, AudioAttributes_Builder.build, "build",
+                "()Landroid/media/AudioAttributes;", true );
+        GET_ID( GetMethodID, AudioAttributes_Builder.setLegacyStreamType, "setLegacyStreamType",
+                "(I)Landroid/media/AudioAttributes$Builder;", true );
+
+        /* AudioFormat_Builder class init */
+        GET_CLASS( "android/media/AudioFormat$Builder", true );
+        jfields.AudioFormat_Builder.clazz = (jclass) (*env)->NewGlobalRef( env, clazz );
+        CHECK_EXCEPTION( "NewGlobalRef", true );
+        GET_ID( GetMethodID, AudioFormat_Builder.ctor, "<init>",
+                "()V", true );
+        GET_ID( GetMethodID, AudioFormat_Builder.build, "build",
+                "()Landroid/media/AudioFormat;", true );
+        GET_ID( GetMethodID, AudioFormat_Builder.setChannelMask, "setChannelMask",
+                "(I)Landroid/media/AudioFormat$Builder;", true );
+        GET_ID( GetMethodID, AudioFormat_Builder.setEncoding, "setEncoding",
+                "(I)Landroid/media/AudioFormat$Builder;", true );
+        GET_ID( GetMethodID, AudioFormat_Builder.setSampleRate, "setSampleRate",
+                "(I)Landroid/media/AudioFormat$Builder;", true );
+    }
 
     /* AudioTimestamp class init (if any) */
     if( jfields.AudioTrack.getTimestamp )
@@ -467,7 +515,7 @@ end:
 
 static inline bool
 check_exception( JNIEnv *env, audio_output_t *p_aout,
-                 const char *method )
+                 const char *class, const char *method )
 {
     if( (*env)->ExceptionCheck( env ) )
     {
@@ -477,17 +525,20 @@ check_exception( JNIEnv *env, audio_output_t *p_aout,
         p_sys->b_error = true;
         (*env)->ExceptionDescribe( env );
         (*env)->ExceptionClear( env );
-        msg_Err( p_aout, "AudioTrack.%s triggered an exception !", method );
+        msg_Err( p_aout, "%s.%s triggered an exception !", class, method );
         return true;
     } else
         return false;
 }
-#define CHECK_AT_EXCEPTION( method ) check_exception( env, p_aout, method )
+
+#define CHECK_EXCEPTION( class, method ) check_exception( env, p_aout, class, method )
+#define CHECK_AT_EXCEPTION( method ) check_exception( env, p_aout, "AudioTrack", method )
 
 #define JNI_CALL( what, obj, method, ... ) (*env)->what( env, obj, method, ##__VA_ARGS__ )
 
 #define JNI_CALL_INT( obj, method, ... ) JNI_CALL( CallIntMethod, obj, method, ##__VA_ARGS__ )
 #define JNI_CALL_BOOL( obj, method, ... ) JNI_CALL( CallBooleanMethod, obj, method, ##__VA_ARGS__ )
+#define JNI_CALL_OBJECT( obj, method, ... ) JNI_CALL( CallObjectMethod, obj, method, ##__VA_ARGS__ )
 #define JNI_CALL_VOID( obj, method, ... ) JNI_CALL( CallVoidMethod, obj, method, ##__VA_ARGS__ )
 #define JNI_CALL_STATIC_INT( clazz, method, ... ) JNI_CALL( CallStaticIntMethod, clazz, method, ##__VA_ARGS__ )
 
@@ -812,6 +863,99 @@ AudioTrack_GetChanOrder( uint16_t i_physical_channels, uint32_t p_chans_out[] )
 #undef HAS_CHAN
 }
 
+static jobject
+AudioTrack_New21( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+                  int i_channel_config, int i_format, int i_size,
+                  jint session_id )
+{
+    jobject p_audiotrack = NULL;
+    jobject p_aattr_builder = NULL;
+    jobject p_audio_attributes = NULL;
+    jobject p_afmt_builder = NULL;
+    jobject p_audio_format = NULL;
+    jobject ref;
+
+    p_aattr_builder =
+        JNI_CALL( NewObject,
+                  jfields.AudioAttributes_Builder.clazz,
+                  jfields.AudioAttributes_Builder.ctor );
+    if( !p_aattr_builder )
+        return NULL;
+
+    ref = JNI_CALL_OBJECT( p_aattr_builder,
+                           jfields.AudioAttributes_Builder.setLegacyStreamType,
+                           jfields.AudioManager.STREAM_MUSIC );
+    (*env)->DeleteLocalRef( env, ref );
+
+    p_audio_attributes =
+        JNI_CALL_OBJECT( p_aattr_builder,
+                         jfields.AudioAttributes_Builder.build );
+    if( !p_audio_attributes )
+        goto del_local_refs;
+
+    p_afmt_builder = JNI_CALL( NewObject,
+                               jfields.AudioFormat_Builder.clazz,
+                               jfields.AudioFormat_Builder.ctor );
+    if( !p_afmt_builder )
+        goto del_local_refs;
+
+    ref = JNI_CALL_OBJECT( p_afmt_builder,
+                           jfields.AudioFormat_Builder.setChannelMask,
+                           i_channel_config );
+    if( CHECK_EXCEPTION( "AudioFormat.Builder", "setChannelMask" ) )
+    {
+        (*env)->DeleteLocalRef( env, ref );
+        goto del_local_refs;
+    }
+    (*env)->DeleteLocalRef( env, ref );
+
+    ref = JNI_CALL_OBJECT( p_afmt_builder,
+                           jfields.AudioFormat_Builder.setEncoding,
+                           i_format );
+    if( CHECK_EXCEPTION( "AudioFormat.Builder", "setEncoding" ) )
+    {
+        (*env)->DeleteLocalRef( env, ref );
+        goto del_local_refs;
+    }
+    (*env)->DeleteLocalRef( env, ref );
+
+    ref = JNI_CALL_OBJECT( p_afmt_builder,
+                           jfields.AudioFormat_Builder.setSampleRate,
+                           i_rate );
+    if( CHECK_EXCEPTION( "AudioFormat.Builder", "setSampleRate" ) )
+    {
+        (*env)->DeleteLocalRef( env, ref );
+        goto del_local_refs;
+    }
+    (*env)->DeleteLocalRef( env, ref );
+
+    p_audio_format = JNI_CALL_OBJECT( p_afmt_builder,
+                                      jfields.AudioFormat_Builder.build );
+    if(!p_audio_format)
+        goto del_local_refs;
+
+    p_audiotrack = JNI_AT_NEW( p_audio_attributes, p_audio_format, i_size,
+                               jfields.AudioTrack.MODE_STREAM, session_id );
+
+del_local_refs:
+    (*env)->DeleteLocalRef( env, p_aattr_builder );
+    (*env)->DeleteLocalRef( env, p_audio_attributes );
+    (*env)->DeleteLocalRef( env, p_afmt_builder );
+    (*env)->DeleteLocalRef( env, p_audio_format );
+    return p_audiotrack;
+}
+
+static jobject
+AudioTrack_NewLegacy( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
+                      int i_channel_config, int i_format, int i_size,
+                      jint session_id )
+{
+    VLC_UNUSED( p_aout );
+    return JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC, i_rate,
+                       i_channel_config, i_format, i_size,
+                       jfields.AudioTrack.MODE_STREAM, session_id );
+}
+
 /**
  * Create an Android AudioTrack.
  * returns -1 on error, 0 on success.
@@ -822,13 +966,18 @@ AudioTrack_New( JNIEnv *env, audio_output_t *p_aout, unsigned int i_rate,
 {
     aout_sys_t *p_sys = p_aout->sys;
     jint session_id = var_InheritInteger( p_aout, "audiotrack-session-id" );
-    jobject p_audiotrack = JNI_AT_NEW( jfields.AudioManager.STREAM_MUSIC,
-                                       i_rate, i_channel_config, i_format,
-                                       i_size, jfields.AudioTrack.MODE_STREAM,
-                                       session_id );
+
+    jobject p_audiotrack;
+    if( jfields.AudioTrack.has_ctor_21 )
+        p_audiotrack = AudioTrack_New21( env, p_aout, i_rate, i_channel_config,
+                                         i_format, i_size, session_id );
+    else
+        p_audiotrack = AudioTrack_NewLegacy( env, p_aout, i_rate,
+                                             i_channel_config, i_format, i_size,
+                                             session_id );
     if( CHECK_AT_EXCEPTION( "AudioTrack<init>" ) || !p_audiotrack )
     {
-        msg_Warn( p_aout, "AudioTrack Init failed" ) ;
+        msg_Warn( p_aout, "AudioTrack Init failed" );
         return -1;
     }
     if( JNI_CALL_INT( p_audiotrack, jfields.AudioTrack.getState )
