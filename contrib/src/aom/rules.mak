@@ -1,5 +1,5 @@
 # aom
-AOM_HASH := ce4cce47bd0eda6871cfba278f50ef82b0b5e1b0
+AOM_HASH := a65377bf5c555fccd161f27c33168cc36390662e
 AOM_VERSION := v1.0.0-$(AOM_HASH)
 AOM_GITURL := https://aomedia.googlesource.com/aom/+archive/$(AOM_HASH).tar.gz
 
