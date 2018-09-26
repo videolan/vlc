@@ -85,6 +85,10 @@ vlc_module_end ()
 static int Demux  ( demux_t * );
 static int Control( demux_t *, int, va_list );
 
+#define WAV_PROBE_SIZE (512*1024)
+#define BASE_PROBE_SIZE (8000)
+#define WAV_EXTRA_PROBE_SIZE (44000/2*2*2)
+
 typedef struct
 {
     vlc_fourcc_t i_codec;
@@ -570,7 +574,6 @@ static int GenericFormatCheck( int i_format, const uint8_t *p_head )
 /*****************************************************************************
  * Wav header skipper
  *****************************************************************************/
-#define WAV_PROBE_SIZE (512*1024)
 static int WavSkipHeader( demux_t *p_demux, uint64_t *pi_skip,
                           const uint16_t rgi_twocc[],
                           int (*pf_format_check)( int, const uint8_t * ) )
@@ -642,7 +645,10 @@ static int WavSkipHeader( demux_t *p_demux, uint64_t *pi_skip,
 static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
                          const char * ppsz_name[],
                          int (*pf_check)( const uint8_t *, unsigned * ),
-                         unsigned i_check_size, bool b_use_word,
+                         unsigned i_check_size,
+                         unsigned i_base_probing,
+                         unsigned i_wav_extra_probing,
+                         bool b_use_word,
                          const uint16_t pi_twocc[],
                          int (*pf_format_check)( int, const uint8_t * ) )
 {
@@ -671,7 +677,7 @@ static int GenericProbe( demux_t *p_demux, uint64_t *pi_offset,
      * It is common that wav files have some sort of garbage at the begining
      * We will accept probing 0.5s of data in this case.
      */
-    const size_t i_probe = i_skip + i_check_size + 8000 + ( b_wav ? (44000/2*2*2) : 0);
+    const size_t i_probe = i_skip + i_check_size + i_base_probing + ( b_wav ? i_wav_extra_probing : 0);
     const size_t i_peek = vlc_stream_Peek( p_demux->s, &p_peek, i_probe );
     if( i_peek < i_skip + i_check_size )
     {
@@ -1151,7 +1157,8 @@ static int EA52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE, true, rgi_twocc, GenericFormatCheck );
+                         VLC_A52_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         true, rgi_twocc, GenericFormatCheck );
 }
 
 static int A52CheckSyncProbe( const uint8_t *p_peek, unsigned *pi_samples )
@@ -1166,7 +1173,8 @@ static int A52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE, true, rgi_twocc, GenericFormatCheck );
+                         VLC_A52_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         true, rgi_twocc, GenericFormatCheck );
 }
 
 static int A52Init( demux_t *p_demux )
@@ -1211,7 +1219,8 @@ static int DtsProbe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_DTS, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync,
-                         VLC_DTS_HEADER_SIZE, false, rgi_twocc, NULL );
+                         VLC_DTS_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         false, rgi_twocc, NULL );
 }
 static int DtsInit( demux_t *p_demux )
 {
@@ -1255,7 +1264,8 @@ static int MlpProbe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, MlpCheckSync,
-                         4+28+16*4, false, rgi_twocc, GenericFormatCheck );
+                         4+28+16*4, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         false, rgi_twocc, GenericFormatCheck );
 }
 static int ThdProbe( demux_t *p_demux, uint64_t *pi_offset )
 {
@@ -1263,7 +1273,8 @@ static int ThdProbe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, ThdCheckSync,
-                         4+28+16*4, false, rgi_twocc, GenericFormatCheck );
+                         4+28+16*4, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         false, rgi_twocc, GenericFormatCheck );
 }
 static int MlpInit( demux_t *p_demux )
 
