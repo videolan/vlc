@@ -1157,7 +1157,9 @@ static int EA52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, EA52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         VLC_A52_HEADER_SIZE,
+                         1920 + VLC_A52_HEADER_SIZE + 1,
+                         WAV_EXTRA_PROBE_SIZE,
                          true, rgi_twocc, GenericFormatCheck );
 }
 
@@ -1173,7 +1175,9 @@ static int A52Probe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_A52, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, A52CheckSyncProbe,
-                         VLC_A52_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         VLC_A52_HEADER_SIZE,
+                         1920 + VLC_A52_HEADER_SIZE + 1,
+                         WAV_EXTRA_PROBE_SIZE,
                          true, rgi_twocc, GenericFormatCheck );
 }
 
@@ -1219,7 +1223,9 @@ static int DtsProbe( demux_t *p_demux, uint64_t *pi_offset )
     const uint16_t rgi_twocc[] = { WAVE_FORMAT_PCM, WAVE_FORMAT_DTS, WAVE_FORMAT_UNKNOWN };
 
     return GenericProbe( p_demux, pi_offset, ppsz_name, DtsCheckSync,
-                         VLC_DTS_HEADER_SIZE, BASE_PROBE_SIZE, WAV_EXTRA_PROBE_SIZE,
+                         VLC_DTS_HEADER_SIZE,
+                         16384 + VLC_DTS_HEADER_SIZE + 1,
+                         WAV_EXTRA_PROBE_SIZE,
                          false, rgi_twocc, NULL );
 }
 static int DtsInit( demux_t *p_demux )
