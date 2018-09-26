@@ -960,7 +960,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
     {
         /* TODO device lost */
-        msg_Dbg(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
+        msg_Err(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
     d3d11_device_unlock( &sys->d3d_dev );
 
