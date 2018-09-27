@@ -28,7 +28,7 @@ ${LangFileString} Desc_Section05 \
 ${LangFileString} Desc_Section06 \
     "Indstil VLC media player som standardprogram til den angive filtype"
 ${LangFileString} Desc_Section07 \
-    "Tilføj menupunkter i genvejsmenuen ($\"Afspil med VLC$\" og $\"Føj til spilleliste i VLC$\")"
+    "Tilføj menupunkter i genvejsmenuen ($\"Afspil med VLC$\" og $\"Tilføj til spilleliste i VLC$\")"
 ${LangFileString} Desc_Section08 \
     "Sletter VLC media player-indstillinger og mellemlager-filer efterladt fra tidligere installationer"
 
@@ -42,7 +42,7 @@ ${LangFileString} Desc_Section92 \
 
 ${LangFileString} ShellAssociation_Play "Afspil"
 ${LangFileString} ContextMenuEntry_PlayWith "Afspil med VLC media player"
-${LangFileString} ContextMenuEntry_AddToPlaylist "Føj til spilleliste i VLC media player"
+${LangFileString} ContextMenuEntry_AddToPlaylist "Tilføj til spilleliste i VLC media player"
 
 ${LangFileString} Link_VisitWebsite "Besøg hjemmesiden for VideoLAN VLC media player"
 
