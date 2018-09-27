@@ -52,6 +52,7 @@
 #include "config/vlc_getopt.h"
 
 #include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
 #include <vlc_interface.h>
 
 #include <vlc_actions.h>
@@ -94,6 +95,7 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->playlist = NULL;
+    priv->main_playlist = NULL;
     priv->p_vlm = NULL;
 
     vlc_ExitInit( &priv->exit );
@@ -281,6 +283,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
+    priv->main_playlist = vlc_playlist_New(VLC_OBJECT(p_libvlc));
+    if (unlikely(!priv->main_playlist))
+        goto error;
+
     /*
      * Load background interfaces
      */
@@ -407,6 +413,9 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     if (priv->parser != NULL)
         input_preparser_Delete(priv->parser);
+
+    if (priv->main_playlist)
+        vlc_playlist_Delete(priv->main_playlist);
 
     libvlc_InternalActionsClean( p_libvlc );
 

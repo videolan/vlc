@@ -146,6 +146,12 @@ static playlist_t *intf_GetPlaylist(libvlc_int_t *libvlc)
     return playlist;
 }
 
+vlc_playlist_t *
+vlc_intf_GetMainPlaylist(intf_thread_t *intf)
+{
+    return libvlc_priv(intf->obj.libvlc)->main_playlist;
+}
+
 /**
  * Inserts an item in the playlist.
  *

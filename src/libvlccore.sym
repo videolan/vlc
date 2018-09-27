@@ -943,3 +943,4 @@ vlc_playlist_Stop
 vlc_playlist_Pause
 vlc_playlist_Resume
 vlc_playlist_Preparse
+vlc_intf_GetMainPlaylist

@@ -30,6 +30,7 @@
 extern "C" {
 # endif
 
+typedef struct vlc_playlist vlc_playlist_t;
 typedef struct intf_dialog_args_t intf_dialog_args_t;
 
 /**
@@ -95,6 +96,9 @@ static inline playlist_t *pl_Get( struct intf_thread_t *intf )
 {
     return (playlist_t *)(intf->obj.parent);
 }
+
+VLC_API vlc_playlist_t *
+vlc_intf_GetMainPlaylist(intf_thread_t *intf);
 
 /**
  * Retrieves the current input thread from the playlist.

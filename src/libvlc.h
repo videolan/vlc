@@ -183,6 +183,7 @@ void vlc_objres_remove(vlc_object_t *obj, void *data,
 typedef struct vlc_dialog_provider vlc_dialog_provider;
 typedef struct vlc_keystore vlc_keystore;
 typedef struct vlc_actions_t vlc_actions_t;
+typedef struct vlc_playlist vlc_playlist_t;
 
 typedef struct libvlc_priv_t
 {
@@ -194,6 +195,7 @@ typedef struct libvlc_priv_t
     vlc_dialog_provider *p_dialog_provider; ///< dialog provider
     vlc_keystore      *p_memory_keystore; ///< memory keystore
     struct playlist_t *playlist; ///< Playlist for interfaces
+    vlc_playlist_t *main_playlist;
     struct input_preparser_t *parser; ///< Input item meta data handler
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
