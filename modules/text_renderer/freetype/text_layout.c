@@ -66,6 +66,8 @@
 #include "text_layout.h"
 #include "platform_fonts.h"
 
+#include <stdlib.h>
+
 /* Win32 */
 #ifdef _WIN32
 # undef HAVE_FONTCONFIG
@@ -1065,7 +1067,7 @@ static int LoadGlyphs( filter_t *p_filter, paragraph_t *p_paragraph,
                 p_bitmaps->i_y_advance = p_face->glyph->advance.y;
             }
 
-            unsigned i_x_advance = FT_FLOOR( p_bitmaps->i_x_advance );
+            unsigned i_x_advance = FT_FLOOR( abs( p_bitmaps->i_x_advance ) );
             if( i_x_advance > *pi_max_advance_x )
                 *pi_max_advance_x = i_x_advance;
         }
