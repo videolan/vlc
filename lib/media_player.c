@@ -111,6 +111,28 @@ on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
 }
 
 static void
+on_recording_changed(vlc_player_t *player, bool recording, void *data)
+{
+    (void) player;
+
+    libvlc_media_player_t *mp = data;
+
+    char *file_path = NULL;
+    if (!recording) {
+        file_path = var_GetString( mp, "record-file" );
+    }
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerRecordChanged;
+    event.u.media_player_record_changed.file_path = file_path;
+    event.u.media_player_record_changed.recording = recording;
+
+    libvlc_event_send(&mp->event_manager, &event);
+
+    free(file_path);
+}
+
+static void
 on_error_changed(vlc_player_t *player, enum vlc_player_error error, void *data)
 {
     (void) player;
@@ -504,6 +526,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_media_subitems_changed = on_media_subitems_changed,
     .on_cork_changed = on_cork_changed,
     .on_vout_changed = on_vout_changed,
+    .on_recording_changed = on_recording_changed,
 };
 
 static const struct vlc_player_aout_cbs vlc_player_aout_cbs = {
