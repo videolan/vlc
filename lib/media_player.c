@@ -111,6 +111,25 @@ on_state_changed(vlc_player_t *player, enum vlc_player_state new_state,
 }
 
 static void
+on_recording_changed(vlc_player_t *player, bool recording, void *data)
+{
+    (void) player;
+    libvlc_media_player_t *mp = data;
+
+    /* "record-file" is only valid when recording ends */
+    char *file_path = !recording ? var_GetString(mp, "record-file") : NULL;
+
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerRecordChanged;
+    event.u.media_player_record_changed.recorded_file_path = file_path;
+    event.u.media_player_record_changed.recording = recording;
+
+    libvlc_event_send(&mp->event_manager, &event);
+
+    free(file_path);
+}
+
+static void
 on_error_changed(vlc_player_t *player, enum vlc_player_error error, void *data)
 {
     (void) player;
@@ -504,6 +523,7 @@ static const struct vlc_player_cbs vlc_player_cbs = {
     .on_media_subitems_changed = on_media_subitems_changed,
     .on_cork_changed = on_cork_changed,
     .on_vout_changed = on_vout_changed,
+    .on_recording_changed = on_recording_changed,
 };
 
 static const struct vlc_player_aout_cbs vlc_player_aout_cbs = {
@@ -717,8 +737,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "equalizer-vlcfreqs", VLC_VAR_BOOL);
     var_Create (mp, "equalizer-bands", VLC_VAR_STRING);
 
-    mp->timer.id = NULL;
+    /* variables for signalling creation of new files */
+    var_Create(mp, "record-file", VLC_VAR_STRING);
 
+    mp->timer.id = NULL;
     mp->p_md = NULL;
     mp->p_libvlc_instance = instance;
     /* use a reentrant lock to allow calling libvlc functions from callbacks */
@@ -2207,6 +2229,17 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
 
     free(str);
     return ret;
+}
+
+void libvlc_media_player_record( libvlc_media_player_t *p_mi,
+                                 bool enable,
+                                 const char *path)
+{
+    vlc_player_t *player = p_mi->player;
+
+    vlc_player_Lock(player);
+    vlc_player_SetRecordingEnabled(player, enable, path);
+    vlc_player_Unlock(player);
 }
 
 #define PLAYER_TIME_CORE_TO_LIB(point) { \
