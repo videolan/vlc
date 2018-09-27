@@ -42,12 +42,21 @@
 #include <mach/mach_time.h>
 #include <execinfo.h>
 
-static mach_timebase_info_data_t vlc_clock_conversion_factor;
+static struct {
+    uint32_t quotient;
+    uint32_t remainder;
+    uint32_t divider;
+} vlc_clock_conversion;
 
 static void vlc_clock_setup_once (void)
 {
-    if (unlikely(mach_timebase_info (&vlc_clock_conversion_factor) != 0))
+    mach_timebase_info_data_t timebase;
+    if (unlikely(mach_timebase_info (&timebase) != 0))
         abort ();
+    lldiv_t d = lldiv (timebase.numer, timebase.denom);
+    vlc_clock_conversion.quotient = (uint32_t)d.quot;
+    vlc_clock_conversion.remainder = (uint32_t)d.rem;
+    vlc_clock_conversion.divider = timebase.denom;
 }
 
 static pthread_once_t vlc_clock_once = PTHREAD_ONCE_INIT;
@@ -516,14 +525,9 @@ vlc_tick_t vlc_tick_now (void)
     vlc_clock_setup();
     uint64_t date = mach_absolute_time();
 
-    /* denom is uint32_t, switch to 64 bits to prevent overflow. */
-    uint64_t denom = vlc_clock_conversion_factor.denom;
-
-    /* Switch to microsecs */
-    denom *= UINT64_C(1000);
-
-    /* Split the division to prevent overflow */
-    return vlc_tick_from_frac( date * vlc_clock_conversion_factor.numer, denom );
+    date = date * vlc_clock_conversion.quotient +
+        date * vlc_clock_conversion.remainder / vlc_clock_conversion.divider;
+    return VLC_TICK_FROM_NS(date);
 }
 
 #undef vlc_tick_wait
