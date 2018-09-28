@@ -189,6 +189,7 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
 
     memset( p_picture, 0, sizeof( *p_picture ) );
 
+    p_picture->format = *p_fmt;
     /* Make sure the real dimensions are a multiple of 16 */
     if( picture_Setup( p_picture, p_fmt ) )
     {
