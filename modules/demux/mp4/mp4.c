@@ -410,6 +410,22 @@ static int CreateTracks( demux_t *p_demux, unsigned i_tracks )
     return VLC_SUCCESS;
 }
 
+static block_t * MP4_AV1_Convert( block_t *p_block )
+{
+    /* See av1-isobmff 2.4 */
+    if( (p_block->p_buffer[0] & 0x81) == 0 && /* reserved flags */
+        (p_block->p_buffer[0] & 0x7A) != 0x12 ) /* not TEMPORAL_DELIMITER */
+    {
+        p_block = block_Realloc( p_block, 2, p_block->i_buffer );
+        if( p_block )
+        {
+            p_block->p_buffer[0] = 0x12;
+            p_block->p_buffer[1] = 0x00;
+        }
+    }
+    return p_block;
+}
+
 static block_t * MP4_EIA608_Convert( block_t * p_block )
 {
     /* Rebuild codec data from encap */
@@ -565,6 +581,10 @@ static block_t * MP4_Block_Convert( demux_t *p_demux, const mp4_track_t *p_track
             p_block->i_buffer = 0;
             break;
         }
+    }
+    else if( p_track->fmt.i_codec == VLC_CODEC_AV1 )
+    {
+        p_block = MP4_AV1_Convert( p_block );
     }
     else if( p_track->fmt.i_original_fourcc == ATOM_rrtp )
     {
