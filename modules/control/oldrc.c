@@ -364,13 +364,20 @@ static int Activate( vlc_object_t *p_this )
 #endif
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
-        abort();
+        goto error;
 
     msg_rc( "%s", _("Remote control interface initialized. Type `help' for help.") );
 
     /* Listen to audio volume updates */
     var_AddCallback( p_sys->p_playlist, "volume", VolumeChanged, p_intf );
     return VLC_SUCCESS;
+
+error:
+    net_ListenClose( pi_socket );
+    free( psz_unix_path );
+    vlc_mutex_destroy( &p_sys->status_lock );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
