@@ -475,6 +475,8 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         return VLC_EGENERIC;
     }
 
+    renderer->PrepareForConnection(dlna_write_protocol_info(*stream_protocol).c_str());
+
     msg_Dbg(p_stream, "AVTransportURI: %s", uri);
     renderer->Stop();
     renderer->SetAVTransportURI(uri, *stream_protocol);
@@ -569,7 +571,7 @@ IXML_Document *MediaRenderer::SendAction(const char* action_name,const char *ser
 int MediaRenderer::Play(const char *speed)
 {
     std::list<std::pair<const char*, const char*>> arg_list = {
-        {"InstanceID", "0"},
+        {"InstanceID", AVTransportID.c_str()},
         {"Speed", speed},
     };
 
@@ -585,7 +587,7 @@ int MediaRenderer::Play(const char *speed)
 int MediaRenderer::Stop()
 {
     std::list<std::pair<const char*, const char*>> arg_list = {
-        {"InstanceID", "0"},
+        {"InstanceID", AVTransportID.c_str()},
     };
 
     IXML_Document *p_response = SendAction("Stop", AV_TRANSPORT_SERVICE_TYPE, arg_list);
@@ -674,6 +676,94 @@ std::vector<protocol_info_t> MediaRenderer::GetProtocolInfo()
     return supported_protocols;
 }
 
+int MediaRenderer::PrepareForConnection(const char* protocol_str)
+{
+    std::list<std::pair<const char*, const char*>> arg_list = {
+        { "PeerConnectionID", "-1" },
+        { "PeerConnectionManager", "" },
+        { "Direction", "Input" },
+        { "RemoteProtocolInfo", protocol_str },
+    };
+
+    IXML_Document *response = SendAction("PrepareForConnection",
+                                    CONNECTION_MANAGER_SERVICE_TYPE, arg_list);
+    if(!response)
+    {
+        return VLC_EGENERIC;
+    }
+
+    msg_Dbg(parent, "PrepareForConnection response: %s",
+                                    ixmlPrintDocument(response));
+
+    IXML_NodeList *node_list =
+            ixmlDocument_getElementsByTagName(response , "ConnectionID");
+    if (node_list)
+    {
+        IXML_Node* node = ixmlNodeList_item(node_list, 0);
+        if (node)
+        {
+            IXML_Node* p_text_node = ixmlNode_getFirstChild(node);
+            if (p_text_node)
+            {
+                ConnectionID.assign(ixmlNode_getNodeValue(p_text_node));
+            }
+        }
+        ixmlNodeList_free(node_list);
+    }
+
+    node_list =
+            ixmlDocument_getElementsByTagName(response , "AVTransportID");
+    if (node_list)
+    {
+        IXML_Node* node = ixmlNodeList_item(node_list, 0);
+        if (node)
+        {
+            IXML_Node* p_text_node = ixmlNode_getFirstChild(node);
+            if (p_text_node)
+            {
+                AVTransportID.assign(ixmlNode_getNodeValue(p_text_node));
+            }
+        }
+        ixmlNodeList_free(node_list);
+    }
+
+    node_list =
+            ixmlDocument_getElementsByTagName(response , "RcsID");
+    if (node_list)
+    {
+        IXML_Node* node = ixmlNodeList_item(node_list, 0);
+        if (node)
+        {
+            IXML_Node* p_text_node = ixmlNode_getFirstChild(node);
+            if (p_text_node)
+            {
+                RcsID.assign(ixmlNode_getNodeValue(p_text_node));
+            }
+        }
+        ixmlNodeList_free(node_list);
+    }
+
+    ixmlDocument_free(response);
+    return VLC_SUCCESS;
+}
+
+int MediaRenderer::ConnectionComplete()
+{
+    std::list<std::pair<const char*, const char*>> arg_list = {
+        {"ConnectionID", ConnectionID.c_str()},
+    };
+
+    IXML_Document *p_response = SendAction("ConnectionComplete",
+                                    CONNECTION_MANAGER_SERVICE_TYPE, arg_list);
+    if(!p_response)
+    {
+        return VLC_EGENERIC;
+    }
+
+    ixmlDocument_free(p_response);
+    return VLC_SUCCESS;
+}
+
 int MediaRenderer::SetAVTransportURI(const char* uri, const protocol_info_t& proto)
 {
     static const char didl[] =
@@ -703,7 +793,7 @@ int MediaRenderer::SetAVTransportURI(const char* uri, const protocol_info_t& pro
 
     msg_Dbg(parent, "didl: %s", meta_data);
     std::list<std::pair<const char*, const char*>> arg_list = {
-        {"InstanceID", "0"},
+        {"InstanceID", AVTransportID.c_str()},
         {"CurrentURI", uri},
         {"CurrentURIMetaData", meta_data},
     };
@@ -873,6 +963,7 @@ void CloseSout( vlc_object_t *p_this)
     sout_stream_t *p_stream = reinterpret_cast<sout_stream_t*>( p_this );
     sout_stream_sys_t *p_sys = static_cast<sout_stream_sys_t *>( p_stream->p_sys );
 
+    p_sys->renderer->ConnectionComplete();
     p_sys->p_upnp->release();
     delete p_sys;
 }

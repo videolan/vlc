@@ -77,6 +77,9 @@ public:
         , base_url(base_url)
         , device_url(device_url)
         , handle(upnp->handle())
+        , ConnectionID("0")
+        , AVTransportID("0")
+        , RcsID("0")
     {
     }
 
@@ -85,6 +88,10 @@ public:
     std::string         device_url;
     UpnpClient_Handle   handle;
 
+    std::string         ConnectionID;
+    std::string         AVTransportID;
+    std::string         RcsID;
+
     char *getServiceURL(const char* type, const char* service);
     IXML_Document *SendAction(const char* action_name, const char *service_type,
                     std::list<std::pair<const char*, const char*>> arguments);
@@ -92,6 +99,8 @@ public:
     int Play(const char *speed);
     int Stop();
     std::vector<protocol_info_t> GetProtocolInfo();
+    int PrepareForConnection(const char* protocol_str);
+    int ConnectionComplete();
     int SetAVTransportURI(const char* uri, const protocol_info_t& proto);
 };
 
