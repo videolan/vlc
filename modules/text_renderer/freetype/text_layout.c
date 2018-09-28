@@ -466,7 +466,8 @@ static int AnalyzeParagraph( paragraph_t *p_paragraph )
 #endif
 
 #ifdef HAVE_HARFBUZZ
-    hb_unicode_funcs_t *p_funcs = hb_unicode_funcs_get_default();
+    hb_unicode_funcs_t *p_funcs =
+        hb_unicode_funcs_create( hb_unicode_funcs_get_default() );
     for( int i = 0; i < p_paragraph->i_size; ++i )
         p_paragraph->p_scripts[ i ] =
             hb_unicode_script( p_funcs, p_paragraph->p_code_points[ i ] );
