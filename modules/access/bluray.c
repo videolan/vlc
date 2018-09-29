@@ -1295,8 +1295,10 @@ static void onMouseEvent(const vlc_mouse_t *newmouse, void *user_data)
     demux_t     *p_demux = user_data;
     demux_sys_t *p_sys   = p_demux->p_sys;
 
-    if (!newmouse)
+    if (!newmouse) {
         vlc_mouse_Init(&p_sys->oldmouse);
+        return;
+    }
 
     if (vlc_mouse_HasMoved(&p_sys->oldmouse, newmouse))
         bd_mouse_select(p_sys->bluray, -1, newmouse->i_x, newmouse->i_y);
