@@ -579,21 +579,6 @@ opengl_deinit_program(vout_display_opengl_t *vgl, struct prgm *prgm)
     vlc_object_release(tc);
 }
 
-#ifdef HAVE_LIBPLACEBO
-static void
-log_cb(void *priv, enum pl_log_level level, const char *msg)
-{
-    opengl_tex_converter_t *tc = priv;
-    switch (level) {
-    case PL_LOG_FATAL: // fall through
-    case PL_LOG_ERR:  msg_Err(tc->gl, "%s", msg); break;
-    case PL_LOG_WARN: msg_Warn(tc->gl,"%s", msg); break;
-    case PL_LOG_INFO: msg_Info(tc->gl,"%s", msg); break;
-    default: break;
-    }
-}
-#endif
-
 static int
 opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
                     const char *glexts, const video_format_t *fmt, bool subpics,
@@ -621,14 +606,10 @@ opengl_init_program(vout_display_opengl_t *vgl, struct prgm *prgm,
     tc->fmt = *fmt;
 
 #ifdef HAVE_LIBPLACEBO
-    // create the main libplacebo context
+    // Create the main libplacebo context
     if (!subpics)
     {
-        tc->pl_ctx = pl_context_create(PL_API_VER, &(struct pl_context_params) {
-            .log_cb    = log_cb,
-            .log_priv  = tc,
-            .log_level = PL_LOG_INFO,
-        });
+        tc->pl_ctx = vlc_placebo_Create(VLC_OBJECT(tc));
         if (tc->pl_ctx) {
 #   if PL_API_VER >= 6
             tc->pl_sh = pl_shader_alloc(tc->pl_ctx, NULL, 0);

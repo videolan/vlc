@@ -28,6 +28,7 @@
 #ifdef HAVE_LIBPLACEBO
 #include <libplacebo/shaders.h>
 #include <libplacebo/shaders/colorspace.h>
+#include "../placebo_utils.h"
 #endif
 
 #include <vlc_common.h>
@@ -503,57 +504,6 @@ xyz12_shader_init(opengl_tex_converter_t *tc)
     return fragment_shader;
 }
 
-#ifdef HAVE_LIBPLACEBO
-static struct pl_color_space pl_color_space_from_video_format(const video_format_t *fmt)
-{
-    static enum pl_color_primaries primaries[COLOR_PRIMARIES_MAX+1] = {
-        [COLOR_PRIMARIES_UNDEF]     = PL_COLOR_PRIM_UNKNOWN,
-        [COLOR_PRIMARIES_BT601_525] = PL_COLOR_PRIM_BT_601_525,
-        [COLOR_PRIMARIES_BT601_625] = PL_COLOR_PRIM_BT_601_625,
-        [COLOR_PRIMARIES_BT709]     = PL_COLOR_PRIM_BT_709,
-        [COLOR_PRIMARIES_BT2020]    = PL_COLOR_PRIM_BT_2020,
-        [COLOR_PRIMARIES_DCI_P3]    = PL_COLOR_PRIM_DCI_P3,
-        [COLOR_PRIMARIES_BT470_M]   = PL_COLOR_PRIM_BT_470M,
-    };
-
-    static enum pl_color_transfer transfers[TRANSFER_FUNC_MAX+1] = {
-        [TRANSFER_FUNC_UNDEF]        = PL_COLOR_TRC_UNKNOWN,
-        [TRANSFER_FUNC_LINEAR]       = PL_COLOR_TRC_LINEAR,
-        [TRANSFER_FUNC_SRGB]         = PL_COLOR_TRC_SRGB,
-        [TRANSFER_FUNC_SMPTE_ST2084] = PL_COLOR_TRC_PQ,
-        [TRANSFER_FUNC_HLG]          = PL_COLOR_TRC_HLG,
-        // these are all designed to be displayed on BT.1886 displays, so this
-        // is the correct way to handle them in libplacebo
-        [TRANSFER_FUNC_BT470_BG]    = PL_COLOR_TRC_BT_1886,
-        [TRANSFER_FUNC_BT470_M]     = PL_COLOR_TRC_BT_1886,
-        [TRANSFER_FUNC_BT709]       = PL_COLOR_TRC_BT_1886,
-        [TRANSFER_FUNC_SMPTE_240]   = PL_COLOR_TRC_BT_1886,
-    };
-
-    // Derive the signal peak/avg from the color light level metadata
-    float sig_peak = fmt->lighting.MaxCLL / PL_COLOR_REF_WHITE;
-    float sig_avg = fmt->lighting.MaxFALL / PL_COLOR_REF_WHITE;
-
-    // As a fallback value for the signal peak, we can also use the mastering
-    // metadata's luminance information
-    if (!sig_peak)
-        sig_peak = fmt->mastering.max_luminance / (10000.0 * PL_COLOR_REF_WHITE);
-
-    // Sanitize the sig_peak/sig_avg, because of buggy or low quality tagging
-    // that's sadly common in lots of typical sources
-    sig_peak = (sig_peak > 1.0 && sig_peak <= 100.0) ? sig_peak : 0.0;
-    sig_avg  = (sig_avg >= 0.0 && sig_avg <= 1.0) ? sig_avg : 0.0;
-
-    return (struct pl_color_space) {
-        .primaries = primaries[fmt->primaries],
-        .transfer  = transfers[fmt->transfer],
-        .light     = PL_COLOR_LIGHT_UNKNOWN,
-        .sig_peak  = sig_peak,
-        .sig_avg   = sig_avg,
-    };
-}
-#endif
-
 GLuint
 opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
                                  vlc_fourcc_t chroma, video_color_space_t yuv_space)
@@ -624,7 +574,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         dst_space.transfer = var_InheritInteger(tc->gl, "target-trc");
 
         pl_shader_color_map(sh, &color_params,
-                pl_color_space_from_video_format(&tc->fmt),
+                vlc_placebo_ColorSpace(&tc->fmt),
                 dst_space, NULL, false);
 
         struct pl_shader_obj *dither_state = NULL;
