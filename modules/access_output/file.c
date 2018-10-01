@@ -86,6 +86,9 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
         {
             if (errno == EINTR)
                 continue;
+            if (errno == ENOSPC)
+                vlc_dialog_display_error(p_access, "record",
+                                         "An error occurred during recording. Error: %s", vlc_strerror_c(errno));
             block_ChainRelease (p_buffer);
             msg_Err( p_access, "cannot write: %s", vlc_strerror_c(errno) );
             return -1;
@@ -303,8 +306,13 @@ static int Open( vlc_object_t *p_this )
             if (fd != -1)
                 break;
             if (fd == -1)
+            {
                 msg_Err (p_access, "cannot create %s: %s", path,
                          vlc_strerror_c(errno));
+
+                vlc_dialog_display_error(p_access, "record",
+                                         "An error occurred during recording. Error: %s", vlc_strerror_c(errno));
+            }
             if (overwrite || errno != EEXIST)
                 break;
             flags &= ~O_EXCL;
