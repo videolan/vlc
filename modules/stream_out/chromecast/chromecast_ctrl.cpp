@@ -856,6 +856,8 @@ void intf_sys_t::processMediaMessage( const castchannel::CastMessage& msg )
                     // Do not reset the mediaSessionId to ensure we refuse all
                     // other MEDIA_STATUS from the new session.
                 }
+                else if ( idleReason == "ERROR" && m_state == Playing )
+                    setState( LoadFailed );
                 else if ( m_state == Buffering )
                     setState( LoadFailed );
                 else
