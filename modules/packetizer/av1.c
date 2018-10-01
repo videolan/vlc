@@ -37,8 +37,6 @@
 #include "av1.h"
 #include "av1_obu.h"
 
-#include <limits.h>
-
 //#define DEBUG_AV1_PACKETIZER
 
 /****************************************************************************
