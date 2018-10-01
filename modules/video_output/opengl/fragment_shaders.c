@@ -399,18 +399,10 @@ tc_base_prepare_shader(const opengl_tex_converter_t *tc,
             continue;
 
         struct pl_shader_var sv = res->variables[i];
-#if PL_API_VER >= 4
         struct pl_var var = sv.var;
         // libplacebo doesn't need anything else anyway
         if (var.type != PL_VAR_FLOAT)
             continue;
-#else
-        struct ra_var var = sv.var;
-        // libplacebo doesn't need anything else anyway
-        if (var.type != RA_VAR_FLOAT)
-            continue;
-#endif
-
         if (var.dim_m > 1 && var.dim_m != var.dim_v)
             continue;
 
@@ -613,11 +605,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         tc->uloc.pl_vars = calloc(res->num_variables, sizeof(GLint));
         for (int i = 0; i < res->num_variables; i++) {
             struct pl_shader_var sv = res->variables[i];
-#if PL_API_VER >= 4
             const char *glsl_type_name = pl_var_glsl_type_name(sv.var);
-#else
-            const char *glsl_type_name = ra_var_glsl_type_name(sv.var);
-#endif
             ADDF("uniform %s %s;\n", glsl_type_name, sv.var.name);
         }
 
