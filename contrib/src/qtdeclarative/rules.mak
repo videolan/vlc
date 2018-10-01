@@ -29,16 +29,15 @@ qtdeclarative: qtdeclarative-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	mv qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION) qtdeclarative-$(QTDECLARATIVE_VERSION)
 	$(MOVE)
 
-ifdef HAVE_CROSS_COMPILE
-QMAKE=$(PREFIX)/bin/qmake
-else
-QMAKE=../qt/bin/qmake
-endif
-
 .qtdeclarative: qtdeclarative
 	# Generate Makefile & src/Makefile
-	cd $< && $(QMAKE)
-	cd $</src && $(QMAKE) -o Makefile src.pro
+ifdef HAVE_CROSS_COMPILE
+	cd $< && $(PREFIX)/bin/qmake
+	cd $</src && $(PREFIX)/bin/qmake -o Makefile src.pro
+else
+	cd $< && ../qt/bin/qmake
+	cd $</src && ../../qt/bin/qmake -o Makefile src.pro
+endif
 	# Build & install only what we require
 	# Invoke the build rules one at a time as some rule dependencies seem to be broken
 	cd $< && $(MAKE) -C src sub-quick-make_first-ordered
