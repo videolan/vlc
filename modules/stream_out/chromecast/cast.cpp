@@ -1133,10 +1133,10 @@ sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
     {
         case CONVERSION_QUALITY_HIGH:
         case CONVERSION_QUALITY_MEDIUM:
-            ssout << video_maxres_hd << ',';
+            ssout << ( ( p_vid->i_width > 1920 ) ? "width=1920," : "" ) << video_maxres_hd << ',';
             break;
         default:
-            ssout << video_maxres_720p << ',';
+            ssout << ( ( p_vid->i_width > 1280 ) ? "width=1280," : "" ) << video_maxres_720p << ',';
     }
 
     if( p_vid == NULL
