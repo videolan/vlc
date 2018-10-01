@@ -2545,8 +2545,10 @@ int input_DecoderSetSpuHighlight( decoder_t *dec,
     struct decoder_owner *p_owner = dec_get_owner( dec );
     assert( dec->fmt_in.i_cat == SPU_ES );
 
+#ifdef ENABLE_SOUT
     if( p_owner->p_sout_input )
         sout_InputControl( p_owner->p_sout_input, SOUT_INPUT_SET_SPU_HIGHLIGHT, spu_hl );
+#endif
 
     vlc_mutex_lock( &p_owner->lock );
     if( !p_owner->p_vout )
