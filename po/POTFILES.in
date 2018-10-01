@@ -1171,6 +1171,7 @@ modules/video_output/macosx.m
 modules/video_output/opengl/display.c
 modules/video_output/opengl/egl.c
 modules/video_output/opengl/vout_helper.h
+modules/video_output/vulkan/display.c
 modules/video_output/win32/direct3d9.c
 modules/video_output/win32/direct3d11.c
 modules/video_output/win32/directdraw.c

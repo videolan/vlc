@@ -2988,6 +2988,27 @@ dnl
 EXTEND_HELP_STRING([Video plugins:])
 
 dnl
+dnl  libplacebo support
+dnl
+AC_ARG_ENABLE([libplacebo],
+  AS_HELP_STRING([--disable-libplacebo],
+      [disable libplacebo support (default auto)]))
+
+AS_IF([test "$enable_libplacebo" != "no"], [
+  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.5], [
+    AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
+    PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 1.7],
+      [have_libplacebo_vk="yes"], [have_libplacebo_vk="no"])
+  ], [
+    AS_IF([test -n "${enable_libplacebo}"], [
+      AC_MSG_ERROR([${LIBPLACEBO_PKG_ERRORS}.])
+    ])
+    enable_libplacebo="no"
+  ])
+])
+AM_CONDITIONAL([HAVE_LIBPLACEBO], [test "$enable_libplacebo" != "no"])
+
+dnl
 dnl  OpenGL
 dnl
 PKG_CHECK_MODULES([EGL], [egl], [
@@ -3027,6 +3048,32 @@ AS_IF([test "${have_gl}" = "yes"], [
 
 dnl OpenGL ES 2: depends on EGL 1.1
 PKG_ENABLE_MODULES_VLC([GLES2], [], [glesv2], [OpenGL ES v2 support], [disabled])
+
+dnl
+dnl Vulkan
+dnl
+AC_ARG_ENABLE(vulkan,
+  [AS_HELP_STRING([--disable-vulkan],
+      [disable Vulkan support (default auto)])])
+
+AS_IF([test "$enable_vulkan" != "no"], [
+  AS_IF([test "$have_libplacebo_vk" = "yes"], [
+    PKG_CHECK_MODULES([VULKAN], [vulkan >= 1.0.26], [
+      AC_DEFINE([HAVE_VULKAN], [1], [Define to 1 if vulkan is enabled.])
+    ], [
+      AS_IF([test -n "${enable_vulkan}"], [
+        AC_MSG_ERROR([${VULKAN_PKG_ERRORS}.])
+      ])
+      enable_vulkan="no"
+    ])
+  ], [
+    AS_IF([test -n "${enable_vulkan}"], [
+      AC_MSG_ERROR([Vulkan support requires libplacebo 1.7 as well. Do not use --disable-libplacebo.])
+    ])
+    enable_vulkan="no"
+  ])
+])
+AM_CONDITIONAL(HAVE_VULKAN, [test "$enable_vulkan" != "no"])
 
 dnl
 dnl  Xlib
@@ -4141,25 +4188,6 @@ dnl
 dnl Libnotify notification plugin
 dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify gtk+-3.0], [libnotify notification], [auto])
-
-dnl
-dnl  libplacebo support
-dnl
-AC_ARG_ENABLE([libplacebo],
-  AS_HELP_STRING([--disable-libplacebo],
-      [disable libplacebo support (default auto)]))
-
-AS_IF([test "$enable_libplacebo" != "no"], [
-  PKG_CHECK_MODULES([LIBPLACEBO], [libplacebo >= 0.2.1], [
-    AC_DEFINE([HAVE_LIBPLACEBO], [1], [Define to 1 if libplacebo is enabled.])
-  ], [
-    AS_IF([test -n "${enable_libplacebo}"], [
-      AC_MSG_ERROR([${LIBPLACEBO_PKG_ERRORS}.])
-    ])
-    enable_libplacebo="no"
-  ])
-])
-AM_CONDITIONAL([HAVE_LIBPLACEBO], [test "$enable_libplacebo" != "no"])
 
 PKG_ENABLE_MODULES_VLC([MEDIALIBRARY], [medialibrary], [medialibrary], (medialibrary support), [auto])
 
