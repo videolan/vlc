@@ -36,11 +36,7 @@ endif
 
 
 .qtquickcontrols2: qtquickcontrols2
-ifdef HAVE_CROSS_COMPILE
-	cd $< && $(PREFIX)/bin/qmake
-else
-	cd $< && ../qt/bin/qmake
-endif
+	cd $< && $(QMAKE)
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-quickcontrols2-install_subtargets sub-imports-install_subtargets
