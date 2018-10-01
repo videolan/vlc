@@ -64,11 +64,6 @@ static wchar_t *widen_path (const char *path)
     return wpath;
 }
 
-#define CONVERT_PATH(path, wpath, err) \
-    wchar_t *wpath = wide_path(path); \
-    if (wpath == NULL) return (err)
-
-
 int vlc_open (const char *filename, int flags, ...)
 {
     int mode = 0;
