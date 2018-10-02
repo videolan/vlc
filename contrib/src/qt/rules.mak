@@ -68,7 +68,7 @@ QT_CONFIG += -release
 	cd $(PREFIX)/lib/pkgconfig; sed -i -e 's/ -lQt5Gui/ -lqwindows -lQt5PlatformSupport -lQt5Gui/g' Qt5Gui.pc
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
-	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
+	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
 	cd $<; $(MAKE) -C qmake
 	cd $<; $(MAKE) install_qmake install_mkspecs
 	cd $</src/tools; \

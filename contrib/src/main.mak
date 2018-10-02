@@ -148,9 +148,13 @@ CCAS=gas-preprocessor.pl $(CC) -c
 endif
 endif
 
+LN_S = ln -s
 ifdef HAVE_WIN32
 ifneq ($(shell $(CC) $(CFLAGS) -E -dM -include _mingw.h - < /dev/null | grep -E __MINGW64_VERSION_MAJOR),)
 HAVE_MINGW_W64 := 1
+endif
+ifndef HAVE_CROSS_COMPILE
+LN_S = cp -R
 endif
 ifneq ($(findstring clang, $(shell $(CC) --version)),)
 HAVE_CLANG := 1
