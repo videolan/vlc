@@ -87,8 +87,6 @@ static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, vlc_tick_t i_st
         }
         else if( i_sid == 0x07 )
         {
-            if( i_data < 2 )
-                return;
             i_sid = p_data[1] & 0x3F;
             if( i_sid < 0x07 )
                 return;
