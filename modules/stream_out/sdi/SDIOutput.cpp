@@ -51,6 +51,7 @@ SDIOutput::SDIOutput(sout_stream_t *p_stream_)
     ancillary.ar = var_InheritInteger(p_stream, CFG_PREFIX "ar");
     ancillary.afd_line = var_InheritInteger(p_stream, CFG_PREFIX "afd-line");
     ancillary.captions_line = 15;
+    program = -1;
     videoStream = NULL;
     captionsStream = NULL;
     audioMultiplex = new SDIAudioMultiplex( var_InheritInteger(p_stream, CFG_PREFIX "channels") );
@@ -81,6 +82,10 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
 {
     AbstractStream *s = NULL;
     StreamID id(fmt->i_id);
+
+    if(program >= 0 && fmt->i_group != program)
+        return NULL;
+
     if(fmt->i_cat == VIDEO_ES && !videoStream)
     {
         if(ConfigureVideo(&fmt->video) == VLC_SUCCESS)
@@ -125,6 +130,10 @@ AbstractStream *SDIOutput::Add(const es_format_t *fmt)
     {
         s = captionsStream = dynamic_cast<CaptionsStream *>(createStream(id, fmt, &captionsBuffer));
     }
+
+    if(program == -1)
+        program = fmt->i_group;
+
     return s;
 }
 

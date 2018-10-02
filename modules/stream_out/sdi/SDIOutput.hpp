@@ -54,6 +54,8 @@ namespace sdi_sout
             BlockStreamOutputBuffer captionsBuffer;
             SDIAudioMultiplex *audioMultiplex;
 
+            int program;
+
             struct
             {
                 es_format_t configuredfmt;
