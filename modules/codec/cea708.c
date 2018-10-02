@@ -87,8 +87,6 @@ static void CEA708_DTVCC_Demux_ServiceBlocks( cea708_demux_t *h, mtime_t i_start
         }
         else if( i_sid == 0x07 )
         {
-            if( i_data < 2 )
-                return;
             i_sid = p_data[1] & 0x3F;
             if( i_sid < 0x07 )
                 return;
