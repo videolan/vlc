@@ -503,15 +503,18 @@ int DBMSDIOutput::Process()
 
     picture_t *p;
     while((p = reinterpret_cast<picture_t *>(videoBuffer.Dequeue())))
-        ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));
-
-    while(audioMultiplex->availableSamples() >= SAMPLES_PER_FRAME)
     {
-          block_t *out = audioMultiplex->Extract(SAMPLES_PER_FRAME);
-          if(out)
-          {
-              ProcessAudio(out);
-          }
+        while(audioMultiplex->availableSamples() >= SAMPLES_PER_FRAME &&
+              audioMultiplex->bufferStart() <= p->date)
+        {
+              block_t *out = audioMultiplex->Extract(SAMPLES_PER_FRAME);
+            if(out)
+            {
+                  ProcessAudio(out);
+            }
+        }
+
+        ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));
     }
 
     return VLC_SUCCESS;
