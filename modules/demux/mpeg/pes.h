@@ -115,8 +115,6 @@ static int ParsePESHeader( vlc_object_t *p_object, const uint8_t *p_header, size
             if( pb_pes_scambling )
                 *pb_pes_scambling = false;
 
-            if( i_header < i_skip + 1 )
-                return VLC_EGENERIC;
             while( i_skip < 23 && p_header[i_skip] == 0xff )
             {
                 i_skip++;
