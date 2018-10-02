@@ -28,7 +28,7 @@ static inline uint64_t leb128(const uint8_t *p_buf, size_t i_buf, uint8_t *pi_le
     {
         if(i >= i_buf)
             break;
-        i_val |= ((p_buf[i] & 0x7F) << (i * 7));
+        i_val |= (UINT64_C(p_buf[i] & 0x7F) << (i * 7));
         if((p_buf[i] & 0x80) == 0)
         {
             *pi_len = i + 1;
