@@ -9,6 +9,8 @@ ifeq ($(call need_pkg,"sqlite3"),)
 PKGS_FOUND += sqlite
 endif
 
+SQLITE_CONF = $(HOSTCONF) --disable-readline
+
 $(TARBALLS)/sqlite-autoconf-$(SQLITE_VERSION).tar.gz:
 	$(call download_pkg,$(SQLITE_URL),sqlite)
 
@@ -20,6 +22,6 @@ sqlite: sqlite-autoconf-$(SQLITE_VERSION).tar.gz .sum-sqlite
 	$(MOVE)
 
 .sqlite: sqlite
-	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
+	cd $< && $(HOSTVARS) ./configure $(SQLITE_CONF)
 	cd $< && $(MAKE) && $(MAKE) install
 	touch $@
