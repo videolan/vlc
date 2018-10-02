@@ -90,7 +90,7 @@ ifdef HAVE_WIN32
 endif
 ifdef HAVE_CROSS_COMPILE
 	# Building Qt build tools for Xcompilation
-	cd $</include/QtCore; ln -sf $(QT_VERSION)/QtCore/private
+	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
 	cd $<; $(MAKE) -C qmake
 	cd $<; $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
 	cd $</src/tools; \
