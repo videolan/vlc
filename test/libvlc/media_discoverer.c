@@ -28,8 +28,8 @@ ml_item_event(const struct libvlc_event_t *p_ev, const char *psz_event)
     char *psz_mrl = libvlc_media_get_mrl(p_ev->u.media_list_item_added.item);
     assert(psz_mrl);
 
-    log("item %s(%d): '%s'\n", psz_event, p_ev->u.media_list_item_added.index,
-        psz_mrl);
+    test_log("item %s(%d): '%s'\n", psz_event,
+             p_ev->u.media_list_item_added.index, psz_mrl);
     free(psz_mrl);
 }
 
@@ -50,7 +50,7 @@ ml_item_deleted(const struct libvlc_event_t *p_ev, void *p_data)
 static void
 test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name, bool b_wait)
 {
-    log("creating and starting discoverer %s\n", psz_name);
+    test_log("creating and starting discoverer %s\n", psz_name);
 
     libvlc_media_discoverer_t *p_md =
         libvlc_media_discoverer_new(p_vlc, psz_name);
@@ -72,14 +72,14 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name, bool b_wait)
 
     if (libvlc_media_discoverer_start(p_md) == -1)
     {
-        log("warn: could not start md (not critical)\n");
+        test_log("warn: could not start md (not critical)\n");
     }
     else
     {
         assert(libvlc_media_discoverer_is_running(p_md));
         if (b_wait)
         {
-            log("Press any keys to stop\n");
+            test_log("Press any keys to stop\n");
             getchar();
         }
         libvlc_media_discoverer_stop(p_md);
@@ -117,14 +117,14 @@ main(int i_argc, char *ppsz_argv[])
     for(libvlc_media_discoverer_category_t i_cat = libvlc_media_discoverer_devices;
         i_cat <= libvlc_media_discoverer_localdirs; i_cat ++)
     {
-        log("== getting list of media_discoverer for %d category ==\n", i_cat);
+        test_log("== getting list of media_discoverer for %d category ==\n", i_cat);
 
         libvlc_media_discoverer_description_t **pp_services;
         ssize_t i_count =
             libvlc_media_discoverer_list_get(p_vlc, i_cat, &pp_services);
         if (i_count <= 0)
         {
-            log("warn: no discoverers (not critical)\n");
+            test_log("warn: no discoverers (not critical)\n");
             continue;
         }
         assert(pp_services != NULL);
@@ -134,8 +134,8 @@ main(int i_argc, char *ppsz_argv[])
             libvlc_media_discoverer_description_t *p_service = pp_services[i];
 
             assert(i_cat == p_service->i_cat);
-            log("= discoverer: name: '%s', longname: '%s' =\n",
-                p_service->psz_name, p_service->psz_longname);
+            test_log("= discoverer: name: '%s', longname: '%s' =\n",
+                     p_service->psz_name, p_service->psz_longname);
 
 #if 0
             if (!strncasecmp(p_service->psz_name, "podcast", 7)

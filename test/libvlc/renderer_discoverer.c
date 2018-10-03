@@ -25,9 +25,9 @@
 static void
 item_event(const libvlc_renderer_item_t *p_item, const char *psz_event)
 {
-    log("item %s: name: '%s', type: '%s', flags: 0x%X\n", psz_event,
-        libvlc_renderer_item_name(p_item), libvlc_renderer_item_type(p_item),
-        libvlc_renderer_item_flags(p_item));
+    test_log("item %s: name: '%s', type: '%s', flags: 0x%X\n", psz_event,
+             libvlc_renderer_item_name(p_item), libvlc_renderer_item_type(p_item),
+             libvlc_renderer_item_flags(p_item));
 }
 
 static void
@@ -47,7 +47,7 @@ renderer_discoverer_item_deleted(const struct libvlc_event_t *p_ev, void *p_data
 static void
 test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
 {
-    log("creating and starting discoverer %s\n", psz_name);
+    test_log("creating and starting discoverer %s\n", psz_name);
 
     libvlc_renderer_discoverer_t *p_rd =
         libvlc_renderer_discoverer_new(p_vlc, psz_name);
@@ -66,11 +66,11 @@ test_discoverer(libvlc_instance_t *p_vlc, const char *psz_name)
 
     if (libvlc_renderer_discoverer_start(p_rd) == -1)
     {
-        log("warn: could not start md (not critical)\n");
+        test_log("warn: could not start md (not critical)\n");
     }
     else
     {
-        log("Press any keys to stop\n");
+        test_log("Press any keys to stop\n");
         getchar();
         libvlc_renderer_discoverer_stop(p_rd);
     }
@@ -98,14 +98,14 @@ main(int i_argc, char *ppsz_argv[])
         return 0;
     }
 
-    log("== getting the list of renderer_discoverer  ==\n");
+    test_log("== getting the list of renderer_discoverer  ==\n");
 
     libvlc_rd_description_t **pp_services;
     ssize_t i_count =
         libvlc_renderer_discoverer_list_get(p_vlc, &pp_services);
     if (i_count <= 0)
     {
-        log("warn: no discoverers (not critical)\n");
+        test_log("warn: no discoverers (not critical)\n");
         goto end;
     }
     assert(pp_services != NULL);
@@ -114,8 +114,8 @@ main(int i_argc, char *ppsz_argv[])
     {
         libvlc_rd_description_t *p_service = pp_services[i];
 
-        log("= discoverer: name: '%s', longname: '%s' =\n",
-            p_service->psz_name, p_service->psz_longname);
+        test_log("= discoverer: name: '%s', longname: '%s' =\n",
+                 p_service->psz_name, p_service->psz_longname);
     }
 
     libvlc_renderer_discoverer_list_release(pp_services, i_count);

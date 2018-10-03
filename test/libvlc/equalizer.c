@@ -14,7 +14,7 @@ static void test_equalizer (const char ** argv, int argc)
     libvlc_equalizer_t *equalizer;
     unsigned u_presets, u_bands;
 
-    log ("Testing equalizer\n");
+    test_log ("Testing equalizer\n");
 
     vlc = libvlc_new (argc, argv);
     assert (NULL != vlc);
@@ -24,7 +24,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // presets
 
-    log ("Testing equalizer presets\n");
+    test_log ("Testing equalizer presets\n");
 
     u_presets = libvlc_audio_equalizer_get_preset_count();
     assert (u_presets > 0);
@@ -46,7 +46,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // bands
 
-    log ("Testing equalizer bands\n");
+    test_log ("Testing equalizer bands\n");
 
     u_bands = libvlc_audio_equalizer_get_band_count();
     assert (u_bands > 0);
@@ -60,7 +60,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // initialisation
 
-    log ("Testing equalizer initialisation\n");
+    test_log ("Testing equalizer initialisation\n");
 
     equalizer = libvlc_audio_equalizer_new();
     assert (equalizer);
@@ -72,7 +72,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // preamp (range -20.0 to 20.0)
 
-    log ("Testing equalizer preamp\n");
+    test_log ("Testing equalizer preamp\n");
 
     assert (0 == libvlc_audio_equalizer_set_preamp (equalizer, 19.9f));
     assert (libvlc_audio_equalizer_get_preamp(equalizer) == 19.9f);
@@ -94,7 +94,7 @@ static void test_equalizer (const char ** argv, int argc)
 
     // amp at index (range -20.0 to 20.0)
 
-    log ("Testing equalizer amp at index\n");
+    test_log ("Testing equalizer amp at index\n");
 
     for (unsigned i = 0; i < u_bands; i++)
     {
@@ -124,20 +124,20 @@ static void test_equalizer (const char ** argv, int argc)
 
     // no equalizer
 
-    log ("Testing release NULL\n");
+    test_log ("Testing release NULL\n");
 
     libvlc_audio_equalizer_release (NULL);
 
     // media player
 
-    log ("Testing set equalizer\n");
+    test_log ("Testing set equalizer\n");
 
     assert (0 == libvlc_media_player_set_equalizer(mp, NULL));
     assert (0 == libvlc_media_player_set_equalizer(mp, equalizer));
 
     // maximum string length (test string concatenation)
 
-    log ("Testing equalizer-bands string limit\n");
+    test_log ("Testing equalizer-bands string limit\n");
 
     for (unsigned i = 0; i < u_bands; i++)
         assert (0 == libvlc_audio_equalizer_set_amp_at_index (equalizer, -19.1234567f, i));
@@ -146,11 +146,11 @@ static void test_equalizer (const char ** argv, int argc)
 
     // cleanup
 
-    log ("Testing equalizer cleanup\n");
+    test_log ("Testing equalizer cleanup\n");
 
     libvlc_audio_equalizer_release (equalizer);
 
-    log ("Finished testing equalizer\n");
+    test_log ("Finished testing equalizer\n");
 
     libvlc_media_player_release (mp);
 
