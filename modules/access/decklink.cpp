@@ -146,7 +146,7 @@ struct demux_sys_t
 
     es_out_id_t *video_es;
     es_format_t video_fmt;
-    es_out_id_t *audio_es;
+    es_out_id_t *audio_es[8];
     es_out_id_t *cc_es;
 
     vlc_mutex_t pts_lock;
@@ -154,6 +154,7 @@ struct demux_sys_t
 
     uint32_t dominance_flags;
     int channels;
+    int audio_streams;
 
     bool tenbits;
 };
@@ -393,28 +394,51 @@ HRESULT DeckLinkCaptureDelegate::VideoInputFrameArrived(IDeckLinkVideoInputFrame
         es_out_Send(demux_->out, sys->video_es, video_frame);
     }
 
-    if (audioFrame) {
+    if (audioFrame && audioFrame->GetSampleFrameCount())
+    {
         const int bytes = audioFrame->GetSampleFrameCount() * sizeof(int16_t) * sys->channels;
-
-        block_t *audio_frame = block_Alloc(bytes);
-        if (!audio_frame)
-            return S_OK;
-
-        void *frame_bytes;
-        audioFrame->GetBytes(&frame_bytes);
-        memcpy(audio_frame->p_buffer, frame_bytes, bytes);
-
         BMDTimeValue packet_time;
+        void *frame_bytes;
+
+        audioFrame->GetBytes(&frame_bytes);
         audioFrame->GetPacketTime(&packet_time, CLOCK_FREQ);
-        audio_frame->i_pts = audio_frame->i_dts = VLC_TICK_0 + packet_time;
+
+        if(sys->audio_streams > 1)
+        {
+            for(int i=0; i<sys->audio_streams; i++)
+            {
+                size_t i_samples = bytes / (sys->audio_streams * 4);
+                block_t *p_frame = block_Alloc(i_samples * 4);
+                if (!p_frame)
+                    continue;
+
+                for(size_t j=0; j<i_samples; j++) /* for each pair sample */
+                {
+                    memcpy(&p_frame->p_buffer[j * 4],
+                           &reinterpret_cast<uint8_t *>(frame_bytes)[(j * sys->audio_streams + i) * 4],
+                           4);
+                }
+
+                p_frame->i_pts = p_frame->i_dts = VLC_TICK_0 + packet_time;
+                es_out_Send(demux_->out, sys->audio_es[i], p_frame);
+            }
+        }
+        else
+        {
+            block_t *audio_frame = block_Alloc(bytes);
+            if (!audio_frame)
+                return S_OK;
+            memcpy(audio_frame->p_buffer, frame_bytes, bytes);
+            audio_frame->i_pts = audio_frame->i_dts = VLC_TICK_0 + packet_time;
+            es_out_Send(demux_->out, sys->audio_es[0], audio_frame);
+        }
 
         vlc_mutex_lock(&sys->pts_lock);
-        if (audio_frame->i_pts > sys->last_pts)
-            sys->last_pts = audio_frame->i_pts;
+        if (VLC_TICK_0 + packet_time > sys->last_pts)
+            sys->last_pts = VLC_TICK_0 + packet_time;
         vlc_mutex_unlock(&sys->pts_lock);
 
-        es_out_SetPCR(demux_->out, audio_frame->i_pts);
-        es_out_Send(demux_->out, sys->audio_es, audio_frame);
+        es_out_SetPCR(demux_->out, VLC_TICK_0 + packet_time);
     }
 
     return S_OK;
@@ -650,14 +674,20 @@ static int Open(vlc_object_t *p_this)
         break;
     case 2:
         physical_channels = AOUT_CHANS_STEREO;
+        sys->audio_streams = 1;
         break;
     case 8:
         physical_channels = AOUT_CHANS_7_1;
+        sys->audio_streams = 1;
         break;
-    //case 16:
+    case 16:
+        physical_channels = AOUT_CHANS_STEREO;
+        sys->audio_streams = 8;
+        break;
     default:
         msg_Err(demux, "Invalid number of channels (%d), disabling audio", sys->channels);
         sys->channels = 0;
+        sys->audio_streams = 0;
     }
     rate = var_InheritInteger(demux, "decklink-audio-rate");
     if (rate > 0 && sys->channels > 0) {
@@ -682,16 +712,20 @@ static int Open(vlc_object_t *p_this)
 
     es_format_t audio_fmt;
     es_format_Init(&audio_fmt, AUDIO_ES, VLC_CODEC_S16N);
-    audio_fmt.audio.i_channels = sys->channels;
+    audio_fmt.audio.i_channels = sys->channels / sys->audio_streams;
     audio_fmt.audio.i_physical_channels = physical_channels;
     audio_fmt.audio.i_rate = rate;
     audio_fmt.audio.i_bitspersample = 16;
     audio_fmt.audio.i_blockalign = audio_fmt.audio.i_channels * audio_fmt.audio.i_bitspersample / 8;
     audio_fmt.i_bitrate = audio_fmt.audio.i_channels * audio_fmt.audio.i_rate * audio_fmt.audio.i_bitspersample;
 
-    msg_Dbg(demux, "added new audio es %4.4s %dHz %dbpp %dch",
-             (char*)&audio_fmt.i_codec, audio_fmt.audio.i_rate, audio_fmt.audio.i_bitspersample, audio_fmt.audio.i_channels);
-    sys->audio_es = es_out_Add(demux->out, &audio_fmt);
+    for(int i=0; i<sys->audio_streams; i++)
+    {
+        msg_Dbg(demux, "added new audio es [%d] %4.4s %dHz %dbpp %dch", i,
+                (char*)&audio_fmt.i_codec, audio_fmt.audio.i_rate,
+                audio_fmt.audio.i_bitspersample, audio_fmt.audio.i_channels);
+        sys->audio_es[i] = es_out_Add(demux->out, &audio_fmt);
+    }
 
     ret = VLC_SUCCESS;
 
