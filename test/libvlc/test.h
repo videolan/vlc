@@ -63,7 +63,7 @@ static const char test_default_video[] = SRCDIR"/samples/image.jpg";
  * Some useful common functions
  */
 
-#define log( ... ) printf( "testapi: " __VA_ARGS__ );
+#define test_log( ... ) printf( "testapi: " __VA_ARGS__ );
 
 static inline void test_init (void)
 {

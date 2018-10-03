@@ -97,7 +97,7 @@ static void test_media_player_set_media(const char** argv, int argc)
 {
     const char * file = test_default_sample;
 
-    log ("Testing set_media\n");
+    test_log ("Testing set_media\n");
 
     libvlc_instance_t *vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
@@ -128,7 +128,7 @@ static void test_media_player_play_stop(const char** argv, int argc)
     libvlc_media_player_t *mi;
     const char * file = test_default_sample;
 
-    log ("Testing play and pause of %s\n", file);
+    test_log ("Testing play and pause of %s\n", file);
 
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
@@ -157,7 +157,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     libvlc_media_player_t *mi;
     const char * file = test_default_sample;
 
-    log ("Testing pause and stop of %s\n", file);
+    test_log ("Testing pause and stop of %s\n", file);
 
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
@@ -174,12 +174,12 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     test_role(mi);
 
     libvlc_media_player_play (mi);
-    log ("Waiting for playing\n");
+    test_log ("Waiting for playing\n");
     wait_playing (mi);
     test_audio_video(mi);
 
     libvlc_media_player_set_pause (mi, true);
-    log ("Waiting for pause\n");
+    test_log ("Waiting for pause\n");
     wait_paused (mi);
     test_audio_video(mi);
 

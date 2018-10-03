@@ -450,37 +450,37 @@ static void test_variables( libvlc_instance_t *p_vlc )
     libvlc_int_t *p_libvlc = p_vlc->p_libvlc_int;
     srand( time( NULL ) );
 
-    log( "Testing for integers\n" );
+    test_log( "Testing for integers\n" );
     test_integer( p_libvlc );
 
-    log( "Testing for booleans\n" );
+    test_log( "Testing for booleans\n" );
     test_booleans( p_libvlc );
 
-    log( "Testing for floats\n" );
+    test_log( "Testing for floats\n" );
     test_floats( p_libvlc );
 
-    log( "Testing for rationals\n" );
+    test_log( "Testing for rationals\n" );
     test_fracts( p_libvlc );
 
-    log( "Testing for strings\n" );
+    test_log( "Testing for strings\n" );
     test_strings( p_libvlc );
 
-    log( "Testing for addresses\n" );
+    test_log( "Testing for addresses\n" );
     test_address( p_libvlc );
 
-    log( "Testing the callbacks\n" );
+    test_log( "Testing the callbacks\n" );
     test_callbacks( p_libvlc );
 
-    log( "Testing the limits\n" );
+    test_log( "Testing the limits\n" );
     test_limits( p_libvlc );
 
-    log( "Testing choices\n" );
+    test_log( "Testing choices\n" );
     test_choices( p_libvlc );
 
-    log( "Testing var_Change()\n" );
+    test_log( "Testing var_Change()\n" );
     test_change( p_libvlc );
 
-    log( "Testing type at creation\n" );
+    test_log( "Testing type at creation\n" );
     test_creation_and_type( p_libvlc );
 }
 
@@ -491,7 +491,7 @@ int main( void )
 
     test_init();
 
-    log( "Testing the core variables\n" );
+    test_log( "Testing the core variables\n" );
     p_vlc = libvlc_new( test_defaults_nargs, test_defaults_args );
     assert( p_vlc != NULL );
 
