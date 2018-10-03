@@ -1501,17 +1501,9 @@ static void CloseDecoder(vlc_object_t *p_this)
 
 static BOOL deviceSupportsHEVC()
 {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-
-#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED >= 101300) || \
-    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000) || \
-    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED >= 110000)
-    if (VTIsHardwareDecodeSupported != nil)
+    if (@available(macOS 10.13, iOS 11.0, tvOS 11.0, *))
         return VTIsHardwareDecodeSupported(kCMVideoCodecType_HEVC);
     else
-#endif
-#pragma clang diagnostic pop
         return NO;
 }
 
