@@ -61,12 +61,6 @@
 
 #endif
 
-// Define stuff for older SDKs
-#if (TARGET_OS_OSX && MAC_OS_X_VERSION_MAX_ALLOWED < 101100) || \
-    (TARGET_OS_IPHONE && __IPHONE_OS_VERSION_MAX_ALLOWED < 90000) || \
-    (TARGET_OS_TV && __TV_OS_VERSION_MAX_ALLOWED < 90000)
-enum { kCMVideoCodecType_HEVC = 'hvc1' };
-#endif
 
 #if (!TARGET_OS_OSX || MAC_OS_X_VERSION_MAX_ALLOWED < 1090)
 const CFStringRef kVTVideoDecoderSpecification_EnableHardwareAcceleratedVideoDecoder = CFSTR("EnableHardwareAcceleratedVideoDecoder");
@@ -1134,15 +1128,8 @@ static CFMutableDictionaryRef CreateSessionDescriptionFormat(decoder_t *p_dec,
             yuvmatrix = kCVImageBufferYCbCrMatrix_ITU_R_601_4;
             break;
         case COLOR_SPACE_BT2020:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-            if (&kCVImageBufferColorPrimaries_ITU_R_2020 != nil)
-            {
-                yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_2020;
-                break;
-            }
-#pragma clang diagnostic pop
-            /* fall through */
+            yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_2020;
+            break;
         case COLOR_SPACE_BT709:
         default:
             yuvmatrix = kCVImageBufferColorPrimaries_ITU_R_709_2;
