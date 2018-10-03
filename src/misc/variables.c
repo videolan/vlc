@@ -968,7 +968,18 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
     switch( i_type )
     {
     case VLC_VAR_BOOL:
-        val.b_bool = !b_isno;
+        if( psz_value )
+        {
+            char *endptr;
+            long long int value = strtoll( psz_value, &endptr, 0 );
+            if( endptr == psz_value ) /* Not an integer */
+                val.b_bool = strcasecmp( psz_value, "true" ) == 0
+                          || strcasecmp( psz_value, "yes" ) == 0;
+            else
+                val.b_bool = value != 0;
+        }
+        else
+            val.b_bool = !b_isno;
         break;
 
     case VLC_VAR_INTEGER:
