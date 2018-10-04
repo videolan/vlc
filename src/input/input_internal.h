@@ -132,6 +132,7 @@ typedef struct input_thread_private_t
     bool        is_running;
     bool        is_stopped;
     bool        b_recording;
+    bool        b_thumbnailing;
     int         i_rate;
 
     /* Playtime configuration and state */

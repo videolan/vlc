@@ -425,6 +425,8 @@ void input_LegacyEvents( input_thread_t *p_input,
             break;
         case INPUT_EVENT_SUBITEMS:
             break;
+        case INPUT_EVENT_THUMBNAIL_READY:
+            break;
     }
     Trigger( p_input, event->type );
 }

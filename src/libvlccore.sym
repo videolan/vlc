@@ -155,6 +155,7 @@ input_Control
 input_Create
 input_CreateFilename
 input_CreatePreparser
+input_CreateThumbnailer
 input_DecoderCreate
 input_DecoderDelete
 input_DecoderDecode
@@ -786,3 +787,8 @@ vlc_es_id_Hold
 vlc_es_id_Release
 vlc_es_id_GetInputId
 vlc_es_id_GetCat
+vlc_thumbnailer_Create
+vlc_thumbnailer_RequestByTime
+vlc_thumbnailer_RequestByPos
+vlc_thumbnailer_Cancel
+vlc_thumbnailer_Release

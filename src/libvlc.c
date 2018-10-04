@@ -63,6 +63,7 @@
 #include <vlc_url.h>
 #include <vlc_modules.h>
 #include <vlc_media_library.h>
+#include <vlc_thumbnailer.h>
 
 #include "libvlc.h"
 #include "playlist/playlist_internal.h"
@@ -224,6 +225,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if ( priv->p_media_library == NULL )
             msg_Warn( p_libvlc, "Media library initialization failed" );
     }
+
+    priv->p_thumbnailer = vlc_thumbnailer_Create( VLC_OBJECT( p_libvlc ) );
+    if ( priv->p_thumbnailer == NULL )
+        msg_Warn( p_libvlc, "Failed to instantiate VLC thumbnailer" );
 
     /*
      * Initialize hotkey handling
