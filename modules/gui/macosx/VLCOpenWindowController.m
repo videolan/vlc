@@ -786,8 +786,10 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 }
 
-- (NSDictionary *)scanPath:(NSString *)path
+- (NSDictionary *)scanPath:(NSURL *)url
 {
+    NSString *path = [url path];
+
     NSString *type = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath:path];
     NSImage *image = [[NSWorkspace sharedWorkspace] iconForFile: path];
     NSString *devicePath;
@@ -818,8 +820,20 @@ static NSString *kCaptureTabViewId  = @"capture";
     @autoreleasepool {
         NSUInteger count = [paths count];
         NSMutableArray *o_result = [NSMutableArray array];
-        for (NSUInteger i = 0; i < count; i++)
-            [o_result addObject: [self scanPath:[paths objectAtIndex:i]]];
+        for (NSUInteger i = 0; i < count; i++) {
+            NSURL *currentURL = [paths objectAtIndex:i];
+
+            NSNumber *isRemovable = nil;
+            if (![currentURL getResourceValue:&isRemovable forKey:NSURLVolumeIsRemovableKey error:nil] || !isRemovable) {
+                msg_Warn(getIntf(), "Cannot find removable flag for mount point");
+                continue;
+            }
+
+            if (!isRemovable.boolValue)
+                continue;
+
+            [o_result addObject: [self scanPath:currentURL]];
+        }
 
         @synchronized (self) {
             _opticalDevices = [[NSArray alloc] initWithArray: o_result];
@@ -829,7 +843,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 }
 
-- (void)scanSpecialPath:(NSString *)oPath
+- (void)scanSpecialPath:(NSURL *)oPath
 {
     @autoreleasepool {
         NSDictionary *o_dict = [self scanPath:oPath];
@@ -844,7 +858,9 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (void)scanOpticalMedia:(NSNotification *)o_notification
 {
-    [NSThread detachNewThreadSelector:@selector(scanDevicesWithPaths:) toTarget:self withObject:[NSArray arrayWithArray:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]]];
+    NSArray *mountURLs = [[NSFileManager defaultManager] mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsRemovableKey] options:NSVolumeEnumerationSkipHiddenVolumes];
+
+    [NSThread detachNewThreadSelector:@selector(scanDevicesWithPaths:) toTarget:self withObject:mountURLs];
 }
 
 - (void)updateMediaSelector:(NSNumber *)selection
@@ -905,9 +921,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     [openPanel setAllowedFileTypes:[NSArray arrayWithObject:@"public.directory"]];
 
     if ([openPanel runModal] == NSModalResponseOK) {
-        NSString *oPath = [[[openPanel URLs] firstObject] path];
-        if ([oPath length] > 0) {
-            [NSThread detachNewThreadSelector:@selector(scanSpecialPath:) toTarget:self withObject:oPath];
+        NSURL *path = openPanel.URL;
+        if (path) {
+            [NSThread detachNewThreadSelector:@selector(scanSpecialPath:) toTarget:self withObject:path];
         }
     }
 }
