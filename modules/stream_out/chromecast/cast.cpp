@@ -1005,7 +1005,7 @@ static std::string GetVencX264Option( sout_stream_t * /* p_stream */,
             break;
     }
 
-    const bool b_hdres = p_vid == NULL || p_vid->i_height == 0 || p_vid->i_height >= 800;
+    const bool b_hdres = p_vid->i_height == 0 || p_vid->i_height >= 800;
     unsigned i_video_x264_crf = b_hdres ? i_video_x264_crf_hd : i_video_x264_crf_720p;
 
     ssout << "venc=x264{preset=" << psz_video_x264_preset
@@ -1139,8 +1139,7 @@ sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_cod
             ssout << ( ( p_vid->i_width > 1280 ) ? "width=1280," : "" ) << video_maxres_720p << ',';
     }
 
-    if( p_vid == NULL
-     || p_vid->i_frame_rate == 0 || p_vid->i_frame_rate_base == 0
+    if( p_vid->i_frame_rate == 0 || p_vid->i_frame_rate_base == 0
      || ( p_vid->i_frame_rate / p_vid->i_frame_rate_base ) > 30 )
     {
         /* Even force 24fps if the frame rate is unknown */
