@@ -10,8 +10,8 @@ In file included from xmm_quantize_sub.c:37:0:
 xmm_quantize_sub.c:65:18: error: called from here
      const __m128 vec_fabs_mask = _mm_loadu_ps(&fabs_mask._float[0]);
                   ^
---- lame/libmp3lame/vector/xmm_quantize_sub.c.orig	2014-06-08 12:16:19.455468042 -0700
-+++ lame/libmp3lame/vector/xmm_quantize_sub.c	2014-06-08 12:16:09.592356980 -0700
+--- lame/libmp3lame/vector/xmm_quantize_sub.c.orig	2018-10-04 13:48:32.286892400 +0200
++++ lame/libmp3lame/vector/xmm_quantize_sub.c	2018-10-04 13:49:23.640116100 +0200
 @@ -35,6 +35,7 @@
  #ifdef HAVE_XMMINTRIN_H
  
@@ -20,11 +20,11 @@ xmm_quantize_sub.c:65:18: error: called from here
  
  typedef union {
      int32_t _i_32[4]; /* unions are initialized by its first member */
-@@ -124,6 +125,7 @@
+@@ -132,6 +133,7 @@ store4(__m128 v, float* f0, float* f1, f
  }
  
  
 +#pragma GCC target("sse2")
- void
+ SSE_FUNCTION void
  fht_SSE2(FLOAT * fz, int n)
  {

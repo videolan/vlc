@@ -1,6 +1,6 @@
 # lame
 
-LAME_VERSION := 3.99.5
+LAME_VERSION := 3.100
 LAME_URL := $(SF)/lame/lame-$(LAME_VERSION).tar.gz
 
 $(TARBALLS)/lame-$(LAME_VERSION).tar.gz:
@@ -12,7 +12,6 @@ lame: lame-$(LAME_VERSION).tar.gz .sum-lame
 	$(UNPACK)
 	$(APPLY) $(SRC)/lame/lame-forceinline.patch
 	$(APPLY) $(SRC)/lame/sse.patch
-	$(APPLY) $(SRC)/lame/lame-outdated-autotools.patch
 	# Avoid relying on iconv.m4 from gettext, when reconfiguring.
 	# This is only used by the frontend which we disable.
 	cd $(UNPACK_DIR) && sed -i.orig 's/^AM_ICONV/#&/' configure.in
