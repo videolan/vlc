@@ -103,6 +103,30 @@ libvlc_int_t * libvlc_InternalCreate( void )
     return p_libvlc;
 }
 
+static void
+PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
+{
+    enum vlc_playlist_playback_order order;
+    if (var_InheritBool(obj, "random"))
+        order = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    else
+        order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+
+    /* repeat = repeat current; loop = repeat all */
+    enum vlc_playlist_playback_repeat repeat;
+    if (var_InheritBool(obj, "repeat"))
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+    else if (var_InheritBool(obj, "loop"))
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    else
+        repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_SetPlaybackOrder(playlist, order);
+    vlc_playlist_SetPlaybackRepeat(playlist, repeat);
+    vlc_playlist_Unlock(playlist);
+}
+
 /**
  * Initialize a libvlc instance
  * This function initializes a previously allocated libvlc instance:
@@ -286,6 +310,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->main_playlist = vlc_playlist_New(VLC_OBJECT(p_libvlc));
     if (unlikely(!priv->main_playlist))
         goto error;
+
+    PlaylistConfigureFromVariables(priv->main_playlist, VLC_OBJECT(p_libvlc));
 
     /*
      * Load background interfaces
