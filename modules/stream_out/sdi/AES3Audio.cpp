@@ -51,7 +51,7 @@ void AES3AudioBuffer::push(block_t *p_block)
     bytestream_mutex.unlock();
 }
 
-void AES3AudioBuffer::read(void *dstbuf, unsigned count,
+void AES3AudioBuffer::read(void *dstbuf, unsigned count, unsigned skip,
                            const AES3AudioSubFrameIndex &dstbufsubframeidx,
                            const AES3AudioSubFrameIndex &srcchannelidx,
                            unsigned dstbufframeswidth)
@@ -65,7 +65,7 @@ void AES3AudioBuffer::read(void *dstbuf, unsigned count,
     uint8_t *dst = reinterpret_cast<uint8_t *>(dstbuf);
     for(unsigned i=0; i<count; i++)
     {
-       size_t srcoffset = sizeof(uint16_t) * (i * buffersubframes + srcchannelidx.index());
+       size_t srcoffset = sizeof(uint16_t) * ((i + skip) * buffersubframes + srcchannelidx.index());
        size_t dstoffset = sizeof(uint16_t) * (i * 2 * dstbufframeswidth + dstbufsubframeidx.index());
        block_PeekOffsetBytes(&bytestream, srcoffset, &dst[dstoffset], sizeof(uint16_t));
     }
@@ -139,12 +139,16 @@ vlc_tick_t AES3AudioBuffer::bufferEnd() const
      return start;
 }
 
-unsigned AES3AudioBuffer::availableSamples() const
+unsigned AES3AudioBuffer::availableSamples(vlc_tick_t from) const
 {
+    vlc_tick_t start = bufferStart();
+    if(start == VLC_TICK_INVALID)
+        return 0;
     bytestream_mutex.lock();
     unsigned samples = BytesToFrames(block_BytestreamRemaining(&bytestream));
     bytestream_mutex.unlock();
-    return samples;
+    unsigned offset = TicksDurationToFrames(from - start);
+    return samples + offset;
 }
 
 AES3AudioSubFrameSource::AES3AudioSubFrameSource()
@@ -167,12 +171,13 @@ vlc_tick_t AES3AudioSubFrameSource::bufferStartTime() const
 
 void AES3AudioSubFrameSource::copy(void *buf,
                                    unsigned count,
+                                   unsigned skip,
                                    const AES3AudioSubFrameIndex &srcsubframeidx,
                                    unsigned widthinframes)
 {
     if(aes3AudioBuffer == NULL)
         return;
-    aes3AudioBuffer->read(buf, count, srcsubframeidx, bufferSubFrameIdx, widthinframes);
+    aes3AudioBuffer->read(buf, count, skip, srcsubframeidx, bufferSubFrameIdx, widthinframes);
 }
 
 void AES3AudioSubFrameSource::flushConsumed()
@@ -203,11 +208,11 @@ bool AES3AudioSubFrameSource::available() const
     return aes3AudioBuffer == NULL;
 }
 
-unsigned AES3AudioSubFrameSource::availableSamples() const
+unsigned AES3AudioSubFrameSource::availableSamples(vlc_tick_t from) const
 {
     if(aes3AudioBuffer == NULL)
         return 0;
-    return aes3AudioBuffer->availableSamples();
+    return aes3AudioBuffer->availableSamples(from);
 }
 
 AES3AudioFrameSource::AES3AudioFrameSource()
@@ -235,14 +240,14 @@ unsigned AES3AudioFrameSource::samplesUpToTime(vlc_tick_t t) const
     return diff / (48000 * 2 * 2);
 }
 
-unsigned AES3AudioFrameSource::availableSamples() const
+unsigned AES3AudioFrameSource::availableSamples(vlc_tick_t from) const
 {
     if(!subframe0.available() && !subframe1.available())
-        return std::min(subframe0.availableSamples(), subframe1.availableSamples());
+        return std::min(subframe0.availableSamples(from), subframe1.availableSamples(from));
     else if(subframe1.available())
-        return subframe0.availableSamples();
+        return subframe0.availableSamples(from);
     else
-        return subframe1.availableSamples();
+        return subframe1.availableSamples(from);
 }
 
 void AES3AudioFrameSource::flushConsumed()

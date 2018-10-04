@@ -329,7 +329,7 @@ SDIAudioMultiplex::~SDIAudioMultiplex()
 
 }
 
-unsigned SDIAudioMultiplex::availableSamples() const
+unsigned SDIAudioMultiplex::availableSamples(vlc_tick_t from) const
 {
     unsigned samples = std::numeric_limits<unsigned>::max();
     for(size_t i=0; i<MAX_AES3_AUDIO_FRAMES; i++)
@@ -337,7 +337,7 @@ unsigned SDIAudioMultiplex::availableSamples() const
         if(framesources[i].subframe0.available() &&
            framesources[i].subframe1.available())
             continue;
-        samples = std::min(samples, framesources[i].availableSamples());
+        samples = std::min(samples, framesources[i].availableSamples(from));
     }
     return samples < std::numeric_limits<unsigned>::max() ? samples : 0;
 }
@@ -406,7 +406,7 @@ block_t * SDIAudioMultiplex::Extract(unsigned samples)
     for(unsigned i=0; i<MAX_AES3_AUDIO_FRAMES; i++)
     {
         AES3AudioFrameSource *source = &framesources[i];
-        unsigned avail = source->availableSamples();
+        unsigned avail = source->availableSamples(start);
         if(avail == 0)
             continue;
 
@@ -414,12 +414,12 @@ block_t * SDIAudioMultiplex::Extract(unsigned samples)
         unsigned tocopy = std::min(samples, avail);
 
         toskip = source->samplesUpToTime(start);
-        if(toskip > tocopy)
+        if(toskip >= tocopy)
             continue;
         tocopy -= toskip;
 
-        source->subframe0.copy(p_block->p_buffer, tocopy, (i * 2 + 0), interleavedframes);
-        source->subframe1.copy(p_block->p_buffer, tocopy, (i * 2 + 1), interleavedframes);
+        source->subframe0.copy(p_block->p_buffer, tocopy, toskip, (i * 2 + 0), interleavedframes);
+        source->subframe1.copy(p_block->p_buffer, tocopy, toskip, (i * 2 + 1), interleavedframes);
     }
 
     for(unsigned i=0; i<MAX_AES3_AUDIO_FRAMES; i++)

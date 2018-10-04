@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#define SAMPLES_PER_FRAME        (1536/4)
+#define SAMPLES_PER_FRAME        (1536U/4)
 
 namespace sdi_sout
 {
@@ -86,7 +86,7 @@ namespace sdi_sout
             SDIAudioMultiplex(uint8_t channels);
             ~SDIAudioMultiplex();
             vlc_tick_t bufferStart() const;
-            unsigned availableSamples() const;
+            unsigned availableSamples(vlc_tick_t) const;
             block_t * Extract(unsigned);
             unsigned getFreeSubFrameSlots() const;
             void SetSubFrameSource(uint8_t, AES3AudioBuffer *, AES3AudioSubFrameIndex);

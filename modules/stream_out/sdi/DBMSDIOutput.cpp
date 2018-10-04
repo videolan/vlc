@@ -504,8 +504,9 @@ int DBMSDIOutput::Process()
     picture_t *p;
     while((p = reinterpret_cast<picture_t *>(videoBuffer.Dequeue())))
     {
-        while(audioMultiplex->availableSamples() >= SAMPLES_PER_FRAME &&
-              audioMultiplex->bufferStart() <= p->date)
+        vlc_tick_t bufferStart = audioMultiplex->bufferStart();
+        while(bufferStart <= p->date &&
+              audioMultiplex->availableSamples(bufferStart) >= SAMPLES_PER_FRAME)
         {
               block_t *out = audioMultiplex->Extract(SAMPLES_PER_FRAME);
             if(out)

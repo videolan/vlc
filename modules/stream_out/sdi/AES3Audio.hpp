@@ -48,9 +48,9 @@ namespace sdi_sout
             void setSubFramesCount(uint8_t);
             vlc_tick_t bufferStart() const;
             vlc_tick_t bufferEnd() const;
-            unsigned availableSamples() const;
+            unsigned availableSamples(vlc_tick_t) const;
             void push(block_t *);
-            void read(void *, unsigned,
+            void read(void *, unsigned, unsigned,
                       const AES3AudioSubFrameIndex &,
                       const AES3AudioSubFrameIndex &, unsigned);
             void flushConsumed();
@@ -74,12 +74,12 @@ namespace sdi_sout
             AES3AudioSubFrameSource();
             AES3AudioSubFrameSource(AES3AudioBuffer *, AES3AudioSubFrameIndex);
             vlc_tick_t bufferStartTime() const;
-            void copy(void *, unsigned count,
+            void copy(void *, unsigned count, unsigned,
                       const AES3AudioSubFrameIndex &, unsigned width);
             void flushConsumed();
             void tagConsumed(unsigned);
-            unsigned availableSamples() const;
             void forwardTo(vlc_tick_t t);
+            unsigned availableSamples(vlc_tick_t) const;
             const AES3AudioSubFrameIndex & index() const;
             bool available() const;
 
@@ -94,7 +94,7 @@ namespace sdi_sout
             AES3AudioFrameSource();
             vlc_tick_t bufferStartTime() const;
             unsigned samplesUpToTime(vlc_tick_t) const;
-            unsigned availableSamples() const;
+            unsigned availableSamples(vlc_tick_t) const;
             void flushConsumed();
             void tagConsumed(unsigned);
             void forwardTo(vlc_tick_t t);
