@@ -3233,6 +3233,7 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     int ret = es_format_Copy(&es->fmt_out, &update);
     if (ret == VLC_SUCCESS)
     {
+        free( es->psz_title );
         free( es->psz_language );
         free( es->psz_language_code );
 
