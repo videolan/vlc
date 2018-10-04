@@ -98,8 +98,10 @@ void AES3AudioBuffer::flushConsumed()
     {
         size_t bytes = FramesToBytes(toconsume);
         bytestream_mutex.lock();
-        block_SkipBytes(&bytestream, bytes);
-        block_BytestreamFlush(&bytestream);
+        if(block_SkipBytes(&bytestream, bytes) == VLC_SUCCESS)
+            block_BytestreamFlush(&bytestream);
+        else
+            block_BytestreamEmpty(&bytestream);
         bytestream_mutex.unlock();
         toconsume = 0;
     }
