@@ -382,6 +382,19 @@ void SDIAudioMultiplex::SetSubFrameSource(uint8_t n, AES3AudioBuffer *buf,
     *s = AES3AudioSubFrameSource(buf, idx);
 }
 
+void SDIAudioMultiplex::Debug(vlc_object_t *p_obj) const
+{
+    msg_Dbg(p_obj, "Multiplex: head %ld bufferstart() %ld", head, bufferStart());
+    for(unsigned i=0; i<MAX_AES3_AUDIO_FRAMES; i++)
+    {
+        const AES3AudioFrameSource *source = &framesources[i];
+        if(!source->subframe0.available())
+            msg_Dbg(p_obj, " [%d.0] bufferstart() %ld", i, source->subframe0.bufferStartTime());
+        if(!source->subframe1.available())
+            msg_Dbg(p_obj, " [%d.1] bufferstart() %ld", i, source->subframe1.bufferStartTime());
+    }
+}
+
 block_t * SDIAudioMultiplex::Extract(unsigned samples)
 {
     vlc_tick_t start = bufferStart();

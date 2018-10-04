@@ -90,6 +90,7 @@ namespace sdi_sout
             block_t * Extract(unsigned);
             unsigned getFreeSubFrameSlots() const;
             void SetSubFrameSource(uint8_t, AES3AudioBuffer *, AES3AudioSubFrameIndex);
+            void Debug(vlc_object_t *) const;
 
             SDIAudioMultiplexConfig config;
             vlc_tick_t head;
