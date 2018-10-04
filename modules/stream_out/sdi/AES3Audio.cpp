@@ -113,10 +113,11 @@ void AES3AudioBuffer::tagConsumed(unsigned f)
 
 void AES3AudioBuffer::forwardTo(vlc_tick_t t)
 {
-    if(bufferStart() == VLC_TICK_INVALID)
+    if(bufferStart() == VLC_TICK_INVALID || t <= bufferStart())
         return;
 
     tagConsumed(TicksDurationToFrames(t - bytestream.p_block->i_pts));
+    flushConsumed();
 }
 
 vlc_tick_t AES3AudioBuffer::bufferStart() const
@@ -186,6 +187,12 @@ void AES3AudioSubFrameSource::tagConsumed(unsigned count)
         aes3AudioBuffer->tagConsumed(count);
 }
 
+void AES3AudioSubFrameSource::forwardTo(vlc_tick_t t)
+{
+    if(aes3AudioBuffer)
+        aes3AudioBuffer->forwardTo(t);
+}
+
 const AES3AudioSubFrameIndex & AES3AudioSubFrameSource::index() const
 {
     return bufferSubFrameIdx;
@@ -248,6 +255,12 @@ void AES3AudioFrameSource::tagConsumed(unsigned samples)
 {
     subframe0.tagConsumed(samples);
     subframe1.tagConsumed(samples);
+}
+
+void AES3AudioFrameSource::forwardTo(vlc_tick_t t)
+{
+    subframe0.forwardTo(t);
+    subframe1.forwardTo(t);
 }
 
 AES3AudioSubFrameIndex::AES3AudioSubFrameIndex(uint8_t v)

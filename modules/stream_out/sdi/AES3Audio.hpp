@@ -79,6 +79,7 @@ namespace sdi_sout
             void flushConsumed();
             void tagConsumed(unsigned);
             unsigned availableSamples() const;
+            void forwardTo(vlc_tick_t t);
             const AES3AudioSubFrameIndex & index() const;
             bool available() const;
 
@@ -96,6 +97,7 @@ namespace sdi_sout
             unsigned availableSamples() const;
             void flushConsumed();
             void tagConsumed(unsigned);
+            void forwardTo(vlc_tick_t t);
             AES3AudioSubFrameSource subframe0;
             AES3AudioSubFrameSource subframe1;
     };

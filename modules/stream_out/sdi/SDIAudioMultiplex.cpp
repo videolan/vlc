@@ -321,6 +321,7 @@ const es_format_t *
 SDIAudioMultiplex::SDIAudioMultiplex(uint8_t channels)
 {
     config = SDIAudioMultiplexConfig(channels);
+    head = VLC_TICK_INVALID;
 }
 
 SDIAudioMultiplex::~SDIAudioMultiplex()
@@ -387,6 +388,13 @@ block_t * SDIAudioMultiplex::Extract(unsigned samples)
 
     uint8_t interleavedframes = config.getMultiplexedFramesCount();
 
+    /* Ensure we never roll back due to late fifo */
+    if(head != VLC_TICK_INVALID && start > head)
+    {
+        for(unsigned i=0; i<MAX_AES3_AUDIO_FRAMES; i++)
+            framesources[i].forwardTo(head);
+    }
+
     block_t *p_block = block_Alloc( interleavedframes * 2 * sizeof(uint16_t) * samples );
     if(!p_block)
         return NULL;
@@ -418,6 +426,8 @@ block_t * SDIAudioMultiplex::Extract(unsigned samples)
         framesources[i].tagConsumed(samples);
     for(unsigned i=0; i<MAX_AES3_AUDIO_FRAMES; i++)
         framesources[i].flushConsumed();
+
+    head = bufferStart();
 
     return p_block;
 }

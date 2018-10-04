@@ -92,6 +92,7 @@ namespace sdi_sout
             void SetSubFrameSource(uint8_t, AES3AudioBuffer *, AES3AudioSubFrameIndex);
 
             SDIAudioMultiplexConfig config;
+            vlc_tick_t head;
 
         private:
             unsigned count;
