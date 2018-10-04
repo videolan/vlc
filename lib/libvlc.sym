@@ -262,3 +262,12 @@ libvlc_set_exit_handler
 libvlc_audio_filter_list_get
 libvlc_video_filter_list_get
 libvlc_module_description_list_release
+libvlc_picture_retain
+libvlc_picture_release
+libvlc_picture_save
+libvlc_picture_get_buffer
+libvlc_picture_type
+libvlc_picture_get_stride
+libvlc_picture_get_width
+libvlc_picture_get_height
+libvlc_picture_get_time
