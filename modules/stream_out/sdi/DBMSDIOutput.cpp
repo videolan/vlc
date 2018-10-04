@@ -510,9 +510,8 @@ int DBMSDIOutput::Process()
         {
               block_t *out = audioMultiplex->Extract(SAMPLES_PER_FRAME);
             if(out)
-            {
                   ProcessAudio(out);
-            }
+            else break;
         }
 
         ProcessVideo(p, reinterpret_cast<block_t *>(captionsBuffer.Dequeue()));
