@@ -164,9 +164,16 @@ void SDIOutput::Del(AbstractStream *s)
     delete s;
 }
 
-int SDIOutput::Control(int, va_list)
+int SDIOutput::Control(int i_query, va_list args)
 {
-    return VLC_EGENERIC;
+    switch(i_query)
+    {
+        case SOUT_STREAM_WANTS_SUBSTREAMS:
+            *va_arg(args, bool *) = true;
+            return VLC_SUCCESS;
+        default:
+            return VLC_EGENERIC;
+    };
 }
 
 AbstractStream *SDIOutput::createStream(const StreamID &id,
