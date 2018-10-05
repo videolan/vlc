@@ -581,6 +581,9 @@ static int vout_update_format( decoder_t *p_dec )
         case VLC_CODEC_DIRAC: /* FIXME valid ? */
             dpb_size = 18;
             break;
+        case VLC_CODEC_AV1:
+            dpb_size = 10;
+            break;
         case VLC_CODEC_VP5:
         case VLC_CODEC_VP6:
         case VLC_CODEC_VP6F:
