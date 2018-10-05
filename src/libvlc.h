@@ -197,6 +197,7 @@ typedef struct libvlc_priv_t
     struct input_preparser_t *parser; ///< Input item meta data handler
     vlc_actions_t *actions; ///< Hotkeys handler
     struct vlc_medialibrary_t *p_media_library; ///< Media library instance
+    struct vlc_thumbnailer_t *p_thumbnailer; ///< Lazily instantiated media thumbnailer
 
     /* Exit callback */
     vlc_exit_t       exit;

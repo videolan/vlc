@@ -84,6 +84,11 @@ enum libvlc_event_e {
      * Subitem tree was added to a \link #libvlc_media_t media item\endlink
      */
     libvlc_MediaSubItemTreeAdded,
+    /**
+     * A thumbnail generation for this \link #libvlc_media_t media \endlink completed.
+     * \see libvlc_media_get_thumbnail()
+     */
+    libvlc_MediaThumbnailGenerated,
 
     libvlc_MediaPlayerMediaChanged=0x100,
     libvlc_MediaPlayerNothingSpecial,
@@ -233,6 +238,10 @@ typedef struct libvlc_event_t
         {
             int new_state; /**< see @ref libvlc_state_t */
         } media_state_changed;
+        struct
+        {
+            libvlc_picture_t* p_thumbnail;
+        } media_thumbnail_generated;
         struct
         {
             libvlc_media_t * item;
