@@ -314,8 +314,18 @@ static block_t *ParseOBUBlock(decoder_t *p_dec, block_t *p_obu)
                         if((p_sys->i_seen & AV1_OBU_TEMPORAL_DELIMITER) && p_sys->tu.b_has_visible_frame)
                             p_output = OutputQueues(p_dec, p_sys->p_sequence_header != NULL);
 
-                        if(AV1_get_frame_type(p_fh) == AV1_KEY_FRAME)
-                            p_obu->i_flags |= BLOCK_FLAG_TYPE_I;
+                        switch(AV1_get_frame_type(p_fh))
+                        {
+                            case AV1_FRAME_TYPE_KEY:
+                            case AV1_FRAME_TYPE_INTRA_ONLY:
+                                p_obu->i_flags |= BLOCK_FLAG_TYPE_I;
+                                break;
+                            case AV1_FRAME_TYPE_INTER:
+                                p_obu->i_flags |= BLOCK_FLAG_TYPE_P;
+                                break;
+                            default:
+                                break;
+                        }
 
                         p_sys->tu.b_has_visible_frame |= AV1_get_frame_visibility(p_fh);
                         AV1_release_frame_header(p_fh);

@@ -174,10 +174,10 @@ bool AV1_get_frame_rate(const av1_OBU_sequence_header_t *, unsigned *, unsigned 
 typedef struct av1_OBU_frame_header_t av1_OBU_frame_header_t;
 enum av1_frame_type_e
 {
-    AV1_KEY_FRAME        = 0,
-    AV1_INTER_FRAME      = 1,
-    AV1_INTRA_ONLY_FRAME = 2,
-    AV1_SWITCH_FRAME     = 3,
+    AV1_FRAME_TYPE_KEY        = 0,
+    AV1_FRAME_TYPE_INTER      = 1,
+    AV1_FRAME_TYPE_INTRA_ONLY = 2,
+    AV1_FRAME_TYPE_SWITCH     = 3,
 };
 
 av1_OBU_frame_header_t * AV1_OBU_parse_frame_header(const uint8_t *p_data, size_t i_data,
