@@ -421,7 +421,7 @@ static bool av1_parse_uncompressed_header(bs_t *p_bs, struct av1_uncompressed_he
 {
     if(p_seq->reduced_still_picture_header)
     {
-        p_uh->frame_type = AV1_KEY_FRAME;
+        p_uh->frame_type = AV1_FRAME_TYPE_KEY;
         p_uh->show_frame = 1;
     }
     else
