@@ -155,7 +155,10 @@ pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
 
         if( p->i_pitch < 0 || p->i_lines <= 0 ||
             (size_t)p->i_pitch > SIZE_MAX/p->i_lines )
+        {
+            picture_Release(pic);
             return NULL;
+        }
         picsys->bytes[i] = (p->i_pitch * p->i_lines) + 15 / 16 * 16;
     }
     return pic;
