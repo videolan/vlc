@@ -272,6 +272,7 @@ error:
 int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
 {
     HRESULT result;
+    IDeckLinkAttributes *p_attributes = NULL;
 
     if(FAKE_DRIVER)
         return VLC_SUCCESS;
@@ -285,6 +286,20 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
     if (audio.i_channels > 0)
     {
         uint8_t maxchannels = audioMultiplex->config.getMultiplexedFramesCount() * 2;
+
+        result = p_card->QueryInterface(IID_IDeckLinkAttributes, (void**)&p_attributes);
+        CHECK("Could not get IDeckLinkAttributes");
+
+        int64_t i64;
+        result = p_attributes->GetInt(BMDDeckLinkMaximumAudioChannels, &i64);
+        CHECK("Could not get BMDDeckLinkMaximumAudioChannels");
+        if(i64 < maxchannels)
+        {
+            msg_Err(p_stream, "requested channels %" PRIu8 " exceeds supported maximum: %" PRId64,
+                    maxchannels, i64);
+            goto error;
+        }
+
         msg_Dbg(p_stream, "configuring audio output with %d", maxchannels);
         result = p_output->EnableAudioOutput(
                     bmdAudioSampleRate48kHz,
@@ -293,10 +308,14 @@ int DBMSDIOutput::ConfigureAudio(const audio_format_t *)
                     bmdAudioOutputStreamTimestamped);
         CHECK("Could not start audio output");
         audio.b_configured = true;
+
+        p_attributes->Release();
     }
     return VLC_SUCCESS;
 
 error:
+    if(p_attributes)
+        p_attributes->Release();
     return VLC_EGENERIC;
 }
 
