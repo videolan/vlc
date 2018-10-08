@@ -151,7 +151,7 @@ static int Open( vlc_object_t * p_this )
 {
     demux_t     *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys;
-    guid_t      guid;
+    vlc_guid_t      guid;
     const uint8_t     *p_peek;
 
     /* A little test to see if it could be a asf stream */
@@ -226,7 +226,7 @@ static int Demux( demux_t *p_demux )
             const uint8_t *p_peek;
             if( vlc_stream_Peek( p_demux->s, &p_peek, 16 ) == 16 )
             {
-                guid_t guid;
+                vlc_guid_t guid;
 
                 ASF_GetGUID( &guid, p_peek );
                 p_sys->b_eof = !guidcmp( &guid, &asf_object_header_guid );
@@ -1048,12 +1048,12 @@ static int DemuxInit( demux_t *p_demux )
         else if( guidcmp( &p_sp->i_stream_type, &asf_object_stream_type_binary ) &&
             p_sp->i_type_specific_data_length >= 64 )
         {
-            guid_t i_major_media_type;
+            vlc_guid_t i_major_media_type;
             ASF_GetGUID( &i_major_media_type, p_sp->p_type_specific_data );
             msg_Dbg( p_demux, "stream(ID:%d) major type " GUID_FMT, p_sp->i_stream_number,
                      GUID_PRINT(i_major_media_type) );
 
-            guid_t i_media_subtype;
+            vlc_guid_t i_media_subtype;
             ASF_GetGUID( &i_media_subtype, &p_sp->p_type_specific_data[16] );
             msg_Dbg( p_demux, "stream(ID:%d) subtype " GUID_FMT, p_sp->i_stream_number,
                      GUID_PRINT(i_media_subtype) );
@@ -1062,7 +1062,7 @@ static int DemuxInit( demux_t *p_demux )
             //uint32_t i_temporal_compression = GetDWBE( &p_sp->p_type_specific_data[36] );
             //uint32_t i_sample_size = GetDWBE( &p_sp->p_type_specific_data[40] );
 
-            guid_t i_format_type;
+            vlc_guid_t i_format_type;
             ASF_GetGUID( &i_format_type, &p_sp->p_type_specific_data[44] );
             msg_Dbg( p_demux, "stream(ID:%d) format type " GUID_FMT, p_sp->i_stream_number,
                      GUID_PRINT(i_format_type) );

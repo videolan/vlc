@@ -68,7 +68,7 @@ typedef struct
     uint64_t        i_position;
 
     asf_header_t    asfh;
-    guid_t          guid;
+    vlc_guid_t          guid;
 } access_sys_t;
 
 #endif

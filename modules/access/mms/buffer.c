@@ -213,7 +213,7 @@ int var_buffer_readempty( var_buffer_t *p_buf )
     return( ( p_buf->i_data >= p_buf->i_size ) ? 1 : 0 );
 }
 
-void var_buffer_getguid( var_buffer_t *p_buf, guid_t *p_guid )
+void var_buffer_getguid( var_buffer_t *p_buf, vlc_guid_t *p_guid )
 {
     p_guid->Data1 = var_buffer_get32( p_buf );
     p_guid->Data2 = var_buffer_get16( p_buf );

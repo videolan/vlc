@@ -132,7 +132,7 @@ typedef struct
 
 typedef struct
 {
-    guid_t          fid;    /* file id */
+    vlc_guid_t      fid;    /* file id */
     int             i_packet_size;
     int64_t         i_packet_count;
     vlc_tick_t      i_dts_first;
@@ -817,7 +817,7 @@ static void bo_addle_str16_nosize( bo_t *bo, const char *str )
 /****************************************************************************
  * GUID definitions
  ****************************************************************************/
-static void bo_add_guid( bo_t *p_bo, const guid_t *id )
+static void bo_add_guid( bo_t *p_bo, const vlc_guid_t *id )
 {
     bo_addle_u32( p_bo, id->Data1 );
     bo_addle_u16( p_bo, id->Data2 );

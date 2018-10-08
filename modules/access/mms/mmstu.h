@@ -58,7 +58,7 @@ typedef struct
     size_t      i_buffer_udp;
 
     /* data necessary to send data to server */
-    guid_t      guid;
+    vlc_guid_t  guid;
     int         i_command_level;
     int         i_seq_num;
     uint32_t    i_header_packet_id_type;

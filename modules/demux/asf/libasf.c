@@ -1068,9 +1068,9 @@ static int ASF_ReadObject_advanced_mutual_exclusion( stream_t *s,
     if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
         return VLC_EGENERIC;
 
-    if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_language ) )
+    if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_language ) )
         p_ae->exclusion_type = LANGUAGE;
-    else if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_bitrate ) )
+    else if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_bitrate ) )
         p_ae->exclusion_type = BITRATE;
     ASF_SKIP( 16 );
 
@@ -1182,9 +1182,9 @@ static int ASF_ReadObject_bitrate_mutual_exclusion( stream_t *s, asf_object_t *p
     if( !ASF_HAVE( 16 + 2 * sizeof(uint16_t) ) ) /* at least one entry */
         return VLC_EGENERIC;
 
-    if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_language ) )
+    if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_language ) )
         p_ex->exclusion_type = LANGUAGE;
-    else if ( guidcmp( (const guid_t *) p_data, &asf_guid_mutex_bitrate ) )
+    else if ( guidcmp( (const vlc_guid_t *) p_data, &asf_guid_mutex_bitrate ) )
         p_ex->exclusion_type = BITRATE;
     ASF_SKIP( 16 );
 
@@ -1421,7 +1421,7 @@ static int ASF_ReadObject_Raw(stream_t *s, asf_object_t *p_obj)
 /* */
 static const struct ASF_Object_Function_entry
 {
-    const guid_t  *p_id;
+    const vlc_guid_t  *p_id;
     int     i_type;
     int     (*ASF_ReadObject_function)( stream_t *, asf_object_t *p_obj );
     void    (*ASF_FreeObject_function)( asf_object_t *p_obj );
@@ -1494,7 +1494,7 @@ static void ASF_ParentObject( asf_object_t *p_father, asf_object_t *p_obj )
     }
 }
 
-static const struct ASF_Object_Function_entry * ASF_GetObject_Function( const guid_t *id )
+static const struct ASF_Object_Function_entry * ASF_GetObject_Function( const vlc_guid_t *id )
 {
     for( size_t i = 0; i < ARRAY_SIZE(ASF_Object_Function); i++ )
     {
@@ -1593,7 +1593,7 @@ static void ASF_FreeObject( stream_t *s, asf_object_t *p_obj )
  *****************************************************************************/
 static const struct
 {
-    const guid_t *p_id;
+    const vlc_guid_t *p_id;
     const char *psz_name;
 } ASF_ObjectDumpDebugInfo[] =
 {
@@ -1692,7 +1692,7 @@ asf_object_root_t *ASF_ReadObjectRoot( stream_t *s, int b_seekable )
         return NULL;
 
     p_root->i_type = ASF_OBJECT_ROOT;
-    memcpy( &p_root->i_object_id, &vlc_object_root_guid, sizeof( guid_t ) );
+    memcpy( &p_root->i_object_id, &vlc_object_root_guid, sizeof( vlc_guid_t ) );
     p_root->i_object_pos = vlc_stream_Tell( s );
     p_root->i_object_size = 0;
     p_root->p_first = NULL;
@@ -1821,7 +1821,7 @@ void ASF_FreeObjectRoot( stream_t *s, asf_object_root_t *p_root )
     free( p_root );
 }
 
-int ASF_CountObject( void *_p_obj, const guid_t *p_guid )
+int ASF_CountObject( void *_p_obj, const vlc_guid_t *p_guid )
 {
     int i_count;
     asf_object_t *p_child, *p_obj;
@@ -1842,7 +1842,7 @@ int ASF_CountObject( void *_p_obj, const guid_t *p_guid )
     return i_count;
 }
 
-void *ASF_FindObject( void *_p_obj, const guid_t *p_guid,
+void *ASF_FindObject( void *_p_obj, const vlc_guid_t *p_guid,
                         int i_number )
 {
     asf_object_t *p_child, *p_obj;

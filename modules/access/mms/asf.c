@@ -32,7 +32,7 @@
 #include "buffer.h"
 #include "../../demux/asf/libasf_guid.h"
 
-void  GenerateGuid ( guid_t *p_guid )
+void  GenerateGuid ( vlc_guid_t *p_guid )
 {
     p_guid->Data1 = 0xbabac001;
     vlc_rand_bytes(&p_guid->Data2, sizeof(p_guid->Data2));
@@ -44,7 +44,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
                             uint8_t *p_header, int i_header )
 {
     var_buffer_t buffer;
-    guid_t      guid;
+    vlc_guid_t  guid;
     uint64_t    i_size;
 
     hdr->i_file_size = 0;
@@ -130,7 +130,7 @@ void  asf_HeaderParse ( asf_header_t *hdr,
         else if( guidcmp( &guid, &asf_object_stream_properties_guid ) )
         {
             int     i_stream_id;
-            guid_t  stream_type;
+            vlc_guid_t  stream_type;
 
             var_buffer_getguid( &buffer, &stream_type );
             var_buffer_getmemory( &buffer, NULL, 32 );

@@ -43,7 +43,7 @@ typedef struct _GUID
 } GUID, *REFGUID, *LPGUID;
 #endif /* GUID_DEFINED */
 
-typedef GUID guid_t;
+typedef GUID vlc_guid_t;
 
 #ifdef HAVE_ATTRIBUTE_PACKED
 #   define ATTR_PACKED __attribute__((__packed__))

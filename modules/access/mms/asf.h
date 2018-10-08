@@ -55,7 +55,7 @@ typedef struct
 } asf_header_t;
 
 
-void  GenerateGuid      ( guid_t * );
+void  GenerateGuid      ( vlc_guid_t * );
 void  asf_HeaderParse   ( asf_header_t *, uint8_t *, int );
 void  asf_StreamSelect  ( asf_header_t *,
                               int i_bitrate_max, bool b_all, bool b_audio,
