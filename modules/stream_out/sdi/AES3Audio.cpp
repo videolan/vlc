@@ -227,14 +227,6 @@ vlc_tick_t AES3AudioBuffer::bufferStart() const
     return start;
 }
 
-vlc_tick_t AES3AudioBuffer::bufferEnd() const
-{
-    vlc_tick_t start = bufferStart();
-    if(start != VLC_TICK_INVALID)
-        start += CLOCK_FREQ * FramesToDuration(BytesToFrames(block_BytestreamRemaining(&bytestream)));
-     return start;
-}
-
 unsigned AES3AudioBuffer::availableVirtualSamples(vlc_tick_t from) const
 {
     vlc_tick_t start = bufferStart();
@@ -332,11 +324,6 @@ void AES3AudioSubFrameSource::forwardTo(vlc_tick_t t)
 {
     if(aes3AudioBuffer)
         aes3AudioBuffer->forwardTo(t);
-}
-
-const AES3AudioSubFrameIndex & AES3AudioSubFrameSource::index() const
-{
-    return bufferSubFrameIdx;
 }
 
 bool AES3AudioSubFrameSource::available() const

@@ -48,7 +48,6 @@ namespace sdi_sout
             ~AES3AudioBuffer();
             void setSubFramesCount(uint8_t);
             vlc_tick_t bufferStart() const;
-            vlc_tick_t bufferEnd() const;
             unsigned availableVirtualSamples(vlc_tick_t) const;
             unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
             void push(block_t *);
@@ -89,7 +88,6 @@ namespace sdi_sout
             void forwardTo(vlc_tick_t t);
             unsigned availableVirtualSamples(vlc_tick_t) const;
             unsigned alignedInterleaveInSamples(vlc_tick_t, unsigned) const;
-            const AES3AudioSubFrameIndex & index() const;
             bool available() const;
             vlc_fourcc_t getCodec() const;
 
