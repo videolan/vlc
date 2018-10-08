@@ -73,16 +73,16 @@ static void picture_Destroy(picture_t *pic)
 
 VLC_WEAK void *picture_Allocate(int *restrict fdp, size_t size)
 {
-    assert((size % 16) == 0);
+    assert((size % 64) == 0);
     *fdp = -1;
-    return aligned_alloc(16, size);
+    return aligned_alloc(64, size);
 }
 
 VLC_WEAK void picture_Deallocate(int fd, void *base, size_t size)
 {
     assert(fd == -1);
     aligned_free(base);
-    assert((size % 16) == 0);
+    assert((size % 64) == 0);
 }
 
 /*****************************************************************************
