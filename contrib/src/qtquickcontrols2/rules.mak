@@ -27,16 +27,8 @@ qtquickcontrols2: qtquickcontrols2-$(QTQC2_VERSION).tar.xz .sum-qtquickcontrols2
 	mv qtquickcontrols2-everywhere-src-$(QTQC2_VERSION) qtquickcontrols2-$(QTQC2_VERSION)
 	$(MOVE)
 
-
-ifdef HAVE_CROSS_COMPILE
-QMAKE=$(PREFIX)/bin/qmake
-else
-QMAKE=../qt/bin/qmake
-endif
-
-
 .qtquickcontrols2: qtquickcontrols2
-	cd $< && $(QMAKE)
+	cd $< && $(PREFIX)/bin/qmake
 	# Make && Install libraries
 	cd $< && $(MAKE)
 	cd $< && $(MAKE) -C src sub-quickcontrols2-install_subtargets sub-imports-install_subtargets
