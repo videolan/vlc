@@ -28,6 +28,7 @@
 
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>                      // vlc_dialog_display_error
+#import <vlc_charset.h>                     // FromCFString
 
 #import <CoreAudio/CoreAudio.h>             // AudioDeviceID
 #import <CoreServices/CoreServices.h>
@@ -505,16 +506,7 @@ RebuildDeviceList(audio_output_t * p_aout, UInt32 *p_id_exists)
             continue;
         }
 
-        length = CFStringGetLength(device_name_ref);
-        length++;
-        psz_name = malloc(length);
-        if (!psz_name)
-        {
-            CFRelease(device_name_ref);
-            return;
-        }
-        CFStringGetCString(device_name_ref, psz_name, length,
-                           kCFStringEncodingUTF8);
+        psz_name = FromCFString(device_name_ref, kCFStringEncodingUTF8);
         CFRelease(device_name_ref);
 
         msg_Dbg(p_aout, "DevID: %i DevName: %s", i_id, psz_name);
