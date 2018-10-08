@@ -35,6 +35,8 @@
 #include <Security/SecureTransport.h>
 #include <TargetConditionals.h>
 
+#include <vlc_charset.h>
+
 /* From MacErrors.h (cannot be included because it isn't present in iOS: */
 #ifndef ioErr
 # define ioErr -36
@@ -67,45 +69,6 @@ static CFMutableArrayRef alpnToCFArray(const char *const *alpn)
     return alpnValues;
 }
 
-/* Obtains a copy of the contents of a CFString in ASCII encoding.
- * Returns char* (must be freed by caller) or NULL on failure.
- */
-static char* CFStringCopyASCIICString(CFStringRef cfString)
-{
-    // Try the quick way to obtain the buffer
-    const char *tmpBuffer = CFStringGetCStringPtr(cfString, kCFStringEncodingASCII);
-
-    if (tmpBuffer != NULL) {
-       return strdup(tmpBuffer);
-    }
-
-    // The quick way did not work, try the long way
-    CFIndex length = CFStringGetLength(cfString);
-    CFIndex maxSize =
-        CFStringGetMaximumSizeForEncoding(length, kCFStringEncodingASCII);
-
-    // If result would exceed LONG_MAX, kCFNotFound is returned
-    if (unlikely(maxSize == kCFNotFound)) {
-        return NULL;
-    }
-
-    // Account for the null terminator
-    maxSize++;
-
-    char *buffer = (char *)malloc(maxSize);
-
-    if (unlikely(buffer == NULL)) {
-        return NULL;
-    }
-
-    // Copy CFString in requested encoding to buffer
-    Boolean success = CFStringGetCString(cfString, buffer, maxSize, kCFStringEncodingASCII);
-
-    if (!success)
-        FREENULL(buffer);
-    return buffer;
-}
-
 /* Returns the first entry copy of the ALPN array as char*
  * or NULL on failure.
  */
@@ -117,7 +80,7 @@ static char* CFArrayALPNCopyFirst(CFArrayRef alpnArray)
         return NULL;
 
     CFStringRef alpnVal = CFArrayGetValueAtIndex(alpnArray, 0);
-    return CFStringCopyASCIICString(alpnVal);
+    return FromCFString(alpnVal, kCFStringEncodingASCII);
 }
 
 /*****************************************************************************
