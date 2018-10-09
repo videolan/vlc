@@ -26,8 +26,20 @@
  *****************************************************************************/
 
 #import <Foundation/Foundation.h>
+#import <vlc_input.h>
 
 @interface NSString (Helpers)
+
+/**
+ Creates an NSString with the current time of the \c input_thread_t
+
+ This method allocates and initializes an NSString with the current
+ elapsed or remaining time of the given input.
+
+ \param negative   If YES, calculate remaining instead of elapsed time
+ */
++ (instancetype)stringWithTimeFromInput:(input_thread_t *)input
+                               negative:(BOOL)negative;
 
 /**
  Creates an NSString from the given null-terminated C string

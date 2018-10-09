@@ -58,7 +58,6 @@ NSImage *imageFromRes(NSString *name);
 
 + (VLCStringUtility *)sharedInstance;
 
-- (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative;
 - (NSString *)stringForTime:(long long int)time;
 
 - (NSString *)OSXStringKeyToString:(NSString *)theString;

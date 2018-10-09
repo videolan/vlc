@@ -33,6 +33,26 @@
 
 @implementation NSString (Helpers)
 
++ (instancetype)stringWithTimeFromInput:(input_thread_t *)input
+                               negative:(BOOL)negative
+{
+    NSAssert(input != NULL, @"Input may not be NULL!");
+
+    char psz_time[MSTRTIME_MAX_SIZE];
+    vlc_tick_t t = var_GetInteger(input, "time");
+
+    vlc_tick_t dur = input_item_GetDuration(input_GetItem(input));
+    if (negative && dur > 0) {
+        vlc_tick_t remaining = (dur > t) ? (dur - t) : 0;
+
+        return [NSString stringWithFormat:@"-%s",
+                secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(remaining))];
+    } else {
+        return [NSString stringWithUTF8String:
+                secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(t))];
+    }
+}
+
 + (instancetype)base64StringWithCString:(const char *)cstring
 {
     if (cstring == NULL)

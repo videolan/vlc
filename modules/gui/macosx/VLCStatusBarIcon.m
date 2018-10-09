@@ -33,6 +33,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCCoreInteraction.h"
 #import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 #import "VLCApplication.h"
 
@@ -243,8 +244,8 @@
         NSString *totalTime;
 
         /* Get elapsed and remaining time */
-        elapsedTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:input negative:NO];
-        remainingTime = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:input negative:YES];
+        elapsedTime = [NSString stringWithTimeFromInput:input negative:NO];
+        remainingTime = [NSString stringWithTimeFromInput:input negative:YES];
 
         /* Check item duration */
         vlc_tick_t dur = input_item_GetDuration(input_GetItem(input));

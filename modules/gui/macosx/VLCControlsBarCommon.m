@@ -28,6 +28,7 @@
 #import "VLCMainMenu.h"
 #import "VLCPlaylist.h"
 #import "CompatibilityFixes.h"
+#import "NSString+Helpers.h"
 
 /*****************************************************************************
  * VLCControlsBarCommon
@@ -265,7 +266,8 @@
         var_Set(p_input, "position", pos);
         [self.timeSlider setFloatValue: f_updated];
 
-        o_time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString: p_input negative:[self.timeField timeRemaining]];
+        o_time = [NSString stringWithTimeFromInput:p_input
+                                          negative:self.timeField.timeRemaining];
         [self.timeField setStringValue: o_time];
         vlc_object_release(p_input);
     }
@@ -312,8 +314,8 @@
         [self.timeSlider setIndefinite:buffering];
     }
 
-    NSString *time = [[VLCStringUtility sharedInstance] getCurrentTimeAsString:p_input
-                                                                      negative:[self.timeField timeRemaining]];
+    NSString *time = [NSString stringWithTimeFromInput:p_input
+                                              negative:self.timeField.timeRemaining];
     [self.timeField setStringValue:time];
     [self.timeField setNeedsDisplay:YES];
 
