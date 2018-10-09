@@ -54,6 +54,16 @@
  */
 - (NSString *)base64DecodedString;
 
+/**
+ Returns a copy of the receiver string, wrapped to the specified width
+
+ This method returns a copy of the receiver string, wrapped to the given
+ width in pixels.
+
+ \param width Width in pixel
+ */
+- (NSString *)stringWrappedToWidth:(int)width;
+
 @end
 
 /**

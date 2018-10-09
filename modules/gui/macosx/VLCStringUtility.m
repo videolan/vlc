@@ -67,44 +67,6 @@ NSString *const kVLCMediaUnknown = @"Unknown";
 #pragma mark -
 #pragma mark String utility
 
-/* i_width is in pixels */
-- (NSString *)wrapString:(NSString *)o_in_string toWidth:(int)i_width
-{
-    NSMutableString *o_wrapped;
-    NSString *o_out_string;
-    NSRange glyphRange, effectiveRange, charRange;
-    NSUInteger glyphIndex;
-    unsigned breaksInserted = 0;
-
-    NSTextStorage *o_storage = [[NSTextStorage alloc] initWithString: o_in_string
-                                                          attributes: [NSDictionary dictionaryWithObjectsAndKeys:
-                                                                       [NSFont labelFontOfSize: 0.0], NSFontAttributeName, nil]];
-    NSLayoutManager *o_layout_manager = [[NSLayoutManager alloc] init];
-    NSTextContainer *o_container = [[NSTextContainer alloc]
-                                    initWithContainerSize: NSMakeSize(i_width, 2000)];
-
-    [o_layout_manager addTextContainer: o_container];
-    [o_storage addLayoutManager: o_layout_manager];
-
-    o_wrapped = [o_in_string mutableCopy];
-    glyphRange = [o_layout_manager glyphRangeForTextContainer: o_container];
-
-    for (glyphIndex = glyphRange.location ; glyphIndex < NSMaxRange(glyphRange) ;
-        glyphIndex += effectiveRange.length) {
-        [o_layout_manager lineFragmentRectForGlyphAtIndex: glyphIndex
-                                           effectiveRange: &effectiveRange];
-        charRange = [o_layout_manager characterRangeForGlyphRange: effectiveRange
-                                                 actualGlyphRange: &effectiveRange];
-        if ([o_wrapped lineRangeForRange:
-            NSMakeRange(charRange.location + breaksInserted, charRange.length)].length > charRange.length) {
-            [o_wrapped insertString: @"\n" atIndex: NSMaxRange(charRange) + breaksInserted];
-            breaksInserted++;
-        }
-    }
-    o_out_string = [NSString stringWithString: o_wrapped];
-
-    return o_out_string;
-}
 
 - (NSString *)getCurrentTimeAsString:(input_thread_t *)p_input negative:(BOOL)b_negative
 {

@@ -26,6 +26,7 @@
  *****************************************************************************/
 
 #import "NSString+Helpers.h"
+#import <Cocoa/Cocoa.h>
 
 #import <vlc_common.h>
 #import <vlc_strings.h>
@@ -69,6 +70,49 @@
                                           length:strlen(decoded_cstring)
                                         encoding:NSUTF8StringEncoding
                                     freeWhenDone:YES];
+}
+
+- (NSString *)stringWrappedToWidth:(int)width
+{
+    NSRange glyphRange, effectiveRange, charRange;
+    unsigned breaksInserted = 0;
+
+    NSMutableString *wrapped_string = [self mutableCopy];
+
+    NSTextStorage *text_storage =
+        [[NSTextStorage alloc] initWithString:wrapped_string
+                                   attributes:@{
+                                                NSFontAttributeName : [NSFont labelFontOfSize: 0.0]
+                                                }];
+
+    NSLayoutManager *layout_manager = [[NSLayoutManager alloc] init];
+    NSTextContainer *text_container =
+        [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(width, 2000)];
+
+    [layout_manager addTextContainer:text_container];
+    [text_storage addLayoutManager:layout_manager];
+
+    glyphRange = [layout_manager glyphRangeForTextContainer:text_container];
+
+    for (NSUInteger glyphIndex = glyphRange.location;
+         glyphIndex < NSMaxRange(glyphRange);
+         glyphIndex += effectiveRange.length)
+    {
+        [layout_manager lineFragmentRectForGlyphAtIndex:glyphIndex
+                                         effectiveRange:&effectiveRange];
+
+        charRange = [layout_manager characterRangeForGlyphRange:effectiveRange
+                                               actualGlyphRange:&effectiveRange];
+        if ([wrapped_string lineRangeForRange:
+                NSMakeRange(charRange.location + breaksInserted, charRange.length)
+             ].length > charRange.length)
+        {
+            [wrapped_string insertString:@"\n" atIndex:NSMaxRange(charRange) + breaksInserted];
+            breaksInserted++;
+        }
+    }
+
+    return [NSString stringWithString:wrapped_string];
 }
 
 @end

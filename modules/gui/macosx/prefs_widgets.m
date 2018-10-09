@@ -38,6 +38,7 @@
 #include <vlc_actions.h>
 
 #include "VLCMain.h"
+#include "NSString+Helpers.h"
 #include "prefs_widgets.h"
 
 #define CONFIG_ITEM_STRING_LIST (CONFIG_ITEM_STRING + 10)
@@ -926,7 +927,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             self.viewType = CONFIG_ITEM_STRING;
 
-        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1003,7 +1004,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
         else
             self.viewType = CONFIG_ITEM_MODULE;
 
-        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1101,7 +1102,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_LOADFILE;
 
-        o_itemTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_itemTooltip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* is it a directory */
         b_directory = ([self type] == CONFIG_ITEM_DIRECTORY) ? YES : NO;
@@ -1189,7 +1190,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_MODULE;
 
-        o_popupTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_popupTooltip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1321,7 +1322,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS((char *)p_item->psz_text);
@@ -1410,7 +1411,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_STRING_LIST;
 
-        o_textfieldTooltip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        o_textfieldTooltip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1500,7 +1501,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame: mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1612,7 +1613,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1703,7 +1704,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_RANGED_INTEGER;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -1816,7 +1817,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
 
         labelString = _NS(p_item->psz_text);
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the checkbox */
         ADD_CHECKBOX(o_checkbox, mainFrame, 0,
@@ -1859,7 +1860,7 @@ o_textfield = [[NSSecureTextField alloc] initWithFrame: s_rc];              \
     if (self = [super initWithFrame:mainFrame item:p_item]) {
         self.viewType = CONFIG_ITEM_KEY;
 
-        toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+        toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
         /* add the label */
         labelString = _NS(p_item->psz_text);
@@ -2075,7 +2076,7 @@ o_moduleenabled = [NSNumber numberWithBool:NO];\
     mainFrame.origin.y = 0;
     self.frame = mainFrame;
 
-    toolTip = [[VLCStringUtility sharedInstance] wrapString: _NS(p_item->psz_longtext) toWidth: PREFS_WRAP];
+    toolTip = [_NS(p_item->psz_longtext) stringWrappedToWidth:PREFS_WRAP];
 
     /* add the label */
     labelString = _NS((char *)p_item->psz_text);
