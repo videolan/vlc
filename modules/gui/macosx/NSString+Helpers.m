@@ -56,18 +56,17 @@
 + (instancetype)stringWithTime:(long long int)time
 {
     if (time > 0) {
-        long long positiveDuration = llabs(time);
-        if (positiveDuration > 3600)
+        if (time > 3600)
             return [NSString stringWithFormat:@"%s%01ld:%02ld:%02ld",
                     time < 0 ? "-" : "",
-                    (long) (positiveDuration / 3600),
-                    (long)((positiveDuration / 60) % 60),
-                    (long) (positiveDuration % 60)];
+                    (long) (time / 3600),
+                    (long)((time / 60) % 60),
+                    (long) (time % 60)];
         else
             return [NSString stringWithFormat:@"%s%02ld:%02ld",
                     time < 0 ? "-" : "",
-                    (long)((positiveDuration / 60) % 60),
-                    (long) (positiveDuration % 60)];
+                    (long)((time / 60) % 60),
+                    (long) (time % 60)];
     } else {
         // Return a string that represents an undefined time.
         return @"--:--";
