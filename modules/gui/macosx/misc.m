@@ -168,35 +168,6 @@
 
 @end
 
-/*****************************************************************************
- * VLCThreePartImageView interface
- *****************************************************************************/
-
-@interface VLCThreePartImageView()
-{
-    NSImage *_left_img;
-    NSImage *_middle_img;
-    NSImage *_right_img;
-}
-@end
-
-@implementation VLCThreePartImageView
-
-- (void)setImagesLeft:(NSImage *)left middle: (NSImage *)middle right:(NSImage *)right
-{
-    _left_img = left;
-    _middle_img = middle;
-    _right_img = right;
-}
-
-- (void)drawRect:(NSRect)rect
-{
-    NSRect bnds = [self bounds];
-    NSDrawThreePartImage( bnds, _left_img, _middle_img, _right_img, NO, NSCompositeSourceOver, 1, NO );
-}
-
-@end
-
 @interface PositionFormatter()
 {
     NSCharacterSet *o_forbidden_characters;
