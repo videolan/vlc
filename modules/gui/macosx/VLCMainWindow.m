@@ -218,7 +218,7 @@ static const float f_min_window_height = 307.;
     _fspanel = [[VLCFSPanelController alloc] init];
     [_fspanel showWindow:self];
 
-    /* make sure we display the desired default appearance when VLC launches for the first time */
+    // Check for first run and show metadata network access question
     if (![defaults objectForKey:@"VLCFirstRun"]) {
         [defaults setObject:[NSDate date] forKey:@"VLCFirstRun"];
 
