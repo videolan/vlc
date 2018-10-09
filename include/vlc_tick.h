@@ -200,6 +200,17 @@ struct timespec timespec_from_vlc_tick(vlc_tick_t date);
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
+
+/**
+ * Convert seconds to a time in the format h:mm:ss.
+ *
+ * This function is provided for any interface function which need to print a
+ * time string in the format h:mm:ss
+ * date.
+ * \param secs  the date to be converted
+ * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
+ * \return psz_buffer is returned so this can be used as printf parameter.
+ */
 VLC_API char * secstotimestr( char *psz_buffer, int32_t secs );
 
 /**
@@ -285,5 +296,8 @@ VLC_API vlc_tick_t date_Decrement(date_t *restrict date, uint32_t count);
 
 /** @} */
 
+/**
+ * @return NTP 64-bits timestamp in host byte order.
+ */
 VLC_API uint64_t NTPtime64( void );
 #endif /* !__VLC_MTIME_ */

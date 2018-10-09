@@ -39,16 +39,6 @@
 #include <time.h>
 #include <stdlib.h>
 
-/**
- * Convert seconds to a time in the format h:mm:ss.
- *
- * This function is provided for any interface function which need to print a
- * time string in the format h:mm:ss
- * date.
- * \param secs  the date to be converted
- * \param psz_buffer should be a buffer at least MSTRTIME_MAX_SIZE characters
- * \return psz_buffer is returned so this can be used as printf parameter.
- */
 char *secstotimestr( char *psz_buffer, int32_t i_seconds )
 {
     if( unlikely(i_seconds < 0) )
@@ -136,9 +126,6 @@ vlc_tick_t date_Decrement( date_t *p_date, uint32_t i_nb_samples )
     return p_date->date;
 }
 
-/**
- * @return NTP 64-bits timestamp in host byte order.
- */
 uint64_t NTPtime64(void)
 {
     struct timespec ts;
