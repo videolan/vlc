@@ -69,6 +69,7 @@
 #include "libvlc.h"
 #include "playlist_legacy/playlist_internal.h"
 #include "misc/variables.h"
+#include "input/player.h"
 
 #include <vlc_vlm.h>
 
@@ -121,9 +122,29 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
     else
         repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
 
+    enum vlc_player_media_stopped_action media_stopped_action;
+    if (var_InheritBool(obj, "play-and-exit"))
+        media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_EXIT;
+    else if (var_InheritBool(obj, "play-and-stop"))
+        media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_STOP;
+    else if (var_InheritBool(obj, "play-and-pause"))
+        media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_PAUSE;
+    else
+        media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
+
+    bool start_paused = var_InheritBool(obj, "start-paused");
+
     vlc_playlist_Lock(playlist);
     vlc_playlist_SetPlaybackOrder(playlist, order);
     vlc_playlist_SetPlaybackRepeat(playlist, repeat);
+
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    /* the playlist and the player share the same lock, and this is not an
+     * implementation detail */
+    vlc_player_SetMediaStoppedAction(player, media_stopped_action);
+    vlc_player_SetStartPaused(player, start_paused);
+
     vlc_playlist_Unlock(playlist);
 }
 
