@@ -95,7 +95,7 @@ SDIAudioMultiplexConfig::SDIAudioMultiplexConfig(vlc_object_t *obj, uint8_t chan
 {
     this->obj = obj;
     subframeslotbitmap = 0;
-    if(channels > 4)
+    if(channels > 8)
         framewidth = 8;
     else if(channels > 2)
         framewidth = 4;
