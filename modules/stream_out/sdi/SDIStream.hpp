@@ -27,6 +27,7 @@
 #include <queue>
 #include <mutex>
 #include <string>
+#include <list>
 
 namespace sdi_sout
 {
@@ -172,6 +173,23 @@ namespace sdi_sout
             void FlushQueued();
     };
 
+    class AbstractReorderedStream : public AbstractRawStream
+    {
+        public:
+            AbstractReorderedStream(vlc_object_t *, const StreamID &,
+                                    AbstractStreamOutputBuffer *);
+            virtual ~AbstractReorderedStream();
+            virtual int Send(block_t*); /* impl */
+            virtual void Flush(); /* impl */
+            virtual void Drain(); /* impl */
+            void setReorder(size_t);
+
+        protected:
+            std::list<block_t *> reorder;
+            size_t reorder_depth;
+            bool do_reorder;
+    };
+
     class AudioCompressedStream : public AbstractRawStream
     {
         public:
@@ -182,7 +200,7 @@ namespace sdi_sout
             virtual bool init(const es_format_t *); /* impl */
     };
 
-    class CaptionsStream : public AbstractRawStream
+    class CaptionsStream : public AbstractReorderedStream
     {
         public:
             CaptionsStream(vlc_object_t *, const StreamID &,

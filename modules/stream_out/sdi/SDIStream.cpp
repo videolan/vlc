@@ -566,6 +566,71 @@ void AbstractRawStream::FlushQueued()
         block_Release(p);
 }
 
+
+AbstractReorderedStream::AbstractReorderedStream(vlc_object_t *p_obj, const StreamID &id,
+                                                 AbstractStreamOutputBuffer *buffer)
+    : AbstractRawStream(p_obj, id, buffer)
+{
+    reorder_depth = 0;
+    do_reorder = false;
+}
+
+AbstractReorderedStream::~AbstractReorderedStream()
+{
+}
+
+int AbstractReorderedStream::Send(block_t *p_block)
+{
+    auto it = reorder.begin();
+    if(do_reorder)
+    {
+        for(; it != reorder.end(); ++it)
+        {
+            if((*it)->i_pts == VLC_TICK_INVALID)
+                continue;
+            if(p_block->i_pts < (*it)->i_pts)
+            {
+                /* found insertion point */
+                if(it == reorder.begin() &&
+                   reorder_depth < 16 && reorder.size() < reorder_depth)
+                      reorder_depth++;
+                break;
+            }
+        }
+
+        reorder.insert(it, p_block);
+
+        if(reorder.size() <= reorder_depth + 1)
+            return VLC_SUCCESS;
+
+        p_block = reorder.front();
+        reorder.pop_front();
+    }
+
+    return AbstractRawStream::Send(p_block);
+}
+
+void AbstractReorderedStream::Flush()
+{
+    Drain();
+    FlushQueued();
+}
+
+void AbstractReorderedStream::Drain()
+{
+    while(!reorder.empty())
+    {
+        AbstractRawStream::Send(reorder.front());
+        reorder.pop_front();
+    }
+}
+
+void AbstractReorderedStream::setReorder(size_t r)
+{
+    reorder_depth = r;
+    do_reorder = true;
+}
+
 AudioCompressedStream::AudioCompressedStream(vlc_object_t *p_obj, const StreamID &id,
                                              AbstractStreamOutputBuffer *buffer)
     : AbstractRawStream(p_obj, id, buffer)
@@ -602,8 +667,9 @@ bool AudioCompressedStream::init(const es_format_t *fmt)
 
 CaptionsStream::CaptionsStream(vlc_object_t *p_obj, const StreamID &id,
                                AbstractStreamOutputBuffer *buffer)
-    : AbstractRawStream(p_obj, id, buffer)
+    : AbstractReorderedStream(p_obj, id, buffer)
 {
+
 }
 
 CaptionsStream::~CaptionsStream()
@@ -612,5 +678,8 @@ CaptionsStream::~CaptionsStream()
 
 bool CaptionsStream::init(const es_format_t *fmt)
 {
+    if(fmt->subs.cc.i_reorder_depth >= 0)
+        setReorder(fmt->subs.cc.i_reorder_depth);
     return (fmt->i_codec == VLC_CODEC_CEA608);
 }
+
