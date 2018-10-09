@@ -136,6 +136,30 @@ static struct decoders IntelDevices[] = {
     { 0x2E92, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
     { 0x2E93, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) B43 Express Chipset */
 
+    { 0x29D3, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q33 Express Chipset Family */
+    { 0x29D2, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q33 Express Chipset Family */
+    { 0x29B3, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q35 Express Chipset Family */
+    { 0x29B2, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) Q35 Express Chipset Family */
+    { 0x29C3, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G33/G31 Express Chipset Family */
+    { 0x29C2, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) G33/G31 Express Chipset Family */
+    { 0x2A13, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 965 Express Chipset Family */
+    { 0x2A12, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 965 Express Chipset Family */
+    { 0x2A03, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 965 Express Chipset Family */
+    { 0x2A02, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 965 Express Chipset Family */
+    { 0x2973, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  946GZ Express Chipset Family */
+    { 0x2972, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  946GZ Express Chipset Family */
+    { 0x29A3, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  G965 Express Chipset Family */
+    { 0x29A2, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  G965 Express Chipset Family */
+    { 0x2993, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  Q965/Q963 Express Chipset Family */
+    { 0x2992, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  Q965/Q963 Express Chipset Family */
+    { 0x2983, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  G35 Express Chipset Family */
+    { 0x2982, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R)  G35 Express Chipset Family */
+    { 0x2772, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) 82945G Express Chipset Family */
+    { 0x2776, AnyDecoder, BLAnyDriver, 0 }, /* Intel(R) 82945G Express Chipset Family */
+    { 0x27A2, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 945 Express Chipset Family */
+    { 0x27A6, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 945 Express Chipset Family */
+    { 0x27AE, AnyDecoder, BLAnyDriver, 0 }, /* Mobile Intel(R) 945 Express Chipset Family */
+
     {0, NULL, BLAnyDriver, 0}
 };
 
