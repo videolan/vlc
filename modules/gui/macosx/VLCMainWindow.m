@@ -147,9 +147,6 @@ static const float f_min_window_height = 307.;
      * General setup
      */
 
-    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
     BOOL splitViewShouldBeHidden = NO;
 
     [self setDelegate:self];
@@ -219,6 +216,7 @@ static const float f_min_window_height = 307.;
     [_fspanel showWindow:self];
 
     // Check for first run and show metadata network access question
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (![defaults objectForKey:@"VLCFirstRun"]) {
         [defaults setObject:[NSDate date] forKey:@"VLCFirstRun"];
 
@@ -237,20 +235,34 @@ static const float f_min_window_height = 307.;
     [_playlistScrollView setBorderType:NSNoBorder];
     [_sidebarScrollView setBorderType:NSNoBorder];
 
-    [defaultCenter addObserver: self selector: @selector(someWindowWillClose:) name: NSWindowWillCloseNotification object: nil];
-    [defaultCenter addObserver: self selector: @selector(someWindowWillMiniaturize:) name: NSWindowWillMiniaturizeNotification object:nil];
-    [defaultCenter addObserver: self selector: @selector(applicationWillTerminate:) name: NSApplicationWillTerminateNotification object: nil];
-    [defaultCenter addObserver: self selector: @selector(mainSplitViewDidResizeSubviews:) name: NSSplitViewDidResizeSubviewsNotification object:_splitView];
+    // Register for NSNotifications about Window and SplitView changes
+    NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
+    [defaultCenter addObserver:self
+                      selector:@selector(someWindowWillClose:)
+                          name:NSWindowWillCloseNotification
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(someWindowWillMiniaturize:)
+                          name:NSWindowWillMiniaturizeNotification
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(applicationWillTerminate:)
+                          name:NSApplicationWillTerminateNotification
+                        object:nil];
+    [defaultCenter addObserver:self
+                      selector:@selector(mainSplitViewDidResizeSubviews:)
+                          name:NSSplitViewDidResizeSubviewsNotification
+                        object:_splitView];
 
     if (splitViewShouldBeHidden) {
         [self hideSplitView:YES];
         f_lastSplitViewHeight = 300;
     }
 
-    /* sanity check for the window size */
-    NSRect frame = [self frame];
-    NSSize screenSize = [[self screen] frame].size;
-    if (screenSize.width <= frame.size.width || screenSize.height <= frame.size.height) {
+    // Resize MainWindow to the screen size, if it exceeds the screens size
+    NSSize windowSize = self.frame.size;
+    NSSize screenSize = self.screen.frame.size;
+    if (screenSize.width <= windowSize.width || screenSize.height <= windowSize.height) {
         self.nativeVideoSize = screenSize;
         [self resizeWindow];
     }
