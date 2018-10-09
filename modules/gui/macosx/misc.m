@@ -148,26 +148,6 @@
 
 @end
 
-
-/*****************************************************************************
- * VLCMainWindowSplitView implementation
- *****************************************************************************/
-@implementation VLCMainWindowSplitView : NSSplitView
-
-// Custom color for the dividers
-- (NSColor *)dividerColor
-{
-    return [NSColor colorWithCalibratedRed:.60 green:.60 blue:.60 alpha:1.];
-}
-
-// Custom thickness for the divider
-- (CGFloat)dividerThickness
-{
-    return 1.0;
-}
-
-@end
-
 @interface PositionFormatter()
 {
     NSCharacterSet *o_forbidden_characters;

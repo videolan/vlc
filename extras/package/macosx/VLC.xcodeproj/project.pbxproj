@@ -1538,7 +1538,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1949,7 +1949,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,

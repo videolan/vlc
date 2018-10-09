@@ -28,7 +28,7 @@
                             <customView hidden="YES" focusRingType="none" translatesAutoresizingMaskIntoConstraints="NO" id="4665" customClass="VLCVoutView">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="297"/>
                             </customView>
-                            <splitView autosaveName="mainWindowSplitView" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680" customClass="VLCMainWindowSplitView">
+                            <splitView autosaveName="mainWindowSplitView" dividerStyle="thin" vertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4680">
                                 <rect key="frame" x="0.0" y="0.0" width="716" height="297"/>
                                 <subviews>
                                     <customView fixedFrame="YES" id="4681">
