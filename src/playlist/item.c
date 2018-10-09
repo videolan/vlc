@@ -717,7 +717,7 @@ void playlist_SendAddNotify( playlist_t *p_playlist, playlist_item_t *item )
 vlc_tick_t playlist_GetNodeDuration( playlist_item_t* node )
 {
     vlc_tick_t duration = input_item_GetDuration( node->p_input );
-    if( duration == VLC_TICK_INVALID )
+    if( duration == INPUT_DURATION_UNSET )
         duration = 0;
 
     for( int i = 0; i < node->i_children; i++ )
