@@ -58,8 +58,6 @@ NSImage *imageFromRes(NSString *name);
 
 + (VLCStringUtility *)sharedInstance;
 
-- (NSString *)stringForTime:(long long int)time;
-
 - (NSString *)OSXStringKeyToString:(NSString *)theString;
 - (NSString *)VLCKeyToString:(NSString *)theString;
 - (unsigned int)VLCModifiersToCocoa:(NSString *)theString;

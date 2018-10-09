@@ -65,31 +65,6 @@ NSString *const kVLCMediaUnknown = @"Unknown";
 }
 
 #pragma mark -
-#pragma mark String utility
-
-
-- (NSString *)stringForTime:(long long int)time
-{
-    if (time > 0) {
-        long long positiveDuration = llabs(time);
-        if (positiveDuration > 3600)
-            return [NSString stringWithFormat:@"%s%01ld:%02ld:%02ld",
-                    time < 0 ? "-" : "",
-                    (long) (positiveDuration / 3600),
-                    (long)((positiveDuration / 60) % 60),
-                    (long) (positiveDuration % 60)];
-        else
-            return [NSString stringWithFormat:@"%s%02ld:%02ld",
-                    time < 0 ? "-" : "",
-                    (long)((positiveDuration / 60) % 60),
-                    (long) (positiveDuration % 60)];
-    } else {
-        // Return a string that represents an undefined time.
-        return @"--:--";
-    }
-}
-
-#pragma mark -
 #pragma mark Key Shortcuts
 
 static struct

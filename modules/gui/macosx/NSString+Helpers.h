@@ -42,6 +42,16 @@
                                negative:(BOOL)negative;
 
 /**
+ Creates an NSString with the given time in seconds
+
+ This method allocates and initializes an NSString with the given
+ time formatted as playback time.
+
+ \param time   Time in seconds
+ */
++ (instancetype)stringWithTime:(long long int)time;
+
+/**
  Creates an NSString from the given null-terminated C string
  buffer encoded as base64
 

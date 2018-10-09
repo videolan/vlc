@@ -260,7 +260,7 @@
             [totalField setStringValue:@"∞"];
         } else {
             /* Not unknown, update displayed duration */
-            totalTime = [[VLCStringUtility sharedInstance] stringForTime:(dur/1000000)];
+            totalTime = [NSString stringWithTime:SEC_FROM_VLC_TICK(dur)];
             [progressField setStringValue:(showTimeElapsed) ? elapsedTime : remainingTime];
             [totalField setStringValue:totalTime];
         }

@@ -26,6 +26,7 @@
 
 #import "VLCMain.h"
 #import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 @interface VLCResumeDialogController()
 {
@@ -66,7 +67,7 @@
     char *psz_title_name = input_item_GetTitleFbName(p_item);
     NSString *o_title = toNSStr(psz_title_name);
     free(psz_title_name);
-    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), o_title, [[VLCStringUtility sharedInstance] stringForTime:pos]];
+    NSString *labelString = [NSString stringWithFormat:_NS("Playback of \"%@\" will continue at %@"), o_title, [NSString stringWithTime:pos]];
     [o_text_lbl setStringValue:labelString];
     [o_always_resume_chk setState: NSOffState];
 
