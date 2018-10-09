@@ -668,6 +668,11 @@ static bool FillReorderInfoHEVC(decoder_t *p_dec, const block_t *p_block,
             }
 
             p_info->b_keyframe = i_nal_type >= HEVC_NAL_BLA_W_LP;
+            enum hevc_slice_type_e slice_type;
+            if(hevc_get_slice_type(p_sli, &slice_type))
+            {
+                p_info->b_keyframe |= (slice_type == HEVC_SLICE_TYPE_I);
+            }
 
             hevc_sequence_parameter_set_t *p_sps;
             hevc_picture_parameter_set_t *p_pps;
