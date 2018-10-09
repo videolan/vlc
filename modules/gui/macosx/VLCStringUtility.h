@@ -57,6 +57,7 @@ unsigned int CocoaKeyToVLC(unichar i_key);
  * depending on the os version.
  */
 NSImage *imageFromRes(NSString *o_id);
+NSImage *sidebarImageFromRes(NSString *o_id, BOOL darkMode);
 
 @interface VLCStringUtility : NSObject
 

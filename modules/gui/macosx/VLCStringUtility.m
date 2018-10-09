@@ -523,3 +523,20 @@ NSImage *imageFromRes(NSString *o_id)
 
     return [NSImage imageNamed:result];
 }
+
+NSImage *sidebarImageFromRes(NSString *o_id, BOOL darkMode)
+{
+    if (!OSX_MOJAVE_AND_HIGHER) {
+        return imageFromRes(o_id);
+    }
+
+    NSString *result = @"";
+    if (darkMode) {
+        result = [result stringByAppendingString:@"mv-dark-"];
+    } else {
+        result = [result stringByAppendingString:@"mv-"];
+    }
+    result = [result stringByAppendingString:o_id];
+
+    return [NSImage imageNamed:result];
+}
