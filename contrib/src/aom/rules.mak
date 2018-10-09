@@ -63,6 +63,17 @@ AOM_CONF += -DAOM_ADS2GAS_REQUIRED=1 -DAOM_ADS2GAS=../build/make/ads2gas.pl -DAO
 endif
 endif
 
+ifdef HAVE_IOS
+ifneq ($(filter arm aarch64, $(ARCH)),)
+# These targets don't have runtime cpu detection.
+AOM_CONF += -DCONFIG_RUNTIME_CPU_DETECT=0
+endif
+ifeq ($(ARCH),arm)
+# armv7, not just plain arm
+AOM_CONF += -DAOM_TARGET_CPU=armv7
+endif
+endif
+
 # libaom doesn't allow in-tree builds
 .aom: aom toolchain.cmake
 	cd $< && mkdir -p aom_build
