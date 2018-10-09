@@ -189,11 +189,11 @@ struct timespec timespec_from_vlc_tick(vlc_tick_t date);
 
 
 /*****************************************************************************
- * MSTRTIME_MAX_SIZE: maximum possible size of mstrtime
+ * MSTRTIME_MAX_SIZE: maximum possible size of secstotimestr
  *****************************************************************************
  * This values is the maximal possible size of the string returned by the
- * mstrtime() function, including '-' and the final '\0'. It should be used to
- * allocate the buffer.
+ * secstotimestr() function, including '-' and the final '\0'. It should be
+ * used to allocate the buffer.
  *****************************************************************************/
 #define MSTRTIME_MAX_SIZE 22
 
