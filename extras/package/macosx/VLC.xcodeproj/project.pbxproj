@@ -93,6 +93,7 @@
 		6B0AB0F11F1AC8B3003A1B4E /* VLCSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0EF1F1AC8B3003A1B4E /* VLCSliderCell.m */; };
 		6B2EFC601F2819F700F3C0EA /* VLCVolumeSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */; };
 		6B2EFC631F281A0900F3C0EA /* VLCVolumeSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */; };
+		6B397C4F216C8EB200403ED0 /* NSString+Helpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */; };
 		6B3BE42C1E6217CB008D098A /* VLCImageButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B3BE42B1E6217CB008D098A /* VLCImageButton.m */; };
 		6B4D50901E79781F004479B5 /* VLCHotkeyChangeWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D508F1E79781F004479B5 /* VLCHotkeyChangeWindow.m */; };
 		6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B4D50921E7979CB004479B5 /* VLCSimplePrefsWindow.m */; };
@@ -190,6 +191,8 @@
 		6B2EFC5F1F2819F700F3C0EA /* VLCVolumeSlider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVolumeSlider.m; sourceTree = "<group>"; };
 		6B2EFC611F281A0900F3C0EA /* VLCVolumeSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVolumeSliderCell.h; sourceTree = "<group>"; };
 		6B2EFC621F281A0900F3C0EA /* VLCVolumeSliderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVolumeSliderCell.m; sourceTree = "<group>"; };
+		6B397C4D216C8EB200403ED0 /* NSString+Helpers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Helpers.h"; sourceTree = "<group>"; };
+		6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Helpers.m"; sourceTree = "<group>"; };
 		6B3BE42A1E6217CB008D098A /* VLCImageButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCImageButton.h; sourceTree = "<group>"; };
 		6B3BE42B1E6217CB008D098A /* VLCImageButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCImageButton.m; sourceTree = "<group>"; };
 		6B4D508E1E79781F004479B5 /* VLCHotkeyChangeWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHotkeyChangeWindow.h; sourceTree = "<group>"; };
@@ -988,6 +991,8 @@
 				8ED6C28003E2EB1C0059A3A7 /* misc.m */,
 				CC269A4615E7947F00F2FDC9 /* VLCStringUtility.h */,
 				CC269A4715E7947F00F2FDC9 /* VLCStringUtility.m */,
+				6B397C4D216C8EB200403ED0 /* NSString+Helpers.h */,
+				6B397C4E216C8EB200403ED0 /* NSString+Helpers.m */,
 				6B7F1FDD1F07DA920002BDD8 /* VLCHexNumberFormatter.h */,
 				6B7F1FDE1F07DA920002BDD8 /* VLCHexNumberFormatter.m */,
 			);
@@ -1607,6 +1612,7 @@
 				1C3113F11E508C7600D4DD76 /* VLCRendererItem.m in Sources */,
 				1C3113F31E508C7600D4DD76 /* VLCRendererMenuController.m in Sources */,
 				6B4D50931E7979CB004479B5 /* VLCSimplePrefsWindow.m in Sources */,
+				6B397C4F216C8EB200403ED0 /* NSString+Helpers.m in Sources */,
 				1C31138E1E508C6900D4DD76 /* VLCAboutWindowController.m in Sources */,
 				1C3113901E508C6900D4DD76 /* VLCHelpWindowController.m in Sources */,
 				1C3113921E508C6900D4DD76 /* VLCAddonListItem.m in Sources */,

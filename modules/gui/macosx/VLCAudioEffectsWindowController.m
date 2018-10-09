@@ -32,6 +32,7 @@
 #import "CompatibilityFixes.h"
 #import "VLCPopupPanelController.h"
 #import "VLCTextfieldPanelController.h"
+#import "NSString+Helpers.h"
 
 #import <vlc_common.h>
 

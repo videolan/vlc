@@ -28,6 +28,7 @@
 #import "VLCTextfieldPanelController.h"
 #import "VLCCoreInteraction.h"
 #import "VLCHexNumberFormatter.h"
+#import "NSString+Helpers.h"
 
 #define getWidgetBoolValue(w)   ((vlc_value_t){ .b_bool = [w state] })
 #define getWidgetIntValue(w)    ((vlc_value_t){ .i_int = [w intValue] })
