@@ -6,7 +6,7 @@ libmux_asf_plugin_la_SOURCES = mux/asf.c demux/asf/libasf_guid.h
 libmux_avi_plugin_la_SOURCES = mux/avi.c demux/avi/bitmapinfoheader.h
 libmux_mp4_plugin_la_SOURCES = mux/mp4/mp4.c \
 	mux/mp4/libmp4mux.c mux/mp4/libmp4mux.h \
-       demux/mp4/libmp4.h \
+        demux/mp4/libmp4.h mux/av1_pack.h \
 	packetizer/hxxx_nal.c packetizer/hxxx_nal.h \
         packetizer/hevc_nal.c packetizer/hevc_nal.h \
         packetizer/h264_nal.c packetizer/h264_nal.h

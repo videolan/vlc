@@ -43,6 +43,7 @@
 #include "../demux/mp4/libmp4.h"
 #include "libmp4mux.h"
 #include "../packetizer/hxxx_nal.h"
+#include "../av1_pack.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -577,6 +578,9 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
 
     switch(p_stream->mux.fmt.i_codec)
     {
+        case VLC_CODEC_AV1:
+            p_block = AV1_Pack_Sample(p_block);
+            break;
         case VLC_CODEC_H264:
         case VLC_CODEC_HEVC:
             p_block = hxxx_AnnexB_to_xVC(p_block, 4);

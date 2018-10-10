@@ -25,10 +25,11 @@
 #endif
 
 #include "libmp4mux.h"
-#include "../demux/mp4/libmp4.h" /* flags */
-#include "../packetizer/hevc_nal.h"
-#include "../packetizer/h264_nal.h" /* h264_AnnexB_get_spspps */
-#include "../packetizer/hxxx_nal.h"
+#include "../../demux/mp4/libmp4.h" /* flags */
+#include "../../packetizer/hevc_nal.h"
+#include "../../packetizer/h264_nal.h" /* h264_AnnexB_get_spspps */
+#include "../../packetizer/hxxx_nal.h"
+#include "../../packetizer/iso_color_tables.h"
 
 #include <vlc_es.h>
 #include <vlc_iso_lang.h>
@@ -687,6 +688,50 @@ static bo_t *GetxxxxTag(es_format_t *p_fmt, const char *tag)
     return box;
 }
 
+static bo_t *GetColrBox(const video_format_t *p_vfmt, bool b_mov)
+{
+    bo_t *p_box = box_new("colr");
+    if(p_box)
+    {
+        bo_add_mem(p_box, 4, b_mov ? "nclc" : "nclx");
+        bo_add_16be(p_box, vlc_primaries_to_iso_23001_8_cp(p_vfmt->primaries));
+        bo_add_16be(p_box, vlc_xfer_to_iso_23001_8_tc(p_vfmt->transfer));
+        bo_add_16be(p_box, vlc_coeffs_to_iso_23001_8_mc(p_vfmt->space));
+        bo_add_8(p_box, p_vfmt->b_color_range_full ? 0x80 : 0x00);
+    }
+    return p_box;
+}
+
+static bo_t *GetMdcv(const video_format_t *p_vfmt)
+{
+    if(!p_vfmt->mastering.max_luminance)
+        return NULL;
+    bo_t *p_box = box_new("mdcv");
+    if(p_box)
+    {
+        for(int i=0; i<6; i++)
+            bo_add_16be(p_box, p_vfmt->mastering.primaries[i]);
+        bo_add_16be(p_box, p_vfmt->mastering.white_point[0]);
+        bo_add_16be(p_box, p_vfmt->mastering.white_point[1]);
+        bo_add_32be(p_box, p_vfmt->mastering.max_luminance);
+        bo_add_32be(p_box, p_vfmt->mastering.min_luminance);
+    }
+    return p_box;
+}
+
+static bo_t *GetClli(const video_format_t *p_vfmt)
+{
+    if(!p_vfmt->lighting.MaxFALL)
+        return NULL;
+    bo_t *p_box = box_new("clli");
+    if(p_box)
+    {
+        bo_add_16be(p_box, p_vfmt->lighting.MaxCLL);
+        bo_add_16be(p_box, p_vfmt->lighting.MaxFALL);
+    }
+    return p_box;
+}
+
 static bo_t *GetAvcCTag(es_format_t *p_fmt)
 {
     bo_t    *avcC = box_new("avcC");/* FIXME use better value */
@@ -982,8 +1027,16 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     bo_add_16be(vide, 1);         // frames count per sample
 
     // compressor name;
-    for (int i = 0; i < 32; i++)
-        bo_add_8(vide, 0);
+    uint8_t compressor_name[32] = {0};
+    switch (p_track->fmt.i_codec)
+    {
+        case VLC_CODEC_AV1:
+            memcpy(compressor_name, "\012AOM Coding", 11);
+            break;
+        default:
+            break;
+    }
+    bo_add_mem(vide, 32, compressor_name);
 
     bo_add_16be(vide, 0x18);      // depth
     bo_add_16be(vide, 0xffff);    // predefined
@@ -991,6 +1044,13 @@ static bo_t *GetVideBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     /* add an ES Descriptor */
     switch(p_track->fmt.i_codec)
     {
+    case VLC_CODEC_AV1:
+        box_gather(vide, GetxxxxTag(&p_track->fmt, "av1C"));
+        box_gather(vide, GetColrBox(&p_track->fmt.video, b_mov));
+        box_gather(vide, GetMdcv(&p_track->fmt.video));
+        box_gather(vide, GetClli(&p_track->fmt.video));
+        break;
+
     case VLC_CODEC_MP4V:
     case VLC_CODEC_MPGV:
         box_gather(vide, GetESDS(p_track));
@@ -1876,6 +1936,15 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_YUYV:
     case VLC_CODEC_VC1:
     case VLC_CODEC_WMAP:
+        break;
+    case VLC_CODEC_AV1:
+        /* Extradata is an AVC1DecoderConfigurationRecord */
+        if(p_fmt->i_extra < 4 || ((uint8_t *)p_fmt->p_extra)[0] != 0x81)
+        {
+            if(p_obj)
+                msg_Err(p_obj, "Can't mux AV1 without extradata");
+            return false;
+        }
         break;
     case VLC_CODEC_H264:
         if(!p_fmt->i_extra && p_obj)
