@@ -1600,7 +1600,7 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     es->i_pos = 0;
     es_out_id_t *it;
     foreach_es_then_es_slaves(it)
-        if( it->fmt.i_cat == fmt->i_cat )
+        if( it->fmt.i_cat == fmt->i_cat && it->fmt.i_group == fmt->i_group )
             es->i_pos++;
 
     /* Increase ref count for program */
