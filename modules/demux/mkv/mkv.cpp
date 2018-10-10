@@ -648,6 +648,21 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
                 p_block->p_buffer[ p_block->i_buffer - 1 ] = 0x3f; // end marker
             }
             break;
+
+          case VLC_CODEC_AV1:
+            {
+                if( (p_block->p_buffer[0] & 0x81) == 0 && /* reserved flags */
+                    (p_block->p_buffer[0] & 0x7A) != 0x12 ) /* no starting TEMPORAL_DELIMITER */
+                {
+                    p_block = block_Realloc( p_block, 2, p_block->i_buffer );
+                    if( p_block )
+                    {
+                        p_block->p_buffer[0] = 0x12;
+                        p_block->p_buffer[1] = 0x00;
+                    }
+                }
+            }
+            break;
         }
 
         if( track.fmt.i_cat != VIDEO_ES )
