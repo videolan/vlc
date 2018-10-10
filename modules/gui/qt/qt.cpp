@@ -62,9 +62,6 @@ extern "C" char **environ;
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
-#ifndef X_DISPLAY_MISSING
-# include <vlc_xlib.h>
-#endif
 
 #ifdef _WIN32 /* For static builds */
  #include <QtPlugin>
@@ -80,6 +77,10 @@ extern "C" char **environ;
    Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin)
   #endif
  #endif
+#endif
+
+#ifndef X_DISPLAY_MISSING
+# include <vlc_xlib.h>
 #endif
 
 /*****************************************************************************
