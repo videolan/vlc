@@ -120,7 +120,7 @@ fi
 if test -z "$BUILD"
 then
 	echo -n "Guessing build system... "
-	BUILD="`${CC:-cc} -dumpmachine`"
+	BUILD="`${CC:-cc} -dumpmachine | sed s/windows-gnu/mingw32/`"
 	if test -z "$BUILD"; then
 		echo "FAIL!"
 		exit 1
