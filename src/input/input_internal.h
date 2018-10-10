@@ -84,12 +84,10 @@ typedef union
     vlc_viewpoint_t viewpoint;
     struct {
         bool b_fast_seek;
-        bool b_absolute;
         vlc_tick_t i_val;
     } time;
     struct {
         bool b_fast_seek;
-        bool b_absolute;
         float f_val;
     } pos;
     struct {
@@ -207,8 +205,10 @@ enum input_control_e
     INPUT_CONTROL_SET_RATE,
 
     INPUT_CONTROL_SET_POSITION,
+    INPUT_CONTROL_JUMP_POSITION,
 
     INPUT_CONTROL_SET_TIME,
+    INPUT_CONTROL_JUMP_TIME,
 
     INPUT_CONTROL_SET_PROGRAM,
 
