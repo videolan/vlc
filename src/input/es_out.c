@@ -458,6 +458,7 @@ static void EsOutTerminate( es_out_t *out )
             vlc_meta_Delete( p_pgrm->p_meta );
 
         vlc_list_remove(&p_pgrm->node);
+        input_SendEventProgramDel( p_sys->p_input, p_pgrm->i_id );
         free( p_pgrm );
     }
 
