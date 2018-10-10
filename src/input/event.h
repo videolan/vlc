@@ -197,6 +197,18 @@ static inline void input_SendEventProgramAdd(input_thread_t *p_input,
         }
     });
 }
+static inline void input_SendEventProgramUpdated(input_thread_t *p_input,
+                                int i_program, const char *psz_text)
+{
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_PROGRAM,
+        .program = {
+            .action = VLC_INPUT_PROGRAM_UPDATED,
+            .id = i_program,
+            .title = psz_text
+        }
+    });
+}
 static inline void input_SendEventProgramDel(input_thread_t *p_input,
                                              int i_program)
 {

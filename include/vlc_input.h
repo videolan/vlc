@@ -429,6 +429,7 @@ struct vlc_input_event_program {
     enum {
         VLC_INPUT_PROGRAM_ADDED,
         VLC_INPUT_PROGRAM_DELETED,
+        VLC_INPUT_PROGRAM_UPDATED,
         VLC_INPUT_PROGRAM_SELECTED,
         VLC_INPUT_PROGRAM_SCRAMBLED,
     } action;

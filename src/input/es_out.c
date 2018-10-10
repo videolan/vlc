@@ -1317,11 +1317,9 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
             psz_text = strdup( psz_title );
         }
 
-        /* ugly but it works */
         if( psz_text )
         {
-            input_SendEventProgramDel( p_input, i_group );
-            input_SendEventProgramAdd( p_input, i_group, psz_text );
+            input_SendEventProgramUpdated( p_input, i_group, psz_text );
             if( p_sys->p_pgrm == p_pgrm )
                 input_SendEventProgramSelect( p_input, i_group );
             free( psz_text );

@@ -314,6 +314,11 @@ void input_LegacyEvents( input_thread_t *p_input,
                 case VLC_INPUT_PROGRAM_DELETED:
                     VarListDel( p_input, "program", event->program.id );
                     break;
+                case VLC_INPUT_PROGRAM_UPDATED:
+                    VarListDel( p_input, "program", event->program.id );
+                    VarListAdd( p_input, "program", event->program.id,
+                                event->program.title );
+                    break;
                 case VLC_INPUT_PROGRAM_SELECTED:
                     VarListSelect( p_input, "program", event->program.id );
                     break;
