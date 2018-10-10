@@ -39,7 +39,7 @@ typedef struct
     uint32_t          begin;
     uint32_t          size;
     uint32_t          capacity;
-    int64_t           *buffer;
+    vlc_tick_t        *buffer;
 } timestamp_fifo_t;
 
 static inline timestamp_fifo_t *timestamp_FifoNew(uint32_t capacity)
@@ -77,7 +77,7 @@ static inline void timestamp_FifoEmpty(timestamp_fifo_t *fifo)
     fifo->size = 0;
 }
 
-static inline void timestamp_FifoPut(timestamp_fifo_t *fifo, int64_t ts)
+static inline void timestamp_FifoPut(timestamp_fifo_t *fifo, vlc_tick_t ts)
 {
     uint32_t end = (fifo->begin + fifo->size) % fifo->capacity;
     fifo->buffer[end] = ts;
@@ -87,12 +87,12 @@ static inline void timestamp_FifoPut(timestamp_fifo_t *fifo, int64_t ts)
         fifo->begin = (fifo->begin + 1) % fifo->capacity;
 }
 
-static inline int64_t timestamp_FifoGet(timestamp_fifo_t *fifo)
+static inline vlc_tick_t timestamp_FifoGet(timestamp_fifo_t *fifo)
 {
     if (timestamp_FifoIsEmpty(fifo))
         return VLC_TICK_INVALID;
 
-    int64_t result = fifo->buffer[fifo->begin];
+    vlc_tick_t result = fifo->buffer[fifo->begin];
     fifo->begin = (fifo->begin + 1) % fifo->capacity;
     fifo->size -= 1;
     return result;
