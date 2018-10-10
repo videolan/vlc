@@ -57,9 +57,8 @@ parts:
     source: ../../../
     source-type: git
     plugin: autotools
-    prepare: |
+    override-build: |
       sed -i 's|0\.19\.8|0\.19\.7|'  configure.ac
-    build: |
       cd extras/tools
       ./bootstrap
       make -j $(getconf _NPROCESSORS_ONLN) .protoc
@@ -84,7 +83,6 @@ parts:
           --disable-wayland \
           --enable-merge-ffmpeg
       make -j $(getconf _NPROCESSORS_ONLN)
-    install: |
       echo $(git describe HEAD) > $SNAPCRAFT_STAGE/version
       make install
       sed -i 's|Icon=vlc|Icon=/usr/share/icons/hicolor/256x256/apps/vlc\.png|' $SNAPCRAFT_PART_INSTALL/usr/share/applications/vlc.desktop
@@ -162,6 +160,7 @@ parts:
       - libfreerdp-gdi1.1
       - libfreetype6
       - libfribidi0
+      - libdb5.3
       - libgcc1
       - libgl1-mesa-glx
       - libgles2-mesa
