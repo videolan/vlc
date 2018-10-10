@@ -609,11 +609,28 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
 
          case VLC_CODEC_OPUS:
-            mtime_t i_length = i_duration * track. f_timecodescale *
-                    (double) p_segment->i_timescale / 1000.0;
-            if ( i_length < 0 ) i_length = 0;
-            p_block->i_nb_samples = i_length * track.fmt.audio.i_rate
-                    / CLOCK_FREQ;
+            {
+                mtime_t i_length = i_duration * track. f_timecodescale *
+                        (double) p_segment->i_timescale / 1000.0;
+                if ( i_length < 0 ) i_length = 0;
+                p_block->i_nb_samples = i_length * track.fmt.audio.i_rate
+                        / CLOCK_FREQ;
+                break;
+            }
+
+          case VLC_CODEC_AV1:
+            {
+                if( (p_block->p_buffer[0] & 0x81) == 0 && /* reserved flags */
+                    (p_block->p_buffer[0] & 0x7A) != 0x12 ) /* no starting TEMPORAL_DELIMITER */
+                {
+                    p_block = block_Realloc( p_block, 2, p_block->i_buffer );
+                    if( p_block )
+                    {
+                        p_block->p_buffer[0] = 0x12;
+                        p_block->p_buffer[1] = 0x00;
+                    }
+                }
+            }
             break;
         }
 
