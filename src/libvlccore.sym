@@ -577,6 +577,7 @@ vlc_fourcc_GetChromaDescription
 vlc_fourcc_IsYUV
 vlc_fourcc_GetRGBFallback
 vlc_fourcc_GetYUVFallback
+vlc_fourcc_GetFallback
 vlc_fourcc_AreUVPlanesSwapped
 vlc_getaddrinfo
 vlc_getaddrinfo_i11e

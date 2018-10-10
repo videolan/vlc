@@ -620,6 +620,13 @@ const vlc_fourcc_t *vlc_fourcc_GetRGBFallback( vlc_fourcc_t i_fourcc )
     return GetFallback( i_fourcc, pp_RGB_fallback, p_RGB32_fallback );
 }
 
+const vlc_fourcc_t *vlc_fourcc_GetFallback( vlc_fourcc_t i_fourcc )
+{
+    return vlc_fourcc_IsYUV( i_fourcc)
+            ? vlc_fourcc_GetYUVFallback( i_fourcc )
+            : vlc_fourcc_GetRGBFallback( i_fourcc );
+}
+
 bool vlc_fourcc_AreUVPlanesSwapped( vlc_fourcc_t a, vlc_fourcc_t b )
 {
     static const vlc_fourcc_t pp_swapped[][4] = {
