@@ -446,6 +446,7 @@ static block_t *PacketizeOBU(decoder_t *p_dec, block_t **pp_block)
         {
             msg_Warn(p_dec,"Invalid OBU header in sequence, discarding");
             /* frag is not OBU, drop */
+            p_sys->obus.p_chain = p_frag->p_next;
             if(p_frag->p_next == NULL)
                 p_sys->obus.pp_chain_last = &p_sys->obus.p_chain;
             else
