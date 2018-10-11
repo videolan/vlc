@@ -1943,7 +1943,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         if( !EsIsSelected( es ) )
         {
             if( b_auto_unselect )
-                EsOutUnselectEs( out, p_esprops->p_main_es, false );
+                EsOutUnselectEs( out, p_esprops->p_main_es, true );
 
             EsOutSelectEs( out, es );
         }
@@ -2049,7 +2049,7 @@ static void EsOutSelect( es_out_t *out, es_out_id_t *es, bool b_force )
         if( wanted_es == es && !EsIsSelected( es ) )
         {
             if( b_auto_unselect )
-                EsOutUnselectEs( out, p_esprops->p_main_es, false );
+                EsOutUnselectEs( out, p_esprops->p_main_es, true );
 
             EsOutSelectEs( out, es );
         }
