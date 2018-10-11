@@ -1070,6 +1070,7 @@ modules/stream_out/cycle.c
 modules/stream_out/delay.c
 modules/stream_out/description.c
 modules/stream_out/display.c
+modules/stream_out/dlna/dlna.hpp
 modules/stream_out/dummy.c
 modules/stream_out/duplicate.c
 modules/stream_out/es.c

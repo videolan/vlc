@@ -379,6 +379,7 @@ $Id$
  * stream_out_delay: introduce delay in an ES when streaming
  * stream_out_description: helper module for RTSP vod
  * stream_out_display: displays a stream output chain
+ * stream_out_dlna: DLNA streaming output module
  * stream_out_dummy: dummy stream out chain module
  * stream_out_duplicate: duplicates a stream output chain
  * stream_out_es: stream out module outputing ES

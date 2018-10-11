@@ -28,7 +28,12 @@ sd_LTLIBRARIES += $(LTLIBmtp)
 
 libupnp_plugin_la_SOURCES = services_discovery/upnp.cpp services_discovery/upnp.hpp \
 			    services_discovery/upnp-wrapper.hpp \
-			    services_discovery/upnp-wrapper.cpp
+			    services_discovery/upnp-wrapper.cpp \
+			    stream_out/renderer_common.hpp \
+			    stream_out/renderer_common.cpp \
+			    stream_out/dlna/dlna_common.hpp \
+			    stream_out/dlna/dlna.hpp \
+			    stream_out/dlna/dlna.cpp
 libupnp_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(UPNP_CFLAGS)
 libupnp_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(sddir)'
 libupnp_plugin_la_LIBADD = $(UPNP_LIBS)

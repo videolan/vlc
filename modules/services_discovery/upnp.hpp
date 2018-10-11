@@ -33,6 +33,7 @@
 #endif
 
 #include "upnp-wrapper.hpp"
+#include "../stream_out/dlna/dlna_common.hpp"
 
 #include <vlc_url.h>
 #include <vlc_interrupt.h>

@@ -54,6 +54,23 @@ const char* SATIP_SERVER_DEVICE_TYPE = "urn:ses-com:device:SatIPServer:1";
 #define UPNP_SEARCH_TIMEOUT_SECONDS 15
 #define SATIP_CHANNEL_LIST N_("SAT>IP channel list")
 #define SATIP_CHANNEL_LIST_URL N_("Custom SAT>IP channel list URL")
+
+#define HTTP_PORT         7070
+
+#define HTTP_PORT_TEXT N_("HTTP port")
+#define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the local server used to stream the media to the UPnP Renderer.")
+#define HAS_VIDEO_TEXT N_("Video")
+#define HAS_VIDEO_LONGTEXT N_("The UPnP Renderer can receive video.")
+
+#define IP_ADDR_TEXT N_("IP Address")
+#define IP_ADDR_LONGTEXT N_("IP Address of the UPnP Renderer.")
+#define PORT_TEXT N_("UPnP Renderer port")
+#define PORT_LONGTEXT N_("The port used to talk to the UPnP Renderer.")
+#define BASE_URL_TEXT N_("base URL")
+#define BASE_URL_LONGTEXT N_("The base Url relative to which all other UPnP operations must be called")
+#define URL_TEXT N_("description URL")
+#define URL_LONGTEXT N_("The Url used to get the xml descriptor of the UPnP Renderer")
+
 static const char *const ppsz_satip_channel_lists[] = {
     "Auto", "ASTRA_19_2E", "ASTRA_28_2E", "ASTRA_23_5E", "MasterList", "ServerList", "CustomList"
 };
@@ -147,6 +164,22 @@ vlc_module_begin()
 
     VLC_RD_PROBE_SUBMODULE
 
+    add_submodule()
+        set_shortname("dlna")
+        set_description(N_("UPnP/DLNA stream output"))
+        set_capability("sout stream", 0)
+        add_shortcut("dlna")
+        set_category(CAT_SOUT)
+        set_subcategory(SUBCAT_SOUT_STREAM)
+        set_callbacks(DLNA::OpenSout, DLNA::CloseSout)
+
+        add_string(SOUT_CFG_PREFIX "ip", NULL, IP_ADDR_TEXT, IP_ADDR_LONGTEXT, false)
+        add_integer(SOUT_CFG_PREFIX "port", NULL, PORT_TEXT, PORT_LONGTEXT, false)
+        add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
+        add_bool(SOUT_CFG_PREFIX "video", true, HAS_VIDEO_TEXT, HAS_VIDEO_LONGTEXT, false)
+        add_string(SOUT_CFG_PREFIX "base_url", NULL, BASE_URL_TEXT, BASE_URL_LONGTEXT, false)
+        add_string(SOUT_CFG_PREFIX "url", NULL, URL_TEXT, URL_LONGTEXT, false)
+        add_renderer_opts(SOUT_CFG_PREFIX)
 vlc_module_end()
 
 /*
