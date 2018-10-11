@@ -56,7 +56,7 @@ enum av1_obu_type_e
 
 static inline enum av1_obu_type_e AV1_OBUGetType(const uint8_t *p_buf)
 {
-    return (p_buf[0] >> 3) & 0x0F;
+    return (enum av1_obu_type_e)((p_buf[0] >> 3) & 0x0F);
 }
 
 static inline bool AV1_OBUHasSizeField(const uint8_t *p_buf)
@@ -152,7 +152,7 @@ static inline enum av1_obu_metadata_type_e
     uint64_t i_type = leb128(p_buf, i_buf, &i_len);
     if(i_len == 0 || i_type > ((INT64_C(1) << 32) - 1))
         return AV1_METADATA_TYPE_RESERVED;
-    return i_type;
+    return (enum av1_obu_metadata_type_e) i_type;
 }
 
 
