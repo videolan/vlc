@@ -33,6 +33,10 @@
 
 #include <new>
 
+extern "C" {
+    #include "../av1_unpack.h"
+}
+
 #include <vlc_fs.h>
 #include <vlc_url.h>
 
@@ -650,18 +654,9 @@ void BlockDecode( demux_t *p_demux, KaxBlock *block, KaxSimpleBlock *simpleblock
             break;
 
           case VLC_CODEC_AV1:
-            {
-                if( (p_block->p_buffer[0] & 0x81) == 0 && /* reserved flags */
-                    (p_block->p_buffer[0] & 0x7A) != 0x12 ) /* no starting TEMPORAL_DELIMITER */
-                {
-                    p_block = block_Realloc( p_block, 2, p_block->i_buffer );
-                    if( p_block )
-                    {
-                        p_block->p_buffer[0] = 0x12;
-                        p_block->p_buffer[1] = 0x00;
-                    }
-                }
-            }
+            p_block = AV1_Unpack_Sample( p_block );
+            if( unlikely( !p_block ) )
+                continue;
             break;
         }
 
