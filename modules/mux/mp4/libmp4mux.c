@@ -1882,9 +1882,10 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
             msg_Warn(p_obj, "H264 muxing from AnnexB source will set an incorrect default profile");
         break;
     case VLC_CODEC_HEVC:
-        if(!p_fmt->i_extra && p_obj)
+        if(!p_fmt->i_extra)
         {
-            msg_Err(p_obj, "HEVC muxing from AnnexB source is unsupported");
+            if(p_obj)
+                msg_Err(p_obj, "HEVC muxing from AnnexB source is unsupported");
             return false;
         }
         break;
