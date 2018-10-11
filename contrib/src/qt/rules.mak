@@ -1,7 +1,10 @@
 # Qt
 
-QT_VERSION := 5.11.0
-QT_URL := https://download.qt.io/official_releases/qt/5.11/$(QT_VERSION)/submodules/qtbase-everywhere-src-$(QT_VERSION).tar.xz
+QT_VERSION_MAJOR := 5.11
+QT_VERSION := $(QT_VERSION_MAJOR).0
+# Insert potential -betaX suffix here:
+QT_VERSION_FULL := $(QT_VERSION)
+QT_URL := https://download.qt.io/development_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
 
 ifdef HAVE_MACOSX
 #PKGS += qt
@@ -14,14 +17,14 @@ ifeq ($(call need_pkg,"Qt5Core Qt5Gui Qt5Widgets"),)
 PKGS_FOUND += qt
 endif
 
-$(TARBALLS)/qt-$(QT_VERSION).tar.xz:
+$(TARBALLS)/qt-$(QT_VERSION_FULL).tar.xz:
 	$(call download,$(QT_URL))
 
-.sum-qt: qt-$(QT_VERSION).tar.xz
+.sum-qt: qt-$(QT_VERSION_FULL).tar.xz
 
-qt: qt-$(QT_VERSION).tar.xz .sum-qt
+qt: qt-$(QT_VERSION_FULL).tar.xz .sum-qt
 	$(UNPACK)
-	mv qtbase-everywhere-src-$(QT_VERSION) qt-$(QT_VERSION)
+	mv qtbase-everywhere-src-$(QT_VERSION_FULL) qt-$(QT_VERSION_FULL)
 ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0001-Windows-QPA-prefer-lower-value-when-rounding-fractio.patch
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
