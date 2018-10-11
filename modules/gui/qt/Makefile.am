@@ -56,6 +56,10 @@ libqt_plugin_la_CPPFLAGS += -DQT5_HAS_WAYLAND \
 libqt_plugin_la_CXXFLAGS += $(WAYLAND_CLIENT_CFLAGS)
 libqt_plugin_la_LIBADD += $(WAYLAND_CLIENT_LIBS)
 endif
+if HAVE_QT5_WAYLAND
+libqt_plugin_la_CPPFLAGS += $(QT5_WAYLAND_CFLAGS)
+libqt_plugin_la_LIBADD += $(QT5_WAYLAND_LIBS)
+endif
 if HAVE_WIN32
 libqt_plugin_la_CXXFLAGS += $(LIBCOMCXXFLAGS)
 libqt_plugin_la_LIBADD += $(LIBCOM) -lcomctl32 -luuid -ld3d11
