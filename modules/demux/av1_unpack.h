@@ -26,10 +26,10 @@
 
 static inline uint8_t leb128_expected(uint32_t v)
 {
-    if     (v < (1U << 8))  return 1;
-    else if(v < (1U << 15)) return 2;
-    else if(v < (1U << 22)) return 3;
-    else if(v < (1U << 29)) return 4;
+    if     (v < (1U << 7))  return 1;
+    else if(v < (1U << 14)) return 2;
+    else if(v < (1U << 21)) return 3;
+    else if(v < (1U << 28)) return 4;
     else                    return 5;
 }
 
