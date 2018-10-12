@@ -689,6 +689,209 @@ error:
     return VLC_EGENERIC;
 }
 
+struct xy_primary {
+    double x, y;
+};
+
+struct cie1931_primaries {
+    struct xy_primary red, green, blue, white;
+};
+
+static const struct cie1931_primaries STANDARD_PRIMARIES[] = {
+#define CIE_D65 {0.31271, 0.32902}
+#define CIE_C   {0.31006, 0.31616}
+
+    [COLOR_PRIMARIES_BT601_525] = {
+        .red   = {0.630, 0.340},
+        .green = {0.310, 0.595},
+        .blue  = {0.155, 0.070},
+        .white = CIE_D65
+    },
+    [COLOR_PRIMARIES_BT601_625] = {
+        .red   = {0.640, 0.330},
+        .green = {0.290, 0.600},
+        .blue  = {0.150, 0.060},
+        .white = CIE_D65
+    },
+    [COLOR_PRIMARIES_BT709] = {
+        .red   = {0.640, 0.330},
+        .green = {0.300, 0.600},
+        .blue  = {0.150, 0.060},
+        .white = CIE_D65
+    },
+    [COLOR_PRIMARIES_BT2020] = {
+        .red   = {0.708, 0.292},
+        .green = {0.170, 0.797},
+        .blue  = {0.131, 0.046},
+        .white = CIE_D65
+    },
+    [COLOR_PRIMARIES_DCI_P3] = {
+        .red   = {0.680, 0.320},
+        .green = {0.265, 0.690},
+        .blue  = {0.150, 0.060},
+        .white = CIE_D65
+    },
+    [COLOR_PRIMARIES_FCC1953] = {
+        .red   = {0.670, 0.330},
+        .green = {0.210, 0.710},
+        .blue  = {0.140, 0.080},
+        .white = CIE_C
+    },
+#undef CIE_D65
+#undef CIE_C
+};
+
+static void ChromaticAdaptation(const struct xy_primary *src_white,
+                                const struct xy_primary *dst_white,
+                                double in_out[3 * 3])
+{
+    if (fabs(src_white->x - dst_white->x) < 1e-6 &&
+        fabs(src_white->y - dst_white->y) < 1e-6)
+        return;
+
+    /* TODO, see http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html */
+}
+
+static void Float3x3Inverse(double in_out[3 * 3])
+{
+    double m00 = in_out[0 + 0*3], m01 = in_out[1 + 0*3], m02 = in_out[2 + 0*3],
+          m10 = in_out[0 + 1*3], m11 = in_out[1 + 1*3], m12 = in_out[2 + 1*3],
+          m20 = in_out[0 + 2*3], m21 = in_out[1 + 2*3], m22 = in_out[2 + 2*3];
+
+    // calculate the adjoint
+    in_out[0 + 0*3] =  (m11 * m22 - m21 * m12);
+    in_out[1 + 0*3] = -(m01 * m22 - m21 * m02);
+    in_out[2 + 0*3] =  (m01 * m12 - m11 * m02);
+    in_out[0 + 1*3] = -(m10 * m22 - m20 * m12);
+    in_out[1 + 1*3] =  (m00 * m22 - m20 * m02);
+    in_out[2 + 1*3] = -(m00 * m12 - m10 * m02);
+    in_out[0 + 2*3] =  (m10 * m21 - m20 * m11);
+    in_out[1 + 2*3] = -(m00 * m21 - m20 * m01);
+    in_out[2 + 2*3] =  (m00 * m11 - m10 * m01);
+
+    // calculate the determinant (as inverse == 1/det * adjoint,
+    // adjoint * m == identity * det, so this calculates the det)
+    double det = m00 * in_out[0 + 0*3] + m10 * in_out[1 + 0*3] + m20 * in_out[2 + 0*3];
+    det = 1.0f / det;
+
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++)
+            in_out[j + i*3] *= det;
+    }
+}
+
+static void Float3x3Multiply(double m1[3 * 3], const double m2[3 * 3])
+{
+    double a00 = m1[0 + 0*3], a01 = m1[1 + 0*3], a02 = m1[2 + 0*3],
+           a10 = m1[0 + 1*3], a11 = m1[1 + 1*3], a12 = m1[2 + 1*3],
+           a20 = m1[0 + 2*3], a21 = m1[1 + 2*3], a22 = m1[2 + 2*3];
+
+    for (int i = 0; i < 3; i++) {
+        m1[i + 0*3] = a00 * m2[i + 0*3] + a01 * m2[i + 1*3] + a02 * m2[i + 2*3];
+        m1[i + 1*3] = a10 * m2[i + 0*3] + a11 * m2[i + 1*3] + a12 * m2[i + 2*3];
+        m1[i + 2*3] = a20 * m2[i + 0*3] + a21 * m2[i + 1*3] + a22 * m2[i + 2*3];
+    }
+}
+
+static void Float3Multiply(const double in[3], const double mult[3 * 3], double out[3])
+{
+    for (size_t i=0; i<3; i++)
+    {
+        out[i] = mult[i + 0*3] * in[0] +
+                 mult[i + 1*3] * in[1] +
+                 mult[i + 2*3] * in[2];
+    }
+}
+
+/* from http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html */
+static void GetRGB2XYZMatrix(const struct cie1931_primaries *primaries,
+                             double out[3 * 3])
+{
+#define RED   0
+#define GREEN 1
+#define BLUE  2
+    double X[3], Y[3], Z[3], S[3], W[3];
+    double W_TO_S[3 * 3];
+
+    X[RED  ] = primaries->red.x / primaries->red.y;
+    X[GREEN] = 1;
+    X[BLUE ] = (1 - primaries->red.x - primaries->red.y) / primaries->red.y;
+
+    Y[RED  ] = primaries->green.x / primaries->green.y;
+    Y[GREEN] = 1;
+    Y[BLUE ] = (1 - primaries->green.x - primaries->green.y) / primaries->green.y;
+
+    Z[RED  ] = primaries->blue.x / primaries->blue.y;
+    Z[GREEN] = 1;
+    Z[BLUE ] = (1 - primaries->blue.x - primaries->blue.y) / primaries->blue.y;
+
+    W_TO_S[0 + 0*3] = X[RED  ];
+    W_TO_S[1 + 0*3] = X[GREEN];
+    W_TO_S[2 + 0*3] = X[BLUE ];
+    W_TO_S[0 + 1*3] = Y[RED  ];
+    W_TO_S[1 + 1*3] = Y[GREEN];
+    W_TO_S[2 + 1*3] = Y[BLUE ];
+    W_TO_S[0 + 2*3] = Z[RED  ];
+    W_TO_S[1 + 2*3] = Z[GREEN];
+    W_TO_S[2 + 2*3] = Z[BLUE ];
+
+    Float3x3Inverse(W_TO_S);
+
+    W[0] = primaries->white.x / primaries->white.y; /* Xw */
+    W[1] = 1;                  /* Yw */
+    W[2] = (1 - primaries->white.x - primaries->white.y) / primaries->white.y; /* Yw */
+
+    Float3Multiply(W, W_TO_S, S);
+
+    out[0 + 0*3] = S[RED  ] * X[RED  ];
+    out[1 + 0*3] = S[GREEN] * Y[RED  ];
+    out[2 + 0*3] = S[BLUE ] * Z[RED  ];
+    out[0 + 1*3] = S[RED  ] * X[GREEN];
+    out[1 + 1*3] = S[GREEN] * Y[GREEN];
+    out[2 + 1*3] = S[BLUE ] * Z[GREEN];
+    out[0 + 2*3] = S[RED  ] * X[BLUE ];
+    out[1 + 2*3] = S[GREEN] * Y[BLUE ];
+    out[2 + 2*3] = S[BLUE ] * Z[BLUE ];
+#undef RED
+#undef GREEN
+#undef BLUE
+}
+
+/* from http://www.brucelindbloom.com/index.html?Eqn_RGB_XYZ_Matrix.html */
+static void GetXYZ2RGBMatrix(const struct cie1931_primaries *primaries,
+                             double out[3 * 3])
+{
+    GetRGB2XYZMatrix(primaries, out);
+    Float3x3Inverse(out);
+}
+
+static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t src,
+                                  video_color_primaries_t dst)
+{
+    const struct cie1931_primaries *p_src = &STANDARD_PRIMARIES[src];
+    const struct cie1931_primaries *p_dst = &STANDARD_PRIMARIES[dst];
+    double rgb2xyz[3 * 3], xyz2rgb[3 * 3];
+
+    /* src[RGB] -> src[XYZ] */
+    GetRGB2XYZMatrix(p_src, rgb2xyz);
+
+    /* src[XYZ] -> dst[XYZ] */
+    ChromaticAdaptation(&p_src->white, &p_dst->white, rgb2xyz);
+
+    /* dst[XYZ] -> dst[RGB] */
+    GetXYZ2RGBMatrix(p_dst, xyz2rgb);
+
+    /* src[RGB] -> src[XYZ] -> dst[XYZ] -> dst[RGB] */
+    Float3x3Multiply(xyz2rgb, rgb2xyz);
+
+    for (size_t i=0;i<4; ++i)
+    {
+        for (size_t j=0;j<3; ++j)
+            Primaries[j + i*4] = xyz2rgb[j + i*3];
+        Primaries[3 + i*4] = i == 3;
+    }
+}
+
 #undef D3D11_SetupQuad
 int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format_t *fmt, d3d_quad_t *quad,
                     const display_info_t *displayFormat, const RECT *output,
@@ -826,6 +1029,12 @@ int D3D11_SetupQuad(vlc_object_t *o, d3d11_device_t *d3d_dev, const video_format
     }
 
     memcpy(colorspace.Colorspace, ppColorspace, sizeof(colorspace.Colorspace));
+
+    if (fmt->primaries != displayFormat->colorspace->primaries)
+    {
+        GetPrimariesTransform(colorspace.Primaries, fmt->primaries,
+                              displayFormat->colorspace->primaries);
+    }
 
     ShaderUpdateConstants(o, d3d_dev, quad, PS_CONST_COLORSPACE, &colorspace);
 

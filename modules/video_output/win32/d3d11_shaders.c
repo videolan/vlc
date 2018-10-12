@@ -63,7 +63,7 @@ static const char* globPixelShaderDefault = "\
   {\n\
     float4x4 WhitePoint;\n\
     float4x4 Colorspace;\n\
-    float3x3 Primaries;\n\
+    float4x4 Primaries;\n\
   };\n\
   Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\n\
   SamplerState SamplerStates[2];\n\
@@ -511,6 +511,9 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 break;
         }
     }
+
+    if (display->colorspace->primaries != primaries)
+        psz_primaries_transform = "return mul(rgb, Primaries)";
 
     int range_adjust = 0;
     if (display->colorspace->b_full_range) {

@@ -62,8 +62,7 @@ typedef struct {
 typedef struct {
     FLOAT WhitePoint[4*4];
     FLOAT Colorspace[4*4];
-    FLOAT Primaries[3*3];
-    FLOAT padding[16 - 3*3];
+    FLOAT Primaries[4*4];
 } PS_COLOR_TRANSFORM;
 
 typedef struct {
