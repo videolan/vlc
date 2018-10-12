@@ -258,7 +258,8 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
 HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
                                  d3d11_device_t *d3d_dev,
                                  const display_info_t *display,
-                                 video_transfer_func_t transfer, bool src_full_range,
+                                 video_transfer_func_t transfer,
+                                 video_color_primaries_t primaries, bool src_full_range,
                                  d3d_quad_t *quad)
 {
     static const char *DEFAULT_NOOP = "return rgb";

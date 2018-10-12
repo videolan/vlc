@@ -1416,7 +1416,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                  &sys->display, fmt->transfer, fmt->b_color_range_full,
+                                  &sys->display, fmt->transfer, fmt->primaries,
+                                  fmt->b_color_range_full,
                                   &sys->picQuad);
     if (FAILED(hr))
     {
@@ -1523,7 +1524,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     if (sys->regionQuad.textureFormat != NULL)
     {
         hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
-                                      &sys->display, TRANSFER_FUNC_SRGB, true,
+                                      &sys->display, TRANSFER_FUNC_SRGB, COLOR_PRIMARIES_SRGB, true,
                                       &sys->regionQuad);
         if (FAILED(hr))
         {
