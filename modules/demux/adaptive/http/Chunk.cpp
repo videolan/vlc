@@ -250,10 +250,11 @@ bool HTTPChunkSource::prepare()
                 break;
         }
 
-        int i_ret = connection->request(connparams.getPath(), bytesRange);
-        if(i_ret != VLC_SUCCESS)
+        enum RequestStatus status =
+                connection->request(connparams.getPath(), bytesRange);
+        if(status != RequestStatus::Success)
         {
-            if(i_ret == VLC_ETIMEOUT) /* redirection */
+            if(status == RequestStatus::Redirection)
             {
                 HTTPConnection *httpconn = dynamic_cast<HTTPConnection *>(connection);
                 if(httpconn)
