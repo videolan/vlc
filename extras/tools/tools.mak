@@ -129,6 +129,7 @@ libtool: libtool-$(LIBTOOL_VERSION).tar.gz
 	$(APPLY) libtool-2.4.2-bitcode.patch
 	$(APPLY) libtool-2.4.2-san.patch
 	$(APPLY) libtool-2.4.6-clang-libs.patch
+	$(APPLY) libtool-2.4.2-response-files.patch
 	$(MOVE)
 
 .buildlibtool: libtool .automake .help2man
