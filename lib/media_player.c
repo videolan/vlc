@@ -1269,7 +1269,7 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
     var_SetInteger (p_mi, "drawable-hwnd", (uintptr_t)drawable);
 #else
     (void) drawable;
-    libvlc_printerr ("can't set nsobject: WIN32 build required");
+    libvlc_printerr ("can't set hwnd: WIN32 build required");
     assert(false);
     var_SetString (p_mi, "vout", "none");
     var_SetString (p_mi, "window", "none");
