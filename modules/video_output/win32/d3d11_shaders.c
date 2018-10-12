@@ -98,7 +98,7 @@ static const char* globPixelShaderDefault = "\
   }\n\
   \n\
   inline float3 linearToDisplay(float3 rgb) {\n\
-     rgb = max(min(rgb, 1), 0);\n\
+     rgb = clamp(rgb, 0, 1);\n\
       %s;\n\
   }\n\
   \n\
@@ -573,7 +573,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     black_level -= itu_black_level;
                     range_factor /= itu_range_factor;
                 }
-                sprintf(psz_range, "return max(0,min(1,(rgb + %f) * %f))",
+                sprintf(psz_range, "return clamp((rgb + %f) * %f, 0, 1)",
                         black_level, range_factor);
             }
             else
