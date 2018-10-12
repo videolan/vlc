@@ -98,6 +98,7 @@ static const char* globPixelShaderDefault = "\
   }\n\
   \n\
   inline float3 linearToDisplay(float3 rgb) {\n\
+     rgb = max(min(rgb, 1), 0);\n\
       %s;\n\
   }\n\
   \n\
