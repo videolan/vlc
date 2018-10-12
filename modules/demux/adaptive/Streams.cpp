@@ -56,6 +56,7 @@ AbstractStream::AbstractStream(demux_t * demux_)
     demuxersource = NULL;
     demuxer = NULL;
     fakeesout = NULL;
+    notfound_sequence = 0;
     last_buffer_status = buffering_lessthanmin;
     vlc_mutex_init(&lock);
 }
@@ -500,10 +501,16 @@ block_t * AbstractStream::readNextBlock()
     block_t *block = currentChunk->readBlock();
     if(block == NULL)
     {
+        if(currentChunk->getRequestStatus() == RequestStatus::NotFound &&
+           ++notfound_sequence < 3)
+        {
+            discontinuity = true;
+        }
         delete currentChunk;
         currentChunk = NULL;
         return NULL;
     }
+    else notfound_sequence = 0;
 
     demuxfirstchunk = false;
 
@@ -530,6 +537,7 @@ bool AbstractStream::setPosition(mtime_t time, bool tryonly)
         // clear eof flag before restartDemux() to prevent readNextBlock() fail
         eof = false;
         demuxfirstchunk = true;
+        notfound_sequence = 0;
         if(b_needs_restart)
         {
             if(currentChunk)
