@@ -138,6 +138,7 @@ namespace adaptive
         buffering_status last_buffer_status;
         bool dead;
         bool disabled;
+        unsigned notfound_sequence;
     };
 
     class AbstractStreamFactory
