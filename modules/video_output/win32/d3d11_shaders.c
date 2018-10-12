@@ -63,6 +63,7 @@ static const char* globPixelShaderDefault = "\
   {\n\
     float4x4 WhitePoint;\n\
     float4x4 Colorspace;\n\
+    float3x3 Primaries;\n\
   };\n\
   Texture2D%s shaderTexture[" STRINGIZE(D3D11_MAX_SHADER_VIEW) "];\n\
   SamplerState SamplerStates[2];\n\
@@ -100,6 +101,10 @@ static const char* globPixelShaderDefault = "\
       %s;\n\
   }\n\
   \n\
+  inline float3 transformPrimaries(float3 rgb) {\n\
+      %s;\n\
+  }\n\
+  \n\
   inline float3 toneMapping(float3 rgb) {\n\
       %s;\n\
   }\n\
@@ -130,6 +135,7 @@ static const char* globPixelShaderDefault = "\
     float opacity = rgba.a * Opacity;\n\
     float3 rgb = (float3)rgba;\n\
     rgb = sourceToLinear(rgb);\n\
+    rgb = transformPrimaries(rgb);\n\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
     rgb = adjustRange(rgb);\n\
@@ -203,13 +209,15 @@ bool IsRGBShader(const d3d_format_t *cfg)
 static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool legacy_shader,
                                    d3d11_device_t *d3d_dev,
                                    const char *psz_sampler,
-                                   const char *psz_src_transform, const char *psz_display_transform,
+                                   const char *psz_src_transform,
+                                   const char *psz_primaries_transform,
+                                   const char *psz_display_transform,
                                    const char *psz_tone_mapping,
                                    const char *psz_adjust_range, const char *psz_move_planes,
                                    ID3D11PixelShader **output)
 {
     char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
-                          strlen(psz_src_transform) + strlen(psz_display_transform) +
+                          strlen(psz_src_transform) + strlen(psz_primaries_transform) + strlen(psz_display_transform) +
                           strlen(psz_tone_mapping) + strlen(psz_adjust_range) + strlen(psz_move_planes));
     if (!shader)
     {
@@ -217,9 +225,11 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
         return E_OUTOFMEMORY;
     }
     sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_tone_mapping, psz_adjust_range, psz_move_planes, psz_sampler);
+            psz_display_transform, psz_primaries_transform, psz_tone_mapping,
+            psz_adjust_range, psz_move_planes, psz_sampler);
 #ifndef NDEBUG
     msg_Dbg(o,"psz_src_transform %s", psz_src_transform);
+    msg_Dbg(o,"psz_primaries_transform %s", psz_primaries_transform);
     msg_Dbg(o,"psz_tone_mapping %s", psz_tone_mapping);
     msg_Dbg(o,"psz_display_transform %s", psz_display_transform);
     msg_Dbg(o,"psz_adjust_range %s", psz_adjust_range);
@@ -251,6 +261,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     const char *psz_sampler[2] = {NULL, NULL};
     const char *psz_src_transform     = DEFAULT_NOOP;
     const char *psz_display_transform = DEFAULT_NOOP;
+    const char *psz_primaries_transform = DEFAULT_NOOP;
     const char *psz_tone_mapping      = DEFAULT_NOOP;
     const char *psz_adjust_range      = DEFAULT_NOOP;
     const char *psz_move_planes[2]    = {DEFAULT_NOOP, DEFAULT_NOOP};
@@ -573,11 +584,13 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
 
     hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                      psz_sampler[0], psz_src_transform,
+                                     psz_primaries_transform,
                                      psz_display_transform, psz_tone_mapping,
                                      psz_adjust_range, psz_move_planes[0], &quad->d3dpixelShader[0]);
     if (!FAILED(hr) && psz_sampler[1])
         hr = CompileTargetShader(o, hd3d, legacy_shader, d3d_dev,
                                  psz_sampler[1], psz_src_transform,
+                                 psz_primaries_transform,
                                  psz_display_transform, psz_tone_mapping,
                                  psz_adjust_range, psz_move_planes[1], &quad->d3dpixelShader[1]);
     free(psz_range);
