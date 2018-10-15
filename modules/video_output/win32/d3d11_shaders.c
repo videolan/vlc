@@ -98,7 +98,6 @@ static const char* globPixelShaderDefault = "\
   }\n\
   \n\
   inline float3 linearToDisplay(float3 rgb) {\n\
-     rgb = clamp(rgb, 0, 1);\n\
       %s;\n\
   }\n\
   \n\
@@ -438,7 +437,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                 /* ST2084 to Linear */
                 psz_src_transform =
                        ST2084_PQ_CONSTANTS
-                       "rgb = pow(rgb, 1.0/ST2084_m2);\n"
+                       "rgb = pow(max(rgb, 0), 1.0/ST2084_m2);\n"
                        "rgb = max(rgb - ST2084_c1, 0.0) / (ST2084_c2 - ST2084_c3 * rgb);\n"
                        "rgb = pow(rgb, 1.0/ST2084_m1);\n"
                        "return rgb";
@@ -514,7 +513,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
 
     if (display->colorspace->primaries != primaries)
-        psz_primaries_transform = "return mul(rgb, Primaries)";
+        psz_primaries_transform = "return max(mul(rgb, Primaries), 0)";
 
     int range_adjust = 0;
     if (display->colorspace->b_full_range) {
