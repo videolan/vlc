@@ -324,7 +324,7 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
                     {
                         /* HDR tone mapping */
                         psz_tone_mapping =
-                            "static const float3 HABLE_DIV = hable(11.2);\n"
+                            "static const float4 HABLE_DIV = hable(11.2);\n"
                             "rgb = hable(rgb * LuminanceScale) / HABLE_DIV;\n"
                             "return rgb";
                     }
