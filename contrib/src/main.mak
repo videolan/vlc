@@ -513,6 +513,7 @@ endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
+	echo "set(PKG_CONFIG_EXECUTABLE $(PKG_CONFIG))" >> $@
 endif
 
 # Default pattern rules
