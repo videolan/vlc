@@ -75,7 +75,7 @@ static const char* globPixelShaderDefault = "\
   };\n\
   \n\
   /* see http://filmicworlds.com/blog/filmic-tonemapping-operators/ */\n\
-  inline float3 hable(float3 x) {\n\
+  inline float4 hable(float4 x) {\n\
       const float A = 0.15, B = 0.50, C = 0.10, D = 0.20, E = 0.02, F = 0.30;\n\
       return ((x * (A*x + (C*B))+(D*E))/(x * (A*x + B) + (D*F))) - E/F;\n\
   }\n\
@@ -93,23 +93,23 @@ static const char* globPixelShaderDefault = "\
       return x;\n\
   }\n\
   \n\
-  inline float3 sourceToLinear(float3 rgb) {\n\
+  inline float4 sourceToLinear(float4 rgb) {\n\
       %s;\n\
   }\n\
   \n\
-  inline float3 linearToDisplay(float3 rgb) {\n\
+  inline float4 linearToDisplay(float4 rgb) {\n\
       %s;\n\
   }\n\
   \n\
-  inline float3 transformPrimaries(float3 rgb) {\n\
+  inline float4 transformPrimaries(float4 rgb) {\n\
       %s;\n\
   }\n\
   \n\
-  inline float3 toneMapping(float3 rgb) {\n\
+  inline float4 toneMapping(float4 rgb) {\n\
       %s;\n\
   }\n\
   \n\
-  inline float3 adjustRange(float3 rgb) {\n\
+  inline float4 adjustRange(float4 rgb) {\n\
       %s;\n\
   }\n\
   \n\
@@ -129,13 +129,13 @@ static const char* globPixelShaderDefault = "\
         sample = sampleTexture( SamplerStates[0], In.Texture );\n\
     float4 rgba = mul(mul(sample, WhitePoint), Colorspace);\n\
     float opacity = rgba.a * Opacity;\n\
-    float3 rgb = (float3)rgba;\n\
+    float4 rgb = rgba; rgb.a = 0;\n\
     rgb = sourceToLinear(rgb);\n\
     rgb = transformPrimaries(rgb);\n\
     rgb = toneMapping(rgb);\n\
     rgb = linearToDisplay(rgb);\n\
     rgb = adjustRange(rgb);\n\
-    return float4(rgb, saturate(opacity));\n\
+    return float4(rgb.rgb, saturate(opacity));\n\
   }\n\
 ";
 
