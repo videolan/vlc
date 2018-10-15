@@ -217,7 +217,7 @@ static int assert_staging(filter_t *p_filter, picture_sys_t *p_sys)
         /* failed with the this format, try a different one */
         UINT supportFlags = D3D11_FORMAT_SUPPORT_SHADER_LOAD | D3D11_FORMAT_SUPPORT_VIDEO_PROCESSOR_OUTPUT;
         const d3d_format_t *new_fmt =
-                FindD3D11Format( p_filter, &d3d_dev, 0, false, 0, false, supportFlags );
+                FindD3D11Format( p_filter, &d3d_dev, 0, false, 0, 0, 0, false, supportFlags );
         if (new_fmt && texDesc.Format != new_fmt->formatTexture)
         {
             DXGI_FORMAT srcFormat = texDesc.Format;

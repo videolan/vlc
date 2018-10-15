@@ -502,6 +502,8 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
                                     vlc_fourcc_t i_src_chroma,
                                     bool rgb_only,
                                     uint8_t bits_per_channel,
+                                    uint8_t widthDenominator,
+                                    uint8_t heightDenominator,
                                     bool allow_opaque,
                                     UINT supportFlags)
 {
@@ -516,6 +518,10 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *o,
         if (!allow_opaque && is_d3d11_opaque(output_format->fourcc))
             continue;
         if (rgb_only && vlc_fourcc_IsYUV(output_format->fourcc))
+            continue;
+        if (widthDenominator && widthDenominator < output_format->widthDenominator)
+            continue;
+        if (heightDenominator && heightDenominator < output_format->heightDenominator)
             continue;
 
         DXGI_FORMAT textureFormat;

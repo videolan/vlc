@@ -132,9 +132,12 @@ const d3d_format_t *FindD3D11Format(vlc_object_t *,
                                     vlc_fourcc_t i_src_chroma,
                                     bool rgb_only,
                                     uint8_t bits_per_channel,
+                                    uint8_t widthDenominator,
+                                    uint8_t heightDenominator,
                                     bool allow_opaque,
                                     UINT supportFlags);
-#define FindD3D11Format(a,b,c,d,e,f,g)  FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g)
+#define FindD3D11Format(a,b,c,d,e,f,g,h,i)  \
+    FindD3D11Format(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 int AllocateTextures(vlc_object_t *, d3d11_device_t *, const d3d_format_t *,
                      const video_format_t *, unsigned pool_size, ID3D11Texture2D *textures[]);
