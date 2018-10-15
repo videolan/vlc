@@ -1,11 +1,13 @@
---- soxr/CMakeLists.txt.orig	2018-03-20 15:53:33.455252098 -0400
-+++ soxr/CMakeLists.txt	2018-03-20 15:54:37.683356636 -0400
-@@ -127,18 +127,20 @@
+--- soxr/CMakeLists.txt.orig	2018-10-15 12:15:01.620074074 +0200
++++ soxr/CMakeLists.txt	2018-10-15 12:16:27.269662032 +0200
+@@ -126,19 +126,21 @@
+   set (WITH_CR64S ${SIMD64_FOUND})
  endif ()
  
++find_package(PkgConfig)
++
  if (WITH_AVFFT)
 -  find_package (LibAVCodec REQUIRED)
-+  find_package(PkgConfig)
 +  pkg_check_modules(AVCODEC REQUIRED libavcodec)
    if (AVCODEC_FOUND)
      include_directories (${AVCODEC_INCLUDE_DIRS})
@@ -16,7 +18,6 @@
  
  if (WITH_AVFFT OR (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" AND SIMD32_FOUND AND WITH_CR32))
 -  find_package (LibAVUtil)
-+  find_package(PkgConfig)
 +  pkg_check_modules(AVUTIL REQUIRED libavutil)
    if (AVUTIL_FOUND)
      include_directories (${AVUTIL_INCLUDE_DIRS})
