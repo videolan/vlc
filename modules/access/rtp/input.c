@@ -109,6 +109,12 @@ void *rtp_dgram_thread (void *opaque)
     demux_sys_t *sys = demux->p_sys;
     vlc_tick_t deadline = VLC_TICK_INVALID;
     int rtp_fd = sys->fd;
+#ifdef __linux__
+    const int trunc_flag = MSG_TRUNC;
+#else
+    const int trunc_flag = 0;
+#endif
+
     struct iovec iov =
     {
         .iov_len = DEFAULT_MRU,
@@ -149,17 +155,12 @@ void *rtp_dgram_thread (void *opaque)
             }
 
             iov.iov_base = block->p_buffer;
-#ifdef __linux__
-            msg.msg_flags = MSG_TRUNC;
-#else
-            msg.msg_flags = 0;
-#endif
+            msg.msg_flags = trunc_flag;
 
-            ssize_t len = recvmsg (rtp_fd, &msg, 0);
+            ssize_t len = recvmsg (rtp_fd, &msg, trunc_flag);
             if (len != -1)
             {
-#ifdef MSG_TRUNC
-                if (msg.msg_flags & MSG_TRUNC)
+                if (msg.msg_flags & trunc_flag)
                 {
                     msg_Err(demux, "%zd bytes packet truncated (MRU was %zu)",
                             len, iov.iov_len);
@@ -167,7 +168,6 @@ void *rtp_dgram_thread (void *opaque)
                     iov.iov_len = len;
                 }
                 else
-#endif
                     block->i_buffer = len;
 
                 rtp_process (demux, block);
