@@ -78,6 +78,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_picture_pool.h \
 	../include/vlc_playlist_legacy.h \
 	../include/vlc_player.h \
+	../include/vlc_playlist.h \
 	../include/vlc_plugin.h \
 	../include/vlc_probe.h \
 	../include/vlc_rand.h \
@@ -226,6 +227,20 @@ libvlccore_la_SOURCES = \
 	playlist_legacy/search.c \
 	playlist_legacy/services_discovery.c \
 	playlist_legacy/renderer.c \
+	playlist/content.c \
+	playlist/content.h \
+	playlist/control.c \
+	playlist/control.h \
+	playlist/item.c \
+	playlist/item.h \
+	playlist/notify.c \
+	playlist/notify.h \
+	playlist/player.c \
+	playlist/player.h \
+	playlist/playlist.c \
+	playlist/playlist.h \
+	playlist/preparse.c \
+	playlist/preparse.h \
 	preparser/art.c \
 	preparser/art.h \
 	preparser/fetcher.c \
@@ -539,7 +554,8 @@ check_PROGRAMS = \
 	test_mrl_helpers \
 	test_arrays \
 	test_vector \
-	test_shared_data_ptr
+	test_shared_data_ptr \
+	test_playlist
 
 TESTS = $(check_PROGRAMS) check_symbols
 
@@ -564,6 +580,15 @@ test_mrl_helpers_SOURCES = test/mrl_helpers.c
 test_arrays_SOURCES = test/arrays.c
 test_vector_SOURCES = test/vector.c
 test_shared_data_ptr_SOURCES = test/shared_data_ptr.cpp
+test_playlist_SOURCES = playlist/test.c \
+	playlist/content.c \
+	playlist/control.c \
+	playlist/item.c \
+	playlist/notify.c \
+	playlist/player.c \
+	playlist/playlist.c \
+	playlist/preparse.c
+test_playlist_CFLAGS = -DTEST_PLAYLIST
 
 AM_LDFLAGS = -no-install
 LDADD = libvlccore.la \
