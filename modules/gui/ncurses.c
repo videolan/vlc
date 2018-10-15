@@ -1092,6 +1092,7 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
         case PAUSE_S:
             mvnprintw(y++, 0, COLS, _(input_state[val.i_int]),
                         repeat, random, loop);
+            /* fall-through */
 
         default:
             secstotimestr(buf1, SEC_FROM_VLC_TICK(var_GetInteger(p_input, "time")));
