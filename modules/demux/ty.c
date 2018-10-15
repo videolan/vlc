@@ -474,6 +474,7 @@ static int Demux( demux_t *p_demux )
 
         default:
             msg_Dbg(p_demux, "Invalid record type 0x%02x", p_rec->rec_type );
+            /* fall-through */
 
         case 0x03: /* tivo data services */
         case 0x05: /* unknown, but seen regularly */
