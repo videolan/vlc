@@ -31,6 +31,20 @@
 static void
 vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
 {
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        /* randomizer is expected to be empty at this point */
+        assert(randomizer_Count(&playlist->randomizer) == 0);
+        randomizer_Add(&playlist->randomizer, playlist->items.data,
+                       playlist->items.size);
+
+        bool loop = playlist->repeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+        randomizer_SetLoop(&playlist->randomizer, loop);
+    }
+    else
+        /* we don't use the randomizer anymore */
+        randomizer_Clear(&playlist->randomizer);
+
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
 
@@ -44,6 +58,12 @@ vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
 static void
 vlc_playlist_PlaybackRepeatChanged(vlc_playlist_t *playlist)
 {
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        bool loop = playlist->repeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+        randomizer_SetLoop(&playlist->randomizer, loop);
+    }
+
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
 
@@ -166,33 +186,35 @@ vlc_playlist_NormalOrderGetNextIndex(vlc_playlist_t *playlist)
 static inline bool
 vlc_playlist_RandomOrderHasPrev(vlc_playlist_t *playlist)
 {
-    VLC_UNUSED(playlist);
-    /* TODO */
-    return false;
+    return randomizer_HasPrev(&playlist->randomizer);
 }
 
 static inline size_t
 vlc_playlist_RandomOrderGetPrevIndex(vlc_playlist_t *playlist)
 {
-    VLC_UNUSED(playlist);
-    /* TODO */
-    return -0;
+    vlc_playlist_item_t *prev = randomizer_PeekPrev(&playlist->randomizer);
+    assert(prev);
+    ssize_t index = vlc_playlist_IndexOf(playlist, prev);
+    assert(index != -1);
+    return (size_t) index;
 }
 
 static inline bool
 vlc_playlist_RandomOrderHasNext(vlc_playlist_t *playlist)
 {
-    VLC_UNUSED(playlist);
-    /* TODO */
-    return false;
+    if (playlist->repeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL)
+        return playlist->items.size > 0;
+    return randomizer_HasNext(&playlist->randomizer);
 }
 
 static inline size_t
 vlc_playlist_RandomOrderGetNextIndex(vlc_playlist_t *playlist)
 {
-    VLC_UNUSED(playlist);
-    /* TODO */
-    return 0;
+    vlc_playlist_item_t *next = randomizer_PeekNext(&playlist->randomizer);
+    assert(next);
+    ssize_t index = vlc_playlist_IndexOf(playlist, next);
+    assert(index != -1);
+    return (size_t) index;
 }
 
 static size_t
@@ -304,6 +326,14 @@ vlc_playlist_Prev(vlc_playlist_t *playlist)
     if (ret != VLC_SUCCESS)
         return ret;
 
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        /* mark the item as selected in the randomizer */
+        vlc_playlist_item_t *selected = randomizer_Prev(&playlist->randomizer);
+        assert(selected == playlist->items.data[index]);
+        VLC_UNUSED(selected);
+    }
+
     vlc_playlist_SetCurrentIndex(playlist, index);
     return VLC_SUCCESS;
 }
@@ -323,6 +353,14 @@ vlc_playlist_Next(vlc_playlist_t *playlist)
     if (ret != VLC_SUCCESS)
         return ret;
 
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        /* mark the item as selected in the randomizer */
+        vlc_playlist_item_t *selected = randomizer_Next(&playlist->randomizer);
+        assert(selected == playlist->items.data[index]);
+        VLC_UNUSED(selected);
+    }
+
     vlc_playlist_SetCurrentIndex(playlist, index);
     return VLC_SUCCESS;
 }
@@ -336,6 +374,12 @@ vlc_playlist_GoTo(vlc_playlist_t *playlist, ssize_t index)
     int ret = vlc_playlist_SetCurrentMedia(playlist, index);
     if (ret != VLC_SUCCESS)
         return ret;
+
+    if (index != -1 && playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        vlc_playlist_item_t *item = playlist->items.data[index];
+        randomizer_Select(&playlist->randomizer, item);
+    }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
     return VLC_SUCCESS;

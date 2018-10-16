@@ -45,6 +45,7 @@ vlc_playlist_New(vlc_object_t *parent)
     }
 
     vlc_vector_init(&playlist->items);
+    randomizer_Init(&playlist->randomizer);
     playlist->current = -1;
     playlist->has_prev = false;
     playlist->has_next = false;
@@ -61,6 +62,7 @@ vlc_playlist_Delete(vlc_playlist_t *playlist)
     assert(vlc_list_is_empty(&playlist->listeners));
 
     vlc_playlist_PlayerDestroy(playlist);
+    randomizer_Destroy(&playlist->randomizer);
     vlc_playlist_ClearItems(playlist);
     free(playlist);
 }

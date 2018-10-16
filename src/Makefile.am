@@ -592,6 +592,7 @@ test_playlist_SOURCES = playlist/test.c \
 	playlist/player.c \
 	playlist/playlist.c \
 	playlist/preparse.c \
+	playlist/randomizer.c \
 	playlist/request.c
 test_playlist_CFLAGS = -DTEST_PLAYLIST
 test_randomizer_SOURCES = playlist/randomizer.c

@@ -41,6 +41,9 @@ vlc_playlist_ClearItems(vlc_playlist_t *playlist)
 static void
 vlc_playlist_ItemsReset(vlc_playlist_t *playlist)
 {
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+        randomizer_Clear(&playlist->randomizer);
+
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
 
@@ -57,6 +60,10 @@ vlc_playlist_ItemsReset(vlc_playlist_t *playlist)
 void
 vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index, size_t count)
 {
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+        randomizer_Add(&playlist->randomizer,
+                       &playlist->items.data[index], count);
+
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
 
@@ -110,6 +117,14 @@ vlc_playlist_ItemsMoved(vlc_playlist_t *playlist, size_t index, size_t count,
 
     vlc_playlist_Notify(playlist, on_items_moved, index, count, target);
     vlc_playlist_state_NotifyChanges(playlist, &state);
+}
+
+static void
+vlc_playlist_ItemsRemoving(vlc_playlist_t *playlist, size_t index, size_t count)
+{
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+        randomizer_Remove(&playlist->randomizer,
+                          &playlist->items.data[index], count);
 }
 
 static void
@@ -261,6 +276,8 @@ vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count)
 {
     vlc_playlist_AssertLocked(playlist);
     assert(index < playlist->items.size);
+
+    vlc_playlist_ItemsRemoving(playlist, index, count);
 
     for (size_t i = 0; i < count; ++i)
         vlc_playlist_item_Release(playlist->items.data[index + i]);

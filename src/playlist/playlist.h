@@ -25,6 +25,7 @@
 #include <vlc_playlist.h>
 #include <vlc_vector.h>
 #include "../input/player.h"
+#include "randomizer.h"
 
 typedef struct input_item_t input_item_t;
 
@@ -48,6 +49,7 @@ struct vlc_playlist
     /* all remaining fields are protected by the lock of the player */
     struct vlc_player_listener_id *player_listener;
     playlist_item_vector_t items;
+    struct randomizer randomizer;
     ssize_t current;
     bool has_prev;
     bool has_next;
