@@ -191,7 +191,7 @@ typedef struct
 
     /* TS stream */
     es_out_t            *p_out;
-    vlc_array_t         es;
+    vlc_array_t         es; /* es_pair_t */
     int                 i_audio_stream_idx; /* Selected audio stream. -1 if default */
     int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
     bool                b_spu_enable;       /* enabled / disabled */
@@ -207,6 +207,73 @@ typedef struct
     char                *psz_bd_path;
 } demux_sys_t;
 
+/*
+ * Local ES index storage
+ */
+typedef struct
+{
+    int         i_pid;
+    es_out_id_t *p_es;
+} es_pair_t;
+
+static bool es_pair_Add(vlc_array_t *p_array, int i_pid, es_out_id_t *p_es)
+{
+    es_pair_t *p_pair = malloc(sizeof(*p_pair));
+    if (likely(p_pair != NULL))
+    {
+        p_pair->i_pid = i_pid;
+        p_pair->p_es = p_es;
+        if(vlc_array_append(p_array, p_pair) != VLC_SUCCESS)
+        {
+            free(p_pair);
+            p_pair = NULL;
+        }
+    }
+    return p_pair != NULL;
+}
+
+static void es_pair_Remove(vlc_array_t *p_array, es_pair_t *p_pair)
+{
+    vlc_array_remove(p_array, vlc_array_index_of_item(p_array, p_pair));
+    free(p_pair);
+}
+
+static es_pair_t *getEsPair(vlc_array_t *p_array,
+                            bool (*match)(const es_pair_t *, const void *),
+                            const void *param)
+{
+    for (size_t i = 0; i < vlc_array_count(p_array); ++i)
+    {
+        es_pair_t *p_pair = vlc_array_item_at_index(p_array, i);
+        if(match(p_pair, param))
+            return p_pair;
+    }
+    return NULL;
+}
+
+static bool es_pair_compare_PID(const es_pair_t *p_pair, const void *p_pid)
+{
+    return p_pair->i_pid == *((const int *)p_pid);
+}
+
+static bool es_pair_compare_ES(const es_pair_t *p_pair, const void *p_es)
+{
+    return p_pair->p_es == (const es_out_id_t *)p_es;
+}
+
+static es_pair_t *getEsPairByPID(vlc_array_t *p_array, int i_pid)
+{
+    return getEsPair(p_array, es_pair_compare_PID, &i_pid);
+}
+
+static es_pair_t *getEsPairByES(vlc_array_t *p_array, const es_out_id_t *p_es)
+{
+    return getEsPair(p_array, es_pair_compare_ES, p_es);
+}
+
+/*
+ * Subpicture updater
+*/
 struct bluray_spu_updater_sys_t
 {
     vlc_mutex_t          lock;      // protect p_overlay pointer and ref_cnt
@@ -939,29 +1006,6 @@ typedef struct
     es_out_t es_out;
 } es_out_sys_t;
 
-typedef struct  fmt_es_pair {
-    int         i_id;
-    es_out_id_t *p_es;
-}               fmt_es_pair_t;
-
-static int  findEsPairIndex(demux_sys_t *p_sys, int i_id)
-{
-    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
-        if (((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->i_id == i_id)
-            return i;
-
-    return -1;
-}
-
-static int  findEsPairIndexByEs(demux_sys_t *p_sys, es_out_id_t *p_es)
-{
-    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
-        if (((fmt_es_pair_t*)vlc_array_item_at_index(&p_sys->es, i))->p_es == p_es)
-            return i;
-
-    return -1;
-}
-
 static void setStreamLang(demux_sys_t *p_sys, es_format_t *p_fmt)
 {
     const BLURAY_STREAM_INFO *p_streams;
@@ -1051,18 +1095,12 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     es_out_id_t *p_es = es_out_Add(es_out_sys->p_dst_out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
-        int idx = findEsPairIndex(p_sys, p_fmt->i_id);
-        if (idx == -1) {
-            fmt_es_pair_t *p_pair = malloc(sizeof(*p_pair));
-            if (likely(p_pair != NULL)) {
-                p_pair->i_id = p_fmt->i_id;
-                p_pair->p_es = p_es;
-                msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
-                vlc_array_append_or_abort(&p_sys->es, p_pair);
-
-                if (b_select)
-                    es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
-            }
+        es_pair_t *p_pair = getEsPairByPID(&p_sys->es, p_fmt->i_id);
+        if (p_pair == NULL)
+        {
+            msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
+            if (es_pair_Add(&p_sys->es, p_fmt->i_id, p_es) && b_select)
+                es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
         }
     }
     if (p_es && fmt.i_cat == VIDEO_ES)
@@ -1090,11 +1128,9 @@ static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
     demux_t *p_demux = es_out_sys->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    int idx = findEsPairIndexByEs(p_sys, p_es);
-    if (idx >= 0) {
-        free(vlc_array_item_at_index(&p_sys->es, idx));
-        vlc_array_remove(&p_sys->es, idx);
-    }
+    es_pair_t *p_pair = getEsPairByES(&p_sys->es, p_es);
+    if (p_pair)
+        es_pair_Remove(&p_sys->es, p_pair);
 
     vlc_mutex_lock(&p_sys->bdj_overlay_lock);
     if (p_es == p_sys->p_video_es)
@@ -2259,9 +2295,9 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     }
 
     if (i_pid > 0) {
-        int i_idx = findEsPairIndex(p_sys, i_pid);
-        if (i_idx >= 0) {
-            fmt_es_pair_t *p_pair = vlc_array_item_at_index(&p_sys->es, i_idx);
+        es_pair_t *p_pair = getEsPairByPID(&p_sys->es, i_pid);
+        if (p_pair)
+        {
             assert(p_pair->p_es);
 
             if (i_type == BD_EVENT_PG_TEXTST_STREAM && !p_sys->b_spu_enable)
