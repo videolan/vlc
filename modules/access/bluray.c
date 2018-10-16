@@ -183,10 +183,7 @@ struct  demux_sys_t
 
     /* TS stream */
     es_out_t            *p_out;
-    int                 i_audio_stream_idx; /* Selected audio stream. -1 if default */
-    int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
     bool                b_spu_enable;       /* enabled / disabled */
-    int                 i_video_stream;
     vlc_demux_chained_t *p_parser;
     bool                b_flushed;
     bool                b_pl_playing;       /* true when playing playlist */
@@ -740,9 +737,6 @@ static int blurayOpen(vlc_object_t *object)
     if (unlikely(!p_sys))
         return VLC_ENOMEM;
 
-    p_sys->i_audio_stream_idx = -1;
-    p_sys->i_spu_stream_idx = -1;
-    p_sys->i_video_stream = -1;
     p_sys->i_still_end_time = STILL_IMAGE_NOT_SET;
 
     /* init demux info fields */
@@ -1076,6 +1070,12 @@ typedef struct
     vlc_object_t *p_obj;
     vlc_array_t es; /* es_pair_t */
     void *priv;
+    struct
+    {
+        int i_audio_pid; /* Selected audio stream. -1 if default */
+        int i_video_pid;
+        int i_spu_pid;   /* Selected spu stream. -1 if default */
+    } selected;
 } bluray_esout_sys_t;
 
 enum
@@ -1096,21 +1096,21 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 
     switch (fmt.i_cat) {
     case VIDEO_ES:
-        if (p_sys->i_video_stream != -1 && p_sys->i_video_stream != p_fmt->i_id)
+        if (esout_sys->selected.i_video_pid != -1 && esout_sys->selected.i_video_pid != p_fmt->i_id)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break ;
     case AUDIO_ES:
-        if (p_sys->i_audio_stream_idx != -1) {
-            if (blurayGetStreamPID(p_sys, BD_EVENT_AUDIO_STREAM, p_sys->i_audio_stream_idx) == p_fmt->i_id)
+        if (esout_sys->selected.i_audio_pid != -1) {
+            if (esout_sys->selected.i_audio_pid == p_fmt->i_id)
                 b_select = true;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         }
         setStreamLang(p_sys, &fmt);
         break ;
     case SPU_ES:
-        if (p_sys->i_spu_stream_idx != -1) {
-            if (blurayGetStreamPID(p_sys, BD_EVENT_PG_TEXTST_STREAM, p_sys->i_spu_stream_idx) == p_fmt->i_id)
-                b_select = true;
+        if (esout_sys->selected.i_spu_pid != -1) {
+            if (esout_sys->selected.i_spu_pid == p_fmt->i_id)
+                b_select = p_sys->b_spu_enable;
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         }
         setStreamLang(p_sys, &fmt);
@@ -1167,9 +1167,24 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
         case BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID:
         {
             bool b_select = (i_query == BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID);
-            es_pair_t *p_pair = getEsPairByPID(&esout_sys->es, va_arg(args, int));
+            const int i_bluray_stream_type = va_arg(args, int);
+            const int i_pid = va_arg(args, int);
+            switch(i_bluray_stream_type)
+            {
+                case BD_EVENT_AUDIO_STREAM:
+                    esout_sys->selected.i_audio_pid = i_pid;
+                    break;
+                case BD_EVENT_PG_TEXTST_STREAM:
+                    esout_sys->selected.i_spu_pid = i_pid;
+                    break;
+                default:
+                    break;
+            }
+
+            es_pair_t *p_pair = getEsPairByPID(&esout_sys->es, i_pid);
             if(unlikely(!p_pair))
                 return VLC_EGENERIC;
+
             if(b_select)
                 return es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES, p_pair->p_es);
             else
@@ -1215,6 +1230,9 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
     esout_sys->p_dst_out = p_dst_out;
     esout_sys->p_obj = p_obj;
     esout_sys->priv = priv;
+    esout_sys->selected.i_audio_pid = -1;
+    esout_sys->selected.i_video_pid = -1;
+    esout_sys->selected.i_spu_pid = -1;
     return p_out;
 }
 
@@ -1875,7 +1893,7 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
 #  define BLURAY_AUDIO_STREAM 0
 #endif
 
-static void blurayStreamSelected(demux_sys_t *p_sys, int i_pid)
+static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
 {
     vlc_mutex_lock(&p_sys->pl_info_lock);
 
@@ -1884,7 +1902,6 @@ static void blurayStreamSelected(demux_sys_t *p_sys, int i_pid)
             // audio
             for (int i_id = 0; i_id < p_sys->p_clip_info->audio_stream_count; i_id++) {
                 if (i_pid == p_sys->p_clip_info->audio_streams[i_id].pid) {
-                    p_sys->i_audio_stream_idx = i_id;
                     bd_select_stream(p_sys->bluray, BLURAY_AUDIO_STREAM, i_id + 1, 1);
                     break;
                 }
@@ -1893,7 +1910,6 @@ static void blurayStreamSelected(demux_sys_t *p_sys, int i_pid)
             // subtitle
             for (int i_id = 0; i_id < p_sys->p_clip_info->pg_stream_count; i_id++) {
                 if (i_pid == p_sys->p_clip_info->pg_streams[i_id].pid) {
-                    p_sys->i_spu_stream_idx = i_id;
                     bd_select_stream(p_sys->bluray, BLURAY_PG_TEXTST_STREAM, i_id + 1, 1);
                     break;
                 }
@@ -1939,7 +1955,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_ES:
     {
         int i_id = va_arg(args, int);
-        blurayStreamSelected(p_sys, i_id);
+        blurayOnUserStreamSelection(p_sys, i_id);
         break;
     }
     case DEMUX_SET_TITLE:
@@ -2296,7 +2312,7 @@ static void blurayStillImage( demux_t *p_demux, unsigned i_timeout )
     msleep( 40000 );
 }
 
-static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
+static void blurayOnStreamSelectedEvent(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     int i_pid = -1;
@@ -2305,22 +2321,17 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
     i_id--;
 
     if (i_type == BD_EVENT_AUDIO_STREAM) {
-        p_sys->i_audio_stream_idx = i_id;
         i_pid = blurayGetStreamPID(p_sys, i_type, i_id);
     } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
-        p_sys->i_spu_stream_idx = i_id;
         i_pid = blurayGetStreamPID(p_sys, i_type, i_id);
     }
 
     if (i_pid > 0)
     {
         if (i_type == BD_EVENT_PG_TEXTST_STREAM && !p_sys->b_spu_enable)
-            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID, i_pid);
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID, (int)i_type, i_pid);
         else
-        {
-            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID, i_pid);
-            blurayStreamSelected(p_sys, i_pid);
-        }
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID, (int)i_type, i_pid);
     }
 }
 
@@ -2354,7 +2365,6 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
     vlc_mutex_lock(&p_sys->pl_info_lock);
 
     p_sys->p_clip_info = NULL;
-    p_sys->i_video_stream = -1;
 
     if (p_sys->p_pl_info && clip < p_sys->p_pl_info->clip_count) {
 
@@ -2364,7 +2374,6 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
      * This may brake later, but it's enough for now.
      */
         assert(p_sys->p_clip_info->video_stream_count >= 1);
-        p_sys->i_video_stream = p_sys->p_clip_info->video_streams[0].pid;
     }
 
     vlc_mutex_unlock(&p_sys->pl_info_lock);
@@ -2450,7 +2459,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         break;
     case BD_EVENT_AUDIO_STREAM:
     case BD_EVENT_PG_TEXTST_STREAM:
-        blurayStreamSelect(p_demux, e->event, e->param);
+        blurayOnStreamSelectedEvent(p_demux, e->event, e->param);
         break;
     case BD_EVENT_IG_STREAM:
     case BD_EVENT_SECONDARY_AUDIO:
