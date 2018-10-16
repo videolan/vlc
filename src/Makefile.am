@@ -241,6 +241,7 @@ libvlccore_la_SOURCES = \
 	playlist/playlist.h \
 	playlist/preparse.c \
 	playlist/preparse.h \
+	playlist/request.c \
 	preparser/art.c \
 	preparser/art.h \
 	preparser/fetcher.c \
@@ -587,7 +588,8 @@ test_playlist_SOURCES = playlist/test.c \
 	playlist/notify.c \
 	playlist/player.c \
 	playlist/playlist.c \
-	playlist/preparse.c
+	playlist/preparse.c \
+	playlist/request.c
 test_playlist_CFLAGS = -DTEST_PLAYLIST
 
 AM_LDFLAGS = -no-install

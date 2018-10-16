@@ -919,6 +919,9 @@ vlc_playlist_Clear
 vlc_playlist_Insert
 vlc_playlist_Move
 vlc_playlist_Remove
+vlc_playlist_RequestInsert
+vlc_playlist_RequestMove
+vlc_playlist_RequestRemove
 vlc_playlist_IndexOf
 vlc_playlist_IndexOfMedia
 vlc_playlist_GetPlaybackRepeat
@@ -931,6 +934,7 @@ vlc_playlist_HasNext
 vlc_playlist_Prev
 vlc_playlist_Next
 vlc_playlist_GoTo
+vlc_playlist_RequestGoTo
 vlc_playlist_GetPlayer
 vlc_playlist_Start
 vlc_playlist_Stop
