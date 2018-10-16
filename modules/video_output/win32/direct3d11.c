@@ -505,11 +505,11 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
         out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     else
     {
-        bool isWin81OrGreater = false;
+        bool isWin80OrGreater = false;
         HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
         if (likely(hKernel32 != NULL))
-            isWin81OrGreater = GetProcAddress(hKernel32, "IsProcessCritical") != NULL;
-        if (isWin81OrGreater)
+            isWin80OrGreater = GetProcAddress(hKernel32, "CheckTokenCapability") != NULL;
+        if (isWin80OrGreater)
             out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
         else
         {
