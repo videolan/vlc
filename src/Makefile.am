@@ -245,6 +245,7 @@ libvlccore_la_SOURCES = \
 	playlist/randomizer.h \
 	playlist/request.c \
 	playlist/shuffle.c \
+	playlist/sort.c \
 	preparser/art.c \
 	preparser/art.h \
 	preparser/fetcher.c \
@@ -595,7 +596,8 @@ test_playlist_SOURCES = playlist/test.c \
 	playlist/preparse.c \
 	playlist/randomizer.c \
 	playlist/request.c \
-	playlist/shuffle.c
+	playlist/shuffle.c \
+	playlist/sort.c
 test_playlist_CFLAGS = -DTEST_PLAYLIST
 test_randomizer_SOURCES = playlist/randomizer.c
 test_randomizer_CFLAGS = -DTEST_RANDOMIZER

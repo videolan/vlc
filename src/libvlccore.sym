@@ -923,6 +923,7 @@ vlc_playlist_RequestInsert
 vlc_playlist_RequestMove
 vlc_playlist_RequestRemove
 vlc_playlist_Shuffle
+vlc_playlist_Sort
 vlc_playlist_IndexOf
 vlc_playlist_IndexOfMedia
 vlc_playlist_GetPlaybackRepeat

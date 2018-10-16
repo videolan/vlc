@@ -126,6 +126,33 @@ enum vlc_playlist_playback_order
     VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM,
 };
 
+enum vlc_playlist_sort_key
+{
+    VLC_PLAYLIST_SORT_KEY_TITLE,
+    VLC_PLAYLIST_SORT_KEY_DURATION,
+    VLC_PLAYLIST_SORT_KEY_ARTIST,
+    VLC_PLAYLIST_SORT_KEY_ALBUM,
+    VLC_PLAYLIST_SORT_KEY_ALBUM_ARTIST,
+    VLC_PLAYLIST_SORT_KEY_GENRE,
+    VLC_PLAYLIST_SORT_KEY_DATE,
+    VLC_PLAYLIST_SORT_KEY_TRACK_NUMBER,
+    VLC_PLAYLIST_SORT_KEY_DISC_NUMBER,
+    VLC_PLAYLIST_SORT_KEY_URL,
+    VLC_PLAYLIST_SORT_KEY_RATING,
+};
+
+enum vlc_playlist_sort_order
+{
+    VLC_PLAYLIST_SORT_ORDER_ASCENDING,
+    VLC_PLAYLIST_SORT_ORDER_DESCENDING,
+};
+
+struct vlc_playlist_sort_criterion
+{
+    enum vlc_playlist_sort_key key;
+    enum vlc_playlist_sort_order order;
+};
+
 /**
  * Playlist callbacks.
  *
@@ -588,6 +615,19 @@ vlc_playlist_RequestRemove(vlc_playlist_t *playlist,
  */
 VLC_API void
 vlc_playlist_Shuffle(vlc_playlist_t *playlist);
+
+/**
+ * Sort the playlist by a list of criteria.
+ *
+ * \param playlist the playlist, locked
+ * \param criteria the sort criteria (in order)
+ * \param count    the number of criteria
+ * \return VLC_SUCCESS on success, another value on error
+ */
+VLC_API int
+vlc_playlist_Sort(vlc_playlist_t *playlist,
+                  const struct vlc_playlist_sort_criterion criteria[],
+                  size_t count);
 
 /**
  * Return the index of a given item.

@@ -112,6 +112,10 @@ typedef struct
 # include <dirent.h>
 #endif
 
+#ifdef _WIN32
+# define qsort_r qsort_s
+#endif
+
 #ifdef __cplusplus
 # define VLC_NOTHROW throw ()
 extern "C" {
