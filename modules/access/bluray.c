@@ -997,15 +997,6 @@ static void blurayClose(vlc_object_t *object)
 /*****************************************************************************
  * Elementary streams handling
  *****************************************************************************/
-
-typedef struct
-{
-    es_out_t *p_dst_out;
-    vlc_object_t *p_obj;
-    void *priv;
-    es_out_t es_out;
-} es_out_sys_t;
-
 static void setStreamLang(demux_sys_t *p_sys, es_format_t *p_fmt)
 {
     const BLURAY_STREAM_INFO *p_streams;
@@ -1057,10 +1048,21 @@ static int blurayEsPid(demux_sys_t *p_sys, int es_type, int i_es_idx)
     return i_pid;
 }
 
-static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
+/*****************************************************************************
+ * bluray fake es_out
+ *****************************************************************************/
+typedef struct
 {
-    es_out_sys_t *es_out_sys = container_of(p_out, es_out_sys_t, es_out);
-    demux_t *p_demux = es_out_sys->priv;
+    es_out_t *p_dst_out;
+    vlc_object_t *p_obj;
+    void *priv;
+    es_out_t es_out;
+} bluray_esout_priv_t;
+
+static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
+{
+    bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
+    demux_t *p_demux = esout_priv->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
     es_format_t fmt;
     bool b_select = false;
@@ -1092,7 +1094,7 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         ;
     }
 
-    es_out_id_t *p_es = es_out_Add(es_out_sys->p_dst_out, &fmt);
+    es_out_id_t *p_es = es_out_Add(esout_priv->p_dst_out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
         es_pair_t *p_pair = getEsPairByPID(&p_sys->es, p_fmt->i_id);
@@ -1115,17 +1117,17 @@ static es_out_id_t *esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     return p_es;
 }
 
-static int esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block)
+static int bluray_esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block)
 {
-    es_out_sys_t *es_out_sys = container_of(p_out, es_out_sys_t, es_out);
+    bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
 
-    return es_out_Send(es_out_sys->p_dst_out, p_es, p_block);
+    return es_out_Send(esout_priv->p_dst_out, p_es, p_block);
 }
 
-static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
+static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
-    es_out_sys_t *es_out_sys = container_of(p_out, es_out_sys_t, es_out);
-    demux_t *p_demux = es_out_sys->priv;
+    bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
+    demux_t *p_demux = esout_priv->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     es_pair_t *p_pair = getEsPairByES(&p_sys->es, p_es);
@@ -1137,47 +1139,47 @@ static void esOutDel(es_out_t *p_out, es_out_id_t *p_es)
         p_sys->p_video_es = NULL;
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
 
-    es_out_Del(es_out_sys->p_dst_out, p_es);
+    es_out_Del(esout_priv->p_dst_out, p_es);
 }
 
-static int esOutControl(es_out_t *p_out, int i_query, va_list args)
+static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
-    es_out_sys_t *es_out_sys = container_of(p_out, es_out_sys_t, es_out);
+    bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
 
-    return es_out_vaControl(es_out_sys->p_dst_out, i_query, args);
+    return es_out_vaControl(esout_priv->p_dst_out, i_query, args);
 }
 
-static void esOutDestroy(es_out_t *p_out)
+static void bluray_esOutDestroy(es_out_t *p_out)
 {
-    es_out_sys_t *es_out_sys = container_of(p_out, es_out_sys_t, es_out);
-    demux_t *p_demux = es_out_sys->priv;
+    bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
+    demux_t *p_demux = esout_priv->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
     for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
         free(vlc_array_item_at_index(&p_sys->es, i));
     vlc_array_clear(&p_sys->es);
-    free(es_out_sys);
+    free(esout_priv);
 }
 
-static const struct es_out_callbacks esOutCallbacks = {
-    .add = esOutAdd,
-    .send = esOutSend,
-    .del = esOutDel,
-    .control = esOutControl,
-    .destroy = esOutDestroy,
+static const struct es_out_callbacks bluray_esOutCallbacks = {
+    .add = bluray_esOutAdd,
+    .send = bluray_esOutSend,
+    .del = bluray_esOutDel,
+    .control = bluray_esOutControl,
+    .destroy = bluray_esOutDestroy,
 };
 
 static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
 {
-    es_out_sys_t *es_out_sys = malloc(sizeof(*es_out_sys));
-    if (unlikely(es_out_sys == NULL))
+    bluray_esout_priv_t *esout_priv = malloc(sizeof(*esout_priv));
+    if (unlikely(esout_priv == NULL))
         return NULL;
 
-    es_out_sys->p_dst_out = p_dst_out;
-    es_out_sys->p_obj = p_obj;
-    es_out_sys->priv = priv;
-    es_out_sys->es_out.cbs = &esOutCallbacks;
-    return &es_out_sys->es_out;
+    esout_priv->p_dst_out = p_dst_out;
+    esout_priv->p_obj = p_obj;
+    esout_priv->priv = priv;
+    esout_priv->es_out.cbs = &bluray_esOutCallbacks;
+    return &esout_priv->es_out;
 }
 
 /*****************************************************************************
