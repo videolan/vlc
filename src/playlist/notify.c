@@ -27,10 +27,28 @@
 #include "item.h"
 #include "playlist.h"
 
+static void
+vlc_playlist_NotifyCurrentState(vlc_playlist_t *playlist,
+                                vlc_playlist_listener_id *listener)
+{
+    vlc_playlist_NotifyListener(playlist, listener, on_items_reset,
+                                playlist->items.data, playlist->items.size);
+    vlc_playlist_NotifyListener(playlist, listener, on_playback_repeat_changed,
+                                playlist->repeat);
+    vlc_playlist_NotifyListener(playlist, listener, on_playback_order_changed,
+                                playlist->order);
+    vlc_playlist_NotifyListener(playlist, listener, on_current_index_changed,
+                                playlist->current);
+    vlc_playlist_NotifyListener(playlist, listener, on_has_prev_changed,
+                                playlist->has_prev);
+    vlc_playlist_NotifyListener(playlist, listener, on_has_next_changed,
+                                playlist->has_next);
+}
+
 vlc_playlist_listener_id *
 vlc_playlist_AddListener(vlc_playlist_t *playlist,
                          const struct vlc_playlist_callbacks *cbs,
-                         void *userdata)
+                         void *userdata, bool notify_current_state)
 {
     vlc_playlist_AssertLocked(playlist);
 
@@ -41,6 +59,9 @@ vlc_playlist_AddListener(vlc_playlist_t *playlist,
     listener->cbs = cbs;
     listener->userdata = userdata;
     vlc_list_append(&listener->node, &playlist->listeners);
+
+    if (notify_current_state)
+        vlc_playlist_NotifyCurrentState(playlist, listener);
 
     return listener;
 }

@@ -366,15 +366,23 @@ vlc_playlist_Unlock(vlc_playlist_t *);
  * Return an opaque listener identifier, to be passed to
  * vlc_player_RemoveListener().
  *
- * \param playlist the playlist, locked
- * \param cbs      the callbacks (must be valid until the listener is removed)
- * \param userdata userdata provided as a parameter in callbacks
+ * If notify_current_state is true, the callbacks are called once with the
+ * current state of the playlist. This is useful because when a client
+ * registers to the playlist, it may already contain items. Calling callbacks
+ * is a convenient way to initialize the client automatically.
+ *
+ * \param playlist             the playlist, locked
+ * \param cbs                  the callbacks (must be valid until the listener
+ *                             is removed)
+ * \param userdata             userdata provided as a parameter in callbacks
+ * \param notify_current_state true to notify the current state immediately via
+ *                             callbacks
  * \return a listener identifier, or NULL if an error occurred
  */
 VLC_API VLC_USED vlc_playlist_listener_id *
 vlc_playlist_AddListener(vlc_playlist_t *playlist,
                          const struct vlc_playlist_callbacks *cbs,
-                         void *userdata);
+                         void *userdata, bool notify_current_state);
 
 /**
  * Remove a player listener.
