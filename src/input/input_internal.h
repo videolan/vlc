@@ -95,6 +95,14 @@ typedef union
         bool b_absolute;
         vlc_tick_t i_val;
     } delay;
+    struct {
+        vlc_es_id_t *id;
+        unsigned page;
+    } vbi_page;
+    struct {
+        vlc_es_id_t *id;
+        bool enabled;
+    } vbi_transparency;
 } input_control_param_t;
 
 typedef struct
@@ -252,6 +260,9 @@ enum input_control_e
     INPUT_CONTROL_SET_FRAME_NEXT,
 
     INPUT_CONTROL_SET_RENDERER,
+
+    INPUT_CONTROL_SET_VBI_PAGE,
+    INPUT_CONTROL_SET_VBI_TRANSPARENCY,
 };
 
 /* Internal helpers */

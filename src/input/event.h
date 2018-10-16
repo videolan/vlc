@@ -262,6 +262,23 @@ static inline void input_SendEventParsing(input_thread_t *p_input,
     });
 }
 
+static inline void input_SendEventVbiPage(input_thread_t *p_input, unsigned page)
+{
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_VBI_PAGE,
+        .vbi_page = page,
+    });
+}
+
+static inline void input_SendEventVbiTransparency(input_thread_t *p_input,
+                                                  bool transparent)
+{
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_VBI_TRANSPARENCY,
+        .vbi_transparent = transparent,
+    });
+}
+
 /*****************************************************************************
  * Event for resource.c
  *****************************************************************************/

@@ -2329,6 +2329,15 @@ static bool Control( input_thread_t *p_input,
 #endif
             break;
         }
+        case INPUT_CONTROL_SET_VBI_PAGE:
+            es_out_Control( priv->p_es_out_display, ES_OUT_SET_VBI_PAGE,
+                            param.vbi_page.id, param.vbi_page.page );
+            break;
+        case INPUT_CONTROL_SET_VBI_TRANSPARENCY:
+            es_out_Control( priv->p_es_out_display, ES_OUT_SET_VBI_TRANSPARENCY,
+                            param.vbi_transparency.id,
+                            param.vbi_transparency.enabled );
+            break;
 
         case INPUT_CONTROL_NAV_ACTIVATE:
         case INPUT_CONTROL_NAV_UP:

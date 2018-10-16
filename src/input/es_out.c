@@ -1852,6 +1852,18 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
 
     /* Mark it as selected */
     EsOutSendEsEvent(out, es, VLC_INPUT_ES_SELECTED);
+
+    /* Special case of the zvbi decoder for teletext: send the initial selected
+     * page and transparency */
+    if( !es->p_master && es->fmt.i_cat == SPU_ES
+     && es->fmt.i_codec == VLC_CODEC_TELETEXT
+     && var_Type( es->p_dec, "vbi-page" ) == VLC_VAR_INTEGER )
+    {
+        input_SendEventVbiPage( p_input,
+                                var_GetInteger( es->p_dec, "vbi-page" ) );
+        input_SendEventVbiTransparency( p_input,
+                                        var_GetBool( es->p_dec, "vbi-opaque" ) );
+    }
 }
 
 static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
@@ -3041,7 +3053,32 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
             return input_DecoderSetSpuHighlight( p_es->p_dec, spu_hl );
         return VLC_EGENERIC;
     }
+    case ES_OUT_SET_VBI_PAGE:
+    case ES_OUT_SET_VBI_TRANSPARENCY:
+    {
+        es_out_id_t *es = va_arg( args, es_out_id_t * );
+        assert(es);
+        if( !es->p_dec || es->fmt.i_cat != SPU_ES
+          || es->fmt.i_codec != VLC_CODEC_TELETEXT )
+            return VLC_EGENERIC;
 
+        int ret;
+        if( i_query == ES_OUT_SET_VBI_PAGE )
+        {
+            unsigned page = va_arg( args, unsigned );
+            ret = var_SetInteger( es->p_dec, "vbi-page", page );
+            if( ret == VLC_SUCCESS )
+                input_SendEventVbiPage( p_sys->p_input, page );
+        }
+        else
+        {
+            bool opaque = va_arg( args, int );
+            ret = var_SetBool( es->p_dec, "vbi-opaque", opaque );
+            if( ret == VLC_SUCCESS )
+                input_SendEventVbiTransparency( p_sys->p_input, opaque );
+        }
+        return ret;
+    }
     default:
         msg_Err( p_sys->p_input, "unknown query 0x%x in %s", i_query,
                  __func__  );

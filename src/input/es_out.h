@@ -85,6 +85,12 @@ enum es_out_query_private_e
 
     /* Set End Of Stream */
     ES_OUT_SET_EOS,                                 /* res=cannot fail */
+
+    /* Set a VBI/Teletext page */
+    ES_OUT_SET_VBI_PAGE,                            /* arg1=unsigned res=can fail */
+
+    /* Set VBI/Teletext menu transparent */
+    ES_OUT_SET_VBI_TRANSPARENCY                     /* arg1=bool res=can fail */
 };
 
 static inline void es_out_SetMode( es_out_t *p_out, int i_mode )

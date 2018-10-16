@@ -747,6 +747,8 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_START_ALL_ES:
     case ES_OUT_SET_DELAY:
     case ES_OUT_SET_RECORD_STATE:
+    case ES_OUT_SET_VBI_PAGE:
+    case ES_OUT_SET_VBI_TRANSPARENCY:
     default:
         vlc_assert_unreachable();
         return VLC_EGENERIC;
