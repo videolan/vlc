@@ -211,21 +211,26 @@ typedef struct
  */
 typedef struct
 {
-    int         i_pid;
+    es_format_t fmt;
     es_out_id_t *p_es;
 } es_pair_t;
 
-static bool es_pair_Add(vlc_array_t *p_array, int i_pid, es_out_id_t *p_es)
+static bool es_pair_Add(vlc_array_t *p_array, const es_format_t *p_fmt,
+                        es_out_id_t *p_es)
 {
     es_pair_t *p_pair = malloc(sizeof(*p_pair));
     if (likely(p_pair != NULL))
     {
-        p_pair->i_pid = i_pid;
         p_pair->p_es = p_es;
         if(vlc_array_append(p_array, p_pair) != VLC_SUCCESS)
         {
             free(p_pair);
             p_pair = NULL;
+        }
+        else
+        {
+            es_format_Init(&p_pair->fmt, p_fmt->i_cat, p_fmt->i_codec);
+            es_format_Copy(&p_pair->fmt, p_fmt);
         }
     }
     return p_pair != NULL;
@@ -234,6 +239,7 @@ static bool es_pair_Add(vlc_array_t *p_array, int i_pid, es_out_id_t *p_es)
 static void es_pair_Remove(vlc_array_t *p_array, es_pair_t *p_pair)
 {
     vlc_array_remove(p_array, vlc_array_index_of_item(p_array, p_pair));
+    es_format_Clean(&p_pair->fmt);
     free(p_pair);
 }
 
@@ -252,7 +258,7 @@ static es_pair_t *getEsPair(vlc_array_t *p_array,
 
 static bool es_pair_compare_PID(const es_pair_t *p_pair, const void *p_pid)
 {
-    return p_pair->i_pid == *((const int *)p_pid);
+    return p_pair->fmt.i_id == *((const int *)p_pid);
 }
 
 static bool es_pair_compare_ES(const es_pair_t *p_pair, const void *p_es)
@@ -1128,7 +1134,7 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         if (p_pair == NULL)
         {
             msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
-            if (es_pair_Add(&esout_priv->es, p_fmt->i_id, p_es) && b_select)
+            if (es_pair_Add(&esout_priv->es, &fmt, p_es) && b_select)
                 es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
         }
     }
