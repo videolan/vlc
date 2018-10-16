@@ -4,7 +4,7 @@ QT_VERSION_MAJOR := 5.11
 QT_VERSION := $(QT_VERSION_MAJOR).0
 # Insert potential -betaX suffix here:
 QT_VERSION_FULL := $(QT_VERSION)
-QT_URL := https://download.qt.io/development_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
+QT_URL := https://download.qt.io/official_releases/qt/$(QT_VERSION_MAJOR)/$(QT_VERSION_FULL)/submodules/qtbase-everywhere-src-$(QT_VERSION_FULL).tar.xz
 
 ifdef HAVE_MACOSX
 #PKGS += qt
