@@ -1119,6 +1119,12 @@ static inline void *vlc_alloc(size_t count, size_t size)
     return mul_overflow(count, size, &size) ? NULL : malloc(size);
 }
 
+VLC_USED
+static inline void *vlc_reallocarray(void *ptr, size_t count, size_t size)
+{
+    return mul_overflow(count, size, &size) ? NULL : realloc(ptr, size);
+}
+
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
