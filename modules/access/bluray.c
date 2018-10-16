@@ -183,7 +183,6 @@ struct  demux_sys_t
 
     /* TS stream */
     es_out_t            *p_out;
-    vlc_array_t         es; /* es_pair_t */
     int                 i_audio_stream_idx; /* Selected audio stream. -1 if default */
     int                 i_spu_stream_idx;   /* Selected subtitle stream. -1 if default */
     bool                b_spu_enable;       /* enabled / disabled */
@@ -907,7 +906,6 @@ static int blurayOpen(vlc_object_t *object)
         }
     }
 
-    vlc_array_init(&p_sys->es);
     p_sys->p_out = esOutNew(VLC_OBJECT(p_demux), p_demux->out, p_demux);
     if (unlikely(p_sys->p_out == NULL))
         goto error;
@@ -966,10 +964,7 @@ static void blurayClose(vlc_object_t *object)
 
     if (p_sys->p_parser)
         vlc_demux_chained_Delete(p_sys->p_parser);
-    if (p_sys->p_out != NULL)
-        es_out_Delete(p_sys->p_out);
-    assert(vlc_array_count(&p_sys->es) == 0);
-    vlc_array_clear(&p_sys->es);
+    es_out_Delete(p_sys->p_out);
 
     /* Titles */
     for (unsigned int i = 0; i < p_sys->i_title; i++)
@@ -1073,8 +1068,15 @@ typedef struct
 {
     es_out_t *p_dst_out;
     vlc_object_t *p_obj;
+    vlc_array_t es; /* es_pair_t */
     void *priv;
 } bluray_esout_sys_t;
+
+enum
+{
+    BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID = ES_OUT_PRIVATE_START,
+    BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID,
+};
 
 static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 {
@@ -1114,11 +1116,11 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     es_out_id_t *p_es = es_out_Add(esout_sys->p_dst_out, &fmt);
     if (p_fmt->i_id >= 0) {
         /* Ensure we are not overriding anything */
-        es_pair_t *p_pair = getEsPairByPID(&p_sys->es, p_fmt->i_id);
+        es_pair_t *p_pair = getEsPairByPID(&esout_sys->es, p_fmt->i_id);
         if (p_pair == NULL)
         {
             msg_Info(p_demux, "Adding ES %d", p_fmt->i_id);
-            if (es_pair_Add(&p_sys->es, p_fmt->i_id, p_es) && b_select)
+            if (es_pair_Add(&esout_sys->es, p_fmt->i_id, p_es) && b_select)
             {
                 if (fmt.i_cat == AUDIO_ES) {
                     var_SetInteger( p_demux->p_input, "audio-es", p_fmt->i_id );
@@ -1142,12 +1144,10 @@ static int bluray_esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block
 static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
     bluray_esout_sys_t *esout_sys = (bluray_esout_sys_t *)p_out->p_sys;
-    demux_t *p_demux = esout_sys->priv;
-    demux_sys_t *p_sys = p_demux->p_sys;
 
-    es_pair_t *p_pair = getEsPairByES(&p_sys->es, p_es);
+    es_pair_t *p_pair = getEsPairByES(&esout_sys->es, p_es);
     if (p_pair)
-        es_pair_Remove(&p_sys->es, p_pair);
+        es_pair_Remove(&esout_sys->es, p_pair);
 
     es_out_Del(esout_sys->p_dst_out, p_es);
 }
@@ -1155,19 +1155,33 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
     bluray_esout_sys_t *esout_sys = (bluray_esout_sys_t *)p_out->p_sys;
-
-    return es_out_vaControl(esout_sys->p_dst_out, i_query, args);
+    switch(i_query)
+    {
+        case BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID:
+        case BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID:
+        {
+            bool b_select = (i_query == BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID);
+            es_pair_t *p_pair = getEsPairByPID(&esout_sys->es, va_arg(args, int));
+            if(unlikely(!p_pair))
+                return VLC_EGENERIC;
+            if(b_select)
+                return es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES, p_pair->p_es);
+            else
+                return es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES_STATE,
+                                      p_pair->p_es, false);
+        };
+        default:
+            return es_out_vaControl(esout_sys->p_dst_out, i_query, args);
+    }
 }
 
 static void bluray_esOutDestroy(es_out_t *p_out)
 {
     bluray_esout_sys_t *esout_sys = (bluray_esout_sys_t *)p_out->p_sys;
-    demux_t *p_demux = esout_sys->priv;
-    demux_sys_t *p_sys = p_demux->p_sys;
 
-    for (size_t i = 0; i < vlc_array_count(&p_sys->es); ++i)
-        free(vlc_array_item_at_index(&p_sys->es, i));
-    vlc_array_clear(&p_sys->es);
+    for (size_t i = 0; i < vlc_array_count(&esout_sys->es); ++i)
+        free(vlc_array_item_at_index(&esout_sys->es, i));
+    vlc_array_clear(&esout_sys->es);
     free(p_out->p_sys);
     free(p_out);
 }
@@ -1191,6 +1205,7 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
         return NULL;
     }
     p_out->p_sys = (es_out_sys_t *) esout_sys;
+    vlc_array_init(&esout_sys->es);
     esout_sys->p_dst_out = p_dst_out;
     esout_sys->p_obj = p_obj;
     esout_sys->priv = priv;
@@ -2293,21 +2308,12 @@ static void blurayStreamSelect(demux_t *p_demux, uint32_t i_type, uint32_t i_id)
 
     if (i_pid > 0)
     {
-        es_pair_t *p_pair = getEsPairByPID(&p_sys->es, i_pid);
-        if (p_pair)
+        if (i_type == BD_EVENT_PG_TEXTST_STREAM && !p_sys->b_spu_enable)
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID, i_pid);
+        else
         {
-            assert(p_pair->p_es);
-
-            bool b_select = false;
-            if (i_type == BD_EVENT_AUDIO_STREAM) {
-                var_SetInteger( p_demux->p_input, "audio-es", i_pid );
-            } else if (i_type == BD_EVENT_PG_TEXTST_STREAM) {
-                b_select = p_sys->b_spu_enable;
-                var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? i_pid : -1 );
-            }
-
-            if(b_select)
-                blurayStreamSelected(p_sys, i_pid);
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID, i_pid);
+            blurayStreamSelected(p_sys, i_pid);
         }
     }
 }
