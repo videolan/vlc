@@ -495,18 +495,14 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
     //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
 
     bool isWin10OrGreater = false;
-    HMODULE hKernelBase = GetModuleHandle(TEXT("kernelbase.dll"));
-    if (likely(hKernelBase != NULL))
-    {
-        isWin10OrGreater = GetProcAddress(hKernelBase, "VirtualAllocFromApp") != NULL;
-        FreeLibrary(hKernelBase);
-    }
+    HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+    if (likely(hKernel32 != NULL))
+        isWin10OrGreater = GetProcAddress(hKernel32, "GetSystemCpuSetInformation") != NULL;
     if (isWin10OrGreater)
         out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     else
     {
         bool isWin80OrGreater = false;
-        HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
         if (likely(hKernel32 != NULL))
             isWin80OrGreater = GetProcAddress(hKernel32, "CheckTokenCapability") != NULL;
         if (isWin80OrGreater)
