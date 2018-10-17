@@ -48,8 +48,6 @@
 static int  Open ( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
-#define SUB_DELAY_LONGTEXT \
-    N_("Apply a delay to all subtitles (in 1/10s, eg 100 means 10s).")
 #define SUB_FPS_LONGTEXT \
     N_("Override the normal frames per second settings. " \
     "This will only work with MicroDVD and SubRIP (SRT) subtitles.")
@@ -75,9 +73,6 @@ vlc_module_begin ()
     add_float( "sub-fps", 0.0,
                N_("Frames per Second"),
                SUB_FPS_LONGTEXT, true )
-    add_integer( "sub-delay", 0,
-               N_("Subtitle delay"),
-               SUB_DELAY_LONGTEXT, true )
     add_string( "sub-type", "auto", N_("Subtitle format"),
                 SUB_TYPE_LONGTEXT, true )
         change_string_list( ppsz_sub_type, ppsz_sub_type )

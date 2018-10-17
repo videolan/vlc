@@ -764,6 +764,10 @@ static const char *const ppsz_prefres[] = {
     "Look for a subtitle file in those paths too, if your subtitle " \
     "file was not found in the current directory.")
 
+#define SUB_DELAY_TEXT N_("Subtitle delay")
+#define SUB_DELAY_LONGTEXT \
+    N_("Apply a delay to all subtitles (in 1/10s, eg 100 means 10s).")
+
 #define SUB_FILE_TEXT N_("Use subtitle file")
 #define SUB_FILE_LONGTEXT N_( \
     "Load this subtitle file. To be used when autodetect cannot detect " \
@@ -1702,6 +1706,7 @@ vlc_module_begin ()
                TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
     set_section( N_("Subtitles") , NULL )
+    add_integer( "sub-delay", 0, SUB_DELAY_TEXT, SUB_DELAY_LONGTEXT, false )
     add_loadfile("sub-file", NULL, SUB_FILE_TEXT, SUB_FILE_LONGTEXT)
         change_safe()
     add_bool( "sub-autodetect-file", true,
