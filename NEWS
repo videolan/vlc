@@ -10,6 +10,10 @@ Demux:
 Audio output:
  * Fix corking when the play is paused
 
+Video Output:
+ * fix Direct3D11 tone-mapping when HDR is displayed on an SDR screen
+ * More accurate colors for SD sources in Direct3D11
+ * Disable hardware decoding on some old Intel GPUs
 
 Changes between 3.0.3 and 3.0.4:
 --------------------------------
