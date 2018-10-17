@@ -360,7 +360,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     TAB_INIT( priv->i_attachment, priv->attachment );
     priv->attachment_demux = NULL;
     priv->p_sout   = NULL;
-    priv->b_out_pace_control = false;
+    priv->b_out_pace_control = b_thumbnailing;
     priv->p_renderer = p_renderer && b_preparsing == false ?
                 vlc_renderer_item_hold( p_renderer ) : NULL;
 
