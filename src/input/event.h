@@ -182,6 +182,14 @@ static inline void input_SendEventMetaEpg(input_thread_t *p_input)
     });
 }
 
+static inline void input_SendEventSubsFPS(input_thread_t *p_input, float fps)
+{
+    input_SendEvent(p_input, &(struct vlc_input_event) {
+        .type = INPUT_EVENT_SUBS_FPS,
+        .subs_fps = fps,
+    });
+}
+
 /*****************************************************************************
  * Event for es_out.c
  *****************************************************************************/

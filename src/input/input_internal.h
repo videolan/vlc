@@ -69,6 +69,10 @@ typedef struct
     bool b_rescale_ts;
     double f_fps;
 
+    /* sub-fps handling */
+    bool b_slave_sub;
+    unsigned i_sub_rate;
+
     /* */
     vlc_tick_t i_pts_delay;
 
@@ -175,6 +179,7 @@ typedef struct input_thread_private_t
     /* Slave sources (subs, and others) */
     int            i_slave;
     input_source_t **slave;
+    unsigned i_slave_subs_rate;
 
     /* Last ES added */
     enum es_format_category_e i_last_es_cat;
@@ -252,6 +257,7 @@ enum input_control_e
     INPUT_CONTROL_SET_SPU_DELAY,
 
     INPUT_CONTROL_ADD_SLAVE,
+    INPUT_CONTROL_SET_SUBS_FPS,
 
     INPUT_CONTROL_SET_RECORD_STATE,
 

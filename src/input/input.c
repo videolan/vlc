@@ -996,6 +996,16 @@ static bool SlaveExists( input_item_slave_t **pp_slaves, int i_slaves,
     return false;
 }
 
+static void RequestSubRate( input_thread_t *p_input, float f_slave_fps )
+{
+    input_thread_private_t *priv = input_priv(p_input);
+    const float f_fps = input_priv(p_input)->master->f_fps;
+    if( f_fps > 1.f && f_slave_fps > 1.f )
+        priv->i_slave_subs_rate = INPUT_RATE_DEFAULT / ( f_fps / f_slave_fps );
+    else if ( priv->i_slave_subs_rate != 0 )
+        priv->i_slave_subs_rate = INPUT_RATE_DEFAULT;
+}
+
 static void SetSubtitlesOptions( input_thread_t *p_input )
 {
     input_thread_private_t *priv = input_priv(p_input);
@@ -1005,6 +1015,7 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
     if( f_fps > 1.f )
     {
         var_SetFloat( p_input, "sub-original-fps", f_fps );
+        RequestSubRate( p_input, var_InheritFloat( p_input, "sub-fps" ) );
     }
 
     int64_t sub_delay = var_InheritInteger( p_input, "sub-delay" );
@@ -2229,6 +2240,10 @@ static bool Control( input_thread_t *p_input,
                 }
             }
             break;
+        case INPUT_CONTROL_SET_SUBS_FPS:
+            RequestSubRate( p_input, param.val.f_float );
+            input_SendEventSubsFPS( p_input, param.val.f_float );
+            break;
 
         case INPUT_CONTROL_SET_RECORD_STATE:
             val = param.val;
@@ -2846,6 +2861,7 @@ static void InputSourceMeta( input_thread_t *p_input,
 
 static void SlaveDemux( input_thread_t *p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
     vlc_tick_t i_time;
     int i;
 
@@ -2862,6 +2878,19 @@ static void SlaveDemux( input_thread_t *p_input )
 
         if( in->b_eof )
             continue;
+
+        if( priv->i_slave_subs_rate != in->i_sub_rate )
+        {
+            if( in->b_slave_sub && in->b_can_rate_control )
+            {
+                if( in->i_sub_rate != 0 ) /* Don't reset when it's the first time */
+                    es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
+                int i_new_rate = priv->i_slave_subs_rate;
+                demux_Control( in->p_demux, DEMUX_SET_RATE, &i_new_rate );
+            }
+            in->i_sub_rate = priv->i_slave_subs_rate;
+        }
+
 
         /* Call demux_Demux until we have read enough data */
         if( demux_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
@@ -3344,6 +3373,8 @@ static int input_SlaveSourceAdd( input_thread_t *p_input,
         /* Get meta (access and demux) */
         InputUpdateMeta( p_input, p_source->p_demux );
     }
+    else
+        p_source->b_slave_sub = true;
 
     TAB_APPEND( priv->i_slave, priv->slave, p_source );
 

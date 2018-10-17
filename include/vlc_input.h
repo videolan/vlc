@@ -392,6 +392,9 @@ typedef enum input_event_type_e
     INPUT_EVENT_VBI_PAGE,
     /* vbi_transparent has changed */
     INPUT_EVENT_VBI_TRANSPARENCY,
+
+    /* subs_fps has changed */
+    INPUT_EVENT_SUBS_FPS,
 } input_event_type_e;
 
 #define VLC_INPUT_CAPABILITIES_SEEKABLE (1<<0)
@@ -523,6 +526,8 @@ struct vlc_input_event
         unsigned vbi_page;
         /* INPUT_EVENT_VBI_TRANSPARENCY */
         bool vbi_transparent;
+        /* INPUT_EVENT_SUBS_FPS */
+        float subs_fps;
     };
 };
 
