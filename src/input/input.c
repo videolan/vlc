@@ -998,6 +998,8 @@ static bool SlaveExists( input_item_slave_t **pp_slaves, int i_slaves,
 
 static void SetSubtitlesOptions( input_thread_t *p_input )
 {
+    input_thread_private_t *priv = input_priv(p_input);
+
     /* Get fps and set it if not already set */
     const float f_fps = input_priv(p_input)->master->f_fps;
     if( f_fps > 1.f )
@@ -1007,9 +1009,13 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
             var_SetFloat( p_input, "sub-fps", f_fps );
     }
 
-    const int i_delay = var_CreateGetInteger( p_input, "sub-delay" );
-    if( i_delay != 0 )
-        var_SetInteger( p_input, "spu-delay", vlc_tick_from_samples(i_delay, 10) );
+    int64_t sub_delay = var_InheritInteger( p_input, "sub-delay" );
+    if( sub_delay != 0 )
+    {
+        priv->i_spu_delay = vlc_tick_from_samples(sub_delay, 10);
+        input_SendEventSubtitleDelay( p_input, priv->i_spu_delay );
+        /* UpdatePtsDelay will be called next by InitPrograms */
+    }
 }
 
 static void GetVarSlaves( input_thread_t *p_input,
