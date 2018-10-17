@@ -795,6 +795,9 @@ void input_ConfigVarInit ( input_thread_t *p_input )
     var_Create( p_input, "meta-description", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     var_Create( p_input, "meta-date", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_Create( p_input, "meta-url", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+    /* Inherited by demux/subtitle.c */
+    var_Create( p_input, "sub-original-fps", VLC_VAR_FLOAT );
 }
 
 /*****************************************************************************

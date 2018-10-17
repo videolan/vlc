@@ -330,7 +330,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->props.sami.psz_start     = NULL;
 
     /* Get the FPS */
-    f_fps = var_CreateGetFloat( p_demux, "sub-fps" );
+    f_fps = var_CreateGetFloat( p_demux, "sub-original-fps" );
     if( f_fps >= 1.f )
     {
         p_sys->props.i_microsecperframe = llroundf( (float)CLOCK_FREQ / f_fps );
@@ -996,9 +996,9 @@ static int ParseMicroDvd( vlc_object_t *p_obj, subs_properties_t *p_props,
                 break;
 
             /* We found a possible setting of the framerate "{1}{1}23.976" */
-            /* Check if it's usable, and if the sub-fps is not set */
+            /* Check if it's usable, and if the sub-original-fps is not set */
             float f_fps = us_strtof( psz_text, NULL );
-            if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
+            if( f_fps > 0.f && var_GetFloat( p_obj, "sub-original-fps" ) <= 0.f )
                 p_props->i_microsecperframe = llroundf((float)CLOCK_FREQ / f_fps);
         }
         free( psz_text );
@@ -1715,8 +1715,8 @@ static int ParseMPSub( vlc_object_t *p_obj, subs_properties_t *p_props,
             {
                 float f_fps = us_strtof( psz_temp, NULL );
 
-                if( f_fps > 0.f && var_GetFloat( p_obj, "sub-fps" ) <= 0.f )
-                    var_SetFloat( p_obj, "sub-fps", f_fps );
+                if( f_fps > 0.f && var_GetFloat( p_obj, "sub-original-fps" ) <= 0.f )
+                    var_SetFloat( p_obj, "sub-original-fps", f_fps );
 
                 p_props->mpsub.i_factor = 1;
                 free( psz_temp );
@@ -2346,7 +2346,7 @@ static int ParseSCC( vlc_object_t *p_obj, subs_properties_t *p_props,
         { 6000, { 60, 1 },       false },
     };
     const struct rates *p_rate = &framerates[3];
-    float f_fps = var_GetFloat( p_obj, "sub-fps" );
+    float f_fps = var_GetFloat( p_obj, "sub-original-fps" );
     if( f_fps > 1.0 )
     {
         for( size_t i=0; i<ARRAY_SIZE(framerates); i++ )

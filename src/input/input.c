@@ -1004,9 +1004,7 @@ static void SetSubtitlesOptions( input_thread_t *p_input )
     const float f_fps = input_priv(p_input)->master->f_fps;
     if( f_fps > 1.f )
     {
-        float f_requested_fps = var_CreateGetFloat( p_input, "sub-fps" );
-        if( f_requested_fps <= 1.f )
-            var_SetFloat( p_input, "sub-fps", f_fps );
+        var_SetFloat( p_input, "sub-original-fps", f_fps );
     }
 
     int64_t sub_delay = var_InheritInteger( p_input, "sub-delay" );
