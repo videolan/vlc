@@ -33,7 +33,7 @@ check_PROGRAMS = \
 	test_modules_packetizer_helpers \
 	test_modules_packetizer_hxxx \
 	test_modules_keystore \
-        test_modules_demux_dashuri
+	test_modules_demux_dashuri
 if ENABLE_SOUT
 check_PROGRAMS += test_modules_tls
 endif
