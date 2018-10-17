@@ -764,6 +764,10 @@ static const char *const ppsz_prefres[] = {
     "Look for a subtitle file in those paths too, if your subtitle " \
     "file was not found in the current directory.")
 
+#define SUB_FPS_TEXT  N_("Subtitle Frames per Second")
+#define SUB_FPS_LONGTEXT \
+    N_("Override the normal frames per second settings. ")
+
 #define SUB_DELAY_TEXT N_("Subtitle delay")
 #define SUB_DELAY_LONGTEXT \
     N_("Apply a delay to all subtitles (in 1/10s, eg 100 means 10s).")
@@ -1706,6 +1710,7 @@ vlc_module_begin ()
                TEXTRENDERER_TEXT, TEXTRENDERER_LONGTEXT)
 
     set_section( N_("Subtitles") , NULL )
+    add_float( "sub-fps", 0.0, SUB_FPS_TEXT, SUB_FPS_LONGTEXT, false )
     add_integer( "sub-delay", 0, SUB_DELAY_TEXT, SUB_DELAY_LONGTEXT, false )
     add_loadfile("sub-file", NULL, SUB_FILE_TEXT, SUB_FILE_LONGTEXT)
         change_safe()

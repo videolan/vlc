@@ -48,9 +48,6 @@
 static int  Open ( vlc_object_t *p_this );
 static void Close( vlc_object_t *p_this );
 
-#define SUB_FPS_LONGTEXT \
-    N_("Override the normal frames per second settings. " \
-    "This will only work with MicroDVD and SubRIP (SRT) subtitles.")
 #define SUB_TYPE_LONGTEXT \
     N_("Force the subtiles format. Selecting \"auto\" means autodetection and should always work.")
 #define SUB_DESCRIPTION_LONGTEXT \
@@ -70,9 +67,6 @@ vlc_module_begin ()
     set_capability( "demux", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
-    add_float( "sub-fps", 0.0,
-               N_("Frames per Second"),
-               SUB_FPS_LONGTEXT, true )
     add_string( "sub-type", "auto", N_("Subtitle format"),
                 SUB_TYPE_LONGTEXT, true )
         change_string_list( ppsz_sub_type, ppsz_sub_type )
