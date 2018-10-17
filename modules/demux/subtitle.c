@@ -167,6 +167,7 @@ typedef struct
     bool        b_slave;
     bool        b_first_time;
 
+    double      f_rate;
     vlc_tick_t  i_next_demux_date;
 
     struct
@@ -316,6 +317,7 @@ static int Open ( vlc_object_t *p_this )
     p_sys->b_slave = false;
     p_sys->b_first_time = true;
     p_sys->i_next_demux_date = 0;
+    p_sys->f_rate = 1.0;
 
     p_sys->pf_convert = ToTextBlock;
 
@@ -740,6 +742,19 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static void
+ResetCurrentIndex( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    for( size_t i = 0; i < p_sys->subtitles.i_count; i++ )
+    {
+        if( p_sys->subtitles.p_array[i].i_start * p_sys->f_rate >
+            p_sys->i_next_demux_date && i > 0 )
+            break;
+        p_sys->subtitles.i_current = i;
+    }
+}
+
 /*****************************************************************************
  * Control:
  *****************************************************************************/
@@ -766,13 +781,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             p_sys->b_first_time = true;
             p_sys->i_next_demux_date = va_arg( args, vlc_tick_t );
-            for( size_t i = 0; i < p_sys->subtitles.i_count; i++ )
-            {
-                if( p_sys->subtitles.p_array[i].i_start > p_sys->i_next_demux_date &&
-                    i > 0 )
-                    break;
-                p_sys->subtitles.i_current = i;
-            }
+            ResetCurrentIndex( p_demux );
             return VLC_SUCCESS;
         }
 
@@ -802,6 +811,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             }
             break;
 
+        case DEMUX_CAN_CONTROL_RATE:
+            *va_arg( args, bool * ) = true;
+            return VLC_SUCCESS;
+        case DEMUX_SET_RATE:
+            p_sys->f_rate = (double)INPUT_RATE_DEFAULT / *va_arg( args, int * );
+            ResetCurrentIndex( p_demux );
+            return VLC_SUCCESS;
         case DEMUX_SET_NEXT_DEMUX_TIME:
             p_sys->b_slave = true;
             p_sys->i_next_demux_date = va_arg( args, vlc_tick_t ) - VLC_TICK_0;
@@ -836,7 +852,8 @@ static int Demux( demux_t *p_demux )
     vlc_tick_t i_barrier = p_sys->i_next_demux_date;
 
     while( p_sys->subtitles.i_current < p_sys->subtitles.i_count &&
-           p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start <= i_barrier )
+           ( p_sys->subtitles.p_array[p_sys->subtitles.i_current].i_start *
+             p_sys->f_rate ) <= i_barrier )
     {
         const subtitle_t *p_subtitle = &p_sys->subtitles.p_array[p_sys->subtitles.i_current];
 
@@ -852,9 +869,9 @@ static int Demux( demux_t *p_demux )
             if( p_block )
             {
                 p_block->i_dts =
-                p_block->i_pts = VLC_TICK_0 + p_subtitle->i_start;
+                p_block->i_pts = VLC_TICK_0 + p_subtitle->i_start * p_sys->f_rate;
                 if( p_subtitle->i_stop >= 0 && p_subtitle->i_stop >= p_subtitle->i_start )
-                    p_block->i_length = p_subtitle->i_stop - p_subtitle->i_start;
+                    p_block->i_length = (p_subtitle->i_stop - p_subtitle->i_start) * p_sys->f_rate;
 
                 es_out_Send( p_demux->out, p_sys->es, p_block );
             }
