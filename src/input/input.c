@@ -2456,20 +2456,20 @@ static void UpdateTitleListfromDemux( input_thread_t *p_input )
 }
 
 static int
-InputStreamHandleAnchor( input_source_t *source, stream_t **stream,
-                         char const *anchor )
+InputStreamHandleAnchor( input_thread_t *p_input, input_source_t *source,
+                         stream_t **stream, char const *anchor )
 {
     char const* extra;
     if( stream_extractor_AttachParsed( stream, anchor, &extra ) )
     {
-        msg_Err( source, "unable to attach stream-extractors for %s",
+        msg_Err( p_input, "unable to attach stream-extractors for %s",
             (*stream)->psz_url );
 
         return VLC_EGENERIC;
     }
 
     if( vlc_stream_directory_Attach( stream, NULL ) )
-        msg_Dbg( source, "attachment of directory-extractor failed for %s",
+        msg_Dbg( p_input, "attachment of directory-extractor failed for %s",
             (*stream)->psz_url );
 
     MRLSections( extra ? extra : "",
@@ -2484,7 +2484,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
                                const char *psz_demux, const char *psz_anchor )
 {
     input_thread_private_t *priv = input_priv(p_input );
-    vlc_object_t *obj = VLC_OBJECT(p_source);
+    vlc_object_t *obj = VLC_OBJECT(p_input);
 
     /* create the underlying access stream */
     stream_t *p_stream = stream_AccessNew( obj, p_input, priv->p_es_out,
@@ -2504,7 +2504,7 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
     }
 
     /* attach explicit stream filters to stream */
-    char *psz_filters = var_InheritString( obj, "stream-filter" );
+    char *psz_filters = var_InheritString( p_input, "stream-filter" );
     if( psz_filters )
     {
         p_stream = stream_FilterChainNew( p_stream, psz_filters );
@@ -2512,11 +2512,11 @@ static demux_t *InputDemuxNew( input_thread_t *p_input,
     }
 
     /* handle anchors */
-    if( InputStreamHandleAnchor( p_source, &p_stream, psz_anchor ) )
+    if( InputStreamHandleAnchor( p_input, p_source, &p_stream, psz_anchor ) )
         goto error;
 
     /* attach conditional record stream-filter */
-    if( var_InheritBool( obj, "input-record-native" ) )
+    if( var_InheritBool( p_input, "input-record-native" ) )
         p_stream = stream_FilterChainNew( p_stream, "record" );
 
     /* create a regular demux with the access stream created */
@@ -2542,8 +2542,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
                                        bool b_in_can_fail )
 {
     input_thread_private_t *priv = input_priv(p_input);
-    input_source_t *in = vlc_custom_create( p_input, sizeof( *in ),
-                                            "input source" );
+    input_source_t *in = calloc(1, sizeof(*in) );
     if( unlikely(in == NULL) )
         return NULL;
 
@@ -2555,7 +2554,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
 
     if( psz_dup == NULL )
     {
-        vlc_object_release( in );
+        free( in );
         return NULL;
     }
 
@@ -2563,7 +2562,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, &psz_anchor, psz_dup );
 
     if( psz_demux == NULL || psz_demux[0] == '\0' )
-        psz_demux = psz_demux_var = var_InheritString( in, "demux" );
+        psz_demux = psz_demux_var = var_InheritString( p_input, "demux" );
 
     if( psz_forced_demux != NULL )
         psz_demux = psz_forced_demux;
@@ -2644,7 +2643,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
             vlc_dialog_display_error( p_input, _("Your input can't be opened"),
                                       _("VLC is unable to open the MRL '%s'."
                                       " Check the log for details."), psz_mrl );
-        vlc_object_release( in );
+        free( in );
         return NULL;
     }
 
@@ -2666,7 +2665,7 @@ static input_source_t *InputSourceNew( input_thread_t *p_input,
         if( in->p_demux == NULL )
         {
             msg_Err(p_input, "Failed to create demux filter");
-            vlc_object_release( in );
+            free( in );
             return NULL;
         }
     }
@@ -2784,7 +2783,7 @@ static void InputSourceDestroy( input_source_t *in )
         TAB_CLEAN( in->i_title, in->title );
     }
 
-    vlc_object_release( in );
+    free( in );
 }
 
 /*****************************************************************************
@@ -2814,7 +2813,7 @@ static void InputSourceMeta( input_thread_t *p_input,
         return;
 
     demux_meta_t *p_demux_meta =
-        vlc_custom_create( p_source, sizeof( *p_demux_meta ), "demux meta" );
+        vlc_custom_create( p_input, sizeof( *p_demux_meta ), "demux meta" );
     if( unlikely(p_demux_meta == NULL) )
         return;
     p_demux_meta->p_item = input_priv(p_input)->p_item;
