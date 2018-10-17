@@ -1077,6 +1077,7 @@ typedef struct
     vlc_object_t *p_obj;
     vlc_array_t es; /* es_pair_t */
     void *priv;
+    vlc_mutex_t lock;
     struct
     {
         int i_audio_pid; /* Selected audio stream. -1 if default */
@@ -1101,6 +1102,8 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
     bool b_select = false;
 
     es_format_Copy(&fmt, p_fmt);
+
+    vlc_mutex_lock(&esout_priv->lock);
 
     switch (fmt.i_cat) {
     case VIDEO_ES:
@@ -1147,6 +1150,9 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
     }
     es_format_Clean(&fmt);
+
+    vlc_mutex_unlock(&esout_priv->lock);
+
     return p_es;
 }
 
@@ -1163,6 +1169,8 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
     demux_t *p_demux = esout_priv->priv;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    vlc_mutex_lock(&esout_priv->lock);
+
     es_pair_t *p_pair = getEsPairByES(&esout_priv->es, p_es);
     if (p_pair)
         es_pair_Remove(&esout_priv->es, p_pair);
@@ -1173,11 +1181,15 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
     vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
 
     es_out_Del(esout_priv->p_dst_out, p_es);
+
+    vlc_mutex_unlock(&esout_priv->lock);
 }
 
 static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
 {
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
+    int i_ret;
+    vlc_mutex_lock(&esout_priv->lock);
     switch(i_query)
     {
         case BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID:
@@ -1200,16 +1212,22 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
 
             es_pair_t *p_pair = getEsPairByPID(&esout_priv->es, i_pid);
             if(unlikely(!p_pair))
+            {
+                vlc_mutex_unlock(&esout_priv->lock);
                 return VLC_EGENERIC;
+            }
 
-            return es_out_Control(esout_priv->p_dst_out,
-                                  b_select ? ES_OUT_SET_ES : ES_OUT_UNSET_ES,
-                                  p_pair->p_es);
-        };
+            i_ret = es_out_Control(esout_priv->p_dst_out,
+                                   b_select ? ES_OUT_SET_ES : ES_OUT_UNSET_ES,
+                                   p_pair->p_es);
+        } break;
 
         default:
-            return es_out_vaControl(esout_priv->p_dst_out, i_query, args);
+            i_ret = es_out_vaControl(esout_priv->p_dst_out, i_query, args);
+            break;
     }
+    vlc_mutex_unlock(&esout_priv->lock);
+    return i_ret;
 }
 
 static void bluray_esOutDestroy(es_out_t *p_out)
@@ -1219,6 +1237,7 @@ static void bluray_esOutDestroy(es_out_t *p_out)
     for (size_t i = 0; i < vlc_array_count(&esout_priv->es); ++i)
         free(vlc_array_item_at_index(&esout_priv->es, i));
     vlc_array_clear(&esout_priv->es);
+    vlc_mutex_destroy(&esout_priv->lock);
     free(esout_priv);
 }
 
@@ -1244,6 +1263,7 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
     esout_priv->selected.i_audio_pid = -1;
     esout_priv->selected.i_video_pid = -1;
     esout_priv->selected.i_spu_pid = -1;
+    vlc_mutex_init(&esout_priv->lock);
     return &esout_priv->es_out;
 }
 
