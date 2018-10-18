@@ -108,6 +108,9 @@ var_InheritFourcc(vlc_object_t *obj, const char *name)
     X(can_control_rate, bool, add_bool, var_InheritBool, true) \
     X(can_record, bool, add_bool, var_InheritBool, true) \
     X(error, bool, add_bool, var_InheritBool, false) \
+    X(add_video_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
+    X(add_audio_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
+    X(add_spu_track_at, vlc_tick_t, add_integer, var_InheritInteger, VLC_TICK_INVALID ) \
 
 struct demux_sys
 {
@@ -590,6 +593,26 @@ Demux(demux_t *demux)
     sys->pts += sys->step_length;
     if (sys->pts > sys->length)
         sys->pts = sys->length;
+
+    if (sys->add_video_track_at != VLC_TICK_INVALID &&
+        sys->add_video_track_at <= sys->pts)
+    {
+        InitVideoTracks(demux, 0, 1);
+        sys->add_video_track_at = VLC_TICK_INVALID;
+    }
+    if (sys->add_audio_track_at != VLC_TICK_INVALID &&
+        sys->add_audio_track_at <= sys->pts)
+    {
+        InitAudioTracks(demux, 0, 1);
+        sys->add_audio_track_at = VLC_TICK_INVALID;
+    }
+    if (sys->add_spu_track_at != VLC_TICK_INVALID &&
+        sys->add_spu_track_at <= sys->pts)
+    {
+        InitSubTracks(demux, 0, 1);
+        sys->add_spu_track_at = VLC_TICK_INVALID;
+    }
+
     return sys->pts == sys->length ? VLC_DEMUXER_EOF : VLC_DEMUXER_SUCCESS;
 }
 
