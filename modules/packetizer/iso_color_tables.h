@@ -138,7 +138,7 @@ static inline enum iso_23001_8_tc vlc_xfer_to_iso_23001_8_tc( video_transfer_fun
 {
     for(size_t i=1; i<ARRAY_SIZE(iso_23001_8_tc_to_vlc_xfer_table); i++)
         if(iso_23001_8_tc_to_vlc_xfer_table[i] == v)
-            return (enum iso_23001_8_cp) i;
+            return (enum iso_23001_8_tc) i;
     return ISO_23001_8_TC_UNSPECIFIED;
 }
 
@@ -191,7 +191,7 @@ static inline enum iso_23001_8_mc vlc_coeffs_to_iso_23001_8_mc( video_color_spac
 {
     for(size_t i=1; i<ARRAY_SIZE(iso_23001_8_mc_to_vlc_coeffs_table); i++)
         if(iso_23001_8_mc_to_vlc_coeffs_table[i] == v)
-            return (enum iso_23001_8_cp) i;
+            return (enum iso_23001_8_mc) i;
     return ISO_23001_8_MC_UNSPECIFIED;
 }
 
