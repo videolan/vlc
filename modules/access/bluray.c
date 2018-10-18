@@ -2656,10 +2656,9 @@ static int blurayDemux(demux_t *p_demux)
     int nread;
 
     if (p_sys->b_menu == false) {
+        nread = bd_read(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE);
         while (bd_get_event(p_sys->bluray, &e))
             blurayHandleEvent(p_demux, &e);
-
-        nread = bd_read(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE);
     } else {
         nread = bd_read_ext(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE, &e);
         while (e.event != BD_EVENT_NONE) {
