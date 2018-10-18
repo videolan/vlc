@@ -448,13 +448,12 @@ static void blurayReleaseVout(demux_t *p_demux)
  * BD-J background video
  *****************************************************************************/
 
-static void startBackground(demux_t *p_demux)
+static es_out_id_t * blurayCreateBackgroundUnlocked(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if (p_sys->p_dummy_video) {
-        return;
-    }
+    if (p_sys->p_dummy_video)
+        return p_sys->p_dummy_video;
 
     msg_Info(p_demux, "Start background");
 
@@ -493,6 +492,7 @@ static void startBackground(demux_t *p_demux)
 
  out:
     es_format_Clean(&fmt);
+    return p_sys->p_dummy_video;
 }
 
 static void stopBackground(demux_t *p_demux)
@@ -2572,7 +2572,8 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
 
                 /* Looks like there's no video stream playing.
                    Emit blank frame so that BD-J overlay can be drawn. */
-                startBackground(p_demux);
+                if(blurayCreateBackgroundUnlocked(p_demux) != NULL)
+                    p_sys->p_vout = input_GetVout(p_demux->p_input);
             }
 
             if (p_sys->p_vout != NULL) {
