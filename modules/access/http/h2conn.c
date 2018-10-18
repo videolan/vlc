@@ -672,8 +672,10 @@ static void *vlc_h2_recv_thread(void *data)
     vlc_h2_parse_destroy(parser);
 fail:
     /* Terminate any remaining stream */
+    vlc_mutex_lock(&conn->lock);
     for (struct vlc_h2_stream *s = conn->streams; s != NULL; s = s->older)
         vlc_h2_stream_reset(s, VLC_H2_CANCEL);
+    vlc_mutex_unlock(&conn->lock);
     return NULL;
 }
 
