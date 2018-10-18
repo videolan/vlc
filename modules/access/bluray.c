@@ -428,7 +428,7 @@ static void blurayReleaseVideoES(demux_t *p_demux)
                                     p_sys->p_video_es, p_ov->i_channel );
                 }
                 p_ov->i_channel = -1;
-                p_ov->status = ToDisplay;
+                p_ov->status = Closed;
                 vlc_mutex_unlock(&p_ov->lock);
 
                 if (p_ov->p_updater) {
