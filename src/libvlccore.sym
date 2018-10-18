@@ -6,6 +6,7 @@ aout_ChannelExtract
 aout_ChannelReorder
 aout_CheckChannelExtraction
 aout_CheckChannelReorder
+aout_EnableFilter
 aout_Interleave
 aout_Deinterleave
 aout_filter_RequestVout

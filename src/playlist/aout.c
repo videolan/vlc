@@ -116,9 +116,9 @@ int playlist_MuteSet (playlist_t *pl, bool mute)
 void playlist_EnableAudioFilter (playlist_t *pl, const char *name, bool add)
 {
     audio_output_t *aout = playlist_GetAout (pl);
-
-    aout_ChangeFilterString (VLC_OBJECT(pl), aout ? VLC_OBJECT(aout) : NULL,
-                             "audio-filter", name, add);
-    if (aout != NULL)
+    if (aout)
+    {
+        aout_EnableFilter(aout, name, add);
         vlc_object_release (aout);
+    }
 }

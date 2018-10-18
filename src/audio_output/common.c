@@ -537,25 +537,14 @@ static int FilterOrder( const char *psz_name )
     return INT_MAX;
 }
 
-/* This function will add or remove a module from a string list (colon
- * separated). It will return true if there is a modification
- * In case p_aout is NULL, we will use configuration instead of variable */
-bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
-                              const char *psz_variable,
-                              const char *psz_name, bool b_add )
+int aout_EnableFilter( audio_output_t *p_aout, const char *psz_name, bool b_add )
 {
     if( *psz_name == '\0' )
-        return false;
+        return VLC_EGENERIC;
 
+    const char *psz_variable = "audio-filter";
     char *psz_list;
-    if( p_aout )
-    {
-        psz_list = var_GetString( p_aout, psz_variable );
-    }
-    else
-    {
-        psz_list = var_InheritString( p_obj, psz_variable );
-    }
+    psz_list = var_GetString( p_aout, psz_variable );
 
     /* Split the string into an array of filters */
     int i_count = 1;
@@ -567,7 +556,7 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     if( !ppsz_filter )
     {
         free( psz_list );
-        return false;
+        return VLC_ENOMEM;
     }
     bool b_present = false;
     i_count = 0;
@@ -589,7 +578,7 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     {
         free( ppsz_filter );
         free( psz_list );
-        return false;
+        return VLC_EGENERIC;
     }
 
     if( b_add )
@@ -624,7 +613,7 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     {
         free( ppsz_filter );
         free( psz_list );
-        return false;
+        return VLC_ENOMEM;
     }
 
     *psz_new = '\0';
@@ -639,10 +628,8 @@ bool aout_ChangeFilterString( vlc_object_t *p_obj, vlc_object_t *p_aout,
     free( ppsz_filter );
     free( psz_list );
 
-    var_SetString( p_obj, psz_variable, psz_new );
-    if( p_aout )
-        var_SetString( p_aout, psz_variable, psz_new );
+    var_SetString( p_aout, psz_variable, psz_new );
     free( psz_new );
 
-    return true;
+    return VLC_SUCCESS;
 }

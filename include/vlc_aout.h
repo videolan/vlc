@@ -461,6 +461,16 @@ static inline void aout_PauseDefault(audio_output_t *aout, bool paused,
 
 /* Audio output filters */
 
+/**
+ * Enable or disable an audio filter ("audio-filter")
+ *
+ * \param aout a valid audio output
+ * \param name a valid filter name
+ * \param add true to add the filter, false to remove it
+ * \return 0 on success, non-zero on failure.
+ */
+VLC_API int aout_EnableFilter(audio_output_t *aout, const char *name, bool add);
+
 typedef struct
 {
     /**

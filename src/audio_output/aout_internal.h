@@ -130,8 +130,6 @@ void aout_FormatsPrint(vlc_object_t *, const char *,
                        const audio_sample_format_t *);
 #define aout_FormatsPrint(o, t, a, b) \
         aout_FormatsPrint(VLC_OBJECT(o), t, a, b)
-bool aout_ChangeFilterString( vlc_object_t *manager, vlc_object_t *aout,
-                              const char *var, const char *name, bool b_add );
 
 /* From dec.c */
 #define AOUT_DEC_SUCCESS 0
