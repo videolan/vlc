@@ -445,13 +445,12 @@ static void blurayReleaseVideoES(demux_t *p_demux)
  * BD-J background video
  *****************************************************************************/
 
-static void startBackground(demux_t *p_demux)
+static es_out_id_t * blurayCreateBackgroundUnlocked(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if (p_sys->p_dummy_video) {
-        return;
-    }
+    if (p_sys->p_dummy_video)
+        return p_sys->p_dummy_video;
 
     msg_Info(p_demux, "Start background");
 
@@ -491,11 +490,9 @@ static void startBackground(demux_t *p_demux)
     es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT,
                     p_sys->p_dummy_video, onMouseEvent, p_demux );
 
-    vlc_mutex_lock(&p_sys->bdj_overlay_lock);
-    p_sys->p_video_es = p_sys->p_dummy_video;
-    vlc_mutex_unlock(&p_sys->bdj_overlay_lock);
  out:
     es_format_Clean(&fmt);
+    return p_sys->p_dummy_video;
 }
 
 static void stopBackground(demux_t *p_demux)
@@ -2589,13 +2586,13 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
                disappears and just playlist is shown.
                (sometimes BD-J runs slowly ...)
             */
-            if (!p_sys->p_video_es && !p_sys->p_dummy_video && p_sys->b_menu &&
+            if (!p_sys->p_video_es && p_sys->b_menu &&
                 !p_sys->p_pl_info && nread == 0 &&
                 blurayIsBdjTitle(p_demux)) {
 
                 /* Looks like there's no video stream playing.
                    Emit blank frame so that BD-J overlay can be drawn. */
-                startBackground(p_demux);
+                p_sys->p_video_es = blurayCreateBackgroundUnlocked(p_demux);
             }
 
             if (p_sys->p_video_es != NULL) {
