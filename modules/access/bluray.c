@@ -63,6 +63,23 @@
 #include <libbluray/meta_data.h>
 #include <libbluray/overlay.h>
 
+//#define DEBUG_BLURAY
+#ifdef DEBUG_BLURAY
+#  include <libbluray/log_control.h>
+#  define BLURAY_DEBUG_MASK (0xFFFFF & ~DBG_STREAM)
+static vlc_object_t *p_bluray_DebugObject;
+static void bluray_DebugHandler(const char *psz)
+{
+    size_t len = strlen(psz);
+    if(len < 1) return;
+    char *psz_log = NULL;
+    if(psz[len - 1] == '\n')
+        psz_log = strndup(psz, len - 1);
+    msg_Dbg(p_bluray_DebugObject, "%s", psz_log ? psz_log : psz);
+    free(psz_log);
+}
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -761,6 +778,12 @@ static int blurayOpen(vlc_object_t *object)
        file concatenation are just resetting counters... */
     var_Create( p_demux, "ts-cc-check", VLC_VAR_BOOL );
     var_SetBool( p_demux, "ts-cc-check", false );
+
+#ifdef DEBUG_BLURAY
+    p_bluray_DebugObject = VLC_OBJECT(p_demux);
+    bd_set_debug_mask(BLURAY_DEBUG_MASK);
+    bd_set_debug_handler(bluray_DebugHandler);
+#endif
 
     /* Open BluRay */
 #ifdef BLURAY_DEMUX
