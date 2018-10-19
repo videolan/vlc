@@ -89,7 +89,7 @@ void MetadataExtractor::populateItem( medialibrary::parser::IItem& item, input_i
                 emptyStringWrapper( vlc_meta_Get( inputItem->p_meta, pair.second ) ) );
     }
 
-    item.setDuration( inputItem->i_duration );
+    item.setDuration( MS_FROM_VLC_TICK(inputItem->i_duration) );
 
     for ( auto i = 0; i < inputItem->i_es; ++i )
     {
