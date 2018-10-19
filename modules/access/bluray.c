@@ -1219,6 +1219,19 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
                                    p_pair->p_es);
         } break;
 
+        case ES_OUT_SET_ES_DEFAULT:
+        case ES_OUT_SET_ES:
+        case ES_OUT_UNSET_ES:
+        case ES_OUT_SET_ES_STATE:
+            i_ret = VLC_EGENERIC;
+            break;
+
+        case ES_OUT_GET_ES_STATE:
+            va_arg(args, es_out_id_t *);
+            *va_arg(args, bool *) = true;
+            i_ret = VLC_SUCCESS;
+            break;
+
         default:
             i_ret = es_out_vaControl(esout_priv->p_dst_out, i_query, args);
             break;
