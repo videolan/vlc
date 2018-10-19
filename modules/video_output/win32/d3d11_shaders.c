@@ -216,17 +216,16 @@ static HRESULT CompileTargetShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool l
                                    const char *psz_adjust_range, const char *psz_move_planes,
                                    ID3D11PixelShader **output)
 {
-    char *shader = malloc(strlen(globPixelShaderDefault) + 32 + strlen(psz_sampler) +
-                          strlen(psz_src_transform) + strlen(psz_primaries_transform) + strlen(psz_display_transform) +
-                          strlen(psz_tone_mapping) + strlen(psz_adjust_range) + strlen(psz_move_planes));
-    if (!shader)
+    char *shader;
+    int allocated = asprintf(&shader, globPixelShaderDefault, legacy_shader ? "" : "Array",
+                             psz_src_transform, psz_display_transform,
+                             psz_primaries_transform, psz_tone_mapping,
+                             psz_adjust_range, psz_move_planes, psz_sampler);
+    if (allocated <= 0)
     {
         msg_Err(o, "no room for the Pixel Shader");
         return E_OUTOFMEMORY;
     }
-    sprintf(shader, globPixelShaderDefault, legacy_shader ? "" : "Array", psz_src_transform,
-            psz_display_transform, psz_primaries_transform, psz_tone_mapping,
-            psz_adjust_range, psz_move_planes, psz_sampler);
     if (var_InheritInteger(o, "verbose") >= 4)
         msg_Dbg(o, "shader %s", shader);
 #ifndef NDEBUG
