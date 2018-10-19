@@ -85,7 +85,7 @@ struct input_item_t
     unsigned   optflagc;
     input_item_opaque_t *opaques;    /**< List of opaque pointer values */
 
-    vlc_tick_t i_duration;           /**< Duration in microseconds */
+    vlc_tick_t i_duration;           /**< Duration in vlc ticks */
 
 
     int        i_categories;         /**< Number of info categories */
