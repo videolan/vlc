@@ -453,6 +453,8 @@ error:
     if (filter_sys->va.conf != VA_INVALID_ID)
         vlc_vaapi_DestroyConfig(VLC_OBJECT(filter),
                                 filter_sys->va.dpy, filter_sys->va.conf);
+    if (filter_sys->dest_pics)
+        picture_pool_Release(filter_sys->dest_pics);
     if (filter_sys->va.inst)
         vlc_vaapi_FilterReleaseInstance(filter, filter_sys->va.inst);
     free(filter_sys);
