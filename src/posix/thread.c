@@ -136,43 +136,32 @@ void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("destroying mutex");
 }
 
-#ifndef NDEBUG
-# ifdef HAVE_VALGRIND_VALGRIND_H
-#  include <valgrind/valgrind.h>
-# else
-#  define RUNNING_ON_VALGRIND (0)
-# endif
-
-/**
- * Asserts that a mutex is locked by the calling thread.
- */
-void vlc_assert_locked (vlc_mutex_t *p_mutex)
+void vlc_mutex_lock(vlc_mutex_t *mutex)
 {
-    if (RUNNING_ON_VALGRIND > 0)
-        return;
-    assert (pthread_mutex_lock (p_mutex) == EDEADLK);
-}
-#endif
+    int val = pthread_mutex_lock(mutex);
 
-void vlc_mutex_lock (vlc_mutex_t *p_mutex)
-{
-    int val = pthread_mutex_lock( p_mutex );
-    VLC_THREAD_ASSERT ("locking mutex");
+    VLC_THREAD_ASSERT("locking mutex");
+    vlc_mutex_mark(mutex);
 }
 
-int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
+int vlc_mutex_trylock(vlc_mutex_t *mutex)
 {
-    int val = pthread_mutex_trylock( p_mutex );
+    int val = pthread_mutex_trylock(mutex);
 
-    if (val != EBUSY)
-        VLC_THREAD_ASSERT ("locking mutex");
+    if (val != EBUSY) {
+        VLC_THREAD_ASSERT("locking mutex");
+        vlc_mutex_mark(mutex);
+    }
+
     return val;
 }
 
-void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
+void vlc_mutex_unlock(vlc_mutex_t *mutex)
 {
-    int val = pthread_mutex_unlock( p_mutex );
-    VLC_THREAD_ASSERT ("unlocking mutex");
+    int val = pthread_mutex_unlock(mutex);
+
+    VLC_THREAD_ASSERT("unlocking mutex");
+    vlc_mutex_unmark(mutex);
 }
 
 void vlc_cond_init (vlc_cond_t *p_condvar)
