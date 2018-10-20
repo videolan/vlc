@@ -26,6 +26,7 @@
 #include <errno.h>
 
 #include <vlc_common.h>
+#include "libvlc.h"
 
 /*** Global locks ***/
 
@@ -50,6 +51,87 @@ void vlc_global_mutex (unsigned n, bool acquire)
     else
         vlc_mutex_unlock (lock);
 }
+
+#ifndef NDEBUG
+# include <search.h>
+
+struct vlc_lock_mark
+{
+    const void *object;
+    uintptr_t refs;
+};
+
+static int vlc_lock_mark_cmp(const void *a, const void *b)
+{
+    const struct vlc_lock_mark *ma = a, *mb = b;
+
+    if (ma->object == mb->object)
+        return 0;
+
+    return ((uintptr_t)(ma->object) > (uintptr_t)(mb->object)) ? +1 : -1;
+}
+
+static void vlc_lock_mark(const void *lock, void **rootp)
+{
+    struct vlc_lock_mark *mark = malloc(sizeof (*mark));
+    if (unlikely(mark == NULL))
+        abort();
+
+    mark->object = lock;
+    mark->refs = 0;
+
+    struct vlc_lock_mark **entry = tsearch(mark, rootp, vlc_lock_mark_cmp);
+    if (unlikely(entry == NULL))
+        abort();
+
+    if (unlikely(*entry != mark)) {
+        /* Recursive locking: lock is already in the tree */
+        free(mark);
+        mark = *entry;
+    }
+
+    mark->refs++;
+}
+
+static void vlc_lock_unmark(const void *lock, void **rootp)
+{
+    struct vlc_lock_mark *mark = &(struct vlc_lock_mark){ lock, 0 };
+    struct vlc_lock_mark **entry = tfind(mark, rootp, vlc_lock_mark_cmp);
+
+    assert(entry != NULL);
+    mark = *entry;
+    assert(mark->refs > 0);
+
+    if (likely(--mark->refs == 0)) {
+        tdelete(mark, rootp, vlc_lock_mark_cmp);
+        free(mark);
+    }
+}
+
+static bool vlc_lock_marked(const void *lock, void **rootp)
+{
+    struct vlc_lock_mark *mark = &(struct vlc_lock_mark){ lock, 0 };
+
+    return tfind(mark, rootp, vlc_lock_mark_cmp) != NULL;
+}
+
+static _Thread_local void *vlc_mutex_marks = NULL;
+
+void vlc_mutex_mark(const vlc_mutex_t *mutex)
+{
+    vlc_lock_mark(mutex, &vlc_mutex_marks);
+}
+
+void vlc_mutex_unmark(const vlc_mutex_t *mutex)
+{
+    vlc_lock_unmark(mutex, &vlc_mutex_marks);
+}
+
+bool vlc_mutex_marked(const vlc_mutex_t *mutex)
+{
+    return vlc_lock_marked(mutex, &vlc_mutex_marks);
+}
+#endif
 
 #if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)
 /* Cannot define OS version-dependent stuff in public headers */

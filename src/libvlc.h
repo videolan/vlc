@@ -58,6 +58,28 @@ void vlc_threads_setup (libvlc_int_t *);
 void vlc_trace (const char *fn, const char *file, unsigned line);
 #define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
 
+#ifndef NDEBUG
+/**
+ * Marks a mutex locked.
+ */
+void vlc_mutex_mark(const vlc_mutex_t *);
+
+/**
+ * Unmarks a mutex.
+ */
+void vlc_mutex_unmark(const vlc_mutex_t *);
+
+/**
+ * Checks if a mutex is marked.
+ */
+bool vlc_mutex_marked(const vlc_mutex_t *);
+#else
+# define vlc_mutex_mark(m) ((void)(m))
+# define vlc_mutex_unmark(m) ((void)(m))
+#endif
+
+#define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
+
 #if (defined (LIBVLC_USE_PTHREAD) || defined(__ANDROID__) || defined (__APPLE__)) && !defined (NDEBUG)
 void vlc_assert_locked (vlc_mutex_t *);
 #else
