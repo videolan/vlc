@@ -83,7 +83,7 @@ bool vlc_mutex_marked(const vlc_mutex_t *);
  */
 #define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
 
-#if !(defined (_WIN32) || defined (__OS2__))
+#if !defined (__OS2__)
 #define vlc_assert_locked(m) vlc_mutex_assert(m)
 #else
 # define vlc_assert_locked( m ) (void)m

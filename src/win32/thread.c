@@ -104,29 +104,36 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
         }
         p_mutex->locked = true;
         LeaveCriticalSection(&super_mutex);
-        return;
     }
+    else
+        EnterCriticalSection (&p_mutex->mutex);
 
-    EnterCriticalSection (&p_mutex->mutex);
+    vlc_mutex_mark(p_mutex);
 }
 
 int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
 {
+    int ret;
+
     if (!p_mutex->dynamic)
     {   /* static mutexes */
-        int ret = EBUSY;
-
         EnterCriticalSection(&super_mutex);
         if (!p_mutex->locked)
         {
             p_mutex->locked = true;
             ret = 0;
         }
+        else
+            ret = EBUSY;
         LeaveCriticalSection(&super_mutex);
-        return ret;
     }
+    else
+        ret = TryEnterCriticalSection (&p_mutex->mutex) ? 0 : EBUSY;
 
-    return TryEnterCriticalSection (&p_mutex->mutex) ? 0 : EBUSY;
+    if (ret == 0)
+        vlc_mutex_mark(p_mutex);
+
+    return ret;
 }
 
 void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
@@ -139,10 +146,11 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         if (p_mutex->contention)
             WakeAllConditionVariable(&super_variable);
         LeaveCriticalSection(&super_mutex);
-        return;
     }
+    else
+        LeaveCriticalSection (&p_mutex->mutex);
 
-    LeaveCriticalSection (&p_mutex->mutex);
+    vlc_mutex_unmark(p_mutex);
 }
 
 /*** Semaphore ***/
