@@ -35,14 +35,10 @@
 #ifdef _WIN32
 #error FIXME: Win32 is known to not work for decklink.
 #elif defined(__APPLE__)
-static char *dup_cfstring_to_utf8(CFStringRef w)
-{
-    char s[256];
-    CFStringGetCString(w, s, 255, kCFStringEncodingUTF8);
-    return strdup(s);
-}
+#include <vlc_common.h>
+#include <vlc_charset.h>
 #define DECKLINK_STR    const __CFString *
-#define DECKLINK_STRDUP dup_cfstring_to_utf8
+#define DECKLINK_STRDUP(s) FromCFString(s, kCFStringEncodingUTF8)
 #define DECKLINK_FREE(s) CFRelease(s)
 #else
 #define DECKLINK_STR    const char *
