@@ -285,7 +285,7 @@ VLC_API void playlist_Lock( playlist_t * );
  */
 VLC_API void playlist_Unlock( playlist_t * );
 
-VLC_API void playlist_AssertLocked( playlist_t * );
+VLC_API playlist_t *playlist_AssertLocked( playlist_t * );
 VLC_API void playlist_Deactivate( playlist_t * );
 
 /**
@@ -412,22 +412,13 @@ static inline int playlist_MuteToggle( playlist_t *pl )
 
 VLC_API void playlist_EnableAudioFilter( playlist_t *, const char *, bool );
 
-/***********************************************************************
- * Inline functions
- ***********************************************************************/
 /** Tell if the playlist is empty */
-static inline bool playlist_IsEmpty( playlist_t *p_playlist )
-{
-    PL_ASSERT_LOCKED;
-    return p_playlist->items.i_size == 0;
-}
+#define playlist_IsEmpty(p_playlist) \
+    (playlist_AssertLocked(p_playlist)->items.i_size == 0)
 
 /** Tell the number of items in the current playing context */
-static inline int playlist_CurrentSize( playlist_t *p_playlist )
-{
-    PL_ASSERT_LOCKED;
-    return p_playlist->current.i_size;
-}
+#define playlist_CurrentSize(p_playlist) \
+    (playlist_AssertLocked(p_playlist)->current.i_size)
 
 /** @} */
 # ifdef __cplusplus
