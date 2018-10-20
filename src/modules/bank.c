@@ -146,7 +146,7 @@ error:
  */
 static void vlc_plugin_store(vlc_plugin_t *lib)
 {
-    /*vlc_assert_locked (&modules.lock);*/
+    vlc_mutex_assert(&modules.lock);
 
     lib->next = vlc_plugins;
     vlc_plugins = lib;
@@ -619,8 +619,8 @@ void module_EndBank (bool b_plugins)
      * from module_InitBank(). */
     if( b_plugins )
         vlc_mutex_lock (&modules.lock);
-    /*else
-        vlc_assert_locked (&modules.lock); not for static mutexes :( */
+    else
+        vlc_mutex_assert(&modules.lock);
 
     assert (modules.usage > 0);
     if (--modules.usage == 0)
