@@ -328,7 +328,7 @@ plane_CopyPixels
 playlist_Add
 playlist_AddExt
 playlist_AddInput
-playlist_AssertLocked
+playlist_Locked
 playlist_ChildSearchName
 playlist_Clear
 playlist_Control

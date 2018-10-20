@@ -211,7 +211,7 @@ enum pl_locked_state
 /* Helpers */
 #define PL_LOCK playlist_Lock( p_playlist )
 #define PL_UNLOCK playlist_Unlock( p_playlist )
-#define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
+#define PL_ASSERT_LOCKED assert(playlist_Locked(p_playlist))
 
 /** Playlist commands */
 enum {
@@ -285,7 +285,9 @@ VLC_API void playlist_Lock( playlist_t * );
  */
 VLC_API void playlist_Unlock( playlist_t * );
 
-VLC_API playlist_t *playlist_AssertLocked( playlist_t * );
+VLC_API bool playlist_Locked( const playlist_t * );
+#define playlist_AssertLocked(pl) (assert(playlist_Locked(pl)), pl)
+
 VLC_API void playlist_Deactivate( playlist_t * );
 
 /**
