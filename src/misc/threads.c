@@ -131,6 +131,11 @@ bool vlc_mutex_marked(const vlc_mutex_t *mutex)
 {
     return vlc_lock_marked(mutex, &vlc_mutex_marks);
 }
+#else
+bool vlc_mutex_marked(const vlc_mutex_t *mutex)
+{
+    return true;
+}
 #endif
 
 #if defined (_WIN32) && (_WIN32_WINNT < _WIN32_WINNT_WIN8)

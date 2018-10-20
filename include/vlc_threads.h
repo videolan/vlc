@@ -439,6 +439,28 @@ VLC_API int vlc_mutex_trylock( vlc_mutex_t * ) VLC_USED;
 VLC_API void vlc_mutex_unlock(vlc_mutex_t *);
 
 /**
+ * Checks if a mutex is locked.
+ *
+ * Do not use this function directly. Use vlc_mutex_assert() instead.
+ *
+ * @note
+ * This function has no effects.
+ * It is only meant to be use in run-time assertions.
+ *
+ * @retval false in debug builds of LibVLC,
+ *               if the mutex is not locked by the calling thread;
+ * @retval true in debug builds of LibVLC,
+ *              if the mutex is locked by the calling thread;
+ * @retval true in release builds of LibVLC.
+ */
+VLC_API bool vlc_mutex_marked(const vlc_mutex_t *) VLC_USED;
+
+/**
+ * Asserts that a mutex is locked by the calling thread.
+ */
+#define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
+
+/**
  * Initializes a condition variable.
  */
 VLC_API void vlc_cond_init(vlc_cond_t *);

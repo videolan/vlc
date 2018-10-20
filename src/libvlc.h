@@ -68,20 +68,10 @@ void vlc_mutex_mark(const vlc_mutex_t *);
  * Unmarks a mutex.
  */
 void vlc_mutex_unmark(const vlc_mutex_t *);
-
-/**
- * Checks if a mutex is marked.
- */
-bool vlc_mutex_marked(const vlc_mutex_t *);
 #else
 # define vlc_mutex_mark(m) ((void)(m))
 # define vlc_mutex_unmark(m) ((void)(m))
 #endif
-
-/**
- * Asserts that a mutex is locked by the calling thread.
- */
-#define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
 
 /*
  * Logging
