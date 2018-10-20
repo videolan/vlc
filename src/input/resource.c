@@ -198,7 +198,7 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
                                    const vout_configuration_t *req_cfg,
                                    bool b_recycle )
 {
-    vlc_assert_locked( &p_resource->lock );
+    vlc_mutex_assert( &p_resource->lock );
 
     if( !req_cfg )
     {

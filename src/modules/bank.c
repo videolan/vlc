@@ -658,7 +658,7 @@ void module_EndBank (bool b_plugins)
  */
 void module_LoadPlugins(vlc_object_t *obj)
 {
-    /*vlc_assert_locked (&modules.lock); not for static mutexes :( */
+    /*vlc_mutex_assert (&modules.lock); not for static mutexes :( */
 
     if (modules.usage == 1)
     {

@@ -90,7 +90,7 @@ size_t vlc_fifo_GetBytes(const vlc_fifo_t *fifo)
 
 void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
 {
-    vlc_assert_locked(&fifo->lock);
+    vlc_mutex_assert(&fifo->lock);
     assert(*(fifo->pp_last) == NULL);
 
     *(fifo->pp_last) = block;
@@ -109,7 +109,7 @@ void vlc_fifo_QueueUnlocked(block_fifo_t *fifo, block_t *block)
 
 block_t *vlc_fifo_DequeueUnlocked(block_fifo_t *fifo)
 {
-    vlc_assert_locked(&fifo->lock);
+    vlc_mutex_assert(&fifo->lock);
 
     block_t *block = fifo->p_first;
 
@@ -131,7 +131,7 @@ block_t *vlc_fifo_DequeueUnlocked(block_fifo_t *fifo)
 
 block_t *vlc_fifo_DequeueAllUnlocked(block_fifo_t *fifo)
 {
-    vlc_assert_locked(&fifo->lock);
+    vlc_mutex_assert(&fifo->lock);
 
     block_t *block = fifo->p_first;
 

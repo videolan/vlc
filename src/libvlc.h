@@ -83,8 +83,6 @@ bool vlc_mutex_marked(const vlc_mutex_t *);
  */
 #define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
 
-#define vlc_assert_locked(m) vlc_mutex_assert(m)
-
 /*
  * Logging
  */

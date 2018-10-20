@@ -900,7 +900,7 @@ static void TsPushCmd( ts_thread_t *p_ts, ts_cmd_t *p_cmd )
 }
 static int TsPopCmdLocked( ts_thread_t *p_ts, ts_cmd_t *p_cmd, bool b_flush )
 {
-    vlc_assert_locked( &p_ts->lock );
+    vlc_mutex_assert( &p_ts->lock );
 
     if( TsStorageIsEmpty( p_ts->p_storage_r ) )
         return VLC_EGENERIC;

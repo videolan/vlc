@@ -694,7 +694,7 @@ int input_item_AddSlave(input_item_t *p_item, input_item_slave_t *p_slave)
 static info_category_t *InputItemFindCat( input_item_t *p_item,
                                           int *pi_index, const char *psz_cat )
 {
-    vlc_assert_locked( &p_item->lock );
+    vlc_mutex_assert( &p_item->lock );
     for( int i = 0; i < p_item->i_categories && psz_cat; i++ )
     {
         info_category_t *p_cat = p_item->pp_categories[i];
@@ -745,7 +745,7 @@ static int InputItemVaAddInfo( input_item_t *p_i,
                                const char *psz_name,
                                const char *psz_format, va_list args )
 {
-    vlc_assert_locked( &p_i->lock );
+    vlc_mutex_assert( &p_i->lock );
 
     info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
     if( !p_cat )

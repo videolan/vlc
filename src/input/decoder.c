@@ -270,7 +270,7 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vlc_assert_locked( &p_owner->lock );
+    vlc_mutex_assert( &p_owner->lock );
 
     es_format_Clean( &p_owner->fmt );
     es_format_Copy( &p_owner->fmt, &p_dec->fmt_out );
@@ -729,7 +729,7 @@ static void DecoderWaitUnblock( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
 
-    vlc_assert_locked( &p_owner->lock );
+    vlc_mutex_assert( &p_owner->lock );
 
     for( ;; )
     {
@@ -777,7 +777,7 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     input_clock_t   *p_clock = p_owner->p_clock;
 
-    vlc_assert_locked( &p_owner->lock );
+    vlc_mutex_assert( &p_owner->lock );
 
     const vlc_tick_t i_es_delay = p_owner->i_ts_delay;
 

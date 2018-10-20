@@ -86,7 +86,7 @@ static void task_Destroy(struct background_worker *worker, struct task *task)
 
 static struct task *QueueTake(struct background_worker *worker, int timeout_ms)
 {
-    vlc_assert_locked(&worker->lock);
+    vlc_mutex_assert(&worker->lock);
 
     vlc_tick_t deadline = vlc_tick_now() + VLC_TICK_FROM_MS(timeout_ms);
     bool timeout = false;
@@ -107,14 +107,14 @@ static struct task *QueueTake(struct background_worker *worker, int timeout_ms)
 
 static void QueuePush(struct background_worker *worker, struct task *task)
 {
-    vlc_assert_locked(&worker->lock);
+    vlc_mutex_assert(&worker->lock);
     vlc_list_append(&task->node, &worker->queue);
     vlc_cond_signal(&worker->queue_wait);
 }
 
 static void QueueRemoveAll(struct background_worker *worker, void *id)
 {
-    vlc_assert_locked(&worker->lock);
+    vlc_mutex_assert(&worker->lock);
     struct task *task;
     vlc_list_foreach(task, &worker->queue, node)
     {
@@ -268,7 +268,7 @@ static void* Thread( void* data )
 
 static bool SpawnThread(struct background_worker *worker)
 {
-    vlc_assert_locked(&worker->lock);
+    vlc_mutex_assert(&worker->lock);
 
     struct background_thread *thread = background_thread_Create(worker);
     if (!thread)
@@ -311,7 +311,7 @@ int background_worker_Push( struct background_worker* worker, void* entity,
 static void BackgroundWorkerCancelLocked(struct background_worker *worker,
                                          void *id)
 {
-    vlc_assert_locked(&worker->lock);
+    vlc_mutex_assert(&worker->lock);
 
     QueueRemoveAll(worker, id);
 
