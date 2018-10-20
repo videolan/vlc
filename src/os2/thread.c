@@ -212,18 +212,19 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
         p_mutex->locked = true;
         vlc_mutex_unlock (&super_mutex);
         vlc_restorecancel (canc);
-        return;
     }
+    else
+        DosRequestMutexSem(p_mutex->hmtx, SEM_INDEFINITE_WAIT);
 
-    DosRequestMutexSem(p_mutex->hmtx, SEM_INDEFINITE_WAIT);
+    vlc_mutex_mark(p_mutex);
 }
 
 int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
 {
+    int ret;
+
     if (!p_mutex->dynamic)
     {   /* static mutexes */
-        int ret = EBUSY;
-
         assert (p_mutex != &super_mutex); /* this one cannot be static */
         vlc_mutex_lock (&super_mutex);
         if (!p_mutex->locked)
@@ -231,11 +232,17 @@ int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
             p_mutex->locked = true;
             ret = 0;
         }
+        else
+            ret = EBUSY;
         vlc_mutex_unlock (&super_mutex);
-        return ret;
     }
+    else
+        ret = DosRequestMutexSem( p_mutex->hmtx, 0 ) ? EBUSY : 0;
 
-    return DosRequestMutexSem( p_mutex->hmtx, 0 ) ? EBUSY : 0;
+    if (ret == 0)
+        vlc_mutex_mark(p_mutex);
+
+    return ret;
 }
 
 void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
@@ -250,10 +257,11 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         if (p_mutex->contention)
             vlc_cond_broadcast (&super_variable);
         vlc_mutex_unlock (&super_mutex);
-        return;
     }
+    else
+        DosReleaseMutexSem( p_mutex->hmtx );
 
-    DosReleaseMutexSem( p_mutex->hmtx );
+    vlc_mutex_unmark(p_mutex);
 }
 
 /*** Condition variables ***/
