@@ -78,11 +78,13 @@ int vlc_fifo_TimedWaitCond(vlc_fifo_t *fifo, vlc_cond_t *condvar, vlc_tick_t dea
 
 size_t vlc_fifo_GetCount(const vlc_fifo_t *fifo)
 {
+    vlc_mutex_assert(&fifo->lock);
     return fifo->i_depth;
 }
 
 size_t vlc_fifo_GetBytes(const vlc_fifo_t *fifo)
 {
+    vlc_mutex_assert(&fifo->lock);
     return fifo->i_size;
 }
 
