@@ -83,9 +83,9 @@ bool vlc_mutex_marked(const vlc_mutex_t *);
  */
 #define vlc_mutex_assert(m) assert(vlc_mutex_marked(m))
 
-#if (defined (LIBVLC_USE_PTHREAD))
+#if (defined (LIBVLC_USE_PTHREAD) || defined (__ANDROID__))
 #define vlc_assert_locked(m) vlc_mutex_assert(m)
-#elif (defined(__ANDROID__) || defined (__APPLE__)) && !defined (NDEBUG)
+#elif defined (__APPLE__) && !defined (NDEBUG)
 void vlc_assert_locked (vlc_mutex_t *);
 #else
 # define vlc_assert_locked( m ) (void)m
