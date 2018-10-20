@@ -58,7 +58,7 @@ void vlc_threads_setup (libvlc_int_t *);
 void vlc_trace (const char *fn, const char *file, unsigned line);
 #define vlc_backtrace() vlc_trace(__func__, __FILE__, __LINE__)
 
-#if (defined (LIBVLC_USE_PTHREAD) || defined(__ANDROID__)) && !defined (NDEBUG)
+#if (defined (LIBVLC_USE_PTHREAD) || defined(__ANDROID__) || defined (__APPLE__)) && !defined (NDEBUG)
 void vlc_assert_locked (vlc_mutex_t *);
 #else
 # define vlc_assert_locked( m ) (void)m

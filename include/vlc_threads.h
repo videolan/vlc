@@ -218,7 +218,6 @@ static inline int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
 /* Unnamed POSIX semaphores not supported on Mac OS X */
 # include <mach/semaphore.h>
 # include <mach/task.h>
-# define LIBVLC_USE_PTHREAD           1
 # define LIBVLC_USE_PTHREAD_CLEANUP   1
 
 typedef pthread_t       vlc_thread_t;

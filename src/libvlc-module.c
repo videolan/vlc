@@ -2073,7 +2073,7 @@ vlc_module_begin ()
 
     set_section( N_("Performance options"), NULL )
 
-#if defined (LIBVLC_USE_PTHREAD) && !defined (__APPLE__)
+#if defined (LIBVLC_USE_PTHREAD)
     add_bool( "rt-priority", false, RT_PRIORITY_TEXT,
               RT_PRIORITY_LONGTEXT, true )
     add_integer( "rt-offset", 0, RT_OFFSET_TEXT,
