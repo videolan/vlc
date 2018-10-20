@@ -554,7 +554,7 @@ static void ProcessEvents( intf_thread_t *p_intf,
         {
             playlist_t *p_playlist = p_intf->p_sys->p_playlist;
             PL_LOCK;
-            b_can_play = playlist_CurrentSize( p_playlist ) > 0;
+            b_can_play = !playlist_IsEmpty( p_playlist );
             PL_UNLOCK;
 
             if( b_can_play != p_intf->p_sys->b_can_play )
