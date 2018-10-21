@@ -662,7 +662,6 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
     picture_t *p_pic = NULL;
     decoder_sys_t *p_sys = p_dec->p_sys;
     GstMessage *p_msg;
-    GstBuffer *p_buf;
 
     if( !p_block ) /* No Drain */
         return VLCDEC_SUCCESS;
@@ -682,6 +681,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t *p_block )
 
     if( likely( p_block->i_buffer ) )
     {
+        GstBuffer *p_buf;
+
         p_buf = gst_buffer_new_wrapped_full( GST_MEMORY_FLAG_READONLY,
                 p_block->p_start, p_block->i_size,
                 p_block->p_buffer - p_block->p_start, p_block->i_buffer,
