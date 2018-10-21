@@ -72,7 +72,7 @@ access_LTLIBRARIES += libpulsesrc_plugin.la
 endif
 
 libaccess_qtsound_plugin_la_SOURCES = access/qtsound.m
-libaccess_qtsound_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' -Wl,-framework,Foundation -Wl,-framework,QTKit -Wl,-framework,CoreAudio
+libaccess_qtsound_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(accessdir)' -Wl,-framework,Foundation -Wl,-framework,QTKit -Wl,-framework,AVFoundation -Wl,-framework,CoreAudio
 access_LTLIBRARIES += $(LTLIBaccess_qtsound)
 EXTRA_LTLIBRARIES += libaccess_qtsound_plugin.la
 
