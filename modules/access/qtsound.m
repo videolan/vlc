@@ -41,14 +41,17 @@
 
 #define QTKIT_VERSION_MIN_REQUIRED 70603
 
+#import <AvailabilityMacros.h>
 #import <QTKit/QTKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+#ifndef MAC_OS_X_VERSION_10_14
 @interface AVCaptureDevice (AVCaptureDeviceAuthorizationSince10_14)
 
 + (void)requestAccessForMediaType:(AVMediaType)mediaType completionHandler:(void (^)(BOOL granted))handler API_AVAILABLE(macos(10.14), ios(7.0));
 
 @end
+#endif
 
 /*****************************************************************************
  * Local prototypes.
