@@ -79,9 +79,6 @@ typedef struct
     vlc_thread_t thread;
 } services_discovery_sys_t;
 
-static vlc_mutex_t mtp_lock = VLC_STATIC_MUTEX;
-static bool b_mtp_initialized = false;
-
 /*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
@@ -96,13 +93,9 @@ static int Open( vlc_object_t *p_this )
     p_sd->description = _("MTP devices");
     p_sys->psz_name = NULL;
 
-    vlc_mutex_lock( &mtp_lock );
-    if( !b_mtp_initialized )
-    {
-        LIBMTP_Init();
-        b_mtp_initialized = true;
-    }
-    vlc_mutex_unlock( &mtp_lock );
+    static vlc_once_t mtp_init_once = VLC_STATIC_ONCE;
+
+    vlc_once( &mtp_init_once, LIBMTP_Init );
 
     if (vlc_clone (&p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW))
     {
