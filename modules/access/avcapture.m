@@ -39,14 +39,17 @@
 #include <vlc_dialog.h>
 #include <vlc_access.h>
 
+#import <AvailabilityMacros.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 
+#ifndef MAC_OS_X_VERSION_10_14
 @interface AVCaptureDevice (AVCaptureDeviceAuthorizationSince10_14)
 
 + (void)requestAccessForMediaType:(AVMediaType)mediaType completionHandler:(void (^)(BOOL granted))handler API_AVAILABLE(macos(10.14), ios(7.0));
 
 @end
+#endif
 
 /*****************************************************************************
 * Local prototypes
