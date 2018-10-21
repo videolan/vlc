@@ -325,13 +325,31 @@ static int Open(vlc_object_t *p_this)
             goto error;
         }
 
+        if (@available(macOS 10.14, *)) {
+            msg_Dbg(p_demux, "Check user consent for access to the video device");
+
+            dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+            __block bool accessGranted = NO;
+            [AVCaptureDevice requestAccessForMediaType: AVMediaTypeVideo completionHandler:^(BOOL granted) {
+                accessGranted = granted;
+                dispatch_semaphore_signal(sema);
+            } ];
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            dispatch_release(sema);
+            if (!accessGranted) {
+                msg_Err(p_demux, "Can't use the video device as access has not been granted by the user");
+                goto error;
+            }
+        }
+
         input = [AVCaptureDeviceInput deviceInputWithDevice:(__bridge AVCaptureDevice *)p_sys->device error:&o_returnedError];
 
         if ( !input )
         {
-            msg_Err(p_demux, "can't create a valid capture input facility (%ld)", [o_returnedError code]);
+            msg_Err(p_demux, "can't create a valid capture input facility: %s (%ld)",[[o_returnedError localizedDescription] UTF8String], [o_returnedError code]);
             goto error;
         }
+
 
         int chroma = VLC_CODEC_RGB32;
 
