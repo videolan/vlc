@@ -44,6 +44,12 @@
 #import <QTKit/QTKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+@interface AVCaptureDevice (AVCaptureDeviceAuthorizationSince10_14)
+
++ (void)requestAccessForMediaType:(AVMediaType)mediaType completionHandler:(void (^)(BOOL granted))handler API_AVAILABLE(macos(10.14), ios(7.0));
+
+@end
+
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
