@@ -884,12 +884,14 @@ static void GetPrimariesTransform(FLOAT Primaries[4*4], video_color_primaries_t 
     /* src[RGB] -> src[XYZ] -> dst[XYZ] -> dst[RGB] */
     Float3x3Multiply(xyz2rgb, rgb2xyz);
 
-    for (size_t i=0;i<4; ++i)
+    for (size_t i=0;i<3; ++i)
     {
         for (size_t j=0;j<3; ++j)
             Primaries[j + i*4] = xyz2rgb[j + i*3];
-        Primaries[3 + i*4] = i == 3;
+        Primaries[3 + i*4] = 0;
     }
+    for (size_t j=0;j<4; ++j)
+        Primaries[j + 3*4] = j == 3;
 }
 
 #undef D3D11_SetupQuad
