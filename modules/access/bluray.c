@@ -227,6 +227,7 @@ typedef struct
 {
     es_format_t fmt;
     es_out_id_t *p_es;
+    int i_next_block_flags;
 } es_pair_t;
 
 static bool es_pair_Add(vlc_array_t *p_array, const es_format_t *p_fmt,
@@ -236,6 +237,7 @@ static bool es_pair_Add(vlc_array_t *p_array, const es_format_t *p_fmt,
     if (likely(p_pair != NULL))
     {
         p_pair->p_es = p_es;
+        p_pair->i_next_block_flags = 0;
         if(vlc_array_append(p_array, p_pair) != VLC_SUCCESS)
         {
             free(p_pair);
@@ -1097,6 +1099,7 @@ typedef struct
     vlc_object_t *p_obj;
     vlc_array_t es; /* es_pair_t */
     void *priv;
+    bool b_discontinuity;
     bool b_disable_output;
     vlc_mutex_t lock;
     struct
@@ -1112,6 +1115,7 @@ enum
 {
     BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID = ES_OUT_PRIVATE_START,
     BLURAY_ES_OUT_CONTROL_UNSET_ES_BY_PID,
+    BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY,
     BLURAY_ES_OUT_CONTROL_ENABLE_OUTPUT,
     BLURAY_ES_OUT_CONTROL_DISABLE_OUTPUT,
 };
@@ -1184,6 +1188,16 @@ static int bluray_esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
 
     vlc_mutex_lock(&esout_priv->lock);
+
+    if(esout_priv->b_discontinuity)
+        esout_priv->b_discontinuity = false;
+
+    es_pair_t *p_pair = getEsPairByES(&esout_priv->es, p_es);
+    if(p_pair && p_pair->i_next_block_flags)
+    {
+        p_block->i_flags |= p_pair->i_next_block_flags;
+        p_pair->i_next_block_flags = 0;
+    }
     if(esout_priv->b_disable_output)
     {
         block_Release(p_block);
@@ -1200,6 +1214,9 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
     demux_sys_t *p_sys = p_demux->p_sys;
 
     vlc_mutex_lock(&esout_priv->lock);
+
+    if(esout_priv->b_discontinuity)
+        esout_priv->b_discontinuity = false;
 
     es_pair_t *p_pair = getEsPairByES(&esout_priv->es, p_es);
     if (p_pair)
@@ -1227,6 +1244,9 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
         vlc_mutex_unlock(&esout_priv->lock);
         return VLC_EGENERIC;
     }
+
+    if(esout_priv->b_discontinuity)
+        esout_priv->b_discontinuity = false;
 
     switch(i_query)
     {
@@ -1258,6 +1278,12 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
             i_ret = es_out_Control(esout_priv->p_dst_out,
                                    b_select ? ES_OUT_SET_ES : ES_OUT_UNSET_ES,
                                    p_pair->p_es);
+        } break;
+
+        case BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY:
+        {
+            esout_priv->b_discontinuity = true;
+            i_ret = VLC_SUCCESS;
         } break;
 
         case BLURAY_ES_OUT_CONTROL_ENABLE_OUTPUT:
@@ -1318,6 +1344,7 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
     esout_priv->p_obj = p_obj;
     esout_priv->priv = priv;
     esout_priv->es_out.cbs = &bluray_esOutCallbacks;
+    esout_priv->b_discontinuity = false;
     esout_priv->b_disable_output = false;
     esout_priv->selected.i_audio_pid = -1;
     esout_priv->selected.i_video_pid = -1;
@@ -2076,6 +2103,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         }
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         break;
     }
     case DEMUX_SET_SEEKPOINT:
@@ -2141,6 +2169,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_time(p_sys->bluray, TO_SCALE_NZ(va_arg(args, vlc_tick_t)));
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         return VLC_SUCCESS;
     }
     case DEMUX_GET_TIME:
@@ -2169,6 +2198,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_time(p_sys->bluray, TO_SCALE_NZ(f_position*CUR_LENGTH));
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         return VLC_SUCCESS;
     }
 
@@ -2604,6 +2634,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_DISCONTINUITY:
         /* reset demuxer (partially decoded PES packets must be dropped) */
         blurayRestartParser(p_demux, false);
+        es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         break;
     case BD_EVENT_END_OF_TITLE:
         p_sys->b_pl_playing = false;
