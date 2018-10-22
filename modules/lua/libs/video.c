@@ -43,18 +43,11 @@
  *****************************************************************************/
 static int vlclua_fullscreen( lua_State *L )
 {
-    vout_thread_t *p_vout;
     int i_ret;
 
-    input_thread_t * p_input = vlclua_get_input_internal( L );
-    if( !p_input ) return vlclua_error( L );
-
-    p_vout = input_GetVout( p_input );
-    input_Release(p_input);
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
     if( !p_vout )
-    {
         return vlclua_error( L );
-    }
 
     i_ret = vlclua_var_toggle_or_set( L, p_vout, "fullscreen" );
 

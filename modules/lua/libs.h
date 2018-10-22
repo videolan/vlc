@@ -23,6 +23,8 @@
 #ifndef VLC_LUA_LIBS_H
 #define VLC_LUA_LIBS_H
 
+#include "vlc.h"
+
 void luaopen_config( lua_State * );
 void luaopen_dialog( lua_State *, void * );
 void luaopen_httpd( lua_State * );

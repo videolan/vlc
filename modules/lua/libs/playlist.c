@@ -34,7 +34,8 @@
 #include <vlc_common.h>
 
 #include <vlc_interface.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
+#include <vlc_player.h>
 
 #include "../vlc.h"
 #include "../libs.h"
@@ -42,139 +43,254 @@
 #include "variables.h"
 #include "misc.h"
 
-void vlclua_set_playlist_internal( lua_State *L, playlist_t *pl )
+void vlclua_set_playlist_internal(lua_State *L, vlc_playlist_t *playlist)
 {
-    vlclua_set_object( L, vlclua_set_playlist_internal, pl );
+    vlclua_set_object(L, vlclua_set_playlist_internal, playlist);
 }
 
-playlist_t *vlclua_get_playlist_internal( lua_State *L )
+vlc_playlist_t *vlclua_get_playlist_internal(lua_State *L)
 {
-    return vlclua_get_object( L, vlclua_set_playlist_internal );
+    return vlclua_get_object(L, vlclua_set_playlist_internal);
 }
 
-static int vlclua_playlist_prev( lua_State * L )
+static int vlclua_playlist_prev(lua_State *L)
 {
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Prev( p_playlist );
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Prev(playlist);
+    vlc_playlist_Unlock(playlist);
     return 0;
 }
 
-static int vlclua_playlist_next( lua_State * L )
+static int vlclua_playlist_next(lua_State *L)
 {
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Next( p_playlist );
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Next(playlist);
+    vlc_playlist_Unlock(playlist);
     return 0;
 }
 
-static int vlclua_playlist_skip( lua_State * L )
+static int vlclua_playlist_skip(lua_State *L)
 {
-    int i_skip = luaL_checkinteger( L, 1 );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Skip( p_playlist, i_skip );
-    return 0;
-}
-
-static int vlclua_playlist_play( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Play( p_playlist );
-    return 0;
-}
-
-static int vlclua_playlist_pause( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_TogglePause( p_playlist );
-    return 0;
-}
-
-static int vlclua_playlist_stop( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Stop( p_playlist );
-    return 0;
-}
-
-static int vlclua_playlist_clear( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_Stop( p_playlist ); /* Isn't this already implied by Clear? */
-    playlist_Clear( p_playlist, pl_Unlocked );
-    return 0;
-}
-
-static int vlclua_playlist_repeat( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "repeat" );
-    return i_ret;
-}
-
-static int vlclua_playlist_loop( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "loop" );
-    return i_ret;
-}
-
-static int vlclua_playlist_random( lua_State * L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    int i_ret = vlclua_var_toggle_or_set( L, p_playlist, "random" );
-    return i_ret;
-}
-
-static int vlclua_playlist_gotoitem( lua_State * L )
-{
-    int i_id = luaL_checkinteger( L, 1 );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    PL_LOCK;
-    playlist_ViewPlay( p_playlist, NULL,
-                       playlist_ItemGetById( p_playlist, i_id ) );
-    PL_UNLOCK;
-    return vlclua_push_ret( L, VLC_SUCCESS );
-}
-
-static int vlclua_playlist_delete( lua_State * L )
-{
-    int i_id = luaL_checkinteger( L, 1 );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-
-    PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-    if( p_item != NULL )
-       playlist_NodeDelete( p_playlist, p_item );
-    PL_UNLOCK;
-
-    return vlclua_push_ret( L, (p_item != NULL) ? 0 : -1 );
-}
-
-static int vlclua_playlist_move( lua_State * L )
-{
-    int i_item = luaL_checkinteger( L, 1 );
-    int i_target = luaL_checkinteger( L, 2 );
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_item );
-    playlist_item_t *p_target = playlist_ItemGetById( p_playlist, i_target );
-    if( !p_item || !p_target )
-    {
-       PL_UNLOCK;
-       return vlclua_push_ret( L, -1 );
+    int n = luaL_checkinteger( L, 1 );
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    if (n < 0) {
+        for (int i = 0; i < -n; i++)
+            vlc_playlist_Prev(playlist);
+    } else {
+        for (int i = 0; i < n; ++i)
+            vlc_playlist_Next(playlist);
     }
-    int i_ret;
-    if( p_target->i_children != -1 )
-        i_ret = playlist_TreeMove( p_playlist, p_item, p_target, 0 );
+    return 0;
+}
+
+static int vlclua_playlist_play(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_Lock(playlist);
+    if (vlc_playlist_GetCurrentIndex(playlist) == -1 &&
+            vlc_playlist_Count(playlist) > 0)
+        vlc_playlist_GoTo(playlist, 0);
+    vlc_playlist_Start(playlist);
+    vlc_playlist_Unlock(playlist);
+    return 0;
+}
+
+static int vlclua_playlist_pause(lua_State *L)
+{
+    /* this is in fact a toggle pause */
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+
+    vlc_player_Lock(player);
+    if (vlc_player_GetState(player) != VLC_PLAYER_STATE_PAUSED)
+        vlc_player_Pause(player);
     else
-        i_ret = playlist_TreeMove( p_playlist, p_item, p_target->p_parent, p_target->i_id - p_target->p_parent->pp_children[0]->i_id + 1 );
-    PL_UNLOCK;
-    return vlclua_push_ret( L, i_ret );
+        vlc_player_Resume(player);
+    vlc_player_Unlock(player);
+
+    return 0;
+}
+
+static int vlclua_playlist_stop(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Stop(playlist);
+    vlc_playlist_Unlock(playlist);
+    return 0;
+}
+
+static int vlclua_playlist_clear( lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Clear(playlist);
+    vlc_playlist_Unlock(playlist);
+    return 0;
+}
+
+static bool take_bool(lua_State *L)
+{
+    const char *s = luaL_checkstring(L, -1);
+    lua_pop( L, 1 );
+    return s && !strcmp(s, "on");
+}
+
+static int vlclua_playlist_repeat_(lua_State *L,
+                               enum vlc_playlist_playback_repeat enabled_mode)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    int top = lua_gettop(L);
+    if (top > 1)
+        return vlclua_error(L);
+
+    vlc_playlist_Lock(playlist);
+
+    bool enable;
+    if (top == 0)
+    {
+        /* no value provided, toggle the current */
+        enum vlc_playlist_playback_repeat repeat =
+                vlc_playlist_GetPlaybackRepeat(playlist);
+        enable = repeat != enabled_mode;
+    }
+    else
+    {
+        /* use the provided value */
+        enable = take_bool(L);
+    }
+
+    enum vlc_playlist_playback_repeat new_repeat = enable
+                                    ? enabled_mode
+                                    : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+
+    vlc_playlist_SetPlaybackRepeat(playlist, new_repeat);
+
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushboolean(L, enable);
+    return 1;
+}
+
+static int vlclua_playlist_repeat(lua_State *L)
+{
+    return vlclua_playlist_repeat_(L, VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT);
+}
+
+static int vlclua_playlist_loop(lua_State *L)
+{
+    return vlclua_playlist_repeat_(L, VLC_PLAYLIST_PLAYBACK_REPEAT_ALL);
+}
+
+static int vlclua_playlist_random(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    int top = lua_gettop(L);
+    if (top > 1)
+        return vlclua_error(L);
+
+    vlc_playlist_Lock(playlist);
+
+    bool enable;
+    if (top == 0)
+    {
+        enum vlc_playlist_playback_order order =
+                vlc_playlist_GetPlaybackOrder(playlist);
+        enable = order != VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    }
+    else
+    {
+        /* use the provided value */
+        enable = take_bool(L);
+    }
+
+    enum vlc_playlist_playback_order new_order = enable
+                                    ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM
+                                    : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+
+    vlc_playlist_SetPlaybackOrder(playlist, new_order);
+
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushboolean(L, enable);
+    return 1;
+}
+
+static int vlclua_playlist_gotoitem(lua_State *L)
+{
+    uint64_t id = luaL_checkinteger(L, 1);
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    int ret;
+
+    vlc_playlist_Lock(playlist);
+    ssize_t index = vlc_playlist_IndexOfId(playlist, id);
+    if (index == -1)
+        ret = VLC_ENOITEM;
+    else
+    {
+        vlc_playlist_GoTo(playlist, index);
+        ret = VLC_SUCCESS;
+    }
+    vlc_playlist_Unlock(playlist);
+
+    return vlclua_push_ret(L, ret);
+}
+
+static int vlclua_playlist_delete(lua_State *L)
+{
+    uint64_t id = luaL_checkinteger(L, 1);
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    int ret;
+
+    vlc_playlist_Lock(playlist);
+    ssize_t index = vlc_playlist_IndexOfId(playlist, id);
+    if (index == -1)
+        ret = -1;
+    else
+    {
+        vlc_playlist_RemoveOne(playlist, index);
+        ret = VLC_SUCCESS;
+    }
+    vlc_playlist_Unlock(playlist);
+
+    return vlclua_push_ret(L, ret);
+}
+
+static int vlclua_playlist_move(lua_State *L)
+{
+    uint64_t item_id = luaL_checkinteger(L, 1);
+    uint64_t target_id = luaL_checkinteger(L, 2);
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    int ret;
+
+    vlc_playlist_Lock(playlist);
+    ssize_t item_index = vlc_playlist_IndexOfId(playlist, item_id);
+    ssize_t target_index = vlc_playlist_IndexOfId(playlist, target_id);
+    if (item_index == -1 || target_index == -1)
+        ret = -1;
+    else
+    {
+        /* if the current item was before the target, moving it shifts the
+         * target item by one */
+        size_t new_index = item_index <= target_index ? target_index
+                                                      : target_index + 1;
+        vlc_playlist_MoveOne(playlist, item_index, new_index);
+        ret = VLC_SUCCESS;
+    }
+    vlc_playlist_Unlock(playlist);
+
+    return vlclua_push_ret(L, ret);
 }
 
 static int vlclua_playlist_add_common(lua_State *L, bool play)
 {
     vlc_object_t *obj = vlclua_get_this(L);
-    playlist_t *playlist = vlclua_get_playlist_internal(L);
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
     int count = 0;
 
     /* playlist */
@@ -186,209 +302,195 @@ static int vlclua_playlist_add_common(lua_State *L, bool play)
 
     lua_pushnil(L);
 
+    vlc_playlist_Lock(playlist);
+
     /* playlist nil */
     while (lua_next(L, -2))
     {
         input_item_t *item = vlclua_read_input_item(obj, L);
         if (item != NULL)
         {
-            /* Play or Enqueue (preparse) */
-            /* FIXME: playlist_AddInput() can fail */
-            playlist_AddInput(playlist, item, play);
+            int ret = vlc_playlist_AppendOne(playlist, item);
+            if (ret == VLC_SUCCESS)
+            {
+                count++;
+                if (play)
+                {
+                    size_t last = vlc_playlist_Count(playlist) - 1;
+                    vlc_playlist_PlayAt(playlist, last);
+                }
+            }
             input_item_Release(item);
-            count++;
         }
         /* pop the value, keep the key for the next lua_next() call */
         lua_pop(L, 1);
     }
     /* playlist */
 
+    vlc_playlist_Unlock(playlist);
+
     lua_pushinteger(L, count);
     return 1;
 }
 
-static int vlclua_playlist_add( lua_State *L )
+static int vlclua_playlist_add(lua_State *L)
 {
     return vlclua_playlist_add_common(L, true);
 }
 
-static int vlclua_playlist_enqueue( lua_State *L )
+static int vlclua_playlist_enqueue(lua_State *L)
 {
     return vlclua_playlist_add_common(L, false);
 }
 
-static void push_playlist_item( lua_State *L, playlist_item_t *p_item )
+static void push_playlist_item(lua_State *L, vlc_playlist_item_t *item)
 {
-    input_item_t *p_input = p_item->p_input;
-    int i_flags = 0;
-    i_flags = p_item->i_flags;
-    lua_newtable( L );
-    lua_pushinteger( L, p_item->i_id );
-    lua_setfield( L, -2, "id" );
-    lua_newtable( L );
-#define CHECK_AND_SET_FLAG( name, label ) \
-    if( i_flags & PLAYLIST_ ## name ## _FLAG ) \
-    { \
-        lua_pushboolean( L, 1 ); \
-        lua_setfield( L, -2, #label ); \
-    }
-    CHECK_AND_SET_FLAG( DBL, disabled )
-    CHECK_AND_SET_FLAG( RO, ro )
-#undef CHECK_AND_SET_FLAG
-    lua_setfield( L, -2, "flags" );
-    if( p_input )
-    {
-        /* Apart from nb_played, these fields unfortunately duplicate
-           fields already available from the input item */
-        char *psz_name = input_item_GetTitleFbName( p_input );
-        lua_pushstring( L, psz_name );
-        free( psz_name );
-        lua_setfield( L, -2, "name" );
-        lua_pushstring( L, p_input->psz_uri );
-        lua_setfield( L, -2, "path" );
-        if( p_input->i_duration < 0 )
-            lua_pushnumber( L, -1 );
-        else
-            lua_pushnumber( L, secf_from_vlc_tick(p_input->i_duration) );
-        lua_setfield( L, -2, "duration" );
-        lua_pushinteger( L, p_item->i_nb_played );
-        lua_setfield( L, -2, "nb_played" );
-        luaopen_input_item( L, p_input );
-    }
-    if( p_item->i_children >= 0 )
-    {
-        int i;
-        lua_createtable( L, p_item->i_children, 0 );
-        for( i = 0; i < p_item->i_children; i++ )
-        {
-            push_playlist_item( L, p_item->pp_children[i] );
-            lua_rawseti( L, -2, i+1 );
-        }
-        lua_setfield( L, -2, "children" );
-    }
-}
+    lua_newtable(L);
 
-static int vlclua_playlist_get( lua_State *L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    PL_LOCK;
-    playlist_item_t *p_item = NULL;
+    lua_pushinteger(L, vlc_playlist_item_GetId(item));
+    lua_setfield(L, -2, "id");
 
-    if( lua_isnumber( L, 1 ) )
-    {
-        int i_id = lua_tointeger( L, 1 );
-        p_item = playlist_ItemGetById( p_playlist, i_id );
-        if( !p_item )
-        {
-            PL_UNLOCK;
-            return 0; /* Should we return an error instead? */
-        }
-    }
-    else if( lua_isstring( L, 1 ) )
-    {
-        const char *psz_what = lua_tostring( L, 1 );
-        if( !strcasecmp( psz_what, "normal" )
-         || !strcasecmp( psz_what, "playlist" ) )
-            p_item = p_playlist->p_playing;
-        else if( !strcasecmp( psz_what, "root" ) )
-            p_item = &p_playlist->root;
-        else
-        {
-            /* currently, psz_what must be SD module's longname! */
-            p_item = playlist_ChildSearchName( &p_playlist->root, psz_what );
+    input_item_t *media = vlc_playlist_item_GetMedia(item);
 
-            if( !p_item )
-            {
-                PL_UNLOCK;
-                return 0; /* Should we return an error instead? */
-            }
-        }
-    }
+    /* Apart from nb_played, these fields unfortunately duplicate
+       fields already available from the input item */
+    char *name = input_item_GetTitleFbName(media);
+    lua_pushstring(L, name);
+    free(name);
+    lua_setfield(L, -2, "name");
+
+    lua_pushstring(L, media->psz_uri);
+    lua_setfield(L, -2, "path");
+
+    if( media->i_duration < 0 )
+        lua_pushnumber(L, -1);
     else
-    {
-        p_item = &p_playlist->root;
-    }
-    push_playlist_item( L, p_item );
-    PL_UNLOCK;
-    return 1;
+        lua_pushnumber(L, secf_from_vlc_tick(media->i_duration));
+    lua_setfield(L, -2, "duration");
+
+    luaopen_input_item(L, media);
 }
 
-static int vlclua_playlist_current( lua_State *L )
+static int vlclua_playlist_get(lua_State *L)
 {
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    playlist_item_t *item;
-    int id = -1;
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    uint64_t item_id = luaL_checkinteger(L, 1);
 
-    PL_LOCK;
-    item = playlist_CurrentPlayingItem( p_playlist );
-    if( item != NULL )
-        id = item->i_id;
-    PL_UNLOCK;
-    lua_pushinteger( L, id );
+    vlc_playlist_Lock(playlist);
+    ssize_t index = vlc_playlist_IndexOfId(playlist, item_id);
+    vlc_playlist_item_t *item = index != -1 ? vlc_playlist_Get(playlist, index)
+                                            : NULL;
+    if (item)
+        push_playlist_item(L, item);
+    else
+        lua_pushnil(L);
+    vlc_playlist_Unlock(playlist);
+
     return 1;
 }
 
-static int vlc_sort_key_from_string( const char *psz_name )
+static int vlclua_playlist_current(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_playlist_Lock(playlist);
+    ssize_t current = vlc_playlist_GetCurrentIndex(playlist);
+    int id;
+    if (current != -1) {
+        vlc_playlist_item_t *item = vlc_playlist_Get(playlist, current);
+        id = vlc_playlist_item_GetId(item);
+    } else
+        id = -1;
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushinteger(L, id);
+    return 1;
+}
+
+static bool vlc_sort_key_from_string(const char *keyname,
+                                     enum vlc_playlist_sort_key *key)
 {
     static const struct
     {
-        const char *psz_name;
-        int i_key;
-    } pp_keys[] =
-        { { "id", SORT_ID },
-          { "title", SORT_TITLE },
-          { "title nodes first", SORT_TITLE_NODES_FIRST },
-          { "artist", SORT_ARTIST },
-          { "genre", SORT_GENRE },
-          { "random", SORT_RANDOM },
-          { "duration", SORT_DURATION },
-          { "title numeric", SORT_TITLE_NUMERIC },
-          { "album", SORT_ALBUM },
-          { NULL, -1 } };
-    int i;
-    for( i = 0; pp_keys[i].psz_name; i++ )
+        const char *keyname;
+        enum vlc_playlist_sort_key key;
+    } map[] = {
+        { "title",    VLC_PLAYLIST_SORT_KEY_TITLE },
+        { "artist",   VLC_PLAYLIST_SORT_KEY_ARTIST },
+        { "genre",    VLC_PLAYLIST_SORT_KEY_GENRE },
+        { "duration", VLC_PLAYLIST_SORT_KEY_DURATION },
+        { "album",    VLC_PLAYLIST_SORT_KEY_ALBUM },
+    };
+    for (size_t i = 0; i < ARRAY_SIZE(map); ++i)
     {
-        if( !strcmp( psz_name, pp_keys[i].psz_name ) )
-            return pp_keys[i].i_key;
+        if (!strcmp(keyname, map[i].keyname))
+        {
+            *key = map[i].key;
+            return true;
+        }
     }
-    return -1;
+    return false;
 }
 
 static int vlclua_playlist_sort( lua_State *L )
 {
-    /* allow setting the different sort keys */
-    int i_mode = vlc_sort_key_from_string( luaL_checkstring( L, 1 ) );
-    if( i_mode == -1 )
-        return luaL_error( L, "Invalid search key." );
-    int i_type = luaL_optboolean( L, 2, 0 ) ? ORDER_REVERSE : ORDER_NORMAL;
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    PL_LOCK;
-    int i_ret = playlist_RecursiveNodeSort( p_playlist, p_playlist->p_playing,
-                                            i_mode, i_type );
-    PL_UNLOCK;
-    return vlclua_push_ret( L, i_ret );
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    const char *keyname = luaL_checkstring(L, 1);
+
+    int ret;
+    if (!strcmp(keyname, "random"))
+    {
+        /* sort randomly -> shuffle */
+        vlc_playlist_Lock(playlist);
+        vlc_playlist_Shuffle(playlist);
+        vlc_playlist_Unlock(playlist);
+        ret = VLC_SUCCESS;
+    }
+    else
+    {
+        struct vlc_playlist_sort_criterion criterion;
+        if (!vlc_sort_key_from_string(keyname, &criterion.key))
+            return luaL_error(L, "Invalid search key.");
+        criterion.order = luaL_optboolean(L, 2, 0)
+                        ? VLC_PLAYLIST_SORT_ORDER_DESCENDING
+                        : VLC_PLAYLIST_SORT_ORDER_ASCENDING;
+
+        vlc_playlist_Lock(playlist);
+        ret = vlc_playlist_Sort(playlist, &criterion, 1);
+        vlc_playlist_Unlock(playlist);
+    }
+    return vlclua_push_ret(L, ret);
 }
 
-static int vlclua_playlist_status( lua_State *L )
+static int vlclua_playlist_status(lua_State *L)
 {
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    PL_LOCK;
-    int status = playlist_Status( p_playlist );
-    PL_UNLOCK;
-    switch( status )
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+    vlc_player_Lock(player);
+    enum vlc_player_state state = vlc_player_GetState(player);
+    vlc_player_Unlock(player);
+
+    switch (state)
     {
-        case PLAYLIST_STOPPED:
-            lua_pushliteral( L, "stopped" );
+        case VLC_PLAYER_STATE_STOPPED:
+            lua_pushliteral(L, "stopped");
             break;
-        case PLAYLIST_RUNNING:
-            lua_pushliteral( L, "playing" );
+        case VLC_PLAYER_STATE_STARTED:
+            lua_pushliteral(L, "started");
             break;
-        case PLAYLIST_PAUSED:
-            lua_pushliteral( L, "paused" );
+        case VLC_PLAYER_STATE_PLAYING:
+            lua_pushliteral(L, "playing");
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            lua_pushliteral(L, "paused");
+            break;
+        case VLC_PLAYER_STATE_STOPPING:
+            lua_pushliteral(L, "stopping");
             break;
         default:
-            lua_pushliteral( L, "unknown" );
-            break;
+            lua_pushliteral(L, "unknown");
     }
     return 1;
 }

@@ -70,16 +70,11 @@ static int vlclua_osd_icon( lua_State *L )
     if( !i_icon )
         return luaL_error( L, "\"%s\" is not a valid osd icon.", psz_icon );
 
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
+    if( p_vout )
     {
-        vout_thread_t *p_vout = input_GetVout( p_input );
-        if( p_vout )
-        {
-            vout_OSDIcon( p_vout, i_chan, i_icon );
-            vout_Release(p_vout);
-        }
-        input_Release(p_input);
+        vout_OSDIcon( p_vout, i_chan, i_icon );
+        vout_Release( p_vout );
     }
     return 0;
 }
@@ -117,17 +112,12 @@ static int vlclua_osd_message( lua_State *L )
     const char *psz_position = luaL_optstring( L, 3, "top-right" );
     vlc_tick_t duration = (vlc_tick_t)luaL_optinteger( L, 4, VLC_TICK_FROM_SEC(1));
 
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
+    if( p_vout )
     {
-        vout_thread_t *p_vout = input_GetVout( p_input );
-        if( p_vout )
-        {
-            vout_OSDText( p_vout, i_chan, vlc_osd_position_from_string( psz_position ),
-                          duration, psz_message );
-            vout_Release(p_vout);
-        }
-        input_Release(p_input);
+        vout_OSDText( p_vout, i_chan, vlc_osd_position_from_string( psz_position ),
+                      duration, psz_message );
+        vout_Release( p_vout );
     }
     return 0;
 }
@@ -161,32 +151,20 @@ static int vlclua_osd_slider( lua_State *L )
         return luaL_error( L, "\"%s\" is not a valid slider type.",
                            psz_type );
 
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( p_input )
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
+    if( p_vout )
     {
-        vout_thread_t *p_vout = input_GetVout( p_input );
-        if( p_vout )
-        {
-            vout_OSDSlider( p_vout, i_chan, i_position, i_type );
-            vout_Release(p_vout);
-        }
-        input_Release(p_input);
+        vout_OSDSlider( p_vout, i_chan, i_position, i_type );
+        vout_Release( p_vout );
     }
     return 0;
 }
 
 static int vlclua_spu_channel_register( lua_State *L )
 {
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( !p_input )
-        return luaL_error( L, "Unable to find input." );
-
-    vout_thread_t *p_vout = input_GetVout( p_input );
-    input_Release(p_input);
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
     if( !p_vout )
-    {
         return luaL_error( L, "Unable to find vout." );
-    }
 
     int i_chan = vout_RegisterSubpictureChannel( p_vout );
     vout_Release( p_vout );
@@ -197,15 +175,9 @@ static int vlclua_spu_channel_register( lua_State *L )
 static int vlclua_spu_channel_clear( lua_State *L )
 {
     int i_chan = luaL_checkinteger( L, 1 );
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( !p_input )
-        return luaL_error( L, "Unable to find input." );
-    vout_thread_t *p_vout = input_GetVout( p_input );
-    input_Release(p_input);
+    vout_thread_t *p_vout = vlclua_get_vout_internal(L);
     if( !p_vout )
-    {
         return luaL_error( L, "Unable to find vout." );
-    }
 
     vout_FlushSubpictureChannel( p_vout, i_chan );
     vout_Release(p_vout);

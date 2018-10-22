@@ -35,6 +35,8 @@
 #include <vlc_meta.h>
 #include <vlc_url.h>
 #include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
+#include <vlc_player.h>
 
 #include <assert.h>
 
@@ -43,24 +45,24 @@
 #include "../libs.h"
 #include "../extension.h"
 
-static input_item_t* vlclua_input_item_get_internal( lua_State *L );
-
-input_thread_t * vlclua_get_input_internal( lua_State *L )
-{
-    extension_t *p_extension = vlclua_extension_get( L );
-    if( p_extension )
-    {
-        input_thread_t *p_input = p_extension->p_sys->p_input;
-        if( p_input )
-        {
-            input_Hold(p_input);
-            return p_input;
-        }
-    }
-
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    return playlist_CurrentInput( p_playlist );
+vlc_player_t *vlclua_get_player_internal(lua_State *L) {
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+    return vlc_playlist_GetPlayer(playlist);
 }
+
+vout_thread_t *vlclua_get_vout_internal(lua_State *L)
+{
+    vlc_player_t *player = vlclua_get_player_internal(L);
+    return vlc_player_vout_Hold(player);
+}
+
+audio_output_t *vlclua_get_aout_internal(lua_State *L)
+{
+    vlc_player_t *player = vlclua_get_player_internal(L);
+    return vlc_player_aout_Hold(player);
+}
+
+static input_item_t* vlclua_input_item_get_internal( lua_State *L );
 
 static int vlclua_input_item_info( lua_State *L )
 {
@@ -89,10 +91,12 @@ static int vlclua_input_item_info( lua_State *L )
 
 static int vlclua_input_is_playing( lua_State *L )
 {
-    input_thread_t * p_input = vlclua_get_input_internal( L );
-    lua_pushboolean( L, !!p_input );
-    if( p_input )
-        input_Release(p_input);
+    vlc_player_t *player = vlclua_get_player_internal(L);
+
+    vlc_player_Lock(player);
+    bool started = vlc_player_IsStarted(player);
+    vlc_player_Unlock(player);
+    lua_pushboolean(L, started);
     return 1;
 }
 
@@ -214,32 +218,27 @@ static int vlclua_input_item_stats( lua_State *L )
     return 1;
 }
 
-static int vlclua_input_add_subtitle( lua_State *L, bool b_path )
+static int vlclua_input_add_subtitle(lua_State *L, bool b_path)
 {
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    bool b_autoselect = false;
-    if( !p_input )
-        return luaL_error( L, "can't add subtitle: no current input" );
-    if( !lua_isstring( L, 1 ) )
-    {
-        input_Release(p_input);
-        return luaL_error( L, "vlc.input.add_subtitle() usage: (path)" );
-    }
-    if( lua_gettop( L ) >= 2 )
-        b_autoselect = lua_toboolean( L, 2 );
-    const char *psz_sub = luaL_checkstring( L, 1 );
-    if( !b_path )
-        input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_sub, b_autoselect, true, false );
-    else
-    {
-        char* psz_mrl = vlc_path2uri( psz_sub, NULL );
-        if ( psz_mrl )
-        {
-            input_AddSlave( p_input, SLAVE_TYPE_SPU, psz_mrl, b_autoselect, true, false );
-            free( psz_mrl );
-        }
-    }
-    input_Release(p_input);
+    vlc_player_t *player = vlclua_get_player_internal(L);
+
+    if (!lua_isstring(L, 1))
+        return luaL_error( L, "vlc.player.add_subtitle() usage: (path)" );
+
+    bool autoselect;
+    if (lua_gettop(L) >= 2)
+        autoselect = lua_toboolean(L, 2);
+
+    const char *sub = luaL_checkstring(L, 1);
+    char *mrl;
+    if (b_path)
+        mrl = vlc_path2uri(sub, NULL);
+
+    const char *uri = b_path ? mrl : sub;
+    vlc_player_AddAssociatedMedia(player, SPU_ES, uri, autoselect, true, false);
+    if (b_path)
+        free(mrl);
+
     return 1;
 }
 
@@ -285,20 +284,16 @@ static int vlclua_input_item_delete( lua_State *L )
 
 static int vlclua_input_item_get_current( lua_State *L )
 {
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    input_item_t *p_item = p_input ? input_GetItem( p_input ) : NULL;
-    if( !p_item )
-    {
-        lua_pushnil( L );
-        if (p_input != NULL)
-            input_Release(p_input);
-        return 1;
-    }
+    vlc_player_t *player = vlclua_get_player_internal(L);
 
-    vlclua_input_item_get( L, p_item );
+    vlc_player_Lock(player);
+    input_item_t *media = vlc_player_GetCurrentMedia(player);
+    if (media)
+        vlclua_input_item_get(L, media);
+    else
+        lua_pushnil(L);
+    vlc_player_Unlock(player);
 
-    if (p_input != NULL)
-        input_Release(p_input);
     return 1;
 }
 
@@ -413,7 +408,7 @@ void luaopen_input( lua_State *L )
 {
     lua_newtable( L );
     luaL_register( L, NULL, vlclua_input_reg );
-    lua_setfield( L, -2, "input" );
+    lua_setfield( L, -2, "player" );
 }
 
 static const luaL_Reg vlclua_input_item_reg[] = {

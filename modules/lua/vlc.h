@@ -29,7 +29,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_meta_fetcher.h>
 #include <vlc_url.h>
@@ -142,8 +142,8 @@ void vlclua_set_this( lua_State *, vlc_object_t * );
 #define vlclua_set_this(a, b) vlclua_set_this(a, VLC_OBJECT(b))
 vlc_object_t * vlclua_get_this( lua_State * );
 
-void vlclua_set_playlist_internal( lua_State *, playlist_t * );
-playlist_t * vlclua_get_playlist_internal( lua_State * );
+void vlclua_set_playlist_internal( lua_State *, vlc_playlist_t * );
+vlc_playlist_t * vlclua_get_playlist_internal( lua_State * );
 
 /*****************************************************************************
  * Lua function bridge
