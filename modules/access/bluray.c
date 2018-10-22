@@ -2700,7 +2700,12 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         break;
     case BD_EVENT_END_OF_TITLE:
-        p_sys->b_pl_playing = false;
+        if(p_sys->b_pl_playing)
+        {
+            notifyDiscontinuityToParser(p_sys);
+            blurayRestartParser(p_demux, false);
+            p_sys->b_pl_playing = false;
+        }
         break;
     case BD_EVENT_IDLE:
         /* nothing to do (ex. BD-J is preparing menus, waiting user input or running animation) */
