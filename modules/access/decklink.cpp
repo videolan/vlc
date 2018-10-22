@@ -267,7 +267,7 @@ public:
             mode_name = strdup("unknown");
         } else {
             mode_name = DECKLINK_STRDUP(tmp_name);
-            DECKLINK_STRDUP(tmp_name);
+            DECKLINK_FREE(tmp_name);
         }
 
         msg_Dbg(demux_, "Video input format changed to %s", mode_name);
