@@ -65,6 +65,8 @@
 #include <libbluray/overlay.h>
 
 //#define DEBUG_BLURAY
+//#define DEBUG_BLURAY_EVENTS
+
 #ifdef DEBUG_BLURAY
 #  include <libbluray/log_control.h>
 #  define BLURAY_DEBUG_MASK (0xFFFFF & ~DBG_STREAM)
@@ -79,6 +81,55 @@ static void bluray_DebugHandler(const char *psz)
     msg_Dbg(p_bluray_DebugObject, "%s", psz_log ? psz_log : psz);
     free(psz_log);
 }
+#endif
+
+#ifdef DEBUG_BLURAY_EVENTS
+#  define BD_DEBUG_EVENT_ENTRY(a) [a]=#a
+static const char * bluray_event_debug_strings[] =
+{
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_NONE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_ERROR),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_READ_ERROR),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_ENCRYPTED),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_ANGLE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_TITLE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PLAYLIST),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PLAYITEM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_CHAPTER),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PLAYMARK),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_END_OF_TITLE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_AUDIO_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_IG_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PG_TEXTST_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PIP_PG_TEXTST_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SECONDARY_AUDIO_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SECONDARY_VIDEO_STREAM),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PG_TEXTST),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PIP_PG_TEXTST),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SECONDARY_AUDIO),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SECONDARY_VIDEO),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SECONDARY_VIDEO_SIZE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_PLAYLIST_STOP),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_DISCONTINUITY),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SEEK),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_STILL),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_STILL_TIME),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_SOUND_EFFECT),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_IDLE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_POPUP),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_MENU),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_STEREOSCOPIC_STATUS),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_KEY_INTEREST_TABLE),
+    BD_DEBUG_EVENT_ENTRY(BD_EVENT_UO_MASK_CHANGED),
+};
+#  define blurayDebugEvent(e, v) do {\
+    if(e < ARRAY_SIZE(bluray_event_debug_strings))\
+        msg_Dbg(p_demux, "Event %s %x", bluray_event_debug_strings[e], v);\
+    else\
+        msg_Dbg(p_demux, "Event Unk 0x%x %x", e, v);\
+    } while(0)
+#else
+#  define blurayDebugEvent(e, v)
 #endif
 
 /*****************************************************************************
@@ -2603,6 +2654,8 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
 static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
+
+    blurayDebugEvent(e->event, e->param);
 
     switch (e->event) {
     case BD_EVENT_TITLE:
