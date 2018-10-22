@@ -481,6 +481,7 @@ static es_out_id_t * blurayCreateBackgroundUnlocked(demux_t *p_demux)
     fmt.i_priority = ES_PRIORITY_SELECTABLE_MIN;
     fmt.i_id = 4115; /* 4113 = main video. 4114 = MVC. 4115 = unused. */
     fmt.i_group = 1;
+    fmt.psz_description = strdup("Background video");
 
     p_sys->p_dummy_video = es_out_Add(p_demux->out, &fmt);
 
