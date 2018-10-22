@@ -2165,6 +2165,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         }
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         break;
     }
@@ -2174,6 +2175,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_chapter(p_sys->bluray, i_chapter);
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
         break;
     }
@@ -2704,6 +2706,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         {
             notifyDiscontinuityToParser(p_sys);
             blurayRestartParser(p_demux, false);
+            es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
             p_sys->b_pl_playing = false;
         }
         break;
