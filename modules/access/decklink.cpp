@@ -262,15 +262,14 @@ public:
             return S_OK;
 
         decklink_str_t tmp_name;
-        char *mode_name;
-        if (mode->GetName(&tmp_name) != S_OK) {
-            mode_name = strdup("unknown");
-        } else {
+        char *mode_name = NULL;
+        if (mode->GetName(&tmp_name) == S_OK) {
             mode_name = DECKLINK_STRDUP(tmp_name);
             DECKLINK_FREE(tmp_name);
         }
 
-        msg_Dbg(demux_, "Video input format changed to %s", mode_name);
+        msg_Dbg(demux_, "Video input format changed to %s",
+            (mode_name) ? mode_name : "unknown");
         free(mode_name);
         if (!sys->autodetect) {
             msg_Err(demux_, "Video format detection disabled");
