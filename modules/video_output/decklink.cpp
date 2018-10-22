@@ -507,8 +507,8 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                         msg_Dbg(vd, "Found mode '%4.4s': %s (%ldx%ld, %.3f fps, %4.4s, scale %ld dur %ld)",
                                 (char*)&modenl, psz_mode_name,
                                 p_mode->GetWidth(), p_mode->GetHeight(),
-                                (char *)&field,
                                 double(timescale) / frameduration,
+                                (char *)&field,
                                 timescale, frameduration);
                     }
 		    free(psz_mode_name);
