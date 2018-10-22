@@ -493,7 +493,7 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                 BMDTimeScale timescale;
                 char *psz_mode_name;
 
-                DECKLINK_STR tmp_name;
+                decklink_str_t tmp_name;
                 if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
                         p_mode->GetName(&tmp_name) == S_OK)
                 {
@@ -626,7 +626,7 @@ static int OpenDecklink(vout_display_t *vd, decklink_sys_t *sys)
         CHECK("Card not found");
     }
 
-    DECKLINK_STR tmp_name;
+    decklink_str_t tmp_name;
     char *psz_model_name;
     result = p_card->GetModelName(&tmp_name);
     CHECK("Unknown model name");

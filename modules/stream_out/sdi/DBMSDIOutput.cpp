@@ -107,7 +107,7 @@ IDeckLinkDisplayMode * DBMSDIOutput::MatchDisplayMode(const video_format_t *fmt,
                 BMDTimeValue frameduration;
                 BMDTimeScale timescale;
                 const char *psz_mode_name;
-                DECKLINK_STR tmp_name;
+                decklink_str_t tmp_name;
 
                 if(p_mode->GetFrameRate(&frameduration, &timescale) == S_OK &&
                         p_mode->GetName(&tmp_name) == S_OK)
@@ -243,7 +243,7 @@ int DBMSDIOutput::Open()
         CHECK("Card not found");
     }
 
-    DECKLINK_STR tmp_name;
+    decklink_str_t tmp_name;
     const char *psz_model_name;
     result = p_card->GetModelName(&tmp_name);
     CHECK("Unknown model name");

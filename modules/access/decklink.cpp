@@ -261,7 +261,7 @@ public:
         if( !(events & bmdVideoInputDisplayModeChanged ))
             return S_OK;
 
-        DECKLINK_STR tmp_name;
+        decklink_str_t tmp_name;
         char *mode_name;
         if (mode->GetName(&tmp_name) != S_OK) {
             mode_name = strdup("unknown");
@@ -561,7 +561,7 @@ static int Open(vlc_object_t *p_this)
         }
     }
 
-    DECKLINK_STR tmp_name;
+    decklink_str_t tmp_name;
     char *model_name;
     if (sys->card->GetModelName(&tmp_name) != S_OK) {
         model_name = strdup("unknown");
@@ -648,7 +648,7 @@ static int Open(vlc_object_t *p_this)
         uint32_t field_flags;
         const char *field = GetFieldDominance(m->GetFieldDominance(), &field_flags);
         BMDDisplayMode id = ntohl(m->GetDisplayMode());
-        DECKLINK_STR tmp_name;
+        decklink_str_t tmp_name;
 
         if (m->GetName(&tmp_name) != S_OK) {
             mode_name = "unknown";
