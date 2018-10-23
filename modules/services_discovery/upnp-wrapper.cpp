@@ -85,7 +85,7 @@ UpnpInstanceWrapper *UpnpInstanceWrapper::get(vlc_object_t *p_obj)
         ixmlRelaxParser( 1 );
 
         /* Register a control point */
-        i_res = UpnpRegisterClient( Callback, instance, &instance->m_handle );
+        i_res = UpnpRegisterClient( Callback, NULL, &instance->m_handle );
         if( i_res != UPNP_E_SUCCESS )
         {
             msg_Err( p_obj, "Client registration failed: %s", UpnpGetErrorMessage( i_res ) );
