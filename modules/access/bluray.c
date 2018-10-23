@@ -600,7 +600,11 @@ static void stopBackground(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if (!p_sys->bdj.p_dummy_video) {
+    vlc_mutex_lock(&p_sys->bdj.lock);
+
+    if (!p_sys->bdj.p_dummy_video)
+    {
+        vlc_mutex_unlock(&p_sys->bdj.lock);
         return;
     }
 
@@ -608,12 +612,11 @@ static void stopBackground(demux_t *p_demux)
 
     es_out_Del(p_demux->out, p_sys->bdj.p_dummy_video);
 
-    vlc_mutex_lock(&p_sys->bdj.lock);
     if (p_sys->bdj.p_video_es == p_sys->bdj.p_dummy_video)
         blurayReleaseVideoES(p_demux);
-    vlc_mutex_unlock(&p_sys->bdj.lock);
-
     p_sys->bdj.p_dummy_video = NULL;
+
+    vlc_mutex_unlock(&p_sys->bdj.lock);
 }
 
 /*****************************************************************************
