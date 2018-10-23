@@ -63,6 +63,7 @@
 #include <libbluray/keys.h>
 #include <libbluray/meta_data.h>
 #include <libbluray/overlay.h>
+#include <libbluray/clpi_data.h>
 
 //#define DEBUG_BLURAY
 //#define DEBUG_BLURAY_EVENTS
@@ -236,6 +237,16 @@ typedef struct
     vlc_mutex_t             pl_info_lock;
     BLURAY_TITLE_INFO      *p_pl_info;
     const BLURAY_CLIP_INFO *p_clip_info;
+    enum
+    {
+        BD_CLIP_APP_TYPE_TS_MAIN_PATH_MOVIE = 1,
+        BD_CLIP_APP_TYPE_TS_MAIN_PATH_TIMED_SLIDESHOW = 2,
+        BD_CLIP_APP_TYPE_TS_MAIN_PATH_BROWSABLE_SLIDESHOW = 3,
+        BD_CLIP_APP_TYPE_TS_SUB_PATH_BROWSABLE_SLIDESHOW = 4,
+        BD_CLIP_APP_TYPE_TS_SUB_PATH_INTERACTIVE_MENU = 5,
+        BD_CLIP_APP_TYPE_TS_SUB_PATH_TEXT_SUBTITLE = 6,
+        BD_CLIP_APP_TYPE_TS_SUB_PATH_ELEMENTARY_STREAM_PATH = 7,
+    } clip_application_type;
 
     /* Attachments */
     int                 i_attachments;
@@ -1180,6 +1191,7 @@ typedef struct
     void *priv;
     bool b_discontinuity;
     bool b_disable_output;
+    bool b_lowdelay;
     vlc_mutex_t lock;
     struct
     {
@@ -1197,6 +1209,8 @@ enum
     BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY,
     BLURAY_ES_OUT_CONTROL_ENABLE_OUTPUT,
     BLURAY_ES_OUT_CONTROL_DISABLE_OUTPUT,
+    BLURAY_ES_OUT_CONTROL_ENABLE_LOW_DELAY,
+    BLURAY_ES_OUT_CONTROL_DISABLE_LOW_DELAY,
 };
 
 static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
@@ -1213,6 +1227,11 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 
     switch (fmt.i_cat) {
     case VIDEO_ES:
+        if(esout_priv->b_lowdelay)
+        {
+            fmt.video.i_frame_rate = 1; fmt.video.i_frame_rate_base = 1;
+            fmt.b_packetized = true;
+        }
         if (esout_priv->selected.i_video_pid != -1 && esout_priv->selected.i_video_pid != p_fmt->i_id)
             fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         b_select = (p_fmt->i_id == 0x1011);
@@ -1252,7 +1271,8 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             msg_Info(p_demux, "Reusing ES %d", p_fmt->i_id);
             p_pair->b_recyling = false;
             p_es = p_pair->p_es;
-            if(!es_format_IsSimilar(&fmt, &p_pair->fmt))
+            if(!es_format_IsSimilar(&fmt, &p_pair->fmt) ||
+               fmt.b_packetized != p_pair->fmt.b_packetized)
             {
                 es_out_Control(esout_priv->p_dst_out, ES_OUT_SET_ES_FMT, p_pair->p_es, &fmt);
                 es_format_Clean(&p_pair->fmt);
@@ -1405,6 +1425,13 @@ static int bluray_esOutControl(es_out_t *p_out, int i_query, va_list args)
             i_ret = VLC_SUCCESS;
         } break;
 
+        case BLURAY_ES_OUT_CONTROL_ENABLE_LOW_DELAY:
+        case BLURAY_ES_OUT_CONTROL_DISABLE_LOW_DELAY:
+        {
+            esout_priv->b_lowdelay = (i_query == BLURAY_ES_OUT_CONTROL_ENABLE_LOW_DELAY);
+            i_ret = VLC_SUCCESS;
+        } break;
+
         case ES_OUT_SET_ES_DEFAULT:
         case ES_OUT_SET_ES:
         case ES_OUT_UNSET_ES:
@@ -1459,6 +1486,7 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
     esout_priv->b_discontinuity = false;
     esout_priv->b_disable_output = false;
     esout_priv->b_entered_recycling = false;
+    esout_priv->b_lowdelay = false;
     esout_priv->selected.i_audio_pid = -1;
     esout_priv->selected.i_video_pid = -1;
     esout_priv->selected.i_spu_pid = -1;
@@ -2631,7 +2659,7 @@ static void blurayUpdatePlaylist(demux_t *p_demux, unsigned i_playlist)
     blurayResetStillImage(p_demux);
 }
 
-static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
+static void blurayOnClipUpdate(demux_t *p_demux, uint32_t clip)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2647,6 +2675,19 @@ static void blurayUpdateCurrentClip(demux_t *p_demux, uint32_t clip)
      * This may brake later, but it's enough for now.
      */
         assert(p_sys->p_clip_info->video_stream_count >= 1);
+    }
+
+    const CLPI_CL *clpi = bd_get_clpi(p_sys->bluray, clip);
+    if(clpi && clpi->clip.application_type != p_sys->clip_application_type)
+    {
+        if(p_sys->clip_application_type == BD_CLIP_APP_TYPE_TS_MAIN_PATH_TIMED_SLIDESHOW ||
+           clpi->clip.application_type == BD_CLIP_APP_TYPE_TS_MAIN_PATH_TIMED_SLIDESHOW)
+            blurayRestartParser(p_demux, false);
+
+        if(clpi->clip.application_type == BD_CLIP_APP_TYPE_TS_MAIN_PATH_TIMED_SLIDESHOW)
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_ENABLE_LOW_DELAY);
+        else
+            es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_DISABLE_LOW_DELAY);
     }
 
     vlc_mutex_unlock(&p_sys->pl_info_lock);
@@ -2685,7 +2726,7 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         break;
     case BD_EVENT_PLAYITEM:
         notifyDiscontinuityToParser(p_sys);
-        blurayUpdateCurrentClip(p_demux, e->param);
+        blurayOnClipUpdate(p_demux, e->param);
         break;
     case BD_EVENT_CHAPTER:
         if (e->param && e->param < 0xffff)
