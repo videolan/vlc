@@ -23,6 +23,7 @@
  *****************************************************************************/
 
 #include <vlc_vout_window.h>
+#include <vlc_vout_display.h>
 
 /**
  * HWNDs manager.
