@@ -1,0 +1,79 @@
+From b9b10be3ea0e7ffe660747f35f11dc6b896883fc Mon Sep 17 00:00:00 2001
+From: Victorien Le Couviour--Tuffet <victorien.lecouviour.tuffet@gmail.com>
+Date: Tue, 11 Sep 2018 17:38:25 +0200
+Subject: [PATCH 1/2] build: fix getifaddrs detection
+
+Before this was determined by the presence of a struct member, but for
+android target, the NDK will provide the struct but not necessarily the
+related functions.
+---
+ compat/compat.h | 2 +-
+ configure.ac    | 7 ++-----
+ src/mdns.c      | 6 +++---
+ 3 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/compat/compat.h b/compat/compat.h
+index ef4103c..dd78134 100644
+--- a/compat/compat.h
++++ b/compat/compat.h
+@@ -99,7 +99,7 @@ typedef DWORD multicast_if;
+ 
+ #else
+ 
+-# if HAVE_IFADDRS
++# if HAVE_IFADDRS_H
+ #include <ifaddrs.h>
+ typedef struct sockaddr_storage multicast_if;
+ # else
+diff --git a/configure.ac b/configure.ac
+index 489e233..f0b3be2 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -257,11 +257,8 @@ AC_CHECK_TYPES([struct pollfd],,,
+ #endif
+ ])
+ 
+-
+-AC_CHECK_MEMBER([struct ifaddrs.ifa_addr],[
+-    AC_DEFINE([HAVE_IFADDRS],[1],[Define to 1 if you have ifaddrs.ifa_addr function])],
+-    [],[[#include <ifaddrs.h>]])
+-
++AC_CHECK_FUNCS([getifaddrs])
++AC_CHECK_HEADERS([ifaddrs.h])
+ 
+ AC_SUBST([LIBSOCKET])
+ 
+diff --git a/src/mdns.c b/src/mdns.c
+index 55c5cb4..d3c29b1 100644
+--- a/src/mdns.c
++++ b/src/mdns.c
+@@ -73,7 +73,7 @@ extern void rr_print(const struct rr_entry *);
+ extern void rr_free(struct rr_entry *);
+ 
+ #ifndef _WIN32
+-#if HAVE_IFADDRS
++#if HAVE_GETIFADDRS
+ 
+ static bool
+ mdns_is_interface_valuable(struct ifaddrs* ifa)
+@@ -139,7 +139,7 @@ mdns_list_interfaces(multicast_if** pp_intfs, size_t* p_nb_intf, int ai_family)
+         *p_nb_intf = 1;
+         return (0);
+ }
+-#endif // HAVE_IFADDRS
++#endif // HAVE_GETIFADDRS
+ 
+ #else // _WIN32
+ 
+@@ -332,7 +332,7 @@ mdns_init(struct mdns_ctx **p_ctx, const char *addr, unsigned short port)
+                     return mdns_destroy(ctx), (MDNS_NETERR);
+             }
+ 
+-#if defined(HAVE_IFADDRS) || defined(_WIN32)
++#if defined(HAVE_GETIFADDRS) || defined(_WIN32)
+             if (setsockopt(ctx->conns[i].sock,
+                            ctx->conns[i].family == AF_INET ? IPPROTO_IP : IPPROTO_IPV6,
+                            ctx->conns[i].family == AF_INET ? IP_MULTICAST_IF : IPV6_MULTICAST_IF,
+-- 
+2.19.1
+
