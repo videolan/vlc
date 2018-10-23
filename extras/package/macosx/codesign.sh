@@ -37,11 +37,12 @@ OPTIONS:
    -h            Show this help
    -i            Identity to use
    -g            Developer ID certificate mode (validates with Gatekeeper)
+   -r            Enable runtime hardening
 EOF
 
 }
 
-while getopts "hi:g" OPTION
+while getopts "hi:gr" OPTION
 do
      case $OPTION in
          h)
@@ -53,6 +54,9 @@ do
          ;;
          g)
              GK="yes"
+         ;;
+         r)
+             RUNTIME="yes"
          ;;
          *)
              usage
@@ -79,12 +83,17 @@ if [ -z "$VLCCACHEGEN" ]; then
 info "WARN: Cannot find vlc-cache-gen, cache will be corrupt after signing"
 fi
 
+SCRIPTDIR=$(dirname "$0")
+if [ ! -z "$RUNTIME" ]; then
+RUNTIME_FLAGS="--options runtime --entitlements $SCRIPTDIR/vlc-hardening.entitlements"
+fi
+
 # Call with $1 = file or folder
 sign()
 {
     # info "Signing file $1 with identifier $IDENTIFIER"
 
-    codesign --force --verbose -s "$IDENTITY" "$1"
+    codesign --force --verbose $RUNTIME_FLAGS -s "$IDENTITY" "$1"
 }
 
 
