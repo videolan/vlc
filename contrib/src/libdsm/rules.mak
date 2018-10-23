@@ -20,6 +20,7 @@ endif
 
 libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(UNPACK)
+	$(APPLY) $(SRC)/libdsm/0001-build-fix-nl_langinfo-detection-on-Android.patch
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
