@@ -22,6 +22,7 @@ microdns: microdns-$(LIBMICRODNS_VERSION).tar.gz .sum-microdns
 	$(MOVE)
 
 .microdns: microdns
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF)
 	cd $< && $(MAKE) install
 	touch $@
