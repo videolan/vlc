@@ -53,7 +53,9 @@ void vlc_global_mutex (unsigned n, bool acquire)
 }
 
 #ifndef NDEBUG
-# include <search.h>
+# ifdef HAVE_SEARCH_H
+#  include <search.h>
+# endif
 
 struct vlc_lock_mark
 {
