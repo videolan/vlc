@@ -28,10 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-#include <vlc_threads.h>
-#include <vlc_cxx_helpers.hpp>
-
 #include "upnp.hpp"
 
 #include <vlc_access.h>

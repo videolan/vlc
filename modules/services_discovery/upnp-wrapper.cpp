@@ -28,8 +28,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_common.h>
-
 #ifdef _WIN32
 #include <windows.h>
 #include <wincrypt.h>

@@ -37,6 +37,7 @@
 #include <vlc_url.h>
 #include <vlc_interrupt.h>
 #include <vlc_threads.h>
+#include <vlc_cxx_helpers.hpp>
 
 namespace SD
 {
