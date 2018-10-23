@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_vout_wrapper.h: definitions for vout wrappers (temporary)
+ * vout_wrapper.h: definitions for vout wrappers (temporary)
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$
@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_VOUT_WRAPPER_H
-#define VLC_VOUT_WRAPPER_H 1
+#ifndef LIBVLC_VOUT_WRAPPER_H
+#define LIBVLC_VOUT_WRAPPER_H 1
 
 #include <vlc_vout_display.h>
 
@@ -93,5 +93,5 @@ void vout_SetDisplayCrop(vout_display_t *, unsigned num, unsigned den,
                          unsigned left, unsigned top, int right, int bottom);
 void vout_SetDisplayViewpoint(vout_display_t *, const vlc_viewpoint_t *);
 
-#endif /* VLC_VOUT_WRAPPER_H */
+#endif /* LIBVLC_VOUT_WRAPPER_H */
 

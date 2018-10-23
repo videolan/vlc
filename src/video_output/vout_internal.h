@@ -28,7 +28,7 @@
 #include <vlc_picture_fifo.h>
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
-#include <vlc_vout_wrapper.h>
+#include "vout_wrapper.h"
 #include "snapshot.h"
 #include "statistic.h"
 #include "chrono.h"

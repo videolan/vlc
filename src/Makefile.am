@@ -119,7 +119,6 @@ noinst_HEADERS = \
 	../include/vlc_pgpkey.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
-	../include/vlc_vout_wrapper.h \
 	$(NULL)
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
@@ -293,6 +292,7 @@ libvlccore_la_SOURCES = \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
 	video_output/vout_spuregion_helper.h \
+	video_output/vout_wrapper.h \
 	video_output/window.c \
 	video_output/window.h \
 	video_output/opengl.c \
