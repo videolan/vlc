@@ -36,7 +36,7 @@ Sign VLC.app in the current directory
 OPTIONS:
    -h            Show this help
    -i            Identity to use
-   -g            Use gatekeeper mode (additional magic)
+   -g            Developer ID certificate mode (validates with Gatekeeper)
 EOF
 
 }
@@ -79,7 +79,7 @@ if [ -z "$VLCCACHEGEN" ]; then
 info "WARN: Cannot find vlc-cache-gen, cache will be corrupt after signing"
 fi
 
-# Call with $1 = file or folder, $2 = identifier (if empty, file name is used)
+# Call with $1 = file or folder
 sign()
 {
     # info "Signing file $1 with identifier $IDENTIFIER"
@@ -98,12 +98,12 @@ info "Signing frameworks"
 sign "VLC.app/Contents/Frameworks/Growl.framework/Versions/A" "com.growl.growlframework"
 
 sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A/Resources/Autoupdate.app/Contents/MacOS/fileop"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app" "org.sparkle-project.Sparkle.Autoupdate"
-sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A" "org.sparkle-project.Sparkle"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app"
+sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A"
 
 if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
-    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app" "com.Breakpad.crash_report_sender"
-    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A" "com.googlecode.google-breakpad"
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app"
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A"
 fi
 
 info "Signing the framework headers"
@@ -164,7 +164,7 @@ do
 done
 
 info "Signing the executable"
-sign "VLC.app" "org.videolan.vlc"
+sign "VLC.app"
 
 
 info "all items signed, validating..."
