@@ -228,7 +228,6 @@ static void vout_display_window_GetSize(vlc_object_t *obj,
 
 typedef struct vout_display_window
 {
-    vout_display_t *vd;
     vlc_mouse_t mouse;
     vlc_tick_t last_left_press;
 } vout_display_window_t;
