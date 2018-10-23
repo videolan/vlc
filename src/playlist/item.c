@@ -28,13 +28,14 @@
 #include <vlc_input_item.h>
 
 vlc_playlist_item_t *
-vlc_playlist_item_New(input_item_t *media)
+vlc_playlist_item_New(input_item_t *media, uint64_t id)
 {
     vlc_playlist_item_t *item = malloc(sizeof(*item));
     if (unlikely(!item))
         return NULL;
 
     vlc_atomic_rc_init(&item->rc);
+    item->id = id;
     item->media = media;
     input_item_Hold(media);
     return item;
@@ -60,4 +61,10 @@ input_item_t *
 vlc_playlist_item_GetMedia(vlc_playlist_item_t *item)
 {
     return item->media;
+}
+
+uint64_t
+vlc_playlist_item_GetId(vlc_playlist_item_t *item)
+{
+    return item->id;
 }

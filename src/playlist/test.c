@@ -1504,7 +1504,7 @@ test_request_remove_adapt(void)
             vlc_playlist_AddListener(playlist, &cbs, &ctx, false);
     assert(listener);
 
-    vlc_playlist_item_t *dummy = vlc_playlist_item_New(media[10]);
+    vlc_playlist_item_t *dummy = vlc_playlist_item_New(media[10], 0);
     assert(dummy);
 
     /* remove items in a wrong order at wrong position, as if the playlist had
@@ -1702,7 +1702,7 @@ test_request_move_adapt(void)
             vlc_playlist_AddListener(playlist, &cbs, &ctx, false);
     assert(listener);
 
-    vlc_playlist_item_t *dummy = vlc_playlist_item_New(media[15]);
+    vlc_playlist_item_t *dummy = vlc_playlist_item_New(media[15], 0);
     assert(dummy);
 
     /* move items in a wrong order at wrong position, as if the playlist had

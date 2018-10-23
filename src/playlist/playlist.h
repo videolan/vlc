@@ -57,6 +57,7 @@ struct vlc_playlist
     struct vlc_list listeners; /**< list of vlc_playlist_listener_id.node */
     enum vlc_playlist_playback_repeat repeat;
     enum vlc_playlist_playback_order order;
+    uint64_t idgen;
 };
 
 static inline void

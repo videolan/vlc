@@ -32,14 +32,17 @@
 typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
 
 static void
-vlc_playlist_CollectChildren(media_vector_t *dest, input_item_node_t *node)
+vlc_playlist_CollectChildren(vlc_playlist_t *playlist,
+                             media_vector_t *dest,
+                             input_item_node_t *node)
 {
+    vlc_playlist_AssertLocked(playlist);
     for (int i = 0; i < node->i_children; ++i)
     {
         input_item_node_t *child = node->pp_children[i];
         input_item_t *media = child->p_item;
         vlc_vector_push(dest, media);
-        vlc_playlist_CollectChildren(dest, child);
+        vlc_playlist_CollectChildren(playlist, dest, child);
     }
 }
 
@@ -50,7 +53,7 @@ vlc_playlist_ExpandItem(vlc_playlist_t *playlist, size_t index,
     vlc_playlist_AssertLocked(playlist);
 
     media_vector_t flatten = VLC_VECTOR_INITIALIZER;
-    vlc_playlist_CollectChildren(&flatten, node);
+    vlc_playlist_CollectChildren(playlist, &flatten, node);
 
     int ret = vlc_playlist_Expand(playlist, index, flatten.data, flatten.size);
     vlc_vector_destroy(&flatten);

@@ -52,6 +52,7 @@ vlc_playlist_New(vlc_object_t *parent)
     vlc_list_init(&playlist->listeners);
     playlist->repeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
     playlist->order = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    playlist->idgen = 0;
 
     return playlist;
 }

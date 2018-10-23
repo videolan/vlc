@@ -936,6 +936,7 @@ vlc_player_vout_Snapshot
 vlc_playlist_item_Hold
 vlc_playlist_item_Release
 vlc_playlist_item_GetMedia
+vlc_playlist_item_GetId
 vlc_playlist_New
 vlc_playlist_Delete
 vlc_playlist_Lock
@@ -955,6 +956,7 @@ vlc_playlist_Shuffle
 vlc_playlist_Sort
 vlc_playlist_IndexOf
 vlc_playlist_IndexOfMedia
+vlc_playlist_IndexOfId
 vlc_playlist_GetPlaybackRepeat
 vlc_playlist_GetPlaybackOrder
 vlc_playlist_SetPlaybackRepeat

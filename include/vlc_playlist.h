@@ -316,6 +316,12 @@ vlc_playlist_item_Release(vlc_playlist_item_t *);
 VLC_API input_item_t *
 vlc_playlist_item_GetMedia(vlc_playlist_item_t *);
 
+/**
+ * Return a unique id for the playlist item instance.
+ */
+VLC_API uint64_t
+vlc_playlist_item_GetId(vlc_playlist_item_t *);
+
 /* Playlist */
 
 /**
@@ -654,6 +660,16 @@ vlc_playlist_IndexOf(vlc_playlist_t *playlist, const vlc_playlist_item_t *item);
  */
 VLC_API ssize_t
 vlc_playlist_IndexOfMedia(vlc_playlist_t *playlist, const input_item_t *media);
+
+/**
+ * Return the index of a given item id.
+ *
+ * \param playlist the playlist, locked
+ * \param id       the id to locate
+ * \return the index of the playlist item having the id (-1 if not found)
+ */
+VLC_API ssize_t
+vlc_playlist_IndexOfId(vlc_playlist_t *playlist, uint64_t id);
 
 /**
  * Return the playback "repeat" mode.
