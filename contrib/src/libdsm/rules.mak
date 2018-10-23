@@ -25,6 +25,7 @@ libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 DEPS_libdsm = libtasn1 iconv
 
 .libdsm: libdsm
+	$(RECONF)
 	cd $< && $(HOSTVARS_PIC) ./configure --disable-programs $(LIBDSM_CONF)
 	cd $< && $(MAKE)
 	cd $< && ../../../contrib/src/pkg-static.sh libdsm.pc
