@@ -3541,12 +3541,12 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
        }
        if ( fmt->video.mastering.max_luminance )
        {
-           info_category_AddInfo( p_cat, _("Max. luminance"), "%.4f cd/m²",
+           info_category_AddInfo( p_cat, _("Max. mastering luminance"), "%.4f cd/m²",
                fmt->video.mastering.max_luminance / 10000.f );
        }
        if ( fmt->video.mastering.min_luminance )
        {
-           info_category_AddInfo( p_cat, _("Min. luminance"), "%.4f cd/m²",
+           info_category_AddInfo( p_cat, _("Min. mastering luminance"), "%.4f cd/m²",
                fmt->video.mastering.min_luminance / 10000.f );
        }
        if ( fmt->video.mastering.primaries[4] &&
@@ -3554,28 +3554,28 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
        {
            float x = (float)fmt->video.mastering.primaries[4] / 50000.f;
            float y = (float)fmt->video.mastering.primaries[5] / 50000.f;
-           info_category_AddInfo( p_cat, _("Primary R"), "x=%.4f y=%.4f", x, y );
+           info_category_AddInfo( p_cat, _("Mastering Primary R"), "x=%.4f y=%.4f", x, y );
        }
        if ( fmt->video.mastering.primaries[0] &&
             fmt->video.mastering.primaries[1] )
        {
            float x = (float)fmt->video.mastering.primaries[0] / 50000.f;
            float y = (float)fmt->video.mastering.primaries[1] / 50000.f;
-           info_category_AddInfo( p_cat, _("Primary G"), "x=%.4f y=%.4f", x, y );
+           info_category_AddInfo( p_cat, _("Mastering Primary G"), "x=%.4f y=%.4f", x, y );
        }
        if ( fmt->video.mastering.primaries[2] &&
             fmt->video.mastering.primaries[3] )
        {
            float x = (float)fmt->video.mastering.primaries[2] / 50000.f;
            float y = (float)fmt->video.mastering.primaries[3] / 50000.f;
-           info_category_AddInfo( p_cat, _("Primary B"), "x=%.4f y=%.4f", x, y );
+           info_category_AddInfo( p_cat, _("Mastering Primary B"), "x=%.4f y=%.4f", x, y );
        }
        if ( fmt->video.mastering.white_point[0] &&
             fmt->video.mastering.white_point[1] )
        {
            float x = (float)fmt->video.mastering.white_point[0] / 50000.f;
            float y = (float)fmt->video.mastering.white_point[1] / 50000.f;
-           info_category_AddInfo( p_cat, _("White point"), "x=%.4f y=%.4f", x, y );
+           info_category_AddInfo( p_cat, _("Mastering White point"), "x=%.4f y=%.4f", x, y );
        }
        if ( fmt->video.lighting.MaxCLL )
        {
