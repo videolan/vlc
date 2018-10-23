@@ -102,6 +102,8 @@ sign "VLC.app/Contents/Frameworks/Sparkle.framework/Resources/Autoupdate.app"
 sign "VLC.app/Contents/Frameworks/Sparkle.framework/Versions/A"
 
 if [ -e "VLC.app/Contents/Frameworks/Breakpad.framework" ]; then
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/breakpadUtilities.dylib"
+    sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/Inspector"
     sign "VLC.app/Contents/Frameworks/Breakpad.framework/Resources/crash_report_sender.app"
     sign "VLC.app/Contents/Frameworks/Breakpad.framework/Versions/A"
 fi
