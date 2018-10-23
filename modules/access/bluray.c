@@ -91,6 +91,9 @@ static const char *const ppsz_region_code_text[] = {
 # define BD_STREAM_TYPE_VIDEO_HEVC 0x24
 #endif
 
+#define BD_CLUSTER_SIZE 6144
+#define BD_READ_SIZE    (10 * BD_CLUSTER_SIZE)
+
 /* Callbacks */
 static int  blurayOpen (vlc_object_t *);
 static void blurayClose(vlc_object_t *);
@@ -2707,10 +2710,6 @@ static int onIntfEvent( vlc_object_t *p_input, char const *psz_var,
 
     return VLC_SUCCESS;
 }
-
-#define BD_TS_PACKET_SIZE (192)
-#define NB_TS_PACKETS (200)
-#define BD_READ_SIZE (NB_TS_PACKETS * BD_TS_PACKET_SIZE)
 
 static int blurayDemux(demux_t *p_demux)
 {
