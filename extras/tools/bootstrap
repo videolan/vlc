@@ -94,9 +94,12 @@ then
     NEEDED="$NEEDED nasm"
 else
     # found, need to check version ?
-    [ -z "$1" ] && return # no
-    gotver=`nasm -v | cut -d ' ' -f 3`
-    check_version nasm $gotver $1
+    if [ -z "$1" ];then
+        FOUND="$FOUND nasm"
+    else
+        gotver=`nasm -v | cut -d ' ' -f 3`
+        check_version nasm $gotver $1
+    fi
 fi
 }
 
@@ -107,9 +110,12 @@ then
     NEEDED="$NEEDED $1"
 else
     # found, need to check version ?
-    [ -z "$2" ] && return # no
-    gotver=`$1 --version | head -1 | sed s/'.* '//`
-    check_version $1 $gotver $2
+    if [ -z "$2" ];then
+        FOUND="$FOUND $1"
+    else
+        gotver=`$1 --version | head -1 | sed s/'.* '//`
+        check_version $1 $gotver $2
+    fi
 fi
 }
 
@@ -120,9 +126,12 @@ then
     NEEDED="$NEEDED $1"
 else
     # found, need to check version ?
-    [ -z "$2" ] && return # no
-    gotver=`$1 --version | head -1 | sed s/'.* '//`
-    check_version_majmin $1 $gotver $2
+    if [ -z "$2" ];then
+        FOUND="$FOUND $1"
+    else
+        gotver=`$1 --version | head -1 | sed s/'.* '//`
+        check_version_majmin $1 $gotver $2
+    fi
 fi
 }
 
@@ -165,7 +174,6 @@ case `uname` in
         CPUS=1  # default
      ;;
 esac
-
 
 cat > Makefile << EOF
 MAKEFLAGS += -j$CPUS
