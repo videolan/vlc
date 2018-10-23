@@ -1,0 +1,33 @@
+From f5a9f81eb7635fb3bb31a305e88cf02f0b9ec7b3 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Tue, 23 Oct 2018 13:56:47 +0200
+Subject: [PATCH 2/2] fix dummy mdns_list_interfaces
+
+In case multicast_if is a valid struct and not a void *. This can happen when
+getifaddr headers are present but not the function.
+---
+ src/mdns.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/src/mdns.c b/src/mdns.c
+index d3c29b1..e499195 100644
+--- a/src/mdns.c
++++ b/src/mdns.c
+@@ -132,10 +132,11 @@ mdns_list_interfaces(multicast_if** pp_intfs, size_t* p_nb_intf, int ai_family)
+ static size_t
+ mdns_list_interfaces(multicast_if** pp_intfs, size_t* p_nb_intf, int ai_family)
+ {
+-        *pp_intfs = malloc(sizeof(**pp_intfs));
+-        if (*pp_intfs == NULL)
++        multicast_if *intfs;
++        *pp_intfs = intfs = malloc(sizeof(*intfs));
++        if (intfs == NULL)
+                 return (MDNS_ERROR);
+-        **pp_intfs = NULL;
++        memset(intfs, 0, sizeof(*intfs));
+         *p_nb_intf = 1;
+         return (0);
+ }
+-- 
+2.19.1
+
