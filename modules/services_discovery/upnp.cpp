@@ -8,6 +8,7 @@
  *          Mirsal Ennaime <mirsal dot ennaime at gmail dot com>
  *          Hugo Beauzée-Luyssen <hugo@beauzee.fr>
  *          Shaleen Jain <shaleen@jain.sh>
+ *          William Ung <william1.ung@epitech.eu>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interrupt.h>
 #include <vlc_services_discovery.h>
+#include <vlc_renderer_discovery.h>
 
 #include <assert.h>
 #include <limits.h>
@@ -45,9 +47,11 @@
  * Constants
 */
 const char* MEDIA_SERVER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
+const char* MEDIA_RENDERER_DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1";
 const char* CONTENT_DIRECTORY_SERVICE_TYPE = "urn:schemas-upnp-org:service:ContentDirectory:1";
 const char* SATIP_SERVER_DEVICE_TYPE = "urn:ses-com:device:SatIPServer:1";
 
+#define UPNP_SEARCH_TIMEOUT_SECONDS 15
 #define SATIP_CHANNEL_LIST N_("SAT>IP channel list")
 #define SATIP_CHANNEL_LIST_URL N_("Custom SAT>IP channel list URL")
 static const char *const ppsz_satip_channel_lists[] = {
@@ -67,6 +71,14 @@ struct services_discovery_sys_t
     UpnpInstanceWrapper* p_upnp;
     std::shared_ptr<SD::MediaServerList> p_server_list;
     vlc_thread_t         thread;
+};
+
+
+struct renderer_discovery_sys_t
+{
+    UpnpInstanceWrapper* p_upnp;
+    std::shared_ptr<RD::MediaRendererList> p_renderer_list;
+    vlc_thread_t thread;
 };
 
 struct access_sys_t
@@ -91,7 +103,14 @@ namespace Access
     static void CloseAccess( vlc_object_t* );
 }
 
+namespace RD
+{
+    static int OpenRD( vlc_object_t*);
+    static void CloseRD( vlc_object_t* );
+}
+
 VLC_SD_PROBE_HELPER( "upnp", N_("Universal Plug'n'Play"), SD_CAT_LAN )
+VLC_RD_PROBE_HELPER( "upnp_renderer", N_("UPnP Renderer Discovery") )
 
 /*
  * Module descriptor
@@ -117,6 +136,17 @@ vlc_module_begin()
         set_capability( "access", 0 )
 
     VLC_SD_PROBE_SUBMODULE
+
+    add_submodule()
+        set_description( N_( "UPnP Renderer Discovery" ) )
+        set_category( CAT_SOUT )
+        set_subcategory( SUBCAT_SOUT_RENDERER )
+        set_callbacks( RD::OpenRD, RD::CloseRD )
+        set_capability( "renderer_discovery", 0 )
+        add_shortcut( "upnp_renderer" )
+
+    VLC_RD_PROBE_SUBMODULE
+
 vlc_module_end()
 
 /*
@@ -170,6 +200,32 @@ IXML_Document* parseBrowseResult( IXML_Document* p_doc )
     ixmlNodeList_free( p_elems );
 
     return (IXML_Document*)p_node;
+}
+
+/**
+ * Reads the base URL from an XML device list
+ *
+ * \param services_discovery_t* p_sd This SD instance
+ * \param IXML_Document* p_desc an XML device list document
+ *
+ * \return const char* The base URL
+ */
+static const char *parseBaseUrl( IXML_Document *p_desc )
+{
+    const char    *psz_base_url = nullptr;
+    IXML_NodeList *p_url_list = nullptr;
+
+    if( ( p_url_list = ixmlDocument_getElementsByTagName( p_desc, "URLBase" ) ) )
+    {
+        if ( IXML_Node* p_url_node = ixmlNodeList_item( p_url_list, 0 ) )
+        {
+            IXML_Node* p_text_node = ixmlNode_getFirstChild( p_url_node );
+            if ( p_text_node )
+                psz_base_url = ixmlNode_getNodeValue( p_text_node );
+        }
+        ixmlNodeList_free( p_url_list );
+    }
+    return psz_base_url;
 }
 
 namespace SD
@@ -1279,4 +1335,290 @@ static void CloseAccess( vlc_object_t* p_this )
     delete sys;
 }
 
+} // namespace Access
+
+namespace RD
+{
+
+/**
+ * Crafts an MRL with the 'dlna' stream out
+ * containing the host and port.
+ *
+ * \param psz_location URL to the MediaRenderer device description doc
+ */
+const char *getUrl(const char *psz_location)
+{
+    char *psz_res;
+    vlc_url_t url;
+
+    vlc_UrlParse(&url, psz_location);
+    if (asprintf(&psz_res, "dlna://%s:%d", url.psz_host, url.i_port) < 0)
+    {
+        vlc_UrlClean(&url);
+        return NULL;
+    }
+    vlc_UrlClean(&url);
+    return psz_res;
 }
+
+MediaRendererDesc::MediaRendererDesc( const std::string& udn,
+                                      const std::string& fName,
+                                      const std::string& base,
+                                      const std::string& loc )
+    : UDN( udn )
+    , friendlyName( fName )
+    , base_url( base )
+    , location( loc )
+    , inputItem( NULL )
+{
+}
+
+MediaRendererDesc::~MediaRendererDesc()
+{
+    if (inputItem)
+        vlc_renderer_item_release(inputItem);
+}
+
+MediaRendererList::MediaRendererList(vlc_renderer_discovery_t *p_rd)
+    : m_rd( p_rd )
+{
+}
+
+MediaRendererList::~MediaRendererList()
+{
+    vlc_delete_all(m_list);
+}
+
+bool MediaRendererList::addRenderer(MediaRendererDesc *desc)
+{
+    const char* psz_url = getUrl(desc->location.c_str());
+
+    char *extra_sout;
+
+    if (asprintf(&extra_sout, "base_url=%s,url=%s", desc->base_url.c_str(),
+                        desc->location.c_str()) < 0)
+        return false;
+    desc->inputItem = vlc_renderer_item_new("stream_out_dlna",
+                                            desc->friendlyName.c_str(),
+                                            psz_url,
+                                            extra_sout,
+                                            NULL, "", 3);
+    free(extra_sout);
+    if ( !desc->inputItem )
+        return false;
+    msg_Dbg( m_rd, "Adding renderer '%s' with uuid %s",
+                        desc->friendlyName.c_str(),
+                        desc->UDN.c_str() );
+    vlc_rd_add_item(m_rd, desc->inputItem);
+    m_list.push_back(desc);
+    return true;
+}
+
+MediaRendererDesc* MediaRendererList::getRenderer( const std::string& udn )
+{
+    std::vector<MediaRendererDesc*>::const_iterator it = m_list.begin();
+    std::vector<MediaRendererDesc*>::const_iterator ite = m_list.end();
+
+    for ( ; it != ite; ++it )
+    {
+        if( udn == (*it)->UDN )
+            return *it;
+    }
+    return NULL;
+}
+
+void MediaRendererList::removeRenderer( const std::string& udn )
+{
+    MediaRendererDesc* p_renderer = getRenderer( udn );
+    if ( !p_renderer )
+        return;
+
+    assert( p_renderer->inputItem );
+
+    std::vector<MediaRendererDesc*>::iterator it =
+                        std::find( m_list.begin(),
+                                   m_list.end(),
+                                   p_renderer );
+    if( it != m_list.end() )
+    {
+        msg_Dbg( m_rd, "Removing renderer '%s' with uuid %s",
+                            p_renderer->friendlyName.c_str(),
+                            p_renderer->UDN.c_str() );
+        m_list.erase( it );
+    }
+    delete p_renderer;
+}
+
+void MediaRendererList::parseNewRenderer( IXML_Document* doc,
+                                          const std::string& location)
+{
+    assert(!location.empty());
+    msg_Dbg( m_rd , "Got device desc doc:\n%s", ixmlPrintDocument( doc ));
+
+    const char* psz_base_url = nullptr;
+    IXML_NodeList* p_device_nodes = nullptr;
+
+    /* Fallback to the Device description URL basename
+    * if no base URL is advertised */
+    psz_base_url = parseBaseUrl( doc );
+    if( !psz_base_url && !location.empty() )
+    {
+        psz_base_url = location.c_str();
+    }
+
+    p_device_nodes = ixmlDocument_getElementsByTagName( doc, "device" );
+    if ( !p_device_nodes )
+        return;
+
+    for ( unsigned int i = 0; i < ixmlNodeList_length( p_device_nodes ); i++ )
+    {
+        IXML_Element* p_device_element = ( IXML_Element* ) ixmlNodeList_item( p_device_nodes, i );
+        const char* psz_device_name = nullptr;
+        const char* psz_udn = nullptr;
+
+        if( !p_device_element )
+            continue;
+
+        psz_device_name = xml_getChildElementValue( p_device_element, "friendlyName");
+        if (psz_device_name == nullptr)
+            msg_Dbg( m_rd, "No friendlyName!" );
+
+        psz_udn = xml_getChildElementValue( p_device_element, "UDN");
+        if (psz_udn == nullptr)
+        {
+            msg_Err( m_rd, "No UDN" );
+            continue;
+        }
+
+        /* Check if renderer is already added */
+        if (getRenderer( psz_udn ))
+        {
+            msg_Warn( m_rd, "Renderer with UDN '%s' already exists.", psz_udn );
+            continue;
+        }
+
+        MediaRendererDesc *p_renderer = new MediaRendererDesc(psz_udn,
+                                                psz_device_name,
+                                                psz_base_url,
+                                                location);
+        if (!addRenderer( p_renderer ))
+            delete p_renderer;
+    }
+    ixmlNodeList_free( p_device_nodes );
+}
+
+int MediaRendererList::onEvent( Upnp_EventType event_type,
+                                UpnpEventPtr Event,
+                                void *p_user_data )
+{
+    if (p_user_data != MEDIA_RENDERER_DEVICE_TYPE)
+        return 0;
+
+    switch (event_type)
+    {
+        case UPNP_DISCOVERY_SEARCH_RESULT:
+        {
+            struct Upnp_Discovery *p_discovery = (struct Upnp_Discovery*)Event;
+            IXML_Document *p_doc = NULL;
+            int i_res;
+
+            i_res = UpnpDownloadXmlDoc( UpnpDiscovery_get_Location_cstr( p_discovery ), &p_doc);
+            if (i_res != UPNP_E_SUCCESS)
+            {
+                fprintf(stderr, "%s\n", UpnpDiscovery_get_Location_cstr( p_discovery ));
+                return i_res;
+            }
+            parseNewRenderer(p_doc, UpnpDiscovery_get_Location_cstr( p_discovery ) );
+            ixmlDocument_free(p_doc);
+        }
+        break;
+
+        case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
+        {
+            struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )Event;
+
+            removeRenderer( p_discovery->DeviceId );
+        }
+        break;
+
+        case UPNP_DISCOVERY_SEARCH_TIMEOUT:
+        {
+                msg_Warn( m_rd, "search timeout" );
+        }
+        break;
+
+        default:
+        break;
+    }
+    return UPNP_E_SUCCESS;
+}
+
+void *SearchThread(void *data)
+{
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t*)data;
+    renderer_discovery_sys_t *p_sys = (renderer_discovery_sys_t*)p_rd->p_sys;
+    int i_res;
+
+    i_res = UpnpSearchAsync(p_sys->p_upnp->handle(), UPNP_SEARCH_TIMEOUT_SECONDS,
+            MEDIA_RENDERER_DEVICE_TYPE, MEDIA_RENDERER_DEVICE_TYPE);
+    if( i_res != UPNP_E_SUCCESS )
+    {
+        msg_Err( p_rd, "Error sending search request: %s", UpnpGetErrorMessage( i_res ) );
+        return NULL;
+    }
+    return data;
+}
+
+static int OpenRD( vlc_object_t *p_this )
+{
+    vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )p_this;
+    renderer_discovery_sys_t *p_sys  = new(std::nothrow) renderer_discovery_sys_t;
+
+    if ( !p_sys )
+        return VLC_ENOMEM;
+    p_rd->p_sys = ( vlc_renderer_discovery_sys* ) p_sys;
+    p_sys->p_upnp = UpnpInstanceWrapper::get( p_this );
+
+    if ( !p_sys->p_upnp )
+    {
+        delete p_sys;
+        return VLC_EGENERIC;
+    }
+
+    try
+    {
+        p_sys->p_renderer_list = std::make_shared<RD::MediaRendererList>( p_rd );
+    }
+    catch ( const std::bad_alloc& )
+    {
+        msg_Err( p_rd, "Failed to create a MediaRendererList");
+        p_sys->p_upnp->release();
+        free(p_sys);
+        return VLC_EGENERIC;
+    }
+    p_sys->p_upnp->addListener( p_sys->p_renderer_list );
+
+    if( vlc_clone( &p_sys->thread, SearchThread, (void*)p_rd,
+                    VLC_THREAD_PRIORITY_LOW ) )
+        {
+            msg_Err( p_rd, "Can't run the lookup thread" );
+            p_sys->p_upnp->removeListener( p_sys->p_renderer_list );
+            p_sys->p_upnp->release();
+            delete p_sys;
+            return VLC_EGENERIC;
+        }
+    return VLC_SUCCESS;
+}
+
+static void CloseRD( vlc_object_t *p_this )
+{
+    vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )p_this;
+    renderer_discovery_sys_t *p_sys = (renderer_discovery_sys_t*)p_rd->p_sys;
+
+    vlc_join(p_sys->thread, NULL);
+    p_sys->p_upnp->removeListener( p_sys->p_renderer_list );
+    p_sys->p_upnp->release();
+    delete p_sys;
+}
+
+} // namespace RD

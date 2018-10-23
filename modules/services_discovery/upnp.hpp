@@ -128,3 +128,42 @@ private:
 };
 
 }
+
+namespace RD
+{
+
+struct MediaRendererDesc
+{
+    MediaRendererDesc( const std::string& udn, const std::string& fName,
+                    const std::string& base, const std::string& loc );
+    ~MediaRendererDesc();
+    std::string UDN;
+    std::string friendlyName;
+    std::string base_url;               // base url of the renderer
+    std::string location;               // device description url
+    vlc_renderer_item_t *inputItem;
+};
+
+class MediaRendererList : public UpnpInstanceWrapper::Listener
+{
+public:
+    MediaRendererList( vlc_renderer_discovery_t *p_rd );
+    ~MediaRendererList();
+
+    bool addRenderer(MediaRendererDesc *desc );
+    void removeRenderer(const std::string &udn );
+    MediaRendererDesc* getRenderer( const std::string& udn );
+    int onEvent( Upnp_EventType event_type,
+                 UpnpEventPtr p_event,
+                 void* p_user_data ) override;
+
+private:
+    void parseNewRenderer( IXML_Document* doc, const std::string& location );
+
+private:
+    vlc_renderer_discovery_t* const m_rd;
+    std::vector<MediaRendererDesc*> m_list;
+
+};
+
+}
