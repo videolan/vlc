@@ -429,19 +429,67 @@ static int aout_update_format( decoder_t *p_dec )
 static int vout_update_format( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
+    bool need_vout = false;
+    bool need_format_update = false;
 
-    if( p_owner->p_vout == NULL
-     || p_dec->fmt_out.video.i_width != p_owner->fmt.video.i_width
-     || p_dec->fmt_out.video.i_height != p_owner->fmt.video.i_height
-     || p_dec->fmt_out.video.i_visible_width != p_owner->fmt.video.i_visible_width
-     || p_dec->fmt_out.video.i_visible_height != p_owner->fmt.video.i_visible_height
-     || p_dec->fmt_out.video.i_x_offset != p_owner->fmt.video.i_x_offset
-     || p_dec->fmt_out.video.i_y_offset != p_owner->fmt.video.i_y_offset
-     || p_dec->fmt_out.i_codec != p_owner->fmt.video.i_chroma
-     || (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->fmt.video.i_sar_den !=
-        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->fmt.video.i_sar_num ||
-        p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation ||
-        p_dec->fmt_out.video.multiview_mode != p_owner->fmt.video.multiview_mode )
+    if( p_owner->p_vout == NULL )
+    {
+        msg_Dbg(p_dec, "vout: none found");
+        need_vout = true;
+    }
+    if( p_dec->fmt_out.video.i_width != p_owner->fmt.video.i_width
+             || p_dec->fmt_out.video.i_height != p_owner->fmt.video.i_height )
+    {
+        msg_Dbg(p_dec, "vout change: decoder size");
+        need_vout = true;
+    }
+    if( p_dec->fmt_out.video.i_visible_width != p_owner->fmt.video.i_visible_width
+             || p_dec->fmt_out.video.i_visible_height != p_owner->fmt.video.i_visible_height
+             || p_dec->fmt_out.video.i_x_offset != p_owner->fmt.video.i_x_offset
+             || p_dec->fmt_out.video.i_y_offset != p_owner->fmt.video.i_y_offset )
+    {
+        msg_Dbg(p_dec, "vout change: visible size");
+        need_vout = true;
+    }
+    if( p_dec->fmt_out.i_codec != p_owner->fmt.video.i_chroma )
+    {
+        msg_Dbg(p_dec, "vout change: chroma");
+        need_vout = true;
+    }
+    if( (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->fmt.video.i_sar_den !=
+             (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->fmt.video.i_sar_num )
+    {
+        msg_Dbg(p_dec, "vout change: SAR");
+        need_vout = true;
+    }
+    if( p_dec->fmt_out.video.orientation != p_owner->fmt.video.orientation )
+    {
+        msg_Dbg(p_dec, "vout change: orientation");
+        need_vout = true;
+    }
+    if( p_dec->fmt_out.video.multiview_mode != p_owner->fmt.video.multiview_mode )
+    {
+        msg_Dbg(p_dec, "vout change: multiview");
+        need_vout = true;
+    }
+
+    if ( memcmp( &p_dec->fmt_out.video.mastering,
+                 &p_owner->fmt.video.mastering,
+                 sizeof(p_owner->fmt.video.mastering)) )
+    {
+        msg_Dbg(p_dec, "vout update: mastering data");
+        need_format_update = true;
+    }
+    if ( p_dec->fmt_out.video.lighting.MaxCLL !=
+         p_owner->fmt.video.lighting.MaxCLL ||
+         p_dec->fmt_out.video.lighting.MaxFALL !=
+         p_owner->fmt.video.lighting.MaxFALL )
+    {
+        msg_Dbg(p_dec, "vout update: lighting data");
+        need_format_update = true;
+    }
+
+    if( need_vout )
     {
         vout_thread_t *p_vout;
 
@@ -560,13 +608,7 @@ static int vout_update_format( decoder_t *p_dec )
         vlc_fifo_Unlock( p_owner->p_fifo );
     }
     else
-    if ( memcmp( &p_dec->fmt_out.video.mastering,
-                 &p_owner->fmt.video.mastering,
-                 sizeof(p_owner->fmt.video.mastering)) ||
-         p_dec->fmt_out.video.lighting.MaxCLL !=
-         p_owner->fmt.video.lighting.MaxCLL ||
-         p_dec->fmt_out.video.lighting.MaxFALL !=
-         p_owner->fmt.video.lighting.MaxFALL)
+    if ( need_format_update )
     {
         /* the format has changed but we don't need a new vout */
         vlc_mutex_lock( &p_owner->lock );
