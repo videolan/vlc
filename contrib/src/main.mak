@@ -290,7 +290,7 @@ HOSTTOOLS := \
 	CC="$(CC)" CXX="$(CXX)" LD="$(LD)" \
 	AR="$(AR)" CCAS="$(CCAS)" RANLIB="$(RANLIB)" STRIP="$(STRIP)" \
 	PATH="$(PREFIX)/bin:$(PATH)"
-HOSTVARS := $(HOSTTOOLS) \
+HOSTVARS := \
 	CPPFLAGS="$(CPPFLAGS)" \
 	CFLAGS="$(CFLAGS)" \
 	CXXFLAGS="$(CXXFLAGS)" \
@@ -300,6 +300,11 @@ HOSTVARS_PIC := $(HOSTTOOLS) \
 	CFLAGS="$(CFLAGS) $(PIC)" \
 	CXXFLAGS="$(CXXFLAGS) $(PIC)" \
 	LDFLAGS="$(LDFLAGS)"
+
+# Keep a version of HOSTVARS without the tools, since meson requires the
+# tools variables to point to the native ones
+HOSTVARS_MESON := $(HOSTVARS)
+HOSTVARS := $(HOSTTOOLS) $(HOSTVARS)
 
 download_git = \
 	rm -Rf -- "$(@:.tar.xz=)" && \
@@ -367,7 +372,9 @@ else
 MESON += --buildtype release
 endif
 
-
+ifdef HAVE_CROSS_COMPILE
+MESON += --cross-file $(abspath crossfile.meson)
+endif
 
 ifdef GPL
 REQUIRE_GPL =
@@ -412,6 +419,7 @@ install: $(PKGS:%=.%)
 mostlyclean:
 	-$(RM) $(foreach p,$(PKGS_ALL),.$(p) .sum-$(p) .dep-$(p))
 	-$(RM) toolchain.cmake
+	-$(RM) crossfile.meson
 	-$(RM) -R "$(PREFIX)"
 	-$(RM) -R "$(BUILDBINDIR)"
 	-$(RM) -R */
@@ -523,6 +531,34 @@ ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> $@
 	echo "set(PKG_CONFIG_EXECUTABLE $(PKG_CONFIG))" >> $@
+endif
+
+crossfile.meson:
+	$(RM) $@
+	echo "[binaries]" >> $@
+	echo "c = '$(CC)'" >> $@
+	echo "cpp = '$(CXX)'" >> $@
+	echo "ar = '$(AR)'" >> $@
+	echo "strip = '$(STRIP)'" >> $@
+	echo "pkgconfig = '$(PKG_CONFIG)'" >> $@
+	echo "[properties]" >> $@
+	echo "needs_exe_wrapper = true" >> $@
+ifdef HAVE_CROSS_COMPILE
+	echo "[host_machine]" >> $@
+ifdef HAVE_WIN32
+	echo "system = 'windows'" >> $@
+else
+ifdef HAVE_IOS
+	echo "system = 'darwin'" >> $@
+else
+ifdef HAVE_ANDROID
+	echo "system = 'linux'" >> $@
+endif
+endif
+endif
+	echo "cpu_family = '$(subst i386,x86,$(ARCH))'" >> $@
+	echo "cpu = '`echo $(HOST) | cut -d - -f 1`'" >> $@
+	echo "endian = 'little'" >> $@
 endif
 
 # Default pattern rules
