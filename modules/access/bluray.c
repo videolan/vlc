@@ -225,6 +225,7 @@ typedef struct bluray_overlay_t
 typedef struct
 {
     BLURAY              *bluray;
+    bool                b_draining;
 
     /* Titles */
     unsigned int        i_title;
@@ -2259,6 +2260,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         }
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        p_sys->b_draining = false;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         break;
@@ -2269,6 +2271,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_chapter(p_sys->bluray, i_chapter);
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        p_sys->b_draining = false;
         es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
         p_sys->updates |= INPUT_UPDATE_SEEKPOINT;
         break;
@@ -2327,6 +2330,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_time(p_sys->bluray, TO_SCALE_NZ(va_arg(args, vlc_tick_t)));
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        p_sys->b_draining = false;
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         return VLC_SUCCESS;
     }
@@ -2356,6 +2360,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
         bd_seek_time(p_sys->bluray, TO_SCALE_NZ(f_position*CUR_LENGTH));
         blurayRestartParser(p_demux, true);
         notifyDiscontinuityToParser(p_sys);
+        p_sys->b_draining = false;
         es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_FLAG_DISCONTINUITY);
         return VLC_SUCCESS;
     }
@@ -2815,7 +2820,8 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         {
             notifyDiscontinuityToParser(p_sys);
             blurayRestartParser(p_demux, false);
-            es_out_Control(p_demux->out, ES_OUT_RESET_PCR);
+            es_out_Control(p_demux->out, ES_OUT_GET_EMPTY);
+            p_sys->b_draining = true;
             p_sys->b_pl_playing = false;
         }
         break;
@@ -2889,6 +2895,22 @@ static int blurayDemux(demux_t *p_demux)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     BD_EVENT e;
+
+    if(p_sys->b_draining)
+    {
+        bool b_empty = false;
+        if(es_out_Control(p_sys->p_out, ES_OUT_GET_EMPTY, &b_empty) != VLC_SUCCESS || b_empty)
+        {
+            es_out_Control(p_sys->p_out, ES_OUT_RESET_PCR);
+            p_sys->b_draining = false;
+        }
+        else
+        {
+            msg_Dbg(p_demux, "Draining...");
+            vlc_tick_sleep(VLC_TICK_FROM_MS(40));
+            return VLC_DEMUXER_SUCCESS;
+        }
+    }
 
     block_t *p_block = block_Alloc(BD_READ_SIZE);
     if (!p_block)
