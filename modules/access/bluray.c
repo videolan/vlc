@@ -865,6 +865,14 @@ static int blurayOpen(vlc_object_t *object)
        file concatenation are just resetting counters... */
     var_Create( p_demux, "ts-cc-check", VLC_VAR_BOOL );
     var_SetBool( p_demux, "ts-cc-check", false );
+    var_Create( p_demux, "ts-standard", VLC_VAR_STRING );
+    var_SetString( p_demux, "ts-standard", "mpeg" );
+    var_Create( p_demux, "ts-pmtfix-waitdata", VLC_VAR_BOOL );
+    var_SetBool( p_demux, "ts-pmtfix-waitdata", false );
+    var_Create( p_demux, "ts-patfix", VLC_VAR_BOOL );
+    var_SetBool( p_demux, "ts-patfix", false );
+    var_Create( p_demux, "ts-pcr-offsetfix", VLC_VAR_BOOL );
+    var_SetBool( p_demux, "ts-pcr-offsetfix", false );
 
 #ifdef DEBUG_BLURAY
     p_bluray_DebugObject = VLC_OBJECT(p_demux);
