@@ -95,6 +95,7 @@ struct demux_sys_t
     bool        b_valid_scrambling;
 
     bool        b_trust_pcr;
+    bool        b_check_pcr_offset;
 
     /* */
     bool        b_access_control;

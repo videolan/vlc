@@ -115,6 +115,10 @@ static void Close ( vlc_object_t * );
 #define CC_CHECK_LONGTEXT   "Detect discontinuities and drop packet duplicates. " \
                             "(bluRay sources are known broken and have false positives). "
 
+#define TS_PATFIX_TEXT      "Try to generate PAT/PMT if missing"
+#define TS_SKIP_GHOST_PROGRAM_TEXT "Only create ES on program sending data"
+#define TS_OFFSETFIX_TEXT   "Try to fix too early PCR (or late DTS)"
+
 #define PCR_TEXT N_("Trust in-stream PCR")
 #define PCR_LONGTEXT N_("Use the stream PCR as a reference.")
 
@@ -153,6 +157,9 @@ vlc_module_begin ()
     add_bool( "ts-split-es", true, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
     add_bool( "ts-seek-percent", false, SEEK_PERCENT_TEXT, SEEK_PERCENT_LONGTEXT, true )
     add_bool( "ts-cc-check", true, CC_CHECK_TEXT, CC_CHECK_LONGTEXT, true )
+    add_bool( "ts-pmtfix-waitdata", true, TS_SKIP_GHOST_PROGRAM_TEXT, NULL, true )
+    add_bool( "ts-patfix", true, TS_PATFIX_TEXT, NULL, true )
+    add_bool( "ts-pcr-offsetfix", true, TS_OFFSETFIX_TEXT, NULL, true )
 
     add_obsolete_bool( "ts-silent" );
 
@@ -401,7 +408,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->patfix.i_first_dts = -1;
     p_sys->patfix.i_timesourcepid = 0;
-    p_sys->patfix.status = PAT_WAITING;
+    p_sys->patfix.status = var_GetBool( p_demux, "ts-patfix" ) ? PAT_WAITING : PAT_FIXTRIED;
 
     /* Init PAT handler */
     patpid = GetPID(p_sys, 0);
@@ -430,6 +437,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_next_extraid = 1;
 
     p_sys->b_trust_pcr = var_CreateGetBool( p_demux, "ts-trust-pcr" );
+    p_sys->b_check_pcr_offset = p_sys->b_trust_pcr && var_GetBool(p_demux, "ts-pcr-offsetfix" );
 
     /* We handle description of an extra PMT */
     char* psz_string = var_CreateGetString( p_demux, "ts-extra-pmt" );
@@ -519,7 +527,10 @@ static int Open( vlc_object_t *p_this )
     vlc_stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK,
                         &p_sys->b_canfastseek );
 
-    p_sys->es_creation = ( p_sys->b_access_control ? CREATE_ES : DELAY_ES );
+    if( !p_sys->b_access_control && var_GetBool( p_demux, "ts-pmtfix-waitdata" ) )
+        p_sys->es_creation = DELAY_ES;
+    else
+        p_sys->es_creation = CREATE_ES;
 
     /* Preparse time */
     if( p_demux->b_preparsing && p_sys->b_canseek )
@@ -2369,6 +2380,12 @@ int FindPCRCandidate( ts_pmt_t *p_pmt )
 /* Tries to reselect a new PCR when none has been received */
 static void PCRFixHandle( demux_t *p_demux, ts_pmt_t *p_pmt, block_t *p_block )
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    /* disable PCR offset check */
+    if( !p_sys->b_check_pcr_offset && p_pmt->pcr.i_pcroffset == -1 )
+        p_pmt->pcr.i_pcroffset = 0;
+
     if ( p_pmt->pcr.b_disable || p_pmt->pcr.b_fix_done )
     {
         return;
