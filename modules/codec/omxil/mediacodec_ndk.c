@@ -78,6 +78,13 @@ typedef enum {
  * NdkMediaCodec.h
  *****************************************************************************/
 
+/* cf. https://github.com/android-ndk/ndk/issues/459 */
+#if defined(__USE_FILE_OFFSET64) && !defined(__LP64__)
+#define off_t_compat int32_t
+#else
+#define off_t_compat off_t
+#endif
+
 struct AMediaCodec;
 typedef struct AMediaCodec AMediaCodec;
 
@@ -132,7 +139,7 @@ typedef uint8_t* (*pf_AMediaCodec_getInputBuffer)(AMediaCodec*,
         size_t idx, size_t *out_size);
 
 typedef media_status_t (*pf_AMediaCodec_queueInputBuffer)(AMediaCodec*,
-        size_t idx, off_t offset, size_t size, uint64_t time, uint32_t flags);
+        size_t idx, off_t_compat offset, size_t size, uint64_t time, uint32_t flags);
 
 typedef ssize_t (*pf_AMediaCodec_dequeueOutputBuffer)(AMediaCodec*,
         AMediaCodecBufferInfo *info, int64_t timeoutUs);
