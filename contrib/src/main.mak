@@ -359,6 +359,15 @@ ifeq ($(V),1)
 CMAKE += -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endif
 
+MESON = meson --default-library static --prefix "$(PREFIX)" --backend ninja \
+	-Dlibdir=lib
+ifndef WITH_OPTIMIZATION
+MESON += --buildtype debug
+else
+MESON += --buildtype release
+endif
+
+
 
 ifdef GPL
 REQUIRE_GPL =
