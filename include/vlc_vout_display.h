@@ -149,8 +149,8 @@ enum {
 
     /* Ask the module to acknowledge/refuse source crop change after being
      * requested externally.
-     * The cropping requested is stored by video_format_t::i_x/y_offset and
-     * video_format_t::i_visible_width/height */
+     * The cropping requested is stored by source video_format_t::i_x/y_offset
+     * and video_format_t::i_visible_width/height */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,
 
     /* Ask the module to acknowledge/refuse VR/360° viewing direction after
