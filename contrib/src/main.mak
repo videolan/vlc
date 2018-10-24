@@ -348,6 +348,16 @@ RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
 		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR)
 
+MESON = meson --default-library static --prefix "$(PREFIX)" --backend ninja \
+	-Dlibdir=lib
+ifndef WITH_OPTIMIZATION
+MESON += --buildtype debug
+else
+MESON += --buildtype release
+endif
+
+
+
 ifdef GPL
 REQUIRE_GPL =
 else
