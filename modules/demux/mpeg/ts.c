@@ -519,17 +519,15 @@ static int Open( vlc_object_t *p_this )
     vlc_stream_Control( p_sys->stream, STREAM_CAN_FASTSEEK,
                         &p_sys->b_canfastseek );
 
+    p_sys->es_creation = ( p_sys->b_access_control ? CREATE_ES : DELAY_ES );
+
     /* Preparse time */
-    if( p_sys->b_canseek )
+    if( p_demux->b_preparsing && p_sys->b_canseek )
     {
-        p_sys->es_creation = NO_ES;
         while( !p_sys->i_pmt_es && !p_sys->b_end_preparse )
             if( Demux( p_demux ) != VLC_DEMUXER_SUCCESS )
                 break;
-        p_sys->es_creation = DELAY_ES;
     }
-    else
-        p_sys->es_creation = ( p_sys->b_access_control ? CREATE_ES : DELAY_ES );
 
     return VLC_SUCCESS;
 }
