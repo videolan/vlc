@@ -2592,6 +2592,15 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
     case BD_EVENT_PLAYMARK:
     case BD_EVENT_ANGLE:
         break;
+    case BD_EVENT_SEEK:
+        /* Seek will happen with any chapter/title or bd_seek(),
+           but also BD-J initiated. We can't make the difference
+           between input or vm ones, better double flush/pcr reset
+           than break the clock by throwing post random access PCR */
+        blurayRestartParser(p_demux, true);
+        notifyDiscontinuityToParser(p_sys);
+        es_out_Control(p_sys->p_out, ES_OUT_RESET_PCR);
+        break;
 #if BLURAY_VERSION >= BLURAY_VERSION_CODE(0,8,1)
     case BD_EVENT_UO_MASK_CHANGED:
         /* This event could be used to grey out unselectable items in title menu */
