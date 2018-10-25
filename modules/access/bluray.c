@@ -529,7 +529,7 @@ static void blurayReleaseVideoES(demux_t *p_demux)
                                     p_sys->bdj.p_video_es, p_ov->i_channel );
                 }
                 p_ov->i_channel = -1;
-                p_ov->status = Closed;
+                p_ov->status = ToDisplay;
                 vlc_mutex_unlock(&p_ov->lock);
 
                 if (p_ov->p_updater) {
@@ -1193,6 +1193,25 @@ static int blurayGetStreamPID(demux_sys_t *p_sys, int i_stream_type, uint8_t i_s
 }
 
 /*****************************************************************************
+ * internal overlay
+ *****************************************************************************/
+static void bluraySetActiveVideoES(demux_t *p_demux, es_out_id_t *p_es)
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    vlc_mutex_lock(&p_sys->bdj.lock);
+    if(p_sys->bdj.p_video_es == p_es)
+    {
+        vlc_mutex_unlock(&p_sys->bdj.lock);
+        return;
+    }
+    p_sys->bdj.p_video_es = p_es;
+    vlc_mutex_unlock(&p_sys->bdj.lock);
+    es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, p_es,
+                    onMouseEvent, p_demux );
+}
+
+/*****************************************************************************
  * bluray fake es_out
  *****************************************************************************/
 typedef struct
@@ -1295,14 +1314,10 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
         if (b_select)
             es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
     }
-    if (p_es && fmt.i_cat == VIDEO_ES)
-    {
-        es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT, p_es,
-                        onMouseEvent, p_demux );
-        vlc_mutex_lock(&p_sys->bdj.lock);
-        p_sys->bdj.p_video_es = p_es;
-        vlc_mutex_unlock(&p_sys->bdj.lock);
-    }
+
+    if (p_es && fmt.i_cat == VIDEO_ES && b_select)
+        bluraySetActiveVideoES(p_demux, p_es);
+
     es_format_Clean(&fmt);
 
     vlc_mutex_unlock(&esout_priv->lock);
@@ -2026,6 +2041,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
     {
         unref_subpicture_updater(p_ov->p_updater);
         p_ov->p_updater = NULL;
+        p_ov->i_channel = -1;
         subpicture_Delete(p_pic);
         return;
     }
@@ -2873,7 +2889,7 @@ static void blurayHandleOverlays(demux_t *p_demux, int nread)
         vlc_mutex_lock(&ov->lock);
         bool display = ov->status == ToDisplay;
         vlc_mutex_unlock(&ov->lock);
-        if (display) {
+        if (display && ov->i_channel == -1) {
             /* NOTE: we might want to enable background video always when there's no video stream playing.
                Now, with some discs, there are perioids (even seconds) during which the video window
                disappears and just playlist is shown.
