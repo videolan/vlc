@@ -142,8 +142,17 @@ libvk_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/display.c
 libvk_plugin_la_CFLAGS = $(AM_CFLAGS) $(VULKAN_COMMONCFLAGS)
 libvk_plugin_la_LIBADD = $(VULKAN_COMMONLIBS)
 
+libvk_x11_plugin_la_SOURCES = $(VULKAN_COMMONSOURCES) video_output/vulkan/surface.c \
+			      video_output/vulkan/platform_xcb.c
+libvk_x11_plugin_la_CFLAGS = $(AM_CFLAGS) $(XCB_CFLAGS) $(VULKAN_COMMONCFLAGS) \
+			     -DVK_USE_PLATFORM_XCB_KHR -DPLATFORM_NAME=X11
+libvk_x11_plugin_la_LIBADD = $(VULKAN_COMMONLIBS) $(XCB_LIBS)
+
 if HAVE_VULKAN
 vout_LTLIBRARIES += libvk_plugin.la
+if HAVE_XCB
+vout_LTLIBRARIES += libvk_x11_plugin.la
+endif
 endif
 
 ### XCB ###
