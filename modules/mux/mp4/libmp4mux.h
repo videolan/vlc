@@ -24,6 +24,8 @@
 #include <vlc_es.h>
 #include <vlc_boxes.h>
 
+typedef struct mp4mux_handle_t mp4mux_handle_t;
+
 typedef struct
 {
     uint64_t i_pos;
@@ -32,7 +34,7 @@ typedef struct
     vlc_tick_t  i_pts_dts;
     vlc_tick_t  i_length;
     unsigned int i_flags;
-} mp4mux_entry_t;
+} mp4mux_sample_t;
 
 typedef struct
 {
@@ -47,9 +49,9 @@ typedef struct
     es_format_t   fmt;
 
     /* index */
-    unsigned int i_entry_count;
-    unsigned int i_entry_max;
-    mp4mux_entry_t *entry;
+    unsigned int i_samples_count;
+    unsigned int i_samples_max;
+    mp4mux_sample_t *samples;
 
     /* XXX: needed for other codecs too, see lavf */
     block_t      *a52_frame;
@@ -74,8 +76,32 @@ typedef struct
 
 } mp4mux_trackinfo_t;
 
-bool mp4mux_trackinfo_Init( mp4mux_trackinfo_t *, unsigned, uint32_t );
-void mp4mux_trackinfo_Clear( mp4mux_trackinfo_t * );
+enum mp4mux_options
+{
+    FRAGMENTED          = 1 << 0,
+    QUICKTIME           = 1 << 1,
+    USE64BITEXT         = 1 << 2,
+};
+
+mp4mux_handle_t * mp4mux_New(enum mp4mux_options);
+void mp4mux_Delete(mp4mux_handle_t *);
+void mp4mux_Set64BitExt(mp4mux_handle_t *);
+bool mp4mux_Is(mp4mux_handle_t *, enum mp4mux_options);
+
+mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *, unsigned id,
+                                      const es_format_t *fmt, uint32_t timescale);
+/* ELST */
+bool mp4mux_track_AddEdit(mp4mux_trackinfo_t *, const mp4mux_edit_t *);
+const mp4mux_edit_t *mp4mux_track_GetLastEdit(const mp4mux_trackinfo_t *);
+void mp4mux_track_DebugEdits(vlc_object_t *, const mp4mux_trackinfo_t *);
+/* Samples */
+bool mp4mux_track_AddSample(mp4mux_trackinfo_t *, const mp4mux_sample_t *);
+mp4mux_sample_t *mp4mux_track_GetLastSample(mp4mux_trackinfo_t *);
+
+
+bo_t *mp4mux_GetMoov(mp4mux_handle_t *, vlc_object_t *, vlc_tick_t i_movie_duration);
+
+/* old */
 
 bo_t *box_new     (const char *fcc);
 bo_t *box_full_new(const char *fcc, uint8_t v, uint32_t f);
@@ -84,6 +110,4 @@ void  box_gather  (bo_t *box, bo_t *box2);
 
 bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
 bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
-bo_t *mp4mux_GetMoovBox(vlc_object_t *, mp4mux_trackinfo_t **pp_tracks, unsigned int i_tracks,
-                        vlc_tick_t i_movie_duration,
-                        bool b_fragmented, bool b_mov, bool b_64ext, bool b_stco64);
+
