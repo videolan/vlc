@@ -37,7 +37,7 @@ endif
 QT_OPENGL := -opengl desktop
 
 ifdef HAVE_MACOSX
-QT_PLATFORM := -platform darwin-g++
+QT_SPEC := darwin-g++
 endif
 ifdef HAVE_WIN32
 ifdef HAVE_CLANG
@@ -48,7 +48,9 @@ endif
 ifdef HAVE_CROSS_COMPILE
 QT_PLATFORM := -xplatform $(QT_SPEC) -device-option CROSS_COMPILE=$(HOST)-
 else
+ifneq ($(QT_SPEC),)
 QT_PLATFORM := -platform $(QT_SPEC)
+endif
 endif
 ifneq ($(findstring $(ARCH), arm aarch64),)
 # There is no opengl available on windows on these architectures.
