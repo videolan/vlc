@@ -1872,9 +1872,10 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     demux_t *p_demux = (demux_t*)ptr;
     demux_sys_t *p_sys = p_demux->p_sys;
 
+    vlc_mutex_lock(&p_sys->bdj.lock);
+
     if (!overlay) {
         msg_Info(p_demux, "Closing overlays.");
-        vlc_mutex_lock(&p_sys->bdj.lock);
         if (p_sys->bdj.p_video_es)
             for (int i = 0; i < MAX_OVERLAY; i++)
                 blurayCloseOverlay(p_demux, i);
@@ -1885,23 +1886,17 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     switch (overlay->cmd) {
     case BD_OVERLAY_INIT:
         msg_Info(p_demux, "Initializing overlay");
-        vlc_mutex_lock(&p_sys->bdj.lock);
         blurayInitOverlay(p_demux, overlay->plane, overlay->w, overlay->h);
-        vlc_mutex_unlock(&p_sys->bdj.lock);
         break;
     case BD_OVERLAY_CLOSE:
-        vlc_mutex_lock(&p_sys->bdj.lock);
         blurayClearOverlay(p_demux, overlay->plane);
         blurayCloseOverlay(p_demux, overlay->plane);
-        vlc_mutex_unlock(&p_sys->bdj.lock);
         break;
     case BD_OVERLAY_CLEAR:
         blurayClearOverlay(p_demux, overlay->plane);
         break;
     case BD_OVERLAY_FLUSH:
-        vlc_mutex_lock(&p_sys->bdj.lock);
         blurayActivateOverlay(p_demux, overlay->plane);
-        vlc_mutex_unlock(&p_sys->bdj.lock);
         break;
     case BD_OVERLAY_DRAW:
     case BD_OVERLAY_WIPE:
@@ -1911,6 +1906,8 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
         msg_Warn(p_demux, "Unknown BD overlay command: %u", overlay->cmd);
         break;
     }
+
+    vlc_mutex_unlock(&p_sys->bdj.lock);
 }
 
 /*
