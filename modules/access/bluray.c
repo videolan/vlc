@@ -2694,7 +2694,7 @@ static void blurayOnClipUpdate(demux_t *p_demux, uint32_t clip)
         assert(p_sys->p_clip_info->video_stream_count >= 1);
     }
 
-    const CLPI_CL *clpi = bd_get_clpi(p_sys->bluray, clip);
+    CLPI_CL *clpi = bd_get_clpi(p_sys->bluray, clip);
     if(clpi && clpi->clip.application_type != p_sys->clip_application_type)
     {
         if(p_sys->clip_application_type == BD_CLIP_APP_TYPE_TS_MAIN_PATH_TIMED_SLIDESHOW ||
@@ -2705,6 +2705,7 @@ static void blurayOnClipUpdate(demux_t *p_demux, uint32_t clip)
             es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_ENABLE_LOW_DELAY);
         else
             es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_DISABLE_LOW_DELAY);
+        bd_free_clpi(clpi);
     }
 
     vlc_mutex_unlock(&p_sys->pl_info_lock);
