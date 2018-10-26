@@ -511,7 +511,7 @@ static IDeckLinkDisplayMode * MatchDisplayMode(vout_display_t *vd,
                                 (char *)&field,
                                 timescale, frameduration);
                     }
-		    free(psz_mode_name);
+                    free(psz_mode_name);
                 }
                 else
                 {
