@@ -138,7 +138,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     VLC_UNUSED(vd);
     VLC_UNUSED(subpicture);
-    picture_Release(picture);
+    VLC_UNUSED(picture);
 }
 
 static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
@@ -155,7 +155,6 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *su
         msg_Dbg(vd, "VOUT got %"PRIu64" ms offset",
                 MS_FROM_VLC_TICK(vlc_tick_now() - date));
     }
-    picture_Release(picture);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)

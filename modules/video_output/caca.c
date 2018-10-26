@@ -180,7 +180,7 @@ static void PictureDisplay(vout_display_t *vd, picture_t *picture, subpicture_t 
     vout_display_sys_t *sys = vd->sys;
 
     caca_refresh_display(sys->dp);
-    picture_Release(picture);
+    VLC_UNUSED(picture);
     VLC_UNUSED(subpicture);
 }
 

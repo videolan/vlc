@@ -653,6 +653,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Display(vout_display_t *vd, picture_t *picture,
                     subpicture_t *subpicture)
 {
+    VLC_UNUSED(picture);
     VLC_UNUSED(subpicture);
     vout_display_sys_t *sys = vd->sys;
     int i;
@@ -672,7 +673,6 @@ static void Display(vout_display_t *vd, picture_t *picture,
             sys->picture->p[i].p_pixels =
                     sys->map[sys->front_buf]+sys->offsets[i];
     }
-    picture_Release(picture);
 }
 
 

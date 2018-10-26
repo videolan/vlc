@@ -1026,7 +1026,7 @@ end:
 
 static void DisplayVideo(vout_display_t *, picture_t *picture, subpicture_t *)
 {
-    picture_Release(picture);
+    VLC_UNUSED(picture);
 }
 
 static int ControlVideo(vout_display_t *vd, int query, va_list args)

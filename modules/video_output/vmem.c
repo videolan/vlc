@@ -271,11 +271,11 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(pic);
 
     if (sys->display != NULL)
         sys->display(sys->opaque, sys->pic_opaque);
 
-    picture_Release(pic);
     VLC_UNUSED(subpic);
 }
 

@@ -276,9 +276,6 @@ struct vout_display_t {
      * possible.
      * You cannot change the pixel content of the picture_t or of the
      * subpicture_t.
-     *
-     * This function gives away the ownership of the picture and of the
-     * subpicture, so you must release them as soon as possible.
      */
     void       (*display)(vout_display_t *, picture_t *, subpicture_t *);
 

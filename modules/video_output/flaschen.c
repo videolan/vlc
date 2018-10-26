@@ -219,8 +219,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     else if (result < (int)(header_len + vd->fmt.i_width * vd->fmt.i_height * 3))
         msg_Err(vd, "sendmsg only sent %d bytes in vout display flaschen", result);
         /* we might want to drop some frames? */
-
-    picture_Release(picture);
 }
 
 /**

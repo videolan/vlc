@@ -264,7 +264,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     fflush(sys->f);
 
     /* */
-    picture_Release(picture);
     VLC_UNUSED(subpicture);
 }
 

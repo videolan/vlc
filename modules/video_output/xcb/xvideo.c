@@ -700,7 +700,6 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
         free (e);
     }
 out:
-    picture_Release (pic);
     (void)subpicture;
 }
 

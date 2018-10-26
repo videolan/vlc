@@ -338,7 +338,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     }
     CommonDisplay(vd);
 
-    picture_Release(picture);
     VLC_UNUSED(subpicture);
 
     Manage(vd);

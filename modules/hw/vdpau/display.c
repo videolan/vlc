@@ -308,13 +308,12 @@ static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
         {
             msg_Err(vd, "presentation queue blocking error: %s",
                     vdp_get_error_string(sys->vdp, err));
-            picture_Release(pic);
             goto out;
         }
         picture_Release(current);
     }
 
-    sys->current = pic;
+    sys->current = picture_Hold(pic);
 out:
     /* We already dealt with the subpicture in the Queue phase, so it's safe to
        delete at this point */

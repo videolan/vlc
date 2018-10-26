@@ -385,7 +385,7 @@ static void Display( vout_display_t *vd, picture_t *picture,
     vout_display_sys_t * sys = vd->sys;
 
     VLC_UNUSED( subpicture );
-    picture_Release( picture );
+    VLC_UNUSED( picture );
 
     /* Let a window procedure manage instead because if resizing a frame window
      * here, WM_SIZE is not sent to its child window.

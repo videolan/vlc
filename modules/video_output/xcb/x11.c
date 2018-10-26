@@ -440,7 +440,6 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
      * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
      * vout_display wrapper. */
 out:
-    picture_Release (pic);
     (void)subpicture;
 }
 

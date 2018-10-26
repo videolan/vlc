@@ -334,6 +334,7 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(pic);
     [sys->glView setVoutFlushing:YES];
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
@@ -341,7 +342,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
         vlc_gl_ReleaseCurrent(sys->gl);
     }
     [sys->glView setVoutFlushing:NO];
-    picture_Release (pic);
     sys->has_first_frame = true;
 
     if (subpicture)

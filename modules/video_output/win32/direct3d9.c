@@ -582,9 +582,9 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
+    VLC_UNUSED(subpicture);
 
     if (sys->lost_not_ready) {
-        picture_Release(picture);
         if (subpicture)
             subpicture_Delete(subpicture);
         return;
@@ -608,7 +608,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     /* XXX See Prepare() */
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
         Direct3D9LockSurface(picture);
-    picture_Release(picture);
     if (subpicture)
         subpicture_Delete(subpicture);
 

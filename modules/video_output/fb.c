@@ -379,7 +379,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     if (!sys->is_hw_accel)
         picture_Copy(sys->picture, picture);
 
-    picture_Release(picture);
     VLC_UNUSED(subpicture);
 }
 static int Control(vout_display_t *vd, int query, va_list args)

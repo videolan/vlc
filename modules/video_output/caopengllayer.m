@@ -298,6 +298,7 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
 static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(pic);
 
     @synchronized (sys->cgLayer) {
         sys->b_frame_available = YES;
@@ -308,8 +309,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
         [sys->cgLayer display];
         [CATransaction flush];
     }
-
-    picture_Release(pic);
 
     if (subpicture)
         subpicture_Delete(subpicture);

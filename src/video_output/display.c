@@ -1085,13 +1085,13 @@ static void SplitterDisplay(vout_display_t *vd,
                             subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(picture);
 
     assert(!subpicture);
     for (int i = 0; i < sys->count; i++) {
         if (sys->picture[i])
             vout_display_Display(sys->display[i], sys->picture[i], NULL);
     }
-    picture_Release(picture);
 }
 static int SplitterControl(vout_display_t *vd, int query, va_list args)
 {

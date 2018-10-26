@@ -147,6 +147,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(picture);
 
 #define rect_src vd->sys->rect_src
 #define rect_src_clipped vd->sys->sys.rect_src_clipped
@@ -182,7 +183,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #undef rect_dest
 #undef rect_dest_clipped
     /* TODO */
-    picture_Release(picture);
     VLC_UNUSED(subpicture);
 
     CommonDisplay(vd);
