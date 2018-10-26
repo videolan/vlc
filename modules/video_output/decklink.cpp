@@ -1024,11 +1024,6 @@ end:
         pDLVideoFrame->Release();
 }
 
-static void DisplayVideo(vout_display_t *, picture_t *picture, subpicture_t *)
-{
-    VLC_UNUSED(picture);
-}
-
 static int ControlVideo(vout_display_t *vd, int query, va_list args)
 {
     (void) vd; (void) query; (void) args;
@@ -1080,7 +1075,7 @@ static int OpenVideo(vlc_object_t *p_this)
 
     vd->pool    = PoolVideo;
     vd->prepare = PrepareVideo;
-    vd->display = DisplayVideo;
+    vd->display = NULL;
     vd->control = ControlVideo;
 
     return VLC_SUCCESS;

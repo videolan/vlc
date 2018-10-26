@@ -270,7 +270,7 @@ struct vout_display_t {
     void       (*prepare)(vout_display_t *, picture_t *, subpicture_t *,
                           vlc_tick_t date);
 
-    /* Display a picture and an optional subpicture (mandatory).
+    /* Display a picture and an optional subpicture.
      *
      * The picture and the optional subpicture must be displayed as soon as
      * possible.

@@ -69,7 +69,6 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
 };
 static picture_pool_t *Pool(vout_display_t *, unsigned count);
-static void            Display(vout_display_t *, picture_t *, subpicture_t *);
 static void            DisplayStat(vout_display_t *, picture_t *, subpicture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
@@ -108,7 +107,7 @@ static int Open(vlc_object_t *object,
 
 static int OpenDummy(vlc_object_t *object)
 {
-    return Open(object, Display);
+    return Open(object, NULL);
 }
 
 static int OpenStats(vlc_object_t *object)
@@ -132,13 +131,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     if (!sys->pool)
         sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
     return sys->pool;
-}
-
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
-{
-    VLC_UNUSED(vd);
-    VLC_UNUSED(subpicture);
-    VLC_UNUSED(picture);
 }
 
 static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
