@@ -139,6 +139,19 @@ mp4mux_sample_t *mp4mux_track_GetLastSample(mp4mux_trackinfo_t *t)
     else return NULL;
 }
 
+void mp4mux_ShiftSamples(mp4mux_handle_t *h, int64_t offset)
+{
+    for(size_t i_track = 0; i_track < vlc_array_count(&h->tracks); i_track++)
+    {
+        mp4mux_trackinfo_t *t = vlc_array_item_at_index(&h->tracks, i_track);
+        for (unsigned i = 0; i < t->i_samples_count; i++)
+        {
+            mp4mux_sample_t *sample = t->samples;
+            sample[i].i_pos += offset;
+        }
+    }
+}
+
 mp4mux_handle_t * mp4mux_New(enum mp4mux_options options)
 {
     mp4mux_handle_t *h = malloc(sizeof(*h));
@@ -1560,7 +1573,6 @@ static bo_t *GetStblBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         box_gather(stbl, ctts);
     box_gather(stbl, stsc);
     box_gather(stbl, stsz);
-    p_track->i_stco_pos = bo_size(stbl) + 16;
     box_gather(stbl, stco);
 
     return stbl;
@@ -1935,19 +1947,15 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
             stbl = GetStblBox(p_obj, p_stream, h->options & QUICKTIME, h->options & USE64BITEXT);
 
         /* append stbl to minf */
-        p_stream->i_stco_pos += bo_size(minf);
         box_gather(minf, stbl);
 
         /* append minf to mdia */
-        p_stream->i_stco_pos += bo_size(mdia);
         box_gather(mdia, minf);
 
         /* append mdia to trak */
-        p_stream->i_stco_pos += bo_size(trak);
         box_gather(trak, mdia);
 
         /* append trak to moov */
-        p_stream->i_stco_pos += bo_size(moov);
         box_gather(moov, trak);
     }
 

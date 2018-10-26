@@ -297,64 +297,77 @@ static void Close(vlc_object_t *p_this)
     sout_AccessOutWrite(p_mux->p_access, bo.b);
 
     /* Create MOOV header */
-    const bool b_64bitext = (p_sys->i_pos >= (((uint64_t)0x1) << 32));
+    bool b_64bitext = (p_sys->i_pos > UINT32_MAX);
     if(b_64bitext)
         mp4mux_Set64BitExt(p_sys->muxh);
+
     uint64_t i_moov_pos = p_sys->i_pos;
     bo_t *moov = mp4mux_GetMoov(p_sys->muxh, VLC_OBJECT(p_mux), 0);
 
     /* Check we need to create "fast start" files */
     p_sys->b_fast_start = var_GetBool(p_this, SOUT_CFG_PREFIX "faststart");
-    while (p_sys->b_fast_start && moov && moov->b) {
+    while (p_sys->b_fast_start && moov && moov->b)
+    {
         /* Move data to the end of the file so we can fit the moov header
          * at the start */
-        int64_t i_size = p_sys->i_pos - p_sys->i_mdat_pos;
-        int i_moov_size = bo_size(moov);
+        uint64_t i_mdatsize = p_sys->i_pos - p_sys->i_mdat_pos;
 
-        while (i_size > 0) {
-            int64_t i_chunk = __MIN(32768, i_size);
+        /* moving samples will need new moov with 64bit atoms ? */
+        if(!b_64bitext && p_sys->i_pos + bo_size(moov) > UINT32_MAX)
+        {
+            mp4mux_Set64BitExt(p_sys->muxh);
+            b_64bitext = true;
+            /* generate a new moov */
+            bo_t *moov64 = mp4mux_GetMoov(p_sys->muxh, VLC_OBJECT(p_mux), 0);
+            if(moov64)
+            {
+                bo_free(moov);
+                moov = moov64;
+            }
+        }
+        /* We now know our final MOOV size */
+
+        /* Fix-up samples to chunks table in MOOV header to they point to next MDAT location */
+        mp4mux_ShiftSamples(p_sys->muxh, bo_size(moov));
+        msg_Dbg(p_this,"Moving data by %"PRIu64, (uint64_t)bo_size(moov));
+        bo_t *shifted = mp4mux_GetMoov(p_sys->muxh, VLC_OBJECT(p_mux), 0);
+        if(!shifted)
+        {
+            /* fail */
+            p_sys->b_fast_start = false;
+            continue;
+        }
+        assert(bo_size(shifted) == bo_size(moov));
+        bo_free(moov);
+        moov = shifted;
+
+        /* Make space, move MDAT data by moov size towards the end */
+        while (i_mdatsize > 0)
+        {
+            size_t i_chunk = __MIN(32768, i_mdatsize);
             block_t *p_buf = block_Alloc(i_chunk);
             sout_AccessOutSeek(p_mux->p_access,
-                                p_sys->i_mdat_pos + i_size - i_chunk);
-            if (sout_AccessOutRead(p_mux->p_access, p_buf) < i_chunk) {
+                                p_sys->i_mdat_pos + i_mdatsize - i_chunk);
+            ssize_t i_read = sout_AccessOutRead(p_mux->p_access, p_buf);
+            if (i_read < 0 || (size_t) i_read < i_chunk) {
                 msg_Warn(p_this, "read() not supported by access output, "
                           "won't create a fast start file");
                 p_sys->b_fast_start = false;
                 block_Release(p_buf);
                 break;
             }
-            sout_AccessOutSeek(p_mux->p_access, p_sys->i_mdat_pos + i_size +
-                                i_moov_size - i_chunk);
+            sout_AccessOutSeek(p_mux->p_access, p_sys->i_mdat_pos + i_mdatsize +
+                               bo_size(moov) - i_chunk);
             sout_AccessOutWrite(p_mux->p_access, p_buf);
-            i_size -= i_chunk;
+            i_mdatsize -= i_chunk;
         }
 
-        if (!p_sys->b_fast_start)
-            break;
+        if (!p_sys->b_fast_start) /* failed above */
+            continue;
 
         /* Update pos pointers */
         i_moov_pos = p_sys->i_mdat_pos;
         p_sys->i_mdat_pos += bo_size(moov);
-
-        /* Fix-up samples to chunks table in MOOV header */
-        for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++) {
-            mp4_stream_t *p_stream = p_sys->pp_streams[i_trak];
-            unsigned i_written = 0;
-            for (unsigned i = 0; i < p_stream->tinfo->i_samples_count; ) {
-                mp4mux_sample_t *entry = p_stream->tinfo->samples;
-                if (b_64bitext)
-                    bo_set_64be(moov, p_stream->tinfo->i_stco_pos + i_written++ * 8, entry[i].i_pos + p_sys->i_mdat_pos - i_moov_pos);
-                else
-                    bo_set_32be(moov, p_stream->tinfo->i_stco_pos + i_written++ * 4, entry[i].i_pos + p_sys->i_mdat_pos - i_moov_pos);
-
-                for (; i < p_stream->tinfo->i_samples_count; i++)
-                    if (i >= p_stream->tinfo->i_samples_count - 1 ||
-                        entry[i].i_pos + entry[i].i_size != entry[i+1].i_pos) {
-                        i++;
-                        break;
-                    }
-            }
-        }
 
         p_sys->b_fast_start = false;
     }
