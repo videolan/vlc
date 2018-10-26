@@ -26,6 +26,7 @@
 #include <medialibrary/parser/IItem.h>
 #include <medialibrary/parser/Parser.h>
 #include <medialibrary/IMedia.h>
+#include <medialibrary/IThumbnailer.h>
 
 #include <vlc_common.h>
 #include <vlc_threads.h>
@@ -38,6 +39,7 @@
 
 struct vlc_event_t;
 struct vlc_object_t;
+struct vlc_thumbnailer_t;
 
 class Logger;
 
@@ -90,6 +92,18 @@ private:
 
 private:
     vlc_object_t* m_obj;
+};
+
+class Thumbnailer : public medialibrary::IThumbnailer
+{
+public:
+    Thumbnailer( vlc_medialibrary_module_t* ml, std::string thumbnailsDir);
+    virtual bool generate( medialibrary::MediaPtr media, const std::string& mrl ) override;
+
+private:
+    vlc_medialibrary_module_t* m_ml;
+    std::string m_thumbnailDir;
+    std::unique_ptr<vlc_thumbnailer_t, void(*)(vlc_thumbnailer_t*)> m_thumbnailer;
 };
 
 class MediaLibrary : public medialibrary::IMediaLibraryCb

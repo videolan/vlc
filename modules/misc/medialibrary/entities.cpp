@@ -215,12 +215,22 @@ bool Convert( const medialibrary::IMedia* input, vlc_ml_media_t& output )
 
     if ( input->isThumbnailGenerated() == true )
     {
-        output.psz_artwork_mrl = strdup( input->thumbnail().c_str() );
-        if ( unlikely( output.psz_artwork_mrl == nullptr ) )
-            return false;
+        output.b_artwork_generated = true;
+        const auto& thumbnail = input->thumbnail();
+        if ( thumbnail.empty() == true )
+            output.psz_artwork_mrl = nullptr;
+        else
+        {
+            output.psz_artwork_mrl = strdup( thumbnail.c_str() );
+            if ( unlikely( output.psz_artwork_mrl == nullptr ) )
+                return false;
+        }
     }
     else
+    {
         output.psz_artwork_mrl = nullptr;
+        output.b_artwork_generated = false;
+    }
 
     return true;
 }

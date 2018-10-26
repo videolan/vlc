@@ -269,8 +269,20 @@ void MediaLibrary::onBackgroundTasksIdleChanged( bool idle )
     m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
-void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr, bool )
+void MediaLibrary::onMediaThumbnailReady( medialibrary::MediaPtr media, bool success )
 {
+    vlc_ml_event_t ev;
+    ev.i_type = VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED;
+    ev.media_thumbnail_generated.b_success = success;
+    auto mPtr = vlc::wrap_cptr<vlc_ml_media_t>(
+                static_cast<vlc_ml_media_t*>( malloc( sizeof( vlc_ml_media_t ) ) ),
+                vlc_ml_media_release );
+    if ( unlikely( mPtr == nullptr ) )
+        return;
+    ev.media_thumbnail_generated.p_media = mPtr.get();
+    if ( Convert( media.get(), *mPtr ) == false )
+        return;
+    m_vlc_ml->cbs->pf_send_event( m_vlc_ml, &ev );
 }
 
 MediaLibrary::MediaLibrary( vlc_medialibrary_module_t* ml )
@@ -291,8 +303,9 @@ bool MediaLibrary::Start()
 
     auto userDir = vlc::wrap_cptr( config_GetUserDir( VLC_USERDATA_DIR ) );
     std::string mlDir = std::string{ userDir.get() } + "/ml/";
+    auto thumbnailsDir = mlDir + "thumbnails/";
 
-    auto initStatus = ml->initialize( mlDir + "ml.db", mlDir + "thumbnails/", this );
+    auto initStatus = ml->initialize( mlDir + "ml.db", thumbnailsDir, this );
     switch ( initStatus )
     {
         case medialibrary::InitializeResult::AlreadyInitialized:
@@ -310,6 +323,17 @@ bool MediaLibrary::Start()
     }
 
     ml->addParserService( std::make_shared<MetadataExtractor>( VLC_OBJECT( m_vlc_ml ) ) );
+    try
+    {
+        ml->addThumbnailer( std::make_shared<Thumbnailer>(
+                                m_vlc_ml, std::move( thumbnailsDir ) ) );
+    }
+    catch ( const std::runtime_error& ex )
+    {
+        msg_Err( m_vlc_ml, "Failed to provide a thumbnailer module to the "
+                 "medialib: %s", ex.what() );
+        return false;
+    }
     if ( ml->start() == false )
     {
         msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
@@ -426,6 +450,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF:
         case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF:
         case VLC_ML_MEDIA_SET_THUMBNAIL:
+        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
             return controlMedia( query, args );
         default:
@@ -872,6 +897,11 @@ int MediaLibrary::controlMedia( int query, va_list args )
             auto mrl = va_arg( args, const char* );
             m->setThumbnail( mrl );
             return VLC_SUCCESS;
+        }
+        case VLC_ML_MEDIA_GENERATE_THUMBNAIL:
+        {
+            auto res = m_ml->requestThumbnail( m );
+            return res == true ? VLC_SUCCESS : VLC_EGENERIC;
         }
         case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
         {

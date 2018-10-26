@@ -182,6 +182,9 @@ typedef struct vlc_ml_media_t
     char* psz_title;
 
     char* psz_artwork_mrl;
+    /* True if a thumbnail is available, or if thumbnail generation was
+     * attempted but failed */
+    bool b_artwork_generated;
     bool b_is_favorite;
 
     union
@@ -431,6 +434,7 @@ enum vlc_ml_control
     VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: char**; */
     VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF,   /**< arg1: media id; arg2: vlc_ml_playback_pref; arg3: const char*; */
     VLC_ML_MEDIA_SET_THUMBNAIL,             /**< arg1: media id; arg2: const char*; */
+    VLC_ML_MEDIA_GENERATE_THUMBNAIL,        /**< arg1: media id; */
     VLC_ML_MEDIA_ADD_EXTERNAL_MRL,          /**< arg1: media id; arg2: const char*; arg3: type(vlc_ml_file_type_t) */
 };
 
@@ -568,6 +572,13 @@ enum vlc_ml_event_type
      * increase once all discovery operations are completed.
      */
     VLC_ML_EVENT_PARSING_PROGRESS_UPDATED,
+    /**
+     * Sent after a media thumbnail was generated, or if it's generation failed.
+     * The media is stored in vlc_ml_event_t::media_thumbnail_generated::p_media
+     * and the success state is stored in
+     * vlc_ml_event_t::media_thumbnail_generated::b_success
+     */
+    VLC_ML_EVENT_MEDIA_THUMBNAIL_GENERATED,
 };
 
 typedef struct vlc_ml_event_t
@@ -632,6 +643,11 @@ typedef struct vlc_ml_event_t
         {
             bool b_idle;
         } background_idle_changed;
+        struct
+        {
+            const vlc_ml_media_t* p_media;
+            bool b_success;
+        } media_thumbnail_generated;
     };
 } vlc_ml_event_t;
 
@@ -813,6 +829,11 @@ static inline int vlc_ml_media_set_playback_pref( vlc_medialibrary_t* p_ml, int6
 static inline int vlc_ml_media_set_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id, const char* psz_mrl )
 {
     return vlc_ml_control( p_ml, VLC_ML_MEDIA_SET_THUMBNAIL, i_media_id, psz_mrl );
+}
+
+static inline int vlc_ml_media_generate_thumbnail( vlc_medialibrary_t* p_ml, int64_t i_media_id )
+{
+    return vlc_ml_control( p_ml, VLC_ML_MEDIA_GENERATE_THUMBNAIL, i_media_id );
 }
 
 static inline int vlc_ml_media_add_external_mrl( vlc_medialibrary_t* p_ml, int64_t i_media_id,
