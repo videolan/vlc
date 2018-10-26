@@ -414,6 +414,7 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
     url->i_port = 0;
     url->psz_path = NULL;
     url->psz_option = NULL;
+    url->psz_fragment = NULL;
     url->psz_buffer = NULL;
     url->psz_pathbuffer = NULL;
 
@@ -447,12 +448,9 @@ static int vlc_UrlParseInner(vlc_url_t *restrict url, const char *str)
     next = strchr(cur, '#');
     if (next != NULL)
     {
-#if 0  /* TODO */
        *(next++) = '\0';
-       url->psz_fragment = next;
-#else
-       *next = '\0';
-#endif
+       if (vlc_uri_component_validate(next, "/?"))
+           url->psz_fragment = next;
     }
 
     /* Query parameters */
