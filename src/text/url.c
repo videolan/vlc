@@ -753,7 +753,8 @@ char *vlc_uri_compose(const vlc_url_t *uri)
         vlc_memstream_puts(&stream, uri->psz_path);
     if (uri->psz_option != NULL)
         vlc_memstream_printf(&stream, "?%s", uri->psz_option);
-    /* NOTE: fragment not handled currently */
+    if (uri->psz_fragment != NULL)
+        vlc_memstream_printf(&stream, "#%s", uri->psz_fragment);
 
     if (vlc_memstream_close(&stream))
         return NULL;
