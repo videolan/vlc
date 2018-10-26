@@ -74,7 +74,7 @@
 #include <QTimer>
 
 #include <vlc_actions.h>                    /* Wheel event */
-#include <vlc_vout_display.h>               /* vout_thread_t and VOUT_ events */
+#include <vlc_vout_window.h>                /* VOUT_ events */
 
 // #define DEBUG_INTF
 

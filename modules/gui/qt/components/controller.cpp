@@ -26,8 +26,6 @@
 # include "config.h"
 #endif
 
-#include <vlc_vout.h>                       /* vout_thread_t for FSC */
-
 /* Widgets */
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"

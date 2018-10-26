@@ -54,7 +54,6 @@
 #include "dialogs_provider.hpp"
 
 #include "../../audio_filter/equalizer_presets.h"
-#include <vlc_vout.h>
 #include <vlc_modules.h>
 #include <vlc_plugin.h>
 

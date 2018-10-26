@@ -25,7 +25,7 @@
 # include "config.h"
 #endif
 
-#include <vlc_vout.h>
+#include <vlc_common.h>
 #include <vlc_actions.h>
 
 #include "actions_manager.hpp"

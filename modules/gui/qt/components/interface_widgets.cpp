@@ -70,7 +70,6 @@
 #include <math.h>
 #include <assert.h>
 
-#include <vlc_vout.h>
 #include <vlc_vout_window.h>
 
 /**********************************************************************
