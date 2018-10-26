@@ -426,6 +426,7 @@ int MediaLibrary::Control( int query, va_list args )
         case VLC_ML_MEDIA_GET_MEDIA_PLAYBACK_PREF:
         case VLC_ML_MEDIA_SET_MEDIA_PLAYBACK_PREF:
         case VLC_ML_MEDIA_SET_THUMBNAIL:
+        case VLC_ML_MEDIA_ADD_EXTERNAL_MRL:
             return controlMedia( query, args );
         default:
             return VLC_EGENERIC;
