@@ -78,7 +78,7 @@ struct vout_display_sys_t
 };
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
-static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
 static int            Init(vout_display_t *, video_format_t *);
@@ -144,7 +144,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return vd->sys->sys.pool;
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
@@ -182,8 +182,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #undef rect_src_clipped
 #undef rect_dest
 #undef rect_dest_clipped
-    /* TODO */
-    VLC_UNUSED(subpicture);
 
     CommonDisplay(vd);
     CommonManage(vd);

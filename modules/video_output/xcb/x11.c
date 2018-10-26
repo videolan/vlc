@@ -75,7 +75,7 @@ struct vout_display_sys_t
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
-static void Display (vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void Display (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
 
 static void ResetPictures (vout_display_t *);
@@ -393,7 +393,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 /**
  * Sends an image to the X server.
  */
-static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void Display (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
@@ -402,7 +402,7 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
     vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 
     if (!sys->visible)
-        goto out;
+        return;
     if (segment != 0)
         ck = xcb_shm_put_image_checked (sys->conn, sys->window, sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
@@ -439,8 +439,6 @@ static void Display (vout_display_t *vd, picture_t *pic, subpicture_t *subpictur
     /* FIXME might be WAY better to wait in some case (be carefull with
      * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
      * vout_display wrapper. */
-out:
-    (void)subpicture;
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)

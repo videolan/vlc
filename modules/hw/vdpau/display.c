@@ -291,11 +291,10 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                 vdp_get_error_string(sys->vdp, err));
 }
 
-static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void Wait(vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     xcb_generic_event_t *ev;
-    VLC_UNUSED(subpicture);
 
     picture_t *current = sys->current;
     if (current != NULL)

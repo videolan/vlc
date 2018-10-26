@@ -270,14 +270,12 @@ struct vout_display_t {
     void       (*prepare)(vout_display_t *, picture_t *, subpicture_t *,
                           vlc_tick_t date);
 
-    /* Display a picture and an optional subpicture.
+    /* Display a picture.
      *
-     * The picture and the optional subpicture must be displayed as soon as
-     * possible.
-     * You cannot change the pixel content of the picture_t or of the
-     * subpicture_t.
+     * The picture must be displayed as soon as possible.
+     * You cannot change the pixel content of the picture_t.
      */
-    void       (*display)(vout_display_t *, picture_t *, subpicture_t *);
+    void       (*display)(vout_display_t *, picture_t *);
 
     /* Control on the module (mandatory) */
     int        (*control)(vout_display_t *, int, va_list);

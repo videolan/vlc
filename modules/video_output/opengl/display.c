@@ -79,7 +79,7 @@ struct vout_display_sys_t
 /* Display callbacks */
 static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void PictureRender (vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
-static void PictureDisplay (vout_display_t *, picture_t *, subpicture_t *);
+static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
 
 /**
@@ -205,11 +205,10 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     }
 }
 
-static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureDisplay (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
-    VLC_UNUSED(subpicture);
 
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {

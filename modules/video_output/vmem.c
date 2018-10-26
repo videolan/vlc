@@ -106,7 +106,7 @@ typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
-static void           Display(vout_display_t *, picture_t *, subpicture_t *);
+static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
 /*****************************************************************************
@@ -268,15 +268,13 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     (void) subpic;
 }
 
-static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
+static void Display(vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
 
     if (sys->display != NULL)
         sys->display(sys->opaque, sys->pic_opaque);
-
-    VLC_UNUSED(subpic);
 }
 
 static int Control(vout_display_t *vd, int query, va_list args)

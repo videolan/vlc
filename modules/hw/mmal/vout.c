@@ -153,8 +153,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
 static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count);
 static void vd_prepare(vout_display_t *vd, picture_t *picture,
                 subpicture_t *subpicture);
-static void vd_display(vout_display_t *vd, picture_t *picture,
-                subpicture_t *subpicture);
+static void vd_display(vout_display_t *vd, picture_t *picture);
 static int vd_control(vout_display_t *vd, int query, va_list args);
 static void vd_manage(vout_display_t *vd);
 
@@ -557,8 +556,7 @@ static void vd_prepare(vout_display_t *vd, picture_t *picture,
     picture->date += sys->phase_offset;
 }
 
-static void vd_display(vout_display_t *vd, picture_t *picture,
-                subpicture_t *subpicture)
+static void vd_display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *pic_sys = picture->p_sys;

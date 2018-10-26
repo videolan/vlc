@@ -175,13 +175,12 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 /**
  * Display a picture
  */
-static void PictureDisplay(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void PictureDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
 
     caca_refresh_display(sys->dp);
     VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
 }
 
 /**

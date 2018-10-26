@@ -62,7 +62,7 @@ vlc_module_end()
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender   (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
                              vlc_tick_t date);
-static void PictureDisplay  (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture);
+static void PictureDisplay  (vout_display_t *vd, picture_t *pic);
 static int Control          (vout_display_t *vd, int query, va_list ap);
 
 static void *OurGetProcAddress (vlc_gl_t *gl, const char *name);
@@ -295,11 +295,10 @@ static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *sub
     }
 }
 
-static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureDisplay (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
-    VLC_UNUSED(subpicture);
 
     @synchronized (sys->cgLayer) {
         sys->b_frame_available = YES;

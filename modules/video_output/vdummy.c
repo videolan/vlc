@@ -69,14 +69,14 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
 };
 static picture_pool_t *Pool(vout_display_t *, unsigned count);
-static void            DisplayStat(vout_display_t *, picture_t *, subpicture_t *);
+static void            DisplayStat(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
  *****************************************************************************/
 static int Open(vlc_object_t *object,
-                void (*display)(vout_display_t *, picture_t *, subpicture_t *))
+                void (*display)(vout_display_t *, picture_t *))
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
@@ -133,12 +133,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return sys->pool;
 }
 
-static void DisplayStat(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void DisplayStat(vout_display_t *vd, picture_t *picture)
 {
     plane_t *p = picture->p;
 
     VLC_UNUSED(vd);
-    VLC_UNUSED(subpicture);
 
     if (vd->fmt.i_width * vd->fmt.i_height >= sizeof (vlc_tick_t)
      && (p->i_pitch * p->i_lines) >= (ssize_t)sizeof (vlc_tick_t)) {

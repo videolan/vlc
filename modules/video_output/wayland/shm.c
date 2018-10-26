@@ -231,7 +231,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     (void) subpic;
 }
 
-static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
+static void Display(vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
@@ -240,7 +240,7 @@ static void Display(vout_display_t *vd, picture_t *pic, subpicture_t *subpic)
     wl_surface_commit(surface);
     wl_display_roundtrip_queue(display, sys->eventq);
 
-    (void) pic; (void) subpic;
+    (void) pic;
 }
 
 static void ResetPictures(vout_display_t *vd)

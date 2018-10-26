@@ -56,7 +56,7 @@ static void Close(vlc_object_t *);
 
 static picture_pool_t* PicturePool(vout_display_t *, unsigned);
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
-static void PictureDisplay(vout_display_t *, picture_t *, subpicture_t *);
+static void PictureDisplay(vout_display_t *, picture_t *);
 static int Control(vout_display_t*, int, va_list);
 
 static void *OurGetProcAddress(vlc_gl_t *, const char *);
@@ -297,12 +297,11 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     }
 }
 
-static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
+static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
     struct gl_sys *glsys = sys->gl->sys;
     VLC_UNUSED(pic);
-    VLC_UNUSED(subpicture);
 
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {

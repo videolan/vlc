@@ -81,7 +81,7 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
 };
 static picture_pool_t *Pool(vout_display_t *, unsigned count);
-static void            Display(vout_display_t *, picture_t *, subpicture_t *);
+static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
 /*****************************************************************************
@@ -170,7 +170,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     return sys->pool;
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
 #ifdef IOV_MAX
     const long iovmax = IOV_MAX;
@@ -179,7 +179,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 #endif
     vout_display_sys_t *sys = vd->sys;
     int result;
-    VLC_UNUSED(subpicture);
 
     char buffer[64];
     int header_len = snprintf(buffer, sizeof(buffer), "P6\n%d %d\n255\n",

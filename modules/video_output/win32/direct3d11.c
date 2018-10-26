@@ -124,7 +124,7 @@ struct vout_display_sys_t
 static picture_pool_t *Pool(vout_display_t *, unsigned);
 
 static void Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
-static void Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void Display(vout_display_t *, picture_t *);
 
 static void Direct3D11Destroy(vout_display_t *);
 
@@ -968,11 +968,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     PreparePicture(vd, picture, subpicture);
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
 
     DXGI_PRESENT_PARAMETERS presentParams;
     memset(&presentParams, 0, sizeof(presentParams));

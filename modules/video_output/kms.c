@@ -650,11 +650,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 }
 
 
-static void Display(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
     vout_display_sys_t *sys = vd->sys;
     int i;
 

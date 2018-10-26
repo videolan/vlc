@@ -175,7 +175,7 @@ static picture_pool_t *Direct3D9CreatePicturePool  (vlc_object_t *, d3d9_device_
      const d3d9_format_t *, const video_format_t *, unsigned);
 
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *subpicture, vlc_tick_t);
-static void           Display(vout_display_t *, picture_t *, subpicture_t *subpicture);
+static void           Display(vout_display_t *, picture_t *);
 static picture_pool_t*DisplayPool(vout_display_t *, unsigned);
 static int            Control(vout_display_t *, int, va_list);
 static void           Manage (vout_display_t *);
@@ -578,11 +578,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 }
 
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
-    VLC_UNUSED(subpicture);
 
     if (sys->lost_not_ready)
         return;

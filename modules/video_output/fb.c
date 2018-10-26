@@ -97,7 +97,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
-static void           Display(vout_display_t *, picture_t *, subpicture_t *);
+static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
 /* */
@@ -355,7 +355,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     }
     return sys->pool;
 }
-static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -378,8 +378,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 
     if (!sys->is_hw_accel)
         picture_Copy(sys->picture, picture);
-
-    VLC_UNUSED(subpicture);
 }
 static int Control(vout_display_t *vd, int query, va_list args)
 {

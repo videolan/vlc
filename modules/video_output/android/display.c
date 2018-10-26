@@ -83,7 +83,7 @@ static const vlc_fourcc_t subpicture_chromas[] =
 
 static picture_pool_t   *Pool  (vout_display_t *, unsigned);
 static void             Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
-static void             Display(vout_display_t *, picture_t *, subpicture_t *);
+static void             Display(vout_display_t *, picture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
 typedef struct android_window android_window;
@@ -1000,12 +1000,10 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 }
 
-static void Display(vout_display_t *vd, picture_t *picture,
-                    subpicture_t *subpicture)
+static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
-    VLC_UNUSED(subpicture);
 
     if (sys->p_window->b_opaque)
         AndroidOpaquePicture_Release(picture->p_sys, true);
