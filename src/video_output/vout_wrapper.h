@@ -51,15 +51,11 @@ static inline void vout_display_Prepare(vout_display_t *vd,
 /**
  * It display a picture.
  */
-static inline void vout_display_Display(vout_display_t *vd,
-                                        picture_t *picture,
-                                        subpicture_t *subpicture)
+static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 {
     if (vd->display)
         vd->display(vd, picture);
     picture_Release(picture);
-    if (subpicture)
-        subpicture_Delete(subpicture);
 }
 
 /**

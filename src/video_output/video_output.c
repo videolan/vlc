@@ -1233,7 +1233,9 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 
     /* Display the direct buffer returned by vout_RenderPicture */
     sys->displayed.date = vlc_tick_now();
-    vout_display_Display(vd, todisplay, subpic);
+    vout_display_Display(vd, todisplay);
+    if (subpic)
+        subpicture_Delete(subpic);
 
     vout_statistic_AddDisplayed(&sys->statistic, 1);
 
