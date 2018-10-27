@@ -92,7 +92,6 @@ struct vout_display_sys_t
     display_info_t           display;
 
 #if !VLC_WINSTORE_APP
-    HINSTANCE                hdxgi_dll;        /* handle of the opened dxgi dll */
     d3d11_handle_t           hd3d;
 #endif
     IDXGISwapChain1          *dxgiswapChain;   /* DXGI 1.2 swap chain */
@@ -990,8 +989,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 static void Direct3D11Destroy(vout_display_t *vd)
 {
 #if !VLC_WINSTORE_APP
-    vout_display_sys_t *sys = vd->sys;
-    sys->hdxgi_dll = NULL;
     D3D11_Destroy( &vd->sys->hd3d );
 #endif
 }
