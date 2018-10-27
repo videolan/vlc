@@ -346,13 +346,7 @@ void directx_va_Close(vlc_va_t *va, directx_sys_t *dx_sys)
 
 int directx_va_Open(vlc_va_t *va, directx_sys_t *dx_sys)
 {
-    if (va_pool_Open(va, &dx_sys->va_pool) != VLC_SUCCESS)
-        goto error;
-
-    return VLC_SUCCESS;
-
-error:
-    return VLC_EGENERIC;
+    return va_pool_Open(va, &dx_sys->va_pool);
 }
 
 static bool profile_supported(const directx_va_mode_t *mode, const es_format_t *fmt,
