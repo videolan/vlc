@@ -696,6 +696,8 @@ vlc_timer_getoverrun
 vlc_timer_schedule
 vlc_towc
 vlc_ureduce
+vlc_entry_copyright__core
+vlc_entry_license__core
 vlc_epg_event_Delete
 vlc_epg_event_Duplicate
 vlc_epg_event_New
