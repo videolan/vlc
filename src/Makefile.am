@@ -432,6 +432,7 @@ libvlccore_la_SOURCES += \
 	posix/dirs.c \
 	posix/error.c \
 	posix/netconf.c \
+	posix/picture.c \
 	posix/specific.c \
 	posix/thread.c
 if HAVE_LINUX
