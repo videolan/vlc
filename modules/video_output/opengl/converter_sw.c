@@ -503,7 +503,6 @@ tc_common_update(const opengl_tex_converter_t *tc, GLuint *textures,
                  const GLsizei *tex_width, const GLsizei *tex_height,
                  picture_t *pic, const size_t *plane_offset)
 {
-    assert(pic->p_sys == NULL);
     int ret = VLC_SUCCESS;
     for (unsigned i = 0; i < tc->tex_count && ret == VLC_SUCCESS; i++)
     {
