@@ -302,15 +302,13 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic, subpicture_t *sub
     vout_display_sys_t *sys = vd->sys;
     struct gl_sys *glsys = sys->gl->sys;
     VLC_UNUSED(pic);
+    VLC_UNUSED(subpicture);
 
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
         vout_display_opengl_Display(glsys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent(sys->gl);
     }
-
-    if (subpicture)
-        subpicture_Delete(subpicture);
 }
 
 static void PictureRender(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,

@@ -1005,6 +1005,7 @@ static void Display(vout_display_t *vd, picture_t *picture,
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
+    VLC_UNUSED(subpicture);
 
     if (sys->p_window->b_opaque)
         AndroidOpaquePicture_Release(picture->p_sys, true);
@@ -1013,9 +1014,6 @@ static void Display(vout_display_t *vd, picture_t *picture,
 
     if (sys->p_sub_pic)
         AndroidWindow_UnlockPicture(sys, sys->p_sub_window, sys->p_sub_pic);
-
-    if (subpicture)
-        subpicture_Delete(subpicture);
 
     sys->b_displayed = true;
 }

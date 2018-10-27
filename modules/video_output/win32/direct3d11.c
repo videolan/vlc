@@ -972,6 +972,7 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
+    VLC_UNUSED(subpicture);
 
     DXGI_PRESENT_PARAMETERS presentParams;
     memset(&presentParams, 0, sizeof(presentParams));
@@ -983,8 +984,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
         msg_Err(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
     d3d11_device_unlock( &sys->d3d_dev );
-    if (subpicture)
-        subpicture_Delete(subpicture);
 
     CommonDisplay(vd);
 }

@@ -294,6 +294,8 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
+    xcb_generic_event_t *ev;
+    VLC_UNUSED(subpicture);
 
     picture_t *current = sys->current;
     if (current != NULL)
@@ -315,13 +317,7 @@ static void Wait(vout_display_t *vd, picture_t *pic, subpicture_t *subpicture)
 
     sys->current = picture_Hold(pic);
 out:
-    /* We already dealt with the subpicture in the Queue phase, so it's safe to
-       delete at this point */
-    if (subpicture)
-        subpicture_Delete(subpicture);
-
     /* Drain the event queue. TODO: remove sys->conn completely */
-    xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event(sys->conn)) != NULL)
         free(ev);

@@ -232,14 +232,13 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
+    VLC_UNUSED(subpicture);
 
     if (vlc_gl_MakeCurrent (sys->gl) == VLC_SUCCESS)
     {
         vout_display_opengl_Display (sys->vgl, &vd->source);
         vlc_gl_ReleaseCurrent (sys->gl);
     }
-    if (subpicture)
-        subpicture_Delete(subpicture);
 
     CommonDisplay(vd);
 }

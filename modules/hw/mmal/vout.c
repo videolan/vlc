@@ -595,9 +595,6 @@ static void vd_display(vout_display_t *vd, picture_t *picture,
 
     display_subpicture(vd, subpicture);
 
-    if (subpicture)
-        subpicture_Delete(subpicture);
-
     if (sys->next_phase_check == 0 && sys->adjust_refresh_rate)
         maintain_phase_sync(vd);
     sys->next_phase_check = (sys->next_phase_check + 1) % PHASE_CHECK_INTERVAL;

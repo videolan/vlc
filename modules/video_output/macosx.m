@@ -335,6 +335,7 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
 {
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(pic);
+    VLC_UNUSED(subpicture);
     [sys->glView setVoutFlushing:YES];
     if (vlc_gl_MakeCurrent(sys->gl) == VLC_SUCCESS)
     {
@@ -343,9 +344,6 @@ static void PictureDisplay (vout_display_t *vd, picture_t *pic, subpicture_t *su
     }
     [sys->glView setVoutFlushing:NO];
     sys->has_first_frame = true;
-
-    if (subpicture)
-        subpicture_Delete(subpicture);
 }
 
 static int Control (vout_display_t *vd, int query, va_list ap)

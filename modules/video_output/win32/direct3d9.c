@@ -584,11 +584,8 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
     VLC_UNUSED(subpicture);
 
-    if (sys->lost_not_ready) {
-        if (subpicture)
-            subpicture_Delete(subpicture);
+    if (sys->lost_not_ready)
         return;
-    }
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
@@ -608,8 +605,6 @@ static void Display(vout_display_t *vd, picture_t *picture, subpicture_t *subpic
     /* XXX See Prepare() */
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
         Direct3D9LockSurface(picture);
-    if (subpicture)
-        subpicture_Delete(subpicture);
 
     CommonDisplay(vd);
 }

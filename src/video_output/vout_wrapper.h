@@ -57,6 +57,8 @@ static inline void vout_display_Display(vout_display_t *vd,
 {
     vd->display(vd, picture, subpicture);
     picture_Release(picture);
+    if (subpicture)
+        subpicture_Delete(subpicture);
 }
 
 /**
