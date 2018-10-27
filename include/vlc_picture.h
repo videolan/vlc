@@ -64,6 +64,14 @@ typedef struct picture_context_t
     struct picture_context_t *(*copy)(struct picture_context_t *);
 } picture_context_t;
 
+typedef struct picture_buffer_t
+{
+    int fd;
+    void *base;
+    size_t size;
+    off_t offset;
+} picture_buffer_t;
+
 /**
  * Video picture
  */

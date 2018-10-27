@@ -35,3 +35,6 @@ typedef struct
 
     max_align_t extra[];
 } picture_priv_t;
+
+void *picture_Allocate(int *, size_t);
+void picture_Deallocate(int, void *, size_t);

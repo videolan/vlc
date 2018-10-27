@@ -62,10 +62,27 @@ static void picture_DestroyFromResource( picture_t *p_picture )
 /**
  * Destroys a picture allocated with picture_NewFromFormat().
  */
-static void picture_Destroy( picture_t *p_picture )
+static void picture_Destroy(picture_t *pic)
 {
-    aligned_free( p_picture->p[0].p_pixels );
-    free( p_picture );
+    picture_buffer_t *res = pic->p_sys;
+
+    if (res != NULL)
+        picture_Deallocate(res->fd, res->base, res->size);
+    free(pic);
+}
+
+VLC_WEAK void *picture_Allocate(int *restrict fdp, size_t size)
+{
+    assert((size % 16) == 0);
+    *fdp = -1;
+    return aligned_alloc(16, size);
+}
+
+VLC_WEAK void picture_Deallocate(int fd, void *base, size_t size)
+{
+    assert(fd == -1);
+    aligned_free(base);
+    assert((size % 16) == 0);
 }
 
 /*****************************************************************************
@@ -235,15 +252,17 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
 picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 {
-    picture_priv_t *priv = picture_NewPrivate(fmt, 0);
+    picture_priv_t *priv = picture_NewPrivate(fmt, sizeof (picture_buffer_t));
     if (unlikely(priv == NULL))
         return NULL;
 
     priv->gc.destroy = picture_Destroy;
 
     picture_t *pic = &priv->picture;
-    if (pic->i_planes == 0)
+    if (pic->i_planes == 0) {
+        pic->p_sys = NULL;
         return pic;
+    }
 
     /* Calculate how big the new image should be */
     size_t plane_sizes[PICTURE_PLANE_MAX];
@@ -261,9 +280,16 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(pic_size >= PICTURE_SW_SIZE_MAX))
         goto error;
 
-    uint8_t *buf = aligned_alloc(16, pic_size);
+    picture_buffer_t *res = (void *)priv->extra;
+
+    unsigned char *buf = picture_Allocate(&res->fd, pic_size);
     if (unlikely(buf == NULL))
         goto error;
+
+    res->base = buf;
+    res->size = pic_size;
+    res->offset = 0;
+    pic->p_sys = res;
 
     /* Fill the p_pixels field for each plane */
     for (int i = 0; i < pic->i_planes; i++)
