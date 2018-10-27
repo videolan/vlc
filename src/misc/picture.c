@@ -178,10 +178,11 @@ int picture_Setup( picture_t *p_picture, const video_format_t *restrict fmt )
  *
  *****************************************************************************/
 
-static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt)
+static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt,
+                                          size_t extra)
 {
     /* */
-    picture_priv_t *priv = malloc( sizeof (*priv) );
+    picture_priv_t *priv = malloc(sizeof (*priv) + extra);
     if( unlikely(priv == NULL) )
         return NULL;
 
@@ -207,7 +208,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 {
     assert(p_resource != NULL);
 
-    picture_priv_t *priv = picture_NewPrivate(p_fmt);
+    picture_priv_t *priv = picture_NewPrivate(p_fmt, 0);
     if (unlikely(priv == NULL))
         return NULL;
 
@@ -234,7 +235,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
 picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
 {
-    picture_priv_t *priv = picture_NewPrivate(fmt);
+    picture_priv_t *priv = picture_NewPrivate(fmt, 0);
     if (unlikely(priv == NULL))
         return NULL;
 

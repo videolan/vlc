@@ -19,6 +19,7 @@
  *****************************************************************************/
 
 #include <stdatomic.h>
+#include <stddef.h>
 
 #include <vlc_picture.h>
 
@@ -31,4 +32,6 @@ typedef struct
         void (*destroy)(picture_t *);
         void *opaque;
     } gc;
+
+    max_align_t extra[];
 } picture_priv_t;
