@@ -500,15 +500,17 @@ static void SetRGBMask(video_format_t *p_fmt)
     }
 }
 
-static int OpenCommon(vout_display_t *vd)
+static int OpenCommon(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                      video_format_t *fmtp)
 {
     vout_display_sys_t *sys;
     video_format_t fmt, sub_fmt;
 
-    fmt = vd->fmt;
+    vout_window_t *embed = cfg->window;
+    if (embed->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
+        return VLC_EGENERIC;
 
-    vout_window_t *embed =
-        vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
+    fmt = *fmtp;
 
     if (embed == NULL)
         return VLC_EGENERIC;
@@ -531,8 +533,8 @@ static int OpenCommon(vout_display_t *vd)
     sys->p_awh = p_awh;
     sys->anw = AWindowHandler_getANativeWindowAPI(sys->p_awh);
 
-    sys->i_display_width = vd->cfg->display.width;
-    sys->i_display_height = vd->cfg->display.height;
+    sys->i_display_width = cfg->display.width;
+    sys->i_display_height = cfg->display.height;
 
     if (fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE) {
         /* Setup chroma */
@@ -594,7 +596,7 @@ static int OpenCommon(vout_display_t *vd)
         goto error;
     }
 
-    vd->fmt = fmt;
+    *fmtp = fmt;
     /* Setup vout_display */
     vd->pool    = Pool;
     vd->prepare = Prepare;
@@ -612,34 +614,38 @@ error:
 static int Open(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t*)p_this;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
 
-    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
+    if (fmtp->i_chroma == VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
 
     /* There are two cases:
      * 1. the projection_mode is PROJECTION_MODE_RECTANGULAR
      * 2. gles2 vout failed */
-    vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
+    fmtp->projection_mode = PROJECTION_MODE_RECTANGULAR;
 
-    return OpenCommon(vd);
+    return OpenCommon(vd, cfg, fmtp);
 }
 
 static int OpenOpaque(vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t*)p_this;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
 
-    if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE)
+    if (fmtp->i_chroma != VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
 
     if (!vd->obj.force
-        && (vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
-            || vd->fmt.orientation != ORIENT_NORMAL))
+        && (fmtp->projection_mode != PROJECTION_MODE_RECTANGULAR
+            || fmtp->orientation != ORIENT_NORMAL))
     {
         /* Let the gles2 vout handle orientation and projection */
         return VLC_EGENERIC;
     }
 
-    return OpenCommon(vd);
+    return OpenCommon(vd, cfg, fmtp);
 }
 
 static void ClearSurface(vout_display_t *vd)
