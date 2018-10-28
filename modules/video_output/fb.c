@@ -173,6 +173,8 @@ static void ClearScreen(vout_display_sys_t *sys)
 static int Open(vlc_object_t *object)
 {
     vout_display_t     *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     if (vout_display_IsWindowed(vd))
@@ -256,7 +258,7 @@ static int Open(vlc_object_t *object)
 
     /* */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     if (sys->chroma) {
         fmt.i_chroma = sys->chroma;
@@ -299,7 +301,7 @@ static int Open(vlc_object_t *object)
     fmt.i_visible_height = sys->height;
 
     /* */
-    vd->fmt     = fmt;
+    *fmtp = fmt;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
