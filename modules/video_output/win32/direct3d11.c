@@ -58,8 +58,9 @@
 DEFINE_GUID(GUID_SWAPCHAIN_WIDTH,  0xf1b59347, 0x1643, 0x411a, 0xad, 0x6b, 0xc7, 0x80, 0x17, 0x7a, 0x06, 0xb6);
 DEFINE_GUID(GUID_SWAPCHAIN_HEIGHT, 0x6ea976a0, 0x9d60, 0x4bb7, 0xa5, 0xa9, 0x7d, 0xd1, 0x18, 0x7f, 0xc9, 0xbd);
 
-static int  Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open(vout_display_t *, const vout_display_cfg_t *,
+                 video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 #define D3D11_HELP N_("Recommended video output for Windows 8 and later versions")
 #define HW_BLENDING_TEXT N_("Use hardware blending support")
@@ -338,12 +339,9 @@ static unsigned int GetPictureHeight(const vout_display_t *vd)
     return vd->sys->picQuad.i_height;
 }
 
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
-
 #if !VLC_WINSTORE_APP
     /* Allow using D3D11 automatically starting from Windows 8.1 */
     if (!vd->obj.force)
@@ -357,7 +355,7 @@ static int Open(vlc_object_t *object)
     }
 #endif
 
-    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(object, 1, sizeof(vout_display_sys_t));
+    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(vd, 1, sizeof(vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
 
@@ -414,14 +412,12 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    Close(object);
+    Close(vd);
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t * vd = (vout_display_t *)object;
-
     Direct3D11Close(vd);
     CommonClean(vd);
     Direct3D11Destroy(vd);

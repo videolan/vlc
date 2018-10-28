@@ -68,8 +68,9 @@
 #define PHASE_OFFSET_TARGET ((double)0.25)
 #define PHASE_CHECK_INTERVAL 100
 
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_shortname(N_("MMAL vout"))
@@ -181,10 +182,9 @@ static void dmx_region_delete(struct dmx_region_t *dmx_region,
 static void show_background(vout_display_t *vd, bool enable);
 static void maintain_phase_sync(vout_display_t *vd);
 
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
     vout_display_sys_t *sys;
     uint32_t buffer_pitch, buffer_height;
     vout_display_place_t place;
@@ -321,10 +321,11 @@ out:
     if (ret != VLC_SUCCESS)
         Close(object);
 
+    (void) context;
     return ret;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;

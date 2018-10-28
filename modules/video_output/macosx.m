@@ -52,8 +52,9 @@
 /**
  * Forward declarations
  */
-static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count);
 static void PictureRender (vout_display_t *vd, picture_t *pic, subpicture_t *subpicture,
@@ -130,11 +131,9 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
     return dlsym(RTLD_DEFAULT, name);
 }
 
-static int Open (vlc_object_t *this)
+static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+                 video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)this;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
 
     if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
@@ -146,7 +145,7 @@ static int Open (vlc_object_t *this)
 
     @autoreleasepool {
         if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
-            msg_Err (this, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
+            msg_Err (vd, "no OpenGL hardware acceleration found. this can lead to slow output and unexpected results");
 
         vd->sys = sys;
         sys->pool = NULL;
@@ -204,7 +203,7 @@ static int Open (vlc_object_t *this)
         }
 
         /* Initialize common OpenGL video display */
-        sys->gl = vlc_object_create(this, sizeof(*sys->gl));
+        sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
 
         if( unlikely( !sys->gl ) )
             goto error;
@@ -256,17 +255,17 @@ static int Open (vlc_object_t *this)
         /* */
         vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
 
+        (void) context;
         return VLC_SUCCESS;
 
     error:
-        Close(this);
+        Close(vd);
         return VLC_EGENERIC;
     }
 }
 
-void Close (vlc_object_t *this)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {

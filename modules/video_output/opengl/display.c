@@ -34,8 +34,9 @@
 #include "vout_helper.h"
 
 /* Plugin callbacks */
-static int Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 #define GL_TEXT N_("OpenGL extension")
 #define GLES2_TEXT N_("OpenGL ES 2 extension")
@@ -85,11 +86,9 @@ static int Control (vout_display_t *, int, va_list);
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
-static int Open (vlc_object_t *obj)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -160,14 +159,14 @@ error:
         vlc_gl_Release (sys->gl);
     free (sys);
     return VLC_EGENERIC;
+    (void) context;
 }
 
 /**
  * Destroys the OpenGL context.
  */
-static void Close (vlc_object_t *obj)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
     vlc_gl_t *gl = sys->gl;
 

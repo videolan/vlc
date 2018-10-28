@@ -30,11 +30,13 @@
  * Preamble
  *****************************************************************************/
 
+#if 0
 #import <UIKit/UIKit.h>
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 #import <QuartzCore/QuartzCore.h>
+#endif
 #import <dlfcn.h>
 
 #ifdef HAVE_CONFIG_H
@@ -51,8 +53,9 @@
 /**
  * Forward declarations
  */
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 static picture_pool_t* PicturePool(vout_display_t *, unsigned);
 static void PictureRender(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
@@ -142,12 +145,9 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
     return dlsym(RTLD_DEFAULT, name);
 }
 
-static int Open(vlc_object_t *this)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)this;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmt = &vd->fmt;
-
     if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
@@ -179,12 +179,12 @@ static int Open(vlc_object_t *this)
         const vlc_fourcc_t *subpicture_chromas;
 
         sys->embed = cfg->window;
-        sys->gl = vlc_object_create(this, sizeof(*sys->gl));
+        sys->gl = vlc_object_create(vd, sizeof(*sys->gl));
         if (!sys->gl)
             goto bailout;
 
         struct gl_sys *glsys = sys->gl->sys =
-            vlc_obj_malloc(this, sizeof(struct gl_sys));
+            vlc_obj_malloc(VLC_OBJECT(vd), sizeof(struct gl_sys));
         if (unlikely(!sys->gl->sys))
             goto bailout;
         glsys->glESView = sys->glESView;
@@ -223,21 +223,20 @@ static int Open(vlc_object_t *this)
         return VLC_SUCCESS;
 
     bailout:
-        Close(this);
+        Close(vd);
         return VLC_EGENERIC;
     }
 }
 
-static void Close (vlc_object_t *this)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)this;
     vout_display_sys_t *sys = vd->sys;
 
     @autoreleasepool {
         BOOL flushed = NO;
         if (sys->gl != NULL) {
             struct gl_sys *glsys = sys->gl->sys;
-            msg_Dbg(this, "deleting display");
+            msg_Dbg(vd, "deleting display");
 
             if (likely(glsys->vgl))
             {

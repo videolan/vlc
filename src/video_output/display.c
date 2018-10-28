@@ -71,10 +71,18 @@ static picture_t *VideoBufferNew(filter_t *filter)
 
 static int vout_display_start(void *func, va_list ap)
 {
-    int (*activate)(vlc_object_t *) = func;
+    vout_display_open_cb activate = func;
     vout_display_t *vd = va_arg(ap, vout_display_t *);
+    const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+    video_format_t *fmtp = va_arg(ap, video_format_t *);
+    vlc_video_context *context = va_arg(ap, vlc_video_context *);
 
-    return activate(VLC_OBJECT(vd));
+    video_format_Clean(fmtp);
+    video_format_Copy(fmtp, &vd->source);
+    fmtp->i_sar_num = 0;
+    fmtp->i_sar_den = 0;
+
+    return activate(vd, cfg, fmtp, context);
 }
 
 /**
@@ -91,11 +99,9 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
 
     /* */
     video_format_Copy(&vd->source, fmt);
+    video_format_Init(&vd->fmt, 0);
 
     /* Picture buffer does not have the concept of aspect ratio */
-    video_format_Copy(&vd->fmt, fmt);
-    vd->fmt.i_sar_num = 0;
-    vd->fmt.i_sar_den = 0;
 
     vd->info.is_slow = false;
     vd->info.has_double_click = false;
@@ -112,7 +118,10 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->owner = *owner;
 
     if (load_module) {
-        vd->module = vlc_module_load(vd, "vout display", module, module && *module != '\0', vout_display_start, vd);
+        vd->module = vlc_module_load(vd, "vout display", module,
+                                     module && *module != '\0',
+                                     vout_display_start, vd, cfg, &vd->fmt,
+                                     NULL);
         if (!vd->module) {
             vlc_object_release(vd);
             return NULL;
@@ -129,10 +138,9 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
 
 static void vout_display_stop(void *func, va_list ap)
 {
-    void (*deactivate)(vlc_object_t *) = func;
-    vout_display_t *vd = va_arg(ap, vout_display_t *);
+    vout_display_close_cb deactivate = func;
 
-    deactivate(VLC_OBJECT(vd));
+    deactivate(va_arg(ap, vout_display_t *));
 }
 
 /**

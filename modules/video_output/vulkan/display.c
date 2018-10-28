@@ -91,11 +91,11 @@ static void PollBuffers(vout_display_t *);
 static void UpdateParams(vout_display_t *);
 
 // Allocates a Vulkan surface and instance for video output.
-static int Open(vlc_object_t *obj)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *) obj;
-    video_format_t *fmt = &vd->fmt;
-    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
+    vout_display_sys_t *sys = vd->sys =
+        vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -158,6 +158,7 @@ static int Open(vlc_object_t *obj)
     vd->control = Control;
 
     UpdateParams(vd);
+    (void) cfg; (void) context;
     return VLC_SUCCESS;
 
 error:
@@ -167,9 +168,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
     const struct pl_gpu *gpu = sys->vk->vulkan->gpu;
 

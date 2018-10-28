@@ -93,8 +93,9 @@
 #define DX_HELP N_("Recommended video output for Windows XP. " \
     "Incompatible with Vista's Aero interface" )
 
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_display_t *, const vout_display_cfg_t *,
+                  video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 static int FindDevicesCallback(const char *, char ***, char ***);
 
@@ -184,11 +185,9 @@ static void WallpaperChange(vout_display_t *vd, bool use_wallpaper);
 
 /** This function allocates and initialize the DirectX vout display.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     /* Allocate structure */
@@ -258,9 +257,8 @@ error:
 
 /** Terminate a vout display created by Open.
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
     var_DelCallback(vd, "video-wallpaper", WallpaperCallback, NULL);

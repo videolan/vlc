@@ -51,9 +51,11 @@
     "Force use of a specific chroma for output. Default is RGB32."
 
 #define CFG_PREFIX "android-display-"
-static int  Open (vlc_object_t *);
-static int  OpenOpaque (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static int OpenOpaque(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                      video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 static void SubpicturePrepare(vout_display_t *vd, subpicture_t *subpicture);
 
 vlc_module_begin()
@@ -607,16 +609,13 @@ static int OpenCommon(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return VLC_SUCCESS;
 
 error:
-    Close(VLC_OBJECT(vd));
+    Close(vd);
     return VLC_EGENERIC;
 }
 
-static int Open(vlc_object_t *p_this)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t*)p_this;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
-
     if (fmtp->i_chroma == VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
 
@@ -625,15 +624,13 @@ static int Open(vlc_object_t *p_this)
      * 2. gles2 vout failed */
     fmtp->projection_mode = PROJECTION_MODE_RECTANGULAR;
 
+    (void) context;
     return OpenCommon(vd, cfg, fmtp);
 }
 
-static int OpenOpaque(vlc_object_t *p_this)
+static int OpenOpaque(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                      video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t*)p_this;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
-
     if (fmtp->i_chroma != VLC_CODEC_ANDROID_OPAQUE)
         return VLC_EGENERIC;
 
@@ -645,6 +642,7 @@ static int OpenOpaque(vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
+    (void) context;
     return OpenCommon(vd, cfg, fmtp);
 }
 
@@ -690,9 +688,8 @@ end:
     }
 }
 
-static void Close(vlc_object_t *p_this)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
     /* Check if SPU regions have been properly cleared, and clear them if they

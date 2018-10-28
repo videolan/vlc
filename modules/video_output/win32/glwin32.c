@@ -42,8 +42,9 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open (vout_display_t *, const vout_display_cfg_t *,
+                  video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 vlc_module_begin()
     set_category(CAT_VIDEO)
@@ -109,15 +110,13 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 /**
  * It creates an OpenGL vout display.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     /* do not use OpenGL on XP unless forced */
-    if(!object->obj.force && !IsWindowsVistaOrGreater())
+    if(!vd->obj.force && !IsWindowsVistaOrGreater())
         return VLC_EGENERIC;
 
     /* Allocate structure */
@@ -173,16 +172,15 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    Close(object);
+    Close(vd);
     return VLC_EGENERIC;
 }
 
 /**
  * It destroys an OpenGL vout display.
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
     vlc_gl_t *gl = sys->gl;
 

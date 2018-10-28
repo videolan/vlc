@@ -48,8 +48,9 @@
 /*****************************************************************************
  * Vout interface
  *****************************************************************************/
-static int  Open   (vlc_object_t *);
-static void Close  (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmt, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_description(N_("Core Animation OpenGL Layer (Mac OS X)"))
@@ -110,11 +111,9 @@ struct gl_sys
 /*****************************************************************************
  * Open: This function allocates and initializes the OpenGL vout method.
  *****************************************************************************/
-static int Open (vlc_object_t *p_this)
+static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+                 video_format_t *fmt, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)p_this;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
 
     if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
@@ -225,14 +224,13 @@ static int Open (vlc_object_t *p_this)
         return VLC_SUCCESS;
 
     bailout:
-        Close(p_this);
+        Close(vd);
         return VLC_EGENERIC;
     }
 }
 
-static void Close (vlc_object_t *p_this)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)p_this;
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->cgLayer) {

@@ -38,8 +38,9 @@
 #include "pictures.h"
 #include "events.h"
 
-static int  Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 /*
  * Module descriptor
@@ -101,11 +102,9 @@ static const xcb_depth_t *FindDepth (const xcb_screen_t *scr,
 /**
  * Probe the X server.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+                 video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -228,7 +227,7 @@ static int Open (vlc_object_t *obj)
         }
     }
 
-    msg_Err (obj, "no supported pixel format & visual");
+    msg_Err (vd, "no supported pixel format & visual");
     goto error;
 
 found_format:;
@@ -289,7 +288,7 @@ found_format:;
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, sys->gc);
 
     sys->visible = false;
-    if (XCB_shm_Check (obj, conn))
+    if (XCB_shm_Check (VLC_OBJECT(vd), conn))
     {
         sys->seg_base = xcb_generate_id (conn);
         for (unsigned i = 1; i < MAX_PICTURES; i++)
@@ -309,10 +308,11 @@ found_format:;
     vd->display = Display;
     vd->control = Control;
 
+    (void) context;
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    Close (vd);
     return VLC_EGENERIC;
 }
 
@@ -320,9 +320,8 @@ error:
 /**
  * Disconnect from the X server.
  */
-static void Close (vlc_object_t *obj)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
     ResetPictures (vd);

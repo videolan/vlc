@@ -396,12 +396,9 @@ static const struct wl_registry_listener registry_cbs =
     registry_global_remove_cb,
 };
 
-static int Open(vlc_object_t *obj)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
-
     if (cfg->window->type != VOUT_WINDOW_TYPE_WAYLAND)
         return VLC_EGENERIC;
 
@@ -484,6 +481,7 @@ static int Open(vlc_object_t *obj)
     vd->display = Display;
     vd->control = Control;
 
+    (void) context;
     return VLC_SUCCESS;
 
 error:
@@ -493,9 +491,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *obj)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *sys = vd->sys;
 
     ResetPictures(vd);

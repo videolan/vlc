@@ -60,8 +60,9 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int  Open(vout_display_t *, const vout_display_cfg_t *,
+                 video_format_t *, vlc_video_context *);
+static void Close(vout_display_t *);
 
 static int  GLConvOpen(vlc_object_t *);
 static void GLConvClose(vlc_object_t *);
@@ -1641,12 +1642,10 @@ static int FindShadersCallback(const char *name, char ***values, char ***descs)
 /**
  * It creates a Direct3D vout display.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
 
     if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC; /* let a module who can handle it do it */
@@ -1678,7 +1677,7 @@ static int Open(vlc_object_t *object)
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
     if (!sys->hxdll)
-        msg_Warn(object, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
+        msg_Warn(vd, "cannot load Direct3D9 Shader Library; HLSL pixel shading will be disabled.");
 
     sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
@@ -1752,10 +1751,8 @@ error:
 /**
  * It destroyes a Direct3D vout display.
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t * vd = (vout_display_t *)object;
-
     var_DelCallback(vd, "video-wallpaper", DesktopCallback, NULL);
     vlc_mutex_destroy(&vd->sys->lock);
 

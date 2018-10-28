@@ -73,8 +73,9 @@
 #define CHROMA_TEXT N_("Image format (default RGB)")
 #define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to report its chroma.")
 
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin ()
     set_shortname("Framebuffer")
@@ -170,11 +171,9 @@ static void ClearScreen(vout_display_sys_t *sys)
 /**
  * This function allocates and initializes a FB vout method.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t     *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     if (vout_display_cfg_IsWindowed(cfg))
@@ -252,7 +251,7 @@ static int Open(vlc_object_t *object)
     sys->pool = NULL;
 
     if (OpenDisplay(vd, force_resolution)) {
-        Close(VLC_OBJECT(vd));
+        Close(vd);
         return VLC_EGENERIC;
     }
 
@@ -284,7 +283,7 @@ static int Open(vlc_object_t *object)
             break;
         default:
             msg_Err(vd, "unknown screendepth %i", sys->var_info.bits_per_pixel);
-            Close(VLC_OBJECT(vd));
+            Close(vd);
             return VLC_EGENERIC;
         }
         if (sys->var_info.bits_per_pixel != 8) {
@@ -307,15 +306,15 @@ static int Open(vlc_object_t *object)
     vd->display = Display;
     vd->control = Control;
 
+    (void) context;
     return VLC_SUCCESS;
 }
 
 /**
  * Terminate an output method created by Open
  */
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)

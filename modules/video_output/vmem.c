@@ -52,8 +52,9 @@
 #define LT_CHROMA N_("Output chroma for the memory image as a 4-character " \
                       "string, eg. \"RV32\".")
 
-static int  Open (vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin()
     set_description(N_("Video memory output"))
@@ -114,10 +115,9 @@ static int            Control(vout_display_t *, int, va_list);
  *****************************************************************************
  * This function allocates and initializes a vout method.
  *****************************************************************************/
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(!sys))
         return VLC_ENOMEM;
@@ -218,12 +218,12 @@ static int Open(vlc_object_t *object)
     vd->display = Display;
     vd->control = Control;
 
+    (void) cfg; (void) context;
     return VLC_SUCCESS;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->cleanup)

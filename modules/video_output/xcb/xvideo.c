@@ -51,8 +51,9 @@
     "XVideo image format id to use. By default, VLC will " \
     "try to use the best match for the video being played.")
 
-static int  Open (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 static int EnumAdaptors(const char *, int64_t **, char ***);
 
 /*
@@ -346,11 +347,10 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
 /**
  * Probe the X server.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
+                 video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
+    vlc_object_t *obj = VLC_OBJECT(vd);
     vout_display_sys_t *p_sys;
 
     {   /* NOTE: Reject hardware surface formats. Blending would break. */
@@ -563,10 +563,11 @@ static int Open (vlc_object_t *obj)
     vd->display = Display;
     vd->control = Control;
 
+    (void) context;
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    Close (vd);
     return VLC_EGENERIC;
 }
 
@@ -574,9 +575,8 @@ error:
 /**
  * Disconnect from the X server.
  */
-static void Close (vlc_object_t *obj)
+static void Close (vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *p_sys = vd->sys;
 
     if (p_sys->pool)

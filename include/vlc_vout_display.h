@@ -209,6 +209,29 @@ struct vout_display_owner_t {
     void            (*event)(vout_display_t *, int, va_list);
 };
 
+/**
+ * "vout display" open callback
+ *
+ * @param vd vout display context
+ * @param cfg Initial and current configuration.
+ * @param fmtp By default, it is equal to vd->source except for the aspect
+ * ratio which is undefined(0) and is ignored. It can be changed by the module
+ * to request a different format.
+ * @param context XXX: to be defined.
+ * @return VLC_SUCCESS or a VLC error code
+ */
+typedef int (*vout_display_open_cb)(vout_display_t *vd,
+                                    const vout_display_cfg_t *cfg,
+                                    video_format_t *fmtp,
+                                    vlc_video_context *context);
+
+/**
+ * "vout display" close callback
+ *
+ * @param vd vout display context
+ */
+typedef int (*vout_display_close_cb)(vout_display_t *vd);
+
 struct vout_display_t {
     struct vlc_common_members obj;
 

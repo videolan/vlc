@@ -39,9 +39,11 @@
     "format instead of trying to improve performances by using the most " \
     "efficient one.")
 
-static int OpenDummy( vlc_object_t * );
-static int OpenStats( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                     video_format_t *fmtp, vlc_video_context *context);
+static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                     video_format_t *fmtp, vlc_video_context *context);
+static void Close(vout_display_t *vd);
 
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
@@ -75,11 +77,9 @@ static int             Control(vout_display_t *, int, va_list);
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
  *****************************************************************************/
-static int Open(vlc_object_t *object,
+static int Open(vout_display_t *vd, video_format_t *fmt,
                 void (*display)(vout_display_t *, picture_t *))
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
 
     vd->sys = sys = calloc(1, sizeof(*sys));
@@ -106,19 +106,22 @@ static int Open(vlc_object_t *object,
     return VLC_SUCCESS;
 }
 
-static int OpenDummy(vlc_object_t *object)
+static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                     video_format_t *fmtp, vlc_video_context *context)
 {
-    return Open(object, NULL);
+    (void) cfg; (void) context;
+    return Open(vd, fmtp, NULL);
 }
 
-static int OpenStats(vlc_object_t *object)
+static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                     video_format_t *fmtp, vlc_video_context *context)
 {
-    return Open(object, DisplayStat);
+    (void) cfg; (void) context;
+    return Open(vd, fmtp, DisplayStat);
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vout_display_t *vd)
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool)

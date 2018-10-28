@@ -43,7 +43,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
+static int  Open ( vout_display_t *, const vout_display_cfg_t *,
+                   video_format_t *, vlc_video_context * );
 static void Close( vlc_object_t * );
 
 #define KVA_FIXT23_TEXT N_( \
@@ -142,12 +143,20 @@ static MRESULT EXPENTRY WndProc       ( HWND, ULONG, MPARAM, MPARAM );
 static const char *psz_video_mode[ 4 ] = {"DIVE", "WarpOverlay!", "SNAP",
                                           "VMAN"};
 
+struct open_init
+{
+    vout_display_t *vd;
+    const vout_display_cfg_t *cfg;
+    video_format_t *fmtp;
+};
+
 static void PMThread( void *arg )
 {
-    vout_display_t *vd = ( vout_display_t * )arg;
+    struct open_init *init = ( struct open_init * )arg;
+    vout_display_t *vd = init->vd;
     vout_display_sys_t * sys = vd->sys;
-    const vout_display_cfg_t * cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
+    const vout_display_cfg_t * cfg = init->cfg;
+    video_format_t *fmtp = init->fmtp;
     ULONG i_frame_flags;
     QMSG qm;
     char *psz_mode;
@@ -317,10 +326,16 @@ exit_frame :
 /**
  * This function initializes KVA vout method.
  */
-static int Open ( vlc_object_t *object )
+static int Open ( vout_display_t *vd, const vout_display_cfg_t *cfg,
+                  video_format_t *fmtp, vlc_video_context *context )
 {
-    vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
+    struct open_init init = {
+        .vd   = vd,
+        .cfg  = cfg,
+        .fmtp = fmtp,
+    };
+    VLC_UNUSED(context);
 
     vd->sys = sys = calloc( 1, sizeof( *sys ));
     if( !sys )
@@ -328,7 +343,7 @@ static int Open ( vlc_object_t *object )
 
     DosCreateEventSem( NULL, &sys->ack_event, 0, FALSE );
 
-    sys->tid = _beginthread( PMThread, NULL, 1024 * 1024, vd );
+    sys->tid = _beginthread( PMThread, NULL, 1024 * 1024, &init );
     DosWaitEventSem( sys->ack_event, SEM_INDEFINITE_WAIT );
 
     if( sys->i_result != VLC_SUCCESS )

@@ -674,7 +674,10 @@ static void Display(vout_display_t *vd, picture_t *picture)
 }
 
 
-static void CloseDisplay(vout_display_t *vd)
+/**
+ * Terminate an output method created by Open
+ */
+static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -685,26 +688,12 @@ static void CloseDisplay(vout_display_t *vd)
         drmDropMaster(sys->drm_fd);
 }
 
-
-/**
- * Terminate an output method created by Open
- */
-static void Close(vlc_object_t *object)
-{
-    vout_display_t *vd = (vout_display_t *)object;
-
-    CloseDisplay(vd);
-}
-
-
 /**
  * This function allocates and initializes a KMS vout method.
  */
-static int Open(vlc_object_t *object)
+static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
+                video_format_t *fmtp, vlc_video_context *context)
 {
-    vout_display_t *vd = (vout_display_t *)object;
-    const vout_display_cfg_t *cfg = vd->cfg;
-    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
     vlc_fourcc_t local_vlc_chroma;
     uint32_t local_drm_chroma;
@@ -717,7 +706,7 @@ static int Open(vlc_object_t *object)
     /*
      * Allocate instance and initialize some members
      */
-    vd->sys = sys = vlc_obj_calloc(object, 1, sizeof(*sys));
+    vd->sys = sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
 
@@ -758,7 +747,7 @@ static int Open(vlc_object_t *object)
     }
 
     if (OpenDisplay(vd) != VLC_SUCCESS) {
-        Close(VLC_OBJECT(vd));
+        Close(vd);
         return VLC_EGENERIC;
     }
 
@@ -775,6 +764,7 @@ static int Open(vlc_object_t *object)
     vd->control = Control;
 
     vout_window_ReportSize(cfg->window, sys->width, sys->height);
+    (void) context;
     return VLC_SUCCESS;
 }
 
