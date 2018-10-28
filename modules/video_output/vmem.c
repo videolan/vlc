@@ -117,6 +117,7 @@ static int            Control(vout_display_t *, int, va_list);
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys = malloc(sizeof(*sys));
     if (unlikely(!sys))
         return VLC_ENOMEM;
@@ -138,7 +139,7 @@ static int Open(vlc_object_t *object)
 
     /* Define the video format */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     if (setup != NULL) {
         char chroma[5];
@@ -209,8 +210,9 @@ static int Open(vlc_object_t *object)
     }
 
     /* */
+    *fmtp = fmt;
+
     vd->sys     = sys;
-    vd->fmt     = fmt;
     vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
