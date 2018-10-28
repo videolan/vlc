@@ -113,7 +113,12 @@ struct gl_sys
 static int Open (vlc_object_t *p_this)
 {
     vout_display_t *vd = (vout_display_t *)p_this;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
+
+    if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+        return VLC_EGENERIC;
 
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(vout_display_sys_t));
@@ -123,9 +128,8 @@ static int Open (vlc_object_t *p_this)
     @autoreleasepool {
         id container = var_CreateGetAddress(vd, "drawable-nsobject");
         if (!container) {
-            sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_NSOBJECT);
-            if (sys->embed)
-                container = sys->embed->handle.nsobject;
+            sys->embed = cfg->window;
+            container = sys->embed->handle.nsobject;
 
             if (!container) {
                 msg_Err(vd, "No drawable-nsobject found!");
@@ -183,8 +187,8 @@ static int Open (vlc_object_t *p_this)
 
         const vlc_fourcc_t *subpicture_chromas;
         if (!OpenglLock(sys->gl)) {
-            sys->vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
-                                               sys->gl, &vd->cfg->viewpoint);
+            sys->vgl = vout_display_opengl_New(fmt, &subpicture_chromas,
+                                               sys->gl, &cfg->viewpoint);
             OpenglUnlock(sys->gl);
         } else
             sys->vgl = NULL;
@@ -216,7 +220,7 @@ static int Open (vlc_object_t *p_this)
             outputSize = [container currentOutputSize];
         else
             outputSize = [sys->container visibleRect].size;
-        vout_display_SendEventDisplaySize(vd, (int)outputSize.width, (int)outputSize.height);
+        vout_window_ReportSize(sys->embed, (int)outputSize.width, (int)outputSize.height);
 
         return VLC_SUCCESS;
 
@@ -326,13 +330,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            const vout_display_cfg_t *cfg;
-
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                cfg = vd->cfg;
-            } else {
-                cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-            }
+            const vout_display_cfg_t *cfg =
+                va_arg (ap, const vout_display_cfg_t *);
 
             /* we always use our current frame here */
             vout_display_cfg_t cfg_tmp = *cfg;
@@ -459,7 +458,10 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
     CGSize boundsSize = self.visibleRect.size;
 
     if (_voutDisplay)
-        vout_display_SendEventDisplaySize(_voutDisplay, boundsSize.width, boundsSize.height);
+    {
+        vout_display_sys_t *sys = _voutDisplay->sys;
+        vout_window_ReportSize(sys->embed, boundsSize.width, boundsSize.height);
+    }
 }
 
 - (BOOL)canDrawInCGLContext:(CGLContextObj)glContext pixelFormat:(CGLPixelFormatObj)pixelFormat forLayerTime:(CFTimeInterval)timeInterval displayTime:(const CVTimeStamp *)timeStamp
