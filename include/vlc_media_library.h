@@ -1248,6 +1248,24 @@ static inline size_t vlc_ml_count_playlists( vlc_medialibrary_t* p_ml, const vlc
     return count;
 }
 
+static inline vlc_ml_media_list_t* vlc_ml_list_playlist_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_playlist_id )
+{
+    vlc_assert( p_ml != NULL );
+    vlc_ml_media_list_t* res;
+    if ( vlc_ml_list( p_ml, VLC_ML_LIST_PLAYLIST_MEDIA, params, i_playlist_id, &res ) != VLC_SUCCESS )
+        return NULL;
+    return res;
+}
+
+static inline size_t vlc_ml_count_playlist_media( vlc_medialibrary_t* p_ml, const vlc_ml_query_params_t* params, int64_t i_playlist_id )
+{
+    vlc_assert( p_ml != NULL );
+    size_t count;
+    if ( vlc_ml_list( p_ml, VLC_ML_COUNT_PLAYLIST_MEDIA, params, i_playlist_id, &count ) != VLC_SUCCESS )
+        return 0;
+    return count;
+}
+
 #ifdef __cplusplus
 }
 #endif /* C++ */
