@@ -302,32 +302,12 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
     va_end(args);
 }
 
-VLC_DEPRECATED /* Use vout_window_ReportSize() in window provider instead. */
-static inline void vout_display_SendEventDisplaySize(vout_display_t *vd,
-                                                     int width, int height)
-{
-    vout_window_ReportSize(vd->cfg->window, width, height);
-}
-
 static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_PICTURES_INVALID);
 }
 
-VLC_DEPRECATED /* Use vout_window_ReportClose() in window provider instead. */
-static inline void vout_display_SendEventClose(vout_display_t *vd)
-{
-    vout_window_ReportClose(vd->cfg->window);
-}
-
 #if defined(_WIN32) || defined(__OS2__)
-VLC_DEPRECATED
-/* Use vout_window_ReportKeyPress() in window provider instead. */
-static inline void vout_display_SendEventKey(vout_display_t *vd, int key)
-{
-    vout_window_ReportKeyPress(vd->cfg->window, key);
-}
-
 static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
@@ -359,16 +339,6 @@ static inline void vout_display_SendEventViewpointMoved(vout_display_t *vd,
                                                         const vlc_viewpoint_t *vp)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED, vp);
-}
-
-/**
- * Asks for a new window of a given type.
- */
-static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned type)
-{
-    vout_window_t *wnd = vd->cfg->window;
-
-    return (type == wnd->type) ? wnd : NULL;
 }
 
 static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)

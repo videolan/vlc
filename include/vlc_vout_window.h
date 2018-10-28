@@ -218,8 +218,7 @@ struct vout_window_t {
  * Creates a new window.
  *
  * @param module plugin name (usually "$window")
- * @note If you are inside a "vout display", you must use
- * vout_display_NewWindow() instead. This enables recycling windows.
+ * @note don't use it inside a "vout display" module
  */
 VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *, const vout_window_owner_t *);
 
