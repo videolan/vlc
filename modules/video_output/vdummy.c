@@ -79,6 +79,7 @@ static int Open(vlc_object_t *object,
                 void (*display)(vout_display_t *, picture_t *))
 {
     vout_display_t *vd = (vout_display_t *)object;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
 
     vd->sys = sys = calloc(1, sizeof(*sys));
@@ -93,7 +94,7 @@ static int Open(vlc_object_t *object,
         vlc_fourcc_t fcc = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
         if (fcc != 0) {
             msg_Dbg(vd, "forcing chroma 0x%.8x (%4.4s)", fcc, (char*)&fcc);
-            vd->fmt.i_chroma = fcc;
+            fmt->i_chroma = fcc;
         }
         free(chroma);
     }
@@ -139,7 +140,7 @@ static void DisplayStat(vout_display_t *vd, picture_t *picture)
 
     VLC_UNUSED(vd);
 
-    if (vd->fmt.i_width * vd->fmt.i_height >= sizeof (vlc_tick_t)
+    if (picture->format.i_width * picture->format.i_height >= sizeof (vlc_tick_t)
      && (p->i_pitch * p->i_lines) >= (ssize_t)sizeof (vlc_tick_t)) {
         vlc_tick_t date;
         memcpy(&date, p->p_pixels, sizeof(date));
