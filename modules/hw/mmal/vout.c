@@ -107,6 +107,7 @@ struct vout_display_sys_t {
     plane_t planes[3]; /* Depending on video format up to 3 planes are used */
     picture_t **pictures; /* Actual list of alloced pictures passed into picture_pool */
     picture_pool_t *picture_pool;
+    vout_display_cfg_t last_cfg;
 
     MMAL_COMPONENT_T *component;
     MMAL_PORT_T *input;
@@ -183,7 +184,7 @@ static void maintain_phase_sync(vout_display_t *vd);
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
-    video_format_t *fmt = &vd->fmt;
+    const vout_display_cfg_t *cfg = vd->cfg;
     vout_display_sys_t *sys;
     uint32_t buffer_pitch, buffer_height;
     vout_display_place_t place;
@@ -246,6 +247,7 @@ static int Open(vlc_object_t *object)
     sys->input->format->es->video.crop.height = fmt->i_height;
     sys->input->format->es->video.par.num = vd->source.i_sar_num;
     sys->input->format->es->video.par.den = vd->source.i_sar_den;
+    sys->last_cfg = *cfg;
 
     status = mmal_port_format_commit(sys->input);
     if (status != MMAL_SUCCESS) {
@@ -256,7 +258,7 @@ static int Open(vlc_object_t *object)
     }
     sys->input->buffer_size = sys->input->buffer_size_recommended;
 
-    vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+    vout_display_PlacePicture(&place, &vd->source, cfg, false);
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
     display_region.fullscreen = MMAL_FALSE;
@@ -305,11 +307,11 @@ static int Open(vlc_object_t *object)
     vc_tv_register_callback(tvservice_cb, vd);
 
     if (query_resolution(vd, &sys->display_width, &sys->display_height) >= 0) {
-        vout_window_ReportSize(vd->cfg->window,
+        vout_window_ReportSize(cfg->window,
                                sys->display_width, sys->display_height);
     } else {
-        sys->display_width = vd->cfg->display.width;
-        sys->display_height = vd->cfg->display.height;
+        sys->display_width = cfg->display.width;
+        sys->display_height = cfg->display.height;
     }
 
     sys->dmx_handle = vc_dispmanx_display_open(0);
@@ -408,7 +410,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     if (!cfg)
-        cfg = vd->cfg;
+        cfg = &sys->last_cfg;
 
     vout_display_PlacePicture(&place, fmt, cfg, false);
 
@@ -618,7 +620,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
             tmp_cfg = va_arg(args, const vout_display_cfg_t *);
             if (tmp_cfg->display.width == sys->display_width &&
                             tmp_cfg->display.height == sys->display_height) {
-                cfg = *vd->cfg;
+                cfg = sys->last_cfg;
                 cfg.display.width = sys->display_width;
                 cfg.display.height = sys->display_height;
                 if (configure_display(vd, &cfg, NULL) >= 0)
@@ -628,6 +630,7 @@ static int vd_control(vout_display_t *vd, int query, va_list args)
 
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+            sys->last_cfg = *va_arg(args, const vout_display_cfg_t *);
             if (configure_display(vd, NULL, &vd->source) >= 0)
                 ret = VLC_SUCCESS;
             break;
@@ -660,7 +663,7 @@ static void vd_manage(vout_display_t *vd)
         if (query_resolution(vd, &width, &height) >= 0) {
             sys->display_width = width;
             sys->display_height = height;
-            vout_window_ReportSize(vd->cfg->window, width, height);
+            vout_window_ReportSize(sys->last_cfg->window, width, height);
         }
 
         sys->need_configure_display = false;
