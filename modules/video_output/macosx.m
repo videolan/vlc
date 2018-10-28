@@ -114,6 +114,7 @@ struct vout_display_sys_t
     bool has_first_frame;
 
     vout_display_place_t place;
+    vout_display_cfg_t cfg;
 };
 
 struct gl_sys
@@ -132,10 +133,16 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 static int Open (vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys = calloc (1, sizeof(*sys));
+
+    if (cfg->window->type != VOUT_WINDOW_TYPE_NSOBJECT)
+        return VLC_EGENERIC;
 
     if (!sys)
         return VLC_ENOMEM;
+    sys->cfg = *cfg;
 
     @autoreleasepool {
         if (!CGDisplayUsesOpenGLAcceleration (kCGDirectMainDisplay))
@@ -152,9 +159,8 @@ static int Open (vlc_object_t *this)
         /* Get the drawable object */
         id container = var_CreateGetAddress (vd, "drawable-nsobject");
         if (!container) {
-            sys->embed = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_NSOBJECT);
-            if (sys->embed)
-                container = sys->embed->handle.nsobject;
+            sys->embed = cfg->window;
+            container = sys->embed->handle.nsobject;
 
             if (!container) {
                 msg_Err(vd, "No drawable-nsobject nor vout_window_t found, passing over.");
@@ -226,8 +232,8 @@ static int Open (vlc_object_t *this)
             msg_Err(vd, "Can't attach gl context");
             goto error;
         }
-        sys->vgl = vout_display_opengl_New (&vd->fmt, &subpicture_chromas, sys->gl,
-                                            &vd->cfg->viewpoint);
+        sys->vgl = vout_display_opengl_New (fmt, &subpicture_chromas, sys->gl,
+                                            &cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
         if (!sys->vgl) {
             msg_Err(vd, "Error while initializing opengl display.");
@@ -248,7 +254,7 @@ static int Open (vlc_object_t *this)
         vd->control = Control;
 
         /* */
-        vout_display_SendEventDisplaySize (vd, vd->fmt.i_visible_width, vd->fmt.i_visible_height);
+        vout_window_ReportSize(sys->embed, fmt->i_visible_width, fmt->i_visible_height);
 
         return VLC_SUCCESS;
 
@@ -361,13 +367,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
             case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
             case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
             {
-                const vout_display_cfg_t *cfg;
-
-                if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP) {
-                    cfg = vd->cfg;
-                } else {
-                    cfg = (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
-                }
+                const vout_display_cfg_t *cfg =
+                    va_arg (ap, const vout_display_cfg_t *);
 
                 /* we always use our current frame here, because we have some size constraints
                  in the ui vout provider */
@@ -383,6 +384,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                 vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
                 @synchronized (sys->glView) {
                     sys->place = place;
+                    sys->cfg = *cfg;
                 }
 
                 if (vlc_gl_MakeCurrent (sys->gl) != VLC_SUCCESS)
@@ -635,23 +637,23 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
     NSRect bounds = [self convertRectToBacking:[self bounds]];
-    vout_display_place_t place;
 
     @synchronized(self) {
         if (vd) {
-            vout_display_cfg_t cfg_tmp = *(vd->cfg);
-            cfg_tmp.display.width  = bounds.size.width;
-            cfg_tmp.display.height = bounds.size.height;
+            vout_display_sys_t *sys = vd->sys;
+            sys->cfg.display.width  = bounds.size.width;
+            sys->cfg.display.height = bounds.size.height;
 
-            vout_display_PlacePicture (&place, &vd->source, &cfg_tmp, false);
-            vd->sys->place = place;
-            vout_display_SendEventDisplaySize (vd, bounds.size.width, bounds.size.height);
+            vout_display_PlacePicture (&sys->place, &vd->source, &sys->cfg, false);
+            vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
         }
     }
 
     if ([self lockgl]) {
+        vout_display_sys_t *sys = vd->sys;
         // x / y are top left corner, but we need the lower left one
-        glViewport (place.x, bounds.size.height - (place.y + place.height), place.width, place.height);
+        glViewport (sys->place.x, bounds.size.height - (sys->place.y + sys->place.height),
+                    sys->place.width, sys->place.height);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
