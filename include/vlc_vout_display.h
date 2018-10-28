@@ -146,13 +146,13 @@ enum {
 
     /* Ask the module to acknowledge/refuse source aspect ratio after being
      * requested externally */
-    VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
+    VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse source crop change after being
      * requested externally.
      * The cropping requested is stored by source video_format_t::i_x/y_offset
      * and video_format_t::i_visible_width/height */
-    VOUT_DISPLAY_CHANGE_SOURCE_CROP,
+    VOUT_DISPLAY_CHANGE_SOURCE_CROP, /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse VR/360° viewing direction after
      * being requested externally */

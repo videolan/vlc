@@ -675,7 +675,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             vd->source.i_sar_den = osys->source.i_sar_den;
         }
 
-        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT);
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, &osys->cfg);
         osys->sar.num = vd->source.i_sar_num;
         osys->sar.den = vd->source.i_sar_den;
         osys->ch_sar  = false;
@@ -723,7 +723,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         vd->source.i_visible_height = bottom - top;
         video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
         video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
-        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP);
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &osys->cfg);
         osys->crop.left   = left - osys->source.i_x_offset;
         osys->crop.top    = top  - osys->source.i_y_offset;
         /* FIXME for right/bottom we should keep the 'type' border vs window */
