@@ -56,6 +56,8 @@ struct vout_display_sys_t
 
     int x;
     int y;
+    unsigned display_width;
+    unsigned display_height;
     bool use_buffer_transform;
 };
 
@@ -206,8 +208,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     wl_buffer_set_user_data(buf, pic);
     wl_surface_attach(surface, buf, 0, 0);
-    wl_surface_damage(surface, 0, 0,
-                      vd->cfg->display.width, vd->cfg->display.height);
+    wl_surface_damage(surface, 0, 0, sys->display_width, sys->display_height);
     wl_display_flush(display);
 
     sys->x = 0;
@@ -281,24 +282,25 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
         case VOUT_DISPLAY_RESET_PICTURES:
         {
+            const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+            video_format_t *fmt = va_arg(ap, video_format_t *);
             vout_display_place_t place;
             video_format_t src;
-
             assert(sys->viewport == NULL);
 
-            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+            vout_display_PlacePicture(&place, &vd->source, cfg, false);
             video_format_ApplyRotation(&src, &vd->source);
 
-            vd->fmt.i_width  = src.i_width  * place.width
-                                            / src.i_visible_width;
-            vd->fmt.i_height = src.i_height * place.height
-                                            / src.i_visible_height;
-            vd->fmt.i_visible_width  = place.width;
-            vd->fmt.i_visible_height = place.height;
-            vd->fmt.i_x_offset = src.i_x_offset * place.width
-                                                / src.i_visible_width;
-            vd->fmt.i_y_offset = src.i_y_offset * place.height
-                                                / src.i_visible_height;
+            fmt->i_width  = src.i_width * place.width
+                                        / src.i_visible_width;
+            fmt->i_height = src.i_height * place.height
+                                         / src.i_visible_height;
+            fmt->i_visible_width  = place.width;
+            fmt->i_visible_height = place.height;
+            fmt->i_x_offset = src.i_x_offset * place.width
+                                             / src.i_visible_width;
+            fmt->i_y_offset = src.i_y_offset * place.height
+                                             / src.i_visible_height;
 
             ResetPictures(vd);
             break;
@@ -310,17 +312,9 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         {
-            const vout_display_cfg_t *cfg;
-
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
-             || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
-            {
-                cfg = vd->cfg;
-            }
-            else
-            {
-                cfg = va_arg(ap, const vout_display_cfg_t *);
-            }
+            const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+            sys->display_width = cfg->display.width;
+            sys->display_height = cfg->display.height;
 
             if (sys->viewport != NULL)
             {
@@ -405,6 +399,12 @@ static const struct wl_registry_listener registry_cbs =
 static int Open(vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
+
+    if (cfg->window->type != VOUT_WINDOW_TYPE_WAYLAND)
+        return VLC_EGENERIC;
+
     vout_display_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -417,12 +417,13 @@ static int Open(vlc_object_t *obj)
     sys->pool = NULL;
     sys->x = 0;
     sys->y = 0;
+    sys->display_width = cfg->display.width;
+    sys->display_height = cfg->display.height;
     sys->use_buffer_transform = false;
 
     /* Get window */
-    sys->embed = vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_WAYLAND);
-    if (sys->embed == NULL)
-        goto error;
+    sys->embed = cfg->window;
+    assert(sys->embed != NULL);
 
     struct wl_display *display = sys->embed->display.wl;
 
@@ -466,15 +467,15 @@ static int Open(vlc_object_t *obj)
     if (sys->use_buffer_transform)
     {
         wl_surface_set_buffer_transform(surface,
-                                        transforms[vd->fmt.orientation]);
+                                        transforms[fmtp->orientation]);
     }
     else
     {
-        video_format_t fmt = vd->fmt;
-        video_format_ApplyRotation(&vd->fmt, &fmt);
+        video_format_t fmt = *fmtp;
+        video_format_ApplyRotation(fmtp, &fmt);
     }
 
-    vd->fmt.i_chroma = VLC_CODEC_RGB32;
+    fmtp->i_chroma = VLC_CODEC_RGB32;
 
     vd->info.has_pictures_invalid = sys->viewport == NULL;
 
