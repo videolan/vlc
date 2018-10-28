@@ -371,9 +371,13 @@ static inline vout_window_t *vout_display_NewWindow(vout_display_t *vd, unsigned
     return (type == wnd->type) ? wnd : NULL;
 }
 
+static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
+{
+    return cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
+}
 static inline bool vout_display_IsWindowed(vout_display_t *vd)
 {
-    return vd->cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
+    return vout_display_cfg_IsWindowed(vd->cfg);
 }
 
 /**
