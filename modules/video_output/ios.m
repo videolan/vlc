@@ -123,6 +123,7 @@ struct vout_display_sys_t
     vlc_gl_t *gl;
 
     picture_pool_t *picturePool;
+    vout_window_t *embed;
 };
 
 struct gl_sys
@@ -145,6 +146,7 @@ static int Open(vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
     const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmt = &vd->fmt;
 
     if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
@@ -175,8 +177,8 @@ static int Open(vlc_object_t *this)
         }
 
         const vlc_fourcc_t *subpicture_chromas;
-        video_format_t fmt = vd->fmt;
 
+        sys->embed = cfg->window;
         sys->gl = vlc_object_create(this, sizeof(*sys->gl));
         if (!sys->gl)
             goto bailout;
@@ -198,8 +200,8 @@ static int Open(vlc_object_t *this)
         if (vlc_gl_MakeCurrent(sys->gl) != VLC_SUCCESS)
             goto bailout;
 
-        vout_display_opengl_t *vgl = vout_display_opengl_New(&vd->fmt, &subpicture_chromas,
-                                                             sys->gl, &vd->cfg->viewpoint);
+        vout_display_opengl_t *vgl = vout_display_opengl_New(fmt, &subpicture_chromas,
+                                                             sys->gl, &cfg->viewpoint);
         vlc_gl_ReleaseCurrent(sys->gl);
         if (!vgl)
             goto bailout;
@@ -271,13 +273,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         {
-            const vout_display_cfg_t *cfg;
-
-            if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT ||
-                query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
-                cfg = vd->cfg;
-            else
-                cfg = (const vout_display_cfg_t*)va_arg(ap, const vout_display_cfg_t *);
+            const vout_display_cfg_t *cfg =
+                va_arg(ap, const vout_display_cfg_t *);
 
             assert(cfg);
 
@@ -701,8 +698,9 @@ static void GLESSwap(vlc_gl_t *gl)
         _place = place;
     }
 
-    vout_display_SendEventDisplaySize(_voutDisplay, _viewSize.width * _scaleFactor,
-                                      _viewSize.height * _scaleFactor);
+    vout_display_sys_t *sys = _voutDisplay->sys;
+    vout_window_ReportSize(sys->embed, _viewSize.width * _scaleFactor,
+                           _viewSize.height * _scaleFactor);
 
     vlc_mutex_unlock(&_mutex);
 }
