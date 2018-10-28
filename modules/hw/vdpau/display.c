@@ -65,6 +65,8 @@ struct vout_display_sys_t
     VdpRGBAFormat rgb_fmt; /**< Output surface format */
 
     picture_pool_t *pool; /**< pictures pool */
+    unsigned width;
+    unsigned height;
 };
 
 static void pictureSys_DestroyVDPAU(picture_sys_t *psys)
@@ -203,13 +205,13 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
 
     /* Render onto main surface */
     VdpRect area = {
-        reg->i_x * vd->fmt.i_visible_width
+        reg->i_x * sys->width
             / subpic->i_original_picture_width,
-        reg->i_y * vd->fmt.i_visible_height
+        reg->i_y * sys->height
             / subpic->i_original_picture_height,
-        (reg->i_x + reg->fmt.i_visible_width) * vd->fmt.i_visible_width
+        (reg->i_x + reg->fmt.i_visible_width) * sys->width
             / subpic->i_original_picture_width,
-        (reg->i_y + reg->fmt.i_visible_height) * vd->fmt.i_visible_height
+        (reg->i_y + reg->fmt.i_visible_height) * sys->height
             / subpic->i_original_picture_height,
     };
     VdpColor color = { 1.f, 1.f, 1.f,
@@ -330,6 +332,8 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
     case VOUT_DISPLAY_RESET_PICTURES:
     {
+        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(ap, video_format_t *);
         msg_Dbg(vd, "resetting pictures");
         if (sys->pool != NULL)
         {
@@ -338,15 +342,14 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         }
 
         const video_format_t *src= &vd->source;
-        video_format_t *fmt = &vd->fmt;
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, src, vd->cfg, false);
+        vout_display_PlacePicture(&place, src, cfg, false);
 
         fmt->i_width = src->i_width * place.width / src->i_visible_width;
         fmt->i_height = src->i_height * place.height / src->i_visible_height;
-        fmt->i_visible_width  = place.width;
-        fmt->i_visible_height = place.height;
+        sys->width = fmt->i_visible_width = place.width;
+        sys->height = fmt->i_visible_height = place.height;
         fmt->i_x_offset = src->i_x_offset * place.width / src->i_visible_width;
         fmt->i_y_offset = src->i_y_offset * place.height / src->i_visible_height;
 
@@ -414,19 +417,21 @@ static int Open(vlc_object_t *obj)
         return VLC_EGENERIC;
 
     vout_display_t *vd = (vout_display_t *)obj;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     const xcb_screen_t *screen;
-    if (vlc_xcb_parent_Create(vd, &sys->conn, &screen) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg, &sys->conn, &screen) == NULL)
     {
         free(sys);
         return VLC_EGENERIC;
     }
 
     /* Load the VDPAU back-end and create a device instance */
-    VdpStatus err = vdp_get_x11(vd->cfg->window->display.x11,
+    VdpStatus err = vdp_get_x11(cfg->window->display.x11,
                                 xcb_screen_num(sys->conn, screen),
                                 &sys->vdp, &sys->device);
     if (err != VDP_STATUS_OK)
@@ -446,7 +451,7 @@ static int Open(vlc_object_t *obj)
     VdpChromaType chroma;
     VdpYCbCrFormat format;
 
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     if (fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_420
      || fmt.i_chroma == VLC_CODEC_VDPAU_VIDEO_422
@@ -561,6 +566,8 @@ static int Open(vlc_object_t *obj)
         goto error;
     }
 
+    sys->width = fmtp->i_visible_width;
+    sys->height = fmtp->i_visible_height;
     /* VDPAU-X11 requires a window dedicated to the back-end */
     {
         xcb_pixmap_t pix = xcb_generate_id(sys->conn);
@@ -577,12 +584,12 @@ static int Open(vlc_object_t *obj)
         };
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+        vout_display_PlacePicture (&place, &vd->source, cfg, false);
         sys->window = xcb_generate_id(sys->conn);
 
         xcb_void_cookie_t c =
             xcb_create_window_checked(sys->conn, screen->root_depth,
-                sys->window, vd->cfg->window->handle.xid, place.x, place.y,
+                sys->window, cfg->window->handle.xid, place.x, place.y,
                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
                 screen->root_visual, mask, values);
         if (vlc_xcb_error_Check(vd, sys->conn, "window creation failure", c))
@@ -640,7 +647,7 @@ static int Open(vlc_object_t *obj)
     vd->sys = sys;
     vd->info.has_pictures_invalid = true;
     vd->info.subpicture_chromas = spu_chromas;
-    vd->fmt = fmt;
+    *fmtp = fmt;
 
     vd->pool = Pool;
     vd->prepare = Queue;

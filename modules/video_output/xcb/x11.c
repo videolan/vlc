@@ -72,6 +72,8 @@ struct vout_display_sys_t
     uint8_t depth; /* useful bits per pixel */
 
     picture_pool_t *pool; /* picture pool */
+    vout_display_place_t place;
+    video_format_t fmt;
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -102,6 +104,8 @@ static const xcb_depth_t *FindDepth (const xcb_screen_t *scr,
 static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -112,7 +116,7 @@ static int Open (vlc_object_t *obj)
     /* Get window, connect to X server */
     xcb_connection_t *conn;
     const xcb_screen_t *scr;
-    if (vlc_xcb_parent_Create(vd, &conn, &scr) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg, &conn, &scr) == NULL)
     {
         free (sys);
         return VLC_EGENERIC;
@@ -134,7 +138,7 @@ static int Open (vlc_object_t *obj)
         if (fmt->depth <= sys->depth)
             continue; /* no better than earlier format */
 
-        video_format_ApplyRotation(&fmt_pic, &vd->fmt);
+        video_format_ApplyRotation(&fmt_pic, fmtp);
 
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
@@ -269,9 +273,9 @@ found_format:;
 
         xcb_create_pixmap (conn, sys->depth, pixmap, scr->root, 1, 1);
         c = xcb_create_window_checked (conn, sys->depth, sys->window,
-                                       vd->cfg->window->handle.xid, 0, 0,
-                                       vd->cfg->display.width,
-                                       vd->cfg->display.height, 0,
+                                       cfg->window->handle.xid, 0, 0,
+                                       cfg->display.width,
+                                       cfg->display.height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
         xcb_map_window (conn, sys->window);
@@ -294,10 +298,12 @@ found_format:;
     else
         sys->seg_base = 0;
 
+    vout_display_PlacePicture (&sys->place, &vd->source, cfg, false);
+
+    sys->fmt = *fmtp = fmt_pic;
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
 
-    vd->fmt = fmt_pic;
     vd->pool = Pool;
     vd->prepare = NULL;
     vd->display = Display;
@@ -337,12 +343,8 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     if (sys->pool)
         return sys->pool;
 
-    vout_display_place_t place;
-
-    vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
-
     /* */
-    const uint32_t values[] = { place.x, place.y, place.width, place.height };
+    const uint32_t values[] = { sys->place.x, sys->place.y, sys->place.width, sys->place.height };
     xcb_configure_window (sys->conn, sys->window,
                           XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
                           XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
@@ -407,21 +409,21 @@ static void Display (vout_display_t *vd, picture_t *pic)
         ck = xcb_shm_put_image_checked (sys->conn, sys->window, sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
          /* real height */ pic->p->i_lines,
-                   /* x */ vd->fmt.i_x_offset,
-                   /* y */ vd->fmt.i_y_offset,
-               /* width */ vd->fmt.i_visible_width,
-              /* height */ vd->fmt.i_visible_height,
+                   /* x */ sys->fmt.i_x_offset,
+                   /* y */ sys->fmt.i_y_offset,
+               /* width */ sys->fmt.i_visible_width,
+              /* height */ sys->fmt.i_visible_height,
                            0, 0, sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
                            0, segment, 0);
     else
     {
-        const size_t offset = vd->fmt.i_y_offset * pic->p->i_pitch;
-        const unsigned lines = pic->p->i_lines - vd->fmt.i_y_offset;
+        const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
+        const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
 
         ck = xcb_put_image_checked (sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                        sys->window, sys->gc,
                        pic->p->i_pitch / pic->p->i_pixel_pitch,
-                       lines, -vd->fmt.i_x_offset, 0, 0, sys->depth,
+                       lines, -sys->fmt.i_x_offset, 0, 0, sys->depth,
                        pic->p->i_pitch * lines, pic->p->p_pixels + offset);
     }
 
@@ -451,19 +453,17 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         const vout_display_cfg_t *p_cfg =
             va_arg (ap, const vout_display_cfg_t *);
-        vout_display_place_t place;
+        vout_display_PlacePicture (&sys->place, &vd->source, p_cfg, false);
 
-        vout_display_PlacePicture (&place, &vd->source, p_cfg, false);
-
-        if (place.width  != vd->fmt.i_visible_width ||
-            place.height != vd->fmt.i_visible_height)
+        if (sys->place.width  != sys->fmt.i_visible_width ||
+            sys->place.height != sys->fmt.i_visible_height)
         {
             vout_display_SendEventPicturesInvalid (vd);
             return VLC_SUCCESS;
         }
 
         /* Move the picture within the window */
-        const uint32_t values[] = { place.x, place.y };
+        const uint32_t values[] = { sys->place.x, sys->place.y };
         xcb_configure_window (sys->conn, sys->window,
                               XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
                               values);
@@ -480,22 +480,24 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        ResetPictures (vd);
+        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(ap, video_format_t *);
 
-        vout_display_place_t place;
-        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+        ResetPictures (vd);
 
         video_format_t src;
         video_format_ApplyRotation(&src, &vd->source);
 
-        vd->fmt.i_width  = src.i_width  * place.width / src.i_visible_width;
-        vd->fmt.i_height = src.i_height * place.height / src.i_visible_height;
+        fmt->i_width  = src.i_width  * sys->place.width / src.i_visible_width;
+        fmt->i_height = src.i_height * sys->place.height / src.i_visible_height;
 
-        vd->fmt.i_visible_width  = place.width;
-        vd->fmt.i_visible_height = place.height;
-        vd->fmt.i_x_offset = src.i_x_offset * place.width / src.i_visible_width;
-        vd->fmt.i_y_offset = src.i_y_offset * place.height / src.i_visible_height;
+        fmt->i_visible_width  = sys->place.width;
+        fmt->i_visible_height = sys->place.height;
+        fmt->i_x_offset = src.i_x_offset * sys->place.width / src.i_visible_width;
+        fmt->i_y_offset = src.i_y_offset * sys->place.height / src.i_visible_height;
+        sys->fmt = *fmt;
         return VLC_SUCCESS;
+        (void) cfg;
     }
 
     default:

@@ -41,6 +41,7 @@ int vlc_xcb_error_Check(vout_display_t *, xcb_connection_t *conn,
  * finds the corresponding X server screen.
  */
 struct vout_window_t *vlc_xcb_parent_Create(vout_display_t *obj,
+                                            const vout_display_cfg_t *cfg,
                                             xcb_connection_t **connp,
                                             const xcb_screen_t **screenp);
 /**

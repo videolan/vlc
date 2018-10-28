@@ -102,15 +102,16 @@ static const xcb_screen_t *FindScreen (vlc_object_t *obj,
 }
 
 vout_window_t *vlc_xcb_parent_Create(vout_display_t *vd,
+                                     const vout_display_cfg_t *cfg,
                                      xcb_connection_t **restrict pconn,
                                      const xcb_screen_t **restrict pscreen)
 {
-    vout_window_t *wnd = vout_display_NewWindow (vd, VOUT_WINDOW_TYPE_XID);
-    if (wnd == NULL)
+    if (cfg->window->type != VOUT_WINDOW_TYPE_XID)
     {
         msg_Err (vd, "window not available");
         return NULL;
     }
+    vout_window_t *wnd = cfg->window;
 
     xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
     if (conn == NULL)

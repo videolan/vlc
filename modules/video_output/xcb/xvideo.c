@@ -85,8 +85,6 @@ struct vout_display_sys_t
     xcb_gcontext_t gc;   /* context to put images */
     xcb_xv_port_t port;  /* XVideo port */
     uint32_t id;         /* XVideo format */
-    uint16_t width;      /* display width */
-    uint16_t height;     /* display height */
     uint32_t data_size;  /* picture byte size (for non-SHM) */
     bool     swap_uv;    /* U/V pointer must be swapped in a picture */
     bool shm;            /* whether to use MIT-SHM */
@@ -94,6 +92,7 @@ struct vout_display_sys_t
 
     xcb_xv_query_image_attributes_reply_t *att;
     picture_pool_t *pool; /* picture pool */
+    vout_display_place_t place;
 };
 
 static picture_pool_t *Pool (vout_display_t *, unsigned);
@@ -350,6 +349,8 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
 static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *p_sys;
 
     {   /* NOTE: Reject hardware surface formats. Blending would break. */
@@ -368,7 +369,7 @@ static int Open (vlc_object_t *obj)
     /* Connect to X */
     xcb_connection_t *conn;
     const xcb_screen_t *screen;
-    if (vlc_xcb_parent_Create(vd, &conn, &screen) == NULL)
+    if (vlc_xcb_parent_Create(vd, cfg, &conn, &screen) == NULL)
     {
         free (p_sys);
         return VLC_EGENERIC;
@@ -390,7 +391,7 @@ static int Open (vlc_object_t *obj)
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
         xcb_xv_query_adaptors_reply (conn,
-            xcb_xv_query_adaptors (conn, vd->cfg->window->handle.xid), NULL);
+            xcb_xv_query_adaptors (conn, cfg->window->handle.xid), NULL);
     if (adaptors == NULL)
         goto error;
 
@@ -399,12 +400,9 @@ static int Open (vlc_object_t *obj)
 
     /* */
     video_format_t fmt;
-    vout_display_place_t place;
 
     p_sys->port = 0;
-    vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
-    p_sys->width  = place.width;
-    p_sys->height = place.height;
+    vout_display_PlacePicture (&p_sys->place, &vd->source, cfg, false);
 
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
@@ -421,7 +419,7 @@ static int Open (vlc_object_t *obj)
             continue;
 
         /* Look for an image format */
-        video_format_ApplyRotation(&fmt, &vd->fmt);
+        video_format_ApplyRotation(&fmt, fmtp);
         free (p_sys->att);
         p_sys->att = FindFormat (obj, conn, &fmt, a, &p_sys->id);
         if (p_sys->att == NULL) /* No acceptable image formats */
@@ -486,9 +484,9 @@ static int Open (vlc_object_t *obj)
 
             xcb_create_pixmap (conn, f->depth, pixmap, screen->root, 1, 1);
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
-                 vd->cfg->window->handle.xid, place.x, place.y,
-                 place.width, place.height, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                 f->visual, mask, list);
+                 cfg->window->handle.xid, p_sys->place.x, p_sys->place.y,
+                 p_sys->place.width, p_sys->place.height, 0,
+                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
             xcb_map_window (conn, p_sys->window);
 
             if (!vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
@@ -554,10 +552,10 @@ static int Open (vlc_object_t *obj)
 
     /* Setup vout_display_t once everything is fine */
     p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
-                                                    vd->fmt.i_chroma);
+                                                    fmtp->i_chroma);
     if (p_sys->swap_uv)
-        fmt.i_chroma = vd->fmt.i_chroma;
-    vd->fmt = fmt;
+        fmt.i_chroma = fmtp->i_chroma;
+    *fmtp = fmt;
     vd->info = info;
 
     vd->pool = Pool;
@@ -679,7 +677,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                               p_sys->window, p_sys->gc, segment, p_sys->id, 0,
                    /* Src: */ fmt.i_x_offset, fmt.i_y_offset,
                               fmt.i_visible_width, fmt.i_visible_height,
-                   /* Dst: */ 0, 0, p_sys->width, p_sys->height,
+                   /* Dst: */ 0, 0, p_sys->place.width, p_sys->place.height,
                 /* Memory: */ pic->p->i_pitch / pic->p->i_pixel_pitch,
                               pic->p->i_lines, false);
     else
@@ -687,7 +685,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                           p_sys->gc, p_sys->id,
                           fmt.i_x_offset, fmt.i_y_offset,
                           fmt.i_visible_width, fmt.i_visible_height,
-                          0, 0, p_sys->width, p_sys->height,
+                          0, 0, p_sys->place.width, p_sys->place.height,
                           pic->p->i_pitch / pic->p->i_pixel_pitch,
                           pic->p->i_lines,
                           p_sys->data_size, pic->p->p_pixels);
@@ -713,26 +711,13 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        const vout_display_cfg_t *cfg;
-
-        if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
-         || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
-        {
-            cfg = vd->cfg;
-        }
-        else
-        {
-            cfg = va_arg(ap, const vout_display_cfg_t *);
-        }
-
-        vout_display_place_t place;
-        vout_display_PlacePicture (&place, &vd->source, cfg, false);
-        p_sys->width  = place.width;
-        p_sys->height = place.height;
+        vout_display_PlacePicture (&p_sys->place, &vd->source,
+                                   va_arg(ap, const vout_display_cfg_t *),
+                                   false);
 
         /* Move the picture within the window */
-        const uint32_t values[] = { place.x, place.y,
-                                    place.width, place.height, };
+        const uint32_t values[] = { p_sys->place.x, p_sys->place.y,
+                                    p_sys->place.width, p_sys->place.height, };
         xcb_configure_window (p_sys->conn, p_sys->window,
                               XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y
                             | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
