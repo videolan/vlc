@@ -69,6 +69,14 @@ static picture_t *VideoBufferNew(filter_t *filter)
  *
  *****************************************************************************/
 
+static int vout_display_start(void *func, va_list ap)
+{
+    int (*activate)(vlc_object_t *) = func;
+    vout_display_t *vd = va_arg(ap, vout_display_t *);
+
+    return activate(VLC_OBJECT(vd));
+}
+
 /**
  * It creates a new vout_display_t using the given configuration.
  */
@@ -104,7 +112,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->owner = *owner;
 
     if (load_module) {
-        vd->module = module_need(vd, "vout display", module, module && *module != '\0');
+        vd->module = vlc_module_load(vd, "vout display", module, module && *module != '\0', vout_display_start, vd);
         if (!vd->module) {
             vlc_object_release(vd);
             return NULL;
@@ -119,13 +127,21 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     return vd;
 }
 
+static void vout_display_stop(void *func, va_list ap)
+{
+    void (*deactivate)(vlc_object_t *) = func;
+    vout_display_t *vd = va_arg(ap, vout_display_t *);
+
+    deactivate(VLC_OBJECT(vd));
+}
+
 /**
  * It deletes a vout_display_t
  */
 static void vout_display_Delete(vout_display_t *vd)
 {
     if (vd->module)
-        module_unneed(vd, vd->module);
+        vlc_module_unload(vd, vd->module, vout_display_stop, vd);
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
