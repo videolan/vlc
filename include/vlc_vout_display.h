@@ -123,7 +123,7 @@ enum {
     /* Ask to reset the internal buffers after a VOUT_DISPLAY_EVENT_PICTURES_INVALID
      * request.
      */
-    VOUT_DISPLAY_RESET_PICTURES,
+    VOUT_DISPLAY_RESET_PICTURES, /* const vout_display_cfg_t *, es_format_t * */
 
 #if defined(_WIN32) || defined(__OS2__)
     /* Ask the module to acknowledge/refuse the fullscreen state change after

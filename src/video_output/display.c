@@ -738,7 +738,8 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 
     if (allow_reset_pictures
      && atomic_exchange(&osys->reset_pictures, false)) {
-        if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES)) {
+        if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
+                                 &vd->fmt)) {
             /* FIXME what to do here ? */
             msg_Err(vd, "Failed to reset pictures (probably fatal)");
         }
