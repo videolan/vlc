@@ -703,6 +703,8 @@ static void Close(vlc_object_t *object)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
     vlc_fourcc_t local_vlc_chroma;
     uint32_t local_drm_chroma;
@@ -727,14 +729,14 @@ static int Open(vlc_object_t *object)
             sys->vlc_fourcc = local_vlc_chroma;
             msg_Dbg(vd, "Forcing VLC to use chroma '%4s'", chroma);
          } else {
-            sys->vlc_fourcc = vd->fmt.i_chroma;
+            sys->vlc_fourcc = fmtp->i_chroma;
             msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
          }
 
         free(chroma);
         chroma = NULL;
     } else {
-        sys->vlc_fourcc = vd->fmt.i_chroma;
+        sys->vlc_fourcc = fmtp->i_chroma;
         msg_Dbg(vd, "Chroma %4s invalid, using default", chroma);
     }
 
@@ -760,19 +762,19 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     fmt.i_width = fmt.i_visible_width  = sys->width;
     fmt.i_height = fmt.i_visible_height = sys->height;
     fmt.i_chroma = sys->vlc_fourcc;
+    *fmtp = fmt;
 
-    vd->fmt     = fmt;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
 
-    vout_window_ReportSize(vd->cfg->window, sys->width, sys->height);
+    vout_window_ReportSize(cfg->window, sys->width, sys->height);
     return VLC_SUCCESS;
 }
 
