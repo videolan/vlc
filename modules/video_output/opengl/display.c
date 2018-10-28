@@ -88,6 +88,8 @@ static int Control (vout_display_t *, int, va_list);
 static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -95,7 +97,7 @@ static int Open (vlc_object_t *obj)
     sys->gl = NULL;
     sys->pool = NULL;
 
-    vout_window_t *surface = vd->cfg->window;
+    vout_window_t *surface = cfg->window;
     char *gl_name = var_InheritString(surface, MODULE_VARNAME);
 
     /* VDPAU GL interop works only with GLX. Override the "gl" option to force
@@ -103,7 +105,7 @@ static int Open (vlc_object_t *obj)
 #ifndef USE_OPENGL_ES2
     if (surface->type == VOUT_WINDOW_TYPE_XID)
     {
-        switch (vd->fmt.i_chroma)
+        switch (fmt->i_chroma)
         {
             case VLC_CODEC_VDPAU_VIDEO_444:
             case VLC_CODEC_VDPAU_VIDEO_422:
@@ -129,7 +131,7 @@ static int Open (vlc_object_t *obj)
     if (sys->gl == NULL)
         goto error;
 
-    vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
+    vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;
@@ -137,8 +139,8 @@ static int Open (vlc_object_t *obj)
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
 
-    sys->vgl = vout_display_opengl_New (&vd->fmt, &spu_chromas, sys->gl,
-                                        &vd->cfg->viewpoint);
+    sys->vgl = vout_display_opengl_New (fmt, &spu_chromas, sys->gl,
+                                        &cfg->viewpoint);
     vlc_gl_ReleaseCurrent (sys->gl);
 
     if (sys->vgl == NULL)
@@ -255,7 +257,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
       case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
       case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
       {
-        const vout_display_cfg_t *cfg = vd->cfg;
+        const vout_display_cfg_t *cfg = va_arg (ap, const vout_display_cfg_t *);
         vout_display_place_t place;
 
         vout_display_PlacePicture (&place, &vd->source, cfg, false);
