@@ -283,11 +283,7 @@ block_t * ForgedInitSegment::buildMoovBox()
                                      0x01, /* Will always be 1st and unique track; tfhd patched on block read */
                                      &fmt, (uint32_t) trackTimescale);
             if(p_track)
-            {
-                p_track->i_read_duration = duration.Get();
-                p_track->i_trex_default_length = 1;
-                p_track->i_trex_default_size = 1;
-            }
+                mp4mux_track_ForceDuration(p_track, duration.Get());
         }
 
         box = mp4mux_GetMoov(muxh, NULL, trackTimescale.ToTime(duration.Get()));

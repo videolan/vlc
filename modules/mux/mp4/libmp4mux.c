@@ -39,6 +39,38 @@
 #include <assert.h>
 #include <time.h>
 
+struct mp4mux_trackinfo_t
+{
+    unsigned i_track_id;
+    es_format_t   fmt;
+
+    /* index */
+    unsigned int i_samples_count;
+    unsigned int i_samples_max;
+    mp4mux_sample_t *samples;
+
+    /* XXX: needed for other codecs too, see lavf */
+    struct
+    {
+        size_t   i_data;
+        uint8_t *p_data;
+    } sample_priv;
+
+    /* stats */
+    vlc_tick_t   i_read_duration;
+    uint32_t     i_timescale;
+    bool         b_hasbframes;
+
+    /* frags */
+    vlc_tick_t   i_trex_default_length;
+    uint32_t     i_trex_default_size;
+
+    /* edit list */
+    unsigned int i_edits_count;
+    mp4mux_edit_t *p_edits;
+
+};
+
 struct mp4mux_handle_t
 {
     unsigned options;
@@ -60,8 +92,7 @@ static bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
 static void mp4mux_trackinfo_Clear(mp4mux_trackinfo_t *p_stream)
 {
     es_format_Clean(&p_stream->fmt);
-    if (p_stream->a52_frame)
-        block_Release(p_stream->a52_frame);
+    mp4mux_track_SetSamplePriv(p_stream, NULL, 0);
     free(p_stream->samples);
     free(p_stream->p_edits);
 }
@@ -77,7 +108,6 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *h, unsigned id,
     }
     t->i_track_id = id;
     t->i_timescale = timescale;
-    t->i_firstdts = VLC_TICK_INVALID;
     es_format_Init(&t->fmt, fmt->i_cat, fmt->i_codec);
     es_format_Copy(&t->fmt, fmt);
     vlc_array_append(&h->tracks, t);
@@ -129,14 +159,100 @@ bool mp4mux_track_AddSample(mp4mux_trackinfo_t *t, const mp4mux_sample_t *entry)
         t->i_samples_max += 1000;
     }
     t->samples[t->i_samples_count++] = *entry;
+    if(!t->b_hasbframes && entry->i_pts_dts != 0)
+        t->b_hasbframes = true;
+    t->i_read_duration += __MAX(0, entry->i_length);
     return true;
 }
 
-mp4mux_sample_t *mp4mux_track_GetLastSample(mp4mux_trackinfo_t *t)
+const mp4mux_sample_t *mp4mux_track_GetLastSample(const mp4mux_trackinfo_t *t)
 {
     if(t->i_samples_count)
         return &t->samples[t->i_samples_count - 1];
     else return NULL;
+}
+
+unsigned mp4mux_track_GetSampleCount(const mp4mux_trackinfo_t *t)
+{
+    return t->i_samples_count;
+}
+
+void mp4mux_track_UpdateLastSample(mp4mux_trackinfo_t *t,
+                                   const mp4mux_sample_t *entry)
+{
+    if(t->i_samples_count)
+    {
+        mp4mux_sample_t *e = &t->samples[t->i_samples_count - 1];
+        t->i_read_duration -= e->i_length;
+        t->i_read_duration += entry->i_length;
+        *e = *entry;
+    }
+}
+
+vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *t)
+{
+    return t->i_trex_default_length;
+}
+
+uint32_t mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *t)
+{
+    return t->i_trex_default_size;
+}
+
+bool mp4mux_track_HasBFrames(const mp4mux_trackinfo_t *t)
+{
+    return t->b_hasbframes;
+}
+
+void mp4mux_track_SetHasBFrames(mp4mux_trackinfo_t *t)
+{
+    t->b_hasbframes = true;
+}
+
+uint32_t mp4mux_track_GetTimescale(const mp4mux_trackinfo_t *t)
+{
+    return t->i_timescale;
+}
+
+vlc_tick_t mp4mux_track_GetDuration(const mp4mux_trackinfo_t *t)
+{
+    return t->i_read_duration;
+}
+
+void mp4mux_track_ForceDuration(mp4mux_trackinfo_t *t, vlc_tick_t d)
+{
+    t->i_read_duration = d;
+}
+
+uint32_t mp4mux_track_GetID(const mp4mux_trackinfo_t *t)
+{
+    return t->i_track_id;
+}
+
+void mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *t,
+                                const uint8_t *p_data, size_t i_data)
+{
+    if(t->sample_priv.p_data)
+    {
+        free(t->sample_priv.p_data);
+        t->sample_priv.p_data = NULL;
+        t->sample_priv.i_data = 0;
+    }
+
+    if(p_data && i_data)
+    {
+        t->sample_priv.p_data = malloc(i_data);
+        if(i_data)
+        {
+            memcpy(t->sample_priv.p_data, p_data, i_data);
+            t->sample_priv.i_data = i_data;
+        }
+    }
+}
+
+bool mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *t)
+{
+    return t->sample_priv.i_data != 0;
 }
 
 void mp4mux_ShiftSamples(mp4mux_handle_t *h, int64_t offset)
@@ -495,13 +611,14 @@ static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
     return wave;
 }
 
-static bo_t *GetDec3Tag(es_format_t *p_fmt, block_t *a52_frame)
+static bo_t *GetDec3Tag(es_format_t *p_fmt,
+                        const uint8_t *p_data, size_t i_data)
 {
-    if (!a52_frame)
+    if (!i_data)
         return NULL;
 
     bs_t s;
-    bs_write_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
+    bs_init(&s, p_data, i_data);
     bs_skip(&s, 16); // syncword
 
     uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
@@ -596,7 +713,7 @@ static bo_t *GetDec3Tag(es_format_t *p_fmt, block_t *a52_frame)
         bsmod = bs_read(&s, 3);
 
     uint8_t mp4_eac3_header[5] = {0};
-    bs_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
+    bs_write_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
 
     int data_rate = p_fmt->i_bitrate / 1000;
     bs_write(&s, 13, data_rate);
@@ -617,9 +734,9 @@ static bo_t *GetDec3Tag(es_format_t *p_fmt, block_t *a52_frame)
     return dec3;
 }
 
-static bo_t *GetDac3Tag(block_t *a52_frame)
+static bo_t *GetDac3Tag(const uint8_t *p_data, size_t i_data)
 {
-    if (!a52_frame)
+    if (!i_data)
         return NULL;
 
     bo_t *dac3 = box_new("dac3");
@@ -627,7 +744,7 @@ static bo_t *GetDac3Tag(block_t *a52_frame)
         return NULL;
 
     bs_t s;
-    bs_init(&s, a52_frame->p_buffer, sizeof(a52_frame->i_buffer));
+    bs_init(&s, p_data, i_data);
 
     uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
 
@@ -650,7 +767,7 @@ static bo_t *GetDac3Tag(block_t *a52_frame)
     lfeon = bs_read1(&s);
 
     uint8_t mp4_a52_header[3];
-    bs_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
+    bs_write_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
 
     bs_write(&s, 2, fscod);
     bs_write(&s, 5, bsid);
@@ -1085,9 +1202,9 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
         else if (codec == VLC_CODEC_AMR_NB)
             box = GetDamrTag(&p_track->fmt);
         else if (codec == VLC_CODEC_A52)
-            box = GetDac3Tag(p_track->a52_frame);
+            box = GetDac3Tag(p_track->sample_priv.p_data, p_track->sample_priv.i_data);
         else if (codec == VLC_CODEC_EAC3)
-            box = GetDec3Tag(&p_track->fmt, p_track->a52_frame);
+            box = GetDec3Tag(&p_track->fmt, p_track->sample_priv.p_data, p_track->sample_priv.i_data);
         else if (codec == VLC_CODEC_WMAP)
             box = GetWaveFormatExTag(&p_track->fmt, "wfex");
         else
@@ -1990,6 +2107,11 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
                     // FIXME: find highest occurence
                     p_stream->i_trex_default_length = p_stream->samples[0].i_length;
                     p_stream->i_trex_default_size = p_stream->samples[0].i_size;
+                }
+                else
+                {
+                    p_stream->i_trex_default_length = 1;
+                    p_stream->i_trex_default_size = 1;
                 }
 
                 /* *** add /mvex/trex *** */

@@ -128,6 +128,7 @@ typedef struct mp4_fragqueue_t
 typedef struct
 {
     mp4mux_trackinfo_t *tinfo;
+    const es_format_t *p_fmt;
 
     /* index */
     vlc_tick_t   i_length_neg;
@@ -480,6 +481,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_ENOMEM;
     }
 
+    p_stream->p_fmt = p_input->p_fmt;
     p_stream->i_length_neg  = 0;
     p_stream->i_last_dts    = VLC_TICK_INVALID;
     p_stream->i_last_pts    = VLC_TICK_INVALID;
@@ -538,7 +540,8 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
     if(p_lastedit != NULL && b_fragmented)
         return true;
 
-    if(p_stream->tinfo->i_samples_count == 0)
+    const mp4mux_sample_t *p_lastsample = mp4mux_track_GetLastSample(p_stream->tinfo);
+    if(p_lastsample == NULL)
         return true;
 
     mp4mux_edit_t newedit;
@@ -564,8 +567,8 @@ static bool CreateCurrentEdit(mp4_stream_t *p_stream, vlc_tick_t i_mux_start_dts
             newedit.i_duration = p_stream->i_last_pts - p_stream->i_first_dts;
         else
             newedit.i_duration = p_stream->i_last_dts - p_stream->i_first_dts;
-        if(p_stream->tinfo->i_samples_count)
-            newedit.i_duration += p_stream->tinfo->samples[p_stream->tinfo->i_samples_count - 1].i_length;
+
+        newedit.i_duration += p_lastsample->i_length;
     }
 
     return mp4mux_track_AddEdit(p_stream->tinfo, &newedit);
@@ -577,7 +580,7 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
     if(unlikely(!p_block))
         return NULL;
 
-    switch(p_stream->tinfo->fmt.i_codec)
+    switch(p_stream->p_fmt->i_codec)
     {
         case VLC_CODEC_AV1:
             p_block = AV1_Pack_Sample(p_block);
@@ -591,8 +594,12 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
             break;
         case VLC_CODEC_A52:
         case VLC_CODEC_EAC3:
-            if (p_stream->tinfo->a52_frame == NULL && p_block->i_buffer >= 8)
-                p_stream->tinfo->a52_frame = block_Duplicate(p_block);
+            if(!mp4mux_track_HasSamplePriv(p_stream->tinfo) &&
+               p_block->i_buffer >= 8)
+            {
+                mp4mux_track_SetSamplePriv(p_stream->tinfo,
+                                           p_block->p_buffer, p_block->i_buffer);
+            }
             break;
         default:
             break;
@@ -615,7 +622,8 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
         return VLC_SUCCESS;
 
     /* Reset reference dts in case of discontinuity (ex: gather sout) */
-    if (p_data->i_flags & BLOCK_FLAG_DISCONTINUITY && p_stream->tinfo->i_samples_count)
+    if (p_data->i_flags & BLOCK_FLAG_DISCONTINUITY &&
+        mp4mux_track_GetLastSample(p_stream->tinfo) != NULL)
     {
         if(p_stream->i_first_dts != VLC_TICK_INVALID)
         {
@@ -641,7 +649,7 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             p_sys->i_start_dts = p_stream->i_first_dts;
     }
 
-    if (p_stream->tinfo->fmt.i_cat != SPU_ES)
+    if (p_stream->p_fmt->i_cat != SPU_ES)
     {
         /* Fix length of the sample */
         if (block_FifoCount(p_input->p_fifo) > 0)
@@ -649,29 +657,32 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
             block_t *p_next = block_FifoShow(p_input->p_fifo);
             if ( p_next->i_flags & BLOCK_FLAG_DISCONTINUITY )
             { /* we have no way to know real length except by decoding */
-                if ( p_stream->tinfo->fmt.i_cat == VIDEO_ES )
+                if ( p_stream->p_fmt->i_cat == VIDEO_ES )
                 {
                     p_data->i_length = vlc_tick_from_samples(
-                            p_stream->tinfo->fmt.video.i_frame_rate_base,
-                            p_stream->tinfo->fmt.video.i_frame_rate );
+                            p_stream->p_fmt->video.i_frame_rate_base,
+                            p_stream->p_fmt->video.i_frame_rate );
                     if( p_data->i_flags & BLOCK_FLAG_SINGLE_FIELD )
                         p_data->i_length >>= 1;
                     msg_Dbg( p_mux, "video track %u fixup to %"PRId64" for sample %u",
-                             p_stream->tinfo->i_track_id, p_data->i_length, p_stream->tinfo->i_samples_count );
+                             mp4mux_track_GetID(p_stream->tinfo), p_data->i_length,
+                             mp4mux_track_GetSampleCount(p_stream->tinfo) );
                 }
-                else if ( p_stream->tinfo->fmt.i_cat == AUDIO_ES &&
-                          p_stream->tinfo->fmt.audio.i_rate &&
+                else if ( p_stream->p_fmt->i_cat == AUDIO_ES &&
+                          p_stream->p_fmt->audio.i_rate &&
                           p_data->i_nb_samples )
                 {
                     p_data->i_length = vlc_tick_from_samples(p_data->i_nb_samples,
-                            p_stream->tinfo->fmt.audio.i_rate);
+                            p_stream->p_fmt->audio.i_rate);
                     msg_Dbg( p_mux, "audio track %u fixup to %"PRId64" for sample %u",
-                             p_stream->tinfo->i_track_id, p_data->i_length, p_stream->tinfo->i_samples_count );
+                             mp4mux_track_GetID(p_stream->tinfo), p_data->i_length,
+                             mp4mux_track_GetSampleCount(p_stream->tinfo) );
                 }
                 else if ( p_data->i_length <= 0 )
                 {
                     msg_Warn( p_mux, "unknown length for track %u sample %u",
-                              p_stream->tinfo->i_track_id, p_stream->tinfo->i_samples_count );
+                              mp4mux_track_GetID(p_stream->tinfo),
+                              mp4mux_track_GetSampleCount(p_stream->tinfo) );
                     p_data->i_length = 1;
                 }
             }
@@ -695,16 +706,17 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     }
     else /* SPU_ES */
     {
-        mp4mux_sample_t *p_lastsample = mp4mux_track_GetLastSample(p_stream->tinfo);
+        const mp4mux_sample_t *p_lastsample = mp4mux_track_GetLastSample(p_stream->tinfo);
         if (p_lastsample != NULL && p_lastsample->i_length == 0)
         {
+            mp4mux_sample_t updated = *p_lastsample;
             /* length of previous spu, stored in spu clearer */
             int64_t i_length = dts_fb_pts( p_data ) - p_stream->i_last_dts;
             if(i_length < 0)
                 i_length = 0;
             /* Fix entry */
-            p_lastsample->i_length = i_length;
-            p_stream->tinfo->i_read_duration += i_length;
+            updated.i_length = i_length;
+            mp4mux_track_UpdateLastSample(p_stream->tinfo, &updated);
         }
     }
 
@@ -719,18 +731,14 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     sample.i_size   = p_data->i_buffer;
 
     if ( p_data->i_dts != VLC_TICK_INVALID && p_data->i_pts > p_data->i_dts )
-    {
         sample.i_pts_dts = p_data->i_pts - p_data->i_dts;
-        if ( !p_stream->tinfo->b_hasbframes )
-            p_stream->tinfo->b_hasbframes = true;
-    }
-    else sample.i_pts_dts = 0;
+    else
+        sample.i_pts_dts = 0;
 
     sample.i_length = p_data->i_length;
     sample.i_flags  = p_data->i_flags;
 
     /* update */
-    p_stream->tinfo->i_read_duration += __MAX( 0, p_data->i_length );
     p_stream->i_last_dts = dts_fb_pts( p_data );
 
     /* write data */
@@ -741,12 +749,12 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     }
 
     /* Add SPU clearing tag (duration tb fixed on next SPU or stream end )*/
-    if ( p_stream->tinfo->fmt.i_cat == SPU_ES && sample.i_length > 0 )
+    if ( p_stream->p_fmt->i_cat == SPU_ES && sample.i_length > 0 )
     {
         block_t *p_empty = NULL;
-        if(p_stream->tinfo->fmt.i_codec == VLC_CODEC_SUBT||
-           p_stream->tinfo->fmt.i_codec == VLC_CODEC_QTXT||
-           p_stream->tinfo->fmt.i_codec == VLC_CODEC_TX3G)
+        if(p_stream->p_fmt->i_codec == VLC_CODEC_SUBT||
+           p_stream->p_fmt->i_codec == VLC_CODEC_QTXT||
+           p_stream->p_fmt->i_codec == VLC_CODEC_TX3G)
         {
             p_empty = block_Alloc(3);
             if(p_empty)
@@ -757,13 +765,13 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
                 p_empty->p_buffer[2] = ' ';
             }
         }
-        else if(p_stream->tinfo->fmt.i_codec == VLC_CODEC_TTML)
+        else if(p_stream->p_fmt->i_codec == VLC_CODEC_TTML)
         {
             p_empty = block_Alloc(40);
             if(p_empty)
                 memcpy(p_empty->p_buffer, "<tt><body><div><p></p></div></body></tt>", 40);
         }
-        else if(p_stream->tinfo->fmt.i_codec == VLC_CODEC_WEBVTT)
+        else if(p_stream->p_fmt->i_codec == VLC_CODEC_WEBVTT)
         {
             p_empty = block_Alloc(8);
             if(p_empty)
@@ -793,8 +801,8 @@ static int MuxStream(sout_mux_t *p_mux, sout_input_t *p_input, mp4_stream_t *p_s
     }
 
     /* Update the global segment/media duration */
-    if( p_stream->tinfo->i_read_duration > p_sys->i_read_duration )
-        p_sys->i_read_duration = p_stream->tinfo->i_read_duration;
+    if( mp4mux_track_GetDuration(p_stream->tinfo) > p_sys->i_read_duration )
+        p_sys->i_read_duration = mp4mux_track_GetDuration(p_stream->tinfo);
 
     return VLC_SUCCESS;
 }
@@ -970,13 +978,15 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
         {
             /* Current segment have all same duration value, different than trex's default */
             if (b_allsamelength &&
-                p_stream->read.p_first->p_block->i_length != p_stream->tinfo->i_trex_default_length &&
+                p_stream->read.p_first->p_block->i_length !=
+                    mp4mux_track_GetDefaultSampleDuration(p_stream->tinfo) &&
                 p_stream->read.p_first->p_block->i_length)
                     i_tfhd_flags |= MP4_TFHD_DFLT_SAMPLE_DURATION;
 
             /* Current segment have all same size value, different than trex's default */
             if (b_allsamesize &&
-                p_stream->read.p_first->p_block->i_buffer != p_stream->tinfo->i_trex_default_size &&
+                p_stream->read.p_first->p_block->i_buffer !=
+                    mp4mux_track_GetDefaultSampleSize(p_stream->tinfo) &&
                 p_stream->read.p_first->p_block->i_buffer)
                     i_tfhd_flags |= MP4_TFHD_DFLT_SAMPLE_SIZE;
         }
@@ -993,11 +1003,12 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
             bo_free(traf);
             continue;
         }
-        bo_add_32be(tfhd, p_stream->tinfo->i_track_id);
+        bo_add_32be(tfhd, mp4mux_track_GetID(p_stream->tinfo));
 
         /* set the local sample duration default */
         if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION)
-            bo_add_32be(tfhd, samples_from_vlc_tick(p_stream->read.p_first->p_block->i_length, p_stream->tinfo->i_timescale));
+            bo_add_32be(tfhd, samples_from_vlc_tick(p_stream->read.p_first->p_block->i_length,
+                                                    mp4mux_track_GetTimescale(p_stream->tinfo)));
 
         /* set the local sample size default */
         if (i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE)
@@ -1012,7 +1023,8 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
             bo_free(traf);
             continue;
         }
-        bo_add_64be(tfdt, samples_from_vlc_tick(p_stream->i_written_duration, p_stream->tinfo->i_timescale) );
+        bo_add_64be(tfdt, samples_from_vlc_tick(p_stream->i_written_duration,
+                                                mp4mux_track_GetTimescale(p_stream->tinfo)) );
         box_gather(traf, tfdt);
 
         /* *** add /moof/traf/trun *** */
@@ -1024,14 +1036,16 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                 i_trun_flags |= MP4_TRUN_FIRST_FLAGS;
 
             if (!b_allsamelength ||
-                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION) && p_stream->tinfo->i_trex_default_length == 0 ))
+                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_DURATION) &&
+                    mp4mux_track_GetDefaultSampleDuration(p_stream->tinfo) == 0 ))
                 i_trun_flags |= MP4_TRUN_SAMPLE_DURATION;
 
             if (!b_allsamesize ||
-                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE) && p_stream->tinfo->i_trex_default_size == 0 ))
+                ( !(i_tfhd_flags & MP4_TFHD_DFLT_SAMPLE_SIZE) &&
+                  mp4mux_track_GetDefaultSampleSize(p_stream->tinfo) == 0 ))
                 i_trun_flags |= MP4_TRUN_SAMPLE_SIZE;
 
-            if (p_stream->tinfo->b_hasbframes)
+            if (mp4mux_track_HasBFrames(p_stream->tinfo))
                 i_trun_flags |= MP4_TRUN_SAMPLE_TIME_OFFSET;
 
             if (i_fixupoffset == 0)
@@ -1072,7 +1086,8 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                 DEQUEUE_ENTRY(p_stream->read, p_entry);
 
                 if (i_trun_flags & MP4_TRUN_SAMPLE_DURATION)
-                    bo_add_32be(trun, samples_from_vlc_tick(p_entry->p_block->i_length, p_stream->tinfo->i_timescale)); // sample duration
+                    bo_add_32be(trun, samples_from_vlc_tick(p_entry->p_block->i_length,
+                                                            mp4mux_track_GetTimescale(p_stream->tinfo))); // sample duration
 
                 if (i_trun_flags & MP4_TRUN_SAMPLE_SIZE)
                     bo_add_32be(trun, p_entry->p_block->i_buffer); // sample size
@@ -1085,7 +1100,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
                     {
                         i_diff = p_entry->p_block->i_pts - p_entry->p_block->i_dts;
                     }
-                    bo_add_32be(trun, samples_from_vlc_tick(i_diff, p_stream->tinfo->i_timescale)); // ctts
+                    bo_add_32be(trun, samples_from_vlc_tick(i_diff, mp4mux_track_GetTimescale(p_stream->tinfo))); // ctts
                 }
 
                 *pi_mdat_total_size += p_entry->p_block->i_buffer;
@@ -1096,7 +1111,7 @@ static bo_t *GetMoofBox(sout_mux_t *p_mux, size_t *pi_mdat_total_size,
 
                 /* Add keyframe entry if needed */
                 if (p_stream->b_hasiframes && (p_entry->p_block->i_flags & BLOCK_FLAG_TYPE_I) &&
-                    (p_stream->tinfo->fmt.i_cat == VIDEO_ES || p_stream->tinfo->fmt.i_cat == AUDIO_ES))
+                    (p_stream->p_fmt->i_cat == VIDEO_ES || p_stream->p_fmt->i_cat == AUDIO_ES))
                 {
                     AddKeyframeEntry(p_stream, i_write_pos, i_trak, i_sample, i_time);
                 }
@@ -1179,7 +1194,7 @@ static bo_t *GetMfraBox(sout_mux_t *p_mux)
         {
             bo_t *tfra = box_full_new("tfra", 0, 0x0);
             if (!tfra) continue;
-            bo_add_32be(tfra, p_stream->tinfo->i_track_id);
+            bo_add_32be(tfra, mp4mux_track_GetID(p_stream->tinfo));
             bo_add_32be(tfra, 0x3); // reserved + lengths (1,1,4)=>(0,0,3)
             bo_add_32be(tfra, p_stream->i_indexentries);
             for(uint32_t i_index=0; i_index<p_stream->i_indexentries; i_index++)
@@ -1259,8 +1274,8 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
             /* set a barrier so we try to align to keyframe */
             if (p_stream->b_hasiframes &&
                     p_stream->i_last_iframe_time > p_stream->i_written_duration &&
-                    (p_stream->tinfo->fmt.i_cat == VIDEO_ES ||
-                     p_stream->tinfo->fmt.i_cat == AUDIO_ES) )
+                    (p_stream->p_fmt->i_cat == VIDEO_ES ||
+                     p_stream->p_fmt->i_cat == AUDIO_ES) )
             {
                 i_barrier_time = __MIN(i_barrier_time, p_stream->i_last_iframe_time);
             }
@@ -1301,27 +1316,30 @@ static void WriteFragments(sout_mux_t *p_mux, bool b_flush)
  * This is the end boundary case. */
 static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, block_t *p_entrydata)
 {
-    if ( p_stream->tinfo->fmt.i_cat == VIDEO_ES && p_stream->tinfo->fmt.video.i_frame_rate )
+    if ( p_stream->p_fmt->i_cat == VIDEO_ES && p_stream->p_fmt->video.i_frame_rate )
     {
         p_entrydata->i_length = vlc_tick_from_samples(
-                p_stream->tinfo->fmt.video.i_frame_rate_base,
-                p_stream->tinfo->fmt.video.i_frame_rate);
+                p_stream->p_fmt->video.i_frame_rate_base,
+                p_stream->p_fmt->video.i_frame_rate);
         msg_Dbg(p_mux, "video track %d fixup to %"PRId64" for sample %u",
-                p_stream->tinfo->i_track_id, p_entrydata->i_length, p_stream->tinfo->i_samples_count - 1);
+                mp4mux_track_GetID(p_stream->tinfo), p_entrydata->i_length,
+                mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
     }
-    else if (p_stream->tinfo->fmt.i_cat == AUDIO_ES &&
-             p_stream->tinfo->fmt.audio.i_rate &&
-             p_entrydata->i_nb_samples && p_stream->tinfo->fmt.audio.i_rate)
+    else if (p_stream->p_fmt->i_cat == AUDIO_ES &&
+             p_stream->p_fmt->audio.i_rate &&
+             p_entrydata->i_nb_samples && p_stream->p_fmt->audio.i_rate)
     {
         p_entrydata->i_length = vlc_tick_from_samples(p_entrydata->i_nb_samples,
-                p_stream->tinfo->fmt.audio.i_rate);
+                p_stream->p_fmt->audio.i_rate);
         msg_Dbg(p_mux, "audio track %d fixup to %"PRId64" for sample %u",
-                p_stream->tinfo->i_track_id, p_entrydata->i_length, p_stream->tinfo->i_samples_count - 1);
+                mp4mux_track_GetID(p_stream->tinfo), p_entrydata->i_length,
+                mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
     }
     else
     {
         msg_Warn(p_mux, "unknown length for track %d sample %u",
-                 p_stream->tinfo->i_track_id, p_stream->tinfo->i_samples_count - 1);
+                 mp4mux_track_GetID(p_stream->tinfo),
+                 mp4mux_track_GetSampleCount(p_stream->tinfo) - 1);
         p_entrydata->i_length = 1;
     }
 }
@@ -1447,15 +1465,17 @@ static int MuxFrag(sout_mux_t *p_mux)
         p_stream->p_held_entry = NULL;
 
         if (p_stream->b_hasiframes && (p_heldblock->i_flags & BLOCK_FLAG_TYPE_I) &&
-            p_stream->tinfo->i_read_duration - p_sys->i_written_duration < FRAGMENT_LENGTH)
+            mp4mux_track_GetDuration(p_stream->tinfo) - p_sys->i_written_duration < FRAGMENT_LENGTH)
         {
             /* Flag the last iframe time, we'll use it as boundary so it will start
                next fragment */
-            p_stream->i_last_iframe_time = p_stream->tinfo->i_read_duration;
+            p_stream->i_last_iframe_time = mp4mux_track_GetDuration(p_stream->tinfo);
         }
 
         /* update buffered time */
-        p_stream->tinfo->i_read_duration += __MAX(0, p_heldblock->i_length);
+        mp4mux_track_ForceDuration(p_stream->tinfo,
+                                 mp4mux_track_GetDuration(p_stream->tinfo) +
+                                 __MAX(0, p_heldblock->i_length));
     }
 
 
@@ -1468,26 +1488,27 @@ static int MuxFrag(sout_mux_t *p_mux)
     p_stream->p_held_entry->i_run    = p_stream->i_current_run;
     p_stream->p_held_entry->p_next   = NULL;
 
-    if (p_stream->tinfo->fmt.i_cat == VIDEO_ES )
+    if (p_stream->p_fmt->i_cat == VIDEO_ES )
     {
         if (!p_stream->b_hasiframes && (p_currentblock->i_flags & BLOCK_FLAG_TYPE_I))
             p_stream->b_hasiframes = true;
 
-        if (!p_stream->tinfo->b_hasbframes && p_currentblock->i_dts != VLC_TICK_INVALID &&
+        if (!mp4mux_track_HasBFrames(p_stream->tinfo) &&
+            p_currentblock->i_dts != VLC_TICK_INVALID &&
             p_currentblock->i_pts > p_currentblock->i_dts)
-            p_stream->tinfo->b_hasbframes = true;
+                mp4mux_track_SetHasBFrames(p_stream->tinfo);
     }
 
     /* Update the global fragment/media duration */
-    vlc_tick_t i_min_read_duration = p_stream->tinfo->i_read_duration;
+    vlc_tick_t i_min_read_duration = mp4mux_track_GetDuration(p_stream->tinfo);
     vlc_tick_t i_min_written_duration = p_stream->i_written_duration;
     for (unsigned int i=0; i<p_sys->i_nb_streams; i++)
     {
         const mp4_stream_t *p_s = p_sys->pp_streams[i];
-        if (p_s->tinfo->fmt.i_cat != VIDEO_ES && p_s->tinfo->fmt.i_cat != AUDIO_ES)
+        if (p_s->p_fmt->i_cat != VIDEO_ES && p_s->p_fmt->i_cat != AUDIO_ES)
             continue;
-        if (p_s->tinfo->i_read_duration < i_min_read_duration)
-            i_min_read_duration = p_s->tinfo->i_read_duration;
+        if (mp4mux_track_GetDuration(p_s->tinfo) < i_min_read_duration)
+            i_min_read_duration = mp4mux_track_GetDuration(p_s->tinfo);
 
         if (p_s->i_written_duration < i_min_written_duration)
             i_min_written_duration = p_s->i_written_duration;

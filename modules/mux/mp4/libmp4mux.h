@@ -25,52 +25,7 @@
 #include <vlc_boxes.h>
 
 typedef struct mp4mux_handle_t mp4mux_handle_t;
-
-typedef struct
-{
-    uint64_t i_pos;
-    int      i_size;
-
-    vlc_tick_t  i_pts_dts;
-    vlc_tick_t  i_length;
-    unsigned int i_flags;
-} mp4mux_sample_t;
-
-typedef struct
-{
-    vlc_tick_t i_duration;
-    vlc_tick_t i_start_time;
-    vlc_tick_t i_start_offset;
-} mp4mux_edit_t;
-
-typedef struct
-{
-    unsigned i_track_id;
-    es_format_t   fmt;
-
-    /* index */
-    unsigned int i_samples_count;
-    unsigned int i_samples_max;
-    mp4mux_sample_t *samples;
-
-    /* XXX: needed for other codecs too, see lavf */
-    block_t      *a52_frame;
-
-    /* stats */
-    vlc_tick_t   i_read_duration;
-    uint32_t     i_timescale;
-    vlc_tick_t   i_firstdts; /* the really first packet */
-    bool         b_hasbframes;
-
-    /* frags */
-    vlc_tick_t   i_trex_default_length;
-    uint32_t     i_trex_default_size;
-
-    /* edit list */
-    unsigned int i_edits_count;
-    mp4mux_edit_t *p_edits;
-
-} mp4mux_trackinfo_t;
+typedef struct mp4mux_trackinfo_t mp4mux_trackinfo_t;
 
 enum mp4mux_options
 {
@@ -86,16 +41,46 @@ bool mp4mux_Is(mp4mux_handle_t *, enum mp4mux_options);
 
 mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *, unsigned id,
                                       const es_format_t *fmt, uint32_t timescale);
+/* Track properties */
+uint32_t   mp4mux_track_GetID(const mp4mux_trackinfo_t *);
+uint32_t   mp4mux_track_GetTimescale(const mp4mux_trackinfo_t *);
+vlc_tick_t mp4mux_track_GetDuration(const mp4mux_trackinfo_t *);
+void       mp4mux_track_ForceDuration(mp4mux_trackinfo_t *, vlc_tick_t); /* Used by frag */
+bool       mp4mux_track_HasBFrames(const mp4mux_trackinfo_t *);
+void       mp4mux_track_SetHasBFrames(mp4mux_trackinfo_t *);
+void       mp4mux_track_SetSamplePriv(mp4mux_trackinfo_t *, const uint8_t *, size_t);
+bool       mp4mux_track_HasSamplePriv(const mp4mux_trackinfo_t *);
+vlc_tick_t mp4mux_track_GetDefaultSampleDuration(const mp4mux_trackinfo_t *);
+uint32_t   mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *);
+
 /* ELST */
-bool mp4mux_track_AddEdit(mp4mux_trackinfo_t *, const mp4mux_edit_t *);
+typedef struct
+{
+    vlc_tick_t i_duration;
+    vlc_tick_t i_start_time;
+    vlc_tick_t i_start_offset;
+} mp4mux_edit_t;
+bool  mp4mux_track_AddEdit(mp4mux_trackinfo_t *, const mp4mux_edit_t *);
 const mp4mux_edit_t *mp4mux_track_GetLastEdit(const mp4mux_trackinfo_t *);
-void mp4mux_track_DebugEdits(vlc_object_t *, const mp4mux_trackinfo_t *);
+void  mp4mux_track_DebugEdits(vlc_object_t *, const mp4mux_trackinfo_t *);
+
 /* Samples */
-bool mp4mux_track_AddSample(mp4mux_trackinfo_t *, const mp4mux_sample_t *);
-mp4mux_sample_t *mp4mux_track_GetLastSample(mp4mux_trackinfo_t *);
+typedef struct
+{
+    uint64_t i_pos;
+    int      i_size;
+
+    vlc_tick_t  i_pts_dts;
+    vlc_tick_t  i_length;
+    unsigned int i_flags;
+} mp4mux_sample_t;
+bool       mp4mux_track_AddSample(mp4mux_trackinfo_t *, const mp4mux_sample_t *);
+const      mp4mux_sample_t *mp4mux_track_GetLastSample(const mp4mux_trackinfo_t *);
+unsigned   mp4mux_track_GetSampleCount(const mp4mux_trackinfo_t *);
+void       mp4mux_track_UpdateLastSample(mp4mux_trackinfo_t *, const mp4mux_sample_t *);
 
 bo_t *mp4mux_GetMoov(mp4mux_handle_t *, vlc_object_t *, vlc_tick_t i_movie_duration);
-void mp4mux_ShiftSamples(mp4mux_handle_t *, int64_t offset);
+void  mp4mux_ShiftSamples(mp4mux_handle_t *, int64_t offset);
 
 /* old */
 
