@@ -114,7 +114,7 @@ static const char * const trc_text[] = {
     "Pure power gamma 2.2",
     "Pure power gamma 2.8",
     "ProPhoto RGB (ROMM)",
-    "ITU-R BT.2100 PQ (perceptual quantizer), aka SMPTE ST2048",
+    "ITU-R BT.2100 PQ (perceptual quantizer), aka SMPTE ST2084",
     "ITU-R BT.2100 HLG (hybrid log-gamma), aka ARIB STD-B67",
     "Panasonic V-Log (VARICAM)",
     "Sony S-Log1",
