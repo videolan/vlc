@@ -33,6 +33,8 @@
 void *picture_Allocate(int *restrict fdp, size_t size)
 {
     int fd = vlc_memfd();
+    if (fd == -1)
+        return NULL;
 
     if (ftruncate(fd, size)) {
 error:
