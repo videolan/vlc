@@ -297,9 +297,13 @@ block_t * ForgedInitSegment::buildMoovBox()
     block_t *moov = box->b;
     free(box);
 
-    vlc_fourcc_t extra[] = {MAJOR_isom, VLC_FOURCC('p','i','f','f'), VLC_FOURCC('i','s','o','2'), VLC_FOURCC('s','m','o','o')};
-    box = mp4mux_GetFtyp(VLC_FOURCC('i','s','m','l'), 1, extra, ARRAY_SIZE(extra));
+    mp4mux_SetBrand(muxh, VLC_FOURCC('i','s','m','l'), 0x01);
+    mp4mux_AddExtraBrand(muxh, MAJOR_isom);
+    mp4mux_AddExtraBrand(muxh, VLC_FOURCC('p','i','f','f'));
+    mp4mux_AddExtraBrand(muxh, VLC_FOURCC('i','s','o','2'));
+    mp4mux_AddExtraBrand(muxh, VLC_FOURCC('s','m','o','o'));
 
+    box = mp4mux_GetFtyp(muxh);
     if(box)
     {
         block_ChainAppend(&box->b, moov);

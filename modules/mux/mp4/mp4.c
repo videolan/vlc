@@ -186,19 +186,10 @@ static int WriteSlowStartHeader(sout_mux_t *p_mux)
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     bo_t *box;
 
-    if (!mp4mux_Is(p_sys->muxh, QUICKTIME)) {
+    if (!mp4mux_Is(p_sys->muxh, QUICKTIME))
+    {
         /* Now add ftyp header */
-        if(p_sys->b_3gp)
-        {
-            vlc_fourcc_t extra[] = {MAJOR_3gp4, MAJOR_avc1};
-            box = mp4mux_GetFtyp(MAJOR_3gp6, 0, extra, ARRAY_SIZE(extra));
-        }
-        else
-        {
-            vlc_fourcc_t extra[] = {MAJOR_mp41, MAJOR_avc1};
-            box = mp4mux_GetFtyp(MAJOR_isom, 0, extra, ARRAY_SIZE(extra));
-        }
-
+        box = mp4mux_GetFtyp(p_sys->muxh);
         if(!box)
             return VLC_ENOMEM;
 
@@ -264,6 +255,19 @@ static int Open(vlc_object_t *p_this)
     p_mux->pf_addstream = AddStream;
     p_mux->pf_delstream = DelStream;
     p_mux->pf_mux       = (options & FRAGMENTED) ? MuxFrag : Mux;
+
+    if(p_sys->b_3gp)
+    {
+        mp4mux_SetBrand(p_sys->muxh, MAJOR_3gp6, 0x0);
+        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_3gp4);
+        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_avc1);
+    }
+    else
+    {
+        mp4mux_SetBrand(p_sys->muxh, MAJOR_isom, 0x0);
+        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_mp41);
+        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_avc1);
+    }
 
     return VLC_SUCCESS;
 }
@@ -1230,7 +1234,7 @@ static void FlushHeader(sout_mux_t *p_mux)
         mp4mux_Set64BitExt(p_sys->muxh);
 
     /* Now add ftyp header */
-    bo_t *ftyp = mp4mux_GetFtyp(MAJOR_isom, 0, NULL, 0);
+    bo_t *ftyp = mp4mux_GetFtyp(p_sys->muxh);
     if(!ftyp)
         return;
 

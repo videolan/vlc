@@ -38,6 +38,8 @@ mp4mux_handle_t * mp4mux_New(enum mp4mux_options);
 void mp4mux_Delete(mp4mux_handle_t *);
 void mp4mux_Set64BitExt(mp4mux_handle_t *);
 bool mp4mux_Is(mp4mux_handle_t *, enum mp4mux_options);
+void mp4mux_SetBrand(mp4mux_handle_t *, vlc_fourcc_t, uint32_t);
+void mp4mux_AddExtraBrand(mp4mux_handle_t *, vlc_fourcc_t);
 
 mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *, unsigned id,
                                       const es_format_t *fmt, uint32_t timescale);
@@ -79,6 +81,7 @@ const      mp4mux_sample_t *mp4mux_track_GetLastSample(const mp4mux_trackinfo_t 
 unsigned   mp4mux_track_GetSampleCount(const mp4mux_trackinfo_t *);
 void       mp4mux_track_UpdateLastSample(mp4mux_trackinfo_t *, const mp4mux_sample_t *);
 
+bo_t *mp4mux_GetFtyp(const mp4mux_handle_t *);
 bo_t *mp4mux_GetMoov(mp4mux_handle_t *, vlc_object_t *, vlc_tick_t i_movie_duration);
 void  mp4mux_ShiftSamples(mp4mux_handle_t *, int64_t offset);
 
@@ -90,5 +93,4 @@ void  box_fix     (bo_t *box, uint32_t);
 void  box_gather  (bo_t *box, bo_t *box2);
 
 bool mp4mux_CanMux(vlc_object_t *, const es_format_t *, vlc_fourcc_t, bool);
-bo_t *mp4mux_GetFtyp(vlc_fourcc_t, uint32_t, vlc_fourcc_t[], size_t i_fourcc);
 

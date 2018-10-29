@@ -75,6 +75,12 @@ struct mp4mux_handle_t
 {
     unsigned options;
     vlc_array_t tracks;
+    struct
+    {
+        vlc_fourcc_t i_major;
+        uint32_t     i_minor;
+        DECL_ARRAY(vlc_fourcc_t) extra;
+    } brands;
 };
 
 static bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
@@ -272,6 +278,9 @@ mp4mux_handle_t * mp4mux_New(enum mp4mux_options options)
 {
     mp4mux_handle_t *h = malloc(sizeof(*h));
     vlc_array_init(&h->tracks);
+    ARRAY_INIT(h->brands.extra);
+    h->brands.i_major = 0;
+    h->brands.i_minor = 0;
     h->options = options;
     return h;
 }
@@ -285,6 +294,7 @@ void mp4mux_Delete(mp4mux_handle_t *h)
         free(t);
     }
     vlc_array_clear(&h->tracks);
+    ARRAY_RESET(h->brands.extra);
     free(h);
 }
 
@@ -301,6 +311,21 @@ void mp4mux_Set64BitExt(mp4mux_handle_t *h)
 bool mp4mux_Is(mp4mux_handle_t *h, enum mp4mux_options o)
 {
     return h->options & o;
+}
+
+void mp4mux_SetBrand(mp4mux_handle_t *h, vlc_fourcc_t i_major, uint32_t i_minor)
+{
+    h->brands.i_major = i_major;
+    h->brands.i_minor = i_minor;
+    mp4mux_AddExtraBrand(h, i_major);
+}
+
+void mp4mux_AddExtraBrand(mp4mux_handle_t *h, vlc_fourcc_t b)
+{
+    for(int i=0; i<h->brands.extra.i_size; i++)
+        if(h->brands.extra.p_elems[i] == b)
+            return;
+    ARRAY_APPEND(h->brands.extra, b);
 }
 
 bo_t *box_new(const char *fcc)
@@ -2132,15 +2157,15 @@ bo_t * mp4mux_GetMoov(mp4mux_handle_t *h, vlc_object_t *p_obj, vlc_tick_t i_dura
     return moov;
 }
 
-bo_t *mp4mux_GetFtyp(vlc_fourcc_t major, uint32_t minor, vlc_fourcc_t extra[], size_t i_fourcc)
+bo_t *mp4mux_GetFtyp(const mp4mux_handle_t *h)
 {
     bo_t *box = box_new("ftyp");
     if(box)
     {
-        bo_add_fourcc(box, &major);
-        bo_add_32be  (box, minor);
-        for(size_t i=0; i<i_fourcc; i++)
-            bo_add_fourcc(box, &extra[i]);
+        bo_add_fourcc(box, &h->brands.i_major);
+        bo_add_32be  (box, h->brands.i_minor);
+        for(int i=0; i<h->brands.extra.i_size; i++)
+            bo_add_fourcc(box, &h->brands.extra.p_elems[i]);
         if(!box->b)
         {
             free(box);
