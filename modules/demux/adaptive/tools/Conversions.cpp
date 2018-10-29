@@ -149,21 +149,26 @@ UTCTime::UTCTime(const std::string &str)
             }
         }
 
-        struct tm tm;
+        if (!in.fail() && !in.bad()) {
+            struct tm tm;
 
-        tm.tm_year = values[UTCTIME_YEAR] - 1900;
-        tm.tm_mon = values[UTCTIME_MON] - 1;
-        tm.tm_mday = values[UTCTIME_DAY];
-        tm.tm_hour = values[UTCTIME_HOUR];
-        tm.tm_min = values[UTCTIME_MIN];
-        tm.tm_sec = values[UTCTIME_SEC];
-        tm.tm_isdst = 0;
+            tm.tm_year = values[UTCTIME_YEAR] - 1900;
+            tm.tm_mon = values[UTCTIME_MON] - 1;
+            tm.tm_mday = values[UTCTIME_DAY];
+            tm.tm_hour = values[UTCTIME_HOUR];
+            tm.tm_min = values[UTCTIME_MIN];
+            tm.tm_sec = values[UTCTIME_SEC];
+            tm.tm_isdst = 0;
 
-        t = timegm( &tm );
-        t += values[UTCTIME_TZ] * 60;
-        t *= 1000;
-        t += values[UTCTIME_MSEC];
-        t *= CLOCK_FREQ / 1000;
+            int64_t mst = timegm( &tm );
+            mst += values[UTCTIME_TZ] * 60;
+            mst *= 1000;
+            mst += values[UTCTIME_MSEC];
+            t = mst * 1000;
+        } else {
+            // Failure parsing time string
+            t = 0;
+        }
     } catch(int) {
         t = 0;
     }
