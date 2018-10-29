@@ -219,6 +219,8 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     struct wl_surface *surface = sys->embed->handle.wl;
     struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
 
+    picture_Hold(pic);
+
     wl_buffer_set_user_data(buf, pic);
     wl_surface_attach(surface, buf, 0, 0);
     wl_surface_damage(surface, 0, 0,
