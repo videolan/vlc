@@ -83,6 +83,37 @@ struct mp4mux_handle_t
     } brands;
 };
 
+static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t *fmt)
+{
+    switch(fmt->i_codec)
+    {
+        case VLC_CODEC_H264:
+            mp4mux_AddExtraBrand(h, MAJOR_avc1);
+            break;
+        case VLC_CODEC_HEVC:
+            mp4mux_AddExtraBrand(h, MAJOR_hevc);
+            break;
+        case VLC_CODEC_AV1:
+            mp4mux_AddExtraBrand(h, VLC_FOURCC('a','v','0','1'));
+            mp4mux_AddExtraBrand(h, VLC_FOURCC('i','s','o','6'));
+            break;
+        case VLC_CODEC_MP4V:
+        case VLC_CODEC_DIV1:
+        case VLC_CODEC_DIV2:
+        case VLC_CODEC_DIV3:
+        case VLC_CODEC_H263:
+            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            break;
+        case VLC_CODEC_MP4A:
+            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            if(vlc_array_count(&h->tracks) == 1)
+                mp4mux_AddExtraBrand(h, MAJOR_M4A);
+            break;
+        default:
+            break;
+    }
+}
+
 static bool mp4mux_trackinfo_Init(mp4mux_trackinfo_t *p_stream, unsigned i_id,
                                   uint32_t i_timescale)
 {
@@ -117,6 +148,7 @@ mp4mux_trackinfo_t * mp4mux_track_Add(mp4mux_handle_t *h, unsigned id,
     es_format_Init(&t->fmt, fmt->i_cat, fmt->i_codec);
     es_format_Copy(&t->fmt, fmt);
     vlc_array_append(&h->tracks, t);
+    mp4mux_AddExtraBrandForFormat(h, fmt);
     return t;
 }
 

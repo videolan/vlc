@@ -260,13 +260,10 @@ static int Open(vlc_object_t *p_this)
     {
         mp4mux_SetBrand(p_sys->muxh, MAJOR_3gp6, 0x0);
         mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_3gp4);
-        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_avc1);
     }
     else
     {
         mp4mux_SetBrand(p_sys->muxh, MAJOR_isom, 0x0);
-        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_mp41);
-        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_avc1);
     }
 
     return VLC_SUCCESS;
