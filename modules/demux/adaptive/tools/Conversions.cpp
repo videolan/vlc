@@ -169,7 +169,7 @@ UTCTime::UTCTime(const std::string &str)
             // Failure parsing time string
             t = 0;
         }
-    } catch(int) {
+    } catch(...) {
         t = 0;
     }
 }

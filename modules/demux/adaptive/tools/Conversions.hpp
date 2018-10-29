@@ -57,7 +57,7 @@ template<typename T> class Integer
                 in >> value;
                 if (in.fail() || in.bad())
                     value = 0;
-            } catch (int) {
+            } catch (...) {
                 value = 0;
             }
         }
