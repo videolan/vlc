@@ -3,6 +3,7 @@ Changes between 3.0.4 and 3.0.5:
 
 Access:
  * Improve RTSP playback
+ * bluray fixes and improvements
 
 Demux:
  * MP4: Fix reading some HDR metadata
