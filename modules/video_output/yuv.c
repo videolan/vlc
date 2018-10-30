@@ -95,6 +95,7 @@ struct vout_display_sys_t {
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     /* Allocate instance and initialize some members */
@@ -149,12 +150,12 @@ static int Open(vlc_object_t *object)
 
     /* */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
     fmt.i_chroma = chroma;
     video_format_FixRgb(&fmt);
 
     /* */
-    vd->fmt     = fmt;
+    *fmtp = fmt;
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
