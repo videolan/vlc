@@ -25,4 +25,14 @@
 
 @implementation VLCSourceListItem
 
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _sdtype = -1; // No SD type set
+    }
+
+    return self;
+}
+
 @end
