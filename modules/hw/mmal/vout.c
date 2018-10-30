@@ -183,6 +183,7 @@ static void maintain_phase_sync(vout_display_t *vd);
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys;
     uint32_t buffer_pitch, buffer_height;
     vout_display_place_t place;
@@ -202,7 +203,7 @@ static int Open(vlc_object_t *object)
     sys->layer = var_InheritInteger(vd, MMAL_LAYER_NAME);
     bcm_host_init();
 
-    sys->opaque = vd->fmt.i_chroma == VLC_CODEC_MMAL_OPAQUE;
+    sys->opaque = fmt->i_chroma == VLC_CODEC_MMAL_OPAQUE;
 
     status = mmal_component_create(MMAL_COMPONENT_DEFAULT_VIDEO_RENDERER, &sys->component);
     if (status != MMAL_SUCCESS) {
@@ -230,19 +231,19 @@ static int Open(vlc_object_t *object)
         sys->buffer_size = sys->input->buffer_size_recommended;
     } else {
         sys->input->format->encoding = MMAL_ENCODING_I420;
-        vd->fmt.i_chroma = VLC_CODEC_I420;
-        buffer_pitch = align(vd->fmt.i_width, 32);
-        buffer_height = align(vd->fmt.i_height, 16);
+        fmt->i_chroma = VLC_CODEC_I420;
+        buffer_pitch = align(fmt->i_width, 32);
+        buffer_height = align(fmt->i_height, 16);
         sys->i_planes = 3;
         sys->buffer_size = 3 * buffer_pitch * buffer_height / 2;
     }
 
-    sys->input->format->es->video.width = vd->fmt.i_width;
-    sys->input->format->es->video.height = vd->fmt.i_height;
+    sys->input->format->es->video.width = fmt->i_width;
+    sys->input->format->es->video.height = fmt->i_height;
     sys->input->format->es->video.crop.x = 0;
     sys->input->format->es->video.crop.y = 0;
-    sys->input->format->es->video.crop.width = vd->fmt.i_width;
-    sys->input->format->es->video.crop.height = vd->fmt.i_height;
+    sys->input->format->es->video.crop.width = fmt->i_width;
+    sys->input->format->es->video.crop.height = fmt->i_height;
     sys->input->format->es->video.par.num = vd->source.i_sar_num;
     sys->input->format->es->video.par.den = vd->source.i_sar_den;
 
@@ -259,10 +260,10 @@ static int Open(vlc_object_t *object)
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
     display_region.fullscreen = MMAL_FALSE;
-    display_region.src_rect.x = vd->fmt.i_x_offset;
-    display_region.src_rect.y = vd->fmt.i_y_offset;
-    display_region.src_rect.width = vd->fmt.i_visible_width;
-    display_region.src_rect.height = vd->fmt.i_visible_height;
+    display_region.src_rect.x = fmt->i_x_offset;
+    display_region.src_rect.y = fmt->i_y_offset;
+    display_region.src_rect.width = fmt->i_visible_width;
+    display_region.src_rect.height = fmt->i_visible_height;
     display_region.dest_rect.x = place.x;
     display_region.dest_rect.y = place.y;
     display_region.dest_rect.width = place.width;
@@ -281,8 +282,8 @@ static int Open(vlc_object_t *object)
     for (i = 0; i < sys->i_planes; ++i) {
         sys->planes[i].i_lines = buffer_height;
         sys->planes[i].i_pitch = buffer_pitch;
-        sys->planes[i].i_visible_lines = vd->fmt.i_visible_height;
-        sys->planes[i].i_visible_pitch = vd->fmt.i_visible_width;
+        sys->planes[i].i_visible_lines = fmt->i_visible_height;
+        sys->planes[i].i_visible_pitch = fmt->i_visible_width;
 
         if (i > 0) {
             sys->planes[i].i_lines /= 2;
@@ -785,8 +786,8 @@ static void adjust_refresh_rate(vout_display_t *vd, const video_format_t *fmt)
                                 mode->scan_mode == HDMI_INTERLACED)
                     continue;
             } else {
-                if (mode->width != vd->fmt.i_visible_width ||
-                        mode->height != vd->fmt.i_visible_height)
+                if (mode->width != fmt->i_visible_width ||
+                        mode->height != fmt->i_visible_height)
                     continue;
                 if (mode->scan_mode != sys->b_progressive ? HDMI_NONINTERLACED : HDMI_INTERLACED)
                     continue;
