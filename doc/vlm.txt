@@ -6,14 +6,14 @@ streams with only one VLC.
 I - Interfaces
  1) Telnet interface
     You can launch it as a common interface.
-    Default port is 4212, default password is "admin". These are common
+    The default port is 4212, the default password is "admin". These are common
     options of the interface, so you can modify them as you wish.
     Once you are connected on telnet interface, just type a command
     line.
 
  2) HTTP interface
     You can launch it as a common interface
-    Default port is 8080.
+    The default port is 8080.
     Access it from http://127.0.0.1:8080/vlm.html
 
 II - VLM Elements
@@ -21,7 +21,7 @@ II - VLM Elements
     A media is composed with a list of inputs (the videos and audios you
     want to stream), an output (where you want to stream them), and some
     options.
-    There are two types of medias: vod and broadcast.
+    There are two types of media: vod and broadcast.
     A vod media is commonly used for Video on Demand. It can be launched
     only if a vod client asks for it.
     A broadcast media is very close to a TV program, or channel: it is
@@ -38,7 +38,7 @@ III - Command line syntax:
 Note: an element is a media or a schedule.
  1) Command lines:
     help
-        Displays an exhaustive commmand lines list.
+        Displays an exhaustive command lines list.
 
     new (name) vod|broadcast|schedule [properties]
         Creates a new element. You must specify if it as a vod media, a
@@ -55,13 +55,13 @@ Note: an element is a media or a schedule.
         "show (name)" displays all information about the (name) element.
         "show media" displays a summary of medias states.
         "show schedule" displays a summary of schedules states.
-        "show" is a the same as "show media show schedule".
+        "show" is same as "show media show schedule".
     del (name)|all|media|schedule
         Destroys an element, or a group of elements. If the element is
         at a non-stop state, it stops it (media or schedule).
         "del (name)" destroys the (name) element.
         "del all" destroys all elements.
-        "del media" destroys all medias.
+        "del media" destroys all media.
         "del schedule" destroys all schedules.
     control (name) [instance_name] (command)
         Changes the state of the (instance_name) instance of (name) media.
@@ -167,7 +167,7 @@ IV - The configuration file
   example, if you put a "load pouet" in a pouet file, and you launch the
   "load pouet" command, then pouet will be loaded endlessly, and VLC
   will crash (at least).
-  The load command converts the medias and schedules configurations into
+  The load command converts the media and schedules configurations into
   command lines, and writes them into a file.
   Any line where the first non white space character is a '#' is considered
   as a comment.
