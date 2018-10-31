@@ -68,8 +68,8 @@ Release HOWTO
  * Mirrors
   - Forwarn the mirror admins (optional for any minor release)
   - Go to https://get.videolan.org/<path-to-the-file>?mirrorlist
-  - Ensures there is enough mirrors able to serve the file in each region
-    or just wait few more hours before doing the release.
+  - Ensures there are enough mirrors able to serve the file in each region
+    or just wait a few more hours before doing the release.
     Suggested number of mirrors:
         - > 70% for a minor release
         - > 80% for a major release
