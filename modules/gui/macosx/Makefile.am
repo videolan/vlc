@@ -674,6 +674,18 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/sidebar-icons/sidebar-playlist@2x.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-podcast.png \
 	gui/macosx/Resources/sidebar-icons/sidebar-podcast@2x.png \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-local.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-movie.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-music.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-pictures.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-playlist.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/dark/mv-dark-sidebar-podcast.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-local.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-movie.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-music.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-pictures.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-playlist.pdf \
+	gui/macosx/Resources/sidebar-icons_mojave/light/mv-sidebar-podcast.pdf \
 	gui/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-local.png \
 	gui/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-local@2x.png \
 	gui/macosx/Resources/sidebar-icons_yosemite/ys-sidebar-movie.png \

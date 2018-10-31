@@ -305,12 +305,20 @@ static const float f_min_window_height = 307.;
     if (o_sidebaritems)
         isAReload = YES;
 
+    BOOL darkMode = NO;
+    if (@available(macOS 10.14, *)) {
+        NSApplication *app = [NSApplication sharedApplication];
+        if ([app.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
+            darkMode = YES;
+        }
+    }
+
     o_sidebaritems = [[NSMutableArray alloc] init];
     SideBarItem *libraryItem = [SideBarItem itemWithTitle:_NS("LIBRARY") identifier:@"library"];
     SideBarItem *playlistItem = [SideBarItem itemWithTitle:_NS("Playlist") identifier:@"playlist"];
-    [playlistItem setIcon: imageFromRes(@"sidebar-playlist")];
+    [playlistItem setIcon: sidebarImageFromRes(@"sidebar-playlist", darkMode)];
     SideBarItem *medialibraryItem = [SideBarItem itemWithTitle:_NS("Media Library") identifier:@"medialibrary"];
-    [medialibraryItem setIcon: imageFromRes(@"sidebar-playlist")];
+    [medialibraryItem setIcon: sidebarImageFromRes(@"sidebar-playlist", darkMode)];
     SideBarItem *mycompItem = [SideBarItem itemWithTitle:_NS("MY COMPUTER") identifier:@"mycomputer"];
     SideBarItem *devicesItem = [SideBarItem itemWithTitle:_NS("DEVICES") identifier:@"devices"];
     SideBarItem *lanItem = [SideBarItem itemWithTitle:_NS("LOCAL NETWORK") identifier:@"localnetwork"];
@@ -334,27 +342,27 @@ static const float f_min_window_height = 307.;
         switch (*p_category) {
             case SD_CAT_INTERNET:
                 [internetItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[internetItems lastObject] setIcon: imageFromRes(@"sidebar-podcast")];
+                [[internetItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-podcast", darkMode)];
                 [[internetItems lastObject] setSdtype: SD_CAT_INTERNET];
                 break;
             case SD_CAT_DEVICES:
                 [devicesItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[devicesItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
+                [[devicesItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-local", darkMode)];
                 [[devicesItems lastObject] setSdtype: SD_CAT_DEVICES];
                 break;
             case SD_CAT_LAN:
                 [lanItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
-                [[lanItems lastObject] setIcon: imageFromRes(@"sidebar-local")];
+                [[lanItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-local", darkMode)];
                 [[lanItems lastObject] setSdtype: SD_CAT_LAN];
                 break;
             case SD_CAT_MYCOMPUTER:
                 [mycompItems addObject: [SideBarItem itemWithTitle: _NS(*ppsz_longname) identifier: o_identifier]];
                 if (!strncmp(*ppsz_name, "video_dir", 9))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-movie")];
+                    [[mycompItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-movie", darkMode)];
                 else if (!strncmp(*ppsz_name, "audio_dir", 9))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-music")];
+                    [[mycompItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-music", darkMode)];
                 else if (!strncmp(*ppsz_name, "picture_dir", 11))
-                    [[mycompItems lastObject] setIcon: imageFromRes(@"sidebar-pictures")];
+                    [[mycompItems lastObject] setIcon: sidebarImageFromRes(@"sidebar-pictures", darkMode)];
                 else
                     [[mycompItems lastObject] setIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
                 [[mycompItems lastObject] setSdtype: SD_CAT_MYCOMPUTER];
@@ -757,6 +765,7 @@ static const float f_min_window_height = 307.;
         } else {
             [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
         }
+        [self reloadSidebar];
     }
 }
 
