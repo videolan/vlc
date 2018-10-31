@@ -779,25 +779,26 @@ static block_t * filter_earlydropped_blocks( decoder_t *p_dec, block_t *block )
     return block;
 }
 
-static void interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
+static vlc_tick_t interpolate_next_pts( decoder_t *p_dec, AVFrame *frame )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     AVCodecContext *p_context = p_sys->p_context;
 
     if( p_sys->pts.i_divider_num == 0 ||
         date_Get( &p_sys->pts ) == VLC_TICK_INVALID )
-        return;
+        return VLC_TICK_INVALID;
 
     int i_tick = p_context->ticks_per_frame;
     if( i_tick <= 0 )
         i_tick = 1;
 
     /* interpolate the next PTS */
-    date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
+    return date_Increment( &p_sys->pts, i_tick + frame->repeat_pict );
 }
 
 static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
-                                     vlc_tick_t current_time, vlc_tick_t i_pts, int64_t i_fnum )
+                                     vlc_tick_t current_time, vlc_tick_t i_pts,
+                                     vlc_tick_t i_next_pts, int64_t i_fnum )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
    /* Update frame late count (except when doing preroll) */
@@ -805,7 +806,10 @@ static void update_late_frame_count( decoder_t *p_dec, block_t *p_block,
    if( !p_block || !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
        i_display_date = decoder_GetDisplayDate( p_dec, i_pts );
 
-   if( i_display_date != VLC_TICK_INVALID && i_display_date <= current_time )
+   vlc_tick_t i_threshold = i_next_pts != VLC_TICK_INVALID
+                          ? (i_next_pts - i_pts) / 2 : VLC_TICK_FROM_MS(20);
+
+   if( i_display_date != VLC_TICK_INVALID && i_display_date + i_threshold <= current_time )
    {
        /* Out of preroll, consider only late frames on rising delay */
        if( p_sys->b_from_preroll )
@@ -1188,9 +1192,10 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         if( i_pts != VLC_TICK_INVALID )
             date_Set( &p_sys->pts, i_pts );
 
-        interpolate_next_pts( p_dec, frame );
+        const vlc_tick_t i_next_pts = interpolate_next_pts(p_dec, frame);
 
-        update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts, frame->reordered_opaque);
+        update_late_frame_count( p_dec, p_block, vlc_tick_now(), i_pts,
+                                 i_next_pts, frame->reordered_opaque);
 
         if( !p_frame_info->b_display ||
            ( !p_sys->p_va && !frame->linesize[0] ) ||
