@@ -2714,8 +2714,9 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         {
             EsOutDrainDecoder( out, es );
             EsOutDestroyDecoder( out, es );
-            EsOutCreateDecoder( out, es );
         }
+
+        EsOutCreateDecoder( out, es );
 
         return VLC_SUCCESS;
     }
