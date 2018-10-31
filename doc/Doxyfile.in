@@ -41,7 +41,7 @@ PROJECT_NAME           = VLC
 PROJECT_NUMBER         = @VERSION@
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
-# for a project that appears at the top of each page and should give viewer a
+# for a project that appears at the top of each page and should give the viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
 PROJECT_BRIEF          =
@@ -64,7 +64,7 @@ OUTPUT_DIRECTORY       = doxygen
 # directories (in 2 levels) under the output directory of each output format and
 # will distribute the generated files over these directories. Enabling this
 # option can be useful when feeding doxygen a huge amount of source files, where
-# putting all generated files in the same directory would otherwise causes
+# putting all generated files in the same directory would otherwise cause
 # performance problems for the file system.
 # The default value is: NO.
 
@@ -194,7 +194,7 @@ QT_AUTOBRIEF           = NO
 # tag to YES if you prefer the old behavior instead.
 #
 # Note that setting this tag to YES also means that rational rose comments are
-# not recognized any more.
+# not recognized anymore.
 # The default value is: NO.
 
 MULTILINE_CPP_IS_BRIEF = NO
@@ -224,7 +224,7 @@ TAB_SIZE               = 4
 # For example adding
 # "sideeffect=@par Side Effects:\n"
 # will allow you to put the command \sideeffect (or @sideeffect) in the
-# documentation, which will result in a user-defined paragraph with heading
+# documentation, which will result in a user-defined paragraph with the heading
 # "Side Effects:". You can put \n's in the value part of an alias to insert
 # newlines.
 
@@ -271,12 +271,12 @@ OPTIMIZE_OUTPUT_VHDL   = NO
 # language is one of the parsers supported by doxygen: IDL, Java, Javascript,
 # C#, C, C++, D, PHP, Objective-C, Python, Fortran (fixed format Fortran:
 # FortranFixed, free formatted Fortran: FortranFree, unknown formatted Fortran:
-# Fortran. In the later case the parser tries to guess whether the code is fixed
+# Fortran. In the latter case the parser tries to guess whether the code is fixed
 # or free formatted code, this is the default for Fortran type files), VHDL. For
 # instance to make doxygen treat .inc files as Fortran files (default is PHP),
 # and .f files as C (default is Fortran), use: inc=Fortran f=C.
 #
-# Note: For files without extension you can use no_extension as a placeholder.
+# Note: For files without an extension you can use no_extension as a placeholder.
 #
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
@@ -305,7 +305,7 @@ AUTOLINK_SUPPORT       = YES
 # to include (a tag file for) the STL sources as input, then you should set this
 # tag to YES in order to let doxygen match functions declarations and
 # definitions whose arguments contain STL classes (e.g. func(std::string);
-# versus func(std::string) {}). This also make the inheritance and collaboration
+# versus func(std::string) {}). This also makes the inheritance and collaboration
 # diagrams that involve STL classes more complete and accurate.
 # The default value is: NO.
 
@@ -417,7 +417,7 @@ EXTRACT_ALL            = YES
 
 EXTRACT_PRIVATE        = NO
 
-# If the EXTRACT_PACKAGE tag is set to YES, all members with package or internal
+# If the EXTRACT_PACKAGE tag is set to YES, all members with the package or internal
 # scope will be included in the documentation.
 # The default value is: NO.
 
@@ -447,7 +447,7 @@ EXTRACT_LOCAL_METHODS  = NO
 
 # If this flag is set to YES, the members of anonymous namespaces will be
 # extracted and appear in the documentation as a namespace called
-# 'anonymous_namespace{file}', where file will be replaced with the base name of
+# 'anonymous_namespace{file}', where the file will be replaced with the base name of
 # the file that contains the anonymous namespace. By default anonymous namespace
 # are hidden.
 # The default value is: NO.
@@ -659,7 +659,7 @@ SHOW_NAMESPACES        = YES
 # The FILE_VERSION_FILTER tag can be used to specify a program or script that
 # doxygen should invoke to get the current version for each file (typically from
 # the version control system). Doxygen will invoke the program by executing (via
-# popen()) the command command input-file, where command is the value of the
+# popen()) the command input-file, where command is the value of the
 # FILE_VERSION_FILTER tag, and input-file is the name of an input file provided
 # by doxygen. Whatever the program writes to standard output is used as the file
 # version. For an example see the documentation.
@@ -1172,7 +1172,7 @@ HTML_DYNAMIC_SECTIONS  = NO
 # such a level that at most the specified number of entries are visible (unless
 # a fully collapsed tree already exceeds this amount). So setting the number of
 # entries 1 will produce a full collapsed tree by default. 0 is a special value
-# representing an infinite number of entries and will result in a full expanded
+# representing an infinite number of entries and will result in a fully expanded
 # tree by default.
 # Minimum value: 0, maximum value: 9999, default value: 100.
 # This tag requires that the tag GENERATE_HTML is set to YES.
@@ -1238,7 +1238,6 @@ DOCSET_PUBLISHER_NAME  = VideoLAN
 # compressed HTML files.
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
-
 GENERATE_HTMLHELP      = NO
 
 # The CHM_FILE tag can be used to specify the file name of the resulting .chm
@@ -1632,7 +1631,6 @@ PAPER_TYPE             = a4wide
 # EXTRA_PACKAGES=times
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
-
 EXTRA_PACKAGES         =
 
 # The LATEX_HEADER tag can be used to specify a personal LaTeX header for the
@@ -1771,7 +1769,7 @@ COMPACT_RTF            = NO
 
 RTF_HYPERLINKS         = NO
 
-# Load stylesheet definitions from file. Syntax is similar to doxygen's config
+# Load stylesheet definitions from file. The syntax is similar to doxygen's config
 # file, i.e. a series of assignments. You only have to provide replacements,
 # missing definitions are set to their default value.
 #
@@ -1781,7 +1779,7 @@ RTF_HYPERLINKS         = NO
 
 RTF_STYLESHEET_FILE    =
 
-# Set optional variables used in the generation of an RTF document. Syntax is
+# Set optional variables used in the generation of an RTF document. The syntax is
 # similar to doxygen's config file. A template extensions file can be generated
 # using doxygen -e rtf extensionFile.
 # This tag requires that the tag GENERATE_RTF is set to YES.
