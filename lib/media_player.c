@@ -592,6 +592,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
     var_Create (mp, "sout", VLC_VAR_STRING);
     var_Create (mp, "demux-filter", VLC_VAR_STRING);
+    var_Create (mp, "input-record-path", VLC_VAR_STRING|VLC_VAR_DOINHERIT);
     var_Create (mp, "http-cookies", VLC_VAR_ADDRESS);
 
     /* Video */
@@ -2188,6 +2189,25 @@ int libvlc_media_player_get_role(libvlc_media_player_t *mp)
 
     free(str);
     return ret;
+}
+
+int libvlc_media_player_record( libvlc_media_player_t *p_mi,
+                                bool enable,
+                                const char *path)
+{
+    vlc_player_t *player = p_mi->player;
+    vlc_player_Lock(player);
+
+    vlc_value_t val = { .psz_string = (char *)path };
+
+    if(enable)
+        var_Set(p_mi, "input-record-path", val);
+
+    vlc_player_SetRecordingEnabled(player, enable);
+
+    vlc_player_Unlock(player);
+
+    return VLC_SUCCESS;
 }
 
 #include <vlc_vout_display.h>

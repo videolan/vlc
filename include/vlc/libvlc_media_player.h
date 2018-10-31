@@ -2629,6 +2629,19 @@ LIBVLC_API int libvlc_media_player_get_role(libvlc_media_player_t *p_mi);
  */
 LIBVLC_API int libvlc_media_player_set_role(libvlc_media_player_t *p_mi,
                                             unsigned role);
+/**
+ * Start/stop recording
+ *
+ * \version LibVLC 4.0.0 and later.
+ *
+ * \param p_mi media player
+ * \param enable true to start recording, false to stop
+ * \param path the path of the recording directory
+ * \return 0 on success, -1 on error
+ */
+LIBVLC_API int libvlc_media_player_record(libvlc_media_player_t *p_mi,
+                                          bool enable,
+                                          const char *path);
 
 /** @} audio */
 
