@@ -4,10 +4,12 @@ vout_LTLIBRARIES =
 EXTRA_DIST += video_output/README
 
 OPENGL_COMMONSOURCES = video_output/opengl/vout_helper.c \
-	video_output/placebo_utils.c video_output/placebo_utils.h \
 	video_output/opengl/vout_helper.h video_output/opengl/converter.h \
 	video_output/opengl/internal.h video_output/opengl/fragment_shaders.c \
 	video_output/opengl/converter_sw.c
+if HAVE_LIBPLACEBO
+OPENGL_COMMONSOURCES += video_output/placebo_utils.c video_output/placebo_utils.h
+endif
 
 OPENGL_COMMONCFLAGS = $(LIBPLACEBO_CFLAGS)
 OPENGL_COMMONLIBS = $(LIBPLACEBO_LIBS)
