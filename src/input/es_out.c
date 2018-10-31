@@ -2702,7 +2702,8 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         es_out_id_t *es = va_arg( args, es_out_id_t * );
         es_format_t *p_fmt = va_arg( args, es_format_t * );
         if( es == NULL || es->fmt.i_cat != p_fmt->i_cat
-         || es->fmt.i_id != p_fmt->i_id )
+         || es->fmt.i_id != p_fmt->i_id
+         || es->fmt.i_group != p_fmt->i_group )
             return VLC_EGENERIC;
 
         es_format_Clean( &es->fmt );
