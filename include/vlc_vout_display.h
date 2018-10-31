@@ -375,10 +375,6 @@ static inline bool vout_display_cfg_IsWindowed(const vout_display_cfg_t *cfg)
 {
     return cfg->window->type != VOUT_WINDOW_TYPE_DUMMY;
 }
-static inline bool vout_display_IsWindowed(vout_display_t *vd)
-{
-    return vout_display_cfg_IsWindowed(vd->cfg);
-}
 
 /**
  * Computes the default display size given the source and
