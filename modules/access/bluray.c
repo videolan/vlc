@@ -587,6 +587,7 @@ static es_out_id_t * blurayCreateBackgroundUnlocked(demux_t *p_demux)
     p += fmt.video.i_width * fmt.video.i_height;
     memset(p, 0x80, fmt.video.i_width * fmt.video.i_height / 2);
 
+    es_out_Control(p_demux->out, ES_OUT_SET_ES, p_sys->bdj.p_dummy_video);
     es_out_Send(p_demux->out, p_sys->bdj.p_dummy_video, p_block);
 
     es_out_Control( p_demux->out, ES_OUT_VOUT_SET_MOUSE_EVENT,
