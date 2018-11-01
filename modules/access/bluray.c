@@ -1303,13 +1303,9 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             msg_Info(p_demux, "Reusing ES %d", p_fmt->i_id);
             p_pair->b_recyling = false;
             p_es = p_pair->p_es;
-            if(!es_format_IsSimilar(&fmt, &p_pair->fmt) ||
-               fmt.b_packetized != p_pair->fmt.b_packetized)
-            {
-                es_out_Control(esout_priv->p_dst_out, ES_OUT_SET_ES_FMT, p_pair->p_es, &fmt);
-                es_format_Clean(&p_pair->fmt);
-                es_format_Copy(&p_pair->fmt, &fmt);
-            }
+            es_out_Control(esout_priv->p_dst_out, ES_OUT_SET_ES_FMT, p_pair->p_es, &fmt);
+            es_format_Clean(&p_pair->fmt);
+            es_format_Copy(&p_pair->fmt, &fmt);
         }
         if (b_select)
             es_out_Control(p_demux->out, ES_OUT_SET_ES, p_es);
