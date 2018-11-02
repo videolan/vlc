@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Spill SVCD-film"
 ${LangFileString} Action_OnArrivalVideoFiles "Spill videofiler"
 ${LangFileString} Action_OnArrivalMusicFiles "Spill lydfiler"
 ${LangFileString} Action_OnArrivalDVDAudio "Spill lyd-DVDer"
+${LangFileString} Action_OnArrivalBluray "Spill av Blu-ray"
+
 ${LangFileString} License_NextText "Du er nå klar over rettighetene dine.  Trykk «Neste» for å fortsette."
 
 ${LangFileString} Detail_CheckProcesses "Sjekker prosesser…"
