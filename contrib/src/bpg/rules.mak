@@ -1,5 +1,5 @@
 # BPG
-BPG_VERSION := 0.9.7
+BPG_VERSION := 0.9.8
 BPG_URL := http://bellard.org/bpg/libbpg-$(BPG_VERSION).tar.gz
 
 # default disabled
