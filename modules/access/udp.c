@@ -81,6 +81,7 @@ typedef struct
     int fd;
     int timeout;
     size_t mtu;
+    block_t *overflow_block;
 } access_sys_t;
 
 /*****************************************************************************
@@ -102,6 +103,15 @@ static int Open( vlc_object_t *p_this )
 
     sys = vlc_obj_malloc( p_this, sizeof( *sys ) );
     if( unlikely( sys == NULL ) )
+        return VLC_ENOMEM;
+
+    sys->mtu = 7 * 188;
+
+    /* Overflow can be max theoretical datagram content less anticipated MTU,
+     *  IPv6 headers are larger than IPv4, ignore IPv6 jumbograms
+     */
+    sys->overflow_block = block_Alloc(65507 - sys->mtu);
+    if( unlikely( sys->overflow_block == NULL ) )
         return VLC_ENOMEM;
 
     p_access->p_sys = sys;
@@ -168,8 +178,6 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    sys->mtu = 7 * 188;
-
     sys->timeout = var_InheritInteger( p_access, "udp-timeout");
     if( sys->timeout > 0)
         sys->timeout *= 1000;
@@ -184,6 +192,8 @@ static void Close( vlc_object_t *p_this )
 {
     stream_t     *p_access = (stream_t*)p_this;
     access_sys_t *sys = p_access->p_sys;
+    if( sys->overflow_block )
+        block_Release( sys->overflow_block );
 
     net_Close( sys->fd );
 }
@@ -231,20 +241,17 @@ static block_t *BlockUDP(stream_t *access, bool *restrict eof)
         return NULL;
     }
 
-#ifdef __linux__
-    const int trunc_flag = MSG_TRUNC;
-#else
-    const int trunc_flag = 0;
-#endif
 
-    struct iovec iov = {
+    struct iovec iov[] = {{
         .iov_base = pkt->p_buffer,
         .iov_len = sys->mtu,
-    };
+    },{
+        .iov_base = sys->overflow_block->p_buffer,
+        .iov_len = sys->overflow_block->i_buffer,
+    }};
     struct msghdr msg = {
-        .msg_iov = &iov,
-        .msg_iovlen = 1,
-        .msg_flags = trunc_flag,
+        .msg_iov = iov,
+        .msg_iovlen = 2,
     };
 
     struct pollfd ufd[1];
@@ -262,7 +269,7 @@ static block_t *BlockUDP(stream_t *access, bool *restrict eof)
             goto skip;
      }
 
-    ssize_t len = recvmsg(sys->fd, &msg, trunc_flag);
+    ssize_t len = recvmsg(sys->fd, &msg, 0);
 
     if (len < 0)
     {
@@ -271,11 +278,22 @@ skip:
         return NULL;
     }
 
-    if (msg.msg_flags & trunc_flag)
+    /* Received more than mtu amount,
+     * we should gather blocks and increase mtu
+     * and allocate new overflow block.  See Open()
+     */
+    if (unlikely(len > sys->mtu))
     {
-        msg_Err(access, "%zd bytes packet truncated (MTU was %zu)",
+        msg_Warn(access, "%zd bytes packet received (MTU was %zu), adjusting mtu",
                 len, sys->mtu);
-        pkt->i_flags |= BLOCK_FLAG_CORRUPTED;
+        block_t *gather_block = sys->overflow_block;
+
+        sys->overflow_block = block_Alloc(65507 - len);
+
+        gather_block->i_buffer = len - sys->mtu;
+        pkt->p_next = gather_block;
+        pkt = block_ChainGather( pkt );
+
         sys->mtu = len;
     }
     else
