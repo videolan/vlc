@@ -13,6 +13,7 @@ $Id$
  * access_output_file: File access_output module
  * access_output_http: HTTP Network access module
  * access_output_livehttp: Live HTTP stream output
+ * access_output_rist: RIST (Reliable Internet Stream Transport) access_output module
  * access_output_shout: Shoutcast access output
  * access_output_srt: SRT (Secure Reliable Transport) access_output module
  * access_output_udp: UDP Network access_output module
