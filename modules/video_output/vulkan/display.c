@@ -71,6 +71,7 @@ struct vout_display_sys_t
     struct pl_dither_params dither;
     struct pl_render_params params;
     struct pl_color_space target;
+    enum pl_chroma_location yuv_chroma_loc;
     int dither_depth;
 };
 
@@ -93,6 +94,7 @@ static void UpdateParams(vout_display_t *);
 static int Open(vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *) obj;
+    video_format_t *fmt = &vd->fmt;
     vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(obj, 1, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -115,22 +117,24 @@ static int Open(vlc_object_t *obj)
 
     // Attempt using the input format as the display format
     if (vlc_placebo_FormatSupported(gpu, vd->source.i_chroma)) {
-        vd->fmt.i_chroma = vd->source.i_chroma;
+        fmt->i_chroma = vd->source.i_chroma;
     } else {
         const vlc_fourcc_t *fcc;
         for (fcc = vlc_fourcc_GetFallback(vd->source.i_chroma); *fcc; fcc++) {
             if (vlc_placebo_FormatSupported(gpu, *fcc)) {
-                vd->fmt.i_chroma = *fcc;
+                fmt->i_chroma = *fcc;
                 break;
             }
         }
 
-        if (!vd->fmt.i_chroma) {
-            vd->fmt.i_chroma = VLC_CODEC_RGBA;
+        if (!fmt->i_chroma) {
+            fmt->i_chroma = VLC_CODEC_RGBA;
             msg_Warn(vd, "Failed picking any suitable input format, falling "
                      "back to RGBA for sanity!");
         }
     }
+    sys->yuv_chroma_loc = vlc_fourcc_IsYUV(fmt->i_chroma) ?
+                          vlc_placebo_ChromaLoc(fmt) : PL_CHROMA_UNKNOWN;
 
     // Hard-coded list of supported subtitle chromas (non-planar only!)
     static const vlc_fourcc_t subfmts[] = {
@@ -352,8 +356,8 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         .num_planes = pic->i_planes,
         .width      = pic->format.i_visible_width,
         .height     = pic->format.i_visible_height,
-        .color      = vlc_placebo_ColorSpace(&vd->fmt),
-        .repr       = vlc_placebo_ColorRepr(&vd->fmt),
+        .color      = vlc_placebo_ColorSpace(&vd->source),
+        .repr       = vlc_placebo_ColorRepr(&vd->source),
         .src_rect = {
             .x0 = pic->format.i_x_offset,
             .y0 = pic->format.i_y_offset,
@@ -379,10 +383,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic,
         }
 
         // Matches only the chroma planes, never luma or alpha
-        if (vlc_fourcc_IsYUV(vd->fmt.i_chroma) && i != 0 && i != 3) {
-            enum pl_chroma_location loc = vlc_placebo_ChromaLoc(&vd->fmt);
-            pl_chroma_location_offset(loc, &plane->shift_x, &plane->shift_y);
-        }
+        if (sys->yuv_chroma_loc != PL_CHROMA_UNKNOWN && i != 0 && i != 3)
+            pl_chroma_location_offset(sys->yuv_chroma_loc, &plane->shift_x,
+                                      &plane->shift_y);
     }
 
     // If this was a mapped buffer, mark it as in use by the GPU
@@ -521,16 +524,13 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     case VOUT_DISPLAY_CHANGE_ZOOM: {
         vout_display_cfg_t cfg = *va_arg (ap, const vout_display_cfg_t *);
         vout_display_PlacePicture(&sys->place, &vd->source, &cfg, false);
         return VLC_SUCCESS;
     }
-
-    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
-    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        vout_display_PlacePicture(&sys->place, &vd->source, vd->cfg, false);
-        return VLC_SUCCESS;
 
     default:
         msg_Err (vd, "Unknown request %d", query);
