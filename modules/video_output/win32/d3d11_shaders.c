@@ -354,7 +354,22 @@ HRESULT D3D11_CompilePixelShader(vlc_object_t *o, d3d11_handle_t *hd3d, bool leg
     }
 
     if (display->colorspace->primaries != primaries)
-        psz_primaries_transform = "return max(mul(rgb, Primaries), 0)";
+    {
+        switch (primaries)
+        {
+        case COLOR_PRIMARIES_BT601_525:
+        case COLOR_PRIMARIES_BT601_625:
+        case COLOR_PRIMARIES_BT709:
+        case COLOR_PRIMARIES_BT2020:
+        case COLOR_PRIMARIES_DCI_P3:
+        case COLOR_PRIMARIES_FCC1953:
+            psz_primaries_transform = "return max(mul(rgb, Primaries), 0)";
+            break;
+        default:
+            /* see STANDARD_PRIMARIES */
+            msg_Warn(o, "unhandled color primaries %d", primaries);
+        }
+    }
 
     int range_adjust = 0;
     if (display->colorspace->b_full_range) {
