@@ -298,6 +298,9 @@ static int Open( vlc_object_t *p_this )
         .i_visible_height = height,
         .i_sar_num = 1,
         .i_sar_den = 1,
+        .transfer = TRANSFER_FUNC_SRGB,
+        .primaries = COLOR_PRIMARIES_SRGB,
+        .space = COLOR_SPACE_SRGB,
     };
     p_sys->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
     if( p_sys->p_vout == NULL )
