@@ -198,6 +198,8 @@ modules/access/oss.c
 modules/access/pulse.c
 modules/access/qtsound.m
 modules/access/rdp.c
+modules/access/rist.h
+modules/access/rist.c
 modules/access/rtp/rtp.c
 modules/access/samba.c
 modules/access/satip.c

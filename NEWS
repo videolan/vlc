@@ -29,6 +29,7 @@ Codecs:
 
 Access:
  * Enable SMB2 / SMB3 support on mobile ports with libsmb2
+ * Added support for the RIST (Reliable Internet Stream Transport) Protocol
 
 Video output:
  * Remove aa plugin
