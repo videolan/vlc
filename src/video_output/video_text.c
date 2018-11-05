@@ -144,11 +144,9 @@ void vout_OSDText(vout_thread_t *vout, int channel,
     vout_PutSubpicture(vout, subpic);
 }
 
-void vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
+void vout_OSDMessageVa(vout_thread_t *vout, int channel,
+                       const char *format, va_list args)
 {
-    va_list args;
-    va_start(args, format);
-
     char *string;
     if (vasprintf(&string, format, args) != -1) {
         vout_OSDText(vout, channel,
@@ -156,6 +154,4 @@ void vout_OSDMessage(vout_thread_t *vout, int channel, const char *format, ...)
                      string);
         free(string);
     }
-    va_end(args);
 }
-

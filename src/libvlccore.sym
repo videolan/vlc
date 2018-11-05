@@ -737,7 +737,7 @@ vout_RegisterSubpictureChannel
 vout_FlushSubpictureChannel
 vout_GetSnapshot
 vout_OSDIcon
-vout_OSDMessage
+vout_OSDMessageVa
 vout_OSDEpg
 vout_OSDSlider
 vout_OSDText
