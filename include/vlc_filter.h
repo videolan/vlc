@@ -36,8 +36,6 @@
  * Filter modules interface
  */
 
-typedef struct filter_owner_sys_t filter_owner_sys_t;
-
 struct filter_video_callbacks
 {
     picture_t *(*buffer_new)(filter_t *);
