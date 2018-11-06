@@ -149,10 +149,11 @@ ifdef HAVE_ANDROID
 # vpx configure.sh overrides our sysroot and it looks for it itself, and
 # uses that path to look for the compiler (which we already know)
 VPX_CONF += --sdk-path=$(shell dirname $(shell which $(HOST)-clang))
-# broken text relocations
-ifneq ($(filter i386 x86_64,$(ARCH)),)
-VPX_CONF += --disable-mmx
 endif
+
+ifneq ($(filter i386 x86_64,$(ARCH)),)
+# broken text relocations or invalid register for .seh_savexmm with gcc8
+VPX_CONF += --disable-mmx
 endif
 
 ifndef WITH_OPTIMIZATION
