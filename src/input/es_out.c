@@ -2744,6 +2744,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         if( ret != VLC_SUCCESS )
             return ret;
         EsOutFillEsFmt( out, &es->fmt );
+        EsOutUpdateEsLanguageTitle(es, &es->fmt);
 
         if( es->p_dec )
         {
