@@ -433,6 +433,7 @@ EXTRA_LTLIBRARIES += libaccess_srt_plugin.la
 
 librist_plugin_la_SOURCES = access/rist.c access/rist.h
 librist_plugin_la_CFLAGS = $(AM_CFLAGS) $(BITSTREAM_CFLAGS)
+librist_plugin_la_LIBADD = $(SOCKET_LIBS)
 if HAVE_BITSTREAM
 access_LTLIBRARIES += librist_plugin.la
 endif
