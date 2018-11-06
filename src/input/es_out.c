@@ -2730,6 +2730,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         int ret = es_format_Copy( &es->fmt, p_fmt );
         if( ret != VLC_SUCCESS )
             return ret;
+        EsOutFillEsFmt( out, &es->fmt );
 
         if( es->p_dec )
         {
