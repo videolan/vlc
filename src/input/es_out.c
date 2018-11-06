@@ -1559,6 +1559,64 @@ static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
                (p_sys->p_pgrm && p_sys->p_pgrm->p_meta) ? p_sys->p_pgrm->p_meta : NULL );
 }
 
+static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
+{
+    es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
+    input_thread_t    *p_input = p_sys->p_input;
+
+    switch( fmt->i_cat )
+    {
+    case AUDIO_ES:
+    {
+        fmt->i_codec = vlc_fourcc_GetCodecAudio( fmt->i_codec,
+                                                 fmt->audio.i_bitspersample );
+        audio_replay_gain_t rg;
+        memset( &rg, 0, sizeof(rg) );
+        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
+        vlc_audio_replay_gain_MergeFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
+        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
+
+        for( int i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
+        {
+            if( !fmt->audio_replay_gain.pb_peak[i] )
+            {
+                fmt->audio_replay_gain.pb_peak[i] = rg.pb_peak[i];
+                fmt->audio_replay_gain.pf_peak[i] = rg.pf_peak[i];
+            }
+            if( !fmt->audio_replay_gain.pb_gain[i] )
+            {
+                fmt->audio_replay_gain.pb_gain[i] = rg.pb_gain[i];
+                fmt->audio_replay_gain.pf_gain[i] = rg.pf_gain[i];
+            }
+        }
+        break;
+    }
+
+    case VIDEO_ES:
+        fmt->i_codec = vlc_fourcc_GetCodec( fmt->i_cat, fmt->i_codec );
+
+        if( !fmt->video.i_visible_width || !fmt->video.i_visible_height )
+        {
+            fmt->video.i_visible_width = fmt->video.i_width;
+            fmt->video.i_visible_height = fmt->video.i_height;
+        }
+
+        if( fmt->video.i_frame_rate && fmt->video.i_frame_rate_base )
+            vlc_ureduce( &fmt->video.i_frame_rate,
+                         &fmt->video.i_frame_rate_base,
+                         fmt->video.i_frame_rate,
+                         fmt->video.i_frame_rate_base, 0 );
+        break;
+
+    case SPU_ES:
+        fmt->i_codec = vlc_fourcc_GetCodec( fmt->i_cat, fmt->i_codec );
+        break;
+
+    default:
+        break;
+    }
+}
+
 static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
                                          es_out_id_t *p_master )
 {
@@ -1573,7 +1631,6 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
 
     es_out_id_t   *es = malloc( sizeof( *es ) );
     es_out_pgrm_t *p_pgrm;
-    int i;
 
     if( !es )
         return NULL;
@@ -1623,52 +1680,14 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
     switch( es->fmt.i_cat )
     {
     case AUDIO_ES:
-    {
-        es->fmt.i_codec = vlc_fourcc_GetCodecAudio( es->fmt.i_codec,
-                                                    es->fmt.audio.i_bitspersample );
         es->i_channel = p_sys->audio.i_count++;
-
-        audio_replay_gain_t rg;
-        memset( &rg, 0, sizeof(rg) );
-        vlc_mutex_lock( &input_priv(p_input)->p_item->lock );
-        vlc_audio_replay_gain_MergeFromMeta( &rg, input_priv(p_input)->p_item->p_meta );
-        vlc_mutex_unlock( &input_priv(p_input)->p_item->lock );
-
-        for( i = 0; i < AUDIO_REPLAY_GAIN_MAX; i++ )
-        {
-            if( !es->fmt.audio_replay_gain.pb_peak[i] )
-            {
-                es->fmt.audio_replay_gain.pb_peak[i] = rg.pb_peak[i];
-                es->fmt.audio_replay_gain.pf_peak[i] = rg.pf_peak[i];
-            }
-            if( !es->fmt.audio_replay_gain.pb_gain[i] )
-            {
-                es->fmt.audio_replay_gain.pb_gain[i] = rg.pb_gain[i];
-                es->fmt.audio_replay_gain.pf_gain[i] = rg.pf_gain[i];
-            }
-        }
         break;
-    }
 
     case VIDEO_ES:
-        es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
         es->i_channel = p_sys->video.i_count++;
-
-        if( !es->fmt.video.i_visible_width || !es->fmt.video.i_visible_height )
-        {
-            es->fmt.video.i_visible_width = es->fmt.video.i_width;
-            es->fmt.video.i_visible_height = es->fmt.video.i_height;
-        }
-
-        if( es->fmt.video.i_frame_rate && es->fmt.video.i_frame_rate_base )
-            vlc_ureduce( &es->fmt.video.i_frame_rate,
-                         &es->fmt.video.i_frame_rate_base,
-                         es->fmt.video.i_frame_rate,
-                         es->fmt.video.i_frame_rate_base, 0 );
         break;
 
     case SPU_ES:
-        es->fmt.i_codec = vlc_fourcc_GetCodec( es->fmt.i_cat, es->fmt.i_codec );
         es->i_channel = p_sys->sub.i_count++;
         break;
 
@@ -1676,6 +1695,7 @@ static es_out_id_t *EsOutAddSlaveLocked( es_out_t *out, const es_format_t *fmt,
         es->i_channel = 0;
         break;
     }
+    EsOutFillEsFmt( out, &es->fmt );
     es->psz_language = LanguageGetName( es->fmt.psz_language ); /* remember so we only need to do it once */
     es->psz_language_code = LanguageGetCode( es->fmt.psz_language );
     es->psz_title = EsGetTitle(es);
