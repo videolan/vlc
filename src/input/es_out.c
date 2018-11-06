@@ -1559,6 +1559,19 @@ static void EsOutGlobalMeta( es_out_t *p_out, const vlc_meta_t *p_meta )
                (p_sys->p_pgrm && p_sys->p_pgrm->p_meta) ? p_sys->p_pgrm->p_meta : NULL );
 }
 
+static void EsOutUpdateEsLanguageTitle(es_out_id_t *es,
+                                     const es_format_t *fmt)
+{
+    free( es->psz_title );
+    free( es->psz_language );
+    free( es->psz_language_code );
+
+    es->psz_language = LanguageGetName( fmt->psz_language );
+    es->psz_language_code = LanguageGetCode( fmt->psz_language );
+
+    es->psz_title = EsGetTitle(es);
+}
+
 static void EsOutFillEsFmt(es_out_t *out, es_format_t *fmt)
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
@@ -3293,15 +3306,7 @@ static int EsOutEsUpdateFmt(es_out_t *out, es_out_id_t *es,
     int ret = es_format_Copy(&es->fmt_out, &update);
     if (ret == VLC_SUCCESS)
     {
-        free( es->psz_title );
-        free( es->psz_language );
-        free( es->psz_language_code );
-
-        es->psz_language = LanguageGetName( es->fmt_out.psz_language );
-        es->psz_language_code = LanguageGetCode( es->fmt_out.psz_language );
-
-        es->psz_title = EsGetTitle(es);
-
+        EsOutUpdateEsLanguageTitle(es, &es->fmt_out);
         input_item_UpdateTracksInfo(input_GetItem(p_input), &es->fmt_out);
     }
 
