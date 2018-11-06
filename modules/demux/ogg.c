@@ -2164,7 +2164,7 @@ static void Ogg_CreateES( demux_t *p_demux )
             if( p_old_stream &&
                 p_old_stream->fmt.i_cat == p_stream->fmt.i_cat &&
                 p_old_stream->fmt.i_codec == p_stream->fmt.i_codec &&
-                p_old_stream->p_es != NULL )
+                p_old_stream->p_es != NULL && p_stream->p_es != NULL )
             {
                 msg_Dbg( p_demux, "will reuse old stream to avoid glitch" );
 
