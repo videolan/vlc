@@ -106,6 +106,8 @@ VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
 /* Subpictures channels ID */
 #define VOUT_SPU_CHANNEL_INVALID      (-1) /* Always fails in comparison */
 #define VOUT_SPU_CHANNEL_OSD            1 /* OSD channel is automatically cleared */
+#define VOUT_SPU_CHANNEL_OSD_HSLIDER    2
+#define VOUT_SPU_CHANNEL_OSD_VSLIDER    3
 #define VOUT_SPU_CHANNEL_AVAIL_FIRST    8 /* Registerable channels from this offset */
 
 /* */
