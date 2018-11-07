@@ -2746,13 +2746,15 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         EsOutFillEsFmt( out, &es->fmt );
         EsOutUpdateEsLanguageTitle(es, &es->fmt);
 
+        const bool b_was_selected = EsIsSelected( es );
         if( es->p_dec )
         {
             EsOutDrainDecoder( out, es );
             EsOutDestroyDecoder( out, es );
         }
 
-        EsOutCreateDecoder( out, es );
+        if(b_was_selected)
+            EsOutCreateDecoder( out, es );
 
         return VLC_SUCCESS;
     }
