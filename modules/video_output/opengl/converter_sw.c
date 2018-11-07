@@ -29,6 +29,10 @@
 #include <vlc_common.h>
 #include "internal.h"
 
+#ifndef GL_MIN_MAP_BUFFER_ALIGNMENT
+# define GL_MIN_MAP_BUFFER_ALIGNMENT 0x90BC
+#endif
+
 #ifndef GL_UNPACK_ROW_LENGTH
 # define GL_UNPACK_ROW_LENGTH 0x0CF2
 #endif
@@ -160,7 +164,7 @@ pbo_picture_create(const opengl_tex_converter_t *tc, bool direct_rendering)
             picture_Release(pic);
             return NULL;
         }
-        picsys->bytes[i] = (p->i_pitch * p->i_lines) + 15 / 16 * 16;
+        picsys->bytes[i] = p->i_pitch * p->i_lines;
     }
     return pic;
 }
@@ -263,7 +267,7 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
 
         pic->p[i].p_pixels =
             tc->vt->MapBufferRange(GL_PIXEL_UNPACK_BUFFER, 0, picsys->bytes[i],
-                                    access | GL_MAP_FLUSH_EXPLICIT_BIT);
+                                   access | GL_MAP_FLUSH_EXPLICIT_BIT);
 
         if (pic->p[i].p_pixels == NULL)
         {
@@ -278,6 +282,11 @@ persistent_map(const opengl_tex_converter_t *tc, picture_t *pic)
             memset(picsys->buffers, 0, PICTURE_PLANE_MAX * sizeof(GLuint));
             return VLC_EGENERIC;
         }
+#ifndef NDEBUG
+        GLint min_align = 0;
+        tc->vt->GetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &min_align);
+        assert(((uintptr_t)pic->p[i].p_pixels) % min_align == 0);
+#endif
     }
     return VLC_SUCCESS;
 }
@@ -609,7 +618,9 @@ opengl_tex_converter_generic_init(opengl_tex_converter_t *tc, bool allow_dr)
             (vlc_gl_StrHasToken(tc->glexts, "GL_ARB_buffer_storage") ||
              vlc_gl_StrHasToken(tc->glexts, "GL_EXT_buffer_storage"));
 
-        supports_map_persistent = has_bs && tc->gl->module
+        GLint min_align = 0;
+        tc->vt->GetIntegerv(GL_MIN_MAP_BUFFER_ALIGNMENT, &min_align);
+        supports_map_persistent = min_align >= 64 && has_bs && tc->gl->module
             && tc->vt->BufferStorage && tc->vt->MapBufferRange && tc->vt->FlushMappedBufferRange
             && tc->vt->UnmapBuffer && tc->vt->FenceSync && tc->vt->DeleteSync
             && tc->vt->ClientWaitSync;
