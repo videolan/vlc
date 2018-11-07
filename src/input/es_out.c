@@ -1899,6 +1899,19 @@ static void EsOutSelectEs( es_out_t *out, es_out_id_t *es )
     }
 }
 
+static void EsOutDrainCCChannels( es_out_id_t *parent )
+{
+    /* Drain captions sub ES as well */
+    uint64_t i_bitmap = parent->cc.i_bitmap;
+    for( int i = 0; i_bitmap > 0; i++, i_bitmap >>= 1 )
+    {
+        if( (i_bitmap & 1) == 0 || !parent->cc.pp_es[i] ||
+            !parent->cc.pp_es[i]->p_dec )
+            continue;
+        input_DecoderDrain( parent->cc.pp_es[i]->p_dec );
+    }
+}
+
 static void EsDeleteCCChannels( es_out_t *out, es_out_id_t *parent )
 {
     if( parent->cc.type == 0 )
@@ -2263,6 +2276,7 @@ EsOutDrainDecoder( es_out_t *out, es_out_id_t *es )
      * the corresponding thread (typically the input thread), for a little
      * bit too long if the ES is deleted in the middle of a stream. */
     input_DecoderDrain( es->p_dec );
+    EsOutDrainCCChannels( es );
     while( !input_Stopped(p_sys->p_input) && !p_sys->b_buffering )
     {
         if( input_DecoderIsEmpty( es->p_dec ) &&
