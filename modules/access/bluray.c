@@ -1325,6 +1325,9 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
 static void bluray_esOutDeleteNonReusedESUnlocked(es_out_t *p_out)
 {
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
+    demux_t *p_demux = esout_priv->priv;
+    demux_sys_t *p_sys = p_demux->p_sys;
+
     if(!esout_priv->b_entered_recycling)
         return;
     esout_priv->b_entered_recycling = false;
@@ -1333,7 +1336,12 @@ static void bluray_esOutDeleteNonReusedESUnlocked(es_out_t *p_out)
     while((p_pair = getUnusedEsPair(&esout_priv->es)))
     {
         msg_Info(esout_priv->p_obj, "Trashing unused ES %d", p_pair->fmt.i_id);
+        vlc_mutex_lock(&p_sys->bdj.lock);
+        if (p_pair->p_es == p_sys->bdj.p_video_es)
+            p_sys->bdj.p_video_es = NULL;
         es_out_Del(esout_priv->p_dst_out, p_pair->p_es);
+        vlc_mutex_unlock(&p_sys->bdj.lock);
+
         es_pair_Remove(&esout_priv->es, p_pair);
     }
 }
@@ -1366,9 +1374,6 @@ static int bluray_esOutSend(es_out_t *p_out, es_out_id_t *p_es, block_t *p_block
 static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
 {
     bluray_esout_priv_t *esout_priv = container_of(p_out, bluray_esout_priv_t, es_out);
-    demux_t *p_demux = esout_priv->priv;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     vlc_mutex_lock(&esout_priv->lock);
 
     if(esout_priv->b_discontinuity)
@@ -1380,11 +1385,6 @@ static void bluray_esOutDel(es_out_t *p_out, es_out_id_t *p_es)
         p_pair->b_recyling = true;
         esout_priv->b_entered_recycling = true;
     }
-
-    vlc_mutex_lock(&p_sys->bdj.lock);
-    if (p_es == p_sys->bdj.p_video_es)
-        p_sys->bdj.p_video_es = NULL;
-    vlc_mutex_unlock(&p_sys->bdj.lock);
 
     vlc_mutex_unlock(&esout_priv->lock);
 }
