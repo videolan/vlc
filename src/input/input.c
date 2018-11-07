@@ -1827,7 +1827,10 @@ static void ControlNav( input_thread_t *p_input, int i_type )
     if( seek_direction != 0 )
     {
         vlc_tick_t it = vlc_tick_from_sec( seek_direction * var_InheritInteger( p_input, "short-jump-size" ) );
-        var_SetInteger( p_input, "time-offset", it );
+        Control( p_input, INPUT_CONTROL_JUMP_TIME, (input_control_param_t) {
+            .time.b_fast_seek = false,
+            .time.i_val = it
+        });
     }
     else
     {
