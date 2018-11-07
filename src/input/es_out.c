@@ -2750,6 +2750,7 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         if( es->p_dec )
         {
             EsOutDrainDecoder( out, es );
+            EsDeleteCCChannels( out, es );
             EsOutDestroyDecoder( out, es );
         }
 
