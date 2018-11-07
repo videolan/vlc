@@ -60,7 +60,9 @@
 
 - (void)dealloc
 {
-    [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+    if (@available(macOS 10_14, *)) {
+        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
+    }
 }
 
 - (void)awakeFromNib
