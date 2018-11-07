@@ -75,7 +75,7 @@ else !HAVE_DMGBUILD
 	$(LN_S) -f /Applications "$(top_builddir)/vlc-$(VERSION)/"
 	## Create DMG
 	hdiutil create -srcfolder "$(top_builddir)/vlc-$(VERSION)" -volname "VLC Media Player" \
-		-format UDBZ -o "$(top_builddir)/vlc-$(VERSION).dmg"
+		-format UDBZ -fs HFS+ -o "$(top_builddir)/vlc-$(VERSION).dmg"
 	## Cleanup
 	rm -rf "$(top_builddir)/vlc-$(VERSION)"
 endif
