@@ -2757,6 +2757,8 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
         if(b_was_selected)
             EsOutCreateDecoder( out, es );
 
+        EsOutSendEsEvent( out, es, VLC_INPUT_ES_UPDATED );
+
         return VLC_SUCCESS;
     }
 
