@@ -63,6 +63,7 @@ parts:
       ./bootstrap
       make -j $(getconf _NPROCESSORS_ONLN) .protoc
       make -j $(getconf _NPROCESSORS_ONLN) .nasm
+      make -j $(getconf _NPROCESSORS_ONLN) .meson
       cd ../../
       export PATH=$PWD/extras/tools/build/bin:$PATH
       cd contrib && mkdir linux && cd linux
