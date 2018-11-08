@@ -1,0 +1,48 @@
+From e4626984de40115af22041087936c3ad68401f75 Mon Sep 17 00:00:00 2001
+From: Thomas Guillem <thomas@gllm.fr>
+Date: Thu, 8 Nov 2018 10:09:19 +0100
+Subject: [PATCH 1/2] build: fix lpthread dependency with glslang
+
+"-pthread" is enough for a dynamic build. Indeed, the pthread API is used
+within libplacebo, so the compiler know that it shoud link with pthread in that
+case.
+
+However, this may fail with static builds. If the code using libplacebo.a and
+all glslang .a doesn't use the pthread API, the compiler won't link with
+pthread. To work-around this issue, make libplacebo depends on -lpthread, if
+present.
+---
+ src/meson.build | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/src/meson.build b/src/meson.build
+index 4d791c30d9..25b898b7a4 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -90,6 +90,7 @@ tests = [
+ glslang_combined = disabler()
+ glslang_min_ver = 2763
+ glslang_req = get_option('glslang')
++glslang_pthread_deps = []
+ glslang_deps = [
+   cxx.find_library('glslang',     required: glslang_req),
+   cxx.find_library('HLSL',        required: glslang_req),
+@@ -105,12 +106,14 @@ foreach d : glslang_deps
+ endforeach
+ 
+ if glslang_found
++  glslang_pthread_deps += cxx.find_library('pthread', required: false)
++
+   glslang_ver = cxx.get_define('GLSLANG_PATCH_LEVEL',
+       prefix: '#include <glslang/Include/revision.h>'
+   ).to_int()
+ 
+   if glslang_ver >= glslang_min_ver
+-    glslang_combined = declare_dependency(dependencies: glslang_deps)
++    glslang_combined = declare_dependency(dependencies: glslang_deps + glslang_pthread_deps)
+   else
+     error('glslang revision @0@ too old! Must be at least @1@'
+           .format(glslang_ver, glslang_min_ver))
+-- 
+2.19.1
+

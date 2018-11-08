@@ -26,7 +26,8 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
-	$(APPLY) $(SRC)/libplacebo/0001-meson-fix-glslang-search-path.patch
+	$(APPLY) $(SRC)/libplacebo/0001-build-fix-lpthread-dependency-with-glslang.patch
+	$(APPLY) $(SRC)/libplacebo/0002-meson-fix-glslang-search-path.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson
