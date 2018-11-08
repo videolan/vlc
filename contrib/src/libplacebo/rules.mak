@@ -11,13 +11,8 @@ ifeq ($(call need_pkg,"libplacebo"),)
 PKGS_FOUND += libplacebo
 endif
 
-ifdef HAVE_WIN32
-PLACEBOCONF :=
-else
-PLACEBOCONF := -Dvulkan=enabled \
-	-Dglslang=enabled \
+PLACEBOCONF := -Dglslang=enabled \
 	-Dshaderc=disabled
-endif
 
 $(TARBALLS)/$(PLACEBO_ARCHIVE):
 	$(call download_pkg,$(PLACEBO_URL),libplacebo)
