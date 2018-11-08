@@ -1900,6 +1900,43 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
     p_ov->status = Outdated;
 }
 
+static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
+                                   unsigned repeats, unsigned ratio)
+{
+    const BLURAY_CLIP_INFO *prev = NULL;
+    unsigned maxrepeats = 0;
+    unsigned sequence = 0;
+    if(!title_info->chapter_count)
+        return false;
+
+    for (unsigned int j = 0; j < title_info->chapter_count; j++)
+    {
+        unsigned i = title_info->chapters[j].clip_ref;
+        if(i < title_info->clip_count)
+        {
+            if(prev == NULL ||
+               /* non repeated does not need start time offset */
+               title_info->clips[i].start_time == 0 ||
+               /* repeats occurs on same segment */
+               memcmp(title_info->clips[i].clip_id, prev->clip_id, 6) ||
+               prev->in_time != title_info->clips[i].in_time ||
+               prev->pkt_count != title_info->clips[i].pkt_count)
+            {
+                sequence = 0;
+                prev = &title_info->clips[i];
+                continue;
+            }
+            else
+            {
+                if(maxrepeats < sequence++)
+                    maxrepeats = sequence;
+            }
+        }
+    }
+    return (maxrepeats > repeats &&
+            (100 * maxrepeats / title_info->chapter_count) >= ratio);
+}
+
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
 {
     t->i_length = FROM_TICKS(title_info->duration);
@@ -1907,6 +1944,10 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
     for (int i = 0; i < t->i_seekpoint; i++)
         vlc_seekpoint_Delete( t->seekpoint[i] );
     TAB_CLEAN(t->i_seekpoint, t->seekpoint);
+
+    /* FIXME: have libbluray expose repeating titles */
+    if(blurayTitleIsRepeating(title_info, 50, 90))
+        return;
 
     for (unsigned int j = 0; j < title_info->chapter_count; j++) {
         seekpoint_t *s = vlc_seekpoint_New();
