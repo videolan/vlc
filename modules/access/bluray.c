@@ -1744,7 +1744,9 @@ static void blurayActivateOverlay(demux_t *p_demux, int plane)
      * We must NOT use vout_PutSubpicture if a picture is already displayed.
      */
     vlc_mutex_lock(&ov->lock);
-    if (ov->status >= Displayed && p_sys->bdj.p_video_es) {
+    if (ov->status >= Displayed && ov->i_channel != -1 &&
+        p_sys->bdj.p_video_es)
+    {
         ov->status = Outdated;
         vlc_mutex_unlock(&ov->lock);
         return;
