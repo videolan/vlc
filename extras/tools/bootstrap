@@ -87,6 +87,7 @@ check bison 3.0.0
 check flex
 check nasm 2.13.01
 check meson 0.48.1
+check ninja
 
 [ -n "$NEEDED" ] && mkdir -p build/bin && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
