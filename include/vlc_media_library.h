@@ -719,6 +719,16 @@ vlc_ml_event_register_callback( vlc_medialibrary_t* p_ml, vlc_ml_callback_t cb, 
  */
 VLC_API void vlc_ml_event_unregister_callback( vlc_medialibrary_t* p_ml,
                                                vlc_ml_event_callback_t* p_callback );
+/**
+ * \brief Unregisters a medialibrary callback from the said callback.
+ * \param p_callback The handle returned by vlc_ml_register_callback
+ *
+ * This must only be called synchronously from the callback function provided to
+ * vlc_ml_event_register_callback
+ * The p_callback handle must be considered invalid when this function returns
+ */
+VLC_API void vlc_ml_event_unregister_from_callback( vlc_medialibrary_t* p_ml,
+                                                    vlc_ml_event_callback_t* p_callback );
 
 
 VLC_API void vlc_ml_show_release( vlc_ml_show_t* p_show );
