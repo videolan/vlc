@@ -503,15 +503,15 @@ WidgetListing::WidgetListing( intf_thread_t *p_intf, QWidget *_parent )
                 prevSectionButton->setToolTip( qtr("Previous Chapter/Title" ) );
                 discLayout->addWidget( prevSectionButton );
 
-                QToolButton *menuButton = new QToolButton( discFrame );
-                menuButton->setIcon( QIcon( ":/toolbar/dvd_menu.svg" ) );
-                menuButton->setToolTip( qtr( "Menu" ) );
-                discLayout->addWidget( menuButton );
-
                 QToolButton *nextButton = new QToolButton( discFrame );
                 nextButton->setIcon( QIcon( ":/toolbar/dvd_next.svg" ) );
                 nextButton->setToolTip( qtr("Next Chapter/Title" ) );
                 discLayout->addWidget( nextButton );
+
+                QToolButton *menuButton = new QToolButton( discFrame );
+                menuButton->setIcon( QIcon( ":/toolbar/dvd_menu.svg" ) );
+                menuButton->setToolTip( qtr( "Menu" ) );
+                discLayout->addWidget( menuButton );
 
                 widget = discFrame;
             }
