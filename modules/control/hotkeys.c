@@ -1396,7 +1396,9 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
                 else
                 {
                     i_scale = var_GetInteger( p_playlist, "sub-text-scale" );
-                    i_scale += ((i_action == ACTIONID_SUBTITLE_TEXT_SCALE_UP) ? 1 : -1) * 25;
+                    unsigned increment = ((i_scale > 100 ? i_scale - 100 : 100 - i_scale) / 25) <= 1 ? 10 : 25;
+                    i_scale += ((i_action == ACTIONID_SUBTITLE_TEXT_SCALE_UP) ? 1 : -1) * increment;
+                    i_scale -= i_scale % increment;
                     i_scale = VLC_CLIP( i_scale, 25, 500 );
                 }
                 var_SetInteger( p_playlist, "sub-text-scale", i_scale );
