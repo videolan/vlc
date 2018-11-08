@@ -1518,7 +1518,7 @@ int MediaRendererList::onEvent( Upnp_EventType event_type,
     {
         case UPNP_DISCOVERY_SEARCH_RESULT:
         {
-            struct Upnp_Discovery *p_discovery = (struct Upnp_Discovery*)Event;
+            const UpnpDiscovery *p_discovery = (const UpnpDiscovery*)Event;
             IXML_Document *p_doc = NULL;
             int i_res;
 
@@ -1535,9 +1535,9 @@ int MediaRendererList::onEvent( Upnp_EventType event_type,
 
         case UPNP_DISCOVERY_ADVERTISEMENT_BYEBYE:
         {
-            struct Upnp_Discovery* p_discovery = ( struct Upnp_Discovery* )Event;
+            const UpnpDiscovery* p_discovery = ( const UpnpDiscovery* )Event;
 
-            removeRenderer( p_discovery->DeviceId );
+            removeRenderer( UpnpDiscovery_get_DeviceID_cstr ( p_discovery ) );
         }
         break;
 
