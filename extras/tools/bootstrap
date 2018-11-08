@@ -199,7 +199,7 @@ for t in $NEEDED; do
     esac
 done
 
-[ -n "$PACKAGES" ] && mkdir -p build/ && echo "To-be-built packages: $PACKAGES"
+[ -n "$PACKAGES" ] && mkdir -p build/bin && echo "To-be-built packages: $PACKAGES"
 
 cat >> Makefile << EOF
 all: $TARGETS
