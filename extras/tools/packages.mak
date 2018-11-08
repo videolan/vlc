@@ -62,3 +62,6 @@ HELP2MAN_URL=$(GNU)/help2man/help2man-$(HELP2MAN_VERSION).tar.xz
 
 MESON_VERSION=0.48.1
 MESON_URL=https://github.com/mesonbuild/meson/releases/download/$(MESON_VERSION)/meson-$(MESON_VERSION).tar.gz
+
+NINJA_VERSION=1.8.2
+NINJA_URL=https://github.com/ninja-build/ninja/archive/v$(NINJA_VERSION).tar.gz

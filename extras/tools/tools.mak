@@ -418,6 +418,25 @@ DISTCLEAN_PKG += meson-$(MESON_VERSION).tar.gz
 CLEAN_FILE += .buildmeson
 
 #
+# ninja build
+#
+
+ninja-$(NINJA_VERSION).tar.gz:
+	$(call download_pkg,$(NINJA_URL),ninja)
+
+ninja: ninja-$(NINJA_VERSION).tar.gz
+	$(UNPACK)
+	$(MOVE)
+
+.buildninja: ninja
+	(cd $<; ./configure.py --bootstrap && mv ninja $(PREFIX)/bin/)
+	touch $@
+
+CLEAN_PKG += ninja
+DISTCLEAN_PKG += ninja-$(NINJA_VERSION).tar.gz
+CLEAN_FILE += .buildninja
+
+#
 #
 #
 
