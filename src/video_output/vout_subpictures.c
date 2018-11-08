@@ -550,6 +550,10 @@ static void SpuSelectSubpictures(spu_t *spu,
             channel[channel_count++] = i_channel;
     }
 
+    /* Ensure a 1 pass garbage collection for rejected subpictures */
+    if(channel_count == 0)
+        channel[channel_count++] = VOUT_SPU_CHANNEL_INVALID;
+
     /* Fill up the subpicture_array arrays with relevant pictures */
     for (int i = 0; i < channel_count; i++) {
         subpicture_t *available_subpic[VOUT_MAX_SUBPICTURES];
@@ -1652,7 +1656,7 @@ void spu_ClearChannel(spu_t *spu, int channel)
         if (subpic->i_channel != channel && (channel != -1 || subpic->i_channel == VOUT_SPU_CHANNEL_OSD))
             continue;
 
-        /* You cannot delete subpicture outside of spu_SortSubpictures */
+        /* You cannot delete subpicture outside of SpuSelectSubpictures */
         entry->reject = true;
     }
 
