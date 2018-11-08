@@ -88,7 +88,7 @@ check flex
 check nasm 2.13.01
 check meson 0.48.1
 
-[ -n "$NEEDED" ] && mkdir -p build/ && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
+[ -n "$NEEDED" ] && mkdir -p build/bin && echo "To-be-built packages: `echo $NEEDED | sed 's/\.//g'`"
 
 CPUS=
 case `uname` in
