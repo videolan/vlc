@@ -2052,6 +2052,37 @@ static void bluraySendOverlayToVout(demux_t *p_demux, bluray_overlay_t *p_ov)
     p_ov->status = Outdated;
 }
 
+static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
+                                   unsigned repeats, unsigned ratio)
+{
+    char clip_id[6] = {0};
+    unsigned maxrepeats = 0;
+    unsigned sequence = 0;
+    if(!title_info->chapter_count)
+        return false;
+
+    for (unsigned int j = 0; j < title_info->chapter_count; j++)
+    {
+        unsigned i = title_info->chapters[j].clip_ref;
+        if(i < title_info->clip_count)
+        {
+            if(memcmp(title_info->clips[i].clip_id, clip_id, 6))
+            {
+                sequence = 0;
+                memcpy(clip_id, title_info->clips[i].clip_id, 6);
+                continue;
+            }
+            else
+            {
+                if(maxrepeats < sequence++)
+                    maxrepeats = sequence;
+            }
+        }
+    }
+    return (maxrepeats > repeats &&
+            (100 * maxrepeats / title_info->chapter_count) >= ratio);
+}
+
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
 {
     t->i_length = FROM_SCALE_NZ(title_info->duration);
@@ -2059,6 +2090,10 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
     for (int i = 0; i < t->i_seekpoint; i++)
         vlc_seekpoint_Delete( t->seekpoint[i] );
     TAB_CLEAN(t->i_seekpoint, t->seekpoint);
+
+    /* FIXME: have libbluray expose repeating titles */
+    if(blurayTitleIsRepeating(title_info, 10, 90))
+        return;
 
     for (unsigned int j = 0; j < title_info->chapter_count; j++) {
         seekpoint_t *s = vlc_seekpoint_New();
