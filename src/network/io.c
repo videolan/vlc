@@ -224,12 +224,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
     return sockv;
 }
 
-/**
- * Reads data from a socket, blocking until all requested data is received or
- * the end of the stream is reached.
- * This function is a cancellation point.
- * @return -1 on error, or the number of bytes of read.
- */
 ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
                    void *restrict buf, size_t len)
 {
@@ -277,15 +271,6 @@ ssize_t (net_Read)(vlc_object_t *restrict obj, int fd,
     return rd;
 }
 
-/**
- * Writes data to a socket.
- * This blocks until all data is written or an error occurs.
- *
- * This function is a cancellation point.
- *
- * @return the total number of bytes written, or -1 if an error occurs
- * before any data is written.
- */
 ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
 {
     size_t written = 0;
@@ -323,16 +308,6 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
 }
 
 #undef net_Gets
-/**
- * Reads a line from a file descriptor.
- * This function is not thread-safe; the same file descriptor I/O cannot be
- * read by another thread at the same time (although it can be written to).
- *
- * @note This only works with stream-oriented file descriptors, not with
- * datagram or packet-oriented ones.
- *
- * @return nul-terminated heap-allocated string, or NULL on I/O error.
- */
 char *net_Gets(vlc_object_t *obj, int fd)
 {
     char *buf = NULL;

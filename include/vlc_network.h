@@ -182,13 +182,45 @@ int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
 
 VLC_API int net_SetCSCov( int fd, int sendcov, int recvcov );
 
+/**
+ * Reads data from a socket.
+ *
+ * This blocks until all requested data is received
+ * or the end of the stream is reached.
+ *
+ * This function is a cancellation point.
+ * @return -1 on error, or the number of bytes of read.
+ */
 VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, void *p_data, size_t i_data );
 #define net_Read(a,b,c,d) net_Read(VLC_OBJECT(a),b,c,d)
+
+/**
+ * Writes data to a socket.
+ *
+ * This blocks until all data is written or an error occurs.
+ *
+ * This function is a cancellation point.
+ *
+ * @return the total number of bytes written, or -1 if an error occurs
+ * before any data is written.
+ */
 VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const void *p_data, size_t i_data );
 #define net_Write(a,b,c,d) net_Write(VLC_OBJECT(a),b,c,d)
+
+/**
+ * Reads a line from a file descriptor.
+ *
+ * @warning
+ * This function is not thread-safe; the same file descriptor I/O cannot be
+ * read by another thread at the same time (although it can be written to).
+ *
+ * @note This only works with stream-oriented file descriptors, not with
+ * datagram or packet-oriented ones.
+ *
+ * @return nul-terminated heap-allocated string, or NULL on I/O error.
+ */
 VLC_API char * net_Gets( vlc_object_t *p_this, int fd );
 #define net_Gets(a,b) net_Gets(VLC_OBJECT(a),b)
-
 
 VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... ) VLC_FORMAT( 3, 4 );
 #define net_Printf(o,fd,...) net_Printf(VLC_OBJECT(o),fd, __VA_ARGS__)
