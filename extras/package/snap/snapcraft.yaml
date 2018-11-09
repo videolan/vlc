@@ -155,6 +155,7 @@ parts:
       - zlib1g-dev
       - bison
       - flex
+      - libvulkan-dev
     stage-packages:
       - fonts-freefont-ttf
       - dbus-x11
@@ -210,6 +211,7 @@ parts:
       - libzvbi0
       - libnotify4
       - libaacs0
+      - libvulkan1
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
