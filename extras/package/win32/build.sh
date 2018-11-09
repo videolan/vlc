@@ -124,7 +124,7 @@ fi
 if [ "$PREBUILT" != "yes" ]; then
 make list
 make -j$JOBS fetch
-make -j$JOBS
+make -j$JOBS -k || make -j1
 if [ "$PACKAGE" = "yes" ]; then
 make package
 fi
