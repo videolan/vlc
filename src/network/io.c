@@ -340,25 +340,6 @@ void net_ListenClose(int *fds)
     }
 }
 
-static int net_AcceptSingle(vlc_object_t *obj, int lfd)
-{
-    int fd = vlc_accept(lfd, NULL, NULL, true);
-    if (fd == -1)
-    {
-        if (net_errno != EAGAIN)
-#if (EAGAIN != EWOULDBLOCK)
-          if (net_errno != EWOULDBLOCK)
-#endif
-            msg_Err(obj, "accept failed (from socket %d): %s", lfd,
-                    vlc_strerror_c(net_errno));
-        return -1;
-    }
-
-    msg_Dbg(obj, "accepted socket %d (from socket %d)", fd, lfd);
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
-    return fd;
-}
-
 #undef net_Accept
 int net_Accept(vlc_object_t *obj, int *fds)
 {
@@ -393,10 +374,21 @@ int net_Accept(vlc_object_t *obj, int *fds)
                 continue;
 
             int sfd = ufd[i].fd;
-            int fd = net_AcceptSingle(obj, sfd);
+            int fd = vlc_accept(sfd, NULL, NULL, true);
             if (fd == -1)
+            {
+                if (net_errno != EAGAIN)
+#if (EAGAIN != EWOULDBLOCK)
+                if (net_errno != EWOULDBLOCK)
+#endif
+                    msg_Err(obj, "accept failed (from socket %d): %s", sfd,
+                            vlc_strerror_c(net_errno));
                 continue;
+            }
 
+            msg_Dbg(obj, "accepted socket %d (from socket %d)", fd, sfd);
+            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+                       &(int){ 1 }, sizeof (int));
             /*
              * Move listening socket to the end to let the others in the
              * set a chance next time.
