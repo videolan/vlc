@@ -227,11 +227,6 @@ static int Decode(decoder_t *dec, block_t *block)
             picture_Hold(pic);
             decoder_QueueVideo(dec, pic);
             dav1d_picture_unref(&img);
-
-            if (p_data && p_data->sz == 0)
-            {
-                p_data = NULL; /* no more data, continue until we get EAGAIN */
-            }
         }
         else if (res != -EAGAIN)
         {
