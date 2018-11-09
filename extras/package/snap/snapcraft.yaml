@@ -204,6 +204,7 @@ parts:
       - libupnp6
       - libzvbi0
       - libnotify4
+      - libaacs0
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
