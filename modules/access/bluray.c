@@ -2029,7 +2029,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux, int plane, bluray_overlay_
 static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
                                    unsigned repeats, unsigned ratio)
 {
-    char clip_id[6] = {0};
+    const BLURAY_CLIP_INFO *prev = NULL;
     unsigned maxrepeats = 0;
     unsigned sequence = 0;
     if(!title_info->chapter_count)
@@ -2040,10 +2040,16 @@ static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
         unsigned i = title_info->chapters[j].clip_ref;
         if(i < title_info->clip_count)
         {
-            if(memcmp(title_info->clips[i].clip_id, clip_id, 6))
+            if(prev == NULL ||
+               /* non repeated does not need start time offset */
+               title_info->clips[i].start_time == 0 ||
+               /* repeats occurs on same segment */
+               memcmp(title_info->clips[i].clip_id, prev->clip_id, 6) ||
+               prev->in_time != title_info->clips[i].in_time ||
+               prev->pkt_count != title_info->clips[i].pkt_count)
             {
                 sequence = 0;
-                memcpy(clip_id, title_info->clips[i].clip_id, 6);
+                prev = &title_info->clips[i];
                 continue;
             }
             else
@@ -2066,7 +2072,7 @@ static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_inf
     TAB_CLEAN(t->i_seekpoint, t->seekpoint);
 
     /* FIXME: have libbluray expose repeating titles */
-    if(blurayTitleIsRepeating(title_info, 10, 90))
+    if(blurayTitleIsRepeating(title_info, 50, 90))
         return;
 
     for (unsigned int j = 0; j < title_info->chapter_count; j++) {
