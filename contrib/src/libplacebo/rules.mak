@@ -30,5 +30,5 @@ libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	cd $< && $(HOSTVARS_MESON) $(MESON) $(PLACEBOCONF) build
 	cd $< && cd build && ninja install
 # Work-around messon issue https://github.com/mesonbuild/meson/issues/4091
-	sed -i $(PREFIX)/lib/pkgconfig/libplacebo.pc -e 's/Libs: \(.*\) -L$${libdir} -lplacebo/Libs: -L$${libdir} -lplacebo \1/g'
+	sed -i.orig $(PREFIX)/lib/pkgconfig/libplacebo.pc -e 's/Libs: \(.*\) -L$${libdir} -lplacebo/Libs: -L$${libdir} -lplacebo \1/g'
 	touch $@
