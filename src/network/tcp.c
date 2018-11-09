@@ -257,17 +257,6 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
 
 
 #undef net_Accept
-/**
- * Accepts an new connection on a set of listening sockets.
- * If there are no pending connections, this function will wait.
- * @note If the thread needs to handle events other than incoming connections,
- * you need to use poll() and net_AcceptSingle() instead.
- *
- * @param p_this VLC object for logging and object kill signal
- * @param pi_fd listening socket set
- * @return -1 on error (may be transient error due to network issues),
- * a new socket descriptor on success.
- */
 int net_Accept (vlc_object_t *p_this, int *pi_fd)
 {
     assert (pi_fd != NULL);

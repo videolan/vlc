@@ -137,7 +137,23 @@ static inline int net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
 
 VLC_API int net_AcceptSingle(vlc_object_t *obj, int lfd);
 
-VLC_API int net_Accept( vlc_object_t *, int * );
+/**
+ * Accepts an new connection on a set of listening sockets.
+ *
+ * If there are no pending connections, this function will wait.
+ *
+ * @note If the thread needs to handle events other than incoming connections,
+ * you need to use poll() and net_AcceptSingle() instead.
+ *
+ * @deprecated This function exists for backward compatibility.
+ * Use vlc_accept() or vlc_accept_i11e() in new code.
+ *
+ * @param obj VLC object for logging and object kill signal
+ * @param fds listening socket set
+ * @return -1 on error (may be transient error due to network issues),
+ * a new socket descriptor on success.
+ */
+VLC_API int net_Accept(vlc_object_t *obj, int *fds);
 #define net_Accept(a, b) \
         net_Accept(VLC_OBJECT(a), b)
 
