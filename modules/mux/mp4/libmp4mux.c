@@ -94,8 +94,8 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
             mp4mux_AddExtraBrand(h, BRAND_hevc);
             break;
         case VLC_CODEC_AV1:
-            mp4mux_AddExtraBrand(h, VLC_FOURCC('a','v','0','1'));
-            mp4mux_AddExtraBrand(h, VLC_FOURCC('i','s','o','6'));
+            mp4mux_AddExtraBrand(h, BRAND_av01);
+            mp4mux_AddExtraBrand(h, BRAND_iso6);
             break;
         case VLC_CODEC_MP4V:
         case VLC_CODEC_DIV1:
@@ -2263,7 +2263,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_TTML:
         /* Special case with smooth headers where we need to force frag TTML */
         /* TTML currently not supported in sout, until we can keep original timestamps */
-            return i_brand == VLC_FOURCC('s', 'm', 'o', 'o');
+            return i_brand == BRAND_smoo;
     case VLC_CODEC_QTXT:
     case VLC_CODEC_TX3G:
     case VLC_CODEC_WEBVTT:

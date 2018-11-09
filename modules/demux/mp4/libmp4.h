@@ -36,12 +36,17 @@ typedef int64_t stime_t;
 #define BRAND_3gp7 VLC_FOURCC( '3', 'g', 'p', '7' )
 #define BRAND_isml VLC_FOURCC( 'i', 's', 'm', 'l' )
 #define BRAND_isom VLC_FOURCC( 'i', 's', 'o', 'm' )
+#define BRAND_iso2 VLC_FOURCC( 'i', 's', 'o', '2' )
+#define BRAND_iso6 VLC_FOURCC( 'i', 's', 'o', '6' )
 #define BRAND_qt__ VLC_FOURCC( 'q', 't', ' ', ' ' )
 #define BRAND_f4v  VLC_FOURCC( 'f', '4', 'v', ' ' ) /* Adobe Flash */
 #define BRAND_dash VLC_FOURCC( 'd', 'a', 's', 'h' )
+#define BRAND_smoo VLC_FOURCC( 's', 'm', 'o', 'o' ) /* Internal use */
 #define BRAND_mp41 VLC_FOURCC( 'm', 'p', '4', '1' )
+#define BRAND_av01 VLC_FOURCC( 'a', 'v', '0', '1' )
 #define BRAND_avc1 VLC_FOURCC( 'a', 'v', 'c', '1' )
 #define BRAND_M4A  VLC_FOURCC( 'M', '4', 'A', ' ' )
+#define BRAND_piff VLC_FOURCC( 'p', 'i', 'f', 'f' )
 #define BRAND_mif1 VLC_FOURCC( 'm', 'i', 'f', '1' ) /* heif */
 #define BRAND_msf1 VLC_FOURCC( 'm', 's', 'f', '1' ) /* heif */
 #define BRAND_heic VLC_FOURCC( 'h', 'e', 'i', 'c' ) /* heif */

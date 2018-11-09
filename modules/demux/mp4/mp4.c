@@ -827,7 +827,7 @@ static int Open( vlc_object_t * p_this )
             {
                 msg_Dbg( p_demux, "DASH Stream" );
             }
-            else if (BOXDATA(p_ftyp)->i_compatible_brands[i] == VLC_FOURCC('s', 'm', 'o', 'o') )
+            else if (BOXDATA(p_ftyp)->i_compatible_brands[i] == BRAND_smoo)
             {
                 msg_Dbg( p_demux, "Handling VLC Smooth Stream" );
             }
