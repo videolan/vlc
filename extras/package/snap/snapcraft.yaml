@@ -71,7 +71,6 @@ parts:
         --enable-libdsm \
         --enable-dvdcss \
         --disable-upnp \
-        --disable-srt \
         --disable-chromaprint
       make list
       make -j $(getconf _NPROCESSORS_ONLN) fetch
