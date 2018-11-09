@@ -207,6 +207,7 @@ parts:
       - libzvbi0
       - libnotify4
       - libvulkan1
+      - libaacs0
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
