@@ -28,11 +28,13 @@
 # include "config.h"
 #endif
 
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_timestamp_helper.h>
 
+#include <errno.h>
 #include <dav1d/dav1d.h>
 
 #include "../packetizer/iso_color_tables.h"
