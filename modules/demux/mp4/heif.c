@@ -446,16 +446,16 @@ int OpenHEIF( vlc_object_t * p_this )
 
     switch( VLC_FOURCC( p_peek[8], p_peek[9], p_peek[10], p_peek[11] ) )
     {
-        case MAJOR_mif1:
-        case MAJOR_heic:
-        case MAJOR_heix:
-        case MAJOR_jpeg:
-        case MAJOR_avci:
+        case BRAND_mif1:
+        case BRAND_heic:
+        case BRAND_heix:
+        case BRAND_jpeg:
+        case BRAND_avci:
             break;
-        case MAJOR_msf1:
-        case MAJOR_hevc:
-        case MAJOR_hevx:
-        case MAJOR_avcs:
+        case BRAND_msf1:
+        case BRAND_hevc:
+        case BRAND_hevx:
+        case BRAND_avcs:
         default:
             return VLC_EGENERIC;
     }

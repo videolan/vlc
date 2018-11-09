@@ -88,10 +88,10 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
     switch(fmt->i_codec)
     {
         case VLC_CODEC_H264:
-            mp4mux_AddExtraBrand(h, MAJOR_avc1);
+            mp4mux_AddExtraBrand(h, BRAND_avc1);
             break;
         case VLC_CODEC_HEVC:
-            mp4mux_AddExtraBrand(h, MAJOR_hevc);
+            mp4mux_AddExtraBrand(h, BRAND_hevc);
             break;
         case VLC_CODEC_AV1:
             mp4mux_AddExtraBrand(h, VLC_FOURCC('a','v','0','1'));
@@ -102,12 +102,12 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
         case VLC_CODEC_DIV2:
         case VLC_CODEC_DIV3:
         case VLC_CODEC_H263:
-            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            mp4mux_AddExtraBrand(h, BRAND_mp41);
             break;
         case VLC_CODEC_MP4A:
-            mp4mux_AddExtraBrand(h, MAJOR_mp41);
+            mp4mux_AddExtraBrand(h, BRAND_mp41);
             if(vlc_array_count(&h->tracks) == 1)
-                mp4mux_AddExtraBrand(h, MAJOR_M4A);
+                mp4mux_AddExtraBrand(h, BRAND_M4A);
             break;
         default:
             break;

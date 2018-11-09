@@ -258,12 +258,12 @@ static int Open(vlc_object_t *p_this)
 
     if(p_sys->b_3gp)
     {
-        mp4mux_SetBrand(p_sys->muxh, MAJOR_3gp6, 0x0);
-        mp4mux_AddExtraBrand(p_sys->muxh, MAJOR_3gp4);
+        mp4mux_SetBrand(p_sys->muxh, BRAND_3gp6, 0x0);
+        mp4mux_AddExtraBrand(p_sys->muxh, BRAND_3gp4);
     }
     else
     {
-        mp4mux_SetBrand(p_sys->muxh, MAJOR_isom, 0x0);
+        mp4mux_SetBrand(p_sys->muxh, BRAND_isom, 0x0);
     }
 
     return VLC_SUCCESS;
@@ -423,7 +423,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     mp4_stream_t    *p_stream;
 
     if(!mp4mux_CanMux(VLC_OBJECT(p_mux), p_input->p_fmt,
-                      mp4mux_Is(p_sys->muxh, QUICKTIME) ? MAJOR_qt__ : MAJOR_isom,
+                      mp4mux_Is(p_sys->muxh, QUICKTIME) ? BRAND_qt__ : BRAND_isom,
                       mp4mux_Is(p_sys->muxh, FRAGMENTED)))
     {
         msg_Err(p_mux, "unsupported codec %4.4s in mp4",

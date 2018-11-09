@@ -298,7 +298,7 @@ block_t * ForgedInitSegment::buildMoovBox()
     free(box);
 
     mp4mux_SetBrand(muxh, VLC_FOURCC('i','s','m','l'), 0x01);
-    mp4mux_AddExtraBrand(muxh, MAJOR_isom);
+    mp4mux_AddExtraBrand(muxh, BRAND_isom);
     mp4mux_AddExtraBrand(muxh, VLC_FOURCC('p','i','f','f'));
     mp4mux_AddExtraBrand(muxh, VLC_FOURCC('i','s','o','2'));
     mp4mux_AddExtraBrand(muxh, VLC_FOURCC('s','m','o','o'));
