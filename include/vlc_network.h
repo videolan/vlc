@@ -132,8 +132,6 @@ VLC_API int * net_Listen(vlc_object_t *p_this, const char *psz_host, unsigned i_
 VLC_API int net_ConnectTCP (vlc_object_t *obj, const char *host, int port);
 #define net_ConnectTCP(a, b, c) net_ConnectTCP(VLC_OBJECT(a), b, c)
 
-VLC_API int net_AcceptSingle(vlc_object_t *obj, int lfd);
-
 /**
  * Accepts an new connection on a set of listening sockets.
  *

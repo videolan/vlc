@@ -282,7 +282,6 @@ vlc_obj_free
 vlc_tick_sleep
 vlc_tick_wait
 net_Accept
-net_AcceptSingle
 net_Connect
 net_ConnectDgram
 net_ConnectTCP

@@ -340,7 +340,7 @@ void net_ListenClose(int *fds)
     }
 }
 
-int net_AcceptSingle(vlc_object_t *obj, int lfd)
+static int net_AcceptSingle(vlc_object_t *obj, int lfd)
 {
     int fd = vlc_accept(lfd, NULL, NULL, true);
     if (fd == -1)
