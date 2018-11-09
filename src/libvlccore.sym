@@ -285,6 +285,7 @@ net_Accept
 net_AcceptSingle
 net_Connect
 net_ConnectDgram
+net_ConnectTCP
 net_Gets
 net_Listen
 net_ListenClose

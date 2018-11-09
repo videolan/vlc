@@ -515,6 +515,11 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
     return VLC_SUCCESS;
 }
 
+int (net_ConnectTCP)(vlc_object_t *obj, const char *host, int serv)
+{
+    return net_Connect(obj, host, serv, SOCK_STREAM, IPPROTO_TCP);
+}
+
 void net_ListenClose( int *pi_fd )
 {
     if( pi_fd != NULL )
