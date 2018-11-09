@@ -57,6 +57,8 @@ typedef int64_t stime_t;
 #define BRAND_jpgs VLC_FOURCC( 'j', 'p', 'g', 's' ) /* heif */
 #define BRAND_avci VLC_FOURCC( 'a', 'v', 'c', 'i' ) /* heif */
 #define BRAND_avcs VLC_FOURCC( 'a', 'v', 'c', 's' ) /* heif */
+#define BRAND_avif VLC_FOURCC( 'a', 'v', 'i', 'f' ) /* heif AV1 AVIF */
+#define BRAND_avis VLC_FOURCC( 'a', 'v', 'i', 's' ) /* heig AV1 AVIF */
 
 #define ATOM_root VLC_FOURCC( 'r', 'o', 'o', 't' )
 #define ATOM_uuid VLC_FOURCC( 'u', 'u', 'i', 'd' )

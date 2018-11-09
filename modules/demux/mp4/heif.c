@@ -269,13 +269,19 @@ static int DemuxHEIF( demux_t *p_demux )
         case VLC_FOURCC('a','v','c','1'):
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
             break;
+        case ATOM_av01:
+            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_AV1 );
+            break;
         case VLC_FOURCC('j','p','e','g'):
             es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
             break;
         default:
-            if( psz_mime && !strcasecmp( "image/jpeg", psz_mime ) )
+            if( psz_mime )
             {
-                es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
+                if( !strcasecmp( "image/jpeg", psz_mime ) )
+                    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
+                else if( !strcasecmp( "image/avif", psz_mime ) )
+                    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_AV1 );
                 break;
             }
             return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
@@ -300,9 +306,11 @@ static int DemuxHEIF( demux_t *p_demux )
             {
                 case ATOM_hvcC:
                 case ATOM_avcC:
+                case ATOM_av1C:
                     if( !fmt.p_extra &&
                        ((fmt.i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
-                        (fmt.i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC)) )
+                        (fmt.i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ||
+                        (fmt.i_codec == VLC_CODEC_AV1  && p_prop->i_type == ATOM_av1C)) )
                     {
                         fmt.p_extra = malloc( p_prop->data.p_binary->i_blob );
                         if( fmt.p_extra )
@@ -346,6 +354,18 @@ static int DemuxHEIF( demux_t *p_demux )
                     fmt.video.space = iso_23001_8_mc_to_vlc_coeffs(
                                         p_prop->data.p_colr->nclc.i_matrix_idx );
                     fmt.video.b_color_range_full = p_prop->data.p_colr->nclc.i_full_range;
+                    break;
+                case ATOM_clli:
+                    fmt.video.lighting.MaxCLL = p_prop->data.p_CoLL->i_maxCLL;
+                    fmt.video.lighting.MaxFALL = p_prop->data.p_CoLL->i_maxFALL;
+                    break;
+                case ATOM_mdcv:
+                    memcpy( fmt.video.mastering.primaries,
+                            p_prop->data.p_SmDm->primaries, sizeof(uint16_t) * 6 );
+                    memcpy( fmt.video.mastering.white_point,
+                            p_prop->data.p_SmDm->white_point, sizeof(uint16_t) * 2 );
+                    fmt.video.mastering.max_luminance = p_prop->data.p_SmDm->i_luminanceMax;
+                    fmt.video.mastering.min_luminance = p_prop->data.p_SmDm->i_luminanceMin;
                     break;
             }
         }
@@ -451,11 +471,13 @@ int OpenHEIF( vlc_object_t * p_this )
         case BRAND_heix:
         case BRAND_jpeg:
         case BRAND_avci:
+        case BRAND_avif:
             break;
         case BRAND_msf1:
         case BRAND_hevc:
         case BRAND_hevx:
         case BRAND_avcs:
+        case BRAND_avis:
         default:
             return VLC_EGENERIC;
     }

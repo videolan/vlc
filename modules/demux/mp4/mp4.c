@@ -749,6 +749,7 @@ static int Open( vlc_object_t * p_this )
                 case BRAND_mif1:
                 case BRAND_jpeg:
                 case BRAND_avci:
+                case BRAND_avif:
                 /* We don't yet support f4v, but avformat does. */
                 case BRAND_f4v:
                     return VLC_EGENERIC;
