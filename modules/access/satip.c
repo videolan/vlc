@@ -666,7 +666,7 @@ static int satip_open(vlc_object_t *obj)
     }
 
     msg_Dbg(access, "connect to host '%s'", psz_host);
-    sys->tcp_sock = net_ConnectTCP(access, psz_host, url.i_port);
+    sys->tcp_sock = net_Connect(access, psz_host, url.i_port, SOCK_STREAM, 0);
     if (sys->tcp_sock < 0) {
         msg_Err(access, "Failed to connect to RTSP server %s:%d",
                 psz_host, url.i_port);
