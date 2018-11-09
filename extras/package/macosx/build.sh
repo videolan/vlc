@@ -210,7 +210,7 @@ fi
 if [ "$CONTRIBFROMSOURCE" = "yes" ]; then
     make fetch
     make -j$JOBS .gettext
-    make -j$JOBS
+    make -j$JOBS -k || make -j1
 
     if [ "$PACKAGE" = "yes" ]; then
         make package
