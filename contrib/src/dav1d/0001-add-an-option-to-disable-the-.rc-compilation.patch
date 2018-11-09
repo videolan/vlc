@@ -1,0 +1,46 @@
+From f459feb6b0b4ad526d794c8c3f3e5a2f09806ecc Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@videolan.org>
+Date: Fri, 9 Nov 2018 14:01:49 +0100
+Subject: [PATCH] add an option to disable the .rc compilation
+
+This is to avoid issues where Meson doesn't detect the .rc compiler properly
+and there is no way to disable the .rc files compilation for static targets.
+---
+ meson_options.txt | 6 ++++++
+ src/meson.build   | 6 +++++-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/meson_options.txt b/meson_options.txt
+index 08e75ad..bedbc7a 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -30,3 +30,9 @@ option('fuzzing_engine',
+     choices : ['none', 'libfuzzer', 'oss-fuzz'],
+     value: 'none',
+     description: 'Select the fuzzing engine')
++
++# temporary option until it can be done automatically only when 
++option('win32_ver',
++    type: 'boolean',
++    value: true,
++    description: 'Add a version number to the built library on Windows')
+diff --git a/src/meson.build b/src/meson.build
+index 5515c2e..fefa0b0 100644
+--- a/src/meson.build
++++ b/src/meson.build
+@@ -146,7 +146,11 @@ if host_machine.system() == 'windows'
+         configuration : rc_data
+     )
+ 
+-    libdav1d_rc_obj = winmod.compile_resources(rc_file)
++    if get_option('win32_ver')
++        libdav1d_rc_obj = winmod.compile_resources(rc_file)
++    else
++        libdav1d_rc_obj = []
++    endif
+ else
+     libdav1d_rc_obj = []
+ endif
+-- 
+2.17.0.windows.1
+
