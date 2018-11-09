@@ -74,7 +74,7 @@ parts:
         --disable-chromaprint
       make list
       make -j $(getconf _NPROCESSORS_ONLN) fetch
-      make -j $(getconf _NPROCESSORS_ONLN) install
+      make -j $(getconf _NPROCESSORS_ONLN) -k install || make -j1
       cd ../../
       export NOCONFIGURE=1
       autoreconf -fi
