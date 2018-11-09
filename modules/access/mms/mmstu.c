@@ -495,7 +495,7 @@ static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
 
     /* *** Open a TCP connection with server *** */
     msg_Dbg( p_access, "waiting for connection..." );
-    p_sys->i_handle_tcp = net_ConnectTCP( p_access, p_url->psz_host, p_url->i_port );
+    p_sys->i_handle_tcp = net_Connect( p_access, p_url->psz_host, p_url->i_port, SOCK_STREAM, 0 );
     if( p_sys->i_handle_tcp < 0 )
     {
         msg_Err( p_access, "failed to open a connection (tcp)" );
