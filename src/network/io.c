@@ -243,27 +243,6 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Bind the socket */
-#if defined (_WIN32)
-        /*
-         * Under Win32 and for multicasting, we bind to INADDR_ANY.
-         * This is of course a severe bug, since the socket would logically
-         * receive unicast traffic, and multicast traffic of groups subscribed
-         * to via other sockets.
-         */
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen)
-         && (sizeof (struct sockaddr_storage) >= ptr->ai_addrlen))
-        {
-            // This works for IPv4 too - don't worry!
-            struct sockaddr_in6 dumb =
-            {
-                .sin6_family = ptr->ai_addr->sa_family,
-                .sin6_port =  ((struct sockaddr_in *)(ptr->ai_addr))->sin_port
-            };
-
-            bind (fd, (struct sockaddr *)&dumb, ptr->ai_addrlen);
-        }
-        else
-#endif
         if (bind (fd, ptr->ai_addr, ptr->ai_addrlen))
         {
             int err = net_errno;
@@ -284,31 +263,13 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
             }
         }
 
-        if (net_SockAddrIsMulticast (ptr->ai_addr, ptr->ai_addrlen))
-        {
-            if (net_Subscribe (p_this, fd, ptr->ai_addr, ptr->ai_addrlen))
-            {
-                net_Close (fd);
-                continue;
-            }
-        }
-
         /* Listen */
-        switch (ptr->ai_socktype)
+        if (listen(fd, INT_MAX))
         {
-            case SOCK_STREAM:
-            case SOCK_RDM:
-            case SOCK_SEQPACKET:
-#ifdef SOCK_DCCP
-            case SOCK_DCCP:
-#endif
-                if (listen (fd, INT_MAX))
-                {
-                    msg_Err (p_this, "socket listen error: %s",
-                             vlc_strerror_c(net_errno));
-                    net_Close (fd);
-                    continue;
-                }
+            msg_Err(p_this, "socket listen error: %s",
+                    vlc_strerror_c(net_errno));
+            net_Close(fd);
+            continue;
         }
 
         int *nsockv = (int *)realloc (sockv, (sockc + 2) * sizeof (int));
