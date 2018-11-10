@@ -37,7 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_meta.h>
-#include <vlc_network.h>
+#include <vlc_tls.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
@@ -81,7 +81,7 @@ vlc_module_end ()
 
 typedef struct
 {
-    int fd;
+    vlc_tls_t *stream;
 
     /* From uri */
     vlc_url_t url;
@@ -145,7 +145,7 @@ static int Open( vlc_object_t *p_this )
     if( unlikely(p_sys == NULL) )
         return VLC_ENOMEM;
 
-    p_sys->fd = -1;
+    p_sys->stream = NULL;
     p_sys->b_proxy = false;
     p_sys->psz_proxy_passbuf = NULL;
     p_sys->psz_mime = NULL;
@@ -393,7 +393,7 @@ static int ReadData( stream_t *p_access, int *pi_read,
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    *pi_read = vlc_recv_i11e( p_sys->fd, p_buffer, i_len, 0 );
+    *pi_read = vlc_tls_Read(p_sys->stream, p_buffer, i_len, false);
     if( *pi_read < 0 && errno != EINTR && errno != EAGAIN )
         return VLC_EGENERIC;
     return VLC_SUCCESS;
@@ -409,7 +409,7 @@ static ssize_t Read( stream_t *p_access, void *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_sys->fd == -1 )
+    if (p_sys->stream == NULL)
         return 0;
 
     int i_chunk = i_len;
@@ -701,18 +701,18 @@ static int Connect( stream_t *p_access )
         return -1;
 
     /* Open connection */
-    assert( p_sys->fd == -1 ); /* No open sockets (leaking fds is BAD) */
-    p_sys->fd = net_ConnectTCP( p_access, srv.psz_host, srv.i_port );
-    if( p_sys->fd == -1 )
+    assert(p_sys->stream == NULL); /* No open sockets (leaking fds is BAD) */
+    p_sys->stream = vlc_tls_SocketOpenTCP(VLC_OBJECT(p_access),
+                                          srv.psz_host, srv.i_port);
+    if (p_sys->stream == NULL)
     {
         msg_Err( p_access, "cannot connect to %s:%d", srv.psz_host, srv.i_port );
         free( stream.ptr );
         return -1;
     }
-    setsockopt (p_sys->fd, SOL_SOCKET, SO_KEEPALIVE, &(int){ 1 }, sizeof (int));
 
     msg_Dbg( p_access, "sending request:\n%s", stream.ptr );
-    val = net_Write( p_access, p_sys->fd, stream.ptr, stream.length );
+    val = vlc_tls_Write(p_sys->stream, stream.ptr, stream.length);
     free( stream.ptr );
 
     if( val < (ssize_t)stream.length )
@@ -723,7 +723,7 @@ static int Connect( stream_t *p_access )
     }
 
     /* Read Answer */
-    char *psz = net_Gets( p_access, p_sys->fd );
+    char *psz = vlc_tls_GetLine(p_sys->stream);
     if( psz == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
@@ -765,7 +765,7 @@ static int Connect( stream_t *p_access )
     {
         char *p, *p_trailing;
 
-        psz = net_Gets( p_access, p_sys->fd );
+        psz = vlc_tls_GetLine(p_sys->stream);
         if( psz == NULL )
         {
             msg_Err( p_access, "failed to read answer" );
@@ -960,9 +960,9 @@ static void Disconnect( stream_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( p_sys->fd != -1)
-        net_Close(p_sys->fd);
-    p_sys->fd = -1;
+    if (p_sys->stream != NULL)
+        vlc_tls_Close(p_sys->stream);
+    p_sys->stream = NULL;
 
     vlc_http_auth_Deinit( &p_sys->auth );
     vlc_http_auth_Deinit( &p_sys->proxy_auth );
