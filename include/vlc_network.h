@@ -199,8 +199,6 @@ VLC_API ssize_t net_Read( vlc_object_t *p_this, int fd, void *p_data, size_t i_d
 VLC_API ssize_t net_Write( vlc_object_t *p_this, int fd, const void *p_data, size_t i_data );
 #define net_Write(a,b,c,d) net_Write(VLC_OBJECT(a),b,c,d)
 
-VLC_API ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... ) VLC_FORMAT( 3, 4 );
-#define net_Printf(o,fd,...) net_Printf(VLC_OBJECT(o),fd, __VA_ARGS__)
 VLC_API ssize_t net_vaPrintf( vlc_object_t *p_this, int fd, const char *psz_fmt, va_list args );
 #define net_vaPrintf(a,b,c,d) net_vaPrintf(VLC_OBJECT(a),b,c,d)
 

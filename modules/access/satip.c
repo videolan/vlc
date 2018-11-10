@@ -118,6 +118,23 @@ typedef struct
     bool woken;
 } access_sys_t;
 
+VLC_FORMAT(3, 4)
+static void net_Printf(stream_t *access, int fd, const char *fmt, ...)
+{
+    va_list ap;
+    char *str;
+    int val;
+
+    va_start(ap, fmt);
+    val = vasprintf(&str, fmt, ap);
+    va_end(ap);
+
+    if (val >= 0) {
+        net_Write(access, fd, str, val);
+        free(str);
+    }
+}
+
 static void parse_session(char *request_line, char *session, unsigned max, int *timeout) {
     char *state;
     char *tok;

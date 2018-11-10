@@ -445,18 +445,6 @@ ssize_t (net_Write)(vlc_object_t *obj, int fd, const void *buf, size_t len)
     return written;
 }
 
-#undef net_Printf
-ssize_t net_Printf( vlc_object_t *p_this, int fd, const char *psz_fmt, ... )
-{
-    int i_ret;
-    va_list args;
-    va_start( args, psz_fmt );
-    i_ret = net_vaPrintf( p_this, fd, psz_fmt, args );
-    va_end( args );
-
-    return i_ret;
-}
-
 #undef net_vaPrintf
 ssize_t net_vaPrintf( vlc_object_t *p_this, int fd,
                       const char *psz_fmt, va_list args )
