@@ -172,9 +172,6 @@ static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, unsigned 
 
 VLC_API void net_ListenClose( int *fd );
 
-int net_Subscribe (vlc_object_t *obj, int fd, const struct sockaddr *addr,
-                   socklen_t addrlen);
-
 VLC_API int net_SetCSCov( int fd, int sendcov, int recvcov );
 
 /**

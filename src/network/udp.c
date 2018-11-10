@@ -138,6 +138,9 @@ static int net_SetupDgramSocket (vlc_object_t *p_obj, int fd,
     return fd;
 }
 
+static int net_Subscribe(vlc_object_t *obj, int fd,
+                         const struct sockaddr *addr, socklen_t addrlen);
+
 /* */
 static int net_ListenSingle (vlc_object_t *obj, const char *host, unsigned port,
                              int protocol)
@@ -390,8 +393,8 @@ net_SourceSubscribe (vlc_object_t *obj, int fd,
 }
 
 
-int net_Subscribe (vlc_object_t *obj, int fd,
-                   const struct sockaddr *grp, socklen_t grplen)
+static int net_Subscribe(vlc_object_t *obj, int fd,
+                         const struct sockaddr *grp, socklen_t grplen)
 {
 /* MCAST_JOIN_GROUP was introduced to OS X in v10.7, but it doesn't work,
  * so ignore it to use the same code as on 10.5 or 10.6 */
