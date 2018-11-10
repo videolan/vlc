@@ -37,9 +37,6 @@
 
 #include <assert.h>
 #include <time.h>
-#ifdef HAVE_POLL
-# include <poll.h>
-#endif
 
 #define VLC_MODULE_LICENSE VLC_LICENSE_GPL_2_PLUS
 #include <vlc_common.h>
@@ -52,7 +49,7 @@
 #include <vlc_memstream.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>
-#include <vlc_network.h>
+#include <vlc_tls.h>
 #include <vlc_playlist.h>
 
 /*****************************************************************************
@@ -822,10 +819,9 @@ static void *Run(void *data)
         if (vlc_memstream_close(&req)) /* Out of memory */
             goto out;
 
-        int i_post_socket = net_ConnectTCP(p_intf, url->psz_host,
-                                        url->i_port);
-
-        if (i_post_socket == -1)
+        vlc_tls_t *sock = vlc_tls_SocketOpenTCP(VLC_OBJECT(p_intf),
+                                                url->psz_host, url->i_port);
+        if (sock == NULL)
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval(&next_exchange, &i_interval);
@@ -835,32 +831,27 @@ static void *Run(void *data)
         }
 
         /* we transmit the data */
-        int i_net_ret = net_Write(p_intf, i_post_socket, req.ptr, req.length);
+        int i_net_ret = vlc_tls_Write(sock, req.ptr, req.length);
         free(req.ptr);
         if (i_net_ret == -1)
         {
             /* If connection fails, we assume we must handshake again */
             HandleInterval(&next_exchange, &i_interval);
             b_handshaked = false;
-            net_Close(i_post_socket);
+            vlc_tls_Close(sock);
             continue;
         }
 
         /* FIXME: this might wait forever */
-        struct pollfd ufd = { .fd = i_post_socket, .events = POLLIN };
-        while( poll( &ufd, 1, -1 ) == -1 );
-
         /* FIXME: With TCP, you should never assume that a single read will
          * return the entire response... */
-        i_net_ret = recv(i_post_socket, p_buffer, sizeof(p_buffer) - 1, 0);
+        i_net_ret = vlc_tls_Read(sock, p_buffer, sizeof(p_buffer) - 1, false);
+        vlc_tls_Close(sock);
         if (i_net_ret <= 0)
         {
             /* if we get no answer, something went wrong : try again */
-            net_Close(i_post_socket);
             continue;
         }
-
-        net_Close(i_post_socket);
         p_buffer[i_net_ret] = '\0';
 
         char *failed = strstr((char *) p_buffer, "FAILED");
