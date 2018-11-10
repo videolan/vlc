@@ -57,7 +57,8 @@
 #include <vlc_subpicture.h>
 #include <vlc_actions.h>               /* KEY_MODIFIER_CTRL */
 
-#include <vlc_network.h>               /* net_*, htonl */
+#include <vlc_network.h>               /* htonl */
+#include <vlc_tls.h>
 #include <gcrypt.h>                    /* to encrypt password */
 #include <vlc_gcrypt.h>
 
@@ -208,7 +209,7 @@ struct filter_sys_t
 
     picture_t     *p_pic;              /* The picture with OSD data from VNC */
 
-    int           i_socket;            /* Socket used for VNC */
+    vlc_tls_t    *i_socket;            /* Socket used for VNC */
 
     uint16_t      i_vnc_width;          /* The with of the VNC screen */
     uint16_t      i_vnc_height;         /* The height of the VNC screen */
@@ -241,7 +242,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     p_sys->psz_passwd = var_InheritString( p_this, RMTOSD_CFG "password" );
     p_sys->i_alpha = var_InheritInteger( p_this, RMTOSD_CFG "alpha" );
     p_sys->p_pic = NULL;
-    p_sys->i_socket = -1;
+    p_sys->i_socket = NULL;
 
     memset( p_sys->ar_color_table_yuv, 255,
             sizeof( p_sys->ar_color_table_yuv ) );
@@ -317,8 +318,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     if( p_sys->p_pic != NULL )
         picture_Release( p_sys->p_pic );
-    if( p_sys->i_socket >= 0 )
-        net_Close( p_sys->i_socket );
+    if( p_sys->i_socket != NULL )
+        vlc_tls_Close( p_sys->i_socket );
 
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->psz_host );
@@ -326,28 +327,32 @@ static void DestroyFilter( vlc_object_t *p_this )
     free( p_sys );
 }
 
-static bool read_exact( filter_t *obj, int fd, void *buf, size_t len )
+static bool read_exact( filter_t *obj, vlc_tls_t *fd, void *buf, size_t len )
 {
-    return (ssize_t)len == net_Read( obj, fd, buf, len );
+    (void) obj;
+    return (ssize_t)len == vlc_tls_Read( fd, buf, len, true );
 }
 
 
-static bool write_exact( filter_t *obj, int fd, const void *buf, size_t len )
+static bool write_exact( filter_t *obj, vlc_tls_t *fd,
+                         const void *buf, size_t len )
 {
-    return (ssize_t)len == net_Write( obj, fd, buf, len );
+    (void) obj;
+    return (ssize_t)len == vlc_tls_Write( fd, buf, len );
 }
 
-static int vnc_connect( filter_t *p_filter )
+static vlc_tls_t *vnc_connect( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     int port = var_InheritInteger( p_filter, RMTOSD_CFG "port" );
 
-    int fd = net_ConnectTCP( p_filter, p_sys->psz_host, port );
-    if( fd == -1 )
+    vlc_tls_t *fd = vlc_tls_SocketOpenTCP( VLC_OBJECT(p_filter),
+                                           p_sys->psz_host, port );
+    if( fd == NULL )
     {
         msg_Err( p_filter, "Could not connect to VNC host" );
-        return -1;
+        return NULL;
     }
 
     msg_Dbg( p_filter, "Reading protocol version" );
@@ -552,8 +557,8 @@ static int vnc_connect( filter_t *p_filter )
 
     return fd;
 error:
-    net_Close( fd );
-    return -1;
+    vlc_tls_Close( fd );
+    return NULL;
 }
 
 static int write_update_request(filter_t *p_filter, bool incremental)
@@ -597,8 +602,8 @@ static void* vnc_worker_thread( void *obj )
 
     msg_Dbg( p_filter, "VNC worker thread started" );
 
-    int fd = vnc_connect( p_filter );
-    if( fd == -1 )
+    vlc_tls_t *fd = vnc_connect( p_filter );
+    if( fd == NULL )
     {
         msg_Err( p_filter, "Error occurred while handshaking VNC host" );
         return NULL;
@@ -616,7 +621,7 @@ static void* vnc_worker_thread( void *obj )
     }
     else
     {
-        net_Close( fd );
+        vlc_tls_Close( fd );
         return NULL;
     }
 
@@ -1207,7 +1212,7 @@ static int MouseEvent( filter_t *p_filter,
         return VLC_SUCCESS;
     }
 
-    if( p_sys->i_socket == -1 )
+    if( p_sys->i_socket == NULL )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
@@ -1254,7 +1259,7 @@ static int KeyEvent( vlc_object_t *p_this, char const *psz_var,
     }
 
     vlc_mutex_lock( &p_sys->lock );
-    if( p_sys->i_socket == -1 )
+    if( p_sys->i_socket == NULL )
     {
         vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
