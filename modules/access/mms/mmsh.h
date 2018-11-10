@@ -44,7 +44,7 @@ typedef struct
 {
     int             i_proto;
 
-    int             fd;
+    struct vlc_tls *stream;
     vlc_url_t       url;
 
     bool      b_proxy;
