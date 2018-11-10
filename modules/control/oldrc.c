@@ -48,7 +48,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-
+#include <vlc_fs.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
@@ -141,16 +141,27 @@ VLC_FORMAT(2, 3)
 static void msg_rc( intf_thread_t *p_intf, const char *psz_fmt, ... )
 {
     va_list args;
-    char fmt_eol[strlen (psz_fmt) + 3];
+    char fmt_eol[strlen (psz_fmt) + 3], *msg;
+    int len;
 
     snprintf (fmt_eol, sizeof (fmt_eol), "%s\r\n", psz_fmt);
     va_start( args, psz_fmt );
+    len = vasprintf( &msg, fmt_eol, args );
+    va_end( args );
+
+    if( len < 0 )
+        return;
 
     if( p_intf->p_sys->i_socket == -1 )
-        utf8_vfprintf( stdout, fmt_eol, args );
+#ifdef _WIN32
+        utf8_fprintf( stdout, "%s", msg );
+#else
+        vlc_write( 1, msg, len );
+#endif
     else
-        net_vaPrintf( p_intf, p_intf->p_sys->i_socket, fmt_eol, args );
-    va_end( args );
+        net_Write( p_intf, p_intf->p_sys->i_socket, msg, len );
+
+    free( msg );
 }
 #define msg_rc( ... ) msg_rc( p_intf, __VA_ARGS__ )
 
