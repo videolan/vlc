@@ -223,6 +223,7 @@ parts:
 
   wrapper:
     plugin: dump
+    after: [vlc]
     source: .
     organize:
       vlc-snap-wrapper.sh: bin/vlc-snap-wrapper.sh
