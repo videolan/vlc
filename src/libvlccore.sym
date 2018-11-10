@@ -291,7 +291,6 @@ net_OpenDgram
 net_Printf
 net_Read
 net_SetCSCov
-net_vaPrintf
 net_Write
 NTPtime64
 picture_BlendSubpicture
