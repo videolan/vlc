@@ -208,6 +208,8 @@ parts:
       - libnotify4
       - libvulkan1
       - libaacs0
+      - mesa-vulkan-drivers
+      - libvulkan-dev
     filesets:
       exclusion:
       - "-usr/lib/*/cmake/*"
@@ -227,3 +229,9 @@ parts:
     source: .
     organize:
       vlc-snap-wrapper.sh: bin/vlc-snap-wrapper.sh
+
+  fixup-vulkan-icd-paths:
+    plugin: nil
+    after: [wrapper]
+    override-build: |
+      sed -i -E 's,(^.+"library_path": ")/.*/,\1,' $SNAPCRAFT_STAGE/usr/share/vulkan/icd.d/*.json
