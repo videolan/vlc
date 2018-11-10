@@ -287,21 +287,6 @@ static inline int net_GetPeerAddress( int fd, char *address, int *port )
         ? VLC_EGENERIC : 0;
 }
 
-static inline void net_SetPort (struct sockaddr *addr, uint16_t port)
-{
-    switch (addr->sa_family)
-    {
-#ifdef AF_INET6
-        case AF_INET6:
-            ((struct sockaddr_in6 *)addr)->sin6_port = port;
-        break;
-#endif
-        case AF_INET:
-            ((struct sockaddr_in *)addr)->sin_port = port;
-        break;
-    }
-}
-
 VLC_API char *vlc_getProxyUrl(const char *);
 
 # ifdef __cplusplus

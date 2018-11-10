@@ -1152,6 +1152,20 @@ static int ParseSDPConnection (const char *str, struct sockaddr_storage *addr,
     return 0;
 }
 
+static void net_SetPort(struct sockaddr *addr, uint16_t port)
+{
+    switch (addr->sa_family)
+    {
+#ifdef AF_INET6
+        case AF_INET6:
+            ((struct sockaddr_in6 *)addr)->sin6_port = port;
+        break;
+#endif
+        case AF_INET:
+            ((struct sockaddr_in *)addr)->sin_port = port;
+        break;
+    }
+}
 
 /***********************************************************************
  * ParseSDP : SDP parsing
