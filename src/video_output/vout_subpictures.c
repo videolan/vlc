@@ -1640,7 +1640,8 @@ void spu_ClearChannel(spu_t *spu, int channel)
 
         if (!subpic)
             continue;
-        if (subpic->i_channel != channel && (channel != -1 || subpic->i_channel == VOUT_SPU_CHANNEL_OSD))
+        if (subpic->i_channel != channel &&
+            (channel != VOUT_SPU_CHANNEL_INVALID || subpic->i_channel == VOUT_SPU_CHANNEL_OSD))
             continue;
 
         /* You cannot delete subpicture outside of SpuSelectSubpictures */
