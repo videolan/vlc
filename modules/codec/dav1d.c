@@ -221,10 +221,10 @@ static int Decode(decoder_t *dec, block_t *block)
         if (res == 0)
         {
             picture_t *pic = img.allocator_data;
+            pic = picture_Clone(pic);
             pic->b_progressive = true; /* codec does not support interlacing */
             pic->date = timestamp_FifoGet(p_sys->ts_fifo);
             /* TODO udpate the color primaries and such */
-            picture_Hold(pic);
             decoder_QueueVideo(dec, pic);
             dav1d_picture_unref(&img);
         }
