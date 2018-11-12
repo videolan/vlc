@@ -807,11 +807,11 @@ libvlc_media_type_t libvlc_media_get_type( libvlc_media_t *p_md );
  */
 typedef struct libvlc_media_thumbnail_request_t libvlc_media_thumbnail_request_t;
 
-enum libvlc_thumbnailer_seek_speed
+typedef enum libvlc_thumbnailer_seek_speed_t
 {
     libvlc_media_thumbnail_seek_precise,
     libvlc_media_thumbnail_seek_fast,
-};
+} libvlc_thumbnailer_seek_speed_t;
 
 /**
  * \brief libvlc_media_get_thumbnail_by_time Start an asynchronous thumbnail generation
@@ -821,7 +821,7 @@ enum libvlc_thumbnailer_seek_speed
  *
  * \param md media descriptor object
  * \param time The time at which the thumbnail should be generated
- * \param speed The seeking speed \sa{enum libvlc_thumbnailer_seek_speed}
+ * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
  * \param width The thumbnail width
  * \param height the thumbnail height
  * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
@@ -837,7 +837,7 @@ enum libvlc_thumbnailer_seek_speed
 LIBVLC_API libvlc_media_thumbnail_request_t*
 libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
                                         libvlc_time_t time,
-                                        enum libvlc_thumbnailer_seek_speed speed,
+                                        libvlc_thumbnailer_seek_speed_t speed,
                                         unsigned int width, unsigned int height,
                                         libvlc_picture_type_t picture_type,
                                         libvlc_time_t timeout );
@@ -850,7 +850,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
  *
  * \param md media descriptor object
  * \param pos The position at which the thumbnail should be generated
- * \param speed The seeking speed \sa{enum libvlc_thumbnailer_seek_speed}
+ * \param speed The seeking speed \sa{libvlc_thumbnailer_seek_speed_t}
  * \param width The thumbnail width
  * \param height the thumbnail height
  * \param picture_type The thumbnail picture type \sa{libvlc_picture_type_t}
@@ -866,7 +866,7 @@ libvlc_media_thumbnail_request_by_time( libvlc_media_t *md,
 LIBVLC_API libvlc_media_thumbnail_request_t*
 libvlc_media_thumbnail_request_by_pos( libvlc_media_t *md,
                                        float pos,
-                                       enum libvlc_thumbnailer_seek_speed speed,
+                                       libvlc_thumbnailer_seek_speed_t speed,
                                        unsigned int width, unsigned int height,
                                        libvlc_picture_type_t picture_type,
                                        libvlc_time_t timeout );
