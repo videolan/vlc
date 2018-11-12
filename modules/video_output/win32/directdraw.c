@@ -187,6 +187,8 @@ static void WallpaperChange(vout_display_t *vd, bool use_wallpaper);
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     /* Allocate structure */
@@ -210,11 +212,11 @@ static int Open(vlc_object_t *object)
     var_Create(vd, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* Initialisation */
-    if (CommonInit(vd, false))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     /* */
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
 
     if (DirectXOpen(vd, &fmt))
         goto error;
@@ -235,8 +237,8 @@ static int Open(vlc_object_t *object)
     var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
-    video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, &fmt);
+    video_format_Clean(fmtp);
+    video_format_Copy(fmtp, &fmt);
     vd->info    = info;
 
     vd->pool    = Pool;
@@ -346,9 +348,13 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     switch (query) {
     case VOUT_DISPLAY_RESET_PICTURES:
+    {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(args, video_format_t *);
         DirectXClose(vd);
         /* Make sure the wallpaper is restored */
         if (sys->use_wallpaper) {
+
             vlc_mutex_lock(&sys->lock);
             if (!sys->ch_wallpaper) {
                 sys->ch_wallpaper = true;
@@ -358,7 +364,9 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
             WallpaperChange(vd, false);
         }
-        return DirectXOpen(vd, &vd->fmt);
+        (void) cfg;
+        return DirectXOpen(vd, fmt);
+    }
     default:
         return CommonControl(vd, query, args);
     }
@@ -427,7 +435,7 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
         msg_Err(vd, "cannot initialize DirectX DirectDraw");
         return VLC_EGENERIC;
     }
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     /* Create the picture pool */
     if (DirectXCreatePool(vd, &sys->sys.use_overlay, fmt)) {
@@ -1344,7 +1352,7 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
         src.bottom = vd->source.i_y_offset + vd->source.i_visible_height;
         AlignRect(&src, sys->sys.i_align_src_boundary, sys->sys.i_align_src_size);
 
-        vout_display_cfg_t cfg = *vd->cfg;
+        vout_display_cfg_t cfg = sys->sys.vdcfg;
         cfg.display.width  = sys->sys.rect_display.right;
         cfg.display.height = sys->sys.rect_display.bottom;
 

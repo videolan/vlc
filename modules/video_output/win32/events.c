@@ -456,7 +456,7 @@ bool EventThreadGetAndResetHasMoved( event_thread_t *p_event )
     return atomic_exchange(&p_event->has_moved, false);
 }
 
-event_thread_t *EventThreadCreate( vout_display_t *vd)
+event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t *vdcfg)
 {
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -480,7 +480,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd)
     p_event->source = vd->source;
     p_event->hwnd = NULL;
     atomic_init(&p_event->has_moved, false);
-    vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, false);
+    vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg, false);
 
     _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
                _T("VLC video main %p"), (void *)p_event );

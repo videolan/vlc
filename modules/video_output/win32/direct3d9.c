@@ -863,7 +863,7 @@ static int Direct3D9CreateResources(vout_display_t *vd, video_format_t *fmt)
 /**
  * It reset the Direct3D9 device and its resources.
  */
-static int Direct3D9Reset(vout_display_t *vd)
+static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
@@ -889,10 +889,10 @@ static int Direct3D9Reset(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     /* re-create them */
-    if (Direct3D9CreateResources(vd, &vd->fmt)) {
+    if (Direct3D9CreateResources(vd, fmtp)) {
         msg_Dbg(vd, "Direct3D9CreateResources failed !");
         return VLC_EGENERIC;
     }
@@ -1366,23 +1366,23 @@ static const d3d9_format_t d3d_formats[] = {
 
 /**
  * It returns the format (closest to chroma) that can be converted to target */
-static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, vlc_fourcc_t chroma, D3DFORMAT target)
+static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_format_t *fmt, D3DFORMAT target)
 {
     vout_display_sys_t *sys = vd->sys;
-    bool hardware_scale_ok = !(vd->fmt.i_visible_width & 1) && !(vd->fmt.i_visible_height & 1);
+    bool hardware_scale_ok = !(fmt->i_visible_width & 1) && !(fmt->i_visible_height & 1);
     if( !hardware_scale_ok )
         msg_Warn( vd, "Disabling hardware chroma conversion due to odd dimensions" );
 
     for (unsigned pass = 0; pass < 2; pass++) {
         const vlc_fourcc_t *list;
-        const vlc_fourcc_t dxva_chroma[] = {chroma, 0};
+        const vlc_fourcc_t dxva_chroma[] = {fmt->i_chroma, 0};
 
-        if (pass == 0 && is_d3d9_opaque(chroma))
+        if (pass == 0 && is_d3d9_opaque(fmt->i_chroma))
             list = dxva_chroma;
-        else if (pass == 0 && hardware_scale_ok && sys->allow_hw_yuv && vlc_fourcc_IsYUV(chroma))
-            list = vlc_fourcc_GetYUVFallback(chroma);
+        else if (pass == 0 && hardware_scale_ok && sys->allow_hw_yuv && vlc_fourcc_IsYUV(fmt->i_chroma))
+            list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
         else if (pass == 1)
-            list = vlc_fourcc_GetRGBFallback(chroma);
+            list = vlc_fourcc_GetRGBFallback(fmt->i_chroma);
         else
             continue;
 
@@ -1434,7 +1434,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     /* Find the appropriate D3DFORMAT for the render chroma, the format will be the closest to
      * the requested chroma which is usable by the hardware in an offscreen surface, as they
      * typically support more formats than textures */
-    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt->i_chroma, p_d3d9_dev->pp.BackBufferFormat);
+    const d3d9_format_t *d3dfmt = Direct3DFindFormat(vd, fmt, p_d3d9_dev->pp.BackBufferFormat);
     if (!d3dfmt) {
         msg_Err(vd, "surface pixel format is not supported.");
         goto error;
@@ -1445,7 +1445,7 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     fmt->i_bmask  = d3dfmt->bmask;
     sys->d3dtexture_format = d3dfmt;
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     if (Direct3D9CreateResources(vd, fmt)) {
         msg_Err(vd, "Failed to allocate resources");
@@ -1475,13 +1475,13 @@ static void Direct3D9Close(vout_display_t *vd)
     D3D9_ReleaseDevice(&sys->d3d_dev);
 }
 
-static int ControlReopenDevice(vout_display_t *vd)
+static int ControlReopenDevice(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->sys.use_desktop) {
         /* Save non-desktop state */
-        sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
+        sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
         sys->desktop_save.is_on_top     = sys->sys.is_on_top;
 
         WINDOWPLACEMENT wp = { .length = sizeof(wp), };
@@ -1530,7 +1530,7 @@ static int ControlReopenDevice(vout_display_t *vd)
         msg_Err(vd, "Failed to reopen device");
         return VLC_EGENERIC;
     }
-    vd->fmt = fmt;
+    *fmtp = fmt;
     sys->sys.is_first_display = true;
 
     if (sys->sys.use_desktop) {
@@ -1555,21 +1555,26 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
     switch (query) {
     case VOUT_DISPLAY_RESET_PICTURES:
+    {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        video_format_t *fmt = va_arg(args, video_format_t *);
         /* FIXME what to do here in case of failure */
         if (sys->reset_device) {
-            if (Direct3D9Reset(vd)) {
+            if (Direct3D9Reset(vd, fmt)) {
                 msg_Err(vd, "Failed to reset device");
                 return VLC_EGENERIC;
             }
             sys->reset_device = false;
         } else if(sys->reopen_device) {
-            if (ControlReopenDevice(vd)) {
+            if (ControlReopenDevice(vd, fmt)) {
                 msg_Err(vd, "Failed to reopen device");
                 return VLC_EGENERIC;
             }
             sys->reopen_device = false;
         }
+        (void) cfg;
         return VLC_SUCCESS;
+    }
     default:
         return CommonControl(vd, query, args);
     }
@@ -1640,6 +1645,8 @@ static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
 
     if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
         return VLC_EGENERIC; /* let a module who can handle it do it */
@@ -1678,14 +1685,14 @@ static int Open(vlc_object_t *object)
     sys->reopen_device = false;
     sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
-    sys->desktop_save.is_fullscreen = vd->cfg->is_fullscreen;
+    sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
     sys->desktop_save.win.left      = var_InheritInteger(vd, "video-x");
-    sys->desktop_save.win.right     = vd->cfg->display.width;
+    sys->desktop_save.win.right     = cfg->display.width;
     sys->desktop_save.win.top       = var_InheritInteger(vd, "video-y");
-    sys->desktop_save.win.bottom    = vd->cfg->display.height;
+    sys->desktop_save.win.bottom    = cfg->display.height;
 
-    if (CommonInit(vd, false))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     /* */
@@ -1720,8 +1727,8 @@ static int Open(vlc_object_t *object)
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
     /* Setup vout_display now that everything is fine */
-    video_format_Clean(&vd->fmt);
-    video_format_Copy(&vd->fmt, &fmt);
+    video_format_Clean(fmtp);
+    video_format_Copy(fmtp, &fmt);
     vd->info = info;
 
     vd->pool = DisplayPool;
@@ -1730,7 +1737,7 @@ static int Open(vlc_object_t *object)
     vd->control = Control;
 
     /* Fix state in case of desktop mode */
-    if (sys->sys.use_desktop && vd->cfg->is_fullscreen)
+    if (sys->sys.use_desktop && cfg->is_fullscreen)
         vout_display_SendEventFullscreen(vd, false);
 
     return VLC_SUCCESS;

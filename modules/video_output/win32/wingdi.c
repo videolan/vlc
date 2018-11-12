@@ -88,6 +88,8 @@ static void           Clean(vout_display_t *);
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     if ( !vd->obj.force && vd->source.projection_mode != PROJECTION_MODE_RECTANGULAR)
@@ -97,12 +99,11 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd, false))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     /* */
-    video_format_t fmt = vd->fmt;
-    if (Init(vd, &fmt))
+    if (Init(vd, fmtp))
         goto error;
 
     vout_display_info_t info = vd->info;
@@ -111,7 +112,6 @@ static int Open(vlc_object_t *object)
     info.has_pictures_invalid = true;
 
     /* */
-    vd->fmt  = fmt;
     vd->info = info;
 
     vd->pool    = Pool;
@@ -306,7 +306,7 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     else
         sys->sys.pool = NULL;
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     return VLC_SUCCESS;
 }

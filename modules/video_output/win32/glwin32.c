@@ -112,6 +112,8 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
     /* do not use OpenGL on XP unless forced */
@@ -124,7 +126,7 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd, false))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
     if (!sys->sys.b_windowless)
@@ -143,14 +145,14 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-    vlc_gl_Resize (sys->gl, vd->cfg->display.width, vd->cfg->display.height);
+    vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
 
-    video_format_t fmt = vd->fmt;
+    video_format_t fmt = *fmtp;
     const vlc_fourcc_t *subpicture_chromas;
     if (vlc_gl_MakeCurrent (sys->gl))
         goto error;
     sys->vgl = vout_display_opengl_New(&fmt, &subpicture_chromas, sys->gl,
-                                       &vd->cfg->viewpoint);
+                                       &cfg->viewpoint);
     vlc_gl_ReleaseCurrent (sys->gl);
     if (!sys->vgl)
         goto error;
@@ -160,7 +162,7 @@ static int Open(vlc_object_t *object)
     info.subpicture_chromas = subpicture_chromas;
 
    /* Setup vout_display now that everything is fine */
-    vd->fmt  = fmt;
+    *fmtp    = fmt;
     vd->info = info;
 
     vd->pool    = Pool;

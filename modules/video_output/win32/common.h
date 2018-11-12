@@ -71,6 +71,7 @@ typedef struct vout_display_sys_win32_t
     RECT         rect_dest_clipped;
 
     picture_pool_t *pool;
+    vout_display_cfg_t vdcfg;
 
     bool use_desktop;     /* show video on desktop window ? */
 
@@ -90,16 +91,14 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int  CommonInit(vout_display_t *, bool b_windowless);
+int  CommonInit(vout_display_t *, bool b_windowless, const vout_display_cfg_t *vdcfg);
 void CommonClean(vout_display_t *);
 void CommonManage(vout_display_t *);
 int  CommonControl(vout_display_t *, int , va_list );
 void CommonDisplay(vout_display_t *);
 int  CommonUpdatePicture(picture_t *, picture_t **fallback, uint8_t *plane, unsigned pitch);
 
-void UpdateRects (vout_display_t *,
-                  const vout_display_cfg_t *,
-                  bool is_forced);
+void UpdateRects (vout_display_t *, bool is_forced);
 void AlignRect(RECT *, int align_boundary, int align_size);
 
 /*****************************************************************************

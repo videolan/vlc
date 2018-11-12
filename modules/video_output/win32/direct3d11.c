@@ -127,7 +127,7 @@ static void Display(vout_display_t *, picture_t *);
 
 static void Direct3D11Destroy(vout_display_t *);
 
-static int  Direct3D11Open (vout_display_t *);
+static int  Direct3D11Open (vout_display_t *, video_format_t *);
 static void Direct3D11Close(vout_display_t *);
 
 static int SetupOutputFormat(vout_display_t *, video_format_t *);
@@ -306,7 +306,7 @@ static void UpdateSize(vout_display_t *vd)
     UpdatePicQuadPosition(vd);
 
     D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &sys->sys.rect_src_clipped,
-                             vd->fmt.orientation);
+                             vd->source.orientation);
 
     d3d11_device_unlock( &sys->d3d_dev );
 }
@@ -341,6 +341,8 @@ static unsigned int GetPictureHeight(const vout_display_t *vd)
 static int Open(vlc_object_t *object)
 {
     vout_display_t *vd = (vout_display_t *)object;
+    const vout_display_cfg_t *cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
 
 #if !VLC_WINSTORE_APP
     /* Allow using D3D11 automatically starting from Windows 8.1 */
@@ -368,7 +370,7 @@ static int Open(vlc_object_t *object)
     if (ret != VLC_SUCCESS)
         return ret;
 
-    if (CommonInit(vd, false))
+    if (CommonInit(vd, false, cfg))
         goto error;
 
 #if VLC_WINSTORE_APP
@@ -377,7 +379,7 @@ static int Open(vlc_object_t *object)
     sys->sys.pf_GetPictureWidth  = GetPictureWidth;
     sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
-    if (Direct3D11Open(vd)) {
+    if (Direct3D11Open(vd, fmtp)) {
         msg_Err(vd, "Direct3D11 could not be opened");
         goto error;
     }
@@ -445,21 +447,21 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
-    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->fmt.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
     {
         msg_Err(vd, "Could not allocate quad buffers.");
         return NULL;
     }
 
     if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   vd->fmt.orientation ) != VLC_SUCCESS) {
+                   vd->source.orientation ) != VLC_SUCCESS) {
         msg_Err(vd, "Could not Create the main quad picture.");
         return NULL;
     }
 
-    if ( vd->fmt.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
-         vd->fmt.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        SetQuadVSProjection( vd, &sys->picQuad, &vd->cfg->viewpoint );
+    if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
+         vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
+        SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
 
     if (!vd->info.is_slow) {
         HRESULT           hr;
@@ -725,6 +727,7 @@ static float UpdateZ(float f_fovx, float f_fovy)
 
 static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_viewpoint_t *p_vp)
 {
+    vout_display_sys_t *sys = vd->sys;
     if (!quad->pVertexShaderConstants)
         return;
 
@@ -734,14 +737,13 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
          f_fovx < -0.001f )
         return;
 
-    float f_sar = (float) vd->cfg->display.width / vd->cfg->display.height;
+    float f_sar = (float) sys->sys.vdcfg.display.width / sys->sys.vdcfg.display.height;
     float f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
     float f_phi  = RAD(p_vp->pitch);
     float f_roll = RAD(p_vp->roll);
     float f_fovy = UpdateFOVy(f_fovx, f_sar);
     float f_z = UpdateZ(f_fovx, f_fovy);
 
-    vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
     D3D11_MAPPED_SUBRESOURCE mapped;
     hr = ID3D11DeviceContext_Map(sys->d3d_dev.d3dcontext, (ID3D11Resource *)quad->pVertexShaderConstants, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
@@ -871,7 +873,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
                 sys->picQuad.i_height = texDesc.Height;
                 sys->picQuad.i_width = texDesc.Width;
 
-                UpdateRects(vd, NULL, true);
+                UpdateRects(vd, true);
                 UpdateSize(vd);
             }
         }
@@ -918,7 +920,7 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         renderSrc = p_sys->renderSrc;
     }
     D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
-                     vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                     vd->source.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
                      renderSrc, sys->swapchainTargetView);
 
     if (subpicture) {
@@ -1187,7 +1189,7 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
     return FindD3D11Format( vd, &vd->sys->d3d_dev, i_src_chroma, false, 0, 0, 0, false, supportFlags );
 }
 
-static int Direct3D11Open(vout_display_t *vd)
+static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
@@ -1289,8 +1291,8 @@ static int Direct3D11Open(vout_display_t *vd)
         return VLC_EGENERIC;
     }
 
-    video_format_Clean(&vd->fmt);
-    vd->fmt = fmt;
+    video_format_Clean(fmtp);
+    *fmtp = fmt;
 
     return VLC_SUCCESS;
 }
@@ -1420,7 +1422,7 @@ static void UpdatePicQuadPosition(vout_display_t *vd)
 
     D3D11_UpdateViewport( &sys->picQuad, &sys->sys.rect_dest_clipped, sys->display.pixelFormat );
 
-    SetQuadVSProjection(vd, &sys->picQuad, &vd->cfg->viewpoint);
+    SetQuadVSProjection(vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint);
 
 #ifndef NDEBUG
     msg_Dbg( vd, "picQuad position (%.02f,%.02f) %.02fx%.02f",
@@ -1483,7 +1485,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
@@ -1560,7 +1562,7 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
         ID3D11DepthStencilState_Release(pDepthStencilState);
     }
 
-    UpdateRects(vd, NULL, true);
+    UpdateRects(vd, true);
 
     hr = UpdateBackBuffer(vd);
     if (FAILED(hr)) {
