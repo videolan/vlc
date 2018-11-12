@@ -79,6 +79,9 @@ endif
 ifneq ($(findstring $(origin WIDL),undefined default),)
 WIDL := widl
 endif
+ifneq ($(findstring $(origin WINDRES),undefined default),)
+WINDRES := windres
+endif
 else
 ifneq ($(findstring $(origin CC),undefined default),)
 CC := $(HOST)-gcc
@@ -100,6 +103,9 @@ STRIP := $(HOST)-strip
 endif
 ifneq ($(findstring $(origin WIDL),undefined default),)
 WIDL := $(HOST)-widl
+endif
+ifneq ($(findstring $(origin WINDRES),undefined default),)
+WINDRES := $(HOST)-windres
 endif
 endif
 
@@ -541,6 +547,7 @@ crossfile.meson:
 	echo "ar = '$(AR)'" >> $@
 	echo "strip = '$(STRIP)'" >> $@
 	echo "pkgconfig = '$(PKG_CONFIG)'" >> $@
+	echo "windres = '$(WINDRES)'" >> $@
 	echo "[properties]" >> $@
 	echo "needs_exe_wrapper = true" >> $@
 ifdef HAVE_CROSS_COMPILE
