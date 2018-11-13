@@ -677,10 +677,6 @@ static int Open( vlc_object_t *p_this )
     if( unlikely( p_sys == NULL ) )
         return VLC_ENOMEM;
 
-    p_sys->rtp_counter = 0;
-    p_sys->last_rtcp_tx = 0;
-    memset(p_sys->receiver_name, 0, MAX_CNAME);
-
     int i_dst_port = RIST_DEFAULT_PORT;
     char *psz_dst_addr;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
