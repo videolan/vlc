@@ -27,6 +27,7 @@
 #include "item.h"
 #include "notify.h"
 #include "playlist.h"
+#include "player.h"
 
 static void
 vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
@@ -53,6 +54,19 @@ vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
 
     vlc_playlist_Notify(playlist, on_playback_order_changed, playlist->order);
     vlc_playlist_state_NotifyChanges(playlist, &state);
+
+    char const *state_text = NULL;
+    switch (playlist->order)
+    {
+        case VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL:
+            state_text = N_("Off");
+            break;
+        case VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM:
+            state_text = N_("On");
+            break;
+    }
+    vlc_playlist_PlayerOSDMessage(playlist,
+                                  _("Random: %s"), vlc_gettext(state_text));
 }
 
 static void
@@ -72,6 +86,21 @@ vlc_playlist_PlaybackRepeatChanged(vlc_playlist_t *playlist)
 
     vlc_playlist_Notify(playlist, on_playback_repeat_changed, playlist->repeat);
     vlc_playlist_state_NotifyChanges(playlist, &state);
+
+    char const *mode = NULL;
+    switch (playlist->repeat)
+    {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+            mode = N_("Off");
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            mode = N_("All");
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            mode = N_("One");
+            break;
+    }
+    vlc_playlist_PlayerOSDMessage(playlist, _("Loop: %s"), vlc_gettext(mode));
 }
 
 enum vlc_playlist_playback_repeat
@@ -335,6 +364,7 @@ vlc_playlist_Prev(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
+    vlc_playlist_PlayerOSDMessage(playlist, _("Previous"));
     return VLC_SUCCESS;
 }
 
@@ -362,6 +392,7 @@ vlc_playlist_Next(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
+    vlc_playlist_PlayerOSDMessage(playlist, _("Next"));
     return VLC_SUCCESS;
 }
 
