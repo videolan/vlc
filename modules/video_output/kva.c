@@ -146,6 +146,8 @@ static void PMThread( void *arg )
 {
     vout_display_t *vd = ( vout_display_t * )arg;
     vout_display_sys_t * sys = vd->sys;
+    const vout_display_cfg_t * cfg = vd->cfg;
+    video_format_t *fmtp = &vd->fmt;
     ULONG i_frame_flags;
     QMSG qm;
     char *psz_mode;
@@ -153,7 +155,7 @@ static void PMThread( void *arg )
 
     /* */
     video_format_t fmt;
-    video_format_ApplyRotation(&fmt, &vd->fmt);
+    video_format_ApplyRotation(&fmt, fmtp);
 
     /* */
     vout_display_info_t info = vd->info;
@@ -256,14 +258,14 @@ static void PMThread( void *arg )
         goto exit_open_display;
     }
 
-    if( vd->cfg->is_fullscreen && !sys->parent_window )
+    if( cfg->is_fullscreen && !sys->parent_window )
         WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE,
                     MPFROMLONG( true ), 0 );
 
     kvaDisableScreenSaver();
 
     /* Setup vout_display now that everything is fine */
-    vd->fmt     = fmt;
+    *fmtp       = fmt;
     vd->info    = info;
 
     vd->pool    = Pool;
