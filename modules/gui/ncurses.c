@@ -50,12 +50,14 @@
 #include <vlc_interface.h>
 #include <vlc_vout.h>
 #include <vlc_charset.h>
-#include <vlc_input.h>
+#include <vlc_input_item.h>
 #include <vlc_es.h>
-#include <vlc_playlist_legacy.h>
+#include <vlc_player.h>
+#include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>
+#include <vlc_vector.h>
 
 /*****************************************************************************
  * Local prototypes.
@@ -169,11 +171,7 @@ struct dir_entry_t
     char        *path;
 };
 
-struct pl_item_t
-{
-    input_item_t *item;
-    char         *display;
-};
+typedef struct VLC_VECTOR(char const *) pl_item_names;
 
 struct intf_sys_t
 {
@@ -216,11 +214,11 @@ struct intf_sys_t
     bool            show_hidden_files;
 
     /* Playlist context */
-    struct pl_item_t    **plist;
-    int             plist_entries;
-    bool            need_update;
-    bool            plidx_follow;
-    input_item_t    *node;        /* current node */
+    vlc_playlist_t             *playlist;
+    vlc_playlist_listener_id   *playlist_listener;
+    pl_item_names               pl_item_names;
+    bool                        need_update;
+    bool                        plidx_follow;
 };
 
 /*****************************************************************************
@@ -343,125 +341,61 @@ static void CheckIdx(intf_sys_t *sys)
 /*****************************************************************************
  * Playlist
  *****************************************************************************/
-static void PlaylistDestroy(intf_sys_t *sys)
-{
-    while (sys->plist_entries) {
-        struct pl_item_t *p_pl_item = sys->plist[--sys->plist_entries];
-
-        input_item_Release(p_pl_item->item);
-        free(p_pl_item->display);
-        free(p_pl_item);
-    }
-    free(sys->plist);
-    sys->plist = NULL;
-}
-
-static bool PlaylistAddChild(intf_sys_t *sys, playlist_item_t *p_child,
-                             const char *c, const char d)
-{
-    int ret;
-    char *name = input_item_GetTitleFbName(p_child->p_input);
-    struct pl_item_t *p_pl_item = malloc(sizeof *p_pl_item);
-
-    if (!name || !p_pl_item)
-        goto error;
-
-    if (c && *c)
-        ret = asprintf(&p_pl_item->display, "%s%c-%s", c, d, name);
-    else
-        ret = asprintf(&p_pl_item->display, " %s", name);
-    if (ret == -1)
-        goto error;
-
-    free(name);
-    p_pl_item->item = input_item_Hold(p_child->p_input);
-
-    TAB_APPEND(sys->plist_entries, sys->plist, p_pl_item);
-
-    return true;
-
-error:
-    free(name);
-    free(p_pl_item);
-    return false;
-}
-
-static void PlaylistAddNode(intf_sys_t *sys, playlist_item_t *node,
-                            const char *c)
-{
-    for (int k = 0; k < node->i_children; k++) {
-        bool last = k == node->i_children - 1;
-        playlist_item_t *p_child = node->pp_children[k];
-        if (!PlaylistAddChild(sys, p_child, c, last ? '`' : '|'))
-            return;
-
-        if (p_child->i_children <= 0)
-            continue;
-
-        if (*c) {
-            char *tmp;
-            if (asprintf(&tmp, "%s%c ", c, last ? ' ' : '|') == -1)
-                return;
-            PlaylistAddNode(sys, p_child, tmp);
-            free(tmp);
-        } else {
-            PlaylistAddNode(sys, p_child, " ");
-        }
-    }
-}
-
 static void PlaylistRebuild(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
 
-    PlaylistDestroy(sys);
-    PlaylistAddNode(sys, &p_playlist->root, "");
+    for (size_t i = 0; i < sys->pl_item_names.size; ++i)
+        free((void *)sys->pl_item_names.data[i]);
+    vlc_vector_clear(&sys->pl_item_names);
+
+    size_t count = vlc_playlist_Count(playlist);
+    if (!vlc_vector_reserve(&sys->pl_item_names, count))
+        return;
+    for (size_t i = 0; i < count; ++i)
+    {
+        vlc_playlist_item_t *plitem = vlc_playlist_Get(playlist, i);
+        input_item_t *item = vlc_playlist_item_GetMedia(plitem);
+        char *name = input_item_GetTitleFbName(item);
+        vlc_vector_push(&sys->pl_item_names, name);
+    }
+
+    sys->need_update = false;
 }
 
-static int ItemChanged(vlc_object_t *p_this, const char *variable,
-                       vlc_value_t oval, vlc_value_t nval, void *param)
+static void
+playlist_on_items_added(vlc_playlist_t *playlist,
+                        size_t index,
+                        vlc_playlist_item_t *const items[], size_t count,
+                        void *userdata)
 {
-    playlist_t *playlist = (playlist_t *)p_this;
-    intf_sys_t *sys = param;
+    VLC_UNUSED(playlist);
+    VLC_UNUSED(index); VLC_UNUSED(items); VLC_UNUSED(count);
 
-    VLC_UNUSED(p_this); VLC_UNUSED(variable);
-    VLC_UNUSED(oval); VLC_UNUSED(nval);
-
-    playlist_Lock(playlist);
+    intf_sys_t *sys = (intf_sys_t *)userdata;
     sys->need_update = true;
-    playlist_Unlock(playlist);
-
-    return VLC_SUCCESS;
 }
 
-static int PlaylistChanged(vlc_object_t *p_this, const char *variable,
-                            vlc_value_t oval, vlc_value_t nval, void *param)
+static void
+playlist_on_items_updated(vlc_playlist_t *playlist,
+                          size_t index,
+                          vlc_playlist_item_t *const items[], size_t count,
+                          void *userdata)
 {
-    playlist_t *playlist = (playlist_t *)p_this;
-    intf_sys_t *sys = param;
-    playlist_item_t *node = playlist_CurrentPlayingItem(playlist);
+    VLC_UNUSED(playlist);
+    VLC_UNUSED(index); VLC_UNUSED(items); VLC_UNUSED(count);
 
-    VLC_UNUSED(variable);
-    VLC_UNUSED(oval); VLC_UNUSED(nval);
-
-    sys->need_update = true;
-
-    if (sys->node != NULL)
-        input_item_Release(sys->node);
-    sys->node = (node != NULL) ? input_item_Hold(node->p_input) : NULL;
-
-    return VLC_SUCCESS;
+    ((intf_sys_t *)userdata)->need_update = true;
 }
 
 /* Playlist suxx */
 static int SubSearchPlaylist(intf_sys_t *sys, char *searchstring,
-                              int i_start, int i_stop)
+                             int i_start, int i_stop)
 {
     for (int i = i_start + 1; i < i_stop; i++)
-        if (strcasestr(sys->plist[i]->display, searchstring))
+        if (strcasestr(sys->pl_item_names.data[i], searchstring))
             return i;
-
     return -1;
 }
 
@@ -475,7 +409,8 @@ static void SearchPlaylist(intf_sys_t *sys)
     if (!str || !*str)
         return;
 
-    int i_item = SubSearchPlaylist(sys, str, i_first + 1, sys->plist_entries);
+    int i_item = SubSearchPlaylist(sys, str, i_first + 1,
+                                   sys->pl_item_names.size);
     if (i_item < 0)
         i_item = SubSearchPlaylist(sys, str, 0, i_first);
 
@@ -483,45 +418,6 @@ static void SearchPlaylist(intf_sys_t *sys)
         sys->box_idx = i_item;
         CheckIdx(sys);
     }
-}
-
-static inline bool IsIndex(intf_sys_t *sys, playlist_t *p_playlist, int i)
-{
-    PL_ASSERT_LOCKED;
-
-    input_item_t *input = sys->plist[i]->item;
-    playlist_item_t *item = playlist_ItemGetByInput(p_playlist, input);
-    if (unlikely(item == NULL))
-        return false;
-
-    if (item->i_children == 0 && input == sys->node)
-        return true;
-
-    playlist_item_t *p_played_item = playlist_CurrentPlayingItem(p_playlist);
-    if (p_played_item != NULL)
-        return input == p_played_item->p_input;
-
-    return false;
-}
-
-static void FindIndex(intf_sys_t *sys, playlist_t *p_playlist)
-{
-    int plidx = sys->box_idx;
-    int max = sys->plist_entries;
-
-    PL_LOCK;
-
-    if (!IsIndex(sys, p_playlist, plidx))
-        for (int i = 0; i < max; i++)
-            if (IsIndex(sys, p_playlist, i)) {
-                sys->box_idx = i;
-                CheckIdx(sys);
-                break;
-            }
-
-    PL_UNLOCK;
-
-    sys->plidx_follow = true;
 }
 
 /****************************************************************************
@@ -708,16 +604,18 @@ static void MainBoxWrite(intf_sys_t *sys, int l, const char *p_fmt, ...)
     free(p_buf);
 }
 
-static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
+static int DrawMeta(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_item_t *item;
     int l = 0;
 
-    if (!p_input)
+    vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+    vlc_player_Lock(player);
+    input_item_t *item = vlc_player_HoldCurrentMedia(player);
+    vlc_player_Unlock(player);
+    if (!item)
         return 0;
 
-    item = input_GetItem(p_input);
     vlc_mutex_lock(&item->lock);
     for (int i=0; i<VLC_META_TYPE_COUNT; i++) {
         const char *meta = vlc_meta_Get(item->p_meta, i);
@@ -731,19 +629,23 @@ static int DrawMeta(intf_thread_t *intf, input_thread_t *p_input)
     }
     vlc_mutex_unlock(&item->lock);
 
+    input_item_Release(item);
+
     return l;
 }
 
-static int DrawInfo(intf_thread_t *intf, input_thread_t *p_input)
+static int DrawInfo(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_item_t *item;
     int l = 0;
 
-    if (!p_input)
+    vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+    vlc_player_Lock(player);
+    input_item_t *item = vlc_player_HoldCurrentMedia(player);
+    vlc_player_Unlock(player);
+    if (!item)
         return 0;
 
-    item = input_GetItem(p_input);
     vlc_mutex_lock(&item->lock);
     for (int i = 0; i < item->i_categories; i++) {
         info_category_t *p_category = item->pp_categories[i];
@@ -758,21 +660,23 @@ static int DrawInfo(intf_thread_t *intf, input_thread_t *p_input)
     }
     vlc_mutex_unlock(&item->lock);
 
+    input_item_Release(item);
+
     return l;
 }
 
-static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
+static int DrawStats(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    input_item_t *item;
     input_stats_t *p_stats;
     int l = 0, i_audio = 0, i_video = 0;
 
-    if (!p_input)
+    vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
+    vlc_player_Lock(player);
+    input_item_t *item = vlc_player_HoldCurrentMedia(player);
+    vlc_player_Unlock(player);
+    if (!item)
         return 0;
-
-    item = input_GetItem(p_input);
-    assert(item);
 
     vlc_mutex_lock(&item->lock);
     p_stats = item->p_stats;
@@ -823,10 +727,12 @@ static int DrawStats(intf_thread_t *intf, input_thread_t *p_input)
 
     vlc_mutex_unlock(&item->lock);
 
+    input_item_Release(item);
+
     return l;
 }
 
-static int DrawHelp(intf_thread_t *intf, input_thread_t *input)
+static int DrawHelp(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
     int l = 0;
@@ -904,11 +810,10 @@ static int DrawHelp(intf_thread_t *intf, input_thread_t *input)
     H(_(" <up>,<down>            Seek +/-5%%"));
 
 #undef H
-    (void) input;
     return l;
 }
 
-static int DrawBrowse(intf_thread_t *intf, input_thread_t *input)
+static int DrawBrowse(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
 
@@ -921,52 +826,40 @@ static int DrawBrowse(intf_thread_t *intf, input_thread_t *input)
         MainBoxWrite(sys, i, " %c %s", type, dir_entry->path);
     }
 
-    (void) input;
     return sys->n_dir_entries;
 }
 
-static int DrawPlaylist(intf_thread_t *intf, input_thread_t *input)
+static int DrawPlaylist(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
 
-    PL_LOCK;
-    if (sys->need_update) {
+    vlc_playlist_Lock(playlist);
+    ssize_t cur_idx = vlc_playlist_GetCurrentIndex(playlist);
+    if (sys->need_update)
         PlaylistRebuild(intf);
-        sys->need_update = false;
-    }
-    PL_UNLOCK;
+    vlc_playlist_Unlock(playlist);
 
     if (sys->plidx_follow)
-        FindIndex(sys, p_playlist);
+        sys->box_idx = cur_idx == -1 ? 0 : cur_idx;
 
-    for (int i = 0; i < sys->plist_entries; i++) {
-        char c;
-        playlist_item_t *current;
-        input_item_t *item = sys->plist[i]->item;
+    for (size_t i = 0; i < sys->pl_item_names.size; i++)
+    {
+        if (sys->color)
+            color_set(i%3 + C_PLAYLIST_1, NULL);
 
-        PL_LOCK;
-        current = playlist_CurrentPlayingItem(p_playlist);
+        MainBoxWrite(sys, i, "%c %s",
+                (ssize_t)i == cur_idx ? '>' : ' ',
+                sys->pl_item_names.data[i]);
 
-        if ((sys->node != NULL && item == sys->node) ||
-            (sys->node == NULL && current != NULL && item == current->p_input))
-            c = '*';
-        else if (current != NULL && current->p_input == item)
-            c = '>';
-        else
-            c = ' ';
-        PL_UNLOCK;
-
-        if (sys->color) color_set(i%3 + C_PLAYLIST_1, NULL);
-        MainBoxWrite(sys, i, "%c%s", c, sys->plist[i]->display);
-        if (sys->color) color_set(C_DEFAULT, NULL);
+        if (sys->color)
+            color_set(C_DEFAULT, NULL);
     }
 
-    (void) input;
-    return sys->plist_entries;
+    return sys->pl_item_names.size;
 }
 
-static int DrawMessages(intf_thread_t *intf, input_thread_t *input)
+static int DrawMessages(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
     int l = 0;
@@ -992,14 +885,13 @@ static int DrawMessages(intf_thread_t *intf, input_thread_t *input)
     if (sys->color)
         color_set(C_DEFAULT, NULL);
 
-    (void) input;
     return l;
 }
 
-static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
+static int DrawStatus(intf_thread_t *intf)
 {
     intf_sys_t     *sys = intf->p_sys;
-    playlist_t     *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
     const char *name = _("VLC media player");
     const size_t name_len = strlen(name) + sizeof(PACKAGE_VERSION);
     int y = 0;
@@ -1020,71 +912,87 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
 
     y++; /* leave a blank line */
 
-    repeat = var_GetBool(p_playlist, "repeat") ? _("[Repeat]") : "";
-    random = var_GetBool(p_playlist, "random") ? _("[Random]") : "";
-    loop   = var_GetBool(p_playlist, "loop")   ? _("[Loop]")    : "";
+    repeat = "";
+    loop = "";
+    random = "";
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_repeat repeat_mode =
+        vlc_playlist_GetPlaybackRepeat(playlist);
+    enum vlc_playlist_playback_order order_mode =
+        vlc_playlist_GetPlaybackOrder(playlist);
+    if (repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT)
+        repeat = "[Repeat]";
+    else if (repeat_mode == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL)
+        loop = "[Loop]";
+    if (order_mode == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+        random = "[Random]";
 
-    if (p_input) {
-        vlc_value_t val;
+    vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+    if (vlc_player_IsStarted(player)) {
         char *path, *uri;
 
-        uri = input_item_GetURI(input_GetItem(p_input));
+        input_item_t *item = vlc_player_GetCurrentMedia(player);
+        assert(item);
+        uri = input_item_GetURI(item);
         path = vlc_uri2path(uri);
 
         mvnprintw(y++, 0, COLS, _(" Source   : %s"), path?path:uri);
         free(uri);
         free(path);
 
-        var_Get(p_input, "state", &val);
-        switch(val.i_int)
+        enum vlc_player_state state = vlc_player_GetState(player);
+        switch (state)
         {
             static const char *input_state[] = {
-                [PLAYING_S] = " State    : Playing %s%s%s",
-                [OPENING_S] = " State    : Opening/Connecting %s%s%s",
-                [PAUSE_S]   = " State    : Paused %s%s%s",
+                [VLC_PLAYER_STATE_PLAYING] = " State    : Playing %s%s%s",
+                [VLC_PLAYER_STATE_STARTED] = " State    : Opening/Connecting %s%s%s",
+                [VLC_PLAYER_STATE_PAUSED]  = " State    : Paused %s%s%s",
             };
             char buf1[MSTRTIME_MAX_SIZE];
             char buf2[MSTRTIME_MAX_SIZE];
             float volume;
 
-        case INIT_S:
-        case END_S:
+        case VLC_PLAYER_STATE_STOPPED:
             y += 2;
             break;
 
-        case PLAYING_S:
-        case OPENING_S:
-        case PAUSE_S:
-            mvnprintw(y++, 0, COLS, _(input_state[val.i_int]),
-                        repeat, random, loop);
-            /* fall-through */
+        case VLC_PLAYER_STATE_PLAYING:
+        case VLC_PLAYER_STATE_STARTED:
+        case VLC_PLAYER_STATE_PAUSED:
+            mvnprintw(y++, 0, COLS, _(input_state[state]), repeat, random, loop);
+            /* Fall-through */
 
         default:
-            secstotimestr(buf1, SEC_FROM_VLC_TICK(var_GetInteger(p_input, "time")));
-            secstotimestr(buf2, SEC_FROM_VLC_TICK(var_GetInteger(p_input, "length")));
+            secstotimestr(buf1, SEC_FROM_VLC_TICK(vlc_player_GetTime(player)));
+            secstotimestr(buf2, SEC_FROM_VLC_TICK(vlc_player_GetLength(player)));
 
             mvnprintw(y++, 0, COLS, _(" Position : %s/%s"), buf1, buf2);
 
-            volume = playlist_VolumeGet(p_playlist);
-            int mute = playlist_MuteGet(p_playlist);
+            volume = vlc_player_aout_GetVolume(player);
+            bool mute = vlc_player_aout_IsMuted(player);
             mvnprintw(y++, 0, COLS,
                       mute ? _(" Volume   : Mute") :
                       volume >= 0.f ? _(" Volume   : %3ld%%") : _(" Volume   : ----"),
                       lroundf(volume * 100.f));
 
-            if (!var_Get(p_input, "title", &val)) {
-                int i_title_count = var_CountChoices(p_input, "title");
-                if (i_title_count > 0)
-                    mvnprintw(y++, 0, COLS, _(" Title    : %"PRId64"/%d"),
-                               val.i_int, i_title_count);
-            }
+            size_t title_count = 0;
+            struct vlc_player_title_list *titles =
+                vlc_player_GetTitleList(player);
+            if (titles)
+                title_count = vlc_player_title_list_GetCount(titles);
+            if (title_count > 0)
+                mvnprintw(y++, 0, COLS, _(" Title    : %zd/%d"),
+                          vlc_player_GetSelectedTitleIdx(player), title_count);
+            struct vlc_player_title const *title =
+                vlc_player_GetSelectedTitle(player);
 
-            if (!var_Get(p_input, "chapter", &val)) {
-                int i_chapter_count = var_CountChoices(p_input, "chapter");
-                if (i_chapter_count > 0) mvnprintw(y++, 0, COLS, _(" Chapter  : %"PRId64"/%d"),
-                               val.i_int, i_chapter_count);
-            }
+            if (title && title->chapter_count > 0)
+                mvnprintw(y++, 0, COLS, _(" Chapter  : %zd/%d"),
+                          vlc_player_GetSelectedChapterIdx(player),
+                          title->chapter_count);
         }
+        if (vlc_player_GetError(player) == VLC_PLAYER_ERROR_GENERIC)
+            y += 2;
     } else {
         mvnprintw(y++, 0, COLS, _(" Source: <no current item>"));
         mvnprintw(y++, 0, COLS, " %s%s%s", repeat, random, loop);
@@ -1095,10 +1003,11 @@ static int DrawStatus(intf_thread_t *intf, input_thread_t *p_input)
     if (sys->color) color_set(C_DEFAULT, NULL);
     DrawBox(y++, 1, sys->color, ""); /* position slider */
     DrawEmptyLine(y, 1, COLS-2);
-    if (p_input)
-        DrawLine(y, 1, (int)((COLS-2) * var_GetFloat(p_input, "position")));
-
+    if (vlc_player_IsStarted(player))
+        DrawLine(y, 1, (int)((COLS-2) * vlc_player_GetPosition(player)));
     y += 2; /* skip slider and box */
+
+    vlc_playlist_Unlock(playlist);
 
     return y;
 }
@@ -1114,10 +1023,10 @@ static void FillTextBox(intf_sys_t *sys)
         mvnprintw(7, 1, width, _("Find: %s"), sys->search_chain);
 }
 
-static void FillBox(intf_thread_t *intf, input_thread_t *input)
+static void FillBox(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
-    static int (* const draw[]) (intf_thread_t *, input_thread_t *) = {
+    static int (* const draw[]) (intf_thread_t *) = {
         [BOX_HELP]      = DrawHelp,
         [BOX_INFO]      = DrawInfo,
         [BOX_META]      = DrawMeta,
@@ -1129,17 +1038,17 @@ static void FillBox(intf_thread_t *intf, input_thread_t *input)
         [BOX_LOG]       = DrawMessages,
     };
 
-    sys->box_lines_total = draw[sys->box_type](intf, input);
+    sys->box_lines_total = draw[sys->box_type](intf);
 
     if (sys->box_type == BOX_SEARCH || sys->box_type == BOX_OPEN)
         FillTextBox(sys);
 }
 
-static void Redraw(intf_thread_t *intf, input_thread_t *input)
+static void Redraw(intf_thread_t *intf)
 {
     intf_sys_t *sys   = intf->p_sys;
     int         box   = sys->box_type;
-    int         y     = DrawStatus(intf, input);
+    int         y     = DrawStatus(intf);
 
     sys->box_height = LINES - y - 2;
     DrawBox(y++, sys->box_height, sys->color, _(box_title[box]));
@@ -1147,7 +1056,7 @@ static void Redraw(intf_thread_t *intf, input_thread_t *input)
     sys->box_y = y;
 
     if (box != BOX_NONE) {
-        FillBox(intf, input);
+        FillBox(intf);
 
         if (sys->box_lines_total == 0)
             sys->box_start = 0;
@@ -1163,19 +1072,12 @@ static void Redraw(intf_thread_t *intf, input_thread_t *input)
     refresh();
 }
 
-static void ChangePosition(input_thread_t *p_input, float increment)
+static void ChangePosition(vlc_player_t *player, float increment)
 {
-    float pos;
-
-    if (!p_input || var_GetInteger(p_input, "state") != PLAYING_S)
-        return;
-
-    pos = var_GetFloat(p_input, "position") + increment;
-
-    if (pos > 0.99) pos = 0.99;
-    if (pos < 0.0)  pos = 0.0;
-
-    var_SetFloat(p_input, "position", pos);
+    vlc_player_Lock(player);
+    if (vlc_player_GetState(player) == VLC_PLAYER_STATE_PLAYING)
+        vlc_player_JumpPos(player, increment);
+    vlc_player_Unlock(player);
 }
 
 static inline void RemoveLastUTF8Entity(char *psz, int len)
@@ -1213,41 +1115,29 @@ static char *GetDiscDevice(const char *name)
     return device;
 }
 
-static void Eject(intf_thread_t *intf, input_thread_t *p_input)
+static void Eject(intf_thread_t *intf, vlc_player_t *player)
 {
     char *device, *name;
-    playlist_t * p_playlist = pl_Get(intf);
 
     /* If there's a stream playing, we aren't allowed to eject ! */
-    if (p_input)
+    vlc_player_Lock(player);
+    bool started = vlc_player_IsStarted(player);
+    vlc_player_Unlock(player);
+    if (started)
         return;
 
-    PL_LOCK;
-
-    if (!playlist_CurrentPlayingItem(p_playlist)) {
-        PL_UNLOCK;
+    vlc_player_Lock(player);
+    input_item_t *current = vlc_player_GetCurrentMedia(player);
+    vlc_player_Unlock(player);
+    if (!current)
         return;
-    }
-
-    name = playlist_CurrentPlayingItem(p_playlist)->p_input->psz_name;
+    name = current->psz_name;
     device = name ? GetDiscDevice(name) : NULL;
-
-    PL_UNLOCK;
 
     if (device) {
         intf_Eject(intf, device);
         free(device);
     }
-}
-
-static void PlayPause(intf_thread_t *intf, input_thread_t *p_input)
-{
-    if (p_input) {
-        int64_t state = var_GetInteger( p_input, "state" );
-        state = (state != PLAYING_S) ? PLAYING_S : PAUSE_S;
-        var_SetInteger( p_input, "state", state );
-    } else
-        playlist_Play(pl_Get(intf));
 }
 
 static void AddItem(intf_thread_t *intf, const char *path)
@@ -1261,23 +1151,11 @@ static void AddItem(intf_thread_t *intf, const char *path)
     if (unlikely(item == NULL))
         return;
 
-    playlist_t *playlist = pl_Get(intf);
-    playlist_item_t *node;
-
-    playlist_Lock(playlist);
-    node = playlist_CurrentPlayingItem(playlist);
-
-    while (node != NULL) {
-        if (node == playlist->p_playing)
-            break;
-        node = node->p_parent;
-    }
-
-    if (node == NULL)
-        node = playlist->p_playing;
-
-    playlist_NodeAddInput(playlist, item, node, PLAYLIST_END);
-    playlist_Unlock(playlist);
+    intf_sys_t *sys = intf->p_sys;
+    vlc_playlist_t *playlist = sys->playlist;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_AppendOne(playlist, item);
+    vlc_playlist_Unlock(playlist);
 
     input_item_Release(item);
 }
@@ -1292,24 +1170,63 @@ static inline void BoxSwitch(intf_sys_t *sys, int box)
 static bool HandlePlaylistKey(intf_thread_t *intf, int key)
 {
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
 
     switch(key)
     {
     /* Playlist Settings */
-    case 'r': var_ToggleBool(p_playlist, "random"); return true;
-    case 'l': var_ToggleBool(p_playlist, "loop");   return true;
-    case 'R': var_ToggleBool(p_playlist, "repeat"); return true;
+    case 'r':
+        vlc_playlist_Lock(playlist);
+        enum vlc_playlist_playback_order order_mode =
+            vlc_playlist_GetPlaybackOrder(playlist);
+        order_mode =
+            order_mode == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL
+            ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM
+            : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+        vlc_playlist_SetPlaybackOrder(playlist, order_mode);
+        vlc_playlist_Unlock(playlist);
+        return true;
+    case 'l':
+    case 'R':
+        vlc_playlist_Lock(playlist);
+        enum vlc_playlist_playback_repeat repeat_mode =
+            vlc_playlist_GetPlaybackRepeat(playlist);
+        switch (repeat_mode)
+        {
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+                repeat_mode = key == 'l'
+                    ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL
+                    : VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+                repeat_mode = key == 'l'
+                    ? VLC_PLAYLIST_PLAYBACK_REPEAT_NONE
+                    : VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+                break;
+            case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+                repeat_mode = key == 'l'
+                    ? VLC_PLAYLIST_PLAYBACK_REPEAT_ALL
+                    : VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+                break;
+        }
+        vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
+        vlc_playlist_Unlock(playlist);
+        return true;
 
     /* Playlist sort */
     case 'o':
     case 'O':
-        playlist_Lock(p_playlist);
-        playlist_RecursiveNodeSort(p_playlist, &p_playlist->root,
-                                   SORT_TITLE_NODES_FIRST,
-                                   (key == 'o')? ORDER_NORMAL : ORDER_REVERSE);
+        vlc_playlist_Lock(playlist);
+        struct vlc_playlist_sort_criterion criteria =
+        {
+            .key = VLC_PLAYLIST_SORT_KEY_TITLE,
+            .order = key == 'o'
+                ? VLC_PLAYLIST_SORT_ORDER_ASCENDING
+                : VLC_PLAYLIST_SORT_ORDER_DESCENDING
+        };
+        vlc_playlist_Sort(playlist, &criteria, 1);
         sys->need_update = true;
-        playlist_Unlock(p_playlist);
+        vlc_playlist_Unlock(playlist);
         return true;
 
     case ';':
@@ -1317,7 +1234,10 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
         return true;
 
     case 'g':
-        FindIndex(sys, p_playlist);
+        vlc_playlist_Lock(playlist);
+        sys->box_idx = vlc_playlist_GetCurrentIndex(playlist);
+        vlc_playlist_Unlock(playlist);
+        sys->plidx_follow = true;
         return true;
 
     /* Deletion */
@@ -1325,61 +1245,28 @@ static bool HandlePlaylistKey(intf_thread_t *intf, int key)
     case KEY_BACKSPACE:
     case 0x7f:
     case KEY_DC:
-    {
-        input_item_t *input = sys->plist[sys->box_idx]->item;
-        playlist_item_t *item;
-
-        PL_LOCK;
-        item = playlist_ItemGetByInput(p_playlist, input);
-        playlist_NodeDelete(p_playlist, item);
-
-        if (sys->box_idx >= sys->box_lines_total - 1)
-            sys->box_idx = sys->box_lines_total - 2;
-        sys->need_update = true;
-        PL_UNLOCK;
+        if (sys->pl_item_names.size)
+        {
+            vlc_playlist_Lock(playlist);
+            vlc_playlist_RemoveOne(playlist, sys->box_idx);
+            if (sys->box_idx >= sys->box_lines_total - 1)
+                sys->box_idx = sys->box_lines_total - 2;
+            sys->need_update = true;
+            vlc_playlist_Unlock(playlist);
+        }
         return true;
-    }
 
     case KEY_ENTER:
     case '\r':
     case '\n':
-    {
-        struct pl_item_t *p_pl_item = sys->plist[sys->box_idx];
-        if (p_pl_item == NULL)
-            return false;
-
-        playlist_item_t *item;
-
-        playlist_Lock(p_playlist);
-        item = playlist_ItemGetByInput(p_playlist, p_pl_item->item);
-
-        if (item->i_children) {
-            playlist_item_t *parent = item;
-
-            if (item->i_children == -1) {
-                while (parent->p_parent != NULL)
-                    parent = parent->p_parent;
-            } else {
-                if (sys->node != NULL)
-                    input_item_Release(sys->node);
-                sys->node = parent->p_input ? input_item_Hold(parent->p_input)
-                                            : NULL;
-                item = NULL;
-            }
-
-            playlist_ViewPlay(p_playlist, parent, item);
-        } else {   /* We only want to set the current node */
-            playlist_Control(p_playlist, PLAYLIST_STOP, true);
-            if (sys->node != NULL)
-                input_item_Release(sys->node);
-            sys->node = p_pl_item->item ? input_item_Hold(p_pl_item->item)
-                                        : NULL;
+        if (sys->pl_item_names.size)
+        {
+            vlc_playlist_Lock(playlist);
+            vlc_playlist_PlayAt(playlist, sys->box_idx);
+            vlc_playlist_Unlock(playlist);
+            sys->plidx_follow = true;
         }
-        playlist_Unlock(p_playlist);
-
-        sys->plidx_follow = true;
         return true;
-    }
     }
 
     return false;
@@ -1495,49 +1382,19 @@ static void HandleEditBoxKey(intf_thread_t *intf, int key, int box)
         SearchPlaylist(sys);
 }
 
-static void InputNavigate(input_thread_t* p_input, const char *var)
-{
-    if (p_input)
-        var_TriggerCallback(p_input, var);
-}
-
-static void CycleESTrack(input_thread_t *input, const char *var)
-{
-    if (!input)
-        return;
-
-    vlc_value_t *list;
-    size_t count;
-
-    if (var_Change(input, var, VLC_VAR_GETCHOICES,
-                   &count, &list, (char ***)NULL) < 0)
-        return;
-
-    int64_t current = var_GetInteger(input, var);
-
-    size_t i;
-    for (i = 0; i < count; i++)
-        if (list[i].i_int == current)
-            break;
-
-    if (++i >= count)
-        i = 0;
-    var_SetInteger(input, var, list[i].i_int);
-    free(list);
-}
-
-static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
-                            int key)
+static void HandleCommonKey(intf_thread_t *intf, vlc_player_t *player, int key)
 {
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
+
     switch(key)
     {
     case 0x1b:  /* ESC */
         /* See comment in HandleEditBoxKey() */
         if (getch() != ERR)
             return;
-        /* fall through */
+        /* Fall-through */
+
     case 'q':
     case 'Q':
     case KEY_EXIT:
@@ -1564,39 +1421,90 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
         return;
 
     /* Navigation */
-    case KEY_RIGHT: ChangePosition(input, +0.01); return;
-    case KEY_LEFT:  ChangePosition(input, -0.01); return;
+    case KEY_RIGHT: ChangePosition(player, +0.01); return;
+    case KEY_LEFT:  ChangePosition(player, -0.01); return;
 
     /* Common control */
     case 'f':
-        if (input) {
-            vout_thread_t *p_vout = input_GetVout(input);
-            if (p_vout) {
-                bool fs = var_ToggleBool(p_playlist, "fullscreen");
-                var_SetBool(p_vout, "fullscreen", fs);
-                vout_Release(p_vout);
-            }
-        }
+        vlc_player_vout_ToggleFullscreen(player);
         return;
 
-    case ' ': PlayPause(intf, input);       return;
-    case 's': playlist_Stop(p_playlist);    return;
-    case 'e': Eject(intf, input);           return;
+    case ' ':
+        vlc_player_Lock(player);
+        vlc_player_TogglePause(player);
+        vlc_player_Unlock(player);
+        return;
+    case 's':
+        vlc_player_Lock(player);
+        vlc_player_Stop(player);
+        vlc_player_Unlock(player);
+        return;
 
-    case '[': InputNavigate(input, "prev-title");      return;
-    case ']': InputNavigate(input, "next-title");      return;
-    case '<': InputNavigate(input, "prev-chapter");    return;
-    case '>': InputNavigate(input, "next-chapter");    return;
+    case 'e': Eject(intf, player);           return;
 
-    case 'p': playlist_Prev(p_playlist);            break;
-    case 'n': playlist_Next(p_playlist);            break;
-    case 'a': playlist_VolumeUp(p_playlist, 1, NULL);   break;
-    case 'z': playlist_VolumeDown(p_playlist, 1, NULL); break;
-    case 'm': playlist_MuteToggle(p_playlist); break;
+    case '[':
+        vlc_player_Lock(player);
+        vlc_player_SelectPrevTitle(player);
+        vlc_player_Unlock(player);
+        return;
+    case ']':
+        vlc_player_Lock(player);
+        vlc_player_SelectNextTitle(player);
+        vlc_player_Unlock(player);
+        return;
+    case '<':
+        vlc_player_Lock(player);
+        vlc_player_SelectPrevChapter(player);
+        vlc_player_Unlock(player);
+        return;
+    case '>':
+        vlc_player_Lock(player);
+        vlc_player_SelectNextChapter(player);
+        vlc_player_Unlock(player);
+        return;
 
-    case 'c': CycleESTrack(input, "audio-es"); break;
-    case 'v': CycleESTrack(input, "spu-es");   break;
-    case 'b': CycleESTrack(input, "video-es"); break;
+    case 'p':
+        vlc_playlist_Lock(playlist);
+        vlc_playlist_Prev(playlist);
+        vlc_playlist_Unlock(playlist);
+        break;
+    case 'n':
+        vlc_playlist_Lock(playlist);
+        vlc_playlist_Next(playlist);
+        vlc_playlist_Unlock(playlist);
+        break;
+
+    case 'a':
+        vlc_player_Lock(player);
+        vlc_player_aout_IncrementVolume(player, 1, NULL);
+        vlc_player_Unlock(player);
+        break;
+    case 'z':
+        vlc_player_Lock(player);
+        vlc_player_aout_DecrementVolume(player, 1, NULL);
+        vlc_player_Unlock(player);
+        break;
+    case 'm':
+        vlc_player_Lock(player);
+        vlc_player_aout_ToggleMute(player);
+        vlc_player_Unlock(player);
+        break;
+
+    case 'c':
+        vlc_player_Lock(player);
+        vlc_player_SelectNextTrack(player, AUDIO_ES);
+        vlc_player_Unlock(player);
+        break;
+    case 'v':
+        vlc_player_Lock(player);
+        vlc_player_SelectNextTrack(player, SPU_ES);
+        vlc_player_Unlock(player);
+        break;
+    case 'b':
+        vlc_player_Lock(player);
+        vlc_player_SelectNextTrack(player, VIDEO_ES);
+        vlc_player_Unlock(player);
+        break;
 
     case 0x0c:  /* ^l */
     case KEY_CLEAR:
@@ -1613,7 +1521,7 @@ static void HandleCommonKey(intf_thread_t *intf, input_thread_t *input,
 static bool HandleListKey(intf_thread_t *intf, int key)
 {
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *p_playlist = pl_Get(intf);
+    vlc_playlist_t *playlist = sys->playlist;
 
     switch(key)
     {
@@ -1635,19 +1543,22 @@ static bool HandleListKey(intf_thread_t *intf, int key)
     CheckIdx(sys);
 
     if (sys->box_type == BOX_PLAYLIST) {
-        PL_LOCK;
-        sys->plidx_follow = IsIndex(sys, p_playlist, sys->box_idx);
-        PL_UNLOCK;
+        vlc_playlist_Lock(playlist);
+        sys->plidx_follow =
+            sys->box_idx == vlc_playlist_GetCurrentIndex(playlist);
+        vlc_playlist_Unlock(playlist);
     }
 
     return true;
 }
 
-static void HandleKey(intf_thread_t *intf, input_thread_t *input)
+static void HandleKey(intf_thread_t *intf)
 {
     intf_sys_t *sys = intf->p_sys;
     int key = getch();
     int box = sys->box_type;
+
+    vlc_player_t *player = vlc_playlist_GetPlayer(sys->playlist);
 
     if (key == -1)
         return;
@@ -1663,11 +1574,11 @@ static void HandleKey(intf_thread_t *intf, input_thread_t *input)
 #ifdef __FreeBSD__
         case KEY_SELECT:
 #endif
-        case KEY_END:   ChangePosition(input, +.99);       return;
-        case KEY_HOME:  ChangePosition(input, -1.0);       return;
-        case KEY_UP:    ChangePosition(input, +0.05);      return;
-        case KEY_DOWN:  ChangePosition(input, -0.05);      return;
-        default:        HandleCommonKey(intf, input, key); return;
+        case KEY_END:   ChangePosition(player, +.99);       return;
+        case KEY_HOME:  ChangePosition(player, -1.0);       return;
+        case KEY_UP:    ChangePosition(player, +0.05);      return;
+        case KEY_DOWN:  ChangePosition(player, -0.05);      return;
+        default:        HandleCommonKey(intf, player, key); return;
         }
 
     if (box == BOX_BROWSE   && HandleBrowseKey(intf, key))
@@ -1679,7 +1590,7 @@ static void HandleKey(intf_thread_t *intf, input_thread_t *input)
     if (HandleListKey(intf, key))
         return;
 
-    HandleCommonKey(intf, input, key);
+    HandleCommonKey(intf, player, key);
 }
 
 /*
@@ -1736,18 +1647,14 @@ static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
 static void *Run(void *data)
 {
     intf_thread_t *intf = data;
-    playlist_t    *p_playlist = pl_Get(intf);
 
     for (;;) {
         vlc_testcancel();
 
         int canc = vlc_savecancel();
-        input_thread_t *input = playlist_CurrentInput(p_playlist);
 
-        Redraw(intf, input);
-        HandleKey(intf, input);
-        if (input)
-            input_Release(input);
+        Redraw(intf);
+        HandleKey(intf);
         vlc_restorecancel(canc);
     }
     vlc_assert_unreachable();
@@ -1758,9 +1665,8 @@ static void *Run(void *data)
  *****************************************************************************/
 static int Open(vlc_object_t *p_this)
 {
-    intf_thread_t *intf = (intf_thread_t *)p_this;
-    intf_sys_t    *sys  = intf->p_sys = calloc(1, sizeof(intf_sys_t));
-    playlist_t    *p_playlist = pl_Get(intf);
+    intf_thread_t  *intf = (intf_thread_t *)p_this;
+    intf_sys_t     *sys  = intf->p_sys = calloc(1, sizeof(intf_sys_t));
 
     if (!sys)
         return VLC_ENOMEM;
@@ -1796,15 +1702,30 @@ static int Open(vlc_object_t *p_this)
         msg_Err(intf, "Couldn't close stderr (%s)", vlc_strerror_c(errno));
 
     ReadDir(intf);
-    PL_LOCK;
-    PlaylistRebuild(intf),
-    PL_UNLOCK;
 
-    var_AddCallback(p_playlist, "item-change", ItemChanged, sys);
-    var_AddCallback(p_playlist, "playlist-item-append", PlaylistChanged, sys);
+    int err = VLC_EGENERIC;
+    sys->playlist = vlc_intf_GetMainPlaylist(intf);
+
+    static struct vlc_playlist_callbacks const playlist_cbs =
+    {
+        .on_items_added = playlist_on_items_added,
+        .on_items_updated = playlist_on_items_updated,
+    };
+    vlc_playlist_Lock(sys->playlist);
+    PlaylistRebuild(intf);
+    sys->playlist_listener =
+        vlc_playlist_AddListener(sys->playlist, &playlist_cbs, sys, false);
+    vlc_playlist_Unlock(sys->playlist);
+    if (!sys->playlist_listener)
+        return err;
 
     if (vlc_clone(&sys->thread, Run, intf, VLC_THREAD_PRIORITY_LOW))
-        abort(); /* TODO */
+    {
+        vlc_playlist_Lock(sys->playlist);
+        vlc_playlist_RemoveListener(sys->playlist, sys->playlist_listener);
+        vlc_playlist_Unlock(sys->playlist);
+        return VLC_ENOMEM;
+    }
 
     return VLC_SUCCESS;
 }
@@ -1816,15 +1737,19 @@ static void Close(vlc_object_t *p_this)
 {
     intf_thread_t *intf = (intf_thread_t *)p_this;
     intf_sys_t *sys = intf->p_sys;
-    playlist_t *playlist = pl_Get(intf);
 
     vlc_cancel(sys->thread);
     vlc_join(sys->thread, NULL);
 
-    var_DelCallback(playlist, "playlist-item-append", PlaylistChanged, sys);
-    var_DelCallback(playlist, "item-change", ItemChanged, sys);
+    vlc_playlist_t *playlist = sys->playlist;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_RemoveListener(playlist, sys->playlist_listener);
+    vlc_playlist_Unlock(playlist);
 
-    PlaylistDestroy(sys);
+    for (size_t i = 0; i < sys->pl_item_names.size; ++i)
+        free((void *)sys->pl_item_names.data[i]);
+    vlc_vector_clear(&sys->pl_item_names);
+
     DirsDestroy(sys);
 
     free(sys->current_dir);
