@@ -72,12 +72,8 @@ static void buffer_release_cb(void *data, struct wl_buffer *buffer)
 {
     picture_t *pic = data;
 
-#ifndef NDEBUG
     assert(pic != NULL);
     wl_buffer_set_user_data(buffer, NULL);
-#else
-    (void) buffer;
-#endif
     picture_Release(pic);
 }
 
@@ -85,19 +81,6 @@ static const struct wl_buffer_listener buffer_cbs =
 {
     buffer_release_cb,
 };
-
-static void PictureDetach(void *data, picture_t *pic)
-{
-    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
-
-    /* Detach the buffer if it is attached */
-    pic = wl_buffer_get_user_data(buf);
-    if (pic != NULL)
-        buffer_release_cb(pic, buf);
-
-    wl_buffer_destroy(buf);
-    (void) data;
-}
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
 {
@@ -245,14 +228,47 @@ static void Display(vout_display_t *vd, picture_t *pic)
     (void) pic;
 }
 
+static void PictureCheckAttached(void *data, picture_t *pic)
+{
+    unsigned *countp = data;
+
+    (*countp) += wl_buffer_get_user_data(pic->p_sys) != NULL;
+}
+
+static unsigned CountActiveBuffers(picture_pool_t *pool)
+{
+    unsigned count = 0;
+
+    picture_pool_Enum(pool, PictureCheckAttached, &count);
+    return count;
+}
+
+static void PictureBufferDestroy(void *data, picture_t *pic)
+{
+    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
+
+    wl_buffer_destroy(buf);
+    (void) data;
+}
+
 static void ResetPictures(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct wl_display *display = sys->embed->display.wl;
+    struct wl_surface *surface = sys->embed->handle.wl;
 
     if (sys->pool == NULL)
         return;
 
-    picture_pool_Enum(sys->pool, PictureDetach, NULL);
+    wl_surface_attach(surface, NULL, 0, 0);
+    wl_surface_commit(surface);
+
+    /* Wait until all picture buffers are released by the server */
+    while (CountActiveBuffers(sys->pool) > 0)
+        wl_display_roundtrip_queue(display, sys->eventq);
+
+    /* Destroy the buffers */
+    picture_pool_Enum(sys->pool, PictureBufferDestroy, NULL);
     picture_pool_Release(sys->pool);
     sys->pool = NULL;
 }
