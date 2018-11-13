@@ -1128,7 +1128,6 @@ typedef struct
     struct
     {
         int i_audio_pid; /* Selected audio stream. -1 if default */
-        int i_video_pid;
         int i_spu_pid;   /* Selected spu stream. -1 if default */
     } selected;
 } bluray_esout_sys_t;
@@ -1163,8 +1162,7 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             fmt.video.i_frame_rate = 1; fmt.video.i_frame_rate_base = 1;
             fmt.b_packetized = true;
         }
-        if (esout_sys->selected.i_video_pid != -1 && esout_sys->selected.i_video_pid != p_fmt->i_id)
-            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
+        fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         b_select = (p_fmt->i_id == 0x1011);
         break;
     case AUDIO_ES:
@@ -1418,7 +1416,6 @@ static es_out_t *esOutNew(vlc_object_t *p_obj, es_out_t *p_dst_out, void *priv)
     esout_sys->b_entered_recycling = false;
     esout_sys->b_lowdelay = false;
     esout_sys->selected.i_audio_pid = -1;
-    esout_sys->selected.i_video_pid = -1;
     esout_sys->selected.i_spu_pid = -1;
     vlc_mutex_init(&esout_sys->lock);
     return p_out;
