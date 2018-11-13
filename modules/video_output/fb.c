@@ -177,7 +177,7 @@ static int Open(vlc_object_t *object)
     video_format_t *fmtp = &vd->fmt;
     vout_display_sys_t *sys;
 
-    if (vout_display_IsWindowed(vd))
+    if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
     /* Allocate instance and initialize some members */
