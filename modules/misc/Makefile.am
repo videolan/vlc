@@ -112,7 +112,17 @@ libmedialibrary_plugin_la_SOURCES = \
 	misc/medialibrary/MetadataExtractor.cpp \
 	misc/medialibrary/entities.cpp \
 	misc/medialibrary/Thumbnailer.cpp \
-	misc/medialibrary/medialibrary.h
+	misc/medialibrary/medialibrary.h \
+	misc/medialibrary/fs/device.h \
+	misc/medialibrary/fs/device.cpp \
+	misc/medialibrary/fs/directory.h \
+	misc/medialibrary/fs/directory.cpp \
+	misc/medialibrary/fs/file.h \
+	misc/medialibrary/fs/file.cpp \
+	misc/medialibrary/fs/fs.h \
+	misc/medialibrary/fs/fs.cpp \
+	misc/medialibrary/fs/util.h \
+	misc/medialibrary/fs/util.cpp
 
 libmedialibrary_plugin_la_CXXFLAGS = $(AM_CXXFLAGS) $(MEDIALIBRARY_CFLAGS)
 libmedialibrary_plugin_la_LIBADD = $(MEDIALIBRARY_LIBS)

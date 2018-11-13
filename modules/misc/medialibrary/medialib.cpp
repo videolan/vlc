@@ -27,6 +27,7 @@
 #include <vlc_url.h>
 #include <vlc_media_library.h>
 #include "medialibrary.h"
+#include "fs/fs.h"
 
 #include <medialibrary/IMedia.h>
 #include <medialibrary/IAlbumTrack.h>
@@ -334,6 +335,12 @@ bool MediaLibrary::Start()
                  "medialib: %s", ex.what() );
         return false;
     }
+
+    auto networkFs = std::make_shared<vlc::medialibrary::SDFileSystemFactory>( VLC_OBJECT( m_vlc_ml ), "smb://");
+    ml->addNetworkFileSystemFactory( networkFs );
+    // Disabled by default for now
+    ml->setDiscoverNetworkEnabled( false );
+
     if ( ml->start() == false )
     {
         msg_Err( m_vlc_ml, "Failed to start the MediaLibrary" );
