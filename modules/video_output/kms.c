@@ -711,7 +711,7 @@ static int Open(vlc_object_t *object)
     video_format_t fmt = {};
     char *chroma;
 
-    if (vout_display_IsWindowed(vd))
+    if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
     /*
