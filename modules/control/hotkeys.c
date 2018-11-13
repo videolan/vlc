@@ -459,11 +459,11 @@ static int PutAction( intf_thread_t *p_intf, input_thread_t *p_input,
             var_SetFloat( p_playlist, "rate", 1.f );
             DisplayRate( p_vout, 1.f );
             break;
-        case ACTIONID_FASTER:
+        case ACTIONID_RATE_FASTER:
             var_TriggerCallback( p_playlist, "rate-faster" );
             DisplayRate( p_vout, var_GetFloat( p_playlist, "rate" ) );
             break;
-        case ACTIONID_SLOWER:
+        case ACTIONID_RATE_SLOWER:
             var_TriggerCallback( p_playlist, "rate-slower" );
             DisplayRate( p_vout, var_GetFloat( p_playlist, "rate" ) );
             break;
