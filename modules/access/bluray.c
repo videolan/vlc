@@ -1162,23 +1162,17 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
             fmt.video.i_frame_rate = 1; fmt.video.i_frame_rate_base = 1;
             fmt.b_packetized = true;
         }
-        fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         b_select = (p_fmt->i_id == 0x1011);
+        fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         break;
     case AUDIO_ES:
-        if (esout_sys->selected.i_audio_pid != -1) {
-            if (esout_sys->selected.i_audio_pid == p_fmt->i_id)
-                b_select = true;
-            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        }
+        b_select = (esout_sys->selected.i_audio_pid == p_fmt->i_id);
+        fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         setStreamLang(p_sys, &fmt);
         break ;
     case SPU_ES:
-        if (esout_sys->selected.i_spu_pid != -1) {
-            if (esout_sys->selected.i_spu_pid == p_fmt->i_id)
-                b_select = p_sys->b_spu_enable;
-            fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
-        }
+        b_select = (esout_sys->selected.i_spu_pid == p_fmt->i_id && p_sys->b_spu_enable);
+        fmt.i_priority = ES_PRIORITY_NOT_SELECTABLE;
         setStreamLang(p_sys, &fmt);
         break ;
     default:
@@ -1207,15 +1201,14 @@ static es_out_id_t *bluray_esOutAdd(es_out_t *p_out, const es_format_t *p_fmt)
                 es_format_Copy(&p_pair->fmt, &fmt);
             }
         }
+    }
 
-        if (b_select)
-        {
-            if (fmt.i_cat == AUDIO_ES) {
-                var_SetInteger( p_demux->p_input, "audio-es", p_fmt->i_id );
-            } else if (fmt.i_cat == SPU_ES) {
-                var_SetInteger( p_demux->p_input, "spu-es", p_sys->b_spu_enable ? p_fmt->i_id : -1 );
-            }
-        }
+    if (p_es)
+    {
+        if(b_select)
+            es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES, p_es);
+        else
+            es_out_Control(esout_sys->p_dst_out, ES_OUT_SET_ES_STATE, p_es, false);
     }
     es_format_Clean(&fmt);
 
