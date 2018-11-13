@@ -144,8 +144,9 @@ static void *OurGetProcAddress(vlc_gl_t *gl, const char *name)
 static int Open(vlc_object_t *this)
 {
     vout_display_t *vd = (vout_display_t *)this;
+    const vout_display_cfg_t *cfg = vd->cfg;
 
-    if (vout_display_IsWindowed(vd))
+    if (vout_display_cfg_IsWindowed(cfg))
         return VLC_EGENERIC;
 
     vout_display_sys_t *sys = vlc_obj_calloc (this, 1, sizeof(*sys));
