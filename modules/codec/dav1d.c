@@ -220,8 +220,14 @@ static int Decode(decoder_t *dec, block_t *block)
 
         if (res == 0)
         {
-            picture_t *pic = img.allocator_data;
-            pic = picture_Clone(pic);
+            picture_t *_pic = img.allocator_data;
+            picture_t *pic = picture_Clone(_pic);
+            if (unlikely(pic == NULL))
+            {
+                i_ret = VLC_EGENERIC;
+                picture_Release(_pic);
+                break;
+            }
             pic->b_progressive = true; /* codec does not support interlacing */
             pic->date = timestamp_FifoGet(p_sys->ts_fifo);
             /* TODO udpate the color primaries and such */
