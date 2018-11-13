@@ -1335,6 +1335,10 @@ static int Init( input_thread_t * p_input )
     input_thread_private_t *priv = input_priv(p_input);
     input_source_t *master;
 
+    /* */
+    input_ChangeState( p_input, OPENING_S );
+    input_SendEventCache( p_input, 0.0 );
+
     if( var_Type( p_input->obj.parent, "meta-file" ) )
     {
         msg_Dbg( p_input, "Input is a meta file: disabling unneeded options" );
@@ -1356,10 +1360,6 @@ static int Init( input_thread_t * p_input )
                                               priv->i_rate );
     if( priv->p_es_out == NULL )
         goto error;
-
-    /* */
-    input_ChangeState( p_input, OPENING_S );
-    input_SendEventCache( p_input, 0.0 );
 
     /* */
     master = InputSourceNew( p_input, priv->p_item->psz_uri, NULL, false );
