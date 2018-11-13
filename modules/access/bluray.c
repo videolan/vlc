@@ -2134,7 +2134,12 @@ static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
 {
     vlc_mutex_lock(&p_sys->pl_info_lock);
 
-    if (p_sys->p_clip_info) {
+    if(i_pid == -AUDIO_ES)
+        bd_select_stream(p_sys->bluray, BLURAY_AUDIO_STREAM, 0, 0);
+    else if(i_pid == -SPU_ES)
+        bd_select_stream(p_sys->bluray, BLURAY_PG_TEXTST_STREAM, 0, 0);
+    else if (p_sys->p_clip_info)
+    {
 
         if ((i_pid & 0xff00) == 0x1100) {
             // audio
