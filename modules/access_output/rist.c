@@ -685,7 +685,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_dst_addr;
     char *psz_parser = psz_dst_addr = strdup( p_access->psz_path );
     if( !psz_dst_addr )
-        goto failed;
+        return VLC_ENOMEM;
 
     if ( psz_parser[0] == '[' )
         psz_parser = strchr( psz_parser, ']' );
