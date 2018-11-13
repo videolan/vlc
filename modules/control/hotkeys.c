@@ -200,8 +200,10 @@ static int ButtonEvent( vlc_object_t *p_this, char const *psz_var,
 
     for (int i = MOUSE_BUTTON_WHEEL_UP; i <= MOUSE_BUTTON_WHEEL_RIGHT; i++)
         if (pressed & (1 << i))
-            var_SetInteger(vlc_object_instance(p_intf), "key-pressed",
-                           i - MOUSE_BUTTON_WHEEL_UP + KEY_MOUSEWHEELUP);
+        {
+            int keycode = KEY_MOUSEWHEEL_FROM_BUTTON(i);
+            var_SetInteger(vlc_object_instance(p_intf), "key-pressed", keycode);
+        }
 
     return VLC_SUCCESS;
 }
