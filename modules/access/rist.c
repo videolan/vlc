@@ -998,7 +998,6 @@ static int Open(vlc_object_t *p_this)
 
     p_access->p_sys = p_sys;
 
-    memset(p_sys->sender_name, 0, MAX_CNAME);
     vlc_mutex_init( &p_sys->lock );
 
     if ( vlc_UrlParse( &parsed_url, p_access->psz_url ) == -1 )
