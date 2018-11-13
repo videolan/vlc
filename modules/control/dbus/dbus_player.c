@@ -30,8 +30,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist_legacy.h>
-#include <vlc_input.h>
 #include <vlc_interface.h>
 
 #include <math.h>
@@ -42,17 +40,14 @@
 static int
 MarshalPosition( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    /* returns position in microseconds */
+    /* returns time in microseconds */
     dbus_int64_t i_pos;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
 
-    if( !p_input )
-        i_pos = 0;
-    else
-    {
-        i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
-        input_Release(p_input);
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    i_pos = vlc_player_GetTime(player);
+    vlc_player_Unlock(player);
+    i_pos = i_pos == VLC_TICK_INVALID ? 0 : US_FROM_VLC_TICK(i_pos);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_INT64, &i_pos ) )
         return VLC_ENOMEM;
@@ -61,15 +56,13 @@ MarshalPosition( intf_thread_t *p_intf, DBusMessageIter *container )
 }
 
 DBUS_METHOD( SetPosition )
-{ /* set position in microseconds */
+{ /* set time in microseconds */
 
     REPLY_INIT;
     dbus_int64_t i_pos;
     const char *psz_trackid;
-    playlist_t *playlist = pl_Get(p_this);
-    playlist_item_t *item;
-    input_thread_t *input = NULL;
-    int i_id;
+    ssize_t i_item_id;
+    size_t i_id;
 
     DBusError error;
     dbus_error_init( &error );
@@ -90,17 +83,15 @@ DBUS_METHOD( SetPosition )
     if( sscanf( psz_trackid, MPRIS_TRACKID_FORMAT, &i_id ) < 1 )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    playlist_Lock( playlist );
-    item = playlist_CurrentPlayingItem( playlist );
-    if( item != NULL && item->i_id == i_id )
-        input = playlist_CurrentInputLocked( playlist );
-    playlist_Unlock( playlist );
-
-    if( input != NULL )
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    i_item_id = vlc_playlist_GetCurrentIndex( playlist );
+    if (i_item_id != -1 && (size_t)i_item_id == i_id)
     {
-        var_SetInteger( input, "time", VLC_TICK_FROM_US(i_pos) );
-        input_Release(input);
+        vlc_player_t *player = vlc_playlist_GetPlayer(playlist);
+        vlc_player_SetTime(player, VLC_TICK_FROM_US(i_pos));
     }
+    vlc_playlist_Unlock(playlist);
 
     REPLY_SEND;
 }
@@ -125,15 +116,10 @@ DBUS_METHOD( Seek )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    input_thread_t *p_input = pl_CurrentInput( p_this );
-    if( p_input && var_GetBool( p_input, "can-seek" ) )
-    {
-        vlc_tick_t i_pos = var_GetInteger( p_input, "time" ) + i_step;
-        var_SetInteger( p_input, "time", (i_pos >= 0) ? VLC_TICK_FROM_US(i_pos) : 0 );
-    }
-
-    if( p_input )
-        input_Release(p_input);
+    vlc_player_t *player = vlc_playlist_GetPlayer(PL);
+    vlc_player_Lock(player);
+    vlc_player_JumpTime(player, VLC_TICK_FROM_US(i_step));
+    vlc_player_Unlock(player);
 
     REPLY_SEND;
 }
@@ -141,13 +127,12 @@ DBUS_METHOD( Seek )
 static int
 MarshalVolume( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    float f_vol = playlist_VolumeGet( p_intf->p_sys->p_playlist );
-    if( f_vol < 0.f )
-        f_vol = 1.f; /* ? */
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    double vol = vlc_player_aout_GetVolume(player);
+    if( vol < .0f )
+        vol = .0f;
 
-    double d_vol = f_vol;
-
-    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &d_vol ) )
+    if( !dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE, &vol ) )
         return VLC_ENOMEM;
 
     return VLC_SUCCESS;
@@ -161,7 +146,8 @@ DBUS_METHOD( VolumeSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &d_dbus_vol ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    playlist_VolumeSet( PL, fmaxf( d_dbus_vol, 0.f ) );
+    vlc_player_t *player = vlc_playlist_GetPlayer(PL);
+    vlc_player_aout_SetVolume(player, fmaxf(d_dbus_vol, .0f));
 
     REPLY_SEND;
 }
@@ -169,42 +155,63 @@ DBUS_METHOD( VolumeSet )
 DBUS_METHOD( Next )
 { /* next playlist item */
     REPLY_INIT;
-    playlist_Next( PL );
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Next(playlist);
+    vlc_playlist_Unlock(playlist);
     REPLY_SEND;
 }
 
 DBUS_METHOD( Prev )
 { /* previous playlist item */
     REPLY_INIT;
-    playlist_Prev( PL );
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Prev(playlist);
+    vlc_playlist_Unlock(playlist);
     REPLY_SEND;
 }
 
 DBUS_METHOD( Stop )
 { /* stop playing */
     REPLY_INIT;
-    playlist_Stop( PL );
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Stop(playlist);
+    vlc_playlist_Unlock(playlist);
     REPLY_SEND;
 }
 
 DBUS_METHOD( Play )
 {
     REPLY_INIT;
-    playlist_Play( PL );
+    vlc_player_t *player = vlc_playlist_GetPlayer(PL);
+    vlc_player_Lock(player);
+    if (vlc_player_IsPaused(player))
+        vlc_player_Resume(player);
+    else
+        vlc_player_Start(player);
+    vlc_player_Unlock(player);
     REPLY_SEND;
 }
 
 DBUS_METHOD( Pause )
 {
     REPLY_INIT;
-    playlist_Pause( PL );
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_Pause(playlist);
+    vlc_playlist_Unlock(playlist);
     REPLY_SEND;
 }
 
 DBUS_METHOD( PlayPause )
 {
     REPLY_INIT;
-    playlist_TogglePause( PL );
+    vlc_player_t *player = vlc_playlist_GetPlayer(PL);
+    vlc_player_Lock(player);
+    vlc_player_TogglePause(player);
+    vlc_player_Unlock(player);
     REPLY_SEND;
 }
 
@@ -228,7 +235,18 @@ DBUS_METHOD( OpenUri )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    playlist_Add( PL, psz_mrl, true );
+    input_item_t *item = input_item_New(psz_mrl, NULL);
+    if (!item)
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    size_t count = vlc_playlist_Count(playlist);
+    vlc_playlist_InsertOne(playlist, count, item);
+    vlc_playlist_PlayAt(playlist, count);
+    vlc_playlist_Unlock(playlist);
+
+    input_item_Release(item);
 
     REPLY_SEND;
 }
@@ -236,9 +254,18 @@ DBUS_METHOD( OpenUri )
 static int
 MarshalCanGoNext( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    VLC_UNUSED( p_intf );
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    size_t count = vlc_playlist_Count(playlist);
+    ssize_t index = vlc_playlist_GetCurrentIndex(playlist);
+    enum vlc_playlist_playback_repeat repeat_mode =
+        vlc_playlist_GetPlaybackRepeat(playlist);
+    vlc_playlist_Unlock(playlist);
 
-    dbus_bool_t b_can_go_next = TRUE;
+    dbus_bool_t b_can_go_next =
+        count != 0 &&
+        (index != -1 && (size_t)index < count - 1 ||
+         repeat_mode != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_go_next ) )
@@ -250,9 +277,17 @@ MarshalCanGoNext( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalCanGoPrevious( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    VLC_UNUSED( p_intf );
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    size_t count = vlc_playlist_Count(playlist);
+    ssize_t index = vlc_playlist_GetCurrentIndex(playlist);
+    enum vlc_playlist_playback_repeat repeat_mode =
+        vlc_playlist_GetPlaybackRepeat(playlist);
+    vlc_playlist_Unlock(playlist);
 
-    dbus_bool_t b_can_go_previous = TRUE;
+    dbus_bool_t b_can_go_previous =
+        count != 0 &&
+        (index > 0 || repeat_mode != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_go_previous ) )
@@ -264,11 +299,10 @@ MarshalCanGoPrevious( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalCanPlay( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
-
-    PL_LOCK;
-    dbus_bool_t b_can_play = !playlist_IsEmpty( p_playlist );
-    PL_UNLOCK;
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    dbus_bool_t b_can_play = vlc_playlist_Count(playlist) != 0;
+    vlc_playlist_Unlock(playlist);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_play ) )
@@ -280,14 +314,10 @@ MarshalCanPlay( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalCanPause( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    dbus_bool_t b_can_pause = FALSE;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
-
-    if( p_input )
-    {
-        b_can_pause = var_GetBool( p_input, "can-pause" );
-        input_Release(p_input);
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    dbus_bool_t b_can_pause = vlc_player_CanPause(player);
+    vlc_player_Unlock(player);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_pause ) )
@@ -312,14 +342,10 @@ MarshalCanControl( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalCanSeek( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    dbus_bool_t b_can_seek = FALSE;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
-
-    if( p_input )
-    {
-        b_can_seek = var_GetBool( p_input, "can-seek" );
-        input_Release(p_input);
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    dbus_bool_t b_can_seek = vlc_player_CanSeek(player);
+    vlc_player_Unlock(player);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_can_seek ) )
@@ -331,8 +357,13 @@ MarshalCanSeek( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalShuffle( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    dbus_bool_t b_shuffle = var_GetBool( p_intf->p_sys->p_playlist, "random" );
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_order order_mode =
+        vlc_playlist_GetPlaybackOrder(playlist);
+    vlc_playlist_Unlock(playlist);
 
+    dbus_bool_t b_shuffle = order_mode == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_BOOLEAN,
                                          &b_shuffle ))
         return VLC_ENOMEM;
@@ -348,7 +379,12 @@ DBUS_METHOD( ShuffleSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &b_shuffle ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    var_SetBool( PL, "random", ( b_shuffle == TRUE ) );
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_SetPlaybackOrder(playlist, b_shuffle == TRUE
+            ? VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM
+            : VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL);
+    vlc_playlist_Unlock(playlist);
 
     REPLY_SEND;
 }
@@ -356,28 +392,24 @@ DBUS_METHOD( ShuffleSet )
 static int
 MarshalPlaybackStatus( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    enum vlc_player_state state = vlc_player_GetState(player);
+    vlc_player_Unlock(player);
+
     const char *psz_playback_status;
-
-    if( p_input != NULL )
+    switch (state)
     {
-        switch( var_GetInteger( p_input, "state" ) )
-        {
-            case OPENING_S:
-            case PLAYING_S:
-                psz_playback_status = PLAYBACK_STATUS_PLAYING;
-                break;
-            case PAUSE_S:
-                psz_playback_status = PLAYBACK_STATUS_PAUSED;
-                break;
-            default:
-                psz_playback_status = PLAYBACK_STATUS_STOPPED;
-        }
-
-        input_Release(p_input);
+        case VLC_PLAYER_STATE_STARTED:
+        case VLC_PLAYER_STATE_PLAYING:
+            psz_playback_status = PLAYBACK_STATUS_PLAYING;
+            break;
+        case VLC_PLAYER_STATE_PAUSED:
+            psz_playback_status = PLAYBACK_STATUS_PAUSED;
+            break;
+        default:
+            psz_playback_status = PLAYBACK_STATUS_STOPPED;
     }
-    else
-        psz_playback_status = PLAYBACK_STATUS_STOPPED;
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_STRING,
                                          &psz_playback_status ) )
@@ -389,16 +421,10 @@ MarshalPlaybackStatus( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalRate( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    double d_rate;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
-
-    if( p_input != NULL )
-    {
-        d_rate = var_GetFloat( p_input, "rate" );
-        input_Release(p_input);
-    }
-    else
-        d_rate = 1.0;
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    double d_rate = vlc_player_GetRate(player);
+    vlc_player_Unlock(player);
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_DOUBLE,
                                          &d_rate ) )
@@ -416,14 +442,10 @@ DBUS_METHOD( RateSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &d_rate ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    input_thread_t *p_input = pl_CurrentInput( p_this );
-    if( p_input != NULL )
-    {
-        var_SetFloat( p_input, "rate", (float) d_rate );
-        input_Release(p_input);
-    }
-    else
-        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    vlc_player_t *player = vlc_playlist_GetPlayer(PL);
+    vlc_player_Lock(player);
+    vlc_player_ChangeRate(player, d_rate);
+    vlc_player_Unlock(player);
 
     REPLY_SEND;
 }
@@ -455,16 +477,27 @@ MarshalMaximumRate( intf_thread_t *p_intf, DBusMessageIter *container )
 static int
 MarshalLoopStatus( intf_thread_t *p_intf, DBusMessageIter *container )
 {
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_repeat repeat_mode =
+        vlc_playlist_GetPlaybackRepeat(playlist);
+    vlc_playlist_Unlock(playlist);
+
     const char *psz_loop_status;
-
-    if( var_GetBool( p_intf->p_sys->p_playlist, "repeat" ) )
-        psz_loop_status = LOOP_STATUS_TRACK;
-
-    else if( var_GetBool( p_intf->p_sys->p_playlist, "loop" ) )
-        psz_loop_status = LOOP_STATUS_PLAYLIST;
-
-    else
-        psz_loop_status = LOOP_STATUS_NONE;
+    switch (repeat_mode)
+    {
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
+            psz_loop_status = LOOP_STATUS_PLAYLIST;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
+            psz_loop_status = LOOP_STATUS_TRACK;
+            break;
+        case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
+            psz_loop_status = LOOP_STATUS_NONE;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
 
     if( !dbus_message_iter_append_basic( container, DBUS_TYPE_STRING,
                                          &psz_loop_status ) )
@@ -481,23 +514,20 @@ DBUS_METHOD( LoopStatusSet )
     if( VLC_SUCCESS != DemarshalSetPropertyValue( p_from, &psz_loop_status ) )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 
-    if( !strcmp( psz_loop_status, LOOP_STATUS_NONE ) )
-    {
-        var_SetBool( PL, "loop",   FALSE );
-        var_SetBool( PL, "repeat", FALSE );
-    }
-    else if( !strcmp( psz_loop_status, LOOP_STATUS_TRACK ) )
-    {
-        var_SetBool( PL, "loop",   FALSE );
-        var_SetBool( PL, "repeat", TRUE  );
-    }
-    else if( !strcmp( psz_loop_status, LOOP_STATUS_PLAYLIST ) )
-    {
-        var_SetBool( PL, "loop",   TRUE );
-        var_SetBool( PL, "repeat", FALSE  );
-    }
+    enum vlc_playlist_playback_repeat repeat_mode;
+    if (!strcmp(psz_loop_status, LOOP_STATUS_NONE))
+        repeat_mode = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    else if (!strcmp(psz_loop_status, LOOP_STATUS_TRACK))
+        repeat_mode = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+    else if (!strcmp(psz_loop_status, LOOP_STATUS_PLAYLIST))
+        repeat_mode = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
     else
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+
+    vlc_playlist_t *playlist = PL;
+    vlc_playlist_Lock(playlist);
+    vlc_playlist_SetPlaybackRepeat(playlist, repeat_mode);
+    vlc_playlist_Unlock(playlist);
 
     REPLY_SEND;
 }
@@ -505,26 +535,24 @@ DBUS_METHOD( LoopStatusSet )
 static int
 MarshalMetadata( intf_thread_t *p_intf, DBusMessageIter *container )
 {
-    playlist_t *playlist = pl_Get( p_intf );
-    playlist_item_t *item;
     int result = VLC_SUCCESS;
-
-    playlist_Lock( playlist );
-    item = playlist_CurrentPlayingItem( playlist );
-
-    if( item != NULL )
-        result = GetInputMeta( item, container );
+    vlc_playlist_t *playlist = p_intf->p_sys->playlist;
+    vlc_playlist_Lock(playlist);
+    ssize_t id = vlc_playlist_GetCurrentIndex(playlist);
+    if(id != -1)
+    {
+        vlc_playlist_item_t *plitem = vlc_playlist_Get(playlist, id);
+        result = GetInputMeta(playlist, plitem, container);
+    }
     else
     {   // avoid breaking the type marshalling
         DBusMessageIter a;
-
         if( !dbus_message_iter_open_container( container, DBUS_TYPE_ARRAY,
                                                "{sv}", &a ) ||
             !dbus_message_iter_close_container( container, &a ) )
             result = VLC_ENOMEM;
     }
-
-    playlist_Unlock( playlist );
+    vlc_playlist_Unlock(playlist);
     return result;
 }
 
@@ -542,13 +570,11 @@ DBUS_SIGNAL( SeekedSignal )
 
     dbus_int64_t i_pos = 0;
     intf_thread_t *p_intf = (intf_thread_t*) p_data;
-    input_thread_t *p_input = pl_CurrentInput( p_intf );
-
-    if( p_input )
-    {
-        i_pos = US_FROM_VLC_TICK(var_GetInteger( p_input, "time" ));
-        input_Release(p_input);
-    }
+    vlc_player_t *player = vlc_playlist_GetPlayer(p_intf->p_sys->playlist);
+    vlc_player_Lock(player);
+    i_pos = vlc_player_GetTime(player);
+    vlc_player_Unlock(player);
+    i_pos = i_pos == VLC_TICK_INVALID ? 0 : US_FROM_VLC_TICK(i_pos);
 
     ADD_INT64( &i_pos );
     SIGNAL_SEND;
