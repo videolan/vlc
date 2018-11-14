@@ -1914,53 +1914,46 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
  */
 static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int height)
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     blurayInitOverlay(p_demux, plane, width, height);
-
-    if (!p_sys->bdj.p_overlays[plane]->p_regions) {
-        video_format_t fmt;
-        video_format_Init(&fmt, 0);
-        video_format_Setup(&fmt, VLC_CODEC_RGBA, width, height, width, height, 1, 1);
-
-        p_sys->bdj.p_overlays[plane]->p_regions = subpicture_region_New(&fmt);
-    }
 }
 
 static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const ov)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    vlc_mutex_lock(&p_sys->bdj.p_overlays[ov->plane]->lock);
+    bluray_overlay_t *bdov = p_sys->bdj.p_overlays[ov->plane];
+    vlc_mutex_lock(&bdov->lock);
+
+    if (!bdov->p_regions)
+    {
+        video_format_t fmt;
+        video_format_Init(&fmt, 0);
+        video_format_Setup(&fmt,
+        /* ARGB in word order -> byte order */
+#ifdef WORDS_BIG_ENDIAN
+                           VLC_CODEC_ARGB,
+#else
+                           VLC_CODEC_BGRA,
+#endif
+                           ov->stride, bdov->height,
+                           bdov->width, bdov->height, 1, 1);
+        bdov->p_regions = subpicture_region_New(&fmt);
+    }
 
     /* Find a region to update */
-    subpicture_region_t *p_reg = p_sys->bdj.p_overlays[ov->plane]->p_regions;
+    subpicture_region_t *p_reg = bdov->p_regions;
     if (!p_reg) {
-        vlc_mutex_unlock(&p_sys->bdj.p_overlays[ov->plane]->lock);
+        vlc_mutex_unlock(&bdov->lock);
         return;
     }
 
     /* Now we can update the region */
-    const uint32_t *src0 = ov->argb;
     uint8_t        *dst0 = p_reg->p_picture->p[0].p_pixels +
                            p_reg->p_picture->p[0].i_pitch * ov->y +
                            ov->x * 4;
+    memcpy(dst0, ov->argb, (ov->stride * ov->h - ov->x)*4);
 
-    for (int y = 0; y < ov->h; y++) {
-        // XXX: add support for this format ? Should be possible with OPENGL/VDPAU/...
-        // - or add libbluray option to select the format ?
-        for (int x = 0; x < ov->w; x++) {
-            dst0[x*4  ] = src0[x]>>16; /* R */
-            dst0[x*4+1] = src0[x]>>8;  /* G */
-            dst0[x*4+2] = src0[x];     /* B */
-            dst0[x*4+3] = src0[x]>>24; /* A */
-        }
-
-        src0 += ov->stride;
-        dst0 += p_reg->p_picture->p[0].i_pitch;
-    }
-
-    vlc_mutex_unlock(&p_sys->bdj.p_overlays[ov->plane]->lock);
+    vlc_mutex_unlock(&bdov->lock);
     /*
      * /!\ The region is now stored in our internal list, but not in the subpicture /!\
      */
