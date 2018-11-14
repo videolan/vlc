@@ -1862,6 +1862,13 @@ static void blurayOverlayProc(void *ptr, const BD_OVERLAY *const overlay)
     }
 }
 
+/* ARGB in word order -> byte order */
+#ifdef WORDS_BIG_ENDIAN
+  #define ARGB_OVERLAY_CHROMA VLC_CODEC_ARGB
+#else
+  #define ARGB_OVERLAY_CHROMA VLC_CODEC_BGRA
+#endif
+
 /*
  * ARGB overlay (BD-J)
  */
@@ -1874,7 +1881,7 @@ static void blurayInitArgbOverlay(demux_t *p_demux, int plane, int width, int he
     if (!p_sys->p_overlays[plane]->p_regions) {
         video_format_t fmt;
         video_format_Init(&fmt, 0);
-        video_format_Setup(&fmt, VLC_CODEC_RGBA, width, height, width, height, 1, 1);
+        video_format_Setup(&fmt, ARGB_OVERLAY_CHROMA, width, height, width, height, 1, 1);
 
         p_sys->p_overlays[plane]->p_regions = subpicture_region_New(&fmt);
     }
@@ -1892,7 +1899,9 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
 
     /* Find a region to update */
     subpicture_region_t *p_reg = ov->p_regions;
-    if (!p_reg || p_reg->fmt.i_chroma != VLC_CODEC_RGBA) {
+    if (!p_reg || p_reg->fmt.i_chroma != ARGB_OVERLAY_CHROMA ||
+        eventov->x + eventov->w > p_reg->fmt.i_width ||
+        eventov->y + eventov->h > p_reg->fmt.i_height) {
         vlc_mutex_unlock(&ov->lock);
         return;
     }
@@ -1902,19 +1911,19 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
     uint8_t        *dst0 = p_reg->p_picture->p[0].p_pixels +
                            p_reg->p_picture->p[0].i_pitch * eventov->y +
                            eventov->x * 4;
-
-    for (int y = 0; y < eventov->h; y++) {
-        // XXX: add support for this format ? Should be possible with OPENGL/VDPAU/...
-        // - or add libbluray option to select the format ?
-        for (int x = 0; x < eventov->w; x++) {
-            dst0[x*4  ] = src0[x]>>16; /* R */
-            dst0[x*4+1] = src0[x]>>8;  /* G */
-            dst0[x*4+2] = src0[x];     /* B */
-            dst0[x*4+3] = src0[x]>>24; /* A */
+    /* always true as for now, see bd_bdj_osd_cb */
+    if(likely(eventov->stride == p_reg->p_picture->p[0].i_pitch))
+    {
+        memcpy(dst0, src0, (eventov->stride * eventov->h - eventov->x)*4);
+    }
+    else
+    {
+        for(uint16_t h = 0; h < eventov->h; h++)
+        {
+            memcpy(dst0, src0, eventov->w *4);
+            dst0 = dst0 + p_reg->p_picture->p[0].i_pitch;
+            src0 = src0 + eventov->stride;
         }
-
-        src0 += eventov->stride;
-        dst0 += p_reg->p_picture->p[0].i_pitch;
     }
 
     vlc_mutex_unlock(&ov->lock);
