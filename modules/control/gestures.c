@@ -301,66 +301,57 @@ static void ProcessGesture( intf_thread_t *p_intf )
     p_sys->i_pattern = 0;
 }
 
-static int MovedEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int MovedEvent(vlc_object_t *this, char const *psz_var,
+                      vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_data;
-    intf_sys_t    *p_sys = p_intf->p_sys;
+    VLC_UNUSED(this); VLC_UNUSED(psz_var); VLC_UNUSED(oldval);
 
-    (void) p_this; (void) psz_var; (void) oldval;
+    intf_thread_t *intf = data;
+    intf_sys_t *sys = intf->p_sys;
 
-    vlc_mutex_lock( &p_sys->lock );
-    if( p_sys->b_button_pressed )
+    vlc_mutex_lock(&sys->lock);
+    if (sys->b_button_pressed)
     {
-        int i_horizontal = newval.coords.x - p_sys->i_last_x;
-        int i_vertical = newval.coords.y - p_sys->i_last_y;
         unsigned int pattern = 0;
+        int xdelta = newval.coords.x - sys->i_last_x;
+        xdelta /= sys->i_threshold;
+        int ydelta = newval.coords.y - sys->i_last_y;
+        ydelta /= sys->i_threshold;
 
-        i_horizontal /= p_sys->i_threshold;
-        i_vertical /= p_sys->i_threshold;
-
-        if( i_horizontal < 0 )
+        char const *dir;
+        unsigned int delta;
+        if (abs(xdelta) > abs(ydelta))
         {
-            msg_Dbg( p_intf, "left gesture (%d)", i_horizontal );
-            pattern = LEFT;
+            pattern = xdelta < 0 ? LEFT : RIGHT;
+            dir = xdelta < 0 ? "left" : "right";
+            delta = abs(xdelta);
         }
-        else if( i_horizontal > 0 )
+        else if (abs(ydelta) > 0)
         {
-            msg_Dbg( p_intf, "right gesture (%d)", i_horizontal );
-            pattern = RIGHT;
-        }
-        if( i_vertical < 0 )
-        {
-            msg_Dbg( p_intf, "up gesture (%d)", i_vertical );
-            pattern = UP;
-        }
-        else if( i_vertical > 0 )
-        {
-            msg_Dbg( p_intf, "down gesture (%d)", i_vertical );
-            pattern = DOWN;
+            pattern = ydelta < 0 ? UP : DOWN;
+            dir = ydelta < 0 ? "up" : "down";
+            delta = abs(ydelta);
         }
 
-        if( pattern )
+        if (pattern)
         {
-            p_sys->i_last_x = newval.coords.x;
-            p_sys->i_last_y = newval.coords.y;
-            if( p_sys->i_num_gestures > 0
-             && gesture( p_sys->i_pattern, p_sys->i_num_gestures - 1 )
-                    != pattern )
+            sys->i_last_x = newval.coords.x;
+            sys->i_last_y = newval.coords.y;
+            if (sys->i_num_gestures > 0 &&
+                gesture(sys->i_pattern, sys->i_num_gestures - 1) != pattern)
             {
-                p_sys->i_pattern |= pattern << ( p_sys->i_num_gestures * 4 );
-                p_sys->i_num_gestures++;
+                sys->i_pattern |= pattern << (sys->i_num_gestures * 4);
+                sys->i_num_gestures++;
             }
-            else if( p_sys->i_num_gestures == 0 )
+            else if (sys->i_num_gestures == 0)
             {
-                p_sys->i_pattern = pattern;
-                p_sys->i_num_gestures++;
+                sys->i_pattern = pattern;
+                sys->i_num_gestures = 1;
             }
+            msg_Dbg(intf, "%s gesture (%u)", dir, delta);
         }
-
     }
-    vlc_mutex_unlock( &p_sys->lock );
-
+    vlc_mutex_unlock(&sys->lock);
     return VLC_SUCCESS;
 }
 
