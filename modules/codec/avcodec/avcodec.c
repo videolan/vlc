@@ -256,7 +256,8 @@ AVCodecContext *ffmpeg_AllocContext( decoder_t *p_dec,
 
     /* *** determine codec type *** */
     if( !GetFfmpegCodec( p_dec->fmt_in.i_cat, p_dec->fmt_in.i_codec,
-                         &i_codec_id, &psz_namecodec ) )
+                         &i_codec_id, &psz_namecodec ) ||
+         i_codec_id == AV_CODEC_ID_RAWVIDEO )
          return NULL;
 
     msg_Dbg( p_dec, "using %s %s", AVPROVIDER(LIBAVCODEC), LIBAVCODEC_IDENT );
