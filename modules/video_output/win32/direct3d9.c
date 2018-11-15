@@ -1164,9 +1164,9 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
     msg_Dbg(vd, "Direct3D9 scene released successfully");
 }
 
+#ifdef HAVE_D3DX9EFFECT_H
 static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source, size_t source_length)
 {
-#ifdef HAVE_D3DX9EFFECT_H
     vout_display_sys_t *sys = vd->sys;
 
     HRESULT (WINAPI * OurD3DXCompileShader)(
@@ -1217,12 +1217,12 @@ static int Direct3D9CompileShader(vout_display_t *vd, const char *shader_source,
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
-#else
-    return VLC_EGENERIC;
-#endif
 }
+#else
+# define Direct3D9CompileShader(a,b,c)  VLC_EGENERIC
+#endif
 
-#define MAX_SHADER_FILE_SIZE 1024*1024
+#define MAX_SHADER_FILE_SIZE  (1024*1024)
 
 static int Direct3D9CreateShaders(vout_display_t *vd)
 {
