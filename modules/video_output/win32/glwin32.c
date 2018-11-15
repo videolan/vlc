@@ -127,7 +127,8 @@ static int Open(vlc_object_t *object)
     if (CommonInit(vd, false))
         goto error;
 
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
+    if (!sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
 
     vout_window_t *surface = EmbedVideoWindow_Create(vd);
     if (!surface)

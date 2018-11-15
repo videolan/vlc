@@ -438,17 +438,20 @@ static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
     /* */
     if (sys->sys.use_overlay)
         DirectXUpdateOverlay(vd, NULL);
-    EventThreadUseOverlay(sys->sys.event, sys->sys.use_overlay);
+    if (!sys->sys.b_windowless)
+    {
+        EventThreadUseOverlay(sys->sys.event, sys->sys.use_overlay);
 
-    /* Change the window title bar text */
-    const char *fallback;
-    if (sys->sys.use_overlay)
-        fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
-    else if (vlc_fourcc_IsYUV(fmt->i_chroma))
-        fallback = VOUT_TITLE " (hardware YUV DirectX output)";
-    else
-        fallback = VOUT_TITLE " (software RGB DirectX output)";
-    EventThreadUpdateTitle(sys->sys.event, fallback);
+        /* Change the window title bar text */
+        const char *fallback;
+        if (sys->sys.use_overlay)
+            fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
+        else if (vlc_fourcc_IsYUV(fmt->i_chroma))
+            fallback = VOUT_TITLE " (hardware YUV DirectX output)";
+        else
+            fallback = VOUT_TITLE " (software RGB DirectX output)";
+        EventThreadUpdateTitle(sys->sys.event, fallback);
+    }
 
     return VLC_SUCCESS;
 }

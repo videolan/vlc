@@ -52,6 +52,8 @@ static int  CommonControlSetFullscreen(vout_display_t *, bool is_fullscreen);
 
 static bool GetRect(const vout_display_sys_t *sys, RECT *out)
 {
+    if (sys->b_windowless)
+        return false;
     return GetClientRect(sys->hwnd, out);
 }
 #endif
@@ -91,8 +93,12 @@ int CommonInit(vout_display_t *vd, bool b_windowless)
     SetRectEmpty(&sys->rect_display);
     SetRectEmpty(&sys->rect_parent);
 
-    var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
+
+    if (b_windowless)
+        return VLC_SUCCESS;
+
+    var_Create(vd, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* */
     sys->event = EventThreadCreate(vd);
@@ -151,21 +157,30 @@ void UpdateRects(vout_display_t *vd,
 #define rect_dest_clipped sys->rect_dest_clipped
 
     RECT  rect;
-    POINT point;
+    POINT point = { 0 };
 
     /* */
     if (!cfg)
         cfg = vd->cfg;
 
     /* Retrieve the window size */
-    if (!sys->pf_GetRect(sys, &rect))
-        return;
+    if (sys->b_windowless)
+    {
+        rect.left   = 0;
+        rect.top    = 0;
+        rect.right  = vd->source.i_visible_width;
+        rect.bottom = vd->source.i_visible_height;
+    }
+    else
+    {
+        if (!sys->pf_GetRect(sys, &rect))
+            return;
 
-    /* Retrieve the window position */
-    point.x = point.y = 0;
 #if !VLC_WINSTORE_APP
-    ClientToScreen(sys->hwnd, &point);
+        /* Retrieve the window position */
+        ClientToScreen(sys->hwnd, &point);
 #endif
+    }
 
     /* If nothing changed, we can return */
     bool has_moved;
@@ -180,6 +195,11 @@ void UpdateRects(vout_display_t *vd,
         vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom);
 #endif
 #else
+    if (sys->b_windowless)
+    {
+        has_moved = is_resized = false;
+    }
+    else
     EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
         point.x, point.y,
         rect.right, rect.bottom);
@@ -204,12 +224,15 @@ void UpdateRects(vout_display_t *vd,
     vout_display_PlacePicture(&place, source, &place_cfg, false);
 
 #if !VLC_WINSTORE_APP
-    EventThreadUpdateSourceAndPlace(sys->event, source, &place);
+    if (!sys->b_windowless)
+    {
+        EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 
-    if (sys->hvideownd)
-        SetWindowPos(sys->hvideownd, 0,
-            place.x, place.y, place.width, place.height,
-            SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+        if (sys->hvideownd)
+            SetWindowPos(sys->hvideownd, 0,
+                place.x, place.y, place.width, place.height,
+                SWP_NOCOPYBITS | SWP_NOZORDER | SWP_ASYNCWINDOWPOS);
+    }
 #endif
 
     /* Destination image position and dimensions */
@@ -353,6 +376,8 @@ void CommonClean(vout_display_t *vd)
 void CommonManage(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    if (sys->b_windowless)
+        return;
 
     /* We used to call the Win32 PeekMessage function here to read the window
      * messages. But since window can stay blocked into this function for a
@@ -514,6 +539,9 @@ static int CommonControlSetFullscreen(vout_display_t *vd, bool is_fullscreen)
     if (sys->parent_window)
         return VLC_EGENERIC;
 
+    if(sys->b_windowless)
+        return VLC_SUCCESS;
+
     /* */
     HWND hwnd = sys->hparent && sys->hfswnd ? sys->hfswnd : sys->hwnd;
 
@@ -629,7 +657,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
             .bottom = cfg->display.height,
         };
 
-        if (!cfg->is_fullscreen) {
+        if (!cfg->is_fullscreen && !sys->b_windowless) {
             AdjustWindowRect(&rect_window, EventThreadGetWindowStyle(sys->event), 0);
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          rect_window.right - rect_window.left,

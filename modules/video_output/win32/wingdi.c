@@ -290,7 +290,8 @@ static int Init(vout_display_t *vd, video_format_t *fmt)
     SelectObject(sys->off_dc, sys->off_bitmap);
     ReleaseDC(sys->sys.hvideownd, window_dc);
 
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
+    if (!sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (WinGDI output)");
 
     /* */
     picture_resource_t rsc;

@@ -291,7 +291,8 @@ static int Open(vlc_object_t *object)
     }
 
 #if !VLC_WINSTORE_APP
-    EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
+    if (!vd->sys->sys.b_windowless)
+        EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
 #endif
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
@@ -1239,6 +1240,9 @@ static int Direct3D11Open(vout_display_t *vd)
     }
 
     FillSwapChainDesc(vd, &scd);
+
+    if (sys->sys.hvideownd == 0)
+        return VLC_EGENERIC;
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
                                               sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);

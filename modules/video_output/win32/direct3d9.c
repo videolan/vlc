@@ -625,7 +625,8 @@ static int ControlReopenDevice(vout_display_t *vd)
 
     /* */
     Direct3D9Close(vd);
-    EventThreadStop(sys->sys.event);
+    if (!sys->sys.b_windowless)
+        EventThreadStop(sys->sys.event);
 
     /* */
     vlc_mutex_lock(&sys->lock);
@@ -645,7 +646,7 @@ static int ControlReopenDevice(vout_display_t *vd)
     }
 
     event_hwnd_t hwnd;
-    if (EventThreadStart(sys->sys.event, &hwnd, &cfg)) {
+    if (!sys->sys.b_windowless && EventThreadStart(sys->sys.event, &hwnd, &cfg)) {
         msg_Err(vd, "Failed to restart event thread");
         return VLC_EGENERIC;
     }
@@ -812,7 +813,8 @@ static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
     }
 
     /* Change the window title bar text */
-    EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D9 output)");
+    if (!vd->sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D9 output)");
 
     msg_Dbg(vd, "Direct3D9 device adapter successfully initialized");
     return VLC_SUCCESS;
