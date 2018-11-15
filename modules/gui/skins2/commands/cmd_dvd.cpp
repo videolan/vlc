@@ -23,7 +23,7 @@
 
 #include "cmd_dvd.hpp"
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 void CmdDvdNextTitle::execute()
 {

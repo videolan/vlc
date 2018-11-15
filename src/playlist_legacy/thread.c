@@ -31,7 +31,7 @@
 #include <vlc_es.h>
 #include <vlc_input.h>
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_rand.h>
 #include <vlc_renderer_discovery.h>
 #include "playlist_internal.h"

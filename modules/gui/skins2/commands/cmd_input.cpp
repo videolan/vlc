@@ -25,7 +25,7 @@
 #include "cmd_input.hpp"
 #include "cmd_dialogs.hpp"
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 void CmdPlay::execute()
 {

@@ -36,7 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "libvlc.h"
 #include "modules/modules.h"
 

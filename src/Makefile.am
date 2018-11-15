@@ -76,7 +76,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_picture.h \
 	../include/vlc_picture_fifo.h \
 	../include/vlc_picture_pool.h \
-	../include/vlc_playlist.h \
+	../include/vlc_playlist_legacy.h \
 	../include/vlc_plugin.h \
 	../include/vlc_probe.h \
 	../include/vlc_rand.h \
@@ -213,18 +213,18 @@ libvlccore_la_SOURCES = \
 	modules/textdomain.c \
 	interface/dialog.c \
 	interface/interface.c \
-	playlist/playlist_internal.h \
-	playlist/aout.c \
-	playlist/thread.c \
-	playlist/control.c \
-	playlist/engine.c \
-	playlist/sort.c \
-	playlist/loadsave.c \
-	playlist/tree.c \
-	playlist/item.c \
-	playlist/search.c \
-	playlist/services_discovery.c \
-	playlist/renderer.c \
+	playlist_legacy/playlist_internal.h \
+	playlist_legacy/aout.c \
+	playlist_legacy/thread.c \
+	playlist_legacy/control.c \
+	playlist_legacy/engine.c \
+	playlist_legacy/sort.c \
+	playlist_legacy/loadsave.c \
+	playlist_legacy/tree.c \
+	playlist_legacy/item.c \
+	playlist_legacy/search.c \
+	playlist_legacy/services_discovery.c \
+	playlist_legacy/renderer.c \
 	preparser/art.c \
 	preparser/art.h \
 	preparser/fetcher.c \

@@ -29,7 +29,7 @@
 #include "../commands/cmd_quit.hpp"
 #include "../commands/cmd_playlist.hpp"
 #include "../commands/cmd_playtree.hpp"
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_modules.h>
 #include <vlc_url.h>
 

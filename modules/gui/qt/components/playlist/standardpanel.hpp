@@ -35,7 +35,7 @@
 #include <QWidget>
 #include <QModelIndexList>
 
-#include <vlc_playlist.h> /* playlist_item_t */
+#include <vlc_playlist_legacy.h> /* playlist_item_t */
 
 class QSignalMapper;
 class QWheelEvent;

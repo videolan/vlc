@@ -27,7 +27,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_url.h>
 #include "cmd_add_item.hpp"
 

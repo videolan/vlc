@@ -32,7 +32,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_rand.h>
 #include "playlist_internal.h"
 #include "libvlc.h"

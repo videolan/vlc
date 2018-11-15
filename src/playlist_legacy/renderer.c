@@ -25,10 +25,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_renderer_discovery.h>
 
-#include "playlist/playlist_internal.h"
+#include "playlist_internal.h"
 
 int playlist_SetRenderer( playlist_t* p_playlist, vlc_renderer_item_t* p_item )
 {

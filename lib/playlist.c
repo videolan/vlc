@@ -30,7 +30,7 @@
 
 #include <vlc/vlc.h>
 
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include <assert.h>
 

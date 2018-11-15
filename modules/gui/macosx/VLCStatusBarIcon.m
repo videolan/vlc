@@ -27,7 +27,7 @@
 #import "VLCMain.h"
 
 #import <vlc_common.h>
-#import <vlc_playlist.h>
+#import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
 
 #import "CompatibilityFixes.h"

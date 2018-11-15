@@ -36,7 +36,7 @@
 #import "VLCPlaylist.h"
 #import "VLCSourceListItem.h"
 #import <math.h>
-#import <vlc_playlist.h>
+#import <vlc_playlist_legacy.h>
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>

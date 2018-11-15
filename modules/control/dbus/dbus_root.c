@@ -35,7 +35,7 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>
 #include <vlc_plugin.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include <unistd.h>
 #include <limits.h>

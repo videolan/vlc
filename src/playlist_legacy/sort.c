@@ -29,7 +29,7 @@
 #include <vlc_common.h>
 #include <vlc_rand.h>
 #define  VLC_INTERNAL_PLAYLIST_SORT_FUNCTIONS
-#include "vlc_playlist.h"
+#include "vlc_playlist_legacy.h"
 #include "playlist_internal.h"
 
 

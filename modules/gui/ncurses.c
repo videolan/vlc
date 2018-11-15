@@ -53,7 +53,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_es.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_meta.h>
 #include <vlc_fs.h>
 #include <vlc_url.h>

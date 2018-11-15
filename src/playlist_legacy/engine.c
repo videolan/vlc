@@ -31,7 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_arrays.h>
 #include <vlc_sout.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_interface.h>
 #include <vlc_http.h>
 #include <vlc_renderer_discovery.h>

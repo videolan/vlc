@@ -21,7 +21,7 @@
 
 #import "VLCPLItem.h"
 
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include <vlc_input_item.h>
 
 #pragma mark -

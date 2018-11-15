@@ -30,7 +30,7 @@
 #endif
 
 #include <vlc_input.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "vlc_model.hpp"
 #include "playlist_item.hpp"
 

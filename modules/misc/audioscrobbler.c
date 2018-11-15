@@ -50,7 +50,7 @@
 #include <vlc_stream.h>
 #include <vlc_url.h>
 #include <vlc_tls.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 /*****************************************************************************
  * Local prototypes

@@ -42,9 +42,9 @@
 #include <vlc_common.h>
 #include <vlc_modules.h>
 #include <vlc_interface.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 #include "libvlc.h"
-#include "playlist/playlist_internal.h"
+#include "playlist_legacy/playlist_internal.h"
 #include "../lib/libvlc_internal.h"
 
 static int AddIntfCallback( vlc_object_t *, char const *,

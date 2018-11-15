@@ -28,7 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_aout.h>
-#include <vlc_playlist.h>
+#include <vlc_playlist_legacy.h>
 
 #include "../audio_output/aout_internal.h"
 #include "playlist_internal.h"

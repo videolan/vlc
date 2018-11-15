@@ -32,7 +32,7 @@
 
 #include "qt.hpp"
 
-//#include <vlc_playlist.h>
+//#include <vlc_playlist_legacy.h>
 
 #include <QSplitter>
 

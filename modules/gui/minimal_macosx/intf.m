@@ -34,7 +34,7 @@
 #endif
 
 #import <vlc_common.h>
-#import <vlc_playlist.h>
+#import <vlc_playlist_legacy.h>
 #import <vlc_interface.h>
 #import <vlc_vout_window.h>
 

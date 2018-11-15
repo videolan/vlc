@@ -26,7 +26,7 @@
 #import "VLCOpenWindowController.h"
 #import "VLCPlaylist.h"
 #import <math.h>
-#import <vlc_playlist.h>
+#import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
 #import <vlc_actions.h>
 #import <vlc_aout.h>

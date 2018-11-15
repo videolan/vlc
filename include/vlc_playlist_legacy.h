@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vlc_playlist.h : Playlist functions
+ * vlc_playlist_legacy.h : Legacy playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
  * $Id$
@@ -21,8 +21,8 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC_PLAYLIST_H_
-#define VLC_PLAYLIST_H_
+#ifndef VLC_PLAYLIST_LEGACY_H_
+#define VLC_PLAYLIST_LEGACY_H_
 
 # ifdef __cplusplus
 extern "C" {
