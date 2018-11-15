@@ -44,8 +44,8 @@ typedef struct
 {
     HINSTANCE               hdll;       /* handle of the opened d3d9 dll */
     union {
-        LPDIRECT3D9         obj;
-        LPDIRECT3D9EX       objex;
+        IDirect3D9          *obj;
+        IDirect3D9Ex        *objex;
     };
     bool                    use_ex;
 } d3d9_handle_t;
@@ -55,8 +55,8 @@ typedef struct
     /* d3d9_handle_t           hd3d; TODO */
     union
     {
-        LPDIRECT3DDEVICE9   dev;
-        LPDIRECT3DDEVICE9EX devex;
+        IDirect3DDevice9    *dev;
+        IDirect3DDevice9Ex  *devex;
     };
     bool                    owner;
 

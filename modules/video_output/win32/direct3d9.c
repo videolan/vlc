@@ -148,8 +148,8 @@ struct vout_display_sys_t
     d3d9_device_t           d3d_dev;
 
     // scene objects
-    LPDIRECT3DTEXTURE9      d3dtex;
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc;
+    IDirect3DTexture9       *d3dtex;
+    IDirect3DVertexBuffer9  *d3dvtc;
     D3DFORMAT               d3dregion_format;    /* Backbuffer output format */
     int                     d3dregion_count;
     struct d3d_region_t     *d3dregion;
@@ -201,12 +201,12 @@ typedef struct d3d_region_t {
     unsigned           width;
     unsigned           height;
     CUSTOMVERTEX       vertex[4];
-    LPDIRECT3DTEXTURE9 texture;
+    IDirect3DTexture9  *texture;
 } d3d_region_t;
 
 static void Direct3D9DeleteRegions(int, d3d_region_t *);
 
-static int  Direct3D9ImportPicture(vout_display_t *vd, d3d_region_t *, LPDIRECT3DSURFACE9 surface);
+static int  Direct3D9ImportPicture(vout_display_t *vd, d3d_region_t *, IDirect3DSurface9 *surface);
 static void Direct3D9ImportSubpicture(vout_display_t *vd, int *, d3d_region_t **, subpicture_t *);
 
 static void Direct3D9RenderScene(vout_display_t *vd, d3d_region_t *, int, d3d_region_t *);
@@ -507,7 +507,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     VLC_UNUSED(date);
     vout_display_sys_t *sys = vd->sys;
     picture_sys_t *p_sys = picture->p_sys;
-    LPDIRECT3DSURFACE9 surface = p_sys->surface;
+    IDirect3DSurface9 *surface = p_sys->surface;
     d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
 
     /* FIXME it is a bit ugly, we need the surface to be unlocked for
@@ -932,7 +932,7 @@ static int Direct3D9CheckConversion(vout_display_t *vd,
                                    D3DFORMAT src, D3DFORMAT dst)
 {
     vout_display_sys_t *sys = vd->sys;
-    LPDIRECT3D9 d3dobj = sys->hd3d.obj;
+    IDirect3D9 *d3dobj = sys->hd3d.obj;
     HRESULT hr;
 
     /* test whether device can create a surface of that format */
@@ -1024,7 +1024,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
 {
     vout_display_sys_t *sys = vd->sys;
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
-    LPDIRECT3DDEVICE9       d3ddev = p_d3d9_dev->dev;
+    IDirect3DDevice9        *d3ddev = p_d3d9_dev->dev;
     HRESULT hr;
 
     /*
@@ -1032,7 +1032,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      * for performance reason, texture format is identical to backbuffer
      * which would usually be a RGB format
      */
-    LPDIRECT3DTEXTURE9 d3dtex;
+    IDirect3DTexture9 *d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
                                         fmt->i_width,
                                         fmt->i_height,
@@ -1055,7 +1055,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     /*
     ** Create a vertex buffer for use when rendering scene
     */
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc;
+    IDirect3DVertexBuffer9 *d3dvtc;
     hr = IDirect3DDevice9_CreateVertexBuffer(d3ddev,
                                              sizeof(CUSTOMVERTEX)*4,
                                              D3DUSAGE_DYNAMIC|D3DUSAGE_WRITEONLY,
@@ -1150,11 +1150,11 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
 
     Direct3D9DeleteRegions(sys->d3dregion_count, sys->d3dregion);
 
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc = sys->d3dvtc;
+    IDirect3DVertexBuffer9 *d3dvtc = sys->d3dvtc;
     if (d3dvtc)
         IDirect3DVertexBuffer9_Release(d3dvtc);
 
-    LPDIRECT3DTEXTURE9 d3dtex = sys->d3dtex;
+    IDirect3DTexture9 *d3dtex = sys->d3dtex;
     if (d3dtex)
         IDirect3DTexture9_Release(d3dtex);
 
@@ -1438,7 +1438,7 @@ static void  Direct3D9SetupVertices(CUSTOMVERTEX *vertices,
  */
 static int Direct3D9ImportPicture(vout_display_t *vd,
                                  d3d_region_t *region,
-                                 LPDIRECT3DSURFACE9 source)
+                                 IDirect3DSurface9 *source)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
@@ -1449,7 +1449,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     }
 
     /* retrieve texture top-level surface */
-    LPDIRECT3DSURFACE9 destination;
+    IDirect3DSurface9 *destination;
     hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
@@ -1618,10 +1618,10 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    LPDIRECT3DDEVICE9 d3ddev = vd->sys->d3d_dev.dev;
+    IDirect3DDevice9 *d3ddev = vd->sys->d3d_dev.dev;
 
-    LPDIRECT3DVERTEXBUFFER9 d3dvtc = sys->d3dvtc;
-    LPDIRECT3DTEXTURE9      d3dtex = region->texture;
+    IDirect3DVertexBuffer9  *d3dvtc = sys->d3dvtc;
+    IDirect3DTexture9       *d3dtex = region->texture;
 
     HRESULT hr;
 
@@ -1643,7 +1643,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // which govern how textures get blended together (in the case of multiple
     // textures) and lighting information. In this case, we are modulating
     // (blending) our texture with the diffuse color of the vertices.
-    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (LPDIRECT3DBASETEXTURE9)d3dtex);
+    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (IDirect3DBaseTexture9*)d3dtex);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed SetTexture: 0x%0lx", hr);
         return -1;
@@ -1703,7 +1703,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
                                 d3d_region_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
-    LPDIRECT3DDEVICE9 d3ddev = sys->d3d_dev.dev;
+    IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
     HRESULT hr;
 
     if (sys->clear_scene) {

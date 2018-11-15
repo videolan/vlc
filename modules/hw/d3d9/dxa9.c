@@ -54,7 +54,7 @@ typedef struct
     picture_t         *staging;
 } filter_sys_t;
 
-static bool GetLock(filter_t *p_filter, LPDIRECT3DSURFACE9 d3d,
+static bool GetLock(filter_t *p_filter, IDirect3DSurface9 *d3d,
                     D3DLOCKED_RECT *p_lock, D3DSURFACE_DESC *p_desc)
 {
     if (unlikely(FAILED( IDirect3DSurface9_GetDesc(d3d, p_desc))))
@@ -364,7 +364,7 @@ int D3D9OpenCPUConverter( vlc_object_t *obj )
 {
     filter_t *p_filter = (filter_t *)obj;
     int err = VLC_EGENERIC;
-    LPDIRECT3DSURFACE9 texture = NULL;
+    IDirect3DSurface9 *texture = NULL;
     filter_t *p_cpu_filter = NULL;
     picture_t *p_dst = NULL;
     video_format_t fmt_staging;

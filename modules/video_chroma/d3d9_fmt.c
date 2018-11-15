@@ -214,7 +214,7 @@ int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
         return VLC_EGENERIC;
     }
 
-    LPDIRECT3D9 (WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
+    IDirect3D9 *(WINAPI *OurDirect3DCreate9)(UINT SDKVersion);
     OurDirect3DCreate9 =
         (void *)GetProcAddress(hd3d->hdll, "Direct3DCreate9");
     if (!OurDirect3DCreate9) {
