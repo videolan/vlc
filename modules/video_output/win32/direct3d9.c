@@ -148,8 +148,8 @@ struct vout_display_sys_t
     d3d9_device_t           d3d_dev;
 
     // scene objects
-    IDirect3DTexture9       *d3dtex;
-    IDirect3DVertexBuffer9  *d3dvtc;
+    IDirect3DTexture9       *sceneTexture;
+    IDirect3DVertexBuffer9  *sceneVertexBuffer;
     D3DFORMAT               d3dregion_format;    /* Backbuffer output format */
     int                     d3dregion_count;
     struct d3d_region_t     *d3dregion;
@@ -1039,7 +1039,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
                                         D3DPOOL_DEFAULT,
-                                        &sys->d3dtex,
+                                        &sys->sceneTexture,
                                         NULL);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create texture. (hr=0x%lx)", hr);
@@ -1059,12 +1059,12 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                              D3DUSAGE_DYNAMIC|D3DUSAGE_WRITEONLY,
                                              D3DFVF_CUSTOMVERTEX,
                                              D3DPOOL_DEFAULT,
-                                             &sys->d3dvtc,
+                                             &sys->sceneVertexBuffer,
                                              NULL);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create vertex buffer. (hr=0x%lx)", hr);
-        IDirect3DTexture9_Release(sys->d3dtex);
-        sys->d3dtex = NULL;
+        IDirect3DTexture9_Release(sys->sceneTexture);
+        sys->sceneTexture = NULL;
         return VLC_EGENERIC;
     }
 
@@ -1146,16 +1146,16 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
 
     Direct3D9DeleteRegions(sys->d3dregion_count, sys->d3dregion);
 
-    if (sys->d3dvtc)
+    if (sys->sceneVertexBuffer)
     {
-        IDirect3DVertexBuffer9_Release(sys->d3dvtc);
-        sys->d3dvtc = NULL;
+        IDirect3DVertexBuffer9_Release(sys->sceneVertexBuffer);
+        sys->sceneVertexBuffer = NULL;
     }
 
-    if (sys->d3dtex)
+    if (sys->sceneTexture)
     {
-        IDirect3DTexture9_Release(sys->d3dtex);
-        sys->d3dtex = NULL;
+        IDirect3DTexture9_Release(sys->sceneTexture);
+        sys->sceneTexture = NULL;
     }
 
     sys->d3dregion_count = 0;
@@ -1447,7 +1447,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
 
     /* retrieve texture top-level surface */
     IDirect3DSurface9 *destination;
-    hr = IDirect3DTexture9_GetSurfaceLevel(sys->d3dtex, 0, &destination);
+    hr = IDirect3DTexture9_GetSurfaceLevel(sys->sceneTexture, 0, &destination);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DTexture9_GetSurfaceLevel: 0x%0lx", hr);
         return VLC_EGENERIC;
@@ -1473,7 +1473,7 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     }
 
     /* */
-    region->texture = sys->d3dtex;
+    region->texture = sys->sceneTexture;
     Direct3D9SetupVertices(region->vertex, &vd->sys->sys.rect_src, &vd->sys->sys.rect_src_clipped,
                            &vd->sys->sys.rect_dest_clipped, 255, vd->fmt.orientation);
     return VLC_SUCCESS;
@@ -1621,13 +1621,13 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
 
     /* Import vertices */
     void *vertex;
-    hr = IDirect3DVertexBuffer9_Lock(sys->d3dvtc, 0, 0, &vertex, D3DLOCK_DISCARD);
+    hr = IDirect3DVertexBuffer9_Lock(sys->sceneVertexBuffer, 0, 0, &vertex, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Lock: 0x%0lx", hr);
         return -1;
     }
     memcpy(vertex, region->vertex, sizeof(region->vertex));
-    hr = IDirect3DVertexBuffer9_Unlock(sys->d3dvtc);
+    hr = IDirect3DVertexBuffer9_Unlock(sys->sceneVertexBuffer);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%0lx", hr);
         return -1;
@@ -1663,7 +1663,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     }
 
     // Render the vertex buffer contents
-    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->d3dvtc, 0, sizeof(CUSTOMVERTEX));
+    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->sceneVertexBuffer, 0, sizeof(CUSTOMVERTEX));
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed SetStreamSource: 0x%0lx", hr);
         return -1;
