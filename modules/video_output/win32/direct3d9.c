@@ -1442,12 +1442,18 @@ static const d3d9_format_t *Direct3DFindFormat(vout_display_t *vd, const video_f
 /**
  * It creates a Direct3D9 device and the associated resources.
  */
-static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt)
+static int Direct3D9Open(vout_display_t *vd, video_format_t *fmt,
+                         IDirect3DDevice9 *external_dev)
 {
     vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
 
-    HRESULT hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
-                                 &vd->source, &sys->d3d_dev);
+    if (external_dev)
+        hr = D3D9_CreateDeviceExternal(external_dev, &sys->hd3d, sys->sys.hvideownd,
+                                       &vd->source, &sys->d3d_dev);
+    else
+        hr = D3D9_CreateDevice(vd, &sys->hd3d, sys->sys.hvideownd,
+                               &vd->source, &sys->d3d_dev);
 
     if (FAILED(hr)) {
         msg_Err( vd, "D3D9 Creation failed! (hr=0x%0lx)", hr);
@@ -1558,7 +1564,8 @@ static int ControlReopenDevice(vout_display_t *vd, video_format_t *fmtp)
 
     /* */
     video_format_t fmt;
-    if (Direct3D9Open(vd, &fmt)) {
+    IDirect3DDevice9 *d3d9_device = var_InheritAddress(vd, "vout-engine-ctx");
+    if (Direct3D9Open(vd, &fmt, d3d9_device)) {
         CommonClean(vd);
         msg_Err(vd, "Failed to reopen device");
         return VLC_EGENERIC;
@@ -1701,7 +1708,16 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    if (D3D9_Create(vd, &sys->hd3d)) {
+    IDirect3DDevice9 *d3d9_device = var_InheritAddress(vd, "vout-engine-ctx");
+    if (d3d9_device != NULL)
+    {
+        if (D3D9_CreateExternal(vd, &sys->hd3d, d3d9_device)) {
+            msg_Err(vd, "External Direct3D9 could not be used");
+            free(sys);
+            return VLC_EGENERIC;
+        }
+    }
+    else if (D3D9_Create(vd, &sys->hd3d)) {
         msg_Err(vd, "Direct3D9 could not be initialized");
         free(sys);
         return VLC_EGENERIC;
@@ -1732,12 +1748,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->desktop_save.win.top       = var_InheritInteger(vd, "video-y");
     sys->desktop_save.win.bottom    = cfg->display.height;
 
-    if (CommonInit(vd, false, cfg))
+    if (CommonInit(vd, d3d9_device != NULL, cfg))
         goto error;
 
     /* */
     video_format_t fmt;
-    if (Direct3D9Open(vd, &fmt)) {
+    if (Direct3D9Open(vd, &fmt, d3d9_device)) {
         msg_Err(vd, "Direct3D9 could not be opened");
         goto error;
     }
