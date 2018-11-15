@@ -270,7 +270,26 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
         return VLC_ENOMEM;
 
     /* Load dll*/
-    if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
+    if (p_sys!=NULL && p_sys->surface!=NULL)
+    {
+        IDirect3DDevice9 *device;
+        if ( FAILED(IDirect3DSurface9_GetDevice( p_sys->surface, &device )) )
+        {
+            free( sys );
+            goto error;
+        }
+        if ( D3D9_CreateExternal(va, &sys->hd3d, device) != VLC_SUCCESS ||
+             FAILED(D3D9_CreateDeviceExternal( device, &sys->hd3d, 0, &fmt->video, &sys->d3d_dev)) )
+        {
+            IDirect3DDevice9_Release(device);
+            free( sys );
+            goto error;
+        }
+        D3DSURFACE_DESC src;
+        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
+            sys->render = src.Format;
+    }
+    else if (D3D9_Create(va, &sys->hd3d) != VLC_SUCCESS) {
         msg_Warn(va, "cannot load d3d9.dll");
         free( sys );
         goto error;
@@ -301,15 +320,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     dx_sys->pf_setup_output            = DxSetupOutput;
 
     va->sys = sys;
-
-    if (p_sys!=NULL)
-    {
-        D3DSURFACE_DESC src;
-        if (SUCCEEDED(IDirect3DSurface9_GetDesc(p_sys->surface, &src)))
-            sys->render = src.Format;
-        IDirect3DSurface9_GetDevice(p_sys->surface, &sys->d3d_dev.dev );
-        sys->d3d_dev.owner = false;
-    }
 
     err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
