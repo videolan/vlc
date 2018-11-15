@@ -130,6 +130,21 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
     return hr;
 }
 
+HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *dev, d3d9_handle_t *hd3d, HWND hwnd,
+                                  const video_format_t *source, d3d9_device_t *out)
+{
+
+    out->dev   = dev;
+    out->owner = false;
+    out->hwnd  = hwnd;
+    if (D3D9_FillPresentationParameters(hd3d, source, out))
+    {
+        return E_FAIL;
+    }
+    IDirect3DDevice9_AddRef(out->dev);
+    return S_OK;
+}
+
 void D3D9_ReleaseDevice(d3d9_device_t *d3d_dev)
 {
     if (d3d_dev->dev)
@@ -248,4 +263,15 @@ int D3D9_Create(vlc_object_t *o, d3d9_handle_t *hd3d)
 error:
     D3D9_Destroy( hd3d );
     return VLC_EGENERIC;
+}
+
+#undef D3D9_CreateExternal
+int D3D9_CreateExternal(vlc_object_t *o, d3d9_handle_t *hd3d, IDirect3DDevice9 *d3d9dev)
+{
+    HRESULT hr = IDirect3DDevice9_GetDirect3D(d3d9dev, &hd3d->obj);
+    if (FAILED(hr))
+        return VLC_EGENERIC;
+    hd3d->hdll = NULL;
+    hd3d->use_ex = false; /* we don't care */
+    return VLC_SUCCESS;
 }
