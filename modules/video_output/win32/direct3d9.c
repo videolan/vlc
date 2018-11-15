@@ -1032,7 +1032,6 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
      * for performance reason, texture format is identical to backbuffer
      * which would usually be a RGB format
      */
-    IDirect3DTexture9 *d3dtex;
     hr = IDirect3DDevice9_CreateTexture(d3ddev,
                                         fmt->i_width,
                                         fmt->i_height,
@@ -1040,7 +1039,7 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
                                         D3DUSAGE_RENDERTARGET,
                                         p_d3d9_dev->pp.BackBufferFormat,
                                         D3DPOOL_DEFAULT,
-                                        &d3dtex,
+                                        &sys->d3dtex,
                                         NULL);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create texture. (hr=0x%lx)", hr);
@@ -1055,24 +1054,21 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     /*
     ** Create a vertex buffer for use when rendering scene
     */
-    IDirect3DVertexBuffer9 *d3dvtc;
     hr = IDirect3DDevice9_CreateVertexBuffer(d3ddev,
                                              sizeof(CUSTOMVERTEX)*4,
                                              D3DUSAGE_DYNAMIC|D3DUSAGE_WRITEONLY,
                                              D3DFVF_CUSTOMVERTEX,
                                              D3DPOOL_DEFAULT,
-                                             &d3dvtc,
+                                             &sys->d3dvtc,
                                              NULL);
     if (FAILED(hr)) {
         msg_Err(vd, "Failed to create vertex buffer. (hr=0x%lx)", hr);
-        IDirect3DTexture9_Release(d3dtex);
+        IDirect3DTexture9_Release(sys->d3dtex);
+        sys->d3dtex = NULL;
         return VLC_EGENERIC;
     }
 
     /* */
-    sys->d3dtex = d3dtex;
-    sys->d3dvtc = d3dvtc;
-
     sys->d3dregion_count = 0;
     sys->d3dregion       = NULL;
 
@@ -1150,16 +1146,17 @@ static void Direct3D9DestroyScene(vout_display_t *vd)
 
     Direct3D9DeleteRegions(sys->d3dregion_count, sys->d3dregion);
 
-    IDirect3DVertexBuffer9 *d3dvtc = sys->d3dvtc;
-    if (d3dvtc)
-        IDirect3DVertexBuffer9_Release(d3dvtc);
+    if (sys->d3dvtc)
+    {
+        IDirect3DVertexBuffer9_Release(sys->d3dvtc);
+        sys->d3dvtc = NULL;
+    }
 
-    IDirect3DTexture9 *d3dtex = sys->d3dtex;
-    if (d3dtex)
-        IDirect3DTexture9_Release(d3dtex);
-
-    sys->d3dvtc = NULL;
-    sys->d3dtex = NULL;
+    if (sys->d3dtex)
+    {
+        IDirect3DTexture9_Release(sys->d3dtex);
+        sys->d3dtex = NULL;
+    }
 
     sys->d3dregion_count = 0;
     sys->d3dregion       = NULL;
@@ -1620,20 +1617,17 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
 
     IDirect3DDevice9 *d3ddev = vd->sys->d3d_dev.dev;
 
-    IDirect3DVertexBuffer9  *d3dvtc = sys->d3dvtc;
-    IDirect3DTexture9       *d3dtex = region->texture;
-
     HRESULT hr;
 
     /* Import vertices */
     void *vertex;
-    hr = IDirect3DVertexBuffer9_Lock(d3dvtc, 0, 0, &vertex, D3DLOCK_DISCARD);
+    hr = IDirect3DVertexBuffer9_Lock(sys->d3dvtc, 0, 0, &vertex, D3DLOCK_DISCARD);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Lock: 0x%0lx", hr);
         return -1;
     }
     memcpy(vertex, region->vertex, sizeof(region->vertex));
-    hr = IDirect3DVertexBuffer9_Unlock(d3dvtc);
+    hr = IDirect3DVertexBuffer9_Unlock(sys->d3dvtc);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed IDirect3DVertexBuffer9_Unlock: 0x%0lx", hr);
         return -1;
@@ -1643,7 +1637,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     // which govern how textures get blended together (in the case of multiple
     // textures) and lighting information. In this case, we are modulating
     // (blending) our texture with the diffuse color of the vertices.
-    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (IDirect3DBaseTexture9*)d3dtex);
+    hr = IDirect3DDevice9_SetTexture(d3ddev, 0, (IDirect3DBaseTexture9*)region->texture);
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed SetTexture: 0x%0lx", hr);
         return -1;
@@ -1669,7 +1663,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     }
 
     // Render the vertex buffer contents
-    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, d3dvtc, 0, sizeof(CUSTOMVERTEX));
+    hr = IDirect3DDevice9_SetStreamSource(d3ddev, 0, sys->d3dvtc, 0, sizeof(CUSTOMVERTEX));
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed SetStreamSource: 0x%0lx", hr);
         return -1;
