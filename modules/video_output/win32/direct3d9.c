@@ -165,6 +165,7 @@ struct vout_display_sys_t
     void (*swapCb)(void* opaque);
     void (*endRenderCb)(void* opaque);
     bool (*starRenderCb)(void* opaque);
+    bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
 /* */
@@ -580,6 +581,14 @@ static int Direct3D9CreateScene(vout_display_t *vd, const video_format_t *fmt)
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
     IDirect3DDevice9        *d3ddev = p_d3d9_dev->dev;
     HRESULT hr;
+
+    if (sys->resizeCb && !sys->resizeCb( sys->outside_opaque,
+                                         fmt->i_visible_width,
+                                         fmt->i_visible_height ))
+    {
+        msg_Err(vd, "Failed to set the external render size");
+        return VLC_EGENERIC;
+    }
 
     /*
      * Create a texture for use when rendering a scene
@@ -1655,6 +1664,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         sys->swapCb         = Swap;
         sys->starRenderCb   = StartRendering;
         sys->endRenderCb    = EndRendering;
+        sys->resizeCb       = NULL;
     }
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
