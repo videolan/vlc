@@ -166,6 +166,12 @@ struct vout_display_sys_t
     vlc_mutex_t    lock;
     bool           ch_desktop;
     bool           desktop_requested;
+
+    /* outside rendering */
+    void *outside_opaque;
+    void (*swapCb)(void* opaque);
+    void (*endRenderCb)(void* opaque);
+    bool (*starRenderCb)(void* opaque);
 };
 
 /* */
@@ -1137,6 +1143,46 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
     return 0;
 }
 
+static bool StartRendering(void *opaque)
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+    IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
+    HRESULT hr;
+
+    if (sys->clear_scene) {
+        /* Clear the backbuffer and the zbuffer */
+        hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
+                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
+        if (FAILED(hr)) {
+            msg_Dbg(vd, "Failed Clear: 0x%0lx", hr);
+            return false;
+        }
+        sys->clear_scene = false;
+    }
+
+    // Begin the scene
+    hr = IDirect3DDevice9_BeginScene(d3ddev);
+    if (FAILED(hr)) {
+        msg_Dbg(vd, "Failed BeginScene: 0x%0lx", hr);
+        return false;
+    }
+    return true;
+}
+
+static void EndRendering(void *opaque)
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+    IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
+    HRESULT hr;
+
+    // End the scene
+    hr = IDirect3DDevice9_EndScene(d3ddev);
+    if (FAILED(hr))
+        msg_Dbg(vd, "Failed EndScene: 0x%0lx", hr);
+}
+
 /**
  * It renders the scene.
  *
@@ -1150,25 +1196,9 @@ static void Direct3D9RenderScene(vout_display_t *vd,
 {
     vout_display_sys_t *sys = vd->sys;
     IDirect3DDevice9 *d3ddev = sys->d3d_dev.dev;
-    HRESULT hr;
 
-    if (sys->clear_scene) {
-        /* Clear the backbuffer and the zbuffer */
-        hr = IDirect3DDevice9_Clear(d3ddev, 0, NULL, D3DCLEAR_TARGET,
-                                  D3DCOLOR_XRGB(0, 0, 0), 1.0f, 0);
-        if (FAILED(hr)) {
-            msg_Dbg(vd, "Failed Clear: 0x%0lx", hr);
-            return;
-        }
-        sys->clear_scene = false;
-    }
-
-    // Begin the scene
-    hr = IDirect3DDevice9_BeginScene(d3ddev);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed BeginScene: 0x%0lx", hr);
+    if (!sys->starRenderCb(sys->outside_opaque))
         return;
-    }
 
     Direct3D9RenderRegion(vd, picture, true);
 
@@ -1183,12 +1213,7 @@ static void Direct3D9RenderScene(vout_display_t *vd,
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
     }
 
-    // End the scene
-    hr = IDirect3DDevice9_EndScene(d3ddev);
-    if (FAILED(hr)) {
-        msg_Dbg(vd, "Failed EndScene: 0x%0lx", hr);
-        return;
-    }
+    sys->endRenderCb(sys->outside_opaque);
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture,
@@ -1270,13 +1295,11 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     }
 }
 
-static void Display(vout_display_t *vd, picture_t *picture)
+static void Swap(void *opaque)
 {
+    vout_display_t *vd = opaque;
     vout_display_sys_t *sys = vd->sys;
     const d3d9_device_t *p_d3d9_dev = &sys->d3d_dev;
-
-    if (sys->lost_not_ready)
-        return;
 
     // Present the back buffer contents to the display
     // No stretching should happen here !
@@ -1292,6 +1315,16 @@ static void Display(vout_display_t *vd, picture_t *picture)
     if (FAILED(hr)) {
         msg_Dbg(vd, "Failed Present: 0x%0lx", hr);
     }
+}
+
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->lost_not_ready)
+        return;
+
+    sys->swapCb(sys->outside_opaque);
 
     /* XXX See Prepare() */
     if ( !is_d3d9_opaque(picture->format.i_chroma) )
@@ -1672,6 +1705,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         msg_Err(vd, "Direct3D9 could not be initialized");
         free(sys);
         return VLC_EGENERIC;
+    }
+
+    if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb)
+    {
+        /* use our own callbacks, since there isn't any external ones */
+        sys->outside_opaque = vd;
+        sys->swapCb         = Swap;
+        sys->starRenderCb   = StartRendering;
+        sys->endRenderCb    = EndRendering;
     }
 
     sys->hxdll = Direct3D9LoadShaderLibrary();
