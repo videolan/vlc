@@ -1305,6 +1305,8 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Send decoded frame to vout */
         if (i_pts != VLC_TICK_INVALID)
         {
+            if(p_frame_info->b_eos)
+                p_pic->b_still = true;
             p_sys->b_first_frame = false;
             decoder_QueueVideo( p_dec, p_pic );
         }

@@ -1151,6 +1151,11 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
             vout_Flush( p_vout, p_picture->date );
             p_owner->i_last_rate = i_rate;
         }
+        else if( p_picture->b_still )
+        {
+            /* Ensure no earlier higher pts breaks still state */
+            vout_Flush( p_vout, p_picture->date );
+        }
         vout_PutPicture( p_vout, p_picture );
     }
     else

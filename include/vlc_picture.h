@@ -91,6 +91,7 @@ struct picture_t
     /**@{*/
     vlc_tick_t      date;                                  /**< display date */
     bool            b_force;
+    bool            b_still;
     /**@}*/
 
     /** \name Picture dynamic properties
