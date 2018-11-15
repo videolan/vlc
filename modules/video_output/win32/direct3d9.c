@@ -151,7 +151,7 @@ struct vout_display_sys_t
     IDirect3DTexture9       *sceneTexture;
     IDirect3DVertexBuffer9  *sceneVertexBuffer;
     D3DFORMAT               d3dregion_format;    /* Backbuffer output format */
-    int                     d3dregion_count;
+    size_t                  d3dregion_count;
     struct d3d_region_t     *d3dregion;
     const d3d9_format_t      *d3dtexture_format;  /* Rendering texture(s) format */
 
@@ -204,12 +204,12 @@ typedef struct d3d_region_t {
     IDirect3DTexture9  *texture;
 } d3d_region_t;
 
-static void Direct3D9DeleteRegions(int, d3d_region_t *);
+static void Direct3D9DeleteRegions(size_t, d3d_region_t *);
 
 static int  Direct3D9ImportPicture(vout_display_t *vd, d3d_region_t *, IDirect3DSurface9 *surface);
-static void Direct3D9ImportSubpicture(vout_display_t *vd, int *, d3d_region_t **, subpicture_t *);
+static void Direct3D9ImportSubpicture(vout_display_t *vd, size_t *, d3d_region_t **, subpicture_t *);
 
-static void Direct3D9RenderScene(vout_display_t *vd, d3d_region_t *, int, d3d_region_t *);
+static void Direct3D9RenderScene(vout_display_t *vd, d3d_region_t *, size_t, d3d_region_t *);
 
 /* */
 static int DesktopCallback(vlc_object_t *, char const *, vlc_value_t, vlc_value_t, void *);
@@ -564,7 +564,7 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     if (!Direct3D9ImportPicture(vd, &picture_region, surface)) {
         picture_region.width = picture->format.i_visible_width;
         picture_region.height = picture->format.i_visible_height;
-        int subpicture_region_count     = 0;
+        size_t subpicture_region_count     = 0;
         d3d_region_t *subpicture_region = NULL;
         if (subpicture)
             Direct3D9ImportSubpicture(vd, &subpicture_region_count, &subpicture_region,
@@ -1479,9 +1479,9 @@ static int Direct3D9ImportPicture(vout_display_t *vd,
     return VLC_SUCCESS;
 }
 
-static void Direct3D9DeleteRegions(int count, d3d_region_t *region)
+static void Direct3D9DeleteRegions(size_t count, d3d_region_t *region)
 {
-    for (int i = 0; i < count; i++) {
+    for (size_t i = 0; i < count; i++) {
         if (region[i].texture)
             IDirect3DTexture9_Release(region[i].texture);
     }
@@ -1489,12 +1489,12 @@ static void Direct3D9DeleteRegions(int count, d3d_region_t *region)
 }
 
 static void Direct3D9ImportSubpicture(vout_display_t *vd,
-                                     int *count_ptr, d3d_region_t **region,
+                                     size_t *count_ptr, d3d_region_t **region,
                                      subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    int count = 0;
+    size_t count = 0;
     for (subpicture_region_t *r = subpicture->p_region; r; r = r->p_next)
         count++;
 
@@ -1511,7 +1511,7 @@ static void Direct3D9ImportSubpicture(vout_display_t *vd,
         HRESULT hr;
 
         d3dr->texture = NULL;
-        for (int j = 0; j < sys->d3dregion_count; j++) {
+        for (size_t j = 0; j < sys->d3dregion_count; j++) {
             d3d_region_t *cache = &sys->d3dregion[j];
             if (cache->texture &&
                 cache->format == sys->d3dregion_format &&
@@ -1693,7 +1693,7 @@ static int Direct3D9RenderRegion(vout_display_t *vd,
  */
 static void Direct3D9RenderScene(vout_display_t *vd,
                                 d3d_region_t *picture,
-                                int subpicture_count,
+                                size_t subpicture_count,
                                 d3d_region_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1720,15 +1720,16 @@ static void Direct3D9RenderScene(vout_display_t *vd,
 
     Direct3D9RenderRegion(vd, picture, true);
 
-    if (subpicture_count > 0)
+    if (subpicture_count)
+    {
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, TRUE);
-    for (int i = 0; i < subpicture_count; i++) {
-        d3d_region_t *r = &subpicture[i];
-        if (r->texture)
-            Direct3D9RenderRegion(vd, r, false);
-    }
-    if (subpicture_count > 0)
+        for (size_t i = 0; i < subpicture_count; i++) {
+            d3d_region_t *r = &subpicture[i];
+            if (r->texture)
+                Direct3D9RenderRegion(vd, r, false);
+        }
         IDirect3DDevice9_SetRenderState(d3ddev, D3DRS_ALPHABLENDENABLE, FALSE);
+    }
 
     // End the scene
     hr = IDirect3DDevice9_EndScene(d3ddev);
