@@ -1948,10 +1948,17 @@ static void blurayDrawArgbOverlay(demux_t *p_demux, const BD_ARGB_OVERLAY* const
     }
 
     /* Now we can update the region */
+    const uint32_t *src0 = ov->argb;
     uint8_t        *dst0 = p_reg->p_picture->p[0].p_pixels +
                            p_reg->p_picture->p[0].i_pitch * ov->y +
                            ov->x * 4;
-    memcpy(dst0, ov->argb, (ov->stride * ov->h - ov->x)*4);
+
+    for (int y = 0; y < ov->h; y++)
+    {
+        memcpy(dst0, src0, ov->w * 4);
+        src0 += ov->stride;
+        dst0 += p_reg->p_picture->p[0].i_pitch;
+    }
 
     vlc_mutex_unlock(&bdov->lock);
     /*
