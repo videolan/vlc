@@ -97,7 +97,7 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    if (CommonInit(vd))
+    if (CommonInit(vd, false))
         goto error;
 
     /* */

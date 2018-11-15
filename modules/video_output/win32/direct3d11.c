@@ -276,7 +276,7 @@ static int Open(vlc_object_t *object)
     if (ret != VLC_SUCCESS)
         return ret;
 
-    if (CommonInit(vd))
+    if (CommonInit(vd, false))
         goto error;
 
 #if VLC_WINSTORE_APP

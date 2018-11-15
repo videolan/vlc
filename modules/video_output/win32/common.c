@@ -67,7 +67,7 @@ static unsigned int GetPictureHeight(const vout_display_t *vd)
 }
 
 /* */
-int CommonInit(vout_display_t *vd)
+int CommonInit(vout_display_t *vd, bool b_windowless)
 {
     vout_display_sys_t *sys = vd->sys;
 
@@ -76,11 +76,16 @@ int CommonInit(vout_display_t *vd)
     sys->hparent   = NULL;
     sys->hfswnd    = NULL;
     sys->changes   = 0;
+    sys->b_windowless = b_windowless;
     sys->is_first_display = true;
     sys->is_on_top        = false;
 
     sys->pf_GetPictureWidth  = GetPictureWidth;
     sys->pf_GetPictureHeight = GetPictureHeight;
+
+#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
+    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
+#endif
 #if !VLC_WINSTORE_APP
     sys->pf_GetRect = GetRect;
     SetRectEmpty(&sys->rect_display);
@@ -93,9 +98,7 @@ int CommonInit(vout_display_t *vd)
     sys->event = EventThreadCreate(vd);
     if (!sys->event)
         return VLC_EGENERIC;
-#endif
 
-#if !VLC_WINSTORE_APP
     event_cfg_t cfg;
     memset(&cfg, 0, sizeof(cfg));
 #ifdef MODULE_NAME_IS_direct3d9
@@ -124,10 +127,7 @@ int CommonInit(vout_display_t *vd)
             vout_display_SendEventFullscreen(vd, false);
     }
 
-#endif
-#if !defined(NDEBUG) && defined(HAVE_DXGIDEBUG_H)
-    sys->dxgidebug_dll = LoadLibrary(TEXT("DXGIDEBUG.DLL"));
-#endif
+#endif /* !VLC_WINSTORE_APP */
 
     return VLC_SUCCESS;
 }

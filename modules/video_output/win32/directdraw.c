@@ -210,7 +210,7 @@ static int Open(vlc_object_t *object)
     var_Create(vd, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* Initialisation */
-    if (CommonInit(vd))
+    if (CommonInit(vd, false))
         goto error;
 
     /* */

@@ -293,7 +293,7 @@ static int Open(vlc_object_t *object)
     sys->desktop_save.win.top       = var_InheritInteger(vd, "video-y");
     sys->desktop_save.win.bottom    = vd->cfg->display.height;
 
-    if (CommonInit(vd))
+    if (CommonInit(vd, false))
         goto error;
 
     /* */

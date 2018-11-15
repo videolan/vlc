@@ -36,6 +36,8 @@
  *****************************************************************************/
 typedef struct vout_display_sys_win32_t
 {
+    bool                 b_windowless;    /* the rendering is done offscreen */
+
     /* */
     event_thread_t *event;
 
@@ -88,7 +90,7 @@ typedef struct vout_display_sys_win32_t
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int  CommonInit(vout_display_t *);
+int  CommonInit(vout_display_t *, bool b_windowless);
 void CommonClean(vout_display_t *);
 void CommonManage(vout_display_t *);
 int  CommonControl(vout_display_t *, int , va_list );

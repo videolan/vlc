@@ -124,7 +124,7 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
     /* */
-    if (CommonInit(vd))
+    if (CommonInit(vd, false))
         goto error;
 
     EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (OpenGL output)");
