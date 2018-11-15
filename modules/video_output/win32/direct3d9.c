@@ -548,7 +548,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
     HRESULT hr = IDirect3DDevice9_TestCooperativeLevel(p_d3d9_dev->dev);
     if (FAILED(hr)) {
         if (hr == D3DERR_DEVICENOTRESET && !sys->reset_device) {
-            vout_display_SendEventPicturesInvalid(vd);
+            if (vd->info.has_pictures_invalid)
+                vout_display_SendEventPicturesInvalid(vd);
             sys->reset_device = true;
             sys->lost_not_ready = false;
         }
