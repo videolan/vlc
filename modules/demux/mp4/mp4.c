@@ -461,10 +461,14 @@ static int LoadInitFrag( demux_t *p_demux )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     /* Load all boxes ( except raw data ) */
-    if( ( p_sys->p_root = MP4_BoxGetRoot( p_demux->s ) ) == NULL )
+    MP4_Box_t *p_root = MP4_BoxGetRoot( p_demux->s );
+    if( p_root == NULL || !MP4_BoxGet( p_root, "/moov" ) )
     {
+        MP4_BoxFree( p_root );
         goto LoadInitFragError;
     }
+
+    p_sys->p_root = p_root;
 
     return VLC_SUCCESS;
 

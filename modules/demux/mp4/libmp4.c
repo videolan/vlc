@@ -5354,7 +5354,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *p_stream )
     }
 
     if( !i_result )
-        goto error;
+        return p_vroot;
 
     /* If there is a mvex box, it means fragmented MP4, and we're done */
     if( MP4_BoxCount( p_vroot, "moov/mvex" ) > 0 )
