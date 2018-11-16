@@ -1647,7 +1647,6 @@ static int Open(vlc_object_t *object)
     if ( !vd->obj.force && vd->source.mastering.max_luminance != 0)
         return VLC_EGENERIC; /* let a module who can handle it do it */
 
-#if !VLC_WINSTORE_APP
     /* do not use D3D9 on XP unless forced */
     if (!vd->obj.force)
     {
@@ -1658,7 +1657,6 @@ static int Open(vlc_object_t *object)
         if (!isVistaOrGreater)
             return VLC_EGENERIC;
     }
-#endif
 
     /* Allocate structure */
     vd->sys = sys = calloc(1, sizeof(vout_display_sys_t));
