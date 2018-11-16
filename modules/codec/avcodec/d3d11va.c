@@ -354,33 +354,31 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     sys->d3d_dev.d3ddevice = NULL;
     va->sys->render = DXGI_FORMAT_UNKNOWN;
     if ( p_sys != NULL && p_sys->context != NULL ) {
-        void *d3dvidctx = NULL;
-        HRESULT hr = ID3D11DeviceContext_QueryInterface(p_sys->context, &IID_ID3D11VideoContext, &d3dvidctx);
-        if (FAILED(hr)) {
-           msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
-        } else {
-            ID3D11DeviceContext_GetDevice( p_sys->context, &sys->d3d_dev.d3ddevice );
-            HANDLE context_lock = INVALID_HANDLE_VALUE;
-            UINT dataSize = sizeof(context_lock);
-            hr = ID3D11DeviceContext_GetPrivateData(p_sys->context, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
-            if (FAILED(hr))
+        HRESULT hr = D3D11_CreateDeviceExternal(va, p_sys->context, true, &sys->d3d_dev);
+        if (FAILED(hr))
+            msg_Err(va, "can't use the provided D3D11 context");
+        else
+        {
+            if (sys->d3d_dev.context_mutex == INVALID_HANDLE_VALUE)
                 msg_Warn(va, "No mutex found to lock the decoder");
-            sys->d3d_dev.context_mutex = context_lock;
+            void *d3dvidctx = NULL;
+            hr = ID3D11DeviceContext_QueryInterface(p_sys->context, &IID_ID3D11VideoContext, &d3dvidctx);
+            if (FAILED(hr)) {
+               msg_Err(va, "Could not Query ID3D11VideoContext Interface from the picture. (hr=0x%lX)", hr);
+               D3D11_ReleaseDevice(&sys->d3d_dev);
+            } else {
+                sys->d3dvidctx = d3dvidctx;
 
-            sys->d3d_dev.d3dcontext = p_sys->context;
-            sys->d3d_dev.owner = false;
-            D3D11_GetDriverVersion(va, &sys->d3d_dev);
-            sys->d3dvidctx = d3dvidctx;
-
-            assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
-            D3D11_TEXTURE2D_DESC dstDesc;
-            ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
-            sys->render = dstDesc.Format;
-            if (dstDesc.BindFlags & D3D11_BIND_DECODER)
-            {
-                va->sys->textureWidth = dstDesc.Width;
-                va->sys->textureHeight = dstDesc.Height;
-                va->sys->totalTextureSlices = dstDesc.ArraySize;
+                assert(p_sys->texture[KNOWN_DXGI_INDEX] != NULL);
+                D3D11_TEXTURE2D_DESC dstDesc;
+                ID3D11Texture2D_GetDesc( p_sys->texture[KNOWN_DXGI_INDEX], &dstDesc);
+                sys->render = dstDesc.Format;
+                if (dstDesc.BindFlags & D3D11_BIND_DECODER)
+                {
+                    va->sys->textureWidth = dstDesc.Width;
+                    va->sys->textureHeight = dstDesc.Height;
+                    va->sys->totalTextureSlices = dstDesc.ArraySize;
+                }
             }
         }
     }
