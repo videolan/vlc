@@ -65,8 +65,10 @@ vlc_playlist_PlaybackOrderChanged(vlc_playlist_t *playlist)
             state_text = N_("On");
             break;
     }
-    vlc_playlist_PlayerOSDMessage(playlist,
-                                  _("Random: %s"), vlc_gettext(state_text));
+    vlc_player_vout_OSDMessage(playlist->player,
+                               _("Random: %s"), vlc_gettext(state_text));
+    /* vlc_player_vout_OSDMessage() does nothing in tests */
+    VLC_UNUSED(state_text);
 }
 
 static void
@@ -87,20 +89,23 @@ vlc_playlist_PlaybackRepeatChanged(vlc_playlist_t *playlist)
     vlc_playlist_Notify(playlist, on_playback_repeat_changed, playlist->repeat);
     vlc_playlist_state_NotifyChanges(playlist, &state);
 
-    char const *mode = NULL;
+    char const *state_text = NULL;
     switch (playlist->repeat)
     {
         case VLC_PLAYLIST_PLAYBACK_REPEAT_NONE:
-            mode = N_("Off");
+            state_text = N_("Off");
             break;
         case VLC_PLAYLIST_PLAYBACK_REPEAT_ALL:
-            mode = N_("All");
+            state_text = N_("All");
             break;
         case VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT:
-            mode = N_("One");
+            state_text = N_("One");
             break;
     }
-    vlc_playlist_PlayerOSDMessage(playlist, _("Loop: %s"), vlc_gettext(mode));
+    vlc_player_vout_OSDMessage(playlist->player,
+                               _("Loop: %s"), vlc_gettext(state_text));
+    /* vlc_player_vout_OSDMessage() does nothing in tests */
+    VLC_UNUSED(state_text);
 }
 
 enum vlc_playlist_playback_repeat
@@ -364,7 +369,7 @@ vlc_playlist_Prev(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
-    vlc_playlist_PlayerOSDMessage(playlist, _("Previous"));
+    vlc_player_vout_OSDMessage(playlist->player, _("Previous"));
     return VLC_SUCCESS;
 }
 
@@ -392,7 +397,7 @@ vlc_playlist_Next(vlc_playlist_t *playlist)
     }
 
     vlc_playlist_SetCurrentIndex(playlist, index);
-    vlc_playlist_PlayerOSDMessage(playlist, _("Next"));
+    vlc_player_vout_OSDMessage(playlist->player, _("Next"));
     return VLC_SUCCESS;
 }
 

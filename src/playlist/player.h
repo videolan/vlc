@@ -31,11 +31,4 @@ vlc_playlist_PlayerInit(vlc_playlist_t *playlist, vlc_object_t *parent);
 void
 vlc_playlist_PlayerDestroy(vlc_playlist_t *playlist);
 
-#ifdef TEST_PLAYLIST
-#define vlc_playlist_PlayerOSDMessage(playlist, fmt...)
-#else
-#define vlc_playlist_PlayerOSDMessage(playlist, fmt...) \
-    vlc_player_vout_OSDMessage(playlist->player, fmt)
-#endif
-
 #endif
