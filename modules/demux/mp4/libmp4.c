@@ -4244,8 +4244,8 @@ static int MP4_ReadBox_Reference( stream_t *p_stream, MP4_Box_t *p_box )
     else
         MP4_GET4BYTES( p_data->i_from_item_id );
     MP4_GET2BYTES( p_data->i_reference_count );
-
-    if( i_read / sizeof(*p_data->p_references) < p_data->i_reference_count )
+    if( i_read / ((p_box->p_father->data.p_iref->i_flags == 0 ) ? 2 : 4) <
+            p_data->i_reference_count )
         MP4_READBOX_EXIT( 0 );
 
     p_data->p_references = malloc( sizeof(*p_data->p_references) *
@@ -4254,7 +4254,7 @@ static int MP4_ReadBox_Reference( stream_t *p_stream, MP4_Box_t *p_box )
         MP4_READBOX_EXIT( 0 );
     for( uint16_t i=0; i<p_data->i_reference_count; i++ )
     {
-        if( p_box->p_father->data.p_iref == 0 )
+        if( p_box->p_father->data.p_iref->i_flags == 0 )
             MP4_GET2BYTES( p_data->p_references[i].i_to_item_id );
         else
             MP4_GET4BYTES( p_data->p_references[i].i_to_item_id );
