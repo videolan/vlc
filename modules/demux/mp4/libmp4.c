@@ -4442,7 +4442,7 @@ static int MP4_ReadBox_iinf( stream_t *p_stream, MP4_Box_t *p_box )
     assert( i_read == 0 );
 
     uint32_t i = 0;
-    uint64_t i_remain = p_box->i_size - 16;
+    uint64_t i_remain = p_box->i_size - i_header;
     while ( i_remain > 8 && i < p_box->data.p_iinf->i_entry_count )
     {
         MP4_Box_t *p_childbox = MP4_ReadBox( p_stream, p_box );
