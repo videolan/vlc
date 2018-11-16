@@ -212,6 +212,61 @@ static int ControlHEIF( demux_t *p_demux, int i_query, va_list args )
     }
 }
 
+//static int DemuxCompositeImage( demux_t *p_demux )
+//{
+
+//}
+
+static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
+                                 const MP4_Box_t *p_shared_header )
+{
+    struct heif_private_t *p_sys = (void *) p_demux->p_sys;
+    block_t *p_block = NULL;
+
+    MP4_Box_t *p_iloc = MP4_BoxGet( p_sys->p_root, "meta/iloc" );
+    if( !p_iloc )
+        return p_block;
+
+    for( uint32_t i=0; i<BOXDATA(p_iloc)->i_item_count; i++ )
+    {
+        if( BOXDATA(p_iloc)->p_items[i].i_item_id != i_item_id )
+            continue;
+
+        block_t **pp_append = &p_block;
+
+        /* Shared prefix data, ex: JPEG */
+        if( p_shared_header )
+        {
+            *pp_append = block_Alloc( p_shared_header->data.p_binary->i_blob );
+            if( *pp_append )
+            {
+                memcpy( (*pp_append)->p_buffer,
+                        p_shared_header->data.p_binary->p_blob,
+                        p_shared_header->data.p_binary->i_blob );
+                pp_append = &((*pp_append)->p_next);
+            }
+        }
+
+        for( uint16_t j=0; j<BOXDATA(p_iloc)->p_items[i].i_extent_count; j++ )
+        {
+            uint64_t i_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset +
+                                BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_offset;
+            uint64_t i_length = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_length;
+            if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
+                break;
+            *pp_append = vlc_stream_Block( p_demux->s, i_length );
+            if( *pp_append )
+                pp_append = &((*pp_append)->p_next);
+        }
+        break;
+    }
+
+    if( p_block )
+        p_block = block_ChainGather( p_block );
+
+    return p_block;
+}
+
 static int DemuxHEIF( demux_t *p_demux )
 {
     struct heif_private_t *p_sys = (void *) p_demux->p_sys;
@@ -393,47 +448,8 @@ static int DemuxHEIF( demux_t *p_demux )
         return VLC_DEMUXER_SUCCESS;
     }
 
-    MP4_Box_t *p_iloc = MP4_BoxGet( p_sys->p_root, "meta/iloc" );
-    if( !p_iloc )
-        return VLC_DEMUXER_EOF;
-
-    block_t *p_block = NULL;
-    for( uint32_t i=0; i<BOXDATA(p_iloc)->i_item_count; i++ )
-    {
-        if( BOXDATA(p_iloc)->p_items[i].i_item_id != i_current_item_id )
-            continue;
-
-        block_t **pp_append = &p_block;
-
-        /* Shared prefix data, ex: JPEG */
-        if( p_sys->current.p_shared_header )
-        {
-            *pp_append = block_Alloc( p_sys->current.p_shared_header->data.p_binary->i_blob );
-            if( *pp_append )
-            {
-                memcpy( (*pp_append)->p_buffer,
-                        p_sys->current.p_shared_header->data.p_binary->p_blob,
-                        p_sys->current.p_shared_header->data.p_binary->i_blob );
-                pp_append = &((*pp_append)->p_next);
-            }
-        }
-
-        for( uint16_t j=0; j<BOXDATA(p_iloc)->p_items[i].i_extent_count; j++ )
-        {
-            uint64_t i_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset +
-                                BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_offset;
-            uint64_t i_length = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_length;
-            if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
-                break;
-            *pp_append = vlc_stream_Block( p_demux->s, i_length );
-            if( *pp_append )
-                pp_append = &((*pp_append)->p_next);
-        }
-        break;
-    }
-
-    if( p_block )
-        p_block = block_ChainGather( p_block );
+    block_t *p_block = ReadItemExtents( p_demux, i_current_item_id,
+                                        p_sys->current.p_shared_header );
     if( !p_block )
         return VLC_DEMUXER_SUCCESS; /* Goto next picture */
 
