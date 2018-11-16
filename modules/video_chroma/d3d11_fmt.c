@@ -228,6 +228,42 @@ void D3D11_ReleaseDevice(d3d11_device_t *d3d_dev)
 #endif
 }
 
+#undef D3D11_CreateDeviceExternal
+HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11ctx,
+                                   bool hw_decoding, d3d11_device_t *out)
+{
+    HRESULT hr;
+    ID3D11DeviceContext_GetDevice( d3d11ctx, &out->d3ddevice );
+
+    if (hw_decoding)
+    {
+        UINT creationFlags = ID3D11Device_GetCreationFlags(out->d3ddevice);
+        if (!(creationFlags & D3D11_CREATE_DEVICE_VIDEO_SUPPORT))
+        {
+            msg_Err(obj, "the provided D3D11 device doesn't support decoding");
+            ID3D11Device_Release(out->d3ddevice);
+            out->d3ddevice = NULL;
+            return E_FAIL;
+        }
+    }
+
+    ID3D11DeviceContext_AddRef( d3d11ctx );
+    out->d3dcontext = d3d11ctx;
+    out->owner = false;
+    out->feature_level = ID3D11Device_GetFeatureLevel(out->d3ddevice );
+
+    HANDLE context_lock = INVALID_HANDLE_VALUE;
+    UINT dataSize = sizeof(context_lock);
+    hr = ID3D11DeviceContext_GetPrivateData(d3d11ctx, &GUID_CONTEXT_MUTEX, &dataSize, &context_lock);
+    if (SUCCEEDED(hr))
+        out->context_mutex = context_lock;
+    else
+        out->context_mutex = INVALID_HANDLE_VALUE;
+
+    D3D11_GetDriverVersion(obj, out);
+    return S_OK;
+}
+
 #undef D3D11_CreateDevice
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
                            bool hw_decoding, d3d11_device_t *out)
