@@ -5214,7 +5214,7 @@ static MP4_Box_t *MP4_ReadBoxUsing( stream_t *p_stream, MP4_Box_t *p_father,
     if( !p_box )
         return NULL;
 
-    if( MP4_ReadBox_function( p_stream, p_box ) != VLC_SUCCESS )
+    if( MP4_ReadBox_function( p_stream, p_box ) != 1 )
     {
         uint64_t i_end = p_box->i_pos + p_box->i_size;
         MP4_BoxFree( p_box );
