@@ -247,11 +247,21 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
             }
         }
 
+        uint64_t i_base_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset;
+        if( i_base_offset == 0 )
+        {
+            MP4_Box_t *mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
+            if( !mdat )
+                break;
+            i_base_offset = mdat->i_pos + mp4_box_headersize( mdat );
+        }
+
         for( uint16_t j=0; j<BOXDATA(p_iloc)->p_items[i].i_extent_count; j++ )
         {
-            uint64_t i_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset +
+            uint64_t i_offset = i_base_offset +
                                 BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_offset;
             uint64_t i_length = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_length;
+
             if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
                 break;
             *pp_append = vlc_stream_Block( p_demux->s, i_length );
