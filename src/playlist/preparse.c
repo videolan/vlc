@@ -38,7 +38,10 @@ vlc_playlist_CollectChildren(playlist_item_vector_t *dest,
         input_item_node_t *child = node->pp_children[i];
         vlc_playlist_item_t *item = vlc_playlist_item_New(child->p_item);
         if (item)
-            vlc_vector_push(dest, item);
+        {
+            if (!vlc_vector_push(dest, item))
+                vlc_playlist_item_Release(item);
+        }
         vlc_playlist_CollectChildren(dest, child);
     }
 }
