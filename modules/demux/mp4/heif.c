@@ -279,10 +279,15 @@ static int DemuxHEIF( demux_t *p_demux )
             if( psz_mime )
             {
                 if( !strcasecmp( "image/jpeg", psz_mime ) )
+                {
                     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
+                    break;
+                }
                 else if( !strcasecmp( "image/avif", psz_mime ) )
+                {
                     es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_AV1 );
-                break;
+                    break;
+                }
             }
             return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
     }
