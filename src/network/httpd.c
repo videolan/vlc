@@ -1704,7 +1704,6 @@ static void httpdLoop(httpd_host_t *host)
         struct pollfd *pufd = ufd + nfd;
         assert (pufd < ufd + (sizeof (ufd) / sizeof (ufd[0])));
 
-        pufd->fd = vlc_tls_GetFD(cl->sock);
         pufd->events = pufd->revents = 0;
 
         switch (cl->i_state) {
@@ -1925,6 +1924,8 @@ static void httpdLoop(httpd_host_t *host)
                     cl->i_state = HTTPD_CLIENT_SENDING;
                 }
         }
+
+        pufd->fd = vlc_tls_GetPollFD(cl->sock, &pufd->events);
 
         if (pufd->events != 0)
             nfd++;
