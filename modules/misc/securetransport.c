@@ -507,12 +507,12 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
     }
 }
 
-static int st_GetFD (vlc_tls_t *session)
+static int st_GetFD (vlc_tls_t *session, short *restrict events)
 {
     vlc_tls_st_t *sys = (vlc_tls_st_t *)session;
     vlc_tls_t *sock = sys->sock;
 
-    return vlc_tls_GetFD(sock);
+    return vlc_tls_GetPollFD(sock, events);
 }
 
 /**

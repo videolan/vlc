@@ -94,11 +94,11 @@ typedef struct vlc_tls_proxy
     vlc_tls_t *sock;
 } vlc_tls_proxy_t;
 
-static int vlc_tls_ProxyGetFD(vlc_tls_t *tls)
+static int vlc_tls_ProxyGetFD(vlc_tls_t *tls, short *restrict events)
 {
     vlc_tls_proxy_t *proxy = (vlc_tls_proxy_t *)tls;
 
-    return vlc_tls_GetFD(proxy->sock);
+    return vlc_tls_GetPollFD(proxy->sock, events);
 }
 
 static ssize_t vlc_tls_ProxyRead(vlc_tls_t *tls, struct iovec *iov,

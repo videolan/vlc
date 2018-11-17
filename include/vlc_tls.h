@@ -48,7 +48,7 @@ typedef struct vlc_tls
 
 struct vlc_tls_operations
 {
-    int (*get_fd)(struct vlc_tls *);
+    int (*get_fd)(struct vlc_tls *, short *events);
     ssize_t (*readv)(struct vlc_tls *, struct iovec *, unsigned);
     ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
     int (*shutdown)(struct vlc_tls *, bool duplex);
@@ -188,9 +188,16 @@ VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
  */
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
+static inline int vlc_tls_GetPollFD(vlc_tls_t *tls, short *events)
+{
+    return tls->ops->get_fd(tls, events);
+}
+
 static inline int vlc_tls_GetFD(vlc_tls_t *tls)
 {
-    return tls->ops->get_fd(tls);
+    short events = 0;
+
+    return vlc_tls_GetPollFD(tls, &events);
 }
 
 /**

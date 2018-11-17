@@ -133,12 +133,12 @@ static ssize_t vlc_gnutls_writev(gnutls_transport_ptr_t ptr,
     return sock->ops->writev(sock, iov, iovcnt);
 }
 
-static int gnutls_GetFD(vlc_tls_t *tls)
+static int gnutls_GetFD(vlc_tls_t *tls, short *restrict events)
 {
     vlc_tls_gnutls_t *priv = (vlc_tls_gnutls_t *)tls;
     vlc_tls_t *sock = gnutls_transport_get_ptr(priv->session);
 
-    return vlc_tls_GetFD(sock);
+    return vlc_tls_GetPollFD(sock, events);
 }
 
 static ssize_t gnutls_Recv(vlc_tls_t *tls, struct iovec *iov, unsigned count)
