@@ -406,8 +406,8 @@ enum
 struct pollfd
 {
     int fd;
-    unsigned events;
-    unsigned revents;
+    short events;
+    short revents;
 };
 #endif
 #ifndef HAVE_POLL
