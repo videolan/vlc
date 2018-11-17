@@ -3740,6 +3740,7 @@ dnl QT
 dnl
 AC_ARG_ENABLE([qt],
   AS_HELP_STRING([--disable-qt], [Qt UI support (default enabled)]),, [
+  AS_IF([test "${enable_vlc}" != "no"], [enable_qt="yes"])
   AS_IF([test "${SYS}" = "darwin"], [
     enable_qt="no"
   ])
@@ -3760,7 +3761,7 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
     ], [
       AS_IF([test -n "${enable_qt}"],[
-        AC_MSG_ERROR([${QT_PKG_ERRORS}.])
+        AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
       ],[
         AC_MSG_WARN([${QT_PKG_ERRORS}.])
       ])
