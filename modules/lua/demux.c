@@ -52,7 +52,7 @@ struct vlclua_playlist
 static int vlclua_demux_peek( lua_State *L )
 {
     stream_t *s = (stream_t *)vlclua_get_this(L);
-    int n = luaL_checkint( L, 1 );
+    int n = luaL_checkinteger( L, 1 );
     const uint8_t *p_peek;
 
     ssize_t val = vlc_stream_Peek(s->s, &p_peek, n);
@@ -66,7 +66,7 @@ static int vlclua_demux_peek( lua_State *L )
 static int vlclua_demux_read( lua_State *L )
 {
     stream_t *s = (stream_t *)vlclua_get_this(L);
-    int n = luaL_checkint( L, 1 );
+    int n = luaL_checkinteger( L, 1 );
     char *buf = malloc(n);
 
     if (buf != NULL)

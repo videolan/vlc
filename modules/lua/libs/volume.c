@@ -49,7 +49,7 @@
 static int vlclua_volume_set( lua_State *L )
 {
     playlist_t *p_this = vlclua_get_playlist_internal( L );
-    int i_volume = luaL_checkint( L, 1 );
+    int i_volume = luaL_checkinteger( L, 1 );
     if( i_volume < 0 )
         i_volume = 0;
     int i_ret = playlist_VolumeSet( p_this, i_volume/(float)AOUT_VOLUME_DEFAULT );

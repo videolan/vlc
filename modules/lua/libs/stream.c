@@ -123,7 +123,7 @@ static int vlclua_stream_read( lua_State *L )
 {
     int i_read;
     stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
-    int n = luaL_checkint( L, 2 );
+    int n = luaL_checkinteger( L, 2 );
     uint8_t *p_read = malloc( n );
     if( !p_read ) return vlclua_error( L );
 
