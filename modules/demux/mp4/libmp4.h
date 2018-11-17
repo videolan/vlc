@@ -422,6 +422,7 @@ typedef int64_t stime_t;
 #define ATOM_SA3D VLC_FOURCC( 'S', 'A', '3', 'D' )
 
 /* iso4 meta references */
+#define ATOM_idat VLC_FOURCC('i','d','a','t')
 #define ATOM_iloc VLC_FOURCC('i','l','o','c')
 #define ATOM_iinf VLC_FOURCC('i','i','n','f')
 #define ATOM_infe VLC_FOURCC('i','n','f','e')

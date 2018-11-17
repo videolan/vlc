@@ -247,25 +247,61 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
             }
         }
 
-        uint64_t i_base_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset;
-        if( i_base_offset == 0 )
-        {
-            MP4_Box_t *mdat = MP4_BoxGet( p_sys->p_root, "mdat" );
-            if( !mdat )
-                break;
-            i_base_offset = mdat->i_pos + mp4_box_headersize( mdat );
-        }
-
         for( uint16_t j=0; j<BOXDATA(p_iloc)->p_items[i].i_extent_count; j++ )
         {
-            uint64_t i_offset = i_base_offset +
+            uint64_t i_offset = BOXDATA(p_iloc)->p_items[i].i_base_offset +
                                 BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_offset;
             uint64_t i_length = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_length;
 
-            if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
-                break;
-            *pp_append = vlc_stream_Block( p_demux->s, i_length );
-            if( *pp_append )
+            if( BOXDATA(p_iloc)->p_items[i].i_construction_method < 2 )
+            {
+                /* Extents are in 1:file, 2:idat */
+                if( BOXDATA(p_iloc)->p_items[i].i_construction_method == 1 )
+                {
+                    MP4_Box_t *idat = MP4_BoxGet( p_sys->p_root, "meta/idat" );
+                    if(!idat)
+                        break;
+                    i_offset += idat->i_pos + mp4_box_headersize(idat);
+                }
+
+                if( vlc_stream_Seek( p_demux->s, i_offset ) != VLC_SUCCESS )
+                    break;
+                *pp_append = vlc_stream_Block( p_demux->s, i_length );
+            }
+            /* Extents are 3:iloc reference */
+            else if( BOXDATA(p_iloc)->p_items[i].i_construction_method == 2 )
+            {
+                /* FIXME ? That's totally untested and really complicated */
+                uint32_t i_extent_index = BOXDATA(p_iloc)->p_items[i].p_extents[j].i_extent_index;
+                if(i_extent_index == 0)
+                    i_extent_index = 1; /* Inferred. Indexes start 1 */
+                const MP4_Box_t *p_iref = MP4_BoxGet( p_sys->p_root, "meta/iref" );
+                if(!p_iref)
+                    break;
+                for( const MP4_Box_t *p_refbox = p_iref->p_first;
+                                      p_refbox; p_refbox = p_refbox->p_next )
+                {
+                    if( p_refbox->i_type != VLC_FOURCC('i','l','o','c') ||
+                        BOXDATA(p_refbox)->i_from_item_id == i_item_id )
+                        continue;
+
+                    for( uint16_t k=0; k< BOXDATA(p_refbox)->i_reference_count; k++ )
+                    {
+                        if( --i_extent_index > 0 )
+                            continue;
+                        if( BOXDATA(p_refbox)->p_references[k].i_to_item_id != i_item_id )
+                        {
+                            *pp_append = ReadItemExtents(p_demux,
+                                            BOXDATA(p_refbox)->p_references[k].i_to_item_id,
+                                            NULL);
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            while( *pp_append )
                 pp_append = &((*pp_append)->p_next);
         }
         break;

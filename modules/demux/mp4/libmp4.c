@@ -5131,6 +5131,7 @@ static const struct
     { ATOM_SA3D,    MP4_ReadBox_SA3D,        0 },
 
     /* iso4 brand meta references */
+    { ATOM_idat,    MP4_ReadBoxSkip,         ATOM_meta },
     { ATOM_iloc,    MP4_ReadBox_iloc,        ATOM_meta },
     { ATOM_iinf,    MP4_ReadBox_iinf,        ATOM_meta },
     { ATOM_infe,    MP4_ReadBox_infe,        ATOM_iinf },
