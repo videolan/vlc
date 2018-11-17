@@ -31,6 +31,9 @@
 # include "config.h"
 #endif
 
+#undef MODULE_STRING
+#define MODULE_STRING "oldhttp"
+
 #include <errno.h>
 
 #include <vlc_common.h>
