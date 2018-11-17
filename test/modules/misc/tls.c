@@ -47,20 +47,21 @@ static vlc_tls_creds_t *client_creds;
 static void *tls_echo(void *data)
 {
     vlc_tls_t *tls = data;
-    struct pollfd ufd;
     ssize_t val;
     char buf[256];
 
-    ufd.fd = vlc_tls_GetFD(tls);
-
     while ((val = vlc_tls_SessionHandshake(server_creds, tls)) > 0)
     {
+        struct pollfd ufd;
+
         switch (val)
         {
             case 1:  ufd.events = POLLIN;  break;
             case 2:  ufd.events = POLLOUT; break;
             default: vlc_assert_unreachable();
         }
+
+        ufd.fd = vlc_tls_GetPollFD(tls, &ufd.events);
         poll(&ufd, 1, -1);
     }
 

@@ -170,12 +170,11 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     vlc_tick_t deadline = vlc_tick_now ();
     deadline += VLC_TICK_FROM_MS( var_InheritInteger (crd, "ipv4-timeout") );
 
-    struct pollfd ufd[1];
-    ufd[0].fd = vlc_tls_GetFD(sock);
-
     vlc_cleanup_push (cleanup_tls, session);
     while ((val = crd->handshake(crd, session, host, service, alp)) != 0)
     {
+        struct pollfd ufd[1];
+
         if (val < 0 || vlc_killed() )
         {
             if (val < 0)
@@ -191,7 +190,9 @@ error:
            now = deadline;
 
         assert (val <= 2);
-        ufd[0] .events = (val == 1) ? POLLIN : POLLOUT;
+
+        ufd[0].events = (val == 1) ? POLLIN : POLLOUT;
+        ufd[0].fd = vlc_tls_GetPollFD(sock, &ufd->events);
 
         vlc_restorecancel(canc);
         val = vlc_poll_i11e(ufd, 1, MS_FROM_VLC_TICK(deadline - now));

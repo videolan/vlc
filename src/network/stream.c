@@ -56,8 +56,8 @@ ssize_t vlc_tls_Read(vlc_tls_t *session, void *buf, size_t len, bool waitall)
     struct pollfd ufd;
     struct iovec iov;
 
-    ufd.fd = vlc_tls_GetFD(session);
     ufd.events = POLLIN;
+    ufd.fd = vlc_tls_GetPollFD(session, &ufd.events);
     iov.iov_base = buf;
     iov.iov_len = len;
 
@@ -97,8 +97,8 @@ ssize_t vlc_tls_Write(vlc_tls_t *session, const void *buf, size_t len)
     struct pollfd ufd;
     struct iovec iov;
 
-    ufd.fd = vlc_tls_GetFD(session);
     ufd.events = POLLOUT;
+    ufd.fd = vlc_tls_GetPollFD(session, &ufd.events);
     iov.iov_base = (void *)buf;
     iov.iov_len = len;
 
