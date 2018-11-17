@@ -121,9 +121,6 @@ int ChromecastCommunication::buildMessage(const std::string & namespace_,
 ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_timeout, bool *pb_timeout )
 {
     ssize_t i_received = 0;
-    struct pollfd ufd[1];
-    ufd[0].fd = vlc_tls_GetFD( m_tls );
-    ufd[0].events = POLLIN;
 
     struct iovec iov;
     iov.iov_base = p_data;
@@ -146,6 +143,11 @@ ssize_t ChromecastCommunication::receive( uint8_t *p_data, size_t i_size, int i_
             {
                 return -1;
             }
+
+            struct pollfd ufd[1];
+            ufd[0].events = POLLIN;
+            ufd[0].fd = vlc_tls_GetPollFD( m_tls, &ufd[0].events );
+
             ssize_t val = vlc_poll_i11e(ufd, 1, i_timeout);
             if ( val < 0 )
                 return -1;
