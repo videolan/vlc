@@ -221,7 +221,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     // Auto collapse MRL field
     self.mrlViewHeightConstraint.constant = 0;
 
-    [self updateQTKVideoDevices];
+    [self updateVideoDevices];
     [_qtkVideoDevicePopup removeAllItems];
     msg_Dbg(getIntf(), "Found %lu video capture devices", _avvideoDevices.count);
 
@@ -246,7 +246,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [_qtkAudioDevicePopup removeAllItems];
     [_screenqtkAudioPopup removeAllItems];
 
-    [self updateQTKAudioDevices];
+    [self updateAudioDevices];
     msg_Dbg(getIntf(), "Found %lu audio capture devices", _avaudioDevices.count);
 
     if (_avaudioDevices.count >= 1) {
@@ -498,12 +498,12 @@ static NSString *kCaptureTabViewId  = @"capture";
             else
                 [options addObject: @"no-screen-follow-mouse"];
             if ([_screenqtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-                [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
+                [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
         }
         else if ([[[_captureModePopup selectedItem] title] isEqualToString: _NS("Input Devices")]) {
             if ([_qtkVideoCheckbox state]) {
                 if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-                    [options addObject: [NSString stringWithFormat: @"input-slave=qtsound://%@", _avCurrentAudioDeviceUID]];
+                    [options addObject: [NSString stringWithFormat: @"input-slave=avaudiocapture://%@", _avCurrentAudioDeviceUID]];
             }
         }
     }
@@ -1161,7 +1161,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         if ([_qtkVideoCheckbox state] && _avCurrentDeviceUID)
             [self setMRL:[NSString stringWithFormat:@"avcapture://%@", _avCurrentDeviceUID]];
         else if ([_qtkAudioCheckbox state] && _avCurrentAudioDeviceUID)
-            [self setMRL:[NSString stringWithFormat:@"qtsound://%@", _avCurrentAudioDeviceUID]];
+            [self setMRL:[NSString stringWithFormat:@"avaudiocapture://%@", _avCurrentAudioDeviceUID]];
     }
 }
 
@@ -1306,13 +1306,13 @@ static NSString *kCaptureTabViewId  = @"capture";
         NSBeep();
 }
 
-- (void)updateQTKVideoDevices
+- (void)updateVideoDevices
 {
     _avvideoDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]
                          arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
 }
 
-- (void)updateQTKAudioDevices
+- (void)updateAudioDevices
 {
     _avaudioDevices = [[AVCaptureDevice devicesWithMediaType:AVMediaTypeAudio]
                         arrayByAddingObjectsFromArray:[AVCaptureDevice devicesWithMediaType:AVMediaTypeMuxed]];
