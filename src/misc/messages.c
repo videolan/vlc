@@ -218,6 +218,7 @@ typedef struct
     vlc_mutex_t lock;
     vlc_log_early_t *head;
     vlc_log_early_t **tailp;
+    vlc_logger_t *sink;
 } vlc_logger_early_t;
 
 static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
@@ -266,16 +267,18 @@ static int vlc_LogEarlyOpen(vlc_logger_t *logger)
     vlc_mutex_init(&sys->lock);
     sys->head = NULL;
     sys->tailp = &sys->head;
+    sys->sink = logger;
 
     logger->ops = &early_ops;
     logger->sys = sys;
     return 0;
 }
 
-static void vlc_LogEarlyClose(vlc_logger_t *logger, void *d)
+static void vlc_LogEarlyClose(void *d)
 {
-    libvlc_int_t *vlc = logger->obj.libvlc;
     vlc_logger_early_t *sys = d;
+    vlc_logger_t *logger = sys->sink;
+    libvlc_int_t *vlc = logger->obj.libvlc;
 
     /* Drain early log messages */
     for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
@@ -390,7 +393,7 @@ int vlc_LogInit(libvlc_int_t *vlc)
     vlc_rwlock_unlock(&logger->lock);
 
     if (early_sys != NULL)
-        vlc_LogEarlyClose(logger, early_sys);
+        vlc_LogEarlyClose(early_sys);
 
     return 0;
 }
@@ -447,7 +450,7 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
     if (logger->ops == &early_ops)
     {
         logger->ops = &discard_ops;
-        vlc_LogEarlyClose(logger, logger->sys);
+        vlc_LogEarlyClose(logger->sys);
     }
 
     vlc_rwlock_destroy(&logger->lock);
