@@ -26,7 +26,6 @@ OPTIONS="
         --enable-ncurses
         --enable-twolame
         --enable-libass
-        --enable-macosx-qtkit
         --enable-macosx-avfoundation
         --disable-skins2
         --disable-xcb
