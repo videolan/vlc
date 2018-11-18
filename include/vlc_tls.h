@@ -139,16 +139,19 @@ struct vlc_tls_operations
 typedef struct vlc_tls_client
 {
     struct vlc_common_members obj;
-
+    const struct vlc_tls_client_operations *ops;
     void *sys;
+} vlc_tls_client_t;
 
+struct vlc_tls_client_operations
+{
     vlc_tls_t *(*open)(struct vlc_tls_client *, vlc_tls_t *sock,
                        const char *host, const char *const *alpn);
     int  (*handshake)(vlc_tls_t *session,
                       const char *hostname, const char *service,
                       char ** /*restrict*/ alp);
     void (*destroy)(struct vlc_tls_client *);
-} vlc_tls_client_t;
+};
 
 /**
  * Allocates TLS client-side credentials.

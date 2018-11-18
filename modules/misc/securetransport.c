@@ -818,6 +818,13 @@ static void st_ClientDestroy (vlc_tls_client_t *crd) {
     free(sys);
 }
 
+static const struct vlc_tls_client_operations st_ClientOps =
+{
+    .open = st_ClientSessionOpen,
+    .handshake = st_Handshake,
+    .destroy = st_ClientDestroy,
+};
+
 /**
  * Initializes a client-side TLS credentials.
  */
@@ -832,11 +839,8 @@ static int OpenClient (vlc_tls_client_t *crd) {
     sys->whitelist = CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks);
     sys->server_cert_chain = NULL;
 
+    crd->ops = &st_ClientOps;
     crd->sys = sys;
-    crd->open = st_ClientSessionOpen;
-    crd->handshake = st_Handshake;
-    crd->destroy = st_ClientDestroy;
-
     return VLC_SUCCESS;
 }
 

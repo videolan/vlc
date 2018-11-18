@@ -549,6 +549,13 @@ static void gnutls_ClientDestroy(vlc_tls_client_t *crd)
     gnutls_certificate_free_credentials(x509);
 }
 
+static const struct vlc_tls_client_operations gnutls_ClientOps =
+{
+    .open = gnutls_ClientSessionOpen,
+    .handshake = gnutls_ClientHandshake,
+    .destroy = gnutls_ClientDestroy,
+};
+
 /**
  * Initializes a client-side TLS credentials.
  */
@@ -592,11 +599,8 @@ static int OpenClient(vlc_tls_client_t *crd)
     gnutls_certificate_set_verify_flags (x509,
                                          GNUTLS_VERIFY_ALLOW_X509_V1_CA_CRT);
 
+    crd->ops = &gnutls_ClientOps;
     crd->sys = x509;
-    crd->open = gnutls_ClientSessionOpen;
-    crd->handshake = gnutls_ClientHandshake;
-    crd->destroy = gnutls_ClientDestroy;
-
     return VLC_SUCCESS;
 }
 

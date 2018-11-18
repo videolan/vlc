@@ -121,7 +121,7 @@ void vlc_tls_ClientDelete(vlc_tls_client_t *crd)
     if (crd == NULL)
         return;
 
-    crd->destroy(crd);
+    crd->ops->destroy(crd);
     vlc_objres_clear(VLC_OBJECT(crd));
     vlc_object_release (crd);
 }
@@ -149,7 +149,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *crd, vlc_tls_t *sock,
 {
     int val;
     int canc = vlc_savecancel();
-    vlc_tls_t *session = crd->open(crd, sock, host, alpn);
+    vlc_tls_t *session = crd->ops->open(crd, sock, host, alpn);
     vlc_restorecancel(canc);
 
     if (session == NULL)
@@ -162,7 +162,7 @@ vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *crd, vlc_tls_t *sock,
     deadline += VLC_TICK_FROM_MS( var_InheritInteger (crd, "ipv4-timeout") );
 
     vlc_cleanup_push (cleanup_tls, session);
-    while ((val = crd->handshake(session, host, service, alp)) != 0)
+    while ((val = crd->ops->handshake(session, host, service, alp)) != 0)
     {
         struct pollfd ufd[1];
 
