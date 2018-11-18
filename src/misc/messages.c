@@ -252,6 +252,26 @@ static void vlc_vaLogEarly(void *d, int type, const vlc_log_t *item,
     vlc_mutex_unlock(&sys->lock);
 }
 
+static void vlc_LogEarlyClose(void *d)
+{
+    vlc_logger_early_t *sys = d;
+    vlc_logger_t *logger = sys->sink;
+    libvlc_int_t *vlc = logger->obj.libvlc;
+
+    /* Drain early log messages */
+    for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
+    {
+        vlc_LogCallback(vlc, log->type, &log->meta, "%s",
+                        (log->msg != NULL) ? log->msg : "message lost");
+        free(log->msg);
+        next = log->next;
+        free(log);
+    }
+
+    vlc_mutex_destroy(&sys->lock);
+    free(sys);
+}
+
 static const struct vlc_logger_operations early_ops = {
     vlc_vaLogEarly,
     NULL,
@@ -272,26 +292,6 @@ static int vlc_LogEarlyOpen(vlc_logger_t *logger)
     logger->ops = &early_ops;
     logger->sys = sys;
     return 0;
-}
-
-static void vlc_LogEarlyClose(void *d)
-{
-    vlc_logger_early_t *sys = d;
-    vlc_logger_t *logger = sys->sink;
-    libvlc_int_t *vlc = logger->obj.libvlc;
-
-    /* Drain early log messages */
-    for (vlc_log_early_t *log = sys->head, *next; log != NULL; log = next)
-    {
-        vlc_LogCallback(vlc, log->type, &log->meta, "%s",
-                        (log->msg != NULL) ? log->msg : "message lost");
-        free(log->msg);
-        next = log->next;
-        free(log);
-    }
-
-    vlc_mutex_destroy(&sys->lock);
-    free(sys);
 }
 
 static void vlc_vaLogDiscard(void *d, int type, const vlc_log_t *item,
