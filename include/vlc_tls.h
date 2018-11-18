@@ -139,7 +139,6 @@ typedef struct vlc_tls_creds
 {
     struct vlc_common_members obj;
 
-    module_t *module;
     void *sys;
 
     vlc_tls_t *(*open)(struct vlc_tls_creds *, vlc_tls_t *sock,

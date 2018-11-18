@@ -65,14 +65,6 @@ static int tls_client_load(void *func, va_list ap)
     return activate (crd);
 }
 
-static void tls_unload(void *func, va_list ap)
-{
-    void (*deactivate) (vlc_tls_creds_t *) = func;
-    vlc_tls_creds_t *crd = va_arg (ap, vlc_tls_creds_t *);
-
-    deactivate (crd);
-}
-
 vlc_tls_creds_t *
 vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
                       const char *key_path)
@@ -85,9 +77,8 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
     if (key_path == NULL)
         key_path = cert_path;
 
-    srv->module = vlc_module_load (srv, "tls server", NULL, false,
-                                   tls_server_load, srv, cert_path, key_path);
-    if (srv->module == NULL)
+    if (vlc_module_load(srv, "tls server", NULL, false,
+                        tls_server_load, srv, cert_path, key_path) == NULL)
     {
         msg_Err (srv, "TLS server plugin not available");
         vlc_object_release (srv);
@@ -104,9 +95,8 @@ vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *obj)
     if (unlikely(crd == NULL))
         return NULL;
 
-    crd->module = vlc_module_load (crd, "tls client", NULL, false,
-                                   tls_client_load, crd);
-    if (crd->module == NULL)
+    if (vlc_module_load(crd, "tls client", NULL, false,
+                        tls_client_load, crd) == NULL)
     {
         msg_Err (crd, "TLS client plugin not available");
         vlc_object_release (crd);
@@ -122,7 +112,7 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
         return;
 
     crd->destroy(crd);
-    vlc_module_unload(crd, crd->module, tls_unload, crd);
+    vlc_objres_clear(VLC_OBJECT(crd));
     vlc_object_release (crd);
 }
 
