@@ -65,6 +65,12 @@ static void LogText(void *opaque, int type, const vlc_log_t *meta,
     funlockfile(stream);
 }
 
+static const struct vlc_logger_operations text_ops =
+{
+    LogText,
+    NULL
+};
+
 #define HTML_FILENAME "vlc-log.html"
 #define HTML_HEADER \
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"\n" \
@@ -105,7 +111,14 @@ static void LogHtml(void *opaque, int type, const vlc_log_t *meta,
     funlockfile(stream);
 }
 
-static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
+static const struct vlc_logger_operations html_ops =
+{
+    LogHtml,
+    NULL
+};
+
+static const struct vlc_logger_operations *Open(vlc_object_t *obj,
+                                                void **restrict sysp)
 {
     if (!var_InheritBool(obj, "file-logging"))
         return NULL;
@@ -125,7 +138,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
     const char *filename = TEXT_FILENAME;
     const char *header = TEXT_HEADER;
 
-    vlc_log_cb cb = LogText;
+    const struct vlc_logger_operations *ops = &text_ops;
     sys->footer = TEXT_FOOTER;
     sys->verbosity = verbosity;
 
@@ -136,7 +149,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
         {
             filename = HTML_FILENAME;
             header = HTML_HEADER;
-            cb = LogHtml;
+            ops = &html_ops;
             sys->footer = HTML_FOOTER;
         }
         else if (strcmp(mode, "text"))
@@ -177,7 +190,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **restrict sysp)
     fputs(header, sys->stream);
 
     *sysp = sys;
-    return cb;
+    return ops;
 }
 
 static void Close(void *opaque)

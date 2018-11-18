@@ -111,7 +111,8 @@ vlc_intf_GetMainPlaylist(intf_thread_t *intf);
  * @{
  */
 
-VLC_API void vlc_LogSet(libvlc_int_t *, vlc_log_cb cb, void *data);
+VLC_API void vlc_LogSet(libvlc_int_t *, const struct vlc_logger_operations *,
+                        void *data);
 
 /*@}*/
 

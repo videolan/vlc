@@ -101,7 +101,10 @@ static int var_InheritFacility(vlc_object_t *obj, const char *varname)
 
 static const char default_ident[] = PACKAGE;
 
-static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
+static const struct vlc_logger_operations ops = { Log, NULL };
+
+static const struct vlc_logger_operations *Open(vlc_object_t *obj,
+                                                void **restrict sysp)
 {
     if (!var_InheritBool(obj, "syslog"))
         return NULL;
@@ -123,7 +126,7 @@ static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
 
     setlogmask(mask);
 
-    return Log;
+    return &ops;
 }
 
 static void Close(void *opaque)

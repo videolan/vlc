@@ -69,6 +69,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     }
 }
 
+static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
+
 @implementation VLCLogWindowController
 
 - (id)init
@@ -122,7 +124,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     }
 
     // Subscribe to LibVLCCore's messages
-    vlc_LogSet(getIntf()->obj.libvlc, MsgCallback, (__bridge void*)self);
+    vlc_LogSet(getIntf()->obj.libvlc, &log_ops, (__bridge void*)self);
     _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.3
                                                      target:self
                                                    selector:@selector(appendMessageBuffer)
@@ -221,7 +223,7 @@ static void MsgCallback(void *data, int type, const vlc_log_t *item, const char 
     [self clearMessageTable];
 
     // Reregister handler, to write new header to log
-    vlc_LogSet(getIntf()->obj.libvlc, MsgCallback, (__bridge void*)self);
+    vlc_LogSet(getIntf()->obj.libvlc, &log_ops, (__bridge void*)self);
 }
 
 /* Refresh log action

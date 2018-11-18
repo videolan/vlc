@@ -93,6 +93,12 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
     fputs(GRAY"\n", stream);
     funlockfile(stream);
 }
+
+static const struct vlc_logger_operations color_ops =
+{
+    LogConsoleColor,
+    NULL
+};
 #endif /* !_WIN32 */
 
 static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
@@ -118,7 +124,13 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
     funlockfile(stream);
 }
 
-static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
+static const struct vlc_logger_operations gray_ops =
+{
+    LogConsoleGray,
+    NULL
+};
+
+static const struct vlc_logger_operations *Open(vlc_object_t *obj, void **sysp)
 {
     int verbosity = -1;
 
@@ -139,9 +151,9 @@ static vlc_log_cb Open(vlc_object_t *obj, void **sysp)
 
 #if defined (HAVE_ISATTY) && !defined (_WIN32)
     if (isatty(STDERR_FILENO) && var_InheritBool(obj, "color"))
-        return LogConsoleColor;
+        return &color_ops;
 #endif
-    return LogConsoleGray;
+    return &gray_ops;
 }
 
 #define QUIET_TEXT N_("Be quiet")

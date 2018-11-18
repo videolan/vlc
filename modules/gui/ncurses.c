@@ -1764,6 +1764,8 @@ static void MsgCallback(void *data, int type, const vlc_log_t *msg,
     vlc_mutex_unlock(&sys->msg_lock);
 }
 
+static const struct vlc_logger_operations log_ops = { MsgCallback, NULL };
+
 /*****************************************************************************
  * Run: ncurses thread
  *****************************************************************************/
@@ -1802,7 +1804,7 @@ static int Open(vlc_object_t *p_this)
     vlc_mutex_init(&sys->msg_lock);
 
     sys->verbosity = var_InheritInteger(intf, "verbose");
-    vlc_LogSet(intf->obj.libvlc, MsgCallback, sys);
+    vlc_LogSet(intf->obj.libvlc, &log_ops, sys);
 
     sys->box_type = BOX_PLAYLIST;
     sys->plidx_follow = true;
