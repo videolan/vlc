@@ -665,14 +665,15 @@ static const struct vlc_tls_operations st_ops =
  * Initializes a client-side TLS session.
  */
 
-static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
-                                       bool b_server)
+static vlc_tls_t *st_SessionOpenCommon(vlc_object_t *obj,
+                                       vlc_tls_creds_sys_t *crd,
+                                       vlc_tls_t *sock, bool b_server)
 {
     vlc_tls_st_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return NULL;
 
-    sys->p_cred = crd->sys;
+    sys->p_cred = crd;
     sys->b_handshaked = false;
     sys->b_blocking_send = false;
     sys->i_send_buffered_bytes = 0;
@@ -680,7 +681,7 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     sys->sock = sock;
     sys->b_server_mode = b_server;
     vlc_mutex_init(&sys->lock);
-    sys->obj = VLC_OBJECT(crd);
+    sys->obj = obj;
 
     vlc_tls_t *tls = &sys->tls;
 
@@ -690,12 +691,12 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
 #if TARGET_OS_IPHONE
     p_context = SSLCreateContext(NULL, b_server ? kSSLServerSide : kSSLClientSide, kSSLStreamType);
     if (p_context == NULL) {
-        msg_Err(crd, "cannot create ssl context");
+        msg_Err(obj, "cannot create ssl context");
         goto error;
     }
 #else
     if (SSLNewContext(b_server, &p_context) != noErr) {
-        msg_Err(crd, "error calling SSLNewContext");
+        msg_Err(obj, "error calling SSLNewContext");
         goto error;
     }
 #endif
@@ -704,13 +705,13 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
 
     OSStatus ret = SSLSetIOFuncs(p_context, st_SocketReadFunc, st_SocketWriteFunc);
     if (ret != noErr) {
-        msg_Err(crd, "cannot set io functions");
+        msg_Err(obj, "cannot set io functions");
         goto error;
     }
 
     ret = SSLSetConnection(p_context, tls);
     if (ret != noErr) {
-        msg_Err(crd, "cannot set connection");
+        msg_Err(obj, "cannot set connection");
         goto error;
     }
 
@@ -726,7 +727,8 @@ static vlc_tls_t *st_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *sock,
 {
     msg_Dbg(crd, "open TLS session for %s", hostname);
 
-    vlc_tls_t *tls = st_SessionOpenCommon(crd, sock, false);
+    vlc_tls_t *tls = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
+                                          false);
     if (tls == NULL)
         return NULL;
 
@@ -851,7 +853,8 @@ static vlc_tls_t *st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *sock,
     VLC_UNUSED(alpn);
     msg_Dbg(crd, "open TLS server session");
 
-    vlc_tls_t *tls = st_SessionOpenCommon(crd, sock, true);
+    vlc_tls_t *tls = st_SessionOpenCommon(VLC_OBJECT(crd), crd->sys, sock,
+                                          true);
     if (tls != NULL)
         return NULL;
 
