@@ -39,19 +39,86 @@
 
 # include <vlc_network.h>
 
-/** Transport layer socket */
+/**
+ * Transport layer socket.
+ *
+ * Transport layer sockets are full-duplex, meaning data can be sent and
+ * received at the same time. As such, it is permitted for two threads to
+ * use the same TLS simultaneously, if one thread is receiving data while the
+ * other is sending data. However receiving or rending data from two threads
+ * concurrently is undefined behaviour.
+ *
+ * The following functions are treated as sending data:
+ * - vlc_tls_Write(),
+ * - vlc_tls_Shutdown(),
+ * - callback vlc_tls_operations.writev,
+ * - callback vlc_tls_operations.shutdown.
+ *
+ * The following funcitons are treated as receiving data:
+ * - vlc_tls_Read(),
+ * - vlc_tls_GetLine(),
+ * - callback vlc_tls_operations.readv,
+ * - vlc_tls_Shutdown() if the duplex flag is true,
+ * - callback vlc_tls_operations.shutdown if the duplex flag is true.
+ */
 typedef struct vlc_tls
 {
+    /** Callbacks to operate on the stream. */
     const struct vlc_tls_operations *ops;
+    /** Reserved. Pointer to the underlying stream, or NULL if none. */
     struct vlc_tls *p;
 } vlc_tls_t;
 
 struct vlc_tls_operations
 {
+    /** Callback for events polling.
+     *
+     * See \ref vlc_tls_GetPollFD().
+     */
     int (*get_fd)(struct vlc_tls *, short *events);
-    ssize_t (*readv)(struct vlc_tls *, struct iovec *, unsigned);
-    ssize_t (*writev)(struct vlc_tls *, const struct iovec *, unsigned);
+
+    /** Callback for receiving data.
+     *
+     * This callback receives/reads data into an I/O vector
+     * in non-blocking mode.
+     *
+     * @param iov I/O vector to read data into
+     * @param len number of entries of the I/O vector
+     * @return the number of bytes received or -1 on error
+     *
+     * If no data is available without blocking, the function returns -1 and
+     * sets @c errno to @c EAGAIN .
+     */
+    ssize_t (*readv)(struct vlc_tls *, struct iovec *iov, unsigned len);
+
+    /** Callback for sending data.
+     *
+     * This callback sends/writes data from an I/O vector
+     * in non-blocking mode.
+     *
+     * @param iov I/O vector to write data from
+     * @param len number of entries of the I/O vector
+     * @return the number of bytes sent or -1 on error
+     *
+     * If no data can be sent without blocking, the function returns -1 and
+     * sets @c errno to @c EAGAIN .
+     */
+    ssize_t (*writev)(struct vlc_tls *, const struct iovec *iov, unsigned len);
+
+    /** Callback for shutting down.
+     *
+     * This callback marks the end of the output (send/write) half of the
+     * stream. If the duplex flag is set, it also marks the end of the input
+     * (receive/read) half. See also \ref vlc_tls_Shutdown().
+     */
     int (*shutdown)(struct vlc_tls *, bool duplex);
+
+    /** Callback for closing.
+     *
+     * This callback terminates the stream and releases any associated
+     * resources. However, it does <b>not</b> destroy the underlying stream
+     * if there is one. See also \ref vlc_tls_SessionDelete().
+     */
     void (*close)(struct vlc_tls *);
 };
 
@@ -175,7 +242,7 @@ VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
 /** @} */
 
 /**
- * Destroys a TLS session down.
+ * Destroys a TLS session.
  *
  * All resources associated with the TLS session are released.
  *
@@ -188,11 +255,30 @@ VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
  */
 VLC_API void vlc_tls_SessionDelete (vlc_tls_t *);
 
+/**
+ * Generates an event polling description.
+ *
+ * This function provides the necessary informations to make an event polling
+ * description for use with poll() or similar event multiplexing functions.
+ *
+ * This function is necessary both for receiving and sending data, therefore
+ * it is reentrant. It is not a cancellation point.
+ *
+ * @param events a pointer to a mask of poll events (e.g. POLLIN, POLLOUT)
+ *               [IN/OUT]
+ * @return the file descriptor to poll
+ */
 static inline int vlc_tls_GetPollFD(vlc_tls_t *tls, short *events)
 {
     return tls->ops->get_fd(tls, events);
 }
 
+/**
+ * Returns the underlying file descriptor.
+ *
+ * This function returns the file descriptor underlying the transport layer
+ * stream object. This function is reentrant and is not a cancellation point.
+ */
 static inline int vlc_tls_GetFD(vlc_tls_t *tls)
 {
     short events = 0;
@@ -308,6 +394,14 @@ struct addrinfo;
  * - if the socket type is not SOCK_STREAM,
  * - if the transport protocol is not TCP (IPPROTO_TCP), or
  * - if TCP Fast Open should be attempted.
+ *
+ * @note If the @c defer_connect flag is @c true , data must be sent with a
+ * data sending function (other than vlc_tls_Shutdown()) before data can be
+ * received.
+ * Notwithstanding the thread-safety and reentrancy promises of \ref vlc_tls_t,
+ * the owner of the stream object is responsible for ensuring that data will be
+ * sent at least once before any attempt to receive data.
+ * Otherwise @c defer_connect must be @c false .
  *
  * @param ai a filled addrinfo structure (the ai_next member is ignored)
  * @param defer_connect whether to attempt a TCP Fast Open connection or not
