@@ -614,12 +614,10 @@ typedef struct vlc_tls_creds_sys
  * Initializes a server-side TLS session.
  */
 static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_server_t *crd,
-                                           vlc_tls_t *sk, const char *hostname,
+                                           vlc_tls_t *sk,
                                            const char *const *alpn)
 {
     vlc_tls_creds_sys_t *sys = crd->sys;
-
-    assert (hostname == NULL);
     vlc_tls_gnutls_t *priv = gnutls_SessionOpen(VLC_OBJECT(crd), GNUTLS_SERVER,
                                                 sys->x509_cred, sk, alpn);
     return (priv != NULL) ? &priv->tls : NULL;

@@ -847,9 +847,8 @@ static int OpenClient (vlc_tls_client_t *crd) {
  * Initializes a server-side TLS session.
  */
 static vlc_tls_t *st_ServerSessionOpen (vlc_tls_server_t *crd, vlc_tls_t *sock,
-                               const char *hostname, const char *const *alpn) {
+                                        const char *const *alpn) {
 
-    VLC_UNUSED(hostname);
     VLC_UNUSED(alpn);
     msg_Dbg(crd, "open TLS server session");
 

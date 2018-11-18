@@ -218,7 +218,7 @@ typedef struct vlc_tls_server
     void *sys;
 
     vlc_tls_t *(*open)(struct vlc_tls_server *, vlc_tls_t *sock,
-                       const char *host, const char *const *alpn);
+                       const char *const *alpn);
     int  (*handshake)(vlc_tls_t *session,
                       const char *hostname, const char *service,
                       char ** /*restrict*/ alp);
