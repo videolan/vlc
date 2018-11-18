@@ -93,7 +93,7 @@ void vlc_tls_ServerDelete(vlc_tls_server_t *crd)
     if (crd == NULL)
         return;
 
-    crd->destroy(crd);
+    crd->ops->destroy(crd);
     vlc_objres_clear(VLC_OBJECT(crd));
     vlc_object_release(crd);
 }
@@ -204,7 +204,7 @@ vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_server_t *crd,
                                        const char *const *alpn)
 {
     int canc = vlc_savecancel();
-    vlc_tls_t *session = crd->open(crd, sock, alpn);
+    vlc_tls_t *session = crd->ops->open(crd, sock, alpn);
     vlc_restorecancel(canc);
     if (session != NULL)
         session->p = sock;

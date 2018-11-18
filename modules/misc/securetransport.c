@@ -890,6 +890,13 @@ static void st_ServerDestroy (vlc_tls_server_t *crd) {
     free(sys);
 }
 
+static const struct vlc_tls_server_operations st_ServerOps =
+{
+    .open = st_ServerSessionOpen,
+    .handshake = st_ServerHandshake,
+    .destroy = st_ServerDestroy,
+};
+
 /**
  * Initializes server-side TLS credentials.
  */
@@ -994,10 +1001,8 @@ static int OpenServer (vlc_tls_server_t *crd, const char *cert, const char *key)
     sys->server_cert_chain = server_cert_chain;
     sys->whitelist = NULL;
 
+    crd->ops = &st_ServerOps;
     crd->sys = sys;
-    crd->open = st_ServerSessionOpen;
-    crd->handshake = st_ServerHandshake;
-    crd->destroy = st_ServerDestroy;
 
 out:
     if (policy)

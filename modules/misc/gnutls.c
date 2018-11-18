@@ -640,6 +640,13 @@ static void gnutls_ServerDestroy(vlc_tls_server_t *crd)
     free(sys);
 }
 
+static const struct vlc_tls_server_operations gnutls_ServerOps =
+{
+    .open = gnutls_ServerSessionOpen,
+    .handshake = gnutls_ServerHandshake,
+    .destroy = gnutls_ServerDestroy,
+};
+
 /**
  * Allocates a whole server's TLS credentials.
  */
@@ -720,11 +727,8 @@ static int OpenServer(vlc_tls_server_t *crd, const char *cert, const char *key)
 
     msg_Dbg (crd, "ciphers parameters loaded");
 
+    crd->ops = &gnutls_ServerOps;
     crd->sys = sys;
-    crd->open = gnutls_ServerSessionOpen;
-    crd->handshake = gnutls_ServerHandshake;
-    crd->destroy = gnutls_ServerDestroy;
-
     return VLC_SUCCESS;
 
 error:
