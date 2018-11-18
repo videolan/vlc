@@ -542,6 +542,13 @@ error:
     return -1;
 }
 
+static void gnutls_ClientDestroy(vlc_tls_creds_t *crd)
+{
+    gnutls_certificate_credentials_t x509 = crd->sys;
+
+    gnutls_certificate_free_credentials(x509);
+}
+
 /**
  * Initializes a client-side TLS credentials.
  */
@@ -588,15 +595,9 @@ static int OpenClient (vlc_tls_creds_t *crd)
     crd->sys = x509;
     crd->open = gnutls_ClientSessionOpen;
     crd->handshake = gnutls_ClientHandshake;
+    crd->destroy = gnutls_ClientDestroy;
 
     return VLC_SUCCESS;
-}
-
-static void CloseClient (vlc_tls_creds_t *crd)
-{
-    gnutls_certificate_credentials_t x509 = crd->sys;
-
-    gnutls_certificate_free_credentials (x509);
 }
 
 #ifdef ENABLE_SOUT
@@ -632,6 +633,16 @@ static int gnutls_ServerHandshake(vlc_tls_t *tls,
 
     (void) host; (void) service;
     return gnutls_ContinueHandshake(priv, alp);
+}
+
+static void gnutls_ServerDestroy(vlc_tls_creds_t *crd)
+{
+    vlc_tls_creds_sys_t *sys = crd->sys;
+
+    /* all sessions depending on the server are now deinitialized */
+    gnutls_certificate_free_credentials(sys->x509_cred);
+    gnutls_dh_params_deinit(sys->dh_params);
+    free(sys);
 }
 
 /**
@@ -717,6 +728,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
     crd->sys = sys;
     crd->open = gnutls_ServerSessionOpen;
     crd->handshake = gnutls_ServerHandshake;
+    crd->destroy = gnutls_ServerDestroy;
 
     return VLC_SUCCESS;
 
@@ -724,19 +736,6 @@ error:
     gnutls_certificate_free_credentials (sys->x509_cred);
     free (sys);
     return VLC_EGENERIC;
-}
-
-/**
- * Destroys a TLS server object.
- */
-static void CloseServer (vlc_tls_creds_t *crd)
-{
-    vlc_tls_creds_sys_t *sys = crd->sys;
-
-    /* all sessions depending on the server are now deinitialized */
-    gnutls_certificate_free_credentials (sys->x509_cred);
-    gnutls_dh_params_deinit (sys->dh_params);
-    free (sys);
 }
 #endif
 
@@ -773,7 +772,7 @@ vlc_module_begin ()
     set_shortname( "GNU TLS" )
     set_description( N_("GNU TLS transport layer security") )
     set_capability( "tls client", 1 )
-    set_callbacks( OpenClient, CloseClient )
+    set_callbacks(OpenClient, NULL)
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_NETWORK )
     add_bool("gnutls-system-trust", true, SYSTEM_TRUST_TEXT,
@@ -789,6 +788,6 @@ vlc_module_begin ()
         set_capability( "tls server", 1 )
         set_category( CAT_ADVANCED )
         set_subcategory( SUBCAT_ADVANCED_NETWORK )
-        set_callbacks( OpenServer, CloseServer )
+        set_callbacks(OpenServer, NULL)
 #endif
 vlc_module_end ()
