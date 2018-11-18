@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14113" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.13.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14113"/>
+        <capability name="box content view" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,7 +17,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="53" y="419" width="716" height="333"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <view key="contentView" id="2">
                 <rect key="frame" x="0.0" y="0.0" width="716" height="333"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -131,7 +131,7 @@
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <subviews>
                                                         <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="sourceList" columnReordering="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="20" indentationPerLevel="14" autoresizesOutlineColumn="YES" outlineTableColumn="4717" id="4714" customClass="PXSourceList">
-                                                            <rect key="frame" x="0.0" y="0.0" width="203" height="20"/>
+                                                            <rect key="frame" x="0.0" y="0.0" width="236" height="273"/>
                                                             <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                             <size key="intercellSpacing" width="3" height="0.0"/>
                                                             <color key="backgroundColor" name="_sourceListBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -224,14 +224,14 @@
                                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="4722" userLabel="Dropzone">
                                                         <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
                                                         <subviews>
-                                                            <imageView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4731" customClass="VLCDropDisabledImageView">
-                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
+                                                            <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4731" customClass="VLCDropDisabledImageView">
+                                                                <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
                                                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="axesIndependently" image="dropzone-background" id="4732"/>
                                                             </imageView>
                                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="5605" customClass="VLCDragDropView">
                                                                 <rect key="frame" x="0.0" y="0.0" width="477" height="252"/>
                                                                 <subviews>
-                                                                    <box autoresizesSubviews="NO" transparent="YES" title="Box" borderType="none" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="4739">
+                                                                    <box autoresizesSubviews="NO" borderType="none" title="Box" titlePosition="noTitle" transparent="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4739">
                                                                         <rect key="frame" x="89" y="10" width="300" height="230"/>
                                                                         <view key="contentView" id="pxq-Tn-LtA">
                                                                             <rect key="frame" x="0.0" y="0.0" width="300" height="230"/>
@@ -254,7 +254,7 @@
                                                                                     </textFieldCell>
                                                                                 </textField>
                                                                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4729">
-                                                                                    <rect key="frame" x="100" y="15" width="99" height="23"/>
+                                                                                    <rect key="frame" x="100" y="14" width="99" height="25"/>
                                                                                     <buttonCell key="cell" type="roundTextured" title="Open media..." bezelStyle="texturedRounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4730">
                                                                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                                                         <font key="font" metaFont="system"/>
@@ -324,11 +324,11 @@
                                                                 </outlineView>
                                                             </subviews>
                                                         </clipView>
-                                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="4374">
+                                                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="4374">
                                                             <rect key="frame" x="1" y="234" width="0.0" height="16"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
-                                                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="4375">
+                                                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="4375">
                                                             <rect key="frame" x="386" y="23" width="16" height="0.0"/>
                                                             <autoresizingMask key="autoresizingMask"/>
                                                         </scroller>
@@ -737,6 +737,7 @@
             <connections>
                 <outlet property="categoryLabel" destination="5610" id="28H-0K-uf4"/>
                 <outlet property="controlsBar" destination="5339" id="5624"/>
+                <outlet property="dropzoneBackgroundImageView" destination="4731" id="cCV-LP-gVb"/>
                 <outlet property="dropzoneBox" destination="4739" id="3sx-Uq-aFL"/>
                 <outlet property="dropzoneButton" destination="4729" id="uUO-5x-qmU"/>
                 <outlet property="dropzoneImageView" destination="4725" id="Ck9-vp-aDM"/>
@@ -805,7 +806,7 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="157"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <value key="minSize" type="size" width="612" height="157"/>
             <value key="maxSize" type="size" width="612" height="159"/>
             <view key="contentView" id="5266">
@@ -885,7 +886,7 @@ Gw
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="265" y="520" width="612" height="156"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1028"/>
             <value key="minSize" type="size" width="612" height="156"/>
             <value key="maxSize" type="size" width="612" height="159"/>
             <view key="contentView" id="5306">
@@ -909,7 +910,7 @@ Gw
                         </textFieldCell>
                     </textField>
                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5319">
-                        <rect key="frame" x="18" y="65" width="577" height="25"/>
+                        <rect key="frame" x="18" y="65" width="577" height="26"/>
                         <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="5322" id="5320">
                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
@@ -996,6 +997,6 @@ Gw
         <image name="stop-pressed" width="29" height="23"/>
         <image name="topbar_background" width="1" height="27"/>
         <image name="volume-high" width="13" height="11"/>
-        <image name="volume-low" width="5" height="11"/>
+        <image name="volume-low" width="5" height="10"/>
     </resources>
 </document>

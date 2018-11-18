@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCMainWindow.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2002-2013 VLC authors and VideoLAN
+ * Copyright (C) 2002-2018 VLC authors and VideoLAN
  * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
@@ -203,6 +203,7 @@ static const float f_min_window_height = 307.;
               forKeyPath:@"effectiveAppearance"
                  options:0
                  context:nil];
+        self.dropzoneBackgroundImageView.hidden = YES;
     } else {
         [_dropzoneImageView setImage:imageFromRes(@"dropzone")];
     }
