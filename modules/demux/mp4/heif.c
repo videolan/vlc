@@ -313,6 +313,145 @@ static block_t *ReadItemExtents( demux_t *p_demux, uint32_t i_item_id,
     return p_block;
 }
 
+static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
+                                 es_format_t *fmt, const MP4_Box_t **p_header )
+{
+    struct heif_private_t *p_sys = (void *) p_demux->p_sys;
+
+    const MP4_Box_t *p_ipma = MP4_BoxGet( p_sys->p_root, "meta/iprp/ipma" );
+    if( !p_ipma )
+        return VLC_EGENERIC;
+
+    /* Load properties */
+    for( uint32_t i=0; i<BOXDATA(p_ipma)->i_entry_count; i++ )
+    {
+        if( BOXDATA(p_ipma)->p_entries[i].i_item_id != i_item_id )
+            continue;
+
+        for( uint8_t j=0; j<BOXDATA(p_ipma)->p_entries[i].i_association_count; j++ )
+        {
+            if( !BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index )
+                continue;
+
+            const MP4_Box_t *p_prop = MP4_BoxGet( p_sys->p_root, "meta/iprp/ipco/[%u]",
+                BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index - 1 );
+            if( !p_prop )
+                continue;
+
+            switch( p_prop->i_type )
+            {
+                case ATOM_hvcC:
+                case ATOM_avcC:
+                case ATOM_av1C:
+                    if( !fmt->p_extra &&
+                       ((fmt->i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
+                        (fmt->i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ||
+                        (fmt->i_codec == VLC_CODEC_AV1  && p_prop->i_type == ATOM_av1C)) )
+                    {
+                        fmt->p_extra = malloc( p_prop->data.p_binary->i_blob );
+                        if( fmt->p_extra )
+                        {
+                            fmt->i_extra = p_prop->data.p_binary->i_blob;
+                            memcpy( fmt->p_extra, p_prop->data.p_binary->p_blob, fmt->i_extra );
+                        }
+                    }
+                    break;
+                case ATOM_jpeC:
+                    if( fmt->i_codec == VLC_CODEC_JPEG )
+                        *p_header = p_prop;
+                    break;
+                case ATOM_ispe:
+                    fmt->video.i_visible_width = p_prop->data.p_ispe->i_width;
+                    fmt->video.i_visible_height = p_prop->data.p_ispe->i_height;
+                    break;
+                case ATOM_pasp:
+                    if( p_prop->data.p_pasp->i_horizontal_spacing &&
+                        p_prop->data.p_pasp->i_vertical_spacing )
+                    {
+                        fmt->video.i_sar_num = p_prop->data.p_pasp->i_horizontal_spacing;
+                        fmt->video.i_sar_den = p_prop->data.p_pasp->i_vertical_spacing;
+                    }
+                    break;
+                case ATOM_irot:
+                    switch( p_prop->data.p_irot->i_ccw_degrees % 360 )
+                    {
+                        default:
+                        case 0:   fmt->video.orientation = ORIENT_NORMAL ; break;
+                        case 90:  fmt->video.orientation = ORIENT_ROTATED_90; break;
+                        case 180: fmt->video.orientation = ORIENT_ROTATED_180 ; break;
+                        case 270: fmt->video.orientation = ORIENT_ROTATED_270 ; break;
+                    }
+                    break;
+                case ATOM_colr:
+                    fmt->video.primaries = iso_23001_8_cp_to_vlc_primaries(
+                                            p_prop->data.p_colr->nclc.i_primary_idx );
+                    fmt->video.transfer = iso_23001_8_tc_to_vlc_xfer(
+                                            p_prop->data.p_colr->nclc.i_transfer_function_idx );
+                    fmt->video.space = iso_23001_8_mc_to_vlc_coeffs(
+                                        p_prop->data.p_colr->nclc.i_matrix_idx );
+                    fmt->video.b_color_range_full = p_prop->data.p_colr->nclc.i_full_range;
+                    break;
+                case ATOM_clli:
+                    fmt->video.lighting.MaxCLL = p_prop->data.p_CoLL->i_maxCLL;
+                    fmt->video.lighting.MaxFALL = p_prop->data.p_CoLL->i_maxFALL;
+                    break;
+                case ATOM_mdcv:
+                    memcpy( fmt->video.mastering.primaries,
+                            p_prop->data.p_SmDm->primaries, sizeof(uint16_t) * 6 );
+                    memcpy( fmt->video.mastering.white_point,
+                            p_prop->data.p_SmDm->white_point, sizeof(uint16_t) * 2 );
+                    fmt->video.mastering.max_luminance = p_prop->data.p_SmDm->i_luminanceMax;
+                    fmt->video.mastering.min_luminance = p_prop->data.p_SmDm->i_luminanceMin;
+                    break;
+            }
+        }
+    }
+
+    fmt->video.i_frame_rate      = 1000;
+    fmt->video.i_frame_rate_base = p_sys->i_image_duration / 1000;
+
+    return VLC_SUCCESS;
+}
+
+static int SetupPicture( demux_t *p_demux, const MP4_Box_t *p_infe,
+                         es_format_t *fmt, const MP4_Box_t **p_header )
+{
+    fmt->i_codec = 0;
+    *p_header = NULL;
+
+    const uint32_t i_item_id = BOXDATA(p_infe)->i_item_id;
+    const char *psz_mime = BOXDATA(p_infe)->psz_content_type;
+    switch( BOXDATA(p_infe)->item_type )
+    {
+        case VLC_FOURCC('h','v','c','1'):
+            es_format_Init( fmt, VIDEO_ES, VLC_CODEC_HEVC );
+            break;
+        case VLC_FOURCC('a','v','c','1'):
+            es_format_Init( fmt, VIDEO_ES, VLC_CODEC_H264 );
+            break;
+        case ATOM_av01:
+            es_format_Init( fmt, VIDEO_ES, VLC_CODEC_AV1 );
+            break;
+        case VLC_FOURCC('j','p','e','g'):
+            es_format_Init( fmt, VIDEO_ES, VLC_CODEC_JPEG );
+            break;
+        default:
+            if( psz_mime )
+            {
+                if( !strcasecmp( "image/jpeg", psz_mime ) )
+                    es_format_Init( fmt, VIDEO_ES, VLC_CODEC_JPEG );
+                else if( !strcasecmp( "image/avif", psz_mime ) )
+                    es_format_Init( fmt, VIDEO_ES, VLC_CODEC_AV1 );
+            }
+            break;
+    }
+
+    if( fmt->i_codec == 0 )
+        return VLC_EGENERIC;
+
+    return SetPictureProperties( p_demux, i_item_id, fmt, p_header );
+}
+
 static int DemuxHEIF( demux_t *p_demux )
 {
     struct heif_private_t *p_sys = (void *) p_demux->p_sys;
@@ -356,129 +495,18 @@ static int DemuxHEIF( demux_t *p_demux )
 
     const uint32_t i_current_item_id = p_sys->current.BOXDATA(p_infe)->i_item_id;
     const MP4_Box_t *p_ipco = MP4_BoxGet( p_sys->p_root, "meta/iprp/ipco" );
-    const MP4_Box_t *p_ipma = MP4_BoxGet( p_sys->p_root, "meta/iprp/ipma" );
-    if( !p_ipma || !p_ipco )
+    if( !p_ipco )
         return VLC_DEMUXER_EOF;
 
     es_format_t fmt;
-    const char *psz_mime = p_sys->current.BOXDATA(p_infe)->psz_content_type;
-    switch( p_sys->current.BOXDATA(p_infe)->item_type )
+    es_format_Init(&fmt, UNKNOWN_ES, 0);
+
+    if( SetupPicture( p_demux, p_sys->current.p_infe,
+                      &fmt, &p_sys->current.p_shared_header ) != VLC_SUCCESS )
     {
-        case VLC_FOURCC('h','v','c','1'):
-            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_HEVC );
-            break;
-        case VLC_FOURCC('a','v','c','1'):
-            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_H264 );
-            break;
-        case ATOM_av01:
-            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_AV1 );
-            break;
-        case VLC_FOURCC('j','p','e','g'):
-            es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
-            break;
-        default:
-            if( psz_mime )
-            {
-                if( !strcasecmp( "image/jpeg", psz_mime ) )
-                {
-                    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_JPEG );
-                    break;
-                }
-                else if( !strcasecmp( "image/avif", psz_mime ) )
-                {
-                    es_format_Init( &fmt, VIDEO_ES, VLC_CODEC_AV1 );
-                    break;
-                }
-            }
-            return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
+        es_format_Clean( &fmt );
+        return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
     }
-
-    /* Load properties */
-    for( uint32_t i=0; i<BOXDATA(p_ipma)->i_entry_count; i++ )
-    {
-        if( BOXDATA(p_ipma)->p_entries[i].i_item_id != i_current_item_id )
-            continue;
-        for( uint8_t j=0; j<BOXDATA(p_ipma)->p_entries[i].i_association_count; j++ )
-        {
-            if( !BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index )
-                continue;
-
-            const MP4_Box_t *p_prop = MP4_BoxGet( p_ipco, "./[%u]",
-                BOXDATA(p_ipma)->p_entries[i].p_assocs[j].i_property_index - 1 );
-            if( !p_prop )
-                continue;
-
-            switch( p_prop->i_type )
-            {
-                case ATOM_hvcC:
-                case ATOM_avcC:
-                case ATOM_av1C:
-                    if( !fmt.p_extra &&
-                       ((fmt.i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
-                        (fmt.i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ||
-                        (fmt.i_codec == VLC_CODEC_AV1  && p_prop->i_type == ATOM_av1C)) )
-                    {
-                        fmt.p_extra = malloc( p_prop->data.p_binary->i_blob );
-                        if( fmt.p_extra )
-                        {
-                            fmt.i_extra = p_prop->data.p_binary->i_blob;
-                            memcpy( fmt.p_extra, p_prop->data.p_binary->p_blob, fmt.i_extra );
-                        }
-                    }
-                    break;
-                case ATOM_jpeC:
-                    if( fmt.i_codec == VLC_CODEC_JPEG )
-                        p_sys->current.p_shared_header = p_prop;
-                    break;
-                case ATOM_ispe:
-                    fmt.video.i_visible_width = p_prop->data.p_ispe->i_width;
-                    fmt.video.i_visible_height = p_prop->data.p_ispe->i_height;
-                    break;
-                case ATOM_pasp:
-                    if( p_prop->data.p_pasp->i_horizontal_spacing &&
-                        p_prop->data.p_pasp->i_vertical_spacing )
-                    {
-                        fmt.video.i_sar_num = p_prop->data.p_pasp->i_horizontal_spacing;
-                        fmt.video.i_sar_den = p_prop->data.p_pasp->i_vertical_spacing;
-                    }
-                    break;
-                case ATOM_irot:
-                    switch( p_prop->data.p_irot->i_ccw_degrees % 360 )
-                    {
-                        default:
-                        case 0:   fmt.video.orientation = ORIENT_NORMAL ; break;
-                        case 90:  fmt.video.orientation = ORIENT_ROTATED_90; break;
-                        case 180: fmt.video.orientation = ORIENT_ROTATED_180 ; break;
-                        case 270: fmt.video.orientation = ORIENT_ROTATED_270 ; break;
-                    }
-                    break;
-                case ATOM_colr:
-                    fmt.video.primaries = iso_23001_8_cp_to_vlc_primaries(
-                                            p_prop->data.p_colr->nclc.i_primary_idx );
-                    fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer(
-                                            p_prop->data.p_colr->nclc.i_transfer_function_idx );
-                    fmt.video.space = iso_23001_8_mc_to_vlc_coeffs(
-                                        p_prop->data.p_colr->nclc.i_matrix_idx );
-                    fmt.video.b_color_range_full = p_prop->data.p_colr->nclc.i_full_range;
-                    break;
-                case ATOM_clli:
-                    fmt.video.lighting.MaxCLL = p_prop->data.p_CoLL->i_maxCLL;
-                    fmt.video.lighting.MaxFALL = p_prop->data.p_CoLL->i_maxFALL;
-                    break;
-                case ATOM_mdcv:
-                    memcpy( fmt.video.mastering.primaries,
-                            p_prop->data.p_SmDm->primaries, sizeof(uint16_t) * 6 );
-                    memcpy( fmt.video.mastering.white_point,
-                            p_prop->data.p_SmDm->white_point, sizeof(uint16_t) * 2 );
-                    fmt.video.mastering.max_luminance = p_prop->data.p_SmDm->i_luminanceMax;
-                    fmt.video.mastering.min_luminance = p_prop->data.p_SmDm->i_luminanceMin;
-                    break;
-            }
-        }
-    }
-
-    fmt.video.i_frame_rate      = 1000;
-    fmt.video.i_frame_rate_base = p_sys->i_image_duration / 1000;
 
     es_format_Clean( &p_sys->current.fmt );
     es_format_Copy( &p_sys->current.fmt, &fmt );
