@@ -49,16 +49,10 @@ typedef struct vlc_tls_gnutls
     vlc_object_t *obj;
 } vlc_tls_gnutls_t;
 
-static int gnutls_Init (vlc_object_t *obj)
+static void gnutls_Banner(vlc_object_t *obj)
 {
-    const char *version = gnutls_check_version ("3.3.0");
-    if (version == NULL)
-    {
-        msg_Err (obj, "unsupported GnuTLS version");
-        return -1;
-    }
-    msg_Dbg (obj, "using GnuTLS version %s", version);
-    return 0;
+    msg_Dbg(obj, "using GnuTLS v%s (built with v"GNUTLS_VERSION")",
+            gnutls_check_version(NULL));
 }
 
 static int gnutls_Error(vlc_tls_gnutls_t *priv, int val)
@@ -555,8 +549,7 @@ static int OpenClient (vlc_tls_creds_t *crd)
 {
     gnutls_certificate_credentials_t x509;
 
-    if (gnutls_Init (VLC_OBJECT(crd)))
-        return VLC_EGENERIC;
+    gnutls_Banner(VLC_OBJECT(crd));
 
     int val = gnutls_certificate_allocate_credentials (&x509);
     if (val != 0)
@@ -646,17 +639,14 @@ static int gnutls_ServerHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
  */
 static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
 {
-    int val;
-
-    if (gnutls_Init (VLC_OBJECT(crd)))
-        return VLC_EGENERIC;
+    gnutls_Banner(VLC_OBJECT(crd));
 
     vlc_tls_creds_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
     /* Sets server's credentials */
-    val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
+    int val = gnutls_certificate_allocate_credentials (&sys->x509_cred);
     if (val != 0)
     {
         msg_Err (crd, "cannot allocate credentials: %s",
