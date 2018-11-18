@@ -87,17 +87,15 @@ static char* CFArrayALPNCopyFirst(CFArrayRef alpnArray)
  * Module descriptor
  *****************************************************************************/
 static int  OpenClient  (vlc_tls_creds_t *);
-static void CloseClient (vlc_tls_creds_t *);
 
 #if !TARGET_OS_IPHONE
     static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
-    static void CloseServer (vlc_tls_creds_t *);
 #endif
 
 vlc_module_begin ()
     set_description(N_("TLS support for OS X and iOS"))
     set_capability("tls client", 2)
-    set_callbacks(OpenClient, CloseClient)
+    set_callbacks(OpenClient, NULL)
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_NETWORK)
 
@@ -110,7 +108,7 @@ vlc_module_begin ()
     add_submodule()
         set_description(N_("TLS server support for OS X"))
         set_capability("tls server", 2)
-        set_callbacks(OpenServer, CloseServer)
+        set_callbacks(OpenServer, NULL)
         set_category(CAT_ADVANCED)
         set_subcategory(SUBCAT_ADVANCED_NETWORK)
 #endif /* !TARGET_OS_IPHONE */
@@ -808,6 +806,17 @@ error:
     return NULL;
 }
 
+static void st_ClientDestroy (vlc_tls_creds_t *crd) {
+    msg_Dbg(crd, "close secure transport client");
+
+    vlc_tls_creds_sys_t *sys = crd->sys;
+
+    if (sys->whitelist)
+        CFRelease(sys->whitelist);
+
+    free(sys);
+}
+
 /**
  * Initializes a client-side TLS credentials.
  */
@@ -824,19 +833,9 @@ static int OpenClient (vlc_tls_creds_t *crd) {
 
     crd->sys = sys;
     crd->open = st_ClientSessionOpen;
+    crd->destroy = st_ClientDestroy;
 
     return VLC_SUCCESS;
-}
-
-static void CloseClient (vlc_tls_creds_t *crd) {
-    msg_Dbg(crd, "close secure transport client");
-
-    vlc_tls_creds_sys_t *sys = crd->sys;
-
-    if (sys->whitelist)
-        CFRelease(sys->whitelist);
-
-    free(sys);
 }
 
 /* Begin of server-side methods */
@@ -871,6 +870,17 @@ error:
     st_SessionShutdown(tls, true);
     st_SessionClose(tls);
     return NULL;
+}
+
+static void st_ServerDestroy (vlc_tls_creds_t *crd) {
+    msg_Dbg(crd, "close secure transport server");
+
+    vlc_tls_creds_sys_t *sys = crd->sys;
+
+    if (sys->server_cert_chain)
+        CFRelease(sys->server_cert_chain);
+
+    free(sys);
 }
 
 /**
@@ -979,6 +989,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
 
     crd->sys = sys;
     crd->open = st_ServerSessionOpen;
+    crd->destroy = st_ServerDestroy;
 
 out:
     if (policy)
@@ -992,17 +1003,6 @@ out:
         CFRelease(cert_identity);
 
     return result;
-}
-
-static void CloseServer (vlc_tls_creds_t *crd) {
-    msg_Dbg(crd, "close secure transport server");
-
-    vlc_tls_creds_sys_t *sys = crd->sys;
-
-    if (sys->server_cert_chain)
-        CFRelease(sys->server_cert_chain);
-
-    free(sys);
 }
 
 #endif /* !TARGET_OS_IPHONE */
