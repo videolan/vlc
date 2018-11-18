@@ -166,10 +166,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     char        *psz_val;
     int          i_ret = VLC_EGENERIC;
 
+    if (unlikely(vlc_LogPreinit(p_libvlc)))
+        return VLC_ENOMEM;
+
     /* System specific initialization code */
     system_Init();
-
-    vlc_LogPreinit(p_libvlc);
 
     /* Initialize the module bank and load the configuration of the
      * core module. We need to do this at this stage to be able to display

@@ -354,17 +354,16 @@ static void vlc_LogSwitch(libvlc_int_t *vlc,
 int vlc_LogPreinit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = vlc_custom_create(vlc, sizeof (*logger), "logger");
-
-    libvlc_priv(vlc)->logger = logger;
-
     if (unlikely(logger == NULL))
         return -1;
 
+    libvlc_priv(vlc)->logger = logger;
     vlc_rwlock_init(&logger->lock);
+    logger->ops = &discard_ops;
 
     if (vlc_LogEarlyOpen(logger))
     {
-        logger->ops = &discard_ops;
+        vlc_LogDeinit(vlc);
         return -1;
     }
 
@@ -379,17 +378,12 @@ int vlc_LogPreinit(libvlc_int_t *vlc)
 /**
  * Initializes the messages logging subsystem and drain the early messages to
  * the configured log.
- *
- * \return 0 on success, -1 on error.
  */
-int vlc_LogInit(libvlc_int_t *vlc)
+void vlc_LogInit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
     const struct vlc_logger_operations *ops;
     void *opaque;
-
-    if (unlikely(logger == NULL))
-        return -1;
 
     /* TODO: module configuration item */
     if (vlc_module_load(logger, "logger", NULL, false,
@@ -397,7 +391,6 @@ int vlc_LogInit(libvlc_int_t *vlc)
         ops = NULL;
 
     vlc_LogSwitch(vlc, ops, opaque);
-    return 0;
 }
 
 /**
@@ -421,13 +414,9 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
 {
     vlc_logger_t *logger = libvlc_priv(vlc)->logger;
 
-    if (unlikely(logger == NULL))
-        return;
-
     if (logger->ops->destroy != NULL)
         logger->ops->destroy(logger->sys);
 
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
-    libvlc_priv(vlc)->logger = NULL;
 }

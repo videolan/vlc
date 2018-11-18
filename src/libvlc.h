@@ -78,8 +78,8 @@ void vlc_mutex_unmark(const vlc_mutex_t *);
  */
 typedef struct vlc_logger_t vlc_logger_t;
 
-int vlc_LogPreinit(libvlc_int_t *);
-int vlc_LogInit(libvlc_int_t *);
+int vlc_LogPreinit(libvlc_int_t *) VLC_USED;
+void vlc_LogInit(libvlc_int_t *);
 void vlc_LogDeinit(libvlc_int_t *);
 
 /*
