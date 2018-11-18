@@ -27,6 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_input.h>
+#include <vlc_image.h>
 #include <assert.h>
 #include <limits.h>
 
@@ -452,6 +453,212 @@ static int SetupPicture( demux_t *p_demux, const MP4_Box_t *p_infe,
     return SetPictureProperties( p_demux, i_item_id, fmt, p_header );
 }
 
+union heif_derivation_data
+{
+    struct
+    {
+        uint8_t rows_minus_one;
+        uint8_t columns_minus_one;
+        uint32_t output_width;
+        uint32_t output_height;
+    } ImageGrid;
+};
+
+static int ReadDerivationData_Grid( const uint8_t *p_data, size_t i_data,
+                                    union heif_derivation_data *d )
+{
+    if( i_data < 8 || p_data[0] != 0x00 )
+        return VLC_EGENERIC;
+
+    uint8_t i_fieldlength = ((p_data[1] & 0x01) + 1) << 1;
+    /* length is either 2 or 4 bytes */
+    d->ImageGrid.rows_minus_one = p_data[2];
+    d->ImageGrid.columns_minus_one = p_data[3];
+    if(i_fieldlength == 2)
+    {
+        d->ImageGrid.output_width = GetWBE(&p_data[4]);
+        d->ImageGrid.output_height = GetWBE(&p_data[6]);
+    }
+    else
+    {
+        if(i_data < 12)
+            return VLC_EGENERIC;
+        d->ImageGrid.output_width = GetDWBE(&p_data[4]);
+        d->ImageGrid.output_height = GetDWBE(&p_data[8]);
+    }
+    return VLC_SUCCESS;
+}
+
+static int ReadDerivationData( demux_t *p_demux, vlc_fourcc_t type,
+                               uint32_t i_item_id,
+                               union heif_derivation_data *d )
+{
+    int i_ret = VLC_EGENERIC;
+    block_t *p_data = ReadItemExtents( p_demux, i_item_id, NULL );
+    if( p_data )
+    {
+        switch( type )
+        {
+            case VLC_FOURCC('g','r','i','d'):
+                i_ret = ReadDerivationData_Grid( p_data->p_buffer,
+                                                 p_data->i_buffer, d );
+                /* fallthrough */
+            default:
+                break;
+        }
+        block_Release( p_data );
+    }
+    return i_ret;
+}
+
+static int LoadGridImage( demux_t *p_demux, uint32_t i_pic_item_id,
+                               uint8_t *p_buffer,
+                               unsigned tile, unsigned gridcols,
+                               unsigned imagewidth, unsigned imageheight )
+{
+    struct heif_private_t *p_sys = (void *) p_demux->p_sys;
+
+    MP4_Box_t *p_infe = GetAtom( p_sys->p_root, NULL,
+                                 ATOM_infe, "meta/iinf/infe",
+                                 MatchInfeID, &i_pic_item_id );
+    if( !p_infe )
+        return VLC_EGENERIC;
+
+    es_format_t fmt;
+    es_format_Init(&fmt, UNKNOWN_ES, 0);
+
+    const MP4_Box_t *p_shared_header = NULL;
+    if( SetupPicture( p_demux, p_infe, &fmt, &p_shared_header ) != VLC_SUCCESS )
+    {
+        es_format_Clean( &fmt );
+        return VLC_EGENERIC; /* Unsupported picture, goto next */
+    }
+
+    block_t *p_sample = ReadItemExtents( p_demux, i_pic_item_id,
+                                         p_shared_header );
+    if(!p_sample)
+    {
+        es_format_Clean( &fmt );
+        return VLC_EGENERIC;
+    }
+
+    image_handler_t *handler = image_HandlerCreate( p_demux );
+    if (!handler)
+    {
+        block_Release( p_sample );
+        es_format_Clean( &fmt );
+        return VLC_EGENERIC;
+    }
+
+    video_format_t decoded;
+    video_format_Init( &decoded, VLC_CODEC_RGBA );
+
+    fmt.video.i_chroma = fmt.i_codec;
+    picture_t *p_picture = image_ReadExt( handler, p_sample, &fmt.video,
+                                          fmt.p_extra, fmt.i_extra, &decoded );
+    image_HandlerDelete( handler );
+
+    es_format_Clean( &fmt );
+
+    if ( !p_picture )
+        return VLC_EGENERIC;
+
+    const unsigned tilewidth = p_picture->format.i_visible_width;
+    const unsigned tileheight = p_picture->format.i_visible_height;
+    uint8_t *dstline = p_buffer;
+    dstline += (tile / gridcols) * (imagewidth * tileheight * 4);
+    for(;1;)
+    {
+        const unsigned offsetpxw = (tile % gridcols) * tilewidth;
+        const unsigned offsetpxh = (tile / gridcols) * tileheight;
+        if( offsetpxw > imagewidth )
+            break;
+        const uint8_t *srcline = p_picture->p[0].p_pixels;
+        unsigned tocopylines = p_picture->p[0].i_lines;
+        if(offsetpxh + tocopylines >= imageheight)
+            tocopylines = imageheight - offsetpxh;
+        for(unsigned i=0; i<tocopylines; i++)
+        {
+            size_t tocopypx = tilewidth;
+            if( offsetpxw + tilewidth > imagewidth )
+                tocopypx = imagewidth - offsetpxw;
+            memcpy( &dstline[offsetpxw * 4], srcline, tocopypx * 4 );
+            dstline += imagewidth * 4;
+            srcline += p_picture->p[0].i_pitch;
+        }
+
+        break;
+    }
+
+    picture_Release( p_picture );
+
+    return VLC_SUCCESS;
+}
+
+static int DerivedImageAssembleGrid( demux_t *p_demux, uint32_t i_grid_item_id,
+                                     es_format_t *fmt, block_t **pp_block )
+{
+    struct heif_private_t *p_sys = (void *) p_demux->p_sys;
+
+    const MP4_Box_t *p_iref = MP4_BoxGet( p_sys->p_root, "meta/iref" );
+    if(!p_iref)
+        return VLC_EGENERIC;
+
+    const MP4_Box_t *p_refbox;
+    for( p_refbox = p_iref->p_first; p_refbox; p_refbox = p_refbox->p_next )
+    {
+        if( p_refbox->i_type == VLC_FOURCC('d','i','m','g') &&
+            BOXDATA(p_refbox)->i_from_item_id == i_grid_item_id )
+            break;
+    }
+
+    if(!p_refbox)
+        return VLC_EGENERIC;
+
+    union heif_derivation_data derivation_data;
+    if( ReadDerivationData( p_demux,
+                            p_sys->current.BOXDATA(p_infe)->item_type,
+                            i_grid_item_id, &derivation_data ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+
+    msg_Dbg(p_demux,"%ux%upx image %ux%u tiles composition",
+            derivation_data.ImageGrid.output_width,
+            derivation_data.ImageGrid.output_height,
+            derivation_data.ImageGrid.columns_minus_one + 1,
+            derivation_data.ImageGrid.columns_minus_one + 1);
+
+    block_t *p_block = block_Alloc( derivation_data.ImageGrid.output_width *
+                                    derivation_data.ImageGrid.output_height * 4 );
+    if( !p_block )
+        return VLC_EGENERIC;
+    *pp_block = p_block;
+
+    es_format_Init( fmt, VIDEO_ES, VLC_CODEC_RGBA );
+    fmt->video.i_sar_num =
+    fmt->video.i_width =
+    fmt->video.i_visible_width = derivation_data.ImageGrid.output_width;
+    fmt->video.i_sar_den =
+    fmt->video.i_height =
+    fmt->video.i_visible_height = derivation_data.ImageGrid.output_height;
+
+    for( uint16_t i=0; i<BOXDATA(p_refbox)->i_reference_count; i++ )
+    {
+        msg_Dbg( p_demux, "Loading tile %d/%d", i,
+                 (derivation_data.ImageGrid.rows_minus_one + 1) *
+                 (derivation_data.ImageGrid.columns_minus_one + 1) );
+        LoadGridImage( p_demux,
+                       BOXDATA(p_refbox)->p_references[i].i_to_item_id,
+                       p_block->p_buffer, i,
+                       derivation_data.ImageGrid.columns_minus_one + 1,
+                       derivation_data.ImageGrid.output_width,
+                       derivation_data.ImageGrid.output_height );
+    }
+
+    SetPictureProperties( p_demux, i_grid_item_id, fmt, NULL );
+
+    return VLC_SUCCESS;
+}
+
 static int DemuxHEIF( demux_t *p_demux )
 {
     struct heif_private_t *p_sys = (void *) p_demux->p_sys;
@@ -501,11 +708,32 @@ static int DemuxHEIF( demux_t *p_demux )
     es_format_t fmt;
     es_format_Init(&fmt, UNKNOWN_ES, 0);
 
-    if( SetupPicture( p_demux, p_sys->current.p_infe,
-                      &fmt, &p_sys->current.p_shared_header ) != VLC_SUCCESS )
+    block_t *p_block = NULL;
+    if( p_sys->current.BOXDATA(p_infe)->item_type == VLC_FOURCC('g','r','i','d') )
     {
-        es_format_Clean( &fmt );
-        return VLC_DEMUXER_SUCCESS; /* Unsupported picture, goto next */
+        if( DerivedImageAssembleGrid( p_demux, i_current_item_id,
+                                      &fmt, &p_block ) != VLC_SUCCESS )
+        {
+            es_format_Clean( &fmt );
+            return VLC_DEMUXER_SUCCESS;
+        }
+    }
+    else
+    {
+        if( SetupPicture( p_demux, p_sys->current.p_infe,
+                          &fmt, &p_sys->current.p_shared_header ) != VLC_SUCCESS )
+        {
+            es_format_Clean( &fmt );
+            return VLC_DEMUXER_SUCCESS;
+        }
+
+        p_block = ReadItemExtents( p_demux, i_current_item_id,
+                                   p_sys->current.p_shared_header );
+        if( !p_block )
+        {
+            es_format_Clean( &fmt );
+            return VLC_DEMUXER_SUCCESS; /* Goto next picture */
+        }
     }
 
     es_format_Clean( &p_sys->current.fmt );
@@ -520,11 +748,6 @@ static int DemuxHEIF( demux_t *p_demux )
         p_sys->current.p_infe = NULL; /* Goto next picture */
         return VLC_DEMUXER_SUCCESS;
     }
-
-    block_t *p_block = ReadItemExtents( p_demux, i_current_item_id,
-                                        p_sys->current.p_shared_header );
-    if( !p_block )
-        return VLC_DEMUXER_SUCCESS; /* Goto next picture */
 
     if( p_sys->i_pcr == VLC_TICK_INVALID )
     {
