@@ -274,7 +274,7 @@ static void vlc_LogEarlyClose(void *d)
 
 static const struct vlc_logger_operations early_ops = {
     vlc_vaLogEarly,
-    NULL,
+    vlc_LogEarlyClose,
 };
 
 static int vlc_LogEarlyOpen(vlc_logger_t *logger)
@@ -373,27 +373,26 @@ int vlc_LogInit(libvlc_int_t *vlc)
     if (unlikely(logger == NULL))
         return -1;
 
-    const struct vlc_logger_operations *ops;
-    void *sys, *early_sys = NULL;
+    const struct vlc_logger_operations *ops, *old_ops;
+    void *opaque, *old_opaque = NULL;
 
     /* TODO: module configuration item */
     module_t *module = vlc_module_load(logger, "logger", NULL, false,
-                                       vlc_logger_load, logger, &ops, &sys);
+                                       vlc_logger_load, logger, &ops, &opaque);
     if (module == NULL)
         ops = &discard_ops;
 
     vlc_rwlock_wrlock(&logger->lock);
-    if (logger->ops == &early_ops)
-        early_sys = logger->sys;
-
+    old_ops = logger->ops;
+    old_opaque = logger->sys;
     logger->ops = ops;
-    logger->sys = sys;
+    logger->sys = opaque;
     assert(logger->module == NULL); /* Only one call to vlc_LogInit()! */
     logger->module = module;
     vlc_rwlock_unlock(&logger->lock);
 
-    if (early_sys != NULL)
-        vlc_LogEarlyClose(early_sys);
+    if (old_ops->destroy != NULL)
+        old_ops->destroy(old_opaque);
 
     return 0;
 }
@@ -451,13 +450,6 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
         logger->ops->destroy(logger->sys);
     if (logger->module != NULL)
         vlc_module_unload(vlc, logger->module, vlc_logger_unload, logger->sys);
-    else
-    /* Flush early log messages (corner case: no call to vlc_LogInit()) */
-    if (logger->ops == &early_ops)
-    {
-        logger->ops = &discard_ops;
-        vlc_LogEarlyClose(logger->sys);
-    }
 
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
