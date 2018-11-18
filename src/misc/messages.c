@@ -49,7 +49,6 @@ struct vlc_logger_t
     vlc_rwlock_t lock;
     const struct vlc_logger_operations *ops;
     void *sys;
-    module_t *module;
 };
 
 static void vlc_vaLogCallback(libvlc_int_t *vlc, int type,
@@ -319,14 +318,6 @@ static int vlc_logger_load(void *func, va_list ap)
     return (*ops != NULL) ? VLC_SUCCESS : VLC_EGENERIC;
 }
 
-static void vlc_logger_unload(void *func, va_list ap)
-{
-    void (*deactivate)(vlc_logger_t *) = func;
-    void *sys = va_arg(ap, void *);
-
-    deactivate(sys);
-}
-
 /**
  * Performs preinitialization of the messages logging subsystem.
  *
@@ -377,9 +368,8 @@ int vlc_LogInit(libvlc_int_t *vlc)
     void *opaque, *old_opaque = NULL;
 
     /* TODO: module configuration item */
-    module_t *module = vlc_module_load(logger, "logger", NULL, false,
-                                       vlc_logger_load, logger, &ops, &opaque);
-    if (module == NULL)
+    if (vlc_module_load(logger, "logger", NULL, false,
+                        vlc_logger_load, logger, &ops, &opaque) == NULL)
         ops = &discard_ops;
 
     vlc_rwlock_wrlock(&logger->lock);
@@ -387,8 +377,6 @@ int vlc_LogInit(libvlc_int_t *vlc)
     old_opaque = logger->sys;
     logger->ops = ops;
     logger->sys = opaque;
-    assert(logger->module == NULL); /* Only one call to vlc_LogInit()! */
-    logger->module = module;
     vlc_rwlock_unlock(&logger->lock);
 
     if (old_ops->destroy != NULL)
@@ -412,25 +400,18 @@ void vlc_LogSet(libvlc_int_t *vlc, const struct vlc_logger_operations *ops,
     if (unlikely(logger == NULL))
         return;
 
-    module_t *module;
-
     if (ops == NULL)
         ops = &discard_ops;
 
     vlc_rwlock_wrlock(&logger->lock);
     old_ops = logger->ops;
     old_opaque = logger->sys;
-    module = logger->module;
-
     logger->ops = ops;
     logger->sys = opaque;
-    logger->module = NULL;
     vlc_rwlock_unlock(&logger->lock);
 
     if (old_ops->destroy != NULL)
         old_ops->destroy(old_opaque);
-    if (module != NULL)
-        vlc_module_unload(vlc, module, vlc_logger_unload, old_opaque);
 
     /* Announce who we are */
     msg_Dbg (vlc, "VLC media player - %s", VERSION_MESSAGE);
@@ -448,8 +429,6 @@ void vlc_LogDeinit(libvlc_int_t *vlc)
 
     if (logger->ops->destroy != NULL)
         logger->ops->destroy(logger->sys);
-    if (logger->module != NULL)
-        vlc_module_unload(vlc, logger->module, vlc_logger_unload, logger->sys);
 
     vlc_rwlock_destroy(&logger->lock);
     vlc_object_release(logger);
