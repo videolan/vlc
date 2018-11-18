@@ -427,7 +427,7 @@ out:
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
+static int st_Handshake (vlc_tls_t *session,
                          const char *host, const char *service,
                          char **restrict alp) {
 
@@ -474,7 +474,7 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
 #endif
 
     if (retValue == errSSLWouldBlock) {
-        msg_Dbg(crd, "handshake is blocked, try again later");
+        msg_Dbg(sys->obj, "handshake is blocked, try again later");
         return 1 + (sys->b_blocking_send ? 1 : 0);
     }
 
@@ -483,26 +483,26 @@ static int st_Handshake (vlc_tls_creds_t *crd, vlc_tls_t *session,
             if (sys->b_server_mode == false && st_validateServerCertificate(session, host) != 0) {
                 return -1;
             }
-            msg_Dbg(crd, "handshake completed successfully");
+            msg_Dbg(sys->obj, "handshake completed successfully");
             sys->b_handshaked = true;
             return 0;
 
         case errSSLServerAuthCompleted:
-            msg_Dbg(crd, "SSLHandshake returned errSSLServerAuthCompleted, continuing handshake");
-            return st_Handshake(crd, session, host, service, alp);
+            msg_Dbg(sys->obj, "SSLHandshake returned errSSLServerAuthCompleted, continuing handshake");
+            return st_Handshake(session, host, service, alp);
 
         case errSSLConnectionRefused:
-            msg_Err(crd, "connection was refused");
+            msg_Err(sys->obj, "connection was refused");
             return -1;
         case errSSLNegotiation:
-            msg_Err(crd, "cipher suite negotiation failed");
+            msg_Err(sys->obj, "cipher suite negotiation failed");
             return -1;
         case errSSLFatalAlert:
-            msg_Err(crd, "fatal error occurred during handshake");
+            msg_Err(sys->obj, "fatal error occurred during handshake");
             return -1;
 
         default:
-            msg_Err(crd, "handshake returned error %d", (int)retValue);
+            msg_Err(sys->obj, "handshake returned error %d", (int)retValue);
             return -1;
     }
 }

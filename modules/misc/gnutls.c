@@ -408,7 +408,7 @@ static vlc_tls_t *gnutls_ClientSessionOpen(vlc_tls_creds_t *crd,
     return &priv->tls;
 }
 
-static int gnutls_ClientHandshake(vlc_tls_creds_t *creds, vlc_tls_t *tls,
+static int gnutls_ClientHandshake(vlc_tls_t *tls,
                                   const char *host, const char *service,
                                   char **restrict alp)
 {
@@ -624,7 +624,7 @@ static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_creds_t *crd,
     return (priv != NULL) ? &priv->tls : NULL;
 }
 
-static int gnutls_ServerHandshake(vlc_tls_creds_t *crd, vlc_tls_t *tls,
+static int gnutls_ServerHandshake(vlc_tls_t *tls,
                                   const char *host, const char *service,
                                   char **restrict alp)
 {
