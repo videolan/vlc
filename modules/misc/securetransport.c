@@ -86,10 +86,10 @@ static char* CFArrayALPNCopyFirst(CFArrayRef alpnArray)
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  OpenClient  (vlc_tls_creds_t *);
+static int  OpenClient  (vlc_tls_client_t *);
 
 #if !TARGET_OS_IPHONE
-    static int  OpenServer  (vlc_tls_creds_t *crd, const char *cert, const char *key);
+    static int  OpenServer  (vlc_tls_server_t *crd, const char *cert, const char *key);
 #endif
 
 vlc_module_begin ()
@@ -722,7 +722,7 @@ error:
     return NULL;
 }
 
-static vlc_tls_t *st_ClientSessionOpen(vlc_tls_creds_t *crd, vlc_tls_t *sock,
+static vlc_tls_t *st_ClientSessionOpen(vlc_tls_client_t *crd, vlc_tls_t *sock,
                                  const char *hostname, const char *const *alpn)
 {
     msg_Dbg(crd, "open TLS session for %s", hostname);
@@ -807,7 +807,7 @@ error:
     return NULL;
 }
 
-static void st_ClientDestroy (vlc_tls_creds_t *crd) {
+static void st_ClientDestroy (vlc_tls_client_t *crd) {
     msg_Dbg(crd, "close secure transport client");
 
     vlc_tls_creds_sys_t *sys = crd->sys;
@@ -821,7 +821,7 @@ static void st_ClientDestroy (vlc_tls_creds_t *crd) {
 /**
  * Initializes a client-side TLS credentials.
  */
-static int OpenClient (vlc_tls_creds_t *crd) {
+static int OpenClient (vlc_tls_client_t *crd) {
 
     msg_Dbg(crd, "open st client");
 
@@ -846,7 +846,7 @@ static int OpenClient (vlc_tls_creds_t *crd) {
 /**
  * Initializes a server-side TLS session.
  */
-static vlc_tls_t *st_ServerSessionOpen (vlc_tls_creds_t *crd, vlc_tls_t *sock,
+static vlc_tls_t *st_ServerSessionOpen (vlc_tls_server_t *crd, vlc_tls_t *sock,
                                const char *hostname, const char *const *alpn) {
 
     VLC_UNUSED(hostname);
@@ -875,7 +875,7 @@ error:
     return NULL;
 }
 
-static void st_ServerDestroy (vlc_tls_creds_t *crd) {
+static void st_ServerDestroy (vlc_tls_server_t *crd) {
     msg_Dbg(crd, "close secure transport server");
 
     vlc_tls_creds_sys_t *sys = crd->sys;
@@ -889,7 +889,7 @@ static void st_ServerDestroy (vlc_tls_creds_t *crd) {
 /**
  * Initializes server-side TLS credentials.
  */
-static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) {
+static int OpenServer (vlc_tls_server_t *crd, const char *cert, const char *key) {
 
     /*
      * This function expects the label of the certificate in "cert", stored

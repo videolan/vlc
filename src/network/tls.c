@@ -49,8 +49,8 @@
 
 static int tls_server_load(void *func, va_list ap)
 {
-    int (*activate) (vlc_tls_creds_t *, const char *, const char *) = func;
-    vlc_tls_creds_t *crd = va_arg (ap, vlc_tls_creds_t *);
+    int (*activate)(vlc_tls_server_t *, const char *, const char *) = func;
+    vlc_tls_server_t *crd = va_arg(ap, vlc_tls_server_t *);
     const char *cert = va_arg (ap, const char *);
     const char *key = va_arg (ap, const char *);
 
@@ -59,17 +59,17 @@ static int tls_server_load(void *func, va_list ap)
 
 static int tls_client_load(void *func, va_list ap)
 {
-    int (*activate) (vlc_tls_creds_t *) = func;
-    vlc_tls_creds_t *crd = va_arg (ap, vlc_tls_creds_t *);
+    int (*activate)(vlc_tls_client_t *) = func;
+    vlc_tls_client_t *crd = va_arg(ap, vlc_tls_client_t *);
 
     return activate (crd);
 }
 
-vlc_tls_creds_t *
+vlc_tls_server_t *
 vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
                       const char *key_path)
 {
-    vlc_tls_creds_t *srv = vlc_custom_create (obj, sizeof (*srv),
+    vlc_tls_server_t *srv = vlc_custom_create(obj, sizeof (*srv),
                                               "tls server");
     if (unlikely(srv == NULL))
         return NULL;
@@ -88,9 +88,19 @@ vlc_tls_ServerCreate (vlc_object_t *obj, const char *cert_path,
     return srv;
 }
 
-vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *obj)
+void vlc_tls_ServerDelete(vlc_tls_server_t *crd)
 {
-    vlc_tls_creds_t *crd = vlc_custom_create (obj, sizeof (*crd),
+    if (crd == NULL)
+        return;
+
+    crd->destroy(crd);
+    vlc_objres_clear(VLC_OBJECT(crd));
+    vlc_object_release(crd);
+}
+
+vlc_tls_client_t *vlc_tls_ClientCreate(vlc_object_t *obj)
+{
+    vlc_tls_client_t *crd = vlc_custom_create(obj, sizeof (*crd),
                                               "tls client");
     if (unlikely(crd == NULL))
         return NULL;
@@ -106,7 +116,7 @@ vlc_tls_creds_t *vlc_tls_ClientCreate (vlc_object_t *obj)
     return crd;
 }
 
-void vlc_tls_Delete (vlc_tls_creds_t *crd)
+void vlc_tls_ClientDelete(vlc_tls_client_t *crd)
 {
     if (crd == NULL)
         return;
@@ -118,20 +128,6 @@ void vlc_tls_Delete (vlc_tls_creds_t *crd)
 
 
 /*** TLS  session ***/
-
-static vlc_tls_t *vlc_tls_SessionCreate(vlc_tls_creds_t *crd,
-                                        vlc_tls_t *sock,
-                                        const char *host,
-                                        const char *const *alpn)
-{
-    vlc_tls_t *session;
-    int canc = vlc_savecancel();
-    session = crd->open(crd, sock, host, alpn);
-    vlc_restorecancel(canc);
-    if (session != NULL)
-        session->p = sock;
-    return session;
-}
 
 void vlc_tls_SessionDelete (vlc_tls_t *session)
 {
@@ -147,17 +143,21 @@ static void cleanup_tls(void *data)
     vlc_tls_SessionDelete (session);
 }
 
-vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *crd, vlc_tls_t *sock,
+vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *crd, vlc_tls_t *sock,
                                        const char *host, const char *service,
                                        const char *const *alpn, char **alp)
 {
     int val;
+    int canc = vlc_savecancel();
+    vlc_tls_t *session = crd->open(crd, sock, host, alpn);
+    vlc_restorecancel(canc);
 
-    vlc_tls_t *session = vlc_tls_SessionCreate(crd, sock, host, alpn);
     if (session == NULL)
         return NULL;
 
-    int canc = vlc_savecancel();
+    session->p = sock;
+
+    canc = vlc_savecancel();
     vlc_tick_t deadline = vlc_tick_now ();
     deadline += VLC_TICK_FROM_MS( var_InheritInteger (crd, "ipv4-timeout") );
 
@@ -199,14 +199,19 @@ error:
     return session;
 }
 
-vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *crd,
+vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_server_t *crd,
                                        vlc_tls_t *sock,
                                        const char *const *alpn)
 {
-    return vlc_tls_SessionCreate(crd, sock, NULL, alpn);
+    int canc = vlc_savecancel();
+    vlc_tls_t *session = crd->open(crd, sock, NULL, alpn);
+    vlc_restorecancel(canc);
+    if (session != NULL)
+        session->p = sock;
+    return session;
 }
 
-vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *creds, const char *name,
+vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_client_t *creds, const char *name,
                                  unsigned port, const char *service,
                                  const char *const *alpn, char **alp)
 {

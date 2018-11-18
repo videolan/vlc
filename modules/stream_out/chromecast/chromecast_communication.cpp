@@ -55,7 +55,7 @@ ChromecastCommunication::ChromecastCommunication( vlc_object_t* p_module,
                                    NULL, NULL );
     if (m_tls == NULL)
     {
-        vlc_tls_Delete(m_creds);
+        vlc_tls_ClientDelete(m_creds);
         throw std::runtime_error( "Failed to create client session" );
     }
 
@@ -76,7 +76,7 @@ void ChromecastCommunication::disconnect()
     if ( m_tls != NULL )
     {
         vlc_tls_Close(m_tls);
-        vlc_tls_Delete(m_creds);
+        vlc_tls_ClientDelete(m_creds);
         m_tls = NULL;
     }
 }

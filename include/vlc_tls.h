@@ -125,65 +125,46 @@ struct vlc_tls_operations
 /**
  * \defgroup tls Transport Layer Security
  * @{
+ * \defgroup tls_client TLS client
+ * @{
  */
 
 /**
- * TLS credentials
+ * TLS client-side credentials
  *
- * This structure contains the credentials for establishing TLS sessions.
- * This includes root Certificate Authorities (on client side),
- * trust and cryptographic parameters,
- * public certificates and private keys.
+ * This structure contains the credentials for establishing TLS sessions
+ * on client side, essentially the set of trusted root Certificate Authorities
+ * with which to validate certificate chains presented by servers.
  */
-typedef struct vlc_tls_creds
+typedef struct vlc_tls_client
 {
     struct vlc_common_members obj;
 
     void *sys;
 
-    vlc_tls_t *(*open)(struct vlc_tls_creds *, vlc_tls_t *sock,
+    vlc_tls_t *(*open)(struct vlc_tls_client *, vlc_tls_t *sock,
                        const char *host, const char *const *alpn);
     int  (*handshake)(vlc_tls_t *session,
                       const char *hostname, const char *service,
                       char ** /*restrict*/ alp);
-    void (*destroy)(struct vlc_tls_creds *);
-} vlc_tls_creds_t;
+    void (*destroy)(struct vlc_tls_client *);
+} vlc_tls_client_t;
 
 /**
- * Allocates TLS credentials for a client.
+ * Allocates TLS client-side credentials.
+ *
  * Credentials can be cached and reused across multiple TLS sessions.
  *
  * @return TLS credentials object, or NULL on error.
  **/
-VLC_API vlc_tls_creds_t *vlc_tls_ClientCreate(vlc_object_t *);
+VLC_API vlc_tls_client_t *vlc_tls_ClientCreate(vlc_object_t *);
 
 /**
- * Allocates server TLS credentials.
+ * Releases TLS client-side credentials.
  *
- * @param cert path to an x509 certificate (required)
- * @param key path to the PKCS private key for the certificate,
- *            or NULL to use cert path
- *
- * @return TLS credentials object, or NULL on error.
+ * Releases data allocated with vlc_tls_ClientCreate().
  */
-VLC_API vlc_tls_creds_t *vlc_tls_ServerCreate(vlc_object_t *, const char *cert,
-                                              const char *key);
-
-static inline int vlc_tls_SessionHandshake (vlc_tls_creds_t *crd,
-                                            vlc_tls_t *tls)
-{
-    return crd->handshake(tls, NULL, NULL, NULL);
-}
-
-/**
- * Releases TLS credentials.
- *
- * Releases data allocated with vlc_tls_ClientCreate() or
- * vlc_tls_ServerCreate().
- *
- * @param srv object to be destroyed (or NULL)
- */
-VLC_API void vlc_tls_Delete(vlc_tls_creds_t *);
+VLC_API void vlc_tls_ClientDelete(vlc_tls_client_t *);
 
 /**
  * Initiates a client TLS session.
@@ -209,12 +190,59 @@ VLC_API void vlc_tls_Delete(vlc_tls_creds_t *);
  *
  * @return TLS session, or NULL on error.
  **/
-VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
+VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_client_t *creds,
                                                vlc_tls_t *sock,
                                                const char *host,
                                                const char *service,
                                                const char *const *alpn,
                                                char **alp);
+
+/**
+ * @}
+ * \defgroup tls_server TLS server
+ * @{
+ */
+
+/**
+ * TLS server-side credentials
+ *
+ * This structure contains the credentials for establishing TLS sessions.
+ * This includes root Certificate Authorities (on client side),
+ * trust and cryptographic parameters,
+ * public certificates and private keys.
+ */
+typedef struct vlc_tls_server
+{
+    struct vlc_common_members obj;
+
+    void *sys;
+
+    vlc_tls_t *(*open)(struct vlc_tls_server *, vlc_tls_t *sock,
+                       const char *host, const char *const *alpn);
+    int  (*handshake)(vlc_tls_t *session,
+                      const char *hostname, const char *service,
+                      char ** /*restrict*/ alp);
+    void (*destroy)(struct vlc_tls_server *);
+} vlc_tls_server_t;
+
+/**
+ * Allocates server TLS credentials.
+ *
+ * @param cert path to an x509 certificate (required)
+ * @param key path to the PKCS private key for the certificate,
+ *            or NULL to use cert path
+ *
+ * @return TLS credentials object, or NULL on error.
+ */
+VLC_API vlc_tls_server_t *vlc_tls_ServerCreate(vlc_object_t *,
+                                               const char *cert,
+                                               const char *key);
+
+static inline int vlc_tls_SessionHandshake(vlc_tls_server_t *crd,
+                                           vlc_tls_t *tls)
+{
+    return crd->handshake(tls, NULL, NULL, NULL);
+}
 
 /**
  * Creates a TLS server session.
@@ -235,9 +263,18 @@ VLC_API vlc_tls_t *vlc_tls_ClientSessionCreate(vlc_tls_creds_t *creds,
  *
  * @return TLS session, or NULL on error.
  */
-VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_creds_t *creds,
+VLC_API vlc_tls_t *vlc_tls_ServerSessionCreate(vlc_tls_server_t *creds,
                                                vlc_tls_t *sock,
                                                const char *const *alpn);
+
+/**
+ * Releases server-side TLS credentials.
+ *
+ * Releases data allocated with vlc_tls_ServerCreate().
+ */
+VLC_API void vlc_tls_ServerDelete(vlc_tls_server_t *);
+
+/** @} */
 
 /** @} */
 
@@ -430,9 +467,9 @@ VLC_API vlc_tls_t *vlc_tls_SocketOpenTCP(vlc_object_t *obj,
  * connection to the specified host and port number, and finally attempts to
  * establish a TLS session over the TCP/IP stream.
  *
- * See also vlc_tls_SocketOpenTCP() and vlc_tls_SessionCreate().
+ * See also vlc_tls_SocketOpenTCP() and vlc_tls_ClientSessionCreate().
  */
-VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_creds_t *crd,
+VLC_API vlc_tls_t *vlc_tls_SocketOpenTLS(vlc_tls_client_t *crd,
                                          const char *hostname, unsigned port,
                                          const char *service,
                                          const char *const *alpn, char **alp);

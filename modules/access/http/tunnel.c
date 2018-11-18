@@ -142,7 +142,7 @@ static const struct vlc_tls_operations vlc_tls_proxy_ops =
     vlc_tls_ProxyClose,
 };
 
-vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_creds_t *creds,
+vlc_tls_t *vlc_https_connect_proxy(void *ctx, vlc_tls_client_t *creds,
                                    const char *hostname, unsigned port,
                                    bool *restrict two, const char *proxy)
 {

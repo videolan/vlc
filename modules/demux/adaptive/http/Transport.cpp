@@ -52,7 +52,7 @@ bool Transport::connect(vlc_object_t *p_object, const std::string &hostname, int
                                     NULL, NULL );
         if(!tls)
         {
-            vlc_tls_Delete(creds);
+            vlc_tls_ClientDelete(creds);
             creds = NULL;
         }
     }
@@ -79,7 +79,7 @@ void Transport::disconnect()
 
     if(creds)
     {
-        vlc_tls_Delete(creds);
+        vlc_tls_ClientDelete(creds);
         creds = NULL;
     }
 }

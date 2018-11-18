@@ -100,7 +100,7 @@ struct httpd_host_t
     struct vlc_list clients;
 
     /* TLS data */
-    vlc_tls_creds_t *p_tls;
+    vlc_tls_server_t *p_tls;
 };
 
 
@@ -861,7 +861,7 @@ void httpd_StreamDelete(httpd_stream_t *stream)
  *****************************************************************************/
 static void* httpd_HostThread(void *);
 static httpd_host_t *httpd_HostCreate(vlc_object_t *, const char *,
-                                       const char *, vlc_tls_creds_t *);
+                                       const char *, vlc_tls_server_t *);
 
 /* create a new host */
 httpd_host_t *vlc_http_HostNew(vlc_object_t *p_this)
@@ -878,7 +878,7 @@ httpd_host_t *vlc_https_HostNew(vlc_object_t *obj)
     }
 
     char *key = var_InheritString(obj, "http-key");
-    vlc_tls_creds_t *tls = vlc_tls_ServerCreate(obj, cert, key);
+    vlc_tls_server_t *tls = vlc_tls_ServerCreate(obj, cert, key);
 
     if (!tls) {
         msg_Err(obj, "HTTP/TLS certificate error (%s and %s)",
@@ -907,7 +907,7 @@ static struct httpd
 static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
                                        const char *hostvar,
                                        const char *portvar,
-                                       vlc_tls_creds_t *p_tls)
+                                       vlc_tls_server_t *p_tls)
 {
     httpd_host_t *host;
     unsigned port = var_InheritInteger(p_this, portvar);
@@ -926,7 +926,7 @@ static httpd_host_t *httpd_HostCreate(vlc_object_t *p_this,
         atomic_fetch_add_explicit(&host->ref, 1, memory_order_relaxed);
 
         vlc_mutex_unlock(&httpd.mutex);
-        vlc_tls_Delete(p_tls);
+        vlc_tls_ServerDelete(p_tls);
         return host;
     }
 
@@ -980,7 +980,7 @@ error:
         vlc_object_release(host);
     }
 
-    vlc_tls_Delete(p_tls);
+    vlc_tls_ServerDelete(p_tls);
     return NULL;
 }
 
@@ -1010,7 +1010,7 @@ void httpd_HostDelete(httpd_host_t *host)
     }
 
     assert(vlc_list_is_empty(&host->urls));
-    vlc_tls_Delete(host->p_tls);
+    vlc_tls_ServerDelete(host->p_tls);
     net_ListenClose(host->fds);
     vlc_cond_destroy(&host->wait);
     vlc_mutex_destroy(&host->lock);

@@ -386,7 +386,7 @@ done:
     return 0;
 }
 
-static vlc_tls_t *gnutls_ClientSessionOpen(vlc_tls_creds_t *crd,
+static vlc_tls_t *gnutls_ClientSessionOpen(vlc_tls_client_t *crd,
                                            vlc_tls_t *sk, const char *hostname,
                                            const char *const *alpn)
 {
@@ -542,7 +542,7 @@ error:
     return -1;
 }
 
-static void gnutls_ClientDestroy(vlc_tls_creds_t *crd)
+static void gnutls_ClientDestroy(vlc_tls_client_t *crd)
 {
     gnutls_certificate_credentials_t x509 = crd->sys;
 
@@ -552,7 +552,7 @@ static void gnutls_ClientDestroy(vlc_tls_creds_t *crd)
 /**
  * Initializes a client-side TLS credentials.
  */
-static int OpenClient (vlc_tls_creds_t *crd)
+static int OpenClient(vlc_tls_client_t *crd)
 {
     gnutls_certificate_credentials_t x509;
 
@@ -613,7 +613,7 @@ typedef struct vlc_tls_creds_sys
 /**
  * Initializes a server-side TLS session.
  */
-static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_creds_t *crd,
+static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_server_t *crd,
                                            vlc_tls_t *sk, const char *hostname,
                                            const char *const *alpn)
 {
@@ -635,7 +635,7 @@ static int gnutls_ServerHandshake(vlc_tls_t *tls,
     return gnutls_ContinueHandshake(priv, alp);
 }
 
-static void gnutls_ServerDestroy(vlc_tls_creds_t *crd)
+static void gnutls_ServerDestroy(vlc_tls_server_t *crd)
 {
     vlc_tls_creds_sys_t *sys = crd->sys;
 
@@ -648,7 +648,7 @@ static void gnutls_ServerDestroy(vlc_tls_creds_t *crd)
 /**
  * Allocates a whole server's TLS credentials.
  */
-static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key)
+static int OpenServer(vlc_tls_server_t *crd, const char *cert, const char *key)
 {
     gnutls_Banner(VLC_OBJECT(crd));
 

@@ -41,8 +41,8 @@
 
 #include <vlc/vlc.h>
 
-static vlc_tls_creds_t *server_creds;
-static vlc_tls_creds_t *client_creds;
+static vlc_tls_server_t *server_creds;
+static vlc_tls_client_t *client_creds;
 
 static void *tls_echo(void *data)
 {
@@ -149,7 +149,7 @@ int main(void)
         libvlc_release(vlc);
         return 77;
     }
-    vlc_tls_Delete(server_creds);
+    vlc_tls_ServerDelete(server_creds);
 
     server_creds = vlc_tls_ServerCreate(obj, CERTFILE, CERTFILE);
     assert(server_creds != NULL);
@@ -162,8 +162,8 @@ int main(void)
     tls = securepair(&th, alpn, alpn, NULL);
     assert(tls == NULL);
 
-    vlc_tls_Delete(client_creds);
-    vlc_tls_Delete(server_creds);
+    vlc_tls_ClientDelete(client_creds);
+    vlc_tls_ServerDelete(server_creds);
     libvlc_release(vlc);
 
     /*** Tests with test certs database - server cert accepted. ***/
@@ -290,8 +290,8 @@ int main(void)
     vlc_tls_Close(tls);
     vlc_join(th, NULL);
 
-    vlc_tls_Delete(client_creds);
-    vlc_tls_Delete(server_creds);
+    vlc_tls_ClientDelete(client_creds);
+    vlc_tls_ServerDelete(server_creds);
     libvlc_release(vlc);
 
     return 0;
