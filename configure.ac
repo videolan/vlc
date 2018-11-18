@@ -2030,21 +2030,6 @@ if test "${enable_realrtsp}" = "yes"; then
   VLC_ADD_PLUGIN([access_realrtsp])
 fi
 
-dnl
-dnl QTKit
-AC_ARG_ENABLE(macosx-qtkit,
-  [  --enable-macosx-qtkit Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)])
-if test "x${enable_macosx_qtkit}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
-then
-  AC_LANG_PUSH([Objective C])
-  AC_CHECK_HEADERS(QTKit/QTKit.h, [
-      VLC_ADD_PLUGIN([access_qtsound])
-    ])
-  AC_LANG_POP([Objective C])
-fi
-
-dnl
 dnl AVFoundation
 AC_SUBST(have_avfoundation, ["no"])
 AC_ARG_ENABLE(macosx-avfoundation,
