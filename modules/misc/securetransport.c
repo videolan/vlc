@@ -685,7 +685,6 @@ static vlc_tls_t *st_SessionOpenCommon(vlc_tls_creds_t *crd, vlc_tls_t *sock,
     vlc_tls_t *tls = &sys->tls;
 
     tls->ops = &st_ops;
-    crd->handshake = st_Handshake;
 
     SSLContextRef p_context = NULL;
 #if TARGET_OS_IPHONE
@@ -833,6 +832,7 @@ static int OpenClient (vlc_tls_creds_t *crd) {
 
     crd->sys = sys;
     crd->open = st_ClientSessionOpen;
+    crd->handshake = st_Handshake;
     crd->destroy = st_ClientDestroy;
 
     return VLC_SUCCESS;
@@ -989,6 +989,7 @@ static int OpenServer (vlc_tls_creds_t *crd, const char *cert, const char *key) 
 
     crd->sys = sys;
     crd->open = st_ServerSessionOpen;
+    crd->handshake = st_Handshake;
     crd->destroy = st_ServerDestroy;
 
 out:
