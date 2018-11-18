@@ -4364,6 +4364,7 @@ static int MP4_ReadBox_iloc( stream_t *p_stream, MP4_Box_t *p_box )
             MP4_GET2BYTES( i_foo );
             p_data->p_items[i].i_construction_method = i_foo & 0x0F;
         }
+        else p_data->p_items[i].i_construction_method = 0;
 
         MP4_GET2BYTES( p_data->p_items[i].i_data_reference_index );
 
