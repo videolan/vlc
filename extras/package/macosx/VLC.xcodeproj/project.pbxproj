@@ -541,7 +541,6 @@
 		CCDDF1AD172FF4C4007729A1 /* dirs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = dirs.c; path = ../../../src/darwin/dirs.c; sourceTree = "<group>"; };
 		CCF0777B13659A8000AF19FD /* SPMediaKeyTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPMediaKeyTap.h; sourceTree = "<group>"; };
 		CCF0777C13659A8000AF19FD /* SPMediaKeyTap.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPMediaKeyTap.m; sourceTree = "<group>"; };
-		DC1A176914E2778A001477C6 /* qtsound.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = qtsound.m; path = ../../../modules/access/qtsound.m; sourceTree = "<group>"; };
 		DCC8017816FCA036007FE736 /* avcapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = avcapture.m; path = ../../../modules/access/avcapture.m; sourceTree = "<group>"; };
 		DCC8017916FCA0DA007FE736 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		DCE7BD0608A5724D007B10AE /* VLCBookmarksWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCBookmarksWindowController.m; sourceTree = "<group>"; };
@@ -1476,7 +1475,6 @@
 			children = (
 				1CCD8F9F2117957600407114 /* avaudiocapture.m */,
 				DCC8017816FCA036007FE736 /* avcapture.m */,
-				DC1A176914E2778A001477C6 /* qtsound.m */,
 			);
 			name = access;
 			sourceTree = "<group>";
