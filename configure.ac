@@ -2020,20 +2020,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([FREERDP], [rdp], [freerdp >= 1.0.1], (RDP/Remote Desktop client support) )
 
 dnl
-dnl QTKit
-AC_ARG_ENABLE([macosx-qtkit],
-  AS_HELP_STRING([--enable-macosx-qtkit], [Mac OS X qtsound (audio) module (default enabled on Mac OS X <= v10.11)]))
-if test "x${enable_macosx_qtkit}" != "xno" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx_qtkit}" = "yes")
-then
-  AC_LANG_PUSH([Objective C])
-  AC_CHECK_HEADERS([QTKit/QTKit.h], [
-      VLC_ADD_PLUGIN([access_qtsound])
-    ])
-  AC_LANG_POP([Objective C])
-fi
-
-dnl
 dnl AVFoundation
 AC_SUBST([have_avfoundation], ["no"])
 AC_ARG_ENABLE([macosx-avfoundation],
@@ -2975,7 +2961,7 @@ AS_IF([test "${enable_tiger}" != "no"], [
 ])
 
 dnl
-dnl  check if we can build the css selector engine 
+dnl  check if we can build the css selector engine
 dnl
 AC_ARG_ENABLE([css],
 AS_HELP_STRING([--enable-css], [CSS selector engine (default auto)]))
@@ -4269,7 +4255,7 @@ AS_IF([test "${SYS}" = "mingw32"], [
 AM_CONDITIONAL([HAVE_MAKENSIS], [test "x$MAKENSIS" != "xno" && test "$nsis_version_ok" = "yes"])
 
 dnl
-dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY 
+dnl Check wether we have the PROCESS_MITIGATION_IMAGE_LOAD_POLICY
 dnl It should only be available when building for win10, but some SDKs define it unconditionnaly
 dnl
 if test "${SYS}" = "mingw32"; then
