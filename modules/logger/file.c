@@ -65,10 +65,19 @@ static void LogText(void *opaque, int type, const vlc_log_t *meta,
     funlockfile(stream);
 }
 
+static void Close(void *opaque)
+{
+    vlc_logger_sys_t *sys = opaque;
+
+    fputs(sys->footer, sys->stream);
+    fclose(sys->stream);
+    free(sys);
+}
+
 static const struct vlc_logger_operations text_ops =
 {
     LogText,
-    NULL
+    Close
 };
 
 #define HTML_FILENAME "vlc-log.html"
@@ -114,7 +123,7 @@ static void LogHtml(void *opaque, int type, const vlc_log_t *meta,
 static const struct vlc_logger_operations html_ops =
 {
     LogHtml,
-    NULL
+    Close
 };
 
 static const struct vlc_logger_operations *Open(vlc_object_t *obj,
@@ -193,15 +202,6 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj,
     return ops;
 }
 
-static void Close(void *opaque)
-{
-    vlc_logger_sys_t *sys = opaque;
-
-    fputs(sys->footer, sys->stream);
-    fclose(sys->stream);
-    free(sys);
-}
-
 static const char *const mode_list[] = { "text", "html" };
 static const char *const mode_list_text[] = { N_("Text"), N_("HTML") };
 
@@ -234,7 +234,7 @@ vlc_module_begin()
     set_category(CAT_ADVANCED)
     set_subcategory(SUBCAT_ADVANCED_MISC)
     set_capability("logger", 15)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
 
     add_bool("file-logging", false, FILE_LOG_TEXT, FILE_LOG_LONGTEXT, false)
     add_savefile("logfile", NULL, LOGFILE_NAME_TEXT, LOGFILE_NAME_LONGTEXT)
