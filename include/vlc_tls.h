@@ -147,6 +147,7 @@ typedef struct vlc_tls_creds
     int  (*handshake)(vlc_tls_t *session,
                       const char *hostname, const char *service,
                       char ** /*restrict*/ alp);
+    void (*destroy)(struct vlc_tls_creds *);
 } vlc_tls_creds_t;
 
 /**
