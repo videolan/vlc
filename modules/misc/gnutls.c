@@ -623,13 +623,10 @@ static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_server_t *crd,
     return (priv != NULL) ? &priv->tls : NULL;
 }
 
-static int gnutls_ServerHandshake(vlc_tls_t *tls,
-                                  const char *host, const char *service,
-                                  char **restrict alp)
+static int gnutls_ServerHandshake(vlc_tls_t *tls, char **restrict alp)
 {
     vlc_tls_gnutls_t *priv = (vlc_tls_gnutls_t *)tls;
 
-    (void) host; (void) service;
     return gnutls_ContinueHandshake(priv, alp);
 }
 

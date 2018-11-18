@@ -874,6 +874,11 @@ error:
     return NULL;
 }
 
+static int st_ServerHandshake (vlc_tls_t *session, char **restrict alp) {
+
+    return st_Handshake(session, NULL, NULL, alp);
+}
+
 static void st_ServerDestroy (vlc_tls_server_t *crd) {
     msg_Dbg(crd, "close secure transport server");
 
@@ -991,7 +996,7 @@ static int OpenServer (vlc_tls_server_t *crd, const char *cert, const char *key)
 
     crd->sys = sys;
     crd->open = st_ServerSessionOpen;
-    crd->handshake = st_Handshake;
+    crd->handshake = st_ServerHandshake;
     crd->destroy = st_ServerDestroy;
 
 out:
