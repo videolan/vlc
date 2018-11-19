@@ -116,6 +116,13 @@ struct vout_display_sys_t
     d3d_quad_t               regionQuad;
     int                      d3dregion_count;
     picture_t                **d3dregions;
+
+    /* outside rendering */
+    void *outside_opaque;
+    void (*swapCb)(void* opaque);
+    void (*endRenderCb)(void* opaque);
+    bool (*starRenderCb)(void* opaque);
+    bool (*resizeCb)(void* opaque, unsigned, unsigned);
 };
 
 #define RECTWidth(r)   (int)((r).right - (r).left)
@@ -235,8 +242,6 @@ static inline bool RectEquals(const RECT *r1, const RECT *r2)
 static HRESULT UpdateBackBuffer(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    HRESULT hr;
-    ID3D11Texture2D* pBackBuffer;
     RECT rect;
 #if VLC_WINSTORE_APP
     if (!GetRect(&sys->sys, &rect))
@@ -244,52 +249,9 @@ static HRESULT UpdateBackBuffer(vout_display_t *vd)
         rect = sys->sys.rect_dest_clipped;
     uint32_t i_width = RECTWidth(rect);
     uint32_t i_height = RECTHeight(rect);
-    D3D11_TEXTURE2D_DESC dsc = { 0 };
 
-    if (sys->swapchainTargetView[0]) {
-        ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
-        if (res)
-        {
-            ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
-            ID3D11Resource_Release(res);
-        }
-    }
-
-    if (dsc.Width == i_width && dsc.Height == i_height)
-        return S_OK; /* nothing changed */
-
-    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
-    {
-        if (sys->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
-            sys->swapchainTargetView[i] = NULL;
-        }
-    }
-
-    /* TODO detect is the size is the same as the output and switch to fullscreen mode */
-    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
-        DXGI_FORMAT_UNKNOWN, 0);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
-       return hr;
-    }
-
-    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
-       return hr;
-    }
-
-    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
-                                    sys->display.pixelFormat, sys->swapchainTargetView );
-    ID3D11Texture2D_Release(pBackBuffer);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
-        return hr;
-    }
-
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+    if (!sys->resizeCb(sys->outside_opaque, i_width, i_height))
+        return E_FAIL;
 
     return S_OK;
 }
@@ -326,6 +288,89 @@ static void Manage(vout_display_t *vd)
         !RectEquals(&before_dest, &sys->sys.rect_dest))
     {
         UpdateSize(vd);
+    }
+}
+
+static bool Resize(void *opaque, unsigned i_width, unsigned i_height)
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+    ID3D11Texture2D* pBackBuffer;
+    HRESULT hr;
+
+    D3D11_TEXTURE2D_DESC dsc = { 0 };
+
+    if (sys->swapchainTargetView[0]) {
+        ID3D11Resource *res = NULL;
+        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
+        if (res)
+        {
+            ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
+            ID3D11Resource_Release(res);
+        }
+    }
+
+    if (dsc.Width == i_width && dsc.Height == i_height)
+        return true; /* nothing changed */
+
+    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
+    {
+        if (sys->swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
+            sys->swapchainTargetView[i] = NULL;
+        }
+    }
+
+    /* TODO detect is the size is the same as the output and switch to fullscreen mode */
+    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
+        DXGI_FORMAT_UNKNOWN, 0);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
+       return false;
+    }
+
+    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
+       return false;
+    }
+
+    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
+                                    sys->display.pixelFormat, sys->swapchainTargetView );
+    ID3D11Texture2D_Release(pBackBuffer);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
+        return false;
+    }
+
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+
+    return true;
+}
+
+static bool StartRendering(void *opaque)
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+
+    Manage(vd);
+
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+    return true;
+}
+
+static void Swap(void *opaque)
+{
+    vout_display_t *vd = opaque;
+    vout_display_sys_t *sys = vd->sys;
+
+    DXGI_PRESENT_PARAMETERS presentParams = { 0 };
+
+    HRESULT hr = IDXGISwapChain1_Present1(sys->dxgiswapChain, 0, 0, &presentParams);
+    if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
+    {
+        /* TODO device lost */
+        msg_Err(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
     }
 }
 
@@ -376,6 +421,15 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #endif
     sys->sys.pf_GetPictureWidth  = GetPictureWidth;
     sys->sys.pf_GetPictureHeight = GetPictureHeight;
+
+    if (!sys->swapCb || !sys->starRenderCb || !sys->endRenderCb || !sys->resizeCb)
+    {
+        sys->outside_opaque = vd;
+        sys->swapCb       = Swap;
+        sys->starRenderCb = StartRendering;
+        sys->endRenderCb  = NULL;
+        sys->resizeCb     = Resize;
+    }
 
     if (Direct3D11Open(vd, fmtp)) {
         msg_Err(vd, "Direct3D11 could not be opened");
@@ -924,12 +978,15 @@ static void Prepare(vout_display_t *vd, picture_t *picture,
 {
     vout_display_sys_t *sys = vd->sys;
 
-    Manage(vd);
     VLC_UNUSED(date);
 
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+    if (sys->starRenderCb(sys->outside_opaque))
+    {
+        PreparePicture(vd, picture, subpicture);
 
-    PreparePicture(vd, picture, subpicture);
+        if (sys->endRenderCb)
+            sys->endRenderCb(sys->outside_opaque);
+    }
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
@@ -937,15 +994,8 @@ static void Display(vout_display_t *vd, picture_t *picture)
     vout_display_sys_t *sys = vd->sys;
     VLC_UNUSED(picture);
 
-    DXGI_PRESENT_PARAMETERS presentParams;
-    memset(&presentParams, 0, sizeof(presentParams));
     d3d11_device_lock( &sys->d3d_dev );
-    HRESULT hr = IDXGISwapChain1_Present1(sys->dxgiswapChain, 0, 0, &presentParams);
-    if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
-    {
-        /* TODO device lost */
-        msg_Err(vd, "SwapChain Present failed. (hr=0x%lX)", hr);
-    }
+    sys->swapCb(sys->outside_opaque);
     d3d11_device_unlock( &sys->d3d_dev );
 
     CommonDisplay(vd);
