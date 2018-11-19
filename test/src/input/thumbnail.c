@@ -75,7 +75,7 @@ static void thumbnailer_callback( void* data, picture_t* thumbnail )
     if ( thumbnail != NULL )
     {
         assert( test_params[p_ctx->test_idx].b_expected_success && "Unexpected failure" );
-        assert( thumbnail->format.i_chroma == VLC_CODEC_RGB32 );
+        assert( thumbnail->format.i_chroma == VLC_CODEC_ARGB );
 
         /* TODO: Enable this once the new clock is merged */
 #if 0
