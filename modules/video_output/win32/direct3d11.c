@@ -191,21 +191,9 @@ static int OpenCoreW(vout_display_t *vd)
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
     if (!dxgiswapChain)
         return VLC_EGENERIC;
-    ID3D11DeviceContext* d3dcontext = var_InheritInteger(vd, "winrt-d3dcontext");
-    if (!d3dcontext)
-        return VLC_EGENERIC;
-    ID3D11Device* d3ddevice = NULL;
-    ID3D11DeviceContext_GetDevice(d3dcontext, &d3ddevice);
-    if (!d3ddevice)
-        return VLC_EGENERIC;
 
     sys->dxgiswapChain = dxgiswapChain;
-    sys->d3d_dev.d3ddevice     = d3ddevice;
-    sys->d3d_dev.d3dcontext    = d3dcontext;
-    sys->d3d_dev.feature_level = ID3D11Device_GetFeatureLevel(sys->d3d_dev.d3ddevice );
     IDXGISwapChain_AddRef     (sys->dxgiswapChain);
-    ID3D11Device_AddRef       (sys->d3d_dev.d3ddevice);
-    ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
 
     return VLC_SUCCESS;
 }
@@ -1212,19 +1200,36 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
+    HRESULT hr = E_FAIL;
 
+    ID3D11DeviceContext *d3d11_ctx = NULL;
+#if VLC_WINSTORE_APP
+    if (d3d11_ctx == NULL)
+        d3d11_ctx = var_InheritInteger(vd, "winrt-d3dcontext");
+    if (d3d11_ctx == NULL)
+        return VLC_EGENERIC;
+#endif /* VLC_WINSTORE_APP */
+    if (d3d11_ctx != NULL)
+    {
+        hr = D3D11_CreateDeviceExternal(vd, d3d11_ctx,
+                                        is_d3d11_opaque(vd->source.i_chroma),
+                                        &sys->d3d_dev);
+    }
 #if !VLC_WINSTORE_APP
-    HRESULT hr = S_OK;
-
-    DXGI_SWAP_CHAIN_DESC1 scd;
-
-    hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL,
-                            is_d3d11_opaque(vd->source.i_chroma),
-                            &sys->d3d_dev);
+    else
+    {
+        hr = D3D11_CreateDevice(vd, &sys->hd3d, NULL,
+                                is_d3d11_opaque(vd->source.i_chroma),
+                                &sys->d3d_dev);
+    }
+#endif /* !VLC_WINSTORE_APP */
     if (FAILED(hr)) {
        msg_Err(vd, "Could not Create the D3D11 device. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
+
+#if !VLC_WINSTORE_APP
+    DXGI_SWAP_CHAIN_DESC1 scd;
 
     IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
     if (unlikely(dxgiadapter==NULL)) {
