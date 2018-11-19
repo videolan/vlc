@@ -133,6 +133,78 @@ static const char * bluray_event_debug_strings[] =
 #  define blurayDebugEvent(e, v)
 #endif
 
+#ifdef BLURAY_HAS_BDJO_DATA_H
+/* System version check menu freeze. See
+ * https://code.videolan.org/videolan/libbluray/issues/1
+ * To be removed with fix[ed,able] libbluray */
+#  include <libbluray/bdjo_data.h>
+#  include <strings.h>
+static int BDJO_FileSelect( const char *psz_filename )
+{
+    int i_len = strlen( psz_filename );
+    if ( i_len  <= 5 )
+        return 0;
+    else
+        return ! strcasecmp( &psz_filename[i_len - 5], ".bdjo" );
+}
+
+static bool BDJO_IsBlacklisted(demux_t *p_demux, const char *psz_bd_path)
+{
+    const char * rgsz_class_blacklist[] =
+    {
+        "com.macrovision.bdplus.Handshake",
+    };
+
+    bool b_ret = false;
+    char *psz_bdjo_dir;
+    if(-1 == asprintf(&psz_bdjo_dir, "%s/BDMV/BDJO", psz_bd_path))
+        return false;
+
+    char **ppsz_filenames = NULL;
+    int i_files = vlc_scandir(psz_bdjo_dir, &ppsz_filenames, BDJO_FileSelect, NULL);
+    if(i_files < 1)
+    {
+        free(psz_bdjo_dir);
+        return false;
+    }
+
+    for( int i=0; i<i_files && !b_ret; i++ )
+    {
+        char *psz_bdjo_file;
+        if(-1 < asprintf(&psz_bdjo_file, "%s/%s", psz_bdjo_dir, ppsz_filenames[i]))
+        {
+            struct bdjo_data *bdjo = bd_read_bdjo(psz_bdjo_file);
+            if(bdjo)
+            {
+                for(uint8_t j=0; j<bdjo->app_table.num_app && !b_ret; j++)
+                    for(size_t k=0; k<ARRAY_SIZE(rgsz_class_blacklist) && !b_ret; k++)
+                        b_ret = (!strcmp(rgsz_class_blacklist[k],
+                                         bdjo->app_table.app[j].initial_class));
+#ifdef DEBUG_BLURAY
+                 if(b_ret)
+                     msg_Warn("Found blacklisted class %s in %s", rgsz_class_blacklist[k],
+                              ppsz_filenames[i]);
+#else
+    VLC_UNUSED(p_demux);
+#endif
+                bd_free_bdjo(bdjo);
+            }
+            free(psz_bdjo_file);
+        }
+    }
+
+    free(psz_bdjo_dir);
+
+    for( int i=0; i<i_files; i++ )
+        free(ppsz_filenames[i]);
+    free(ppsz_filenames);
+
+    return b_ret;
+}
+#else
+# define BDJO_IsBlacklisted(foo, bar) (0)
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -926,6 +998,19 @@ static int blurayOpen(vlc_object_t *object)
              _("This Blu-ray disc requires Java for menus support.%s\nThe disc will be played without menus."),
              !disc_info->libjvm_detected ? _("Java was not found on your system.") : "");
         p_sys->b_menu = false;
+    }
+
+    if(disc_info->bdj_detected &&p_sys->b_menu &&
+       BDJO_IsBlacklisted(p_demux, p_sys->psz_bd_path))
+    {
+        p_sys->b_menu = vlc_dialog_wait_question( p_demux,
+                                                  VLC_DIALOG_QUESTION_NORMAL,
+                                                  _("Play without Menus"),
+                                                  _("Try anyway"),
+                                                  NULL,
+                                                  _("BDJO Menu check"),
+                                                  "%s",
+                                                  _("Incompatible Java Menu detected"));
     }
 
     /* Get titles and chapters */
