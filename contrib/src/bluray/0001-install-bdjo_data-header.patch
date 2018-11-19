@@ -1,0 +1,37 @@
+From 73681388dfd0f839e0b4447b3063842d606691d8 Mon Sep 17 00:00:00 2001
+From: Francois Cartegnie <fcvlcdev@free.fr>
+Date: Mon, 19 Nov 2018 15:27:23 +0100
+Subject: [PATCH] install bdjo_data header
+
+---
+ Makefile.am            | 1 +
+ src/libbluray/bluray.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/Makefile.am b/Makefile.am
+index 94add5b..f9a76a0 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -218,6 +218,7 @@ pkginclude_HEADERS = \
+ 	src/libbluray/bluray-version.h \
+ 	src/libbluray/keys.h \
+ 	src/libbluray/player_settings.h \
++	src/libbluray/bdj/bdjo_data.h \
+ 	src/libbluray/bdnav/clpi_data.h \
+ 	src/libbluray/bdnav/meta_data.h \
+ 	src/libbluray/decoders/overlay.h \
+diff --git a/src/libbluray/bluray.h b/src/libbluray/bluray.h
+index 8eb8100..86be9e6 100644
+--- a/src/libbluray/bluray.h
++++ b/src/libbluray/bluray.h
+@@ -1073,6 +1073,7 @@ void bd_free_mobj(struct mobj_objects *);
+ struct bdjo_data;
+ struct bdjo_data *bd_read_bdjo(const char *bdjo_file);
+ void bd_free_bdjo(struct bdjo_data *);
++#define BLURAY_HAS_BDJO_DATA_H
+ 
+ /* BD-J testing */
+ 
+-- 
+2.17.2
+
