@@ -186,18 +186,6 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
 }
 
 #if VLC_WINSTORE_APP
-static int OpenCoreW(vout_display_t *vd)
-{
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
-    if (!dxgiswapChain)
-        return VLC_EGENERIC;
-
-    sys->dxgiswapChain = dxgiswapChain;
-    IDXGISwapChain_AddRef     (sys->dxgiswapChain);
-
-    return VLC_SUCCESS;
-}
-
 static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 {
     const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
@@ -392,12 +380,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-#if !VLC_WINSTORE_APP
     int ret = D3D11_Create(vd, &sys->hd3d, true);
-#else
-    int ret = OpenCoreW(vd);
-#endif
-
     if (ret != VLC_SUCCESS)
         return ret;
 
@@ -1201,6 +1184,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     vout_display_sys_t *sys = vd->sys;
     IDXGIFactory2 *dxgifactory;
     HRESULT hr = E_FAIL;
+    DXGI_SWAP_CHAIN_DESC1 scd;
 
     ID3D11DeviceContext *d3d11_ctx = NULL;
 #if VLC_WINSTORE_APP
@@ -1228,22 +1212,32 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
        return VLC_EGENERIC;
     }
 
-#if !VLC_WINSTORE_APP
-    DXGI_SWAP_CHAIN_DESC1 scd;
+#if VLC_WINSTORE_APP
+    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
+    if (!dxgiswapChain)
+        return VLC_EGENERIC;
 
-    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-    if (unlikely(dxgiadapter==NULL)) {
-       msg_Err(vd, "Could not get the DXGI Adapter");
-       return VLC_EGENERIC;
+    sys->dxgiswapChain = dxgiswapChain;
+    IDXGISwapChain_AddRef     (sys->dxgiswapChain);
+
+    if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
+        return VLC_EGENERIC;
+
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == scd.Format &&
+            !is_d3d11_opaque(output_format->fourcc))
+        {
+            sys->display.pixelFormat = output_format;
+            break;
+        }
     }
-
-    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
-    IDXGIAdapter_Release(dxgiadapter);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
-       return VLC_EGENERIC;
+    if (unlikely(sys->display.pixelFormat == NULL)) {
+        msg_Err(vd, "Could not setup the output format.");
+        return VLC_EGENERIC;
     }
-
+#else /* !VLC_WINSTORE_APP */
     sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, true,
                                                 vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
                                                 0, 0,
@@ -1258,10 +1252,23 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
         return VLC_EGENERIC;
     }
 
-    FillSwapChainDesc(vd, &scd);
-
     if (sys->sys.hvideownd == 0)
         return VLC_EGENERIC;
+
+    FillSwapChainDesc(vd, &scd);
+
+    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+    if (unlikely(dxgiadapter==NULL)) {
+       msg_Err(vd, "Could not get the DXGI Adapter");
+       return VLC_EGENERIC;
+    }
+
+    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+    IDXGIAdapter_Release(dxgiadapter);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
+       return VLC_EGENERIC;
+    }
 
     hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
                                               sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
@@ -1277,7 +1284,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
        msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
        return VLC_EGENERIC;
     }
-#endif
+#endif /* !VLC_WINSTORE_APP */
 
     IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
 

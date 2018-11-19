@@ -735,6 +735,9 @@ int D3D11_Create(vlc_object_t *obj, d3d11_handle_t *hd3d, bool with_shaders)
             return VLC_EGENERIC;
         }
     }
+#else
+    hd3d->hdll = NULL;
+    hd3d->compiler_dll = NULL;
 #endif
     return VLC_SUCCESS;
 }
