@@ -180,11 +180,7 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
 #if !VLC_WINSTORE_APP
 static int OpenHwnd(vout_display_t *vd)
 {
-    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
-    if (!sys)
-        return VLC_ENOMEM;
-
-    return D3D11_Create(vd, &sys->hd3d, true);
+    return D3D11_Create(vd, &vd->sys->hd3d, true);
 }
 #else
 static int OpenCoreW(vout_display_t *vd)
@@ -199,10 +195,6 @@ static int OpenCoreW(vout_display_t *vd)
     ID3D11DeviceContext_GetDevice(d3dcontext, &d3ddevice);
     if (!d3ddevice)
         return VLC_EGENERIC;
-
-    vout_display_sys_t *sys = vd->sys = calloc(1, sizeof(vout_display_sys_t));
-    if (!sys)
-        return VLC_ENOMEM;
 
     sys->dxgiswapChain = dxgiswapChain;
     sys->d3d_dev.d3ddevice     = d3ddevice;
@@ -370,6 +362,10 @@ static int Open(vlc_object_t *object)
     }
 #endif
 
+    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(object, 1, sizeof(vout_display_sys_t));
+    if (!sys)
+        return VLC_ENOMEM;
+
 #if !VLC_WINSTORE_APP
     int ret = OpenHwnd(vd);
 #else
@@ -383,10 +379,10 @@ static int Open(vlc_object_t *object)
         goto error;
 
 #if VLC_WINSTORE_APP
-    vd->sys->sys.pf_GetRect = GetRect;
+    sys->sys.pf_GetRect = GetRect;
 #endif
-    vd->sys->sys.pf_GetPictureWidth  = GetPictureWidth;
-    vd->sys->sys.pf_GetPictureHeight = GetPictureHeight;
+    sys->sys.pf_GetPictureWidth  = GetPictureWidth;
+    sys->sys.pf_GetPictureHeight = GetPictureHeight;
 
     if (Direct3D11Open(vd)) {
         msg_Err(vd, "Direct3D11 could not be opened");
@@ -394,8 +390,8 @@ static int Open(vlc_object_t *object)
     }
 
 #if !VLC_WINSTORE_APP
-    if (!vd->sys->sys.b_windowless)
-        EventThreadUpdateTitle(vd->sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
+    if (!sys->sys.b_windowless)
+        EventThreadUpdateTitle(sys->sys.event, VOUT_TITLE " (Direct3D11 output)");
 #endif
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
@@ -403,11 +399,11 @@ static int Open(vlc_object_t *object)
     vd->info.has_pictures_invalid = vd->info.is_slow;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
-        vd->sys->regionQuad.textureFormat != NULL)
+        sys->regionQuad.textureFormat != NULL)
     {
-        vd->sys->pSubpictureChromas[0] = vd->sys->regionQuad.textureFormat->fourcc;
-        vd->sys->pSubpictureChromas[1] = 0;
-        vd->info.subpicture_chromas = vd->sys->pSubpictureChromas;
+        sys->pSubpictureChromas[0] = sys->regionQuad.textureFormat->fourcc;
+        sys->pSubpictureChromas[1] = 0;
+        vd->info.subpicture_chromas = sys->pSubpictureChromas;
     }
     else
         vd->info.subpicture_chromas = NULL;
@@ -433,7 +429,6 @@ static void Close(vlc_object_t *object)
     Direct3D11Close(vd);
     CommonClean(vd);
     Direct3D11Destroy(vd);
-    free(vd->sys);
 }
 
 static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
