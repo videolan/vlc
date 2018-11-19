@@ -240,6 +240,109 @@ static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 }
 #endif
 
+static inline bool RectEquals(const RECT *r1, const RECT *r2)
+{
+    return r1->bottom == r2->bottom && r1->top == r2->top &&
+           r1->left == r2->left && r1->right == r2->right;
+}
+
+static HRESULT UpdateBackBuffer(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+    ID3D11Texture2D* pBackBuffer;
+    RECT rect;
+#if VLC_WINSTORE_APP
+    if (!GetRect(&sys->sys, &rect))
+#endif
+        rect = sys->sys.rect_dest_clipped;
+    uint32_t i_width = RECTWidth(rect);
+    uint32_t i_height = RECTHeight(rect);
+    D3D11_TEXTURE2D_DESC dsc = { 0 };
+
+    if (sys->swapchainTargetView[0]) {
+        ID3D11Resource *res = NULL;
+        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
+        if (res)
+        {
+            ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
+            ID3D11Resource_Release(res);
+        }
+    }
+
+    if (dsc.Width == i_width && dsc.Height == i_height)
+        return S_OK; /* nothing changed */
+
+    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
+    {
+        if (sys->swapchainTargetView[i]) {
+            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
+            sys->swapchainTargetView[i] = NULL;
+        }
+    }
+
+    /* TODO detect is the size is the same as the output and switch to fullscreen mode */
+    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
+        DXGI_FORMAT_UNKNOWN, 0);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
+       return hr;
+    }
+
+    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
+                                    sys->display.pixelFormat, sys->swapchainTargetView );
+    ID3D11Texture2D_Release(pBackBuffer);
+    if (FAILED(hr)) {
+        msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
+        return hr;
+    }
+
+    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
+
+    return S_OK;
+}
+
+static void UpdateSize(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
+            RECTHeight(sys->sys.rect_dest_clipped));
+
+    UpdateBackBuffer(vd);
+
+    d3d11_device_lock( &sys->d3d_dev );
+
+    UpdatePicQuadPosition(vd);
+
+    D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &sys->sys.rect_src_clipped,
+                             vd->fmt.orientation);
+
+    d3d11_device_unlock( &sys->d3d_dev );
+}
+
+static void Manage(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    RECT before_src_clipped  = sys->sys.rect_src_clipped;
+    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
+    RECT before_dest         = sys->sys.rect_dest;
+
+    CommonManage(vd);
+
+    if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
+        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
+        !RectEquals(&before_dest, &sys->sys.rect_dest))
+    {
+        UpdateSize(vd);
+    }
+}
+
 static unsigned int GetPictureWidth(const vout_display_t *vd)
 {
     return vd->sys->picQuad.i_width;
@@ -516,68 +619,6 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
 }
 #endif
 
-static HRESULT UpdateBackBuffer(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    HRESULT hr;
-    ID3D11Texture2D* pBackBuffer;
-    RECT rect;
-#if VLC_WINSTORE_APP
-    if (!GetRect(&sys->sys, &rect))
-#endif
-        rect = sys->sys.rect_dest_clipped;
-    uint32_t i_width = RECTWidth(rect);
-    uint32_t i_height = RECTHeight(rect);
-    D3D11_TEXTURE2D_DESC dsc = { 0 };
-
-    if (sys->swapchainTargetView[0]) {
-        ID3D11Resource *res = NULL;
-        ID3D11RenderTargetView_GetResource(sys->swapchainTargetView[0], &res);
-        if (res)
-        {
-            ID3D11Texture2D_GetDesc((ID3D11Texture2D*) res, &dsc);
-            ID3D11Resource_Release(res);
-        }
-    }
-
-    if (dsc.Width == i_width && dsc.Height == i_height)
-        return S_OK; /* nothing changed */
-
-    for (size_t i=0; i < D3D11_MAX_SHADER_VIEW; i++)
-    {
-        if (sys->swapchainTargetView[i]) {
-            ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
-            sys->swapchainTargetView[i] = NULL;
-        }
-    }
-
-    /* TODO detect is the size is the same as the output and switch to fullscreen mode */
-    hr = IDXGISwapChain_ResizeBuffers(sys->dxgiswapChain, 0, i_width, i_height,
-        DXGI_FORMAT_UNKNOWN, 0);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Failed to resize the backbuffer. (hr=0x%lX)", hr);
-       return hr;
-    }
-
-    hr = IDXGISwapChain_GetBuffer(sys->dxgiswapChain, 0, &IID_ID3D11Texture2D, (LPVOID *)&pBackBuffer);
-    if (FAILED(hr)) {
-       msg_Err(vd, "Could not get the backbuffer for the Swapchain. (hr=0x%lX)", hr);
-       return hr;
-    }
-
-    hr = D3D11_CreateRenderTargets( &sys->d3d_dev, (ID3D11Resource *)pBackBuffer,
-                                    sys->display.pixelFormat, sys->swapchainTargetView );
-    ID3D11Texture2D_Release(pBackBuffer);
-    if (FAILED(hr)) {
-        msg_Err(vd, "Failed to create the target view. (hr=0x%lX)", hr);
-        return hr;
-    }
-
-    D3D11_ClearRenderTargets( &sys->d3d_dev, sys->display.pixelFormat, sys->swapchainTargetView );
-
-    return S_OK;
-}
-
 /* rotation around the Z axis */
 static void getZRotMatrix(float theta, FLOAT matrix[static 16])
 {
@@ -727,30 +768,6 @@ static void SetQuadVSProjection(vout_display_t *vd, d3d_quad_t *quad, const vlc_
 #undef RAD
 }
 
-static void UpdateSize(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    msg_Dbg(vd, "Detected size change %dx%d", RECTWidth(sys->sys.rect_dest_clipped),
-            RECTHeight(sys->sys.rect_dest_clipped));
-
-    UpdateBackBuffer(vd);
-
-    d3d11_device_lock( &sys->d3d_dev );
-
-    UpdatePicQuadPosition(vd);
-
-    D3D11_UpdateQuadPosition(vd, &sys->d3d_dev, &sys->picQuad, &sys->sys.rect_src_clipped,
-                             vd->fmt.orientation);
-
-    d3d11_device_unlock( &sys->d3d_dev );
-}
-
-static inline bool RectEquals(const RECT *r1, const RECT *r2)
-{
-    return r1->bottom == r2->bottom && r1->top == r2->top &&
-           r1->left == r2->left && r1->right == r2->right;
-}
-
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -778,23 +795,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
 
     return res;
-}
-
-static void Manage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    RECT before_src_clipped  = sys->sys.rect_src_clipped;
-    RECT before_dest_clipped = sys->sys.rect_dest_clipped;
-    RECT before_dest         = sys->sys.rect_dest;
-
-    CommonManage(vd);
-
-    if (!RectEquals(&before_src_clipped, &sys->sys.rect_src_clipped) ||
-        !RectEquals(&before_dest_clipped, &sys->sys.rect_dest_clipped) ||
-        !RectEquals(&before_dest, &sys->sys.rect_dest))
-    {
-        UpdateSize(vd);
-    }
 }
 
 static void DisplayPicture(vout_display_sys_t *sys, d3d_quad_t *quad, d3d_vshader_t *vs_shader,
