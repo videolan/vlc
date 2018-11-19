@@ -760,6 +760,11 @@ void* MediaLibrary::Get( int query, int64_t id )
             auto media = m_ml->media( id );
             return CreateAndConvert<vlc_ml_media_t>( media.get() );
         }
+        case VLC_ML_GET_INPUT_ITEM:
+        {
+            auto media = m_ml->media( id );
+            return MediaToInputItem( media.get() );
+        }
         case VLC_ML_GET_ALBUM:
         {
             auto album = m_ml->album( id );

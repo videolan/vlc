@@ -179,6 +179,7 @@ bool Convert( const medialibrary::IShow* input, vlc_ml_show_t& output );
 bool Convert( const medialibrary::ILabel* input, vlc_ml_label_t& output );
 bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output );
 bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output );
+input_item_t* MediaToInputItem( const medialibrary::IMedia* media );
 
 template <typename To, typename ItemType, typename From>
 To* ml_convert_list( const std::vector<std::shared_ptr<From>>& input )
