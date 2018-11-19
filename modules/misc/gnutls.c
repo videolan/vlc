@@ -317,9 +317,9 @@ error:
  * 1 if more would-be blocking recv is needed,
  * 2 if more would-be blocking send is required.
  */
-static int gnutls_ContinueHandshake(vlc_tls_gnutls_t *priv,
-                                    char **restrict alp)
+static int gnutls_Handshake(vlc_tls_t *tls, char **restrict alp)
 {
+    vlc_tls_gnutls_t *priv = (vlc_tls_gnutls_t *)tls;
     vlc_object_t *obj = priv->obj;
     gnutls_session_t session = priv->session;
     int val = gnutls_handshake(session);
@@ -408,7 +408,7 @@ static int gnutls_ClientHandshake(vlc_tls_t *tls,
     vlc_tls_gnutls_t *priv = (vlc_tls_gnutls_t *)tls;
     vlc_object_t *obj = priv->obj;
 
-    int val = gnutls_ContinueHandshake(priv, alp);
+    int val = gnutls_Handshake(tls, alp);
     if (val)
         return val;
 
@@ -620,13 +620,6 @@ static vlc_tls_t *gnutls_ServerSessionOpen(vlc_tls_server_t *crd,
     return (priv != NULL) ? &priv->tls : NULL;
 }
 
-static int gnutls_ServerHandshake(vlc_tls_t *tls, char **restrict alp)
-{
-    vlc_tls_gnutls_t *priv = (vlc_tls_gnutls_t *)tls;
-
-    return gnutls_ContinueHandshake(priv, alp);
-}
-
 static void gnutls_ServerDestroy(vlc_tls_server_t *crd)
 {
     vlc_tls_creds_sys_t *sys = crd->sys;
@@ -640,7 +633,7 @@ static void gnutls_ServerDestroy(vlc_tls_server_t *crd)
 static const struct vlc_tls_server_operations gnutls_ServerOps =
 {
     .open = gnutls_ServerSessionOpen,
-    .handshake = gnutls_ServerHandshake,
+    .handshake = gnutls_Handshake,
     .destroy = gnutls_ServerDestroy,
 };
 
