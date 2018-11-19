@@ -177,12 +177,7 @@ static void Direct3D11UnmapPoolTexture(picture_t *picture)
     ID3D11DeviceContext_Unmap(p_sys->context, p_sys->resource[KNOWN_DXGI_INDEX], 0);
 }
 
-#if !VLC_WINSTORE_APP
-static int OpenHwnd(vout_display_t *vd)
-{
-    return D3D11_Create(vd, &vd->sys->hd3d, true);
-}
-#else
+#if VLC_WINSTORE_APP
 static int OpenCoreW(vout_display_t *vd)
 {
     IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
@@ -206,9 +201,7 @@ static int OpenCoreW(vout_display_t *vd)
 
     return VLC_SUCCESS;
 }
-#endif
 
-#if VLC_WINSTORE_APP
 static bool GetRect(const vout_display_sys_win32_t *p_sys, RECT *out)
 {
     const vout_display_sys_t *sys = (const vout_display_sys_t *)p_sys;
@@ -367,7 +360,7 @@ static int Open(vlc_object_t *object)
         return VLC_ENOMEM;
 
 #if !VLC_WINSTORE_APP
-    int ret = OpenHwnd(vd);
+    int ret = D3D11_Create(vd, &sys->hd3d, true);
 #else
     int ret = OpenCoreW(vd);
 #endif
@@ -792,12 +785,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
     return res;
 }
 
-static void DisplayPicture(vout_display_sys_t *sys, d3d_quad_t *quad, d3d_vshader_t *vs_shader,
-                           ID3D11ShaderResourceView *renderSrc[D3D11_MAX_SHADER_VIEW])
-{
-    D3D11_RenderQuad(&sys->d3d_dev, quad, vs_shader, renderSrc, sys->swapchainTargetView);
-}
-
 static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t *subpicture)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -929,9 +916,9 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         picture_sys_t *p_sys = ActivePictureSys(picture);
         renderSrc = p_sys->renderSrc;
     }
-    DisplayPicture(sys, &sys->picQuad,
-                   vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
-                   renderSrc);
+    D3D11_RenderQuad(&sys->d3d_dev, &sys->picQuad,
+                     vd->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR ? &sys->flatVShader : &sys->projectionVShader,
+                     renderSrc, sys->swapchainTargetView);
 
     if (subpicture) {
         // draw the additional vertices
@@ -939,7 +926,8 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
             if (sys->d3dregions[i])
             {
                 d3d_quad_t *quad = (d3d_quad_t *) sys->d3dregions[i]->p_sys;
-                DisplayPicture(sys, quad, &sys->flatVShader, quad->picSys.renderSrc);
+                D3D11_RenderQuad(&sys->d3d_dev, quad, &sys->flatVShader,
+                                 quad->picSys.renderSrc, sys->swapchainTargetView);
             }
         }
     }
