@@ -204,10 +204,10 @@ vlc_playlist_Clear(vlc_playlist_t *playlist)
 {
     vlc_playlist_AssertLocked(playlist);
 
-    vlc_playlist_ClearItems(playlist);
     int ret = vlc_player_SetCurrentMedia(playlist->player, NULL);
     VLC_UNUSED(ret); /* what could we do? */
 
+    vlc_playlist_ClearItems(playlist);
     vlc_playlist_ItemsReset(playlist);
 }
 
