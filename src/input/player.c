@@ -2074,13 +2074,15 @@ vlc_player_SetCurrentMedia(vlc_player_t *player, input_item_t *media)
         player->releasing_media = false;
         player->has_next_media = true;
     }
-    else
+    else if (player->media)
     {
         /* The current media will be set to NULL once the current input is
          * stopped */
         player->releasing_media = true;
         player->has_next_media = false;
     }
+    else
+        return VLC_SUCCESS;
 
     if (player->input)
     {
