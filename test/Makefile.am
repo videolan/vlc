@@ -26,6 +26,7 @@ check_PROGRAMS = \
 	test_src_misc_variables \
 	test_src_input_stream \
 	test_src_input_stream_fifo \
+	test_src_input_thumbnail \
 	test_src_input_player \
 	test_src_interface_dialog \
 	test_src_misc_bits \
