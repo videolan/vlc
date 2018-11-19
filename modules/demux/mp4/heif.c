@@ -511,10 +511,9 @@ static int DemuxHEIF( demux_t *p_demux )
     es_format_Clean( &p_sys->current.fmt );
     es_format_Copy( &p_sys->current.fmt, &fmt );
     es_format_Clean( &fmt );
-    if( !p_sys->id )
-        p_sys->id = es_out_Add( p_demux->out, &p_sys->current.fmt );
-    else
-        es_out_Control( p_demux->out, ES_OUT_RESTART_ES, p_sys->id );
+    if( p_sys->id )
+        es_out_Del( p_demux->out, p_sys->id );
+    p_sys->id = es_out_Add( p_demux->out, &p_sys->current.fmt );
 
     if( !p_sys->id )
     {
