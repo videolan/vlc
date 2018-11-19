@@ -322,35 +322,28 @@ static int gnutls_ContinueHandshake(vlc_tls_gnutls_t *priv,
 {
     vlc_object_t *obj = priv->obj;
     gnutls_session_t session = priv->session;
-    int val;
+    int val = gnutls_handshake(session);
 
-#ifdef _WIN32
-    WSASetLastError (0);
-#endif
-    do
+    if (gnutls_error_is_fatal(val))
     {
-        val = gnutls_handshake (session);
-        msg_Dbg(obj, "TLS handshake: %s", gnutls_strerror (val));
-
-        switch (val)
-        {
-            case GNUTLS_E_SUCCESS:
-                goto done;
-            case GNUTLS_E_AGAIN:
-            case GNUTLS_E_INTERRUPTED:
-                /* I/O event: return to caller's poll() loop */
-                return 1 + gnutls_record_get_direction (session);
-        }
+        msg_Err(obj, "TLS handshake error: %s", gnutls_strerror(val));
+        return -1;
     }
-    while (!gnutls_error_is_fatal (val));
 
-#ifdef _WIN32
-    msg_Dbg(obj, "Winsock error %d", WSAGetLastError ());
-#endif
-    msg_Err(obj, "TLS handshake error: %s", gnutls_strerror (val));
-    return -1;
+    switch (val)
+    {
+        case GNUTLS_E_SUCCESS:
+            break;
+        case GNUTLS_E_AGAIN:
+        case GNUTLS_E_INTERRUPTED:
+            /* I/O event: return to caller's poll() loop */
+            return 1 + gnutls_record_get_direction(session);
+        default:
+            msg_Warn(obj, "TLS handshake error: %s", gnutls_strerror(val));
+            return 1;
+    }
 
-done:
+    msg_Dbg(obj, "TLS handshake complete");
 #if (GNUTLS_VERSION_NUMBER >= 0x030500)
     /* intentionally left blank */;
 
