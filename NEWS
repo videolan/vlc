@@ -14,9 +14,10 @@ Audio output:
    Use --alsa-passthrough to configure S/PDIF or HDMI passthrough.
 
 Demuxer:
- * Support for HEIF format
+ * Support for HEIF image and grid image formats
  * Support for DASH WebM
  * Support for DVBSUB in mkv
+ * Improved Bluray menus, clips and stream selection
 
 Codecs:
  * Support for experimental AV1 video encoding
