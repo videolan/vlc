@@ -82,6 +82,11 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *
 
         ID3D11DeviceContext_DrawIndexed(d3d_dev->d3dcontext, quad->indexCount, 0, 0);
     }
+
+    /* force unbinding the input texture, otherwise we get:
+     * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
+    ID3D11RenderTargetView *reset[D3D11_MAX_SHADER_VIEW] = { 0 };
+    ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, reset);
 }
 
 static bool AllocQuadVertices(vlc_object_t *o, d3d11_device_t *d3d_dev, d3d_quad_t *quad, video_projection_mode_t projection)
