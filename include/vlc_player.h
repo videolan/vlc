@@ -1891,6 +1891,16 @@ vlc_player_IsSubtitleEnabled(vlc_player_t *player)
 }
 
 /**
+ * Helper to toggle subtitles
+ */
+static inline void
+vlc_player_ToggleSubtitle(vlc_player_t *player)
+{
+    bool enabled = !vlc_player_IsSubtitleEnabled(player);
+    return vlc_player_SetSubtitleEnabled(player, enabled);
+}
+
+/**
  * Get the number of programs
  *
  * @warning The returned size becomes invalid when the player is unlocked.
