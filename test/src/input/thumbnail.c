@@ -115,7 +115,6 @@ static void test_thumbnails( libvlc_instance_t* p_vlc )
 
     for ( size_t i = 0; i < sizeof(test_params) / sizeof(test_params[0]); ++i)
     {
-        fprintf(stderr, "Test #%d\n", i);
         char* psz_mrl;
 
         ctx.test_idx = i;
