@@ -42,7 +42,7 @@ struct image_handler_t
                                   const video_format_t *, const uint8_t *, size_t,
                                   video_format_t * );
     picture_t * (*pf_read_url)  ( image_handler_t *, const char *,
-                                  video_format_t *, video_format_t * );
+                                  const video_format_t *, video_format_t * );
     block_t * (*pf_write)       ( image_handler_t *, picture_t *,
                                   const video_format_t *, const video_format_t * );
     int (*pf_write_url)         ( image_handler_t *, picture_t *,
