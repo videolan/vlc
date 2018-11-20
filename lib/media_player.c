@@ -642,7 +642,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create( mp, "vgl-opaque", VLC_VAR_ADDRESS );
     var_Create( mp, "vgl-setup-cb", VLC_VAR_ADDRESS );
     var_Create( mp, "vgl-cleanup-cb", VLC_VAR_ADDRESS );
-    var_Create( mp, "vgl-resize-cb", VLC_VAR_ADDRESS );
+    var_Create( mp, "vout-cb-update-output", VLC_VAR_ADDRESS );
     var_Create( mp, "vgl-swap-cb", VLC_VAR_ADDRESS );
     var_Create( mp, "vgl-get-proc-address-cb", VLC_VAR_ADDRESS );
     var_Create( mp, "vgl-make-current-cb", VLC_VAR_ADDRESS );
@@ -1164,7 +1164,7 @@ void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
                                         libvlc_gl_engine_t gl_engine,
                                         libvlc_gl_setup_cb setup_cb,
                                         libvlc_gl_cleanup_cb cleanup_cb,
-                                        libvlc_gl_resize_cb resize_cb,
+                                        libvlc_update_output_cb update_output_cb,
                                         libvlc_gl_swap_cb swap_cb,
                                         libvlc_gl_makeCurrent_cb makeCurrent_cb,
                                         libvlc_gl_getProcAddress_cb getProcAddress_cb,
@@ -1191,7 +1191,7 @@ void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vgl-opaque", opaque );
     var_SetAddress( mp, "vgl-setup-cb", setup_cb );
     var_SetAddress( mp, "vgl-cleanup-cb", cleanup_cb );
-    var_SetAddress( mp, "vgl-resize-cb", resize_cb );
+    var_SetAddress( mp, "vout-cb-update-output", update_output_cb );
     var_SetAddress( mp, "vgl-swap-cb", swap_cb );
     var_SetAddress( mp, "vgl-get-proc-address-cb", getProcAddress_cb );
     var_SetAddress( mp, "vgl-make-current-cb", makeCurrent_cb );

@@ -116,7 +116,7 @@ static int Open(vlc_object_t *object)
     sys->opaque = var_InheritAddress(gl, "vgl-opaque");
     sys->setupCb = var_InheritAddress(gl, "vgl-setup-cb");
     sys->cleanupCb = var_InheritAddress(gl, "vgl-cleanup-cb");
-    sys->resizeCb = var_InheritAddress(gl, "vgl-resize-cb");
+    sys->resizeCb = var_InheritAddress(gl, "vout-cb-update-output");
     SET_CALLBACK_ADDR(sys->swapCb, "vgl-swap-cb");
     SET_CALLBACK_ADDR(sys->makeCurrentCb, "vgl-make-current-cb");
     SET_CALLBACK_ADDR(sys->getProcAddressCb, "vgl-get-proc-address-cb");

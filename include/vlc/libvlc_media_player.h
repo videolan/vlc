@@ -448,7 +448,7 @@ typedef void (*libvlc_gl_cleanup_cb)(void* opaque);
  * \param height video height in pixel [IN]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_gl_resize_cb)(void* opaque, unsigned width, unsigned height);
+typedef void (*libvlc_update_output_cb)(void* opaque, unsigned width, unsigned height);
 
 
 /**
@@ -500,7 +500,7 @@ typedef enum libvlc_gl_engine_t {
  * \param gl_engine the OpenGL engine to use
  * \param setup_cb callback called to initialize user data
  * \param cleanup_cb callback called to clean up user data
- * \param resize_cb callback called to get the size of the video
+ * \param update_output_cb callback called to get the size of the video
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL)
@@ -512,7 +512,7 @@ void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
                                         libvlc_gl_engine_t gl_engine,
                                         libvlc_gl_setup_cb setup_cb,
                                         libvlc_gl_cleanup_cb cleanup_cb,
-                                        libvlc_gl_resize_cb resize_cb,
+                                        libvlc_update_output_cb update_output_cb,
                                         libvlc_gl_swap_cb swap_cb,
                                         libvlc_gl_makeCurrent_cb makeCurrent_cb,
                                         libvlc_gl_getProcAddress_cb getProcAddress_cb,
