@@ -73,7 +73,9 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     xml_reader_t *p_xml_reader;
     const char *node;
 
-    p_demux->p_sys = (void *)(uintptr_t)0;
+    p_demux->p_sys = calloc( 1, sizeof (size_t) );
+    if( unlikely(p_demux->p_sys == NULL) )
+         return 0;
 
     /* create new xml parser from stream */
     p_xml_reader = xml_ReaderCreate( p_demux, p_demux->s );
@@ -111,6 +113,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
 end:
     if( p_xml_reader )
         xml_ReaderDelete( p_xml_reader );
+    free( p_demux->p_sys );
 
     /* Needed for correct operation of go back */
     return 0;
@@ -282,8 +285,8 @@ static bool parse_tracks_dict( stream_t *p_demux, input_item_node_t *p_input_nod
     parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                 "dict", tracks_elements );
 
-    msg_Info( p_demux, "added %" PRIuPTR " tracks successfully",
-              (uintptr_t)p_demux->p_sys );
+    msg_Info( p_demux, "added %zu tracks successfully",
+              *(size_t *)p_demux->p_sys );
 
     return true;
 }
@@ -330,7 +333,7 @@ static bool parse_track_dict( stream_t *p_demux, input_item_node_t *p_input_node
     add_meta( p_new_input, p_track );
     input_item_Release( p_new_input );
 
-    p_demux->p_sys = (void *)((uintptr_t)p_demux->p_sys + 1);
+    (*(size_t *)p_demux->p_sys)++;
 
     free_track( p_track );
     return i_ret;
