@@ -393,8 +393,7 @@ void DumpFamily( filter_t *p_filter, const vlc_family_t *p_family,
 
     for( int i = 0; p_family && i < i_max_families ; p_family = p_family->p_next, ++i )
     {
-        msg_Dbg( p_filter, "\t[0x%"PRIxPTR"] %s",
-                 ( uintptr_t ) p_family, p_family->psz_name );
+        msg_Dbg( p_filter, "\t[%p] %s", (void *)p_family, p_family->psz_name );
 
         if( b_dump_fonts )
         {
@@ -410,10 +409,8 @@ void DumpFamily( filter_t *p_filter, const vlc_family_t *p_family,
                 else if( p_font->b_bold && p_font->b_italic )
                     psz_style = "Bold Italic";
 
-                msg_Dbg( p_filter, "\t\t[0x%"PRIxPTR"] (%s): %s - %d",
-                         ( uintptr_t ) p_font, psz_style,
-                         p_font->psz_fontfile, p_font->i_index );
-
+                msg_Dbg( p_filter, "\t\t[%p] (%s): %s - %d", (void *)p_font,
+                         psz_style, p_font->psz_fontfile, p_font->i_index );
             }
 
         }
