@@ -249,8 +249,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
     /* Add a variable to indicate if the window should be below all others */
     var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback,
-                     (void *)(uintptr_t)VOUT_WINDOW_STATE_BELOW );
+    var_AddCallback( p_vout, "video-wallpaper", WallPaperCallback, NULL );
 
     /* Add a variable to indicate whether we want window decoration or not */
     var_Create( p_vout, "video-deco", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
