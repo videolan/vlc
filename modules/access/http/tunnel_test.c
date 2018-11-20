@@ -92,11 +92,11 @@ static unsigned connection_count = 0;
 
 static void *proxy_thread(void *data)
 {
-    int lfd = (intptr_t)data;
+    int *lfd = data;
 
     for (;;)
     {
-        int cfd = accept4(lfd, NULL, NULL, SOCK_CLOEXEC);
+        int cfd = accept4(*lfd, NULL, NULL, SOCK_CLOEXEC);
         if (cfd == -1)
             continue;
 
@@ -147,7 +147,9 @@ int main(void)
     vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two,
                             "ftp://proxy.example.com/");
 
-    int lfd = server_socket(&port);
+    int *lfd = malloc(sizeof (int));
+    assert(lfd != NULL);
+    *lfd = server_socket(&port);
     if (lfd == -1)
         return 77;
 
@@ -159,15 +161,14 @@ int main(void)
     /* Test connection failure */
     vlc_https_connect_proxy(NULL, NULL, "www.example.com", 0, &two, url);
 
-    if (listen(lfd, 255))
+    if (listen(*lfd, 255))
     {
-        vlc_close(lfd);
+        vlc_close(*lfd);
         return 77;
     }
 
     vlc_thread_t th;
-    if (vlc_clone(&th, proxy_thread, (void*)(intptr_t)lfd,
-                  VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&th, proxy_thread, lfd, VLC_THREAD_PRIORITY_LOW))
         assert(!"Thread error");
 
     /* Test proxy error */
@@ -177,5 +178,6 @@ int main(void)
     vlc_join(th, NULL);
     assert(connection_count > 0);
     free(url);
-    vlc_close(lfd);
+    vlc_close(*lfd);
+    free(lfd);
 }
