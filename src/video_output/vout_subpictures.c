@@ -1187,7 +1187,7 @@ static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
 
 static subpicture_t *sub_new_buffer(filter_t *filter)
 {
-    int channel = (intptr_t)filter->owner.sys;
+    int channel = *(int *)filter->owner.sys;
 
     subpicture_t *subpicture = subpicture_New(NULL);
     if (subpicture)
@@ -1202,9 +1202,12 @@ static const struct filter_subpicture_callbacks sub_cbs = {
 static int SubSourceInit(filter_t *filter, void *data)
 {
     spu_t *spu = data;
-    int channel = spu_RegisterChannel(spu);
+    int *channel = malloc(sizeof (int));
+    if (unlikely(channel == NULL))
+        return VLC_ENOMEM;
 
-    filter->owner.sys = (void *)(intptr_t)channel;
+    *channel = spu_RegisterChannel(spu);
+    filter->owner.sys = channel;
     filter->owner.sub = &sub_cbs;
     return VLC_SUCCESS;
 }
@@ -1212,9 +1215,10 @@ static int SubSourceInit(filter_t *filter, void *data)
 static int SubSourceClean(filter_t *filter, void *data)
 {
     spu_t *spu = data;
-    int channel = (intptr_t)filter->owner.sys;
+    int *channel = filter->owner.sys;
 
-    spu_ClearChannel(spu, channel);
+    spu_ClearChannel(spu, *channel);
+    free(channel);
     return VLC_SUCCESS;
 }
 
