@@ -1160,8 +1160,8 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
     var_SetInteger( mp, "vmem-pitch", pitch );
 }
 
-void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
-                                        libvlc_gl_engine_t gl_engine,
+void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_video_engine_t engine,
                                         libvlc_gl_setup_cb setup_cb,
                                         libvlc_gl_cleanup_cb cleanup_cb,
                                         libvlc_update_output_cb update_output_cb,
@@ -1177,7 +1177,7 @@ void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
     var_SetString( mp, "window", "wdummy");
 #endif
 
-    if( gl_engine == libvlc_gl_engine_gles2 )
+    if( engine == libvlc_video_engine_gles2 )
     {
         var_SetString ( mp, "vout", "gles2" );
         var_SetString ( mp, "gles2", "vgl" );

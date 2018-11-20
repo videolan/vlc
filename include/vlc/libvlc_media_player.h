@@ -425,7 +425,7 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
 /**
  * Callback prototype called to initialize user data.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
  */
@@ -435,7 +435,7 @@ typedef bool (*libvlc_gl_setup_cb)(void* opaque);
 /**
  * Callback prototype called to release user data
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_gl_cleanup_cb)(void* opaque);
@@ -443,7 +443,7 @@ typedef void (*libvlc_gl_cleanup_cb)(void* opaque);
 /**
  * Callback prototype called on video size changes
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \param width video width in pixel [IN]
  * \param height video height in pixel [IN]
  * \version LibVLC 4.0.0 or later
@@ -454,7 +454,7 @@ typedef void (*libvlc_update_output_cb)(void* opaque, unsigned width, unsigned h
 /**
  * Callback prototype called after performing drawing calls.
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \version LibVLC 4.0.0 or later
  */
 typedef void (*libvlc_gl_swap_cb)(void* opaque);
@@ -462,7 +462,7 @@ typedef void (*libvlc_gl_swap_cb)(void* opaque);
 /**
  * Callback prototype to set up the OpenGL context for rendering
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \param enter true to set the context as current, false to unset it [IN]
  * \return true on success
  * \version LibVLC 4.0.0 or later
@@ -472,7 +472,7 @@ typedef bool (*libvlc_gl_makeCurrent_cb)(void* opaque, bool enter);
 /**
  * Callback prototype to load opengl functions
  *
- * \param opaque private pointer passed to the @a libvlc_video_set_opengl_callbacks() [IN]
+ * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \param fct_name name of the opengl function to load
  * \return a pointer to the named OpenGL function the NULL otherwise
  * \version LibVLC 4.0.0 or later
@@ -480,16 +480,16 @@ typedef bool (*libvlc_gl_makeCurrent_cb)(void* opaque, bool enter);
 typedef void* (*libvlc_gl_getProcAddress_cb)(void* opaque, const char* fct_name);
 
 /**
- * Enumeration of the OpenGL engine to be used
- * can be passed to @a libvlc_video_set_opengl_callbacks
+ * Enumeration of the Video engine to be used on output.
+ * can be passed to @a libvlc_video_set_output_callbacks
  */
-typedef enum libvlc_gl_engine_t {
-    libvlc_gl_engine_opengl,
-    libvlc_gl_engine_gles2
-} libvlc_gl_engine_t;
+typedef enum libvlc_video_engine_t {
+    libvlc_video_engine_opengl,
+    libvlc_video_engine_gles2,
+} libvlc_video_engine_t;
 
 /**
- * Set callbacks and data to render decoded video to a custom OpenGL texture
+ * Set callbacks and data to render decoded video to a custom texture
  *
  * \warning VLC will perform video rendering in its own thread and at its own rate,
  * You need to provide your own synchronisation mechanism.
@@ -497,7 +497,7 @@ typedef enum libvlc_gl_engine_t {
  * OpenGL context need to be created before playing a media.
  *
  * \param mp the media player
- * \param gl_engine the OpenGL engine to use
+ * \param engine the GPU engine to use
  * \param setup_cb callback called to initialize user data
  * \param cleanup_cb callback called to clean up user data
  * \param update_output_cb callback called to get the size of the video
@@ -508,8 +508,8 @@ typedef enum libvlc_gl_engine_t {
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API
-void libvlc_video_set_opengl_callbacks( libvlc_media_player_t *mp,
-                                        libvlc_gl_engine_t gl_engine,
+void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_video_engine_t engine,
                                         libvlc_gl_setup_cb setup_cb,
                                         libvlc_gl_cleanup_cb cleanup_cb,
                                         libvlc_update_output_cb update_output_cb,
