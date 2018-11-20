@@ -795,7 +795,7 @@ static int ChangeKeyCallback( vlc_object_t *p_this, char const *psz_cmd,
     int ret;
 
     vlc_mutex_lock(&p_sys->csa_lock);
-    ret = csa_SetCW(p_this, p_sys->csa, newval.psz_string, !!(intptr_t)p_data);
+    ret = csa_SetCW(p_this, p_sys->csa, newval.psz_string, p_data != NULL);
     vlc_mutex_unlock(&p_sys->csa_lock);
 
     return ret;
