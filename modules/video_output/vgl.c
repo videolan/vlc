@@ -113,13 +113,13 @@ static int Open(vlc_object_t *object)
     if( !sys )
         return VLC_ENOMEM;
 
-    sys->opaque = var_InheritAddress(gl, "vgl-opaque");
-    sys->setupCb = var_InheritAddress(gl, "vgl-setup-cb");
-    sys->cleanupCb = var_InheritAddress(gl, "vgl-cleanup-cb");
+    sys->opaque = var_InheritAddress(gl, "vout-cb-opaque");
+    sys->setupCb = var_InheritAddress(gl, "vout-cb-setup");
+    sys->cleanupCb = var_InheritAddress(gl, "vout-cb-cleanup");
     sys->resizeCb = var_InheritAddress(gl, "vout-cb-update-output");
-    SET_CALLBACK_ADDR(sys->swapCb, "vgl-swap-cb");
-    SET_CALLBACK_ADDR(sys->makeCurrentCb, "vgl-make-current-cb");
-    SET_CALLBACK_ADDR(sys->getProcAddressCb, "vgl-get-proc-address-cb");
+    SET_CALLBACK_ADDR(sys->swapCb, "vout-cb-swap");
+    SET_CALLBACK_ADDR(sys->makeCurrentCb, "vout-cb-make-current");
+    SET_CALLBACK_ADDR(sys->getProcAddressCb, "vout-cb-get-proc-address");
 
     gl->makeCurrent = MakeCurrent;
     gl->releaseCurrent = ReleaseCurrent;

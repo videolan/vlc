@@ -429,7 +429,7 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
  * \return true on success
  * \version LibVLC 4.0.0 or later
  */
-typedef bool (*libvlc_gl_setup_cb)(void* opaque);
+typedef bool (*libvlc_video_setup_cb)(void* opaque);
 
 
 /**
@@ -438,7 +438,7 @@ typedef bool (*libvlc_gl_setup_cb)(void* opaque);
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_gl_cleanup_cb)(void* opaque);
+typedef void (*libvlc_video_cleanup_cb)(void* opaque);
 
 /**
  * Callback prototype called on video size changes
@@ -448,7 +448,7 @@ typedef void (*libvlc_gl_cleanup_cb)(void* opaque);
  * \param height video height in pixel [IN]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_update_output_cb)(void* opaque, unsigned width, unsigned height);
+typedef void (*libvlc_video_update_output_cb)(void* opaque, unsigned width, unsigned height);
 
 
 /**
@@ -457,7 +457,7 @@ typedef void (*libvlc_update_output_cb)(void* opaque, unsigned width, unsigned h
  * \param opaque private pointer passed to the @a libvlc_video_set_output_callbacks() [IN]
  * \version LibVLC 4.0.0 or later
  */
-typedef void (*libvlc_gl_swap_cb)(void* opaque);
+typedef void (*libvlc_video_swap_cb)(void* opaque);
 
 /**
  * Callback prototype to set up the OpenGL context for rendering
@@ -467,7 +467,7 @@ typedef void (*libvlc_gl_swap_cb)(void* opaque);
  * \return true on success
  * \version LibVLC 4.0.0 or later
  */
-typedef bool (*libvlc_gl_makeCurrent_cb)(void* opaque, bool enter);
+typedef bool (*libvlc_video_makeCurrent_cb)(void* opaque, bool enter);
 
 /**
  * Callback prototype to load opengl functions
@@ -477,7 +477,7 @@ typedef bool (*libvlc_gl_makeCurrent_cb)(void* opaque, bool enter);
  * \return a pointer to the named OpenGL function the NULL otherwise
  * \version LibVLC 4.0.0 or later
  */
-typedef void* (*libvlc_gl_getProcAddress_cb)(void* opaque, const char* fct_name);
+typedef void* (*libvlc_video_getProcAddress_cb)(void* opaque, const char* fct_name);
 
 /**
  * Enumeration of the Video engine to be used on output.
@@ -510,12 +510,12 @@ typedef enum libvlc_video_engine_t {
 LIBVLC_API
 void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
-                                        libvlc_gl_setup_cb setup_cb,
-                                        libvlc_gl_cleanup_cb cleanup_cb,
-                                        libvlc_update_output_cb update_output_cb,
-                                        libvlc_gl_swap_cb swap_cb,
-                                        libvlc_gl_makeCurrent_cb makeCurrent_cb,
-                                        libvlc_gl_getProcAddress_cb getProcAddress_cb,
+                                        libvlc_video_setup_cb setup_cb,
+                                        libvlc_video_cleanup_cb cleanup_cb,
+                                        libvlc_video_update_output_cb update_output_cb,
+                                        libvlc_video_swap_cb swap_cb,
+                                        libvlc_video_makeCurrent_cb makeCurrent_cb,
+                                        libvlc_video_getProcAddress_cb getProcAddress_cb,
                                         void* opaque );
 
 /**
