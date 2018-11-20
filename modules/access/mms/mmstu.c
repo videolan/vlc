@@ -595,9 +595,7 @@ static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
 #define GETUTF16( fmt, size ) \
 do \
 { \
-    if( (UINT32_MAX == size) || \
-        ((uintptr_t) p / sizeof(uint16_t) < size) || \
-       ((UINTPTR_MAX - (uintptr_t) p_cmdend) / sizeof(uint16_t)) < size )\
+    if( (p_cmdend - p) / 2 < (size) ) \
     {\
         var_buffer_free( &buffer );\
         MMSClose( p_access );\
