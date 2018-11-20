@@ -1,0 +1,11 @@
+--- jpeg/Makefile.am.old	2018-11-20 16:49:53.187918820 +0100
++++ jpeg/Makefile.am	2018-11-20 16:49:55.179918813 +0100
+@@ -76,7 +76,7 @@
+ endif
+ 
+ # Executables to build
+-bin_PROGRAMS = cjpeg djpeg jpegtran rdjpgcom wrjpgcom
++EXTRA_PROGRAMS = cjpeg djpeg jpegtran rdjpgcom wrjpgcom
+ 
+ # Executable sources & libs
+ cjpeg_SOURCES    = cjpeg.c rdppm.c rdgif.c rdtarga.c rdrle.c rdbmp.c \
