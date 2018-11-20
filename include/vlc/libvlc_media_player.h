@@ -504,10 +504,11 @@ typedef enum libvlc_video_engine_t {
  * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL)
  * \param getProcAddress_cb opengl function loading callback (cannot be NULL)
  * \param opaque private pointer passed to callbacks
+ * \libvlc_return_bool
  * \version LibVLC 4.0.0 or later
  */
 LIBVLC_API
-void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
+int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_setup_cb setup_cb,
                                         libvlc_video_cleanup_cb cleanup_cb,

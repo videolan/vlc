@@ -1160,7 +1160,7 @@ void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
     var_SetInteger( mp, "vmem-pitch", pitch );
 }
 
-void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
+int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_engine_t engine,
                                         libvlc_video_setup_cb setup_cb,
                                         libvlc_video_cleanup_cb cleanup_cb,
@@ -1182,11 +1182,13 @@ void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
         var_SetString ( mp, "vout", "gles2" );
         var_SetString ( mp, "gles2", "vgl" );
     }
-    else
+    else if( engine == libvlc_video_engine_opengl )
     {
         var_SetString ( mp, "vout", "gl" );
         var_SetString ( mp, "gl", "vgl");
     }
+    else
+        return 0;
 
     var_SetAddress( mp, "vout-cb-opaque", opaque );
     var_SetAddress( mp, "vout-cb-setup", setup_cb );
@@ -1195,6 +1197,7 @@ void libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
     var_SetAddress( mp, "vout-cb-swap", swap_cb );
     var_SetAddress( mp, "vout-cb-get-proc-address", getProcAddress_cb );
     var_SetAddress( mp, "vout-cb-make-current", makeCurrent_cb );
+    return 1;
 }
 
 
