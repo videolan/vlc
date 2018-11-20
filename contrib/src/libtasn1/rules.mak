@@ -14,12 +14,11 @@ $(TARBALLS)/libtasn1-$(LIBTASN1_VERSION).tar.gz:
 
 libtasn1: libtasn1-$(LIBTASN1_VERSION).tar.gz .sum-libtasn1
 	$(UNPACK)
-ifdef HAVE_WINSTORE
-	$(APPLY) $(SRC)/libtasn1/no-benchmark.patch
-endif
+	$(APPLY) $(SRC)/libtasn1/no-executables.patch
 	$(MOVE)
 
 .libtasn1: libtasn1
+	$(RECONF)
 	cd $< && $(HOSTVARS) ./configure $(HOSTCONF) --disable-doc
 	cd $< && $(MAKE) install
 	touch $@
