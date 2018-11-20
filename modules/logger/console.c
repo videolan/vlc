@@ -33,6 +33,7 @@
 
 static const int ptr_width = 2 * /* hex digits */ sizeof (uintptr_t);
 static const char msg_type[4][9] = { "", " error", " warning", " debug" };
+static char verbosities[VLC_MSG_DBG];
 
 #ifdef __OS2__
 #include <vlc_charset.h>
@@ -74,7 +75,7 @@ static void LogConsoleColor(void *opaque, int type, const vlc_log_t *meta,
                             const char *format, va_list ap)
 {
     FILE *stream = stderr;
-    int verbose = (intptr_t)opaque;
+    int verbose = (char *)opaque - verbosities;
 
     if (verbose < type)
         return;
@@ -105,7 +106,7 @@ static void LogConsoleGray(void *opaque, int type, const vlc_log_t *meta,
                            const char *format, va_list ap)
 {
     FILE *stream = stderr;
-    int verbose = (intptr_t)opaque;
+    int verbose = (char *)opaque - verbosities;
 
     if (verbose < type)
         return;
@@ -130,7 +131,8 @@ static const struct vlc_logger_operations gray_ops =
     NULL
 };
 
-static const struct vlc_logger_operations *Open(vlc_object_t *obj, void **sysp)
+static const struct vlc_logger_operations *Open(vlc_object_t *obj,
+                                                void **restrict sysp)
 {
     int verbosity = -1;
 
@@ -147,7 +149,10 @@ static const struct vlc_logger_operations *Open(vlc_object_t *obj, void **sysp)
         return NULL;
 
     verbosity += VLC_MSG_ERR;
-    *sysp = (void *)(uintptr_t)verbosity;
+    if (verbosity > VLC_MSG_DBG)
+        verbosity = VLC_MSG_DBG;
+
+    *sysp = verbosities + verbosity;
 
 #if defined (HAVE_ISATTY) && !defined (_WIN32)
     if (isatty(STDERR_FILENO) && var_InheritBool(obj, "color"))
