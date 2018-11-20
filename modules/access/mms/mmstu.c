@@ -592,7 +592,9 @@ static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
     p = p_sys->p_cmd + MMS_CMD_HEADERSIZE + 48;
     p_cmdend = &p_sys->p_cmd[p_sys->i_cmd];
 
-#define GETUTF16( psz, size ) \
+#define GETUTF16( fmt, size ) \
+do \
+{ \
     if( (UINT32_MAX == size) || \
         ((uintptr_t) p / sizeof(uint16_t) < size) || \
        ((UINTPTR_MAX - (uintptr_t) p_cmdend) / sizeof(uint16_t)) < size )\
@@ -601,20 +603,20 @@ static int MMSOpen( stream_t  *p_access, vlc_url_t *p_url, int  i_proto )
         MMSClose( p_access );\
         return VLC_EBADVAR;\
     }\
-    (psz) = FromCharset( "UTF-16LE", p, (size) * 2 ); \
-    p += (size) * 2
+    char *str = FromCharset( "UTF-16LE", p, (size) * 2 ); \
+    p += (size) * 2; \
+    if( str != NULL ) \
+    { \
+        msg_Dbg( p_access, fmt " %s", str ); \
+        free( str ); \
+    } \
+} while (0)
 
-    GETUTF16( p_sys->psz_server_version, i_server_version );
-    GETUTF16( p_sys->psz_tool_version, i_tool_version );
-    GETUTF16( p_sys->psz_update_player_url, i_update_player_url );
-    GETUTF16( p_sys->psz_encryption_type, i_encryption_type );
+    GETUTF16( "server version:   ", i_server_version );
+    GETUTF16( "tool version:     ", i_tool_version );
+    GETUTF16( "update player URL:", i_update_player_url );
+    GETUTF16( "encryption type:  ", i_encryption_type );
 #undef GETUTF16
-    msg_Dbg( p_access,
-             "0x01 --> server_version:\"%s\" tool_version:\"%s\" update_player_url:\"%s\" encryption_type:\"%s\"",
-             p_sys->psz_server_version,
-             p_sys->psz_tool_version,
-             p_sys->psz_update_player_url,
-             p_sys->psz_encryption_type );
 
     /* *** should make an 18 command to make data timing *** */
 
@@ -991,11 +993,6 @@ static void MMSClose( stream_t  *p_access )
     FREENULL( p_sys->p_media );
     FREENULL( p_sys->p_header );
     p_sys->i_header = 0;
-
-    FREENULL( p_sys->psz_server_version );
-    FREENULL( p_sys->psz_tool_version );
-    FREENULL( p_sys->psz_update_player_url );
-    FREENULL( p_sys->psz_encryption_type );
 }
 
 /****************************************************************************

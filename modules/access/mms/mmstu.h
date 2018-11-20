@@ -79,12 +79,6 @@ typedef struct
     /* extracted information */
     int         i_command;
 
-    /* from 0x01 answer (not yet set) */
-    char        *psz_server_version;
-    char        *psz_tool_version;
-    char        *psz_update_player_url;
-    char        *psz_encryption_type;
-
     /* from 0x06 answer */
     uint32_t    i_flags_broadcast;
     uint32_t    i_media_length;
