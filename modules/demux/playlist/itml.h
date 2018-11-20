@@ -32,8 +32,7 @@
 
 #define SIMPLE_INTERFACE  (track_elem_t    *p_track,\
                            const char      *psz_name,\
-                           char            *psz_value,\
-                           void            *opaque)
+                           char            *psz_value)
 #define COMPLEX_INTERFACE (stream_t        *p_demux,\
                            input_item_node_t    *p_input_node,\
                            track_elem_t    *p_track,\
