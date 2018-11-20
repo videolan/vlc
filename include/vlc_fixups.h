@@ -90,6 +90,7 @@ typedef struct
 
 #if !defined (HAVE_ALIGNED_ALLOC) || \
     !defined (HAVE_MEMRCHR) || \
+    !defined (HAVE_QSORT_R) || \
     !defined (HAVE_STRLCPY) || \
     !defined (HAVE_STRNDUP) || \
     !defined (HAVE_STRNLEN) || \
@@ -221,6 +222,11 @@ long long atoll (const char *);
 
 #ifndef HAVE_LLDIV
 lldiv_t lldiv (long long, long long);
+#endif
+
+#ifndef HAVE_QSORT_R
+void (qsort_r)(void *, size_t, size_t,
+               int (*)(const void *, const void *, void *), void *);
 #endif
 
 #ifndef HAVE_STRTOF
