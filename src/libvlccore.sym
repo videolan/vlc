@@ -188,6 +188,7 @@ input_item_Hold
 input_item_Release
 input_item_node_AppendItem
 input_item_node_AppendNode
+input_item_node_RemoveNode
 input_item_node_Create
 input_item_node_Delete
 input_item_ReplaceInfos

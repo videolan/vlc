@@ -218,8 +218,8 @@ VLC_API void input_item_node_AppendNode( input_item_node_t *p_parent, input_item
 /**
  * Remove a node from its parent.
  */
-void input_item_node_RemoveNode( input_item_node_t *parent,
-                                 input_item_node_t *child );
+VLC_API void input_item_node_RemoveNode( input_item_node_t *parent,
+                                         input_item_node_t *child );
 
 /**
  * Delete a node created with input_item_node_Create() and all its children.
