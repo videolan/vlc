@@ -1,0 +1,65 @@
+From e9849895aeb378a59e6cc545540c8b8eecba7fba Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Hugo=20Beauz=C3=A9e-Luyssen?= <hugo@beauzee.fr>
+Date: Wed, 21 Nov 2018 13:27:12 +0100
+Subject: [PATCH] compat: Fix pipe compat function
+
+The compatibility function was never built since we were forcing
+HAVE_PIPE in compat.h
+---
+ Makefile.am     |  2 +-
+ compat/compat.c | 11 -----------
+ compat/compat.h |  6 +++++-
+ 3 files changed, 6 insertions(+), 13 deletions(-)
+ delete mode 100644 compat/compat.c
+
+diff --git a/Makefile.am b/Makefile.am
+index 5c191cf..6dde7bc 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -88,7 +88,7 @@ libdsm_la_SOURCES = \
+     src/smb_utils.c
+ 
+ noinst_LTLIBRARIES = libcompat.la
+-libcompat_la_SOURCES = compat/compat.c
++libcompat_la_SOURCES = 
+ libcompat_la_LIBADD = $(LTLIBOBJS)
+ 
+ pkgconfigdir = $(libdir)/pkgconfig
+diff --git a/compat/compat.c b/compat/compat.c
+deleted file mode 100644
+index c3c6f9e..0000000
+--- a/compat/compat.c
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#include "config.h"
+-
+-#if !defined(HAVE_PIPE) && defined(HAVE__PIPE)
+-
+-#include <fcntl.h>
+-
+-int pipe(int fds[2])
+-{
+-    return _pipe(fds, 32768, O_NOINHERIT | O_BINARY);
+-}
+-#endif
+diff --git a/compat/compat.h b/compat/compat.h
+index 50b102c..4eef355 100644
+--- a/compat/compat.h
++++ b/compat/compat.h
+@@ -66,8 +66,12 @@ char *strndup(const char *str, size_t n);
+ #endif
+ 
+ #if !defined(HAVE_PIPE) && defined(HAVE__PIPE)
++#include <fcntl.h>
+ #define HAVE_PIPE
+-int pipe(int fds[2]);
++static inline int pipe(int fds[2])
++{
++    return _pipe(fds, 32768, O_NOINHERIT | O_BINARY);
++}
+ #endif
+ 
+ #ifndef _WIN32
+-- 
+2.19.1
+
