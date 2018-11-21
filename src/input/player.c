@@ -3525,6 +3525,7 @@ vlc_player_New(vlc_object_t *parent,
     VAR_CREATE("rate", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     VAR_CREATE("sub-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT);
     VAR_CREATE("sub-text-scale", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT);
+    VAR_CREATE("demux-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     /* vout variables */
     VAR_CREATE("video-splitter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
@@ -3536,10 +3537,12 @@ vlc_player_New(vlc_object_t *parent,
     VAR_CREATE("video-wallpaper", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
     /* aout variables */
+    VAR_CREATE("audio-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("mute", VLC_VAR_BOOL);
     VAR_CREATE("corks", VLC_VAR_INTEGER);
 
     /* es_out variables */
+    VAR_CREATE("sout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
     VAR_CREATE("video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("sout-video", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     VAR_CREATE("audio", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
