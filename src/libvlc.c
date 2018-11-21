@@ -362,6 +362,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         free( psz_val );
     }
 
+    /* Callbacks between interfaces */
+
+    /* Create a variable for showing the right click menu */
+    var_Create(p_libvlc, "intf-popupmenu", VLC_VAR_BOOL);
+
+    /* Create a variable for showing the fullscreen interface */
+    var_Create(p_libvlc, "intf-toggle-fscontrol", VLC_VAR_VOID);
+
+    /* Create a variable for the Boss Key */
+    var_Create(p_libvlc, "intf-boss", VLC_VAR_VOID);
+
+    /* Create a variable for showing the main interface */
+    var_Create(p_libvlc, "intf-show", VLC_VAR_VOID);
+
     return VLC_SUCCESS;
 
 error:
