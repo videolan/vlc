@@ -112,6 +112,7 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
         media_stopped_action = VLC_PLAYER_MEDIA_STOPPED_CONTINUE;
 
     bool start_paused = var_InheritBool(obj, "start-paused");
+    bool playlist_cork = var_InheritBool(obj, "playlist-cork");
 
     vlc_playlist_Lock(playlist);
     vlc_playlist_SetPlaybackOrder(playlist, order);
@@ -123,6 +124,7 @@ PlaylistConfigureFromVariables(vlc_playlist_t *playlist, vlc_object_t *obj)
      * implementation detail */
     vlc_player_SetMediaStoppedAction(player, media_stopped_action);
     vlc_player_SetStartPaused(player, start_paused);
+    vlc_player_SetPauseOnCork(player, playlist_cork);
 
     vlc_playlist_Unlock(playlist);
 }
