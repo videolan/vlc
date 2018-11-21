@@ -3301,11 +3301,10 @@ vlc_player_VoutOSDCallback(vlc_object_t *this, const char *var,
             vouts_osd_Message(&vout, 1, _("Zooming reset"));
         else
         {
-            char const *fmt = _("Zoom: x%f");
             bool found =  vout_osd_PrintVariableText(vout, var, VLC_VAR_FLOAT,
-                                                     newval, fmt);
+                                                     newval, _("Zoom mode: %s"));
             if (!found)
-                vouts_osd_Message(&vout, 1, fmt, newval.f_float);
+                vouts_osd_Message(&vout, 1, _("Zoom: x%f"), newval.f_float);
         }
     }
 
