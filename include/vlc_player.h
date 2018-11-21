@@ -332,7 +332,6 @@ enum vlc_player_subtitle_sync
  */
 enum vlc_vout_filter_type
 {
-    VLC_VOUT_FILTER_VIDEO_SPLITTER,
     VLC_VOUT_FILTER_VIDEO_FILTER,
     VLC_VOUT_FILTER_SUB_SOURCE,
     VLC_VOUT_FILTER_SUB_FILTER,
@@ -2445,6 +2444,15 @@ vlc_player_GetStatistics(vlc_player_t *player);
  */
 VLC_API void
 vlc_player_SetPauseOnCork(vlc_player_t *player, bool enabled);
+
+/**
+ * Set a video splitter to the main vout
+ *
+ * @param player locked instance
+ * @param splitter a video splitter name or NULL
+ */
+VLC_API void
+vlc_player_SetVideoSplitter(vlc_player_t *player, const char *splitter);
 
 /**
  * Get the audio output

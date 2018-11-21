@@ -3353,6 +3353,30 @@ vlc_player_vout_TriggerOption(vlc_player_t *player, const char *option)
 }
 
 void
+vlc_player_SetVideoSplitter(vlc_player_t *player, const char *splitter)
+{
+    if (config_GetType("video-splitter") == 0)
+        return;
+    struct vlc_player_input *input = vlc_player_get_input_locked(player);
+    if (!input)
+        return;
+
+    vout_thread_t *vout = vlc_player_vout_Hold(player);
+    var_SetString(vout, "video-splitter", splitter);
+    vout_Release(vout);
+
+    /* FIXME vout cannot handle live video splitter change, restart the main
+     * vout manually by restarting the first video es */
+    struct vlc_player_track *track;
+    vlc_vector_foreach(track, &input->video_track_vector)
+        if (track->selected)
+        {
+            vlc_player_RestartTrack(player, track->es_id);
+            break;
+        }
+}
+
+void
 vlc_player_vout_SetFullscreen(vlc_player_t *player, bool enabled)
 {
     vlc_player_vout_SetVar(player, "fullscreen", VLC_VAR_BOOL,
@@ -3379,8 +3403,6 @@ vlc_vout_filter_type_to_varname(enum vlc_vout_filter_type type)
 {
     switch (type)
     {
-        case VLC_VOUT_FILTER_VIDEO_SPLITTER:
-            return config_GetType("video-splitter") ? "video-splitter" : NULL;
         case VLC_VOUT_FILTER_VIDEO_FILTER:
             return "video-filter";
         case VLC_VOUT_FILTER_SUB_SOURCE:
