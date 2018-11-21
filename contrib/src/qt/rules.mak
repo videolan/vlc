@@ -95,14 +95,6 @@ ifdef HAVE_WIN32
 	# Fix Qt5Widget.pc file to include qwindowsvistastyle before Qt5Widget, as it depends on it
 	cd $(PREFIX)/lib/pkgconfig; sed -i.orig -e 's/ -lQt5Widget/ -lqwindowsvistastyle -lQt5Widget/' Qt5Widgets.pc
 endif
-ifdef HAVE_CROSS_COMPILE
-	# Building Qt build tools for Xcompilation
-	cd $</include/QtCore; $(LN_S)f $(QT_VERSION)/QtCore/private private
-	cd $<; $(MAKE) -C qmake
+	# Install a qmake with correct paths set
 	cd $<; $(MAKE) sub-qmake-qmake-aux-pro-install_subtargets install_mkspecs
-	cd $</src/tools; \
-	for i in bootstrap uic rcc moc; \
-		do (cd $$i; echo $$i && ../../../bin/qmake -spec $(QT_SPEC) QMAKE_RC=$(HOST)-windres && $(MAKE) clean && $(MAKE) CC=$(HOST)-gcc CXX=$(HOST)-g++ LINKER=$(HOST)-g++ LIB="$(HOST)-ar -rc" && $(MAKE) install); \
-	done
-endif
 	touch $@
