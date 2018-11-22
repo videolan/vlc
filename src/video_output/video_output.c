@@ -1115,7 +1115,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
                                       subpicture_chromas, &fmt_spu_rot,
                                       &vd->source,
                                       render_subtitle_date, render_osd_date,
-                                      do_snapshot);
+                                      do_snapshot,
+                                      vd->info.can_scale_spu);
     /*
      * Perform rendering
      *

@@ -1010,7 +1010,8 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
                                           const video_format_t *fmt_dst,
                                           const video_format_t *fmt_src,
                                           vlc_tick_t render_subtitle_date,
-                                          vlc_tick_t render_osd_date)
+                                          vlc_tick_t render_osd_date,
+                                          bool external_scale)
 {
     spu_private_t *sys = spu->p;
 
@@ -1114,14 +1115,33 @@ static subpicture_t *SpuRenderSubpictures(spu_t *spu,
             if (scale.w <= 0 || scale.h <= 0)
                 continue;
 
+            const bool do_external_scale = external_scale && region->fmt.i_chroma != VLC_CODEC_TEXT;
+            spu_scale_t virtual_scale = external_scale ? (spu_scale_t){ SCALE_UNIT, SCALE_UNIT } : scale;
+
             /* */
             SpuRenderRegion(spu, output_last_ptr, &area,
-                            subpic, region, scale,
+                            subpic, region, virtual_scale,
                             chroma_list, fmt_dst,
                             subtitle_area, subtitle_area_count,
                             subpic->b_subtitle ? render_subtitle_date : render_osd_date);
             if (*output_last_ptr)
+            {
+                if (do_external_scale)
+                {
+                    if (scale.h != SCALE_UNIT)
+                    {
+                        (*output_last_ptr)->zoom_h.num = scale.h;
+                        (*output_last_ptr)->zoom_h.den = SCALE_UNIT;
+                    }
+                    if (scale.w != SCALE_UNIT)
+                    {
+                        (*output_last_ptr)->zoom_v.num = scale.w;
+                        (*output_last_ptr)->zoom_v.den = SCALE_UNIT;
+                    }
+                }
+
                 output_last_ptr = &(*output_last_ptr)->p_next;
+            }
 
             if (subpic->b_subtitle) {
                 area = spu_area_unscaled(area, scale);
@@ -1512,7 +1532,8 @@ subpicture_t *spu_Render(spu_t *spu,
                          const video_format_t *fmt_src,
                          vlc_tick_t render_subtitle_date,
                          vlc_tick_t render_osd_date,
-                         bool ignore_osd)
+                         bool ignore_osd,
+                         bool external_scale)
 {
     spu_private_t *sys = spu->p;
 
@@ -1596,7 +1617,8 @@ subpicture_t *spu_Render(spu_t *spu,
                                                 fmt_dst,
                                                 fmt_src,
                                                 render_subtitle_date,
-                                                render_osd_date);
+                                                render_osd_date,
+                                                external_scale);
     vlc_mutex_unlock(&sys->lock);
 
     return render;
