@@ -388,6 +388,7 @@ static int Open(vlc_object_t *object)
 
     vd->info.has_double_click     = true;
     vd->info.has_pictures_invalid = vd->info.is_slow;
+    vd->info.can_scale_spu        = true;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
         sys->regionQuad.textureFormat != NULL)
@@ -1781,6 +1782,17 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
         spuViewport.top    = sys->sys.rect_dest.top  + (FLOAT) r->i_y * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
         spuViewport.right  = sys->sys.rect_dest.left + (FLOAT) (r->i_x + r->fmt.i_visible_width)  * RECTWidth(sys->sys.rect_dest)  / subpicture->i_original_picture_width;
         spuViewport.bottom = sys->sys.rect_dest.top  + (FLOAT) (r->i_y + r->fmt.i_visible_height) * RECTHeight(sys->sys.rect_dest) / subpicture->i_original_picture_height;
+
+        if (r->zoom_h.num != 0 && r->zoom_h.den != 0)
+        {
+            spuViewport.left   = (FLOAT) spuViewport.left   * r->zoom_h.num / r->zoom_h.den;
+            spuViewport.right  = (FLOAT) spuViewport.right  * r->zoom_h.num / r->zoom_h.den;
+        }
+        if (r->zoom_v.num != 0 && r->zoom_v.den != 0)
+        {
+            spuViewport.top    = (FLOAT) spuViewport.top    * r->zoom_v.num / r->zoom_v.den;
+            spuViewport.bottom = (FLOAT) spuViewport.bottom * r->zoom_v.num / r->zoom_v.den;
+        }
 
         D3D11_UpdateViewport( quad, &spuViewport, sys->display.pixelFormat );
 
