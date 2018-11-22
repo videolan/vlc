@@ -26,6 +26,7 @@ libshout: libshout-$(SHOUT_VERSION).tar.gz .sum-shout
 	$(APPLY) $(SRC)/shout/shout-strings.patch
 	$(APPLY) $(SRC)/shout/shout-timeval.patch
 	$(APPLY) $(SRC)/shout/shout-win32-socklen.patch
+	$(APPLY) $(SRC)/shout/no-examples.patch
 	$(call pkg_static,"shout.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
