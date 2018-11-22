@@ -74,6 +74,9 @@ struct subpicture_region_t
     int             i_max_width;     /** horizontal rendering/cropping target/limit */
     int             i_max_height;    /** vertical rendering/cropping target/limit */
 
+    vlc_rational_t  zoom_h;
+    vlc_rational_t  zoom_v;
+
     subpicture_region_t *p_next;                /**< next region in the list */
     subpicture_region_private_t *p_private;  /**< Private data for spu_t *only* */
 };
