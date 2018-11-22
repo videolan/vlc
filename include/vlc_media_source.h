@@ -23,6 +23,7 @@
 
 #include <vlc_common.h>
 #include <vlc_input_item.h>
+#include <vlc_services_discovery.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -228,6 +229,59 @@ vlc_media_source_provider_Get(libvlc_int_t *);
 VLC_API vlc_media_source_t *
 vlc_media_source_provider_GetMediaSource(vlc_media_source_provider_t *,
                                          const char *name);
+
+/**
+ * Structure containing the description of a media source.
+ */
+struct vlc_media_source_meta
+{
+    char *name;
+    char *longname;
+    enum services_discovery_category_e category;
+};
+
+/** List of media source metadata (opaque). */
+typedef struct vlc_media_source_meta_list vlc_media_source_meta_list_t;
+
+/**
+ * Return the list of metadata of available media sources.
+ *
+ * If category is not 0, then only media sources for the requested category are
+ * listed.
+ *
+ * The result must be deleted by vlc_media_source_meta_list_Delete() (if not
+ * null).
+ *
+ * Return NULL either on error or on empty list (this is due to the behavior
+ * of the underlying vlc_sd_GetNames()).
+ *
+ * \param provider the media source provider
+ * \param category the category to list (0 for all)
+ */
+VLC_API vlc_media_source_meta_list_t *
+vlc_media_source_provider_List(vlc_media_source_provider_t *,
+                               enum services_discovery_category_e category);
+
+/**
+ * Return the number of items in the list.
+ */
+VLC_API size_t
+vlc_media_source_meta_list_Count(vlc_media_source_meta_list_t *);
+
+/**
+ * Return the item at index.
+ */
+VLC_API struct vlc_media_source_meta *
+vlc_media_source_meta_list_Get(vlc_media_source_meta_list_t *, size_t index);
+
+/**
+ * Delete the list.
+ *
+ * Any struct vlc_media_source_meta retrieved from this list become invalid
+ * after this call.
+ */
+VLC_API void
+vlc_media_source_meta_list_Delete(vlc_media_source_meta_list_t *);
 
 /** @} */
 

@@ -28,6 +28,7 @@
 #include <vlc_atomic.h>
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
+#include <vlc_vector.h>
 #include "libvlc.h"
 #include "media_tree.h"
 
@@ -271,4 +272,84 @@ vlc_media_source_provider_GetMediaSource(vlc_media_source_provider_t *provider,
     vlc_mutex_unlock(&provider->lock);
 
     return ms;
+}
+
+struct vlc_media_source_meta_list
+{
+    struct VLC_VECTOR(struct vlc_media_source_meta) vec;
+};
+
+struct vlc_media_source_meta_list *
+vlc_media_source_provider_List(vlc_media_source_provider_t *provider,
+                               enum services_discovery_category_e category)
+{
+    char **longnames;
+    int *categories;
+    char **names = vlc_sd_GetNames(provider, &longnames, &categories);
+    if (!names)
+        /* vlc_sd_GetNames() returns NULL both on error or no result */
+        return NULL;
+
+    struct vlc_media_source_meta_list *list = malloc(sizeof(*list));
+    if (unlikely(!list))
+        return NULL;
+
+    vlc_vector_init(&list->vec);
+    for (size_t i = 0; names[i]; ++i)
+    {
+        if (category && categories[i] != (int) category)
+        {
+            free(names[i]);
+            free(longnames[i]);
+            /* only list items for the requested category */
+            continue;
+        }
+
+        struct vlc_media_source_meta meta = {
+            .name = names[i],
+            .longname = longnames[i],
+            .category = categories[i],
+        };
+        bool ok = vlc_vector_push(&list->vec, meta);
+        if (unlikely(!ok)) {
+            /* failure, clean up */
+            for (char **p = names; *p; ++p)
+                free(*p);
+            for (char **p = longnames; *p; ++p)
+                free(*p);
+            vlc_vector_destroy(&list->vec);
+            free(list);
+            list = NULL;
+            break;
+        }
+    }
+
+    free(names);
+    free(longnames);
+    free(categories);
+
+    return list;
+}
+
+size_t
+vlc_media_source_meta_list_Count(vlc_media_source_meta_list_t *list)
+{
+    return list->vec.size;
+}
+
+struct vlc_media_source_meta *
+vlc_media_source_meta_list_Get(vlc_media_source_meta_list_t *list, size_t index)
+{
+    return &list->vec.data[index];
+}
+
+void
+vlc_media_source_meta_list_Delete(vlc_media_source_meta_list_t *list) {
+    for (size_t i = 0; i < list->vec.size; ++i)
+    {
+        free(list->vec.data[i].name);
+        free(list->vec.data[i].longname);
+    }
+    vlc_vector_destroy(&list->vec);
+    free(list);
 }
