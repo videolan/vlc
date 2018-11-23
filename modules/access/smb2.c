@@ -594,17 +594,6 @@ Open(vlc_object_t *p_obj)
         goto error;
     sys->encoded_url.i_port = 0;
 
-    char *resolved_host = vlc_smb2_resolve(access, sys->encoded_url.psz_host,
-                                           CIFS_PORT);
-    if (resolved_host)
-    {
-        free(sys->encoded_url.psz_host);
-        sys->encoded_url.psz_host = resolved_host;
-    }
-
-    if (sys->encoded_url.psz_path == NULL)
-        sys->encoded_url.psz_path = (char *) "/";
-
     sys->smb2 = smb2_init_context();
     if (sys->smb2 == NULL)
     {
@@ -612,9 +601,24 @@ Open(vlc_object_t *p_obj)
         goto error;
     }
 
+    if (sys->encoded_url.psz_path == NULL)
+        sys->encoded_url.psz_path = (char *) "/";
+
+    char *resolved_host = vlc_smb2_resolve(access, sys->encoded_url.psz_host,
+                                           CIFS_PORT);
+
     /* smb2_* functions need a decoded url. Re compose the url from the
      * modified sys->encoded_url (without port and with the resolved host). */
-    char *url = vlc_uri_compose(&sys->encoded_url);
+    char *url;
+    if (resolved_host != NULL)
+    {
+        vlc_url_t resolved_url = sys->encoded_url;
+        resolved_url.psz_host = resolved_host;
+        url = vlc_uri_compose(&resolved_url);
+        free(resolved_host);
+    }
+    else
+        url = vlc_uri_compose(&sys->encoded_url);
     if (!vlc_uri_decode(url))
     {
         free(url);
