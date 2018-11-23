@@ -348,7 +348,6 @@ static void resolve_callback(
             vlc_dictionary_insert( &p_sys->services_name_to_input_item,
                 name, p_input );
             services_discovery_AddItem( p_sd, p_input );
-            input_item_Release( p_input );
        }
     }
 
@@ -407,8 +406,15 @@ static void browse_callback(
             vlc_dictionary_remove_value_for_key(
                         &p_sys->services_name_to_input_item,
                         name, NULL, NULL );
+            input_item_Release( p_item );
         }
     }
+}
+
+static void clear_item( void* p_item, void* p_obj )
+{
+    VLC_UNUSED( p_obj );
+    input_item_Release( (input_item_t*)p_item );
 }
 
 /*****************************************************************************
@@ -463,7 +469,7 @@ error:
     if( p_sys->poll != NULL )
         avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item, clear_item, NULL );
     free( p_sys );
 
     return VLC_EGENERIC;
@@ -506,7 +512,7 @@ static void CloseCommon( discovery_sys_t *p_sys )
     avahi_client_free( p_sys->client );
     avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item, NULL, NULL );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item, clear_item, NULL );
     free( p_sys );
 }
 
