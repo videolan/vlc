@@ -315,11 +315,11 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
         {
             fmtin.i_chroma = image_Mime2Fourcc( psz_mime );
             free( psz_mime );
-            if( !fmtin.i_chroma )
-            {
-                /* Try to guess format from file name */
-                fmtin.i_chroma = image_Ext2Fourcc( psz_url );
-            }
+        }
+        if( !fmtin.i_chroma )
+        {
+           /* Try to guess format from file name */
+           fmtin.i_chroma = image_Ext2Fourcc( psz_url );
         }
     }
     vlc_stream_Delete( p_stream );
