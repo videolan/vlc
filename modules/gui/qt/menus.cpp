@@ -732,7 +732,7 @@ QMenu *VLCMenuBar::NavigMenu( intf_thread_t *p_intf, QMenu *menu )
     menu->addSeparator();
 
     if ( !VLCMenuBar::rendererMenu )
-        VLCMenuBar::rendererMenu = new RendererMenu( menu, p_intf );
+        VLCMenuBar::rendererMenu = new RendererMenu( NULL, p_intf );
 
     menu->addMenu( VLCMenuBar::rendererMenu );
     menu->addSeparator();
