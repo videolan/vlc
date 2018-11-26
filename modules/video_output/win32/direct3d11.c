@@ -97,6 +97,8 @@ struct vout_display_sys_t
     d3d11_device_t           d3d_dev;
     d3d_quad_t               picQuad;
 
+    ID3D11Query              *prepareWait;
+
     picture_sys_t            stagingSys;
 
     ID3D11RenderTargetView   *swapchainTargetView[D3D11_MAX_SHADER_VIEW];
@@ -931,7 +933,16 @@ static void PreparePicture(vout_display_t *vd, picture_t *picture, subpicture_t 
         }
     }
 
-    ID3D11DeviceContext_Flush(sys->d3d_dev.d3dcontext);
+    if (sys->prepareWait)
+    {
+        int maxWait = 10;
+        ID3D11DeviceContext_End(sys->d3d_dev.d3dcontext, (ID3D11Asynchronous*)sys->prepareWait);
+
+        while (S_FALSE == ID3D11DeviceContext_GetData(sys->d3d_dev.d3dcontext,
+                                                      (ID3D11Asynchronous*)sys->prepareWait, NULL, 0, 0)
+               && --maxWait)
+            SleepEx(2, TRUE);
+    }
 
     if (is_d3d11_opaque(picture->format.i_chroma))
         d3d11_device_unlock( &sys->d3d_dev );
@@ -1510,6 +1521,10 @@ static int Direct3D11CreateGenericResources(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
 
+    D3D11_QUERY_DESC query = { 0 };
+    query.Query = D3D11_QUERY_EVENT;
+    hr = ID3D11Device_CreateQuery(sys->d3d_dev.d3ddevice, &query, &sys->prepareWait);
+
     ID3D11BlendState *pSpuBlendState;
     D3D11_BLEND_DESC spuBlendDesc = { 0 };
     spuBlendDesc.RenderTarget[0].BlendEnable = TRUE;
@@ -1615,6 +1630,11 @@ static void Direct3D11DestroyResources(vout_display_t *vd)
             ID3D11RenderTargetView_Release(sys->swapchainTargetView[i]);
             sys->swapchainTargetView[i] = NULL;
         }
+    }
+    if (sys->prepareWait)
+    {
+        ID3D11Query_Release(sys->prepareWait);
+        sys->prepareWait = NULL;
     }
 
     msg_Dbg(vd, "Direct3D11 resources destroyed");
