@@ -68,7 +68,24 @@ static const char test_default_video[] = SRCDIR"/samples/image.jpg";
 static inline void test_init (void)
 {
     (void)test_default_sample; /* This one may not be used */
-    alarm (10); /* Make sure "make check" does not get stuck */
+
+    /* Make sure "make check" does not get stuck */
+    /* Timeout of 10secs by default */
+    unsigned alarm_timeout = 10;
+    /* Valid timeout value are < 0, for infinite, and > 0, for the number of
+     * seconds */
+    char *alarm_timeout_str = getenv("VLC_TEST_TIMEOUT");
+    if (alarm_timeout_str)
+    {
+        int val = atoi(alarm_timeout_str);
+        if (val <= 0)
+            alarm_timeout = 0; /* infinite */
+        else
+            alarm_timeout = val;
+    }
+    if (alarm_timeout != 0)
+        alarm (alarm_timeout);
+
     setenv( "VLC_PLUGIN_PATH", "../modules", 1 );
 }
 
