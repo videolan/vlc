@@ -539,6 +539,8 @@ ifdef HAVE_IOS
 else
 	echo "set(CMAKE_OSX_SYSROOT $(MACOSX_SDK))" >> $@
 endif
+else
+	echo "set(CMAKE_AR $(AR) CACHE FILEPATH "Archiver")" >> $@
 endif
 ifdef HAVE_CROSS_COMPILE
 	echo "set(_CMAKE_TOOLCHAIN_PREFIX $(HOST)-)" >> $@
