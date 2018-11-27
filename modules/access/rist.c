@@ -341,7 +341,7 @@ static void send_nacks(stream_t *p_access, struct rist_flow *flow)
                 if (retry_count == 0){
                     expiration = flow->reorder_buffer;
                 } else {
-                    expiration = flow->nacks_retries[idx] * flow->retry_interval;
+                    expiration = (uint64_t)flow->nacks_retries[idx] * (uint64_t)flow->retry_interval;
                 }
                 if (age > expiration && retry_count <= flow->max_retries)
                 {
