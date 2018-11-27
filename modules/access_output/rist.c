@@ -126,20 +126,25 @@ static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char 
     if (flow->fd_out < 0)
     {
         msg_Err( p_access, "cannot open output socket" );
-        return NULL;
+        goto fail;
     }
 
     flow->fd_rtcp = net_ConnectDgram(p_access, psz_dst_server, i_dst_port + 1, -1, IPPROTO_UDP );
     if (flow->fd_rtcp < 0)
     {
         msg_Err( p_access, "cannot open nack socket" );
-        return NULL;
+        goto fail;
     }
 
     populate_cname(flow->fd_rtcp, flow->cname);
     msg_Info(p_access, "our cname is %s", flow->cname);
 
     return flow;
+
+fail:
+    free(flow->buffer);
+    free(flow);
+    return NULL;
 }
 
 static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow, uint16_t seq)
