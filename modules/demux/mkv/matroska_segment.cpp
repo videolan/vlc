@@ -1216,7 +1216,6 @@ int matroska_segment_c::BlockGet( KaxBlock * & pp_block, KaxSimpleBlock * & pp_s
         {
             VLC_UNUSED( kcue );
             msg_Warn( vars.p_demuxer, "find KaxCues FIXME" );
-            throw VLC_EGENERIC;
         }
         E_CASE_DEFAULT(element)
         {
