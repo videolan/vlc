@@ -112,6 +112,10 @@ DialogsProvider::~DialogsProvider()
     delete videoPopupMenu;
     delete audioPopupMenu;
     delete miscPopupMenu;
+
+    /* free parentless menus  */
+    VLCMenuBar::freeRecentsMenu();
+    VLCMenuBar::freeRendererMenu();
 }
 
 QString DialogsProvider::getSaveFileName( QWidget *parent,

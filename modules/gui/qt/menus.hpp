@@ -84,6 +84,10 @@ public:
     static void updateSystrayMenu( MainInterface *, intf_thread_t  *,
                                    bool b_force_visible = false);
 
+    /* destructor for parentless Menus (kept in static variables) */
+    static void freeRendererMenu(){ delete rendererMenu; rendererMenu = NULL; }
+    static void freeRecentsMenu(){ delete recentsMenu; recentsMenu = NULL; }
+
     /* Actions */
     static void DoAction( QObject * );
     enum actionflag {
@@ -95,8 +99,6 @@ public:
         ACTION_DELETE_ON_REBUILD = 0x8
     };
     Q_DECLARE_FLAGS(actionflags, actionflag)
-
-    static RendererMenu *rendererMenu;
 
 private:
     /* All main Menus */
@@ -153,6 +155,8 @@ private:
 
     /* recentMRL menu */
     static QMenu *recentsMenu;
+
+    static RendererMenu *rendererMenu;
 
     static void updateAudioDevice( intf_thread_t *, audio_output_t *, QMenu* );
 
