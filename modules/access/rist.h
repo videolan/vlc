@@ -140,7 +140,7 @@ static inline void populate_cname(int fd, char *identifier)
     char hostname[MAX_CNAME];
     struct sockaddr_storage peer_sockaddr;
     int name_length = 0;
-    socklen_t peer_socklen;
+    socklen_t peer_socklen = 0;
     int ret_hostname = gethostname(hostname, MAX_CNAME);
     if (ret_hostname == -1)
         snprintf(hostname, MAX_CNAME, "UnknownHost");
