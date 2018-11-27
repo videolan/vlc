@@ -178,7 +178,10 @@ static void rist_retransmit(sout_access_out_t *p_access, struct rist_flow *flow,
             seq, age, flow->wi);
         p_sys->i_retransmit_packets++;
         vlc_mutex_lock( &p_sys->fd_lock );
-        rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer);
+        if (rist_Write(flow->fd_out, pkt->buffer->p_buffer, pkt->buffer->i_buffer) 
+                != (ssize_t)pkt->buffer->i_buffer) {
+            msg_Err(p_access, "Error sending retransmitted packet after 2 tries ...");
+        }
         vlc_mutex_unlock( &p_sys->fd_lock );
     }
 }
