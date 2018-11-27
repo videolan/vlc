@@ -31,8 +31,6 @@
 #include "playlist.h"
 #include "preparse.h"
 
-/* called when the current media has changed _automatically_ (not on
- * SetCurrentItem) */
 static void
 player_on_current_media_changed(vlc_player_t *player, input_item_t *new_media,
                                 void *userdata)
