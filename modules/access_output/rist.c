@@ -769,10 +769,10 @@ failed:
     "a near jitter free output. Be aware that this setting will also add to " \
     "the overall latency of the stream." )
 
-#define BUFFER_TEXT N_("RIST client side buffer size (ms)")
+#define BUFFER_TEXT N_("RIST retry-buffer queue size (ms)")
 #define BUFFER_LONGTEXT N_( \
     "This must match the buffer size (latency) configured on the server side. If you " \
-    "are not sure, leave the default of -1 which will set it the maximum " \
+    "are not sure, leave the default of 0 which will set it the maximum " \
     "value and will use about 100MB of RAM" )
 
 #define SSRC_TEXT N_("SSRC used in RTP output (default is random, i.e. 0)")
