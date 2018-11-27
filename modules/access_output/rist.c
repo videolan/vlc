@@ -338,7 +338,9 @@ static void rist_rtcp_send(sout_access_out_t *p_access)
     rtcp_sr_set_length(p_sr, 6);
     rtcp_fb_set_int_ssrc_pkt_sender(p_sr, p_sys->ssrc);
     rtcp_sr_set_ntp_time_msw(p_sr, tv.tv_sec + SEVENTY_YEARS_OFFSET);
-    fractions = (tv.tv_usec << 32ULL) / 1000000ULL;
+    fractions = (uint64_t)tv.tv_usec;
+    fractions <<= 32ULL;
+    fractions /= 1000000ULL;
     rtcp_sr_set_ntp_time_lsw(p_sr, (uint32_t)fractions);
     rtcp_sr_set_rtp_time(p_sr, rtp_get_ts(vlc_tick_now()));
     vlc_mutex_lock( &p_sys->lock );
