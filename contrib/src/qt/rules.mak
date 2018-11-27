@@ -66,7 +66,7 @@ endif
 
 QT_CONFIG := -static -opensource -confirm-license -no-pkg-config \
 	-no-sql-sqlite -no-gif -qt-libjpeg -no-openssl $(QT_OPENGL) -no-dbus \
-	-no-sql-odbc -no-pch \
+	-no-vulkan -no-sql-odbc -no-pch \
 	-no-compile-examples -nomake examples -qt-zlib
 
 QT_CONFIG += -release
