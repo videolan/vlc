@@ -1064,16 +1064,16 @@ vlc_module_begin ()
     add_integer( "packet-size", RIST_MAX_PACKET_SIZE,
         N_("RIST maximum packet size (bytes)"), NULL, true )
     add_integer( "maximum-jitter", RIST_DEFAULT_POLL_TIMEOUT,
-        N_("This controls the maximum jitter that will be passed to the demux/decode chain " \
-            "(defaut is 5ms)"),
-        N_("The lower the value, the more CPU cycles the algortyhm will consume"), true )
+        N_("RIST demux/decode maximum jitter (defaut is 5ms)"),
+        N_("This controls the maximum jitter that will be passed to the demux/decode chain. "
+            "The lower the value, the more CPU cycles the algortyhm will consume"), true )
     add_integer( "latency", RIST_DEFAULT_LATENCY, N_("RIST latency (ms)"), NULL, true )
     add_integer( "retry-interval", RIST_DEFAULT_RETRY_INTERVAL, N_("RIST nack retry interval (ms)"),
         NULL, true )
     add_integer( "reorder-buffer", RIST_DEFAULT_REORDER_BUFFER, N_("RIST reorder buffer (ms)"),
         NULL, true )
     add_integer( "max-retries", RIST_MAX_RETRIES, N_("RIST maximum retry count"), NULL, true )
-    add_bool( "eof-on-reset", false, "Trigger and EOF event when the buffer reset is triggered",
+    add_bool( "eof-on-reset", false, "Trigger an EOF event when a buffer reset is triggered",
         "This is probably useful when you are decoding but not so much if you are streaming", true )
     add_integer( "nack-type", NACK_FMT_RANGE,
             N_("RIST nack type, 0 = range, 1 = bitmask. Default is range"), NULL, true )
