@@ -30,6 +30,7 @@
 # include "config.h"
 #endif
 
+#include "../renderer_common.hpp"
 #include "chromecast.h"
 #include <vlc_dialog.h>
 
@@ -157,10 +158,7 @@ struct sout_stream_sys_t
     unsigned int                       spu_streams_count;
 
 private:
-    std::string GetVencOption( sout_stream_t *, vlc_fourcc_t *,
-                               const video_format_t *, int );
     std::string GetAcodecOption( sout_stream_t *, vlc_fourcc_t *, const audio_format_t *, int );
-    std::string GetVcodecOption( sout_stream_t *, vlc_fourcc_t *, const video_format_t *, int );
     bool UpdateOutput( sout_stream_t * );
 };
 
@@ -199,39 +197,6 @@ static const char *const ppsz_sout_options[] = {
 #define HTTP_PORT_TEXT N_("HTTP port")
 #define HTTP_PORT_LONGTEXT N_("This sets the HTTP port of the local server " \
                               "used to stream the media to the Chromecast.")
-#define PERF_TEXT N_( "Performance warning" )
-#define PERF_LONGTEXT N_( "Display a performance warning when transcoding" )
-#define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
-#define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®." )
-
-enum {
-    CONVERSION_QUALITY_HIGH = 0,
-    CONVERSION_QUALITY_MEDIUM = 1,
-    CONVERSION_QUALITY_LOW = 2,
-    CONVERSION_QUALITY_LOWCPU = 3,
-};
-
-#if defined (__ANDROID__) || defined (__arm__) || (defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
-# define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_LOW
-#else
-# define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_MEDIUM
-#endif
-
-static const int conversion_quality_list[] = {
-    CONVERSION_QUALITY_HIGH,
-    CONVERSION_QUALITY_MEDIUM,
-    CONVERSION_QUALITY_LOW,
-    CONVERSION_QUALITY_LOWCPU,
-};
-static const char *const conversion_quality_list_text[] = {
-    N_( "High (high quality and high bandwidth)" ),
-    N_( "Medium (medium quality and medium bandwidth)" ),
-    N_( "Low (low quality and low bandwidth)" ),
-    N_( "Low CPU (low quality but high bandwidth)" ),
-};
-
-#define CONVERSION_QUALITY_TEXT N_( "Conversion quality" )
-#define CONVERSION_QUALITY_LONGTEXT N_( "Change this option to increase conversion speed or quality." )
 
 #define IP_ADDR_TEXT N_("IP Address")
 #define IP_ADDR_LONGTEXT N_("IP Address of the Chromecast.")
@@ -263,12 +228,7 @@ vlc_module_begin ()
     add_integer(SOUT_CFG_PREFIX "http-port", HTTP_PORT, HTTP_PORT_TEXT, HTTP_PORT_LONGTEXT, false)
     add_obsolete_string(SOUT_CFG_PREFIX "mux")
     add_obsolete_string(SOUT_CFG_PREFIX "mime")
-    add_integer(SOUT_CFG_PREFIX "show-perf-warning", 1, PERF_TEXT, PERF_LONGTEXT, true )
-        change_private()
-    add_bool(SOUT_CFG_PREFIX "audio-passthrough", false, AUDIO_PASSTHROUGH_TEXT, AUDIO_PASSTHROUGH_LONGTEXT, false )
-    add_integer(SOUT_CFG_PREFIX "conversion-quality", CONVERSION_QUALITY_DEFAULT,
-                CONVERSION_QUALITY_TEXT, CONVERSION_QUALITY_LONGTEXT, false );
-        change_integer_list(conversion_quality_list, conversion_quality_list_text)
+    add_renderer_opts(SOUT_CFG_PREFIX)
 
     add_submodule()
         /* sout proxy that start the cc input when all streams are loaded */
@@ -927,231 +887,6 @@ bool sout_stream_sys_t::transcodingCanFallback() const
     return transcoding_state != (TRANSCODING_VIDEO|TRANSCODING_AUDIO);
 }
 
-static std::string GetVencVPXOption( sout_stream_t * /* p_stream */,
-                                      const video_format_t * /* p_vid */,
-                                      int /* i_quality */ )
-{
-    return "venc=vpx{quality-mode=1}";
-}
-
-static std::string GetVencQSVH264Option( sout_stream_t * /* p_stream */,
-                                         const video_format_t * /* p_vid */,
-                                         int i_quality )
-{
-    std::stringstream ssout;
-    static const char video_target_usage_quality[]  = "quality";
-    static const char video_target_usage_balanced[] = "balanced";
-    static const char video_target_usage_speed[]    = "speed";
-    static const char video_bitrate_high[] = "vb=8000000";
-    static const char video_bitrate_low[]  = "vb=3000000";
-    const char *psz_video_target_usage;
-    const char *psz_video_bitrate;
-
-    switch ( i_quality )
-    {
-        case CONVERSION_QUALITY_HIGH:
-            psz_video_target_usage = video_target_usage_quality;
-            psz_video_bitrate = video_bitrate_high;
-            break;
-        case CONVERSION_QUALITY_MEDIUM:
-            psz_video_target_usage = video_target_usage_balanced;
-            psz_video_bitrate = video_bitrate_high;
-            break;
-        case CONVERSION_QUALITY_LOW:
-            psz_video_target_usage = video_target_usage_balanced;
-            psz_video_bitrate = video_bitrate_low;
-            break;
-        default:
-        case CONVERSION_QUALITY_LOWCPU:
-            psz_video_target_usage = video_target_usage_speed;
-            psz_video_bitrate = video_bitrate_low;
-            break;
-    }
-
-    ssout << "venc=qsv{target-usage=" << psz_video_target_usage <<
-             "}," << psz_video_bitrate;
-    return ssout.str();
-}
-
-static std::string GetVencX264Option( sout_stream_t * /* p_stream */,
-                                      const video_format_t *p_vid,
-                                      int i_quality )
-{
-    std::stringstream ssout;
-    static const char video_x264_preset_veryfast[] = "veryfast";
-    static const char video_x264_preset_ultrafast[] = "ultrafast";
-    const char *psz_video_x264_preset;
-    unsigned i_video_x264_crf_hd, i_video_x264_crf_720p;
-
-    switch ( i_quality )
-    {
-        case CONVERSION_QUALITY_HIGH:
-            i_video_x264_crf_hd = i_video_x264_crf_720p = 21;
-            psz_video_x264_preset = video_x264_preset_veryfast;
-            break;
-        case CONVERSION_QUALITY_MEDIUM:
-            i_video_x264_crf_hd = 23;
-            i_video_x264_crf_720p = 21;
-            psz_video_x264_preset = video_x264_preset_veryfast;
-            break;
-        case CONVERSION_QUALITY_LOW:
-            i_video_x264_crf_hd = i_video_x264_crf_720p = 23;
-            psz_video_x264_preset = video_x264_preset_veryfast;
-            break;
-        default:
-        case CONVERSION_QUALITY_LOWCPU:
-            i_video_x264_crf_hd = i_video_x264_crf_720p = 23;
-            psz_video_x264_preset = video_x264_preset_ultrafast;
-            break;
-    }
-
-    const bool b_hdres = p_vid->i_height == 0 || p_vid->i_height >= 800;
-    unsigned i_video_x264_crf = b_hdres ? i_video_x264_crf_hd : i_video_x264_crf_720p;
-
-    ssout << "venc=x264{preset=" << psz_video_x264_preset
-          << ",crf=" << i_video_x264_crf << "}";
-    return ssout.str();
-}
-
-#ifdef __APPLE__
-static std::string GetVencAvcodecVTOption( sout_stream_t * /* p_stream */,
-                                           const video_format_t * p_vid,
-                                           int i_quality )
-{
-    std::stringstream ssout;
-    ssout << "venc=avcodec{codec=h264_videotoolbox,options{realtime=1}}";
-    switch( i_quality )
-    {
-        /* Here, performances issues won't come from videotoolbox but from
-         * some old chromecast devices */
-
-        case CONVERSION_QUALITY_HIGH:
-            break;
-        case CONVERSION_QUALITY_MEDIUM:
-            ssout << ",vb=8000000";
-            break;
-        case CONVERSION_QUALITY_LOW:
-        case CONVERSION_QUALITY_LOWCPU:
-            ssout << ",vb=3000000";
-            break;
-    }
-
-    return ssout.str();
-}
-#endif
-
-static struct
-{
-    vlc_fourcc_t fcc;
-    std::string (*get_opt)( sout_stream_t *, const video_format_t *, int);
-} venc_opt_list[] = {
-#ifdef __APPLE__
-    { .fcc = VLC_CODEC_H264, .get_opt = GetVencAvcodecVTOption },
-#endif
-    { .fcc = VLC_CODEC_H264, .get_opt = GetVencQSVH264Option },
-    { .fcc = VLC_CODEC_H264, .get_opt = GetVencX264Option },
-    { .fcc = VLC_CODEC_VP8,  .get_opt = GetVencVPXOption },
-    { .fcc = VLC_CODEC_H264, .get_opt = NULL },
-};
-
-std::string
-sout_stream_sys_t::GetVencOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec_video,
-                                  const video_format_t *p_vid, int i_quality )
-{
-    for( size_t i = (venc_opt_idx == -1 ? 0 : venc_opt_idx);
-         i < ARRAY_SIZE(venc_opt_list); ++i )
-    {
-        std::stringstream ssout, ssvenc;
-        char fourcc[5];
-        ssvenc << "vcodec=";
-        vlc_fourcc_to_char( venc_opt_list[i].fcc, fourcc );
-        fourcc[4] = '\0';
-        ssvenc << fourcc << ',';
-
-        if( venc_opt_list[i].get_opt != NULL )
-            ssvenc << venc_opt_list[i].get_opt( p_stream, p_vid, i_quality ) << ',';
-
-        if( venc_opt_list[i].get_opt == NULL
-         || ( venc_opt_idx != -1 && (unsigned) venc_opt_idx == i) )
-        {
-            venc_opt_idx = i;
-            *p_codec_video = venc_opt_list[i].fcc;
-            return ssvenc.str();
-        }
-
-        /* Test if a module can encode with the specified options / fmt_video. */
-        ssout << "transcode{" << ssvenc.str() << "}:dummy";
-
-        sout_stream_t *p_sout_test =
-            sout_StreamChainNew( p_stream->p_sout, ssout.str().c_str(), NULL, NULL );
-
-        if( p_sout_test != NULL )
-        {
-            p_sout_test->obj.flags |= OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT;
-
-            es_format_t fmt;
-            es_format_InitFromVideo( &fmt, p_vid );
-            fmt.i_codec = fmt.video.i_chroma = VLC_CODEC_I420;
-
-            /* Test the maximum size/fps we will encode */
-            fmt.video.i_visible_width = fmt.video.i_width = 1920;
-            fmt.video.i_visible_height = fmt.video.i_height = 1080;
-            fmt.video.i_frame_rate = 30;
-            fmt.video.i_frame_rate_base = 1;
-
-            void *id = sout_StreamIdAdd( p_sout_test, &fmt );
-
-            es_format_Clean( &fmt );
-            const bool success = id != NULL;
-
-            if( id )
-                sout_StreamIdDel( p_sout_test, id );
-            sout_StreamChainDelete( p_sout_test, NULL );
-
-            if( success )
-            {
-                venc_opt_idx = i;
-                *p_codec_video = venc_opt_list[i].fcc;
-                return ssvenc.str();
-            }
-        }
-    }
-    vlc_assert_unreachable();
-}
-
-std::string
-sout_stream_sys_t::GetVcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec_video,
-                                    const video_format_t *p_vid, int i_quality )
-{
-    std::stringstream ssout;
-    static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";
-    static const char video_maxres_720p[] = "maxwidth=1280,maxheight=720";
-
-    ssout << GetVencOption( p_stream, p_codec_video, p_vid, i_quality );
-
-    switch ( i_quality )
-    {
-        case CONVERSION_QUALITY_HIGH:
-        case CONVERSION_QUALITY_MEDIUM:
-            ssout << ( ( p_vid->i_width > 1920 ) ? "width=1920," : "" ) << video_maxres_hd << ',';
-            break;
-        default:
-            ssout << ( ( p_vid->i_width > 1280 ) ? "width=1280," : "" ) << video_maxres_720p << ',';
-    }
-
-    if( p_vid->i_frame_rate == 0 || p_vid->i_frame_rate_base == 0
-     || ( p_vid->i_frame_rate / p_vid->i_frame_rate_base ) > 30 )
-    {
-        /* Even force 24fps if the frame rate is unknown */
-        msg_Warn( p_stream, "lowering frame rate to 24fps" );
-        ssout << "fps=24,";
-    }
-
-    msg_Dbg( p_stream, "Converting video to %.4s", (const char*)p_codec_video );
-
-    return ssout.str();
-}
-
 std::string
 sout_stream_sys_t::GetAcodecOption( sout_stream_t *p_stream, vlc_fourcc_t *p_codec_audio,
                                     const audio_format_t *p_aud, int i_quality )
@@ -1291,7 +1026,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
     if ( !canRemux )
     {
         if ( !perf_warning_shown && i_codec_video == 0 && p_original_video
-          && var_InheritInteger( p_stream, SOUT_CFG_PREFIX "show-perf-warning" ) )
+          && var_InheritInteger( p_stream, RENDERER_CFG_PREFIX "show-perf-warning" ) )
         {
             int res = vlc_dialog_wait_question( p_stream,
                           VLC_DIALOG_QUESTION_WARNING,
@@ -1304,7 +1039,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
                  return false;
             perf_warning_shown = true;
             if ( res == 2 )
-                config_PutInt(SOUT_CFG_PREFIX "show-perf-warning", 0 );
+                config_PutInt(RENDERER_CFG_PREFIX "show-perf-warning", 0 );
         }
 
         const int i_quality = var_InheritInteger( p_stream, SOUT_CFG_PREFIX "conversion-quality" );
@@ -1319,9 +1054,14 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         }
         if ( i_codec_video == 0 && p_original_video )
         {
-            ssout << GetVcodecOption( p_stream, &i_codec_video,
-                                      &p_original_video->video, i_quality );
-            new_transcoding_state |= TRANSCODING_VIDEO;
+            try {
+                ssout << vlc_sout_renderer_GetVcodecOption( p_stream,
+                                        { VLC_CODEC_H264, VLC_CODEC_VP8 },
+                                        &p_original_video->video, i_quality );
+                new_transcoding_state |= TRANSCODING_VIDEO;
+            } catch(const std::exception& e) {
+                return false;
+            }
         }
         if ( p_original_spu )
             ssout << "soverlay,";

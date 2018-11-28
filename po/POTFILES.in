@@ -1076,6 +1076,7 @@ modules/stream_out/es.c
 modules/stream_out/gather.c
 modules/stream_out/mosaic_bridge.c
 modules/stream_out/record.c
+modules/stream_out/renderer_common.hpp
 modules/stream_out/rtcp.c
 modules/stream_out/rtp.c
 modules/stream_out/rtpfmt.c
