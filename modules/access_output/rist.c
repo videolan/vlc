@@ -110,6 +110,8 @@ static struct rist_flow *rist_init_tx()
         free(flow);
         return NULL;
     }
+    flow->fd_out = -1;
+    flow->fd_rtcp = -1;
 
     return flow;
 }
@@ -142,6 +144,10 @@ static struct rist_flow *rist_udp_transmitter(sout_access_out_t *p_access, char 
     return flow;
 
 fail:
+    if (flow->fd_out != -1)
+        vlc_close(flow->fd_out);
+    if (flow->fd_rtcp != -1)
+        vlc_close(flow->fd_rtcp);
     free(flow->buffer);
     free(flow);
     return NULL;
