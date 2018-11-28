@@ -171,6 +171,8 @@ struct ctx
     struct media_params params;
     float rate;
 
+    size_t last_state_idx;
+
     vlc_cond_t wait;
     struct reports report;
 };
@@ -479,11 +481,24 @@ player_on_media_subitems_changed(vlc_player_t *player, input_item_t *media,
     assert(fabs((report)->pos - (report)->time / (float) ctx->params.length) < 0.001); \
 } while (0)
 
-#define wait_state(ctx, state) do { \
-    vec_on_state_changed *vec = &ctx->report.on_state_changed; \
-    while (vec->size == 0 || VEC_LAST(vec) != state) \
-        vlc_player_CondWait(player, &ctx->wait); \
-} while(0)
+/* Wait for the next state event */
+static inline void
+wait_state(struct ctx *ctx, enum vlc_player_state state)
+{
+    vec_on_state_changed *vec = &ctx->report.on_state_changed;
+    for (;;)
+    {
+        while (vec->size <= ctx->last_state_idx)
+            vlc_player_CondWait(ctx->player, &ctx->wait);
+        for (size_t i = ctx->last_state_idx; i < vec->size; ++i)
+            if ((vec)->data[i] == state)
+            {
+                ctx->last_state_idx = i + 1;
+                return;
+            }
+        ctx->last_state_idx = vec->size;
+    }
+}
 
 #define assert_state(ctx, state) do { \
     vec_on_state_changed *vec = &ctx->report.on_state_changed; \
@@ -586,6 +601,8 @@ REPORT_LIST
     ctx->extra_start_count = 0;
     ctx->program_switch_count = 1;
     ctx->rate = 1.f;
+
+    ctx->last_state_idx = 0;
 };
 
 static input_item_t *
@@ -899,9 +916,14 @@ test_end(struct ctx *ctx)
 {
     vlc_player_t *player = ctx->player;
 
+    /* Don't wait if we already stopped or waited for a stop */
+    const bool wait_stopped =
+        VEC_LAST(&ctx->report.on_state_changed) != VLC_PLAYER_STATE_STOPPED;
+    /* Can be no-op */
     vlc_player_Stop(player);
     assert(vlc_player_GetCurrentMedia(player) != NULL);
-    wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
+    if (wait_stopped)
+        wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
 
     if (!ctx->params.error)
     {
@@ -1342,8 +1364,7 @@ test_unknown_uri(struct ctx *ctx)
     bool success = vlc_vector_push(&ctx->played_medias, media);
     assert(success);
 
-    ret = vlc_player_Start(player);
-    assert(ret == VLC_SUCCESS);
+    player_start(ctx);
 
     wait_state(ctx, VLC_PLAYER_STATE_STARTED);
     wait_state(ctx, VLC_PLAYER_STATE_STOPPED);
@@ -1544,7 +1565,6 @@ test_next_media(struct ctx *ctx)
     const char *media_names[] = { "media1", "media2", "media3" };
     const size_t media_count = ARRAY_SIZE(media_names);
 
-    vlc_player_t *player = ctx->player;
     struct media_params params = DEFAULT_MEDIA_PARAMS(VLC_TICK_FROM_MS(100));
 
     for (size_t i = 0; i < media_count; ++i)
