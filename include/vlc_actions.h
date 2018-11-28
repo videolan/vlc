@@ -23,6 +23,8 @@
 #ifndef VLC_ACTIONS_H
 #define VLC_ACTIONS_H 1
 
+# include <vlc_mouse.h>
+
 /* Called from src/libvlc.c */
 int
 libvlc_InternalActionsInit(libvlc_int_t *p_libvlc);
@@ -112,6 +114,8 @@ libvlc_InternalActionsClean(libvlc_int_t *p_libvlc);
 #define KEY_MOUSEWHEELDOWN   0x00F10000
 #define KEY_MOUSEWHEELLEFT   0x00F20000
 #define KEY_MOUSEWHEELRIGHT  0x00F30000
+#define KEY_MOUSEWHEEL_FROM_BUTTON(button) \
+    (KEY_MOUSEWHEELUP | ((button - MOUSE_BUTTON_WHEEL_UP) << 16))
 
 VLC_API char *vlc_keycode2str(uint_fast32_t i_key, bool locale) VLC_USED;
 VLC_API uint_fast32_t vlc_str2keycode(const char *str) VLC_USED;
