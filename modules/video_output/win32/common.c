@@ -95,6 +95,8 @@ int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *
 
     var_Create(vd, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
 
+    sys->vdcfg = *vdcfg;
+
     if (b_windowless)
         return VLC_SUCCESS;
 
@@ -117,7 +119,6 @@ int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *
     cfg.y      = var_InheritInteger(vd, "video-y");
     cfg.width  = vdcfg->display.width;
     cfg.height = vdcfg->display.height;
-    sys->vdcfg = *vdcfg;
 
     event_hwnd_t hwnd;
     if (EventThreadStart(sys->event, &hwnd, &cfg))
