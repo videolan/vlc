@@ -384,7 +384,7 @@ static void *rist_thread(void *data)
     uint8_t pkt[RTP_PKT_SIZE];
     struct pollfd pfd[1];
     int ret;
-    int r;
+    ssize_t r;
 
     pfd[0].fd = p_sys->flow->fd_rtcp;
     pfd[0].events = POLLIN;
@@ -398,7 +398,7 @@ static void *rist_thread(void *data)
             {
                 r = rist_Read(p_sys->flow->fd_rtcp, pkt, RTP_PKT_SIZE);
                 if (r == RTP_PKT_SIZE) {
-                    msg_Err(p_access, "Rist RTCP messsage is too big (%d bytes) and was probably " \
+                    msg_Err(p_access, "Rist RTCP messsage is too big (%zd bytes) and was probably " \
                         "cut, please keep it under %d bytes", r, RTP_PKT_SIZE);
                 }
                 if (unlikely(r == -1)) {
