@@ -636,6 +636,7 @@ static void OpenglSwap (vlc_gl_t *gl)
 
     /* on HiDPI displays, the point bounds don't equal the actual pixel based bounds */
     NSRect bounds = [self convertRectToBacking:[self bounds]];
+    vout_display_place_t place;
 
     @synchronized(self) {
         if (vd) {
@@ -645,14 +646,14 @@ static void OpenglSwap (vlc_gl_t *gl)
 
             vout_display_PlacePicture (&sys->place, &vd->source, &sys->cfg, false);
             vout_window_ReportSize(sys->embed, bounds.size.width, bounds.size.height);
+            place = sys->place;
         }
     }
 
     if ([self lockgl]) {
-        vout_display_sys_t *sys = vd->sys;
         // x / y are top left corner, but we need the lower left one
-        glViewport (sys->place.x, bounds.size.height - (sys->place.y + sys->place.height),
-                    sys->place.width, sys->place.height);
+        glViewport (place.x, bounds.size.height - (place.y + place.height),
+                    place.width, place.height);
 
         @synchronized(self) {
             // This may be cleared before -drawRect is being called,
