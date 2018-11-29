@@ -112,14 +112,14 @@ static bool AV1_OBUSkipHeader(const uint8_t **pp_buf, size_t *pi_buf)
 {
     if(*pi_buf < 1)
         return false;
-    size_t i_header;
+    size_t i_header = 1 + !!AV1_OBUHasExtensionField(*pp_buf);
     if(AV1_OBUHasSizeField(*pp_buf))
     {
         uint8_t i_len;
         (void) AV1_OBUSize(*pp_buf, *pi_buf, &i_len);
         if(i_len == 0)
             return false;
-        i_header = 1 + !!AV1_OBUHasExtensionField(*pp_buf) + i_len;
+        i_header += i_len;
     }
     if(i_header > *pi_buf)
         return false;
