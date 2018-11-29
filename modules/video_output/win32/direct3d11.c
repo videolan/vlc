@@ -1481,6 +1481,29 @@ static bool CanUseTextureArray(vout_display_t *vd)
 #endif
 }
 
+static bool BogusZeroCopy(vout_display_t *vd)
+{
+    IDXGIAdapter *p_adapter = D3D11DeviceAdapter(vd->sys->d3d_dev.d3ddevice);
+    if (!p_adapter)
+        return false;
+
+    DXGI_ADAPTER_DESC adapterDesc;
+    if (FAILED(IDXGIAdapter_GetDesc(p_adapter, &adapterDesc)))
+        return false;
+    IDXGIAdapter_Release(p_adapter);
+
+    if (adapterDesc.VendorId != GPU_MANUFACTURER_AMD)
+        return false;
+
+    switch (adapterDesc.DeviceId)
+    {
+    case 0x687F: // RX Vega 56/64
+        return true;
+    default:
+        return false;
+    }
+}
+
 /* TODO : handle errors better
    TODO : seperate out into smaller functions like createshaders */
 static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_format_t *fmt)
@@ -1488,7 +1511,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr;
 
-    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd);
+    sys->legacy_shader = sys->d3d_dev.feature_level < D3D_FEATURE_LEVEL_10_0 || !CanUseTextureArray(vd) ||
+            BogusZeroCopy(vd);
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
                                   sys->picQuad.formatInfo, &sys->display, fmt->transfer, fmt->primaries,
