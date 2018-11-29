@@ -411,6 +411,7 @@ enum vlc_ml_control
     VLC_ML_BAN_FOLDER,              /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_UNBAN_FOLDER,            /**< arg1: mrl (const char*)  res: can't fail */
     VLC_ML_LIST_FOLDERS,            /**< arg1: entrypoints (vlc_ml_entry_point_list_t**); res: can fail */
+    VLC_ML_IS_INDEXED,              /**< arg1: mrl (const char*) arg2 (out): bool*;       res: can fail */
     /**
      * Reload a specific folder, or all.
      * arg1: mrl (const char*), NULL to reload all folders
@@ -783,6 +784,12 @@ static inline int vlc_ml_list_folder( vlc_medialibrary_t* p_ml,
                                       vlc_ml_entry_point_list_t** pp_entrypoints )
 {
     return vlc_ml_control( p_ml, VLC_ML_LIST_FOLDERS, pp_entrypoints );
+}
+
+static inline int vlc_ml_is_indexed( vlc_medialibrary_t* p_ml,
+                                     const char* psz_mrl, bool* p_res )
+{
+    return vlc_ml_control( p_ml, VLC_ML_IS_INDEXED, psz_mrl, p_res );
 }
 
 static inline int vlc_ml_reload_folder( vlc_medialibrary_t* p_ml, const char* psz_mrl )
