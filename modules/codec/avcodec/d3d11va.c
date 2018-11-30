@@ -783,25 +783,26 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
             }
 
             D3D11_TEXTURE2D_DESC texDesc;
-            ID3D11Texture2D_GetDesc(pic->p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
+            picture_sys_t * p_sys = pic->p_sys;
+            ID3D11Texture2D_GetDesc(p_sys->texture[KNOWN_DXGI_INDEX], &texDesc);
             assert(texDesc.Format == sys->render);
             assert(texDesc.BindFlags & D3D11_BIND_DECODER);
 
 #if !LIBAVCODEC_VERSION_CHECK( 57, 27, 2, 61, 102 )
-            if (pic->p_sys->slice_index != surface_idx)
+            if (p_sys->slice_index != surface_idx)
             {
                 msg_Warn(va, "d3d11va requires decoding slices to be the first in the texture (%d/%d)",
-                         pic->p_sys->slice_index, surface_idx);
+                         p_sys->slice_index, surface_idx);
                 dx_sys->can_extern_pool = false;
                 break;
             }
 #endif
 
-            viewDesc.Texture2D.ArraySlice = pic->p_sys->slice_index;
+            viewDesc.Texture2D.ArraySlice = p_sys->slice_index;
             hr = ID3D11VideoDevice_CreateVideoDecoderOutputView( dx_sys->d3ddec,
-                                                                 pic->p_sys->resource[KNOWN_DXGI_INDEX],
+                                                                 p_sys->resource[KNOWN_DXGI_INDEX],
                                                                  &viewDesc,
-                                                                 &pic->p_sys->decoder );
+                                                                 &p_sys->decoder );
             if (FAILED(hr)) {
                 msg_Warn(va, "CreateVideoDecoderOutputView %d failed. (hr=0x%0lx)", surface_idx, hr);
                 dx_sys->can_extern_pool = false;
@@ -810,7 +811,7 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
 
             D3D11_AllocateResourceView(va, sys->d3d_dev.d3ddevice, textureFmt, pic->p_sys->texture, pic->p_sys->slice_index, pic->p_sys->renderSrc);
 
-            dx_sys->hw_surface[surface_idx] = pic->p_sys->decoder;
+            dx_sys->hw_surface[surface_idx] = p_sys->decoder;
         }
 
         if (!dx_sys->can_extern_pool)
@@ -824,7 +825,8 @@ static int DxCreateDecoderSurfaces(vlc_va_t *va, int codec_id,
                 }
                 if (sys->extern_pics[i])
                 {
-                    sys->extern_pics[i]->p_sys->decoder = NULL;
+                    picture_sys_t *p_sys = sys->extern_pics[i]->p_sys;
+                    p_sys->decoder = NULL;
                     picture_Release(sys->extern_pics[i]);
                     sys->extern_pics[i] = NULL;
                 }
