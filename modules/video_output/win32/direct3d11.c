@@ -1463,6 +1463,7 @@ static bool BogusZeroCopy(vout_display_t *vd)
     switch (adapterDesc.DeviceId)
     {
     case 0x687F: // RX Vega 56/64
+    case 0x6863: // RX Vega Frontier Edition
         return true;
     default:
         return false;
