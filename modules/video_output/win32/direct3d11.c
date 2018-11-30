@@ -355,7 +355,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 #endif
 
-    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(vd, 1, sizeof(vout_display_sys_t));
+    vout_display_sys_t *sys = vd->sys = vlc_obj_calloc(VLC_OBJECT(vd), 1, sizeof(vout_display_sys_t));
     if (!sys)
         return VLC_ENOMEM;
 

@@ -85,7 +85,7 @@ void D3D11_RenderQuad(d3d11_device_t *d3d_dev, d3d_quad_t *quad, d3d_vshader_t *
 
     /* force unbinding the input texture, otherwise we get:
      * OMSetRenderTargets: Resource being set to OM RenderTarget slot 0 is still bound on input! */
-    ID3D11RenderTargetView *reset[D3D11_MAX_SHADER_VIEW] = { 0 };
+    ID3D11ShaderResourceView *reset[D3D11_MAX_SHADER_VIEW] = { 0 };
     ID3D11DeviceContext_PSSetShaderResources(d3d_dev->d3dcontext, 0, quad->resourceCount, reset);
 }
 
