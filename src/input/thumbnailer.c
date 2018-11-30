@@ -130,7 +130,10 @@ static int thumbnailer_request_Start( void* owner, void* entity, void** out )
                                      on_thumbnailer_input_event, request,
                                      request->params.input_item );
     if ( unlikely( input == NULL ) )
+    {
+        request->params.cb( request->params.user_data, NULL );
         return VLC_EGENERIC;
+    }
     if ( request->params.type == VLC_THUMBNAILER_SEEK_TIME )
     {
         input_SetTime( input, request->params.time,
@@ -143,7 +146,10 @@ static int thumbnailer_request_Start( void* owner, void* entity, void** out )
                        request->params.fast_seek );
     }
     if ( input_Start( input ) != VLC_SUCCESS )
+    {
+        request->params.cb( request->params.user_data, NULL );
         return VLC_EGENERIC;
+    }
     *out = request;
     return VLC_SUCCESS;
 }
