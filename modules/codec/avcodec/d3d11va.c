@@ -336,6 +336,10 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
+    err = D3D11_Create( va, &sys->hd3d, false );
+    if (err != VLC_SUCCESS)
+        goto error;
+
     dx_sys = &sys->dx_sys;
 
     dx_sys->va_pool.pf_create_device           = D3dCreateDevice;
@@ -382,10 +386,6 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
             }
         }
     }
-
-    err = D3D11_Create( va, &sys->hd3d, false );
-    if (err != VLC_SUCCESS)
-        goto error;
 
     err = directx_va_Open(va, &sys->dx_sys);
     if (err!=VLC_SUCCESS)
