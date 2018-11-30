@@ -266,6 +266,7 @@ HRESULT D3D11_CreateDeviceExternal(vlc_object_t *obj, ID3D11DeviceContext *d3d11
 
 #undef D3D11_CreateDevice
 HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
+                           IDXGIAdapter *adapter,
                            bool hw_decoding, d3d11_device_t *out)
 {
 #if !VLC_WINSTORE_APP
@@ -311,10 +312,11 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
     };
 
-    for (UINT driver = 0; driver < ARRAY_SIZE(driverAttempts); driver++) {
-        hr = D3D11CreateDevice(NULL, driverAttempts[driver], NULL, creationFlags,
-                    D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
-                    &out->d3ddevice, &out->feature_level, &out->d3dcontext);
+    for (UINT driver = 0; driver < adapter ? 1 : ARRAY_SIZE(driverAttempts); driver++) {
+        hr = D3D11CreateDevice(adapter, adapter ? D3D_DRIVER_TYPE_UNKNOWN : driverAttempts[driver],
+                               NULL, creationFlags,
+                               D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
+                               &out->d3ddevice, &out->feature_level, &out->d3dcontext);
         if (SUCCEEDED(hr)) {
             msg_Dbg(obj, "Created the D3D11 device type %d level %x.",
                     driverAttempts[driver], out->feature_level);
