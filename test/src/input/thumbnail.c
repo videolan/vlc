@@ -74,7 +74,8 @@ static void thumbnailer_callback( void* data, picture_t* thumbnail )
 
     if ( thumbnail != NULL )
     {
-        assert( test_params[p_ctx->test_idx].b_expected_success && "Unexpected failure" );
+        assert( test_params[p_ctx->test_idx].b_expected_success &&
+                "Expected failure but got a thumbnail" );
         assert( thumbnail->format.i_chroma == VLC_CODEC_ARGB );
 
         /* TODO: Enable this once the new clock is merged */
@@ -96,7 +97,8 @@ static void thumbnailer_callback( void* data, picture_t* thumbnail )
 #endif
     }
     else
-        assert( !test_params[p_ctx->test_idx].b_expected_success && "Unexpected thumbnail" );
+        assert( !test_params[p_ctx->test_idx].b_expected_success &&
+                "Expected a thumbnail but got a failure" );
 
     p_ctx->b_done = true;
     vlc_cond_signal( &p_ctx->cond );
