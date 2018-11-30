@@ -49,23 +49,25 @@ private:
     struct ParseContext
     {
         ParseContext( MetadataExtractor* mde, medialibrary::parser::IItem& item )
-            : inputItem( nullptr, &input_item_Release )
-            , input( nullptr, &input_Close )
-            , needsProbing( false )
+            : needsProbing( false )
             , state( INIT_S )
             , mde( mde )
             , item( item )
+            , inputItem( nullptr, &input_item_Release )
+            , input( nullptr, &input_Close )
         {
         }
 
-        std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
-        std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
         vlc::threads::condition_variable m_cond;
         vlc::threads::mutex m_mutex;
         bool needsProbing;
         input_state_e state;
         MetadataExtractor* mde;
         medialibrary::parser::IItem& item;
+        std::unique_ptr<input_item_t, decltype(&input_item_Release)> inputItem;
+        // Needs to be last to be destroyed first, otherwise a late callback
+        // could use some already destroyed fields
+        std::unique_ptr<input_thread_t, decltype(&input_Close)> input;
     };
 
 public:
