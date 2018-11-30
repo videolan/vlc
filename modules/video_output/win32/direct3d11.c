@@ -495,10 +495,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             for (unsigned plane = 0; plane < D3D11_MAX_SHADER_VIEW; plane++)
                 picsys->texture[plane] = textures[picture_count * D3D11_MAX_SHADER_VIEW + plane];
 
-            picsys->slice_index = picture_count;
-            picsys->formatTexture = sys->picQuad.textureFormat->formatTexture;
-            picsys->context = sys->d3d_dev.d3dcontext;
-
             picture_resource_t resource = {
                 .p_sys = picsys,
                 .pf_destroy = DestroyDisplayPoolPicture,
@@ -512,8 +508,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
             }
 
             pictures[picture_count] = picture;
+            picsys->slice_index = picture_count;
+            picsys->formatTexture = sys->picQuad.textureFormat->formatTexture;
             /* each picture_t holds a ref to the context and release it on Destroy */
-            ID3D11DeviceContext_AddRef(picsys->context);
+            picsys->context = sys->d3d_dev.d3dcontext;
+            ID3D11DeviceContext_AddRef(sys->d3d_dev.d3dcontext);
         }
 
 #ifdef HAVE_ID3D11VIDEODECODER
