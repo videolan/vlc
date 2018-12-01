@@ -393,7 +393,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
     }
 
-    sys = (vout_window_sys_t*)calloc( 1, sizeof( *sys ) );
+    sys = new (std::nothrow) vout_window_sys_t;
     if( !sys )
     {
         vlc_object_release( pIntf );
@@ -401,8 +401,8 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     }
 
     pWnd->sys = sys;
-    pWnd->sys->cfg = *cfg;
-    pWnd->sys->pIntf = pIntf;
+    sys->cfg = *cfg;
+    sys->pIntf = pIntf;
     pWnd->ops = &window_ops;
 
     pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
@@ -415,7 +415,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
     {
         msg_Dbg( pIntf, "Vout window creation failed" );
-        free( sys );
+        delete sys;
         vlc_object_release( pIntf );
         return VLC_EGENERIC;
     }
@@ -436,7 +436,7 @@ static void WindowClose( vout_window_t *pWnd )
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
     vlc_object_release( sys->pIntf );
-    free( sys );
+    delete sys;
 }
 
 static int WindowControl( vout_window_t *pWnd, int query, va_list args )
