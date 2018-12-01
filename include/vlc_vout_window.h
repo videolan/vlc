@@ -127,6 +127,19 @@ struct vout_window_callbacks {
     void (*output_event)(vout_window_t *, const char *id, const char *desc);
 };
 
+struct vout_window_operations {
+    /**
+     * Control callback (mandatory)
+     *
+     * This callback handles some control request regarding the window.
+     * See \ref vout_window_control.
+     *
+     * This field should not be used directly when manipulating a window.
+     * vout_window_Control() should be used instead.
+     */
+    int (*control)(vout_window_t *, int, va_list);
+};
+
 typedef struct vout_window_owner {
     const struct vout_window_callbacks *cbs;
     void *sys;
@@ -188,16 +201,7 @@ struct vout_window_t {
         struct wl_display *wl; /**< Wayland display (client pointer) */
     } display;
 
-    /**
-     * Control callback (mandatory)
-     *
-     * This callback handles some control request regarding the window.
-     * See \ref vout_window_control.
-     *
-     * This field should not be used directly when manipulating a window.
-     * vout_window_Control() should be used instead.
-     */
-    int (*control)(vout_window_t *, int query, va_list);
+    const struct vout_window_operations *ops;
 
     struct {
         bool has_double_click; /**< Whether double click events are sent,
@@ -233,7 +237,7 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled);
 static inline int vout_window_vaControl(vout_window_t *window, int query,
                                         va_list ap)
 {
-    return window->control(window, query, ap);
+    return window->ops->control(window, query, ap);
 }
 
 /**

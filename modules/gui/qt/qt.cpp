@@ -694,6 +694,10 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
  */
 static int WindowControl( vout_window_t *, int i_query, va_list );
 
+static const struct vout_window_operations window_ops = {
+    WindowControl,
+};
+
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
     if( cfg->is_standalone )
@@ -727,7 +731,7 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
 
     p_wnd->info.has_double_click = true;
-    p_wnd->control = WindowControl;
+    p_wnd->ops = &window_ops;
     p_wnd->sys = (vout_window_sys_t*)p_mi;
     return VLC_SUCCESS;
 }

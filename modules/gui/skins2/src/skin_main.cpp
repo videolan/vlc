@@ -342,6 +342,10 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
+static const struct vout_window_operations window_ops = {
+    WindowControl,
+};
+
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
     if( var_InheritBool( pWnd, "video-wallpaper" ) )
@@ -375,7 +379,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     pWnd->sys = sys;
     pWnd->sys->cfg = *cfg;
     pWnd->sys->pIntf = pIntf;
-    pWnd->control = WindowControl;
+    pWnd->ops = &window_ops;
 
     pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
 

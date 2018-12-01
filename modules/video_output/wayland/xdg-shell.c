@@ -236,6 +236,10 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
     return VLC_SUCCESS;
 }
 
+static const struct vout_window_operations ops = {
+    .control = Control,
+};
+
 #ifdef XDG_SHELL
 static void xdg_toplevel_configure_cb(void *data,
                                       struct xdg_toplevel *toplevel,
@@ -573,7 +577,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->type = VOUT_WINDOW_TYPE_WAYLAND;
     wnd->handle.wl = surface;
     wnd->display.wl = display;
-    wnd->control = Control;
+    wnd->ops = &ops;
 
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         goto error;

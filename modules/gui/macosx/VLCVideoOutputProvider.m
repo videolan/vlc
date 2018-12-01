@@ -43,6 +43,10 @@ static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
 static int WindowControl(vout_window_t *, int i_query, va_list);
 
+static const struct vout_window_operations ops = {
+    WindowControl,
+};
+
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
     @autoreleasepool {
@@ -74,7 +78,7 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
         p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
 
         p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
-        p_wnd->control = WindowControl;
+        p_wnd->ops = &ops;
     }
     if (cfg->is_fullscreen)
         vout_window_SetFullScreen(p_wnd, NULL);

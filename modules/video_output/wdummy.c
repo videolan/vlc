@@ -55,10 +55,14 @@ static int Control(vout_window_t *wnd, int query, va_list ap)
     }
 }
 
+static const struct vout_window_operations ops = {
+    .control = Control,
+};
+
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     wnd->type = VOUT_WINDOW_TYPE_DUMMY;
-    wnd->control = Control;
+    wnd->ops = &ops;
     vout_window_ReportSize(wnd, cfg->width, cfg->height);
     return VLC_SUCCESS;
 }

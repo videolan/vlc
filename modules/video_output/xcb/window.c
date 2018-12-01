@@ -561,6 +561,10 @@ static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
                         atom, 32, ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
 }
 
+static const struct vout_window_operations ops = {
+    .control = Control,
+};
+
 /**
  * Create an X11 window.
  */
@@ -631,7 +635,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->handle.xid = window;
     wnd->display.x11 = display;
-    wnd->control = Control;
+    wnd->ops = &ops;
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
@@ -838,7 +842,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->display.x11 = NULL;
     wnd->handle.xid = window;
-    wnd->control = Control;
+    wnd->ops = &ops;
     wnd->sys = p_sys;
 
     p_sys->conn = conn;

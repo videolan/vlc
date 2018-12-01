@@ -90,6 +90,11 @@ static int EmbedVideoWindow_Control(vout_window_t *wnd, int query, va_list ap)
     return VLC_EGENERIC;
 }
 
+static const struct vout_window_operations embedVideoWindow_Ops =
+{
+    .control = EmbedVideoWindow_Control,
+};
+
 static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -103,7 +108,7 @@ static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)
 
     wnd->type = VOUT_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = sys->sys.hvideownd;
-    wnd->control = EmbedVideoWindow_Control;
+    wnd->ops = &embedVideoWindow_Ops;
     return wnd;
 }
 

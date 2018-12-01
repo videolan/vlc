@@ -82,6 +82,10 @@ static void OnNewMouseCoords(vout_window_t *wnd,
     }
 }
 
+static const struct vout_window_operations ops = {
+    .control = Control,
+};
+
 /**
  * Create an Android native window.
  */
@@ -99,7 +103,7 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
     wnd->handle.anativewindow = p_sys->p_awh;
-    wnd->control = Control;
+    wnd->ops = &ops;
 
     return VLC_SUCCESS;
 

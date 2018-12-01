@@ -62,6 +62,10 @@ static int Control (vout_window_t *, int, va_list);
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 static uintptr_t *used = NULL;
 
+static const struct vout_window_operations ops = {
+    .control = Control,
+};
+
 /**
  * Find the drawable set by libvlc application.
  */
@@ -101,7 +105,7 @@ skip:
 
     wnd->type = VOUT_WINDOW_TYPE_HWND;
     wnd->handle.hwnd = (void *)val;
-    wnd->control = Control;
+    wnd->ops = &ops;
     wnd->sys = (void *)val;
     return VLC_SUCCESS;
 }
