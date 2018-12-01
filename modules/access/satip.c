@@ -142,7 +142,7 @@ static void parse_session(char *request_line, char *session, unsigned max, int *
     tok = strtok_r(request_line, ";", &state);
     if (tok == NULL)
         return;
-    strncpy(session, tok, __MIN(strlen(tok), max - 1));
+    memcpy(session, tok, __MIN(strlen(tok), max - 1));
 
     while ((tok = strtok_r(NULL, ";", &state)) != NULL) {
         if (strncmp(tok, "timeout=", 8) == 0) {
@@ -182,13 +182,13 @@ static int parse_transport(stream_t *access, char *request_line) {
 
     while ((tok = strtok_r(NULL, ";", &state)) != NULL) {
         if (strncmp(tok, "destination=", 12) == 0) {
-            strncpy(sys->udp_address, tok + 12, __MIN(strlen(tok + 12), UDP_ADDRESS_LEN - 1));
+            memcpy(sys->udp_address, tok + 12, __MIN(strlen(tok + 12), UDP_ADDRESS_LEN - 1));
         } else if (strncmp(tok, "port=", 5) == 0) {
             char port[6];
             char *end;
 
             memset(port, 0x00, 6);
-            strncpy(port, tok + 5, __MIN(strlen(tok + 5), 5));
+            memcpy(port, tok + 5, __MIN(strlen(tok + 5), 5));
             if ((end = strstr(port, "-")) != NULL)
                 *end = '\0';
             err = parse_port(port, &sys->udp_port);
