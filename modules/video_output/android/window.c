@@ -54,11 +54,6 @@ vlc_module_begin()
 vlc_module_end()
 
 
-struct vout_window_sys_t
-{
-    AWindowHandler *p_awh;
-};
-
 static void OnNewWindowSize(vout_window_t *wnd,
                             unsigned i_width, unsigned i_height)
 {
@@ -92,25 +87,16 @@ static const struct vout_window_operations ops = {
  */
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
-    vout_window_sys_t *p_sys = malloc(sizeof (*p_sys));
-    if (p_sys == NULL)
-        return VLC_ENOMEM;
-    wnd->sys = p_sys;
-
-    p_sys->p_awh = AWindowHandler_new(wnd,
+    AWindowHandler *p_awh = AWindowHandler_new(wnd,
         &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
-    if (!p_sys->p_awh)
-        goto error;
+    if (p_awh == NULL)
+        return VLC_EGENERIC;
 
     wnd->type = VOUT_WINDOW_TYPE_ANDROID_NATIVE;
-    wnd->handle.anativewindow = p_sys->p_awh;
+    wnd->handle.anativewindow = p_awh;
     wnd->ops = &ops;
 
     return VLC_SUCCESS;
-
-error:
-    Close(wnd);
-    return VLC_EGENERIC;
 }
 
 
@@ -119,10 +105,7 @@ error:
  */
 static void Close(vout_window_t *wnd)
 {
-    vout_window_sys_t *p_sys = wnd->sys;
-    if (p_sys->p_awh)
-        AWindowHandler_destroy(p_sys->p_awh);
-    free (p_sys);
+    AWindowHandler_destroy(wnd->handle.anativewindow);
 }
 
 
