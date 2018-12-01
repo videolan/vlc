@@ -45,7 +45,7 @@ typedef xcb_atom_t Atom;
 
 #include "events.h"
 
-struct vout_window_sys_t
+typedef struct
 {
     xcb_connection_t *conn;
     vlc_thread_t thread;
@@ -67,7 +67,7 @@ struct vout_window_sys_t
 #endif
 
     bool embedded;
-};
+} vout_window_sys_t;
 
 #ifdef HAVE_XKBCOMMON
 static int InitKeyboard(vout_window_t *wnd)

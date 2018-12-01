@@ -322,17 +322,19 @@ static int  WindowOpen( vout_window_t *, const vout_window_cfg_t * );
 static void WindowClose( vout_window_t * );
 static int  WindowControl( vout_window_t *, int, va_list );
 
-struct vout_window_sys_t
+typedef struct
 {
     intf_thread_t*     pIntf;
     vout_window_cfg_t  cfg;
-};
+} vout_window_skins_t;
 
 static void WindowOpenLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 {
     vout_window_t* pWnd = (vout_window_t*)pObj;
-    int width = (int)pWnd->sys->cfg.width;
-    int height = (int)pWnd->sys->cfg.height;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    int width = sys->cfg.width;
+    int height = sys->cfg.height;
+
     VoutManager::instance( pIntf )->acceptWnd( pWnd, width, height );
 }
 
@@ -344,7 +346,7 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 
 static void WindowUnsetFullscreen( vout_window_t *pWnd )
 {
-    vout_window_sys_t *sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
     CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd, false );
@@ -354,7 +356,7 @@ static void WindowUnsetFullscreen( vout_window_t *pWnd )
 
 static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 {
-    vout_window_sys_t *sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
     // Post a set fullscreen command
@@ -376,7 +378,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
      || !var_InheritBool( pWnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
-    vout_window_sys_t* sys;
+    vout_window_skins_t* sys;
 
     vlc_mutex_lock( &skin_load.mutex );
     intf_thread_t *pIntf = skin_load.intf;
@@ -388,7 +390,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( !var_InheritBool( pIntf, "skinned-video") )
         return VLC_EGENERIC;
 
-    sys = new (std::nothrow) vout_window_sys_t;
+    sys = new (std::nothrow) vout_window_skins_t;
     if( !sys )
         return VLC_ENOMEM;
 
@@ -418,7 +420,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 
 static void WindowClose( vout_window_t *pWnd )
 {
-    vout_window_sys_t* sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
 
     // force execution in the skins2 thread context
@@ -431,7 +433,7 @@ static void WindowClose( vout_window_t *pWnd )
 
 static int WindowControl( vout_window_t *pWnd, int query, va_list args )
 {
-    vout_window_sys_t* sys = pWnd->sys;
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
     intf_thread_t *pIntf = sys->pIntf;
     AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
 

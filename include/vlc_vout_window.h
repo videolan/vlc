@@ -38,7 +38,6 @@
  */
 
 typedef struct vout_window_t vout_window_t;
-typedef struct vout_window_sys_t vout_window_sys_t;
 
 struct wl_display;
 struct wl_surface;
@@ -237,7 +236,7 @@ struct vout_window_t {
      *
      * A module is free to use it as it wishes.
      */
-    vout_window_sys_t *sys;
+    void *sys;
 
     vout_window_owner_t owner;
 };

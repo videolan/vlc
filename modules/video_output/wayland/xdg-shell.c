@@ -66,7 +66,7 @@
 #include "input.h"
 #include "output.h"
 
-struct vout_window_sys_t
+typedef struct
 {
     struct wl_registry *registry;
     struct wl_compositor *compositor;
@@ -105,7 +105,7 @@ struct vout_window_sys_t
 
     vlc_mutex_t lock;
     vlc_thread_t thread;
-};
+} vout_window_sys_t;
 
 static void cleanup_wl_display_read(void *data)
 {

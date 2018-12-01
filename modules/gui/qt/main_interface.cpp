@@ -747,7 +747,7 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
     {
         p_wnd->ops = &ops;
         p_wnd->info.has_double_click = true;
-        p_wnd->sys = (vout_window_sys_t*)this;
+        p_wnd->sys = this;
     }
 
     return result;
