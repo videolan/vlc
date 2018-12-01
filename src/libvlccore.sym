@@ -746,6 +746,8 @@ vout_OSDSlider
 vout_OSDText
 vout_window_New
 vout_window_Delete
+vout_window_Enable
+vout_window_Disable
 vout_display_GetDefaultDisplaySize
 vout_display_PlacePicture
 vout_display_SendMouseMovedDisplayCoordinates

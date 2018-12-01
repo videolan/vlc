@@ -147,6 +147,10 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
     free(modlist);
     if (surface == NULL)
         goto error;
+    if (vout_window_Enable(surface, cfg)) {
+        vout_window_Delete(surface);
+        goto error;
+    }
     if (wp != NULL)
         *wp = surface;
 
@@ -202,6 +206,7 @@ void vlc_gl_surface_Destroy(vlc_gl_t *gl)
     vlc_gl_surface_t *sys = surface->owner.sys;
 
     vlc_gl_Release(gl);
+    vout_window_Disable(surface);
     vout_window_Delete(surface);
     vlc_mutex_destroy(&sys->lock);
     free(sys);

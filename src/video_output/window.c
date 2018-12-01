@@ -78,14 +78,38 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     if (var_InheritBool(obj, "disable-screensaver") &&
         (window->type == VOUT_WINDOW_TYPE_XID || window->type == VOUT_WINDOW_TYPE_HWND
       || window->type == VOUT_WINDOW_TYPE_WAYLAND))
-    {
-        w->inhibit = vlc_inhibit_Create(VLC_OBJECT (window));
-        if (w->inhibit != NULL)
-            vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
-    }
+        w->inhibit = vlc_inhibit_Create(VLC_OBJECT(window));
     else
         w->inhibit = NULL;
     return window;
+}
+
+int vout_window_Enable(vout_window_t *window,
+                       const vout_window_cfg_t *restrict cfg)
+{
+    window_t *w = container_of(window, window_t, wnd);
+
+    if (window->ops->enable != NULL) {
+        int err = window->ops->enable(window, cfg);
+        if (err)
+            return err;
+    }
+
+    if (w->inhibit != NULL)
+        vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_VIDEO);
+
+    return VLC_SUCCESS;
+}
+
+void vout_window_Disable(vout_window_t *window)
+{
+    window_t *w = container_of(window, window_t, wnd);
+
+    if (w->inhibit != NULL)
+        vlc_inhibit_Set(w->inhibit, VLC_INHIBIT_NONE);
+
+    if (window->ops->disable != NULL)
+        window->ops->disable(window);
 }
 
 void vout_window_Delete(vout_window_t *window)
@@ -93,13 +117,10 @@ void vout_window_Delete(vout_window_t *window)
     if (!window)
         return;
 
-    window_t *w = (window_t *)window;
-    if (w->inhibit)
-    {
-        vlc_inhibit_Set (w->inhibit, VLC_INHIBIT_NONE);
-        vlc_inhibit_Destroy (w->inhibit);
-    }
+    window_t *w = container_of(window, window_t, wnd);
 
+    if (w->inhibit != NULL)
+        vlc_inhibit_Destroy(w->inhibit);
     if (window->ops->destroy != NULL)
         window->ops->destroy(window);
     vlc_objres_clear(VLC_OBJECT(window));
@@ -375,6 +396,14 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
 
     window = vout_window_New((vlc_object_t *)vout, modlist, cfg, &owner);
     free(modlist);
+
+    if (window != NULL) {
+        if (vout_window_Enable(window, cfg)) {
+            vout_window_Delete(window);
+            window = NULL;
+        }
+    }
+
     if (window == NULL)
         free(state);
     return window;
@@ -401,6 +430,7 @@ void vout_display_window_Delete(vout_window_t *window)
     vout_thread_t *vout = (vout_thread_t *)(window->obj.parent);
     vout_display_window_t *state = window->owner.sys;
 
+    vout_window_Disable(window);
     vout_window_Delete(window);
     var_Destroy(vout, "window-fullscreen-output");
     var_Destroy(vout, "window-fullscreen");

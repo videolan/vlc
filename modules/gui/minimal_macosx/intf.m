@@ -148,6 +148,8 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    NULL,
+    NULL,
     WindowResize,
     WindowClose,
     WindowSetState,

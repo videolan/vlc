@@ -393,6 +393,8 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 }
 
 static const struct vout_window_operations window_ops = {
+    NULL,
+    NULL,
     WindowResize,
     WindowClose,
     WindowSetState,

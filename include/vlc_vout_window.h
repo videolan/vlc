@@ -134,6 +134,8 @@ struct vout_window_callbacks {
 };
 
 struct vout_window_operations {
+    int (*enable)(vout_window_t *, const vout_window_cfg_t *);
+    void (*disable)(vout_window_t *);
     void (*resize)(vout_window_t *, unsigned width, unsigned height);
 
     /**
@@ -292,6 +294,29 @@ static inline void vout_window_UnsetFullScreen(vout_window_t *window)
     if (window->ops->unset_fullscreen != NULL)
         window->ops->unset_fullscreen(window);
 }
+
+/**
+ * Enables a window.
+ *
+ * This informs the window provider that the window is about to be taken into
+ * active use. A window is always initially disabled. This is so that the
+ * window provider can provide a persistent connection to the display server,
+ * and track any useful events, such as monitors hotplug.
+ *
+ * The window handle (vout_window_t.handle) and display (vout_window_t.display)
+ * must remain valid and constant while the window is enabled.
+ */
+int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
+
+/**
+ * Disables a window.
+ *
+ * This informs the window provider that the window is no longer needed.
+ *
+ * Note that the window may be re-enabled later by a call to
+ * vout_window_Enable().
+ */
+void vout_window_Disable(vout_window_t *window);
 
 /**
  * Report current window size

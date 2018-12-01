@@ -731,6 +731,8 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
                               bool fullscreen )
 {
     static const struct vout_window_operations ops = {
+        NULL,
+        NULL,
         MainInterface::resizeVideo,
         MainInterface::releaseVideo,
         MainInterface::requestVideoState,
