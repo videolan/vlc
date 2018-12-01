@@ -372,7 +372,8 @@ static const struct vout_window_operations window_ops = {
 
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 {
-    if( var_InheritBool( pWnd, "video-wallpaper" ) )
+    if( var_InheritBool( pWnd, "video-wallpaper" )
+     || !var_InheritBool( pWnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
     vout_window_sys_t* sys;
@@ -384,7 +385,7 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    if( !var_InheritBool( pIntf, "skinned-video") || cfg->is_standalone )
+    if( !var_InheritBool( pIntf, "skinned-video") )
         return VLC_EGENERIC;
 
     sys = new (std::nothrow) vout_window_sys_t;

@@ -691,7 +691,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
  */
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
-    if( cfg->is_standalone )
+    if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
 
     intf_thread_t *p_intf =

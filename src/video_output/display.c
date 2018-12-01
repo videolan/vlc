@@ -1231,7 +1231,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         vout_window_cfg_t cfg = {
             .width = state->cfg.display.width,
             .height = state->cfg.display.height,
-            .is_standalone = true,
             .is_decorated = true,
         };
 
