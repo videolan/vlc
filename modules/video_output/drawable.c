@@ -48,7 +48,7 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window", 70)
-    set_callbacks (Open, Close)
+    set_callbacks (Open, NULL)
     add_shortcut ("embed-hwnd")
 
     add_integer ("drawable-hwnd", 0, HWND_TEXT, HWND_LONGTEXT, true)
@@ -64,6 +64,7 @@ static uintptr_t *used = NULL;
 
 static const struct vout_window_operations ops = {
     .control = Control,
+    .destroy = Close,
 };
 
 /**

@@ -44,7 +44,6 @@ int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
 int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
-void WindowClose  ( vout_window_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -64,6 +63,6 @@ vlc_module_begin ()
     /* Will be loaded even without interface module. see voutgl.m */
         set_description( "Minimal Mac OS X Video Output Provider" )
         set_capability( "vout window", 50 )
-        set_callbacks( WindowOpen, WindowClose )
+        set_callbacks( WindowOpen, NULL )
 vlc_module_end ()
 

@@ -561,8 +561,11 @@ static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
                         atom, 32, ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
 }
 
+static void Close(vout_window_t *);
+
 static const struct vout_window_operations ops = {
     .control = Control,
+    .destroy = Close,
 };
 
 /**
@@ -821,6 +824,13 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
     var_Destroy (obj->obj.libvlc, "xid-in-use");
 }
 
+static void EmClose(vout_window_t *);
+
+static const struct vout_window_operations em_ops = {
+    .control = Control,
+    .destroy = EmClose,
+};
+
 /**
  * Wrap an existing X11 window to embed the video.
  */
@@ -842,7 +852,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->display.x11 = NULL;
     wnd->handle.xid = window;
-    wnd->ops = &ops;
+    wnd->ops = &em_ops;
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
@@ -923,7 +933,7 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window", 10)
-    set_callbacks (Open, Close)
+    set_callbacks(Open, NULL)
 
     /* Obsolete since 1.1.0: */
     add_obsolete_bool ("x11-altfullscreen")
@@ -937,7 +947,7 @@ vlc_module_begin ()
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window", 70)
-    set_callbacks (EmOpen, EmClose)
+    set_callbacks(EmOpen, NULL)
     add_shortcut ("embed-xid")
 
     add_string ("x11-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)

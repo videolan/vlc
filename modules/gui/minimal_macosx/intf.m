@@ -101,9 +101,11 @@ static void Run(intf_thread_t *p_intf)
  * Vout window management
  *****************************************************************************/
 static int WindowControl(vout_window_t *, int i_query, va_list);
+static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
     WindowControl,
+    WindowClose,
 };
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
@@ -185,7 +187,7 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
     }
 }
 
-void WindowClose(vout_window_t *p_wnd)
+static void WindowClose(vout_window_t *p_wnd)
 {
     @autoreleasepool {
         NSWindow * o_window = [(__bridge id)p_wnd->handle.nsobject window];

@@ -138,6 +138,13 @@ struct vout_window_operations {
      * vout_window_Control() should be used instead.
      */
     int (*control)(vout_window_t *, int, va_list);
+
+    /**
+     * Destroy the window.
+     *
+     * Destroys the window and releases all associated resources.
+     */
+    void (*destroy)(vout_window_t *);
 };
 
 typedef struct vout_window_owner {

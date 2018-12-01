@@ -344,6 +344,7 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
 
 static const struct vout_window_operations window_ops = {
     WindowControl,
+    WindowClose,
 };
 
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
@@ -518,6 +519,6 @@ vlc_module_begin ()
 
     add_submodule ()
         set_capability( "vout window", 51 )
-        set_callbacks( WindowOpen, WindowClose )
+        set_callbacks( WindowOpen, NULL )
 
 vlc_module_end ()

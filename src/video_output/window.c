@@ -88,14 +88,6 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     return window;
 }
 
-static void vout_window_stop(void *func, va_list ap)
-{
-    int (*deactivate)(vout_window_t *) = func;
-    vout_window_t *wnd = va_arg(ap, vout_window_t *);
-
-    deactivate(wnd);
-}
-
 void vout_window_Delete(vout_window_t *window)
 {
     if (!window)
@@ -108,7 +100,9 @@ void vout_window_Delete(vout_window_t *window)
         vlc_inhibit_Destroy (w->inhibit);
     }
 
-    vlc_module_unload(window, w->module, vout_window_stop, window);
+    if (window->ops->destroy != NULL)
+        window->ops->destroy(window);
+    vlc_objres_clear(VLC_OBJECT(window));
     vlc_object_release(window);
 }
 

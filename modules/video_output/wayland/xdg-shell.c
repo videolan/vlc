@@ -236,8 +236,11 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
     return VLC_SUCCESS;
 }
 
+static void Close(vout_window_t *);
+
 static const struct vout_window_operations ops = {
     .control = Control,
+    .destroy = Close,
 };
 
 #ifdef XDG_SHELL
@@ -674,7 +677,7 @@ vlc_module_begin()
 #else
     set_capability("vout window", 10)
 #endif
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
 
     add_string("wl-display", NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
     add_integer("wl-output", 0, OUTPUT_TEXT, OUTPUT_LONGTEXT, true)

@@ -50,7 +50,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_capability("vout window", 10)
-    set_callbacks(Open, Close)
+    set_callbacks(Open, NULL)
 vlc_module_end()
 
 
@@ -84,6 +84,7 @@ static void OnNewMouseCoords(vout_window_t *wnd,
 
 static const struct vout_window_operations ops = {
     .control = Control,
+    .destroy = Close,
 };
 
 /**
