@@ -379,26 +379,17 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
 
     vlc_mutex_lock( &skin_load.mutex );
     intf_thread_t *pIntf = skin_load.intf;
-    if( pIntf )
-        vlc_object_hold( pIntf );
     vlc_mutex_unlock( &skin_load.mutex );
 
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    if( !var_InheritBool( pIntf, "skinned-video") ||
-        cfg->is_standalone )
-    {
-        vlc_object_release( pIntf );
+    if( !var_InheritBool( pIntf, "skinned-video") || cfg->is_standalone )
         return VLC_EGENERIC;
-    }
 
     sys = new (std::nothrow) vout_window_sys_t;
     if( !sys )
-    {
-        vlc_object_release( pIntf );
         return VLC_ENOMEM;
-    }
 
     pWnd->sys = sys;
     sys->cfg = *cfg;
@@ -416,7 +407,6 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
     {
         msg_Dbg( pIntf, "Vout window creation failed" );
         delete sys;
-        vlc_object_release( pIntf );
         return VLC_EGENERIC;
     }
 
@@ -435,7 +425,6 @@ static void WindowClose( vout_window_t *pWnd )
                                                 WindowCloseLocal );
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
-    vlc_object_release( sys->pIntf );
     delete sys;
 }
 
