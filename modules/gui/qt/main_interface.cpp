@@ -729,11 +729,27 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
                               unsigned int i_width, unsigned int i_height,
                               bool fullscreen )
 {
+    static const struct vout_window_operations ops = {
+        MainInterface::controlVideo,
+        MainInterface::releaseVideo,
+        MainInterface::requestVideoWindowed,
+        MainInterface::requestVideoFullScreen,
+    };
     bool result;
+
+    msg_Dbg( p_wnd, "requesting video window..." );
 
     /* This is a blocking call signal. Results are stored directly in the
      * vout_window_t and boolean pointers. Beware of deadlocks! */
     emit askGetVideo( p_wnd, i_width, i_height, fullscreen, &result );
+
+    if( result )
+    {
+        p_wnd->ops = &ops;
+        p_wnd->info.has_double_click = true;
+        p_wnd->sys = (vout_window_sys_t*)this;
+    }
+
     return result;
 }
 
@@ -771,12 +787,6 @@ void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
             videoWidget->setSize( i_width, i_height );
         }
     }
-}
-
-/* Asynchronous call from the WindowClose function */
-void MainInterface::releaseVideo( void )
-{
-    emit askReleaseVideo();
 }
 
 /* Function that is CONNECTED to the previous emit */
@@ -987,8 +997,11 @@ void MainInterface::requestVideoFullScreen( vout_window_t *wnd, const char * )
     emit p_mi->askVideoSetFullScreen( true );
 }
 
-int MainInterface::controlVideo( int i_query, va_list args )
+int MainInterface::controlVideo( vout_window_t *p_wnd, int i_query,
+                                 va_list args )
 {
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+
     switch( i_query )
     {
     case VOUT_WINDOW_SET_SIZE:
@@ -996,7 +1009,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
         unsigned int i_width  = va_arg( args, unsigned int );
         unsigned int i_height = va_arg( args, unsigned int );
 
-        emit askVideoToResize( i_width, i_height );
+        emit p_mi->askVideoToResize( i_width, i_height );
         return VLC_SUCCESS;
     }
     case VOUT_WINDOW_SET_STATE:
@@ -1004,13 +1017,21 @@ int MainInterface::controlVideo( int i_query, va_list args )
         unsigned i_arg = va_arg( args, unsigned );
         unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
 
-        emit askVideoOnTop( on_top != 0 );
+        emit p_mi->askVideoOnTop( on_top != 0 );
         return VLC_SUCCESS;
     }
     default:
-        msg_Warn( p_intf, "unsupported control query" );
+        msg_Warn( p_wnd, "unsupported control query" );
         return VLC_EGENERIC;
     }
+}
+
+void MainInterface::releaseVideo( vout_window_t *p_wnd )
+{
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+
+    msg_Dbg( p_wnd, "releasing video..." );
+    emit p_mi->askReleaseVideo();
 }
 
 /*****************************************************************************

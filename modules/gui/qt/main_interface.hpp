@@ -72,12 +72,13 @@ public:
     /* Video requests from core */
     bool getVideo( struct vout_window_t *,
                    unsigned int i_width, unsigned int i_height, bool );
-    void releaseVideo( void );
-
-    int  controlVideo( int i_query, va_list args );
+private:
+    static void releaseVideo( struct vout_window_t * );
+    static int controlVideo( struct vout_window_t *, int, va_list );
     static void requestVideoWindowed( struct vout_window_t * );
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
 
+public:
     /* Getters */
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }

@@ -91,7 +91,6 @@ static int  OpenDialogs  ( vlc_object_t * );
 static int  Open         ( vlc_object_t *, bool );
 static void Close        ( vlc_object_t * );
 static int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
-static void WindowClose  ( vout_window_t * );
 static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 
 /*****************************************************************************
@@ -689,18 +688,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 
 /**
  * Video output window provider
- *
- * TODO move it out of here ?
  */
-static int WindowControl( vout_window_t *, int i_query, va_list );
-
-static const struct vout_window_operations window_ops = {
-    WindowControl,
-    WindowClose,
-    MainInterface::requestVideoWindowed,
-    MainInterface::requestVideoFullScreen,
-};
-
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 {
     if( cfg->is_standalone )
@@ -728,49 +716,9 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
         return VLC_EGENERIC;
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
-    msg_Dbg( p_wnd, "requesting video window..." );
 
     if( !p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen ) )
         return VLC_EGENERIC;
 
-    p_wnd->info.has_double_click = true;
-    p_wnd->ops = &window_ops;
-    p_wnd->sys = (vout_window_sys_t*)p_mi;
     return VLC_SUCCESS;
-}
-
-static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
-{
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-    QMutexLocker locker (&lock);
-
-    if (unlikely(!active))
-    {
-        msg_Warn (p_wnd, "video already released before control");
-        return VLC_EGENERIC;
-    }
-    return p_mi->controlVideo( i_query, args );
-}
-
-static void WindowClose( vout_window_t *p_wnd )
-{
-    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-    QMutexLocker locker (&lock);
-
-    /* Normally, the interface terminates after the video. In the contrary, the
-     * Qt main loop is gone, so we cannot send any event to the user interface
-     * widgets. Ideally, we would keep the Qt main loop running until after
-     * the video window is released. But it is far simpler to just have the Qt
-     * thread destroy the window early, and to turn this function into a stub.
-     *
-     * That assumes the video output will behave sanely if it window is
-     * destroyed asynchronously.
-     * XCB and Xlib-XCB are fine with that. Plain Xlib wouldn't, */
-    if (unlikely(!active))
-    {
-        msg_Warn (p_wnd, "video already released");
-        return;
-    }
-    msg_Dbg (p_wnd, "releasing video...");
-    p_mi->releaseVideo();
 }
