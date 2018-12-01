@@ -46,6 +46,4 @@
 
 - (void)updateWindowLevelForHelperWindows:(NSInteger)i_level;
 
-- (void)hideMouseForWindow:(vout_window_t *)p_wnd;
-
 @end

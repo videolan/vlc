@@ -63,7 +63,6 @@ enum vout_window_control {
     VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
     VOUT_WINDOW_SET_FULLSCREEN, /* void */
     VOUT_WINDOW_UNSET_FULLSCREEN, /* void */
-    VOUT_WINDOW_HIDE_MOUSE VLC_DEPRECATED_ENUM,
 };
 
 /**
