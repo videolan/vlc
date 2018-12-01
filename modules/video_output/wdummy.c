@@ -44,8 +44,6 @@ static int Control(vout_window_t *wnd, int query, va_list ap)
         }
 
         case VOUT_WINDOW_SET_STATE:
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
             /* These controls deserve a proper window provider. Move along. */
             return VLC_EGENERIC;
 

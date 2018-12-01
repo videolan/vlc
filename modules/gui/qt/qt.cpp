@@ -697,6 +697,8 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 static const struct vout_window_operations window_ops = {
     WindowControl,
     WindowClose,
+    MainInterface::requestVideoWindowed,
+    MainInterface::requestVideoFullScreen,
 };
 
 static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )

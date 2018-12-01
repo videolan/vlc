@@ -39,6 +39,37 @@
 #import "VLCPlaylist.h"
 #import "NSScreen+VLCAdditions.h"
 
+static const char windowed;
+
+static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
+{
+    if (var_InheritBool(getIntf(), "video-wallpaper")) {
+        msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
+        return;
+    }
+
+    int i_full = psz_id == &windowed;
+    BOOL b_animation = YES;
+
+    @autoreleasepool {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutProvider setFullscreen:i_full
+                          forWindow:p_wnd
+                          withAnimation:b_animation];
+        });
+    }
+}
+
+static void WindowUnsetFullscreen(vout_window_t *wnd)
+{
+    WindowSetFullscreen(wnd, &windowed);
+}
+
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
 static int WindowControl(vout_window_t *, int i_query, va_list);
@@ -47,6 +78,8 @@ static void WindowClose(vout_window_t *);
 static const struct vout_window_operations ops = {
     WindowControl,
     WindowClose,
+    WindowUnsetFullscreen,
+    WindowSetFullscreen,
 };
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
@@ -124,25 +157,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
                                              forWindow:p_wnd];
-                });
-
-                break;
-            }
-            case VOUT_WINDOW_SET_FULLSCREEN:
-            case VOUT_WINDOW_UNSET_FULLSCREEN:
-            {
-                if (var_InheritBool(getIntf(), "video-wallpaper")) {
-                    msg_Dbg(p_wnd, "Ignore fullscreen event as video-wallpaper is on");
-                    goto out;
-                }
-
-                int i_full = i_query == VOUT_WINDOW_SET_FULLSCREEN;
-                BOOL b_animation = YES;
-
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutProvider setFullscreen:i_full
-                                        forWindow:p_wnd
-                                    withAnimation:b_animation];
                 });
 
                 break;

@@ -100,12 +100,37 @@ static void Run(intf_thread_t *p_intf)
 /*****************************************************************************
  * Vout window management
  *****************************************************************************/
+
+static void WindowUnsetFullscreen(vout_window_t *p_wnd)
+{
+    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
+
+    @autoreleasepool {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [(VLCMinimalVoutWindow*)o_window leaveFullscreen];
+        });
+    }
+}
+
+static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
+{
+    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
+
+    @autoreleasepool {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [(VLCMinimalVoutWindow*)o_window enterFullscreen];
+        });
+    }
+}
+
 static int WindowControl(vout_window_t *, int i_query, va_list);
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
     WindowControl,
     WindowClose,
+    WindowUnsetFullscreen,
+    WindowSetFullscreen,
 };
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
@@ -163,20 +188,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
                     theFrame.size.width = i_width;
                     theFrame.size.height = i_height;
                     [o_window setFrame:theFrame display:YES animate:YES];
-                });
-            }
-            return VLC_SUCCESS;
-        }
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-        {
-            int i_full = i_query == VOUT_WINDOW_SET_FULLSCREEN;
-            @autoreleasepool {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    if (i_full)
-                        [(VLCMinimalVoutWindow*)o_window enterFullscreen];
-                    else
-                        [(VLCMinimalVoutWindow*)o_window leaveFullscreen];
                 });
             }
             return VLC_SUCCESS;

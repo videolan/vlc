@@ -61,8 +61,6 @@ enum vout_window_type {
 enum vout_window_control {
     VOUT_WINDOW_SET_STATE, /* unsigned state */
     VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
-    VOUT_WINDOW_SET_FULLSCREEN, /* void */
-    VOUT_WINDOW_UNSET_FULLSCREEN, /* void */
 };
 
 /**
@@ -145,6 +143,9 @@ struct vout_window_operations {
      * Destroys the window and releases all associated resources.
      */
     void (*destroy)(vout_window_t *);
+
+    void (*unset_fullscreen)(vout_window_t *);
+    void (*set_fullscreen)(vout_window_t *, const char *id);
 };
 
 typedef struct vout_window_owner {
@@ -286,26 +287,21 @@ static inline int vout_window_SetSize(vout_window_t *window,
  * Requests fullscreen mode.
  *
  * \param id nul-terminated output identifier, NULL for default
- *
- * \retval VLC_SUCCESS The request has been queued to the windowing system
- * (that does <b>not</b> imply that the request is complete nor succesful).
- * \retval VLC_EGENERIC The request could not be queued, e.g. the back-end does
- * not implement toggling between fullscreen and windowed modes.
  */
-static inline int vout_window_SetFullScreen(vout_window_t *window,
+static inline void vout_window_SetFullScreen(vout_window_t *window,
                                             const char *id)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, id);
+    if (window->ops->set_fullscreen != NULL)
+        window->ops->set_fullscreen(window, id);
 }
 
 /**
  * Requests windowed mode.
- *
- * \return \see vout_window_SetFullScreen()
  */
-static inline int vout_window_UnsetFullScreen(vout_window_t *window)
+static inline void vout_window_UnsetFullScreen(vout_window_t *window)
 {
-    return vout_window_Control(window, VOUT_WINDOW_UNSET_FULLSCREEN);
+    if (window->ops->unset_fullscreen != NULL)
+        window->ops->unset_fullscreen(window);
 }
 
 /**

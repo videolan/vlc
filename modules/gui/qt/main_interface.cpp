@@ -972,7 +972,21 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
     }
 }
 
-/* Asynchronous call from WindowControl function */
+/* Asynchronous calls for video window contrlos */
+void MainInterface::requestVideoWindowed( struct vout_window_t *wnd )
+{
+   MainInterface *p_mi = (MainInterface *)wnd->sys;
+
+   emit p_mi->askVideoSetFullScreen( false );
+}
+
+void MainInterface::requestVideoFullScreen( vout_window_t *wnd, const char * )
+{
+    MainInterface *p_mi = (MainInterface *)wnd->sys;
+
+    emit p_mi->askVideoSetFullScreen( true );
+}
+
 int MainInterface::controlVideo( int i_query, va_list args )
 {
     switch( i_query )
@@ -993,12 +1007,6 @@ int MainInterface::controlVideo( int i_query, va_list args )
         emit askVideoOnTop( on_top != 0 );
         return VLC_SUCCESS;
     }
-    case VOUT_WINDOW_SET_FULLSCREEN:
-        emit askVideoSetFullScreen( true );
-        return VLC_SUCCESS;
-    case VOUT_WINDOW_UNSET_FULLSCREEN:
-        emit askVideoSetFullScreen( false );
-        return VLC_SUCCESS;
     default:
         msg_Warn( p_intf, "unsupported control query" );
         return VLC_EGENERIC;

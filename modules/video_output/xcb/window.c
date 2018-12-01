@@ -446,18 +446,29 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             break;
         }
 
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-            change_wm_state (wnd, cmd == VOUT_WINDOW_SET_FULLSCREEN,
-                             p_sys->wm_state_fullscreen);
-            break;
-
         default:
             msg_Err (wnd, "request %d not implemented", cmd);
             return VLC_EGENERIC;
     }
     xcb_flush (p_sys->conn);
     return VLC_SUCCESS;
+}
+
+static void UnsetFullscreen(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    change_wm_state(wnd, false, sys->wm_state_fullscreen);
+    xcb_flush(sys->conn);
+}
+
+static void SetFullscreen(vout_window_t *wnd, const char *idstr)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    (void) idstr; /* TODO */
+    change_wm_state(wnd, true, sys->wm_state_fullscreen);
+    xcb_flush(sys->conn);
 }
 
 /** Set an X window property from a nul-terminated string */
@@ -564,6 +575,8 @@ static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
 static void Close(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    .set_fullscreen = SetFullscreen,
+    .unset_fullscreen = UnsetFullscreen,
     .control = Control,
     .destroy = Close,
 };

@@ -197,36 +197,6 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
             break;
         }
 
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        {
-            const char *idstr = va_arg(ap, const char *);
-            struct wl_output *output = NULL;
-
-            if (idstr != NULL)
-            {
-                char *end;
-                unsigned long name = strtoul(idstr, &end, 10);
-
-                assert(*end == '\0' && name <= UINT32_MAX);
-                output = wl_registry_bind(sys->registry, name,
-                                          &wl_output_interface, 1);
-            }
-            else
-            if (sys->default_output != 0)
-                output = wl_registry_bind(sys->registry, sys->default_output,
-                                          &wl_output_interface, 1);
-
-            xdg_toplevel_set_fullscreen(sys->toplevel, output);
-
-            if (output != NULL)
-                wl_output_destroy(output);
-            break;
-        }
-
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-            xdg_toplevel_unset_fullscreen(sys->toplevel);
-            break;
-
         default:
             msg_Err(wnd, "request %d not implemented", cmd);
             return VLC_EGENERIC;
@@ -238,9 +208,46 @@ static int Control(vout_window_t *wnd, int cmd, va_list ap)
 
 static void Close(vout_window_t *);
 
+static void UnsetFullscreen(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    xdg_toplevel_unset_fullscreen(sys->toplevel);
+    wl_display_flush(wnd->display.wl);
+}
+
+static void SetFullscreen(vout_window_t *wnd, const char *idstr)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    struct wl_output *output = NULL;
+
+    if (idstr != NULL)
+    {
+        char *end;
+        unsigned long name = strtoul(idstr, &end, 10);
+
+        assert(*end == '\0' && name <= UINT32_MAX);
+        output = wl_registry_bind(sys->registry, name,
+                                  &wl_output_interface, 1);
+    }
+    else
+    if (sys->default_output != 0)
+        output = wl_registry_bind(sys->registry, sys->default_output,
+                                  &wl_output_interface, 1);
+
+    xdg_toplevel_set_fullscreen(sys->toplevel, output);
+
+    if (output != NULL)
+        wl_output_destroy(output);
+
+    wl_display_flush(wnd->display.wl);
+}
+
 static const struct vout_window_operations ops = {
     .control = Control,
     .destroy = Close,
+    .unset_fullscreen = UnsetFullscreen,
+    .set_fullscreen = SetFullscreen,
 };
 
 #ifdef XDG_SHELL

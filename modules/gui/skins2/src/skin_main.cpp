@@ -342,9 +342,32 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
+static void WindowUnsetFullscreen( vout_window_t *pWnd )
+{
+    vout_window_sys_t *sys = pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd, false );
+
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
+static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
+{
+    vout_window_sys_t *sys = pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    // Post a set fullscreen command
+    CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd, true );
+
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
 static const struct vout_window_operations window_ops = {
     WindowControl,
     WindowClose,
+    WindowUnsetFullscreen,
+    WindowSetFullscreen,
 };
 
 static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
@@ -438,16 +461,6 @@ static int WindowControl( vout_window_t *pWnd, int query, va_list args )
                 pQueue->push( CmdGenericPtr( pCmd ) );
             }
             return VLC_EGENERIC;
-        }
-
-        case VOUT_WINDOW_SET_FULLSCREEN:
-        case VOUT_WINDOW_UNSET_FULLSCREEN:
-        {
-            // Post a set fullscreen command
-            CmdSetFullscreen* pCmd = new CmdSetFullscreen( pIntf, pWnd,
-                query == VOUT_WINDOW_SET_FULLSCREEN );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-            return VLC_SUCCESS;
         }
 
         case VOUT_WINDOW_SET_STATE:
