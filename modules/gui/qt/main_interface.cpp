@@ -726,13 +726,11 @@ void MainInterface::toggleFSC()
  * All window provider queries must be handled through signals or events.
  * That's why we have all those emit statements...
  */
-bool MainInterface::getVideo( struct vout_window_t *p_wnd,
-                              unsigned int i_width, unsigned int i_height,
-                              bool fullscreen )
+bool MainInterface::getVideo( struct vout_window_t *p_wnd )
 {
     static const struct vout_window_operations ops = {
-        NULL,
-        NULL,
+        MainInterface::enableVideo,
+        MainInterface::disableVideo,
         MainInterface::resizeVideo,
         MainInterface::releaseVideo,
         MainInterface::requestVideoState,
@@ -742,12 +740,6 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
 
     if( videoActive.test_and_set() )
         return false;
-
-    msg_Dbg( p_wnd, "requesting video window..." );
-
-    /* This is a blocking call signal. Results are stored directly in the
-     * vout_window_t and boolean pointers. Beware of deadlocks! */
-    emit askGetVideo( p_wnd, i_width, i_height, fullscreen );
 
     p_wnd->ops = &ops;
     p_wnd->info.has_double_click = true;
@@ -986,6 +978,27 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
 }
 
 /* Asynchronous calls for video window contrlos */
+int MainInterface::enableVideo( vout_window_t *p_wnd,
+                                 const vout_window_cfg_t *cfg )
+{
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+
+    msg_Dbg( p_wnd, "requesting video window..." );
+    /* This is a blocking call signal. Results are stored directly in the
+     * vout_window_t and boolean pointers. Beware of deadlocks! */
+    emit p_mi->askGetVideo( p_wnd, cfg->width, cfg->height,
+                            cfg->is_fullscreen );
+    return VLC_SUCCESS;
+}
+
+void MainInterface::disableVideo( vout_window_t *p_wnd )
+{
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+
+    msg_Dbg( p_wnd, "releasing video..." );
+    emit p_mi->askReleaseVideo();
+}
+
 void MainInterface::resizeVideo( vout_window_t *p_wnd,
                                  unsigned i_width, unsigned i_height )
 {
@@ -1020,9 +1033,9 @@ void MainInterface::releaseVideo( vout_window_t *p_wnd )
 {
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
 
-    msg_Dbg( p_wnd, "releasing video..." );
-    emit p_mi->askReleaseVideo();
-    /* Releasing video is a blocking call. The video is no longer active. */
+    /* Releasing video (in disableVideo()) was a blocking call.
+     * The video is no longer active by this point.
+     */
     p_mi->videoActive.clear();
 }
 

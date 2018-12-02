@@ -55,6 +55,7 @@ class QScreen;
 class QTimer;
 class StandardPLPanel;
 struct vout_window_t;
+struct vout_window_cfg_t;
 
 class MainInterface : public QVLCMW
 {
@@ -70,10 +71,12 @@ public:
     static const QEvent::Type ToolbarsNeedRebuild;
 
     /* Video requests from core */
-    bool getVideo( struct vout_window_t *,
-                   unsigned int i_width, unsigned int i_height, bool );
+    bool getVideo( struct vout_window_t * );
 private:
     std::atomic_flag videoActive;
+    static int enableVideo( struct vout_window_t *,
+                            const struct vout_window_cfg_t * );
+    static void disableVideo( struct vout_window_t * );
     static void releaseVideo( struct vout_window_t * );
     static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
     static void requestVideoState( struct vout_window_t *, unsigned );

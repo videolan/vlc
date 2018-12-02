@@ -689,7 +689,7 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 /**
  * Video output window provider
  */
-static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
+static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t * )
 {
     if( !var_InheritBool( p_wnd, "embedded-video" ) )
         return VLC_EGENERIC;
@@ -717,8 +717,5 @@ static int WindowOpen( vout_window_t *p_wnd, const vout_window_cfg_t *cfg )
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
 
-    if( !p_mi->getVideo( p_wnd, cfg->width, cfg->height, cfg->is_fullscreen ) )
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
+    return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
 }
