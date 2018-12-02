@@ -93,8 +93,21 @@ typedef struct vout_window_mouse_event_t
     int button_mask;
 } vout_window_mouse_event_t;
 
+/**
+ * Window (desired) configuration.
+ *
+ * This structure describes the intended initial configuration
+ * of a \ref vout_window_t.
+ */
 typedef struct vout_window_cfg_t {
+    /**
+     * Whether the window should be in full screen mode or not.
+     */
     bool is_fullscreen;
+
+    /**
+     * Whether the window should have decorations or not.
+     */
     bool is_decorated;
 
 #ifdef __APPLE__
@@ -103,8 +116,14 @@ typedef struct vout_window_cfg_t {
     int y;
 #endif
 
-    /* Windows size hint */
+    /**
+     * Intended pixel width of the window.
+     */
     unsigned width;
+
+    /**
+     * Intended pixel height of the window.
+     */
     unsigned height;
 
 } vout_window_cfg_t;
