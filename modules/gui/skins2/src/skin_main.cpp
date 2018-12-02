@@ -343,6 +343,42 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
+static int WindowEnable( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+
+    sys->cfg = *cfg;
+
+    // force execution in the skins2 thread context
+    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
+                                                WindowOpenLocal );
+    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
+
+    if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
+    {
+        msg_Dbg( pIntf, "Vout window creation failed" );
+        return VLC_EGENERIC;
+    }
+
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen( pWnd, NULL );
+    return VLC_SUCCESS;
+}
+
+static void WindowDisable( vout_window_t *pWnd )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+
+    // force execution in the skins2 thread context
+    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
+                                                WindowCloseLocal );
+    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
+
+    pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
+}
+
 static void WindowResize( vout_window_t *pWnd,
                           unsigned i_width, unsigned i_height )
 {
@@ -393,8 +429,8 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 }
 
 static const struct vout_window_operations window_ops = {
-    NULL,
-    NULL,
+    WindowEnable,
+    WindowDisable,
     WindowResize,
     WindowClose,
     WindowSetState,
@@ -402,7 +438,7 @@ static const struct vout_window_operations window_ops = {
     WindowSetFullscreen,
 };
 
-static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
+static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t * )
 {
     if( var_InheritBool( pWnd, "video-wallpaper" )
      || !var_InheritBool( pWnd, "embedded-video" ) )
@@ -425,38 +461,15 @@ static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t *cfg )
         return VLC_ENOMEM;
 
     pWnd->sys = sys;
-    sys->cfg = *cfg;
     sys->pIntf = pIntf;
     pWnd->ops = &window_ops;
-
     pWnd->type = VOUT_WINDOW_TYPE_DUMMY;
-
-    // force execution in the skins2 thread context
-    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
-                                                WindowOpenLocal );
-    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
-
-    if( pWnd->type == VOUT_WINDOW_TYPE_DUMMY )
-    {
-        msg_Dbg( pIntf, "Vout window creation failed" );
-        delete sys;
-        return VLC_EGENERIC;
-    }
-
-    if (cfg->is_fullscreen)
-        vout_window_SetFullScreen( pWnd, NULL );
     return VLC_SUCCESS;
 }
 
 static void WindowClose( vout_window_t *pWnd )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
-    intf_thread_t *pIntf = sys->pIntf;
-
-    // force execution in the skins2 thread context
-    CmdExecuteBlock* cmd = new CmdExecuteBlock( pIntf, VLC_OBJECT( pWnd ),
-                                                WindowCloseLocal );
-    CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
     delete sys;
 }
