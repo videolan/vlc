@@ -239,9 +239,35 @@ static void SetDecoration(vout_window_t *wnd, bool decorated)
     if (deco_mode != ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE)
         msg_Err(wnd, "server-side decoration not supported");
 }
+#else
+# define SetDecoration(wnd, deco) (wnd, (void)(deco))
 #endif
 
+static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    struct wl_display *display = wnd->display.wl;
+
+    if (cfg->is_fullscreen)
+        xdg_toplevel_set_fullscreen(sys->toplevel, NULL);
+    else
+        xdg_toplevel_unset_fullscreen(sys->toplevel);
+
+    SetDecoration(wnd, cfg->is_decorated);
+    vout_window_SetSize(wnd, cfg->width, cfg->height);
+    wl_surface_commit(wnd->handle.wl);
+    wl_display_flush(display);
+
+#ifdef XDG_SHELL
+    while (!sys->wm.configured)
+        wl_display_dispatch(display);
+#endif
+
+    return VLC_SUCCESS;
+}
+
 static const struct vout_window_operations ops = {
+    .enable = Enable,
     .resize = Resize,
     .destroy = Close,
     .unset_fullscreen = UnsetFullscreen,
@@ -495,8 +521,8 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->wm.latch.height = 0;
     sys->wm.latch.fullscreen = false;
     sys->wm.configured = false;
-    sys->set.width = cfg->width;
-    sys->set.height = cfg->height;
+    sys->set.width = 0;
+    sys->set.height = 0;
     wl_list_init(&sys->outputs);
     wl_list_init(&sys->seats);
     sys->cursor_theme = NULL;
@@ -562,10 +588,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         free(app_id);
     }
 
-    xdg_surface_set_window_geometry(xdg_surface, 0, 0,
-                                    cfg->width, cfg->height);
-    vout_window_ReportSize(wnd, cfg->width, cfg->height);
-
     if (sys->shm != NULL)
     {
         sys->cursor_theme = wl_cursor_theme_load(NULL, 32, sys->shm);
@@ -586,15 +608,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
         zxdg_toplevel_decoration_v1_add_listener(sys->deco,
                                                  &xdg_toplevel_decoration_cbs,
                                                  wnd);
-    SetDecoration(wnd, cfg->is_decorated);
-#endif
-
-    wl_surface_commit(surface);
-    wl_display_flush(display);
-
-#ifdef XDG_SHELL
-    while (!sys->wm.configured)
-        wl_display_dispatch(display);
 #endif
 
     wnd->type = VOUT_WINDOW_TYPE_WAYLAND;
@@ -605,8 +618,6 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         goto error;
 
-    if (cfg->is_fullscreen)
-        vout_window_SetFullScreen(wnd, NULL);
     return VLC_SUCCESS;
 
 error:
