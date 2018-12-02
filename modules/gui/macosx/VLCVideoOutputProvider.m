@@ -158,47 +158,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     return VLC_SUCCESS;
 }
 
-static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
-{
-    @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return VLC_EGENERIC;
-        }
-
-        switch(i_query) {
-            case VOUT_WINDOW_SET_STATE:
-            {
-                unsigned i_state = va_arg(args, unsigned);
-
-                if (i_state & VOUT_WINDOW_STATE_BELOW)
-                {
-                    msg_Dbg(p_wnd, "Ignore change to VOUT_WINDOW_STATE_BELOW");
-                    goto out;
-                }
-
-                NSInteger i_cooca_level = NSNormalWindowLevel;
-                if (i_state & VOUT_WINDOW_STATE_ABOVE)
-                    i_cooca_level = NSStatusWindowLevel;
-
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutProvider setWindowLevel:i_cooca_level forWindow:p_wnd];
-                });
-
-                break;
-            }
-            default:
-            {
-                msg_Warn(p_wnd, "unsupported control query: %i", i_query );
-                return VLC_EGENERIC;
-            }
-        }
-
-        out:
-        return VLC_SUCCESS;
-    }
-}
-
 static void WindowClose(vout_window_t *p_wnd)
 {
     @autoreleasepool {
