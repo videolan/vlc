@@ -1175,15 +1175,13 @@ static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
 {
     spu_private_t *sys = spu->p;
 
-    vlc_mutex_lock(&sys->lock);
+    vlc_mutex_assert(&sys->lock);
 
     sys->palette.i_entries = 0;
     sys->force_crop = false;
 
-    if (hl == NULL) {
-        vlc_mutex_unlock(&sys->lock);
+    if (hl == NULL)
         return;
-    }
 
     sys->force_crop = true;
     sys->crop.x      = hl->x_start;
@@ -1193,7 +1191,6 @@ static void UpdateSPU(spu_t *spu, const vlc_spu_highlight_t *hl)
 
     if (hl->palette.i_entries == 4) /* XXX: Only DVD palette for now */
         memcpy(&sys->palette, &hl->palette, sizeof(sys->palette));
-    vlc_mutex_unlock(&sys->lock);
 
     msg_Dbg(spu, "crop: %i,%i,%i,%i, palette forced: %i",
             sys->crop.x, sys->crop.y,
@@ -1399,9 +1396,10 @@ void spu_Destroy(spu_t *spu)
  */
 void spu_Attach(spu_t *spu, input_thread_t *input)
 {
+    vlc_mutex_lock(&spu->p->lock);
+
     UpdateSPU(spu, NULL);
 
-    vlc_mutex_lock(&spu->p->lock);
     spu->p->input = input;
 
     if (spu->p->text)
@@ -1725,5 +1723,7 @@ void spu_ChangeMargin(spu_t *spu, int margin)
 
 void spu_SetHighlight(spu_t *spu, const vlc_spu_highlight_t *hl)
 {
+    vlc_mutex_lock(&spu->p->lock);
     UpdateSPU(spu, hl);
+    vlc_mutex_unlock(&spu->p->lock);
 }
