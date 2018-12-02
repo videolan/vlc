@@ -30,23 +30,8 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
-static int Control(vout_window_t *wnd, int query, va_list ap)
-{
-    switch (query)
-    {
-        case VOUT_WINDOW_SET_STATE:
-            /* These controls deserve a proper window provider. Move along. */
-            return VLC_EGENERIC;
-
-        default:
-            msg_Warn(wnd, "unsupported control query %d", query);
-            return VLC_EGENERIC;
-    }
-}
-
 static const struct vout_window_operations ops = {
     .resize = vout_window_ReportSize,
-    .control = Control,
 };
 
 static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)

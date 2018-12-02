@@ -55,13 +55,6 @@ enum vout_window_type {
 };
 
 /**
- * Control query for vout_window_t
- */
-enum vout_window_control {
-    VOUT_WINDOW_SET_STATE, /* unsigned state */
-};
-
-/**
  * Window management state.
  */
 enum vout_window_state {
@@ -144,23 +137,13 @@ struct vout_window_operations {
     void (*resize)(vout_window_t *, unsigned width, unsigned height);
 
     /**
-     * Control callback (mandatory)
-     *
-     * This callback handles some control request regarding the window.
-     * See \ref vout_window_control.
-     *
-     * This field should not be used directly when manipulating a window.
-     * vout_window_Control() should be used instead.
-     */
-    int (*control)(vout_window_t *, int, va_list);
-
-    /**
      * Destroy the window.
      *
      * Destroys the window and releases all associated resources.
      */
     void (*destroy)(vout_window_t *);
 
+    void (*set_state)(vout_window_t *, unsigned state);
     void (*unset_fullscreen)(vout_window_t *);
     void (*set_fullscreen)(vout_window_t *, const char *id);
 };
@@ -259,36 +242,13 @@ VLC_API void vout_window_Delete(vout_window_t *);
 
 void vout_window_SetInhibition(vout_window_t *window, bool enabled);
 
-static inline int vout_window_vaControl(vout_window_t *window, int query,
-                                        va_list ap)
-{
-    return window->ops->control(window, query, ap);
-}
-
-/**
- * Reconfigures a window.
- *
- * @note The vout_window_* wrappers should be used instead of this function.
- *
- * @warning The caller must own the window, as vout_window_t is not thread safe.
- */
-static inline int vout_window_Control(vout_window_t *window, int query, ...)
-{
-    va_list ap;
-    int ret;
-
-    va_start(ap, query);
-    ret = vout_window_vaControl(window, query, ap);
-    va_end(ap);
-    return ret;
-}
-
 /**
  * Configures the window manager state for this window.
  */
-static inline int vout_window_SetState(vout_window_t *window, unsigned state)
+static inline void vout_window_SetState(vout_window_t *window, unsigned state)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_STATE, state);
+    if (window->ops->set_state != NULL)
+        window->ops->set_state(window, state);
 }
 
 /**

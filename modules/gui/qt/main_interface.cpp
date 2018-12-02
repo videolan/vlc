@@ -731,8 +731,8 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
 {
     static const struct vout_window_operations ops = {
         MainInterface::resizeVideo,
-        MainInterface::controlVideo,
         MainInterface::releaseVideo,
+        MainInterface::requestVideoState,
         MainInterface::requestVideoWindowed,
         MainInterface::requestVideoFullScreen,
     };
@@ -1006,25 +1006,12 @@ void MainInterface::requestVideoFullScreen( vout_window_t *wnd, const char * )
     emit p_mi->askVideoSetFullScreen( true );
 }
 
-int MainInterface::controlVideo( vout_window_t *p_wnd, int i_query,
-                                 va_list args )
+void MainInterface::requestVideoState( vout_window_t *p_wnd, unsigned i_arg )
 {
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+    bool on_top = (i_arg & VOUT_WINDOW_STATE_ABOVE) != 0;
 
-    switch( i_query )
-    {
-    case VOUT_WINDOW_SET_STATE:
-    {
-        unsigned i_arg = va_arg( args, unsigned );
-        unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
-
-        emit p_mi->askVideoOnTop( on_top != 0 );
-        return VLC_SUCCESS;
-    }
-    default:
-        msg_Warn( p_wnd, "unsupported control query" );
-        return VLC_EGENERIC;
-    }
+    emit p_mi->askVideoOnTop( on_top );
 }
 
 void MainInterface::releaseVideo( vout_window_t *p_wnd )

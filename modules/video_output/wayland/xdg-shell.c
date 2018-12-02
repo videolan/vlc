@@ -186,21 +186,6 @@ static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
     wl_display_flush(wnd->display.wl);
 }
 
-static int Control(vout_window_t *wnd, int cmd, va_list ap)
-{
-    switch (cmd)
-    {
-        case VOUT_WINDOW_SET_STATE:
-            return VLC_EGENERIC;
-
-        default:
-            msg_Err(wnd, "request %d not implemented", cmd);
-            return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
 static void Close(vout_window_t *);
 
 static void UnsetFullscreen(vout_window_t *wnd)
@@ -240,7 +225,6 @@ static void SetFullscreen(vout_window_t *wnd, const char *idstr)
 
 static const struct vout_window_operations ops = {
     .resize = Resize,
-    .control = Control,
     .destroy = Close,
     .unset_fullscreen = UnsetFullscreen,
     .set_fullscreen = SetFullscreen,

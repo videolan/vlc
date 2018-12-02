@@ -84,15 +84,8 @@ static int Control(vout_display_t *vd, int query, va_list args)
     return CommonControl(vd, query, args);
 }
 
-static int EmbedVideoWindow_Control(vout_window_t *wnd, int query, va_list ap)
-{
-    VLC_UNUSED( ap ); VLC_UNUSED( query );
-    return VLC_EGENERIC;
-}
-
 static const struct vout_window_operations embedVideoWindow_Ops =
 {
-    .control = EmbedVideoWindow_Control,
 };
 
 static vout_window_t *EmbedVideoWindow_Create(vout_display_t *vd)

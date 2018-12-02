@@ -55,6 +55,31 @@ static void WindowResize(vout_window_t *p_wnd,
     }
 }
 
+static void WindowSetState(vout_window_t *p_wnd, unsigned i_state)
+{
+    if (i_state & VOUT_WINDOW_STATE_BELOW)
+    {
+        msg_Dbg(p_wnd, "Ignore change to VOUT_WINDOW_STATE_BELOW");
+        return;
+    }
+
+    @autoreleasepool {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
+            return;
+        }
+
+        NSInteger i_cooca_level = NSNormalWindowLevel;
+
+        if (i_state & VOUT_WINDOW_STATE_ABOVE)
+            i_cooca_level = NSStatusWindowLevel;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutProvider setWindowLevel:i_cooca_level forWindow:p_wnd];
+        });
+    }
+}
+
 static const char windowed;
 
 static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
@@ -88,13 +113,12 @@ static void WindowUnsetFullscreen(vout_window_t *wnd)
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
-static int WindowControl(vout_window_t *, int i_query, va_list);
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
     WindowResize,
-    WindowControl,
     WindowClose,
+    WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
 };

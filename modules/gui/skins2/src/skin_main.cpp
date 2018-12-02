@@ -320,7 +320,6 @@ end:
 
 static int  WindowOpen( vout_window_t *, const vout_window_cfg_t * );
 static void WindowClose( vout_window_t * );
-static int  WindowControl( vout_window_t *, int, va_list );
 
 typedef struct
 {
@@ -360,6 +359,18 @@ static void WindowResize( vout_window_t *pWnd,
     pQueue->push( CmdGenericPtr( pCmd ) );
 }
 
+static void WindowSetState( vout_window_t *pWnd, unsigned i_arg )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    bool on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+
+    // Post a SetOnTop command
+    CmdSetOnTop* pCmd = new CmdSetOnTop( pIntf, on_top );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
 static void WindowUnsetFullscreen( vout_window_t *pWnd )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
@@ -383,8 +394,8 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 
 static const struct vout_window_operations window_ops = {
     WindowResize,
-    WindowControl,
     WindowClose,
+    WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
 };
@@ -446,32 +457,6 @@ static void WindowClose( vout_window_t *pWnd )
     CmdExecuteBlock::executeWait( CmdGenericPtr( cmd ) );
 
     delete sys;
-}
-
-static int WindowControl( vout_window_t *pWnd, int query, va_list args )
-{
-    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
-    intf_thread_t *pIntf = sys->pIntf;
-    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
-
-    switch( query )
-    {
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned i_arg = va_arg( args, unsigned );
-            unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
-
-            // Post a SetOnTop command
-            CmdSetOnTop* pCmd =
-                new CmdSetOnTop( pIntf, on_top );
-            pQueue->push( CmdGenericPtr( pCmd ) );
-            return VLC_SUCCESS;
-        }
-
-        default:
-            msg_Dbg( pIntf, "control query not supported" );
-            return VLC_EGENERIC;
-    }
 }
 
 //---------------------------------------------------------------------------

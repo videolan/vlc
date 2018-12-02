@@ -116,6 +116,13 @@ static void WindowResize(vout_window_t *p_wnd,
     }
 }
 
+static void WindowSetState(vout_window_t *p_wnd, unsigned state)
+{
+    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
+
+    [o_window setLevel:i_state];
+}
+
 static void WindowUnsetFullscreen(vout_window_t *p_wnd)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
@@ -138,13 +145,12 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
     }
 }
 
-static int WindowControl(vout_window_t *, int i_query, va_list);
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
     WindowResize,
-    WindowControl,
     WindowClose,
+    WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
 };
@@ -175,29 +181,6 @@ int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
     if (cfg->is_fullscreen)
         vout_window_SetFullScreen(p_wnd, NULL);
     return VLC_SUCCESS;
-}
-
-static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
-{
-    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
-    if (!o_window) {
-        msg_Err(p_wnd, "failed to recover cocoa window");
-        return VLC_EGENERIC;
-    }
-
-    switch (i_query) {
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned i_state = va_arg(args, unsigned);
-
-            [o_window setLevel:i_state];
-
-            return VLC_SUCCESS;
-        }
-        default:
-            msg_Warn(p_wnd, "unsupported control query");
-            return VLC_EGENERIC;
-    }
 }
 
 static void WindowClose(vout_window_t *p_wnd)

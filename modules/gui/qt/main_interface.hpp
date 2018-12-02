@@ -75,7 +75,7 @@ public:
 private:
     static void releaseVideo( struct vout_window_t * );
     static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
-    static int controlVideo( struct vout_window_t *, int, va_list );
+    static void requestVideoState( struct vout_window_t *, unsigned );
     static void requestVideoWindowed( struct vout_window_t * );
     static void requestVideoFullScreen( struct vout_window_t *, const char * );
 

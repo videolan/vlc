@@ -423,30 +423,15 @@ static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
     xcb_flush(conn);
 }
 
-static int Control (vout_window_t *wnd, int cmd, va_list ap)
+static void SetState(vout_window_t *wnd, unsigned state)
 {
-    vout_window_sys_t *p_sys = wnd->sys;
-    xcb_connection_t *conn = p_sys->conn;
+    vout_window_sys_t *sys = wnd->sys;
+    bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+    bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
 
-    switch (cmd)
-    {
-        case VOUT_WINDOW_SET_STATE:
-        {
-            unsigned state = va_arg (ap, unsigned);
-            bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
-            bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
-
-            change_wm_state (wnd, above, p_sys->wm_state_above);
-            change_wm_state (wnd, below, p_sys->wm_state_below);
-            break;
-        }
-
-        default:
-            msg_Err (wnd, "request %d not implemented", cmd);
-            return VLC_EGENERIC;
-    }
-    xcb_flush (p_sys->conn);
-    return VLC_SUCCESS;
+    change_wm_state(wnd, above, sys->wm_state_above);
+    change_wm_state(wnd, below, sys->wm_state_below);
+    xcb_flush(sys->conn);
 }
 
 static void UnsetFullscreen(vout_window_t *wnd)
@@ -573,8 +558,8 @@ static const struct vout_window_operations ops = {
     .resize = Resize,
     .set_fullscreen = SetFullscreen,
     .unset_fullscreen = UnsetFullscreen,
-    .control = Control,
     .destroy = Close,
+    .set_state = SetState,
 };
 
 /**
@@ -835,7 +820,6 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 static void EmClose(vout_window_t *);
 
 static const struct vout_window_operations em_ops = {
-    .control = Control,
     .destroy = EmClose,
 };
 
