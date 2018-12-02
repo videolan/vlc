@@ -101,6 +101,40 @@ static void Run(intf_thread_t *p_intf)
  * Vout window management
  *****************************************************************************/
 
+static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+{
+    @autoreleasepool {
+        VLCMinimalVoutWindow __block *o_window;
+        NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            o_window = [[VLCMinimalVoutWindow alloc] initWithContentRect:proposedVideoViewPosition];
+            [o_window makeKeyAndOrderFront:nil];
+        });
+
+        if (!o_window) {
+            msg_Err(p_wnd, "window creation failed");
+            return VLC_EGENERIC;
+        }
+
+        msg_Dbg(p_wnd, "returning video window with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+        p_wnd->handle.nsobject = (void *)CFBridgingRetain([o_window contentView]);
+    }
+
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen(p_wnd, NULL);
+    return VLC_SUCCESS;
+}
+
+static void WindowDisable(vout_window_t *p_wnd)
+{
+    @autoreleasepool {
+        NSWindow * o_window = [(__bridge id)p_wnd->handle.nsobject window];
+        if (o_window)
+            o_window = nil;
+    }
+}
+
 static void WindowResize(vout_window_t *p_wnd,
                          unsigned i_width, unsigned i_height)
 {
@@ -148,10 +182,10 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
-    NULL,
-    NULL,
+    WindowEnable,
+    WindowDisable,
     WindowResize,
-    WindowClose,
+    NULL,
     WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
@@ -159,37 +193,7 @@ static const struct vout_window_operations ops = {
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
-    @autoreleasepool {
-        VLCMinimalVoutWindow __block *o_window;
-        NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            o_window = [[VLCMinimalVoutWindow alloc] initWithContentRect:proposedVideoViewPosition];
-            [o_window makeKeyAndOrderFront:nil];
-        });
-
-        if (!o_window) {
-            msg_Err(p_wnd, "window creation failed");
-            return VLC_EGENERIC;
-        }
-
-        msg_Dbg(p_wnd, "returning video window with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
-        p_wnd->handle.nsobject = (void *)CFBridgingRetain([o_window contentView]);
-
-        p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
-        p_wnd->ops = &ops;
-    }
-
-    if (cfg->is_fullscreen)
-        vout_window_SetFullScreen(p_wnd, NULL);
+    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    p_wnd->ops = &ops;
     return VLC_SUCCESS;
-}
-
-static void WindowClose(vout_window_t *p_wnd)
-{
-    @autoreleasepool {
-        NSWindow * o_window = [(__bridge id)p_wnd->handle.nsobject window];
-        if (o_window)
-            o_window = nil;
-    }
 }
