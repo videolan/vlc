@@ -101,6 +101,21 @@ static void Run(intf_thread_t *p_intf)
  * Vout window management
  *****************************************************************************/
 
+static void WindowResize(vout_window_t *p_wnd,
+                         unsigned i_width, unsigned i_height)
+{
+    NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
+
+    @autoreleasepool {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            NSRect theFrame = [o_window frame];
+            theFrame.size.width = i_width;
+            theFrame.size.height = i_height;
+            [o_window setFrame:theFrame display:YES animate:YES];
+        });
+    }
+}
+
 static void WindowUnsetFullscreen(vout_window_t *p_wnd)
 {
     NSWindow* o_window = [(__bridge id)p_wnd->handle.nsobject window];
@@ -127,6 +142,7 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    WindowResize,
     WindowControl,
     WindowClose,
     WindowUnsetFullscreen,
@@ -176,20 +192,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 
             [o_window setLevel:i_state];
 
-            return VLC_SUCCESS;
-        }
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg(args, unsigned int);
-            unsigned int i_height = va_arg(args, unsigned int);
-            @autoreleasepool {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    NSRect theFrame = [o_window frame];
-                    theFrame.size.width = i_width;
-                    theFrame.size.height = i_height;
-                    [o_window setFrame:theFrame display:YES animate:YES];
-                });
-            }
             return VLC_SUCCESS;
         }
         default:

@@ -39,6 +39,22 @@
 #import "VLCPlaylist.h"
 #import "NSScreen+VLCAdditions.h"
 
+static void WindowResize(vout_window_t *p_wnd,
+                         unsigned i_width, unsigned i_height)
+{
+    @autoreleasepool {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
+            return;
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
+                          forWindow:p_wnd];
+        });
+    }
+}
+
 static const char windowed;
 
 static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
@@ -76,6 +92,7 @@ static int WindowControl(vout_window_t *, int i_query, va_list);
 static void WindowClose(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    WindowResize,
     WindowControl,
     WindowClose,
     WindowUnsetFullscreen,
@@ -145,18 +162,6 @@ static int WindowControl(vout_window_t *p_wnd, int i_query, va_list args)
 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [voutProvider setWindowLevel:i_cooca_level forWindow:p_wnd];
-                });
-
-                break;
-            }
-            case VOUT_WINDOW_SET_SIZE:
-            {
-                unsigned int i_width  = va_arg(args, unsigned int);
-                unsigned int i_height = va_arg(args, unsigned int);
-
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
-                                             forWindow:p_wnd];
                 });
 
                 break;

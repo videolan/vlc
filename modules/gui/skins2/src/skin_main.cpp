@@ -344,6 +344,22 @@ static void WindowCloseLocal( intf_thread_t* pIntf, vlc_object_t *pObj )
     VoutManager::instance( pIntf )->releaseWnd( pWnd );
 }
 
+static void WindowResize( vout_window_t *pWnd,
+                          unsigned i_width, unsigned i_height )
+{
+    vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
+    intf_thread_t *pIntf = sys->pIntf;
+
+    if( i_width == 0 || i_height == 0 )
+        return;
+
+    // Post a vout resize command
+    AsyncQueue *pQueue = AsyncQueue::instance( pIntf );
+    CmdResizeVout *pCmd = new CmdResizeVout( pIntf, pWnd,
+                                             (int)i_width, (int)i_height );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+}
+
 static void WindowUnsetFullscreen( vout_window_t *pWnd )
 {
     vout_window_skins_t* sys = (vout_window_skins_t *)pWnd->sys;
@@ -366,6 +382,7 @@ static void WindowSetFullscreen( vout_window_t *pWnd, const char * )
 }
 
 static const struct vout_window_operations window_ops = {
+    WindowResize,
     WindowControl,
     WindowClose,
     WindowUnsetFullscreen,
@@ -439,22 +456,6 @@ static int WindowControl( vout_window_t *pWnd, int query, va_list args )
 
     switch( query )
     {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
-
-            if( i_width && i_height )
-            {
-                // Post a vout resize command
-                CmdResizeVout *pCmd =
-                    new CmdResizeVout( pIntf, pWnd,
-                                       (int)i_width, (int)i_height );
-                pQueue->push( CmdGenericPtr( pCmd ) );
-            }
-            return VLC_EGENERIC;
-        }
-
         case VOUT_WINDOW_SET_STATE:
         {
             unsigned i_arg = va_arg( args, unsigned );

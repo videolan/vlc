@@ -730,6 +730,7 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
                               bool fullscreen )
 {
     static const struct vout_window_operations ops = {
+        MainInterface::resizeVideo,
         MainInterface::controlVideo,
         MainInterface::releaseVideo,
         MainInterface::requestVideoWindowed,
@@ -983,6 +984,14 @@ void MainInterface::setInterfaceAlwaysOnTop( bool on_top )
 }
 
 /* Asynchronous calls for video window contrlos */
+void MainInterface::resizeVideo( vout_window_t *p_wnd,
+                                 unsigned i_width, unsigned i_height )
+{
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+
+    emit p_mi->askVideoToResize( i_width, i_height );
+}
+
 void MainInterface::requestVideoWindowed( struct vout_window_t *wnd )
 {
    MainInterface *p_mi = (MainInterface *)wnd->sys;
@@ -1004,14 +1013,6 @@ int MainInterface::controlVideo( vout_window_t *p_wnd, int i_query,
 
     switch( i_query )
     {
-    case VOUT_WINDOW_SET_SIZE:
-    {
-        unsigned int i_width  = va_arg( args, unsigned int );
-        unsigned int i_height = va_arg( args, unsigned int );
-
-        emit p_mi->askVideoToResize( i_width, i_height );
-        return VLC_SUCCESS;
-    }
     case VOUT_WINDOW_SET_STATE:
     {
         unsigned i_arg = va_arg( args, unsigned );

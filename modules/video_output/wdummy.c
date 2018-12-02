@@ -34,15 +34,6 @@ static int Control(vout_window_t *wnd, int query, va_list ap)
 {
     switch (query)
     {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned width = va_arg(ap, unsigned);
-            unsigned height = va_arg(ap, unsigned);
-
-            vout_window_ReportSize(wnd, width, height);
-            return VLC_SUCCESS;
-        }
-
         case VOUT_WINDOW_SET_STATE:
             /* These controls deserve a proper window provider. Move along. */
             return VLC_EGENERIC;
@@ -54,6 +45,7 @@ static int Control(vout_window_t *wnd, int query, va_list ap)
 }
 
 static const struct vout_window_operations ops = {
+    .resize = vout_window_ReportSize,
     .control = Control,
 };
 

@@ -166,43 +166,38 @@ static void ReportSize(vout_window_t *wnd)
     xdg_surface_set_window_geometry(sys->surface, 0, 0, width, height);
 }
 
-static int Control(vout_window_t *wnd, int cmd, va_list ap)
+static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
 {
     vout_window_sys_t *sys = wnd->sys;
-    struct wl_display *display = wnd->display.wl;
 
+#ifdef XDG_SHELL
+    /* The minimum size must be smaller or equal to the maximum size
+     * at _all_ times. This gets a bit cumbersome. */
+    xdg_toplevel_set_min_size(sys->toplevel, 0, 0);
+    xdg_toplevel_set_max_size(sys->toplevel, width, height);
+    xdg_toplevel_set_min_size(sys->toplevel, width, height);
+#endif
+
+    vlc_mutex_lock(&sys->lock);
+    sys->set.width = width;
+    sys->set.height = height;
+    ReportSize(wnd);
+    vlc_mutex_unlock(&sys->lock);
+    wl_display_flush(wnd->display.wl);
+}
+
+static int Control(vout_window_t *wnd, int cmd, va_list ap)
+{
     switch (cmd)
     {
         case VOUT_WINDOW_SET_STATE:
             return VLC_EGENERIC;
-
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            unsigned width = va_arg(ap, unsigned);
-            unsigned height = va_arg(ap, unsigned);
-
-#ifdef XDG_SHELL
-            /* The minimum size must be smaller or equal to the maximum size
-             * at _all_ times. This gets a bit cumbersome. */
-            xdg_toplevel_set_min_size(sys->toplevel, 0, 0);
-            xdg_toplevel_set_max_size(sys->toplevel, width, height);
-            xdg_toplevel_set_min_size(sys->toplevel, width, height);
-#endif
-
-            vlc_mutex_lock(&sys->lock);
-            sys->set.width = width;
-            sys->set.height = height;
-            ReportSize(wnd);
-            vlc_mutex_unlock(&sys->lock);
-            break;
-        }
 
         default:
             msg_Err(wnd, "request %d not implemented", cmd);
             return VLC_EGENERIC;
     }
 
-    wl_display_flush(display);
     return VLC_SUCCESS;
 }
 
@@ -244,6 +239,7 @@ static void SetFullscreen(vout_window_t *wnd, const char *idstr)
 }
 
 static const struct vout_window_operations ops = {
+    .resize = Resize,
     .control = Control,
     .destroy = Close,
     .unset_fullscreen = UnsetFullscreen,

@@ -74,6 +74,7 @@ public:
                    unsigned int i_width, unsigned int i_height, bool );
 private:
     static void releaseVideo( struct vout_window_t * );
+    static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
     static int controlVideo( struct vout_window_t *, int, va_list );
     static void requestVideoWindowed( struct vout_window_t * );
     static void requestVideoFullScreen( struct vout_window_t *, const char * );

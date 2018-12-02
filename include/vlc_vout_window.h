@@ -59,7 +59,6 @@ enum vout_window_type {
  */
 enum vout_window_control {
     VOUT_WINDOW_SET_STATE, /* unsigned state */
-    VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
 };
 
 /**
@@ -142,6 +141,8 @@ struct vout_window_callbacks {
 };
 
 struct vout_window_operations {
+    void (*resize)(vout_window_t *, unsigned width, unsigned height);
+
     /**
      * Control callback (mandatory)
      *
@@ -291,12 +292,24 @@ static inline int vout_window_SetState(vout_window_t *window, unsigned state)
 }
 
 /**
- * Configures the window display (i.e. inner/useful) size.
+ * Requests a new window size.
+ *
+ * This requests a change of the window size.
+ *
+ * \warning  The windowing system may or may not actually resize the window
+ * to the requested size. Track the resized event to determine the actual size.
+ *
+ * \note The size is expressed in terms of the "useful" area,
+ * i.e. it excludes any side decoration added by the windowing system.
+ *
+ * \param width pixel width
+ * \param height height width
  */
-static inline int vout_window_SetSize(vout_window_t *window,
+static inline void vout_window_SetSize(vout_window_t *window,
                                       unsigned width, unsigned height)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_SIZE, width, height);
+    if (window->ops->resize != NULL)
+        window->ops->resize(window, width, height);
 }
 
 /**

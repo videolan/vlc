@@ -413,6 +413,18 @@ static void change_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
                     (const char *)&ev);
 }
 
+static void Resize(vout_window_t *wnd, unsigned width, unsigned height)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+    const uint32_t values[] = { width, height, };
+
+    xcb_configure_window(conn, wnd->handle.xid,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                         values);
+    xcb_flush(conn);
+}
+
 static int Control (vout_window_t *wnd, int cmd, va_list ap)
 {
     vout_window_sys_t *p_sys = wnd->sys;
@@ -420,21 +432,6 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
 
     switch (cmd)
     {
-        case VOUT_WINDOW_SET_SIZE:
-        {
-            if (p_sys->embedded)
-                return VLC_EGENERIC;
-
-            unsigned width = va_arg (ap, unsigned);
-            unsigned height = va_arg (ap, unsigned);
-            const uint32_t values[] = { width, height, };
-
-            xcb_configure_window (conn, wnd->handle.xid,
-                                  XCB_CONFIG_WINDOW_WIDTH |
-                                  XCB_CONFIG_WINDOW_HEIGHT, values);
-            break;
-        }
-
         case VOUT_WINDOW_SET_STATE:
         {
             unsigned state = va_arg (ap, unsigned);
@@ -575,6 +572,7 @@ static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
 static void Close(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    .resize = Resize,
     .set_fullscreen = SetFullscreen,
     .unset_fullscreen = UnsetFullscreen,
     .control = Control,
