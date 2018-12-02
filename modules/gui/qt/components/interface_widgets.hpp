@@ -60,7 +60,7 @@ public:
     VideoWidget( intf_thread_t *, QWidget* p_parent );
     virtual ~VideoWidget();
 
-    bool request( struct vout_window_t * );
+    void request( struct vout_window_t * );
     void release( void );
     void sync( void );
 

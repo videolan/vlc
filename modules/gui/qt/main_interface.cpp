@@ -92,7 +92,8 @@ static int IntfRaiseMainCB( vlc_object_t *p_this, const char *psz_variable,
 const QEvent::Type MainInterface::ToolbarsNeedRebuild =
         (QEvent::Type)QEvent::registerEventType();
 
-MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
+MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf ),
+    videoActive( ATOMIC_FLAG_INIT )
 {
     /* Variables initialisation */
     bgWidget             = NULL;
@@ -203,8 +204,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 
     /* VideoWidget connects for asynchronous calls */
     b_videoFullScreen = false;
-    connect( this, SIGNAL(askGetVideo(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
-             this, SLOT(getVideoSlot(struct vout_window_t*, unsigned, unsigned, bool, bool*)),
+    connect( this, SIGNAL(askGetVideo(struct vout_window_t*, unsigned, unsigned, bool)),
+             this, SLOT(getVideoSlot(struct vout_window_t*, unsigned, unsigned, bool)),
              Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
              this, SLOT(releaseVideoSlot( void )),
@@ -736,27 +737,25 @@ bool MainInterface::getVideo( struct vout_window_t *p_wnd,
         MainInterface::requestVideoWindowed,
         MainInterface::requestVideoFullScreen,
     };
-    bool result;
+
+    if( videoActive.test_and_set() )
+        return false;
 
     msg_Dbg( p_wnd, "requesting video window..." );
 
     /* This is a blocking call signal. Results are stored directly in the
      * vout_window_t and boolean pointers. Beware of deadlocks! */
-    emit askGetVideo( p_wnd, i_width, i_height, fullscreen, &result );
+    emit askGetVideo( p_wnd, i_width, i_height, fullscreen );
 
-    if( result )
-    {
-        p_wnd->ops = &ops;
-        p_wnd->info.has_double_click = true;
-        p_wnd->sys = this;
-    }
-
-    return result;
+    p_wnd->ops = &ops;
+    p_wnd->info.has_double_click = true;
+    p_wnd->sys = this;
+    return true;
 }
 
 void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
                                   unsigned i_width, unsigned i_height,
-                                  bool fullscreen, bool *res )
+                                  bool fullscreen )
 {
     /* Hidden or minimized, activate */
     if( isHidden() || isMinimized() )
@@ -768,8 +767,9 @@ void MainInterface::getVideoSlot( struct vout_window_t *p_wnd,
         videoWidget = new VideoWidget( p_intf, stackCentralW );
         stackCentralW->addWidget( videoWidget );
     }
-    *res = videoWidget->request( p_wnd );
-    if( *res ) /* The videoWidget is available */
+
+    videoWidget->request( p_wnd );
+    if( true ) /* The videoWidget is available */
     {
         setVideoFullScreen( fullscreen );
 
@@ -1020,6 +1020,8 @@ void MainInterface::releaseVideo( vout_window_t *p_wnd )
 
     msg_Dbg( p_wnd, "releasing video..." );
     emit p_mi->askReleaseVideo();
+    /* Releasing video is a blocking call. The video is no longer active. */
+    p_mi->videoActive.clear();
 }
 
 /*****************************************************************************

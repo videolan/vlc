@@ -73,6 +73,7 @@ public:
     bool getVideo( struct vout_window_t *,
                    unsigned int i_width, unsigned int i_height, bool );
 private:
+    std::atomic_flag videoActive;
     static void releaseVideo( struct vout_window_t * );
     static void resizeVideo( struct vout_window_t *, unsigned, unsigned );
     static void requestVideoState( struct vout_window_t *, unsigned );
@@ -221,7 +222,7 @@ public slots:
 
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( struct vout_window_t *,
-                       unsigned i_width, unsigned i_height, bool, bool * );
+                       unsigned i_width, unsigned i_height, bool );
     void releaseVideoSlot( void );
 
     void emitBoss();
@@ -277,8 +278,7 @@ protected slots:
     void onInputChanged( bool );
 
 signals:
-    void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool,
-                      bool * );
+    void askGetVideo( struct vout_window_t *, unsigned, unsigned, bool );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
