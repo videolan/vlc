@@ -867,7 +867,7 @@ static void vlc_uri_putc(struct vlc_memstream *s, int c, const char *extras)
     if (isurisafe(c) || isurisubdelim(c) || (strchr(extras, c) != NULL))
         vlc_memstream_putc(s, c);
     else
-        vlc_memstream_printf(s, "%%%02hhX", c);
+        vlc_memstream_printf(s, "%%%02hhX", (unsigned char)c);
 }
 
 char *vlc_uri_fixup(const char *str)
