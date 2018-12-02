@@ -65,8 +65,6 @@ typedef struct
         uint8_t base;
     } xkb;
 #endif
-
-    bool embedded;
 } vout_window_sys_t;
 
 #ifdef HAVE_XKBCOMMON
@@ -590,7 +588,6 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
-    p_sys->embedded = false;
 
     /* Connect to X */
     char *display = var_InheritString (wnd, "x11-display");
@@ -859,7 +856,6 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (p_sys == NULL || xcb_connection_has_error (conn))
         goto error;
 
-    p_sys->embedded = true;
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->display.x11 = NULL;
     wnd->handle.xid = window;
