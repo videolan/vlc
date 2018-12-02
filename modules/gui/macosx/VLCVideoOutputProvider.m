@@ -39,14 +39,52 @@
 #import "VLCPlaylist.h"
 #import "NSScreen+VLCAdditions.h"
 
+static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+{
+    @autoreleasepool {
+        msg_Dbg(p_wnd, "Opening video window");
+
+        NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
+
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+        if (!voutProvider) {
+            return VLC_EGENERIC;
+        }
+
+        __block VLCVoutView *videoView = nil;
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            videoView = [voutProvider setupVoutForWindow:p_wnd
+                             withProposedVideoViewPosition:proposedVideoViewPosition];
+        });
+
+        // this method is not supposed to fail
+        assert(videoView != nil);
+
+        msg_Dbg(getIntf(), "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
+        p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
+    }
+    if (cfg->is_fullscreen)
+        vout_window_SetFullScreen(p_wnd, NULL);
+    return VLC_SUCCESS;
+}
+
+static void WindowDisable(vout_window_t *p_wnd)
+{
+    @autoreleasepool {
+        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [voutProvider removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
+        });
+    }
+}
+
 static void WindowResize(vout_window_t *p_wnd,
                          unsigned i_width, unsigned i_height)
 {
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return;
-        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutProvider setNativeVideoSize:NSMakeSize(i_width, i_height)
@@ -62,9 +100,6 @@ static void WindowSetState(vout_window_t *p_wnd, unsigned i_state)
 
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return;
-        }
 
         NSInteger i_cooca_level = NSNormalWindowLevel;
 
@@ -91,9 +126,6 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
 
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return;
-        }
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [voutProvider setFullscreen:i_full
@@ -110,13 +142,11 @@ static void WindowUnsetFullscreen(vout_window_t *wnd)
 
 static atomic_bool b_intf_starting = ATOMIC_VAR_INIT(false);
 
-static void WindowClose(vout_window_t *);
-
 static const struct vout_window_operations ops = {
-    NULL,
-    NULL,
+    WindowEnable,
+    WindowDisable,
     WindowResize,
-    WindowClose,
+    NULL,
     WindowSetState,
     WindowUnsetFullscreen,
     WindowSetFullscreen,
@@ -124,54 +154,14 @@ static const struct vout_window_operations ops = {
 
 int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
 {
-    @autoreleasepool {
-        msg_Dbg(p_wnd, "Opening video window");
-
-        if (!atomic_load(&b_intf_starting)) {
-            msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");
-            return VLC_EGENERIC;
-        }
-
-        NSRect proposedVideoViewPosition = NSMakeRect(cfg->x, cfg->y, cfg->width, cfg->height);
-
-        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return VLC_EGENERIC;
-        }
-
-        __block VLCVoutView *videoView = nil;
-
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            videoView = [voutProvider setupVoutForWindow:p_wnd
-                             withProposedVideoViewPosition:proposedVideoViewPosition];
-        });
-
-        // this method is not supposed to fail
-        assert(videoView != nil);
-
-        msg_Dbg(getIntf(), "returning videoview with proposed position x=%i, y=%i, width=%i, height=%i", cfg->x, cfg->y, cfg->width, cfg->height);
-        p_wnd->handle.nsobject = (void *)CFBridgingRetain(videoView);
-
-        p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
-        p_wnd->ops = &ops;
+    if (!atomic_load(&b_intf_starting)) {
+        msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");
+        return VLC_EGENERIC;
     }
-    if (cfg->is_fullscreen)
-        vout_window_SetFullScreen(p_wnd, NULL);
+
+    p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
+    p_wnd->ops = &ops;
     return VLC_SUCCESS;
-}
-
-static void WindowClose(vout_window_t *p_wnd)
-{
-    @autoreleasepool {
-        VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
-        if (!voutProvider) {
-            return;
-        }
-
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [voutProvider removeVoutForDisplay:[NSValue valueWithPointer:p_wnd]];
-        });
-    }
 }
 
 @interface VLCVideoOutputProvider ()
