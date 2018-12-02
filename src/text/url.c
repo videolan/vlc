@@ -913,7 +913,7 @@ char *vlc_uri_fixup(const char *str)
         encode_brackets = true;
 
         while (memchr("/?#", *p, 4) == NULL)
-            vlc_uri_putc(&stream, *(p++), "%:[]@" + encode_percent);
+            vlc_uri_putc(&stream, *(p++), &"%:[]@"[encode_percent]);
     }
 
     /* Handle URI path and what follows */
