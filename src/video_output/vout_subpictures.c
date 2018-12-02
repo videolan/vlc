@@ -1395,29 +1395,30 @@ void spu_Destroy(spu_t *spu)
 }
 
 /**
- * Attach/Detach the SPU from any input
- *
- * \param p_this the object in which to destroy the subpicture unit
- * \param b_attach to select attach or detach
+ * Attach the SPU to an input
  */
-void spu_Attach(spu_t *spu, input_thread_t *input, bool attach)
+void spu_Attach(spu_t *spu, input_thread_t *input)
 {
-    if (attach) {
-        UpdateSPU(spu, NULL);
+    UpdateSPU(spu, NULL);
 
-        vlc_mutex_lock(&spu->p->lock);
-        spu->p->input = input;
+    vlc_mutex_lock(&spu->p->lock);
+    spu->p->input = input;
 
-        if (spu->p->text)
-            FilterRelease(spu->p->text);
-        spu->p->text = SpuRenderCreateAndLoadText(spu);
+    if (spu->p->text)
+        FilterRelease(spu->p->text);
+    spu->p->text = SpuRenderCreateAndLoadText(spu);
 
-        vlc_mutex_unlock(&spu->p->lock);
-    } else {
-        vlc_mutex_lock(&spu->p->lock);
-        spu->p->input = NULL;
-        vlc_mutex_unlock(&spu->p->lock);
-    }
+    vlc_mutex_unlock(&spu->p->lock);
+}
+
+/**
+ * Detach the SPU from its attached input
+ */
+void spu_Detach(spu_t *spu)
+{
+    vlc_mutex_lock(&spu->p->lock);
+    spu->p->input = NULL;
+    vlc_mutex_unlock(&spu->p->lock);
 }
 
 /**

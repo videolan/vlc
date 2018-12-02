@@ -222,7 +222,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     vout->p->input = input;
     if (vout->p->input)
-        spu_Attach(vout->p->spu, input, true);
+        spu_Attach(vout->p->spu, input);
 
     return vout;
 }
@@ -238,10 +238,10 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     if (vout) {
         if (vout->p->input != input) {
             if (vout->p->input)
-                spu_Attach(vout->p->spu, vout->p->input, false);
+                spu_Detach(vout->p->spu);
             vout->p->input = input;
             if (vout->p->input)
-                spu_Attach(vout->p->spu, vout->p->input, true);
+                spu_Attach(vout->p->spu, vout->p->input);
         }
 
         vout_control_cmd_t cmd;
@@ -269,7 +269,7 @@ void vout_Close(vout_thread_t *vout)
     assert(vout);
 
     if (vout->p->input)
-        spu_Attach(vout->p->spu, vout->p->input, false);
+        spu_Detach(vout->p->spu);
 
     vout_snapshot_End(&vout->p->snapshot);
 
