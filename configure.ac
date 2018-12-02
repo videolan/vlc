@@ -3201,7 +3201,7 @@ AS_IF([test "${enable_wayland}" != "no"], [
   ])
 
   dnl wayland-protocols
-  PKG_CHECK_MODULES([WAYLAND_PROTOCOLS], [wayland-protocols >= 1.12], [
+  PKG_CHECK_MODULES([WAYLAND_PROTOCOLS], [wayland-protocols >= 1.15], [
     WAYLAND_PROTOCOLS="$(${PKG_CONFIG} wayland-protocols --variable pkgdatadir)"
   ], [
     wl_err="$wl_err ${WAYLAND_PROTOCOLS_PKG_ERRORS}."

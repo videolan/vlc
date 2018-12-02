@@ -268,8 +268,8 @@ libxdg_shell_plugin_la_SOURCES = \
 nodist_libxdg_shell_plugin_la_SOURCES = \
 	video_output/wayland/xdg-shell-client-protocol.h \
 	video_output/wayland/xdg-shell-protocol.c \
-	video_output/wayland/server-decoration-client-protocol.h \
-	video_output/wayland/server-decoration-protocol.c
+	video_output/wayland/xdg-decoration-client-protocol.h \
+	video_output/wayland/xdg-decoration-protocol.c
 libxdg_shell_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DXDG_SHELL \
 	-I$(builddir)/video_output/wayland
 libxdg_shell_plugin_la_CFLAGS = \
@@ -293,11 +293,15 @@ video_output/wayland/xdg-shell-protocol.c: \
 		video_output/Makefile.am
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
-video_output/wayland/server-decoration-client-protocol.h: \
-		video_output/wayland/server-decoration.xml
-video_output/wayland/server-decoration-protocol.c: \
-		video_output/wayland/server-decoration.xml
-EXTRA_DIST += video_output/wayland/server-decoration.xml
+video_output/wayland/xdg-decoration-client-protocol.h: \
+		$(WAYLAND_PROTOCOLS)/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml \
+		video_output/Makefile.am
+	$(AM_V_GEN)$(WAYLAND_SCANNER) client-header $< $@
+
+video_output/wayland/xdg-decoration-protocol.c: \
+		$(WAYLAND_PROTOCOLS)/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml \
+		video_output/Makefile.am
+	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 libegl_wl_plugin_la_SOURCES = video_output/opengl/egl.c
 libegl_wl_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DUSE_PLATFORM_WAYLAND=1

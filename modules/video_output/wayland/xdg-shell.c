@@ -36,7 +36,7 @@
 #include <wayland-cursor.h>
 #ifdef XDG_SHELL
 # include "xdg-shell-client-protocol.h"
-# include "server-decoration-client-protocol.h"
+# include "xdg-decoration-client-protocol.h"
 #else
 # define xdg_wm_base wl_shell
 # define xdg_wm_base_add_listener(s, l, q) (void)0
@@ -75,8 +75,8 @@ typedef struct
     struct xdg_surface *surface;
     struct xdg_toplevel *toplevel;
 #ifdef XDG_SHELL
-    struct org_kde_kwin_server_decoration_manager *deco_manager;
-    struct org_kde_kwin_server_decoration *deco;
+    struct zxdg_decoration_manager_v1 *deco_manager;
+    struct zxdg_toplevel_decoration_v1 *deco;
 #endif
 
     uint32_t default_output;
@@ -230,13 +230,13 @@ static void SetDecoration(vout_window_t *wnd, bool decorated)
 {
     vout_window_sys_t *sys = wnd->sys;
     const uint_fast32_t deco_mode = decorated
-        ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
-        : ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT;
+        ? ZXDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE
+        : ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE;
 
     if (sys->deco != NULL)
-        org_kde_kwin_server_decoration_request_mode(sys->deco, deco_mode);
+        zxdg_toplevel_decoration_v1_set_mode(sys->deco, deco_mode);
     else
-    if (deco_mode != ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT)
+    if (deco_mode != ZXDG_TOPLEVEL_DECORATION_V1_MODE_CLIENT_SIDE)
         msg_Err(wnd, "server-side decoration not supported");
 }
 #endif
@@ -329,6 +329,22 @@ static const struct xdg_wm_base_listener xdg_wm_base_cbs =
 {
     xdg_wm_base_ping_cb,
 };
+
+static void xdg_toplevel_decoration_configure_cb(void *data,
+                                      struct zxdg_toplevel_decoration_v1 *deco,
+                                                 uint32_t mode)
+{
+    vout_window_t *wnd = data;
+
+    msg_Dbg(wnd, "new decoration mode: %"PRIu32, mode);
+    (void) deco;
+}
+
+static const struct zxdg_toplevel_decoration_v1_listener
+                                                  xdg_toplevel_decoration_cbs =
+{
+    xdg_toplevel_decoration_configure_cb,
+};
 #else
 static void wl_shell_surface_configure_cb(void *data,
                                           struct wl_shell_surface *toplevel,
@@ -398,9 +414,9 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
         output_create(wnd, registry, name, vers, &sys->outputs);
 #ifdef XDG_SHELL
     else
-    if (!strcmp(iface, "org_kde_kwin_server_decoration_manager"))
+    if (!strcmp(iface, "zxdg_decoration_manager_v1"))
         sys->deco_manager = wl_registry_bind(registry, name,
-                         &org_kde_kwin_server_decoration_manager_interface, 1);
+                                     &zxdg_decoration_manager_v1_interface, 1);
 #endif
 }
 
@@ -564,8 +580,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
 #ifdef XDG_SHELL
     if (sys->deco_manager != NULL)
-        sys->deco = org_kde_kwin_server_decoration_manager_create(
-                                                   sys->deco_manager, surface);
+        sys->deco = zxdg_decoration_manager_v1_get_toplevel_decoration(
+                                                  sys->deco_manager, toplevel);
+    if (sys->deco != NULL)
+        zxdg_toplevel_decoration_v1_add_listener(sys->deco,
+                                                 &xdg_toplevel_decoration_cbs,
+                                                 wnd);
     SetDecoration(wnd, cfg->is_decorated);
 #endif
 
@@ -594,9 +614,9 @@ error:
     output_destroy_all(&sys->outputs);
 #ifdef XDG_SHELL
     if (sys->deco != NULL)
-        org_kde_kwin_server_decoration_destroy(sys->deco);
+        zxdg_toplevel_decoration_v1_destroy(sys->deco);
     if (sys->deco_manager != NULL)
-        org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+        zxdg_decoration_manager_v1_destroy(sys->deco_manager);
 #endif
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
@@ -636,9 +656,9 @@ static void Close(vout_window_t *wnd)
     output_destroy_all(&sys->outputs);
 #ifdef XDG_SHELL
     if (sys->deco != NULL)
-        org_kde_kwin_server_decoration_destroy(sys->deco);
+        zxdg_toplevel_decoration_v1_destroy(sys->deco);
     if (sys->deco_manager != NULL)
-        org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+        zxdg_decoration_manager_v1_destroy(sys->deco_manager);
 #endif
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
