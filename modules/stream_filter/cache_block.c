@@ -141,10 +141,9 @@ static void AStreamPrebufferBlock(stream_t *s)
             byterate = (CLOCK_FREQ * sys->stat.read_bytes ) /
                         (sys->stat.read_time -1);
 
-            msg_Dbg(s, "prebuffering done %zu bytes in %zus - %zu KiB/s",
-                        cache_size,
-                        SEC_FROM_VLC_TICK(sys->stat.read_time),
-                        byterate / 1024 );
+            msg_Dbg(s, "prebuffering done %zu bytes "
+                    "in %"PRIu64"s - %"PRIu64"u KiB/s", cache_size,
+                    SEC_FROM_VLC_TICK(sys->stat.read_time), byterate / 1024 );
             break;
         }
 
