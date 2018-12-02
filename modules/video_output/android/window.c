@@ -39,7 +39,6 @@
 
 static int Open(vout_window_t *, const vout_window_cfg_t *);
 static void Close(vout_window_t *);
-static int Control(vout_window_t *, int, va_list ap);
 
 /*
  * Module descriptor
@@ -78,7 +77,6 @@ static void OnNewMouseCoords(vout_window_t *wnd,
 }
 
 static const struct vout_window_operations ops = {
-    .control = Control,
     .destroy = Close,
 };
 
@@ -106,15 +104,4 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 static void Close(vout_window_t *wnd)
 {
     AWindowHandler_destroy(wnd->handle.anativewindow);
-}
-
-
-/**
- * Window control.
- */
-static int Control(vout_window_t *wnd, int cmd, va_list ap)
-{
-    (void) ap;
-    msg_Err (wnd, "request %d not implemented", cmd);
-    return VLC_EGENERIC;
 }
