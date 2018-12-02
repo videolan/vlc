@@ -255,9 +255,6 @@ video_output/wayland/viewporter-protocol.c: \
 	$(AM_V_GEN)$(WAYLAND_SCANNER) private-code $< $@
 
 libwl_shell_plugin_la_SOURCES = $(libxdg_shell_plugin_la_SOURCES)
-nodist_libwl_shell_plugin_la_SOURCES = \
-	video_output/wayland/server-decoration-client-protocol.h \
-	video_output/wayland/server-decoration-protocol.c
 libwl_shell_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
 	-I$(builddir)/video_output/wayland
 libwl_shell_plugin_la_CFLAGS = $(libxdg_shell_plugin_la_CFLAGS)

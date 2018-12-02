@@ -35,7 +35,8 @@
 #include <wayland-client.h>
 #include <wayland-cursor.h>
 #ifdef XDG_SHELL
-#include "xdg-shell-client-protocol.h"
+# include "xdg-shell-client-protocol.h"
+# include "server-decoration-client-protocol.h"
 #else
 # define xdg_wm_base wl_shell
 # define xdg_wm_base_add_listener(s, l, q) (void)0
@@ -57,7 +58,6 @@
          wl_shell_surface_set_fullscreen(s, 1, 0, o)
 # define xdg_toplevel_unset_fullscreen wl_shell_surface_set_toplevel
 #endif
-#include "server-decoration-client-protocol.h"
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -74,8 +74,10 @@ typedef struct
     struct xdg_wm_base *wm_base;
     struct xdg_surface *surface;
     struct xdg_toplevel *toplevel;
+#ifdef XDG_SHELL
     struct org_kde_kwin_server_decoration_manager *deco_manager;
     struct org_kde_kwin_server_decoration *deco;
+#endif
 
     uint32_t default_output;
 
@@ -222,6 +224,22 @@ static void SetFullscreen(vout_window_t *wnd, const char *idstr)
 
     wl_display_flush(wnd->display.wl);
 }
+
+#ifdef XDG_SHELL
+static void SetDecoration(vout_window_t *wnd, bool decorated)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    const uint_fast32_t deco_mode = decorated
+        ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
+        : ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT;
+
+    if (sys->deco != NULL)
+        org_kde_kwin_server_decoration_request_mode(sys->deco, deco_mode);
+    else
+    if (deco_mode != ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT)
+        msg_Err(wnd, "server-side decoration not supported");
+}
+#endif
 
 static const struct vout_window_operations ops = {
     .resize = Resize,
@@ -378,10 +396,12 @@ static void registry_global_cb(void *data, struct wl_registry *registry,
     else
     if (!strcmp(iface, "wl_output"))
         output_create(wnd, registry, name, vers, &sys->outputs);
+#ifdef XDG_SHELL
     else
     if (!strcmp(iface, "org_kde_kwin_server_decoration_manager"))
         sys->deco_manager = wl_registry_bind(registry, name,
                          &org_kde_kwin_server_decoration_manager_interface, 1);
+#endif
 }
 
 static void registry_global_remove_cb(void *data, struct wl_registry *registry,
@@ -448,8 +468,10 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     sys->toplevel = NULL;
     sys->cursor_theme = NULL;
     sys->cursor = NULL;
+#ifdef XDG_SHELL
     sys->deco_manager = NULL;
     sys->deco = NULL;
+#endif
     sys->default_output = var_InheritInteger(wnd, "wl-output");
     sys->wm.width = 0;
     sys->wm.height = 0;
@@ -540,21 +562,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (sys->cursor == NULL)
         msg_Err(wnd, "failed to load cursor");
 
-    const uint_fast32_t deco_mode = cfg->is_decorated
-            ? ORG_KDE_KWIN_SERVER_DECORATION_MODE_SERVER
-            : ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT;
-
+#ifdef XDG_SHELL
     if (sys->deco_manager != NULL)
         sys->deco = org_kde_kwin_server_decoration_manager_create(
                                                    sys->deco_manager, surface);
-    if (sys->deco != NULL)
-        org_kde_kwin_server_decoration_request_mode(sys->deco, deco_mode);
-    else
-    if (deco_mode != ORG_KDE_KWIN_SERVER_DECORATION_MODE_CLIENT)
-    {
-        msg_Err(wnd, "server-side decoration not supported");
-        goto error;
-    }
+    SetDecoration(wnd, cfg->is_decorated);
+#endif
 
     wl_surface_commit(surface);
     wl_display_flush(display);
@@ -579,10 +592,12 @@ static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
 error:
     seat_destroy_all(&sys->seats);
     output_destroy_all(&sys->outputs);
+#ifdef XDG_SHELL
     if (sys->deco != NULL)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+#endif
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
     if (sys->cursor_theme != NULL)
@@ -619,10 +634,12 @@ static void Close(vout_window_t *wnd)
     vlc_mutex_destroy(&sys->lock);
     seat_destroy_all(&sys->seats);
     output_destroy_all(&sys->outputs);
+#ifdef XDG_SHELL
     if (sys->deco != NULL)
         org_kde_kwin_server_decoration_destroy(sys->deco);
     if (sys->deco_manager != NULL)
         org_kde_kwin_server_decoration_manager_destroy(sys->deco_manager);
+#endif
     if (sys->cursor_surface != NULL)
         wl_surface_destroy(sys->cursor_surface);
     if (sys->cursor_theme != NULL)
