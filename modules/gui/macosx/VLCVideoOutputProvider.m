@@ -58,10 +58,7 @@ static void WindowResize(vout_window_t *p_wnd,
 static void WindowSetState(vout_window_t *p_wnd, unsigned i_state)
 {
     if (i_state & VOUT_WINDOW_STATE_BELOW)
-    {
         msg_Dbg(p_wnd, "Ignore change to VOUT_WINDOW_STATE_BELOW");
-        return;
-    }
 
     @autoreleasepool {
         VLCVideoOutputProvider *voutProvider = [[VLCMain sharedInstance] voutProvider];
