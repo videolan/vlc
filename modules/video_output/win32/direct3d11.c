@@ -1464,6 +1464,7 @@ static bool BogusZeroCopy(vout_display_t *vd)
     {
     case 0x687F: // RX Vega 56/64
     case 0x6863: // RX Vega Frontier Edition
+    case 0x15DD: // RX Vega 8/11 (Ryzen iGPU)
         return true;
     default:
         return false;
