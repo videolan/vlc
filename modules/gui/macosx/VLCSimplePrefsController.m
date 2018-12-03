@@ -836,7 +836,7 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
                 exit(0);
                 return;
             }
-            execl(path, path, NULL);
+            execl(path, path, (char *)NULL);
         }
     }];
 }

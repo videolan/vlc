@@ -142,7 +142,7 @@ static const int kCurrentPreferencesVersion = 4;
     if (fork() != 0) {
         exit(0);
     }
-    execl(path, path, NULL);
+    execl(path, path, (char *)NULL);
 }
 
 @end
