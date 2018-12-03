@@ -570,8 +570,8 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
 
-    vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (p_sys == NULL)
+    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
+    if (sys == NULL)
         return VLC_ENOMEM;
 
     /* Connect to X */
@@ -632,12 +632,12 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     wnd->handle.xid = window;
     wnd->display.x11 = display;
     wnd->ops = &ops;
-    wnd->sys = p_sys;
+    wnd->sys = sys;
 
-    p_sys->conn = conn;
+    sys->conn = conn;
     if (var_InheritBool(wnd, "keyboard-events"))
         InitKeyboardExtension(wnd);
-    p_sys->root = scr->root;
+    sys->root = scr->root;
 
     /* ICCCM
      * No cut&paste nor drag&drop, only Window Manager communication. */
@@ -688,7 +688,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     set_ascii_prop (conn, window, wm_window_role, "vlc-video");
 
     /* Cache any EWMH atom we may need later */
-    CacheAtoms (p_sys);
+    CacheAtoms(sys);
 
     /* Set initial window state */
     set_wm_state (wnd, cfg);
@@ -707,7 +707,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
-    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
         DeinitKeyboardExtension(wnd);
         goto error;
@@ -719,7 +719,6 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 error:
     xcb_disconnect (conn);
     free (display);
-    free (p_sys);
     return VLC_EGENERIC;
 }
 
@@ -738,7 +737,6 @@ static void Close (vout_window_t *wnd)
     DeinitKeyboardExtension(wnd);
     xcb_disconnect (conn);
     free (wnd->display.x11);
-    free (p_sys);
 }
 
 /*** Embedded drawable support ***/
@@ -835,18 +833,18 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (AcquireDrawable (VLC_OBJECT(wnd), window))
         return VLC_EGENERIC;
 
-    vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
+    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
     xcb_connection_t *conn = xcb_connect (NULL, NULL);
-    if (p_sys == NULL || xcb_connection_has_error (conn))
+    if (sys == NULL || xcb_connection_has_error (conn))
         goto error;
 
     wnd->type = VOUT_WINDOW_TYPE_XID;
     wnd->display.x11 = NULL;
     wnd->handle.xid = window;
     wnd->ops = &em_ops;
-    wnd->sys = p_sys;
+    wnd->sys = sys;
 
-    p_sys->conn = conn;
+    sys->conn = conn;
 
     /* Subscribe to window events (_before_ the geometry is queried) */
     uint32_t mask = XCB_CW_EVENT_MASK;
@@ -863,7 +861,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         msg_Err (wnd, "bad X11 window 0x%08"PRIx8, window);
         goto error;
     }
-    p_sys->root = geo->root;
+    sys->root = geo->root;
     vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
@@ -879,8 +877,8 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (value != ovalue)
         xcb_change_window_attributes (conn, window, mask, &value);
 
-    CacheAtoms (p_sys);
-    if (vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    CacheAtoms(sys);
+    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
     {
         DeinitKeyboardExtension(wnd);
         goto error;
@@ -892,7 +890,6 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
 error:
     xcb_disconnect (conn);
-    free (p_sys);
     ReleaseDrawable (VLC_OBJECT(wnd), window);
     return VLC_EGENERIC;
 }
