@@ -326,7 +326,7 @@ int demux_vaControlHelper( stream_t *s,
             return VLC_EGENERIC;
 
         case DEMUX_GET_POSITION:
-            pf = (double*)va_arg( args, double * );
+            pf = va_arg( args, double * );
             if( i_start < i_end )
             {
                 *pf = (double)( i_tell - i_start ) /
@@ -337,7 +337,7 @@ int demux_vaControlHelper( stream_t *s,
 
 
         case DEMUX_SET_POSITION:
-            f = (double)va_arg( args, double );
+            f = va_arg( args, double );
             if( i_start < i_end && f >= 0.0 && f <= 1.0 )
             {
                 int64_t i_block = (f * ( i_end - i_start )) / i_align;

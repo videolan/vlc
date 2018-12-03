@@ -643,8 +643,8 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     /* Special control when delayed */
     case ES_OUT_GET_ES_STATE:
     {
-        es_out_id_t *p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        bool *pb_enabled = (bool*)va_arg( args, bool* );
+        es_out_id_t *p_es = va_arg( args, es_out_id_t * );
+        bool *pb_enabled = va_arg( args, bool* );
 
         if( p_sys->b_delayed )
         {
@@ -678,7 +678,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     }
     case ES_OUT_SPU_SET_HIGHLIGHT:
     {
-        es_out_id_t *p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        es_out_id_t *p_es = va_arg( args, es_out_id_t * );
         const vlc_spu_highlight_t *p_hl = va_arg( args, const vlc_spu_highlight_t * );
         return es_out_Control( p_sys->p_out, ES_OUT_SPU_SET_HIGHLIGHT,
                                p_es->p_es, p_hl );
@@ -686,31 +686,31 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     /* Special internal input control */
     case ES_OUT_GET_EMPTY:
     {
-        bool *pb_empty = (bool*)va_arg( args, bool* );
+        bool *pb_empty = va_arg( args, bool* );
         return ControlLockedGetEmpty( p_out, pb_empty );
     }
     case ES_OUT_GET_WAKE_UP: /* TODO ? */
     {
-        vlc_tick_t *pi_wakeup = (vlc_tick_t*)va_arg( args, vlc_tick_t* );
+        vlc_tick_t *pi_wakeup = va_arg( args, vlc_tick_t* );
         return ControlLockedGetWakeup( p_out, pi_wakeup );
     }
     case ES_OUT_GET_BUFFERING:
     {
-        bool *pb_buffering = (bool *)va_arg( args, bool* );
+        bool *pb_buffering = va_arg( args, bool* );
         return ControlLockedGetBuffering( p_out, pb_buffering );
     }
     case ES_OUT_SET_PAUSE_STATE:
     {
         const bool b_source_paused = (bool)va_arg( args, int );
         const bool b_paused = (bool)va_arg( args, int );
-        const vlc_tick_t i_date = (vlc_tick_t) va_arg( args, vlc_tick_t );
+        const vlc_tick_t i_date = va_arg( args, vlc_tick_t );
 
         return ControlLockedSetPauseState( p_out, b_source_paused, b_paused, i_date );
     }
     case ES_OUT_SET_RATE:
     {
-        const int i_src_rate = (int)va_arg( args, int );
-        const int i_rate = (int)va_arg( args, int );
+        const int i_src_rate = va_arg( args, int );
+        const int i_rate = va_arg( args, int );
 
         return ControlLockedSetRate( p_out, i_src_rate, i_rate );
     }
@@ -1395,21 +1395,21 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
-        p_cmd->u.control.u.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.i_int = va_arg( args, int );
         break;
 
     case ES_OUT_SET_PCR:                /* arg1=vlc_tick_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
-        p_cmd->u.control.u.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->u.control.u.i_i64 = va_arg( args, int64_t );
         break;
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=vlc_tick_t i_pcr(microsecond!)*/
-        p_cmd->u.control.u.int_i64.i_int = (int)va_arg( args, int );
-        p_cmd->u.control.u.int_i64.i_i64 = (int64_t)va_arg( args, vlc_tick_t );
+        p_cmd->u.control.u.int_i64.i_int = va_arg( args, int );
+        p_cmd->u.control.u.int_i64.i_i64 = va_arg( args, vlc_tick_t );
         break;
 
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
-        p_cmd->u.control.u.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.es_bool.p_es = va_arg( args, es_out_id_t * );
         p_cmd->u.control.u.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
@@ -1421,7 +1421,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
     {
         if( i_query == ES_OUT_SET_GROUP_META )
-            p_cmd->u.control.u.int_meta.i_int = (int)va_arg( args, int );
+            p_cmd->u.control.u.int_meta.i_int = va_arg( args, int );
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
         if( b_copy )
@@ -1441,7 +1441,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=const vlc_epg_t* */
     {
-        p_cmd->u.control.u.int_epg.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.int_epg.i_int = va_arg( args, int );
         const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
         if( b_copy )
@@ -1459,7 +1459,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     }
     case ES_OUT_SET_GROUP_EPG_EVENT:   /* arg1=int i_group arg2=const vlc_epg_event_t* */
     {
-        p_cmd->u.control.u.int_epg_evt.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.int_epg_evt.i_int = va_arg( args, int );
         const vlc_epg_event_t *p_evt = va_arg( args, const vlc_epg_event_t * );
 
         if( b_copy )
@@ -1476,7 +1476,7 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         break;
     }
     case ES_OUT_SET_EPG_TIME: /* arg1=int64_t (seconds) */
-        p_cmd->u.control.u.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->u.control.u.i_i64 = va_arg( args, int64_t );
         break;
 
     /* Modified control */
@@ -1484,23 +1484,23 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_UNSET_ES:    /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
-        p_cmd->u.control.u.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.p_es = va_arg( args, es_out_id_t * );
         break;
 
     case ES_OUT_SET_ES_CAT_POLICY:
-        p_cmd->u.control.u.es_policy.i_cat = (int) va_arg( args, int );
-        p_cmd->u.control.u.es_policy.i_policy = (int) va_arg( args, int );
+        p_cmd->u.control.u.es_policy.i_cat = va_arg( args, int );
+        p_cmd->u.control.u.es_policy.i_policy = va_arg( args, int );
         break;
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        p_cmd->u.control.u.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.es_bool.p_es = va_arg( args, es_out_id_t * );
         p_cmd->u.control.u.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
     {
-        p_cmd->u.control.u.es_fmt.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        es_format_t *p_fmt = (es_format_t*)va_arg( args, es_format_t * );
+        p_cmd->u.control.u.es_fmt.p_es = va_arg( args, es_out_id_t * );
+        es_format_t *p_fmt = va_arg( args, es_format_t * );
 
         if( b_copy )
         {
@@ -1517,9 +1517,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     }
     case ES_OUT_SET_TIMES:
     {
-        double f_position = (double)va_arg( args, double );
-        vlc_tick_t i_time = (vlc_tick_t)va_arg( args, vlc_tick_t );
-        vlc_tick_t i_length = (vlc_tick_t)va_arg( args, vlc_tick_t );
+        double f_position = va_arg( args, double );
+        vlc_tick_t i_time = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_length = va_arg( args, vlc_tick_t );
 
         p_cmd->u.control.u.times.f_position = f_position;
         p_cmd->u.control.u.times.i_time = i_time;
@@ -1528,9 +1528,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     }
     case ES_OUT_SET_JITTER:
     {
-        vlc_tick_t i_pts_delay = (vlc_tick_t)va_arg( args, vlc_tick_t );
-        vlc_tick_t i_pts_jitter = (vlc_tick_t)va_arg( args, vlc_tick_t );
-        int     i_cr_average = (int)va_arg( args, int );
+        vlc_tick_t i_pts_delay = va_arg( args, vlc_tick_t );
+        vlc_tick_t i_pts_jitter = va_arg( args, vlc_tick_t );
+        int     i_cr_average = va_arg( args, int );
 
         p_cmd->u.control.u.jitter.i_pts_delay = i_pts_delay;
         p_cmd->u.control.u.jitter.i_pts_jitter = i_pts_jitter;
