@@ -118,7 +118,7 @@ static void playlist_vaControl( playlist_t *p_playlist, int i_query,
     case PLAYLIST_SKIP:
         pl_priv(p_playlist)->request.p_node = get_current_status_node( p_playlist );
         pl_priv(p_playlist)->request.p_item = get_current_status_item( p_playlist );
-        pl_priv(p_playlist)->request.i_skip = (int) va_arg( args, int );
+        pl_priv(p_playlist)->request.i_skip = va_arg( args, int );
         pl_priv(p_playlist)->request.b_request = true;
         break;
 
