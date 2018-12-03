@@ -24,6 +24,7 @@ cat libvlccore.sym | grep -v \
 	-e '^us_' -e '^utf8_' -e '^xml_' -e '^GetLang_' \
 	-e '^m\(date\|sleep\|wait\)$' -e '^[A-Z][a-z]*Charset$' -e 'MD5$' \
 	-e '^NTPtime64$' -e '^secstotimestr$' \
+	-e '^pl_Get' \
 		&& exit 1
 
 echo "None found."

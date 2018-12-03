@@ -94,7 +94,6 @@ libvlc_int_t * libvlc_InternalCreate( void )
 
     priv = libvlc_priv (p_libvlc);
     priv->interfaces = NULL;
-    priv->playlist = NULL;
     priv->main_playlist = NULL;
     priv->p_vlm = NULL;
     priv->media_source_provider = NULL;

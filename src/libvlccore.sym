@@ -336,6 +336,7 @@ picture_pool_Wait
 picture_Reset
 picture_Setup
 plane_CopyPixels
+pl_Get
 playlist_Add
 playlist_AddExt
 playlist_AddInput
