@@ -38,6 +38,7 @@
 #include <medialibrary/IAudioTrack.h>
 #include <medialibrary/IVideoTrack.h>
 #include <medialibrary/IFolder.h>
+#include <medialibrary/filesystem/IDevice.h>
 
 #include <algorithm>
 
@@ -260,8 +261,18 @@ bool Convert( const medialibrary::IFile* input, vlc_ml_file_t& output )
             vlc_assert_unreachable();
     }
 
-    if( !strdup_helper( input->mrl(), output.psz_mrl ) )
-        return false;
+    output.b_removable = input->isRemovable();
+    output.b_present = true;
+    try
+    {
+        if( !strdup_helper( input->mrl(), output.psz_mrl ) )
+            return false;
+    }
+    catch ( const medialibrary::fs::DeviceRemovedException& )
+    {
+        output.psz_mrl = nullptr;
+        output.b_present = false;
+    }
 
     output.b_external = input->isExternal();
     return true;
@@ -371,13 +382,13 @@ bool Convert( const medialibrary::IPlaylist* input, vlc_ml_playlist_t& output )
 
 bool Convert( const medialibrary::IFolder* input, vlc_ml_entry_point_t& output )
 {
-    if ( input->isPresent() == true )
+    try
     {
         if ( strdup_helper( input->mrl(), output.psz_mrl ) == false )
             return false;
         output.b_present = true;
     }
-    else
+    catch ( const medialibrary::fs::DeviceRemovedException& )
     {
         output.psz_mrl = nullptr;
         output.b_present = false;
@@ -394,8 +405,17 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
         return f->type() == medialibrary::IFile::Type::Main;
     });
     assert( it != cend( files ) );
+    std::string mrl;
+    try
+    {
+        mrl = (*it)->mrl();
+    }
+    catch ( const medialibrary::fs::DeviceRemovedException& ex )
+    {
+        return nullptr;
+    }
     auto inputItem = vlc::wrap_cptr<input_item_t>(
-                input_item_NewExt( (*it)->mrl().c_str(), media->fileName().c_str(),
+                input_item_NewExt( mrl.c_str(), media->fileName().c_str(),
                                    VLC_TICK_FROM_MS( media->duration() ),
                                    ITEM_TYPE_FILE, ITEM_NET_UNKNOWN ),
                 &input_item_Release );

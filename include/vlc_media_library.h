@@ -121,6 +121,8 @@ typedef struct vlc_ml_file_t
     char* psz_mrl;
     vlc_ml_file_type_t i_type;
     bool b_external;
+    bool b_removable;
+    bool b_present;
 } vlc_ml_file_t;
 
 typedef struct vlc_ml_file_list_t
