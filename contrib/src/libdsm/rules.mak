@@ -27,6 +27,9 @@ libdsm: libdsm-$(LIBDSM_VERSION).tar.gz .sum-libdsm
 	$(MOVE)
 
 DEPS_libdsm = libtasn1 iconv
+ifdef HAVE_WIN32
+DEPS_libdsm += pthreads $(DEPS_pthreads)
+endif
 
 .libdsm: libdsm
 	$(RECONF)
