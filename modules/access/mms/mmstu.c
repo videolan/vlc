@@ -257,7 +257,7 @@ static int Control( stream_t *p_access, int i_query, va_list args )
 
         case STREAM_GET_PRIVATE_ID_STATE:
             i_int = va_arg( args, int );
-            pb_bool = (bool *)va_arg( args, bool * );
+            pb_bool = va_arg( args, bool * );
 
             if( i_int < 0 || i_int > 127 )
                 return VLC_EGENERIC;
