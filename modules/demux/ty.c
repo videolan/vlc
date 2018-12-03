@@ -513,7 +513,7 @@ static int Control(demux_t *p_demux, int i_query, va_list args)
 
     case DEMUX_SET_POSITION:
         /* arg is 0.0 - 1.0 percent of overall file position */
-        f = (double) va_arg( args, double );
+        f = va_arg( args, double );
         /* msg_Dbg(p_demux, "Control - set position to %2.3f", f); */
         if ((i64 = p_sys->i_stream_size) > 0)
             return ty_stream_seek_pct(p_demux, f);
