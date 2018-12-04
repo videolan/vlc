@@ -72,7 +72,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     QLabel *label;
 
 #define ADD_META( string, widget, col, colspan ) {                        \
-    label = new QLabel( qtr( string ) ); label->setFont( smallFont );     \
+    label = new QLabel( qfu( string ) ); label->setFont( smallFont );     \
     label->setContentsMargins( 3, 2, 0, 0 );                              \
     metaLayout->addWidget( label, line++, col, 1, colspan );              \
     widget = new QLineEdit;                                               \
@@ -86,7 +86,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META( VLC_META_ALBUM, collection_text, 0, 7 );
 
     /* Date */
-    label = new QLabel( qtr( VLC_META_DATE ) );
+    label = new QLabel( qfu( VLC_META_DATE ) );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line - 1, 7, 1, 2 );
 
@@ -103,7 +103,7 @@ MetaPanel::MetaPanel( QWidget *parent,
     ADD_META( VLC_META_GENRE, genre_text, 0, 7 );
 
     /* Number - on the same line */
-    label = new QLabel( qtr( VLC_META_TRACK_NUMBER ) );
+    label = new QLabel( qfu( VLC_META_TRACK_NUMBER ) );
     label->setFont( smallFont ); label->setContentsMargins( 3, 2, 0, 0 );
     metaLayout->addWidget( label, line - 1, 7, 1, 3  );
 
