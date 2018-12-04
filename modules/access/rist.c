@@ -1064,9 +1064,9 @@ vlc_module_begin ()
     add_integer( "packet-size", RIST_MAX_PACKET_SIZE,
         N_("RIST maximum packet size (bytes)"), NULL, true )
     add_integer( "maximum-jitter", RIST_DEFAULT_POLL_TIMEOUT,
-        N_("RIST demux/decode maximum jitter (defaut is 5ms)"),
+        N_("RIST demux/decode maximum jitter (default is 5ms)"),
         N_("This controls the maximum jitter that will be passed to the demux/decode chain. "
-            "The lower the value, the more CPU cycles the algortyhm will consume"), true )
+            "The lower the value, the more CPU cycles the algorithm will consume"), true )
     add_integer( "latency", RIST_DEFAULT_LATENCY, N_("RIST latency (ms)"), NULL, true )
     add_integer( "retry-interval", RIST_DEFAULT_RETRY_INTERVAL, N_("RIST nack retry interval (ms)"),
         NULL, true )
