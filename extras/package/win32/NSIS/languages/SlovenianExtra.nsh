@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Predvajaj film SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Predvajaj video datoteke"
 ${LangFileString} Action_OnArrivalMusicFiles "Predvajaj zvokovne datoteke"
 ${LangFileString} Action_OnArrivalDVDAudio "Predvajaj zvočni DVD"
+${LangFileString} Action_OnArrivalBluray "Predvajaj Blu-ray"
+
 ${LangFileString} License_NextText "Sedaj ste seznanjeni z dovoljenji in vašimi pravicami in lahko nadaljujete."
 
 ${LangFileString} Detail_CheckProcesses "Preverjanje opravil ..."
