@@ -67,8 +67,7 @@
     _darkInterface = var_InheritBool(getIntf(), "macosx-interfacestyle");
     if (@available(macOS 10_14, *)) {
         NSApplication *app = [NSApplication sharedApplication];
-        if ([app.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua])
-            _darkInterface = YES;
+        _darkInterface = [app.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua];
 
         [app addObserver:self
               forKeyPath:@"effectiveAppearance"
@@ -440,6 +439,7 @@
         [self.fullscreenButton setState:b_fullscreen];
 }
 
+// This is used for both VLCControlsBarCommon, as well as VLCMainWindowControlsBar instances
 - (void)observeValueForKeyPath:(NSString *)keyPath
                       ofObject:(id)object
                         change:(NSDictionary<NSKeyValueChangeKey,id> *)change

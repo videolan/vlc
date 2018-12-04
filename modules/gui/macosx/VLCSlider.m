@@ -123,6 +123,8 @@
         else
             [self setSliderStyleLight];
     }
+
+    [self setNeedsDisplay:YES];
 }
 
 @end

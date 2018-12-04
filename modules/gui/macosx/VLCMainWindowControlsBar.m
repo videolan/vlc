@@ -58,13 +58,6 @@
 
 @implementation VLCMainWindowControlsBar
 
-- (void)dealloc
-{
-    if (@available(macOS 10_14, *)) {
-        [[NSApplication sharedApplication] removeObserver:self forKeyPath:@"effectiveAppearance"];
-    }
-}
-
 - (void)awakeFromNib
 {
     [super awakeFromNib];
@@ -96,38 +89,17 @@
     [[self.effectsButton cell] accessibilitySetOverrideValue:_NS("Open Audio Effects window") forAttribute:NSAccessibilityDescriptionAttribute];
     [[self.effectsButton cell] accessibilitySetOverrideValue:[self.effectsButton toolTip] forAttribute:NSAccessibilityTitleAttribute];
 
-    if (@available(macOS 10_14, *)) {
-        [[NSApplication sharedApplication] addObserver:self
-                                            forKeyPath:@"effectiveAppearance"
-                                               options:0
-                                               context:nil];
-    }
-
     if (!self.darkInterface) {
         [self setBrightButtonImageSet];
     } else {
         [self setDarkButtonImageSet];
     }
-    [self.repeatButton setImage: _repeatImage];
-    [self.repeatButton setAlternateImage: _pressedRepeatImage];
-    [self.shuffleButton setImage: _shuffleImage];
-    [self.shuffleButton setAlternateImage: _pressedShuffleImage];
 
     BOOL b_mute = ![[VLCCoreInteraction sharedInstance] mute];
     [self.volumeSlider setEnabled: b_mute];
     [self.volumeSlider setMaxValue: [[VLCCoreInteraction sharedInstance] maxVolume]];
     [self.volumeSlider setDefaultValue: AOUT_VOLUME_DEFAULT];
     [self.volumeUpButton setEnabled: b_mute];
-
-    // configure optional buttons
-    if (!var_InheritBool(getIntf(), "macosx-show-effects-button"))
-        [self removeEffectsButton:NO];
-
-    if (!var_InheritBool(getIntf(), "macosx-show-playmode-buttons"))
-        [self removePlaymodeButtons:NO];
-
-    if (!var_InheritBool(getIntf(), "macosx-show-playback-buttons"))
-        [self removeJumpButtons:NO];
 
     [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
 }
@@ -139,8 +111,6 @@
     [self.stopButton setImage: imageFromRes(@"stop")];
     [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed")];
 
-    [self.playlistButton setImage: imageFromRes(@"playlist-btn")];
-    [self.playlistButton setAlternateImage: imageFromRes(@"playlist-btn-pressed")];
     _repeatImage = imageFromRes(@"repeat");
     _pressedRepeatImage = imageFromRes(@"repeat-pressed");
     _repeatAllImage  = imageFromRes(@"repeat-all");
@@ -173,6 +143,9 @@
     [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-pressed")];
 
     [self updatePlaymodeButtonImages];
+    [self setupJumpButtons:NO];
+    [self setupPlaymodeButtons:NO];
+    [self setupEffectsButton:NO];
 }
 
 - (void)setDarkButtonImageSet
@@ -182,8 +155,6 @@
     [self.stopButton setImage: imageFromRes(@"stop_dark")];
     [self.stopButton setAlternateImage: imageFromRes(@"stop-pressed_dark")];
 
-    [self.playlistButton setImage: imageFromRes(@"playlist_dark")];
-    [self.playlistButton setAlternateImage: imageFromRes(@"playlist-pressed_dark")];
     _repeatImage = imageFromRes(@"repeat_dark");
     _pressedRepeatImage = imageFromRes(@"repeat-pressed_dark");
     _repeatAllImage  = imageFromRes(@"repeat-all-blue_dark");
@@ -216,6 +187,9 @@
     [self.nextButton setAlternateImage: imageFromRes(@"next-6btns-dark-pressed")];
 
     [self updatePlaymodeButtonImages];
+    [self setupJumpButtons:NO];
+    [self setupPlaymodeButtons:NO];
+    [self setupEffectsButton:NO];
 }
 
 - (void)updatePlaymodeButtonImages
@@ -258,12 +232,12 @@
     animatedConstraint.constant = ((NSButton *)constraint.firstItem).image.size.width;
 }
 
-- (void)toggleEffectsButton
+- (void)setupEffectsButton:(BOOL)withAnimation
 {
     if (var_InheritBool(getIntf(), "macosx-show-effects-button"))
-        [self addEffectsButton:YES];
+        [self addEffectsButton:withAnimation];
     else
-        [self removeEffectsButton:YES];
+        [self removeEffectsButton:withAnimation];
 }
 
 - (void)addEffectsButton:(BOOL)withAnimation
@@ -302,12 +276,12 @@
     [NSAnimationContext endGrouping];
 }
 
-- (void)toggleJumpButtons
+- (void)setupJumpButtons:(BOOL)withAnimation
 {
     if (var_InheritBool(getIntf(), "macosx-show-playback-buttons"))
-        [self addJumpButtons:YES];
+        [self addJumpButtons:withAnimation];
     else
-        [self removeJumpButtons:YES];
+        [self removeJumpButtons:withAnimation];
 }
 
 - (void)addJumpButtons:(BOOL)withAnimation
@@ -358,12 +332,12 @@
     [self toggleForwardBackwardMode: NO];
 }
 
-- (void)togglePlaymodeButtons
+- (void)setupPlaymodeButtons:(BOOL)withAnimation
 {
     if (var_InheritBool(getIntf(), "macosx-show-playmode-buttons"))
-        [self addPlaymodeButtons:YES];
+        [self addPlaymodeButtons:withAnimation];
     else
-        [self removePlaymodeButtons:YES];
+        [self removePlaymodeButtons:withAnimation];
 }
 
 - (void)addPlaymodeButtons:(BOOL)withAnimation
@@ -568,20 +542,6 @@
     [self.nextButton setEnabled: (b_seekable || b_plmul || b_chapters)];
 
     [[[VLCMain sharedInstance] mainMenu] setRateControlsEnabled: b_control];
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary<NSKeyValueChangeKey,id> *)change
-                       context:(void *)context
-{
-    if (@available(macOS 10_14, *)) {
-        if ([[NSApplication sharedApplication].effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
-            [self setDarkButtonImageSet];
-        } else {
-            [self setBrightButtonImageSet];
-        }
-    }
 }
 
 @end

@@ -71,9 +71,9 @@
 
 - (IBAction)togglePlaylist:(id)sender;
 
-- (void)toggleEffectsButton;
-- (void)toggleJumpButtons;
-- (void)togglePlaymodeButtons;
+- (void)setupEffectsButton:(BOOL)withAnimation;
+- (void)setupJumpButtons:(BOOL)withAnimation;
+- (void)setupPlaymodeButtons:(BOOL)withAnimation;
 
 - (void)updateVolumeSlider;
 - (void)updateControls;

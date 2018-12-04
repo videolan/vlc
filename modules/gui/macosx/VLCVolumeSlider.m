@@ -62,6 +62,8 @@
         } else {
             [(VLCVolumeSliderCell*)self.cell setSliderStyleLight];
         }
+
+        [self setNeedsDisplay:YES];
     }
 }
 

@@ -71,6 +71,9 @@
     _knobGradientAngleHighlighted = 270;
     _knobGradientAngle = 90;
 
+    // Reset gradient in case it was set before
+    _knobGradient = nil;
+
     // Shadow Declarations
     _knobShadow = [[NSShadow alloc] init];
     _knobShadow.shadowColor = _shadowColor;
