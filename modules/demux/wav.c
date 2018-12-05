@@ -412,7 +412,12 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
     if( !b_is_rf64 || i_size < UINT32_MAX )
-        p_sys->i_data_size = i_size;
+    {
+        int64_t i_stream_size = stream_Size( p_demux->s );
+        if( i_stream_size > 0 && i_stream_size >= i_size + p_sys->i_data_pos )
+            p_sys->i_data_size = i_size;
+    }
+
     if( vlc_stream_Read( p_demux->s, NULL, 8 ) != 8 )
         goto error;
     p_sys->i_data_pos = vlc_stream_Tell( p_demux->s );
