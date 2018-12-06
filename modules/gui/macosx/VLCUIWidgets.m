@@ -41,6 +41,12 @@
 
 @end
 
+
+@implementation VLCDialogSecureTextField
+
+@end
+
+
 @implementation VLCDialogLabel
 - (void)resetCursorRects {
     [self addCursorRect:[self bounds] cursor:[NSCursor arrowCursor]];

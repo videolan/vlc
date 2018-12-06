@@ -42,6 +42,10 @@
 @property (readwrite) extension_widget_t *widget;
 @end
 
+@interface VLCDialogSecureTextField : NSSecureTextField
+@property (readwrite) extension_widget_t *widget;
+@end
+
 @interface VLCDialogWindow : NSWindow
 @property (readwrite) extension_dialog_t *dialog;
 @property (readwrite) BOOL has_lock;
