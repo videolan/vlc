@@ -76,6 +76,17 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
                 return field;
             }
+            case EXTENSION_WIDGET_PASSWORD:
+            {
+                VLCDialogSecureTextField *field = [[VLCDialogSecureTextField alloc] init];
+                [field setWidget:widget];
+                [field setAutoresizingMask:NSViewWidthSizable];
+                [field setFont:[NSFont systemFontOfSize:0]];
+                [[field cell] setControlSize:NSRegularControlSize];
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
+                return field;
+            }
+
             case EXTENSION_WIDGET_CHECK_BOX:
             {
                 VLCDialogButton *button = [[VLCDialogButton alloc] init];
@@ -315,9 +326,17 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 - (void)syncTextField:(NSNotification *)notifcation
 {
     id sender = [notifcation object];
-    assert([sender isKindOfClass:[VLCDialogTextField class]]);
-    VLCDialogTextField *field = sender;
-    extension_widget_t *widget = [field widget];
+    assert([sender isKindOfClass:[VLCDialogTextField class]] ||
+        [sender isKindOfClass:[VLCDialogSecureTextField class]]);
+    NSTextField *field = sender;
+    extension_widget_t *widget;
+
+    if ([sender isKindOfClass:[VLCDialogTextField class]])
+        widget = [(VLCDialogTextField*)field widget];
+    else if ([sender isKindOfClass:[VLCDialogSecureTextField class]])
+        widget = [(VLCDialogSecureTextField*)field widget];
+    else
+        return;
 
     vlc_mutex_lock(&widget->p_dialog->lock);
     free(widget->psz_text);
