@@ -144,6 +144,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
                 return spinner;
             }
             default:
+                msg_Err(getIntf(), "Unhandled Widget type %i", widget->type);
                 return nil;
         }
     }
@@ -391,6 +392,8 @@ static void extensionDialogCallback(extension_dialog_t *p_ext_dialog,
 
         if (!control && !shouldDestroy) {
             control = createControlFromWidget(widget, self);
+            if (control == NULL)
+                msg_Err(getIntf(), "Failed to create control from widget!");
             updateControlFromWidget(control, widget, self);
             /* Ownership needs to be given-up, if ARC would remain with the
              * ownership, the object could be freed while it is still referenced
