@@ -133,10 +133,18 @@ HRESULT D3D9_CreateDevice(vlc_object_t *o, d3d9_handle_t *hd3d, HWND hwnd,
 HRESULT D3D9_CreateDeviceExternal(IDirect3DDevice9 *dev, d3d9_handle_t *hd3d, HWND hwnd,
                                   const video_format_t *source, d3d9_device_t *out)
 {
-
+    D3DDEVICE_CREATION_PARAMETERS params;
+    HRESULT hr = IDirect3DDevice9_GetCreationParameters(dev, &params);
+    if (FAILED(hr))
+       return hr;
     out->dev   = dev;
     out->owner = false;
     out->hwnd  = hwnd;
+    out->adapterId = params.AdapterOrdinal;
+    ZeroMemory(&out->caps, sizeof(out->caps));
+    hr = IDirect3D9_GetDeviceCaps(hd3d->obj, out->adapterId, params.DeviceType, &out->caps);
+    if (FAILED(hr))
+       return hr;
     if (D3D9_FillPresentationParameters(hd3d, source, out))
     {
         return E_FAIL;
