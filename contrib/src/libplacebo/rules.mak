@@ -1,8 +1,8 @@
 # libplacebo
 
 PLACEBO_VERSION := 1.7.0-rc2
-PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
-PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
+PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
+PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 
 DEPS_libplacebo = glslang
 
