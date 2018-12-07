@@ -1,6 +1,6 @@
 # libplacebo
 
-PLACEBO_VERSION := 1.7.0-rc1
+PLACEBO_VERSION := 1.7.0-rc2
 PLACEBO_URL := https://github.com/haasn/libplacebo/archive/v$(PLACEBO_VERSION).tar.gz
 PLACEBO_ARCHIVE = libplacebo-$(PLACEBO_VERSION).tar.gz
 
@@ -21,8 +21,7 @@ $(TARBALLS)/$(PLACEBO_ARCHIVE):
 
 libplacebo: $(PLACEBO_ARCHIVE) .sum-libplacebo
 	$(UNPACK)
-	$(APPLY) $(SRC)/libplacebo/0001-build-fix-lpthread-dependency-with-glslang.patch
-	$(APPLY) $(SRC)/libplacebo/0002-meson-fix-glslang-search-path.patch
+	$(APPLY) $(SRC)/libplacebo/0001-meson-fix-glslang-search-path.patch
 	$(MOVE)
 
 .libplacebo: libplacebo crossfile.meson

@@ -1,17 +1,17 @@
-From fd85596f1d684be20d383b7d6b01d19a6a576fdc Mon Sep 17 00:00:00 2001
+From f3809023b90a8399dd40edadbd92c9d436b25842 Mon Sep 17 00:00:00 2001
 From: Thomas Guillem <thomas@gllm.fr>
 Date: Wed, 24 Oct 2018 10:28:55 +0200
-Subject: [PATCH 2/2] meson: fix glslang search path
+Subject: [PATCH] meson: fix glslang search path
 
 ---
- src/meson.build | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ src/meson.build | 20 ++++++++++++++++++--
+ 1 file changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/src/meson.build b/src/meson.build
-index 25b898b7a4..c63996f53f 100644
+index be1f0aa..e558b06 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -25,6 +25,12 @@ build_opts = [
+@@ -42,6 +42,12 @@ build_opts = [
  ]
  
  link_args = []
@@ -24,28 +24,24 @@ index 25b898b7a4..c63996f53f 100644
  
  cc = meson.get_compiler('c')
  cxx = meson.get_compiler('cpp')
-@@ -92,12 +98,12 @@ glslang_min_ver = 2763
+@@ -128,6 +134,14 @@ endif
+ glslang_combined = disabler()
+ glslang_min_ver = 2763
  glslang_req = get_option('glslang')
- glslang_pthread_deps = []
- glslang_deps = [
--  cxx.find_library('glslang',     required: glslang_req),
--  cxx.find_library('HLSL',        required: glslang_req),
--  cxx.find_library('OGLCompiler', required: glslang_req),
--  cxx.find_library('OSDependent', required: glslang_req),
--  cxx.find_library('SPIRV',       required: glslang_req),
--  cxx.find_library('SPVRemapper', required: glslang_req),
++glslang_deps = [
 +  cxx.find_library('glslang',     dirs: prefix_lib, required: glslang_req),
 +  cxx.find_library('HLSL',        dirs: prefix_lib, required: glslang_req),
 +  cxx.find_library('OGLCompiler', dirs: prefix_lib, required: glslang_req),
 +  cxx.find_library('OSDependent', dirs: prefix_lib, required: glslang_req),
 +  cxx.find_library('SPIRV',       dirs: prefix_lib, required: glslang_req),
 +  cxx.find_library('SPVRemapper', dirs: prefix_lib, required: glslang_req),
- ]
++]
  
- glslang_found = true
-@@ -109,11 +115,13 @@ if glslang_found
-   glslang_pthread_deps += cxx.find_library('pthread', required: false)
+ if glslang_req.auto() and shaderc.found()
  
+@@ -156,7 +170,8 @@ endif
+ 
+ if glslang_found
    glslang_ver = cxx.get_define('GLSLANG_PATCH_LEVEL',
 -      prefix: '#include <glslang/Include/revision.h>'
 +      prefix: '#include <glslang/Include/revision.h>',
@@ -53,12 +49,16 @@ index 25b898b7a4..c63996f53f 100644
    ).to_int()
  
    if glslang_ver >= glslang_min_ver
--    glslang_combined = declare_dependency(dependencies: glslang_deps + glslang_pthread_deps)
-+    glslang_combined = declare_dependency(dependencies: glslang_deps + glslang_pthread_deps,
+@@ -166,7 +181,8 @@ if glslang_found
+     # -pthread) doesn't work. We actually need -lpthreads for the glslang
+     # object files to link, for whatever weird reason.
+     pthread = cxx.find_library('pthread', required: false)
+-    glslang_combined = declare_dependency(dependencies: glslang_deps + [pthread])
++    glslang_combined = declare_dependency(dependencies: glslang_deps + [pthread],
 +        include_directories : prefix_include)
    else
      error('glslang revision @0@ too old! Must be at least @1@'
            .format(glslang_ver, glslang_min_ver))
 -- 
-2.19.1
+2.19.2
 
