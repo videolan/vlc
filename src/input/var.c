@@ -422,10 +422,11 @@ void input_LegacyEvents( input_thread_t *p_input,
             var_Change( p_input, "cache", VLC_VAR_SETVALUE, val );
             break;
         case INPUT_EVENT_VOUT:
-            break;
         case INPUT_EVENT_SUBITEMS:
-            break;
         case INPUT_EVENT_THUMBNAIL_READY:
+        case INPUT_EVENT_VBI_PAGE:
+        case INPUT_EVENT_VBI_TRANSPARENCY:
+        case INPUT_EVENT_SUBS_FPS:
             break;
     }
     Trigger( p_input, event->type );
