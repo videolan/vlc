@@ -956,10 +956,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = osys->cfg.is_fullscreen;
-    osys->wm_state = var_InheritBool(vout, "video-wallpaper")
-        ? VOUT_WINDOW_STATE_BELOW
-        : var_InheritBool(vout, "video-on-top")
-            ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
+    osys->wm_state = var_InheritBool(vout, "video-on-top")
+                     ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
     osys->ch_wm_state = true;
 #endif
 
