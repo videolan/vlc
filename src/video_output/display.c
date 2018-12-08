@@ -940,11 +940,11 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 {
     /* */
     vout_display_owner_sys_t *osys = calloc(1, sizeof(*osys));
-    vout_display_cfg_t *cfg = &osys->cfg;
 
-    *cfg = state->cfg;
-    vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
-                                       source, cfg);
+    osys->cfg = state->cfg;
+    vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
+                                       &osys->cfg.display.height,
+                                       source, &osys->cfg);
 
     osys->vout = vout;
     osys->is_splitter = is_splitter;
@@ -955,7 +955,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vlc_mouse_Init(&osys->mouse.state);
 
 #if defined(_WIN32) || defined(__OS2__)
-    osys->is_fullscreen  = cfg->is_fullscreen;
+    osys->is_fullscreen  = osys->cfg.is_fullscreen;
     osys->wm_state = state->wm_state;
     osys->ch_wm_state = true;
 #endif
@@ -979,7 +979,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
                                                  module, !is_splitter,
-                                                 source, cfg, &owner);
+                                                 source, &osys->cfg, &owner);
     if (!p_display)
         goto error;
 
