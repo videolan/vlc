@@ -54,7 +54,6 @@ static int vout_window_start(void *func, va_list ap)
 }
 
 vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
-                               const vout_window_cfg_t *cfg,
                                const vout_window_owner_t *owner)
 {
     window_t *w = vlc_custom_create(obj, sizeof(*w), "window");
@@ -393,7 +392,7 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     var_Create(vout, "window-fullscreen", VLC_VAR_BOOL);
     var_Create(vout, "window-fullscreen-output", VLC_VAR_STRING);
 
-    window = vout_window_New((vlc_object_t *)vout, modlist, cfg, &owner);
+    window = vout_window_New((vlc_object_t *)vout, modlist, &owner);
     free(modlist);
 
     if (window != NULL) {

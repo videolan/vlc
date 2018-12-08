@@ -233,7 +233,7 @@ struct vout_window_t {
  * @param module plugin name (usually "$window")
  * @note don't use it inside a "vout display" module
  */
-VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_cfg_t *, const vout_window_owner_t *);
+VLC_API vout_window_t * vout_window_New(vlc_object_t *, const char *module, const vout_window_owner_t *);
 
 /**
  * Deletes a window created by vout_window_New().
