@@ -369,20 +369,6 @@ static void *Thread (void *data)
     return NULL;
 }
 
-/** Sets the EWMH state of the (unmapped) window */
-static void set_wm_state (vout_window_t *wnd, const vout_window_cfg_t *cfg)
-{
-    vout_window_sys_t *sys = wnd->sys;
-    xcb_atom_t data[1];
-    uint32_t len = 0;
-
-    if (cfg->is_fullscreen)
-        data[len++] = sys->wm_state_fullscreen;
-
-    xcb_change_property (sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
-                         sys->wm_state, XA_ATOM, 32, len, data);
-}
-
 #define NET_WM_STATE_REMOVE 0
 #define NET_WM_STATE_ADD    1
 #define NET_WM_STATE_TOGGLE 2
@@ -522,22 +508,59 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     return atom;
 }
 
-static void set_wm_deco(vout_window_t *wnd, bool on)
+static int Enable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
 {
-    static const uint32_t motif_wm_hints[5] = { 2, 0, 0, 0, 0 };
     vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+    xcb_window_t window = wnd->handle.xid;
 
-    if (on)
+    /* Set initial window state */
+    xcb_atom_t state[1];
+    uint32_t len = 0;
+
+    if (cfg->is_fullscreen)
+        state[len++] = sys->wm_state_fullscreen;
+
+    xcb_change_property (sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
+                         sys->wm_state, XA_ATOM, 32, len, state);
+
+    if (cfg->is_decorated)
         xcb_delete_property(sys->conn, wnd->handle.xid, sys->motif_wm_hints);
     else
+    {
+        static const uint32_t motif_wm_hints[5] = { 2, 0, 0, 0, 0 };
+
         xcb_change_property(sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
                             sys->motif_wm_hints, sys->motif_wm_hints, 32,
                             ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
+    }
+
+    const uint32_t values[] = { cfg->width, cfg->height };
+
+    xcb_configure_window(conn, window,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                         values);
+
+    /* Make the window visible */
+    xcb_map_window(conn, window);
+    xcb_flush(conn);
+    return VLC_SUCCESS;
+}
+
+static void Disable(vout_window_t *wnd)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    xcb_connection_t *conn = sys->conn;
+
+    xcb_unmap_window(conn, wnd->handle.xid);
+    xcb_flush(conn);
 }
 
 static void Close(vout_window_t *);
 
 static const struct vout_window_operations ops = {
+    .enable = Enable,
+    .disable = Disable,
     .resize = Resize,
     .set_fullscreen = SetFullscreen,
     .unset_fullscreen = UnsetFullscreen,
@@ -545,8 +568,8 @@ static const struct vout_window_operations ops = {
     .set_state = SetState,
 };
 
-static int OpenCommon(vout_window_t *wnd, const vout_window_cfg_t *cfg,
-                      char *display, xcb_connection_t *conn,
+static int OpenCommon(vout_window_t *wnd, char *display,
+                      xcb_connection_t *conn,
                       xcb_window_t root, xcb_window_t window)
 {
     vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
@@ -634,10 +657,6 @@ static int OpenCommon(vout_window_t *wnd, const vout_window_cfg_t *cfg,
     sys->wm_state_fullscreen = get_atom(conn, wm_state_fs_ck);
     sys->motif_wm_hints = get_atom(conn, motif_wm_hints_ck);
 
-    /* Set initial window state */
-    set_wm_state(wnd, cfg);
-    set_wm_deco(wnd, cfg->is_decorated);
-
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
@@ -712,13 +731,10 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
 
-    ret = OpenCommon(wnd, cfg, display, conn, scr->root, window);
+    ret = OpenCommon(wnd, display, conn, scr->root, window);
     if (ret != VLC_SUCCESS)
         goto error;
 
-    /* Make the window visible */
-    xcb_map_window(conn, window);
-    xcb_flush(conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
 
 error:
@@ -745,6 +761,14 @@ static void Close (vout_window_t *wnd)
 }
 
 /*** Embedded drawable support ***/
+
+static int EmEnable(vout_window_t *wnd, const vout_window_cfg_t *restrict cfg)
+{
+    vout_window_sys_t *sys = wnd->sys;
+
+    change_wm_state(wnd, cfg->is_fullscreen, sys->wm_state_fullscreen);
+    return VLC_SUCCESS;
+}
 
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 
@@ -823,6 +847,7 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 static void EmClose(vout_window_t *);
 
 static const struct vout_window_operations em_ops = {
+    .enable = EmEnable,
     .set_fullscreen = SetFullscreen,
     .unset_fullscreen = UnsetFullscreen,
     .destroy = EmClose,
@@ -875,7 +900,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     xcb_change_window_attributes(conn, window, XCB_CW_EVENT_MASK, &value);
 
-    ret = OpenCommon(wnd, cfg, NULL, conn, root, window);
+    ret = OpenCommon(wnd, NULL, conn, root, window);
     if (ret != VLC_SUCCESS)
         goto error;
 
