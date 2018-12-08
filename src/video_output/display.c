@@ -988,11 +988,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         goto error;
     }
 
-    /* Setup delayed request */
-    if (osys->sar.num != source->i_sar_num ||
-        osys->sar.den != source->i_sar_den)
-        osys->ch_sar = true;
-
     var_SetBool(osys->vout, "viewpoint-changeable",
                 p_display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
 
