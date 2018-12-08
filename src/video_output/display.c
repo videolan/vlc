@@ -1219,7 +1219,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         };
         const video_splitter_output_t *output = &splitter->p_output[i];
         vout_display_state_t ostate;
-        vout_window_cfg_t cfg = {
+        vout_window_cfg_t wcfg = {
             .width = state->cfg.display.width,
             .height = state->cfg.display.height,
             .is_decorated = true,
@@ -1232,9 +1232,9 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
         ostate.cfg.is_display_filled = true;
         ostate.cfg.zoom.num = 1;
         ostate.cfg.zoom.den = 1;
-        vout_display_GetDefaultDisplaySize(&cfg.width, &cfg.height,
+        vout_display_GetDefaultDisplaySize(&wcfg.width, &wcfg.height,
                                            source, &ostate.cfg);
-        ostate.cfg.window = vout_display_window_New(vout, &cfg);
+        ostate.cfg.window = vout_display_window_New(vout, &wcfg);
         if (unlikely(ostate.cfg.window == NULL)) {
             vout_DeleteDisplay(wrapper, NULL);
             return NULL;
