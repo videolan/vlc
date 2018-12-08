@@ -206,7 +206,6 @@ static void DeinitKeyboardExtension(vout_window_t *wnd)
     xkb_context_unref(sys->xkb.ctx);
 }
 #else
-# define InitKeyboardExtension(w) (w, -1)
 # define DeinitKeyboardExtension(w) ((void)(w))
 #endif
 
@@ -522,23 +521,6 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     return atom;
 }
 
-static void CacheAtoms (vout_window_sys_t *p_sys)
-{
-    xcb_connection_t *conn = p_sys->conn;
-    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck,
-                             wm_state_below_ck, wm_state_fs_ck;
-
-    wm_state_ck = intern_string (conn, "_NET_WM_STATE");
-    wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
-    wm_state_below_ck = intern_string (conn, "_NET_WM_STATE_BELOW");
-    wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
-
-    p_sys->wm_state = get_atom (conn, wm_state_ck);
-    p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
-    p_sys->wm_state_below = get_atom (conn, wm_state_below_ck);
-    p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
-}
-
 static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
 {
     if (on)
@@ -562,6 +544,107 @@ static const struct vout_window_operations ops = {
     .set_state = SetState,
 };
 
+static int OpenCommon(vout_window_t *wnd, const vout_window_cfg_t *cfg,
+                      char *display, xcb_connection_t *conn,
+                      xcb_window_t root, xcb_window_t window)
+{
+    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
+    if (sys == NULL)
+        return VLC_ENOMEM;
+
+    wnd->type = VOUT_WINDOW_TYPE_XID;
+    wnd->handle.xid = window;
+    wnd->display.x11 = display;
+    wnd->ops = &ops;
+    wnd->sys = sys;
+
+    sys->conn = conn;
+    sys->root = root;
+
+#ifdef HAVE_XKBCOMMON
+    if (var_InheritBool(wnd, "keyboard-events"))
+        InitKeyboardExtension(wnd);
+    else
+        sys->xkb.ctx = NULL;
+#endif
+
+    /* ICCCM */
+    /* No cut&paste nor drag&drop, only Window Manager communication. */
+    set_ascii_prop(conn, window, XA_WM_NAME,
+    /* xgettext: This is a plain ASCII spelling of "VLC media player"
+       for the ICCCM window name. This must be pure ASCII.
+       The limitation is partially with ICCCM and partially with VLC.
+       For Latin script languages, you may need to strip accents.
+       For other scripts, you will need to transliterate into Latin. */
+                   vlc_pgettext("ASCII", "VLC media player"));
+
+    set_ascii_prop(conn, window, XA_WM_ICON_NAME,
+    /* xgettext: This is a plain ASCII spelling of "VLC"
+       for the ICCCM window name. This must be pure ASCII. */
+                   vlc_pgettext("ASCII", "VLC"));
+
+    set_wm_hints(conn, window);
+    xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
+                        XA_STRING, 8, 8, "vlc\0Vlc");
+    set_hostname_prop(conn, window);
+
+    /* EWMH */
+    xcb_intern_atom_cookie_t utf8_string_ck =
+        intern_string(conn, "UTF8_STRING");
+    xcb_intern_atom_cookie_t net_wm_name_ck =
+        intern_string(conn, "_NET_WM_NAME");
+    xcb_intern_atom_cookie_t net_wm_icon_name_ck =
+        intern_string(conn, "_NET_WM_ICON_NAME");
+    xcb_intern_atom_cookie_t wm_window_role_ck =
+        intern_string(conn, "WM_WINDOW_ROLE");
+    xcb_intern_atom_cookie_t wm_state_ck =
+        intern_string(conn, "_NET_WM_STATE");
+    xcb_intern_atom_cookie_t wm_state_above_ck =
+        intern_string(conn, "_NET_WM_STATE_ABOVE");
+    xcb_intern_atom_cookie_t wm_state_below_ck =
+        intern_string(conn, "_NET_WM_STATE_BELOW");
+    xcb_intern_atom_cookie_t wm_state_fs_ck =
+        intern_string(conn, "_NET_WM_STATE_FULLSCREEN");
+
+    xcb_atom_t utf8 = get_atom(conn, utf8_string_ck);
+    xcb_atom_t net_wm_name = get_atom(conn, net_wm_name_ck);
+    char *title = var_InheritString(wnd, "video-title");
+
+    if (title != NULL)
+    {
+        set_string(conn, window, utf8, net_wm_name, title);
+        free(title);
+    }
+    else
+        set_string(conn, window, utf8, net_wm_name, _("VLC media player"));
+
+    xcb_atom_t net_wm_icon_name = get_atom(conn, net_wm_icon_name_ck);
+    set_string(conn, window, utf8, net_wm_icon_name, _("VLC"));
+
+    xcb_atom_t wm_window_role = get_atom(conn, wm_window_role_ck);
+    set_ascii_prop(conn, window, wm_window_role, "vlc-video");
+
+    /* Cache any EWMH atom we may need later */
+    sys->wm_state = get_atom(conn, wm_state_ck);
+    sys->wm_state_above = get_atom(conn, wm_state_above_ck);
+    sys->wm_state_below = get_atom(conn, wm_state_below_ck);
+    sys->wm_state_fullscreen = get_atom(conn, wm_state_fs_ck);
+
+    /* Set initial window state */
+    set_wm_state(wnd, cfg);
+    set_wm_deco(conn, window, cfg->is_decorated);
+
+    /* Create the event thread. It will dequeue all events, so any checked
+     * request from this thread must be completed at this point. */
+    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+    {
+        DeinitKeyboardExtension(wnd);
+        return VLC_ENOMEM;
+    }
+
+    return VLC_SUCCESS;
+}
+
 /**
  * Create an X11 window.
  */
@@ -569,10 +652,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
-
-    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
-    if (sys == NULL)
-        return VLC_ENOMEM;
+    int ret = VLC_EGENERIC;
 
     /* Connect to X */
     char *display = var_InheritString (wnd, "x11-display");
@@ -628,89 +708,19 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
     }
 
-    wnd->type = VOUT_WINDOW_TYPE_XID;
-    wnd->handle.xid = window;
-    wnd->display.x11 = display;
-    wnd->ops = &ops;
-    wnd->sys = sys;
-
-    sys->conn = conn;
-    if (var_InheritBool(wnd, "keyboard-events"))
-        InitKeyboardExtension(wnd);
-    sys->root = scr->root;
-
-    /* ICCCM
-     * No cut&paste nor drag&drop, only Window Manager communication. */
-    set_ascii_prop (conn, window, XA_WM_NAME,
-    /* xgettext: This is a plain ASCII spelling of "VLC media player"
-       for the ICCCM window name. This must be pure ASCII.
-       The limitation is partially with ICCCM and partially with VLC.
-       For Latin script languages, you may need to strip accents.
-       For other scripts, you will need to transliterate into Latin. */
-                    vlc_pgettext ("ASCII", "VLC media player"));
-
-    set_ascii_prop (conn, window, XA_WM_ICON_NAME,
-    /* xgettext: This is a plain ASCII spelling of "VLC"
-       for the ICCCM window name. This must be pure ASCII. */
-                    vlc_pgettext ("ASCII", "VLC"));
-    set_wm_hints (conn, window);
-    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
-                         XA_STRING, 8, 8, "vlc\0Vlc");
-    set_hostname_prop (conn, window);
-    set_wm_deco(conn, window, cfg->is_decorated);
-
-    /* EWMH */
-    xcb_intern_atom_cookie_t utf8_string_ck
-        = intern_string (conn, "UTF8_STRING");;
-    xcb_intern_atom_cookie_t net_wm_name_ck
-        = intern_string (conn, "_NET_WM_NAME");
-    xcb_intern_atom_cookie_t net_wm_icon_name_ck
-        = intern_string (conn, "_NET_WM_ICON_NAME");
-    xcb_intern_atom_cookie_t wm_window_role_ck
-        = intern_string (conn, "WM_WINDOW_ROLE");
-
-    xcb_atom_t utf8 = get_atom (conn, utf8_string_ck);
-
-    xcb_atom_t net_wm_name = get_atom (conn, net_wm_name_ck);
-    char *title = var_InheritString (wnd, "video-title");
-    if (title)
-    {
-        set_string (conn, window, utf8, net_wm_name, title);
-        free (title);
-    }
-    else
-        set_string (conn, window, utf8, net_wm_name, _("VLC media player"));
-
-    xcb_atom_t net_wm_icon_name = get_atom (conn, net_wm_icon_name_ck);
-    set_string (conn, window, utf8, net_wm_icon_name, _("VLC"));
-
-    xcb_atom_t wm_window_role = get_atom (conn, wm_window_role_ck);
-    set_ascii_prop (conn, window, wm_window_role, "vlc-video");
-
-    /* Cache any EWMH atom we may need later */
-    CacheAtoms(sys);
-
-    /* Set initial window state */
-    set_wm_state (wnd, cfg);
+    ret = OpenCommon(wnd, cfg, display, conn, scr->root, window);
+    if (ret != VLC_SUCCESS)
+        goto error;
 
     /* Make the window visible */
-    xcb_map_window (conn, window);
-
-    /* Create the event thread. It will dequeue all events, so any checked
-     * request from this thread must be completed at this point. */
-    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
-    {
-        DeinitKeyboardExtension(wnd);
-        goto error;
-    }
-
-    xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
+    xcb_map_window(conn, window);
+    xcb_flush(conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
 
 error:
     xcb_disconnect (conn);
     free (display);
-    return VLC_EGENERIC;
+    return ret;
 }
 
 
@@ -809,7 +819,10 @@ static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 static void EmClose(vout_window_t *);
 
 static const struct vout_window_operations em_ops = {
+    .set_fullscreen = SetFullscreen,
+    .unset_fullscreen = UnsetFullscreen,
     .destroy = EmClose,
+    .set_state = SetState,
 };
 
 /**
@@ -817,6 +830,7 @@ static const struct vout_window_operations em_ops = {
  */
 static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 {
+    int ret = VLC_EGENERIC;
     xcb_window_t window = var_InheritInteger (wnd, "drawable-xid");
     if (window == 0)
         return VLC_EGENERIC;
@@ -824,24 +838,15 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     if (AcquireDrawable (VLC_OBJECT(wnd), window))
         return VLC_EGENERIC;
 
-    vout_window_sys_t *sys = vlc_obj_malloc(VLC_OBJECT(wnd), sizeof (*sys));
     xcb_connection_t *conn = xcb_connect (NULL, NULL);
-    if (sys == NULL || xcb_connection_has_error (conn))
+    if (xcb_connection_has_error (conn))
         goto error;
-
-    wnd->type = VOUT_WINDOW_TYPE_XID;
-    wnd->display.x11 = NULL;
-    wnd->handle.xid = window;
-    wnd->ops = &em_ops;
-    wnd->sys = sys;
-
-    sys->conn = conn;
 
     /* Subscribe to window events (_before_ the geometry is queried) */
     uint32_t mask = XCB_CW_EVENT_MASK;
-    const uint32_t ovalue = XCB_EVENT_MASK_POINTER_MOTION
-                          | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-    uint32_t value = ovalue;
+    uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
+                   | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+    xcb_window_t root;
 
     xcb_change_window_attributes (conn, window, mask, &value);
 
@@ -852,31 +857,25 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         msg_Err (wnd, "bad X11 window 0x%08"PRIx8, window);
         goto error;
     }
-    sys->root = geo->root;
+    root = geo->root;
+    /* FIXME: racy - compare seq.no.with configure event */
     vout_window_ReportSize(wnd, geo->width, geo->height);
     free (geo);
 
     /* Try to subscribe to keyboard and mouse events (only one X11 client can
      * subscribe to input events, so this can fail). */
-    if (var_InheritBool(wnd, "keyboard-events")
-     && InitKeyboardExtension(wnd) == 0)
-        value |= XCB_EVENT_MASK_KEY_PRESS;
+    value |= XCB_EVENT_MASK_KEY_PRESS;
 
     if (var_InheritBool(wnd, "mouse-events"))
         value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
 
-    if (value != ovalue)
-        xcb_change_window_attributes (conn, window, mask, &value);
+    xcb_change_window_attributes(conn, window, XCB_CW_EVENT_MASK, &value);
 
-    CacheAtoms(sys);
-    if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
-    {
-        DeinitKeyboardExtension(wnd);
+    ret = OpenCommon(wnd, cfg, NULL, conn, root, window);
+    if (ret != VLC_SUCCESS)
         goto error;
-    }
 
-    xcb_flush (conn);
-    (void) cfg;
+    wnd->ops = &em_ops;
     return VLC_SUCCESS;
 
 error:
