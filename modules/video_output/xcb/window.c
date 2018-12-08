@@ -55,6 +55,7 @@ typedef struct
     xcb_atom_t wm_state_above;
     xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
+    xcb_atom_t motif_wm_hints;
 
 #ifdef HAVE_XKBCOMMON
     struct
@@ -521,17 +522,17 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
     return atom;
 }
 
-static void set_wm_deco(xcb_connection_t *conn, xcb_window_t window, bool on)
+static void set_wm_deco(vout_window_t *wnd, bool on)
 {
-    if (on)
-        return;
-
-    xcb_intern_atom_cookie_t atom_ck = intern_string(conn, "_MOTIF_WM_HINTS");
-    xcb_atom_t atom = get_atom(conn, atom_ck);
     static const uint32_t motif_wm_hints[5] = { 2, 0, 0, 0, 0 };
+    vout_window_sys_t *sys = wnd->sys;
 
-    xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window, atom,
-                        atom, 32, ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
+    if (on)
+        xcb_delete_property(sys->conn, wnd->handle.xid, sys->motif_wm_hints);
+    else
+        xcb_change_property(sys->conn, XCB_PROP_MODE_REPLACE, wnd->handle.xid,
+                            sys->motif_wm_hints, sys->motif_wm_hints, 32,
+                            ARRAY_SIZE(motif_wm_hints), motif_wm_hints);
 }
 
 static void Close(vout_window_t *);
@@ -605,6 +606,8 @@ static int OpenCommon(vout_window_t *wnd, const vout_window_cfg_t *cfg,
         intern_string(conn, "_NET_WM_STATE_BELOW");
     xcb_intern_atom_cookie_t wm_state_fs_ck =
         intern_string(conn, "_NET_WM_STATE_FULLSCREEN");
+    xcb_intern_atom_cookie_t motif_wm_hints_ck =
+        intern_string(conn, "_MOTIF_WM_HINTS");
 
     xcb_atom_t utf8 = get_atom(conn, utf8_string_ck);
     xcb_atom_t net_wm_name = get_atom(conn, net_wm_name_ck);
@@ -629,10 +632,11 @@ static int OpenCommon(vout_window_t *wnd, const vout_window_cfg_t *cfg,
     sys->wm_state_above = get_atom(conn, wm_state_above_ck);
     sys->wm_state_below = get_atom(conn, wm_state_below_ck);
     sys->wm_state_fullscreen = get_atom(conn, wm_state_fs_ck);
+    sys->motif_wm_hints = get_atom(conn, motif_wm_hints_ck);
 
     /* Set initial window state */
     set_wm_state(wnd, cfg);
-    set_wm_deco(conn, window, cfg->is_decorated);
+    set_wm_deco(wnd, cfg->is_decorated);
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
