@@ -1422,7 +1422,7 @@ static void ThreadTranslateMouseState(vout_thread_t *vout,
     vout_SendDisplayEventMouse(vout, &vid_mouse);
 }
 
-static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
+static int ThreadStart(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
@@ -1450,17 +1450,17 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
     vout->p->filter.chain_interactive =
         filter_chain_NewVideo( vout, true, &owner );
 
-    vout_display_state_t state_default;
-    if (!state) {
-        VoutGetDisplayCfg(vout, &state_default.cfg);
-        state = &state_default;
+    vout_display_cfg_t cfg_default;
+    if (cfg == NULL) {
+        VoutGetDisplayCfg(vout, &cfg_default);
+        cfg = &cfg_default;
     }
 
-    if (vout_OpenWrapper(vout, vout->p->splitter_name, state))
+    if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
         goto error;
     if (vout_InitWrapper(vout))
     {
-        vout_CloseWrapper(vout, state);
+        vout_CloseWrapper(vout, cfg);
         goto error;
     }
     assert(vout->p->decoder_pool && vout->p->private_pool);
@@ -1494,7 +1494,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
+static void ThreadStop(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     if (vout->p->spu_blend)
         filter_DeleteBlend(vout->p->spu_blend);
@@ -1505,7 +1505,7 @@ static void ThreadStop(vout_thread_t *vout, vout_display_state_t *state)
             ThreadFlush(vout, true, INT64_MAX);
             vout_EndWrapper(vout);
         }
-        vout_CloseWrapper(vout, state);
+        vout_CloseWrapper(vout, cfg);
     }
 
     /* Destroy the video filters */
@@ -1559,35 +1559,34 @@ static int ThreadReinit(vout_thread_t *vout,
         msg_Warn(vout, "DPB need to be increased");
     }
 
-    vout_display_state_t state;
-    memset(&state, 0, sizeof(state));
+    vout_display_cfg_t dcfg = { };
 
-    ThreadStop(vout, &state);
+    ThreadStop(vout, &dcfg);
 
     vout_ReinitInterlacingSupport(vout);
 
 #if defined(_WIN32) || defined(__OS2__)
-    if (!state.cfg.is_fullscreen)
+    if (!dcfg.is_fullscreen)
 #endif
     {
-        state.cfg.display.width  = 0;
-        state.cfg.display.height = 0;
+        dcfg.display.width  = 0;
+        dcfg.display.height = 0;
     }
 
     /* FIXME current vout "variables" are not in sync here anymore
      * and I am not sure what to do */
-    if (state.cfg.display.sar.num <= 0 || state.cfg.display.sar.den <= 0) {
-        state.cfg.display.sar.num = 1;
-        state.cfg.display.sar.den = 1;
+    if (dcfg.display.sar.num <= 0 || dcfg.display.sar.den <= 0) {
+        dcfg.display.sar.num = 1;
+        dcfg.display.sar.den = 1;
     }
-    if (state.cfg.zoom.num == 0 || state.cfg.zoom.den == 0) {
-        state.cfg.zoom.num = 1;
-        state.cfg.zoom.den = 1;
+    if (dcfg.zoom.num == 0 || dcfg.zoom.den == 0) {
+        dcfg.zoom.num = 1;
+        dcfg.zoom.den = 1;
     }
 
     vout->p->original = original;
     vout->p->dpb_size = cfg->dpb_size;
-    if (ThreadStart(vout, &state))
+    if (ThreadStart(vout, &dcfg))
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;

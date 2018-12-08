@@ -934,14 +934,14 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 
 static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
-                                  const vout_display_state_t *state,
+                                  const vout_display_cfg_t *cfg,
                                   const char *module, bool is_splitter,
                                   const vout_display_owner_t *owner_ptr)
 {
     /* */
     vout_display_owner_sys_t *osys = calloc(1, sizeof(*osys));
 
-    osys->cfg = state->cfg;
+    osys->cfg = *cfg;
     vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
@@ -999,12 +999,12 @@ error:
     return NULL;
 }
 
-void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
+void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (state != NULL && !osys->is_splitter)
-        state->cfg = osys->cfg;
+    if (cfg != NULL && !osys->is_splitter)
+        *cfg = osys->cfg;
 
     VoutDisplayDestroyRender(vd);
     if (osys->is_splitter)
@@ -1019,10 +1019,10 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
  *****************************************************************************/
 vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const video_format_t *source,
-                                const vout_display_state_t *state,
+                                const vout_display_cfg_t *cfg,
                                 const char *module)
 {
-    return DisplayNew(vout, source, state, module, false, NULL);
+    return DisplayNew(vout, source, cfg, module, false, NULL);
 }
 
 /*****************************************************************************
@@ -1169,7 +1169,7 @@ static void SplitterClose(vout_display_t *vd)
 
 vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                  const video_format_t *source,
-                                 const vout_display_state_t *state,
+                                 const vout_display_cfg_t *cfg,
                                  const char *module,
                                  const char *splitter_module)
 {
@@ -1180,7 +1180,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     /* */
     vout_display_t *wrapper =
-        DisplayNew(vout, source, state, module, true, NULL);
+        DisplayNew(vout, source, cfg, module, true, NULL);
     if (!wrapper) {
         video_splitter_Delete(splitter);
         return NULL;
@@ -1214,35 +1214,33 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
             .event      = SplitterEvent,
         };
         const video_splitter_output_t *output = &splitter->p_output[i];
-        vout_display_state_t ostate;
         vout_window_cfg_t wcfg = {
-            .width = state->cfg.display.width,
-            .height = state->cfg.display.height,
+            .width = cfg->display.width,
+            .height = cfg->display.height,
             .is_decorated = true,
         };
+        vout_display_cfg_t ocfg = {
+            .display = cfg->display,
+            .align = { 0, 0 } /* TODO */,
+            .is_display_filled = true,
+            .zoom = { 1, 1 },
+        };
 
-        memset(&ostate, 0, sizeof(ostate));
-        ostate.cfg.display = state->cfg.display;
-        ostate.cfg.align.horizontal = 0; /* TODO */
-        ostate.cfg.align.vertical = 0; /* TODO */
-        ostate.cfg.is_display_filled = true;
-        ostate.cfg.zoom.num = 1;
-        ostate.cfg.zoom.den = 1;
         vout_display_GetDefaultDisplaySize(&wcfg.width, &wcfg.height,
-                                           source, &ostate.cfg);
-        ostate.cfg.window = vout_display_window_New(vout, &wcfg);
-        if (unlikely(ostate.cfg.window == NULL)) {
+                                           source, &ocfg);
+        ocfg.window = vout_display_window_New(vout, &wcfg);
+        if (unlikely(ocfg.window == NULL)) {
             vout_DeleteDisplay(wrapper, NULL);
             return NULL;
         }
 
-        vout_display_t *vd = DisplayNew(vout, &output->fmt, &ostate,
+        vout_display_t *vd = DisplayNew(vout, &output->fmt, &ocfg,
                                         output->psz_module ? output->psz_module : module,
                                         false, &vdo);
         if (!vd) {
             vout_DeleteDisplay(wrapper, NULL);
-            if (ostate.cfg.window != NULL)
-                vout_display_window_Delete(ostate.cfg.window);
+            if (ocfg.window != NULL)
+                vout_display_window_Delete(ocfg.window);
             return NULL;
         }
         TAB_APPEND(sys->count, sys->display, vd);

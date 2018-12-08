@@ -25,7 +25,7 @@
 
 vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                  const video_format_t *source,
-                                 const vout_display_state_t *state,
+                                 const vout_display_cfg_t *cfg,
                                  const char *module,
                                  const char *splitter_module);
 

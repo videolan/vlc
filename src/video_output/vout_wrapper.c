@@ -47,7 +47,7 @@ static int  Forward(vlc_object_t *, char const *,
  *
  *****************************************************************************/
 int vout_OpenWrapper(vout_thread_t *vout,
-                     const char *splitter_name, const vout_display_state_t *state)
+                     const char *splitter_name, const vout_display_cfg_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
     msg_Dbg(vout, "Opening vout display wrapper");
@@ -56,9 +56,9 @@ int vout_OpenWrapper(vout_thread_t *vout,
     char *modlist = var_InheritString(vout, "vout");
 
     if (splitter_name)
-        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, state, modlist, splitter_name);
+        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
     else
-        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, state, modlist);
+        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist);
     free(modlist);
 
     if (!sys->display.vd)
@@ -79,7 +79,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
+void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -88,7 +88,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_state_t *state)
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
 
-    vout_DeleteDisplay(sys->display.vd, state);
+    vout_DeleteDisplay(sys->display.vd, cfg);
 }
 
 /*****************************************************************************

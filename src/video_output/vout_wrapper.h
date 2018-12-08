@@ -59,21 +59,14 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
 }
 
 /**
- * It holds a state for a vout display.
- */
-typedef struct {
-    vout_display_cfg_t cfg;
-} vout_display_state_t;
-
-/**
  * It creates a vout managed display.
  */
 vout_display_t *vout_NewDisplay( vout_thread_t *, const video_format_t *,
-    const vout_display_state_t *, const char *module);
+    const vout_display_cfg_t *, const char *module);
 /**
  * It destroy a vout managed display.
  */
-void vout_DeleteDisplay(vout_display_t *, vout_display_state_t *);
+void vout_DeleteDisplay(vout_display_t *, vout_display_cfg_t *);
 bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
