@@ -36,7 +36,7 @@
     "Video will be embedded in this pre-existing window. " \
     "If zero, a new window will be created.")
 
-static int  Open (vout_window_t *, const vout_window_cfg_t *);
+static int Open(vout_window_t *);
 static void Close(vout_window_t *);
 
 /*
@@ -67,7 +67,7 @@ static const struct vout_window_operations ops = {
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Open(vout_window_t *wnd)
 {
     uintptr_t val = var_InheritInteger (wnd, "drawable-hwnd");
     if (val == 0)

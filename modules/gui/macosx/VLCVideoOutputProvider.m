@@ -152,7 +152,7 @@ static const struct vout_window_operations ops = {
     WindowSetFullscreen,
 };
 
-int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+int WindowOpen(vout_window_t *p_wnd)
 {
     if (!atomic_load(&b_intf_starting)) {
         msg_Err(p_wnd, "Cannot create vout as Mac OS X interface was not found");

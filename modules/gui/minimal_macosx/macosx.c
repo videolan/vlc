@@ -43,7 +43,7 @@
 int  OpenIntf     ( vlc_object_t * );
 void CloseIntf    ( vlc_object_t * );
 
-int  WindowOpen   ( vout_window_t *, const vout_window_cfg_t * );
+int  WindowOpen   ( vout_window_t * );
 
 /*****************************************************************************
  * Module descriptor

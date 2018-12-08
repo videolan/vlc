@@ -34,11 +34,10 @@ static const struct vout_window_operations ops = {
     .resize = vout_window_ReportSize,
 };
 
-static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Open(vout_window_t *wnd)
 {
     wnd->type = VOUT_WINDOW_TYPE_DUMMY;
     wnd->ops = &ops;
-    vout_window_ReportSize(wnd, cfg->width, cfg->height);
     return VLC_SUCCESS;
 }
 

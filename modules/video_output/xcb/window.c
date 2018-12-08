@@ -671,7 +671,7 @@ static int OpenCommon(vout_window_t *wnd, char *display,
 /**
  * Create an X11 window.
  */
-static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Open(vout_window_t *wnd)
 {
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
@@ -720,7 +720,7 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
-                                    0, 0, cfg->width, cfg->height, 0,
+                                    0, 0, 1, 1, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     scr->root_visual, mask, values);
     err = xcb_request_check (conn, ck);

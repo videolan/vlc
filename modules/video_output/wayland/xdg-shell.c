@@ -497,7 +497,7 @@ struct wl_surface *window_get_cursor(vout_window_t *wnd, int32_t *restrict hsx,
 /**
  * Creates a Wayland shell surface.
  */
-static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Open(vout_window_t *wnd)
 {
     vout_window_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))

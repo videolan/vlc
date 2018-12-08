@@ -191,7 +191,7 @@ static const struct vout_window_operations ops = {
     WindowSetFullscreen,
 };
 
-int WindowOpen(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)
+int WindowOpen(vout_window_t *p_wnd)
 {
     p_wnd->type = VOUT_WINDOW_TYPE_NSOBJECT;
     p_wnd->ops = &ops;

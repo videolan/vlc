@@ -318,7 +318,7 @@ end:
     return NULL;
 }
 
-static int  WindowOpen( vout_window_t *, const vout_window_cfg_t * );
+static int  WindowOpen( vout_window_t * );
 static void WindowClose( vout_window_t * );
 
 typedef struct
@@ -438,7 +438,7 @@ static const struct vout_window_operations window_ops = {
     WindowSetFullscreen,
 };
 
-static int WindowOpen( vout_window_t *pWnd, const vout_window_cfg_t * )
+static int WindowOpen( vout_window_t *pWnd )
 {
     if( var_InheritBool( pWnd, "video-wallpaper" )
      || !var_InheritBool( pWnd, "embedded-video" ) )

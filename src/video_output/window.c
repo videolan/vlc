@@ -47,11 +47,10 @@ typedef struct
 
 static int vout_window_start(void *func, va_list ap)
 {
-    int (*activate)(vout_window_t *, const vout_window_cfg_t *) = func;
+    int (*activate)(vout_window_t *) = func;
     vout_window_t *wnd = va_arg(ap, vout_window_t *);
-    const vout_window_cfg_t *cfg = va_arg(ap, const vout_window_cfg_t *);
 
-    return activate(wnd, cfg);
+    return activate(wnd);
 }
 
 vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
@@ -68,7 +67,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj, const char *module,
     window->owner = *owner;
 
     w->module = vlc_module_load(window, "vout window", module, false,
-                                vout_window_start, window, cfg);
+                                vout_window_start, window);
     if (!w->module) {
         vlc_object_release(window);
         return NULL;

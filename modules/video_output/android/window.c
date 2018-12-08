@@ -37,7 +37,7 @@
 
 #include "utils.h"
 
-static int Open(vout_window_t *, const vout_window_cfg_t *);
+static int Open(vout_window_t *);
 static void Close(vout_window_t *);
 
 /*
@@ -83,7 +83,7 @@ static const struct vout_window_operations ops = {
 /**
  * Create an Android native window.
  */
-static int Open(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+static int Open(vout_window_t *wnd)
 {
     AWindowHandler *p_awh = AWindowHandler_new(wnd,
         &(awh_events_t) { OnNewWindowSize, OnNewMouseCoords });
