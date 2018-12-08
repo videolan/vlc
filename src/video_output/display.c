@@ -354,7 +354,6 @@ typedef struct {
 
     /* */
     vout_display_cfg_t cfg;
-    vlc_rational_t sar_initial;
 
     /* */
 #if defined(_WIN32) || defined(__OS2__)
@@ -944,7 +943,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->sar_initial = state->sar;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
                                        source, cfg);
 
@@ -969,9 +967,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->crop.bottom = 0;
     osys->crop.num = 0;
     osys->crop.den = 0;
-
-    osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source->i_sar_num;
-    osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source->i_sar_den;
+    osys->sar.num = source->i_sar_num;
+    osys->sar.den = source->i_sar_den;
 
     vout_display_owner_t owner;
     if (owner_ptr)
@@ -1016,7 +1013,6 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
 #if defined(_WIN32) || defined(__OS2__)
         state->wm_state = osys->wm_state;
 #endif
-        state->sar = osys->sar_initial;
     }
 
     VoutDisplayDestroyRender(vd);

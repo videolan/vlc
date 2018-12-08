@@ -1462,9 +1462,6 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
                                : above ? VOUT_WINDOW_STATE_ABOVE
                                : VOUT_WINDOW_STATE_NORMAL;
 #endif
-        state_default.sar.num = 0;
-        state_default.sar.den = 0;
-
         state = &state_default;
     }
 
@@ -1585,8 +1582,6 @@ static int ThreadReinit(vout_thread_t *vout,
         state.cfg.display.width  = 0;
         state.cfg.display.height = 0;
     }
-    state.sar.num = 0;
-    state.sar.den = 0;
 
     /* FIXME current vout "variables" are not in sync here anymore
      * and I am not sure what to do */

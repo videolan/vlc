@@ -66,7 +66,6 @@ typedef struct {
 #if defined(_WIN32) || defined(__OS2__)
     unsigned wm_state;
 #endif
-    vlc_rational_t sar;
 } vout_display_state_t;
 
 /**
