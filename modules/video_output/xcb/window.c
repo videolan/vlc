@@ -696,15 +696,6 @@ static int Open (vout_window_t *wnd, const vout_window_cfg_t *cfg)
     /* Make the window visible */
     xcb_map_window (conn, window);
 
-    /* Get the initial mapped size (may differ from requested size) */
-    xcb_get_geometry_reply_t *geo =
-        xcb_get_geometry_reply (conn, xcb_get_geometry (conn, window), NULL);
-    if (geo != NULL)
-    {
-        vout_window_ReportSize(wnd, geo->width, geo->height);
-        free (geo);
-    }
-
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
     if (vlc_clone(&sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
