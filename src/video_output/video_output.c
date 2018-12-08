@@ -1453,15 +1453,6 @@ static int ThreadStart(vout_thread_t *vout, vout_display_state_t *state)
     vout_display_state_t state_default;
     if (!state) {
         VoutGetDisplayCfg(vout, &state_default.cfg);
-
-#if defined(_WIN32) || defined(__OS2__)
-        bool below = var_InheritBool(vout, "video-wallpaper");
-        bool above = var_InheritBool(vout, "video-on-top");
-
-        state_default.wm_state = below ? VOUT_WINDOW_STATE_BELOW
-                               : above ? VOUT_WINDOW_STATE_ABOVE
-                               : VOUT_WINDOW_STATE_NORMAL;
-#endif
         state = &state_default;
     }
 

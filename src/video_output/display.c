@@ -956,7 +956,10 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = osys->cfg.is_fullscreen;
-    osys->wm_state = state->wm_state;
+    osys->wm_state = var_InheritBool(vout, "video-wallpaper")
+        ? VOUT_WINDOW_STATE_BELOW
+        : var_InheritBool(vout, "video-on-top")
+            ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
     osys->ch_wm_state = true;
 #endif
 
@@ -1002,13 +1005,8 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (state) {
-        if (!osys->is_splitter)
-            state->cfg = osys->cfg;
-#if defined(_WIN32) || defined(__OS2__)
-        state->wm_state = osys->wm_state;
-#endif
-    }
+    if (state != NULL && !osys->is_splitter)
+        state->cfg = osys->cfg;
 
     VoutDisplayDestroyRender(vd);
     if (osys->is_splitter)
