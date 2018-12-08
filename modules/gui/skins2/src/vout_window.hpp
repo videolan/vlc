@@ -32,14 +32,14 @@
 class OSGraphics;
 class OSTimer;
 class CtrlVideo;
-
+struct vout_window_t;
 
 /// Class to handle a video output window
 class VoutWindow: private GenericWindow
 {
 public:
 
-    VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
+    VoutWindow( intf_thread_t *pIntf, struct vout_window_t* pWnd,
                 int width, int height, GenericWindow* pParent = NULL );
     virtual ~VoutWindow();
 
@@ -86,7 +86,7 @@ public:
 private:
 
     /// vout thread
-    vout_window_t* m_pWnd;
+    struct vout_window_t* m_pWnd;
 
     /// original width and height
     int original_width;

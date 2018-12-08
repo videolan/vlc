@@ -31,6 +31,8 @@
 #include "../src/generic_window.hpp"
 #include "../src/os_window.hpp"
 
+#include <vlc_vout_window.h>
+
 class X11Display;
 class X11DragDrop;
 

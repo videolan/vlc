@@ -27,7 +27,6 @@
 
 #include "skin_common.hpp"
 #include "../utils/var_bool.hpp"
-#include "vlc_vout_window.h"
 
 class OSWindow;
 class EvtGeneric;
@@ -44,6 +43,7 @@ class EvtDragLeave;
 class EvtDragOver;
 class EvtDragDrop;
 class WindowManager;
+struct vout_window_t;
 
 
 /// Generic window class
@@ -113,7 +113,7 @@ public:
     virtual std::string getType() const { return "Generic"; }
 
     /// window handle
-    void updateWindowConfiguration( vout_window_t *pWnd ) const;
+    void updateWindowConfiguration( struct vout_window_t *pWnd ) const;
 
     /// window type
     WindowType_t getType() { return m_type; }
