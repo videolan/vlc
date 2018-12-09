@@ -49,7 +49,6 @@ struct vout_display_sys_t
     uint8_t depth; /* useful bits per pixel */
 
     picture_pool_t *pool; /* picture pool */
-    vout_display_place_t place;
     video_format_t fmt;
 };
 
@@ -189,16 +188,18 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+        video_format_t src, *fmt = &sys->fmt;
+        vout_display_place_t place;
 
-        vout_display_PlacePicture(&sys->place, &vd->source, cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg, false);
 
         uint32_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y;
         const uint32_t values[] = {
-            sys->place.x, sys->place.y, sys->place.width, sys->place.height
+            place.x, place.y, place.width, place.height
         };
 
-        if (sys->place.width  != sys->fmt.i_visible_width
-         || sys->place.height != sys->fmt.i_visible_height)
+        if (place.width  != sys->fmt.i_visible_width
+         || place.height != sys->fmt.i_visible_height)
         {
             mask |= XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
             vout_display_SendEventPicturesInvalid(vd);
@@ -206,29 +207,25 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 
         /* Move the picture within the window */
         xcb_configure_window(sys->conn, sys->window, mask, values);
+
+        video_format_ApplyRotation(&src, &vd->source);
+        fmt->i_width  = src.i_width  * place.width / src.i_visible_width;
+        fmt->i_height = src.i_height * place.height / src.i_visible_height;
+
+        fmt->i_visible_width  = place.width;
+        fmt->i_visible_height = place.height;
+        fmt->i_x_offset = src.i_x_offset * place.width / src.i_visible_width;
+        fmt->i_y_offset = src.i_y_offset * place.height / src.i_visible_height;
+
         return VLC_SUCCESS;
     }
 
     case VOUT_DISPLAY_RESET_PICTURES:
     {
-        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
-        video_format_t *fmt = va_arg(ap, video_format_t *);
-
+        va_arg(ap, const vout_display_cfg_t *);
+        *va_arg(ap, video_format_t *) = sys->fmt;
         ResetPictures(vd);
-
-        video_format_t src;
-        video_format_ApplyRotation(&src, &vd->source);
-
-        fmt->i_width  = src.i_width  * sys->place.width / src.i_visible_width;
-        fmt->i_height = src.i_height * sys->place.height / src.i_visible_height;
-
-        fmt->i_visible_width  = sys->place.width;
-        fmt->i_visible_height = sys->place.height;
-        fmt->i_x_offset = src.i_x_offset * sys->place.width / src.i_visible_width;
-        fmt->i_y_offset = src.i_y_offset * sys->place.height / src.i_visible_height;
-        sys->fmt = *fmt;
         return VLC_SUCCESS;
-        (void) cfg;
     }
 
     default:
@@ -432,14 +429,15 @@ found_format:;
         /* XCB_CW_COLORMAP */
         cmap,
     };
+    vout_display_place_t place;
 
-    vout_display_PlacePicture(&sys->place, &vd->source, cfg, false);
+    vout_display_PlacePicture(&place, &vd->source, cfg, false);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
 
     xcb_create_pixmap(conn, sys->depth, pixmap, scr->root, 1, 1);
     xcb_create_window(conn, sys->depth, sys->window, cfg->window->handle.xid,
-        sys->place.x, sys->place.y, sys->place.width, sys->place.height, 0,
+        place.x, place.y, place.width, place.height, 0,
         XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
     xcb_map_window(conn, sys->window);
     /* Create graphic context (I wonder why the heck do we need this) */
