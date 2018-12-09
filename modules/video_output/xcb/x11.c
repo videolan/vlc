@@ -34,7 +34,6 @@
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 
 #include "pictures.h"
 #include "events.h"
@@ -49,8 +48,6 @@ struct vout_display_sys_t
     bool attached;
     bool visible; /* whether to draw */
     uint8_t depth; /* useful bits per pixel */
-
-    picture_pool_t *pool; /* picture pool */
     video_format_t fmt;
 };
 
@@ -58,18 +55,6 @@ struct vout_display_sys_t
  * But excessively large value is useless as direct rendering cannot be used
  * with XCB X11. */
 #define MAX_PICTURES (3)
-
-/**
- * Return a direct buffer
- */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool == NULL)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
-    return sys->pool;
-}
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)
@@ -160,17 +145,6 @@ static void Display (vout_display_t *vd, picture_t *pic)
         xcb_shm_detach(conn, segment);
 }
 
-static void ResetPictures(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool)
-        return;
-
-    picture_pool_Release(sys->pool);
-    sys->pool = NULL;
-}
-
 static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -219,7 +193,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
         va_arg(ap, const vout_display_cfg_t *);
         *va_arg(ap, video_format_t *) = sys->fmt;
-        ResetPictures(vd);
         return VLC_SUCCESS;
     }
 
@@ -235,8 +208,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-
-    ResetPictures(vd);
 
     /* colormap, window and context are garbage-collected by X */
     xcb_disconnect(sys->conn);
@@ -269,7 +240,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         return VLC_ENOMEM;
 
     vd->sys = sys;
-    sys->pool = NULL;
 
     /* Get window, connect to X server */
     xcb_connection_t *conn;
@@ -451,7 +421,6 @@ found_format:;
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
 
-    vd->pool = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
