@@ -21,6 +21,7 @@
 #define VLC_VECTOR_H
 
 #include <stdbool.h>
+#include <stddef.h>
 
 /**
  * \defgroup vector Vector
