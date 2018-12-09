@@ -1197,14 +1197,11 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         return VLC_EGENERIC;
     }
 
-    if (sys->display.use_dr) {
-        vout_display_Prepare(vd, todisplay, subpic, todisplay->date);
-    } else {
-        if (!do_dr_spu && sys->spu_blend != NULL && subpic != NULL)
-            picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
-        vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL,
-                             todisplay->date);
-    }
+    if (!do_dr_spu && sys->spu_blend != NULL && subpic != NULL)
+        picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
+
+    vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL,
+                         todisplay->date);
 
     vout_chrono_Stop(&sys->render);
 #if 0
