@@ -1487,10 +1487,8 @@ static void ThreadStop(vout_thread_t *vout, vout_display_cfg_t *cfg)
 
     /* Destroy translation tables */
     if (vout->p->display.vd) {
-        if (vout->p->decoder_pool) {
+        if (vout->p->decoder_pool)
             ThreadFlush(vout, true, INT64_MAX);
-            vout_EndWrapper(vout);
-        }
         vout_CloseWrapper(vout, cfg);
     }
 

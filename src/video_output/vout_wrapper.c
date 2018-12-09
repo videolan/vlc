@@ -144,7 +144,7 @@ error:
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_EndWrapper(vout_thread_t *vout)
+void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -154,14 +154,6 @@ void vout_EndWrapper(vout_thread_t *vout)
 
     if (sys->decoder_pool != sys->display_pool)
         picture_pool_Release(sys->decoder_pool);
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
-{
-    vout_thread_sys_t *sys = vout->p;
 
 #ifdef _WIN32
     var_DelCallback(vout, "video-wallpaper", Forward, NULL);

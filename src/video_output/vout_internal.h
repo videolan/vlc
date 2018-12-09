@@ -216,7 +216,6 @@ void vout_IntfReinit( vout_thread_t * );
 /* */
 int  vout_OpenWrapper(vout_thread_t *, const char *, vout_display_cfg_t *);
 void vout_CloseWrapper(vout_thread_t *, vout_display_cfg_t *);
-void vout_EndWrapper(vout_thread_t *);
 void vout_ManageWrapper(vout_thread_t *);
 
 /* */
