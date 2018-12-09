@@ -362,8 +362,6 @@ typedef struct {
     bool ch_wm_state;
     unsigned wm_state;
 #endif
-    bool ch_sar;
-    vlc_rational_t sar;
 
     bool ch_crop;
     struct {
@@ -673,25 +671,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     }
 #endif
 
-    if (osys->ch_sar) {
-        if (osys->sar.num > 0 && osys->sar.den > 0) {
-            vd->source.i_sar_num = osys->sar.num;
-            vd->source.i_sar_den = osys->sar.den;
-        } else {
-            vd->source.i_sar_num = osys->source.i_sar_num;
-            vd->source.i_sar_den = osys->source.i_sar_den;
-        }
-
-        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, &osys->cfg);
-        osys->sar.num = vd->source.i_sar_num;
-        osys->sar.den = vd->source.i_sar_den;
-        osys->ch_sar  = false;
-
-        /* If a crop ratio is requested, recompute the parameters */
-        if (osys->crop.num != 0 && osys->crop.den != 0)
-            osys->ch_crop = true;
-    }
-
     if (osys->ch_crop) {
         unsigned crop_num = osys->crop.num;
         unsigned crop_den = osys->crop.den;
@@ -791,6 +770,27 @@ void vout_FilterFlush(vout_display_t *vd)
         filter_chain_VideoFlush(osys->converters);
 }
 
+static void vout_SetSourceAspect(vout_display_t *vd,
+                                 unsigned sar_num, unsigned sar_den)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+
+    if (sar_num > 0 && sar_den > 0) {
+        vd->source.i_sar_num = sar_num;
+        vd->source.i_sar_den = sar_den;
+    } else {
+        vd->source.i_sar_num = osys->source.i_sar_num;
+        vd->source.i_sar_den = osys->source.i_sar_den;
+    }
+
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
+                         &osys->cfg);
+
+    /* If a crop ratio is requested, recompute the parameters */
+    if (osys->crop.num != 0 && osys->crop.den != 0)
+        osys->ch_crop = true;
+}
+
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -804,9 +804,8 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
                     osys->source.i_sar_num, osys->source.i_sar_den, 0);
 
         /* FIXME it will override any AR that the user would have forced */
-        osys->ch_sar = true;
-        osys->sar.num = osys->source.i_sar_num;
-        osys->sar.den = osys->source.i_sar_den;
+        vout_SetSourceAspect(vd, osys->source.i_sar_num,
+                             osys->source.i_sar_den);
     }
     if (source->i_x_offset       != osys->source.i_x_offset ||
         source->i_y_offset       != osys->source.i_y_offset ||
@@ -883,12 +882,9 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         sar_den = 0;
     }
 
-    if (osys->sar.num != sar_num || osys->sar.den != sar_den) {
-        osys->ch_sar = true;
-        osys->sar.num = sar_num;
-        osys->sar.den = sar_den;
-    }
+    vout_SetSourceAspect(vd, sar_num, sar_den);
 }
+
 void vout_SetDisplayCrop(vout_display_t *vd,
                          unsigned crop_num, unsigned crop_den,
                          unsigned left, unsigned top, int right, int bottom)
@@ -968,8 +964,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->crop.bottom = 0;
     osys->crop.num = 0;
     osys->crop.den = 0;
-    osys->sar.num = source->i_sar_num;
-    osys->sar.den = source->i_sar_den;
 
     vout_display_owner_t owner;
     if (owner_ptr)
