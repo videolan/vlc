@@ -631,7 +631,7 @@ static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
     }
 }
 
-bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
+bool vout_ManageDisplay(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
@@ -670,8 +670,7 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     }
 #endif
 
-    if (allow_reset_pictures
-     && atomic_exchange(&osys->reset_pictures, false)) {
+    if (atomic_exchange(&osys->reset_pictures, false)) {
         if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
                                  &vd->fmt)) {
             /* FIXME what to do here ? */
@@ -1109,7 +1108,7 @@ static void SplitterManage(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     for (int i = 0; i < sys->count; i++)
-        vout_ManageDisplay(sys->display[i], true);
+        vout_ManageDisplay(sys->display[i]);
 }
 
 static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])

@@ -72,7 +72,7 @@ picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
 bool vout_AreDisplayPicturesInvalid(vout_display_t *);
 
-bool vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
+bool vout_ManageDisplay(vout_display_t *);
 
 void vout_SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
