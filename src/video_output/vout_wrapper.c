@@ -43,6 +43,17 @@ static int  Forward(vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void *);
 #endif
 
+/* Minimum number of display picture */
+#define DISPLAY_PICTURE_COUNT (1)
+
+static void NoDrInit(vout_thread_sys_t *sys)
+{
+    if (sys->display.use_dr)
+        sys->display_pool = vout_display_Pool(sys->display.vd, 3);
+    else
+        sys->display_pool = NULL;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -79,32 +90,6 @@ int vout_OpenWrapper(vout_thread_t *vout,
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
-{
-    vout_thread_sys_t *sys = vout->p;
-
-#ifdef _WIN32
-    var_DelCallback(vout, "video-wallpaper", Forward, NULL);
-#endif
-    sys->decoder_pool = NULL; /* FIXME remove */
-
-    vout_DeleteDisplay(sys->display.vd, cfg);
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-/* Minimum number of display picture */
-#define DISPLAY_PICTURE_COUNT (1)
-
-static void NoDrInit(vout_thread_sys_t *sys)
-{
-    if (sys->display.use_dr)
-        sys->display_pool = vout_display_Pool(sys->display.vd, 3);
-    else
-        sys->display_pool = NULL;
-}
-
 int vout_InitWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -174,6 +159,21 @@ void vout_EndWrapper(vout_thread_t *vout)
 
     if (sys->decoder_pool != sys->display_pool)
         picture_pool_Release(sys->decoder_pool);
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+#ifdef _WIN32
+    var_DelCallback(vout, "video-wallpaper", Forward, NULL);
+#endif
+    sys->decoder_pool = NULL; /* FIXME remove */
+
+    vout_DeleteDisplay(sys->display.vd, cfg);
 }
 
 /*****************************************************************************
