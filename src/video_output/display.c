@@ -59,7 +59,7 @@ static picture_t *VideoBufferNew(filter_t *filter)
            vd->fmt.i_width  == fmt->i_width  &&
            vd->fmt.i_height == fmt->i_height);
 
-    picture_pool_t *pool = vout_display_Pool(vd, 3);
+    picture_pool_t *pool = vout_GetPool(vd, 3);
     if (!pool)
         return NULL;
     return picture_pool_Get(pool);
@@ -390,6 +390,7 @@ typedef struct {
     } mouse;
 
     atomic_bool reset_pictures;
+    picture_pool_t *pool;
 } vout_display_owner_sys_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
@@ -631,6 +632,21 @@ static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
     }
 }
 
+/**
+ * It retreives a picture pool from the display
+ */
+picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+
+    if (vd->pool != NULL)
+        return vd->pool(vd, count);
+
+    if (osys->pool == NULL)
+        osys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+    return osys->pool;
+}
+
 bool vout_ManageDisplay(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -671,6 +687,11 @@ bool vout_ManageDisplay(vout_display_t *vd)
 #endif
 
     if (atomic_exchange(&osys->reset_pictures, false)) {
+        if (osys->pool != NULL) {
+            picture_pool_Release(osys->pool);
+            osys->pool = NULL;
+        }
+
         if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
                                  &vd->fmt)) {
             /* FIXME what to do here ? */
@@ -941,6 +962,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->is_splitter = is_splitter;
 
     atomic_init(&osys->reset_pictures, false);
+    osys->pool = NULL;
     vlc_mutex_init(&osys->lock);
 
     vlc_mouse_Init(&osys->mouse.state);
@@ -998,6 +1020,10 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
     VoutDisplayDestroyRender(vd);
     if (osys->is_splitter)
         SplitterClose(vd);
+
+    if (osys->pool != NULL)
+        picture_pool_Release(osys->pool);
+
     vout_display_Delete(vd);
     vlc_mutex_destroy(&osys->lock);
     free(osys);
@@ -1113,7 +1139,7 @@ static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
             /* TODO use a pool ? */
             picture[i] = picture_NewFromFormat(&wsys->display[i]->source);
         } else {
-            picture_pool_t *pool = vout_display_Pool(wsys->display[i], 3);
+            picture_pool_t *pool = vout_GetPool(wsys->display[i], 3);
             picture[i] = pool ? picture_pool_Get(pool) : NULL;
         }
         if (!picture[i]) {

@@ -28,13 +28,7 @@
 
 /* XXX DO NOT use it outside the vout module wrapper XXX */
 
-/**
- * It retreives a picture pool from the display
- */
-static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned count)
-{
-    return vd->pool(vd, count);
-}
+picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count);
 
 /**
  * It preparse a picture for display.

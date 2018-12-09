@@ -49,7 +49,7 @@ static int  Forward(vlc_object_t *, char const *,
 static void NoDrInit(vout_thread_sys_t *sys)
 {
     if (sys->display.use_dr)
-        sys->display_pool = vout_display_Pool(sys->display.vd, 3);
+        sys->display_pool = vout_GetPool(sys->display.vd, 3);
     else
         sys->display_pool = NULL;
 }
@@ -89,7 +89,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
                                       kept_picture;
     const unsigned display_pool_size = allow_dr ? __MAX(VOUT_MAX_PICTURES,
                                                         reserved_picture + decoder_picture) : 3;
-    picture_pool_t *display_pool = vout_display_Pool(vd, display_pool_size);
+    picture_pool_t *display_pool = vout_GetPool(vd, display_pool_size);
     if (display_pool == NULL)
         goto error;
 
