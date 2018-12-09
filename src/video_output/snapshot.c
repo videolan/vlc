@@ -41,18 +41,36 @@
 #include "snapshot.h"
 #include "vout_internal.h"
 
-/* */
-void vout_snapshot_Init(vout_snapshot_t *snap)
+struct vout_snapshot {
+    vlc_mutex_t lock;
+    vlc_cond_t  wait;
+
+    bool        is_available;
+    int         request_count;
+    picture_t   *picture;
+
+};
+
+vout_snapshot_t *vout_snapshot_New(void)
 {
+    vout_snapshot_t *snap = malloc(sizeof (*snap));
+    if (unlikely(snap == NULL))
+        return NULL;
+
     vlc_mutex_init(&snap->lock);
     vlc_cond_init(&snap->wait);
 
     snap->is_available = true;
     snap->request_count = 0;
     snap->picture = NULL;
+    return snap;
 }
-void vout_snapshot_Clean(vout_snapshot_t *snap)
+
+void vout_snapshot_Destroy(vout_snapshot_t *snap)
 {
+    if (snap == NULL)
+        return;
+
     picture_t *picture = snap->picture;
     while (picture) {
         picture_t *next = picture->p_next;
@@ -62,10 +80,14 @@ void vout_snapshot_Clean(vout_snapshot_t *snap)
 
     vlc_cond_destroy(&snap->wait);
     vlc_mutex_destroy(&snap->lock);
+    free(snap);
 }
 
 void vout_snapshot_End(vout_snapshot_t *snap)
 {
+    if (snap == NULL)
+        return;
+
     vlc_mutex_lock(&snap->lock);
 
     snap->is_available = false;
@@ -77,6 +99,9 @@ void vout_snapshot_End(vout_snapshot_t *snap)
 /* */
 picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
 {
+    if (snap == NULL)
+        return NULL;
+
     const vlc_tick_t deadline = vlc_tick_now() + timeout;
 
     vlc_mutex_lock(&snap->lock);
@@ -100,9 +125,11 @@ picture_t *vout_snapshot_Get(vout_snapshot_t *snap, vlc_tick_t timeout)
     return picture;
 }
 
-/* */
 bool vout_snapshot_IsRequested(vout_snapshot_t *snap)
 {
+    if (snap == NULL)
+        return false;
+
     bool has_request = false;
     if (!vlc_mutex_trylock(&snap->lock)) {
         has_request = snap->request_count > 0;
@@ -110,10 +137,14 @@ bool vout_snapshot_IsRequested(vout_snapshot_t *snap)
     }
     return has_request;
 }
+
 void vout_snapshot_Set(vout_snapshot_t *snap,
                        const video_format_t *fmt,
                        picture_t *picture)
 {
+    if (snap == NULL)
+        return;
+
     if (!fmt)
         fmt = &picture->format;
 

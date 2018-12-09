@@ -29,7 +29,6 @@
 #include <vlc_picture_pool.h>
 #include <vlc_vout_display.h>
 #include "vout_wrapper.h"
-#include "snapshot.h"
 #include "statistic.h"
 #include "chrono.h"
 
@@ -53,6 +52,8 @@ typedef struct {
 } vout_configuration_t;
 #include "control.h"
 
+struct vout_snapshot;
+
 /* */
 struct vout_thread_sys_t
 {
@@ -67,7 +68,7 @@ struct vout_thread_sys_t
     unsigned        dpb_size;
 
     /* Snapshot interface */
-    vout_snapshot_t snapshot;
+    struct vout_snapshot *snapshot;
 
     /* Statistics */
     vout_statistic_t statistic;

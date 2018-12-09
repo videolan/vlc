@@ -52,6 +52,7 @@
 #include "vout_internal.h"
 #include "interlacing.h"
 #include "display.h"
+#include "snapshot.h"
 #include "window.h"
 #include "../misc/variables.h"
 
@@ -144,7 +145,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     vout_control_Init(&vout->p->control);
     vout_statistic_Init(&vout->p->statistic);
-    vout_snapshot_Init(&vout->p->snapshot);
+    vout->p->snapshot = vout_snapshot_New();
     vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
 
     /* Initialize locks */
@@ -270,7 +271,7 @@ void vout_Close(vout_thread_t *vout)
     if (vout->p->input)
         spu_Detach(vout->p->spu);
 
-    vout_snapshot_End(&vout->p->snapshot);
+    vout_snapshot_End(vout->p->snapshot);
 
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
     vlc_join(vout->p->thread, NULL);
@@ -310,7 +311,7 @@ static void VoutDestructor(vlc_object_t *object)
     vout_statistic_Clean(&vout->p->statistic);
 
     /* */
-    vout_snapshot_Clean(&vout->p->snapshot);
+    vout_snapshot_Destroy(vout->p->snapshot);
 
     video_format_Clean(&vout->p->original);
 }
@@ -469,7 +470,7 @@ int vout_GetSnapshot(vout_thread_t *vout,
                      video_format_t *fmt,
                      const char *type, vlc_tick_t timeout)
 {
-    picture_t *picture = vout_snapshot_Get(&vout->p->snapshot, timeout);
+    picture_t *picture = vout_snapshot_Get(vout->p->snapshot, timeout);
     if (!picture) {
         msg_Err(vout, "Failed to grab a snapshot");
         return VLC_EGENERIC;
@@ -1042,7 +1043,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     /*
      * Get the subpicture to be displayed
      */
-    const bool do_snapshot = vout_snapshot_IsRequested(&sys->snapshot);
+    const bool do_snapshot = vout_snapshot_IsRequested(sys->snapshot);
     vlc_tick_t render_subtitle_date;
     if (sys->pause.is_on)
         render_subtitle_date = sys->pause.date;
@@ -1182,7 +1183,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (do_snapshot)
     {
         assert(snap_pic);
-        vout_snapshot_Set(&sys->snapshot, &vd->source, snap_pic);
+        vout_snapshot_Set(sys->snapshot, &vd->source, snap_pic);
         if (snap_pic != todisplay)
             picture_Release(snap_pic);
     }

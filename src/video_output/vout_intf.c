@@ -42,6 +42,7 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 #include "vout_internal.h"
+#include "snapshot.h"
 
 /*****************************************************************************
  * Local prototypes
