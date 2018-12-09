@@ -39,21 +39,21 @@
  *
  * To use a vector, a new type must be defined:
  *
- * \verbatim
+ * \code
  * struct vec_int VLC_VECTOR(int);
- * \endverbatim
+ * \endcode
  *
  * The struct may be anonymous:
  *
- * \verbatim
+ * \code
  * struct VLC_VECTOR(const char *) names;
- * \endverbatim
+ * \endcode
  *
  * It is convenient to define a typedef to an anonymous structure:
  *
- * \verbatim
+ * \code
  * typedef struct VLC_VECTOR(int) vec_int_t;
- * \endverbatim
+ * \endcode
  *
  * Vector size is accessible via `vec.size`, and items are intended to be
  * accessed directly, via `vec.data[i]`.
