@@ -31,6 +31,7 @@
 #include <xcb/shm.h>
 
 #include <vlc_common.h>
+#include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
@@ -44,7 +45,8 @@ struct vout_display_sys_t
 
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
-    xcb_shm_seg_t seg_base; /**< shared memory segment XID base */
+    xcb_shm_seg_t segment; /**< shared memory segment XID */
+    bool attached;
     bool visible; /* whether to draw */
     uint8_t depth; /* useful bits per pixel */
 
@@ -63,51 +65,40 @@ struct vout_display_sys_t
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
-    (void)requested_count;
 
-    if (sys->pool)
-        return sys->pool;
-
-    picture_t *pic = picture_NewFromFormat(&vd->fmt);
-    if (!pic)
-        return NULL;
-
-    assert (pic->i_planes == 1);
-
-    picture_resource_t res = {
-        .p = {
-            [0] = {
-                .i_lines = pic->p->i_lines,
-                .i_pitch = pic->p->i_pitch,
-            },
-        },
-    };
-    picture_Release (pic);
-
-    unsigned count;
-    picture_t *pic_array[MAX_PICTURES];
-    const size_t size = res.p->i_pitch * res.p->i_lines;
-    for (count = 0; count < MAX_PICTURES; count++)
-    {
-        xcb_shm_seg_t seg = (sys->seg_base != 0) ? (sys->seg_base + count) : 0;
-
-        if (XCB_picture_Alloc(vd, &res, size, sys->conn, seg))
-            break;
-        pic_array[count] = XCB_picture_NewFromResource(&vd->fmt, &res,
-                                                       sys->conn);
-        if (unlikely(pic_array[count] == NULL))
-            break;
-    }
-    xcb_flush(sys->conn);
-
-    if (count == 0)
-        return NULL;
-
-    sys->pool = picture_pool_New(count, pic_array);
-    if (unlikely(sys->pool == NULL))
-        while (count > 0)
-            picture_Release(pic_array[--count]);
+    if (sys->pool == NULL)
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
     return sys->pool;
+}
+
+static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
+                    vlc_tick_t date)
+{
+    vout_display_sys_t *sys = vd->sys;
+    const picture_buffer_t *buf = pic->p_sys;
+    xcb_connection_t *conn = sys->conn;
+
+    sys->attached = false;
+
+    if (sys->segment == 0)
+        return; /* SHM extension not supported */
+    if (buf->fd == -1)
+        return; /* not a shareable picture buffer */
+
+    int fd = vlc_dup(buf->fd);
+    if (fd == -1)
+        return;
+
+    xcb_void_cookie_t c = xcb_shm_attach_fd_checked(conn, sys->segment, fd, 1);
+    xcb_generic_error_t *e = xcb_request_check(conn, c);
+    if (e != NULL) /* attach failure (likely remote access) */
+    {
+        free(e);
+        return;
+    }
+
+    sys->attached = true;
+    (void) subpic; (void) date;
 }
 
 /**
@@ -116,15 +107,17 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 static void Display (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
-    xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
+    xcb_connection_t *conn = sys->conn;
+    const picture_buffer_t *buf = pic->p_sys;
+    xcb_shm_seg_t segment = sys->segment;
     xcb_void_cookie_t ck;
 
     vlc_xcb_Manage(vd, sys->conn, &sys->visible);
 
     if (sys->visible)
     {
-        if (segment != 0)
-            ck = xcb_shm_put_image_checked(sys->conn, sys->window, sys->gc,
+        if (sys->attached)
+            ck = xcb_shm_put_image_checked(conn, sys->window, sys->gc,
               /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
              /* real height */ pic->p->i_lines,
                        /* x */ sys->fmt.i_x_offset,
@@ -132,13 +125,13 @@ static void Display (vout_display_t *vd, picture_t *pic)
                    /* width */ sys->fmt.i_visible_width,
                   /* height */ sys->fmt.i_visible_height,
                                0, 0, sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                               0, segment, 0);
+                               0, segment, buf->offset);
         else
         {
             const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
             const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
 
-            ck = xcb_put_image_checked(sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
+            ck = xcb_put_image_checked(conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                                sys->window, sys->gc,
                                pic->p->i_pitch / pic->p->i_pixel_pitch,
                                lines, -sys->fmt.i_x_offset, 0, 0, sys->depth,
@@ -151,7 +144,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
          * with shared memory the PUT requests are so short that many of them
          * can fit in X11 socket output buffer before the kernel preempts VLC.
          */
-        xcb_generic_error_t *e = xcb_request_check(sys->conn, ck);
+        xcb_generic_error_t *e = xcb_request_check(conn, ck);
         if (e != NULL)
         {
             msg_Dbg(vd, "%s: X11 error %d", "cannot put image", e->error_code);
@@ -162,6 +155,9 @@ static void Display (vout_display_t *vd, picture_t *pic)
     /* FIXME might be WAY better to wait in some case (be carefull with
      * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
      * vout_display wrapper. */
+
+    if (sys->attached)
+        xcb_shm_detach(conn, segment);
 }
 
 static void ResetPictures(vout_display_t *vd)
@@ -170,10 +166,6 @@ static void ResetPictures(vout_display_t *vd)
 
     if (!sys->pool)
         return;
-
-    if (sys->seg_base != 0)
-        for (unsigned i = 0; i < MAX_PICTURES; i++)
-            xcb_shm_detach(sys->conn, sys->seg_base + i);
 
     picture_pool_Release(sys->pool);
     sys->pool = NULL;
@@ -451,20 +443,16 @@ found_format:;
 
     sys->visible = false;
     if (XCB_shm_Check (VLC_OBJECT(vd), conn))
-    {
-        sys->seg_base = xcb_generate_id (conn);
-        for (unsigned i = 1; i < MAX_PICTURES; i++)
-             xcb_generate_id (conn);
-    }
+        sys->segment = xcb_generate_id(conn);
     else
-        sys->seg_base = 0;
+        sys->segment = 0;
 
     sys->fmt = *fmtp = fmt_pic;
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
 
     vd->pool = Pool;
-    vd->prepare = NULL;
+    vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
 
