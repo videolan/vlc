@@ -69,13 +69,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     if (sys->pool)
         return sys->pool;
 
-    /* */
-    const uint32_t values[] = { sys->place.x, sys->place.y, sys->place.width, sys->place.height };
-    xcb_configure_window(sys->conn, sys->window,
-                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                         values);
-
     picture_t *pic = picture_NewFromFormat(&vd->fmt);
     if (!pic)
         return NULL;
@@ -188,36 +181,33 @@ static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    switch (query)
-    {
+    switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-    {
-        const vout_display_cfg_t *p_cfg =
-            va_arg(ap, const vout_display_cfg_t *);
-        vout_display_PlacePicture(&sys->place, &vd->source, p_cfg, false);
-
-        if (sys->place.width  != sys->fmt.i_visible_width ||
-            sys->place.height != sys->fmt.i_visible_height)
-        {
-            vout_display_SendEventPicturesInvalid(vd);
-            return VLC_SUCCESS;
-        }
-
-        /* Move the picture within the window */
-        const uint32_t values[] = { sys->place.x, sys->place.y };
-        xcb_configure_window(sys->conn, sys->window,
-                             XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
-                             values);
-        return VLC_SUCCESS;
-    }
-
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        /* I am not sure it is always necessary, but it is way simpler ... */
-        vout_display_SendEventPicturesInvalid(vd);
+    {
+        const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
+
+        vout_display_PlacePicture(&sys->place, &vd->source, cfg, false);
+
+        uint32_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y;
+        const uint32_t values[] = {
+            sys->place.x, sys->place.y, sys->place.width, sys->place.height
+        };
+
+        if (sys->place.width  != sys->fmt.i_visible_width
+         || sys->place.height != sys->fmt.i_visible_height)
+        {
+            mask |= XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+            vout_display_SendEventPicturesInvalid(vd);
+        }
+
+        /* Move the picture within the window */
+        xcb_configure_window(sys->conn, sys->window, mask, values);
         return VLC_SUCCESS;
+    }
 
     case VOUT_DISPLAY_RESET_PICTURES:
     {
@@ -420,47 +410,41 @@ found_format:;
         cmap = scr->default_colormap;
 
     /* Create window */
+    xcb_pixmap_t pixmap = xcb_generate_id(conn);
+    const uint32_t mask =
+        XCB_CW_BACK_PIXMAP |
+        XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXMAP |
+        XCB_CW_BORDER_PIXEL |
+        XCB_CW_EVENT_MASK |
+        XCB_CW_COLORMAP;
+    const uint32_t values[] = {
+        /* XCB_CW_BACK_PIXMAP */
+        pixmap,
+        /* XCB_CW_BACK_PIXEL */
+        scr->black_pixel,
+        /* XCB_CW_BORDER_PIXMAP */
+        pixmap,
+        /* XCB_CW_BORDER_PIXEL */
+        scr->black_pixel,
+        /* XCB_CW_EVENT_MASK */
+        XCB_EVENT_MASK_VISIBILITY_CHANGE,
+        /* XCB_CW_COLORMAP */
+        cmap,
+    };
+
+    vout_display_PlacePicture(&sys->place, &vd->source, cfg, false);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
-    xcb_pixmap_t pixmap = xcb_generate_id (conn);
-    {
-        const uint32_t mask =
-            XCB_CW_BACK_PIXMAP |
-            XCB_CW_BACK_PIXEL |
-            XCB_CW_BORDER_PIXMAP |
-            XCB_CW_BORDER_PIXEL |
-            XCB_CW_EVENT_MASK |
-            XCB_CW_COLORMAP;
-        const uint32_t values[] = {
-            /* XCB_CW_BACK_PIXMAP */
-            pixmap,
-            /* XCB_CW_BACK_PIXEL */
-            scr->black_pixel,
-            /* XCB_CW_BORDER_PIXMAP */
-            pixmap,
-            /* XCB_CW_BORDER_PIXEL */
-            scr->black_pixel,
-            /* XCB_CW_EVENT_MASK */
-            XCB_EVENT_MASK_VISIBILITY_CHANGE,
-            /* XCB_CW_COLORMAP */
-            cmap,
-        };
-        xcb_void_cookie_t c;
 
-        xcb_create_pixmap (conn, sys->depth, pixmap, scr->root, 1, 1);
-        c = xcb_create_window_checked (conn, sys->depth, sys->window,
-                                       cfg->window->handle.xid, 0, 0,
-                                       cfg->display.width,
-                                       cfg->display.height, 0,
-                                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                       vid, mask, values);
-        xcb_map_window (conn, sys->window);
-        /* Create graphic context (I wonder why the heck do we need this) */
-        xcb_create_gc (conn, sys->gc, sys->window, 0, NULL);
+    xcb_create_pixmap(conn, sys->depth, pixmap, scr->root, 1, 1);
+    xcb_create_window(conn, sys->depth, sys->window, cfg->window->handle.xid,
+        sys->place.x, sys->place.y, sys->place.width, sys->place.height, 0,
+        XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
+    xcb_map_window(conn, sys->window);
+    /* Create graphic context (I wonder why the heck do we need this) */
+    xcb_create_gc(conn, sys->gc, sys->window, 0, NULL);
 
-        if (vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
-            goto error;
-    }
     msg_Dbg (vd, "using X11 window %08"PRIx32, sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, sys->gc);
 
@@ -473,8 +457,6 @@ found_format:;
     }
     else
         sys->seg_base = 0;
-
-    vout_display_PlacePicture (&sys->place, &vd->source, cfg, false);
 
     sys->fmt = *fmtp = fmt_pic;
     /* Setup vout_display_t once everything is fine */
