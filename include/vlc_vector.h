@@ -156,10 +156,10 @@ vlc_vector_enforce_size_t_(size_t value)
  * Private.
  *
  * \param ptr the current data to realloc
- * \param the requested capacity, in number of items
- * \param the size of one item
- * \pcap a pointer to the `cap` field of the vector [IN/OUT]
- * \pcap a pointer to the `size` field of the vector [IN/OUT]
+ * \param count the requested capacity, in number of items
+ * \param size the size of one item
+ * \param pcap a pointer to the `cap` field of the vector [IN/OUT]
+ * \param psize a pointer to the `size` field of the vector [IN/OUT]
  * \return the reallocated array, or `ptr` if reallocation failed
  */
 static inline void *
