@@ -363,7 +363,6 @@ typedef struct {
     unsigned wm_state;
 #endif
 
-    bool ch_crop;
     struct {
         int      left;
         int      top;
@@ -671,57 +670,6 @@ bool vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
     }
 #endif
 
-    if (osys->ch_crop) {
-        unsigned crop_num = osys->crop.num;
-        unsigned crop_den = osys->crop.den;
-
-        if (crop_num != 0 && crop_den != 0) {
-            video_format_t fmt = osys->source;
-            fmt.i_sar_num = vd->source.i_sar_num;
-            fmt.i_sar_den = vd->source.i_sar_den;
-            VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
-                                 &osys->crop.right, &osys->crop.bottom,
-                                 &fmt, crop_num, crop_den);
-        }
-
-        const int right_max  = osys->source.i_x_offset + osys->source.i_visible_width;
-        const int bottom_max = osys->source.i_y_offset + osys->source.i_visible_height;
-        int left   = VLC_CLIP((int)osys->source.i_x_offset + osys->crop.left,
-                              0, right_max - 1);
-        int top    = VLC_CLIP((int)osys->source.i_y_offset + osys->crop.top,
-                              0, bottom_max - 1);
-        int right, bottom;
-
-        if (osys->crop.right <= 0)
-            right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + osys->crop.right;
-        else
-            right = (int)osys->source.i_x_offset + osys->crop.right;
-        right = VLC_CLIP(right, left + 1, right_max);
-        if (osys->crop.bottom <= 0)
-            bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + osys->crop.bottom;
-        else
-            bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
-        bottom = VLC_CLIP(bottom, top + 1, bottom_max);
-
-        vd->source.i_x_offset       = left;
-        vd->source.i_y_offset       = top;
-        vd->source.i_visible_width  = right - left;
-        vd->source.i_visible_height = bottom - top;
-        video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
-        video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
-        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &osys->cfg);
-        osys->crop.left   = left - osys->source.i_x_offset;
-        osys->crop.top    = top  - osys->source.i_y_offset;
-        /* FIXME for right/bottom we should keep the 'type' border vs window */
-        osys->crop.right  = right -
-                            (osys->source.i_x_offset + osys->source.i_visible_width);
-        osys->crop.bottom = bottom -
-                            (osys->source.i_y_offset + osys->source.i_visible_height);
-        osys->crop.num    = crop_num;
-        osys->crop.den    = crop_den;
-        osys->ch_crop = false;
-    }
-
     if (allow_reset_pictures
      && atomic_exchange(&osys->reset_pictures, false)) {
         if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
@@ -770,6 +718,61 @@ void vout_FilterFlush(vout_display_t *vd)
         filter_chain_VideoFlush(osys->converters);
 }
 
+static void vout_UpdateSourceCrop(vout_display_t *vd)
+{
+    vout_display_owner_sys_t *osys = vd->owner.sys;
+    unsigned crop_num = osys->crop.num;
+    unsigned crop_den = osys->crop.den;
+
+    if (crop_num != 0 && crop_den != 0) {
+        video_format_t fmt = osys->source;
+        fmt.i_sar_num = vd->source.i_sar_num;
+        fmt.i_sar_den = vd->source.i_sar_den;
+        VoutDisplayCropRatio(&osys->crop.left,  &osys->crop.top,
+                             &osys->crop.right, &osys->crop.bottom,
+                             &fmt, crop_num, crop_den);
+    }
+
+    const int right_max  = osys->source.i_x_offset
+                           + osys->source.i_visible_width;
+    const int bottom_max = osys->source.i_y_offset
+                           + osys->source.i_visible_height;
+    int left = VLC_CLIP((int)osys->source.i_x_offset + osys->crop.left,
+                          0, right_max - 1);
+    int top  = VLC_CLIP((int)osys->source.i_y_offset + osys->crop.top,
+                        0, bottom_max - 1);
+    int right, bottom;
+
+    if (osys->crop.right <= 0)
+        right = (int)(osys->source.i_x_offset + osys->source.i_visible_width) + osys->crop.right;
+    else
+        right = (int)osys->source.i_x_offset + osys->crop.right;
+    right = VLC_CLIP(right, left + 1, right_max);
+
+    if (osys->crop.bottom <= 0)
+        bottom = (int)(osys->source.i_y_offset + osys->source.i_visible_height) + osys->crop.bottom;
+    else
+        bottom = (int)osys->source.i_y_offset + osys->crop.bottom;
+    bottom = VLC_CLIP(bottom, top + 1, bottom_max);
+
+    vd->source.i_x_offset       = left;
+    vd->source.i_y_offset       = top;
+    vd->source.i_visible_width  = right - left;
+    vd->source.i_visible_height = bottom - top;
+    video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
+    video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &osys->cfg);
+    osys->crop.left   = left - osys->source.i_x_offset;
+    osys->crop.top    = top  - osys->source.i_y_offset;
+    /* FIXME for right/bottom we should keep the 'type' border vs window */
+    osys->crop.right  = right -
+                        (osys->source.i_x_offset + osys->source.i_visible_width);
+    osys->crop.bottom = bottom -
+                        (osys->source.i_y_offset + osys->source.i_visible_height);
+    osys->crop.num    = crop_num;
+    osys->crop.den    = crop_den;
+}
+
 static void vout_SetSourceAspect(vout_display_t *vd,
                                  unsigned sar_num, unsigned sar_den)
 {
@@ -788,7 +791,7 @@ static void vout_SetSourceAspect(vout_display_t *vd,
 
     /* If a crop ratio is requested, recompute the parameters */
     if (osys->crop.num != 0 && osys->crop.den != 0)
-        osys->ch_crop = true;
+        vout_UpdateSourceCrop(vd);
 }
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
@@ -814,9 +817,9 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
 
         video_format_CopyCrop(&osys->source, source);
 
-        /* Force the vout to reapply the current user crop settings over the new decoder
-         * crop settings. */
-        osys->ch_crop = true;
+        /* Force the vout to reapply the current user crop settings
+         * over the new decoder crop settings. */
+        vout_UpdateSourceCrop(vd);
     }
 }
 
@@ -903,7 +906,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
         osys->crop.num    = crop_num;
         osys->crop.den    = crop_den;
 
-        osys->ch_crop = true;
+        vout_UpdateSourceCrop(vd);
     }
 }
 
