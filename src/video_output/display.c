@@ -683,13 +683,6 @@ bool vout_ManageDisplay(vout_display_t *vd)
     return false;
 }
 
-bool vout_AreDisplayPicturesInvalid(vout_display_t *vd)
-{
-    vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    return atomic_load(&osys->reset_pictures);
-}
-
 bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;

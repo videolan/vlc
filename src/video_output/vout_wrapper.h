@@ -70,7 +70,6 @@ void vout_DeleteDisplay(vout_display_t *, vout_display_cfg_t *);
 bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
-bool vout_AreDisplayPicturesInvalid(vout_display_t *);
 
 bool vout_ManageDisplay(vout_display_t *);
 
