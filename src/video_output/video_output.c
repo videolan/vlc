@@ -1449,11 +1449,6 @@ static int ThreadStart(vout_thread_t *vout, vout_display_cfg_t *cfg)
 
     if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
         goto error;
-    if (vout_InitWrapper(vout))
-    {
-        vout_CloseWrapper(vout, cfg);
-        goto error;
-    }
     assert(vout->p->decoder_pool && vout->p->private_pool);
 
     vout->p->displayed.current       = NULL;

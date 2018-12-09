@@ -58,42 +58,26 @@ static void NoDrInit(vout_thread_sys_t *sys)
  *
  *****************************************************************************/
 int vout_OpenWrapper(vout_thread_t *vout,
-                     const char *splitter_name, const vout_display_cfg_t *cfg)
+                     const char *splitter_name, vout_display_cfg_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
+    vout_display_t *vd;
+
     msg_Dbg(vout, "Opening vout display wrapper");
 
     /* */
     char *modlist = var_InheritString(vout, "vout");
 
     if (splitter_name)
-        sys->display.vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
+        vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
     else
-        sys->display.vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist);
+        vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist);
     free(modlist);
 
-    if (!sys->display.vd)
+    if (vd == NULL)
         return VLC_EGENERIC;
 
-    /* */
-#ifdef _WIN32
-    var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
-    var_AddCallback(vout, "video-wallpaper", Forward, NULL);
-#endif
-
-    /* */
     sys->decoder_pool = NULL;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-int vout_InitWrapper(vout_thread_t *vout)
-{
-    vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = sys->display.vd;
 
     sys->display.use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && !vd->info.is_slow && sys->display.use_dr;
@@ -107,7 +91,7 @@ int vout_InitWrapper(vout_thread_t *vout)
                                                         reserved_picture + decoder_picture) : 3;
     picture_pool_t *display_pool = vout_display_Pool(vd, display_pool_size);
     if (display_pool == NULL)
-        return VLC_EGENERIC;
+        goto error;
 
 #ifndef NDEBUG
     if ( picture_pool_GetSize(display_pool) < display_pool_size )
@@ -126,7 +110,7 @@ int vout_InitWrapper(vout_thread_t *vout)
                                        __MAX(VOUT_MAX_PICTURES,
                                              reserved_picture + decoder_picture - DISPLAY_PICTURE_COUNT));
         if (!sys->decoder_pool)
-            return VLC_EGENERIC;
+            goto error;
         if (allow_dr) {
             msg_Warn(vout, "Not enough direct buffers, using system memory");
             sys->dpb_size = 0;
@@ -141,9 +125,20 @@ int vout_InitWrapper(vout_thread_t *vout)
         if (sys->decoder_pool != sys->display_pool)
             picture_pool_Release(sys->decoder_pool);
         sys->display_pool = sys->decoder_pool = NULL;
-        return VLC_EGENERIC;
+        goto error;
     }
+
+    sys->display.vd = vd;
+
+#ifdef _WIN32
+    var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
+    var_AddCallback(vout, "video-wallpaper", Forward, NULL);
+#endif
     return VLC_SUCCESS;
+
+error:
+    vout_DeleteDisplay(vd, cfg);
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
