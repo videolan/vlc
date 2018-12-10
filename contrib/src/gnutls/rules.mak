@@ -31,7 +31,6 @@ endif
 ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
-	$(APPLY) $(SRC)/gnutls/read-file-limits.h.patch
 ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-getentropy-osx.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-connectx-macos.patch
