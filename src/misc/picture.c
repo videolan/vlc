@@ -320,15 +320,6 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
  *
  *****************************************************************************/
 
-picture_t *picture_Hold( picture_t *p_picture )
-{
-    assert( p_picture != NULL );
-
-    uintptr_t refs = atomic_fetch_add(&p_picture->refs, 1);
-    assert( refs > 0 );
-    return p_picture;
-}
-
 void picture_Release( picture_t *p_picture )
 {
     assert( p_picture != NULL );

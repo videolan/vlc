@@ -32,6 +32,8 @@
 #else
 #include <atomic>
 using std::atomic_uintptr_t;
+using std::memory_order;
+using std::memory_order_relaxed;
 #endif
 
 /**
@@ -166,12 +168,16 @@ typedef struct
 VLC_API picture_t * picture_NewFromResource( const video_format_t *, const picture_resource_t * ) VLC_USED;
 
 /**
- * This function will increase the picture reference count.
- * It will not have any effect on picture obtained from vout
+ * Increments the picture reference count.
  *
- * It returns the given picture for convenience.
+ * \return picture
  */
-VLC_API picture_t *picture_Hold( picture_t *p_picture );
+static inline picture_t *picture_Hold(picture_t *picture)
+{
+    atomic_fetch_add_explicit(&picture->refs, (uintptr_t)1,
+                              memory_order_relaxed);
+    return picture;
+}
 
 /**
  * This function will release a picture.
