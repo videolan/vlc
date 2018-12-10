@@ -38,7 +38,6 @@
 #include <vlc_threads.h>
 
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 
 #include <vlc_block.h>
 #include <vlc_image.h>
@@ -214,7 +213,6 @@ struct decklink_sys_t
     struct
     {
         video_format_t currentfmt;
-        picture_pool_t *pool;
         bool tenbits;
         uint8_t afd, ar;
         int nosignal_delay;
@@ -356,8 +354,6 @@ static void ReleaseDLSys(vlc_object_t *obj, int i_cat)
         }
 
         /* Clean video specific */
-        if (sys->video.pool)
-            picture_pool_Release(sys->video.pool);
         if (sys->video.pic_nosignal)
             picture_Release(sys->video.pic_nosignal);
         video_format_Clean(&sys->video.currentfmt);
@@ -776,14 +772,6 @@ error:
  * Video
  *****************************************************************************/
 
-static picture_pool_t *PoolVideo(vout_display_t *vd, unsigned requested_count)
-{
-    struct decklink_sys_t *sys = (struct decklink_sys_t *) vd->sys;
-    if (!sys->video.pool)
-        sys->video.pool = picture_pool_NewFromFormat(&vd->fmt, requested_count);
-    return sys->video.pool;
-}
-
 static inline void put_le32(uint8_t **p, uint32_t d)
 {
     SetDWLE(*p, d);
@@ -1051,7 +1039,6 @@ static int OpenVideo(vlc_object_t *p_this)
         sys->video.afd = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "afd");
         sys->video.ar = var_InheritInteger(p_this, VIDEO_CFG_PREFIX "ar");
         sys->video.pic_nosignal = NULL;
-        sys->video.pool = NULL;
 
         if (OpenDecklink(vd, sys) != VLC_SUCCESS)
         {
@@ -1073,7 +1060,6 @@ static int OpenVideo(vlc_object_t *p_this)
     video_format_Clean( &vd->fmt );
     video_format_Copy( &vd->fmt, &sys->video.currentfmt );
 
-    vd->pool    = PoolVideo;
     vd->prepare = PrepareVideo;
     vd->display = NULL;
     vd->control = ControlVideo;
