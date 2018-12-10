@@ -320,7 +320,7 @@ static void Close(vout_display_t *vd)
 
     if (sys->pool)
         picture_pool_Release(sys->pool);
-    if (!sys->is_hw_accel && sys->picture)
+    else if (sys->picture != NULL)
         picture_Release(sys->picture);
 
     CloseDisplay(vd);
@@ -337,19 +337,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->pool) {
-        if (!sys->picture) {
-            picture_resource_t rsc;
-
-            memset(&rsc, 0, sizeof(rsc));
-            rsc.p[0].p_pixels = sys->video_ptr;
-            rsc.p[0].i_lines  = sys->var_info.yres;
-            rsc.p[0].i_pitch = sys->line_length;
-
-            sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
-            if (!sys->picture)
-                return NULL;
-        }
-
         if (sys->is_hw_accel)
             sys->pool = picture_pool_New(1, &sys->picture);
         else
@@ -622,6 +609,22 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
         return VLC_EGENERIC;
+    }
+
+    picture_resource_t rsc = {
+       .p = {
+           [0] = {
+               .i_lines = sys->var_info.yres,
+               .i_pitch = fix_info.line_length,
+           },
+       },
+    };
+
+    sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
+    if (unlikely(sys->picture == NULL)) {
+        munmap(rsc.p[0].p_pixels, sys->video_size);
+        ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
+        return VLC_ENOMEM;
     }
 
     ClearScreen(sys);
