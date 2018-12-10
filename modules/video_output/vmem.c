@@ -34,7 +34,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -89,8 +88,6 @@ typedef struct
 
 /* NOTE: the callback prototypes must match those of LibVLC */
 struct vout_display_sys_t {
-    picture_pool_t *pool;
-
     void *opaque;
     void *pic_opaque;
     void *(*lock)(void *sys, void **plane);
@@ -105,7 +102,6 @@ struct vout_display_sys_t {
 typedef unsigned (*vlc_format_cb)(void **, char *, unsigned *, unsigned *,
                                   unsigned *, unsigned *);
 
-static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Prepare(vout_display_t *, picture_t *, subpicture_t *, vlc_tick_t);
 static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
@@ -135,7 +131,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->display = var_InheritAddress(vd, "vmem-display");
     sys->cleanup = var_InheritAddress(vd, "vmem-cleanup");
     sys->opaque = var_InheritAddress(vd, "vmem-data");
-    sys->pool = NULL;
 
     /* Define the video format */
     video_format_t fmt;
@@ -213,7 +208,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     *fmtp = fmt;
 
     vd->sys     = sys;
-    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -228,18 +222,7 @@ static void Close(vout_display_t *vd)
 
     if (sys->cleanup)
         sys->cleanup(sys->opaque);
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
     free(sys);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool == NULL)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
 }
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
