@@ -186,6 +186,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* Does the framebuffer uses hw acceleration? */
     sys->is_hw_accel = var_InheritBool(vd, "fb-hw-accel");
+    sys->fd = -1;
 
     /* Set tty and fb devices */
     sys->tty = 0; /* 0 == /dev/tty0 == current console */
@@ -504,7 +505,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
     /* Get framebuffer device information */
     if (ioctl(sys->fd, FBIOGET_VSCREENINFO, &sys->var_info)) {
         msg_Err(vd, "cannot get fb info (%s)", vlc_strerror_c(errno));
-        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
     sys->old_info = sys->var_info;
@@ -523,7 +523,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
     if (ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->var_info)) {
         msg_Err(vd, "cannot set fb info (%s)", vlc_strerror_c(errno));
-        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -536,8 +535,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
-
-        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -571,8 +568,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         if (!sys->palette) {
             /* Restore fb config */
             ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
-
-            vlc_close(sys->fd);
             return VLC_ENOMEM;
         }
         sys->fb_cmap.start = 0;
@@ -607,8 +602,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
-
-        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
@@ -628,8 +621,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
         /* Restore fb config */
         ioctl(sys->fd, FBIOPUT_VSCREENINFO, &sys->old_info);
-
-        vlc_close(sys->fd);
         return VLC_EGENERIC;
     }
 
