@@ -37,7 +37,6 @@
 #include <vlc_block.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #if !defined(_WIN32) && !defined(__APPLE__)
 # ifdef X_DISPLAY_MISSING
 #  error Xlib required due to XInitThreads
@@ -53,7 +52,6 @@ struct vout_display_sys_t {
     caca_display_t *dp;
     cucul_dither_t *dither;
 
-    picture_pool_t *pool;
     block_fifo_t *fifo;
     vlc_thread_t thread;
     vout_window_t *window;
@@ -89,18 +87,6 @@ static void VoutDisplayEventKey(vout_display_sys_t *sys, int key)
         memcpy(event->p_buffer, &key, sizeof (key));
         block_FifoPut(sys->fifo, event);
     }
-}
-
-/**
- * Return a pool of direct buffers
- */
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
 }
 
 /**
@@ -488,7 +474,6 @@ static int Open(vlc_object_t *object)
     /* Setup vout_display now that everything is fine */
     *fmtp = fmt;
 
-    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = PictureDisplay;
     vd->control = Control;
@@ -502,8 +487,6 @@ static int Open(vlc_object_t *object)
 
 error:
     if (sys) {
-        if (sys->pool)
-            picture_pool_Release(sys->pool);
         if (sys->dither)
             cucul_free_dither(sys->dither);
         if (sys->dp)
@@ -532,8 +515,6 @@ static void Close(vlc_object_t *object)
         vlc_join(sys->thread, NULL);
         block_FifoRelease(sys->fifo);
     }
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);
