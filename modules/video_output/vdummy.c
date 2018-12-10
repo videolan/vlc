@@ -68,9 +68,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 struct vout_display_sys_t {
-    picture_pool_t *pool;
 };
-static picture_pool_t *Pool(vout_display_t *, unsigned count);
 static void            DisplayStat(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
@@ -85,7 +83,6 @@ static int Open(vout_display_t *vd, video_format_t *fmt,
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_EGENERIC;
-    sys->pool = NULL;
 
     /* p_vd->info is not modified */
 
@@ -98,7 +95,6 @@ static int Open(vout_display_t *vd, video_format_t *fmt,
         }
         free(chroma);
     }
-    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = display;
     vd->control = Control;
@@ -124,17 +120,7 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
     free(sys);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
 }
 
 static void DisplayStat(vout_display_t *vd, picture_t *picture)
