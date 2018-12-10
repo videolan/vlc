@@ -33,7 +33,6 @@
 #include <vlc_playlist_legacy.h>
 #include <vlc_threads.h>
 #include <vlc_vout_window.h>
-#include <vlc_vout_display.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
