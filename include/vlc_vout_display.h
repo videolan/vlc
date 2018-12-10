@@ -51,16 +51,16 @@ typedef struct vout_display_owner_t vout_display_owner_t;
 /**
  * Possible alignments for vout_display.
  */
-typedef enum
-{
-    VOUT_DISPLAY_ALIGN_CENTER,
-    /* */
-    VOUT_DISPLAY_ALIGN_LEFT,
-    VOUT_DISPLAY_ALIGN_RIGHT,
-    /* */
-    VOUT_DISPLAY_ALIGN_TOP,
-    VOUT_DISPLAY_ALIGN_BOTTOM,
-} vout_display_align_t;
+#define VLC_VIDEO_ALIGN_CENTER 0
+#define VLC_VIDEO_ALIGN_LEFT   1
+#define VLC_VIDEO_ALIGN_RIGHT  2
+#define VLC_VIDEO_ALIGN_TOP    1
+#define VLC_VIDEO_ALIGN_BOTTOM 2
+
+typedef struct vlc_video_align {
+    char horizontal;
+    char vertical;
+} vlc_video_align_t;
 
 /**
  * Initial/Current configuration for a vout_display_t
@@ -82,10 +82,7 @@ typedef struct {
     } display;
 
     /* Alignment of the picture inside the display */
-    struct {
-        int horizontal;
-        int vertical;
-    } align;
+    vlc_video_align_t align;
 
     /* Do we fill up the display with the video */
     bool is_display_filled;

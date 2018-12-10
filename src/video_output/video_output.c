@@ -695,17 +695,17 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
     vlc_ureduce(&zoom_num, &zoom_den, zoom_num, zoom_den, 0);
     cfg->zoom.num = zoom_num;
     cfg->zoom.den = zoom_den;
-    cfg->align.vertical = VOUT_DISPLAY_ALIGN_CENTER;
-    cfg->align.horizontal = VOUT_DISPLAY_ALIGN_CENTER;
+    cfg->align.vertical = VLC_VIDEO_ALIGN_CENTER;
+    cfg->align.horizontal = VLC_VIDEO_ALIGN_CENTER;
     const int align_mask = var_GetInteger(vout, "align");
-    if (align_mask & 0x1)
-        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_LEFT;
-    else if (align_mask & 0x2)
-        cfg->align.horizontal = VOUT_DISPLAY_ALIGN_RIGHT;
-    if (align_mask & 0x4)
-        cfg->align.vertical = VOUT_DISPLAY_ALIGN_TOP;
-    else if (align_mask & 0x8)
-        cfg->align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
+    if (align_mask & VOUT_ALIGN_LEFT)
+        cfg->align.horizontal = VLC_VIDEO_ALIGN_LEFT;
+    else if (align_mask & VOUT_ALIGN_RIGHT)
+        cfg->align.horizontal = VLC_VIDEO_ALIGN_RIGHT;
+    if (align_mask & VOUT_ALIGN_TOP)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_TOP;
+    else if (align_mask & VOUT_ALIGN_BOTTOM)
+        cfg->align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
 }
 
 /* */

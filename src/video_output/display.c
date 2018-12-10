@@ -268,10 +268,10 @@ void vout_display_PlacePicture(vout_display_place_t *place,
 
     /*  Compute position */
     switch (cfg->align.horizontal) {
-    case VOUT_DISPLAY_ALIGN_LEFT:
+    case VLC_VIDEO_ALIGN_LEFT:
         place->x = 0;
         break;
-    case VOUT_DISPLAY_ALIGN_RIGHT:
+    case VLC_VIDEO_ALIGN_RIGHT:
         place->x = cfg->display.width - place->width;
         break;
     default:
@@ -280,10 +280,10 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     }
 
     switch (cfg->align.vertical) {
-    case VOUT_DISPLAY_ALIGN_TOP:
+    case VLC_VIDEO_ALIGN_TOP:
         place->y = 0;
         break;
-    case VOUT_DISPLAY_ALIGN_BOTTOM:
+    case VLC_VIDEO_ALIGN_BOTTOM:
         place->y = cfg->display.height - place->height;
         break;
     default:

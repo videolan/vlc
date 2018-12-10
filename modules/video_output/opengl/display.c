@@ -238,10 +238,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         vout_display_place_t place;
 
         /* Reverse vertical alignment as the GL tex are Y inverted */
-        if (c.align.vertical == VOUT_DISPLAY_ALIGN_TOP)
-            c.align.vertical = VOUT_DISPLAY_ALIGN_BOTTOM;
-        else if (c.align.vertical == VOUT_DISPLAY_ALIGN_BOTTOM)
-            c.align.vertical = VOUT_DISPLAY_ALIGN_TOP;
+        if (c.align.vertical == VLC_VIDEO_ALIGN_TOP)
+            c.align.vertical = VLC_VIDEO_ALIGN_BOTTOM;
+        else if (c.align.vertical == VLC_VIDEO_ALIGN_BOTTOM)
+            c.align.vertical = VLC_VIDEO_ALIGN_TOP;
 
         vout_display_PlacePicture (&place, src, &c, false);
         vlc_gl_Resize (sys->gl, c.display.width, c.display.height);
