@@ -43,13 +43,12 @@ static int OpenDummy(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context);
 static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
                      video_format_t *fmtp, vlc_video_context *context);
-static void Close(vout_display_t *vd);
 
 vlc_module_begin ()
     set_shortname( N_("Dummy") )
     set_description( N_("Dummy video output") )
     set_capability( "vout display", 0 )
-    set_callbacks( OpenDummy, Close )
+    set_callbacks( OpenDummy, NULL )
     add_shortcut( "dummy" )
 
     set_category( CAT_VIDEO )
@@ -60,15 +59,13 @@ vlc_module_begin ()
     set_description( N_("Statistics video output") )
     set_capability( "vout display", 0 )
     add_shortcut( "stats" )
-    set_callbacks( OpenStats, Close )
+    set_callbacks( OpenStats, NULL )
 vlc_module_end ()
 
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct vout_display_sys_t {
-};
 static void            DisplayStat(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
@@ -78,12 +75,6 @@ static int             Control(vout_display_t *, int, va_list);
 static int Open(vout_display_t *vd, video_format_t *fmt,
                 void (*display)(vout_display_t *, picture_t *))
 {
-    vout_display_sys_t *sys;
-
-    vd->sys = sys = calloc(1, sizeof(*sys));
-    if (!sys)
-        return VLC_EGENERIC;
-
     /* p_vd->info is not modified */
 
     char *chroma = var_InheritString(vd, "dummy-chroma");
@@ -114,13 +105,6 @@ static int OpenStats(vout_display_t *vd, const vout_display_cfg_t *cfg,
 {
     (void) cfg; (void) context;
     return Open(vd, fmtp, DisplayStat);
-}
-
-static void Close(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    free(sys);
 }
 
 static void DisplayStat(vout_display_t *vd, picture_t *picture)
