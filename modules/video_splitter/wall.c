@@ -34,9 +34,6 @@
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
 
-/* FIXME it is needed for VOUT_ALIGN_* only */
-#include <vlc_vout.h>
-
 #define ROW_MAX (15)
 #define COL_MAX (15)
 
@@ -97,7 +94,7 @@ typedef struct
     int  i_output;
     int  i_width;
     int  i_height;
-    int  i_align;
+    vlc_video_align_t align;
     int  i_left;
     int  i_top;
 } wall_output_t;
@@ -265,12 +262,12 @@ static int Open( vlc_object_t *p_this )
                          i_vstart%i_target_height );
             if(  y >= ( p_sys->i_row / 2 ) )
             {
-                i_halign = VOUT_ALIGN_TOP;
+                i_halign = VLC_VIDEO_ALIGN_TOP;
                 i_height -= b_vstart_rounded ? 2: 0;
             }
             else
             {
-                i_halign = VOUT_ALIGN_BOTTOM;
+                i_halign = VLC_VIDEO_ALIGN_BOTTOM;
             }
         }
 
@@ -297,12 +294,12 @@ static int Open( vlc_object_t *p_this )
                 i_width = ( i_target_width - i_hstart % i_target_width );
                 if( x >= ( p_sys->i_col / 2 ) )
                 {
-                    i_valign = VOUT_ALIGN_LEFT;
+                    i_valign = VLC_VIDEO_ALIGN_LEFT;
                     i_width -= b_hstart_rounded ? 2: 0;
                 }
                 else
                 {
-                    i_valign = VOUT_ALIGN_RIGHT;
+                    i_valign = VLC_VIDEO_ALIGN_RIGHT;
                 }
             }
 
@@ -310,7 +307,8 @@ static int Open( vlc_object_t *p_this )
             p_output->b_active = pb_active[y * p_sys->i_col + x] &&
                                  i_height > 0 && i_width > 0;
             p_output->i_output = -1;
-            p_output->i_align = i_valign | i_halign;
+            p_output->align.vertical = i_valign;
+            p_output->align.horizontal = i_halign;
             p_output->i_width = i_width;
             p_output->i_height = i_height;
             p_output->i_left = i_left;
@@ -361,9 +359,9 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_height         = p_output->i_height;
             p_cfg->fmt.i_sar_num        = p_splitter->fmt.i_sar_num;
             p_cfg->fmt.i_sar_den        = p_splitter->fmt.i_sar_den;
-            p_cfg->window.i_x     = p_output->i_left;
-            p_cfg->window.i_y     = p_output->i_top;
-            p_cfg->window.i_align = p_output->i_align;
+            p_cfg->window.i_x   = p_output->i_left;
+            p_cfg->window.i_y   = p_output->i_top;
+            p_cfg->window.align = p_output->align;
             p_cfg->psz_module = NULL;
         }
     }

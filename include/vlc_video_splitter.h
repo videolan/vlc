@@ -27,6 +27,7 @@
 #include <vlc_es.h>
 #include <vlc_picture.h>
 #include <vlc_mouse.h>
+#include <vlc_vout_display.h>
 
 /**
  * \file
@@ -55,7 +56,7 @@ typedef struct
 
         /* Alignment inside the window
          */
-        int i_align;
+        vlc_video_align_t align;
     } window;
 
     /* Video output module

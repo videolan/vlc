@@ -36,9 +36,6 @@
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
 
-/* FIXME it is needed for VOUT_ALIGN_* only */
-#include <vlc_vout.h>
-
 #define OVERLAP
 
 #ifdef OVERLAP
@@ -248,7 +245,7 @@ typedef struct
     int i_y;
     int i_width;
     int i_height;
-    int i_align;
+    vlc_video_align_t align;
 
     /* Source position and size */
     int  i_src_x;
@@ -685,9 +682,9 @@ static int Open( vlc_object_t *p_this )
             p_cfg->fmt.i_visible_height =
             p_cfg->fmt.i_height         = p_output->i_height;
 
-            p_cfg->window.i_x     = p_output->i_x;
-            p_cfg->window.i_y     = p_output->i_y;
-            p_cfg->window.i_align = p_output->i_align;
+            p_cfg->window.i_x   = p_output->i_x;
+            p_cfg->window.i_y   = p_output->i_y;
+            p_cfg->window.align = p_output->align;
 
             p_cfg->psz_module = NULL;
         }
@@ -906,20 +903,20 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
             }
 
             /* Compute alignment */
-            int i_align = 0;
+            char halign = 0, valign = 0;
             if( i_col > 1 )
             {
                 if( b_col_first )
-                    i_align |= VOUT_ALIGN_RIGHT;
+                    halign = VLC_VIDEO_ALIGN_RIGHT;
                 if( b_col_last )
-                    i_align |= VOUT_ALIGN_LEFT;
+                    halign = VLC_VIDEO_ALIGN_LEFT;
             }
             if( i_row > 1 )
             {
                 if( b_row_first )
-                    i_align |= VOUT_ALIGN_BOTTOM;
+                    valign = VLC_VIDEO_ALIGN_BOTTOM;
                 if( b_row_last )
-                    i_align |= VOUT_ALIGN_TOP;
+                    valign = VLC_VIDEO_ALIGN_TOP;
             }
 
             /* */
@@ -935,7 +932,8 @@ static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
             p_output->filter = cfg;
 
             /* */
-            p_output->i_align = i_align;
+            p_output->align.horizontal = halign;
+            p_output->align.vertical = valign;
             p_output->i_x = i_dst_x;
             p_output->i_y = i_dst_y;
 
