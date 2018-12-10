@@ -216,7 +216,7 @@ static picture_priv_t *picture_NewPrivate(const video_format_t *restrict p_fmt,
         return NULL;
     }
 
-    atomic_init( &priv->gc.refs, 1 );
+    atomic_init(&p_picture->refs, 1);
     priv->gc.opaque = NULL;
 
     return priv;
@@ -324,8 +324,7 @@ picture_t *picture_Hold( picture_t *p_picture )
 {
     assert( p_picture != NULL );
 
-    picture_priv_t *priv = (picture_priv_t *)p_picture;
-    uintptr_t refs = atomic_fetch_add( &priv->gc.refs, 1 );
+    uintptr_t refs = atomic_fetch_add(&p_picture->refs, 1);
     assert( refs > 0 );
     return p_picture;
 }
@@ -335,7 +334,7 @@ void picture_Release( picture_t *p_picture )
     assert( p_picture != NULL );
 
     picture_priv_t *priv = (picture_priv_t *)p_picture;
-    uintptr_t refs = atomic_fetch_sub( &priv->gc.refs, 1 );
+    uintptr_t refs = atomic_fetch_sub(&p_picture->refs, 1);
     assert( refs != 0 );
     if( refs > 1 )
         return;

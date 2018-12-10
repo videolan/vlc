@@ -27,6 +27,12 @@
 #define VLC_PICTURE_H 1
 
 #include <assert.h>
+#ifndef __cplusplus
+#include <stdatomic.h>
+#else
+#include <atomic>
+using std::atomic_uintptr_t;
+#endif
 
 /**
  * \file
@@ -112,6 +118,8 @@ struct picture_t
 
     /** Next picture in a FIFO a pictures */
     struct picture_t *p_next;
+
+    atomic_uintptr_t refs;
 };
 
 /**
