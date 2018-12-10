@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #include <vlc_fs.h>
 
 /*****************************************************************************
@@ -77,7 +76,6 @@ vlc_module_end()
  *****************************************************************************/
 
 /* */
-static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *);
 static int            Control(vout_display_t *, int, va_list);
 
@@ -88,8 +86,6 @@ struct vout_display_sys_t {
     FILE *f;
     bool  is_first;
     bool  is_yuv4mpeg2;
-
-    picture_pool_t *pool;
 };
 
 /* */
@@ -105,7 +101,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->is_first = false;
     sys->is_yuv4mpeg2 = var_InheritBool(vd, CFG_PREFIX "yuv4mpeg2");
-    sys->pool = NULL;
 
     /* */
     char *psz_fcc = var_InheritString(vd, CFG_PREFIX "chroma");
@@ -156,7 +151,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     *fmtp = fmt;
-    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -170,8 +164,6 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
     fclose(sys->f);
     free(sys);
 }
@@ -179,14 +171,6 @@ static void Close(vout_display_t *vd)
 /*****************************************************************************
  *
  *****************************************************************************/
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
-}
-
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
