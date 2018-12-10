@@ -78,10 +78,7 @@ vlc_module_end ()
  *****************************************************************************/
 struct vout_display_sys_t {
     int             fd;
-
-    picture_pool_t *pool;
 };
-static picture_pool_t *Pool(vout_display_t *, unsigned count);
 static void            Display(vout_display_t *, picture_t *);
 static int             Control(vout_display_t *, int, va_list);
 
@@ -98,7 +95,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->sys = sys = calloc(1, sizeof(*sys));
     if (!sys)
         return VLC_ENOMEM;
-    sys->pool = NULL;
     sys->fd = -1;
 
     /* */
@@ -143,7 +139,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     *fmtp = fmt;
 
-    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -156,19 +151,8 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
-
     net_Close(sys->fd);
     free(sys);
-}
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
