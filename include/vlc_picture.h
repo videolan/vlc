@@ -34,6 +34,7 @@
 using std::atomic_uintptr_t;
 using std::memory_order;
 using std::memory_order_relaxed;
+using std::memory_order_release;
 #endif
 
 /**
@@ -168,6 +169,14 @@ typedef struct
 VLC_API picture_t * picture_NewFromResource( const video_format_t *, const picture_resource_t * ) VLC_USED;
 
 /**
+ * Destroys a picture without references.
+ *
+ * This function destroys a picture with zero references left.
+ * Never call this function directly. Use picture_Release() instead.
+ */
+VLC_API void picture_Destroy(picture_t *picture);
+
+/**
  * Increments the picture reference count.
  *
  * \return picture
@@ -180,10 +189,20 @@ static inline picture_t *picture_Hold(picture_t *picture)
 }
 
 /**
- * This function will release a picture.
- * It will not have any effect on picture obtained from vout
+ * Decrements the picture reference count.
+ *
+ * If the reference count reaches zero, the picture is destroyed. If it was
+ * allocated from a pool, the underlying picture buffer will be returned to the
+ * pool. Otherwise, the picture buffer will be freed.
  */
-VLC_API void picture_Release( picture_t *p_picture );
+static inline void picture_Release(picture_t *picture)
+{
+    uintptr_t refs = atomic_fetch_sub_explicit(&picture->refs, (uintptr_t)1,
+                                               memory_order_release);
+    vlc_assert(refs > 0);
+    if (refs == 1)
+        picture_Destroy(picture);
+}
 
 /**
  * This function will copy all picture dynamic properties.

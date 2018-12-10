@@ -62,7 +62,7 @@ static void picture_DestroyFromResource( picture_t *p_picture )
 /**
  * Destroys a picture allocated with picture_NewFromFormat().
  */
-static void picture_Destroy(picture_t *pic)
+static void picture_DestroyFromFormat(picture_t *pic)
 {
     picture_buffer_t *res = pic->p_sys;
 
@@ -257,7 +257,7 @@ picture_t *picture_NewFromFormat(const video_format_t *restrict fmt)
     if (unlikely(priv == NULL))
         return NULL;
 
-    priv->gc.destroy = picture_Destroy;
+    priv->gc.destroy = picture_DestroyFromFormat;
 
     picture_t *pic = &priv->picture;
     if (pic->i_planes == 0) {
@@ -320,19 +320,17 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
  *
  *****************************************************************************/
 
-void picture_Release( picture_t *p_picture )
+void picture_Destroy(picture_t *picture)
 {
-    assert( p_picture != NULL );
+    /* See changes from other threads */
+    atomic_thread_fence(memory_order_acquire);
+    assert(atomic_load_explicit(&picture->refs, memory_order_relaxed) == 0);
 
-    picture_priv_t *priv = (picture_priv_t *)p_picture;
-    uintptr_t refs = atomic_fetch_sub(&p_picture->refs, 1);
-    assert( refs != 0 );
-    if( refs > 1 )
-        return;
+    PictureDestroyContext(picture);
 
-    PictureDestroyContext( p_picture );
-    assert( priv->gc.destroy != NULL );
-    priv->gc.destroy( p_picture );
+    picture_priv_t *priv = container_of(picture, picture_priv_t, picture);
+    assert(priv->gc.destroy != NULL);
+    priv->gc.destroy(picture);
 }
 
 /*****************************************************************************

@@ -298,7 +298,7 @@ NTPtime64
 picture_BlendSubpicture
 picture_Clone
 picture_CopyPixels
-picture_Release
+picture_Destroy
 picture_CopyProperties
 picture_Copy
 picture_Export
