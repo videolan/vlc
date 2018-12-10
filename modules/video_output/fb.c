@@ -87,8 +87,7 @@ vlc_module_begin ()
     add_obsolete_string("fb-aspect-ratio")
     add_integer("fb-mode", 4, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true)
-    add_bool("fb-hw-accel", true, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
-              true)
+    add_obsolete_bool("fb-hw-accel") /* since 4.0.0 */
     set_description(N_("GNU/Linux framebuffer video output"))
     set_capability("vout display", 30)
     set_callbacks(Open, Close)
@@ -134,7 +133,6 @@ struct vout_display_sys_t {
     bool                        has_pan;   /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *palette;                /* original palette */
-    bool                        is_hw_accel;         /* has hardware support */
 
     /* Video information */
     uint32_t width;
@@ -184,8 +182,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys)
         return VLC_ENOMEM;
 
-    /* Does the framebuffer uses hw acceleration? */
-    sys->is_hw_accel = var_InheritBool(vd, "fb-hw-accel");
     sys->fd = -1;
 
     /* Set tty and fb devices */
@@ -337,10 +333,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
     vout_display_sys_t *sys = vd->sys;
 
     if (!sys->pool) {
-        if (sys->is_hw_accel)
-            sys->pool = picture_pool_New(1, &sys->picture);
-        else
-            sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
     }
     return sys->pool;
 }
@@ -365,8 +358,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
         }
     }
 
-    if (!sys->is_hw_accel)
-        picture_Copy(sys->picture, picture);
+    picture_Copy(sys->picture, picture);
 }
 static int Control(vout_display_t *vd, int query, va_list args)
 {
