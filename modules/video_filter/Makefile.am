@@ -144,6 +144,10 @@ if HAVE_ARM64
 libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_arm64.S
 libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_ARM64
 endif
+if HAVE_SVE
+libdeinterlace_plugin_la_SOURCES += video_filter/deinterlace/merge_sve.S
+libdeinterlace_plugin_la_CFLAGS += -DCAN_COMPILE_SVE
+endif
 libdeinterlace_plugin_la_LIBADD = libdeinterlace_common.la
 video_filter_LTLIBRARIES += libdeinterlace_plugin.la
 
