@@ -408,7 +408,7 @@ VLC_API bool filter_chain_IsEmpty(const filter_chain_t *chain);
  *
  * \param chain filter chain
  */
-VLC_API const es_format_t *filter_chain_GetFmtOut(filter_chain_t *chain);
+VLC_API const es_format_t *filter_chain_GetFmtOut(const filter_chain_t *chain);
 
 /**
  * Apply the filter chain to a video picture.
