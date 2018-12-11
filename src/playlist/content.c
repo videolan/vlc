@@ -71,8 +71,6 @@ vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index, size_t count)
     playlist->has_prev = vlc_playlist_ComputeHasPrev(playlist);
     playlist->has_next = vlc_playlist_ComputeHasNext(playlist);
 
-    vlc_player_InvalidateNextMedia(playlist->player);
-
     vlc_playlist_item_t **items = &playlist->items.data[index];
     vlc_playlist_Notify(playlist, on_items_added, index, items, count);
     vlc_playlist_state_NotifyChanges(playlist, &state);
@@ -112,8 +110,6 @@ vlc_playlist_ItemsMoved(vlc_playlist_t *playlist, size_t index, size_t count,
     playlist->has_prev = vlc_playlist_ComputeHasPrev(playlist);
     playlist->has_next = vlc_playlist_ComputeHasNext(playlist);
 
-    vlc_player_InvalidateNextMedia(playlist->player);
-
     vlc_playlist_Notify(playlist, on_items_moved, index, count, target);
     vlc_playlist_state_NotifyChanges(playlist, &state);
 }
@@ -126,13 +122,14 @@ vlc_playlist_ItemsRemoving(vlc_playlist_t *playlist, size_t index, size_t count)
                           &playlist->items.data[index], count);
 }
 
-static void
+/* return whether the current media has changed */
+static bool
 vlc_playlist_ItemsRemoved(vlc_playlist_t *playlist, size_t index, size_t count)
 {
     struct vlc_playlist_state state;
     vlc_playlist_state_Save(playlist, &state);
 
-    bool invalidate_next_media = true;
+    bool current_media_changed = false;
     if (playlist->current != -1) {
         size_t current = (size_t) playlist->current;
         if (current >= index && current < index + count) {
@@ -144,10 +141,7 @@ vlc_playlist_ItemsRemoved(vlc_playlist_t *playlist, size_t index, size_t count)
                 /* no more items */
                 playlist->current = -1;
             }
-            /* change current playback */
-            vlc_playlist_SetCurrentMedia(playlist, playlist->current);
-            /* we changed the current media, this already resets the next */
-            invalidate_next_media = false;
+            current_media_changed = true;
         } else if (current >= index + count) {
             playlist->current -= count;
         }
@@ -158,8 +152,7 @@ vlc_playlist_ItemsRemoved(vlc_playlist_t *playlist, size_t index, size_t count)
     vlc_playlist_Notify(playlist, on_items_removed, index, count);
     vlc_playlist_state_NotifyChanges(playlist, &state);
 
-    if (invalidate_next_media)
-        vlc_player_InvalidateNextMedia(playlist->player);
+    return current_media_changed;
 }
 
 size_t
@@ -253,6 +246,7 @@ vlc_playlist_Insert(vlc_playlist_t *playlist, size_t index,
     }
 
     vlc_playlist_ItemsInserted(playlist, index, count);
+    vlc_player_InvalidateNextMedia(playlist->player);
 
     return VLC_SUCCESS;
 }
@@ -268,6 +262,7 @@ vlc_playlist_Move(vlc_playlist_t *playlist, size_t index, size_t count,
     vlc_vector_move_slice(&playlist->items, index, count, target);
 
     vlc_playlist_ItemsMoved(playlist, index, count, target);
+    vlc_player_InvalidateNextMedia(playlist->player);
 }
 
 void
@@ -283,7 +278,12 @@ vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count)
 
     vlc_vector_remove_slice(&playlist->items, index, count);
 
-    vlc_playlist_ItemsRemoved(playlist, index, count);
+    bool current_media_changed = vlc_playlist_ItemsRemoved(playlist, index,
+                                                           count);
+    if (current_media_changed)
+        vlc_playlist_SetCurrentMedia(playlist, playlist->current);
+    else
+        vlc_player_InvalidateNextMedia(playlist->player);
 }
 
 int
