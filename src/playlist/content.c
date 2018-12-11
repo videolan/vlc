@@ -155,6 +155,20 @@ vlc_playlist_ItemsRemoved(vlc_playlist_t *playlist, size_t index, size_t count)
     return current_media_changed;
 }
 
+static void
+vlc_playlist_ItemReplaced(vlc_playlist_t *playlist, size_t index)
+{
+    struct vlc_playlist_state state;
+    vlc_playlist_state_Save(playlist, &state);
+
+    playlist->has_prev = vlc_playlist_ComputeHasPrev(playlist);
+    playlist->has_next = vlc_playlist_ComputeHasNext(playlist);
+
+    vlc_playlist_Notify(playlist, on_items_updated, index,
+                        &playlist->items.data[index], 1);
+    vlc_playlist_state_NotifyChanges(playlist, &state);
+}
+
 size_t
 vlc_playlist_Count(vlc_playlist_t *playlist)
 {
@@ -286,6 +300,31 @@ vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count)
         vlc_player_InvalidateNextMedia(playlist->player);
 }
 
+static int
+vlc_playlist_Replace(vlc_playlist_t *playlist, size_t index,
+                     input_item_t *media)
+{
+    vlc_playlist_AssertLocked(playlist);
+    assert(index < playlist->items.size);
+
+    vlc_playlist_item_t *item = vlc_playlist_item_New(media);
+    if (!item)
+        return VLC_ENOMEM;
+
+    if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
+    {
+        randomizer_Remove(&playlist->randomizer,
+                          &playlist->items.data[index], 1);
+        randomizer_Add(&playlist->randomizer, &item, 1);
+    }
+
+    vlc_playlist_item_Release(playlist->items.data[index]);
+    playlist->items.data[index] = item;
+
+    vlc_playlist_ItemReplaced(playlist, index);
+    return VLC_SUCCESS;
+}
+
 int
 vlc_playlist_Expand(vlc_playlist_t *playlist, size_t index,
                     input_item_t *const media[], size_t count)
@@ -293,6 +332,37 @@ vlc_playlist_Expand(vlc_playlist_t *playlist, size_t index,
     vlc_playlist_AssertLocked(playlist);
     assert(index < playlist->items.size);
 
-    vlc_playlist_RemoveOne(playlist, index);
-    return vlc_playlist_Insert(playlist, index, media, count);
+    if (count == 0)
+        vlc_playlist_RemoveOne(playlist, index);
+    else
+    {
+        int ret = vlc_playlist_Replace(playlist, index, media[0]);
+        if (ret != VLC_SUCCESS)
+            return ret;
+
+        if (count > 1)
+        {
+            /* make space in the vector */
+            if (!vlc_vector_insert_hole(&playlist->items, index + 1, count - 1))
+                return VLC_ENOMEM;
+
+            /* create playlist items in place */
+            ret = vlc_playlist_MediaToItems(&media[1], count - 1,
+                                            &playlist->items.data[index + 1]);
+            if (ret != VLC_SUCCESS)
+            {
+                /* we were optimistic, it failed, restore the vector state */
+                vlc_vector_remove_slice(&playlist->items, index + 1, count - 1);
+                return ret;
+            }
+            vlc_playlist_ItemsInserted(playlist, index + 1, count - 1);
+        }
+
+        if ((ssize_t) index == playlist->current)
+            vlc_playlist_SetCurrentMedia(playlist, playlist->current);
+        else
+            vlc_player_InvalidateNextMedia(playlist->player);
+    }
+
+    return VLC_SUCCESS;
 }

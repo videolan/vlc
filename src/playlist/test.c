@@ -285,6 +285,10 @@ test_expand_item(void)
         assert(node);
     }
 
+    playlist->current = 8;
+    playlist->has_prev = true;
+    playlist->has_next = true;
+
     ret = vlc_playlist_ExpandItem(playlist, 8, root);
     assert(ret == VLC_SUCCESS);
     assert(vlc_playlist_Count(playlist) == 15);
@@ -300,6 +304,9 @@ test_expand_item(void)
     EXPECT_AT(13, 13);
 
     EXPECT_AT(14, 9);
+
+    /* item 8 will be replaced, the current must stay the same */
+    assert(playlist->current == 8);
 
     input_item_node_Delete(root);
     DestroyMediaArray(media, 16);
