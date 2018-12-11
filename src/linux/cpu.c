@@ -28,7 +28,7 @@
 #include <vlc_cpu.h>
 
 #undef CPU_FLAGS
-#if defined (__arm__)
+#if defined (__arm__) || defined (__aarch64__)
 # define CPU_FLAGS "Features\t:"
 
 #elif defined (__i386__) || defined (__x86_64__)
@@ -70,6 +70,10 @@ static void vlc_CPU_init (void)
 #if defined (__arm__)
             if (!strcmp (cap, "neon"))
                 core_caps |= VLC_CPU_ARM_NEON;
+
+#elif defined (__aarch64__)
+            if (!strcmp (cap, "sve"))
+                core_caps |= VLC_CPU_ARM_SVE;
 
 #elif defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))
