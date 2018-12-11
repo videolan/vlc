@@ -1506,6 +1506,29 @@ asm volatile("uhadd v0.8b, v0.8b, v1.8b":::"v0");
 ])
 AM_CONDITIONAL([HAVE_ARM64], [test "${ac_cv_arm64}" = "yes"])
 
+AC_ARG_ENABLE([sve],
+  AS_HELP_STRING([--disable-sve],
+    [disable ARM SVE optimizations (default auto)]),, [
+  AS_IF([test "${host_cpu}" = "aarch64"], [enable_sve="yes"] ,[enable_sve="no"])
+])
+AS_IF([test "${enable_sve}" != "no"], [
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -march=armv8-a+sve"
+  AC_CACHE_CHECK([if $CCAS groks ARM SVE assembly], [ac_cv_arm_sve], [
+    AC_COMPILE_IFELSE([
+      AC_LANG_PROGRAM(,[[
+asm volatile("ptrue p0.s" ::: "p0");
+]])
+    ], [
+      ac_cv_arm_sve="yes"
+    ], [
+      ac_cv_arm_sve="no"
+    ])
+  ])
+  VLC_RESTORE_FLAGS
+])
+AM_CONDITIONAL([HAVE_SVE], [test "${ac_cv_arm_sve}" = "yes"])
+
 
 AC_ARG_ENABLE([altivec],
   AS_HELP_STRING([--disable-altivec],
