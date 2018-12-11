@@ -56,8 +56,7 @@ vlc_playlist_ItemsReset(vlc_playlist_t *playlist)
     vlc_playlist_state_NotifyChanges(playlist, &state);
 }
 
-/* not static, it's called from preparse.c */
-void
+static void
 vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index, size_t count)
 {
     if (playlist->order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM)
@@ -285,4 +284,15 @@ vlc_playlist_Remove(vlc_playlist_t *playlist, size_t index, size_t count)
     vlc_vector_remove_slice(&playlist->items, index, count);
 
     vlc_playlist_ItemsRemoved(playlist, index, count);
+}
+
+int
+vlc_playlist_Expand(vlc_playlist_t *playlist, size_t index,
+                    input_item_t *const media[], size_t count)
+{
+    vlc_playlist_AssertLocked(playlist);
+    assert(index < playlist->items.size);
+
+    vlc_playlist_RemoveOne(playlist, index);
+    return vlc_playlist_Insert(playlist, index, media, count);
 }

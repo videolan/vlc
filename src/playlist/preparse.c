@@ -29,42 +29,36 @@
 #include "playlist.h"
 #include "libvlc.h" /* for vlc_MetadataRequest() */
 
+typedef struct VLC_VECTOR(input_item_t *) media_vector_t;
+
 static void
-vlc_playlist_CollectChildren(playlist_item_vector_t *dest,
-                             input_item_node_t *node)
+vlc_playlist_CollectChildren(media_vector_t *dest, input_item_node_t *node)
 {
     for (int i = 0; i < node->i_children; ++i)
     {
         input_item_node_t *child = node->pp_children[i];
-        vlc_playlist_item_t *item = vlc_playlist_item_New(child->p_item);
-        if (item)
-        {
-            if (!vlc_vector_push(dest, item))
-                vlc_playlist_item_Release(item);
-        }
+        input_item_t *media = child->p_item;
+        vlc_vector_push(dest, media);
         vlc_playlist_CollectChildren(dest, child);
     }
 }
 
-bool
+int
 vlc_playlist_ExpandItem(vlc_playlist_t *playlist, size_t index,
                         input_item_node_t *node)
 {
     vlc_playlist_AssertLocked(playlist);
-    vlc_playlist_RemoveOne(playlist, index);
 
-    playlist_item_vector_t flatten = VLC_VECTOR_INITIALIZER;
+    media_vector_t flatten = VLC_VECTOR_INITIALIZER;
     vlc_playlist_CollectChildren(&flatten, node);
 
-    if (vlc_vector_insert_all(&playlist->items, index, flatten.data,
-                              flatten.size))
-        vlc_playlist_ItemsInserted(playlist, index, flatten.size);
-
+    int ret = vlc_playlist_Expand(playlist, index, flatten.data, flatten.size);
     vlc_vector_destroy(&flatten);
-    return true;
+
+    return ret;
 }
 
-bool
+int
 vlc_playlist_ExpandItemFromNode(vlc_playlist_t *playlist,
                                 input_item_node_t *subitems)
 {
@@ -72,11 +66,10 @@ vlc_playlist_ExpandItemFromNode(vlc_playlist_t *playlist,
     input_item_t *media = subitems->p_item;
     ssize_t index = vlc_playlist_IndexOfMedia(playlist, media);
     if (index == -1)
-        return false;
+        return VLC_ENOITEM;
 
     /* replace the item by its flatten subtree */
-    vlc_playlist_ExpandItem(playlist, index, subitems);
-    return true;
+    return vlc_playlist_ExpandItem(playlist, index, subitems);
 }
 
 static void

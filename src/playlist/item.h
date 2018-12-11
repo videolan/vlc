@@ -24,6 +24,7 @@
 #include <vlc_atomic.h>
 
 typedef struct vlc_playlist_item vlc_playlist_item_t;
+typedef struct input_item_t input_item_t;
 
 struct vlc_playlist_item
 {

@@ -285,8 +285,8 @@ test_expand_item(void)
         assert(node);
     }
 
-    bool ok = vlc_playlist_ExpandItem(playlist, 8, root);
-    assert(ok);
+    ret = vlc_playlist_ExpandItem(playlist, 8, root);
+    assert(ret == VLC_SUCCESS);
     assert(vlc_playlist_Count(playlist) == 15);
     EXPECT_AT(7, 7);
 

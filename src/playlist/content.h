@@ -22,14 +22,15 @@
 #define VLC_PLAYLIST_CONTENT_H
 
 typedef struct vlc_playlist vlc_playlist_t;
+typedef struct input_item_t input_item_t;
 
 /* called by vlc_playlist_Delete() in playlist.c */
 void
 vlc_playlist_ClearItems(vlc_playlist_t *playlist);
 
-/* called by vlc_playlist_ExpandItem() in preparse.c */
-void
-vlc_playlist_ItemsInserted(vlc_playlist_t *playlist, size_t index,
-                           size_t count);
+/* expand an item (replace it by the given media array) */
+int
+vlc_playlist_Expand(vlc_playlist_t *playlist, size_t index,
+                    input_item_t *const media[], size_t count);
 
 #endif
