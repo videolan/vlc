@@ -47,10 +47,9 @@ static const video_format_t* filtered_video_format( sout_stream_id_sys_t *id,
     assert( id && p_pic );
     if( id->p_uf_chain )
         return &filter_chain_GetFmtOut( id->p_uf_chain )->video;
-    else if( id->p_f_chain )
+    if( id->p_f_chain )
         return &filter_chain_GetFmtOut( id->p_f_chain )->video;
-    else
-        return &p_pic->format;
+    return &p_pic->format;
 }
 
 static int video_update_format_decoder( decoder_t *p_dec )

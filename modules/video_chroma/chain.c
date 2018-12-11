@@ -197,7 +197,7 @@ static int Activate( filter_t *p_filter, int (*pf_build)(filter_t *) )
         free( p_sys );
         return VLC_EGENERIC;
     }
-    else if( p_filter->b_allow_fmt_out_change )
+    if( p_filter->b_allow_fmt_out_change )
     {
         es_format_Clean( &p_filter->fmt_out );
         es_format_Copy( &p_filter->fmt_out,
