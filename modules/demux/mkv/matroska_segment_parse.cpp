@@ -249,6 +249,9 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         unsigned int i_display_unit;
         unsigned int i_display_width;
         unsigned int i_display_height;
+
+        unsigned int chroma_sit_vertical;
+        unsigned int chroma_sit_horizontal;
       } track_video_info;
 
     } metadata_payload = {
@@ -489,6 +492,34 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             unsigned int i_display_unit   = vars.track_video_info.i_display_unit; VLC_UNUSED(i_display_unit);
             unsigned int i_display_width  = vars.track_video_info.i_display_width;
             unsigned int i_display_height = vars.track_video_info.i_display_height;
+
+            if (vars.track_video_info.chroma_sit_vertical || vars.track_video_info.chroma_sit_horizontal)
+            {
+                switch (vars.track_video_info.chroma_sit_vertical)
+                {
+                case 0: // unspecified
+                case 2: // center
+                    if (vars.track_video_info.chroma_sit_horizontal == 1) // left
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_LEFT;
+                    else if (vars.track_video_info.chroma_sit_horizontal == 2) // half
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_CENTER;
+                    else
+                        debug( vars, "unsupported chroma Siting %u/%u",
+                               vars.track_video_info.chroma_sit_horizontal,
+                               vars.track_video_info.chroma_sit_vertical);
+                    break;
+                case 1: // top
+                    if (vars.track_video_info.chroma_sit_horizontal == 1) // left
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_TOP_LEFT;
+                    else if (vars.track_video_info.chroma_sit_horizontal == 2) // half
+                        tk->fmt.video.chroma_location = CHROMA_LOCATION_TOP_CENTER;
+                    else
+                        debug( vars, "unsupported chroma Siting %u/%u",
+                               vars.track_video_info.chroma_sit_horizontal,
+                               vars.track_video_info.chroma_sit_vertical);
+                    break;
+                }
+            }
 
             if( i_display_height && i_display_width )
             {
@@ -798,6 +829,34 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
                 debug( vars, "Colour Matrix=%d", static_cast<uint8>(matrix) );
             else
                 debug( vars, "Colour Matrix=%s", name );
+        }
+        E_CASE( KaxVideoChromaSitHorz, chroma_hor )
+        {
+            const char *name = nullptr;
+            vars.track_video_info.chroma_sit_horizontal = static_cast<uint8>(chroma_hor);
+            switch( static_cast<uint8>(chroma_hor) )
+            {
+            case 0: name = "unspecified"; break;
+            case 1: name = "left";        break;
+            case 2: name = "center";      break;
+            default:
+                debug( vars, "Unsupported Horizontal Chroma Siting=%d", static_cast<uint8>(chroma_hor) );
+            }
+            if (name != nullptr) debug( vars, "Chroma Siting Horizontal=%s", name);
+        }
+        E_CASE( KaxVideoChromaSitVert, chroma_ver )
+        {
+            const char *name = nullptr;
+            vars.track_video_info.chroma_sit_vertical = static_cast<uint8>(chroma_ver);
+            switch( static_cast<uint8>(chroma_ver) )
+            {
+            case 0: name = "unspecified"; break;
+            case 1: name = "left";        break;
+            case 2: name = "center";      break;
+            default:
+                debug( vars, "Unsupported Vertical Chroma Siting=%d", static_cast<uint8>(chroma_ver) );
+            }
+            if (name != nullptr) debug( vars, "Chroma Siting Vertical=%s", name);
         }
         E_CASE( KaxVideoColourMaxCLL, maxCLL )
         {
