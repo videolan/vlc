@@ -24,7 +24,7 @@ OPTIONS:
    -p            Use a Prebuilt contrib package (speeds up compilation)
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
-   -i <n|r|u>    Create an Installer (n: nightly, r: release, u: unsigned release archive)
+   -i <n|r|u|m>  Create an Installer (n: nightly, r: release, u: unsigned release archive, m: msi only)
    -s            Interactive shell (get correct environment variables for build)
    -b <url>      Enable breakpad support and send crash reports to this URL
 EOF
@@ -168,4 +168,6 @@ make package-win32
 elif [ "$INSTALLER" = "u" ]; then
 make package-win32-release
 sha512sum vlc-*-release.7z
+elif [ "$INSTALLER" = "m" ]; then
+make package-msi
 fi
