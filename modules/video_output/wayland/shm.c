@@ -39,7 +39,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #include <vlc_fs.h>
 
 #define MAX_PICTURES 4
@@ -52,7 +51,6 @@ struct vout_display_sys_t
     struct wp_viewporter *viewporter;
     struct wp_viewport *viewport;
 
-    picture_pool_t *pool; /* picture pool */
     size_t active_buffers;
 
     int x;
@@ -85,40 +83,6 @@ static const struct wl_buffer_listener buffer_cbs =
 {
     buffer_release_cb,
 };
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool != NULL)
-        return sys->pool;
-
-    if (req > MAX_PICTURES)
-        req = MAX_PICTURES;
-
-    picture_t *pics[MAX_PICTURES];
-    unsigned count = 0;
-
-    while (count < req)
-    {
-        picture_t *pic = picture_NewFromFormat(&vd->fmt);
-        if (unlikely(pic == NULL))
-            break;
-
-        pics[count++] = pic;
-    }
-
-    if (count == 0)
-        return NULL;
-
-    sys->pool = picture_pool_New (count, pics);
-    if (unlikely(sys->pool == NULL))
-    {
-        while (count > 0)
-            picture_Release(pics[--count]);
-    }
-    return sys->pool;
-}
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)
@@ -192,17 +156,6 @@ static void Display(vout_display_t *vd, picture_t *pic)
     (void) pic;
 }
 
-static void ResetPictures(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (sys->pool == NULL)
-        return;
-
-    /* Destroy the buffers */
-    picture_pool_Release(sys->pool);
-    sys->pool = NULL;
-}
-
 static int Control(vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -230,8 +183,6 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                                              / src.i_visible_width;
             fmt->i_y_offset = src.i_y_offset * place.height
                                              / src.i_visible_height;
-
-            ResetPictures(vd);
             break;
         }
 
@@ -340,7 +291,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->eventq = NULL;
     sys->shm = NULL;
     sys->viewporter = NULL;
-    sys->pool = NULL;
     sys->active_buffers = 0;
     sys->x = 0;
     sys->y = 0;
@@ -406,7 +356,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     vd->info.has_pictures_invalid = sys->viewport == NULL;
 
-    vd->pool = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -426,8 +375,6 @@ static void Close(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;
-
-    ResetPictures(vd);
 
     wl_surface_attach(surface, NULL, 0, 0);
     wl_surface_commit(surface);
