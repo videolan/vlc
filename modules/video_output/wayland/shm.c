@@ -54,6 +54,9 @@ struct vout_display_sys_t
     struct wp_viewport *viewport;
 
     picture_pool_t *pool; /* picture pool */
+    size_t picsize;
+    size_t stride;
+    size_t active_buffers;
 
     int x;
     int y;
@@ -61,6 +64,15 @@ struct vout_display_sys_t
     unsigned display_height;
     bool use_buffer_transform;
 };
+
+struct buffer_data
+{
+    picture_t *picture;
+    size_t *counter;
+};
+
+static_assert (sizeof (vout_display_sys_t) >= MAX_PICTURES,
+               "Pointer arithmetic error");
 
 static void PictureDestroy(picture_t *pic)
 {
@@ -72,11 +84,12 @@ static void PictureDestroy(picture_t *pic)
 
 static void buffer_release_cb(void *data, struct wl_buffer *buffer)
 {
-    picture_t *pic = data;
+    struct buffer_data *d = data;
 
-    assert(pic != NULL);
-    wl_buffer_set_user_data(buffer, NULL);
-    picture_Release(pic);
+    picture_Release(d->picture);
+    (*(d->counter))--;
+    free(d);
+    wl_buffer_destroy(buffer);
 }
 
 static const struct wl_buffer_listener buffer_cbs =
@@ -102,11 +115,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     }
 
     /* We need one extra line to cover for horizontal crop offset */
-    unsigned stride = 4 * ((vd->fmt.i_width + 31) & ~31);
+    sys->stride = 4 * ((vd->fmt.i_width + 31) & ~31);
     unsigned lines = (vd->fmt.i_height + 31 + (sys->viewport == NULL)) & ~31;
     const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
-    size_t picsize = ((stride * lines) + pagemask) & ~pagemask;
-    size_t length = picsize * req;
+    sys->picsize = ((sys->stride * lines) + pagemask) & ~pagemask;
+    size_t length = sys->picsize * req;
 
     if (ftruncate(fd, length))
     {
@@ -140,41 +153,28 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
         .p = {
             [0] = {
                 .i_lines = lines,
-                .i_pitch = stride,
+                .i_pitch = sys->stride,
             },
         },
     };
     size_t offset = 0;
-    unsigned width = vd->fmt.i_visible_width;
-    unsigned height = vd->fmt.i_visible_height;
     unsigned count = 0;
 
     if (sys->viewport == NULL) /* Poor man's crop */
-        offset += 4 * vd->fmt.i_x_offset + stride * vd->fmt.i_y_offset;
+        offset += 4 * vd->fmt.i_x_offset + sys->stride * vd->fmt.i_y_offset;
 
     while (count < req)
     {
-        struct wl_buffer *buf;
-
-        buf = wl_shm_pool_create_buffer(sys->shm_pool, offset, width, height,
-                                        stride, WL_SHM_FORMAT_XRGB8888);
-        if (buf == NULL)
-            break;
-
-        res.p_sys = buf;
+        res.p_sys = ((char *)sys) + count;
         res.p[0].p_pixels = base;
-        base = ((char *)base) + picsize;
-        offset += picsize;
-        length -= picsize;
+        base = ((char *)base) + sys->picsize;
+        offset += sys->picsize;
+        length -= sys->picsize;
 
         picture_t *pic = picture_NewFromResource(&vd->fmt, &res);
         if (unlikely(pic == NULL))
-        {
-            wl_buffer_destroy(buf);
             break;
-        }
 
-        wl_buffer_add_listener(buf, &buffer_cbs, NULL);
         pics[count++] = pic;
     }
 
@@ -201,15 +201,38 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;
-    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
+    struct wl_buffer *buf;
+    unsigned idx = ((char *)pic->p_sys) - ((char *)sys);
+    struct buffer_data *d = malloc(sizeof (*d));
+    off_t offset = sys->picsize * idx;
+
+    if (unlikely(d == NULL))
+        return;
+
+    d->picture = pic;
+    d->counter = &sys->active_buffers;
+
+    if (sys->viewport == NULL) /* Poor man's crop */
+        offset += 4 * vd->fmt.i_x_offset + sys->stride * vd->fmt.i_y_offset;
+
+    buf = wl_shm_pool_create_buffer(sys->shm_pool, offset,
+                                    vd->fmt.i_visible_width,
+                                    vd->fmt.i_visible_height, sys->stride,
+                                    WL_SHM_FORMAT_XRGB8888);
+    if (buf == NULL)
+    {
+        free(d);
+        return;
+    }
 
     picture_Hold(pic);
 
-    wl_buffer_set_user_data(buf, pic);
+    wl_buffer_add_listener(buf, &buffer_cbs, d);
     wl_surface_attach(surface, buf, 0, 0);
     wl_surface_damage(surface, 0, 0, sys->display_width, sys->display_height);
     wl_display_flush(display);
 
+    sys->active_buffers++;
     sys->x = 0;
     sys->y = 0;
 
@@ -228,35 +251,11 @@ static void Display(vout_display_t *vd, picture_t *pic)
     (void) pic;
 }
 
-static void PictureCheckAttached(void *data, picture_t *pic)
-{
-    unsigned *countp = data;
-
-    (*countp) += wl_buffer_get_user_data(pic->p_sys) != NULL;
-}
-
-static unsigned CountActiveBuffers(picture_pool_t *pool)
-{
-    unsigned count = 0;
-
-    picture_pool_Enum(pool, PictureCheckAttached, &count);
-    return count;
-}
-
-static void PictureBufferDestroy(void *data, picture_t *pic)
-{
-    struct wl_buffer *buf = (struct wl_buffer *)pic->p_sys;
-
-    wl_buffer_destroy(buf);
-    (void) data;
-}
-
 static void ResetPictures(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;
-
     if (sys->pool == NULL)
         return;
 
@@ -265,11 +264,13 @@ static void ResetPictures(vout_display_t *vd)
     wl_surface_commit(surface);
 
     /* Wait until all picture buffers are released by the server */
-    while (CountActiveBuffers(sys->pool) > 0)
+    while (sys->active_buffers > 0) {
+        msg_Dbg(vd, "%zu buffer(s) still active", sys->active_buffers);
         wl_display_roundtrip_queue(display, sys->eventq);
+    }
+    msg_Dbg(vd, "no active buffers left");
 
     /* Destroy the buffers */
-    picture_pool_Enum(sys->pool, PictureBufferDestroy, NULL);
     picture_pool_Release(sys->pool);
     sys->pool = NULL;
 }
@@ -412,6 +413,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->shm = NULL;
     sys->viewporter = NULL;
     sys->pool = NULL;
+    sys->active_buffers = 0;
     sys->x = 0;
     sys->y = 0;
     sys->display_width = cfg->display.width;
