@@ -3125,6 +3125,8 @@ AS_IF([test "${enable_xcb}" != "no"], [
     xcb_err="$xcb_err ${XCB_COMPOSITE_PKG_ERRORS}."])
   PKG_CHECK_MODULES([XCB_RANDR], [xcb-randr >= 1.3],, [
     xcb_err="$xcb_err ${XCB_RANDR_PKG_ERRORS}."])
+  PKG_CHECK_MODULES([XCB_RENDER], [xcb-render],, [
+    xcb_err="$xcb_err ${XCB_RENDER_PKG_ERRORS}."])
   PKG_CHECK_MODULES([XCB_SHM], [xcb-shm >= 1.9.2],, [
     xcb_err="$xcb_err ${XCB_SHM_PKG_ERRORS}."])
   PKG_CHECK_MODULES([XCB_XKB], [xcb-xkb],, [

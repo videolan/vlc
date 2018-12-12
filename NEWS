@@ -37,6 +37,7 @@ Access output:
  * Added support for the RIST (Reliable Internet Stream Transport) Protocol
 
 Video output:
+ * Added X11 RENDER video output plugin
  * Remove aa plugin
  * Remove evas plugin
  * Remove omxil_vout plugin

@@ -191,6 +191,14 @@ libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 libxcb_x11_plugin_la_LIBADD = libvlc_xcb_events.la \
 	$(XCB_LIBS) $(XCB_SHM_LIBS)
 
+libxcb_render_plugin_la_SOURCES = \
+	video_output/xcb/pictures.c video_output/xcb/pictures.h \
+	video_output/xcb/render.c
+libxcb_render_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_RENDER_CFLAGS)
+libxcb_render_plugin_la_LIBADD = libvlc_xcb_events.la \
+	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_RENDER_LIBS)
+
 libxcb_xv_plugin_la_SOURCES = \
 	video_output/xcb/pictures.c video_output/xcb/pictures.h \
 	video_output/xcb/xvideo.c
@@ -218,7 +226,7 @@ libglx_plugin_la_LIBADD = $(GL_LIBS) $(X_LIBS) $(X_PRE_LIBS) -lX11
 
 if HAVE_XCB
 pkglib_LTLIBRARIES += libvlc_xcb_events.la
-vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_window_plugin.la
+vout_LTLIBRARIES += libxcb_x11_plugin.la libxcb_render_plugin.la libxcb_window_plugin.la
 if HAVE_XKBCOMMON_X11
 libxcb_window_plugin_la_SOURCES += \
 	video_output/xcb/keysym.h video_output/xcb/xcb_keysym.h \
