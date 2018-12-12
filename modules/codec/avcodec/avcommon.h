@@ -210,6 +210,30 @@ static inline void set_video_color_settings( const video_format_t *p_fmt, AVCode
             p_context->color_primaries = AVCOL_PRI_UNSPECIFIED;
             break;
     }
+    switch( p_fmt->chroma_location )
+    {
+        case CHROMA_LOCATION_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_LEFT;
+            break;
+        case CHROMA_LOCATION_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_CENTER;
+            break;
+        case CHROMA_LOCATION_TOP_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_TOPLEFT;
+            break;
+        case CHROMA_LOCATION_TOP_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_TOP;
+            break;
+        case CHROMA_LOCATION_BOTTOM_LEFT:
+            p_context->chroma_sample_location = AVCHROMA_LOC_BOTTOMLEFT;
+            break;
+        case CHROMA_LOCATION_BOTTOM_CENTER:
+            p_context->chroma_sample_location = AVCHROMA_LOC_BOTTOM;
+            break;
+        default:
+            p_context->chroma_sample_location = AVCHROMA_LOC_UNSPECIFIED;
+            break;
+    }
 }
 
 #endif
