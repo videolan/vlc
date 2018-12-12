@@ -763,6 +763,42 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             else
                 debug( vars, "Colour Primaries=%s", name );
         }
+        E_CASE( KaxVideoColourMatrix, matrix )
+        {
+            vars.tk->fmt.video.space = iso_23001_8_mc_to_vlc_coeffs( static_cast<uint8>(matrix) );
+            const char *name = nullptr;
+            switch( static_cast<uint8>(matrix) )
+            {
+            case 1: name = "BT-709";
+                break;
+            case 6: name = "SMPTE 170M";
+                break;
+            case 7: name = "SMPTE 240M";
+                break;
+            case 9: name = "BT.2020 Non-constant Luminance";
+                break;
+            case 10: name = "BT.2020 Constant Luminance";
+                break;
+            case 0: // Identity
+            case 2: // unspecified
+            case 3: // reserved
+            case 4: // US FCC 73.682
+            case 5: // ITU-R BT.470BG
+            case 8: // YCoCg
+            case 11: // SMPTE ST 2085
+            case 12: // Chroma-derived Non-constant Luminance
+            case 13: // Chroma-derived Constant Luminance
+            case 14: // ITU-R BT.2100
+            default:
+                break;
+            }
+            if (vars.tk->fmt.video.space == COLOR_SPACE_UNDEF)
+                debug( vars, "Unsupported Colour Matrix=%d", static_cast<uint8>(matrix) );
+            else if (name == nullptr)
+                debug( vars, "Colour Matrix=%d", static_cast<uint8>(matrix) );
+            else
+                debug( vars, "Colour Matrix=%s", name );
+        }
         E_CASE( KaxVideoColourMaxCLL, maxCLL )
         {
             debug( vars, "Video Max Pixel Brightness");
