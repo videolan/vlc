@@ -305,12 +305,3 @@ unsigned picture_pool_GetSize(const picture_pool_t *pool)
 {
     return pool->picture_count;
 }
-
-void picture_pool_Enum(picture_pool_t *pool, void (*cb)(void *, picture_t *),
-                       void *opaque)
-{
-    /* NOTE: So far, the pictures table cannot change after the pool is created
-     * so there is no need to lock the pool mutex here. */
-    for (unsigned i = 0; i < pool->picture_count; i++)
-        cb(opaque, pool->picture[i]);
-}
