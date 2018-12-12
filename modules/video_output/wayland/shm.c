@@ -49,7 +49,6 @@ struct vout_display_sys_t
     vout_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
     struct wl_shm *shm;
-    struct wl_shm_pool *shm_pool;
     struct wp_viewporter *viewporter;
     struct wp_viewport *viewport;
 
@@ -58,6 +57,7 @@ struct vout_display_sys_t
     size_t stride;
     size_t active_buffers;
 
+    int fd;
     int x;
     int y;
     unsigned display_width;
@@ -139,13 +139,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     memset(base, 0x80, length); /* gray fill */
 #endif
 
-    sys->shm_pool = wl_shm_create_pool(sys->shm, fd, length);
-    vlc_close(fd);
-    if (sys->shm_pool == NULL)
-    {
-        munmap(base, length);
-        return NULL;
-    }
+    sys->fd = fd;
 
     picture_t *pics[MAX_PICTURES];
     picture_resource_t res = {
@@ -201,6 +195,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;
+    struct wl_shm_pool *pool;
     struct wl_buffer *buf;
     unsigned idx = ((char *)pic->p_sys) - ((char *)sys);
     struct buffer_data *d = malloc(sizeof (*d));
@@ -215,10 +210,17 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     if (sys->viewport == NULL) /* Poor man's crop */
         offset += 4 * vd->fmt.i_x_offset + sys->stride * vd->fmt.i_y_offset;
 
-    buf = wl_shm_pool_create_buffer(sys->shm_pool, offset,
-                                    vd->fmt.i_visible_width,
+    pool = wl_shm_create_pool(sys->shm, sys->fd, offset + sys->picsize);
+    if (pool == NULL)
+    {
+        free(d);
+        return;
+    }
+
+    buf = wl_shm_pool_create_buffer(pool, offset, vd->fmt.i_visible_width,
                                     vd->fmt.i_visible_height, sys->stride,
                                     WL_SHM_FORMAT_XRGB8888);
+    wl_shm_pool_destroy(pool);
     if (buf == NULL)
     {
         free(d);
@@ -259,7 +261,7 @@ static void ResetPictures(vout_display_t *vd)
     if (sys->pool == NULL)
         return;
 
-    wl_shm_pool_destroy(sys->shm_pool);
+    vlc_close(sys->fd);
     wl_surface_attach(surface, NULL, 0, 0);
     wl_surface_commit(surface);
 
