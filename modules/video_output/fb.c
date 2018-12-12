@@ -590,6 +590,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
     picture_resource_t rsc = {
        .p = {
            [0] = {
+               .p_pixels = sys->video_ptr,
                .i_lines = sys->var_info.yres,
                .i_pitch = fix_info.line_length,
            },
