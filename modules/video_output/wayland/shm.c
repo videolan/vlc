@@ -49,6 +49,7 @@ struct vout_display_sys_t
     vout_window_t *embed; /* VLC window */
     struct wl_event_queue *eventq;
     struct wl_shm *shm;
+    struct wl_shm_pool *shm_pool;
     struct wp_viewporter *viewporter;
     struct wp_viewport *viewport;
 
@@ -125,9 +126,9 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     memset(base, 0x80, length); /* gray fill */
 #endif
 
-    struct wl_shm_pool *shm_pool = wl_shm_create_pool(sys->shm, fd, length);
+    sys->shm_pool = wl_shm_create_pool(sys->shm, fd, length);
     vlc_close(fd);
-    if (shm_pool == NULL)
+    if (sys->shm_pool == NULL)
     {
         munmap(base, length);
         return NULL;
@@ -155,7 +156,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     {
         struct wl_buffer *buf;
 
-        buf = wl_shm_pool_create_buffer(shm_pool, offset, width, height,
+        buf = wl_shm_pool_create_buffer(sys->shm_pool, offset, width, height,
                                         stride, WL_SHM_FORMAT_XRGB8888);
         if (buf == NULL)
             break;
@@ -177,7 +178,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
         pics[count++] = pic;
     }
 
-    wl_shm_pool_destroy(shm_pool);
     wl_display_flush(sys->embed->display.wl);
 
     if (length > 0)
@@ -260,6 +260,7 @@ static void ResetPictures(vout_display_t *vd)
     if (sys->pool == NULL)
         return;
 
+    wl_shm_pool_destroy(sys->shm_pool);
     wl_surface_attach(surface, NULL, 0, 0);
     wl_surface_commit(surface);
 
