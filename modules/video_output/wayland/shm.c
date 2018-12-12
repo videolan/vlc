@@ -195,20 +195,8 @@ static void Display(vout_display_t *vd, picture_t *pic)
 static void ResetPictures(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
-    struct wl_display *display = sys->embed->display.wl;
-    struct wl_surface *surface = sys->embed->handle.wl;
     if (sys->pool == NULL)
         return;
-
-    wl_surface_attach(surface, NULL, 0, 0);
-    wl_surface_commit(surface);
-
-    /* Wait until all picture buffers are released by the server */
-    while (sys->active_buffers > 0) {
-        msg_Dbg(vd, "%zu buffer(s) still active", sys->active_buffers);
-        wl_display_roundtrip_queue(display, sys->eventq);
-    }
-    msg_Dbg(vd, "no active buffers left");
 
     /* Destroy the buffers */
     picture_pool_Release(sys->pool);
@@ -436,15 +424,27 @@ error:
 static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
+    struct wl_display *display = sys->embed->display.wl;
+    struct wl_surface *surface = sys->embed->handle.wl;
 
     ResetPictures(vd);
+
+    wl_surface_attach(surface, NULL, 0, 0);
+    wl_surface_commit(surface);
+
+    /* Wait until all picture buffers are released by the server */
+    while (sys->active_buffers > 0) {
+        msg_Dbg(vd, "%zu buffer(s) still active", sys->active_buffers);
+        wl_display_roundtrip_queue(display, sys->eventq);
+    }
+    msg_Dbg(vd, "no active buffers left");
 
     if (sys->viewport != NULL)
         wp_viewport_destroy(sys->viewport);
     if (sys->viewporter != NULL)
         wp_viewporter_destroy(sys->viewporter);
     wl_shm_destroy(sys->shm);
-    wl_display_flush(sys->embed->display.wl);
+    wl_display_flush(display);
     wl_event_queue_destroy(sys->eventq);
     free(sys);
 }
