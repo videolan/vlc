@@ -84,7 +84,6 @@ cmake-$(CMAKE_VERSION).tar.gz:
 
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(UNPACK)
-	$(APPLY) cmake-winstore.patch
 	$(MOVE)
 
 .cmake: cmake
