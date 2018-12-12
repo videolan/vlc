@@ -37,6 +37,8 @@ extern "C" {
 #include "../mp4/libmp4.h"
 }
 
+#include "../../packetizer/iso_color_tables.h"
+
 #include <vlc_codecs.h>
 #include <stdexcept>
 #include <limits>
@@ -691,72 +693,75 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoColourTransferCharacter, tranfer )
         {
+            vars.tk->fmt.video.transfer = iso_23001_8_tc_to_vlc_xfer( static_cast<uint8>(tranfer) );
+            const char *name = nullptr;
             switch( static_cast<uint8>(tranfer) )
             {
-            case 1: // BT-709
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT709;
+            case 1: name = "BT-709";
                 break;
-            case 4: // Gamma 2.2
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SRGB;
+            case 4: name = "BT.470BM";
                 break;
-            case 5: // Gamma 2.8
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_BT470_BG;
+            case 5: name = "BT.470BG";
                 break;
-            case 6: // SMPTE 170
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_170;
+            case 6: name = "SMPTE 170M";
                 break;
-            case 7: // SMPTE 240M
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_240;
+            case 7: name = "SMPTE 240M";
                 break;
-            case 8: // Linear
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_LINEAR;
+            case 8: name = "linear";
                 break;
-            case 16: // SMPTE ST-2084
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_SMPTE_ST2084;
+            case 13: name = "sRGB/sYCC";
                 break;
-            case 18: // ARIB STD-B67
-                vars.tk->fmt.video.transfer = TRANSFER_FUNC_ARIB_B67;
+            case 16: name = "BT.2100 PQ";
+                break;
+            case 18: name = "HLG";
                 break;
             case 9:  // Log
             case 10: // Log SQRT
             case 11: // IEC 61966-2-4
             case 12: // ITU-R BT.1361 Extended Colour Gamut
-            case 13: // IEC 61966-2-1
             case 14: // ITU-R BT.2020 10 bit
             case 15: // ITU-R BT.2020 12 bit
             case 17: // SMPTE ST 428-1
             default:
-                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+                break;
             }
+            if (vars.tk->fmt.video.transfer == TRANSFER_FUNC_UNDEF)
+                debug( vars, "Unsupported Colour Transfer=%d", static_cast<uint8>(tranfer) );
+            else if (name == nullptr)
+                debug( vars, "Colour Transfer=%d", static_cast<uint8>(tranfer) );
+            else
+                debug( vars, "Colour Transfer=%s", name );
         }
         E_CASE( KaxVideoColourPrimaries, primaries )
         {
+            vars.tk->fmt.video.primaries = iso_23001_8_cp_to_vlc_primaries( static_cast<uint8>(primaries) );
+            const char *name = nullptr;
             switch( static_cast<uint8>(primaries) )
             {
-            case 1: // ITU-R BT.709
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT709;
+            case 1: name = "BT-709";
                 break;
-            case 4: // ITU-R BT.470M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_M;
+            case 4: name = "BT.470M";
                 break;
-            case 5: // ITU-R BT.470BG
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT470_BG;
+            case 5: name = "BT.470BG";
                 break;
-            case 6: // SMPTE 170M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_170;
+            case 6: name = "SMPTE 170M";
                 break;
-            case 7: // SMPTE 240M
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_SMTPE_240;
+            case 7: name = "SMPTE 240M";
                 break;
-            case 9: // ITU-R BT.2020
-                vars.tk->fmt.video.primaries = COLOR_PRIMARIES_BT2020;
+            case 9: name = "BT.2020";
                 break;
             case 8:  // FILM
             case 10: // SMPTE ST 428-1
             case 22: // JEDEC P22 phosphors
             default:
-                debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8>(primaries) );
+                break;
             }
+            if (vars.tk->fmt.video.primaries == COLOR_PRIMARIES_UNDEF)
+                debug( vars, "Unsupported Colour Primaries=%d", static_cast<uint8>(primaries) );
+            else if (name == nullptr)
+                debug( vars, "Colour Primaries=%s", static_cast<uint8>(primaries) );
+            else
+                debug( vars, "Colour Primaries=%s", name );
         }
         E_CASE( KaxVideoColourMaxCLL, maxCLL )
         {
