@@ -1281,6 +1281,10 @@ static void DirectXUnlock(picture_t *picture)
     DirectXUnlockSurface(p_sys->front_surface,
                          p_sys->surface);
 }
+static void DirectXDestroyPicture(picture_t *picture)
+{
+    free(picture->p_sys);
+}
 
 static int DirectXCreatePool(vout_display_t *vd,
                              bool *use_overlay, video_format_t *fmt)
@@ -1294,7 +1298,9 @@ static int DirectXCreatePool(vout_display_t *vd,
         return VLC_EGENERIC;
 
     /* Create the associated picture */
-    picture_resource_t resource = { .p_sys = sys->picsys };
+    picture_resource_t resource = {
+        .p_sys = sys->picsys, .pf_destroy = DirectXDestroyPicture,
+    };
     picture_t *picture = picture_NewFromResource(fmt, &resource);
     if (!picture) {
         DirectXDestroyPictureResource(vd);
