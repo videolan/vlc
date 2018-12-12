@@ -53,11 +53,8 @@ struct vout_display_sys_t
     struct wp_viewport *viewport;
 
     picture_pool_t *pool; /* picture pool */
-    size_t picsize;
-    size_t stride;
     size_t active_buffers;
 
-    int fd;
     int x;
     int y;
     unsigned display_width;
@@ -73,14 +70,6 @@ struct buffer_data
 
 static_assert (sizeof (vout_display_sys_t) >= MAX_PICTURES,
                "Pointer arithmetic error");
-
-static void PictureDestroy(picture_t *pic)
-{
-    const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
-    size_t picsize = pic->p[0].i_pitch * pic->p[0].i_lines;
-
-    munmap(pic->p[0].p_pixels, (picsize + pagemask) & ~pagemask);
-}
 
 static void buffer_release_cb(void *data, struct wl_buffer *buffer)
 {
@@ -107,75 +96,18 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned req)
     if (req > MAX_PICTURES)
         req = MAX_PICTURES;
 
-    int fd = vlc_memfd();
-    if (fd == -1)
-    {
-        msg_Err(vd, "cannot create buffers: %s", vlc_strerror_c(errno));
-        return NULL;
-    }
-
-    /* We need one extra line to cover for horizontal crop offset */
-    sys->stride = 4 * ((vd->fmt.i_width + 31) & ~31);
-    unsigned lines = (vd->fmt.i_height + 31 + (sys->viewport == NULL)) & ~31;
-    const long pagemask = sysconf(_SC_PAGE_SIZE) - 1;
-    sys->picsize = ((sys->stride * lines) + pagemask) & ~pagemask;
-    size_t length = sys->picsize * req;
-
-    if (ftruncate(fd, length))
-    {
-        msg_Err(vd, "cannot allocate buffers: %s", vlc_strerror_c(errno));
-        vlc_close(fd);
-        return NULL;
-    }
-
-    void *base = mmap(NULL, length, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-    if (base == MAP_FAILED)
-    {
-        msg_Err(vd, "cannot map buffers: %s", vlc_strerror_c(errno));
-        vlc_close(fd);
-        return NULL;
-    }
-#ifndef NDEBUG
-    memset(base, 0x80, length); /* gray fill */
-#endif
-
-    sys->fd = fd;
-
     picture_t *pics[MAX_PICTURES];
-    picture_resource_t res = {
-        .pf_destroy = PictureDestroy,
-        .p = {
-            [0] = {
-                .i_lines = lines,
-                .i_pitch = sys->stride,
-            },
-        },
-    };
-    size_t offset = 0;
     unsigned count = 0;
-
-    if (sys->viewport == NULL) /* Poor man's crop */
-        offset += 4 * vd->fmt.i_x_offset + sys->stride * vd->fmt.i_y_offset;
 
     while (count < req)
     {
-        res.p_sys = ((char *)sys) + count;
-        res.p[0].p_pixels = base;
-        base = ((char *)base) + sys->picsize;
-        offset += sys->picsize;
-        length -= sys->picsize;
-
-        picture_t *pic = picture_NewFromResource(&vd->fmt, &res);
+        picture_t *pic = picture_NewFromFormat(&vd->fmt);
         if (unlikely(pic == NULL))
             break;
 
         pics[count++] = pic;
     }
 
-    wl_display_flush(sys->embed->display.wl);
-
-    if (length > 0)
-        munmap(base, length); /* Left-over buffers */
     if (count == 0)
         return NULL;
 
@@ -195,30 +127,37 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     vout_display_sys_t *sys = vd->sys;
     struct wl_display *display = sys->embed->display.wl;
     struct wl_surface *surface = sys->embed->handle.wl;
-    struct wl_shm_pool *pool;
-    struct wl_buffer *buf;
-    unsigned idx = ((char *)pic->p_sys) - ((char *)sys);
-    struct buffer_data *d = malloc(sizeof (*d));
-    off_t offset = sys->picsize * idx;
+    struct picture_buffer_t *picbuf = pic->p_sys;
 
+    if (picbuf->fd == -1)
+        return;
+
+    struct buffer_data *d = malloc(sizeof (*d));
     if (unlikely(d == NULL))
         return;
 
     d->picture = pic;
     d->counter = &sys->active_buffers;
 
-    if (sys->viewport == NULL) /* Poor man's crop */
-        offset += 4 * vd->fmt.i_x_offset + sys->stride * vd->fmt.i_y_offset;
+    off_t offset = picbuf->offset;
+    const size_t stride = pic->p->i_pitch;
+    const size_t size = pic->p->i_lines * stride;
+    struct wl_shm_pool *pool;
+    struct wl_buffer *buf;
 
-    pool = wl_shm_create_pool(sys->shm, sys->fd, offset + sys->picsize);
+    pool = wl_shm_create_pool(sys->shm, picbuf->fd, offset + size);
     if (pool == NULL)
     {
         free(d);
         return;
     }
 
+    if (sys->viewport == NULL) /* Poor man's crop */
+        offset += 4 * vd->fmt.i_x_offset
+                  + pic->p->i_pitch * vd->fmt.i_y_offset;
+
     buf = wl_shm_pool_create_buffer(pool, offset, vd->fmt.i_visible_width,
-                                    vd->fmt.i_visible_height, sys->stride,
+                                    vd->fmt.i_visible_height, stride,
                                     WL_SHM_FORMAT_XRGB8888);
     wl_shm_pool_destroy(pool);
     if (buf == NULL)
@@ -261,7 +200,6 @@ static void ResetPictures(vout_display_t *vd)
     if (sys->pool == NULL)
         return;
 
-    vlc_close(sys->fd);
     wl_surface_attach(surface, NULL, 0, 0);
     wl_surface_commit(surface);
 
