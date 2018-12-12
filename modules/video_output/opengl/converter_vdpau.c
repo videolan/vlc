@@ -70,7 +70,6 @@ pool_pic_destroy_cb(picture_t *pic)
     vdp_output_surface_destroy(p_sys->vdp, p_sys->surface);
     vdp_release_x11(p_sys->vdp);
     free(p_sys);
-    free(pic);
 }
 
 static picture_pool_t *

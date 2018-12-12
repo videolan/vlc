@@ -77,8 +77,6 @@ static void picture_pool_ReleasePicture(picture_t *clone)
     unsigned offset = sys & (POOL_MAX - 1);
     picture_t *picture = pool->picture[offset];
 
-    free(clone);
-
     if (pool->pic_unlock != NULL)
         pool->pic_unlock(picture);
     picture_Release(picture);

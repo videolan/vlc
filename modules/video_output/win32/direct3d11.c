@@ -567,7 +567,6 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
     picture_sys_t *p_sys = picture->p_sys;
     ReleasePictureSys( p_sys );
     free(p_sys);
-    free(picture);
 }
 
 #if !VLC_WINSTORE_APP

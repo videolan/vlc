@@ -83,7 +83,6 @@ fail:
 static void XCB_picture_SysV_Destroy (picture_t *pic)
 {
     shmdt (pic->p[0].p_pixels);
-    free (pic);
 }
 
 static int XCB_picture_SysV_Alloc(vout_display_t *vd, picture_resource_t *res,
@@ -151,7 +150,6 @@ static int XCB_picture_SysV_Alloc(vout_display_t *vd, picture_resource_t *res,
 static void XCB_picture_Destroy(picture_t *pic)
 {
     free(pic->p[0].p_pixels);
-    free(pic);
 }
 
 /**

@@ -202,7 +202,6 @@ static void DestroyPicture(picture_t *pic)
     pl_buf_destroy(gpu, &picsys->buf);
     vlc_vk_Release(picsys->vk);
     free(picsys);
-    free(pic);
 }
 
 static picture_t *CreatePicture(vout_display_t *vd)

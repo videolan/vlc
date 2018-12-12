@@ -56,7 +56,6 @@ static void PictureDestroyContext( picture_t *p_picture )
 static void picture_DestroyFromResource( picture_t *p_picture )
 {
     free( p_picture->p_sys );
-    free( p_picture );
 }
 
 /**
@@ -68,7 +67,6 @@ static void picture_DestroyFromFormat(picture_t *pic)
 
     if (res != NULL)
         picture_Deallocate(res->fd, res->base, res->size);
-    free(pic);
 }
 
 VLC_WEAK void *picture_Allocate(int *restrict fdp, size_t size)
@@ -331,6 +329,7 @@ void picture_Destroy(picture_t *picture)
     picture_priv_t *priv = container_of(picture, picture_priv_t, picture);
     assert(priv->gc.destroy != NULL);
     priv->gc.destroy(picture);
+    free(priv);
 }
 
 /*****************************************************************************

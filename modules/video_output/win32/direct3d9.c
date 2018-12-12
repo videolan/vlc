@@ -217,7 +217,6 @@ static void DestroyPicture(picture_t *picture)
     ReleasePictureSys(picture->p_sys);
 
     free(picture->p_sys);
-    free(picture);
 }
 
 /**
@@ -328,7 +327,7 @@ static picture_pool_t *Direct3D9CreatePicturePool(vlc_object_t *o,
 error:
     if (pool == NULL && pictures) {
         for (unsigned i=0;i<picture_count; ++i)
-            DestroyPicture(pictures[i]);
+            picture_Release(pictures[i]);
     }
     free(pictures);
     return pool;

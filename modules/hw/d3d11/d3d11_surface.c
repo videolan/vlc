@@ -499,7 +499,6 @@ static void DestroyPicture(picture_t *picture)
     picture_sys_t *p_sys = picture->p_sys;
     ReleasePictureSys( p_sys );
     free(p_sys);
-    free(picture);
 }
 
 static void DeleteFilter( filter_t * p_filter )

@@ -1085,7 +1085,6 @@ static void pic_rsc_destroy(picture_t *pic)
 {
     for (unsigned i = 0; i < 3; i++)
         free(pic->p[i].p_pixels);
-    free(pic);
 }
 
 static picture_t *pic_new_unaligned(const video_format_t *fmt)

@@ -605,7 +605,6 @@ static void CustomDestroyPicture(picture_t *p_picture)
     vlc_close(sys->drm_fd);
     sys->drm_fd = 0;
     free(p_picture->p_sys);
-    free(p_picture);
 }
 
 

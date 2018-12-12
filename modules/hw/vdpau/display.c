@@ -80,7 +80,6 @@ static void pictureSys_DestroyVDPAU(picture_sys_t *psys)
 static void PictureDestroyVDPAU(picture_t *pic)
 {
     pictureSys_DestroyVDPAU(pic->p_sys);
-    free(pic);
 }
 
 static VdpStatus picture_NewVDPAU(vdp_t *vdp, VdpRGBAFormat rgb_fmt,

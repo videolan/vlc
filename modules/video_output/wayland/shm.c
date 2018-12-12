@@ -67,7 +67,6 @@ static void PictureDestroy(picture_t *pic)
     size_t picsize = pic->p[0].i_pitch * pic->p[0].i_lines;
 
     munmap(pic->p[0].p_pixels, (picsize + pagemask) & ~pagemask);
-    free(pic);
 }
 
 static void buffer_release_cb(void *data, struct wl_buffer *buffer)
