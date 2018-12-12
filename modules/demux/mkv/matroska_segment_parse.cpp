@@ -1768,6 +1768,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         }
         S_CASE("V_MJPEG") {
             vars.p_fmt->i_codec = VLC_CODEC_MJPG;
+            vars.p_tk->b_pts_only = true;
         }
         S_CASE("V_UNCOMPRESSED") {
             msg_Dbg( vars.p_demuxer, "uncompressed format detected");
