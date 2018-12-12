@@ -53,9 +53,9 @@ static void PictureDestroyContext( picture_t *p_picture )
  * Destroys a picture allocated by picture_NewFromResource() but without
  * a custom destruction callback.
  */
-static void picture_DestroyFromResource( picture_t *p_picture )
+static void picture_DestroyDummy( picture_t *p_picture )
 {
-    free( p_picture->p_sys );
+    (void) p_picture;
 }
 
 /**
@@ -235,7 +235,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     if( p_resource->pf_destroy != NULL )
         priv->gc.destroy = p_resource->pf_destroy;
     else
-        priv->gc.destroy = picture_DestroyFromResource;
+        priv->gc.destroy = picture_DestroyDummy;
 
     for( int i = 0; i < p_picture->i_planes; i++ )
     {
