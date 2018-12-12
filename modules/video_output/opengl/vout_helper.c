@@ -2900,8 +2900,11 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     if (vgl->b_sideBySide) {
 
         // Get latest viewpoint values.
-        vlc_viewpoint_t vp = vgl->hmd_cfg.getViewpoint(vgl->hmd_cfg.p_vpProvider);
-        UpdateViewpoint(vgl, &vp);
+        if (vgl->hmd_cfg.p_vpProvider)
+        {
+            vlc_viewpoint_t vp = vgl->hmd_cfg.getViewpoint(vgl->hmd_cfg.p_vpProvider);
+            UpdateViewpoint(vgl, &vp);
+        }
 
         // Draw scene into framebuffers.
         vgl->vt.UseProgram(vgl->prgm->id);
