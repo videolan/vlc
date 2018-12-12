@@ -672,18 +672,22 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         }
         E_CASE( KaxVideoColourRange, range )
         {
+            const char *name = nullptr;
             switch( static_cast<uint8>(range) )
             {
-            case 1: // broadcast
+            case 1:
                 vars.tk->fmt.video.b_color_range_full = 0;
+                name ="limited";
                 break;
-            case 2: // full range
+            case 2:
                 vars.tk->fmt.video.b_color_range_full = 1;
+                name ="full";
                 break;
             case 3: // Matrix coefficients + Transfer characteristics
             default:
                 debug( vars, "Unsupported Colour Range=%d", static_cast<uint8>(range) );
             }
+            if (name != nullptr) debug( vars, "Range=%s", name );
         }
         E_CASE( KaxVideoColourTransferCharacter, tranfer )
         {
