@@ -20,7 +20,7 @@ Build vlc in the current directory
 OPTIONS:
    -h            Show some help
    -r            Release mode (default is debug)
-   -a <arch>     Use the specified arch (default: x86_64, possible i686)
+   -a <arch>     Use the specified arch (default: x86_64, possible i686, aarch64)
    -p            Use a Prebuilt contrib package (speeds up compilation)
    -c            Create a Prebuilt contrib package (rarely used)
    -l            Enable translations (can be slow)
@@ -78,6 +78,9 @@ case $ARCH in
         ;;
     i686)
         SHORTARCH="win32"
+        ;;
+    aarch64)
+        SHORTARCH="winarm64"
         ;;
     *)
         usage
