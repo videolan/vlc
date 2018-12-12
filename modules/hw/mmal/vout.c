@@ -447,6 +447,11 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return 0;
 }
 
+static void pic_destroy(picture_t *pic)
+{
+    free(pic->p_sys);
+}
+
 static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -512,6 +517,8 @@ static picture_pool_t *vd_pool(vout_display_t *vd, unsigned count)
     }
 
     memset(&picture_res, 0, sizeof(picture_resource_t));
+    picture_res.pf_destroy = pic_destroy;
+
     sys->pictures = calloc(sys->num_buffers, sizeof(picture_t *));
     for (i = 0; i < sys->num_buffers; ++i) {
         picture_res.p_sys = calloc(1, sizeof(picture_sys_t));
