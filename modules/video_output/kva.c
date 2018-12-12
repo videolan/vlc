@@ -490,6 +490,11 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
 /* following functions are local */
 
+static void DestroyPicture( picture_t *pic )
+{
+    free( pic->p_sys );
+}
+
 /*****************************************************************************
  * OpenDisplay: open and initialize KVA device
  *****************************************************************************
@@ -612,7 +617,9 @@ static int OpenDisplay( vout_display_t *vd, video_format_t *fmt )
         return VLC_ENOMEM;
     picsys->i_chroma_shift = i_chroma_shift;
 
-    picture_resource_t resource = { .p_sys = picsys };
+    picture_resource_t resource = {
+        .p_sys = picsys, .pf_destroy = DestroyPicture,
+    };
     picture_t *picture = picture_NewFromResource( fmt, &resource );
     if( !picture )
     {
