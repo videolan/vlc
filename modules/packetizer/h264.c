@@ -228,12 +228,10 @@ static void ActivateSets( decoder_t *p_dec, const h264_sequence_parameter_set_t 
             }
             if( p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF )
             {
-                bool color_full;
                 h264_get_colorimetry( p_sps, &p_dec->fmt_out.video.primaries,
                                       &p_dec->fmt_out.video.transfer,
                                       &p_dec->fmt_out.video.space,
-                                      &color_full );
-                p_dec->fmt_out.video.color_range = color_full ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+                                      &p_dec->fmt_out.video.color_range );
             }
         }
 

@@ -478,7 +478,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
         video_color_primaries_t primaries;
         video_transfer_func_t transfer;
         video_color_space_t colorspace;
-        bool full_range;
+        video_color_range_t full_range;
         if (hxxx_helper_get_colorimetry(&p_sys->hh,
                                         &primaries,
                                         &transfer,
@@ -488,7 +488,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
             p_dec->fmt_out.video.primaries = primaries;
             p_dec->fmt_out.video.transfer = transfer;
             p_dec->fmt_out.video.space = colorspace;
-            p_dec->fmt_out.video.color_range = full_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+            p_dec->fmt_out.video.color_range = full_range;
         }
     }
 

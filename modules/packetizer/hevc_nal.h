@@ -191,7 +191,7 @@ bool hevc_get_colorimetry( const hevc_sequence_parameter_set_t *p_sps,
                            video_color_primaries_t *p_primaries,
                            video_transfer_func_t *p_transfer,
                            video_color_space_t *p_colorspace,
-                           bool *p_full_range );
+                           video_color_range_t *p_full_range );
 uint8_t hevc_get_max_num_reorder( const hevc_video_parameter_set_t *p_vps );
 bool hevc_get_slice_type( const hevc_slice_segment_header_t *, enum hevc_slice_type_e * );
 

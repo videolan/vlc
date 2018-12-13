@@ -961,7 +961,7 @@ hxxx_helper_get_colorimetry(const struct hxxx_helper *hh,
                             video_color_primaries_t *p_primaries,
                             video_transfer_func_t *p_transfer,
                             video_color_space_t *p_colorspace,
-                            bool *p_full_range)
+                            video_color_range_t *p_full_range)
 {
     switch (hh->i_codec)
     {
