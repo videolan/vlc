@@ -123,12 +123,12 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
         v->i_sar_den = 1;
     }
 
-    if(dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF)
+    if(dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF && img->seq_hdr)
     {
-        v->primaries = iso_23001_8_cp_to_vlc_primaries(img->p.pri);
-        v->transfer = iso_23001_8_tc_to_vlc_xfer(img->p.trc);
-        v->space = iso_23001_8_mc_to_vlc_coeffs(img->p.mtrx);
-        v->b_color_range_full = img->p.fullrange;
+        v->primaries = iso_23001_8_cp_to_vlc_primaries(img->seq_hdr->pri);
+        v->transfer = iso_23001_8_tc_to_vlc_xfer(img->seq_hdr->trc);
+        v->space = iso_23001_8_mc_to_vlc_coeffs(img->seq_hdr->mtrx);
+        v->b_color_range_full = img->seq_hdr->color_range;
     }
 
     v->projection_mode = dec->fmt_in.video.projection_mode;
@@ -155,12 +155,11 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     return -1;
 }
 
-static void FreePicture(uint8_t *data, void *allocator_data, void *cookie)
+static void FreePicture(Dav1dPicture *data, void *cookie)
 {
-    picture_t *pic = allocator_data;
+    picture_t *pic = data->allocator_data;
     decoder_t *dec = cookie;
     VLC_UNUSED(dec);
-    assert( data == pic->p[0].p_pixels );
     picture_Release(pic);
 }
 
@@ -216,8 +215,15 @@ static int Decode(decoder_t *dec, block_t *block)
     timestamp_FifoPut(p_sys->ts_fifo, pts);
     int res;
     do {
-        res = dav1d_decode(p_sys->c, p_data, &img);
+        res = dav1d_send_data(p_sys->c, p_data);
+        if (res < 0 && res != -EAGAIN)
+        {
+            msg_Err(dec, "Decoder feed error %d!", res);
+            i_ret = VLC_EGENERIC;
+            break;
+        }
 
+        res = dav1d_get_picture(p_sys->c, &img);
         if (res == 0)
         {
             picture_t *_pic = img.allocator_data;
