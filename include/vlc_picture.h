@@ -32,7 +32,6 @@
 #else
 #include <atomic>
 using std::atomic_uintptr_t;
-using std::memory_order;
 using std::memory_order_relaxed;
 using std::memory_order_release;
 #endif
