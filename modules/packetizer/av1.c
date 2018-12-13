@@ -136,7 +136,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
     video_color_primaries_t prim;
     video_color_space_t space;
     video_transfer_func_t xfer;
-    bool full;
+    video_color_range_t full;
     if(p_dec->fmt_in.video.primaries == COLOR_PRIMARIES_UNDEF &&
        AV1_get_colorimetry(p_sys->p_sequence_header, &prim, &xfer, &space, &full) &&
        prim != COLOR_PRIMARIES_UNDEF &&
@@ -147,7 +147,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.video.primaries = prim;
         p_dec->fmt_out.video.transfer = xfer;
         p_dec->fmt_out.video.space = space;
-        p_dec->fmt_out.video.color_range = full ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
+        p_dec->fmt_out.video.color_range = full;
     }
 
     if(!p_dec->fmt_in.i_extra && !p_dec->fmt_out.i_extra)

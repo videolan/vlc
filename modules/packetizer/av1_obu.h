@@ -165,7 +165,7 @@ void AV1_get_frame_max_dimensions(const av1_OBU_sequence_header_t *, unsigned *,
 void AV1_get_profile_level(const av1_OBU_sequence_header_t *, int *, int *, int *);
 bool AV1_get_colorimetry( const av1_OBU_sequence_header_t *,
                           video_color_primaries_t *, video_transfer_func_t *,
-                          video_color_space_t *, bool *);
+                          video_color_space_t *, video_color_range_t *);
 bool AV1_get_frame_rate(const av1_OBU_sequence_header_t *, unsigned *, unsigned *);
 
 
