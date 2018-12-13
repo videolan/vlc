@@ -455,6 +455,14 @@ static inline void video_format_AdjustColorSpace( video_format_t *p_fmt )
         else
             p_fmt->space = COLOR_SPACE_BT601;
     }
+
+    if ( p_fmt->color_range == COLOR_RANGE_UNDEF )
+    {
+        if ( vlc_fourcc_IsYUV(p_fmt->i_chroma) )
+            p_fmt->color_range = COLOR_RANGE_LIMITED;
+        else
+            p_fmt->color_range = COLOR_RANGE_FULL;
+    }
 }
 
 /**
