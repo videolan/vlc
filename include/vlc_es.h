@@ -334,6 +334,15 @@ typedef enum video_chroma_location_t
 #define CHROMA_LOCATION_MAX CHROMA_LOCATION_BOTTOM_CENTER
 } video_chroma_location_t;
 
+typedef enum video_color_range_t
+{
+    COLOR_RANGE_UNDEF,
+    COLOR_RANGE_FULL,
+    COLOR_RANGE_LIMITED,
+#define COLOR_RANGE_STUDIO COLOR_RANGE_LIMITED
+#define COLOR_RANGE_MAX    COLOR_RANGE_LIMITED
+} video_color_range_t;
+
 /**
  * video format description
  */
