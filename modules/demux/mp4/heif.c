@@ -390,7 +390,8 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                                             p_prop->data.p_colr->nclc.i_transfer_function_idx );
                     fmt->video.space = iso_23001_8_mc_to_vlc_coeffs(
                                         p_prop->data.p_colr->nclc.i_matrix_idx );
-                    fmt->video.b_color_range_full = p_prop->data.p_colr->nclc.i_full_range;
+                    fmt->video.color_range = p_prop->data.p_colr->nclc.i_full_range ?
+                                COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
                     break;
                 case ATOM_clli:
                     fmt->video.lighting.MaxCLL = p_prop->data.p_CoLL->i_maxCLL;

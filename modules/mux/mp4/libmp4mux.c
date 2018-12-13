@@ -993,7 +993,7 @@ static bo_t *GetColrBox(const video_format_t *p_vfmt, bool b_mov)
         bo_add_16be(p_box, vlc_primaries_to_iso_23001_8_cp(p_vfmt->primaries));
         bo_add_16be(p_box, vlc_xfer_to_iso_23001_8_tc(p_vfmt->transfer));
         bo_add_16be(p_box, vlc_coeffs_to_iso_23001_8_mc(p_vfmt->space));
-        bo_add_8(p_box, p_vfmt->b_color_range_full ? 0x80 : 0x00);
+        bo_add_8(p_box, p_vfmt->color_range == COLOR_RANGE_FULL ? 0x80 : 0x00);
     }
     return p_box;
 }

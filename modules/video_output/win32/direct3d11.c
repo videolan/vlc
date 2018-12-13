@@ -1049,7 +1049,7 @@ static void D3D11SetColorSpace(vout_display_t *vd)
         goto done;
     }
 
-    bool src_full_range = vd->source.b_color_range_full ||
+    bool src_full_range = vd->source.color_range == COLOR_RANGE_FULL ||
                           /* the YUV->RGB conversion already output full range */
                           is_d3d11_opaque(vd->source.i_chroma) ||
                           vlc_fourcc_IsYUV(vd->source.i_chroma);
@@ -1490,7 +1490,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
 
     hr = D3D11_CompilePixelShader(vd, &sys->hd3d, sys->legacy_shader, &sys->d3d_dev,
                                   &sys->display, fmt->transfer, fmt->primaries,
-                                  fmt->b_color_range_full,
+                                  fmt->color_range == COLOR_RANGE_FULL,
                                   &sys->picQuad);
     if (FAILED(hr))
     {

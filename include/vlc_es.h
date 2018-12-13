@@ -374,7 +374,7 @@ struct video_format_t
     video_color_primaries_t primaries;                  /**< color primaries */
     video_transfer_func_t transfer;                   /**< transfer function */
     video_color_space_t space;                        /**< YCbCr color space */
-    bool b_color_range_full;                    /**< 0-255 instead of 16-235 */
+    video_color_range_t color_range;            /**< 0-255 instead of 16-235 */
     video_chroma_location_t chroma_location;      /**< YCbCr chroma location */
 
     video_multiview_mode_t multiview_mode;        /** Multiview mode, 2D, 3D */

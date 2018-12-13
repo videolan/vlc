@@ -136,7 +136,7 @@ int screen_InitCapture( demux_t *p_demux )
     p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
     p_sys->fmt.video.i_chroma         = i_chroma;
     p_sys->fmt.video.transfer         = TRANSFER_FUNC_SRGB;
-    p_sys->fmt.video.b_color_range_full = true;
+    p_sys->fmt.video.color_range      = COLOR_RANGE_FULL;
 
     switch( i_chroma )
     {

@@ -143,8 +143,19 @@ static inline vlc_rational_t FromAVRational(const AVRational rat)
 
 static inline void set_video_color_settings( const video_format_t *p_fmt, AVCodecContext *p_context )
 {
-    if( p_fmt->b_color_range_full )
+    switch( p_fmt->color_range )
+    {
+    case COLOR_RANGE_FULL:
         p_context->color_range = AVCOL_RANGE_JPEG;
+        break;
+    case COLOR_RANGE_LIMITED:
+        p_context->color_range = AVCOL_RANGE_MPEG;
+    case COLOR_RANGE_UNDEF: /* do nothing */
+        break;
+    default:
+        p_context->color_range = AVCOL_RANGE_UNSPECIFIED;
+        break;
+    }
 
     switch( p_fmt->space )
     {

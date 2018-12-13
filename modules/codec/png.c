@@ -126,7 +126,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Set output properties */
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
     p_dec->fmt_out.video.transfer = TRANSFER_FUNC_SRGB;
-    p_dec->fmt_out.video.b_color_range_full = true;
+    p_dec->fmt_out.video.color_range = COLOR_RANGE_FULL;
 
     /* Set callbacks */
     p_dec->pf_decode = DecodeBlock;

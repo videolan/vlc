@@ -127,7 +127,7 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
         v->primaries = iso_23001_8_cp_to_vlc_primaries(img->seq_hdr->pri);
         v->transfer = iso_23001_8_tc_to_vlc_xfer(img->seq_hdr->trc);
         v->space = iso_23001_8_mc_to_vlc_coeffs(img->seq_hdr->mtrx);
-        v->b_color_range_full = img->seq_hdr->color_range;
+        v->color_range = img->seq_hdr->color_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
     v->projection_mode = dec->fmt_in.video.projection_mode;

@@ -504,8 +504,11 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                     iso_23001_8_tc_to_vlc_xfer( BOXDATA( p_colr )->nclc.i_transfer_function_idx );
             p_track->fmt.video.space =
                     iso_23001_8_mc_to_vlc_coeffs( BOXDATA( p_colr )->nclc.i_matrix_idx );
-            p_track->fmt.video.b_color_range_full = BOXDATA(p_colr)->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) &&
-                    (BOXDATA(p_colr)->nclc.i_full_range >> 7) != 0;
+            if ( BOXDATA(p_colr)->i_type == VLC_FOURCC( 'n', 'c', 'l', 'x' ) &&
+                    (BOXDATA(p_colr)->nclc.i_full_range >> 7) != 0 )
+                p_track->fmt.video.color_range = COLOR_RANGE_FULL;
+            else
+                p_track->fmt.video.color_range = COLOR_RANGE_LIMITED;
         }
     }
 
@@ -725,7 +728,7 @@ int SetupVideoES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                             iso_23001_8_mc_to_vlc_coeffs( p_data->i_matrix_coeffs );
                 }
 
-                p_track->fmt.video.b_color_range_full = p_data->i_fullrange;
+                p_track->fmt.video.color_range = p_data->i_fullrange ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
                 p_track->fmt.video.i_bits_per_pixel = p_data->i_bit_depth;
 
                 if( p_data->i_codec_init_datasize )

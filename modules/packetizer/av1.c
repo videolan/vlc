@@ -147,7 +147,7 @@ static void UpdateDecoderFormat(decoder_t *p_dec)
         p_dec->fmt_out.video.primaries = prim;
         p_dec->fmt_out.video.transfer = xfer;
         p_dec->fmt_out.video.space = space;
-        p_dec->fmt_out.video.b_color_range_full = full;
+        p_dec->fmt_out.video.color_range = full ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
     if(!p_dec->fmt_in.i_extra && !p_dec->fmt_out.i_extra)

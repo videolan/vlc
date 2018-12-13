@@ -225,7 +225,7 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
         v->primaries = iso_23001_8_cp_to_vlc_primaries(img->cp);
         v->transfer = iso_23001_8_tc_to_vlc_xfer(img->tc);
         v->space = iso_23001_8_mc_to_vlc_coeffs(img->mc);
-        v->b_color_range_full = img->range == AOM_CR_FULL_RANGE;
+        v->color_range = img->range == AOM_CR_FULL_RANGE ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
     }
 
     dec->fmt_out.video.projection_mode = dec->fmt_in.video.projection_mode;

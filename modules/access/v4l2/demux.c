@@ -436,7 +436,7 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
             es_fmt.video.primaries = COLOR_PRIMARIES_SRGB;
             es_fmt.video.transfer = TRANSFER_FUNC_SRGB;
             es_fmt.video.space = COLOR_SPACE_BT601;
-            es_fmt.video.b_color_range_full = true;
+            es_fmt.video.color_range = COLOR_RANGE_FULL;
             break;
         case V4L2_COLORSPACE_SRGB:
             es_fmt.video.primaries = COLOR_PRIMARIES_SRGB;
@@ -529,10 +529,10 @@ static int InitVideo (demux_t *demux, int fd, uint32_t caps)
         case V4L2_QUANTIZATION_DEFAULT:
             break;
         case V4L2_QUANTIZATION_FULL_RANGE:
-            es_fmt.video.b_color_range_full = true;
+            es_fmt.video.color_range = COLOR_RANGE_FULL;
             break;
         case V4L2_QUANTIZATION_LIM_RANGE:
-            es_fmt.video.b_color_range_full = false;
+            es_fmt.video.color_range = COLOR_RANGE_LIMITED;
             break;
         default:
             msg_Err (demux, "unknown quantization: %u",

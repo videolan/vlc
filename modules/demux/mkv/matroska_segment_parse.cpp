@@ -709,11 +709,11 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
             switch( static_cast<uint8>(range) )
             {
             case 1:
-                vars.tk->fmt.video.b_color_range_full = 0;
+                vars.tk->fmt.video.color_range = COLOR_RANGE_LIMITED;
                 name ="limited";
                 break;
             case 2:
-                vars.tk->fmt.video.b_color_range_full = 1;
+                vars.tk->fmt.video.color_range = COLOR_RANGE_FULL;
                 name ="full";
                 break;
             case 3: // Matrix coefficients + Transfer characteristics

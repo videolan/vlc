@@ -3517,10 +3517,20 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const vlc_meta_t *p
            };
            static_assert(ARRAY_SIZE(space_names) == COLOR_SPACE_MAX+1,
                          "Color space table mismatch");
-           info_category_AddInfo( p_cat, _("Color space"), _("%s %s Range"),
-               vlc_gettext(space_names[fmt->video.space]),
-               vlc_gettext(fmt->video.b_color_range_full
-                           ? N_("Full") : N_("Limited")) );
+           info_category_AddInfo( p_cat, _("Color space"), "%s",
+               vlc_gettext(space_names[fmt->video.space]) );
+       }
+       if( fmt->video.color_range != COLOR_RANGE_UNDEF )
+       {
+           static const char range_names[][16] = {
+               [COLOR_RANGE_UNDEF]   = N_("Undefined"),
+               [COLOR_RANGE_FULL]    = N_("Full"),
+               [COLOR_RANGE_LIMITED] = N_("Limited"),
+           };
+           static_assert(ARRAY_SIZE(range_names) == COLOR_RANGE_MAX+1,
+                         "Color range table mismatch");
+           info_category_AddInfo( p_cat, _("Color Range"), "%s",
+               vlc_gettext(range_names[fmt->video.color_range]) );
        }
        if( fmt->video.chroma_location != CHROMA_LOCATION_UNDEF )
        {

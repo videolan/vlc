@@ -488,7 +488,7 @@ static bool ConfigureVoutH264(decoder_t *p_dec)
             p_dec->fmt_out.video.primaries = primaries;
             p_dec->fmt_out.video.transfer = transfer;
             p_dec->fmt_out.video.space = colorspace;
-            p_dec->fmt_out.video.b_color_range_full = full_range;
+            p_dec->fmt_out.video.color_range = full_range ? COLOR_RANGE_FULL : COLOR_RANGE_LIMITED;
         }
     }
 
