@@ -403,7 +403,6 @@ static void picture_DestroyClone(picture_t *clone)
 {
     picture_t *picture = ((picture_priv_t *)clone)->gc.opaque;
 
-    free(clone);
     picture_Release(picture);
 }
 
