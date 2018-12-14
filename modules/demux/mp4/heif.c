@@ -344,7 +344,7 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
                 case ATOM_hvcC:
                 case ATOM_avcC:
                 case ATOM_av1C:
-                    if( !fmt->p_extra &&
+                    if( !fmt->p_extra && p_prop->data.p_binary &&
                        ((fmt->i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
                         (fmt->i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ||
                         (fmt->i_codec == VLC_CODEC_AV1  && p_prop->i_type == ATOM_av1C)) )
