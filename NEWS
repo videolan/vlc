@@ -8,6 +8,13 @@ Access:
 Demux:
  * MP4: Fix reading some HDR metadata
 
+macOS:
+ * Starting with VLC 3.0.5, VLC will be distributed with runtime hardening
+   enabled on macOS Mojave. All external VLC plugins need to be signed
+   by a DeveloperID certificate in order to continue working with the official
+   VLC package.
+ * Update the VLC dark UI to better match the dark mode of macOS Mojave
+
 Audio output:
  * Fix corking when the play is paused
 
