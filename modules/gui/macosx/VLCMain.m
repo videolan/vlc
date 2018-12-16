@@ -95,6 +95,16 @@ int OpenIntf (vlc_object_t *p_this)
             [VLCApplication sharedApplication];
             [VLCMain sharedInstance];
 
+            if (@available(macOS 10.14, *)) {
+                if (var_InheritBool(getIntf(), "macosx-interfacestyle")) {
+
+                    // Use the native dark appearance style on Mojave
+                    // Automatic switching between both styles does not work yet, see commit msg
+                    NSApplication *app = [NSApplication sharedApplication];
+                    app.appearance = [NSAppearance appearanceNamed: NSAppearanceNameDarkAqua];
+                }
+            }
+
             [NSBundle loadNibNamed:@"MainMenu" owner:[[VLCMain sharedInstance] mainMenu]];
             [[[VLCMain sharedInstance] mainWindow] makeKeyAndOrderFront:nil];
 

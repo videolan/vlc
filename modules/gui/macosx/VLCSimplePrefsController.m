@@ -579,25 +579,12 @@ static inline const char * __config_GetLabel(vlc_object_t *p_this, const char *p
     BOOL growlEnabled = [self hasModule:@"growl" inConfig:@"control"];
     [_intf_enableNotificationsCheckbox setState: growlEnabled ? NSOnState : NSOffState];
 
-    if (@available(macOS 10.14, *)) {
-        _intf_style_darkButtonCell.enabled = NO;
-        _intf_style_brightButtonCell.enabled = NO;
-
-        if ([self.contentView.effectiveAppearance.name isEqualToString:NSAppearanceNameDarkAqua]) {
-            [_intf_style_darkButtonCell setState: YES];
-            [_intf_style_brightButtonCell setState: NO];
-        } else {
-            [_intf_style_darkButtonCell setState: NO];
-            [_intf_style_brightButtonCell setState: YES];
-        }
+    if (config_GetInt(p_intf, "macosx-interfacestyle")) {
+        [_intf_style_darkButtonCell setState: YES];
+        [_intf_style_brightButtonCell setState: NO];
     } else {
-        if (config_GetInt(p_intf, "macosx-interfacestyle")) {
-            [_intf_style_darkButtonCell setState: YES];
-            [_intf_style_brightButtonCell setState: NO];
-        } else {
-            [_intf_style_darkButtonCell setState: NO];
-            [_intf_style_brightButtonCell setState: YES];
-        }
+        [_intf_style_darkButtonCell setState: NO];
+        [_intf_style_brightButtonCell setState: YES];
     }
 
     BOOL httpEnabled = [self hasModule:@"http" inConfig:@"extraintf"];

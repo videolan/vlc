@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>NSRequiresAquaSystemAppearance</key>
-	<false/>
+	<true/>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
