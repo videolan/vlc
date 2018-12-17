@@ -21,6 +21,7 @@
 
 #include "../../arm_neon/asm.S"
 
+	.arch_extension simd
 	.text
 
 #define	DEST	x0

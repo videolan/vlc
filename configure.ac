@@ -1465,46 +1465,50 @@ AM_CONDITIONAL([HAVE_3DNOW], [test "$have_3dnow" = "yes"])
 
 AC_ARG_ENABLE([neon],
   AS_HELP_STRING([--disable-neon],
-    [disable NEON optimizations (default auto)]),, [
-  AS_IF([test "${host_cpu}" = "arm"], [enable_neon="yes"] ,[enable_neon="no"])
+    [disable ARM NEON optimizations (default auto)]),, [
+  case "${host_cpu}" in
+    "arm")
+      enable_neon="32"
+      ;;
+    "aarch64")
+      enable_neon="64"
+      ;;
+    *)
+      enable_neon="no"
+      ;;
+  esac
 ])
 AS_IF([test "${enable_neon}" != "no"], [
   VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -mfpu=neon -mhard-float"
   AC_CACHE_CHECK([if $CCAS groks ARM NEON assembly], [ac_cv_arm_neon], [
-    AC_COMPILE_IFELSE([
-      AC_LANG_PROGRAM(,[[
+    AS_IF([test "${enable_neon}" != "64"], [
+      CFLAGS="${CFLAGS} -mfpu=neon -mhard-float"
+      AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM(,[[
 asm volatile("vqmovun.s64 d0, q1":::"d0");
 ]])
+      ], [
+        ac_cv_arm_neon="32"
+      ], [
+        ac_cv_arm_neon="no"
+      ])
     ], [
-      ac_cv_arm_neon="yes"
-    ], [
-      ac_cv_arm_neon="no"
+      CFLAGS="${CFLAGS} -march=armv8-a+simd"
+      AC_COMPILE_IFELSE([
+        AC_LANG_PROGRAM(,[[
+asm volatile("uhadd v0.8b, v0.8b, v1.8b":::"v0");
+]])
+      ], [
+        ac_cv_arm_neon="64"
+      ], [
+        ac_cv_arm_neon="no"
+      ])
     ])
   ])
   VLC_RESTORE_FLAGS
 ])
-AM_CONDITIONAL([HAVE_NEON], [test "${ac_cv_arm_neon}" = "yes"])
-
-AC_ARG_ENABLE([arm64],
-  AS_HELP_STRING([--disable-arm64],
-    [disable arm 64-bit optimizations (default auto)]),, [
-  AS_IF([test "${host_cpu}" = "aarch64"], [enable_arm64="yes"] ,[enable_arm64="no"])
-])
-AS_IF([test "${enable_arm64}" != "no"], [
-  AC_CACHE_CHECK([if $CCAS groks ARM 64 SIMD assembly], [ac_cv_arm64], [
-    AC_COMPILE_IFELSE([
-      AC_LANG_PROGRAM(,[[
-asm volatile("uhadd v0.8b, v0.8b, v1.8b":::"v0");
-]])
-    ], [
-      ac_cv_arm64="yes"
-    ], [
-      ac_cv_arm64="no"
-    ])
-  ])
-])
-AM_CONDITIONAL([HAVE_ARM64], [test "${ac_cv_arm64}" = "yes"])
+AM_CONDITIONAL([HAVE_NEON], [test "${ac_cv_arm_neon}" = "32"])
+AM_CONDITIONAL([HAVE_ARM64], [test "${ac_cv_arm_neon}" = "64"])
 
 AC_ARG_ENABLE([sve],
   AS_HELP_STRING([--disable-sve],
