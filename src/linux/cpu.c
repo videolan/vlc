@@ -67,13 +67,13 @@ static void vlc_CPU_init (void)
 
         while ((cap = strsep (&p, " ")) != NULL)
         {
-#if defined (__arm__)
+#if defined (__arm__) || defined (__aarch64__)
             if (!strcmp (cap, "neon"))
                 core_caps |= VLC_CPU_ARM_NEON;
-
-#elif defined (__aarch64__)
+# if defined (__aarch64__)
             if (!strcmp (cap, "sve"))
                 core_caps |= VLC_CPU_ARM_SVE;
+# endif
 
 #elif defined (__i386__) || defined (__x86_64__)
             if (!strcmp (cap, "mmx"))

@@ -170,10 +170,14 @@ VLC_API unsigned vlc_CPU(void);
 
 # elif defined (__aarch64__)
 #  define HAVE_FPU 1
-#  define VLC_CPU_ARM_SVE 0x1
+#  define VLC_CPU_ARM_NEON 0x1
+#  define VLC_CPU_ARM_SVE  0x2
 
-// NEON is mandatory for general purpose ARMv8-a CPUs
-#  define vlc_CPU_ARM64_NEON() (1)
+#  ifdef __ARM_NEON
+#   define vlc_CPU_ARM_NEON() (1)
+#  else
+#   define vlc_CPU_ARM_NEON() ((vlc_CPU() & VLC_CPU_ARM_NEON) != 0)
+#  endif
 
 #  ifdef __ARM_FEATURE_SVE
 #   define vlc_CPU_ARM_SVE()   (1)
