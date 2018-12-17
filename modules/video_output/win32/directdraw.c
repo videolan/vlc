@@ -1361,7 +1361,20 @@ static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface
         cfg.display.height = sys->sys.rect_display.bottom;
 
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, &vd->source, &cfg, true);
+        vout_display_PlacePicture(&place, &vd->source, &cfg, false);
+
+        if (place.x < 0) {
+            place.width += -place.x;
+            place.x = 0;
+        }
+        if (place.y < 0) {
+            place.height += -place.y;
+            place.y = 0;
+        }
+        if (place.width > cfg.display.width)
+            place.width = cfg.display.width;
+        if (place.height > cfg.display.height)
+            place.height = cfg.display.height;
 
         dst.left   = sys->sys.rect_display.left + place.x;
         dst.top    = sys->sys.rect_display.top  + place.y;
