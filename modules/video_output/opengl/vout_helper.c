@@ -2570,6 +2570,11 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 1);
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 1);
 
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
+    vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
+
     float p_eye_pos[3] = {
         prgm->var.ViewMatrix[12] / prgm->var.ViewMatrix[15],
         prgm->var.ViewMatrix[13] / prgm->var.ViewMatrix[15] + 500,
@@ -2646,19 +2651,15 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_FALSE);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->texture_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
         vgl->vt.VertexAttribPointer(prgm->aloc.MultiTexCoord[0], 2, GL_FLOAT, 0, 0, 0);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->vertex_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->normal_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexNormal);
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexNormal, 3, GL_FLOAT, 0, 0, 0);
 
         vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->tangent_buffer_object[p_object->meshId]);
-        vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexTangent);
         vgl->vt.VertexAttribPointer(prgm->aloc.VertexTangent, 3, GL_FLOAT, 0, 0, 0);
 
         tc->vt->Uniform1i(tc->uloc.IsUniformColor, GL_TRUE);
@@ -2698,10 +2699,16 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
         GL_ASSERT_NOERROR();
     }
-    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
-    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
-    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
-    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
+
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.MultiTexCoord[0]);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.VertexPosition);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.VertexNormal);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.VertexTangent);
+
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.InstanceTransformMatrix);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+1);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+2);
+    vgl->vt.DisableVertexAttribArray(prgm->aloc.InstanceTransformMatrix+3);
 
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix, 0);
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+1, 0);
