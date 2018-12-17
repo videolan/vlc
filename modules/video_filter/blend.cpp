@@ -461,15 +461,20 @@ struct convertYuv8ToRgb {
 };
 
 struct convertRgbToRgbSmall {
-    convertRgbToRgbSmall(const video_format_t *dst, const video_format_t *) : fmt(*dst) {}
+    convertRgbToRgbSmall(const video_format_t *dst, const video_format_t *)
+    {
+        rshift = 8 - vlc_popcount(dst->i_rmask);
+        bshift = 8 - vlc_popcount(dst->i_bmask);
+        gshift = 8 - vlc_popcount(dst->i_gmask);
+    }
     void operator()(CPixel &p)
     {
-        p.i >>= fmt.i_rrshift;
-        p.j >>= fmt.i_rgshift;
-        p.k >>= fmt.i_rbshift;
+        p.i >>= rshift;
+        p.j >>= gshift;
+        p.k >>= bshift;
     }
 private:
-    const video_format_t &fmt;
+    unsigned rshift, gshift, bshift;
 };
 
 struct convertYuvpToAny {
