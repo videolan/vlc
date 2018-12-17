@@ -247,6 +247,13 @@ static int Decode(decoder_t *dec, block_t *block)
             i_ret = VLC_EGENERIC;
             break;
         }
+
+        /* on drain, we must ignore the 1st EAGAIN */
+        if(!b_draining && (res == -EAGAIN || res == 0) && (p_data == NULL))
+        {
+            b_draining = true;
+            res = 0;
+        }
     } while (res == 0 || (p_data && p_data->sz != 0));
 
 
