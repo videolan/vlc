@@ -213,12 +213,15 @@ static int Decode(decoder_t *dec, block_t *block)
     int i_ret = VLCDEC_SUCCESS;
     int res;
     do {
-        res = dav1d_send_data(p_sys->c, p_data);
-        if (res < 0 && res != -EAGAIN)
+        if( p_data )
         {
-            msg_Err(dec, "Decoder feed error %d!", res);
-            i_ret = VLC_EGENERIC;
-            break;
+            res = dav1d_send_data(p_sys->c, p_data);
+            if (res < 0 && res != -EAGAIN)
+            {
+                msg_Err(dec, "Decoder feed error %d!", res);
+                i_ret = VLC_EGENERIC;
+                break;
+            }
         }
 
         res = dav1d_get_picture(p_sys->c, &img);
