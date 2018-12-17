@@ -58,12 +58,9 @@ static picture_t *I420_A8B8G8R8_Filter( filter_t *, picture_t * );
  * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
  *****************************************************************************/
 #define RGB2PIXEL( p_filter, i_r, i_g, i_b )                 \
-    (((((uint32_t)i_r) >> vfmt->i_rrshift) \
-                       << vfmt->i_lrshift) \
-   | ((((uint32_t)i_g) >> vfmt->i_rgshift) \
-                       << vfmt->i_lgshift) \
-   | ((((uint32_t)i_b) >> vfmt->i_rbshift) \
-                       << vfmt->i_lbshift))
+    ((((i_r) >> vfmt->i_rrshift) << vfmt->i_lrshift) \
+   | (((i_g) >> vfmt->i_rgshift) << vfmt->i_lgshift) \
+   | (((i_b) >> vfmt->i_rbshift) << vfmt->i_lbshift))
 
 /*****************************************************************************
  * Module descriptor.
@@ -311,10 +308,6 @@ VIDEO_FILTER_WRAPPER( I420_RGB32 )
  *****************************************************************************/
 static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 {
-    volatile int i_index;                                 /* index in tables */
-                   /* We use volatile here to work around a strange gcc-3.3.4
-                    * optimization bug */
-
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /*
@@ -332,22 +325,22 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     case VLC_CODEC_RGB15:
     case VLC_CODEC_RGB16:
         p_sys->p_rgb16 = (uint16_t *)p_sys->p_base;
-        for( i_index = 0; i_index < RED_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
             p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
         }
-        for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
             p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
         }
-        for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
             p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
         }
-        for( i_index = 0; i_index < 256; i_index++ )
+        for( unsigned i_index = 0; i_index < 256; i_index++ )
         {
             p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
             p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
@@ -358,22 +351,22 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     case VLC_CODEC_RGB24:
     case VLC_CODEC_RGB32:
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
-        for( i_index = 0; i_index < RED_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
             p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
         }
-        for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
             p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
         }
-        for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
+        for( unsigned i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
             p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
             p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
         }
-        for( i_index = 0; i_index < 256; i_index++ )
+        for( unsigned i_index = 0; i_index < 256; i_index++ )
         {
             p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
             p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
