@@ -843,10 +843,10 @@ static block_t *OutputPicture( decoder_t *p_dec )
     }
 
     /* Now rebuild NAL Sequence, inserting PPS/SPS if any */
-    if( p_sys->frame.p_head->i_flags & BLOCK_FLAG_PRIVATE_AUD )
+    if( p_sys->leading.p_head->i_flags & BLOCK_FLAG_PRIVATE_AUD )
     {
-        block_t *p_au = p_sys->frame.p_head;
-        p_sys->frame.p_head = p_au->p_next;
+        block_t *p_au = p_sys->leading.p_head;
+        p_sys->leading.p_head = p_au->p_next;
         p_au->p_next = NULL;
         block_ChainLastAppend( &pp_pic_last, p_au );
     }
