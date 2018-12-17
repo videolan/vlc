@@ -98,7 +98,7 @@ static inline int GetPackedRgbIndexes( const video_format_t *p_fmt, int *i_r_ind
         return VLC_EGENERIC;
 
 #ifdef WORDS_BIGENDIAN
-    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 24 : 32;
+    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 16 : 24;
     *i_r_index = (i_mask_bits - vlc_ctz(p_fmt->i_rmask) / 8;
     *i_g_index = (i_mask_bits - vlc_ctz(p_fmt->i_gmask) / 8;
     *i_b_index = (i_mask_bits - vlc_ctz(p_fmt->i_bmask) / 8;
