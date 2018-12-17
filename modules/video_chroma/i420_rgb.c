@@ -307,35 +307,15 @@ VIDEO_FILTER_WRAPPER( I420_RGB16 )
 VIDEO_FILTER_WRAPPER( I420_RGB32 )
 
 /*****************************************************************************
- * SetGammaTable: return intensity table transformed by gamma curve.
- *****************************************************************************
- * pi_table is a table of 256 entries from 0 to 255.
- *****************************************************************************/
-static void SetGammaTable( int *pi_table )
-{
-    int i_y;                                               /* base intensity */
-
-    /* Build gamma table */
-    for( i_y = 0; i_y < 256; i_y++ )
-    {
-        pi_table[ i_y ] = i_y;
-    }
-}
-
-/*****************************************************************************
  * SetYUV: compute tables and set function pointers
  *****************************************************************************/
 static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 {
-    int          pi_gamma[256];                               /* gamma table */
     volatile int i_index;                                 /* index in tables */
                    /* We use volatile here to work around a strange gcc-3.3.4
                     * optimization bug */
 
     filter_sys_t *p_sys = p_filter->p_sys;
-
-    /* Build gamma table */
-    SetGammaTable( pi_gamma );
 
     /*
      * Set pointers and build YUV tables
@@ -354,24 +334,24 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         p_sys->p_rgb16 = (uint16_t *)p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, pi_gamma[0], 0, 0 );
-            p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, pi_gamma[255], 0, 0 );
+            p_sys->p_rgb16[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb16[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
         }
         for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[0], 0 );
-            p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, pi_gamma[255], 0 );
+            p_sys->p_rgb16[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb16[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
         }
         for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[0] );
-            p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[255] );
+            p_sys->p_rgb16[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb16[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
         }
         for( i_index = 0; i_index < 256; i_index++ )
         {
-            p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, pi_gamma[ i_index ], 0, 0 );
-            p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[ i_index ], 0 );
-            p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, pi_gamma[ i_index ] );
+            p_sys->p_rgb16[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
+            p_sys->p_rgb16[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
+            p_sys->p_rgb16[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, i_index );
         }
         break;
 
@@ -380,24 +360,24 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
         p_sys->p_rgb32 = (uint32_t *)p_sys->p_base;
         for( i_index = 0; i_index < RED_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, pi_gamma[0], 0, 0 );
-            p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, pi_gamma[255], 0, 0 );
+            p_sys->p_rgb32[RED_OFFSET - RED_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb32[RED_OFFSET + 256 + i_index] =        RGB2PIXEL( p_filter, 255, 0, 0 );
         }
         for( i_index = 0; i_index < GREEN_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[0], 0 );
-            p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, pi_gamma[255], 0 );
+            p_sys->p_rgb32[GREEN_OFFSET - GREEN_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb32[GREEN_OFFSET + 256 + i_index] =          RGB2PIXEL( p_filter, 0, 255, 0 );
         }
         for( i_index = 0; i_index < BLUE_MARGIN; i_index++ )
         {
-            p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[0] );
-            p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, pi_gamma[255] );
+            p_sys->p_rgb32[BLUE_OFFSET - BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 0 );
+            p_sys->p_rgb32[BLUE_OFFSET + BLUE_MARGIN + i_index] = RGB2PIXEL( p_filter, 0, 0, 255 );
         }
         for( i_index = 0; i_index < 256; i_index++ )
         {
-            p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, pi_gamma[ i_index ], 0, 0 );
-            p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, pi_gamma[ i_index ], 0 );
-            p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, pi_gamma[ i_index ] );
+            p_sys->p_rgb32[RED_OFFSET + i_index] =   RGB2PIXEL( p_filter, i_index, 0, 0 );
+            p_sys->p_rgb32[GREEN_OFFSET + i_index] = RGB2PIXEL( p_filter, 0, i_index, 0 );
+            p_sys->p_rgb32[BLUE_OFFSET + i_index] =  RGB2PIXEL( p_filter, 0, 0, i_index );
         }
         break;
     }
