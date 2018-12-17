@@ -76,7 +76,6 @@ struct decoder_sys_t
 {
     Dav1dSettings s;
     Dav1dContext *c;
-    timestamp_fifo_t *ts_fifo;
 };
 
 static const struct
@@ -171,7 +170,6 @@ static void FlushDecoder(decoder_t *dec)
 {
     decoder_sys_t *p_sys = dec->p_sys;
     dav1d_flush(p_sys->c);
-    timestamp_FifoEmpty(p_sys->ts_fifo);
 }
 
 static void release_block(const uint8_t *buf, void *b)
@@ -206,13 +204,13 @@ static int Decode(decoder_t *dec, block_t *block)
             block_Release(block);
             return VLCDEC_ECRITICAL;
         }
+        mtime_t pts = block->i_pts == VLC_TS_INVALID ? block->i_dts : block->i_pts;
+        p_data->m.timestamp = pts;
     }
 
     Dav1dPicture img = { 0 };
 
     int i_ret = VLCDEC_SUCCESS;
-    mtime_t pts = block ? (block->i_pts == VLC_TS_INVALID ? block->i_dts : block->i_pts) : VLC_TS_INVALID;
-    timestamp_FifoPut(p_sys->ts_fifo, pts);
     int res;
     do {
         res = dav1d_send_data(p_sys->c, p_data);
@@ -235,7 +233,7 @@ static int Decode(decoder_t *dec, block_t *block)
                 break;
             }
             pic->b_progressive = true; /* codec does not support interlacing */
-            pic->date = timestamp_FifoGet(p_sys->ts_fifo);
+            pic->date = img.m.timestamp;
             /* TODO udpate the color primaries and such */
             decoder_QueueVideo(dec, pic);
             dav1d_picture_unref(&img);
@@ -277,10 +275,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->s.allocator.alloc_picture_callback = NewPicture;
     p_sys->s.allocator.release_picture_callback = FreePicture;
 
-    p_sys->ts_fifo = timestamp_FifoNew( 32 );
-    if (unlikely(p_sys->ts_fifo == NULL))
-        return VLC_EGENERIC;
-
     if (dav1d_open(&p_sys->c, &p_sys->s) < 0)
     {
         msg_Err(p_this, "Could not open the Dav1d decoder");
@@ -317,8 +311,6 @@ static void CloseDecoder(vlc_object_t *p_this)
 
     /* Flush decoder */
     FlushDecoder(dec);
-
-    timestamp_FifoRelease(p_sys->ts_fifo);
 
     dav1d_close(&p_sys->c);
 }
