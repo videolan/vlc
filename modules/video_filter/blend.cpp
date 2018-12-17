@@ -339,17 +339,22 @@ private:
 };
 
 class CPictureRGB16 : public CPicture {
+private:
+    unsigned rshift, gshift, bshift;
 public:
     CPictureRGB16(const CPicture &cfg) : CPicture(cfg)
     {
         data = CPicture::getLine<1>(0);
+        rshift = vlc_ctz(fmt->i_rmask);
+        gshift = vlc_ctz(fmt->i_gmask);
+        bshift = vlc_ctz(fmt->i_bmask);
     }
     void get(CPixel *px, unsigned dx, bool = true) const
     {
         const uint16_t data = *getPointer(dx);
-        px->i = (data & fmt->i_rmask) >> fmt->i_lrshift;
-        px->j = (data & fmt->i_gmask) >> fmt->i_lgshift;
-        px->k = (data & fmt->i_bmask) >> fmt->i_lbshift;
+        px->i = (data & fmt->i_rmask) >> rshift;
+        px->j = (data & fmt->i_gmask) >> gshift;
+        px->k = (data & fmt->i_bmask) >> bshift;
     }
     void merge(unsigned dx, const CPixel &spx, unsigned a, bool full)
     {
@@ -360,9 +365,9 @@ public:
         ::merge(&dpx.j, spx.j, a);
         ::merge(&dpx.k, spx.k, a);
 
-        *getPointer(dx) = (dpx.i << fmt->i_lrshift) |
-                          (dpx.j << fmt->i_lgshift) |
-                          (dpx.k << fmt->i_lbshift);
+        *getPointer(dx) = (dpx.i << rshift) |
+                          (dpx.j << gshift) |
+                          (dpx.k << bshift);
     }
     void nextLine()
     {
