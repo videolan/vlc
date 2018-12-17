@@ -35,55 +35,14 @@
 #include <vlc_es.h>
 
 
-/*****************************************************************************
- * BinaryLog: computes the base 2 log of a binary value
- *****************************************************************************
- * This functions is used by MaskToShift, to get a bit index from a binary
- * value.
- *****************************************************************************/
-static int BinaryLog( uint32_t i )
-{
-    int i_log = 0;
-
-    if( i == 0 ) return -31337;
-
-    if( i & 0xffff0000 ) i_log += 16;
-    if( i & 0xff00ff00 ) i_log += 8;
-    if( i & 0xf0f0f0f0 ) i_log += 4;
-    if( i & 0xcccccccc ) i_log += 2;
-    if( i & 0xaaaaaaaa ) i_log += 1;
-
-    return i_log;
-}
-
 /**
  * It transforms a color mask into right and left shifts
  * FIXME copied from video_output.c
  */
 static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
 {
-    uint32_t i_low, i_high;            /* lower and higher bits of the mask */
-
-    if( !i_mask )
-    {
-        *pi_left = *pi_right = 0;
-        return;
-    }
-
-    /* Get bits */
-    i_low = i_high = i_mask;
-
-    i_low &= - (int32_t)i_low;          /* lower bit of the mask */
-    i_high += i_low;                    /* higher bit of the mask */
-
-    /* Transform bits into an index. Also deal with i_high overflow, which
-     * is faster than changing the BinaryLog code to handle 64 bit integers. */
-    i_low =  BinaryLog (i_low);
-    i_high = i_high ? BinaryLog (i_high) : 32;
-
-    /* Update pointers and return */
-    *pi_left =   i_low;
-    *pi_right = (8 - i_high + i_low);
+    *pi_left = ctz(i_mask);
+    *pi_right = 8 - vlc_popcount(i_mask);
 }
 
 /* */
