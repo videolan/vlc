@@ -281,15 +281,7 @@ public:
             }
             offset_a = 3;
         } else {
-#ifdef WORDS_BIGENDIAN
-            offset_r = (8 * bytes - fmt->i_lrshift) / 8;
-            offset_g = (8 * bytes - fmt->i_lgshift) / 8;
-            offset_b = (8 * bytes - fmt->i_lbshift) / 8;
-#else
-            offset_r = fmt->i_lrshift / 8;
-            offset_g = fmt->i_lgshift / 8;
-            offset_b = fmt->i_lbshift / 8;
-#endif
+            GetPackedRgbIndexes(fmt, &offset_r, &offset_g, &offset_b);
         }
         data = CPicture::getLine<1>(0);
     }
@@ -339,9 +331,9 @@ private:
     {
         return &data[(x + dx) * bytes];
     }
-    unsigned offset_r;
-    unsigned offset_g;
-    unsigned offset_b;
+    int offset_r;
+    int offset_g;
+    int offset_b;
     unsigned offset_a;
     uint8_t *data;
 };
