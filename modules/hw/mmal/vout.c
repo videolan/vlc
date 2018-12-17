@@ -258,7 +258,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
     sys->input->buffer_size = sys->input->buffer_size_recommended;
 
-    vout_display_PlacePicture(&place, &vd->source, cfg, false);
+    vout_display_PlacePicture(&place, &vd->source, cfg);
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);
     display_region.fullscreen = MMAL_FALSE;
@@ -413,7 +413,7 @@ static int configure_display(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!cfg)
         cfg = &sys->last_cfg;
 
-    vout_display_PlacePicture(&place, fmt, cfg, false);
+    vout_display_PlacePicture(&place, fmt, cfg);
 
     display_region.hdr.id = MMAL_PARAMETER_DISPLAYREGION;
     display_region.hdr.size = sizeof(MMAL_DISPLAYREGION_T);

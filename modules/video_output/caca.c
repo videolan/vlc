@@ -96,7 +96,7 @@ static void Place(vout_display_t *vd, const vout_display_cfg_t *cfg)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    vout_display_PlacePicture(&sys->place, &vd->source, cfg, false);
+    vout_display_PlacePicture(&sys->place, &vd->source, cfg);
 
     const int canvas_width   = cucul_get_canvas_width(sys->cv);
     const int canvas_height  = cucul_get_canvas_height(sys->cv);

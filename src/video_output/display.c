@@ -210,8 +210,7 @@ void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
 /* */
 void vout_display_PlacePicture(vout_display_place_t *place,
                                const video_format_t *source,
-                               const vout_display_cfg_t *cfg,
-                               bool do_clipping)
+                               const vout_display_cfg_t *cfg)
 {
     /* */
     memset(place, 0, sizeof(*place));
@@ -236,11 +235,6 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         cfg_tmp.display.height = 0;
         vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                            source, &cfg_tmp);
-
-        if (do_clipping) {
-            display_width  = __MIN(display_width,  cfg->display.width);
-            display_height = __MIN(display_height, cfg->display.height);
-        }
     }
 
     const unsigned width  = source->i_visible_width;

@@ -344,7 +344,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         const video_format_t *src= &vd->source;
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, src, cfg, false);
+        vout_display_PlacePicture(&place, src, cfg);
 
         fmt->i_width = src->i_width * place.width / src->i_visible_width;
         fmt->i_height = src->i_height * place.height / src->i_visible_height;
@@ -366,7 +366,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, &vd->source, cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg);
         if (place.width  != vd->fmt.i_visible_width
          || place.height != vd->fmt.i_visible_height)
         {
@@ -582,7 +582,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         };
         vout_display_place_t place;
 
-        vout_display_PlacePicture (&place, &vd->source, cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg);
         sys->window = xcb_generate_id(sys->conn);
 
         xcb_void_cookie_t c =

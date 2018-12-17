@@ -485,7 +485,7 @@ event_thread_t *EventThreadCreate( vout_display_t *vd, const vout_display_cfg_t 
     p_event->source = vd->source;
     p_event->hwnd = NULL;
     atomic_init(&p_event->has_moved, false);
-    vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg, false);
+    vout_display_PlacePicture(&p_event->place, &vd->source, vdcfg);
 
     _sntprintf( p_event->class_main, sizeof(p_event->class_main)/sizeof(*p_event->class_main),
                _T("VLC video main %p"), (void *)p_event );

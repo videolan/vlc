@@ -160,7 +160,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         video_format_t src, *fmt = &sys->fmt;
         vout_display_place_t place;
 
-        vout_display_PlacePicture(&place, &vd->source, cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, cfg);
 
         uint32_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y;
         const uint32_t values[] = {
@@ -396,7 +396,7 @@ found_format:;
     };
     vout_display_place_t place;
 
-    vout_display_PlacePicture(&place, &vd->source, cfg, false);
+    vout_display_PlacePicture(&place, &vd->source, cfg);
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
 

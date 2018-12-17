@@ -1073,7 +1073,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     video_format_t fmt_spu;
     if (do_dr_spu) {
         vout_display_place_t place;
-        vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+        vout_display_PlacePicture(&place, &vd->source, vd->cfg);
 
         fmt_spu = vd->source;
         if (fmt_spu.i_width * fmt_spu.i_height < place.width * place.height) {
@@ -1395,7 +1395,7 @@ static void ThreadTranslateMouseState(vout_thread_t *vout,
     vout_display_place_t place;
 
     /* Translate window coordinates to video coordinates */
-    vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+    vout_display_PlacePicture(&place, &vd->source, vd->cfg);
 
     if (place.width <= 0 || place.height <= 0)
         return;

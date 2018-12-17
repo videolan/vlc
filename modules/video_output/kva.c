@@ -455,7 +455,7 @@ static int Control( vout_display_t *vd, int query, va_list args )
         if( query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT )
         {
             vout_display_place_t place;
-            vout_display_PlacePicture(&place, &vd->source, vd->cfg, false);
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg);
 
             sys->kvas.ulAspectWidth  = place.width;
             sys->kvas.ulAspectHeight = place.height;

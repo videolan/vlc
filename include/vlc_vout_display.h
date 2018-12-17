@@ -393,9 +393,8 @@ typedef struct {
  * \param p_place Place inside the window (window pixel unit)
  * \param p_source Video source format
  * \param p_cfg Display configuration
- * \param b_clip If true, prevent the video to go outside the display (break zoom).
  */
-VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_format_t *source, const vout_display_cfg_t *cfg, bool do_clipping);
+VLC_API void vout_display_PlacePicture(vout_display_place_t *place, const video_format_t *source, const vout_display_cfg_t *cfg);
 
 
 /**

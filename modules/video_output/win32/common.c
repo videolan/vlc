@@ -216,7 +216,7 @@ void UpdateRects(vout_display_t *vd, bool is_forced)
 #endif
 
     vout_display_place_t place;
-    vout_display_PlacePicture(&place, source, &place_cfg, false);
+    vout_display_PlacePicture(&place, source, &place_cfg);
 
 #if !VLC_WINSTORE_APP
     if (!sys->b_windowless)

@@ -402,7 +402,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     video_format_t fmt;
 
     p_sys->port = 0;
-    vout_display_PlacePicture (&p_sys->place, &vd->source, cfg, false);
+    vout_display_PlacePicture(&p_sys->place, &vd->source, cfg);
 
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
@@ -711,9 +711,8 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        vout_display_PlacePicture (&p_sys->place, &vd->source,
-                                   va_arg(ap, const vout_display_cfg_t *),
-                                   false);
+        vout_display_PlacePicture(&p_sys->place, &vd->source,
+                                  va_arg(ap, const vout_display_cfg_t *));
 
         /* Move the picture within the window */
         const uint32_t values[] = { p_sys->place.x, p_sys->place.y,
