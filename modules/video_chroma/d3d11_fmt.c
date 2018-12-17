@@ -312,7 +312,7 @@ HRESULT D3D11_CreateDevice(vlc_object_t *obj, d3d11_handle_t *hd3d,
         D3D_FEATURE_LEVEL_9_3, D3D_FEATURE_LEVEL_9_2, D3D_FEATURE_LEVEL_9_1
     };
 
-    for (UINT driver = 0; driver < adapter ? 1 : ARRAY_SIZE(driverAttempts); driver++) {
+    for (UINT driver = 0; driver < (adapter ? 1 : ARRAY_SIZE(driverAttempts)); driver++) {
         hr = D3D11CreateDevice(adapter, adapter ? D3D_DRIVER_TYPE_UNKNOWN : driverAttempts[driver],
                                NULL, creationFlags,
                                D3D11_features, ARRAY_SIZE(D3D11_features), D3D11_SDK_VERSION,
