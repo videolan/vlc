@@ -19,7 +19,6 @@ libgrey_yuv_plugin_la_SOURCES = video_chroma/grey_yuv.c
 
 libi420_rgb_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
 	video_chroma/i420_rgb8.c video_chroma/i420_rgb16.c video_chroma/i420_rgb_c.h
-libi420_rgb_plugin_la_LIBADD = $(LIBM)
 
 libi420_yuy2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
 libi420_yuy2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \

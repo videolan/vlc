@@ -30,8 +30,6 @@
 # include "config.h"
 #endif
 
-#include <math.h>                                            /* exp(), pow() */
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
@@ -45,7 +43,6 @@ static picture_t *I420_RGB8_Filter( filter_t *, picture_t * );
 static picture_t *I420_RGB16_Filter( filter_t *, picture_t * );
 static picture_t *I420_RGB32_Filter( filter_t *, picture_t * );
 
-static void SetGammaTable( int *pi_table, double f_gamma );
 static void SetYUV( filter_t *, const video_format_t * );
 static void Set8bppPalette( filter_t *, uint8_t * );
 #else
@@ -314,17 +311,14 @@ VIDEO_FILTER_WRAPPER( I420_RGB32 )
  *****************************************************************************
  * pi_table is a table of 256 entries from 0 to 255.
  *****************************************************************************/
-static void SetGammaTable( int *pi_table, double f_gamma )
+static void SetGammaTable( int *pi_table )
 {
     int i_y;                                               /* base intensity */
-
-    /* Use exp(gamma) instead of gamma */
-    f_gamma = exp( f_gamma );
 
     /* Build gamma table */
     for( i_y = 0; i_y < 256; i_y++ )
     {
-        pi_table[ i_y ] = (int)( pow( (double)i_y / 256, f_gamma ) * 256 );
+        pi_table[ i_y ] = i_y;
     }
 }
 
@@ -341,7 +335,7 @@ static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
     filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Build gamma table */
-    SetGammaTable( pi_gamma, 0 ); //p_filter/*FIXME wasn't used anywhere anyway*/->f_gamma );
+    SetGammaTable( pi_gamma );
 
     /*
      * Set pointers and build YUV tables
