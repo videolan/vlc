@@ -39,10 +39,9 @@
  * It transforms a color mask into right and left shifts
  * FIXME copied from video_output.c
  */
-static void MaskToShift( int *pi_left, int *pi_right, uint32_t i_mask )
+static void MaskToShift( int *pi_left, uint32_t i_mask )
 {
     *pi_left = ctz(i_mask);
-    *pi_right = 8 - vlc_popcount(i_mask);
 }
 
 /* */
@@ -81,12 +80,9 @@ void video_format_FixRgb( video_format_t *p_fmt )
         }
     }
 
-    MaskToShift( &p_fmt->i_lrshift, &p_fmt->i_rrshift,
-                 p_fmt->i_rmask );
-    MaskToShift( &p_fmt->i_lgshift, &p_fmt->i_rgshift,
-                 p_fmt->i_gmask );
-    MaskToShift( &p_fmt->i_lbshift, &p_fmt->i_rbshift,
-                 p_fmt->i_bmask );
+    MaskToShift( &p_fmt->i_lrshift, p_fmt->i_rmask );
+    MaskToShift( &p_fmt->i_lgshift, p_fmt->i_gmask );
+    MaskToShift( &p_fmt->i_lbshift, p_fmt->i_bmask );
 }
 
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,

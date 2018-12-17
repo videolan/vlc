@@ -366,9 +366,9 @@ struct video_format_t
     unsigned int i_frame_rate_base;              /**< frame rate denominator */
 
     uint32_t i_rmask, i_gmask, i_bmask;      /**< color masks for RGB chroma */
-    int i_rrshift, i_lrshift;
-    int i_rgshift, i_lgshift;
-    int i_rbshift, i_lbshift;
+    int i_lrshift;
+    int i_lgshift;
+    int i_lbshift;
     video_palette_t *p_palette;              /**< video palette from demuxer */
     video_orientation_t orientation;                /**< picture orientation */
     video_color_primaries_t primaries;                  /**< color primaries */
