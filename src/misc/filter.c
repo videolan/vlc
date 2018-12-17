@@ -118,9 +118,6 @@ filter_t *filter_NewBlend( vlc_object_t *p_this,
     p_blend->fmt_out.video.i_rmask  = p_dst_chroma->i_rmask;
     p_blend->fmt_out.video.i_gmask  = p_dst_chroma->i_gmask;
     p_blend->fmt_out.video.i_bmask  = p_dst_chroma->i_bmask;
-    p_blend->fmt_out.video.i_lrshift= p_dst_chroma->i_lrshift;
-    p_blend->fmt_out.video.i_lgshift= p_dst_chroma->i_lgshift;
-    p_blend->fmt_out.video.i_lbshift= p_dst_chroma->i_lbshift;
 
     /* The blend module will be loaded when needed with the real
     * input format */

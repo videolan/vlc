@@ -34,16 +34,6 @@
 #include <vlc_common.h>
 #include <vlc_es.h>
 
-
-/**
- * It transforms a color mask into right and left shifts
- * FIXME copied from video_output.c
- */
-static void MaskToShift( int *pi_left, uint32_t i_mask )
-{
-    *pi_left = ctz(i_mask);
-}
-
 /* */
 void video_format_FixRgb( video_format_t *p_fmt )
 {
@@ -79,10 +69,6 @@ void video_format_FixRgb( video_format_t *p_fmt )
             return;
         }
     }
-
-    MaskToShift( &p_fmt->i_lrshift, p_fmt->i_rmask );
-    MaskToShift( &p_fmt->i_lgshift, p_fmt->i_gmask );
-    MaskToShift( &p_fmt->i_lbshift, p_fmt->i_bmask );
 }
 
 void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
