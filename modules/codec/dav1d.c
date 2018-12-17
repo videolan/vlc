@@ -192,6 +192,7 @@ static int Decode(decoder_t *dec, block_t *block)
         return VLCDEC_SUCCESS;
     }
 
+    bool b_eos = false;
     Dav1dData data;
     Dav1dData *p_data = NULL;
 
@@ -206,10 +207,12 @@ static int Decode(decoder_t *dec, block_t *block)
         }
         vlc_tick_t pts = block->i_pts == VLC_TICK_INVALID ? block->i_dts : block->i_pts;
         p_data->m.timestamp = pts;
+        b_eos = (block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE);
     }
 
     Dav1dPicture img = { 0 };
 
+    bool b_draining = false;
     int i_ret = VLCDEC_SUCCESS;
     int res;
     do {
@@ -249,7 +252,7 @@ static int Decode(decoder_t *dec, block_t *block)
         }
 
         /* on drain, we must ignore the 1st EAGAIN */
-        if(!b_draining && (res == -EAGAIN || res == 0) && (p_data == NULL))
+        if(!b_draining && (res == -EAGAIN || res == 0) && (p_data == NULL||b_eos))
         {
             b_draining = true;
             res = 0;
