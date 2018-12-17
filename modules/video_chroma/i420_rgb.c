@@ -58,9 +58,9 @@ static picture_t *I420_A8B8G8R8_Filter( filter_t *, picture_t * );
  * RGB2PIXEL: assemble RGB components to a pixel value, returns a uint32_t
  *****************************************************************************/
 #define RGB2PIXEL( p_filter, i_r, i_g, i_b )                 \
-    ((((i_r) >> vfmt->i_rrshift) << vfmt->i_lrshift) \
-   | (((i_g) >> vfmt->i_rgshift) << vfmt->i_lgshift) \
-   | (((i_b) >> vfmt->i_rbshift) << vfmt->i_lbshift))
+    ((((i_r) >> i_rrshift) << i_lrshift) \
+   | (((i_g) >> i_rgshift) << i_lgshift) \
+   | (((i_b) >> i_rbshift) << i_lbshift))
 
 /*****************************************************************************
  * Module descriptor.
@@ -309,6 +309,12 @@ VIDEO_FILTER_WRAPPER( I420_RGB32 )
 static void SetYUV( filter_t *p_filter, const video_format_t *vfmt )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+    unsigned i_lrshift = ctz(vfmt->i_rmask);
+    unsigned i_lgshift = ctz(vfmt->i_gmask);
+    unsigned i_lbshift = ctz(vfmt->i_bmask);
+    unsigned i_rrshift = 8 - vlc_popcount(vfmt->i_rmask);
+    unsigned i_rgshift = 8 - vlc_popcount(vfmt->i_gmask);
+    unsigned i_rbshift = 8 - vlc_popcount(vfmt->i_bmask);
 
     /*
      * Set pointers and build YUV tables
