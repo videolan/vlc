@@ -343,17 +343,27 @@ static int SetPictureProperties( demux_t *p_demux, uint32_t i_item_id,
             {
                 case ATOM_hvcC:
                 case ATOM_avcC:
-                case ATOM_av1C:
                     if( !fmt->p_extra && p_prop->data.p_binary &&
                        ((fmt->i_codec == VLC_CODEC_HEVC && p_prop->i_type == ATOM_hvcC) ||
-                        (fmt->i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ||
-                        (fmt->i_codec == VLC_CODEC_AV1  && p_prop->i_type == ATOM_av1C)) )
+                        (fmt->i_codec == VLC_CODEC_H264 && p_prop->i_type == ATOM_avcC) ))
                     {
                         fmt->p_extra = malloc( p_prop->data.p_binary->i_blob );
                         if( fmt->p_extra )
                         {
                             fmt->i_extra = p_prop->data.p_binary->i_blob;
                             memcpy( fmt->p_extra, p_prop->data.p_binary->p_blob, fmt->i_extra );
+                        }
+                    }
+                    break;
+                case ATOM_av1C:
+                    if( fmt->i_codec == VLC_CODEC_AV1 && !fmt->i_extra &&
+                        p_prop->data.p_av1C->i_av1C >= 4 )
+                    {
+                        fmt->p_extra = malloc( p_prop->data.p_av1C->i_av1C );
+                        if( fmt->p_extra )
+                        {
+                            fmt->i_extra = p_prop->data.p_av1C->i_av1C ;
+                            memcpy( fmt->p_extra, p_prop->data.p_av1C->p_av1C, fmt->i_extra );
                         }
                     }
                     break;

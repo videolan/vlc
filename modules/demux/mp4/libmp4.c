@@ -4811,6 +4811,7 @@ static const struct
     { ATOM_avcC,    MP4_ReadBox_avcC,         ATOM_avc3 },
     { ATOM_hvcC,    MP4_ReadBox_Binary,       0 },
     { ATOM_jpeC,    MP4_ReadBox_Binary,       0 }, /* heif */
+    { ATOM_av1C,    MP4_ReadBox_av1C,         ATOM_ipco }, /* heif */
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp08 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp09 },
     { ATOM_vpcC,    MP4_ReadBox_vpcC,         ATOM_vp10 },
