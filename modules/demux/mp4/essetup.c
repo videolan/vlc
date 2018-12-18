@@ -1187,15 +1187,13 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         uint8_t i_channels = 0;
         const uint32_t *p_rg_chans_order = NULL;
 
-        if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == CoreAudio_Layout_BITMAP &&
-             CoreAudio_Bitmap_to_vlc_bitmap( &BOXDATA(p_chan)->layout,
-                                            &i_vlc_mapping, &i_channels,
-                                            &p_rg_chans_order ) != VLC_SUCCESS )
+        if ( CoreAudio_Layout_to_vlc( &BOXDATA(p_chan)->layout,
+                                      &i_vlc_mapping, &i_channels,
+                                      &p_rg_chans_order ) != VLC_SUCCESS )
         {
             msg_Warn( p_demux, "discarding chan mapping" );
         }
-
-        if( i_vlc_mapping )
+        else if( i_vlc_mapping )
         {
             const unsigned i_bps = aout_BitsPerSample( p_track->fmt.i_codec );
             /* Uncompressed audio */
