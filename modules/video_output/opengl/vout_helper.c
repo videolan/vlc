@@ -2456,6 +2456,7 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
 
 static bool is_object_visible(scene_object_t *p_object, scene_mesh_t *p_mesh, float *eye_position, float *eye_direction)
 {
+    return true;
     float mesh_to_eye[3] =  {
         p_object->transformMatrix[12] - eye_position[0],
         p_object->transformMatrix[13] - eye_position[1],
