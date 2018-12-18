@@ -361,14 +361,14 @@ meson: meson-$(MESON_VERSION).tar.gz
 	$(UNPACK)
 	$(MOVE)
 
-.buildmeson: meson
+.meson: meson
 	printf "#!/bin/sh\n\npython3 $(abspath .)/meson/meson.py \"\$$@\"\n" >> $(PREFIX)/bin/meson
 	chmod +x $(PREFIX)/bin/meson
 	touch $@
 
 CLEAN_PKG += meson
 DISTCLEAN_PKG += meson-$(MESON_VERSION).tar.gz
-CLEAN_FILE += .buildmeson
+CLEAN_FILE += .meson
 
 #
 #
