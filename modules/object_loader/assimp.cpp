@@ -438,7 +438,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
             else
             {
                 // External texutre
-                std::string baseTexFileName = pathStr.substr(strlen("C:\\sourceimages\\"));
+                std::string baseTexFileName = pathStr; //pathStr.substr(strlen("C:\\sourceimages\\"));
                 std::string::size_type baseTexFileNameEnd = baseTexFileName.find_last_of("_");
                 if (baseTexFileNameEnd != std::string::npos)
                     baseTexFileName = baseTexFileName.substr(0, baseTexFileNameEnd);
@@ -452,7 +452,8 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 
                 std::string baseTexPath(psz_dataDir);
                 #define TEXTURE_DIR DIR_SEP "VirtualTheater" DIR_SEP "Textures" DIR_SEP
-                baseTexPath += TEXTURE_DIR + baseTexFileName;
+                //baseTexPath += TEXTURE_DIR + baseTexFileName;
+                baseTexPath = baseTexFileName;
 
                 std::string diffuseTexPath = baseTexPath;
                 if (baseTexFileNameEnd != std::string::npos)
