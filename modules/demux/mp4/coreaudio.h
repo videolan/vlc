@@ -68,13 +68,13 @@ static const struct
     { CoreAudio_Bitmap_BACKCENTER,   AOUT_CHAN_REARCENTER },
     { CoreAudio_Bitmap_SIDELEFT,     AOUT_CHAN_MIDDLELEFT },
     { CoreAudio_Bitmap_SIDERIGHT,    AOUT_CHAN_MIDDLERIGHT },
-    { CoreAudio_Bitmap_TOPCENTER,    AOUT_CHAN_CENTER },
-    { CoreAudio_Bitmap_TOPFRONTLEFT, AOUT_CHAN_LEFT },
-    { CoreAudio_Bitmap_TOPFRONTENTER,AOUT_CHAN_CENTER },
-    { CoreAudio_Bitmap_TOPFRONTRIGHT,AOUT_CHAN_RIGHT },
-    { CoreAudio_Bitmap_TOPBACKLEFT,  AOUT_CHAN_REARLEFT },
-    { CoreAudio_Bitmap_TOPBACKCENTER,AOUT_CHAN_REARCENTER },
-    { CoreAudio_Bitmap_TOPBACKRIGHT, AOUT_CHAN_REARRIGHT },
+    { CoreAudio_Bitmap_TOPCENTER,    0 },
+    { CoreAudio_Bitmap_TOPFRONTLEFT, 0 },
+    { CoreAudio_Bitmap_TOPFRONTENTER,0 },
+    { CoreAudio_Bitmap_TOPFRONTRIGHT,0 },
+    { CoreAudio_Bitmap_TOPBACKLEFT,  0 },
+    { CoreAudio_Bitmap_TOPBACKCENTER,0 },
+    { CoreAudio_Bitmap_TOPBACKRIGHT, 0 },
 };
 
 enum CoreAudio_Layout
