@@ -1195,13 +1195,22 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
             msg_Warn( p_demux, "discarding chan mapping" );
         }
 
-        if( aout_BitsPerSample( p_track->fmt.i_codec ) && i_vlc_mapping > 0 &&
-            aout_CheckChannelReorder( p_rg_chans_order, NULL, i_vlc_mapping,
-                                      p_track->rgi_chans_reordering ) )
+        if( i_vlc_mapping )
         {
-            p_track->b_chans_reorder = true;
-            p_track->fmt.audio.i_channels = i_channels;
-            p_track->fmt.audio.i_physical_channels = i_vlc_mapping;
+            const unsigned i_bps = aout_BitsPerSample( p_track->fmt.i_codec );
+            /* Uncompressed audio */
+            if( i_bps && aout_CheckChannelReorder( p_rg_chans_order, NULL,
+                                                   i_vlc_mapping,
+                                                   p_track->rgi_chans_reordering ) )
+                p_track->b_chans_reorder = true;
+
+            /* we can only set bitmap for VLC mapping or [re]mapped pcm audio
+             * as vlc can't enumerate channels for compressed content */
+            if( i_bps || p_track->rgi_chans_reordering == NULL )
+            {
+                p_track->fmt.audio.i_channels = i_channels;
+                p_track->fmt.audio.i_physical_channels = i_vlc_mapping;
+            }
         }
     }
 
