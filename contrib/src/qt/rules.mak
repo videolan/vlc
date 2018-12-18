@@ -33,6 +33,7 @@ ifdef HAVE_WIN32
 ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
 endif
+	$(APPLY) $(SRC)/qt/fix-glibc-2.28-build.patch
 ifndef HAVE_CROSS_COMPILE
 	cd qt-$(QT_VERSION_FULL); for i in QtFontDatabaseSupport QtWindowsUIAutomationSupport QtEventDispatcherSupport QtCore; do \
 		sed -i -e 's,"../../../../../src,"../src,g' include/$$i/$(QT_VERSION)/$$i/private/*.h; done
