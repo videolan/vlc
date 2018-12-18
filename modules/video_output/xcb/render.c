@@ -30,8 +30,10 @@
 
 #include <xcb/xcb.h>
 #include <xcb/render.h>
+#include <xcb/shm.h>
 
 #include <vlc_common.h>
+#include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 
@@ -55,6 +57,7 @@ struct vout_display_sys_t {
     } picture;
 
     xcb_gcontext_t gc;
+    xcb_shm_seg_t segment;
     xcb_window_t root;
     xcb_render_pictformat_t fmt_id;
 
@@ -63,6 +66,38 @@ struct vout_display_sys_t {
     int32_t src_y;
 };
 
+static size_t PictureAttach(vout_display_t *vd, picture_t *pic)
+{
+    vout_display_sys_t *sys = vd->sys;
+    xcb_connection_t *conn = sys->conn;
+    xcb_shm_seg_t segment = sys->segment;
+    const picture_buffer_t *buf = pic->p_sys;
+
+    if (segment == 0  /* SHM extension not supported */
+     || buf->fd == -1 /* picture buffer not in shared memory */)
+        return -1;
+
+    int fd = vlc_dup(buf->fd);
+    if (fd == -1)
+        return -1;
+
+    xcb_void_cookie_t c = xcb_shm_attach_fd_checked(conn, segment, fd, 1);
+    xcb_generic_error_t *e = xcb_request_check(conn, c);
+    if (e != NULL) /* attach failure (likely remote access) */
+    {
+        free(e);
+        return -1;
+    }
+    return buf->offset;
+}
+
+static void PictureDetach(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    xcb_shm_detach(sys->conn, sys->segment);
+}
+
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)
 {
@@ -70,10 +105,24 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
 
-    xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->drawable.source,
-                  sys->gc, pic->p->i_pitch / pic->p->i_pixel_pitch,
-                  pic->p->i_lines, 0, 0, 0, 32,
-                  pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
+    size_t offset = PictureAttach(vd, pic);
+    if (offset != (size_t)-1) {
+        xcb_shm_put_image_checked(conn, sys->drawable.source, sys->gc,
+                                  pic->p->i_pitch / pic->p->i_pixel_pitch,
+                                  pic->p->i_lines,
+                                  0,
+                                  0,
+                      /* width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
+                     /* height */ pic->p->i_lines,
+                                  0, 0, 32, XCB_IMAGE_FORMAT_Z_PIXMAP,
+                                  0, sys->segment, offset);
+    } else {
+        xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->drawable.source,
+                      sys->gc, pic->p->i_pitch / pic->p->i_pixel_pitch,
+                      pic->p->i_lines, 0, 0, 0, 32,
+                      pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
+    }
+
     /* Crop the picture with pixel accuracy */
     xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
                          sys->picture.source, XCB_RENDER_PICTURE_NONE,
@@ -97,7 +146,9 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                          sys->picture.scale, sys->src_x, sys->src_y, 0, 0,
                          sys->place.x, sys->place.y,
                          sys->place.width, sys->place.height);
-
+    if (offset != (size_t)-1)
+        PictureDetach(vd);
+    xcb_flush(conn);
     (void) subpic; (void) date;
 }
 
@@ -483,6 +534,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->picture.scale = xcb_generate_id(conn);
     sys->picture.dest = xcb_generate_id(conn);
     sys->gc = xcb_generate_id(conn);
+
+    if (XCB_shm_Check(obj, conn))
+        sys->segment = xcb_generate_id(conn);
+    else
+        sys->segment = 0;
 
     xcb_colormap_t cmap = xcb_generate_id(conn);
     uint32_t cw_mask =
