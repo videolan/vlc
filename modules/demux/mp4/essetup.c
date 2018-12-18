@@ -1183,29 +1183,25 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     const MP4_Box_t *p_chan = MP4_BoxGet( p_sample, "chan" );
     if ( p_chan )
     {
-        if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == CoreAudio_Layout_BITMAP )
+        uint16_t i_vlc_mapping = 0;
+        uint8_t i_channels = 0;
+        const uint32_t *p_rg_chans_order = NULL;
+
+        if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == CoreAudio_Layout_BITMAP &&
+             CoreAudio_Bitmap_to_vlc_bitmap( BOXDATA(p_chan)->layout.i_channels_bitmap,
+                                            &i_vlc_mapping, &i_channels,
+                                            &p_rg_chans_order ) != VLC_SUCCESS )
         {
-            uint32_t rgi_chans_sequence[AOUT_CHAN_MAX + 1];
-            memset(rgi_chans_sequence, 0, sizeof(rgi_chans_sequence));
-            uint16_t i_vlc_mapping = 0;
-            uint8_t i_channels = 0;
+            msg_Warn( p_demux, "discarding chan mapping" );
+        }
 
-            if( CoreAudio_Bitmap_to_vlc_bitmap( BOXDATA(p_chan)->layout.i_channels_bitmap,
-                                               &i_vlc_mapping, &i_channels,
-                                                rgi_chans_sequence ) != VLC_SUCCESS )
-            {
-                msg_Warn( p_demux, "discarding chan mapping" );
-            }
-
-            if( aout_CheckChannelReorder( rgi_chans_sequence, NULL, i_vlc_mapping,
-                                          p_track->rgi_chans_reordering ) &&
-                aout_BitsPerSample( p_track->fmt.i_codec ) )
-            {
-                p_track->b_chans_reorder = true;
-                p_track->fmt.audio.i_channels = i_channels;
-                p_track->fmt.audio.i_physical_channels = i_vlc_mapping;
-            }
-
+        if( aout_BitsPerSample( p_track->fmt.i_codec ) && i_vlc_mapping > 0 &&
+            aout_CheckChannelReorder( p_rg_chans_order, NULL, i_vlc_mapping,
+                                      p_track->rgi_chans_reordering ) )
+        {
+            p_track->b_chans_reorder = true;
+            p_track->fmt.audio.i_channels = i_channels;
+            p_track->fmt.audio.i_physical_channels = i_vlc_mapping;
         }
     }
 

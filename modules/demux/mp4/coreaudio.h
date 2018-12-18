@@ -42,6 +42,16 @@ enum
     CoreAudio_Bitmap_TOPBACKRIGHT         = (1<<17),
 };
 
+static const uint32_t pi_vlc_chan_order_CoreAudio[] =
+{
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,
+    AOUT_CHAN_LFE,
+    AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT,
+    AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT, AOUT_CHAN_REARCENTER,
+    AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
+    0
+};
+
 static const struct
 {
     uint32_t i_bitmap;
@@ -76,8 +86,9 @@ enum CoreAudio_Layout
 static inline int CoreAudio_Bitmap_to_vlc_bitmap( uint32_t i_corebitmap,
                                                   uint16_t *pi_mapping,
                                                   uint8_t *pi_channels,
-                                                  uint32_t p_chans[AOUT_CHAN_MAX + 1] )
+                                                  const uint32_t **pp_chans_order )
 {
+    *pp_chans_order = pi_vlc_chan_order_CoreAudio;
     *pi_mapping = 0;
     *pi_channels = 0;
     for (uint8_t i=0;i<ARRAY_SIZE(CoreAudio_Bitmap_mapping);i++)
@@ -89,12 +100,11 @@ static inline int CoreAudio_Bitmap_to_vlc_bitmap( uint32_t i_corebitmap,
             {
                 /* double mapping or unsupported number of channels */
                 *pi_mapping = 0;
+                *pi_channels = 0;
                 return VLC_EGENERIC;
             }
             *pi_mapping |= CoreAudio_Bitmap_mapping[i].i_vlc_bitmap;
-            p_chans[(*pi_channels)++] = CoreAudio_Bitmap_mapping[i].i_vlc_bitmap;
         }
     }
-    p_chans[*pi_channels] = 0;
     return VLC_SUCCESS;
 }
