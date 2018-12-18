@@ -1183,30 +1183,20 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
     const MP4_Box_t *p_chan = MP4_BoxGet( p_sample, "chan" );
     if ( p_chan )
     {
-        if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == MP4_CHAN_USE_CHANNELS_BITMAP )
+        if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == CoreAudio_Layout_BITMAP )
         {
             uint32_t rgi_chans_sequence[AOUT_CHAN_MAX + 1];
             memset(rgi_chans_sequence, 0, sizeof(rgi_chans_sequence));
             uint16_t i_vlc_mapping = 0;
             uint8_t i_channels = 0;
-            const uint32_t i_bitmap = BOXDATA(p_chan)->layout.i_channels_bitmap;
-            for (uint8_t i=0;i<MP4_CHAN_BITMAP_MAPPING_COUNT;i++)
+
+            if( CoreAudio_Bitmap_to_vlc_bitmap( BOXDATA(p_chan)->layout.i_channels_bitmap,
+                                               &i_vlc_mapping, &i_channels,
+                                                rgi_chans_sequence ) != VLC_SUCCESS )
             {
-                if ( chan_bitmap_mapping[i].i_bitmap & i_bitmap )
-                {
-                    if ( (chan_bitmap_mapping[i].i_vlc & i_vlc_mapping) ||
-                         i_channels >= AOUT_CHAN_MAX )
-                    {
-                        /* double mapping or unsupported number of channels */
-                        i_vlc_mapping = 0;
-                        msg_Warn( p_demux, "discarding chan mapping" );
-                        break;
-                    }
-                    i_vlc_mapping |= chan_bitmap_mapping[i].i_vlc;
-                    rgi_chans_sequence[i_channels++] = chan_bitmap_mapping[i].i_vlc;
-                }
+                msg_Warn( p_demux, "discarding chan mapping" );
             }
-            rgi_chans_sequence[i_channels] = 0;
+
             if( aout_CheckChannelReorder( rgi_chans_sequence, NULL, i_vlc_mapping,
                                           p_track->rgi_chans_reordering ) &&
                 aout_BitsPerSample( p_track->fmt.i_codec ) )
