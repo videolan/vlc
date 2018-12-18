@@ -1683,7 +1683,6 @@ static void Direct3D11DeleteRegions(int count, picture_t **region)
 static void DestroyPictureQuad(picture_t *p_picture)
 {
     D3D11_ReleaseQuad( (d3d_quad_t *) p_picture->p_sys );
-    free( p_picture );
 }
 
 static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_count,
@@ -1720,7 +1719,7 @@ static int Direct3D11MapSubpicture(vout_display_t *vd, int *subpicture_region_co
                     texDesc.Width  == r->p_picture->format.i_width &&
                     texDesc.Height == r->p_picture->format.i_height) {
                     (*region)[i] = cache;
-                    memset(&sys->d3dregions[j], 0, sizeof(cache)); // do not reuse this cached value
+                    memset(&sys->d3dregions[j], 0, sizeof(cache)); // do not reuse this cached value a second time
                     break;
                 }
             }
