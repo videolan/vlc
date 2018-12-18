@@ -34,7 +34,6 @@ struct vlc_inhibit_sys
     vlc_mutex_t mutex;
     vlc_cond_t cond;
     vlc_thread_t thread;
-    bool signaled;
     unsigned int mask;
 };
 
@@ -43,7 +42,6 @@ static void Inhibit (vlc_inhibit_t *ih, unsigned mask)
     vlc_inhibit_sys_t *sys = ih->p_sys;
     vlc_mutex_lock(&sys->mutex);
     sys->mask = mask;
-    sys->signaled = true;
     vlc_mutex_unlock(&sys->mutex);
     vlc_cond_signal(&sys->cond);
 }
@@ -60,17 +58,14 @@ static void* Run(void* obj)
     vlc_inhibit_sys_t *sys = ih->p_sys;
     EXECUTION_STATE prev_state = ES_CONTINUOUS;
 
-    while (true)
+    for  (unsigned int mask = 0;;)
     {
-        unsigned int mask;
-
         vlc_mutex_lock(&sys->mutex);
         mutex_cleanup_push(&sys->mutex);
         vlc_cleanup_push(RestoreStateOnCancel, ih);
-        while (!sys->signaled)
+        while (mask == sys->mask)
             vlc_cond_wait(&sys->cond, &sys->mutex);
         mask = sys->mask;
-        sys->signaled = false;
         vlc_mutex_unlock(&sys->mutex);
         vlc_cleanup_pop();
         vlc_cleanup_pop();
@@ -107,7 +102,7 @@ static int OpenInhibit (vlc_object_t *obj)
 
     vlc_mutex_init(&sys->mutex);
     vlc_cond_init(&sys->cond);
-    sys->signaled = false;
+    sys->mask = 0;
 
     /* SetThreadExecutionState always needs to be called from the same thread */
     if (vlc_clone(&sys->thread, Run, ih, VLC_THREAD_PRIORITY_LOW))
