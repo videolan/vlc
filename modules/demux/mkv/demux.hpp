@@ -61,7 +61,7 @@ public:
         vlc_mutex_init( &lock_demuxer );
     }
 
-    virtual ~demux_sys_t();
+    ~demux_sys_t();
 
     /* current data */
     demux_t                 & demuxer;
