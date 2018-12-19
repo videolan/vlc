@@ -77,6 +77,7 @@ static int vout_display_start(void *func, va_list ap)
     video_format_t *fmtp = va_arg(ap, video_format_t *);
     vlc_video_context *context = va_arg(ap, vlc_video_context *);
 
+    /* Picture buffer does not have the concept of aspect ratio */
     video_format_Copy(fmtp, &vd->source);
     fmtp->i_sar_num = 0;
     fmtp->i_sar_den = 0;
@@ -102,7 +103,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     /* */
     video_format_Copy(&vd->source, fmt);
 
-    /* Picture buffer does not have the concept of aspect ratio */
     vd->info = (vout_display_info_t){ };
     vd->cfg = cfg;
     vd->pool = NULL;
