@@ -546,17 +546,14 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     p_sys->shm = XCB_shm_Check (obj, conn);
     p_sys->visible = false;
 
-    /* */
-    vout_display_info_t info = vd->info;
-    info.has_pictures_invalid = false;
-
     /* Setup vout_display_t once everything is fine */
+    vd->info.has_pictures_invalid = false;
+
     p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
                                                     fmtp->i_chroma);
     if (p_sys->swap_uv)
         fmt.i_chroma = fmtp->i_chroma;
     *fmtp = fmt;
-    vd->info = info;
 
     vd->pool = Pool;
     vd->prepare = NULL;
