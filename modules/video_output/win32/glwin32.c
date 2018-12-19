@@ -154,13 +154,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (!sys->vgl)
         goto error;
 
-    vout_display_info_t info = vd->info;
-    info.has_double_click = true;
-    info.subpicture_chromas = subpicture_chromas;
+    /* Setup vout_display now that everything is fine */
+    vd->info.has_double_click = true;
+    vd->info.subpicture_chromas = subpicture_chromas;
 
-   /* Setup vout_display now that everything is fine */
     *fmtp    = fmt;
-    vd->info = info;
 
     vd->pool    = Pool;
     vd->prepare = Prepare;
