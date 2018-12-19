@@ -45,6 +45,109 @@
 #include "pictures.h"
 #include "events.h"
 
+const xcb_format_t *vlc_xcb_DepthToPixmapFormat(const xcb_setup_t *setup,
+                                                uint_fast8_t depth)
+{
+    const xcb_format_t *fmt = xcb_setup_pixmap_formats(setup);
+
+    for (int i = xcb_setup_pixmap_formats_length(setup); i > 0; i--, fmt++)
+        if (fmt->depth == depth)
+        {   /* Sanity check: unusable format is as good as none. */
+            if (unlikely(fmt->bits_per_pixel < depth
+                      || (fmt->scanline_pad % fmt->bits_per_pixel)))
+                return NULL;
+            return fmt;
+        }
+    return NULL; /* should never happen, buggy server */
+}
+
+/** Convert X11 visual to VLC video format */
+bool vlc_xcb_VisualToFormat(const xcb_setup_t *setup, uint_fast8_t depth,
+                            const xcb_visualtype_t *vt,
+                            video_format_t *restrict f)
+{
+    if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
+    {
+        /* Check that VLC supports the TrueColor visual. */
+        switch (depth)
+        {
+            /* TODO: 32 bits RGBA */
+            /* TODO: 30 bits HDR RGB */
+            case 24:
+                if (vlc_popcount(vt->red_mask) == 8
+                 && vlc_popcount(vt->green_mask) == 8
+                 && vlc_popcount(vt->red_mask) == 8)
+                    break; /* 32-bits ARGB or 24-bits RGB */
+                return false;
+            case 16:
+            case 15:
+                if (vlc_popcount(vt->red_mask) == 5
+                 && vlc_popcount(vt->green_mask) == (depth - 10)
+                 && vlc_popcount(vt->red_mask) == 5)
+                    break; /* 16-bits or 15-bits RGB */
+                return false;
+            case 8:
+                /* XXX: VLC does not use masks for 8-bits. Untested. */
+                break;
+            default:
+                return false;
+        }
+    }
+    else
+    if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
+    {
+        if (depth != 8)
+            return false;
+    }
+
+    const xcb_format_t *fmt = vlc_xcb_DepthToPixmapFormat(setup, depth);
+    if (unlikely(fmt == NULL))
+        return false;
+
+    /* Byte sex is a non-issue for 8-bits. It can be worked around with
+     * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
+    if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
+        return false;
+
+    /* Check that VLC supports the pixel format. */
+    switch (fmt->depth)
+    {
+        case 24:
+            if (fmt->bits_per_pixel == 32)
+                f->i_chroma = VLC_CODEC_RGB32;
+            else if (fmt->bits_per_pixel == 24)
+                f->i_chroma = VLC_CODEC_RGB24;
+            else
+                return false;
+            break;
+        case 16:
+            if (fmt->bits_per_pixel != 16)
+                return false;
+            f->i_chroma = VLC_CODEC_RGB16;
+            break;
+        case 15:
+            if (fmt->bits_per_pixel != 16)
+                return false;
+            f->i_chroma = VLC_CODEC_RGB15;
+            break;
+        case 8:
+            if (fmt->bits_per_pixel != 8)
+                return false;
+            if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
+                f->i_chroma = VLC_CODEC_RGB8;
+            else
+                f->i_chroma = VLC_CODEC_GREY;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+
+    f->i_rmask = vt->red_mask;
+    f->i_gmask = vt->green_mask;
+    f->i_bmask = vt->blue_mask;
+    return true;
+}
+
 /** Check MIT-SHM shared memory support */
 bool XCB_shm_Check (vlc_object_t *obj, xcb_connection_t *conn)
 {
