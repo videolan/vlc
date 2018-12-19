@@ -1,31 +1,36 @@
 # Nepali translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Ashish Agarwal <sawnhot27@gmail.com>, 2018
 # Ashish Belwase <techackernp@gmail.com>, 2014
 # Ashish Ghimire <ashishghimire02@gmail.com>, 2014
 # Bibhuti Regmi <bibhutiregmi@gmail.com>, 2014
 # Jyoti Manandhar <manandharjyoti@gmail.com>, 2014
-# Prabin Gautam <PRABINGAUTAM@gmail.com>, 2014
 # Pari <anzel.shrestha@gmail.com>, 2014
 # Prabesh <prabesh904@gmail.com>, 2014
 # Prabin Gautam <PRABINGAUTAM@gmail.com>, 2014
+# Prabin Thapa Magar <prabinmagar526@gmail.com>, 2018
 # Pratik <prt.bluestrngvibration@gmail.com>, 2014
+# Sandip Rai <scotrai8@gmail.com>, 2018
 # Sanjog <sigsandy02@gmail.com>, 2014
+# suraj bohara <surajbohara65@gmail.com>, 2017
 # Saroj Dhakal <lotusnagarkot@gmail.com>, 2015,2017
 # Suyogya <suyogya.tamrakar@gmail.com>, 2014
+# Surit Aryal <surit_people@hotmail.com>, 2018
+# Umesh Chakradhar <umeshchakradhar11@gmail.com>, 2018
 # Yoses Gurung <trustjoses1@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 19:07+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Nepali (Nepal) (https://www.transifex.com/yaron/teams/16553/"
 "ne_NP/)\n"
-"Language: ne\n"
+"Language: ne_NP\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -22716,9 +22721,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 भिडियो प्याकेटाइजर"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
