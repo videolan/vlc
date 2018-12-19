@@ -1188,7 +1188,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         const uint32_t *p_rg_chans_order = NULL;
 
         if ( BOXDATA(p_chan)->layout.i_channels_layout_tag == CoreAudio_Layout_BITMAP &&
-             CoreAudio_Bitmap_to_vlc_bitmap( BOXDATA(p_chan)->layout.i_channels_bitmap,
+             CoreAudio_Bitmap_to_vlc_bitmap( &BOXDATA(p_chan)->layout,
                                             &i_vlc_mapping, &i_channels,
                                             &p_rg_chans_order ) != VLC_SUCCESS )
         {

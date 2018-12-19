@@ -19,6 +19,24 @@
  *****************************************************************************/
 #include <vlc_aout.h>
 
+struct CoreAudio_layout_s
+{
+    uint32_t i_channels_layout_tag;
+    uint32_t i_channels_bitmap;
+    uint32_t i_channels_description_count;
+    struct
+    {
+        uint32_t i_channel_label;
+        uint32_t i_channel_flags;
+        float    f_coordinates[3];
+    } *p_descriptions;
+};
+
+static inline void CoreAudio_Layout_Clean(struct CoreAudio_layout_s *c)
+{
+    free( c->p_descriptions );
+}
+
 /* According to Apple's CoreAudio_Bitmap/CoreAudio_BitmapTypes.h */
 enum
 {
@@ -83,7 +101,7 @@ enum CoreAudio_Layout
     CoreAudio_Layout_BITMAP               = (1<<16),
 };
 
-static inline int CoreAudio_Bitmap_to_vlc_bitmap( uint32_t i_corebitmap,
+static inline int CoreAudio_Bitmap_to_vlc_bitmap( const struct CoreAudio_layout_s *c,
                                                   uint16_t *pi_mapping,
                                                   uint8_t *pi_channels,
                                                   const uint32_t **pp_chans_order )
@@ -93,7 +111,7 @@ static inline int CoreAudio_Bitmap_to_vlc_bitmap( uint32_t i_corebitmap,
     *pi_channels = 0;
     for (uint8_t i=0;i<ARRAY_SIZE(CoreAudio_Bitmap_mapping);i++)
     {
-        if ( CoreAudio_Bitmap_mapping[i].i_bitmap & i_corebitmap )
+        if ( CoreAudio_Bitmap_mapping[i].i_bitmap & c->i_channels_bitmap )
         {
             if ( (CoreAudio_Bitmap_mapping[i].i_vlc_bitmap & *pi_mapping) ||
                  *pi_channels >= AOUT_CHAN_MAX )

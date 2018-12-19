@@ -1379,18 +1379,7 @@ typedef struct
 {
     uint8_t i_version;
     uint32_t i_channels_flags; /* 24 bits */
-    struct
-    {
-        uint32_t i_channels_layout_tag;
-        uint32_t i_channels_bitmap;
-        uint32_t i_channels_description_count;
-        struct
-        {
-            uint32_t i_channel_label;
-            uint32_t i_channel_flags;
-            float    f_coordinates[3];
-        } *p_descriptions;
-    } layout;
+    struct CoreAudio_layout_s layout;
 } MP4_Box_data_chan_t;
 
 typedef struct
