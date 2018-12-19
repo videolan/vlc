@@ -1,5 +1,5 @@
 # Telugu translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,11 +8,11 @@
 # వీవెన్ వీరపనేని <veeven@gmail.com>, 2013,2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:15+0200\n"
-"Last-Translator: వీవెన్ వీరపనేని <veeven@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Telugu (https://www.transifex.com/yaron/teams/16553/te/)\n"
 "Language: te\n"
 "MIME-Version: 1.0\n"
@@ -22261,9 +22261,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "వీడియో పరికరం"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
