@@ -11,6 +11,7 @@ Demux:
 Packetizers:
  * Fixes H264/HEVC incomplete draining in some cases
  * packetizer_helper: Fix potential trailing junk on last packet
+ * Improved check to prevent fLAC synchronization drops
 
 Decoder:
  * avcodec: revector video decoder to fix incomplete drain
