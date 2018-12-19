@@ -68,7 +68,8 @@ static int Open( vlc_object_t *p_this )
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVP ||
         ( p_filter->fmt_out.video.i_chroma != VLC_CODEC_YUVA &&
           p_filter->fmt_out.video.i_chroma != VLC_CODEC_RGBA &&
-          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB ) ||
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_ARGB &&
+          p_filter->fmt_out.video.i_chroma != VLC_CODEC_BGRA ) ||
         p_filter->fmt_in.video.i_width  != p_filter->fmt_out.video.i_width ||
         p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height ||
         p_filter->fmt_in.video.orientation != p_filter->fmt_out.video.orientation )
@@ -144,15 +145,18 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     else
     {
         video_palette_t rgbp;
+        int r, g, b, a;
 
-        assert( p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ||
-                p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGBA );
+        switch( p_filter->fmt_out.video.i_chroma )
+        {
+            case VLC_CODEC_ARGB: r = 1, g = 2, b = 3, a = 0; break;
+            case VLC_CODEC_RGBA: r = 0, g = 1, b = 2, a = 3; break;
+            case VLC_CODEC_BGRA: r = 2, g = 1, b = 0, a = 3; break;
+            default:
+                vlc_assert_unreachable();
+        }
         /* Create a RGBA palette */
         rgbp.i_entries = p_yuvp->i_entries;
-        const uint8_t r = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 1 : 0;
-        const uint8_t g = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 2 : 1;
-        const uint8_t b = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 3 : 2;
-        const uint8_t a = p_filter->fmt_out.video.i_chroma == VLC_CODEC_ARGB ? 0 : 3;
         for( int i = 0; i < p_yuvp->i_entries; i++ )
         {
             if( p_yuvp->palette[i][3] == 0 )
