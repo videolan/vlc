@@ -167,11 +167,6 @@ static void PMThread( void *arg )
     video_format_ApplyRotation(&fmt, fmtp);
 
     /* */
-    vout_display_info_t info = vd->info;
-    info.is_slow = false;
-    info.has_double_click = true;
-    info.has_pictures_invalid = false;
-
     MorphToPM();
 
     sys->hab = WinInitialize( 0 );
@@ -275,7 +270,10 @@ static void PMThread( void *arg )
 
     /* Setup vout_display now that everything is fine */
     *fmtp       = fmt;
-    vd->info    = info;
+
+    vd->info.is_slow = false;
+    vd->info.has_double_click = true;
+    vd->info.has_pictures_invalid = false;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
