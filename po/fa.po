@@ -4,16 +4,13 @@
 #
 # Translators:
 # Hossein Arshadaghghaleh <hossein.arshad@gmail.com>, 2013
-# saeed farzad <security.registered@gmail.com>, 2013
-# Emad <tiptopland@gmail.com>, 2013
+# Saeed Farzad <security.registered@gmail.com>, 2013
 # Goudarz Jafari <goudarz.jafari@gmail.com>, 2016-2017
-# imni <if90@chmail.ir>, 2014
 # Meelad Zakaria <meelad@farsiweb.info>, 2007
 # Mohammad Hossein Mojtahedi <Mhm5000@gmail.com>, 2013
-# mohammad rahmani <mohammadrahmani2o0@gmail.com>, 2015-2016
+# Mohammad Rahmani <mohammadrahmani2o0@gmail.com>, 2015-2016
 # Na Mira <ota_co@yahoo.com>, 2017-2018
 # Pouriya <pouriya.he@ymail.com>, 2014
-# ropy <ropy.nf@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.7\n"
