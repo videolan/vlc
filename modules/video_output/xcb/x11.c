@@ -132,7 +132,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
         xcb_generic_error_t *e = xcb_request_check(conn, ck);
         if (e != NULL)
         {
-            msg_Dbg(vd, "%s: X11 error %d", "cannot put image", e->error_code);
+            msg_Err(vd, "%s: X11 error %d", "cannot put image", e->error_code);
             free(e);
         }
     }
