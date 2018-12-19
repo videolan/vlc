@@ -63,7 +63,8 @@ static int OpenFilter( vlc_object_t *p_this )
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_YV12 &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB32 &&
           p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBA &&
-          p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB ) ||
+          p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
+          p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRA ) ||
         p_filter->fmt_in.video.i_chroma != p_filter->fmt_out.video.i_chroma )
     {
         return VLC_EGENERIC;
@@ -105,6 +106,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGBA &&
         p_filter->fmt_in.video.i_chroma != VLC_CODEC_ARGB &&
+        p_filter->fmt_in.video.i_chroma != VLC_CODEC_BGRA &&
         p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB32 )
     {
         for( int i_plane = 0; i_plane < p_pic_dst->i_planes; i_plane++ )
