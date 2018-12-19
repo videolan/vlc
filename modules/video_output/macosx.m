@@ -240,7 +240,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         }
 
         /* Setup vout_display_t once everything is fine */
-        vd->info.has_pictures_invalid = false;
         vd->info.subpicture_chromas = subpicture_chromas;
 
         vd->pool = Pool;
