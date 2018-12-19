@@ -271,9 +271,7 @@ static void PMThread( void *arg )
     /* Setup vout_display now that everything is fine */
     *fmtp       = fmt;
 
-    vd->info.is_slow = false;
     vd->info.has_double_click = true;
-    vd->info.has_pictures_invalid = false;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
