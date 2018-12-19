@@ -1,5 +1,5 @@
 # Czech translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -23,18 +23,18 @@
 # Tomáš Chvátal <tomas.chvatal@gmail.com>, 2014-2018
 # Tomáš Souček <soucek.gns@gmail.com>, 2014
 # Václav Pavlíček <v.pavlicek@centrum.cz>, 2012
-# Vít Pelčák, 2012,2015,2016,2018
+# Vít Pelčák <vit@pelcak.org>, 2012,2015,2016,2018
 # Vojtěch Smejkal <smejkalv@gmail.com>, 2009
 # Zuzana Wolfová <painteddreaming@gmail.com>, 2014
 # Lukáš Spurný <lukasspurny8@gmail.com>, 2018
 # Pavel Řehák <pavel-rehak@email.cz>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-20 11:34+0200\n"
-"Last-Translator: Tomáš Chvátal <tomas.chvatal@gmail.com>, 2018\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
+"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Czech (https://www.transifex.com/yaron/teams/16553/cs/)\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -16286,7 +16286,7 @@ msgstr ""
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "Opustit režim celé obrazovky"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -16482,7 +16482,7 @@ msgstr "Uzamknout poměr stran"
 
 #: modules/gui/macosx/macosx.m:113
 msgid "Dim keyboard backlight during fullscreen playback"
-msgstr ""
+msgstr "Ztlumit podsvícení klávesnice při přehrávání v režimu celé obrazovky"
 
 #: modules/gui/macosx/macosx.m:114
 msgid ""
@@ -17467,7 +17467,7 @@ msgstr "Nastavení videa"
 #: modules/gui/qt/components/simple_preferences.cpp:238
 #: modules/gui/qt/components/simple_preferences.cpp:853
 msgid "Subtitle & On Screen Display Settings"
-msgstr ""
+msgstr "Nastavení titulků a OSD"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:235
 msgid "Input & Codec Settings"
@@ -17673,11 +17673,11 @@ msgstr "Zobrazit video uvnitř hlavního okna"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:360
 msgid "Fullscreen settings"
-msgstr ""
+msgstr "Nastavení režimu celé obrazovky"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:361
 msgid "Start in fullscreen"
-msgstr ""
+msgstr "Spustit v režimu celé obrazovky"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:362
 msgid "Black screens in Fullscreen mode"
@@ -19627,7 +19627,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/firstrun.cpp:100
 msgid "Regularly check for VLC updates"
-msgstr ""
+msgstr "Pravidelně kontrolovat dostupnost aktualizací přehrávače VLC"
 
 #: modules/gui/qt/dialogs/gototime.cpp:42
 msgid "Go to Time"
@@ -22746,9 +22746,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Paketizér videa Daala"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
