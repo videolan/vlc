@@ -1,17 +1,17 @@
 # Punjabi translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# A S Alam <apreet.alam@gmail.com>, 2009-2018
+# A S Alam <alam.yellow@gmail.com>, 2009-2018
 # Navpreet Kaur <passionate.preet3@gmail.com>, 2014
 # Punjabi Fied <towtruckerwiki@gmail.com>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:15+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Panjabi (Punjabi) (https://www.transifex.com/yaron/"
 "teams/16553/pa/)\n"
@@ -742,11 +742,11 @@ msgstr ""
 
 #: src/config/help.c:490
 msgid "(default enabled)"
-msgstr ""
+msgstr "(ਮੂਲ ਸਮਰੱਥ ਹੈ)"
 
 #: src/config/help.c:491
 msgid "(default disabled)"
-msgstr ""
+msgstr "(ਮੂਲ ਅਸਮਰੱਥ ਹੈ)"
 
 #: src/config/help.c:651 src/config/help.c:655
 msgid "Note:"
@@ -976,7 +976,7 @@ msgstr "%.2f dB"
 
 #: src/input/es_out.c:3168
 msgid "Video resolution"
-msgstr ""
+msgstr " ਵੀਡੀਓ ਰੈਜ਼ੋਲੂਸ਼ਨ"
 
 #: src/input/es_out.c:3173
 msgid "Buffer dimensions"
@@ -998,35 +998,35 @@ msgstr "ਡੀਕੋਡ ਕੀਤਾ ਫਾਰਮੈਟ"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
-msgstr ""
+msgstr "ਉੱਤੇ ਖੱਬੇ"
 
 #: src/input/es_out.c:3199
 msgid "Left top"
-msgstr ""
+msgstr "ਖੱਬੇ ਉੱਤੇ"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "ਸੱਜੇ ਹੇਠਾਂ"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
-msgstr ""
+msgstr "ਉੱਤੇ ਸੱਜੇ"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "ਹੇਠਾਂ ਖੱਬੇ"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "ਹੇਠਾਂ ਸੱਜੇ"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "ਖੱਬੇ ਹੇਠਾਂ"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
-msgstr ""
+msgstr "ਸੱਜੇ ਉੱਤੇ"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
@@ -22285,9 +22285,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 ਵਿਡੀਓ ਪੈਕਟਾਈਜ਼ਰ"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
