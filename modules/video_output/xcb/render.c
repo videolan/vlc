@@ -618,7 +618,7 @@ vlc_module_begin()
     set_capability("vout display", 200)
     set_callbacks(Open, Close)
     add_shortcut("x11-render", "xcb-render", "render")
-    add_string("x11-render-filter", "nearest", N_("Scaling mode"),
+    add_string("x11-render-filter", "good", N_("Scaling mode"),
                N_("Scaling mode"), true)
         change_string_list(filter_names, filter_descs)
 vlc_module_end()
