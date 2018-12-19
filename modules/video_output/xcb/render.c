@@ -110,15 +110,12 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
 
     size_t offset = PictureAttach(vd, pic);
     if (offset != (size_t)-1) {
-        xcb_shm_put_image_checked(conn, sys->drawable.source, sys->gc,
-                                  pic->p->i_pitch / pic->p->i_pixel_pitch,
-                                  pic->p->i_lines,
-                                  0,
-                                  0,
-                      /* width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
-                     /* height */ pic->p->i_lines,
-                                  0, 0, 32, XCB_IMAGE_FORMAT_Z_PIXMAP,
-                                  0, sys->segment, offset);
+        xcb_shm_put_image(conn, sys->drawable.source, sys->gc,
+                          pic->p->i_pitch / pic->p->i_pixel_pitch,
+                          pic->p->i_lines, 0, 0,
+                          pic->p->i_pitch / pic->p->i_pixel_pitch,
+                          pic->p->i_lines, 0, 0, 32, XCB_IMAGE_FORMAT_Z_PIXMAP,
+                          0, sys->segment, offset);
     } else {
         xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->drawable.source,
                       sys->gc, pic->p->i_pitch / pic->p->i_pixel_pitch,
