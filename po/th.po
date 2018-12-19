@@ -1,20 +1,21 @@
 # Thai translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# bact' <arthit@gmail.com>, 2017
 # Chaisiri Toomthong <chaisiri_tt@hotmail.com>, 2015
 # Chalermpon Dasri <d.chalermpon@gmail.com>, 2013
-# <develop5@datawiz.co.th>, 2006
 # jerng <jernghan@gmail.com>, 2014
-# Rockers RRock <sumoisrock@gmail.com>, 2017-2018
-# Theppitak Karoonboonyanan <thep@linux.thai.net>, 2013
+# Phattanon Duangdara <sfalpha@gmail.com>, 2017
+# Rockers <sumorock@hotmail.com>, 2017-2018
+# Theppitak Karoonboonyanan <theppitak@gmail.com>, 2013,2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:15+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Thai (https://www.transifex.com/yaron/teams/16553/th/)\n"
 "Language: th\n"
@@ -22582,9 +22583,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "ตัวทำแพ็กเก็ตวีดิทัศน์ H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
