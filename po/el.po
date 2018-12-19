@@ -1,10 +1,10 @@
 # Modern Greek translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Alex Kalfas <kalfas.alex@gmail.com>, 2014
-# firespin <dartworldgr@hotmail.com>, 2014
+# firespin <dartworldgr@hotmail.com>, 2014,2018
 # Pontikis Ioannis <johnpontikis@yahoo.gr>, 2013
 # melmel <p_mel@windowslive.com>, 2014
 # Savvas Nesseris <nesseris@yahoo.com>, 2014-2015
@@ -12,10 +12,10 @@
 # Dimitrios Glentadakis <dglent@free.fr>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 02:59+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Greek (https://www.transifex.com/yaron/teams/16553/el/)\n"
 "Language: el\n"
@@ -7685,7 +7685,7 @@ msgstr "Παρακαλώ εισάγετε ένα έγκυρο όνομα και 
 
 #: modules/access/http/access.c:288
 msgid "HTTPS input"
-msgstr ""
+msgstr "Είσοδος HTTPS"
 
 #: modules/access/http/access.c:289
 msgid "HTTPS"
@@ -16964,11 +16964,11 @@ msgstr ""
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
-msgstr ""
+msgstr "Θέση αναπαραγωγής"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:113
 msgid "Playback time"
-msgstr ""
+msgstr "Χρόνος αναπαραγωγής"
 
 #: modules/gui/macosx/VLCControlsBarCommon.m:194
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
@@ -21395,7 +21395,7 @@ msgstr "Άδειο"
 
 #: modules/gui/qt/extensions_manager.cpp:197
 msgid "Deactivate"
-msgstr ""
+msgstr "Απενεργοποίηση"
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
@@ -21435,7 +21435,7 @@ msgstr "Υπότι&τλος"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "Εργαλείο&α"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -21985,7 +21985,7 @@ msgstr "αποσφαλμάτωση"
 #: modules/gui/qt/util/searchlineedit.cpp:49
 msgctxt "Tooltip|Clear"
 msgid "Clear"
-msgstr ""
+msgstr "Εκκαθάριση"
 
 #: modules/gui/skins2/src/dialogs.cpp:212
 msgid "Open a skin file"
@@ -21997,7 +21997,7 @@ msgstr "Αρχεία προσόψεων |*.vlt;*.wsz;*.xml"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "Playlist Files |"
-msgstr ""
+msgstr " Αρχεία Λίστας Αναπαραγωγής |"
 
 #: modules/gui/skins2/src/dialogs.cpp:221
 msgid "|All Files |*"
@@ -24016,9 +24016,8 @@ msgid "avparser packetizer"
 msgstr "πακετοποιητής avparser "
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Πακετοποιητής βίντεο H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -25317,7 +25316,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:187
 msgid "HTTP port"
-msgstr ""
+msgstr "Θύρα HTTP"
 
 #: modules/stream_out/chromecast/cast.cpp:188
 msgid ""
@@ -25328,7 +25327,7 @@ msgstr ""
 #: modules/stream_out/chromecast/cast.cpp:190
 #: modules/stream_out/chromecast/cast.cpp:1200
 msgid "Performance warning"
-msgstr ""
+msgstr "Προειδοποίηση απόδοσης"
 
 #: modules/stream_out/chromecast/cast.cpp:191
 msgid "Display a performance warning when transcoding"
@@ -29447,7 +29446,7 @@ msgstr ""
 
 #: modules/gui/qt/ui/profiles.h:706
 msgid "M&JPEG"
-msgstr ""
+msgstr "M&JPEG"
 
 #: modules/gui/qt/ui/profiles.h:707
 msgid "MPEG-PS"
@@ -29455,7 +29454,7 @@ msgstr "MPEG PS"
 
 #: modules/gui/qt/ui/profiles.h:708
 msgid "F&LV"
-msgstr ""
+msgstr "F&LV"
 
 #: modules/gui/qt/ui/profiles.h:709
 msgid "&MPEG-TS"
@@ -29475,7 +29474,7 @@ msgstr "Webm"
 
 #: modules/gui/qt/ui/profiles.h:713
 msgid "MPEG &1"
-msgstr ""
+msgstr "MPEG &1"
 
 #: modules/gui/qt/ui/profiles.h:714
 msgid "AVI"
@@ -29487,7 +29486,7 @@ msgstr "ASF/WMV"
 
 #: modules/gui/qt/ui/profiles.h:716
 msgid "MP&3"
-msgstr ""
+msgstr "MP&3"
 
 #: modules/gui/qt/ui/profiles.h:717
 msgid "Features"
@@ -29523,7 +29522,7 @@ msgstr "Προσαρμοσμένες επιλογές"
 
 #: modules/gui/qt/ui/profiles.h:735
 msgid "&Quality"
-msgstr ""
+msgstr "&Ποιότητα"
 
 #: modules/gui/qt/ui/profiles.h:736 modules/gui/qt/ui/profiles.h:737
 msgid "Not Used"
