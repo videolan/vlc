@@ -265,7 +265,7 @@ static const char * const scale_text[] = {
     "Mitchell-Netravali (recommended downscaler)",
     "Bicubic",
     "Jinc / EWA Lanczos 3 taps (high quality, slow)",
-    "Nearest neighbour",
+    "Nearest neighbor",
     "Bilinear",
     "Gaussian",
     "Lanczos 3 taps",
