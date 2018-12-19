@@ -21465,7 +21465,7 @@ msgstr "재생목록 저장"
 
 #: modules/gui/skins2/src/dialogs.cpp:230
 msgid "XSPF playlist |*.xspf|M3U file |*.m3u|HTML playlist |*.html"
-msgstr "XSPF 재생목록|*.xspf|M3U 파일 |*.m3u|HTML 재생목록 |*.html"
+msgstr "XSPF 재생목록 |*.xspf|M3U 파일 |*.m3u|HTML 재생목록 |*.html"
 
 #: modules/gui/skins2/src/skin_main.cpp:494
 msgid "Skin to use"
