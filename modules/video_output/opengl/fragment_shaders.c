@@ -804,7 +804,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         //"   if ( light_spot_dot < 0.7071) { continue; }\n"
 
-        "   float distance = length(light_to_object);\n"
+        "   float distance = length(light_to_object) / 10;\n"
         "   float attenuation = Lights.Kc[i] + Lights.Kl[i] * distance\n"
         "                     + Lights.Kq[i] * distance * distance;\n"
 
