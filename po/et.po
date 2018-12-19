@@ -1,5 +1,5 @@
 # Estonian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,13 +9,14 @@
 # Mattias Põldaru <mahfiaz gmail com> 2010
 # Joel Limberg <joel@stuudium.com>, 2014
 # robertzon, 2014
-# mihkel <turakas@gmail.com>, 2010-2014
+# Mihkel Vain <turakas@gmail.com>, 2010-2014
+# Mihkel Tõnnov <mihhkel@gmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:15+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Estonian (https://www.transifex.com/yaron/teams/16553/et/)\n"
 "Language: et\n"
@@ -1382,7 +1383,7 @@ msgstr ""
 
 #: src/input/meta.c:80
 msgid "Disc number"
-msgstr ""
+msgstr "Plaadi number"
 
 #: src/input/var.c:152
 msgid "Bookmark"
@@ -19402,7 +19403,7 @@ msgstr "Vähenda"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:406
 msgid "Playlist View Mode"
-msgstr ""
+msgstr "Esitusloendi vaate&režiim"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:585
 msgid ""
@@ -20530,11 +20531,11 @@ msgstr "Vi&deo"
 
 #: modules/gui/qt/menus.cpp:337 modules/gui/qt/menus.cpp:1063
 msgid "Subti&tle"
-msgstr "Subtii&ter"
+msgstr "&Subtiitrid"
 
 #: modules/gui/qt/menus.cpp:339 modules/gui/qt/menus.cpp:1079
 msgid "Tool&s"
-msgstr ""
+msgstr "&Tööriistad"
 
 #: modules/gui/qt/menus.cpp:342 modules/gui/qt/menus.cpp:1086
 msgid "V&iew"
@@ -20630,7 +20631,7 @@ msgstr "Dokitud esitusloend"
 
 #: modules/gui/qt/menus.cpp:501
 msgid "Always on &top"
-msgstr ""
+msgstr "Alati &pealmine"
 
 #: modules/gui/qt/menus.cpp:509
 msgid "Mi&nimal Interface"
@@ -20662,7 +20663,7 @@ msgstr "Heli v&aljemaks"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
-msgstr ""
+msgstr "Heli va&iksemaks"
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
@@ -20690,7 +20691,7 @@ msgstr "&Subtiitrite faili lisamine..."
 
 #: modules/gui/qt/menus.cpp:655
 msgid "Sub &Track"
-msgstr "Alam &Rada"
+msgstr "Subtiitrite &rada"
 
 #: modules/gui/qt/menus.cpp:677
 msgid "Video &Track"
@@ -23021,9 +23022,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 video tükeldaja"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
