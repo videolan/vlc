@@ -46,10 +46,10 @@ static int  Forward(vlc_object_t *, char const *,
 /* Minimum number of display picture */
 #define DISPLAY_PICTURE_COUNT (1)
 
-static void NoDrInit(vout_thread_sys_t *sys)
+static void NoDrInit(vout_thread_sys_t *sys, vout_display_t *vd)
 {
     if (sys->display.use_dr)
-        sys->display_pool = vout_GetPool(sys->display.vd, 3);
+        sys->display_pool = vout_GetPool(vd, 3);
     else
         sys->display_pool = NULL;
 }
@@ -117,7 +117,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
         } else {
             sys->dpb_size = picture_pool_GetSize(sys->decoder_pool) - reserved_picture;
         }
-        NoDrInit(sys);
+        NoDrInit(sys, vd);
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
     if (!sys->private_pool)
@@ -173,7 +173,7 @@ void vout_ManageWrapper(vout_thread_t *vout)
 
     if (vout_ManageDisplay(vd)) {
         sys->display.use_dr = !vout_IsDisplayFiltered(vd);
-        NoDrInit(sys);
+        NoDrInit(sys, vd);
     }
 }
 
