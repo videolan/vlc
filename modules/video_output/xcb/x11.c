@@ -214,19 +214,50 @@ static void Close(vout_display_t *vd)
     free(sys);
 }
 
-static const xcb_depth_t *FindDepth (const xcb_screen_t *scr,
-                                     uint_fast8_t depth)
+static xcb_visualid_t DepthToFormat(const xcb_setup_t *setup,
+                                    const xcb_depth_t *depth,
+                                    video_format_t *restrict f)
 {
-    xcb_depth_t *d = NULL;
-    for (xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
-         it.rem > 0 && d == NULL;
-         xcb_depth_next (&it))
-    {
-        if (it.data->depth == depth)
-            d = it.data;
-    }
+    /* Check visual types for the selected depth */
+    const xcb_visualtype_t *vt = xcb_depth_visuals(depth);
 
-    return d;
+    for (int i = xcb_depth_visuals_length(depth); i > 0; i--, vt++)
+        if (vlc_xcb_VisualToFormat(setup, depth->depth, vt, f))
+            return vt->visual_id;
+
+    return 0;
+}
+
+static xcb_visualid_t ScreenToFormat(const xcb_setup_t *setup,
+                                     const xcb_screen_t *screen,
+                                     uint8_t *restrict bits,
+                                     video_format_t *restrict fmtp)
+{
+    xcb_visualid_t visual = 0;
+
+    *bits = 0;
+
+    for (xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator(screen);
+         it.rem > 0;
+         xcb_depth_next(&it))
+    {
+        const xcb_depth_t *depth = it.data;
+        video_format_t fmt;
+        xcb_visualid_t vid;
+
+        if (depth->depth <= *bits)
+            continue; /* no better than earlier depth */
+
+        video_format_ApplyRotation(&fmt, fmtp);
+        vid = DepthToFormat(setup, depth, &fmt);
+        if (vid != 0)
+        {
+            *bits = depth->depth;
+            *fmtp = fmt;
+            visual = vid;
+        }
+    }
+    return visual;
 }
 
 /**
@@ -254,112 +285,15 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     const xcb_setup_t *setup = xcb_get_setup (conn);
 
     /* Determine our pixel format */
-    video_format_t fmt_pic;
-    xcb_visualid_t vid = 0;
-    sys->depth = 0;
-
-    for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
-             *end = fmt + xcb_setup_pixmap_formats_length (setup);
-         fmt < end;
-         fmt++)
-    {
-        if (fmt->depth <= sys->depth)
-            continue; /* no better than earlier format */
-
-        video_format_ApplyRotation(&fmt_pic, fmtp);
-
-        /* Check that the pixmap format is supported by VLC. */
-        switch (fmt->depth)
-        {
-          case 32:
-            if (fmt->bits_per_pixel != 32)
-                continue;
-            fmt_pic.i_chroma = VLC_CODEC_ARGB;
-            break;
-          case 24:
-            if (fmt->bits_per_pixel == 32)
-                fmt_pic.i_chroma = VLC_CODEC_RGB32;
-            else if (fmt->bits_per_pixel == 24)
-                fmt_pic.i_chroma = VLC_CODEC_RGB24;
-            else
-                continue;
-            break;
-          case 16:
-            if (fmt->bits_per_pixel != 16)
-                continue;
-            fmt_pic.i_chroma = VLC_CODEC_RGB16;
-            break;
-          case 15:
-            if (fmt->bits_per_pixel != 16)
-                continue;
-            fmt_pic.i_chroma = VLC_CODEC_RGB15;
-            break;
-          case 8:
-            if (fmt->bits_per_pixel != 8)
-                continue;
-            fmt_pic.i_chroma = VLC_CODEC_RGB8;
-            break;
-          default:
-            continue;
-        }
-
-        /* Byte sex is a non-issue for 8-bits. It can be worked around with
-         * RGB masks for 24-bits. Too bad for 15-bits and 16-bits. */
-        if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
-            continue;
-
-        /* Make sure the X server is sane */
-        assert (fmt->bits_per_pixel > 0);
-        if (unlikely(fmt->scanline_pad % fmt->bits_per_pixel))
-            continue;
-
-        /* Check that the selected screen supports this depth */
-        const xcb_depth_t *d = FindDepth (scr, fmt->depth);
-        if (d == NULL)
-            continue;
-
-        /* Find a visual type for the selected depth */
-        const xcb_visualtype_t *vt = xcb_depth_visuals (d);
-
-        /* First try True Color class */
-        for (int i = xcb_depth_visuals_length (d); i > 0; i--)
-        {
-            if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
-            {
-                fmt_pic.i_rmask = vt->red_mask;
-                fmt_pic.i_gmask = vt->green_mask;
-                fmt_pic.i_bmask = vt->blue_mask;
-            found_visual:
-                vid = vt->visual_id;
-                msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
-                sys->depth = fmt->depth;
-                msg_Dbg (vd, " %"PRIu8" bits depth", sys->depth);
-                msg_Dbg (vd, " %"PRIu8" bits per pixel", fmt->bits_per_pixel);
-                msg_Dbg (vd, " %"PRIu8" bits line pad", fmt->scanline_pad);
-                goto found_format;
-            }
-            vt++;
-        }
-
-        /* Then try Static Gray class */
-        if (fmt->depth != 8)
-            continue;
-        vt = xcb_depth_visuals (d);
-        for (int i = xcb_depth_visuals_length (d); i > 0 && !vid; i--)
-        {
-            if (vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
-            {
-                fmt_pic.i_chroma = VLC_CODEC_GREY;
-                goto found_visual;
-            }
-            vt++;
-        }
+    xcb_visualid_t vid = ScreenToFormat(setup, scr, &sys->depth, fmtp);
+    if (vid == 0) {
+        msg_Err(vd, "no supported visual & pixel format");
+        goto error;
     }
 
-    msg_Err (vd, "no supported pixel format & visual");
-    goto error;
+    msg_Dbg(vd, "using X11 visual ID 0x%"PRIx32, vid);
+    msg_Dbg(vd, " %"PRIu8" bits depth", sys->depth);
 
-found_format:;
     /* Create colormap (needed to select non-default visual) */
     xcb_colormap_t cmap;
     if (vid != scr->root_visual)
@@ -417,7 +351,7 @@ found_format:;
     else
         sys->segment = 0;
 
-    sys->fmt = *fmtp = fmt_pic;
+    sys->fmt = *fmtp;
     /* Setup vout_display_t once everything is fine */
     vd->info.has_pictures_invalid = true;
 
