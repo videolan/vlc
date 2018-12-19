@@ -429,28 +429,28 @@ int D3D11CheckDriverVersion(d3d11_device_t *d3d_dev, UINT vendorId, const struct
     {
         if (d3d_dev->WDDM.wddm > min_ver->wddm)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.wddm != min_ver->wddm)
+        if (d3d_dev->WDDM.wddm != min_ver->wddm)
             return VLC_EGENERIC;
     }
     if (min_ver->d3d_features)
     {
         if (d3d_dev->WDDM.d3d_features > min_ver->d3d_features)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.d3d_features != min_ver->d3d_features)
+        if (d3d_dev->WDDM.d3d_features != min_ver->d3d_features)
             return VLC_EGENERIC;
     }
     if (min_ver->revision)
     {
         if (d3d_dev->WDDM.revision > min_ver->revision)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.revision != min_ver->revision)
+        if (d3d_dev->WDDM.revision != min_ver->revision)
             return VLC_EGENERIC;
     }
     if (min_ver->build)
     {
         if (d3d_dev->WDDM.build > min_ver->build)
             return VLC_SUCCESS;
-        else if (d3d_dev->WDDM.build != min_ver->build)
+        if (d3d_dev->WDDM.build != min_ver->build)
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
