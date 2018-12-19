@@ -3,10 +3,14 @@ Changes between 3.0.4 and 3.0.5:
 
 Access:
  * Improve RTSP playback
- * bluray fixes and improvements
+ * BluRay fixes and improvements
 
 Demux:
  * MP4: Fix reading some HDR metadata
+ * Various AV1 improvements
+
+Codec:
+ * Add dav1d AV1 decoder
 
 macOS:
  * Starting with VLC 3.0.5, VLC will be distributed with runtime hardening
@@ -14,6 +18,7 @@ macOS:
    by a DeveloperID certificate in order to continue working with the official
    VLC package.
  * Update the VLC dark UI to better match the dark mode of macOS Mojave
+ * Fix convert & save panel stream option
 
 Audio output:
  * Fix corking when the play is paused
@@ -23,6 +28,7 @@ Video Output:
  * More accurate colors for SD sources in Direct3D11
  * Disable hardware decoding on some old Intel GPUs
  * Fix zero-copy GPU acceleration on AMD RX Vega
+ * Misc Direct3D11 fixes
 
 Changes between 3.0.3 and 3.0.4:
 --------------------------------
