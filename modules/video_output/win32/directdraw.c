@@ -220,11 +220,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (DirectXOpen(vd, &fmt))
         goto error;
 
-    /* */
-    vout_display_info_t info = vd->info;
-    info.is_slow = true;
-    info.has_double_click = true;
-    info.has_pictures_invalid = true;
+    /* Setup vout_display now that everything is fine */
+    vd->info.is_slow = true;
+    vd->info.has_double_click = true;
+    vd->info.has_pictures_invalid = true;
 
     /* Interaction TODO support starting with wallpaper mode */
     vlc_mutex_init(&sys->lock);
@@ -235,10 +234,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Wallpaper"));
     var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
-    /* Setup vout_display now that everything is fine */
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
-    vd->info    = info;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
