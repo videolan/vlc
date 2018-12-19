@@ -146,7 +146,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     vd->sys = sys;
-    vd->info.has_pictures_invalid = false;
     vd->info.subpicture_chromas = spu_chromas;
     vd->pool = Pool;
     vd->prepare = PictureRender;
