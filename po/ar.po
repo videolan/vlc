@@ -1,5 +1,5 @@
 # Arabic translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -9,7 +9,7 @@
 # Ali_Alshaya, 2013
 # Ammar Salem <amar_s1414@hotmail.com>, 2016
 # Faissal Chamekh <chamfay@gmail.com>, 2014
-# FIRST AUTHOR <bouraifouzia@hotmail.com>, 2006
+# Bourai Fouzia <bouraifouzia@hotmail.com>, 2006
 # free_voice <free8voice@gmail.com>, 2014
 # Abdulrahman Alothaim <ar.alothaim@gmail.com>, 2013
 # Islam Ouahouda <iouahouda@gmail.com>, 2014
@@ -23,12 +23,13 @@
 # (المعتز) <sickdemonid@gmail.com>, 2014
 # محيي الدين <tx99h4@hotmail.com>, 2014-2015
 # وجدي أبو سلطان, 2018
+# صفا الفليج <safaalfulaij@hotmail.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 21:33+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Arabic (https://www.transifex.com/yaron/teams/16553/ar/)\n"
 "Language: ar\n"
@@ -22779,9 +22780,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 باكيتيزير الفديو"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
