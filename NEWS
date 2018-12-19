@@ -3,32 +3,48 @@ Changes between 3.0.4 and 3.0.5:
 
 Access:
  * Improve RTSP playback
- * BluRay fixes and improvements
-
-Demux:
- * MP4: Fix reading some HDR metadata
- * Various AV1 improvements
+ * BluRay fixes and improvements, notably for menus and seeking
+ * Improve the UDP/RTP truncated issue
 
 Codec:
- * Add dav1d AV1 decoder
+ * Add a new AV1 decoder based on dav1d library
+ * Enable libaom decoder by default
+ * Fix decoding of some HEVC streams with macOS hardware decoding
+
+Demux:
+ * MP4: Fix reading of some HDR metadata
+ * Miscellaneous AV1 demuxing improvements
+ * Fix CAF integer-underflow
+ * Fix an MKV crash on iOS 12.0, on iPhone XS phones
+
+Packetizer:
+ * Add an AV1 packetizer
 
 macOS:
  * Starting with VLC 3.0.5, VLC will be distributed with runtime hardening
-   enabled on macOS Mojave. All external VLC plugins need to be signed
-   by a DeveloperID certificate in order to continue working with the official
-   VLC package.
+   enabled on macOS Mojave.
+   All external VLC plugins need to be signed by a DeveloperID certificate in order
+   to continue working with the official VLC package.
  * Update the VLC dark UI to better match the dark mode of macOS Mojave
  * Fix convert & save panel stream option
 
 Audio output:
- * Fix corking when the play is paused
+ * Fix corking when the playback state is paused
+ * Improve corking on Android
 
 Video Output:
- * fix Direct3D11 tone-mapping when HDR is displayed on an SDR screen
+ * Fix Direct3D11 tone-mapping when HDR is displayed on an SDR screen
  * More accurate colors for SD sources in Direct3D11
  * Disable hardware decoding on some old Intel GPUs
  * Fix zero-copy GPU acceleration on AMD RX Vega
  * Misc Direct3D11 fixes
+
+Miscellaneaous:
+ * Improve ChromeCast
+ * Update numerous 3rd party libraries, including for minor security issues
+ * Update Youtube support
+ * Fix subtitles rendering with specific fonts with negative horizontal advance
+
 
 Changes between 3.0.3 and 3.0.4:
 --------------------------------
