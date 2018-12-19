@@ -1700,11 +1700,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    /* */
-    vout_display_info_t info = vd->info;
-    info.is_slow = !is_d3d9_opaque(fmt.i_chroma);
-    info.has_double_click = true;
-    info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
+    /* Setup vout_display now that everything is fine */
+    vd->info.is_slow = !is_d3d9_opaque(fmt.i_chroma);
+    vd->info.has_double_click = true;
+    vd->info.has_pictures_invalid = !is_d3d9_opaque(fmt.i_chroma);
+
     if (var_InheritBool(vd, "direct3d9-hw-blending") &&
         sys->d3dregion_format != D3DFMT_UNKNOWN &&
         (sys->d3d_dev.caps.SrcBlendCaps  & D3DPBLENDCAPS_SRCALPHA) &&
@@ -1712,9 +1712,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         (sys->d3d_dev.caps.TextureCaps   & D3DPTEXTURECAPS_ALPHA) &&
         (sys->d3d_dev.caps.TextureOpCaps & D3DTEXOPCAPS_SELECTARG1) &&
         (sys->d3d_dev.caps.TextureOpCaps & D3DTEXOPCAPS_MODULATE))
-        info.subpicture_chromas = d3d_subpicture_chromas;
+        vd->info.subpicture_chromas = d3d_subpicture_chromas;
     else
-        info.subpicture_chromas = NULL;
+        vd->info.subpicture_chromas = NULL;
 
     /* Interaction */
     vlc_mutex_init(&sys->lock);
@@ -1724,10 +1724,8 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Desktop"));
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
 
-    /* Setup vout_display now that everything is fine */
     video_format_Clean(fmtp);
     video_format_Copy(fmtp, &fmt);
-    vd->info = info;
 
     vd->pool = DisplayPool;
     vd->prepare = Prepare;
