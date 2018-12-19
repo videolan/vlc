@@ -1,16 +1,16 @@
 # Welsh translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Aled Powell <cymrodor@gmail.com>, 2013-2016
+# Aled Powell <aled@aledpowell.cymru>, 2013-2017
 # Huw Waters <huwwaters@gmail.com>, 2012-2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 11:13+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Welsh (https://www.transifex.com/yaron/teams/16553/cy/)\n"
 "Language: cy\n"
@@ -4122,11 +4122,11 @@ msgstr "Dewiswch bysell i ostwng uchder y sain."
 #: modules/gui/macosx/VLCMainMenu.m:510
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:82
 msgid "Mute"
-msgstr "Tewi"
+msgstr "Distewi"
 
 #: src/libvlc-module.c:1320
 msgid "Select the key to mute audio."
-msgstr "Dewisa bysell i dewi'r sain."
+msgstr "Dewiswch fysell i ddistewi'r sain."
 
 #: src/libvlc-module.c:1321
 msgid "Subtitle delay up"
@@ -4978,7 +4978,7 @@ msgstr "Sain Lawr"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr "Tewi'r Sain"
+msgstr "Distewi'r Sain"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:508
 msgid "Volume Up"
@@ -8549,7 +8549,7 @@ msgstr "Addasiad trebl y mewnbwn sain."
 
 #: modules/access/v4l2/v4l2.c:183
 msgid "Mute the audio."
-msgstr "Tewi'r sain."
+msgstr "Distewi'r sain."
 
 #: modules/access/v4l2/v4l2.c:184
 msgid "Loudness mode"
@@ -18211,7 +18211,7 @@ msgstr " a, z                   Sain i Fyny/Lawr"
 
 #: modules/gui/ncurses.c:889
 msgid " m                      Mute"
-msgstr " m                      Tewi"
+msgstr " m                      Distewi"
 
 #. xgettext: You can use ↑ and ↓ characters
 #: modules/gui/ncurses.c:891
@@ -18328,7 +18328,7 @@ msgstr " Safle : %s/%s"
 
 #: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
-msgstr " Sain   : Tewi"
+msgstr " Sain   : Distewi"
 
 #: modules/gui/ncurses.c:1096
 #, c-format
@@ -18520,12 +18520,12 @@ msgstr "Docio/Dad-ddocio "
 #: modules/gui/qt/components/controller_widget.cpp:136
 msgctxt "Tooltip|Unmute"
 msgid "Unmute"
-msgstr "Dad-tewi"
+msgstr "Dad-ddistewi"
 
 #: modules/gui/qt/components/controller_widget.cpp:148
 msgctxt "Tooltip|Mute"
 msgid "Mute"
-msgstr "Tewi"
+msgstr "Distewi"
 
 #: modules/gui/qt/components/controller_widget.cpp:234
 msgid "Pause the playback"
@@ -20322,7 +20322,7 @@ msgstr ""
 
 #: modules/gui/qt/menus.cpp:602
 msgid "&Mute"
-msgstr "&Tewi"
+msgstr "&Distewi"
 
 #: modules/gui/qt/menus.cpp:618
 msgid "Audio &Device"
@@ -22646,9 +22646,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Pecynnydd fideo H.264"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
