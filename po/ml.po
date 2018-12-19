@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vlc 3.0.3\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
-"POT-Creation-Date: 2018-08-02 22:51+0200\n"
+"POT-Creation-Date: 2018-12-19 17:55+0100\n"
 "PO-Revision-Date: 2018-07-09 01:04+0200\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Malayalam (https://www.transifex.com/yaron/teams/16553/ml/)\n"
@@ -359,10 +359,10 @@ msgid "VLC's implementation of Video On Demand"
 msgstr "വീഡിയോ ഓണ്‍ ഡിമാന്‍ഡിന്റെ വിഎല്‍സി ഇംപ്ലിമെന്റേഷന്‍"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
-#: src/playlist/engine.c:233 modules/demux/playlist/playlist.c:64
+#: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
 #: modules/demux/playlist/playlist.c:65 modules/demux/playlist/wpl.c:99
-#: modules/gui/macosx/VLCMainWindow.m:294
-#: modules/gui/macosx/VLCMainWindow.m:856
+#: modules/gui/macosx/VLCMainWindow.m:319
+#: modules/gui/macosx/VLCMainWindow.m:896
 #: modules/gui/qt/components/controller.hpp:109
 #: modules/gui/qt/components/playlist/playlist.cpp:165
 #: modules/gui/qt/components/playlist/selector.cpp:227
@@ -464,8 +464,8 @@ msgid "&About"
 msgstr "കുറിച്ച്(_A)"
 
 #: include/vlc_intf_strings.h:65 modules/control/oldrc.c:71
-#: modules/gui/macosx/VLCControlsBarCommon.m:64
-#: modules/gui/macosx/VLCControlsBarCommon.m:397
+#: modules/gui/macosx/VLCControlsBarCommon.m:81
+#: modules/gui/macosx/VLCControlsBarCommon.m:432
 #: modules/gui/macosx/VLCFSPanelController.m:232
 #: modules/gui/macosx/VLCMainMenu.m:385 modules/gui/macosx/VLCMainMenu.m:497
 #: modules/gui/macosx/VLCMainMenu.m:504 modules/gui/macosx/VLCMainMenu.m:1339
@@ -557,7 +557,7 @@ msgstr "ഭോള്‍ഡര്‍ ചേര്‍ക്കുക..."
 msgid "Save Playlist to &File..."
 msgstr "ഫയലിലേക്ക് പ്ലേലിസ്റ്റ് സേവ് ചെയ്യുക(_F)..."
 
-#: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:186
+#: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:189
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
 msgid "Search"
 msgstr "തിരയുക"
@@ -633,7 +633,7 @@ msgstr "ഫില്‍റ്ററുകളുടെ കൂടിയ എണ്�
 
 #: src/audio_output/output.c:263 src/config/core.c:380 src/input/es_out.c:948
 #: src/libvlc-module.c:540 modules/gui/macosx/VLCMainMenu.m:243
-#: modules/gui/macosx/VLCMainWindow.m:999 modules/video_filter/postproc.c:235
+#: modules/gui/macosx/VLCMainWindow.m:1039 modules/video_filter/postproc.c:235
 msgid "Disable"
 msgstr "നിര്‍ജ്ജീവമാക്കുക"
 
@@ -727,10 +727,10 @@ msgstr "റിവേഴ്സ് സ്റ്റീരിയോ"
 msgid "Headphones"
 msgstr "ഹെഡ്ഫോണുകള്‍"
 
-#: src/config/core.c:370 modules/access/dtv/access.c:91
-#: modules/access/dtv/access.c:106 modules/access/dtv/access.c:115
-#: modules/access/dtv/access.c:123 modules/access/dtv/access.c:132
-#: modules/access/dtv/access.c:140 modules/access/dtv/access.c:162
+#: src/config/core.c:370 modules/access/dtv/access.c:93
+#: modules/access/dtv/access.c:108 modules/access/dtv/access.c:117
+#: modules/access/dtv/access.c:125 modules/access/dtv/access.c:134
+#: modules/access/dtv/access.c:142 modules/access/dtv/access.c:164
 #: modules/access/v4l2/v4l2.c:137 modules/gui/qt/components/open_panels.cpp:976
 #: modules/gui/qt/components/simple_preferences.cpp:379
 msgid "Automatic"
@@ -871,47 +871,47 @@ msgstr "അറിയാത്ത പിശക്"
 msgid "Bookmark %i"
 msgstr "ബുക്ക്മാര്‍ക്ക് %i"
 
-#: src/input/decoder.c:1882
+#: src/input/decoder.c:1890
 msgid "No description for this codec"
 msgstr "ഈ കോഡെക്കിനു വിവരണം ഇല്ല"
 
-#: src/input/decoder.c:1884
+#: src/input/decoder.c:1892
 msgid "Codec not supported"
 msgstr "കോഡെക്ക് പിന്തുണയ്ക്കുന്നില്ല"
 
-#: src/input/decoder.c:1885
+#: src/input/decoder.c:1893
 #, c-format
 msgid "VLC could not decode the format \"%4.4s\" (%s)"
 msgstr " \"%4.4s\" (%s) ഘടനയെ വിഎല്‍സിക്കു ഡീക്കോഡ് ചെയ്യാനാകുന്നില്ല"
 
-#: src/input/decoder.c:1889
+#: src/input/decoder.c:1897
 msgid "Unidentified codec"
 msgstr "തിരിച്ചറിയാത്ത കോഡെക്കുകള്‍"
 
-#: src/input/decoder.c:1890
+#: src/input/decoder.c:1898
 msgid "VLC could not identify the audio or video codec"
 msgstr "വിഎല്‍സിക്ക് ഓഡിയോ അല്ലേല്‍ വീഡിയോ കോഡെക്ക് തിരിച്ചറിയാനായില്ല"
 
-#: src/input/decoder.c:1901
+#: src/input/decoder.c:1909
 msgid "packetizer"
 msgstr "പാക്കറ്റൈസര്‍"
 
-#: src/input/decoder.c:1901
+#: src/input/decoder.c:1909
 msgid "decoder"
 msgstr "ഡികോഡര്‍"
 
-#: src/input/decoder.c:1909 src/input/decoder.c:2192
-#: modules/codec/avcodec/encoder.c:369 modules/codec/avcodec/encoder.c:903
+#: src/input/decoder.c:1917 src/input/decoder.c:2200
+#: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
 #: modules/stream_out/es.c:349 modules/stream_out/es.c:362
 msgid "Streaming / Transcoding failed"
 msgstr "സ്ട്രീമിംഗ് /ട്രാന്‍സ്കോഡിംഗ് പരാജയപ്പെട്ടു"
 
-#: src/input/decoder.c:1910
+#: src/input/decoder.c:1918
 #, c-format
 msgid "VLC could not open the %s module."
 msgstr "വിഎല്‍സിക്ക് %s മോഡ്യൂള്‍ തുറക്കാനായില്ല."
 
-#: src/input/decoder.c:2193
+#: src/input/decoder.c:2201
 msgid "VLC could not open the decoder module."
 msgstr "വിഎല്‍സിക്കു ഡീക്കോഡര്‍ മോഡ്യൂള്‍ തുറക്കാനായില്ല"
 
@@ -982,7 +982,7 @@ msgid "Description"
 msgstr "വിവരണം"
 
 #: src/input/es_out.c:3120 src/input/es_out.c:3164 src/input/es_out.c:3354
-#: modules/gui/macosx/VLCAddonsWindowController.m:132
+#: modules/gui/macosx/VLCAddonsWindowController.m:133
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:185
 #: modules/gui/macosx/VLCOutput.m:75 modules/gui/qt/dialogs/plugins.cpp:1487
 msgid "Type"
@@ -1094,7 +1094,7 @@ msgstr ""
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
-#: modules/access/dtv/access.c:75 modules/access/v4l2/v4l2.c:242
+#: modules/access/dtv/access.c:77 modules/access/v4l2/v4l2.c:242
 msgid "Undefined"
 msgstr "നിര്‍വചിക്കാത്തത്"
 
@@ -1231,7 +1231,7 @@ msgstr ""
 msgid "Subtitle"
 msgstr "ഉപശീര്‍ഷകം"
 
-#: src/input/input.c:1821 modules/control/hotkeys.c:1510
+#: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
 msgstr "വോള്യം %ld%%"
@@ -1725,7 +1725,7 @@ msgstr ""
 
 #: src/libvlc-module.c:187 src/libvlc-module.c:361 src/win32/thread.c:942
 #: modules/audio_output/kai.c:106 modules/codec/subsdec.c:167
-#: modules/codec/x264.c:440 modules/demux/mpeg/ts.c:124
+#: modules/codec/x264.c:434 modules/demux/mpeg/ts.c:128
 #: modules/gui/macosx/VLCSimplePrefsController.m:54
 #: modules/gui/qt/components/simple_preferences.cpp:67
 #: modules/gui/qt/components/sout/profile_selector.cpp:590
@@ -1737,12 +1737,12 @@ msgstr ""
 msgid "Auto"
 msgstr "ഓട്ടോ"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:92
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
 #: modules/access/v4l2/v4l2.c:201 modules/control/hotkeys.c:405
 msgid "On"
 msgstr "ഓണ്‍"
 
-#: src/libvlc-module.c:187 modules/access/dtv/access.c:92
+#: src/libvlc-module.c:187 modules/access/dtv/access.c:94
 #: modules/access/v4l2/v4l2.c:137 modules/access/v4l2/v4l2.c:201
 #: modules/control/hotkeys.c:383 modules/control/hotkeys.c:405
 #: modules/video_filter/deinterlace/algo_phosphor.h:55
@@ -1813,10 +1813,10 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:239 src/libvlc-module.c:1131
-#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:107
-#: modules/access/dtv/access.c:141 modules/access/v4l2/v4l2.c:163
+#: modules/access/dshow/dshow.cpp:2083 modules/access/dtv/access.c:109
+#: modules/access/dtv/access.c:143 modules/access/v4l2/v4l2.c:163
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
-#: modules/codec/kate.c:199 modules/codec/x264.c:435 modules/codec/x264.c:440
+#: modules/codec/kate.c:199 modules/codec/x264.c:429 modules/codec/x264.c:434
 #: modules/demux/mp4/meta.c:430
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:191
 #: modules/gui/macosx/VLCOpenWindowController.m:243
@@ -2509,7 +2509,7 @@ msgstr "സഹജമായ"
 
 #: src/libvlc-module.c:540
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:215
-#: modules/gui/macosx/VLCMainWindow.m:997
+#: modules/gui/macosx/VLCMainWindow.m:1037
 #: modules/gui/qt/components/extended_panels.cpp:949
 #: modules/gui/qt/ui/equalizer.h:133 modules/gui/qt/ui/vlm.h:289
 msgid "Enable"
@@ -3880,7 +3880,7 @@ msgid ""
 msgstr ""
 
 #: src/libvlc-module.c:1226 src/video_output/vout_intf.c:268
-#: modules/gui/macosx/VLCControlsBarCommon.m:81
+#: modules/gui/macosx/VLCControlsBarCommon.m:98
 #: modules/gui/macosx/VLCMainMenu.m:432 modules/gui/macosx/VLCMainMenu.m:511
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/ui/sprefs_video.h:318
@@ -3961,7 +3961,7 @@ msgid "Slower (fine)"
 msgstr "പതുക്കെ(ഫൈന്‍)"
 
 #: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
-#: modules/gui/macosx/VLCControlsBarCommon.m:163
+#: modules/gui/macosx/VLCControlsBarCommon.m:196
 #: modules/gui/macosx/VLCFSPanelController.m:112
 #: modules/gui/macosx/VLCMainMenu.m:396 modules/gui/macosx/VLCMainMenu.m:499
 #: modules/gui/macosx/VLCMainMenu.m:507
@@ -3976,7 +3976,7 @@ msgid "Select the hotkey to use to skip to the next item in the playlist."
 msgstr "പ്ലേലിസ്റ്റിലെ അടുത്ത വസ്തുവിലേക്ക് മാറുന്നതിനായി  ഉപയോഗിക്കേണ്ട ഹോട്ട്കീ തിരഞ്ഞെടുക്കുക"
 
 #: src/libvlc-module.c:1248 modules/control/hotkeys.c:414
-#: modules/gui/macosx/VLCControlsBarCommon.m:160
+#: modules/gui/macosx/VLCControlsBarCommon.m:193
 #: modules/gui/macosx/VLCFSPanelController.m:115
 #: modules/gui/macosx/VLCMainMenu.m:395 modules/gui/macosx/VLCMainMenu.m:500
 #: modules/gui/macosx/VLCMainMenu.m:506
@@ -3990,7 +3990,7 @@ msgstr "പ്ലേലിസ്റ്റിലെ മുമ്പത്തെ �
 
 #: src/libvlc-module.c:1250 modules/gui/macosx/VLCMainMenu.m:386
 #: modules/gui/macosx/VLCMainMenu.m:498 modules/gui/macosx/VLCMainMenu.m:505
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:61
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:65
 #: modules/gui/qt/components/controller.hpp:107
 #: modules/gui/qt/dialogs/vlm.cpp:544 modules/gui/qt/ui/streampanel.h:180
 msgid "Stop"
@@ -4000,7 +4000,7 @@ msgstr "നിര്‍ത്തുക"
 msgid "Select the hotkey to stop playback."
 msgstr "പ്ലേബാക്ക് സ്റ്റോപ്പ് ചെയ്യാനായി ഉപയോഗിക്കേണ്ട ഹോട്ട്കീ തിരഞ്ഞെടുക്കുക"
 
-#: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:75
+#: src/libvlc-module.c:1252 modules/gui/macosx/VLCControlsBarCommon.m:92
 #: modules/gui/macosx/VLCFSPanelController.m:130
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:287
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:309
@@ -4237,7 +4237,7 @@ msgstr "ഓഡിയോ വോള്യം കുറയ്ക്കുവാന�
 #: src/libvlc-module.c:1319 modules/access/v4l2/v4l2.c:181
 #: modules/gui/macosx/VLCMainMenu.m:417 modules/gui/macosx/VLCMainMenu.m:501
 #: modules/gui/macosx/VLCMainMenu.m:510
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:78
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:82
 msgid "Mute"
 msgstr "നിശബ്ദമാക്കുക"
 
@@ -5072,7 +5072,7 @@ msgid "Page Up"
 msgstr "പേജ് മുകളിലേക്ക്"
 
 #: src/misc/actions.c:107 modules/control/oldrc.c:72
-#: modules/gui/macosx/VLCControlsBarCommon.m:389
+#: modules/gui/macosx/VLCControlsBarCommon.m:423
 #: modules/gui/macosx/VLCFSPanelController.m:238
 #: modules/gui/macosx/VLCMainMenu.m:1346 modules/gui/macosx/VLCMainMenu.m:1347
 #: modules/gui/macosx/VLCMainMenu.m:1348
@@ -5168,7 +5168,7 @@ msgid "Failed to open \"%s\" for writing"
 msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക്കുന്നതില്‍ പരാജയപ്പെട്ടു"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
-#: modules/demux/avi/avi.c:2725
+#: modules/demux/avi/avi.c:2734
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:513
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:571
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:825
@@ -5181,8 +5181,8 @@ msgstr "റൈറ്റ് ചെയ്യാനായി  \"%s\" തുറക�
 #: modules/gui/macosx/VLCCoreDialogProvider.m:193
 #: modules/gui/macosx/VLCCoreDialogProvider.m:197
 #: modules/gui/macosx/VLCCoreDialogProvider.m:293
-#: modules/gui/macosx/VLCMainWindow.m:205
-#: modules/gui/macosx/VLCMainWindow.m:211
+#: modules/gui/macosx/VLCMainWindow.m:222
+#: modules/gui/macosx/VLCMainWindow.m:228
 #: modules/gui/macosx/VLCOpenWindowController.m:134
 #: modules/gui/macosx/VLCOpenWindowController.m:192
 #: modules/gui/macosx/VLCSimplePrefsController.m:280
@@ -5266,7 +5266,7 @@ msgstr ""
 "പുതിയ വേര്‍ഷന്‍ വിജയകരമായി ഡൌണ്‍ലോഡ് ചെയ്യപ്പെട്ടു. വി‌എല്‍‌സി ഇപ്പോള്‍ നിങ്ങള്‍ക്ക് നിര്‍ത്തുകയും കൂടാതെ "
 "അതിനാടെ ഇപ്പോള്‍ ഇന്‍സ്റ്റാള്‍ ചെയ്യണമോ?"
 
-#: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:199
+#: src/misc/update.c:726 modules/gui/macosx/VLCAddonsWindowController.m:200
 msgid "Install"
 msgstr "ഇന്‍സ്റ്റാള്‍ ചെയ്യുക"
 
@@ -5274,9 +5274,9 @@ msgstr "ഇന്‍സ്റ്റാള്‍ ചെയ്യുക"
 msgid "Update VLC media player"
 msgstr "വിഎല്‍സി മീഡിയ പ്ലേയര്‍ പുതുക്കുക"
 
-#: src/playlist/engine.c:237 src/playlist/loadsave.c:159 lib/media_list.c:237
-#: modules/gui/macosx/VLCMainWindow.m:296
-#: modules/gui/macosx/VLCMainWindow.m:858
+#: src/playlist/engine.c:247 src/playlist/loadsave.c:159 lib/media_list.c:237
+#: modules/gui/macosx/VLCMainWindow.m:321
+#: modules/gui/macosx/VLCMainWindow.m:898
 #: modules/gui/qt/components/playlist/selector.cpp:236
 msgid "Media Library"
 msgstr "മീഡിയ ലൈബ്രറി"
@@ -6036,25 +6036,25 @@ msgstr "ഘടിപ്പിക്കുക"
 msgid "Attachment input"
 msgstr "അറ്റാച്ച്മെന്റ് ഇന്‍പുട്ട്"
 
-#: modules/access/avcapture.m:57
+#: modules/access/avcapture.m:66
 msgid "AVFoundation Video Capture"
 msgstr ""
 
-#: modules/access/avcapture.m:58
+#: modules/access/avcapture.m:67
 msgid "AVFoundation video capture module."
 msgstr ""
 
-#: modules/access/avcapture.m:286 modules/access/avcapture.m:315
+#: modules/access/avcapture.m:295 modules/access/avcapture.m:324
 msgid "No video devices found"
 msgstr ""
 
-#: modules/access/avcapture.m:287
+#: modules/access/avcapture.m:296
 msgid ""
 "Your Mac does not seem to be equipped with a suitable video input device. "
 "Please check your connectors and drivers."
 msgstr ""
 
-#: modules/access/avcapture.m:316
+#: modules/access/avcapture.m:325
 msgid ""
 "Your Mac does not seem to be equipped with a suitable input device. Please "
 "check your connectors and drivers."
@@ -6074,19 +6074,19 @@ msgstr "ലിബ്എവിഫോര്‍മാറ്റ് എവിഐഒ �
 msgid "libavformat AVIO access output"
 msgstr "ലിബ്എവിഫോര്‍മാറ്റ് എവിഐഒ അക്സസ്സ് ഔട്ട്പുട്ട്"
 
-#: modules/access/bluray.c:68
+#: modules/access/bluray.c:72
 msgid "Blu-ray menus"
 msgstr "ബ്ലൂ-റേ  മെനുകള്‍"
 
-#: modules/access/bluray.c:69
+#: modules/access/bluray.c:73
 msgid "Use Blu-ray menus. If disabled, the movie will start directly"
 msgstr "ബ്ലൂ-റേ മെനുകള്‍ ഉപയോഗിക്കുക. അസാധ്യമാക്കിയിട്ടുണ്ടെങ്കില്‍, ചിത്രം നേരിട്ട് തുടങ്ങും"
 
-#: modules/access/bluray.c:71
+#: modules/access/bluray.c:75
 msgid "Region code"
 msgstr "റീജിയണ്‍ കോഡ്"
 
-#: modules/access/bluray.c:72
+#: modules/access/bluray.c:76
 msgid ""
 "Blu-Ray player region code. Some discs can be played only with a correct "
 "region code."
@@ -6094,20 +6094,20 @@ msgstr ""
 "ബ്ലൂ-റേ പ്ലേയര്‍ സ്ഥല കോഡ്.  ചില ഡിസ്ക്കുകള്‍ ശരിയായ സ്ഥല കോഡുകളാല്‍ മാത്രമേ പ്ലേ ചെയ്യാന്‍ "
 "കഴിയുകയുള്ളൂ."
 
-#: modules/access/bluray.c:92 modules/services_discovery/udev.c:601
+#: modules/access/bluray.c:103 modules/services_discovery/udev.c:603
 #: modules/gui/qt/ui/open_disk.h:299
 msgid "Blu-ray"
 msgstr "ബ്ലൂ-റേ"
 
-#: modules/access/bluray.c:93
+#: modules/access/bluray.c:104
 msgid "Blu-ray Disc support (libbluray)"
 msgstr "ബ്ലൂ-റേ ഡിസ്ക് പിന്തുണ (ലിബ്ബ്ലൂറേ)"
 
-#: modules/access/bluray.c:722
+#: modules/access/bluray.c:841
 msgid "Path doesn't appear to be a Blu-ray"
 msgstr "പാത ബ്ലൂ-റേ ആയി പ്രത്യക്ഷപ്പെടുന്നില്ല"
 
-#: modules/access/bluray.c:737
+#: modules/access/bluray.c:856
 msgid ""
 "This Blu-ray Disc needs a library for AACS decoding, and your system does "
 "not have it."
@@ -6115,31 +6115,31 @@ msgstr ""
 "എ‌എ‌സി‌എസ് ഡികോഡിങ്ങിന് വേണ്ടി ബ്ലൂ-റേ ഡിസ്കിന് ഒരു ലൈബ്രറി വേണം, കൂടാതെ നിങ്ങളുടെ സിസ്റ്റത്തിന് "
 "അതില്ല."
 
-#: modules/access/bluray.c:743
+#: modules/access/bluray.c:862
 msgid "Blu-ray Disc is corrupted."
 msgstr "ബ്ലൂ-റേ ഡിസ്ക് കറപ്റ്റ് ആയതാണ്."
 
-#: modules/access/bluray.c:745
+#: modules/access/bluray.c:864
 msgid "Missing AACS configuration file!"
 msgstr "എഎസിഎസ് കോണ്‍ഫിഗറേഷന്‍ ഫയല്‍ കാണ്മാനില്ല!"
 
-#: modules/access/bluray.c:747
+#: modules/access/bluray.c:866
 msgid "No valid processing key found in AACS config file."
 msgstr "എ‌എ‌സി‌എസ് കോന്‍ഫീഗ് ഫയലില്‍ പ്രബലമായ സംസ്കരണ കീ ഇല്ല."
 
-#: modules/access/bluray.c:749
+#: modules/access/bluray.c:868
 msgid "No valid host certificate found in AACS config file."
 msgstr "എ‌എ‌സി‌എസ് കോണ്‍ഫിഗ് ഫയലില്‍ സാധുവായ ഒരു ആതിഥേയ സര്‍ട്ടിഫിക്കറ്റ് കണ്ടില്ല."
 
-#: modules/access/bluray.c:751
+#: modules/access/bluray.c:870
 msgid "AACS Host certificate revoked."
 msgstr "എഎസിഎസ് ഹോസ്റ്റ് സര്‍ട്ടിഫിക്കറ്റ് റിവോക്ക് ചെയ്തിരിക്കുന്നു."
 
-#: modules/access/bluray.c:753
+#: modules/access/bluray.c:872
 msgid "AACS MMC failed."
 msgstr "എഎസിഎസ് എംഎംസി പരാജയപ്പെട്ടു"
 
-#: modules/access/bluray.c:763
+#: modules/access/bluray.c:882
 msgid ""
 "This Blu-ray Disc needs a library for BD+ decoding, and your system does not "
 "have it."
@@ -6147,40 +6147,40 @@ msgstr ""
 "ബി‌ഡി+ ഡികോഡിങ്ങിന് വേണ്ടി ബ്ലൂ-റേ ഡിസ്കിന് ഒരു ലൈബ്രറി വേണം, കൂടാതെ നിങ്ങളുടെ സിസ്റ്റത്തിന് "
 "അതില്ല."
 
-#: modules/access/bluray.c:766
+#: modules/access/bluray.c:885
 msgid "Your system BD+ decoding library does not work. Missing configuration?"
 msgstr ""
 "നിങ്ങളുടെ സിസ്റ്റത്തിന്റെ ബി‌ഡി+ ഡികോഡിങ് ലൈബ്രറി പ്രവര്‍ത്തിക്കുന്നില്ല.  രൂപരേഖ നഷ്ട്ടമായോ?"
 
-#: modules/access/bluray.c:799
+#: modules/access/bluray.c:918
 msgid "Java required"
 msgstr ""
 
-#: modules/access/bluray.c:800
+#: modules/access/bluray.c:919
 #, c-format
 msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
 
-#: modules/access/bluray.c:801
+#: modules/access/bluray.c:920
 msgid "Java was not found on your system."
 msgstr ""
 
-#: modules/access/bluray.c:824
+#: modules/access/bluray.c:943
 msgid "Failed to start bluray playback. Please try without menu support."
 msgstr "ബ്ലൂറേ പ്ലേബാക്ക് തുടങ്ങാന്‍ പരാജയപ്പെട്ടു. മെനു പിന്തുണ ഇല്ലാതെ ദയവായി ശ്രമിക്കുക."
 
-#: modules/access/bluray.c:852 modules/access/bluray.c:2287
-#: modules/access/bluray.c:2292
+#: modules/access/bluray.c:974 modules/access/bluray.c:2733
+#: modules/access/bluray.c:2738
 msgid "Blu-ray error"
 msgstr "ബ്ലൂ-റേ പിശക്"
 
-#: modules/access/bluray.c:1674
+#: modules/access/bluray.c:2042
 msgid "Top Menu"
 msgstr "ടോപ് മെനു"
 
-#: modules/access/bluray.c:1677
+#: modules/access/bluray.c:2045
 msgid "First Play"
 msgstr "ആദ്യ കളി"
 
@@ -6667,11 +6667,11 @@ msgstr ""
 msgid "libdsm NETBIOS discovery module"
 msgstr ""
 
-#: modules/access/dtv/access.c:36
+#: modules/access/dtv/access.c:38
 msgid "DVB adapter"
 msgstr "ഡിവിബി അഡാപ്റ്റര്‍"
 
-#: modules/access/dtv/access.c:38
+#: modules/access/dtv/access.c:40
 msgid ""
 "If there is more than one digital broadcasting adapter, the adapter number "
 "must be selected. Numbering starts from zero."
@@ -6679,11 +6679,11 @@ msgstr ""
 "ഒന്നില്‍ കൂടുതല്‍ ഡിജിറ്റൽ പ്രക്ഷേപണ അഡാപ്റ്ററുകള്‍ ഉണ്ടെങ്കില്‍, അഡാപ്റ്റര്‍ സംഖ്യ തിരഞ്ഞെടുക്കണം. "
 "സംഖ്യകള്‍ 0 മുതല്‍ തുടങ്ങണം."
 
-#: modules/access/dtv/access.c:41
+#: modules/access/dtv/access.c:43
 msgid "DVB device"
 msgstr "ഡിവിബി ഡിവൈസ്"
 
-#: modules/access/dtv/access.c:43
+#: modules/access/dtv/access.c:45
 msgid ""
 "If the adapter provides multiple independent tuner devices, the device "
 "number must be selected. Numbering starts from zero."
@@ -6691,11 +6691,11 @@ msgstr ""
 "അഡാപ്റ്റര്‍ ബഹുവിധ സ്വതന്ത്ര ട്യൂണര്‍ ഉപകരണങ്ങള്‍ സൌകര്യപ്പെടുത്തുന്നുണ്ടെങ്കില്‍, ഉപകരണ സംഖ്യ "
 "തിരഞ്ഞെടുത്തിരിക്കണം. സംഖ്യാവല്‍കരണം പൂജ്യം മുതല്‍ ആരംഭിക്കണം."
 
-#: modules/access/dtv/access.c:45
+#: modules/access/dtv/access.c:47
 msgid "Do not demultiplex"
 msgstr "ഡീമള്‍ട്ടിപ്ലെക്സ് ചെയ്യരുത്"
 
-#: modules/access/dtv/access.c:47
+#: modules/access/dtv/access.c:49
 msgid ""
 "Only useful programs are normally demultiplexed from the transponder. This "
 "option will disable demultiplexing and receive all programs."
@@ -6704,27 +6704,27 @@ msgstr ""
 "ചെയ്യാറുള്ളത്.  ഈ ഐഛികം ഡിമള്‍ട്ടിപ്ലെക്സിങ് പ്രവര്‍ത്തനരഹിതമാക്കുകയും കൂടാതെ എല്ലാ "
 "പ്രോഗ്രാമുകളെയും സ്വീകരിക്കും"
 
-#: modules/access/dtv/access.c:50
+#: modules/access/dtv/access.c:52
 msgid "Network name"
 msgstr "നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:51
+#: modules/access/dtv/access.c:53
 msgid "Unique network name in the System Tuning Spaces"
 msgstr "സിസ്റ്റം ട്യൂണിംഗ് സ്പേസുകളില്‍ അനുപമമായ നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:53
+#: modules/access/dtv/access.c:55
 msgid "Network name to create"
 msgstr "നിര്‍മ്മിക്കേണ്ട നെറ്റ്വര്‍ക്ക് നാമം"
 
-#: modules/access/dtv/access.c:54
+#: modules/access/dtv/access.c:56
 msgid "Create unique name in the System Tuning Spaces"
 msgstr "സിസ്റ്റം ട്യൂണിംഗ് സ്പേസുകളില്‍ ഒരു അനുപമമായ നാമം സൃഷ്ടിക്കുക"
 
-#: modules/access/dtv/access.c:56
+#: modules/access/dtv/access.c:58
 msgid "Frequency (Hz)"
 msgstr "ഫ്രീക്വന്‍സി (Hz)"
 
-#: modules/access/dtv/access.c:58
+#: modules/access/dtv/access.c:60
 msgid ""
 "TV channels are grouped by transponder (a.k.a. multiplex) on a given "
 "frequency. This is required to tune the receiver."
@@ -6732,23 +6732,23 @@ msgstr ""
 "ഒരു തന്നിരിക്കുന്ന ഫ്രീക്വെന്‍സിയില്‍ ടി‌വി ചാനലുകളെ ട്രാന്‍സ്പോണ്ടറുകള്‍ (മള്‍ട്ടിപ്ലെക്സ് എന്നും "
 "അറിയപ്പെടും) വര്‍ഗ്ഗീകരിക്കും. റിസീവര്‍ ട്യൂണ്‍ ചെയ്യാന്‍ ഇത് ആവശ്യമാണ്."
 
-#: modules/access/dtv/access.c:61 modules/gui/qt/components/open_panels.cpp:972
+#: modules/access/dtv/access.c:63 modules/gui/qt/components/open_panels.cpp:972
 msgid "Modulation / Constellation"
 msgstr "മോഡ്യുലേഷന്‍ /കോണ്‍സ്റ്റലേഷന്‍"
 
-#: modules/access/dtv/access.c:62
+#: modules/access/dtv/access.c:64
 msgid "Layer A modulation"
 msgstr "ലെയര്‍ എ മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:63
+#: modules/access/dtv/access.c:65
 msgid "Layer B modulation"
 msgstr "ലെയര്‍ ബി മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:64
+#: modules/access/dtv/access.c:66
 msgid "Layer C modulation"
 msgstr "ലെയര്‍ സി മോഡ്യുലേഷന്‍"
 
-#: modules/access/dtv/access.c:66
+#: modules/access/dtv/access.c:68
 msgid ""
 "The digital signal can be modulated according with different constellations "
 "(depending on the delivery system). If the demodulator cannot detect the "
@@ -6758,11 +6758,11 @@ msgstr ""
 "ആശ്രയിച്ച്). ഡിമോഡുലേറ്ററിന് സ്വയം കൂട്ടത്തെ തിരിച്ചറിയാന്‍ കഴിഞ്ഞില്ലെങ്കില്‍, അതിനെ സ്വമേധയാ "
 "കോൺഫിഗർ ചെയ്യേണ്ടതുണ്ട്."
 
-#: modules/access/dtv/access.c:81
+#: modules/access/dtv/access.c:83
 msgid "Symbol rate (bauds)"
 msgstr "സിമ്പല്‍ റേറ്റ്(ബൗഡ്സ്)"
 
-#: modules/access/dtv/access.c:83
+#: modules/access/dtv/access.c:85
 msgid ""
 "The symbol rate must be specified manually for some systems, notably DVB-C, "
 "DVB-S and DVB-S2."
@@ -6770,11 +6770,11 @@ msgstr ""
 "ചിഹ്നനിരക്ക് ചില സിസ്റ്റങ്ങളിൽ സ്വമേധ നിര്‍ദ്ദേശിക്കപ്പെടണം, വിശേഷിച്ച് ഡി‌വി‌ബി-സി, ഡി‌വി‌ബി-"
 "എസ് കൂടാതെ ഡി‌വി‌ബി-എസ്2."
 
-#: modules/access/dtv/access.c:86
+#: modules/access/dtv/access.c:88
 msgid "Spectrum inversion"
 msgstr "സ്പെക്ട്രം ഇന്‍വേര്‍ഷന്‍"
 
-#: modules/access/dtv/access.c:88
+#: modules/access/dtv/access.c:90
 msgid ""
 "If the demodulator cannot detect spectral inversion correctly, it needs to "
 "be configured manually."
@@ -6782,135 +6782,135 @@ msgstr ""
 "ഡിമോഡുലേറ്ററിന് പ്രതസംബന്ധ വൈപരീത്യം ശരിയായി തിരിച്ചറിയാന്‍ കഴിഞ്ഞില്ലെങ്കില്‍, അതിനെ "
 "സ്വമേധയാ കോൺഫിഗർ ചെയ്യേണ്ടതുണ്ട്."
 
-#: modules/access/dtv/access.c:94
+#: modules/access/dtv/access.c:96
 msgid "FEC code rate"
 msgstr "എഫ്ഇസി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:95
+#: modules/access/dtv/access.c:97
 msgid "High-priority code rate"
 msgstr "ഹൈ-പ്രയോരിറ്റി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:96
+#: modules/access/dtv/access.c:98
 msgid "Low-priority code rate"
 msgstr "ലോ-പ്രയോരിറ്റി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:97
+#: modules/access/dtv/access.c:99
 msgid "Layer A code rate"
 msgstr "ലെയര്‍ എ കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:98
+#: modules/access/dtv/access.c:100
 msgid "Layer B code rate"
 msgstr "ലെയര്‍ ബി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:99
+#: modules/access/dtv/access.c:101
 msgid "Layer C code rate"
 msgstr "ലെയര്‍ സി കോഡ് റേറ്റ്"
 
-#: modules/access/dtv/access.c:101
+#: modules/access/dtv/access.c:103
 msgid "The code rate for Forward Error Correction can be specified."
 msgstr "മുന്നോട്ടുള്ള തെറ്റുകള്‍ ശരിയാക്കാനാവശ്യമായ കോഡ് നിരക്ക് നിര്‍ദ്ദേശിക്കാം."
 
-#: modules/access/dtv/access.c:111
+#: modules/access/dtv/access.c:113
 msgid "Transmission mode"
 msgstr "ട്രാന്‍സ്മിഷന്‍ മോഡ്"
 
-#: modules/access/dtv/access.c:119
+#: modules/access/dtv/access.c:121
 msgid "Bandwidth (MHz)"
 msgstr "ബാന്‍ഡ്വിഡ്ത്ത് (MHz)"
 
-#: modules/access/dtv/access.c:124
+#: modules/access/dtv/access.c:126
 msgid "10 MHz"
 msgstr "10 MHz"
 
-#: modules/access/dtv/access.c:124
+#: modules/access/dtv/access.c:126
 msgid "8 MHz"
 msgstr "8 MHz"
 
-#: modules/access/dtv/access.c:124
+#: modules/access/dtv/access.c:126
 msgid "7 MHz"
 msgstr "7 MHz"
 
-#: modules/access/dtv/access.c:124
+#: modules/access/dtv/access.c:126
 msgid "6 MHz"
 msgstr "6 MHz"
 
-#: modules/access/dtv/access.c:125
+#: modules/access/dtv/access.c:127
 msgid "5 MHz"
 msgstr "5 MHz"
 
-#: modules/access/dtv/access.c:125
+#: modules/access/dtv/access.c:127
 msgid "1.712 MHz"
 msgstr "1.712 MHz"
 
-#: modules/access/dtv/access.c:128
+#: modules/access/dtv/access.c:130
 msgid "Guard interval"
 msgstr "ഗാര്‍ഡ് ഇടവേള"
 
-#: modules/access/dtv/access.c:136
+#: modules/access/dtv/access.c:138
 msgid "Hierarchy mode"
 msgstr "ഹൈറാര്‍ക്കി മോഡ്"
 
-#: modules/access/dtv/access.c:144
+#: modules/access/dtv/access.c:146
 msgid "DVB-T2 Physical Layer Pipe"
 msgstr "ഡിവിബി-ടി2 ഫിസിക്കല്‍ ലെയര്‍ പൈപ്പ്"
 
-#: modules/access/dtv/access.c:146
+#: modules/access/dtv/access.c:148
 msgid "Layer A segments count"
 msgstr "ലെയര്‍ എ സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:147
+#: modules/access/dtv/access.c:149
 msgid "Layer B segments count"
 msgstr "ലെയര്‍ ബി സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:148
+#: modules/access/dtv/access.c:150
 msgid "Layer C segments count"
 msgstr "ലെയര്‍ സി സെഗ്മെന്റുകളുടെ കൗണ്ട്"
 
-#: modules/access/dtv/access.c:150
+#: modules/access/dtv/access.c:152
 msgid "Layer A time interleaving"
 msgstr "ലെയര്‍ എ ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:151
+#: modules/access/dtv/access.c:153
 msgid "Layer B time interleaving"
 msgstr "ലെയര്‍ ബി ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:152
+#: modules/access/dtv/access.c:154
 msgid "Layer C time interleaving"
 msgstr "ലെയര്‍ സി ടൈം ഇന്റര്‍ലീവിംഗ്"
 
-#: modules/access/dtv/access.c:154
+#: modules/access/dtv/access.c:156
 msgid "Stream identifier"
 msgstr "സ്ട്രീം ഐഡന്റിഫയര്‍"
 
-#: modules/access/dtv/access.c:156
+#: modules/access/dtv/access.c:158
 msgid "Pilot"
 msgstr "പൈലറ്റ്"
 
-#: modules/access/dtv/access.c:158
+#: modules/access/dtv/access.c:160
 msgid "Roll-off factor"
 msgstr "റോള്‍-ഓഫ് ഫാക്ടര്‍"
 
-#: modules/access/dtv/access.c:163
+#: modules/access/dtv/access.c:165
 msgid "0.35 (same as DVB-S)"
 msgstr "0.35 (ഡിവിബി-എസിനു തുല്യമായ)"
 
-#: modules/access/dtv/access.c:163
+#: modules/access/dtv/access.c:165
 msgid "0.20"
 msgstr "0.20"
 
-#: modules/access/dtv/access.c:163
+#: modules/access/dtv/access.c:165
 msgid "0.25"
 msgstr "0.25"
 
-#: modules/access/dtv/access.c:166
+#: modules/access/dtv/access.c:168
 msgid "Transport stream ID"
 msgstr "ട്രാന്‍സ്പോര്‍ട്ട് സ്ട്രീം ഐഡി"
 
-#: modules/access/dtv/access.c:168
+#: modules/access/dtv/access.c:170
 msgid "Polarization (Voltage)"
 msgstr "പോളറൈസേഷന്‍(വോള്‍ട്ടേജ്)"
 
-#: modules/access/dtv/access.c:170
+#: modules/access/dtv/access.c:172
 msgid ""
 "To select the polarization of the transponder, a different voltage is "
 "normally applied to the low noise block-downconverter (LNB)."
@@ -6918,31 +6918,31 @@ msgstr ""
 "ട്രാന്‍സ്പോണ്ടറുകളുടെ ധ്രുവീകരണം തിരഞ്ഞെടുക്കാന്‍, സാധാരണഗതിയില്‍ ഒരു വ്യത്യസ്ഥമായ വോള്‍ട്ടേജ് കുറഞ്ഞ "
 "നോയിസ് ബ്ലോക്-ഡൌണ്‍കൌണ്ടറിലേക്ക് (എല്‍‌എന്‍‌ബി)  പ്രയോഗിക്കും."
 
-#: modules/access/dtv/access.c:173
+#: modules/access/dtv/access.c:175
 msgid "Unspecified (0V)"
 msgstr "സൂചിപ്പിക്കാത്തത് (0V)"
 
-#: modules/access/dtv/access.c:174
+#: modules/access/dtv/access.c:176
 msgid "Vertical (13V)"
 msgstr "ലംബമായ (13V)"
 
-#: modules/access/dtv/access.c:174
+#: modules/access/dtv/access.c:176
 msgid "Horizontal (18V)"
 msgstr "തിരശ്ചീനമായ (18V)"
 
-#: modules/access/dtv/access.c:175
+#: modules/access/dtv/access.c:177
 msgid "Circular Right Hand (13V)"
 msgstr "സര്‍ക്കുലര്‍ വലത് കൈ (13V)"
 
-#: modules/access/dtv/access.c:175
+#: modules/access/dtv/access.c:177
 msgid "Circular Left Hand (18V)"
 msgstr "സര്‍ക്കുലര്‍ വലത് കൈ(18V)"
 
-#: modules/access/dtv/access.c:177
+#: modules/access/dtv/access.c:179
 msgid "High LNB voltage"
 msgstr "ഉയര്‍ന്ന എല്‍എന്‍ബി വോള്‍ട്ടേജ്"
 
-#: modules/access/dtv/access.c:179
+#: modules/access/dtv/access.c:181
 msgid ""
 "If the cables between the satellilte low noise block-downconverter and the "
 "receiver are long, higher voltage may be required.\n"
@@ -6952,26 +6952,26 @@ msgstr ""
 "കൂടുതലാണെങ്കില്‍, കൂടിയ വോള്‍ട്ടേജ് അനിവാര്യമായേക്കാം.\n"
 "എല്ലാ റിസീവറുകളും ഇത് പിന്തുണക്കില്ല. "
 
-#: modules/access/dtv/access.c:183
+#: modules/access/dtv/access.c:185
 msgid "Local oscillator low frequency (kHz)"
 msgstr "ലോക്കല്‍ ഓസിലേറ്റര്‍ ലോ ഫ്രീക്വന്‍സി (kHz)"
 
-#: modules/access/dtv/access.c:184
+#: modules/access/dtv/access.c:186
 msgid "Local oscillator high frequency (kHz)"
 msgstr "ലോക്കല്‍ ഓസിലേറ്റര്‍ ഹൈ ഫ്രീക്വന്‍സി (kHz)"
 
-#: modules/access/dtv/access.c:186
+#: modules/access/dtv/access.c:188
 msgid ""
 "The downconverter (LNB) will subtract the local oscillator frequency from "
 "the satellite transmission frequency. The intermediate frequency (IF) on the "
 "RF cable is the result."
 msgstr ""
 
-#: modules/access/dtv/access.c:189
+#: modules/access/dtv/access.c:191
 msgid "Universal LNB switch frequency (kHz)"
 msgstr "യൂണിവേഴ്സല്‍ എല്‍എന്‍ബി സ്വിച്ച് ഫ്രീക്വന്‍സി  (kHz)"
 
-#: modules/access/dtv/access.c:191
+#: modules/access/dtv/access.c:193
 msgid ""
 "If the satellite transmission frequency exceeds the switch frequency, the "
 "oscillator high frequency will be used as reference. Furthermore the "
@@ -6981,11 +6981,11 @@ msgstr ""
 "സിയെ പ്രമനകോശമായി ഉപയോഗിക്കും. അതിനുപുറമേ 22 കിലോഹെര്‍ട്സ് സ്വയംപ്രേരിത തുടര്‍ ടോണ്‍ "
 "അയക്കപ്പെടും."
 
-#: modules/access/dtv/access.c:194
+#: modules/access/dtv/access.c:196
 msgid "Continuous 22kHz tone"
 msgstr "തുടര്‍ച്ചയായ 22kHz ടോണ്‍"
 
-#: modules/access/dtv/access.c:196
+#: modules/access/dtv/access.c:198
 msgid ""
 "A continuous tone at 22kHz can be sent on the cable. This normally selects "
 "the higher frequency band from a universal LNB."
@@ -6993,11 +6993,11 @@ msgstr ""
 "22 കിലോഹെര്‍ട്സ് തുടര്‍ ടോണ്‍ കേബിളില്‍ അയക്കാം. എല്ലാറ്റിനും പറ്റിയ എല്‍‌എന്‍‌ബിയില്‍ നിന്നും കൂടിയ "
 "ഫ്രീക്വെന്‍സി ബാന്‍ഡ് ഇത് പൊതുവേ തിരഞ്ഞെടുക്കും."
 
-#: modules/access/dtv/access.c:199
+#: modules/access/dtv/access.c:201
 msgid "DiSEqC LNB number"
 msgstr "ഡിസെക്സി എല്‍എന്‍ബി നമ്പര്‍"
 
-#: modules/access/dtv/access.c:201
+#: modules/access/dtv/access.c:203
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a DiSEqC 1.0 switch, the correct LNB can be "
@@ -7007,16 +7007,16 @@ msgstr ""
 "സ്വിച്ചിലൂടെ ഘടിപ്പിച്ചിട്ടുണ്ടെങ്കില്‍, ശരിയായ എല്‍‌എന്‍‌ബി തിരഞ്ഞെടുക്കാം (1 മുതല്‍ 4 വരെ). സ്വിച്ച് "
 "ഒന്നുമില്ലെങ്കില്‍ ഈ ഘടകം 0 ആയിരിക്കണം."
 
-#: modules/access/dtv/access.c:207 modules/access/v4l2/v4l2.c:136
+#: modules/access/dtv/access.c:209 modules/access/v4l2/v4l2.c:136
 #: modules/access/v4l2/v4l2.c:163 modules/access/v4l2/v4l2.c:201
 msgid "Unspecified"
 msgstr "വിവരിയ്ക്കപ്പെടാത്ത"
 
-#: modules/access/dtv/access.c:211
+#: modules/access/dtv/access.c:213
 msgid "Uncommitted DiSEqC LNB number"
 msgstr "കമ്മിറ്റ് ചെയ്യാത്ത ഡിസെക്സി എന്‍എന്‍ബി നമ്പര്‍"
 
-#: modules/access/dtv/access.c:213
+#: modules/access/dtv/access.c:215
 msgid ""
 "If the satellite receiver is connected to multiple low noise block-"
 "downconverters (LNB) through a cascade formed from DiSEqC 1.1 uncommitted "
@@ -7029,100 +7029,100 @@ msgstr ""
 "സ്വിച്ചിനോടും ഘടിപ്പിച്ചിട്ടുണ്ടെങ്കില്‍, ശരിയായ പരിത്യജികാത്ത എല്‍‌എന്‍‌ബി തിരഞ്ഞെടുക്കാം (1 മുതല്‍ "
 "4 വരെ). പരിത്യജികാത്ത സ്വിച്ച് ഒന്നുമില്ലെങ്കില്‍ ഈ ഘടകം 0 ആയിരിക്കണം."
 
-#: modules/access/dtv/access.c:220
+#: modules/access/dtv/access.c:222
 msgid "Network identifier"
 msgstr "നെറ്റ്വര്‍ക്ക് ഐഡന്റിഫയര്‍"
 
-#: modules/access/dtv/access.c:221
+#: modules/access/dtv/access.c:223
 msgid "Satellite azimuth"
 msgstr "സാറ്റലൈറ്റ് അസിമുത്ത്"
 
-#: modules/access/dtv/access.c:222
+#: modules/access/dtv/access.c:224
 msgid "Satellite azimuth in tenths of degree"
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് അഗ്രകോടി"
 
-#: modules/access/dtv/access.c:223
+#: modules/access/dtv/access.c:225
 msgid "Satellite elevation"
 msgstr "സാറ്റലൈറ്റ് എലിവേഷന്‍"
 
-#: modules/access/dtv/access.c:224
+#: modules/access/dtv/access.c:226
 msgid "Satellite elevation in tenths of degree"
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് ഉയരം"
 
-#: modules/access/dtv/access.c:225
+#: modules/access/dtv/access.c:227
 msgid "Satellite longitude"
 msgstr "സാറ്റ്ലൈറ്റ് ലോംഗിറ്റ്യൂഡ്"
 
-#: modules/access/dtv/access.c:227
+#: modules/access/dtv/access.c:229
 msgid "Satellite longitude in tenths of degree. West is negative."
 msgstr "ഡിഗ്രീയുടെ പത്തിലൊന്നിലുള്ള സാറ്റലൈറ്റ് ധ്രുവരേഖാശം. പടിഞ്ഞാറു നെഗറ്റിവ് ആണ്"
 
-#: modules/access/dtv/access.c:229
+#: modules/access/dtv/access.c:231
 msgid "Satellite range code"
 msgstr "സാറ്റലൈറ്റ് റേഞ്ച് കോഡ്"
 
-#: modules/access/dtv/access.c:230
+#: modules/access/dtv/access.c:232
 msgid "Satellite range code as defined by manufacturer e.g. DISEqC switch code"
 msgstr ""
 "നിര്‍മ്മാതാവിനാല്‍ നിര്‍വചിക്കപ്പെട്ട സാറ്റലൈറ്റ് പരിധി കോഡ് ഉദാ. ഡി‌ഐ‌എസ്‌ഇ‌ക്യൂ‌സി സ്വിച്ച് കോഡ്"
 
-#: modules/access/dtv/access.c:234
+#: modules/access/dtv/access.c:236
 msgid "Major channel"
 msgstr "പ്രധാന ചാനല്‍"
 
-#: modules/access/dtv/access.c:235
+#: modules/access/dtv/access.c:237
 msgid "ATSC minor channel"
 msgstr "എടിഎസ്സി മൈനര്‍ ചാനല്‍"
 
-#: modules/access/dtv/access.c:236
+#: modules/access/dtv/access.c:238
 msgid "Physical channel"
 msgstr "ഫിസിക്കല്‍ ചാനല്‍"
 
-#: modules/access/dtv/access.c:242
+#: modules/access/dtv/access.c:244
 msgid "DTV"
 msgstr "ഡിടിവി"
 
-#: modules/access/dtv/access.c:243
+#: modules/access/dtv/access.c:245
 msgid "Digital Television and Radio"
 msgstr "ഡിജിറ്റല്‍ ടെലിവിഷനും റോഡിയോയും"
 
-#: modules/access/dtv/access.c:281
+#: modules/access/dtv/access.c:283
 msgid "Terrestrial reception parameters"
 msgstr "ടെറസ്ട്രിയല്‍ റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:293
+#: modules/access/dtv/access.c:295
 msgid "DVB-T reception parameters"
 msgstr "ഡിവിബി-ടി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:309
+#: modules/access/dtv/access.c:311
 msgid "ISDB-T reception parameters"
 msgstr "ഐസ്ഡിബി-ടി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:350
+#: modules/access/dtv/access.c:352
 msgid "Cable and satellite reception parameters"
 msgstr "കേബിളും സാറ്റലൈറ്റ് റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:362
+#: modules/access/dtv/access.c:364
 msgid "DVB-S2 parameters"
 msgstr "ഡിവിബി-എസ്2 പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:373
+#: modules/access/dtv/access.c:375
 msgid "ISDB-S parameters"
 msgstr "ഐഎസ്ഡിബി-എസ് പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:378
+#: modules/access/dtv/access.c:380
 msgid "Satellite equipment control"
 msgstr "സാറ്റ്ലൈറ്റ് ഉപകരണ നിയന്ത്രണം"
 
-#: modules/access/dtv/access.c:420
+#: modules/access/dtv/access.c:422
 msgid "ATSC reception parameters"
 msgstr "എടിഎസ്സി റിസപ്ഷന്‍ പരാമീറ്ററുകള്‍"
 
-#: modules/access/dtv/access.c:474
+#: modules/access/dtv/access.c:476
 msgid "Digital broadcasting"
 msgstr "ഡിജിറ്റല്‍ ബ്രോഡ്കാസ്റ്റിംഗ്"
 
-#: modules/access/dtv/access.c:475
+#: modules/access/dtv/access.c:477
 msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
@@ -7288,7 +7288,7 @@ msgstr ""
 msgid "Include devices and pipes when listing directories"
 msgstr ""
 
-#: modules/access/ftp.c:68 modules/access/live555.cpp:83
+#: modules/access/ftp.c:68 modules/access/live555.cpp:84
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
 #: modules/access/smb_common.h:21 modules/access/vnc.c:46
 #: modules/access_output/http.c:52
@@ -7306,7 +7306,7 @@ msgid ""
 "URL."
 msgstr ""
 
-#: modules/access/ftp.c:71 modules/access/live555.cpp:86
+#: modules/access/ftp.c:71 modules/access/live555.cpp:87
 #: modules/access/rdp.c:68 modules/access/sftp.c:58
 #: modules/access/smb_common.h:24 modules/access/vnc.c:47
 #: modules/access_output/http.c:55
@@ -7473,7 +7473,7 @@ msgstr "വിഭാഗം"
 msgid "Set the category of the elementary stream"
 msgstr "എലിമെന്ററി സ്ട്രീമിന്റെ വിഭാഗം സെറ്റ് ചെയ്യുക"
 
-#: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:361
+#: modules/access/imem.c:64 modules/gui/macosx/VLCAddonsWindowController.m:363
 #: modules/gui/qt/managers/addons_manager.cpp:98
 msgid "Unknown"
 msgstr "അറിയാത്ത"
@@ -7694,11 +7694,11 @@ msgstr "എസ്ഡിഐ ഇന്‍പുട്ട്"
 msgid "SDI Demux"
 msgstr "എസ്ഡിഐ ഡീമക്സ്"
 
-#: modules/access/live555.cpp:73
+#: modules/access/live555.cpp:74
 msgid "Kasenna RTSP dialect"
 msgstr "കാസെന്ന ആര്‍ടിഎസ്പി ഡയലക്ട്"
 
-#: modules/access/live555.cpp:74
+#: modules/access/live555.cpp:75
 msgid ""
 "Kasenna servers use an old and nonstandard dialect of RTSP. With this "
 "parameter VLC will try this dialect, but then it cannot connect to normal "
@@ -7708,11 +7708,11 @@ msgstr ""
 "ഘടകം കൊണ്ട് വി‌എല്‍‌സി  ഈ ഡയലെക്റ്റ് ശ്രമിക്കും, പക്ഷെ പിന്നീട് അതിനു സാധാരണ ആര്‍‌ടി‌എസ്‌പി സെര്‍"
 "വറുകളോട് ബന്ധപ്പെടാന്‍ സാധിക്കില്ല."
 
-#: modules/access/live555.cpp:78
+#: modules/access/live555.cpp:79
 msgid "WMServer RTSP dialect"
 msgstr "ഡബ്ല്യുഎംസര്‍വ്വര്‍ ആര്‍ടിഎസ്പി ഡയലക്ട്"
 
-#: modules/access/live555.cpp:79
+#: modules/access/live555.cpp:80
 msgid ""
 "WMServer uses a nonstandard dialect of RTSP. Selecting this parameter will "
 "tell VLC to assume some options contrary to RFC 2326 guidelines."
@@ -7721,7 +7721,7 @@ msgstr ""
 "തിരഞ്ഞെടുക്കുന്നത് വഴി ചില ഐച്ഛികങ്ങള്‍ ആര്‍‌എഫ്‌സി2326 മാര്‍ഗനിര്‍ദ്ദേശകരേഖകള്‍ക്ക് വിരുദ്ധമായി "
 "അനുമാനിക്കാന്‍ വി‌എല്‍‌സിയോട് പറയും."
 
-#: modules/access/live555.cpp:84
+#: modules/access/live555.cpp:85
 msgid ""
 "Sets the username for the connection, if no username or password are set in "
 "the url."
@@ -7729,7 +7729,7 @@ msgstr ""
 "ഉപയോക്തനാമമോ അല്ലെങ്കില്‍ രഹസ്യനാമമോ യു‌ആര്‍‌എല്‍ലില്‍ സജീകരിച്ചിട്ടില്ലെങ്കില്‍ ബന്ധപ്പെടലിന് വേണ്ടി "
 "ഉപയോക്തനാമം സജ്ജീകരിക്കും"
 
-#: modules/access/live555.cpp:87
+#: modules/access/live555.cpp:88
 msgid ""
 "Sets the password for the connection, if no username or password are set in "
 "the url."
@@ -7737,11 +7737,11 @@ msgstr ""
 "ഉപയോക്തനാമമോ അല്ലെങ്കില്‍ രഹസ്യനാമമോ യു‌ആര്‍‌എല്‍ലില്‍ സജീകരിച്ചിട്ടില്ലെങ്കില്‍ ബന്ധപ്പെടലിന് വേണ്ടി "
 "രഹസ്യനാമം സജ്ജീകരിക്കും"
 
-#: modules/access/live555.cpp:89
+#: modules/access/live555.cpp:90
 msgid "RTSP frame buffer size"
 msgstr "ആര്‍ടിഎസ്പി ഫ്രെയിം ബഫര്‍ വലുപ്പം"
 
-#: modules/access/live555.cpp:90
+#: modules/access/live555.cpp:91
 msgid ""
 "RTSP start frame buffer size of the video track, can be increased in case of "
 "broken pictures due to too small buffer."
@@ -7749,55 +7749,55 @@ msgstr ""
 "വീഡിയോ ട്രാക്കിന്റെ ഫ്രെയിം ബഫര്‍ വലിപ്പം ആര്‍‌ടി‌എസ്‌പി തുടങ്ങും, ചെറിയ ബഫറുകള്‍ കാരണമുള്ള മുറിഞ്ഞ "
 "പടങ്ങളുണ്ടെങ്കില്‍ ഇത് കൂട്ടാം."
 
-#: modules/access/live555.cpp:96
+#: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
 msgstr "ആര്‍ടിപി/ആര്‍ടിഎസ്പി/എസ്ഡിപി ഡീമക്സര്‍ (Live555 ഉപയോഗിക്കുന്നു)"
 
-#: modules/access/live555.cpp:105
+#: modules/access/live555.cpp:106
 msgid "RTSP/RTP access and demux"
 msgstr "ആര്‍ടിഎസ്പി/ആര്‍ടിപി അക്സസ്സും ഡീമക്സും"
 
-#: modules/access/live555.cpp:110 modules/access/live555.cpp:111
+#: modules/access/live555.cpp:111 modules/access/live555.cpp:112
 msgid "Use RTP over RTSP (TCP)"
 msgstr "ആര്‍ടിഎസ്പിക്കു(ടിസിപി) മേല്‍ ആര്‍ടിപി ഉപയോഗിക്കുക"
 
-#: modules/access/live555.cpp:114
+#: modules/access/live555.cpp:115
 msgid "Client port"
 msgstr "ക്ലയന്റ് പോര്‍ട്ട്"
 
-#: modules/access/live555.cpp:115
+#: modules/access/live555.cpp:116
 msgid "Port to use for the RTP source of the session"
 msgstr "സെഷന്റെ ആര്‍‌ടി‌പി ഉറവിടത്തിന് വേണ്ടി ഉപയോഗിയ്ക്കുന്ന പോര്‍ട്ട്"
 
-#: modules/access/live555.cpp:117 modules/access/live555.cpp:118
+#: modules/access/live555.cpp:118 modules/access/live555.cpp:119
 msgid "Force multicast RTP via RTSP"
 msgstr "ആര്‍ടിഎസ്പി വഴി മള്‍ട്ടികാസ്റ്റ് ഫോഴ്സ് ചെയ്യുക"
 
-#: modules/access/live555.cpp:121 modules/access/live555.cpp:122
+#: modules/access/live555.cpp:122 modules/access/live555.cpp:123
 msgid "Tunnel RTSP and RTP over HTTP"
 msgstr "എച്ച്ടിടിപിക്കു മുകളിലായി ആര്‍ടിഎസ്പിയും ആര്‍ടിപിയും ടണല്‍ ചെയ്യുക"
 
-#: modules/access/live555.cpp:125
+#: modules/access/live555.cpp:126
 msgid "HTTP tunnel port"
 msgstr "എച്ച്ടിടിപി ടണല്‍ പോര്‍ട്ട്"
 
-#: modules/access/live555.cpp:126
+#: modules/access/live555.cpp:127
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
 msgstr "എച്ച്‌ടി‌ടി‌പിയുടെ പുറത്തു ആര്‍‌ടി‌എസ്‌പി/ആര്‍‌ടി‌പി ടണലിങ്ങിന് വേണ്ടി ഉപയോഗിയ്ക്കുന്ന പോര്‍ട്ട്"
 
-#: modules/access/live555.cpp:668
+#: modules/access/live555.cpp:672
 msgid "RTSP authentication"
 msgstr "ആര്‍ടിഎസ്പി ഓതന്റിക്കേഷന്‍"
 
-#: modules/access/live555.cpp:669
+#: modules/access/live555.cpp:673
 msgid "Please enter a valid login name and a password."
 msgstr "സാധുതയുള്ള ലോഗിന്‍ നാമവും പാസ്വേര്‍ഡും നല്‍കുക."
 
-#: modules/access/live555.cpp:694
+#: modules/access/live555.cpp:698
 msgid "RTSP connection failed"
 msgstr "ആര്‍ടിഎസ്പി ബന്ധം പരാജയപ്പെട്ടു"
 
-#: modules/access/live555.cpp:695
+#: modules/access/live555.cpp:699
 msgid "Access to the stream is denied by the server configuration."
 msgstr "സ്ട്രീമിലേക്കുള്ള പ്രവേശനം സെര്‍വര്‍ കോണ്‍ഫിഗറേഷനാല്‍ നിഷേധിക്കപ്പെട്ടു."
 
@@ -7917,25 +7917,25 @@ msgstr "പള്‍സ്ഓഡിയോ"
 msgid "PulseAudio input"
 msgstr "പള്‍സ്ഓഡിയോ ഇന്‍പുട്ട്"
 
-#: modules/access/qtsound.m:59
+#: modules/access/qtsound.m:69
 msgid "QTSound"
 msgstr ""
 
-#: modules/access/qtsound.m:60
+#: modules/access/qtsound.m:70
 msgid "QuickTime Sound Capture"
 msgstr ""
 
-#: modules/access/qtsound.m:262
+#: modules/access/qtsound.m:272
 msgid "No Audio Input device found"
 msgstr ""
 
-#: modules/access/qtsound.m:263 modules/access/qtsound.m:294
+#: modules/access/qtsound.m:273 modules/access/qtsound.m:304
 msgid ""
 "Your Mac does not seem to be equipped with a suitable audio input device."
 "Please check your connectors and drivers."
 msgstr ""
 
-#: modules/access/qtsound.m:293
+#: modules/access/qtsound.m:303
 msgid "No audio input device found"
 msgstr ""
 
@@ -8809,9 +8809,9 @@ msgid ""
 msgstr ""
 
 #: modules/access/v4l2/v4l2.c:242 modules/codec/avcodec/avcodec.c:50
-#: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:435
+#: modules/codec/avcodec/avcodec.c:54 modules/codec/x264.c:429
 #: modules/control/hotkeys.c:395
-#: modules/gui/macosx/VLCAddonsWindowController.m:99
+#: modules/gui/macosx/VLCAddonsWindowController.m:100
 #: modules/gui/qt/dialogs/convert.cpp:164
 #: modules/gui/qt/dialogs/plugins.cpp:375
 #: modules/gui/qt/dialogs/preferences.cpp:79
@@ -10588,7 +10588,7 @@ msgstr "AES3/SMPTE 302M ഓഡിയോ ഡീക്കോഡര്‍"
 msgid "AES3/SMPTE 302M audio packetizer"
 msgstr "എ‌ഇ‌എസ്3/എസ്‌എംപി‌ടി‌ഇ 320എം ഓഡിയോ പായ്ക്കറ്റൈസര്‍"
 
-#: modules/codec/aom.c:50
+#: modules/codec/aom.c:52
 msgid "AOM video decoder"
 msgstr ""
 
@@ -10929,7 +10929,7 @@ msgstr ""
 "ഐ ഫ്രെയിമുകള്‍ക്കുള്ള ക്വാണ്ടൈസേഷൻ ഘടകം, പി ഫ്രെയിമുകളോട് താരതമ്യപ്പെടുത്തിയത്. (സന്ദര്‍ഭത്തില്‍ "
 "1.0=> ഐ കൂടാതെ പി ഫ്രെയിമുകള്‍ക്ക് ഒരേ ക്യൂസ്കെയിലാണ്). "
 
-#: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:369
+#: modules/codec/avcodec/avcodec.h:161 modules/codec/x264.c:363
 #: modules/demux/mod.c:79
 msgid "Noise reduction"
 msgstr "നോയിസ് റിഡക്ഷന്‍"
@@ -11113,7 +11113,7 @@ msgstr ""
 msgid "DirectX Video Acceleration (DXVA) 2.0"
 msgstr "ഡിറക്റ്റ്എക്സ്വീഡിയോ ത്വരിതപ്പെടുത്തല്‍ (ഡി‌എക്സ്‌വി‌എ) 2.0 "
 
-#: modules/codec/avcodec/encoder.c:374
+#: modules/codec/avcodec/encoder.c:376
 #, c-format
 msgid ""
 "It seems your Libav/FFmpeg (libavcodec) installation lacks the following "
@@ -11133,23 +11133,23 @@ msgstr ""
 "വി‌എല്‍‌സി മീഡിയ പ്ലെയറിന് അകത്തുള്ള ഒരു തെറ്റല്ല ഇത്.\n"
 "ഈ പ്രശ്നത്തിന് വേണ്ടി വീഡിയോലാന്‍ പ്രോജക്റ്റുമായി ബന്ധപ്പെടണ്ട.\n"
 
-#: modules/codec/avcodec/encoder.c:890
+#: modules/codec/avcodec/encoder.c:892
 msgid "unknown"
 msgstr "അറിയാത്ത"
 
-#: modules/codec/avcodec/encoder.c:890
+#: modules/codec/avcodec/encoder.c:892
 msgid "video"
 msgstr "വീഡിയോ"
 
-#: modules/codec/avcodec/encoder.c:891
+#: modules/codec/avcodec/encoder.c:893
 msgid "audio"
 msgstr "ഓഡിയോ"
 
-#: modules/codec/avcodec/encoder.c:891
+#: modules/codec/avcodec/encoder.c:893
 msgid "subpicture"
 msgstr "സബ്പിക്ച്ചര്‍"
 
-#: modules/codec/avcodec/encoder.c:904
+#: modules/codec/avcodec/encoder.c:906
 #, c-format
 msgid "VLC could not open the %4.4s %s encoder."
 msgstr "%4.4s %s എന്‍കോഡര്‍ വി‌എല്‍‌സിക്കു തുറക്കാന്‍ കഴിഞ്ഞില്ല."
@@ -12068,7 +12068,7 @@ msgstr ""
 "ബ്ലോക്ക് വരികൾ അടങ്ങിയിരിക്കുന്നു. നംസ്ലൈസ് സജ്ജമാക്കിയിട്ടില്ലെങ്കിൽ , എൻകോഡർ കോഡെക് "
 "സാധാരണ അനുവദിച്ചിരിക്കുകയാണ് ഏതെങ്കിലും സ്ലൈസ് വിഭജനം തിരഞ്ഞെടുക്കാം."
 
-#: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:143
+#: modules/codec/qsv.c:145 modules/codec/qsv.c:146 modules/codec/x264.c:137
 msgid "Number of reference frames"
 msgstr "റഫറന്‍സ് ഫ്രെയിമുകളുടെ നമ്പര്‍"
 
@@ -13170,25 +13170,15 @@ msgstr ""
 msgid "Use recovery points to close GOPs"
 msgstr "ജി‌ഓ‌പികള്‍ അടക്കാന്‍ തിരിച്ചുകിട്ടാല്‍ പോയിന്‍റ്റുകള്‍ ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:88
-msgid ""
-"none: use closed GOPs only\n"
-"normal: use standard open GOPs\n"
-"bluray: use Blu-ray compatible open GOPs"
-msgstr ""
-"ഒന്നുമില്ല: ക്ലോസ് ചെയ്ത ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക\n"
-"സാധാരണ: അടിസ്ഥാന ഓപ്പണ്‍ ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക\n"
-"ബ്ലൂറേ: ബ്ലൂ-റേ കോംപാറ്റബിളായ ഓപ്പണ്‍ ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക"
-
-#: modules/codec/x264.c:92
+#: modules/codec/x264.c:87
 msgid "use open GOP, for bluray compatibility use also bluray-compat option"
 msgstr "തുറന്ന GOP ഉപയോഗിക്കുക, ബ്ലൂറേ അനുയോജ്യതയ്ക്കായി ബ്ലൂറേ-കോംപാറ്റ് ഓപ്ഷന്‍ ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:95
+#: modules/codec/x264.c:89
 msgid "Enable compatibility hacks for Blu-ray support"
 msgstr "ബ്ലൂറേ പിന്തുണയ്ക്കുന്നതിനായി കോംപാറ്റിബിലിറ്റി ഹാക്കുകള്‍ പ്രാപ്തമാക്കുക"
 
-#: modules/codec/x264.c:96
+#: modules/codec/x264.c:90
 msgid ""
 "Enable hacks for Blu-ray support, this doesn't enforce every aspect of Blu-"
 "ray compatibility\n"
@@ -13197,11 +13187,11 @@ msgstr ""
 "ബ്ലൂറേ പിന്തുണയ്ക്കുന്നതിനായി ഹാക്കുകള്‍ പ്രാപ്തമാക്കുക, ഇത് ബ്ലൂ-റേ കോംപാറ്റിബിലിറ്റിയുടെ എല്ലാ "
 "സാധ്യതകളും നടപ്പിലാക്കുന്നില്ല. ഉദാ: റെസല്യൂഷന്‍,ഫ്രയിം റേറ്റ്,ലെവല്‍"
 
-#: modules/codec/x264.c:99
+#: modules/codec/x264.c:93
 msgid "Extra I-frames aggressivity"
 msgstr "അധികമുള്ള I-ഫ്രൈയിംസിന്‍റെ പ്രകോപനം"
 
-#: modules/codec/x264.c:100
+#: modules/codec/x264.c:94
 msgid ""
 "Scene-cut detection. Controls how aggressively to insert extra I-frames. "
 "With small values of scenecut, the codec often has to force an I-frame when "
@@ -13219,29 +13209,29 @@ msgstr ""
 "ഗതകാലചരിത്രത്തിലേക്ക് നയിക്കുന്ന മാത്രമേ മറ്റെല്ലാ കീഇന്റ് ഫ്രെയിമുകൾ , ചേർത്തതും . 100 റേഞ്ച് "
 "1."
 
-#: modules/codec/x264.c:111
+#: modules/codec/x264.c:105
 msgid "B-frames between I and P"
 msgstr "ഐ കൂടാതെ പീക്ക് ഇടയിളുള്ള ബി-ഫ്രെയിമുകള്‍"
 
-#: modules/codec/x264.c:112
+#: modules/codec/x264.c:106
 msgid "Number of consecutive B-frames between I and P-frames. Range 1 to 16."
 msgstr "ഐ കൂടാതെ പീക്ക് ഇടയിളുള്ള അടുത്തടുത്തുള്ള ബി-ഫ്രെയിമുകളുടെ എണ്ണം. പരിധി 1 തൊട്ട് 16."
 
-#: modules/codec/x264.c:115
+#: modules/codec/x264.c:109
 msgid "Adaptive B-frame decision"
 msgstr "തരത്തിനോത്ത ബി-ഫ്രെയിം തീരുമാനം"
 
-#: modules/codec/x264.c:116
+#: modules/codec/x264.c:110
 msgid ""
 "Force the specified number of consecutive B-frames to be used, except "
 "possibly before an I-frame. Range 0 to 2."
 msgstr ""
 
-#: modules/codec/x264.c:120
+#: modules/codec/x264.c:114
 msgid "Influence (bias) B-frames usage"
 msgstr "ബി-ഫ്രെയിമുകളുടെ ഉപയോഗത്തെ സ്വാധീനിച്ചു (ബയാസ്)"
 
-#: modules/codec/x264.c:121
+#: modules/codec/x264.c:115
 msgid ""
 "Bias the choice to use B-frames. Positive values cause more B-frames, "
 "negative values cause less B-frames."
@@ -13249,11 +13239,11 @@ msgstr ""
 "ബയാസ് ബി- ഫ്രെയിമുകൾ ഉപയോഗിക്കാൻ ചോയ്സ് . പോസിറ്റീവ് മൂല്യങ്ങൾ കൂടുതൽ ബി- ഫ്രെയിമുകൾ "
 "കാരണമായേക്കാം , നെഗറ്റീവ് മൂല്യങ്ങൾ കുറവ് ബി- ഫ്രെയിമുകൾ കാരണമാകും ."
 
-#: modules/codec/x264.c:125
+#: modules/codec/x264.c:119
 msgid "Keep some B-frames as references"
 msgstr "കുറച്ചു ബി-ഫ്രെയിമുകള്‍ പരിശോധിക്കാനായി വെക്കുക"
 
-#: modules/codec/x264.c:126
+#: modules/codec/x264.c:120
 msgid ""
 "Allows B-frames to be used as references for predicting other frames. Keeps "
 "the middle of 2+ consecutive B-frames as a reference, and reorders frame "
@@ -13268,11 +13258,11 @@ msgstr ""
 " - strict: കര്‍ക്കശമായ ഹൈറാര്‍ക്കിയല്‍ പിരമിഡ്\n"
 " - normal: കര്‍ക്കശമല്ലാത്തത് (ബ്ലൂ-റേ കോംപാറ്റബിളല്ലാത്തത്)\n"
 
-#: modules/codec/x264.c:134
+#: modules/codec/x264.c:128
 msgid "Use fullrange instead of TV colorrange"
 msgstr "ടി‌വി കളര്‍ പരിധിക്കുപകരം മുഴുവന്‍ പരിധി ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:135
+#: modules/codec/x264.c:129
 msgid ""
 "TV-range is usually used colorrange, defining this to true will enable "
 "libx264 to use full colorrange on encoding"
@@ -13280,11 +13270,11 @@ msgstr ""
 "ടിവി - റേഞ്ച് സാധാരണയായി കളര്‍റേഞ്ച് ഉപയോഗിക്കുന്നു , യഥാർഥ ഈ നിർവചനം എൻകോഡിങ്ങിനു് പൂർണ "
 "colorrange ഉപയോഗിക്കാൻ libx264 പ്രാപ്തമാക്കും"
 
-#: modules/codec/x264.c:138
+#: modules/codec/x264.c:132
 msgid "CABAC"
 msgstr "സിഎബിഎസി"
 
-#: modules/codec/x264.c:139
+#: modules/codec/x264.c:133
 msgid ""
 "CABAC (Context-Adaptive Binary Arithmetic Coding). Slightly slows down "
 "encoding and decoding, but should save 10 to 15% bitrate."
@@ -13292,7 +13282,7 @@ msgstr ""
 "സിഎബിഎസി (കോണ്‍ടെക്സ്റ്റ്-അഡാപ്റ്റീവ് ബൈനറി അരിതമറ്റിക് കോഡിംഗ്). ചെറുതായി എന്‍കോഡിംഗ് "
 "ഡീകോഡിംഗ് പതുക്കെയാക്കുന്നു, പക്ഷേ  10 മുതല്‍ 15%  ബിറ്റ്റേറ്റ് സേവ് ചെയ്യേണ്ടതാണ്."
 
-#: modules/codec/x264.c:144
+#: modules/codec/x264.c:138
 msgid ""
 "Number of previous frames used as predictors. This is effective in Anime, "
 "but seems to make little difference in live-action source material. Some "
@@ -13302,19 +13292,19 @@ msgstr ""
 "സ്രോതസ്സ് മെറ്റീരിയലിന്റെയോ ചെറിയ മാറ്റമുണ്ടാക്കാൻ തോന്നുന്നു. ചില ഡീകോഡറുകൾ വലിയ "
 "ഫ്രെയിംറെഫ് മൂല്യങ്ങൾ കൈകാര്യം ചെയ്യാനാവില്ല . റേഞ്ച് 1 മുതല്‍ 16 വരെ."
 
-#: modules/codec/x264.c:149
+#: modules/codec/x264.c:143
 msgid "Skip loop filter"
 msgstr "സ്കിപ്പ് ലൂപ്പ് ഫില്‍റ്റര്‍"
 
-#: modules/codec/x264.c:150
+#: modules/codec/x264.c:144
 msgid "Deactivate the deblocking loop filter (decreases quality)."
 msgstr "ബ്ലോക്കാക്കാത്ത ലൂപ്പ് ഫില്‍ട്ടര്‍ പ്രവര്‍ത്തനരഹിതമാക്കുക (ഗുണം കുറക്കുന്നു)."
 
-#: modules/codec/x264.c:152
+#: modules/codec/x264.c:146
 msgid "Loop filter AlphaC0 and Beta parameters alpha:beta"
 msgstr "ലൂപ്പ് ഫില്‍ട്ടര്‍ ആല്‍ഫസി0 കൂടാതെ ബീറ്റാ ഘടകങ്ങള്‍ ആല്‍ഫ:ബീറ്റ"
 
-#: modules/codec/x264.c:153
+#: modules/codec/x264.c:147
 msgid ""
 "Loop filter AlphaC0 and Beta parameters. Range -6 to 6 for both alpha and "
 "beta parameters. -6 means light filter, 6 means strong."
@@ -13322,11 +13312,11 @@ msgstr ""
 "ലൂപ് ഫില്‍റ്റര്‍ AlphaC0യും ബീറ്റ പരാമീറ്ററുകളെയും. ആല്‍ഫ ബീറ്റ പരാമീറ്ററുകള്‍ക്കായുള്ള ശ്രേണി -6 "
 "മുതല്‍ 6 വരെ. -6 എന്നാല്‍ ലൈറ്റ് ഫില്‍റ്റര്‍, 6 എന്നാല്‍ ശക്തമായവ."
 
-#: modules/codec/x264.c:157
+#: modules/codec/x264.c:151
 msgid "H.264 level"
 msgstr "H.264 നില"
 
-#: modules/codec/x264.c:158
+#: modules/codec/x264.c:152
 msgid ""
 "Specify H.264 level (as defined by Annex A of the standard). Levels are not "
 "enforced; it's up to the user to select a level compatible with the rest of "
@@ -13338,27 +13328,27 @@ msgstr ""
 "തിരഞ്ഞെടുക്കുന്നതിന് ഉപയോക്താവിന് തീരുമാനിക്കേണ്ടത്. 5.1 റേഞ്ച് 1 ( 10 51 ഇതും "
 "അനുവദനീയമാണ് ) . X264 സെറ്റ് ലെവൽ അനുവദിച്ചതിന് 0 സജ്ജമാക്കുക ."
 
-#: modules/codec/x264.c:163
+#: modules/codec/x264.c:157
 msgid "H.264 profile"
 msgstr "H.264 പ്രൊഫൈല്‍"
 
-#: modules/codec/x264.c:164
+#: modules/codec/x264.c:158
 msgid "Specify H.264 profile which limits are enforced over other settings"
 msgstr "മറ്റു ക്രമീകരണങ്ങള്‍ക്കുമേല്‍ പരിധികള്‍ അടിച്ചേല്പിക്കുന്ന  H.264  പ്രൊഫൈല്‍ സൂചിപ്പിക്കുക"
 
-#: modules/codec/x264.c:170
+#: modules/codec/x264.c:164
 msgid "Interlaced mode"
 msgstr "ഇന്റര്‍ലേസ്ഡ് മോഡ്"
 
-#: modules/codec/x264.c:171
+#: modules/codec/x264.c:165
 msgid "Pure-interlaced mode."
 msgstr "ശുദ്ധമായ- പിണഞ്ഞുകെട്ടിയ രീതി"
 
-#: modules/codec/x264.c:173
+#: modules/codec/x264.c:167
 msgid "Frame packing"
 msgstr "ഫ്രെയിം പാക്കിംഗ്"
 
-#: modules/codec/x264.c:174
+#: modules/codec/x264.c:168
 msgid ""
 "For stereoscopic videos define frame arrangement:\n"
 " 0: checkerboard - pixels are alternatively from L and R\n"
@@ -13376,51 +13366,51 @@ msgstr ""
 " 4: ടോപ് ബോട്ടം - എല്‍ മുകളിലാണ്, ആര്‍ താഴെയാണ്\n"
 " 5: ഫ്രെയിം ആള്‍ടര്‍ണേഷന്‍ - പ്രതി ഫ്രെയിം ഒരു വ്യൂ"
 
-#: modules/codec/x264.c:182
+#: modules/codec/x264.c:176
 msgid "Use Periodic Intra Refresh"
 msgstr "സാമയികമായ അകത്തെ റിഫ്രഷ് ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:183
+#: modules/codec/x264.c:177
 msgid "Use Periodic Intra Refresh instead of IDR frames"
 msgstr "ഐ‌ഡി‌ആര്‍ ഫ്രെയിമുകള്‍ക്ക് പകരം സാമയികമായ അകത്തെ റിഫ്രഷ് ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:185
+#: modules/codec/x264.c:179
 msgid "Use mb-tree ratecontrol"
 msgstr "എം‌ബി-ട്രീ മൂല്യനിയന്ത്രണം ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:186
+#: modules/codec/x264.c:180
 msgid "You can disable use of Macroblock-tree on ratecontrol"
 msgstr "മൂല്യനിയന്ത്രണത്തില്‍ മാക്രോബ്ളോക്ക്-ട്രീയുടെ ഉപയോഗം നിങ്ങള്ക്ക് പ്രവര്‍ത്തനരഹിതമാക്കാം"
 
-#: modules/codec/x264.c:188
+#: modules/codec/x264.c:182
 msgid "Force number of slices per frame"
 msgstr "ഒരു ഫ്രെയിമിലുള്ള സ്ലയിസുകളുടെ എണ്ണം നിര്‍ബന്ധിക്കുക"
 
-#: modules/codec/x264.c:189
+#: modules/codec/x264.c:183
 msgid "Force rectangular slices and is overridden by other slicing options"
 msgstr "ദീര്‍ഘചതുര സ്ലൈസുകളെ നിര്‍ബന്ധിക്കുക കൂടാതെ മറ്റുള്ള സ്ലൈസിങ് ഐച്ഛികങ്ങളെ നിഷ്ഫലമാക്കുക"
 
-#: modules/codec/x264.c:191
+#: modules/codec/x264.c:185
 msgid "Limit the size of each slice in bytes"
 msgstr "ഓരോ സ്ലൈസിന്റ്റെയും വലിപ്പം ബൈറ്റ്സില്‍ നിയന്ത്രിക്കുക"
 
-#: modules/codec/x264.c:192
+#: modules/codec/x264.c:186
 msgid "Sets a maximum slice size in bytes, Includes NAL overhead in size"
 msgstr "ബൈറ്റില്‍ കൂടിയ സ്ലൈസ് വലുപ്പം സെറ്റ് ചെയ്യുന്നു, എന്‍എഎല്‍ ഓവര്‍ഹെഡ് വലുപ്പത്തില്‍ ഉള്‍പ്പെടുത്തുന്നു"
 
-#: modules/codec/x264.c:194
+#: modules/codec/x264.c:188
 msgid "Limit the size of each slice in macroblocks"
 msgstr "ഓരോ സ്ലൈസിന്റ്റെയും വലിപ്പം മാക്രോബ്ലോക്കുകളായി നിയന്ത്രിക്കുക"
 
-#: modules/codec/x264.c:195
+#: modules/codec/x264.c:189
 msgid "Sets a maximum number of macroblocks per slice"
 msgstr "ഓരോ സ്ലൈസിലും പരമാവധി എണ്ണം മാക്രോബ്ലോക്കുകള്‍ നിശ്ചയിക്കുക"
 
-#: modules/codec/x264.c:198
+#: modules/codec/x264.c:192
 msgid "Set QP"
 msgstr "ക്യുപി സെറ്റ് ചെയ്യുക"
 
-#: modules/codec/x264.c:199
+#: modules/codec/x264.c:193
 msgid ""
 "This selects the quantizer to use. Lower values result in better fidelity, "
 "but higher bitrates. 26 is a good default value. Range 0 (lossless) to 51."
@@ -13429,78 +13419,78 @@ msgstr ""
 "കാരണമാകുന്നു , എന്നാൽ കൂടുതൽ ബിറ്റ്റേറ്റുകളാണ് . 26 ഒരു നല്ല സഹജമായ മൂല്യം. ശ്രേണി 0 "
 "( ലോസ്ലെസ് ) മുതല്‍ 51."
 
-#: modules/codec/x264.c:203
+#: modules/codec/x264.c:197
 msgid "Quality-based VBR"
 msgstr "ഗുണം- അനുസരിച്ചുള്ള വി‌ബി‌ആര്‍"
 
-#: modules/codec/x264.c:204
+#: modules/codec/x264.c:198
 msgid "1-pass Quality-based VBR. Range 0 to 51."
 msgstr "1-കൈമാറുക ഗുണം-അനുസരിച്ചുള്ള വി‌ബി‌ആര്‍. പരിധി 0 തൊട്ട് 51."
 
-#: modules/codec/x264.c:206
+#: modules/codec/x264.c:200
 msgid "Min QP"
 msgstr "കുറഞ്ഞ ക്യുപി"
 
-#: modules/codec/x264.c:207
+#: modules/codec/x264.c:201
 msgid "Minimum quantizer parameter. 15 to 35 seems to be a useful range."
 msgstr "കുറഞ്ഞ ക്വാന്‍റൈസര് ഘടകം. 15 മുതല്‍ 35 വരെ ഉപയോഗമുള്ള പരിതിയായി കാണപ്പെടുന്നു."
 
-#: modules/codec/x264.c:210
+#: modules/codec/x264.c:204
 msgid "Max QP"
 msgstr "കൂടിയ ക്യുപി"
 
-#: modules/codec/x264.c:211
+#: modules/codec/x264.c:205
 msgid "Maximum quantizer parameter."
 msgstr "കുറഞ്ഞ ക്വാന്‍റൈസര് ഘടകം."
 
-#: modules/codec/x264.c:213
+#: modules/codec/x264.c:207
 msgid "Max QP step"
 msgstr "കൂടിയ ക്യുപി സ്റ്റെപ്പ്"
 
-#: modules/codec/x264.c:214
+#: modules/codec/x264.c:208
 msgid "Max QP step between frames."
 msgstr "ഫ്രെയിമുകള്‍ തമ്മിലുള്ള കൂടിയ ക്യൂ‌പി പടി"
 
-#: modules/codec/x264.c:216
+#: modules/codec/x264.c:210
 msgid "Average bitrate tolerance"
 msgstr "ശരാശരി ബിറ്റ്നിരക്ക് സഹിഷ്ണത"
 
-#: modules/codec/x264.c:217
+#: modules/codec/x264.c:211
 msgid "Allowed variance in average bitrate (in kbits/s)."
 msgstr "ശരാശരി ബിറ്റ്നിരക്കിന് അനുവദനീയമായ വ്യത്യസ്തത (കെബിറ്റ്സ്/സെല്‍)."
 
-#: modules/codec/x264.c:220
+#: modules/codec/x264.c:214
 msgid "Max local bitrate"
 msgstr "കൂടിയ ലോക്കല്‍ ബിറ്റ്റേറ്റ്"
 
-#: modules/codec/x264.c:221
+#: modules/codec/x264.c:215
 msgid "Sets a maximum local bitrate (in kbits/s)."
 msgstr "കൂടിയ പ്രാദേശിക ബിറ്റ്നിരക്ക് സജ്ജീകരിക്കുക (in kbits/s)."
 
-#: modules/codec/x264.c:223
+#: modules/codec/x264.c:217
 msgid "VBV buffer"
 msgstr "വിബിവി ബഫര്‍"
 
-#: modules/codec/x264.c:224
+#: modules/codec/x264.c:218
 msgid "Averaging period for the maximum local bitrate (in kbits)."
 msgstr "കൂടിയ പ്രാദേശിക ബിട്നിരക്കിന്റെ ശരാശരി കാലവിധി (in kbits/s)."
 
-#: modules/codec/x264.c:227
+#: modules/codec/x264.c:221
 msgid "Initial VBV buffer occupancy"
 msgstr "പ്രാഥമിക വി‌ബി‌എഫ് ബഫര്‍ ഉത്തരവാദിത്വം"
 
-#: modules/codec/x264.c:228
+#: modules/codec/x264.c:222
 msgid ""
 "Sets the initial buffer occupancy as a fraction of the buffer size. Range "
 "0.0 to 1.0."
 msgstr ""
 "ബഫര്‍ വലുപ്പത്തിന്റെ ഫ്രാക്ഷനായി ഇനീഷ്യല്‍ ബഫര്‍ ഒക്യുപന്‍സി സെറ്റ് ചെയ്യുന്നു. ശ്രേണി 0.0 മുതല്‍ 1.0."
 
-#: modules/codec/x264.c:231
+#: modules/codec/x264.c:225
 msgid "How AQ distributes bits"
 msgstr "എ‌ക്യൂ എങ്ങനേ ബിറ്റുകളെ വീതരണം ചെയ്യുന്നു"
 
-#: modules/codec/x264.c:232
+#: modules/codec/x264.c:226
 msgid ""
 "Defines bitdistribution mode for AQ, default 1\n"
 " - 0: Disabled\n"
@@ -13514,11 +13504,11 @@ msgstr ""
 " - 2: log(var) നു പകരം  log(var)^2  ഉപയോഗിക്കുന്നു പ്രതി ഫ്രെയിം ശക്തി വര്‍ദ്ധിപ്പിക്കാന്‍ "
 "ശ്രമിക്കുന്നു"
 
-#: modules/codec/x264.c:237
+#: modules/codec/x264.c:231
 msgid "Strength of AQ"
 msgstr "എക്യുയുടെ ശക്തി"
 
-#: modules/codec/x264.c:238
+#: modules/codec/x264.c:232
 msgid ""
 "Strength to reduce blocking and blurring in flat\n"
 "and textured areas, default 1.0 recommended to be between 0..2\n"
@@ -13530,35 +13520,35 @@ msgstr ""
 " - 0.5: ശക്തി കുറഞ്ഞ എക്യു\n"
 " - 1.5: ശക്തമായ എക്യു"
 
-#: modules/codec/x264.c:244
+#: modules/codec/x264.c:238
 msgid "QP factor between I and P"
 msgstr "ഐക്കും പിക്കും ഇടക്കുള്ള ക്യൂ‌പി അംശം"
 
-#: modules/codec/x264.c:245
+#: modules/codec/x264.c:239
 msgid "QP factor between I and P. Range 1.0 to 2.0."
 msgstr "ഐക്കും പിക്കും ഇടക്കുള്ള ക്യൂ‌പി അംശം. പരിധി 1.0 തൊട്ട് 2.0"
 
-#: modules/codec/x264.c:248
+#: modules/codec/x264.c:242
 msgid "QP factor between P and B"
 msgstr "പിക്കും ബിക്കും ഇടക്കുള്ള ക്യൂ‌പി അംശം"
 
-#: modules/codec/x264.c:249
+#: modules/codec/x264.c:243
 msgid "QP factor between P and B. Range 1.0 to 2.0."
 msgstr "പിക്കും ബിക്കും ഇടക്കുള്ള ക്യൂ‌പി അംശം. പരിധി 1.0 തൊട്ട് 2.0"
 
-#: modules/codec/x264.c:251
+#: modules/codec/x264.c:245
 msgid "QP difference between chroma and luma"
 msgstr "ക്രോമയും ലുമയും തമ്മിലുള്ള ക്യൂ‌പി വ്യത്യാസം"
 
-#: modules/codec/x264.c:252
+#: modules/codec/x264.c:246
 msgid "QP difference between chroma and luma."
 msgstr "ക്രോമയും ലുമയും തമ്മിലുള്ള ക്യൂ‌പി വ്യത്യാസം"
 
-#: modules/codec/x264.c:254
+#: modules/codec/x264.c:248
 msgid "Multipass ratecontrol"
 msgstr "മള്‍ട്ടിപാസ് റേറ്റ്നിയന്ത്രണം"
 
-#: modules/codec/x264.c:255
+#: modules/codec/x264.c:249
 msgid ""
 "Multipass ratecontrol:\n"
 " - 1: First pass, creates stats file\n"
@@ -13570,19 +13560,19 @@ msgstr ""
 " - 2: അവസാന പാസ്, സ്റ്റാറ്റ് ഫയല്‍ ഓവര്‍റൈറ്റ് ചെയ്യുന്നു\n"
 " - 3: Nth പാസ്, സ്റ്റാറ്റ് ഫയല്‍ ഓവര്‍റൈറ്റ് ചെയ്യുന്നു\n"
 
-#: modules/codec/x264.c:260
+#: modules/codec/x264.c:254
 msgid "QP curve compression"
 msgstr "ക്യുപി കര്‍വ് കംപ്രഷന്‍"
 
-#: modules/codec/x264.c:261
+#: modules/codec/x264.c:255
 msgid "QP curve compression. Range 0.0 (CBR) to 1.0 (QCP)."
 msgstr "ക്യൂ‌പി കര്‍വ് സങ്കോചിപ്പിക്കുക. പരിധി 0.0 (സി‌ബി‌ആര്‍) തൊട്ട് 1.0 (ക്യൂ‌സി‌പി)."
 
-#: modules/codec/x264.c:263 modules/codec/x264.c:267
+#: modules/codec/x264.c:257 modules/codec/x264.c:261
 msgid "Reduce fluctuations in QP"
 msgstr "ക്യൂ‌പിയിലുള്ള വ്യത്യാസങ്ങള്‍ കുറക്കുക"
 
-#: modules/codec/x264.c:264
+#: modules/codec/x264.c:258
 msgid ""
 "This reduces the fluctuations in QP before curve compression. Temporally "
 "blurs complexity."
@@ -13590,7 +13580,7 @@ msgstr ""
 "ഈ കർവ് കംപ്രഷൻ മുമ്പ് എന്ന്കിട്ടുന്നു ലെ ഏറ്റക്കുറച്ചിലുകൾ കുറയ്ക്കുന്നു. കോംപ്ലക്സിറ്റിയെ ഭാഗീകമായി "
 "ബ്ലര്‍ ചെയ്യുന്നു ."
 
-#: modules/codec/x264.c:268
+#: modules/codec/x264.c:262
 msgid ""
 "This reduces the fluctuations in QP after curve compression. Temporally "
 "blurs quants."
@@ -13598,11 +13588,11 @@ msgstr ""
 "ഈ കർവ് കംപ്രഷൻ ശേഷം എന്ന്കിട്ടുന്നു ലെ ഏറ്റക്കുറച്ചിലുകൾ കുറയ്ക്കുന്നു. താല്‍ക്കാലികമായി ക്വാണ്ടുകളെ "
 "ബ്ലര്‍ ചെയ്യുന്നു."
 
-#: modules/codec/x264.c:273
+#: modules/codec/x264.c:267
 msgid "Partitions to consider"
 msgstr "പരിഗണിക്കേണ്ട പാര്‍ടീഷനുകള്‍"
 
-#: modules/codec/x264.c:274
+#: modules/codec/x264.c:268
 msgid ""
 "Partitions to consider in analyse mode:\n"
 " - none  : \n"
@@ -13613,15 +13603,15 @@ msgid ""
 "(p4x4 requires p8x8. i8x8 requires 8x8dct)."
 msgstr ""
 
-#: modules/codec/x264.c:282
+#: modules/codec/x264.c:276
 msgid "Direct MV prediction mode"
 msgstr "ഡയറക്ട് എംവി പ്രെഡിക്ഷന്‍ മോഡ്"
 
-#: modules/codec/x264.c:285
+#: modules/codec/x264.c:279
 msgid "Direct prediction size"
 msgstr "നേരിട്ടുള്ള പ്രവചന വലുപ്പം"
 
-#: modules/codec/x264.c:286
+#: modules/codec/x264.c:280
 msgid ""
 "Direct prediction size:\n"
 " -  0: 4x4\n"
@@ -13629,19 +13619,19 @@ msgid ""
 " - -1: smallest possible according to level\n"
 msgstr ""
 
-#: modules/codec/x264.c:291
+#: modules/codec/x264.c:285
 msgid "Weighted prediction for B-frames"
 msgstr "ബി-ഫ്രെയിമുകള്‍ക്കുള്ള പ്രമുഖ പ്രവചനം"
 
-#: modules/codec/x264.c:292
+#: modules/codec/x264.c:286
 msgid "Weighted prediction for B-frames."
 msgstr "ബി-ഫ്രെയിമുകള്‍ക്കുള്ള പ്രമുഖ പ്രവചനം"
 
-#: modules/codec/x264.c:294
+#: modules/codec/x264.c:288
 msgid "Weighted prediction for P-frames"
 msgstr "പി-ഫ്രെയിമുകള്‍ക്കുള്ള പ്രമുഖ പ്രവചനം"
 
-#: modules/codec/x264.c:295
+#: modules/codec/x264.c:289
 msgid ""
 "Weighted prediction for P-frames:\n"
 " - 0: Disabled\n"
@@ -13649,11 +13639,11 @@ msgid ""
 " - 2: Smart analysis\n"
 msgstr ""
 
-#: modules/codec/x264.c:300
+#: modules/codec/x264.c:294
 msgid "Integer pixel motion estimation method"
 msgstr "സംഖ്യ പിക്സെല്‍ ചലന മൂല്യനിര്‍ണയ വഴി"
 
-#: modules/codec/x264.c:301
+#: modules/codec/x264.c:295
 msgid ""
 "Selects the motion estimation algorithm:\n"
 " - dia: diamond search, radius 1 (fast)\n"
@@ -13663,11 +13653,11 @@ msgid ""
 " - tesa: hadamard exhaustive search (extremely slow, primarily for testing)\n"
 msgstr ""
 
-#: modules/codec/x264.c:308
+#: modules/codec/x264.c:302
 msgid "Maximum motion vector search range"
 msgstr "കൂടിയ ചലന വെക്ടര്‍ തിരയല്‍ പരിധി"
 
-#: modules/codec/x264.c:309
+#: modules/codec/x264.c:303
 msgid ""
 "Maximum distance to search for motion estimation, measured from predicted "
 "position(s). Default of 16 is good for most footage, high motion sequences "
@@ -13677,31 +13667,31 @@ msgstr ""
 "ദൃശ്യങ്ങൾ നല്ലതാണ് , ഉയർന്ന ചലനം സീക്വൻസുകളാണ്  24നു  32നും ഇടയിലാണ്.  ശ്രേണി 0 മുതല്‍ 64 "
 "വരെ."
 
-#: modules/codec/x264.c:314
+#: modules/codec/x264.c:308
 msgid "Maximum motion vector length"
 msgstr "കൂടിയ മോഷന്‍ വെക്ടര്‍ നീളം"
 
-#: modules/codec/x264.c:315
+#: modules/codec/x264.c:309
 msgid ""
 "Maximum motion vector length in pixels. -1 is automatic, based on level."
 msgstr "കൂടിയ ചലന വെക്ടര്‍ തിരയല്‍ പരിധി പിക്സലില്‍. -1 സ്വയം, നില അനുസരിച്ചു."
 
-#: modules/codec/x264.c:318
+#: modules/codec/x264.c:312
 msgid "Minimum buffer space between threads"
 msgstr "ത്രേഡുകള്‍ തമ്മിലുള്ള കുറഞ്ഞ ബഫ്ഫര്‍ സ്ഥലം"
 
-#: modules/codec/x264.c:319
+#: modules/codec/x264.c:313
 msgid ""
 "Minimum buffer space between threads. -1 is automatic, based on number of "
 "threads."
 msgstr ""
 "ത്രെഡുകള്‍ക്കിടയിലുള്ള കുറഞ്ഞ ബഫര്‍ സ്പേസ്. -1 സ്വമേധയായുള്ള, ത്രെഡുകളുടെ എണ്ണത്തിനധിഷ്ഠിതമായി."
 
-#: modules/codec/x264.c:322
+#: modules/codec/x264.c:316
 msgid "Strength of psychovisual optimization, default is \"1.0:0.0\""
 msgstr "സൈക്കോവിഷ്വല്‍ ഒപ്റ്റിമൈസേഷന്റെ ശക്തി,  \"1.0:0.0\" സഹജമായത്."
 
-#: modules/codec/x264.c:323
+#: modules/codec/x264.c:317
 msgid ""
 "First parameter controls if RD is on (subme>=6) or off.\n"
 "Second parameter controls if Trellis is used on psychovisual optimization, "
@@ -13711,11 +13701,11 @@ msgstr ""
 "സൈക്കോവിശ്വല്‍ ഒപ്റ്റിമൈസേഷനില്‍ ട്രെല്ലിസ് ഉപയോഗിക്കുന്നതിനായുള്ള രണ്ടാമത്തെ പരാമീറ്റര്‍ "
 "നിയന്ത്രണങ്ങള്‍, സഹജമായി ഓഫ് ആണ്"
 
-#: modules/codec/x264.c:327
+#: modules/codec/x264.c:321
 msgid "Subpixel motion estimation and partition decision quality"
 msgstr "സബ്പിക്സല്‍ മോഷന്‍ എസ്റ്റിമേഷന്‍ ആന്‍ഡ് പാര്‍ടീഷന്‍ ഡിസിഷന്‍ ക്വാളിറ്റി"
 
-#: modules/codec/x264.c:329
+#: modules/codec/x264.c:323
 msgid ""
 "This parameter controls quality versus speed tradeoffs involved in the "
 "motion estimation decision process (lower = quicker and higher = better "
@@ -13725,16 +13715,16 @@ msgstr ""
 "പരാമീറ്റര്‍ നിയന്ത്രിക്കുന്നു (താഴ്ന്നത് = വേഗത്തിലുള്ളത് കൂടാതെ ഉയര്‍ന്നത് = മികച്ച ഗുണമേന്മ). "
 "ശ്രേണി 1 മുതല്‍ 9 വരെ."
 
-#: modules/codec/x264.c:333
+#: modules/codec/x264.c:327
 msgid "RD based mode decision for B-frames. This requires subme 6 (or higher)."
 msgstr ""
 "B- ഫ്രെയിമുകള്‍ക്കുള്ള ആര്‍ഡി അധിഷ്ഠിത മോഡ് തീരുമാനം. ഇതിന് സബ്മീ 6 (അല്ലേല്‍ ഉയര്‍ന്നത്) ആവശ്യമാണ്."
 
-#: modules/codec/x264.c:336
+#: modules/codec/x264.c:330
 msgid "Decide references on a per partition basis"
 msgstr "ഓരോ പാര്‍ട്ടീഷനെ അടിസ്ഥാനമാക്കി റഫറസുകള്‍ തീരുമാനിക്കുക"
 
-#: modules/codec/x264.c:337
+#: modules/codec/x264.c:331
 msgid ""
 "Allows each 8x8 or 16x8 partition to independently select a reference frame, "
 "as opposed to only one ref per macroblock."
@@ -13742,31 +13732,31 @@ msgstr ""
 "ഓരോ  8x8 അല്ലേല്‍ 16x8 വിഭാഗത്തെ സ്വതന്ത്രമായി റഫറന്‍സ് ഫ്രെയിം തിരഞ്ഞെടുക്കാനായി "
 "അനുവദിക്കുന്നു, മാക്രോബ്ലോക്ക് ശതമാനം ഒരേയൊരു റഫറൻസിലെ എതിരെയുളള ."
 
-#: modules/codec/x264.c:341
+#: modules/codec/x264.c:335
 msgid "Chroma in motion estimation"
 msgstr "ചലന മൂല്യ നിര്‍ണയത്തില്‍ ക്രോമ"
 
-#: modules/codec/x264.c:342
+#: modules/codec/x264.c:336
 msgid "Chroma ME for subpel and mode decision in P-frames."
 msgstr "സബ്പെലിനുള്ള ക്രോമ എംഇയും P- ഫ്രെയിമുകളുടെ മോഡ് തീരുമാനം."
 
-#: modules/codec/x264.c:345
+#: modules/codec/x264.c:339
 msgid "Joint bidirectional motion refinement."
 msgstr "ജോയിന്റ് ബൈഡയറക്ഷണല്‍ മോഷന്‍ റിഫൈന്‍മെന്റ്"
 
-#: modules/codec/x264.c:347
+#: modules/codec/x264.c:341
 msgid "Adaptive spatial transform size"
 msgstr "അഡാപ്റ്റീവ് സ്പാഷ്യല്‍ ട്രാന്‍സ്ഫോം സൈസ്"
 
-#: modules/codec/x264.c:349
+#: modules/codec/x264.c:343
 msgid "SATD-based decision for 8x8 transform in inter-MBs."
 msgstr "ഇന്റര്‍-എംബികളുടെ 8x8 ട്രാന്‍സ്ഫോമിനായുള്ള  എസ്എടിഡി-അധിഷ്ഠിതമായ തീരുമാനം."
 
-#: modules/codec/x264.c:351
+#: modules/codec/x264.c:345
 msgid "Trellis RD quantization"
 msgstr "ട്രെല്ലിസ് RD ക്വാന്ടൈസെഷന്‍"
 
-#: modules/codec/x264.c:352
+#: modules/codec/x264.c:346
 msgid ""
 "Trellis RD quantization:\n"
 " - 0: disabled\n"
@@ -13775,34 +13765,34 @@ msgid ""
 "This requires CABAC."
 msgstr ""
 
-#: modules/codec/x264.c:358
+#: modules/codec/x264.c:352
 msgid "Early SKIP detection on P-frames"
 msgstr "P-ഫ്രയിമുകളില്‍ മുന്‍ SKIP കണ്ടെത്തല്‍"
 
-#: modules/codec/x264.c:359
+#: modules/codec/x264.c:353
 msgid "Early SKIP detection on P-frames."
 msgstr "P-ഫ്രയിമുകളില്‍ മുന്‍ SKIP കണ്ടെത്തല്‍"
 
-#: modules/codec/x264.c:361
+#: modules/codec/x264.c:355
 msgid "Coefficient thresholding on P-frames"
 msgstr "P-ഫ്രയിമുകളില്‍ കോയെഫിഷ്യന്‍റ് ത്രേഷോള്‍ഡിങ്ങ്"
 
-#: modules/codec/x264.c:362
+#: modules/codec/x264.c:356
 msgid ""
 "Coefficient thresholding on P-frames. Eliminate dct blocks containing only a "
 "small single coefficient."
 msgstr ""
 
-#: modules/codec/x264.c:365
+#: modules/codec/x264.c:359
 msgid "Use Psy-optimizations"
 msgstr "സൈ-ഒപ്റ്റിമൈസേഷന്‍ ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:366
+#: modules/codec/x264.c:360
 msgid "Use all visual optimizations that can worsen both PSNR and SSIM"
 msgstr ""
 "PSNR നെയും SSIMനെയും മോശമാക്കാന്‍ സാധ്യതയുള്ള എല്ലാ വിഷ്വല്‍ ഒപ്റ്റിമൈസേഷനുകളും ഉപയോഗിക്കുക"
 
-#: modules/codec/x264.c:370
+#: modules/codec/x264.c:364
 msgid ""
 "Dct-domain noise reduction. Adaptive pseudo-deadzone. 10 to 1000 seems to be "
 "a useful range."
@@ -13810,51 +13800,51 @@ msgstr ""
 "ഡിസിടി-ഡൊമൈന്‍ നോയിസ് റിഡക്ഷന്‍. അഡാപ്ടീവ് സ്യൂഡോ-ഡെഡ്സോണ്‍. 10 മുതല്‍ 1000 വരെ ഉപയോഗപ്രദമായ "
 "ശ്രേണിയായി തോന്നുന്നു."
 
-#: modules/codec/x264.c:373
+#: modules/codec/x264.c:367
 msgid "Inter luma quantization deadzone"
 msgstr "ഇന്റര്‍ ലുമ ക്വാണ്ടിസൈഷന്‍ ഡെഡ്സോണ്‍"
 
-#: modules/codec/x264.c:374
+#: modules/codec/x264.c:368
 msgid "Set the size of the inter luma quantization deadzone. Range 0 to 32."
 msgstr "ഇന്റര്‍ ലുമ ക്വാണ്ടൈസേഷന്‍ ഡെഡ്സോണ്‍ വലുപ്പം സെറ്റ് ചെയ്യുക. ശ്രേണി 0 മുതല്‍ 32 വരെ."
 
-#: modules/codec/x264.c:377
+#: modules/codec/x264.c:371
 msgid "Intra luma quantization deadzone"
 msgstr "ഇന്‍ട്രാ ലുമ ക്വാണ്ടിസൈഷന്‍ ഡെഡ്സോണ്‍"
 
-#: modules/codec/x264.c:378
+#: modules/codec/x264.c:372
 msgid "Set the size of the intra luma quantization deadzone. Range 0 to 32."
 msgstr "ഇന്‍ട്ര ലുമ ക്വാണ്ടൈസേഷന്‍ ഡെഡ്സോണ്‍ വലുപ്പം സെറ്റ് ചെയ്യുക. ശ്രേണി 0 മുതല്‍ 32 വരെ."
 
-#: modules/codec/x264.c:383
+#: modules/codec/x264.c:377
 msgid "Non-deterministic optimizations when threaded"
 msgstr "ത്രെഡ് ചെയ്യുമ്പോഴുള്ള നോണ്‍-ഡിറ്റര്‍മിനിസ്റ്റിക് ഒപ്റ്റിമൈസേഷനുകള്‍"
 
-#: modules/codec/x264.c:384
+#: modules/codec/x264.c:378
 msgid "Slightly improve quality of SMP, at the cost of repeatability."
 msgstr "ആവര്‍ത്തനം കൊണ്ട് SMPയുടെ ഗുണനിലവാരം കുറച്ച് ഉയര്‍ത്തുക"
 
-#: modules/codec/x264.c:387
+#: modules/codec/x264.c:381
 msgid "CPU optimizations"
 msgstr "സിപിയു ഒപ്റ്റിമൈസേഷനുകള്‍"
 
-#: modules/codec/x264.c:388
+#: modules/codec/x264.c:382
 msgid "Use assembler CPU optimizations."
 msgstr "അസെമ്പളര്‍ സിപിയു ഒപ്റ്റിമൈസേഷനുകള്‍."
 
-#: modules/codec/x264.c:390
+#: modules/codec/x264.c:384
 msgid "Filename for 2 pass stats file"
 msgstr "2 പാസ് സ്റ്റാറ്റ്സ് ഫയലിന്‍റെ ഫയല്‍പേര്"
 
-#: modules/codec/x264.c:391
+#: modules/codec/x264.c:385
 msgid "Filename for 2 pass stats file for multi-pass encoding."
 msgstr "മള്‍ട്ടിപാസ് എന്‍കോഡിംഗിനായുള്ള 2 പാസ് സ്റ്റാറ്റ്സ് ഫയലിന്‍റെ ഫയല്‍പേര്"
 
-#: modules/codec/x264.c:393
+#: modules/codec/x264.c:387
 msgid "PSNR computation"
 msgstr "പിഎസ്എന്‍ആര്‍ കംപ്യൂട്ടേഷന്‍"
 
-#: modules/codec/x264.c:394
+#: modules/codec/x264.c:388
 msgid ""
 "Compute and print PSNR stats. This has no effect on the actual encoding "
 "quality."
@@ -13862,11 +13852,11 @@ msgstr ""
 "PSNR സ്റ്റാറ്റ്സ് കണക്കാക്കുകയും പ്രിന്‍റ് ചെയ്യുകയും ചെയ്യുക. ഇതിന് ശരിക്കുള്ള എന്‍കോഡിംഗ് "
 "ക്വാളിറ്റിയില്‍ ഒരു സ്വാധീനവും ഇല്ല"
 
-#: modules/codec/x264.c:397
+#: modules/codec/x264.c:391
 msgid "SSIM computation"
 msgstr "എസ്എസ്ഐഎം കംപ്യൂട്ടേഷന്‍"
 
-#: modules/codec/x264.c:398
+#: modules/codec/x264.c:392
 msgid ""
 "Compute and print SSIM stats. This has no effect on the actual encoding "
 "quality."
@@ -13874,24 +13864,24 @@ msgstr ""
 "SSIM സ്റ്റാറ്റ്സ് കണക്കാക്കുകയും പ്രിന്‍റ് ചെയ്യുകയും ചെയ്യുക. ഇതിന് ശരിക്കുള്ള എന്‍കോഡിംഗ് "
 "ക്വാളിറ്റിയില്‍ ഒരു സ്വാധീനവും ഇല്ല"
 
-#: modules/codec/x264.c:401
+#: modules/codec/x264.c:395
 msgid "Quiet mode"
 msgstr "നിശബ്ദമായ മോഡ്"
 
-#: modules/codec/x264.c:403 modules/gui/macosx/VLCPlaylistInfo.m:69
+#: modules/codec/x264.c:397 modules/gui/macosx/VLCPlaylistInfo.m:69
 #: modules/gui/qt/ui/streampanel.h:170
 msgid "Statistics"
 msgstr "സ്ഥിതി വിവരം"
 
-#: modules/codec/x264.c:404
+#: modules/codec/x264.c:398
 msgid "Print stats for each frame."
 msgstr "ഓരോ ഫ്രൈയിമിനും  സ്റ്റാറ്റ്സ് പ്രിന്‍റ് ചെയ്യുക"
 
-#: modules/codec/x264.c:406
+#: modules/codec/x264.c:400
 msgid "SPS and PPS id numbers"
 msgstr "എസ്പിഎസും പിപിഎസും ഐഡി നമ്പറുകള്‍"
 
-#: modules/codec/x264.c:407
+#: modules/codec/x264.c:401
 msgid ""
 "Set SPS and PPS id numbers to allow concatenating streams with different "
 "settings."
@@ -13899,19 +13889,19 @@ msgstr ""
 "സ്ട്രീമുകളെ വിവിധ സെറ്റിംഗ്സുമായി കൂട്ടിച്ചേര്‍ക്കാന്‍ വേണ്ടി SPS ന്റെയും PPS ഐഡിയുടെയും നമ്പരുകള്‍ "
 "നിശ്ചയിക്കുക"
 
-#: modules/codec/x264.c:410
+#: modules/codec/x264.c:404
 msgid "Access unit delimiters"
 msgstr "അക്സസ്സ് യൂണിറ്റ് ഡീലിമിറ്റേഴ്സ്"
 
-#: modules/codec/x264.c:411
+#: modules/codec/x264.c:405
 msgid "Generate access unit delimiter NAL units."
 msgstr "ആക്സസ് യൂണിറ്റ് ഡീലിമിറ്റര്‍ NAL യൂണിറ്റുകള്‍ ഉണ്ടാക്കുക"
 
-#: modules/codec/x264.c:413
+#: modules/codec/x264.c:407
 msgid "Framecount to use on frametype lookahead"
 msgstr "ഫ്രെയിംടൈപ്പ് ലുക്അഹെഡില്‍ ഉപയോഗിക്കേണ്ട ഫ്രെയിംകൗണ്ട്"
 
-#: modules/codec/x264.c:414
+#: modules/codec/x264.c:408
 msgid ""
 "Framecount to use on frametype lookahead. Currently default can cause sync-"
 "issues on unmuxable output, like rtsp-output without ts-mux"
@@ -13919,51 +13909,51 @@ msgstr ""
 "ഫ്രെയിംടൈപ്പ് ലുക്ക്എഹെഡില്‍ ഉപയോഗിക്കേണ്ട ഫ്രെയിംകൗണ്ട്.  നിലവില്‍ സഹജമായി അണ്‍മകസ്ബിള്‍ "
 "ഔട്ട്പുട്ടിന്മേല്‍ സിങ്ക്-പ്രശ്നങ്ങള്‍ ഉണ്ടാക്കാം, ടിഎസ്-മക്സ് ഇല്ലാതെ ആര്‍ടിഎസ്പി-ഔട്ട്പുട്ട് പോലെ"
 
-#: modules/codec/x264.c:417
+#: modules/codec/x264.c:411
 msgid "HRD-timing information"
 msgstr "എച്ച്ആര്‍ഡി-ടൈമിംഗ് വിവരം"
 
-#: modules/codec/x264.c:418
+#: modules/codec/x264.c:412
 msgid "Default tune setting used"
 msgstr "സഹജമായ ട്യൂണ്‍ ക്രമീകരണങ്ങള്‍ ഉപയോഗിച്ചത്"
 
-#: modules/codec/x264.c:419
+#: modules/codec/x264.c:413
 msgid "Default preset setting used"
 msgstr "സഹജമായ പ്രിസെറ്റ് ക്രമീകരണങ്ങള്‍ ഉപയോഗിച്ചത്"
 
-#: modules/codec/x264.c:421
+#: modules/codec/x264.c:415
 msgid "x264 advanced options"
 msgstr ""
 
-#: modules/codec/x264.c:422
+#: modules/codec/x264.c:416
 msgid "x264 advanced options, in the form {opt=val,op2=val2}."
 msgstr ""
 
-#: modules/codec/x264.c:427
+#: modules/codec/x264.c:421
 msgid "dia"
 msgstr "ഡിയ"
 
-#: modules/codec/x264.c:427
+#: modules/codec/x264.c:421
 msgid "hex"
 msgstr "ഹെക്സ്"
 
-#: modules/codec/x264.c:427
+#: modules/codec/x264.c:421
 msgid "umh"
 msgstr "യുഎംഎച്ച്"
 
-#: modules/codec/x264.c:427
+#: modules/codec/x264.c:421
 msgid "esa"
 msgstr "എസ"
 
-#: modules/codec/x264.c:427
+#: modules/codec/x264.c:421
 msgid "tesa"
 msgstr "ടെസ"
 
-#: modules/codec/x264.c:435
+#: modules/codec/x264.c:429
 msgid "Fast"
 msgstr "വേഗം"
 
-#: modules/codec/x264.c:435 modules/gui/macosx/VLCMainMenu.m:290
+#: modules/codec/x264.c:429 modules/gui/macosx/VLCMainMenu.m:290
 #: modules/gui/macosx/VLCMainMenu.m:392
 #: modules/gui/macosx/VLCSimplePrefsController.m:697
 #: modules/gui/qt/components/simple_preferences.cpp:688
@@ -13972,55 +13962,55 @@ msgstr "വേഗം"
 msgid "Normal"
 msgstr "സാധാരണ"
 
-#: modules/codec/x264.c:435
+#: modules/codec/x264.c:429
 msgid "Slow"
 msgstr "പതുക്കെ"
 
-#: modules/codec/x264.c:440
+#: modules/codec/x264.c:434
 msgid "Spatial"
 msgstr "സ്പാറ്റിയല്‍"
 
-#: modules/codec/x264.c:440 modules/hw/vdpau/chroma.c:883
+#: modules/codec/x264.c:434 modules/hw/vdpau/chroma.c:883
 msgid "Temporal"
 msgstr "ടെംപറല്‍"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "checkerboard"
 msgstr "ചെക്കര്‍ബോര്‍ഡ്"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "column alternation"
 msgstr "കോളത്തിന് പകരം"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "row alternation"
 msgstr "നിരക്ക് പകരം"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "side by side"
 msgstr "സൈഡ് ബൈ സൈഡ്"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "top bottom"
 msgstr "ടോപ് ബോട്ടം"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "frame alternation"
 msgstr "ഫ്രെയിം ആള്‍ടര്‍ണേഷന്‍"
 
-#: modules/codec/x264.c:445
+#: modules/codec/x264.c:439
 msgid "2D"
 msgstr ""
 
-#: modules/codec/x264.c:449
+#: modules/codec/x264.c:443
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264 10-bit)"
 msgstr "എച്ച്.264/എംപേഗ് -4  ഭാഗം 10/എ‌വി‌സി എന്‍കോഡര്‍ (x264 10-ബിറ്റ്)"
 
-#: modules/codec/x264.c:453
+#: modules/codec/x264.c:447
 msgid "H.262/MPEG-2 encoder (x262)"
 msgstr "എച്ച്.262/എംപേഗ് - 2 എന്‍കോഡര്‍ (x262)"
 
-#: modules/codec/x264.c:457
+#: modules/codec/x264.c:451
 msgid "H.264/MPEG-4 Part 10/AVC encoder (x264)"
 msgstr "എച്ച്.264/എംപേഗ് -4  ഭാഗം 10/എ‌വി‌സി എന്‍കോഡര്‍ (x264)"
 
@@ -14098,10 +14088,10 @@ msgstr "ഡിബസ്"
 msgid "D-Bus control interface"
 msgstr "ഡി-ബസ് നിയന്ത്രണ പൊതുപ്രതലം"
 
-#: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:182
-#: modules/gui/macosx/VLCMainWindow.m:662
-#: modules/gui/macosx/VLCMainWindow.m:668
-#: modules/gui/macosx/VLCMainWindow.m:1272
+#: modules/control/dbus/dbus_root.c:81 modules/gui/macosx/VLCMainWindow.m:185
+#: modules/gui/macosx/VLCMainWindow.m:687
+#: modules/gui/macosx/VLCMainWindow.m:693
+#: modules/gui/macosx/VLCMainWindow.m:1315
 #: modules/gui/macosx/VLCStatusBarIcon.m:378 modules/gui/ncurses.c:1026
 #: modules/gui/qt/dialogs/help.cpp:91 modules/gui/qt/main_interface.cpp:1258
 #: modules/gui/qt/main_interface.cpp:1262
@@ -14313,12 +14303,12 @@ msgstr "സഹശീര്‍ഷക സ്ഥാനം: സജീവമായ �
 msgid "Subtitle position %d px"
 msgstr "സഹശീര്‍ഷക സ്ഥാനം %d px"
 
-#: modules/control/hotkeys.c:1354
+#: modules/control/hotkeys.c:1356
 #, c-format
 msgid "Subtitle text scale %d%%"
 msgstr ""
 
-#: modules/control/hotkeys.c:1515
+#: modules/control/hotkeys.c:1517
 #, c-format
 msgid "Speed: %.2fx"
 msgstr "വേഗത: %.2fx"
@@ -15000,7 +14990,7 @@ msgstr "ആവശ്യമുള്ളപ്പോള്‍ ഫിക്സ് �
 msgid "AVI demuxer"
 msgstr "എവിഐ ഡീമക്സര്‍"
 
-#: modules/demux/avi/avi.c:832 modules/demux/mp4/mp4.c:1674
+#: modules/demux/avi/avi.c:841 modules/demux/mp4/mp4.c:1679
 msgid ""
 "Because this file index is broken or missing, seeking will not work "
 "correctly.\n"
@@ -15010,27 +15000,27 @@ msgid ""
 "What do you want to do?"
 msgstr ""
 
-#: modules/demux/avi/avi.c:840
+#: modules/demux/avi/avi.c:849
 msgid "Do not play"
 msgstr "പ്ലേ ചെയ്യരുത്"
 
-#: modules/demux/avi/avi.c:841
+#: modules/demux/avi/avi.c:850
 msgid "Build index then play"
 msgstr "സൂചിക നിര്‍മ്മിച്ചതിന്‍ശേഷം പ്ലേ ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:842
+#: modules/demux/avi/avi.c:851
 msgid "Play as is"
 msgstr "ഉള്ളതുപോലേ പ്ലേ ചെയ്യുക"
 
-#: modules/demux/avi/avi.c:843 modules/demux/mp4/mp4.c:1685
+#: modules/demux/avi/avi.c:852 modules/demux/mp4/mp4.c:1690
 msgid "Broken or missing Index"
 msgstr ""
 
-#: modules/demux/avi/avi.c:2726
+#: modules/demux/avi/avi.c:2735
 msgid "Broken or missing AVI Index"
 msgstr "പൊട്ടിപ്പോയ അല്ലെങ്കില്‍ നഷ്ട്ടപ്പെട്ട എ‌വി‌ഐ സൂചിക"
 
-#: modules/demux/avi/avi.c:2727
+#: modules/demux/avi/avi.c:2736
 msgid "Fixing AVI Index..."
 msgstr "എവിഐ ഇന്‍ഡെക്സ് ഫിക്സ് ചെയ്യുന്നു..."
 
@@ -15165,31 +15155,31 @@ msgstr ""
 msgid "M-JPEG camera demuxer"
 msgstr "എം-ജെപേഗ് ക്യാമറ ഡിമക്സര്‍"
 
-#: modules/demux/mkv/mkv.cpp:49
+#: modules/demux/mkv/mkv.cpp:53
 msgid "Matroska stream demuxer"
 msgstr "മട്രോസ്ക സ്ട്രീം ടിമക്സര്‍"
 
-#: modules/demux/mkv/mkv.cpp:56
+#: modules/demux/mkv/mkv.cpp:60
 msgid "Respect ordered chapters"
 msgstr "നിരയുള്ള അദ്ധ്യായങ്ങളെ ബഹുമാനിക്കുക"
 
-#: modules/demux/mkv/mkv.cpp:57
+#: modules/demux/mkv/mkv.cpp:61
 msgid "Play chapters in the order specified in the segment."
 msgstr "ഘടകത്തില്‍ നിര്‍ദ്ദേശിച്ചിട്ടുള്ള നിലയനുസരിച്ച് അദ്ധ്യായങ്ങള്‍ പ്ലേ ചെയ്യുക."
 
-#: modules/demux/mkv/mkv.cpp:60
+#: modules/demux/mkv/mkv.cpp:64
 msgid "Chapter codecs"
 msgstr "ചാപ്റ്റര്‍ കോഡെക്കുകള്‍"
 
-#: modules/demux/mkv/mkv.cpp:61
+#: modules/demux/mkv/mkv.cpp:65
 msgid "Use chapter codecs found in the segment."
 msgstr "ഘടകത്തില്‍ കാണുന്ന അദ്ധ്യായങ്ങളുടെ കോടക്കുകള്‍ ഉപയോഗിക്കുക."
 
-#: modules/demux/mkv/mkv.cpp:64 modules/gui/qt/ui/sprefs_input.h:370
+#: modules/demux/mkv/mkv.cpp:68 modules/gui/qt/ui/sprefs_input.h:370
 msgid "Preload MKV files in the same directory"
 msgstr "അതേ ഡിറക്ടറിയില്‍ എം‌കെ‌വി ഫയലുകള്‍ മുന്നമേ ലോഡ് ചെയ്യുക"
 
-#: modules/demux/mkv/mkv.cpp:65
+#: modules/demux/mkv/mkv.cpp:69
 msgid ""
 "Preload matroska files in the same directory to find linked segments (not "
 "good for broken files)."
@@ -15197,28 +15187,28 @@ msgstr ""
 "ബന്ധമുള്ള ഘടകങ്ങള്‍ കണ്ടുപിടിക്കാന്‍ അതേ ഡിറക്ടറിയില്‍ മട്രോസ്ക ഫയലുകള്‍ മുന്നമേ ലോഡ് ചെയ്യുക (മുറിഞ്ഞ "
 "ഫയലുകള്‍ക്ക് നല്ലതല്ല)"
 
-#: modules/demux/mkv/mkv.cpp:68 modules/demux/mpeg/ts.c:109
+#: modules/demux/mkv/mkv.cpp:72 modules/demux/mpeg/ts.c:109
 msgid "Seek based on percent not time"
 msgstr "ശതമാനം അനുസരിച്ചു തിരഞ്ഞെടുക്കുക സമയം അല്ല"
 
-#: modules/demux/mkv/mkv.cpp:69
+#: modules/demux/mkv/mkv.cpp:73
 msgid "Seek based on percent not time."
 msgstr "ശതമാനം അനുസരിച്ചു തിരഞ്ഞെടുക്കുക സമയം അല്ല"
 
-#: modules/demux/mkv/mkv.cpp:72
+#: modules/demux/mkv/mkv.cpp:76
 msgid "Dummy Elements"
 msgstr "ഡമ്മി ഘടകങ്ങള്‍"
 
-#: modules/demux/mkv/mkv.cpp:73
+#: modules/demux/mkv/mkv.cpp:77
 msgid "Read and discard unknown EBML elements (not good for broken files)."
 msgstr ""
 "അറിയാത്ത ഇ‌ബി‌എം‌എല്‍ ഘടകങ്ങള്‍ വായിക്കുക അല്ലെങ്കില്‍ തിരസ്കരിക്കുക (മുറിഞ്ഞ ഫയലുകള്‍ക്ക് നല്ലതല്ല)"
 
-#: modules/demux/mkv/mkv.cpp:76
+#: modules/demux/mkv/mkv.cpp:80
 msgid "Preload clusters"
 msgstr ""
 
-#: modules/demux/mkv/mkv.cpp:77
+#: modules/demux/mkv/mkv.cpp:81
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
@@ -15450,27 +15440,27 @@ msgstr ""
 msgid "Clean"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:49
+#: modules/demux/mp4/mp4.c:50
 msgid "M4A audio only"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:50
+#: modules/demux/mp4/mp4.c:51
 msgid "Ignore non audio tracks from iTunes audio files"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:55
+#: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
 msgstr "എം‌പി4 സ്ട്രീം ടിമക്സര്‍"
 
-#: modules/demux/mp4/mp4.c:56
+#: modules/demux/mp4/mp4.c:57
 msgid "MP4"
 msgstr "എം‌പി4"
 
-#: modules/demux/mp4/mp4.c:1682
+#: modules/demux/mp4/mp4.c:1687
 msgid "Do not seek"
 msgstr ""
 
-#: modules/demux/mp4/mp4.c:1683
+#: modules/demux/mp4/mp4.c:1688
 msgid "Build index"
 msgstr ""
 
@@ -15611,25 +15601,25 @@ msgstr ""
 "തേടുകയും ഒരു ശതമാനം ബൈറ്റ് സ്ഥാനം , ഒരു പി.സി.ആർ. ജനറേറ്റ് സമയം സ്ഥാനം അടിസ്ഥാനമാക്കിയുള്ള "
 "സ്ഥാനം . തേടുന്നതും പ്രോപ്പർട്ടി പ്രവർത്തിക്കുന്നില്ലെങ്കിൽ , ഈ ഓപ്ഷൻ ഓൺ ചെയ്യുക."
 
-#: modules/demux/mpeg/ts.c:118
+#: modules/demux/mpeg/ts.c:122
 msgid "Trust in-stream PCR"
 msgstr "അകത്തുള്ള-സ്ട്രീം പി‌സി‌ആറിനെ വിശ്വസിക്കുക"
 
-#: modules/demux/mpeg/ts.c:119
+#: modules/demux/mpeg/ts.c:123
 msgid "Use the stream PCR as a reference."
 msgstr "ഒരു ഉപമക്ക് അകത്തുള്ള-സ്ട്രീം പി‌സി‌ആറിനെ വിശ്വസിക്കുക"
 
-#: modules/demux/mpeg/ts.c:126 modules/mux/mpeg/ts.c:100
+#: modules/demux/mpeg/ts.c:130 modules/mux/mpeg/ts.c:100
 msgid "Digital TV Standard"
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:127
+#: modules/demux/mpeg/ts.c:131
 msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
 
-#: modules/demux/mpeg/ts.c:131
+#: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
 msgstr "എംപേഗ് കടത്തല്‍ സ്ട്രീം ടിമക്സര്‍"
 
@@ -16082,32 +16072,32 @@ msgstr "സ്ലൈഡുകള്‍ (ടെക്സ്റ്റ്)"
 msgid "Slides (images)"
 msgstr "സ്ലൈഡുകള്‍ (ചിത്രങ്ങള്‍)"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:99
+#: modules/gui/macosx/VLCAboutWindowController.m:96
 #: modules/gui/macosx/VLCMainMenu.m:339
 msgid "About VLC media player"
 msgstr "വി‌എല്‍‌സി മെഡിയ പ്ലെയറിനെ പറ്റി"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:102
+#: modules/gui/macosx/VLCAboutWindowController.m:99
 #: modules/gui/qt/dialogs/help.cpp:125
 msgid "Credits"
 msgstr "ക്രെഡിറ്റുകള്‍"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:104
+#: modules/gui/macosx/VLCAboutWindowController.m:101
 #: modules/gui/macosx/VLCMainMenu.m:490 modules/gui/qt/dialogs/help.cpp:119
 msgid "License"
 msgstr "ലൈസന്‍സ്"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:106
+#: modules/gui/macosx/VLCAboutWindowController.m:103
 #: modules/gui/qt/dialogs/help.cpp:122
 msgid "Authors"
 msgstr "കര്‍ത്താക്കള്‍"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:109
+#: modules/gui/macosx/VLCAboutWindowController.m:105
 msgid ""
 "VLC media player and VideoLAN are trademarks of the VideoLAN Association."
 msgstr "വീഡിയോ LAN അസ്സോസിയേഷന്‍റെ വ്യാപാരമുദ്രകള്‍ ആണ് VLC മീഡിയപ്ലെയറും വീഡിയോLANഉം"
 
-#: modules/gui/macosx/VLCAboutWindowController.m:134
+#: modules/gui/macosx/VLCAboutWindowController.m:130
 msgid ""
 "<p>VLC media player is a free and open source media player, encoder, and "
 "streamer made by the volunteers of the <a href=\"https://www.videolan.org/"
@@ -16127,77 +16117,77 @@ msgstr ""
 "www.videolan.org/contribute/\"><span style=\" text-decoration: underline; "
 "color:#0057ae;\"> സഹായിക്കുക നമ്മളിലൊന്നാവുക!</span></a>"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:104
-#: modules/gui/macosx/VLCAddonsWindowController.m:355
+#: modules/gui/macosx/VLCAddonsWindowController.m:105
+#: modules/gui/macosx/VLCAddonsWindowController.m:357
 #: modules/gui/qt/dialogs/plugins.cpp:381
 #: modules/gui/qt/managers/addons_manager.cpp:88
 msgid "Playlist parsers"
 msgstr "പ്ലേലിസ്റ്റ് പാര്‍സറുകള്‍"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:106
-#: modules/gui/macosx/VLCAddonsWindowController.m:357
+#: modules/gui/macosx/VLCAddonsWindowController.m:107
+#: modules/gui/macosx/VLCAddonsWindowController.m:359
 #: modules/gui/qt/dialogs/plugins.cpp:385
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
 msgstr "സര്‍വ്വീസ് ഡിസ്കവറി"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:108
+#: modules/gui/macosx/VLCAddonsWindowController.m:109
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
 msgstr "ഇൻറ്റർഫേസ്"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:110
+#: modules/gui/macosx/VLCAddonsWindowController.m:111
 #: modules/gui/qt/dialogs/plugins.cpp:392
 #: modules/gui/qt/managers/addons_manager.cpp:94
 msgid "Art and meta fetchers"
 msgstr "ആർറ്റ് & മെറ്റാ ഫെച്ചര്‍"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:112
-#: modules/gui/macosx/VLCAddonsWindowController.m:359
+#: modules/gui/macosx/VLCAddonsWindowController.m:113
+#: modules/gui/macosx/VLCAddonsWindowController.m:361
 #: modules/gui/macosx/VLCMainMenu.m:343 modules/gui/macosx/VLCMainMenu.m:344
 #: modules/gui/qt/dialogs/plugins.cpp:395
 #: modules/gui/qt/managers/addons_manager.cpp:96
 msgid "Extensions"
 msgstr "അനുബന്ധങ്ങള്‍"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:115
+#: modules/gui/macosx/VLCAddonsWindowController.m:116
 msgid "Show Installed Only"
 msgstr "ഇന്‍സ്റ്റാള്‍ ചെയ്തത് മാത്രം കാണിക്കുക"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:117
+#: modules/gui/macosx/VLCAddonsWindowController.m:118
 #: modules/gui/qt/dialogs/plugins.cpp:423
 msgid "Find more addons online"
 msgstr "കൂടുതല്‍ ആഡ്ഓണുകള്‍ ഒണ്‍ലൈനില്‍ കണ്ടെത്താം"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:127
+#: modules/gui/macosx/VLCAddonsWindowController.m:128
 #: modules/gui/macosx/VLCMainMenu.m:345 modules/gui/qt/dialogs/plugins.cpp:85
 msgid "Addons Manager"
 msgstr "ആഡ്ഓണ്‍സ് മാനേജര്‍"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:129
+#: modules/gui/macosx/VLCAddonsWindowController.m:130
 #: modules/gui/qt/dialogs/plugins.cpp:1165
 #: modules/gui/qt/dialogs/plugins.cpp:1178
 msgid "Installed"
 msgstr "ഇന്‍സ്റ്റാള്‍ഡ്"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:130
+#: modules/gui/macosx/VLCAddonsWindowController.m:131
 #: modules/gui/macosx/VLCBookmarksWindowController.m:90
 #: modules/gui/qt/dialogs/plugins.cpp:127 modules/mux/avi.c:54
 msgid "Name"
 msgstr "നെയിം"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:131
+#: modules/gui/macosx/VLCAddonsWindowController.m:132
 #: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
 msgstr "രചയ്താവ്"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:196
+#: modules/gui/macosx/VLCAddonsWindowController.m:197
 msgid "Uninstall"
 msgstr "അണ്‍ഇന്‍സ്റ്റാള്‍"
 
-#: modules/gui/macosx/VLCAddonsWindowController.m:353
+#: modules/gui/macosx/VLCAddonsWindowController.m:355
 #: modules/gui/qt/dialogs/plugins.cpp:377
 #: modules/gui/qt/managers/addons_manager.cpp:86
 #: modules/gui/skins2/src/skin_main.cpp:535
@@ -16268,7 +16258,7 @@ msgid "Filter"
 msgstr "ഫില്‍റ്റര്‍"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:276
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:84
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:88
 #: modules/gui/macosx/VLCSimplePrefsController.m:266
 #: modules/gui/qt/dialogs/extended.cpp:96
 msgid "Audio Effects"
@@ -16280,7 +16270,7 @@ msgid "Duplicate current profile..."
 msgstr "ഇപ്പോഴത്തെ പ്രൊഫൈലിന്‍റെ തനിപ്പകര്‍പ്പ്"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:332
-#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1057
+#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1062
 msgid "Organize Profiles..."
 msgstr "പ്രൊഫൈലുകള്‍ ഓര്‍ഗനൈസ് ചെയ്യുക..."
 
@@ -16430,44 +16420,44 @@ msgstr ""
 "ഇന്‍പുട്ട് മാറിയിട്ടുണ്ട്, ബുക്ക്മാര്‍ക്ക് സംരക്ഷിക്കാന്‍ സാധിക്കുന്നില്ല.  ബുക്ക്മാര്‍ക്കുകള്‍ ചിട്ടപ്പെടുത്തുന്ന "
 "സമയത്ത് പ്ലേബാക്കിനെ  \"പോസ്\" ഉപയോഗിച്ച് നിര്‍ത്തുന്നത് ഒരേ ഇന്‍പുട്ട് തന്നെ എന്നുറപ്പു വരുത്തുന്നതിനാണ്"
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:67
-#: modules/gui/macosx/VLCControlsBarCommon.m:149
+#: modules/gui/macosx/VLCControlsBarCommon.m:84
+#: modules/gui/macosx/VLCControlsBarCommon.m:182
 #: modules/gui/macosx/VLCFSPanelController.m:121
 msgid "Backward"
 msgstr "പുറകിലേക്ക്"
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:68
-#: modules/gui/macosx/VLCControlsBarCommon.m:150
+#: modules/gui/macosx/VLCControlsBarCommon.m:85
+#: modules/gui/macosx/VLCControlsBarCommon.m:183
 #: modules/gui/macosx/VLCFSPanelController.m:122
 msgid "Seek backward"
 msgstr ""
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:71
-#: modules/gui/macosx/VLCControlsBarCommon.m:152
+#: modules/gui/macosx/VLCControlsBarCommon.m:88
+#: modules/gui/macosx/VLCControlsBarCommon.m:185
 #: modules/gui/macosx/VLCFSPanelController.m:118
 msgid "Forward"
 msgstr "മുമ്പോട്ട്"
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:72
-#: modules/gui/macosx/VLCControlsBarCommon.m:153
+#: modules/gui/macosx/VLCControlsBarCommon.m:89
+#: modules/gui/macosx/VLCControlsBarCommon.m:186
 #: modules/gui/macosx/VLCFSPanelController.m:119
 msgid "Seek forward"
 msgstr ""
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:76
+#: modules/gui/macosx/VLCControlsBarCommon.m:93
 msgid "Playback position"
 msgstr ""
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:127
+#: modules/gui/macosx/VLCControlsBarCommon.m:113
 msgid "Playback time"
 msgstr ""
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:161
+#: modules/gui/macosx/VLCControlsBarCommon.m:194
 #: modules/gui/macosx/VLCStatusBarIcon.m:100
 msgid "Go to previous item"
 msgstr ""
 
-#: modules/gui/macosx/VLCControlsBarCommon.m:164
+#: modules/gui/macosx/VLCControlsBarCommon.m:197
 #: modules/gui/macosx/VLCFSPanelController.m:113
 #: modules/gui/macosx/VLCStatusBarIcon.m:106
 msgid "Go to next item"
@@ -16482,12 +16472,12 @@ msgid "Go!"
 msgstr "പോകുക!"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:138
-#: modules/gui/macosx/VLCMainWindow.m:191
+#: modules/gui/macosx/VLCMainWindow.m:194
 msgid "Drop media here"
 msgstr "മീഡിയയെ ഇവിടെ നിക്ഷേപിക്കുക"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:139
-#: modules/gui/macosx/VLCMainWindow.m:193
+#: modules/gui/macosx/VLCMainWindow.m:210
 msgid "Open media..."
 msgstr "മീഡിയ തുറക്കുക"
 
@@ -16725,7 +16715,7 @@ msgstr "SDP URL ഒന്നും തന്നിട്ടില്ല"
 msgid "A SDP export is requested, but no URL is provided."
 msgstr "ഒരു SDP എക്സ്പോര്‍ട്ട് അപേക്ഷിക്കപ്പെട്ടിട്ടുണ്ട്, പക്ഷേ URL ഒന്നും തന്നെ നല്‍കിയിട്ടില്ല"
 
-#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1055
+#: modules/gui/macosx/VLCConvertAndSaveWindowController.m:1060
 #: modules/gui/macosx/VLCSimplePrefsController.m:691
 #: modules/gui/macosx/VLCSimplePrefsController.m:719
 #: modules/gui/macosx/VLCSimplePrefsController.m:1252
@@ -16767,7 +16757,7 @@ msgid "Leave fullscreen"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:76
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:80
 #: modules/gui/qt/dialogs/toolbar.cpp:477 modules/gui/qt/ui/sprefs_audio.h:411
 msgid "Volume"
 msgstr "ഒച്ച"
@@ -16781,8 +16771,8 @@ msgid "Adjust the current playback position"
 msgstr ""
 
 #: modules/gui/macosx/VLCFSPanelController.m:305
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:74
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:466
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:78
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:503
 #, c-format
 msgid "Volume: %i %%"
 msgstr ""
@@ -17449,61 +17439,61 @@ msgstr "എച്ച്ടിഎംഎല്‍ പ്ലേലിസ്റ്�
 msgid "Save Playlist"
 msgstr "പ്ലേലിസ്റ്റ് സേവ് ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainWindow.m:185
+#: modules/gui/macosx/VLCMainWindow.m:188
 msgid "Search in Playlist"
 msgstr "പ്ലേലിസ്റ്റിലുള്ള തിരച്ചി"
 
-#: modules/gui/macosx/VLCMainWindow.m:187
+#: modules/gui/macosx/VLCMainWindow.m:190
 msgid "Search the playlist. Results will be selected in the table."
 msgstr ""
 
-#: modules/gui/macosx/VLCMainWindow.m:194
+#: modules/gui/macosx/VLCMainWindow.m:211
 msgid "Open a dialog to select the media to play"
 msgstr ""
 
-#: modules/gui/macosx/VLCMainWindow.m:198
-#: modules/gui/macosx/VLCMainWindow.m:204
+#: modules/gui/macosx/VLCMainWindow.m:215
+#: modules/gui/macosx/VLCMainWindow.m:221
 #: modules/gui/qt/components/playlist/selector.cpp:580
 msgid "Subscribe"
 msgstr "സംഭാവന ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainWindow.m:199
-#: modules/gui/macosx/VLCMainWindow.m:210
+#: modules/gui/macosx/VLCMainWindow.m:216
+#: modules/gui/macosx/VLCMainWindow.m:227
 #: modules/gui/qt/components/playlist/selector.cpp:597
 msgid "Unsubscribe"
 msgstr "അണ്‍സബ്സ്ക്രൈബ്"
 
-#: modules/gui/macosx/VLCMainWindow.m:202
+#: modules/gui/macosx/VLCMainWindow.m:219
 #: modules/gui/qt/components/playlist/selector.cpp:279
 msgid "Subscribe to a podcast"
 msgstr "പോഡ്കാസ്റ്റിലേക്ക് സബ്സ്ക്രൈബ് ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainWindow.m:203
+#: modules/gui/macosx/VLCMainWindow.m:220
 #: modules/gui/qt/components/playlist/selector.cpp:581
 msgid "Enter URL of the podcast to subscribe to:"
 msgstr "പോഡ്കാസ്റ്റിന്റെ URL ചേര്‍ക്കുക വരിക്കാരാവുന്നതിന്:"
 
-#: modules/gui/macosx/VLCMainWindow.m:208
+#: modules/gui/macosx/VLCMainWindow.m:225
 msgid "Unsubscribe from a podcast"
 msgstr "പോഡ്കാസ്റ്റില്‍ നിന്ന് വരിക്കാരനല്ലാതാകുക"
 
-#: modules/gui/macosx/VLCMainWindow.m:209
+#: modules/gui/macosx/VLCMainWindow.m:226
 msgid "Select the podcast you would like to unsubscribe from:"
 msgstr "നിങ്ങള്‍ക്ക് വരിക്കാരനല്ലാതാവുന്നതിനുള്ള പോഡ്കാസ്റ്റ് തിരഞ്ഞെടുക്കുക ഇതില്‍ നിന്നും:"
 
-#: modules/gui/macosx/VLCMainWindow.m:235
+#: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Check for album art and metadata?"
 msgstr "ആല്‍ബം ആര്‍ട്ടിനും കൂടാതെ മെറ്റാ‍ഡാറ്റയ്ക്കും വേണ്ടി പരിശോധിക്കുക?"
 
-#: modules/gui/macosx/VLCMainWindow.m:235
+#: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Enable Metadata Retrieval"
 msgstr "മെറ്റാഡാറ്റ വീണ്ടെടുക്കല്‍ പ്രവര്‍ത്തനസജ്ജമാക്കുക"
 
-#: modules/gui/macosx/VLCMainWindow.m:235
+#: modules/gui/macosx/VLCMainWindow.m:252
 msgid "No, Thanks"
 msgstr "വേണ്ട, നന്ദി"
 
-#: modules/gui/macosx/VLCMainWindow.m:235
+#: modules/gui/macosx/VLCMainWindow.m:252
 msgid ""
 "VLC can check online for album art and metadata to enrich your playback "
 "experience, e.g. by providing track information when playing Audio CDs. To "
@@ -17515,49 +17505,49 @@ msgstr ""
 "VLC നിങ്ങളുടെ ഉള്ളടക്കത്തെക്കുറിച്ചുള്ള വിവരങ്ങള്‍ ഒരു വിശ്വസ്ത സേവനങ്ങളിലേയ്ക്ക് ഒരു അജ്ഞാത "
 "രൂപത്തില്‍‌ അയയ്ക്കുന്നു."
 
-#: modules/gui/macosx/VLCMainWindow.m:293
+#: modules/gui/macosx/VLCMainWindow.m:318
 msgid "LIBRARY"
 msgstr "ലൈബ്രറി"
 
-#: modules/gui/macosx/VLCMainWindow.m:298
+#: modules/gui/macosx/VLCMainWindow.m:323
 msgid "MY COMPUTER"
 msgstr "എന്റെ കംപ്യൂട്ടര്‍"
 
-#: modules/gui/macosx/VLCMainWindow.m:299
+#: modules/gui/macosx/VLCMainWindow.m:324
 msgid "DEVICES"
 msgstr "ഡിവൈസുകള്‍"
 
-#: modules/gui/macosx/VLCMainWindow.m:300
+#: modules/gui/macosx/VLCMainWindow.m:325
 msgid "LOCAL NETWORK"
 msgstr "ലോക്കല്‍ നെറ്റ്വര്‍ക്ക്"
 
-#: modules/gui/macosx/VLCMainWindow.m:301
+#: modules/gui/macosx/VLCMainWindow.m:326
 msgid "INTERNET"
 msgstr "ഇന്റര്‍നെറ്റ്"
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:64
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:68
 msgid "Show/Hide Playlist"
 msgstr "പ്ലേലിസ്റ്റ് കാണിക്കുകയും/മറയ്ക്കുകയും ചെയ്യുക"
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:67
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:71
 #: modules/gui/qt/dialogs/vlm.cpp:548 share/lua/http/index.html:241
 msgid "Repeat"
 msgstr "ആവര്‍ത്തനം"
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:68
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:72
 msgid "Change repeat mode. Modes: repeat one, repeat all and no repeat."
 msgstr ""
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:71
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:75
 #: share/lua/http/index.html:239
 msgid "Shuffle"
 msgstr "ഷഫിള്‍"
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:81
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:85
 msgid "Full Volume"
 msgstr "മുഴുവന്‍ ശബ്ദം"
 
-#: modules/gui/macosx/VLCMainWindowControlsBar.m:85
+#: modules/gui/macosx/VLCMainWindowControlsBar.m:89
 msgid "Open Audio Effects window"
 msgstr ""
 
@@ -18360,7 +18350,7 @@ msgstr ""
 msgid "Copy URL to clipboard"
 msgstr ""
 
-#: modules/gui/macosx/VLCStringUtility.m:243
+#: modules/gui/macosx/VLCStringUtility.m:242
 msgid "Not Set"
 msgstr "സെറ്റ് ചെയ്തില്ല"
 
@@ -21518,12 +21508,12 @@ msgstr "സ്കിന്‍ തിരഞ്ഞെടുക്കുക"
 msgid "Open skin..."
 msgstr ""
 
-#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:68
+#: modules/hw/d3d11/d3d11_filters.c:86 modules/hw/d3d9/d3d9_filters.c:68
 #: modules/video_filter/adjust.c:61
 msgid "Brightness threshold"
 msgstr "ബ്രൈറ്റ്നെസ്സ് ത്രെഷ്ഹോള്‍ഡ്"
 
-#: modules/hw/d3d11/d3d11_filters.c:88 modules/hw/d3d9/d3d9_filters.c:69
+#: modules/hw/d3d11/d3d11_filters.c:87 modules/hw/d3d9/d3d9_filters.c:69
 #: modules/video_filter/adjust.c:62
 msgid ""
 "When this mode is enabled, pixels will be shown as black or white. The "
@@ -21532,50 +21522,50 @@ msgstr ""
 "ഈ മോഡ് സജ്ജമായിരിക്കുമ്പോള്‍, പിക്സല്‍ കറുപ്പ് അല്ലെങ്കില്‍ വെളുത്തതായി കാണിക്കപ്പെടുന്നു. താഴെ "
 "തെളിച്ചത്തില്‍ പറഞ്ഞിരിക്കുന്നതാണ് ത്രഷോള്‍ഡ് മൂല്യം."
 
-#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:72
+#: modules/hw/d3d11/d3d11_filters.c:90 modules/hw/d3d9/d3d9_filters.c:72
 #: modules/video_filter/adjust.c:65
 msgid "Image contrast (0-2)"
 msgstr "ഇമേജ് കോണ്ട്രാസ്റ്റ് (0-2)"
 
-#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:73
+#: modules/hw/d3d11/d3d11_filters.c:91 modules/hw/d3d9/d3d9_filters.c:73
 #: modules/video_filter/adjust.c:66
 msgid "Set the image contrast, between 0 and 2. Defaults to 1."
 msgstr "ചിത്ര പ്രകാശവ്യതിയാനം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
 
-#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:74
+#: modules/hw/d3d11/d3d11_filters.c:92 modules/hw/d3d9/d3d9_filters.c:74
 msgid "Image hue (0-360)"
 msgstr "ഇമേജ് ഹ്യൂ (0-360)"
 
-#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:75
+#: modules/hw/d3d11/d3d11_filters.c:93 modules/hw/d3d9/d3d9_filters.c:75
 msgid "Set the image hue, between 0 and 360. Defaults to 0."
 msgstr "ചിത്ര വര്‍ണ്ണവ്യത്യാസം 0 നും 360നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 0."
 
-#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:76
+#: modules/hw/d3d11/d3d11_filters.c:94 modules/hw/d3d9/d3d9_filters.c:76
 #: modules/video_filter/adjust.c:69
 msgid "Image saturation (0-3)"
 msgstr "ചിത്ര പൂരിതാവസ്ഥ (0-3)"
 
-#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:77
+#: modules/hw/d3d11/d3d11_filters.c:95 modules/hw/d3d9/d3d9_filters.c:77
 #: modules/video_filter/adjust.c:70
 msgid "Set the image saturation, between 0 and 3. Defaults to 1."
 msgstr "ചിത്ര പൂരിതാവസ്ഥ 0 നും 3 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
 
-#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:78
+#: modules/hw/d3d11/d3d11_filters.c:96 modules/hw/d3d9/d3d9_filters.c:78
 #: modules/video_filter/adjust.c:71
 msgid "Image brightness (0-2)"
 msgstr "ഇമേജ് ബ്രെറ്റ്നെസ്സ് (0-2)"
 
-#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:79
+#: modules/hw/d3d11/d3d11_filters.c:97 modules/hw/d3d9/d3d9_filters.c:79
 #: modules/video_filter/adjust.c:72
 msgid "Set the image brightness, between 0 and 2. Defaults to 1."
 msgstr "ചിത്ര തെളിച്ചം 0 നും 2 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
 
-#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:80
+#: modules/hw/d3d11/d3d11_filters.c:98 modules/hw/d3d9/d3d9_filters.c:80
 #: modules/video_filter/adjust.c:73
 msgid "Image gamma (0-10)"
 msgstr "ഇമേജ് ഗാമ (0-10)"
 
-#: modules/hw/d3d11/d3d11_filters.c:100 modules/hw/d3d9/d3d9_filters.c:81
+#: modules/hw/d3d11/d3d11_filters.c:99 modules/hw/d3d9/d3d9_filters.c:81
 #: modules/video_filter/adjust.c:74
 msgid "Set the image gamma, between 0.01 and 10. Defaults to 1."
 msgstr "ചിത്ര ഗാമ 0.01 നും 10 നും ഇടയ്ക്ക് ക്രമീകരിക്കുക. സ്വമേധയാലുള്ളത് 1."
@@ -23420,6 +23410,11 @@ msgstr "A/52 ഓഡിയോ പാക്കറ്റൈസര്‍"
 msgid "avparser packetizer"
 msgstr "എവിപാര്‍സര്‍ പാക്കറ്റൈസര്‍"
 
+#: modules/packetizer/av1.c:557
+#, fuzzy
+msgid "AV1 video packetizer"
+msgstr "H.264 വീഡിയോ പാക്കറ്റൈസര്‍"
+
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
 msgstr "പാക്കറ്റൈസര്‍ പകര്‍ത്തുക"
@@ -23547,8 +23542,8 @@ msgstr "MTP ഉപകരണം"
 #: modules/services_discovery/os2drive.c:43
 #: modules/services_discovery/os2drive.c:44
 #: modules/services_discovery/os2drive.c:69
-#: modules/services_discovery/udev.c:74 modules/services_discovery/udev.c:75
-#: modules/services_discovery/udev.c:103 modules/services_discovery/udev.c:625
+#: modules/services_discovery/udev.c:76 modules/services_discovery/udev.c:77
+#: modules/services_discovery/udev.c:105 modules/services_discovery/udev.c:627
 #: modules/services_discovery/windrive.c:33
 #: modules/services_discovery/windrive.c:40
 #: modules/services_discovery/windrive.c:41
@@ -23571,17 +23566,17 @@ msgstr "പോഡ്കാസ്റ്റ് ചെയ്യപ്പെടു�
 msgid "Enter the list of podcasts to retrieve, separated by '|' (pipe)."
 msgstr "വീണ്ടെടുക്കേണ്ട പോഡ്കാസ്റ്റുകളുടെ പട്ടിക ചേര്‍ക്കുക, '|' (pipe)നാല്‍ വിഭജിക്കപ്പെട്ടത്."
 
-#: modules/services_discovery/pulse.c:39 modules/services_discovery/pulse.c:42
-#: modules/services_discovery/pulse.c:82 modules/services_discovery/udev.c:65
-#: modules/services_discovery/udev.c:100 modules/services_discovery/udev.c:520
+#: modules/services_discovery/pulse.c:41 modules/services_discovery/pulse.c:44
+#: modules/services_discovery/pulse.c:84 modules/services_discovery/udev.c:67
+#: modules/services_discovery/udev.c:102 modules/services_discovery/udev.c:522
 msgid "Audio capture"
 msgstr "ഓഡിയോ ക്യാപ്ച്ചര്‍ ചെയ്യുക"
 
-#: modules/services_discovery/pulse.c:43
+#: modules/services_discovery/pulse.c:45
 msgid "Audio capture (PulseAudio)"
 msgstr "ഓഡിയോ ആഗീരണം (പള്‍സ്ഓഡിയോ)"
 
-#: modules/services_discovery/pulse.c:185 modules/stream_out/es.c:86
+#: modules/services_discovery/pulse.c:187 modules/stream_out/es.c:86
 msgid "Generic"
 msgstr "പൊതുവായ"
 
@@ -23657,32 +23652,32 @@ msgstr "ടൂള്‍"
 msgid "User"
 msgstr "ഉപയോക്താവ്"
 
-#: modules/services_discovery/udev.c:56 modules/services_discovery/udev.c:97
-#: modules/services_discovery/udev.c:445
+#: modules/services_discovery/udev.c:58 modules/services_discovery/udev.c:99
+#: modules/services_discovery/udev.c:447
 msgid "Video capture"
 msgstr "വീഡിയോ ക്യാപ്ച്ചര്‍"
 
-#: modules/services_discovery/udev.c:57
+#: modules/services_discovery/udev.c:59
 msgid "Video capture (Video4Linux)"
 msgstr "വീഡിയോ പകര്‍ത്തല്‍ (വീഡിയോ4ലിനക്സ്)"
 
-#: modules/services_discovery/udev.c:66
+#: modules/services_discovery/udev.c:68
 msgid "Audio capture (ALSA)"
 msgstr "ഓഡിയോ ക്യാപ്ച്ചര്‍(എഎല്‍എസ്എ )"
 
-#: modules/services_discovery/udev.c:597
+#: modules/services_discovery/udev.c:599
 msgid "CD"
 msgstr "സിഡി"
 
-#: modules/services_discovery/udev.c:599 modules/gui/qt/ui/open_disk.h:298
+#: modules/services_discovery/udev.c:601 modules/gui/qt/ui/open_disk.h:298
 msgid "DVD"
 msgstr "ഡിവിഡി"
 
-#: modules/services_discovery/udev.c:603
+#: modules/services_discovery/udev.c:605
 msgid "HD DVD"
 msgstr "എച്ച്ഡി ഡിവിഡി"
 
-#: modules/services_discovery/udev.c:610
+#: modules/services_discovery/udev.c:612
 msgid "Unknown type"
 msgstr "അറിയാത്ത തരം"
 
@@ -23729,7 +23724,7 @@ msgid "Applications"
 msgstr "ആപ്ലിക്കേഷനുകള്‍"
 
 #: modules/services_discovery/xcb_apps.c:361
-#: modules/video_output/win32/direct3d9.c:318
+#: modules/video_output/win32/direct3d9.c:326
 msgid "Desktop"
 msgstr "ഡെസ്ക്ടോപ്പ്"
 
@@ -27367,12 +27362,12 @@ msgid "The desktop mode allows you to display the video on the desktop."
 msgstr "ഡെസ്ക്ടോപ് രീതി  ഡെസ്ക്ടോപില്‍ തന്നെ വീഡിയോ കാണിക്കാന്‍ നിങ്ങളെ സഹായിക്കുന്നു"
 
 #: modules/video_output/win32/direct3d9.c:72
-#: modules/video_output/win32/direct3d11.c:72
+#: modules/video_output/win32/direct3d11.c:65
 msgid "Use hardware blending support"
 msgstr "ഹാര്‍ഡ്വെയര്‍ ബ്ലെന്‍ഡിംഗ് പിന്തുണ ഉപയോഗിക്കുക"
 
 #: modules/video_output/win32/direct3d9.c:74
-#: modules/video_output/win32/direct3d11.c:74
+#: modules/video_output/win32/direct3d11.c:67
 msgid "Try to use hardware acceleration for subtitle/OSD blending."
 msgstr "സബ്ടൈറ്റില്‍/OSD ബ്ലെന്‍ഡിംങ്ങിനായി ഹാര്‍ഡ് വയര്‍ ആക്സിലറേഷന്‍ ഉപയോഗിക്കാന്‍ ശ്രമിക്കുക"
 
@@ -27404,11 +27399,11 @@ msgstr "വിന്‍ഡോസ് വിസ്റ്റയ്ക്കും �
 msgid "Direct3D9 video output"
 msgstr ""
 
-#: modules/video_output/win32/direct3d11.c:71
+#: modules/video_output/win32/direct3d11.c:64
 msgid "Recommended video output for Windows 8 and later versions"
 msgstr ""
 
-#: modules/video_output/win32/direct3d11.c:78
+#: modules/video_output/win32/direct3d11.c:71
 msgid "Direct3D11 video output"
 msgstr ""
 
@@ -27495,7 +27490,7 @@ msgstr "ഡയറക്ട്എക്സ്(ഡയറക്ട്ഡ്രോ) 
 msgid "Wallpaper"
 msgstr "വാള്‍പേപ്പര്‍"
 
-#: modules/video_output/win32/glwin32.c:51
+#: modules/video_output/win32/glwin32.c:52
 msgid "OpenGL video output for Windows"
 msgstr ""
 
@@ -29321,6 +29316,15 @@ msgstr "AAAA; "
 #: modules/gui/qt/ui/vlm.h:302
 msgid "Media Manager List"
 msgstr "മീഡിയ മാനേജര്‍ ലിസ്റ്റ്"
+
+#~ msgid ""
+#~ "none: use closed GOPs only\n"
+#~ "normal: use standard open GOPs\n"
+#~ "bluray: use Blu-ray compatible open GOPs"
+#~ msgstr ""
+#~ "ഒന്നുമില്ല: ക്ലോസ് ചെയ്ത ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക\n"
+#~ "സാധാരണ: അടിസ്ഥാന ഓപ്പണ്‍ ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക\n"
+#~ "ബ്ലൂറേ: ബ്ലൂ-റേ കോംപാറ്റബിളായ ഓപ്പണ്‍ ജിഒപികള്‍ മാത്രം ഉപയോഗിക്കുക"
 
 #~ msgid "Toggle Fullscreen mode"
 #~ msgstr "ഫുള്‍സ്ക്രീന്‍ രീതി ടോഗിള്‍ ചെയ്യുക"
