@@ -197,9 +197,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         }
 
         /* setup vout display */
-        vout_display_info_t info = vd->info;
-        info.subpicture_chromas = subpicture_chromas;
-        vd->info = info;
+        vd->info.subpicture_chromas = subpicture_chromas;
 
         vd->pool    = Pool;
         vd->prepare = PictureRender;
