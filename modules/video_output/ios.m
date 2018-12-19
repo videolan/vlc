@@ -207,13 +207,9 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
             goto bailout;
         glsys->vgl = vgl;
 
-        /* */
-        vout_display_info_t info = vd->info;
-        info.has_pictures_invalid = false;
-        info.subpicture_chromas = subpicture_chromas;
-
         /* Setup vout_display_t once everything is fine */
-        vd->info = info;
+        vd->info.has_pictures_invalid = false;
+        vd->info.subpicture_chromas = subpicture_chromas;
 
         vd->pool = PicturePool;
         vd->prepare = PictureRender;
