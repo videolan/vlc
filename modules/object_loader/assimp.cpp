@@ -521,11 +521,20 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         p_light->attenuationLinear = myAiLight->mAttenuationLinear;
         p_light->attenuationQuadratic = myAiLight->mAttenuationQuadratic;
 
-        msg_Err(p_loader, "** %f %f %f", myAiLight->mPosition.x, myAiLight->mPosition.y, myAiLight->mPosition.z);
-        msg_Err(p_loader, "   %f %f %f", myAiLight->mDirection.x, myAiLight->mDirection.y, myAiLight->mDirection.z);
-        msg_Err(p_loader, "   %f %f %f", myAiLight->mColorDiffuse.r, myAiLight->mColorDiffuse.g, myAiLight->mColorDiffuse.b);
-        msg_Err(p_loader, "   %f %f %f", myAiLight->mColorAmbient.r, myAiLight->mColorAmbient.g, myAiLight->mColorAmbient.b);
-        msg_Err(p_loader, "   %f %f %f", myAiLight->mColorSpecular.r, myAiLight->mColorSpecular.g, myAiLight->mColorSpecular.b);
+        msg_Info(p_loader, "POSITION:    %f %f %f", myAiLight->mPosition.x,
+                 myAiLight->mPosition.y, myAiLight->mPosition.z);
+        msg_Info(p_loader, "DIRECTION:   %f %f %f", myAiLight->mDirection.x,
+                 myAiLight->mDirection.y, myAiLight->mDirection.z);
+        msg_Info(p_loader, "DIFFUSE:     %f %f %f", myAiLight->mColorDiffuse.r,
+                 myAiLight->mColorDiffuse.g, myAiLight->mColorDiffuse.b);
+        msg_Info(p_loader, "AMBIANT:     %f %f %f", myAiLight->mColorAmbient.r,
+                 myAiLight->mColorAmbient.g, myAiLight->mColorAmbient.b);
+        msg_Info(p_loader, "SPECULAR:    %f %f %f", myAiLight->mColorSpecular.r,
+                 myAiLight->mColorSpecular.g, myAiLight->mColorSpecular.b);
+        msg_Info(p_loader, "KC: %f / KL: %f / KQ: %f",
+                 p_light->attenuationConstant, p_light->attenuationLinear,
+                 p_light->attenuationQuadratic);
+
 
         lights.push_back(p_light);
     }
