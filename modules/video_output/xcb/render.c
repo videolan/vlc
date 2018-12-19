@@ -25,6 +25,7 @@
 #endif
 
 #include <stdlib.h>
+#include <string.h>
 #include <limits.h>
 #include <assert.h>
 
@@ -33,6 +34,7 @@
 #include <xcb/shm.h>
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include <vlc_fs.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
@@ -60,6 +62,7 @@ struct vout_display_sys_t {
     xcb_shm_seg_t segment;
     xcb_window_t root;
     xcb_render_pictformat_t fmt_id;
+    char *filter;
 
     vout_display_place_t place;
     int32_t src_x;
@@ -247,6 +250,11 @@ static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
     }
 
     xcb_render_set_picture_transform(conn, sys->picture.crop, transform);
+
+    if (likely(sys->filter != NULL))
+        xcb_render_set_picture_filter(conn, sys->picture.crop,
+                                      strlen(sys->filter), sys->filter,
+                                      0, NULL);
 }
 
 static void DeleteBuffers(vout_display_t *vd)
@@ -327,6 +335,7 @@ static void Close(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
+    free(sys->filter);
     xcb_disconnect(sys->conn);
 }
 
@@ -525,6 +534,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     msg_Dbg(obj, "using RENDER picture format %u", sys->fmt_id);
     msg_Dbg(obj, "using X11 visual 0x%"PRIx32, vid);
 
+    char *filter = var_InheritString(obj, "x11-render-filter");
+    if (filter != NULL) {
+        msg_Dbg(obj, "using filter \"%s\"", filter);
+        sys->filter = ToCharset("ISO 8859-1", filter, &(size_t){ 0 });
+        free(filter);
+    } else
+        sys->filter = NULL;
+
     sys->drawable.source = xcb_generate_id(conn);
     sys->drawable.crop = xcb_generate_id(conn);
     sys->drawable.scale = xcb_generate_id(conn);
@@ -584,7 +601,14 @@ error:
     return VLC_EGENERIC;
 }
 
-/* TODO: configurable filter */
+static const char *filter_names[] = {
+    "nearest", "bilinear", "fast", "good", "best",
+};
+
+static const char *filter_descs[] = {
+    N_("Nearest neighbor (bad quality)"),
+    N_("Bilinear"), N_("Fast"), N_("Good"), N_("Best"),
+};
 
 vlc_module_begin()
     set_shortname(N_("RENDER"))
@@ -594,4 +618,7 @@ vlc_module_begin()
     set_capability("vout display", 200)
     set_callbacks(Open, Close)
     add_shortcut("x11-render", "xcb-render", "render")
+    add_string("x11-render-filter", "nearest", N_("Scaling mode"),
+               N_("Scaling mode"), true)
+        change_string_list(filter_names, filter_descs)
 vlc_module_end()
