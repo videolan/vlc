@@ -105,13 +105,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (Init(vd, fmtp))
         goto error;
 
-    vout_display_info_t info = vd->info;
-    info.is_slow              = false;
-    info.has_double_click     = true;
-    info.has_pictures_invalid = true;
-
     /* */
-    vd->info = info;
+    vd->info.is_slow              = false;
+    vd->info.has_double_click     = true;
+    vd->info.has_pictures_invalid = true;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
