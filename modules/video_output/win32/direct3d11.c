@@ -443,32 +443,6 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned pool_size)
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
-    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
-    {
-        msg_Err(vd, "Could not allocate quad buffers.");
-        return NULL;
-    }
-
-    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
-                   vd->source.orientation ) != VLC_SUCCESS) {
-        msg_Err(vd, "Could not Create the main quad picture.");
-        return NULL;
-    }
-
-    if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
-         vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
-        SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
-
-    if (!vd->info.is_slow) {
-        HRESULT           hr;
-        ID3D10Multithread *pMultithread;
-        hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
-        if (SUCCEEDED(hr)) {
-            ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
-            ID3D10Multithread_Release(pMultithread);
-        }
-    }
-
     if (sys->picQuad.textureFormat->formatTexture == DXGI_FORMAT_UNKNOWN)
         sys->sys.pool = picture_pool_NewFromFormat( &surface_fmt, pool_size );
     else
@@ -1513,6 +1487,36 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
+    video_format_t surface_fmt = vd->fmt;
+    surface_fmt.i_width  = sys->picQuad.i_width;
+    surface_fmt.i_height = sys->picQuad.i_height;
+
+    if (D3D11_AllocateQuad(vd, &sys->d3d_dev, vd->source.projection_mode, &sys->picQuad) != VLC_SUCCESS)
+    {
+        msg_Err(vd, "Could not allocate quad buffers.");
+       return VLC_EGENERIC;
+    }
+
+    if (D3D11_SetupQuad( vd, &sys->d3d_dev, &surface_fmt, &sys->picQuad, &sys->display, &sys->sys.rect_src_clipped,
+                   vd->source.orientation ) != VLC_SUCCESS) {
+        msg_Err(vd, "Could not Create the main quad picture.");
+        return VLC_EGENERIC;
+    }
+
+    if ( vd->source.projection_mode == PROJECTION_MODE_EQUIRECTANGULAR ||
+         vd->source.projection_mode == PROJECTION_MODE_CUBEMAP_LAYOUT_STANDARD )
+        SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
+
+    if (!vd->info.is_slow) {
+        HRESULT           hr;
+        ID3D10Multithread *pMultithread;
+        hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
+        if (SUCCEEDED(hr)) {
+            ID3D10Multithread_SetMultithreadProtected(pMultithread, TRUE);
+            ID3D10Multithread_Release(pMultithread);
+        }
+    }
+
     UpdateRects(vd, true);
 
 #ifdef HAVE_ID3D11VIDEODECODER
@@ -1520,9 +1524,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
     {
         /* we need a staging texture */
         ID3D11Texture2D *textures[D3D11_MAX_SHADER_VIEW] = {0};
-        video_format_t surface_fmt = *fmt;
-        surface_fmt.i_width  = sys->picQuad.i_width;
-        surface_fmt.i_height = sys->picQuad.i_height;
 
         if (AllocateTextures(vd, &sys->d3d_dev, sys->picQuad.textureFormat, &surface_fmt, 1, textures))
         {
@@ -1634,8 +1635,10 @@ static void Direct3D11DestroyPool(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->sys.pool)
+    {
         picture_pool_Release(sys->sys.pool);
-    sys->sys.pool = NULL;
+        sys->sys.pool = NULL;
+    }
 }
 
 static void Direct3D11DestroyResources(vout_display_t *vd)
