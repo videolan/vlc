@@ -103,12 +103,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     video_format_Copy(&vd->source, fmt);
 
     /* Picture buffer does not have the concept of aspect ratio */
-
-    vd->info.is_slow = false;
-    vd->info.has_double_click = false;
-    vd->info.has_pictures_invalid = false;
-    vd->info.subpicture_chromas = NULL;
-
+    vd->info = (vout_display_info_t){ };
     vd->cfg = cfg;
     vd->pool = NULL;
     vd->prepare = NULL;
