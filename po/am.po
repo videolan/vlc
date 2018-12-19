@@ -1,15 +1,15 @@
 # Amharic translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Solomon Gizaw, 2011
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-04 21:14+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Amharic (https://www.transifex.com/yaron/teams/16553/am/)\n"
 "Language: am\n"
@@ -22239,9 +22239,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "የቪድዮ መሳሪያ "
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
