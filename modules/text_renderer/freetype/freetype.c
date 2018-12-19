@@ -1347,10 +1347,11 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region_out,
                                  YUVFromRGB,
                                  FillYUVAPicture,
                                  BlendYUVAPixel );
-            else if( *p_chroma == VLC_CODEC_RGBA )
+            else if( *p_chroma == VLC_CODEC_RGBA
+                  || *p_chroma == VLC_CODEC_BGRA )
                 rv = RenderAXYZ( p_filter, p_region_out, text_block.p_laid,
                                  &regionbbox, &paddedbbox, &bbox,
-                                 VLC_CODEC_RGBA,
+                                 *p_chroma,
                                  &p_region_out->fmt,
                                  RGBFromRGB,
                                  FillRGBAPicture,
