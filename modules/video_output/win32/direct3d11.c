@@ -379,6 +379,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     if (Direct3D11Open(vd, fmtp)) {
         msg_Err(vd, "Direct3D11 could not be opened");
+        assert(!vd->info.is_slow); /* vd->info was not modified */
         goto error;
     }
 
