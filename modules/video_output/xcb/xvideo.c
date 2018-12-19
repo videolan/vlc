@@ -547,8 +547,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     p_sys->visible = false;
 
     /* Setup vout_display_t once everything is fine */
-    vd->info.has_pictures_invalid = false;
-
     p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
                                                     fmtp->i_chroma);
     if (p_sys->swap_uv)
