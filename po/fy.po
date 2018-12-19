@@ -1,5 +1,5 @@
 # West Frisian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,13 +7,13 @@
 # Wim Benes <fryskefirefox@gmail.com>, 2016,2018
 # Robin van der Vliet <info@robinvandervliet.nl>, 2014,2016
 # Thomas De Rocker, 2014
-# Wiebe Tokkel <justmarkus@gmx.net>, 2016
+# Wiebe Tokkel <justmarkus@gmx.net>, 2016,2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-08 23:01+0200\n"
+"PO-Revision-Date: 2018-12-19 22:50+0100\n"
 "Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
 "Language-Team: Western Frisian (https://www.transifex.com/yaron/teams/16553/"
 "fy/)\n"
@@ -23679,9 +23679,8 @@ msgid "avparser packetizer"
 msgstr "avparser-packetizer"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264 video packetizer"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
