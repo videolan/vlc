@@ -37,6 +37,7 @@ ifdef HAVE_MACOSX
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-connectx-macos.patch
 endif
 	$(APPLY) $(SRC)/gnutls/gnutls-libidn.patch
+	$(APPLY) $(SRC)/gnutls/vasnprintf-android-no-percent-n.patch
 	$(call pkg_static,"lib/gnutls.pc.in")
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
