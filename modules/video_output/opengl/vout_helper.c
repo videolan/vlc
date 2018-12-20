@@ -2512,12 +2512,53 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.Uniform2fv(prgm->uloc.SbSCoefs, 1, prgm->var.SbSCoefs);
     vgl->vt.Uniform2fv(prgm->uloc.SbSOffsets, 1, prgm->var.SbSOffsets);
 
+    float p_eye_pos[3] = {
+        vgl->p_objDisplay->p_scene->headPositionMatrix[12],
+        vgl->p_objDisplay->p_scene->headPositionMatrix[13],
+        vgl->p_objDisplay->p_scene->headPositionMatrix[14]
+    };
+    //fprintf(stderr, "Eye pos is %f / %f / %f\n", p_eye_pos[0], p_eye_pos[1], p_eye_pos[2]);
+
+    float p_eye_dir[3] = {
+        -cos(vgl->f_teta),
+        -sin(vgl->f_teta),
+        0
+    };
+
+    fprintf(stderr, "Theta : %f, Phi: %f\n", vgl->f_teta, vgl->f_phi);
+
+    //fprintf(stderr, "Eye rot is %f / %f \n", vgl->f_teta, vgl->f_phi);
+    //fprintf(stderr, "Eye dir is %f / %f / %f\n", p_eye_dir[0], p_eye_dir[1], p_eye_dir[2]);
 
     for (unsigned o = 0; o < p_scene->nObjects; ++o)
     {
         scene_object_t *p_object = vgl->p_objDisplay->p_scene->objects[o];
         scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
         scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
+
+        float p_object_pos[3] = {
+            p_object->transformMatrix[12],
+            p_object->transformMatrix[13],
+            p_object->transformMatrix[14]
+        };
+
+        //fprintf(stderr, "Object pos is %f / %f / %f\n", p_object_pos[0], p_object_pos[1], p_object_pos[2]);
+        float p_object_dir[3] = {
+            p_eye_pos[0]-p_object_pos[0],
+            p_eye_pos[1]-p_object_pos[1],
+            p_eye_pos[2]-p_object_pos[2]
+        };
+        //fprintf(stderr, "Object dir is %f / %f / %f\n", p_object_dir[0], p_object_dir[1], p_object_dir[2]);
+
+        float dot_eye_object =
+            p_object_dir[0] * p_eye_dir[0] +
+            p_object_dir[1] * p_eye_dir[1] +
+            p_object_dir[2] * p_eye_dir[2];
+
+        //fprintf(stderr, "Dot product for object %p is %f\n", p_object, dot_eye_object);
+
+        // discard object not visible
+        //if (dot_eye_object < 0) continue;
 
         if (p_material->p_baseColorTex != NULL)
         {
