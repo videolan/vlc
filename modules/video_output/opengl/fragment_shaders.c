@@ -704,12 +704,9 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
 
         // Compute the view space base
 
-        // We don't need normal if there is no lights
-        " if (HasLight) {\n"
         " // Allows to go from tangent space to view space\n"
         "  vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
         "  normal_world = normalize(TBNMatrix * normalTexel);\n"
-        " }\n\n"
 
         " if (UseAmbientTexture)\n"
         "  ambient.xyz  = texture2D(MatAmbientTex, TexCoord0).xyz;\n"
