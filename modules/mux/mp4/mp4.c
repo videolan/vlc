@@ -175,6 +175,45 @@ typedef struct
     uint32_t       i_mfhd_sequence;
 } sout_mux_sys_t;
 
+static void mp4_stream_Delete(mp4_stream_t *p_stream)
+{
+    /* mp4 frag */
+    if (p_stream->p_held_entry)
+    {
+        block_Release(p_stream->p_held_entry->p_block);
+        free(p_stream->p_held_entry);
+    }
+    while(p_stream->read.p_first)
+    {
+        mp4_fragentry_t *p_next = p_stream->read.p_first->p_next;
+        block_Release(p_stream->read.p_first->p_block);
+        free(p_stream->read.p_first);
+        p_stream->read.p_first = p_next;
+    }
+    while(p_stream->towrite.p_first)
+    {
+        mp4_fragentry_t *p_next = p_stream->towrite.p_first->p_next;
+        block_Release(p_stream->towrite.p_first->p_block);
+        free(p_stream->towrite.p_first);
+        p_stream->towrite.p_first = p_next;
+    }
+    free(p_stream->p_indexentries);
+
+    free(p_stream);
+}
+
+static mp4_stream_t *mp4_stream_New(void)
+{
+    mp4_stream_t *p_stream = calloc(1, sizeof(*p_stream));
+    if(p_stream)
+    {
+        p_stream->i_first_dts = VLC_TICK_INVALID;
+        p_stream->i_last_dts = VLC_TICK_INVALID;
+        p_stream->i_last_pts = VLC_TICK_INVALID;
+    }
+    return p_stream;
+}
+
 static void box_send(sout_mux_t *p_mux,  bo_t *box);
 
 static block_t *ConvertSUBT(block_t *);
@@ -382,7 +421,7 @@ static void Close(vlc_object_t *p_this)
 cleanup:
     /* Clean-up */
     for (unsigned int i_trak = 0; i_trak < p_sys->i_nb_streams; i_trak++)
-        free(p_sys->pp_streams[i_trak]);
+        mp4_stream_Delete(p_sys->pp_streams[i_trak]);
     TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
     mp4mux_Delete(p_sys->muxh);
     free(p_sys);
@@ -431,8 +470,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_EGENERIC;
     }
 
-    p_stream = malloc(sizeof(mp4_stream_t));
-    if(!p_stream)
+    if(!(p_stream = mp4_stream_New()))
         return VLC_ENOMEM;
 
     uint32_t i_track_timescale = CLOCK_FREQ;
@@ -483,23 +521,6 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
     }
 
     p_stream->p_fmt = p_input->p_fmt;
-    p_stream->i_length_neg  = 0;
-    p_stream->i_last_dts    = VLC_TICK_INVALID;
-    p_stream->i_last_pts    = VLC_TICK_INVALID;
-
-    p_stream->b_hasiframes  = false;
-
-    p_stream->i_current_run = 0;
-    p_stream->read.p_first  = NULL;
-    p_stream->read.p_last   = NULL;
-    p_stream->towrite.p_first = NULL;
-    p_stream->towrite.p_last  = NULL;
-    p_stream->p_held_entry    = NULL;
-    p_stream->i_last_iframe_time = 0;
-    p_stream->i_written_duration = 0;
-    p_stream->p_indexentries     = NULL;
-    p_stream->i_indexentriesmax  = 0;
-    p_stream->i_indexentries     = 0;
 
     p_input->p_sys          = p_stream;
 
@@ -1345,38 +1366,6 @@ static void LengthLocalFixup(sout_mux_t *p_mux, const mp4_stream_t *p_stream, bl
     }
 }
 
-static void CleanupFrag(sout_mux_sys_t *p_sys)
-{
-    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
-    {
-        mp4_stream_t *p_stream = p_sys->pp_streams[i];
-        if (p_stream->p_held_entry)
-        {
-            block_Release(p_stream->p_held_entry->p_block);
-            free(p_stream->p_held_entry);
-        }
-        while(p_stream->read.p_first)
-        {
-            mp4_fragentry_t *p_next = p_stream->read.p_first->p_next;
-            block_Release(p_stream->read.p_first->p_block);
-            free(p_stream->read.p_first);
-            p_stream->read.p_first = p_next;
-        }
-        while(p_stream->towrite.p_first)
-        {
-            mp4_fragentry_t *p_next = p_stream->towrite.p_first->p_next;
-            block_Release(p_stream->towrite.p_first->p_block);
-            free(p_stream->towrite.p_first);
-            p_stream->towrite.p_first = p_next;
-        }
-        free(p_stream->p_indexentries);
-        free(p_stream);
-    }
-    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
-    mp4mux_Delete(p_sys->muxh);
-    free(p_sys);
-}
-
 static void CloseFrag(vlc_object_t *p_this)
 {
     sout_mux_t *p_mux = (sout_mux_t *) p_this;
@@ -1419,7 +1408,11 @@ static void CloseFrag(vlc_object_t *p_this)
         }
     }
 
-    CleanupFrag(p_sys);
+    for (unsigned int i = 0; i < p_sys->i_nb_streams; i++)
+        mp4_stream_Delete(p_sys->pp_streams[i]);
+    TAB_CLEAN(p_sys->i_nb_streams, p_sys->pp_streams);
+    mp4mux_Delete(p_sys->muxh);
+    free(p_sys);
 }
 
 static int MuxFrag(sout_mux_t *p_mux)
