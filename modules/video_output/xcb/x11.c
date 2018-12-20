@@ -51,11 +51,6 @@ struct vout_display_sys_t
     video_format_t fmt;
 };
 
-/* This must be large enough to absorb the server display jitter.
- * But excessively large value is useless as direct rendering cannot be used
- * with XCB X11. */
-#define MAX_PICTURES (3)
-
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                     vlc_tick_t date)
 {
