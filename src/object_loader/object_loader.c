@@ -45,6 +45,8 @@ void objLoader_release(object_loader_t* p_objLoader)
     video_format_Clean(&p_objLoader->texPic_fmt_in);
     video_format_Clean(&p_objLoader->texPic_fmt_out);
 
+    image_HandlerDelete(p_objLoader->p_imgHandler);
+
     module_unneed(p_objLoader, p_objLoader->p_module);
     vlc_object_release(p_objLoader);
 }
