@@ -43,6 +43,8 @@ typedef struct
     GLuint *texturesNormal;
     GLuint *texturesRoughness;
 
+    GLuint transform_buffer_object;
+
     vlc_scene_lights_t lights;
     int light_count;
 

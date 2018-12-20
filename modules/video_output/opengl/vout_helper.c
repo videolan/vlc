@@ -164,6 +164,7 @@ struct prgm
         GLint VertexPosition;
         GLint VertexNormal;
         GLint VertexTangent;
+        GLint ObjectTransformMatrix;
     } aloc;
 };
 
@@ -544,7 +545,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "uniform mat4 YRotMatrix;\n"
         "uniform mat4 ZRotMatrix;\n"
         "uniform mat4 ZoomMatrix;\n"
-        "uniform mat4 ObjectTransformMatrix;\n"
+        "varying mat4 ObjectTransformMatrix;\n"
         "uniform mat4 SceneTransformMatrix;\n"
         "uniform mat4 HeadPositionMatrix;\n"
         "void main() {\n"
@@ -729,7 +730,7 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(YRotMatrix, "YRotMatrix");
     GET_ULOC(XRotMatrix, "XRotMatrix");
     GET_ULOC(ZoomMatrix, "ZoomMatrix");
-    GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
+    //GET_ULOC(ObjectTransformMatrix, "ObjectTransformMatrix");
     GET_ULOC(SceneTransformMatrix, "SceneTransformMatrix");
     GET_ULOC(HeadPositionMatrix, "HeadPositionMatrix");
     GET_ULOC(SbSCoefs, "SbSCoefs");
@@ -739,6 +740,7 @@ opengl_link_program(struct prgm *prgm)
     GET_ALOC(VertexNormal, "VertexNormal");
     GET_ALOC(VertexTangent, "VertexTangent");
     GET_ALOC(MultiTexCoord[0], "MultiTexCoord0");
+    GET_ALOC(ObjectTransformMatrix, "ObjectTransformMatrix");
     /* MultiTexCoord 1 and 2 can be optimized out if not used */
     if (prgm->tc->tex_count > 1)
         GET_ALOC(MultiTexCoord[1], "MultiTexCoord1");
@@ -2262,8 +2264,8 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
                               prgm->var.XRotMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                               prgm->var.ZoomMatrix);
-    vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                              prgm->var.ObjectTransformMatrix);
+    //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+    //                          prgm->var.ObjectTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                               prgm->var.SceneTransformMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
@@ -2388,7 +2390,7 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
         memcpy(prgm->var.YRotMatrix, vgl->prgm->var.YRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.XRotMatrix, vgl->prgm->var.XRotMatrix, 16 * sizeof(float));
         memcpy(prgm->var.ZoomMatrix, vgl->prgm->var.ZoomMatrix, 16 * sizeof(float));
-        memcpy(prgm->var.ObjectTransformMatrix, vgl->prgm->var.ObjectTransformMatrix, 16 * sizeof(float));
+        //memcpy(prgm->var.ObjectTransformMatrix, vgl->prgm->var.ObjectTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.SceneTransformMatrix, vgl->prgm->var.SceneTransformMatrix, 16 * sizeof(float));
         memcpy(prgm->var.HeadPositionMatrix, vgl->prgm->var.HeadPositionMatrix, 16 * sizeof(float));
 
@@ -2406,8 +2408,8 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
                                  prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                  prgm->var.ZoomMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                                 prgm->var.ObjectTransformMatrix);
+        //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+        //                         prgm->var.ObjectTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                                  prgm->var.SceneTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,
@@ -2530,11 +2532,51 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     //fprintf(stderr, "Eye rot is %f / %f \n", vgl->f_teta, vgl->f_phi);
     //fprintf(stderr, "Eye dir is %f / %f / %f\n", p_eye_dir[0], p_eye_dir[1], p_eye_dir[2]);
 
-    for (unsigned o = 0; o < p_scene->nObjects; ++o)
+    // Set the active texture id for the different sampler2D
+    vgl->vt.Uniform1i(prgm->uloc.MatDiffuseTex, 0);
+    vgl->vt.Uniform1i(prgm->uloc.MatAmbientTex, 1);
+    vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
+    vgl->vt.Uniform1i(prgm->uloc.MatNormalTex, 3);
+
+    unsigned instance_count = 1;
+    for (unsigned o = 0; o < p_scene->nObjects; o += instance_count)
     {
         scene_object_t *p_object = vgl->p_objDisplay->p_scene->objects[o];
         scene_mesh_t *p_mesh = vgl->p_objDisplay->p_scene->meshes[p_object->meshId];
         scene_material_t *p_material = vgl->p_objDisplay->p_scene->materials[p_object->textureId];
+
+        unsigned next_object_idx = o+1;
+        scene_object_t* next_object = p_object;
+
+        while(next_object_idx < p_scene->nObjects && next_object->meshId == p_object->meshId)
+        {
+            next_object = vgl->p_objDisplay->p_scene->objects[next_object_idx];
+            next_object_idx++;
+        }
+
+        // count how many instances of this mesh will be rendered at once by openGL
+        instance_count = next_object_idx - o;
+
+        vgl->vt.BindBuffer(GL_ARRAY_BUFFER, vgl->p_objDisplay->transform_buffer_object);
+        // OpenGL only allows to bind a vertex attrib but we want to bind a mat4.
+        // Fortunately we can bind the attrib 4 times with the correct offset and stride
+        // and the location will just be the next one for the next column
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
+        vgl->vt.EnableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
+        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix, 4, GL_FLOAT,
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 0) * sizeof(float)));
+        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+1, 4, GL_FLOAT,
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 4) * sizeof(float)));
+        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+2, 4, GL_FLOAT,
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 8) * sizeof(float)));
+        vgl->vt.VertexAttribPointer(prgm->aloc.ObjectTransformMatrix+3, 4, GL_FLOAT,
+                GL_FALSE, 16*sizeof(float), (void*) ((16*o + 12) * sizeof(float)));
+        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix, 1);
+        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+1, 1);
+        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+2, 1);
+        vgl->vt.VertexAttribDivisor(prgm->aloc.ObjectTransformMatrix+3, 1);
 
         float p_object_pos[3] = {
             p_object->transformMatrix[12],
@@ -2598,11 +2640,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         //vgl->vt.Uniform1fv(prgm->uloc.MatSpecular, 1, p_material->specular_color);
 
 
-        // Set the active texture id for the different sampler2D
-        vgl->vt.Uniform1i(prgm->uloc.MatDiffuseTex, 0);
-        vgl->vt.Uniform1i(prgm->uloc.MatAmbientTex, 1);
-        vgl->vt.Uniform1i(prgm->uloc.MatSpecularTex, 2);
-        vgl->vt.Uniform1i(prgm->uloc.MatNormalTex, 3);
 
         if(p_material->p_normalTex != NULL)
         {
@@ -2623,13 +2660,18 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
 
         vgl->vt.Uniform1i(prgm->uloc.UseAmbiantTexture, GL_FALSE);
 
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                                  p_object->transformMatrix);
+        //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+        //                          p_object->transformMatrix);
 
-        vgl->vt.DrawElements(GL_TRIANGLES, p_mesh->nFaces * 3, GL_UNSIGNED_INT, 0);
+        vgl->vt.DrawElementsInstanced(GL_TRIANGLES, p_mesh->nFaces * 3, GL_UNSIGNED_INT, 0, instance_count);
 
         GL_ASSERT_NOERROR();
     }
+    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix);
+    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+1);
+    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+2);
+    //vgl->vt.DisableVertexAttribArray(prgm->aloc.ObjectTransformMatrix+3);
+
 
     //vgl->vt.Disable(GL_DEPTH_TEST);
 }
@@ -2802,8 +2844,8 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
                                   prgm->var.XRotMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.ZoomMatrix, 1, GL_FALSE,
                                   prgm->var.ZoomMatrix);
-        vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
-                                  prgm->var.ObjectTransformMatrix);
+        //vgl->vt.UniformMatrix4fv(prgm->uloc.ObjectTransformMatrix, 1, GL_FALSE,
+        //                          prgm->var.ObjectTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.SceneTransformMatrix, 1, GL_FALSE,
                                   prgm->var.SceneTransformMatrix);
         vgl->vt.UniformMatrix4fv(prgm->uloc.HeadPositionMatrix, 1, GL_FALSE,

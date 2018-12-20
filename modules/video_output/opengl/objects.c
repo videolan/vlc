@@ -165,10 +165,10 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
     vt->GenBuffers(nMeshes, p_objDisplay->index_buffer_object);
     vt->GenBuffers(nMeshes, p_objDisplay->texture_buffer_object);
 
+
     for (unsigned i = 0; i < nMeshes; ++i)
     {
         scene_mesh_t *p_mesh = p_objDisplay->p_scene->meshes[i];
-
 #if 0
         for(unsigned j = 0; j < p_mesh->nVertices; ++j)
             msg_Err(p_objDisplay->gl, "%f %f %f - %f %f",
@@ -231,6 +231,24 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
         p_objDisplay->lights.k_l[i] = p_objDisplay->p_scene->lights[i]->attenuationLinear;
         p_objDisplay->lights.k_q[i] = p_objDisplay->p_scene->lights[i]->attenuationQuadratic;
     }
+
+    unsigned nObjects = p_objDisplay->p_scene->nObjects;
+
+    // TODO: check MapBufferAvailability
+    vt->GenBuffers(1, &p_objDisplay->transform_buffer_object);
+    vt->BindBuffer(GL_ARRAY_BUFFER, p_objDisplay->transform_buffer_object);
+
+    // Initialize the vertex buffer object storage and map it into memory to fill it
+    vt->BufferData(GL_ARRAY_BUFFER, 16*nObjects*sizeof(float),
+                 NULL, GL_STATIC_DRAW);
+    float *transform_buffer = vt->MapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+    for(int i=0; i<nObjects; ++i)
+    {
+        scene_object_t* p_object = p_objDisplay->p_scene->objects[i];
+        memcpy(transform_buffer + 16*i, p_object->transformMatrix, 16*sizeof(float));
+    }
+    vt->UnmapBuffer(GL_ARRAY_BUFFER);
 
     return VLC_SUCCESS;
 }
