@@ -1,6 +1,6 @@
 # libplacebo
 
-PLACEBO_VERSION := 1.7.0-rc2
+PLACEBO_VERSION := 1.7.0
 PLACEBO_ARCHIVE = libplacebo-v$(PLACEBO_VERSION).tar.gz
 PLACEBO_URL := https://code.videolan.org/videolan/libplacebo/-/archive/v$(PLACEBO_VERSION)/$(PLACEBO_ARCHIVE)
 

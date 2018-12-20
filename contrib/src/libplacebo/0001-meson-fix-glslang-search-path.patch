@@ -1,30 +1,32 @@
-From 0897b34f63ffe5532b988bc9ab2783102baca653 Mon Sep 17 00:00:00 2001
-From: Thomas Guillem <thomas@gllm.fr>
-Date: Wed, 24 Oct 2018 10:28:55 +0200
-Subject: [PATCH] meson: fix glslang search path
+From da0990bf05e3433aa21c50e6a62f33fe6649b417 Mon Sep 17 00:00:00 2001
+From: Niklas Haas <git@haasn.xyz>
+Date: Fri, 14 Dec 2018 14:16:10 +0100
+Subject: [PATCH] Work-around meson prefix bug
 
+Normally this is inferred from the environment's CFLAGS/LDFLAGS, but old
+meson versions don't do this correctly. So work-around it by explicitly
+including the prefix when searching for glslang.
 ---
- src/meson.build | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ src/meson.build | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
 diff --git a/src/meson.build b/src/meson.build
-index be1f0aa..e6db1f9 100644
+index 411ce2c..bc9214a 100644
 --- a/src/meson.build
 +++ b/src/meson.build
-@@ -42,6 +42,12 @@ build_opts = [
- ]
+@@ -48,6 +48,11 @@ glslang_combined = disabler()
+ glslang_min_ver = 2763
+ glslang_req = get_option('glslang')
  
- link_args = []
-+# Meson doesn't seem to add ${prefix/}lib and ${prefix}/include directories
-+# into link/includes search directories. This is needed by glslang (that
-+# doesn't have a .pc file).
++# fix build inside contrib dir (cf. meson issue #4597)
 +prefix_option = get_option('prefix')
 +prefix_lib = prefix_option + '/lib'
 +prefix_include = include_directories(prefix_option + '/include')
++
+ if glslang_req.auto() and shaderc.found()
  
- cc = meson.get_compiler('c')
- cxx = meson.get_compiler('cpp')
-@@ -139,12 +145,12 @@ if glslang_req.auto() and shaderc.found()
+   # we only need one or the other, and shaderc is preferred
+@@ -58,12 +63,12 @@ if glslang_req.auto() and shaderc.found()
  else
  
    glslang_deps = [
@@ -43,7 +45,7 @@ index be1f0aa..e6db1f9 100644
    ]
  
    glslang_found = true
-@@ -156,7 +162,8 @@ endif
+@@ -75,7 +80,8 @@ endif
  
  if glslang_found
    glslang_ver = cxx.get_define('GLSLANG_PATCH_LEVEL',
@@ -53,7 +55,7 @@ index be1f0aa..e6db1f9 100644
    ).to_int()
  
    if glslang_ver >= glslang_min_ver
-@@ -166,7 +173,8 @@ if glslang_found
+@@ -85,7 +91,8 @@ if glslang_found
      # -pthread) doesn't work. We actually need -lpthreads for the glslang
      # object files to link, for whatever weird reason.
      pthread = cxx.find_library('pthread', required: false)
@@ -64,5 +66,5 @@ index be1f0aa..e6db1f9 100644
      error('glslang revision @0@ too old! Must be at least @1@'
            .format(glslang_ver, glslang_min_ver))
 -- 
-2.7.4
+2.19.2
 
