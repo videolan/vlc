@@ -1487,7 +1487,7 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
-    video_format_t surface_fmt = vd->fmt;
+    video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
 
