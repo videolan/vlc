@@ -95,7 +95,7 @@ static void Close(vlc_object_t *p_this)
 }
 
 
-_json_value *getJSONValues(object_loader_t *p_loader, const char *psz_path)
+json_value *getJSONValues(object_loader_t *p_loader, const char *psz_path)
 {
     char *psz_url = vlc_path2uri(psz_path, NULL);
     stream_t *p_stream = vlc_stream_NewURL(p_loader, psz_url);
@@ -141,19 +141,19 @@ std::string getDirectoryPath(std::string path)
 }
 
 
-int getViewer(_json_value *root, float *position)
+int getViewer(json_value *root, float *position)
 {
-    _json_value viewerValue = (*root)["viewer"];
+    json_value viewerValue = (*root)["viewer"];
     if (viewerValue.type == json_none)
         return VLC_EGENERIC;
 
-    _json_value positionValue = viewerValue["position"];
+    json_value positionValue = viewerValue["position"];
     if (positionValue.type == json_none)
         return VLC_EGENERIC;
 
     for (unsigned i = 0; i < 3; ++i)
     {
-        _json_value positionCoordValue = positionValue[i];
+        json_value positionCoordValue = positionValue[i];
         if (positionCoordValue.type == json_none)
             return VLC_EGENERIC;
         const double dp = positionCoordValue;
@@ -164,52 +164,52 @@ int getViewer(_json_value *root, float *position)
 }
 
 
-int getScreenParams(_json_value *root, scene_t *p_scene)
+int getScreenParams(json_value *root, scene_t *p_scene)
 {
-    _json_value screenValue = (*root)["screen"];
+    json_value screenValue = (*root)["screen"];
     if (screenValue.type == json_none)
         return VLC_EGENERIC;
 
-    _json_value sizeValue = screenValue["size"];
+    json_value sizeValue = screenValue["size"];
     if (screenValue.type == json_none)
         return VLC_EGENERIC;
 
     const double ds = sizeValue;
     p_scene->screenSize = ds;
 
-    _json_value positionValue = screenValue["position"];
+    json_value positionValue = screenValue["position"];
     if (positionValue.type == json_none)
         return VLC_EGENERIC;
 
     for (unsigned i = 0; i < 3; ++i)
     {
-        _json_value positionCoordValue = positionValue[i];
+        json_value positionCoordValue = positionValue[i];
         if (positionCoordValue.type == json_none)
             return VLC_EGENERIC;
         const double dp = positionCoordValue;
         p_scene->screenPosition[i] = dp;
     }
 
-    _json_value normalDirValue = screenValue["normalDir"];
+    json_value normalDirValue = screenValue["normalDir"];
     if (normalDirValue.type == json_none)
         return VLC_EGENERIC;
 
     for (unsigned i = 0; i < 3; ++i)
     {
-        _json_value normalDirCoordValue = normalDirValue[i];
+        json_value normalDirCoordValue = normalDirValue[i];
         if (normalDirCoordValue.type == json_none)
             return VLC_EGENERIC;
         const double ds = normalDirCoordValue;
         p_scene->screenNormalDir[i] = ds;
     }
 
-    _json_value fitDirValue = screenValue["fitDir"];
+    json_value fitDirValue = screenValue["fitDir"];
     if (fitDirValue.type == json_none)
         return VLC_EGENERIC;
 
     for (unsigned i = 0; i < 3; ++i)
     {
-        _json_value fitDirCoordValue = fitDirValue[i];
+        json_value fitDirCoordValue = fitDirValue[i];
         if (fitDirCoordValue.type == json_none)
             return VLC_EGENERIC;
         const double ds = fitDirCoordValue;
@@ -220,32 +220,32 @@ int getScreenParams(_json_value *root, scene_t *p_scene)
 }
 
 
-int getModel(_json_value *root, std::string &modelPath, float &scale, float *rotationAngles)
+int getModel(json_value *root, std::string &modelPath, float &scale, float *rotationAngles)
 {
-    _json_value modelValue = (*root)["model"];
+    json_value modelValue = (*root)["model"];
     if (modelValue.type == json_none)
         return VLC_EGENERIC;
 
-    _json_value scaleValue = modelValue["scale"];
+    json_value scaleValue = modelValue["scale"];
     if (scaleValue.type == json_none)
         return VLC_EGENERIC;
 
     const double ds = scaleValue;
     scale = ds;
 
-    _json_value pathValue = modelValue["path"];
+    json_value pathValue = modelValue["path"];
     if (pathValue.type == json_none)
         return VLC_EGENERIC;
 
     modelPath = std::string(pathValue);
 
-    _json_value rotationAnglesValue = modelValue["rotationAngles"];
+    json_value rotationAnglesValue = modelValue["rotationAngles"];
     if (rotationAnglesValue.type == json_none)
         return VLC_EGENERIC;
 
     for (unsigned i = 0; i < 3; ++i)
     {
-        _json_value rotationAngleValue = rotationAnglesValue[i];
+        json_value rotationAngleValue = rotationAnglesValue[i];
         if (rotationAngleValue.type == json_none)
             return VLC_EGENERIC;
         const double ds = rotationAngleValue;
@@ -313,7 +313,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     object_loader_sys_t *p_sys = p_loader->p_sys;
     scene_t *p_scene = NULL;
 
-    _json_value *root = getJSONValues(p_loader, psz_path);
+    json_value *root = getJSONValues(p_loader, psz_path);
     if (unlikely(root == NULL))
     {
         msg_Err(p_loader, "Cannot get scene information");
