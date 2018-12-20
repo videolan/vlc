@@ -1,5 +1,5 @@
 # Hungarian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,13 +7,14 @@
 # Dávid Eredics, 2015
 # Gabor Kelemen <kelemeng@ubuntu.com>, 2005-2015
 # iskr <iscreamd@gmail.com>, 2013
+# Schafer Gergő <gergoschafer@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 00:45+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2018-12-20 18:26+0100\n"
+"Last-Translator: Balázs Meskó <meskobalazs@gmail.com>, 2018\n"
 "Language-Team: Hungarian (https://www.transifex.com/yaron/teams/16553/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -2721,7 +2722,7 @@ msgstr "A használandó feliratsáv folyam azonosítója."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr "Előnyben részesítendő feliratdekódoló"
+msgstr "Előnyben részesített felirat-dekódoló"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -5640,7 +5641,7 @@ msgstr "Guarani"
 
 #: src/text/iso-639_def.h:89
 msgid "Gujarati"
-msgstr "Gudzsarati"
+msgstr "Gudzsaráti"
 
 #: src/text/iso-639_def.h:90
 msgid "Hebrew"
@@ -5900,7 +5901,7 @@ msgstr "Eredeti hang"
 
 #: src/text/iso-639_def.h:155
 msgid "Raeto-Romance"
-msgstr "Retoromán"
+msgstr "Rétoromán"
 
 #: src/text/iso-639_def.h:156
 msgid "Romanian"
@@ -5944,7 +5945,7 @@ msgstr "Szlovén"
 
 #: src/text/iso-639_def.h:166
 msgid "Northern Sami"
-msgstr "Északi lapp"
+msgstr "Északi számi"
 
 #: src/text/iso-639_def.h:167
 msgid "Samoan"
@@ -7603,7 +7604,7 @@ msgstr "Folyamatos folyam"
 
 #: modules/access/http/access.c:297
 msgid "Keep reading a resource that keeps being updated."
-msgstr ""
+msgstr "Folyamatosan frissülő erőforrás folyamatos olvasása"
 
 #: modules/access/http/access.c:300
 msgid "Cookies forwarding"
@@ -8095,7 +8096,7 @@ msgstr ""
 
 #: modules/access/oss.c:76
 msgid "OSS"
-msgstr "DSS"
+msgstr "OSS"
 
 #: modules/access/oss.c:77
 msgid "OSS input"
@@ -8463,7 +8464,7 @@ msgstr "Framebuffer mélysége"
 
 #: modules/access/shm.c:48
 msgid "Pixel depth of the frame buffer, or zero for XWD file"
-msgstr "Framebuffer mélysége képpontokban, vagy 0 XWD fájlhoz"
+msgstr "Framebuffer mélysége képpontokban, vagy XWD fájl esetén nulla"
 
 #: modules/access/shm.c:50
 msgid "Frame buffer width"
@@ -8471,8 +8472,7 @@ msgstr "Framebuffer szélessége"
 
 #: modules/access/shm.c:52
 msgid "Pixel width of the frame buffer (ignored for XWD file)"
-msgstr ""
-"Framebuffer szélessége képpontokban (XWD fájlhoz nem lesz figyelembe véve)"
+msgstr "Framebuffer szélessége képpontokban (XWD fájl esetén mellőzve)"
 
 #: modules/access/shm.c:54
 msgid "Frame buffer height"
@@ -8480,8 +8480,7 @@ msgstr "Framebuffer magassága"
 
 #: modules/access/shm.c:56
 msgid "Pixel height of the frame buffer (ignored for XWD file)"
-msgstr ""
-"Framebuffer magassága képpontokban (XWD fájlhoz nem lesz figyelembe véve)"
+msgstr "Framebuffer magassága képpontokban (XWD fájl esetén mellőzve)"
 
 #: modules/access/shm.c:58
 msgid "Frame buffer segment ID"
@@ -8492,8 +8491,8 @@ msgid ""
 "System V shared memory segment ID of the frame buffer (this is ignored if --"
 "shm-file is specified)."
 msgstr ""
-"A framebuffer System V megosztottmemória-szegmensének azonosítója (a --shm-"
-"file megadásakor figyelmen kívül marad)."
+"A framebuffer System V osztott memória szegmensének azonosítója (a --shm-"
+"file megadása esetén mellőzve)."
 
 #: modules/access/shm.c:63
 msgid "Frame buffer file"
@@ -8533,7 +8532,7 @@ msgstr "Framebuffer bemenet"
 
 #: modules/access/shm.c:84
 msgid "Shared memory framebuffer"
-msgstr "Megosztottmemória-framebuffer"
+msgstr "Osztott memória framebuffer"
 
 #: modules/access/smb.c:65
 msgid "Samba (Windows network shares) input"
@@ -8562,6 +8561,9 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+"A számítógéphez (%s), amelyhez kapcsolódni próbál, hitelesítés szükséges.\n"
+"Adjon meg egy felhasználónevet (ideálisan tartománynévvel, TARTOMÁNY;"
+"felhasználónév formátumban) és egy jelszót."
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
@@ -8578,6 +8580,8 @@ msgstr "SRT szeletméret (bájtban)"
 #: modules/access/srt.c:394 modules/access_output/srt.c:444
 msgid "Return poll wait after timeout milliseconds (-1 = infinite)"
 msgstr ""
+"Visszatérés a várakozásból a megadott ezredmásodperc leteltekor (-1 = "
+"végtelen)"
 
 #: modules/access/srt.c:395 modules/access_output/srt.c:445
 msgid "SRT latency (ms)"
@@ -8597,7 +8601,7 @@ msgstr "Időkód"
 
 #: modules/access/timecode.c:43
 msgid "Time code subpicture elementary stream generator"
-msgstr "Az alkép elemi folyam-generátor időkódolása"
+msgstr "Időkód részkép elemi folyamelőállító"
 
 #: modules/access/udp.c:61
 msgid "UDP Source timeout (sec)"
@@ -8630,6 +8634,7 @@ msgstr "VBI felvevőeszköz"
 #: modules/access/v4l2/v4l2.c:48
 msgid "The device node where VBI data can be read (for closed captions)."
 msgstr ""
+"Az eszközcsomópont, ahol a VBI adatok kiolvashatóak (filmfeliratokhoz)."
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -8637,7 +8642,7 @@ msgstr "Szabványos"
 
 #: modules/access/v4l2/v4l2.c:52
 msgid "Video standard (Default, SECAM, PAL, or NTSC)."
-msgstr "Videoszabvány (automatikus, SECAM, PAL vagy NTSC)."
+msgstr "Videoszabvány (Alapértelmezett, SECAM, PAL vagy NTSC)."
 
 #: modules/access/v4l2/v4l2.c:55
 msgid ""
@@ -8646,6 +8651,10 @@ msgid ""
 "list: GREY, I240, RV16, RV15, RV24, RV32, YUY2, YUYV, UYVY, I41N, I422, "
 "I420, I411, I410, MJPG"
 msgstr ""
+"A Video4Linux2 videoeszköz adott színességformátum használatának "
+"kényszerítése (például I420 vagy I422 nyers képekhez, MJPEG az M-JPEG "
+"tömörítésű bemenethez). A teljes lista: GREY, I240, RV16, RV15, RV24, RV32, "
+"YUY2, YUYV, UYVY, I41N, I422, I420, I411, I410, MJPG"
 
 #: modules/access/v4l2/v4l2.c:61
 msgid "Input of the card to use (see debug)."
@@ -8669,7 +8678,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr "Használandó maximális képkockasebesség (0=nincs korlát)"
+msgstr "Használandó maximális képkockasebesség (0 = nincs korlát)"
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -9066,7 +9075,7 @@ msgstr "Másodlagos nyelv vagy folyam"
 
 #: modules/access/v4l2/v4l2.c:271 modules/codec/twolame.c:70
 msgid "Dual mono"
-msgstr "Dual mono"
+msgstr "Kettős mono"
 
 #: modules/access/v4l2/v4l2.c:275
 msgid "V4L"
@@ -9074,7 +9083,7 @@ msgstr "V4L"
 
 #: modules/access/v4l2/v4l2.c:276
 msgid "Video4Linux input"
-msgstr "Kép menü"
+msgstr "Video4Linux bemenet"
 
 #: modules/access/v4l2/v4l2.c:280
 msgid "Video input"
@@ -9217,11 +9226,11 @@ msgstr "VNC kliens hozzáférése"
 
 #: modules/access/wasapi.c:485
 msgid "Loopback mode"
-msgstr ""
+msgstr "Visszacsatolási mód"
 
 #: modules/access/wasapi.c:486
 msgid "Record an audio rendering endpoint."
-msgstr ""
+msgstr "Hangmegjelenítő végpont rögzítése."
 
 #: modules/access/wasapi.c:489
 msgid "WASAPI"
@@ -9410,14 +9419,17 @@ msgid ""
 "\\nkey-file. File is read on the segment opening and values are used on that "
 "segment."
 msgstr ""
+"A fájl a szegmens kezdetén kerül beolvasásra és kulcs-uri\\nkulcsfájl "
+"formátumban kell lennie. A fájl beolvasása a szegmens megnyitásakor "
+"kezdődik, és az értékek az adott szegmensen kerülnek felhasználásra."
 
 #: modules/access_output/livehttp.c:102
 msgid "Use randomized IV for encryption"
-msgstr "Véletlenszerűsített IV használata titkosításra"
+msgstr "Véletlenszerű IV használata a titkosításhoz"
 
 #: modules/access_output/livehttp.c:103
 msgid "Generate IV instead using segment-number as IV"
-msgstr "IV előállítása a szegmens számának használatakor IV-ként"
+msgstr "IV előállítása a szegmens számának IV értékként használata helyett"
 
 #: modules/access_output/livehttp.c:105
 msgid "Number of first segment"
@@ -9528,7 +9540,7 @@ msgstr "IceCAST kimenet"
 
 #: modules/access_output/srt.c:50
 msgid "Crypto key length in bytes"
-msgstr ""
+msgstr "Kriptográfiai kulcs hossza bájtban"
 
 #: modules/access_output/srt.c:57
 msgid "16 bytes"
@@ -9795,7 +9807,7 @@ msgstr "Hátsó középső"
 
 #: modules/audio_filter/channel_mixer/mono.c:99
 msgid "Stereo to mono downmixer"
-msgstr "Sztereó -> mono lekeverő"
+msgstr "Sztereó–mono lekeverő"
 
 #: modules/audio_filter/channel_mixer/remap.c:74
 msgid "Audio channel remapper"
@@ -9807,27 +9819,30 @@ msgstr "Hangszűrő az egyszerű csatornakeveréshez"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
 msgid "HRTF file for the binauralization"
-msgstr ""
+msgstr "HRTF fájl binauralizációhoz"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
 msgstr ""
+"Egyéni HRTF (Fejjel kapcsolatos átviteli függvény) fájl SOFA formátumban."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Fejhallgató mód (binaurális)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
 msgstr ""
+"Ha a kimenet sztereó, akkor ambisonics térhatású hangokat jelenít meg a "
+"binaurális dekódolóval."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
-msgstr ""
+msgstr "Ambisonics hangmegjelenítő és binauralizáló"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:77
 msgid "Binauralizer"
-msgstr ""
+msgstr "Binauralizáló"
 
 #: modules/audio_filter/channel_mixer/trivial.c:42
 msgid "Audio filter for trivial channel mixing"
@@ -9921,7 +9936,7 @@ msgstr "Támadás ideje"
 
 #: modules/audio_filter/compressor.c:159
 msgid "Set the attack time in milliseconds."
-msgstr ""
+msgstr "A támadás idejének beállítása ezredmásodpercben."
 
 #: modules/audio_filter/compressor.c:161
 msgid "Release time"
@@ -9929,7 +9944,7 @@ msgstr "Elengedési idő"
 
 #: modules/audio_filter/compressor.c:162
 msgid "Set the release time in milliseconds."
-msgstr ""
+msgstr "Az elengedés idejének beállítása ezredmásodpercben."
 
 #: modules/audio_filter/compressor.c:164
 msgid "Threshold level"
@@ -10282,7 +10297,7 @@ msgstr "Sinc függvény (gyors)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Zero Order Hold (fastest)"
-msgstr "Nulla nagyságrendű tárolás (leggyorsabb)"
+msgstr "Nulladrendű tárolás (leggyorsabb)"
 
 #: modules/audio_filter/resampler/src.c:50
 msgid "Linear (fastest)"
@@ -10302,11 +10317,11 @@ msgstr "Legközelebbi szomszéd hang-újramintavételező"
 
 #: modules/audio_filter/scaletempo.c:52
 msgid "Pitch Shifter"
-msgstr ""
+msgstr "Hangmagasság eltoló"
 
 #: modules/audio_filter/scaletempo.c:53
 msgid "Audio pitch changer"
-msgstr ""
+msgstr "Hangmagasság módosító"
 
 #: modules/audio_filter/scaletempo.c:55
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:263
@@ -10344,11 +10359,11 @@ msgstr "A legjobb átfedési pozíció keresésének hossza ezredmásodpercben"
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch Shift"
-msgstr ""
+msgstr "Hangmagasság eltolás"
 
 #: modules/audio_filter/scaletempo.c:74
 msgid "Pitch shift in semitones."
-msgstr ""
+msgstr "Hangmagasság eltolás félhangokban."
 
 #: modules/audio_filter/spatializer/spatializer.cpp:54
 msgid "Room size"
@@ -10634,7 +10649,7 @@ msgstr "Kimeneti fájl"
 
 #: modules/audio_output/file.c:109
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr ""
+msgstr "A fájl, amelybe a hangminták kerülnek („-” a szabványos kimenethez)."
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10667,7 +10682,7 @@ msgstr ""
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
-msgstr "Jack kliens neve"
+msgstr "JACK kliens neve"
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
@@ -10706,6 +10721,8 @@ msgid ""
 "Change this value if you have issue with HD codecs when using a HDMI "
 "receiver."
 msgstr ""
+"Módosítsa ezt az értéket, ha problémát tapasztal a HD kodekekkel HDMI vevő "
+"használata esetén."
 
 #: modules/audio_output/mmdevice.c:1460
 msgid "Disabled"
@@ -10855,11 +10872,11 @@ msgstr "AUMIDI"
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
-msgstr ""
+msgstr "Rubi (furigana) mellőzése"
 
 #: modules/codec/arib/aribsub.c:47
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr ""
+msgstr "Rubi (furigana) mellőzése a feliratban."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
@@ -12042,7 +12059,7 @@ msgstr "Feliratok (speciális)"
 
 #: modules/codec/libass.c:61
 msgid "Subtitle renderers using libass"
-msgstr "Libass-t használó feliratmegjelenítők"
+msgstr "Libasst használó feliratmegjelenítők"
 
 #: modules/codec/libass.c:249
 #: modules/text_renderer/freetype/fonts/fontconfig.c:78
@@ -12054,7 +12071,7 @@ msgid ""
 "Please wait while your font cache is rebuilt.\n"
 "This should take less than a minute."
 msgstr ""
-"Kis türelmet a betűkészlet-gyorsítótár újjáépítéséig.\n"
+"Várjon a betűkészlet-gyorsítótár újjáépítéséig.\n"
 "Ez nem tarthat tovább egy percnél."
 
 #: modules/codec/libmpeg2.c:137
@@ -16004,6 +16021,8 @@ msgid ""
 "Selects mode for digital TV standard. This feature affects EPG information "
 "and subtitles."
 msgstr ""
+"Kiválasztja a digitális TV szabvány módját. Ez a funkció az EPG "
+"információkat és a feliratokat érinti."
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
@@ -19753,7 +19772,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
 msgid "Adjust pitch"
-msgstr ""
+msgstr "Hangmagasság módosítása"
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -23050,11 +23069,11 @@ msgstr "Keresztény gengszterrap"
 
 #: modules/meta_engine/ID3Genres.h:170
 msgid "Heavy Metal"
-msgstr "Heavy metal"
+msgstr "Heavy metál"
 
 #: modules/meta_engine/ID3Genres.h:171
 msgid "Black Metal"
-msgstr "Black metal"
+msgstr "Black metál"
 
 #: modules/meta_engine/ID3Genres.h:172
 msgid "Crossover"
@@ -23078,7 +23097,7 @@ msgstr "Salsa"
 
 #: modules/meta_engine/ID3Genres.h:177
 msgid "Thrash Metal"
-msgstr "Thrash metal"
+msgstr "Thrash metál"
 
 #: modules/meta_engine/ID3Genres.h:178
 msgid "Anime"
@@ -23192,6 +23211,9 @@ msgid ""
 "previous visit and was not authenticated by any trusted Certificate "
 "Authority."
 msgstr ""
+"Azonban a kiszolgáló által bemutatott biztonsági tanúsítvány megváltozott a "
+"legutóbbi látogatás óta, és egyetlen megbízható hitelesítésszolgáltató sem "
+"hitelesítette."
 
 #: modules/misc/gnutls.c:502 modules/misc/gnutls.c:523
 #: modules/misc/securetransport.c:346
@@ -23216,6 +23238,11 @@ msgid ""
 "\n"
 "If in doubt, abort now.\n"
 msgstr ""
+"Ezt próbálta elérni: %s. %s\n"
+"Ez a probléma egy behatolási kísérletből, a magánszférájának megsértéséből, "
+"vagy egy konfigurációs hibából eredhet.\n"
+"\n"
+"Ha nem biztos benne, szakítsa meg most.\n"
 
 #: modules/misc/gnutls.c:523
 msgid "Accept 24 hours"
@@ -23240,23 +23267,27 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "A rendszer tanúsítvány-adatbázisának használata"
 
 #: modules/misc/gnutls.c:758
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "operating system trust database to authenticate TLS sessions."
 msgstr ""
+"A rendszer tanúsítvány-adatbázisban lévő hitelesítésszolgáltatók "
+"gyökértanúsítványainak használata a TLS munkamenetek hitelesítéséhez."
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Tanúsítvány könyvtár"
 
 #: modules/misc/gnutls.c:763
 msgid ""
 "Trust the root certificates of Certificate Authorities stored in the "
 "specified directory to authenticate TLS sessions."
 msgstr ""
+"A megadott könyvtárban lévő hitelesítésszolgáltatók gyökértanúsítványainak "
+"használata a TLS munkamenetek hitelesítéséhez."
 
 #: modules/misc/gnutls.c:766
 msgid "TLS cipher priorities"
@@ -23289,7 +23320,7 @@ msgstr "Exportálás (nem biztonságos rejtjelezők is)"
 
 #: modules/misc/gnutls.c:787
 msgid "GNU TLS transport layer security"
-msgstr "GNU TLS szállítási réteg biztonsága"
+msgstr "GNU TLS titkosítás"
 
 #: modules/misc/gnutls.c:801
 msgid "GNU TLS server"
@@ -23526,7 +23557,7 @@ msgstr "MP4/MOV egyesítő"
 
 #: modules/mux/mp4/mp4.c:77
 msgid "Fragmented and streamable MP4 muxer"
-msgstr ""
+msgstr "Töredezett és adatfolyamként továbbítható MP4 egyesítő"
 
 #: modules/mux/mpeg/ps.c:48 modules/mux/mpeg/ts.c:162
 msgid "DTS delay (ms)"
@@ -23854,9 +23885,8 @@ msgid "avparser packetizer"
 msgstr "avparser daraboló"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala videodaraboló"
+msgstr "AV1 videodaraboló"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -25193,6 +25223,7 @@ msgstr "Átalakítási minőség"
 #: modules/stream_out/chromecast/cast.cpp:222
 msgid "Change this option to increase conversion speed or quality."
 msgstr ""
+"Módosítsa ezt a beállítást az átalakítási sebesség vagy minőség növeléséhez."
 
 #: modules/stream_out/chromecast/cast.cpp:225
 msgid "IP Address of the Chromecast."
@@ -26008,13 +26039,15 @@ msgstr ""
 
 #: modules/stream_out/transcode/transcode.c:130
 msgid "Picture pool size"
-msgstr ""
+msgstr "Képtároló mérete"
 
 #: modules/stream_out/transcode/transcode.c:131
 msgid ""
 "Defines how many pictures we allow to be in pool between decoder/encoder "
 "threads when threads > 0"
 msgstr ""
+"Megadja, hogy kép lehet a dekódoló/kódoló szálak közti tárolóban, ha a "
+"szálak száma több mint 0."
 
 #: modules/stream_out/transcode/transcode.c:146
 msgid "Transcode"
@@ -26138,7 +26171,7 @@ msgstr "Szövegirány"
 
 #: modules/text_renderer/freetype/freetype.c:119
 msgid "Paragraph base direction for the Unicode bi-directional algorithm."
-msgstr ""
+msgstr "A bekezdés alapvető iránya a kétirányú Unicode algoritmusban."
 
 #: modules/text_renderer/freetype/freetype.c:125
 msgid "Use YUVP renderer"
@@ -26211,11 +26244,11 @@ msgstr "Átalakítások erről: "
 
 #: modules/video_chroma/i420_10_p010.c:131
 msgid "YUV 10-bits planar to semiplanar 10-bits conversions"
-msgstr ""
+msgstr "YUV 10 bites planárisról 10 bites félplanárisra alakítások"
 
 #: modules/video_chroma/i420_nv12.c:237
 msgid "YUV planar to semiplanar conversions"
-msgstr ""
+msgstr "YUV planárisról félplanárisra alakítások"
 
 #: modules/video_chroma/i420_rgb.c:79
 msgid "SSE2 I420,IYUV,YV12 to RV15,RV16,RV24,RV32 conversions"
@@ -26629,7 +26662,7 @@ msgstr "Vászon videoszűrő"
 
 #: modules/video_filter/ci_filters.m:755
 msgid "Use a specific Core Image Filter"
-msgstr ""
+msgstr "A megadott Core Image Filter használata"
 
 #: modules/video_filter/ci_filters.m:757
 msgid ""
@@ -27626,7 +27659,7 @@ msgstr "Active Format Descriptor sor"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
-msgstr ""
+msgstr "A VBI sor, amelyre az Active Format Descriptor lesz kiírva."
 
 #: modules/video_output/decklink.cpp:81
 msgid "Picture to display on input signal loss"
@@ -29189,7 +29222,7 @@ msgstr "Hálózati protokoll"
 
 #: modules/gui/qt/ui/open_net.h:98
 msgid "Please enter a network URL:"
-msgstr "Adjon meg hálózati URL-címet:"
+msgstr "Adjon meg egy hálózati URL-t:"
 
 #: modules/gui/qt/ui/profiles.h:701
 msgid "Profile edition"
