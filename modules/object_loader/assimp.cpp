@@ -431,7 +431,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
 
                 aiTexture *tex = myAiScene->mTextures[i_textureId];
 
-                p_material->p_baseColorTex = scene_material_LoadTextureFromData(p_loader, (char *)tex->pcData, tex->mWidth);
+                p_material->p_baseColorTex = scene_material_LoadTextureFromData(p_loader, (char *)tex->pcData, tex->mWidth*tex->mHeight);
                 if (p_material->p_baseColorTex == NULL)
                     msg_Warn(p_loader, "Could not load the base color texture from embedded data");
             }
