@@ -517,3 +517,20 @@ vout_LTLIBRARIES += \
 	libwdummy_plugin.la \
 	libvgl_plugin.la \
 	libyuv_plugin.la
+
+### HMD devices ###
+
+libopenhmd_plugin_la_SOURCES = video_output/hmd/openhmd.c
+libopenhmd_plugin_la_LIBADD = $(OPENHMD_LIBS) -lm
+if !HAVE_WIN32
+if !HAVE_DARWIN
+libopenhmd_plugin_la_LIBADD += -lusb-1.0
+endif
+endif
+if HAVE_WIN32
+libopenhmd_plugin_la_CFLAGS = -DOHMD_STATIC
+libopenhmd_plugin_la_LIBADD += -lsetupapi
+endif
+libopenhmd_plugin_la_LDFLAGS = $(AM_LDFLAGS) -rpath '$(voutdir)'
+EXTRA_LTLIBRARIES += libopenhmd_plugin.la
+vout_LTLIBRARIES += $(LTLIBopenhmd)
