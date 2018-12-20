@@ -215,7 +215,7 @@ static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
             / subpic->i_original_picture_height,
     };
     VdpColor color = { 1.f, 1.f, 1.f,
-        reg->i_alpha * subpic->i_alpha / 65535.f };
+        reg->i_alpha * subpic->i_alpha / 65025.f };
     VdpOutputSurfaceRenderBlendState state = {
         .struct_version = VDP_OUTPUT_SURFACE_RENDER_BLEND_STATE_VERSION,
         .blend_factor_source_color =
