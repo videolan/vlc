@@ -1184,6 +1184,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(Disable);
     GET_PROC_ADDR_CORE(DrawArrays);
     GET_PROC_ADDR_CORE(DrawElements);
+    GET_PROC_ADDR_CORE(DrawElementsInstanced);
     GET_PROC_ADDR_CORE(Enable);
     GET_PROC_ADDR_CORE(Finish);
     GET_PROC_ADDR_CORE(Flush);
@@ -1216,6 +1217,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR(GetUniformLocation);
     GET_PROC_ADDR(GetAttribLocation);
     GET_PROC_ADDR(VertexAttribPointer);
+    GET_PROC_ADDR(VertexAttribDivisor);
     GET_PROC_ADDR(EnableVertexAttribArray);
     GET_PROC_ADDR(UniformMatrix4fv);
     GET_PROC_ADDR(UniformMatrix3fv);
@@ -1259,6 +1261,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
 
     GET_PROC_ADDR_OPTIONAL(BufferSubData);
     GET_PROC_ADDR_OPTIONAL(BufferStorage);
+    GET_PROC_ADDR_OPTIONAL(MapBuffer);
     GET_PROC_ADDR_OPTIONAL(MapBufferRange);
     GET_PROC_ADDR_OPTIONAL(FlushMappedBufferRange);
     GET_PROC_ADDR_OPTIONAL(UnmapBuffer);
