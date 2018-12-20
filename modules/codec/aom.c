@@ -423,6 +423,7 @@ static int OpenEncoder(vlc_object_t *p_this)
     enccfg.g_threads = __MIN(vlc_GetCPUCount(), 4);
     enccfg.g_w = p_enc->fmt_in.video.i_visible_width;
     enccfg.g_h = p_enc->fmt_in.video.i_visible_height;
+    enccfg.g_lag_in_frames = 16; /* we have no pcr on sout */
 
     int enc_flags;
     int i_profile = var_InheritInteger( p_enc, SOUT_CFG_PREFIX "profile" );
