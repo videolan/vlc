@@ -800,21 +800,22 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "   vec3 light_pos_world= Lights.Position[i];\n"
 
         "   vec3 light_to_object = Position_world - light_pos_world;\n"
+        "   vec3 light_dir = normalize(light_to_object);\n"
+        "   vec3 spot_dir = normalize(Lights.Direction[i]);\n"
+        "   float light_spot_dot = dot(light_dir, spot_dir);\n"
+
+        //"   if ( light_spot_dot < 0.7071) { continue; }\n"
+
         "   float distance = length(light_to_object);\n"
-        "   float attenuation = Lights.Kc[i]\n"
-        "    + Lights.Kl[i] * distance\n"
-        "    + Lights.Kq[i] * distance * distance;\n"
+        "   float attenuation = Lights.Kq[i] * distance * distance;\n"
 
         "   vec3 light_dir = light_to_object / distance;\n"
         "   vec3 light_diffuse = Lights.Diffuse[i];\n"
 
-        "   vec3 spot_dir = normalize(Lights.Direction[i]);\n"
-
         "   vec3 light_contribution = \n"
-        "    + ambient * (Lights.Ambient[i]) / attenuation\n"
-        "    + clamp(dot(-light_dir, normal_world), 0, 1) * light_diffuse*diffuse / attenuation ;\n"
+        "     max(0, dot(-light_dir, normal_world)) * light_diffuse * diffuse / attenuation ;\n"
 
-        "   result.xyz += clamp(dot(spot_dir, light_dir), 0, 1) * light_contribution; \n"
+        "   result.xyz += light_spot_dot * light_contribution/2; \n"
         "  }\n"
         " }\n"
         " gl_FragColor = result;\n"
