@@ -450,6 +450,13 @@ typedef struct addon_entry_t addon_entry_t;
 /* Update */
 typedef struct update_t update_t;
 
+/* HMD devices */
+typedef struct vlc_hmd_cfg_t vlc_hmd_cfg_t;
+typedef struct vlc_hmd_driver_t vlc_hmd_driver_t;
+typedef struct vlc_hmd_device_t vlc_hmd_device_t;
+typedef struct vlc_hmd_interface_t vlc_hmd_interface_t;
+typedef struct vlc_hmd_interface_cbs_t vlc_hmd_interface_cbs_t;
+
 /**
  * VLC value structure
  */
