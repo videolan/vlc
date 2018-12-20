@@ -62,6 +62,7 @@ extern "C" char **environ;
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <vlc_hmd.h>
 
 #ifdef QT_STATIC /* For static builds */
  #include <QtPlugin>
@@ -240,6 +241,9 @@ vlc_module_begin ()
     set_callbacks( OpenIntf, Close )
 
     add_shortcut("qt")
+
+    add_bool( "hmd", false, "Enable HMD",
+              "Enable HMD in the interface", false )
 
     add_bool( "qt-minimal-view", false, QT_MINIMAL_MODE_TEXT,
               QT_MINIMAL_MODE_TEXT, false );
@@ -717,5 +721,53 @@ static int WindowOpen( vout_window_t *p_wnd )
 
     MainInterface *p_mi = p_intf->p_sys->p_mi;
 
-    return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+    if( !var_InheritBool( p_intf, "hmd" ) )
+        return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+
+    // TODO: move this code to the intf
+
+    // early exit if we already have a HMD device loaded
+    if (var_GetAddress(THEPL, "hmd-device-data"))
+    {
+        msg_Info( p_intf, "HMD device already loaded, reusing it" );
+        return VLC_EGENERIC;
+    }
+
+    msg_Info( p_intf, "trying to load an HMD device" );
+
+    /* We are in the HMD mode, we first have to find a HMD device, otherwise we
+     * can display an error and fallback to normal rendering */
+    vlc_hmd_device_t *device = vlc_hmd_FindDevice( VLC_OBJECT( p_intf ),
+                                                   "any", NULL );
+
+    if( device == NULL )
+    {
+        msg_Err( p_intf, "cannot find any HMD device" );
+        return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+    }
+
+    var_SetAddress(THEPL, "hmd-device-data", device);
+
+    /* Do not handle HMD display in the Qt interface but create a new vout
+     * fullscreen on its surface */
+
+    //switch( p_intf->p_sys->voutWindowType )
+    //{
+    //        /* TODO: create window according to voutWindowType */
+    //    case VOUT_WINDOW_TYPE_XID:
+    //    case VOUT_WINDOW_TYPE_HWND:
+    //    case VOUT_WINDOW_TYPE_WAYLAND:
+    //    case VOUT_WINDOW_TYPE_NSOBJECT:
+    //    case VOUT_WINDOW_TYPE_INVALID:
+    //    default:
+    //        vlc_object_release( device );
+    //        return p_mi->getVideo( p_wnd ) ? VLC_SUCCESS : VLC_EGENERIC;
+    //}
+
+    // TODO: how to get input/cfg? input can be NULL
+    //vout_thread_t *vout = vout_Request( p_intf, &cfg, NULL );
+    //vout_window_t *window = vout_display_NewWindow();
+
+    // fallback to HMD-capable video output
+    return VLC_EGENERIC;
 }
