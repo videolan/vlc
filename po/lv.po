@@ -1,8 +1,9 @@
 # Latvian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
+# Andrejs Pavars <andrejs.pavars@gmail.com>, 2017
 # Anita Reitere <nitalynx@gmail.com>, 2015
 # Arnis Lupiks, 2014
 # Baiba Bērziņa <baibabeerzinnaa@gmail.com>, 2015
@@ -14,10 +15,10 @@
 # Rūdolfs Mazurs <rudolfs.mazurs@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-28 10:39+0200\n"
+"PO-Revision-Date: 2018-12-20 08:34+0100\n"
 "Last-Translator: Ingmārs Dīriņš <melhiors14@gmail.com>, 2018\n"
 "Language-Team: Latvian (https://www.transifex.com/yaron/teams/16553/lv/)\n"
 "Language: lv\n"
@@ -610,7 +611,7 @@ msgid ""
 "can <b>promote</b> VLC media player.</p></body></html>"
 msgstr ""
 "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; "
-"charset=utf-8\" /></head><body><h2>Laipni lūgti VLC mediju atskaņotāja "
+"charset=utf-8\" /></head><body><h2>Laipni lūdzam VLC mediju atskaņotāja "
 "palīdzībā</h2><h3>Dokumentācija</h3><p>Jūs varat atrast dokumentāciju "
 "VideoLAN <a href=\"http://wiki.videolan.org\">viki</a> Tīmekļa vietnē.</"
 "p><p>Ja jūs esat jaunpienācējs VLC mediju atskaņotājā, lūdzu, izlasiet<br><a "
@@ -8662,7 +8663,7 @@ msgstr "Audio režīms"
 
 #: modules/access/v4l2/v4l2.c:80
 msgid "Tuner audio mono/stereo and track selection."
-msgstr "Uztvērēja audio mono/stereo un celiņa atlase."
+msgstr "Uztvērēja audio mono/stereo un celiņu atlase."
 
 #: modules/access/v4l2/v4l2.c:82
 msgid "Reset controls"
@@ -16466,7 +16467,7 @@ msgstr "Atskaņošanas sarakstu sintaktiskie analizatori"
 #: modules/gui/qt/dialogs/plugins.cpp:385
 #: modules/gui/qt/managers/addons_manager.cpp:90
 msgid "Service Discovery"
-msgstr "Pakalpojuma atklāšana"
+msgstr "Pakalpojumu atklāšana"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:109
 #: modules/gui/qt/dialogs/plugins.cpp:389
@@ -17126,8 +17127,8 @@ msgid ""
 "menu."
 msgstr ""
 "Numurs ekrānam, kuru lietot pēc noklusējuma, lai attēlotu video iekš "
-"'pilnekrāna'. Ekrāna numuru saskaņotība var tikt atrasta iekš video ierīces "
-"atlases izvēlnes."
+"'pilnekrāna'. Ekrāna numuru saskaņotība var tikt atrasta video ierīču "
+"atlases izvēlnē."
 
 #: modules/gui/macosx/macosx.m:56
 msgid "Opaqueness"
@@ -19469,7 +19470,7 @@ msgstr "Pārslēgt video ārā no pilnekrāna"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Show extended settings"
-msgstr "Rādīt paplašinātus iestatījumus"
+msgstr "Rādīt paplašinātos iestatījumus"
 
 #: modules/gui/qt/components/controller.hpp:120
 msgid "Toggle playlist"
@@ -21281,7 +21282,7 @@ msgstr "&Efekti un filtri"
 
 #: modules/gui/qt/menus.cpp:418
 msgid "&Track Synchronization"
-msgstr "&Celiņa sinhronizācija"
+msgstr "&Celiņu sinhronizācija"
 
 #: modules/gui/qt/menus.cpp:437
 msgid "Plu&gins and extensions"
@@ -23802,9 +23803,8 @@ msgid "avparser packetizer"
 msgstr "avparser paketizētājs"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala video paketizētājs"
+msgstr "AV1 video paketizētājs"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24183,7 +24183,7 @@ msgstr "Attēlojamā joslu grafika augstums pikseļos."
 
 #: modules/spu/audiobargraph_v.c:79 modules/spu/audiobargraph_v.c:98
 msgid "Audio Bar Graph Video sub source"
-msgstr "Audio joslas diagrammas video apakš avots"
+msgstr "Audio joslas diagrammas video apakšavots"
 
 #: modules/spu/audiobargraph_v.c:80
 msgid "Audio Bar Graph Video"
@@ -24281,7 +24281,7 @@ msgstr "Lietot lokālo bildi kā logo uz video"
 
 #: modules/spu/logo.c:93
 msgid "Logo sub source"
-msgstr "Logo apakš avots"
+msgstr "Logo apakšavots"
 
 #: modules/spu/logo.c:94
 msgid "Logo overlay"
@@ -24580,7 +24580,7 @@ msgstr "nobīde"
 
 #: modules/spu/mosaic.c:176
 msgid "Mosaic video sub source"
-msgstr "Mozaīkas video apakšējais avots"
+msgstr "Mozaīkas video apakšavots"
 
 #: modules/spu/mosaic.c:177
 msgid "Mosaic"
@@ -29049,7 +29049,7 @@ msgstr "Izvēlieties tveršanas ierīces tipu"
 
 #: modules/gui/qt/ui/open_capture.h:101
 msgid "Device Selection"
-msgstr "Ierīces izvēle"
+msgstr "Ierīču atlase"
 
 #: modules/gui/qt/ui/open_capture.h:102
 msgid "Options"
@@ -29065,7 +29065,7 @@ msgstr "Paplašinātas opcijas..."
 
 #: modules/gui/qt/ui/open_disk.h:297
 msgid "Disc Selection"
-msgstr "Disku atlasīšana"
+msgstr "Disku atlase"
 
 #: modules/gui/qt/ui/open_disk.h:301
 msgid "SVCD/VCD"
@@ -29105,7 +29105,7 @@ msgstr "Izvēlieties vienu vai vairākas mediju datnes, kuras atvērt"
 
 #: modules/gui/qt/ui/open_file.h:152
 msgid "File Selection"
-msgstr "Datnes atlase"
+msgstr "Datņu atlase"
 
 #: modules/gui/qt/ui/open_file.h:153
 msgid "You can select local files with the following list and buttons."
@@ -29369,7 +29369,7 @@ msgstr "Kodeki"
 
 #: modules/gui/qt/ui/sprefs_input.h:358
 msgid "x264 profile and level selection"
-msgstr "x264 profila un līmeņa atlase"
+msgstr "x264 profilu un līmeņu atlase"
 
 #: modules/gui/qt/ui/sprefs_input.h:359
 msgid "Hardware-accelerated decoding"
