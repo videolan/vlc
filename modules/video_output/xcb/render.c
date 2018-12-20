@@ -24,6 +24,7 @@
 # include <config.h>
 #endif
 
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
@@ -49,16 +50,21 @@ struct vout_display_sys_t {
         xcb_pixmap_t source;
         xcb_pixmap_t crop;
         xcb_pixmap_t scale;
+        xcb_pixmap_t subpic;
+        xcb_pixmap_t alpha;
         xcb_window_t dest;
     } drawable;
     struct {
         xcb_render_picture_t source;
         xcb_render_picture_t crop;
         xcb_render_picture_t scale;
+        xcb_render_picture_t subpic;
+        xcb_render_picture_t alpha;
         xcb_render_picture_t dest;
     } picture;
     struct {
         xcb_render_pictformat_t argb;
+        xcb_render_pictformat_t alpha;
     } format;
 
     xcb_gcontext_t gc;
@@ -69,6 +75,7 @@ struct vout_display_sys_t {
     vout_display_place_t place;
     int32_t src_x;
     int32_t src_y;
+    vlc_fourcc_t spu_chromas[2];
 };
 
 static size_t PictureAttach(vout_display_t *vd, picture_t *pic)
@@ -101,6 +108,76 @@ static void PictureDetach(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     xcb_shm_detach(sys->conn, sys->segment);
+}
+
+static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
+                         const subpicture_region_t *reg)
+{
+    vout_display_sys_t *sys = vd->sys;
+    xcb_connection_t *conn = sys->conn;
+    const vout_display_place_t *place = &sys->place;
+    picture_t *pic = reg->p_picture;
+    unsigned sw = reg->fmt.i_width;
+    unsigned sh = reg->fmt.i_height;
+    xcb_rectangle_t rects[] = { { 0, 0, sw, sh }, };
+
+    xcb_create_pixmap(conn, 32, sys->drawable.subpic, sys->root, sw, sh);
+    xcb_create_pixmap(conn, 8, sys->drawable.alpha, sys->root, sw, sh);
+    xcb_render_create_picture(conn, sys->picture.subpic, sys->drawable.subpic,
+                              sys->format.argb, 0, NULL);
+    xcb_render_create_picture(conn, sys->picture.alpha, sys->drawable.alpha,
+                              sys->format.alpha, 0, NULL);
+
+    /* Upload region (TODO: use FD passing for SPU?) */
+    xcb_put_image(conn, XCB_IMAGE_FORMAT_Z_PIXMAP, sys->drawable.subpic,
+                  sys->gc, pic->p->i_pitch / pic->p->i_pixel_pitch,
+                  pic->p->i_lines, 0, 0, 0, 32,
+                  pic->p->i_pitch * pic->p->i_lines, pic->p->p_pixels);
+
+    /* Copy alpha channel */
+    xcb_render_composite(conn, XCB_RENDER_PICT_OP_SRC,
+                         sys->picture.subpic, XCB_RENDER_PICTURE_NONE,
+                         sys->picture.alpha, 0, 0, 0, 0, 0, 0, sw, sh);
+
+    /* Force alpha channel to maximum (add 100% and clip).
+     * This is to compensate RENDER expecting pre-multiplied RGB
+     * while VLC uses straight RGB.
+     */
+    static const xcb_render_color_t alpha_one_color = { 0, 0, 0, 0xffff };
+
+    xcb_render_fill_rectangles(conn, XCB_RENDER_PICT_OP_ADD,
+                               sys->picture.subpic, alpha_one_color,
+                               ARRAY_SIZE(rects), rects);
+
+    /* Multiply by region and subpicture alpha factors */
+    static const float alpha_fixed = 0xffffp0f / (0xffp0f * 0xffp0f);
+    xcb_render_color_t alpha_color = {
+        0, 0, 0, lroundf(reg->i_alpha * subpic->i_alpha * alpha_fixed) };
+
+    xcb_render_fill_rectangles(conn, XCB_RENDER_PICT_OP_IN_REVERSE,
+                               sys->picture.subpic, alpha_color,
+                               ARRAY_SIZE(rects), rects);
+
+    /* Mask in the original alpha channel then renver over the scaled pixmap.
+     * Mask (pre)multiplies RGB channels and restores the alpha channel.
+     */
+    int_fast16_t dx = reg->i_x * place->width
+                      / subpic->i_original_picture_width;
+    int_fast16_t dy = reg->i_y * place->height
+                      / subpic->i_original_picture_height;
+    uint_fast16_t dw = (reg->i_x + reg->fmt.i_visible_width) * place->width
+                       / subpic->i_original_picture_width;
+    uint_fast16_t dh = (reg->i_y + reg->fmt.i_visible_height) * place->height
+                       / subpic->i_original_picture_height;
+
+    xcb_render_composite(conn, XCB_RENDER_PICT_OP_OVER,
+                         sys->picture.subpic, sys->picture.alpha,
+                         sys->picture.scale, 0, 0, 0, 0, dx, dy, dw, dh);
+
+    xcb_render_free_picture(conn, sys->picture.alpha);
+    xcb_render_free_picture(conn, sys->picture.subpic);
+    xcb_free_pixmap(conn, sys->drawable.alpha);
+    xcb_free_pixmap(conn, sys->drawable.subpic);
 }
 
 static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
@@ -150,8 +227,15 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                          sys->place.width, sys->place.height);
     if (offset != (size_t)-1)
         PictureDetach(vd);
+
+    /* Blend subpictures */
+    if (subpic != NULL)
+        for (subpicture_region_t *r = subpic->p_region; r != NULL;
+             r = r->p_next)
+            RenderRegion(vd, subpic, r);
+
     xcb_flush(conn);
-    (void) subpic; (void) date;
+    (void) date;
 }
 
 static void Display(vout_display_t *vd, picture_t *pic)
@@ -486,6 +570,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->conn = conn;
     sys->root = screen->root;
     sys->format.argb = 0;
+    sys->format.alpha = 0;
 
     if (!CheckRender(vd, conn))
         goto error;
@@ -505,6 +590,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     for (unsigned i = 0; i < pic_fmt_r->num_formats; i++) {
         const xcb_render_pictforminfo_t *const pic_fmt = pic_fmts + i;
         const xcb_render_directformat_t *const d = &pic_fmt->direct;
+
+        if (pic_fmt->depth == 8 && pic_fmt->direct.alpha_mask == 0xff) {
+            /* Alpha mask format */
+            sys->format.alpha = pic_fmt->id;
+            continue;
+        }
 
         xcb_visualid_t vid = FindVisual(setup, screen, pic_fmt_r, pic_fmt->id);
         if (vid == 0)
@@ -528,7 +619,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     free(pic_fmt_r);
 
-    if (unlikely(sys->format.argb == 0))
+    if (unlikely(sys->format.argb == 0 || sys->format.alpha == 0))
         goto error; /* Buggy server */
 
     msg_Dbg(obj, "using RENDER picture format %u", sys->format.argb);
@@ -545,10 +636,14 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->drawable.source = xcb_generate_id(conn);
     sys->drawable.crop = xcb_generate_id(conn);
     sys->drawable.scale = xcb_generate_id(conn);
+    sys->drawable.subpic = xcb_generate_id(conn);
+    sys->drawable.alpha = xcb_generate_id(conn);
     sys->drawable.dest = xcb_generate_id(conn);
     sys->picture.source = xcb_generate_id(conn);
     sys->picture.crop = xcb_generate_id(conn);
     sys->picture.scale = xcb_generate_id(conn);
+    sys->picture.subpic = xcb_generate_id(conn);
+    sys->picture.alpha = xcb_generate_id(conn);
     sys->picture.dest = xcb_generate_id(conn);
     sys->gc = xcb_generate_id(conn);
 
@@ -589,6 +684,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     CreateBuffers(vd, cfg);
     xcb_map_window(conn, sys->drawable.dest);
 
+    sys->spu_chromas[0] = fmtp->i_chroma;
+    sys->spu_chromas[1] = 0;
+
+    vd->info.subpicture_chromas = sys->spu_chromas;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;

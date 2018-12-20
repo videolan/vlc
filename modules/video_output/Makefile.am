@@ -197,7 +197,7 @@ libxcb_render_plugin_la_SOURCES = \
 libxcb_render_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_RENDER_CFLAGS)
 libxcb_render_plugin_la_LIBADD = libvlc_xcb_events.la \
-	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_RENDER_LIBS)
+	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_RENDER_LIBS) $(LIBM)
 
 libxcb_xv_plugin_la_SOURCES = \
 	video_output/xcb/pictures.c video_output/xcb/pictures.h \
