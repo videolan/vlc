@@ -133,7 +133,7 @@ static void Prepare(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                          0, 0, fmt->i_visible_width, fmt->i_visible_height);
 
     /* Blank background */
-    static const xcb_render_color_t black_color = { 0, 0, 0, 0 };
+    static const xcb_render_color_t black_color = { 0, 0, 0, 0xffff };
     xcb_rectangle_t rects[] = {
         { 0, 0, vd->cfg->display.width, vd->cfg->display.height },
     };
