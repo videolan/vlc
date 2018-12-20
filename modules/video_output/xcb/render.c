@@ -57,11 +57,13 @@ struct vout_display_sys_t {
         xcb_render_picture_t scale;
         xcb_render_picture_t dest;
     } picture;
+    struct {
+        xcb_render_pictformat_t argb;
+    } format;
 
     xcb_gcontext_t gc;
     xcb_shm_seg_t segment;
     xcb_window_t root;
-    xcb_render_pictformat_t fmt_id;
     char *filter;
 
     vout_display_place_t place;
@@ -191,9 +193,9 @@ static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
     xcb_create_pixmap(conn, 32, sys->drawable.scale, sys->root,
                       cfg->display.width, cfg->display.height);
     xcb_render_create_picture(conn, sys->picture.crop, sys->drawable.crop,
-                             sys->fmt_id, 0, NULL);
-    xcb_render_create_picture(conn, sys->picture.scale,
-                              sys->drawable.scale, sys->fmt_id, 0, NULL);
+                              sys->format.argb, 0, NULL);
+    xcb_render_create_picture(conn, sys->picture.scale, sys->drawable.scale,
+                              sys->format.argb, 0, NULL);
 
     vout_display_place_t *place = &sys->place;
     vout_display_PlacePicture(place, fmt, cfg);
@@ -483,7 +485,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->conn = conn;
     sys->root = screen->root;
-    sys->fmt_id = 0;
+    sys->format.argb = 0;
 
     if (!CheckRender(vd, conn))
         goto error;
@@ -498,13 +500,13 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     const xcb_setup_t *setup = xcb_get_setup(conn);
     const xcb_render_pictforminfo_t *const pic_fmts =
         xcb_render_query_pict_formats_formats(pic_fmt_r);
-    xcb_visualid_t vid = 0;
+    xcb_visualid_t visual = 0;
 
     for (unsigned i = 0; i < pic_fmt_r->num_formats; i++) {
         const xcb_render_pictforminfo_t *const pic_fmt = pic_fmts + i;
         const xcb_render_directformat_t *const d = &pic_fmt->direct;
 
-        vid = FindVisual(setup, screen, pic_fmt_r, pic_fmt->id);
+        xcb_visualid_t vid = FindVisual(setup, screen, pic_fmt_r, pic_fmt->id);
         if (vid == 0)
             continue;
 
@@ -512,24 +514,25 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (pic_fmt->depth != 32)
             continue;
 
-        fmtp->i_chroma = ParseFormat(setup, pic_fmt);
-        if (fmtp->i_chroma == 0)
+        vlc_fourcc_t chroma = ParseFormat(setup, pic_fmt);
+        if (chroma == 0)
             continue;
 
+        fmtp->i_chroma = chroma;
         fmtp->i_rmask = ((uint32_t)d->red_mask) << d->red_shift;
         fmtp->i_gmask = ((uint32_t)d->green_mask) << d->green_shift;
         fmtp->i_bmask = ((uint32_t)d->blue_mask) << d->blue_shift;
-        sys->fmt_id = pic_fmt->id;
-        break;
+        sys->format.argb = pic_fmt->id;
+        visual = vid;
     }
 
     free(pic_fmt_r);
 
-    if (sys->fmt_id == 0)
-        goto error;
+    if (unlikely(sys->format.argb == 0))
+        goto error; /* Buggy server */
 
-    msg_Dbg(obj, "using RENDER picture format %u", sys->fmt_id);
-    msg_Dbg(obj, "using X11 visual 0x%"PRIx32, vid);
+    msg_Dbg(obj, "using RENDER picture format %u", sys->format.argb);
+    msg_Dbg(obj, "using X11 visual 0x%"PRIx32, visual);
 
     char *filter = var_InheritString(obj, "x11-render-filter");
     if (filter != NULL) {
@@ -572,17 +575,17 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     };
 
     xcb_create_colormap(conn, XCB_COLORMAP_ALLOC_NONE, cmap, screen->root,
-                        vid);
+                        visual);
     xcb_create_pixmap(conn, 32, sys->drawable.source, screen->root,
                       vd->source.i_width, vd->source.i_height);
     xcb_create_gc(conn, sys->gc, sys->drawable.source, 0, NULL);
     xcb_create_window(conn, 32, sys->drawable.dest, cfg->window->handle.xid,
                       0, 0, cfg->display.width, cfg->display.height, 0,
-                      XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, cw_mask, cw_list);
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, visual, cw_mask, cw_list);
     xcb_render_create_picture(conn, sys->picture.source, sys->drawable.source,
-                              sys->fmt_id, 0, NULL);
+                              sys->format.argb, 0, NULL);
     xcb_render_create_picture(conn, sys->picture.dest, sys->drawable.dest,
-                              sys->fmt_id, 0, NULL);
+                              sys->format.argb, 0, NULL);
     CreateBuffers(vd, cfg);
     xcb_map_window(conn, sys->drawable.dest);
 
