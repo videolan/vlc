@@ -39,6 +39,7 @@
 #include <vlc_modules.h>
 #include <vlc_vout.h>
 #include <vlc_viewpoint.h>
+#include <vlc_hmd.h>
 
 #include "vout_helper.h"
 #include "internal.h"
@@ -160,6 +161,11 @@ struct vout_display_opengl_t {
 
     /* Non-power-of-2 texture size support */
     bool supports_npot;
+
+    /* HMD device */
+    vlc_hmd_interface_t *hmd;
+    vlc_mutex_t hmd_lock;
+    bool close_hmd;
 
     /* View point */
     float f_teta;
@@ -964,6 +970,8 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
         *subpicture_chromas = gl_subpicture_chromas;
     }
 
+    vlc_mutex_init(&vgl->hmd_lock);
+
     GL_ASSERT_NOERROR();
     return vgl;
 }
@@ -1003,6 +1011,10 @@ void vout_display_opengl_Delete(vout_display_opengl_t *vgl)
     }
     free(vgl->region);
     GL_ASSERT_NOERROR();
+
+    if (vgl->hmd)
+        vlc_hmd_UnmapDevice(vgl->hmd);
+    vlc_mutex_destroy(&vgl->hmd_lock);
 
     free(vgl);
 }
@@ -1647,6 +1659,23 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
 {
     GL_ASSERT_NOERROR();
 
+    vlc_mutex_lock (&vgl->hmd_lock);
+    if (vgl->hmd)
+        vlc_hmd_ReadEvents(vgl->hmd);
+
+    if (vgl->close_hmd)
+    {
+        vlc_hmd_UnmapDevice(vgl->hmd);
+        vgl->hmd = NULL;
+    }
+
+    if (vgl->hmd)
+    {
+        vlc_viewpoint_t vp = vlc_hmd_ReadViewpoint(vgl->hmd);
+        vout_display_opengl_SetViewpoint(vgl, &vp);
+    }
+    vlc_mutex_unlock (&vgl->hmd_lock);
+
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
@@ -1785,3 +1814,31 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
     return VLC_SUCCESS;
 }
 
+static void HmdStateChanged(vlc_hmd_interface_t *hmd,
+                            vlc_hmd_state_e state,
+                            void *userdata)
+{
+
+}
+
+static const struct vlc_hmd_interface_cbs_t vout_hmd_cbs =
+{
+    .state_changed = HmdStateChanged
+};
+
+void vout_display_opengl_UpdateHMD(vout_display_opengl_t *vgl,
+                                   vlc_hmd_device_t *device)
+{
+    vlc_mutex_lock(&vgl->hmd_lock);
+    if (vgl->hmd)
+        vlc_hmd_UnmapDevice(vgl->hmd);
+
+    if (device)
+    {
+        msg_Info(vgl->gl, "Enabling HMD mode");
+        vgl->hmd = vlc_hmd_MapDevice(device, &vout_hmd_cbs, NULL);
+    }
+    else
+        msg_Info(vgl->gl, "Disabling HMD mode");
+        vlc_mutex_unlock(&vgl->hmd_lock);
+    }
