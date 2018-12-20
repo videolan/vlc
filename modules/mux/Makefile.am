@@ -1,5 +1,8 @@
 muxdir = $(pluginsdir)/mux
 
+extradata_builder_SOURCES = mux/extradata.c mux/extradata.h \
+                            packetizer/av1_obu.c
+
 libmux_dummy_plugin_la_SOURCES = mux/dummy.c
 
 libmux_asf_plugin_la_SOURCES = mux/asf.c demux/asf/libasf_guid.h
