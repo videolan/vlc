@@ -251,7 +251,7 @@ int loadBufferObjects(gl_scene_objects_display_t *p_objDisplay)
 
     assert(transform_buffer != NULL);
 
-    for(int i=0; i<nObjects; ++i)
+    for (unsigned i = 0; i < nObjects; ++i)
     {
         scene_object_t* p_object = p_objDisplay->p_scene->objects[i];
         memcpy(transform_buffer + 16*i, p_object->transformMatrix, 16*sizeof(float));
