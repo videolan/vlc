@@ -149,6 +149,8 @@ void scene_mesh_Release(scene_mesh_t *p_mesh)
 {
     free(p_mesh->faces);
     free(p_mesh->tCoords);
+    free(p_mesh->tanCoords);
+    free(p_mesh->nCoords);
     free(p_mesh->vCoords);
     free(p_mesh);
 }
