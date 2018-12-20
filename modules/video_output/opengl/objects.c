@@ -24,10 +24,12 @@ gl_scene_objects_display_t *loadSceneObjects(vlc_gl_t *gl, const opengl_tex_conv
         goto error;
     }
 
-    char psz_path[1024];
-    strncpy(psz_path, config_GetDataDir(), sizeof(psz_path));
-    strncat(psz_path, DIR_SEP "VirtualTheater" DIR_SEP "virtualCinemaTargo.json",
-            sizeof(psz_path));
+    char *psz_path = config_GetSysPath(VLC_PKG_DATA_DIR, "VirtualTheater" DIR_SEP "virtualCinemaTargo.json");
+    if (unlikely(psz_path == NULL))
+    {
+        msg_Err(p_objDisplay->gl, "Could not load get the 3d scene path");
+        goto error;
+    }
 
     scene_t *p_scene = p_objDisplay->p_scene = objLoader_loadScene(p_objLoader, psz_path);
 
