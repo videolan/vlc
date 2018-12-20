@@ -474,6 +474,9 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* Create a variable for showing the main interface */
     var_Create( p_playlist, "intf-show", VLC_VAR_VOID );
+
+    /* Create a variable for holding the shared HMD device */
+    var_Create( p_playlist, "hmd-device-data", VLC_VAR_ADDRESS );
 }
 
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
