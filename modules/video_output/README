@@ -4,14 +4,14 @@ Video output display plugins
 Priority rules
 ---------------
 
-The priorities ranges are as follows since December 2014:
+The priorities ranges are as follows since December 2018:
 
  - less than  20: console (text)
  - less than  50: plain frame buffers
  - less than 100: no embedded windowing
  - less than 150: SW scaling
- - less than 200: SW chroma conversion
- - less than 250: SW subpicture blending
+ - less than 200: SW subpicture blending
+ - less than 250: SW chroma conversion
  - rest: good stuff :-)
 
 No more than one plugin with a given non-zero riority.

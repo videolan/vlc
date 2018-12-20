@@ -115,7 +115,7 @@ vlc_module_begin()
     add_string("directx-device", "", DEVICE_TEXT, DEVICE_LONGTEXT, true)
         change_string_cb(FindDevicesCallback)
 
-    set_capability("vout display", 230)
+    set_capability("vout display", 180)
     add_shortcut("directx", "directdraw")
     set_callbacks(Open, Close)
 vlc_module_end()

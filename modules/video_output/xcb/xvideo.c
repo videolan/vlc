@@ -64,7 +64,7 @@ vlc_module_begin ()
     set_description (N_("XVideo output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 200)
+    set_capability ("vout display", 150)
     set_callbacks (Open, Close)
 
     add_integer ("xvideo-adaptor", -1,
