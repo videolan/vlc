@@ -44,6 +44,7 @@
 #include "libmp4mux.h"
 #include "../packetizer/hxxx_nal.h"
 #include "../av1_pack.h"
+#include "../extradata.h"
 
 /*****************************************************************************
  * Module descriptor
@@ -130,6 +131,8 @@ typedef struct
     mp4mux_trackinfo_t *tinfo;
     const es_format_t *p_fmt;
 
+    mux_extradata_builder_t *extrabuilder;
+
     /* index */
     vlc_tick_t   i_length_neg;
 
@@ -177,6 +180,9 @@ typedef struct
 
 static void mp4_stream_Delete(mp4_stream_t *p_stream)
 {
+    if(p_stream->extrabuilder)
+        mux_extradata_builder_Delete(p_stream->extrabuilder);
+
     /* mp4 frag */
     if (p_stream->p_held_entry)
     {
@@ -520,6 +526,7 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_ENOMEM;
     }
 
+    p_stream->extrabuilder = mux_extradata_builder_New(p_input->p_fmt->i_codec);
     p_stream->p_fmt = p_input->p_fmt;
 
     p_input->p_sys          = p_stream;
@@ -601,6 +608,17 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
     block_t *p_block = block_FifoGet(p_input->p_fifo);
     if(unlikely(!p_block))
         return NULL;
+
+    /* Create on the fly extradata as packetizer is not in the loop */
+    if(p_stream->extrabuilder && !mp4mux_track_HasSamplePriv(p_stream->tinfo))
+    {
+         mux_extradata_builder_Feed(p_stream->extrabuilder,
+                                    p_block->p_buffer, p_block->i_buffer);
+         const uint8_t *p_extra;
+         size_t i_extra = mux_extradata_builder_Get(p_stream->extrabuilder, &p_extra);
+         if(i_extra)
+            mp4mux_track_SetSamplePriv(p_stream->tinfo, p_extra, i_extra);
+    }
 
     switch(p_stream->p_fmt->i_codec)
     {

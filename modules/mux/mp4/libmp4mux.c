@@ -2255,15 +2255,7 @@ bool mp4mux_CanMux(vlc_object_t *p_obj, const es_format_t *p_fmt,
     case VLC_CODEC_YUYV:
     case VLC_CODEC_VC1:
     case VLC_CODEC_WMAP:
-        break;
     case VLC_CODEC_AV1:
-        /* Extradata is an AVC1DecoderConfigurationRecord */
-        if(p_fmt->i_extra < 4 || ((uint8_t *)p_fmt->p_extra)[0] != 0x81)
-        {
-            if(p_obj)
-                msg_Err(p_obj, "Can't mux AV1 without extradata");
-            return false;
-        }
         break;
     case VLC_CODEC_H264:
         if(!p_fmt->i_extra && p_obj)
