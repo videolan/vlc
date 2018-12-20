@@ -31,6 +31,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
+#include <vlc_hmd.h>
 #include "vout_helper.h"
 
 /* Plugin callbacks */
@@ -83,6 +84,10 @@ static void PictureRender (vout_display_t *, picture_t *, subpicture_t *, vlc_ti
 static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
 
+static int OnHmdDeviceStateChanged(vlc_object_t *, char const*,
+                                   vlc_value_t olval, vlc_value_t new_val,
+                                   void *userdata);
+
 /**
  * Allocates a surface and an OpenGL context for video output.
  */
@@ -92,6 +97,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vout_display_sys_t *sys = malloc (sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
+
+    //var_Create (vd, "hmd-device-data", VLC_VAR_ADDRESS | VLC_VAR_DOINHERIT);
+    vlc_object_t *playlist = vd->obj.parent->obj.parent; // TODO: HACK, UGLY XXX
+    var_AddCallback (playlist, "hmd-device-data", OnHmdDeviceStateChanged, NULL);
 
     sys->gl = NULL;
     sys->pool = NULL;
@@ -152,6 +161,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
+
+    vlc_hmd_device_t *hmd_device = var_GetAddress (playlist, "hmd-device-data");
+    if (hmd_device)
+        vout_display_opengl_UpdateHMD (sys->vgl, hmd_device);
+
     return VLC_SUCCESS;
 
 error:
@@ -274,4 +288,21 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         msg_Err (vd, "Unknown request %d", query);
     }
     return VLC_EGENERIC;
+}
+
+static int OnHmdDeviceStateChanged(vlc_object_t *p_this, char const *name,
+                                   vlc_value_t old_val, vlc_value_t new_val,
+                                   void *userdata)
+{
+    /* We only bind to hmd-device-data so these variable are not used */
+    (void) name; (void) userdata;
+
+    vout_display_t *vd = p_this;
+    vout_display_sys_t *sys = vd->sys;
+
+    msg_Err(vd, "Updating HMD status from display");
+
+    vout_display_opengl_UpdateHMD (sys->vgl, new_val.p_address);
+
+    return VLC_SUCCESS;
 }
