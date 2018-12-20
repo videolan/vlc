@@ -326,7 +326,8 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     int ret = getModel(root, modelPath, scale, rotationAngles);
     if (ret != VLC_SUCCESS)
     {
-        msg_Err(p_loader, "Could not het the model information");
+        msg_Err(p_loader, "Could not get the model information");
+        json_value_free(root);
         return NULL;
     }
 
@@ -344,6 +345,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     if (!myAiScene)
     {
         msg_Err(p_loader, "%s", p_sys->importer.GetErrorString());
+        json_value_free(root);
         return NULL;
     }
 
@@ -513,7 +515,10 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     p_scene = scene_New(objects.size(), meshes.size(), materials.size(),
                         lights.size());
     if (unlikely(p_scene == NULL))
+    {
+        json_value_free(root);
         return NULL;
+    }
 
     std::copy(objects.begin(), objects.end(), p_scene->objects);
     std::copy(meshes.begin(), meshes.end(), p_scene->meshes);
@@ -526,6 +531,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     {
         msg_Err(p_loader, "Could not het the viewer information");
         scene_Release(p_scene);
+        json_value_free(root);
         return NULL;
     }
 
@@ -537,11 +543,13 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     {
         msg_Err(p_loader, "Could not get the virtual screen information");
         scene_Release(p_scene);
+        json_value_free(root);
         return NULL;
     }
 
     msg_Dbg(p_loader, "3D scene loaded with %d object(s), %d mesh(es) and %d texture(s)",
             p_scene->nObjects, p_scene->nMeshes, p_scene->nMaterials);
 
+    json_value_free(root);
     return p_scene;
 }
