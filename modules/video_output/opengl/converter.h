@@ -72,6 +72,7 @@ typedef void (APIENTRY *PFNGLBLENDFUNCPROC) (GLenum sfactor, GLenum dfactor);
 typedef void (APIENTRY *PFNGLBUFFERSTORAGEPROC) (GLenum target, GLsizeiptr size, const void *data, GLbitfield flags);
 typedef void (APIENTRY *PFNGLCLEARCOLORPROC) (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 typedef void (APIENTRY *PFNGLCLEARPROC) (GLbitfield mask);
+typedef void (APIENTRY *PFNGLCULLFACEPROC)(void);
 typedef void (APIENTRY *PFNGLDELETETEXTURESPROC) (GLsizei n, const GLuint *textures);
 typedef void (APIENTRY *PFNGLDEPTHMASKPROC) (GLboolean flag);
 typedef void (APIENTRY *PFNGLDISABLEPROC) (GLenum cap);
@@ -170,6 +171,7 @@ typedef struct {
     PFNGLBLENDFUNCPROC      BlendFunc;
     PFNGLCLEARCOLORPROC     ClearColor;
     PFNGLCLEARPROC          Clear;
+    PFNGLCULLFACEPROC       CullFace;
     PFNGLDELETETEXTURESPROC DeleteTextures;
     PFNGLDEPTHMASKPROC      DepthMask;
     PFNGLDISABLEPROC        Disable;

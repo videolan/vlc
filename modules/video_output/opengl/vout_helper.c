@@ -1178,6 +1178,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(BlendFunc);
     GET_PROC_ADDR_CORE(Clear);
     GET_PROC_ADDR_CORE(ClearColor);
+    GET_PROC_ADDR_CORE(CullFace);
     GET_PROC_ADDR_CORE(DeleteTextures);
     GET_PROC_ADDR_CORE(DepthMask);
     GET_PROC_ADDR_CORE(Disable);
