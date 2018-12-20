@@ -84,6 +84,8 @@ gl_scene_objects_display_t *loadSceneObjects(vlc_gl_t *gl, const opengl_tex_conv
     return p_objDisplay;
 
 error:
+    if (p_objDisplay)
+        objLoader_release(p_objLoader);
     free(p_objDisplay->texturesRoughness);
     free(p_objDisplay->texturesNormal);
     free(p_objDisplay->texturesMetalness);
