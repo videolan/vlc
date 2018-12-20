@@ -104,7 +104,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;
-    } else if (!sys->decoder_pool) {
+    } else {
         sys->decoder_pool =
             picture_pool_NewFromFormat(&vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
