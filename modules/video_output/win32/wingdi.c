@@ -107,7 +107,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     /* */
     vd->info.has_double_click     = true;
-    vd->info.has_pictures_invalid = true;
 
     vd->pool    = Pool;
     vd->prepare = NULL;
