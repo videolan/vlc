@@ -375,49 +375,75 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
         for (unsigned k = 0; k < i_nbProperties; ++k)
             msg_Dbg(p_loader, "Property name: %s", myAiMaterial->mProperties[k]->mKey.C_Str());
 
+        scene_material_t *p_material = scene_material_New();
+        if (p_material == NULL)
+            continue;
+
         unsigned i_nbTextures = myAiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
         if (i_nbTextures > 0)
         {
-            for (unsigned j = 0; j < i_nbTextures; ++j)
+            aiString path;
+            myAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path, NULL, NULL, NULL, NULL, NULL);
+
+            unsigned pathLen = strlen(path.C_Str()) + 1024;
+            char psz_path[pathLen];
+            #define TEXTURE_DIR "VirtualTheater" DIR_SEP "Textures" DIR_SEP
+            strcpy(psz_path, TEXTURE_DIR);
+            strcat(psz_path, path.C_Str() + strlen("..\\..\\sourceimages\\"));
+
+            char psz_baseTexPath[pathLen];
+            const char *basePathEnd = strrchr(psz_path, '_');
+            if (basePathEnd != NULL)
             {
-                aiString path;
-                myAiMaterial->GetTexture(aiTextureType_DIFFUSE, j, &path, NULL, NULL, NULL, NULL, NULL);
+                strcpy(psz_baseTexPath, psz_path);
+                psz_baseTexPath[basePathEnd - psz_path] = '\0';
+            }
 
-                char psz_path[1024];
-                #define TEXTURE_DIR "VirtualTheater" DIR_SEP "Textures" DIR_SEP
-                strcpy(psz_path, TEXTURE_DIR);
-                strcpy(psz_path + strlen(TEXTURE_DIR), path.C_Str() + strlen("..\\..\\sourceimages\\"));
+            char psz_baseColorTexPath[pathLen];
+            if (basePathEnd != NULL)
+            {
+                strcpy(psz_baseColorTexPath, psz_baseTexPath);
+                strcat(psz_baseColorTexPath, "_BaseColor.png");
+            }
+            else
+                strcpy(psz_baseColorTexPath, psz_path);
 
-                scene_material_t *p_material = scene_material_New();
-                if (p_material == NULL)
-                    continue;
-                p_material->material_type = MATERIAL_TYPE_TEXTURE;
+            msg_Dbg(p_loader, "Base color texture path: %s", psz_baseColorTexPath);
+            p_material->p_baseColorTex = scene_material_LoadTexture(p_loader, psz_baseColorTexPath);
+            if (p_material->p_baseColorTex == NULL)
+                msg_Warn(p_loader, "Could not load the base color texture");
 
-                int loaded = scene_material_LoadTexture(p_loader, p_material, psz_path);
-                if (loaded != VLC_SUCCESS)
-                {
-                    msg_Warn(p_loader, "Could not load the texture at path %s", psz_path);
-                    continue;
-                }
+            if (basePathEnd != NULL)
+            {
+                char psz_metalnessTexPath[pathLen];
+                strcpy(psz_metalnessTexPath, psz_baseTexPath); strcat(psz_metalnessTexPath, "_Metalness.png");
+                msg_Dbg(p_loader, "Metalness texture path: %s", psz_metalnessTexPath);
+                p_material->p_metalnessTex = scene_material_LoadTexture(p_loader, psz_metalnessTexPath);
+                if (p_material->p_metalnessTex == NULL)
+                    msg_Warn(p_loader, "Could not load the metalness texture");
 
-                materials.push_back(p_material);
-                aiTextureMap[i] = materials.size() - 1;
+                char psz_normalTexPath[pathLen];
+                strcpy(psz_normalTexPath, psz_baseTexPath); strcat(psz_normalTexPath, "_Normal.png");
+                msg_Dbg(p_loader, "Normal texture path: %s", psz_normalTexPath);
+                p_material->p_normalTex = scene_material_LoadTexture(p_loader, psz_normalTexPath);
+                if (p_material->p_normalTex == NULL)
+                    msg_Warn(p_loader, "Could not load the normal texture");
+
+                char psz_roughnessTexPath[pathLen];
+                strcpy(psz_roughnessTexPath, psz_baseTexPath); strcat(psz_roughnessTexPath, "_Roughness.png");
+                msg_Dbg(p_loader, "Roughness texture path: %s", psz_roughnessTexPath);
+                p_material->p_roughnessTex = scene_material_LoadTexture(p_loader, psz_roughnessTexPath);
+                if (p_material->p_roughnessTex == NULL)
+                    msg_Warn(p_loader, "Could not load the roughness texture");
             }
         }
-        else
-        {
-            scene_material_t *p_material = scene_material_New();
-            if (p_material == NULL)
-                continue;
-            p_material->material_type = MATERIAL_TYPE_DIFFUSE_COLOR;
 
-            aiColor3DToArray(diffuseColor, p_material->diffuse_color);
-            aiColor3DToArray(emissiveColor, p_material->emissive_color);
-            aiColor3DToArray(ambientColor, p_material->ambient_color);
+        aiColor3DToArray(diffuseColor, p_material->diffuse_color);
+        aiColor3DToArray(emissiveColor, p_material->emissive_color);
+        aiColor3DToArray(ambientColor, p_material->ambient_color);
 
-            materials.push_back(p_material);
-            aiTextureMap[i] = materials.size() - 1;
-        }
+        materials.push_back(p_material);
+        aiTextureMap[i] = materials.size() - 1;
     }
 
     // Objects
