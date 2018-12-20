@@ -1,5 +1,5 @@
 # Ukrainian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -8,11 +8,11 @@
 # Андрій Бандура <andriykopanytsia@gmail.com>, 2013-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:34+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2018-12-20 06:22+0100\n"
+"Last-Translator: Андрій Бандура <andriykopanytsia@gmail.com>, 2018\n"
 "Language-Team: Ukrainian (https://www.transifex.com/yaron/teams/16553/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -23828,9 +23828,8 @@ msgid "avparser packetizer"
 msgstr "пакетувальник avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Відеопакетувальник Daala"
+msgstr "Відеопакетувальник AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
