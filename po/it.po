@@ -1,5 +1,5 @@
 # Italian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -44,10 +44,10 @@
 # Vincenzo Reale <smart2128@baslug.org>, 2014-2018
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-18 05:26+0200\n"
+"PO-Revision-Date: 2018-12-20 06:38+0100\n"
 "Last-Translator: Vincenzo Reale <smart2128@baslug.org>, 2018\n"
 "Language-Team: Italian (https://www.transifex.com/yaron/teams/16553/it/)\n"
 "Language: it\n"
@@ -1190,7 +1190,7 @@ msgstr "ITU-R BT.601 (625 righe, 50 Hz)"
 
 #: src/input/es_out.c:3222
 msgid "Color primaries"
-msgstr ""
+msgstr "Colori primari"
 
 #: src/input/es_out.c:3229 src/libvlc-module.c:362
 #: modules/video_filter/deinterlace/deinterlace.h:58
@@ -17810,7 +17810,7 @@ msgstr "Salta a"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "Render"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
@@ -22378,7 +22378,7 @@ msgstr ""
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group"
-msgstr ""
+msgstr "Gruppo di accesso del portachiavi"
 
 #: modules/keystore/keychain.m:63
 msgid "Keychain access group as defined by the app entitlements."
@@ -23410,7 +23410,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:756
 msgid "Use system trust database"
-msgstr ""
+msgstr "Utilizza il database di fiducia di sistema"
 
 #: modules/misc/gnutls.c:758
 msgid ""
@@ -23420,7 +23420,7 @@ msgstr ""
 
 #: modules/misc/gnutls.c:761
 msgid "Trust directory"
-msgstr ""
+msgstr "Cartella di fiducia"
 
 #: modules/misc/gnutls.c:763
 msgid ""
@@ -24024,9 +24024,8 @@ msgid "avparser packetizer"
 msgstr "Incapsulamento avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Incapsulamento video Daala"
+msgstr "Pacchettizatore video AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
