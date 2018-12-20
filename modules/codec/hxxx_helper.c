@@ -32,6 +32,9 @@
 #include "../packetizer/hxxx_nal.h"
 #include "../packetizer/h264_slice.h"
 
+#define hxxx_helper_Debug(s, ...) \
+    { if(hh->p_obj) msg_Dbg(hh->p_obj, s __VA_OPT__(,) __VA_ARGS__); }
+
 void
 hxxx_helper_init(struct hxxx_helper *hh, vlc_object_t *p_obj,
                  vlc_fourcc_t i_codec, bool b_need_xvcC)
@@ -213,7 +216,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                      h264_decode_sps,
                      h264_release_sps);
             hh->h264.i_current_sps = ((h264_sequence_parameter_set_t*)p_xps)->i_id;
-            msg_Dbg(hh->p_obj, "new SPS parsed: %u", hh->h264.i_current_sps);
+            hxxx_helper_Debug("new SPS parsed: %u", hh->h264.i_current_sps);
         }
         else if (i_nal_type == H264_NAL_PPS)
         {
@@ -222,7 +225,7 @@ h264_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                      h264_picture_parameter_set_t,
                      h264_decode_pps,
                      h264_release_pps);
-            msg_Dbg(hh->p_obj, "new PPS parsed: %u", ((h264_picture_parameter_set_t*)p_xps)->i_id);
+            hxxx_helper_Debug("new PPS parsed: %u", ((h264_picture_parameter_set_t*)p_xps)->i_id);
         }
         else if (i_nal_type <= H264_NAL_SLICE_IDR
               && i_nal_type != H264_NAL_UNKNOWN)
@@ -307,7 +310,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                      hevc_video_parameter_set_t,
                      hevc_decode_vps,
                      hevc_rbsp_release_vps);
-            msg_Dbg(hh->p_obj, "new VPS parsed: %u", i_id);
+            hxxx_helper_Debug("new VPS parsed: %u", i_id);
         }
         else if (i_nal_type == HEVC_NAL_SPS)
         {
@@ -319,7 +322,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                      hevc_sequence_parameter_set_t,
                      hevc_decode_sps,
                      hevc_rbsp_release_sps);
-            msg_Dbg(hh->p_obj, "new SPS parsed: %u", i_id);
+            hxxx_helper_Debug("new SPS parsed: %u", i_id);
         }
         else if (i_nal_type == HEVC_NAL_PPS)
         {
@@ -331,7 +334,7 @@ hevc_helper_parse_nal(struct hxxx_helper *hh, const uint8_t *p_buf, size_t i_buf
                      hevc_picture_parameter_set_t,
                      hevc_decode_pps,
                      hevc_rbsp_release_pps);
-            msg_Dbg(hh->p_obj, "new PPS parsed: %u", i_id);
+            hxxx_helper_Debug("new PPS parsed: %u", i_id);
         }
         else if (i_nal_type <= HEVC_NAL_IRAP_VCL23)
         {
@@ -436,7 +439,7 @@ h264_helper_set_extra(struct hxxx_helper *hh, const void *p_extra,
          * -Thomas */
         if (!hh->b_need_xvcC && hh->i_nal_length_size != 4)
         {
-            msg_Dbg(hh->p_obj, "nal_length_size is too small");
+            hxxx_helper_Debug("nal_length_size is too small");
             return VLC_EGENERIC;
         }
 
