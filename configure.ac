@@ -3646,6 +3646,11 @@ AS_IF([test "${enable_jack}" != "no"], [
 AM_CONDITIONAL([HAVE_JACK], [test "${have_jack}" != "no"])
 
 dnl
+dnl  OpenHMD
+dnl
+PKG_ENABLE_MODULES_VLC([OPENHMD], [], [openhmd], [OpenHMD head mounted display handler], [auto])
+
+dnl
 dnl  OpenSLES Android
 dnl
 AC_ARG_ENABLE([opensles],
