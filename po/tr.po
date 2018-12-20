@@ -1,5 +1,5 @@
 # Turkish translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -17,11 +17,11 @@
 # Yaşar TAY <yasartay@yahoo.com>, 2009
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:33+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2018-12-20 09:32+0100\n"
+"Last-Translator: Kaya Zeren <kayazeren@gmail.com>, 2018\n"
 "Language-Team: Turkish (https://www.transifex.com/yaron/teams/16553/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -507,11 +507,11 @@ msgstr "Klasör Oluşturun..."
 
 #: include/vlc_intf_strings.h:70
 msgid "Rename Directory..."
-msgstr "Klasörü Yeniden Adlandırın..."
+msgstr "Klasörü Yeniden Adlandır..."
 
 #: include/vlc_intf_strings.h:71
 msgid "Rename Folder..."
-msgstr "Klasörü Yeniden Adlandırın..."
+msgstr "Klasörü Yeniden Adlandır..."
 
 #: include/vlc_intf_strings.h:72
 msgid "Show Containing Directory..."
@@ -3813,7 +3813,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/firstrun.cpp:95
 #: modules/gui/qt/ui/sprefs_interface.h:565
 msgid "Allow metadata network access"
-msgstr "Üstveriye ağ üzerinden erişilebilsin"
+msgstr "Üst veriye ağ üzerinden erişilebilsin"
 
 #: src/libvlc-module.c:1131
 msgid "Collapse"
@@ -4935,7 +4935,7 @@ msgstr "Socks vekil sunucusu"
 
 #: src/libvlc-module.c:1836 modules/demux/xiph_metadata.h:55
 msgid "Metadata"
-msgstr "Üstveriler"
+msgstr "Üst veri"
 
 #: src/libvlc-module.c:1937
 msgid "Decoders"
@@ -17148,7 +17148,7 @@ msgstr "SDP dışa aktarma işlemi istenmiş ancak İnternet adresi belirtilmemi
 #: modules/gui/macosx/VLCSimplePrefsController.m:1252
 #: modules/gui/qt/components/simple_preferences.cpp:685
 msgid "Custom"
-msgstr "İsteğe Uyarlanmış"
+msgstr "İsteğe Göre Uyarlanmış"
 
 #: modules/gui/macosx/VLCCoreDialogProvider.m:195
 msgid "Remember"
@@ -17926,11 +17926,11 @@ msgstr "Ayrılmak istediğiniz podcast aboneliğini seçin:"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Check for album art and metadata?"
-msgstr "Albüm ve üstveri denetimi yapılsın"
+msgstr "Albüm ve üst veri denetimi yapılsın"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "Enable Metadata Retrieval"
-msgstr "Üstveriler Alınsın"
+msgstr "Üst Veri Alınsın"
 
 #: modules/gui/macosx/VLCMainWindow.m:252
 msgid "No, Thanks"
@@ -18072,7 +18072,7 @@ msgstr ""
 
 #: modules/gui/macosx/VLCOpenWindowController.m:158
 msgid "Custom playback"
-msgstr "İsteğe uyarlanmış oynatım"
+msgstr "İsteğe göre uyarlanmış oynatım"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:166
 msgid "Open VIDEO_TS / BDMV folder"
@@ -18316,7 +18316,7 @@ msgstr "Konum"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:65
 msgid "Save Metadata"
-msgstr "Üstveriler Kaydedilsin"
+msgstr "Üst Veriyi Kaydet"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:67
 #: modules/visualization/visual/visual.c:122
@@ -18367,16 +18367,16 @@ msgstr "Kayıp ara bellekler"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:339
 msgid "Error while saving meta"
-msgstr "Üstveri kaydedilirken hata"
+msgstr "Üst veri kaydedilirken sorun çıktı"
 
 #: modules/gui/macosx/VLCPlaylistInfo.m:340
 msgid "VLC was unable to save the meta data."
-msgstr "VLC üstveriyi kaydedemedi."
+msgstr "VLC üst veriyi kaydedemedi."
 
 #: modules/gui/macosx/VLCResumeDialogController.m:48 modules/gui/qt/qt.cpp:194
 #: modules/gui/qt/ui/sprefs_interface.h:554
 msgid "Continue playback?"
-msgstr "Oynatmaya devam edin"
+msgstr "Oynatmaya devam edilsin mi?"
 
 #: modules/gui/macosx/VLCResumeDialogController.m:49
 #: modules/gui/macosx/VLCSimplePrefsController.m:822
@@ -18541,7 +18541,7 @@ msgstr "Açık"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:317
 msgid "Continue playback"
-msgstr "Oynatmaya devam edin"
+msgstr "Oynatmaya devam edilsin"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:323
 msgid "Playback behaviour"
@@ -19216,7 +19216,7 @@ msgstr " i                      Bilgi Kutusunu Görüntüler/Gizler"
 
 #: modules/gui/ncurses.c:863
 msgid " M                      Show/Hide metadata box"
-msgstr " M                      Üstveri kutusunu Görüntüler/Gizler"
+msgstr " M                      Üst Veri kutusunu Görüntüler/Gizler"
 
 #: modules/gui/ncurses.c:864
 msgid " L                      Show/Hide messages box"
@@ -19814,7 +19814,7 @@ msgstr "&Parmak izi"
 
 #: modules/gui/qt/components/info_panels.cpp:133
 msgid "Find meta data using audio fingerprinting"
-msgstr "Ses parmak izi kullanılarak üstveri bulunsun"
+msgstr "Ses parmak izi kullanılarak üst veri bulunsun"
 
 #: modules/gui/qt/components/info_panels.cpp:154
 msgid "Comments"
@@ -19822,7 +19822,7 @@ msgstr "Yorumlar"
 
 #: modules/gui/qt/components/info_panels.cpp:376
 msgid "Extra metadata and other information are shown in this panel.\n"
-msgstr "Ek üstveriler ve diğer açıklayıcı bilgiler burada görüntülenir.\n"
+msgstr "Ek üst veriler ve diğer açıklayıcı bilgiler burada görüntülenir.\n"
 
 #: modules/gui/qt/components/info_panels.cpp:473
 msgid ""
@@ -20100,11 +20100,11 @@ msgstr "Yeni klasörün adını yazın:"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Directory"
-msgstr "Klasörü Yeniden Adlandırın"
+msgstr "Klasörü Yeniden Adlandır"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:56
 msgid "Rename Folder"
-msgstr "Klasörü Yeniden Adlandırın"
+msgstr "Klasörü Yeniden Adlandır"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:58
 msgid "Enter a new name for the directory:"
@@ -20669,7 +20669,7 @@ msgstr ""
 
 #: modules/gui/qt/dialogs/help.cpp:214
 msgid "&Recheck version"
-msgstr "Sü&rümü yeniden denetle"
+msgstr "Sü&rümü Denetle"
 
 #: modules/gui/qt/dialogs/help.cpp:217
 msgid "&Yes"
@@ -20872,7 +20872,7 @@ msgid ""
 "Playlist parsers add new capabilities to read internet streams or extract "
 "meta data."
 msgstr ""
-"Oynatma listesi işleyicileri, İnternet akışlarını okuma ya da üstverileri "
+"Oynatma listesi işleyicileri, İnternet akışlarını okuma ya da üst verileri "
 "ayıklama gibi yeni yetenekler ekler."
 
 #: modules/gui/qt/dialogs/plugins.cpp:386
@@ -21275,7 +21275,7 @@ msgstr "Devre dışı bırak"
 
 #: modules/gui/qt/main_interface.cpp:373
 msgid "Do you want to restart the playback where left off?"
-msgstr "Kalınan yerden oynatmaya devam edin"
+msgstr "Kalınan yerden oynatmaya devam edilsin"
 
 #: modules/gui/qt/main_interface.cpp:379
 msgid "&Continue"
@@ -21359,7 +21359,7 @@ msgstr "&Akıt..."
 
 #: modules/gui/qt/menus.cpp:394
 msgid "Quit at the end of playlist"
-msgstr "Oynatma listesinin sonunda çık"
+msgstr "Oynatma Listesinin Sonunda Çık"
 
 #: modules/gui/qt/menus.cpp:401
 msgid "Close to systray"
@@ -21379,7 +21379,7 @@ msgstr "Kayıt Eşle&me"
 
 #: modules/gui/qt/menus.cpp:437
 msgid "Plu&gins and extensions"
-msgstr "Uygulama eki ve ek&lentiler"
+msgstr "Uygulama Eki ve Ek&lentiler"
 
 #: modules/gui/qt/menus.cpp:442
 msgid "Customi&ze Interface..."
@@ -21527,7 +21527,7 @@ msgstr "&Yönetim"
 
 #: modules/gui/qt/menus.cpp:790
 msgid "Check for &Updates..."
-msgstr "Güncellemeleri &Denetle..."
+msgstr "Güncelleme &Denetimi..."
 
 #: modules/gui/qt/menus.cpp:837
 msgid "&Stop"
@@ -21834,14 +21834,14 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:188
 msgid "When to raise the interface"
-msgstr "Arabirimin etkinleştirilme zamanı"
+msgstr "Ara yüzün etkinleştirilme zamanı"
 
 #: modules/gui/qt/qt.cpp:189
 msgid ""
 "This option allows the interface to be raised automatically when a video/"
 "audio playback starts, or never."
 msgstr ""
-"Bu seçenek bir görüntü ya da ses oynatılmaya başlatıldığında arabirimin "
+"Bu seçenek bir görüntü ya da ses oynatılmaya başlatıldığında ara yüzün "
 "otomatik olarak etkinleştirilmesini ya da hiç bir şey yapılmamasını sağlar."
 
 #: modules/gui/qt/qt.cpp:192
@@ -22546,19 +22546,19 @@ msgstr "Lua Telnet"
 
 #: modules/lua/vlc.c:135
 msgid "Lua Meta Fetcher"
-msgstr "Lua Üstveri Toplayıcı"
+msgstr "Lua Üst Veri Toplayıcı"
 
 #: modules/lua/vlc.c:136
 msgid "Fetch meta data using lua scripts"
-msgstr "Üstveri Lua betikleri kullanılarak toplanır"
+msgstr "Üst veri Lua betikleri kullanılarak toplanır"
 
 #: modules/lua/vlc.c:141
 msgid "Lua Meta Reader"
-msgstr "Lua Üstveri Okuyucu"
+msgstr "Lua Üst Veri Okuyucu"
 
 #: modules/lua/vlc.c:142
 msgid "Read meta data using lua scripts"
-msgstr "Üstveri Lua betikleri kullanılarak okunur"
+msgstr "Üst veri Lua betikleri kullanılarak okunur"
 
 #: modules/lua/vlc.c:148
 msgid "Lua Playlist"
@@ -22586,7 +22586,7 @@ msgstr "Lua SD Modülü"
 
 #: modules/meta_engine/folder.c:71
 msgid "Folder meta data"
-msgstr "Klasör üstverisi"
+msgstr "Klasör üst verisi"
 
 #: modules/meta_engine/folder.c:73
 msgid "Album art filename"
@@ -23912,9 +23912,8 @@ msgid "avparser packetizer"
 msgstr "avparser Paketleyicisi"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala Görüntü Paketleyicisi"
+msgstr "AV1 Görüntü Paketleyicisi"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -24452,7 +24451,7 @@ msgid ""
 "using meta data or time format string sequences."
 msgstr ""
 "Milisaniye cinsinden, metin güncellemeleri arasındaki süre. Bu ayar "
-"özellikle üstveri ya da zamana bağlı metinler kullanıyorsanız işe yarar."
+"özellikle üst veri ya da zamana bağlı metinler kullanıyorsanız işe yarar."
 
 #: modules/spu/marq.c:109
 msgid ""
@@ -29539,7 +29538,7 @@ msgstr "Görünüm ve Algılama"
 
 #: modules/gui/qt/ui/sprefs_interface.h:533
 msgid "Use custom skin"
-msgstr "İsteğe uyarlanmış tema kullanılsın"
+msgstr "İsteğe göre uyarlanmış tema kullanılsın"
 
 #: modules/gui/qt/ui/sprefs_interface.h:535
 msgid "This is VLC's default interface, with a native look and feel."
@@ -29583,7 +29582,7 @@ msgstr "Sistem tepsisi simgesi görüntülensin"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
 msgid "Auto raising the interface:"
-msgstr "Otomatik arabirim etkinleştirme:"
+msgstr "Otomatik ara yüz etkinleştirme:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
@@ -29603,7 +29602,7 @@ msgstr "Yalnızca tek bir kopya çalışsın"
 
 #: modules/gui/qt/ui/sprefs_interface.h:557
 msgid "Activate updates notifier"
-msgstr "Güncelleme uyarıları kullanılsın"
+msgstr "Güncelleme denetimi ve bildirimleri"
 
 #: modules/gui/qt/ui/sprefs_interface.h:559
 msgid "Every "
@@ -29619,7 +29618,7 @@ msgstr "Kelimeleri | ile ayırın (boşluk olmadan)"
 
 #: modules/gui/qt/ui/sprefs_interface.h:566
 msgid "Operating System Integration"
-msgstr "İşletim Sistemi Tümleştirmesi"
+msgstr "İşletim Sistemi Bütünleştirmesi"
 
 #: modules/gui/qt/ui/sprefs_interface.h:567
 msgid "File extensions association"
