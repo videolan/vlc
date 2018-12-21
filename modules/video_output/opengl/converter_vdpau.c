@@ -94,8 +94,10 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
             goto error;
 
         vlc_vdp_output_surface_t *picsys = malloc(sizeof (*picsys));
-        if (!picsys)
+        if (!picsys) {
+            vdp_output_surface_destroy(priv->vdp, surface);
             goto error;
+        }
 
         picsys->vdp = vdp_hold_x11(priv->vdp, NULL);
         picsys->device = priv->vdp_device;
@@ -106,8 +108,11 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                                    .pf_destroy = pool_pic_destroy_cb };
 
         pics[i] = picture_NewFromResource(&tc->fmt, &rsc);
-        if (!pics[i])
+        if (!pics[i]) {
+            free(picsys);
+            vdp_output_surface_destroy(priv->vdp, surface);
             goto error;
+        }
     }
 
     picture_pool_t *pool = picture_pool_New(requested_count, pics);
