@@ -33,7 +33,9 @@
 /**
  * Minimum AC3 header size that vlc_a52_header_Parse needs.
  */
-#define VLC_A52_HEADER_SIZE (8)
+#define VLC_A52_MIN_HEADER_SIZE  (8)
+#define VLC_A52_EAC3_BSI_SIZE    ((532 + 7)/8)
+#define VLC_A52_EAC3_HEADER_SIZE (VLC_A52_EAC3_BSI_SIZE + 2)
 
 /**
  * AC3 header information.
@@ -130,7 +132,7 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
 {
     if( vlc_a52_ParseAc3BitstreamInfo( &p_header->bs,
                                        &p_buf[4], /* start code + CRC */
-                                       VLC_A52_HEADER_SIZE - 4 ) != VLC_SUCCESS )
+                                       VLC_A52_MIN_HEADER_SIZE - 4 ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     /* cf. Table 5.18 Frame Size Code Table */
@@ -249,7 +251,7 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
 {
     if( vlc_a52_ParseEac3BitstreamInfo( &p_header->bs,
                                         &p_buf[2], /* start code */
-                                        VLC_A52_HEADER_SIZE - 2 ) != VLC_SUCCESS )
+                                        VLC_A52_MIN_HEADER_SIZE - 2 ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     const struct vlc_a52_bitstream_info *bs = &p_header->bs;
@@ -306,7 +308,7 @@ static inline int vlc_a52_header_Parse( vlc_a52_header_t *p_header,
         48000, 44100, 32000
     };
 
-    if( i_buffer < VLC_A52_HEADER_SIZE )
+    if( i_buffer < VLC_A52_MIN_HEADER_SIZE )
         return VLC_EGENERIC;
 
     /* Check synword */
