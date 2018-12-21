@@ -362,7 +362,8 @@ static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 }
 
 /* perspective matrix see https://www.opengl.org/sdk/docs/man2/xhtml/gluPerspective.xml */
-static void getProjectionMatrix(float sar, float fovy, GLfloat matrix[static 16]) {
+static void getProjectionMatrix(float sar, float fovy, float offset,
+                                GLfloat matrix[static 16]) {
 
     float zFar  = 1000;
     float zNear = 0.01;
@@ -2282,23 +2283,29 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
     vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
+    float offset = 0.f;
     if (vgl->b_sideBySide)
     {
+        float center = vgl->hmd_cfg.viewport_scale[0] / 2.f;
+        float shift = center - vgl->hmd_cfg.separator / 2.f;
+        float proj_offset = fabs(4.0f *  shift / vgl->hmd_cfg.viewport_scale[0] * 2.f);
+
         if (eye == LEFT_EYE)
         {
             memcpy(vgl->prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
-            memcpy(vgl->prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.left.projection, 16 * sizeof(float));
+            offset = -proj_offset;
         }
         else if (eye == RIGHT_EYE)
         {
             memcpy(vgl->prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
-            memcpy(vgl->prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.right.projection, 16 * sizeof(float));
+            offset = proj_offset;
         }
     }
+
+    getProjectionMatrix(vgl->f_sar, vgl->f_fovy, offset,
+                        prgm->var.ProjectionMatrix);
 
     updateViewMatrix(vgl->prgm);
 

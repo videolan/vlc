@@ -22,6 +22,8 @@ struct vlc_hmd_cfg_t
     int i_screen_width;
     int i_screen_height;
 
+    float separator;
+
     float distorsion_coefs[4];
     float viewport_scale[2];
     float aberr_scale[3];
