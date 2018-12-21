@@ -11,6 +11,10 @@ ifeq ($(call need_pkg,"libplacebo"),)
 PKGS_FOUND += libplacebo
 endif
 
+ifdef HAVE_WIN32
+DEPS_libplacebo += pthreads $(DEPS_pthreads)
+endif
+
 PLACEBOCONF := -Dglslang=enabled \
 	-Dshaderc=disabled
 
