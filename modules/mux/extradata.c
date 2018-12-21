@@ -26,6 +26,7 @@
 
 #include "extradata.h"
 #include "../packetizer/av1_obu.h"
+#include "../packetizer/a52.h"
 
 struct mux_extradata_builder_cb
 {
@@ -41,6 +42,41 @@ struct mux_extradata_builder_t
     uint8_t *p_extra;
     size_t i_extra;
     vlc_fourcc_t fcc;
+};
+
+static void ac3_extradata_builder_Feed(mux_extradata_builder_t *m,
+                                       const uint8_t *p_data, size_t i_data)
+{
+    if(m->i_extra || i_data < VLC_A52_MIN_HEADER_SIZE ||
+       p_data[0] != 0x0B || p_data[1] != 0x77)
+        return;
+
+    struct vlc_a52_bitstream_info bsi;
+    if(vlc_a52_ParseAc3BitstreamInfo(&bsi, &p_data[4], /* start code + CRC */
+                                     VLC_A52_MIN_HEADER_SIZE - 4 ) != VLC_SUCCESS)
+        return;
+
+    m->p_extra = malloc(3);
+    if(!m->p_extra)
+        return;
+    m->i_extra = 3;
+
+    bs_t s;
+    bs_write_init(&s, m->p_extra, m->i_extra);
+    bs_write(&s, 2, bsi.i_fscod);
+    bs_write(&s, 5, bsi.i_bsid);
+    bs_write(&s, 3, bsi.i_bsmod);
+    bs_write(&s, 3, bsi.i_acmod);
+    bs_write(&s, 1, bsi.i_lfeon);
+    bs_write(&s, 5, bsi.i_frmsizcod >> 1); // bit_rate_code
+    bs_write(&s, 5, 0); // reserved
+}
+
+const struct mux_extradata_builder_cb ac3_cb =
+{
+    NULL,
+    ac3_extradata_builder_Feed,
+    NULL,
 };
 
 static void av1_extradata_builder_Feed(mux_extradata_builder_t *m,
@@ -90,6 +126,9 @@ mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc)
     {
         case VLC_CODEC_AV1:
             cb = &av1_cb;
+            break;
+        case VLC_CODEC_A52:
+            cb = &ac3_cb;
             break;
         default:
             return NULL;

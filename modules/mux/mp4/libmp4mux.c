@@ -791,54 +791,6 @@ static bo_t *GetDec3Tag(es_format_t *p_fmt,
     return dec3;
 }
 
-static bo_t *GetDac3Tag(const uint8_t *p_data, size_t i_data)
-{
-    if (!i_data)
-        return NULL;
-
-    bo_t *dac3 = box_new("dac3");
-    if(!dac3)
-        return NULL;
-
-    bs_t s;
-    bs_init(&s, p_data, i_data);
-
-    uint8_t fscod, bsid, bsmod, acmod, lfeon, frmsizecod;
-
-    bs_skip(&s, 16 + 16); // syncword + crc
-
-    fscod = bs_read(&s, 2);
-    frmsizecod = bs_read(&s, 6);
-    bsid = bs_read(&s, 5);
-    bsmod = bs_read(&s, 3);
-    acmod = bs_read(&s, 3);
-    if (acmod == 2)
-        bs_skip(&s, 2); // dsurmod
-    else {
-        if ((acmod & 1) && acmod != 1)
-            bs_skip(&s, 2); // cmixlev
-        if (acmod & 4)
-            bs_skip(&s, 2); // surmixlev
-    }
-
-    lfeon = bs_read1(&s);
-
-    uint8_t mp4_a52_header[3];
-    bs_write_init(&s, mp4_a52_header, sizeof(mp4_a52_header));
-
-    bs_write(&s, 2, fscod);
-    bs_write(&s, 5, bsid);
-    bs_write(&s, 3, bsmod);
-    bs_write(&s, 3, acmod);
-    bs_write(&s, 1, lfeon);
-    bs_write(&s, 5, frmsizecod >> 1); // bit_rate_code
-    bs_write(&s, 5, 0); // reserved
-
-    bo_add_mem(dac3, sizeof(mp4_a52_header), mp4_a52_header);
-
-    return dac3;
-}
-
 static bo_t *GetDamrTag(es_format_t *p_fmt)
 {
     bo_t *damr = box_new("damr");
@@ -1270,8 +1222,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             box = GetWaveTag(p_track);
         else if (codec == VLC_CODEC_AMR_NB)
             box = GetDamrTag(&p_track->fmt);
-        else if (codec == VLC_CODEC_A52)
-            box = GetDac3Tag(p_extradata, i_extradata);
+        else if (codec == VLC_CODEC_A52 && i_extradata >= 3)
+            box = GetxxxxTag(p_extradata, i_extradata, "dac3");
         else if (codec == VLC_CODEC_EAC3)
             box = GetDec3Tag(&p_track->fmt, p_extradata, i_extradata);
         else if (codec == VLC_CODEC_WMAP)
