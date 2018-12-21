@@ -57,6 +57,10 @@ struct vlc_a52_bitstream_info
             } strmtyp;
             uint8_t i_substreamid;
         } eac3;
+        struct
+        {
+            uint8_t i_dsurmod;
+        } ac3;
     };
 };
 
@@ -83,11 +87,49 @@ typedef struct
  *
  * cf. AC3 spec
  */
+static inline int vlc_a52_ParseAc3BitstreamInfo( struct vlc_a52_bitstream_info *bs,
+                                                 const uint8_t *p_buf, size_t i_buf )
+{
+    bs_t s;
+    bs_init( &s, p_buf, i_buf );
+
+    /* cf. 5.3.2 */
+    bs->i_fscod = bs_read( &s, 2 );
+    if( bs->i_fscod == 3 )
+        return VLC_EGENERIC;
+    bs->i_frmsizcod = bs_read( &s, 6 );
+    if( bs->i_frmsizcod >= 38 )
+        return VLC_EGENERIC;
+    bs->i_bsid = bs_read( &s, 5 );
+    bs->i_bsmod = bs_read( &s, 3 );
+    bs->i_acmod = bs_read( &s, 3 );
+    if( ( bs->i_acmod & 0x1 ) && ( bs->i_acmod != 0x1 ) )
+    {
+        /* if 3 front channels */
+        bs_skip( &s, 2 ); /* i_cmixlev */
+    }
+    if( bs->i_acmod & 0x4 )
+    {
+        /* if a surround channel exists */
+        bs_skip( &s, 2 ); /* i_surmixlev */
+    }
+    /* if in 2/0 mode */
+    bs->ac3.i_dsurmod = bs->i_acmod == 0x2 ? bs_read( &s, 2 ) : 0;
+    bs->i_lfeon = bs_read( &s, 1 );
+
+    return VLC_SUCCESS;
+}
+
 static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
                                            const uint8_t *p_buf,
                                            const uint32_t *p_acmod,
                                            const unsigned *pi_fscod_samplerates )
 {
+    if( vlc_a52_ParseAc3BitstreamInfo( &p_header->bs,
+                                       &p_buf[4], /* start code + CRC */
+                                       VLC_A52_HEADER_SIZE - 4 ) != VLC_SUCCESS )
+        return VLC_EGENERIC;
+
     /* cf. Table 5.18 Frame Size Code Table */
     static const uint16_t ppi_frmsizcod_fscod_sizes[][3] = {
         /* 32K, 44.1K, 48K */
@@ -138,39 +180,11 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
         512, 576, 640
     };
 
-    struct vlc_a52_bitstream_info *bs = &p_header->bs;
-
-    bs_t s;
-    bs_init( &s, (void*)p_buf, VLC_A52_HEADER_SIZE );
-    bs_skip( &s, 32 );  /* start code + CRC */
-
-    /* cf. 5.3.2 */
-    bs->i_fscod = bs_read( &s, 2 );
-    if( bs->i_fscod == 3 )
-        return VLC_EGENERIC;
-    bs->i_frmsizcod = bs_read( &s, 6 );
-    if( bs->i_frmsizcod >= 38 )
-        return VLC_EGENERIC;
-    bs->i_bsid = bs_read( &s, 5 );
-    bs_skip( &s, 3 ); /* i_bsmod */
-    bs->i_acmod = bs_read( &s, 3 );
-    if( ( bs->i_acmod & 0x1 ) && ( bs->i_acmod != 0x1 ) )
-    {
-        /* if 3 front channels */
-        bs_skip( &s, 2 ); /* i_cmixlev */
-    }
-    if( bs->i_acmod & 0x4 )
-    {
-        /* if a surround channel exists */
-        bs_skip( &s, 2 ); /* i_surmixlev */
-    }
-    /* if in 2/0 mode */
-    const uint8_t i_dsurmod = bs->i_acmod == 0x2 ? bs_read( &s, 2 ) : 0;
-    bs->i_lfeon = bs_read( &s, 1 );
+    const struct vlc_a52_bitstream_info *bs = &p_header->bs;
 
     p_header->i_channels_conf = p_acmod[bs->i_acmod];
     p_header->i_chan_mode = 0;
-    if( i_dsurmod == 2 )
+    if( bs->ac3.i_dsurmod == 2 )
         p_header->i_chan_mode |= AOUT_CHANMODE_DOLBYSTEREO;
     if( bs->i_acmod == 0 )
         p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
