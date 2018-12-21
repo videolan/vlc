@@ -18,14 +18,14 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "../../arm_neon/asm.S"
+
 	.arch armv8-a+sve
 
 	/* TODO: prefetch, unroll */
 
 	.text
-	.globl	merge8_arm_sve
-	.type	merge8_arm_sve, %function
-merge8_arm_sve:
+function merge8_arm_sve
 	mov	x4, #0
 	b	2f
 1:	ld1b	{z0.h}, p0/z, [x1, x4]
@@ -38,9 +38,7 @@ merge8_arm_sve:
 	b.first	1b
 	ret
 
-	.globl	merge16_arm_sve
-	.type	merge16_arm_sve, %function
-merge16_arm_sve:
+function merge16_arm_sve
 	mov	x4, #0
 	b	2f
 1:	ld1h	{z0.s}, p0/z, [x1, x4, lsl #1]
