@@ -240,6 +240,88 @@ static inline int vlc_a52_ParseEac3BitstreamInfo( struct vlc_a52_bitstream_info 
 
     bs->i_acmod = bs_read( &s, 3 );
     bs->i_lfeon = bs_read1( &s );
+    bs->i_bsid = bs_read( &s, 5 );
+
+    if( i_buf <= VLC_A52_MIN_HEADER_SIZE )
+    {
+        bs->i_bsmod = 0;
+        return VLC_SUCCESS;
+    }
+
+    bs_skip( &s, 5 ); /* dialnorm */
+    if(bs_read1( &s ))
+        bs_skip( &s, 8 ); /* compr */
+
+    if( bs->i_acmod == 0x00 )
+    {
+        bs_skip( &s, 5 );
+        if(bs_read1( &s ))
+            bs_skip( &s, 8 ); /* compr2 */
+    }
+
+    if( bs->eac3.strmtyp == 0x01 && bs_read1( &s ) )
+        bs_skip( &s, 16 ); /* chanmap */
+
+    if( bs_read1( &s ) ) /* mixmdate */
+    {
+        if( bs->i_acmod > 0x02 )
+        {
+            bs_skip( &s, 2 ); /* dmixmod */
+            if( bs->i_acmod & 0x01 )
+                bs_skip( &s, 6 ); /* ltrtcmixlev + lorocmixlev */
+            if( bs->i_acmod & 0x04 )
+                bs_skip( &s, 6 ); /* ltrtsurmixlev + lorosurmixlev */
+        }
+
+        if( bs->i_lfeon && bs_read1( &s ) )
+            bs_skip( &s, 5 ); /* (lfemixlevcode) */
+
+        if( bs->eac3.strmtyp == 0x00 )
+        {
+            if( bs_read1( &s ) )
+                bs_skip( &s, 6 ); /* pgmscl */
+            if( bs->i_acmod == 0x00 && bs_read1( &s ) )
+                bs_skip( &s, 6 ); /* pgmscl2 */
+            if(bs_read1( &s ))
+                bs_skip( &s, 6 ); /* extpgmscl */
+            const uint8_t i_mixdef = bs_read( &s, 2 );
+            if( i_mixdef == 0x01 )
+                bs_skip( &s, 5 ); /* premixcmpsel + drcsrc + premixcmpscl */
+            else if( i_mixdef == 0x02 )
+                bs_skip( &s, 12 ); /* mixdata */
+            else if( i_mixdef == 0x03 )
+            {
+                const unsigned mixdeflen = bs_read( &s, 5 ) + 2;
+                for(size_t i=0; i<mixdeflen; i++)
+                    bs_skip( &s, 8 );
+                bs_align( &s );
+            }
+            if( bs->i_acmod < 0x02 )
+            {
+                if( bs_read1( &s ) )
+                    bs_skip( &s, 14 ); /* panmean + paninfo */
+                if( bs->i_acmod == 0x00 && bs_read1( &s ) )
+                    bs_skip( &s, 14 ); /* panmean2 + paninfo2 */
+            }
+            if( bs_read1( &s ) )
+            {
+                const uint8_t blkspersyncframe[] = { 0+1, 1, 2, 6 };
+                const size_t nb = blkspersyncframe[bs->eac3.i_numblkscod];
+                for(size_t i=0; i<nb; i++)
+                {
+                    if( bs->eac3.i_numblkscod == 0x00 )
+                        bs_skip( &s, 5 ); /* blkmixcfginfo[N] */
+                }
+            }
+        }
+    }
+
+    if( bs_read1( &s ) ) /* infomdate */
+    {
+        bs->i_bsmod = bs_read( &s, 3 );
+        // ...
+    }
+    else bs->i_bsmod = 0;
 
     return VLC_SUCCESS;
 }
