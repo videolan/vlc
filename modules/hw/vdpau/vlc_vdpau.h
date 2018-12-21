@@ -256,14 +256,6 @@ bool vlc_fourcc_to_vdp_ycc(vlc_fourcc_t fourcc,
     return true;
 }
 
-typedef struct
-{
-    VdpOutputSurface surface;
-    VdpDevice device;
-    vdp_t *vdp;
-    void *gl_nv_surface;
-} picture_sys_t;
-
 typedef struct vlc_vdp_video_frame
 {
     VdpVideoSurface surface;
@@ -305,4 +297,13 @@ static inline vlc_vdp_video_field_t *vlc_vdp_video_copy(
 {
     return (vlc_vdp_video_field_t *)fold->context.copy(&fold->context);
 }
+
+typedef struct vlc_vdp_output_surface
+{
+    VdpOutputSurface surface;
+    VdpDevice device;
+    vdp_t *vdp;
+    void *gl_nv_surface;
+} vlc_vdp_output_surface_t;
+
 #endif

@@ -70,7 +70,7 @@ struct vout_display_sys_t
     unsigned height;
 };
 
-static void pictureSys_DestroyVDPAU(picture_sys_t *psys)
+static void pictureSys_DestroyVDPAU(vlc_vdp_output_surface_t *psys)
 {
     vdp_output_surface_destroy(psys->vdp, psys->surface);
     vdp_release_x11(psys->vdp);
@@ -86,7 +86,7 @@ static VdpStatus picture_NewVDPAU(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
                                   const video_format_t *restrict fmt,
                                   picture_t **restrict picp)
 {
-    picture_sys_t *psys = malloc(sizeof (*psys));
+    vlc_vdp_output_surface_t *psys = malloc(sizeof (*psys));
     if (unlikely(psys == NULL))
         return VDP_STATUS_RESOURCES;
 
@@ -245,7 +245,7 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
                   vlc_tick_t date)
 {
     vout_display_sys_t *sys = vd->sys;
-    picture_sys_t *p_sys = pic->p_sys;
+    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
     VdpOutputSurface surface = p_sys->surface;
     VdpStatus err;
 
@@ -301,7 +301,7 @@ static void Wait(vout_display_t *vd, picture_t *pic)
     picture_t *current = sys->current;
     if (current != NULL)
     {
-        picture_sys_t *psys = current->p_sys;
+        vlc_vdp_output_surface_t *psys = current->p_sys;
         VdpTime pts;
         VdpStatus err;
 

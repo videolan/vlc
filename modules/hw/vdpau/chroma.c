@@ -516,7 +516,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     if (dst == NULL)
         goto skip;
 
-    picture_sys_t *p_sys = dst->p_sys;
+    vlc_vdp_output_surface_t *p_sys = dst->p_sys;
     assert(p_sys != NULL && p_sys->vdp == sys->vdp);
     dst->date = sys->history[MAX_PAST].date;
     dst->b_force = sys->history[MAX_PAST].force;
@@ -756,7 +756,7 @@ static int OutputOpen(vlc_object_t *obj)
     if (pic == NULL)
         goto error;
 
-    picture_sys_t *picsys = pic->p_sys;
+    vlc_vdp_output_surface_t *picsys = pic->p_sys;
     assert(picsys != NULL && picsys->vdp != NULL);
 
     sys->vdp = vdp_hold_x11(picsys->vdp, NULL);

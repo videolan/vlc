@@ -66,7 +66,8 @@ static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
 static void
 pool_pic_destroy_cb(picture_t *pic)
 {
-    picture_sys_t *p_sys = pic->p_sys;
+    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
+
     vdp_output_surface_destroy(p_sys->vdp, p_sys->surface);
     vdp_release_x11(p_sys->vdp);
     free(p_sys);
@@ -92,13 +93,14 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                                             &surface)) != VDP_STATUS_OK)
             goto error;
 
-        picture_sys_t *picsys = calloc(1, sizeof(*picsys));
+        vlc_vdp_output_surface_t *picsys = malloc(sizeof (*picsys));
         if (!picsys)
             goto error;
 
         picsys->vdp = vdp_hold_x11(priv->vdp, NULL);
         picsys->device = priv->vdp_device;
         picsys->surface = surface;
+        *(GLvdpauSurfaceNV *)&picsys->gl_nv_surface = 0;
 
         picture_resource_t rsc = { .p_sys = picsys,
                                    .pf_destroy = pool_pic_destroy_cb };
@@ -129,7 +131,7 @@ tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
     VLC_UNUSED(tex_heights);
     VLC_UNUSED(plane_offsets);
 
-    picture_sys_t *p_sys = pic->p_sys;
+    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
 
     GLvdpauSurfaceNV *p_gl_nv_surface =
         (GLvdpauSurfaceNV *)&p_sys->gl_nv_surface;
