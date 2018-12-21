@@ -35,9 +35,10 @@
 static_assert(offsetof (vlc_vdp_video_field_t, context) == 0,
               "Cast assumption failure");
 
-static void SurfaceDestroy(struct picture_context_t *ctx)
+static void VideoSurfaceDestroy(struct picture_context_t *ctx)
 {
-    vlc_vdp_video_field_t *field = (vlc_vdp_video_field_t *)ctx;
+    vlc_vdp_video_field_t *field = container_of(ctx, vlc_vdp_video_field_t,
+                                                context);
     vlc_vdp_video_frame_t *frame = field->frame;
     VdpStatus err;
 
@@ -56,16 +57,17 @@ static void SurfaceDestroy(struct picture_context_t *ctx)
     free(frame);
 }
 
-static picture_context_t *SurfaceCopy(picture_context_t *ctx)
+static picture_context_t *VideoSurfaceCopy(picture_context_t *ctx)
 {
-    vlc_vdp_video_field_t *fold = (vlc_vdp_video_field_t *)ctx;
+    vlc_vdp_video_field_t *fold = container_of(ctx, vlc_vdp_video_field_t,
+                                               context);
     vlc_vdp_video_frame_t *frame = fold->frame;
     vlc_vdp_video_field_t *fnew = malloc(sizeof (*fnew));
     if (unlikely(fnew == NULL))
         return NULL;
 
-    fnew->context.destroy = SurfaceDestroy;
-    fnew->context.copy = SurfaceCopy;
+    fnew->context.destroy = VideoSurfaceDestroy;
+    fnew->context.copy = VideoSurfaceCopy;
     fnew->frame = frame;
     fnew->structure = fold->structure;
     fnew->procamp = fold->procamp;
@@ -97,8 +99,8 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *vdp,
         return NULL;
     }
 
-    field->context.destroy = SurfaceDestroy;
-    field->context.copy = SurfaceCopy;
+    field->context.destroy = VideoSurfaceDestroy;
+    field->context.copy = VideoSurfaceCopy;
     field->frame = frame;
     field->structure = VDP_VIDEO_MIXER_PICTURE_STRUCTURE_FRAME;
     field->procamp = procamp_default;
