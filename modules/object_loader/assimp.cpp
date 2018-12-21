@@ -443,7 +443,9 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
                 if (baseTexFileNameEnd != std::string::npos)
                     baseTexFileName = baseTexFileName.substr(0, baseTexFileNameEnd);
 
-                char *psz_dataDir = config_GetSysPath(VLC_PKG_DATA_DIR, NULL);
+                char *psz_dataDir =
+                    config_GetSysPath(VLC_PKG_DATA_DIR,
+                                      "VirtualTheater" DIR_SEP);
                 if (unlikely(psz_dataDir == NULL))
                 {
                     msg_Warn(p_loader, "Could not get the main data directory");
@@ -453,7 +455,7 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
                 std::string baseTexPath(psz_dataDir);
                 #define TEXTURE_DIR DIR_SEP "VirtualTheater" DIR_SEP "Textures" DIR_SEP
                 //baseTexPath += TEXTURE_DIR + baseTexFileName;
-                baseTexPath = baseTexFileName;
+                baseTexPath += baseTexFileName;
 
                 std::string diffuseTexPath = baseTexPath;
                 if (baseTexFileNameEnd != std::string::npos)

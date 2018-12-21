@@ -708,7 +708,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         " // Allows to go from tangent space to view space\n"
         " vec3 normalTexel = vec3(texture2D(MatNormalTex, TexCoord0)*2.0 - 1.0);\n"
         " if (!UseNormalTexture)\n"
-        "  normalTexel = vec3(0,1,0);\n"
+        "  normalTexel = vec3(0,0,1);\n"
 
         " normal_world = normalize(TBNMatrix * normalTexel);\n"
 
