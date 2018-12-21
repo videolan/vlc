@@ -632,14 +632,6 @@ static block_t * BlockDequeue(sout_input_t *p_input, mp4_stream_t *p_stream)
         case VLC_CODEC_SUBT:
             p_block = ConvertSUBT(p_block);
             break;
-        case VLC_CODEC_EAC3:
-            if(!mp4mux_track_HasSamplePriv(p_stream->tinfo) &&
-               p_block->i_buffer >= 8)
-            {
-                mp4mux_track_SetSamplePriv(p_stream->tinfo,
-                                           p_block->p_buffer, p_block->i_buffer);
-            }
-            break;
         default:
             break;
     }

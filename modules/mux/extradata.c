@@ -79,6 +79,50 @@ const struct mux_extradata_builder_cb ac3_cb =
     NULL,
 };
 
+static void eac3_extradata_builder_Feed(mux_extradata_builder_t *m,
+                                        const uint8_t *p_data, size_t i_data)
+{
+    if(m->i_extra || i_data < VLC_A52_MIN_HEADER_SIZE ||
+       p_data[0] != 0x0B || p_data[1] != 0x77)
+        return;
+
+    struct vlc_a52_bitstream_info bsi;
+    if(vlc_a52_ParseEac3BitstreamInfo(&bsi, &p_data[2], /* start code */
+                                      i_data - 2) != VLC_SUCCESS)
+        return;
+
+    m->p_extra = malloc(5);
+    if(!m->p_extra)
+        return;
+    m->i_extra = 5;
+
+    bs_t s;
+    bs_write_init(&s, m->p_extra, m->i_extra);
+    const unsigned rgi_fscod_samplerates[] = { 48000, 44100, 32000 };
+    unsigned fs = rgi_fscod_samplerates[bsi.i_fscod];
+    unsigned numblks = bsi.eac3.i_numblkscod + 1;
+    if(numblks > 3)
+        numblks = 6;
+    unsigned data_rate = (bsi.eac3.i_frmsiz + 1) * fs / (numblks << 4); /* F.6.2.2 */
+    bs_write(&s, 13, data_rate);
+    bs_write(&s, 3, 0); // num_ind_sub - 1
+    bs_write(&s, 2, bsi.i_fscod);
+    bs_write(&s, 5, bsi.i_bsid);
+    bs_write(&s, 5, bsi.i_bsmod);
+    bs_write(&s, 3, bsi.i_acmod);
+    bs_write(&s, 1, bsi.i_lfeon);
+    bs_write(&s, 3, 0); // reserved
+    bs_write(&s, 4, 0); // num_dep_sub
+    bs_write(&s, 1, 0); // reserved
+}
+
+const struct mux_extradata_builder_cb eac3_cb =
+{
+    NULL,
+    eac3_extradata_builder_Feed,
+    NULL,
+};
+
 static void av1_extradata_builder_Feed(mux_extradata_builder_t *m,
                                        const uint8_t *p_data, size_t i_data)
 {
@@ -129,6 +173,9 @@ mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc)
             break;
         case VLC_CODEC_A52:
             cb = &ac3_cb;
+            break;
+        case VLC_CODEC_EAC3:
+            cb = &eac3_cb;
             break;
         default:
             return NULL;

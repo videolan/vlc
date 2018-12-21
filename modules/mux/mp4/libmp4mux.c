@@ -668,129 +668,6 @@ static bo_t *GetWaveTag(mp4mux_trackinfo_t *p_track)
     return wave;
 }
 
-static bo_t *GetDec3Tag(es_format_t *p_fmt,
-                        const uint8_t *p_data, size_t i_data)
-{
-    if (!i_data)
-        return NULL;
-
-    bs_t s;
-    bs_init(&s, p_data, i_data);
-    bs_skip(&s, 16); // syncword
-
-    uint8_t fscod, bsid, bsmod, acmod, lfeon, strmtyp;
-
-    bsmod = 0;
-
-    strmtyp = bs_read(&s, 2);
-
-    if (strmtyp & 0x1) // dependent or reserved stream
-        return NULL;
-
-    if (bs_read(&s, 3) != 0x0) // substreamid: we don't support more than 1 stream
-        return NULL;
-
-    int numblkscod;
-    bs_skip(&s, 11); // frmsizecod
-    fscod = bs_read(&s, 2);
-    if (fscod == 0x03) {
-        bs_skip(&s, 2); // fscod2
-        numblkscod = 3;
-    } else {
-        numblkscod = bs_read(&s, 2);
-    }
-
-    acmod = bs_read(&s, 3);
-    lfeon = bs_read1(&s);
-
-    bsid = bs_read(&s, 5);
-
-    bs_skip(&s, 5); // dialnorm
-    if (bs_read1(&s)) // compre
-        bs_skip(&s, 5); // compr
-
-    if (acmod == 0) {
-        bs_skip(&s, 5); // dialnorm2
-        if (bs_read1(&s)) // compr2e
-            bs_skip(&s, 8); // compr2
-    }
-
-    if (strmtyp == 0x1) // dependent stream XXX: unsupported
-        if (bs_read1(&s)) // chanmape
-            bs_skip(&s, 16); // chanmap
-
-    /* we have to skip mixing info to read bsmod */
-    if (bs_read1(&s)) { // mixmdate
-        if (acmod > 0x2) // 2+ channels
-            bs_skip(&s, 2); // dmixmod
-        if ((acmod & 0x1) && (acmod > 0x2)) // 3 front channels
-            bs_skip(&s, 3 + 3); // ltrtcmixlev + lorocmixlev
-        if (acmod & 0x4) // surround channel
-            bs_skip(&s, 3 + 3); // ltrsurmixlev + lorosurmixlev
-        if (lfeon)
-            if (bs_read1(&s))
-                bs_skip(&s, 5); // lfemixlevcod
-        if (strmtyp == 0) { // independent stream
-            if (bs_read1(&s)) // pgmscle
-                bs_skip(&s, 6); // pgmscl
-            if (acmod == 0x0) // dual mono
-                if (bs_read1(&s)) // pgmscl2e
-                    bs_skip(&s, 6); // pgmscl2
-            if (bs_read1(&s)) // extpgmscle
-                bs_skip(&s, 6); // extpgmscl
-            uint8_t mixdef = bs_read(&s, 2);
-            if (mixdef == 0x1)
-                bs_skip(&s, 5);
-            else if (mixdef == 0x2)
-                bs_skip(&s, 12);
-            else if (mixdef == 0x3) {
-                uint8_t mixdeflen = bs_read(&s, 5);
-                bs_skip(&s, 8 * (mixdeflen + 2));
-            }
-            if (acmod < 0x2) { // mono or dual mono
-                if (bs_read1(&s)) // paninfoe
-                    bs_skip(&s, 14); // paninfo
-                if (acmod == 0) // dual mono
-                    if (bs_read1(&s)) // paninfo2e
-                        bs_skip(&s, 14); // paninfo2
-            }
-            if (bs_read1(&s)) { // frmmixcfginfoe
-                static const int blocks[4] = { 1, 2, 3, 6 };
-                int number_of_blocks = blocks[numblkscod];
-                if (number_of_blocks == 1)
-                    bs_skip(&s, 5); // blkmixcfginfo[0]
-                else for (int i = 0; i < number_of_blocks; i++)
-                    if (bs_read1(&s)) // blkmixcfginfoe
-                        bs_skip(&s, 5); // blkmixcfginfo[i]
-            }
-        }
-    }
-
-    if (bs_read1(&s)) // infomdate
-        bsmod = bs_read(&s, 3);
-
-    uint8_t mp4_eac3_header[5] = {0};
-    bs_write_init(&s, mp4_eac3_header, sizeof(mp4_eac3_header));
-
-    int data_rate = p_fmt->i_bitrate / 1000;
-    bs_write(&s, 13, data_rate);
-    bs_write(&s, 3, 0); // num_ind_sub - 1
-    bs_write(&s, 2, fscod);
-    bs_write(&s, 5, bsid);
-    bs_write(&s, 5, bsmod);
-    bs_write(&s, 3, acmod);
-    bs_write(&s, 1, lfeon);
-    bs_write(&s, 3, 0); // reserved
-    bs_write(&s, 4, 0); // num_dep_sub
-    bs_write(&s, 1, 0); // reserved
-
-    bo_t *dec3 = box_new("dec3");
-    if(dec3)
-        bo_add_mem(dec3, sizeof(mp4_eac3_header), mp4_eac3_header);
-
-    return dec3;
-}
-
 static bo_t *GetDamrTag(es_format_t *p_fmt)
 {
     bo_t *damr = box_new("damr");
@@ -1224,8 +1101,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
             box = GetDamrTag(&p_track->fmt);
         else if (codec == VLC_CODEC_A52 && i_extradata >= 3)
             box = GetxxxxTag(p_extradata, i_extradata, "dac3");
-        else if (codec == VLC_CODEC_EAC3)
-            box = GetDec3Tag(&p_track->fmt, p_extradata, i_extradata);
+        else if (codec == VLC_CODEC_EAC3 && i_extradata >= 5)
+            box = GetxxxxTag(p_extradata, i_extradata, "dec3");
         else if (codec == VLC_CODEC_WMAP)
             box = GetWaveFormatExTag(&p_track->fmt, "wfex");
         else
