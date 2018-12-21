@@ -38,6 +38,28 @@
 /**
  * AC3 header information.
  */
+struct vlc_a52_bitstream_info
+{
+    uint8_t i_fscod;
+    uint8_t i_frmsizcod;
+    uint8_t i_bsid;
+    uint8_t i_bsmod;
+    uint8_t i_acmod;
+    uint8_t i_lfeon;
+    union
+    {
+        struct {
+            enum {
+                EAC3_STRMTYP_INDEPENDENT    = 0,
+                EAC3_STRMTYP_DEPENDENT      = 1,
+                EAC3_STRMTYP_AC3_CONVERT    = 2,
+                EAC3_STRMTYP_RESERVED,
+            } strmtyp;
+            uint8_t i_substreamid;
+        } eac3;
+    };
+};
+
 typedef struct
 {
     bool b_eac3;
@@ -51,17 +73,8 @@ typedef struct
     unsigned int i_size;
     unsigned int i_samples;
 
-    union {
-        struct {
-            enum {
-                EAC3_STRMTYP_INDEPENDENT    = 0,
-                EAC3_STRMTYP_DEPENDENT      = 1,
-                EAC3_STRMTYP_AC3_CONVERT    = 2,
-                EAC3_STRMTYP_RESERVED,
-            } strmtyp;
-            uint8_t i_substreamid;
-        } eac3;
-    };
+    struct vlc_a52_bitstream_info bs;
+
     uint8_t i_blocks_per_sync_frame;
 } vlc_a52_header_t;
 
@@ -125,52 +138,55 @@ static inline int vlc_a52_header_ParseAc3( vlc_a52_header_t *p_header,
         512, 576, 640
     };
 
+    struct vlc_a52_bitstream_info *bs = &p_header->bs;
+
     bs_t s;
     bs_init( &s, (void*)p_buf, VLC_A52_HEADER_SIZE );
     bs_skip( &s, 32 );  /* start code + CRC */
 
     /* cf. 5.3.2 */
-    const uint8_t i_fscod = bs_read( &s, 2 );
-    if( i_fscod == 3 )
+    bs->i_fscod = bs_read( &s, 2 );
+    if( bs->i_fscod == 3 )
         return VLC_EGENERIC;
-    const uint8_t i_frmsizcod = bs_read( &s, 6 );
-    if( i_frmsizcod >= 38 )
+    bs->i_frmsizcod = bs_read( &s, 6 );
+    if( bs->i_frmsizcod >= 38 )
         return VLC_EGENERIC;
-    const uint8_t i_bsid = bs_read( &s, 5 );
+    bs->i_bsid = bs_read( &s, 5 );
     bs_skip( &s, 3 ); /* i_bsmod */
-    const uint8_t i_acmod = bs_read( &s, 3 );
-    if( ( i_acmod & 0x1 ) && ( i_acmod != 0x1 ) )
+    bs->i_acmod = bs_read( &s, 3 );
+    if( ( bs->i_acmod & 0x1 ) && ( bs->i_acmod != 0x1 ) )
     {
         /* if 3 front channels */
         bs_skip( &s, 2 ); /* i_cmixlev */
     }
-    if( i_acmod & 0x4 )
+    if( bs->i_acmod & 0x4 )
     {
         /* if a surround channel exists */
         bs_skip( &s, 2 ); /* i_surmixlev */
     }
     /* if in 2/0 mode */
-    const uint8_t i_dsurmod = i_acmod == 0x2 ? bs_read( &s, 2 ) : 0;
-    const uint8_t i_lfeon = bs_read( &s, 1 );
+    const uint8_t i_dsurmod = bs->i_acmod == 0x2 ? bs_read( &s, 2 ) : 0;
+    bs->i_lfeon = bs_read( &s, 1 );
 
-    p_header->i_channels_conf = p_acmod[i_acmod];
+    p_header->i_channels_conf = p_acmod[bs->i_acmod];
     p_header->i_chan_mode = 0;
     if( i_dsurmod == 2 )
         p_header->i_chan_mode |= AOUT_CHANMODE_DOLBYSTEREO;
-    if( i_acmod == 0 )
+    if( bs->i_acmod == 0 )
         p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
 
-    if( i_lfeon )
+    if( bs->i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
 
     p_header->i_channels = vlc_popcount(p_header->i_channels_conf);
 
-    const unsigned i_rate_shift = VLC_CLIP(i_bsid, 8, 11) - 8;
-    p_header->i_bitrate = (pi_frmsizcod_bitrates[i_frmsizcod >> 1] * 1000)
+    const unsigned i_rate_shift = VLC_CLIP(bs->i_bsid, 8, 11) - 8;
+    p_header->i_bitrate = (pi_frmsizcod_bitrates[bs->i_frmsizcod >> 1] * 1000)
                         >> i_rate_shift;
-    p_header->i_rate = pi_fscod_samplerates[i_fscod] >> i_rate_shift;
+    p_header->i_rate = pi_fscod_samplerates[bs->i_fscod] >> i_rate_shift;
 
-    p_header->i_size = ppi_frmsizcod_fscod_sizes[i_frmsizcod][2 - i_fscod] * 2;
+    p_header->i_size = ppi_frmsizcod_fscod_sizes[bs->i_frmsizcod]
+                                                [2 - bs->i_fscod] * 2;
     p_header->i_blocks_per_sync_frame = 6;
     p_header->i_samples = p_header->i_blocks_per_sync_frame * 256;
 
@@ -186,19 +202,21 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
                                             const uint32_t *p_acmod,
                                             const unsigned *pi_fscod_samplerates )
 {
+    struct vlc_a52_bitstream_info *bs = &p_header->bs;
+
     bs_t s;
     bs_init( &s, (void*)p_buf, VLC_A52_HEADER_SIZE );
     bs_skip( &s, 16 );  /* start code */
-    p_header->eac3.strmtyp = bs_read( &s, 2 );      /* Stream Type */
-    p_header->eac3.i_substreamid = bs_read( &s, 3 );/* Substream Identification */
+    bs->eac3.strmtyp = bs_read( &s, 2 );      /* Stream Type */
+    bs->eac3.i_substreamid = bs_read( &s, 3 );/* Substream Identification */
 
     const uint16_t i_frmsiz = bs_read( &s, 11 );
     if( i_frmsiz < 2 )
         return VLC_EGENERIC;
     p_header->i_size = 2 * (i_frmsiz + 1 );
 
-    const uint8_t i_fscod = bs_read( &s, 2 );
-    if( i_fscod == 0x03 )
+    bs->i_fscod = bs_read( &s, 2 );
+    if( bs->i_fscod == 0x03 )
     {
         const uint8_t i_fscod2 = bs_read( &s, 2 );
         if( i_fscod2 == 0x03 )
@@ -210,18 +228,18 @@ static inline int vlc_a52_header_ParseEac3( vlc_a52_header_t *p_header,
     {
         static const int pi_numblkscod [4] = { 1, 2, 3, 6 };
 
-        p_header->i_rate = pi_fscod_samplerates[i_fscod];
+        p_header->i_rate = pi_fscod_samplerates[bs->i_fscod];
         p_header->i_blocks_per_sync_frame = pi_numblkscod[bs_read( &s, 2 )];
     }
 
-    const unsigned i_acmod = bs_read( &s, 3 );
-    const unsigned i_lfeon = bs_read1( &s );
+    bs->i_acmod = bs_read( &s, 3 );
+    bs->i_lfeon = bs_read1( &s );
 
-    p_header->i_channels_conf = p_acmod[i_acmod];
+    p_header->i_channels_conf = p_acmod[bs->i_acmod];
     p_header->i_chan_mode = 0;
-    if( i_acmod == 0 )
+    if( bs->i_acmod == 0 )
         p_header->i_chan_mode |= AOUT_CHANMODE_DUALMONO;
-    if( i_lfeon )
+    if( bs->i_lfeon )
         p_header->i_channels_conf |= AOUT_CHAN_LFE;
     p_header->i_channels = vlc_popcount( p_header->i_channels_conf );
     p_header->i_bitrate = 8 * p_header->i_size * p_header->i_rate

@@ -211,7 +211,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
                 break;
             }
 
-            if( p_sys->frame.b_eac3 && p_sys->frame.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+            if( p_sys->frame.b_eac3 && p_sys->frame.bs.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
             {
                 msg_Warn( p_dec, "starting with dependent stream, skip it" );
                 p_sys->i_state = STATE_NOSYNC;
@@ -258,7 +258,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
 
             vlc_a52_header_t a52;
             if( !vlc_a52_header_Parse( &a52, p_header, VLC_A52_HEADER_SIZE )
-             && a52.b_eac3 && a52.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
+             && a52.b_eac3 && a52.bs.eac3.strmtyp == EAC3_STRMTYP_DEPENDENT )
                 p_sys->i_input_size += a52.i_size;
 
             p_sys->i_state = STATE_GET_DATA;
