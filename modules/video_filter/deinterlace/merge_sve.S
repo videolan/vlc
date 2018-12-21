@@ -18,7 +18,7 @@
  * Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-	.arch_extension sve
+	.arch armv8-a+sve
 
 	/* TODO: prefetch, unroll */
 
