@@ -553,6 +553,10 @@ crossfile.meson:
 	echo "[properties]" >> $@
 	echo "needs_exe_wrapper = true" >> $@
 ifdef HAVE_CROSS_COMPILE
+	echo "c_args = [ ' -I $(PREFIX)/include' ]" >> $@
+	echo "cpp_args = [ ' -I $(PREFIX)/include' ]" >> $@
+	echo "c_link_args = [' -L $(PREFIX)/lib' ]" >> $@
+	echo "cpp_link_args = [ ' -L $(PREFIX)/lib' ]" >> $@
 	echo "[host_machine]" >> $@
 ifdef HAVE_WIN32
 	echo "system = 'windows'" >> $@
