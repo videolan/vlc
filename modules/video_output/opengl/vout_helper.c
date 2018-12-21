@@ -160,6 +160,7 @@ struct prgm
         GLint UseAmbiantTexture;
         GLint UseDiffuseTexture;
         GLint UseSpecularTexture;
+        GLint UseNormalTexture;
 
         GLint IsUniformColor;
         GLint IsInstanced;
@@ -811,6 +812,7 @@ opengl_link_program(struct prgm *prgm)
     GET_ULOC(UseAmbiantTexture, "UseAmbiantTexture");
     GET_ULOC(UseDiffuseTexture, "UseDiffuseTexture");
     GET_ULOC(UseSpecularTexture, "UseSpecularTexture");
+    GET_ULOC(UseNormalTexture, "UseNormalTexture");
 
 #undef GET_LOC
 #undef GET_ULOC
@@ -2678,7 +2680,10 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         {
             vgl->vt.ActiveTexture(GL_TEXTURE3);
             vgl->vt.BindTexture(GL_TEXTURE_2D, vgl->p_objDisplay->texturesNormal[p_object->textureId]);
+            vgl->vt.Uniform1i(prgm->uloc.UseNormalTexture, GL_TRUE);
         }
+        else
+            vgl->vt.Uniform1i(prgm->uloc.UseNormalTexture, GL_FALSE);
 
         if(p_material->p_baseColorTex != NULL)
         {
