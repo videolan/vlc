@@ -751,17 +751,9 @@ static int OutputOpen(vlc_object_t *obj)
     else
         return VLC_EGENERIC;
 
-    /* Get the context and allocate the mixer (through *ahem* picture) */
-    picture_t *pic = filter_NewPicture(filter);
-    if (pic == NULL)
+    VdpStatus err = vdp_get_x11(NULL, -1, &sys->vdp, &sys->device);
+    if (err != VDP_STATUS_OK)
         return VLC_EGENERIC;
-
-    vlc_vdp_output_surface_t *picsys = pic->p_sys;
-    assert(picsys != NULL && picsys->vdp != NULL);
-
-    sys->vdp = vdp_hold_x11(picsys->vdp, NULL);
-    sys->device = picsys->device;
-    picture_Release(pic);
 
     sys->mixer = MixerCreate(filter, video_filter == YCbCrRender);
     if (sys->mixer == VDP_INVALID_HANDLE)
