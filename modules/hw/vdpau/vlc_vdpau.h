@@ -285,7 +285,7 @@ vlc_vdp_video_field_t *vlc_vdp_video_create(vdp_t *, VdpVideoSurface);
 
 static inline void vlc_vdp_video_destroy(vlc_vdp_video_field_t *f)
 {
-    return f->context.destroy(&f->context);
+    f->context.destroy(&f->context);
 }
 
 /**
