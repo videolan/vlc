@@ -234,6 +234,7 @@ struct vout_display_opengl_t {
     float f_teta;
     float f_phi;
     float f_roll;
+    float f_fov;
     float f_fovx; /* f_fovx and f_fovy are linked but we keep both */
     float f_fovy; /* to avoid recalculating them when needed.      */
     float f_z;    /* Position of the camera on the shpere radius vector */
@@ -367,8 +368,8 @@ static void getZoomMatrix(float zoom, GLfloat matrix[static 16]) {
 static void getProjectionMatrix(float sar, float fovy, float offset,
                                 GLfloat matrix[static 16]) {
 
-    float zFar  = 1000;
-    float zNear = 0.01;
+    float zFar  = 10000;
+    float zNear = 0.1;
 
     float f = 1.f / tanf(fovy / 2.f);
 
@@ -407,7 +408,7 @@ static void ComputeProjectionMatrix(vout_display_opengl_t *vgl,
             offset = -proj_offset;
     }
 
-    getProjectionMatrix(vgl->f_sar, vgl->f_fovx, offset, matrix);
+    getProjectionMatrix(vgl->f_sar, vgl->f_fov, offset, matrix);
 }
 
 static void getViewpointMatrixes(vout_display_opengl_t *vgl,
@@ -636,6 +637,12 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " TBNMatrix = mat3(Tangent_world, Bitangent_world, Normal_world);\n"
 
         " gl_Position = ProjectionMatrix * ViewMatrix * vec4(Position_world, 1);\n"
+        // TODO: is it y or z ?
+        //" float zfar = 1000000;\n"
+        //" float factor = 0.001;\n"
+        //" gl_Position.z = -1 + 2 * log(1 + factor * gl_Position.z)\n"
+        //"               / log(1 + factor * zfar);\n"
+        //" gl_Position.z *= gl_Position.w;\n"
         "}";
 
     const char *coord1_header = plane_count > 1 ?
@@ -1179,7 +1186,7 @@ static void UpdateFBOSize(vout_display_opengl_t *vgl,
     vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 
     vgl->vt.BindRenderbuffer(GL_RENDERBUFFER, depth_tex);
-    vgl->vt.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, vgl->i_displayWidth, vgl->i_displayHeight);
+    vgl->vt.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, vgl->i_displayWidth/2, vgl->i_displayHeight);
 #else
     vgl->vt.BindTexture(GL_TEXTURE_2D, color_tex);
     vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vgl->i_displayWidth / 2.f, vgl->i_displayHeight, 0, GL_RGBA, GL_UNSIGNED_INT, NULL);
@@ -1189,7 +1196,7 @@ static void UpdateFBOSize(vout_display_opengl_t *vgl,
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     vgl->vt.BindTexture(GL_TEXTURE_2D, depth_tex);
-    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, vgl->i_displayWidth / 2.f, vgl->i_displayHeight, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+    vgl->vt.TexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, vgl->i_displayWidth / 2.f, vgl->i_displayHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     vgl->vt.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -2549,6 +2556,16 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
     updateViewMatrix(vgl, prgm);
 
+    float *p = prgm->var.ProjectionMatrix;
+    msg_Err(vgl->gl, "Projection matrix: \n"
+            "[ %f %f %f %f ]\n"
+            "[ %f %f %f %f ]\n"
+            "[ %f %f %f %f ]\n"
+            "[ %f %f %f %f ]",
+            p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
+            p[11], p[12], p[13], p[14], p[15]);
+
+
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
@@ -2752,7 +2769,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+2, 0);
     vgl->vt.VertexAttribDivisor(prgm->aloc.InstanceTransformMatrix+3, 0);
 
-    printf("=> %u instances have been culled out\n", instances_dropped);
+    //printf("=> %u instances have been culled out\n", instances_dropped);
 }
 
 static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, side_by_side_eye eye)
@@ -3093,6 +3110,9 @@ static void HmdConfigChanged(vlc_hmd_interface_t *hmd,
             1, vgl->hmd_cfg.viewport_scale);
     vgl->vt.Uniform3fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "aberr"),
             1, vgl->hmd_cfg.aberr_scale);
+
+    vgl->f_fov = cfg.left.fov;
+    vgl->f_sar = cfg.left.ar;
 
     vout_display_opengl_Viewport(vgl, vgl->i_displayX, vgl->i_displayY,
                                  vgl->i_displayWidth, vgl->i_displayHeight);

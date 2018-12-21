@@ -286,15 +286,15 @@ static void* HMDThread(void *p_data)
         ohmd_device_getf(sys->hmd, OHMD_UNIVERSAL_ABERRATION_K,
                          p_hmd->cfg.aberr_scale);
 
-        float sep;
-        ohmd_device_getf(sys->hmd, OHMD_LENS_HORIZONTAL_SEPARATION, &sep);
+        ohmd_device_getf(sys->hmd, OHMD_LENS_HORIZONTAL_SEPARATION,
+                         &p_hmd->cfg.separator);
 
         p_hmd->cfg.left.lens_center[0] =
-            p_hmd->cfg.viewport_scale[0] - sep / 2.0f;
+            p_hmd->cfg.viewport_scale[0] - p_hmd->cfg.separator / 2.0f;
         ohmd_device_getf(sys->hmd, OHMD_LENS_VERTICAL_POSITION,
                          &p_hmd->cfg.left.lens_center[1]);
 
-        p_hmd->cfg.right.lens_center[0] = sep / 2.0f;
+        p_hmd->cfg.right.lens_center[0] = p_hmd->cfg.separator / 2.0f;
         ohmd_device_getf(sys->hmd, OHMD_LENS_VERTICAL_POSITION,
                          &p_hmd->cfg.right.lens_center[1]);
 
@@ -315,6 +315,18 @@ static void* HMDThread(void *p_data)
                          p_hmd->cfg.left.modelview);
         ohmd_device_getf(sys->hmd, OHMD_RIGHT_EYE_GL_MODELVIEW_MATRIX,
                          p_hmd->cfg.right.modelview);
+
+        ohmd_device_getf(sys->hmd, OHMD_LEFT_EYE_FOV,
+                         &p_hmd->cfg.left.fov);
+        ohmd_device_getf(sys->hmd, OHMD_RIGHT_EYE_FOV,
+                         &p_hmd->cfg.right.fov);
+
+        ohmd_device_getf(sys->hmd, OHMD_LEFT_EYE_ASPECT_RATIO,
+                         &p_hmd->cfg.left.ar);
+        ohmd_device_getf(sys->hmd, OHMD_RIGHT_EYE_ASPECT_RATIO,
+                         &p_hmd->cfg.right.ar);
+
+        ohmd_device_getf(sys->hmd, OHMD_EYE_IPD, &p_hmd->cfg.ipd);
     }
 
     vlc_mutex_lock(&sys->lock);
