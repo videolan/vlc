@@ -163,23 +163,31 @@ void mux_extradata_builder_Delete(mux_extradata_builder_t *m)
     free(m);
 }
 
-mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc)
+static const struct
 {
+    enum mux_extradata_type_e type;
+    vlc_fourcc_t fcc;
     const struct mux_extradata_builder_cb *cb;
-    switch(fcc)
+} mappings[] = {
+    { EXTRADATA_ISOBMFF, VLC_CODEC_AV1,  &av1_cb },
+    { EXTRADATA_ISOBMFF, VLC_CODEC_A52,  &ac3_cb },
+    { EXTRADATA_ISOBMFF, VLC_CODEC_EAC3, &eac3_cb },
+};
+
+mux_extradata_builder_t * mux_extradata_builder_New(vlc_fourcc_t fcc,
+                                                    enum mux_extradata_type_e type)
+{
+    const struct mux_extradata_builder_cb *cb = NULL;
+    for(size_t i=0; i<ARRAY_SIZE(mappings); i++)
     {
-        case VLC_CODEC_AV1:
-            cb = &av1_cb;
-            break;
-        case VLC_CODEC_A52:
-            cb = &ac3_cb;
-            break;
-        case VLC_CODEC_EAC3:
-            cb = &eac3_cb;
-            break;
-        default:
-            return NULL;
+        if(mappings[i].type != type || mappings[i].fcc != fcc)
+            continue;
+        cb = mappings[i].cb;
+        break;
     }
+
+    if(cb == NULL)
+        return NULL;
 
     mux_extradata_builder_t *m = calloc(1, sizeof(*m));
     if(m)

@@ -526,7 +526,8 @@ static int AddStream(sout_mux_t *p_mux, sout_input_t *p_input)
         return VLC_ENOMEM;
     }
 
-    p_stream->extrabuilder = mux_extradata_builder_New(p_input->p_fmt->i_codec);
+    p_stream->extrabuilder = mux_extradata_builder_New(p_input->p_fmt->i_codec,
+                                                       EXTRADATA_ISOBMFF);
     p_stream->p_fmt = p_input->p_fmt;
 
     p_input->p_sys          = p_stream;
