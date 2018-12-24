@@ -50,7 +50,6 @@
 struct  priv
 {
     vdp_t *vdp;
-    VdpDevice vdp_device;
 };
 
 static PFNGLVDPAUINITNVPROC                     _glVDPAUInitNV;
@@ -164,15 +163,17 @@ Open(vlc_object_t *obj)
         return VLC_EGENERIC;
     tc->priv = priv;
 
+    VdpDevice device;
+
     if (vdp_get_x11(tc->gl->surface->display.x11, -1,
-                    &priv->vdp, &priv->vdp_device) != VDP_STATUS_OK)
+                    &priv->vdp, &device) != VDP_STATUS_OK)
     {
         free(priv);
         return VLC_EGENERIC;
     }
 
     void *vdp_gpa;
-    if (vdp_get_proc_address(priv->vdp, priv->vdp_device,
+    if (vdp_get_proc_address(priv->vdp, device,
                              VDP_FUNC_ID_GET_PROC_ADDRESS, &vdp_gpa)
         != VDP_STATUS_OK)
     {
@@ -200,7 +201,7 @@ Open(vlc_object_t *obj)
     SAFE_GPA(glVDPAUUnmapSurfacesNV);
 #undef SAFE_GPA
 
-    INTEROP_CALL(glVDPAUInitNV, (void *)(size_t)priv->vdp_device, vdp_gpa);
+    INTEROP_CALL(glVDPAUInitNV, (void *)(uintptr_t)device, vdp_gpa);
 
     tc->fshader = opengl_fragment_shader_init(tc, GL_TEXTURE_2D,
                                               VLC_CODEC_RGB32,
