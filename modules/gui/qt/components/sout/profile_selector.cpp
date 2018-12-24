@@ -582,7 +582,7 @@ inline void VLCProfileEditor::registerCodecs()
     ADD_ACODEC( "Flac", "flac" )
     ADD_ACODEC( "Opus", "opus" )
     ADD_ACODEC( "Speex", "spx" )
-    ADD_ACODEC( "WAV", "s16l" )
+    ADD_ACODEC( "PCM 16-bit", "s16l" )
     ADD_ACODEC( "WMA2", "wma2" )
 #undef ADD_ACODEC
 
