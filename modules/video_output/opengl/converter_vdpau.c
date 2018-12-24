@@ -47,11 +47,6 @@
         } \
     }
 
-struct  priv
-{
-    vdp_t *vdp;
-};
-
 static PFNGLVDPAUINITNVPROC                     _glVDPAUInitNV;
 static PFNGLVDPAUFININVPROC                     _glVDPAUFiniNV;
 static PFNGLVDPAUREGISTEROUTPUTSURFACENVPROC    _glVDPAURegisterOutputSurfaceNV;
@@ -66,14 +61,13 @@ static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    struct priv *priv = tc->priv;
+    vdp_t *vdp = tc->priv;
     picture_t *pics[requested_count];
 
     unsigned int i;
     for (i = 0; i < requested_count; ++i)
     {
-        pics[i] = vlc_vdp_output_surface_create(priv->vdp,
-                                                VDP_RGBA_FORMAT_B8G8R8A8,
+        pics[i] = vlc_vdp_output_surface_create(vdp, VDP_RGBA_FORMAT_B8G8R8A8,
                                                 &tc->fmt);
         if (pics[i] == NULL)
             goto error;
@@ -140,8 +134,7 @@ Close(vlc_object_t *obj)
 {
     opengl_tex_converter_t *tc = (void *)obj;
     _glVDPAUFiniNV(); assert(tc->vt->GetError() == GL_NO_ERROR);
-    vdp_release_x11(((struct priv *)tc->priv)->vdp);
-    free(tc->priv);
+    vdp_release_x11(tc->priv);
 }
 
 static int
@@ -160,27 +153,21 @@ Open(vlc_object_t *obj)
     if (!vlc_xlib_init(VLC_OBJECT(tc->gl)))
         return VLC_EGENERIC;
 
-    struct priv *priv = calloc(1, sizeof(*priv));
-    if (!priv)
-        return VLC_EGENERIC;
-    tc->priv = priv;
-
+    vdp_t *vdp;
     VdpDevice device;
 
     if (vdp_get_x11(tc->gl->surface->display.x11, -1,
-                    &priv->vdp, &device) != VDP_STATUS_OK)
-    {
-        free(priv);
+                    &vdp, &device) != VDP_STATUS_OK)
         return VLC_EGENERIC;
-    }
+
+    tc->priv = vdp;
 
     void *vdp_gpa;
-    if (vdp_get_proc_address(priv->vdp, device,
+    if (vdp_get_proc_address(vdp, device,
                              VDP_FUNC_ID_GET_PROC_ADDRESS, &vdp_gpa)
         != VDP_STATUS_OK)
     {
-        vdp_release_x11(priv->vdp);
-        free(priv);
+        vdp_release_x11(vdp);
         return VLC_EGENERIC;
     }
 
@@ -188,8 +175,7 @@ Open(vlc_object_t *obj)
     _##fct = vlc_gl_GetProcAddress(tc->gl, #fct); \
     if (!_##fct) \
     { \
-        vdp_release_x11(priv->vdp); \
-        free(priv); \
+        vdp_release_x11(vdp); \
         return VLC_EGENERIC; \
     }
     SAFE_GPA(glVDPAUInitNV);
