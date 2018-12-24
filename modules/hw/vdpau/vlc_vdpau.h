@@ -206,6 +206,7 @@ void vdp_release_x11(vdp_t *);
 /* VLC specifics */
 # include <stdatomic.h>
 # include <stdbool.h>
+# include <stdint.h>
 # include <vlc_common.h>
 # include <vlc_fourcc.h>
 # include <vlc_picture.h>
@@ -303,7 +304,7 @@ typedef struct vlc_vdp_output_surface
     VdpOutputSurface surface;
     VdpDevice device;
     vdp_t *vdp;
-    void *gl_nv_surface;
+    ptrdiff_t gl_nv_surface;
 } vlc_vdp_output_surface_t;
 
 picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,

@@ -80,7 +80,7 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
 
         vlc_vdp_output_surface_t *picsys = pics[i]->p_sys;
 
-        *(GLvdpauSurfaceNV *)&picsys->gl_nv_surface = 0;
+        picsys->gl_nv_surface = 0;
     }
 
     picture_pool_t *pool = picture_pool_New(requested_count, pics);
@@ -106,8 +106,10 @@ tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
 
     vlc_vdp_output_surface_t *p_sys = pic->p_sys;
 
-    GLvdpauSurfaceNV *p_gl_nv_surface =
-        (GLvdpauSurfaceNV *)&p_sys->gl_nv_surface;
+    static_assert (_Generic (p_sys->gl_nv_surface, GLvdpauSurfaceNV: 1,
+                                                   default: 0), "Mismatch");
+
+    GLvdpauSurfaceNV *p_gl_nv_surface = &p_sys->gl_nv_surface;
 
     if (*p_gl_nv_surface)
     {
