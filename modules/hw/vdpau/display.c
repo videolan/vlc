@@ -70,53 +70,6 @@ struct vout_display_sys_t
     unsigned height;
 };
 
-static void pictureSys_DestroyVDPAU(vlc_vdp_output_surface_t *psys)
-{
-    vdp_output_surface_destroy(psys->vdp, psys->surface);
-    vdp_release_x11(psys->vdp);
-    free(psys);
-}
-
-static void PictureDestroyVDPAU(picture_t *pic)
-{
-    pictureSys_DestroyVDPAU(pic->p_sys);
-}
-
-static VdpStatus picture_NewVDPAU(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
-                                  const video_format_t *restrict fmt,
-                                  picture_t **restrict picp)
-{
-    vlc_vdp_output_surface_t *psys = malloc(sizeof (*psys));
-    if (unlikely(psys == NULL))
-        return VDP_STATUS_RESOURCES;
-
-    psys->vdp = vdp_hold_x11(vdp, &psys->device);
-
-    VdpStatus err = vdp_output_surface_create(psys->vdp, psys->device,
-                          rgb_fmt, fmt->i_visible_width, fmt->i_visible_height,
-                                              &psys->surface);
-    if (err != VDP_STATUS_OK)
-    {
-        vdp_release_x11(psys->vdp);
-        free(psys);
-        return err;
-    }
-
-    picture_resource_t res = {
-        .p_sys = psys,
-        .pf_destroy = PictureDestroyVDPAU,
-    };
-
-    picture_t *pic = picture_NewFromResource(fmt, &res);
-    if (unlikely(pic == NULL))
-    {
-        pictureSys_DestroyVDPAU(psys);
-        return VDP_STATUS_RESOURCES;
-    }
-    *picp = pic;
-    return VDP_STATUS_OK;
-}
-
 static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -125,12 +78,11 @@ static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
     unsigned count = 0;
     while (count < requested_count)
     {
-        VdpStatus err = picture_NewVDPAU(sys->vdp, sys->rgb_fmt, &vd->fmt,
-                                         pics + count);
-        if (err != VDP_STATUS_OK)
+        pics[count] = vlc_vdp_output_surface_create(sys->vdp, sys->rgb_fmt,
+                                                    &vd->fmt);
+        if (pics[count] == NULL)
         {
-            msg_Err(vd, "%s creation failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
+            msg_Err(vd, "%s creation failure", "output surface");
             break;
         }
         count++;

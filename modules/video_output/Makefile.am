@@ -95,7 +95,7 @@ libglconv_vaapi_drm_plugin_la_LIBADD = $(LIBVA_LIBS) $(LIBVA_EGL_LIBS) \
 	$(LIBVA_DRM_LIBS)
 
 libglconv_vdpau_plugin_la_SOURCES = video_output/opengl/converter_vdpau.c \
-	video_output/opengl/converter.h hw/vdpau/vlc_vdpau.h
+	video_output/opengl/converter.h hw/vdpau/picture.c hw/vdpau/vlc_vdpau.h
 libglconv_vdpau_plugin_la_CFLAGS = $(AM_CFLAGS) $(VDPAU_CFLAGS)
 libglconv_vdpau_plugin_la_LIBADD = $(LIBDL) libvlc_vdpau.la $(X_LIBS) $(X_PRE_LIBS) -lX11
 

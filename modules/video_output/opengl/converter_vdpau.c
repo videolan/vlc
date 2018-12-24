@@ -63,16 +63,6 @@ static PFNGLVDPAUSURFACEACCESSNVPROC            _glVDPAUSurfaceAccessNV;
 static PFNGLVDPAUMAPSURFACESNVPROC              _glVDPAUMapSurfacesNV;
 static PFNGLVDPAUUNMAPSURFACESNVPROC            _glVDPAUUnmapSurfacesNV;
 
-static void
-pool_pic_destroy_cb(picture_t *pic)
-{
-    vlc_vdp_output_surface_t *p_sys = pic->p_sys;
-
-    vdp_output_surface_destroy(p_sys->vdp, p_sys->surface);
-    vdp_release_x11(p_sys->vdp);
-    free(p_sys);
-}
-
 static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
@@ -83,36 +73,15 @@ tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
     unsigned int i;
     for (i = 0; i < requested_count; ++i)
     {
-        VdpOutputSurface surface;
-
-        VdpStatus st;
-        if ((st = vdp_output_surface_create(priv->vdp, priv->vdp_device,
-                                            VDP_RGBA_FORMAT_B8G8R8A8,
-                                            tc->fmt.i_visible_width,
-                                            tc->fmt.i_visible_height,
-                                            &surface)) != VDP_STATUS_OK)
+        pics[i] = vlc_vdp_output_surface_create(priv->vdp,
+                                                VDP_RGBA_FORMAT_B8G8R8A8,
+                                                &tc->fmt);
+        if (pics[i] == NULL)
             goto error;
 
-        vlc_vdp_output_surface_t *picsys = malloc(sizeof (*picsys));
-        if (!picsys) {
-            vdp_output_surface_destroy(priv->vdp, surface);
-            goto error;
-        }
+        vlc_vdp_output_surface_t *picsys = pics[i]->p_sys;
 
-        picsys->vdp = vdp_hold_x11(priv->vdp, NULL);
-        picsys->device = priv->vdp_device;
-        picsys->surface = surface;
         *(GLvdpauSurfaceNV *)&picsys->gl_nv_surface = 0;
-
-        picture_resource_t rsc = { .p_sys = picsys,
-                                   .pf_destroy = pool_pic_destroy_cb };
-
-        pics[i] = picture_NewFromResource(&tc->fmt, &rsc);
-        if (!pics[i]) {
-            free(picsys);
-            vdp_output_surface_destroy(priv->vdp, surface);
-            goto error;
-        }
     }
 
     picture_pool_t *pool = picture_pool_New(requested_count, pics);

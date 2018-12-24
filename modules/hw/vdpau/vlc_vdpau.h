@@ -306,4 +306,7 @@ typedef struct vlc_vdp_output_surface
     void *gl_nv_surface;
 } vlc_vdp_output_surface_t;
 
+picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                         const video_format_t *restrict fmt);
+
 #endif

@@ -126,3 +126,45 @@ VdpStatus vlc_vdp_video_attach(vdp_t *vdp, VdpVideoSurface surface,
     pic->context = &field->context;
     return VDP_STATUS_OK;
 }
+
+static void vlc_vdp_output_surface_destroy(picture_t *pic)
+{
+    vlc_vdp_output_surface_t *sys = pic->p_sys;
+
+    vdp_output_surface_destroy(sys->vdp, sys->surface);
+    vdp_release_x11(sys->vdp);
+    free(sys);
+}
+
+picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                         const video_format_t *restrict fmt)
+{
+    vlc_vdp_output_surface_t *sys = malloc(sizeof (*sys));
+    if (unlikely(sys == NULL))
+        return NULL;
+
+    sys->vdp = vdp_hold_x11(vdp, &sys->device);
+
+    VdpStatus err = vdp_output_surface_create(vdp, sys->device, rgb_fmt,
+        fmt->i_visible_width, fmt->i_visible_height, &sys->surface);
+    if (err != VDP_STATUS_OK)
+    {
+error:
+        vdp_release_x11(vdp);
+        free(sys);
+        return NULL;
+    }
+
+    picture_resource_t res = {
+        .p_sys = sys,
+        .pf_destroy = vlc_vdp_output_surface_destroy,
+    };
+
+    picture_t *pic = picture_NewFromResource(fmt, &res);
+    if (unlikely(pic == NULL))
+    {
+        vdp_output_surface_destroy(vdp, sys->surface);
+        goto error;
+    }
+    return pic;
+}
