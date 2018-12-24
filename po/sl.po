@@ -1,5 +1,5 @@
 # Slovenian translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,11 +12,11 @@
 # Rok Žerdin <zerdin.rok1@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:29+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2018-12-24 18:15+0100\n"
+"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>, 2018\n"
 "Language-Team: Slovenian (https://www.transifex.com/yaron/teams/16553/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -8255,7 +8255,7 @@ msgstr "Pravi RTSP"
 
 #: modules/access/rtsp/access.c:87
 msgid "Connection failed"
-msgstr "Neuspešna povezava"
+msgstr "Povezava je spodletela"
 
 #: modules/access/rtsp/access.c:88
 #, c-format
@@ -8264,7 +8264,7 @@ msgstr "Ni mogoče vzpostaviti povezave z »%s:%d«."
 
 #: modules/access/rtsp/access.c:225
 msgid "Session failed"
-msgstr "Neuspešna seja"
+msgstr "Seja je spodletela"
 
 #: modules/access/rtsp/access.c:226
 msgid "The requested RTSP session could not be established."
@@ -8692,7 +8692,7 @@ msgstr "Svetlost"
 
 #: modules/access/v4l2/v4l2.c:85
 msgid "Picture brightness or black level."
-msgstr "Svetlost slike ali raven črnine."
+msgstr "Svetlost slike oziroma raven črnine."
 
 #: modules/access/v4l2/v4l2.c:86
 msgid "Automatic brightness"
@@ -8710,7 +8710,7 @@ msgstr "Kontrast"
 
 #: modules/access/v4l2/v4l2.c:90
 msgid "Picture contrast or luma gain."
-msgstr "Kontrast slike ali uskladitev osvetljenosti"
+msgstr "Kontrast slike oziroma uskladitev osvetljenosti."
 
 #: modules/access/v4l2/v4l2.c:91
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:208
@@ -8722,7 +8722,7 @@ msgstr "Nasičenost"
 
 #: modules/access/v4l2/v4l2.c:92
 msgid "Picture saturation or chroma gain."
-msgstr "Nasičenost slike ali uskladitev barve."
+msgstr "Nasičenost slike oziroma uskladitev barve."
 
 #: modules/access/v4l2/v4l2.c:93
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:204
@@ -17354,7 +17354,7 @@ msgstr "Uporabi veliko besedilo za poglede seznama"
 
 #: modules/gui/macosx/macosx.m:133
 msgid "Do nothing"
-msgstr "Ne naredi ničesar"
+msgstr "Ne stori ničesar"
 
 #: modules/gui/macosx/macosx.m:133
 msgid "Pause iTunes / Spotify"
@@ -17434,7 +17434,7 @@ msgstr "Raven %i"
 #: modules/gui/macosx/VLCMainMenu.m:288
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Smaller"
-msgstr "Manjša"
+msgstr "Najmanjša"
 
 #: modules/gui/macosx/VLCMainMenu.m:289
 #: modules/text_renderer/freetype/freetype.c:124
@@ -17449,7 +17449,7 @@ msgstr "Velika"
 #: modules/gui/macosx/VLCMainMenu.m:292
 #: modules/text_renderer/freetype/freetype.c:124
 msgid "Larger"
-msgstr "Večja"
+msgstr "Največja"
 
 #: modules/gui/macosx/VLCMainMenu.m:341
 msgid "Check for Update..."
@@ -23781,9 +23781,8 @@ msgid "avparser packetizer"
 msgstr "Paketnik avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Paketnik slike Theora"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
