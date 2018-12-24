@@ -61,32 +61,8 @@ static picture_pool_t *
 tc_vdpau_gl_get_pool(opengl_tex_converter_t const *tc,
                      unsigned int requested_count)
 {
-    vdp_t *vdp = tc->priv;
-    picture_t *pics[requested_count];
-
-    unsigned int i;
-    for (i = 0; i < requested_count; ++i)
-    {
-        pics[i] = vlc_vdp_output_surface_create(vdp, VDP_RGBA_FORMAT_B8G8R8A8,
-                                                &tc->fmt);
-        if (pics[i] == NULL)
-            goto error;
-
-        vlc_vdp_output_surface_t *picsys = pics[i]->p_sys;
-
-        picsys->gl_nv_surface = 0;
-    }
-
-    picture_pool_t *pool = picture_pool_New(requested_count, pics);
-    if (!pool)
-        goto error;
-
-    return pool;
-
-error:
-    while (i--)
-        picture_Release(pics[i]);
-    return NULL;
+    return vlc_vdp_output_pool_create(tc->priv, VDP_RGBA_FORMAT_B8G8R8A8,
+                                      &tc->fmt, requested_count);
 }
 
 static int

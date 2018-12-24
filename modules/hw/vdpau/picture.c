@@ -28,6 +28,7 @@
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_picture.h>
+#include <vlc_picture_pool.h>
 #include "vlc_vdpau.h"
 
 #pragma GCC visibility push(default)
@@ -136,6 +137,7 @@ static void vlc_vdp_output_surface_destroy(picture_t *pic)
     free(sys);
 }
 
+static
 picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
                                          const video_format_t *restrict fmt)
 {
@@ -144,6 +146,7 @@ picture_t *vlc_vdp_output_surface_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
         return NULL;
 
     sys->vdp = vdp_hold_x11(vdp, &sys->device);
+    sys->gl_nv_surface = 0;
 
     VdpStatus err = vdp_output_surface_create(vdp, sys->device, rgb_fmt,
         fmt->i_visible_width, fmt->i_visible_height, &sys->surface);
@@ -167,4 +170,29 @@ error:
         goto error;
     }
     return pic;
+}
+
+picture_pool_t *vlc_vdp_output_pool_create(vdp_t *vdp, VdpRGBAFormat rgb_fmt,
+                                           const video_format_t *restrict fmt,
+                                           unsigned requested_count)
+{
+    picture_t *pics[requested_count];
+    unsigned count = 0;
+
+    while (count < requested_count)
+    {
+        pics[count] = vlc_vdp_output_surface_create(vdp, rgb_fmt, fmt);
+        if (pics[count] == NULL)
+            break;
+        count++;
+    }
+
+    if (count == 0)
+        return NULL;
+
+    picture_pool_t *pool = picture_pool_New(count, pics);
+    if (unlikely(pool == NULL))
+        while (count > 0)
+            picture_Release(pics[--count]);
+    return pool;
 }

@@ -70,35 +70,6 @@ struct vout_display_sys_t
     unsigned height;
 };
 
-static picture_pool_t *PoolAlloc(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    picture_t *pics[requested_count];
-
-    unsigned count = 0;
-    while (count < requested_count)
-    {
-        pics[count] = vlc_vdp_output_surface_create(sys->vdp, sys->rgb_fmt,
-                                                    &vd->fmt);
-        if (pics[count] == NULL)
-        {
-            msg_Err(vd, "%s creation failure", "output surface");
-            break;
-        }
-        count++;
-    }
-    sys->current = NULL;
-
-    if (count == 0)
-        return NULL;
-
-    picture_pool_t *pool = picture_pool_New(count, pics);
-    if (unlikely(pool == NULL))
-        while (count > 0)
-            picture_Release(pics[--count]);
-    return pool;
-}
-
 static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -113,7 +84,11 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool == NULL)
-        sys->pool = PoolAlloc(vd, requested_count);
+    {
+        sys->current = NULL;
+        sys->pool = vlc_vdp_output_pool_create(sys->vdp, sys->rgb_fmt,
+                                               &vd->fmt, requested_count);
+    }
     return sys->pool;
 }
 
