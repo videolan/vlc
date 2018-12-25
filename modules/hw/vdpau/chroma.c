@@ -718,7 +718,7 @@ static int OutputOpen(vlc_object_t *obj)
     assert(filter->fmt_out.video.orientation == ORIENT_TOP_LEFT
         || filter->fmt_in.video.orientation == filter->fmt_out.video.orientation);
 
-    filter_sys_t *sys = malloc(sizeof (*sys));
+    filter_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
 
@@ -749,12 +749,12 @@ static int OutputOpen(vlc_object_t *obj)
                               &sys->chroma, &sys->format))
         video_filter = YCbCrRender;
     else
-        goto error;
+        return VLC_EGENERIC;
 
     /* Get the context and allocate the mixer (through *ahem* picture) */
     picture_t *pic = filter_NewPicture(filter);
     if (pic == NULL)
-        goto error;
+        return VLC_EGENERIC;
 
     vlc_vdp_output_surface_t *picsys = pic->p_sys;
     assert(picsys != NULL && picsys->vdp != NULL);
@@ -767,7 +767,7 @@ static int OutputOpen(vlc_object_t *obj)
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         vdp_release_x11(sys->vdp);
-        goto error;
+        return VLC_EGENERIC;
     }
 
     /* NOTE: The video mixer capabilities should be checked here, and the
@@ -788,9 +788,6 @@ static int OutputOpen(vlc_object_t *obj)
     filter->pf_video_filter = video_filter;
     filter->pf_flush = Flush;
     return VLC_SUCCESS;
-error:
-    free(sys);
-    return VLC_EGENERIC;
 }
 
 static void OutputClose(vlc_object_t *obj)
@@ -801,7 +798,6 @@ static void OutputClose(vlc_object_t *obj)
     Flush(filter);
     vdp_video_mixer_destroy(sys->vdp, sys->mixer);
     vdp_release_x11(sys->vdp);
-    free(sys);
 }
 
 static picture_t *VideoExport_Filter(filter_t *filter, picture_t *src)
@@ -855,7 +851,7 @@ static int YCbCrOpen(vlc_object_t *obj)
           != filter->fmt_in.video.i_sar_den * filter->fmt_out.video.i_sar_num))
         return VLC_EGENERIC;
 
-    filter_sys_t *sys = malloc(sizeof (*sys));
+    filter_sys_t *sys = vlc_obj_malloc(obj, sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
     sys->chroma = type;
@@ -864,14 +860,6 @@ static int YCbCrOpen(vlc_object_t *obj)
     filter->pf_video_filter = VideoExport_Filter;
     filter->p_sys = sys;
     return VLC_SUCCESS;
-}
-
-static void YCbCrClose(vlc_object_t *obj)
-{
-    filter_t *filter = (filter_t *)obj;
-    filter_sys_t *sys = filter->p_sys;
-
-    free(sys);
 }
 
 static const int algo_values[] = {
@@ -907,5 +895,5 @@ vlc_module_begin()
        N_("Scaling quality"), N_("High quality scaling level"), true)
 
     add_submodule()
-    set_callbacks(YCbCrOpen, YCbCrClose)
+    set_callbacks(YCbCrOpen, NULL)
 vlc_module_end()
