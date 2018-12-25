@@ -514,7 +514,7 @@ static picture_t *Render(filter_t *filter, picture_t *src, bool import)
     }
 
     /* Get a VLC picture for a VDPAU output surface */
-    dst = filter_NewPicture(filter);
+    dst = picture_pool_Get(sys->pool);
     if (dst == NULL)
         goto skip;
 
