@@ -30,6 +30,7 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 #include <vlc_picture.h>
+#include <vlc_picture_pool.h>
 #include "vlc_vdpau.h"
 
 /* Picture history as recommended by VDPAU documentation */
@@ -43,6 +44,7 @@ typedef struct
     VdpVideoMixer mixer;
     VdpChromaType chroma;
     VdpYCbCrFormat format;
+    picture_pool_t *pool;
 
     struct
     {
@@ -743,6 +745,19 @@ static int OutputCheckFormat(vlc_object_t *obj, vdp_t *vdp, VdpDevice dev,
     return VLC_EGENERIC;
 }
 
+static picture_pool_t *OutputPoolAlloc(vlc_object_t *obj, vdp_t *vdp,
+    VdpDevice dev, const video_format_t *restrict fmt)
+{
+    /* Check output surface format */
+    VdpRGBAFormat rgb_fmt;
+
+    if (OutputCheckFormat(obj, vdp, dev, fmt, &rgb_fmt))
+        return NULL;
+
+    /* Allocate the pool */
+    return vlc_vdp_output_pool_create(vdp, rgb_fmt, fmt, 3);
+}
+
 static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -790,11 +805,10 @@ static int OutputOpen(vlc_object_t *obj)
     if (err != VDP_STATUS_OK)
         return VLC_EGENERIC;
 
-    /* Check output surface format */
-    VdpRGBAFormat rgb_fmt;
-
-    if (OutputCheckFormat(obj, sys->vdp, sys->device, &filter->fmt_out.video,
-                          &rgb_fmt))
+    /* Allocate the output surface picture pool */
+    sys->pool = OutputPoolAlloc(obj, sys->vdp, sys->device,
+                                &filter->fmt_out.video);
+    if (sys->pool == NULL)
     {
         vdp_release_x11(sys->vdp);
         return VLC_EGENERIC;
@@ -804,6 +818,7 @@ static int OutputOpen(vlc_object_t *obj)
     sys->mixer = MixerCreate(filter, video_filter == YCbCrRender);
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
+        picture_pool_Release(sys->pool);
         vdp_release_x11(sys->vdp);
         return VLC_EGENERIC;
     }
@@ -828,6 +843,7 @@ static void OutputClose(vlc_object_t *obj)
 
     Flush(filter);
     vdp_video_mixer_destroy(sys->vdp, sys->mixer);
+    picture_pool_Release(sys->pool);
     vdp_release_x11(sys->vdp);
 }
 
