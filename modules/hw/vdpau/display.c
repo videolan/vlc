@@ -70,25 +70,13 @@ struct vout_display_sys_t
     unsigned height;
 };
 
-static void PoolFree(vout_display_t *vd, picture_pool_t *pool)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->current != NULL)
-        picture_Release(sys->current);
-    picture_pool_Release(pool);
-}
-
 static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->pool == NULL)
-    {
-        sys->current = NULL;
         sys->pool = vlc_vdp_output_pool_create(sys->vdp, sys->rgb_fmt,
                                                &vd->fmt, requested_count);
-    }
     return sys->pool;
 }
 
@@ -264,7 +252,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         msg_Dbg(vd, "resetting pictures");
         if (sys->pool != NULL)
         {
-            PoolFree(vd, sys->pool);
+            picture_pool_Release(sys->pool);
             sys->pool = NULL;
         }
 
@@ -569,6 +557,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->pool = NULL;
 
     /* */
+    sys->current = NULL;
     vd->sys = sys;
     vd->info.has_pictures_invalid = true;
     vd->info.subpicture_chromas = spu_chromas;
@@ -596,8 +585,10 @@ static void Close(vout_display_t *vd)
     vdp_presentation_queue_destroy(sys->vdp, sys->queue);
     vdp_presentation_queue_target_destroy(sys->vdp, sys->target);
 
+    if (sys->current != NULL)
+        picture_Release(sys->current);
     if (sys->pool != NULL)
-        PoolFree(vd, sys->pool);
+        picture_pool_Release(sys->pool);
 
     vdp_release_x11(sys->vdp);
     xcb_disconnect(sys->conn);
