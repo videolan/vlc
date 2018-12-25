@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
-#include <vlc_picture_pool.h>
 #include <vlc_xlib.h>
 
 #include "vlc_vdpau.h"
@@ -63,22 +62,10 @@ struct vout_display_sys_t
     VdpDevice device; /**< VDPAU device handle */
     VdpPresentationQueueTarget target; /**< VDPAU presentation queue target */
     VdpPresentationQueue queue; /**< VDPAU presentation queue */
-    VdpRGBAFormat rgb_fmt; /**< Output surface format */
 
-    picture_pool_t *pool; /**< pictures pool */
     unsigned width;
     unsigned height;
 };
-
-static picture_pool_t *Pool(vout_display_t *vd, unsigned requested_count)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    if (sys->pool == NULL)
-        sys->pool = vlc_vdp_output_pool_create(sys->vdp, sys->rgb_fmt,
-                                               &vd->fmt, requested_count);
-    return sys->pool;
-}
 
 static void RenderRegion(vout_display_t *vd, VdpOutputSurface target,
                          const subpicture_t *subpic,
@@ -249,16 +236,10 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     {
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
         video_format_t *fmt = va_arg(ap, video_format_t *);
-        msg_Dbg(vd, "resetting pictures");
-        if (sys->pool != NULL)
-        {
-            picture_pool_Release(sys->pool);
-            sys->pool = NULL;
-        }
-
         const video_format_t *src= &vd->source;
         vout_display_place_t place;
 
+        msg_Dbg(vd, "resetting pictures");
         vout_display_PlacePicture(&place, src, cfg);
 
         fmt->i_width = src->i_width * place.width / src->i_visible_width;
@@ -445,40 +426,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
     fmt.i_chroma = VLC_CODEC_VDPAU_OUTPUT;
 
-    /* Select surface format */
-    static const VdpRGBAFormat rgb_fmts[] = {
-        VDP_RGBA_FORMAT_R10G10B10A2, VDP_RGBA_FORMAT_B10G10R10A2,
-        VDP_RGBA_FORMAT_B8G8R8A8, VDP_RGBA_FORMAT_R8G8B8A8,
-    };
-    unsigned i;
-
-    for (i = 0; i < sizeof (rgb_fmts) / sizeof (rgb_fmts[0]); i++)
-    {
-        uint32_t w, h;
-        VdpBool ok;
-
-        err = vdp_output_surface_query_capabilities(sys->vdp, sys->device,
-                                                    rgb_fmts[i], &ok, &w, &h);
-        if (err != VDP_STATUS_OK)
-        {
-            msg_Err(vd, "%s capabilities query failure: %s", "output surface",
-                    vdp_get_error_string(sys->vdp, err));
-            continue;
-        }
-        /* NOTE: Wrong! No warranties that zoom <= 100%! */
-        if (!ok || w < fmt.i_width || h < fmt.i_height)
-            continue;
-
-        sys->rgb_fmt = rgb_fmts[i];
-        msg_Dbg(vd, "using RGBA format %u", sys->rgb_fmt);
-        break;
-    }
-    if (i == sizeof (rgb_fmts) / sizeof (rgb_fmts[0]))
-    {
-        msg_Err(vd, "no supported output surface format");
-        goto error;
-    }
-
     sys->width = fmtp->i_visible_width;
     sys->height = fmtp->i_visible_height;
     /* VDPAU-X11 requires a window dedicated to the back-end */
@@ -554,8 +501,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
     }
 
-    sys->pool = NULL;
-
     /* */
     sys->current = NULL;
     vd->sys = sys;
@@ -563,7 +508,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->info.subpicture_chromas = spu_chromas;
     *fmtp = fmt;
 
-    vd->pool = Pool;
     vd->prepare = Queue;
     vd->display = Wait;
     vd->control = Control;
@@ -587,8 +531,6 @@ static void Close(vout_display_t *vd)
 
     if (sys->current != NULL)
         picture_Release(sys->current);
-    if (sys->pool != NULL)
-        picture_pool_Release(sys->pool);
 
     vdp_release_x11(sys->vdp);
     xcb_disconnect(sys->conn);
