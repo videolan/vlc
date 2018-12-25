@@ -708,6 +708,41 @@ static picture_t *YCbCrRender(filter_t *filter, picture_t *src)
     return (src != NULL) ? Render(filter, src, true) : NULL;
 }
 
+static int OutputCheckFormat(vlc_object_t *obj, vdp_t *vdp, VdpDevice dev,
+                             const video_format_t *fmt,
+                             VdpRGBAFormat *restrict rgb_fmt)
+{
+    static const VdpRGBAFormat rgb_fmts[] = {
+        VDP_RGBA_FORMAT_R10G10B10A2, VDP_RGBA_FORMAT_B10G10R10A2,
+        VDP_RGBA_FORMAT_B8G8R8A8, VDP_RGBA_FORMAT_R8G8B8A8,
+    };
+
+    for (unsigned i = 0; i < ARRAY_SIZE(rgb_fmts); i++)
+    {
+        uint32_t w, h;
+        VdpBool ok;
+
+        VdpStatus err = vdp_output_surface_query_capabilities(vdp, dev,
+                                                     rgb_fmts[i], &ok, &w, &h);
+        if (err != VDP_STATUS_OK)
+        {
+            msg_Err(obj, "%s capabilities query failure: %s", "output surface",
+                    vdp_get_error_string(vdp, err));
+            continue;
+        }
+
+        if (!ok || w < fmt->i_width || h < fmt->i_height)
+            continue;
+
+        *rgb_fmt = rgb_fmts[i];
+        msg_Dbg(obj, "using RGBA format %u", *rgb_fmt);
+        return 0;
+    }
+
+    msg_Err(obj, "no supported output surface format");
+    return VLC_EGENERIC;
+}
+
 static int OutputOpen(vlc_object_t *obj)
 {
     filter_t *filter = (filter_t *)obj;
@@ -755,19 +790,23 @@ static int OutputOpen(vlc_object_t *obj)
     if (err != VDP_STATUS_OK)
         return VLC_EGENERIC;
 
+    /* Check output surface format */
+    VdpRGBAFormat rgb_fmt;
+
+    if (OutputCheckFormat(obj, sys->vdp, sys->device, &filter->fmt_out.video,
+                          &rgb_fmt))
+    {
+        vdp_release_x11(sys->vdp);
+        return VLC_EGENERIC;
+    }
+
+    /* Create the video-to-output mixer */
     sys->mixer = MixerCreate(filter, video_filter == YCbCrRender);
     if (sys->mixer == VDP_INVALID_HANDLE)
     {
         vdp_release_x11(sys->vdp);
         return VLC_EGENERIC;
     }
-
-    /* NOTE: The video mixer capabilities should be checked here, and the
-     * then video mixer set up. But:
-     * 1) The VDPAU back-end is accessible only once the first picture
-     *    gets filtered. Thus the video mixer is created later.
-     * 2) Bailing out due to insufficient capabilities would break the
-     *    video pipeline. Thus capabilities should be checked earlier. */
 
     for (unsigned i = 0; i < MAX_PAST + MAX_FUTURE; i++)
         sys->history[i].field = NULL;
