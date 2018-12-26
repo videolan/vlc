@@ -1669,7 +1669,9 @@ static void *Thread(void *object)
         const bool picture_interlaced = sys->displayed.is_interlaced;
 
         vout_SetInterlacingState(vout, picture_interlaced);
+#if defined (_WIN32) || defined (__OS2__)
         vout_ManageDisplay(sys->display);
+#endif
     }
 
 out:

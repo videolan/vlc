@@ -631,11 +631,11 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     return osys->pool;
 }
 
+#if defined(_WIN32) || defined(__OS2__)
 void vout_ManageDisplay(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-#if defined(_WIN32) || defined(__OS2__)
     for (;;) {
         vlc_mutex_lock(&osys->lock);
         bool ch_fullscreen  = osys->ch_fullscreen;
@@ -665,8 +665,8 @@ void vout_ManageDisplay(vout_display_t *vd)
                                  wm_state))
             msg_Err(vd, "Failed to set on top");
     }
-#endif
 }
+#endif
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
