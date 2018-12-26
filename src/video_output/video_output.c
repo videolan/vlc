@@ -1153,10 +1153,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         subpic = NULL;
     }
 
-    if (sys->display.use_copy) {
-        picture_t *direct = NULL;
-        if (likely(sys->display_pool != NULL))
-            direct = picture_pool_Get(sys->display_pool);
+    if (sys->display_pool != NULL) {
+        picture_t *direct = picture_pool_Get(sys->display_pool);
         if (!direct) {
             picture_Release(todisplay);
             if (subpic)

@@ -70,6 +70,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
         return VLC_EGENERIC;
 
     sys->decoder_pool = NULL;
+    sys->display_pool = NULL;
 
     const bool use_dr = !vout_IsDisplayFiltered(vd);
     const bool allow_dr = !vd->info.has_pictures_invalid && !vd->info.is_slow && use_dr;
@@ -98,7 +99,6 @@ int vout_OpenWrapper(vout_thread_t *vout,
         sys->display.use_copy = false;
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
-        sys->display_pool = display_pool;
     } else {
         sys->display.use_copy = use_dr;
         sys->decoder_pool = decoder_pool =
@@ -115,14 +115,12 @@ int vout_OpenWrapper(vout_thread_t *vout,
         }
         if (use_dr)
             sys->display_pool = vout_GetPool(vd, 3);
-        else
-            sys->display_pool = NULL;
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
     if (sys->private_pool == NULL) {
         if (decoder_pool != NULL)
             picture_pool_Release(decoder_pool);
-        sys->display_pool = sys->decoder_pool = NULL;
+        sys->decoder_pool = NULL;
         goto error;
     }
 
