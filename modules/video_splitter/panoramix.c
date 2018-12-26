@@ -271,7 +271,7 @@ typedef struct
 
 } panoramix_chroma_t;
 
-struct video_splitter_sys_t
+typedef struct
 {
     const panoramix_chroma_t *p_chroma;
 
@@ -293,7 +293,7 @@ struct video_splitter_sys_t
     int i_col;
     int i_row;
     panoramix_output_t pp_output[COL_MAX][ROW_MAX]; /* [x][y] */
-};
+} video_splitter_sys_t;
 
 /* */
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );

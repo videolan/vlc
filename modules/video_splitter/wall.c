@@ -99,13 +99,13 @@ typedef struct
     int  i_top;
 } wall_output_t;
 
-struct video_splitter_sys_t
+typedef struct
 {
     int           i_col;
     int           i_row;
     int           i_output;
     wall_output_t pp_output[COL_MAX][ROW_MAX]; /* [x][y] */
-};
+} video_splitter_sys_t;
 
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 static int Mouse( video_splitter_t *, vlc_mouse_t *,
