@@ -485,6 +485,14 @@ VLC_API void video_format_Setup( video_format_t *, vlc_fourcc_t i_chroma,
  */
 VLC_API void video_format_CopyCrop( video_format_t *, const video_format_t * );
 
+static inline void video_format_CopyCropAr(video_format_t *dst,
+                                           const video_format_t *src)
+{
+    video_format_CopyCrop(dst, src);
+    dst->i_sar_num = src->i_sar_num;
+    dst->i_sar_den = src->i_sar_den;
+}
+
 /**
  * It will compute the crop/ar properties when scaling.
  */

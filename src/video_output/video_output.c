@@ -97,13 +97,7 @@ static int VoutValidateFormat(video_format_t *dst,
     video_format_FixRgb(dst);
     return VLC_SUCCESS;
 }
-static void VideoFormatCopyCropAr(video_format_t *dst,
-                                  const video_format_t *src)
-{
-    video_format_CopyCrop(dst, src);
-    dst->i_sar_num = src->i_sar_num;
-    dst->i_sar_den = src->i_sar_den;
-}
+
 static bool VideoFormatIsCropArEqual(video_format_t *dst,
                                      const video_format_t *src)
 {
@@ -433,7 +427,7 @@ picture_t *vout_GetPicture(vout_thread_t *vout)
     picture_t *picture = picture_pool_Wait(vout->p->decoder_pool);
     if (likely(picture != NULL)) {
         picture_Reset(picture);
-        VideoFormatCopyCropAr(&picture->format, &vout->p->original);
+        video_format_CopyCropAr(&picture->format, &vout->p->original);
     }
     return picture;
 }
@@ -739,7 +733,7 @@ static picture_t *VoutVideoFilterInteractiveNewPicture(filter_t *filter)
     picture_t *picture = picture_pool_Get(vout->p->private_pool);
     if (picture) {
         picture_Reset(picture);
-        VideoFormatCopyCropAr(&picture->format, &filter->fmt_out.video);
+        video_format_CopyCropAr(&picture->format, &filter->fmt_out.video);
     }
     return picture;
 }
@@ -1129,7 +1123,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         if (sys->spu_blend) {
             picture_t *blent = picture_pool_Get(sys->private_pool);
             if (blent) {
-                VideoFormatCopyCropAr(&blent->format, &filtered->format);
+                video_format_CopyCropAr(&blent->format, &filtered->format);
                 picture_Copy(blent, filtered);
                 if (picture_BlendSubpicture(blent, sys->spu_blend, subpic)) {
                     picture_Release(todisplay);
@@ -1166,7 +1160,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
          * pictures is not usable by the decoder (too few, too slow or
          * subject to invalidation...). Since there are no filters, copying
          * pictures from the decoder to the output is unavoidable. */
-        VideoFormatCopyCropAr(&direct->format, &todisplay->format);
+        video_format_CopyCropAr(&direct->format, &todisplay->format);
         picture_Copy(direct, todisplay);
         picture_Release(todisplay);
         snap_pic = todisplay = direct;
