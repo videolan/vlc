@@ -100,7 +100,6 @@ struct video_splitter_t
 
     /* Buffer allocation */
     int  (*pf_picture_new) ( video_splitter_t *, picture_t *pp_picture[] );
-    void (*pf_picture_del) ( video_splitter_t *, picture_t *pp_picture[] );
     void *p_owner;
 };
 
@@ -128,7 +127,8 @@ static inline int video_splitter_NewPicture( video_splitter_t *p_splitter,
 static inline void video_splitter_DeletePicture( video_splitter_t *p_splitter,
                                                  picture_t *pp_picture[] )
 {
-    p_splitter->pf_picture_del( p_splitter, pp_picture );
+    for (int i = 0; i < p_splitter->i_output; i++)
+        picture_Release(pp_picture[i]);
 }
 
 /* */

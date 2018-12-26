@@ -1141,14 +1141,7 @@ static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
     }
     return VLC_SUCCESS;
 }
-static void SplitterPictureDel(video_splitter_t *splitter, picture_t *picture[])
-{
-    vout_display_t *wrapper = splitter->p_owner;
-    vout_display_sys_t *wsys = wrapper->sys;
 
-    for (int i = 0; i < wsys->count; i++)
-        picture_Release(picture[i]);
-}
 static void SplitterClose(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1205,7 +1198,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     /* */
     splitter->p_owner = wrapper;
     splitter->pf_picture_new = SplitterPictureNew;
-    splitter->pf_picture_del = SplitterPictureDel;
 
     /* */
     TAB_INIT(sys->count, sys->display);
