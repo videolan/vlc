@@ -711,7 +711,25 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
         return NULL;
     }
 
-    return filter_chain_VideoFilter(osys->converters, picture);
+    picture = filter_chain_VideoFilter(osys->converters, picture);
+
+    if (picture != NULL && vd->pool != NULL) {
+        picture_pool_t *pool = vd->pool(vd, 3);
+
+        if (!picture_pool_OwnsPic(pool, picture)) {
+            /* The picture is not be allocated from the expected pool. Copy. */
+            picture_t *direct = picture_pool_Get(pool);
+
+            if (direct != NULL) {
+                video_format_CopyCropAr(&direct->format, &picture->format);
+                picture_Copy(direct, picture);
+            }
+            picture_Release(picture);
+            picture = direct;
+        }
+    }
+
+    return picture;
 }
 
 void vout_FilterFlush(vout_display_t *vd)
