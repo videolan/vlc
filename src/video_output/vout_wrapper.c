@@ -165,14 +165,7 @@ void vout_ManageWrapper(vout_thread_t *vout)
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd = sys->display;
 
-    if (vout_ManageDisplay(vd)) {
-        assert(vd->info.has_pictures_invalid);
-
-        if (!vout_IsDisplayFiltered(vd))
-            sys->display_pool = vout_GetPool(vd, 3);
-        else
-            sys->display_pool = NULL;
-    }
+    vout_ManageDisplay(vd);
 }
 
 #ifdef _WIN32

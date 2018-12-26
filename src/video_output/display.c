@@ -632,7 +632,7 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     return osys->pool;
 }
 
-bool vout_ManageDisplay(vout_display_t *vd)
+void vout_ManageDisplay(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
@@ -670,7 +670,6 @@ bool vout_ManageDisplay(vout_display_t *vd)
             msg_Err(vd, "Failed to set on top");
     }
 #endif
-    return false;
 }
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)
