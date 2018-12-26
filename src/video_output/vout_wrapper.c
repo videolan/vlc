@@ -93,10 +93,12 @@ int vout_OpenWrapper(vout_thread_t *vout,
 
     if (allow_dr &&
         picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
+        sys->display.use_copy = false;
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
         sys->display_pool = display_pool;
     } else {
+        sys->display.use_copy = sys->display.use_dr;
         sys->decoder_pool =
             picture_pool_NewFromFormat(&vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
