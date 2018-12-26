@@ -91,7 +91,6 @@ struct vout_thread_sys_t
     /* */
     struct {
         vout_display_t *vd;
-        bool           use_dr;
         bool           use_copy;
     } display;
 
