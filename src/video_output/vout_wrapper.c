@@ -96,11 +96,9 @@ int vout_OpenWrapper(vout_thread_t *vout,
 
     if (allow_dr &&
         picture_pool_GetSize(display_pool) >= reserved_picture + decoder_picture) {
-        sys->display.use_copy = false;
         sys->dpb_size     = picture_pool_GetSize(display_pool) - reserved_picture;
         sys->decoder_pool = display_pool;
     } else {
-        sys->display.use_copy = use_dr;
         sys->decoder_pool = decoder_pool =
             picture_pool_NewFromFormat(&vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
@@ -148,7 +146,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 
     picture_pool_Release(sys->private_pool);
 
-    if (sys->display.use_copy || vout_IsDisplayFiltered(sys->display.vd))
+    if (sys->display_pool != NULL || vout_IsDisplayFiltered(sys->display.vd))
         picture_pool_Release(sys->decoder_pool);
 
 #ifdef _WIN32
