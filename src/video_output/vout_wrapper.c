@@ -157,17 +157,6 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
     vout_DeleteDisplay(sys->display, cfg);
 }
 
-/*****************************************************************************
- *
- *****************************************************************************/
-void vout_ManageWrapper(vout_thread_t *vout)
-{
-    vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = sys->display;
-
-    vout_ManageDisplay(vd);
-}
-
 #ifdef _WIN32
 static int Forward(vlc_object_t *object, char const *var,
                    vlc_value_t oldval, vlc_value_t newval, void *data)
