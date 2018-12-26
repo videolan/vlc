@@ -85,6 +85,8 @@ int vout_OpenWrapper(vout_thread_t *vout,
     if (display_pool == NULL)
         goto error;
 
+    picture_pool_t *decoder_pool = NULL;
+
 #ifndef NDEBUG
     if ( picture_pool_GetSize(display_pool) < display_pool_size )
         msg_Warn(vout, "Not enough display buffers in the pool, requested %u got %u",
@@ -99,7 +101,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
         sys->display_pool = display_pool;
     } else {
         sys->display.use_copy = use_dr;
-        sys->decoder_pool =
+        sys->decoder_pool = decoder_pool =
             picture_pool_NewFromFormat(&vd->source,
                                        __MAX(VOUT_MAX_PICTURES,
                                              reserved_picture + decoder_picture - DISPLAY_PICTURE_COUNT));
@@ -117,10 +119,9 @@ int vout_OpenWrapper(vout_thread_t *vout,
             sys->display_pool = NULL;
     }
     sys->private_pool = picture_pool_Reserve(sys->decoder_pool, private_picture);
-    if (!sys->private_pool)
-    {
-        if (sys->decoder_pool != sys->display_pool)
-            picture_pool_Release(sys->decoder_pool);
+    if (sys->private_pool == NULL) {
+        if (decoder_pool != NULL)
+            picture_pool_Release(decoder_pool);
         sys->display_pool = sys->decoder_pool = NULL;
         goto error;
     }
@@ -149,7 +150,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 
     picture_pool_Release(sys->private_pool);
 
-    if (sys->decoder_pool != sys->display_pool)
+    if (sys->display.use_copy || vout_IsDisplayFiltered(sys->display.vd))
         picture_pool_Release(sys->decoder_pool);
 
 #ifdef _WIN32
