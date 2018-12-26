@@ -435,7 +435,6 @@ static int Control( vout_display_t *vd, int query, va_list args )
     }
 
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
-    case VOUT_DISPLAY_CHANGE_ZOOM:
     {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
 
@@ -445,19 +444,21 @@ static int Control( vout_display_t *vd, int query, va_list args )
         return VLC_SUCCESS;
     }
 
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    {
+        vout_display_place_t place;
+        vout_display_PlacePicture(&place, &vd->source, vd->cfg);
+
+        sys->kvas.ulAspectWidth  = place.width;
+        sys->kvas.ulAspectHeight = place.height;
+        kvaSetup( &sys->kvas );
+        return VLC_SUCCESS;
+    }
+
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-        if( query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT )
-        {
-            vout_display_place_t place;
-            vout_display_PlacePicture(&place, &vd->source, vd->cfg);
-
-            sys->kvas.ulAspectWidth  = place.width;
-            sys->kvas.ulAspectHeight = place.height;
-        }
-        else
-        {
             video_format_t src_rot;
             video_format_ApplyRotation(&src_rot, &vd->source);
 
@@ -468,16 +469,12 @@ static int Control( vout_display_t *vd, int query, va_list args )
             sys->kvas.rclSrcRect.yBottom = src_rot.i_y_offset +
                                            src_rot.i_visible_height;
         }
-
         kvaSetup( &sys->kvas );
-
         return VLC_SUCCESS;
     }
 
     case VOUT_DISPLAY_RESET_PICTURES:
-    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
-        /* TODO */
-        break;
+        vlc_assert_unreachable();
     }
 
     msg_Err(vd, "Unsupported query(=%d) in vout display KVA", query);
