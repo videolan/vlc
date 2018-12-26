@@ -44,7 +44,6 @@
 #include "display.h"
 #include "window.h"
 
-static void SplitterManage(vout_display_t *vd);
 static void SplitterClose(vout_display_t *vd);
 
 /*****************************************************************************
@@ -636,9 +635,6 @@ void vout_ManageDisplay(vout_display_t *vd)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->is_splitter)
-        SplitterManage(vd);
-
 #if defined(_WIN32) || defined(__OS2__)
     for (;;) {
         vlc_mutex_lock(&osys->lock);
@@ -1133,13 +1129,6 @@ static int SplitterControl(vout_display_t *vd, int query, va_list args)
 {
     (void)vd; (void)query; (void)args;
     return VLC_EGENERIC;
-}
-static void SplitterManage(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    for (int i = 0; i < sys->count; i++)
-        vout_ManageDisplay(sys->display[i]);
 }
 
 static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
