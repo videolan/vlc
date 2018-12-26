@@ -35,7 +35,6 @@
  */
 
 typedef struct video_splitter_t video_splitter_t;
-typedef struct video_splitter_owner_t video_splitter_owner_t;
 
 /** Structure describing a video splitter output properties
  */
@@ -102,7 +101,7 @@ struct video_splitter_t
     /* Buffer allocation */
     int  (*pf_picture_new) ( video_splitter_t *, picture_t *pp_picture[] );
     void (*pf_picture_del) ( video_splitter_t *, picture_t *pp_picture[] );
-    video_splitter_owner_t *p_owner;
+    void *p_owner;
 };
 
 /**

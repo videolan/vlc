@@ -1060,9 +1060,9 @@ struct vout_display_sys_t {
     picture_t      **picture;
     vout_display_t **display;
 };
-struct video_splitter_owner_t {
+typedef struct {
     vout_display_t *wrapper;
-};
+} video_splitter_owner_t;
 
 static void SplitterEvent(vout_display_t *vd, int event, va_list args)
 {
@@ -1133,7 +1133,8 @@ static int SplitterControl(vout_display_t *vd, int query, va_list args)
 
 static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
 {
-    vout_display_sys_t *wsys = splitter->p_owner->wrapper->sys;
+    video_splitter_owner_t *owner = splitter->p_owner;
+    vout_display_sys_t *wsys = owner->wrapper->sys;
 
     for (int i = 0; i < wsys->count; i++) {
         if (vout_IsDisplayFiltered(wsys->display[i])) {
@@ -1153,7 +1154,8 @@ static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
 }
 static void SplitterPictureDel(video_splitter_t *splitter, picture_t *picture[])
 {
-    vout_display_sys_t *wsys = splitter->p_owner->wrapper->sys;
+    video_splitter_owner_t *owner = splitter->p_owner;
+    vout_display_sys_t *wsys = owner->wrapper->sys;
 
     for (int i = 0; i < wsys->count; i++)
         picture_Release(picture[i]);
