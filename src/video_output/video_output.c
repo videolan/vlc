@@ -1147,25 +1147,6 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
         subpic = NULL;
     }
 
-    if (sys->display_pool != NULL) {
-        picture_t *direct = picture_pool_Get(sys->display_pool);
-        if (!direct) {
-            picture_Release(todisplay);
-            if (subpic)
-                subpicture_Delete(subpic);
-            return VLC_EGENERIC;
-        }
-
-        /* The display uses direct rendering (no conversion), but its pool of
-         * pictures is not usable by the decoder (too few, too slow or
-         * subject to invalidation...). Since there are no filters, copying
-         * pictures from the decoder to the output is unavoidable. */
-        video_format_CopyCropAr(&direct->format, &todisplay->format);
-        picture_Copy(direct, todisplay);
-        picture_Release(todisplay);
-        snap_pic = todisplay = direct;
-    }
-
     /*
      * Take a snapshot if requested
      */
