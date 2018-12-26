@@ -1052,7 +1052,6 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
  *
  *****************************************************************************/
 struct vout_display_sys_t {
-    picture_pool_t   *pool;
     video_splitter_t *splitter;
 
     /* */
@@ -1084,13 +1083,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     }
 }
 
-static picture_pool_t *SplitterPool(vout_display_t *vd, unsigned count)
-{
-    vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool)
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
-    return sys->pool;
-}
 static void SplitterPrepare(vout_display_t *vd,
                             picture_t *picture,
                             subpicture_t *subpicture, vlc_tick_t date)
@@ -1165,9 +1157,6 @@ static void SplitterClose(vout_display_t *vd)
     video_splitter_t *splitter = sys->splitter;
     video_splitter_Delete(splitter);
 
-    if (sys->pool)
-        picture_pool_Release(sys->pool);
-
     /* */
     for (int i = 0; i < sys->count; i++) {
         vout_window_t *wnd = sys->display[i]->cfg->window;
@@ -1206,9 +1195,8 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     if (!sys->picture )
         abort();
     sys->splitter = splitter;
-    sys->pool     = NULL;
 
-    wrapper->pool    = SplitterPool;
+    wrapper->pool    = NULL;
     wrapper->prepare = SplitterPrepare;
     wrapper->display = SplitterDisplay;
     wrapper->control = SplitterControl;
