@@ -1024,7 +1024,7 @@ static picture_t *ConvertRGB32AndBlend(vout_thread_t *vout, picture_t *pic,
 static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 {
     vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = sys->display.vd;
+    vout_display_t *vd = sys->display;
 
     picture_t *torender = picture_Hold(sys->displayed.current);
 
@@ -1359,7 +1359,7 @@ static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
     }
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
-    vout_FilterFlush(vout->p->display.vd);
+    vout_FilterFlush(vout->p->display);
 }
 
 static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
@@ -1385,7 +1385,7 @@ static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
 static void ThreadTranslateMouseState(vout_thread_t *vout,
                                       const vlc_mouse_t *win_mouse)
 {
-    vout_display_t *vd = vout->p->display.vd;
+    vout_display_t *vd = vout->p->display;
     vlc_mouse_t vid_mouse;
     vout_display_place_t place;
 
@@ -1482,7 +1482,7 @@ static void ThreadStop(vout_thread_t *vout, vout_display_cfg_t *cfg)
         filter_DeleteBlend(vout->p->spu_blend);
 
     /* Destroy translation tables */
-    if (vout->p->display.vd) {
+    if (vout->p->display) {
         if (vout->p->decoder_pool)
             ThreadFlush(vout, true, INT64_MAX);
         vout_CloseWrapper(vout, cfg);
@@ -1620,34 +1620,34 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadTranslateMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_SIZE:
-        vout_SetDisplaySize(vout->p->display.vd,
+        vout_SetDisplaySize(vout->p->display,
                             cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
-        vout_SetDisplayFilled(vout->p->display.vd, cmd.boolean);
+        vout_SetDisplayFilled(vout->p->display, cmd.boolean);
         break;
     case VOUT_CONTROL_ZOOM:
-        vout_SetDisplayZoom(vout->p->display.vd, cmd.pair.a, cmd.pair.b);
+        vout_SetDisplayZoom(vout->p->display, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_ASPECT_RATIO:
-        vout_SetDisplayAspect(vout->p->display.vd, cmd.pair.a, cmd.pair.b);
+        vout_SetDisplayAspect(vout->p->display, cmd.pair.a, cmd.pair.b);
         break;
     case VOUT_CONTROL_CROP_RATIO:
-        vout_SetDisplayCrop(vout->p->display.vd, cmd.pair.a, cmd.pair.b,
+        vout_SetDisplayCrop(vout->p->display, cmd.pair.a, cmd.pair.b,
                             0, 0, 0, 0);
         break;
     case VOUT_CONTROL_CROP_WINDOW:
-        vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+        vout_SetDisplayCrop(vout->p->display, 0, 0,
                             cmd.window.x, cmd.window.y,
                             cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_CROP_BORDER:
-        vout_SetDisplayCrop(vout->p->display.vd, 0, 0,
+        vout_SetDisplayCrop(vout->p->display, 0, 0,
                             cmd.border.left, cmd.border.top,
                             -(int)cmd.border.right, -(int)cmd.border.bottom);
         break;
     case VOUT_CONTROL_VIEWPOINT:
-        vout_SetDisplayViewpoint(vout->p->display.vd, &cmd.viewpoint);
+        vout_SetDisplayViewpoint(vout->p->display, &cmd.viewpoint);
         break;
     default:
         break;

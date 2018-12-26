@@ -89,9 +89,7 @@ struct vout_thread_sys_t
     vout_control_t  control;
 
     /* */
-    struct {
-        vout_display_t *vd;
-    } display;
+    vout_display_t *display;
 
     struct {
         vlc_tick_t  date;

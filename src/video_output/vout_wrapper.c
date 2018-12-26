@@ -122,7 +122,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
         goto error;
     }
 
-    sys->display.vd = vd;
+    sys->display = vd;
 
 #ifdef _WIN32
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
@@ -146,7 +146,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 
     picture_pool_Release(sys->private_pool);
 
-    if (sys->display_pool != NULL || vout_IsDisplayFiltered(sys->display.vd))
+    if (sys->display_pool != NULL || vout_IsDisplayFiltered(sys->display))
         picture_pool_Release(sys->decoder_pool);
 
 #ifdef _WIN32
@@ -154,7 +154,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
 
-    vout_DeleteDisplay(sys->display.vd, cfg);
+    vout_DeleteDisplay(sys->display, cfg);
 }
 
 /*****************************************************************************
@@ -163,7 +163,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 void vout_ManageWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
-    vout_display_t *vd = sys->display.vd;
+    vout_display_t *vd = sys->display;
 
     if (vout_ManageDisplay(vd)) {
         assert(vd->info.has_pictures_invalid);
@@ -183,7 +183,7 @@ static int Forward(vlc_object_t *object, char const *var,
 
     VLC_UNUSED(oldval);
     VLC_UNUSED(data);
-    return var_Set(vout->p->display.vd, var, newval);
+    return var_Set(vout->p->display, var, newval);
 }
 #endif
 
