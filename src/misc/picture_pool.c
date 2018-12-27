@@ -299,9 +299,18 @@ bool picture_pool_OwnsPic(picture_pool_t *pool, picture_t *pic)
         priv = (picture_priv_t *)pic;
     }
 
-    uintptr_t sys = (uintptr_t)priv->gc.opaque;
-    picture_pool_t *picpool = (void *)(sys & ~(POOL_MAX - 1));
-    return pool == picpool;
+    do {
+        uintptr_t sys = (uintptr_t)priv->gc.opaque;
+        picture_pool_t *picpool = (void *)(sys & ~(POOL_MAX - 1));
+
+        if (pool == picpool)
+            return true;
+
+        pic = picpool->picture[sys & (POOL_MAX - 1 )];
+        priv = (picture_priv_t *)pic;
+    } while (priv->gc.destroy == picture_pool_ReleasePicture);
+
+    return false;
 }
 
 unsigned picture_pool_GetSize(const picture_pool_t *pool)
