@@ -97,9 +97,6 @@ struct video_splitter_t
                                   const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
 
     void *p_sys;
-
-    /* Buffer allocation */
-    int  (*pf_picture_new) ( video_splitter_t *, picture_t *pp_picture[] );
     void *p_owner;
 };
 
@@ -111,13 +108,20 @@ struct video_splitter_t
  *
  * If VLC_SUCCESS is not returned, pp_picture values are undefined.
  */
-static inline int video_splitter_NewPicture( video_splitter_t *p_splitter,
-                                             picture_t *pp_picture[] )
+static inline int video_splitter_NewPicture(video_splitter_t *splitter,
+                                            picture_t *pics[])
 {
-    int i_ret = p_splitter->pf_picture_new( p_splitter, pp_picture );
-    if( i_ret )
-        msg_Warn( p_splitter, "can't get output pictures" );
-    return i_ret;
+    for (int i = 0; i < splitter->i_output; i++) {
+        pics[i] = picture_NewFromFormat(&splitter->p_output[i].fmt);
+        if (pics[i] == NULL) {
+            for (int j = 0; j < i; j++)
+                picture_Release(pics[j]);
+
+            msg_Warn(splitter, "can't get output pictures");
+            return VLC_EGENERIC;
+        }
+    }
+    return VLC_SUCCESS;
 }
 
 /**

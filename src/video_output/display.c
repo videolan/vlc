@@ -1120,28 +1120,6 @@ static int SplitterControl(vout_display_t *vd, int query, va_list args)
     return VLC_EGENERIC;
 }
 
-static int SplitterPictureNew(video_splitter_t *splitter, picture_t *picture[])
-{
-    vout_display_t *wrapper = splitter->p_owner;
-    vout_display_sys_t *wsys = wrapper->sys;
-
-    for (int i = 0; i < wsys->count; i++) {
-        if (vout_IsDisplayFiltered(wsys->display[i])) {
-            /* TODO use a pool ? */
-            picture[i] = picture_NewFromFormat(&wsys->display[i]->source);
-        } else {
-            picture_pool_t *pool = vout_GetPool(wsys->display[i], 3);
-            picture[i] = pool ? picture_pool_Get(pool) : NULL;
-        }
-        if (!picture[i]) {
-            for (int j = 0; j < i; j++)
-                picture_Release(picture[j]);
-            return VLC_EGENERIC;
-        }
-    }
-    return VLC_SUCCESS;
-}
-
 static void SplitterClose(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1197,7 +1175,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     /* */
     splitter->p_owner = wrapper;
-    splitter->pf_picture_new = SplitterPictureNew;
 
     /* */
     TAB_INIT(sys->count, sys->display);

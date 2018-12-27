@@ -292,6 +292,9 @@ bool picture_pool_OwnsPic(picture_pool_t *pool, picture_t *pic)
     picture_priv_t *priv = (picture_priv_t *)pic;
 
     while (priv->gc.destroy != picture_pool_ReleasePicture) {
+        if (priv->gc.opaque == NULL)
+            return false; /* not a pooled picture */
+
         pic = priv->gc.opaque;
         priv = (picture_priv_t *)pic;
     }
