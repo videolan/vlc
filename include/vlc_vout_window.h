@@ -306,6 +306,7 @@ static inline void vout_window_UnsetFullScreen(vout_window_t *window)
  * The window handle (vout_window_t.handle) and display (vout_window_t.display)
  * must remain valid and constant while the window is enabled.
  */
+VLC_API
 int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
 
 /**
@@ -316,6 +317,7 @@ int vout_window_Enable(vout_window_t *window, const vout_window_cfg_t *cfg);
  * Note that the window may be re-enabled later by a call to
  * vout_window_Enable().
  */
+VLC_API
 void vout_window_Disable(vout_window_t *window);
 
 /**
