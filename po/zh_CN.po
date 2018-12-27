@@ -1,5 +1,5 @@
 # Simplified Chinese translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,11 +12,11 @@
 # zhangmin <zm1990s@gmail.com>, 2014
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:38+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2018-12-27 16:54+0100\n"
+"Last-Translator: Dian Li <xslidian@gmail.com>, 2018\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/yaron/teams/16553/"
 "zh_CN/)\n"
 "Language: zh_CN\n"
@@ -22961,9 +22961,8 @@ msgid "avparser packetizer"
 msgstr "avparser 封包器"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala 视频封包器"
+msgstr "AV1 视频封包器"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
