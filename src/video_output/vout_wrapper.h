@@ -31,28 +31,6 @@
 picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count);
 
 /**
- * It preparse a picture for display.
- */
-static inline void vout_display_Prepare(vout_display_t *vd,
-                                        picture_t *picture,
-                                        subpicture_t *subpicture,
-                                        vlc_tick_t date)
-{
-    if (vd->prepare)
-        vd->prepare(vd, picture, subpicture, date);
-}
-
-/**
- * It display a picture.
- */
-static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
-{
-    if (vd->display)
-        vd->display(vd, picture);
-    picture_Release(picture);
-}
-
-/**
  * It creates a vout managed display.
  */
 vout_display_t *vout_NewDisplay( vout_thread_t *, const video_format_t *,

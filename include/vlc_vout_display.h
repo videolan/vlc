@@ -314,6 +314,26 @@ struct vout_display_t {
     vout_display_owner_t owner;
 };
 
+/**
+ * Prepares a picture for display.
+ */
+static inline void vout_display_Prepare(vout_display_t *vd, picture_t *picture,
+                                        subpicture_t *subpic, vlc_tick_t date)
+{
+    if (vd->prepare != NULL)
+        vd->prepare(vd, picture, subpic, date);
+}
+
+/**
+ * Displays a picture.
+ */
+static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
+{
+    if (vd->display != NULL)
+        vd->display(vd, picture);
+    picture_Release(picture);
+}
+
 static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
 {
     va_list args;
