@@ -97,7 +97,6 @@ struct video_splitter_t
                                   const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
 
     void *p_sys;
-    void *p_owner;
 };
 
 /**

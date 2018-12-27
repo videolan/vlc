@@ -1174,9 +1174,6 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
     wrapper->sys     = sys;
 
     /* */
-    splitter->p_owner = wrapper;
-
-    /* */
     TAB_INIT(sys->count, sys->display);
     for (int i = 0; i < splitter->i_output; i++) {
         vout_display_owner_t vdo = {
