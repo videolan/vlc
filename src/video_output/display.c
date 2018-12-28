@@ -967,6 +967,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                      vout_display_start, vd, &osys->cfg,
                                      &vd->fmt, NULL);
         if (vd->module == NULL) {
+            video_format_Clean(&vd->source);
             vlc_object_release(vd);
             goto error;
         }
