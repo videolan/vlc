@@ -1690,10 +1690,6 @@ vlc_module_begin ()
     add_module_list("video-filter", "video filter", NULL,
                     VIDEO_FILTER_TEXT, VIDEO_FILTER_LONGTEXT)
 
-    set_subcategory( SUBCAT_VIDEO_SPLITTER )
-    add_module_list("video-splitter", "video splitter", NULL,
-                    VIDEO_SPLITTER_TEXT, VIDEO_SPLITTER_LONGTEXT)
-    add_obsolete_string( "vout-filter" ) /* since 2.0.0 */
 #if 0
     add_string( "pixel-ratio", "1", PIXEL_RATIO_TEXT, PIXEL_RATIO_TEXT )
 #endif
