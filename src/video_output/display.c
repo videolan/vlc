@@ -87,51 +87,6 @@ static int vout_display_start(void *func, va_list ap)
     return ret;
 }
 
-/**
- * It creates a new vout_display_t using the given configuration.
- */
-static vout_display_t *vout_display_New(vlc_object_t *obj,
-                                        const char *module, bool load_module,
-                                        const video_format_t *fmt,
-                                        const vout_display_cfg_t *cfg,
-                                        vout_display_owner_t *owner)
-{
-    /* */
-    vout_display_t *vd = vlc_custom_create(obj, sizeof(*vd), "vout display" );
-
-    /* */
-    video_format_Copy(&vd->source, fmt);
-
-    vd->info = (vout_display_info_t){ };
-    vd->cfg = cfg;
-    vd->pool = NULL;
-    vd->prepare = NULL;
-    vd->display = NULL;
-    vd->control = NULL;
-    vd->sys = NULL;
-
-    vd->owner = *owner;
-
-    if (load_module) {
-        vd->module = vlc_module_load(vd, "vout display", module,
-                                     module && *module != '\0',
-                                     vout_display_start, vd, cfg, &vd->fmt,
-                                     NULL);
-        if (!vd->module) {
-            vlc_object_release(vd);
-            return NULL;
-        }
-
-        vout_window_SetSize(cfg->window,
-                            cfg->display.width, cfg->display.height);
-    } else {
-        video_format_Copy(&vd->fmt, &vd->source);
-        vd->module = NULL;
-    }
-
-    return vd;
-}
-
 static void vout_display_stop(void *func, va_list ap)
 {
     vout_display_close_cb deactivate = func;
@@ -956,9 +911,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const video_format_t *source,
                                   const vout_display_cfg_t *cfg,
                                   const char *module, bool is_splitter,
-                                  const vout_display_owner_t *owner_ptr)
+                                  const vout_display_owner_t *owner)
 {
-    /* */
     vout_display_owner_sys_t *osys = calloc(1, sizeof(*osys));
 
     osys->cfg = *cfg;
@@ -990,28 +944,48 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->crop.num = 0;
     osys->crop.den = 0;
 
-    vout_display_owner_t owner;
-    if (owner_ptr)
-        owner = *owner_ptr;
-    else
-        owner.event = VoutDisplayEvent;
-    owner.sys = osys;
-
-    vout_display_t *p_display = vout_display_New(VLC_OBJECT(vout),
-                                                 module, !is_splitter,
-                                                 source, &osys->cfg, &owner);
-    if (!p_display)
+    /* */
+    vout_display_t *vd = vlc_custom_create(VLC_OBJECT(vout), sizeof (*vd),
+                                           "vout display" );
+    if (unlikely(vd == NULL))
         goto error;
 
-    if (VoutDisplayCreateRender(p_display)) {
-        vout_display_Delete(p_display);
+    video_format_Copy(&vd->source, source);
+    vd->info = (vout_display_info_t){ };
+    vd->cfg = &osys->cfg;
+    vd->pool = NULL;
+    vd->prepare = NULL;
+    vd->display = NULL;
+    vd->control = NULL;
+    vd->sys = NULL;
+    vd->owner.event = (owner != NULL) ? owner->event : VoutDisplayEvent;
+    vd->owner.sys = osys;
+
+    if (!is_splitter) {
+        vd->module = vlc_module_load(vd, "vout display", module,
+                                     module && *module != '\0',
+                                     vout_display_start, vd, &osys->cfg,
+                                     &vd->fmt, NULL);
+        if (vd->module == NULL) {
+            vlc_object_release(vd);
+            goto error;
+        }
+
+        vout_window_SetSize(cfg->window,
+                            cfg->display.width, cfg->display.height);
+    } else {
+        video_format_Copy(&vd->fmt, &vd->source);
+        vd->module = NULL;
+    }
+
+    if (VoutDisplayCreateRender(vd)) {
+        vout_display_Delete(vd);
         goto error;
     }
 
     var_SetBool(osys->vout, "viewpoint-changeable",
-                p_display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
-
-    return p_display;
+                vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
+    return vd;
 error:
     vlc_mutex_destroy(&osys->lock);
     free(osys);
