@@ -323,7 +323,7 @@ typedef struct {
 
     atomic_bool reset_pictures;
     picture_pool_t *pool;
-} vout_display_owner_sys_t, vout_display_priv_t;
+} vout_display_priv_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
     .buffer_new = VideoBufferNew,
@@ -331,7 +331,7 @@ static const struct filter_video_callbacks vout_display_filter_cbs = {
 
 static int VoutDisplayCreateRender(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     filter_owner_t owner = {
         .video = &vout_display_filter_cbs,
         .sys = vd,
@@ -393,7 +393,7 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
 
 static void VoutDisplayDestroyRender(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->converters)
         filter_chain_Delete(osys->converters);
@@ -401,7 +401,7 @@ static void VoutDisplayDestroyRender(vout_display_t *vd)
 
 static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     vlc_mutex_lock(&osys->lock);
 
@@ -480,7 +480,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     switch (event) {
     case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
@@ -563,7 +563,7 @@ static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
  */
 picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (vd->pool != NULL)
         return vd->pool(vd, count);
@@ -576,7 +576,7 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
 #if defined(_WIN32) || defined(__OS2__)
 void vout_ManageDisplay(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     for (;;) {
         vlc_mutex_lock(&osys->lock);
@@ -612,14 +612,14 @@ void vout_ManageDisplay(vout_display_t *vd)
 
 bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     return osys->converters == NULL || !filter_chain_IsEmpty(osys->converters);
 }
 
 picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->converters == NULL) {
         picture_Release(picture);
@@ -649,7 +649,7 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 
 void vout_FilterFlush(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->converters != NULL)
         filter_chain_VideoFlush(osys->converters);
@@ -657,7 +657,7 @@ void vout_FilterFlush(vout_display_t *vd)
 
 static void vout_display_Reset(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (likely(!atomic_exchange(&osys->reset_pictures, false)))
         return;
@@ -677,7 +677,7 @@ static void vout_display_Reset(vout_display_t *vd)
 
 static void vout_UpdateSourceCrop(vout_display_t *vd)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     unsigned crop_num = osys->crop.num;
     unsigned crop_den = osys->crop.den;
 
@@ -733,7 +733,7 @@ static void vout_UpdateSourceCrop(vout_display_t *vd)
 static void vout_SetSourceAspect(vout_display_t *vd,
                                  unsigned sar_num, unsigned sar_den)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (sar_num > 0 && sar_den > 0) {
         vd->source.i_sar_num = sar_num;
@@ -753,7 +753,7 @@ static void vout_SetSourceAspect(vout_display_t *vd,
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (source->i_sar_num * osys->source.i_sar_den !=
         source->i_sar_den * osys->source.i_sar_num) {
@@ -783,7 +783,7 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
 
 void vout_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
@@ -793,7 +793,7 @@ void vout_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
 
 void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (is_filled == osys->cfg.is_display_filled)
         return; /* nothing to do */
@@ -805,7 +805,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 
 void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (num != 0 && den != 0) {
         vlc_ureduce(&num, &den, num, den, 0);
@@ -834,7 +834,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     unsigned sar_num, sar_den;
     if (dar_num > 0 && dar_den > 0) {
@@ -854,7 +854,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
                          unsigned crop_num, unsigned crop_den,
                          unsigned left, unsigned top, int right, int bottom)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->crop.left  != (int)left  || osys->crop.top != (int)top ||
         osys->crop.right != right || osys->crop.bottom != bottom ||
@@ -876,7 +876,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
 void vout_SetDisplayViewpoint(vout_display_t *vd,
                               const vlc_viewpoint_t *p_viewpoint)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (osys->cfg.viewpoint.yaw   != p_viewpoint->yaw ||
         osys->cfg.viewpoint.pitch != p_viewpoint->pitch ||
@@ -945,7 +945,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vd->control = NULL;
     vd->sys = NULL;
     vd->owner.event = (owner != NULL) ? owner->event : VoutDisplayEvent;
-    vd->owner.sys = osys;
 
     if (!is_splitter) {
         vd->module = vlc_module_load(vd, "vout display", module,
@@ -982,7 +981,7 @@ error:
 
 void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 {
-    vout_display_owner_sys_t *osys = vd->owner.sys;
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (cfg != NULL && !osys->is_splitter)
         *cfg = osys->cfg;
