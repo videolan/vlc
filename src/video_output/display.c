@@ -95,20 +95,6 @@ static void vout_display_stop(void *func, va_list ap)
 }
 
 /**
- * It deletes a vout_display_t
- */
-static void vout_display_Delete(vout_display_t *vd)
-{
-    if (vd->module)
-        vlc_module_unload(vd, vd->module, vout_display_stop, vd);
-
-    video_format_Clean(&vd->source);
-    video_format_Clean(&vd->fmt);
-
-    vlc_object_release(vd);
-}
-
-/**
  * It controls a vout_display_t
  */
 static int vout_display_Control(vout_display_t *vd, int query, ...)
@@ -980,7 +966,12 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     }
 
     if (VoutDisplayCreateRender(vd)) {
-        vout_display_Delete(vd);
+        if (vd->module != NULL)
+            vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+
+        video_format_Clean(&vd->source);
+        video_format_Clean(&vd->fmt);
+        vlc_object_release(vd);
         goto error;
     }
 
@@ -1007,7 +998,12 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
     if (osys->pool != NULL)
         picture_pool_Release(osys->pool);
 
-    vout_display_Delete(vd);
+    if (vd->module != NULL)
+        vlc_module_unload(vd, vd->module, vout_display_stop, vd);
+
+    video_format_Clean(&vd->source);
+    video_format_Clean(&vd->fmt);
+    vlc_object_release(vd);
     vlc_mutex_destroy(&osys->lock);
     free(osys);
 }
