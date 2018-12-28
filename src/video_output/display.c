@@ -280,6 +280,7 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_ori
 }
 
 typedef struct {
+    vout_display_t  display;
     vout_thread_t   *vout;
     bool            is_splitter;  /* Is this a video splitter */
 
@@ -322,7 +323,7 @@ typedef struct {
 
     atomic_bool reset_pictures;
     picture_pool_t *pool;
-} vout_display_owner_sys_t;
+} vout_display_owner_sys_t, vout_display_priv_t;
 
 static const struct filter_video_callbacks vout_display_filter_cbs = {
     .buffer_new = VideoBufferNew,
@@ -899,13 +900,16 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                   const char *module, bool is_splitter,
                                   const vout_display_owner_t *owner)
 {
-    vout_display_owner_sys_t *osys = calloc(1, sizeof(*osys));
+    vout_display_priv_t *osys = vlc_custom_create(VLC_OBJECT(vout),
+                                                  sizeof (*osys),
+                                                  "vout display");
+    if (unlikely(osys == NULL))
+        return NULL;
 
     osys->cfg = *cfg;
     vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
-
     osys->vout = vout;
     osys->is_splitter = is_splitter;
 
@@ -931,11 +935,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->crop.den = 0;
 
     /* */
-    vout_display_t *vd = vlc_custom_create(VLC_OBJECT(vout), sizeof (*vd),
-                                           "vout display" );
-    if (unlikely(vd == NULL))
-        goto error;
-
+    vout_display_t *vd = &osys->display;
     video_format_Copy(&vd->source, source);
     vd->info = (vout_display_info_t){ };
     vd->cfg = &osys->cfg;
@@ -952,11 +952,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                                      module && *module != '\0',
                                      vout_display_start, vd, &osys->cfg,
                                      &vd->fmt, NULL);
-        if (vd->module == NULL) {
-            video_format_Clean(&vd->source);
-            vlc_object_release(vd);
+        if (vd->module == NULL)
             goto error;
-        }
 
         vout_window_SetSize(cfg->window,
                             cfg->display.width, cfg->display.height);
@@ -969,9 +966,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         if (vd->module != NULL)
             vlc_module_unload(vd, vd->module, vout_display_stop, vd);
 
-        video_format_Clean(&vd->source);
         video_format_Clean(&vd->fmt);
-        vlc_object_release(vd);
         goto error;
     }
 
@@ -979,8 +974,9 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                 vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     return vd;
 error:
+    video_format_Clean(&vd->source);
     vlc_mutex_destroy(&osys->lock);
-    free(osys);
+    vlc_object_release(vd);
     return NULL;
 }
 
@@ -1003,9 +999,8 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
-    vlc_object_release(vd);
     vlc_mutex_destroy(&osys->lock);
-    free(osys);
+    vlc_object_release(vd);
 }
 
 /*****************************************************************************
