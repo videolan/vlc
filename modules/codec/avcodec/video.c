@@ -1455,12 +1455,15 @@ static void lavc_ReleaseFrame(void *opaque, uint8_t *data)
     picture_Release(picture);
 }
 
-static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
-                            picture_t *pic)
+static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *p_sys = dec->p_sys;
     vlc_va_t *va = p_sys->p_va;
+
+    picture_t *pic = decoder_NewPicture(dec);
+    if (pic == NULL)
+        return -1;
 
     if (vlc_va_Get(va, pic, &frame->data[0]))
     {
@@ -1484,14 +1487,17 @@ static int lavc_va_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
     return 0;
 }
 
-static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame,
-                            picture_t *pic)
+static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
 {
-    decoder_t *dec = (decoder_t *)ctx->opaque;
+    decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
 
     if (ctx->pix_fmt == AV_PIX_FMT_PAL8)
-        goto error;
+        return -1;
+
+    picture_t *pic = decoder_NewPicture(dec);
+    if (pic == NULL)
+        return -1;
 
     int width = frame->width;
     int height = frame->height;
@@ -1561,7 +1567,6 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
 {
     decoder_t *dec = ctx->opaque;
     decoder_sys_t *sys = dec->p_sys;
-    picture_t *pic;
 
     for (unsigned i = 0; i < AV_NUM_DATA_POINTERS; i++)
     {
@@ -1591,16 +1596,12 @@ static int lavc_GetFrame(struct AVCodecContext *ctx, AVFrame *frame, int flags)
     }
     post_mt(sys);
 
-    pic = decoder_NewPicture(dec);
-    if (pic == NULL)
-        return -ENOMEM;
-
     if (sys->p_va != NULL)
-        return lavc_va_GetFrame(ctx, frame, pic);
+        return lavc_va_GetFrame(ctx, frame);
 
     /* Some codecs set pix_fmt only after the 1st frame has been decoded,
      * so we need to check for direct rendering again. */
-    int ret = lavc_dr_GetFrame(ctx, frame, pic);
+    int ret = lavc_dr_GetFrame(ctx, frame);
     if (ret)
         ret = avcodec_default_get_buffer2(ctx, frame, flags);
     return ret;
