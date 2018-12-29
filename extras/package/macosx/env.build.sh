@@ -39,7 +39,13 @@ vlcSetBaseEnvironment() {
     export CXX="$(xcrun --find clang++)"
     export OBJC="$(xcrun --find clang)"
     export OBJCXX="$(xcrun --find clang++)"
-    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_TRIPLET}/bin:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
+
+    python3Path=$(echo /Library/Frameworks/Python.framework/Versions/3.*/bin | awk '{print $1;}')
+    if [ ! -d "$python3Path" ]; then
+        python3Path=""
+    fi
+
+    export PATH="${VLC_ROOT_DIR}/extras/tools/build/bin:${VLC_ROOT_DIR}/contrib/${LOCAL_TRIPLET}/bin:$python3Path:${VLC_PATH}:/bin:/sbin:/usr/bin:/usr/sbin"
 }
 
 vlcSetSymbolEnvironment() {
