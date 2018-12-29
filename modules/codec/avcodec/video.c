@@ -1550,6 +1550,7 @@ static int lavc_dr_GetFrame(struct AVCodecContext *ctx, AVFrame *frame)
 
     frame->opaque = pic;
     /* The loop above held one reference to the picture for each plane. */
+    assert(pic->i_planes > 0);
     picture_Release(pic);
     return 0;
 error:
