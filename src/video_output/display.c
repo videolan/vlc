@@ -628,7 +628,7 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 
     picture = filter_chain_VideoFilter(osys->converters, picture);
 
-    if (picture != NULL && vd->pool != NULL) {
+    if (picture != NULL && vd->pool != NULL && picture->i_planes > 0) {
         picture_pool_t *pool = vd->pool(vd, 3);
 
         if (!picture_pool_OwnsPic(pool, picture)) {
