@@ -1347,25 +1347,10 @@ static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
 static void ThreadTranslateMouseState(vout_thread_t *vout,
                                       const vlc_mouse_t *win_mouse)
 {
-    vout_display_t *vd = vout->p->display;
     vlc_mouse_t vid_mouse;
-    vout_display_place_t place;
 
     /* Translate window coordinates to video coordinates */
-    vout_display_PlacePicture(&place, &vd->source, vd->cfg);
-
-    if (place.width <= 0 || place.height <= 0)
-        return;
-
-    const int x = vd->source.i_x_offset
-        + (int64_t)(win_mouse->i_x - place.x)
-          * vd->source.i_visible_width / place.width;
-    const int y = vd->source.i_y_offset
-        + (int64_t)(win_mouse->i_y - place.y)
-          * vd->source.i_visible_height / place.height;
-
-    vid_mouse = *win_mouse;
-    vlc_mouse_SetPosition(&vid_mouse, x, y);
+    vout_display_TranslateMouseState(vout->p->display, &vid_mouse, win_mouse);
 
     /* Then pass up the filter chains. */
     vout_SendDisplayEventMouse(vout, &vid_mouse);

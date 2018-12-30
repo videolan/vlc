@@ -223,6 +223,29 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     }
 }
 
+void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
+                                      const vlc_mouse_t *window)
+{
+    vout_display_place_t place;
+
+    /* Translate window coordinates to video coordinates */
+    vout_display_PlacePicture(&place, &vd->source, vd->cfg);
+
+    if (place.width <= 0 || place.height <= 0) {
+        memset(video, 0, sizeof (*video));
+        return;
+    }
+
+    video->i_x = vd->source.i_x_offset
+        + (int64_t)(window->i_x - place.x)
+          * vd->source.i_visible_width / place.width;
+    video->i_y = vd->source.i_y_offset
+        + (int64_t)(window->i_y - place.y)
+          * vd->source.i_visible_height / place.height;
+    video->i_pressed = window->i_pressed;
+    video->b_double_click = window->b_double_click;
+}
+
 void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, video_orientation_t orient_display, int m_x, int m_y, vout_display_place_t *place)
 {
     video_format_t source_rot = vd->source;
