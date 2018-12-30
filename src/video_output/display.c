@@ -335,8 +335,6 @@ typedef struct {
 #if defined(_WIN32) || defined(__OS2__)
     bool ch_fullscreen;
     bool is_fullscreen;
-    bool ch_wm_state;
-    unsigned wm_state;
 #endif
 
     struct {
@@ -553,20 +551,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vlc_mutex_unlock(&osys->lock);
         break;
     }
-
-    case VOUT_DISPLAY_EVENT_WINDOW_STATE: {
-        const unsigned state = va_arg(args, unsigned);
-
-        msg_Dbg(vd, "VoutDisplayEvent 'window state' %u", state);
-
-        vlc_mutex_lock(&osys->lock);
-        if (state != osys->wm_state) {
-            osys->ch_wm_state = true;
-            osys->wm_state = state;
-        }
-        vlc_mutex_unlock(&osys->lock);
-        break;
-    }
 #endif
 
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID: {
@@ -627,13 +611,9 @@ void vout_ManageDisplay(vout_display_t *vd)
         bool ch_fullscreen  = osys->ch_fullscreen;
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
-
-        bool ch_wm_state  = osys->ch_wm_state;
-        unsigned wm_state  = osys->wm_state;
-        osys->ch_wm_state = false;
         vlc_mutex_unlock(&osys->lock);
 
-        if (!ch_fullscreen && !ch_wm_state)
+        if (!ch_fullscreen)
             break;
 
         /* */
@@ -644,12 +624,6 @@ void vout_ManageDisplay(vout_display_t *vd)
             } else
                 msg_Err(vd, "Failed to set fullscreen");
         }
-
-        /* */
-        if (ch_wm_state
-         && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
-                                 wm_state))
-            msg_Err(vd, "Failed to set on top");
     }
 }
 #endif

@@ -171,7 +171,6 @@ enum {
 
 #if defined(_WIN32) || defined(__OS2__)
     VOUT_DISPLAY_EVENT_FULLSCREEN,
-    VOUT_DISPLAY_EVENT_WINDOW_STATE,
 #endif
 
     /* Mouse event */
@@ -364,10 +363,10 @@ static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
 }
 
-VLC_DEPRECATED /* Core needs not know about this. Don't call. */
+VLC_DEPRECATED
 static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned state)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_WINDOW_STATE, state);
+    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, state);
 }
 #endif
 static inline void vout_display_SendEventMouseMoved(vout_display_t *vd, int x, int y)
