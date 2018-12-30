@@ -579,12 +579,6 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count)
     return osys->pool;
 }
 
-#if defined(_WIN32) || defined(__OS2__)
-void vout_ManageDisplay(vout_display_t *vd)
-{
-}
-#endif
-
 bool vout_IsDisplayFiltered(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
