@@ -169,12 +169,6 @@ enum {
     /* */
     VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
 
-    /* Mouse event */
-    VOUT_DISPLAY_EVENT_MOUSE_MOVED,
-    VOUT_DISPLAY_EVENT_MOUSE_PRESSED,
-    VOUT_DISPLAY_EVENT_MOUSE_RELEASED,
-    VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK,
-
     /* VR navigation */
     VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED,
 };
@@ -368,10 +362,6 @@ static inline void vout_display_SendWindowState(vout_display_t *vd, unsigned sta
     vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, state);
 }
 #endif
-static inline void vout_display_SendEventMouseMoved(vout_display_t *vd, int x, int y)
-{
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_MOUSE_MOVED, x, y);
-}
 static inline void vout_display_SendEventMousePressed(vout_display_t *vd, int button)
 {
     vout_window_ReportMousePressed(vd->cfg->window, button);

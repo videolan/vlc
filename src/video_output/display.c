@@ -299,13 +299,6 @@ typedef struct {
      * VoutDisplayEvent(ie vout_display_SendEvent) */
     vlc_mutex_t lock;
 
-    /* mouse state */
-    struct {
-        vlc_mouse_t state;
-
-        vlc_tick_t last_pressed;
-    } mouse;
-
     atomic_bool reset_pictures;
     picture_pool_t *pool;
 } vout_display_priv_t;
@@ -384,97 +377,11 @@ static void VoutDisplayDestroyRender(vout_display_t *vd)
         filter_chain_Delete(osys->converters);
 }
 
-static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
-{
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    vlc_mutex_lock(&osys->lock);
-
-    /* */
-    vlc_mouse_t m = osys->mouse.state;
-    bool is_ignored = false;
-
-    switch (event) {
-    case VOUT_DISPLAY_EVENT_MOUSE_MOVED: {
-        const int x = (int)va_arg(args, int);
-        const int y = (int)va_arg(args, int);
-
-        //msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
-
-        m.i_x = x;
-        m.i_y = y;
-        m.b_double_click = false;
-        break;
-    }
-    case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
-    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED: {
-        const int button = (int)va_arg(args, int);
-        const int button_mask = 1 << button;
-
-        /* Ignore inconsistent event */
-        if ((event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED  &&  (osys->mouse.state.i_pressed & button_mask)) ||
-            (event == VOUT_DISPLAY_EVENT_MOUSE_RELEASED && !(osys->mouse.state.i_pressed & button_mask))) {
-            is_ignored = true;
-            break;
-        }
-
-        /* */
-        msg_Dbg(vd, "VoutDisplayEvent 'mouse button' %d t=%d", button, event);
-
-        m.b_double_click = false;
-        if (event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED)
-            m.i_pressed |= button_mask;
-        else
-            m.i_pressed &= ~button_mask;
-        break;
-    }
-    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
-        msg_Dbg(vd, "VoutDisplayEvent 'double click'");
-
-        m.b_double_click = true;
-        break;
-    default:
-        vlc_assert_unreachable();
-    }
-
-    if (is_ignored) {
-        vlc_mutex_unlock(&osys->lock);
-        return;
-    }
-
-    /* Emulate double-click if needed */
-    if (!vd->info.has_double_click &&
-        vlc_mouse_HasPressed(&osys->mouse.state, &m, MOUSE_BUTTON_LEFT)) {
-        const vlc_tick_t i_date = vlc_tick_now();
-
-        if (i_date - osys->mouse.last_pressed < VLC_TICK_FROM_MS(300) ) {
-            m.b_double_click = true;
-            osys->mouse.last_pressed = 0;
-        } else {
-            osys->mouse.last_pressed = vlc_tick_now();
-        }
-    }
-
-    /* */
-    osys->mouse.state = m;
-
-    /* */
-    vout_SendDisplayEventMouse(osys->vout, &m);
-    vlc_mutex_unlock(&osys->lock);
-}
-
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     switch (event) {
-    case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
-    case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
-    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
-    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
-        VoutDisplayEventMouse(vd, event, args);
-        break;
-
     case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
         var_SetAddress(osys->vout, "viewpoint-moved",
                        (void *)va_arg(args, const vlc_viewpoint_t *));
@@ -835,8 +742,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     osys->pool = NULL;
     vlc_mutex_init(&osys->lock);
 
-    vlc_mouse_Init(&osys->mouse.state);
-
     osys->source = *source;
     osys->crop.left   = 0;
     osys->crop.top    = 0;
@@ -953,14 +858,6 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     //vout_display_owner_sys_t *osys = vd->owner.sys;
 
     switch (event) {
-#if 0
-    case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
-    case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
-    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
-        /* TODO */
-        break;
-#endif
-    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
     case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
         VoutDisplayEvent(vd, event, args);
         break;
