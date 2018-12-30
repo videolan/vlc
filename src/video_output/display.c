@@ -950,7 +950,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         vd->module = vlc_module_load(vd, "vout display", module,
                                      module && *module != '\0',
                                      vout_display_start, vd, &osys->cfg,
-                                     &vd->fmt, NULL);
+                                     &vd->fmt, (vlc_video_context *)NULL);
         if (vd->module == NULL)
             goto error;
 
