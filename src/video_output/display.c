@@ -965,9 +965,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
 #if defined(_WIN32) || defined(__OS2__)
     osys->is_fullscreen  = osys->cfg.is_fullscreen;
-    osys->wm_state = var_InheritBool(vout, "video-on-top")
-                     ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
-    osys->ch_wm_state = true;
 #endif
 
     osys->source = *source;
@@ -1000,6 +997,12 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
         vout_window_SetSize(osys->cfg.window,
                             osys->cfg.display.width, osys->cfg.display.height);
+
+#if defined(_WIN32) || defined(__OS2__)
+        if (var_InheritBool(vout, "video-on-top"))
+            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
+                                 (unsigned)VOUT_WINDOW_STATE_ABOVE);
+#endif
     } else {
         video_format_Copy(&vd->fmt, &vd->source);
         vd->module = NULL;
