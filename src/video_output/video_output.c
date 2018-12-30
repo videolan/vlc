@@ -1344,16 +1344,53 @@ static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
     }
 }
 
-static void ThreadTranslateMouseState(vout_thread_t *vout,
-                                      const vlc_mouse_t *win_mouse)
+static void ThreadProcessMouseState(vout_thread_t *vout,
+                                    const vlc_mouse_t *win_mouse)
 {
-    vlc_mouse_t vid_mouse;
+    vlc_mouse_t vid_mouse, tmp1, tmp2, *m;
 
     /* Translate window coordinates to video coordinates */
     vout_display_TranslateMouseState(vout->p->display, &vid_mouse, win_mouse);
 
+    /* Let SPU handle the mouse */
+    if (likely(vout->p->spu != NULL)
+     && spu_ProcessMouse(vout->p->spu, &vid_mouse, &vout->p->display->source))
+        return;
+
     /* Then pass up the filter chains. */
-    vout_SendDisplayEventMouse(vout, &vid_mouse);
+    m = &vid_mouse;
+    vlc_mutex_lock(&vout->p->filter.lock);
+    if (vout->p->filter.chain_static && vout->p->filter.chain_interactive) {
+        if (!filter_chain_MouseFilter(vout->p->filter.chain_interactive,
+                                      &tmp1, m))
+            m = &tmp1;
+        if (!filter_chain_MouseFilter(vout->p->filter.chain_static,
+                                      &tmp2, m))
+            m = &tmp2;
+    }
+    vlc_mutex_unlock(&vout->p->filter.lock);
+
+    if (vlc_mouse_HasMoved(&vout->p->mouse, m))
+        var_SetCoords(vout, "mouse-moved", m->i_x, m->i_y);
+
+    if (vlc_mouse_HasButton(&vout->p->mouse, m)) {
+        var_SetInteger(vout, "mouse-button-down", m->i_pressed);
+
+        if (vlc_mouse_HasPressed(&vout->p->mouse, m, MOUSE_BUTTON_LEFT)) {
+            /* FIXME? */
+            int x, y;
+
+            var_GetCoords(vout, "mouse-moved", &x, &y);
+            var_SetCoords(vout, "mouse-clicked", x, y);
+        }
+    }
+
+    if (m->b_double_click)
+        var_ToggleBool(vout, "fullscreen");
+    vout->p->mouse = *m;
+
+    if (vout->p->mouse_event)
+        vout->p->mouse_event(m, vout->p->opaque);
 }
 
 static int ThreadStart(vout_thread_t *vout, vout_display_cfg_t *cfg)
@@ -1564,7 +1601,7 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadStep(vout, cmd.time_ptr);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
-        ThreadTranslateMouseState(vout, &cmd.mouse);
+        ThreadProcessMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_SIZE:
         vout_SetDisplaySize(vout->p->display,
