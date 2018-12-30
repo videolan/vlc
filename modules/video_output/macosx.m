@@ -784,7 +784,7 @@ static void OpenglSwap (vlc_gl_t *gl)
     if (b_inside) {
         @synchronized (self) {
             if (vd) {
-                vout_display_SendMouseMovedDisplayCoordinates(vd, ORIENT_NORMAL,
+                vout_display_SendMouseMovedDisplayCoordinates(vd,
                                                               (int)ml.x, videoRect.size.height - (int)ml.y,
                                                               &vd->sys->place);
             }
