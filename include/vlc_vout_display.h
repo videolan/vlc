@@ -334,6 +334,17 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
     picture_Release(picture);
 }
 
+static inline int vout_display_Control(vout_display_t *vd, int query, ...)
+{
+    va_list ap;
+    int ret;
+
+    va_start(ap, query);
+    ret = vd->control(vd, query, ap);
+    va_end(ap);
+    return ret;
+}
+
 static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
 {
     va_list args;
