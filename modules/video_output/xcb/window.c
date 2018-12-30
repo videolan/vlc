@@ -905,6 +905,7 @@ static int EmOpen (vout_window_t *wnd, const vout_window_cfg_t *cfg)
         goto error;
 
     wnd->ops = &em_ops;
+    (void) cfg;
     return VLC_SUCCESS;
 
 error:
