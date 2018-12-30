@@ -954,8 +954,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         if (vd->module == NULL)
             goto error;
 
-        vout_window_SetSize(cfg->window,
-                            cfg->display.width, cfg->display.height);
+        vout_window_SetSize(osys->cfg.window,
+                            osys->cfg.display.width, osys->cfg.display.height);
     } else {
         video_format_Copy(&vd->fmt, &vd->source);
         vd->module = NULL;
