@@ -937,10 +937,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     vlc_mouse_Init(&osys->mouse.state);
 
-#if defined(_WIN32) || defined(__OS2__)
-    osys->is_fullscreen  = osys->cfg.is_fullscreen;
-#endif
-
     osys->source = *source;
     osys->crop.left   = 0;
     osys->crop.top    = 0;
@@ -973,6 +969,12 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                             osys->cfg.display.width, osys->cfg.display.height);
 
 #if defined(_WIN32) || defined(__OS2__)
+        if ((var_GetBool(vout, "fullscreen")
+          || var_GetBool(vout, "video-wallpaper"))
+         && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+                                 true) == VLC_SUCCESS)
+            osys->cfg.is_fullscreen = true;
+
         if (var_InheritBool(vout, "video-on-top"))
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
                                  (unsigned)VOUT_WINDOW_STATE_ABOVE);

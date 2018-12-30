@@ -654,10 +654,6 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     /* Load configuration */
     cfg->window = vout->p->window;
-#if defined(_WIN32) || defined(__OS2__)
-    cfg->is_fullscreen = var_GetBool(vout, "fullscreen")
-                         || var_GetBool(vout, "video-wallpaper");
-#endif
     cfg->viewpoint = vout->p->original.pose;
 
     const int display_width = var_GetInteger(vout, "width");

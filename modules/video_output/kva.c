@@ -262,10 +262,6 @@ static void PMThread( void *arg )
         goto exit_open_display;
     }
 
-    if( cfg->is_fullscreen && !sys->parent_window )
-        WinPostMsg( sys->client, WM_VLC_FULLSCREEN_CHANGE,
-                    MPFROMLONG( true ), 0 );
-
     kvaDisableScreenSaver();
 
     /* Setup vout_display now that everything is fine */

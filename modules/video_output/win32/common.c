@@ -130,11 +130,6 @@ int CommonInit(vout_display_t *vd, bool b_windowless, const vout_display_cfg_t *
     sys->hvideownd     = hwnd.hvideownd;
     sys->hfswnd        = hwnd.hfswnd;
 
-    if (vdcfg->is_fullscreen) {
-        if (CommonControlSetFullscreen(vd, true))
-            vout_display_SendEventFullscreen(vd, false);
-    }
-
 #endif /* !VLC_WINSTORE_APP */
 
     return VLC_SUCCESS;
