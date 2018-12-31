@@ -193,7 +193,6 @@ static void *EventThread( void *p_this )
     for( ;; )
     {
         vout_display_place_t place;
-        video_format_t       source;
 
         if( !GetMessage( &msg, 0, 0, 0 ) )
         {
@@ -240,22 +239,20 @@ static void *EventThread( void *p_this )
         case WM_MOUSEMOVE:
             vlc_mutex_lock( &p_event->lock );
             place  = p_event->place;
-            source = p_event->source;
             vlc_mutex_unlock( &p_event->lock );
 
             if( place.width > 0 && place.height > 0 )
             {
+                int x = GET_X_LPARAM(msg.lParam);
+                int y = GET_Y_LPARAM(msg.lParam);
+
                 if( msg.hwnd == p_event->hvideownd )
                 {
                     /* Child window */
-                    place.x = 0;
-                    place.y = 0;
+                    x += place.x;
+                    y += place.y;
                 }
-                const int x = source.i_x_offset +
-                    (int64_t)(GET_X_LPARAM(msg.lParam) - place.x) * source.i_width  / place.width;
-                const int y = source.i_y_offset +
-                    (int64_t)(GET_Y_LPARAM(msg.lParam) - place.y) * source.i_height / place.height;
-                vout_display_SendEventMouseMoved(vd, x, y);
+                vout_display_SendMouseMovedDisplayCoordinates(vd, x, y);
             }
             break;
         case WM_NCMOUSEMOVE:
