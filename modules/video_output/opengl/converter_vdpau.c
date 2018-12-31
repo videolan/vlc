@@ -75,33 +75,33 @@ tc_vdpau_gl_update(opengl_tex_converter_t const *tc, GLuint textures[],
     VLC_UNUSED(plane_offsets);
 
     vlc_vdp_output_surface_t *p_sys = pic->p_sys;
+    GLvdpauSurfaceNV gl_nv_surface = p_sys->gl_nv_surface;
 
-    static_assert (_Generic (p_sys->gl_nv_surface, GLvdpauSurfaceNV: 1,
-                                                   default: 0), "Mismatch");
+    static_assert (sizeof (gl_nv_surface) <= sizeof (p_sys->gl_nv_surface),
+                   "Type too small");
 
-    GLvdpauSurfaceNV *p_gl_nv_surface = &p_sys->gl_nv_surface;
-
-    if (*p_gl_nv_surface)
+    if (gl_nv_surface)
     {
-        assert(_glVDPAUIsSurfaceNV(*p_gl_nv_surface) == GL_TRUE);
+        assert(_glVDPAUIsSurfaceNV(gl_nv_surface) == GL_TRUE);
 
         GLint state;
         GLsizei num_val;
-        INTEROP_CALL(glVDPAUGetSurfaceivNV, *p_gl_nv_surface,
+        INTEROP_CALL(glVDPAUGetSurfaceivNV, gl_nv_surface,
                      GL_SURFACE_STATE_NV, 1, &num_val, &state);
         assert(num_val == 1); assert(state == GL_SURFACE_MAPPED_NV);
 
-        INTEROP_CALL(glVDPAUUnmapSurfacesNV, 1, p_gl_nv_surface);
-        INTEROP_CALL(glVDPAUUnregisterSurfaceNV, *p_gl_nv_surface);
+        INTEROP_CALL(glVDPAUUnmapSurfacesNV, 1, &gl_nv_surface);
+        INTEROP_CALL(glVDPAUUnregisterSurfaceNV, gl_nv_surface);
     }
 
-    *p_gl_nv_surface =
+    gl_nv_surface =
         INTEROP_CALL(glVDPAURegisterOutputSurfaceNV,
                      (void *)(size_t)p_sys->surface,
                      GL_TEXTURE_2D, tc->tex_count, textures);
-    INTEROP_CALL(glVDPAUSurfaceAccessNV, *p_gl_nv_surface, GL_READ_ONLY);
-    INTEROP_CALL(glVDPAUMapSurfacesNV, 1, p_gl_nv_surface);
+    INTEROP_CALL(glVDPAUSurfaceAccessNV, gl_nv_surface, GL_READ_ONLY);
+    INTEROP_CALL(glVDPAUMapSurfacesNV, 1, &gl_nv_surface);
 
+    p_sys->gl_nv_surface = gl_nv_surface;
     return VLC_SUCCESS;
 }
 
