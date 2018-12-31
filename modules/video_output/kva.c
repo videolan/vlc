@@ -180,10 +180,9 @@ static void PMThread( void *arg )
 
     sys->b_fixt23 = var_CreateGetBool( vd, "kva-fixt23");
 
-    if( !sys->b_fixt23 )
+    if( !sys->b_fixt23 && vd->cfg->window->type == VOUT_WINDOW_TYPE_HWND )
         /* If an external window was specified, we'll draw in it. */
-        sys->parent_window =
-            vout_display_NewWindow( vd, VOUT_WINDOW_TYPE_HWND );
+        sys->parent_window = vd->cfg->window;
 
     if( sys->parent_window )
     {
@@ -964,7 +963,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
     {
         /* the user wants to close the window */
         case WM_CLOSE:
-            vout_display_SendEventClose(vd);
+            vout_window_ReportClose(vd->cfg->window);
             result = 0;
             break;
 
@@ -1067,7 +1066,7 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
                     if( i_flags & KC_ALT )
                         i_key |= KEY_MODIFIER_ALT;
 
-                    vout_display_SendEventKey(vd, i_key);
+                    vout_window_ReportKeyPress(vd->cfg->window, i_key);
                 }
             }
             break;
