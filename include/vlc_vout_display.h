@@ -169,10 +169,6 @@ enum {
     /* */
     VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
 
-#if defined(_WIN32) || defined(__OS2__)
-    VOUT_DISPLAY_EVENT_FULLSCREEN,
-#endif
-
     /* Mouse event */
     VOUT_DISPLAY_EVENT_MOUSE_MOVED,
     VOUT_DISPLAY_EVENT_MOUSE_PRESSED,
@@ -358,9 +354,12 @@ static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 }
 
 #if defined(_WIN32) || defined(__OS2__)
+VLC_DEPRECATED
 static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+                             is_fullscreen) == VLC_SUCCESS)
+        ((vout_display_cfg_t *)vd->cfg)->is_fullscreen = is_fullscreen;
 }
 
 VLC_DEPRECATED
