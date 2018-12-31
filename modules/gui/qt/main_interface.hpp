@@ -36,6 +36,8 @@
 # include <shobjidl.h>
 #endif
 
+#include <atomic>
+
 class QSettings;
 class QCloseEvent;
 class QKeyEvent;
