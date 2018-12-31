@@ -560,8 +560,7 @@ static void *OurGetProcAddress (vlc_gl_t *gl, const char *name)
         if (_voutDisplay) {
             vout_display_SendMouseMovedDisplayCoordinates (_voutDisplay,
                                                            xValue,
-                                                           yValue,
-                                                           &_voutDisplay->sys->place);
+                                                           yValue);
         }
     }
 }

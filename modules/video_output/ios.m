@@ -712,8 +712,7 @@ static void GLESSwap(vlc_gl_t *gl)
     CGPoint touchPoint = [tapRecognizer locationInView:self];
     CGFloat scaleFactor = self.contentScaleFactor;
     vout_display_SendMouseMovedDisplayCoordinates(_voutDisplay,
-                                                  (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor,
-                                                  &_place);
+                                                  (int)touchPoint.x * scaleFactor, (int)touchPoint.y * scaleFactor);
 
     vout_display_SendEventMousePressed(_voutDisplay, MOUSE_BUTTON_LEFT);
     vout_display_SendEventMouseReleased(_voutDisplay, MOUSE_BUTTON_LEFT);

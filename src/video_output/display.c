@@ -267,9 +267,12 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
     video->b_double_click = window->b_double_click;
 }
 
-void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y, vout_display_place_t *place)
+void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y)
 {
     video_format_t source_rot = vd->source;
+    vout_display_place_t *place = &(vout_display_place_t) { };
+
+    vout_display_PlacePicture(place, &vd->source, vd->cfg);
 
     if (place->width > 0 && place->height > 0) {
 

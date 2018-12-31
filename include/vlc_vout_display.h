@@ -442,10 +442,8 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
  * \param vd vout_display_t.
  * \param m_x Mouse x position (relative to place, origin is top left).
  * \param m_y Mouse y position (relative to place, origin is top left).
- * \param place Place of the picture.
  */
-VLC_API void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y,
-                                                           vout_display_place_t *place);
+VLC_API void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, int m_y);
 
 /** @} */
 #endif /* VLC_VOUT_DISPLAY_H */
