@@ -295,10 +295,6 @@ typedef struct {
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
 
-    /* Lock protecting the variables used by
-     * VoutDisplayEvent(ie vout_display_SendEvent) */
-    vlc_mutex_t lock;
-
     atomic_bool reset_pictures;
     picture_pool_t *pool;
 } vout_display_priv_t;
@@ -740,7 +736,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     atomic_init(&osys->reset_pictures, false);
     osys->pool = NULL;
-    vlc_mutex_init(&osys->lock);
 
     osys->source = *source;
     osys->crop.left   = 0;
@@ -802,7 +797,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     return vd;
 error:
     video_format_Clean(&vd->source);
-    vlc_mutex_destroy(&osys->lock);
     vlc_object_release(vd);
     return NULL;
 }
@@ -826,7 +820,6 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
-    vlc_mutex_destroy(&osys->lock);
     vlc_object_release(vd);
 }
 
