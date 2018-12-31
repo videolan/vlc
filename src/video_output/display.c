@@ -236,12 +236,48 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
         return;
     }
 
+    const int wx = window->i_x, wy = window->i_y;
+    int x, y;
+
+    switch (vd->source.orientation) {
+        case ORIENT_TOP_LEFT:
+            x = wx;
+            y = wy;
+            break;
+        case ORIENT_TOP_RIGHT:
+            x = place.width - wx;
+            y = wy;
+            break;
+        case ORIENT_BOTTOM_LEFT:
+            x = wx;
+            y = place.height - wy;
+            break;
+        case ORIENT_BOTTOM_RIGHT:
+            x = place.width - wx;
+            y = place.height - wy;
+            break;
+        case ORIENT_LEFT_TOP:
+            x = wy;
+            y = wx;
+            break;
+        case ORIENT_LEFT_BOTTOM:
+            x = wy;
+            y = place.width - wx;
+            break;
+        case ORIENT_RIGHT_TOP:
+            x = place.height - wy;
+            y = wx;
+            break;
+        case ORIENT_RIGHT_BOTTOM:
+            x = place.height - wy;
+            y = place.width - wx;
+            break;
+    }
+
     video->i_x = vd->source.i_x_offset
-        + (int64_t)(window->i_x - place.x)
-          * vd->source.i_visible_width / place.width;
+        + (int64_t)(x - place.x) * vd->source.i_visible_width / place.width;
     video->i_y = vd->source.i_y_offset
-        + (int64_t)(window->i_y - place.y)
-          * vd->source.i_visible_height / place.height;
+        + (int64_t)(y - place.y) * vd->source.i_visible_height / place.height;
     video->i_pressed = window->i_pressed;
     video->b_double_click = window->b_double_click;
 }
