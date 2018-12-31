@@ -454,16 +454,15 @@ static int Control( vout_display_t *vd, int query, va_list args )
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
     {
-            video_format_t src_rot;
-            video_format_ApplyRotation(&src_rot, &vd->source);
+        video_format_t src_rot;
+        video_format_ApplyRotation(&src_rot, &vd->source);
 
-            sys->kvas.rclSrcRect.xLeft   = src_rot.i_x_offset;
-            sys->kvas.rclSrcRect.yTop    = src_rot.i_y_offset;
-            sys->kvas.rclSrcRect.xRight  = src_rot.i_x_offset +
-                                           src_rot.i_visible_width;
-            sys->kvas.rclSrcRect.yBottom = src_rot.i_y_offset +
-                                           src_rot.i_visible_height;
-        }
+        sys->kvas.rclSrcRect.xLeft   = src_rot.i_x_offset;
+        sys->kvas.rclSrcRect.yTop    = src_rot.i_y_offset;
+        sys->kvas.rclSrcRect.xRight  = src_rot.i_x_offset +
+                                       src_rot.i_visible_width;
+        sys->kvas.rclSrcRect.yBottom = src_rot.i_y_offset +
+                                       src_rot.i_visible_height;
         kvaSetup( &sys->kvas );
         return VLC_SUCCESS;
     }
