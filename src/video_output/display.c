@@ -709,11 +709,11 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
     }
 }
 
-static vout_display_t *DisplayNew(vlc_object_t *parent,
-                                  const video_format_t *source,
-                                  const vout_display_cfg_t *cfg,
-                                  const char *module,
-                                  const vout_display_owner_t *owner)
+vout_display_t *vout_display_New(vlc_object_t *parent,
+                                 const video_format_t *source,
+                                 const vout_display_cfg_t *cfg,
+                                 const char *module,
+                                 const vout_display_owner_t *owner)
 {
     vout_display_priv_t *osys = vlc_custom_create(parent, sizeof (*osys),
                                                   "vout display");
@@ -809,13 +809,4 @@ void vout_display_Delete(vout_display_t *vd)
     video_format_Clean(&vd->source);
     video_format_Clean(&vd->fmt);
     vlc_object_release(vd);
-}
-
-vout_display_t *vout_display_New(vlc_object_t *parent,
-                                 const video_format_t *source,
-                                 const vout_display_cfg_t *cfg,
-                                 const char *module,
-                                 const vout_display_owner_t *owner)
-{
-    return DisplayNew(parent, source, cfg, module, owner);
 }
