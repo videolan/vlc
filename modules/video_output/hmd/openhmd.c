@@ -332,12 +332,11 @@ static void* HMDThread(void *p_data)
     {
         ohmd_ctx_update(sys->ctx);
 
-        float quat[] = {0, 0, 0, 1};
         vlc_viewpoint_t vp;
         if (sys->b_headTracking)
-            ohmd_device_getf(sys->hmd, OHMD_ROTATION_QUAT, quat);
+            ohmd_device_getf(sys->hmd, OHMD_ROTATION_QUAT, vp.quat);
 
-        quaternionToEuler(quat, &vp);
+        quaternionToEuler(vp.quat, &vp);
 
         vlc_mutex_lock(&sys->vp_lock);
         sys->vp = vp;

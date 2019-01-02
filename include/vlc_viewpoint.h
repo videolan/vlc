@@ -42,6 +42,8 @@ struct vlc_viewpoint_t {
     float pitch; /* pitch in degrees */
     float roll;  /* roll in degrees */
     float fov;   /* field of view in degrees */
+    float quat[4]; /* quaternion */
+    enum { VLC_VP_EULER, VLC_VP_QUATERNION } type;
 };
 
 static inline void vlc_viewpoint_init( vlc_viewpoint_t *p_vp )
