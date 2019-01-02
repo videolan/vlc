@@ -567,6 +567,8 @@ scene_t *loadScene(object_loader_t *p_loader, const char *psz_path)
     scene_CalcTransformationMatrix(p_scene, scale, rotationAngles);
     scene_CalcHeadPositionMatrix(p_scene, position);
 
+    memcpy(p_scene->initialPosition, position, 3 * sizeof(float));
+
     ret = getScreenParams(root, p_scene);
     if (ret != VLC_SUCCESS)
     {

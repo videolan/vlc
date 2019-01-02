@@ -72,6 +72,7 @@ typedef struct
 
     float transformMatrix[16];
     float headPositionMatrix[16];
+    float initialPosition[3];
 
     unsigned nObjects;
     unsigned nMeshes;

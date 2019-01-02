@@ -238,6 +238,7 @@ struct vout_display_opengl_t {
     float f_fovy; /* to avoid recalculating them when needed.      */
     float f_z;    /* Position of the camera on the shpere radius vector */
     float f_sar;
+    float position[3];
 
     /* Side by side */
     bool b_sideBySide;
@@ -2808,8 +2809,12 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
     if (vgl->b_sideBySide
         && vgl->fmt.projection_mode == PROJECTION_MODE_RECTANGULAR
         && vgl->p_objDisplay)
+    {
         memcpy(vgl->prgm->var.HeadPositionMatrix, vgl->p_objDisplay->p_scene->headPositionMatrix,
                sizeof(vgl->p_objDisplay->p_scene->headPositionMatrix));
+        memcpy(vgl->position, vgl->p_objDisplay->p_scene->initialPosition,
+               sizeof(float) * 3);
+    }
 
 
     DrawWithShaders(vgl, vgl->prgm, eye);
