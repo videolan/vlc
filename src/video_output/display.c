@@ -381,22 +381,6 @@ void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
     atomic_store_explicit(&osys->reset_pictures, true, memory_order_release);
 }
 
-static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
-{
-    vout_thread_t *vout = vd->owner.sys;
-
-    switch (event) {
-    case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
-        var_SetAddress(vout, "viewpoint-moved",
-                       (void *)va_arg(args, const vlc_viewpoint_t *));
-        break;
-    default:
-        msg_Err(vd, "VoutDisplayEvent received event %d", event);
-        /* TODO add an assert when all event are handled */
-        break;
-    }
-}
-
 static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
                                  const video_format_t *source,
                                  unsigned num, unsigned den)
@@ -793,9 +777,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         video_format_Clean(&vd->fmt);
         goto error;
     }
-
-    var_SetBool(vout, "viewpoint-changeable",
-                vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     return vd;
 error:
     video_format_Clean(&vd->source);
@@ -831,13 +812,10 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const video_format_t *source,
                                 const vout_display_cfg_t *cfg,
-                                const char *module)
+                                const char *module,
+                                const vout_display_owner_t *owner)
 {
-    vout_display_owner_t owner = {
-        .event = VoutDisplayEvent, .sys = vout,
-    };
-
-    return DisplayNew(vout, source, cfg, module, false, &owner);
+    return DisplayNew(vout, source, cfg, module, false, owner);
 }
 
 /*****************************************************************************

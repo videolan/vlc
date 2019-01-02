@@ -43,6 +43,22 @@ static int  Forward(vlc_object_t *, char const *,
                     vlc_value_t, vlc_value_t, void *);
 #endif
 
+static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
+{
+    vout_thread_t *vout = vd->owner.sys;
+
+    switch (event) {
+    case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
+        var_SetAddress(vout, "viewpoint-moved",
+                       (void *)va_arg(args, const vlc_viewpoint_t *));
+        break;
+    default:
+        msg_Err(vd, "VoutDisplayEvent received event %d", event);
+        /* TODO add an assert when all event are handled */
+        break;
+    }
+}
+
 /* Minimum number of display picture */
 #define DISPLAY_PICTURE_COUNT (1)
 
@@ -54,6 +70,9 @@ int vout_OpenWrapper(vout_thread_t *vout,
 {
     vout_thread_sys_t *sys = vout->p;
     vout_display_t *vd;
+    vout_display_owner_t owner = {
+        .event = VoutDisplayEvent, .sys = vout,
+    };
 
     msg_Dbg(vout, "Opening vout display wrapper");
 
@@ -63,7 +82,7 @@ int vout_OpenWrapper(vout_thread_t *vout,
     if (splitter_name)
         vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
     else
-        vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist);
+        vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist, &owner);
     free(modlist);
 
     if (vd == NULL)
@@ -128,6 +147,8 @@ int vout_OpenWrapper(vout_thread_t *vout,
     var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
     var_AddCallback(vout, "video-wallpaper", Forward, NULL);
 #endif
+    var_SetBool(VLC_OBJECT(vout), "viewpoint-changeable",
+        vout->p->display->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     return VLC_SUCCESS;
 
 error:

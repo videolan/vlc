@@ -34,7 +34,8 @@ picture_pool_t *vout_GetPool(vout_display_t *vd, unsigned count);
  * It creates a vout managed display.
  */
 vout_display_t *vout_NewDisplay( vout_thread_t *, const video_format_t *,
-    const vout_display_cfg_t *, const char *module);
+    const vout_display_cfg_t *, const char *module,
+    const vout_display_owner_t *);
 /**
  * It destroy a vout managed display.
  */
