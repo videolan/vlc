@@ -453,6 +453,17 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
     return picture;
 }
 
+picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
+                                subpicture_t *subpic, vlc_tick_t date)
+{
+    assert(subpic == NULL); /* TODO */
+    picture = vout_FilterDisplay(vd, picture);
+
+    if (picture != NULL && vd->prepare != NULL)
+        vd->prepare(vd, picture, subpic, date);
+    return picture;
+}
+
 void vout_FilterFlush(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
@@ -860,11 +871,9 @@ static void SplitterPrepare(vout_display_t *vd,
         return;
     }
 
-    for (int i = 0; i < sys->count; i++) {
-        sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
-        if (sys->picture[i])
-            vout_display_Prepare(sys->display[i], sys->picture[i], NULL, date);
-    }
+    for (int i = 0; i < sys->count; i++)
+        sys->picture[i] = vout_display_Prepare(sys->display[i],
+                                               sys->picture[i], NULL, date);
 }
 static void SplitterDisplay(vout_display_t *vd, picture_t *picture)
 {

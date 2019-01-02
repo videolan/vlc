@@ -1154,8 +1154,8 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
     if (!do_dr_spu && sys->spu_blend != NULL && subpic != NULL)
         picture_BlendSubpicture(todisplay, sys->spu_blend, subpic);
 
-    vout_display_Prepare(vd, todisplay, do_dr_spu ? subpic : NULL,
-                         todisplay->date);
+    if (vd->prepare != NULL)
+        vd->prepare(vd, todisplay, do_dr_spu ? subpic : NULL, todisplay->date);
 
     vout_chrono_Stop(&sys->render);
 #if 0

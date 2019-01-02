@@ -312,13 +312,28 @@ VLC_API void vout_display_Delete(vout_display_t *);
 
 /**
  * Prepares a picture for display.
+ *
+ * This renders a picture for subsequent display, with vout_display_Display().
+ *
+ * \note A reference to the input picture is consumed by the function, which
+ * returns a reference to an output picture for display. The input and output
+ * picture may or may not be equal depending on the underlying display setup.
+ *
+ * \bug Currently, only one picture can be prepared at a time. It must be
+ * displayed with vout_display_Display() before any picture is prepared or
+ * before the display is destroyd with vout_display_Delete().
+ *
+ \ bug Rendering subpictures is not supported with this function yet.
+ * \c subpic must be @c NULL .
+ *
+ * \param vd display to prepare the picture for
+ * \param picture picure to be prepared
+ * \param subpic reserved, must be NULL
+ * \param date intended time to show the picture
+ * \return The prepared picture is returned, NULL on error.
  */
-static inline void vout_display_Prepare(vout_display_t *vd, picture_t *picture,
-                                        subpicture_t *subpic, vlc_tick_t date)
-{
-    if (vd->prepare != NULL)
-        vd->prepare(vd, picture, subpic, date);
-}
+VLC_API picture_t *vout_display_Prepare(vout_display_t *vd, picture_t *picture,
+                                        subpicture_t *subpic, vlc_tick_t date);
 
 /**
  * Displays a picture.
