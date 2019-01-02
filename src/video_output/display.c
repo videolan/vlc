@@ -274,7 +274,6 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, 
 
 typedef struct {
     vout_display_t  display;
-    vout_thread_t   *vout;
     bool            is_splitter;  /* Is this a video splitter */
 
     /* */
@@ -735,7 +734,6 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
-    osys->vout = vout;
     osys->is_splitter = is_splitter;
 
     atomic_init(&osys->reset_pictures, false);
@@ -796,7 +794,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
         goto error;
     }
 
-    var_SetBool(osys->vout, "viewpoint-changeable",
+    var_SetBool(vout, "viewpoint-changeable",
                 vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR);
     return vd;
 error:
