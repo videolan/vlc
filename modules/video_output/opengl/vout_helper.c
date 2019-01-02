@@ -239,6 +239,7 @@ struct vout_display_opengl_t {
     float f_z;    /* Position of the camera on the shpere radius vector */
     float f_sar;
     float position[3];
+    vlc_viewpoint_t vp;
 
     /* Side by side */
     bool b_sideBySide;
@@ -1710,6 +1711,8 @@ static int UpdateViewpoint(vout_display_opengl_t *vgl,
     vgl->f_teta = RAD(p_vp->yaw) - (float) M_PI_2;
     vgl->f_phi  = RAD(p_vp->pitch);
     vgl->f_roll = RAD(p_vp->roll);
+
+    vgl->vp = *p_vp;
 
     if (fabsf(f_fovx - vgl->f_fovx) >= 0.001f)
     {
