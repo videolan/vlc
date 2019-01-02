@@ -36,7 +36,12 @@ dnl
 AC_PROG_CC
 AC_USE_SYSTEM_EXTENSIONS
 VLC_PROG_CC_C11
-AC_DEFINE([_FORTIFY_SOURCE], 2, [Define to 2 to get glibc warnings.])
+AH_VERBATIM([FORTIFY_SOURCE],
+  [/* Enable compile-time and run-time bounds-checking, and some warnings,
+   without upsetting glibc 2.15+ or toolchains predefining _FORTIFY_SOURCE */
+#if !defined _FORTIFY_SOURCE && defined __OPTIMIZE__ && __OPTIMIZE__
+# define _FORTIFY_SOURCE 2
+#endif])
 AC_DEFINE([_FILE_OFFSET_BITS], 64, [Define to 64 for large files support.])
 AC_DEFINE([__LIBVLC__],, [Define within the LibVLC source code tree.])
 AC_DEFINE([WIN32_LEAN_AND_MEAN],, [Define to limit the scope of <windows.h>.])
