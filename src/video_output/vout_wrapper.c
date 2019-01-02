@@ -82,7 +82,8 @@ int vout_OpenWrapper(vout_thread_t *vout,
     if (splitter_name)
         vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
     else
-        vd = vout_NewDisplay(vout, &vout->p->original, cfg, modlist, &owner);
+        vd = vout_NewDisplay(VLC_OBJECT(vout), &vout->p->original, cfg,
+                             modlist, &owner);
     free(modlist);
 
     if (vd == NULL)

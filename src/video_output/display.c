@@ -702,14 +702,13 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
     }
 }
 
-static vout_display_t *DisplayNew(vout_thread_t *vout,
+static vout_display_t *DisplayNew(vlc_object_t *parent,
                                   const video_format_t *source,
                                   const vout_display_cfg_t *cfg,
                                   const char *module, bool is_splitter,
                                   const vout_display_owner_t *owner)
 {
-    vout_display_priv_t *osys = vlc_custom_create(VLC_OBJECT(vout),
-                                                  sizeof (*osys),
+    vout_display_priv_t *osys = vlc_custom_create(parent, sizeof (*osys),
                                                   "vout display");
     if (unlikely(osys == NULL))
         return NULL;
@@ -755,13 +754,13 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
                             osys->cfg.display.width, osys->cfg.display.height);
 
 #if defined(_WIN32) || defined(__OS2__)
-        if ((var_GetBool(vout, "fullscreen")
-          || var_GetBool(vout, "video-wallpaper"))
+        if ((var_GetBool(parent, "fullscreen")
+          || var_GetBool(parent, "video-wallpaper"))
          && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
                                  true) == VLC_SUCCESS)
             osys->cfg.is_fullscreen = true;
 
-        if (var_InheritBool(vout, "video-on-top"))
+        if (var_InheritBool(parent, "video-on-top"))
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
                                  (unsigned)VOUT_WINDOW_STATE_ABOVE);
 #endif
@@ -809,13 +808,13 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 /*****************************************************************************
  *
  *****************************************************************************/
-vout_display_t *vout_NewDisplay(vout_thread_t *vout,
+vout_display_t *vout_NewDisplay(vlc_object_t *parent,
                                 const video_format_t *source,
                                 const vout_display_cfg_t *cfg,
                                 const char *module,
                                 const vout_display_owner_t *owner)
 {
-    return DisplayNew(vout, source, cfg, module, false, owner);
+    return DisplayNew(parent, source, cfg, module, false, owner);
 }
 
 /*****************************************************************************
@@ -913,7 +912,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
 
     /* */
     vout_display_t *wrapper =
-        DisplayNew(vout, source, cfg, module, true, NULL);
+        DisplayNew(VLC_OBJECT(vout), source, cfg, module, true, NULL);
     if (!wrapper) {
         video_splitter_Delete(splitter);
         return NULL;
@@ -959,7 +958,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
             return NULL;
         }
 
-        vout_display_t *vd = DisplayNew(vout, &output->fmt, &ocfg,
+        vout_display_t *vd = DisplayNew(VLC_OBJECT(vout), &output->fmt, &ocfg,
                                         output->psz_module ? output->psz_module : module,
                                         false, &vdo);
         if (!vd) {
