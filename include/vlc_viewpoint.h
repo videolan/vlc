@@ -61,4 +61,29 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
                           FIELD_OF_VIEW_DEGREES_MAX );
 }
 
+static inline void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *p_vp,
+                                         float *m )
+{
+    /* The quaternion must be normalized */
+    const float *q = p_vp->quat;
+
+    m[0] = 1 - 2 * (q[1]*q[1] + q[2] * q[2]);
+    m[1] = 2 * (q[0]*q[1] + q[2]*q[3]);
+    m[2] = 2 * (q[0]*q[2] - q[1]*q[3]);
+    m[3] = 0;
+
+    m[4] = 2 * (q[0]*q[1] - q[2]*q[3]);
+    m[5] = 1 - 2 * (q[0]*q[0] + q[2]*q[2]);
+    m[6] = 2 * (q[1]*q[2] + q[0]*q[3]);
+    m[7] = 0;
+
+    m[8] = 2 * (q[0]*q[2] + q[1]*q[3]);
+    m[9] = 2 * (q[1]*q[2] - q[0]*q[3]);
+    m[10] = 1 - 2*(q[0]*q[0] + q[1]*q[1]);
+    m[11] = 0;
+
+    m[12] = m[13] = m[14] = 0;
+    m[15] = 1;
+}
+
 #endif /* VLC_VIEWPOINT_H_ */
