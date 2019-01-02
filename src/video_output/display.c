@@ -384,11 +384,11 @@ void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 {
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    vout_thread_t *vout = vd->owner.sys;
 
     switch (event) {
     case VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED:
-        var_SetAddress(osys->vout, "viewpoint-moved",
+        var_SetAddress(vout, "viewpoint-moved",
                        (void *)va_arg(args, const vlc_viewpoint_t *));
         break;
     default:
@@ -759,7 +759,7 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vd->display = NULL;
     vd->control = NULL;
     vd->sys = NULL;
-    vd->owner.event = (owner != NULL) ? owner->event : VoutDisplayEvent;
+    vd->owner = *owner;
 
     if (!is_splitter) {
         vd->module = vlc_module_load(vd, "vout display", module,
@@ -835,7 +835,11 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
                                 const vout_display_cfg_t *cfg,
                                 const char *module)
 {
-    return DisplayNew(vout, source, cfg, module, false, NULL);
+    vout_display_owner_t owner = {
+        .event = VoutDisplayEvent, .sys = vout,
+    };
+
+    return DisplayNew(vout, source, cfg, module, false, &owner);
 }
 
 /*****************************************************************************
