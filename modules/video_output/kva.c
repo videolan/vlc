@@ -972,28 +972,24 @@ static MRESULT EXPENTRY WndProc( HWND hwnd, ULONG msg, MPARAM mp1, MPARAM mp2 )
             SHORT i_mouse_y = SHORT2FROMMP( mp1 );
             RECTL movie_rect;
             int   i_movie_width, i_movie_height;
-            int   i_src_width, i_src_height;
 
             /* Get a current movie area */
             kvaAdjustDstRect( &sys->kvas.rclSrcRect, &movie_rect );
             i_movie_width = movie_rect.xRight - movie_rect.xLeft;
             i_movie_height = movie_rect.yTop - movie_rect.yBottom;
 
-            i_src_width =  sys->kvas.rclSrcRect.xRight -
-                           sys->kvas.rclSrcRect.xLeft;
-            i_src_height = sys->kvas.rclSrcRect.yBottom -
-                           sys->kvas.rclSrcRect.yTop;
+            vout_display_place_t place;
+            vout_display_PlacePicture(&place, &vd->source, vd->cfg);
 
             int x = ( i_mouse_x - movie_rect.xLeft ) *
-                    i_src_width / i_movie_width +
-                    sys->kvas.rclSrcRect.xLeft;
+                    place.width / i_movie_width + place.x;
             int y = ( i_mouse_y - movie_rect.yBottom ) *
-                    i_src_height / i_movie_height;
+                    place.height / i_movie_height;
 
             /* Invert Y coordinate and add y offset */
-            y = ( i_src_height - y ) + sys->kvas.rclSrcRect.yTop;;
+            y = ( place.height - y ) + place.y;
 
-            vout_display_SendEventMouseMoved(vd, x, y);
+            vout_display_SendMouseMovedDisplayCoordinates( vd, x, y );
 
             result = WinDefWindowProc( hwnd, msg, mp1,mp2 );
             break;
