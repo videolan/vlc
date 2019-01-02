@@ -298,6 +298,19 @@ struct vout_display_t {
 };
 
 /**
+ * Creates video output display.
+ */
+VLC_API
+vout_display_t *vout_display_New(vlc_object_t *, const video_format_t *,
+    const vout_display_cfg_t *, const char *module,
+    const vout_display_owner_t *);
+
+/**
+ * Destroys a video output display.
+ */
+VLC_API void vout_display_Delete(vout_display_t *);
+
+/**
  * Prepares a picture for display.
  */
 static inline void vout_display_Prepare(vout_display_t *vd, picture_t *picture,

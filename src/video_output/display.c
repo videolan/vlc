@@ -790,6 +790,13 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
     if (cfg != NULL && !osys->is_splitter)
         *cfg = osys->cfg;
 
+    vout_display_Delete(vd);
+}
+
+void vout_display_Delete(vout_display_t *vd)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
     VoutDisplayDestroyRender(vd);
     if (osys->is_splitter)
         SplitterClose(vd);
@@ -805,14 +812,11 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
     vlc_object_release(vd);
 }
 
-/*****************************************************************************
- *
- *****************************************************************************/
-vout_display_t *vout_NewDisplay(vlc_object_t *parent,
-                                const video_format_t *source,
-                                const vout_display_cfg_t *cfg,
-                                const char *module,
-                                const vout_display_owner_t *owner)
+vout_display_t *vout_display_New(vlc_object_t *parent,
+                                 const video_format_t *source,
+                                 const vout_display_cfg_t *cfg,
+                                 const char *module,
+                                 const vout_display_owner_t *owner)
 {
     return DisplayNew(parent, source, cfg, module, false, owner);
 }
@@ -890,7 +894,7 @@ static void SplitterClose(vout_display_t *vd)
     for (int i = 0; i < sys->count; i++) {
         vout_window_t *wnd = sys->display[i]->cfg->window;
 
-        vout_DeleteDisplay(sys->display[i], NULL);
+        vout_display_Delete(sys->display[i]);
         vout_display_window_Delete(wnd);
     }
     TAB_CLEAN(sys->count, sys->display);
@@ -954,7 +958,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                            source, &ocfg);
         ocfg.window = vout_display_window_New(vout, &wcfg);
         if (unlikely(ocfg.window == NULL)) {
-            vout_DeleteDisplay(wrapper, NULL);
+            vout_display_Delete(wrapper);
             return NULL;
         }
 
@@ -962,7 +966,7 @@ vout_display_t *vout_NewSplitter(vout_thread_t *vout,
                                         output->psz_module ? output->psz_module : module,
                                         false, &vdo);
         if (!vd) {
-            vout_DeleteDisplay(wrapper, NULL);
+            vout_display_Delete(wrapper);
             if (ocfg.window != NULL)
                 vout_display_window_Delete(ocfg.window);
             return NULL;
