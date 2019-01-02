@@ -445,86 +445,22 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
 
 static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
-    const float up[] = { 0, 1, 0 };
+    vlc_viewpoint_to_4x4(&vgl->vp, prgm->var.ViewMatrix);
 
-    const float z_axis[] =
-    {
-        cosf(vgl->f_teta) * sinf(vgl->f_phi),
-        sinf(vgl->f_teta) * sinf(vgl->f_phi),
-        cosf(vgl->f_phi)
-    };
+    const float *view = prgm->var.ViewMatrix;
+    const float *eye  = vgl->position;
 
-    float x_axis[] =
-    {
-        up[1] * z_axis[2] - up[2] * z_axis[1],
-        up[2] * z_axis[0] - up[0] * z_axis[2],
-        up[0] * z_axis[1] - up[1] * z_axis[0],
-    };
-
-    float x_axis_length = x_axis[0]*x_axis[0]
-                        + x_axis[1]*x_axis[1]
-                        + x_axis[2]*x_axis[2];
-    x_axis_length = sqrtf(x_axis_length);
-
-    msg_Err(vgl->gl, "z_axis: %f %f %f",
-            z_axis[0], z_axis[1], z_axis[2]);
-
-    x_axis[0] /= x_axis_length;
-    x_axis[1] /= x_axis_length;
-    x_axis[2] /= x_axis_length;
-
-    const float y_axis[] =
-    {
-        z_axis[1] * x_axis[2] - z_axis[2] * x_axis[1],
-        z_axis[2] * x_axis[0] - z_axis[0] * x_axis[2],
-        z_axis[0] * x_axis[1] - z_axis[1] * x_axis[0],
-    };
-
-
-    const float *eye = vgl->position;
-
-    /* Project the position on the computed axis */
+    /* Project the position on the computed axis.
+     * The view matrix is in column-order and each row is the axis in the new
+     * base for the point of view from the camera. */
     const float position[] =
     {
-        -x_axis[0]*eye[0] - x_axis[1]*eye[1] - x_axis[2]*eye[2],
-        -y_axis[0]*eye[0] - y_axis[1]*eye[1] - y_axis[2]*eye[2],
-        -z_axis[0]*eye[0] - z_axis[1]*eye[1] - z_axis[2]*eye[2],
+        -view[0]*eye[0] - view[4]*eye[1] - view[8]*eye[2],
+        -view[1]*eye[0] - view[5]*eye[1] - view[9]*eye[2],
+        -view[2]*eye[0] - view[6]*eye[1] - view[10]*eye[2],
     };
 
-    const float m[] = {
-        // right vector
-        x_axis[0], x_axis[1], x_axis[2], 0,
-        // up vector
-        y_axis[0], y_axis[1], y_axis[2], 0,
-        // forward vector
-        z_axis[0], z_axis[1], z_axis[2], 0,
-
-        position[0], position[1], position[2], 1.f,
-    };
-
-    msg_Err(vgl->gl, "ViewMatrix\n"
-            "%f %f %f %f\n"
-            "%f %f %f %f\n"
-            "%f %f %f %f\n"
-            "%f %f %f %f\n",
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15]);
-
-    memcpy(prgm->var.ViewMatrix, m, 16 * sizeof(float));
-    return;
-
-
-    float ret1_matrix[16];
-    float ret2_matrix[16];
-
-    //matrixMul(ret1_matrix, prgm->var.SceneTransformMatrix, prgm->var.HeadPositionMatrix);
-    matrixMul(ret2_matrix, prgm->var.HeadPositionMatrix, prgm->var.YRotMatrix);
-    matrixMul(ret1_matrix, ret2_matrix, prgm->var.XRotMatrix);
-    matrixMul(ret2_matrix, ret1_matrix, prgm->var.ZRotMatrix);
-    matrixMul(ret1_matrix, ret2_matrix, prgm->var.ZoomMatrix);
-    matrixMul(prgm->var.ViewMatrix, ret1_matrix, prgm->var.ModelViewMatrix);
+    memcpy(&prgm->var.ViewMatrix[12], position, sizeof(float)*3);
 }
 
 
