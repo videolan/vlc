@@ -748,6 +748,7 @@ vout_window_Enable
 vout_window_Disable
 vout_display_GetDefaultDisplaySize
 vout_display_PlacePicture
+vout_display_SendEventPicturesInvalid
 vout_display_SendMouseMovedDisplayCoordinates
 xml_Create
 text_style_Copy

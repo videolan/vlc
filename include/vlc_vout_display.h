@@ -108,7 +108,7 @@ typedef struct {
 typedef struct {
     bool is_slow;                           /* The picture memory has slow read/write */
     bool has_double_click;                  /* Is double-click generated */
-    bool has_pictures_invalid;              /* Will VOUT_DISPLAY_EVENT_PICTURES_INVALID be used */
+    bool has_pictures_invalid;              /* May invoke vout_display_SendEventPicturesInvalid() */
     bool can_scale_spu;                     /* Handles subpictures with a non default zoom factor */
     const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
@@ -117,8 +117,8 @@ typedef struct {
  * Control query for vout_display_t
  */
 enum {
-    /* Ask to reset the internal buffers after a VOUT_DISPLAY_EVENT_PICTURES_INVALID
-     * request.
+    /* Ask to reset the internal buffers after calling
+     * vout_display_SendEventPicturesInvalid().
      */
     VOUT_DISPLAY_RESET_PICTURES, /* const vout_display_cfg_t *, es_format_t * */
 
@@ -163,12 +163,6 @@ enum {
  * Only the transition will be retained and acted upon.
  */
 enum {
-    /* TODO:
-     * ZOOM ? DISPLAY_FILLED ? ON_TOP ?
-     */
-    /* */
-    VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
-
     /* VR navigation */
     VOUT_DISPLAY_EVENT_VIEWPOINT_MOVED,
 };
@@ -342,10 +336,7 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
     va_end(args);
 }
 
-static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
-{
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_PICTURES_INVALID);
-}
+VLC_API void vout_display_SendEventPicturesInvalid(vout_display_t *vd);
 
 #if defined(_WIN32) || defined(__OS2__)
 VLC_DEPRECATED

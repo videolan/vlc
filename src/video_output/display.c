@@ -373,6 +373,15 @@ static void VoutDisplayDestroyRender(vout_display_t *vd)
         filter_chain_Delete(osys->converters);
 }
 
+void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    msg_Warn(vd, "picture buffers invalidated");
+    assert(vd->info.has_pictures_invalid);
+    atomic_store(&osys->reset_pictures, true);
+}
+
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
@@ -382,13 +391,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         var_SetAddress(osys->vout, "viewpoint-moved",
                        (void *)va_arg(args, const vlc_viewpoint_t *));
         break;
-
-    case VOUT_DISPLAY_EVENT_PICTURES_INVALID: {
-        msg_Warn(vd, "VoutDisplayEvent 'pictures invalid'");
-        assert(vd->info.has_pictures_invalid);
-        atomic_store(&osys->reset_pictures, true);
-        break;
-    }
     default:
         msg_Err(vd, "VoutDisplayEvent received event %d", event);
         /* TODO add an assert when all event are handled */
@@ -851,12 +853,9 @@ static void SplitterEvent(vout_display_t *vd, int event, va_list args)
     //vout_display_owner_sys_t *osys = vd->owner.sys;
 
     switch (event) {
-    case VOUT_DISPLAY_EVENT_PICTURES_INVALID:
-        VoutDisplayEvent(vd, event, args);
-        break;
-
     default:
         msg_Err(vd, "splitter event not implemented: %d", event);
+        (void) args;
         break;
     }
 }
