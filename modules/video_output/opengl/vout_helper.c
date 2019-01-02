@@ -442,8 +442,78 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
 
 }
 
-static void updateViewMatrix(struct prgm *prgm)
+static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
+    const float up[] = { 0, 1, 0 };
+
+    const float z_axis[] =
+    {
+        cosf(vgl->f_teta) * sinf(vgl->f_phi),
+        sinf(vgl->f_teta) * sinf(vgl->f_phi),
+        cosf(vgl->f_phi)
+    };
+
+    float x_axis[] =
+    {
+        up[1] * z_axis[2] - up[2] * z_axis[1],
+        up[2] * z_axis[0] - up[0] * z_axis[2],
+        up[0] * z_axis[1] - up[1] * z_axis[0],
+    };
+
+    float x_axis_length = x_axis[0]*x_axis[0]
+                        + x_axis[1]*x_axis[1]
+                        + x_axis[2]*x_axis[2];
+    x_axis_length = sqrtf(x_axis_length);
+
+    msg_Err(vgl->gl, "z_axis: %f %f %f",
+            z_axis[0], z_axis[1], z_axis[2]);
+
+    x_axis[0] /= x_axis_length;
+    x_axis[1] /= x_axis_length;
+    x_axis[2] /= x_axis_length;
+
+    const float y_axis[] =
+    {
+        z_axis[1] * x_axis[2] - z_axis[2] * x_axis[1],
+        z_axis[2] * x_axis[0] - z_axis[0] * x_axis[2],
+        z_axis[0] * x_axis[1] - z_axis[1] * x_axis[0],
+    };
+
+
+    const float *eye = vgl->position;
+
+    /* Project the position on the computed axis */
+    const float position[] =
+    {
+        -x_axis[0]*eye[0] - x_axis[1]*eye[1] - x_axis[2]*eye[2],
+        -y_axis[0]*eye[0] - y_axis[1]*eye[1] - y_axis[2]*eye[2],
+        -z_axis[0]*eye[0] - z_axis[1]*eye[1] - z_axis[2]*eye[2],
+    };
+
+    const float m[] = {
+        // right vector
+        x_axis[0], x_axis[1], x_axis[2], 0,
+        // up vector
+        y_axis[0], y_axis[1], y_axis[2], 0,
+        // forward vector
+        z_axis[0], z_axis[1], z_axis[2], 0,
+
+        position[0], position[1], position[2], 1.f,
+    };
+
+    msg_Err(vgl->gl, "ViewMatrix\n"
+            "%f %f %f %f\n"
+            "%f %f %f %f\n"
+            "%f %f %f %f\n"
+            "%f %f %f %f\n",
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15]);
+
+    memcpy(prgm->var.ViewMatrix, m, 16 * sizeof(float));
+    return;
+
 
     float ret1_matrix[16];
     float ret2_matrix[16];
@@ -2327,7 +2397,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
     }
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
-    updateViewMatrix(vgl->prgm);
+    updateViewMatrix(vgl, prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
@@ -2453,7 +2523,7 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
 
-    updateViewMatrix(vgl->ctl_prgm);
+    updateViewMatrix(vgl, vgl->ctl_prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                              prgm->var.ViewMatrix);
@@ -2538,7 +2608,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     }
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
-    updateViewMatrix(prgm);
+    updateViewMatrix(vgl, prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
