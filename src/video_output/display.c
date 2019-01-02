@@ -379,7 +379,7 @@ void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 
     msg_Warn(vd, "picture buffers invalidated");
     assert(vd->info.has_pictures_invalid);
-    atomic_store(&osys->reset_pictures, true);
+    atomic_store_explicit(&osys->reset_pictures, true, memory_order_release);
 }
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
@@ -482,9 +482,11 @@ static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (likely(!atomic_exchange(&osys->reset_pictures, false)))
+    if (likely(!atomic_exchange_explicit(&osys->reset_pictures, false,
+                                         memory_order_relaxed)))
         return;
 
+    atomic_thread_fence(memory_order_acquire);
     VoutDisplayDestroyRender(vd);
 
     if (osys->pool != NULL) {
