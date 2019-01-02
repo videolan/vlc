@@ -376,9 +376,37 @@ static void getProjectionMatrix(float sar, float fovy, float offset,
         0.f,     0.f,     (zNear + zFar) / (zNear - zFar), -1.f,
         0.f,     0.f, (2 * zNear * zFar) / (zNear - zFar),  0.f};
 
-     memcpy(matrix, m, sizeof(m));
+    /* Translation matrix for the eyes */
+    /* TODO: embed the transformation into the previous one */
+    const GLfloat t[] = {
+        1.f,    0.f, 0.f, 0.f,
+        0.f,    1.f, 0.f, 0.f,
+        0.f,    0.f, 1.f, 0.f,
+        offset, 0.f, 0.f, 1.f };
+
+    /* m and t are transposed matrices, so multiplication is also transposed */
+    matrixMul(matrix, m, t);
 }
 
+static void ComputeProjectionMatrix(vout_display_opengl_t *vgl,
+                                    side_by_side_eye eye,
+                                    GLfloat matrix[static 16])
+{
+    float offset = 0.f;
+    if (vgl->b_sideBySide)
+    {
+        float center = vgl->hmd_cfg.viewport_scale[0] / 2.f;
+        float shift = center - vgl->hmd_cfg.separator / 2.f;
+        float proj_offset = fabs(2.0f *  shift / vgl->hmd_cfg.viewport_scale[0]);
+
+        if (eye == LEFT_EYE)
+            offset = proj_offset;
+        else if (eye == RIGHT_EYE)
+            offset = -proj_offset;
+    }
+
+    getProjectionMatrix(vgl->f_sar, vgl->f_fovx, offset, matrix);
+}
 
 static void getViewpointMatrixes(vout_display_opengl_t *vgl,
                                  video_projection_mode_t projection_mode,
@@ -389,7 +417,6 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         || vgl->b_sideBySide)
     {
         float sar = (float) vgl->f_sar;
-        //getProjectionMatrix(sar, vgl->f_fovy, 0. prgm->var.ProjectionMatrix);
         memcpy(prgm->var.ModelViewMatrix, identity, sizeof(identity));
         getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
@@ -420,8 +447,8 @@ static void updateViewMatrix(struct prgm *prgm)
     float ret1_matrix[16];
     float ret2_matrix[16];
 
-    matrixMul(ret1_matrix, prgm->var.SceneTransformMatrix, prgm->var.HeadPositionMatrix);
-    matrixMul(ret2_matrix, ret1_matrix, prgm->var.YRotMatrix);
+    //matrixMul(ret1_matrix, prgm->var.SceneTransformMatrix, prgm->var.HeadPositionMatrix);
+    matrixMul(ret2_matrix, prgm->var.HeadPositionMatrix, prgm->var.YRotMatrix);
     matrixMul(ret1_matrix, ret2_matrix, prgm->var.XRotMatrix);
     matrixMul(ret2_matrix, ret1_matrix, prgm->var.ZRotMatrix);
     matrixMul(ret1_matrix, ret2_matrix, prgm->var.ZoomMatrix);
@@ -2284,30 +2311,21 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
     vgl->vt.EnableVertexAttribArray(prgm->aloc.VertexPosition);
     vgl->vt.VertexAttribPointer(prgm->aloc.VertexPosition, 3, GL_FLOAT, 0, 0, 0);
 
-    float offset = 0.f;
     if (vgl->b_sideBySide)
     {
-        float center = vgl->hmd_cfg.viewport_scale[0] / 2.f;
-        float shift = center - vgl->hmd_cfg.separator / 2.f;
-        float proj_offset = fabs(4.0f *  shift / vgl->hmd_cfg.viewport_scale[0] * 2.f);
-
         if (eye == LEFT_EYE)
         {
             memcpy(vgl->prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
-            offset = -proj_offset;
         }
         else if (eye == RIGHT_EYE)
         {
             memcpy(vgl->prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
-            offset = proj_offset;
         }
     }
 
-    getProjectionMatrix(vgl->f_sar, vgl->f_fovy, offset,
-                        prgm->var.ProjectionMatrix);
-
+    ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
     updateViewMatrix(vgl->prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
@@ -2425,16 +2443,14 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
     {
         memcpy(prgm->var.ModelViewMatrix,
                vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
-        memcpy(prgm->var.ProjectionMatrix,
-               vgl->hmd_cfg.left.projection, 16 * sizeof(float));
     }
     else if (eye == RIGHT_EYE)
     {
         memcpy(prgm->var.ModelViewMatrix,
                vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
-        memcpy(prgm->var.ProjectionMatrix,
-               vgl->hmd_cfg.right.projection, 16 * sizeof(float));
     }
+
+    ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
 
     updateViewMatrix(vgl->ctl_prgm);
 
@@ -2512,18 +2528,15 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
         {
             memcpy(prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.left.modelview, 16 * sizeof(float));
-            memcpy(prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.left.projection, 16 * sizeof(float));
         }
         else if (eye == RIGHT_EYE)
         {
             memcpy(prgm->var.ModelViewMatrix,
                    vgl->hmd_cfg.right.modelview, 16 * sizeof(float));
-            memcpy(prgm->var.ProjectionMatrix,
-                   vgl->hmd_cfg.right.projection, 16 * sizeof(float));
         }
     }
 
+    ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
     updateViewMatrix(prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
