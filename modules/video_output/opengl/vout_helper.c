@@ -389,7 +389,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
         || vgl->b_sideBySide)
     {
         float sar = (float) vgl->f_sar;
-        getProjectionMatrix(sar, vgl->f_fovy, prgm->var.ProjectionMatrix);
+        //getProjectionMatrix(sar, vgl->f_fovy, 0. prgm->var.ProjectionMatrix);
         memcpy(prgm->var.ModelViewMatrix, identity, sizeof(identity));
         getYRotMatrix(vgl->f_teta, prgm->var.YRotMatrix);
         getXRotMatrix(vgl->f_phi, prgm->var.XRotMatrix);
@@ -1226,6 +1226,7 @@ vout_display_opengl_t *vout_display_opengl_New(video_format_t *fmt,
     GET_PROC_ADDR_CORE(Enable);
     GET_PROC_ADDR_CORE(Finish);
     GET_PROC_ADDR_CORE(Flush);
+    GET_PROC_ADDR_CORE(Hint);
     GET_PROC_ADDR_CORE(GenTextures);
     GET_PROC_ADDR_CORE(GetError);
     GET_PROC_ADDR_CORE(GetIntegerv);
@@ -3027,6 +3028,7 @@ static void HmdStateChanged(vlc_hmd_interface_t *hmd,
 
     if (state == VLC_HMD_STATE_ENABLED)
     {
+        vgl->vt.Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         vgl->p_objDisplay = loadSceneObjects(vgl->gl, vgl->scene_prgm->tc);
         if (vgl->p_objDisplay == NULL)
         {

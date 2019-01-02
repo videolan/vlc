@@ -81,6 +81,7 @@ typedef void (APIENTRY *PFNGLDRAWELEMENTSPROC) (GLenum mode, GLsizei count, GLen
 typedef void (APIENTRY *PFNGLENABLEPROC) (GLenum cap);
 typedef void (APIENTRY *PFNGLFINISHPROC)(void);
 typedef void (APIENTRY *PFNGLFLUSHPROC)(void);
+typedef void (APIENTRY *PFNGLHINTPROC)(GLenum, GLenum);
 typedef void (APIENTRY *PFNGLGENTEXTURESPROC) (GLsizei n, GLuint *textures);
 typedef void (APIENTRY *PFNGLGENERATEMIPMAPPROC) (GLenum target);
 typedef GLenum (APIENTRY *PFNGLGETERRORPROC) (void);
@@ -189,6 +190,7 @@ typedef struct {
     PFNGLGETERRORPROC       GetError;
     PFNGLGETINTEGERVPROC    GetIntegerv;
     PFNGLGETSTRINGPROC      GetString;
+    PFNGLHINTPROC           Hint;
     PFNGLPIXELSTOREIPROC    PixelStorei;
     PFNGLTEXIMAGE2DPROC     TexImage2D;
     PFNGLTEXPARAMETERFPROC  TexParameterf;
