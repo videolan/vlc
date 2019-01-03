@@ -159,39 +159,42 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     /* Get splitter name if present */
     vout->p->splitter_name = var_InheritString(vout, "video-splitter");
+    if (vout->p->splitter_name != NULL) {
+        var_Create(vout, "window", VLC_VAR_STRING);
+        var_SetString(vout, "window", "wdummy");
+    }
 
     /* */
     vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);
 
     /* Window */
-    if (vout->p->splitter_name == NULL) {
-        vout_window_cfg_t wcfg = {
-            .is_fullscreen = var_GetBool(vout, "fullscreen"),
-            .is_decorated = var_InheritBool(vout, "video-deco"),
-            // TODO: take pixel A/R, crop and zoom into account
+    vout_window_cfg_t wcfg = {
+        .is_fullscreen = var_GetBool(vout, "fullscreen"),
+        .is_decorated = var_InheritBool(vout, "video-deco"),
+        // TODO: take pixel A/R, crop and zoom into account
 #ifdef __APPLE__
-            .x = var_InheritInteger(vout, "video-x"),
-            .y = var_InheritInteger(vout, "video-y"),
+        .x = var_InheritInteger(vout, "video-x"),
+        .y = var_InheritInteger(vout, "video-y"),
 #endif
-            .width = cfg->fmt->i_visible_width,
-            .height = cfg->fmt->i_visible_height,
-        };
+        .width = cfg->fmt->i_visible_width,
+        .height = cfg->fmt->i_visible_height,
+    };
 
-        vout_window_t *window = vout_display_window_New(vout, &wcfg);
-        if (unlikely(window == NULL)) {
-            spu_Destroy(vout->p->spu);
-            vlc_object_release(vout);
-            return NULL;
-        }
+    vout_window_t *window = vout_display_window_New(vout, &wcfg);
+    if (vout->p->splitter_name != NULL)
+        var_Destroy(vout, "window");
+    if (unlikely(window == NULL)) {
+        spu_Destroy(vout->p->spu);
+        vlc_object_release(vout);
+        return NULL;
+    }
 
-        if (var_InheritBool(vout, "video-wallpaper"))
-            vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
-        else if (var_InheritBool(vout, "video-on-top"))
-            vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
+    if (var_InheritBool(vout, "video-wallpaper"))
+        vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
+    else if (var_InheritBool(vout, "video-on-top"))
+        vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
 
-        vout->p->window = window;
-    } else
-        vout->p->window = NULL;
+    vout->p->window = window;
 
     /* */
     vlc_object_set_destructor(vout, VoutDestructor);
@@ -199,8 +202,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
-        if (vout->p->window != NULL)
-            vout_display_window_Delete(vout->p->window);
+        vout_display_window_Delete(window);
         spu_Destroy(vout->p->spu);
         vlc_object_release(vout);
         return NULL;
@@ -273,10 +275,8 @@ void vout_Close(vout_thread_t *vout)
     vout_chrono_Clean(&vout->p->render);
 
     vlc_mutex_lock(&vout->p->window_lock);
-    if (vout->p->window != NULL) {
-        vout_display_window_Delete(vout->p->window);
-        vout->p->window = NULL;
-    }
+    vout_display_window_Delete(vout->p->window);
+    vout->p->window = NULL;
     vlc_mutex_unlock(&vout->p->window_lock);
 
     vlc_mutex_lock(&vout->p->spu_lock);
@@ -494,9 +494,7 @@ void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
 
     vlc_mutex_lock(&vout->p->window_lock);
     window = vout->p->window;
-    /* Window is NULL if the output is a splitter,
-     * or if the output was already closed by its owner.
-     */
+    /* Window is NULL if the output was already closed by its owner. */
     if (window != NULL)
         vout_window_SetFullScreen(window, id);
     vlc_mutex_unlock(&vout->p->window_lock);
@@ -1291,9 +1289,7 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t da
     vout->p->pause.is_on = is_paused;
     vout->p->pause.date  = date;
 
-    vout_window_t *window = vout->p->window;
-    if (window != NULL)
-        vout_window_SetInhibition(window, !is_paused);
+    vout_window_SetInhibition(vout->p->window, !is_paused);
 }
 
 static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
