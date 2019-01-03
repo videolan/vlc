@@ -22,6 +22,7 @@ struct vlc_hmd_cfg_t
     int i_screen_width;
     int i_screen_height;
 
+    float ipd;
     float separator;
 
     float distorsion_coefs[4];
@@ -32,6 +33,8 @@ struct vlc_hmd_cfg_t
         float projection[16];
         float modelview[16];
         float lens_center[2];
+        float fov;
+        float ar;
     } left, right;
 
     float warp_scale;
