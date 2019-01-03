@@ -136,49 +136,6 @@ static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
 {
     switch (f->type)
     {
-      case XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB:
-        switch (f->num_planes)
-        {
-          case 1:
-            switch (vlc_popcount (f->red_mask | f->green_mask | f->blue_mask))
-            {
-              case 24:
-                if (f->bpp == 32 && f->depth == 32)
-                    return VLC_CODEC_ARGB;
-                if (f->bpp == 32 && f->depth == 24)
-                    return VLC_CODEC_RGB32;
-                if (f->bpp == 24 && f->depth == 24)
-                    return VLC_CODEC_RGB24;
-                break;
-              case 16:
-                if (f->byte_order != ORDER)
-                    return 0; /* Mixed endian! */
-                if (f->bpp == 16 && f->depth == 16)
-                    return VLC_CODEC_RGB16;
-                break;
-              case 15:
-                if (f->byte_order != ORDER)
-                    return 0; /* Mixed endian! */
-                if (f->bpp == 16 && f->depth == 15)
-                    return VLC_CODEC_RGB15;
-                break;
-              case 12:
-                if (f->bpp == 16 && f->depth == 12)
-                    return VLC_CODEC_RGB12;
-                break;
-              case 8:
-                if (f->bpp == 8 && f->depth == 8)
-                    return VLC_CODEC_RGB8;
-                break;
-            }
-            break;
-        }
-        msg_Err (obj, "unknown XVideo RGB format %"PRIx32" (%.4s)",
-                 f->id, f->guid);
-        msg_Dbg (obj, " %"PRIu8" planes, %"PRIu8" bits/pixel, "
-                 "depth %"PRIu8, f->num_planes, f->bpp, f->depth);
-        break;
-
       case XCB_XV_IMAGE_FORMAT_INFO_TYPE_YUV:
         if (f->u_sample_bits != f->v_sample_bits
          || f->vhorz_u_period != f->vhorz_v_period
@@ -253,7 +210,7 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
             const xcb_xv_adaptor_info_t *a, uint32_t *idp)
 {
     /* Order chromas by preference */
-    vlc_fourcc_t tab[6];
+    vlc_fourcc_t tab[2];
     const vlc_fourcc_t *chromav = tab;
 
     vlc_fourcc_t chroma = var_InheritInteger (obj, "xvideo-format-id");
@@ -267,14 +224,7 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         chromav = vlc_fourcc_GetYUVFallback (fmt->i_chroma);
     }
     else /* RGB chroma */
-    {
-        tab[0] = fmt->i_chroma;
-        tab[1] = VLC_CODEC_RGB32;
-        tab[2] = VLC_CODEC_RGB24;
-        tab[3] = VLC_CODEC_RGB16;
-        tab[4] = VLC_CODEC_RGB15;
-        tab[5] = 0;
-    }
+        return NULL;
 
     /* Get available image formats */
     xcb_xv_list_image_formats_reply_t *list =
@@ -326,12 +276,6 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         fmt->i_width = i->width;
         fmt->i_height = i->height;
 
-        if (f->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
-        {
-            fmt->i_rmask = f->red_mask;
-            fmt->i_gmask = f->green_mask;
-            fmt->i_bmask = f->blue_mask;
-        }
         *idp = f->id;
         free (attr);
         attr = i;
