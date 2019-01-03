@@ -2722,23 +2722,6 @@ static int drawScene(vout_display_opengl_t *vgl, const video_format_t *source, s
 {
     GL_ASSERT_NOERROR();
 
-    vlc_mutex_lock (&vgl->hmd_lock);
-    if (vgl->hmd)
-        vlc_hmd_ReadEvents(vgl->hmd);
-
-    if (vgl->close_hmd)
-    {
-        vlc_hmd_UnmapDevice(vgl->hmd);
-        vgl->hmd = NULL;
-    }
-
-    if (vgl->hmd)
-    {
-        vlc_viewpoint_t vp = vlc_hmd_ReadViewpoint(vgl->hmd);
-        vout_display_opengl_SetViewpoint(vgl, &vp);
-    }
-    vlc_mutex_unlock (&vgl->hmd_lock);
-
     /* Why drawing here and not in Render()? Because this way, the
        OpenGL providers can call vout_display_opengl_Display to force redraw.
        Currently, the OS X provider uses it to get a smooth window resizing */
@@ -2905,14 +2888,24 @@ int vout_display_opengl_Display(vout_display_opengl_t *vgl,
        Currently, the OS X provider uses it to get a smooth window resizing */
     vgl->vt.Clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (vgl->b_sideBySide) {
+    vlc_mutex_lock (&vgl->hmd_lock);
+    if (vgl->hmd)
+        vlc_hmd_ReadEvents(vgl->hmd);
 
-        // Get latest viewpoint values.
-        if (vgl->hmd_cfg.p_vpProvider)
-        {
-            vlc_viewpoint_t vp = vgl->hmd_cfg.getViewpoint(vgl->hmd_cfg.p_vpProvider);
-            UpdateViewpoint(vgl, &vp);
-        }
+    if (vgl->close_hmd)
+    {
+        vlc_hmd_UnmapDevice(vgl->hmd);
+        vgl->hmd = NULL;
+    }
+
+    if (vgl->hmd)
+    {
+        vlc_viewpoint_t vp = vlc_hmd_ReadViewpoint(vgl->hmd);
+        UpdateViewpoint(vgl, &vp);
+    }
+    vlc_mutex_unlock (&vgl->hmd_lock);
+
+    if (vgl->b_sideBySide) {
 
         // Draw scene into framebuffers.
         vgl->vt.UseProgram(vgl->prgm->id);
