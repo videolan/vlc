@@ -305,9 +305,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "hmd-controller", VLC_VAR_ADDRESS );
     var_AddCallback( p_vout, "hmd-controller", HMDControllerCallback, NULL );
 
-    var_Create( p_vout, "hmd-screen-number",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-
     vout_IntfReinit( p_vout );
 }
 
