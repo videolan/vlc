@@ -2556,16 +2556,6 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
     updateViewMatrix(vgl, prgm);
 
-    float *p = prgm->var.ProjectionMatrix;
-    msg_Err(vgl->gl, "Projection matrix: \n"
-            "[ %f %f %f %f ]\n"
-            "[ %f %f %f %f ]\n"
-            "[ %f %f %f %f ]\n"
-            "[ %f %f %f %f ]",
-            p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9], p[10],
-            p[11], p[12], p[13], p[14], p[15]);
-
-
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
     vgl->vt.UniformMatrix4fv(prgm->uloc.OrientationMatrix, 1, GL_FALSE,
