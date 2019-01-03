@@ -3014,31 +3014,53 @@ static void HmdStateChanged(vlc_hmd_interface_t *hmd,
 
     if (state == VLC_HMD_STATE_ENABLED)
     {
-        // TODO: update shader parameters/config
+        vgl->p_objDisplay = loadSceneObjects(vgl->gl, vgl->scene_prgm->tc);
+        if (vgl->p_objDisplay == NULL)
+        {
+            msg_Warn(vgl->gl, "Could not load the virtual theater");
+            vgl->b_sideBySide = false;
+            return;
+        }
 
         vgl->b_sideBySide = true;
-
-        vgl->vt.UseProgram(vgl->stereo_prgm->id);
-
-        vgl->vt.Uniform2fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "ViewportScale"),
-                           1, vgl->hmd_cfg.viewport_scale);
-        vgl->vt.Uniform3fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "aberr"),
-                           1, vgl->hmd_cfg.aberr_scale);
     }
     else
+    {
         vgl->b_sideBySide = false;
+
+        if (vgl->p_objDisplay)
+        {
+            releaseSceneObjects(vgl->p_objDisplay);
+            vgl->p_objDisplay = NULL;
+        }
+    }
+
+}
+
+static void HmdConfigChanged(vlc_hmd_interface_t *hmd,
+                             vlc_hmd_cfg_t cfg,
+                             void *userdata)
+{
+    vout_display_opengl_t *vgl = userdata;
+
+    vgl->hmd_cfg = cfg;
+
+    vgl->vt.UseProgram(vgl->stereo_prgm->id);
+
+    vgl->vt.Uniform2fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "ViewportScale"),
+            1, vgl->hmd_cfg.viewport_scale);
+    vgl->vt.Uniform3fv(vgl->vt.GetUniformLocation(vgl->stereo_prgm->id, "aberr"),
+            1, vgl->hmd_cfg.aberr_scale);
 
     vout_display_opengl_Viewport(vgl, vgl->i_displayX, vgl->i_displayY,
                                  vgl->i_displayWidth, vgl->i_displayHeight);
     getViewpointMatrixes(vgl, vgl->fmt.projection_mode, vgl->prgm);
-
-    return VLC_SUCCESS;
-
 }
 
 static const struct vlc_hmd_interface_cbs_t vout_hmd_cbs =
 {
-    .state_changed = HmdStateChanged
+    .state_changed = HmdStateChanged,
+    .config_changed = HmdConfigChanged,
 };
 
 void vout_display_opengl_UpdateHMD(vout_display_opengl_t *vgl,
