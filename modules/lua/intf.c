@@ -385,7 +385,10 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
             if( !device )
                 msg_Err( p_intf, "Can't find HMD device" );
             else
+            {
                 var_SetAddress( pl_Get(p_intf), "hmd-device-data", device );
+                msg_Info( device, "Found HMD device" );
+            }
         }
     }
 
