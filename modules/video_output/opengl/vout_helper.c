@@ -446,7 +446,9 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
 
 static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
-    vlc_viewpoint_to_4x4(&vgl->vp, prgm->var.ViewMatrix);
+    vlc_viewpoint_t vp = vgl->vp;
+    vlc_viewpoint_reverse(&vp);
+    vlc_viewpoint_to_4x4(&vp, prgm->var.ViewMatrix);
 
     const float *view = prgm->var.ViewMatrix;
     const float *eye  = vgl->position;
