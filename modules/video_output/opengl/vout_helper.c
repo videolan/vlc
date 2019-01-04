@@ -445,7 +445,7 @@ static void getViewpointMatrixes(vout_display_opengl_t *vgl,
 
 }
 
-static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
+static void updateViewMatrix(vout_display_opengl_t *vgl, side_by_side_eye side, struct prgm *prgm)
 {
     vlc_viewpoint_t vp = vgl->vp;
     vlc_viewpoint_reverse(&vp);
@@ -454,6 +454,12 @@ static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
 
     vlc_viewpoint_to_4x4(&vp, view);
     const float *eye  = vgl->position;
+
+    float eye_offset = 0.f;
+    if (side == LEFT_EYE)
+        eye_offset = vgl->hmd_cfg.ipd / 2.f;
+    else if (side == RIGHT_EYE)
+        eye_offset = -vgl->hmd_cfg.ipd / 2.f;
 
     /* Project the position on the computed axis.
      * The view matrix is in column-order and each row is the axis in the new
@@ -465,8 +471,21 @@ static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
         -view[2]*eye[0] - view[6]*eye[1] - view[10]*eye[2],
     };
 
+    /* HACK for vive */
+    const float translation[] =
+    {
+        1.f, 0,   0,   0,
+        0,   1.f, 0,   0,
+        0,   0,   1.f, 0,
+
+        -eye_offset,   0,   0,   1.f
+    };
+
+    float temp[16];
+
     memcpy(&view[12], position, sizeof(float)*3);
-    matrixMul(prgm->var.ViewMatrix, prgm->var.SceneTransformMatrix, view);
+    matrixMul(temp, translation, view);
+    matrixMul(prgm->var.ViewMatrix, prgm->var.SceneTransformMatrix, temp);
 }
 
 
@@ -2348,7 +2367,7 @@ static void DrawWithShaders(vout_display_opengl_t *vgl, struct prgm *prgm,
     }
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
-    updateViewMatrix(vgl, prgm);
+    updateViewMatrix(vgl, eye, prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
@@ -2475,7 +2494,7 @@ static void DrawHMDController(vout_display_opengl_t *vgl, side_by_side_eye eye)
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
 
-    updateViewMatrix(vgl, vgl->ctl_prgm);
+    updateViewMatrix(vgl, eye, vgl->ctl_prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                              prgm->var.ViewMatrix);
@@ -2560,7 +2579,7 @@ static void DrawSceneObjects(vout_display_opengl_t *vgl, struct prgm *prgm,
     }
 
     ComputeProjectionMatrix(vgl, eye, prgm->var.ProjectionMatrix);
-    updateViewMatrix(vgl, prgm);
+    updateViewMatrix(vgl, eye, prgm);
 
     vgl->vt.UniformMatrix4fv(prgm->uloc.ViewMatrix, 1, GL_FALSE,
                               prgm->var.ViewMatrix);
