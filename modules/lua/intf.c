@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_fs.h>
+#include <vlc_hmd.h>
 
 #include "vlc.h"
 #include "libs.h"
@@ -375,6 +376,19 @@ static int Start_LuaIntf( vlc_object_t *p_this, const char *name )
 
     p_sys->L = L;
 
+    if( var_InheritBool( p_intf, "hmd" ) )
+    {
+        vlc_hmd_device_t *device = var_GetAddress(pl_Get(p_intf), "hmd-device-data");
+        if( !device )
+        {
+            device = vlc_hmd_FindDevice( VLC_OBJECT( p_intf ), "any", NULL );
+            if( !device )
+                msg_Err( p_intf, "Can't find HMD device" );
+            else
+                var_SetAddress( pl_Get(p_intf), "hmd-device-data", device );
+        }
+    }
+
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlclua_fd_cleanup( &p_sys->dtable );
@@ -401,7 +415,17 @@ void Close_LuaIntf( vlc_object_t *p_this )
 
     lua_close( p_sys->L );
     vlclua_fd_cleanup( &p_sys->dtable );
+
     free( p_sys->psz_filename );
+
+    vlc_hmd_device_t *device = var_GetAddress( pl_Get( p_intf ),
+                                               "hmd-device-data" );
+    if( device )
+    {
+        var_SetAddress( pl_Get( p_intf ), "hmd-device-data", NULL );
+        vlc_object_release( device );
+    }
+
     free( p_sys );
 }
 
