@@ -61,6 +61,13 @@ static inline void vlc_viewpoint_clip( vlc_viewpoint_t *p_vp )
                           FIELD_OF_VIEW_DEGREES_MAX );
 }
 
+static inline void vlc_viewpoint_reverse( vlc_viewpoint_t *p_vp )
+{
+    p_vp->quat[0] *= -1;
+    p_vp->quat[1] *= -1;
+    p_vp->quat[2] *= -1;
+}
+
 static inline void vlc_viewpoint_to_4x4( const vlc_viewpoint_t *p_vp,
                                          float *m )
 {
