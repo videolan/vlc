@@ -246,7 +246,7 @@ void vout_display_PlacePicture(vout_display_place_t *place,
     const int64_t scaled_width  = (int64_t)width  * display_height * cfg->display.sar.den * source->i_sar_num / (height * source->i_sar_den * cfg->display.sar.num);
 
     // TODO: handle HMD
-    if (source->projection_mode == PROJECTION_MODE_RECTANGULAR)
+    if (source->projection_mode == PROJECTION_MODE_RECTANGULAR && false)
     {
         /* We keep the solution that avoid filling outside the display */
         if (scaled_width <= cfg->display.width) {
