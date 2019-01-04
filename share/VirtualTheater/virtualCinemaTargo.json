@@ -5,7 +5,7 @@
         "rotationAngles" : [0, 180, 0]
     },
     "viewer" : {
-        "position" : [-30, 10, 0]
+        "position" : [-30, -100, -607]
     },
     "screen" : {
         "position" : [30, 280, -2100.93],
