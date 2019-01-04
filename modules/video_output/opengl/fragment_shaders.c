@@ -560,7 +560,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
     ADDF("#version %u\n%s", tc->glsl_version, tc->glsl_precision_header);
     ADD("uniform vec2 SbSCoefs;\n"
         "uniform vec2 SbSOffsets;\n"
-        "varying vec3 Position_world;\n"
+        "varying vec4 Position_world;\n"
         "varying mat4 ViewMatrix;\n"
         "varying mat3 TBNMatrix;\n"
         "varying mat4 ModelMatrix;\n");
@@ -804,7 +804,7 @@ opengl_fragment_shader_init_impl(opengl_tex_converter_t *tc, GLenum tex_target,
         "  for(int i=0; i<29; ++i) {\n"
         "   vec3 light_pos_world= Lights.Position[i];\n"
 
-        "   vec3 light_to_object = Position_world - light_pos_world;\n"
+        "   vec3 light_to_object = Position_world.xyz - light_pos_world;\n"
         "   vec3 spot_dir = normalize(Lights.Direction[i]);\n"
 
         //"   if ( light_spot_dot < 0.7071) { continue; }\n"

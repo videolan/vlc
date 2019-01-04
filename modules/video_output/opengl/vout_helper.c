@@ -606,7 +606,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
     static const char *template =
         "#version %u\n"
         "varying vec2 TexCoord0;\n"
-        "varying vec3 Position_world;\n"
+        "varying vec4 Position_world;\n"
         "varying mat4 ModelMatrix;\n"
         "varying mat4 NormalMatrix;\n"
         "varying mat3 TBNMatrix;\n"
@@ -630,7 +630,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         "  ModelMatrix = ObjectTransformMatrix;\n"
         " NormalMatrix = ViewMatrix*ModelMatrix;\n"
 
-        " Position_world = vec3(ModelMatrix*vec4(VertexPosition, 1));\n"
+        " Position_world = ModelMatrix*vec4(VertexPosition, 1);\n"
 
         // Compute TBN matrix so as to compute normals in world space
         // It should be inverse(transpose(ModelMatrix)) but as there no
@@ -641,7 +641,7 @@ static GLuint BuildVertexShader(const opengl_tex_converter_t *tc,
         " vec3 Bitangent_world = cross(Normal_world, Tangent_world);\n"
         " TBNMatrix = mat3(Tangent_world, Bitangent_world, Normal_world);\n"
 
-        " gl_Position = ProjectionMatrix * ViewMatrix * vec4(Position_world, 1);\n"
+        " gl_Position = ProjectionMatrix * ViewMatrix * Position_world;\n"
         // TODO: is it y or z ?
         //" float zfar = 1000000;\n"
         //" float factor = 0.001;\n"
