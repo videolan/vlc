@@ -1,10 +1,10 @@
 # generate Direct3D9 temporary include
 
 ifdef HAVE_CROSS_COMPILE
-IDL_INC_PATH = /usr/include/wine/windows/
+IDL_INC_PATH = -I/usr/include/wine/windows/
 else
 #ugly way to get the default location of standard idl files
-IDL_INC_PATH = /`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
+IDL_INC_PATH = -I/`echo $(MSYSTEM) | tr A-Z a-z`/$(BUILD)/include
 endif
 
 D3D9CAPS_COMMIT_ID := 477108e5706e73421634436c21cb76e1795b3609
@@ -49,7 +49,7 @@ dxva2api/dxva2api.idl: .sum-d3d9
 
 $(DST_DXVA2API_H): dxva2api/dxva2api.idl
 	mkdir -p -- "$(PREFIX)/include/"
-	$(WIDL) -DBOOL=WINBOOL -D_D3D9_H_ -D__C89_NAMELESS -I$(IDL_INC_PATH) -h -o $@ $<
+	$(WIDL) -DBOOL=WINBOOL -D_D3D9_H_ -D__C89_NAMELESS $(IDL_INCLUDES) -h -o $@ $<
 
 .d3d9caps: $(DST_D3D9CAPS_H)
 	touch $@
