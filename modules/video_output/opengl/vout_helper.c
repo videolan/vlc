@@ -408,7 +408,8 @@ static void ComputeProjectionMatrix(vout_display_opengl_t *vgl,
             offset = -proj_offset;
     }
 
-    getProjectionMatrix(vgl->f_sar, vgl->f_fov, offset, matrix);
+    float sar = vgl->hmd_cfg.viewport_scale[0] / vgl->hmd_cfg.viewport_scale[1];
+    getProjectionMatrix(sar, vgl->f_fov, offset, matrix);
 }
 
 static void getViewpointMatrixes(vout_display_opengl_t *vgl,
