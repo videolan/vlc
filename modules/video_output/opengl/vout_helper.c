@@ -449,9 +449,10 @@ static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
 {
     vlc_viewpoint_t vp = vgl->vp;
     vlc_viewpoint_reverse(&vp);
-    vlc_viewpoint_to_4x4(&vp, prgm->var.ViewMatrix);
 
-    const float *view = prgm->var.ViewMatrix;
+    float view[16];
+
+    vlc_viewpoint_to_4x4(&vp, view);
     const float *eye  = vgl->position;
 
     /* Project the position on the computed axis.
@@ -464,7 +465,8 @@ static void updateViewMatrix(vout_display_opengl_t *vgl, struct prgm *prgm)
         -view[2]*eye[0] - view[6]*eye[1] - view[10]*eye[2],
     };
 
-    memcpy(&prgm->var.ViewMatrix[12], position, sizeof(float)*3);
+    memcpy(&view[12], position, sizeof(float)*3);
+    matrixMul(prgm->var.ViewMatrix, prgm->var.SceneTransformMatrix, view);
 }
 
 
