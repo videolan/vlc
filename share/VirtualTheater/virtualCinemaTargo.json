@@ -1,0 +1,16 @@
+{
+    "model" : {
+        "path" : "vlc_theater_model_embed.fbx",
+        "scale" : 1,
+        "rotationAngles" : [0, 180, 0]
+    },
+    "viewer" : {
+        "position" : [-30, 10, 0]
+    },
+    "screen" : {
+        "position" : [30, 280, -2100.93],
+        "normalDir" : [0, 0, 1],
+        "fitDir" : [0, 1, 0],
+        "size" : 1200
+    }
+}
