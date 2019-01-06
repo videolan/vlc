@@ -214,15 +214,22 @@ SECTION .text
 
 %macro YADIF 0
 %if ARCH_X86_32
-cglobal yadif_filter_line, 4, 6, 8, 80, dst, prev, cur, next, w, prefs, \
+cglobal yadif_filter_line, 4, 6, 8, 112, dst, prev, cur, next, w, prefs, \
                                         mrefs, parity, mode
 %else
-cglobal yadif_filter_line, 4, 7, 8, 80, dst, prev, cur, next, w, prefs, \
+cglobal yadif_filter_line, 4, 7, 8,  80, dst, prev, cur, next, w, prefs, \
                                         mrefs, parity, mode
 %endif
     cmp      DWORD wm, 0
     jle .ret
 %if ARCH_X86_32
+    LEA            r4, pb_1
+  %define pb_1 rsp + 80
+  %define pw_1 rsp + 96
+    mova           m0, [r4]
+    mova           m1, [r4 + 16]
+    movu           [pb_1], m0
+    movu           [pw_1], m1
     mov            r4, r5mp
     mov            r5, r6mp
     DECLARE_REG_TMP 4,5
@@ -245,6 +252,10 @@ cglobal yadif_filter_line, 4, 7, 8, 80, dst, prev, cur, next, w, prefs, \
     emms
 %endif
     RET
+%if ARCH_X86_32
+  %undef pb_1
+  %undef pw_1
+%endif
 %endmacro
 
 INIT_XMM ssse3
