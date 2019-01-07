@@ -70,6 +70,7 @@ static int AllocatePicture( picture_t *p_pic )
         return VLC_ENOMEM;
     }
 
+    i_bytes = (i_bytes + 63) & ~63; /* must be a multiple of 64 */
     uint8_t *p_data = aligned_alloc( 64, i_bytes );
     if( i_bytes > 0 && p_data == NULL )
     {
