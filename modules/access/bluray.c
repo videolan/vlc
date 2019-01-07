@@ -1917,13 +1917,15 @@ static void blurayDrawOverlay(demux_t *p_demux, const BD_OVERLAY* const ov)
         video_format_Setup(&fmt, VLC_CODEC_YUVP, ov->w, ov->h, ov->w, ov->h, 1, 1);
 
         p_reg = subpicture_region_New(&fmt);
-        p_reg->i_x = ov->x;
-        p_reg->i_y = ov->y;
-        /* Append it to our list. */
-        if (p_last != NULL)
-            p_last->p_next = p_reg;
-        else /* If we don't have a last region, then our list empty */
-            p_sys->bdj.p_overlays[ov->plane]->p_regions = p_reg;
+        if (p_reg) {
+            p_reg->i_x = ov->x;
+            p_reg->i_y = ov->y;
+            /* Append it to our list. */
+            if (p_last != NULL)
+                p_last->p_next = p_reg;
+            else /* If we don't have a last region, then our list empty */
+                p_sys->bdj.p_overlays[ov->plane]->p_regions = p_reg;
+        }
     }
 
     /* Now we can update the region, regardless it's an update or an insert */
