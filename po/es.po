@@ -1,5 +1,5 @@
 # Spanish translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -12,17 +12,17 @@
 # Juan Diego Fernández Rosado <juandiegofernandezrosado@gmail.com>, 2014
 # Konrad Iturbe <mail@chernowii.com>, 2013
 # Marc Sokolovitch <sokolovitch@yahoo.com>, 2013
-# picodotdev <pico.dev@gmail.com>, 2014-2018
+# picodotdev <pico.dev@gmail.com>, 2014-2019
 # Sam Askari <saskarip@gmail.com>, 2013
 # saulortega <saulortega.co@gmail.com>, 2013
 # Yllelder, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-08 22:50+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-01-08 22:07+0100\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2019\n"
 "Language-Team: Spanish (https://www.transifex.com/yaron/teams/16553/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -5034,31 +5034,31 @@ msgstr "Más brillo"
 
 #: src/misc/actions.c:55
 msgid "Browser Back"
-msgstr "Atrás en el Navegador"
+msgstr "Atrás en el explorador"
 
 #: src/misc/actions.c:56
 msgid "Browser Favorites"
-msgstr "Favoritos del Navegador"
+msgstr "Favoritos del explorador"
 
 #: src/misc/actions.c:57
 msgid "Browser Forward"
-msgstr "Adelante en el Navegador"
+msgstr "Adelante en el explorador"
 
 #: src/misc/actions.c:58
 msgid "Browser Home"
-msgstr "Inicio en el Navegador"
+msgstr "Inicio en el explorador"
 
 #: src/misc/actions.c:59
 msgid "Browser Refresh"
-msgstr "Actualizar en el Navegador"
+msgstr "Actualizar en el explorador"
 
 #: src/misc/actions.c:60
 msgid "Browser Search"
-msgstr "Buscar en el Navegador"
+msgstr "Buscar en el explorador"
 
 #: src/misc/actions.c:61
 msgid "Browser Stop"
-msgstr "Parar el Navegador"
+msgstr "Parar el explorador"
 
 #: src/misc/actions.c:62 modules/gui/macosx/VLCMainMenu.m:370
 #: modules/gui/macosx/VLCPlaylist.m:229 modules/gui/qt/dialogs/bookmarks.cpp:50
@@ -16963,7 +16963,7 @@ msgstr "Seleccione una ubicación de salida"
 #: modules/gui/qt/ui/open_file.h:148 modules/gui/qt/ui/sprefs_audio.h:417
 #: modules/gui/qt/ui/sprefs_input.h:368 modules/gui/qt/ui/sprefs_video.h:332
 msgid "Browse..."
-msgstr "Navegar..."
+msgstr "Explorar..."
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:146
 msgid "Setup Streaming..."
@@ -21482,7 +21482,7 @@ msgstr "Selector de visualizaciones"
 
 #: modules/gui/qt/menus.cpp:596
 msgid "&Increase Volume"
-msgstr "&Incrementar volumen"
+msgstr "&Subir volumen"
 
 #: modules/gui/qt/menus.cpp:599
 msgid "D&ecrease Volume"
@@ -21817,7 +21817,7 @@ msgstr "Muestra un controlador en modo pantalla completa"
 
 #: modules/gui/qt/qt.cpp:152
 msgid "Embed the file browser in open dialog"
-msgstr "Embeber el navegador de archivos en el diálogo abrir"
+msgstr "Embeber el explorador de archivos en el diálogo abrir"
 
 #: modules/gui/qt/qt.cpp:154
 msgid "Define which screen fullscreen goes"
@@ -23956,9 +23956,8 @@ msgid "avparser packetizer"
 msgstr "Empaquetador avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Empaquetador de vídeo Daala"
+msgstr "Empaquetador de vídeo AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
