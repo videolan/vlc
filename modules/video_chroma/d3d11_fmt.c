@@ -132,25 +132,34 @@ int D3D11_AllocateResourceView(vlc_object_t *obj, ID3D11Device *d3ddevice,
 
 
 #if !VLC_WINSTORE_APP
-static HKEY GetAdapterRegistry(DXGI_ADAPTER_DESC *adapterDesc)
+static HKEY GetAdapterRegistry(vlc_object_t *obj, DXGI_ADAPTER_DESC *adapterDesc)
 {
     HKEY hKey;
     TCHAR key[128];
     TCHAR szData[256], lookup[256];
     DWORD len = 256;
+    LSTATUS ret;
 
     _sntprintf(lookup, 256, TEXT("pci\\ven_%04x&dev_%04x"), adapterDesc->VendorId, adapterDesc->DeviceId);
     for (int i=0;;i++)
     {
         _sntprintf(key, 128, TEXT("SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e968-e325-11ce-bfc1-08002be10318}\\%04d"), i);
-        if( RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey) != ERROR_SUCCESS )
+        ret = RegOpenKeyEx(HKEY_LOCAL_MACHINE, key, 0, KEY_READ, &hKey);
+        if ( ret != ERROR_SUCCESS )
+        {
+            msg_Warn(obj, "failed to read the %d Display Adapter registry key (%d)", i, ret);
             return NULL;
+        }
 
         len = sizeof(szData);
-        if( RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len ) == ERROR_SUCCESS ) {
+        ret = RegQueryValueEx( hKey, TEXT("MatchingDeviceId"), NULL, NULL, (LPBYTE) &szData, &len );
+        if ( ret == ERROR_SUCCESS ) {
             if (_tcsncmp(lookup, szData, _tcslen(lookup)) == 0)
                 return hKey;
+            msg_Dbg(obj, "different %d device %s vs %s", i, lookup, szData);
         }
+        else
+            msg_Warn(obj, "failed to get the %d MatchingDeviceId (%d)", i, ret);
 
         RegCloseKey(hKey);
     }
@@ -167,32 +176,47 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
     return;
 #else
     IDXGIAdapter *pAdapter = D3D11DeviceAdapter(d3d_dev->d3ddevice);
-    if (!pAdapter)
+    if (unlikely(!pAdapter))
+    {
+        msg_Warn(obj, "can't get adapter from device %p", (void*)d3d_dev->d3ddevice);
         return;
+    }
 
     DXGI_ADAPTER_DESC adapterDesc;
     HRESULT hr = IDXGIAdapter_GetDesc(pAdapter, &adapterDesc);
     IDXGIAdapter_Release(pAdapter);
     if (FAILED(hr))
+    {
+        msg_Warn(obj, "can't get adapter description");
         return;
+    }
 
     LONG err = ERROR_ACCESS_DENIED;
     TCHAR szData[256];
     DWORD len = 256;
-    HKEY hKey = GetAdapterRegistry(&adapterDesc);
+    HKEY hKey = GetAdapterRegistry(obj, &adapterDesc);
     if (hKey == NULL)
+    {
+        msg_Warn(obj, "can't find adapter in registry");
         return;
+    }
 
     err = RegQueryValueEx( hKey, TEXT("DriverVersion"), NULL, NULL, (LPBYTE) &szData, &len );
     RegCloseKey(hKey);
 
     if (err != ERROR_SUCCESS )
+    {
+        msg_Warn(obj, "failed to read the adapter DriverVersion");
         return;
+    }
 
     int wddm, d3d_features, revision, build;
     /* see https://msdn.microsoft.com/windows/hardware/commercialize/design/compatibility/device-graphics */
     if (_stscanf(szData, TEXT("%d.%d.%d.%d"), &wddm, &d3d_features, &revision, &build) != 4)
+    {
+        msg_Warn(obj, "the adapter DriverVersion '%s' doesn't match the expected format", szData);
         return;
+    }
     d3d_dev->WDDM.wddm         = wddm;
     d3d_dev->WDDM.d3d_features = d3d_features;
     d3d_dev->WDDM.revision     = revision;
