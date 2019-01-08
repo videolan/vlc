@@ -149,7 +149,6 @@ static int DxSetupOutput(vlc_va_t *, const GUID *, const video_format_t *);
 static int DxCreateVideoDecoder(vlc_va_t *, int codec_id,
                                 const video_format_t *, unsigned surface_count);
 static void DxDestroyVideoDecoder(vlc_va_t *);
-static int DxResetVideoDecoder(vlc_va_t *);
 static void SetupAVCodecContext(vlc_va_t *);
 
 void SetupAVCodecContext(vlc_va_t *va)
@@ -222,12 +221,11 @@ static int Get(vlc_va_t *va, picture_t *pic, uint8_t **data)
 
     /* Check the device */
     HRESULT hr = IDirect3DDeviceManager9_TestDevice(sys->devmng, sys->device);
-    if (hr == DXVA2_E_NEW_VIDEO_DEVICE) {
-        msg_Warn(va, "New video device detected.");
-        if (DxResetVideoDecoder(va))
-            return VLC_EGENERIC;
-    } else if (FAILED(hr)) {
-        msg_Err(va, "IDirect3DDeviceManager9_TestDevice %u", (unsigned)hr);
+    if (FAILED(hr)) {
+        if (hr == DXVA2_E_NEW_VIDEO_DEVICE)
+            msg_Warn(va, "New video device detected.");
+        else
+            msg_Err(va, "device not usable. (hr=0x%lX)", hr);
         return VLC_EGENERIC;
     }
 
@@ -729,10 +727,4 @@ static void DxDestroyVideoDecoder(vlc_va_t *va)
         for (unsigned i = 0; i < dx_sys->va_pool.surface_count; i++)
             IDirect3DSurface9_Release(dx_sys->hw_surface[i]);
     }
-}
-
-static int DxResetVideoDecoder(vlc_va_t *va)
-{
-    msg_Err(va, "DxResetVideoDecoder unimplemented");
-    return VLC_EGENERIC;
 }
