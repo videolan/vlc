@@ -739,6 +739,10 @@ static const struct
     { { VLC_CODEC_RGB8, VLC_CODEC_GREY,
         VLC_CODEC_YUVP, VLC_CODEC_RGBP },      PACKED_FMT(1, 8) },
 
+    { { VLC_CODEC_GREY_10L,
+        VLC_CODEC_GREY_10B },                  PACKED_FMT(2, 10) },
+    { { VLC_CODEC_GREY_12L,
+        VLC_CODEC_GREY_12B },                  PACKED_FMT(2, 12) },
     { { VLC_CODEC_GREY_16L,
         VLC_CODEC_GREY_16B },                  PACKED_FMT(2, 16) },
 
