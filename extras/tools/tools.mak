@@ -32,9 +32,9 @@ download_pkg = $(call download,$(VIDEOLAN)/$(2)/$(lastword $(subst /, ,$(@)))) |
 	&& grep $(@) SHA512SUMS| shasum -a 512 -c
 
 UNPACK = $(RM) -R $@ \
-    $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
-    $(foreach f,$(filter %.tar.bz2,$^), && tar xvjf $(f)) \
-    $(foreach f,$(filter %.tar.xz,$^), && tar xvJf $(f)) \
+    $(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzfo $(f)) \
+    $(foreach f,$(filter %.tar.bz2,$^), && tar xvjfo $(f)) \
+    $(foreach f,$(filter %.tar.xz,$^), && tar xvJfo $(f)) \
     $(foreach f,$(filter %.zip,$^), && unzip $(f))
 
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))

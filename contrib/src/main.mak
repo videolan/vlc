@@ -332,9 +332,9 @@ checksum = \
 		"$(SRC)/$(patsubst .sum-%,%,$@)/$(2)SUMS"
 CHECK_SHA512 = $(call checksum,$(SHA512SUM),SHA512)
 UNPACK = $(RM) -R $@ \
-	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzf $(f)) \
-	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjf $(f)) \
-	$(foreach f,$(filter %.tar.xz,$^), && tar xvJf $(f)) \
+	$(foreach f,$(filter %.tar.gz %.tgz,$^), && tar xvzfo $(f)) \
+	$(foreach f,$(filter %.tar.bz2,$^), && tar xvjfo $(f)) \
+	$(foreach f,$(filter %.tar.xz,$^), && tar xvJfo $(f)) \
 	$(foreach f,$(filter %.zip,$^), && unzip $(f))
 UNPACK_DIR = $(patsubst %.tar,%,$(basename $(notdir $<)))
 APPLY = (cd $(UNPACK_DIR) && patch -fp1) <

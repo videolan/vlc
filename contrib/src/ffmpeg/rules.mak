@@ -230,7 +230,7 @@ $(TARBALLS)/ffmpeg-$(FFMPEG_BASENAME).tar.xz:
 ffmpeg: ffmpeg-$(FFMPEG_BASENAME).tar.xz .sum-ffmpeg
 	rm -Rf $@ $@-$(FFMPEG_BASENAME)
 	mkdir -p $@-$(FFMPEG_BASENAME)
-	tar xvJf "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
+	tar xvJfo "$<" --strip-components=1 -C $@-$(FFMPEG_BASENAME)
 	$(APPLY) $(SRC)/ffmpeg/0001-arm-vc1dsp-Add-commas-between-macro-arguments.patch
 	$(APPLY) $(SRC)/ffmpeg/0002-arm-Produce-.const_data-instead-of-.section-.rodata-.patch
 ifdef USE_FFMPEG
