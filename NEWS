@@ -1,6 +1,9 @@
 Changes between 3.0.5 and 3.0.6:
 --------------------------------
 
+Core:
+ * Fix potential subtitle picture allocation failures
+
 Codec:
  * Add support for 12 bits decoding of AV1
  * Fix HDR support in AV1 when the container provides the metadata
