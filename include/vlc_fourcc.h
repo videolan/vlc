@@ -361,6 +361,12 @@
 
 /* 8 bits grey */
 #define VLC_CODEC_GREY            VLC_FOURCC('G','R','E','Y')
+/* 10 bits grey */
+#define VLC_CODEC_GREY_10L        VLC_FOURCC('G','0','F','L')
+#define VLC_CODEC_GREY_10B        VLC_FOURCC('G','0','F','B')
+/* 12 bits grey */
+#define VLC_CODEC_GREY_12L        VLC_FOURCC('G','2','F','L')
+#define VLC_CODEC_GREY_12B        VLC_FOURCC('G','2','F','B')
 /* 16 bits grey */
 #define VLC_CODEC_GREY_16L        VLC_FOURCC('G','R','F','L')
 #define VLC_CODEC_GREY_16B        VLC_FOURCC('G','R','F','B')
