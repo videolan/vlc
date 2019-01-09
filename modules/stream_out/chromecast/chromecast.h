@@ -270,6 +270,7 @@ private:
     States m_state;
     bool m_retry_on_fail;
     bool m_played_once;
+    bool m_paused_once;
     bool m_request_stop;
     bool m_request_load;
     bool m_paused;

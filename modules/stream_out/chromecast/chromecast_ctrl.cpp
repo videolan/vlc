@@ -102,6 +102,7 @@ intf_sys_t::intf_sys_t(vlc_object_t * const p_this, int port, std::string device
  , m_state( Authenticating )
  , m_retry_on_fail( false )
  , m_played_once( false )
+ , m_paused_once( false )
  , m_request_stop( false )
  , m_request_load( false )
  , m_paused( false )
@@ -394,6 +395,7 @@ void intf_sys_t::setHasInput( const std::string mime_type )
 
     m_request_stop = false;
     m_played_once = false;
+    m_paused_once = false;
     m_paused = false;
     m_cc_eof = false;
     m_request_load = true;
@@ -1211,9 +1213,10 @@ void intf_sys_t::setState( States state )
             case Paused:
                 if (m_played_once && m_on_paused_changed != NULL)
                     m_on_paused_changed(m_on_paused_changed_data, true);
+                m_paused_once = true;
                 break;
             case Playing:
-                if (m_played_once && m_on_paused_changed != NULL)
+                if (m_played_once && m_paused_once && m_on_paused_changed != NULL)
                     m_on_paused_changed(m_on_paused_changed_data, false);
                 m_played_once = true;
                 break;
