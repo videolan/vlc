@@ -360,6 +360,10 @@ static int OpenDecoder(vlc_object_t *p_this)
         dec->fmt_out.video.i_sar_num = dec->fmt_in.video.i_sar_num;
         dec->fmt_out.video.i_sar_den = dec->fmt_in.video.i_sar_den;
     }
+    dec->fmt_out.video.primaries   = dec->fmt_in.video.primaries;
+    dec->fmt_out.video.transfer    = dec->fmt_in.video.transfer;
+    dec->fmt_out.video.space       = dec->fmt_in.video.space;
+    dec->fmt_out.video.color_range = dec->fmt_in.video.color_range;
 
     return VLC_SUCCESS;
 }
