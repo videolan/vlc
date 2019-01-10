@@ -1,0 +1,174 @@
+From 63b832fcc987b31760ae3dabf7bdc6098b632c9b Mon Sep 17 00:00:00 2001
+From: "Ronald S. Bultje" <rsbultje@gmail.com>
+Date: Mon, 17 Dec 2018 20:06:19 -0500
+Subject: [PATCH 4/5] itx: replace qw_ constant prefix with pw_
+
+Makes it more consistent with the rest of the project.
+---
+ src/x86/itx_ssse3.asm | 66 +++++++++++++++++++++----------------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
+
+diff --git a/src/x86/itx_ssse3.asm b/src/x86/itx_ssse3.asm
+index faf224c..0468b3a 100644
+--- a/src/x86/itx_ssse3.asm
++++ b/src/x86/itx_ssse3.asm
+@@ -31,20 +31,20 @@ SECTION_RODATA 16
+ 
+ deint_shuf: db  0,  1,  4,  5,  8,  9, 12, 13,  2,  3,  6,  7, 10, 11, 14, 15
+ 
+-qw_2896x8:      times 8 dw  2896*8
+-qw_1567_m3784:  times 4 dw  1567, -3784
+-qw_3784_1567:   times 4 dw  3784,  1567
+-
+-qw_1321_3803:   times 4 dw  1321,  3803
+-qw_2482_m1321:  times 4 dw  2482, -1321
+-qw_3344_2482:   times 4 dw  3344,  2482
+-qw_3344_m3803:  times 4 dw  3344, -3803
+-qw_m6688_m3803: times 4 dw -6688, -3803
+-qw_3344x8:      times 8 dw  3344*8
+-qw_5793x4:      times 8 dw  5793*4
++pw_2896x8:      times 8 dw  2896*8
++pw_1567_m3784:  times 4 dw  1567, -3784
++pw_3784_1567:   times 4 dw  3784,  1567
++
++pw_1321_3803:   times 4 dw  1321,  3803
++pw_2482_m1321:  times 4 dw  2482, -1321
++pw_3344_2482:   times 4 dw  3344,  2482
++pw_3344_m3803:  times 4 dw  3344, -3803
++pw_m6688_m3803: times 4 dw -6688, -3803
++pw_3344x8:      times 8 dw  3344*8
++pw_5793x4:      times 8 dw  5793*4
+ 
+ pd_2048:        times 4 dd  2048
+-qw_2048:        times 8 dw  2048
++pw_2048:        times 8 dw  2048
+ 
+ iadst4_dconly1a: times 2 dw 10568, 19856, 26752, 30424
+ iadst4_dconly1b: times 2 dw 30424, 26752, 19856, 10568
+@@ -57,7 +57,7 @@ SECTION .text
+ 
+ %macro ITX4_END 4-5 2048 ; row[1-4], rnd
+ %if %5
+-    mova                 m2, [qw_%5]
++    mova                 m2, [pw_%5]
+     pmulhrsw             m0, m2
+     pmulhrsw             m1, m2
+ %endif
+@@ -107,11 +107,11 @@ SECTION .text
+     pmaddwd              m%2, m%4, m%1
+     pmaddwd              m%1, m%5
+ %elif %6 & 1
+-    pmaddwd              m%2, m%1, [qw_%5_%4]
+-    pmaddwd              m%1, [qw_%4_m%5]
++    pmaddwd              m%2, m%1, [pw_%5_%4]
++    pmaddwd              m%1, [pw_%4_m%5]
+ %else
+-    pmaddwd              m%2, m%1, [qw_%4_m%5]
+-    pmaddwd              m%1, [qw_%5_%4]
++    pmaddwd              m%2, m%1, [pw_%4_m%5]
++    pmaddwd              m%1, [pw_%5_%4]
+ %endif
+     paddd                m%2, m%3
+     paddd                m%1, m%3
+@@ -120,7 +120,7 @@ SECTION .text
+     packssdw             m%1, m%2
+ %endmacro
+ 
+-%macro IDCT4_1D_PACKED 0-1   ;qw_2896x8
++%macro IDCT4_1D_PACKED 0-1   ;pw_2896x8
+     punpckhwd            m2, m0, m1           ;unpacked in1 in3
+     psubw                m3, m0, m1
+     paddw                m0, m1
+@@ -132,7 +132,7 @@ SECTION .text
+ %if %0 == 1
+     pmulhrsw             m0, m%1
+ %else
+-    pmulhrsw             m0, [qw_2896x8]     ;high: t1 ;low: t0
++    pmulhrsw             m0, [pw_2896x8]     ;high: t1 ;low: t0
+ %endif
+ 
+     psubsw               m1, m0, m2          ;high: out2 ;low: out3
+@@ -146,14 +146,14 @@ SECTION .text
+     punpckhqdq           m1, m1                    ;
+     paddw                m1, m0                    ;low: in0 - in2 + in3
+ 
+-    pmaddwd              m0, m2, [qw_1321_3803]    ;1321 * in0 + 3803 * in2
+-    pmaddwd              m2, [qw_2482_m1321]       ;2482 * in0 - 1321 * in2
+-    pmaddwd              m4, m3, [qw_3344_2482]    ;3344 * in1 + 2482 * in3
+-    pmaddwd              m5, m3, [qw_3344_m3803]   ;3344 * in1 - 3803 * in3
++    pmaddwd              m0, m2, [pw_1321_3803]    ;1321 * in0 + 3803 * in2
++    pmaddwd              m2, [pw_2482_m1321]       ;2482 * in0 - 1321 * in2
++    pmaddwd              m4, m3, [pw_3344_2482]    ;3344 * in1 + 2482 * in3
++    pmaddwd              m5, m3, [pw_3344_m3803]   ;3344 * in1 - 3803 * in3
+     paddd                m4, m0                    ;t0 + t3
+ 
+-    pmaddwd              m3, [qw_m6688_m3803]      ;-2 * 3344 * in1 - 3803 * in3
+-    pmulhrsw             m1, [qw_3344x8]           ;low: out2
++    pmaddwd              m3, [pw_m6688_m3803]      ;-2 * 3344 * in1 - 3803 * in3
++    pmulhrsw             m1, [pw_3344x8]           ;low: out2
+     mova                 m0, [pd_2048]
+     paddd                m2, m0
+     paddd                m0, m4                    ;t0 + t3 + 2048
+@@ -188,10 +188,10 @@ ALIGN function_align
+ %macro INV_TXFM_4X4_FN 2-3 -1 ; type1, type2, fast_thresh
+     INV_TXFM_FN          %1, %2, %3, 4x4
+ %ifidn %1_%2, dct_identity
+-    mova                 m0, [qw_2896x8]
++    mova                 m0, [pw_2896x8]
+     pmulhrsw             m0, [coeffq]
+     paddw                m0, m0
+-    pmulhrsw             m0, [qw_5793x4]
++    pmulhrsw             m0, [pw_5793x4]
+     punpcklwd            m0, m0
+     punpckhdq            m1, m0, m0
+     punpckldq            m0, m0
+@@ -205,8 +205,8 @@ ALIGN function_align
+     punpcklwd            m0, m1
+     punpcklqdq           m0, m0
+     paddw                m0, m0
+-    pmulhrsw             m0, [qw_5793x4]
+-    pmulhrsw             m0, [qw_2896x8]
++    pmulhrsw             m0, [pw_5793x4]
++    pmulhrsw             m0, [pw_2896x8]
+     mova                 m1, m0
+     call m(iadst_4x4_internal).end
+     RET
+@@ -214,7 +214,7 @@ ALIGN function_align
+     pshuflw              m0, [coeffq], q0000
+     punpcklqdq           m0, m0
+ %ifidn %1, dct
+-    mova                 m1, [qw_2896x8]
++    mova                 m1, [pw_2896x8]
+     pmulhrsw             m0, m1
+ %elifidn %1, adst
+     pmulhrsw             m0, [iadst4_dconly1a]
+@@ -224,7 +224,7 @@ ALIGN function_align
+     mov            [coeffq], eobd                ;0
+ %ifidn %2, dct
+ %ifnidn %1, dct
+-    pmulhrsw             m0, [qw_2896x8]
++    pmulhrsw             m0, [pw_2896x8]
+ %else
+     pmulhrsw             m0, m1
+ %endif
+@@ -330,7 +330,7 @@ INV_TXFM_4X4_FN adst,     flipadst, 0
+ cglobal iidentity_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]
+     mova                 m1, [coeffq+16*1]
+-    mova                 m2, [qw_5793x4]
++    mova                 m2, [pw_5793x4]
+     paddw                m0, m0
+     paddw                m1, m1
+     pmulhrsw             m0, m2
+@@ -343,7 +343,7 @@ cglobal iidentity_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     jmp                tx2q
+ 
+ .pass2:
+-    mova                 m2, [qw_5793x4]
++    mova                 m2, [pw_5793x4]
+     paddw                m0, m0
+     paddw                m1, m1
+     pmulhrsw             m0, m2
+-- 
+2.20.1
+

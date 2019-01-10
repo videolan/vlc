@@ -1,0 +1,411 @@
+From f145fcb1dc122c49f01b8047117ba1703a80eaf8 Mon Sep 17 00:00:00 2001
+From: "Ronald S. Bultje" <rsbultje@gmail.com>
+Date: Mon, 17 Dec 2018 09:06:20 -0500
+Subject: [PATCH 3/5] Remove carriage return characters
+
+---
+ include/compat/msvc/stdatomic.h |  70 ++++-----
+ src/x86/itx_ssse3.asm           | 270 ++++++++++++++++----------------
+ 2 files changed, 170 insertions(+), 170 deletions(-)
+
+diff --git a/include/compat/msvc/stdatomic.h b/include/compat/msvc/stdatomic.h
+index 28fe40c..979ee2b 100644
+--- a/include/compat/msvc/stdatomic.h
++++ b/include/compat/msvc/stdatomic.h
+@@ -23,10 +23,10 @@
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+-
+-#ifndef MSCVER_STDATOMIC_H_
+-#define MSCVER_STDATOMIC_H_
+-
++
++#ifndef MSCVER_STDATOMIC_H_
++#define MSCVER_STDATOMIC_H_
++
+ #if !defined(__cplusplus) && defined(_MSC_VER)
+ 
+ #pragma warning(push)
+@@ -37,34 +37,34 @@
+ #  include_next <stdatomic.h>
+ #else /* ! stdatomic.h */
+ 
+-#include <windows.h>
+-
+-#include "common/attributes.h"
+-
+-typedef volatile LONG  __declspec(align(32)) atomic_int;
+-typedef volatile ULONG __declspec(align(32)) atomic_uint;
+-
+-typedef enum {
+-    memory_order_relaxed,
+-    memory_order_acquire
+-} msvc_atomic_memory_order;
+-
+-#define atomic_init(p_a, v)           do { *(p_a) = (v); } while(0)
+-#define atomic_store(p_a, v)          InterlockedExchange((LONG*)p_a, v)
+-#define atomic_load(p_a)              InterlockedCompareExchange((LONG*)p_a, 0, 0)
+-#define atomic_load_explicit(p_a, mo) atomic_load(p_a)
+-
+-/*
+- * TODO use a special call to increment/decrement
+- * using InterlockedIncrement/InterlockedDecrement
+- */
+-#define atomic_fetch_add(p_a, inc)    InterlockedExchangeAdd(p_a, inc)
+-#define atomic_fetch_sub(p_a, dec)    InterlockedExchangeAdd(p_a, -(dec))
+-
+-#endif /* ! stdatomic.h */
+-
+-#pragma warning(pop)
+-
+-#endif /* !defined(__cplusplus) && defined(_MSC_VER) */
+-
+-#endif /* MSCVER_STDATOMIC_H_ */
++#include <windows.h>
++
++#include "common/attributes.h"
++
++typedef volatile LONG  __declspec(align(32)) atomic_int;
++typedef volatile ULONG __declspec(align(32)) atomic_uint;
++
++typedef enum {
++    memory_order_relaxed,
++    memory_order_acquire
++} msvc_atomic_memory_order;
++
++#define atomic_init(p_a, v)           do { *(p_a) = (v); } while(0)
++#define atomic_store(p_a, v)          InterlockedExchange((LONG*)p_a, v)
++#define atomic_load(p_a)              InterlockedCompareExchange((LONG*)p_a, 0, 0)
++#define atomic_load_explicit(p_a, mo) atomic_load(p_a)
++
++/*
++ * TODO use a special call to increment/decrement
++ * using InterlockedIncrement/InterlockedDecrement
++ */
++#define atomic_fetch_add(p_a, inc)    InterlockedExchangeAdd(p_a, inc)
++#define atomic_fetch_sub(p_a, dec)    InterlockedExchangeAdd(p_a, -(dec))
++
++#endif /* ! stdatomic.h */
++
++#pragma warning(pop)
++
++#endif /* !defined(__cplusplus) && defined(_MSC_VER) */
++
++#endif /* MSCVER_STDATOMIC_H_ */
+diff --git a/src/x86/itx_ssse3.asm b/src/x86/itx_ssse3.asm
+index f46c64c..faf224c 100644
+--- a/src/x86/itx_ssse3.asm
++++ b/src/x86/itx_ssse3.asm
+@@ -31,76 +31,76 @@ SECTION_RODATA 16
+ 
+ deint_shuf: db  0,  1,  4,  5,  8,  9, 12, 13,  2,  3,  6,  7, 10, 11, 14, 15
+ 
+-qw_2896x8:      times 8 dw  2896*8
+-qw_1567_m3784:  times 4 dw  1567, -3784
+-qw_3784_1567:   times 4 dw  3784,  1567
+-
+-qw_1321_3803:   times 4 dw  1321,  3803
+-qw_2482_m1321:  times 4 dw  2482, -1321
+-qw_3344_2482:   times 4 dw  3344,  2482
+-qw_3344_m3803:  times 4 dw  3344, -3803
+-qw_m6688_m3803: times 4 dw -6688, -3803
+-qw_3344x8:      times 8 dw  3344*8
+-qw_5793x4:      times 8 dw  5793*4
+-
+-pd_2048:        times 4 dd  2048
+-qw_2048:        times 8 dw  2048
+-
++qw_2896x8:      times 8 dw  2896*8
++qw_1567_m3784:  times 4 dw  1567, -3784
++qw_3784_1567:   times 4 dw  3784,  1567
++
++qw_1321_3803:   times 4 dw  1321,  3803
++qw_2482_m1321:  times 4 dw  2482, -1321
++qw_3344_2482:   times 4 dw  3344,  2482
++qw_3344_m3803:  times 4 dw  3344, -3803
++qw_m6688_m3803: times 4 dw -6688, -3803
++qw_3344x8:      times 8 dw  3344*8
++qw_5793x4:      times 8 dw  5793*4
++
++pd_2048:        times 4 dd  2048
++qw_2048:        times 8 dw  2048
++
+ iadst4_dconly1a: times 2 dw 10568, 19856, 26752, 30424
+-iadst4_dconly1b: times 2 dw 30424, 26752, 19856, 10568
++iadst4_dconly1b: times 2 dw 30424, 26752, 19856, 10568
+ iadst4_dconly2a: dw 10568, 10568, 10568, 10568, 19856, 19856, 19856, 19856
+-iadst4_dconly2b: dw 26752, 26752, 26752, 26752, 30424, 30424, 30424, 30424
+-
+-SECTION .text
+-
+-%define m(x) mangle(private_prefix %+ _ %+ x %+ SUFFIX)
+-
+-%macro ITX4_END 4-5 2048 ; row[1-4], rnd
+-%if %5
+-    mova                 m2, [qw_%5]
+-    pmulhrsw             m0, m2
+-    pmulhrsw             m1, m2
+-%endif
+-    lea                  r2, [dstq+strideq*2]
+-%assign %%i 1
+-%rep 4
+-    %if %1 & 2
+-        CAT_XDEFINE %%row_adr, %%i, r2   + strideq*(%1&1)
+-    %else
+-        CAT_XDEFINE %%row_adr, %%i, dstq + strideq*(%1&1)
+-    %endif
+-    %assign %%i %%i + 1
+-    %rotate 1
+-%endrep
+-
+-    movd                 m2, [%%row_adr1]       ;dst0
+-    movd                 m4, [%%row_adr2]       ;dst1
+-    punpckldq            m2, m4                 ;high: dst1 :low: dst0
+-    movd                 m3, [%%row_adr3]       ;dst2
+-    movd                 m4, [%%row_adr4]       ;dst3
+-    punpckldq            m3, m4                 ;high: dst3 :low: dst2
+-
+-    pxor                 m4, m4
+-    punpcklbw            m2, m4                 ;extend byte to word
+-    punpcklbw            m3, m4                 ;extend byte to word
+-
+-    paddw                m0, m2                 ;high: dst1 + out1 ;low: dst0 + out0
+-    paddw                m1, m3                 ;high: dst3 + out3 ;low: dst2 + out2
+-
+-    packuswb             m0, m1                 ;high->low: dst3 + out3, dst2 + out2, dst1 + out1, dst0 + out0
+-
+-    movd       [%%row_adr1], m0                 ;store dst0 + out0
+-    pshuflw              m1, m0, q1032
+-    movd       [%%row_adr2], m1                 ;store dst1 + out1
+-    punpckhqdq           m0, m0
+-    movd       [%%row_adr3], m0                 ;store dst2 + out2
+-    psrlq                m0, 32
+-    movd       [%%row_adr4], m0                 ;store dst3 + out3
+-
+-    ret
+-%endmacro
+-
+-
++iadst4_dconly2b: dw 26752, 26752, 26752, 26752, 30424, 30424, 30424, 30424
++
++SECTION .text
++
++%define m(x) mangle(private_prefix %+ _ %+ x %+ SUFFIX)
++
++%macro ITX4_END 4-5 2048 ; row[1-4], rnd
++%if %5
++    mova                 m2, [qw_%5]
++    pmulhrsw             m0, m2
++    pmulhrsw             m1, m2
++%endif
++    lea                  r2, [dstq+strideq*2]
++%assign %%i 1
++%rep 4
++    %if %1 & 2
++        CAT_XDEFINE %%row_adr, %%i, r2   + strideq*(%1&1)
++    %else
++        CAT_XDEFINE %%row_adr, %%i, dstq + strideq*(%1&1)
++    %endif
++    %assign %%i %%i + 1
++    %rotate 1
++%endrep
++
++    movd                 m2, [%%row_adr1]       ;dst0
++    movd                 m4, [%%row_adr2]       ;dst1
++    punpckldq            m2, m4                 ;high: dst1 :low: dst0
++    movd                 m3, [%%row_adr3]       ;dst2
++    movd                 m4, [%%row_adr4]       ;dst3
++    punpckldq            m3, m4                 ;high: dst3 :low: dst2
++
++    pxor                 m4, m4
++    punpcklbw            m2, m4                 ;extend byte to word
++    punpcklbw            m3, m4                 ;extend byte to word
++
++    paddw                m0, m2                 ;high: dst1 + out1 ;low: dst0 + out0
++    paddw                m1, m3                 ;high: dst3 + out3 ;low: dst2 + out2
++
++    packuswb             m0, m1                 ;high->low: dst3 + out3, dst2 + out2, dst1 + out1, dst0 + out0
++
++    movd       [%%row_adr1], m0                 ;store dst0 + out0
++    pshuflw              m1, m0, q1032
++    movd       [%%row_adr2], m1                 ;store dst1 + out1
++    punpckhqdq           m0, m0
++    movd       [%%row_adr3], m0                 ;store dst2 + out2
++    psrlq                m0, 32
++    movd       [%%row_adr4], m0                 ;store dst3 + out3
++
++    ret
++%endmacro
++
++
+ ; flags: 1 = swap, 2: coef_regs
+ %macro ITX_MUL2X_PACK 5-6 0 ; dst/src, tmp[1], rnd, coef[1-2], flags
+ %if %6 & 2
+@@ -118,27 +118,27 @@ SECTION .text
+     psrad                m%2, 12
+     psrad                m%1, 12
+     packssdw             m%1, m%2
+-%endmacro
+-
+-%macro IDCT4_1D_PACKED 0-1   ;qw_2896x8
+-    punpckhwd            m2, m0, m1           ;unpacked in1 in3
+-    psubw                m3, m0, m1
+-    paddw                m0, m1
+-    punpcklqdq           m0, m3               ;high: in0-in2 ;low: in0+in2
+-
+-    mova                 m3, [pd_2048]
+-    ITX_MUL2X_PACK 2, 1, 3, 1567, 3784
+-
+-%if %0 == 1
+-    pmulhrsw             m0, m%1
+-%else
+-    pmulhrsw             m0, [qw_2896x8]     ;high: t1 ;low: t0
+-%endif
+-
++%endmacro
++
++%macro IDCT4_1D_PACKED 0-1   ;qw_2896x8
++    punpckhwd            m2, m0, m1           ;unpacked in1 in3
++    psubw                m3, m0, m1
++    paddw                m0, m1
++    punpcklqdq           m0, m3               ;high: in0-in2 ;low: in0+in2
++
++    mova                 m3, [pd_2048]
++    ITX_MUL2X_PACK 2, 1, 3, 1567, 3784
++
++%if %0 == 1
++    pmulhrsw             m0, m%1
++%else
++    pmulhrsw             m0, [qw_2896x8]     ;high: t1 ;low: t0
++%endif
++
+     psubsw               m1, m0, m2          ;high: out2 ;low: out3
+     paddsw               m0, m2              ;high: out1 ;low: out0
+-%endmacro
+-
++%endmacro
++
+ %macro IADST4_1D_PACKED 0
+     punpcklwd            m2, m0, m1                ;unpacked in0 in2
+     punpckhwd            m3, m0, m1                ;unpacked in1 in3
+@@ -166,27 +166,27 @@ SECTION .text
+     psrad                m2, 12                    ;out3
+     packssdw             m0, m5                    ;high: out1 ;low: out0
+     packssdw             m2, m2                    ;high: out3 ;low: out3
+-%endmacro
+-
+-%macro INV_TXFM_FN 4 ; type1, type2, fast_thresh, size
+-cglobal inv_txfm_add_%1_%2_%4, 4, 5, 0, dst, stride, coeff, eob, tx2
+-    %undef cmp
+-    lea tx2q, [m(i%2_%4_internal).pass2]
+-%if %3 > 0
+-    cmp                  eobd, %3
+-    jle %%end
+-%elif %3 == 0
+-    test                 eobd, eobd
+-    jz %%end
+-%endif
++%endmacro
++
++%macro INV_TXFM_FN 4 ; type1, type2, fast_thresh, size
++cglobal inv_txfm_add_%1_%2_%4, 4, 5, 0, dst, stride, coeff, eob, tx2
++    %undef cmp
++    lea tx2q, [m(i%2_%4_internal).pass2]
++%if %3 > 0
++    cmp                  eobd, %3
++    jle %%end
++%elif %3 == 0
++    test                 eobd, eobd
++    jz %%end
++%endif
+     call i%1_%4_internal
+-    RET
+-ALIGN function_align
+-%%end:
+-%endmacro
+-
+-%macro INV_TXFM_4X4_FN 2-3 -1 ; type1, type2, fast_thresh
+-    INV_TXFM_FN          %1, %2, %3, 4x4
++    RET
++ALIGN function_align
++%%end:
++%endmacro
++
++%macro INV_TXFM_4X4_FN 2-3 -1 ; type1, type2, fast_thresh
++    INV_TXFM_FN          %1, %2, %3, 4x4
+ %ifidn %1_%2, dct_identity
+     mova                 m0, [qw_2896x8]
+     pmulhrsw             m0, [coeffq]
+@@ -238,35 +238,35 @@ ALIGN function_align
+     RET
+ %endif
+ %endif
+-%endmacro
+-
+-
+-INIT_XMM ssse3
+-
+-cglobal idct_4x4_internal, 0, 0, 4, dst, stride, coeff, eob, tx2
+-    mova                 m0, [coeffq+16*0]      ;high: in1 ;low: in0
+-    mova                 m1, [coeffq+16*1]      ;high: in3 ;low in2
+-
+-    IDCT4_1D_PACKED
+-
+-    mova                 m2, [deint_shuf]
+-    shufps               m3, m0, m1, q1331
+-    shufps               m0, m1, q0220
+-    pshufb               m0, m2                 ;high: in1 ;low: in0
+-    pshufb               m1, m3, m2             ;high: in3 ;low :in2
++%endmacro
++
++
++INIT_XMM ssse3
++
++cglobal idct_4x4_internal, 0, 0, 4, dst, stride, coeff, eob, tx2
++    mova                 m0, [coeffq+16*0]      ;high: in1 ;low: in0
++    mova                 m1, [coeffq+16*1]      ;high: in3 ;low in2
++
++    IDCT4_1D_PACKED
++
++    mova                 m2, [deint_shuf]
++    shufps               m3, m0, m1, q1331
++    shufps               m0, m1, q0220
++    pshufb               m0, m2                 ;high: in1 ;low: in0
++    pshufb               m1, m3, m2             ;high: in3 ;low :in2
+     jmp                tx2q
+ 
+-.pass2:
+-    IDCT4_1D_PACKED
+-
+-    pxor                 m2, m2
+-    mova      [coeffq+16*0], m2
+-    mova      [coeffq+16*1], m2                 ;memset(coeff, 0, sizeof(*coeff) * sh * sw);
+-
+-    ITX4_END     0, 1, 3, 2
+-
+-INV_TXFM_4X4_FN dct, dct, 0
+-
++.pass2:
++    IDCT4_1D_PACKED
++
++    pxor                 m2, m2
++    mova      [coeffq+16*0], m2
++    mova      [coeffq+16*1], m2                 ;memset(coeff, 0, sizeof(*coeff) * sh * sw);
++
++    ITX4_END     0, 1, 3, 2
++
++INV_TXFM_4X4_FN dct, dct, 0
++
+ cglobal iadst_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]
+     mova                 m1, [coeffq+16*1]
+@@ -391,4 +391,4 @@ cglobal inv_txfm_add_wht_wht_4x4, 3, 3, 4, dst, stride, coeff
+     IWHT4_1D_PACKED
+ 
+     shufpd               m0, m2, 0x01
+-    ITX4_END              0, 3, 2, 1, 0
++    ITX4_END              0, 3, 2, 1, 0
+-- 
+2.20.1
+

@@ -1,0 +1,606 @@
+From a513e4a41ea7164d659263037db67d59e1f5a3c2 Mon Sep 17 00:00:00 2001
+From: Henrik Gramner <gramner@twoorioles.com>
+Date: Sun, 16 Dec 2018 17:57:38 +0100
+Subject: [PATCH 5/5] Implement support for PIC in x86-32 asm
+
+Convert all existing 32-bit SSSE3 asm to use PIC.
+---
+ meson.build                     |   3 +-
+ src/ext/x86/x86inc.asm          |  27 +++++---
+ src/x86/ipred_ssse3.asm         |   2 +-
+ src/x86/itx_ssse3.asm           | 104 ++++++++++++++++--------------
+ src/x86/mc_ssse3.asm            | 109 +++++++++++++++++---------------
+ tests/checkasm/x86/checkasm.asm |   2 +-
+ 6 files changed, 135 insertions(+), 112 deletions(-)
+
+diff --git a/meson.build b/meson.build
+index 0f83ec0..5e40218 100644
+--- a/meson.build
++++ b/meson.build
+@@ -239,13 +239,12 @@ if host_machine.cpu_family().startswith('x86')
+         cdata.set10('ARCH_X86_64', true)
+         cdata_asm.set10('ARCH_X86_32', false)
+         cdata.set10('ARCH_X86_32', false)
+-
+-        cdata_asm.set10('PIC', true)
+     else
+         cdata_asm.set10('ARCH_X86_64', false)
+         cdata.set10('ARCH_X86_64', false)
+         cdata_asm.set10('ARCH_X86_32', true)
+         cdata.set10('ARCH_X86_32', true)
++        cdata_asm.set10('PIC', true)
+     endif
+ else
+     cdata.set10('ARCH_X86', false)
+diff --git a/src/ext/x86/x86inc.asm b/src/ext/x86/x86inc.asm
+index eab4e53..c7b1e46 100644
+--- a/src/ext/x86/x86inc.asm
++++ b/src/ext/x86/x86inc.asm
+@@ -89,16 +89,13 @@
+     %endif
+ %endmacro
+ 
+-%if WIN64
+-    %define PIC
+-%elif ARCH_X86_64 == 0
+-; x86_32 doesn't require PIC.
+-; Some distros prefer shared objects to be PIC, but nothing breaks if
+-; the code contains a few textrels, so we'll skip that complexity.
+-    %undef PIC
+-%endif
+-%ifdef PIC
++%if ARCH_X86_64
++    %define PIC 1 ; always use PIC on x86-64
+     default rel
++%elifidn __OUTPUT_FORMAT__,win32
++    %define PIC 0 ; PIC isn't used on 32-bit Windows
++%elifndef PIC
++    %define PIC 0
+ %endif
+ 
+ %ifdef __NASM_VER__
+@@ -220,6 +217,18 @@ DECLARE_REG_TMP_SIZE 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14
+     %define gprsize 4
+ %endif
+ 
++%macro LEA 2
++%if ARCH_X86_64
++    lea %1, [%2]
++%elif PIC
++    call $+5 ; special-cased to not affect the RSB on most CPU:s
++    pop %1
++    add %1, (%2)-$+1
++%else
++    mov %1, %2
++%endif
++%endmacro
++
+ %macro PUSH 1
+     push %1
+     %ifidn rstk, rsp
+diff --git a/src/x86/ipred_ssse3.asm b/src/x86/ipred_ssse3.asm
+index d295c37..9a4991e 100644
+--- a/src/x86/ipred_ssse3.asm
++++ b/src/x86/ipred_ssse3.asm
+@@ -93,7 +93,7 @@ SECTION .text
+ 
+ INIT_XMM ssse3
+ cglobal ipred_h, 3, 6, 2, dst, stride, tl, w, h, stride3
+-    lea                          r5, [ipred_h_ssse3_table]
++    LEA                          r5, ipred_h_ssse3_table
+     tzcnt                        wd, wm
+     movifnidn                    hd, hm
+     movsxd                       wq, [r5+wq*4]
+diff --git a/src/x86/itx_ssse3.asm b/src/x86/itx_ssse3.asm
+index 0468b3a..740839f 100644
+--- a/src/x86/itx_ssse3.asm
++++ b/src/x86/itx_ssse3.asm
+@@ -55,9 +55,15 @@ SECTION .text
+ 
+ %define m(x) mangle(private_prefix %+ _ %+ x %+ SUFFIX)
+ 
++%if ARCH_X86_64
++%define o(x) x
++%else
++%define o(x) r5-$$+x ; PIC
++%endif
++
+ %macro ITX4_END 4-5 2048 ; row[1-4], rnd
+ %if %5
+-    mova                 m2, [pw_%5]
++    mova                 m2, [o(pw_%5)]
+     pmulhrsw             m0, m2
+     pmulhrsw             m1, m2
+ %endif
+@@ -100,18 +106,17 @@ SECTION .text
+     ret
+ %endmacro
+ 
+-
+ ; flags: 1 = swap, 2: coef_regs
+ %macro ITX_MUL2X_PACK 5-6 0 ; dst/src, tmp[1], rnd, coef[1-2], flags
+ %if %6 & 2
+     pmaddwd              m%2, m%4, m%1
+     pmaddwd              m%1, m%5
+ %elif %6 & 1
+-    pmaddwd              m%2, m%1, [pw_%5_%4]
++    pmaddwd              m%2, m%1, [o(pw_%5_%4)]
+     pmaddwd              m%1, [pw_%4_m%5]
+ %else
+-    pmaddwd              m%2, m%1, [pw_%4_m%5]
+-    pmaddwd              m%1, [pw_%5_%4]
++    pmaddwd              m%2, m%1, [o(pw_%4_m%5)]
++    pmaddwd              m%1, [o(pw_%5_%4)]
+ %endif
+     paddd                m%2, m%3
+     paddd                m%1, m%3
+@@ -126,13 +131,13 @@ SECTION .text
+     paddw                m0, m1
+     punpcklqdq           m0, m3               ;high: in0-in2 ;low: in0+in2
+ 
+-    mova                 m3, [pd_2048]
++    mova                 m3, [o(pd_2048)]
+     ITX_MUL2X_PACK 2, 1, 3, 1567, 3784
+ 
+ %if %0 == 1
+     pmulhrsw             m0, m%1
+ %else
+-    pmulhrsw             m0, [pw_2896x8]     ;high: t1 ;low: t0
++    pmulhrsw             m0, [o(pw_2896x8)]  ;high: t1 ;low: t0
+ %endif
+ 
+     psubsw               m1, m0, m2          ;high: out2 ;low: out3
+@@ -146,15 +151,14 @@ SECTION .text
+     punpckhqdq           m1, m1                    ;
+     paddw                m1, m0                    ;low: in0 - in2 + in3
+ 
+-    pmaddwd              m0, m2, [pw_1321_3803]    ;1321 * in0 + 3803 * in2
+-    pmaddwd              m2, [pw_2482_m1321]       ;2482 * in0 - 1321 * in2
+-    pmaddwd              m4, m3, [pw_3344_2482]    ;3344 * in1 + 2482 * in3
+-    pmaddwd              m5, m3, [pw_3344_m3803]   ;3344 * in1 - 3803 * in3
++    pmaddwd              m0, m2, [o(pw_1321_3803)] ;1321 * in0 + 3803 * in2
++    pmaddwd              m2, [o(pw_2482_m1321)]    ;2482 * in0 - 1321 * in2
++    pmaddwd              m4, m3, [o(pw_3344_2482)] ;3344 * in1 + 2482 * in3
++    pmaddwd              m5, m3, [o(pw_3344_m3803)];3344 * in1 - 3803 * in3
+     paddd                m4, m0                    ;t0 + t3
+-
+-    pmaddwd              m3, [pw_m6688_m3803]      ;-2 * 3344 * in1 - 3803 * in3
+-    pmulhrsw             m1, [pw_3344x8]           ;low: out2
+-    mova                 m0, [pd_2048]
++    pmaddwd              m3, [o(pw_m6688_m3803)]   ;-2 * 3344 * in1 - 3803 * in3
++    pmulhrsw             m1, [o(pw_3344x8)]        ;low: out2
++    mova                 m0, [o(pd_2048)]
+     paddd                m2, m0
+     paddd                m0, m4                    ;t0 + t3 + 2048
+     paddd                m5, m2                    ;t1 + t3 + 2048
+@@ -169,9 +173,11 @@ SECTION .text
+ %endmacro
+ 
+ %macro INV_TXFM_FN 4 ; type1, type2, fast_thresh, size
+-cglobal inv_txfm_add_%1_%2_%4, 4, 5, 0, dst, stride, coeff, eob, tx2
++cglobal inv_txfm_add_%1_%2_%4, 4, 6, 0, dst, stride, coeff, eob, tx2
+     %undef cmp
+-    lea tx2q, [m(i%2_%4_internal).pass2]
++%if ARCH_X86_32
++    LEA                    r5, $$
++%endif
+ %if %3 > 0
+     cmp                  eobd, %3
+     jle %%end
+@@ -179,7 +185,8 @@ cglobal inv_txfm_add_%1_%2_%4, 4, 5, 0, dst, stride, coeff, eob, tx2
+     test                 eobd, eobd
+     jz %%end
+ %endif
+-    call i%1_%4_internal
++    lea                  tx2q, [o(m(i%2_%4_internal).pass2)]
++    call m(i%1_%4_internal)
+     RET
+ ALIGN function_align
+ %%end:
+@@ -188,10 +195,10 @@ ALIGN function_align
+ %macro INV_TXFM_4X4_FN 2-3 -1 ; type1, type2, fast_thresh
+     INV_TXFM_FN          %1, %2, %3, 4x4
+ %ifidn %1_%2, dct_identity
+-    mova                 m0, [pw_2896x8]
++    mova                 m0, [o(pw_2896x8)]
+     pmulhrsw             m0, [coeffq]
+     paddw                m0, m0
+-    pmulhrsw             m0, [pw_5793x4]
++    pmulhrsw             m0, [o(pw_5793x4)]
+     punpcklwd            m0, m0
+     punpckhdq            m1, m0, m0
+     punpckldq            m0, m0
+@@ -205,8 +212,8 @@ ALIGN function_align
+     punpcklwd            m0, m1
+     punpcklqdq           m0, m0
+     paddw                m0, m0
+-    pmulhrsw             m0, [pw_5793x4]
+-    pmulhrsw             m0, [pw_2896x8]
++    pmulhrsw             m0, [o(pw_5793x4)]
++    pmulhrsw             m0, [o(pw_2896x8)]
+     mova                 m1, m0
+     call m(iadst_4x4_internal).end
+     RET
+@@ -214,17 +221,17 @@ ALIGN function_align
+     pshuflw              m0, [coeffq], q0000
+     punpcklqdq           m0, m0
+ %ifidn %1, dct
+-    mova                 m1, [pw_2896x8]
++    mova                 m1, [o(pw_2896x8)]
+     pmulhrsw             m0, m1
+ %elifidn %1, adst
+-    pmulhrsw             m0, [iadst4_dconly1a]
++    pmulhrsw             m0, [o(iadst4_dconly1a)]
+ %elifidn %1, flipadst
+-    pmulhrsw             m0, [iadst4_dconly1b]
++    pmulhrsw             m0, [o(iadst4_dconly1b)]
+ %endif
+     mov            [coeffq], eobd                ;0
+ %ifidn %2, dct
+ %ifnidn %1, dct
+-    pmulhrsw             m0, [pw_2896x8]
++    pmulhrsw             m0, [o(pw_2896x8)]
+ %else
+     pmulhrsw             m0, m1
+ %endif
+@@ -232,24 +239,28 @@ ALIGN function_align
+     call m(iadst_4x4_internal).end2
+     RET
+ %else ; adst / flipadst
+-    pmulhrsw             m1, m0, [iadst4_dconly2b]
+-    pmulhrsw             m0, [iadst4_dconly2a]
++    pmulhrsw             m1, m0, [o(iadst4_dconly2b)]
++    pmulhrsw             m0, [o(iadst4_dconly2a)]
+     call m(i%2_4x4_internal).end2
+     RET
+ %endif
+ %endif
+ %endmacro
+ 
+-
+ INIT_XMM ssse3
+ 
++INV_TXFM_4X4_FN dct, dct,      0
++INV_TXFM_4X4_FN dct, adst,     0
++INV_TXFM_4X4_FN dct, flipadst, 0
++INV_TXFM_4X4_FN dct, identity, 3
++
+ cglobal idct_4x4_internal, 0, 0, 4, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]      ;high: in1 ;low: in0
+     mova                 m1, [coeffq+16*1]      ;high: in3 ;low in2
+ 
+     IDCT4_1D_PACKED
+ 
+-    mova                 m2, [deint_shuf]
++    mova                 m2, [o(deint_shuf)]
+     shufps               m3, m0, m1, q1331
+     shufps               m0, m1, q0220
+     pshufb               m0, m2                 ;high: in1 ;low: in0
+@@ -265,7 +276,10 @@ cglobal idct_4x4_internal, 0, 0, 4, dst, stride, coeff, eob, tx2
+ 
+     ITX4_END     0, 1, 3, 2
+ 
+-INV_TXFM_4X4_FN dct, dct, 0
++INV_TXFM_4X4_FN adst, dct,      0
++INV_TXFM_4X4_FN adst, adst,     0
++INV_TXFM_4X4_FN adst, flipadst, 0
++INV_TXFM_4X4_FN adst, identity
+ 
+ cglobal iadst_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]
+@@ -294,9 +308,10 @@ ALIGN function_align
+     IADST4_1D_PACKED
+     ret
+ 
+-INV_TXFM_4X4_FN adst, adst, 0
+-INV_TXFM_4X4_FN dct,  adst, 0
+-INV_TXFM_4X4_FN adst, dct,  0
++INV_TXFM_4X4_FN flipadst, dct,      0
++INV_TXFM_4X4_FN flipadst, adst,     0
++INV_TXFM_4X4_FN flipadst, flipadst, 0
++INV_TXFM_4X4_FN flipadst, identity
+ 
+ cglobal iflipadst_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]
+@@ -321,16 +336,15 @@ cglobal iflipadst_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+ .end2:
+     ITX4_END              3, 2, 1, 0
+ 
+-INV_TXFM_4X4_FN flipadst, flipadst, 0
+-INV_TXFM_4X4_FN flipadst, dct,      0
+-INV_TXFM_4X4_FN flipadst, adst,     0
+-INV_TXFM_4X4_FN dct,      flipadst, 0
+-INV_TXFM_4X4_FN adst,     flipadst, 0
++INV_TXFM_4X4_FN identity, dct,      3
++INV_TXFM_4X4_FN identity, adst
++INV_TXFM_4X4_FN identity, flipadst
++INV_TXFM_4X4_FN identity, identity
+ 
+ cglobal iidentity_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     mova                 m0, [coeffq+16*0]
+     mova                 m1, [coeffq+16*1]
+-    mova                 m2, [pw_5793x4]
++    mova                 m2, [o(pw_5793x4)]
+     paddw                m0, m0
+     paddw                m1, m1
+     pmulhrsw             m0, m2
+@@ -343,21 +357,13 @@ cglobal iidentity_4x4_internal, 0, 0, 6, dst, stride, coeff, eob, tx2
+     jmp                tx2q
+ 
+ .pass2:
+-    mova                 m2, [pw_5793x4]
++    mova                 m2, [o(pw_5793x4)]
+     paddw                m0, m0
+     paddw                m1, m1
+     pmulhrsw             m0, m2
+     pmulhrsw             m1, m2
+     jmp m(iadst_4x4_internal).end
+ 
+-INV_TXFM_4X4_FN identity, identity
+-INV_TXFM_4X4_FN identity, dct,      3
+-INV_TXFM_4X4_FN identity, adst
+-INV_TXFM_4X4_FN identity, flipadst
+-INV_TXFM_4X4_FN dct,      identity, 3
+-INV_TXFM_4X4_FN adst,     identity
+-INV_TXFM_4X4_FN flipadst, identity
+-
+ %macro IWHT4_1D_PACKED 0
+     punpckhqdq           m3, m0, m1            ;low: in1 high: in3
+     punpcklqdq           m0, m1                ;low: in0 high: in2
+diff --git a/src/x86/mc_ssse3.asm b/src/x86/mc_ssse3.asm
+index afecb68..696d1fe 100644
+--- a/src/x86/mc_ssse3.asm
++++ b/src/x86/mc_ssse3.asm
+@@ -186,7 +186,7 @@ DECLARE_REG_TMP 6, 7
+ %endmacro
+ 
+ cglobal avg, 4, 7, 3, dst, stride, tmp1, tmp2, w, h, stride3
+-    lea                  r6, [avg_ssse3_table]
++    LEA                  r6, avg_ssse3_table
+     tzcnt                wd, wm ; leading zeros
+     movifnidn            hd, hm ; move h(stack) to h(register) if not already that register
+     movsxd               wq, dword [r6+wq*4] ; push table entry matching the tile width (tzcnt) in widen reg
+@@ -216,7 +216,7 @@ cglobal avg, 4, 7, 3, dst, stride, tmp1, tmp2, w, h, stride3
+ %define W_AVG_INC_PTR AVG_INC_PTR
+ 
+ cglobal w_avg, 4, 7, 6, dst, stride, tmp1, tmp2, w, h, stride3
+-    lea                  r6, [w_avg_ssse3_table]
++    LEA                  r6, w_avg_ssse3_table
+     tzcnt                wd, wm
+     movifnidn            hd, hm
+     movd                 m0, r6m
+@@ -269,11 +269,12 @@ cglobal mask, 4, 8, 7, dst, stride, tmp1, tmp2, w, h, mask, stride3
+ cglobal mask, 4, 7, 7, dst, stride, tmp1, tmp2, w, mask, stride3
+ %define hd dword r5m
+ %endif
+-    lea                  r6, [mask_ssse3_table]
++%define base r6-mask_ssse3_table
++    LEA                  r6, mask_ssse3_table
+     tzcnt                wd, wm
+     movsxd               wq, dword [r6+wq*4]
+     pxor                 m4, m4
+-    mova                 m5, [pw_2048+r6-mask_ssse3_table]
++    mova                 m5, [base+pw_2048]
+     add                  wq, r6
+     mov               maskq, r6m
+     BIDIR_FN           MASK
+@@ -284,9 +285,9 @@ cglobal mask, 4, 7, 7, dst, stride, tmp1, tmp2, w, mask, stride3
+  %define reg_pw_27        m9
+  %define reg_pw_2048      m10
+ %else
+- %define reg_pw_8         [pw_8]
+- %define reg_pw_27        [pw_26] ; 64 - 38
+- %define reg_pw_2048      [pw_2048]
++ %define reg_pw_8         [base+pw_8]
++ %define reg_pw_27        [base+pw_26] ; 64 - 38
++ %define reg_pw_2048      [base+pw_2048]
+ %endif
+ 
+ %macro W_MASK_420_B 2 ; src_offset in bytes, mask_out
+@@ -323,63 +324,60 @@ cglobal mask, 4, 7, 7, dst, stride, tmp1, tmp2, w, mask, stride3
+     W_MASK_420_B (%1*16), %2
+ %endmacro
+ 
++%define base r6-w_mask_420_ssse3_table
+ %if ARCH_X86_64
+ ; args: dst, stride, tmp1, tmp2, w, h, mask, sign
+-cglobal w_mask_420, 4, 9, 11, dst, stride, tmp1, tmp2, w, h, mask, stride3
+-    lea                  r7, [w_mask_420_ssse3_table]
++cglobal w_mask_420, 4, 8, 11, dst, stride, tmp1, tmp2, w, h, mask
++    lea                  r6, [w_mask_420_ssse3_table]
+     mov                  wd, wm
+-    tzcnt               r8d, wd
++    tzcnt               r7d, wd
+     movifnidn            hd, hm
+-    mov               maskq, maskmp
+     movd                 m0, r7m
+     pshuflw              m0, m0, q0000 ; sign
+     punpcklqdq           m0, m0
+-    movsxd               r8, dword [r7+r8*4]
+-    mova           reg_pw_8, [pw_8]
+-    mova          reg_pw_27, [pw_26] ; 64 - 38
+-    mova        reg_pw_2048, [pw_2048]
+-    mova                 m6, [pw_258] ; 64 * 4 + 2
++    movsxd               r7, [r6+r7*4]
++    mova           reg_pw_8, [base+pw_8]
++    mova          reg_pw_27, [base+pw_26] ; 64 - 38
++    mova        reg_pw_2048, [base+pw_2048]
++    mova                 m6, [base+pw_258] ; 64 * 4 + 2
++    add                  r7, r6
++    mov               maskq, maskmp
+     psubw                m6, m0
+-    add                  r8, r7
+     W_MASK_420            0, 4
+-    lea            stride3q, [strideq*3]
+-    jmp                  r8
+-    %define dst_bak      r8
+-    %define loop_w       r7
+-    %define orig_w       wq
++    jmp                  r7
++    %define loop_w      r7d
+ %else
+-cglobal w_mask_420, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask, stride3
+-    tzcnt               r6d, r4m
+-    mov                  wd, w_mask_420_ssse3_table
+-    add                  wd, [wq+r6*4]
++cglobal w_mask_420, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask
++    tzcnt                wd, wm
++    LEA                  r6, w_mask_420_ssse3_table
++    mov                  wd, [r6+wq*4]
+     mov               maskq, r6mp
+     movd                 m0, r7m
+     pshuflw              m0, m0, q0000 ; sign
+     punpcklqdq           m0, m0
+-    mova                 m6, [pw_258] ; 64 * 4 + 2
++    mova                 m6, [base+pw_258] ; 64 * 4 + 2
++    add                  wq, r6
+     psubw                m6, m0
+     W_MASK_420            0, 4
+-    lea            stride3q, [strideq*3]
+     jmp                  wd
+-    %define dst_bak     r0m
+-    %define loop_w      r6q
+-    %define orig_w      r4m
+-    %define hd    dword r5m
++    %define loop_w dword r0m
++    %define hd     dword r5m
+ %endif
+ .w4_loop:
+     add               tmp1q, 2*16
+     add               tmp2q, 2*16
+     W_MASK_420            0, 4
+-    lea                dstq, [dstq+strideq*4]
++    lea                dstq, [dstq+strideq*2]
+     add               maskq, 4
+ .w4:
+     movd   [dstq          ], m0 ; copy m0[0]
+     pshuflw              m1, m0, q1032
+     movd   [dstq+strideq*1], m1 ; copy m0[1]
++    lea                dstq, [dstq+strideq*2]
+     punpckhqdq           m0, m0
+-    movd   [dstq+strideq*2], m0 ; copy m0[2]
++    movd   [dstq+strideq*0], m0 ; copy m0[2]
+     psrlq                m0, 32
+-    movd   [dstq+stride3q ], m0 ; copy m0[3]
++    movd   [dstq+strideq*1], m0 ; copy m0[3]
+     pshufd               m5, m4, q3131; DBDB even lines repeated
+     pshufd               m4, m4, q2020; CACA odd lines repeated
+     psubw                m1, m6, m4   ; m9 == 64 * 4 + 2
+@@ -409,20 +407,19 @@ cglobal w_mask_420, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask, stride3
+     jg .w8_loop
+     RET
+ .w16: ; w32/64/128
+-    mov             dst_bak, dstq
+-    mov              loop_w, orig_w ; use width as counter
+ %if ARCH_X86_32
+-    mov                  wq, orig_w ; because we altered it in 32bit setup
++    mov                  wd, wm     ; because we altered it in 32bit setup
+ %endif
++    mov              loop_w, wd     ; use width as counter
+     jmp .w16ge_inner_loop_first
+ .w16ge_loop:
+     lea               tmp1q, [tmp1q+wq*2] ; skip even line pixels
+     lea               tmp2q, [tmp2q+wq*2] ; skip even line pixels
++    sub                dstq, wq
++    mov              loop_w, wd
+     lea                dstq, [dstq+strideq*2]
+-    mov             dst_bak, dstq
+-    mov              loop_w, orig_w
+ .w16ge_inner_loop:
+-    W_MASK_420_B           0, 4
++    W_MASK_420_B          0, 4
+ .w16ge_inner_loop_first:
+     mova   [dstq          ], m0
+     W_MASK_420_B       wq*2, 5  ; load matching even line (offset = widthpx * (16+16))
+@@ -438,7 +435,6 @@ cglobal w_mask_420, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask, stride3
+     add                dstq, 16
+     sub              loop_w, 16
+     jg .w16ge_inner_loop
+-    mov                dstq, dst_bak
+     sub                  hd, 2
+     jg .w16ge_loop
+     RET
+@@ -470,7 +466,7 @@ cglobal w_mask_420, 4, 7, 8, dst, stride, tmp1, tmp2, w, mask, stride3
+ 
+ cglobal blend, 3, 7, 7, dst, ds, tmp, w, h, mask
+ %define base r6-blend_ssse3_table
+-    lea                  r6, [blend_ssse3_table]
++    LEA                  r6, blend_ssse3_table
+     tzcnt                wd, wm
+     movifnidn            hd, hm
+     movifnidn         maskq, maskmp
+@@ -546,7 +542,7 @@ cglobal blend, 3, 7, 7, dst, ds, tmp, w, h, mask
+ 
+ cglobal blend_v, 3, 6, 8, dst, ds, tmp, w, h, mask
+ %define base r5-blend_v_ssse3_table
+-    lea                  r5, [blend_v_ssse3_table]
++    LEA                  r5, blend_v_ssse3_table
+     tzcnt                wd, wm
+     movifnidn            hd, hm
+     movsxd               wq, dword [r5+wq*4]
+@@ -646,15 +642,21 @@ cglobal blend_v, 3, 6, 8, dst, ds, tmp, w, h, mask
+     jg .w32_loop
+     RET
+ 
+-cglobal blend_h, 4, 7, 6, dst, ds, tmp, w, h, mask
+-%define base r5-blend_h_ssse3_table
+-    lea                  r5, [blend_h_ssse3_table]
++cglobal blend_h, 3, 7, 6, dst, ds, tmp, w, h, mask
++%define base t0-blend_h_ssse3_table
++%if ARCH_X86_32
++    ; We need to keep the PIC pointer for w4, reload wd from stack instead
++    DECLARE_REG_TMP 6
++%else
++    DECLARE_REG_TMP 5
+     mov                 r6d, wd
+-    tzcnt                wd, wd
++%endif
++    LEA                  t0, blend_h_ssse3_table
++    tzcnt                wd, wm
+     mov                  hd, hm
+-    movsxd               wq, dword [r5+wq*4]
++    movsxd               wq, dword [t0+wq*4]
+     mova                 m5, [base+pw_512]
+-    add                  wq, r5
++    add                  wq, t0
+     lea               maskq, [base+obmc_masks+hq*4]
+     neg                  hq
+     jmp                  wq
+@@ -678,7 +680,11 @@ cglobal blend_h, 4, 7, 6, dst, ds, tmp, w, h, mask
+     jl .w2
+     RET
+ .w4:
++%if ARCH_X86_32
++    mova                 m3, [base+blend_shuf]
++%else
+     mova                 m3, [blend_shuf]
++%endif
+ .w4_loop:
+     movd                 m0, [dstq+dsq*0]
+     movd                 m2, [dstq+dsq*1]
+@@ -716,6 +722,9 @@ cglobal blend_h, 4, 7, 6, dst, ds, tmp, w, h, mask
+     RET
+ ; w16/w32/w64/w128
+ .w16:
++%if ARCH_X86_32
++    mov                 r6d, wm
++%endif
+     sub                 dsq, r6
+ .w16_loop0:
+     movd                 m3, [maskq+hq*2]
+diff --git a/tests/checkasm/x86/checkasm.asm b/tests/checkasm/x86/checkasm.asm
+index 0246872..ae8d770 100644
+--- a/tests/checkasm/x86/checkasm.asm
++++ b/tests/checkasm/x86/checkasm.asm
+@@ -200,7 +200,7 @@ cglobal checked_call, 1,7
+     jz .ok
+     mov  r3, eax
+     mov  r4, edx
+-    lea  r0, [error_message]
++    LEA  r0, error_message
+     mov [esp], r0
+     call fail_func
+     mov  edx, r4
+-- 
+2.20.1
+

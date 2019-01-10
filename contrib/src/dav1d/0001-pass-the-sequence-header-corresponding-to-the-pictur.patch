@@ -1,8 +1,8 @@
-From fe62b6cf1ebcde4f64868ce13ea58736beb68efd Mon Sep 17 00:00:00 2001
+From 6da83b3751f9dcb0c6a77b56c821633f87cc5c4f Mon Sep 17 00:00:00 2001
 From: Steve Lhomme <robux4@videolan.org>
 Date: Thu, 13 Dec 2018 11:57:31 +0100
-Subject: [PATCH] pass the sequence header corresponding to the picture being
- allocated
+Subject: [PATCH 1/5] pass the sequence header corresponding to the picture
+ being allocated
 
 Otherwise there's no way to know the colorimetry parameters during allocation.
 
@@ -90,5 +90,5 @@ index f31edb5..ca80a90 100644
                                 Dav1dPicAllocator *);
  
 -- 
-2.19.1.windows.1
+2.20.1
 
