@@ -237,6 +237,11 @@ uint32_t mp4mux_track_GetDefaultSampleSize(const mp4mux_trackinfo_t *t)
     return t->i_trex_default_size;
 }
 
+const es_format_t * mp4mux_track_GetFmt(const mp4mux_trackinfo_t *t)
+{
+    return &t->fmt;
+}
+
 bool mp4mux_track_HasBFrames(const mp4mux_trackinfo_t *t)
 {
     return t->b_hasbframes;
