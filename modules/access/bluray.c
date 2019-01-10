@@ -2128,6 +2128,7 @@ static void bluraySendOverlayToVout(demux_t *p_demux, int plane, bluray_overlay_
 static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
                                    unsigned repeats, unsigned ratio)
 {
+#if BLURAY_VERSION >= BLURAY_VERSION_CODE(1, 0, 0)
     const BLURAY_CLIP_INFO *prev = NULL;
     unsigned maxrepeats = 0;
     unsigned sequence = 0;
@@ -2160,6 +2161,9 @@ static bool blurayTitleIsRepeating(BLURAY_TITLE_INFO *title_info,
     }
     return (maxrepeats > repeats &&
             (100 * maxrepeats / title_info->chapter_count) >= ratio);
+#else
+    return false;
+#endif
 }
 
 static void blurayUpdateTitleInfo(input_title_t *t, BLURAY_TITLE_INFO *title_info)
