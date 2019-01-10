@@ -227,6 +227,8 @@ void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 #else /* VLC_WINSTORE_APP */
 void D3D11_GetDriverVersion(vlc_object_t *obj, d3d11_device_t *d3d_dev)
 {
+    VLC_UNUSED(obj);
+    VLC_UNUSED(d3d_dev);
     return;
 }
 #endif /* VLC_WINSTORE_APP */
