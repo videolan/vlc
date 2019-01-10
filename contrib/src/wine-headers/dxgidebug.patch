@@ -1,6 +1,6 @@
-diff --git a/dxgidebug.idl b/dxgidebug.idl
+diff --git a/include/dxgidebug.idl b/include/dxgidebug.idl
 --- /dev/null
-+++ b/dxgidebug.idl
++++ b/include/dxgidebug.idl
 @@ -0,0 +1,44 @@
 +/*
 + * Copyright 2015 Steve Lhomme
@@ -48,4 +48,3 @@ diff --git a/dxgidebug.idl b/dxgidebug.idl
 +
 --
 1.9.5.msysgit.0
-

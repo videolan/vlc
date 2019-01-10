@@ -180,7 +180,7 @@ endif
 # Windows
 ifdef HAVE_WIN32
 ifndef HAVE_VISUALSTUDIO
-DEPS_ffmpeg += d3d11
+DEPS_ffmpeg += wine-headers
 ifndef HAVE_MINGW_W64
 DEPS_ffmpeg += directx
 endif

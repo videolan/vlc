@@ -1,5 +1,5 @@
---- include/d3d9.h	2016-04-17 11:41:20.676521300 +0300
-+++ include/d3d9.h.new	2016-04-17 12:12:13.637219200 +0300
+--- a/include/d3d9.h	2016-04-17 11:41:20.676521300 +0300
++++ b/include/d3d9.h	2016-04-17 12:12:13.637219200 +0300
 @@ -2185,6 +2185,42 @@ __CRT_UUID_DECL(IDirect3DDevice9Ex,
  #define IDirect3DDevice9Ex_GetDisplayModeEx(p,a,b,c)                     (p)->GetDisplayModeEx(a,b,c)
  #endif
