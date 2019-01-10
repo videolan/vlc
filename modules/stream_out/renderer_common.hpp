@@ -37,7 +37,7 @@
 #define AUDIO_PASSTHROUGH_TEXT N_( "Enable Audio passthrough" )
 #define AUDIO_PASSTHROUGH_LONGTEXT N_( "Disable if your receiver does not support Dolby®." )
 #define CONVERSION_QUALITY_TEXT N_( "Conversion quality" )
-#define CONVERSION_QUALITY_LONGTEXT N_( "Change this option to increase conversion speed or quality." )
+#define CONVERSION_QUALITY_LONGTEXT N_( "Change conversion speed or quality." )
 
 #if defined (__ANDROID__) || defined (__arm__) || (defined (TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
 # define CONVERSION_QUALITY_DEFAULT CONVERSION_QUALITY_LOW
