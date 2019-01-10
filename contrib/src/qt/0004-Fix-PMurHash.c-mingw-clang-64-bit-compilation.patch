@@ -1,0 +1,25 @@
+From 7e0e146443663db23ea0164e0b72694b8f9a1b69 Mon Sep 17 00:00:00 2001
+From: LLVM MinGW <root@localhost>
+Date: Fri, 21 Dec 2018 14:41:36 +0000
+Subject: [PATCH] Fix PMurHash.c mingw clang 64-bit compilation.
+
+---
+ .../angle/src/common/third_party/smhasher/src/PMurHash.cpp      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp b/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
+index 071bc31..ff75759 100644
+--- a/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
++++ b/src/3rdparty/angle/src/common/third_party/smhasher/src/PMurHash.cpp
+@@ -208,7 +208,7 @@ void PMurHash32_Process(uint32_t *ph1, uint32_t *pcarry, const void *key, int le
+   /* This CPU does not handle unaligned word access */
+ 
+   /* Consume enough so that the next data byte is word aligned */
+-  int i = -(long)ptr & 3;
++  int i = -(intptr_t)ptr & 3;
+   if(i && i <= len) {
+       DOBYTES(i, h1, c, n, ptr, len);
+   }
+-- 
+2.20.0.rc1
+
