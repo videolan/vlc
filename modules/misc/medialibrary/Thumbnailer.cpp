@@ -75,6 +75,7 @@ bool Thumbnailer::generate( medialibrary::MediaPtr media, const std::string& mrl
     if ( unlikely( ctx.item == nullptr ) )
         return false;
 
+    input_item_AddOption( ctx.item, "no-hwdec", VLC_INPUT_OPTION_TRUSTED );
     ctx.done = false;
     {
         vlc::threads::mutex_locker lock( ctx.mutex );
