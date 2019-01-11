@@ -18,7 +18,7 @@ $(TARBALLS)/aom-$(AOM_VERSION).tar.gz:
 aom: aom-$(AOM_VERSION).tar.gz .sum-aom
 	rm -Rf $@-$(AOM_VERSION) $@
 	mkdir -p $@-$(AOM_VERSION)
-	tar xvzf "$<" -C $@-$(AOM_VERSION)
+	tar xvzfo "$<" -C $@-$(AOM_VERSION)
 	$(APPLY) $(SRC)/aom/aom-target-cpu.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/aom/aom-pthreads-win32.patch
