@@ -1,5 +1,5 @@
 # Icelandic translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
@@ -7,14 +7,14 @@
 # Freyr Gunnar Ólafsson <gnarlin@gmail.com>, 2010
 # Hotellook, 2014
 # Magnus Magnusson <maggiymir@gmail.com>, 2013
-# Sveinn í Felli <sveinki@nett.is>, 2013-2018
+# Sveinn í Felli <sv1@fellsnet.is>, 2013-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 22:21+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-01-11 11:44+0100\n"
+"Last-Translator: Sveinn í Felli <sv1@fellsnet.is>, 2019\n"
 "Language-Team: Icelandic (https://www.transifex.com/yaron/teams/16553/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -814,7 +814,9 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"%u einingin er ekki birt því hún er einungis með ítarlegri valkosti.\n"
 msgstr[1] ""
+"%u einingarnar eru ekki birtar því þær eru einungis með ítarlegri valkosti.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -1115,7 +1117,7 @@ msgstr "Blandað Log-Gamma"
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Lit-yfirfærsluaðgerð"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
@@ -3293,7 +3295,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1015
 msgid "Demux module"
-msgstr ""
+msgstr "Affléttunareining (demux)"
 
 #: src/libvlc-module.c:1017
 msgid ""
@@ -11966,11 +11968,11 @@ msgstr ""
 
 #: modules/codec/scte18.c:41
 msgid "SCTE-18 decoder"
-msgstr ""
+msgstr "SCTE-18 afkóðari"
 
 #: modules/codec/scte18.c:42
 msgid "SCTE-18"
-msgstr ""
+msgstr "SCTE-18"
 
 #: modules/codec/scte18.h:24
 msgid "Emergency Alert Messaging for Cable"
@@ -12418,7 +12420,7 @@ msgstr ""
 
 #: modules/codec/telx.c:64
 msgid "Workaround for France"
-msgstr ""
+msgstr "Framhjáhlaup í Frakklandi"
 
 #: modules/codec/telx.c:65
 msgid ""
@@ -12523,11 +12525,11 @@ msgstr "Einungis nota vélbúnaðarafkóðun"
 
 #: modules/codec/videotoolbox.m:90
 msgid "VideoToolbox video decoder"
-msgstr ""
+msgstr "VideoToolbox myndmerkisafkóðari"
 
 #: modules/codec/vorbis.c:177
 msgid "Maximum encoding bitrate"
-msgstr ""
+msgstr "Hámarks bitahraði kóðunar"
 
 #: modules/codec/vorbis.c:179
 msgid "Maximum bitrate in kbps. This is useful for streaming applications."
@@ -12535,7 +12537,7 @@ msgstr ""
 
 #: modules/codec/vorbis.c:180
 msgid "Minimum encoding bitrate"
-msgstr ""
+msgstr "Lágmarks bitahraði kóðunar"
 
 #: modules/codec/vorbis.c:182
 msgid ""
@@ -14416,7 +14418,7 @@ msgstr "Dirac myndmerkisaffléttari"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
-msgstr ""
+msgstr "Innflutningur möppu"
 
 #: modules/demux/filter/noseek.c:79
 msgid "Seek prevention demux filter"
@@ -14758,7 +14760,7 @@ msgstr "Framkvæmdastjórn"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
-msgstr ""
+msgstr "Kóðunarviðföng"
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
@@ -14774,7 +14776,7 @@ msgstr "Stikkorð"
 
 #: modules/demux/mp4/meta.c:423
 msgid "Explicit"
-msgstr ""
+msgstr "Skilgreint (explicit)"
 
 #: modules/demux/mp4/meta.c:426
 msgid "Clean"
@@ -14798,7 +14800,7 @@ msgstr "MP4"
 
 #: modules/demux/mp4/mp4.c:1687
 msgid "Do not seek"
-msgstr ""
+msgstr "Ekki leita"
 
 #: modules/demux/mp4/mp4.c:1688
 msgid "Build index"
@@ -14882,7 +14884,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:90 modules/mux/mpeg/ts.c:173
 msgid "CSA Key"
-msgstr ""
+msgstr "CSA-lykill"
 
 #: modules/demux/mpeg/ts.c:91 modules/mux/mpeg/ts.c:174
 msgid ""
@@ -14891,7 +14893,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:94 modules/mux/mpeg/ts.c:177
 msgid "Second CSA Key"
-msgstr ""
+msgstr "Annar CSA-lykill"
 
 #: modules/demux/mpeg/ts.c:95 modules/mux/mpeg/ts.c:178
 msgid ""
@@ -14949,7 +14951,7 @@ msgstr "MPEG Transport Stream affléttari"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
-msgstr ""
+msgstr "Aðalhljóð"
 
 #: modules/demux/mpeg/ts_psi.c:423
 msgid "Audio description for the visually impaired"
@@ -16066,7 +16068,7 @@ msgstr "Fara á fyrra atriði"
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "Fara úr skjáfylliham"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -16889,7 +16891,7 @@ msgstr "Meðhöndla sem pípu fremur en sem skrá"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:151
 msgid "Play another media synchronously"
-msgstr "Samspila annan miðil"
+msgstr "Spila annan miðil samhliða"
 
 #: modules/gui/macosx/VLCOpenWindowController.m:152
 #: modules/gui/macosx/VLCOpenWindowController.m:347
@@ -21125,7 +21127,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
-msgstr ""
+msgstr "Villumeldingar"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
@@ -21133,7 +21135,7 @@ msgstr ""
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
-msgstr ""
+msgstr "Perónuauðkenni"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
@@ -22543,9 +22545,8 @@ msgid "avparser packetizer"
 msgstr "avparser bitari"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Daala myndmerkisbitari"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -27095,7 +27096,7 @@ msgstr "Hæð topps"
 
 #: modules/visualization/visual/visual.c:100
 msgid "Total pixel height of the peak items."
-msgstr ""
+msgstr "Heildarhæð mynddíla á toppum."
 
 #: modules/visualization/visual/visual.c:102
 msgid "Peak extra width"
@@ -27103,7 +27104,7 @@ msgstr "Aukabreidd topps"
 
 #: modules/visualization/visual/visual.c:104
 msgid "Additions or subtractions of pixels on the peak width."
-msgstr ""
+msgstr "Viðbætur eða frádráttur mynddíla á breidd topps."
 
 #: modules/visualization/visual/visual.c:106
 msgid "V-plane color"
@@ -27206,7 +27207,7 @@ msgstr "Villa:"
 
 #: share/lua/http/dialogs/create_stream.html:367
 msgid "Sample ui-state-error style."
-msgstr ""
+msgstr "Stíll sýnishorns af ui-state-error."
 
 #: share/lua/http/dialogs/create_stream.html:390
 msgid "File name"
@@ -27451,7 +27452,7 @@ msgstr "Breyta lokatíma miðils"
 
 #: modules/gui/qt/ui/open.h:291
 msgid "Play another media synchronously (extra audio file, ...)"
-msgstr "Samspila annan miðil (t.d. aukahljóðskrá, ...)"
+msgstr "Spila annan miðil samhliða (t.d. aukahljóðskrá, ...)"
 
 #: modules/gui/qt/ui/open_capture.h:97
 msgid "Capture mode"
