@@ -214,9 +214,9 @@ static const vlc_v4l2_fmt_t v4l2_fmts[] =
     //V4L2_PIX_FMT_DV -> use access
 
     /* Grey scale */
-//  { V4L2_PIX_FMT_Y16,       },
-//  { V4L2_PIX_FMT_Y12,       },
-//  { V4L2_PIX_FMT_Y10,       },
+    { V4L2_PIX_FMT_Y16,     VLC_CODEC_GREY_16L, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_Y12,     VLC_CODEC_GREY_12L, 2, 0, 0, 0 },
+    { V4L2_PIX_FMT_Y10,     VLC_CODEC_GREY_10L, 2, 0, 0, 0 },
 //  { V4L2_PIX_FMT_Y10BPACK,  },
     { V4L2_PIX_FMT_GREY,    VLC_CODEC_GREY, 1, 0, 0, 0 },
 };
