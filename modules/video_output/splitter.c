@@ -34,11 +34,16 @@
 #include <vlc_vout_display.h>
 #include <vlc_video_splitter.h>
 
+struct vlc_vidsplit_part {
+    vout_display_t *display;
+    vlc_sem_t lock;
+};
+
 struct vout_display_sys_t {
     video_splitter_t splitter;
 
     picture_t **pictures;
-    vout_display_t **displays;
+    struct vlc_vidsplit_part *parts;
 };
 
 static void vlc_vidsplit_Prepare(vout_display_t *vd, picture_t *pic,
@@ -55,18 +60,24 @@ static void vlc_vidsplit_Prepare(vout_display_t *vd, picture_t *pic,
         return;
     }
 
-    for (int i = 0; i < sys->splitter.i_output; i++)
-        sys->pictures[i] = vout_display_Prepare(sys->displays[i],
+    for (int i = 0; i < sys->splitter.i_output; i++) {
+        struct vlc_vidsplit_part *part = &sys->parts[i];
+
+        sys->pictures[i] = vout_display_Prepare(part->display,
                                                 sys->pictures[i], NULL, date);
+    }
 }
 
 static void vlc_vidsplit_Display(vout_display_t *vd, picture_t *picture)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    for (int i = 0; i < sys->splitter.i_output; i++)
+    for (int i = 0; i < sys->splitter.i_output; i++) {
+        struct vlc_vidsplit_part *part = &sys->parts[i];
+
         if (sys->pictures[i] != NULL)
-            vout_display_Display(sys->displays[i], sys->pictures[i]);
+            vout_display_Display(part->display, sys->pictures[i]);
+    }
 
     (void) picture;
 }
@@ -88,11 +99,13 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
     int n = sys->splitter.i_output;
 
     for (int i = 0; i < n; i++) {
-        vout_window_t *wnd = sys->displays[i]->cfg->window;
+        struct vlc_vidsplit_part *part = &sys->parts[i];
+        vout_window_t *wnd = part->display->cfg->window;
 
-        vout_display_Delete(sys->displays[i]);
+        vout_display_Delete(part->display);
         vout_window_Disable(wnd);
         vout_window_Delete(wnd);
+        vlc_sem_destroy(&part->lock);
     }
 
     module_unneed(&sys->splitter, sys->splitter.p_module);
@@ -180,9 +193,9 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
     sys->pictures = vlc_obj_malloc(obj, splitter->i_output
                                         * sizeof (*sys->pictures));
-    sys->displays = vlc_obj_malloc(obj, splitter->i_output
-                                        * sizeof (*sys->displays));
-    if (unlikely(sys->pictures == NULL || sys->displays == NULL)) {
+    sys->parts = vlc_obj_malloc(obj,
+                                splitter->i_output * sizeof (*sys->parts));
+    if (unlikely(sys->pictures == NULL || sys->parts == NULL)) {
         splitter->i_output = 0;
         vlc_vidsplit_Close(vd);
         return VLC_ENOMEM;
@@ -197,6 +210,9 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
             .zoom = { 1, 1 },
         };
         const char *modname = output->psz_module;
+        struct vlc_vidsplit_part *part = &sys->parts[i];
+
+        vlc_sem_init(&part->lock, 1);
 
         vdcfg.window = video_splitter_CreateWindow(obj, &vdcfg, &output->fmt);
         if (vdcfg.window == NULL) {
@@ -205,11 +221,12 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
             return VLC_EGENERIC;
         }
 
-        sys->displays[i] = vlc_vidsplit_CreateDisplay(obj, &output->fmt,
-                                                      &vdcfg, modname);
-        if (sys->displays[i] == NULL) {
+        part->display = vlc_vidsplit_CreateDisplay(obj, &output->fmt, &vdcfg,
+                                                   modname);
+        if (part->display == NULL) {
             vout_window_Disable(vdcfg.window);
             vout_window_Delete(vdcfg.window);
+            vlc_sem_destroy(&part->lock);
             splitter->i_output = i;
             vlc_vidsplit_Close(vd);
             return VLC_EGENERIC;
