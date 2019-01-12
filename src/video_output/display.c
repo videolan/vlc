@@ -748,26 +748,26 @@ static vout_display_t *DisplayNew(vlc_object_t *parent,
     vd->sys = NULL;
     vd->owner = *owner;
 
-        vd->module = vlc_module_load(vd, "vout display", module,
-                                     module && *module != '\0',
-                                     vout_display_start, vd, &osys->cfg,
-                                     &vd->fmt, (vlc_video_context *)NULL);
-        if (vd->module == NULL)
-            goto error;
+    vd->module = vlc_module_load(vd, "vout display", module,
+                                 module && *module != '\0',
+                                 vout_display_start, vd, &osys->cfg,
+                                 &vd->fmt, (vlc_video_context *)NULL);
+    if (vd->module == NULL)
+        goto error;
 
-        vout_window_SetSize(osys->cfg.window,
-                            osys->cfg.display.width, osys->cfg.display.height);
+    vout_window_SetSize(osys->cfg.window,
+                        osys->cfg.display.width, osys->cfg.display.height);
 
 #if defined(_WIN32) || defined(__OS2__)
-        if ((var_GetBool(parent, "fullscreen")
-          || var_GetBool(parent, "video-wallpaper"))
-         && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
-                                 true) == VLC_SUCCESS)
-            osys->cfg.is_fullscreen = true;
+    if ((var_GetBool(parent, "fullscreen")
+      || var_GetBool(parent, "video-wallpaper"))
+     && vout_display_Control(vd, VOUT_DISPLAY_CHANGE_FULLSCREEN,
+                             true) == VLC_SUCCESS)
+        osys->cfg.is_fullscreen = true;
 
-        if (var_InheritBool(parent, "video-on-top"))
-            vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
-                                 (unsigned)VOUT_WINDOW_STATE_ABOVE);
+    if (var_InheritBool(parent, "video-on-top"))
+        vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
+                             (unsigned)VOUT_WINDOW_STATE_ABOVE);
 #endif
 
     if (VoutDisplayCreateRender(vd)) {
