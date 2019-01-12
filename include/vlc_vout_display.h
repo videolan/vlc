@@ -345,6 +345,9 @@ static inline void vout_display_Display(vout_display_t *vd, picture_t *picture)
     picture_Release(picture);
 }
 
+VLC_API
+void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height);
+
 static inline int vout_display_Control(vout_display_t *vd, int query, ...)
 {
     va_list ap;

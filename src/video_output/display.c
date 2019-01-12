@@ -596,7 +596,7 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
     vout_display_Reset(vd);
 }
 
-void vout_SetDisplaySize(vout_display_t *vd, unsigned width, unsigned height)
+void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 

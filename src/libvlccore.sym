@@ -753,6 +753,7 @@ vout_display_SendMouseMovedDisplayCoordinates
 vout_display_New
 vout_display_Delete
 vout_display_Prepare
+vout_display_SetSize
 xml_Create
 text_style_Copy
 text_style_Create

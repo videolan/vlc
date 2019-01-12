@@ -1596,8 +1596,8 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         ThreadProcessMouseState(vout, &cmd.mouse);
         break;
     case VOUT_CONTROL_DISPLAY_SIZE:
-        vout_SetDisplaySize(vout->p->display,
-                            cmd.window.width, cmd.window.height);
+        vout_display_SetSize(vout->p->display,
+                             cmd.window.width, cmd.window.height);
         break;
     case VOUT_CONTROL_DISPLAY_FILLED:
         vout_SetDisplayFilled(vout->p->display, cmd.boolean);

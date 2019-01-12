@@ -38,7 +38,6 @@ bool vout_IsDisplayFiltered(vout_display_t *);
 picture_t * vout_FilterDisplay(vout_display_t *, picture_t *);
 void vout_FilterFlush(vout_display_t *);
 
-void vout_SetDisplaySize(vout_display_t *, unsigned width, unsigned height);
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
 void vout_SetDisplayZoom(vout_display_t *, unsigned num, unsigned den);
 void vout_SetDisplayAspect(vout_display_t *, unsigned num, unsigned den);
