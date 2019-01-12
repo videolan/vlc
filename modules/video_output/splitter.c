@@ -37,6 +37,8 @@
 struct vlc_vidsplit_part {
     vout_display_t *display;
     vlc_sem_t lock;
+    unsigned width;
+    unsigned height;
 };
 
 struct vout_display_sys_t {
@@ -118,7 +120,15 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 static void vlc_vidsplit_window_Resized(vout_window_t *wnd,
                                         unsigned width, unsigned height)
 {
-    (void) wnd; (void) width; (void) height;
+    struct vlc_vidsplit_part *part = wnd->owner.sys;
+
+    vlc_sem_wait(&part->lock);
+    part->width = width;
+    part->height = height;
+
+    if (part->display != NULL)
+        vout_display_SetSize(part->display, width, height);
+    vlc_sem_post(&part->lock);
 }
 
 static const struct vout_window_callbacks vlc_vidsplit_window_cbs =
@@ -128,13 +138,14 @@ static const struct vout_window_callbacks vlc_vidsplit_window_cbs =
 
 static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
     const vout_display_cfg_t *restrict vdcfg,
-    const video_format_t *restrict source)
+    const video_format_t *restrict source, void *sys)
 {
     vout_window_cfg_t cfg = {
         .is_decorated = true,
     };
     vout_window_owner_t owner = {
         .cbs = &vlc_vidsplit_window_cbs,
+        .sys = sys,
     };
 
     vout_display_GetDefaultDisplaySize(&cfg.width, &cfg.height, source,
@@ -217,8 +228,11 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
         vlc_sem_init(&part->lock, 1);
         part->display = NULL;
+        part->width = 1;
+        part->height = 1;
 
-        vdcfg.window = video_splitter_CreateWindow(obj, &vdcfg, &output->fmt);
+        vdcfg.window = video_splitter_CreateWindow(obj, &vdcfg, &output->fmt,
+                                                   part);
         if (vdcfg.window == NULL) {
             splitter->i_output = i;
             vlc_vidsplit_Close(vd);
@@ -238,6 +252,7 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
         vlc_sem_wait(&part->lock);
         part->display = display;
+        vout_display_SetSize(display, part->width, part->height);
         vlc_sem_post(&part->lock);
     }
 
