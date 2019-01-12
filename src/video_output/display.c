@@ -31,7 +31,6 @@
 #include <stdatomic.h>
 
 #include <vlc_common.h>
-#include <vlc_video_splitter.h>
 #include <vlc_vout_display.h>
 #include <vlc_vout.h>
 #include <vlc_block.h>
@@ -43,8 +42,6 @@
 
 #include "display.h"
 #include "window.h"
-
-static void SplitterClose(vout_display_t *vd);
 
 /*****************************************************************************
  * FIXME/TODO see how to have direct rendering here (interact with vout.c)
@@ -274,7 +271,6 @@ void vout_display_SendMouseMovedDisplayCoordinates(vout_display_t *vd, int m_x, 
 
 typedef struct {
     vout_display_t  display;
-    bool            is_splitter;  /* Is this a video splitter */
 
     /* */
     vout_display_cfg_t cfg;
@@ -716,7 +712,7 @@ void vout_SetDisplayViewpoint(vout_display_t *vd,
 static vout_display_t *DisplayNew(vlc_object_t *parent,
                                   const video_format_t *source,
                                   const vout_display_cfg_t *cfg,
-                                  const char *module, bool is_splitter,
+                                  const char *module,
                                   const vout_display_owner_t *owner)
 {
     vout_display_priv_t *osys = vlc_custom_create(parent, sizeof (*osys),
@@ -728,7 +724,6 @@ static vout_display_t *DisplayNew(vlc_object_t *parent,
     vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
-    osys->is_splitter = is_splitter;
 
     atomic_init(&osys->reset_pictures, false);
     osys->pool = NULL;
@@ -753,7 +748,6 @@ static vout_display_t *DisplayNew(vlc_object_t *parent,
     vd->sys = NULL;
     vd->owner = *owner;
 
-    if (!is_splitter) {
         vd->module = vlc_module_load(vd, "vout display", module,
                                      module && *module != '\0',
                                      vout_display_start, vd, &osys->cfg,
@@ -775,10 +769,6 @@ static vout_display_t *DisplayNew(vlc_object_t *parent,
             vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE,
                                  (unsigned)VOUT_WINDOW_STATE_ABOVE);
 #endif
-    } else {
-        video_format_Copy(&vd->fmt, &vd->source);
-        vd->module = NULL;
-    }
 
     if (VoutDisplayCreateRender(vd)) {
         if (vd->module != NULL)
@@ -798,7 +788,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (cfg != NULL && !osys->is_splitter)
+    if (cfg != NULL)
         *cfg = osys->cfg;
 
     vout_display_Delete(vd);
@@ -809,8 +799,6 @@ void vout_display_Delete(vout_display_t *vd)
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     VoutDisplayDestroyRender(vd);
-    if (osys->is_splitter)
-        SplitterClose(vd);
 
     if (osys->pool != NULL)
         picture_pool_Release(osys->pool);
@@ -829,159 +817,5 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
                                  const char *module,
                                  const vout_display_owner_t *owner)
 {
-    return DisplayNew(parent, source, cfg, module, false, owner);
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-struct vout_display_sys_t {
-    video_splitter_t *splitter;
-
-    /* */
-    int            count;
-    picture_t      **picture;
-    vout_display_t **display;
-};
-
-static void SplitterEvent(vout_display_t *vd, int event, va_list args)
-{
-    //vout_display_owner_sys_t *osys = vd->owner.sys;
-
-    switch (event) {
-    default:
-        msg_Err(vd, "splitter event not implemented: %d", event);
-        (void) args;
-        break;
-    }
-}
-
-static void SplitterPrepare(vout_display_t *vd,
-                            picture_t *picture,
-                            subpicture_t *subpicture, vlc_tick_t date)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    picture_Hold(picture);
-    assert(!subpicture);
-
-    if (video_splitter_Filter(sys->splitter, sys->picture, picture)) {
-        for (int i = 0; i < sys->count; i++)
-            sys->picture[i] = NULL;
-        return;
-    }
-
-    for (int i = 0; i < sys->count; i++)
-        sys->picture[i] = vout_display_Prepare(sys->display[i],
-                                               sys->picture[i], NULL, date);
-}
-static void SplitterDisplay(vout_display_t *vd, picture_t *picture)
-{
-    vout_display_sys_t *sys = vd->sys;
-    VLC_UNUSED(picture);
-
-    for (int i = 0; i < sys->count; i++) {
-        if (sys->picture[i])
-            vout_display_Display(sys->display[i], sys->picture[i]);
-    }
-}
-static int SplitterControl(vout_display_t *vd, int query, va_list args)
-{
-    (void)vd; (void)query; (void)args;
-    return VLC_EGENERIC;
-}
-
-static void SplitterClose(vout_display_t *vd)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    video_splitter_t *splitter = sys->splitter;
-    video_splitter_Delete(splitter);
-
-    /* */
-    for (int i = 0; i < sys->count; i++) {
-        vout_window_t *wnd = sys->display[i]->cfg->window;
-
-        vout_display_Delete(sys->display[i]);
-        vout_display_window_Delete(wnd);
-    }
-    TAB_CLEAN(sys->count, sys->display);
-    free(sys->picture);
-
-    free(sys);
-}
-
-vout_display_t *vout_NewSplitter(vout_thread_t *vout,
-                                 const video_format_t *source,
-                                 const vout_display_cfg_t *cfg,
-                                 const char *module,
-                                 const char *splitter_module)
-{
-    video_splitter_t *splitter =
-        video_splitter_New(VLC_OBJECT(vout), splitter_module, source);
-    if (!splitter)
-        return NULL;
-
-    /* */
-    vout_display_t *wrapper =
-        DisplayNew(VLC_OBJECT(vout), source, cfg, module, true, NULL);
-    if (!wrapper) {
-        video_splitter_Delete(splitter);
-        return NULL;
-    }
-    vout_display_sys_t *sys = malloc(sizeof(*sys));
-    if (!sys)
-        abort();
-    sys->picture = calloc(splitter->i_output, sizeof(*sys->picture));
-    if (!sys->picture )
-        abort();
-    sys->splitter = splitter;
-
-    wrapper->pool    = NULL;
-    wrapper->prepare = SplitterPrepare;
-    wrapper->display = SplitterDisplay;
-    wrapper->control = SplitterControl;
-    wrapper->sys     = sys;
-
-    /* */
-    TAB_INIT(sys->count, sys->display);
-    for (int i = 0; i < splitter->i_output; i++) {
-        vout_display_owner_t vdo = {
-            .event      = SplitterEvent,
-        };
-        const video_splitter_output_t *output = &splitter->p_output[i];
-        vout_window_cfg_t wcfg = {
-            .width = cfg->display.width,
-            .height = cfg->display.height,
-            .is_decorated = true,
-        };
-        vout_display_cfg_t ocfg = {
-            .display = cfg->display,
-            .align = { 0, 0 } /* TODO */,
-            .is_display_filled = true,
-            .zoom = { 1, 1 },
-        };
-
-        vout_display_GetDefaultDisplaySize(&wcfg.width, &wcfg.height,
-                                           source, &ocfg);
-        ocfg.window = vout_display_window_New(vout, &wcfg);
-        if (unlikely(ocfg.window == NULL)) {
-            vout_display_Delete(wrapper);
-            return NULL;
-        }
-
-        vout_display_t *vd = DisplayNew(VLC_OBJECT(vout), &output->fmt, &ocfg,
-                                        output->psz_module ? output->psz_module : module,
-                                        false, &vdo);
-        if (!vd) {
-            vout_display_Delete(wrapper);
-            if (ocfg.window != NULL)
-                vout_display_window_Delete(ocfg.window);
-            return NULL;
-        }
-        TAB_APPEND(sys->count, sys->display, vd);
-    }
-
-    return wrapper;
+    return DisplayNew(parent, source, cfg, module, owner);
 }
