@@ -73,18 +73,19 @@ int vout_OpenWrapper(vout_thread_t *vout,
     vout_display_owner_t owner = {
         .event = VoutDisplayEvent, .sys = vout,
     };
+    const char *modlist;
+    char *modlistbuf = NULL;
 
     msg_Dbg(vout, "Opening vout display wrapper");
 
-    /* */
-    char *modlist = var_InheritString(vout, "vout");
-
-    if (splitter_name)
-        vd = vout_NewSplitter(vout, &vout->p->original, cfg, modlist, splitter_name);
+    if (splitter_name == NULL)
+        modlist = modlistbuf = var_InheritString(vout, "vout");
     else
-        vd = vout_display_New(VLC_OBJECT(vout), &vout->p->original, cfg,
-                              modlist, &owner);
-    free(modlist);
+        modlist = "splitter,none";
+
+    vd = vout_display_New(VLC_OBJECT(vout), &vout->p->original, cfg, modlist,
+                          &owner);
+    free(modlistbuf);
 
     if (vd == NULL)
         return VLC_EGENERIC;
