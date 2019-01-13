@@ -35,6 +35,7 @@
 #include <vlc_video_splitter.h>
 
 struct vlc_vidsplit_part {
+    vout_window_t *window;
     vout_display_t *display;
     vlc_sem_t lock;
     unsigned width;
@@ -104,11 +105,10 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 
     for (int i = 0; i < n; i++) {
         struct vlc_vidsplit_part *part = &sys->parts[i];
-        vout_window_t *wnd = part->display->cfg->window;
 
         vout_display_Delete(part->display);
-        vout_window_Disable(wnd);
-        vout_window_Delete(wnd);
+        vout_window_Disable(part->window);
+        vout_window_Delete(part->window);
         vlc_sem_destroy(&part->lock);
     }
 
@@ -231,14 +231,15 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
         part->width = 1;
         part->height = 1;
 
-        vdcfg.window = video_splitter_CreateWindow(obj, &vdcfg, &output->fmt,
+        part->window = video_splitter_CreateWindow(obj, &vdcfg, &output->fmt,
                                                    part);
-        if (vdcfg.window == NULL) {
+        if (part->window == NULL) {
             splitter->i_output = i;
             vlc_vidsplit_Close(vd);
             return VLC_EGENERIC;
         }
 
+        vdcfg.window = part->window;
         display = vlc_vidsplit_CreateDisplay(obj, &output->fmt, &vdcfg,
                                              modname);
         if (display == NULL) {
