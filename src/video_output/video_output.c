@@ -1169,7 +1169,7 @@ static int ThreadDisplayRenderPicture(vout_thread_t *vout, bool is_forced)
 #if 0
     vlc_tick_t delay = todisplay->date - vlc_tick_now();
     if (delay < 1000)
-        msg_Warn(vout, "picture is late (%lld ms)", delay / 1000);
+        msg_Warn(vout, "picture is late (%"PRId64" ms)", delay / 1000);
 #endif
     if (!is_forced)
         vlc_tick_wait(todisplay->date);
