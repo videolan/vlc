@@ -299,8 +299,7 @@ typedef struct
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 
 static int Mouse( video_splitter_t *, vlc_mouse_t *,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
+                  int i_index, const vlc_mouse_t *p_new );
 
 
 /* */
@@ -786,11 +785,9 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
  * It converts mouse events
  */
 static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
-                  int i_index,
-                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+                  int i_index, const vlc_mouse_t *p_new )
 {
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
-    VLC_UNUSED(p_old);
 
     for( int y = 0; y < p_sys->i_row; y++ )
     {

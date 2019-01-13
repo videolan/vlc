@@ -93,8 +93,7 @@ struct video_splitter_t
     int             (*pf_filter)( video_splitter_t *, picture_t *pp_dst[],
                                   picture_t *p_src );
     int             (*pf_mouse) ( video_splitter_t *, vlc_mouse_t *,
-                                  int i_index,
-                                  const vlc_mouse_t *p_old, const vlc_mouse_t *p_new );
+                                  int i_index, const vlc_mouse_t *p_new );
 
     void *p_sys;
 };
@@ -145,15 +144,14 @@ static inline int video_splitter_Filter( video_splitter_t *p_splitter,
 }
 static inline int video_splitter_Mouse( video_splitter_t *p_splitter,
                                         vlc_mouse_t *p_mouse,
-                                        int i_index,
-                                        const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
+                                        int i_index, const vlc_mouse_t *p_new )
 {
     if( !p_splitter->pf_mouse )
     {
         *p_mouse = *p_new;
         return VLC_SUCCESS;
     }
-    return p_splitter->pf_mouse( p_splitter, p_mouse, i_index, p_old, p_new );
+    return p_splitter->pf_mouse( p_splitter, p_mouse, i_index, p_new );
 }
 
 #endif /* VLC_VIDEO_SPLITTER_H */
