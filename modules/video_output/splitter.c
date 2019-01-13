@@ -105,8 +105,16 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 
     for (int i = 0; i < n; i++) {
         struct vlc_vidsplit_part *part = &sys->parts[i];
+        vout_display_t *display;
 
-        vout_display_Delete(part->display);
+        vlc_sem_wait(&part->lock);
+        display = part->display;
+        part->display = NULL;
+        vlc_sem_post(&part->lock);
+
+        if (display != NULL)
+            vout_display_Delete(display);
+
         vout_window_Disable(part->window);
         vout_window_Delete(part->window);
         vlc_sem_destroy(&part->lock);
@@ -131,9 +139,24 @@ static void vlc_vidsplit_window_Resized(vout_window_t *wnd,
     vlc_sem_post(&part->lock);
 }
 
+static void vlc_vidsplit_window_Closed(vout_window_t *wnd)
+{
+    struct vlc_vidsplit_part *part = wnd->owner.sys;
+    vout_display_t *display;
+
+    vlc_sem_wait(&part->lock);
+    display = part->display;
+    part->display = NULL;
+    vlc_sem_post(&part->lock);
+
+    if (display != NULL)
+        vout_display_Delete(display);
+}
+
 static const struct vout_window_callbacks vlc_vidsplit_window_cbs =
 {
     .resized = vlc_vidsplit_window_Resized,
+    .closed = vlc_vidsplit_window_Closed,
 };
 
 static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
