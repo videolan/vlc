@@ -44,6 +44,7 @@ struct vlc_vidsplit_part {
 
 struct vout_display_sys_t {
     video_splitter_t splitter;
+    vlc_mutex_t lock;
 
     picture_t **pictures;
     struct vlc_vidsplit_part *parts;
@@ -57,11 +58,15 @@ static void vlc_vidsplit_Prepare(vout_display_t *vd, picture_t *pic,
     picture_Hold(pic);
     (void) subpic;
 
+    vlc_mutex_lock(&sys->lock);
     if (video_splitter_Filter(&sys->splitter, sys->pictures, pic)) {
+        vlc_mutex_unlock(&sys->lock);
+
         for (int i = 0; i < sys->splitter.i_output; i++)
             sys->pictures[i] = NULL;
         return;
     }
+    vlc_mutex_unlock(&sys->lock);
 
     for (int i = 0; i < sys->splitter.i_output; i++) {
         struct vlc_vidsplit_part *part = &sys->parts[i];
@@ -122,6 +127,7 @@ static void vlc_vidsplit_Close(vout_display_t *vd)
 
     module_unneed(&sys->splitter, sys->splitter.p_module);
     video_format_Clean(&sys->splitter.fmt);
+    vlc_mutex_destroy(&sys->lock);
     vlc_object_release(&sys->splitter);
 }
 
@@ -153,10 +159,25 @@ static void vlc_vidsplit_window_Closed(vout_window_t *wnd)
         vout_display_Delete(display);
 }
 
-static const struct vout_window_callbacks vlc_vidsplit_window_cbs =
+static void vlc_vidsplit_window_MouseEvent(vout_window_t *wnd,
+                                           const vout_window_mouse_event_t *e)
 {
+    struct vlc_vidsplit_part *part = wnd->owner.sys;
+    vout_display_t *vd = (vout_display_t *)wnd->obj.parent;
+    vout_display_sys_t *sys = vd->sys;
+    vout_window_mouse_event_t ev = *e;
+
+    vlc_mutex_lock(&sys->lock);
+    if (video_splitter_Mouse(&sys->splitter, part - sys->parts,
+                             &ev) == VLC_SUCCESS)
+        vout_window_SendMouseEvent(vd->cfg->window, &ev);
+    vlc_mutex_unlock(&sys->lock);
+}
+
+static const struct vout_window_callbacks vlc_vidsplit_window_cbs = {
     .resized = vlc_vidsplit_window_Resized,
     .closed = vlc_vidsplit_window_Closed,
+    .mouse_event = vlc_vidsplit_window_MouseEvent,
 };
 
 static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
@@ -217,12 +238,14 @@ static int vlc_vidsplit_Open(vout_display_t *vd,
 
     video_splitter_t *splitter = &sys->splitter;
 
+    vlc_mutex_init(&sys->lock);
     video_format_Copy(&splitter->fmt, &vd->source);
 
     splitter->p_module = module_need(splitter, "video splitter", name, true);
     free(name);
     if (splitter->p_module == NULL) {
         video_format_Clean(&splitter->fmt);
+        vlc_mutex_destroy(&sys->lock);
         vlc_object_release(splitter);
         return VLC_EGENERIC;
     }
