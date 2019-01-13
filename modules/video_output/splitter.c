@@ -174,10 +174,21 @@ static void vlc_vidsplit_window_MouseEvent(vout_window_t *wnd,
     vlc_mutex_unlock(&sys->lock);
 }
 
+static void vlc_vidsplit_window_KeyboardEvent(vout_window_t *wnd, unsigned key)
+{
+    vout_display_t *vd = (vout_display_t *)wnd->obj.parent;
+    vout_display_sys_t *sys = vd->sys;
+
+    vlc_mutex_lock(&sys->lock);
+    vout_window_ReportKeyPress(vd->cfg->window, key);
+    vlc_mutex_unlock(&sys->lock);
+}
+
 static const struct vout_window_callbacks vlc_vidsplit_window_cbs = {
     .resized = vlc_vidsplit_window_Resized,
     .closed = vlc_vidsplit_window_Closed,
     .mouse_event = vlc_vidsplit_window_MouseEvent,
+    .keyboard_event = vlc_vidsplit_window_KeyboardEvent,
 };
 
 static vout_window_t *video_splitter_CreateWindow(vlc_object_t *obj,
