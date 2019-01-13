@@ -121,7 +121,7 @@ static void WindowSetFullscreen(vout_window_t *p_wnd, const char *psz_id)
         return;
     }
 
-    int i_full = psz_id == &windowed;
+    int i_full = psz_id != &windowed;
     BOOL b_animation = YES;
 
     @autoreleasepool {
