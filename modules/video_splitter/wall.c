@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
+#include <vlc_vout_window.h>
 
 #define ROW_MAX (15)
 #define COL_MAX (15)
@@ -108,8 +109,7 @@ typedef struct
 } video_splitter_sys_t;
 
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
-static int Mouse( video_splitter_t *, vlc_mouse_t *,
-                  int i_index, const vlc_mouse_t *p_new );
+static int Mouse( video_splitter_t *, int, vout_window_mouse_event_t * );
 
 /**
  * This function allocates and initializes a Wall splitter module.
@@ -367,7 +367,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_splitter->pf_filter = Filter;
-    p_splitter->pf_mouse = Mouse;
+    p_splitter->mouse = Mouse;
 
     return VLC_SUCCESS;
 }
@@ -422,8 +422,8 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
     picture_Release( p_src );
     return VLC_SUCCESS;
 }
-static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
-                  int i_index, const vlc_mouse_t *p_new )
+static int Mouse( video_splitter_t *p_splitter, int i_index,
+                  vout_window_mouse_event_t *restrict ev )
 {
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
@@ -432,11 +432,11 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
         for( int x = 0; x < p_sys->i_col; x++ )
         {
             wall_output_t *p_output = &p_sys->pp_output[x][y];
+
             if( p_output->b_active && p_output->i_output == i_index )
             {
-                *p_mouse = *p_new;
-                p_mouse->i_x += p_output->i_left;
-                p_mouse->i_y += p_output->i_top;
+                ev->x += p_output->i_left;
+                ev->y += p_output->i_top;
                 return VLC_SUCCESS;
             }
         }

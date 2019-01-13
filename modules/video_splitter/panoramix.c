@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_video_splitter.h>
+#include <vlc_vout_window.h>
 
 #define OVERLAP
 
@@ -298,9 +299,7 @@ typedef struct
 /* */
 static int Filter( video_splitter_t *, picture_t *pp_dst[], picture_t * );
 
-static int Mouse( video_splitter_t *, vlc_mouse_t *,
-                  int i_index, const vlc_mouse_t *p_new );
-
+static int Mouse( video_splitter_t *, int, vout_window_mouse_event_t * );
 
 /* */
 static int Configuration( panoramix_output_t pp_output[ROW_MAX][COL_MAX],
@@ -692,7 +691,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_splitter->pf_filter = Filter;
-    p_splitter->pf_mouse  = Mouse;
+    p_splitter->mouse = Mouse;
 
     return VLC_SUCCESS;
 }
@@ -784,8 +783,8 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
 /**
  * It converts mouse events
  */
-static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
-                  int i_index, const vlc_mouse_t *p_new )
+static int Mouse( video_splitter_t *p_splitter, int i_index,
+                  vout_window_mouse_event_t *restrict ev )
 {
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
@@ -796,14 +795,14 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
             const panoramix_output_t *p_output = &p_sys->pp_output[x][y];
             if( p_output->b_active && p_output->i_output == i_index )
             {
-                const int i_x = p_new->i_x - p_output->filter.black.i_left;
-                const int i_y = p_new->i_y - p_output->filter.black.i_top;
+                const int i_x = ev->x - p_output->filter.black.i_left;
+                const int i_y = ev->y - p_output->filter.black.i_top;
+
                 if( i_x >= 0 && i_x < p_output->i_width  - p_output->filter.black.i_right &&
                     i_y >= 0 && i_y < p_output->i_height - p_output->filter.black.i_bottom )
                 {
-                    *p_mouse = *p_new;
-                    p_mouse->i_x = p_output->i_src_x + i_x;
-                    p_mouse->i_y = p_output->i_src_y + i_y;
+                    ev->x = p_output->i_src_x + i_x;
+                    ev->y = p_output->i_src_y + i_y;
                     return VLC_SUCCESS;
                 }
             }

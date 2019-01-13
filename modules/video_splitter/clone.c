@@ -155,7 +155,7 @@ static int Open( vlc_object_t *p_this )
 
     /* */
     p_splitter->pf_filter = Filter;
-    p_splitter->pf_mouse  = NULL;
+    p_splitter->mouse = NULL;
 
     msg_Dbg( p_splitter, "spawning %i clone(s)", p_splitter->i_output );
 

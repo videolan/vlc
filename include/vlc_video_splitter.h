@@ -36,6 +36,8 @@
 
 typedef struct video_splitter_t video_splitter_t;
 
+struct vout_window_mouse_event_t;
+
 /** Structure describing a video splitter output properties
  */
 typedef struct
@@ -92,8 +94,8 @@ struct video_splitter_t
 
     int             (*pf_filter)( video_splitter_t *, picture_t *pp_dst[],
                                   picture_t *p_src );
-    int             (*pf_mouse) ( video_splitter_t *, vlc_mouse_t *,
-                                  int i_index, const vlc_mouse_t *p_new );
+    int (*mouse)(video_splitter_t *, int idx,
+                 struct vout_window_mouse_event_t *);
 
     void *p_sys;
 };
@@ -142,16 +144,12 @@ static inline int video_splitter_Filter( video_splitter_t *p_splitter,
 {
     return p_splitter->pf_filter( p_splitter, pp_dst, p_src );
 }
-static inline int video_splitter_Mouse( video_splitter_t *p_splitter,
-                                        vlc_mouse_t *p_mouse,
-                                        int i_index, const vlc_mouse_t *p_new )
+
+static inline int video_splitter_Mouse(video_splitter_t *splitter, int index,
+                                       struct vout_window_mouse_event_t *ev)
 {
-    if( !p_splitter->pf_mouse )
-    {
-        *p_mouse = *p_new;
-        return VLC_SUCCESS;
-    }
-    return p_splitter->pf_mouse( p_splitter, p_mouse, i_index, p_new );
+    return (splitter->mouse != NULL)
+        ? splitter->mouse(splitter, index, ev) : VLC_SUCCESS;
 }
 
 #endif /* VLC_VIDEO_SPLITTER_H */
