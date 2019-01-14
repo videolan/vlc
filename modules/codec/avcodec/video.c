@@ -1739,9 +1739,6 @@ no_reuse:
             continue; /* Unsupported codec profile or such */
         }
 
-        if (va->description != NULL)
-            msg_Info(p_dec, "Using %s for hardware decoding", va->description);
-
         p_sys->p_va = va;
         p_sys->pix_fmt = hwfmt;
         p_context->draw_horiz_band = NULL;

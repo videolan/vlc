@@ -327,10 +327,14 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
+    char *desc = DxDescribe(sys);
+    if (desc != NULL)
+        msg_Info(va, "Using %s", desc);
+
     ctx->hwaccel_context = &sys->hw;
 
     /* TODO print the hardware name/vendor for debugging purposes */
-    va->description = DxDescribe(sys);
+    va->description = desc;
     va->get     = Get;
     return VLC_SUCCESS;
 
