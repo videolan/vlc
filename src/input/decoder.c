@@ -89,7 +89,7 @@ struct decoder_owner
     es_format_t    fmt;
 
     /* */
-    bool           b_fmt_description;
+    atomic_bool    b_fmt_description;
     vlc_meta_t     *p_description;
     atomic_int     reload;
 
@@ -284,7 +284,8 @@ static void DecoderUpdateFormatLocked( decoder_t *p_dec )
         p_dec->p_description = NULL;
     }
 
-    p_owner->b_fmt_description = true;
+    atomic_store_explicit( &p_owner->b_fmt_description, true,
+                           memory_order_release );
 }
 
 static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
@@ -1875,7 +1876,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_sout_input = NULL;
     p_owner->p_packetizer = NULL;
 
-    p_owner->b_fmt_description = false;
+    atomic_init( &p_owner->b_fmt_description, false );
     p_owner->p_description = NULL;
 
     p_owner->reset_out_state = false;
@@ -2572,11 +2573,12 @@ void input_DecoderFrameNext( decoder_t *p_dec, vlc_tick_t *pi_duration )
 bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_meta_t **pp_meta )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    bool b_changed;
+
+    if( !atomic_exchange_explicit( &p_owner->b_fmt_description, false,
+                                   memory_order_acquire ) )
+        return false;
 
     vlc_mutex_lock( &p_owner->lock );
-    b_changed = p_owner->b_fmt_description;
-    if( b_changed )
     {
         if( p_fmt != NULL )
             es_format_Copy( p_fmt, &p_owner->fmt );
@@ -2591,10 +2593,9 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_me
                     vlc_meta_Merge( *pp_meta, p_owner->p_description );
             }
         }
-        p_owner->b_fmt_description = false;
     }
     vlc_mutex_unlock( &p_owner->lock );
-    return b_changed;
+    return true;
 }
 
 size_t input_DecoderGetFifoSize( decoder_t *p_dec )
