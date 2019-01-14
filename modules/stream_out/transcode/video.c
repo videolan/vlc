@@ -281,25 +281,6 @@ static void transcode_video_filter_init( sout_stream_t *p_stream,
 
         /* Update encoder so it matches filters output */
         transcode_encoder_update_format_in( id->encoder, p_src );
-
-        /* FIXME: modifying decoder output size from filters
-         *        sounds really suspicious an buggy
-         *        see also size adaption already done in conversion_video_filter_append() */
-        const es_format_t *enc_out = transcode_encoder_format_out( id->encoder );
-        if( enc_out->video.i_width != p_dst->video.i_width ||
-            enc_out->video.i_height != p_dst->video.i_height ||
-            enc_out->video.i_sar_num != p_dst->video.i_sar_num ||
-            enc_out->video.i_sar_den != p_dst->video.i_sar_den )
-        {
-            es_format_t tmp;
-            es_format_Copy( &tmp, enc_out );
-            tmp.video.i_width = p_dst->video.i_width;
-            tmp.video.i_height = p_dst->video.i_height;
-            tmp.video.i_sar_num = p_dst->video.i_sar_num;
-            tmp.video.i_sar_den = p_dst->video.i_sar_den;
-            transcode_encoder_update_format_in( id->encoder, &tmp );
-            es_format_Clean( &tmp );
-        }
     }
 }
 
