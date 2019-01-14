@@ -33,7 +33,6 @@ struct vlc_va_t {
     struct vlc_common_members obj;
 
     vlc_va_sys_t *sys;
-    module_t *module;
     const char *description;
 
     int  (*get)(vlc_va_t *, picture_t *pic, uint8_t **surface);

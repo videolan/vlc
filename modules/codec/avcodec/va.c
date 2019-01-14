@@ -110,20 +110,26 @@ static void vlc_va_Stop(void *func, va_list ap)
     close(va, hwctx);
 }
 
+struct vlc_va_priv {
+    struct vlc_va_t va;
+    module_t *module;
+};
+
 vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
                      enum PixelFormat pix_fmt, const es_format_t *fmt,
-                     void *p_sys)
+                     void *sys)
 {
-    vlc_va_t *va = vlc_object_create(obj, sizeof (*va));
-    if (unlikely(va == NULL))
+    struct vlc_va_priv *priv = vlc_object_create(obj, sizeof (*priv));
+    if (unlikely(priv == NULL))
         return NULL;
 
+    struct vlc_va_t *va = &priv->va;
     char *modlist = var_InheritString(obj, "avcodec-hw");
 
-    va->module = vlc_module_load(va, "hw decoder", modlist, true,
-                                 vlc_va_Start, va, avctx, pix_fmt, fmt, p_sys);
+    priv->module = vlc_module_load(va, "hw decoder", modlist, true,
+                                   vlc_va_Start, va, avctx, pix_fmt, fmt, sys);
     free(modlist);
-    if (va->module == NULL)
+    if (priv->module == NULL)
     {
         vlc_object_release(va);
         va = NULL;
@@ -133,6 +139,8 @@ vlc_va_t *vlc_va_New(vlc_object_t *obj, AVCodecContext *avctx,
 
 void vlc_va_Delete(vlc_va_t *va, void **hwctx)
 {
-    vlc_module_unload(va, va->module, vlc_va_Stop, va, hwctx);
+    struct vlc_va_priv *priv = container_of(va, struct vlc_va_priv, va);
+
+    vlc_module_unload(va, priv->module, vlc_va_Stop, va, hwctx);
     vlc_object_release(va);
 }
