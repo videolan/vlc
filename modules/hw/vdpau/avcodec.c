@@ -194,10 +194,7 @@ static int Open(vlc_va_t *va, AVCodecContext *avctx, enum PixelFormat pix_fmt,
     const char *infos;
     if (vdp_get_information_string(sys->vdp, &infos) == VDP_STATUS_OK)
         msg_Info(va, "Using %s", infos);
-    else
-        infos = "VDPAU";
 
-    va->description = infos;
     va->get = Lock;
     return VLC_SUCCESS;
 

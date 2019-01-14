@@ -212,7 +212,6 @@ static int Create(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
 
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
-    va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = Get;
     return VLC_SUCCESS;
 
@@ -333,7 +332,6 @@ static int CreateDRM(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt
 
     ctx->hwaccel_context = &sys->hw_ctx;
     va->sys = sys;
-    va->description = vaQueryVendorString(sys->hw_ctx.display);
     va->get = GetDRM;
     return VLC_SUCCESS;
 

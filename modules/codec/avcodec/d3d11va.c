@@ -304,7 +304,6 @@ static void Close(vlc_va_t *va, void **ctx)
 
     D3D11_Destroy( &sys->hd3d );
 
-    free((char *)va->description);
     free(sys);
 }
 
@@ -395,14 +394,15 @@ static int Open(vlc_va_t *va, AVCodecContext *ctx, enum PixelFormat pix_fmt,
     if (err != VLC_SUCCESS)
         goto error;
 
+    /* TODO print the hardware name/vendor for debugging purposes */
     char *desc = DxDescribe(sys);
-    if (desc != NULL)
+    if (desc != NULL) {
         msg_Info(va, "Using %s", desc);
+        free(desc);
+    }
 
     ctx->hwaccel_context = &sys->hw;
 
-    /* TODO print the hardware name/vendor for debugging purposes */
-    va->description = desc;
     va->get     = Get;
 
     return VLC_SUCCESS;
