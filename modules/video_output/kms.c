@@ -762,7 +762,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->display = Display;
     vd->control = Control;
 
-    vout_window_ReportSize(cfg->window, sys->width, sys->height);
     (void) context;
     return VLC_SUCCESS;
 }
