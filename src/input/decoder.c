@@ -2579,19 +2579,17 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_me
         return false;
 
     vlc_mutex_lock( &p_owner->lock );
-    {
-        if( p_fmt != NULL )
-            es_format_Copy( p_fmt, &p_owner->fmt );
+    if( p_fmt != NULL )
+        es_format_Copy( p_fmt, &p_owner->fmt );
 
-        if( pp_meta )
+    if( pp_meta )
+    {
+        *pp_meta = NULL;
+        if( p_owner->p_description )
         {
-            *pp_meta = NULL;
-            if( p_owner->p_description )
-            {
-                *pp_meta = vlc_meta_New();
-                if( *pp_meta )
-                    vlc_meta_Merge( *pp_meta, p_owner->p_description );
-            }
+            *pp_meta = vlc_meta_New();
+            if( *pp_meta )
+                vlc_meta_Merge( *pp_meta, p_owner->p_description );
         }
     }
     vlc_mutex_unlock( &p_owner->lock );
