@@ -263,10 +263,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         vout_display_PlacePicture(&place, &vd->source, cfg);
         if (place.width  != vd->fmt.i_visible_width
          || place.height != vd->fmt.i_visible_height)
-        {
-            vout_display_SendEventPicturesInvalid(vd);
-            return VLC_SUCCESS;
-        }
+            return VLC_EGENERIC;
 
         const uint32_t values[] = { place.x, place.y,
                                     place.width, place.height, };
@@ -280,8 +277,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_ZOOM:
     case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-        vout_display_SendEventPicturesInvalid (vd);
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     default:
         msg_Err(vd, "unknown control request %d", query);
         return VLC_EGENERIC;
