@@ -44,7 +44,7 @@
 //#define AVFORMAT_DEBUG 1
 
 static const char *const ppsz_mux_options[] = {
-    "mux", "options", NULL
+    "mux", "options", "reset-ts", NULL
 };
 
 /*****************************************************************************
@@ -64,6 +64,7 @@ struct sout_mux_sys_t
 #if LIBAVFORMAT_VERSION_CHECK( 57, 7, 0, 40, 100 )
     bool     b_header_done;
 #endif
+    bool     b_reset_ts;
 };
 
 /*****************************************************************************
@@ -150,6 +151,7 @@ int avformat_OpenMux( vlc_object_t *p_this )
     p_sys->io->write_data_type = IOWriteTyped;
     p_sys->b_header_done = false;
 #endif
+    p_sys->b_reset_ts = var_GetBool( p_mux, "sout-avformat-reset-ts" );
 
     /* Fill p_mux fields */
     p_mux->pf_control   = Control;
@@ -361,8 +363,15 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
     }
 
     if( p_data->i_pts > 0 )
+    {
+        if( p_sys->b_reset_ts )
+        {
+            p_sys->oc->output_ts_offset = -p_data->i_pts;
+            p_sys->b_reset_ts = false;
+        }
         pkt.pts = p_data->i_pts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num;
+    }
     if( p_data->i_dts > 0 )
         pkt.dts = p_data->i_dts * p_stream->time_base.den /
             CLOCK_FREQ / p_stream->time_base.num;
