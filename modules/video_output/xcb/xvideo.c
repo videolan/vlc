@@ -601,9 +601,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
     xcb_void_cookie_t ck;
     video_format_t fmt;
-    bool dummy;
 
-    vlc_xcb_Manage(vd, p_sys->conn, &dummy);
+    vlc_xcb_Manage(vd, p_sys->conn);
 
     video_format_ApplyRotation(&fmt, &vd->source);
 

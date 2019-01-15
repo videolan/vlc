@@ -47,4 +47,4 @@ struct vout_window_t *vlc_xcb_parent_Create(vout_display_t *obj,
 /**
  * Processes XCB events.
  */
-int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn, bool *visible);
+int vlc_xcb_Manage(vout_display_t *vd, xcb_connection_t *conn);

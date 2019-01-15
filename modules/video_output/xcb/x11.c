@@ -90,9 +90,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
     const picture_buffer_t *buf = pic->p_sys;
     xcb_shm_seg_t segment = sys->segment;
     xcb_void_cookie_t ck;
-    bool dummy;
 
-    vlc_xcb_Manage(vd, sys->conn, &dummy);
+    vlc_xcb_Manage(vd, sys->conn);
 
     if (sys->attached)
         ck = xcb_shm_put_image_checked(conn, sys->window, sys->gc,

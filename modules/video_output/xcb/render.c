@@ -243,9 +243,8 @@ static void Display(vout_display_t *vd, picture_t *pic)
     vout_display_sys_t *sys = vd->sys;
     xcb_connection_t *conn = sys->conn;
     xcb_void_cookie_t ck;
-    bool visible_dummy;
 
-    vlc_xcb_Manage(vd, conn, &visible_dummy);
+    vlc_xcb_Manage(vd, conn);
 
     /* Copy the scaled picture into the target picture, in other words
      * copy the rendered pixmap into the window.
