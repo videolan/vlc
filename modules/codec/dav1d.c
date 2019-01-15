@@ -141,7 +141,7 @@ static int NewPicture(Dav1dPicture *img, void *cookie)
     v->pose = dec->fmt_in.video.pose;
     dec->fmt_out.video.i_chroma = dec->fmt_out.i_codec = FindVlcChroma(img);
 
-    if (decoder_UpdateVideoFormat(dec) == VLC_SUCCESS)
+    if (decoder_UpdateVideoFormat(dec) == 0)
     {
         picture_t *pic = decoder_NewPicture(dec);
         if (likely(pic != NULL))
