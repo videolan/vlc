@@ -46,7 +46,6 @@ struct vout_display_sys_t
     xcb_gcontext_t gc; /* context to put images */
     xcb_shm_seg_t segment; /**< shared memory segment XID */
     bool attached;
-    bool visible; /* whether to draw */
     uint8_t depth; /* useful bits per pixel */
     video_format_t fmt;
 };
@@ -91,13 +90,12 @@ static void Display (vout_display_t *vd, picture_t *pic)
     const picture_buffer_t *buf = pic->p_sys;
     xcb_shm_seg_t segment = sys->segment;
     xcb_void_cookie_t ck;
+    bool dummy;
 
-    vlc_xcb_Manage(vd, sys->conn, &sys->visible);
+    vlc_xcb_Manage(vd, sys->conn, &dummy);
 
-    if (sys->visible)
-    {
-        if (sys->attached)
-            ck = xcb_shm_put_image_checked(conn, sys->window, sys->gc,
+    if (sys->attached)
+        ck = xcb_shm_put_image_checked(conn, sys->window, sys->gc,
               /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
              /* real height */ pic->p->i_lines,
                        /* x */ sys->fmt.i_x_offset,
@@ -106,31 +104,28 @@ static void Display (vout_display_t *vd, picture_t *pic)
                   /* height */ sys->fmt.i_visible_height,
                                0, 0, sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
                                0, segment, buf->offset);
-        else
-        {
-            const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
-            const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
+    else {
+        const size_t offset = sys->fmt.i_y_offset * pic->p->i_pitch;
+        const unsigned lines = pic->p->i_lines - sys->fmt.i_y_offset;
 
-            ck = xcb_put_image_checked(conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
+        ck = xcb_put_image_checked(conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                                sys->window, sys->gc,
                                pic->p->i_pitch / pic->p->i_pixel_pitch,
                                lines, -sys->fmt.i_x_offset, 0, 0, sys->depth,
                                pic->p->i_pitch * lines,
                                pic->p->p_pixels + offset);
-        }
-
-        /* Wait for reply. This makes sure that the X server gets CPU time to
-         * display the picture. xcb_flush() is *not* sufficient: especially
-         * with shared memory the PUT requests are so short that many of them
-         * can fit in X11 socket output buffer before the kernel preempts VLC.
-         */
-        xcb_generic_error_t *e = xcb_request_check(conn, ck);
-        if (e != NULL)
-        {
-            msg_Err(vd, "%s: X11 error %d", "cannot put image", e->error_code);
-            free(e);
-        }
     }
+
+    /* Wait for reply. This makes sure that the X server gets CPU time to
+     * display the picture. xcb_flush() is *not* sufficient: especially
+     * with shared memory the PUT requests are so short that many of them
+     * can fit in X11 socket output buffer before the kernel preempts VLC.
+     */
+   xcb_generic_error_t *e = xcb_request_check(conn, ck);
+   if (e != NULL) {
+       msg_Err(vd, "%s: X11 error %d", "cannot put image", e->error_code);
+       free(e);
+   }
 
     /* FIXME might be WAY better to wait in some case (be carefull with
      * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
@@ -320,7 +315,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         /* XCB_CW_BORDER_PIXEL */
         scr->black_pixel,
         /* XCB_CW_EVENT_MASK */
-        XCB_EVENT_MASK_VISIBILITY_CHANGE,
+        0,
         /* XCB_CW_COLORMAP */
         cmap,
     };
@@ -341,7 +336,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     msg_Dbg (vd, "using X11 window %08"PRIx32, sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, sys->gc);
 
-    sys->visible = false;
     if (XCB_shm_Check (VLC_OBJECT(vd), conn))
         sys->segment = xcb_generate_id(conn);
     else
