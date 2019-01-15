@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist_legacy.h>  /* playlist_t */
+#include <vlc_player.h>  /* vlc_player_t */
 
 #include <qconfig.h>
 
@@ -104,6 +105,28 @@ struct vlc_playlist_locker {
 
     private:
         playlist_t* p_playlist;
+};
+
+/**
+ * This class may be used for scope-bound locking/unlocking
+ * of a player_t*. As hinted, the player is locked when
+ * the object is created, and unlocked when the object is
+ * destroyed.
+ */
+struct vlc_player_locker {
+    vlc_player_locker( vlc_player_t* p_player )
+        : p_player( p_player )
+    {
+        vlc_player_Lock( p_player );
+    }
+
+    ~vlc_player_locker()
+    {
+        vlc_player_Unlock( p_player );
+    }
+
+    private:
+        vlc_player_t* p_player;
 };
 
 #define THEDP DialogsProvider::getInstance()
