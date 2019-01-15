@@ -51,7 +51,7 @@ endif
 	$(UPDATE_AUTOCONFIG)
 	$(MOVE)
 
-DEPS_ass = freetype2 $(DEPS_freetype2) fribidi
+DEPS_ass = freetype2 $(DEPS_freetype2) fribidi iconv $(DEPS_iconv)
 
 ifneq ($(WITH_FONTCONFIG), 0)
 DEPS_ass += fontconfig $(DEPS_fontconfig)
