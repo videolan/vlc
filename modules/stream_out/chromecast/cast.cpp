@@ -1227,9 +1227,9 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
         ssout << "}:";
     }
 
-    const bool is_webm = ( i_codec_audio == 0 || i_codec_audio == VLC_CODEC_VORBIS ||
+    const bool is_webm = ( i_codec_audio == VLC_CODEC_VORBIS ||
                            i_codec_audio == VLC_CODEC_OPUS ) &&
-                         ( i_codec_video == 0 || i_codec_video == VLC_CODEC_VP8 ||
+                         ( i_codec_video == VLC_CODEC_VP8 ||
                            i_codec_video == VLC_CODEC_VP9 );
 
     if ( !p_original_video )
