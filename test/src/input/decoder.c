@@ -167,24 +167,22 @@ decoder_t *test_decoder_create(vlc_object_t *parent, const es_format_t *fmt)
     static const struct decoder_owner_callbacks dec_video_cbs =
     {
         .video = {
-            NULL,
-            video_new_buffer_decoder,
-            queue_video,
-            queue_cc,
+            .buffer_new = video_new_buffer_decoder,
+            .queue = queue_video,
+            .queue_cc = queue_cc,
         },
     };
     static const struct decoder_owner_callbacks dec_audio_cbs =
     {
         .audio = {
-            NULL,
-            queue_audio,
+            .queue = queue_audio,
         },
     };
     static const struct decoder_owner_callbacks dec_spu_cbs =
     {
         .spu = {
-            spu_new_buffer_decoder,
-            queue_sub,
+            .buffer_new = spu_new_buffer_decoder,
+            .queue = queue_sub,
         },
     };
 
