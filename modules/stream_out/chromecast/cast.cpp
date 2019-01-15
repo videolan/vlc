@@ -173,8 +173,8 @@ struct sout_stream_id_sys_t
 
 #define SOUT_CFG_PREFIX "sout-chromecast-"
 
-static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1}}";
-static const char DEFAULT_MUXER_WEBM[] = "avformat{mux=webm,options={live=1}}";
+static const char DEFAULT_MUXER[] = "avformat{mux=matroska,options={live=1},reset-ts}";
+static const char DEFAULT_MUXER_WEBM[] = "avformat{mux=webm,options={live=1},reset-ts}";
 
 
 /*****************************************************************************
