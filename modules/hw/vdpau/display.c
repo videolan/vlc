@@ -172,8 +172,6 @@ static void Queue(vout_display_t *vd, picture_t *pic, subpicture_t *subpic,
     {
         msg_Err(vd, "presentation queue time failure: %s",
                 vdp_get_error_string(sys->vdp, err));
-        if (err == VDP_STATUS_DISPLAY_PREEMPTED)
-            vout_display_SendEventPicturesInvalid(vd);
         return;
     }
 
