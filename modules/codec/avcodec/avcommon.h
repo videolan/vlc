@@ -60,6 +60,9 @@
 #define AV_OPTIONS_TEXT     N_("Advanced options")
 #define AV_OPTIONS_LONGTEXT N_("Advanced options, in the form {opt=val,opt2=val2}.")
 
+#define AV_RESET_TS_TEXT     N_("Reset timestamps")
+#define AV_RESET_TS_LONGTEXT N_("The muxed content will start near a 0 timestamp.")
+
 static inline void vlc_av_get_options(const char *psz_opts, AVDictionary** pp_dict)
 {
     config_chain_t *cfg = NULL;
