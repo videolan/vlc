@@ -154,6 +154,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         const vout_display_cfg_t *cfg = va_arg(ap, const vout_display_cfg_t *);
         video_format_t src, *fmt = &sys->fmt;
         vout_display_place_t place;
+        int ret = VLC_SUCCESS;
 
         vout_display_PlacePicture(&place, &vd->source, cfg);
 
@@ -166,7 +167,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
          || place.height != sys->fmt.i_visible_height)
         {
             mask |= XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
-            vout_display_SendEventPicturesInvalid(vd);
+            ret = VLC_EGENERIC;
         }
 
         /* Move the picture within the window */
@@ -181,7 +182,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
         fmt->i_x_offset = src.i_x_offset * place.width / src.i_visible_width;
         fmt->i_y_offset = src.i_y_offset * place.height / src.i_visible_height;
 
-        return VLC_SUCCESS;
+        return ret;
     }
 
     case VOUT_DISPLAY_RESET_PICTURES:
