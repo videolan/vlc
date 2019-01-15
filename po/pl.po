@@ -1,20 +1,20 @@
 # Polish translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2018
+# Michał Trzebiatowski <michtrz@gmail.com>, 2007-2019
 # Michał Ryszard Balicki <balicki93@gmail.com>, 2015
-# Grzegorz Pruchniakowski <gootector@o2.pl>, 2013-2017
+# Grzegorz Pruchniakowski <gootector@o2.pl>, 2013-2018
 # Daniel Krawczyk <daniekonepl@gmail.com>, 2014
 # Marcin Szymański <cysioland@gmail.com>, 2013
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:16+0200\n"
-"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2018\n"
+"PO-Revision-Date: 2019-01-15 19:09+0100\n"
+"Last-Translator: Michał Trzebiatowski <michtrz@gmail.com>, 2019\n"
 "Language-Team: Polish (https://www.transifex.com/yaron/teams/16553/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -23796,9 +23796,8 @@ msgid "avparser packetizer"
 msgstr "Pakietowiec avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Pakietowiec obrazu Daala"
+msgstr "Pakietowiec obrazu AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
