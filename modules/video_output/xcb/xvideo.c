@@ -323,6 +323,8 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     vout_display_PlacePicture(&p_sys->place, &vd->source, cfg);
 
     xcb_xv_adaptor_info_iterator_t it;
+    const xcb_xv_format_t *f;
+
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
          it.rem > 0;
          xcb_xv_adaptor_info_next (&it))
@@ -343,65 +345,65 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (p_sys->att == NULL) /* No acceptable image formats */
             continue;
 
+        /* Look for an X11 visual, create a window */
+        uint_fast16_t i;
+        f = xcb_xv_adaptor_info_formats(a);
+
+        for (i = 0; i < a->num_formats; i++)
+            if (f[i].depth == screen->root_depth)
+                break; /* this would fail anyway */
+
+        if (i == a->num_formats) {
+            msg_Dbg(vd, "no usable X11 visual");
+            continue;
+        }
+
         p_sys->port = a->base_id;
 
         /* Found port - initialize selected format */
-        msg_Dbg (vd, "using adaptor %.*s", (int)a->name_size,
-                 xcb_xv_adaptor_info_name (a));
-        msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
-        msg_Dbg (vd, "using image format 0x%"PRIx32, p_sys->id);
-
-        /* Look for an X11 visual, create a window */
-        xcb_xv_format_t *f = xcb_xv_adaptor_info_formats (a);
-        for (uint_fast16_t i = a->num_formats; i > 0; i--, f++)
-        {
-            if (f->depth != screen->root_depth)
-                continue; /* this would fail anyway */
-
-            uint32_t mask =
-                XCB_CW_BACK_PIXEL |
-                XCB_CW_BORDER_PIXEL |
-                XCB_CW_EVENT_MASK |
-                XCB_CW_COLORMAP;
-            const uint32_t list[] = {
-                /* XCB_CW_BACK_PIXEL */
-                screen->black_pixel,
-                /* XCB_CW_BORDER_PIXEL */
-                screen->black_pixel,
-                /* XCB_CW_EVENT_MASK */
-                0,
-                /* XCB_CW_COLORMAP */
-                screen->default_colormap,
-            };
-            xcb_void_cookie_t c;
-
-            c = xcb_create_window_checked (conn, f->depth, p_sys->window,
-                 cfg->window->handle.xid, p_sys->place.x, p_sys->place.y,
-                 p_sys->place.width, p_sys->place.height, 0,
-                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
-            xcb_map_window (conn, p_sys->window);
-
-            if (!vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
-            {
-                msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32
-                         " (depth: %"PRIu8")", f->visual, f->depth);
-                msg_Dbg (vd, "using X11 window 0x%08"PRIx32, p_sys->window);
-                goto created_window;
-            }
-        }
-        p_sys->port = 0;
-        msg_Dbg (vd, "no usable X11 visual");
-        continue; /* No workable XVideo format (visual/depth) */
-
-    created_window:
+        msg_Dbg(vd, "using adaptor %.*s", (int)a->name_size,
+                xcb_xv_adaptor_info_name(a));
+        msg_Dbg(vd, "using port %"PRIu32, p_sys->port);
+        msg_Dbg(vd, "using image format 0x%"PRIx32, p_sys->id);
+        msg_Dbg(vd, "using X11 visual ID 0x%"PRIx32" (depth: %"PRIu8")",
+                f->visual, f->depth);
         break;
     }
-    free (adaptors);
     if (!p_sys->port)
     {
+        free(adaptors);
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
     }
+
+    uint32_t mask =
+        XCB_CW_BACK_PIXEL |
+        XCB_CW_BORDER_PIXEL |
+        XCB_CW_EVENT_MASK |
+        XCB_CW_COLORMAP;
+    const uint32_t list[] = {
+        /* XCB_CW_BACK_PIXEL */
+        screen->black_pixel,
+        /* XCB_CW_BORDER_PIXEL */
+        screen->black_pixel,
+        /* XCB_CW_EVENT_MASK */
+        0,
+        /* XCB_CW_COLORMAP */
+        screen->default_colormap,
+    };
+    xcb_void_cookie_t c;
+
+    c = xcb_create_window_checked(conn, f->depth, p_sys->window,
+                 cfg->window->handle.xid, p_sys->place.x, p_sys->place.y,
+                 p_sys->place.width, p_sys->place.height, 0,
+                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual, mask, list);
+    free(adaptors);
+
+    if (vlc_xcb_error_Check(vd, conn, "cannot create X11 window", c))
+        goto error;
+
+    xcb_map_window(conn, p_sys->window);
+    msg_Dbg (vd, "using X11 window 0x%08"PRIx32, p_sys->window);
 
     /* Create graphic context */
     p_sys->gc = xcb_generate_id (conn);
