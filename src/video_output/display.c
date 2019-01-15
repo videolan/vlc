@@ -289,8 +289,9 @@ typedef struct {
      /* filters to convert the vout source to fmt, NULL means no conversion
       * can be done and nothing will be displayed */
     filter_chain_t *converters;
-
+#ifdef _WIN32
     atomic_bool reset_pictures;
+#endif
     picture_pool_t *pool;
 } vout_display_priv_t;
 
@@ -370,11 +371,16 @@ static void VoutDisplayDestroyRender(vout_display_t *vd)
 
 void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
+#ifdef _WIN32
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    msg_Warn(vd, "picture buffers invalidated");
+    msg_Err(vd, "picture buffers invalidated asynchronously");
     assert(vd->info.has_pictures_invalid);
     atomic_store_explicit(&osys->reset_pictures, true, memory_order_release);
+#else
+    (void) vd;
+    vlc_assert_unreachable();
+#endif
 }
 
 static void VoutDisplayCropRatio(int *left, int *top, int *right, int *bottom,
@@ -485,6 +491,7 @@ static void vout_display_Reset(vout_display_t *vd)
 
 static void vout_display_CheckReset(vout_display_t *vd)
 {
+#ifdef _WIN32
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
     if (unlikely(atomic_exchange_explicit(&osys->reset_pictures, false,
@@ -492,6 +499,9 @@ static void vout_display_CheckReset(vout_display_t *vd)
         atomic_thread_fence(memory_order_acquire);
         vout_display_Reset(vd);
     }
+#else
+    (void) vd;
+#endif
 }
 
 static int vout_UpdateSourceCrop(vout_display_t *vd)
@@ -747,8 +757,9 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     vout_display_GetDefaultDisplaySize(&osys->cfg.display.width,
                                        &osys->cfg.display.height,
                                        source, &osys->cfg);
-
+#ifdef _WIN32
     atomic_init(&osys->reset_pictures, false);
+#endif
     osys->pool = NULL;
 
     osys->source = *source;
