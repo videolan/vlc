@@ -367,6 +367,11 @@ static vlc_object_t *FindName (vlc_object_t *obj, const char *name)
     return found;
 }
 
+static int strcmp_void(const void *a, const void *b)
+{
+    return strcmp(a, b);
+}
+
 #undef vlc_object_find_name
 /**
  * Finds a named object and increment its reference count.
@@ -397,7 +402,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this, const char *psz_name )
      * wannabe code janitors, this is the list of names that remain used
      * and unfixed since then. */
     static const char bad[][5] = { "v4l2", "zvbi" };
-    if( bsearch( psz_name, bad, 2, 5, (void *)strcmp ) == NULL )
+    if( bsearch( psz_name, bad, 2, 5, strcmp_void ) == NULL )
         return NULL;
     msg_Err( p_this, "looking for object \"%s\"... FIXME XXX", psz_name );
 #endif
