@@ -247,15 +247,6 @@ FindFormat (vlc_object_t *obj, xcb_connection_t *conn, video_format_t *fmt,
         if (chroma == 0)
             continue;
 
-        /* Oink oink! */
-        if ((chroma == VLC_CODEC_I420 || chroma == VLC_CODEC_YV12)
-         && a->name_size >= 4
-         && !memcmp ("OMAP", xcb_xv_adaptor_info_name (a), 4))
-        {
-            msg_Dbg (obj, "skipping slow I420 format");
-            continue; /* OMAP framebuffer sucks at YUV 4:2:0 */
-        }
-
         if (!BetterFormat (chroma, chromav, &rank))
             continue;
 
