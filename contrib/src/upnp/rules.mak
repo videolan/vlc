@@ -34,6 +34,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/upnp/windows-version-inet.patch
 	$(APPLY) $(SRC)/upnp/libupnp-win32-exports.patch
 	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-checks.patch
+	$(APPLY) $(SRC)/upnp/libupnp-pthread-w32-force.patch
 ifdef HAVE_WINSTORE
 	$(APPLY) $(SRC)/upnp/no-getifinfo.patch
 endif
