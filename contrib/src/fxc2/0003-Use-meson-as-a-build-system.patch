@@ -1,0 +1,47 @@
+From 6289103998e7eb564e05f0866f4e5e9ba8afca45 Mon Sep 17 00:00:00 2001
+From: Pierre Lamot <pierre.lamot@yahoo.fr>
+Date: Mon, 14 Jan 2019 09:49:38 +0100
+Subject: [PATCH 3/4] Use meson as a build system
+
+---
+ meson.build | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+ create mode 100644 meson.build
+
+diff --git a/meson.build b/meson.build
+new file mode 100644
+index 0000000..a3a8601
+--- /dev/null
++++ b/meson.build
+@@ -0,0 +1,28 @@
++project('fxc2', 'cpp')
++
++if host_machine.system() != 'windows' or not host_machine.cpu_family().startswith('x86')
++  error('only compilation for windows i686/x86_64 is supported')
++endif
++
++executable(
++  'fxc2',
++  'fxc2.cpp',
++  override_options : [
++    'b_lundef=false',
++    'b_asneeded=false'
++  ],
++  link_args: ['-static'],
++  install: true
++)
++
++d3dcompiler_dll = []
++if host_machine.cpu_family() == 'x86'
++  d3dcompiler_dll += 'dll/d3dcompiler_47_32.dll'
++else
++  d3dcompiler_dll += 'dll/d3dcompiler_47.dll'
++endif
++
++install_data(d3dcompiler_dll,
++  rename: ['d3dcompiler_47.dll'],
++  install_dir : 'bin'
++)
+-- 
+2.19.1
+
