@@ -343,27 +343,8 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         if (p_sys->att == NULL) /* No acceptable image formats */
             continue;
 
-        /* Grab a port */
-        for (unsigned i = 0; i < a->num_ports; i++)
-        {
-             xcb_xv_port_t port = a->base_id + i;
-             xcb_xv_grab_port_reply_t *gr =
-                 xcb_xv_grab_port_reply (conn,
-                     xcb_xv_grab_port (conn, port, XCB_CURRENT_TIME), NULL);
-             uint8_t result = gr ? gr->result : 0xff;
+        p_sys->port = a->base_id;
 
-             free (gr);
-             if (result == 0)
-             {
-                 p_sys->port = port;
-                 goto grabbed_port;
-             }
-             msg_Dbg (vd, "cannot grab port %"PRIu32": Xv error %"PRIu8, port,
-                      result);
-        }
-        continue; /* No usable port */
-
-    grabbed_port:
         /* Found port - initialize selected format */
         msg_Dbg (vd, "using adaptor %.*s", (int)a->name_size,
                  xcb_xv_adaptor_info_name (a));
@@ -408,7 +389,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
                 goto created_window;
             }
         }
-        xcb_xv_ungrab_port (conn, p_sys->port, XCB_CURRENT_TIME);
         p_sys->port = 0;
         msg_Dbg (vd, "no usable X11 visual");
         continue; /* No workable XVideo format (visual/depth) */
