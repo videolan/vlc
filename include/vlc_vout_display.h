@@ -117,8 +117,13 @@ typedef struct {
  * Control query for vout_display_t
  */
 enum {
-    /* Ask to reset the internal buffers after calling
-     * vout_display_SendEventPicturesInvalid().
+    /* Ask to reset the internal buffers after a
+     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,
+     * \ref VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
+     * \ref VOUT_DISPLAY_CHANGE_ZOOM,
+     * \ref VOUT_DISPLAY_CHANGE_SOURCE_ASPECT or
+     * \ref VOUT_DISPLAY_CHANGE_SOURCE_CROP
+     * control query returns an error.
      */
     VOUT_DISPLAY_RESET_PICTURES, /* const vout_display_cfg_t *, es_format_t * */
 

@@ -581,6 +581,7 @@ static int vout_SetSourceAspect(vout_display_t *vd,
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    int err1 = 0, err2 = 0;
 
     if (source->i_sar_num * osys->source.i_sar_den !=
         source->i_sar_den * osys->source.i_sar_num) {
@@ -591,8 +592,8 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
                     osys->source.i_sar_num, osys->source.i_sar_den, 0);
 
         /* FIXME it will override any AR that the user would have forced */
-        vout_SetSourceAspect(vd, osys->source.i_sar_num,
-                             osys->source.i_sar_den);
+        err1 = vout_SetSourceAspect(vd, osys->source.i_sar_num,
+                                    osys->source.i_sar_den);
     }
     if (source->i_x_offset       != osys->source.i_x_offset ||
         source->i_y_offset       != osys->source.i_y_offset ||
@@ -603,8 +604,12 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
 
         /* Force the vout to reapply the current user crop settings
          * over the new decoder crop settings. */
-        vout_UpdateSourceCrop(vd);
+        err2 = vout_UpdateSourceCrop(vd);
     }
+
+    if (err1 || err2)
+        vout_display_Reset(vd);
+
     vout_display_CheckReset(vd);
 }
 
@@ -614,7 +619,8 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
 
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg);
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg))
+        vout_display_Reset(vd);
     vout_display_CheckReset(vd);
 }
 
@@ -626,7 +632,9 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
         return; /* nothing to do */
 
     osys->cfg.is_display_filled = is_filled;
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &osys->cfg);
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED,
+                             &osys->cfg))
+        vout_display_Reset(vd);
     vout_display_CheckReset(vd);
 }
 
@@ -655,7 +663,8 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 
     osys->cfg.zoom.num = num;
     osys->cfg.zoom.den = den;
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg);
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg))
+        vout_display_Reset(vd);
     vout_display_CheckReset(vd);
 }
 
@@ -673,7 +682,8 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
         sar_den = 0;
     }
 
-    vout_SetSourceAspect(vd, sar_num, sar_den);
+    if (vout_SetSourceAspect(vd, sar_num, sar_den))
+        vout_display_Reset(vd);
     vout_display_CheckReset(vd);
 }
 
@@ -695,7 +705,8 @@ void vout_SetDisplayCrop(vout_display_t *vd,
         osys->crop.num    = crop_num;
         osys->crop.den    = crop_den;
 
-        vout_UpdateSourceCrop(vd);
+        if (vout_UpdateSourceCrop(vd))
+            vout_display_Reset(vd);
         vout_display_CheckReset(vd);
     }
 }
