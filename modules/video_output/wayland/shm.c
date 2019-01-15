@@ -213,7 +213,7 @@ static int Control(vout_display_t *vd, int query, va_list ap)
                                             place.width, place.height);
             }
             else
-                vout_display_SendEventPicturesInvalid(vd);
+                return VLC_EGENERIC;
             break;
         }
         default:
