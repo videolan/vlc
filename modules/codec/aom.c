@@ -235,7 +235,7 @@ static void OutputFrame(decoder_t *dec, const struct aom_image *img)
     dec->fmt_out.video.multiview_mode = dec->fmt_in.video.multiview_mode;
     dec->fmt_out.video.pose = dec->fmt_in.video.pose;
 
-    if (decoder_UpdateVideoFormat(dec) == VLC_SUCCESS)
+    if (decoder_UpdateVideoFormat(dec) == 0)
     {
         picture_t *pic = decoder_NewPicture(dec);
         if (pic)
