@@ -490,7 +490,7 @@ static void vout_display_Reset(vout_display_t *vd)
         msg_Err(vd, "Failed to adjust render format");
 }
 
-static void vout_UpdateSourceCrop(vout_display_t *vd)
+static int vout_UpdateSourceCrop(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
     unsigned crop_num = osys->crop.num;
@@ -533,7 +533,9 @@ static void vout_UpdateSourceCrop(vout_display_t *vd)
     vd->source.i_visible_height = bottom - top;
     video_format_Print(VLC_OBJECT(vd), "SOURCE ", &osys->source);
     video_format_Print(VLC_OBJECT(vd), "CROPPED", &vd->source);
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP, &osys->cfg);
+
+    int ret = vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_CROP,
+                                   &osys->cfg);
     osys->crop.left   = left - osys->source.i_x_offset;
     osys->crop.top    = top  - osys->source.i_y_offset;
     /* FIXME for right/bottom we should keep the 'type' border vs window */
@@ -543,12 +545,14 @@ static void vout_UpdateSourceCrop(vout_display_t *vd)
                         (osys->source.i_y_offset + osys->source.i_visible_height);
     osys->crop.num    = crop_num;
     osys->crop.den    = crop_den;
+    return ret;
 }
 
-static void vout_SetSourceAspect(vout_display_t *vd,
-                                 unsigned sar_num, unsigned sar_den)
+static int vout_SetSourceAspect(vout_display_t *vd,
+                                unsigned sar_num, unsigned sar_den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+    int ret = 0;
 
     if (sar_num > 0 && sar_den > 0) {
         vd->source.i_sar_num = sar_num;
@@ -558,12 +562,16 @@ static void vout_SetSourceAspect(vout_display_t *vd,
         vd->source.i_sar_den = osys->source.i_sar_den;
     }
 
-    vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
-                         &osys->cfg);
+    if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_SOURCE_ASPECT,
+                             &osys->cfg))
+        ret = -1;
 
     /* If a crop ratio is requested, recompute the parameters */
-    if (osys->crop.num != 0 && osys->crop.den != 0)
-        vout_UpdateSourceCrop(vd);
+    if (osys->crop.num != 0 && osys->crop.den != 0
+     && vout_UpdateSourceCrop(vd))
+        ret = -1;
+
+    return ret;
 }
 
 void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t *source)
