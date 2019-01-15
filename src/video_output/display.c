@@ -472,13 +472,6 @@ static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (likely(!atomic_exchange_explicit(&osys->reset_pictures, false,
-                                         memory_order_relaxed)))
-        return;
-
-    atomic_thread_fence(memory_order_acquire);
-    VoutDisplayDestroyRender(vd);
-
     if (osys->pool != NULL) {
         picture_pool_Release(osys->pool);
         osys->pool = NULL;
@@ -488,6 +481,17 @@ static void vout_display_Reset(vout_display_t *vd)
                              &vd->fmt)
      || VoutDisplayCreateRender(vd))
         msg_Err(vd, "Failed to adjust render format");
+}
+
+static void vout_display_CheckReset(vout_display_t *vd)
+{
+    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
+
+    if (unlikely(atomic_exchange_explicit(&osys->reset_pictures, false,
+                                          memory_order_relaxed))) {
+        atomic_thread_fence(memory_order_acquire);
+        vout_display_Reset(vd);
+    }
 }
 
 static int vout_UpdateSourceCrop(vout_display_t *vd)
@@ -601,7 +605,7 @@ void vout_UpdateDisplaySourceProperties(vout_display_t *vd, const video_format_t
          * over the new decoder crop settings. */
         vout_UpdateSourceCrop(vd);
     }
-    vout_display_Reset(vd);
+    vout_display_CheckReset(vd);
 }
 
 void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
@@ -611,7 +615,7 @@ void vout_display_SetSize(vout_display_t *vd, unsigned width, unsigned height)
     osys->cfg.display.width  = width;
     osys->cfg.display.height = height;
     vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &osys->cfg);
-    vout_display_Reset(vd);
+    vout_display_CheckReset(vd);
 }
 
 void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
@@ -623,7 +627,7 @@ void vout_SetDisplayFilled(vout_display_t *vd, bool is_filled)
 
     osys->cfg.is_display_filled = is_filled;
     vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, &osys->cfg);
-    vout_display_Reset(vd);
+    vout_display_CheckReset(vd);
 }
 
 void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
@@ -652,7 +656,7 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
     osys->cfg.zoom.num = num;
     osys->cfg.zoom.den = den;
     vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ZOOM, &osys->cfg);
-    vout_display_Reset(vd);
+    vout_display_CheckReset(vd);
 }
 
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_den)
@@ -670,7 +674,7 @@ void vout_SetDisplayAspect(vout_display_t *vd, unsigned dar_num, unsigned dar_de
     }
 
     vout_SetSourceAspect(vd, sar_num, sar_den);
-    vout_display_Reset(vd);
+    vout_display_CheckReset(vd);
 }
 
 void vout_SetDisplayCrop(vout_display_t *vd,
@@ -692,7 +696,7 @@ void vout_SetDisplayCrop(vout_display_t *vd,
         osys->crop.den    = crop_den;
 
         vout_UpdateSourceCrop(vd);
-        vout_display_Reset(vd);
+        vout_display_CheckReset(vd);
     }
 }
 
