@@ -133,62 +133,47 @@ static bool CheckXVideo (vout_display_t *vd, xcb_connection_t *conn)
 static vlc_fourcc_t ParseFormat (vlc_object_t *obj,
                                  const xcb_xv_image_format_info_t *restrict f)
 {
-    switch (f->type)
-    {
-      case XCB_XV_IMAGE_FORMAT_INFO_TYPE_YUV:
-        if (f->u_sample_bits != f->v_sample_bits
-         || f->vhorz_u_period != f->vhorz_v_period
-         || f->vvert_u_period != f->vvert_v_period
-         || f->y_sample_bits != 8 || f->u_sample_bits != 8
-         || f->vhorz_y_period != 1 || f->vvert_y_period != 1)
-            goto bad;
-        switch (f->num_planes)
-        {
-          case 1:
-            switch (f->bpp)
-            {
-              /*untested: case 24:
-                if (f->vhorz_u_period == 1 && f->vvert_u_period == 1)
-                    return VLC_CODEC_I444;
-                break;*/
-              case 16:
-                if (f->vhorz_u_period == 2 && f->vvert_u_period == 1)
-                {
+    if (f->type != XCB_XV_IMAGE_FORMAT_INFO_TYPE_YUV)
+        return 0; /* Ignore RGB, RENDER handles them better. */
+
+    if (f->u_sample_bits != f->v_sample_bits
+     || f->vhorz_u_period != f->vhorz_v_period
+     || f->vvert_u_period != f->vvert_v_period
+     || f->vhorz_y_period != 1 || f->vvert_y_period != 1)
+        return 0; /* Ignore insane formats with different U and V sampling. */
+
+    if (f->y_sample_bits != f->u_sample_bits)
+        return 0; /* ... or with different luma and chroma depth. */
+
+    if (f->y_sample_bits == 8) {
+        switch (f->num_planes) {
+            case 1:
+                if (f->bpp == 16
+                 && f->vhorz_u_period == 2 && f->vvert_u_period == 1) {
                     if (!strcmp ((const char *)f->vcomp_order, "YUYV"))
                         return VLC_CODEC_YUYV;
                     if (!strcmp ((const char *)f->vcomp_order, "UYVY"))
                         return VLC_CODEC_UYVY;
                 }
                 break;
-            }
-            break;
-          case 3:
-            switch (f->bpp)
-            {
-              case 12:
-                if (f->vhorz_u_period == 2 && f->vvert_u_period == 2)
-                {
+            case 3:
+                if (f->bpp == 12
+                 && f->vhorz_u_period == 2 && f->vvert_u_period == 2) {
                     if (!strcmp ((const char *)f->vcomp_order, "YVU"))
                         return VLC_CODEC_YV12;
                     if (!strcmp ((const char *)f->vcomp_order, "YUV"))
                         return VLC_CODEC_I420;
                 }
-            }
-            break;
+                break;
         }
-    bad:
-        msg_Err (obj, "unknown XVideo YUV format %"PRIx32" (%.4s)", f->id,
-                 f->guid);
-        msg_Dbg (obj, " %"PRIu8" planes, %"PRIu32" bits/pixel, "
-                 "%"PRIu32"/%"PRIu32"/%"PRIu32" bits/sample", f->num_planes,
-                 f->bpp, f->y_sample_bits, f->u_sample_bits, f->v_sample_bits);
-        msg_Dbg (obj, " period: %"PRIu32"/%"PRIu32"/%"PRIu32"x"
-                 "%"PRIu32"/%"PRIu32"/%"PRIu32,
-                 f->vhorz_y_period, f->vhorz_u_period, f->vhorz_v_period,
-                 f->vvert_y_period, f->vvert_u_period, f->vvert_v_period);
-        msg_Warn (obj, " order: %.32s", f->vcomp_order);
-        break;
     }
+
+    msg_Err(obj, "unknown XVideo YUV format %"PRIx32" (%.4s)", f->id, f->guid);
+    msg_Dbg(obj, " %"PRIu8" planes, %"PRIu32" bits/pixel, "
+            "%"PRIu32" bits/sample", f->num_planes, f->bpp, f->y_sample_bits);
+    msg_Dbg(obj, " period: %"PRIu32"x%"PRIu32,
+            f->vhorz_u_period, f->vvert_u_period);
+    msg_Warn(obj, " order: %.32s", f->vcomp_order);
     return 0;
 }
 
