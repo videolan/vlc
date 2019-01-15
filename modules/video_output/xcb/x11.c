@@ -296,21 +296,14 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
         cmap = scr->default_colormap;
 
     /* Create window */
-    xcb_pixmap_t pixmap = xcb_generate_id(conn);
     const uint32_t mask =
-        XCB_CW_BACK_PIXMAP |
         XCB_CW_BACK_PIXEL |
-        XCB_CW_BORDER_PIXMAP |
         XCB_CW_BORDER_PIXEL |
         XCB_CW_EVENT_MASK |
         XCB_CW_COLORMAP;
     const uint32_t values[] = {
-        /* XCB_CW_BACK_PIXMAP */
-        pixmap,
         /* XCB_CW_BACK_PIXEL */
         scr->black_pixel,
-        /* XCB_CW_BORDER_PIXMAP */
-        pixmap,
         /* XCB_CW_BORDER_PIXEL */
         scr->black_pixel,
         /* XCB_CW_EVENT_MASK */
@@ -324,7 +317,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     sys->window = xcb_generate_id (conn);
     sys->gc = xcb_generate_id (conn);
 
-    xcb_create_pixmap(conn, sys->depth, pixmap, scr->root, 1, 1);
     xcb_create_window(conn, sys->depth, sys->window, cfg->window->handle.xid,
         place.x, place.y, place.width, place.height, 0,
         XCB_WINDOW_CLASS_INPUT_OUTPUT, vid, mask, values);
