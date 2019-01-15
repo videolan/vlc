@@ -390,7 +390,14 @@ static int DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( ret == AVERROR(ENOMEM) || ret == AVERROR(EINVAL) )
                     goto end;
                 else
+                {
+                    char errorstring[AV_ERROR_MAX_STRING_SIZE];
+                    const char *psz_error = av_make_error_string( errorstring,
+                                                                  AV_ERROR_MAX_STRING_SIZE, ret );
+                    if( psz_error )
+                        msg_Err( p_dec, "%s", psz_error );
                     goto drop;
+                }
             }
         }
 
