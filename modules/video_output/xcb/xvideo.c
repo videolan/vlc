@@ -329,7 +329,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     p_sys->window = xcb_generate_id (conn);
-    xcb_pixmap_t pixmap = xcb_generate_id (conn);
 
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
@@ -403,19 +402,13 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
                 continue; /* this would fail anyway */
 
             uint32_t mask =
-                XCB_CW_BACK_PIXMAP |
                 XCB_CW_BACK_PIXEL |
-                XCB_CW_BORDER_PIXMAP |
                 XCB_CW_BORDER_PIXEL |
                 XCB_CW_EVENT_MASK |
                 XCB_CW_COLORMAP;
             const uint32_t list[] = {
-                /* XCB_CW_BACK_PIXMAP */
-                pixmap,
                 /* XCB_CW_BACK_PIXEL */
                 screen->black_pixel,
-                /* XCB_CW_BORDER_PIXMAP */
-                pixmap,
                 /* XCB_CW_BORDER_PIXEL */
                 screen->black_pixel,
                 /* XCB_CW_EVENT_MASK */
@@ -425,7 +418,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
             };
             xcb_void_cookie_t c;
 
-            xcb_create_pixmap (conn, f->depth, pixmap, screen->root, 1, 1);
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
                  cfg->window->handle.xid, p_sys->place.x, p_sys->place.y,
                  p_sys->place.width, p_sys->place.height, 0,
