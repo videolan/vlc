@@ -89,7 +89,6 @@ struct vout_display_sys_t
     uint32_t data_size;  /* picture byte size (for non-SHM) */
     bool     swap_uv;    /* U/V pointer must be swapped in a picture */
     bool shm;            /* whether to use MIT-SHM */
-    bool visible;        /* whether it makes sense to draw at all */
 
     xcb_xv_query_image_attributes_reply_t *att;
     picture_pool_t *pool; /* picture pool */
@@ -420,7 +419,7 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
                 /* XCB_CW_BORDER_PIXEL */
                 screen->black_pixel,
                 /* XCB_CW_EVENT_MASK */
-                XCB_EVENT_MASK_VISIBILITY_CHANGE,
+                0,
                 /* XCB_CW_COLORMAP */
                 screen->default_colormap,
             };
@@ -488,7 +487,6 @@ static int Open (vout_display_t *vd, const vout_display_cfg_t *cfg,
     }
 
     p_sys->shm = XCB_shm_Check (obj, conn);
-    p_sys->visible = false;
 
     /* Setup vout_display_t once everything is fine */
     p_sys->swap_uv = vlc_fourcc_AreUVPlanesSwapped (fmt.i_chroma,
@@ -603,11 +601,9 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_shm_seg_t segment = XCB_picture_GetSegment(pic);
     xcb_void_cookie_t ck;
     video_format_t fmt;
+    bool dummy;
 
-    vlc_xcb_Manage(vd, p_sys->conn, &p_sys->visible);
-
-    if (!p_sys->visible)
-        return;
+    vlc_xcb_Manage(vd, p_sys->conn, &dummy);
 
     video_format_ApplyRotation(&fmt, &vd->source);
 
