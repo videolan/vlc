@@ -799,14 +799,16 @@ AM_CONDITIONAL([HAVE_DYNAMIC_PLUGINS], [test "${have_dynamic_objects}" != "no"])
 
 AC_SUBST([LIBDL])
 
-AC_SEARCH_LIBS([clock_nanosleep], [rt pthread], [
-  AS_IF([test "$ac_cv_search_clock_nanosleep" != "none required"], [
-    LIBRT="$ac_cv_search_clock_nanosleep"
-  ])
-], [
-  AC_SEARCH_LIBS([nanosleep], [rt pthread posix4], [
-    AS_IF([test "$ac_cv_search_nanosleep" != "none required"], [
-      LIBRT="$ac_cv_search_nanosleep"
+AS_IF([test "${SYS}" != "mingw32"], [
+  AC_SEARCH_LIBS([clock_nanosleep], [rt pthread], [
+    AS_IF([test "$ac_cv_search_clock_nanosleep" != "none required"], [
+      LIBRT="$ac_cv_search_clock_nanosleep"
+    ])
+  ], [
+    AC_SEARCH_LIBS([nanosleep], [rt pthread posix4], [
+      AS_IF([test "$ac_cv_search_nanosleep" != "none required"], [
+        LIBRT="$ac_cv_search_nanosleep"
+      ])
     ])
   ])
 ])
