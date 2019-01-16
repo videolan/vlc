@@ -941,6 +941,9 @@ static block_t *OutputPicture( decoder_t *p_dec )
                 date_Decrement( &pts, -diff );
 
             p_pic->i_pts = date_Get( &pts );
+            /* non monotonically increasing dts on some videos 33333 33333...35000 */
+            if( p_pic->i_pts < p_pic->i_dts )
+                p_pic->i_pts = p_pic->i_dts;
         }
         /* In case there's no PTS at all */
         else if( CanSwapPTSwithDTS( &p_sys->slice, p_sps ) )
