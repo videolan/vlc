@@ -35,6 +35,9 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QProgressBar>
+#include <QMetaObject>
+#include <QMetaProperty>
+#include <QMetaMethod>
 
 RendererAction::RendererAction( vlc_renderer_item_t *p_item_ )
     : QAction()
@@ -195,4 +198,120 @@ void RendererMenu::RendererSelected(QAction *action)
         RendererManager::getInstance( p_intf )->SelectRenderer( ra->getItem() );
     else
         RendererManager::getInstance( p_intf )->SelectRenderer( NULL );
+}
+
+/*   CheckableListMenu   */
+
+CheckableListMenu::CheckableListMenu(QString title, QAbstractListModel* model , QWidget *parent)
+    : QMenu(parent)
+    , m_model(model)
+{
+    this->setTitle(title);
+    m_actionGroup = new QActionGroup( this );
+
+    connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved, this, &CheckableListMenu::onRowsAboutToBeRemoved);
+    connect(m_model, &QAbstractListModel::rowsInserted, this, &CheckableListMenu::onRowInserted);
+    connect(m_model, &QAbstractListModel::dataChanged, this, &CheckableListMenu::onDataChanged);
+    connect(m_model, &QAbstractListModel::modelAboutToBeReset, this, &CheckableListMenu::onModelAboutToBeReset);
+    connect(m_model, &QAbstractListModel::modelReset, this, &CheckableListMenu::onModelReset);
+    onModelReset();
+}
+
+void CheckableListMenu::onRowsAboutToBeRemoved(const QModelIndex &, int first, int last)
+{
+    for (int i = last; i >= first; i--)
+    {
+        QAction* action = actions()[i];
+        delete action;
+    }
+    if (actions().count() == 0)
+        setEnabled(false);
+}
+
+void CheckableListMenu::onRowInserted(const QModelIndex &, int first, int last)
+{
+    for (int i = first; i <= last; i++)
+    {
+        QModelIndex index = m_model->index(i);
+        QString title = m_model->data(index, Qt::DisplayRole).toString();
+        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
+
+        QAction *choiceAction = new QAction(title, this);
+        m_actionGroup->addAction(choiceAction);
+        addAction(choiceAction);
+        connect(choiceAction, &QAction::triggered, [this, i](bool checked){
+            QModelIndex dataIndex = m_model->index(i);
+            m_model->setData(dataIndex, QVariant::fromValue<bool>(checked), Qt::CheckStateRole);
+        });
+        choiceAction->setCheckable(true);
+        choiceAction->setChecked(checked);
+        setEnabled(true);
+    }
+}
+
+void CheckableListMenu::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> & )
+{
+    for (int i = topLeft.row(); i <= bottomRight.row(); i++)
+    {
+        if (i >= actions().size())
+            break;
+        QAction *choiceAction = actions()[i];
+
+        QModelIndex index = m_model->index(i);
+        QString title = m_model->data(index, Qt::DisplayRole).toString();
+        bool checked = m_model->data(index, Qt::CheckStateRole).toBool();
+
+        choiceAction->setText(title);
+        choiceAction->setChecked(checked);
+    }
+}
+
+void CheckableListMenu::onModelAboutToBeReset()
+{
+    for (QAction* action  :actions())
+        delete action;
+    setEnabled(false);
+}
+
+void CheckableListMenu::onModelReset()
+{
+    int nb_rows = m_model->rowCount();
+    if (nb_rows == 0)
+        setEnabled(false);
+    else
+        onRowInserted({}, 0, nb_rows - 1);
+}
+
+/*     BooleanPropertyAction    */
+
+BooleanPropertyAction::BooleanPropertyAction(QString title, QObject *model, QString propertyName, QWidget *parent)
+    : QAction(parent)
+    , m_model(model)
+    , m_propertyName(propertyName)
+{
+    setText(title);
+    assert(model);
+    const QMetaObject* meta = model->metaObject();
+    int propertyId = meta->indexOfProperty(qtu(propertyName));
+    assert(propertyId != -1);
+    QMetaProperty property = meta->property(propertyId);
+    assert(property.type() ==  QVariant::Bool);
+    const QMetaObject* selfMeta = this->metaObject();
+    if (property.hasNotifySignal())
+    {
+        QMetaMethod checkedSlot = selfMeta->method(selfMeta->indexOfSlot( "setChecked(bool)" ));
+        connect( model, property.notifySignal(), this, checkedSlot );
+        connect( this, &BooleanPropertyAction::toggled, this, &BooleanPropertyAction::setModelChecked );
+        setCheckable(true);
+    }
+    else
+    {
+        connect( this, &BooleanPropertyAction::triggered, this, &BooleanPropertyAction::setModelChecked );
+        setCheckable(true);
+    }
+}
+
+void BooleanPropertyAction::setModelChecked(bool checked)
+{
+    m_model->setProperty(qtu(m_propertyName), QVariant::fromValue<bool>(checked) );
 }

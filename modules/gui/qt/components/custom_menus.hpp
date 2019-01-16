@@ -24,6 +24,7 @@
 #include "qt.hpp"
 
 #include <QMenu>
+#include <QAbstractListModel>
 
 class RendererAction : public QAction
 {
@@ -63,5 +64,58 @@ private:
     intf_thread_t *p_intf;
 };
 
+
+/*
+ * Construct a menu from a QAbstractListModel with Qt::DisplayRole and Qt::CheckStateRole
+ */
+class CheckableListMenu : public QMenu
+{
+    Q_OBJECT
+public:
+    /**
+     * @brief CheckableListMenu
+     * @param title the title of the menu
+     * @param model the model to observe, the model should provide at least Qt::DisplayRole and Qt::CheckStateRole
+     * @param parent QObject parent
+     */
+    CheckableListMenu(QString title, QAbstractListModel* model , QWidget *parent = nullptr);
+
+private slots:
+    void onRowsAboutToBeRemoved(const QModelIndex &parent, int first, int last);
+    void onRowInserted(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int>());
+    void onModelAboutToBeReset();
+    void onModelReset();
+
+private:
+    QAbstractListModel* m_model;
+    QMenu * m_submenu;
+
+    QActionGroup* m_actionGroup;
+};
+
+
+/**
+ * @brief The BooleanPropertyAction class allows to bind a boolean Q_PROPRERTY to a QAction
+ */
+class BooleanPropertyAction: public QAction
+{
+    Q_OBJECT
+public:
+    /**
+     * @brief BooleanPropertyAction
+     * @param title the title of the menu
+     * @param model the object to observe
+     * @param propertyName the name of the property on the @a model
+     * @param parent QObject parent
+     */
+    BooleanPropertyAction(QString title, QObject* model , QString propertyName, QWidget *parent = nullptr);
+
+private slots:
+    void setModelChecked(bool checked);
+private:
+    QObject* m_model;
+    QString m_propertyName;
+};
 
 #endif // CUSTOM_MENUS_HPP
