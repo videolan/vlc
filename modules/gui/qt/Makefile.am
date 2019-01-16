@@ -38,6 +38,9 @@ endif
 if UPDATE_CHECK
 libqt_plugin_la_CPPFLAGS += -DUPDATE_CHECK
 endif
+if QT_QML_DEBUG
+libqt_plugin_la_CPPFLAGS += -DQT_QML_DEBUG
+endif
 
 libqt_plugin_la_SOURCES = \
 	gui/qt/qt.cpp gui/qt/qt.hpp \

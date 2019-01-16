@@ -61,6 +61,7 @@ extern "C" char **environ;
 
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <vlc_cxx_helpers.hpp>
 
 #ifdef QT_STATIC /* For static builds */
  #include <QtPlugin>
@@ -142,6 +143,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define UPDATER_LONGTEXT N_( "Activate the automatic notification of new " \
                             "versions of the software. It runs once every " \
                             "two weeks." )
+
+#define QT_QML_DEBUG_TEXT N_( "set the options for qml debugger" )
+#define QT_QML_DEBUG_LONGTEXT N_( "set the options for qml debugger (see http://doc.qt.io/qt-5/qtquick-debugging.html#starting-applications)" )
+
 #define UPDATER_DAYS_TEXT N_("Number of days between two update checks")
 
 #define PRIVACY_TEXT N_( "Ask for network policy at start" )
@@ -279,6 +284,11 @@ vlc_module_begin ()
               UPDATER_LONGTEXT, false )
     add_integer_with_range( "qt-updates-days", 3, 0, 180,
               UPDATER_DAYS_TEXT, UPDATER_DAYS_TEXT, false )
+#endif
+
+#ifdef QT_QML_DEBUG
+    add_string( "qt-qmljsdebugger", NULL,
+                QT_QML_DEBUG_TEXT, QT_QML_DEBUG_LONGTEXT, false )
 #endif
 
 #ifdef _WIN32
@@ -492,10 +502,30 @@ static void *Thread( void *obj )
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     intf_sys_t *p_sys = p_intf->p_sys;
     char vlc_name[] = "vlc"; /* for WM_CLASS */
-    char *argv[2];
+    char *argv[3] = { nullptr };
     int argc = 0;
 
-    argv[argc++] = vlc_name;
+    auto argvReleaser = vlc::wrap_carray<char*>(argv, [](char* ptr[]) {
+        for ( int i = 0; ptr[i] != nullptr; ++i )
+            free(ptr[i]);
+    });
+    argv[argc++] = strdup(vlc_name);
+
+#ifdef QT_QML_DEBUG
+    char* qmlJsDebugOpt = var_InheritString(p_intf, "qt-qmljsdebugger");
+    if (qmlJsDebugOpt)
+    {
+        msg_Dbg(p_intf, "option qt-qmljsdebugger is %s", qmlJsDebugOpt);
+        char* psz_debug_opt;
+        if (asprintf(&psz_debug_opt, "-qmljsdebugger=%s", qmlJsDebugOpt) < 0)
+        {
+            free(qmlJsDebugOpt);
+            return NULL;
+        }
+        argv[argc++] = psz_debug_opt;
+        free(qmlJsDebugOpt);
+    }
+#endif
     argv[argc] = NULL;
 
     Q_INIT_RESOURCE( vlc );
