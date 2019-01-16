@@ -420,7 +420,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     msg_Dbg(vd, "Direct3D11 device adapter successfully initialized");
 
     vd->info.has_double_click     = true;
-    vd->info.has_pictures_invalid = vd->info.is_slow;
     vd->info.can_scale_spu        = true;
 
     if (var_InheritBool(vd, "direct3d11-hw-blending") &&
