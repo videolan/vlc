@@ -254,6 +254,8 @@ void vout_display_TranslateMouseState(vout_display_t *vd, vlc_mouse_t *video,
             x = place.height - wy;
             y = place.width - wx;
             break;
+        default:
+            vlc_assert_unreachable();
     }
 
     video->i_x = vd->source.i_x_offset
