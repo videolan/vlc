@@ -139,6 +139,10 @@ static inline void vlc_init_avcodec(vlc_object_t *obj)
 }
 #endif
 
+#ifndef AV_ERROR_MAX_STRING_SIZE
+ #define AV_ERROR_MAX_STRING_SIZE 64
+#endif
+
 static inline vlc_rational_t FromAVRational(const AVRational rat)
 {
     return (vlc_rational_t){.num = rat.num, .den = rat.den};
