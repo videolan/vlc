@@ -108,7 +108,7 @@ typedef struct {
 typedef struct {
     bool is_slow;                           /* The picture memory has slow read/write */
     bool has_double_click;                  /* Is double-click generated */
-    bool has_pictures_invalid;              /* May invoke vout_display_SendEventPicturesInvalid() */
+    bool has_pictures_invalid;              /* Can handle VOUT_DISPLAY_RESET_PICTURES */
     bool can_scale_spu;                     /* Handles subpictures with a non default zoom factor */
     const vlc_fourcc_t *subpicture_chromas; /* List of supported chromas for subpicture rendering. */
 } vout_display_info_t;
