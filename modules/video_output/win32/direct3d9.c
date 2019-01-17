@@ -904,6 +904,41 @@ static int Direct3D9Reset(vout_display_t *vd, video_format_t *fmtp)
     return VLC_SUCCESS;
 }
 
+static void UpdateDesktopMode(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (!sys->sys.use_desktop) {
+        /* Save non-desktop state */
+        sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
+        sys->desktop_save.is_on_top     = sys->sys.is_on_top;
+
+        WINDOWPLACEMENT wp = { .length = sizeof(wp), };
+        GetWindowPlacement(sys->sys.hparent ? sys->sys.hparent : sys->sys.hwnd, &wp);
+        sys->desktop_save.win = wp.rcNormalPosition;
+    }
+
+    /* */
+    vlc_mutex_lock(&sys->lock);
+    sys->sys.use_desktop = sys->desktop_requested;
+    sys->ch_desktop = false;
+    vlc_mutex_unlock(&sys->lock);
+
+    if (sys->sys.use_desktop) {
+        /* Disable fullscreen/on_top while using desktop */
+        if (sys->desktop_save.is_fullscreen)
+            vout_display_SendEventFullscreen(vd, false);
+        if (sys->desktop_save.is_on_top)
+            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_NORMAL);
+    } else {
+        /* Restore fullscreen/on_top */
+        if (sys->desktop_save.is_fullscreen)
+            vout_display_SendEventFullscreen(vd, true);
+        if (sys->desktop_save.is_on_top)
+            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
+    }
+}
+
 static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1517,26 +1552,10 @@ static int ControlReopenDevice(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->sys.use_desktop) {
-        /* Save non-desktop state */
-        sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
-        sys->desktop_save.is_on_top     = sys->sys.is_on_top;
-
-        WINDOWPLACEMENT wp = { .length = sizeof(wp), };
-        GetWindowPlacement(sys->sys.hparent ? sys->sys.hparent : sys->sys.hwnd, &wp);
-        sys->desktop_save.win = wp.rcNormalPosition;
-    }
-
     /* */
     Direct3D9Close(vd);
     if (!sys->sys.b_windowless)
         EventThreadStop(sys->sys.event);
-
-    /* */
-    vlc_mutex_lock(&sys->lock);
-    sys->sys.use_desktop = sys->desktop_requested;
-    sys->ch_desktop = false;
-    vlc_mutex_unlock(&sys->lock);
 
     /* */
     event_cfg_t cfg;
@@ -1572,19 +1591,8 @@ static int ControlReopenDevice(vout_display_t *vd, video_format_t *fmtp)
     *fmtp = fmt;
     sys->sys.is_first_display = true;
 
-    if (sys->sys.use_desktop) {
-        /* Disable fullscreen/on_top while using desktop */
-        if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, false);
-        if (sys->desktop_save.is_on_top)
-            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_NORMAL);
-    } else {
-        /* Restore fullscreen/on_top */
-        if (sys->desktop_save.is_fullscreen)
-            vout_display_SendEventFullscreen(vd, true);
-        if (sys->desktop_save.is_on_top)
-            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
-    }
+    UpdateDesktopMode(vd);
+
     return VLC_SUCCESS;
 }
 
