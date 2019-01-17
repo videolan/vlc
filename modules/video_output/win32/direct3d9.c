@@ -140,7 +140,6 @@ struct vout_display_sys_t
         bool is_on_top;
         RECT win;
     } desktop_save;
-    vout_display_cfg_t cfg_saved; /* configuration used before going into desktop mode */
 
     // core objects
     d3d9_handle_t           hd3d;
