@@ -2,7 +2,6 @@
  * libvlc_events.h:  libvlc_events external API structure
  *****************************************************************************
  * Copyright (C) 1998-2010 VLC authors and VideoLAN
- * $Id $
  *
  * Authors: Filippo Carone <littlejohn@videolan.org>
  *          Pierre d'Herbemont <pdherbemont@videolan.org>

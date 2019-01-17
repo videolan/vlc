@@ -3,7 +3,6 @@
  * manipulation. This is internal and used only by media_list_player.
  *****************************************************************************
  * Copyright (C) 2005 VLC authors and VideoLAN
- * $Id $
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *
