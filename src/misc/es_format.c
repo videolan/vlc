@@ -2,7 +2,6 @@
  * es_format.c : es_format_t helpers.
  *****************************************************************************
  * Copyright (C) 2008 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Laurent Aimar <fenrir@videolan.org>
  *

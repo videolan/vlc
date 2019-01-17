@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2001-2007 VLC authors and VideoLAN
  * Copyright (C) 2012 KO Myung-Hun
- * $Id$
  *
  * Authors: Sam Hocevar <sam@zoy.org>
  *          Ethan C. Baldridge <BaldridgeE@cadmus.com>

@@ -2,7 +2,6 @@
  * VLCRemoteControlService.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2017, 2018 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Carola Nitz <nitz.carola # gmail.com>
  *          Felix Paul Kühne <fkuehne # videolan.org>

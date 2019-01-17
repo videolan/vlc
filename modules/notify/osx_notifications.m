@@ -5,7 +5,6 @@
  * item changes.
  *****************************************************************************
  * Copyright © 2008, 2011, 2012, 2015, 2018 the VideoLAN team
- * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
  *          Felix Paul Kühne <fkuehne@videolan.org

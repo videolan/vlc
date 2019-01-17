@@ -2,7 +2,6 @@
  * blend2.cpp: Blend one picture with alpha onto another picture
  *****************************************************************************
  * Copyright (C) 2012 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *

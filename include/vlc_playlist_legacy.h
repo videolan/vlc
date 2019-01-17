@@ -2,7 +2,6 @@
  * vlc_playlist_legacy.h : Legacy playlist functions
  *****************************************************************************
  * Copyright (C) 1999-2004 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *

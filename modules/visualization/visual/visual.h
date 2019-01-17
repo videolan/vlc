@@ -2,7 +2,6 @@
  * visual.h : Header for the visualisation system
  *****************************************************************************
  * Copyright (C) 2002-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@via.ecp.fr>
  *

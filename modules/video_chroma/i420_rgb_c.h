@@ -5,7 +5,6 @@
  * case by optimized functions.
  *****************************************************************************
  * Copyright (C) 1999, 2000 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
  *

@@ -2,7 +2,6 @@
  * VLCOpenWindowController.h: Open dialogues for VLC's MacOS X port
  *****************************************************************************
  * Copyright (C) 2002-2016 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>

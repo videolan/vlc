@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2008 Rémi Denis-Courmont
  * Copyright (C) 2009 Laurent Aimar
- * $Id$
  *
  * Authors: Laurent Aimar <fenrir _AT_ videolan _DOT_ org>
  *

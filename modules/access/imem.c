@@ -2,7 +2,6 @@
  * imem.c : Memory input for VLC
  *****************************************************************************
  * Copyright (C) 2009-2010 Laurent Aimar
- * $Id$
  *
  * Author: Laurent Aimar <fenrir _AT_ videolan _DOT org>
  *

@@ -2,7 +2,6 @@
  * VLCFSPanelDraggableView.h
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: David Fuhrmann <dfuhrmann at videolan dot org>
  *

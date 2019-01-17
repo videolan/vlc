@@ -2,7 +2,6 @@
  * vout_manager.hpp
  *****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
- * $Id$
  *
  * Authors: Erwan Tulou < brezhoneg1 at yahoo.fr r>
  *

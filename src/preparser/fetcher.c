@@ -2,7 +2,6 @@
  * fetcher.c
  *****************************************************************************
  * Copyright © 2017-2017 VLC authors and VideoLAN
- * $Id$
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by

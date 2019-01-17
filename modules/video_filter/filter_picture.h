@@ -2,7 +2,6 @@
  * filter_picture.h: Common picture functions for filters
  *****************************************************************************
  * Copyright (C) 2007 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan dot org>
  *

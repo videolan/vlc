@@ -2,7 +2,6 @@
  * VLCSlider.h
  *****************************************************************************
  * Copyright (C) 2017 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Marvin Scholz <epirat07 at gmail dot com>
  *

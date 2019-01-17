@@ -3,7 +3,6 @@
  *****************************************************************************
  * Copyright (C) 2005-2010 VLC authors and VideoLAN
  *
- * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
  *          Filippo Carone <littlejohn@videolan.org>

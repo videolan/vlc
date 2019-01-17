@@ -2,7 +2,6 @@
  * avcommon.h: common code for libav*
  *****************************************************************************
  * Copyright (C) 2012 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Rafaël Carré <funman@videolanorg>
  *

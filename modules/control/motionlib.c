@@ -2,7 +2,6 @@
  * motion.c: laptop built-in motion sensors
  *****************************************************************************
  * Copyright (C) 2006 - 2012 the VideoLAN team
- * $Id$
  *
  * Author: Sam Hocevar <sam@zoy.org>
  *         Jérôme Decoodt <djc@videolan.org> (unimotion integration)

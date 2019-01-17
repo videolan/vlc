@@ -2,7 +2,6 @@
  * equalizer.c
  *****************************************************************************
  * Copyright (C) 2011 VideoLAN and VLC authors
- * $Id$
  *
  * Authors: Akash Mehrotra < mehrotra <dot> akash <at> gmail <dot> com >
  *

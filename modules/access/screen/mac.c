@@ -2,7 +2,6 @@
  * mac.c: Screen capture module for the Mac.
  *****************************************************************************
  * Copyright (C) 2004 - 2013 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: FUJISAWA Tooru <arai_a@mac.com>
  *          Derk-Jan Hartman <hartman at videolan dot org>

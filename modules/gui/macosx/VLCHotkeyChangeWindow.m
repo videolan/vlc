@@ -2,7 +2,6 @@
  * VLCHotkeyChangeWindow.m: Preferences Hotkey Window subclass for Mac OS X
  *****************************************************************************
  * Copyright (C) 2008-2014 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne at videolan dot org>
  *

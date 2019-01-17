@@ -2,7 +2,6 @@
  * macosx.c: minimal Mac OS X module for vlc
  *****************************************************************************
  * Copyright (C) 2001-2012 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Colin Delacroix <colin@zoy.org>
  *          Eugenio Jarosiewicz <ej0@cise.ufl.edu>

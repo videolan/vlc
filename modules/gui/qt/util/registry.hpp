@@ -2,7 +2,6 @@
  * registry.hpp: Windows Registry Manipulation
  ****************************************************************************
  * Copyright (C) 2008 the VideoLAN team
- * $Id$
  *
  * Authors: Andre Weber <WeberAndre # gmx - de>
  *

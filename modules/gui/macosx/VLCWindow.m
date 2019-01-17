@@ -2,7 +2,6 @@
  * Windows.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2012-2018 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *          David Fuhrmann <david dot fuhrmann at googlemail dot com>

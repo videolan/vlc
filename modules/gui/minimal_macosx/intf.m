@@ -2,7 +2,6 @@
  * intf.m: macOS minimal interface module
  *****************************************************************************
  * Copyright (C) 2002-2017 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *          Felix Paul Kühne <fkuehne at videolan dot org>

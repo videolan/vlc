@@ -2,7 +2,6 @@
  * darwin.c : Put text on the video, using freetype2
  *****************************************************************************
  * Copyright (C) 2015 VLC authors and VideoLAN
- * $Id$
  *
  * Authors: Felix Paul Kühne <fkuehne@videolan.org>
  *          Jean-Baptiste Kempf <jb@videolan.org>

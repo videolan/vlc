@@ -2,7 +2,6 @@
  * window_presets.h : Variable names and strings of FFT window presets
  *****************************************************************************
  * Copyright (C) 2014 Ronald Wright
- * $Id$
  *
  * Author: Ronald Wright <logiconcepts819@gmail.com>
  *

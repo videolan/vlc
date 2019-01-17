@@ -2,7 +2,6 @@
  * dynamicoverlay_queue.c : dynamic overlay plugin commands
  *****************************************************************************
  * Copyright (C) 2008-2009 VLC authors and VideoLAN
- * $Id$
  *
  * Author: Søren Bøg <avacore@videolan.org>
  *         Jean-Paul Saman <jpsaman@videolan.org>
