@@ -139,6 +139,12 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/playlist_legacy/selector.cpp \
 	gui/qt/components/playlist_legacy/selector.hpp \
 	gui/qt/components/playlist_legacy/sorting.h \
+	gui/qt/components/mediacenter/mcmedialib.cpp \
+	gui/qt/components/mediacenter/mcmedialib.hpp \
+	gui/qt/components/mediacenter/mlhelper.hpp \
+	gui/qt/components/mediacenter/mlqmltypes.hpp \
+	gui/qt/components/mediacenter/mlbasemodel.cpp \
+	gui/qt/components/mediacenter/mlbasemodel.hpp \
 	gui/qt/components/playlist/media.hpp \
 	gui/qt/components/playlist/playlist_common.cpp \
 	gui/qt/components/playlist/playlist_common.hpp \
@@ -264,6 +270,9 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/playlist_legacy/playlist.moc.cpp \
 	gui/qt/components/playlist_legacy/standardpanel.moc.cpp \
 	gui/qt/components/playlist_legacy/selector.moc.cpp \
+	gui/qt/components/mediacenter/mcmedialib.moc.cpp \
+	gui/qt/components/mediacenter/mlqmltypes.moc.cpp \
+	gui/qt/components/mediacenter/mlbasemodel.moc.cpp \
 	gui/qt/components/playlist/playlist_common.moc.cpp \
 	gui/qt/components/playlist/playlist_item.moc.cpp \
 	gui/qt/components/playlist/playlist_model.moc.cpp \
