@@ -293,7 +293,8 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
             video_format_Copy(&vfmt, &fmt->video);
             video_format_FixRgb(&vfmt);
             if(GetFfmpegChroma(&codecpar->format, &vfmt))
-                msg_Warn(p_mux, "can't match format RAW video %4.4s", &vfmt.i_chroma);
+                msg_Warn(p_mux, "can't match format RAW video %4.4s",
+                         (const char *)&vfmt.i_chroma);
             video_format_Clean(&vfmt);
         }
         if (fmt->i_bitrate == 0) {
