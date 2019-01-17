@@ -200,7 +200,7 @@ private:
     bool processMessage(const castchannel::CastMessage &msg);
     void queueMessage( QueueableMessages msg );
 
-    void setPauseState(bool paused, vlc_tick_t delay);
+    void setPauseState(bool paused);
     bool isFinishedPlaying();
     bool isStateError() const;
     bool isStatePlaying() const;
@@ -235,7 +235,7 @@ private:
     static void send_input_event(void *, enum cc_input_event event, union cc_input_arg arg);
     static void set_demux_enabled(void *, bool, on_paused_changed_itf, void *);
 
-    static void set_pause_state(void*, bool paused, vlc_tick_t delay);
+    static void set_pause_state(void*, bool paused);
 
     static void set_meta(void*, vlc_meta_t *p_meta);
 
@@ -301,7 +301,6 @@ private:
     vlc_tick_t        m_cc_time_last_request_date;
     vlc_tick_t        m_cc_time_date;
     vlc_tick_t        m_cc_time;
-    vlc_tick_t        m_pause_delay;
 
     /* shared structure with the demux-filter */
     chromecast_common      m_common;

@@ -292,12 +292,6 @@ static int ProxySend(sout_stream_t *p_stream, void *_id, block_t *p_buffer)
             }
         }
 
-        vlc_tick_t pause_delay = p_sys->p_intf->getPauseDelay();
-        if( p_buffer->i_pts != VLC_TICK_INVALID )
-            p_buffer->i_pts -= pause_delay;
-        if( p_buffer->i_dts != VLC_TICK_INVALID )
-            p_buffer->i_dts -= pause_delay;
-
         int ret = sout_StreamIdSend(p_stream->p_next, id, p_buffer);
         if (ret == VLC_SUCCESS && !p_sys->cc_has_input)
         {
