@@ -159,10 +159,7 @@ struct vout_display_sys_t
     bool                    lost_not_ready;
     bool                    clear_scene;
 
-    /* It protects the following variables */
-    vlc_mutex_t    lock;
-    bool           ch_desktop;
-    bool           desktop_requested;
+    atomic_bool             new_desktop_mode;
 
     /* outside rendering */
     void *outside_opaque;
@@ -906,19 +903,11 @@ static void UpdateDesktopMode(vout_display_t *vd)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    if (!sys->sys.use_desktop) {
+    if (sys->sys.use_desktop) {
         /* Save non-desktop state */
         sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
         sys->desktop_save.is_on_top     = sys->sys.is_on_top;
-    }
 
-    /* */
-    vlc_mutex_lock(&sys->lock);
-    sys->sys.use_desktop = sys->desktop_requested;
-    sys->ch_desktop = false;
-    vlc_mutex_unlock(&sys->lock);
-
-    if (sys->sys.use_desktop) {
         /* Disable fullscreen/on_top while using desktop */
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, false);
@@ -940,12 +929,9 @@ static void Manage (vout_display_t *vd)
     CommonManage(vd);
 
     /* Desktop mode change */
-    vlc_mutex_lock(&sys->lock);
-    const bool ch_desktop = sys->ch_desktop;
-    sys->ch_desktop = false;
-    vlc_mutex_unlock(&sys->lock);
-
-    if (ch_desktop)
+    bool prev_desktop = sys->sys.use_desktop;
+    sys->sys.use_desktop = atomic_load( &sys->new_desktop_mode );
+    if (sys->sys.use_desktop != prev_desktop)
         UpdateDesktopMode(vd);
 
     /* Position Change */
@@ -1577,11 +1563,7 @@ static int DesktopCallback(vlc_object_t *object, char const *psz_cmd,
     VLC_UNUSED(oldval);
     VLC_UNUSED(p_data);
 
-    vlc_mutex_lock(&sys->lock);
-    const bool ch_desktop = !sys->desktop_requested != !newval.b_bool;
-    sys->ch_desktop |= ch_desktop;
-    sys->desktop_requested = newval.b_bool;
-    vlc_mutex_unlock(&sys->lock);
+    atomic_store( &sys->new_desktop_mode, newval.b_bool );
     return VLC_SUCCESS;
 }
 
@@ -1714,9 +1696,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         vd->info.subpicture_chromas = NULL;
 
     /* Interaction */
-    vlc_mutex_init(&sys->lock);
-    sys->ch_desktop = false;
-    sys->desktop_requested = sys->sys.use_desktop;
+    atomic_init( &sys->new_desktop_mode, sys->sys.use_desktop );
 
     var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, _("Desktop"));
     var_AddCallback(vd, "video-wallpaper", DesktopCallback, NULL);
@@ -1748,7 +1728,6 @@ error:
 static void Close(vout_display_t *vd)
 {
     var_DelCallback(vd, "video-wallpaper", DesktopCallback, NULL);
-    vlc_mutex_destroy(&vd->sys->lock);
 
     Direct3D9Close(vd);
 
