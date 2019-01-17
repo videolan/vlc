@@ -149,6 +149,10 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlalbum.hpp \
 	gui/qt/components/mediacenter/mlalbummodel.cpp \
 	gui/qt/components/mediacenter/mlalbummodel.hpp \
+	gui/qt/components/mediacenter/mlalbumtrack.cpp \
+	gui/qt/components/mediacenter/mlalbumtrack.hpp \
+	gui/qt/components/mediacenter/mlalbumtrackmodel.cpp \
+	gui/qt/components/mediacenter/mlalbumtrackmodel.hpp \
 	gui/qt/components/playlist/media.hpp \
 	gui/qt/components/playlist/playlist_common.cpp \
 	gui/qt/components/playlist/playlist_common.hpp \
@@ -279,6 +283,8 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/components/mediacenter/mlbasemodel.moc.cpp \
 	gui/qt/components/mediacenter/mlalbum.moc.cpp \
 	gui/qt/components/mediacenter/mlalbummodel.moc.cpp \
+	gui/qt/components/mediacenter/mlalbumtrack.moc.cpp \
+	gui/qt/components/mediacenter/mlalbumtrackmodel.moc.cpp \
 	gui/qt/components/playlist/playlist_common.moc.cpp \
 	gui/qt/components/playlist/playlist_item.moc.cpp \
 	gui/qt/components/playlist/playlist_model.moc.cpp \
