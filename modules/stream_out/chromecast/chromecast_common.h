@@ -66,7 +66,7 @@ typedef struct
 
     void (*pf_send_input_event)(void*, enum cc_input_event, union cc_input_arg);
 
-    void (*pf_set_pause_state)(void*, bool paused, mtime_t delay);
+    void (*pf_set_pause_state)(void*, bool paused);
 
     void (*pf_set_meta)(void*, vlc_meta_t *p_meta);
 

@@ -45,8 +45,6 @@ struct demux_cc
         :p_demux(demux)
         ,p_renderer(renderer)
         ,m_enabled( true )
-        ,m_pause_date( VLC_TS_INVALID )
-        ,m_pause_delay( VLC_TS_INVALID )
     {
         init();
     }
@@ -179,9 +177,9 @@ struct demux_cc
                                          cc_input_arg { false } );
     }
 
-    void setPauseState(bool paused, mtime_t delay)
+    void setPauseState(bool paused)
     {
-        p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused, delay );
+        p_renderer->pf_set_pause_state( p_renderer->p_opaque, paused );
     }
 
     mtime_t getCCTime()
@@ -348,8 +346,6 @@ struct demux_cc
 
         case DEMUX_SET_POSITION:
         {
-            m_pause_delay = m_pause_date = VLC_TS_INVALID;
-
             double pos = va_arg( args, double );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_POSITION, pos, false );
@@ -362,8 +358,6 @@ struct demux_cc
         }
         case DEMUX_SET_TIME:
         {
-            m_pause_delay = m_pause_date = VLC_TS_INVALID;
-
             mtime_t time = va_arg( args, int64_t );
             /* Force unprecise seek */
             int ret = demux_Control( p_demux->p_next, DEMUX_SET_TIME, time, false );
@@ -382,21 +376,7 @@ struct demux_cc
             int paused = va_arg( ap, int );
             va_end( ap );
 
-            if (paused)
-            {
-                if (m_pause_date == VLC_TS_INVALID)
-                    m_pause_date = mdate();
-            }
-            else
-            {
-                if (m_pause_date != VLC_TS_INVALID)
-                {
-                    m_pause_delay += mdate() - m_pause_date;
-                    m_pause_date = VLC_TS_INVALID;
-                }
-            }
-
-            setPauseState( paused != 0, m_pause_delay );
+            setPauseState( paused != 0 );
             break;
         }
         case DEMUX_SET_ES:
@@ -469,8 +449,6 @@ protected:
     double        m_last_pos;
     mtime_t       m_start_time;
     mtime_t       m_last_time;
-    mtime_t       m_pause_date;
-    mtime_t       m_pause_delay;
 };
 
 static void on_paused_changed_cb( void *data, bool paused )
