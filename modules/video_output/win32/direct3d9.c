@@ -138,7 +138,6 @@ struct vout_display_sys_t
     struct {
         bool is_fullscreen;
         bool is_on_top;
-        RECT win;
     } desktop_save;
 
     // core objects
@@ -157,7 +156,6 @@ struct vout_display_sys_t
 
     /* */
     bool                    reset_device;
-    bool                    reopen_device;
     bool                    lost_not_ready;
     bool                    clear_scene;
 
@@ -912,10 +910,6 @@ static void UpdateDesktopMode(vout_display_t *vd)
         /* Save non-desktop state */
         sys->desktop_save.is_fullscreen = sys->sys.vdcfg.is_fullscreen;
         sys->desktop_save.is_on_top     = sys->sys.is_on_top;
-
-        WINDOWPLACEMENT wp = { .length = sizeof(wp), };
-        GetWindowPlacement(sys->sys.hparent ? sys->sys.hparent : sys->sys.hwnd, &wp);
-        sys->desktop_save.win = wp.rcNormalPosition;
     }
 
     /* */
@@ -951,11 +945,8 @@ static void Manage (vout_display_t *vd)
     sys->ch_desktop = false;
     vlc_mutex_unlock(&sys->lock);
 
-    if (ch_desktop) {
-        sys->reopen_device = true;
-        if (vd->info.has_pictures_invalid)
-            vout_display_SendEventPicturesInvalid(vd);
-    }
+    if (ch_desktop)
+        UpdateDesktopMode(vd);
 
     /* Position Change */
     if (sys->sys.changes & DX_POSITION_CHANGE) {
@@ -1548,54 +1539,6 @@ static void Direct3D9Close(vout_display_t *vd)
     D3D9_ReleaseDevice(&sys->d3d_dev);
 }
 
-static int ControlReopenDevice(vout_display_t *vd, video_format_t *fmtp)
-{
-    vout_display_sys_t *sys = vd->sys;
-
-    /* */
-    Direct3D9Close(vd);
-    if (!sys->sys.b_windowless)
-        EventThreadStop(sys->sys.event);
-
-    /* */
-    event_cfg_t cfg;
-    memset(&cfg, 0, sizeof(cfg));
-    cfg.use_desktop = sys->sys.use_desktop;
-    if (!sys->sys.use_desktop) {
-        cfg.x      = sys->desktop_save.win.left;
-        cfg.y      = sys->desktop_save.win.top;
-        cfg.width  = sys->desktop_save.win.right  - sys->desktop_save.win.left;
-        cfg.height = sys->desktop_save.win.bottom - sys->desktop_save.win.top;
-    }
-
-    event_hwnd_t hwnd;
-    if (!sys->sys.b_windowless && EventThreadStart(sys->sys.event, &hwnd, &cfg)) {
-        msg_Err(vd, "Failed to restart event thread");
-        return VLC_EGENERIC;
-    }
-    sys->sys.parent_window = hwnd.parent_window;
-    sys->sys.hparent       = hwnd.hparent;
-    sys->sys.hwnd          = hwnd.hwnd;
-    sys->sys.hvideownd     = hwnd.hvideownd;
-    sys->sys.hfswnd        = hwnd.hfswnd;
-    SetRectEmpty(&sys->sys.rect_parent);
-
-    /* */
-    video_format_t fmt;
-    IDirect3DDevice9 *d3d9_device = var_InheritAddress(vd, "vout-engine-ctx");
-    if (Direct3D9Open(vd, &fmt, d3d9_device)) {
-        CommonClean(vd);
-        msg_Err(vd, "Failed to reopen device");
-        return VLC_EGENERIC;
-    }
-    *fmtp = fmt;
-    sys->sys.is_first_display = true;
-
-    UpdateDesktopMode(vd);
-
-    return VLC_SUCCESS;
-}
-
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
@@ -1612,12 +1555,6 @@ static int Control(vout_display_t *vd, int query, va_list args)
                 return VLC_EGENERIC;
             }
             sys->reset_device = false;
-        } else if(sys->reopen_device) {
-            if (ControlReopenDevice(vd, fmt)) {
-                msg_Err(vd, "Failed to reopen device");
-                return VLC_EGENERIC;
-            }
-            sys->reopen_device = false;
         }
         (void) cfg;
         return VLC_SUCCESS;
@@ -1745,15 +1682,10 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 
     sys->sys.use_desktop = var_CreateGetBool(vd, "video-wallpaper");
     sys->reset_device = false;
-    sys->reopen_device = false;
     sys->lost_not_ready = false;
     sys->allow_hw_yuv = var_CreateGetBool(vd, "directx-hw-yuv");
     sys->desktop_save.is_fullscreen = cfg->is_fullscreen;
     sys->desktop_save.is_on_top     = false;
-    sys->desktop_save.win.left      = var_InheritInteger(vd, "video-x");
-    sys->desktop_save.win.right     = cfg->display.width;
-    sys->desktop_save.win.top       = var_InheritInteger(vd, "video-y");
-    sys->desktop_save.win.bottom    = cfg->display.height;
 
     if (CommonInit(vd, d3d9_device != NULL, cfg))
         goto error;
