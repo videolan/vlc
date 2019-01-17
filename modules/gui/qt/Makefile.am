@@ -85,6 +85,8 @@ libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/fingerprintdialog.hpp \
 	gui/qt/components/qml_main_context.cpp \
 	gui/qt/components/qml_main_context.hpp \
+	gui/qt/components/dialogmodel.cpp \
+	gui/qt/components/dialogmodel.hpp \
 	gui/qt/components/extended_panels.cpp \
 	gui/qt/components/extended_panels.hpp \
 	gui/qt/components/info_panels.cpp gui/qt/components/info_panels.hpp \
@@ -226,6 +228,7 @@ nodist_libqt_plugin_la_SOURCES = \
 	gui/qt/dialogs/extensions.moc.cpp \
 	gui/qt/dialogs/fingerprintdialog.moc.cpp \
 	gui/qt/components/qml_main_context.moc.cpp \
+	gui/qt/components/dialogmodel.moc.cpp \
 	gui/qt/components/extended_panels.moc.cpp \
 	gui/qt/components/info_panels.moc.cpp \
 	gui/qt/components/info_widgets.moc.cpp \
