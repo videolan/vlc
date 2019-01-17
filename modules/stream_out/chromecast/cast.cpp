@@ -1051,6 +1051,7 @@ bool sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             try {
                 ssout << vlc_sout_renderer_GetVcodecOption( p_stream,
                                         { VLC_CODEC_H264, VLC_CODEC_VP8 },
+                                        &i_codec_video,
                                         &p_original_video->video, i_quality );
                 new_transcoding_state |= TRANSCODING_VIDEO;
             } catch(const std::exception& e) {

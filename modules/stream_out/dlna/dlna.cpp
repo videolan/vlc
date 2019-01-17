@@ -439,6 +439,7 @@ int sout_stream_sys_t::UpdateOutput( sout_stream_t *p_stream )
             try {
                 ssout << vlc_sout_renderer_GetVcodecOption( p_stream,
                                         { i_codec_video },
+                                        &i_codec_video,
                                         &p_original_video->video, i_quality );
             } catch(const std::exception& e) {
                 return VLC_EGENERIC ;

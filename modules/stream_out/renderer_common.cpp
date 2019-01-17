@@ -81,7 +81,7 @@ std::map<vlc_fourcc_t, std::vector<venc_options>> opts = {
 
 std::string
 GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
-        const video_format_t *p_vid, int i_quality )
+        vlc_fourcc_t *out_codec, const video_format_t *p_vid, int i_quality )
 {
     for (vlc_fourcc_t codec : codecs) {
         auto opt = opts.find(codec);
@@ -131,6 +131,7 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
                 if( success )
                 {
                     msg_Dbg( p_stream, "Converting video to %.4s", (const char*)&codec );
+                    *out_codec = codec;
                     return ssvenc.str();
                 }
             }
@@ -142,13 +143,14 @@ GetVencOption( sout_stream_t *p_stream, std::vector<vlc_fourcc_t> codecs,
 
 std::string
 vlc_sout_renderer_GetVcodecOption(sout_stream_t *p_stream,
-        std::vector<vlc_fourcc_t> codecs, const video_format_t *p_vid, int i_quality)
+        std::vector<vlc_fourcc_t> codecs,
+        vlc_fourcc_t *out_codec, const video_format_t *p_vid, int i_quality)
 {
     std::stringstream ssout;
     static const char video_maxres_hd[] = "maxwidth=1920,maxheight=1080";
     static const char video_maxres_720p[] = "maxwidth=1280,maxheight=720";
 
-    ssout << GetVencOption( p_stream, codecs, p_vid, i_quality );
+    ssout << GetVencOption( p_stream, codecs, out_codec, p_vid, i_quality );
 
     switch ( i_quality )
     {

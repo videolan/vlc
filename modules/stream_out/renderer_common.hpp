@@ -80,6 +80,7 @@ static const int conversion_quality_list[] = {
 
 std::string
 vlc_sout_renderer_GetVcodecOption(sout_stream_t *p_stream,
-        std::vector<vlc_fourcc_t> codecs, const video_format_t *p_vid, int i_quality);
+        std::vector<vlc_fourcc_t> codecs,
+        vlc_fourcc_t *out_codec, const video_format_t *p_vid, int i_quality);
 
 #endif /* RENDERER_COMMON_H */
