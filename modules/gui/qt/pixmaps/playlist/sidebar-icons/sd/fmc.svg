@@ -11,7 +11,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="48"
    height="48"
-   viewBox="0 0 12.7 12.7"
+   viewBox="0 0 48 48"
    version="1.1"
    id="svg5502"
    inkscape:version="0.92.1 r15371"
@@ -26,9 +26,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="5.6568543"
-     inkscape:cx="-24.093383"
-     inkscape:cy="58.207599"
-     inkscape:document-units="mm"
+     inkscape:cx="-23.73983"
+     inkscape:cy="10.074513"
+     inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      fit-margin-top="0"
@@ -36,8 +36,8 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1920"
-     inkscape:window-height="1027"
-     inkscape:window-x="0"
+     inkscape:window-height="1016"
+     inkscape:window-x="1366"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
      units="px"
@@ -74,12 +74,12 @@
      id="layer1"
      transform="translate(-96.459526,-120.56071)">
     <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;vector-effect:none;fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.06155062;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="M 24 12 A 16.999966 15 0 0 0 7.2871094 24.296875 A 5.9999999 5.9999999 0 0 0 6 28 A 5.9999999 5.9999999 0 0 0 12 34 A 5.9999999 5.9999999 0 0 0 18 28 A 5.9999999 5.9999999 0 0 0 12 22 A 5.9999999 5.9999999 0 0 0 9.6601562 22.482422 A 15.000034 12.000014 0 0 1 24 14 A 15.000034 12.000014 0 0 1 38.318359 22.466797 A 5.9999999 5.9999999 0 0 0 36 22 A 5.9999999 5.9999999 0 0 0 30 28 A 5.9999999 5.9999999 0 0 0 36 34 A 5.9999999 5.9999999 0 0 0 42 28 A 5.9999999 5.9999999 0 0 0 40.705078 24.277344 A 16.999966 15 0 0 0 24 12 z "
-       transform="matrix(0.26458333,0,0,0.26458333,96.459526,120.56071)"
-       id="path6761" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;vector-effect:none;fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.0614593;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 120.46129,132.56071 a 16.998455,15.000003 0 0 0 -16.71143,12.29688 5.9994669,6.0000014 0 0 0 -1.28697,3.70311 5.9994669,6.0000014 0 0 0 5.99947,6 5.9994669,6.0000014 0 0 0 5.99946,-6 5.9994669,6.0000014 0 0 0 -5.99946,-6 5.9994669,6.0000014 0 0 0 -2.33966,0.48242 14.998701,12.000017 0 0 1 14.33859,-8.4824 14.998701,12.000017 0 0 1 14.31709,8.46679 5.9994669,6.0000014 0 0 0 -2.31815,-0.46681 5.9994669,6.0000014 0 0 0 -5.99947,6 5.9994669,6.0000014 0 0 0 5.99947,6 5.9994669,6.0000014 0 0 0 5.99946,-6 5.9994669,6.0000014 0 0 0 -1.29482,-3.72265 16.998455,15.000003 0 0 0 -16.70358,-12.27734 z"
+       id="path6761"
+       inkscape:connector-curvature="0" />
     <g
-       transform="matrix(0.08909929,0,0,0.08909929,99.156301,122.04033)"
+       transform="matrix(0.3367233,0,0,0.3367533,106.65503,126.15297)"
        id="g7040"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:none">
       <path
@@ -89,7 +89,7 @@
          inkscape:connector-curvature="0" />
     </g>
     <g
-       transform="matrix(0.07113218,0,0,0.07213011,92.263505,123.01613)"
+       transform="matrix(0.26882215,0,0,0.2726178,80.605841,129.84103)"
        id="g7052"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;display:inline;fill:#747474;fill-opacity:1;fill-rule:evenodd;stroke:none">
       <path
@@ -98,11 +98,12 @@
          id="path7054"
          inkscape:connector-curvature="0" />
     </g>
-    <circle
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;vector-effect:none;fill:#ff8800;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.573264;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+    <ellipse
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;vector-effect:none;fill:#ff8800;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:2.16657114;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="path6755"
-       cx="102.80952"
-       cy="128.23363"
-       r="3.439584" />
+       cx="120.46123"
+       cy="149.5607"
+       rx="12.998848"
+       ry="13.000006" />
   </g>
 </svg>

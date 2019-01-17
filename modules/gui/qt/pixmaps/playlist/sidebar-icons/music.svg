@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="12.7mm"
-   height="12.7mm"
-   viewBox="0 0 12.7 12.7"
+   width="48"
+   height="48"
+   viewBox="0 0 48 48"
    version="1.1"
    id="svg5502"
    inkscape:version="0.92.1 r15371"
@@ -26,9 +26,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="14.481547"
-     inkscape:cx="10.747005"
-     inkscape:cy="23.309147"
-     inkscape:document-units="mm"
+     inkscape:cx="11.023219"
+     inkscape:cy="23.032933"
+     inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      fit-margin-top="0"
@@ -36,10 +36,11 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1920"
-     inkscape:window-height="1027"
-     inkscape:window-x="0"
+     inkscape:window-height="1016"
+     inkscape:window-x="1366"
      inkscape:window-y="27"
-     inkscape:window-maximized="1">
+     inkscape:window-maximized="1"
+     units="px">
     <inkscape:grid
        type="xygrid"
        id="grid6077" />
@@ -61,21 +62,23 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-96.459526,-120.56071)">
-    <circle
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.05833328;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+    <ellipse
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.00000286;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
        id="path7075"
-       cx="100.1637"
-       cy="130.08571"
-       r="1.5875" />
-    <circle
-       r="1.5875"
-       cy="129.02737"
-       cx="104.92619"
+       cx="110.45953"
+       cy="156.5607"
+       rx="6.0000057"
+       ry="6.0000029" />
+    <ellipse
+       cy="152.5607"
+       cx="128.4595"
        id="circle7077"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1.05833328;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.00000286;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+       rx="6.0000057"
+       ry="6.0000029" />
     <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:0.94660211;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="m 106.51369,122.14821 -1.05833,0.26458 -3.70417,0.92604 c -0.56373,0.14094 -1.05833,0.73842 -1.05833,1.32292 v 1.05833 4.36563 h 1.05833 v -4.63021 l 3.70417,-0.92604 v 4.49792 h 1.05833 v -4.7625 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:3.57771111;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:4.19999981;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 134.45953,126.56071 -3.99999,0.99998 -14.00003,3.5 c -2.13063,0.53269 -3.99999,2.79088 -3.99999,5.00001 v 3.99999 16.50003 h 3.99999 v -17.50001 l 14.00003,-3.5 v 17.00002 h 3.99999 v -18.00001 z"
        id="rect6549"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cccsccccccccc" />

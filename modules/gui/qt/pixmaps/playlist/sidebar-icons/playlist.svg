@@ -11,7 +11,7 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="48"
    height="48"
-   viewBox="0 0 12.7 12.7"
+   viewBox="0 0 48 48"
    version="1.1"
    id="svg5502"
    inkscape:version="0.92.1 r15371"
@@ -26,9 +26,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
-     inkscape:cx="-17.983978"
-     inkscape:cy="20.051274"
-     inkscape:document-units="mm"
+     inkscape:cx="-17.483978"
+     inkscape:cy="19.551274"
+     inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
      fit-margin-top="0"
@@ -36,8 +36,8 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1920"
-     inkscape:window-height="1027"
-     inkscape:window-x="0"
+     inkscape:window-height="1016"
+     inkscape:window-x="1366"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
      units="px">
@@ -66,11 +66,11 @@
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path9959"
-       d="m 98.576192,123.60356 v 1.32278 l 8.466668,-1.3e-4 v -1.32278 z"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.72459131;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       d="m 104.45953,132.0612 v 4.99949 l 32,-4.9e-4 v -4.99949 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.73861599;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.72459131;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
-       d="m 98.576192,126.24939 v 1.32279 l 8.466668,-1.3e-4 v -1.32279 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.73861599;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+       d="m 104.45953,142.06121 v 4.99953 l 32,-5e-4 v -4.99953 z"
        id="path9961"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
@@ -78,8 +78,8 @@
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="path9963"
-       d="m 98.576192,128.89523 v 1.32278 l 4.762498,-1.3e-4 v -1.32279 z"
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.72459131;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+       d="m 104.45953,152.06125 v 4.99949 l 17.99998,-4.9e-4 v -4.99953 z"
+       style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2.73861599;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
     <path
        sodipodi:type="star"
        style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:#ff950d;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:100;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
@@ -95,8 +95,8 @@
        inkscape:rounded="0"
        inkscape:randomized="0"
        d="m -32,654.5058 8,13.85641 -16,0 z"
-       transform="matrix(0,0.19843574,-0.1718504,0,219.51992,136.70025)"
-       inkscape:transform-center-x="-1.4999542"
-       inkscape:transform-center-y="2.510941e-06" />
+       transform="matrix(0,0.7499945,-0.64951383,0,561.57001,181.56058)"
+       inkscape:transform-center-x="-5.6691228"
+       inkscape:transform-center-y="9.1111562e-06" />
   </g>
 </svg>
