@@ -301,7 +301,7 @@ static int Open( vlc_object_t *p_this )
         .primaries = COLOR_PRIMARIES_SRGB,
         .space = COLOR_SPACE_SRGB,
     };
-    p_sys->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );
+    p_sys->p_vout = aout_filter_GetVout( p_filter, &fmt );
     if( p_sys->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
@@ -311,7 +311,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->fifo = block_FifoNew();
     if( unlikely( p_sys->fifo == NULL ) )
     {
-        aout_filter_RequestVout( p_filter, p_sys->p_vout, NULL );
+        aout_filter_PutVout( p_filter, p_sys->p_vout );
         goto error;
     }
 
@@ -319,7 +319,7 @@ static int Open( vlc_object_t *p_this )
                    VLC_THREAD_PRIORITY_VIDEO ) )
     {
         block_FifoRelease( p_sys->fifo );
-        aout_filter_RequestVout( p_filter, p_sys->p_vout, NULL );
+        aout_filter_PutVout( p_filter, p_sys->p_vout );
         goto error;
     }
 
@@ -407,7 +407,7 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
     block_FifoRelease( p_sys->fifo );
-    aout_filter_RequestVout( p_filter, p_sys->p_vout, NULL );
+    aout_filter_PutVout( p_filter, p_sys->p_vout );
 
     /* Free the list */
     for( int i = 0; i < p_sys->i_effect; i++ )

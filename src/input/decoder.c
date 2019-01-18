@@ -309,6 +309,8 @@ static vout_thread_t *aout_request_vout( void *p_private,
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     video_format_t fmt;
 
+    assert((p_fmt == NULL) != (p_vout == NULL));
+
     if (p_fmt != NULL)
     {
         fmt = *p_fmt;

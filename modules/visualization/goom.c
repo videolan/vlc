@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>            /* aout_FormatNbChannels, AOUT_FMTS_SIMILAR */
-#include <vlc_vout.h>              /* vout_*Picture, aout_filter_RequestVout */
+#include <vlc_vout.h>              /* vout_*Picture, aout_filter_..tVout */
 #include <vlc_filter.h>
 
 #include <goom/goom.h>
@@ -122,8 +122,7 @@ static int Open( vlc_object_t *p_this )
     p_thread->fmt.i_chroma = VLC_CODEC_RGB32;
     p_thread->fmt.i_sar_num = p_thread->fmt.i_sar_den = 1;
 
-    p_thread->p_vout = aout_filter_RequestVout( p_filter, NULL,
-                                                &p_thread->fmt );
+    p_thread->p_vout = aout_filter_GetVout( p_filter, &p_thread->fmt );
     if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
@@ -149,7 +148,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_filter, "cannot launch goom thread" );
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
-        aout_filter_RequestVout( p_filter, p_thread->p_vout, NULL );
+        aout_filter_PutVout( p_filter, p_thread->p_vout );
         free( p_thread );
         return VLC_EGENERIC;
     }
@@ -345,7 +344,7 @@ static void Close( vlc_object_t *p_this )
     vlc_join( p_thread->thread, NULL );
 
     /* Free data */
-    aout_filter_RequestVout( p_filter, p_thread->p_vout, NULL );
+    aout_filter_PutVout( p_filter, p_thread->p_vout );
     vlc_mutex_destroy( &p_thread->lock );
     vlc_cond_destroy( &p_thread->wait );
 
