@@ -167,10 +167,9 @@ vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *
 #define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
 
 /**
- * This function will close a vout created by vout_Request.
- * The associated vout module is closed.
- * Note: It is not released yet, you'll have to call vlc_object_release()
- * or use the convenient vout_CloseAndRelease().
+ * Destroys a vout.
+ *
+ * This function closes and releases a vout created by vout_Request().
  *
  * \param p_vout the vout to close
  */
@@ -185,7 +184,6 @@ void vout_Close( vout_thread_t *p_vout );
 static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
 {
     vout_Close( p_vout );
-    vlc_object_release( p_vout );
 }
 
 /* TODO to move them to vlc_vout.h */

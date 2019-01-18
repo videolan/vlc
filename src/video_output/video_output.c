@@ -282,6 +282,8 @@ void vout_Close(vout_thread_t *vout)
     spu_Destroy(vout->p->spu);
     vout->p->spu = NULL;
     vlc_mutex_unlock(&vout->p->spu_lock);
+
+    vlc_object_release(vout);
 }
 
 /* */
