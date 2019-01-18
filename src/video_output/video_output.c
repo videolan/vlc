@@ -259,6 +259,22 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     return VoutCreate(object, cfg, input);
 }
 
+void vout_Stop(vout_thread_t *vout)
+{
+    if (vout->p->input != NULL) {
+        spu_Detach(vout->p->spu);
+        vout->p->input = NULL;
+    }
+
+    vout_control_cmd_t cmd;
+    vout_configuration_t cfg = { .fmt = NULL };
+
+    vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+    cmd.cfg = &cfg;
+    vout_control_Push(&vout->p->control, &cmd);
+    vout_control_WaitEmpty(&vout->p->control);
+}
+
 void vout_Close(vout_thread_t *vout)
 {
     assert(vout);

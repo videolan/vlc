@@ -166,6 +166,13 @@ vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *
 #define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
 
 /**
+ * Disables a vout.
+ *
+ * This disables a vout, but keeps it for later reuse.
+ */
+void vout_Stop(vout_thread_t *);
+
+/**
  * Destroys a vout.
  *
  * This function closes and releases a vout created by vout_Request().
