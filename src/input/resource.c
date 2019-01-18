@@ -469,6 +469,8 @@ vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,
                                            const vout_configuration_t *cfg,
                                            bool b_recycle )
 {
+    assert(cfg != NULL);
+
     vlc_mutex_lock( &p_resource->lock );
     vout_thread_t *p_ret = RequestVout( p_resource, cfg, b_recycle );
     vlc_mutex_unlock( &p_resource->lock );
