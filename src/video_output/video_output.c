@@ -229,15 +229,16 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 {
     vout_thread_t *vout = cfg->vout;
 
+    assert(cfg->fmt != NULL);
+
     /* If a vout is provided, try reusing it */
     if (vout) {
-        if (vout->p->input != input) {
-            if (vout->p->input)
-                spu_Detach(vout->p->spu);
+        if (vout->p->input == NULL) {
             vout->p->input = input;
-            if (vout->p->input)
-                spu_Attach(vout->p->spu, vout->p->input);
-        }
+            if (input != NULL)
+                spu_Attach(vout->p->spu, input);
+        } else
+            assert(vout->p->input == input);
 
         vout_control_cmd_t cmd;
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
@@ -245,8 +246,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_control_Push(&vout->p->control, &cmd);
         vout_control_WaitEmpty(&vout->p->control);
 
-        if (cfg->fmt)
-            vout_IntfReinit(vout);
+        vout_IntfReinit(vout);
 
         if (!vout->p->dead) {
             msg_Dbg(object, "reusing provided vout");
