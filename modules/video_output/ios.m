@@ -402,8 +402,7 @@ static void GLESSwap(vlc_gl_t *gl)
     if (unlikely(!_eaglContext)
      || unlikely(![EAGLContext setCurrentContext:_eaglContext]))
     {
-        if (_eaglContext)
-            [_eaglContext release];
+        [_eaglContext release];
         vlc_mutex_destroy(&_mutex);
         vlc_cond_destroy(&_gl_attached_wait);
         [super dealloc];
