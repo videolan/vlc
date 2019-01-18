@@ -389,8 +389,10 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
      * need to add a new pf_aout_request_vout callback or store a pointer
      * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
     const aout_request_vout_t *req = filter->owner.sys;
+    video_format_t adj_fmt = *fmt;
 
-    return req->pf_request_vout(req->p_private, NULL, fmt);
+    video_format_AdjustColorSpace(&adj_fmt);
+    return req->pf_request_vout(req->p_private, NULL, &adj_fmt);
 }
 
 void aout_filter_PutVout(filter_t *filter, vout_thread_t *vout)
