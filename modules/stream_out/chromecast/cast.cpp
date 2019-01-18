@@ -90,6 +90,7 @@ struct sout_stream_sys_t
         , cc_has_input( false )
         , cc_reload( false )
         , cc_flushing( false )
+        , cc_eof( false )
         , has_video( false )
         , out_force_reload( false )
         , perf_warning_shown( false )
@@ -137,6 +138,7 @@ struct sout_stream_sys_t
     bool                               cc_has_input;
     bool                               cc_reload;
     bool                               cc_flushing;
+    bool                               cc_eof;
     bool                               has_video;
     bool                               out_force_reload;
     bool                               perf_warning_shown;
@@ -1301,7 +1303,7 @@ static int Send(sout_stream_t *p_stream, sout_stream_id_sys_t *id,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_mutex_locker locker(&p_sys->lock);
 
-    if( p_sys->isFlushing( p_stream ) )
+    if( p_sys->isFlushing( p_stream ) || p_sys->cc_eof )
     {
         block_Release( p_buffer );
         return VLC_SUCCESS;
@@ -1360,7 +1362,8 @@ static void on_input_event_cb(void *data, enum cc_input_event event, union cc_in
             /* In case of EOF: stop the sout chain in order to drain all
              * sout/demuxers/access. If EOF changes to false, reset es_changed
              * in order to reload the sout from next Send calls. */
-            if( arg.eof )
+            p_sys->cc_eof = arg.eof;
+            if( p_sys->cc_eof )
                 p_sys->stopSoutChain( p_stream );
             else
                 p_sys->out_force_reload = p_sys->es_changed = true;
