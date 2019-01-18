@@ -108,9 +108,9 @@ vlc_module_end ()
     vout_display_cfg_t _cfg;
 }
 
-- (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd;
+- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd;
 - (void)cleanAndRelease:(BOOL)flushed;
-- (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
+- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl;
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext;
 - (void)presentRenderbuffer;
 
@@ -335,7 +335,7 @@ static int GLESMakeCurrent(vlc_gl_t *gl)
 {
     struct gl_sys *sys = gl->sys;
 
-    if (![sys->glESView makeCurrentWithGL:&sys->previousEaglContext withGL:gl])
+    if (![sys->glESView makeCurrent:&sys->previousEaglContext withGL:gl])
         return VLC_EGENERIC;
     return VLC_SUCCESS;
 }
@@ -369,10 +369,10 @@ static void GLESSwap(vlc_gl_t *gl)
 {
     id *ret = [[value objectAtIndex:0] pointerValue];
     vout_display_t *vd = [[value objectAtIndex:1] pointerValue];
-    *ret = [[self alloc] initWithFrameAndVd:CGRectMake(0.,0.,320.,240.) withVd:vd];
+    *ret = [[self alloc] initWithFrame:CGRectMake(0.,0.,320.,240.) andVD:vd];
 }
 
-- (id)initWithFrameAndVd:(CGRect)frame withVd:(vout_display_t*)vd
+- (id)initWithFrame:(CGRect)frame andVD:(vout_display_t*)vd
 {
     _appActive = ([UIApplication sharedApplication].applicationState == UIApplicationStateActive);
     if (unlikely(!_appActive))
@@ -581,7 +581,7 @@ static void GLESSwap(vlc_gl_t *gl)
     return YES;
 }
 
-- (BOOL)makeCurrentWithGL:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl
+- (BOOL)makeCurrent:(EAGLContext **)previousEaglContext withGL:(vlc_gl_t *)gl
 {
     vlc_mutex_lock(&_mutex);
     assert(!_gl_attached);
