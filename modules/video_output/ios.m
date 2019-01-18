@@ -419,9 +419,7 @@ static void GLESSwap(vlc_gl_t *gl)
      || unlikely(![EAGLContext setCurrentContext:_eaglContext]))
     {
         [_eaglContext release];
-        vlc_mutex_destroy(&_mutex);
-        vlc_cond_destroy(&_gl_attached_wait);
-        [super dealloc];
+        [self release];
         return nil;
     }
     [self releaseCurrent:previousEaglContext];
@@ -437,10 +435,8 @@ static void GLESSwap(vlc_gl_t *gl)
 
     if (![self fetchViewContainer])
     {
-        vlc_mutex_destroy(&_mutex);
-        vlc_cond_destroy(&_gl_attached_wait);
         [_eaglContext release];
-        [super dealloc];
+        [self release];
         return nil;
     }
 
