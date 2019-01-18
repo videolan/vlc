@@ -607,14 +607,19 @@ static void GLESSwap(vlc_gl_t *gl)
         vlc_mutex_unlock(&_mutex);
         return NO;
     }
-    assert(_eaglEnabled);
 
+    assert(_eaglEnabled);
     *previousEaglContext = [EAGLContext currentContext];
 
-    BOOL success = [EAGLContext setCurrentContext:_eaglContext];
+    if (![EAGLContext setCurrentContext:_eaglContext])
+    {
+        vlc_mutex_unlock(&_mutex);
+        return NO;
+    }
+
     BOOL resetBuffers = NO;
 
-    if (success && gl != NULL)
+    if (gl != NULL)
     {
         struct gl_sys *glsys = gl->sys;
 
@@ -636,8 +641,7 @@ static void GLESSwap(vlc_gl_t *gl)
         }
     }
 
-    if (success)
-        _gl_attached = YES;
+    _gl_attached = YES;
 
     vlc_mutex_unlock(&_mutex);
 
@@ -646,7 +650,7 @@ static void GLESSwap(vlc_gl_t *gl)
         [self releaseCurrent:*previousEaglContext];
         return NO;
     }
-    return success;
+    return YES;
 }
 
 - (void)releaseCurrent:(EAGLContext *)previousEaglContext
