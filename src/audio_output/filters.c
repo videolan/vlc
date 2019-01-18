@@ -397,7 +397,7 @@ void aout_filter_PutVout(filter_t *filter, vout_thread_t *vout)
 }
 
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
-                        aout_filters_t *restrict filters, const void *owner,
+                        aout_filters_t *restrict filters,
                         audio_sample_format_t *restrict infmt,
                         const audio_sample_format_t *restrict outfmt,
                         config_chain_t *cfg)
@@ -469,7 +469,7 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
     free(config_ChainCreate(&name, &cfg, str));
     if (name != NULL && cfg != NULL)
         ret = AppendFilter(obj, "audio filter", name, filters,
-                           NULL, infmt, outfmt, cfg);
+                           infmt, outfmt, cfg);
     else
         ret = -1;
 
@@ -590,7 +590,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     if (var_InheritBool (obj, "audio-time-stretch"))
     {
         if (AppendFilter(obj, "audio filter", "scaletempo",
-                         filters, NULL, &input_format, &output_format, NULL) == 0)
+                         filters, &input_format, &output_format, NULL) == 0)
             filters->rate_filter = filters->tab[filters->count - 1];
     }
 
@@ -600,8 +600,8 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
                           cfg->remap);
 
         if (input_format.i_channels > 2 && cfg->headphones)
-            AppendFilter(obj, "audio filter", "binauralizer", filters, NULL,
-                    &input_format, &output_format, NULL);
+            AppendFilter(obj, "audio filter", "binauralizer", filters,
+                         &input_format, &output_format, NULL);
     }
 
     /* Now add user filters */
@@ -612,7 +612,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         while ((name = strsep (&p, " :")) != NULL)
         {
             AppendFilter(obj, "audio filter", name, filters,
-                         NULL, &input_format, &output_format, NULL);
+                         &input_format, &output_format, NULL);
         }
         free (str);
     }
@@ -622,7 +622,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         char *visual = var_InheritString (obj, "audio-visual");
         if (visual != NULL && strcasecmp (visual, "none"))
             AppendFilter(obj, "visualization", visual, filters,
-                         request_vout, &input_format, &output_format, NULL);
+                         &input_format, &output_format, NULL);
         free (visual);
     }
 
