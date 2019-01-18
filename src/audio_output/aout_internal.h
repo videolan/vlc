@@ -81,7 +81,6 @@ typedef struct
     audio_sample_format_t input_format;
     audio_sample_format_t mixer_format;
 
-    aout_request_vout_t request_vout;
     aout_filters_cfg_t filters_cfg;
 
     atomic_uint buffers_lost;

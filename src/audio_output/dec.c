@@ -79,7 +79,6 @@ int aout_DecNew( audio_output_t *p_aout,
     atomic_store_explicit(&owner->restart, 0, memory_order_relaxed);
     owner->input_format = *p_format;
     owner->mixer_format = owner->input_format;
-    owner->request_vout = *p_request_vout;
 
     owner->filters_cfg = AOUT_FILTERS_CFG_INIT;
     if (aout_OutputNew (p_aout, &owner->mixer_format, &owner->filters_cfg))
