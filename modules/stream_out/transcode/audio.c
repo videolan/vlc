@@ -70,7 +70,7 @@ static int transcode_audio_filters_init( sout_stream_t *p_stream,
     var_Create( p_stream, "audio-filter", VLC_VAR_STRING );
     if( p_cfg->psz_filters )
         var_SetString( p_stream, "audio-filter", p_cfg->psz_filters );
-    *pp_chain = aout_FiltersNew( p_stream, p_dec_out, p_enc_in, NULL, NULL );
+    *pp_chain = aout_FiltersNew( p_stream, p_dec_out, p_enc_in, NULL );
     var_Destroy( p_stream, "audio-filter" );
     var_Destroy( p_stream, "audio-time-stretch" );
     return ( *pp_chain != NULL ) ? VLC_SUCCESS : VLC_EGENERIC;

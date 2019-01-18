@@ -496,10 +496,9 @@ typedef struct aout_request_vout aout_request_vout_t;
 VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
                                         const audio_sample_format_t *,
                                         const audio_sample_format_t *,
-                                        const aout_request_vout_t *,
                                         const aout_filters_cfg_t *cfg) VLC_USED;
-#define aout_FiltersNew(o,inf,outf,rv,remap) \
-        aout_FiltersNew(VLC_OBJECT(o),inf,outf,rv,remap)
+#define aout_FiltersNew(o,inf,outf,remap) \
+        aout_FiltersNew(VLC_OBJECT(o),inf,outf,remap)
 VLC_API void aout_FiltersDelete(vlc_object_t *, aout_filters_t *);
 #define aout_FiltersDelete(o,f) \
         aout_FiltersDelete(VLC_OBJECT(o),f)

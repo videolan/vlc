@@ -87,9 +87,8 @@ int aout_DecNew( audio_output_t *p_aout,
     aout_volume_SetFormat (owner->volume, owner->mixer_format.i_format);
 
     /* Create the audio filtering "input" pipeline */
-    owner->filters = aout_FiltersNew (p_aout, p_format, &owner->mixer_format,
-                                      &owner->request_vout,
-                                      &owner->filters_cfg);
+    owner->filters = aout_FiltersNew(p_aout, p_format, &owner->mixer_format,
+                                     &owner->filters_cfg);
     if (owner->filters == NULL)
     {
         aout_OutputDelete (p_aout);
@@ -164,10 +163,9 @@ static int aout_CheckReady (audio_output_t *aout)
 
         if (owner->mixer_format.i_format)
         {
-            owner->filters = aout_FiltersNew (aout, &owner->input_format,
-                                              &owner->mixer_format,
-                                              &owner->request_vout,
-                                              &owner->filters_cfg);
+            owner->filters = aout_FiltersNew(aout, &owner->input_format,
+                                             &owner->mixer_format,
+                                             &owner->filters_cfg);
             if (owner->filters == NULL)
             {
                 aout_OutputDelete (aout);

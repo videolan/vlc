@@ -486,21 +486,13 @@ static int AppendRemapFilter(vlc_object_t *obj, aout_filters_t *restrict filters
  * \param obj parent object for the filters
  * \param infmt chain input format [IN]
  * \param outfmt chain output format [IN]
- * \param request_vout visualization video output request callback
  * \param cfg a valid aout_filters_cfg_t struct or NULL.
  * \return a filters chain or NULL on failure
- *
- * \note
- * *request_vout (if not NULL) must remain valid until aout_FiltersDelete().
- *
- * \bug
- * If request_vout is non NULL, obj is assumed to be an audio_output_t pointer.
  */
-aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
-                                 const audio_sample_format_t *restrict infmt,
-                                 const audio_sample_format_t *restrict outfmt,
-                                 const aout_request_vout_t *request_vout,
-                                 const aout_filters_cfg_t *cfg)
+aout_filters_t *aout_FiltersNew(vlc_object_t *obj,
+                                const audio_sample_format_t *restrict infmt,
+                                const audio_sample_format_t *restrict outfmt,
+                                const aout_filters_cfg_t *cfg)
 {
     aout_filters_t *filters = malloc (sizeof (*filters));
     if (unlikely(filters == NULL))
