@@ -40,10 +40,9 @@
 /**
  * Creates an audio output
  */
-int aout_DecNew( audio_output_t *p_aout,
-                 const audio_sample_format_t *p_format,
-                 const audio_replay_gain_t *p_replay_gain,
-                 const aout_request_vout_t *p_request_vout )
+int aout_DecNew(audio_output_t *p_aout,
+                const audio_sample_format_t *p_format,
+                const audio_replay_gain_t *p_replay_gain)
 {
     if( p_format->i_bitspersample > 0 )
     {
