@@ -553,15 +553,31 @@ crossfile.meson:
 	echo "[properties]" >> $@
 	echo "needs_exe_wrapper = true" >> $@
 ifdef HAVE_CROSS_COMPILE
-	echo "c_args = [ '-I$(PREFIX)/include' ]" >> $@
 	echo "cpp_args = [ '-I$(PREFIX)/include' ]" >> $@
-	echo "c_link_args = [ '-L$(PREFIX)/lib' ]" >> $@
 	echo "cpp_link_args = [ '-L$(PREFIX)/lib' ]" >> $@
+ifdef HAVE_DARWIN_OS
+ifdef HAVE_IOS
+ifdef HAVE_TVOS
+	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(IOS_SDK)', '-mtvos-version-min=10.2', '-arch', '$(PLATFORM_SHORT_ARCH)', '-fembed-bitcode']" >> $@
+	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(IOS_SDK)', '-arch', '$(PLATFORM_SHORT_ARCH)', '-fembed-bitcode']" >> $@
+else
+	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(IOS_SDK)', '-miphoneos-version-min=8.4', '-arch', '$(PLATFORM_SHORT_ARCH)']" >> $@
+	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(IOS_SDK)', '-arch', '$(PLATFORM_SHORT_ARCH)']" >> $@
+endif
+endif
+ifdef HAVE_MACOSX
+	echo "c_args = ['-I$(PREFIX)/include', '-isysroot', '$(MACOSX_SDK)', '-mmacosx-version-min=10.10', '-arch', '$(ARCH)']" >> $@
+	echo "c_link_args = ['-L$(PREFIX)/lib', '-isysroot', '$(MACOSX_SDK)', '-arch', '$(ARCH)']" >> $@
+endif
+else
+	echo "c_args = [ '-I$(PREFIX)/include' ]" >> $@
+	echo "c_link_args = [ '-L$(PREFIX)/lib' ]" >> $@
+endif
 	echo "[host_machine]" >> $@
 ifdef HAVE_WIN32
 	echo "system = 'windows'" >> $@
 else
-ifdef HAVE_IOS
+ifdef HAVE_DARWIN_OS
 	echo "system = 'darwin'" >> $@
 else
 ifdef HAVE_LINUX
