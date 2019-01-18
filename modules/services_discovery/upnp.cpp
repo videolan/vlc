@@ -1302,9 +1302,8 @@ bool MediaServer::fetchContents()
         return false;
     }
 
-#ifndef NDEBUG
-    msg_Dbg( m_access, "Got DIDL document: %s", ixmlPrintDocument( p_result ) );
-#endif
+    if( var_InheritInteger(m_access, "verbose") >= 4 )
+        msg_Dbg( m_access, "Got DIDL document: %s", ixmlPrintDocument( p_result ) );
 
     IXML_NodeList* containerNodeList =
                 ixmlDocument_getElementsByTagName( p_result, "container" );
@@ -1486,7 +1485,8 @@ void MediaRendererList::parseNewRenderer( IXML_Document* doc,
                                           const std::string& location)
 {
     assert(!location.empty());
-    msg_Dbg( m_rd , "Got device desc doc:\n%s", ixmlPrintDocument( doc ));
+    if( var_InheritInteger(m_rd, "verbose") >= 4 )
+        msg_Dbg( m_rd , "Got device desc doc:\n%s", ixmlPrintDocument( doc ));
 
     const char* psz_base_url = nullptr;
     IXML_NodeList* p_device_nodes = nullptr;
