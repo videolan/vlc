@@ -567,7 +567,7 @@ static int vout_update_format( decoder_t *p_dec )
             dpb_size = 2;
             break;
         }
-        p_vout = input_resource_RequestVout( p_owner->p_resource,
+        p_vout = input_resource_GetVout( p_owner->p_resource,
             &(vout_configuration_t) {
                 .vout = p_vout, .fmt = &fmt,
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
@@ -2015,8 +2015,7 @@ static void DeleteDecoder( decoder_t * p_dec )
                  * thread */
                 vout_Cancel( p_owner->p_vout, false );
 
-                input_resource_RequestVout( p_owner->p_resource,
-                    &(vout_configuration_t) { .vout = p_owner->p_vout } );
+                input_resource_PutVout( p_owner->p_resource, p_owner->p_vout );
             }
             break;
         case SPU_ES:
