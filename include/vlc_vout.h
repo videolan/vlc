@@ -76,6 +76,15 @@ struct vout_thread_t {
  *****************************************************************************/
 
 /**
+ * Destroys a vout.
+ *
+ * This function closes and releases a vout created by vout_Request().
+ *
+ * \param vout the vout to close
+ */
+VLC_API void vout_Close(vout_thread_t *vout);
+
+/**
  * This function will handle a snapshot request.
  *
  * pp_image, pp_picture and p_fmt can be NULL otherwise they will be
