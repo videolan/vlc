@@ -488,8 +488,11 @@ void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***pp
 
 void input_resource_TerminateVout( input_resource_t *p_resource )
 {
-    input_resource_RequestVout( p_resource, NULL, false );
+    vlc_mutex_lock(&p_resource->lock);
+    RequestVout(p_resource, NULL, false);
+    vlc_mutex_unlock(&p_resource->lock);
 }
+
 bool input_resource_HasVout( input_resource_t *p_resource )
 {
     vlc_mutex_lock( &p_resource->lock );
