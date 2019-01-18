@@ -442,14 +442,11 @@ void input_resource_PutVout(input_resource_t *p_resource,
         msg_Dbg(p_resource->p_parent, "destroying vout (already one saved or active)");
         vout_Close(vout);
     } else {
-        vout_configuration_t cfg = { .vout = vout };
-
         msg_Dbg(p_resource->p_parent, "saving a free vout");
         vout_FlushAll(vout);
         vout_FlushSubpictureChannel(vout, -1);
-
-        p_resource->p_vout_free = vout_Request(p_resource->p_parent, &cfg,
-                                               NULL);
+        vout_Stop(vout);
+        p_resource->p_vout_free = vout;
     }
     vlc_mutex_unlock( &p_resource->lock );
 }
