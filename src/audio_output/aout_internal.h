@@ -36,13 +36,6 @@ enum {
     AOUT_RESAMPLING_DOWN
 };
 
-struct aout_request_vout
-{
-    struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
-                                               const video_format_t *);
-    void *p_private;
-};
-
 typedef struct aout_volume aout_volume_t;
 typedef struct aout_dev aout_dev_t;
 

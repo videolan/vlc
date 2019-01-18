@@ -491,7 +491,6 @@ typedef struct
     };
 
 typedef struct aout_filters aout_filters_t;
-typedef struct aout_request_vout aout_request_vout_t;
 
 VLC_API aout_filters_t *aout_FiltersNew(vlc_object_t *,
                                         const audio_sample_format_t *,

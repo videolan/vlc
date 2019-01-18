@@ -301,22 +301,6 @@ static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
 /*****************************************************************************
  * Buffers allocation callbacks for the decoders
  *****************************************************************************/
-static vout_thread_t *aout_request_vout( void *p_private,
-                                         vout_thread_t *p_vout,
-                                         const video_format_t *p_fmt )
-{
-    decoder_t *p_dec = p_private;
-    struct decoder_owner *p_owner = dec_get_owner( p_dec );
-
-    assert((p_fmt == NULL) != (p_vout == NULL));
-
-    p_vout = input_resource_RequestVout( p_owner->p_resource,
-        &(vout_configuration_t){ .vout = p_vout, .fmt = p_fmt, .dpb_size = 1 },
-        false );
-
-    return p_vout;
-}
-
 static bool aout_replaygain_changed( const audio_replay_gain_t *a,
                                      const audio_replay_gain_t *b )
 {
@@ -380,10 +364,6 @@ static int aout_update_format( decoder_t *p_dec )
                 format.i_chan_mode &= ~AOUT_CHANMODE_DOLBYSTEREO;
         }
 
-        aout_request_vout_t request_vout = {
-            .pf_request_vout = aout_request_vout,
-            .p_private = p_dec,
-        };
         audio_output_t *p_aout;
 
         p_aout = input_resource_GetAout( p_owner->p_resource );
