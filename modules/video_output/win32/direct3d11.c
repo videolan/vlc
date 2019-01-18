@@ -1565,6 +1565,8 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         sys->picQuad.i_height = (sys->picQuad.i_height + 0x01) & ~0x01;
     }
 
+    UpdateRects(vd, true);
+
     video_format_t surface_fmt = *fmt;
     surface_fmt.i_width  = sys->picQuad.i_width;
     surface_fmt.i_height = sys->picQuad.i_height;
@@ -1594,8 +1596,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
             ID3D10Multithread_Release(pMultithread);
         }
     }
-
-    UpdateRects(vd, true);
 
 #ifdef HAVE_ID3D11VIDEODECODER
     if (!is_d3d11_opaque(fmt->i_chroma) || sys->legacy_shader)
