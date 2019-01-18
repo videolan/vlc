@@ -303,7 +303,7 @@ static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
  *****************************************************************************/
 static vout_thread_t *aout_request_vout( void *p_private,
                                          vout_thread_t *p_vout,
-                                         const video_format_t *p_fmt, bool b_recyle )
+                                         const video_format_t *p_fmt )
 {
     decoder_t *p_dec = p_private;
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
@@ -318,7 +318,7 @@ static vout_thread_t *aout_request_vout( void *p_private,
 
     p_vout = input_resource_RequestVout( p_owner->p_resource,
         &(vout_configuration_t){ .vout = p_vout, .fmt = p_fmt, .dpb_size = 1 },
-        b_recyle );
+        false );
 
     return p_vout;
 }
