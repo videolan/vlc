@@ -390,12 +390,6 @@ vout_thread_t *aout_filter_GetVout(filter_t *filter, const video_format_t *fmt)
     return vout_Request(VLC_OBJECT(filter), &cfg, NULL);
 }
 
-void aout_filter_PutVout(filter_t *filter, vout_thread_t *vout)
-{
-    assert(vout->obj.parent == VLC_OBJECT(filter));
-    vout_Close(vout);
-}
-
 static int AppendFilter(vlc_object_t *obj, const char *type, const char *name,
                         aout_filters_t *restrict filters,
                         audio_sample_format_t *restrict infmt,

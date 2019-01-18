@@ -508,7 +508,6 @@ VLC_API void     aout_FiltersFlush(aout_filters_t *);
 VLC_API void     aout_FiltersChangeViewpoint(aout_filters_t *, const vlc_viewpoint_t *vp);
 
 VLC_API vout_thread_t *aout_filter_GetVout(filter_t *, const video_format_t *);
-VLC_API void aout_filter_PutVout(filter_t *, vout_thread_t *p_vout);
 
 /** @} */
 

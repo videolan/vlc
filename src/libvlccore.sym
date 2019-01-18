@@ -10,7 +10,6 @@ aout_EnableFilter
 aout_Interleave
 aout_Deinterleave
 aout_filter_GetVout
-aout_filter_PutVout
 aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
