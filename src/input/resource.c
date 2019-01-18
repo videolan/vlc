@@ -199,16 +199,6 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
 {
     vlc_mutex_assert( &p_resource->lock );
 
-    if( !req_cfg )
-    {
-        if( p_resource->p_vout_free )
-        {
-            msg_Dbg( p_resource->p_vout_free, "destroying useless vout" );
-            vout_CloseAndRelease( p_resource->p_vout_free );
-            p_resource->p_vout_free = NULL;
-        }
-        return NULL;
-    }
     vout_configuration_t cfg = *req_cfg;
 
     if( cfg.fmt )
