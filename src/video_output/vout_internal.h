@@ -154,8 +154,7 @@ struct vout_thread_sys_t
  * is possible, otherwise it returns NULL.
  * If cfg->vout is not used, it will be closed and released.
  *
- * You can release the returned value either by vout_Request or vout_Close()
- * followed by a vlc_object_release() or shorter vout_CloseAndRelease()
+ * You can release the returned value either by vout_Request() or vout_Close().
  *
  * \param object a vlc object
  * \param cfg the video configuration requested.
@@ -174,17 +173,6 @@ vout_thread_t * vout_Request( vlc_object_t *object, const vout_configuration_t *
  * \param p_vout the vout to close
  */
 void vout_Close( vout_thread_t *p_vout );
-
-/**
- * This function will close a vout created by vout_Create
- * and then release it.
- *
- * \param p_vout the vout to close and release
- */
-static inline void vout_CloseAndRelease( vout_thread_t *p_vout )
-{
-    vout_Close( p_vout );
-}
 
 /* TODO to move them to vlc_vout.h */
 void vout_ControlChangeFullscreen(vout_thread_t *, const char *id);

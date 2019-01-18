@@ -145,7 +145,7 @@ static void DestroyVout( input_resource_t *p_resource )
     assert( p_resource->i_vout == 0 );
 
     if( p_resource->p_vout_free )
-        vout_CloseAndRelease( p_resource->p_vout_free );
+        vout_Close( p_resource->p_vout_free );
 
     p_resource->p_vout_free = NULL;
 }
@@ -440,7 +440,7 @@ void input_resource_PutVout(input_resource_t *p_resource,
 
     if (p_resource->p_vout_free != NULL || active_vouts > 0) {
         msg_Dbg(p_resource->p_parent, "destroying vout (already one saved or active)");
-        vout_CloseAndRelease(vout);
+        vout_Close(vout);
     } else {
         vout_configuration_t cfg = { .vout = vout };
 
@@ -471,7 +471,7 @@ void input_resource_TerminateVout( input_resource_t *p_resource )
     if (p_resource->p_vout_free != NULL)
     {
         msg_Dbg(p_resource->p_vout_free, "destroying useless vout");
-        vout_CloseAndRelease(p_resource->p_vout_free);
+        vout_Close(p_resource->p_vout_free);
         p_resource->p_vout_free = NULL;
     }
     vlc_mutex_unlock(&p_resource->lock);

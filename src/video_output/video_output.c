@@ -211,7 +211,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     if (vout->p->dead) {
         msg_Err(vout, "video output creation failed");
-        vout_CloseAndRelease(vout);
+        vout_Close(vout);
         return NULL;
     }
 
@@ -252,7 +252,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             msg_Dbg(object, "reusing provided vout");
             return vout;
         }
-        vout_CloseAndRelease(vout);
+        vout_Close(vout);
 
         msg_Warn(object, "cannot reuse provided vout");
     }
