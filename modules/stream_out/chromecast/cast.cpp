@@ -1331,7 +1331,7 @@ static void Flush( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
     sout_stream_id_sys_t *next_id = p_sys->GetSubId( p_stream, id, false );
     if ( next_id == NULL )
         return;
-    next_id->flushed = true;
+    id->flushed = true;
 
     if( !p_sys->cc_flushing )
     {
