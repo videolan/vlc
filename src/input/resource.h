@@ -41,7 +41,7 @@ sout_instance_t *input_resource_RequestSout( input_resource_t *, sout_instance_t
  * This function handles vout request.
  */
 vout_thread_t *input_resource_RequestVout( input_resource_t *,
-                                           const vout_configuration_t *, bool );
+                                           const vout_configuration_t * );
 
 /**
  * This function returns one of the current vout if any.

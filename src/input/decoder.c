@@ -572,7 +572,7 @@ static int vout_update_format( decoder_t *p_dec )
                 .vout = p_vout, .fmt = &fmt,
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
                 .mouse_event = MouseEvent, .opaque = p_dec
-            }, true );
+            } );
 
         vlc_mutex_lock( &p_owner->lock );
         p_owner->p_vout = p_vout;
@@ -2016,7 +2016,7 @@ static void DeleteDecoder( decoder_t * p_dec )
                 vout_Cancel( p_owner->p_vout, false );
 
                 input_resource_RequestVout( p_owner->p_resource,
-                    &(vout_configuration_t) { .vout = p_owner->p_vout }, true );
+                    &(vout_configuration_t) { .vout = p_owner->p_vout } );
             }
             break;
         case SPU_ES:

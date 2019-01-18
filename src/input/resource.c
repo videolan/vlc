@@ -370,8 +370,7 @@ void input_resource_SetInput( input_resource_t *p_resource, input_thread_t *p_in
 }
 
 vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,
-                                           const vout_configuration_t *cfg,
-                                           bool b_recycle )
+                                           const vout_configuration_t *cfg )
 {
     vout_thread_t *vout;
 
@@ -433,9 +432,8 @@ vout_thread_t *input_resource_RequestVout( input_resource_t *p_resource,
                     .vout = cfg->vout,
                 });
 
-        if (p_resource->p_vout_free != NULL || active_vouts > 0 || !b_recycle) {
-            if (b_recycle)
-                msg_Dbg(p_resource->p_parent, "destroying vout (already one saved or active)");
+        if (p_resource->p_vout_free != NULL || active_vouts > 0) {
+            msg_Dbg(p_resource->p_parent, "destroying vout (already one saved or active)");
             vout_CloseAndRelease(cfg->vout);
         } else {
             msg_Dbg(p_resource->p_parent, "saving a free vout");
