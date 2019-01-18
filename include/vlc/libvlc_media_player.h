@@ -501,8 +501,8 @@ typedef enum libvlc_video_engine_t {
  * \param cleanup_cb callback called to clean up user data
  * \param update_output_cb callback called to get the size of the video
  * \param swap_cb callback called after rendering a video frame (cannot be NULL)
- * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL)
- * \param getProcAddress_cb opengl function loading callback (cannot be NULL)
+ * \param makeCurrent_cb callback called to enter/leave the opengl context (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
+ * \param getProcAddress_cb opengl function loading callback (cannot be NULL for \ref libvlc_video_engine_opengl and for \ref libvlc_video_engine_gles2)
  * \param opaque private pointer passed to callbacks
  * \libvlc_return_bool
  * \version LibVLC 4.0.0 or later
