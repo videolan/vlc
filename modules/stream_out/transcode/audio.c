@@ -199,7 +199,7 @@ int transcode_audio_init( sout_stream_t *p_stream, const es_format_t *p_fmt,
     return VLC_SUCCESS;
 }
 
-void transcode_audio_clean( sout_stream_id_sys_t *id )
+void transcode_audio_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 {
     /* Close decoder */
     if( id->p_decoder->p_module )

@@ -681,7 +681,7 @@ static void Del( sout_stream_t *p_stream, void *_id )
         {
         case AUDIO_ES:
             Send( p_stream, id, NULL );
-            transcode_audio_clean( id );
+            transcode_audio_clean( p_stream, id );
             if( id == p_sys->id_master_sync )
                 p_sys->id_master_sync = NULL;
             break;
