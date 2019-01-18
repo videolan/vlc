@@ -218,7 +218,7 @@ void transcode_audio_clean( sout_stream_t *p_stream, sout_stream_id_sys_t *id )
 
     /* Close filters */
     if( id->p_af_chain != NULL )
-        aout_FiltersDelete( (vlc_object_t *)NULL, id->p_af_chain );
+        aout_FiltersDelete( p_stream, id->p_af_chain );
 }
 
 static bool transcode_audio_format_IsSimilar( const audio_format_t *a,

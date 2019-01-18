@@ -517,8 +517,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
     audio_sample_format_t output_format = *outfmt;
 
     /* Callbacks (before reading values and also before return statement) */
-    if (request_vout != NULL)
-        var_AddCallback (obj, "visual", VisualizationCallback, NULL);
+    var_AddCallback (obj, "visual", VisualizationCallback, NULL);
 
     if (!AOUT_FMT_LINEAR(outfmt))
     {   /* Non-linear output: just convert formats, no filters/visu */
@@ -617,14 +616,11 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
         free (str);
     }
 
-    if (request_vout != NULL)
-    {
-        char *visual = var_InheritString (obj, "audio-visual");
-        if (visual != NULL && strcasecmp (visual, "none"))
-            AppendFilter(obj, "visualization", visual, filters,
-                         &input_format, &output_format, NULL);
-        free (visual);
-    }
+    char *visual = var_InheritString(obj, "audio-visual");
+    if (visual != NULL && strcasecmp(visual, "none"))
+        AppendFilter(obj, "visualization", visual, filters,
+                     &input_format, &output_format, NULL);
+    free(visual);
 
     /* convert to the output format (minus resampling) if necessary */
     output_format.i_rate = input_format.i_rate;
@@ -653,8 +649,7 @@ aout_filters_t *aout_FiltersNew (vlc_object_t *obj,
 
 error:
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    if (request_vout != NULL)
-        var_DelCallback (obj, "visual", VisualizationCallback, NULL);
+    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
     return NULL;
 }
@@ -664,17 +659,13 @@ error:
  * Destroys a chain of audio filters.
  * \param obj object used with aout_FiltersNew()
  * \param filters chain to be destroyed
- * \bug
- * obj must be NULL iff request_vout was NULL in aout_FiltersNew()
- * (this implies obj is an audio_output_t pointer if non NULL).
  */
 void aout_FiltersDelete (vlc_object_t *obj, aout_filters_t *filters)
 {
     if (filters->resampler != NULL)
         aout_FiltersPipelineDestroy (&filters->resampler, 1);
     aout_FiltersPipelineDestroy (filters->tab, filters->count);
-    if (obj != NULL)
-        var_DelCallback (obj, "visual", VisualizationCallback, NULL);
+    var_DelCallback(obj, "visual", VisualizationCallback, NULL);
     free (filters);
 }
 
