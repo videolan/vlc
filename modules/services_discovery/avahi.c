@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_services_discovery.h>
+#include <vlc_renderer_discovery.h>
 
 #include <avahi-client/client.h>
 #include <avahi-client/publish.h>
@@ -48,8 +49,11 @@
 /* Callbacks */
 static int  OpenSD ( vlc_object_t * );
 static void CloseSD( vlc_object_t * );
+static int  OpenRD ( vlc_object_t * );
+static void CloseRD( vlc_object_t * );
 
 VLC_SD_PROBE_HELPER("avahi", N_("Zeroconf network services"), SD_CAT_LAN)
+VLC_RD_PROBE_HELPER( "avahi_renderer", "Avahi Zeroconf renderer Discovery" )
 
 vlc_module_begin ()
     set_shortname( "Avahi" )
@@ -61,6 +65,14 @@ vlc_module_begin ()
     add_shortcut( "mdns", "avahi" )
 
     VLC_SD_PROBE_SUBMODULE
+    add_submodule() \
+        set_description( N_( "Avahi Renderer Discovery" ) )
+        set_category( CAT_SOUT )
+        set_subcategory( SUBCAT_SOUT_RENDERER )
+        set_capability( "renderer_discovery", 0 )
+        set_callbacks( OpenRD, CloseRD )
+        add_shortcut( "mdns_renderer", "avahi_renderer" )
+        VLC_RD_PROBE_SUBMODULE
 vlc_module_end ()
 
 /*****************************************************************************
@@ -80,14 +92,120 @@ static const struct
 {
     const char *psz_protocol;
     const char *psz_service_name;
+    bool        b_renderer;
 } protocols[] = {
-    { "ftp", "_ftp._tcp" },
-    { "smb", "_smb._tcp" },
-    { "nfs", "_nfs._tcp" },
-    { "sftp", "_sftp-ssh._tcp" },
-    { "rtsp", "_rtsp._tcp" },
+    { "ftp", "_ftp._tcp", false },
+    { "smb", "_smb._tcp", false },
+    { "nfs", "_nfs._tcp", false },
+    { "sftp", "_sftp-ssh._tcp", false },
+    { "rtsp", "_rtsp._tcp", false },
+    { "chromecast", "_googlecast._tcp", true },
 };
 #define NB_PROTOCOLS (sizeof(protocols) / sizeof(*protocols))
+
+/*****************************************************************************
+ * helpers
+ *****************************************************************************/
+static void add_renderer( const char *psz_protocol, const char *psz_name,
+                          const char *psz_addr, uint16_t i_port,
+                          AvahiStringList *txt, discovery_sys_t *p_sys )
+{
+    vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )(p_sys->parent);
+    AvahiStringList *asl = NULL;
+    char *friendly_name = NULL;
+    char *icon_uri = NULL;
+    char *uri = NULL;
+    const char *demux = NULL;
+    const char *extra_uri = NULL;
+    int renderer_flags = 0;
+
+    if( !strcmp( "chromecast", psz_protocol ) ) {
+        int ret = 0;
+
+        /* Capabilities */
+        asl = avahi_string_list_find( txt, "ca" );
+        if( asl != NULL ) {
+            char *key = NULL;
+            char *value = NULL;
+            if( avahi_string_list_get_pair( asl, &key, &value, NULL ) == 0 &&
+                value != NULL )
+            {
+                int ca = atoi( value );
+
+                if( ( ca & 0x01 ) != 0 )
+                    renderer_flags |= VLC_RENDERER_CAN_VIDEO;
+                if( ( ca & 0x04 ) != 0 )
+                    renderer_flags |= VLC_RENDERER_CAN_AUDIO;
+            }
+
+            if( key != NULL )
+                avahi_free( (void *)key );
+            if( value != NULL )
+                avahi_free( (void *)value );
+        }
+
+        /* Friendly name */
+        asl = avahi_string_list_find( txt, "fn" );
+        if( asl != NULL )
+        {
+            char *key = NULL;
+            char *value = NULL;
+            if( avahi_string_list_get_pair( asl, &key, &value, NULL ) == 0 &&
+                value != NULL )
+            {
+                friendly_name = strdup( value );
+                if( !friendly_name )
+                    ret = -1;
+            }
+
+            if( key != NULL )
+                avahi_free( (void *)key );
+            if( value != NULL )
+                avahi_free( (void *)value );
+        }
+        if( ret < 0 )
+            goto error;
+
+        /* Icon */
+        asl = avahi_string_list_find( txt, "ic" );
+        if( asl != NULL ) {
+            char *key = NULL;
+            char *value = NULL;
+            if( avahi_string_list_get_pair( asl, &key, &value, NULL ) == 0 &&
+                value != NULL )
+                ret = asprintf( &icon_uri, "http://%s:8008%s", psz_addr, value);
+
+            if( key != NULL )
+                avahi_free( (void *)key );
+            if( value != NULL )
+                avahi_free( (void *)value );
+        }
+        if( ret < 0 )
+            goto error;
+
+        if( asprintf( &uri, "%s://%s:%u", psz_protocol, psz_addr, i_port ) < 0 )
+            goto error;
+
+        extra_uri = renderer_flags & VLC_RENDERER_CAN_VIDEO ? NULL : "no-video";
+        demux = "cc_demux";
+    }
+
+    vlc_renderer_item_t *p_renderer_item =
+        vlc_renderer_item_new( psz_protocol, friendly_name ? friendly_name : psz_name, uri, extra_uri,
+                               demux, icon_uri, renderer_flags );
+    if( p_renderer_item == NULL )
+        goto error;
+
+    vlc_dictionary_insert( &p_sys->services_name_to_input_item,
+        psz_name, p_renderer_item);
+    vlc_rd_add_item( p_rd, p_renderer_item );
+    vlc_renderer_item_release( p_renderer_item );
+
+error:
+    free( friendly_name );
+    free( icon_uri );
+    free( uri );
+}
 
 /*****************************************************************************
  * client_callback
@@ -154,13 +272,27 @@ static void resolve_callback(
             }
 
         const char *psz_protocol = NULL;
+        bool is_renderer = false;
         for( unsigned int i = 0; i < NB_PROTOCOLS; i++ )
         {
             if( !strcmp(type, protocols[i].psz_service_name) )
+            {
                 psz_protocol = protocols[i].psz_protocol;
+                is_renderer = protocols[i].b_renderer;
+                break;
+            }
         }
         if( psz_protocol == NULL )
         {
+            free( psz_addr );
+            avahi_service_resolver_free( r );
+            return;
+        }
+
+        if( txt != NULL && is_renderer )
+        {
+            const char* addr_v4v6 = psz_addr != NULL ? psz_addr : a;
+            add_renderer( psz_protocol, name, addr_v4v6, port, txt, p_sys );
             free( psz_addr );
             avahi_service_resolver_free( r );
             return;
@@ -262,8 +394,16 @@ static void browse_callback(
             msg_Err( p_sys->parent, "failed to find service '%s' in playlist", name );
         else
         {
-            services_discovery_t *p_sd = ( services_discovery_t* )(p_sys->parent);
-            services_discovery_RemoveItem( p_sd, p_item );
+            if( p_sys->renderer )
+            {
+                vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )(p_sys->parent);
+                vlc_rd_remove_item( p_rd, p_item );
+            }
+            else
+            {
+                services_discovery_t *p_sd = ( services_discovery_t* )(p_sys->parent);
+                services_discovery_RemoveItem( p_sd, p_item );
+            }
             vlc_dictionary_remove_value_for_key(
                         &p_sys->services_name_to_input_item,
                         name, NULL, NULL );
@@ -298,6 +438,9 @@ static int OpenCommon( discovery_sys_t *p_sys )
 
     for( unsigned i = 0; i < NB_PROTOCOLS; i++ )
     {
+        if( protocols[i].b_renderer != p_sys->renderer )
+            continue;
+
         AvahiServiceBrowser *sb;
         sb = avahi_service_browser_new( p_sys->client, AVAHI_IF_UNSPEC,
                 AVAHI_PROTO_UNSPEC,
@@ -340,6 +483,19 @@ static int OpenSD( vlc_object_t *p_this )
     return OpenCommon( p_sys );
 }
 
+static int OpenRD( vlc_object_t *p_this )
+{
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
+
+    discovery_sys_t *p_sys = p_rd->p_sys = calloc( 1, sizeof( discovery_sys_t ) );
+    if( !p_rd->p_sys )
+        return VLC_ENOMEM;
+    p_sys->parent = p_this;
+    p_sys->renderer = true;
+
+    return OpenCommon( p_sys );
+}
+
 /*****************************************************************************
  * Close: cleanup
  *****************************************************************************/
@@ -358,5 +514,12 @@ static void CloseSD( vlc_object_t *p_this )
 {
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     discovery_sys_t *p_sys = p_sd->p_sys;
+    CloseCommon( p_sys );
+}
+
+static void CloseRD( vlc_object_t *p_this )
+{
+    vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
+    discovery_sys_t *p_sys = p_rd->p_sys;
     CloseCommon( p_sys );
 }
