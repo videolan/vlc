@@ -242,7 +242,7 @@ static void browse_callback(
                      avahi_strerror( avahi_client_errno( p_sys->client ) ) );
         }
     }
-    else if( name )
+    else if( event == AVAHI_BROWSER_REMOVE && name )
     {
         /** \todo Store the input id and search it, rather than searching the items */
         input_item_t *p_item;
