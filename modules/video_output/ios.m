@@ -779,13 +779,15 @@ static void GLESSwap(vlc_gl_t *gl)
     {
         _appActive = NO;
 
-        if (_eaglEnabled)
-        {
-            /* Wait for the vout to unlock the eagl context before releasing
-             * it. */
-            while (_gl_attached)
-                vlc_cond_wait(&_gl_attached_wait, &_mutex);
+        /* Wait for the vout to unlock the eagl context before releasing
+         * it. */
+        while (_gl_attached && _eaglEnabled)
+            vlc_cond_wait(&_gl_attached_wait, &_mutex);
 
+        /* _eaglEnabled can change during the vlc_cond_wait
+         * as the mutex is unlocked during that, so this check
+         * has to be done after the vlc_cond_wait! */
+        if (_eaglEnabled) {
             [self flushEAGLLocked];
             _eaglEnabled = NO;
         }
