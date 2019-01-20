@@ -86,10 +86,10 @@ punpcklbw %%mm2, %%mm1  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 movq      %%mm1, %%mm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
 movq      %%mm2, (%0)   # Store low UYVY                                  \n\
-movq      %%mm1, %%mm2  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
-punpckhbw %%mm0, %%mm2  #                     y3 v1 y2 u1 y1 v0 y0 u0     \n\
+movq      %%mm1, %%mm2  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
+punpckhbw %%mm0, %%mm2  #                     y7 v3 y6 u3 y5 v2 y4 u2     \n\
 movq      %%mm2, 8(%0)  # Store high UYVY                                 \n\
-movq      %%mm1, %%mm4  #                     u3 v3 u2 v2 u1 v1 u0 v0     \n\
+movq      %%mm1, %%mm4  #                     v3 u3 v2 u2 v1 u1 v0 u0     \n\
 punpcklbw %%mm3, %%mm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0     \n\
 movq      %%mm4, (%1)   # Store low UYVY                                  \n\
 punpckhbw %%mm3, %%mm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2     \n\
@@ -177,8 +177,8 @@ movq      %%mm1, 8(%1)  # Store high UYVY                                 \n\
     do {                                \
     __asm__ __volatile__(               \
         ".p2align 3 \n\t                \
-movq        (%0), %%xmm1  # Load 8 Cb         u7 u6 u5 u4 u3 u2 u1 u0     \n\
-movq        (%1), %%xmm2  # Load 8 Cr         v7 06 v5 v4 v3 v2 v1 v0     \n\
+movq        (%0), %%xmm1  # Load 8 Cb         00 00 00 ... u2 u1 u0   \n\
+movq        (%1), %%xmm2  # Load 8 Cr         00 00 00 ... v2 v1 v0   \n\
 " \
         :                               \
         : "r" (p_u),  "r" (p_v)         \
@@ -197,108 +197,108 @@ movq        (%1), %%xmm2  # Load 8 Cr         v7 06 v5 v4 v3 v2 v1 v0     \n\
 
 #define SSE2_END  __asm__ __volatile__ ( "sfence" ::: "memory" )
 
-#define SSE2_YUV420_YUYV_ALIGNED "                                        \n\
-movdqa      (%2), %%xmm0  # Load 16 Y         y15 y14 y13 .. y2 y1 y0     \n\
-movdqa      (%3), %%xmm3  # Load 16 Y         Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm2, %%xmm1  #                   v7 u7 v6 u6 .. u1 v0 u0     \n\
-movdqa    %%xmm0, %%xmm2  #                   y15 y14 y13 .. y2 y1 y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                   v3 y7 u3 .. v0 y1 u0 y0     \n\
-movntdq   %%xmm2, (%0)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm0  #                   v3 y7 u3 y6 v2 y5 u2 y4     \n\
-movntdq   %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqa    %%xmm3, %%xmm4  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm4  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
-movntdq   %%xmm4, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm3  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
-movntdq   %%xmm3, 16(%1)  # Store high YUYV                               \n\
+#define SSE2_YUV420_YUYV_ALIGNED "                                     \n\
+movdqa      (%2), %%xmm0  # Load 16 Y          yF yE yD ... y2 y1 y0   \n\
+movdqa      (%3), %%xmm3  # Load 16 Y          YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm2, %%xmm1  #                    00 00 ... v1 u1 v0 u0   \n\
+movdqa    %%xmm0, %%xmm2  #                    yF yE yD ... y2 y1 y0   \n\
+punpcklbw %%xmm1, %%xmm2  #                    v3 y7 ... v0 y1 u0 y0   \n\
+movntdq   %%xmm2, (%0)    # Store low YUYV                             \n\
+punpckhbw %%xmm1, %%xmm0  #                    v7 yF ... v4 y9 u4 y8   \n\
+movntdq   %%xmm0, 16(%0)  # Store high YUYV                            \n\
+movdqa    %%xmm3, %%xmm4  #                    YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm1, %%xmm4  #                    v3 Y7 ... v0 Y1 u0 Y0   \n\
+movntdq   %%xmm4, (%1)    # Store low YUYV                             \n\
+punpckhbw %%xmm1, %%xmm3  #                    v7 YF ... v4 Y9 u4 Y8   \n\
+movntdq   %%xmm3, 16(%1)  # Store high YUYV                            \n\
 "
 
-#define SSE2_YUV420_YUYV_UNALIGNED "                                      \n\
-movdqu      (%2), %%xmm0  # Load 16 Y         y7 y6 y5 y4 y3 y2 y1 y0     \n\
-movdqu      (%3), %%xmm3  # Load 16 Y         Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-prefetchnta (%0)          # Tell CPU not to cache output YUYV data        \n\
-prefetchnta (%1)          # Tell CPU not to cache output YUYV data        \n\
-punpcklbw %%xmm2, %%xmm1  #                   v3 u3 v2 u2 v1 u1 v0 u0     \n\
-movdqa    %%xmm0, %%xmm2  #                   y7 y6 y5 y4 y3 y2 y1 y0     \n\
-punpcklbw %%xmm1, %%xmm2  #                   v1 y3 u1 y2 v0 y1 u0 y0     \n\
-movdqu    %%xmm2, (%0)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm0  #                   v3 y7 u3 y6 v2 y5 u2 y4     \n\
-movdqu    %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqa    %%xmm3, %%xmm4  #                   Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0     \n\
-punpcklbw %%xmm1, %%xmm4  #                   v1 Y3 u1 Y2 v0 Y1 u0 Y0     \n\
-movdqu    %%xmm4, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm1, %%xmm3  #                   v3 Y7 u3 Y6 v2 Y5 u2 Y4     \n\
-movdqu    %%xmm3, 16(%1)  # Store high YUYV                               \n\
+#define SSE2_YUV420_YUYV_UNALIGNED "                                   \n\
+movdqu      (%2), %%xmm0  # Load 16 Y          yF yE yD ... y2 y1 y0   \n\
+movdqu      (%3), %%xmm3  # Load 16 Y          YF YE YD ... Y2 Y1 Y0   \n\
+prefetchnta (%0)          # Tell CPU not to cache output YUYV data     \n\
+prefetchnta (%1)          # Tell CPU not to cache output YUYV data     \n\
+punpcklbw %%xmm2, %%xmm1  #                    00 00 ... v1 u1 v0 u0   \n\
+movdqa    %%xmm0, %%xmm2  #                    yF yE yD ... y2 y1 y0   \n\
+punpcklbw %%xmm1, %%xmm2  #                    v3 y7 ... v0 y1 u0 y0   \n\
+movdqu    %%xmm2, (%0)    # Store low YUYV                             \n\
+punpckhbw %%xmm1, %%xmm0  #                    v7 yF ... v4 y9 u4 y8   \n\
+movdqu    %%xmm0, 16(%0)  # Store high YUYV                            \n\
+movdqa    %%xmm3, %%xmm4  #                    YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm1, %%xmm4  #                    v3 Y7 ... v0 Y1 u0 Y0   \n\
+movdqu    %%xmm4, (%1)    # Store low YUYV                             \n\
+punpckhbw %%xmm1, %%xmm3  #                    v7 YF ... v4 Y9 u4 Y8   \n\
+movdqu    %%xmm3, 16(%1)  # Store high YUYV                            \n\
 "
 
-#define SSE2_YUV420_YVYU_ALIGNED "                                        \n\
-movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0   \n\
-movdqa      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-punpcklbw %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-movdqa    %%xmm0, %%xmm1  #                     y7 y6 y5 y4 y3 y2 y1 y0   \n\
-punpcklbw %%xmm2, %%xmm1  #                     u1 y3 v1 y2 u0 y1 v0 y0   \n\
-movntdq   %%xmm1, (%0)    # Store low YUYV                                \n\
-punpckhbw %%xmm2, %%xmm0  #                     u3 y7 v3 y6 u2 y5 v2 y4   \n\
-movntdq   %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqa    %%xmm3, %%xmm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-punpcklbw %%xmm2, %%xmm4  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0   \n\
-movntdq   %%xmm4, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm2, %%xmm3  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4   \n\
-movntdq   %%xmm3, 16(%1)  # Store high YUYV                               \n\
+#define SSE2_YUV420_YVYU_ALIGNED "                                     \n\
+movdqa      (%2), %%xmm0  # Load 16 Y          yF yE yD ... y2 y1 y0   \n\
+movdqa      (%3), %%xmm3  # Load 16 Y          YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm1, %%xmm2  #                    u7 v7 ... u1 v1 u0 v0   \n\
+movdqa    %%xmm0, %%xmm1  #                    yF yE yD ... y2 y1 y0   \n\
+punpcklbw %%xmm2, %%xmm1  #                    u3 y7 ... u0 y1 v0 y0   \n\
+movntdq   %%xmm1, (%0)    # Store low YUYV                             \n\
+punpckhbw %%xmm2, %%xmm0  #                    u7 yF ... u4 y9 v4 y8   \n\
+movntdq   %%xmm0, 16(%0)  # Store high YUYV                            \n\
+movdqa    %%xmm3, %%xmm4  #                    YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm2, %%xmm4  #                    u3 Y7 ... u0 Y1 v0 Y0   \n\
+movntdq   %%xmm4, (%1)    # Store low YUYV                             \n\
+punpckhbw %%xmm2, %%xmm3  #                    u7 YF ... u4 Y9 v4 Y8   \n\
+movntdq   %%xmm3, 16(%1)  # Store high YUYV                            \n\
 "
 
-#define SSE2_YUV420_YVYU_UNALIGNED "                                      \n\
-movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0   \n\
-movdqu      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-prefetchnta (%0)          # Tell CPU not to cache output YVYU data        \n\
-prefetchnta (%1)          # Tell CPU not to cache output YVYU data        \n\
-punpcklbw %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-movdqu    %%xmm0, %%xmm1  #                     y7 y6 y5 y4 y3 y2 y1 y0   \n\
-punpcklbw %%xmm2, %%xmm1  #                     u1 y3 v1 y2 u0 y1 v0 y0   \n\
-movdqu    %%xmm1, (%0)    # Store low YUYV                                \n\
-punpckhbw %%xmm2, %%xmm0  #                     u3 y7 v3 y6 u2 y5 v2 y4   \n\
-movdqu    %%xmm0, 16(%0)  # Store high YUYV                               \n\
-movdqu    %%xmm3, %%xmm4  #                     Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-punpcklbw %%xmm2, %%xmm4  #                     u1 Y3 v1 Y2 u0 Y1 v0 Y0   \n\
-movdqu    %%xmm4, (%1)    # Store low YUYV                                \n\
-punpckhbw %%xmm2, %%xmm3  #                     u3 Y7 v3 Y6 u2 Y5 v2 Y4   \n\
-movdqu    %%xmm3, 16(%1)  # Store high YUYV                               \n\
+#define SSE2_YUV420_YVYU_UNALIGNED "                                    \n\
+movdqu      (%2), %%xmm0  # Load 16 Y           yF yE yD ... y2 y1 y0   \n\
+movdqu      (%3), %%xmm3  # Load 16 Y           YF YE YD ... Y2 Y1 Y0   \n\
+prefetchnta (%0)          # Tell CPU not to cache output YVYU data      \n\
+prefetchnta (%1)          # Tell CPU not to cache output YVYU data      \n\
+punpcklbw %%xmm1, %%xmm2  #                     u7 v7 ... u1 v1 u0 v0   \n\
+movdqu    %%xmm0, %%xmm1  #                     yF yE yD ... y2 y1 y0   \n\
+punpcklbw %%xmm2, %%xmm1  #                     u3 y7 ... u0 y1 v0 y0   \n\
+movdqu    %%xmm1, (%0)    # Store low YUYV                              \n\
+punpckhbw %%xmm2, %%xmm0  #                     u7 yF ... u4 y9 v4 y8   \n\
+movdqu    %%xmm0, 16(%0)  # Store high YUYV                             \n\
+movdqu    %%xmm3, %%xmm4  #                     YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm2, %%xmm4  #                     u3 Y7 ... u0 Y1 v0 Y0   \n\
+movdqu    %%xmm4, (%1)    # Store low YUYV                              \n\
+punpckhbw %%xmm2, %%xmm3  #                     u7 YF ... u4 Y9 v4 Y8   \n\
+movdqu    %%xmm3, 16(%1)  # Store high YUYV                             \n\
 "
 
-#define SSE2_YUV420_UYVY_ALIGNED "                                        \n\
-movdqa      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0   \n\
-movdqa      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-punpcklbw %%xmm2, %%xmm1  #                     v3 u3 v2 u2 v1 u1 v0 u0   \n\
-movdqa    %%xmm1, %%xmm2  #                     v3 u3 v2 u2 v1 u1 v0 u0   \n\
-punpcklbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0   \n\
-movntdq   %%xmm2, (%0)    # Store low UYVY                                \n\
-movdqa    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-punpckhbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0   \n\
-movntdq   %%xmm2, 16(%0)  # Store high UYVY                               \n\
-movdqa    %%xmm1, %%xmm4  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-punpcklbw %%xmm3, %%xmm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0   \n\
-movntdq   %%xmm4, (%1)    # Store low UYVY                                \n\
-punpckhbw %%xmm3, %%xmm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2   \n\
-movntdq   %%xmm1, 16(%1)  # Store high UYVY                               \n\
+#define SSE2_YUV420_UYVY_ALIGNED "                                      \n\
+movdqa      (%2), %%xmm0  # Load 16 Y           yF yE yD ... y2 y1 y0   \n\
+movdqa      (%3), %%xmm3  # Load 16 Y           YF YE YD ... Y2 Y1 Y0   \n\
+punpcklbw %%xmm2, %%xmm1  #                     v7 u7 ... v1 u1 v0 u0   \n\
+movdqa    %%xmm1, %%xmm2  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpcklbw %%xmm0, %%xmm2  #                     y7 v3 ... y1 v0 y0 u0   \n\
+movntdq   %%xmm2, (%0)    # Store low UYVY                              \n\
+movdqa    %%xmm1, %%xmm2  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpckhbw %%xmm0, %%xmm2  #                     yF v7 ... y9 v4 y8 u4   \n\
+movntdq   %%xmm2, 16(%0)  # Store high UYVY                             \n\
+movdqa    %%xmm1, %%xmm4  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpcklbw %%xmm3, %%xmm4  #                     Y7 v3 ... Y1 v0 Y0 u0   \n\
+movntdq   %%xmm4, (%1)    # Store low UYVY                              \n\
+punpckhbw %%xmm3, %%xmm1  #                     YF v7 ... Y9 v4 Y8 u4   \n\
+movntdq   %%xmm1, 16(%1)  # Store high UYVY                             \n\
 "
 
-#define SSE2_YUV420_UYVY_UNALIGNED "                                      \n\
-movdqu      (%2), %%xmm0  # Load 16 Y           y7 y6 y5 y4 y3 y2 y1 y0   \n\
-movdqu      (%3), %%xmm3  # Load 16 Y           Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
-prefetchnta (%0)          # Tell CPU not to cache output UYVY data        \n\
-prefetchnta (%1)          # Tell CPU not to cache output UYVY data        \n\
-punpcklbw %%xmm2, %%xmm1  #                     v3 u3 v2 u2 v1 u1 v0 u0   \n\
-movdqu    %%xmm1, %%xmm2  #                     v3 u3 v2 u2 v1 u1 v0 u0   \n\
-punpcklbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0   \n\
-movdqu    %%xmm2, (%0)    # Store low UYVY                                \n\
-movdqu    %%xmm1, %%xmm2  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-punpckhbw %%xmm0, %%xmm2  #                     y3 v1 y2 u1 y1 v0 y0 u0   \n\
-movdqu    %%xmm2, 16(%0)  # Store high UYVY                               \n\
-movdqu    %%xmm1, %%xmm4  #                     u3 v3 u2 v2 u1 v1 u0 v0   \n\
-punpcklbw %%xmm3, %%xmm4  #                     Y3 v1 Y2 u1 Y1 v0 Y0 u0   \n\
-movdqu    %%xmm4, (%1)    # Store low UYVY                                \n\
-punpckhbw %%xmm3, %%xmm1  #                     Y7 v3 Y6 u3 Y5 v2 Y4 u2   \n\
-movdqu    %%xmm1, 16(%1)  # Store high UYVY                               \n\
+#define SSE2_YUV420_UYVY_UNALIGNED "                                    \n\
+movdqu      (%2), %%xmm0  # Load 16 Y           yF yE yD ... y2 y1 y0   \n\
+movdqu      (%3), %%xmm3  # Load 16 Y           YF YE YD ... Y2 Y1 Y0   \n\
+prefetchnta (%0)          # Tell CPU not to cache output UYVY data      \n\
+prefetchnta (%1)          # Tell CPU not to cache output UYVY data      \n\
+punpcklbw %%xmm2, %%xmm1  #                     v7 u7 ... v1 u1 v0 u0   \n\
+movdqu    %%xmm1, %%xmm2  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpcklbw %%xmm0, %%xmm2  #                     y7 v3 ... y1 v0 y0 u0   \n\
+movdqu    %%xmm2, (%0)    # Store low UYVY                              \n\
+movdqu    %%xmm1, %%xmm2  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpckhbw %%xmm0, %%xmm2  #                     yF v7 ... y9 v4 y8 u4   \n\
+movdqu    %%xmm2, 16(%0)  # Store high UYVY                             \n\
+movdqu    %%xmm1, %%xmm4  #                     v7 u7 ... v1 u1 v0 u0   \n\
+punpcklbw %%xmm3, %%xmm4  #                     Y7 v3 ... Y1 v0 Y0 u0   \n\
+movdqu    %%xmm4, (%1)    # Store low UYVY                              \n\
+punpckhbw %%xmm3, %%xmm1  #                     YF v7 ... Y9 v4 Y8 u4   \n\
+movdqu    %%xmm1, 16(%1)  # Store high UYVY                             \n\
 "
 
 #elif defined(HAVE_SSE2_INTRINSICS)
