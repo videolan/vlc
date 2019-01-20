@@ -215,16 +215,13 @@ punpcklbw %%mm4, %%mm2          # ________ ________ g7g6g5g4 g3______       \n\
 punpcklbw %%mm1, %%mm0          # __r7r6r5 r4r3____ ______b7 b6b5b4b3       \n\
 psllw     $2,%%mm2              # ________ ____g7g6 g5g4g3__ ________       \n\
 por       %%mm2, %%mm0          # __r7r6r5 r4r3g7g6 g5g4g3b7 b6b5b4b3       \n\
-movq      8(%0), %%mm6          # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
 movq      %%mm0, (%3)           # store pixel 0-3                           \n\
                                                                             \n\
 # pack the 3 separate RGB bytes into 2 for pixels 4-7                       \n\
 punpckhbw %%mm4, %%mm7          # ________ ________ g7g6g5g4 g3______       \n\
 punpckhbw %%mm1, %%mm5          # __r7r6r5 r4r3____ ______b7 b6b5b4b3       \n\
 psllw     $2,%%mm7              # ________ ____g7g6 g5g4g3__ ________       \n\
-movd      4(%1), %%mm0          # Load 4 Cb       00 00 00 00 u3 u2 u1 u0   \n\
 por       %%mm7, %%mm5          # __r7r6r5 r4r3g7g6 g5g4g3b7 b6b5b4b3       \n\
-movd      4(%2), %%mm1          # Load 4 Cr       00 00 00 00 v3 v2 v1 v0   \n\
 movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
 "
 
@@ -250,16 +247,13 @@ punpcklbw %%mm4, %%mm2          # ________ ________ g7g6g5g4 g3g2____       \n\
 punpcklbw %%mm1, %%mm0          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
 psllw     $3,%%mm2              # ________ __g7g6g5 g4g3g2__ ________       \n\
 por       %%mm2, %%mm0          # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3       \n\
-movq      8(%0), %%mm6          # Load 8 Y        Y7 Y6 Y5 Y4 Y3 Y2 Y1 Y0   \n\
 movq      %%mm0, (%3)           # store pixel 0-3                           \n\
                                                                             \n\
 # pack the 3 separate RGB bytes into 2 for pixels 4-7                       \n\
 punpckhbw %%mm4, %%mm7          # ________ ________ g7g6g5g4 g3g2____       \n\
 punpckhbw %%mm1, %%mm5          # r7r6r5r4 r3______ ______b7 b6b5b4b3       \n\
 psllw     $3,%%mm7              # ________ __g7g6g5 g4g3g2__ ________       \n\
-movd      4(%1), %%mm0          # Load 4 Cb       00 00 00 00 u3 u2 u1 u0   \n\
 por       %%mm7, %%mm5          # r7r6r5r4 r3g7g6g5 g4g3g2b7 b6b5b4b3       \n\
-movd      4(%2), %%mm1          # Load 4 Cr       00 00 00 00 v3 v2 v1 v0   \n\
 movq      %%mm5, 8(%3)          # store pixel 4-7                           \n\
 "
 
@@ -437,15 +431,12 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
     mm0 = _mm_unpacklo_pi8(mm0, mm1);               \
     mm2 = _mm_slli_pi16(mm2, 2);                    \
     mm0 = _mm_or_si64(mm0, mm2);                    \
-    mm6 = (__m64)*(uint64_t *)(p_y + 8);            \
     *(uint64_t *)p_buffer = (uint64_t)mm0;          \
     \
     mm7 = _mm_unpackhi_pi8(mm7, mm4);               \
     mm5 = _mm_unpackhi_pi8(mm5, mm1);               \
     mm7 = _mm_slli_pi16(mm7, 2);                    \
-    mm0 = _mm_cvtsi32_si64((int)*(uint32_t *)(p_u + 4)); \
     mm5 = _mm_or_si64(mm5, mm7);                    \
-    mm1 = _mm_cvtsi32_si64((int)*(uint32_t *)(p_v + 4)); \
     *(uint64_t *)(p_buffer + 4) = (uint64_t)mm5;
 
 #define MMX_UNPACK_16                               \
@@ -461,15 +452,12 @@ movq      %%mm2, 24(%3) # Store ABGR7 ABGR6                                 \n\
     mm0 = _mm_unpacklo_pi8(mm0, mm1);               \
     mm2 = _mm_slli_pi16(mm2, 3);                    \
     mm0 = _mm_or_si64(mm0, mm2);                    \
-    mm6 = (__m64)*(uint64_t *)(p_y + 8);            \
     *(uint64_t *)p_buffer = (uint64_t)mm0;          \
     \
     mm7 = _mm_unpackhi_pi8(mm7, mm4);               \
     mm5 = _mm_unpackhi_pi8(mm5, mm1);               \
     mm7 = _mm_slli_pi16(mm7, 3);                    \
-    mm0 = _mm_cvtsi32_si64((int)*(uint32_t *)(p_u + 4)); \
     mm5 = _mm_or_si64(mm5, mm7);                    \
-    mm1 = _mm_cvtsi32_si64((int)*(uint32_t *)(p_v + 4)); \
     *(uint64_t *)(p_buffer + 4) = (uint64_t)mm5;
 
 #define MMX_UNPACK_32_ARGB                      \
