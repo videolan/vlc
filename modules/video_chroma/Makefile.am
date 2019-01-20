@@ -110,6 +110,26 @@ chroma_LTLIBRARIES += \
 	libi422_yuy2_sse2_plugin.la
 endif
 
+# AVX2
+libi420_rgb_avx2_plugin_la_SOURCES = video_chroma/i420_rgb.c video_chroma/i420_rgb.h \
+	video_chroma/i420_rgb16_x86.c video_chroma/i420_rgb_avx2.h
+libi420_rgb_avx2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) -DAVX2
+
+libi420_yuy2_avx2_plugin_la_SOURCES = video_chroma/i420_yuy2.c video_chroma/i420_yuy2.h
+libi420_yuy2_avx2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i420_yuy2_avx2
+
+libi422_yuy2_avx2_plugin_la_SOURCES = video_chroma/i422_yuy2.c video_chroma/i422_yuy2.h
+libi422_yuy2_avx2_plugin_la_CPPFLAGS = $(AM_CPPFLAGS) \
+	-DMODULE_NAME_IS_i422_yuy2_avx2
+
+if HAVE_AVX2
+chroma_LTLIBRARIES += \
+	libi420_rgb_avx2_plugin.la \
+	libi420_yuy2_avx2_plugin.la \
+	libi422_yuy2_avx2_plugin.la
+endif
+
 libcvpx_plugin_la_SOURCES = codec/vt_utils.c codec/vt_utils.h video_chroma/cvpx.c
 if HAVE_IOS
 libcvpx_plugin_la_CFLAGS = $(AM_CFLAGS) -miphoneos-version-min=8.0
