@@ -546,7 +546,8 @@ else
 ifdef HAVE_IOS
 	echo "system = 'darwin'" >> $@
 else
-ifdef HAVE_ANDROID
+ifdef HAVE_LINUX
+	# android has also system = linux and defines HAVE_LINUX
 	echo "system = 'linux'" >> $@
 endif
 endif
