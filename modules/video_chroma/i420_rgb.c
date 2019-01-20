@@ -80,7 +80,7 @@ vlc_module_begin ()
 # define vlc_CPU_capable() vlc_CPU_MMX()
 #else
     set_description( N_("I420,IYUV,YV12 to "
-                       "RGB2,RV15,RV16,RV24,RV32 conversions") )
+                       "RGB8,RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video converter", 80 )
 # define vlc_CPU_capable() (true)
 #endif
