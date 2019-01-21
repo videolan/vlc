@@ -1240,6 +1240,9 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
         }
     }
 
+    /* make sure all SSE2 stores are visible thereafter */
+    SSE2_END;
+
 #else
 
     i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
@@ -1476,6 +1479,9 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_buffer = b_hscale ? p_buffer_start : p_pic;
         }
     }
+
+    /* make sure all SSE2 stores are visible thereafter */
+    SSE2_END;
 
 #else
 
