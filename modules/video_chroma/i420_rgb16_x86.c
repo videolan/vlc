@@ -322,7 +322,6 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 2 );
@@ -563,7 +562,6 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 2 );
@@ -803,7 +801,6 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 4 );
@@ -1043,7 +1040,6 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 4 );
@@ -1283,7 +1279,6 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 4 );
@@ -1523,7 +1518,6 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
             p_y += 8;
             p_u += 4;
             p_v += 4;
-            p_buffer += 8;
         }
         SCALE_WIDTH;
         SCALE_HEIGHT( 420, 4 );
