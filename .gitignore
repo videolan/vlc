@@ -13,6 +13,7 @@
 *.vlt
 *.class
 *.dmg
+*.qmlc
 .DS_Store
 .deps
 .libs
