@@ -1609,7 +1609,7 @@ static int OpenRD( vlc_object_t *p_this )
 
     if ( !p_sys )
         return VLC_ENOMEM;
-    p_rd->p_sys = ( vlc_renderer_discovery_sys* ) p_sys;
+    p_rd->p_sys = p_sys;
     p_sys->p_upnp = UpnpInstanceWrapper::get( p_this );
 
     if ( !p_sys->p_upnp )
