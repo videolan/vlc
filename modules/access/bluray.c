@@ -176,13 +176,15 @@ static bool BDJO_IsBlacklisted(demux_t *p_demux, const char *psz_bd_path)
             struct bdjo_data *bdjo = bd_read_bdjo(psz_bdjo_file);
             if(bdjo)
             {
+                size_t k=0;
                 for(uint8_t j=0; j<bdjo->app_table.num_app && !b_ret; j++)
-                    for(size_t k=0; k<ARRAY_SIZE(rgsz_class_blacklist) && !b_ret; k++)
+                    for(; k<ARRAY_SIZE(rgsz_class_blacklist) && !b_ret; k++)
                         b_ret = (!strcmp(rgsz_class_blacklist[k],
                                          bdjo->app_table.app[j].initial_class));
 #ifdef DEBUG_BLURAY
                  if(b_ret)
-                     msg_Warn("Found blacklisted class %s in %s", rgsz_class_blacklist[k],
+                     msg_Warn(p_demux, "Found blacklisted class %s in %s",
+                              rgsz_class_blacklist[k],
                               ppsz_filenames[i]);
 #else
     VLC_UNUSED(p_demux);
