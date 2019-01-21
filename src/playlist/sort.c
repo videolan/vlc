@@ -24,6 +24,7 @@
 
 #include <vlc_common.h>
 #include <vlc_rand.h>
+#include <vlc_sort.h>
 #include "control.h"
 #include "item.h"
 #include "notify.h"
@@ -377,7 +378,7 @@ vlc_playlist_Sort(vlc_playlist_t *playlist,
 
     struct sort_request req = { criteria, count };
 
-    qsort_r(array, playlist->items.size, sizeof(*array), compare_meta, &req);
+    vlc_qsort(array, playlist->items.size, sizeof(*array), compare_meta, &req);
 
     /* apply the sorting result to the playlist */
     for (size_t i = 0; i < playlist->items.size; ++i)
