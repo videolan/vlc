@@ -112,26 +112,20 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
                                  const vout_configuration_t *cfg,
                                  input_thread_t *input)
 {
-    video_format_t original;
-
     if (!VoutCheckFormat(cfg->fmt))
         return NULL;
-
-    VoutFixFormat(&original, cfg->fmt);
 
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
                                             sizeof(*vout) + sizeof(*vout->p),
                                             "video output");
-    if (!vout) {
-        video_format_Clean(&original);
+    if (!vout)
         return NULL;
-    }
 
     /* */
     vout->p = (vout_thread_sys_t*)&vout[1];
 
-    vout->p->original = original;
+    VoutFixFormat(&vout->p->original, cfg->fmt);
     vout->p->dpb_size = cfg->dpb_size;
     vout->p->mouse_event = cfg->mouse_event;
     vout->p->opaque = cfg->opaque;
