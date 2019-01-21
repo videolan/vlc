@@ -75,16 +75,18 @@ static void VoutDestructor(vlc_object_t *);
 #define VOUT_MWAIT_TOLERANCE VLC_TICK_FROM_MS(4)
 
 /* */
-static int VoutValidateFormat(video_format_t *dst,
-                              const video_format_t *src)
+static bool VoutCheckFormat(const video_format_t *src)
 {
     if (src->i_width == 0  || src->i_width  > 8192 ||
         src->i_height == 0 || src->i_height > 8192)
-        return VLC_EGENERIC;
+        return false;
     if (src->i_sar_num <= 0 || src->i_sar_den <= 0)
-        return VLC_EGENERIC;
+        return false;
+    return true;
+}
 
-    /* */
+static void VoutFixFormat(video_format_t *dst, const video_format_t *src)
+{
     video_format_Copy(dst, src);
     dst->i_chroma = vlc_fourcc_GetCodec(VIDEO_ES, src->i_chroma);
     vlc_ureduce( &dst->i_sar_num, &dst->i_sar_den,
@@ -94,7 +96,6 @@ static int VoutValidateFormat(video_format_t *dst,
         dst->i_sar_den = 1;
     }
     video_format_FixRgb(dst);
-    return VLC_SUCCESS;
 }
 
 static bool VideoFormatIsCropArEqual(video_format_t *dst,
@@ -112,8 +113,11 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
                                  input_thread_t *input)
 {
     video_format_t original;
-    if (VoutValidateFormat(&original, cfg->fmt))
+
+    if (!VoutCheckFormat(cfg->fmt))
         return NULL;
+
+    VoutFixFormat(&original, cfg->fmt);
 
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
@@ -1514,10 +1518,12 @@ static int ThreadReinit(vout_thread_t *vout,
     vout->p->pause.is_on = false;
     vout->p->pause.date  = VLC_TICK_INVALID;
 
-    if (VoutValidateFormat(&original, cfg->fmt)) {
+    if (!VoutCheckFormat(cfg->fmt)) {
         ThreadStop(vout, NULL);
         return VLC_EGENERIC;
     }
+
+    VoutFixFormat(&original, cfg->fmt);
 
     /* We ignore ar changes at this point, they are dynamically supported.
      * #19268: don't ignore crop changes (fix vouts using the crop size of the
