@@ -158,4 +158,10 @@
         <file alias="addon_red.svg">pixmaps/addons/addon_red.svg</file>
         <file alias="addon_yellow.svg">pixmaps/addons/addon_yellow.svg</file>
     </qresource>
+    <qresource prefix="/style">
+        <file alias="qmldir">qml/style/qmldir</file>
+        <file alias="VLCStyle.qml">qml/style/VLCStyle.qml</file>
+        <file alias="VLCColors.qml">qml/style/VLCColors.qml</file>
+        <file alias="VLCIcons.qml">qml/style/VLCIcons.qml</file>
+    </qresource>
 </RCC>

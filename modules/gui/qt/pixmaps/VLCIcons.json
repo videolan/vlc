@@ -120,6 +120,7 @@
 		{"key":"help", "path": "./menus/help_16px.svg"},
 		{"key":"stream", "path": "./menus/stream_16px.svg"},
 		{"key":"valid", "path": "./valid.svg"},
-		{"key":"search_clear", "path": "./search_clear.svg"}
+		{"key":"search_clear", "path": "./search_clear.svg"},
+		{"key":"menu", "path": "./menu.svg"}
 	]
 }
