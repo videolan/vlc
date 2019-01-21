@@ -1339,7 +1339,7 @@ AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
 AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
 
 dnl  Check for fully workin SSE2 intrinsics
-dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
+dnl  We need support for -msse[2], we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE([sse],
   AS_HELP_STRING([--disable-sse],
@@ -1432,6 +1432,7 @@ asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
 
   AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE3, 1, [Define to 1 if SSE3 inline assembly is available.]) ])
+
   # SSSE3
   AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly], [ac_cv_ssse3_inline], [
     AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
@@ -1499,6 +1500,87 @@ asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
     AC_DEFINE([CAN_COMPILE_SSE4A], [1], [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
+
+dnl  Check for fully workin AVX2 intrinsics
+dnl  We need support for -mavx[2], we need <immintrin.h>, and we also need a
+dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
+AC_ARG_ENABLE([avx],
+  AS_HELP_STRING([--disable-avx],
+    [disable AVX (1-2) optimizations (default auto)]),, [
+  case "${host_cpu}" in
+    i?86|x86_64)
+      enable_avx=yes
+      ;;
+    *)
+      enable_avx=no
+      ;;
+  esac
+])
+have_avx2="no"
+AS_IF([test "${enable_avx}" != "no"], [
+  ARCH="${ARCH} avx avx2"
+
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -mavx2"
+  AC_CACHE_CHECK([if $CC groks AVX2 intrinsics], [ac_cv_c_avx2_intrinsics], [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
+[#include <immintrin.h>
+#include <stdint.h>
+uint64_t frobzor;]], [
+[__m256i a, b, c;
+a = b = c = _mm256_set1_epi64x((int64_t)frobzor);
+a = _mm256_slli_epi16(a, 3);
+a = _mm256_adds_epi16(a, b);
+c = _mm256_srli_epi16(c, 8);
+c = _mm256_slli_epi16(c, 3);
+b = _mm256_adds_epi16(b, c);
+a = _mm256_unpacklo_epi8(a, b);
+frobzor = (uint64_t)_mm256_extract_epi64(a, 0);]])], [
+      ac_cv_c_avx2_intrinsics=yes
+    ], [
+      ac_cv_c_avx2_intrinsics=no
+    ])
+  ])
+  VLC_RESTORE_FLAGS
+  AS_IF([test "${ac_cv_c_avx2_intrinsics}" != "no"], [
+    AC_DEFINE(HAVE_AVX2_INTRINSICS, 1, [Define to 1 if AVX2 intrinsics are available.])
+  ])
+
+  VLC_SAVE_FLAGS
+  CFLAGS="${CFLAGS} -mavx"
+  AC_CACHE_CHECK([if $CC groks AVX inline assembly], [ac_cv_avx_inline], [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("xorps256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
+]])
+    ], [
+      ac_cv_avx_inline=yes
+    ], [
+      ac_cv_avx_inline=no
+    ])
+  ])
+
+  AS_IF([test "${ac_cv_avx_inline}" != "no" -a "${SYS}" != "solaris"], [
+    AC_DEFINE(CAN_COMPILE_AVX, 1, [Define to 1 if AVX inline assembly is available.])
+  ])
+
+  AC_CACHE_CHECK([if $CC groks AVX2 inline assembly], [ac_cv_avx2_inline], [
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
+void *p;
+asm volatile("punpckhqdq256 %%ymm1,%%ymm2"::"r"(p):"ymm1", "ymm2");
+]])
+    ], [
+      ac_cv_avx2_inline=yes
+    ], [
+      ac_cv_avx2_inline=no
+    ])
+  ])
+  AS_IF([test "${ac_cv_avx2_inline}" != "no" -a "${SYS}" != "solaris"], [
+    AC_DEFINE(CAN_COMPILE_AVX2, 1, [Define to 1 if AVX2 inline assembly is available.])
+    have_avx2="yes"
+  ])
+])
+AM_CONDITIONAL([HAVE_AVX2], [test "$have_avx2" = "yes"])
 
 VLC_SAVE_FLAGS
 CFLAGS="${CFLAGS} -mmmx"
