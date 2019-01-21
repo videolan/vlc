@@ -671,6 +671,7 @@ vlc_rand_bytes
 vlc_drand48
 vlc_lrand48
 vlc_mrand48
+vlc_qsort
 vlc_restorecancel
 vlc_rwlock_destroy
 vlc_rwlock_init

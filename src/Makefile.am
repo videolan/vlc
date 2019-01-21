@@ -87,6 +87,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_fingerprinter.h \
 	../include/vlc_interrupt.h \
 	../include/vlc_renderer_discovery.h \
+	../include/vlc_sort.h \
 	../include/vlc_sout.h \
 	../include/vlc_spu.h \
 	../include/vlc_stream.h \
@@ -386,6 +387,7 @@ libvlccore_la_SOURCES = \
 	misc/httpcookies.c \
 	misc/fingerprinter.c \
 	misc/text_style.c \
+	misc/sort.c \
 	misc/subpicture.c \
 	misc/subpicture.h \
 	misc/medialibrary.c
