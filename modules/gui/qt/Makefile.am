@@ -543,6 +543,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
+	gui/qt/qml/utils/NavigableFocusScope.qml \
 	gui/qt/qml/style/qmldir \
 	gui/qt/qml/style/VLCIcons.qml \
 	gui/qt/qml/style/VLCStyle.qml \
