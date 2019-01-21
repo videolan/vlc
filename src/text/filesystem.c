@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_fs.h>
+#include <vlc_sort.h>
 
 #include <assert.h>
 
@@ -161,7 +162,7 @@ int vlc_loaddir( DIR *dir, char ***namelist,
     }
 
     if (compar != NULL && num > 0)
-        qsort_r(tab, num, sizeof (*tab), compar_void, compar);
+        vlc_qsort(tab, num, sizeof (*tab), compar_void, compar);
     *namelist = tab;
     return num;
 
