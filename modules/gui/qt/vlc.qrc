@@ -159,6 +159,7 @@
         <file alias="addon_yellow.svg">pixmaps/addons/addon_yellow.svg</file>
     </qresource>
     <qresource prefix="/utils">
+        <file alias="SelectableDelegateModel.qml">qml/utils/SelectableDelegateModel.qml</file>
         <file alias="NavigableFocusScope.qml">qml/utils/NavigableFocusScope.qml</file>
     </qresource>
     <qresource prefix="/style">
