@@ -2341,7 +2341,7 @@ static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
                     break;
                 }
             }
-        } else if ((i_pid & 0xff00) == 0x1400 || i_pid == 0x1800) {
+        } else if ((i_pid & 0xff00) == 0x1200 || i_pid == 0x1800) {
             // subtitle
             for (int i_id = 0; i_id < p_sys->p_clip_info->pg_stream_count; i_id++) {
                 if (i_pid == p_sys->p_clip_info->pg_streams[i_id].pid) {
