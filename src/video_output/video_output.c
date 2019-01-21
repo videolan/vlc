@@ -112,9 +112,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
                                  const vout_configuration_t *cfg,
                                  input_thread_t *input)
 {
-    if (!VoutCheckFormat(cfg->fmt))
-        return NULL;
-
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
                                             sizeof(*vout) + sizeof(*vout->p),
@@ -228,6 +225,12 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     vout_thread_t *vout = cfg->vout;
 
     assert(cfg->fmt != NULL);
+
+    if (!VoutCheckFormat(cfg->fmt)) {
+        if (vout != NULL)
+            vout_Close(vout);
+        return NULL;
+    }
 
     /* If a vout is provided, try reusing it */
     if (vout) {
@@ -1511,11 +1514,6 @@ static int ThreadReinit(vout_thread_t *vout,
 
     vout->p->pause.is_on = false;
     vout->p->pause.date  = VLC_TICK_INVALID;
-
-    if (!VoutCheckFormat(cfg->fmt)) {
-        ThreadStop(vout, NULL);
-        return VLC_EGENERIC;
-    }
 
     VoutFixFormat(&original, cfg->fmt);
 
