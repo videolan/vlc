@@ -545,6 +545,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/lock.svg \
 	gui/qt/qml/utils/DNDLabel.qml \
 	gui/qt/qml/utils/ToolTipArea.qml \
+	gui/qt/qml/utils/Drawer.qml \
 	gui/qt/qml/utils/GridItem.qml \
 	gui/qt/qml/utils/IconToolButton.qml \
 	gui/qt/qml/utils/ImageToolButton.qml \
