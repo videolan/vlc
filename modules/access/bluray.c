@@ -162,6 +162,9 @@ struct  demux_sys_t
     unsigned int        i_longest_title;
     input_title_t       **pp_title;
 
+    /* Events */
+    DECL_ARRAY(BD_EVENT) events_delayed;
+
     vlc_mutex_t             pl_info_lock;
     BLURAY_TITLE_INFO      *p_pl_info;
     const BLURAY_CLIP_INFO *p_clip_info;
@@ -782,6 +785,7 @@ static int blurayOpen(vlc_object_t *object)
 
     TAB_INIT(p_sys->i_title, p_sys->pp_title);
     TAB_INIT(p_sys->i_attachments, p_sys->attachments);
+    ARRAY_INIT(p_sys->events_delayed);
 
     vlc_mutex_init(&p_sys->pl_info_lock);
     vlc_mutex_init(&p_sys->bdj_overlay_lock);
@@ -1026,6 +1030,8 @@ static void blurayClose(vlc_object_t *object)
     for (int i = 0; i < p_sys->i_attachments; i++)
       vlc_input_attachment_Delete(p_sys->attachments[i]);
     TAB_CLEAN(p_sys->i_attachments, p_sys->attachments);
+
+    ARRAY_RESET(p_sys->events_delayed);
 
     vlc_mutex_destroy(&p_sys->pl_info_lock);
     vlc_mutex_destroy(&p_sys->bdj_overlay_lock);
@@ -2669,7 +2675,7 @@ static void blurayOnClipUpdate(demux_t *p_demux, uint32_t clip)
     blurayResetStillImage(p_demux);
 }
 
-static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
+static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e, bool b_delayed)
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
@@ -2757,7 +2763,10 @@ static void blurayHandleEvent(demux_t *p_demux, const BD_EVENT *e)
         break;
     case BD_EVENT_AUDIO_STREAM:
     case BD_EVENT_PG_TEXTST_STREAM:
-        blurayOnStreamSelectedEvent(p_demux, e->event, e->param);
+         if(b_delayed)
+             blurayOnStreamSelectedEvent(p_demux, e->event, e->param);
+         else
+             ARRAY_APPEND(p_sys->events_delayed, *e);
         break;
     case BD_EVENT_IG_STREAM:
     case BD_EVENT_SECONDARY_AUDIO:
@@ -2913,14 +2922,19 @@ static int blurayDemux(demux_t *p_demux)
     if (p_sys->b_menu == false) {
         nread = bd_read(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE);
         while (bd_get_event(p_sys->bluray, &e))
-            blurayHandleEvent(p_demux, &e);
+            blurayHandleEvent(p_demux, &e, false);
     } else {
         nread = bd_read_ext(p_sys->bluray, p_block->p_buffer, BD_READ_SIZE, &e);
         while (e.event != BD_EVENT_NONE) {
-            blurayHandleEvent(p_demux, &e);
+            blurayHandleEvent(p_demux, &e, false);
             bd_get_event(p_sys->bluray, &e);
         }
     }
+
+    /* Process delayed selections events */
+    for(int i=0; i<p_sys->events_delayed.i_size; i++)
+        blurayHandleEvent(p_demux, &p_sys->events_delayed.p_elems[i], true);
+    p_sys->events_delayed.i_size = 0;
 
     blurayHandleOverlays(p_demux, nread);
 
