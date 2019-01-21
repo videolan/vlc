@@ -164,6 +164,7 @@
         <file alias="KeyNavigableListView.qml">qml/utils/KeyNavigableListView.qml</file>
         <file alias="KeyNavigableTableView.qml">qml/utils/KeyNavigableTableView.qml</file>
         <file alias="NavigableFocusScope.qml">qml/utils/NavigableFocusScope.qml</file>
+        <file alias="StackViewExt.qml">qml/utils/StackViewExt.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
