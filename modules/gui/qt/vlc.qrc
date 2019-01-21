@@ -160,6 +160,9 @@
     </qresource>
     <qresource prefix="/utils">
         <file alias="SelectableDelegateModel.qml">qml/utils/SelectableDelegateModel.qml</file>
+        <file alias="KeyNavigableGridView.qml">qml/utils/KeyNavigableGridView.qml</file>
+        <file alias="KeyNavigableListView.qml">qml/utils/KeyNavigableListView.qml</file>
+        <file alias="KeyNavigableTableView.qml">qml/utils/KeyNavigableTableView.qml</file>
         <file alias="NavigableFocusScope.qml">qml/utils/NavigableFocusScope.qml</file>
     </qresource>
     <qresource prefix="/style">

@@ -544,6 +544,9 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
 	gui/qt/qml/utils/NavigableFocusScope.qml \
+	gui/qt/qml/utils/KeyNavigableGridView.qml \
+	gui/qt/qml/utils/KeyNavigableListView.qml \
+	gui/qt/qml/utils/KeyNavigableTableView.qml \
 	gui/qt/qml/utils/SelectableDelegateModel.qml \
 	gui/qt/qml/style/qmldir \
 	gui/qt/qml/style/VLCIcons.qml \
