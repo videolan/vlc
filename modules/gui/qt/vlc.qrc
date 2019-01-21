@@ -159,6 +159,7 @@
         <file alias="addon_yellow.svg">pixmaps/addons/addon_yellow.svg</file>
     </qresource>
     <qresource prefix="/utils">
+        <file alias="MultiCoverPreview.qml">qml/utils/MultiCoverPreview.qml</file>
         <file alias="SelectableDelegateModel.qml">qml/utils/SelectableDelegateModel.qml</file>
         <file alias="KeyNavigableGridView.qml">qml/utils/KeyNavigableGridView.qml</file>
         <file alias="KeyNavigableListView.qml">qml/utils/KeyNavigableListView.qml</file>
