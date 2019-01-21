@@ -224,11 +224,6 @@ long long atoll (const char *);
 lldiv_t lldiv (long long, long long);
 #endif
 
-#ifndef HAVE_QSORT_R
-void (qsort_r)(void *, size_t, size_t,
-               int (*)(const void *, const void *, void *), void *);
-#endif
-
 #ifndef HAVE_STRTOF
 #ifndef __ANDROID__
 float strtof (const char *, char **);
