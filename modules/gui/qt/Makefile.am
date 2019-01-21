@@ -543,11 +543,19 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
+	gui/qt/qml/utils/DNDLabel.qml \
+	gui/qt/qml/utils/ToolTipArea.qml \
+	gui/qt/qml/utils/IconToolButton.qml \
+	gui/qt/qml/utils/ImageToolButton.qml \
+	gui/qt/qml/utils/TextToolButton.qml \
+	gui/qt/qml/utils/MenuExt.qml \
+	gui/qt/qml/utils/MenuItemExt.qml \
 	gui/qt/qml/utils/NavigableFocusScope.qml \
 	gui/qt/qml/utils/KeyNavigableGridView.qml \
 	gui/qt/qml/utils/KeyNavigableListView.qml \
 	gui/qt/qml/utils/KeyNavigableTableView.qml \
 	gui/qt/qml/utils/SelectableDelegateModel.qml \
+	gui/qt/qml/utils/ComboBoxExt.qml \
 	gui/qt/qml/utils/StackViewExt.qml \
 	gui/qt/qml/style/qmldir \
 	gui/qt/qml/style/VLCIcons.qml \

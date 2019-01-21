@@ -162,9 +162,17 @@
         <file alias="SelectableDelegateModel.qml">qml/utils/SelectableDelegateModel.qml</file>
         <file alias="KeyNavigableGridView.qml">qml/utils/KeyNavigableGridView.qml</file>
         <file alias="KeyNavigableListView.qml">qml/utils/KeyNavigableListView.qml</file>
+        <file alias="ToolTipArea.qml">qml/utils/ToolTipArea.qml</file>
+        <file alias="DNDLabel.qml">qml/utils/DNDLabel.qml</file>
         <file alias="KeyNavigableTableView.qml">qml/utils/KeyNavigableTableView.qml</file>
         <file alias="NavigableFocusScope.qml">qml/utils/NavigableFocusScope.qml</file>
+        <file alias="ImageToolButton.qml">qml/utils/ImageToolButton.qml</file>
+        <file alias="TextToolButton.qml">qml/utils/TextToolButton.qml</file>
+        <file alias="IconToolButton.qml">qml/utils/IconToolButton.qml</file>
         <file alias="StackViewExt.qml">qml/utils/StackViewExt.qml</file>
+        <file alias="ComboBoxExt.qml">qml/utils/ComboBoxExt.qml</file>
+        <file alias="MenuExt.qml">qml/utils/MenuExt.qml</file>
+        <file alias="MenuItemExt.qml">qml/utils/MenuItemExt.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
