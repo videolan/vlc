@@ -470,7 +470,8 @@ static void
 new_entries_rd_cb( void *p_this, int i_status, const struct rr_entry *p_entries )
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
-    struct discovery_sys *p_sys = &p_rd->p_sys->s;
+    struct vlc_renderer_discovery_sys *p_rd_sys = p_rd->p_sys;
+    struct discovery_sys *p_sys = &p_rd_sys->s;
     if( i_status < 0 )
     {
         print_error( VLC_OBJECT( p_rd ), "entry callback", i_status );
@@ -549,7 +550,8 @@ static bool
 stop_rd_cb( void *p_this )
 {
     vlc_renderer_discovery_t *p_rd = p_this;
-    struct discovery_sys *p_sys = &p_rd->p_sys->s;
+    struct vlc_renderer_discovery_sys *p_rd_sys = p_rd->p_sys;
+    struct discovery_sys *p_sys = &p_rd_sys->s;
 
     if( atomic_load( &p_sys->stop ) )
         return true;
@@ -564,7 +566,8 @@ static void *
 RunRD( void *p_this )
 {
     vlc_renderer_discovery_t *p_rd = p_this;
-    struct discovery_sys *p_sys = &p_rd->p_sys->s;
+    struct vlc_renderer_discovery_sys *p_rd_sys = p_rd->p_sys;
+    struct discovery_sys *p_sys = &p_rd_sys->s;
 
     int i_status = mdns_listen( p_sys->p_microdns,
                                 p_sys->ppsz_service_names,
@@ -666,20 +669,22 @@ OpenRD( vlc_object_t *p_obj )
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_obj;
 
-    p_rd->p_sys = calloc( 1, sizeof(vlc_renderer_discovery_sys) );
+    struct vlc_renderer_discovery_sys *p_rd_sys = p_rd->p_sys =
+        calloc( 1, sizeof(struct vlc_renderer_discovery_sys) );
     if( !p_rd->p_sys )
         return VLC_ENOMEM;
 
     config_ChainParse( p_rd, CFG_PREFIX, ppsz_options, p_rd->p_cfg );
 
-    return OpenCommon( p_obj, &p_rd->p_sys->s, true );
+    return OpenCommon( p_obj, &p_rd_sys->s, true );
 }
 
 static void
 CloseRD( vlc_object_t *p_this )
 {
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *) p_this;
+    struct vlc_renderer_discovery_sys *p_rd_sys = p_rd->p_sys;
 
-    CleanCommon( &p_rd->p_sys->s );
+    CleanCommon( &p_rd_sys->s );
     free( p_rd->p_sys );
 }
