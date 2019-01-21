@@ -449,6 +449,10 @@ libvlccore_la_SOURCES += \
 	linux/dirs.c \
 	linux/thread.c
 else
+
+# All except OS2/WIN32/NACL/ANDROID
+libvlccore_la_SOURCES += posix/sort.c
+
 if HAVE_DARWIN
 libvlccore_la_SOURCES += \
 	darwin/dirs.c \
