@@ -51,4 +51,12 @@ Utils.KeyNavigableTableView {
         }
         medialib.addAndPlay(list)
     }
+
+    Label {
+        anchors.centerIn: parent
+        visible: rootmodel.count === 0
+        font.pixelSize: VLCStyle.fontHeight_xxlarge
+        color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
+        text: qsTr("No tracks found")
+    }
 }

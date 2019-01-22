@@ -181,6 +181,7 @@
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>
+        <file alias="MCVideoDisplay.qml">qml/mediacenter/MCVideoDisplay.qml</file>
         <file alias="MusicAlbumsDisplay.qml">qml/mediacenter/MusicAlbumsDisplay.qml</file>
         <file alias="MusicAlbumsGridExpandDelegate.qml">qml/mediacenter/MusicAlbumsGridExpandDelegate.qml</file>
         <file alias="MusicArtistsDisplay.qml">qml/mediacenter/MusicArtistsDisplay.qml</file>

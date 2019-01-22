@@ -18,7 +18,7 @@
 import QtQuick 2.11
 import QtQuick.Controls 2.4
 import QtQml.Models 2.2
-import org.videolan.vlc 0.1
+
 import org.videolan.medialib 0.1
 
 import "qrc:///utils/" as Utils
@@ -26,18 +26,12 @@ import "qrc:///style/"
 
 Utils.NavigableFocusScope {
     id: root
-    property alias model: delegateModel.model
-    property var sortModel: ListModel {
-        ListElement { text: qsTr("Alphabetic"); criteria: "title" }
-    }
 
-    function goToView( parent ) {
-        history.push([ "mc", "music", "albums", { parentId: parent } ], History.Go)
-    }
+    property alias model: delegateModel.model
 
     Utils.SelectableDelegateModel {
         id: delegateModel
-        model: MLGenreModel {
+        model: MLVideoModel {
             ml: medialib
         }
 
@@ -45,94 +39,50 @@ Utils.NavigableFocusScope {
             id: element
             Utils.GridItem {
                 Package.name: "grid"
-                id: gridItem
-                image: VLCStyle.noArtCover
-                title: model.name || "Unknown genre"
-                selected: element.DelegateModel.inSelected
-
+                focus: true
+                image: model.thumbnail || VLCStyle.noArtCover
+                title: model.title || qsTr("Unknown title")
+                selected: element.DelegateModel.inSelected || view.currentItem.currentIndex === index
                 shiftX: view.currentItem.shiftX(model.index)
 
-                onItemClicked: {
+                onItemClicked : {
                     delegateModel.updateSelection( modifier , view.currentItem.currentIndex, index)
                     view.currentItem.currentIndex = index
                     view.currentItem.forceActiveFocus()
                 }
-                onPlayClicked: {
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    history.push(["mc", "music", "albums", { parentId: model.id } ], History.Go)
-                }
-                onAddToPlaylistClicked: {
-                    medialib.addToPlaylist( model.id );
-                }
-
-                //replace image with a mutlicovers preview
-                Utils.MultiCoverPreview {
-                    id: multicover
-                    visible: false
-                    width: VLCStyle.cover_normal
-                    height: VLCStyle.cover_normal
-
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                    }
-                }
-
-                Component.onCompleted: {
-                    multicover.grabToImage(function(result) {
-                        gridItem.image = result.url
-                        //multicover.destroy()
-                    })
-                }
+                onPlayClicked: medialib.addAndPlay( model.id )
+                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
             }
 
             Utils.ListItem {
                 Package.name: "list"
                 width: root.width
                 height: VLCStyle.icon_normal
+                focus: true
 
                 color: VLCStyle.colors.getBgColor(element.DelegateModel.inSelected, this.hovered, this.activeFocus)
 
-                cover:  Utils.MultiCoverPreview {
-                    albums: MLAlbumModel {
-                        ml: medialib
-                        parentId: model.id
-                    }
+                cover: Image {
+                    id: cover_obj
+                    fillMode: Image.PreserveAspectCrop
+                    source: model.thumbnail || VLCStyle.noArtCover
                 }
+                line1: (model.title || qsTr("Unknown title"))+" ["+model.duration+"]"
 
-                line1: (model.name || "Unknown genre")+" - "+model.nb_tracks+" tracks"
-
-                onItemClicked: {
-                    console.log("Clicked on : "+model.name);
+                onItemClicked : {
                     delegateModel.updateSelection( modifier, view.currentItem.currentIndex, index )
                     view.currentItem.currentIndex = index
                     this.forceActiveFocus()
                 }
-                onPlayClicked: {
-                    console.log('Clicked on play : '+model.name);
-                    medialib.addAndPlay( model.id )
-                }
-                onItemDoubleClicked: {
-                    history.push([ "mc", "music", "albums", { parentId: model.id } ], History.Go)
-                }
-                onAddToPlaylistClicked: {
-                    console.log('Clicked on addToPlaylist : '+model.name);
-                    medialib.addToPlaylist( model.id );
-                }
+                onPlayClicked: medialib.addAndPlay( model.id )
+                onAddToPlaylistClicked : medialib.addToPlaylist( model.id )
             }
         }
-
         function actionAtIndex(index) {
-            if (delegateModel.selectedGroup.count > 1) {
-                var list = []
-                for (var i = 0; i < delegateModel.selectedGroup.count; i++)
-                    list.push(delegateModel.selectedGroup.get(i).model.id)
-                medialib.addAndPlay( list )
-            } else if (delegateModel.selectedGroup.count === 1) {
-                goToView(delegateModel.selectedGroup.get(0).model.id)
-            }
+            var list = []
+            for (var i = 0; i < delegateModel.selectedGroup.count; i++)
+                list.push(delegateModel.selectedGroup.get(i).model.id)
+            medialib.addAndPlay( list )
         }
     }
 
@@ -151,9 +101,9 @@ Utils.NavigableFocusScope {
         }
     }
 
-    /* Grid View */
     Component {
         id: gridComponent
+
         Utils.KeyNavigableGridView {
             id: gridView_id
 
@@ -162,25 +112,24 @@ Utils.NavigableFocusScope {
 
             focus: true
 
-            cellWidth: (VLCStyle.cover_normal) + VLCStyle.margin_small
-            cellHeight: (VLCStyle.cover_normal + VLCStyle.fontHeight_normal) + VLCStyle.margin_small
+            cellWidth: VLCStyle.cover_normal + VLCStyle.margin_small
+            cellHeight: VLCStyle.cover_normal + VLCStyle.fontHeight_normal + VLCStyle.margin_small
 
             onSelectAll: delegateModel.selectAll()
-            onSelectionUpdated:  delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
+            onSelectionUpdated: delegateModel.updateSelection( keyModifiers, oldIndex, newIndex )
             onActionAtIndex: delegateModel.actionAtIndex(index)
 
             onActionLeft: root.actionLeft(index)
             onActionRight: root.actionRight(index)
-            onActionUp: root.actionUp(index)
             onActionDown: root.actionDown(index)
+            onActionUp: root.actionUp(index)
             onActionCancel: root.actionCancel(index)
         }
     }
 
-
     Component {
         id: listComponent
-        /* List View */
+        /* ListView */
         Utils.KeyNavigableListView {
             id: listView_id
 
@@ -196,12 +145,11 @@ Utils.NavigableFocusScope {
 
             onActionLeft: root.actionLeft(index)
             onActionRight: root.actionRight(index)
-            onActionUp: root.actionUp(index)
             onActionDown: root.actionDown(index)
+            onActionUp: root.actionUp(index)
             onActionCancel: root.actionCancel(index)
         }
     }
-
 
     Utils.StackViewExt {
         id: view
@@ -227,6 +175,6 @@ Utils.NavigableFocusScope {
         visible: delegateModel.items.count === 0
         font.pixelSize: VLCStyle.fontHeight_xxlarge
         color: root.activeFocus ? VLCStyle.colors.accent : VLCStyle.colors.text
-        text: qsTr("No genres found")
+        text: qsTr("No tracks found")
     }
 }
