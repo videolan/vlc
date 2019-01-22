@@ -177,6 +177,7 @@
         <file alias="ComboBoxExt.qml">qml/utils/ComboBoxExt.qml</file>
         <file alias="MenuExt.qml">qml/utils/MenuExt.qml</file>
         <file alias="MenuItemExt.qml">qml/utils/MenuItemExt.qml</file>
+        <file alias="ExpandGridView.qml">qml/utils/ExpandGridView.qml</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="qmldir">qml/style/qmldir</file>
