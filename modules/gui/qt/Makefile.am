@@ -425,6 +425,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/addons/addon_red.svg \
 	gui/qt/pixmaps/addons/addon_yellow.svg \
 	gui/qt/pixmaps/addons/score.svg \
+	gui/qt/pixmaps/menu.svg \
 	gui/qt/pixmaps/menus/exit_16px.svg \
 	gui/qt/pixmaps/menus/help_16px.svg \
 	gui/qt/pixmaps/menus/info_16px.svg \
@@ -487,6 +488,7 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/slower2.svg \
 	gui/qt/pixmaps/space.svg \
 	gui/qt/pixmaps/stop.svg \
+	gui/qt/pixmaps/toolbar/audiosub.svg \
 	gui/qt/pixmaps/toolbar/arrows.svg \
 	gui/qt/pixmaps/toolbar/aspect-ratio.svg \
 	gui/qt/pixmaps/toolbar/atob.svg \

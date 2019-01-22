@@ -62,6 +62,7 @@
         <file alias="space.svg">pixmaps/space.svg</file>
         <file alias="slower2.svg">pixmaps/slower2.svg</file>
         <file alias="faster2.svg">pixmaps/faster2.svg</file>
+        <file alias="audiosub.svg">pixmaps/toolbar/audiosub.svg</file>
     </qresource>
     <qresource prefix="/buttons/playlist">
         <file alias="playlist_add.svg">pixmaps/playlist/add.svg</file>
@@ -94,6 +95,8 @@
         <file alias="search_clear.svg">pixmaps/search_clear.svg</file>
         <file alias="dropzone.svg">pixmaps/playlist/dropzone.svg</file>
         <file alias="valid.svg">pixmaps/valid.svg</file>
+        <file alias="menu.svg">pixmaps/menu.svg</file>
+        <file alias="VLCIcons.ttf">pixmaps/VLCIcons.ttf</file>
     </qresource>
     <qresource prefix="/prefsmenu">
         <file alias="cone_audio_64.png">pixmaps/prefs/spref_cone_Audio_64.png</file>
