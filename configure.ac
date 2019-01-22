@@ -747,6 +747,20 @@ AC_CHECK_LIB([m], [sincos], [
   AC_LIBOBJ([sincos])
 ])
 
+AC_MSG_CHECKING([broken qsort_r prototype])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#include <stdlib.h>
+
+_Static_assert(_Generic((qsort_r),
+    void (*)(void *, size_t, size_t, void *,
+             int (*)(void *, const void *, const void *)) : 1, default: 0),
+    "Bad prototype not matched");
+])], [
+  AC_MSG_RESULT([broken])
+  AC_DEFINE([HAVE_BROKEN_QSORT_R], 1, [Defined to 1 if the qsort_r() prototype contradicts the upcoming POSIX standard.])
+], [
+  AC_MSG_RESULT([no])
+])
+
 AC_MSG_CHECKING([_Thread_local support])
 AC_COMPILE_IFELSE([AC_LANG_SOURCE([_Thread_local int foo = 0;
                    int main() {}])], [
