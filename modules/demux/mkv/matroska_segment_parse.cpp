@@ -257,8 +257,14 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         unsigned int chroma_sit_horizontal;
       } track_video_info;
 
+      struct {
+          float yaw;
+          float pitch;
+          float roll;
+      } pose;
+
     } metadata_payload = {
-      this, p_track, &sys.demuxer, bSupported, 3, { }
+      this, p_track, &sys.demuxer, bSupported, 3, { }, { }
     };
 
     MKV_SWITCH_CREATE( EbmlTypeDispatcher, MetaDataHandlers, MetaDataCapture )
@@ -623,17 +629,17 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
         E_CASE( KaxVideoProjectionPoseYaw, pose )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.pose.yaw = static_cast<float>( pose );
+            vars.pose.yaw = static_cast<float>( pose );
         }
         E_CASE( KaxVideoProjectionPosePitch, pose )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.pose.pitch = static_cast<float>( pose );
+            vars.pose.pitch = static_cast<float>( pose );
         }
         E_CASE( KaxVideoProjectionPoseRoll, pose )
         {
             ONLY_FMT(VIDEO);
-            vars.tk->fmt.video.pose.roll = static_cast<float>( pose );
+            vars.pose.roll = static_cast<float>( pose );
         }
 #endif
         E_CASE( KaxVideoFlagInterlaced, fint ) // UNUSED
@@ -1058,6 +1064,11 @@ void matroska_segment_c::ParseTrackEntry( const KaxTrackEntry *m )
     };
 
     MetaDataHandlers::Dispatcher().iterate ( m->begin(), m->end(), &metadata_payload );
+
+    vlc_viewpoint_from_euler( &p_track->fmt.video.pose,
+                              metadata_payload.pose.yaw,
+                              metadata_payload.pose.pitch,
+                              metadata_payload.pose.roll);
 
     if( p_track->i_number == 0 )
     {
