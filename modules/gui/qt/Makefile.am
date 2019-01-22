@@ -588,12 +588,16 @@ libqt_plugin_la_RES = \
 	gui/qt/qml/mediacenter/ArtistTopBanner.qml \
 	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
 	gui/qt/qml/mediacenter/MCVideoDisplay.qml \
+	gui/qt/qml/mediacenter/MCNetworkDisplay.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsDisplay.qml \
 	gui/qt/qml/mediacenter/MusicAlbumsGridExpandDelegate.qml \
 	gui/qt/qml/mediacenter/MusicArtistsDisplay.qml \
 	gui/qt/qml/mediacenter/MusicGenresDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTracksDisplay.qml \
 	gui/qt/qml/mediacenter/MusicTrackListDisplay.qml \
+	gui/qt/qml/mediacenter/NetworkDriveDisplay.qml \
+	gui/qt/qml/mediacenter/NetworkFileDisplay.qml \
+	gui/qt/qml/mediacenter/NetworkListItem.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
 	gui/qt/qml/playlist/PLItem.qml \
