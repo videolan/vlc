@@ -287,12 +287,11 @@ int libvlc_video_update_viewpoint( libvlc_media_player_t *p_mi,
                                    const libvlc_video_viewpoint_t *p_viewpoint,
                                    bool b_absolute )
 {
-    vlc_viewpoint_t update = {
-        .yaw   = p_viewpoint->f_yaw,
-        .pitch = p_viewpoint->f_pitch,
-        .roll  = p_viewpoint->f_roll,
-        .fov   = p_viewpoint->f_field_of_view,
-    };
+    vlc_viewpoint_t update = { .fov = p_viewpoint->f_field_of_view };
+    vlc_viewpoint_from_euler( &update,
+                              p_viewpoint->f_yaw,
+                              p_viewpoint->f_pitch,
+                              p_viewpoint->f_roll);
 
     enum vlc_player_whence whence = b_absolute ? VLC_PLAYER_WHENCE_ABSOLUTE
                                                : VLC_PLAYER_WHENCE_RELATIVE;
