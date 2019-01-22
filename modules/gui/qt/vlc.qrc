@@ -206,6 +206,14 @@
         <file alias="ViewMenu.qml">qml/menus/ViewMenu.qml</file>
         <file alias="PopupMenu.qml">qml/menus/PopupMenu.qml</file>
     </qresource>
+    <qresource prefix="/player">
+        <file alias="Player.qml">qml/player/Player.qml</file>
+        <file alias="ControlBar.qml">qml/player/ControlBar.qml</file>
+        <file alias="SliderBar.qml">qml/player/SliderBar.qml</file>
+        <file alias="TrackInfo.qml">qml/player/TrackInfo.qml</file>
+        <file alias="TrackSelector.qml">qml/player/TrackSelector.qml</file>
+        <file alias="ModalControlBar.qml">qml/player/ModalControlBar.qml</file>
+    </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>
     </qresource>

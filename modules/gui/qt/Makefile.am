@@ -544,6 +544,12 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
 	gui/qt/qml/about/About.qml \
+	gui/qt/qml/player/Player.qml \
+	gui/qt/qml/player/TrackInfo.qml \
+	gui/qt/qml/player/TrackSelector.qml \
+	gui/qt/qml/player/ControlBar.qml \
+	gui/qt/qml/player/ModalControlBar.qml \
+	gui/qt/qml/player/SliderBar.qml \
 	gui/qt/qml/dialogs/Dialogs.qml \
 	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
