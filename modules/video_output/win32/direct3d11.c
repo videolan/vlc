@@ -383,7 +383,101 @@ static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
         }
     }
 }
+
+static int SetupWindowedOutput(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    DXGI_SWAP_CHAIN_DESC1 scd;
+    HRESULT hr;
+
+    IDXGIFactory2 *dxgifactory;
+    sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, true,
+                                                vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
+                                                0, 0,
+                                                false, D3D11_FORMAT_SUPPORT_DISPLAY );
+    if (unlikely(sys->display.pixelFormat == NULL))
+        sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, false,
+                                                    vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
+                                                    0, 0,
+                                                    false, D3D11_FORMAT_SUPPORT_DISPLAY );
+    if (unlikely(sys->display.pixelFormat == NULL)) {
+        msg_Err(vd, "Could not get the SwapChain format.");
+        return VLC_EGENERIC;
+    }
+
+    if (sys->sys.hvideownd == 0)
+        return VLC_EGENERIC;
+
+    FillSwapChainDesc(vd, &scd);
+
+    IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
+    if (unlikely(dxgiadapter==NULL)) {
+       msg_Err(vd, "Could not get the DXGI Adapter");
+       return VLC_EGENERIC;
+    }
+
+    hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
+    IDXGIAdapter_Release(dxgiadapter);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
+       return VLC_EGENERIC;
+    }
+
+    hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+                                              sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+    if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
+    {
+        msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
+        scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
+                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
+    }
+    IDXGIFactory2_Release(dxgifactory);
+    if (FAILED(hr)) {
+       msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
+       return VLC_EGENERIC;
+    }
+
+    IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
+    return VLC_SUCCESS;
+}
 #endif /* !VLC_WINSTORE_APP */
+
+static int SetupWindowLessOutput(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    DXGI_FORMAT windowlessFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+#if VLC_WINSTORE_APP
+    DXGI_SWAP_CHAIN_DESC1 scd;
+    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
+    if (!dxgiswapChain)
+        return VLC_EGENERIC;
+
+    sys->dxgiswapChain = dxgiswapChain;
+    IDXGISwapChain_AddRef(sys->dxgiswapChain);
+
+    if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
+        return VLC_EGENERIC;
+
+    windowlessFormat = scd.Format;
+#endif /* VLC_WINSTORE_APP */
+    for (const d3d_format_t *output_format = GetRenderFormatList();
+         output_format->name != NULL; ++output_format)
+    {
+        if (output_format->formatTexture == windowlessFormat &&
+            !is_d3d11_opaque(output_format->fourcc))
+        {
+            sys->display.pixelFormat = output_format;
+            break;
+        }
+    }
+    if (unlikely(sys->display.pixelFormat == NULL)) {
+        msg_Err(vd, "Could not setup the output format.");
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
 
 static unsigned int GetPictureWidth(const vout_display_t *vd)
 {
@@ -1194,6 +1288,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
     HRESULT hr = E_FAIL;
+    int ret = VLC_EGENERIC;
 
     ID3D11DeviceContext *d3d11_ctx = NULL;
 #if VLC_WINSTORE_APP
@@ -1222,91 +1317,13 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
     }
 
     if (sys->sys.b_windowless)
-    {
-        DXGI_FORMAT windowlessFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-#if VLC_WINSTORE_APP
-        DXGI_SWAP_CHAIN_DESC1 scd;
-        IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
-        if (!dxgiswapChain)
-            return VLC_EGENERIC;
-
-        sys->dxgiswapChain = dxgiswapChain;
-        IDXGISwapChain_AddRef(sys->dxgiswapChain);
-
-        if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
-            return VLC_EGENERIC;
-
-        windowlessFormat = scd.Format;
-#endif /* VLC_WINSTORE_APP */
-        for (const d3d_format_t *output_format = GetRenderFormatList();
-             output_format->name != NULL; ++output_format)
-        {
-            if (output_format->formatTexture == windowlessFormat &&
-                !is_d3d11_opaque(output_format->fourcc))
-            {
-                sys->display.pixelFormat = output_format;
-                break;
-            }
-        }
-        if (unlikely(sys->display.pixelFormat == NULL)) {
-            msg_Err(vd, "Could not setup the output format.");
-            return VLC_EGENERIC;
-        }
-    }
+        ret = SetupWindowLessOutput(vd);
 #if !VLC_WINSTORE_APP
     else
-    {
-        IDXGIFactory2 *dxgifactory;
-        sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, true,
-                                                    vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
-                                                    0, 0,
-                                                    false, D3D11_FORMAT_SUPPORT_DISPLAY );
-        if (unlikely(sys->display.pixelFormat == NULL))
-            sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, false,
-                                                        vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
-                                                        0, 0,
-                                                        false, D3D11_FORMAT_SUPPORT_DISPLAY );
-        if (unlikely(sys->display.pixelFormat == NULL)) {
-            msg_Err(vd, "Could not get the SwapChain format.");
-            return VLC_EGENERIC;
-        }
-
-        if (sys->sys.hvideownd == 0)
-            return VLC_EGENERIC;
-
-        FillSwapChainDesc(vd, &scd);
-
-        IDXGIAdapter *dxgiadapter = D3D11DeviceAdapter(sys->d3d_dev.d3ddevice);
-        if (unlikely(dxgiadapter==NULL)) {
-           msg_Err(vd, "Could not get the DXGI Adapter");
-           return VLC_EGENERIC;
-        }
-
-        hr = IDXGIAdapter_GetParent(dxgiadapter, &IID_IDXGIFactory2, (void **)&dxgifactory);
-        IDXGIAdapter_Release(dxgiadapter);
-        if (FAILED(hr)) {
-           msg_Err(vd, "Could not get the DXGI Factory. (hr=0x%lX)", hr);
-           return VLC_EGENERIC;
-        }
-
-        hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                                  sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
-        if (hr == DXGI_ERROR_INVALID_CALL && scd.Format == DXGI_FORMAT_R10G10B10A2_UNORM)
-        {
-            msg_Warn(vd, "10 bits swapchain failed, try 8 bits");
-            scd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            hr = IDXGIFactory2_CreateSwapChainForHwnd(dxgifactory, (IUnknown *)sys->d3d_dev.d3ddevice,
-                                                      sys->sys.hvideownd, &scd, NULL, NULL, &sys->dxgiswapChain);
-        }
-        IDXGIFactory2_Release(dxgifactory);
-        if (FAILED(hr)) {
-           msg_Err(vd, "Could not create the SwapChain. (hr=0x%lX)", hr);
-           return VLC_EGENERIC;
-        }
-
-        IDXGISwapChain_QueryInterface( sys->dxgiswapChain, &IID_IDXGISwapChain4, (void **)&sys->dxgiswapChain4);
-    }
+        ret = SetupWindowedOutput(vd);
 #endif /* !VLC_WINSTORE_APP */
+    if (ret != VLC_SUCCESS)
+        return ret;
 
     D3D11SetColorSpace(vd);
 
