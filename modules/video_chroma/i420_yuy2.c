@@ -303,20 +303,17 @@ static void I420_YUY2( filter_t *p_filter, picture_t *p_source,
         p_y1 = p_y2;
         p_y2 += p_source->p[Y_PLANE].i_pitch;
 
-#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
         for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x-- ; )
         {
+#if !defined (MODULE_NAME_IS_i420_yuy2_mmx)
             C_YUV420_YUYV( );
             C_YUV420_YUYV( );
             C_YUV420_YUYV( );
             C_YUV420_YUYV( );
-        }
 #else
-        for( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8 ; i_x-- ; )
-        {
             MMX_CALL( MMX_YUV420_YUYV );
-        }
 #endif
+        }
         for( i_x = ( (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) % 8 ) / 2; i_x-- ; )
         {
             C_YUV420_YUYV( );
