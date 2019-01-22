@@ -272,10 +272,13 @@ static void ChangeViewpoint( filter_t *p_filter, const vlc_viewpoint_t *p_vp)
 {
     filter_spatialaudio *p_sys = reinterpret_cast<filter_spatialaudio *>(p_filter->p_sys);
 
+    float yaw, pitch, roll;
+    vlc_viewpoint_to_euler(p_vp, &yaw, &pitch, &roll);
+
 #define RAD(d) ((float) ((d) * M_PI / 180.f))
-    p_sys->f_teta = -RAD(p_vp->yaw);
-    p_sys->f_phi = RAD(p_vp->pitch);
-    p_sys->f_roll = RAD(p_vp->roll);
+    p_sys->f_teta = -RAD(yaw);
+    p_sys->f_phi = RAD(pitch);
+    p_sys->f_roll = RAD(roll);
 
     if (p_vp->fov >= FIELD_OF_VIEW_DEGREES_DEFAULT)
         p_sys->f_zoom = 0.f; // no unzoom as it does not really make sense.
