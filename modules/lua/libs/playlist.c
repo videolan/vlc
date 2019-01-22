@@ -407,6 +407,23 @@ static int vlclua_playlist_current(lua_State *L)
     return 1;
 }
 
+static int vlclua_playlist_current_item(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_playlist_Lock(playlist);
+    ssize_t index = vlc_playlist_GetCurrentIndex(playlist);
+    vlc_playlist_item_t *item = index != -1 ? vlc_playlist_Get(playlist, index)
+                                            : NULL;
+    if (item)
+        push_playlist_item(L, item);
+    else
+        lua_pushnil(L);
+    vlc_playlist_Unlock(playlist);
+
+    return 1;
+}
+
 static bool vlc_sort_key_from_string(const char *keyname,
                                      enum vlc_playlist_sort_key *key)
 {
@@ -518,6 +535,7 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "enqueue", vlclua_playlist_enqueue },
     { "get", vlclua_playlist_get },
     { "current", vlclua_playlist_current },
+    { "current_item", vlclua_playlist_current_item },
     { "sort", vlclua_playlist_sort },
     { "status", vlclua_playlist_status },
     { "delete", vlclua_playlist_delete },
