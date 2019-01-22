@@ -350,6 +350,41 @@ static void Swap(void *opaque)
     }
 }
 
+#if !VLC_WINSTORE_APP
+static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
+{
+    ZeroMemory(out, sizeof(*out));
+    out->BufferCount = 3;
+    out->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    out->SampleDesc.Count = 1;
+    out->SampleDesc.Quality = 0;
+    out->Width = vd->source.i_visible_width;
+    out->Height = vd->source.i_visible_height;
+    out->Format = vd->sys->display.pixelFormat->formatTexture;
+    //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
+
+    bool isWin10OrGreater = false;
+    HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
+    if (likely(hKernel32 != NULL))
+        isWin10OrGreater = GetProcAddress(hKernel32, "GetSystemCpuSetInformation") != NULL;
+    if (isWin10OrGreater)
+        out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    else
+    {
+        bool isWin80OrGreater = false;
+        if (likely(hKernel32 != NULL))
+            isWin80OrGreater = GetProcAddress(hKernel32, "CheckTokenCapability") != NULL;
+        if (isWin80OrGreater)
+            out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
+        else
+        {
+            out->SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+            out->BufferCount = 1;
+        }
+    }
+}
+#endif /* !VLC_WINSTORE_APP */
+
 static unsigned int GetPictureWidth(const vout_display_t *vd)
 {
     return vd->sys->picQuad.i_width;
@@ -572,41 +607,6 @@ static void DestroyDisplayPoolPicture(picture_t *picture)
     ReleasePictureSys( p_sys );
     free(p_sys);
 }
-
-#if !VLC_WINSTORE_APP
-static void FillSwapChainDesc(vout_display_t *vd, DXGI_SWAP_CHAIN_DESC1 *out)
-{
-    ZeroMemory(out, sizeof(*out));
-    out->BufferCount = 3;
-    out->BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    out->SampleDesc.Count = 1;
-    out->SampleDesc.Quality = 0;
-    out->Width = vd->source.i_visible_width;
-    out->Height = vd->source.i_visible_height;
-    out->Format = vd->sys->display.pixelFormat->formatTexture;
-    //out->Flags = 512; // DXGI_SWAP_CHAIN_FLAG_YUV_VIDEO;
-
-    bool isWin10OrGreater = false;
-    HMODULE hKernel32 = GetModuleHandle(TEXT("kernel32.dll"));
-    if (likely(hKernel32 != NULL))
-        isWin10OrGreater = GetProcAddress(hKernel32, "GetSystemCpuSetInformation") != NULL;
-    if (isWin10OrGreater)
-        out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
-    else
-    {
-        bool isWin80OrGreater = false;
-        if (likely(hKernel32 != NULL))
-            isWin80OrGreater = GetProcAddress(hKernel32, "CheckTokenCapability") != NULL;
-        if (isWin80OrGreater)
-            out->SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-        else
-        {
-            out->SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-            out->BufferCount = 1;
-        }
-    }
-}
-#endif
 
 /* rotation around the Z axis */
 static void getZRotMatrix(float theta, FLOAT matrix[static 16])
