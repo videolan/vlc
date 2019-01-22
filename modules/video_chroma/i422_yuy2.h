@@ -135,11 +135,11 @@ movq      %%mm1, 8(%0)  # Store high UYVY                                 \n\
 
 /* SSE2 assembly */
 
-#define SSE2_CALL(MMX_INSTRUCTIONS)         \
+#define SSE2_CALL(SSE2_INSTRUCTIONS)        \
     do {                                    \
     __asm__ __volatile__(                   \
         ".p2align 3 \n\t"                   \
-        MMX_INSTRUCTIONS                    \
+        SSE2_INSTRUCTIONS                   \
         :                                   \
         : "r" (p_line), "r" (p_y),          \
           "r" (p_u), "r" (p_v)              \
