@@ -423,6 +423,11 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
 #if VLC_WINSTORE_APP
     if (d3d11_ctx == NULL)
         d3d11_ctx = var_InheritInteger(vd, "winrt-d3dcontext");
+    if (d3d11_ctx == NULL)
+    {
+        msg_Err(vd, "missing direct3d context for winstore");
+        goto error;
+    }
 #endif
     if (CommonInit(vd, d3d11_ctx != NULL, cfg))
         goto error;
