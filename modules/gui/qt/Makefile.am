@@ -543,6 +543,8 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/valid.svg \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
+	gui/qt/qml/MainInterface.qml \
+	gui/qt/qml/BannerSources.qml \
 	gui/qt/qml/about/About.qml \
 	gui/qt/qml/player/Player.qml \
 	gui/qt/qml/player/TrackInfo.qml \
