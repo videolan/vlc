@@ -185,4 +185,7 @@
         <file alias="VLCColors.qml">qml/style/VLCColors.qml</file>
         <file alias="VLCIcons.qml">qml/style/VLCIcons.qml</file>
     </qresource>
+    <qresource prefix="/about">
+        <file alias="About.qml">qml/about/About.qml</file>
+    </qresource>
 </RCC>
