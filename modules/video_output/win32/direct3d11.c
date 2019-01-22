@@ -983,8 +983,8 @@ static void Direct3D11Destroy(vout_display_t *vd)
 #endif
 }
 
-#define COLOR_RANGE_FULL   1 /* 0-255 */
-#define COLOR_RANGE_STUDIO 0 /* 16-235 */
+#define DXGI_COLOR_RANGE_FULL   1 /* 0-255 */
+#define DXGI_COLOR_RANGE_STUDIO 0 /* 16-235 */
 
 #define TRANSFER_FUNC_10    TRANSFER_FUNC_LINEAR
 #define TRANSFER_FUNC_22    TRANSFER_FUNC_SRGB
@@ -997,7 +997,7 @@ static const dxgi_color_space color_spaces[] = {
     { DXGI_COLOR_SPACE_##AXIS##_##RANGE##_G##GAMMA##_##SITTING##_P##PRIMARIES, \
       #AXIS " Rec." #PRIMARIES " gamma:" #GAMMA " range:" #RANGE, \
       COLOR_AXIS_##AXIS, COLOR_PRIMARIES_BT##PRIMARIES, TRANSFER_FUNC_##GAMMA, \
-      COLOR_SPACE_BT##PRIMARIES, COLOR_RANGE_##RANGE},
+      COLOR_SPACE_BT##PRIMARIES, DXGI_COLOR_RANGE_##RANGE},
 
     DXGIMAP(RGB,   FULL,     22,    NONE,   709)
     DXGIMAP(YCBCR, STUDIO,   22,    LEFT,   601)
@@ -1588,7 +1588,6 @@ static int Direct3D11CreateFormatResources(vout_display_t *vd, const video_forma
         SetQuadVSProjection( vd, &sys->picQuad, &sys->sys.vdcfg.viewpoint );
 
     if (!vd->info.is_slow) {
-        HRESULT           hr;
         ID3D10Multithread *pMultithread;
         hr = ID3D11Device_QueryInterface( sys->d3d_dev.d3ddevice, &IID_ID3D10Multithread, (void **)&pMultithread);
         if (SUCCEEDED(hr)) {
