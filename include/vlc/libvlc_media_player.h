@@ -420,6 +420,41 @@ void libvlc_video_set_callbacks( libvlc_media_player_t *mp,
                                  libvlc_video_display_cb display,
                                  void *opaque );
 
+/**
+ * Set decoded video chroma and dimensions.
+ * This only works in combination with libvlc_video_set_callbacks(),
+ * and is mutually exclusive with libvlc_video_set_format_callbacks().
+ *
+ * \param mp the media player
+ * \param chroma a four-characters string identifying the chroma
+ *               (e.g. "RV32" or "YUYV")
+ * \param width pixel width
+ * \param height pixel height
+ * \param pitch line pitch (in bytes)
+ * \version LibVLC 1.1.1 or later
+ * \bug All pixel planes are expected to have the same pitch.
+ * To use the YCbCr color space with chrominance subsampling,
+ * consider using libvlc_video_set_format_callbacks() instead.
+ */
+LIBVLC_API
+void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
+                              unsigned width, unsigned height,
+                              unsigned pitch );
+
+/**
+ * Set decoded video chroma and dimensions. This only works in combination with
+ * libvlc_video_set_callbacks().
+ *
+ * \param mp the media player
+ * \param setup callback to select the video format (cannot be NULL)
+ * \param cleanup callback to release any allocated resources (or NULL)
+ * \version LibVLC 2.0.0 or later
+ */
+LIBVLC_API
+void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
+                                        libvlc_video_format_cb setup,
+                                        libvlc_video_cleanup_cb cleanup );
+
 
 /**
  * Callback prototype called to initialize user data.
@@ -517,41 +552,6 @@ int libvlc_video_set_output_callbacks( libvlc_media_player_t *mp,
                                         libvlc_video_makeCurrent_cb makeCurrent_cb,
                                         libvlc_video_getProcAddress_cb getProcAddress_cb,
                                         void* opaque );
-
-/**
- * Set decoded video chroma and dimensions.
- * This only works in combination with libvlc_video_set_callbacks(),
- * and is mutually exclusive with libvlc_video_set_format_callbacks().
- *
- * \param mp the media player
- * \param chroma a four-characters string identifying the chroma
- *               (e.g. "RV32" or "YUYV")
- * \param width pixel width
- * \param height pixel height
- * \param pitch line pitch (in bytes)
- * \version LibVLC 1.1.1 or later
- * \bug All pixel planes are expected to have the same pitch.
- * To use the YCbCr color space with chrominance subsampling,
- * consider using libvlc_video_set_format_callbacks() instead.
- */
-LIBVLC_API
-void libvlc_video_set_format( libvlc_media_player_t *mp, const char *chroma,
-                              unsigned width, unsigned height,
-                              unsigned pitch );
-
-/**
- * Set decoded video chroma and dimensions. This only works in combination with
- * libvlc_video_set_callbacks().
- *
- * \param mp the media player
- * \param setup callback to select the video format (cannot be NULL)
- * \param cleanup callback to release any allocated resources (or NULL)
- * \version LibVLC 2.0.0 or later
- */
-LIBVLC_API
-void libvlc_video_set_format_callbacks( libvlc_media_player_t *mp,
-                                        libvlc_video_format_cb setup,
-                                        libvlc_video_cleanup_cb cleanup );
 
 /**
  * Set the NSView handler where the media player should render its video output.
