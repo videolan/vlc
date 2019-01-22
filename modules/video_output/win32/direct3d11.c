@@ -1193,10 +1193,7 @@ static const d3d_format_t *GetBlendableFormat(vout_display_t *vd, vlc_fourcc_t i
 static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 {
     vout_display_sys_t *sys = vd->sys;
-    IDXGIFactory2 *dxgifactory;
     HRESULT hr = E_FAIL;
-    DXGI_SWAP_CHAIN_DESC1 scd;
-    DXGI_FORMAT windowlessFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     ID3D11DeviceContext *d3d11_ctx = NULL;
 #if VLC_WINSTORE_APP
@@ -1224,21 +1221,23 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
        return VLC_EGENERIC;
     }
 
-#if VLC_WINSTORE_APP
-    IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
-    if (!dxgiswapChain)
-        return VLC_EGENERIC;
-
-    sys->dxgiswapChain = dxgiswapChain;
-    IDXGISwapChain_AddRef(sys->dxgiswapChain);
-
-    if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
-        return VLC_EGENERIC;
-
-    windowlessFormat = scd.Format;
-#endif /* VLC_WINSTORE_APP */
     if (sys->sys.b_windowless)
     {
+        DXGI_FORMAT windowlessFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+#if VLC_WINSTORE_APP
+        DXGI_SWAP_CHAIN_DESC1 scd;
+        IDXGISwapChain1* dxgiswapChain  = var_InheritInteger(vd, "winrt-swapchain");
+        if (!dxgiswapChain)
+            return VLC_EGENERIC;
+
+        sys->dxgiswapChain = dxgiswapChain;
+        IDXGISwapChain_AddRef(sys->dxgiswapChain);
+
+        if (FAILED(IDXGISwapChain1_GetDesc(dxgiswapChain, &scd)))
+            return VLC_EGENERIC;
+
+        windowlessFormat = scd.Format;
+#endif /* VLC_WINSTORE_APP */
         for (const d3d_format_t *output_format = GetRenderFormatList();
              output_format->name != NULL; ++output_format)
         {
@@ -1257,6 +1256,7 @@ static int Direct3D11Open(vout_display_t *vd, video_format_t *fmtp)
 #if !VLC_WINSTORE_APP
     else
     {
+        IDXGIFactory2 *dxgifactory;
         sys->display.pixelFormat = FindD3D11Format( vd, &sys->d3d_dev, 0, true,
                                                     vd->source.i_chroma==VLC_CODEC_D3D11_OPAQUE_10B ? 10 : 8,
                                                     0, 0,
