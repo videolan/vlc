@@ -122,14 +122,18 @@ public:
             PropVariantClear(&pvRot);
         }
 
-        vlc_viewpoint_t vp = {
+        // TODO: use current_pos directly?
+        /* Zero initialize vp for field of view. */
+        vlc_viewpoint_t vp {};
+        vp.fov = 0.f;
+        vlc_viewpoint_from_euler(&vp,
             old_pos.yaw   - current_pos.yaw,
             old_pos.pitch - current_pos.pitch,
-            old_pos.roll  - current_pos.roll,
-            0.0f
-        };
+            old_pos.roll  - current_pos.roll
+        );
         if (owner.viewpoint_moved)
             owner.viewpoint_moved(owner.sys, &vp);
+
         return S_OK;
     }
 
