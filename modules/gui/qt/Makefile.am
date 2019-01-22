@@ -544,6 +544,8 @@ libqt_plugin_la_RES = \
 	gui/qt/pixmaps/search_clear.svg \
 	gui/qt/pixmaps/lock.svg \
 	gui/qt/qml/about/About.qml \
+	gui/qt/qml/dialogs/Dialogs.qml \
+	gui/qt/qml/dialogs/ModalDialog.qml \
 	gui/qt/qml/utils/DNDLabel.qml \
 	gui/qt/qml/utils/ToolTipArea.qml \
 	gui/qt/qml/utils/Drawer.qml \

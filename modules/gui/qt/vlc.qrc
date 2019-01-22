@@ -188,4 +188,8 @@
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>
     </qresource>
+    <qresource prefix="/dialogs">
+        <file alias="Dialogs.qml">qml/dialogs/Dialogs.qml</file>
+        <file alias="ModalDialog.qml">qml/dialogs/ModalDialog.qml</file>
+    </qresource>
 </RCC>
