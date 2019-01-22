@@ -239,22 +239,14 @@ function playlist(name,client,arg)
     end
     local playlist
     local tree = playlist_is_tree(client)
-    if name == "search" then
-        playlist = vlc.playlist.search(arg or "", tree)
+    if tonumber(arg) then
+        playlist = vlc.playlist.get(tonumber(arg), tree)
+    elseif arg then
+        playlist = vlc.playlist.get(arg, tree)
     else
-        if tonumber(arg) then
-            playlist = vlc.playlist.get(tonumber(arg), tree)
-        elseif arg then
-            playlist = vlc.playlist.get(arg, tree)
-        else
-            playlist = vlc.playlist.get(nil, tree)
-        end
+        playlist = vlc.playlist.get(nil, tree)
     end
-    if name == "search" then
-        client:append("+----[ Search - "..(arg or "`reset'").." ]")
-    else
-        client:append("+----[ Playlist - "..name.." ]")
-    end
+    client:append("+----[ Playlist - "..name.." ]")
     if playlist.children then
         for _, item in ipairs(playlist.children) do
             playlist0(item)
@@ -262,11 +254,7 @@ function playlist(name,client,arg)
     else
         playlist0(playlist)
     end
-    if name == "search" then
-        client:append("+----[ End of search - Use `search' to reset ]")
-    else
-        client:append("+----[ End of playlist ]")
-    end
+    client:append("+----[ End of playlist ]")
 end
 
 function playlist_sort(name,client,arg)
@@ -558,7 +546,6 @@ commands_ordered = {
     { "add"; { func = add; args = "XYZ"; help = "add XYZ to playlist" } };
     { "enqueue"; { func = add; args = "XYZ"; help = "queue XYZ to playlist" } };
     { "playlist"; { func = playlist; help = "show items currently in playlist" } };
-    { "search"; { func = playlist; args = "[string]"; help = "search for items in playlist (or reset search)" } };
     { "delete"; { func = skip2(vlc.playlist.delete); args = "[X]"; help = "delete item X in playlist" } };
     { "move"; { func = move; args = "[X][Y]"; help = "move item X in playlist after Y" } };
     { "sort"; { func = playlist_sort; args = "key"; help = "sort the playlist" } };

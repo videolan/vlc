@@ -313,17 +313,6 @@ static int vlclua_playlist_get( lua_State *L )
     return 1;
 }
 
-static int vlclua_playlist_search( lua_State *L )
-{
-    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    const char *psz_string = luaL_optstring( L, 1, "" );
-    PL_LOCK;
-    playlist_LiveSearchUpdate( p_playlist, &p_playlist->root, psz_string, true );
-    push_playlist_item( L, &p_playlist->root );
-    PL_UNLOCK;
-    return 1;
-}
-
 static int vlclua_playlist_current( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -426,7 +415,6 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "add", vlclua_playlist_add },
     { "enqueue", vlclua_playlist_enqueue },
     { "get", vlclua_playlist_get },
-    { "search", vlclua_playlist_search },
     { "current", vlclua_playlist_current },
     { "sort", vlclua_playlist_sort },
     { "status", vlclua_playlist_status },
