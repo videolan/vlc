@@ -192,6 +192,7 @@
         <file alias="ArtistListView.qml">qml/mediacenter/ArtistListView.qml</file>
         <file alias="MusicTrackListDisplay.qml">qml/mediacenter/MusicTrackListDisplay.qml</file>
         <file alias="ArtistTopBanner.qml">qml/mediacenter/ArtistTopBanner.qml</file>
+        <file alias="MCMainDisplay.qml">qml/mediacenter/MCMainDisplay.qml</file>
         <file alias="NetworkDriveDisplay.qml">qml/mediacenter/NetworkDriveDisplay.qml</file>
         <file alias="NetworkFileDisplay.qml">qml/mediacenter/NetworkFileDisplay.qml</file>
         <file alias="NetworkListItem.qml">qml/mediacenter/NetworkListItem.qml</file>
