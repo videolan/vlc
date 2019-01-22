@@ -566,7 +566,7 @@ movdqu    %%xmm2, 48(%3)  # Store ABGR15 ... ABGR12                       \n\
     xmm5 = _mm_unpackhi_epi8(xmm5, xmm1);           \
     xmm7 = _mm_slli_epi16(xmm7, 2);                 \
     xmm5 = _mm_or_si128(xmm5, xmm7);                \
-    _mm_storeu_si128((__m128i*)(p_buffer+16), xmm5);
+    _mm_storeu_si128((__m128i*)(p_buffer+8), xmm5);
 
 #define SSE2_UNPACK_16_ALIGNED                      \
     xmm5 = _mm_set1_epi32(0xf8f8f8f8UL);            \
