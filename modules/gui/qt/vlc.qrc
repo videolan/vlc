@@ -178,6 +178,7 @@
         <file alias="MenuExt.qml">qml/utils/MenuExt.qml</file>
         <file alias="MenuItemExt.qml">qml/utils/MenuItemExt.qml</file>
         <file alias="ExpandGridView.qml">qml/utils/ExpandGridView.qml</file>
+        <file alias="ScanProgressBar.qml">qml/utils/ScanProgressBar.qml</file>
     </qresource>
     <qresource prefix="/mediacenter">
         <file alias="MCMusicDisplay.qml">qml/mediacenter/MCMusicDisplay.qml</file>

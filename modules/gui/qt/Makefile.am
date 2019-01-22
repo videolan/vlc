@@ -571,6 +571,7 @@ libqt_plugin_la_RES = \
 	gui/qt/qml/utils/SelectableDelegateModel.qml \
 	gui/qt/qml/utils/ComboBoxExt.qml \
 	gui/qt/qml/utils/StackViewExt.qml \
+	gui/qt/qml/utils/ScanProgressBar.qml \
 	gui/qt/qml/menus/CheckableModelSubMenu.qml \
 	gui/qt/qml/menus/AudioMenu.qml \
 	gui/qt/qml/menus/HelpMenu.qml \
