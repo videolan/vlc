@@ -583,6 +583,16 @@ libqt_plugin_la_RES = \
 	gui/qt/qml/menus/ToolsMenu.qml \
 	gui/qt/qml/menus/ViewMenu.qml \
 	gui/qt/qml/menus/VideoMenu.qml \
+	gui/qt/qml/mediacenter/ArtistListView.qml \
+	gui/qt/qml/mediacenter/ArtistGridView.qml \
+	gui/qt/qml/mediacenter/ArtistTopBanner.qml \
+	gui/qt/qml/mediacenter/MCMusicDisplay.qml \
+	gui/qt/qml/mediacenter/MusicAlbumsDisplay.qml \
+	gui/qt/qml/mediacenter/MusicAlbumsGridExpandDelegate.qml \
+	gui/qt/qml/mediacenter/MusicArtistsDisplay.qml \
+	gui/qt/qml/mediacenter/MusicGenresDisplay.qml \
+	gui/qt/qml/mediacenter/MusicTracksDisplay.qml \
+	gui/qt/qml/mediacenter/MusicTrackListDisplay.qml \
 	gui/qt/qml/playlist/PlaylistListView.qml \
 	gui/qt/qml/playlist/PlaylistMainView.qml \
 	gui/qt/qml/playlist/PLItem.qml \
