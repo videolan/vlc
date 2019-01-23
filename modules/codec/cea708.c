@@ -1018,8 +1018,25 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
 
     if( p_w->b_relative )
     {
+        /* FIXME: take into account left/right anchors */
         p_region->origin.x = p_w->i_anchor_offset_h / 100.0;
-        p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+
+        switch (p_w->anchor_point) {
+        case CEA708_ANCHOR_TOP_LEFT:
+        case CEA708_ANCHOR_TOP_CENTER:
+        case CEA708_ANCHOR_TOP_RIGHT:
+            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+            break;
+        case CEA708_ANCHOR_BOTTOM_LEFT:
+        case CEA708_ANCHOR_BOTTOM_CENTER:
+        case CEA708_ANCHOR_BOTTOM_RIGHT:
+            p_region->origin.y = 1.0 - (p_w->i_anchor_offset_v / 100.0);
+            break;
+        default:
+            /* FIXME: for CENTER vertical justified, just position as top */
+            p_region->origin.y = p_w->i_anchor_offset_v / 100.0;
+            break;
+        }
     }
     else
     {
