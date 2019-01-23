@@ -211,7 +211,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     }
 
     vout->p->input = input;
-    if (vout->p->input)
+    if (input != NULL)
         spu_Attach(vout->p->spu, input);
 
     return vout;
@@ -234,12 +234,12 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
-        if (vout->p->input == NULL) {
+        if (vout->p->input == NULL)
             vout->p->input = input;
-            if (input != NULL)
-                spu_Attach(vout->p->spu, input);
-        } else
+        else
             assert(vout->p->input == input);
+        if (input != NULL)
+            spu_Attach(vout->p->spu, input);
 
         vout_control_cmd_t cmd;
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
@@ -262,10 +262,8 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
 void vout_Stop(vout_thread_t *vout)
 {
-    if (vout->p->input != NULL) {
-        spu_Detach(vout->p->spu);
-        vout->p->input = NULL;
-    }
+    spu_Detach(vout->p->spu);
+    vout->p->input = NULL;
 
     vout_control_cmd_t cmd;
     vout_configuration_t cfg = { .fmt = NULL };
@@ -280,8 +278,8 @@ void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
 
-    if (vout->p->input)
-        spu_Detach(vout->p->spu);
+    spu_Detach(vout->p->spu);
+    vout->p->input = NULL;
 
     vout_snapshot_End(vout->p->snapshot);
 
