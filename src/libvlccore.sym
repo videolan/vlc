@@ -732,7 +732,6 @@ vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
 vout_Close
-vout_ChangeAspectRatio
 vout_GetPicture
 vout_PutPicture
 vout_PutSubpicture

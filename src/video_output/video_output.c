@@ -499,12 +499,6 @@ int vout_GetSnapshot(vout_thread_t *vout,
     return VLC_SUCCESS;
 }
 
-void vout_ChangeAspectRatio( vout_thread_t *p_vout,
-                             unsigned int i_num, unsigned int i_den )
-{
-    vout_ControlChangeSampleAspectRatio( p_vout, i_num, i_den );
-}
-
 /* vout_Control* are usable by anyone at anytime */
 void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
 {

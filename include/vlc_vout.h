@@ -104,9 +104,6 @@ VLC_API int vout_GetSnapshot( vout_thread_t *p_vout,
                               video_format_t *p_fmt,
                               const char *psz_format, vlc_tick_t i_timeout );
 
-VLC_API void vout_ChangeAspectRatio( vout_thread_t *p_vout,
-                                     unsigned int i_num, unsigned int i_den );
-
 /* */
 VLC_API picture_t * vout_GetPicture( vout_thread_t * );
 VLC_API void vout_PutPicture( vout_thread_t *, picture_t * );
