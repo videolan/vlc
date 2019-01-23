@@ -60,6 +60,7 @@
  *****************************************************************************/
 static void *Thread(void *);
 static void VoutDestructor(vlc_object_t *);
+static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg);
 
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
@@ -201,6 +202,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         vout_window_SetState(sys->window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
         vout_window_SetState(sys->window, VOUT_WINDOW_STATE_ABOVE);
+
+    VoutGetDisplayCfg(vout, &sys->display_cfg);
 
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
@@ -1650,10 +1653,7 @@ static void *Thread(void *object)
     vlc_tick_t deadline = VLC_TICK_INVALID;
     bool wait = false;
 
-    vout_display_cfg_t cfg_default;
-    VoutGetDisplayCfg(vout, &cfg_default);
-
-    if (ThreadStart(vout, &cfg_default))
+    if (ThreadStart(vout, &sys->display_cfg))
         goto out;
 
     for (;;) {
