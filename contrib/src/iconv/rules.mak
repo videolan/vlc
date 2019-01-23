@@ -9,7 +9,7 @@ ifndef HAVE_WIN32
 ifndef HAVE_ANDROID
 PKGS_FOUND += iconv
 else
-ifeq ($(shell echo "$(ANDROID_API) >= 28" | bc), 1)
+ifeq ($(shell expr "$(ANDROID_API)" '>=' '28'), 1)
 PKGS_FOUND += iconv
 endif
 endif
