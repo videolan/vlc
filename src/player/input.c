@@ -798,29 +798,33 @@ vlc_player_input_NavigationFallback(struct vlc_player_input *input, int nav_type
 
     /* Handle Up/Down/Left/Right if the demux can't navigate */
     vlc_viewpoint_t vp = { 0 };
+    bool viewpoint_updated = true;
+    float yaw = 0.f, pitch = 0.f, roll = 0.f;
+
     int vol_direction = 0;
     int seek_direction = 0;
     switch (nav_type)
     {
         case INPUT_CONTROL_NAV_UP:
             vol_direction = 1;
-            vp.pitch = -1.f;
+            pitch = -1.f;
             break;
         case INPUT_CONTROL_NAV_DOWN:
             vol_direction = -1;
-            vp.pitch = 1.f;
+            pitch = 1.f;
             break;
         case INPUT_CONTROL_NAV_LEFT:
             seek_direction = -1;
-            vp.yaw = -1.f;
+            yaw = -1.f;
             break;
         case INPUT_CONTROL_NAV_RIGHT:
             seek_direction = 1;
-            vp.yaw = 1.f;
+            yaw = 1.f;
             break;
         case INPUT_CONTROL_NAV_ACTIVATE:
         case INPUT_CONTROL_NAV_POPUP:
         case INPUT_CONTROL_NAV_MENU:
+            viewpoint_updated = false;
             return;
         default:
             vlc_assert_unreachable();
@@ -838,8 +842,11 @@ vlc_player_input_NavigationFallback(struct vlc_player_input *input, int nav_type
     }
     free(vouts);
 
-    if (viewpoint_ch)
+    if (viewpoint_ch && viewpoint_updated)
+    {
+        vlc_viewpoint_from_euler(&vp, yaw, pitch, roll);
         vlc_player_input_UpdateViewpoint(input, &vp, VLC_PLAYER_WHENCE_RELATIVE);
+    }
     else if (seek_direction != 0)
     {
         /* Seek or change volume if the input doesn't have navigation or viewpoint */
