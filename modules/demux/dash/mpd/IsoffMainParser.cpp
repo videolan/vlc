@@ -104,10 +104,12 @@ void    IsoffMainParser::parseMPDAttributes   (MPD *mpd, xml::Node *node)
     it = attr.find("minimumUpdatePeriod");
     if(it != attr.end())
     {
+        mpd->b_needsUpdates = true;
         vlc_tick_t minupdate = IsoTime(it->second);
         if(minupdate > 0)
             mpd->minUpdatePeriod.Set(minupdate);
     }
+    else mpd->b_needsUpdates = false;
 
     it = attr.find("maxSegmentDuration");
     if(it != attr.end())
