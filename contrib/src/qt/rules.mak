@@ -30,6 +30,7 @@ ifdef HAVE_WIN32
 	$(APPLY) $(SRC)/qt/0002-Windows-QPA-Disable-systray-notification-sounds.patch
 	$(APPLY) $(SRC)/qt/0003-configure-Treat-win32-clang-g-the-same-as-win32-g.patch
 	$(APPLY) $(SRC)/qt/0004-qmake-Fix-building-with-lld-with-mingw-makefiles.patch
+	$(APPLY) $(SRC)/qt/0005-qsimd-Fix-compilation-with-trunk-clang-for-mingw.patch
 ifndef HAVE_WIN64
 	$(APPLY) $(SRC)/qt/0001-disable-qt_random_cpu.patch
 endif
