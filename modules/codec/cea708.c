@@ -987,8 +987,27 @@ static void CEA708SpuConvert( const cea708_window_t *p_w,
     if( p_region == NULL && !(p_region = SubpictureUpdaterSysRegionNew()) )
         return;
 
+    int first, last;
+
+    if (p_w->style.scroll_direction == CEA708_WA_DIRECTION_BT) {
+        /* BT is a bit of a special case since we need to grab the last N
+           rows between first and last, rather than the first... */
+        last = p_w->i_lastrow;
+        if (p_w->i_lastrow - p_w->i_row_count < p_w->i_firstrow)
+            first = p_w->i_firstrow;
+        else
+            first = p_w->i_lastrow - p_w->i_row_count + 1;
+
+    } else {
+        first = p_w->i_firstrow;
+        if (p_w->i_firstrow + p_w->i_row_count > p_w->i_lastrow)
+            last = p_w->i_lastrow;
+        else
+            last = p_w->i_firstrow + p_w->i_row_count - 1;
+    }
+
     text_segment_t **pp_last = &p_region->p_segments;
-    for( uint8_t i=p_w->i_firstrow; i<=p_w->i_lastrow; i++ )
+    for( uint8_t i=first; i<=last; i++ )
     {
         if( !p_w->rows[i] )
             continue;
