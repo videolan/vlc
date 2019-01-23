@@ -696,9 +696,9 @@ static void CEA708_Window_Scroll( cea708_window_t *p_w )
             break;
         case CEA708_WA_DIRECTION_TB:
             /* Move DOWN */
-            if( p_w->i_firstrow == CEA708_WINDOW_MAX_ROWS - 1 )
+            if( p_w->i_lastrow == CEA708_WINDOW_MAX_ROWS - 1 )
                 CEA708_Window_Truncate( p_w, CEA708_WA_DIRECTION_TB );
-            for( int i=p_w->i_lastrow; i > p_w->i_firstrow; i-- )
+            for( int i=p_w->i_lastrow; i >= p_w->i_firstrow; i-- )
                 p_w->rows[i+1] = p_w->rows[i];
             p_w->rows[p_w->i_firstrow] = NULL;
             p_w->i_firstrow++;
