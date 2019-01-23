@@ -1049,12 +1049,14 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
 
     p_spu_sys->margin_ratio = CEA708_SCREEN_SAFE_MARGIN_RATIO;
 
+    bool first = true;
+
     for(size_t i=0; i<CEA708_WINDOWS_COUNT; i++)
     {
         cea708_window_t *p_w = &p_cea708->window[i];
         if( p_w->b_defined && p_w->b_visible && CEA708_Window_RowCount( p_w ) )
         {
-            if( p_region != &p_spu_sys->region )
+            if( !first )
             {
                 substext_updater_region_t *p_newregion =
                         SubpictureUpdaterSysRegionNew();
@@ -1063,6 +1065,8 @@ static subpicture_t *CEA708_BuildSubtitle( cea708_t *p_cea708 )
                 SubpictureUpdaterSysRegionAdd( p_region, p_newregion );
                 p_region = p_newregion;
             }
+            first = false;
+
             /* Fill region */
             CEA708SpuConvert( p_w, p_region );
         }
