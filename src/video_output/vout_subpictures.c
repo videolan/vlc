@@ -1396,15 +1396,15 @@ void spu_Destroy(spu_t *spu)
 void spu_Attach(spu_t *spu, input_thread_t *input)
 {
     vlc_mutex_lock(&spu->p->lock);
+    if (spu->p->input != input) {
+        UpdateSPU(spu, NULL);
 
-    UpdateSPU(spu, NULL);
+        spu->p->input = input;
 
-    spu->p->input = input;
-
-    if (spu->p->text)
-        FilterRelease(spu->p->text);
-    spu->p->text = SpuRenderCreateAndLoadText(spu);
-
+        if (spu->p->text)
+            FilterRelease(spu->p->text);
+        spu->p->text = SpuRenderCreateAndLoadText(spu);
+    }
     vlc_mutex_unlock(&spu->p->lock);
 }
 
