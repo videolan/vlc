@@ -1424,12 +1424,6 @@ static int ThreadStart(vout_thread_t *vout, vout_display_cfg_t *cfg)
     vout->p->filter.chain_interactive =
         filter_chain_NewVideo( vout, true, &owner );
 
-    vout_display_cfg_t cfg_default;
-    if (cfg == NULL) {
-        VoutGetDisplayCfg(vout, &cfg_default);
-        cfg = &cfg_default;
-    }
-
     if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
         goto error;
     assert(vout->p->decoder_pool && vout->p->private_pool);
@@ -1656,7 +1650,10 @@ static void *Thread(void *object)
     vlc_tick_t deadline = VLC_TICK_INVALID;
     bool wait = false;
 
-    if (ThreadStart(vout, NULL))
+    vout_display_cfg_t cfg_default;
+    VoutGetDisplayCfg(vout, &cfg_default);
+
+    if (ThreadStart(vout, &cfg_default))
         goto out;
 
     for (;;) {
