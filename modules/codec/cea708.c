@@ -749,8 +749,7 @@ static void CEA708_Window_CarriageReturn( cea708_window_t *p_w )
                        0 : CEA708_WINDOW_MAX_COLS - 1;
             break;
         case CEA708_WA_DIRECTION_BT:
-            if( p_w->row + 1 < CEA708_WINDOW_MAX_ROWS &&
-                CEA708_Window_RowCount( p_w ) < p_w->i_row_count )
+            if( p_w->row + 1 < p_w->i_row_count )
                 p_w->row++;
             else
                 CEA708_Window_Scroll( p_w );
