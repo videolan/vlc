@@ -1734,7 +1734,7 @@ vlc_player_SelectNextTitle(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_TITLE_NEXT, NULL);
-    vlc_player_vout_OSDMessage(player, NULL, _("Next title"));
+    vlc_player_vout_OSDMessage(player, _("Next title"));
 }
 
 void
@@ -1744,7 +1744,7 @@ vlc_player_SelectPrevTitle(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_TITLE_PREV, NULL);
-    vlc_player_vout_OSDMessage(player, NULL, _("Previous title"));
+    vlc_player_vout_OSDMessage(player, _("Previous title"));
 }
 
 ssize_t
@@ -1765,7 +1765,7 @@ vlc_player_SelectChapterIdx(vlc_player_t *player, size_t index)
         return;
     input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_SEEKPOINT,
                             &(vlc_value_t){ .i_int = index });
-    vlc_player_vout_OSDMessage(player, NULL, _("Chapter %ld"), index);
+    vlc_player_vout_OSDMessage(player, _("Chapter %ld"), index);
 }
 
 void
@@ -1775,7 +1775,7 @@ vlc_player_SelectNextChapter(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_NEXT, NULL);
-    vlc_player_vout_OSDMessage(player, NULL, _("Next chapter"));
+    vlc_player_vout_OSDMessage(player, _("Next chapter"));
 }
 
 void
@@ -1785,7 +1785,7 @@ vlc_player_SelectPrevChapter(vlc_player_t *player)
     if (!input)
         return;
     input_ControlPush(input->thread, INPUT_CONTROL_SET_SEEKPOINT_PREV, NULL);
-    vlc_player_vout_OSDMessage(player, NULL, _("Previous chapter"));
+    vlc_player_vout_OSDMessage(player, _("Previous chapter"));
 }
 
 static void
