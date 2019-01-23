@@ -653,14 +653,6 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (10 * num <= den) {
-        num = 1;
-        den = 10;
-    } else if (num >= 10 * den) {
-        num = 10;
-        den = 1;
-    }
-
     if (!osys->cfg.is_display_filled
      && osys->cfg.zoom.num == num && osys->cfg.zoom.den == den)
         return; /* nothing to do */
