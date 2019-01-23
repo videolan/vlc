@@ -398,7 +398,8 @@ enum vlc_ml_list_queries
 
 enum vlc_ml_parent_type
 {
-    VLC_ML_PARENT_ALBUM = 1,
+    VLC_ML_PARENT_UNKNOWN,
+    VLC_ML_PARENT_ALBUM,
     VLC_ML_PARENT_ARTIST,
     VLC_ML_PARENT_SHOW,
     VLC_ML_PARENT_GENRE,
