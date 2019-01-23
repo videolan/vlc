@@ -1530,7 +1530,7 @@ static int CEA708_Decode_C1( uint8_t code, cea708_t *p_cea708 )
                 p_cea708->p_cw->i_anchor_offset_h = v;
                 v = cea708_input_buffer_get( ib );
                 p_cea708->p_cw->anchor_point = v >> 4;
-                p_cea708->p_cw->i_row_count = v & 0x0F;
+                p_cea708->p_cw->i_row_count = (v & 0x0F) + 1;
                 v = cea708_input_buffer_get( ib );
                 p_cea708->p_cw->i_col_count = v & 0x3F;
                 v = cea708_input_buffer_get( ib );
