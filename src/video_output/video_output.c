@@ -119,48 +119,57 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     if (!vout)
         return NULL;
 
-    /* */
-    vout->p = (vout_thread_sys_t*)&vout[1];
-
-    VoutFixFormat(&vout->p->original, cfg->fmt);
-    vout->p->dpb_size = cfg->dpb_size;
-    vout->p->mouse_event = cfg->mouse_event;
-    vout->p->opaque = cfg->opaque;
-    vout->p->dead = false;
-    vout->p->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
-    vout->p->pause.is_on = false;
-    vout->p->pause.date = VLC_TICK_INVALID;
-
-    vout_control_Init(&vout->p->control);
-    vout_statistic_Init(&vout->p->statistic);
-    vout->p->snapshot = vout_snapshot_New();
-    vout_chrono_Init(&vout->p->render, 5, VLC_TICK_FROM_MS(10)); /* Arbitrary initial time */
-
-    /* Initialize locks */
-    vlc_mutex_init(&vout->p->filter.lock);
-    vlc_mutex_init(&vout->p->spu_lock);
-    vlc_mutex_init(&vout->p->window_lock);
-
-    /* Take care of some "interface/control" related initialisations */
+    /* Register the VLC variable and callbacks. On the one hand, the variables
+     * must be ready early on because further initializations below depend on
+     * some of them. On the other hand, the callbacks depend on said
+     * initializations. In practice, this works because the object is not
+     * visible and callbacks not triggerable before this function returns the
+     * fully initialized object to its caller.
+     */
     vout_IntfInit(vout);
-    vout_IntfReinit(vout);
 
-    /* Initialize subpicture unit */
-    vout->p->spu = spu_Create(vout, vout);
+    vout_thread_sys_t *sys = (vout_thread_sys_t *)&vout[1];
 
-    vout->p->title.show     = var_InheritBool(vout, "video-title-show");
-    vout->p->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
-    vout->p->title.position = var_InheritInteger(vout, "video-title-position");
+    vout->p = sys;
 
     /* Get splitter name if present */
-    vout->p->splitter_name = var_InheritString(vout, "video-splitter");
-    if (vout->p->splitter_name != NULL) {
+    sys->splitter_name = var_InheritString(vout, "video-splitter");
+    if (sys->splitter_name != NULL) {
         var_Create(vout, "window", VLC_VAR_STRING);
         var_SetString(vout, "window", "wdummy");
     }
 
-    /* */
-    vout_InitInterlacingSupport(vout, vout->p->displayed.is_interlaced);
+    sys->input = input;
+    VoutFixFormat(&sys->original, cfg->fmt);
+    sys->dpb_size = cfg->dpb_size;
+    sys->snapshot = vout_snapshot_New();
+    vout_statistic_Init(&sys->statistic);
+
+    /* Initialize subpicture unit */
+    vlc_mutex_init(&sys->spu_lock);
+    sys->spu = spu_Create(vout, vout);
+
+    if (input != NULL)
+        spu_Attach(vout->p->spu, input);
+
+    sys->dead = false;
+    vout_control_Init(&sys->control);
+
+    sys->pause.is_on = false;
+    sys->pause.date = VLC_TICK_INVALID;
+
+    sys->title.show     = var_InheritBool(vout, "video-title-show");
+    sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
+    sys->title.position = var_InheritInteger(vout, "video-title-position");
+
+    vout_InitInterlacingSupport(vout, sys->displayed.is_interlaced);
+
+    sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
+
+    sys->mouse_event = cfg->mouse_event;
+    sys->opaque = cfg->opaque;
+
+    vlc_mutex_init(&sys->filter.lock);
 
     /* Window */
     vout_window_cfg_t wcfg = {
@@ -175,46 +184,46 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         .height = cfg->fmt->i_visible_height,
     };
 
-    vout_window_t *window = vout_display_window_New(vout, &wcfg);
-    if (vout->p->splitter_name != NULL)
+    sys->window = vout_display_window_New(vout, &wcfg);
+    if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
-    if (unlikely(window == NULL)) {
-        spu_Destroy(vout->p->spu);
+    vlc_mutex_init(&sys->window_lock);
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+
+    /* */
+    vlc_object_set_destructor(vout, VoutDestructor);
+
+    if (sys->window == NULL) {
+        spu_Destroy(sys->spu);
         vlc_object_release(vout);
         return NULL;
     }
 
     if (var_InheritBool(vout, "video-wallpaper"))
-        vout_window_SetState(window, VOUT_WINDOW_STATE_BELOW);
+        vout_window_SetState(sys->window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
-        vout_window_SetState(window, VOUT_WINDOW_STATE_ABOVE);
-
-    vout->p->window = window;
-
-    /* */
-    vlc_object_set_destructor(vout, VoutDestructor);
+        vout_window_SetState(sys->window, VOUT_WINDOW_STATE_ABOVE);
 
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
-        vout_display_window_Delete(window);
-        spu_Destroy(vout->p->spu);
+        vout_display_window_Delete(sys->window);
+        spu_Destroy(sys->spu);
         vlc_object_release(vout);
         return NULL;
     }
 
-    vout_control_WaitEmpty(&vout->p->control);
+    vout_control_WaitEmpty(&sys->control);
 
-    if (vout->p->dead) {
+    if (sys->dead) {
         msg_Err(vout, "video output creation failed");
         vout_Close(vout);
         return NULL;
     }
 
-    vout->p->input = input;
-    if (input != NULL)
-        spu_Attach(vout->p->spu, input);
-
+    vout_IntfReinit(vout);
     return vout;
 }
 

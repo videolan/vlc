@@ -78,17 +78,10 @@ struct vout_thread_sys_t
     vlc_fourcc_t    spu_blend_chroma;
     filter_t        *spu_blend;
 
-    /* Video output window */
-    vout_window_t   *window;
-    vlc_mutex_t     window_lock;
-
     /* Thread & synchronization */
     vlc_thread_t    thread;
     bool            dead;
     vout_control_t  control;
-
-    /* */
-    vout_display_t *display;
 
     struct {
         vlc_tick_t  date;
@@ -139,7 +132,13 @@ struct vout_thread_sys_t
     vlc_mouse_event mouse_event;
     void            *opaque;
 
-    /* */
+    /* Video output window */
+    vout_window_t   *window;
+    vlc_mutex_t     window_lock;
+
+    /* Video output display */
+    vout_display_t *display;
+
     picture_pool_t  *private_pool;
     picture_pool_t  *display_pool;
     picture_pool_t  *decoder_pool;
