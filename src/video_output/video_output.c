@@ -659,8 +659,16 @@ void vout_ControlChangeDisplaySize(vout_thread_t *vout,
     cmd.window.height = height;
     vout_control_Push(&vout->p->control, &cmd);
 }
+
 void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
+    vout_thread_sys_t *sys = vout->p;
+
+    vlc_mutex_lock(&sys->window_lock);
+    sys->display_cfg.is_display_filled = is_filled;
+    /* no window size update here */
+    vlc_mutex_unlock(&sys->window_lock);
+
     vout_control_PushBool(&vout->p->control, VOUT_CONTROL_DISPLAY_FILLED,
                           is_filled);
 }
