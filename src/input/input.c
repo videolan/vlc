@@ -1504,9 +1504,14 @@ static size_t ControlGetReducedIndexLocked( input_thread_t *p_input,
         }
         else if ( i_ct == INPUT_CONTROL_UPDATE_VIEWPOINT )
         {
-            c->param.viewpoint.yaw += prev_control->param.viewpoint.yaw;
-            c->param.viewpoint.pitch += prev_control->param.viewpoint.pitch;
-            c->param.viewpoint.roll += prev_control->param.viewpoint.roll;
+            float yaw1, pitch1, roll1;
+            float yaw2, pitch2, roll2;
+            vlc_viewpoint_to_euler(&prev_control->param.viewpoint, &yaw1, &pitch1, &roll1);
+            vlc_viewpoint_to_euler(&c->param.viewpoint, &yaw2, &pitch2, &roll2);
+            vlc_viewpoint_from_euler(&c->param.viewpoint,
+                                     yaw1 + yaw2,
+                                     pitch1 + pitch2,
+                                     roll1 + roll2);
             c->param.viewpoint.fov += prev_control->param.viewpoint.fov;
             return sys->i_control - 1;
         }
