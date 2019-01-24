@@ -192,6 +192,20 @@
         <file alias="PLItemFooter.qml">qml/playlist/PLItemFooter.qml</file>
         <file alias="PlaylistMainView.qml">qml/playlist/PlaylistMainView.qml</file>
     </qresource>
+    <qresource prefix="/menus">
+        <file alias="AudioMenu.qml">qml/menus/AudioMenu.qml</file>
+        <file alias="HelpMenu.qml">qml/menus/HelpMenu.qml</file>
+        <file alias="MainDropdownMenu.qml">qml/menus/MainDropdownMenu.qml</file>
+        <file alias="MainMenubar.qml">qml/menus/MainMenubar.qml</file>
+        <file alias="MediaMenu.qml">qml/menus/MediaMenu.qml</file>
+        <file alias="PlaybackMenu.qml">qml/menus/PlaybackMenu.qml</file>
+        <file alias="SubtitleMenu.qml">qml/menus/SubtitleMenu.qml</file>
+        <file alias="ToolsMenu.qml">qml/menus/ToolsMenu.qml</file>
+        <file alias="VideoMenu.qml">qml/menus/VideoMenu.qml</file>
+        <file alias="CheckableModelSubMenu.qml">qml/menus/CheckableModelSubMenu.qml</file>
+        <file alias="ViewMenu.qml">qml/menus/ViewMenu.qml</file>
+        <file alias="PopupMenu.qml">qml/menus/PopupMenu.qml</file>
+    </qresource>
     <qresource prefix="/about">
         <file alias="About.qml">qml/about/About.qml</file>
     </qresource>
