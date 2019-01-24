@@ -143,6 +143,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     /* Take care of some "interface/control" related initialisations */
     vout_IntfInit(vout);
+    vout_IntfReinit(vout);
 
     /* Initialize subpicture unit */
     vout->p->spu = spu_Create(vout, vout);

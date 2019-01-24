@@ -298,8 +298,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "viewpoint", VLC_VAR_ADDRESS  );
     var_AddCallback( p_vout, "viewpoint", ViewpointCallback, NULL );
     var_Create( p_vout, "viewpoint-changeable", VLC_VAR_BOOL );
-
-    vout_IntfReinit( p_vout );
 }
 
 void vout_IntfReinit( vout_thread_t *p_vout )
