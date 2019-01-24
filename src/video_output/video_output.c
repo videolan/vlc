@@ -172,10 +172,8 @@ static void vout_display_window_GetSize(vlc_object_t *obj,
         h = x;
     }
 
-    unsigned par_num, par_den;
-    if (var_InheritURational(obj, &par_num, &par_den, "monitor-par") == 0
-     && par_num > 0 && par_den > 0)
-        w = (w * par_den) / par_num;
+    if (cfg->display.sar.num > 0 && cfg->display.sar.den > 0)
+        w = (w * cfg->display.sar.den) / cfg->display.sar.num;
 
     /* If width is forced, adjust height according to the aspect ratio */
     if (*width != 0) {
