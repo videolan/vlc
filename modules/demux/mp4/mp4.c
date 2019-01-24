@@ -1348,8 +1348,9 @@ static int DemuxTrack( demux_t *p_demux, mp4_track_t *tk, uint64_t i_readpos,
         }
 
         /* Next sample */
-        if ( i_nb_samples ) /* sample size could be 0, need to go fwd. see return */
-            MP4_TrackNextSample( p_demux, tk, i_nb_samples );
+        if ( i_nb_samples && /* sample size could be 0, need to go fwd. see return */
+             MP4_TrackNextSample( p_demux, tk, i_nb_samples ) )
+            goto end;
 
         uint32_t i_next_run_seq = MP4_TrackGetRunSeq( tk );
         if( i_next_run_seq != i_run_seq )
