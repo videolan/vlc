@@ -634,7 +634,7 @@ static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
 {
     vout_window_t *window;
 
-    vlc_mutex_lock(&vout->p->window_lock);
+    vlc_mutex_assert(&vout->p->window_lock);
     window = vout->p->window;
 
     if (likely(window != NULL)) {
@@ -645,7 +645,6 @@ static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
         msg_Dbg(vout->p->window, "requested size: %ux%u", width, height);
         vout_window_SetSize(window, width, height);
     }
-    vlc_mutex_unlock(&vout->p->window_lock);
 }
 
 void vout_ControlChangeDisplaySize(vout_thread_t *vout,
@@ -668,6 +667,8 @@ void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 
 void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
 {
+    vout_thread_sys_t *sys = vout->p;
+
     if (num != 0 && den != 0) {
         vlc_ureduce(&num, &den, num, den, 0);
     } else {
@@ -683,7 +684,10 @@ void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
         den = 1;
     }
 
+    vlc_mutex_lock(&sys->window_lock);
     vout_ControlUpdateWindowSize(vout);
+    vlc_mutex_unlock(&sys->window_lock);
+
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
                           num, den);
 }
@@ -691,7 +695,12 @@ void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
 void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
                                          unsigned num, unsigned den)
 {
+    vout_thread_sys_t *sys = vout->p;
+
+    vlc_mutex_lock(&sys->window_lock);
     vout_ControlUpdateWindowSize(vout);
+    vlc_mutex_unlock(&sys->window_lock);
+
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
                           num, den);
 }
@@ -699,7 +708,12 @@ void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
 void vout_ControlChangeCropRatio(vout_thread_t *vout,
                                  unsigned num, unsigned den)
 {
+    vout_thread_sys_t *sys = vout->p;
+
+    vlc_mutex_lock(&sys->window_lock);
     vout_ControlUpdateWindowSize(vout);
+    vlc_mutex_unlock(&sys->window_lock);
+
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_CROP_RATIO,
                           num, den);
 }
@@ -707,9 +721,12 @@ void vout_ControlChangeCropRatio(vout_thread_t *vout,
 void vout_ControlChangeCropWindow(vout_thread_t *vout,
                                   int x, int y, int width, int height)
 {
+    vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
 
+    vlc_mutex_lock(&sys->window_lock);
     vout_ControlUpdateWindowSize(vout);
+    vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
     cmd.window.x      = __MAX(x, 0);
@@ -722,9 +739,12 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
 void vout_ControlChangeCropBorder(vout_thread_t *vout,
                                   int left, int top, int right, int bottom)
 {
+    vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
 
+    vlc_mutex_lock(&sys->window_lock);
     vout_ControlUpdateWindowSize(vout);
+    vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
     cmd.border.left   = __MAX(left, 0);
