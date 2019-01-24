@@ -188,20 +188,8 @@ static void vout_display_window_GetSize(vlc_object_t *obj,
     }
 
     /* If neither width nor height are forced, use the requested zoom. */
-    float zoom = var_InheritFloat(obj, "zoom");
-
-    if (isnan(zoom))
-        zoom = 1.f;
-    else
-        zoom = fabsf(zoom);
-
-    if (zoom < 0.1f)
-        zoom = 0.1f;
-    if (zoom > 10.f)
-        zoom = 10.f;
-
-    *width = lroundf(zoom * (float)w);
-    *height = lroundf(zoom * (float)h);
+    *width = (w * cfg->zoom.num) / cfg->zoom.den;
+    *height = (h * cfg->zoom.num) / cfg->zoom.den;
 }
 
 static vout_thread_t *VoutCreate(vlc_object_t *object,
