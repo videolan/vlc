@@ -111,15 +111,15 @@ static bool VideoFormatIsCropArEqual(video_format_t *dst,
 }
 
 static void vout_display_window_GetSize(vlc_object_t *obj,
-                                        const video_format_t *restrict source,
-                                        unsigned *restrict width,
-                                        unsigned *restrict height)
+    const video_format_t *restrict source,
+    const vout_display_cfg_t *restrict cfg,
+    unsigned *restrict width, unsigned *restrict height)
 {
-    *width = var_InheritInteger(obj, "width");
-    *height = var_InheritInteger(obj, "height");
+    *width = cfg->display.width;
+    *height = cfg->display.height;
 
     /* If both width and height are forced, keep them as is. */
-    if (*width != (unsigned)-1 && *height != (unsigned)-1)
+    if (*width != 0 && *height != 0)
         return;
 
     /* Compute intended video resolution from source. */
@@ -178,13 +178,13 @@ static void vout_display_window_GetSize(vlc_object_t *obj,
         w = (w * par_den) / par_num;
 
     /* If width is forced, adjust height according to the aspect ratio */
-    if (*width != (unsigned)-1) {
+    if (*width != 0) {
         *height = (*width * h) / w;
         return;
     }
 
     /* If height is forced, adjust width according to the aspect ratio */
-    if (*height != (unsigned)-1) {
+    if (*height != 0) {
         *width = (*height * w) / h;
         return;
     }
@@ -287,7 +287,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 #endif
     };
 
-    vout_display_window_GetSize(VLC_OBJECT(vout), cfg->fmt,
+    VoutGetDisplayCfg(vout, &sys->display_cfg);
+    vout_display_window_GetSize(VLC_OBJECT(vout), cfg->fmt, &sys->display_cfg,
                                 &wcfg.width, &wcfg.height);
 
     if (sys->window != NULL && vout_window_Enable(sys->window, &wcfg)) {
@@ -305,8 +306,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         vout_window_SetState(sys->window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
         vout_window_SetState(sys->window, VOUT_WINDOW_STATE_ABOVE);
-
-    VoutGetDisplayCfg(vout, &sys->display_cfg);
 
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
@@ -633,16 +632,18 @@ void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
 
 static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
 {
-    unsigned width, height;
+    vout_window_t *window;
 
     vlc_mutex_lock(&vout->p->window_lock);
-    if (likely(vout->p->window != NULL)) {
-        vout_display_window_GetSize(VLC_OBJECT(vout->p->window),
-                                    &vout->p->original, &width, &height);
-        if (width > 0 && height > 0) {
-            msg_Dbg(vout->p->window, "requested size: %ux%u", width, height);
-            vout_window_SetSize(vout->p->window, width, height);
-        }
+    window = vout->p->window;
+
+    if (likely(window != NULL)) {
+        unsigned width, height;
+
+        vout_display_window_GetSize(VLC_OBJECT(vout), &vout->p->original,
+                                    &vout->p->display_cfg, &width, &height);
+        msg_Dbg(vout->p->window, "requested size: %ux%u", width, height);
+        vout_window_SetSize(window, width, height);
     }
     vlc_mutex_unlock(&vout->p->window_lock);
 }
