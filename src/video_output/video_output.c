@@ -158,7 +158,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
     sys->title.position = var_InheritInteger(vout, "video-title-position");
 
-    vout_InitInterlacingSupport(vout, sys->displayed.is_interlaced);
+    vout_InitInterlacingSupport(vout);
 
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
 
