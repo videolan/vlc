@@ -560,13 +560,21 @@ void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
                           is_filled);
 }
 
-void vout_ControlChangeZoom(vout_thread_t *vout, int num, int den)
+void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
 {
+    if (num != 0 && den != 0) {
+        vlc_ureduce(&num, &den, num, den, 0);
+    } else {
+        num = 1;
+        den = 1;
+    }
+
     if (num * 10 < den) {
-        num = den;
-        den *= 10;
+        num = 1;
+        den = 10;
     } else if (num > den * 10) {
-        num = den * 10;
+        num = 10;
+        den = 1;
     }
 
     vout_ControlUpdateWindowSize(vout);

@@ -653,13 +653,6 @@ void vout_SetDisplayZoom(vout_display_t *vd, unsigned num, unsigned den)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    if (num != 0 && den != 0) {
-        vlc_ureduce(&num, &den, num, den, 0);
-    } else {
-        num = 1;
-        den = 1;
-    }
-
     if (10 * num <= den) {
         num = 1;
         den = 10;
