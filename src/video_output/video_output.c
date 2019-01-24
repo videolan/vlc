@@ -798,7 +798,14 @@ void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
 void vout_ControlChangeViewpoint(vout_thread_t *vout,
                                  const vlc_viewpoint_t *p_viewpoint)
 {
+    vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
+
+    vlc_mutex_lock(&sys->window_lock);
+    sys->display_cfg.viewpoint = *p_viewpoint;
+    /* no window size update here */
+    vlc_mutex_unlock(&sys->window_lock);
+
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_VIEWPOINT);
     cmd.viewpoint = *p_viewpoint;
     vout_control_Push(&vout->p->control, &cmd);
