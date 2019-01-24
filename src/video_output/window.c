@@ -27,7 +27,6 @@
 # include "config.h"
 #endif
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -140,102 +139,6 @@ void vout_window_SetInhibition(vout_window_t *window, bool enabled)
 #include "vout_internal.h"
 
 #define DOUBLE_CLICK_TIME VLC_TICK_FROM_MS(300)
-
-static void vout_display_window_GetSize(vlc_object_t *obj,
-                                        const video_format_t *restrict source,
-                                        unsigned *restrict width,
-                                        unsigned *restrict height)
-{
-    *width = var_InheritInteger(obj, "width");
-    *height = var_InheritInteger(obj, "height");
-
-    /* If both width and height are forced, keep them as is. */
-    if (*width != (unsigned)-1 && *height != (unsigned)-1)
-        return;
-
-    /* Compute intended video resolution from source. */
-    unsigned w = source->i_visible_width;
-    unsigned h = source->i_visible_height;
-
-    assert(source->i_sar_num > 0 && source->i_sar_den > 0);
-    w = (w * source->i_sar_num) / source->i_sar_den;
-
-    char *crop = var_InheritString(obj, "crop");
-    if (crop != NULL)
-    {
-        unsigned num, den, cw, ch, top, bottom, left, right;
-
-        if (sscanf(crop, "%u:%u", &num, &den) == 2 && num > 0 && den > 0) {
-            if (w * den > h * num)
-                w = h * num / den;
-            else
-                h = w * den / num;
-        } else
-        if (sscanf(crop, "%ux%u+%*u+%u", &cw, &ch, &(unsigned){ 0 }) == 3) {
-            w = cw;
-            h = ch;
-        } else
-        if (sscanf(crop, "%u+%u+%u+%u", &left, &top, &right, &bottom) == 4
-         && right > left && bottom > top) {
-            w = right - left;
-            h = bottom - top;
-        } else
-            msg_Warn(obj, "Unknown crop format (%s)", crop);
-        free(crop);
-    }
-
-    char *aspect = crop ? NULL : var_InheritString(obj, "aspect-ratio");
-    if (aspect != NULL) {
-        unsigned num, den;
-
-        if (sscanf(aspect, "%u:%u", &num, &den) == 2 && num > 0 && den > 0)
-            w = h * num / den;
-        else
-            msg_Warn(obj, "Unknown aspect format (%s)", aspect);
-        free(aspect);
-    }
-
-    /* Adjust video size for orientation and pixel A/R. */
-    if (ORIENT_IS_SWAP(source->orientation)) {
-        unsigned x = w;
-
-        w = h;
-        h = x;
-    }
-
-    unsigned par_num, par_den;
-    if (var_InheritURational(obj, &par_num, &par_den, "monitor-par") == 0
-     && par_num > 0 && par_den > 0)
-        w = (w * par_den) / par_num;
-
-    /* If width is forced, adjust height according to the aspect ratio */
-    if (*width != (unsigned)-1) {
-        *height = (*width * h) / w;
-        return;
-    }
-
-    /* If height is forced, adjust width according to the aspect ratio */
-    if (*height != (unsigned)-1) {
-        *width = (*height * w) / h;
-        return;
-    }
-
-    /* If neither width nor height are forced, use the requested zoom. */
-    float zoom = var_InheritFloat(obj, "zoom");
-
-    if (isnan(zoom))
-        zoom = 1.f;
-    else
-        zoom = fabsf(zoom);
-
-    if (zoom < 0.1f)
-        zoom = 0.1f;
-    if (zoom > 10.f)
-        zoom = 10.f;
-
-    *width = lroundf(zoom * (float)w);
-    *height = lroundf(zoom * (float)h);
-}
 
 typedef struct vout_display_window
 {
@@ -404,18 +307,6 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
     if (window == NULL)
         free(state);
     return window;
-}
-
-void vout_display_window_UpdateSize(vout_window_t *window,
-                                    const video_format_t *restrict fmt)
-{
-    unsigned width, height;
-
-    vout_display_window_GetSize(VLC_OBJECT(window), fmt, &width, &height);
-    if (width > 0 && height > 0) {
-        msg_Dbg(window, "requested size: %ux%u", width, height);
-        vout_window_SetSize(window, width, height);
-    }
 }
 
 /**
