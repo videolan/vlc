@@ -1672,28 +1672,20 @@ static int ThreadReinit(vout_thread_t *vout,
 
     vout_display_cfg_t dcfg = { };
 
-    ThreadStop(vout, &dcfg);
+    ThreadStop(vout, NULL);
 
     vout_ReinitInterlacingSupport(vout);
 
-#if defined(_WIN32) || defined(__OS2__)
-    if (!dcfg.is_fullscreen)
-#endif
-    {
-        dcfg.display.width  = 0;
-        dcfg.display.height = 0;
-    }
-
-    /* FIXME current vout "variables" are not in sync here anymore
-     * and I am not sure what to do */
-    if (dcfg.display.sar.num <= 0 || dcfg.display.sar.den <= 0) {
-        dcfg.display.sar.num = 1;
-        dcfg.display.sar.den = 1;
-    }
-    if (dcfg.zoom.num == 0 || dcfg.zoom.den == 0) {
-        dcfg.zoom.num = 1;
-        dcfg.zoom.den = 1;
-    }
+    vlc_mutex_lock(&vout->p->window_lock);
+    dcfg = vout->p->display_cfg;
+    /* Any configuration change after unlocking will involve a control request
+     * that will be processed later. There may also be some pending control
+     * requests for configuration change already visible in display_cfg,
+     * leading to harmless albeit useless control request processing.
+     *
+     * TODO: display lock separate from window lock.
+     */
+    vlc_mutex_unlock(&vout->p->window_lock);
 
     video_format_Clean(&vout->p->original);
     vout->p->original = original;
