@@ -39,10 +39,6 @@
 # include "i420_rgb_sse2.h"
 # define VLC_TARGET VLC_SSE
 #endif
-#ifdef MMX
-# include "i420_rgb_mmx.h"
-# define VLC_TARGET VLC_MMX
-#endif
 
 /*****************************************************************************
  * SetOffset: build offset array for conversion functions
@@ -397,60 +393,6 @@ void I420_R5G5B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_16
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_15
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-
-            MMX_CALL (
-                MMX_INIT_16
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_15
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 2 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
 
@@ -747,60 +689,6 @@ void I420_R5G6B5( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_16
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_16
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-
-            MMX_CALL (
-                MMX_INIT_16
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_16
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 2 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
 
@@ -1097,60 +985,6 @@ void I420_A8R8G8B8( filter_t *p_filter, picture_t *p_src,
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_ARGB
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_ARGB
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 4 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
 
@@ -1446,60 +1280,6 @@ void I420_R8G8B8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_RGBA
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_RGBA
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 4 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
 
@@ -1795,60 +1575,6 @@ void I420_B8G8R8A8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_BGRA
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_BGRA
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 4 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
 
@@ -2144,59 +1870,5 @@ void I420_A8B8G8R8( filter_t *p_filter, picture_t *p_src, picture_t *p_dest )
     /* make sure all SSE2 stores are visible thereafter */
     SSE2_END;
 
-#elif defined (MODULE_NAME_IS_i420_rgb_mmx) // MMX
-
-    i_rewind = (-(p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width)) & 7;
-
-    for( i_y = 0; i_y < (p_filter->fmt_in.video.i_y_offset + p_filter->fmt_in.video.i_visible_height); i_y++ )
-    {
-        p_pic_start = p_pic;
-        p_buffer = b_hscale ? p_buffer_start : p_pic;
-
-        for ( i_x = (p_filter->fmt_in.video.i_x_offset + p_filter->fmt_in.video.i_visible_width) / 8; i_x--; )
-        {
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_ABGR
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-            p_buffer += 8;
-        }
-
-        /* Here we do some unaligned reads and duplicate conversions, but
-         * at least we have all the pixels */
-        if( i_rewind )
-        {
-            p_y -= i_rewind;
-            p_u -= i_rewind >> 1;
-            p_v -= i_rewind >> 1;
-            p_buffer -= i_rewind;
-            MMX_CALL (
-                MMX_INIT_32
-                MMX_YUV_MUL
-                MMX_YUV_ADD
-                MMX_UNPACK_32_ABGR
-            );
-            p_y += 8;
-            p_u += 4;
-            p_v += 4;
-        }
-        SCALE_WIDTH;
-        SCALE_HEIGHT( 420, 4 );
-
-        p_y += i_source_margin;
-        if( i_y % 2 )
-        {
-            p_u += i_source_margin_c;
-            p_v += i_source_margin_c;
-        }
-    }
-
-    /* re-enable FPU registers */
-    MMX_END;
 #endif
 }
