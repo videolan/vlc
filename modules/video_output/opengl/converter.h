@@ -45,7 +45,7 @@
 #  include <GLES2/gl2.h>
 #  include <GLES2/gl2ext.h>
 # else
-#  ifdef _WIN32
+#  ifdef HAVE_GL_WGLEW_H
 #   include <GL/glew.h>
 #  endif
 #  include <GL/gl.h>

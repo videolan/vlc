@@ -29,6 +29,7 @@
 #include <vlc_opengl.h>
 
 #include "../opengl/vout_helper.h"
+#include <GL/glew.h>
 #include <GL/wglew.h>
 
 #include "common.h"
