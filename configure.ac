@@ -3436,12 +3436,15 @@ AS_IF([test "${enable_directx}" != "no"], [
   ])
 
   dnl OpenGL
-  AC_CHECK_HEADERS([GL/wglew.h], [
-    VLC_ADD_PLUGIN([glwin32 wgl])
-  ],, [
-    #include <windows.h>
-    #include <GL/gl.h>
-  ])
+  AC_CHECK_HEADERS([GL/glew.h], [
+    AC_CHECK_HEADERS([GL/wglew.h], [
+        VLC_ADD_PLUGIN([glwin32 wgl])
+      ],, [
+        #include <windows.h>
+        #include <GL/glew.h>
+      ])],, [
+      #include <windows.h>
+   ])
 
   dnl Direct3D11
   AC_CHECK_HEADERS([d3d11.h], [

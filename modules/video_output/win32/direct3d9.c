@@ -1747,8 +1747,9 @@ static void Close(vout_display_t *vd)
     free(vd->sys);
 }
 
-#ifdef HAVE_GL
+#if defined(HAVE_GL) && defined(HAVE_GL_WGLEW_H)
 #include "../opengl/converter.h"
+#include <GL/glew.h>
 #include <GL/wglew.h>
 
 struct wgl_vt {
