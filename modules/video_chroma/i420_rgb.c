@@ -63,11 +63,6 @@ vlc_module_begin ()
                         "RV15,RV16,RV24,RV32 conversions") )
     set_callback_video_converter( Activate, 120 )
 # define vlc_CPU_capable() vlc_CPU_SSE2()
-#elif defined (MMX)
-    set_description( N_( "MMX I420,IYUV,YV12 to "
-                        "RV15,RV16,RV24,RV32 conversions") )
-    set_callback_video_converter( Activate, 100 )
-# define vlc_CPU_capable() vlc_CPU_MMX()
 #else
     set_description( N_("I420,IYUV,YV12 to "
                        "RGB8,RV15,RV16,RV24,RV32 conversions") )
