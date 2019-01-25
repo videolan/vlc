@@ -5,6 +5,9 @@ UPNP_URL := $(SF)/pupnp/libupnp-$(UPNP_VERSION).tar.bz2
 ifdef BUILD_NETWORK
 PKGS += upnp
 endif
+ifeq ($(call need_pkg,"libupnp >= 1.6.18"),)
+PKGS_FOUND += upnp
+endif
 
 $(TARBALLS)/libupnp-$(UPNP_VERSION).tar.bz2:
 	$(call download_pkg,$(UPNP_URL),upnp)
