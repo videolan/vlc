@@ -124,18 +124,6 @@ void MergeAltivec ( void *, const void *, const void *, size_t );
 void MergeMMXEXT  ( void *, const void *, const void *, size_t );
 #endif
 
-#if defined(CAN_COMPILE_3DNOW)
-/**
- * 3DNow routine to blend pixels from two picture lines.
- *
- * @param _p_dest Target
- * @param _p_s1 Source line A
- * @param _p_s2 Source line B
- * @param i_bytes Number of bytes to merge
- */
-void Merge3DNow   ( void *, const void *, const void *, size_t );
-#endif
-
 #if defined(CAN_COMPILE_SSE)
 /**
  * SSE2 routine to blend pixels from two picture lines.
@@ -198,19 +186,6 @@ void merge16_arm_sve(void *, const void *, const void *, size_t);
  * so just use that.
  */
 void EndMMX       ( void );
-#endif
-
-#if defined(CAN_COMPILE_3DNOW)
-/**
- * 3DNow merge finalization routine.
- *
- * Must be called after a 3DNow merge is finished.
- * This exits 3DNow mode (by executing the "femms" instruction).
- *
- * The EndMerge() macro detects whether this is needed, and calls if it is,
- * so just use that.
- */
-void End3DNow     ( void );
 #endif
 
 #endif

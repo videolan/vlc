@@ -570,14 +570,6 @@ notsupp:
     }
     else
 #endif
-#if defined(CAN_COMPILE_3DNOW)
-    if( pixel_size == 1 && vlc_CPU_3dNOW() )
-    {
-        p_sys->pf_merge = Merge3DNow;
-        p_sys->pf_end_merge = End3DNow;
-    }
-    else
-#endif
 #if defined(CAN_COMPILE_ARM)
     if( vlc_CPU_ARM_NEON() )
         p_sys->pf_merge = pixel_size == 1 ? merge8_arm_neon : merge16_arm_neon;
