@@ -129,30 +129,6 @@ static void vout_display_SizeWindow(vlc_object_t *obj,
     assert(source->i_sar_num > 0 && source->i_sar_den > 0);
     w = (w * source->i_sar_num) / source->i_sar_den;
 
-    char *crop = var_InheritString(obj, "crop");
-    if (crop != NULL)
-    {
-        unsigned num, den, cw, ch, top, bottom, left, right;
-
-        if (sscanf(crop, "%u:%u", &num, &den) == 2 && num > 0 && den > 0) {
-            if (w * den > h * num)
-                w = h * num / den;
-            else
-                h = w * den / num;
-        } else
-        if (sscanf(crop, "%ux%u+%*u+%u", &cw, &ch, &(unsigned){ 0 }) == 3) {
-            w = cw;
-            h = ch;
-        } else
-        if (sscanf(crop, "%u+%u+%u+%u", &left, &top, &right, &bottom) == 4
-         && right > left && bottom > top) {
-            w = right - left;
-            h = bottom - top;
-        } else
-            msg_Warn(obj, "Unknown crop format (%s)", crop);
-        free(crop);
-    }
-
     /* Adjust video size for orientation and pixel A/R. */
     if (ORIENT_IS_SWAP(source->orientation)) {
         unsigned x = w;
@@ -188,11 +164,43 @@ static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
     video_format_t source;
 
     video_format_Copy(&source, &sys->original);
-    if (sys->source.dar.num > 0 && sys->source.dar.den > 0) {
-        unsigned num = sys->source.dar.num * source.i_visible_height;
-        unsigned den = sys->source.dar.den * source.i_visible_width;
 
-        vlc_ureduce(&source.i_sar_num, &source.i_sar_den, num, den, 0);
+    /* Note: x & y offsets are not correctly computed
+     * since they are not used in vout_display_SizeWindow() anyhow.
+     * TODO: Pass only width, height and SAR instead of video_format_t.
+     */
+    switch (sys->source.crop.mode) {
+        case VOUT_CROP_NONE:
+            if (sys->source.dar.num > 0 && sys->source.dar.den > 0) {
+                unsigned num = sys->source.dar.num * source.i_visible_height;
+                unsigned den = sys->source.dar.den * source.i_visible_width;
+
+                vlc_ureduce(&source.i_sar_num, &source.i_sar_den, num, den, 0);
+            }
+            break;
+
+        case VOUT_CROP_RATIO: {
+            unsigned num = sys->source.crop.ratio.num;
+            unsigned den = sys->source.crop.ratio.den;
+
+            if (source.i_visible_width * den > source.i_visible_height * num)
+                source.i_visible_width = source.i_visible_height * num / den;
+            else
+                source.i_visible_height = source.i_visible_width * den / num;
+            break;
+        }
+
+        case VOUT_CROP_WINDOW:
+            source.i_visible_width = sys->source.crop.window.width;
+            source.i_visible_height = sys->source.crop.window.height;
+            break;
+
+        case VOUT_CROP_BORDER:
+            source.i_visible_width =
+                sys->source.crop.border.right - sys->source.crop.border.left;
+            source.i_visible_height =
+                sys->source.crop.border.bottom - sys->source.crop.border.top;
+            break;
     }
 
     /* If the vout thread is running, the window lock must be held here. */
