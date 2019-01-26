@@ -777,9 +777,6 @@ vout_display_t *vout_display_New(vlc_object_t *parent,
     if (vd->module == NULL)
         goto error;
 
-    vout_window_SetSize(osys->cfg.window,
-                        osys->cfg.display.width, osys->cfg.display.height);
-
 #if defined(_WIN32) || defined(__OS2__)
     if ((var_GetBool(parent, "fullscreen")
       || var_GetBool(parent, "video-wallpaper"))
