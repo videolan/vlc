@@ -133,7 +133,6 @@ struct vout_thread_sys_t
     void            *opaque;
 
     /* Video output window */
-    vout_window_t   *window;
     vlc_mutex_t     window_lock;
 
     /* Video output display */

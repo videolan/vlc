@@ -252,7 +252,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vlc_mutex_init(&sys->filter.lock);
 
     /* Window */
-    sys->window = vout_display_window_New(vout);
+    sys->display_cfg.window = vout_display_window_New(vout);
     if (sys->splitter_name != NULL)
         var_Destroy(vout, "window");
     vlc_mutex_init(&sys->window_lock);
@@ -277,26 +277,27 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout_display_window_GetSize(VLC_OBJECT(vout), cfg->fmt, &sys->display_cfg,
                                 &wcfg.width, &wcfg.height);
 
-    if (sys->window != NULL && vout_window_Enable(sys->window, &wcfg)) {
-        vout_display_window_Delete(sys->window);
-        sys->window = NULL;
+    if (sys->display_cfg.window != NULL
+     && vout_window_Enable(sys->display_cfg.window, &wcfg)) {
+        vout_display_window_Delete(sys->display_cfg.window);
+        sys->display_cfg.window = NULL;
     }
 
-    if (sys->window == NULL) {
+    if (sys->display_cfg.window == NULL) {
         spu_Destroy(sys->spu);
         vlc_object_release(vout);
         return NULL;
     }
 
     if (var_InheritBool(vout, "video-wallpaper"))
-        vout_window_SetState(sys->window, VOUT_WINDOW_STATE_BELOW);
+        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
     else if (var_InheritBool(vout, "video-on-top"))
-        vout_window_SetState(sys->window, VOUT_WINDOW_STATE_ABOVE);
+        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
 
     /* */
     if (vlc_clone(&vout->p->thread, Thread, vout,
                   VLC_THREAD_PRIORITY_OUTPUT)) {
-        vout_display_window_Delete(sys->window);
+        vout_display_window_Delete(sys->display_cfg.window);
         spu_Destroy(sys->spu);
         vlc_object_release(vout);
         return NULL;
@@ -375,8 +376,8 @@ void vout_Close(vout_thread_t *vout)
     vout_chrono_Clean(&vout->p->render);
 
     vlc_mutex_lock(&vout->p->window_lock);
-    vout_display_window_Delete(vout->p->window);
-    vout->p->window = NULL;
+    vout_display_window_Delete(vout->p->display_cfg.window);
+    vout->p->display_cfg.window = NULL;
     vlc_mutex_unlock(&vout->p->window_lock);
 
     vlc_mutex_lock(&vout->p->spu_lock);
@@ -590,7 +591,7 @@ void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
     vout_window_t *window;
 
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->window;
+    window = vout->p->display_cfg.window;
     /* Window is NULL if the output was already closed by its owner. */
     if (window != NULL)
         vout_window_SetFullScreen(window, id);
@@ -602,7 +603,7 @@ void vout_ControlChangeWindowed(vout_thread_t *vout)
     vout_window_t *window;
 
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->window;
+    window = vout->p->display_cfg.window;
     if (window != NULL)
         vout_window_UnsetFullScreen(window);
     vlc_mutex_unlock(&vout->p->window_lock);
@@ -613,7 +614,7 @@ void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
     vout_window_t *window;
 
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->window;
+    window = vout->p->display_cfg.window;
     if (window != NULL)
         vout_window_SetState(window, st);
     vlc_mutex_unlock(&vout->p->window_lock);
@@ -624,14 +625,14 @@ static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
     vout_window_t *window;
 
     vlc_mutex_assert(&vout->p->window_lock);
-    window = vout->p->window;
+    window = vout->p->display_cfg.window;
 
     if (likely(window != NULL)) {
         unsigned width, height;
 
-        vout_display_window_GetSize(VLC_OBJECT(vout), &vout->p->original,
+        vout_display_window_GetSize(VLC_OBJECT(window), &vout->p->original,
                                     &vout->p->display_cfg, &width, &height);
-        msg_Dbg(vout->p->window, "requested size: %ux%u", width, height);
+        msg_Dbg(window, "requested size: %ux%u", width, height);
         vout_window_SetSize(window, width, height);
     }
 }
@@ -804,7 +805,6 @@ void vout_ControlChangeViewpoint(vout_thread_t *vout,
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg)
 {
     /* Load configuration */
-    cfg->window = vout->p->window;
     cfg->viewpoint = vout->p->original.pose;
 
     const int display_width = var_GetInteger(vout, "width");
@@ -1442,7 +1442,7 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t da
     vout->p->pause.is_on = is_paused;
     vout->p->pause.date  = date;
 
-    vout_window_SetInhibition(vout->p->window, !is_paused);
+    vout_window_SetInhibition(vout->p->display_cfg.window, !is_paused);
 }
 
 static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
