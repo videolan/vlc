@@ -693,6 +693,9 @@ void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
     }
 
     vlc_mutex_lock(&sys->window_lock);
+    sys->display_cfg.zoom.num = num;
+    sys->display_cfg.zoom.den = den;
+
     vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
