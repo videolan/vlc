@@ -33,13 +33,13 @@ struct picture_t;
 /**
  * Interpolating deinterlace filter "X".
  *
- * The algorithm works on a 8x8 block basic, it copies the top field
+ * The algorithm works on a 8x8 block basis; It copies the top field
  * and applies a process to recreate the bottom field.
  *
  * If a 8x8 block is classified as :
  *   - progressive: it applies a small blend (1,6,1)
  *   - interlaced:
- *    * in the MMX version: we do a ME between the 2 fields, if there is a
+ *    * in the SIMD version: we do a ME between the 2 fields, if there is a
  *      good match we use MC to recreate the bottom field (with a small
  *      blend (1,6,1) )
  *    * otherwise: it recreates the bottom field by an edge oriented

@@ -68,7 +68,7 @@ typedef struct
 {
     const vlc_chroma_description_t *chroma;
 
-    /** Merge routine: C, MMX, SSE, ALTIVEC, NEON, ... */
+    /** Merge routine: C, SSE, ALTIVEC, NEON, ... */
     void (*pf_merge) ( void *, const void *, const void *, size_t );
 #if defined (__i386__) || defined (__x86_64__)
     /** Merge finalization routine for SSE */

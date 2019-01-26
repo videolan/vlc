@@ -97,6 +97,3 @@ static void yadif_filter_line_c_16bit(uint8_t *dst8, uint8_t *prev8, uint8_t *cu
 void vlcpriv_yadif_filter_line_ssse3(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
 void vlcpriv_yadif_filter_line_sse2(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
 #endif
-#if defined(__i386__)
-void vlcpriv_yadif_filter_line_mmxext(uint8_t *dst, uint8_t *prev, uint8_t *cur, uint8_t *next, int w, int prefs, int mrefs, int parity, int mode);
-#endif

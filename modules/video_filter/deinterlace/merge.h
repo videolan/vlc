@@ -112,18 +112,6 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1, const void *_p_s2,
 void MergeAltivec ( void *, const void *, const void *, size_t );
 #endif
 
-#if defined(CAN_COMPILE_MMXEXT)
-/**
- * MMXEXT routine to blend pixels from two picture lines.
- *
- * @param _p_dest Target
- * @param _p_s1 Source line A
- * @param _p_s2 Source line B
- * @param i_bytes Number of bytes to merge
- */
-void MergeMMXEXT  ( void *, const void *, const void *, size_t );
-#endif
-
 #if defined(CAN_COMPILE_SSE)
 /**
  * SSE2 routine to blend pixels from two picture lines.
@@ -175,17 +163,17 @@ void merge16_arm_sve(void *, const void *, const void *, size_t);
  * EndMerge routines
  *****************************************************************************/
 
-#if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
+#if defined(CAN_COMPILE_SSE2)
 /**
- * MMX merge finalization routine.
+ * SSE merge finalization routine.
  *
- * Must be called after an MMX merge is finished.
- * This exits MMX mode (by executing the "emms" instruction).
+ * Should be called after an SSE merge is finished.
+ * This exits SSE mode (by executing the "emms" instruction).
  *
  * The EndMerge() macro detects whether this is needed, and calls if it is,
  * so just use that.
  */
-void EndMMX       ( void );
+void EndSSE( void );
 #endif
 
 #endif

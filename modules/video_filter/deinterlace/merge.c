@@ -33,10 +33,6 @@
 #include <vlc_cpu.h>
 #include "merge.h"
 
-#ifdef CAN_COMPILE_MMXEXT
-#   include "mmx.h"
-#endif
-
 #ifdef HAVE_ALTIVEC_H
 #   include <altivec.h>
 #endif
@@ -66,32 +62,6 @@ void Merge16BitGeneric( void *_p_dest, const void *_p_s1,
     for( size_t i_words = i_bytes / 2; i_words > 0; i_words-- )
         *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
 }
-
-#if defined(CAN_COMPILE_MMXEXT)
-VLC_MMX
-void MergeMMXEXT( void *_p_dest, const void *_p_s1, const void *_p_s2,
-                  size_t i_bytes )
-{
-    uint8_t *p_dest = _p_dest;
-    const uint8_t *p_s1 = _p_s1;
-    const uint8_t *p_s2 = _p_s2;
-
-    for( ; i_bytes >= 8; i_bytes -= 8 )
-    {
-        __asm__  __volatile__( "movq %2,%%mm1;"
-                               "pavgb %1, %%mm1;"
-                               "movq %%mm1, %0" :"=m" (*p_dest):
-                                                 "m" (*p_s1),
-                                                 "m" (*p_s2) : "mm1" );
-        p_dest += 8;
-        p_s1 += 8;
-        p_s2 += 8;
-    }
-
-    for( ; i_bytes > 0; i_bytes-- )
-        *p_dest++ = ( *p_s1++ + *p_s2++ ) >> 1;
-}
-#endif
 
 #if defined(CAN_COMPILE_SSE)
 VLC_SSE
@@ -223,8 +193,8 @@ void MergeAltivec( void *_p_dest, const void *_p_s1,
  * EndMerge routines
  *****************************************************************************/
 
-#if defined(CAN_COMPILE_MMXEXT) || defined(CAN_COMPILE_SSE)
-void EndMMX( void )
+#if defined(CAN_COMPILE_SSE2)
+void EndSSE( void )
 {
     __asm__ __volatile__( "emms" :: );
 }

@@ -248,9 +248,6 @@ cglobal yadif_filter_line, 4, 7, 8,  80, dst, prev, cur, next, w, prefs, \
     FILTER 0, curq, nextq
 
 .ret:
-%if mmsize == 8
-    emms
-%endif
     RET
 %if ARCH_X86_32
   %undef pb_1
@@ -262,7 +259,3 @@ INIT_XMM ssse3
 YADIF
 INIT_XMM sse2
 YADIF
-%if ARCH_X86_32
-INIT_MMX mmxext
-YADIF
-%endif

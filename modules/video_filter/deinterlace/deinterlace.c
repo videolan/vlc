@@ -558,15 +558,7 @@ notsupp:
     if( vlc_CPU_SSE2() )
     {
         p_sys->pf_merge = pixel_size == 1 ? Merge8BitSSE2 : Merge16BitSSE2;
-        p_sys->pf_end_merge = EndMMX;
-    }
-    else
-#endif
-#if defined(CAN_COMPILE_MMXEXT)
-    if( pixel_size == 1 && vlc_CPU_MMXEXT() )
-    {
-        p_sys->pf_merge = MergeMMXEXT;
-        p_sys->pf_end_merge = EndMMX;
+        p_sys->pf_end_merge = EndSSE;
     }
     else
 #endif

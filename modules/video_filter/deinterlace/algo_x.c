@@ -24,10 +24,6 @@
 #   include "config.h"
 #endif
 
-#ifdef CAN_COMPILE_MMXEXT
-#   include "mmx.h"
-#endif
-
 #include <stdint.h>
 
 #include <vlc_common.h>
@@ -76,71 +72,6 @@ static inline int XDeint8x8DetectC( uint8_t *src, int i_src )
 
     return fc < 1 ? false : true;
 }
-#ifdef CAN_COMPILE_MMXEXT
-VLC_MMX
-static inline int XDeint8x8DetectMMXEXT( uint8_t *src, int i_src )
-{
-
-    int y, x;
-    int32_t ff, fr;
-    int fc;
-
-    /* Detect interlacing */
-    fc = 0;
-    pxor_r2r( mm7, mm7 );
-    for( y = 0; y < 9; y += 2 )
-    {
-        ff = fr = 0;
-        pxor_r2r( mm5, mm5 );
-        pxor_r2r( mm6, mm6 );
-        for( x = 0; x < 8; x+=4 )
-        {
-            movd_m2r( src[        x], mm0 );
-            movd_m2r( src[1*i_src+x], mm1 );
-            movd_m2r( src[2*i_src+x], mm2 );
-            movd_m2r( src[3*i_src+x], mm3 );
-
-            punpcklbw_r2r( mm7, mm0 );
-            punpcklbw_r2r( mm7, mm1 );
-            punpcklbw_r2r( mm7, mm2 );
-            punpcklbw_r2r( mm7, mm3 );
-
-            movq_r2r( mm0, mm4 );
-
-            psubw_r2r( mm1, mm0 );
-            psubw_r2r( mm2, mm4 );
-
-            psubw_r2r( mm1, mm2 );
-            psubw_r2r( mm1, mm3 );
-
-            pmaddwd_r2r( mm0, mm0 );
-            pmaddwd_r2r( mm4, mm4 );
-            pmaddwd_r2r( mm2, mm2 );
-            pmaddwd_r2r( mm3, mm3 );
-            paddd_r2r( mm0, mm2 );
-            paddd_r2r( mm4, mm3 );
-            paddd_r2r( mm2, mm5 );
-            paddd_r2r( mm3, mm6 );
-        }
-
-        movq_r2r( mm5, mm0 );
-        psrlq_i2r( 32, mm0 );
-        paddd_r2r( mm0, mm5 );
-        movd_r2m( mm5, fr );
-
-        movq_r2r( mm6, mm0 );
-        psrlq_i2r( 32, mm0 );
-        paddd_r2r( mm0, mm6 );
-        movd_r2m( mm6, ff );
-
-        if( ff < 6*fr/8 && fr > 32 )
-            fc++;
-
-        src += 2*i_src;
-    }
-    return fc;
-}
-#endif
 
 static inline void XDeint8x8MergeC( uint8_t *dst,  int i_dst,
                                     uint8_t *src1, int i_src1,
@@ -162,49 +93,6 @@ static inline void XDeint8x8MergeC( uint8_t *dst,  int i_dst,
         src2 += i_src2;
     }
 }
-
-#ifdef CAN_COMPILE_MMXEXT
-VLC_MMX
-static inline void XDeint8x8MergeMMXEXT( uint8_t *dst,  int i_dst,
-                                         uint8_t *src1, int i_src1,
-                                         uint8_t *src2, int i_src2 )
-{
-    static const uint64_t m_4 = INT64_C(0x0004000400040004);
-    int y, x;
-
-    /* Progressive */
-    pxor_r2r( mm7, mm7 );
-    for( y = 0; y < 8; y += 2 )
-    {
-        for( x = 0; x < 8; x +=4 )
-        {
-            movd_m2r( src1[x], mm0 );
-            movd_r2m( mm0, dst[x] );
-
-            movd_m2r( src2[x], mm1 );
-            movd_m2r( src1[i_src1+x], mm2 );
-
-            punpcklbw_r2r( mm7, mm0 );
-            punpcklbw_r2r( mm7, mm1 );
-            punpcklbw_r2r( mm7, mm2 );
-            paddw_r2r( mm1, mm1 );
-            movq_r2r( mm1, mm3 );
-            paddw_r2r( mm3, mm3 );
-            paddw_r2r( mm2, mm0 );
-            paddw_r2r( mm3, mm1 );
-            paddw_m2r( m_4, mm1 );
-            paddw_r2r( mm1, mm0 );
-            psraw_i2r( 3, mm0 );
-            packuswb_r2r( mm7, mm0 );
-            movd_r2m( mm0, dst[i_dst+x] );
-        }
-        dst += 2*i_dst;
-        src1 += i_src1;
-        src2 += i_src2;
-    }
-}
-
-#endif
 
 /* XDeint8x8FieldE: Stupid deinterlacing (1,0,1) for block that miss a
  * neighbour
@@ -229,31 +117,6 @@ static inline void XDeint8x8FieldEC( uint8_t *dst, int i_dst,
     }
 }
 
-#ifdef CAN_COMPILE_MMXEXT
-VLC_MMX
-static inline void XDeint8x8FieldEMMXEXT( uint8_t *dst, int i_dst,
-                                          uint8_t *src, int i_src )
-{
-    int y;
-
-    /* Interlaced */
-    for( y = 0; y < 8; y += 2 )
-    {
-        movq_m2r( src[0], mm0 );
-        movq_r2m( mm0, dst[0] );
-        dst += i_dst;
-
-        movq_m2r( src[2*i_src], mm1 );
-        pavgb_r2r( mm1, mm0 );
-
-        movq_r2m( mm0, dst[0] );
-
-        dst += 1*i_dst;
-        src += 2*i_src;
-    }
-}
-#endif
-
 /* XDeint8x8Field: Edge oriented interpolation
  * (Need -4 and +5 pixels H, +1 line)
  */
@@ -271,7 +134,7 @@ static inline void XDeint8x8FieldC( uint8_t *dst, int i_dst,
         for( x = 0; x < 8; x++ )
         {
             uint8_t *src2 = &src[2*i_src];
-            /* I use 8 pixels just to match the MMX version, but it's overkill
+            /* I use 8 pixels just to match the SIMD version, but it's overkill
              * 5 would be enough (less isn't good) */
             const int c0 = abs(src[x-4]-src2[x-2]) + abs(src[x-3]-src2[x-1]) +
                            abs(src[x-2]-src2[x+0]) + abs(src[x-1]-src2[x+1]) +
@@ -300,50 +163,6 @@ static inline void XDeint8x8FieldC( uint8_t *dst, int i_dst,
         src += 2*i_src;
     }
 }
-
-#ifdef CAN_COMPILE_MMXEXT
-VLC_MMX
-static inline void XDeint8x8FieldMMXEXT( uint8_t *dst, int i_dst,
-                                         uint8_t *src, int i_src )
-{
-    int y, x;
-
-    /* Interlaced */
-    for( y = 0; y < 8; y += 2 )
-    {
-        memcpy( dst, src, 8 );
-        dst += i_dst;
-
-        for( x = 0; x < 8; x++ )
-        {
-            uint8_t *src2 = &src[2*i_src];
-            int32_t c0, c1, c2;
-
-            movq_m2r( src[x-2], mm0 );
-            movq_m2r( src[x-3], mm1 );
-            movq_m2r( src[x-4], mm2 );
-
-            psadbw_m2r( src2[x-4], mm0 );
-            psadbw_m2r( src2[x-3], mm1 );
-            psadbw_m2r( src2[x-2], mm2 );
-
-            movd_r2m( mm0, c2 );
-            movd_r2m( mm1, c1 );
-            movd_r2m( mm2, c0 );
-
-            if( c0 < c1 && c1 <= c2 )
-                dst[x] = (src[x-1] + src2[x+1]) >> 1;
-            else if( c2 < c1 && c1 <= c0 )
-                dst[x] = (src[x+1] + src2[x-1]) >> 1;
-            else
-                dst[x] = (src[x+0] + src2[x+0]) >> 1;
-        }
-
-        dst += 1*i_dst;
-        src += 2*i_src;
-    }
-}
-#endif
 
 /* NxN arbitray size (and then only use pixel in the NxN block)
  */
@@ -472,41 +291,6 @@ static inline void XDeintBand8x8C( uint8_t *dst, int i_dst,
         XDeintNxN( dst, i_dst, src, i_src, i_modx, 8 );
 }
 
-#ifdef CAN_COMPILE_MMXEXT
-VLC_MMX
-static inline void XDeintBand8x8MMXEXT( uint8_t *dst, int i_dst,
-                                        uint8_t *src, int i_src,
-                                        const int i_mbx, int i_modx )
-{
-    int x;
-
-    /* Reset current line */
-    for( x = 0; x < i_mbx; x++ )
-    {
-        int s;
-        if( ( s = XDeint8x8DetectMMXEXT( src, i_src ) ) )
-        {
-            if( x == 0 || x == i_mbx - 1 )
-                XDeint8x8FieldEMMXEXT( dst, i_dst, src, i_src );
-            else
-                XDeint8x8FieldMMXEXT( dst, i_dst, src, i_src );
-        }
-        else
-        {
-            XDeint8x8MergeMMXEXT( dst, i_dst,
-                                  &src[0*i_src], 2*i_src,
-                                  &src[1*i_src], 2*i_src );
-        }
-
-        dst += 8;
-        src += 8;
-    }
-
-    if( i_modx )
-        XDeintNxN( dst, i_dst, src, i_src, i_modx, 8 );
-}
-#endif
-
 /*****************************************************************************
  * Public functions
  *****************************************************************************/
@@ -515,9 +299,6 @@ int RenderX( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
 {
     VLC_UNUSED(p_filter);
     int i_plane;
-#if defined (CAN_COMPILE_MMXEXT)
-    const bool mmxext = vlc_CPU_MMXEXT();
-#endif
 
     /* Copy image and skip lines */
     for( i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -538,12 +319,7 @@ int RenderX( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
             uint8_t *dst = &p_outpic->p[i_plane].p_pixels[8*y*i_dst];
             uint8_t *src = &p_pic->p[i_plane].p_pixels[8*y*i_src];
 
-#ifdef CAN_COMPILE_MMXEXT
-            if( mmxext )
-                XDeintBand8x8MMXEXT( dst, i_dst, src, i_src, i_mbx, i_modx );
-            else
-#endif
-                XDeintBand8x8C( dst, i_dst, src, i_src, i_mbx, i_modx );
+            XDeintBand8x8C( dst, i_dst, src, i_src, i_mbx, i_modx );
         }
 
         /* Last line (C only)*/
@@ -565,9 +341,5 @@ int RenderX( filter_t *p_filter, picture_t *p_outpic, picture_t *p_pic )
         }
     }
 
-#ifdef CAN_COMPILE_MMXEXT
-    if( mmxext )
-        emms();
-#endif
     return VLC_SUCCESS;
 }

@@ -159,7 +159,6 @@ noinst_LTLIBRARIES += libdeinterlace_common.la
 
 libdeinterlace_plugin_la_SOURCES = \
 	video_filter/deinterlace/deinterlace.c video_filter/deinterlace/deinterlace.h \
-        video_filter/deinterlace/mmx.h \
 	video_filter/deinterlace/merge.c video_filter/deinterlace/merge.h \
 	video_filter/deinterlace/helpers.c video_filter/deinterlace/helpers.h \
 	video_filter/deinterlace/algo_basic.c video_filter/deinterlace/algo_basic.h \

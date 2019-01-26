@@ -119,11 +119,6 @@ int RenderYadif( filter_t *p_filter, picture_t *p_dst, picture_t *p_src,
         if( vlc_CPU_SSE2() )
             filter = vlcpriv_yadif_filter_line_sse2;
         else
-#if defined(__i386__)
-        if( vlc_CPU_MMXEXT() )
-            filter = vlcpriv_yadif_filter_line_mmxext;
-        else
-#endif
 #endif
             filter = yadif_filter_line_c;
 

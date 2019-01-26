@@ -24,10 +24,6 @@
 #   include "config.h"
 #endif
 
-#ifdef CAN_COMPILE_MMXEXT
-#   include "mmx.h"
-#endif
-
 #include <stdint.h>
 #include <assert.h>
 
