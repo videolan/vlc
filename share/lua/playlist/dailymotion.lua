@@ -36,6 +36,7 @@ function parse()
 		if string.match( line, "<meta property=\"og:title\"" ) then
 			_,_,name = string.find( line, "content=\"(.-)\"" )
 			name = vlc.strings.resolve_xml_special_chars( name )
+			name = string.gsub( name, " %- Vidéo dailymotion$", "" )
 		end
 		if string.match( line, "<meta name=\"description\"" ) then
 			_,_,description = string.find( line, "content=\"(.-)\"" )
