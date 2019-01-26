@@ -1579,6 +1579,16 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
 
     if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
         goto error;
+
+    unsigned num, den;
+    vlc_mutex_lock(&vout->p->window_lock); /* c.f. ThreadReinit() */
+    num = vout->p->source.dar.num;
+    den = vout->p->source.dar.den;
+    vlc_mutex_unlock(&vout->p->window_lock);
+
+    if (num != 0 && den != 0)
+        vout_SetDisplayAspect(vout->p->display, num, den);
+
     assert(vout->p->decoder_pool && vout->p->private_pool);
 
     vout->p->displayed.current       = NULL;
