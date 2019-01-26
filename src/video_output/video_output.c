@@ -331,6 +331,9 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout = VoutCreate(object, cfg);
         if (vout == NULL)
             return NULL;
+
+        if (input != NULL)
+            vout->p->input = vlc_object_hold((vlc_object_t *)input);
     }
 
     vout_control_WaitEmpty(&vout->p->control);
@@ -342,7 +345,6 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     if (input != NULL)
         spu_Attach(vout->p->spu, input);
-    vout->p->input = input;
     vout_IntfReinit(vout);
     return vout;
 }
@@ -406,7 +408,8 @@ static void VoutDestructor(vlc_object_t *object)
 
     /* */
     vout_snapshot_Destroy(vout->p->snapshot);
-
+    if (vout->p->input != NULL)
+        vlc_object_release((vlc_object_t *)vout->p->input);
     video_format_Clean(&vout->p->original);
 }
 
