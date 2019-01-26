@@ -168,7 +168,7 @@ void merge16_arm_sve(void *, const void *, const void *, size_t);
  * SSE merge finalization routine.
  *
  * Should be called after an SSE merge is finished.
- * This exits SSE mode (by executing the "emms" instruction).
+ * This exits SSE mode (by executing the "sfence" instruction).
  *
  * The EndMerge() macro detects whether this is needed, and calls if it is,
  * so just use that.
