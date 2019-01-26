@@ -1,10 +1,8 @@
 --[[
-    Translate Daily Motion video webpages URLs to the corresponding
-    FLV URL.
+    Translate Dailymotion video webpages URLs to corresponding
+    video stream URLs.
 
- $Id$
-
- Copyright © 2007-2016 the VideoLAN team
+ Copyright © 2007-2019 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,9 +45,22 @@ function parse()
 		if string.match( line, "<meta property=\"og:image\"" ) then
 			arturl = string.match( line, "content=\"(.-)\"" )
 		end
+    end
 
-        if string.match( line, "var __PLAYER_CONFIG__ = {" ) then
+    local video_id = string.match( vlc.path, "^www%.dailymotion%.com/video/([^/?#]+)" )
+    if video_id then
+        local metadata = vlc.stream( vlc.access.."://www.dailymotion.com/player/metadata/video/"..video_id )
+        if metadata then
+            local line = metadata:readline() -- data is on one line only
+
+            -- TODO: fetch "title" and resolve \u escape sequences
+            -- FIXME: use "screenname" instead and resolve \u escape sequences
             artist = string.match( line, '"username":"([^"]+)"' )
+
+            local poster = string.match( line, '"poster_url":"([^"]+)"' )
+            if poster then
+                arturl = string.gsub( poster, "\\/", "/")
+            end
 
             local streams = string.match( line, "\"qualities\":{(.-%])}" )
             if streams then
@@ -81,7 +92,7 @@ function parse()
     end
 
     if not path then
-        vlc.msg.err("Couldn't extract the video URL from dailymotion")
+        vlc.msg.err("Couldn't extract dailymotion video URL, please check for updates to this script")
         return { }
     end
 
