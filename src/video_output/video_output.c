@@ -234,6 +234,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     VoutFixFormat(&sys->original, cfg->fmt);
     sys->source.dar.num = 0;
     sys->source.dar.den = 0;
+    sys->source.crop.mode = VOUT_CROP_NONE;
     sys->dpb_size = cfg->dpb_size;
     sys->snapshot = vout_snapshot_New();
     vout_statistic_Init(&sys->statistic);
@@ -723,6 +724,13 @@ void vout_ControlChangeCropRatio(vout_thread_t *vout,
     vout_thread_sys_t *sys = vout->p;
 
     vlc_mutex_lock(&sys->window_lock);
+    if (num != 0 && den != 0) {
+        sys->source.crop.mode = VOUT_CROP_RATIO;
+        sys->source.crop.ratio.num = num;
+        sys->source.crop.ratio.den = den;
+    } else
+        sys->source.crop.mode = VOUT_CROP_NONE;
+
     vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
@@ -736,15 +744,30 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
     vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
 
+    if (x < 0)
+        x = 0;
+    if (y < 0)
+        y = 0;
+    if (width < 0)
+        width = 0;
+    if (height < 0)
+        height = 0;
+
     vlc_mutex_lock(&sys->window_lock);
+    sys->source.crop.mode = VOUT_CROP_WINDOW;
+    sys->source.crop.window.x = x;
+    sys->source.crop.window.y = y;
+    sys->source.crop.window.width = width;
+    sys->source.crop.window.height = height;
+
     vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
-    cmd.window.x      = __MAX(x, 0);
-    cmd.window.y      = __MAX(y, 0);
-    cmd.window.width  = __MAX(width, 0);
-    cmd.window.height = __MAX(height, 0);
+    cmd.window.x = x;
+    cmd.window.y = y;
+    cmd.window.width = width;
+    cmd.window.height = height;
     vout_control_Push(&vout->p->control, &cmd);
 }
 
@@ -754,15 +777,30 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
     vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
 
+    if (left < 0)
+        left = 0;
+    if (top < 0)
+        top = 0;
+    if (right < 0)
+        right = 0;
+    if (bottom < 0)
+        bottom = 0;
+
     vlc_mutex_lock(&sys->window_lock);
+    sys->source.crop.mode = VOUT_CROP_BORDER;
+    sys->source.crop.border.left = left;
+    sys->source.crop.border.right = right;
+    sys->source.crop.border.top = top;
+    sys->source.crop.border.bottom = bottom;
+
     vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
-    cmd.border.left   = __MAX(left, 0);
-    cmd.border.top    = __MAX(top, 0);
-    cmd.border.right  = __MAX(right, 0);
-    cmd.border.bottom = __MAX(bottom, 0);
+    cmd.border.left = left;
+    cmd.border.top = top;
+    cmd.border.right = right;
+    cmd.border.bottom = bottom;
     vout_control_Push(&vout->p->control, &cmd);
 }
 
