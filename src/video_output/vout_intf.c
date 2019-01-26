@@ -302,7 +302,6 @@ void vout_IntfInit( vout_thread_t *p_vout )
 
 void vout_IntfReinit( vout_thread_t *p_vout )
 {
-    var_TriggerCallback( p_vout, "zoom" );
     var_TriggerCallback( p_vout, "crop" );
     var_TriggerCallback( p_vout, "aspect-ratio" );
 
