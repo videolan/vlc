@@ -1606,7 +1606,7 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
         vout->p->mouse_event(m, vout->p->opaque);
 }
 
-static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
+static int ThreadStart(vout_thread_t *vout)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
@@ -1634,13 +1634,27 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
     vout->p->filter.chain_interactive =
         filter_chain_NewVideo( vout, true, &owner );
 
-    if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
+    vout_display_cfg_t dcfg;
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    dcfg = vout->p->display_cfg;
+    /* Any configuration change after unlocking will involve a control request
+     * that will be processed in the new thread. There may also be some pending
+     * control requests for configuration change already visible in
+     * sys->display_cfg, leading to processing of extra harmless and useless
+     * control request processing.
+     *
+     * TODO: display lock separate from window lock.
+     */
+    vlc_mutex_unlock(&vout->p->window_lock);
+
+    if (vout_OpenWrapper(vout, vout->p->splitter_name, &dcfg))
         goto error;
 
     unsigned num = 0, den = 0;
     int x = 0, y = 0, w = 0, h = 0;
 
-    vlc_mutex_lock(&vout->p->window_lock); /* c.f. ThreadReinit() */
+    vlc_mutex_lock(&vout->p->window_lock); /* see above */
     switch (vout->p->source.crop.mode) {
         case VOUT_CROP_NONE:
             break;
@@ -1664,7 +1678,7 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
     vlc_mutex_unlock(&vout->p->window_lock);
     vout_SetDisplayCrop(vout->p->display, num, den, x, y, w, h);
 
-    vlc_mutex_lock(&vout->p->window_lock); /* c.f. ThreadReinit() */
+    vlc_mutex_lock(&vout->p->window_lock); /* see above */
     num = vout->p->source.dar.num;
     den = vout->p->source.dar.den;
     vlc_mutex_unlock(&vout->p->window_lock);
@@ -1738,27 +1752,14 @@ static int ThreadReinit(vout_thread_t *vout,
     vout->p->pause.is_on = false;
     vout->p->pause.date  = VLC_TICK_INVALID;
 
-    vout_display_cfg_t dcfg;
-
     ThreadStop(vout);
 
     vout_ReinitInterlacingSupport(vout);
 
-    vlc_mutex_lock(&vout->p->window_lock);
-    dcfg = vout->p->display_cfg;
-    /* Any configuration change after unlocking will involve a control request
-     * that will be processed later. There may also be some pending control
-     * requests for configuration change already visible in display_cfg,
-     * leading to harmless albeit useless control request processing.
-     *
-     * TODO: display lock separate from window lock.
-     */
-    vlc_mutex_unlock(&vout->p->window_lock);
-
     video_format_Clean(&vout->p->original);
     VoutFixFormat(&vout->p->original, cfg->fmt);
     vout->p->dpb_size = cfg->dpb_size;
-    if (ThreadStart(vout, &dcfg))
+    if (ThreadStart(vout))
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -1866,7 +1867,7 @@ static void *Thread(void *object)
     vlc_tick_t deadline = VLC_TICK_INVALID;
     bool wait = false;
 
-    if (ThreadStart(vout, &sys->display_cfg))
+    if (ThreadStart(vout))
         goto out;
 
     for (;;) {
