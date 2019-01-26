@@ -484,6 +484,8 @@ static void vout_display_Reset(vout_display_t *vd)
         osys->pool = NULL;
     }
 
+    VoutDisplayDestroyRender(vd);
+
     if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
                              &vd->fmt)
      || VoutDisplayCreateRender(vd))
