@@ -1549,7 +1549,7 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
         vout->p->mouse_event(m, vout->p->opaque);
 }
 
-static int ThreadStart(vout_thread_t *vout, vout_display_cfg_t *cfg)
+static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
