@@ -203,6 +203,22 @@ static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
                             &sys->display_cfg);
 }
 
+static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
+{
+    vout_window_t *window;
+
+    vlc_mutex_assert(&vout->p->window_lock);
+    window = vout->p->display_cfg.window;
+
+    if (likely(window != NULL)) {
+        unsigned width, height;
+
+        vout_SizeWindow(vout, &width, &height);
+        msg_Dbg(window, "requested size: %ux%u", width, height);
+        vout_window_SetSize(window, width, height);
+    }
+}
+
 static vout_thread_t *VoutCreate(vlc_object_t *object,
                                  const vout_configuration_t *cfg)
 {
@@ -337,10 +353,15 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     /* If a vout is provided, try reusing it */
     if (vout) {
         vout_control_cmd_t cmd;
+
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
         cmd.cfg = cfg;
         vout_control_Push(&vout->p->control, &cmd);
         msg_Dbg(object, "reusing provided vout");
+
+        vlc_mutex_lock(&vout->p->window_lock);
+        vout_ControlUpdateWindowSize(vout);
+        vlc_mutex_unlock(&vout->p->window_lock);
     } else {
         vout = VoutCreate(object, cfg);
         if (vout == NULL)
@@ -631,22 +652,6 @@ void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
     if (window != NULL)
         vout_window_SetState(window, st);
     vlc_mutex_unlock(&vout->p->window_lock);
-}
-
-static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
-{
-    vout_window_t *window;
-
-    vlc_mutex_assert(&vout->p->window_lock);
-    window = vout->p->display_cfg.window;
-
-    if (likely(window != NULL)) {
-        unsigned width, height;
-
-        vout_SizeWindow(vout, &width, &height);
-        msg_Dbg(window, "requested size: %ux%u", width, height);
-        vout_window_SetSize(window, width, height);
-    }
 }
 
 void vout_ControlChangeDisplaySize(vout_thread_t *vout,
