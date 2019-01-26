@@ -1557,6 +1557,7 @@ static int ThreadReinit(vout_thread_t *vout,
         dcfg.zoom.den = 1;
     }
 
+    video_format_Clean(&vout->p->original);
     vout->p->original = original;
     vout->p->dpb_size = cfg->dpb_size;
     if (ThreadStart(vout, &dcfg))
