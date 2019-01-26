@@ -567,7 +567,6 @@ static void SSE_Copy420_P_to_P(picture_t *dst, const uint8_t *src[static 3],
                       cache->buffer, cache->size,
                       (height+d-1)/d, 0);
     }
-    asm volatile ("emms");
 }
 
 
@@ -579,7 +578,6 @@ static void SSE_Copy420_SP_to_SP(picture_t *dst, const uint8_t *src[static 2],
                   cache->buffer, cache->size, height, 0);
     SSE_CopyPlane(dst->p[1].p_pixels, dst->p[1].i_pitch, src[1], src_pitch[1],
                   cache->buffer, cache->size, (height+1) / 2, 0);
-    asm volatile ("emms");
 }
 
 static void
@@ -594,7 +592,6 @@ SSE_Copy420_SP_to_P(picture_t *dest, const uint8_t *src[static 2],
                     dest->p[2].p_pixels, dest->p[2].i_pitch,
                     src[1], src_pitch[1], cache->buffer, cache->size,
                     (height+1) / 2, pixel_size, bitshift);
-    asm volatile ("emms");
 }
 
 static void SSE_Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
@@ -608,7 +605,6 @@ static void SSE_Copy420_P_to_SP(picture_t *dst, const uint8_t *src[static 3],
                          src[U_PLANE], src_pitch[U_PLANE],
                          src[V_PLANE], src_pitch[V_PLANE],
                          cache->buffer, cache->size, (height+1) / 2, pixel_size, bitshift);
-    asm volatile ("emms");
 }
 #undef COPY64
 #endif /* CAN_COMPILE_SSE2 */
