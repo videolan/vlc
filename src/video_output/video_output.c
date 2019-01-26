@@ -651,6 +651,8 @@ void vout_ControlChangeWindowed(vout_thread_t *vout)
     window = vout->p->display_cfg.window;
     if (window != NULL)
         vout_window_UnsetFullScreen(window);
+    /* Attempt to reset the intended window size */
+    vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
