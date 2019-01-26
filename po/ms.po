@@ -1,18 +1,18 @@
 # Malay translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# abuyop <abuyop@gmail.com>, 2013-2018
+# abuyop <abuyop@gmail.com>, 2013-2019
 # Mahrazi Mohd Kamal <mahrazi@gmail.com>, 2006,2013-2014
 # Timothy “Glash” Wong <timty97@gmail.com>, 2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-09 01:05+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-01-26 16:03+0100\n"
+"Last-Translator: abuyop <abuyop@gmail.com>, 2019\n"
 "Language-Team: Malay (https://www.transifex.com/yaron/teams/16553/ms/)\n"
 "Language: ms\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Penapis audio digunakan untuk memproses strim audio."
 
 #: include/vlc_config_cat.h:61 src/libvlc-module.c:166
 msgid "Audio resampler"
-msgstr "Resampler audio"
+msgstr "Pensampelan semula audio"
 
 #: include/vlc_config_cat.h:63 src/audio_output/output.c:260
 #: modules/gui/macosx/VLCMainMenu.m:424 modules/gui/macosx/VLCMainMenu.m:425
@@ -135,11 +135,11 @@ msgstr "Tetapan am untuk modul output audio."
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:196
 #: modules/stream_out/transcode/transcode.c:211
 msgid "Miscellaneous"
-msgstr "Lain-lain"
+msgstr "Pelbagai"
 
 #: include/vlc_config_cat.h:70
 msgid "Miscellaneous audio settings and modules."
-msgstr "Lain-lain tetapan audio dan modul."
+msgstr "Pelbagai tetapan audio dan modul."
 
 #: include/vlc_config_cat.h:73 src/input/es_out.c:3164 src/libvlc-module.c:142
 #: src/libvlc-module.c:1551 modules/access/imem.c:64
@@ -222,7 +222,7 @@ msgid ""
 "Stream filters are special modules that allow advanced operations on the "
 "input side of VLC. Use with care..."
 msgstr ""
-"Penapis strim adalah modul istimewa yang membenarkan operasi lanjutan pada "
+"Penapis strim adalah modul khas yang membenarkan operasi lanjutan pada "
 "bahagian input VLC. Gunakan dengan hati-hati ..."
 
 #: include/vlc_config_cat.h:112
@@ -235,7 +235,7 @@ msgstr "Demuxer digunakan untuk memisahkan strim audio dan video."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
-msgstr "Kodek video"
+msgstr "Kodeks video"
 
 #: include/vlc_config_cat.h:116
 msgid "Settings for the video, images or video+audio decoders and encoders."
@@ -243,7 +243,7 @@ msgstr "Tetapan untuk video, imej atau penyahkod dan pengekod video+audio."
 
 #: include/vlc_config_cat.h:118
 msgid "Audio codecs"
-msgstr "Kodek audio"
+msgstr "Kodeks audio"
 
 #: include/vlc_config_cat.h:119
 msgid "Settings for the audio-only decoders and encoders."
@@ -251,7 +251,7 @@ msgstr "Tetapan untuk penyahkod dan pengekod audio-sahaja"
 
 #: include/vlc_config_cat.h:121
 msgid "Subtitle codecs"
-msgstr "Kodek sarikata"
+msgstr "Kodeks sarikata"
 
 #: include/vlc_config_cat.h:122
 msgid "Settings for subtitle, teletext and CC decoders and encoders."
@@ -378,7 +378,7 @@ msgid ""
 msgstr ""
 "Tetapan yang berkaitan dengan kelakuan senarai main (cth. mod mainbalik) dan "
 "untuk modul yang automatik menambah item kepada senarai main (modul "
-"\"penemuan servis\")."
+"\"penemuan perkhidmatan\")."
 
 #: include/vlc_config_cat.h:178
 msgid "General playlist behaviour"
@@ -393,8 +393,8 @@ msgid ""
 "Services discovery modules are facilities that automatically add items to "
 "playlist."
 msgstr ""
-"Modul penemuan servis adalah kemudahan yang automatik menambah item kepada "
-"senarai main."
+"Modul penemuan perkhidmatan adalah kemudahan yang automatik menambah item "
+"kepada senarai main."
 
 #: include/vlc_config_cat.h:184 src/libvlc-module.c:1862
 #: modules/gui/qt/dialogs/extended.cpp:93
@@ -424,11 +424,11 @@ msgstr "Buka Direktori..."
 
 #: include/vlc_intf_strings.h:49
 msgid "Open &Folder..."
-msgstr "Buka Folder..."
+msgstr "Buka &Folder..."
 
 #: include/vlc_intf_strings.h:50
 msgid "Select one or more files to open"
-msgstr "Plih satu antara muka atau lebih untuk dibuka"
+msgstr "Plih satu atau lebih fail untuk dibuka"
 
 #: include/vlc_intf_strings.h:51
 msgid "Select Directory"
@@ -456,7 +456,7 @@ msgstr "Lompa&t ke Masa Tertentu"
 
 #: include/vlc_intf_strings.h:59
 msgid "Custom &Bookmarks"
-msgstr "Tanda&buku Langganan"
+msgstr "Tanda &Buku Suai"
 
 #: include/vlc_intf_strings.h:60
 msgid "&VLM Configuration"
@@ -481,7 +481,7 @@ msgstr "Main"
 
 #: include/vlc_intf_strings.h:66
 msgid "Remove Selected"
-msgstr "Singkir Yang Dipilih"
+msgstr "Buang Terpilih"
 
 #: include/vlc_intf_strings.h:67
 msgid "Information..."
@@ -538,11 +538,11 @@ msgstr "Rawak"
 
 #: include/vlc_intf_strings.h:82 modules/gui/macosx/VLCCoreInteraction.m:425
 msgid "Random Off"
-msgstr "Tiada Rawak"
+msgstr "Random Mati"
 
 #: include/vlc_intf_strings.h:83
 msgid "Add to Playlist"
-msgstr "Tambah kepada senarai main"
+msgstr "Tambah ke Senarai Main"
 
 #: include/vlc_intf_strings.h:85 modules/gui/macosx/VLCPlaylist.m:235
 msgid "Add File..."
@@ -558,7 +558,7 @@ msgstr "Tambah Folder..."
 
 #: include/vlc_intf_strings.h:89
 msgid "Save Playlist to &File..."
-msgstr "Simpan Senarai Main ke &Fail..."
+msgstr "Simpan Senarai Main ke dalam &Fail..."
 
 #: include/vlc_intf_strings.h:91 modules/gui/macosx/VLCMainWindow.m:189
 #: modules/gui/qt/components/preferences_widgets.cpp:1138
@@ -665,7 +665,7 @@ msgstr "Penapis audio"
 
 #: src/audio_output/output.c:327
 msgid "Replay gain"
-msgstr "Gandaan ulangan"
+msgstr "Gandaan Main semula"
 
 #: src/audio_output/output.c:345 modules/gui/macosx/VLCMainMenu.m:420
 #: modules/gui/macosx/VLCMainMenu.m:421
@@ -886,7 +886,7 @@ msgid ""
 "Dumped content to vlc-help.txt file.\n"
 msgstr ""
 "\n"
-"Humban kandungan kepada fail vlc-help.txt.\n"
+"Kandungan dilonggok ke fail vlc-help.txt.\n"
 
 #: src/config/help.c:768
 msgid ""
@@ -894,7 +894,7 @@ msgid ""
 "Press the RETURN key to continue...\n"
 msgstr ""
 "\n"
-"Tekan kunci RETURN untuk teruskan...\n"
+"Ketik kunci RETURN untuk teruskan...\n"
 
 #: src/darwin/error.c:37
 msgid "Unknown error"
@@ -932,7 +932,7 @@ msgstr "pempaket"
 
 #: src/input/decoder.c:1909
 msgid "decoder"
-msgstr "dekoder"
+msgstr "penyahkod"
 
 #: src/input/decoder.c:1917 src/input/decoder.c:2200
 #: modules/codec/avcodec/encoder.c:371 modules/codec/avcodec/encoder.c:905
@@ -972,7 +972,7 @@ msgstr "Strim %d"
 
 #: src/input/es_out.c:1474 src/input/es_out.c:1476
 msgid "Scrambled"
-msgstr "Campur aduk"
+msgstr "Karau"
 
 #: src/input/es_out.c:1474 modules/keystore/keychain.m:41
 #: modules/lua/extension.c:1193
@@ -1031,7 +1031,7 @@ msgstr "Saluran"
 #: src/input/es_out.c:3128 modules/access/alsa.c:39 modules/access/imem.c:75
 #: modules/audio_output/amem.c:45 modules/codec/fluidsynth.c:64
 msgid "Sample rate"
-msgstr "Kadar Sampel"
+msgstr "Kadar sampel"
 
 #: src/input/es_out.c:3128
 #, c-format
@@ -1088,7 +1088,7 @@ msgstr "Kadar bingkai"
 
 #: src/input/es_out.c:3194
 msgid "Decoded format"
-msgstr "Format dekoder"
+msgstr "Format penyahkod"
 
 #: src/input/es_out.c:3199
 msgid "Top left"
@@ -1225,7 +1225,7 @@ msgstr "Yaw"
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
 msgid "Pitch"
-msgstr "Pitch"
+msgstr "Pic"
 
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
@@ -1316,7 +1316,7 @@ msgstr "Nombor trek"
 
 #: src/input/meta.c:62 modules/demux/mp4/meta.c:433 modules/mux/asf.c:64
 msgid "Rating"
-msgstr "Kadaran"
+msgstr "Penarafan"
 
 #: src/input/meta.c:63 modules/gui/macosx/VLCPlaylist.m:113
 #: modules/mux/avi.c:50
@@ -1346,7 +1346,7 @@ msgstr "Dienkod oleh"
 
 #: src/input/meta.c:71
 msgid "Artwork URL"
-msgstr "URL Kerja seni"
+msgstr "URL kerja seni"
 
 #: src/input/meta.c:72
 msgid "Track ID"
@@ -1433,7 +1433,7 @@ msgstr "Timbul menu"
 #: src/input/var.c:319
 #, c-format
 msgid "Title %i%s"
-msgstr "Judul %i%s"
+msgstr "Tajuk %i%s"
 
 #: src/input/var.c:344 src/input/var.c:401
 #, c-format
@@ -1468,7 +1468,7 @@ msgstr "Telnet"
 
 #: src/interface/interface.c:96
 msgid "Web"
-msgstr "Web"
+msgstr "Sesawang"
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
@@ -1628,7 +1628,7 @@ msgid ""
 "automatically select the best method available."
 msgstr ""
 "Ini adalah kaedah output audio yang digunakan oleh VLC. Kelakuan lalai "
-"adalah automatik pilih kaedah terbaik yang tersedia."
+"adalah automatik untuk memilih kaedah terbaik yang tersedia."
 
 #: src/libvlc-module.c:129
 msgid "Media role"
@@ -1719,12 +1719,12 @@ msgid ""
 "This delays the audio output. The delay must be given in milliseconds. This "
 "can be handy if you notice a lag between the video and the audio."
 msgstr ""
-"Ini akan lengahkan output audio. Lengahan mestilah diberi dalam milisaat. "
-"Ini berguna jika anda melihat kelewatan video dan juga audio."
+"Tindakan ini akan melengahkan output audio. Lengahan mestilah diberi dalam "
+"milisaat. Ini berguna jika anda melihat kelewatan video dan juga audio."
 
 #: src/libvlc-module.c:168
 msgid "This selects which plugin to use for audio resampling."
-msgstr "Ia memilih pemalam yang digunakan untuk persampelan semula."
+msgstr "Tindakan ini memilih pemalam yang digunakan untuk persampelan semula."
 
 #: src/libvlc-module.c:171
 msgid ""
@@ -19912,7 +19912,7 @@ msgstr "Anda mahu nyahlanggan %1?"
 
 #: modules/gui/qt/components/playlist/sorting.h:69
 msgid "Cover"
-msgstr "Muka depan"
+msgstr "Kulit Hadapan"
 
 #: modules/gui/qt/components/playlist/standardpanel.cpp:50
 msgid "Create Directory"
@@ -20448,8 +20448,8 @@ msgstr ""
 "kepada sesiapa pun.</p>\n"
 "<p>Walaubagaimanapun, <i>VLC</i> masih boleh mendapatkan maklumat secara "
 "automatik mengenai media di dalam senarai main anda melalui perkhidmatan "
-"berasaskan-Internet pihak ketiga. Ia melibatkan seni kulit album, nama trek, "
-"pengarangan dan lain-lain data-meta.</p>\n"
+"berasaskan-Internet pihak ketiga. Ia melibatkan seni kulit hadapan, nama "
+"trek, pengarangan dan lain-lain data-meta.</p>\n"
 "Ia mungkin mendedahkan sesetengah fail media anda ke entiti pihak ketiga. "
 "Oleh itu pembangun <i>VLC</i> meminta anda izinkan pemain media mencapai "
 "Internet secara automatik.</p>\n"
@@ -23730,9 +23730,8 @@ msgid "avparser packetizer"
 msgstr "Pempaket avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Pempaket video Daala"
+msgstr "Pempaket video AV1"
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
