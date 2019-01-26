@@ -803,16 +803,6 @@ error:
     return NULL;
 }
 
-void vout_DeleteDisplay(vout_display_t *vd, vout_display_cfg_t *cfg)
-{
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    if (cfg != NULL)
-        *cfg = osys->cfg;
-
-    vout_display_Delete(vd);
-}
-
 void vout_display_Delete(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
