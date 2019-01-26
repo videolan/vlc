@@ -1619,7 +1619,7 @@ static void ThreadStop(vout_thread_t *vout)
     if (vout->p->display) {
         if (vout->p->decoder_pool)
             ThreadFlush(vout, true, INT64_MAX);
-        vout_CloseWrapper(vout, NULL);
+        vout_CloseWrapper(vout);
     }
 
     /* Destroy the video filters */

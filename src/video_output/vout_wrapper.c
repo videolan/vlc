@@ -160,7 +160,7 @@ error:
 /*****************************************************************************
  *
  *****************************************************************************/
-void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
+void vout_CloseWrapper(vout_thread_t *vout)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -176,7 +176,7 @@ void vout_CloseWrapper(vout_thread_t *vout, vout_display_cfg_t *cfg)
 #endif
     sys->decoder_pool = NULL; /* FIXME remove */
 
-    vout_DeleteDisplay(sys->display, cfg);
+    vout_display_Delete(sys->display);
 }
 
 #ifdef _WIN32
