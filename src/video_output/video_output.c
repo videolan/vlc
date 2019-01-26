@@ -224,6 +224,8 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     sys->input = NULL;
     VoutFixFormat(&sys->original, cfg->fmt);
+    sys->source.dar.num = 0;
+    sys->source.dar.den = 0;
     sys->dpb_size = cfg->dpb_size;
     sys->snapshot = vout_snapshot_New();
     vout_statistic_Init(&sys->statistic);
@@ -699,6 +701,9 @@ void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
     vout_thread_sys_t *sys = vout->p;
 
     vlc_mutex_lock(&sys->window_lock);
+    sys->source.dar.num = num;
+    sys->source.dar.den = den;
+
     vout_ControlUpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 

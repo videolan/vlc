@@ -64,6 +64,12 @@ struct vout_thread_sys_t
 
     /* */
     video_format_t  original;   /* Original format ie coming from the decoder */
+    struct {
+        struct {
+            unsigned num;
+            unsigned den;
+        } dar;
+    } source;
     unsigned        dpb_size;
 
     /* Snapshot interface */
