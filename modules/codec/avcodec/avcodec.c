@@ -35,7 +35,6 @@
 #include <vlc_avcodec.h>
 #include <vlc_cpu.h>
 
-#define HAVE_MMX 1
 #include <libavcodec/avcodec.h>
 
 #include "avcodec.h"

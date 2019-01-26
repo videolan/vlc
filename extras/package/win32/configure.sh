@@ -12,7 +12,7 @@ OPTIONS="
       --enable-live555
       --enable-shout
       --enable-goom
-      --enable-sse --enable-mmx
+      --enable-sse
       --enable-libcddb
       --enable-zvbi --disable-telx
       --enable-nls"

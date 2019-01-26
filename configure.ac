@@ -1354,91 +1354,7 @@ dnl
 dnl  Accelerated modules
 dnl
 
-dnl  Check for fully working MMX intrinsics
-dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
-dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
-AC_ARG_ENABLE([mmx],
-  AS_HELP_STRING([--disable-mmx],
-    [disable MMX optimizations (default auto)]),,[
-  case "${host_cpu}" in
-    i?86|x86_64)
-      enable_mmx="yes"
-      ;;
-    *)
-      enable_mmx="no"
-      ;;
-  esac
-])
-have_mmx="no"
-have_mmxext="no"
-AS_IF([test "${enable_mmx}" != "no"], [
-  ARCH="${ARCH} mmx"
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -mmmx"
-  AC_CACHE_CHECK([if $CC groks MMX intrinsics], [ac_cv_c_mmx_intrinsics], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([
-[#include <mmintrin.h>
-#include <stdint.h>
-uint64_t frobzor;]], [
-[__m64 a, b, c;
-a = b = c = (__m64)frobzor;
-a = _mm_slli_pi16(a, 3);
-a = _mm_adds_pi16(a, b);
-c = _mm_srli_pi16(c, 8);
-c = _mm_slli_pi16(c, 3);
-b = _mm_adds_pi16(b, c);
-a = _mm_unpacklo_pi8(a, b);
-frobzor = (uint64_t)a;]])], [
-      ac_cv_c_mmx_intrinsics=yes
-    ], [
-      ac_cv_c_mmx_intrinsics=no
-    ])
-  ])
-  VLC_RESTORE_FLAGS
-  AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
-    AC_DEFINE(HAVE_MMX_INTRINSICS, 1, [Define to 1 if MMX intrinsics are available.])
-  ])
-
-  VLC_SAVE_FLAGS
-  CFLAGS="${CFLAGS} -mmmx"
-  AC_CACHE_CHECK([if $CC groks MMX inline assembly], [ac_cv_mmx_inline], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("packuswb %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
-]])
-    ], [
-      ac_cv_mmx_inline=yes
-    ], [
-      ac_cv_mmx_inline=no
-    ])
-  ])
-  AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_MMX, 1, [Define to 1 inline MMX assembly is available.])
-    have_mmx="yes"
-  ])
-
-  AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],
-                 [ac_cv_mmxext_inline], [
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("maskmovq %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
-]])
-    ], [
-      ac_cv_mmxext_inline=yes
-    ], [
-      ac_cv_mmxext_inline=no
-    ])
-  ])
-  VLC_RESTORE_FLAGS
-  AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
-    AC_DEFINE(CAN_COMPILE_MMXEXT, 1, [Define to 1 if MMX EXT inline assembly is available.])
-    have_mmxext="yes"
-  ])
-])
-AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
-AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
-
-dnl  Check for fully workin SSE2 intrinsics
+dnl  Check for fully working SSE2 intrinsics
 dnl  We need support for -msse[2], we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE([sse],
@@ -1601,7 +1517,7 @@ asm volatile("insertq %%xmm1,%%xmm0"::"r"(p):"xmm0", "xmm1");
 ])
 AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
 
-dnl  Check for fully workin AVX2 intrinsics
+dnl  Check for fully working AVX2 intrinsics
 dnl  We need support for -mavx[2], we need <immintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE([avx],
