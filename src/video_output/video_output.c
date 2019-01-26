@@ -1621,12 +1621,37 @@ static int ThreadStart(vout_thread_t *vout, const vout_display_cfg_t *cfg)
     if (vout_OpenWrapper(vout, vout->p->splitter_name, cfg))
         goto error;
 
-    unsigned num, den;
+    unsigned num = 0, den = 0;
+    int x = 0, y = 0, w = 0, h = 0;
+
+    vlc_mutex_lock(&vout->p->window_lock); /* c.f. ThreadReinit() */
+    switch (vout->p->source.crop.mode) {
+        case VOUT_CROP_NONE:
+            break;
+        case VOUT_CROP_RATIO:
+            num = vout->p->source.crop.ratio.num;
+            den = vout->p->source.crop.ratio.den;
+            break;
+        case VOUT_CROP_WINDOW:
+            x = vout->p->source.crop.window.x;
+            y = vout->p->source.crop.window.y;
+            w = vout->p->source.crop.window.width;
+            h = vout->p->source.crop.window.height;
+            break;
+        case VOUT_CROP_BORDER:
+            x = vout->p->source.crop.border.left;
+            y = vout->p->source.crop.border.top;
+            w = -(int)vout->p->source.crop.border.right;
+            h = -(int)vout->p->source.crop.border.bottom;
+            break;
+    }
+    vlc_mutex_unlock(&vout->p->window_lock);
+    vout_SetDisplayCrop(vout->p->display, num, den, x, y, w, h);
+
     vlc_mutex_lock(&vout->p->window_lock); /* c.f. ThreadReinit() */
     num = vout->p->source.dar.num;
     den = vout->p->source.dar.den;
     vlc_mutex_unlock(&vout->p->window_lock);
-
     if (num != 0 && den != 0)
         vout_SetDisplayAspect(vout->p->display, num, den);
 
