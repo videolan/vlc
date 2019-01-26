@@ -352,6 +352,22 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
+        video_format_t original;
+
+        VoutFixFormat(&original, cfg->fmt);
+
+        /* TODO: If dimensions are equal or slightly smaller, update the aspect
+         * ratio and crop settings, instead of recreating a display.
+         */
+        if (video_format_IsSimilar(&original, &vout->p->original)) {
+            if (cfg->dpb_size <= vout->p->dpb_size) {
+                video_format_Clean(&original);
+                /* It is assumed that the SPU input matches input already. */
+                return vout;
+            }
+            msg_Warn(vout, "DPB need to be increased");
+        }
+
         vout_control_cmd_t cmd;
 
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
@@ -1721,8 +1737,6 @@ static void ThreadStop(vout_thread_t *vout)
 static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
-    video_format_t original;
-
     if (!cfg->fmt)
     {
         vout->p->mouse_event = NULL;
@@ -1735,19 +1749,6 @@ static int ThreadReinit(vout_thread_t *vout,
 
     vout->p->pause.is_on = false;
     vout->p->pause.date  = VLC_TICK_INVALID;
-
-    VoutFixFormat(&original, cfg->fmt);
-
-    /* TODO: If dimensions are equal or slightly smaller, update the aspect
-     * ratio and crop settings, instead of recreating a display.
-     */
-    if (video_format_IsSimilar(&original, &vout->p->original)) {
-        if (cfg->dpb_size <= vout->p->dpb_size) {
-            video_format_Clean(&original);
-            return VLC_SUCCESS;
-        }
-        msg_Warn(vout, "DPB need to be increased");
-    }
 
     vout_display_cfg_t dcfg;
 
@@ -1767,7 +1768,7 @@ static int ThreadReinit(vout_thread_t *vout,
     vlc_mutex_unlock(&vout->p->window_lock);
 
     video_format_Clean(&vout->p->original);
-    vout->p->original = original;
+    VoutFixFormat(&vout->p->original, cfg->fmt);
     vout->p->dpb_size = cfg->dpb_size;
     if (ThreadStart(vout, &dcfg))
         return VLC_EGENERIC;
