@@ -45,6 +45,7 @@ enum {
     VOUT_CONTROL_FLUSH,                 /* time */
     VOUT_CONTROL_STEP,                  /* time_ptr */
 
+    VOUT_CONTROL_MOUSE_DISABLE,
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
     VOUT_CONTROL_DISPLAY_FILLED,        /* bool */

@@ -404,12 +404,7 @@ void vout_Stop(vout_thread_t *vout)
 {
     spu_Detach(vout->p->spu);
 
-    vout_control_cmd_t cmd;
-    vout_configuration_t cfg = { .fmt = NULL };
-
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-    cmd.cfg = &cfg;
-    vout_control_Push(&vout->p->control, &cmd);
+    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_MOUSE_DISABLE);
     vout_control_WaitEmpty(&vout->p->control);
 }
 
@@ -1737,13 +1732,6 @@ static void ThreadStop(vout_thread_t *vout)
 static int ThreadReinit(vout_thread_t *vout,
                         const vout_configuration_t *cfg)
 {
-    if (!cfg->fmt)
-    {
-        vout->p->mouse_event = NULL;
-        vout->p->opaque = NULL;
-        return VLC_SUCCESS;
-    }
-
     vout->p->mouse_event = cfg->mouse_event;
     vout->p->opaque = cfg->opaque;
 
@@ -1819,6 +1807,9 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_STEP:
         ThreadStep(vout, cmd.time_ptr);
+        break;
+    case VOUT_CONTROL_MOUSE_DISABLE:
+        vout->p->mouse_event = NULL;
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
