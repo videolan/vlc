@@ -1610,7 +1610,7 @@ error:
     return VLC_EGENERIC;
 }
 
-static void ThreadStop(vout_thread_t *vout, vout_display_cfg_t *cfg)
+static void ThreadStop(vout_thread_t *vout)
 {
     if (vout->p->spu_blend)
         filter_DeleteBlend(vout->p->spu_blend);
@@ -1619,7 +1619,7 @@ static void ThreadStop(vout_thread_t *vout, vout_display_cfg_t *cfg)
     if (vout->p->display) {
         if (vout->p->decoder_pool)
             ThreadFlush(vout, true, INT64_MAX);
-        vout_CloseWrapper(vout, cfg);
+        vout_CloseWrapper(vout, NULL);
     }
 
     /* Destroy the video filters */
@@ -1670,9 +1670,9 @@ static int ThreadReinit(vout_thread_t *vout,
         msg_Warn(vout, "DPB need to be increased");
     }
 
-    vout_display_cfg_t dcfg = { };
+    vout_display_cfg_t dcfg;
 
-    ThreadStop(vout, NULL);
+    ThreadStop(vout);
 
     vout_ReinitInterlacingSupport(vout);
 
@@ -1705,7 +1705,7 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
 {
     switch(cmd.type) {
     case VOUT_CONTROL_CLEAN:
-        ThreadStop(vout, NULL);
+        ThreadStop(vout);
         return 1;
     case VOUT_CONTROL_REINIT:
         if (ThreadReinit(vout, cmd.cfg))
