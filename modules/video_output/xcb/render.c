@@ -295,12 +295,12 @@ static void CreateBuffers(vout_display_t *vd, const vout_display_cfg_t *cfg)
         case ORIENT_LEFT_TOP:
             break;
         case ORIENT_TOP_RIGHT:
-        case ORIENT_LEFT_BOTTOM:
+        case ORIENT_RIGHT_TOP:
             ax *= -1;
             bx -= place->width;
             break;
         case ORIENT_BOTTOM_LEFT:
-        case ORIENT_RIGHT_TOP:
+        case ORIENT_LEFT_BOTTOM:
             ay *= -1;
             by -= place->height;
             break;
