@@ -109,8 +109,7 @@ static bool VideoFormatIsCropArEqual(video_format_t *dst,
 }
 
 static vout_thread_t *VoutCreate(vlc_object_t *object,
-                                 const vout_configuration_t *cfg,
-                                 input_thread_t *input)
+                                 const vout_configuration_t *cfg)
 {
     /* Allocate descriptor */
     vout_thread_t *vout = vlc_custom_create(object,
@@ -139,7 +138,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         var_SetString(vout, "window", "wdummy");
     }
 
-    sys->input = input;
+    sys->input = NULL;
     VoutFixFormat(&sys->original, cfg->fmt);
     sys->dpb_size = cfg->dpb_size;
     sys->snapshot = vout_snapshot_New();
@@ -148,9 +147,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     /* Initialize subpicture unit */
     vlc_mutex_init(&sys->spu_lock);
     sys->spu = spu_Create(vout, vout);
-
-    if (input != NULL)
-        spu_Attach(vout->p->spu, input);
 
     sys->dead = false;
     vout_control_Init(&sys->control);
@@ -215,15 +211,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         return NULL;
     }
 
-    vout_control_WaitEmpty(&sys->control);
-
-    if (sys->dead) {
-        msg_Err(vout, "video output creation failed");
-        vout_Close(vout);
-        return NULL;
-    }
-
-    vout_IntfReinit(vout);
     return vout;
 }
 
@@ -244,29 +231,29 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
     /* If a vout is provided, try reusing it */
     if (vout) {
-        if (vout->p->input == NULL)
-            vout->p->input = input;
-        else
-            assert(vout->p->input == input);
-        if (input != NULL)
-            spu_Attach(vout->p->spu, input);
-
         vout_control_cmd_t cmd;
         vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
         cmd.cfg = cfg;
         vout_control_Push(&vout->p->control, &cmd);
-        vout_control_WaitEmpty(&vout->p->control);
-
-        vout_IntfReinit(vout);
-
-        if (vout->p->dead) {
-            vout_Close(vout);
-            return NULL;
-        }
         msg_Dbg(object, "reusing provided vout");
-        return vout;
+    } else {
+        vout = VoutCreate(object, cfg);
+        if (vout == NULL)
+            return NULL;
     }
-    return VoutCreate(object, cfg, input);
+
+    vout_control_WaitEmpty(&vout->p->control);
+    if (vout->p->dead) {
+        msg_Err(vout, "video output creation failed");
+        vout_Close(vout);
+        return NULL;
+    }
+
+    if (input != NULL)
+        spu_Attach(vout->p->spu, input);
+    vout->p->input = input;
+    vout_IntfReinit(vout);
+    return vout;
 }
 
 void vout_Stop(vout_thread_t *vout)
