@@ -30,7 +30,14 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_window.h>
 
+static int Enable(vout_window_t *wnd, const vout_window_cfg_t *cfg)
+{
+    vout_window_ReportSize(wnd, cfg->width, cfg->height);
+    return VLC_SUCCESS;
+}
+
 static const struct vout_window_operations ops = {
+    .enable = Enable,
     .resize = vout_window_ReportSize,
 };
 
