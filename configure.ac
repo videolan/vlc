@@ -1683,28 +1683,6 @@ asm volatile("vpunpckhqdq %%ymm1,%%ymm2,%%ymm3"::"r"(p):"ymm1", "ymm2", "ymm3");
 ])
 AM_CONDITIONAL([HAVE_AVX2], [test "$have_avx2" = "yes"])
 
-VLC_SAVE_FLAGS
-CFLAGS="${CFLAGS} -mmmx"
-have_3dnow="no"
-AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly], [ac_cv_3dnow_inline], [
-  AC_COMPILE_IFELSE([AC_LANG_PROGRAM(,[[
-void *p;
-asm volatile("pfadd %%mm1,%%mm2"::"r"(p):"mm1", "mm2");
-]])
-  ], [
-    ac_cv_3dnow_inline=yes
-  ], [
-    ac_cv_3dnow_inline=no
-  ])
-])
-VLC_RESTORE_FLAGS
-AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
-  AC_DEFINE([CAN_COMPILE_3DNOW], 1,
-            [Define to 1 if 3D Now! inline assembly is available.])
-  have_3dnow="yes"
-])
-AM_CONDITIONAL([HAVE_3DNOW], [test "$have_3dnow" = "yes"])
-
 
 AC_ARG_ENABLE([neon],
   AS_HELP_STRING([--disable-neon],
