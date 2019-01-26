@@ -273,8 +273,7 @@ static const struct vout_window_callbacks vout_display_window_cbs = {
 /**
  * Creates a video window, initially without any attached display.
  */
-vout_window_t *vout_display_window_New(vout_thread_t *vout,
-                                       const vout_window_cfg_t *cfg)
+vout_window_t *vout_display_window_New(vout_thread_t *vout)
 {
     vout_display_window_t *state = malloc(sizeof (*state));
     if (state == NULL)
@@ -296,14 +295,6 @@ vout_window_t *vout_display_window_New(vout_thread_t *vout,
 
     window = vout_window_New((vlc_object_t *)vout, modlist, &owner);
     free(modlist);
-
-    if (window != NULL) {
-        if (vout_window_Enable(window, cfg)) {
-            vout_window_Delete(window);
-            window = NULL;
-        }
-    }
-
     if (window == NULL)
         free(state);
     return window;

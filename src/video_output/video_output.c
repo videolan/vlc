@@ -266,6 +266,17 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vlc_mutex_init(&sys->filter.lock);
 
     /* Window */
+    sys->window = vout_display_window_New(vout);
+    if (sys->splitter_name != NULL)
+        var_Destroy(vout, "window");
+    vlc_mutex_init(&sys->window_lock);
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+
+    /* */
+    vlc_object_set_destructor(vout, VoutDestructor);
+
     vout_window_cfg_t wcfg = {
         .is_fullscreen = var_GetBool(vout, "fullscreen"),
         .is_decorated = var_InheritBool(vout, "video-deco"),
@@ -278,16 +289,10 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         .height = cfg->fmt->i_visible_height,
     };
 
-    sys->window = vout_display_window_New(vout, &wcfg);
-    if (sys->splitter_name != NULL)
-        var_Destroy(vout, "window");
-    vlc_mutex_init(&sys->window_lock);
-
-    /* Arbitrary initial time */
-    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
-
-    /* */
-    vlc_object_set_destructor(vout, VoutDestructor);
+    if (sys->window != NULL && vout_window_Enable(sys->window, &wcfg)) {
+        vout_display_window_Delete(sys->window);
+        sys->window = NULL;
+    }
 
     if (sys->window == NULL) {
         spu_Destroy(sys->spu);
