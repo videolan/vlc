@@ -44,8 +44,8 @@ function parse()
                 description = vlc.strings.resolve_xml_special_chars( description )
             end
 		end
-		if string.match( line, "<link rel=\"thumbnail\" type=\"image/jpeg\"" ) then
-			_,_,arturl = string.find( line, "href=\"(.-)\"" )
+		if string.match( line, "<meta property=\"og:image\"" ) then
+			arturl = string.match( line, "content=\"(.-)\"" )
 		end
 
         if string.match( line, "var __PLAYER_CONFIG__ = {" ) then
