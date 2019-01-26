@@ -285,9 +285,10 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
         .x = var_InheritInteger(vout, "video-x"),
         .y = var_InheritInteger(vout, "video-y"),
 #endif
-        .width = cfg->fmt->i_visible_width,
-        .height = cfg->fmt->i_visible_height,
     };
+
+    vout_display_window_GetSize(VLC_OBJECT(vout), cfg->fmt,
+                                &wcfg.width, &wcfg.height);
 
     if (sys->window != NULL && vout_window_Enable(sys->window, &wcfg)) {
         vout_display_window_Delete(sys->window);
