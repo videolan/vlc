@@ -1343,7 +1343,7 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
         vout->p->mouse_event(m, vout->p->opaque);
 }
 
-static int ThreadStart(vout_thread_t *vout)
+static int vout_Start(vout_thread_t *vout)
 {
     vlc_mouse_Init(&vout->p->mouse);
     vout->p->decoder_fifo = picture_fifo_New();
@@ -1496,7 +1496,7 @@ static int ThreadReinit(vout_thread_t *vout,
     video_format_Clean(&vout->p->original);
     VoutFixFormat(&vout->p->original, cfg->fmt);
     vout->p->dpb_size = cfg->dpb_size;
-    if (ThreadStart(vout))
+    if (vout_Start(vout))
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -1593,9 +1593,6 @@ static void *Thread(void *object)
 
     vlc_tick_t deadline = VLC_TICK_INVALID;
     bool wait = false;
-
-    if (ThreadStart(vout))
-        goto out;
 
     for (;;) {
         vout_control_cmd_t cmd;
@@ -1790,15 +1787,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     else if (var_InheritBool(vout, "video-on-top"))
         vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
 
-    /* */
-    if (vlc_clone(&vout->p->thread, Thread, vout,
-                  VLC_THREAD_PRIORITY_OUTPUT)) {
-        vout_display_window_Delete(sys->display_cfg.window);
-        spu_Destroy(sys->spu);
-        vlc_object_release(vout);
-        return NULL;
-    }
-
     return vout;
 }
 
@@ -1808,6 +1796,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
                             input_thread_t *input)
 {
     vout_thread_t *vout = cfg->vout;
+    vout_thread_sys_t *sys;
 
     assert(cfg->fmt != NULL);
 
@@ -1842,6 +1831,13 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_control_Push(&vout->p->control, &cmd);
         msg_Dbg(object, "reusing provided vout");
 
+        vout_control_WaitEmpty(&vout->p->control);
+        if (vout->p->dead) {
+            msg_Err(vout, "video output creation failed");
+            vout_Close(vout);
+            return NULL;
+        }
+
         vlc_mutex_lock(&vout->p->window_lock);
         vout_ControlUpdateWindowSize(vout);
         vlc_mutex_unlock(&vout->p->window_lock);
@@ -1850,15 +1846,18 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         if (vout == NULL)
             return NULL;
 
+        sys = vout->p;
         if (input != NULL)
             vout->p->input = vlc_object_hold((vlc_object_t *)input);
-    }
 
-    vout_control_WaitEmpty(&vout->p->control);
-    if (vout->p->dead) {
-        msg_Err(vout, "video output creation failed");
-        vout_Close(vout);
-        return NULL;
+        if (vout_Start(vout)
+         || vlc_clone(&sys->thread, Thread, vout,
+                      VLC_THREAD_PRIORITY_OUTPUT)) {
+            vout_display_window_Delete(sys->display_cfg.window);
+            spu_Destroy(sys->spu);
+            vlc_object_release(vout);
+            return NULL;
+        }
     }
 
     if (input != NULL)
