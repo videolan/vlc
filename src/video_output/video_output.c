@@ -1810,6 +1810,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
     if (vout) {
         video_format_t original;
 
+        sys = vout->p;
         VoutFixFormat(&original, cfg->fmt);
 
         /* TODO: If dimensions are equal or slightly smaller, update the aspect
@@ -1824,19 +1825,21 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             msg_Warn(vout, "DPB need to be increased");
         }
 
-        vout_control_cmd_t cmd;
-
-        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-        cmd.cfg = cfg;
-        vout_control_Push(&vout->p->control, &cmd);
+        vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
         msg_Dbg(object, "reusing provided vout");
+        vlc_join(sys->thread, NULL);
 
-        vout_control_WaitEmpty(&vout->p->control);
-        if (vout->p->dead) {
-            msg_Err(vout, "video output creation failed");
-            vout_Close(vout);
-            return NULL;
-        }
+        sys->dead = false;
+        sys->mouse_event = cfg->mouse_event;
+        sys->opaque = cfg->opaque;
+        sys->pause.is_on = false;
+        sys->pause.date  = VLC_TICK_INVALID;
+
+        vout_ReinitInterlacingSupport(vout);
+
+        video_format_Clean(&sys->original);
+        VoutFixFormat(&sys->original, cfg->fmt);
+        sys->dpb_size = cfg->dpb_size;
 
         vlc_mutex_lock(&vout->p->window_lock);
         vout_ControlUpdateWindowSize(vout);
@@ -1849,15 +1852,15 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         sys = vout->p;
         if (input != NULL)
             vout->p->input = vlc_object_hold((vlc_object_t *)input);
+    }
 
-        if (vout_Start(vout)
-         || vlc_clone(&sys->thread, Thread, vout,
-                      VLC_THREAD_PRIORITY_OUTPUT)) {
-            vout_display_window_Delete(sys->display_cfg.window);
-            spu_Destroy(sys->spu);
-            vlc_object_release(vout);
-            return NULL;
-        }
+    if (vout_Start(vout)
+     || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
+        msg_Err(vout, "video output creation failed");
+        vout_display_window_Delete(sys->display_cfg.window);
+        spu_Destroy(sys->spu);
+        vlc_object_release(vout);
+        return NULL;
     }
 
     if (input != NULL)
