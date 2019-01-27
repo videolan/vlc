@@ -106,6 +106,7 @@ typedef struct {
     bool is_dead;
     bool can_sleep;
     bool is_processing;
+    bool is_waiting;
     DECL_ARRAY(vout_control_cmd_t) cmd;
 } vout_control_t;
 
@@ -124,6 +125,8 @@ void vout_control_PushTime(vout_control_t *, int type, vlc_tick_t time);
 void vout_control_PushPair(vout_control_t *, int type, int a, int b);
 void vout_control_PushString(vout_control_t *, int type, const char *string);
 void vout_control_Wake(vout_control_t *);
+void vout_control_Hold(vout_control_t *);
+void vout_control_Release(vout_control_t *);
 
 /* control inside of the vout thread */
 int vout_control_Pop(vout_control_t *, vout_control_cmd_t *, vlc_tick_t deadline);

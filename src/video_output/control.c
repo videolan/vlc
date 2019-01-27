@@ -163,6 +163,19 @@ void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
     vout_control_Push(ctrl, &cmd);
 }
 
+void vout_control_Hold(vout_control_t *ctrl)
+{
+    vlc_mutex_lock(&ctrl->lock);
+    while (!ctrl->is_waiting && !ctrl->is_dead)
+        vlc_cond_wait(&ctrl->wait_acknowledge, &ctrl->lock);
+    /* TODO: unlock to let other threads queue requests */
+}
+
+void vout_control_Release(vout_control_t *ctrl)
+{
+    vlc_mutex_unlock(&ctrl->lock);
+}
+
 int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
                      vlc_tick_t deadline)
 {
@@ -172,8 +185,11 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
         vlc_cond_broadcast(&ctrl->wait_acknowledge);
 
         /* Spurious wakeups are perfectly fine */
-        if (deadline != VLC_TICK_INVALID && ctrl->can_sleep)
+        if (deadline != VLC_TICK_INVALID && ctrl->can_sleep) {
+            ctrl->is_waiting = true;
             vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
+            ctrl->is_waiting = false;
+        }
     }
 
     bool has_cmd;
