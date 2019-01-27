@@ -231,6 +231,7 @@ void vout_ControlChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 /* */
 void vout_IntfInit( vout_thread_t * );
 void vout_IntfReinit( vout_thread_t * );
+void vout_IntfDeinit(vlc_object_t *);
 
 /* */
 int vout_OpenWrapper(vout_thread_t *, const char *,

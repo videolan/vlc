@@ -1609,6 +1609,8 @@ void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
 
+    vout_IntfDeinit(VLC_OBJECT(vout));
+
     spu_Detach(vout->p->spu);
     vout_snapshot_End(vout->p->snapshot);
 

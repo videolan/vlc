@@ -311,6 +311,27 @@ void vout_IntfReinit( vout_thread_t *p_vout )
     var_TriggerCallback( p_vout, "sub-margin" );
 }
 
+void vout_IntfDeinit(vlc_object_t *obj)
+{
+    var_DelCallback(obj, "viewpoint", ViewpointCallback, NULL);
+    var_DelCallback(obj, "sub-margin", SubMarginCallback, NULL);
+    var_DelCallback(obj, "sub-filter", SubFilterCallback, NULL);
+    var_DelCallback(obj, "sub-source", SubSourceCallback, NULL);
+    var_DelCallback(obj, "video-filter", VideoFilterCallback, NULL);
+    var_DelCallback(obj, "video-snapshot", SnapshotCallback, NULL);
+    var_DelCallback(obj, "fullscreen", FullscreenCallback, NULL);
+    var_DelCallback(obj, "video-wallpaper", WallPaperCallback, NULL);
+    var_DelCallback(obj, "video-on-top", AboveCallback, NULL);
+    var_DelCallback(obj, "aspect-ratio", AspectCallback, NULL);
+    var_DelCallback(obj, "crop", CropCallback, NULL);
+    var_DelCallback(obj, "crop-bottom", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-right", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-top", CropBorderCallback, NULL);
+    var_DelCallback(obj, "crop-left", CropBorderCallback, NULL);
+    var_DelCallback(obj, "zoom", ZoomCallback, NULL);
+    var_DelCallback(obj, "autoscale", AutoScaleCallback, NULL);
+}
+
 /*****************************************************************************
  * vout_Snapshot: generates a snapshot.
  *****************************************************************************/
