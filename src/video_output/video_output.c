@@ -1498,9 +1498,11 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
     }
     vout->p->pause.is_on = is_paused;
     vout->p->pause.date  = date;
-
-    vout_window_SetInhibition(vout->p->display_cfg.window, !is_paused);
     vout_control_Release(&vout->p->control);
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    vout_window_SetInhibition(vout->p->display_cfg.window, !is_paused);
+    vlc_mutex_unlock(&vout->p->window_lock);
 }
 
 static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
