@@ -40,8 +40,6 @@ enum {
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
-    VOUT_CONTROL_STEP,                  /* time_ptr */
-
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
     VOUT_CONTROL_DISPLAY_SIZE,          /* window */
     VOUT_CONTROL_DISPLAY_FILLED,        /* bool */
@@ -59,7 +57,6 @@ typedef struct {
 
     union {
         bool    boolean;
-        vlc_tick_t *time_ptr;
         char    *string;
         int     integer;
         struct {

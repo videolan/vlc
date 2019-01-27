@@ -478,16 +478,6 @@ bool vout_IsEmpty(vout_thread_t *vout)
     return !picture;
 }
 
-void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
-{
-    vout_control_cmd_t cmd;
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_STEP);
-    cmd.time_ptr = duration;
-
-    vout_control_Push(&vout->p->control, &cmd);
-    vout_control_WaitEmpty(&vout->p->control);
-}
-
 void vout_DisplayTitle(vout_thread_t *vout, const char *title)
 {
     assert(title);
@@ -1533,15 +1523,18 @@ void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
     vout_control_Release(&sys->control);
 }
 
-static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
+void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
 {
     *duration = 0;
 
+    vout_control_Hold(&vout->p->control);
     if (vout->p->step.last == VLC_TICK_INVALID)
         vout->p->step.last = vout->p->displayed.timestamp;
 
-    if (ThreadDisplayPicture(vout, NULL))
+    if (ThreadDisplayPicture(vout, NULL)) {
+        vout_control_Release(&vout->p->control);
         return;
+    }
 
     vout->p->step.timestamp = vout->p->displayed.timestamp;
 
@@ -1551,6 +1544,7 @@ static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
         vout->p->step.last = vout->p->step.timestamp;
         /* TODO advance subpicture by the duration ... */
     }
+    vout_control_Release(&vout->p->control);
 }
 
 static void ThreadProcessMouseState(vout_thread_t *vout,
@@ -1797,9 +1791,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
                             cmd.boolean ? 1 : 0, false);
-        break;
-    case VOUT_CONTROL_STEP:
-        ThreadStep(vout, cmd.time_ptr);
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
