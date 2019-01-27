@@ -463,17 +463,6 @@ static void VoutDestructor(vlc_object_t *object)
 }
 
 /* */
-void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
-{
-    vout_control_cmd_t cmd;
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_PAUSE);
-    cmd.pause.is_on = is_paused;
-    cmd.pause.date  = date;
-    vout_control_Push(&vout->p->control, &cmd);
-
-    vout_control_WaitEmpty(&vout->p->control);
-}
-
 void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
                             unsigned *restrict lost)
 {
@@ -1485,8 +1474,9 @@ static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
     spu_ClearChannel(vout->p->spu, channel);
 }
 
-static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
+void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
+    vout_control_Hold(&vout->p->control);
     assert(!vout->p->pause.is_on || !is_paused);
 
     if (vout->p->pause.is_on) {
@@ -1510,6 +1500,7 @@ static void ThreadChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t da
     vout->p->pause.date  = date;
 
     vout_window_SetInhibition(vout->p->display_cfg.window, !is_paused);
+    vout_control_Release(&vout->p->control);
 }
 
 static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
@@ -1800,9 +1791,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
                             cmd.boolean ? 1 : 0, false);
-        break;
-    case VOUT_CONTROL_PAUSE:
-        ThreadChangePause(vout, cmd.pause.is_on, cmd.pause.date);
         break;
     case VOUT_CONTROL_FLUSH:
         ThreadFlush(vout, false, cmd.time);

@@ -40,7 +40,6 @@ enum {
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
-    VOUT_CONTROL_PAUSE,
     VOUT_CONTROL_FLUSH,                 /* time */
     VOUT_CONTROL_STEP,                  /* time_ptr */
 
@@ -69,10 +68,6 @@ typedef struct {
             int a;
             int b;
         } pair;
-        struct {
-            bool is_on;
-            vlc_tick_t date;
-        } pause;
         struct {
             unsigned left;
             unsigned top;
