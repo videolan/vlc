@@ -267,11 +267,17 @@ int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 
     return channel;
 }
+
 void vout_FlushSubpictureChannel( vout_thread_t *vout, int channel )
 {
-    vout_control_PushInteger(&vout->p->control, VOUT_CONTROL_FLUSH_SUBPICTURE,
-                             channel);
+    vout_thread_sys_t *sys = vout->p;
+
+    vlc_mutex_lock(&sys->spu_lock);
+    if (sys->spu != NULL)
+        spu_ClearChannel(vout->p->spu, channel);
+    vlc_mutex_unlock(&sys->spu_lock);
 }
+
 void vout_SetSpuHighlight( vout_thread_t *vout,
                         const vlc_spu_highlight_t *spu_hl )
 {
@@ -1185,11 +1191,6 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     return force_refresh ? VLC_EGENERIC : ret;
 }
 
-static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
-{
-    spu_ClearChannel(vout->p->spu, channel);
-}
-
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     vout_control_Hold(&vout->p->control);
@@ -1478,9 +1479,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout);
         return 1;
-    case VOUT_CONTROL_FLUSH_SUBPICTURE:
-        ThreadFlushSubpicture(vout, cmd.integer);
-        break;
     case VOUT_CONTROL_CHANGE_FILTERS:
         ThreadChangeFilters(vout, NULL,
                             cmd.string != NULL ?

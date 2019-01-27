@@ -34,7 +34,6 @@ enum {
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
 #endif
-    VOUT_CONTROL_FLUSH_SUBPICTURE,      /* integer */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
