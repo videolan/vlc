@@ -52,12 +52,22 @@ function parse()
         return { }
 
     else -- API URL
+        -- The /config API will return the data on a single line.
+        -- Otherwise, search the web page for the config.
+        local config = vlc.readline()
+        while true do
+            local line = vlc.readline()
+            if not line then break end
+            if string.match( line, "var config = {" ) then
+                config = line
+                break
+            end
+        end
 
         local prefres = vlc.var.inherit(nil, "preferred-resolution")
         local bestres = nil
-        local line = vlc.readline() -- data is on one line only
 
-        for stream in string.gmatch( line, "{([^}]*\"profile\":[^}]*)}" ) do
+        for stream in string.gmatch( config, "{([^}]*\"profile\":[^}]*)}" ) do
             local url = string.match( stream, "\"url\":\"(.-)\"" )
             if url then
                 -- Apparently the different formats available are listed
@@ -84,10 +94,10 @@ function parse()
             return { }
         end
 
-        local name = string.match( line, "\"title\":\"(.-)\"" )
-        local artist = string.match( line, "\"owner\":{[^}]-\"name\":\"(.-)\"" )
-        local arturl = string.match( line, "\"thumbs\":{\"[^\"]+\":\"(.-)\"" )
-        local duration = string.match( line, "\"duration\":(%d+)[,}]" )
+        local name = string.match( config, "\"title\":\"(.-)\"" )
+        local artist = string.match( config, "\"owner\":{[^}]-\"name\":\"(.-)\"" )
+        local arturl = string.match( config, "\"thumbs\":{\"[^\"]+\":\"(.-)\"" )
+        local duration = string.match( config, "\"duration\":(%d+)[,}]" )
 
         return { { path = path; name = name; artist = artist; arturl = arturl; duration = duration } }
     end
