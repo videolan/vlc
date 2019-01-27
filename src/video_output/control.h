@@ -91,7 +91,6 @@ typedef struct {
     /* */
     bool is_dead;
     bool can_sleep;
-    bool is_processing;
     bool is_waiting;
     DECL_ARRAY(vout_control_cmd_t) cmd;
 } vout_control_t;

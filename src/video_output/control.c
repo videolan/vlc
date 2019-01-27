@@ -59,7 +59,6 @@ void vout_control_Init(vout_control_t *ctrl)
 
     ctrl->is_dead = false;
     ctrl->can_sleep = true;
-    ctrl->is_processing = true;
     ARRAY_INIT(ctrl->cmd);
 }
 
@@ -84,14 +83,6 @@ void vout_control_Dead(vout_control_t *ctrl)
     vlc_cond_broadcast(&ctrl->wait_acknowledge);
     vlc_mutex_unlock(&ctrl->lock);
 
-}
-
-void vout_control_WaitEmpty(vout_control_t *ctrl)
-{
-    vlc_mutex_lock(&ctrl->lock);
-    while ((ctrl->cmd.i_size > 0 || ctrl->is_processing) && !ctrl->is_dead)
-        vlc_cond_wait(&ctrl->wait_acknowledge, &ctrl->lock);
-    vlc_mutex_unlock(&ctrl->lock);
 }
 
 void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
@@ -173,7 +164,6 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
 {
     vlc_mutex_lock(&ctrl->lock);
     if (ctrl->cmd.i_size <= 0) {
-        ctrl->is_processing = false;
         vlc_cond_broadcast(&ctrl->wait_acknowledge);
 
         /* Spurious wakeups are perfectly fine */
@@ -189,8 +179,6 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
         has_cmd = true;
         *cmd = ARRAY_VAL(ctrl->cmd, 0);
         ARRAY_REMOVE(ctrl->cmd, 0);
-
-        ctrl->is_processing = true;
     } else {
         has_cmd = false;
         ctrl->can_sleep = true;
