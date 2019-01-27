@@ -1531,18 +1531,15 @@ void vout_NextPicture(vout_thread_t *vout, vlc_tick_t *duration)
     if (vout->p->step.last == VLC_TICK_INVALID)
         vout->p->step.last = vout->p->displayed.timestamp;
 
-    if (ThreadDisplayPicture(vout, NULL)) {
-        vout_control_Release(&vout->p->control);
-        return;
-    }
+    if (ThreadDisplayPicture(vout, NULL) == 0) {
+        vout->p->step.timestamp = vout->p->displayed.timestamp;
 
-    vout->p->step.timestamp = vout->p->displayed.timestamp;
-
-    if (vout->p->step.last != VLC_TICK_INVALID &&
-        vout->p->step.timestamp > vout->p->step.last) {
-        *duration = vout->p->step.timestamp - vout->p->step.last;
-        vout->p->step.last = vout->p->step.timestamp;
-        /* TODO advance subpicture by the duration ... */
+        if (vout->p->step.last != VLC_TICK_INVALID &&
+            vout->p->step.timestamp > vout->p->step.last) {
+            *duration = vout->p->step.timestamp - vout->p->step.last;
+            vout->p->step.last = vout->p->step.timestamp;
+            /* TODO advance subpicture by the duration ... */
+        }
     }
     vout_control_Release(&vout->p->control);
 }
