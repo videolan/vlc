@@ -246,12 +246,16 @@ void vout_MouseState(vout_thread_t *vout, const vlc_mouse_t *mouse)
 
 void vout_PutSubpicture( vout_thread_t *vout, subpicture_t *subpic )
 {
-    vout_control_cmd_t cmd;
-    vout_control_cmd_Init(&cmd, VOUT_CONTROL_SUBPICTURE);
-    cmd.subpicture = subpic;
+    vout_thread_sys_t *sys = vout->p;
 
-    vout_control_Push(&vout->p->control, &cmd);
+    vlc_mutex_lock(&sys->spu_lock);
+    if (sys->spu != NULL)
+        spu_PutSubpicture(sys->spu, subpic);
+    else
+        subpicture_Delete(subpic);
+    vlc_mutex_unlock(&sys->spu_lock);
 }
+
 int vout_RegisterSubpictureChannel( vout_thread_t *vout )
 {
     int channel = VOUT_SPU_CHANNEL_AVAIL_FIRST;
@@ -1181,12 +1185,6 @@ static int ThreadDisplayPicture(vout_thread_t *vout, vlc_tick_t *deadline)
     return force_refresh ? VLC_EGENERIC : ret;
 }
 
-static void ThreadDisplaySubpicture(vout_thread_t *vout,
-                                    subpicture_t *subpicture)
-{
-    spu_PutSubpicture(vout->p->spu, subpicture);
-}
-
 static void ThreadFlushSubpicture(vout_thread_t *vout, int channel)
 {
     spu_ClearChannel(vout->p->spu, channel);
@@ -1480,10 +1478,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout);
         return 1;
-    case VOUT_CONTROL_SUBPICTURE:
-        ThreadDisplaySubpicture(vout, cmd.subpicture);
-        cmd.subpicture = NULL;
-        break;
     case VOUT_CONTROL_FLUSH_SUBPICTURE:
         ThreadFlushSubpicture(vout, cmd.integer);
         break;

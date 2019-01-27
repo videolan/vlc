@@ -34,7 +34,6 @@ enum {
     VOUT_CONTROL_START,
     VOUT_CONTROL_STOP,
 #endif
-    VOUT_CONTROL_SUBPICTURE,            /* subpicture */
     VOUT_CONTROL_FLUSH_SUBPICTURE,      /* integer */
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
@@ -75,7 +74,6 @@ typedef struct {
             unsigned height;
         } window;
         vlc_mouse_t mouse;
-        subpicture_t *subpicture;
         vlc_viewpoint_t viewpoint;
     };
 } vout_control_cmd_t;
