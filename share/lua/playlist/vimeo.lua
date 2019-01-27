@@ -31,27 +31,7 @@ end
 
 -- Parse function.
 function parse()
-    if not string.match( vlc.path, "player%.vimeo%.com" ) then -- Web page URL
-        while true do
-            local line = vlc.readline()
-            if not line then break end
-
-            -- Get the appropriate ubiquitous meta tag
-            -- <meta name="twitter:player" content="https://player.vimeo.com/video/123456789">
-            local meta = string.match( line, "(<meta[^>]- name=\"twitter:player\"[^>]->)" )
-            if meta then
-                local path = string.match( meta, " content=\"(.-)\"" )
-                if path then
-                    path = vlc.strings.resolve_xml_special_chars( path )
-                    return { { path = path } }
-                end
-            end
-        end
-
-        vlc.msg.err( "Couldn't extract vimeo video URL, please check for updates to this script" )
-        return { }
-
-    else -- API URL
+    if string.match( vlc.path, "^player%.vimeo%.com/" ) then
         -- The /config API will return the data on a single line.
         -- Otherwise, search the web page for the config.
         local config = vlc.readline()
@@ -100,5 +80,12 @@ function parse()
         local duration = string.match( config, "\"duration\":(%d+)[,}]" )
 
         return { { path = path; name = name; artist = artist; arturl = arturl; duration = duration } }
+
+    else -- Video web page
+        local path = string.gsub( vlc.path, "^vimeo%.com/channels/.-/(%d+)", "/%1" )
+        local video_id = string.match( path, "/(%d+)" )
+
+        local api = vlc.access.."://player.vimeo.com/video/"..video_id.."/config"
+        return { { path = api } }
     end
 end
