@@ -196,20 +196,15 @@ static void vout_SizeWindow(vout_thread_t *vout, unsigned *restrict width,
                             &sys->display_cfg);
 }
 
-static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
+static void vout_UpdateWindowSize(vout_thread_t *vout)
 {
-    vout_window_t *window;
+    unsigned width, height;
 
     vlc_mutex_assert(&vout->p->window_lock);
-    window = vout->p->display_cfg.window;
 
-    if (likely(window != NULL)) {
-        unsigned width, height;
-
-        vout_SizeWindow(vout, &width, &height);
-        msg_Dbg(window, "requested size: %ux%u", width, height);
-        vout_window_SetSize(window, width, height);
-    }
+    vout_SizeWindow(vout, &width, &height);
+    msg_Dbg(vout, "requested window size: %ux%u", width, height);
+    vout_window_SetSize(vout->p->display_cfg.window, width, height);
 }
 
 /* */
@@ -351,45 +346,33 @@ int vout_GetSnapshot(vout_thread_t *vout,
 }
 
 /* vout_Control* are usable by anyone at anytime */
-void vout_ControlChangeFullscreen(vout_thread_t *vout, const char *id)
+void vout_ChangeFullscreen(vout_thread_t *vout, const char *id)
 {
-    vout_window_t *window;
-
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->display_cfg.window;
-    /* Window is NULL if the output was already closed by its owner. */
-    if (window != NULL)
-        vout_window_SetFullScreen(window, id);
+    vout_window_SetFullScreen(vout->p->display_cfg.window, id);
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
-void vout_ControlChangeWindowed(vout_thread_t *vout)
+void vout_ChangeWindowed(vout_thread_t *vout)
 {
-    vout_window_t *window;
-
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->display_cfg.window;
-    if (window != NULL)
-        vout_window_UnsetFullScreen(window);
+    vout_window_UnsetFullScreen(vout->p->display_cfg.window);
     /* Attempt to reset the intended window size */
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
-void vout_ControlChangeWindowState(vout_thread_t *vout, unsigned st)
+void vout_ChangeWindowState(vout_thread_t *vout, unsigned st)
 {
-    vout_window_t *window;
-
     vlc_mutex_lock(&vout->p->window_lock);
-    window = vout->p->display_cfg.window;
-    if (window != NULL)
-        vout_window_SetState(window, st);
+    vout_window_SetState(vout->p->display_cfg.window, st);
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
-void vout_ControlChangeDisplaySize(vout_thread_t *vout,
-                                   unsigned width, unsigned height)
+void vout_ChangeDisplaySize(vout_thread_t *vout,
+                            unsigned width, unsigned height)
 {
+    /* DO NOT call this outside the vout window callbacks */
     vout_control_cmd_t cmd;
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_DISPLAY_SIZE);
@@ -400,7 +383,7 @@ void vout_ControlChangeDisplaySize(vout_thread_t *vout,
     vout_control_Push(&vout->p->control, &cmd);
 }
 
-void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
+void vout_ChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -413,7 +396,7 @@ void vout_ControlChangeDisplayFilled(vout_thread_t *vout, bool is_filled)
                           is_filled);
 }
 
-void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
+void vout_ChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -436,15 +419,15 @@ void vout_ControlChangeZoom(vout_thread_t *vout, unsigned num, unsigned den)
     sys->display_cfg.zoom.num = num;
     sys->display_cfg.zoom.den = den;
 
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ZOOM,
                           num, den);
 }
 
-void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
-                                         unsigned num, unsigned den)
+void vout_ChangeSampleAspectRatio(vout_thread_t *vout,
+                                  unsigned num, unsigned den)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -452,15 +435,14 @@ void vout_ControlChangeSampleAspectRatio(vout_thread_t *vout,
     sys->source.dar.num = num;
     sys->source.dar.den = den;
 
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_ASPECT_RATIO,
                           num, den);
 }
 
-void vout_ControlChangeCropRatio(vout_thread_t *vout,
-                                 unsigned num, unsigned den)
+void vout_ChangeCropRatio(vout_thread_t *vout, unsigned num, unsigned den)
 {
     vout_thread_sys_t *sys = vout->p;
 
@@ -472,15 +454,15 @@ void vout_ControlChangeCropRatio(vout_thread_t *vout,
     } else
         sys->source.crop.mode = VOUT_CROP_NONE;
 
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_PushPair(&vout->p->control, VOUT_CONTROL_CROP_RATIO,
                           num, den);
 }
 
-void vout_ControlChangeCropWindow(vout_thread_t *vout,
-                                  int x, int y, int width, int height)
+void vout_ChangeCropWindow(vout_thread_t *vout,
+                           int x, int y, int width, int height)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
@@ -501,7 +483,7 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
     sys->source.crop.window.width = width;
     sys->source.crop.window.height = height;
 
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_WINDOW);
@@ -512,8 +494,8 @@ void vout_ControlChangeCropWindow(vout_thread_t *vout,
     vout_control_Push(&vout->p->control, &cmd);
 }
 
-void vout_ControlChangeCropBorder(vout_thread_t *vout,
-                                  int left, int top, int right, int bottom)
+void vout_ChangeCropBorder(vout_thread_t *vout,
+                           int left, int top, int right, int bottom)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
@@ -534,7 +516,7 @@ void vout_ControlChangeCropBorder(vout_thread_t *vout,
     sys->source.crop.border.top = top;
     sys->source.crop.border.bottom = bottom;
 
-    vout_ControlUpdateWindowSize(vout);
+    vout_UpdateWindowSize(vout);
     vlc_mutex_unlock(&sys->window_lock);
 
     vout_control_cmd_Init(&cmd, VOUT_CONTROL_CROP_BORDER);
@@ -567,16 +549,18 @@ void vout_ControlChangeSubFilters(vout_thread_t *vout, const char *filters)
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
-void vout_ControlChangeSubMargin(vout_thread_t *vout, int margin)
+void vout_ChangeSubMargin(vout_thread_t *vout, int margin)
 {
+    if (unlikely(vout->p->spu == NULL))
+        return;
+
     vlc_mutex_lock(&vout->p->spu_lock);
-    if (likely(vout->p->spu != NULL))
-        spu_ChangeMargin(vout->p->spu, margin);
+    spu_ChangeMargin(vout->p->spu, margin);
     vlc_mutex_unlock(&vout->p->spu_lock);
 }
 
-void vout_ControlChangeViewpoint(vout_thread_t *vout,
-                                 const vlc_viewpoint_t *p_viewpoint)
+void vout_ChangeViewpoint(vout_thread_t *vout,
+                          const vlc_viewpoint_t *p_viewpoint)
 {
     vout_thread_sys_t *sys = vout->p;
     vout_control_cmd_t cmd;
@@ -1815,7 +1799,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         sys->dpb_size = cfg->dpb_size;
 
         vlc_mutex_lock(&vout->p->window_lock);
-        vout_ControlUpdateWindowSize(vout);
+        vout_UpdateWindowSize(vout);
         vlc_mutex_unlock(&vout->p->window_lock);
     } else {
         vout = VoutCreate(object, cfg);

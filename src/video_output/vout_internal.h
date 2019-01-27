@@ -211,22 +211,21 @@ void vout_Stop(vout_thread_t *);
 void vout_Close( vout_thread_t *p_vout );
 
 /* TODO to move them to vlc_vout.h */
-void vout_ControlChangeFullscreen(vout_thread_t *, const char *id);
-void vout_ControlChangeWindowed(vout_thread_t *);
-void vout_ControlChangeWindowState(vout_thread_t *, unsigned state);
-void vout_ControlChangeDisplaySize(vout_thread_t *,
-                                   unsigned width, unsigned height);
-void vout_ControlChangeDisplayFilled(vout_thread_t *, bool is_filled);
-void vout_ControlChangeZoom(vout_thread_t *, unsigned num, unsigned den);
-void vout_ControlChangeSampleAspectRatio(vout_thread_t *, unsigned num, unsigned den);
-void vout_ControlChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
-void vout_ControlChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
-void vout_ControlChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
+void vout_ChangeFullscreen(vout_thread_t *, const char *id);
+void vout_ChangeWindowed(vout_thread_t *);
+void vout_ChangeWindowState(vout_thread_t *, unsigned state);
+void vout_ChangeDisplaySize(vout_thread_t *, unsigned width, unsigned height);
+void vout_ChangeDisplayFilled(vout_thread_t *, bool is_filled);
+void vout_ChangeZoom(vout_thread_t *, unsigned num, unsigned den);
+void vout_ChangeSampleAspectRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ChangeCropRatio(vout_thread_t *, unsigned num, unsigned den);
+void vout_ChangeCropWindow(vout_thread_t *, int x, int y, int width, int height);
+void vout_ChangeCropBorder(vout_thread_t *, int left, int top, int right, int bottom);
 void vout_ControlChangeFilters(vout_thread_t *, const char *);
 void vout_ControlChangeSubSources(vout_thread_t *, const char *);
 void vout_ControlChangeSubFilters(vout_thread_t *, const char *);
-void vout_ControlChangeSubMargin(vout_thread_t *, int);
-void vout_ControlChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
+void vout_ChangeSubMargin(vout_thread_t *, int);
+void vout_ChangeViewpoint( vout_thread_t *, const vlc_viewpoint_t *);
 
 /* */
 void vout_IntfInit( vout_thread_t * );

@@ -456,15 +456,15 @@ static int CropCallback( vlc_object_t *object, char const *cmd,
     unsigned left, top, right, bottom;
 
     if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2) {
-        vout_ControlChangeCropRatio(vout, num, den);
+        vout_ChangeCropRatio(vout, num, den);
     } else if (sscanf(newval.psz_string, "%ux%u+%u+%u",
                       &width, &height, &x, &y) == 4) {
-        vout_ControlChangeCropWindow(vout, x, y, width, height);
+        vout_ChangeCropWindow(vout, x, y, width, height);
     } else if (sscanf(newval.psz_string, "%u+%u+%u+%u",
                     &left, &top, &right, &bottom) == 4) {
-        vout_ControlChangeCropBorder(vout, left, top, right, bottom);
+        vout_ChangeCropBorder(vout, left, top, right, bottom);
     } else if (*newval.psz_string == '\0') {
-        vout_ControlChangeCropRatio(vout, 0, 0);
+        vout_ChangeCropRatio(vout, 0, 0);
     } else {
         msg_Err(object, "Unknown crop format (%s)", newval.psz_string);
     }
@@ -496,9 +496,9 @@ static int AspectCallback( vlc_object_t *object, char const *cmd,
 
     if (sscanf(newval.psz_string, "%u:%u", &num, &den) == 2 &&
         (num != 0) == (den != 0))
-        vout_ControlChangeSampleAspectRatio(vout, num, den);
+        vout_ChangeSampleAspectRatio(vout, num, den);
     else if (*newval.psz_string == '\0')
-        vout_ControlChangeSampleAspectRatio(vout, 0, 0);
+        vout_ChangeSampleAspectRatio(vout, 0, 0);
     return VLC_SUCCESS;
 }
 
@@ -508,7 +508,7 @@ static int AutoScaleCallback( vlc_object_t *obj, char const *name,
     vout_thread_t *p_vout = (vout_thread_t *)obj;
 
     (void) name; (void) prev; (void) data;
-    vout_ControlChangeDisplayFilled( p_vout, cur.b_bool );
+    vout_ChangeDisplayFilled(p_vout, cur.b_bool);
     return VLC_SUCCESS;
 }
 
@@ -518,15 +518,15 @@ static int ZoomCallback( vlc_object_t *obj, char const *name,
     vout_thread_t *p_vout = (vout_thread_t *)obj;
 
     (void) name; (void) prev; (void) data;
-    vout_ControlChangeZoom( p_vout, 1000 * cur.f_float, 1000 );
+    vout_ChangeZoom(p_vout, 1000 * cur.f_float, 1000);
     return VLC_SUCCESS;
 }
 
 static int AboveCallback( vlc_object_t *obj, char const *name,
                           vlc_value_t prev, vlc_value_t cur, void *data )
 {
-    vout_ControlChangeWindowState( (vout_thread_t *)obj,
-        cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL );
+    vout_ChangeWindowState((vout_thread_t *)obj,
+        cur.b_bool ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL);
     (void) name; (void) prev; (void) data;
     return VLC_SUCCESS;
 }
@@ -538,8 +538,8 @@ static int WallPaperCallback( vlc_object_t *obj, char const *name,
 
     if( cur.b_bool )
     {
-        vout_ControlChangeWindowState( vout, VOUT_WINDOW_STATE_BELOW );
-        vout_ControlChangeFullscreen( vout, NULL );
+        vout_ChangeWindowState(vout, VOUT_WINDOW_STATE_BELOW);
+        vout_ChangeFullscreen(vout, NULL);
     }
     else
     {
@@ -557,9 +557,9 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
     (void)psz_cmd; (void) oldval; (void)p_data;
 
     if( newval.b_bool )
-        vout_ControlChangeFullscreen( p_vout, NULL );
+        vout_ChangeFullscreen(p_vout, NULL);
     else
-        vout_ControlChangeWindowed( p_vout );
+        vout_ChangeWindowed(p_vout);
     return VLC_SUCCESS;
 }
 
@@ -610,7 +610,7 @@ static int SubMarginCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    vout_ControlChangeSubMargin( p_vout, newval.i_int );
+    vout_ChangeSubMargin(p_vout, newval.i_int);
     return VLC_SUCCESS;
 }
 
@@ -621,6 +621,6 @@ static int ViewpointCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
     if( newval.p_address != NULL )
-        vout_ControlChangeViewpoint( p_vout, newval.p_address );
+        vout_ChangeViewpoint(p_vout, newval.p_address);
     return VLC_SUCCESS;
 }
