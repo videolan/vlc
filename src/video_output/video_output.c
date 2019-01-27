@@ -402,10 +402,13 @@ vout_thread_t *vout_Request(vlc_object_t *object,
 
 void vout_Stop(vout_thread_t *vout)
 {
-    spu_Detach(vout->p->spu);
+    vout_thread_sys_t *sys = vout->p;
 
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_MOUSE_DISABLE);
-    vout_control_WaitEmpty(&vout->p->control);
+    spu_Detach(sys->spu);
+
+    vout_control_Hold(&sys->control);
+    sys->mouse_event = NULL;
+    vout_control_Release(&sys->control);
 }
 
 void vout_Close(vout_thread_t *vout)
@@ -1806,9 +1809,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
         break;
     case VOUT_CONTROL_STEP:
         ThreadStep(vout, cmd.time_ptr);
-        break;
-    case VOUT_CONTROL_MOUSE_DISABLE:
-        vout->p->mouse_event = NULL;
         break;
     case VOUT_CONTROL_MOUSE_STATE:
         ThreadProcessMouseState(vout, &cmd.mouse);
