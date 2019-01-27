@@ -1,7 +1,6 @@
 --[[
- $Id$
 
- Copyright © 2009-2013 the VideoLAN team
+ Copyright © 2009-2019 the VideoLAN team
 
  Authors: Konstantin Pavlov (thresh@videolan.org)
           François Revol (revol@free.fr)
@@ -24,14 +23,10 @@
 
 -- Probe function.
 function probe()
-    local path = vlc.path
-    path = path:gsub("^www%.", "")
     return ( vlc.access == "http" or vlc.access == "https" )
-        and ( string.match( path, "^vimeo%.com/%d+$" )
-              or string.match( path, "^vimeo%.com/channels/(.-)/%d+$" )
-              or string.match( path, "^player%.vimeo%.com/" ) )
-        -- do not match other addresses,
-        -- else we'll also try to decode the actual video url
+        and ( string.match( vlc.path, "^vimeo%.com/%d+" )
+              or string.match( vlc.path, "^vimeo%.com/channels/.-/%d+" )
+              or string.match( vlc.path, "^player%.vimeo%.com/" ) )
 end
 
 -- Parse function.
