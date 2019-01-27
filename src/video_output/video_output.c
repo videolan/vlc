@@ -460,12 +460,6 @@ static void VoutDestructor(vlc_object_t *object)
 }
 
 /* */
-void vout_Cancel(vout_thread_t *vout, bool canceled)
-{
-    vout_control_PushBool(&vout->p->control, VOUT_CONTROL_CANCEL, canceled);
-    vout_control_WaitEmpty(&vout->p->control);
-}
-
 void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
 {
     vout_control_cmd_t cmd;
@@ -1767,9 +1761,14 @@ static int ThreadReinit(vout_thread_t *vout,
     return VLC_SUCCESS;
 }
 
-static void ThreadCancel(vout_thread_t *vout, bool canceled)
+void vout_Cancel(vout_thread_t *vout, bool canceled)
 {
-    picture_pool_Cancel(vout->p->decoder_pool, canceled);
+    vout_thread_sys_t *sys = vout->p;
+
+    vout_control_Hold(&sys->control);
+    if (sys->decoder_pool != NULL)
+        picture_pool_Cancel(sys->decoder_pool, canceled);
+    vout_control_Release(&sys->control);
 }
 
 static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
@@ -1781,9 +1780,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_REINIT:
         if (ThreadReinit(vout, cmd.cfg))
             return 1;
-        break;
-    case VOUT_CONTROL_CANCEL:
-        ThreadCancel(vout, cmd.boolean);
         break;
     case VOUT_CONTROL_SUBPICTURE:
         ThreadDisplaySubpicture(vout, cmd.subpicture);

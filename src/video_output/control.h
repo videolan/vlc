@@ -29,7 +29,6 @@
 enum {
     VOUT_CONTROL_CLEAN,
     VOUT_CONTROL_REINIT,                /* cfg */
-    VOUT_CONTROL_CANCEL,
 
 #if 0
     /* */
