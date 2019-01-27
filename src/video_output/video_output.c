@@ -56,13 +56,6 @@
 #include "window.h"
 #include "../misc/variables.h"
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void *Thread(void *);
-static void VoutDestructor(vlc_object_t *);
-static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg);
-
 /* Maximum delay between 2 displayed pictures.
  * XXX it is needed for now but should be removed in the long term.
  */
@@ -217,249 +210,6 @@ static void vout_ControlUpdateWindowSize(vout_thread_t *vout)
         msg_Dbg(window, "requested size: %ux%u", width, height);
         vout_window_SetSize(window, width, height);
     }
-}
-
-static vout_thread_t *VoutCreate(vlc_object_t *object,
-                                 const vout_configuration_t *cfg)
-{
-    /* Allocate descriptor */
-    vout_thread_t *vout = vlc_custom_create(object,
-                                            sizeof(*vout) + sizeof(*vout->p),
-                                            "video output");
-    if (!vout)
-        return NULL;
-
-    /* Register the VLC variable and callbacks. On the one hand, the variables
-     * must be ready early on because further initializations below depend on
-     * some of them. On the other hand, the callbacks depend on said
-     * initializations. In practice, this works because the object is not
-     * visible and callbacks not triggerable before this function returns the
-     * fully initialized object to its caller.
-     */
-    vout_IntfInit(vout);
-
-    vout_thread_sys_t *sys = (vout_thread_sys_t *)&vout[1];
-
-    vout->p = sys;
-
-    /* Get splitter name if present */
-    sys->splitter_name = var_InheritString(vout, "video-splitter");
-    if (sys->splitter_name != NULL) {
-        var_Create(vout, "window", VLC_VAR_STRING);
-        var_SetString(vout, "window", "wdummy");
-    }
-
-    sys->input = NULL;
-    VoutFixFormat(&sys->original, cfg->fmt);
-    sys->source.dar.num = 0;
-    sys->source.dar.den = 0;
-    sys->source.crop.mode = VOUT_CROP_NONE;
-    sys->dpb_size = cfg->dpb_size;
-    sys->snapshot = vout_snapshot_New();
-    vout_statistic_Init(&sys->statistic);
-
-    /* Initialize subpicture unit */
-    vlc_mutex_init(&sys->spu_lock);
-    sys->spu = spu_Create(vout, vout);
-
-    sys->dead = false;
-    vout_control_Init(&sys->control);
-
-    sys->pause.is_on = false;
-    sys->pause.date = VLC_TICK_INVALID;
-
-    sys->title.show     = var_InheritBool(vout, "video-title-show");
-    sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
-    sys->title.position = var_InheritInteger(vout, "video-title-position");
-
-    vout_InitInterlacingSupport(vout);
-
-    sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
-
-    sys->mouse_event = cfg->mouse_event;
-    sys->opaque = cfg->opaque;
-
-    vlc_mutex_init(&sys->filter.lock);
-
-    /* Window */
-    sys->display_cfg.window = vout_display_window_New(vout);
-    if (sys->splitter_name != NULL)
-        var_Destroy(vout, "window");
-    vlc_mutex_init(&sys->window_lock);
-
-    /* Arbitrary initial time */
-    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
-
-    /* */
-    vlc_object_set_destructor(vout, VoutDestructor);
-
-    vout_window_cfg_t wcfg = {
-        .is_fullscreen = var_GetBool(vout, "fullscreen"),
-        .is_decorated = var_InheritBool(vout, "video-deco"),
-        // TODO: take pixel A/R, crop and zoom into account
-#ifdef __APPLE__
-        .x = var_InheritInteger(vout, "video-x"),
-        .y = var_InheritInteger(vout, "video-y"),
-#endif
-    };
-
-    VoutGetDisplayCfg(vout, &sys->display_cfg);
-    vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
-
-    if (sys->display_cfg.window != NULL
-     && vout_window_Enable(sys->display_cfg.window, &wcfg)) {
-        vout_display_window_Delete(sys->display_cfg.window);
-        sys->display_cfg.window = NULL;
-    }
-
-    if (sys->display_cfg.window == NULL) {
-        spu_Destroy(sys->spu);
-        vlc_object_release(vout);
-        return NULL;
-    }
-
-    if (var_InheritBool(vout, "video-wallpaper"))
-        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
-    else if (var_InheritBool(vout, "video-on-top"))
-        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
-
-    /* */
-    if (vlc_clone(&vout->p->thread, Thread, vout,
-                  VLC_THREAD_PRIORITY_OUTPUT)) {
-        vout_display_window_Delete(sys->display_cfg.window);
-        spu_Destroy(sys->spu);
-        vlc_object_release(vout);
-        return NULL;
-    }
-
-    return vout;
-}
-
-#undef vout_Request
-vout_thread_t *vout_Request(vlc_object_t *object,
-                            const vout_configuration_t *cfg,
-                            input_thread_t *input)
-{
-    vout_thread_t *vout = cfg->vout;
-
-    assert(cfg->fmt != NULL);
-
-    if (!VoutCheckFormat(cfg->fmt)) {
-        if (vout != NULL)
-            vout_Close(vout);
-        return NULL;
-    }
-
-    /* If a vout is provided, try reusing it */
-    if (vout) {
-        video_format_t original;
-
-        VoutFixFormat(&original, cfg->fmt);
-
-        /* TODO: If dimensions are equal or slightly smaller, update the aspect
-         * ratio and crop settings, instead of recreating a display.
-         */
-        if (video_format_IsSimilar(&original, &vout->p->original)) {
-            if (cfg->dpb_size <= vout->p->dpb_size) {
-                video_format_Clean(&original);
-                /* It is assumed that the SPU input matches input already. */
-                return vout;
-            }
-            msg_Warn(vout, "DPB need to be increased");
-        }
-
-        vout_control_cmd_t cmd;
-
-        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
-        cmd.cfg = cfg;
-        vout_control_Push(&vout->p->control, &cmd);
-        msg_Dbg(object, "reusing provided vout");
-
-        vlc_mutex_lock(&vout->p->window_lock);
-        vout_ControlUpdateWindowSize(vout);
-        vlc_mutex_unlock(&vout->p->window_lock);
-    } else {
-        vout = VoutCreate(object, cfg);
-        if (vout == NULL)
-            return NULL;
-
-        if (input != NULL)
-            vout->p->input = vlc_object_hold((vlc_object_t *)input);
-    }
-
-    vout_control_WaitEmpty(&vout->p->control);
-    if (vout->p->dead) {
-        msg_Err(vout, "video output creation failed");
-        vout_Close(vout);
-        return NULL;
-    }
-
-    if (input != NULL)
-        spu_Attach(vout->p->spu, input);
-    vout_IntfReinit(vout);
-    return vout;
-}
-
-void vout_Stop(vout_thread_t *vout)
-{
-    vout_thread_sys_t *sys = vout->p;
-
-    spu_Detach(sys->spu);
-
-    vout_control_Hold(&sys->control);
-    sys->mouse_event = NULL;
-    vout_control_Release(&sys->control);
-}
-
-void vout_Close(vout_thread_t *vout)
-{
-    assert(vout);
-
-    spu_Detach(vout->p->spu);
-    vout_snapshot_End(vout->p->snapshot);
-
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
-    vlc_join(vout->p->thread, NULL);
-
-    vout_chrono_Clean(&vout->p->render);
-
-    vlc_mutex_lock(&vout->p->window_lock);
-    vout_display_window_Delete(vout->p->display_cfg.window);
-    vout->p->display_cfg.window = NULL;
-    vlc_mutex_unlock(&vout->p->window_lock);
-
-    vlc_mutex_lock(&vout->p->spu_lock);
-    spu_Destroy(vout->p->spu);
-    vout->p->spu = NULL;
-    vlc_mutex_unlock(&vout->p->spu_lock);
-
-    vlc_object_release(vout);
-}
-
-/* */
-static void VoutDestructor(vlc_object_t *object)
-{
-    vout_thread_t *vout = (vout_thread_t *)object;
-
-    /* Make sure the vout was stopped first */
-    //assert(!vout->p_module);
-
-    free(vout->p->splitter_name);
-
-    /* Destroy the locks */
-    vlc_mutex_destroy(&vout->p->window_lock);
-    vlc_mutex_destroy(&vout->p->spu_lock);
-    vlc_mutex_destroy(&vout->p->filter.lock);
-    vout_control_Clean(&vout->p->control);
-
-    /* */
-    vout_statistic_Clean(&vout->p->statistic);
-
-    /* */
-    vout_snapshot_Destroy(vout->p->snapshot);
-    if (vout->p->input != NULL)
-        vlc_object_release((vlc_object_t *)vout->p->input);
-    video_format_Clean(&vout->p->original);
 }
 
 /* */
@@ -1873,4 +1623,246 @@ out:
     vout->p->dead = true;
     vout_control_Dead(&vout->p->control);
     return NULL;
+}
+
+void vout_Stop(vout_thread_t *vout)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    spu_Detach(sys->spu);
+
+    vout_control_Hold(&sys->control);
+    sys->mouse_event = NULL;
+    vout_control_Release(&sys->control);
+}
+
+void vout_Close(vout_thread_t *vout)
+{
+    assert(vout);
+
+    spu_Detach(vout->p->spu);
+    vout_snapshot_End(vout->p->snapshot);
+
+    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
+    vlc_join(vout->p->thread, NULL);
+
+    vout_chrono_Clean(&vout->p->render);
+
+    vlc_mutex_lock(&vout->p->window_lock);
+    vout_display_window_Delete(vout->p->display_cfg.window);
+    vout->p->display_cfg.window = NULL;
+    vlc_mutex_unlock(&vout->p->window_lock);
+
+    vlc_mutex_lock(&vout->p->spu_lock);
+    spu_Destroy(vout->p->spu);
+    vout->p->spu = NULL;
+    vlc_mutex_unlock(&vout->p->spu_lock);
+
+    vlc_object_release(vout);
+}
+
+static void VoutDestructor(vlc_object_t *object)
+{
+    vout_thread_t *vout = (vout_thread_t *)object;
+
+    /* Make sure the vout was stopped first */
+    //assert(!vout->p_module);
+
+    free(vout->p->splitter_name);
+
+    /* Destroy the locks */
+    vlc_mutex_destroy(&vout->p->window_lock);
+    vlc_mutex_destroy(&vout->p->spu_lock);
+    vlc_mutex_destroy(&vout->p->filter.lock);
+    vout_control_Clean(&vout->p->control);
+
+    /* */
+    vout_statistic_Clean(&vout->p->statistic);
+
+    /* */
+    vout_snapshot_Destroy(vout->p->snapshot);
+    if (vout->p->input != NULL)
+        vlc_object_release((vlc_object_t *)vout->p->input);
+    video_format_Clean(&vout->p->original);
+}
+
+static vout_thread_t *VoutCreate(vlc_object_t *object,
+                                 const vout_configuration_t *cfg)
+{
+    /* Allocate descriptor */
+    vout_thread_t *vout = vlc_custom_create(object,
+                                            sizeof(*vout) + sizeof(*vout->p),
+                                            "video output");
+    if (!vout)
+        return NULL;
+
+    /* Register the VLC variable and callbacks. On the one hand, the variables
+     * must be ready early on because further initializations below depend on
+     * some of them. On the other hand, the callbacks depend on said
+     * initializations. In practice, this works because the object is not
+     * visible and callbacks not triggerable before this function returns the
+     * fully initialized object to its caller.
+     */
+    vout_IntfInit(vout);
+
+    vout_thread_sys_t *sys = (vout_thread_sys_t *)&vout[1];
+
+    vout->p = sys;
+
+    /* Get splitter name if present */
+    sys->splitter_name = var_InheritString(vout, "video-splitter");
+    if (sys->splitter_name != NULL) {
+        var_Create(vout, "window", VLC_VAR_STRING);
+        var_SetString(vout, "window", "wdummy");
+    }
+
+    sys->input = NULL;
+    VoutFixFormat(&sys->original, cfg->fmt);
+    sys->source.dar.num = 0;
+    sys->source.dar.den = 0;
+    sys->source.crop.mode = VOUT_CROP_NONE;
+    sys->dpb_size = cfg->dpb_size;
+    sys->snapshot = vout_snapshot_New();
+    vout_statistic_Init(&sys->statistic);
+
+    /* Initialize subpicture unit */
+    vlc_mutex_init(&sys->spu_lock);
+    sys->spu = spu_Create(vout, vout);
+
+    sys->dead = false;
+    vout_control_Init(&sys->control);
+
+    sys->pause.is_on = false;
+    sys->pause.date = VLC_TICK_INVALID;
+
+    sys->title.show     = var_InheritBool(vout, "video-title-show");
+    sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
+    sys->title.position = var_InheritInteger(vout, "video-title-position");
+
+    vout_InitInterlacingSupport(vout);
+
+    sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
+
+    sys->mouse_event = cfg->mouse_event;
+    sys->opaque = cfg->opaque;
+
+    vlc_mutex_init(&sys->filter.lock);
+
+    /* Window */
+    sys->display_cfg.window = vout_display_window_New(vout);
+    if (sys->splitter_name != NULL)
+        var_Destroy(vout, "window");
+    vlc_mutex_init(&sys->window_lock);
+
+    /* Arbitrary initial time */
+    vout_chrono_Init(&sys->render, 5, VLC_TICK_FROM_MS(10));
+
+    /* */
+    vlc_object_set_destructor(vout, VoutDestructor);
+
+    vout_window_cfg_t wcfg = {
+        .is_fullscreen = var_GetBool(vout, "fullscreen"),
+        .is_decorated = var_InheritBool(vout, "video-deco"),
+        // TODO: take pixel A/R, crop and zoom into account
+#ifdef __APPLE__
+        .x = var_InheritInteger(vout, "video-x"),
+        .y = var_InheritInteger(vout, "video-y"),
+#endif
+    };
+
+    VoutGetDisplayCfg(vout, &sys->display_cfg);
+    vout_SizeWindow(vout, &wcfg.width, &wcfg.height);
+
+    if (sys->display_cfg.window != NULL
+     && vout_window_Enable(sys->display_cfg.window, &wcfg)) {
+        vout_display_window_Delete(sys->display_cfg.window);
+        sys->display_cfg.window = NULL;
+    }
+
+    if (sys->display_cfg.window == NULL) {
+        spu_Destroy(sys->spu);
+        vlc_object_release(vout);
+        return NULL;
+    }
+
+    if (var_InheritBool(vout, "video-wallpaper"))
+        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_BELOW);
+    else if (var_InheritBool(vout, "video-on-top"))
+        vout_window_SetState(sys->display_cfg.window, VOUT_WINDOW_STATE_ABOVE);
+
+    /* */
+    if (vlc_clone(&vout->p->thread, Thread, vout,
+                  VLC_THREAD_PRIORITY_OUTPUT)) {
+        vout_display_window_Delete(sys->display_cfg.window);
+        spu_Destroy(sys->spu);
+        vlc_object_release(vout);
+        return NULL;
+    }
+
+    return vout;
+}
+
+#undef vout_Request
+vout_thread_t *vout_Request(vlc_object_t *object,
+                            const vout_configuration_t *cfg,
+                            input_thread_t *input)
+{
+    vout_thread_t *vout = cfg->vout;
+
+    assert(cfg->fmt != NULL);
+
+    if (!VoutCheckFormat(cfg->fmt)) {
+        if (vout != NULL)
+            vout_Close(vout);
+        return NULL;
+    }
+
+    /* If a vout is provided, try reusing it */
+    if (vout) {
+        video_format_t original;
+
+        VoutFixFormat(&original, cfg->fmt);
+
+        /* TODO: If dimensions are equal or slightly smaller, update the aspect
+         * ratio and crop settings, instead of recreating a display.
+         */
+        if (video_format_IsSimilar(&original, &vout->p->original)) {
+            if (cfg->dpb_size <= vout->p->dpb_size) {
+                video_format_Clean(&original);
+                /* It is assumed that the SPU input matches input already. */
+                return vout;
+            }
+            msg_Warn(vout, "DPB need to be increased");
+        }
+
+        vout_control_cmd_t cmd;
+
+        vout_control_cmd_Init(&cmd, VOUT_CONTROL_REINIT);
+        cmd.cfg = cfg;
+        vout_control_Push(&vout->p->control, &cmd);
+        msg_Dbg(object, "reusing provided vout");
+
+        vlc_mutex_lock(&vout->p->window_lock);
+        vout_ControlUpdateWindowSize(vout);
+        vlc_mutex_unlock(&vout->p->window_lock);
+    } else {
+        vout = VoutCreate(object, cfg);
+        if (vout == NULL)
+            return NULL;
+
+        if (input != NULL)
+            vout->p->input = vlc_object_hold((vlc_object_t *)input);
+    }
+
+    vout_control_WaitEmpty(&vout->p->control);
+    if (vout->p->dead) {
+        msg_Err(vout, "video output creation failed");
+        vout_Close(vout);
+        return NULL;
+    }
+
+    if (input != NULL)
+        spu_Attach(vout->p->spu, input);
+    vout_IntfReinit(vout);
+    return vout;
 }
