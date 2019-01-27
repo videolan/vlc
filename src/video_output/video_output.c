@@ -1480,28 +1480,6 @@ static void ThreadStop(vout_thread_t *vout)
         vout->p->mouse_event(NULL, vout->p->opaque);
 }
 
-static int ThreadReinit(vout_thread_t *vout,
-                        const vout_configuration_t *cfg)
-{
-    vout->p->mouse_event = cfg->mouse_event;
-    vout->p->opaque = cfg->opaque;
-
-    vout->p->pause.is_on = false;
-    vout->p->pause.date  = VLC_TICK_INVALID;
-
-    ThreadStop(vout);
-
-    vout_ReinitInterlacingSupport(vout);
-
-    video_format_Clean(&vout->p->original);
-    VoutFixFormat(&vout->p->original, cfg->fmt);
-    vout->p->dpb_size = cfg->dpb_size;
-    if (vout_Start(vout))
-        return VLC_EGENERIC;
-
-    return VLC_SUCCESS;
-}
-
 void vout_Cancel(vout_thread_t *vout, bool canceled)
 {
     vout_thread_sys_t *sys = vout->p;
@@ -1518,10 +1496,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CLEAN:
         ThreadStop(vout);
         return 1;
-    case VOUT_CONTROL_REINIT:
-        if (ThreadReinit(vout, cmd.cfg))
-            return 1;
-        break;
     case VOUT_CONTROL_SUBPICTURE:
         ThreadDisplaySubpicture(vout, cmd.subpicture);
         cmd.subpicture = NULL;
@@ -1838,7 +1812,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vout_ReinitInterlacingSupport(vout);
 
         video_format_Clean(&sys->original);
-        VoutFixFormat(&sys->original, cfg->fmt);
+        sys->original = original;
         sys->dpb_size = cfg->dpb_size;
 
         vlc_mutex_lock(&vout->p->window_lock);

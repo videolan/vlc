@@ -28,7 +28,6 @@
 /* */
 enum {
     VOUT_CONTROL_CLEAN,
-    VOUT_CONTROL_REINIT,                /* cfg */
 
 #if 0
     /* */
@@ -76,7 +75,6 @@ typedef struct {
             unsigned height;
         } window;
         vlc_mouse_t mouse;
-        const vout_configuration_t *cfg;
         subpicture_t *subpicture;
         vlc_viewpoint_t viewpoint;
     };
