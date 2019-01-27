@@ -469,12 +469,6 @@ void vout_GetResetStatistic(vout_thread_t *vout, unsigned *restrict displayed,
     vout_statistic_GetReset( &vout->p->statistic, displayed, lost );
 }
 
-void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
-{
-    vout_control_PushTime(&vout->p->control, VOUT_CONTROL_FLUSH, date);
-    vout_control_WaitEmpty(&vout->p->control);
-}
-
 bool vout_IsEmpty(vout_thread_t *vout)
 {
     picture_t *picture = picture_fifo_Peek(vout->p->decoder_fifo);
@@ -1505,7 +1499,8 @@ void vout_ChangePause(vout_thread_t *vout, bool is_paused, vlc_tick_t date)
     vlc_mutex_unlock(&vout->p->window_lock);
 }
 
-static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
+static void vout_FlushUnlocked(vout_thread_t *vout, bool below,
+                               vlc_tick_t date)
 {
     vout->p->step.timestamp = VLC_TICK_INVALID;
     vout->p->step.last      = VLC_TICK_INVALID;
@@ -1527,6 +1522,15 @@ static void ThreadFlush(vout_thread_t *vout, bool below, vlc_tick_t date)
 
     picture_fifo_Flush(vout->p->decoder_fifo, date, below);
     vout_FilterFlush(vout->p->display);
+}
+
+void vout_Flush(vout_thread_t *vout, vlc_tick_t date)
+{
+    vout_thread_sys_t *sys = vout->p;
+
+    vout_control_Hold(&sys->control);
+    vout_FlushUnlocked(vout, false, date);
+    vout_control_Release(&sys->control);
 }
 
 static void ThreadStep(vout_thread_t *vout, vlc_tick_t *duration)
@@ -1716,7 +1720,7 @@ static void ThreadStop(vout_thread_t *vout)
     /* Destroy translation tables */
     if (vout->p->display) {
         if (vout->p->decoder_pool)
-            ThreadFlush(vout, true, INT64_MAX);
+            vout_FlushUnlocked(vout, true, INT64_MAX);
         vout_CloseWrapper(vout);
     }
 
@@ -1793,9 +1797,6 @@ static int ThreadControl(vout_thread_t *vout, vout_control_cmd_t cmd)
     case VOUT_CONTROL_CHANGE_INTERLACE:
         ThreadChangeFilters(vout, NULL, vout->p->filter.configuration,
                             cmd.boolean ? 1 : 0, false);
-        break;
-    case VOUT_CONTROL_FLUSH:
-        ThreadFlush(vout, false, cmd.time);
         break;
     case VOUT_CONTROL_STEP:
         ThreadStep(vout, cmd.time_ptr);

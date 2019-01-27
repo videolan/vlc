@@ -40,7 +40,6 @@ enum {
     VOUT_CONTROL_CHANGE_FILTERS,        /* string */
     VOUT_CONTROL_CHANGE_INTERLACE,      /* boolean */
 
-    VOUT_CONTROL_FLUSH,                 /* time */
     VOUT_CONTROL_STEP,                  /* time_ptr */
 
     VOUT_CONTROL_MOUSE_STATE,           /* vlc_mouse_t */
