@@ -1591,7 +1591,6 @@ static void *Thread(void *object)
     }
 
 out:
-    vout->p->dead = true;
     return NULL;
 }
 
@@ -1700,7 +1699,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vlc_mutex_init(&sys->spu_lock);
     sys->spu = spu_Create(vout, vout);
 
-    sys->dead = false;
     vout_control_Init(&sys->control);
 
     sys->pause.is_on = false;
@@ -1803,7 +1801,6 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         msg_Dbg(object, "reusing provided vout");
         vlc_join(sys->thread, NULL);
 
-        sys->dead = false;
         sys->mouse_event = cfg->mouse_event;
         sys->opaque = cfg->opaque;
         sys->pause.is_on = false;

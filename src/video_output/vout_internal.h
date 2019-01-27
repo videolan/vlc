@@ -111,7 +111,6 @@ struct vout_thread_sys_t
 
     /* Thread & synchronization */
     vlc_thread_t    thread;
-    bool            dead;
     vout_control_t  control;
 
     struct {
