@@ -1618,7 +1618,6 @@ static void *Thread(void *object)
 
 out:
     vout->p->dead = true;
-    vout_control_Dead(&vout->p->control);
     return NULL;
 }
 
@@ -1641,6 +1640,7 @@ void vout_Close(vout_thread_t *vout)
     vout_snapshot_End(vout->p->snapshot);
 
     vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
+    vout_control_Dead(&vout->p->control);
     vlc_join(vout->p->thread, NULL);
 
     vout_chrono_Clean(&vout->p->render);
