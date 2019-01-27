@@ -549,7 +549,7 @@ seekpoint_GetName(seekpoint_t *seekpoint, int idx, int chapter_offset)
 }
 
 static struct vlc_player_title_list *
-vlc_player_title_list_Create(const input_title_t **array, size_t count,
+vlc_player_title_list_Create(input_title_t *const *array, size_t count,
                              int title_offset, int chapter_offset)
 {
     if (count == 0)

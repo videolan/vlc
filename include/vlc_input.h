@@ -421,7 +421,7 @@ struct vlc_input_event_title
     {
         struct
         {
-            const input_title_t **array;
+            input_title_t *const *array;
             size_t count;
         } list;
         size_t selected_idx;
