@@ -1,19 +1,19 @@
 # Galician translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013, 2014
+# Gonçalo Cordeiro <gzcordeiro@gmail.com>, 2013, 2014, 2018
 # Iván Seoane Pardo <ivam.sp@gmail.com>, 2008
 # Paula Iglesias <localizacion@tagenata.com>, 2009
-# antiparvos  <marcoslansgarza@gmail.com>, 2018
+# antiparvos  <marcoslansgarza@gmail.com>, 2018-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-15 22:43+0200\n"
-"Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2018\n"
+"PO-Revision-Date: 2019-01-28 18:52+0100\n"
+"Last-Translator: antiparvos <marcoslansgarza@gmail.com>, 2019\n"
 "Language-Team: Galician (https://www.transifex.com/yaron/teams/16553/gl/)\n"
 "Language: gl\n"
 "MIME-Version: 1.0\n"
@@ -1485,7 +1485,7 @@ msgstr "Web"
 
 #: src/interface/interface.c:99
 msgid "Mouse Gestures"
-msgstr "Movementos do rato"
+msgstr "Xestos de rato"
 
 #: src/interface/interface.c:222
 msgid ""
@@ -6870,7 +6870,7 @@ msgstr "Redes de Windows"
 
 #: modules/access/dsm/access.c:63
 msgid "libdsm's SMB (Windows network shares) input and browser"
-msgstr ""
+msgstr "Entrada e navegador SMB de libdsm (comparticións de rede de Windows)"
 
 #: modules/access/dsm/access.c:67
 msgid "libdsm SMB input"
@@ -7511,7 +7511,7 @@ msgstr "Listar ficheiros especiais"
 
 #: modules/access/fs.c:54
 msgid "Include devices and pipes when listing directories"
-msgstr ""
+msgstr "Incluír dispositivos e canalizacións na lista de cartafoles"
 
 #: modules/access/ftp.c:68 modules/access/live555.cpp:84
 #: modules/access/rdp.c:65 modules/access/sftp.c:55
@@ -7668,6 +7668,9 @@ msgid ""
 "server, i.e. the HTTP \"User-Agent\". Name and version must be separated by "
 "a forward slash, e.g. \"FooBar/1.2.3\"."
 msgstr ""
+"Sobrescribe o nome e versión do aplicativo cando llo transmite ao servidor "
+"HTTP, esto é, o «Axente do usuario». O nome e a versión deben estar "
+"separados por unha barra, p.e: «Foobar/1.2.3»."
 
 #: modules/access/idummy.c:41 modules/access_output/dummy.c:44
 #: modules/audio_output/adummy.c:36 modules/codec/ddummy.c:46
@@ -8593,6 +8596,10 @@ msgid ""
 "Please provide a username (ideally a domain name using the format DOMAIN;"
 "username) and a password."
 msgstr ""
+"O computador (%s) co que tenta conectar require autenticación. Indique un "
+"nome de usuario\n"
+"(idealmente un nome de dominio usando o formato DOMINIO;nome de usuario) e "
+"un contrasinal."
 
 #: modules/access/srt.c:386 modules/access_output/srt.c:436
 msgid "SRT"
@@ -8706,7 +8713,7 @@ msgstr ""
 
 #: modules/access/v4l2/v4l2.c:71
 msgid "Maximum frame rate to use (0 = no limits)."
-msgstr ""
+msgstr "Límite de fotogramas por segundo (0 = sen límite)."
 
 #: modules/access/v4l2/v4l2.c:73
 msgid "Radio device"
@@ -9853,6 +9860,7 @@ msgstr ""
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
 msgstr ""
+"Ficheiro HRTF personalizado (Head-related transfer function) no formato SOFA."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
@@ -12876,7 +12884,7 @@ msgstr "Codificador de audio MP3 de coma fixa"
 
 #: modules/codec/spdif.c:36
 msgid "S/PDIF pass-through decoder"
-msgstr ""
+msgstr "Descodificador «pass-through» S/PDIF"
 
 #: modules/codec/speex.c:59 modules/codec/speex.c:907
 #: modules/gui/macosx/VLCOpenWindowController.m:195
@@ -13474,6 +13482,10 @@ msgid ""
 " - 1: Realtime\n"
 " - 2: Best quality"
 msgstr ""
+"Configuración da calidade que determinará o tempo máximo de codificación\n"
+" - 0: Boa calidade\n"
+" - 1: Tempo real\n"
+" - 2: Calidade máxima"
 
 #: modules/codec/vpx.c:66
 msgid "WebM video decoder"
@@ -15672,12 +15684,14 @@ msgstr ""
 
 #: modules/demux/mkv/mkv.cpp:80
 msgid "Preload clusters"
-msgstr ""
+msgstr "Precargar bloques"
 
 #: modules/demux/mkv/mkv.cpp:81
 msgid ""
 "Find all cluster positions by jumping cluster-to-cluster before playback"
 msgstr ""
+"Buscar todas as posicións dos bloques indo de bloque en bloque antes da "
+"reprodución"
 
 #: modules/demux/mod.c:55
 msgid "Enable noise reduction algorithm."
@@ -17472,6 +17486,9 @@ msgid ""
 "fullscreen. Automatic brightness adjustment should be disabled in System "
 "Preferences."
 msgstr ""
+"Apagar a luz de fondo do teclado do MacBook mentres se reproduce na pantalla "
+"completa. O axuste automático do brillo debe desactivarse nas preferencias "
+"do sistema."
 
 #: modules/gui/macosx/macosx.m:116 modules/gui/macosx/VLCMainMenu.m:375
 msgid "Show Previous & Next Buttons"
@@ -18654,7 +18671,7 @@ msgstr "Activar OSD"
 #: modules/gui/macosx/VLCSimplePrefsController.m:348
 #: modules/text_renderer/freetype/freetype.c:104
 msgid "Force bold"
-msgstr "Forzar as negritas"
+msgstr "Forzar letras grosas"
 
 #: modules/gui/macosx/VLCSimplePrefsController.m:349
 #: modules/text_renderer/freetype/freetype.c:110
@@ -19857,7 +19874,7 @@ msgstr ""
 
 #: modules/gui/qt/components/extended_panels.cpp:1354
 msgid "Adjust pitch"
-msgstr ""
+msgstr "Axustar o ton"
 
 #: modules/gui/qt/components/extended_panels.cpp:1388
 msgid "(Hastened)"
@@ -20935,6 +20952,8 @@ msgid ""
 "Service discoveries adds new sources to your playlist such as web radios, "
 "video websites, ..."
 msgstr ""
+"Os descubrimentos de servizos engaden novas orixes á súa lista de "
+"reprodución tales como radios web, páxinas de vídeos..."
 
 #: modules/gui/qt/dialogs/plugins.cpp:393
 msgid "Retrieves extra info and art for playlist items"
@@ -21098,7 +21117,7 @@ msgstr "Botón plano"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:77
 msgid "Next widget style"
-msgstr ""
+msgstr "Seguinte estilo de widget"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:78
 msgid "Big Button"
@@ -21134,7 +21153,7 @@ msgstr "Barra de ferramentas de tempo"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:129
 msgid "Advanced Widget"
-msgstr ""
+msgstr "Widget avanzado"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:138
 msgid "Fullscreen Controller"
@@ -22123,6 +22142,8 @@ msgstr "Usar QPUs para desentrelazado avanzado HD."
 msgid ""
 "Make use of the QPUs to allow higher quality deinterlacing of HD content."
 msgstr ""
+"Usar QPU para permitir un desentrelazado de calidade máis alta en contidos "
+"HD."
 
 #: modules/hw/mmal/deinterlace.c:52
 msgid "MMAL deinterlace"
@@ -22134,7 +22155,7 @@ msgstr "Plugin do filtro de desentrelazado baseado en MMAL"
 
 #: modules/hw/mmal/vout.c:50
 msgid "VideoCore layer where the video is displayed."
-msgstr ""
+msgstr "Capa do VídeoCore onde se mostra o vídeo."
 
 #: modules/hw/mmal/vout.c:51
 msgid ""
@@ -22171,7 +22192,7 @@ msgstr "Vout MMAL"
 
 #: modules/hw/mmal/vout.c:76
 msgid "MMAL-based vout plugin for Raspberry Pi"
-msgstr "Plugin de saída de vídeo baseado en MMAL para Raspberry Pi."
+msgstr "Plugin de saída de vídeo baseado en MMAL para Raspberry Pi"
 
 #: modules/hw/vaapi/filters.c:1184
 msgid "VAAPI filters"
@@ -22301,10 +22322,12 @@ msgstr "Sincronizar elementos gardados"
 msgid ""
 "Synchronizes stored items via iCloud Keychain if enabled in the user domain."
 msgstr ""
+"SIncroniza os elementos gardados por medio da iCloud Keychain se está "
+"activada no dominio do usuario."
 
 #: modules/keystore/keychain.m:60
 msgid "Accessibility type for all future passwords saved to the Keychain"
-msgstr ""
+msgstr "Tipo de accesibilidade dos futuros contrasinais gardados no Keychain"
 
 #: modules/keystore/keychain.m:62
 msgid "Keychain access group"
@@ -22352,7 +22375,7 @@ msgstr "Rexistro de Android"
 
 #: modules/logger/android.c:86
 msgid "Android log using logcat"
-msgstr ""
+msgstr "Rexistro de Android usando logcat"
 
 #: modules/logger/console.c:114
 msgid "Be quiet"
@@ -22360,7 +22383,7 @@ msgstr "Silencioso"
 
 #: modules/logger/console.c:115
 msgid "Turn off all messages on the console."
-msgstr ""
+msgstr "Desactivar todas as mensaxes na consola."
 
 #: modules/logger/console.c:118
 msgid "Console log"
@@ -22368,7 +22391,7 @@ msgstr "Rexistro da consola"
 
 #: modules/logger/console.c:119
 msgid "Console logger"
-msgstr ""
+msgstr "Rexistrador de consola"
 
 #: modules/logger/file.c:193
 msgid "HTML"
@@ -22420,11 +22443,11 @@ msgstr ""
 
 #: modules/logger/file.c:219
 msgid "Logger"
-msgstr ""
+msgstr "Rexistrador"
 
 #: modules/logger/file.c:220
 msgid "File logger"
-msgstr ""
+msgstr "Rexistrador de ficheiros"
 
 #: modules/logger/journal.c:77
 msgid "Journal"
@@ -22436,11 +22459,11 @@ msgstr ""
 
 #: modules/logger/syslog.c:138
 msgid "System log (syslog)"
-msgstr ""
+msgstr "Rexistro do sistema (syslog)"
 
 #: modules/logger/syslog.c:139
 msgid "Emit log messages through the POSIX system log."
-msgstr ""
+msgstr "Emitir mensaxes de rexistro por medio do rexistro do sistema de POSIX."
 
 #: modules/logger/syslog.c:141
 msgid "Debug messages"
@@ -22448,7 +22471,7 @@ msgstr "Mensaxes de depuración"
 
 #: modules/logger/syslog.c:142
 msgid "Include debug messages in system log."
-msgstr ""
+msgstr "Incluír mensaxes de depuración no rexistro do sistema."
 
 #: modules/logger/syslog.c:144
 msgid "Identity"
@@ -22456,7 +22479,7 @@ msgstr "Identidade"
 
 #: modules/logger/syslog.c:145
 msgid "Process identity in system log."
-msgstr ""
+msgstr "Procesar a identidade no rexistro do sistema."
 
 #: modules/logger/syslog.c:147
 msgid "Facility"
@@ -22472,11 +22495,11 @@ msgstr "rexistro do sistema"
 
 #: modules/logger/syslog.c:152
 msgid "System logger (syslog)"
-msgstr ""
+msgstr "Rexistrador do sistema (syslog)"
 
 #: modules/lua/extension.c:1194
 msgid "Extension not responding!"
-msgstr ""
+msgstr "A extensión non responde."
 
 #: modules/lua/extension.c:1195
 #, c-format
@@ -22484,6 +22507,8 @@ msgid ""
 "Extension '%s' does not respond.\n"
 "Do you want to kill it now? "
 msgstr ""
+"A extensión «%s» non responde.\n"
+"Desexa parala?"
 
 #: modules/lua/libs/httpd.c:75
 msgid ""
@@ -23461,15 +23486,15 @@ msgstr "RTSP VoD"
 
 #: modules/misc/rtsp.c:78
 msgid "Legacy RTSP VoD server"
-msgstr ""
+msgstr "Servidor antigo RTSP VoD"
 
 #: modules/misc/securetransport.c:55
 msgid "TLS support for OS X and iOS"
-msgstr ""
+msgstr "Compatibilidade TLS para OS X e iOS"
 
 #: modules/misc/securetransport.c:68
 msgid "TLS server support for OS X"
-msgstr ""
+msgstr "Compatibilidade para servidores TLS en OS X"
 
 #: modules/misc/securetransport.c:338
 #, c-format
@@ -23869,7 +23894,7 @@ msgstr "Multiplexor JPEG multipart"
 
 #: modules/mux/ogg.c:47
 msgid "Index interval"
-msgstr ""
+msgstr "Intervalo de indexación"
 
 #: modules/mux/ogg.c:48
 msgid ""
@@ -23930,12 +23955,11 @@ msgstr "Empaquetador de audio A/52"
 
 #: modules/packetizer/avparser.h:49
 msgid "avparser packetizer"
-msgstr ""
+msgstr "Empaquetador avparser"
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "Empaquetador de vídeo Daala"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23959,7 +23983,7 @@ msgstr "Empaquetador de vídeo H.264"
 
 #: modules/packetizer/hevc.c:57
 msgid "HEVC/H.265 video packetizer"
-msgstr ""
+msgstr "Empaquetador de vídeo HEVC/H.265"
 
 #: modules/packetizer/mlp.c:50
 msgid "MLP/TrueHD parser"
@@ -24219,7 +24243,7 @@ msgstr ""
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Server List"
-msgstr ""
+msgstr "Lista de servidores"
 
 #: modules/services_discovery/upnp.cpp:78
 msgid "Custom List"
@@ -25075,7 +25099,7 @@ msgstr "Tamaño do búfer"
 
 #: modules/stream_filter/prefetch.c:535
 msgid "Prefetch buffer size (KiB)"
-msgstr ""
+msgstr "Tamaño do búfer de carga previa (KiB)"
 
 #: modules/stream_filter/prefetch.c:537
 msgid "Read size"
@@ -25272,7 +25296,7 @@ msgstr ""
 
 #: modules/stream_out/chromecast/cast.cpp:218
 msgid "Low CPU (low quality but high bandwidth)"
-msgstr ""
+msgstr "Baixa CPU (calidade baixa pero largo de banda alto)"
 
 #: modules/stream_out/chromecast/cast.cpp:221
 msgid "Conversion quality"
@@ -25294,7 +25318,7 @@ msgstr "Porto do Chromecast"
 
 #: modules/stream_out/chromecast/cast.cpp:227
 msgid "The port used to talk to the Chromecast."
-msgstr ""
+msgstr "Porto usado para comunicarse co Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:237
 msgid "Chromecast"
@@ -26270,11 +26294,11 @@ msgstr "Tipo de letra Freetype2 para o renderizador"
 
 #: modules/text_renderer/nsspeechsynthesizer.m:47
 msgid "Speech synthesis for Mac OS X"
-msgstr ""
+msgstr "Síntese de voz para Mac OS X"
 
 #: modules/text_renderer/sapi.cpp:55
 msgid "Speech synthesis for Windows"
-msgstr ""
+msgstr "Síntese de voz para Windows"
 
 #: modules/text_renderer/svg.c:70
 msgid "SVG template file"
@@ -26448,7 +26472,7 @@ msgstr "Esquema de cor"
 
 #: modules/video_filter/anaglyph.c:40
 msgid "Define the glasses' color scheme"
-msgstr "Define o esquema de cor «Lentes»"
+msgstr "Define o esquema de cor das lentes"
 
 #: modules/video_filter/anaglyph.c:71
 msgid "Convert 3D picture to anaglyph image video filter"
@@ -26734,7 +26758,7 @@ msgstr ""
 
 #: modules/video_filter/ci_filters.m:763
 msgid "Mac OS X hardware video filters"
-msgstr ""
+msgstr "Filtros de vídeo por hardware de Mac OS X"
 
 #: modules/video_filter/colorthres.c:56
 msgid ""
@@ -27721,7 +27745,7 @@ msgstr ""
 
 #: modules/video_output/decklink.cpp:78
 msgid "Active Format Descriptor line"
-msgstr ""
+msgstr "Liña do descritor de formato activo"
 
 #: modules/video_output/decklink.cpp:79
 msgid "VBI line on which to output Active Format Descriptor."
@@ -28019,7 +28043,7 @@ msgstr "Saída de vídeo Direct3D9"
 
 #: modules/video_output/win32/direct3d11.c:64
 msgid "Recommended video output for Windows 8 and later versions"
-msgstr ""
+msgstr "A saída de vídeo recomendada para Windows 8 e versións posteriores"
 
 #: modules/video_output/win32/direct3d11.c:71
 msgid "Direct3D11 video output"
@@ -28123,7 +28147,7 @@ msgstr "Afinidade GPU"
 
 #: modules/video_output/win32/wgl.c:46
 msgid "WGL extension for OpenGL"
-msgstr ""
+msgstr "Extensión WGL para OpenGL"
 
 #: modules/video_output/vdummy.c:36
 msgid "Dummy image chroma format"
@@ -28209,7 +28233,7 @@ msgstr "WL SHM"
 
 #: modules/video_output/wayland/shm.c:509
 msgid "Wayland shared memory video output"
-msgstr ""
+msgstr "Saída de vídeo da memoria compartida Wayland"
 
 #: modules/video_output/wayland/xdg-shell.c:380
 msgid "XDG shell"
@@ -28324,7 +28348,7 @@ msgstr "Forzar o uso dunha crominancia específica para a saída."
 
 #: modules/video_output/yuv.c:48
 msgid "Add a YUV4MPEG2 header"
-msgstr ""
+msgstr "Engadir cabeceira YUV4MPEG2 "
 
 #: modules/video_output/yuv.c:49
 msgid ""
@@ -28792,7 +28816,7 @@ msgstr ""
 
 #: modules/visualization/visual/visual.c:65
 msgid "Kaiser window parameter"
-msgstr ""
+msgstr "Parámetro da xanela Kaiser"
 
 #: modules/visualization/visual/visual.c:67
 msgid ""
@@ -29659,7 +29683,7 @@ msgstr "Mostrar a icona da bandexa do sistema"
 
 #: modules/gui/qt/ui/sprefs_interface.h:546
 msgid "Auto raising the interface:"
-msgstr ""
+msgstr "Traer automaticamente a interface ao primeiro plano:"
 
 #: modules/gui/qt/ui/sprefs_interface.h:547
 msgid "Skin resource file:"
