@@ -374,7 +374,7 @@ endif
 RECONF = mkdir -p -- $(PREFIX)/share/aclocal && \
 	cd $< && $(AUTORECONF) -fiv $(ACLOCAL_AMFLAGS)
 CMAKE = cmake . -DCMAKE_TOOLCHAIN_FILE=$(abspath toolchain.cmake) \
-		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR)
+		-DCMAKE_INSTALL_PREFIX=$(PREFIX) $(CMAKE_GENERATOR) -DCMAKE_DEBUG_POSTFIX:STRING=
 
 MESONFLAGS = --default-library static --prefix "$(PREFIX)" --backend ninja \
 	-Dlibdir=lib
