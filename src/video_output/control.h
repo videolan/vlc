@@ -82,12 +82,13 @@ void vout_control_cmd_Clean(vout_control_cmd_t *);
 typedef struct {
     vlc_mutex_t lock;
     vlc_cond_t  wait_request;
-    vlc_cond_t  wait_acknowledge;
+    vlc_cond_t  wait_available;
 
     /* */
     bool is_dead;
     bool can_sleep;
     bool is_waiting;
+    bool is_held;
     DECL_ARRAY(vout_control_cmd_t) cmd;
 } vout_control_t;
 

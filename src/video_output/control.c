@@ -51,7 +51,7 @@ void vout_control_Init(vout_control_t *ctrl)
 {
     vlc_mutex_init(&ctrl->lock);
     vlc_cond_init(&ctrl->wait_request);
-    vlc_cond_init(&ctrl->wait_acknowledge);
+    vlc_cond_init(&ctrl->wait_available);
 
     ctrl->is_dead = false;
     ctrl->can_sleep = true;
@@ -69,16 +69,14 @@ void vout_control_Clean(vout_control_t *ctrl)
 
     vlc_mutex_destroy(&ctrl->lock);
     vlc_cond_destroy(&ctrl->wait_request);
-    vlc_cond_destroy(&ctrl->wait_acknowledge);
+    vlc_cond_destroy(&ctrl->wait_available);
 }
 
 void vout_control_Dead(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
     ctrl->is_dead = true;
-    vlc_cond_broadcast(&ctrl->wait_acknowledge);
     vlc_mutex_unlock(&ctrl->lock);
-
 }
 
 void vout_control_Push(vout_control_t *ctrl, vout_control_cmd_t *cmd)
@@ -137,13 +135,18 @@ void vout_control_PushString(vout_control_t *ctrl, int type, const char *string)
 void vout_control_Hold(vout_control_t *ctrl)
 {
     vlc_mutex_lock(&ctrl->lock);
-    while (!ctrl->is_waiting && !ctrl->is_dead)
-        vlc_cond_wait(&ctrl->wait_acknowledge, &ctrl->lock);
-    /* TODO: unlock to let other threads queue requests */
+    while (ctrl->is_held || !ctrl->is_waiting)
+        vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
+    ctrl->is_held = true;
+    vlc_mutex_unlock(&ctrl->lock);
 }
 
 void vout_control_Release(vout_control_t *ctrl)
 {
+    vlc_mutex_lock(&ctrl->lock);
+    assert(ctrl->is_held);
+    ctrl->is_held = false;
+    vlc_cond_signal(&ctrl->wait_available);
     vlc_mutex_unlock(&ctrl->lock);
 }
 
@@ -152,15 +155,17 @@ int vout_control_Pop(vout_control_t *ctrl, vout_control_cmd_t *cmd,
 {
     vlc_mutex_lock(&ctrl->lock);
     if (ctrl->cmd.i_size <= 0) {
-        vlc_cond_broadcast(&ctrl->wait_acknowledge);
-
         /* Spurious wakeups are perfectly fine */
         if (deadline != VLC_TICK_INVALID && ctrl->can_sleep) {
             ctrl->is_waiting = true;
+            vlc_cond_signal(&ctrl->wait_available);
             vlc_cond_timedwait(&ctrl->wait_request, &ctrl->lock, deadline);
             ctrl->is_waiting = false;
         }
     }
+
+    while (ctrl->is_held)
+        vlc_cond_wait(&ctrl->wait_available, &ctrl->lock);
 
     bool has_cmd;
     if (ctrl->cmd.i_size > 0) {
