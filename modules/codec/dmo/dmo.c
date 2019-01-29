@@ -870,7 +870,6 @@ static int DecBlock( decoder_t *p_dec, block_t **pp_block )
 #ifdef DMO_DEBUG
             msg_Dbg( p_dec, "ProcessInput(): successful" );
 #endif
-            block_Release( p_block );
             *pp_block = NULL;
         }
     }
