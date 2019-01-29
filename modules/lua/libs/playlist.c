@@ -184,6 +184,34 @@ static int vlclua_playlist_loop(lua_State *L)
     return vlclua_playlist_repeat_(L, VLC_PLAYLIST_PLAYBACK_REPEAT_ALL);
 }
 
+static int vlclua_playlist_get_repeat(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_repeat repeat =
+            vlc_playlist_GetPlaybackRepeat(playlist);
+    bool result = repeat != VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushboolean(L, result);
+    return 1;
+}
+
+static int vlclua_playlist_get_loop(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_repeat repeat =
+            vlc_playlist_GetPlaybackRepeat(playlist);
+    bool result = repeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushboolean(L, result);
+    return 1;
+}
+
 static int vlclua_playlist_random(lua_State *L)
 {
     vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
@@ -215,6 +243,20 @@ static int vlclua_playlist_random(lua_State *L)
     vlc_playlist_Unlock(playlist);
 
     lua_pushboolean(L, enable);
+    return 1;
+}
+
+static int vlclua_playlist_get_random(lua_State *L)
+{
+    vlc_playlist_t *playlist = vlclua_get_playlist_internal(L);
+
+    vlc_playlist_Lock(playlist);
+    enum vlc_playlist_playback_order order =
+            vlc_playlist_GetPlaybackOrder(playlist);
+    bool result = order == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+    vlc_playlist_Unlock(playlist);
+
+    lua_pushboolean(L, result);
     return 1;
 }
 
@@ -547,6 +589,9 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "repeat_", vlclua_playlist_repeat }, // ... provide repeat_ too.
     { "loop", vlclua_playlist_loop },
     { "random", vlclua_playlist_random },
+    { "get_repeat", vlclua_playlist_get_repeat },
+    { "get_loop", vlclua_playlist_get_loop },
+    { "get_random", vlclua_playlist_get_random },
 #if LUA_VERSION_NUM < 502
     { "goto", vlclua_playlist_gotoitem },
 #endif
