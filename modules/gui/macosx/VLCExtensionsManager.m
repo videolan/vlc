@@ -26,6 +26,7 @@
 #import "VLCExtensionsDialogProvider.h"
 
 #import <vlc_modules.h>
+#import <vlc_extensions.h>
 #import "assert.h"
 
 #define MENU_MAP(a,e) ((uint32_t)((((uint16_t)a) << 16) | ((uint16_t)e)))
@@ -36,8 +37,6 @@
 {
     extensions_manager_t *p_extensions_manager;
     VLCExtensionsDialogProvider *_extensionDialogProvider;
-
-    NSMutableDictionary *p_extDict;
 
     BOOL b_failed; ///< Flag set to true if we could not load the module
 }
@@ -52,8 +51,6 @@
     if (self) {
         p_extensions_manager = NULL;
         _extensionDialogProvider = [[VLCExtensionsDialogProvider alloc] init];
-
-        p_extDict = [[NSMutableDictionary alloc] init];
 
         _isUnloading = false;
         b_failed = false;

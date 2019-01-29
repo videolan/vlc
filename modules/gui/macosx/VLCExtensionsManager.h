@@ -27,12 +27,6 @@
 #import "VLCExtensionsDialogProvider.h"
 #import "VLCMain.h"
 
-#import <vlc_extensions.h>
-
-#import <Cocoa/Cocoa.h>
-
-@class VLCExtensionsDialogProvider;
-
 @interface VLCExtensionsManager : NSObject
 
 - (void)buildMenu:(NSMenu *)extMenu;

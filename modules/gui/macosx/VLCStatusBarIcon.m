@@ -74,7 +74,6 @@
 #pragma mark -
 #pragma mark Init
 
-
 - (instancetype)init
 {
     self = [super init];
@@ -114,15 +113,16 @@
     [_vlcStatusBarIconMenu setDelegate:self];
     
     // Register notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateNowPlayingInfo)
-                                                 name:VLCInputChangedNotification
-                                               object:nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateNowPlayingInfo)
+                               name:VLCInputChangedNotification
+                             object:nil];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(configurationChanged:)
-                                                 name:VLCConfigurationChangedNotification
-                                               object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(configurationChanged:)
+                               name:VLCConfigurationChangedNotification
+                             object:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath
@@ -167,7 +167,6 @@
 
         // Attach pull-down menu
         [self.statusItem setMenu:_vlcStatusBarIconMenu];
-
 
         if (@available(macOS 10.12, *)) {
             [self.statusItem setBehavior:NSStatusItemBehaviorRemovalAllowed];

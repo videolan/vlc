@@ -46,14 +46,15 @@ static const int kCurrentPreferencesVersion = 4;
 
 - (void)resetAndReinitializeUserDefaults
 {
+    NSUserDefaults *standardUserDefaults = [NSUserDefaults standardUserDefaults];
     // note that [NSUserDefaults resetStandardUserDefaults] will NOT correctly reset to the defaults
 
     NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    [standardUserDefaults removePersistentDomainForName:appDomain];
 
     // set correct version to avoid question about outdated config
-    [[NSUserDefaults standardUserDefaults] setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [standardUserDefaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
+    [standardUserDefaults synchronize];
 }
 
 - (void)migrateOldPreferences

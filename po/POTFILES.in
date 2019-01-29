@@ -465,6 +465,8 @@ modules/gui/macosx/VLCBookmarksWindowController.h
 modules/gui/macosx/VLCBookmarksWindowController.m
 modules/gui/macosx/VLCBottomBarView.h
 modules/gui/macosx/VLCBottomBarView.m
+modules/gui/macosx/VLCClickerManager.h
+modules/gui/macosx/VLCClickerManager.m
 modules/gui/macosx/VLCControlsBarCommon.h
 modules/gui/macosx/VLCControlsBarCommon.m
 modules/gui/macosx/VLCConvertAndSaveWindowController.h
@@ -477,6 +479,8 @@ modules/gui/macosx/VLCDefaultValueSlider.h
 modules/gui/macosx/VLCDefaultValueSlider.m
 modules/gui/macosx/VLCDefaultValueSliderCell.h
 modules/gui/macosx/VLCDefaultValueSliderCell.m
+modules/gui/macosx/VLCDetachedVideoWindow.h
+modules/gui/macosx/VLCDetachedVideoWindow.m
 modules/gui/macosx/VLCDocumentController.h
 modules/gui/macosx/VLCDocumentController.m
 modules/gui/macosx/VLCErrorWindowController.h
@@ -551,6 +555,10 @@ modules/gui/macosx/VLCUIWidgets.h
 modules/gui/macosx/VLCUIWidgets.m
 modules/gui/macosx/VLCVideoEffectsWindowController.h
 modules/gui/macosx/VLCVideoEffectsWindowController.m
+modules/gui/macosx/VLCVideoFilterHelper.h
+modules/gui/macosx/VLCVideoFilterHelper.m
+modules/gui/macosx/VLCVideoOutputProvider.h
+modules/gui/macosx/VLCVideoOutputProvider.m
 modules/gui/macosx/VLCVideoWindowCommon.h
 modules/gui/macosx/VLCVideoWindowCommon.m
 modules/gui/macosx/VLCVolumeSlider.h
@@ -559,8 +567,6 @@ modules/gui/macosx/VLCVolumeSliderCell.h
 modules/gui/macosx/VLCVolumeSliderCell.m
 modules/gui/macosx/VLCVoutView.h
 modules/gui/macosx/VLCVoutView.m
-modules/gui/macosx/VLCVideoOutputProvider.h
-modules/gui/macosx/VLCVideoOutputProvider.m
 modules/gui/macosx/VLCWindow.h
 modules/gui/macosx/VLCWindow.m
 modules/gui/macosx/VLCWrappableTextField.h

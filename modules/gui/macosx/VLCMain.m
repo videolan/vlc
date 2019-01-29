@@ -169,7 +169,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCOpenWindowController *_open;
     VLCCoreDialogProvider *_coredialogs;
     VLCBookmarksWindowController *_bookmarks;
-    VLCCoreInteraction *_coreinteraction;
     VLCResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
     VLCPlaylist *_playlist;
@@ -274,8 +273,6 @@ static VLCMain *sharedInstance = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-    _coreinteraction = [VLCCoreInteraction sharedInstance];
-
 #ifdef HAVE_SPARKLE
     [[SUUpdater sharedUpdater] setDelegate:self];
 #endif
@@ -288,7 +285,7 @@ static VLCMain *sharedInstance = nil;
     if (!p_intf)
         return;
 
-    [_coreinteraction updateCurrentlyUsedHotkeys];
+    [[VLCCoreInteraction sharedInstance] updateCurrentlyUsedHotkeys];
 
     [self migrateOldPreferences];
 
@@ -363,7 +360,7 @@ static VLCMain *sharedInstance = nil;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
     [NSApp activateIgnoringOtherApps:YES];
-    [_coreinteraction stop];
+    [[VLCCoreInteraction sharedInstance] stop];
 }
 
 /* don't be enthusiastic about an update if we currently play a video */
@@ -382,7 +379,7 @@ static VLCMain *sharedInstance = nil;
 /* Triggered when the computer goes to sleep */
 - (void)computerWillSleep: (NSNotification *)notification
 {
-    [_coreinteraction pause];
+    [[VLCCoreInteraction sharedInstance] pause];
 }
 
 #pragma mark -
