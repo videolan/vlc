@@ -26,62 +26,22 @@ vim:syntax=lua
 ]] ?>
 <root>
 <?vlc
---[[
-function a(t,pre)
-  local pre = pre or ""
-  for k,v in pairs(t) do
-    vlc.msg.err(pre..tostring(k).." : "..tostring(v))
-    if type(v) == "table" then
-      a(v,pre.."  ")
-    end
-  end
-end
---]]
-
-function print_playlist(item)
-    if item.flags.disabled then return end
-    if(item.children) then
+function print_playlist()
+    local current = vlc.playlist.current()
+    local list = vlc.playlist.list()
+    for _, item in ipairs(list) do
         local name = vlc.strings.convert_xml_special_chars(item.name or "")
-        name = name or ""
-        if(name ~= "Undefined") then
-			print('<item id="plid_' ..tostring(item.id).. '" name="' ..tostring(name).. '" ro="' ..(item.flags.ro and "ro" or "rw").. '"><content><name>' ..name.. '</name></content>')
-			for _, child in ipairs(item.children) do
-				print_playlist(child)
-			end
-			print('</item>')
-		else
-			for _, child in ipairs(item.children) do
-				print_playlist(child)
-			end
-		end
-    else
-        local name, path = vlc.strings.convert_xml_special_chars(item.name or "", item.path or "")
-        name = name or ""
-        local current_item_id = vlc.playlist.current()
-        local current = ""
-        -- Is the item the one currently played
-        if(current_item_id ~= nil) then
-            if(current_item_id == item.id) then
-                current = 'current="current"'
-            end
+        local path = item.path or ""
+        print('<item id="plid_' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..tostring(name).. '" duration="' ..math.floor(item.duration).. '"')
+        if current == item.id then
+            print(' current="current"')
         end
-        print('<item id="plid_' ..tostring(item.id).. '" uri="' ..tostring(path).. '" name="' ..name.. '" ro="' ..(item.flags.ro and "ro" or "rw").. '" duration ="' ..math.floor(item.duration).. '" ' ..current.. ' ><content><name>' ..name.. '</name></content></item>')
+        print('>')
+        print('  <content><name>' ..name.. '</name></content>')
+        print('</item>')
     end
 end
 
-local p
-if _GET["search"] then
-  if _GET["search"] ~= "" then
-    _G.search_key = _GET["search"]
-  else
-    _G.search_key = nil
-  end
-  local key = vlc.strings.decode_uri(_GET["search"])
-  p = vlc.playlist.search(key)
-else
-  p = vlc.playlist.get()
-end
---a(p) --Uncomment to debug
-print_playlist(p)
+print_playlist()
 ?>
 </root>

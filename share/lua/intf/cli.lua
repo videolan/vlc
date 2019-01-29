@@ -211,48 +211,32 @@ function playlist_is_tree( client )
     end
 end
 
+function format_item(item, is_current)
+    local marker = ( item.id == current ) and "*" or " "
+    local str = "|"..marker..tostring(item.id).." - "..
+                    ( item.name or item.path )
+    if item.duration > 0 then
+        str = str.." ("..common.durationtostring(item.duration)..")"
+    end
+    return str
+end
+
 function playlist(name,client,arg)
     local current = vlc.playlist.current()
-    function playlist0(item,prefix)
-        local prefix = prefix or ""
-        if not item.flags.disabled then
-            local marker = ( item.id == current ) and "*" or " "
-            local str = "|"..prefix..marker..tostring(item.id).." - "..
-                            ( item.name or item.path )
-            if item.duration > 0 then
-                str = str.." ("..common.durationtostring(item.duration)..")"
-            end
-            if item.nb_played > 0 then
-                str = str.." [played "..tostring(item.nb_played).." time"
-                if item.nb_played > 1 then
-                    str = str .. "s"
-                end
-                str = str .. "]"
-            end
-            client:append(str)
-        end
-        if item.children then
-            for _, c in ipairs(item.children) do
-                playlist0(c,prefix.."  ")
-            end
-        end
-    end
-    local playlist
-    local tree = playlist_is_tree(client)
-    if tonumber(arg) then
-        playlist = vlc.playlist.get(tonumber(arg), tree)
-    elseif arg then
-        playlist = vlc.playlist.get(arg, tree)
-    else
-        playlist = vlc.playlist.get(nil, tree)
-    end
     client:append("+----[ Playlist - "..name.." ]")
-    if playlist.children then
-        for _, item in ipairs(playlist.children) do
-            playlist0(item)
+    if arg == nil then
+        -- print the whole playlist
+        local list = vlc.playlist.list()
+        for _, item in ipairs(list) do
+            client:append(format_item(item, item.id == current))
         end
     else
-        playlist0(playlist)
+        -- print the requested item (if it exists)
+        local id = tonumber(arg)
+        local item = vlc.playlist.get(id)
+        if item ~= nil then
+            client:append(format_item(item, false))
+        end
     end
     client:append("+----[ End of playlist ]")
 end
@@ -339,12 +323,19 @@ function help(name,client,arg)
 end
 
 function input_info(name,client,id)
-    local item = nil;
+    local pl_item;
 
-    if id then item = (vlc.playlist.get(id) or {})["item"]
-    else       item = vlc.input.item() end
+    if id then
+        pl_item = vlc.playlist.get(id)
+    else
+        pl_item = vlc.playlist.current_item()
+    end
 
-    if(item == nil) then return end
+    if pl_item == nil then
+        return
+    end
+
+    local item = pl_item.item
     local infos = item:info()
     infos["Meta data"] = item:metas()
 
@@ -367,7 +358,7 @@ function input_info(name,client,id)
 end
 
 function stats(name,client)
-    local item = vlc.input.item()
+    local item = vlc.player.item()
     if(item == nil) then return end
     local stats_tab = item:stats()
 
@@ -393,7 +384,7 @@ function stats(name,client)
 end
 
 function playlist_status(name,client)
-    local item = vlc.input.item()
+    local item = vlc.player.item()
     if(item ~= nil) then
         client:append( "( new input: " .. vlc.strings.decode_uri(item:uri()) .. " )" )
     end
@@ -402,11 +393,11 @@ function playlist_status(name,client)
 end
 
 function is_playing(name,client)
-    if vlc.input.is_playing() then client:append "1" else client:append "0" end
+    if vlc.player.is_playing() then client:append "1" else client:append "0" end
 end
 
 function get_title(name,client)
-    local item = vlc.input.item()
+    local item = vlc.player.item()
     if item then
         client:append(item:name())
     else
@@ -415,7 +406,7 @@ function get_title(name,client)
 end
 
 function get_length(name,client)
-    local item = vlc.input.item()
+    local item = vlc.player.item()
     if item then
         client:append(math.floor(item:duration()))
     else
@@ -429,48 +420,46 @@ function ret_print(foo,start,stop)
     return function(discard,client,...) client:append(start..tostring(foo(...))..stop) end
 end
 
-function get_time(var)
-    return function(name,client)
-        local input = vlc.object.input()
-	if input then
-	    client:append(math.floor(vlc.var.get( input, var ) / 1000000))
-	else
-	    client:append("")
-	end
-    end
-end
-
-function titlechap(name,client,value)
-    local input = vlc.object.input()
-    local var = string.gsub( name, "_.*$", "" )
-    if value then
-        vlc.var.set( input, var, value )
+function get_time(name,client)
+    if vlc.player.is_playing() then
+        client:append(math.floor(vlc.player.get_time() / 1000000))
     else
-        local item = vlc.var.get( input, var )
-        -- Todo: add item name conversion
-        client:append(item)
+        client:append("")
     end
 end
 
-function titlechap_offset(var,offset)
-    local input = vlc.object.input()
-    vlc.var.set( input, var, vlc.var.get( input, var ) + offset )
+function title(name,client,value)
+    if value then
+        vlc.player.title_goto(value)
+    else
+        local idx = vlc.player.get_title_index()
+        client:append(idx)
+    end
 end
 
 function title_next(name,client,value)
-    titlechap_offset('title', 1)
+    vlc.player.title_next()
 end
 
 function title_previous(name,client,value)
-    titlechap_offset('title', -1)
+    vlc.player.title_prev()
+end
+
+function chapter(name,client,value)
+    if value then
+        vlc.player.chapter_goto(value)
+    else
+        local idx = vlc.player.get_chapter_index()
+        client:append(idx)
+    end
 end
 
 function chapter_next(name,client,value)
-    titlechap_offset('chapter', 1)
+    vlc.player.chapter_next()
 end
 
 function chapter_previous(name,client,value)
-    titlechap_offset('chapter', -1)
+    vlc.player.chapter_prev()
 end
 
 function seek(name,client,value)
@@ -485,30 +474,35 @@ function volume(name,client,value)
     end
 end
 
-function rate(name,client,value)
-    local input = vlc.object.input()
-    if name == "rate" then
-        vlc.var.set(input, "rate", common.us_tonumber(value))
-    elseif name == "normal" then
-        vlc.var.set(input,"rate",1)
+function rate_normal(name, client)
+    vlc.player.set_rate(1)
+end
+
+function rate_faster(name, client)
+    vlc.player.increment_rate()
+end
+
+function rate_slower(name, client)
+    vlc.player.decrement_rate()
+end
+
+function rate(name, client, value)
+    if value then
+        local rate = common.us_tonumber(value)
+        vlc.player.set_rate(rate)
+    else
+        client:append(vlc.player.get_rate())
     end
 end
 
-function rate_var(name,client,value)
-    local playlist = vlc.object.playlist()
-    vlc.var.trigger_callback(playlist,"rate-"..name)
-end
-
 function frame(name,client)
-    vlc.var.trigger_callback(vlc.object.input(),"frame-next");
+    vlc.player.next_video_frame()
 end
 
 function listvalue(obj,var)
     return function(client,value)
         local o
-        if obj == "input" then
-            o = vlc.object.input()
-        elseif obj == "aout" then
+        if obj == "aout" then
             o = vlc.object.aout()
         elseif obj == "vout" then
             o = vlc.object.vout()
@@ -526,6 +520,48 @@ function listvalue(obj,var)
             end
             client:append("+----[ end of "..var.." ]")
         end
+    end
+end
+
+function vtrack(name, client, value)
+    if value then
+        vlc.player.toggle_video_track(value)
+    else
+        client:append("+----[ video tracks ]")
+        local tracks = vlc.player.get_video_tracks()
+        for _, track in ipairs(tracks) do
+            local mark = track.selected and "*" or " "
+            client:append("|"..mark..tostring(track.id).." - "..track.name)
+        end
+        client:append("+----[ end of video tracks ]")
+    end
+end
+
+function atrack(name, client, value)
+    if value then
+        vlc.player.toggle_audio_track(value)
+    else
+        client:append("+----[ audio tracks ]")
+        local tracks = vlc.player.get_audio_tracks()
+        for _, track in ipairs(tracks) do
+            local mark = track.selected and "*" or " "
+            client:append("|"..mark..tostring(track.id).." - "..track.name)
+        end
+        client:append("+----[ end of audio tracks ]")
+    end
+end
+
+function strack(name, client, value)
+    if value then
+        vlc.player.toggle_spu_track(value)
+    else
+        client:append("+----[ spu tracks ]")
+        local tracks = vlc.player.get_spu_tracks()
+        for _, track in ipairs(tracks) do
+            local mark = track.selected and "*" or " "
+            client:append("|"..mark..tostring(track.id).." - "..track.name)
+        end
+        client:append("+----[ end of spu tracks ]")
     end
 end
 
@@ -562,10 +598,10 @@ commands_ordered = {
     { "random"; { func = skip2(vlc.playlist.random); args = "[on|off]"; help = "toggle playlist random" } };
     { "clear"; { func = skip2(vlc.playlist.clear); help = "clear the playlist" } };
     { "status"; { func = playlist_status; help = "current playlist status" } };
-    { "title"; { func = titlechap; args = "[X]"; help = "set/get title in current item" } };
+    { "title"; { func = title; args = "[X]"; help = "set/get title in current item" } };
     { "title_n"; { func = title_next; help = "next title in current item" } };
     { "title_p"; { func = title_previous; help = "previous title in current item" } };
-    { "chapter"; { func = titlechap; args = "[X]"; help = "set/get chapter in current item" } };
+    { "chapter"; { func = chapter; args = "[X]"; help = "set/get chapter in current item" } };
     { "chapter_n"; { func = chapter_next; help = "next chapter in current item" } };
     { "chapter_p"; { func = chapter_previous; help = "previous chapter in current item" } };
     { "" };
@@ -573,15 +609,15 @@ commands_ordered = {
     { "pause"; { func = skip2(vlc.playlist.pause); help = "toggle pause" } };
     { "fastforward"; { func = setarg(common.hotkey,"key-jump+extrashort"); help = "set to maximum rate" } };
     { "rewind"; { func = setarg(common.hotkey,"key-jump-extrashort"); help = "set to minimum rate" } };
-    { "faster"; { func = rate_var; help = "faster playing of stream" } };
-    { "slower"; { func = rate_var; help = "slower playing of stream" } };
-    { "normal"; { func = rate; help = "normal playing of stream" } };
+    { "faster"; { func = rate_faster; help = "faster playing of stream" } };
+    { "slower"; { func = rate_slower; help = "slower playing of stream" } };
+    { "normal"; { func = rate_normal; help = "normal playing of stream" } };
     { "rate"; { func = rate; args = "[playback rate]"; help = "set playback rate to value" } };
     { "frame"; { func = frame; help = "play frame by frame" } };
     { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
     { "info"; { func = input_info; args= "[X]"; help = "information about the current stream (or specified id)" } };
     { "stats"; { func = stats; help = "show statistical information" } };
-    { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
+    { "get_time"; { func = get_time; help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
     { "get_title"; { func = get_title; help = "the title of the current stream" } };
     { "get_length"; { func = get_length; help = "the length of the current stream" } };
@@ -591,15 +627,15 @@ commands_ordered = {
     { "voldown"; { func = ret_print(vlc.volume.down,"( audio volume: "," )"); args = "[X]"; help = "lower audio volume X steps" } };
     -- { "adev"; { func = skip(listvalue("aout","audio-device")); args = "[X]"; help = "set/get audio device" } };
     { "achan"; { func = skip(listvalue("aout","stereo-mode")); args = "[X]"; help = "set/get stereo audio output mode" } };
-    { "atrack"; { func = skip(listvalue("input","audio-es")); args = "[X]"; help = "set/get audio track" } };
-    { "vtrack"; { func = skip(listvalue("input","video-es")); args = "[X]"; help = "set/get video track" } };
+    { "atrack"; { func = atrack; args = "[X]"; help = "set/get audio track" } };
+    { "vtrack"; { func = vtrack; args = "[X]"; help = "set/get video track" } };
     { "vratio"; { func = skip(listvalue("vout","aspect-ratio")); args = "[X]"; help = "set/get video aspect ratio" } };
     { "vcrop"; { func = skip(listvalue("vout","crop")); args = "[X]"; help = "set/get video crop"; aliases = { "crop" } } };
     { "vzoom"; { func = skip(listvalue("vout","zoom")); args = "[X]"; help = "set/get video zoom"; aliases = { "zoom" } } };
     { "vdeinterlace"; { func = skip(listvalue("vout","deinterlace")); args = "[X]"; help = "set/get video deinterlace" } };
     { "vdeinterlace_mode"; { func = skip(listvalue("vout","deinterlace-mode")); args = "[X]"; help = "set/get video deinterlace mode" } };
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
-    { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitle track" } };
+    { "strack"; { func = strack; args = "[X]"; help = "set/get subtitle track" } };
     { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
     { "" };
     { "vlm"; { func = load_vlm; help = "load the VLM" } };

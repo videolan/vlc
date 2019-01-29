@@ -518,7 +518,7 @@ $(function () {
             $(this).addClass('ui-state-highlight');
             current_playlist_id = $(this).attr('id').substr(5);
         });
-    }).delegate("#plid_0 li.jstree-leaf a", "click", function (event, data) {
+    }).delegate("li.jstree-leaf a", "click", function (event, data) {
         event.preventDefault();
         current_playlist_id = $(this).parent().attr('id').substr(5);
         sendCommand('command=pl_play&id=' + current_playlist_id);

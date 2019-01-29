@@ -38,7 +38,7 @@ local statusTable=httprequests.getstatus(false)
 print('<root>\n')
 httprequests.printTableAsXml(statusTable,0)
 
-local item = vlc.input.item()
+local item = vlc.player.item()
 
 --data in the information section is presented in a non-standard way to keep compatibility.
 

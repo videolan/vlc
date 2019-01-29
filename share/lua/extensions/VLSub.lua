@@ -347,7 +347,7 @@ function activate()
         return false
   end
 
-  if vlc.input.item() then
+  if vlc.player.item() then
     openSub.getFileInfo()
     openSub.getMovieInfo()
   end
@@ -1215,7 +1215,7 @@ openSub = {
     }
   },
   getInputItem = function()
-    return vlc.item or vlc.input.item()
+    return vlc.item or vlc.player.item()
   end,
   getFileInfo = function()
   -- Get video file path, name, extension from input uri
@@ -1607,9 +1607,9 @@ function dump_zip(url, dir, subfileName)
 end
 
 function add_sub(subPath)
-  if vlc.item or vlc.input.item() then
+  if vlc.item or vlc.player.item() then
     vlc.msg.dbg("[VLsub] Adding subtitle :" .. subPath)
-    return vlc.input.add_subtitle(subPath, true)
+    return vlc.player.add_subtitle(subPath, true)
   end
   return false
 end

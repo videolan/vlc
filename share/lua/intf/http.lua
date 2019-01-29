@@ -156,12 +156,13 @@ function callback_art(data, request, args)
                 num = num()
             end
         end
-        local item
-        if num == nil then
-            item = vlc.input.item()
+        local pl_item
+        if num then
+            pl_item = vlc.playlist.get(num)
         else
-            item = vlc.playlist.get(num).item
+            pl_item = vlc.playlist.current_item()
         end
+        local item = pl_item.item
         local metas = item:metas()
         local filename = vlc.strings.decode_uri(string.gsub(metas["artwork_url"],"file://",""))
         local windowsdrive = string.match(filename, "^/%a:/.+$")  --match windows drive letter

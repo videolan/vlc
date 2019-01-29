@@ -29,7 +29,7 @@ dumpmeta.lua: dump a file's meta data on stdout/stderr
 
 local item
 repeat
-    item = vlc.input.item()
+    item = vlc.player.item()
 until (item and item:is_preparsed())
 
 -- preparsing doesn't always provide all the information we want (like duration)

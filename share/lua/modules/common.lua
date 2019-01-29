@@ -145,24 +145,23 @@ end
 
 -- seek
 function seek(value)
-    local input = vlc.object.input()
-    if input ~= nil and value ~= nil then
+    if value ~= nil then
         if string.sub(value,-1) == "%" then
             local number = us_tonumber(string.sub(value,1,-2))
             if number ~= nil then
                 local posPercent = number/100
                 if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
-                    vlc.var.set(input,"position",vlc.var.get(input,"position") + posPercent)
+                    vlc.player.seek_by_pos_relative(posPercent);
                 else
-                    vlc.var.set(input,"position",posPercent)
+                    vlc.player.seek_by_pos_absolute(posPercent);
                 end
             end
         else
-            local posTime = parsetime(value)
+            local posTime = parsetime(value) * 1000000 -- secs to usecs
             if string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
-                vlc.var.set(input,"time",vlc.var.get(input,"time") + (posTime * 1000000))
+                vlc.player.seek_by_time_relative(posTime)
             else
-                vlc.var.set(input,"time",posTime * 1000000)
+                vlc.player.seek_by_time_absolute(posTime)
             end
         end
     end
