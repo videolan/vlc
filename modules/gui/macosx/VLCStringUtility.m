@@ -360,3 +360,36 @@ NSImage *imageFromRes(NSString *name)
 {
     return [NSImage imageNamed:name];
 }
+
+bool fixIntfSettings(void)
+{
+    NSMutableString * o_workString;
+    NSRange returnedRange;
+    NSRange fullRange;
+    BOOL b_needsRestart = NO;
+
+    #define fixpref(pref) \
+    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(pref)]; \
+    if ([o_workString length] > 0) \
+    { \
+        returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
+        if (returnedRange.location != NSNotFound) \
+            { \
+            if ([o_workString isEqualToString:@"macosx"]) \
+                [o_workString setString:@""]; \
+            fullRange = NSMakeRange(0, [o_workString length]); \
+            [o_workString replaceOccurrencesOfString:@":macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+            fullRange = NSMakeRange(0, [o_workString length]); \
+            [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
+            \
+            config_PutPsz(pref, [o_workString UTF8String]); \
+            b_needsRestart = YES; \
+        } \
+    }
+
+    fixpref("control");
+    fixpref("extraintf");
+#undef fixpref
+
+    return b_needsRestart;
+}

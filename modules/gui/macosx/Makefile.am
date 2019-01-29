@@ -38,6 +38,8 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCMainWindowControlsBar.m gui/macosx/VLCMainWindowControlsBar.h \
 	gui/macosx/VLCConvertAndSaveWindowController.h gui/macosx/VLCConvertAndSaveWindowController.m \
 	gui/macosx/VLCCoreInteraction.h gui/macosx/VLCCoreInteraction.m \
+	gui/macosx/VLCClickerManager.h gui/macosx/VLCClickerManager.m \
+	gui/macosx/VLCVideoFilterHelper.h gui/macosx/VLCVideoFilterHelper.m \
 	gui/macosx/VLCErrorWindowController.h gui/macosx/VLCErrorWindowController.m \
 	gui/macosx/VLCExtensionsDialogProvider.h gui/macosx/VLCExtensionsDialogProvider.m \
 	gui/macosx/VLCExtensionsManager.h gui/macosx/VLCExtensionsManager.m \

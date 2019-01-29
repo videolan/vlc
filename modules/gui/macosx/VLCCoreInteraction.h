@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.h: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2018 Felix Paul Kühne
+ * Copyright (C) 2011-2019 Felix Paul Kühne
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -45,8 +45,6 @@
 - (void)toggleRecord;
 - (void)next;
 - (void)previous;
-- (void)forward;        //LEGACY SUPPORT
-- (void)backward;       //LEGACY SUPPORT
 - (void)forwardExtraShort;
 - (void)backwardExtraShort;
 - (void)forwardShort;
@@ -69,8 +67,6 @@
 - (void)volumeDown;
 - (void)toggleMute;
 - (void)showPosition;
-- (void)startListeningWithAppleRemote;
-- (void)stopListeningWithAppleRemote;
 
 - (void)menuFocusActivate;
 - (void)moveMenuFocusLeft;
@@ -83,11 +79,6 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)toggleFullscreen;
-
-- (BOOL)fixIntfSettings;
-
-- (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on;
-- (void)setVideoFilterProperty: (const char *)psz_property forFilter: (const char *)psz_filter withValue: (vlc_value_t)value;
 
 - (BOOL)keyEvent:(NSEvent *)o_event;
 - (void)updateCurrentlyUsedHotkeys;

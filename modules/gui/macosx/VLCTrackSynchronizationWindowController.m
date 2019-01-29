@@ -25,7 +25,7 @@
 #import "VLCMain.h"
 #import <vlc_common.h>
 #import "VLCTrackSynchronizationWindowController.h"
-#import "VLCCoreInteraction.h"
+#import "VLCVideoFilterHelper.h"
 
 #define SUBSDELAY_CFG_MODE                     "subsdelay-mode"
 #define SUBSDELAY_CFG_FACTOR                   "subsdelay-factor"
@@ -205,7 +205,7 @@
                 var_SetFloat(p_vout, SUBSDELAY_CFG_FACTOR, f_factor);
                 vlc_object_release(p_vout);
             }
-        [[VLCCoreInteraction sharedInstance] setVideoFilter: "subsdelay" on: f_factor > 0];
+        [VLCVideoFilterHelper setVideoFilter: "subsdelay" on: f_factor > 0];
 
         vlc_object_release(p_input);
     }

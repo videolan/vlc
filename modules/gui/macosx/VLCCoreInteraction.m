@@ -1,7 +1,7 @@
 /*****************************************************************************
  * CoreInteraction.m: MacOS X interface module
  *****************************************************************************
- * Copyright (C) 2011-2018 Felix Paul Kühne
+ * Copyright (C) 2011-2019 Felix Paul Kühne
  *
  * Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -27,7 +27,6 @@
 #import <math.h>
 #import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
-#import <vlc_actions.h>
 #import <vlc_aout.h>
 #import <vlc_vout.h>
 #import <vlc_vout_osd.h>
@@ -35,13 +34,10 @@
 #import <vlc_strings.h>
 #import <vlc_url.h>
 #import <vlc_modules.h>
-#import <vlc_charset.h>
-#include <vlc_plugin.h>
-#import "SPMediaKeyTap.h"
-#import "AppleRemote.h"
+#import <vlc_plugin.h>
+#import <vlc_actions.h>
 #import "VLCInputManager.h"
-
-#import "NSSound+VLCAdditions.h"
+#import "VLCClickerManager.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
@@ -63,16 +59,9 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     float f_maxVolume;
 
-    /* media key support */
-    BOOL b_mediaKeySupport;
-    BOOL b_mediakeyJustJumped;
-    SPMediaKeyTap *_mediaKeyController;
-    BOOL b_mediaKeyTrapEnabled;
-
-    AppleRemote *_remote;
-    BOOL b_remote_button_hold; /* true as long as the user holds the left,right,plus or minus on the remote control */
-
     NSArray *_usedHotkeys;
+
+    VLCClickerManager *_clickerManager;
 }
 @end
 
@@ -98,45 +87,34 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (self) {
         intf_thread_t *p_intf = getIntf();
 
-        /* init media key support */
-        b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
-        if (b_mediaKeySupport) {
-            _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
-        }
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(coreChangedMediaKeySupportSetting:)
-                                                     name:VLCMediaKeySupportSettingChangedNotification
-                                                   object:nil];
+        NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+        [notificationCenter addObserver:self
+                          selector:@selector(applicationWillTerminate:)
+                              name:NSApplicationWillTerminateNotification
+                            object:nil];
 
-        /* init Apple Remote support */
-        _remote = [[AppleRemote alloc] init];
-        [_remote setClickCountEnabledButtons: kRemoteButtonPlay];
-        [_remote setDelegate: self];
+        _clickerManager = [[VLCClickerManager alloc] init];
 
         var_AddCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     }
     return self;
 }
 
-- (void)dealloc
+- (void)applicationWillTerminate:(NSNotification *)notification
 {
-    #warning BUG! This class is a singleton, so dealloc is never called!
-    // Dealloc is never called, which not only means the below code is never
-    // run, but it means that the SPMediaKeyTap object and the AppleRemote object
-    // is not deallocated properly either.
-
+    // Dealloc is never called because this is a singleton, so we should cleanup manually before termination
     intf_thread_t *p_intf = getIntf();
     var_DelCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    _clickerManager = nil;
+    _usedHotkeys = nil;
 }
-
 
 #pragma mark - Playback Controls
 
 - (void)play
 {
     playlist_t *p_playlist = pl_Get(getIntf());
-
     playlist_Play(p_playlist);
 }
 
@@ -148,20 +126,19 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (p_input) {
         playlist_TogglePause(p_playlist);
         vlc_object_release(p_input);
-
     } else {
         PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
-        if ([[[VLCMain sharedInstance] playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST))
-            [[[VLCMain sharedInstance] open] openFileGeneric];
+        VLCMain *mainInstance = [VLCMain sharedInstance];
+        if ([[mainInstance playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST))
+            [[mainInstance open] openFileGeneric];
         else
-            [[[VLCMain sharedInstance] playlist] playItem:nil];
+            [[mainInstance playlist] playItem:nil];
     }
 }
 
 - (void)pause
 {
     playlist_t *p_playlist = pl_Get(getIntf());
-
     playlist_Pause(p_playlist);
 }
 
@@ -223,9 +200,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     if (p_input) {
         f_rate = var_GetFloat(p_input, "rate");
         vlc_object_release(p_input);
-    }
-    else
-    {
+    } else {
         playlist_t * p_playlist = pl_Get(getIntf());
         f_rate = var_GetFloat(p_playlist, "rate");
     }
@@ -321,7 +296,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return nil;
     }
 
-    NSString *o_name = @"";
+    NSString *o_name;
     char *format = var_InheritString(getIntf(), "input-title-format");
     if (format) {
         char *formated = vlc_strfinput(p_input, NULL, format);
@@ -333,7 +308,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     NSURL * o_url = [NSURL URLWithString:toNSStr(psz_uri)];
     free(psz_uri);
 
-    if ([o_name isEqualToString:@""]) {
+    if (!o_name) {
         if ([o_url isFileURL])
             o_name = [[NSFileManager defaultManager] displayNameAtPath:[o_url path]];
         else
@@ -341,18 +316,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
     vlc_object_release(p_input);
     return o_name;
-}
-
-- (void)forward
-{
-    //LEGACY SUPPORT
-    [self forwardShort];
-}
-
-- (void)backward
-{
-    //LEGACY SUPPORT
-    [self backwardShort];
 }
 
 - (void)jumpWithValue:(char *)p_value forward:(BOOL)b_value
@@ -632,7 +595,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         return;
 
     NSUInteger count = [paths count];
-
     for (int i = 0; i < count ; i++) {
         char *mrl = vlc_path2uri([[[paths objectAtIndex:i] path] UTF8String], NULL);
         if (!mrl)
@@ -641,7 +603,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
         int i_result = input_AddSlave(p_input, SLAVE_TYPE_SPU, mrl, true, true, true);
         if (i_result != VLC_SUCCESS)
-            msg_Warn(getIntf(), "unable to load subtitles from '%s'", mrl);
+            msg_Err(getIntf(), "unable to load subtitles from '%s'", mrl);
         free(mrl);
     }
     vlc_object_release(p_input);
@@ -702,280 +664,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     }
 }
 
-#pragma mark - uncommon stuff
-
-- (BOOL)fixIntfSettings
-{
-    NSMutableString * o_workString;
-    NSRange returnedRange;
-    NSRange fullRange;
-    BOOL b_needsRestart = NO;
-
-    #define fixpref(pref) \
-    o_workString = [[NSMutableString alloc] initWithFormat:@"%s", config_GetPsz(pref)]; \
-    if ([o_workString length] > 0) \
-    { \
-        returnedRange = [o_workString rangeOfString:@"macosx" options: NSCaseInsensitiveSearch]; \
-        if (returnedRange.location != NSNotFound) \
-        { \
-            if ([o_workString isEqualToString:@"macosx"]) \
-                [o_workString setString:@""]; \
-            fullRange = NSMakeRange(0, [o_workString length]); \
-            [o_workString replaceOccurrencesOfString:@":macosx" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
-            fullRange = NSMakeRange(0, [o_workString length]); \
-            [o_workString replaceOccurrencesOfString:@"macosx:" withString:@"" options: NSCaseInsensitiveSearch range: fullRange]; \
-            \
-            config_PutPsz(pref, [o_workString UTF8String]); \
-            b_needsRestart = YES; \
-        } \
-    }
-
-    fixpref("control");
-    fixpref("extraintf");
-    #undef fixpref
-
-    return b_needsRestart;
-}
-
-#pragma mark - video filter handling
-
-- (const char *)getFilterType:(const char *)psz_name
-{
-    module_t *p_obj = module_find(psz_name);
-    if (!p_obj) {
-        return NULL;
-    }
-
-    if (module_provides(p_obj, "video splitter")) {
-        return "video-splitter";
-    } else if (module_provides(p_obj, "video filter")) {
-        return "video-filter";
-    } else if (module_provides(p_obj, "sub source")) {
-        return "sub-source";
-    } else if (module_provides(p_obj, "sub filter")) {
-        return "sub-filter";
-    } else {
-        msg_Err(getIntf(), "Unknown video filter type.");
-        return NULL;
-    }
-}
-
-- (void)setVideoFilter: (const char *)psz_name on:(BOOL)b_on
-{
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-    playlist_t *p_playlist = pl_Get(p_intf);
-    char *psz_string, *psz_parser;
-
-    const char *psz_filter_type = [self getFilterType:psz_name];
-    if (!psz_filter_type) {
-        msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_name);
-        return;
-    }
-
-    msg_Dbg(p_intf, "will turn filter '%s' %s", psz_name, b_on ? "on" : "off");
-
-    psz_string = var_InheritString(p_playlist, psz_filter_type);
-
-    if (b_on) {
-        if (psz_string == NULL) {
-            psz_string = strdup(psz_name);
-        } else if (strstr(psz_string, psz_name) == NULL) {
-            char *psz_tmp = strdup([[NSString stringWithFormat: @"%s:%s", psz_string, psz_name] UTF8String]);
-            free(psz_string);
-            psz_string = psz_tmp;
-        }
-    } else {
-        if (!psz_string)
-            return;
-
-        psz_parser = strstr(psz_string, psz_name);
-        if (psz_parser) {
-            if (*(psz_parser + strlen(psz_name)) == ':') {
-                memmove(psz_parser, psz_parser + strlen(psz_name) + 1,
-                        strlen(psz_parser + strlen(psz_name) + 1) + 1);
-            } else {
-                *psz_parser = '\0';
-            }
-
-            /* Remove trailing : : */
-            if (strlen(psz_string) > 0 && *(psz_string + strlen(psz_string) -1) == ':')
-                *(psz_string + strlen(psz_string) -1) = '\0';
-        } else {
-            free(psz_string);
-            return;
-        }
-    }
-    var_SetString(p_playlist, psz_filter_type, psz_string);
-
-    /* Try to set non splitter filters on the fly */
-    if (strcmp(psz_filter_type, "video-splitter")) {
-        NSArray<NSValue *> *vouts = getVouts();
-        if (vouts)
-            for (NSValue * val in vouts) {
-                vout_thread_t *p_vout = [val pointerValue];
-                var_SetString(p_vout, psz_filter_type, psz_string);
-                vlc_object_release(p_vout);
-            }
-    }
-
-    free(psz_string);
-}
-
-- (void)setVideoFilterProperty: (char const *)psz_property
-                     forFilter: (char const *)psz_filter
-                     withValue: (vlc_value_t)value
-{
-    NSArray<NSValue *> *vouts = getVouts();
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    int i_type = 0;
-    bool b_is_command = false;
-    char const *psz_filter_type = [self getFilterType: psz_filter];
-    if (!psz_filter_type) {
-        msg_Err(p_intf, "Unable to find filter module \"%s\".", psz_filter);
-        return;
-    }
-
-    if (vouts && [vouts count])
-    {
-        i_type = var_Type((vout_thread_t *)[[vouts firstObject] pointerValue], psz_property);
-        b_is_command = i_type & VLC_VAR_ISCOMMAND;
-    }
-    if (!i_type)
-        i_type = config_GetType(psz_property);
-
-    i_type &= VLC_VAR_CLASS;
-    if (i_type == VLC_VAR_BOOL)
-        var_SetBool(p_playlist, psz_property, value.b_bool);
-    else if (i_type == VLC_VAR_INTEGER)
-        var_SetInteger(p_playlist, psz_property, value.i_int);
-    else if (i_type == VLC_VAR_FLOAT)
-        var_SetFloat(p_playlist, psz_property, value.f_float);
-    else if (i_type == VLC_VAR_STRING)
-        var_SetString(p_playlist, psz_property, EnsureUTF8(value.psz_string));
-    else
-    {
-        msg_Err(p_intf,
-                "Module %s's %s variable is of an unsupported type ( %d )",
-                psz_filter, psz_property, i_type);
-        b_is_command = false;
-    }
-
-    if (b_is_command)
-        if (vouts)
-            for (NSValue *ptr in vouts)
-            {
-                vout_thread_t *p_vout = [ptr pointerValue];
-                var_SetChecked(p_vout, psz_property, i_type, value);
-#ifndef NDEBUG
-                int i_cur_type = var_Type(p_vout, psz_property);
-                assert((i_cur_type & VLC_VAR_CLASS) == i_type);
-                assert(i_cur_type & VLC_VAR_ISCOMMAND);
-#endif
-            }
-
-    if (vouts)
-        for (NSValue *ptr in vouts)
-            vlc_object_release((vout_thread_t *)[ptr pointerValue]);
-}
-
-#pragma mark -
-#pragma mark Media Key support
-
-- (void)resetMediaKeyJump
-{
-    b_mediakeyJustJumped = NO;
-}
-
-- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
-{
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    b_mediaKeySupport = var_InheritBool(p_intf, "macosx-mediakeys");
-    if (b_mediaKeySupport && !_mediaKeyController)
-        _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
-
-    VLCMain *main = [VLCMain sharedInstance];
-    if (b_mediaKeySupport && ([[[main playlist] model] hasChildren] ||
-                              [[main inputManager] hasInput])) {
-        if (!b_mediaKeyTrapEnabled) {
-            msg_Dbg(p_intf, "Enabling media key support");
-            if ([_mediaKeyController startWatchingMediaKeys]) {
-                b_mediaKeyTrapEnabled = YES;
-            } else {
-                msg_Warn(p_intf, "Failed to enable media key support, likely "
-                    "app needs to be whitelisted in Security Settings.");
-            }
-        }
-    } else {
-        if (b_mediaKeyTrapEnabled) {
-            b_mediaKeyTrapEnabled = NO;
-            msg_Dbg(p_intf, "Disabling media key support");
-            [_mediaKeyController stopWatchingMediaKeys];
-        }
-    }
-}
-
--(void)mediaKeyTap:(SPMediaKeyTap*)keyTap receivedMediaKeyEvent:(NSEvent*)event
-{
-    if (b_mediaKeySupport) {
-        assert([event type] == NSSystemDefined && [event subtype] == SPSystemDefinedEventMediaKeys);
-
-        int keyCode = (([event data1] & 0xFFFF0000) >> 16);
-        int keyFlags = ([event data1] & 0x0000FFFF);
-        int keyState = (((keyFlags & 0xFF00) >> 8)) == 0xA;
-        int keyRepeat = (keyFlags & 0x1);
-
-        if (keyCode == NX_KEYTYPE_PLAY && keyState == 0)
-            [self playOrPause];
-
-        if ((keyCode == NX_KEYTYPE_FAST || keyCode == NX_KEYTYPE_NEXT) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [self next];
-            else if (keyRepeat == 1) {
-                [self forwardShort];
-                b_mediakeyJustJumped = YES;
-                [self performSelector:@selector(resetMediaKeyJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
-        }
-
-        if ((keyCode == NX_KEYTYPE_REWIND || keyCode == NX_KEYTYPE_PREVIOUS) && !b_mediakeyJustJumped) {
-            if (keyState == 0 && keyRepeat == 0)
-                [self previous];
-            else if (keyRepeat == 1) {
-                [self backwardShort];
-                b_mediakeyJustJumped = YES;
-                [self performSelector:@selector(resetMediaKeyJump)
-                           withObject: NULL
-                           afterDelay:0.25];
-            }
-        }
-    }
-}
-
-#pragma mark -
-#pragma mark Apple Remote Control
-
-- (void)startListeningWithAppleRemote
-{
-    [_remote startListening: self];
-}
-
-- (void)stopListeningWithAppleRemote
-{
-    [_remote stopListening:self];
-}
-
 #pragma mark - menu navigation
 - (void)menuFocusActivate
 {
@@ -1025,115 +713,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
     input_Control(p_input_thread, INPUT_NAV_DOWN, NULL );
     vlc_object_release(p_input_thread);
-}
-
-/* Helper method for the remote control interface in order to trigger forward/backward and volume
- increase/decrease as long as the user holds the left/right, plus/minus button */
-- (void) executeHoldActionForRemoteButton: (NSNumber*) buttonIdentifierNumber
-{
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    if (b_remote_button_hold) {
-        switch([buttonIdentifierNumber intValue]) {
-            case kRemoteButtonRight_Hold:
-                [self forward];
-                break;
-            case kRemoteButtonLeft_Hold:
-                [self backward];
-                break;
-            case kRemoteButtonVolume_Plus_Hold:
-                if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
-                break;
-            case kRemoteButtonVolume_Minus_Hold:
-                if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
-                break;
-        }
-        if (b_remote_button_hold) {
-            /* trigger event */
-            [self performSelector:@selector(executeHoldActionForRemoteButton:)
-                       withObject:buttonIdentifierNumber
-                       afterDelay:0.25];
-        }
-    }
-}
-
-/* Apple Remote callback */
-- (void) appleRemoteButton: (AppleRemoteEventIdentifier)buttonIdentifier
-               pressedDown: (BOOL) pressedDown
-                clickCount: (unsigned int) count
-{
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    switch(buttonIdentifier) {
-        case k2009RemoteButtonFullscreen:
-            [self toggleFullscreen];
-            break;
-        case k2009RemoteButtonPlay:
-            [self playOrPause];
-            break;
-        case kRemoteButtonPlay:
-            if (count >= 2)
-                [self toggleFullscreen];
-            else
-                [self playOrPause];
-            break;
-        case kRemoteButtonVolume_Plus:
-            if (config_GetInt("macosx-appleremote-sysvol"))
-                [NSSound increaseSystemVolume];
-            else
-                if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_UP);
-            break;
-        case kRemoteButtonVolume_Minus:
-            if (config_GetInt("macosx-appleremote-sysvol"))
-                [NSSound decreaseSystemVolume];
-            else
-                if (p_intf)
-                    var_SetInteger(p_intf->obj.libvlc, "key-action", ACTIONID_VOL_DOWN);
-            break;
-        case kRemoteButtonRight:
-            if (config_GetInt("macosx-appleremote-prevnext"))
-                [self forward];
-            else
-                [self next];
-            break;
-        case kRemoteButtonLeft:
-            if (config_GetInt("macosx-appleremote-prevnext"))
-                [self backward];
-            else
-                [self previous];
-            break;
-        case kRemoteButtonRight_Hold:
-        case kRemoteButtonLeft_Hold:
-        case kRemoteButtonVolume_Plus_Hold:
-        case kRemoteButtonVolume_Minus_Hold:
-            /* simulate an event as long as the user holds the button */
-            b_remote_button_hold = pressedDown;
-            if (pressedDown) {
-                NSNumber* buttonIdentifierNumber = [NSNumber numberWithInt:buttonIdentifier];
-                [self performSelector:@selector(executeHoldActionForRemoteButton:)
-                           withObject:buttonIdentifierNumber];
-            }
-            break;
-        case kRemoteButtonMenu:
-            [self showPosition];
-            break;
-        case kRemoteButtonPlay_Sleep:
-        {
-            NSAppleScript * script = [[NSAppleScript alloc] initWithSource:@"tell application \"System Events\" to sleep"];
-            [script executeAndReturnError:nil];
-            break;
-        }
-        default:
-            /* Add here whatever you want other buttons to do */
-            break;
-    }
 }
 
 #pragma mark -
@@ -1226,7 +805,8 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         val.i_int |= CocoaKeyToVLC(key);
 
         BOOL b_found_key = NO;
-        for (NSUInteger i = 0; i < [_usedHotkeys count]; i++) {
+        NSUInteger numberOfUsedHotkeys = [_usedHotkeys count];
+        for (NSUInteger i = 0; i < numberOfUsedHotkeys; i++) {
             NSString *str = [_usedHotkeys objectAtIndex:i];
             unsigned int i_keyModifiers = [[VLCStringUtility sharedInstance] VLCModifiersToCocoa: str];
 

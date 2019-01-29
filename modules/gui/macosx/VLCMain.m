@@ -363,7 +363,6 @@ static VLCMain *sharedInstance = nil;
 - (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
 {
     [NSApp activateIgnoringOtherApps:YES];
-    [_coreinteraction stopListeningWithAppleRemote];
     [_coreinteraction stop];
 }
 
@@ -379,22 +378,6 @@ static VLCMain *sharedInstance = nil;
 
 #pragma mark -
 #pragma mark Other notification
-
-/* Listen to the remote in exclusive mode, only when VLC is the active
-   application */
-- (void)applicationDidBecomeActive:(NSNotification *)aNotification
-{
-    if (!p_intf)
-        return;
-    if (var_InheritBool(p_intf, "macosx-appleremote") == YES)
-        [_coreinteraction startListeningWithAppleRemote];
-}
-- (void)applicationDidResignActive:(NSNotification *)aNotification
-{
-    if (!p_intf)
-        return;
-    [_coreinteraction stopListeningWithAppleRemote];
-}
 
 /* Triggered when the computer goes to sleep */
 - (void)computerWillSleep: (NSNotification *)notification

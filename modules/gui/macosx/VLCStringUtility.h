@@ -53,6 +53,11 @@ unsigned int CocoaKeyToVLC(unichar i_key);
  */
 NSImage *imageFromRes(NSString *name);
 
+/**
+ * Fix certain settings strings before saving
+ */
+bool fixIntfSettings(void);
+
 @interface VLCStringUtility : NSObject
 
 + (VLCStringUtility *)sharedInstance;

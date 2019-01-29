@@ -52,6 +52,7 @@ intf_thread_t *getIntf(void);
 static NSString * VLCInputChangedNotification = @"VLCInputChangedNotification";
 static NSString * VLCConfigurationChangedNotification = @"VLCConfigurationChangedNotification";
 static NSString * VLCMediaKeySupportSettingChangedNotification = @"VLCMediaKeySupportSettingChangedNotification";
+static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSettingChangedNotification";
 
 /*****************************************************************************
  * VLCMain interface

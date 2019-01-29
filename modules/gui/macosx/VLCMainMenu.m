@@ -50,6 +50,7 @@
 #import "VLCTimeSelectionPanelController.h"
 #import "NSScreen+VLCAdditions.h"
 #import "VLCRendererMenuController.h"
+#import "VLCVideoFilterHelper.h"
 
 #ifdef HAVE_SPARKLE
 #import <Sparkle/Sparkle.h>
@@ -761,12 +762,12 @@
 
 - (IBAction)forward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] forward];
+    [[VLCCoreInteraction sharedInstance] forwardShort];
 }
 
 - (IBAction)backward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] backward];
+    [[VLCCoreInteraction sharedInstance] backwardShort];
 }
 
 - (IBAction)volumeUp:(id)sender
@@ -984,12 +985,12 @@
 
 - (void)_disablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:false];
+    [VLCVideoFilterHelper setVideoFilter:"postproc" on:false];
 }
 
 - (void)_enablePostProcessing
 {
-    [[VLCCoreInteraction sharedInstance] setVideoFilter:"postproc" on:true];
+    [VLCVideoFilterHelper setVideoFilter:"postproc" on:true];
 }
 
 - (void)togglePostProcessing:(id)sender
@@ -1005,7 +1006,7 @@
         [self _enablePostProcessing];
         [sender setState:NSOnState];
 
-        [[VLCCoreInteraction sharedInstance] setVideoFilterProperty:"postproc-q" forFilter:"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
+        [VLCVideoFilterHelper setVideoFilterProperty:"postproc-q" forFilter:"postproc" withValue:(vlc_value_t){ .i_int = [sender tag] }];
     }
 }
 

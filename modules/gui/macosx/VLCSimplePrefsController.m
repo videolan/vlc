@@ -35,7 +35,6 @@
 #import "misc.h"
 #import "VLCMain.h"
 #import "VLCMain+OldPrefs.h"
-#import "AppleRemote.h"
 #import "VLCCoreInteraction.h"
 #import "NSScreen+VLCAdditions.h"
 
@@ -911,12 +910,6 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
 
         SaveIntList(_intf_pauseitunesPopup, "macosx-control-itunes");
         SaveIntList(_intf_continueplaybackPopup, "macosx-continue-playback");
-
-        /* activate stuff without restart */
-        if ([_intf_appleremoteCheckbox state] == YES)
-            [[VLCCoreInteraction sharedInstance] startListeningWithAppleRemote];
-        else
-            [[VLCCoreInteraction sharedInstance] stopListeningWithAppleRemote];
         _intfSettingChanged = NO;
     }
 
@@ -1036,13 +1029,15 @@ static inline void save_string_list(intf_thread_t * p_intf, id object, const cha
         _hotkeyChanged = NO;
     }
 
-    [[VLCCoreInteraction sharedInstance] fixIntfSettings];
+    fixIntfSettings();
 
     /* okay, let's save our changes to vlcrc */
     config_SaveConfigFile(p_intf);
 
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCMediaKeySupportSettingChangedNotification object:nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName:VLCConfigurationChangedNotification object:nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter postNotificationName:VLCMediaKeySupportSettingChangedNotification object:nil];
+    [notificationCenter postNotificationName:VLCConfigurationChangedNotification object:nil];
+    [notificationCenter postNotificationName:VLCAppleRemoteSettingChangedNotification object:nil];
 }
 
 - (void)showSettingsForCategory:(NSView *)categoryView

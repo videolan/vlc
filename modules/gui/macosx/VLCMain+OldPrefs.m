@@ -25,6 +25,7 @@
 #import "VLCMain+OldPrefs.h"
 #import "VLCCoreInteraction.h"
 #import "VLCSimplePrefsController.h"
+#import "VLCStringUtility.h"
 
 #include <unistd.h> /* execl() */
 
@@ -73,7 +74,7 @@ static const int kCurrentPreferencesVersion = 4;
         [defaults setInteger:kCurrentPreferencesVersion forKey:kVLCPreferencesVersion];
         [defaults synchronize];
 
-        if (![[VLCCoreInteraction sharedInstance] fixIntfSettings])
+        if (!fixIntfSettings())
             return;
         else
             config_SaveConfigFile(getIntf()); // we need to do manually, since we won't quit libvlc cleanly
