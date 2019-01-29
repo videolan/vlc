@@ -33,7 +33,6 @@
 #import "misc.h"
 #import "VLCFSPanelController.h"
 
-@class VLCDetachedVideoWindow;
 @class VLCMainWindowControlsBar;
 @class VLCVoutView;
 @class PXSourceList;
@@ -122,9 +121,5 @@ typedef enum {
 
 - (void)videoplayWillBeStarted;
 - (void)setVideoplayEnabled;
-
-@end
-
-@interface VLCDetachedVideoWindow : VLCVideoWindowCommon
 
 @end

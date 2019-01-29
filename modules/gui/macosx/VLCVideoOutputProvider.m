@@ -27,6 +27,7 @@
 #import "VLCVideoOutputProvider.h"
 #import "VLCMain.h"
 #import "VLCMainWindow.h"
+#import "VLCDetachedVideoWindow.h"
 #import "VLCVoutView.h"
 
 #import "VLCVideoEffectsWindowController.h"

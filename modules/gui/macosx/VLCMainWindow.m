@@ -49,7 +49,7 @@
 #import "VLCMainWindowControlsBar.h"
 #import "VLCVoutView.h"
 #import "VLCVideoOutputProvider.h"
-
+#import "VLCDetachedVideoWindow.h"
 
 @interface VLCMainWindow() <PXSourceListDataSource, PXSourceListDelegate, NSOutlineViewDataSource, NSOutlineViewDelegate, NSWindowDelegate, NSAnimationDelegate, NSSplitViewDelegate>
 {
@@ -1183,22 +1183,6 @@ static const float f_min_window_height = 307.;
 
         b_podcastView_displayed = NO;
     }
-}
-
-@end
-
-@interface VLCDetachedVideoWindow ()
-@end
-
-@implementation VLCDetachedVideoWindow
-
-- (void)awakeFromNib
-{
-    // sets lion fullscreen behaviour
-    [super awakeFromNib];
-    [self setAcceptsMouseMovedEvents: YES];
-
-    [self setContentMinSize: NSMakeSize(363., f_min_video_height + [[self controlsBar] height])];
 }
 
 @end

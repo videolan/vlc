@@ -91,6 +91,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCInputManager.h gui/macosx/VLCInputManager.m \
 	gui/macosx/VLCRemoteControlService.h gui/macosx/VLCRemoteControlService.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
+	gui/macosx/VLCDetachedVideoWindow.h gui/macosx/VLCDetachedVideoWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
 	gui/macosx/VLCRendererItem.h gui/macosx/VLCRendererItem.m \
 	gui/macosx/VLCRendererMenuController.h gui/macosx/VLCRendererMenuController.m \
