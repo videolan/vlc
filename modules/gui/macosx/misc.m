@@ -24,6 +24,8 @@
 #import "CompatibilityFixes.h"
 #import "misc.h"
 #import "VLCMainWindow.h"
+#import "VLCMain.h"
+#import "VLCPlaylist.h"
 #import "VLCMainMenu.h"
 #import "VLCControlsBarCommon.h"
 #import "VLCCoreInteraction.h"
@@ -122,7 +124,7 @@
     if (_dropHandler && [_dropHandler respondsToSelector:@selector(performDragOperation:)])
         b_returned = [_dropHandler performDragOperation:sender];
     else // default
-        b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation:sender];
+        b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;

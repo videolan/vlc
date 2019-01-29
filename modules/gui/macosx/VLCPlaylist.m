@@ -497,6 +497,17 @@
 #pragma mark -
 #pragma mark Item helpers
 
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+    NSArray *items = [self createItemsFromExternalPasteboard:[sender draggingPasteboard]];
+
+    if (items.count == 0)
+        return NO;
+
+    [self addPlaylistItems:items tryAsSubtitle:YES];
+    return YES;
+}
+
 - (input_item_t *)createItem:(NSDictionary *)itemToCreateDict
 {
     intf_thread_t *p_intf = getIntf();

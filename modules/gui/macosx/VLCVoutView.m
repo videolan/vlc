@@ -32,8 +32,9 @@
 
 #import "CompatibilityFixes.h"
 #import "VLCMain.h"
-#import "VLCVoutView.h"
 #import "VLCCoreInteraction.h"
+#import "VLCVoutView.h"
+#import "VLCPlaylist.h"
 #import "VLCMainMenu.h"
 
 #import <QuartzCore/QuartzCore.h>
@@ -130,7 +131,7 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    BOOL b_returned = [[VLCCoreInteraction sharedInstance] performDragOperation:sender];
+    BOOL b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;

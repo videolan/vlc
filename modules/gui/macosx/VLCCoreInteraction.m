@@ -24,19 +24,11 @@
 #import "VLCMain.h"
 #import "VLCOpenWindowController.h"
 #import "VLCPlaylist.h"
-#import <math.h>
-#import <vlc_playlist_legacy.h>
-#import <vlc_input.h>
-#import <vlc_aout.h>
-#import <vlc_vout.h>
-#import <vlc_vout_osd.h>
-#import <vlc/vlc.h>
 #import <vlc_strings.h>
 #import <vlc_url.h>
 #import <vlc_modules.h>
 #import <vlc_plugin.h>
 #import <vlc_actions.h>
-#import "VLCInputManager.h"
 #import "VLCClickerManager.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
@@ -620,19 +612,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         }
         vlc_object_release(p_input);
     }
-}
-
-#pragma mark - Drop support for files into the video, controls bar or drop box
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
-{
-    NSArray *items = [[[VLCMain sharedInstance] playlist] createItemsFromExternalPasteboard:[sender draggingPasteboard]];
-
-    if (items.count == 0)
-        return NO;
-
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items tryAsSubtitle:YES];
-    return YES;
 }
 
 #pragma mark - video output stuff

@@ -63,6 +63,8 @@
 
 - (NSArray *)draggedItems;
 
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+
 /**
  * Prepares an array of playlist items for all suitable pasteboard types.
  *
