@@ -1,7 +1,7 @@
 /*****************************************************************************
  * VLCOpenWindowController.m: Open dialogues for VLC's MacOS X port
  *****************************************************************************
- * Copyright (C) 2002-2015 VLC authors and VideoLAN
+ * Copyright (C) 2002-2019 VLC authors and VideoLAN
  *
  * Authors: Jon Lech Johansen <jon-vl@nanocrew.net>
  *          Christophe Massiot <massiot@via.ecp.fr>
@@ -107,14 +107,14 @@ static NSString *kCaptureTabViewId  = @"capture";
 - (id)init
 {
     self = [super initWithWindowNibName:@"Open"];
-
     return self;
 }
 
 
 - (void)dealloc
 {
-    for (int i = 0; i < [_displayInfos count]; i ++) {
+    NSUInteger displayInfoCount = [_displayInfos count];
+    for (int i = 0; i < displayInfoCount; i ++) {
         NSValue *v = [_displayInfos objectAtIndex:i];
         free([v pointerValue]);
     }
@@ -274,41 +274,42 @@ static NSString *kCaptureTabViewId  = @"capture";
 
     [self setSubPanel];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(openNetInfoChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: _netUDPPortTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(openNetInfoChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: _netUDPMAddressTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(openNetInfoChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: _netUDPMPortTextField];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(openNetInfoChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: _netHTTPURLTextField];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPPortTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPMAddressTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netUDPMPortTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(openNetInfoChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _netHTTPURLTextField];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(screenFPSfieldChanged:)
-                                                 name: NSControlTextDidChangeNotification
-                                               object: _screenFPSTextField];
+    [notificationCenter addObserver: self
+                           selector: @selector(screenFPSfieldChanged:)
+                               name: NSControlTextDidChangeNotification
+                             object: _screenFPSTextField];
 
     /* register clicks on text fields */
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(textFieldWasClicked:)
-                                                 name: VLCOpenTextFieldWasClicked
-                                               object: nil];
+    [notificationCenter addObserver: self
+                           selector: @selector(textFieldWasClicked:)
+                               name: VLCOpenTextFieldWasClicked
+                             object: nil];
 
     /* we want to be notified about removed or added media */
     _allMediaDevices = [[NSMutableArray alloc] init];
     _specialMediaFolders = [[NSMutableArray alloc] init];
     _displayInfos = [[NSMutableArray alloc] init];
-    NSWorkspace *sharedWorkspace = [NSWorkspace sharedWorkspace];
-    [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
-    [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
+    NSNotificationCenter *sharedNotificationCenter = [[NSWorkspace sharedWorkspace] notificationCenter];
+    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidMountNotification object:nil];
+    [sharedNotificationCenter addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
 
     [self qtkToggleUIElements:nil];
     [self updateMediaSelector:nil];
@@ -423,11 +424,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     if (i_result <= 0)
         return;
 
-
-    NSMutableDictionary *itemOptionsDictionary;
     NSMutableArray *options = [NSMutableArray array];
+    NSMutableDictionary *itemOptionsDictionary = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
 
-    itemOptionsDictionary = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
     if ([_fileSubCheckbox state] == NSOnState) {
         module_config_t * p_item;
 
@@ -716,9 +715,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     NSView *opticalTabView = [[_tabView tabViewItemAtIndex: [_tabView indexOfTabViewItemWithIdentifier:kDiscTabViewId]] view];
     if (_currentOpticalMediaView) {
         [[opticalTabView animator] replaceSubview: _currentOpticalMediaView with: theView];
-    }
-    else
+    } else {
         [[opticalTabView animator] addSubview: theView];
+    }
     _currentOpticalMediaView = theView;
 
     NSImageView *imageView = [[NSImageView alloc] init];
@@ -727,9 +726,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     [imageView setImage: icon];
     if (_currentOpticalMediaIconView) {
         [[opticalTabView animator] replaceSubview: _currentOpticalMediaIconView with: imageView];
-    }
-    else
+    } else {
         [[opticalTabView animator] addSubview: imageView];
+    }
     _currentOpticalMediaIconView = imageView;
     [_currentOpticalMediaView setNeedsDisplay: YES];
     [_currentOpticalMediaIconView setNeedsDisplay: YES];
