@@ -311,6 +311,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
 
     [self qtkToggleUIElements:nil];
+    [self updateMediaSelector:nil];
     [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
@@ -808,13 +809,14 @@ static NSString *kCaptureTabViewId  = @"capture";
             image, @"image", nil];
 }
 
-- (void)scanDevicesWithPaths:(NSArray *)paths
+- (void)scanDevices
 {
     @autoreleasepool {
-        NSUInteger count = [paths count];
+        NSArray *mountURLs = [[NSFileManager defaultManager] mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsRemovableKey] options:NSVolumeEnumerationSkipHiddenVolumes];
+        NSUInteger count = [mountURLs count];
         NSMutableArray *o_result = [NSMutableArray array];
         for (NSUInteger i = 0; i < count; i++) {
-            NSURL *currentURL = [paths objectAtIndex:i];
+            NSURL *currentURL = [mountURLs objectAtIndex:i];
 
             NSNumber *isRemovable = nil;
             if (![currentURL getResourceValue:&isRemovable forKey:NSURLVolumeIsRemovableKey error:nil] || !isRemovable) {
@@ -851,9 +853,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (void)scanOpticalMedia:(NSNotification *)o_notification
 {
-    NSArray *mountURLs = [[NSFileManager defaultManager] mountedVolumeURLsIncludingResourceValuesForKeys:@[NSURLVolumeIsRemovableKey] options:NSVolumeEnumerationSkipHiddenVolumes];
-
-    [NSThread detachNewThreadSelector:@selector(scanDevicesWithPaths:) toTarget:self withObject:mountURLs];
+    [NSThread detachNewThreadSelector:@selector(scanDevices) toTarget:self withObject:nil];
 }
 
 - (void)updateMediaSelector:(NSNumber *)selection
@@ -891,7 +891,6 @@ static NSString *kCaptureTabViewId  = @"capture";
         [self setMRL:@""];
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
     }
-
 }
 
 - (IBAction)discSelectorChanged:(id)sender
