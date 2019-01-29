@@ -86,7 +86,6 @@ vlc_module_begin ()
     set_capability( "audio decoder", 1 )
     set_callbacks(DecoderOpen, DecoderClose)
 
-#   define ENC_CFG_PREFIX "sout-dmo-"
     add_submodule ()
     set_description( N_("DirectMedia Object encoder") )
     add_shortcut( "dmo" )
