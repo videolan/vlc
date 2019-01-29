@@ -28,15 +28,20 @@
 #include <vlc_vout_display.h>
 #include <vlc_opengl.h>
 
+#include <vlc/libvlc.h>
+#include <vlc/libvlc_picture.h>
+#include <vlc/libvlc_media.h>
+#include <vlc/libvlc_renderer_discoverer.h>
+#include <vlc/libvlc_media_player.h>
 
 struct vout_display_sys_t
 {
-    void (*cleanupCb)(void* opaque);
-    bool (*setupCb)(void* opaque);
-    void (*resizeCb)(void* opaque, unsigned, unsigned);
-    void (*swapCb)(void* opaque);
-    bool (*makeCurrentCb)(void* opaque, bool);
-    void* (*getProcAddressCb)(void* opaque, const char *name);
+    libvlc_video_cleanup_cb cleanupCb;
+    libvlc_video_setup_cb setupCb;
+    libvlc_video_update_output_cb resizeCb;
+    libvlc_video_swap_cb swapCb;
+    libvlc_video_makeCurrent_cb makeCurrentCb;
+    libvlc_video_getProcAddress_cb getProcAddressCb;
 
     void* opaque;
     unsigned width;
