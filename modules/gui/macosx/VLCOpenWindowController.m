@@ -312,6 +312,7 @@ static NSString *kCaptureTabViewId  = @"capture";
     [[sharedWorkspace notificationCenter] addObserver:self selector:@selector(scanOpticalMedia:) name:NSWorkspaceDidUnmountNotification object:nil];
 
     [self qtkToggleUIElements:nil];
+    [self updateMediaSelector:nil];
     [self scanOpticalMedia:nil];
 
     [self setMRL: @""];
@@ -810,9 +811,10 @@ static NSString *kCaptureTabViewId  = @"capture";
             image, @"image", nil];
 }
 
-- (void)scanDevicesWithPaths:(NSArray *)paths
+- (void)scanDevices
 {
     @autoreleasepool {
+        NSArray *paths = [NSArray arrayWithArray:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]];
         NSUInteger count = [paths count];
         NSMutableArray *o_result = [NSMutableArray array];
         for (NSUInteger i = 0; i < count; i++)
@@ -841,7 +843,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 
 - (void)scanOpticalMedia:(NSNotification *)o_notification
 {
-    [NSThread detachNewThreadSelector:@selector(scanDevicesWithPaths:) toTarget:self withObject:[NSArray arrayWithArray:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]]];
+    [NSThread detachNewThreadSelector:@selector(scanDevices) toTarget:self withObject:nil];
 }
 
 - (void)updateMediaSelector:(NSNumber *)selection
@@ -879,7 +881,6 @@ static NSString *kCaptureTabViewId  = @"capture";
         [self setMRL:@""];
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed: @"NSApplicationIcon"]];
     }
-
 }
 
 - (IBAction)discSelectorChanged:(id)sender
