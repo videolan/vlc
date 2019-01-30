@@ -250,26 +250,6 @@ function playlist_sort(name,client,arg)
     end
 end
 
-function sd_add(name,client,arg)
-    vlc.sd.add(arg)
-    client:append(arg.." enabled.")
-end
-
-function sd_remove(name,client,arg)
-    vlc.sd.remove(arg)
-    client:append(arg.." disabled.")
-end
-
-function services_discovery(name,client,arg)
-    local sd = vlc.sd.get_services_names()
-    client:append("+----[ Services discovery ]")
-    for n,ln in pairs(sd) do
-        client:append("| "..n..": " .. ln)
-    end
-    client:append("+----[ End of services discovery ]")
-    client:append("Enabled services discovery sources appear in the playlist.")
-end
-
 function load_vlm(name, client, value)
     if vlm == nil then
         vlm = vlc.vlm()
@@ -585,9 +565,6 @@ commands_ordered = {
     { "delete"; { func = skip2(vlc.playlist.delete); args = "[X]"; help = "delete item X in playlist" } };
     { "move"; { func = move; args = "[X][Y]"; help = "move item X in playlist after Y" } };
     { "sort"; { func = playlist_sort; args = "key"; help = "sort the playlist" } };
-    { "sd"; { func = services_discovery; args = "[sd]"; help = "show services discovery or toggle" } };
-    { "sd_add"; { func = sd_add; args = "sd"; help = "add services discovery" } };
-    { "sd_remove"; { func = sd_remove; args = "sd"; help = "remove services discovery" } };
     { "play"; { func = skip2(vlc.playlist.play); help = "play stream" } };
     { "stop"; { func = skip2(vlc.playlist.stop); help = "stop stream" } };
     { "next"; { func = skip2(vlc.playlist.next); help = "next playlist item" } };

@@ -839,7 +839,6 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
         luaopen_object( L );
         luaopen_osd( L );
         luaopen_playlist( L );
-        luaopen_sd_intf( L );
         luaopen_stream( L );
         luaopen_strings( L );
         luaopen_variables( L );
