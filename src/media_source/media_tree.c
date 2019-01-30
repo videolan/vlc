@@ -328,7 +328,9 @@ vlc_media_tree_Preparse(vlc_media_tree_t *tree, libvlc_int_t *libvlc,
     VLC_UNUSED(media);
     VLC_UNUSED(input_preparser_callbacks);
 #else
-    vlc_MetadataRequest(libvlc, media, META_REQUEST_OPTION_NONE,
+    media->i_preparse_depth = 1;
+    vlc_MetadataRequest(libvlc, media, META_REQUEST_OPTION_SCOPE_LOCAL |
+                        META_REQUEST_OPTION_SCOPE_NETWORK,
                         &input_preparser_callbacks, tree, -1, NULL);
 #endif
 }
