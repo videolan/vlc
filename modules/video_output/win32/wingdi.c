@@ -79,7 +79,6 @@ struct vout_display_sys_t
 
 static picture_pool_t *Pool  (vout_display_t *, unsigned);
 static void           Display(vout_display_t *, picture_t *);
-static int            Control(vout_display_t *, int, va_list);
 
 static int            Init(vout_display_t *, video_format_t *);
 static void           Clean(vout_display_t *);
@@ -110,7 +109,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
-    vd->control = Control;
+    vd->control = CommonControl;
     return VLC_SUCCESS;
 
 error:
@@ -176,18 +175,6 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     CommonDisplay(vd);
     CommonManage(vd);
-}
-
-static int Control(vout_display_t *vd, int query, va_list args)
-{
-    switch (query) {
-    case VOUT_DISPLAY_RESET_PICTURES:
-        vlc_assert_unreachable();
-        return VLC_EGENERIC;
-    default:
-        return CommonControl(vd, query, args);
-    }
-
 }
 
 static int Init(vout_display_t *vd, video_format_t *fmt)
