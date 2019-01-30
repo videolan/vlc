@@ -70,7 +70,6 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCHotkeyChangeWindow.h gui/macosx/VLCHotkeyChangeWindow.m \
 	gui/macosx/SPMediaKeyTap.h gui/macosx/SPMediaKeyTap.m \
 	gui/macosx/Spotify.h \
-	gui/macosx/VLCStringUtility.h gui/macosx/VLCStringUtility.m \
 	gui/macosx/VLCVoutView.h gui/macosx/VLCVoutView.m \
 	gui/macosx/VLCTimeSelectionPanelController.h gui/macosx/VLCTimeSelectionPanelController.m \
 	gui/macosx/VLCUIWidgets.h gui/macosx/VLCUIWidgets.m \

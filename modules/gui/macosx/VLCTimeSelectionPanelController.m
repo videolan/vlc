@@ -20,9 +20,8 @@
  *****************************************************************************/
 
 #import "VLCTimeSelectionPanelController.h"
-
+#import "NSString+Helpers.h"
 #import "misc.h"
-#import "VLCStringUtility.h"
 
 @interface VLCTimeSelectionPanelController()
 {

@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #import "VLCLibraryWindow.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;

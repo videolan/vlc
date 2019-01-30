@@ -783,7 +783,7 @@ static NSString *kCaptureTabViewId  = @"capture";
 {
     NSString *path = [url path];
 
-    NSString *type = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath:path];
+    NSString *type = getVolumeTypeFromMountPath(path);
     NSImage *image = [[NSWorkspace sharedWorkspace] iconForFile: path];
     NSString *devicePath;
 
@@ -800,7 +800,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [type isEqualToString: kVLCMediaUnknown])
         devicePath = path;
     else
-        devicePath = [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath:path];
+        devicePath = getBSDNodeFromMountPath(path);
 
     return [NSDictionary dictionaryWithObjectsAndKeys: path, @"path",
             devicePath, @"devicePath",

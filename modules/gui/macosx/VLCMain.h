@@ -41,7 +41,7 @@
 #import "VLCMainWindow.h"
 #import "VLCVideoOutputProvider.h"
 #import "VLCStatusBarIcon.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 /*****************************************************************************
  * Local prototypes.

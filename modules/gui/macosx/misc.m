@@ -29,7 +29,7 @@
 #import "VLCMainMenu.h"
 #import "VLCControlsBarCommon.h"
 #import "VLCCoreInteraction.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 #import <vlc_actions.h>
 
 /*****************************************************************************

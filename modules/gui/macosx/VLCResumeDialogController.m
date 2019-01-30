@@ -25,7 +25,7 @@
 #import "VLCResumeDialogController.h"
 
 #import "VLCMain.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 #import "NSString+Helpers.h"
 
 @interface VLCResumeDialogController()

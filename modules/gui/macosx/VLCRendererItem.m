@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 #import "VLCRendererItem.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 #include <vlc_common.h>
 #include <vlc_renderer_discovery.h>

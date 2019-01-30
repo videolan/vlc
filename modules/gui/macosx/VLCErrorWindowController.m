@@ -23,7 +23,7 @@
 
 #import "VLCErrorWindowController.h"
 
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 
 @interface VLCErrorWindowController()

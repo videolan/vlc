@@ -23,7 +23,7 @@
 #import "misc.h"    /* VLCByteCountFormatter */
 
 #import "VLCPlaylist.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 #import "VLCMain.h"
 #import "VLCMainWindowControlsBar.h"
 #import "VLCMainMenu.h"

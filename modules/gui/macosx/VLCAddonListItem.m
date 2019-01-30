@@ -22,7 +22,7 @@
 
 #import "VLCMain.h"
 #import "VLCAddonListItem.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 @interface VLCAddonListItem ()
 {

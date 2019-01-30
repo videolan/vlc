@@ -529,19 +529,19 @@
         [[NSWorkspace sharedWorkspace] getFileSystemInfoForPath:path isRemovable: &b_rem
                                                      isWritable:&b_writable isUnmountable:NULL description:NULL type:NULL] && b_rem && !b_writable && [url isFileURL]) {
 
-        NSString *diskType = [[VLCStringUtility sharedInstance] getVolumeTypeFromMountPath: path];
+        NSString *diskType = getVolumeTypeFromMountPath(path);
         msg_Dbg(p_intf, "detected optical media of type %s in the file input", [diskType UTF8String]);
 
         if ([diskType isEqualToString: kVLCMediaDVD])
-            uri = [NSString stringWithFormat: @"dvdnav://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
+            uri = [NSString stringWithFormat: @"dvdnav://%@", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaVideoTSFolder])
             uri = [NSString stringWithFormat: @"dvdnav://%@", path];
         else if ([diskType isEqualToString: kVLCMediaAudioCD])
-            uri = [NSString stringWithFormat: @"cdda://%@", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
+            uri = [NSString stringWithFormat: @"cdda://%@", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaVCD])
-            uri = [NSString stringWithFormat: @"vcd://%@#0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
+            uri = [NSString stringWithFormat: @"vcd://%@#0:0", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaSVCD])
-            uri = [NSString stringWithFormat: @"vcd://%@@0:0", [[VLCStringUtility sharedInstance] getBSDNodeFromMountPath: path]];
+            uri = [NSString stringWithFormat: @"vcd://%@@0:0", getBSDNodeFromMountPath(path)];
         else if ([diskType isEqualToString: kVLCMediaBD] || [diskType isEqualToString: kVLCMediaBDMVFolder])
             uri = [NSString stringWithFormat: @"bluray://%@", path];
         else

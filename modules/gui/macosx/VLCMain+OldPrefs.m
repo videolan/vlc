@@ -25,7 +25,7 @@
 #import "VLCMain+OldPrefs.h"
 #import "VLCCoreInteraction.h"
 #import "VLCSimplePrefsController.h"
-#import "VLCStringUtility.h"
+#import "NSString+Helpers.h"
 
 #include <unistd.h> /* execl() */
 

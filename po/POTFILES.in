@@ -541,8 +541,6 @@ modules/gui/macosx/VLCSliderCell.h
 modules/gui/macosx/VLCSliderCell.m
 modules/gui/macosx/VLCStatusBarIcon.h
 modules/gui/macosx/VLCStatusBarIcon.m
-modules/gui/macosx/VLCStringUtility.h
-modules/gui/macosx/VLCStringUtility.m
 modules/gui/macosx/VLCTextfieldPanelController.h
 modules/gui/macosx/VLCTextfieldPanelController.m
 modules/gui/macosx/VLCTimeField.h
