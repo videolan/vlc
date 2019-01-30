@@ -441,4 +441,5 @@ void aout_DecFlush (audio_output_t *aout, bool wait)
 
         aout->flush(aout, wait);
     }
+    owner->sync.discontinuity = true;
 }
