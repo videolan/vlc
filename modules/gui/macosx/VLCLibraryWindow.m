@@ -22,9 +22,19 @@
 
 #import "VLCLibraryWindow.h"
 #import "NSString+Helpers.h"
+#import "VLCPlaylistTableCellView.h"
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
+static const float f_playlist_row_height = 40.;
+
+static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
+
+@interface VLCLibraryWindow ()
+{
+    VLCPlaylistDataSource *_playlistDataSource;
+}
+@end
 
 @implementation VLCLibraryWindow
 
@@ -37,10 +47,59 @@ static const float f_min_window_height = 307.;
     [_segmentedTitleControl setLabel:_NS("Video") forSegment:1];
     [_segmentedTitleControl setLabel:_NS("Network") forSegment:2];
     [_segmentedTitleControl sizeToFit];
+
+    _playlistDataSource = [[VLCPlaylistDataSource alloc] init];
+
+    _playlistTableView.dataSource = _playlistDataSource;
+    _playlistTableView.delegate = _playlistDataSource;
+    _playlistTableView.rowHeight = f_playlist_row_height;
+    [_playlistTableView reloadData];
 }
 
 - (void)segmentedControlAction
 {
+}
+
+@end
+
+@implementation VLCPlaylistDataSource
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView
+{
+    return 2;
+}
+
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row
+{
+    VLCPlaylistTableCellView *cellView = [tableView makeViewWithIdentifier:VLCPlaylistCellIdentifier owner:self];
+
+    if (cellView == nil) {
+        /* the following code saves us an instance of NSViewController which we don't need */
+        NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlaylistTableCellView" bundle:nil];
+        NSArray *topLevelObjects;
+        if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
+            NSLog(@"Failed to load nib %@", nib);
+            return nil;
+        }
+
+        for (id topLevelObject in topLevelObjects) {
+            if ([topLevelObject isKindOfClass:[VLCPlaylistTableCellView class]]) {
+                cellView = topLevelObject;
+                break;
+            }
+        }
+        cellView.identifier = VLCPlaylistCellIdentifier;
+    }
+
+    cellView.mediaTitleTextField.stringValue = @"Custom Cell Label Text";
+    cellView.durationTextField.stringValue = @"00:00";
+    cellView.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+    return cellView;
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notification
+{
+    NSLog(@"playlist selection changed: %li", (long)[(NSTableView *)notification.object selectedRow]);
 }
 
 @end
@@ -55,7 +114,7 @@ static const float f_min_window_height = 307.;
 
 - (void)windowDidLoad
 {
-    NSWindow *window = self.window;
+    VLCLibraryWindow *window = (VLCLibraryWindow *)self.window;
     [window setRestorable:NO];
     [window setExcludedFromWindowsMenu:YES];
     [window setAcceptsMouseMovedEvents:YES];

@@ -86,7 +86,6 @@
 		1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224131E4D2A9000833BE1 /* StreamOutput.xib */; };
 		1CCC89052078A3D500E5626F /* TextfieldPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224151E4D2A9000833BE1 /* TextfieldPanel.xib */; };
 		1CCC89062078A3D500E5626F /* TimeSelectionPanel.xib in Sources */ = {isa = PBXBuildFile; fileRef = 6B8224161E4D2A9000833BE1 /* TimeSelectionPanel.xib */; };
-		1CCD8FA02117957700407114 /* avaudiocapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD8F9F2117957600407114 /* avaudiocapture.m */; };
 		1CFE8D591EA0D42A00E94451 /* VLCErrorWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1CFE8D581EA0D42A00E94451 /* VLCErrorWindowController.m */; };
 		6B0292E61F43256300A50082 /* VLCBottomBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0292E51F43256300A50082 /* VLCBottomBarView.m */; };
 		6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */ = {isa = PBXBuildFile; fileRef = 6B0AB0ED1F1AC8B3003A1B4E /* VLCSlider.m */; };
@@ -119,6 +118,7 @@
 		6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BBBF9841F7B257100B404CD /* VLCLogMessage.m */; };
 		6BF093F91EE0182B0049D8B0 /* VLCTimeField.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF093F81EE0182B0049D8B0 /* VLCTimeField.m */; };
 		6BF5C5041EFE66EF008A9C12 /* VLCHUDTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 6BF5C5031EFE66EF008A9C12 /* VLCHUDTableView.m */; };
+		7D0F63FF2201F63400FDB91F /* VLCPlaylistTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D0F63FE2201F63400FDB91F /* VLCPlaylistTableCellView.m */; };
 		7D2E0EDB20CD204D0033A221 /* VLCWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D2E0ED920CD204D0033A221 /* VLCWindow.m */; };
 		7D2E0EDE20CD206F0033A221 /* VLCVideoWindowCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D2E0EDD20CD206F0033A221 /* VLCVideoWindowCommon.m */; };
 		7D66D4362200BC340040D04A /* VLCClickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4352200BC340040D04A /* VLCClickerManager.m */; };
@@ -433,6 +433,9 @@
 		6BF5C5021EFE66EF008A9C12 /* VLCHUDTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCHUDTableView.h; sourceTree = "<group>"; };
 		6BF5C5031EFE66EF008A9C12 /* VLCHUDTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCHUDTableView.m; sourceTree = "<group>"; };
 		7D0A387820CBCC4D00D4BF3B /* videotoolbox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = videotoolbox.m; path = ../../../modules/codec/videotoolbox.m; sourceTree = "<group>"; };
+		7D0F63FD2201F63400FDB91F /* VLCPlaylistTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistTableCellView.h; sourceTree = "<group>"; };
+		7D0F63FE2201F63400FDB91F /* VLCPlaylistTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistTableCellView.m; sourceTree = "<group>"; };
+		7D0F64002201F66D00FDB91F /* VLCPlaylistTableCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = VLCPlaylistTableCellView.xib; sourceTree = "<group>"; };
 		7D2E0ED920CD204D0033A221 /* VLCWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCWindow.m; sourceTree = "<group>"; };
 		7D2E0EDA20CD204D0033A221 /* VLCWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCWindow.h; sourceTree = "<group>"; };
 		7D2E0EDC20CD206F0033A221 /* VLCVideoWindowCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCVideoWindowCommon.h; sourceTree = "<group>"; };
@@ -1290,6 +1293,8 @@
 			children = (
 				7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */,
 				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
+				7D0F63FD2201F63400FDB91F /* VLCPlaylistTableCellView.h */,
+				7D0F63FE2201F63400FDB91F /* VLCPlaylistTableCellView.m */,
 			);
 			name = "Library Window";
 			sourceTree = "<group>";
@@ -1510,6 +1515,7 @@
 				6B8224091E4D2A9000833BE1 /* MainMenu.xib */,
 				6B82240A1E4D2A9000833BE1 /* MainWindow.xib */,
 				7D713D332201BB130042BEB7 /* VLCLibraryWindow.xib */,
+				7D0F64002201F66D00FDB91F /* VLCPlaylistTableCellView.xib */,
 				6B82241A1E4D2A9000833BE1 /* VLCStatusBarIconMainMenu.xib */,
 				6B8224181E4D2A9000833BE1 /* VLCFullScreenPanel.xib */,
 				6B8223FE1E4D2A8F00833BE1 /* About.xib */,
@@ -1658,7 +1664,6 @@
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
 				6B8A6B0121279D2600DC29F3 /* PXSourceListTableCellView.m in Sources */,
 				1C3113981E508C6900D4DD76 /* VLCAudioEffectsWindowController.m in Sources */,
-				1CCD8FA02117957700407114 /* avaudiocapture.m in Sources */,
 				6BBBF9851F7B257100B404CD /* VLCLogMessage.m in Sources */,
 				1C31139A1E508C6900D4DD76 /* VLCBookmarksWindowController.m in Sources */,
 				6B0AB0F01F1AC8B3003A1B4E /* VLCSlider.m in Sources */,
@@ -1698,6 +1703,7 @@
 				6B8A6B0B2128697E00DC29F3 /* VLCSourceListTableCellView.m in Sources */,
 				1C3113CD1E508C6900D4DD76 /* VLCPLModel.m in Sources */,
 				1C3113CF1E508C6900D4DD76 /* prefs_widgets.m in Sources */,
+				7D0F63FF2201F63400FDB91F /* VLCPlaylistTableCellView.m in Sources */,
 				1C3113D11E508C6900D4DD76 /* prefs.m in Sources */,
 				6B8A6AFF21279D2600DC29F3 /* PXSourceListDelegateDataSourceProxy.m in Sources */,
 				1C3113D31E508C6900D4DD76 /* VLCResumeDialogController.m in Sources */,
