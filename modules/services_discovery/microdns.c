@@ -356,6 +356,8 @@ parse_entries( const struct rr_entry *p_entries, bool b_renderer,
     }
     if( psz_ip == NULL || i_nb_srv == 0 )
     {
+        for( unsigned int i = 0; i < i_nb_srv; ++i )
+            free( p_srvs[i].psz_device_name );
         free( p_srvs );
         return VLC_EGENERIC;
     }
