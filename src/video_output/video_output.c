@@ -1323,7 +1323,7 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
     vout->p->mouse = *m;
 
     if (vout->p->mouse_event)
-        vout->p->mouse_event(m, vout->p->opaque);
+        vout->p->mouse_event(m, vout->p->mouse_opaque);
 }
 
 static int vout_Start(vout_thread_t *vout)
@@ -1460,7 +1460,7 @@ static void ThreadStop(vout_thread_t *vout)
     assert(!vout->p->decoder_pool);
 
     if (vout->p->mouse_event)
-        vout->p->mouse_event(NULL, vout->p->opaque);
+        vout->p->mouse_event(NULL, vout->p->mouse_opaque);
 }
 
 void vout_Cancel(vout_thread_t *vout, bool canceled)
@@ -1691,7 +1691,7 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
 
     sys->mouse_event = cfg->mouse_event;
-    sys->opaque = cfg->opaque;
+    sys->mouse_opaque = cfg->mouse_opaque;
 
     vlc_mutex_init(&sys->filter.lock);
 
@@ -1780,7 +1780,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         vlc_join(sys->thread, NULL);
 
         sys->mouse_event = cfg->mouse_event;
-        sys->opaque = cfg->opaque;
+        sys->mouse_opaque = cfg->mouse_opaque;
         sys->pause.is_on = false;
         sys->pause.date  = VLC_TICK_INVALID;
 

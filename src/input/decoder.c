@@ -147,7 +147,7 @@ struct decoder_owner
     /* Mouse event */
     vlc_mutex_t     mouse_lock;
     vlc_mouse_event mouse_event;
-    void           *opaque;
+    void           *mouse_opaque;
 };
 
 /* Pictures which are DECODER_BOGUS_VIDEO_DELAY or more in advance probably have
@@ -294,7 +294,7 @@ static void MouseEvent( const vlc_mouse_t *newmouse, void *user_data )
 
     vlc_mutex_lock( &owner->mouse_lock );
     if( owner->mouse_event )
-        owner->mouse_event( newmouse, owner->opaque);
+        owner->mouse_event( newmouse, owner->mouse_opaque);
     vlc_mutex_unlock( &owner->mouse_lock );
 }
 
@@ -571,7 +571,7 @@ static int vout_update_format( decoder_t *p_dec )
             &(vout_configuration_t) {
                 .vout = p_vout, .fmt = &fmt,
                 .dpb_size = dpb_size + p_dec->i_extra_picture_buffers + 1,
-                .mouse_event = MouseEvent, .opaque = p_dec
+                .mouse_event = MouseEvent, .mouse_opaque = p_dec
             } );
 
         vlc_mutex_lock( &p_owner->lock );
@@ -1870,7 +1870,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->b_idle = false;
 
     p_owner->mouse_event = NULL;
-    p_owner->opaque = NULL;
+    p_owner->mouse_opaque = NULL;
 
     es_format_Init( &p_owner->fmt, fmt->i_cat, 0 );
 
@@ -2598,7 +2598,7 @@ void input_DecoderSetVoutMouseEvent( decoder_t *dec, vlc_mouse_event mouse_event
     vlc_mutex_lock( &owner->mouse_lock );
 
     owner->mouse_event = mouse_event;
-    owner->opaque = user_data;
+    owner->mouse_opaque = user_data;
 
     vlc_mutex_unlock( &owner->mouse_lock );
 }
