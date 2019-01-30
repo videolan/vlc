@@ -136,14 +136,14 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     NSMutableString *wrapped_string = [self mutableCopy];
 
     NSTextStorage *text_storage =
-        [[NSTextStorage alloc] initWithString:wrapped_string
-                                   attributes:@{
-                                                NSFontAttributeName : [NSFont labelFontOfSize: 0.0]
-                                                }];
+    [[NSTextStorage alloc] initWithString:wrapped_string
+                               attributes:@{
+                                            NSFontAttributeName : [NSFont labelFontOfSize: 0.0]
+                                            }];
 
     NSLayoutManager *layout_manager = [[NSLayoutManager alloc] init];
     NSTextContainer *text_container =
-        [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(width, 2000)];
+    [[NSTextContainer alloc] initWithContainerSize:NSMakeSize(width, 2000)];
 
     [layout_manager addTextContainer:text_container];
     [text_storage addLayoutManager:layout_manager];
@@ -160,7 +160,7 @@ NSString *const kVLCMediaUnknown = @"Unknown";
         charRange = [layout_manager characterRangeForGlyphRange:effectiveRange
                                                actualGlyphRange:&effectiveRange];
         if ([wrapped_string lineRangeForRange:
-                NSMakeRange(charRange.location + breaksInserted, charRange.length)
+             NSMakeRange(charRange.location + breaksInserted, charRange.length)
              ].length > charRange.length)
         {
             [wrapped_string insertString:@"\n" atIndex:NSMaxRange(charRange) + breaksInserted];
@@ -296,42 +296,42 @@ NSString * getVolumeTypeFromMountPath(NSString *mountPath)
     out:
     if ([mountPath rangeOfString:@"VIDEO_TS" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
         returnValue = kVLCMediaVideoTSFolder;
-        else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
-            returnValue = kVLCMediaBDMVFolder;
-            else {
-                // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
-                NSFileManager * fm = [[NSFileManager alloc] init];
+    else if ([mountPath rangeOfString:@"BDMV" options:NSCaseInsensitiveSearch | NSBackwardsSearch].location != NSNotFound)
+        returnValue = kVLCMediaBDMVFolder;
+    else {
+        // NSFileManager is not thread-safe, don't use defaultManager outside of the main thread
+        NSFileManager * fm = [[NSFileManager alloc] init];
 
-                NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
-                for (int i = 0; i < [dirContents count]; i++) {
-                    NSString *currentFile = [dirContents objectAtIndex:i];
-                    NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
+        NSArray *dirContents = [fm contentsOfDirectoryAtPath:mountPath error:nil];
+        for (int i = 0; i < [dirContents count]; i++) {
+            NSString *currentFile = [dirContents objectAtIndex:i];
+            NSString *fullPath = [mountPath stringByAppendingPathComponent:currentFile];
 
-                    BOOL isDir;
-                    if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
-                    {
-                        if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
-                            returnValue = kVLCMediaSVCD;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
-                            returnValue = kVLCMediaVCD;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
-                            returnValue = kVLCMediaBDMVFolder;
-                            break;
-                        }
-                        if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
-                            returnValue = kVLCMediaVideoTSFolder;
-                            break;
-                        }
-                    }
+            BOOL isDir;
+            if ([fm fileExistsAtPath:fullPath isDirectory:&isDir] && isDir)
+            {
+                if ([currentFile caseInsensitiveCompare:@"SVCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaSVCD;
+                    break;
                 }
-
-                if (!returnValue)
+                if ([currentFile caseInsensitiveCompare:@"VCD"] == NSOrderedSame) {
+                    returnValue = kVLCMediaVCD;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"BDMV"] == NSOrderedSame) {
+                    returnValue = kVLCMediaBDMVFolder;
+                    break;
+                }
+                if ([currentFile caseInsensitiveCompare:@"VIDEO_TS"] == NSOrderedSame) {
                     returnValue = kVLCMediaVideoTSFolder;
+                    break;
+                }
             }
+        }
+
+        if (!returnValue)
+            returnValue = kVLCMediaVideoTSFolder;
+    }
 
     return returnValue;
 }
