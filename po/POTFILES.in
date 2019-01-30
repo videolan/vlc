@@ -493,8 +493,8 @@ modules/gui/macosx/VLCFSPanelController.h
 modules/gui/macosx/VLCFSPanelController.m
 modules/gui/macosx/helpers.h
 modules/gui/macosx/macosx.m
-modules/gui/macosx/VLCMain.h
-modules/gui/macosx/VLCMain.m
+modules/gui/macosx/VLCLibraryWindow.h
+modules/gui/macosx/VLCLibraryWindow.m
 modules/gui/macosx/VLCMain+OldPrefs.h
 modules/gui/macosx/VLCMain+OldPrefs.m
 modules/gui/macosx/VLCMain.h

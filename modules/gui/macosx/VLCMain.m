@@ -60,6 +60,7 @@
 #import "VLCResumeDialogController.h"
 #import "VLCLogWindowController.h"
 #import "VLCConvertAndSaveWindowController.h"
+#import "VLCLibraryWindow.h"
 
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
@@ -180,6 +181,7 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCConvertAndSaveWindowController *_convertAndSaveWindow;
     VLCExtensionsManager *_extensionsManager;
     VLCInfo *_currentMediaInfoPanel;
+    VLCLibraryWindowController *_libraryWindowController;
 
     bool b_intf_terminating; /* Makes sure applicationWillTerminate will be called only once */
 }
@@ -233,6 +235,7 @@ static VLCMain *sharedInstance = nil;
         _playlist = [[VLCPlaylist alloc] init];
 
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
+        _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
 
         var_AddCallback(pl_Get(p_intf), "intf-toggle-fscontrol", ShowController, (__bridge void *)self);
         var_AddCallback(pl_Get(p_intf), "intf-show", ShowController, (__bridge void *)self);
@@ -463,6 +466,11 @@ static VLCMain *sharedInstance = nil;
 - (VLCMainWindow *)mainWindow
 {
     return (VLCMainWindow *)[_mainWindowController window];
+}
+
+- (VLCLibraryWindowController *)libraryWindowController
+{
+    return _libraryWindowController;
 }
 
 - (VLCInputManager *)inputManager

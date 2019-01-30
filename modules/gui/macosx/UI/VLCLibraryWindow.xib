@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCLibraryWindowController">
+            <connections>
+                <outlet property="window" destination="QvC-M9-y7g" id="V4U-WR-QYC"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" frameAutosaveName="librarywindow" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="QvC-M9-y7g" customClass="VLCLibraryWindow">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="480" height="270"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="W1M-0o-qYG">
+                        <rect key="frame" x="88" y="240" width="304" height="24"/>
+                        <constraints>
+                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="300" id="Wg7-mn-ahw"/>
+                        </constraints>
+                        <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="Twg-gp-8ng">
+                            <font key="font" metaFont="system"/>
+                            <segments>
+                                <segment width="99"/>
+                                <segment width="99" selected="YES" tag="1"/>
+                                <segment width="98"/>
+                            </segments>
+                        </segmentedCell>
+                    </segmentedControl>
+                    <customView hidden="YES" translatesAutoresizingMaskIntoConstraints="NO" id="12s-0J-Uvj" customClass="VLCVoutView">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="235"/>
+                    </customView>
+                    <scrollView wantsLayer="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nXS-11-7iK">
+                        <rect key="frame" x="0.0" y="0.0" width="480" height="235"/>
+                        <clipView key="contentView" id="OKa-dt-1yY">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="235"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <collectionView id="B8x-e8-7zp">
+                                    <rect key="frame" x="0.0" y="0.0" width="480" height="158"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                                    <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="Rag-cM-k1g">
+                                        <size key="itemSize" width="50" height="50"/>
+                                    </collectionViewFlowLayout>
+                                    <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </collectionView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="7ik-B8-JYg">
+                            <rect key="frame" x="1" y="144" width="233" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="rUh-Qg-gUL">
+                            <rect key="frame" x="234" y="1" width="15" height="143"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="nXS-11-7iK" secondAttribute="bottom" id="0pQ-dO-rse"/>
+                    <constraint firstItem="B8x-e8-7zp" firstAttribute="top" secondItem="W1M-0o-qYG" secondAttribute="bottom" constant="7" id="3Wf-d4-dN1"/>
+                    <constraint firstItem="W1M-0o-qYG" firstAttribute="centerX" secondItem="EiT-Mj-1SZ" secondAttribute="centerX" id="4k0-zs-btE"/>
+                    <constraint firstItem="12s-0J-Uvj" firstAttribute="leading" secondItem="nXS-11-7iK" secondAttribute="leading" id="69M-D7-5Yc"/>
+                    <constraint firstItem="12s-0J-Uvj" firstAttribute="bottom" secondItem="nXS-11-7iK" secondAttribute="bottom" id="GcY-YM-Uyd"/>
+                    <constraint firstItem="12s-0J-Uvj" firstAttribute="trailing" secondItem="nXS-11-7iK" secondAttribute="trailing" id="HPG-6j-8DO"/>
+                    <constraint firstItem="12s-0J-Uvj" firstAttribute="top" secondItem="nXS-11-7iK" secondAttribute="top" id="OqY-5k-2vb"/>
+                    <constraint firstItem="nXS-11-7iK" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="pXs-j9-TqM"/>
+                    <constraint firstAttribute="trailing" secondItem="nXS-11-7iK" secondAttribute="trailing" id="rle-L3-teF"/>
+                    <constraint firstItem="W1M-0o-qYG" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="7" id="y9h-yj-Ufq"/>
+                </constraints>
+            </view>
+            <connections>
+                <outlet property="libraryCollectionView" destination="B8x-e8-7zp" id="djF-Lw-nXT"/>
+                <outlet property="segmentedTitleControl" destination="W1M-0o-qYG" id="Gw1-T6-78k"/>
+                <outlet property="videoView" destination="12s-0J-Uvj" id="zTg-s0-qZ5"/>
+            </connections>
+        </window>
+    </objects>
+</document>

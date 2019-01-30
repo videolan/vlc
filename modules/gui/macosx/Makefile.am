@@ -91,6 +91,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCInputManager.h gui/macosx/VLCInputManager.m \
 	gui/macosx/VLCRemoteControlService.h gui/macosx/VLCRemoteControlService.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
+	gui/macosx/VLCLibraryWindow.h gui/macosx/VLCLibraryWindow.m \
 	gui/macosx/VLCDetachedVideoWindow.h gui/macosx/VLCDetachedVideoWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
 	gui/macosx/VLCRendererItem.h gui/macosx/VLCRendererItem.m \
@@ -149,6 +150,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/LogMessageWindow.xib \
 	gui/macosx/UI/MainMenu.xib \
 	gui/macosx/UI/MainWindow.xib \
+	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/MediaInfo.xib \
 	gui/macosx/UI/Open.xib \
 	gui/macosx/UI/PlaylistAccessoryView.xib \

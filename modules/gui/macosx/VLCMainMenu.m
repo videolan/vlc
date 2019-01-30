@@ -42,6 +42,7 @@
 #import "VLCCoreDialogProvider.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainWindow.h"
+#import "VLCLibraryWindow.h"
 #import "VLCMainWindowControlsBar.h"
 #import "VLCExtensionsManager.h"
 #import "VLCConvertAndSaveWindowController.h"
@@ -1253,7 +1254,7 @@
 
 - (IBAction)showPlaylist:(id)sender
 {
-    [[[VLCMain sharedInstance] mainWindow] changePlaylistState: psUserMenuEvent];
+    [[[[VLCMain sharedInstance] libraryWindowController] window] makeKeyAndOrderFront:sender];
 }
 
 #pragma mark - Help and Docs

@@ -69,6 +69,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @class VLCBookmarksWindowController;
 @class VLCOpenWindowController;
 @class VLCLogWindowController;
+@class VLCLibraryWindowController;
 @class VLCTrackSynchronizationWindowController;
 @class VLCAudioEffectsWindowController;
 @class VLCVideoEffectsWindowController;
@@ -82,6 +83,7 @@ static NSString * VLCAppleRemoteSettingChangedNotification = @"VLCAppleRemoteSet
 @property (readonly) VLCVideoOutputProvider* voutProvider;
 @property (readonly) BOOL nativeFullscreenMode;
 @property (nonatomic, readwrite) BOOL playlistUpdatedSelectorInQueue;
+@property (readonly) VLCLibraryWindowController *libraryWindowController;
 
 + (VLCMain *)sharedInstance;
 + (void)killInstance;
