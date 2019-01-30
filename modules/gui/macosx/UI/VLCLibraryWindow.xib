@@ -53,13 +53,14 @@
                                             <rect key="frame" x="0.0" y="0.0" width="242" height="235"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <collectionView id="B8x-e8-7zp">
+                                                <collectionView selectable="YES" id="B8x-e8-7zp">
                                                     <rect key="frame" x="0.0" y="0.0" width="242" height="235"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                                     <collectionViewFlowLayout key="collectionViewLayout" minimumInteritemSpacing="10" minimumLineSpacing="10" id="Rag-cM-k1g">
-                                                        <size key="itemSize" width="50" height="50"/>
+                                                        <size key="itemSize" width="240" height="120"/>
                                                     </collectionViewFlowLayout>
                                                     <color key="primaryBackgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    <color key="secondaryBackgroundColor" name="controlAlternatingRowColor" catalog="System" colorSpace="catalog"/>
                                                 </collectionView>
                                             </subviews>
                                         </clipView>

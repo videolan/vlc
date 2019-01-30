@@ -23,16 +23,19 @@
 #import "VLCLibraryWindow.h"
 #import "NSString+Helpers.h"
 #import "VLCPlaylistTableCellView.h"
+#import "VLCLibraryCollectionViewItem.h"
 
 static const float f_min_window_width = 604.;
 static const float f_min_window_height = 307.;
 static const float f_playlist_row_height = 40.;
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
+static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 
 @interface VLCLibraryWindow ()
 {
     VLCPlaylistDataSource *_playlistDataSource;
+    VLCLibraryDataSource *_libraryDataSource;
 }
 @end
 
@@ -54,6 +57,12 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     _playlistTableView.delegate = _playlistDataSource;
     _playlistTableView.rowHeight = f_playlist_row_height;
     [_playlistTableView reloadData];
+
+    _libraryDataSource = [[VLCLibraryDataSource alloc] init];
+    _libraryCollectionView.dataSource = _libraryDataSource;
+    _libraryCollectionView.delegate = _libraryDataSource;
+    [_libraryCollectionView registerClass:[VLCLibraryCollectionViewItem class] forItemWithIdentifier:VLCLibraryCellIdentifier];
+    [_libraryCollectionView reloadData];
 }
 
 - (void)segmentedControlAction
@@ -100,6 +109,30 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 - (void)tableViewSelectionDidChange:(NSNotification *)notification
 {
     NSLog(@"playlist selection changed: %li", (long)[(NSTableView *)notification.object selectedRow]);
+}
+
+@end
+
+@implementation VLCLibraryDataSource
+
+- (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return 2;
+}
+
+- (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath
+{
+    VLCLibraryCollectionViewItem *viewItem = [collectionView makeItemWithIdentifier:VLCLibraryCellIdentifier forIndexPath:indexPath];
+
+    viewItem.mediaTitleTextField.stringValue = @"Custom Cell Label Text";
+    viewItem.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
+
+    return viewItem;
+}
+
+- (void)collectionView:(NSCollectionView *)collectionView didSelectItemsAtIndexPaths:(NSSet<NSIndexPath *> *)indexPaths
+{
+    NSLog(@"library selection changed: %@", indexPaths);
 }
 
 @end

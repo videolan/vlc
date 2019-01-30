@@ -92,6 +92,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCLibraryWindow.h gui/macosx/VLCLibraryWindow.m \
 	gui/macosx/VLCPlaylistTableCellView.h gui/macosx/VLCPlaylistTableCellView.m \
+	gui/macosx/VLCLibraryCollectionViewItem.h gui/macosx/VLCLibraryCollectionViewItem.m \
 	gui/macosx/VLCDetachedVideoWindow.h gui/macosx/VLCDetachedVideoWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \
 	gui/macosx/VLCRendererItem.h gui/macosx/VLCRendererItem.m \
@@ -152,6 +153,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/MainWindow.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
+	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/MediaInfo.xib \
 	gui/macosx/UI/Open.xib \
 	gui/macosx/UI/PlaylistAccessoryView.xib \
@@ -199,6 +201,8 @@ libmacosx_plugin_la_RES = \
 	gui/macosx/Resources/File-Icons/wav.icns \
 	gui/macosx/Resources/File-Icons/wma.icns \
 	gui/macosx/Resources/File-Icons/wmv.icns \
+	gui/macosx/Resources/librarywindow/libraryCellGradient@1x.png \
+	gui/macosx/Resources/librarywindow/libraryCellGradient@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed.png \
 	gui/macosx/Resources/mainwindow/backward-3btns-pressed@2x.png \
 	gui/macosx/Resources/mainwindow/backward-3btns.png \
