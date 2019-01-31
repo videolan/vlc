@@ -168,7 +168,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         insertionIndex++;
     }
 
-    [_playlistDataSource playlistUpdated];
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
 
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems
@@ -178,11 +178,13 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     for (size_t i = index + numberOfItems; i > index; i--) {
         [_playlistModel removeItemAtIndex:i];
     }
+
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
 
 - (void)currentPlaylistItemChanged:(ssize_t)index
 {
-    [_playlistDataSource playlistUpdated];
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
 
 #pragma mark - controller functions for use within the UI
@@ -197,6 +199,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
               atPosition:(size_t)insertionIndex
            startPlayback:(BOOL)startPlayback;
 {
+    /* note: we don't add the item as cached data to the model here
+     * because this will be done asynchronously through the callback */
+
     intf_thread_t *p_intf = getIntf();
     NSUInteger numberOfItems = [itemArray count];
 
@@ -243,6 +248,23 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
             insertionIndex++;
         }
     }
+}
+
+- (void)playItemAtIndex:(size_t)index
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_PlayAt(_p_playlist, index);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)removeItemAtIndex:(size_t)index
+{
+    /* note: we don't remove the cached data from the model here
+     * because this will be done asynchronously through the callback */
+
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_Remove(_p_playlist, index, 1);
+    vlc_playlist_Unlock(_p_playlist);
 }
 
 #pragma mark - helper methods

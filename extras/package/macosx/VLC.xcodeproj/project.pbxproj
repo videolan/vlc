@@ -126,6 +126,7 @@
 		7D445D812202524000263D34 /* VLCPlaylistController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D802202524000263D34 /* VLCPlaylistController.m */; };
 		7D445D842202524D00263D34 /* VLCPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D832202524D00263D34 /* VLCPlaylistItem.m */; };
 		7D445D872202574B00263D34 /* VLCPlaylistModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D862202574B00263D34 /* VLCPlaylistModel.m */; };
+		7D445D8B22032B9200263D34 /* VLCPlaylistTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D445D8A22032B9200263D34 /* VLCPlaylistTableView.m */; };
 		7D66D4362200BC340040D04A /* VLCClickerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4352200BC340040D04A /* VLCClickerManager.m */; };
 		7D66D4392200C5B80040D04A /* VLCVideoFilterHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D4382200C5B80040D04A /* VLCVideoFilterHelper.m */; };
 		7D66D43C2200D6090040D04A /* VLCDetachedVideoWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 7D66D43B2200D6090040D04A /* VLCDetachedVideoWindow.m */; };
@@ -458,6 +459,8 @@
 		7D445D832202524D00263D34 /* VLCPlaylistItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistItem.m; sourceTree = "<group>"; };
 		7D445D852202574B00263D34 /* VLCPlaylistModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistModel.h; sourceTree = "<group>"; };
 		7D445D862202574B00263D34 /* VLCPlaylistModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistModel.m; sourceTree = "<group>"; };
+		7D445D8922032B9200263D34 /* VLCPlaylistTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCPlaylistTableView.h; sourceTree = "<group>"; };
+		7D445D8A22032B9200263D34 /* VLCPlaylistTableView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlaylistTableView.m; sourceTree = "<group>"; };
 		7D5678EB1D5BA1DC002698F3 /* VLCApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCApplication.h; sourceTree = "<group>"; };
 		7D5678EC1D5BA1DC002698F3 /* VLCApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCApplication.m; sourceTree = "<group>"; };
 		7D5678EE1D5BA397002698F3 /* VLCMainWindowControlsBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCMainWindowControlsBar.h; sourceTree = "<group>"; };
@@ -1315,11 +1318,9 @@
 			name = "Open media";
 			sourceTree = "<group>";
 		};
-		7D713D2F2201ADFD0042BEB7 /* Library Window */ = {
+		7D445D8822032B5D00263D34 /* Playlist */ = {
 			isa = PBXGroup;
 			children = (
-				7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */,
-				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
 				7D0F640A2202163E00FDB91F /* VLCPlaylistDataSource.h */,
 				7D0F640B2202163E00FDB91F /* VLCPlaylistDataSource.m */,
 				7D445D7F2202524000263D34 /* VLCPlaylistController.h */,
@@ -1330,6 +1331,18 @@
 				7D445D832202524D00263D34 /* VLCPlaylistItem.m */,
 				7D0F63FD2201F63400FDB91F /* VLCPlaylistTableCellView.h */,
 				7D0F63FE2201F63400FDB91F /* VLCPlaylistTableCellView.m */,
+				7D445D8922032B9200263D34 /* VLCPlaylistTableView.h */,
+				7D445D8A22032B9200263D34 /* VLCPlaylistTableView.m */,
+			);
+			name = Playlist;
+			sourceTree = "<group>";
+		};
+		7D713D2F2201ADFD0042BEB7 /* Library Window */ = {
+			isa = PBXGroup;
+			children = (
+				7D713D302201AE350042BEB7 /* VLCLibraryWindow.h */,
+				7D713D312201AE350042BEB7 /* VLCLibraryWindow.m */,
+				7D445D8822032B5D00263D34 /* Playlist */,
 				7D0F64032202047900FDB91F /* VLCLibraryCollectionViewItem.h */,
 				7D0F64042202047900FDB91F /* VLCLibraryCollectionViewItem.m */,
 			);
@@ -1754,6 +1767,7 @@
 				1C5716AC1F5B142200678627 /* coreaudio_common.c in Sources */,
 				1C3113D51E508C6900D4DD76 /* VLCTextfieldPanelController.m in Sources */,
 				1C3113D71E508C6900D4DD76 /* VLCPopupPanelController.m in Sources */,
+				7D445D8B22032B9200263D34 /* VLCPlaylistTableView.m in Sources */,
 				6B8A6AFE21279D2600DC29F3 /* PXSourceListRuntimeAdditions.m in Sources */,
 				6B8A6B0321279D2600DC29F3 /* PXSourceListBadgeCell.m in Sources */,
 				1C3113D91E508C6900D4DD76 /* VLCSimplePrefsController.m in Sources */,

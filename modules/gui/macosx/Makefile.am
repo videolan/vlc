@@ -96,6 +96,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCPlaylistItem.h gui/macosx/VLCPlaylistItem.m \
 	gui/macosx/VLCPlaylistModel.h gui/macosx/VLCPlaylistModel.m \
 	gui/macosx/VLCPlaylistTableCellView.h gui/macosx/VLCPlaylistTableCellView.m \
+	gui/macosx/VLCPlaylistTableView.h gui/macosx/VLCPlaylistTableView.m \
 	gui/macosx/VLCLibraryCollectionViewItem.h gui/macosx/VLCLibraryCollectionViewItem.m \
 	gui/macosx/VLCDetachedVideoWindow.h gui/macosx/VLCDetachedVideoWindow.m \
 	gui/macosx/VLCRendererDiscovery.h gui/macosx/VLCRendererDiscovery.m \

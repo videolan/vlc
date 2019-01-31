@@ -51,6 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
               atPosition:(size_t)insertionIndex
            startPlayback:(BOOL)b_start;
 
+- (void)playItemAtIndex:(size_t)index;
+
+- (void)removeItemAtIndex:(size_t)index;
+
 @end
 
 NS_ASSUME_NONNULL_END
