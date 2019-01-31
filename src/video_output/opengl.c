@@ -84,7 +84,7 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
     gl->surface = wnd;
     /* Resize() should be called with the proper size before Swap() */
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
-                                 1u, 1u);
+                                 cfg->display.width, cfg->display.height);
     if (gl->module == NULL)
     {
         vlc_object_release(gl);
@@ -168,7 +168,10 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
         *wp = surface;
 
     /* TODO: support ES? */
-    struct vout_display_cfg dcfg = { .window = surface };
+    struct vout_display_cfg dcfg = {
+        .window = surface,
+        .display = { .width = cfg->width, cfg->height },
+    };
 
     vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL);
     if (gl == NULL) {
