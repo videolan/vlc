@@ -30,30 +30,99 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlaylistController : NSObject
 
+/**
+ * The vlc core playlist controlled by the instance of this class
+ * @note You DO SOMETHING WRONG if you need to access this!
+ */
 @property (readonly) vlc_playlist_t *p_playlist;
+
+/**
+ * The playlist model caching the contents of the playlist controlled by
+ * the instance of this class.
+ */
 @property (readonly) VLCPlaylistModel *playlistModel;
+
+/**
+ * The datasource instance used to actually display the playlist.
+ */
 @property (readwrite, assign) VLCPlaylistDataSource *playlistDataSource;
 
 /**
- * Simplified version to add new items at the end of the current playlist
+ * indicates whether there is a previous item in the list the user could go back to
+ */
+@property (readonly) BOOL hasPreviousPlaylistItem;
+
+/**
+ * indicates whether there is a next item in the list the user could move on to
+ */
+@property (readonly) BOOL hasNextPlaylistItem;
+
+/**
+ * Simplified version to add new items to the end of the current playlist
  * @param array array of items. Each item is a Dictionary with meta info.
  */
 - (void)addPlaylistItems:(NSArray*)array;
 
 /**
- * Adds new items to the playlist, at specified parent node and index.
- * @param o_array array of items. Each item is a Dictionary with meta info.
- * @param i_plItemId parent playlist node id, -1 for default playlist
- * @param i_position index for new items, -1 for appending at end
- * @param b_start starts playback of first item if true
+ * Add new items to the playlist, at specified index.
+ * @param itemArray array of items. Each item is a Dictionary with meta info.
+ * @param insertionIndex index for new items, -1 for appending at end
+ * @param startPlayback starts playback of first item if true
  */
 - (void)addPlaylistItems:(NSArray*)itemArray
               atPosition:(size_t)insertionIndex
-           startPlayback:(BOOL)b_start;
+           startPlayback:(BOOL)startPlayback;
 
-- (void)playItemAtIndex:(size_t)index;
-
+/**
+ * Remove the item at the given index (if any)
+ * @param index the index to remove
+ */
 - (void)removeItemAtIndex:(size_t)index;
+
+/**
+ * Clear the entire playlist
+ */
+- (void)clearPlaylist;
+
+/**
+ * Start the playlist
+ * @return Returns VLC_SUCCESS on success.
+ */
+- (int)startPlaylist;
+
+/**
+ * Play the previous item in the list (if any)
+ * @return Returns VLC_SUCCESS on success.
+ */
+- (int)playPreviousItem;
+
+/**
+ * Play the item at the given index (if any)
+ * @param index the index to play
+ * @return Returns VLC_SUCCESS on success.
+ */
+- (int)playItemAtIndex:(size_t)index;
+
+/**
+ * Play the previous item in the list (if any)
+ * @return Returns VLC_SUCCESS on success.
+ */
+- (int)playNextItem;
+
+/**
+ * Stop playback of the playlist and destroy all facilities
+ */
+- (void)stopPlayback;
+
+/**
+ * Pause playback of the playlist while keeping all facilities
+ */
+- (void)pausePlayback;
+
+/**
+ * Resume playback of the playlist if it was paused
+ */
+- (void)resumePlayback;
 
 @end
 

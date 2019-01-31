@@ -250,13 +250,6 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     }
 }
 
-- (void)playItemAtIndex:(size_t)index
-{
-    vlc_playlist_Lock(_p_playlist);
-    vlc_playlist_PlayAt(_p_playlist, index);
-    vlc_playlist_Unlock(_p_playlist);
-}
-
 - (void)removeItemAtIndex:(size_t)index
 {
     /* note: we don't remove the cached data from the model here
@@ -264,6 +257,66 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_Remove(_p_playlist, index, 1);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)clearPlaylist
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_Clear(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (int)startPlaylist
+{
+    vlc_playlist_Lock(_p_playlist);
+    int ret = vlc_playlist_Start(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+- (int)playPreviousItem
+{
+    vlc_playlist_Lock(_p_playlist);
+    int ret = vlc_playlist_Prev(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+- (int)playItemAtIndex:(size_t)index
+{
+    vlc_playlist_Lock(_p_playlist);
+    int ret = vlc_playlist_PlayAt(_p_playlist, index);
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+- (int)playNextItem
+{
+    vlc_playlist_Lock(_p_playlist);
+    int ret = vlc_playlist_Next(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+    return ret;
+}
+
+- (void)stopPlayback
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_Stop(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)pausePlayback
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_Pause(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)resumePlayback
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_Resume(_p_playlist);
     vlc_playlist_Unlock(_p_playlist);
 }
 
