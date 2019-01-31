@@ -172,13 +172,21 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
         .display = { .width = cfg->width, cfg->height },
     };
 
+    vlc_mutex_lock(&sys->lock);
+    if (sys->width >= 0 && sys->height >= 0) {
+        dcfg.display.width = sys->width;
+        dcfg.display.height = sys->height;
+        sys->width = -1;
+        sys->height = -1;
+    }
+    vlc_mutex_unlock(&sys->lock);
+
     vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL);
     if (gl == NULL) {
         vout_window_Delete(surface);
         goto error;
     }
 
-    vlc_gl_Resize(gl, cfg->width, cfg->height);
     return gl;
 
 error:
