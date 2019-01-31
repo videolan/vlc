@@ -55,16 +55,6 @@ static void vlc_gl_stop(void *func, va_list ap)
     deactivate(gl);
 }
 
-/**
- * Creates an OpenGL context (and its underlying surface).
- *
- * @note In most cases, you should vlc_gl_MakeCurrent() afterward.
- *
- * @param wnd window to use as OpenGL surface
- * @param flags OpenGL context type
- * @param name module name (or NULL for auto)
- * @return a new context, or NULL on failure
- */
 vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
                         const char *name)
 {
