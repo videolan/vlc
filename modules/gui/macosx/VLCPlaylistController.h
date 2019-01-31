@@ -28,6 +28,11 @@ NS_ASSUME_NONNULL_BEGIN
 @class VLCPlaylistModel;
 @class VLCPlaylistDataSource;
 
+extern NSString *VLCPlaybackOrderChanged;
+extern NSString *VLCPlaybackRepeatChanged;
+extern NSString *VLCPlaybackHasPreviousChanged;
+extern NSString *VLCPlaybackHasNextChanged;
+
 @interface VLCPlaylistController : NSObject
 
 /**
@@ -54,13 +59,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  * indicates whether there is a previous item in the list the user could go back to
+ * @note Subscribe to the VLCPlaybackHasPreviousChanged notification to be notified about changes
  */
 @property (readonly) BOOL hasPreviousPlaylistItem;
 
 /**
  * indicates whether there is a next item in the list the user could move on to
+ * @note Subscribe to the VLCPlaybackHasNextChanged notification to be notified about changes
  */
 @property (readonly) BOOL hasNextPlaylistItem;
+
+/**
+ * sets and gets the playback repeat mode according to the enum defined in the core
+ * @note Subscribe to the VLCPlaybackRepeatChanged notification to be notified about changes
+ */
+@property (readwrite) enum vlc_playlist_playback_repeat playbackRepeat;
+
+/**
+ * sets and gets the playback order according to the enum defined in the core
+ * @note Subscribe to the VLCPlaybackOrderChanged notification to be notified about changes
+ */
+@property (readwrite) enum vlc_playlist_playback_order playbackOrder;
 
 /**
  * Simplified version to add new items to the end of the current playlist

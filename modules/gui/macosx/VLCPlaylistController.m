@@ -26,6 +26,11 @@
 #import "VLCMain.h"
 #import <vlc_interface.h>
 
+NSString *VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
+NSString *VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
+NSString *VLCPlaybackHasPreviousChanged = @"VLCPlaybackHasPreviousChanged";
+NSString *VLCPlaybackHasNextChanged = @"VLCPlaybackHasNextChanged";
+
 @interface VLCPlaylistController ()
 {
     vlc_playlist_t *_p_playlist;
@@ -35,8 +40,12 @@
 - (void)playlistResetWithItems:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
 - (void)playlistAdded:(vlc_playlist_item_t *const *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems;
-- (void)currentPlaylistItemChanged:(ssize_t)index;
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
+- (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode;
+- (void)playlistPlaybackOrderUpdated:(enum vlc_playlist_playback_order)currentOrder;
+- (void)currentPlaylistItemChanged:(size_t)index;
+- (void)playlistHasPreviousItem:(BOOL)hasPrevious;
+- (void)playlistHasNextItem:(BOOL)hasNext;
 
 @end
 
@@ -110,6 +119,24 @@ cb_playlist_current_item_changed(vlc_playlist_t *playlist,
     [playlistController currentPlaylistItemChanged:index];
 }
 
+static void
+cb_playlist_has_prev_changed(vlc_playlist_t *playlist,
+                             bool has_prev,
+                             void *p_data)
+{
+    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+    [playlistController playlistHasPreviousItem:has_prev];
+}
+
+static void
+cb_playlist_has_next_changed(vlc_playlist_t *playlist,
+                             bool has_next,
+                             void *p_data)
+{
+    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+    [playlistController playlistHasNextItem:has_next];
+}
+
 static const struct vlc_playlist_callbacks playlist_callbacks = {
     cb_playlist_items_reset,
     cb_playlist_items_added,
@@ -119,8 +146,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     cb_playlist_playback_repeat_changed,
     cb_playlist_playback_order_changed,
     cb_playlist_current_item_changed,
-    NULL,
-    NULL,
+    cb_playlist_has_prev_changed,
+    cb_playlist_has_next_changed,
 };
 
 #pragma mark -
@@ -183,12 +210,6 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
 
-- (void)currentPlaylistItemChanged:(ssize_t)index
-{
-    _currentPlaylistIndex = index;
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
-}
-
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
 {
     VLC_UNUSED(items);
@@ -196,6 +217,36 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         [_playlistModel updateItemAtIndex:i];
     }
     [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+}
+
+- (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode
+{
+    _playbackRepeat = currentRepeatMode;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackRepeatChanged object:nil];
+}
+
+- (void)playlistPlaybackOrderUpdated:(enum vlc_playlist_playback_order)currentOrder
+{
+    _playbackOrder = currentOrder;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackOrderChanged object:nil];
+}
+
+- (void)currentPlaylistItemChanged:(size_t)index
+{
+    _currentPlaylistIndex = index;
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+}
+
+- (void)playlistHasPreviousItem:(BOOL)hasPrevious
+{
+    _hasPreviousPlaylistItem = hasPrevious;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackHasPreviousChanged object:nil];
+}
+
+- (void)playlistHasNextItem:(BOOL)hasNext
+{
+    _hasNextPlaylistItem = hasNext;
+    [[NSNotificationCenter defaultCenter] postNotificationName:VLCPlaybackHasNextChanged object:nil];
 }
 
 #pragma mark - controller functions for use within the UI
