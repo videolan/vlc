@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCPlaylistItem.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,25 +20,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCVideoWindowCommon.h"
+#import <Foundation/Foundation.h>
+#import <vlc_playlist.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryWindowController : NSWindowController
+@interface VLCPlaylistItem : NSObject
 
-- (instancetype)initWithLibraryWindow;
+@property (readwrite, assign) input_item_t *inputItem;
+@property (readwrite, retain) NSString *title;
+@property (readwrite, assign) vlc_tick_t duration;
 
-@end
+@property (readwrite, retain) NSString *artistName;
+@property (readwrite, retain) NSString *albumName;
+@property (readwrite, retain) NSString *artworkURLString;
 
-@interface VLCLibraryWindow : VLCVideoWindowCommon
-
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
-
-@end
-
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+- (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item;
 
 @end
 

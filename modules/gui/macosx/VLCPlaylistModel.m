@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCPlaylistModel.m: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,26 +20,53 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCVideoWindowCommon.h"
+#import "VLCPlaylistModel.h"
+#import "VLCPlaylistController.h"
+#import "VLCPlaylistItem.h"
+#import <vlc_common.h>
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface VLCLibraryWindowController : NSWindowController
-
-- (instancetype)initWithLibraryWindow;
-
+@interface VLCPlaylistModel ()
+{
+    NSMutableArray *_playlistArray;
+}
 @end
 
-@interface VLCLibraryWindow : VLCVideoWindowCommon
+@implementation VLCPlaylistModel
 
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        _playlistArray = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+- (size_t)numberOfPlaylistItems
+{
+    size_t ret = 0;
+
+    vlc_playlist_t *p_playlist = self.playlistController.p_playlist;
+
+    ret = vlc_playlist_Count(p_playlist);
+
+    return ret;
+}
+
+- (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index
+{
+    return _playlistArray[index];
+}
+
+- (void)addItem:(vlc_playlist_item_t *)item atIndex:(size_t)index
+{
+    VLCPlaylistItem *playlistItem = [[VLCPlaylistItem alloc] initWithPlaylistItem:item];
+    [_playlistArray insertObject:playlistItem atIndex:index];
+}
+
+- (void)removeItemAtIndex:(size_t)index
+{
+    [_playlistArray removeObjectAtIndex:index];
+}
 
 @end
-
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
-
-@end
-
-NS_ASSUME_NONNULL_END

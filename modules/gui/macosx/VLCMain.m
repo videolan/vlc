@@ -61,6 +61,7 @@
 #import "VLCLogWindowController.h"
 #import "VLCConvertAndSaveWindowController.h"
 #import "VLCLibraryWindow.h"
+#import "VLCPlaylistController.h"
 
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
@@ -221,6 +222,7 @@ static VLCMain *sharedInstance = nil;
 
         [VLCApplication sharedApplication].delegate = self;
 
+        _playlistController = [[VLCPlaylistController alloc] init];
         _input_manager = [[VLCInputManager alloc] initWithMain:self];
 
         // first initalize extensions dialog provider, then core dialog

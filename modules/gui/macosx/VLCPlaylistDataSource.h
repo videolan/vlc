@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCPlaylistDataSource.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,25 +20,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCVideoWindowCommon.h"
+#import <Cocoa/Cocoa.h>
+
+@class VLCPlaylistController;
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryWindowController : NSWindowController
+@interface VLCPlaylistDataSource : NSObject <NSTableViewDataSource, NSTableViewDelegate>
 
-- (instancetype)initWithLibraryWindow;
+@property (readwrite, assign, nonatomic) VLCPlaylistController *playlistController;
+@property (readwrite, assign) NSTableView *tableView;
 
-@end
-
-@interface VLCLibraryWindow : VLCVideoWindowCommon
-
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
-
-@end
-
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+- (void)playlistUpdated;
 
 @end
 

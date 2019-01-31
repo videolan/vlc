@@ -1,5 +1,5 @@
 /*****************************************************************************
- * VLCLibraryWindow.h: MacOS X interface module
+ * VLCPlaylistController.h: MacOS X interface module
  *****************************************************************************
  * Copyright (C) 2019 VLC authors and VideoLAN
  *
@@ -20,25 +20,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import "VLCVideoWindowCommon.h"
+#import <Foundation/Foundation.h>
+#import <vlc_playlist.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VLCLibraryWindowController : NSWindowController
+@class VLCPlaylistModel;
+@class VLCPlaylistDataSource;
 
-- (instancetype)initWithLibraryWindow;
+@interface VLCPlaylistController : NSObject
 
-@end
+@property (readonly) vlc_playlist_t *p_playlist;
+@property (readonly) VLCPlaylistModel *playlistModel;
+@property (readwrite, assign) VLCPlaylistDataSource *playlistDataSource;
 
-@interface VLCLibraryWindow : VLCVideoWindowCommon
+/**
+ * Simplified version to add new items at the end of the current playlist
+ * @param array array of items. Each item is a Dictionary with meta info.
+ */
+- (void)addPlaylistItems:(NSArray*)array;
 
-@property (readwrite, weak) IBOutlet NSSegmentedControl *segmentedTitleControl;
-@property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
-@property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
-
-@end
-
-@interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
+/**
+ * Adds new items to the playlist, at specified parent node and index.
+ * @param o_array array of items. Each item is a Dictionary with meta info.
+ * @param i_plItemId parent playlist node id, -1 for default playlist
+ * @param i_position index for new items, -1 for appending at end
+ * @param b_start starts playback of first item if true
+ */
+- (void)addPlaylistItems:(NSArray*)itemArray
+              atPosition:(size_t)insertionIndex
+           startPlayback:(BOOL)b_start;
 
 @end
 

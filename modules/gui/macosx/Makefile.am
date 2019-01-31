@@ -91,6 +91,10 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCRemoteControlService.h gui/macosx/VLCRemoteControlService.m \
 	gui/macosx/VLCMainWindow.h gui/macosx/VLCMainWindow.m \
 	gui/macosx/VLCLibraryWindow.h gui/macosx/VLCLibraryWindow.m \
+	gui/macosx/VLCPlaylistController.h gui/macosx/VLCPlaylistController.m \
+	gui/macosx/VLCPlaylistDataSource.h gui/macosx/VLCPlaylistDataSource.m \
+	gui/macosx/VLCPlaylistItem.h gui/macosx/VLCPlaylistItem.m \
+	gui/macosx/VLCPlaylistModel.h gui/macosx/VLCPlaylistModel.m \
 	gui/macosx/VLCPlaylistTableCellView.h gui/macosx/VLCPlaylistTableCellView.m \
 	gui/macosx/VLCLibraryCollectionViewItem.h gui/macosx/VLCLibraryCollectionViewItem.m \
 	gui/macosx/VLCDetachedVideoWindow.h gui/macosx/VLCDetachedVideoWindow.m \
