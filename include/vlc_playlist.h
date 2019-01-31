@@ -207,7 +207,6 @@ struct vlc_playlist_callbacks
      *
      * \param playlist the playlist
      * \param index    the index of the first removed item
-     * \param items    the array of removed items
      * \param count    the number of items removed
      * \param userdata userdata provided to AddListener()
      */
