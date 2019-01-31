@@ -36,7 +36,7 @@ struct vlc_gl_priv_t
     vlc_gl_t gl;
     vlc_atomic_rc_t rc;
 };
-#undef vlc_gl_Create
+
 /**
  * Creates an OpenGL context (and its underlying surface).
  *
