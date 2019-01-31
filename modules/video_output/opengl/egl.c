@@ -205,7 +205,8 @@ static void Close(vlc_gl_t *gl)
 /**
  * Probe EGL display availability
  */
-static int Open(vlc_gl_t *gl, const struct gl_api *api)
+static int Open(vlc_gl_t *gl, const struct gl_api *api,
+                unsigned width, unsigned height)
 {
     vlc_object_t *obj = VLC_OBJECT(gl);
     vlc_gl_sys_t *sys = malloc(sizeof (*sys));
@@ -260,6 +261,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api)
             sys->display = eglGetDisplay(sys->x11);
 # endif
     }
+    (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_WAYLAND)
     sys->window = NULL;
@@ -271,8 +273,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api)
     if (!CheckClientExt("EGL_EXT_platform_wayland"))
         goto error;
 
-    /* Resize() should be called with the proper size before Swap() */
-    window = wl_egl_window_create(wnd->handle.wl, 1, 1);
+    window = wl_egl_window_create(wnd->handle.wl, width, height);
     if (window == NULL)
         goto error;
     sys->window = window;
@@ -292,6 +293,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api)
   && !defined (__CYGWIN__) && !defined (__SCITECH_SNAP__)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
+    (void) width; (void) height;
 
 #elif defined (USE_PLATFORM_ANDROID)
     if (wnd->type != VOUT_WINDOW_TYPE_ANDROID_NATIVE)
@@ -306,6 +308,7 @@ static int Open(vlc_gl_t *gl, const struct gl_api *api)
 # if defined (__ANDROID__) || defined (ANDROID)
     sys->display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 # endif
+    (void) width; (void) height;
 
 #endif
 
@@ -395,22 +398,22 @@ error:
     return VLC_EGENERIC;
 }
 
-static int OpenGLES2(vlc_gl_t *gl)
+static int OpenGLES2(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     static const struct gl_api api = {
         "OpenGL_ES", EGL_OPENGL_ES_API, 3, EGL_OPENGL_ES2_BIT,
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE },
     };
-    return Open(gl, &api);
+    return Open(gl, &api, width, height);
 }
 
-static int OpenGL(vlc_gl_t *gl)
+static int OpenGL(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     static const struct gl_api api = {
         "OpenGL", EGL_OPENGL_API, 4, EGL_OPENGL_BIT,
         { EGL_NONE },
     };
-    return Open(gl, &api);
+    return Open(gl, &api, width, height);
 }
 
 vlc_module_begin ()

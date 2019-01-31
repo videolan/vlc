@@ -37,7 +37,7 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int Open(vlc_gl_t *);
+static int Open(vlc_gl_t *, unsigned width, unsigned height);
 static void Close(vlc_gl_t *);
 
 #define HW_GPU_AFFINITY_TEXT N_("GPU affinity")
@@ -157,7 +157,7 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     fncDeleteDCNV(sys->affinityHDC);
 }
 
-static int Open(vlc_gl_t *gl)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vout_display_sys_t *sys;
 
@@ -242,6 +242,7 @@ static int Open(vlc_gl_t *gl)
     if (sys->exts.GetExtensionsStringEXT || sys->exts.GetExtensionsStringARB)
         gl->wgl.getExtensionsString = GetExtensionsString;
 
+    (void) width; (void) height;
     return VLC_SUCCESS;
 
 error:

@@ -113,7 +113,7 @@ static bool CheckGLXext (Display *dpy, unsigned snum, const char *ext)
     return false;
 }
 
-static int Open(vlc_gl_t *gl)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vlc_object_t *obj = VLC_OBJECT(gl);
 
@@ -245,6 +245,7 @@ static int Open(vlc_gl_t *gl)
         var_SetString(gl->surface, "gl", "glx");
     }
 
+    (void) width; (void) height;
     return VLC_SUCCESS;
 
 error:

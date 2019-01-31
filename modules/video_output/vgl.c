@@ -107,7 +107,7 @@ static void Close(vlc_gl_t *gl)
         }                                                          \
     } while( 0 )
 
-static int Open(vlc_gl_t *gl)
+static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
 {
     vout_display_sys_t * sys;
 
@@ -137,6 +137,7 @@ static int Open(vlc_gl_t *gl)
             return VLC_EGENERIC;
         }
 
+    (void) width; (void) height;
     return VLC_SUCCESS;
 }
 

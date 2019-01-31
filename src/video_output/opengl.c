@@ -39,10 +39,12 @@ struct vlc_gl_priv_t
 
 static int vlc_gl_start(void *func, va_list ap)
 {
-    int (*activate)(vlc_gl_t *) = func;
+    int (*activate)(vlc_gl_t *, unsigned, unsigned) = func;
     vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
+    unsigned width = va_arg(ap, unsigned);
+    unsigned height = va_arg(ap, unsigned);
 
-    return activate(gl);
+    return activate(gl, width, height);
 }
 
 static void vlc_gl_stop(void *func, va_list ap)
@@ -88,7 +90,9 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
 
     vlc_gl_t *gl = &glpriv->gl;
     gl->surface = wnd;
-    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl);
+    /* Resize() should be called with the proper size before Swap() */
+    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
+                                 1u, 1u);
     if (gl->module == NULL)
     {
         vlc_object_release(gl);
