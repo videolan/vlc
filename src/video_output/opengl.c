@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_atomic.h>
 #include <vlc_opengl.h>
+#include <vlc_vout_display.h>
 #include "libvlc.h"
 #include <vlc_modules.h>
 
@@ -55,9 +56,10 @@ static void vlc_gl_stop(void *func, va_list ap)
     deactivate(gl);
 }
 
-vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
-                        const char *name)
+vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
+                        unsigned flags, const char *name)
 {
+    vout_window_t *wnd = cfg->window;
     vlc_object_t *parent = (vlc_object_t *)wnd;
     struct vlc_gl_priv_t *glpriv;
     const char *type;
@@ -166,7 +168,9 @@ vlc_gl_t *vlc_gl_surface_Create(vlc_object_t *obj,
         *wp = surface;
 
     /* TODO: support ES? */
-    vlc_gl_t *gl = vlc_gl_Create(surface, VLC_OPENGL, NULL);
+    struct vout_display_cfg dcfg = { .window = surface };
+
+    vlc_gl_t *gl = vlc_gl_Create(&dcfg, VLC_OPENGL, NULL);
     if (gl == NULL) {
         vout_window_Delete(surface);
         goto error;

@@ -132,7 +132,7 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
         goto error;
 
     char *modlist = var_InheritString(surface, "gl");
-    sys->gl = vlc_gl_Create (surface, VLC_OPENGL, modlist);
+    sys->gl = vlc_gl_Create(cfg, VLC_OPENGL, modlist);
     free(modlist);
     if (!sys->gl)
     {
