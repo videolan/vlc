@@ -85,6 +85,16 @@ NSImage *imageFromRes(NSString *name);
 + (instancetype)stringWithTime:(long long int)time;
 
 /**
+ Creates an NSString with the given time in VLC ticks
+
+ This method allocates and initializes an NSString with the given
+ time formatted as displayable time
+
+ \param time   Time in VLC ticks
+ */
++ (instancetype)stringWithTimeFromTicks:(vlc_tick_t)time;
+
+/**
  Creates an NSString from the given null-terminated C string
  buffer encoded as base64
 

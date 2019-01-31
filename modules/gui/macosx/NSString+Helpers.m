@@ -69,6 +69,13 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     }
 }
 
++ (instancetype)stringWithTimeFromTicks:(vlc_tick_t)time
+{
+    char psz_time[MSTRTIME_MAX_SIZE];
+    return [NSString stringWithUTF8String:
+            secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(time))];
+}
+
 + (instancetype)stringWithTime:(long long int)time
 {
     if (time > 0) {
