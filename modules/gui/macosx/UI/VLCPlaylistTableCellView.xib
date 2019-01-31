@@ -44,6 +44,7 @@
                 <constraint firstItem="ohB-P0-nCv" firstAttribute="centerY" secondItem="c22-O7-iKe" secondAttribute="centerY" id="mGo-gc-dR6"/>
                 <constraint firstItem="Hnm-OH-KKY" firstAttribute="top" secondItem="c22-O7-iKe" secondAttribute="top" id="owl-FT-tZX"/>
                 <constraint firstItem="Hnm-OH-KKY" firstAttribute="leading" secondItem="c22-O7-iKe" secondAttribute="leading" id="vEf-1U-gh4"/>
+                <constraint firstItem="3Ha-ZH-fa9" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="ohB-P0-nCv" secondAttribute="trailing" constant="10" id="wQv-VX-Hhb"/>
             </constraints>
             <connections>
                 <outlet property="durationTextField" destination="3Ha-ZH-fa9" id="vbh-oE-Afj"/>

@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, retain, nullable) NSString *artworkURLString;
 
 - (instancetype)initWithPlaylistItem:(vlc_playlist_item_t *)p_item;
+- (void)updateRepresentation;
 
 @end
 

@@ -48,6 +48,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, assign) VLCPlaylistDataSource *playlistDataSource;
 
 /**
+ * Index of the current playlist item
+ */
+@property (readonly) size_t currentPlaylistIndex;
+
+/**
  * indicates whether there is a previous item in the list the user could go back to
  */
 @property (readonly) BOOL hasPreviousPlaylistItem;

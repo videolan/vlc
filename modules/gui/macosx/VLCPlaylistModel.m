@@ -53,9 +53,20 @@
     return ret;
 }
 
+- (void)dropExistingData
+{
+    [_playlistArray removeAllObjects];
+}
+
 - (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index
 {
     return _playlistArray[index];
+}
+
+- (void)addItem:(vlc_playlist_item_t *)item
+{
+    VLCPlaylistItem *playlistItem = [[VLCPlaylistItem alloc] initWithPlaylistItem:item];
+    [_playlistArray addObject:playlistItem];
 }
 
 - (void)addItem:(vlc_playlist_item_t *)item atIndex:(size_t)index
@@ -67,6 +78,12 @@
 - (void)removeItemAtIndex:(size_t)index
 {
     [_playlistArray removeObjectAtIndex:index];
+}
+
+- (void)updateItemAtIndex:(size_t)index
+{
+    VLCPlaylistItem *item = _playlistArray[index];
+    [item updateRepresentation];
 }
 
 @end

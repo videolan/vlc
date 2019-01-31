@@ -32,9 +32,11 @@
     vlc_playlist_listener_id *_playlistListenerID;
 }
 
+- (void)playlistResetWithItems:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
 - (void)playlistAdded:(vlc_playlist_item_t *const *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems;
 - (void)currentPlaylistItemChanged:(ssize_t)index;
+- (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
 
 @end
 
@@ -48,6 +50,8 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
                         void *p_data)
 {
     NSLog(@"%s: numberOfItems %zu", __func__, numberOfItems);
+    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+    [playlistController playlistResetWithItems:items count:numberOfItems];
 }
 
 static void
@@ -75,12 +79,14 @@ cb_playlist_items_removed(vlc_playlist_t *playlist,
 
 static void
 cb_playlist_items_updated(vlc_playlist_t *playlist,
-                          size_t index,
+                          size_t firstUpdatedIndex,
                           vlc_playlist_item_t *const items[],
-                          size_t len,
+                          size_t numberOfUpdatedItems,
                           void *p_data)
 {
-    NSLog(@"%s: index: %zu len: %zu", __func__, index, len);
+    NSLog(@"%s: index: %zu len: %zu", __func__, firstUpdatedIndex, numberOfUpdatedItems);
+    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+    [playlistController playlistUpdatedForIndex:firstUpdatedIndex items:items count:numberOfUpdatedItems];
 }
 
 static void
@@ -159,6 +165,17 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - callback forwarders
 
+- (void)playlistResetWithItems:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
+{
+    NSLog(@"%s", __func__);
+
+    for (size_t i = 0; i < numberOfItems; i++) {
+        [_playlistModel addItem:items[i]];
+    }
+
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+}
+
 - (void)playlistAdded:(vlc_playlist_item_t *const *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems
 {
     NSLog(@"%s", __func__);
@@ -184,6 +201,17 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)currentPlaylistItemChanged:(ssize_t)index
 {
+    _currentPlaylistIndex = index;
+    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+}
+
+- (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
+{
+    NSLog(@"%s", __func__);
+    VLC_UNUSED(items);
+    for (size_t i = firstUpdatedIndex; i < firstUpdatedIndex + numberOfItems; i++) {
+        [_playlistModel updateItemAtIndex:i];
+    }
     [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
 

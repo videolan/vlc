@@ -77,7 +77,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     }
 
     cellView.mediaTitleTextField.stringValue = item.title;
-    cellView.durationTextField.stringValue = [NSString stringWithTime:item.duration];
+    cellView.durationTextField.stringValue = [NSString stringWithTimeFromTicks:item.duration];
     cellView.mediaImageView.image = [NSImage imageNamed: @"noart.png"];
     // TODO: show more data if available
 

@@ -32,24 +32,29 @@
     self = [super init];
     if (self) {
         _playlistItem = p_item;
-        input_item_t *p_media = vlc_playlist_item_GetMedia(p_item);
-        vlc_mutex_lock(&p_media->lock);
-        _title = toNSStr(p_media->psz_name);
-        _duration = p_media->i_duration;
-
-        if (p_media->p_meta) {
-            _artistName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Artist));
-            _albumName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Album));
-            _artworkURLString = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_ArtworkURL));
-        }
-        vlc_mutex_unlock(&p_media->lock);
+        [self updateRepresentation];
     }
     return self;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"item %p, title: %@", &_playlistItem, _title];
+    return [NSString stringWithFormat:@"item %p, title: %@ duration %lli", &_playlistItem, _title, _duration];
+}
+
+- (void)updateRepresentation
+{
+    input_item_t *p_media = vlc_playlist_item_GetMedia(_playlistItem);
+    vlc_mutex_lock(&p_media->lock);
+    _title = toNSStr(p_media->psz_name);
+    _duration = p_media->i_duration;
+
+    if (p_media->p_meta) {
+        _artistName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Artist));
+        _albumName = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_Album));
+        _artworkURLString = toNSStr(vlc_meta_Get(p_media->p_meta, vlc_meta_ArtworkURL));
+    }
+    vlc_mutex_unlock(&p_media->lock);
 }
 
 - (NSString *)path
