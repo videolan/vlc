@@ -137,7 +137,7 @@ static int Open(vlc_gl_t *gl, unsigned width, unsigned height)
             return VLC_EGENERIC;
         }
 
-    (void) width; (void) height;
+    Resize(gl, width, height);
     return VLC_SUCCESS;
 }
 
