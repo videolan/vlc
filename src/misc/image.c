@@ -685,16 +685,14 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const video_format_t 
     p_owner->p_image = p_image;
 
     p_dec->p_module = NULL;
-    es_format_InitFromVideo( &p_dec->fmt_in, fmt );
-    if( i_extra )
-    {
-        p_dec->fmt_in.p_extra = malloc( i_extra );
-        if( p_dec->fmt_in.p_extra )
-        {
-            memcpy( p_dec->fmt_in.p_extra, p_extra, i_extra );
-            p_dec->fmt_in.i_extra = i_extra;
-        }
-    }
+
+    es_format_t es_fmt;
+    es_format_InitFromVideo( &es_fmt, fmt );
+    if ( es_fmt.p_extra ) free( es_fmt.p_extra );
+    es_fmt.p_extra = p_extra;
+    es_fmt.i_extra = i_extra;
+
+    es_format_Copy( &p_dec->fmt_in, &es_fmt );
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
     p_dec->b_frame_drop_allowed = false;
 
