@@ -234,10 +234,8 @@ int HandleMeta (demux_t *p_demux, mtrk_t *tr)
             break;
 
         case 0x59: /* Key signature */
-            if (length == 2)
-                ;
-            else
-                ret = -1;
+            if (length != 2)
+                msg_Warn(p_demux, "invalid key signature");
             break;
 
         case 0x7f: /* Proprietary event */
