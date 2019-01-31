@@ -130,8 +130,6 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     if (sys->gl == NULL)
         goto error;
 
-    vlc_gl_Resize (sys->gl, cfg->display.width, cfg->display.height);
-
     /* Initialize video display */
     const vlc_fourcc_t *spu_chromas;
 

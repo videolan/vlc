@@ -82,7 +82,6 @@ vlc_gl_t *vlc_gl_Create(const struct vout_display_cfg *restrict cfg,
 
     vlc_gl_t *gl = &glpriv->gl;
     gl->surface = wnd;
-    /* Resize() should be called with the proper size before Swap() */
     gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl,
                                  cfg->display.width, cfg->display.height);
     if (gl->module == NULL)
