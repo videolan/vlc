@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VLCPlaylistTableCellView : NSTableCellView
 
+@property (readwrite, nonatomic) BOOL representsCurrentPlaylistItem;
 @property (readwrite, assign) IBOutlet NSTextField *mediaTitleTextField;
 @property (readwrite, assign) IBOutlet NSTextField *durationTextField;
 @property (readwrite, assign) IBOutlet NSImageView *mediaImageView;

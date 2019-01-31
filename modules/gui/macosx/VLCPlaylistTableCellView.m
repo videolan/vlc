@@ -22,6 +22,18 @@
 
 #import "VLCPlaylistTableCellView.h"
 
+static const float fontSizeForMediaTitle = 13.;
+
 @implementation VLCPlaylistTableCellView
+
+- (void)setRepresentsCurrentPlaylistItem:(BOOL)representsCurrentPlaylistItem
+{
+    _representsCurrentPlaylistItem = representsCurrentPlaylistItem;
+    if (_representsCurrentPlaylistItem) {
+        self.mediaTitleTextField.font = [NSFont boldSystemFontOfSize:fontSizeForMediaTitle];
+    } else {
+        self.mediaTitleTextField.font = [NSFont systemFontOfSize:fontSizeForMediaTitle];
+    }
+}
 
 @end
