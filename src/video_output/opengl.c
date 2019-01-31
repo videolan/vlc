@@ -37,6 +37,22 @@ struct vlc_gl_priv_t
     vlc_atomic_rc_t rc;
 };
 
+static int vlc_gl_start(void *func, va_list ap)
+{
+    int (*activate)(vlc_object_t *) = func;
+    vlc_object_t *gl = va_arg(ap, vlc_object_t *);
+
+    return activate(gl);
+}
+
+static void vlc_gl_stop(void *func, va_list ap)
+{
+    void (*deactivate)(vlc_object_t *) = func;
+    vlc_object_t *gl = va_arg(ap, vlc_object_t *);
+
+    deactivate(gl);
+}
+
 /**
  * Creates an OpenGL context (and its underlying surface).
  *
@@ -72,7 +88,8 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
 
     vlc_gl_t *gl = &glpriv->gl;
     gl->surface = wnd;
-    gl->module = module_need(gl, type, name, true);
+    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start,
+                                 VLC_OBJECT(gl));
     if (gl->module == NULL)
     {
         vlc_object_release(gl);
@@ -96,7 +113,8 @@ void vlc_gl_Release(vlc_gl_t *gl)
     struct vlc_gl_priv_t *glpriv = (struct vlc_gl_priv_t *)gl;
     if (!vlc_atomic_rc_dec(&glpriv->rc))
         return;
-    module_unneed(gl, gl->module);
+
+    vlc_module_unload(gl, gl->module, vlc_gl_stop, VLC_OBJECT(gl));
     vlc_object_release(gl);
 }
 
