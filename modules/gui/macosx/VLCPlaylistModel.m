@@ -75,9 +75,9 @@
     [_playlistArray insertObject:playlistItem atIndex:index];
 }
 
-- (void)removeItemAtIndex:(size_t)index
+- (void)removeItemsInRange:(NSRange)range
 {
-    [_playlistArray removeObjectAtIndex:index];
+    [_playlistArray removeObjectsInRange:range];
 }
 
 - (void)updateItemAtIndex:(size_t)index

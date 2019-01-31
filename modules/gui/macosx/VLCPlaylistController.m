@@ -192,9 +192,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     NSLog(@"%s", __func__);
 
-    for (size_t i = index + numberOfItems; i > index; i--) {
-        [_playlistModel removeItemAtIndex:i];
-    }
+    NSRange range = NSMakeRange(index, numberOfItems);
+    [_playlistModel removeItemsInRange:range];
 
     [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
 }
