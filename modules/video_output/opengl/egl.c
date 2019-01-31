@@ -175,9 +175,8 @@ static EGLSurface CreateWindowSurface(EGLDisplay dpy, EGLConfig config,
     return eglCreateWindowSurface(dpy, config, *native, attrs);
 }
 
-static void Close (vlc_object_t *obj)
+static void Close(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
     vlc_gl_sys_t *sys = gl->sys;
 
     if (sys->display != EGL_NO_DISPLAY)
@@ -206,9 +205,9 @@ static void Close (vlc_object_t *obj)
 /**
  * Probe EGL display availability
  */
-static int Open (vlc_object_t *obj, const struct gl_api *api)
+static int Open(vlc_gl_t *gl, const struct gl_api *api)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
+    vlc_object_t *obj = VLC_OBJECT(gl);
     vlc_gl_sys_t *sys = malloc(sizeof (*sys));
     if (unlikely(sys == NULL))
         return VLC_ENOMEM;
@@ -392,26 +391,26 @@ static int Open (vlc_object_t *obj, const struct gl_api *api)
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    Close(gl);
     return VLC_EGENERIC;
 }
 
-static int OpenGLES2 (vlc_object_t *obj)
+static int OpenGLES2(vlc_gl_t *gl)
 {
     static const struct gl_api api = {
         "OpenGL_ES", EGL_OPENGL_ES_API, 3, EGL_OPENGL_ES2_BIT,
         { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE },
     };
-    return Open (obj, &api);
+    return Open(gl, &api);
 }
 
-static int OpenGL (vlc_object_t *obj)
+static int OpenGL(vlc_gl_t *gl)
 {
     static const struct gl_api api = {
         "OpenGL", EGL_OPENGL_API, 4, EGL_OPENGL_BIT,
         { EGL_NONE },
     };
-    return Open (obj, &api);
+    return Open(gl, &api);
 }
 
 vlc_module_begin ()

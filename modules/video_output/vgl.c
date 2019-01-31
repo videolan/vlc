@@ -90,9 +90,8 @@ static void Resize(vlc_gl_t * gl, unsigned w, unsigned h)
     sys->height = h;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys = gl->sys;
     if( sys->cleanupCb )
         sys->cleanupCb(sys->opaque);
@@ -108,13 +107,12 @@ static void Close(vlc_object_t *object)
         }                                                          \
     } while( 0 )
 
-static int Open(vlc_object_t *object)
+static int Open(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t * sys;
 
     /* Allocate structure */
-    gl->sys = sys = vlc_obj_calloc(object, 1, sizeof(*sys));
+    gl->sys = sys = vlc_obj_calloc(VLC_OBJECT(gl), 1, sizeof(*sys));
     if( !sys )
         return VLC_ENOMEM;
 

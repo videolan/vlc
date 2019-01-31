@@ -39,16 +39,16 @@ struct vlc_gl_priv_t
 
 static int vlc_gl_start(void *func, va_list ap)
 {
-    int (*activate)(vlc_object_t *) = func;
-    vlc_object_t *gl = va_arg(ap, vlc_object_t *);
+    int (*activate)(vlc_gl_t *) = func;
+    vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
 
     return activate(gl);
 }
 
 static void vlc_gl_stop(void *func, va_list ap)
 {
-    void (*deactivate)(vlc_object_t *) = func;
-    vlc_object_t *gl = va_arg(ap, vlc_object_t *);
+    void (*deactivate)(vlc_gl_t *) = func;
+    vlc_gl_t *gl = va_arg(ap, vlc_gl_t *);
 
     deactivate(gl);
 }
@@ -88,8 +88,7 @@ vlc_gl_t *vlc_gl_Create(struct vout_window_t *wnd, unsigned flags,
 
     vlc_gl_t *gl = &glpriv->gl;
     gl->surface = wnd;
-    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start,
-                                 VLC_OBJECT(gl));
+    gl->module = vlc_module_load(gl, type, name, true, vlc_gl_start, gl);
     if (gl->module == NULL)
     {
         vlc_object_release(gl);
@@ -114,7 +113,7 @@ void vlc_gl_Release(vlc_gl_t *gl)
     if (!vlc_atomic_rc_dec(&glpriv->rc))
         return;
 
-    vlc_module_unload(gl, gl->module, vlc_gl_stop, VLC_OBJECT(gl));
+    vlc_module_unload(gl, gl->module, vlc_gl_stop, gl);
     vlc_object_release(gl);
 }
 

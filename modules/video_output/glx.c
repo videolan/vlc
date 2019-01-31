@@ -113,9 +113,9 @@ static bool CheckGLXext (Display *dpy, unsigned snum, const char *ext)
     return false;
 }
 
-static int Open (vlc_object_t *obj)
+static int Open(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
+    vlc_object_t *obj = VLC_OBJECT(gl);
 
     if (gl->surface->type != VOUT_WINDOW_TYPE_XID || !vlc_xlib_init (obj))
         return VLC_EGENERIC;
@@ -253,9 +253,8 @@ error:
     return VLC_EGENERIC;
 }
 
-static void Close (vlc_object_t *obj)
+static void Close(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)obj;
     vlc_gl_sys_t *sys = gl->sys;
     Display *dpy = sys->display;
 

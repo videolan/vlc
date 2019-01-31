@@ -37,8 +37,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int Open(vlc_object_t *);
-static void Close(vlc_object_t *);
+static int Open(vlc_gl_t *);
+static void Close(vlc_gl_t *);
 
 #define HW_GPU_AFFINITY_TEXT N_("GPU affinity")
 
@@ -157,9 +157,8 @@ static void DestroyGPUAffinityDC(vlc_gl_t *gl) {
     fncDeleteDCNV(sys->affinityHDC);
 }
 
-static int Open(vlc_object_t *object)
+static int Open(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys;
 
     /* Allocate structure */
@@ -246,13 +245,12 @@ static int Open(vlc_object_t *object)
     return VLC_SUCCESS;
 
 error:
-    Close(object);
+    Close(gl);
     return VLC_EGENERIC;
 }
 
-static void Close(vlc_object_t *object)
+static void Close(vlc_gl_t *gl)
 {
-    vlc_gl_t *gl = (vlc_gl_t *)object;
     vout_display_sys_t *sys = gl->sys;
 
     if (sys->hGLRC)
