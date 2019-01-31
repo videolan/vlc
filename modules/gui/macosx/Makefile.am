@@ -94,6 +94,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCPlaylistController.h gui/macosx/VLCPlaylistController.m \
 	gui/macosx/VLCPlaylistDataSource.h gui/macosx/VLCPlaylistDataSource.m \
 	gui/macosx/VLCPlaylistItem.h gui/macosx/VLCPlaylistItem.m \
+	gui/macosx/VLCPlaylistMenuController.h gui/macosx/VLCPlaylistMenuController.m \
 	gui/macosx/VLCPlaylistModel.h gui/macosx/VLCPlaylistModel.m \
 	gui/macosx/VLCPlaylistTableCellView.h gui/macosx/VLCPlaylistTableCellView.m \
 	gui/macosx/VLCPlaylistTableView.h gui/macosx/VLCPlaylistTableView.m \
@@ -157,6 +158,7 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/MainMenu.xib \
 	gui/macosx/UI/MainWindow.xib \
 	gui/macosx/UI/VLCLibraryWindow.xib \
+	gui/macosx/UI/VLCPlaylistMenu.xib \
 	gui/macosx/UI/VLCPlaylistTableCellView.xib \
 	gui/macosx/UI/VLCLibraryCollectionViewItem.xib \
 	gui/macosx/UI/MediaInfo.xib \

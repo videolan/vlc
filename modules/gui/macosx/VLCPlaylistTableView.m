@@ -26,13 +26,29 @@
 #import "VLCPlaylistTableView.h"
 #import "VLCMain.h"
 #import "VLCPlaylistController.h"
+#import "VLCPlaylistMenuController.h"
+
+@interface VLCPlaylistTableView ()
+{
+    VLCPlaylistMenuController *_menuController;
+}
+@end
 
 @implementation VLCPlaylistTableView
 
 - (NSMenu *)menuForEvent:(NSEvent *)event
 {
-    return nil;
-    // FIXME:   return([(VLCPlaylist *)[self delegate] menuForEvent: event]);
+    if (!_menuController) {
+        _menuController = [[VLCPlaylistMenuController alloc] init];
+        _menuController.playlistTableView = self;
+    }
+
+    NSPoint pt = [self convertPoint: [event locationInWindow] fromView: nil];
+    NSInteger row = [self rowAtPoint:pt];
+    if (row != -1 && ![[self selectedRowIndexes] containsIndex: row])
+        [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+
+    return _menuController.playlistMenu;
 }
 
 - (void)keyDown:(NSEvent *)event

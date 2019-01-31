@@ -23,6 +23,7 @@
 #import "VLCPlaylistItem.h"
 #import "NSString+Helpers.h"
 #import <vlc_input.h>
+#import <vlc_url.h>
 
 @implementation VLCPlaylistItem
 
@@ -30,6 +31,7 @@
 {
     self = [super init];
     if (self) {
+        _playlistItem = p_item;
         input_item_t *p_media = vlc_playlist_item_GetMedia(p_item);
         vlc_mutex_lock(&p_media->lock);
         _title = toNSStr(p_media->psz_name);
@@ -47,7 +49,27 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"item %p, title: %@", &_inputItem, _title];
+    return [NSString stringWithFormat:@"item %p, title: %@", &_playlistItem, _title];
+}
+
+- (NSString *)path
+{
+    if (!_playlistItem) {
+        return nil;
+    }
+    input_item_t *p_media = vlc_playlist_item_GetMedia(_playlistItem);
+    if (!p_media) {
+        return nil;
+    }
+    char *psz_url = input_item_GetURI(p_media);
+    if (!psz_url)
+        return nil;
+
+    char *psz_path = vlc_uri2path(psz_url);
+    NSString *path = toNSStr(psz_path);
+    free(psz_url);
+    free(psz_path);
+    return path;
 }
 
 @end

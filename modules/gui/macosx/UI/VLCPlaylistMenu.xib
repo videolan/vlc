@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="VLCPlaylistMenuController">
+            <connections>
+                <outlet property="addFilesToPlaylistMenuItem" destination="Mdx-tr-uuI" id="XXf-67-eWE"/>
+                <outlet property="clearPlaylistMenuItem" destination="mfa-zG-Des" id="NjY-ev-rHM"/>
+                <outlet property="playMenuItem" destination="f6u-YD-nbW" id="cf7-f3-bCx"/>
+                <outlet property="playlistMenu" destination="dq6-Th-J8r" id="9Tj-Qo-HbU"/>
+                <outlet property="removeMenuItem" destination="YHt-8w-4G2" id="bRJ-4k-Oa5"/>
+                <outlet property="revealInFinderMenuItem" destination="FgT-MW-hvr" id="677-Gn-fVV"/>
+                <outlet property="sortPlaylistMenu" destination="fcX-EB-mJe" id="ww1-Y1-3SO"/>
+                <outlet property="sortPlaylistMenuItem" destination="fcX-EB-mJe" id="61o-Ll-UrY"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
+        <menu id="dq6-Th-J8r">
+            <items>
+                <menuItem title="Play" id="f6u-YD-nbW">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="play:" target="-2" id="baE-Tq-f7Q"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Remove" id="YHt-8w-4G2">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="remove:" target="-2" id="d7Q-Rl-br2"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Reveal in Finder" id="FgT-MW-hvr">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="revealInFinder:" target="-2" id="1hT-vw-QWq"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="hKI-E8-VMA"/>
+                <menuItem title="Add Files" id="Mdx-tr-uuI">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="addFilesToPlaylist:" target="-2" id="1MB-8E-leR"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Clear Playlist" id="mfa-zG-Des">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="clearPlaylist:" target="-2" id="yy4-15-pKY"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="8XF-0j-B5C"/>
+                <menuItem title="Sort" id="fcX-EB-mJe">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Sort" id="7gg-17-3N9">
+                        <items>
+                            <menuItem title="Item" id="cjh-Mt-gsu">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="-88" y="-124"/>
+        </menu>
+    </objects>
+</document>

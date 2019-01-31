@@ -286,7 +286,13 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (int)playItemAtIndex:(size_t)index
 {
     vlc_playlist_Lock(_p_playlist);
-    int ret = vlc_playlist_PlayAt(_p_playlist, index);
+    size_t playlistLength = vlc_playlist_Count(_p_playlist);
+    int ret = 0;
+    if (index >= playlistLength) {
+        ret = VLC_EGENERIC;
+    } else {
+        ret = vlc_playlist_PlayAt(_p_playlist, index);
+    }
     vlc_playlist_Unlock(_p_playlist);
     return ret;
 }

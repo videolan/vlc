@@ -517,6 +517,8 @@ modules/gui/macosx/VLCPlaylist.h
 modules/gui/macosx/VLCPlaylist.m
 modules/gui/macosx/VLCPlaylistInfo.h
 modules/gui/macosx/VLCPlaylistInfo.m
+modules/gui/macosx/VLCPlaylistMenuController.h
+modules/gui/macosx/VLCPlaylistMenuController.m
 modules/gui/macosx/VLCPlaylistView.h
 modules/gui/macosx/VLCPlaylistView.m
 modules/gui/macosx/VLCPopupPanelController.h
