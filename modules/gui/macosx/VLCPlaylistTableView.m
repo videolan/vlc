@@ -61,14 +61,24 @@
     }
 
     size_t indexOfSelectedItem = self.selectedRow;
+    NSIndexSet *selectedIndexes = [self selectedRowIndexes];
 
     switch(key) {
         case NSDeleteCharacter:
         case NSDeleteFunctionKey:
         case NSDeleteCharFunctionKey:
         case NSBackspaceCharacter:
-            [[[VLCMain sharedInstance] playlistController] removeItemAtIndex:indexOfSelectedItem];
+        {
+            if (selectedIndexes.count == 1) {
+                [[[VLCMain sharedInstance] playlistController] removeItemAtIndex:indexOfSelectedItem];
+            } else {
+                VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+                [selectedIndexes enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+                    [playlistController removeItemAtIndex:idx];
+                }];
+            }
             break;
+        }
 
         case NSEnterCharacter:
         case NSCarriageReturnCharacter:
