@@ -133,6 +133,7 @@
                                                         </tableColumn>
                                                     </tableColumns>
                                                     <connections>
+                                                        <action trigger="doubleAction" selector="playlistDoubleClickAction:" target="QvC-M9-y7g" id="aCf-fY-ndG"/>
                                                         <action selector="selectNextTab:" target="QvC-M9-y7g" id="oNk-CO-d5B"/>
                                                     </connections>
                                                 </tableView>

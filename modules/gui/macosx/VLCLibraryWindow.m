@@ -75,6 +75,15 @@ static NSString *VLCLibraryCellIdentifier = @"VLCLibraryCellIdentifier";
 {
 }
 
+- (void)playlistDoubleClickAction:(id)sender
+{
+    NSInteger selectedRow = self.playlistTableView.selectedRow;
+    if (selectedRow == -1)
+        return;
+
+    [[[VLCMain sharedInstance] playlistController] playItemAtIndex:selectedRow];
+}
+
 @end
 
 @implementation VLCLibraryDataSource

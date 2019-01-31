@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readwrite, weak) IBOutlet NSCollectionView *libraryCollectionView;
 @property (readwrite, weak) IBOutlet NSTableView *playlistTableView;
 
+- (IBAction)playlistDoubleClickAction:(id)sender;
+
 @end
 
 @interface VLCLibraryDataSource : NSObject <NSCollectionViewDataSource, NSCollectionViewDelegate>
