@@ -26,6 +26,7 @@
 #import "VLCPlaylistModel.h"
 #import "VLCPlaylistItem.h"
 #import "NSString+Helpers.h"
+#import "VLCMain.h"
 
 static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
@@ -57,7 +58,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
         NSNib *nib = [[NSNib alloc] initWithNibNamed:@"VLCPlaylistTableCellView" bundle:nil];
         NSArray *topLevelObjects;
         if (![nib instantiateWithOwner:self topLevelObjects:&topLevelObjects]) {
-            NSLog(@"Failed to load nib %@", nib);
+            msg_Err(getIntf(), "Failed to load nib file to show playlist items");
             return nil;
         }
 
@@ -72,7 +73,7 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
 
     VLCPlaylistItem *item = [_playlistModel playlistItemAtIndex:row];
     if (!item) {
-        NSLog(@"%s: model did not return an item!", __func__);
+        msg_Err(getIntf(), "playlist model did not return an item for representation");
         return cellView;
     }
 
@@ -82,11 +83,6 @@ static NSString *VLCPlaylistCellIdentifier = @"VLCPlaylistCellIdentifier";
     cellView.representsCurrentPlaylistItem = _playlistController.currentPlaylistIndex == row;
 
     return cellView;
-}
-
-- (void)tableViewSelectionDidChange:(NSNotification *)notification
-{
-    NSLog(@"playlist selection changed: %li", (long)[(NSTableView *)notification.object selectedRow]);
 }
 
 - (void)playlistUpdated
