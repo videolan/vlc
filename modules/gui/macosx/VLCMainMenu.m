@@ -37,6 +37,7 @@
 #import "VLCBookmarksWindowController.h"
 #import "VLCSimplePrefsController.h"
 #import "VLCPlaylist.h"
+#import "VLCPlaylistController.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCVoutView.h"
 #import "VLCCoreDialogProvider.h"
@@ -1121,7 +1122,7 @@
 - (IBAction)intfOpenFile:(id)sender
 {
     [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
-        [[[VLCMain sharedInstance] playlist] addPlaylistItems:files];
+        [[[VLCMain sharedInstance] playlistController] addPlaylistItems:files];
     }];
 }
 
