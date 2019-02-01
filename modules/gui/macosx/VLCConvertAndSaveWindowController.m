@@ -23,7 +23,6 @@
 #import "VLCConvertAndSaveWindowController.h"
 
 #import "VLCMain.h"
-#import "VLCPlaylist.h"
 #import "misc.h"
 #import "VLCPopupPanelController.h"
 #import "VLCTextfieldPanelController.h"
@@ -642,7 +641,11 @@
             [self updateDropView];
             return YES;
         }
-    } else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
+    }
+
+#if 0
+    // FIXME: re-implement drag-n-drop from the new playlist
+    else if ([desired_type isEqualToString:@"VLCPlaylistItemPboardType"]) {
         NSArray *draggedItems = [[[VLCMain sharedInstance] playlist] draggedItems];
 
         // Return early to prevent unnecessary playlist access/locking
@@ -674,6 +677,7 @@
 
         return (p_item != NULL) ? YES : NO;
     }
+#endif
     return NO;
 }
 

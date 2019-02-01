@@ -34,7 +34,6 @@
 #import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "VLCVoutView.h"
-#import "VLCPlaylist.h"
 #import "VLCMainMenu.h"
 
 #import <QuartzCore/QuartzCore.h>
@@ -131,7 +130,8 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    BOOL b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
+    // FIXME: re-implement drag and drop of new input items to the playlist
+    BOOL b_returned = NO;
 
     [self setNeedsDisplay:YES];
     return b_returned;

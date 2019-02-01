@@ -25,7 +25,6 @@
 #import "misc.h"
 #import "VLCMainWindow.h"
 #import "VLCMain.h"
-#import "VLCPlaylist.h"
 #import "VLCMainMenu.h"
 #import "VLCControlsBarCommon.h"
 #import "VLCCoreInteraction.h"
@@ -119,12 +118,13 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-    BOOL b_returned;
+    BOOL b_returned = NO;
 
     if (_dropHandler && [_dropHandler respondsToSelector:@selector(performDragOperation:)])
         b_returned = [_dropHandler performDragOperation:sender];
-    else // default
-        b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
+    // default
+        // FIXME: implement drag and drop _on_ new playlist
+//        b_returned = [[[VLCMain sharedInstance] playlist] performDragOperation:sender];
 
     [self setNeedsDisplay:YES];
     return b_returned;

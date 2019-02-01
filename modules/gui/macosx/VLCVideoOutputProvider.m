@@ -36,7 +36,6 @@
 #import "VLCBookmarksWindowController.h"
 #import "VLCTrackSynchronizationWindowController.h"
 #import "VLCResumeDialogController.h"
-#import "VLCPlaylist.h"
 #import "NSScreen+VLCAdditions.h"
 
 static int WindowEnable(vout_window_t *p_wnd, const vout_window_cfg_t *cfg)

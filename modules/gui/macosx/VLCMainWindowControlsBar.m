@@ -26,7 +26,6 @@
 #import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
-#import "VLCPlaylist.h"
 #import "CompatibilityFixes.h"
 #import <vlc_aout.h>
 
@@ -140,8 +139,7 @@
     if (!var_InheritBool(getIntf(), "macosx-show-playback-buttons"))
         [self removeJumpButtons:NO];
 
-    [[[VLCMain sharedInstance] playlist] playbackModeUpdated];
-
+    // FIXME: make sure that buttons appear in the correct state
 }
 
 #pragma mark -

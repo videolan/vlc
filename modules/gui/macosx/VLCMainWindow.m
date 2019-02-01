@@ -32,14 +32,12 @@
 #import "VLCAudioEffectsWindowController.h"
 #import "VLCMainMenu.h"
 #import "VLCOpenWindowController.h"
-#import "VLCPlaylist.h"
 #import "VLCSourceListItem.h"
 #import <math.h>
 #import <vlc_playlist_legacy.h>
 #import <vlc_url.h>
 #import <vlc_strings.h>
 #import <vlc_services_discovery.h>
-#import "VLCPLModel.h"
 
 #import "PXSourceList/PXSourceList.h"
 #import "PXSourceList/PXSourceListDataSource.h"
@@ -156,12 +154,6 @@ static const float f_min_window_height = 307.;
 
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
     b_dropzone_active = YES;
-
-    // Playlist setup
-    VLCPlaylist *playlist = [[VLCMain sharedInstance] playlist];
-    [playlist setOutlineView:(VLCPlaylistView *)_outlineView];
-    [playlist setPlaylistHeaderView:_outlineView.headerView];
-    [self setNextResponder:playlist];
 
     // (Re)load sidebar for the first time and select first item
     [self reloadSidebar];
@@ -670,13 +662,7 @@ static const float f_min_window_height = 307.;
     if ([self.fspanel respondsToSelector:@selector(setSeekable:)])
         [self.fspanel setSeekable: b_seekable];
 
-    PL_LOCK;
-    if ([[[[VLCMain sharedInstance] playlist] model] currentRootType] != ROOT_TYPE_PLAYLIST ||
-        [[[[VLCMain sharedInstance] playlist] model] hasChildren])
-        [self hideDropZone];
-    else
-        [self showDropZone];
-    PL_UNLOCK;
+    [self showDropZone];
     [_sidebarView setNeedsDisplay:YES];
 
     [self _updatePlaylistTitle];
@@ -826,23 +812,12 @@ static const float f_min_window_height = 307.;
 #pragma mark private playlist magic
 - (void)_updatePlaylistTitle
 {
-    PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
-    playlist_t *p_playlist = pl_Get(getIntf());
-
-    PL_LOCK;
-    if (root == ROOT_TYPE_PLAYLIST)
-        [_categoryLabel setStringValue: [_NS("Playlist") stringByAppendingString:[self _playbackDurationOfNode:p_playlist->p_playing]]];
-
-    PL_UNLOCK;
 }
 
 - (NSString *)_playbackDurationOfNode:(playlist_item_t*)node
 {
     if (!node)
         return @"";
-
-    playlist_t * p_playlist = pl_Get(getIntf());
-    PL_ASSERT_LOCKED;
 
     vlc_tick_t mt_duration = playlist_GetNodeDuration( node );
 
@@ -859,7 +834,6 @@ static const float f_min_window_height = 307.;
 
 - (IBAction)searchItem:(id)sender
 {
-    [[[[VLCMain sharedInstance] playlist] model] searchUpdate:[_searchField stringValue]];
 }
 
 - (IBAction)highlightSearchField:(id)sender
@@ -962,22 +936,7 @@ static const float f_min_window_height = 307.;
     [_categoryLabel setStringValue:[item title]];
 
     if ([[item identifier] isEqualToString:@"playlist"]) {
-        PL_LOCK;
-        [[[[VLCMain sharedInstance] playlist] model] changeRootItem:p_playlist->p_playing];
-        PL_UNLOCK;
-
         [self _updatePlaylistTitle];
-
-    } else {
-        PL_LOCK;
-        const char *title = [[item title] UTF8String];
-        playlist_item_t *pl_item = playlist_ChildSearchName(&p_playlist->root, title);
-        if (pl_item)
-            [[[[VLCMain sharedInstance] playlist] model] changeRootItem:pl_item];
-        else
-            msg_Err(getIntf(), "Could not find playlist entry with name %s", title);
-
-        PL_UNLOCK;
     }
 
     // Note the order: first hide the podcast controls, then show the drop zone
@@ -986,13 +945,7 @@ static const float f_min_window_height = 307.;
     else
         [self hidePodcastControls];
 
-    PL_LOCK;
-    if ([[[[VLCMain sharedInstance] playlist] model] currentRootType] != ROOT_TYPE_PLAYLIST ||
-        [[[[VLCMain sharedInstance] playlist] model] hasChildren])
-        [self hideDropZone];
-    else
-        [self showDropZone];
-    PL_UNLOCK;
+    [self showDropZone];
 
     [[NSNotificationCenter defaultCenter] postNotificationName: VLCMediaKeySupportSettingChangedNotification
                                                         object: nil
@@ -1036,7 +989,7 @@ static const float f_min_window_height = 307.;
 {
     if ([[item identifier] isEqualToString:@"playlist"]) {
         NSPasteboard *o_pasteboard = [info draggingPasteboard];
-        if ([[o_pasteboard types] containsObject: VLCPLItemPasteboadType] || [[o_pasteboard types] containsObject: NSFilenamesPboardType])
+        if ([[o_pasteboard types] containsObject: NSFilenamesPboardType])
             return NSDragOperationGeneric;
     }
     return NSDragOperationNone;
@@ -1044,44 +997,7 @@ static const float f_min_window_height = 307.;
 
 - (BOOL)sourceList:(PXSourceList *)aSourceList acceptDrop:(id <NSDraggingInfo>)info item:(id)item childIndex:(NSInteger)index
 {
-    NSPasteboard *o_pasteboard = [info draggingPasteboard];
-
-    playlist_t * p_playlist = pl_Get(getIntf());
-    playlist_item_t *p_node;
-
-    if ([[item identifier] isEqualToString:@"playlist"])
-        p_node = p_playlist->p_playing;
-    else {
-        msg_Warn(p_playlist, "dragging non-playlist items is not supported");
-        return NO;
-    }
-
-    if ([[o_pasteboard types] containsObject: @"VLCPlaylistItemPboardType"]) {
-        NSArray * array = [[[VLCMain sharedInstance] playlist] draggedItems];
-
-        NSUInteger count = [array count];
-
-        PL_LOCK;
-        for(NSUInteger i = 0; i < count; i++) {
-            playlist_item_t *p_item = playlist_ItemGetById(p_playlist, [[array objectAtIndex:i] plItemId]);
-            if (!p_item) continue;
-            playlist_NodeAddCopy(p_playlist, p_item, p_node, PLAYLIST_END);
-        }
-        PL_UNLOCK;
-
-        return YES;
-    }
-
-    // check if dropped item is a file
-    NSArray *items = [[[VLCMain sharedInstance] playlist] createItemsFromExternalPasteboard:o_pasteboard];
-    if (items.count == 0)
-        return NO;
-
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:items
-                                         withParentItemId:p_node->i_id
-                                                    atPos:-1
-                                            startPlayback:NO];
-    return YES;
+    return NO;
 }
 
 - (id)sourceList:(PXSourceList *)aSourceList persistentObjectForItem:(id)item
@@ -1162,7 +1078,6 @@ static const float f_min_window_height = 307.;
 
         /* update playlist table */
         if (playlist_IsServicesDiscoveryLoaded(p_playlist, "podcast")) {
-            [[[VLCMain sharedInstance] playlist] playlistUpdated];
         }
     }
 }

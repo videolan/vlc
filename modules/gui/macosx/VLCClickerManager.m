@@ -24,10 +24,11 @@
 #import "SPMediaKeyTap.h"
 #import "AppleRemote.h"
 #import "VLCMain.h"
-#import "VLCPlaylist.h"
 #import "VLCInputManager.h"
 #import "VLCCoreInteraction.h"
 #import "NSSound+VLCAdditions.h"
+#import "VLCPlaylistController.h"
+#import "VLCPlaylistModel.h"
 #import <vlc_actions.h>
 
 @interface VLCClickerManager()
@@ -107,7 +108,7 @@
         _mediaKeyController = [[SPMediaKeyTap alloc] initWithDelegate:self];
 
     VLCMain *main = [VLCMain sharedInstance];
-    if (b_mediaKeySupport && ([[[main playlist] model] hasChildren] ||
+    if (b_mediaKeySupport && ([[[main playlistController] playlistModel] numberOfPlaylistItems] > 0 ||
                               [[main inputManager] hasInput])) {
         if (!b_mediaKeyTrapEnabled) {
             msg_Dbg(p_intf, "Enabling media key support");

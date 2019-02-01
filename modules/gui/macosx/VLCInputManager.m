@@ -28,7 +28,6 @@
 #import "VLCMain.h"
 #import "VLCMainMenu.h"
 #import "VLCMainWindow.h"
-#import "VLCPlaylist.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCResumeDialogController.h"
 #import "VLCTrackSynchronizationWindowController.h"
@@ -259,7 +258,7 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
         p_input_changed = vlc_object_hold(p_current_input);
 
-        [[o_main playlist] currentlyPlayingItemChanged];
+//        [[o_main playlist] currentlyPlayingItemChanged];
 
         [self continuePlaybackWhereYouLeftOff:p_current_input];
 
@@ -516,7 +515,8 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
     input_item_t *p_input_item = input_GetItem(p_current_input);
 
-    [[[o_main playlist] model] updateItem:p_input_item];
+    // FIXME: update metadata in playlist model if needed
+//    [[[o_main playlist] model] updateItem:p_input_item];
     [[[VLCMain sharedInstance] currentMediaInfoPanel] updatePanelWithItem:p_input_item];
 
     if (!p_input_item) {

@@ -23,7 +23,6 @@
 #import "VLCCoreInteraction.h"
 #import "VLCMain.h"
 #import "VLCOpenWindowController.h"
-#import "VLCPlaylist.h"
 #import <vlc_strings.h>
 #import <vlc_url.h>
 #import <vlc_modules.h>
@@ -31,6 +30,7 @@
 #import <vlc_actions.h>
 #import "VLCClickerManager.h"
 #import "VLCPlaylistController.h"
+#import "VLCPlaylistModel.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
@@ -121,12 +121,11 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         playlist_TogglePause(p_playlist);
         vlc_object_release(p_input);
     } else {
-        PLRootType root = [[[[VLCMain sharedInstance] playlist] model] currentRootType];
         VLCMain *mainInstance = [VLCMain sharedInstance];
-        if ([[mainInstance playlist] isSelectionEmpty] && (root == ROOT_TYPE_PLAYLIST))
+        if (mainInstance.playlistController.playlistModel.numberOfPlaylistItems == 0)
             [[mainInstance open] openFileGeneric];
         else
-            [[mainInstance playlist] playItem:nil];
+            [mainInstance.playlistController startPlaylist];
     }
 }
 

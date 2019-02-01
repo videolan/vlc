@@ -47,8 +47,6 @@
 #import "VLCMainMenu.h"
 #import "VLCVoutView.h"
 #import "prefs.h"
-#import "VLCPlaylist.h"
-#import "VLCPlaylistInfo.h"
 #import "VLCPlaylistInfo.h"
 #import "VLCOpenWindowController.h"
 #import "VLCBookmarksWindowController.h"
@@ -174,7 +172,6 @@ static int ShowController(vlc_object_t *p_this, const char *psz_variable,
     VLCBookmarksWindowController *_bookmarks;
     VLCResumeDialogController *_resume_dialog;
     VLCInputManager *_input_manager;
-    VLCPlaylist *_playlist;
     VLCLogWindowController *_messagePanelController;
     VLCStatusBarIcon *_statusBarIcon;
     VLCTrackSynchronizationWindowController *_trackSyncPanel;
@@ -235,7 +232,6 @@ static VLCMain *sharedInstance = nil;
         _statusBarIcon = [[VLCStatusBarIcon  alloc] init];
 
         _voutProvider = [[VLCVideoOutputProvider alloc] init];
-        _playlist = [[VLCPlaylist alloc] init];
 
         _mainWindowController = [[NSWindowController alloc] initWithWindowNibName:@"MainWindow"];
         _libraryWindowController = [[VLCLibraryWindowController alloc] initWithLibraryWindow];
@@ -559,11 +555,6 @@ static VLCMain *sharedInstance = nil;
         _prefs = [[VLCPrefs alloc] init];
 
     return _prefs;
-}
-
-- (VLCPlaylist *)playlist
-{
-    return _playlist;
 }
 
 - (VLCCoreDialogProvider *)coreDialogProvider

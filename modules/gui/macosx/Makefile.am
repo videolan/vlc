@@ -57,11 +57,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/VLCOpenWindowController.h gui/macosx/VLCOpenWindowController.m \
 	gui/macosx/VLCOpenInputMetadata.h gui/macosx/VLCOpenInputMetadata.m \
 	gui/macosx/VLCOutput.h gui/macosx/VLCOutput.m \
-	gui/macosx/VLCPlaylistView.h gui/macosx/VLCPlaylistView.m \
-	gui/macosx/VLCPlaylist.h gui/macosx/VLCPlaylist.m \
 	gui/macosx/VLCPlaylistInfo.h gui/macosx/VLCPlaylistInfo.m \
-	gui/macosx/VLCPLItem.h gui/macosx/VLCPLItem.m \
-	gui/macosx/VLCPLModel.h gui/macosx/VLCPLModel.m \
 	gui/macosx/prefs.h gui/macosx/prefs.m \
 	gui/macosx/prefs_widgets.h gui/macosx/prefs_widgets.m \
 	gui/macosx/VLCPopupPanelController.h gui/macosx/VLCPopupPanelController.m \
@@ -165,7 +161,6 @@ libmacosx_plugin_la_XIB_SOURCES = \
 	gui/macosx/UI/MediaInfo.xib \
 	gui/macosx/UI/Open.xib \
 	gui/macosx/UI/PlaylistAccessoryView.xib \
-	gui/macosx/UI/PlaylistMenu.xib \
 	gui/macosx/UI/PopupPanel.xib \
 	gui/macosx/UI/Preferences.xib \
 	gui/macosx/UI/ResumeDialog.xib \

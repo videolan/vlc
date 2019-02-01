@@ -25,7 +25,6 @@
 #import "VLCMain.h"
 #import "VLCCoreInteraction.h"
 #import "VLCMainMenu.h"
-#import "VLCPlaylist.h"
 #import "CompatibilityFixes.h"
 #import "NSString+Helpers.h"
 

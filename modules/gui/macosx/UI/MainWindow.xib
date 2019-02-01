@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14313.13.2" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14313.13.2"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -270,55 +270,11 @@
                                                             <constraint firstAttribute="bottom" secondItem="5605" secondAttribute="bottom" id="fdA-1r-rKk"/>
                                                         </constraints>
                                                     </customView>
-                                                    <scrollView focusRingType="none" autohidesScrollers="YES" horizontalLineScroll="17" horizontalPageScroll="10" verticalLineScroll="17" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4372">
-                                                        <rect key="frame" x="0.0" y="0.0" width="477" height="274"/>
-                                                        <clipView key="contentView" id="wTX-wO-asx">
-                                                            <rect key="frame" x="1" y="0.0" width="475" height="273"/>
-                                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                            <subviews>
-                                                                <outlineView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="reverseSequential" alternatingRowBackgroundColors="YES" autosaveColumns="NO" rowHeight="15" headerView="4373" indentationPerLevel="16" autoresizesOutlineColumn="YES" outlineTableColumn="4380" id="4376" customClass="VLCPlaylistView">
-                                                                    <rect key="frame" x="0.0" y="0.0" width="475" height="250"/>
-                                                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                                                    <size key="intercellSpacing" width="3" height="2"/>
-                                                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                    <tableViewGridLines key="gridStyleMask" vertical="YES"/>
-                                                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
-                                                                    <tableColumns>
-                                                                        <tableColumn identifier="status" width="18" minWidth="18" maxWidth="18" id="4380">
-                                                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                                                <font key="font" metaFont="smallSystem"/>
-                                                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                                                            </tableHeaderCell>
-                                                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" id="4381"/>
-                                                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
-                                                                        </tableColumn>
-                                                                    </tableColumns>
-                                                                </outlineView>
-                                                            </subviews>
-                                                        </clipView>
-                                                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="4374">
-                                                            <rect key="frame" x="1" y="234" width="0.0" height="16"/>
-                                                            <autoresizingMask key="autoresizingMask"/>
-                                                        </scroller>
-                                                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="4375">
-                                                            <rect key="frame" x="386" y="23" width="16" height="0.0"/>
-                                                            <autoresizingMask key="autoresizingMask"/>
-                                                        </scroller>
-                                                        <tableHeaderView key="headerView" id="4373">
-                                                            <rect key="frame" x="0.0" y="0.0" width="475" height="23"/>
-                                                            <autoresizingMask key="autoresizingMask"/>
-                                                        </tableHeaderView>
-                                                    </scrollView>
                                                 </subviews>
                                                 <constraints>
-                                                    <constraint firstAttribute="bottom" secondItem="4372" secondAttribute="bottom" id="7nB-oh-n2V"/>
                                                     <constraint firstItem="4722" firstAttribute="leading" secondItem="U2A-0F-udY" secondAttribute="leading" id="FCe-Dh-MEG"/>
                                                     <constraint firstAttribute="trailing" secondItem="4722" secondAttribute="trailing" id="G8U-K8-Aao"/>
-                                                    <constraint firstItem="4372" firstAttribute="top" secondItem="U2A-0F-udY" secondAttribute="top" id="TzQ-ic-Og9"/>
                                                     <constraint firstAttribute="bottom" secondItem="4722" secondAttribute="bottom" id="dSW-Uh-nP9"/>
-                                                    <constraint firstItem="4372" firstAttribute="leading" secondItem="U2A-0F-udY" secondAttribute="leading" id="fZe-5h-83L"/>
-                                                    <constraint firstAttribute="trailing" secondItem="4372" secondAttribute="trailing" id="ozJ-dU-Qw7"/>
                                                     <constraint firstItem="4722" firstAttribute="top" secondItem="U2A-0F-udY" secondAttribute="top" id="tIs-Fh-Jsd"/>
                                                 </constraints>
                                             </customView>
@@ -711,8 +667,6 @@
                 <outlet property="dropzoneImageView" destination="4725" id="Ck9-vp-aDM"/>
                 <outlet property="dropzoneLabel" destination="4727" id="HkS-xv-7B6"/>
                 <outlet property="dropzoneView" destination="4722" id="a41-TD-aJs"/>
-                <outlet property="outlineView" destination="4376" id="92d-4j-4PK"/>
-                <outlet property="playlistScrollView" destination="4372" id="QDP-7m-wKJ"/>
                 <outlet property="podcastAddButton" destination="5263" id="Rg8-kX-6dU"/>
                 <outlet property="podcastRemoveButton" destination="5302" id="T6b-Y8-Usc"/>
                 <outlet property="podcastSubscribeCancelButton" destination="5268" id="nSd-2J-TCb"/>
