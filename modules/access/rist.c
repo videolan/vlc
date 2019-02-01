@@ -529,10 +529,11 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                         return;
                     /* Check for changes in source IP address or port */
                     int8_t name_length = rtcp_sdes_get_name_length(buf);
-                    if (name_length > bytes_left)
+                    if (name_length > bytes_left || name_length <= 0 ||
+                        (size_t)name_length > sizeof(new_sender_name))
                     {
                         /* check for a sane number of bytes */
-                        msg_Err(p_access, "Malformed SDES packet, wrong cname len %u, got a " \
+                        msg_Err(p_access, "Malformed SDES packet, wrong cname len %d, got a " \
                             "buffer of %u bytes.", name_length, bytes_left);
                         return;
                     }
