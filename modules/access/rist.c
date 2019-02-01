@@ -142,7 +142,7 @@ static struct rist_flow *rist_init_rx(void)
     return flow;
 }
 
-static void rist_WriteTo_i11e_Locked(vlc_mutex_t lock, int fd, const void *buf, size_t len, 
+static void rist_WriteTo_i11e_Locked(vlc_mutex_t lock, int fd, const void *buf, size_t len,
     const struct sockaddr *peer, socklen_t slen)
 {
     vlc_mutex_lock( &lock );
@@ -169,7 +169,7 @@ static struct rist_flow *rist_udp_receiver(stream_t *p_access, vlc_url_t *parsed
         return NULL;
     }
 
-    p_sys->flow->fd_nack = net_OpenDgram(p_access, parsed_url->psz_host, parsed_url->i_port + 1, 
+    p_sys->flow->fd_nack = net_OpenDgram(p_access, parsed_url->psz_host, parsed_url->i_port + 1,
         NULL, 0, IPPROTO_UDP);
     if (p_sys->flow->fd_nack < 0)
     {
@@ -225,7 +225,7 @@ static void send_rtcp_feedback(stream_t *p_access, struct rist_flow *flow)
     strlcpy((char *)p_sdes_name, flow->cname, namelen);
 
     /* Write to Socket */
-    rist_WriteTo_i11e_Locked(p_sys->lock, flow->fd_nack, buf, rtcp_feedback_size, 
+    rist_WriteTo_i11e_Locked(p_sys->lock, flow->fd_nack, buf, rtcp_feedback_size,
         (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
     buf = NULL;
@@ -263,7 +263,7 @@ static void send_bbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
     len += RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
 
     /* Write to Socket */
-    rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len, 
+    rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len,
         (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
     buf = NULL;
@@ -302,7 +302,7 @@ static void send_rbnack(stream_t *p_access, int fd_nack, block_t *pkt_nacks, uin
     len += RTCP_FB_FCI_GENERIC_NACK_SIZE * nack_count;
 
     /* Write to Socket */
-    rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len, 
+    rist_WriteTo_i11e_Locked(p_sys->lock, fd_nack, buf, len,
         (struct sockaddr *)&flow->peer_sockaddr, flow->peer_socklen);
     free(buf);
     buf = NULL;
@@ -348,7 +348,7 @@ static void send_nacks(stream_t *p_access, struct rist_flow *flow)
                     flow->nacks_retries[idx]++;
                     nacks[nacks_len++] = idx;
                     msg_Dbg(p_access, "Sending NACK for seq %d, age %"PRId64" ms, retry %u, " \
-                        "expiration %"PRId64" ms", idx, ts_get_from_rtp(age)/1000, 
+                        "expiration %"PRId64" ms", idx, ts_get_from_rtp(age)/1000,
                         flow->nacks_retries[idx], ts_get_from_rtp(expiration)/1000);
                 }
             }
@@ -386,7 +386,7 @@ static int sockaddr_cmp(struct sockaddr *x, struct sockaddr *y)
     else if (x->sa_family == AF_INET6)
     {
         struct sockaddr_in6 *xin6 = (void*)x, *yin6 = (void*)y;
-        int r = memcmp(xin6->sin6_addr.s6_addr, yin6->sin6_addr.s6_addr, 
+        int r = memcmp(xin6->sin6_addr.s6_addr, yin6->sin6_addr.s6_addr,
             sizeof(xin6->sin6_addr.s6_addr));
         if (r != 0)
             return r;
@@ -404,8 +404,8 @@ static void print_sockaddr_info_change(stream_t *p_access, struct sockaddr *x, s
     if (x->sa_family == AF_INET)
     {
         struct sockaddr_in *xin = (void*)x, *yin = (void*)y;
-        msg_Info(p_access, "Peer IP:Port change detected: old IP:Port %s:%d, new IP:Port %s:%d", 
-            inet_ntoa(xin->sin_addr), ntohs(xin->sin_port), inet_ntoa(yin->sin_addr), 
+        msg_Info(p_access, "Peer IP:Port change detected: old IP:Port %s:%d, new IP:Port %s:%d",
+            inet_ntoa(xin->sin_addr), ntohs(xin->sin_port), inet_ntoa(yin->sin_addr),
             ntohs(yin->sin_port));
     }
     else if (x->sa_family == AF_INET6)
@@ -415,7 +415,7 @@ static void print_sockaddr_info_change(stream_t *p_access, struct sockaddr *x, s
         char newstr[INET6_ADDRSTRLEN];
         inet_ntop(xin6->sin6_family, &xin6->sin6_addr, oldstr, sizeof(struct in6_addr));
         inet_ntop(yin6->sin6_family, &yin6->sin6_addr, newstr, sizeof(struct in6_addr));
-        msg_Info(p_access, "Peer IP:Port change detected: old IP:Port %s:%d, new IP:Port %s:%d", 
+        msg_Info(p_access, "Peer IP:Port change detected: old IP:Port %s:%d, new IP:Port %s:%d",
             oldstr, ntohs(xin6->sin6_port), newstr, ntohs(yin6->sin6_port));
     }
 }
@@ -436,7 +436,7 @@ static void print_sockaddr_info(stream_t *p_access, struct sockaddr *x)
     }
 }
 
-static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_in, size_t len, 
+static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_in, size_t len,
     struct sockaddr *peer, socklen_t slen)
 {
     stream_sys_t *p_sys = p_access->p_sys;
@@ -453,7 +453,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
         if ( bytes_left < 4 )
         {
             /* we must have at least 4 bytes */
-            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %d", 
+            msg_Err(p_access, "Rist rtcp packet must have at least 4 bytes, we have %d",
                 bytes_left);
             return;
         }
@@ -499,7 +499,7 @@ static void rtcp_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf_
                     {
                         ip_port_changed = true;
                         if(flow->peer_socklen > 0)
-                            print_sockaddr_info_change(p_access, 
+                            print_sockaddr_info_change(p_access,
                                 (struct sockaddr *)&flow->peer_sockaddr, peer);
                         else
                             print_sockaddr_info(p_access, peer);
@@ -590,7 +590,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     /* Check to see if this is a retransmission or a regular packet */
     if (buf[11] & (1 << 0))
     {
-        msg_Dbg(p_access, "Packet %d RECOVERED, Window: [%d:%d-->%d]", idx, flow->ri, flow->wi, 
+        msg_Dbg(p_access, "Packet %d RECOVERED, Window: [%d:%d-->%d]", idx, flow->ri, flow->wi,
             flow->wi-flow->ri);
         p_sys->i_recovered_packets++;
         retrasnmitted = true;
@@ -603,18 +603,18 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
         if (idx != idxnext)
         {
             if (idx > idxnext) {
-                msg_Dbg(p_access, "Gap, got %d, expected %d, %d packet gap, Window: [%d:%d-->%d]", 
+                msg_Dbg(p_access, "Gap, got %d, expected %d, %d packet gap, Window: [%d:%d-->%d]",
                     idx, idxnext, idx - idxnext, flow->ri, flow->wi, (uint16_t)(flow->wi-flow->ri));
             } else {
                 p_sys->i_reordered_packets++;
-                msg_Dbg(p_access, "Out of order, got %d, expected %d, Window: [%d:%d-->%d]", idx, 
+                msg_Dbg(p_access, "Out of order, got %d, expected %d, Window: [%d:%d-->%d]", idx,
                     idxnext, flow->ri, flow->wi, (uint16_t)(flow->wi-flow->ri));
             }
             uint16_t zero_counter = (uint16_t)(flow->wi + 1);
             while(zero_counter++ != idx) {
                 flow->nacks_retries[zero_counter] = 0;
             }
-            /*msg_Dbg(p_access, "Gap, reseting %d packets as zero nacks %d to %d", 
+            /*msg_Dbg(p_access, "Gap, reseting %d packets as zero nacks %d to %d",
                 idx - flow->wi - 1, (uint16_t)(flow->wi + 1), idx);*/
         }
     }
@@ -647,7 +647,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     {
         if ((pkt_ts - flow->hi_timestamp) > flow->hi_timestamp/10)
         {
-            msg_Info(p_access, "Forward stream discontinuity idx@%d/%d/%d ts@%u/%u", flow->ri, idx, 
+            msg_Info(p_access, "Forward stream discontinuity idx@%d/%d/%d ts@%u/%u", flow->ri, idx,
                 flow->wi, pkt_ts, flow->hi_timestamp);
             flow->reset = 1;
             success = false;
@@ -661,7 +661,7 @@ static bool rist_input(stream_t *p_access, struct rist_flow *flow, uint8_t *buf,
     else if (!is_index_in_range(flow, idx))
     {
         /* incoming timestamp just jumped back in time or index is outside of scope */
-        msg_Info(p_access, "Backwards stream discontinuity idx@%d/%d/%d ts@%u/%u", flow->ri, idx, 
+        msg_Info(p_access, "Backwards stream discontinuity idx@%d/%d/%d ts@%u/%u", flow->ri, idx,
             flow->wi, pkt_ts, flow->hi_timestamp);
         flow->reset = 1;
         success = false;
@@ -696,7 +696,7 @@ static block_t *rist_dequeue(stream_t *p_access, struct rist_flow *flow)
             continue;
         }
 
-        /*printf("IDX=%d, flow->hi_timestamp: %u, (ts + flow->rtp_latency): %u\n", idx, 
+        /*printf("IDX=%d, flow->hi_timestamp: %u, (ts + flow->rtp_latency): %u\n", idx,
             flow->hi_timestamp, (ts - 100 * flow->qdelay));*/
         if (flow->hi_timestamp > (uint32_t)(pkt->rtp_ts + flow->rtp_latency))
         {
@@ -722,7 +722,7 @@ static block_t *rist_dequeue(stream_t *p_access, struct rist_flow *flow)
     if (loss_amount > 0 && found_data == true)
     {
         /* Packet loss confirmed, we found valid data after the holes */
-        msg_Dbg(p_access, "Packet NOT RECOVERED, %d packet(s), Window: [%d:%d]", loss_amount, 
+        msg_Dbg(p_access, "Packet NOT RECOVERED, %d packet(s), Window: [%d:%d]", loss_amount,
             flow->ri, flow->wi);
         p_sys->i_lost_packets += loss_amount;
     }
@@ -788,11 +788,11 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     pfd[1].events = POLLIN;
 
     /* The protocol uses a fifo buffer with a fixed time delay.
-     * That buffer needs to be emptied at a rate that is determined by the rtp timestamps of the 
-     * packets. If I waited indefinitely for data coming in, the rate and delay of output packets 
-     * would be wrong. I am calling the rist_dequeue function every time a data packet comes in 
-     * and also every time we get a poll timeout. The configurable poll timeout is for controling 
-     * the maximum jitter of output data coming out of the buffer. The default 5ms timeout covers 
+     * That buffer needs to be emptied at a rate that is determined by the rtp timestamps of the
+     * packets. If I waited indefinitely for data coming in, the rate and delay of output packets
+     * would be wrong. I am calling the rist_dequeue function every time a data packet comes in
+     * and also every time we get a poll timeout. The configurable poll timeout is for controling
+     * the maximum jitter of output data coming out of the buffer. The default 5ms timeout covers
      * most cases. */
 
     ret = vlc_poll_i11e(pfd, 2, p_sys->i_poll_timeout_current);
@@ -821,7 +821,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
         /* Process rctp incoming data */
         if (pfd[1].revents & POLLIN)
         {
-            r = rist_ReadFrom_i11e(flow->fd_nack, buf, p_sys->i_max_packet_size, 
+            r = rist_ReadFrom_i11e(flow->fd_nack, buf, p_sys->i_max_packet_size,
                 (struct sockaddr *)&peer, &slen);
             if (unlikely(r == -1)) {
                 msg_Err(p_access, "socket %d error: %s\n", flow->fd_nack, gai_strerror(errno));
@@ -874,14 +874,14 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     {
         if (p_sys->i_poll_timeout_nonzero_count > 0)
         {
-            float ratio = (float)p_sys->i_poll_timeout_zero_count 
+            float ratio = (float)p_sys->i_poll_timeout_zero_count
                 / (float)p_sys->i_poll_timeout_nonzero_count;
             if (ratio <= 1)
                 p_sys->vbr_ratio += 1 - ratio;
             else
                 p_sys->vbr_ratio += ratio - 1;
             p_sys->vbr_ratio_count++;
-            /*msg_Dbg(p_access, "zero poll %u, non-zero poll %u, ratio %.2f", 
+            /*msg_Dbg(p_access, "zero poll %u, non-zero poll %u, ratio %.2f",
                 p_sys->i_poll_timeout_zero_count, p_sys->i_poll_timeout_nonzero_count, ratio);*/
             p_sys->i_poll_timeout_zero_count = 0;
             p_sys->i_poll_timeout_nonzero_count =  0;
@@ -898,11 +898,11 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
             ratio = p_sys->vbr_ratio / (float)p_sys->vbr_ratio_count;
         float quality = 100;
         if (p_sys->i_total_packets > 0)
-            quality -= (float)100*(float)(p_sys->i_lost_packets + p_sys->i_recovered_packets + 
+            quality -= (float)100*(float)(p_sys->i_lost_packets + p_sys->i_recovered_packets +
                 p_sys->i_reordered_packets)/(float)p_sys->i_total_packets;
         if (quality != 100)
             msg_Info(p_access, "STATS: Total %u, Recovered %u, Reordered %u, Lost %u, VBR Score " \
-                "%.2f, Link Quality %.2f%%", p_sys->i_total_packets, p_sys->i_recovered_packets, 
+                "%.2f, Link Quality %.2f%%", p_sys->i_total_packets, p_sys->i_recovered_packets,
                 p_sys->i_reordered_packets, p_sys->i_lost_packets, ratio, quality);
         p_sys->i_last_stat = now;
         p_sys->vbr_ratio = 0;
@@ -917,7 +917,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
     interval = (now - flow->feedback_time);
     if ( interval > VLC_TICK_FROM_MS(RTCP_INTERVAL) )
     {
-        /* msg_Dbg(p_access, "Calling RTCP Feedback %lu<%d ms using timer", interval, 
+        /* msg_Dbg(p_access, "Calling RTCP Feedback %lu<%d ms using timer", interval,
         VLC_TICK_FROM_MS(RTCP_INTERVAL)); */
         send_rtcp_feedback(p_access, flow);
         flow->feedback_time = now;
@@ -936,7 +936,7 @@ static block_t *BlockRIST(stream_t *p_access, bool *restrict eof)
         (uint64_t)(now - p_sys->last_data_rx) >  (uint64_t)VLC_TICK_FROM_MS(flow->latency) &&
         (uint64_t)(now - p_sys->last_reset) > (uint64_t)VLC_TICK_FROM_MS(flow->latency) )
     {
-        msg_Err(p_access, "No data received for %"PRId64" ms, resetting buffers", 
+        msg_Err(p_access, "No data received for %"PRId64" ms, resetting buffers",
             (int64_t)(now - p_sys->last_data_rx)/1000);
         p_sys->last_reset = now;
         flow->reset = 1;
