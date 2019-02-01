@@ -66,7 +66,7 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-        [playlistController playlistResetWithItems:items count:numberOfItems];
+        [playlistController playlistResetWithItems:array count:numberOfItems];
     });
 }
 
@@ -185,11 +185,17 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     self = [super init];
     if (self) {
         intf_thread_t *p_intf = getIntf();
-        _p_playlist = vlc_intf_GetMainPlaylist( p_intf );
+        _p_playlist = vlc_intf_GetMainPlaylist(p_intf);
+
+        /* set initial values, further updates through callbacks */
+        vlc_playlist_Lock(_p_playlist);
+        _playbackOrder = vlc_playlist_GetPlaybackOrder(_p_playlist);
+        _playbackRepeat = vlc_playlist_GetPlaybackRepeat(_p_playlist);
         _playlistListenerID = vlc_playlist_AddListener(_p_playlist,
                                                        &playlist_callbacks,
                                                        (__bridge void *)self,
                                                        YES);
+        vlc_playlist_Unlock(_p_playlist);
         _playlistModel = [[VLCPlaylistModel alloc] init];
         _playlistModel.playlistController = self;
     }
@@ -405,6 +411,20 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_Resume(_p_playlist);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)setPlaybackOrder:(enum vlc_playlist_playback_order)playbackOrder
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_SetPlaybackOrder(_p_playlist, playbackOrder);
+    vlc_playlist_Unlock(_p_playlist);
+}
+
+- (void)setPlaybackRepeat:(enum vlc_playlist_playback_repeat)playbackRepeat
+{
+    vlc_playlist_Lock(_p_playlist);
+    vlc_playlist_SetPlaybackRepeat(_p_playlist, playbackRepeat);
     vlc_playlist_Unlock(_p_playlist);
 }
 

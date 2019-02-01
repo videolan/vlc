@@ -73,13 +73,13 @@ extern NSString *VLCPlaybackHasNextChanged;
  * sets and gets the playback repeat mode according to the enum defined in the core
  * @note Subscribe to the VLCPlaybackRepeatChanged notification to be notified about changes
  */
-@property (readwrite) enum vlc_playlist_playback_repeat playbackRepeat;
+@property (readwrite, nonatomic) enum vlc_playlist_playback_repeat playbackRepeat;
 
 /**
  * sets and gets the playback order according to the enum defined in the core
  * @note Subscribe to the VLCPlaybackOrderChanged notification to be notified about changes
  */
-@property (readwrite) enum vlc_playlist_playback_order playbackOrder;
+@property (readwrite, nonatomic) enum vlc_playlist_playback_order playbackOrder;
 
 /**
  * Simplified version to add new items to the end of the current playlist
