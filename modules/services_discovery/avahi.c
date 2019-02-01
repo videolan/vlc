@@ -199,7 +199,6 @@ static void add_renderer( const char *psz_protocol, const char *psz_name,
     vlc_dictionary_insert( &p_sys->services_name_to_input_item,
         psz_name, p_renderer_item);
     vlc_rd_add_item( p_rd, p_renderer_item );
-    vlc_renderer_item_release( p_renderer_item );
 
 error:
     free( friendly_name );
