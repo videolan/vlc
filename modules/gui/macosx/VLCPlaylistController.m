@@ -206,9 +206,10 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 {
     if (_p_playlist) {
         if (_playlistListenerID) {
+            vlc_playlist_Lock(_p_playlist);
             vlc_playlist_RemoveListener(_p_playlist, _playlistListenerID);
+            vlc_playlist_Unlock(_p_playlist);
         }
-        vlc_playlist_Delete(_p_playlist);
     }
 }
 
