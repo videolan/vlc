@@ -397,24 +397,31 @@ static void browse_callback(
             {
                 vlc_renderer_discovery_t *p_rd = ( vlc_renderer_discovery_t* )(p_sys->parent);
                 vlc_rd_remove_item( p_rd, p_item );
+                vlc_renderer_item_release( p_item );
             }
             else
             {
                 services_discovery_t *p_sd = ( services_discovery_t* )(p_sys->parent);
                 services_discovery_RemoveItem( p_sd, p_item );
+                input_item_Release( p_item );
             }
             vlc_dictionary_remove_value_for_key(
                         &p_sys->services_name_to_input_item,
                         name, NULL, NULL );
-            input_item_Release( p_item );
         }
     }
 }
 
-static void clear_item( void* p_item, void* p_obj )
+static void clear_input_item( void* p_item, void* p_obj )
 {
     VLC_UNUSED( p_obj );
-    input_item_Release( (input_item_t*)p_item );
+    input_item_Release( p_item );
+}
+
+static void clear_renderer_item( void* p_item, void* p_obj )
+{
+    VLC_UNUSED( p_obj );
+    vlc_renderer_item_release( p_item );
 }
 
 /*****************************************************************************
@@ -469,9 +476,6 @@ error:
     if( p_sys->poll != NULL )
         avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item, clear_item, NULL );
-    free( p_sys );
-
     return VLC_EGENERIC;
 }
 
@@ -486,7 +490,14 @@ static int OpenSD( vlc_object_t *p_this )
     p_sys->parent = p_this;
     p_sys->renderer = false;
 
-    return OpenCommon( p_sys );
+    int ret = OpenCommon( p_sys );
+    if( ret != VLC_SUCCESS )
+    {
+        vlc_dictionary_clear( &p_sys->services_name_to_input_item,
+                              clear_input_item, NULL );
+        free( p_sys );
+    }
+    return ret;
 }
 
 static int OpenRD( vlc_object_t *p_this )
@@ -499,7 +510,14 @@ static int OpenRD( vlc_object_t *p_this )
     p_sys->parent = p_this;
     p_sys->renderer = true;
 
-    return OpenCommon( p_sys );
+    int ret = OpenCommon( p_sys );
+    if( ret != VLC_SUCCESS )
+    {
+        vlc_dictionary_clear( &p_sys->services_name_to_input_item,
+                              clear_renderer_item, NULL );
+        free( p_sys );
+    }
+    return ret;
 }
 
 /*****************************************************************************
@@ -512,8 +530,6 @@ static void CloseCommon( discovery_sys_t *p_sys )
     avahi_client_free( p_sys->client );
     avahi_threaded_poll_free( p_sys->poll );
 
-    vlc_dictionary_clear( &p_sys->services_name_to_input_item, clear_item, NULL );
-    free( p_sys );
 }
 
 static void CloseSD( vlc_object_t *p_this )
@@ -521,6 +537,9 @@ static void CloseSD( vlc_object_t *p_this )
     services_discovery_t *p_sd = ( services_discovery_t* )p_this;
     discovery_sys_t *p_sys = p_sd->p_sys;
     CloseCommon( p_sys );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item,
+                          clear_input_item, NULL );
+    free( p_sys );
 }
 
 static void CloseRD( vlc_object_t *p_this )
@@ -528,4 +547,7 @@ static void CloseRD( vlc_object_t *p_this )
     vlc_renderer_discovery_t *p_rd = (vlc_renderer_discovery_t *)p_this;
     discovery_sys_t *p_sys = p_rd->p_sys;
     CloseCommon( p_sys );
+    vlc_dictionary_clear( &p_sys->services_name_to_input_item,
+                          clear_renderer_item, NULL );
+    free( p_sys );
 }
