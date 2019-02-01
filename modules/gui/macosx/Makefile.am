@@ -55,6 +55,7 @@ libmacosx_plugin_la_SOURCES = \
 	gui/macosx/NSSound+VLCAdditions.h gui/macosx/NSSound+VLCAdditions.m \
 	gui/macosx/NSScreen+VLCAdditions.h gui/macosx/NSScreen+VLCAdditions.m \
 	gui/macosx/VLCOpenWindowController.h gui/macosx/VLCOpenWindowController.m \
+	gui/macosx/VLCOpenInputMetadata.h gui/macosx/VLCOpenInputMetadata.m \
 	gui/macosx/VLCOutput.h gui/macosx/VLCOutput.m \
 	gui/macosx/VLCPlaylistView.h gui/macosx/VLCPlaylistView.m \
 	gui/macosx/VLCPlaylist.h gui/macosx/VLCPlaylist.m \

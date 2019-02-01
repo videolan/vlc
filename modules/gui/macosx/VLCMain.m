@@ -62,6 +62,7 @@
 #import "VLCConvertAndSaveWindowController.h"
 #import "VLCLibraryWindow.h"
 #import "VLCPlaylistController.h"
+#import "VLCOpenInputMetadata.h"
 
 #import "VLCVideoEffectsWindowController.h"
 #import "VLCAudioEffectsWindowController.h"
@@ -415,12 +416,13 @@ static VLCMain *sharedInstance = nil;
         if (!psz_uri)
             continue;
 
-        NSDictionary *o_dic = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
-        [o_result addObject: o_dic];
+        VLCOpenInputMetadata *o_inputMetadata = [[VLCOpenInputMetadata alloc] init];
+        o_inputMetadata.MRLString = toNSStr(psz_uri);
+        [o_result addObject: o_inputMetadata];
         free(psz_uri);
     }
 
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:o_result tryAsSubtitle:YES];
+    [_playlistController addPlaylistItems:o_result];
 }
 
 /* When user click in the Dock icon our double click in the finder */

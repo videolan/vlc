@@ -24,22 +24,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <stdlib.h>                                      /* malloc(), free() */
-#import <sys/param.h>                                    /* for MAXPATHLEN */
-
-#import "CompatibilityFixes.h"
-
-#import <paths.h>
-#import <IOKit/IOBSD.h>
 #import <Cocoa/Cocoa.h>
 #import <AVFoundation/AVFoundation.h>
-#import <CoreMedia/CoreMedia.h>
 
 #import "VLCMain.h"
-#import "VLCPlaylist.h"
 #import "VLCOpenWindowController.h"
 #import "VLCOutput.h"
-#import "misc.h"
+#import "VLCPlaylistController.h"
+#import "VLCOpenInputMetadata.h"
 
 #import <vlc_url.h>
 
@@ -95,7 +87,6 @@ struct display_info_t
 
 @implementation VLCOpenWindowController
 
-
 static NSString *kFileTabViewId     = @"file";
 static NSString *kDiscTabViewId     = @"disc";
 static NSString *kNetworkTabViewId  = @"network";
@@ -109,7 +100,6 @@ static NSString *kCaptureTabViewId  = @"capture";
     self = [super initWithWindowNibName:@"Open"];
     return self;
 }
-
 
 - (void)dealloc
 {
@@ -425,7 +415,8 @@ static NSString *kCaptureTabViewId  = @"capture";
         return;
 
     NSMutableArray *options = [NSMutableArray array];
-    NSMutableDictionary *itemOptionsDictionary = [NSMutableDictionary dictionaryWithObject: [self MRL] forKey: @"ITEM_URL"];
+    VLCOpenInputMetadata *inputMetadata = [[VLCOpenInputMetadata alloc] init];
+    inputMetadata.MRLString = [self MRL];
 
     if ([_fileSubCheckbox state] == NSOnState) {
         module_config_t * p_item;
@@ -507,9 +498,9 @@ static NSString *kCaptureTabViewId  = @"capture";
     }
 
     /* apply the options to our item(s) */
-    [itemOptionsDictionary setObject: (NSArray *)[options copy] forKey: @"ITEM_OPTIONS"];
+    inputMetadata.playbackOptions = options;
 
-    [[[VLCMain sharedInstance] playlist] addPlaylistItems:[NSArray arrayWithObject:itemOptionsDictionary]];
+    [[[VLCMain sharedInstance] playlistController] addPlaylistItems:@[inputMetadata]];
 }
 
 #pragma mark -
@@ -587,13 +578,14 @@ static NSString *kCaptureTabViewId  = @"capture";
         [values sortUsingSelector:@selector(caseInsensitiveCompare:)];
 
         for (NSUInteger i = 0; i < count; i++) {
-            NSDictionary *dictionary;
+            VLCOpenInputMetadata *inputMetadata;
             char *psz_uri = vlc_path2uri([[values objectAtIndex:i] UTF8String], "file");
             if (!psz_uri)
                 continue;
-            dictionary = [NSDictionary dictionaryWithObject:toNSStr(psz_uri) forKey:@"ITEM_URL"];
+            inputMetadata = [[VLCOpenInputMetadata alloc] init];
+            inputMetadata.MRLString = toNSStr(psz_uri);
             free(psz_uri);
-            [array addObject: dictionary];
+            [array addObject:inputMetadata];
         }
 
         action(array);
@@ -772,8 +764,7 @@ static NSString *kCaptureTabViewId  = @"capture";
         [self showOpticalMediaView: _discBDView withIcon: image];
         [self setMRL: [NSString stringWithFormat: @"bluray://%@", opticalDevicePath]];
     } else {
-        if (getIntf())
-            msg_Warn(getIntf(), "unknown disk type, no idea what to display");
+        msg_Warn(getIntf(), "unknown disk type, no idea what to display");
 
         [self showOpticalMediaView: _discNoDiscView withIcon: [NSImage imageNamed:@"NSApplicationIcon"]];
     }

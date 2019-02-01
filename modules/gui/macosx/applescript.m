@@ -27,7 +27,8 @@
 #import "VLCMain.h"
 #import "applescript.h"
 #import "VLCCoreInteraction.h"
-#import "VLCPlaylist.h"
+#import "VLCPlaylistController.h"
+#import "VLCOpenInputMetadata.h"
 #import <vlc_url.h>
 
 /*****************************************************************************
@@ -41,11 +42,10 @@
 
     if ([o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"]) {
         if (o_urlString) {
+            VLCOpenInputMetadata *o_inputMetadata = [[VLCOpenInputMetadata alloc] init];
+            o_inputMetadata.MRLString = o_urlString;
 
-            NSDictionary *o_dic = [NSDictionary dictionaryWithObject:o_urlString forKey:@"ITEM_URL"];
-            NSArray* item = [NSArray arrayWithObject:o_dic];
-
-            [[[VLCMain sharedInstance] playlist] addPlaylistItems:item tryAsSubtitle:YES];
+            [[[VLCMain sharedInstance] playlistController] addPlaylistItems:@[o_inputMetadata]];
         }
     }
     return nil;

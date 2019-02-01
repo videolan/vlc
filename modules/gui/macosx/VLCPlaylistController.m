@@ -24,6 +24,7 @@
 #import "VLCPlaylistModel.h"
 #import "VLCPlaylistItem.h"
 #import "VLCPlaylistDataSource.h"
+#import "VLCOpenInputMetadata.h"
 #import "VLCMain.h"
 #import <vlc_interface.h>
 
@@ -301,9 +302,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     NSUInteger numberOfItems = [itemArray count];
 
     for (NSUInteger i = 0; i < numberOfItems; i++) {
-        NSDictionary *itemMetadata = itemArray[i];
+        VLCOpenInputMetadata *itemMetadata = itemArray[i];
         input_item_t *p_input = [self createInputItemBasedOnMetadata:itemMetadata];
-        NSString *itemURLString = itemMetadata[@"ITEM_URL"];
+        NSString *itemURLString = itemMetadata.MRLString;
 
         if (!p_input) {
             if (itemURLString) {
@@ -437,7 +438,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - helper methods
 
-- (input_item_t *)createInputItemBasedOnMetadata:(NSDictionary *)itemToCreateDict
+- (input_item_t *)createInputItemBasedOnMetadata:(VLCOpenInputMetadata *)itemMetadata
 {
     intf_thread_t *p_intf = getIntf();
 
@@ -448,11 +449,11 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     NSArray *optionsArray;
 
     /* Get the item */
-    uri = (NSString *)[itemToCreateDict objectForKey: @"ITEM_URL"];
+    uri = itemMetadata.MRLString;
     url = [NSURL URLWithString: uri];
     path = [url path];
-    name = (NSString *)[itemToCreateDict objectForKey: @"ITEM_NAME"];
-    optionsArray = (NSArray *)[itemToCreateDict objectForKey: @"ITEM_OPTIONS"];
+    name = itemMetadata.itemName;
+    optionsArray = itemMetadata.playbackOptions;
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&b_dir]
         && b_dir &&

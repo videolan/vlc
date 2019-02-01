@@ -152,6 +152,7 @@
 		7DB7F20720CC07E600C2CAED /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F20620CC07E600C2CAED /* SystemConfiguration.framework */; };
 		7DB7F20920CC07FD00C2CAED /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F20820CC07FD00C2CAED /* WebKit.framework */; };
 		7DB7F20B20CC082800C2CAED /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F20A20CC082800C2CAED /* QuartzCore.framework */; };
+		7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */; };
 		7DD2F5C52081B73B007EE187 /* VLCRemoteControlService.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */; };
 /* End PBXBuildFile section */
 
@@ -509,6 +510,8 @@
 		7DB7F20820CC07FD00C2CAED /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		7DB7F20A20CC082800C2CAED /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		7DBB06631CC2314D004C74D2 /* caopengllayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = caopengllayer.m; path = ../../../modules/video_output/caopengllayer.m; sourceTree = "<group>"; };
+		7DC21A7222049A6600F98A02 /* VLCOpenInputMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCOpenInputMetadata.h; sourceTree = "<group>"; };
+		7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCOpenInputMetadata.m; sourceTree = "<group>"; };
 		7DD2F5C32081B73B007EE187 /* VLCRemoteControlService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCRemoteControlService.h; sourceTree = "<group>"; };
 		7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCRemoteControlService.m; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* VLCAddonListItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAddonListItem.h; sourceTree = "<group>"; };
@@ -1318,6 +1321,8 @@
 			children = (
 				8ED6C28103E2EB1C0059A3A7 /* VLCOpenWindowController.h */,
 				8ED6C28203E2EB1C0059A3A7 /* VLCOpenWindowController.m */,
+				7DC21A7222049A6600F98A02 /* VLCOpenInputMetadata.h */,
+				7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */,
 			);
 			name = "Open media";
 			sourceTree = "<group>";
@@ -1692,6 +1697,7 @@
 				1CCC88FF2078A3D500E5626F /* PlaylistMenu.xib in Sources */,
 				1CCC89002078A3D500E5626F /* PopupPanel.xib in Sources */,
 				1CCC89012078A3D500E5626F /* Preferences.xib in Sources */,
+				7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */,
 				1CCC89022078A3D500E5626F /* ResumeDialog.xib in Sources */,
 				1CCC89032078A3D500E5626F /* SimplePreferences.xib in Sources */,
 				1CCC89042078A3D500E5626F /* StreamOutput.xib in Sources */,
