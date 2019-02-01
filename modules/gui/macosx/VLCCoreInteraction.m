@@ -30,6 +30,7 @@
 #import <vlc_plugin.h>
 #import <vlc_actions.h>
 #import "VLCClickerManager.h"
+#import "VLCPlaylistController.h"
 
 static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t new_val, void *param)
@@ -54,6 +55,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     NSArray *_usedHotkeys;
 
     VLCClickerManager *_clickerManager;
+    VLCPlaylistController *_playlistController;
 }
 @end
 
@@ -86,6 +88,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
                             object:nil];
 
         _clickerManager = [[VLCClickerManager alloc] init];
+        _playlistController = [[VLCMain sharedInstance] playlistController];
 
         var_AddCallback(pl_Get(p_intf), "intf-boss", BossCallback, (__bridge void *)self);
     }
@@ -106,8 +109,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)play
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
-    playlist_Play(p_playlist);
+    [_playlistController startPlaylist];
 }
 
 - (void)playOrPause
@@ -130,13 +132,12 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)pause
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
-    playlist_Pause(p_playlist);
+    [_playlistController pausePlayback];
 }
 
 - (void)stop
 {
-    playlist_Stop(pl_Get(getIntf()));
+    [_playlistController stopPlayback];
 }
 
 - (void)faster
@@ -209,14 +210,14 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     return returnValue;
 }
 
-- (void)previous
+- (int)previous
 {
-    playlist_Prev(pl_Get(getIntf()));
+    return [_playlistController playPreviousItem];
 }
 
-- (void)next
+- (int)next
 {
-    playlist_Next(pl_Get(getIntf()));
+    return [_playlistController playNextItem];
 }
 
 - (NSInteger)durationOfCurrentPlaylistItem
@@ -368,46 +369,31 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)shuffle
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
+    BOOL on = NO;
+    if (_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL) {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
+        on = YES;
+    } else {
+        _playlistController.playbackOrder = VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL;
+    }
+    config_PutInt("random", on);
 
-    vlc_value_t val;
-    playlist_t * p_playlist = pl_Get(p_intf);
     vout_thread_t *p_vout = getVout();
+    if (!p_vout) {
+        return;
+    }
+    if (on) {
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random On"));
+    } else {
+        vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
+    }
 
-    var_Get(p_playlist, "random", &val);
-    val.b_bool = !val.b_bool;
-    var_Set(p_playlist, "random", val);
-    if (val.b_bool) {
-        if (p_vout) {
-            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random On"));
-            vlc_object_release(p_vout);
-        }
-        config_PutInt("random", 1);
-    }
-    else
-    {
-        if (p_vout) {
-            vout_OSDMessage(p_vout, VOUT_SPU_CHANNEL_OSD, "%s", _("Random Off"));
-            vlc_object_release(p_vout);
-        }
-        config_PutInt("random", 0);
-    }
+    vlc_object_release(p_vout);
 }
 
 - (void)repeatAll
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_t * p_playlist = pl_Get(p_intf);
-
-    var_SetBool(p_playlist, "repeat", NO);
-    var_SetBool(p_playlist, "loop", YES);
-    config_PutInt("repeat", NO);
-    config_PutInt("loop", YES);
+    _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
@@ -418,16 +404,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)repeatOne
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_t * p_playlist = pl_Get(p_intf);
-
-    var_SetBool(p_playlist, "repeat", YES);
-    var_SetBool(p_playlist, "loop", NO);
-    config_PutInt("repeat", YES);
-    config_PutInt("loop", NO);
+    _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {
@@ -438,16 +415,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 - (void)repeatOff
 {
-    intf_thread_t *p_intf = getIntf();
-    if (!p_intf)
-        return;
-
-    playlist_t * p_playlist = pl_Get(p_intf);
-
-    var_SetBool(p_playlist, "repeat", NO);
-    var_SetBool(p_playlist, "loop", NO);
-    config_PutInt("repeat", NO);
-    config_PutInt("loop", NO);
+    _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
 
     vout_thread_t *p_vout = getVout();
     if (p_vout) {

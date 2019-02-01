@@ -43,8 +43,8 @@
 - (void)slower;
 - (void)normalSpeed;
 - (void)toggleRecord;
-- (void)next;
-- (void)previous;
+- (int)next;
+- (int)previous;
 - (void)forwardExtraShort;
 - (void)backwardExtraShort;
 - (void)forwardShort;

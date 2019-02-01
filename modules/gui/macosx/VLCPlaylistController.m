@@ -116,17 +116,23 @@ cb_playlist_items_updated(vlc_playlist_t *playlist,
 static void
 cb_playlist_playback_repeat_changed(vlc_playlist_t *playlist,
                                     enum vlc_playlist_playback_repeat repeat,
-                                    void *userdata)
+                                    void *p_data)
 {
-    NSLog(@"%s: repeat mode: %u", __func__, repeat);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistPlaybackRepeatUpdated:repeat];
+    });
 }
 
 static void
 cb_playlist_playback_order_changed(vlc_playlist_t *playlist,
                                    enum vlc_playlist_playback_order order,
-                                   void *userdata)
+                                   void *p_data)
 {
-    NSLog(@"%s: playback order: %u", __func__, order);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistPlaybackOrderUpdated:order];
+    });
 }
 
 static void
