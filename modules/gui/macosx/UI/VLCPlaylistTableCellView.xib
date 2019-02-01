@@ -29,6 +29,9 @@
                 </imageView>
                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="3Ha-ZH-fa9">
                     <rect key="frame" x="353" y="24" width="37" height="17"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="33" id="0cB-ga-0Uw"/>
+                    </constraints>
                     <textFieldCell key="cell" lineBreakMode="clipping" title="Label" id="N0j-xB-3t9">
                         <font key="font" usesAppearanceFont="YES"/>
                         <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>

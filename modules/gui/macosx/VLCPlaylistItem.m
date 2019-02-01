@@ -32,9 +32,15 @@
     self = [super init];
     if (self) {
         _playlistItem = p_item;
+        vlc_playlist_item_Hold(_playlistItem);
         [self updateRepresentation];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    vlc_playlist_item_Release(_playlistItem);
 }
 
 - (NSString *)description

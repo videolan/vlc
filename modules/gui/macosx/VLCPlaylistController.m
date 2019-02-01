@@ -22,6 +22,7 @@
 
 #import "VLCPlaylistController.h"
 #import "VLCPlaylistModel.h"
+#import "VLCPlaylistItem.h"
 #import "VLCPlaylistDataSource.h"
 #import "VLCMain.h"
 #import <vlc_interface.h>
@@ -37,8 +38,8 @@ NSString *VLCPlaybackHasNextChanged = @"VLCPlaybackHasNextChanged";
     vlc_playlist_listener_id *_playlistListenerID;
 }
 
-- (void)playlistResetWithItems:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
-- (void)playlistAdded:(vlc_playlist_item_t *const *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
+- (void)playlistResetWithItems:(NSArray *)items count:(size_t)numberOfItems;
+- (void)playlistAdded:(NSArray *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems;
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
 - (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode;
@@ -58,8 +59,15 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
                         size_t numberOfItems,
                         void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistResetWithItems:items count:numberOfItems];
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:numberOfItems];
+    for (size_t i = 0; i < numberOfItems; i++) {
+        VLCPlaylistItem *item = [[VLCPlaylistItem alloc] initWithPlaylistItem:items[i]];
+        [array addObject:item];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistResetWithItems:items count:numberOfItems];
+    });
 }
 
 static void
@@ -69,8 +77,15 @@ cb_playlist_items_added(vlc_playlist_t *playlist,
                         size_t numberOfAddedItems,
                         void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistAdded:items atIndex:insertionIndex count:numberOfAddedItems];
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:numberOfAddedItems];
+    for (size_t i = 0; i < numberOfAddedItems; i++) {
+        VLCPlaylistItem *item = [[VLCPlaylistItem alloc] initWithPlaylistItem:items[i]];
+        [array addObject:item];
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistAdded:array atIndex:insertionIndex count:numberOfAddedItems];
+    });
 }
 
 static void
@@ -79,8 +94,10 @@ cb_playlist_items_removed(vlc_playlist_t *playlist,
                           size_t count,
                           void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistRemovedItemsAtIndex:index count:count];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistRemovedItemsAtIndex:index count:count];
+    });
 }
 
 static void
@@ -90,8 +107,10 @@ cb_playlist_items_updated(vlc_playlist_t *playlist,
                           size_t numberOfUpdatedItems,
                           void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistUpdatedForIndex:firstUpdatedIndex items:items count:numberOfUpdatedItems];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistUpdatedForIndex:firstUpdatedIndex items:items count:numberOfUpdatedItems];
+    });
 }
 
 static void
@@ -115,8 +134,10 @@ cb_playlist_current_item_changed(vlc_playlist_t *playlist,
                                  ssize_t index,
                                  void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController currentPlaylistItemChanged:index];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController currentPlaylistItemChanged:index];
+    });
 }
 
 static void
@@ -124,8 +145,10 @@ cb_playlist_has_prev_changed(vlc_playlist_t *playlist,
                              bool has_prev,
                              void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistHasPreviousItem:has_prev];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistHasPreviousItem:has_prev];
+    });
 }
 
 static void
@@ -133,8 +156,10 @@ cb_playlist_has_next_changed(vlc_playlist_t *playlist,
                              bool has_next,
                              void *p_data)
 {
-    VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-    [playlistController playlistHasNextItem:has_next];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
+        [playlistController playlistHasNextItem:has_next];
+    });
 }
 
 static const struct vlc_playlist_callbacks playlist_callbacks = {
@@ -183,23 +208,18 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - callback forwarders
 
-- (void)playlistResetWithItems:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
+- (void)playlistResetWithItems:(NSArray *)items count:(size_t)numberOfItems
 {
-    for (size_t i = 0; i < numberOfItems; i++) {
-        [_playlistModel addItem:items[i]];
-    }
+    [_playlistModel addItems:items];
 
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+    [_playlistDataSource playlistUpdated];
 }
 
-- (void)playlistAdded:(vlc_playlist_item_t *const *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems
+- (void)playlistAdded:(NSArray *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems
 {
-    for (size_t i = 0; i < numberOfItems; i++) {
-        [_playlistModel addItem:items[i] atIndex:insertionIndex];
-        insertionIndex++;
-    }
+    [_playlistModel addItems:items atIndex:insertionIndex];
 
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+    [_playlistDataSource playlistUpdated];
 }
 
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems
@@ -207,7 +227,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     NSRange range = NSMakeRange(index, numberOfItems);
     [_playlistModel removeItemsInRange:range];
 
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+    [_playlistDataSource playlistUpdated];
 }
 
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems
@@ -216,7 +236,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     for (size_t i = firstUpdatedIndex; i < firstUpdatedIndex + numberOfItems; i++) {
         [_playlistModel updateItemAtIndex:i];
     }
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+    [_playlistDataSource playlistUpdated];
 }
 
 - (void)playlistPlaybackRepeatUpdated:(enum vlc_playlist_playback_repeat)currentRepeatMode
@@ -234,7 +254,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 - (void)currentPlaylistItemChanged:(size_t)index
 {
     _currentPlaylistIndex = index;
-    [_playlistDataSource performSelectorOnMainThread:@selector(playlistUpdated) withObject:nil waitUntilDone:NO];
+    [_playlistDataSource playlistUpdated];
 }
 
 - (void)playlistHasPreviousItem:(BOOL)hasPrevious
@@ -289,9 +309,9 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
             actualInsertionIndex = vlc_playlist_Count(_p_playlist);
         }
         ret = vlc_playlist_Insert(_p_playlist,
-                                      actualInsertionIndex,
-                                      &p_input,
-                                      1);
+                                  actualInsertionIndex,
+                                  &p_input,
+                                  1);
 
         if (ret != VLC_SUCCESS) {
             msg_Err(p_intf, "failed to insert input item at insertion index: %zu", insertionIndex);
