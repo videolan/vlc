@@ -1585,26 +1585,28 @@ void vout_Close(vout_thread_t *vout)
 {
     assert(vout);
 
+    vout_thread_sys_t *sys = vout->p;
+
     vout_IntfDeinit(VLC_OBJECT(vout));
 
-    spu_Detach(vout->p->spu);
-    vout_snapshot_End(vout->p->snapshot);
+    spu_Detach(sys->spu);
+    vout_snapshot_End(sys->snapshot);
 
-    vout_control_PushVoid(&vout->p->control, VOUT_CONTROL_CLEAN);
-    vout_control_Dead(&vout->p->control);
-    vlc_join(vout->p->thread, NULL);
+    vout_control_PushVoid(&sys->control, VOUT_CONTROL_CLEAN);
+    vout_control_Dead(&sys->control);
+    vlc_join(sys->thread, NULL);
 
-    vout_chrono_Clean(&vout->p->render);
+    vout_chrono_Clean(&sys->render);
 
-    vlc_mutex_lock(&vout->p->window_lock);
-    vout_display_window_Delete(vout->p->display_cfg.window);
-    vout->p->display_cfg.window = NULL;
-    vlc_mutex_unlock(&vout->p->window_lock);
+    vlc_mutex_lock(&sys->window_lock);
+    vout_display_window_Delete(sys->display_cfg.window);
+    sys->display_cfg.window = NULL;
+    vlc_mutex_unlock(&sys->window_lock);
 
-    vlc_mutex_lock(&vout->p->spu_lock);
-    spu_Destroy(vout->p->spu);
-    vout->p->spu = NULL;
-    vlc_mutex_unlock(&vout->p->spu_lock);
+    vlc_mutex_lock(&sys->spu_lock);
+    spu_Destroy(sys->spu);
+    sys->spu = NULL;
+    vlc_mutex_unlock(&sys->spu_lock);
 
     vlc_object_release(vout);
 }
