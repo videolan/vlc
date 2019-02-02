@@ -366,10 +366,8 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (int)startPlaylist
 {
-    vlc_playlist_Lock(_p_playlist);
-    int ret = vlc_playlist_Start(_p_playlist);
-    vlc_playlist_Unlock(_p_playlist);
-    return ret;
+    NSInteger selectedIndex = [_playlistDataSource.tableView selectedRow];
+    return [self playItemAtIndex:selectedIndex];
 }
 
 - (int)playPreviousItem

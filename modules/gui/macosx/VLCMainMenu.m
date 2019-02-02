@@ -63,6 +63,7 @@
     VLCHelpWindowController  *_helpWindowController;
     VLCAddonsWindowController *_addonsController;
     VLCRendererMenuController *_rendererMenuController;
+    VLCPlaylistController *_playlistController;
     NSTimer *_cancelRendererDiscoveryTimer;
 
     NSMenu *_playlistTableColumnsContextMenu;
@@ -86,6 +87,7 @@
 - (void)awakeFromNib
 {
     _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
+    _playlistController = [[VLCMain sharedInstance] playlistController];
 
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
@@ -1604,19 +1606,19 @@
     input_thread_t *p_input = playlist_CurrentInput(p_playlist);
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
-        if (!p_input)
-            enabled = NO;
+        // FIXME: disable the stop item as soon as we can detect if there is an input or not*/
+/*        if (!p_input)
+            enabled = NO;*/
         [self setupMenus]; /* Make sure input menu is up to date */
     } else if (mi == _previous          ||
                mi == _voutMenuprev      ||
-               mi == _dockMenuprevious  ||
+               mi == _dockMenuprevious) {
+        enabled = _playlistController.hasPreviousPlaylistItem;
+    } else if (
                mi == _next              ||
                mi == _voutMenunext      ||
-               mi == _dockMenunext
-               ) {
-        PL_LOCK;
-        enabled = playlist_CurrentSize(p_playlist) > 1;
-        PL_UNLOCK;
+               mi == _dockMenunext) {
+        enabled = _playlistController.hasNextPlaylistItem;
     } else if (mi == _record) {
         enabled = NO;
         if (p_input)
