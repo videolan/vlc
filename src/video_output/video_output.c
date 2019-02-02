@@ -1605,10 +1605,8 @@ void vout_Close(vout_thread_t *vout)
 
     vout_chrono_Clean(&sys->render);
 
-    vlc_mutex_lock(&sys->window_lock);
+    vlc_mutex_destroy(&sys->window_lock);
     vout_display_window_Delete(sys->display_cfg.window);
-    sys->display_cfg.window = NULL;
-    vlc_mutex_unlock(&sys->window_lock);
 
     vlc_mutex_lock(&sys->spu_lock);
     spu_Destroy(sys->spu);
