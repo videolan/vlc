@@ -191,12 +191,11 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 @implementation VLCPlaylistController
 
-- (instancetype)init
+- (instancetype)initWithPlaylist:(vlc_playlist_t *)playlist
 {
     self = [super init];
     if (self) {
-        intf_thread_t *p_intf = getIntf();
-        _p_playlist = vlc_intf_GetMainPlaylist(p_intf);
+        _p_playlist = playlist;
 
         /* set initial values, further updates through callbacks */
         vlc_playlist_Lock(_p_playlist);
