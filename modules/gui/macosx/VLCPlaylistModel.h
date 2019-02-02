@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dropExistingData;
 - (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index;
 - (void)addItems:(NSArray *)array;
-- (void)addItems:(NSArray *)array atIndex:(size_t)index;
+- (void)addItems:(NSArray *)array atIndex:(size_t)index count:(size_t)count;
 - (void)removeItemsInRange:(NSRange)range;
 - (void)updateItemAtIndex:(size_t)index;
 

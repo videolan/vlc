@@ -39,7 +39,7 @@ NSString *VLCPlaybackHasNextChanged = @"VLCPlaybackHasNextChanged";
     vlc_playlist_listener_id *_playlistListenerID;
 }
 
-- (void)playlistResetWithItems:(NSArray *)items count:(size_t)numberOfItems;
+- (void)playlistResetWithItems:(NSArray *)items;
 - (void)playlistAdded:(NSArray *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems;
 - (void)playlistRemovedItemsAtIndex:(size_t)index count:(size_t)numberOfItems;
 - (void)playlistUpdatedForIndex:(size_t)firstUpdatedIndex items:(vlc_playlist_item_t *const *)items count:(size_t)numberOfItems;
@@ -60,6 +60,7 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
                         size_t numberOfItems,
                         void *p_data)
 {
+    VLC_UNUSED(numberOfItems);
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:numberOfItems];
     for (size_t i = 0; i < numberOfItems; i++) {
         VLCPlaylistItem *item = [[VLCPlaylistItem alloc] initWithPlaylistItem:items[i]];
@@ -67,7 +68,7 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
     }
     dispatch_async(dispatch_get_main_queue(), ^{
         VLCPlaylistController *playlistController = (__bridge VLCPlaylistController *)p_data;
-        [playlistController playlistResetWithItems:array count:numberOfItems];
+        [playlistController playlistResetWithItems:array];
     });
 }
 
@@ -222,7 +223,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 #pragma mark - callback forwarders
 
-- (void)playlistResetWithItems:(NSArray *)items count:(size_t)numberOfItems
+- (void)playlistResetWithItems:(NSArray *)items
 {
     [_playlistModel addItems:items];
 
@@ -231,7 +232,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
 
 - (void)playlistAdded:(NSArray *)items atIndex:(size_t)insertionIndex count:(size_t)numberOfItems
 {
-    [_playlistModel addItems:items atIndex:insertionIndex];
+    [_playlistModel addItems:items atIndex:insertionIndex count:numberOfItems];
 
     [_playlistDataSource playlistUpdated];
 }

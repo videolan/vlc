@@ -68,9 +68,9 @@
     [_playlistArray addObjectsFromArray:array];
 }
 
-- (void)addItems:(NSArray *)array atIndex:(size_t)index
+- (void)addItems:(NSArray *)array atIndex:(size_t)index count:(size_t)count
 {
-    [_playlistArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndex:index]];
+    [_playlistArray insertObjects:array atIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(index, count)]];
 }
 
 - (void)removeItemsInRange:(NSRange)range
