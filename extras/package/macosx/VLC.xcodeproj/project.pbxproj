@@ -149,6 +149,8 @@
 		7DB7F20B20CC082800C2CAED /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7DB7F20A20CC082800C2CAED /* QuartzCore.framework */; };
 		7DC21A7422049A6600F98A02 /* VLCOpenInputMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */; };
 		7DD2F5C52081B73B007EE187 /* VLCRemoteControlService.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */; };
+		7DE9C7D82205EF030089108F /* VLCPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE9C7D72205EF030089108F /* VLCPlayerController.m */; };
+		7DE9C7DD220728420089108F /* VLCPlayerController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7DE9C7DC220728420089108F /* VLCPlayerController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -509,6 +511,9 @@
 		7DC21A7322049A6600F98A02 /* VLCOpenInputMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCOpenInputMetadata.m; sourceTree = "<group>"; };
 		7DD2F5C32081B73B007EE187 /* VLCRemoteControlService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCRemoteControlService.h; sourceTree = "<group>"; };
 		7DD2F5C42081B73B007EE187 /* VLCRemoteControlService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCRemoteControlService.m; sourceTree = "<group>"; };
+		7DE9C7D72205EF030089108F /* VLCPlayerController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCPlayerController.m; sourceTree = "<group>"; };
+		7DE9C7DB220728420089108F /* VLCPlayerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLCPlayerController.h; sourceTree = "<group>"; };
+		7DE9C7DC220728420089108F /* VLCPlayerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCPlayerController.m; sourceTree = "<group>"; };
 		7DF0435E1972E26A0022B534 /* VLCAddonListItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCAddonListItem.h; sourceTree = "<group>"; };
 		7DF0435F1972E26A0022B534 /* VLCAddonListItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VLCAddonListItem.m; sourceTree = "<group>"; };
 		7DF812ED1B555A340052293C /* VLCInputManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VLCInputManager.h; sourceTree = "<group>"; };
@@ -619,6 +624,7 @@
 				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
 				7DB7F1EA20CC036C00C2CAED /* Frameworks */,
+				7DE9C7DA2207281F0089108F /* Recovered References */,
 			);
 			name = vlc;
 			sourceTree = "<group>";
@@ -937,6 +943,8 @@
 		1C1ED5142205A96600811EC0 /* playlist */ = {
 			isa = PBXGroup;
 			children = (
+				7DE9C7DB220728420089108F /* VLCPlayerController.h */,
+				7DE9C7DC220728420089108F /* VLCPlayerController.m */,
 				7D445D7F2202524000263D34 /* VLCPlaylistController.h */,
 				7D445D802202524000263D34 /* VLCPlaylistController.m */,
 				7D0F640A2202163E00FDB91F /* VLCPlaylistDataSource.h */,
@@ -1287,6 +1295,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		7DE9C7DA2207281F0089108F /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				7DE9C7D72205EF030089108F /* VLCPlayerController.m */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		8E445F86047289E50059A3A7 /* File Icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -1476,7 +1492,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */;
+			buildConfigurationList = C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -1519,6 +1535,7 @@
 				1CCC88F82078A3D500E5626F /* CoreDialogs.xib in Sources */,
 				1CCC88F92078A3D500E5626F /* DetachedVideoWindow.xib in Sources */,
 				1CCC88FA2078A3D500E5626F /* ErrorPanel.xib in Sources */,
+				7DE9C7D82205EF030089108F /* VLCPlayerController.m in Sources */,
 				1CCC88FB2078A3D500E5626F /* Help.xib in Sources */,
 				1CCC88FC2078A3D500E5626F /* LogMessageWindow.xib in Sources */,
 				1CCC88FD2078A3D500E5626F /* Open.xib in Sources */,
@@ -1553,6 +1570,7 @@
 				1C31138E1E508C6900D4DD76 /* VLCAboutWindowController.m in Sources */,
 				1C3113901E508C6900D4DD76 /* VLCHelpWindowController.m in Sources */,
 				1C3113921E508C6900D4DD76 /* VLCAddonListItem.m in Sources */,
+				7DE9C7DD220728420089108F /* VLCPlayerController.m in Sources */,
 				1C3113941E508C6900D4DD76 /* VLCAddonsWindowController.m in Sources */,
 				7D2E0EDE20CD206F0033A221 /* VLCVideoWindowCommon.m in Sources */,
 				1C3113961E508C6900D4DD76 /* applescript.m in Sources */,
@@ -1917,7 +1935,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Default;
 		};
-		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "vlc" */ = {
+		C2F2A6EA09588F1B00018C74 /* Build configuration list for PBXProject "VLC" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C2F2A6EB09588F1B00018C74 /* Development */,

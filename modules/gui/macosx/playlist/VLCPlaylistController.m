@@ -63,7 +63,6 @@ cb_playlist_items_reset(vlc_playlist_t *playlist,
                         size_t numberOfItems,
                         void *p_data)
 {
-    VLC_UNUSED(numberOfItems);
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:numberOfItems];
     for (size_t i = 0; i < numberOfItems; i++) {
         VLCPlaylistItem *item = [[VLCPlaylistItem alloc] initWithPlaylistItem:items[i]];
