@@ -1328,14 +1328,16 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
 
 static int vout_Start(vout_thread_t *vout)
 {
-    vlc_mouse_Init(&vout->p->mouse);
-    vout->p->decoder_fifo = picture_fifo_New();
-    vout->p->decoder_pool = NULL;
-    vout->p->display_pool = NULL;
-    vout->p->private_pool = NULL;
+    vout_thread_sys_t *sys = vout->p;
 
-    vout->p->filter.configuration = NULL;
-    video_format_Copy(&vout->p->filter.format, &vout->p->original);
+    vlc_mouse_Init(&sys->mouse);
+    sys->decoder_fifo = picture_fifo_New();
+    sys->decoder_pool = NULL;
+    sys->display_pool = NULL;
+    sys->private_pool = NULL;
+
+    sys->filter.configuration = NULL;
+    video_format_Copy(&sys->filter.format, &sys->original);
 
     static const struct filter_video_callbacks static_cbs = {
         .buffer_new = VoutVideoFilterStaticNewPicture,
@@ -1347,17 +1349,15 @@ static int vout_Start(vout_thread_t *vout)
         .video = &static_cbs,
         .sys = vout,
     };
-    vout->p->filter.chain_static =
-        filter_chain_NewVideo( vout, true, &owner );
+    sys->filter.chain_static = filter_chain_NewVideo(vout, true, &owner);
 
     owner.video = &interactive_cbs;
-    vout->p->filter.chain_interactive =
-        filter_chain_NewVideo( vout, true, &owner );
+    sys->filter.chain_interactive = filter_chain_NewVideo(vout, true, &owner);
 
     vout_display_cfg_t dcfg;
 
-    vlc_mutex_lock(&vout->p->window_lock);
-    dcfg = vout->p->display_cfg;
+    vlc_mutex_lock(&sys->window_lock);
+    dcfg = sys->display_cfg;
     /* Any configuration change after unlocking will involve a control request
      * that will be processed in the new thread. There may also be some pending
      * control requests for configuration change already visible in
@@ -1366,73 +1366,73 @@ static int vout_Start(vout_thread_t *vout)
      *
      * TODO: display lock separate from window lock.
      */
-    vlc_mutex_unlock(&vout->p->window_lock);
+    vlc_mutex_unlock(&sys->window_lock);
 
-    if (vout_OpenWrapper(vout, vout->p->splitter_name, &dcfg))
+    if (vout_OpenWrapper(vout, sys->splitter_name, &dcfg))
         goto error;
 
     unsigned num = 0, den = 0;
     int x = 0, y = 0, w = 0, h = 0;
 
-    vlc_mutex_lock(&vout->p->window_lock); /* see above */
-    switch (vout->p->source.crop.mode) {
+    vlc_mutex_lock(&sys->window_lock); /* see above */
+    switch (sys->source.crop.mode) {
         case VOUT_CROP_NONE:
             break;
         case VOUT_CROP_RATIO:
-            num = vout->p->source.crop.ratio.num;
-            den = vout->p->source.crop.ratio.den;
+            num = sys->source.crop.ratio.num;
+            den = sys->source.crop.ratio.den;
             break;
         case VOUT_CROP_WINDOW:
-            x = vout->p->source.crop.window.x;
-            y = vout->p->source.crop.window.y;
-            w = vout->p->source.crop.window.width;
-            h = vout->p->source.crop.window.height;
+            x = sys->source.crop.window.x;
+            y = sys->source.crop.window.y;
+            w = sys->source.crop.window.width;
+            h = sys->source.crop.window.height;
             break;
         case VOUT_CROP_BORDER:
-            x = vout->p->source.crop.border.left;
-            y = vout->p->source.crop.border.top;
-            w = -(int)vout->p->source.crop.border.right;
-            h = -(int)vout->p->source.crop.border.bottom;
+            x = sys->source.crop.border.left;
+            y = sys->source.crop.border.top;
+            w = -(int)sys->source.crop.border.right;
+            h = -(int)sys->source.crop.border.bottom;
             break;
     }
-    vlc_mutex_unlock(&vout->p->window_lock);
-    vout_SetDisplayCrop(vout->p->display, num, den, x, y, w, h);
+    vlc_mutex_unlock(&sys->window_lock);
+    vout_SetDisplayCrop(sys->display, num, den, x, y, w, h);
 
-    vlc_mutex_lock(&vout->p->window_lock); /* see above */
-    num = vout->p->source.dar.num;
-    den = vout->p->source.dar.den;
-    vlc_mutex_unlock(&vout->p->window_lock);
+    vlc_mutex_lock(&sys->window_lock); /* see above */
+    num = sys->source.dar.num;
+    den = sys->source.dar.den;
+    vlc_mutex_unlock(&sys->window_lock);
     if (num != 0 && den != 0)
-        vout_SetDisplayAspect(vout->p->display, num, den);
+        vout_SetDisplayAspect(sys->display, num, den);
 
-    assert(vout->p->decoder_pool && vout->p->private_pool);
+    assert(sys->decoder_pool != NULL && sys->private_pool != NULL);
 
-    vout->p->displayed.current       = NULL;
-    vout->p->displayed.next          = NULL;
-    vout->p->displayed.decoded       = NULL;
-    vout->p->displayed.date          = VLC_TICK_INVALID;
-    vout->p->displayed.timestamp     = VLC_TICK_INVALID;
-    vout->p->displayed.is_interlaced = false;
+    sys->displayed.current       = NULL;
+    sys->displayed.next          = NULL;
+    sys->displayed.decoded       = NULL;
+    sys->displayed.date          = VLC_TICK_INVALID;
+    sys->displayed.timestamp     = VLC_TICK_INVALID;
+    sys->displayed.is_interlaced = false;
 
-    vout->p->step.last               = VLC_TICK_INVALID;
-    vout->p->step.timestamp          = VLC_TICK_INVALID;
+    sys->step.last               = VLC_TICK_INVALID;
+    sys->step.timestamp          = VLC_TICK_INVALID;
 
-    vout->p->spu_blend_chroma        = 0;
-    vout->p->spu_blend               = NULL;
+    sys->spu_blend_chroma        = 0;
+    sys->spu_blend               = NULL;
 
-    video_format_Print(VLC_OBJECT(vout), "original format", &vout->p->original);
+    video_format_Print(VLC_OBJECT(vout), "original format", &sys->original);
     return VLC_SUCCESS;
 error:
-    if (vout->p->filter.chain_interactive != NULL)
+    if (sys->filter.chain_interactive != NULL)
     {
         ThreadDelAllFilterCallbacks(vout);
-        filter_chain_Delete(vout->p->filter.chain_interactive);
+        filter_chain_Delete(sys->filter.chain_interactive);
     }
-    if (vout->p->filter.chain_static != NULL)
-        filter_chain_Delete(vout->p->filter.chain_static);
-    video_format_Clean(&vout->p->filter.format);
-    if (vout->p->decoder_fifo != NULL)
-        picture_fifo_Delete(vout->p->decoder_fifo);
+    if (sys->filter.chain_static != NULL)
+        filter_chain_Delete(sys->filter.chain_static);
+    video_format_Clean(&sys->filter.format);
+    if (sys->decoder_fifo != NULL)
+        picture_fifo_Delete(sys->decoder_fifo);
     return VLC_EGENERIC;
 }
 
