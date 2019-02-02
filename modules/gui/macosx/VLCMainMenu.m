@@ -1602,13 +1602,14 @@
 {
     BOOL enabled = YES;
     vlc_value_t val;
-    playlist_t *p_playlist = pl_Get(getIntf());
-    input_thread_t *p_input = playlist_CurrentInput(p_playlist);
+    input_item_t *inputItem = _playlistController.currentlyPlayingInputItem;
+    if (inputItem) {
+        input_item_Hold(inputItem);
+    }
 
     if (mi == _stop || mi == _voutMenustop || mi == _dockMenustop) {
-        // FIXME: disable the stop item as soon as we can detect if there is an input or not*/
-/*        if (!p_input)
-            enabled = NO;*/
+        if (!inputItem)
+            enabled = NO;
         [self setupMenus]; /* Make sure input menu is up to date */
     } else if (mi == _previous          ||
                mi == _voutMenuprev      ||
@@ -1621,35 +1622,36 @@
         enabled = _playlistController.hasNextPlaylistItem;
     } else if (mi == _record) {
         enabled = NO;
-        if (p_input)
-            enabled = var_GetBool(p_input, "can-record");
+        // FIXME: this internal state is no longer available
+/*        if (p_input)
+            enabled = var_GetBool(p_input, "can-record");*/
     } else if (mi == _random) {
-        int i_state;
-        var_Get(p_playlist, "random", &val);
-        i_state = val.b_bool ? NSOnState : NSOffState;
-        [mi setState: i_state];
+        enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
+        [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
     } else if (mi == _repeat) {
-        int i_state;
-        var_Get(p_playlist, "repeat", &val);
-        i_state = val.b_bool ? NSOnState : NSOffState;
-        [mi setState: i_state];
+        enum vlc_playlist_playback_repeat playbackRepeat = [_playlistController playbackRepeat];
+        [mi setState: playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT ? NSOnState : NSOffState];
     } else if (mi == _loop) {
-        int i_state;
-        var_Get(p_playlist, "loop", &val);
-        i_state = val.b_bool ? NSOnState : NSOffState;
-        [mi setState: i_state];
+        enum vlc_playlist_playback_repeat playbackRepeat = [_playlistController playbackRepeat];
+        [mi setState: playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL ? NSOnState : NSOffState];
     } else if (mi == _quitAfterPB) {
+        enabled = NO;
+        // FIXME: this internal state is no longer available
+        /*
         int i_state;
         bool b_value = var_InheritBool(p_playlist, "play-and-exit");
         i_state = b_value ? NSOnState : NSOffState;
-        [mi setState: i_state];
+        [mi setState: i_state];*/
     } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
+        enabled = NO;
+        // FIXME: this internal state depends on the future abstraction of the player
+        /*
         if (p_input != NULL) {
             var_Get(p_input, "can-seek", &val);
             enabled = val.b_bool;
         } else {
             enabled = NO;
-        }
+        }*/
     } else if (mi == _mute || mi == _dockMenumute || mi == _voutMenumute) {
         [mi setState: [[VLCCoreInteraction sharedInstance] mute] ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
@@ -1666,6 +1668,8 @@
                ) {
         enabled = NO;
 
+        // FIXME: this internal state depends on the future abstraction of the player
+        /*
         if (p_input != NULL) {
             vout_thread_t *p_vout = getVoutForActiveWindow();
             if (p_vout != NULL) {
@@ -1678,7 +1682,7 @@
                 enabled = YES;
                 vlc_object_release(p_vout);
             }
-        }
+        }*/
 
         [self setupMenus]; /* Make sure video menu is up to date */
 
@@ -1698,8 +1702,9 @@
         }
     }
 
-    if (p_input)
-        vlc_object_release(p_input);
+    if (inputItem) {
+        input_item_Release(inputItem);
+    }
 
     return enabled;
 }

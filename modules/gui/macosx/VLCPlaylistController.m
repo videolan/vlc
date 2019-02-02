@@ -27,6 +27,7 @@
 #import "VLCOpenInputMetadata.h"
 #import "VLCMain.h"
 #import <vlc_interface.h>
+#import <vlc_player.h>
 
 NSString *VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
 NSString *VLCPlaybackRepeatChanged = @"VLCPlaybackRepeatChanged";
@@ -433,6 +434,17 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     vlc_playlist_Lock(_p_playlist);
     vlc_playlist_SetPlaybackRepeat(_p_playlist, playbackRepeat);
     vlc_playlist_Unlock(_p_playlist);
+}
+
+#pragma mark - properties
+
+- (input_item_t *)currentlyPlayingInputItem
+{
+    vlc_player_t *player = vlc_playlist_GetPlayer(_p_playlist);
+    vlc_player_Lock(player);
+    input_item_t *inputItem = vlc_player_GetCurrentMedia(player);
+    vlc_player_Unlock(player);
+    return inputItem;
 }
 
 #pragma mark - helper methods

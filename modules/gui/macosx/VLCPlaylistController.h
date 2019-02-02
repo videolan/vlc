@@ -54,8 +54,16 @@ extern NSString *VLCPlaybackHasNextChanged;
 
 /**
  * Index of the current playlist item
+ @return index of the current playlist index or -1 if none
+ @warning just because the current index is valid does not imply that it is playing!
  */
 @property (readonly) size_t currentPlaylistIndex;
+
+/**
+ * input of the currently playing item
+ @return returns the input item for the currently playing playlist item
+ */
+@property (readonly, nullable) input_item_t *currentlyPlayingInputItem;
 
 /**
  * indicates whether there is a previous item in the list the user could go back to
