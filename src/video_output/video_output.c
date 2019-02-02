@@ -1326,11 +1326,15 @@ static void ThreadProcessMouseState(vout_thread_t *vout,
         vout->p->mouse_event(m, vout->p->mouse_opaque);
 }
 
-static int vout_Start(vout_thread_t *vout)
+static int vout_Start(vout_thread_t *vout, const vout_configuration_t *cfg)
 {
     vout_thread_sys_t *sys = vout->p;
 
+    sys->mouse_event = cfg->mouse_event;
+    sys->mouse_opaque = cfg->mouse_opaque;
     vlc_mouse_Init(&sys->mouse);
+
+    sys->dpb_size = cfg->dpb_size;
     sys->decoder_fifo = picture_fifo_New();
     sys->decoder_pool = NULL;
     sys->display_pool = NULL;
@@ -1416,6 +1420,9 @@ static int vout_Start(vout_thread_t *vout)
 
     sys->step.last               = VLC_TICK_INVALID;
     sys->step.timestamp          = VLC_TICK_INVALID;
+
+    sys->pause.is_on = false;
+    sys->pause.date  = VLC_TICK_INVALID;
 
     sys->spu_blend_chroma        = 0;
     sys->spu_blend               = NULL;
@@ -1671,7 +1678,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     sys->source.dar.num = 0;
     sys->source.dar.den = 0;
     sys->source.crop.mode = VOUT_CROP_NONE;
-    sys->dpb_size = cfg->dpb_size;
     sys->snapshot = vout_snapshot_New();
     vout_statistic_Init(&sys->statistic);
 
@@ -1681,9 +1687,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
 
     vout_control_Init(&sys->control);
 
-    sys->pause.is_on = false;
-    sys->pause.date = VLC_TICK_INVALID;
-
     sys->title.show     = var_InheritBool(vout, "video-title-show");
     sys->title.timeout  = var_InheritInteger(vout, "video-title-timeout");
     sys->title.position = var_InheritInteger(vout, "video-title-position");
@@ -1691,9 +1694,6 @@ static vout_thread_t *VoutCreate(vlc_object_t *object,
     vout_InitInterlacingSupport(vout);
 
     sys->is_late_dropped = var_InheritBool(vout, "drop-late-frames");
-
-    sys->mouse_event = cfg->mouse_event;
-    sys->mouse_opaque = cfg->mouse_opaque;
 
     vlc_mutex_init(&sys->filter.lock);
 
@@ -1781,16 +1781,10 @@ vout_thread_t *vout_Request(vlc_object_t *object,
         msg_Dbg(object, "reusing provided vout");
         vlc_join(sys->thread, NULL);
 
-        sys->mouse_event = cfg->mouse_event;
-        sys->mouse_opaque = cfg->mouse_opaque;
-        sys->pause.is_on = false;
-        sys->pause.date  = VLC_TICK_INVALID;
-
         vout_ReinitInterlacingSupport(vout);
 
         video_format_Clean(&sys->original);
         sys->original = original;
-        sys->dpb_size = cfg->dpb_size;
 
         vlc_mutex_lock(&vout->p->window_lock);
         vout_UpdateWindowSize(vout);
@@ -1805,7 +1799,7 @@ vout_thread_t *vout_Request(vlc_object_t *object,
             vout->p->input = vlc_object_hold((vlc_object_t *)input);
     }
 
-    if (vout_Start(vout)
+    if (vout_Start(vout, cfg)
      || vlc_clone(&sys->thread, Thread, vout, VLC_THREAD_PRIORITY_OUTPUT)) {
         msg_Err(vout, "video output creation failed");
         vout_display_window_Delete(sys->display_cfg.window);
