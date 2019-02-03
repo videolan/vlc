@@ -161,9 +161,9 @@ static void RenderRegion(vout_display_t *vd, const subpicture_t *subpic,
     /* Mask in the original alpha channel then renver over the scaled pixmap.
      * Mask (pre)multiplies RGB channels and restores the alpha channel.
      */
-    int_fast16_t dx = reg->i_x * place->width
+    int_fast16_t dx = place->x + reg->i_x * place->width
                       / subpic->i_original_picture_width;
-    int_fast16_t dy = reg->i_y * place->height
+    int_fast16_t dy = place->y + reg->i_y * place->height
                       / subpic->i_original_picture_height;
     uint_fast16_t dw = (reg->i_x + reg->fmt.i_visible_width) * place->width
                        / subpic->i_original_picture_width;
