@@ -1,20 +1,20 @@
 # Norwegian Nynorsk translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
-# Bjørn I. <bjorn.svindseth@online.no>, 2015-2018
+# Bjørn I. <bjorn.svindseth@online.no>, 2015-2019
 # Copyright (C) Eirik U. Birkeland <eirbir@gmail.com>, 2009
 # Copyright (C) Jon Stødle <jonstodle@gmail.com>, 2009
 # Eirik U. Birkeland <eirbir@gmail.com>, 2009-2010
 # Imre Kristoffer Eilertsen <imreeil42@gmail.com>, 2016-2017
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-25 13:21+0200\n"
-"Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2018\n"
+"PO-Revision-Date: 2019-02-03 17:10+0100\n"
+"Last-Translator: Bjørn I. <bjorn.svindseth@online.no>, 2019\n"
 "Language-Team: Norwegian Nynorsk (https://www.transifex.com/yaron/"
 "teams/16553/nn/)\n"
 "Language: nn\n"
@@ -31,7 +31,7 @@ msgid ""
 "Written by the VideoLAN team; see the AUTHORS file.\n"
 msgstr ""
 "Det er INGEN GARANTI for dette programmet utover det som står i lova.\n"
-"Du kan fritt endra og distribuera det vidare viss du følgjer vilkåra i\n"
+"Du kan fritt endra og distribuera det vidare viss du fylgjer vilkåra i\n"
 "GNU General Public License – sjå fila «COPYING».\n"
 "Programmet er utvikla av VideoLAN-gruppa – sjå fila «AUTHORS».\n"
 
@@ -340,7 +340,7 @@ msgstr ""
 
 #: include/vlc_config_cat.h:162
 msgid "Sout stream"
-msgstr "Soutstraum"
+msgstr "Sout-straum"
 
 #: include/vlc_config_cat.h:163
 msgid ""
@@ -818,7 +818,9 @@ msgid "%u module was not displayed because it only has advanced options.\n"
 msgid_plural ""
 "%u modules were not displayed because they only have advanced options.\n"
 msgstr[0] ""
+"%u modul vart ikkje vist fordi han berre har avanserte innstillingar.\n"
 msgstr[1] ""
+"%u modular vart ikkje viste fordi dei berre har avanserte innstillingar.\n"
 
 #: src/config/help.c:663
 msgid ""
@@ -946,7 +948,7 @@ msgstr "Ja"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "DTVCC-undertekstar %u"
 
 #: src/input/es_out.c:2143
 #, c-format
@@ -1064,7 +1066,7 @@ msgstr "Venstre øvst"
 
 #: src/input/es_out.c:3200
 msgid "Right bottom"
-msgstr ""
+msgstr "Høgre nedst"
 
 #: src/input/es_out.c:3200
 msgid "Top right"
@@ -1072,15 +1074,15 @@ msgstr "Øvst til høgre"
 
 #: src/input/es_out.c:3201
 msgid "Bottom left"
-msgstr ""
+msgstr "Nedst til venstre"
 
 #: src/input/es_out.c:3201
 msgid "Bottom right"
-msgstr ""
+msgstr "Nedst til høgre"
 
 #: src/input/es_out.c:3202
 msgid "Left bottom"
-msgstr ""
+msgstr "Venstre nedst"
 
 #: src/input/es_out.c:3202
 msgid "Right top"
@@ -1088,7 +1090,7 @@ msgstr "Høgre øvst"
 
 #: src/input/es_out.c:3204
 msgid "Orientation"
-msgstr ""
+msgstr "Skjermretning"
 
 #: src/input/es_out.c:3210 src/input/es_out.c:3228 src/input/es_out.c:3246
 #: src/input/es_out.c:3260 src/playlist/tree.c:67
@@ -1119,20 +1121,20 @@ msgstr ""
 
 #: src/input/es_out.c:3240
 msgid "Color transfer function"
-msgstr ""
+msgstr "Fargeoverføringsfunksjon"
 
 #: src/input/es_out.c:3253
 msgid "Color space"
-msgstr ""
+msgstr "Fargerom"
 
 #: src/input/es_out.c:3253
 #, c-format
 msgid "%s Range"
-msgstr ""
+msgstr "%s Rekkjevidde"
 
 #: src/input/es_out.c:3255
 msgid "Full"
-msgstr ""
+msgstr "Fullstendig"
 
 #: src/input/es_out.c:3262 src/libvlc-module.c:295 src/libvlc-module.c:368
 #: modules/audio_filter/channel_mixer/mono.c:91
@@ -1155,36 +1157,36 @@ msgstr "Øvst i midten"
 
 #: src/input/es_out.c:3265
 msgid "Bottom Left"
-msgstr ""
+msgstr "Nedst til venstre"
 
 #: src/input/es_out.c:3266
 msgid "Bottom Center"
-msgstr ""
+msgstr "Nedst i midten"
 
 #: src/input/es_out.c:3270
 msgid "Chroma location"
-msgstr ""
+msgstr "Krominansplassering"
 
 #: src/input/es_out.c:3279
 msgid "Rectangular"
-msgstr ""
+msgstr "Rektangulær"
 
 #: src/input/es_out.c:3282
 msgid "Equirectangular"
-msgstr ""
+msgstr "Ekvirektangulær"
 
 #: src/input/es_out.c:3285
 msgid "Cubemap"
-msgstr ""
+msgstr "Cubemap"
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "Projeksjon"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
 msgid "Yaw"
-msgstr ""
+msgstr "Yaw"
 
 #: src/input/es_out.c:3295
 msgctxt "ViewPoint"
@@ -1194,12 +1196,12 @@ msgstr ""
 #: src/input/es_out.c:3297
 msgctxt "ViewPoint"
 msgid "Roll"
-msgstr ""
+msgstr "Rotasjon"
 
 #: src/input/es_out.c:3300
 msgctxt "ViewPoint"
 msgid "Field of view"
-msgstr ""
+msgstr "Synsfelt"
 
 #: src/input/es_out.c:3305
 msgid "Max. luminance"
@@ -1232,7 +1234,7 @@ msgstr "Undertekst"
 #: src/input/input.c:1821 modules/control/hotkeys.c:1512
 #, c-format
 msgid "Volume %ld%%"
-msgstr "Volum %ld%%"
+msgstr "Lydstyrke %ld%%"
 
 #: src/input/input.c:2719
 msgid "Your input can't be opened"
@@ -3623,11 +3625,11 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "Vis skjulte filer"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
-msgstr ""
+msgstr "Ignorer filer som startar med '.'"
 
 #: src/libvlc-module.c:1151
 msgid "Services discovery modules"
@@ -3641,7 +3643,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1156
 msgid "Play files randomly forever"
-msgstr "Spel av filer i tilfeldig rekkjefølgje i det uendelege"
+msgstr "Spel av filer i tilfeldig rekkjefylgje i det uendelege"
 
 #: src/libvlc-module.c:1158
 msgid "VLC will randomly play files in the playlist until interrupted."
@@ -3691,7 +3693,7 @@ msgstr "Pause kvart element i spelelista på det siste biletet."
 
 #: src/libvlc-module.c:1180
 msgid "Start paused"
-msgstr ""
+msgstr "Start i pause"
 
 #: src/libvlc-module.c:1182
 msgid "Pause each item in the playlist on the first frame."
@@ -3751,7 +3753,7 @@ msgstr "Oversjå"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "Lydstyrkekontroll"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
@@ -3839,11 +3841,11 @@ msgstr "Vel snøggtast for å spela av fortare / spola framover."
 #: modules/gui/qt/components/controller.hpp:108
 #: modules/gui/qt/components/controller.hpp:118
 msgid "Slower"
-msgstr "Seinare"
+msgstr "Saktare"
 
 #: src/libvlc-module.c:1239 src/libvlc-module.c:1245
 msgid "Select the hotkey to use for slow motion playback."
-msgstr "Vel snøggtast for å spela av seinare / i sakte film."
+msgstr "Vel snøggtast for å spela av saktare/i sakte film."
 
 #: src/libvlc-module.c:1240
 msgid "Normal rate"
@@ -3859,7 +3861,7 @@ msgstr "Fortare (jamt)"
 
 #: src/libvlc-module.c:1244 modules/gui/qt/menus.cpp:891
 msgid "Slower (fine)"
-msgstr "Seinare (jamt)"
+msgstr "Saktare(jamt)"
 
 #: src/libvlc-module.c:1246 modules/control/hotkeys.c:410
 #: modules/gui/macosx/VLCControlsBarCommon.m:196
@@ -4995,15 +4997,15 @@ msgstr "Opp"
 
 #: src/misc/actions.c:114 modules/gui/macosx/VLCMainMenu.m:509
 msgid "Volume Down"
-msgstr "Lydstyrke opp"
+msgstr "Lågare lyd"
 
 #: src/misc/actions.c:115
 msgid "Volume Mute"
-msgstr "Lydstyrke dempa"
+msgstr "Demp lyden"
 
 #: src/misc/actions.c:116 modules/gui/macosx/VLCMainMenu.m:508
 msgid "Volume Up"
-msgstr "Lydstyrke opp"
+msgstr "Høgare lyd"
 
 #: src/misc/actions.c:117
 msgid "Zoom In"
@@ -9233,7 +9235,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:76
 msgid "Headphone virtual spatialization effect"
-msgstr ""
+msgstr "Virtuell dimensjoneringseffekt for øyretelefonar"
 
 #: modules/audio_filter/channel_mixer/headphone.c:77
 msgid "Headphone effect"
@@ -9310,7 +9312,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "Øyretelefonmodus (binaural)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
@@ -9795,7 +9797,7 @@ msgstr ""
 #: modules/audio_filter/scaletempo.c:56
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:262
 msgid "Scaletempo"
-msgstr ""
+msgstr "Skaleringstempo"
 
 #: modules/audio_filter/scaletempo.c:67
 msgid "Stride Length"
@@ -14236,7 +14238,7 @@ msgstr ""
 
 #: modules/control/win_msg.c:193
 msgid "Windows messages interface"
-msgstr ""
+msgstr "Windows meldingsgrensesnitt"
 
 #: modules/demux/adaptive/adaptive.cpp:68
 msgid "Maximum device width"
@@ -15180,7 +15182,7 @@ msgstr "Podkast, underkategori"
 
 #: modules/demux/playlist/podcast.c:310
 msgid "Podcast Duration"
-msgstr "Podkastlengde"
+msgstr "Podkast-tid"
 
 #: modules/demux/playlist/podcast.c:314
 msgid "Podcast Type"
@@ -15451,7 +15453,7 @@ msgstr "Lisens"
 #: modules/gui/macosx/VLCAboutWindowController.m:103
 #: modules/gui/qt/dialogs/help.cpp:122
 msgid "Authors"
-msgstr "Utviklarar"
+msgstr "Artistar"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:105
 msgid ""
@@ -15469,14 +15471,14 @@ msgid ""
 "\"https://www.videolan.org/contribute/\"><span style=\" text-decoration: "
 "underline; color:#0057ae;\">Help and join us!</span></a>"
 msgstr ""
-"<p>VLC media player er ein fri og open-kjelde mediespelar, straumkodar og "
-"kringkastar som er lagd av dei frivillige i<a href=\"https://www.videolan."
-"org/\"><span style=\" text-decoration: underline; color:#0057ae;\">VideoLAN</"
-"span></a>-samfunnet.</p><p>VLC brukar sine interne kodeker, fungerer på "
-"praktisk talt alle filar, CDar, DVDar, nettverksstraumar, opptakskort og "
-"anna medieformater!</p><p><a href=\"https://www.videolan.org/contribute/"
-"\"><span style=\" text-decoration: underline; color:#0057ae;\">Bli med oss "
-"og hjelp!</span></a>"
+"<p>VLC mediaspelar er ein fri og open kjeldekode-mediespelar, straumkodar og "
+"kringkastar (streamer) som er laga av dei frivillige i <a href=\"https://www."
+"videolan.org/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">VideoLAN</span></a>-fellesskapet.</p><p>VLC brukar eigne interne kodeker, "
+"fungerer på praktisk talt alle filer, CD-ar, DVD-ar, nettverksstraumar, "
+"opptakskort og andre medieformat!</p><p><a href=\"https://www.videolan.org/"
+"contribute/\"><span style=\" text-decoration: underline; color:#0057ae;"
+"\">Bli med oss og hjelp til!</span></a>"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:105
 #: modules/gui/macosx/VLCAddonsWindowController.m:357
@@ -15542,7 +15544,7 @@ msgstr "Namn"
 #: modules/gui/macosx/VLCPlaylist.m:108 modules/gui/qt/dialogs/plugins.cpp:1397
 #: modules/gui/qt/dialogs/plugins.cpp:1502 modules/mux/asf.c:58
 msgid "Author"
-msgstr "Utviklar"
+msgstr "Artist"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:197
 msgid "Uninstall"
@@ -15558,7 +15560,7 @@ msgstr "Drakter"
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:211
 #: modules/gui/macosx/VLCVideoEffectsWindowController.m:199
 msgid "Apply profile at next launch"
-msgstr ""
+msgstr "Bruk profilen ved neste oppstart"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:216
 #: modules/gui/qt/ui/equalizer.h:134
@@ -15573,7 +15575,7 @@ msgstr "Forforsterkar"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:223
 msgid "Enable dynamic range compressor"
-msgstr ""
+msgstr "Aktiver dynamisk breiddekomprimering"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:224
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:235
@@ -15604,7 +15606,7 @@ msgstr "Slå på spatializer"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:246
 msgid "Headphone virtualization"
-msgstr ""
+msgstr "Simulere øyretelefonar"
 
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:253
 msgid "Volume normalization"
@@ -16502,7 +16504,7 @@ msgstr "Opna opptakseining…"
 
 #: modules/gui/macosx/VLCMainMenu.m:360
 msgid "Open Recent"
-msgstr "Opna nyleg brukt"
+msgstr "Opna nyleg brukte"
 
 #: modules/gui/macosx/VLCMainMenu.m:361
 msgid "Close Window"
@@ -16550,7 +16552,7 @@ msgstr "Vis sidestolpe"
 
 #: modules/gui/macosx/VLCMainMenu.m:382
 msgid "Playlist Table Columns"
-msgstr ""
+msgstr "Tabellkolonner for speleliste"
 
 #: modules/gui/macosx/VLCMainMenu.m:384
 msgid "Playback"
@@ -16568,7 +16570,7 @@ msgstr "Sporsynkronisering"
 #: modules/gui/macosx/VLCMainMenu.m:400
 #: modules/gui/qt/components/controller.hpp:110
 msgid "A→B Loop"
-msgstr "A→B sløyfe"
+msgstr "Sløyfe A→B"
 
 #: modules/gui/macosx/VLCMainMenu.m:401
 msgid "Quit after Playback"
@@ -17156,7 +17158,7 @@ msgstr "Spornummer"
 #: modules/gui/macosx/VLCPlaylist.m:109
 #: modules/gui/qt/components/playlist/sorting.h:61
 msgid "Duration"
-msgstr "Lengde"
+msgstr "Tid"
 
 #: modules/gui/macosx/VLCPlaylist.m:115
 #: modules/gui/qt/components/playlist/sorting.h:67
@@ -18266,16 +18268,16 @@ msgstr " Posisjon : %s/%s"
 
 #: modules/gui/ncurses.c:1095
 msgid " Volume   : Mute"
-msgstr "Volum : Dempa"
+msgstr " Lydstyrke   : Dempa"
 
 #: modules/gui/ncurses.c:1096
 #, c-format
 msgid " Volume   : %3ld%%"
-msgstr " Volum   : %3ld%%"
+msgstr " Lydstyrke   : %3ld%%"
 
 #: modules/gui/ncurses.c:1096
 msgid " Volume   : ----"
-msgstr " Volum   : ----"
+msgstr " Lydstyrke   : ----"
 
 #: modules/gui/ncurses.c:1102
 #, c-format
@@ -19925,7 +19927,7 @@ msgstr "Tidsglidebrytar"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:482
 msgid "Small Volume"
-msgstr ""
+msgstr "Låg lydstyrke"
 
 #: modules/gui/qt/dialogs/toolbar.cpp:519
 msgid "DVD menus"
@@ -20351,7 +20353,7 @@ msgstr "&Normal fart"
 
 #: modules/gui/qt/menus.cpp:897
 msgid "Slo&wer"
-msgstr "&Seinare"
+msgstr "&Saktare"
 
 #: modules/gui/qt/menus.cpp:912
 msgid "&Jump Forward"
@@ -20520,7 +20522,7 @@ msgstr ""
 
 #: modules/gui/qt/qt.cpp:138
 msgid "Define the colors of the volume slider"
-msgstr ""
+msgstr "Definer fargane i lydstyrkeglidebrytaren"
 
 #: modules/gui/qt/qt.cpp:139
 msgid ""
@@ -22553,9 +22555,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "H.264-videoførpakkar"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
