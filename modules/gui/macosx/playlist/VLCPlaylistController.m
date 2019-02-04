@@ -29,6 +29,7 @@
 #import "playlist/VLCPlaylistModel.h"
 #import "playlist/VLCPlaylistItem.h"
 #import "playlist/VLCPlaylistDataSource.h"
+#import "playlist/VLCPlayerController.h"
 #import "windows/VLCOpenInputMetadata.h"
 
 NSString *VLCPlaybackOrderChanged = @"VLCPlaybackOrderChanged";
@@ -207,6 +208,7 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
         vlc_playlist_Unlock(_p_playlist);
         _playlistModel = [[VLCPlaylistModel alloc] init];
         _playlistModel.playlistController = self;
+        _playerController = [[VLCPlayerController alloc] initWithPlayer:vlc_playlist_GetPlayer(_p_playlist)];
     }
     return self;
 }

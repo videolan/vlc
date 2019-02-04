@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class VLCPlaylistModel;
 @class VLCPlaylistDataSource;
+@class VLCPlayerController;
 
 extern NSString *VLCPlaybackOrderChanged;
 extern NSString *VLCPlaybackRepeatChanged;
@@ -53,6 +54,11 @@ extern NSString *VLCPlaybackHasNextChanged;
  * The datasource instance used to actually display the playlist.
  */
 @property (readwrite, assign) VLCPlaylistDataSource *playlistDataSource;
+
+/**
+ * The player instance associated with the playlist
+ */
+@property (readonly) VLCPlayerController *playerController;
 
 /**
  * Index of the current playlist item
