@@ -21,6 +21,7 @@
  *****************************************************************************/
 
 #import "VLCPlayerController.h"
+#import "main/VLCMain.h"
 
 NSString *VLCPlayerCurrentMediaItem = @"VLCPlayerCurrentMediaItem";
 NSString *VLCPlayerCurrentMediaItemChanged = @"VLCPlayerCurrentMediaItemChanged";
@@ -32,8 +33,13 @@ NSString *VLCPlayerRateChanged = @"VLCPlayerRateChanged";
 NSString *VLCPlayerCapabilitiesChanged = @"VLCPlayerCapabilitiesChanged";
 NSString *VLCPlayerTimeAndPositionChanged = @"VLCPlayerTimeAndPositionChanged";
 NSString *VLCPlayerLengthChanged = @"VLCPlayerLengthChanged";
+NSString *VLCPlayerTeletextMenuAvailable = @"VLCPlayerTeletextMenuAvailable";
+NSString *VLCPlayerTeletextEnabled = @"VLCPlayerTeletextEnabled";
+NSString *VLCPlayerTeletextPageChanged = @"VLCPlayerTeletextPageChanged";
+NSString *VLCPlayerTeletextTransparencyChanged = @"VLCPlayerTeletextTransparencyChanged";
 NSString *VLCPlayerAudioDelayChanged = @"VLCPlayerAudioDelayChanged";
 NSString *VLCPlayerSubtitlesDelayChanged = @"VLCPlayerSubtitlesDelayChanged";
+NSString *VLCPlayerSubtitleTextScalingFactorChanged = @"VLCPlayerSubtitleTextScalingFactorChanged";
 NSString *VLCPlayerRecordingChanged = @"VLCPlayerRecordingChanged";
 NSString *VLCPlayerFullscreenChanged = @"VLCPlayerFullscreenChanged";
 NSString *VLCPlayerWallpaperModeChanged = @"VLCPlayerWallpaperModeChanged";
@@ -57,8 +63,13 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)capabilitiesChanged:(int)newCapabilities;
 - (void)position:(float)position andTimeChanged:(vlc_tick_t)time;
 - (void)lengthChanged:(vlc_tick_t)length;
+- (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu;
+- (void)teletextEnabledChanged:(BOOL)teletextOn;
+- (void)teletextPageChanged:(unsigned int)page;
+- (void)teletextTransparencyChanged:(BOOL)isTransparent;
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
+- (void)subtitleTextScaleChanged:(unsigned int)subtitleTextScalingFactor;
 - (void)recordingChanged:(BOOL)recording;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 
@@ -145,6 +156,42 @@ static void cb_player_length_changed(vlc_player_t *p_player, vlc_tick_t newLengt
     });
 }
 
+static void cb_player_teletext_menu_availability_changed(vlc_player_t *p_player, bool hasTeletextMenu, void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController teletextAvailibilityChanged:hasTeletextMenu];
+    });
+}
+
+static void cb_player_teletext_enabled_changed(vlc_player_t *p_player, bool teletextEnabled, void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController teletextEnabledChanged:teletextEnabled];
+    });
+}
+
+static void cb_player_teletext_page_changed(vlc_player_t *p_player, unsigned page, void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController teletextPageChanged:page];
+    });
+}
+
+static void cb_player_teletext_transparency_changed(vlc_player_t *p_player, bool isTransparent, void *p_data)
+{
+    VLC_UNUSED(p_player);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        VLCPlayerController *playerController = (__bridge VLCPlayerController *)p_data;
+        [playerController teletextTransparencyChanged:isTransparent];
+    });
+}
+
 static void cb_player_audio_delay_changed(vlc_player_t *p_player, vlc_tick_t newDelay, void *p_data)
 {
     VLC_UNUSED(p_player);
@@ -195,10 +242,10 @@ static const struct vlc_player_cbs player_callbacks = {
     NULL, //cb_player_titles_changed,
     NULL, //cb_player_title_selection_changed,
     NULL, //cb_player_chapter_selection_changed,
-    NULL, //cb_player_teletext_menu_changed,
-    NULL, //cb_player_teletext_enabled_changed,
-    NULL, //cb_player_teletext_page_changed,
-    NULL, //cb_player_teletext_transparency_changed,
+    cb_player_teletext_menu_availability_changed,
+    cb_player_teletext_enabled_changed,
+    cb_player_teletext_page_changed,
+    cb_player_teletext_transparency_changed,
     cb_player_audio_delay_changed,
     cb_player_subtitle_delay_changed,
     NULL, //cb_player_associated_subs_fps_changed,
@@ -497,11 +544,117 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_Unlock(_p_player);
 }
 
+- (void)jumpWithValue:(char *)p_userDefinedJumpSize forward:(BOOL)shallJumpForward
+{
+    int64_t interval = var_InheritInteger(getIntf(), p_userDefinedJumpSize);
+    if (interval > 0) {
+        vlc_tick_t jumptime = vlc_tick_from_sec( interval );
+        if (!shallJumpForward)
+            jumptime = jumptime * -1;
+
+        /* No fask seek for jumps. Indeed, jumps can seek to the current position
+         * if not precise enough or if the jump value is too small. */
+        vlc_player_SeekByTime(_p_player,
+                              jumptime,
+                              VLC_PLAYER_SEEK_PRECISE,
+                              VLC_PLAYER_WHENCE_RELATIVE);
+    }
+}
+
+- (void)jumpForwardExtraShort
+{
+    [self jumpWithValue:"extrashort-jump-size" forward:YES];
+}
+
+- (void)jumpBackwardExtraShort
+{
+    [self jumpWithValue:"extrashort-jump-size" forward:NO];
+}
+
+- (void)jumpForwardShort
+{
+    [self jumpWithValue:"short-jump-size" forward:YES];
+}
+
+- (void)jumpBackwardShort
+{
+    [self jumpWithValue:"short-jump-size" forward:NO];
+}
+
+- (void)jumpForwardMedium
+{
+    [self jumpWithValue:"medium-jump-size" forward:YES];
+}
+
+- (void)jumpBackwardMedium
+{
+    [self jumpWithValue:"medium-jump-size" forward:NO];
+}
+
+- (void)jumpForwardLong
+{
+    [self jumpWithValue:"long-jump-size" forward:YES];
+}
+
+- (void)jumpBackwardLong
+{
+    [self jumpWithValue:"long-jump-size" forward:NO];
+}
+
 - (void)lengthChanged:(vlc_tick_t)length
 {
     _length = length;
     [_defaultNotificationCenter postNotificationName:VLCPlayerLengthChanged
                                               object:self];
+}
+
+- (void)teletextAvailibilityChanged:(BOOL)hasTeletextMenu
+{
+    _teletextMenuAvailable = hasTeletextMenu;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTeletextTransparencyChanged
+                                              object:self];
+}
+
+- (void)teletextEnabledChanged:(BOOL)teletextOn
+{
+    _teletextEnabled = teletextOn;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTeletextEnabled
+                                              object:self];
+}
+
+- (void)setTeletextEnabled:(BOOL)teletextEnabled
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SetTeletextEnabled(_p_player, teletextEnabled);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)teletextPageChanged:(unsigned int)page
+{
+    _teletextPage = page;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTeletextPageChanged
+                                              object:self];
+}
+
+- (void)setTeletextPage:(unsigned int)teletextPage
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SelectTeletextPage(_p_player, teletextPage);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)teletextTransparencyChanged:(BOOL)isTransparent
+{
+    _teletextTransparent = isTransparent;
+    [_defaultNotificationCenter postNotificationName:VLCPlayerTeletextTransparencyChanged
+                                              object:self];
+}
+
+- (void)setTeletextTransparent:(BOOL)teletextTransparent
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SetTeletextTransparency(_p_player, teletextTransparent);
+    vlc_player_Unlock(_p_player);
 }
 
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay
@@ -529,6 +682,27 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     vlc_player_Lock(_p_player);
     vlc_player_SetSubtitleDelay(_p_player, subtitlesDelay, VLC_PLAYER_WHENCE_ABSOLUTE);
+    vlc_player_Unlock(_p_player);
+}
+
+- (unsigned int)subtitleTextScalingFactor
+{
+    unsigned int ret = 100;
+    vlc_player_Lock(_p_player);
+    ret = vlc_player_GetSubtitleTextScale(_p_player);
+    vlc_player_Unlock(_p_player);
+    return ret;
+}
+
+- (void)setSubtitleTextScalingFactor:(unsigned int)subtitleTextScalingFactor
+{
+    if (subtitleTextScalingFactor < 10)
+        subtitleTextScalingFactor = 10;
+    if (subtitleTextScalingFactor > 500)
+        subtitleTextScalingFactor = 500;
+
+    vlc_player_Lock(_p_player);
+    vlc_player_SetSubtitleTextScale(_p_player, subtitleTextScalingFactor);
     vlc_player_Unlock(_p_player);
 }
 
@@ -560,6 +734,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_vout_SetFullscreen(_p_player, fullscreen);
 }
 
+- (void)toggleFullscreen
+{
+    vlc_player_vout_SetFullscreen(_p_player, !_fullscreen);
+}
+
 - (void)wallpaperModeChanged:(BOOL)wallpaperModeValue
 {
     _wallpaperMode = wallpaperModeValue;
@@ -570,6 +749,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)setWallpaperMode:(BOOL)wallpaperMode
 {
     vlc_player_vout_SetWallpaperModeEnabled(_p_player, wallpaperMode);
+}
+
+- (void)takeSnapshot
+{
+    vlc_player_vout_Snapshot(_p_player);
 }
 
 #pragma mark - audio specific delegation
@@ -586,6 +770,16 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     vlc_player_aout_SetVolume(_p_player, volume);
 }
 
+- (void)incrementVolume
+{
+    vlc_player_aout_SetVolume(_p_player, _volume + 0.05);
+}
+
+- (void)decrementVolume
+{
+    vlc_player_aout_SetVolume(_p_player, _volume - 0.05);
+}
+
 - (void)muteChanged:(BOOL)mute
 {
     _mute = mute;
@@ -596,6 +790,11 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 - (void)setMute:(BOOL)mute
 {
     vlc_player_aout_Mute(_p_player, mute);
+}
+
+- (void)toggleMute
+{
+    vlc_player_aout_Mute(_p_player, !_mute);
 }
 
 @end

@@ -79,6 +79,30 @@ extern NSString *VLCPlayerTimeAndPositionChanged;
 extern NSString *VLCPlayerLengthChanged;
 
 /**
+ * Listen to VLCPlayerTeletextMenuAvailable to be notified if a teletext menu becomes (un-)available
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTeletextMenuAvailable;
+
+/**
+ * Listen to VLCPlayerTeletextEnabled to be notified if teletext becomes enabled or disabled
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTeletextEnabled;
+
+/**
+ * Listen to VLCPlayerTeletextPageChanged to be notified if the teletext page changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTeletextPageChanged;
+
+/**
+ * Listen to VLCPlayerTeletextTransparencyChanged to be notified if the teletext transparency changes
+ * @note the affected player object will be the object of the notification
+ */
+extern NSString *VLCPlayerTeletextTransparencyChanged;
+
+/**
  * Listen to VLCPlayerAudioDelayChanged to be notified if the audio delay of the current media changes
  * @note the affected player object will be the object of the notification
  */
@@ -295,6 +319,46 @@ extern NSString *VLCPlayerMuteChanged;
 - (void)setPositionPrecise:(float)position;
 
 /**
+ * helper function to jump forward with the extra short interval (user configurable in preferences)
+ */
+- (void)jumpForwardExtraShort;
+
+/**
+ * helper function to jump backward with the extra short interval (user configurable in preferences)
+ */
+- (void)jumpBackwardExtraShort;
+
+/**
+ * helper function to jump forward with the short interval (user configurable in preferences)
+ */
+- (void)jumpForwardShort;
+
+/**
+ * helper function to jump backward with the extra short interval (user configurable in preferences)
+ */
+- (void)jumpBackwardShort;
+
+/**
+ * helper function to jump forward with the medium interval (user configurable in preferences)
+ */
+- (void)jumpForwardMedium;
+
+/**
+ * helper function to jump backward with the medium interval (user configurable in preferences)
+ */
+- (void)jumpBackwardMedium;
+
+/**
+ * helper function to jump forward with the long interval (user configurable in preferences)
+ */
+- (void)jumpForwardLong;
+
+/**
+ * helper function to jump forward with the long interval (user configurable in preferences)
+ */
+- (void)jumpBackwardLong;
+
+/**
  * the length of the currently playing media in ticks
  * @return a valid time or VLC_TICK_INVALID (if no media is set, the media
  * doesn't have any length, if playback is not yet started or in case of error)
@@ -302,6 +366,37 @@ extern NSString *VLCPlayerMuteChanged;
  * @note listen to VLCPlayerLengthChanged to be notified about changes to this property
  */
 @property (readonly) vlc_tick_t length;
+
+/**
+ * exposes whether a teletext menu is available or not
+ * @note listen to VLCPlayerTeletextMenuAvailable to be notified about changes to this property
+ */
+@property (readonly) BOOL teletextMenuAvailable;
+
+/**
+ * enable/disable teletext display
+ * @note listen to VLCPlayerTeletextEnabled to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) BOOL teletextEnabled;
+
+/**
+ * set/get the currently displayed (or looked for) teletext page
+ *
+ * @note Page keys can be the following: @ref VLC_PLAYER_TELETEXT_KEY_RED,
+ * @ref VLC_PLAYER_TELETEXT_KEY_GREEN, @ref VLC_PLAYER_TELETEXT_KEY_YELLOW,
+ * @ref VLC_PLAYER_TELETEXT_KEY_BLUE or @ref VLC_PLAYER_TELETEXT_KEY_INDEX.
+ *
+ * @param page a page in the range 0 to 888 or a valid key
+ * @note listen to VLCPlayerTeletextPageChanged to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) unsigned int teletextPage;
+
+/**
+ * is the teletext background transparent or not?
+ * @return a BOOL value indicating the current state
+ * @note listen to VLCPlayerTeletextTransparencyChanged to be notified about changes to this property
+ */
+@property (readwrite, nonatomic) BOOL teletextTransparent;
 
 /**
  * the audio delay for the current media
@@ -320,6 +415,12 @@ extern NSString *VLCPlayerMuteChanged;
 @property (readwrite, nonatomic) vlc_tick_t subtitlesDelay;
 
 /**
+ * a scale factor for text based subtitles, range 10 - 500, default 100
+ * @warning this does not have any effect on bitmapped subtitles
+ */
+@property (readwrite, nonatomic) unsigned int subtitleTextScalingFactor;
+
+/**
  * enable recording of the current media or check if it is being done
  * @note listen to VLCPlayerRecordingChanged to be notified about changes to this property
  */
@@ -334,10 +435,20 @@ extern NSString *VLCPlayerMuteChanged;
 @property (readwrite, nonatomic) BOOL fullscreen;
 
 /**
+ * helper function to inverse the current fullscreen state
+ */
+- (void)toggleFullscreen;
+
+/**
  * indicates whether video is displaed in wallpaper mode or shall to
  * @note listen to VLCPlayerWallpaperModeChanged to be notified about changes to this property
  */
 @property (readwrite, nonatomic) BOOL wallpaperMode;
+
+/**
+ * Take a snapshot of all vouts
+ */
+- (void)takeSnapshot;
 
 #pragma mark - audio output properties
 
@@ -349,10 +460,25 @@ extern NSString *VLCPlayerMuteChanged;
 @property (readwrite, nonatomic) float volume;
 
 /**
+ * helper function to increase volume by 5%
+ */
+- (void)incrementVolume;
+
+/**
+ * helper function to decrease volume by 5%
+ */
+- (void)decrementVolume;
+
+/**
  * reveals or sets whether audio output is set to mute or not
  * @note listen to VLCPlayerMuteChanged to be notified about changes to this property
  */
 @property (readwrite, nonatomic) BOOL mute;
+
+/**
+ * helper function to inverse the current mute state
+ */
+- (void)toggleMute;
 
 @end
 
