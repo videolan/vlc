@@ -21,6 +21,7 @@ $(TARBALLS)/qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz:
 
 qtdeclarative: qtdeclarative-everywhere-src-$(QTDECLARATIVE_VERSION).tar.xz .sum-qtdeclarative
 	$(UNPACK)
+	$(APPLY) $(SRC)/qtdeclarative/0001-V4-Only-enable-the-JIT-on-ARM-on-specific-known-OSes.patch
 	$(MOVE)
 
 .qtdeclarative: qtdeclarative

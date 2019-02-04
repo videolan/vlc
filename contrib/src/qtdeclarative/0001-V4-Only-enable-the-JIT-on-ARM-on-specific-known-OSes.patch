@@ -1,0 +1,38 @@
+From 259c958e21c63f227a1bb678867210e0f6af0991 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Martin=20Storsj=C3=B6?= <martin@martin.st>
+Date: Mon, 15 Apr 2019 13:36:46 +0300
+Subject: [PATCH] V4: Only enable the JIT on ARM on specific known OSes
+
+On all other architectures, the JIT is only enabled for explicitly
+mentioned OSes.
+
+This fixes build errors for Windows on 32 bit ARM, about the
+cacheFlush function being unimplemented for that target.
+
+This keeps all other OSes enabled that are mentioned in conditionals
+for other architectures, except for windows.
+
+Change-Id: I8c29a9399a05a57d23b4fee506c3d04859a08a76
+Reviewed-by: Ulf Hermann <ulf.hermann@qt.io>
+Upstream-Commit: 259c958e21c63f227a1bb678867210e0f6af0991
+---
+ src/qml/jsruntime/qv4global_p.h | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/qml/jsruntime/qv4global_p.h b/src/qml/jsruntime/qv4global_p.h
+index 162fb66cb..58bffdf2d 100644
+--- a/src/qml/jsruntime/qv4global_p.h
++++ b/src/qml/jsruntime/qv4global_p.h
+@@ -94,7 +94,8 @@ inline double trunc(double d) { return d > 0 ? floor(d) : ceil(d); }
+ #elif defined(Q_PROCESSOR_X86_64) && (QT_POINTER_SIZE == 8) \
+     && (defined(Q_OS_WIN) || defined(Q_OS_LINUX) || defined(Q_OS_QNX) || defined(Q_OS_MAC) || defined(Q_OS_FREEBSD))
+ #  define V4_ENABLE_JIT
+-#elif defined(Q_PROCESSOR_ARM_32) && (QT_POINTER_SIZE == 4)
++#elif defined(Q_PROCESSOR_ARM_32) && (QT_POINTER_SIZE == 4) \
++    && (defined(Q_OS_LINUX) || defined(Q_OS_QNX) || defined(Q_OS_FREEBSD) || defined(Q_OS_INTEGRITY))
+ #  if defined(thumb2) || defined(__thumb2__) || ((defined(__thumb) || defined(__thumb__)) && __TARGET_ARCH_THUMB-0 == 4)
+ #    define V4_ENABLE_JIT
+ #  elif defined(__ARM_ARCH_ISA_THUMB) && __ARM_ARCH_ISA_THUMB == 2 // clang 3.5 and later will set this if the core supports the Thumb-2 ISA.
+-- 
+2.17.1
+
