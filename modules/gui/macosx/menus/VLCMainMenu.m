@@ -1,7 +1,7 @@
 /*****************************************************************************
  *MainMenu.m: MacOS X interface module
  *****************************************************************************
- *Copyright (C) 2011-2018 Felix Paul Kühne
+ *Copyright (C) 2011-2019 Felix Paul Kühne
  *
  *Authors: Felix Paul Kühne <fkuehne -at- videolan -dot- org>
  *
@@ -44,6 +44,7 @@
 #import "panels/VLCTimeSelectionPanelController.h"
 
 #import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 #import "preferences/VLCSimplePrefsController.h"
 
 #import "windows/VLCAboutWindowController.h"
@@ -69,6 +70,7 @@
     VLCAddonsWindowController *_addonsController;
     VLCRendererMenuController *_rendererMenuController;
     VLCPlaylistController *_playlistController;
+    VLCPlayerController *_playerController;
     NSTimer *_cancelRendererDiscoveryTimer;
 
     NSMenu *_playlistTableColumnsContextMenu;
@@ -100,7 +102,7 @@
 
     if ([NSLocale characterDirectionForLanguage:preferredLanguage] == NSLocaleLanguageDirectionRightToLeft) {
         msg_Dbg(getIntf(), "adapting interface since '%s' is a RTL language", [preferredLanguage UTF8String]);
-        [_rateTextField setAlignment: NSLeftTextAlignment];
+        [_rateTextField setAlignment:NSLeftTextAlignment];
     }
 
     [self setRateControlsEnabled:NO];
@@ -221,10 +223,19 @@
     _rendererMenuController.rendererNoneItem = _rendererNoneItem;
     _rendererMenuController.rendererMenu = _rendererMenu;
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(refreshVoutDeviceMenu:)
-                                                 name: NSApplicationDidChangeScreenParametersNotification
-                                               object: nil];
+    NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
+    [notificationCenter addObserver:self
+                           selector:@selector(refreshVoutDeviceMenu:)
+                               name:NSApplicationDidChangeScreenParametersNotification
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updatePlaybackRate)
+                               name:VLCPlayerRateChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(updateRecordState)
+                               name:VLCPlayerRecordingChanged
+                             object:nil];
 
     [self setupVarMenuItem:_add_intf target: (vlc_object_t *)p_intf
                              var:"intf-add" selector: @selector(toggleVar:)];
@@ -244,6 +255,7 @@
     if (count > 0)
         [_postprocessingMenu removeAllItems];
 
+    // FIXME: re-write the following using VLCPlayerController
     NSMenuItem *mitem;
     [_postprocessingMenu setAutoenablesItems: YES];
     [_postprocessingMenu addItemWithTitle: _NS("Disable") action:@selector(togglePostProcessing:) keyEquivalent:@""];
@@ -342,8 +354,7 @@
 - (void)initStrings
 {
     /* main menu */
-    [_about setTitle: [_NS("About VLC media player") \
-                           stringByAppendingString: @"..."]];
+    [_about setTitle: [_NS("About VLC media player") stringByAppendingString: @"..."]];
     [_checkForUpdate setTitle: _NS("Check for Update...")];
     [_prefs setTitle: _NS("Preferences...")];
     [_extensions setTitle: _NS("Extensions")];
@@ -357,6 +368,9 @@
     [_show_all setTitle: _NS("Show All")];
     [_quit setTitle: _NS("Quit VLC")];
 
+    /* this special case is needed to due to archiac legacy translations of the File menu
+     * on the Mac to the German translation which resulted in 'Ablage' instead of 'Datei'.
+     * This remains until the present day and does not affect the Windows world. */
     [_fileMenu setTitle: _ANS("1:File")];
     [_open_generic setTitle: _NS("Advanced Open File...")];
     [_open_file setTitle: _NS("Open File...")];
@@ -651,7 +665,7 @@
         [_subtitle_bgopacityLabel setHidden: YES];
     }
     [_subtitle_bgopacity_sld setEnabled: b_enabled];
-    [_teletext setEnabled: b_enabled];
+    [_teletext setEnabled:_playerController.teletextMenuAvailable];
 }
 
 - (void)setRateControlsEnabled:(BOOL)b_enabled
@@ -743,125 +757,109 @@
 
 - (IBAction)repeat:(id)sender
 {
-    vlc_value_t val;
-    intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    var_Get(p_playlist, "repeat", &val);
-    if (! val.b_bool)
-        [[VLCCoreInteraction sharedInstance] repeatOne];
-    else
-        [[VLCCoreInteraction sharedInstance] repeatOff];
+    if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT) {
+        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    } else {
+        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_CURRENT;
+    }
 }
 
 - (IBAction)loop:(id)sender
 {
-    vlc_value_t val;
-    intf_thread_t *p_intf = getIntf();
-    playlist_t *p_playlist = pl_Get(p_intf);
-
-    var_Get(p_playlist, "loop", &val);
-    if (! val.b_bool)
-        [[VLCCoreInteraction sharedInstance] repeatAll];
-    else
-        [[VLCCoreInteraction sharedInstance] repeatOff];
+    if (_playlistController.playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL) {
+        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_NONE;
+    } else {
+        _playlistController.playbackRepeat = VLC_PLAYLIST_PLAYBACK_REPEAT_ALL;
+    }
 }
 
 - (IBAction)forward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] forwardShort];
+    [_playerController jumpForwardShort];
 }
 
 - (IBAction)backward:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] backwardShort];
+    [_playerController jumpBackwardShort];
 }
 
 - (IBAction)volumeUp:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] volumeUp];
+    [_playerController incrementVolume];
 }
 
 - (IBAction)volumeDown:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] volumeDown];
+    [_playerController decrementVolume];
 }
 
 - (IBAction)mute:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] toggleMute];
+    [_playerController toggleMute];
 }
 
 - (void)lockVideosAspectRatio:(id)sender
 {
+    // FIXME: re-write the following using VLCPlayerController
     [[VLCCoreInteraction sharedInstance] setAspectRatioIsLocked: ![sender state]];
     [sender setState: [[VLCCoreInteraction sharedInstance] aspectRatioIsLocked]];
 }
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
-    playlist_t *p_playlist = pl_Get(getIntf());
-    bool b_value = !var_CreateGetBool(p_playlist, "play-and-exit");
-    var_SetBool(p_playlist, "play-and-exit", b_value);
-    config_PutInt("play-and-exit", b_value);
+    _playerController.actionAfterStop = VLC_PLAYER_MEDIA_STOPPED_EXIT;
 }
 
 - (IBAction)toggleRecord:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] toggleRecord];
+    [_playerController toggleRecord];
 }
 
-- (void)updateRecordState:(BOOL)b_value
+- (void)updateRecordState
 {
-    [_record setState:b_value];
+    [_record setState:_playerController.enableRecording];
 }
 
 - (IBAction)setPlaybackRate:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] setPlaybackRate: [_rate_sld intValue]];
-    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    double speed =  pow(2, (double)i / 17);
+    double speed =  pow(2, (double)[_rate_sld intValue] / 17);
+    _playerController.playbackRate = speed;
     [_rateTextField setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
 }
 
 - (void)updatePlaybackRate
 {
-    int i = [[VLCCoreInteraction sharedInstance] playbackRate];
-    double speed =  pow(2, (double)i / 17);
-    [_rateTextField setStringValue: [NSString stringWithFormat:@"%.2fx", speed]];
-    [_rate_sld setIntValue: i];
+    double playbackRate = _playerController.playbackRate;
+    double value = 17 * log(playbackRate) / log(2.);
+    int intValue = (int) ((value > 0) ? value + .5 : value - .5);
+
+    if (intValue < -34)
+        intValue = -34;
+    else if (intValue > 34)
+        intValue = 34;
+
+    [_rateTextField setStringValue: [NSString stringWithFormat:@"%.2fx", playbackRate]];
+    [_rate_sld setIntValue: intValue];
 }
 
 - (IBAction)toggleAtoBloop:(id)sender
 {
+    // re-write the following using VLCPlayerController
     [[VLCCoreInteraction sharedInstance] setAtoB];
 }
 
 - (IBAction)goToSpecificTime:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        /* we can obviously only do that if an input is available */
-        vlc_tick_t length = var_GetInteger(p_input, "length");
-        [_timeSelectionPanel setMaxTime:(int)SEC_FROM_VLC_TICK(length)];
-        vlc_tick_t pos = var_GetInteger(p_input, "time");
-        [_timeSelectionPanel setPosition: (int)SEC_FROM_VLC_TICK(pos)];
-        [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
-                             completionHandler:^(NSInteger returnCode, int64_t returnTime) {
-
-            if (returnCode != NSModalResponseOK)
-                return;
-
-            input_thread_t *p_input = pl_CurrentInput(getIntf());
-            if (p_input) {
-                input_SetTime(p_input, vlc_tick_from_sec(returnTime),
-                              var_GetBool(p_input, "input-fast-seek"));
-                vlc_object_release(p_input);
-            }
-        }];
-
-        vlc_object_release(p_input);
-    }
+    vlc_tick_t length = _playerController.length;
+    [_timeSelectionPanel setMaxTime:(int)SEC_FROM_VLC_TICK(length)];
+    vlc_tick_t time = _playerController.time;
+    [_timeSelectionPanel setPosition: (int)SEC_FROM_VLC_TICK(time)];
+    [_timeSelectionPanel runModalForWindow:[NSApp mainWindow]
+                         completionHandler:^(NSInteger returnCode, int64_t returnTime) {
+                             if (returnCode != NSModalResponseOK)
+                                 return;
+                             [self->_playerController setTimePrecise:vlc_tick_from_sec(returnTime)];
+                         }];
 }
 
 - (IBAction)selectRenderer:(id)sender
@@ -937,33 +935,30 @@
 
 - (IBAction)toggleFullscreen:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] toggleFullscreen];
+    [_playerController toggleFullscreen];
 }
 
 - (IBAction)resizeVideoWindow:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        vout_thread_t *p_vout = getVoutForActiveWindow();
-        if (p_vout) {
-            if (sender == _half_window)
-                var_SetFloat(p_vout, "zoom", 0.5);
-            else if (sender == _normal_window)
-                var_SetFloat(p_vout, "zoom", 1.0);
-            else if (sender == _double_window)
-                var_SetFloat(p_vout, "zoom", 2.0);
-            else
-            {
-                [[NSApp keyWindow] performZoom:sender];
-            }
-            vlc_object_release(p_vout);
+    vout_thread_t *p_vout = getVoutForActiveWindow();
+    if (p_vout) {
+        if (sender == _half_window)
+            var_SetFloat(p_vout, "zoom", 0.5);
+        else if (sender == _normal_window)
+            var_SetFloat(p_vout, "zoom", 1.0);
+        else if (sender == _double_window)
+            var_SetFloat(p_vout, "zoom", 2.0);
+        else
+        {
+            [[NSApp keyWindow] performZoom:sender];
         }
-        vlc_object_release(p_input);
+        vlc_object_release(p_vout);
     }
 }
 
 - (IBAction)floatOnTop:(id)sender
 {
+    // FIXME re-write using VLCPlayerController
     input_thread_t *p_input = pl_CurrentInput(getIntf());
     if (p_input) {
         vout_thread_t *p_vout = getVoutForActiveWindow();
@@ -979,29 +974,24 @@
 
 - (IBAction)createVideoSnapshot:(id)sender
 {
-    input_thread_t *p_input = pl_CurrentInput(getIntf());
-    if (p_input) {
-        vout_thread_t *p_vout = getVoutForActiveWindow();
-        if (p_vout) {
-            var_TriggerCallback(p_vout, "video-snapshot");
-            vlc_object_release(p_vout);
-        }
-        vlc_object_release(p_input);
-    }
+    [_playerController takeSnapshot];
 }
 
 - (void)_disablePostProcessing
 {
+    // FIXME re-write using VLCPlayerController
     [VLCVideoFilterHelper setVideoFilter:"postproc" on:false];
 }
 
 - (void)_enablePostProcessing
 {
+    // FIXME re-write using VLCPlayerController
     [VLCVideoFilterHelper setVideoFilter:"postproc" on:true];
 }
 
 - (void)togglePostProcessing:(id)sender
 {
+    // FIXME re-write using VLCPlayerController
     NSInteger count = [_postprocessingMenu numberOfItems];
     for (NSUInteger x = 0; x < count; x++)
         [[_postprocessingMenu itemAtIndex:x] setState:NSOffState];
@@ -1058,16 +1048,15 @@
 
     i_returnValue = [openPanel runModal];
 
+    // FIXME: this cannot work anymore
     if (i_returnValue == NSModalResponseOK)
         [[VLCCoreInteraction sharedInstance] addSubtitlesToCurrentInput:[openPanel URLs]];
 }
 
 - (void)switchSubtitleSize:(id)sender
 {
-    NSInteger intValue = [sender tag];
-    var_SetInteger(pl_Get(getIntf()), "sub-text-scale", intValue);
+    _playerController.subtitleTextScalingFactor = (unsigned int)[sender tag];
 }
-
 
 - (void)switchSubtitleOption:(id)sender
 {
@@ -1090,37 +1079,25 @@
 
 - (IBAction)telxTransparent:(id)sender
 {
-    vlc_object_t *p_vbi;
-    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(getIntf()), "zvbi");
-    if (p_vbi) {
-        var_SetBool(p_vbi, "vbi-opaque", [sender state]);
-        [sender setState: ![sender state]];
-        vlc_object_release(p_vbi);
-    }
+    _playerController.teletextTransparent = !_playerController.teletextTransparent;
 }
 
 - (IBAction)telxNavLink:(id)sender
 {
-    vlc_object_t *p_vbi;
-    int i_page = 0;
+    unsigned int page = 0;
 
     if ([[sender title] isEqualToString: _NS("Index")])
-        i_page = 'i' << 16;
+        page = VLC_PLAYER_TELETEXT_KEY_INDEX;
     else if ([[sender title] isEqualToString: _NS("Red")])
-        i_page = 'r' << 16;
+        page = VLC_PLAYER_TELETEXT_KEY_RED;
     else if ([[sender title] isEqualToString: _NS("Green")])
-        i_page = 'g' << 16;
+        page = VLC_PLAYER_TELETEXT_KEY_GREEN;
     else if ([[sender title] isEqualToString: _NS("Yellow")])
-        i_page = 'y' << 16;
+        page = VLC_PLAYER_TELETEXT_KEY_YELLOW;
     else if ([[sender title] isEqualToString: _NS("Blue")])
-        i_page = 'b' << 16;
-    if (i_page == 0) return;
+        page = VLC_PLAYER_TELETEXT_KEY_BLUE;
 
-    p_vbi = (vlc_object_t *) vlc_object_find_name(pl_Get(getIntf()), "zvbi");
-    if (p_vbi) {
-        var_SetInteger(p_vbi, "vbi-page", i_page);
-        vlc_object_release(p_vbi);
-    }
+    _playerController.teletextPage = page;
 }
 
 #pragma mark - Panels
@@ -1128,7 +1105,7 @@
 - (IBAction)intfOpenFile:(id)sender
 {
     [[[VLCMain sharedInstance] open] openFileWithAction:^(NSArray *files) {
-        [[[VLCMain sharedInstance] playlistController] addPlaylistItems:files];
+        [self->_playlistController addPlaylistItems:files];
     }];
 }
 
@@ -1198,6 +1175,7 @@
         if ([[filename pathExtension] caseInsensitiveCompare:ext] != NSOrderedSame)
             actualFilename = [NSString stringWithFormat: @"%@.%@", filename, ext];
 
+        // FIXME: This will always export an empty playlist unless we do something about it
         playlist_Export(p_playlist,
                         [actualFilename fileSystemRepresentation],
                         psz_module);
@@ -1358,11 +1336,7 @@
 
 - (void)setShuffle
 {
-    bool b_value;
-    playlist_t *p_playlist = pl_Get(getIntf());
-    b_value = var_GetBool(p_playlist, "random");
-
-    [_random setState: b_value];
+    [_random setState:_playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM];
 }
 
 #pragma mark - Dynamic menu creation and validation
@@ -1606,7 +1580,6 @@
 - (BOOL)validateMenuItem:(NSMenuItem *)mi
 {
     BOOL enabled = YES;
-    vlc_value_t val;
     input_item_t *inputItem = _playlistController.currentlyPlayingInputItem;
     if (inputItem) {
         input_item_Hold(inputItem);
@@ -1626,10 +1599,7 @@
                mi == _dockMenunext) {
         enabled = _playlistController.hasNextPlaylistItem;
     } else if (mi == _record) {
-        enabled = NO;
-        // FIXME: this internal state is no longer available
-/*        if (p_input)
-            enabled = var_GetBool(p_input, "can-record");*/
+        enabled = _playerController.recordable;
     } else if (mi == _random) {
         enum vlc_playlist_playback_order playbackOrder = [_playlistController playbackOrder];
         [mi setState: playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
@@ -1640,25 +1610,12 @@
         enum vlc_playlist_playback_repeat playbackRepeat = [_playlistController playbackRepeat];
         [mi setState: playbackRepeat == VLC_PLAYLIST_PLAYBACK_REPEAT_ALL ? NSOnState : NSOffState];
     } else if (mi == _quitAfterPB) {
-        enabled = NO;
-        // FIXME: this internal state is no longer available
-        /*
-        int i_state;
-        bool b_value = var_InheritBool(p_playlist, "play-and-exit");
-        i_state = b_value ? NSOnState : NSOffState;
-        [mi setState: i_state];*/
+        BOOL state = _playerController.actionAfterStop == VLC_PLAYER_MEDIA_STOPPED_EXIT;
+        [mi setState: state ? NSOnState : NSOffState];
     } else if (mi == _fwd || mi == _bwd || mi == _jumpToTime) {
-        enabled = NO;
-        // FIXME: this internal state depends on the future abstraction of the player
-        /*
-        if (p_input != NULL) {
-            var_Get(p_input, "can-seek", &val);
-            enabled = val.b_bool;
-        } else {
-            enabled = NO;
-        }*/
+        enabled = _playerController.seekable;
     } else if (mi == _mute || mi == _dockMenumute || mi == _voutMenumute) {
-        [mi setState: [[VLCCoreInteraction sharedInstance] mute] ? NSOnState : NSOffState];
+        [mi setState: _playerController.mute ? NSOnState : NSOffState];
         [self setupMenus]; /* Make sure audio menu is up to date */
         [self refreshAudioDeviceList];
     } else if (mi == _half_window           ||
@@ -1671,23 +1628,19 @@
                mi == _voutMenufullscreen    ||
                mi == _floatontop
                ) {
-        enabled = NO;
 
-        // FIXME: this internal state depends on the future abstraction of the player
-        /*
-        if (p_input != NULL) {
-            vout_thread_t *p_vout = getVoutForActiveWindow();
-            if (p_vout != NULL) {
-                if (mi == _floatontop)
-                    [mi setState: var_GetBool(p_vout, "video-on-top")];
+        vout_thread_t *p_vout = getVoutForActiveWindow();
+        if (p_vout != NULL) {
+            // FIXME: re-write using VLCPlayerController
+            if (mi == _floatontop)
+                [mi setState: var_GetBool(p_vout, "video-on-top")];
 
-                if (mi == _fullscreenItem || mi == _voutMenufullscreen)
-                    [mi setState: var_GetBool(p_vout, "fullscreen")];
+            if (mi == _fullscreenItem || mi == _voutMenufullscreen)
+                [mi setState: _playerController.fullscreen];
 
-                enabled = YES;
-                vlc_object_release(p_vout);
-            }
-        }*/
+            enabled = YES;
+            vlc_object_release(p_vout);
+        }
 
         [self setupMenus]; /* Make sure video menu is up to date */
 
@@ -1700,10 +1653,11 @@
             _parent == _subtitle_textcolor || mi == _subtitle_textcolor ||
             _parent == _subtitle_bgcolor || mi == _subtitle_bgcolor     ||
             _parent == _subtitle_bgopacity || mi == _subtitle_bgopacity ||
-            _parent == _subtitle_outlinethickness || mi == _subtitle_outlinethickness ||
-            _parent == _teletext || mi == _teletext
+            _parent == _subtitle_outlinethickness || mi == _subtitle_outlinethickness
             ) {
             enabled = _openSubtitleFile.isEnabled;
+        } else if (_parent == _teletext || mi == _teletext) {
+            enabled = _playerController.teletextMenuAvailable;
         }
     }
 

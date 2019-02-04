@@ -250,9 +250,7 @@
 
 - (IBAction)quitAfterPlayback:(id)sender;
 - (IBAction)toggleRecord:(id)sender;
-- (void)updateRecordState:(BOOL)b_value;
 - (IBAction)setPlaybackRate:(id)sender;
-- (void)updatePlaybackRate;
 - (IBAction)toggleAtoBloop:(id)sender;
 - (IBAction)selectRenderer:(id)sender;
 

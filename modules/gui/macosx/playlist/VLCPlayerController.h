@@ -426,6 +426,11 @@ extern NSString *VLCPlayerMuteChanged;
  */
 @property (readwrite, nonatomic) BOOL enableRecording;
 
+/**
+ * helper function to inverse the current recording state
+ */
+- (void)toggleRecord;
+
 #pragma mark - video output properties
 
 /**

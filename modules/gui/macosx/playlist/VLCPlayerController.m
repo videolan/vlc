@@ -69,7 +69,6 @@ NSString *VLCPlayerMuteChanged = @"VLCPlayerMuteChanged";
 - (void)teletextTransparencyChanged:(BOOL)isTransparent;
 - (void)audioDelayChanged:(vlc_tick_t)audioDelay;
 - (void)subtitlesDelayChanged:(vlc_tick_t)subtitlesDelay;
-- (void)subtitleTextScaleChanged:(unsigned int)subtitleTextScalingFactor;
 - (void)recordingChanged:(BOOL)recording;
 - (void)stopActionChanged:(enum vlc_player_media_stopped_action)stoppedAction;
 
@@ -717,6 +716,13 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
 {
     vlc_player_Lock(_p_player);
     vlc_player_SetRecordingEnabled(_p_player, enableRecording);
+    vlc_player_Unlock(_p_player);
+}
+
+- (void)toggleRecord
+{
+    vlc_player_Lock(_p_player);
+    vlc_player_SetRecordingEnabled(_p_player, !_enableRecording);
     vlc_player_Unlock(_p_player);
 }
 

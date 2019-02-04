@@ -72,7 +72,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
                 [inputManager performSelectorOnMainThread:@selector(playbackStatusUpdated) withObject: nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_RATE:
-                [[[VLCMain sharedInstance] mainMenu] performSelectorOnMainThread:@selector(updatePlaybackRate) withObject: nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_POSITION:
 
@@ -109,9 +108,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             case INPUT_EVENT_BOOKMARK:
                 break;
             case INPUT_EVENT_RECORD:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[[VLCMain sharedInstance] mainMenu] updateRecordState: var_InheritBool(p_this, "record")];
-                });
                 break;
             case INPUT_EVENT_PROGRAM:
                 [inputManager performSelectorOnMainThread:@selector(updateMainMenu) withObject: nil waitUntilDone:NO];
@@ -570,7 +566,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 - (void)updateMainMenu
 {
     [[o_main mainMenu] setupMenus];
-    [[o_main mainMenu] updatePlaybackRate];
     [[VLCCoreInteraction sharedInstance] resetAtoB];
 }
 
