@@ -835,6 +835,7 @@ vlc_player_GetSignal
 vlc_player_GetState
 vlc_player_GetStatistics
 vlc_player_GetSubtitleDelay
+vlc_player_GetSubtitleTextScale
 vlc_player_GetTeletextPage
 vlc_player_GetTime
 vlc_player_GetTitleList
@@ -886,6 +887,7 @@ vlc_player_SetRenderer
 vlc_player_SetStartPaused
 vlc_player_SetSubtitleDelay
 vlc_player_SetSubtitleSync
+vlc_player_SetSubtitleTextScale
 vlc_player_SetTeletextEnabled
 vlc_player_SetTeletextTransparency
 vlc_player_SetTrackCategoryEnabled
