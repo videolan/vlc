@@ -358,6 +358,12 @@ static int Open(vout_display_t *vd, const vout_display_cfg_t *cfg,
     return VLC_SUCCESS;
 
 error:
+    if (sys->viewporter != NULL)
+        wp_viewporter_destroy(sys->viewporter);
+
+    if (sys->shm != NULL)
+        wl_shm_destroy(sys->shm);
+
     if (sys->eventq != NULL)
         wl_event_queue_destroy(sys->eventq);
     free(sys);
