@@ -2149,8 +2149,9 @@ static int bluraySetTitle(demux_t *p_demux, int i_title)
 #  define BLURAY_AUDIO_STREAM 0
 #endif
 
-static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
+static void blurayOnUserStreamSelection(demux_t *p_demux, int i_pid)
 {
+    demux_sys_t *p_sys = p_demux->p_sys;
     vlc_mutex_lock(&p_sys->pl_info_lock);
 
     if(i_pid == -AUDIO_ES)
@@ -2159,19 +2160,30 @@ static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
         bd_select_stream(p_sys->bluray, BLURAY_PG_TEXTST_STREAM, 0, 0);
     else if (p_sys->p_clip_info)
     {
-
         if ((i_pid & 0xff00) == 0x1100) {
+            bool b_in_playlist = false;
             // audio
             for (int i_id = 0; i_id < p_sys->p_clip_info->audio_stream_count; i_id++) {
                 if (i_pid == p_sys->p_clip_info->audio_streams[i_id].pid) {
                     bd_select_stream(p_sys->bluray, BLURAY_AUDIO_STREAM, i_id + 1, 1);
+
                     if(!p_sys->b_menu)
                         bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_AUDIO_LANG,
                                   (const char *) p_sys->p_clip_info->audio_streams[i_id].lang);
+                    b_in_playlist = true;
                     break;
                 }
             }
+            if(!b_in_playlist && !p_sys->b_menu)
+            {
+                /* Without menu, the selected playlist might not be correct and only
+                   exposing a subset of PID, although same length */
+                msg_Warn(p_demux, "Incorrect playlist for menuless track, forcing");
+                es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID,
+                               BD_EVENT_AUDIO_STREAM, i_pid);
+            }
         } else if ((i_pid & 0xff00) == 0x1200 || i_pid == 0x1800) {
+            bool b_in_playlist = false;
             // subtitle
             for (int i_id = 0; i_id < p_sys->p_clip_info->pg_stream_count; i_id++) {
                 if (i_pid == p_sys->p_clip_info->pg_streams[i_id].pid) {
@@ -2179,8 +2191,15 @@ static void blurayOnUserStreamSelection(demux_sys_t *p_sys, int i_pid)
                     if(!p_sys->b_menu)
                         bd_set_player_setting_str(p_sys->bluray, BLURAY_PLAYER_SETTING_PG_LANG,
                                    (const char *) p_sys->p_clip_info->pg_streams[i_id].lang);
+                    b_in_playlist = true;
                     break;
                 }
+            }
+            if(!b_in_playlist && !p_sys->b_menu)
+            {
+                msg_Warn(p_demux, "Incorrect playlist for menuless track, forcing");
+                es_out_Control(p_sys->p_out, BLURAY_ES_OUT_CONTROL_SET_ES_BY_PID,
+                               BD_EVENT_PG_TEXTST_STREAM, i_pid);
             }
         }
     }
@@ -2223,7 +2242,7 @@ static int blurayControl(demux_t *p_demux, int query, va_list args)
     case DEMUX_SET_ES:
     {
         int i_id = va_arg(args, int);
-        blurayOnUserStreamSelection(p_sys, i_id);
+        blurayOnUserStreamSelection(p_demux, i_id);
         break;
     }
     case DEMUX_SET_TITLE:
