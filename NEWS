@@ -1,6 +1,9 @@
 Changes between 3.0.6 and 3.0.7:
 --------------------------------
 
+Video Output:
+ * Fix 12 bits sources playback with Direct3D11
+
 Changes between 3.0.5 and 3.0.6:
 --------------------------------
 
