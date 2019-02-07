@@ -142,7 +142,6 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
 #if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
 static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
 #endif
-static VLCTagLib::ExtResolver<MP4::File> m4vresolver(".m4v");
 static bool b_extensions_registered = false;
 
 // taglib is not thread safe
@@ -911,7 +910,6 @@ static int ReadMeta( vlc_object_t* p_this)
 #if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
         FileRef::addFileTypeResolver( &aacresolver );
 #endif
-        FileRef::addFileTypeResolver( &m4vresolver );
         b_extensions_registered = true;
     }
 
