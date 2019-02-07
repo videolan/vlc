@@ -226,8 +226,7 @@ static int Open( vlc_object_t *p_this )
         image_handler_t *p_image;
         video_format_t fmt_out;
         msg_Dbg( p_demux, "Using %s for the mouse pointer image", mouseurl );
-        memset( &fmt_out, 0, sizeof( fmt_out ) );
-        fmt_out.i_chroma = VLC_CODEC_RGBA;
+        video_format_Init( &fmt_out, VLC_CODEC_RGBA );
         p_image = image_HandlerCreate( p_demux );
         if( p_image )
         {
@@ -239,6 +238,7 @@ static int Open( vlc_object_t *p_this )
             msg_Err( p_demux, "Failed to open mouse pointer image (%s)",
                      mouseurl );
         free( mouseurl );
+        video_format_Clean( &fmt_out );
     }
 #endif
 

@@ -124,11 +124,11 @@ static int blendbench_LoadImage( vlc_object_t *p_this, picture_t **pp_pic,
     image_handler_t *p_image;
     video_format_t fmt_out;
 
-    memset( &fmt_out, 0, sizeof(video_format_t) );
+    video_format_Init( &fmt_out, i_chroma );
 
-    fmt_out.i_chroma = i_chroma;
     p_image = image_HandlerCreate( p_this );
     *pp_pic = image_ReadUrl( p_image, psz_file, &fmt_out );
+    video_format_Clean( &fmt_out );
     image_HandlerDelete( p_image );
 
     if( *pp_pic == NULL )

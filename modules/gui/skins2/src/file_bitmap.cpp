@@ -52,10 +52,14 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
     pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_out );
     if( !pPic )
+    {
+        video_format_Clean( &fmt_out );
         return;
+    }
 
     m_width = fmt_out.i_width;
     m_height = fmt_out.i_height;
+    video_format_Clean( &fmt_out );
 
     m_pData = new uint8_t[m_height * m_width * 4];
 
