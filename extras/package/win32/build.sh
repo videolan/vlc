@@ -148,6 +148,8 @@ cd $SHORTARCH
 CONFIGFLAGS=""
 if [ "$RELEASE" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --enable-debug"
+else
+     CONFIGFLAGS="$CONFIGFLAGS --disable-debug"
 fi
 if [ "$I18N" != "yes" ]; then
      CONFIGFLAGS="$CONFIGFLAGS --disable-nls"

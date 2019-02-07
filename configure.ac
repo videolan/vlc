@@ -989,9 +989,9 @@ dnl
 dnl  Debugging mode
 dnl
 AC_ARG_ENABLE([debug],
-  AS_HELP_STRING([--enable-debug],
-    [build with run-time assertions (default disabled)]),,
-  [enable_debug="no"])
+  AS_HELP_STRING([--disable-debug],
+    [disable run-time assertions (default enabled)]),,
+  [enable_debug="yes"])
 AH_TEMPLATE(NDEBUG,
             [Define to 1 if debug code should NOT be compiled])
 AS_IF([test "${enable_debug}" != "no"], [
