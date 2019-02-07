@@ -256,7 +256,6 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         {
             /* Filters should handle on-the-fly size changes */
             p_image->p_converter->fmt_in = p_image->p_dec->fmt_out;
-            p_image->p_converter->fmt_out = p_image->p_dec->fmt_out;
             p_image->p_converter->fmt_out.video = *p_fmt_out;
         }
 
