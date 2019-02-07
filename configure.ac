@@ -354,7 +354,7 @@ AM_CONDITIONAL([HAVE_WIN32_DESKTOP], [test "${SYS}" = "mingw32" -a "$vlc_winstor
 
 dnl Use nasm/yasm only on x86
 AC_CHECK_PROGS(X86ASM, [nasm yasm])
-AM_CONDITIONAL([HAVE_X86ASM], [test -n "${X86ASM}" && test -n "{X86ASMFLAGS}"])
+AM_CONDITIONAL([HAVE_X86ASM], [test -n "${X86ASM}" && test -n "${X86ASMFLAGS}"])
 AM_COND_IF([HAVE_X86ASM], [
   AC_DEFINE([HAVE_X86ASM], [1], [Use external asm on x86.])
 ])
