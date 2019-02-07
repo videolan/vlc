@@ -55,7 +55,7 @@ struct image_handler_t
     vlc_object_t *p_parent;
     decoder_t *p_dec;
     encoder_t *p_enc;
-    filter_t  *p_filter;
+    filter_t  *p_converter;
 
     picture_fifo_t *outfifo;
 };

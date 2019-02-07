@@ -78,9 +78,9 @@ static void DeleteDecoder( decoder_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
                                  const video_format_t * );
 static void DeleteEncoder( encoder_t * );
-static filter_t *CreateFilter( vlc_object_t *, const es_format_t *,
+static filter_t *CreateConverter( vlc_object_t *, const es_format_t *,
                                const video_format_t * );
-static void DeleteFilter( filter_t * );
+static void DeleteConverter( filter_t * );
 
 vlc_fourcc_t image_Type2Fourcc( const char * );
 vlc_fourcc_t image_Ext2Fourcc( const char * );
@@ -120,7 +120,7 @@ void image_HandlerDelete( image_handler_t *p_image )
 
     if( p_image->p_dec ) DeleteDecoder( p_image->p_dec );
     if( p_image->p_enc ) DeleteEncoder( p_image->p_enc );
-    if( p_image->p_filter ) DeleteFilter( p_image->p_filter );
+    if( p_image->p_converter ) DeleteConverter( p_image->p_converter );
 
     picture_fifo_Delete( p_image->outfifo );
 
@@ -229,24 +229,24 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         p_image->p_dec->fmt_out.video.i_width != p_fmt_out->i_width ||
         p_image->p_dec->fmt_out.video.i_height != p_fmt_out->i_height )
     {
-        if( p_image->p_filter )
-        if( p_image->p_filter->fmt_in.video.i_chroma !=
+        if( p_image->p_converter )
+        if( p_image->p_converter->fmt_in.video.i_chroma !=
             p_image->p_dec->fmt_out.video.i_chroma ||
-            p_image->p_filter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
+            p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
         {
             /* We need to restart a new filter */
-            DeleteFilter( p_image->p_filter );
-            p_image->p_filter = 0;
+            DeleteConverter( p_image->p_converter );
+            p_image->p_converter = 0;
         }
 
         /* Start a filter */
-        if( !p_image->p_filter )
+        if( !p_image->p_converter )
         {
-            p_image->p_filter =
-                CreateFilter( p_image->p_parent, &p_image->p_dec->fmt_out,
+            p_image->p_converter =
+                CreateConverter( p_image->p_parent, &p_image->p_dec->fmt_out,
                               p_fmt_out );
 
-            if( !p_image->p_filter )
+            if( !p_image->p_converter )
             {
                 picture_Release( p_pic );
                 return NULL;
@@ -255,16 +255,16 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_filter->fmt_in = p_image->p_dec->fmt_out;
-            p_image->p_filter->fmt_out = p_image->p_dec->fmt_out;
-            p_image->p_filter->fmt_out.i_codec = p_fmt_out->i_chroma;
-            p_image->p_filter->fmt_out.video = *p_fmt_out;
+            p_image->p_converter->fmt_in = p_image->p_dec->fmt_out;
+            p_image->p_converter->fmt_out = p_image->p_dec->fmt_out;
+            p_image->p_converter->fmt_out.i_codec = p_fmt_out->i_chroma;
+            p_image->p_converter->fmt_out.video = *p_fmt_out;
         }
 
-        p_pic = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+        p_pic = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
 
         video_format_Clean( p_fmt_out );
-        video_format_Copy( p_fmt_out, &p_image->p_filter->fmt_out.video );
+        video_format_Copy( p_fmt_out, &p_image->p_converter->fmt_out.video );
     }
     else
     {
@@ -394,29 +394,29 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     {
         picture_t *p_tmp_pic;
 
-        if( p_image->p_filter )
-        if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-            p_image->p_filter->fmt_out.video.i_chroma !=
+        if( p_image->p_converter )
+        if( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+            p_image->p_converter->fmt_out.video.i_chroma !=
             p_image->p_enc->fmt_in.video.i_chroma ||
-           !BitMapFormatIsSimilar( &p_image->p_filter->fmt_in.video, p_fmt_in ) )
+           !BitMapFormatIsSimilar( &p_image->p_converter->fmt_in.video, p_fmt_in ) )
         {
             /* We need to restart a new filter */
-            DeleteFilter( p_image->p_filter );
-            p_image->p_filter = 0;
+            DeleteConverter( p_image->p_converter );
+            p_image->p_converter = 0;
         }
 
         /* Start a filter */
-        if( !p_image->p_filter )
+        if( !p_image->p_converter )
         {
             es_format_t fmt_in;
             es_format_Init( &fmt_in, VIDEO_ES, p_fmt_in->i_chroma );
             fmt_in.video = *p_fmt_in;
 
-            p_image->p_filter =
-                CreateFilter( p_image->p_parent, &fmt_in,
+            p_image->p_converter =
+                CreateConverter( p_image->p_parent, &fmt_in,
                               &p_image->p_enc->fmt_in.video );
 
-            if( !p_image->p_filter )
+            if( !p_image->p_converter )
             {
                 return NULL;
             }
@@ -424,16 +424,16 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_filter->fmt_in.i_codec = p_fmt_in->i_chroma;
-            p_image->p_filter->fmt_out.video = *p_fmt_in;
-            p_image->p_filter->fmt_out.i_codec =p_image->p_enc->fmt_in.i_codec;
-            p_image->p_filter->fmt_out.video = p_image->p_enc->fmt_in.video;
+            p_image->p_converter->fmt_in.i_codec = p_fmt_in->i_chroma;
+            p_image->p_converter->fmt_out.video = *p_fmt_in;
+            p_image->p_converter->fmt_out.i_codec =p_image->p_enc->fmt_in.i_codec;
+            p_image->p_converter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
         picture_Hold( p_pic );
 
         p_tmp_pic =
-            p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+            p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
 
         if( likely(p_tmp_pic != NULL) )
         {
@@ -533,26 +533,26 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     if( !p_fmt_out->i_sar_num ) p_fmt_out->i_sar_num = p_fmt_in->i_sar_num;
     if( !p_fmt_out->i_sar_den ) p_fmt_out->i_sar_den = p_fmt_in->i_sar_den;
 
-    if( p_image->p_filter )
-    if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-        p_image->p_filter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
+    if( p_image->p_converter )
+    if( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+        p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
     {
         /* We need to restart a new filter */
-        DeleteFilter( p_image->p_filter );
-        p_image->p_filter = NULL;
+        DeleteConverter( p_image->p_converter );
+        p_image->p_converter = NULL;
     }
 
     /* Start a filter */
-    if( !p_image->p_filter )
+    if( !p_image->p_converter )
     {
         es_format_t fmt_in;
         es_format_Init( &fmt_in, VIDEO_ES, p_fmt_in->i_chroma );
         fmt_in.video = *p_fmt_in;
 
-        p_image->p_filter =
-            CreateFilter( p_image->p_parent, &fmt_in, p_fmt_out );
+        p_image->p_converter =
+            CreateConverter( p_image->p_parent, &fmt_in, p_fmt_out );
 
-        if( !p_image->p_filter )
+        if( !p_image->p_converter )
         {
             return NULL;
         }
@@ -560,13 +560,13 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     else
     {
         /* Filters should handle on-the-fly size changes */
-        p_image->p_filter->fmt_in.video = *p_fmt_in;
-        p_image->p_filter->fmt_out.video = *p_fmt_out;
+        p_image->p_converter->fmt_in.video = *p_fmt_in;
+        p_image->p_converter->fmt_out.video = *p_fmt_out;
     }
 
     picture_Hold( p_pic );
 
-    p_pif = p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
+    p_pif = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
 
     if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
         p_fmt_in->i_width == p_fmt_out->i_width &&
@@ -574,7 +574,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     {
         /* Duplicate image */
         picture_Release( p_pif ); /* XXX: Better fix must be possible */
-        p_pif = filter_NewPicture( p_image->p_filter );
+        p_pif = filter_NewPicture( p_image->p_converter );
         if( p_pif )
             picture_Copy( p_pif, p_pic );
     }
@@ -834,7 +834,7 @@ static const struct filter_video_callbacks image_filter_cbs =
     .buffer_new = filter_new_picture,
 };
 
-static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
+static filter_t *CreateConverter( vlc_object_t *p_this, const es_format_t *p_fmt_in,
                                const video_format_t *p_fmt_out )
 {
     filter_t *p_filter;
@@ -856,14 +856,14 @@ static filter_t *CreateFilter( vlc_object_t *p_this, const es_format_t *p_fmt_in
     if( !p_filter->p_module )
     {
         msg_Dbg( p_filter, "no video converter found" );
-        DeleteFilter( p_filter );
+        DeleteConverter( p_filter );
         return NULL;
     }
 
     return p_filter;
 }
 
-static void DeleteFilter( filter_t * p_filter )
+static void DeleteConverter( filter_t * p_filter )
 {
     if( p_filter->p_module ) module_unneed( p_filter, p_filter->p_module );
 
