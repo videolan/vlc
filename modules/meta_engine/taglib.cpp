@@ -55,17 +55,13 @@
                                    TAGLIB_MINOR_VERSION, \
                                    TAGLIB_PATCH_VERSION)
 
-#define TAGLIB_VERSION_1_11 VERSION_INT(1,11,0)
-
 #include <fileref.h>
 #include <tag.h>
 #include <tbytevector.h>
 
 /* Support for stream-based metadata */
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
-# include <vlc_access.h>
-# include <tiostream.h>
-#endif
+#include <vlc_access.h>
+#include <tiostream.h>
 
 #include <apefile.h>
 #include <asffile.h>
@@ -135,9 +131,7 @@ File *VLCTagLib::ExtResolver<T>::createFile(FileName fileName, bool, AudioProper
     return 0;
 }
 
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
 static VLCTagLib::ExtResolver<MPEG::File> aacresolver(".aac");
-#endif
 static VLCTagLib::ExtResolver<MP4::File> m4vresolver(".m4v");
 static bool b_extensions_registered = false;
 
@@ -156,7 +150,6 @@ vlc_module_begin ()
         set_callbacks( WriteMeta, NULL )
 vlc_module_end ()
 
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
 class VlcIostream : public IOStream
 {
 public:
@@ -254,7 +247,6 @@ private:
     stream_t* m_stream;
     int64_t m_previousPos;
 };
-#endif /* TAGLIB_VERSION_1_11 */
 
 static int ExtractCoupleNumberValues( vlc_meta_t* p_meta, const char *psz_value,
         vlc_meta_type_t first, vlc_meta_type_t second)
@@ -834,7 +826,7 @@ static int ReadMeta( vlc_object_t* p_this)
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
 
-#if VLC_WINSTORE_APP && TAGLIB_VERSION >= TAGLIB_VERSION_1_11
+#if VLC_WINSTORE_APP
     stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
     free( psz_uri );
     if( p_stream == NULL )
@@ -850,9 +842,7 @@ static int ReadMeta( vlc_object_t* p_this)
 
     if( !b_extensions_registered )
     {
-#if TAGLIB_VERSION >= TAGLIB_VERSION_1_11
         FileRef::addFileTypeResolver( &aacresolver );
-#endif
         FileRef::addFileTypeResolver( &m4vresolver );
         b_extensions_registered = true;
     }
