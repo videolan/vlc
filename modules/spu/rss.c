@@ -560,7 +560,7 @@ static picture_t *LoadImage( filter_t *p_filter, const char *psz_url )
     memset( &fmt_out, 0, sizeof(video_format_t) );
 
     fmt_out.i_chroma = VLC_CODEC_YUVA;
-    p_orig = image_ReadUrl( p_handler, psz_url, &fmt_in, &fmt_out );
+    p_orig = image_ReadUrl( p_handler, psz_url, &fmt_out );
 
     if( !p_orig )
     {

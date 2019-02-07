@@ -63,7 +63,7 @@ static picture_t *ImageRead( image_handler_t *, block_t *,
                              const video_format_t *, const uint8_t *, size_t,
                              video_format_t * );
 static picture_t *ImageReadUrl( image_handler_t *, const char *,
-                                const video_format_t *, video_format_t * );
+                                video_format_t * );
 static block_t *ImageWrite( image_handler_t *, picture_t *,
                             const video_format_t *, const video_format_t * );
 static int ImageWriteUrl( image_handler_t *, picture_t *,
@@ -273,7 +273,6 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
 }
 
 static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
-                                const video_format_t *p_fmt_in,
                                 video_format_t *p_fmt_out )
 {
     block_t *p_block;
@@ -301,22 +300,18 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
         goto error;
 
     video_format_t fmtin;
-    video_format_Init( &fmtin, p_fmt_in->i_chroma );
-    video_format_Copy( &fmtin, p_fmt_in );
+    video_format_Init( &fmtin, 0 ); /* no chroma, the MIME type of the picture will be used */
 
+    char *psz_mime = stream_MimeType( p_stream );
+    if( psz_mime != NULL )
+    {
+        fmtin.i_chroma = image_Mime2Fourcc( psz_mime );
+        free( psz_mime );
+    }
     if( !fmtin.i_chroma )
     {
-        char *psz_mime = stream_MimeType( p_stream );
-        if( psz_mime != NULL )
-        {
-            fmtin.i_chroma = image_Mime2Fourcc( psz_mime );
-            free( psz_mime );
-        }
-        if( !fmtin.i_chroma )
-        {
-           /* Try to guess format from file name */
-           fmtin.i_chroma = image_Ext2Fourcc( psz_url );
-        }
+       /* Try to guess format from file name */
+       fmtin.i_chroma = image_Ext2Fourcc( psz_url );
     }
     vlc_stream_Delete( p_stream );
 

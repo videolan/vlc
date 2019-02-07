@@ -36,10 +36,9 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
     GenericBitmap( pIntf, nbFrames, fps, nbLoops ), m_width( 0 ), m_height( 0 ),
     m_pData( NULL )
 {
-    video_format_t fmt_in, fmt_out;
+    video_format_t fmt_out;
     picture_t *pPic;
 
-    video_format_Init( &fmt_in, 0 );
     video_format_Init( &fmt_out, VLC_CODEC_RGBA );
 
     if( strstr( fileName.c_str(), "://" ) == NULL )
@@ -51,7 +50,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
         free( psz_uri );
     }
 
-    pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_in, &fmt_out );
+    pPic = image_ReadUrl( pImageHandler, fileName.c_str(), &fmt_out );
     if( !pPic )
         return;
 
