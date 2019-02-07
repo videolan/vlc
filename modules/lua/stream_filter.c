@@ -1,5 +1,5 @@
 /*****************************************************************************
- * demux.c :  Lua playlist demux module
+ * stream_filter.c :  Lua playlist stream filter module
  *****************************************************************************
  * Copyright (C) 2007-2008 the VideoLAN team
  *

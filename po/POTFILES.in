@@ -1027,7 +1027,7 @@ modules/logger/console.c
 modules/logger/file.c
 modules/logger/journal.c
 modules/logger/syslog.c
-modules/lua/demux.c
+modules/lua/stream_filter.c
 modules/lua/extension.c
 modules/lua/libs/gettext.c
 modules/lua/intf.c
