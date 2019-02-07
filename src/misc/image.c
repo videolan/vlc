@@ -255,8 +255,10 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_converter->fmt_in = p_image->p_dec->fmt_out;
-            p_image->p_converter->fmt_out.video = *p_fmt_out;
+            es_format_Clean( &p_image->p_converter->fmt_in );
+            es_format_Copy( &p_image->p_converter->fmt_in, &p_image->p_dec->fmt_out );
+            video_format_Clean( &p_image->p_converter->fmt_out.video );
+            video_format_Copy( &p_image->p_converter->fmt_out.video, p_fmt_out);
         }
 
         p_pic = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
@@ -419,8 +421,10 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_converter->fmt_in.video = *p_fmt_in;
-            p_image->p_converter->fmt_out.video = p_image->p_enc->fmt_in.video;
+            es_format_Clean( &p_image->p_converter->fmt_in );
+            es_format_InitFromVideo( &p_image->p_converter->fmt_in, p_fmt_in );
+            es_format_Clean( &p_image->p_converter->fmt_out );
+            es_format_Copy( &p_image->p_converter->fmt_out, &p_image->p_enc->fmt_in );
         }
 
         picture_Hold( p_pic );
@@ -553,8 +557,10 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     else
     {
         /* Filters should handle on-the-fly size changes */
-        p_image->p_converter->fmt_in.video = *p_fmt_in;
-        p_image->p_converter->fmt_out.video = *p_fmt_out;
+        es_format_Clean( &p_image->p_converter->fmt_in );
+        es_format_InitFromVideo( &p_image->p_converter->fmt_in, p_fmt_in );
+        es_format_Clean( &p_image->p_converter->fmt_out );
+        es_format_InitFromVideo( &p_image->p_converter->fmt_out, p_fmt_out );
     }
 
     picture_Hold( p_pic );
