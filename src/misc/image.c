@@ -260,9 +260,6 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         }
 
         p_pic = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
-
-        video_format_Clean( p_fmt_out );
-        video_format_Copy( p_fmt_out, &p_image->p_converter->fmt_out.video );
     }
     else
     {
