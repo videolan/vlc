@@ -257,7 +257,6 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
             /* Filters should handle on-the-fly size changes */
             p_image->p_converter->fmt_in = p_image->p_dec->fmt_out;
             p_image->p_converter->fmt_out = p_image->p_dec->fmt_out;
-            p_image->p_converter->fmt_out.i_codec = p_fmt_out->i_chroma;
             p_image->p_converter->fmt_out.video = *p_fmt_out;
         }
 
@@ -424,9 +423,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_converter->fmt_in.i_codec = p_fmt_in->i_chroma;
             p_image->p_converter->fmt_out.video = *p_fmt_in;
-            p_image->p_converter->fmt_out.i_codec =p_image->p_enc->fmt_in.i_codec;
             p_image->p_converter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
