@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface VLCPlaylistModel : NSObject
 
 @property (readwrite, assign) VLCPlaylistController *playlistController;
-@property (readonly) size_t numberOfPlaylistItems;
+@property (readonly) NSUInteger numberOfPlaylistItems;
 
 - (void)dropExistingData;
 - (VLCPlaylistItem *)playlistItemAtIndex:(NSInteger)index;

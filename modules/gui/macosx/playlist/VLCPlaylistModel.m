@@ -44,15 +44,9 @@
     return self;
 }
 
-- (size_t)numberOfPlaylistItems
+- (NSUInteger)numberOfPlaylistItems
 {
-    size_t ret = 0;
-
-    vlc_playlist_t *p_playlist = self.playlistController.p_playlist;
-
-    ret = vlc_playlist_Count(p_playlist);
-
-    return ret;
+    return _playlistArray.count;
 }
 
 - (void)dropExistingData
