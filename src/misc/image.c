@@ -229,14 +229,14 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
         p_image->p_dec->fmt_out.video.i_width != p_fmt_out->i_width ||
         p_image->p_dec->fmt_out.video.i_height != p_fmt_out->i_height )
     {
-        if( p_image->p_converter )
-        if( p_image->p_converter->fmt_in.video.i_chroma !=
-            p_image->p_dec->fmt_out.video.i_chroma ||
-            p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
+        if( p_image->p_converter &&
+            ( p_image->p_converter->fmt_in.video.i_chroma !=
+              p_image->p_dec->fmt_out.video.i_chroma ||
+              p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma ) )
         {
             /* We need to restart a new filter */
             DeleteConverter( p_image->p_converter );
-            p_image->p_converter = 0;
+            p_image->p_converter = NULL;
         }
 
         /* Start a filter */
@@ -394,15 +394,15 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
     {
         picture_t *p_tmp_pic;
 
-        if( p_image->p_converter )
-        if( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-            p_image->p_converter->fmt_out.video.i_chroma !=
-            p_image->p_enc->fmt_in.video.i_chroma ||
-           !BitMapFormatIsSimilar( &p_image->p_converter->fmt_in.video, p_fmt_in ) )
+        if( p_image->p_converter &&
+            ( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+              p_image->p_converter->fmt_out.video.i_chroma !=
+              p_image->p_enc->fmt_in.video.i_chroma ||
+             !BitMapFormatIsSimilar( &p_image->p_converter->fmt_in.video, p_fmt_in ) ) )
         {
             /* We need to restart a new filter */
             DeleteConverter( p_image->p_converter );
-            p_image->p_converter = 0;
+            p_image->p_converter = NULL;
         }
 
         /* Start a filter */
@@ -533,9 +533,9 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     if( !p_fmt_out->i_sar_num ) p_fmt_out->i_sar_num = p_fmt_in->i_sar_num;
     if( !p_fmt_out->i_sar_den ) p_fmt_out->i_sar_den = p_fmt_in->i_sar_den;
 
-    if( p_image->p_converter )
-    if( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
-        p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma )
+    if( p_image->p_converter &&
+        ( p_image->p_converter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||
+          p_image->p_converter->fmt_out.video.i_chroma != p_fmt_out->i_chroma ) )
     {
         /* We need to restart a new filter */
         DeleteConverter( p_image->p_converter );
