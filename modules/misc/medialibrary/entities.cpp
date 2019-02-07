@@ -404,7 +404,7 @@ input_item_t* MediaToInputItem( const medialibrary::IMedia* media )
                                   [](const medialibrary::FilePtr& f) {
         return f->type() == medialibrary::IFile::Type::Main;
     });
-    assert( it != cend( files ) );
+    assert( it != files.cend() );
     std::string mrl;
     try
     {
