@@ -512,11 +512,8 @@ static int ParseImageAttachments( decoder_t *p_dec )
 
                     memcpy( p_block->p_buffer, p_attach->p_data, p_attach->i_data );
 
-                    memset( &fmt_in,  0, sizeof( video_format_t));
-                    memset( &fmt_out, 0, sizeof( video_format_t));
-
-                    fmt_in.i_chroma  = type;
-                    fmt_out.i_chroma = VLC_CODEC_YUVA;
+                    video_format_Init( &fmt_in,  type );
+                    video_format_Init( &fmt_out, VLC_CODEC_YUVA );
 
                     /* Find a suitable decoder module */
                     if( module_exists( "sdl_image" ) )
@@ -530,6 +527,8 @@ static int ParseImageAttachments( decoder_t *p_dec )
 
                     p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
                     var_Destroy( p_dec, "codec" );
+                    video_format_Clean( &fmt_in );
+                    video_format_Clean( &fmt_out );
                 }
 
                 image_HandlerDelete( p_image );

@@ -1180,6 +1180,8 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
     }
     else block_Release( p_block );
     p_dec->obj.flags = i_flags;
+    video_format_Clean( &fmt_in );
+    video_format_Clean( &fmt_out );
 
     return p_pic;
 }
