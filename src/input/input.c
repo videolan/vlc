@@ -1308,22 +1308,22 @@ static int Init( input_thread_t * p_input )
 
     if (!input_item_IsPreparsed(input_priv(p_input)->p_item))
     {
-    vlc_meta_t *p_meta = vlc_meta_New();
-    if( p_meta != NULL )
-    {
-        /* Get meta data from users */
-        InputMetaUser( p_input, p_meta );
+        vlc_meta_t *p_meta = vlc_meta_New();
+        if( p_meta != NULL )
+        {
+            /* Get meta data from users */
+            InputMetaUser( p_input, p_meta );
 
-        /* Get meta data from master input */
-        InputSourceMeta( p_input, master, p_meta );
+            /* Get meta data from master input */
+            InputSourceMeta( p_input, master, p_meta );
 
-        /* And from slave */
-        for( int i = 0; i < priv->i_slave; i++ )
-            InputSourceMeta( p_input, priv->slave[i], p_meta );
+            /* And from slave */
+            for( int i = 0; i < priv->i_slave; i++ )
+                InputSourceMeta( p_input, priv->slave[i], p_meta );
 
-        es_out_ControlSetMeta( priv->p_es_out, p_meta );
-        vlc_meta_Delete( p_meta );
-    }
+            es_out_ControlSetMeta( priv->p_es_out, p_meta );
+            vlc_meta_Delete( p_meta );
+        }
     }
 
     msg_Dbg( p_input, "`%s' successfully opened",
