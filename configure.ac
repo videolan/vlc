@@ -288,11 +288,21 @@ case "${host_os}" in
         dnl NSIS/MSI Installer prefix and WIN64
         dnl
         case "${host_cpu}" in
-            amd64|x86_64|aarch64)
+            aarch64)
+                HAVE_WIN64="1"
+                WINDOWS_ARCH="arm64"
+                PROGRAMFILES="PROGRAMFILES64"
+                LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
+            ;;
+            amd64|x86_64)
                 HAVE_WIN64="1"
                 WINDOWS_ARCH="x64"
                 PROGRAMFILES="PROGRAMFILES64"
                 LDFLAGS="${LDFLAGS} -Wl,--high-entropy-va -Wl,--image-base,0x140000000"
+            ;;
+            armv7)
+                WINDOWS_ARCH="arm"
+                PROGRAMFILES="PROGRAMFILES"
             ;;
             i?86)
                 WINDOWS_ARCH="x86"
