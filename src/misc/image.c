@@ -419,7 +419,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         else
         {
             /* Filters should handle on-the-fly size changes */
-            p_image->p_converter->fmt_out.video = *p_fmt_in;
+            p_image->p_converter->fmt_in.video = *p_fmt_in;
             p_image->p_converter->fmt_out.video = p_image->p_enc->fmt_in.video;
         }
 
