@@ -313,6 +313,12 @@ stream_t *stream_AccessNew(vlc_object_t *parent, input_thread_t *input,
 
         s->p_input_item = input ? input_GetItem(input) : NULL;
         s->psz_url = strdup(access->psz_url);
+        if (unlikely(s->psz_url == NULL))
+        {
+            vlc_object_release(s);
+            vlc_stream_Delete(access);
+            return NULL;
+        }
 
         if (access->pf_block != NULL)
             s->pf_block = AStreamReadBlock;
