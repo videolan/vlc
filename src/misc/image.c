@@ -506,8 +506,6 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
                                 const video_format_t *p_fmt_in,
                                 video_format_t *p_fmt_out )
 {
-    picture_t *p_pif;
-
     if( !p_fmt_out->i_width && !p_fmt_out->i_height &&
         p_fmt_out->i_sar_num && p_fmt_out->i_sar_den &&
         p_fmt_out->i_sar_num * p_fmt_in->i_sar_den !=
@@ -565,20 +563,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
 
     picture_Hold( p_pic );
 
-    p_pif = p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
-
-    if( p_fmt_in->i_chroma == p_fmt_out->i_chroma &&
-        p_fmt_in->i_width == p_fmt_out->i_width &&
-        p_fmt_in->i_height == p_fmt_out->i_height )
-    {
-        /* Duplicate image */
-        picture_Release( p_pif ); /* XXX: Better fix must be possible */
-        p_pif = filter_NewPicture( p_image->p_converter );
-        if( p_pif )
-            picture_Copy( p_pif, p_pic );
-    }
-
-    return p_pif;
+    return p_image->p_converter->pf_video_filter( p_image->p_converter, p_pic );
 }
 
 /**
