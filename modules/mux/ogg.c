@@ -1422,7 +1422,7 @@ static void OggRewriteFisheadPage( sout_mux_t *p_mux )
 
 static bool AllocateIndex( sout_mux_t *p_mux, sout_input_t *p_input )
 {
-    sout_mux_sys_t *p_sys = p_mux;
+    sout_mux_sys_t *p_sys = p_mux->p_sys;
     ogg_stream_t *p_stream = (ogg_stream_t *) p_input->p_sys;
     size_t i_size;
 
