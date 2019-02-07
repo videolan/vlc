@@ -190,7 +190,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
         p_tk->fmt.i_codec == VLC_CODEC_ATRAC3 )
     {
         const uint16_t i_num = p_sys->i_frame_size / p_sys->i_subpacket_size;
-        const size_t y = p_sys->i_subpacket / ( p_sys->i_frame_size / p_sys->i_subpacket_size );
+        const size_t y = p_sys->i_subpacket / i_num;
 
         for( uint16_t i = 0; i < i_num; i++ )
         {
