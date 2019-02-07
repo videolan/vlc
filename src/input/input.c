@@ -1306,6 +1306,8 @@ static int Init( input_thread_t * p_input )
                  priv->b_out_pace_control ? "a" : "" );
     }
 
+    if (!input_item_IsPreparsed(input_priv(p_input)->p_item))
+    {
     vlc_meta_t *p_meta = vlc_meta_New();
     if( p_meta != NULL )
     {
@@ -1321,6 +1323,7 @@ static int Init( input_thread_t * p_input )
 
         es_out_ControlSetMeta( priv->p_es_out, p_meta );
         vlc_meta_Delete( p_meta );
+    }
     }
 
     msg_Dbg( p_input, "`%s' successfully opened",
