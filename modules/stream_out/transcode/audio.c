@@ -263,7 +263,7 @@ int transcode_audio_process( sout_stream_t *p_stream,
             if( !transcode_encoder_opened( id->encoder ) )
             {
                 transcode_encoder_audio_configure( VLC_OBJECT(p_stream), id->p_enccfg,
-                                                   &id->decoder_out.audio, id->encoder );
+                                                   &id->decoder_out.audio, id->encoder, true );
                 id->fmt_input_audio = id->decoder_out.audio;
             }
             else
