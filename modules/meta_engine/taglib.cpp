@@ -832,7 +832,12 @@ static int ReadMeta( vlc_object_t* p_this)
     if( unlikely(psz_uri == NULL) )
         return VLC_ENOMEM;
 
-#if VLC_WINSTORE_APP
+    if( !b_extensions_registered )
+    {
+        FileRef::addFileTypeResolver( &aacresolver );
+        b_extensions_registered = true;
+    }
+
     stream_t *p_stream = vlc_access_NewMRL( p_this, psz_uri );
     free( psz_uri );
     if( p_stream == NULL )
@@ -840,32 +845,6 @@ static int ReadMeta( vlc_object_t* p_this)
 
     VlcIostream s( p_stream );
     f = FileRef( &s );
-#else /* VLC_WINSTORE_APP */
-    char *psz_path = vlc_uri2path( psz_uri );
-    free( psz_uri );
-    if( psz_path == NULL )
-        return VLC_EGENERIC;
-
-    if( !b_extensions_registered )
-    {
-        FileRef::addFileTypeResolver( &aacresolver );
-        b_extensions_registered = true;
-    }
-
-#if defined(_WIN32)
-    wchar_t *wpath = ToWide( psz_path );
-    if( wpath == NULL )
-    {
-        free( psz_path );
-        return VLC_EGENERIC;
-    }
-    f = FileRef( wpath );
-    free( wpath );
-#else
-    f = FileRef( psz_path );
-#endif
-    free( psz_path );
-#endif /* VLC_WINSTORE_APP */
 
     if( f.isNull() )
         return VLC_EGENERIC;
