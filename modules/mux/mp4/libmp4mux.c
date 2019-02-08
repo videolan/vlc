@@ -266,7 +266,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
     case VLC_CODEC_MPGV:
         if(p_track->fmt.i_original_fourcc == VLC_CODEC_MP1V)
         {
-            i_object_type_indication = 0x6b;
+            i_object_type_indication = 0x6a; /* Visual ISO/IEC 11172-2  */
             break;
         }
         /* fallthrough */
@@ -275,8 +275,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         i_object_type_indication = 0x65;
         break;
     case VLC_CODEC_MP1V:
-        /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-        i_object_type_indication = 0x6b;
+        i_object_type_indication = 0x6a; /* Visual ISO/IEC 11172-2  */
         break;
     case VLC_CODEC_MP4A:
         /* FIXME for mpeg2-aac == 0x66->0x68 */
