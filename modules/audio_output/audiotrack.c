@@ -1729,12 +1729,59 @@ AudioTrack_Thread( void *p_data )
     return NULL;
 }
 
+static int
+ConvertFromIEC61937( audio_output_t *p_aout, block_t *p_buffer )
+{
+    /* This function is only used for Android API 23 when AudioTrack is
+     * configured with ENCODING_ AC3/E_AC3/DTS. In that case, only the codec
+     * data is needed (without the IEC61937 encapsulation). This function
+     * recovers the codec data from an EC61937 frame. It is the opposite of the
+     * code found in converter/tospdif.c. We could also request VLC core to
+     * send us the codec data directly, but in that case, we wouldn't benefit
+     * from the eac3 block merger of tospdif.c. */
+
+    VLC_UNUSED( p_aout );
+    uint8_t i_length_mul;
+
+    switch( GetWBE( &p_buffer->p_buffer[4] ) & 0xFF )
+    {
+        case 0x01: /* IEC61937_AC3 */
+            i_length_mul = 8;
+            break;
+        case 0x15: /* IEC61937_EAC3 */
+            i_length_mul = 1;
+            break;
+        case 0x0B: /* IEC61937_DTS1 */
+        case 0x0C: /* IEC61937_DTS2 */
+        case 0x0D: /* IEC61937_DTS3 */
+        case 0x11: /* IEC61937_DTSHD */
+            i_length_mul = 8;
+            break;
+        default:
+            vlc_assert_unreachable();
+    }
+    uint16_t i_length = GetWBE( &p_buffer->p_buffer[6] );
+    if( i_length == 0 )
+        return -1;
+    p_buffer->p_buffer += 8; /* SPDIF_HEADER_SIZE */
+    p_buffer->i_buffer = i_length / i_length_mul;
+
+    return 0;
+}
+
 static void
 Play( audio_output_t *p_aout, block_t *p_buffer )
 {
     JNIEnv *env = NULL;
     size_t i_buffer_offset = 0;
     aout_sys_t *p_sys = p_aout->sys;
+
+    if( p_sys->b_passthrough && !jfields.AudioFormat.has_ENCODING_IEC61937
+     && ConvertFromIEC61937( p_aout, p_buffer ) != 0 )
+    {
+        block_Release(p_buffer);
+        return;
+    }
 
     vlc_mutex_lock( &p_sys->lock );
 
