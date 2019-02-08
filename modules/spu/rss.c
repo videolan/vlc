@@ -357,8 +357,6 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
     int i_feed, i_item;
     rss_feed_t *p_feed;
 
-    memset( &fmt, 0, sizeof(video_format_t) );
-
     vlc_mutex_lock( &p_sys->lock );
 
     /* Check if the feeds have been fetched and that we have some feeds */
@@ -405,7 +403,7 @@ static subpicture_t *Filter( filter_t *p_filter, vlc_tick_t date )
         return NULL;
     }
 
-    fmt.i_chroma = VLC_CODEC_TEXT;
+    video_format_Init( &fmt, VLC_CODEC_TEXT );
 
     p_spu->p_region = subpicture_region_New( &fmt );
     if( !p_spu->p_region )
