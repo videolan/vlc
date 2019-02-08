@@ -60,7 +60,7 @@ static inline struct decoder_owner *dec_get_owner( decoder_t *p_dec )
 }
 
 static picture_t *ImageRead( image_handler_t *, block_t *,
-                             const video_format_t *, const uint8_t *, size_t,
+                             const es_format_t *,
                              video_format_t * );
 static picture_t *ImageReadUrl( image_handler_t *, const char *,
                                 video_format_t * );
@@ -72,8 +72,7 @@ static int ImageWriteUrl( image_handler_t *, picture_t *,
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 const video_format_t *, video_format_t * );
 
-static decoder_t *CreateDecoder( image_handler_t *, const video_format_t *,
-                                 const uint8_t *, size_t );
+static decoder_t *CreateDecoder( image_handler_t *, const es_format_t * );
 static void DeleteDecoder( decoder_t * );
 static encoder_t *CreateEncoder( vlc_object_t *, const video_format_t *,
                                  const video_format_t * );
@@ -140,15 +139,20 @@ static void ImageQueueVideo( decoder_t *p_dec, picture_t *p_pic )
 }
 
 static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
-                             const video_format_t *p_fmt_in,
-                             const uint8_t *p_extra, size_t i_extra,
+                             const es_format_t *p_es_in,
                              video_format_t *p_fmt_out )
 {
     picture_t *p_pic = NULL;
 
+    if ( p_es_in->i_cat != VIDEO_ES )
+    {
+        block_Release(p_block);
+        return NULL;
+    }
+
     /* Check if we can reuse the current decoder */
     if( p_image->p_dec &&
-        p_image->p_dec->fmt_in.i_codec != p_fmt_in->i_chroma )
+        p_image->p_dec->fmt_in.i_codec != p_es_in->video.i_chroma )
     {
         DeleteDecoder( p_image->p_dec );
         p_image->p_dec = 0;
@@ -157,8 +161,7 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     /* Start a decoder */
     if( !p_image->p_dec )
     {
-        p_image->p_dec = CreateDecoder( p_image, p_fmt_in,
-                                        p_extra, i_extra );
+        p_image->p_dec = CreateDecoder( p_image, p_es_in );
         if( !p_image->p_dec )
         {
             block_Release(p_block);
@@ -299,26 +302,26 @@ static picture_t *ImageReadUrl( image_handler_t *p_image, const char *psz_url,
     if( p_block == NULL )
         goto error;
 
-    video_format_t fmtin;
-    video_format_Init( &fmtin, 0 ); /* no chroma, the MIME type of the picture will be used */
+    es_format_t fmtin;
+    es_format_Init( &fmtin, VIDEO_ES, 0 ); /* no chroma, the MIME type of the picture will be used */
 
     char *psz_mime = stream_MimeType( p_stream );
     if( psz_mime != NULL )
     {
-        fmtin.i_chroma = image_Mime2Fourcc( psz_mime );
+        fmtin.video.i_chroma = image_Mime2Fourcc( psz_mime );
         free( psz_mime );
     }
-    if( !fmtin.i_chroma )
+    if( !fmtin.video.i_chroma )
     {
        /* Try to guess format from file name */
-       fmtin.i_chroma = image_Ext2Fourcc( psz_url );
+       fmtin.video.i_chroma = image_Ext2Fourcc( psz_url );
     }
     vlc_stream_Delete( p_stream );
 
 
-    p_pic = ImageRead( p_image, p_block, &fmtin, NULL, 0, p_fmt_out );
+    p_pic = ImageRead( p_image, p_block, &fmtin, p_fmt_out );
 
-    video_format_Clean( &fmtin );
+    es_format_Clean( &fmtin );
 
     return p_pic;
 error:
@@ -658,8 +661,7 @@ static picture_t *video_new_buffer( decoder_t *p_dec )
     return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
-static decoder_t *CreateDecoder( image_handler_t *p_image, const video_format_t *fmt,
-                                 const uint8_t *p_extra, size_t i_extra )
+static decoder_t *CreateDecoder( image_handler_t *p_image, const es_format_t *fmt )
 {
     decoder_t *p_dec;
     struct decoder_owner *p_owner;
@@ -672,13 +674,7 @@ static decoder_t *CreateDecoder( image_handler_t *p_image, const video_format_t 
 
     p_dec->p_module = NULL;
 
-    es_format_t es_fmt;
-    es_format_InitFromVideo( &es_fmt, fmt );
-    if ( es_fmt.p_extra ) free( es_fmt.p_extra );
-    es_fmt.p_extra = p_extra;
-    es_fmt.i_extra = i_extra;
-
-    es_format_Copy( &p_dec->fmt_in, &es_fmt );
+    es_format_Copy( &p_dec->fmt_in, fmt );
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, 0 );
     p_dec->b_frame_drop_allowed = false;
 

@@ -565,8 +565,8 @@ static int LoadGridImage( demux_t *p_demux, uint32_t i_pic_item_id,
     video_format_Init( &decoded, VLC_CODEC_RGBA );
 
     fmt.video.i_chroma = fmt.i_codec;
-    picture_t *p_picture = image_ReadExt( handler, p_sample, &fmt.video,
-                                          fmt.p_extra, fmt.i_extra, &decoded );
+
+    picture_t *p_picture = image_Read( handler, p_sample, &fmt, &decoded );
     image_HandlerDelete( handler );
 
     es_format_Clean( &fmt );

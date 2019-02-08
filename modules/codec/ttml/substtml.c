@@ -1161,8 +1161,9 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
         return NULL;
     video_format_t fmt_out;
     video_format_Init( &fmt_out, VLC_CODEC_YUVA );
-    video_format_t fmt_in;
-    video_format_Init( &fmt_in, VLC_CODEC_PNG );
+    es_format_t es_in;
+    es_format_Init( &es_in, VIDEO_ES, VLC_CODEC_PNG );
+    es_in.video.i_chroma = es_in.i_codec;
 
     block_t *p_block = block_Alloc( i_data );
     if( !p_block )
@@ -1175,12 +1176,12 @@ static picture_t * picture_CreateFromPNG( decoder_t *p_dec,
     image_handler_t *p_image = image_HandlerCreate( p_dec );
     if( p_image )
     {
-        p_pic = image_Read( p_image, p_block, &fmt_in, &fmt_out );
+        p_pic = image_Read( p_image, p_block, &es_in, &fmt_out );
         image_HandlerDelete( p_image );
     }
     else block_Release( p_block );
     p_dec->obj.flags = i_flags;
-    video_format_Clean( &fmt_in );
+    es_format_Clean( &es_in );
     video_format_Clean( &fmt_out );
 
     return p_pic;

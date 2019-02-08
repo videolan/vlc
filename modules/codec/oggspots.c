@@ -374,7 +374,7 @@ static picture_t* DecodePacket(decoder_t* p_dec, block_t* p_block)
     p_block->p_buffer += i_img_offset;
 
     p_pic = image_Read(p_sys->p_image, p_block,
-                       &p_dec->fmt_in.video,
+                       &p_dec->fmt_in,
                        &p_dec->fmt_out.video);
     if (p_pic == NULL) {
         return NULL;
