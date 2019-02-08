@@ -625,7 +625,6 @@ static int video_update_format( vlc_object_t *p_this,
             fmt_out->video.i_visible_height = fmt_out->video.i_height;
         }
 
-        fmt_out->video.i_chroma = fmt_out->i_codec;
         *video = fmt_out->video;
     }
 
