@@ -551,21 +551,21 @@ static void FilterBall( filter_t *p_filter, picture_t *p_inpic,
 
     picture_t *p_converted;
     video_format_t fmt_comp;
-    memset( &fmt_comp, 0, sizeof(fmt_comp) );
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
         case VLC_CODEC_RGB24:
         CASE_PACKED_YUV_422
+            video_format_Init( &fmt_comp, VLC_CODEC_GREY );
             fmt_comp.i_width = p_filter->fmt_in.video.i_width;
             fmt_comp.i_height = p_filter->fmt_in.video.i_height;
-            fmt_comp.i_chroma = VLC_FOURCC('G','R','E','Y');
             fmt_comp.i_visible_width = fmt_comp.i_width;
             fmt_comp.i_visible_height = fmt_comp.i_height;
 
             p_converted = image_Convert( p_sys->p_image, p_inpic,
                                          &(p_filter->fmt_in.video),
                                          &fmt_comp );
+            video_format_Clean( &fmt_comp );
             if( !p_converted )
                 return;
 
