@@ -852,9 +852,12 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
 
     p_track->fmt.audio.i_channels = p_soun->i_channelcount;
     p_track->fmt.audio.i_rate = p_soun->i_sampleratehi;
-    p_track->fmt.i_bitrate = p_soun->i_channelcount * p_soun->i_sampleratehi *
-                             p_soun->i_samplesize;
-    p_track->fmt.audio.i_bitspersample = p_soun->i_samplesize;
+    if( p_soun->i_qt_version == 0 ) /* otherwise defaults to meaningless 16 */
+    {
+        p_track->fmt.audio.i_bitspersample = p_soun->i_samplesize;
+        p_track->fmt.i_bitrate = p_soun->i_channelcount * p_soun->i_sampleratehi *
+                                 p_soun->i_samplesize;
+    }
 
     p_track->fmt.i_original_fourcc = p_sample->i_type;
 
