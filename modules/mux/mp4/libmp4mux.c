@@ -97,6 +97,8 @@ static void mp4mux_AddExtraBrandForFormat(mp4mux_handle_t *h, const es_format_t 
             mp4mux_AddExtraBrand(h, BRAND_av01);
             mp4mux_AddExtraBrand(h, BRAND_iso6);
             break;
+        case VLC_CODEC_MP3:
+        case VLC_CODEC_MPGA:
         case VLC_CODEC_MP4V:
         case VLC_CODEC_DIV1:
         case VLC_CODEC_DIV2:
