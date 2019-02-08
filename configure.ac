@@ -3902,6 +3902,10 @@ AS_IF([test "${enable_qt}" != "no"], [
       AC_PATH_PROGS(MOC, [moc-qt5 moc], moc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(RCC, [rcc-qt5 rcc], rcc, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
       AC_PATH_PROGS(UIC, [uic-qt5 uic], uic, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+      AC_PATH_PROGS(QMLCACHE, [qmlcachegen-qt5 qmlcachegen], no, ["${QT_HOST_PATH}" "${QT_PATH}/bin"])
+      AS_IF([test "x${QMLCACHE}" = "xno"], [
+          AC_MSG_WARN([qmlcachegen not found])
+      ])
     ], [
       AS_IF([test -n "${enable_qt}"],[
         AC_MSG_ERROR([${QT_PKG_ERRORS}. If you want to build VLC without GUI, pass --disable-qt.])
@@ -3911,6 +3915,11 @@ AS_IF([test "${enable_qt}" != "no"], [
       enable_qt="no"
     ])
 ])
+
+AC_ARG_ENABLE([qt-qml-cache],
+  AS_HELP_STRING([--enable-qt-qml-cache],
+    [enable qml cache generation]))
+AM_CONDITIONAL([HAVE_QMLCACHE], [test "${enable_qt_qml_cache}" = "yes" && "x$QMLCACHE" != "xno"])
 
 AC_ARG_ENABLE([qt-qml-debug],
   AS_HELP_STRING([--enable-qt-qml-debug], [enable qml debuger]))
