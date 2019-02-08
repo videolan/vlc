@@ -23,9 +23,14 @@ for i in $(find -name test-suite.log);do
         core_path="$test_path/core"
         failing_test=$(sed -n 's/^FAIL \([^ ]\+\) (exit status:.*/\1/p' ${test_path}/test-suite.log)
         if [ -f "$core_path" -a ! -z "$failing_test" ];then
+            if [ -x "$test_path/.libs/$failing_test" ];then
+                failing_test_path="$test_path/.libs/$failing_test"
+            else
+                failing_test_path="$test_path/$failing_test"
+            fi
             echo "Printing core dump:"
             echo ""
-            gdb "$test_path/$failing_test" -c "$core_path" \
+            gdb "$failing_test_path" -c "$core_path" \
                 -ex "set pagination off" \
                 -ex "thread apply all bt" \
                 -ex "quit"
