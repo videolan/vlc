@@ -1011,6 +1011,11 @@ StartPassthrough( JNIEnv *env, audio_output_t *p_aout )
                     return VLC_EGENERIC;
                 i_at_format = jfields.AudioFormat.ENCODING_AC3;
                 break;
+            case VLC_CODEC_EAC3:
+                if( !jfields.AudioFormat.has_ENCODING_E_AC3 )
+                    return VLC_EGENERIC;
+                i_at_format = jfields.AudioFormat.ENCODING_E_AC3;
+                break;
             case VLC_CODEC_DTS:
                 if( !jfields.AudioFormat.has_ENCODING_DTS )
                     return VLC_EGENERIC;
