@@ -87,7 +87,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic );
 inline static int video_update_format_decoder( decoder_t *p_dec );
 inline static picture_t *video_new_buffer_decoder( decoder_t * );
 inline static picture_t *video_new_buffer_filter( filter_t * );
-static int video_update_format( vlc_object_t *, video_format_t *, es_format_t * );
+static void video_update_format( video_format_t *, es_format_t * );
 
 static int HeightCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
@@ -583,8 +583,8 @@ static int Send( sout_stream_t *p_stream, void *id, block_t *p_buffer )
 inline static int video_update_format_decoder( decoder_t *p_dec )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
-    return video_update_format( VLC_OBJECT( p_dec ),
-                                &p_owner->video, &p_dec->fmt_out );
+    video_update_format( &p_owner->video, &p_dec->fmt_out );
+    return 0;
 }
 
 inline static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
@@ -595,18 +595,12 @@ inline static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
 inline static picture_t *video_new_buffer_filter( filter_t *p_filter )
 {
     struct decoder_owner *p_owner = p_filter->owner.sys;
-    if( video_update_format( VLC_OBJECT( p_filter ),
-                             &p_owner->video, &p_filter->fmt_out ) ) {
-        msg_Warn( p_filter, "can't get output picture" );
-        return NULL;
-    }
+    video_update_format( &p_owner->video, &p_filter->fmt_out );
     return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 
-static int video_update_format( vlc_object_t *p_this,
-                                video_format_t *video, es_format_t *fmt_out )
+static void video_update_format( video_format_t *video, es_format_t *fmt_out )
 {
-    VLC_UNUSED(p_this);
     if( fmt_out->video.i_width != video->i_width ||
         fmt_out->video.i_height != video->i_height ||
         fmt_out->video.i_chroma != video->i_chroma ||
@@ -630,7 +624,6 @@ static int video_update_format( vlc_object_t *p_this,
 
     /* */
     fmt_out->video.i_chroma = fmt_out->i_codec;
-    return 0;
 }
 
 /**********************************************************************
