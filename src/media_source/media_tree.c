@@ -135,6 +135,17 @@ vlc_media_tree_AddSubtree(input_item_node_t *to, input_item_node_t *from)
 }
 
 static void
+vlc_media_tree_ClearChildren(input_item_node_t *root)
+{
+    for (int i = 0; i < root->i_children; ++i)
+        input_item_node_Delete(root->pp_children[i]);
+
+    free(root->pp_children);
+    root->pp_children = NULL;
+    root->i_children = 0;
+}
+
+static void
 media_subtree_changed(input_item_t *media, input_item_node_t *node,
                       void *userdata)
 {
@@ -151,19 +162,16 @@ media_subtree_changed(input_item_t *media, input_item_node_t *node,
         return;
     }
 
+    vlc_media_tree_ClearChildren(subtree_root);
     vlc_media_tree_AddSubtree(subtree_root, node);
     vlc_media_tree_Notify(tree, on_children_reset, subtree_root);
     vlc_media_tree_Unlock(tree);
 }
 
-static void
+static inline void
 vlc_media_tree_DestroyRootNode(vlc_media_tree_t *tree)
 {
-    input_item_node_t *root = &tree->root;
-    for (int i = 0; i < root->i_children; ++i)
-        input_item_node_Delete(root->pp_children[i]);
-
-    free(root->pp_children);
+    vlc_media_tree_ClearChildren(&tree->root);
 }
 
 static void
