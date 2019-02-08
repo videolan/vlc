@@ -67,7 +67,7 @@ static picture_t *ImageReadUrl( image_handler_t *, const char *,
 static block_t *ImageWrite( image_handler_t *, picture_t *,
                             const video_format_t *, const video_format_t * );
 static int ImageWriteUrl( image_handler_t *, picture_t *,
-                          const video_format_t *, video_format_t *, const char * );
+                          const video_format_t *, const video_format_t *, const char * );
 
 static picture_t *ImageConvert( image_handler_t *, picture_t *,
                                 const video_format_t *, video_format_t * );
@@ -454,16 +454,17 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 }
 
 static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
-                          const video_format_t *p_fmt_in, video_format_t *p_fmt_out,
+                          const video_format_t *p_fmt_in, const video_format_t *p_fmt_out,
                           const char *psz_url )
 {
     block_t *p_block;
     FILE *file;
+    video_format_t fmt_out = *p_fmt_out;
 
-    if( !p_fmt_out->i_chroma )
+    if( !fmt_out.i_chroma )
     {
         /* Try to guess format from file name */
-        p_fmt_out->i_chroma = image_Ext2Fourcc( psz_url );
+        fmt_out.i_chroma = image_Ext2Fourcc( psz_url );
     }
 
     file = vlc_fopen( psz_url, "wb" );
@@ -473,7 +474,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
         return VLC_EGENERIC;
     }
 
-    p_block = ImageWrite( p_image, p_pic, p_fmt_in, p_fmt_out );
+    p_block = ImageWrite( p_image, p_pic, p_fmt_in, &fmt_out );
 
     int err = 0;
     if( p_block )
