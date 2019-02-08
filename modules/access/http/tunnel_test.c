@@ -150,7 +150,7 @@ int main(void)
     int *lfd = malloc(sizeof (int));
     assert(lfd != NULL);
     *lfd = server_socket(&port);
-    if (lfd == -1)
+    if (*lfd == -1)
         return 77;
 
     if (asprintf(&url, "http://Aladdin:open%%20sesame@[::1]:%u", port) < 0)
