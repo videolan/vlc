@@ -699,7 +699,6 @@ static int Open(vlc_object_t *object)
         free(string);
 
         data = Decode(demux, &fmt, chroma, data);
-        fmt.i_codec = fmt.video.i_chroma;
     }
     fmt.i_id    = var_InheritInteger(demux, "image-id");
     fmt.i_group = var_InheritInteger(demux, "image-group");
