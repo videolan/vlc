@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Redă film SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Redă fișiere video"
 ${LangFileString} Action_OnArrivalMusicFiles "Redă fișiere audio"
 ${LangFileString} Action_OnArrivalDVDAudio "Redă DVD audio"
+${LangFileString} Action_OnArrivalBluray "Redare Blu-ray"
+
 ${LangFileString} License_NextText "Acum sunteți conștienți de drepturile dumneavoastră. Faceți clic pe Următorul pentru a continua."
 
 ${LangFileString} Detail_CheckProcesses "Se verifică procesele..."
