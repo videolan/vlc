@@ -180,4 +180,5 @@ int main(void)
     free(url);
     vlc_close(*lfd);
     free(lfd);
+    return 0;
 }
