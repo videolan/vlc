@@ -1715,7 +1715,7 @@ static int MP4_ReadBox_esds( stream_t *p_stream, MP4_Box_t *p_box )
 
 
     MP4_GET1BYTE( i_type );
-    if( i_type == 0x03 ) /* MP4ESDescrTag ISO/IEC 14496-1 8.3.3 */
+    if( i_type == 0x03 ) /* MP4ESDescrTag ISO/IEC 14496-1 */
     {
         i_len = MP4_ReadLengthDescriptor( &p_peek, &i_read );
         if( unlikely(i_len == UINT64_C(-1)) )

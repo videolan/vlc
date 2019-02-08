@@ -52,7 +52,7 @@ static void SetupGlobalExtensions( mp4_track_t *p_track, MP4_Box_t *p_sample )
 static void SetupESDS( demux_t *p_demux, mp4_track_t *p_track, const MP4_descriptor_decoder_config_t *p_decconfig )
 {
     /* First update information based on i_objectTypeIndication */
-    /* See 14496-1 and http://www.mp4ra.org/object.html */
+    /* See 14496-1 and http://mp4ra.org/#/object_types */
     switch( p_decconfig->i_objectProfileIndication )
     {
     case( 0x20 ): /* MPEG4 VIDEO */

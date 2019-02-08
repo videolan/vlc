@@ -1018,7 +1018,7 @@ typedef struct MP4_descriptor_SL_config_s
 } MP4_descriptor_SL_config_t;
 
 
-typedef struct MP4_descriptor_ES_s
+typedef struct MP4_descriptor_ES_s /* ISO/IEC 14496-1 8.3.3 ES_DescrTag */
 {
     uint16_t i_ES_ID;
     int      b_stream_dependence;
