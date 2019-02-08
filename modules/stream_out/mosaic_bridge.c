@@ -543,11 +543,11 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     else
     {
         /* TODO: chroma conversion if needed */
+        video_format_t pic_fmt = p_pic->format;
+        pic_fmt.i_sar_num = p_fmt_in->i_sar_num;
+        pic_fmt.i_sar_den = p_fmt_in->i_sar_den;
 
-        p_new_pic = picture_New( p_pic->format.i_chroma,
-                                 p_pic->format.i_width, p_pic->format.i_height,
-                                 p_fmt_in->i_sar_num,
-                                 p_fmt_in->i_sar_den );
+        p_new_pic = picture_NewFromFormat( &pic_fmt );
         if( !p_new_pic )
         {
             picture_Release( p_pic );
