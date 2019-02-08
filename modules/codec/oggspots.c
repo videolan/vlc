@@ -267,12 +267,12 @@ static int ProcessHeader(decoder_t* p_dec)
      * latter are underspecified. */
 
     if (p_sys->b_packetizer) {
-        void* p_extra = realloc(p_dec->fmt_out.p_extra,
+        void* p_new_extra = realloc(p_dec->fmt_out.p_extra,
                                 p_dec->fmt_in.i_extra);
-        if (unlikely(p_extra == NULL)) {
+        if (unlikely(p_new_extra == NULL)) {
             return VLC_ENOMEM;
         }
-        p_dec->fmt_out.p_extra = p_extra;
+        p_dec->fmt_out.p_extra = p_new_extra;
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         memcpy(p_dec->fmt_out.p_extra,
                p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra);
