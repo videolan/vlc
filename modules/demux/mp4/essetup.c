@@ -1082,6 +1082,7 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
                 p_track->fmt.i_codec = VLC_CODEC_U8;
             else
                 p_track->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+            p_track->fmt.i_original_fourcc = p_track->fmt.i_codec;
 
             /* Buggy files workaround */
             if( (p_track->i_timescale != p_soun->i_sampleratehi) )
@@ -1099,18 +1100,22 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         }
 
         case ATOM_in24:
+            p_track->fmt.i_original_fourcc =
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_S24L : VLC_CODEC_S24B;
             break;
         case ATOM_in32:
+            p_track->fmt.i_original_fourcc =
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_S32L : VLC_CODEC_S32B;
             break;
         case ATOM_fl32:
+            p_track->fmt.i_original_fourcc =
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_F32L : VLC_CODEC_F32B;
             break;
         case ATOM_fl64:
+            p_track->fmt.i_original_fourcc =
             p_track->fmt.i_codec = p_enda && BOXDATA(p_enda)->i_little_endian == 1 ?
                                     VLC_CODEC_F64L : VLC_CODEC_F64B;
             break;
