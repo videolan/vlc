@@ -272,7 +272,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         /* fallthrough */
     case VLC_CODEC_MP2V:
         /* MPEG-I=0x6b, MPEG-II = 0x60 -> 0x65 */
-        i_object_type_indication = 0x65;
+        i_object_type_indication = 0x61; /* Visual 13818-2 Main Profile */
         break;
     case VLC_CODEC_MP1V:
         i_object_type_indication = 0x6a; /* Visual ISO/IEC 11172-2  */
