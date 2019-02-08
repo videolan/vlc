@@ -282,6 +282,7 @@ static bo_t *GetESDS(mp4mux_trackinfo_t *p_track)
         /* FIXME for mpeg2-aac == 0x66->0x68 */
         i_object_type_indication = 0x40;
         break;
+    case VLC_CODEC_MP3:
     case VLC_CODEC_MPGA:
         i_object_type_indication =
             p_track->fmt.audio.i_rate < 32000 ? 0x69 : 0x6b;
