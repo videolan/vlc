@@ -1038,7 +1038,8 @@ static bo_t *GetSounBox(vlc_object_t *p_obj, mp4mux_trackinfo_t *p_track, bool b
     vlc_fourcc_t codec = p_track->fmt.i_codec;
     char fcc[4];
 
-    if (codec == VLC_CODEC_MPGA) {
+    if (codec == VLC_CODEC_MPGA ||
+        codec == VLC_CODEC_MP3) {
         if (b_mov) {
             b_descr = false;
             memcpy(fcc, ".mp3", 4);
