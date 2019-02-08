@@ -497,13 +497,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
     {
         video_format_t fmt_out;
 
-        memset( &fmt_out, 0, sizeof(video_format_t) );
-
-
-        if( p_sys->i_chroma )
-            fmt_out.i_chroma = p_sys->i_chroma;
-        else
-            fmt_out.i_chroma = VLC_CODEC_I420;
+        video_format_Init( &fmt_out, p_sys->i_chroma ? p_sys->i_chroma : VLC_CODEC_I420 );
 
         const unsigned i_fmt_in_aspect =
             (int64_t)VOUT_ASPECT_FACTOR *
@@ -533,6 +527,7 @@ static void decoder_queue_video( decoder_t *p_dec, picture_t *p_pic )
 
         p_new_pic = image_Convert( p_sys->p_image,
                                    p_pic, p_fmt_in, &fmt_out );
+        video_format_Clean( &fmt_out );
         if( p_new_pic == NULL )
         {
             msg_Err( p_stream, "image conversion failed" );
