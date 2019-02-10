@@ -1,17 +1,17 @@
 # Hebrew translation
-# Copyright (C) 2018 VideoLAN
+# Copyright (C) 2019 VideoLAN
 # This file is distributed under the same license as the VLC package.
 #
 # Translators:
 # Amir Aharoni <amir.aharoni@mail.huji.ac.il>, 2016
-# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2018
+# Yaron Shahrabani <sh.yaron@gmail.com>, 2014-2019
 msgid ""
 msgstr ""
-"Project-Id-Version: vlc 3.0.3\n"
+"Project-Id-Version: vlc 3.0.7\n"
 "Report-Msgid-Bugs-To: vlc-devel@videolan.org\n"
 "POT-Creation-Date: 2018-12-19 17:55+0100\n"
-"PO-Revision-Date: 2018-07-05 17:45+0200\n"
-"Last-Translator: VideoLAN <videolan@videolan.org>, 2018\n"
+"PO-Revision-Date: 2019-02-10 15:25+0100\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>, 2019\n"
 "Language-Team: Hebrew (https://www.transifex.com/yaron/teams/16553/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -226,11 +226,11 @@ msgstr ""
 
 #: include/vlc_config_cat.h:112
 msgid "Demuxers"
-msgstr "מפרידי שטפי נתונים (Demuxers)"
+msgstr "מפלגים (Demuxers)"
 
 #: include/vlc_config_cat.h:113
 msgid "Demuxers are used to separate audio and video streams."
-msgstr "שימוש במפרידי שטפי הנתונים לצורך הפרדת שטפי נתוני השמע והווידאו."
+msgstr "מפלגים משמשים להפרדת תזרימי שמע ווידאו."
 
 #: include/vlc_config_cat.h:115
 msgid "Video codecs"
@@ -348,7 +348,7 @@ msgstr "VOD"
 
 #: include/vlc_config_cat.h:169
 msgid "VLC's implementation of Video On Demand"
-msgstr "יישום של VLC ל-\"וידאו בדרישה\" (Video On Demand)"
+msgstr "היישום של VLC ל־„וידאו לפי דרישה” (Video On Demand)"
 
 #: include/vlc_config_cat.h:173 src/libvlc-module.c:2070
 #: src/playlist/engine.c:243 modules/demux/playlist/playlist.c:64
@@ -595,22 +595,22 @@ msgstr ""
 "videolan.org\">וויקי</a> של VideoLAN.</p><p>אם התחלת להשתמש בנגן המדיה VLC "
 "לאחרונה, נא לקרוא את<br><a href=\"http://wiki.videolan.org/Documentation:"
 "VLC_for_dummies\"><em>מדריך ההיכרות עם נגן המדיה VLC</em></a>.</p><p>ניתן "
-"למצוא קצת מידע על כיצד להשתמש בנגן במסמך <br>\"<a href=\"http://wiki."
-"videolan.org/Documentation:Play_HowTo\"><em>מדריך לנגינת קבצים עם נגן המדיה "
-"VLC</em></a>\".</p><p>לכל משימות השמירה, המרה, התמרה, קידוד, ריבוב והזרמה, "
-"ניתן למצוא מידע חיוני ב<a href=\"http://wiki.videolan.org/Documentation:"
-"Streaming_HowTo\">תיעוד ההזרמה</a>.</p><p>אם המינוח אינו ברור לך ניתן לעיין "
-"ב<a href=\"http://wiki.videolan.org/Knowledge_Base\">מאגר המידע</a>.</"
-"p><p>כדי להבין מה הם קיצורי המקלדת העיקריים, ניתן לקרוא את העמוד <a href="
-"\"http://wiki.videolan.org/Hotkeys\">קיצורים</a>.</p><h3>עזרה</h3><p>על כל "
-"שאלה שעולה ניתן לפנות אל ה<a href=\"http://www.videolan.org/support/faq.html"
-"\">שו״ת</a>.</p><p>בשלב זה תהיה לך האפשרות לשאול ולענות על שאלות ב<a href="
-"\"http://forum.videolan.org\">פורומים</a>, ב<a href=\"http://www.videolan."
-"org/vlc/lists.html\">רשימות התפוצה</a> או בערוץ ה־IRC שלנו(<em>#videolan</"
-"em> בשרת irc.freenode.net).</p><h3>תרומה למיזם</h3><p>ניתן לסייע למיזם "
-"VideoLAN באמצעות הקדשת חלק מזמנך בעזרה לקהילה, לעצב ערכות עיצוב, לתרגם את "
-"התיעוד, לבדוק את הקוד ועוד. ניתן גם להעניק ציוד ומימון כדי לעזור לנו. וכמובן "
-"מוטב לעזור <b>לקדם</b>את נגן המדיה VLC.</p></body></html>"
+"למצוא קצת מידע על כיצד להשתמש בנגן במסמך <br>„<a href=\"http://wiki.videolan."
+"org/Documentation:Play_HowTo\"><em>מדריך לנגינת קבצים עם נגן המדיה VLC</em></"
+"a>”.</p><p>לכל משימות השמירה, המרה, התמרה, קידוד, ריבוב והזרמה, ניתן למצוא "
+"מידע חיוני ב<a href=\"http://wiki.videolan.org/Documentation:Streaming_HowTo"
+"\">תיעוד ההזרמה</a>.</p><p>אם המינוח אינו ברור לך ניתן לעיין ב<a href="
+"\"http://wiki.videolan.org/Knowledge_Base\">מאגר המידע</a>.</p><p>כדי להבין "
+"מה הם קיצורי המקלדת העיקריים, ניתן לקרוא את העמוד <a href=\"http://wiki."
+"videolan.org/Hotkeys\">קיצורים</a>.</p><h3>עזרה</h3><p>על כל שאלה שעולה ניתן "
+"לפנות אל ה<a href=\"http://www.videolan.org/support/faq.html\">שו״ת</a>.</"
+"p><p>בשלב זה תהיה לך האפשרות לשאול ולענות על שאלות ב<a href=\"http://forum."
+"videolan.org\">פורומים</a>, ב<a href=\"http://www.videolan.org/vlc/lists.html"
+"\">רשימות התפוצה</a> או בערוץ ה־IRC שלנו (<em>‎#videolan</em> בשרת irc."
+"freenode.net).</p><h3>תרומה למיזם</h3><p>ניתן לסייע למיזם VideoLAN באמצעות "
+"הקדשת חלק מזמנך בעזרה לקהילה, לעצב ערכות עיצוב, לתרגם את התיעוד, לבדוק את "
+"הקוד ועוד. ניתן גם להעניק ציוד ומימון כדי לעזור לנו. וכמובן מוטב לעזור "
+"<b>לקדם</b>את נגן המדיה VLC.</p></body></html>"
 
 #: src/audio_output/filters.c:267
 msgid "Audio filtering failed"
@@ -641,7 +641,7 @@ msgstr "ספקטרום"
 
 #: src/audio_output/output.c:275
 msgid "VU meter"
-msgstr ""
+msgstr "מד VU"
 
 #: src/audio_output/output.c:314 src/libvlc-module.c:201
 msgid "Audio filters"
@@ -667,7 +667,7 @@ msgstr "מקורי"
 
 #: src/audio_output/output.c:431 src/libvlc-module.c:197
 msgid "Dolby Surround"
-msgstr "דולבי סראונד"
+msgstr "Dolby Surround"
 
 #: src/audio_output/output.c:436 src/libvlc-module.c:196
 #: modules/access/alsa.c:38 modules/access/oss.c:64
@@ -968,12 +968,12 @@ msgstr "כן"
 #: src/input/es_out.c:2141
 #, c-format
 msgid "DTVCC Closed captions %u"
-msgstr ""
+msgstr "כתוביות סמויות מסוג DTVCC ‏%u"
 
 #: src/input/es_out.c:2143
 #, c-format
 msgid "Closed captions %u"
-msgstr ""
+msgstr "כתוביות סמויות %u"
 
 #: src/input/es_out.c:3096
 msgid "Original ID"
@@ -1201,7 +1201,7 @@ msgstr ""
 
 #: src/input/es_out.c:3291
 msgid "Projection"
-msgstr ""
+msgstr "הקרנה"
 
 #: src/input/es_out.c:3293
 msgctxt "ViewPoint"
@@ -1561,6 +1561,8 @@ msgid ""
 "This enables colorization of the messages sent to the console. Your terminal "
 "needs Linux color support for this to work."
 msgstr ""
+"תכונה זו מאפשרת את צביעת ההודעות שנשלחות למסוף. לתכנית המסוף שלך צריכה להיות "
+"תמיכה בלינוקס כדי שהתכונה תפעל."
 
 #: src/libvlc-module.c:99
 msgid "Show advanced options"
@@ -1707,13 +1709,15 @@ msgstr ""
 
 #: src/libvlc-module.c:174
 msgid "Force S/PDIF support"
-msgstr ""
+msgstr "אילוץ תמיכה ב־S/PDIF"
 
 #: src/libvlc-module.c:176
 msgid ""
 "This option should be used when the audio output can't negotiate S/PDIF "
 "support."
 msgstr ""
+"יש להשתמש באפשרות זו רק כאשר לפלט השמע אין אפשרות לנהל משא ומתן על תמיכה ב־S/"
+"PDIF."
 
 #: src/libvlc-module.c:178
 msgid "Force detection of Dolby Surround"
@@ -2314,6 +2318,8 @@ msgid ""
 "(1:1). If you have a 16:9 screen, you might need to change this to 4:3 in "
 "order to keep proportions."
 msgstr ""
+"תכונה זו מקבעת את יחס התצוגה. לרוב הצגים יש יחס תצוגה ישיר (1:1). אם יש לך "
+"מסך מסוג 16:9, יכול להיות שיהיה עליך להחליף ל־4:3 כדי לשמור על היחס."
 
 #: src/libvlc-module.c:468 modules/gui/macosx/VLCSimplePrefsController.m:301
 msgid "Skip frames"
@@ -2598,7 +2604,7 @@ msgstr "מזהה התזרים של רצועת הכתוביות לשימוש."
 
 #: src/libvlc-module.c:612
 msgid "Preferred Closed Captions decoder"
-msgstr ""
+msgstr "מפענח כתוביות סמויות מועדף"
 
 #: src/libvlc-module.c:616
 msgid "Preferred video resolution"
@@ -2705,8 +2711,8 @@ msgid ""
 "is experimental, not all formats are supported. Use a '#' separated list of "
 "inputs."
 msgstr ""
-"אפשרות זו מאפשרת לך לנגן ממספר ערוצי קלט בו זמנית. תכונה זו הנה נסיונית, לא "
-"כל התבניות נתמכות. יש להשתמש ברשימת ערוצי קלט המופרדת ב־'#'."
+"אפשרות זו מאפשרת לך לנגן ממספר ערוצי קלט בו זמנית. תכונה זו היא ניסיונית, לא "
+"כל התבניות נתמכות. יש להשתמש ברשימת ערוצי קלט המופרדת ב־‚#’."
 
 #: src/libvlc-module.c:665
 msgid "Bookmarks list for a stream"
@@ -2721,7 +2727,7 @@ msgstr ""
 
 #: src/libvlc-module.c:671
 msgid "Record directory"
-msgstr ""
+msgstr "תיקיית הקלטה"
 
 #: src/libvlc-module.c:673
 msgid "Directory where the records will be stored"
@@ -2952,7 +2958,7 @@ msgstr "תום זמן חיבור ה־TCP"
 
 #: src/libvlc-module.c:801
 msgid "Default TCP connection timeout (in milliseconds)."
-msgstr ""
+msgstr "תום זמן חיבור TCP כבררת מחדל (במילישניות)."
 
 #: src/libvlc-module.c:803
 msgid "HTTP server address"
@@ -3037,21 +3043,23 @@ msgstr "קובץ מפתח פרטי זה (מבנה קובץ PEM) משמש ל־TLS
 
 #: src/libvlc-module.c:847
 msgid "HTTP proxy"
-msgstr ""
+msgstr "מתווך HTTP"
 
 #: src/libvlc-module.c:849
 msgid ""
 "HTTP proxy to be used It must be of the form http://[user@]myproxy.mydomain:"
 "myport/ ; if empty, the http_proxy environment variable will be tried."
 msgstr ""
+"מתווך ה־HTTP לשימוש. עליו להיות בתצורה http://[user@]myproxy.mydomain:"
+"myport/‎, אם השדה נשאר ריק אז יתבצע חיפוש אחר משתנה הסביבה http_proxy."
 
 #: src/libvlc-module.c:853
 msgid "HTTP proxy password"
-msgstr ""
+msgstr "ססמת מתווך HTTP"
 
 #: src/libvlc-module.c:855
 msgid "If your HTTP proxy requires a password, set it here."
-msgstr ""
+msgstr "אם מתווך ה־HTTP שלך דורש ססמה, ניתן להגדיר אותה כאן."
 
 #: src/libvlc-module.c:857
 msgid "SOCKS server"
@@ -3131,11 +3139,11 @@ msgstr ""
 
 #: src/libvlc-module.c:894
 msgid "Date metadata"
-msgstr ""
+msgstr "נתוני על תאריך"
 
 #: src/libvlc-module.c:896
 msgid "Allows you to specify a \"date\" metadata for an input."
-msgstr ""
+msgstr "מאפשר לך לציין נתוני על לציון „תאריך” לקלט."
 
 #: src/libvlc-module.c:898
 msgid "URL metadata"
@@ -3406,7 +3414,7 @@ msgstr "שימוש במטמון תוספים שישפר באופן מהותי א
 
 #: src/libvlc-module.c:1053
 msgid "Scan for new plugins"
-msgstr ""
+msgstr "סריקה לאיתור תוספים חדשים"
 
 #: src/libvlc-module.c:1055
 msgid ""
@@ -3572,7 +3580,7 @@ msgstr ""
 
 #: src/libvlc-module.c:1147
 msgid "Show hidden files"
-msgstr ""
+msgstr "הצגת קבצים מוסתרים"
 
 #: src/libvlc-module.c:1149
 msgid "Ignore files starting with '.'"
@@ -3692,15 +3700,15 @@ msgstr "התעלמות"
 
 #: src/libvlc-module.c:1214
 msgid "Volume control"
-msgstr ""
+msgstr "בקרת עצמת שמע"
 
 #: src/libvlc-module.c:1215
 msgid "Position control"
-msgstr ""
+msgstr "בקרת מיקום"
 
 #: src/libvlc-module.c:1215
 msgid "Position control reversed"
-msgstr ""
+msgstr "בקרת מיקום הפוכה"
 
 #: src/libvlc-module.c:1218
 msgid "Mouse wheel vertical axis control"
@@ -5004,7 +5012,7 @@ msgstr "שמירת הקובץ נכשלה"
 #: src/misc/update.c:581
 #, c-format
 msgid "Failed to open \"%s\" for writing"
-msgstr "אירע כשל בפתיחת \"%s\" לכתיבה"
+msgstr "פתיחת „%s” לכתיבה נכשלה"
 
 #: src/misc/update.c:596 src/misc/update.c:726 modules/access/dvb/scan.c:826
 #: modules/demux/avi/avi.c:2734
@@ -5405,7 +5413,7 @@ msgstr "קירגיזית"
 
 #: src/text/iso-639_def.h:112
 msgid "Komi"
-msgstr ""
+msgstr "קומי"
 
 #: src/text/iso-639_def.h:113
 msgid "Korean"
@@ -5557,7 +5565,7 @@ msgstr "פולנית"
 
 #: src/text/iso-639_def.h:151
 msgid "Portuguese"
-msgstr "פורטוגזית"
+msgstr "פורטוגלית"
 
 #: src/text/iso-639_def.h:152
 msgid "Pushto"
@@ -5653,7 +5661,7 @@ msgstr ""
 
 #: src/text/iso-639_def.h:175
 msgid "Sundanese"
-msgstr ""
+msgstr "סונדאית"
 
 #: src/text/iso-639_def.h:176
 msgid "Swahili"
@@ -5858,7 +5866,7 @@ msgstr "ALSA"
 
 #: modules/access/alsa.c:57
 msgid "ALSA audio capture"
-msgstr ""
+msgstr "לכידת שמע עם ALSA"
 
 #: modules/access/attachment.c:44
 msgid "Attachment"
@@ -5977,7 +5985,7 @@ msgstr ""
 
 #: modules/access/bluray.c:918
 msgid "Java required"
-msgstr ""
+msgstr "יש צורך ב־Java"
 
 #: modules/access/bluray.c:919
 #, c-format
@@ -5985,14 +5993,16 @@ msgid ""
 "This Blu-ray disc requires Java for menus support.%s\n"
 "The disc will be played without menus."
 msgstr ""
+"תקליטור Blu-ray זה דורש Java לטובת תמיכה בתפריטים. %s\n"
+"התקליטור יופעל ללא תפריטים."
 
 #: modules/access/bluray.c:920
 msgid "Java was not found on your system."
-msgstr ""
+msgstr "לא נמצאה התקנת Java על המערכת שלך."
 
 #: modules/access/bluray.c:943
 msgid "Failed to start bluray playback. Please try without menu support."
-msgstr ""
+msgstr "נגינת ה־bluray נכשלה. נא לנסות ללא תמיכה בתפריטים."
 
 #: modules/access/bluray.c:974 modules/access/bluray.c:2733
 #: modules/access/bluray.c:2738
@@ -6001,7 +6011,7 @@ msgstr "שגיאת Blu-ray"
 
 #: modules/access/bluray.c:2042
 msgid "Top Menu"
-msgstr ""
+msgstr "תפריט עליון"
 
 #: modules/access/bluray.c:2045
 msgid "First Play"
@@ -6196,7 +6206,7 @@ msgstr "10 סיביות"
 
 #: modules/access/decklink.cpp:353 modules/demux/ty.c:769
 msgid "Closed captions 1"
-msgstr ""
+msgstr "כתוביות סמויות 1"
 
 #: modules/access/dshow/dshow.cpp:92
 msgid "Cable"
@@ -6441,12 +6451,12 @@ msgstr ""
 #: modules/access/dshow/dshow.cpp:1055
 msgid ""
 "The device you selected cannot be used, because its type is not supported."
-msgstr ""
+msgstr "לא ניתן להשתמש במכשיר שבחרת כיוון שהסוג שלו לא נתמך."
 
 #: modules/access/dshow/dshow.cpp:1126
 #, c-format
 msgid "The capture device \"%s\" does not support the required parameters."
-msgstr ""
+msgstr "התקן הלכידה „%s” אינו תומך במשתנים הנדרשים."
 
 #: modules/access/dsm/access.c:61 modules/access/dsm/sd.c:138
 msgid "Windows networks"
@@ -6685,7 +6695,7 @@ msgstr "0.25"
 
 #: modules/access/dtv/access.c:168
 msgid "Transport stream ID"
-msgstr ""
+msgstr "מזהה תזרים תעבורה"
 
 #: modules/access/dtv/access.c:170
 msgid "Polarization (Voltage)"
@@ -6727,6 +6737,9 @@ msgid ""
 "receiver are long, higher voltage may be required.\n"
 "Not all receivers support this."
 msgstr ""
+"אם הכבלים בין מגבר ה־LNB של צלחת הלוויין לבין המגבר הם ארוכים, יכול להיות "
+"שיש צורך במתח גבוה.\n"
+"לא כל המגברים תומכים בזה."
 
 #: modules/access/dtv/access.c:185
 msgid "Local oscillator low frequency (kHz)"
@@ -6890,6 +6903,8 @@ msgid ""
 "The selected digital tuner does not support the specified parameters.\n"
 "Please check the preferences."
 msgstr ""
+"המכוון הדיגיטלי הנבחר לא תומך במשתנים שסופקו.\n"
+"נא לבדוק את ההעדפות."
 
 #: modules/access/dv.c:57
 msgid "Digital Video (Firewire/ieee1394) input"
@@ -6935,7 +6950,7 @@ msgstr ""
 
 #: modules/access/dvb/access.c:80
 msgid "DVB input with v4l2 support"
-msgstr ""
+msgstr "קלט DVB עם תמיכה ב־v4l2"
 
 #: modules/access/dvb/scan.c:817
 #, c-format
@@ -6978,7 +6993,7 @@ msgstr ""
 
 #: modules/access/dvdnav.c:102
 msgid "DVDnav demuxer"
-msgstr ""
+msgstr "מפלג DVDnav"
 
 #: modules/access/dvdnav.c:298 modules/access/dvdread.c:201
 #: modules/access/dvdread.c:216 modules/access/dvdread.c:471
@@ -6997,7 +7012,7 @@ msgstr "DVD ללא תפריטים"
 
 #: modules/access/dvdread.c:77
 msgid "DVDRead Input (no menu support)"
-msgstr ""
+msgstr "קלט DVDRead (ללא תמיכה בתפריטים)"
 
 #: modules/access/dvdread.c:202
 #, c-format
@@ -7367,7 +7382,7 @@ msgstr "חיבור אוטומטי"
 
 #: modules/access/jack.c:64
 msgid "Automatically connect VLC input ports to available output ports."
-msgstr ""
+msgstr "לחבר את פתחות הקלט של VLC אל פתחות הפלט הזמינות אוטומטית."
 
 #: modules/access/jack.c:67
 msgid "JACK audio input"
@@ -7492,11 +7507,11 @@ msgstr ""
 
 #: modules/access/live555.cpp:97
 msgid "RTP/RTSP/SDP demuxer (using Live555)"
-msgstr ""
+msgstr "מפלג RTP/RTSP/SDP (באמצעות Live555)"
 
 #: modules/access/live555.cpp:106
 msgid "RTSP/RTP access and demux"
-msgstr ""
+msgstr "גישה ופילוג של RTSP/RTP"
 
 #: modules/access/live555.cpp:111 modules/access/live555.cpp:112
 msgid "Use RTP over RTSP (TCP)"
@@ -7504,11 +7519,11 @@ msgstr "שימוש ב־RTP במקום ב־RTSP (TCP)"
 
 #: modules/access/live555.cpp:115
 msgid "Client port"
-msgstr ""
+msgstr "פתחת לקוח"
 
 #: modules/access/live555.cpp:116
 msgid "Port to use for the RTP source of the session"
-msgstr ""
+msgstr "הפתחה לשימוש עבור מקור ה־RTP של ההפעלה"
 
 #: modules/access/live555.cpp:118 modules/access/live555.cpp:119
 msgid "Force multicast RTP via RTSP"
@@ -7520,7 +7535,7 @@ msgstr ""
 
 #: modules/access/live555.cpp:126
 msgid "HTTP tunnel port"
-msgstr ""
+msgstr "פתחת מנהרת HTTP"
 
 #: modules/access/live555.cpp:127
 msgid "Port to use for tunneling the RTSP/RTP over HTTP."
@@ -7697,6 +7712,8 @@ msgid ""
 "RTCP packets will be received on this transport protocol port. If zero, "
 "multiplexed RTP/RTCP is used."
 msgstr ""
+"חבילות RTCP יתקבלו בפרוטוקול תעבורה זה. אם הערך הוא 0, ייעשה שימוש ב־RTP/"
+"RTCP מרובב."
 
 #: modules/access/rtp/rtp.c:49 modules/stream_out/rtp.c:144
 msgid "SRTP key (hexadecimal)"
@@ -8131,7 +8148,7 @@ msgstr "התקן לכידת VBI"
 
 #: modules/access/v4l2/v4l2.c:48
 msgid "The device node where VBI data can be read (for closed captions)."
-msgstr ""
+msgstr "מפרק המכשיר ממנו ניתן לקרוא נתוני VBI (לכתוביות סמויות)."
 
 #: modules/access/v4l2/v4l2.c:50 modules/stream_out/standard.c:92
 msgid "Standard"
@@ -9130,11 +9147,11 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/dolby.c:50
 msgid "Simple decoder for Dolby Surround encoded streams"
-msgstr ""
+msgstr "מפענח פשוט עבור תזרימים שהוצפנו עם Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/dolby.c:51
 msgid "Dolby Surround decoder"
-msgstr ""
+msgstr "מפענח Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:53
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:247
@@ -9145,6 +9162,10 @@ msgid ""
 "tiring when listening to music for long periods of time.\n"
 "It works with any source format from mono to 7.1."
 msgstr ""
+"אפקט זה מעניק את התחושה של עמידה בחדר עם מערכת רמקולים 7.1 על אף השימוש "
+"באזניות בלבד, מה שמספק חווית שמע יותר אמתית. אמור להיות נוח יותר ומעייף פחות "
+"בעת האזנה למוזיקה במשך זמן ממושך.\n"
+"עובד עם כל תצורת קלט החל ממונו ועד 7.1."
 
 #: modules/audio_filter/channel_mixer/headphone.c:60
 msgid "Characteristic dimension"
@@ -9167,13 +9188,15 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/headphone.c:70
 msgid "No decoding of Dolby Surround"
-msgstr ""
+msgstr "אין פענוח של Dolby Surround"
 
 #: modules/audio_filter/channel_mixer/headphone.c:72
 msgid ""
 "Dolby Surround encoded streams won't be decoded before being processed by "
 "this filter. Enabling this setting is not recommended."
 msgstr ""
+"תזרימים שהוצפנו עם Dolby Surround לא יפוענחו בטרם העיבוד בעזרת מסנן זה. "
+"הפעלת הגדרה זו אינה מומלצת."
 
 #: modules/audio_filter/channel_mixer/headphone.c:76
 msgid "Headphone virtual spatialization effect"
@@ -9248,7 +9271,7 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:50
 msgid "HRTF file for the binauralization"
-msgstr ""
+msgstr "קובץ HRTF עבור ההדמיה הדו־ערוצית"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:51
 msgid "Custom HRTF (Head-related transfer function) file in the SOFA format."
@@ -9256,11 +9279,11 @@ msgstr ""
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:54
 msgid "Headphones mode (binaural)"
-msgstr ""
+msgstr "מצב אזניות (דו־ערוצי)"
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:55
 msgid "If the output is stereo, render ambisonics with the binaural decoder."
-msgstr ""
+msgstr "אם הפלט הוא סטריאו, יש לפענח קבצים מסוג ambisonic עם המפענח הדו־ערוצי."
 
 #: modules/audio_filter/channel_mixer/spatialaudio.cpp:65
 msgid "Ambisonics renderer and binauralizer"
@@ -9380,20 +9403,20 @@ msgstr ""
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:229
 #: modules/gui/qt/components/extended_panels.cpp:1299
 msgid "Ratio"
-msgstr ""
+msgstr "יחס"
 
 #: modules/audio_filter/compressor.c:168
 msgid "Set the ratio (n:1)."
-msgstr ""
+msgstr "הגדרת היחס (n:1)."
 
 #: modules/audio_filter/compressor.c:170
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:230
 msgid "Knee radius"
-msgstr ""
+msgstr "רדיוס ברך"
 
 #: modules/audio_filter/compressor.c:171
 msgid "Set the knee radius in dB."
-msgstr ""
+msgstr "הגדרת רדיוס הברך בדציבלים."
 
 #: modules/audio_filter/compressor.c:173
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:231
@@ -9443,21 +9466,21 @@ msgstr ""
 
 #: modules/audio_filter/equalizer.c:67
 msgid "Use VLC frequency bands"
-msgstr ""
+msgstr "להשתמש בערוצי התדרים של VLC"
 
 #: modules/audio_filter/equalizer.c:69
 msgid ""
 "Use the VLC frequency bands. Otherwise, use the ISO Standard frequency bands."
-msgstr ""
+msgstr "להשתמש בערוצי התדרים של VLC. אם לא, להשתמש בערוצי התדרים לפי תקן ISO."
 
 #: modules/audio_filter/equalizer.c:72
 msgid "Two pass"
-msgstr ""
+msgstr "שני מעברים"
 
 #: modules/audio_filter/equalizer.c:73
 #: modules/gui/macosx/VLCAudioEffectsWindowController.m:217
 msgid "Filter the audio twice. This provides a more intense effect."
-msgstr ""
+msgstr "לסנן את השמע פעמיים. האפקט שמתקבל הוא יותר עצמתי."
 
 #: modules/audio_filter/equalizer.c:76
 msgid "Global gain"
@@ -9960,16 +9983,16 @@ msgstr ""
 
 #: modules/audio_output/auhal.c:463
 msgid "System Sound Output Device"
-msgstr ""
+msgstr "התקן פלט שמע מערכת"
 
 #: modules/audio_output/auhal.c:542
 #, c-format
 msgid "%s (Encoded Output)"
-msgstr ""
+msgstr "%s (פלט מקודד)"
 
 #: modules/audio_output/auhal.c:1036
 msgid "Audio device is not configured"
-msgstr ""
+msgstr "לא מוגדר התקן שמע"
 
 #: modules/audio_output/auhal.c:1037
 msgid ""
@@ -9988,21 +10011,23 @@ msgstr "התקן פלט"
 
 #: modules/audio_output/directsound.c:63 modules/audio_output/mmdevice.c:1466
 msgid "Select your audio output device"
-msgstr ""
+msgstr "נא לבחור את התקן פלט השמע שלך"
 
 #: modules/audio_output/directsound.c:65
 msgid "Speaker configuration"
-msgstr ""
+msgstr "תצורת רמקולים"
 
 #: modules/audio_output/directsound.c:66
 msgid ""
 "Select speaker configuration you want to use. This option doesn't upmix! So "
 "NO e.g. Stereo -> 5.1 conversion."
 msgstr ""
+"נא לבחור תצורת רמקולים לשימוש. אפשרות זו אינה מערבלת כלפי מעלה! אז לא יתכן "
+"מצב המרה של סטריאו -> 5.1."
 
 #: modules/audio_output/directsound.c:70 modules/audio_output/mmdevice.c:1469
 msgid "Audio volume in hundredths of decibels (dB)."
-msgstr ""
+msgstr "עצמת שמע במאות דציבלים (dB)."
 
 #: modules/audio_output/directsound.c:73
 msgid "DirectX audio output"
@@ -10014,21 +10039,23 @@ msgstr "פורמט פלט"
 
 #: modules/audio_output/file.c:85
 msgid "Number of output channels"
-msgstr ""
+msgstr "מספר ערוצי הפלט"
 
 #: modules/audio_output/file.c:86
 msgid ""
 "By default (0), all the channels of the incoming will be saved but you can "
 "restrict the number of channels here."
 msgstr ""
+"כבררת מחדל (0), כל הערוצים הנכנסים יישמרו אך ניתן להגביל דרך כאן את מספר "
+"הערוצים."
 
 #: modules/audio_output/file.c:89
 msgid "Add WAVE header"
-msgstr ""
+msgstr "הוספת כותרת WAVE"
 
 #: modules/audio_output/file.c:90
 msgid "Instead of writing a raw file, you can add a WAV header to the file."
-msgstr ""
+msgstr "במקום לכתוב קובץ גולמי, ניתן להוסיף כותרת WAV לקובץ."
 
 #: modules/audio_output/file.c:108 modules/stream_out/stats.c:40
 #: share/lua/http/dialogs/create_stream.html:382
@@ -10037,7 +10064,7 @@ msgstr "קובץ פלט"
 
 #: modules/audio_output/file.c:109
 msgid "File to which the audio samples will be written to (\"-\" for stdout)."
-msgstr ""
+msgstr "קובץ שאליו ייכתבו דגימות השמע („-” כדי לפלוט אל stdout)."
 
 #: modules/audio_output/file.c:112
 msgid "File audio output"
@@ -10045,13 +10072,15 @@ msgstr "פלט שמע לקובץ"
 
 #: modules/audio_output/jack.c:83
 msgid "Automatically connect to writable clients"
-msgstr ""
+msgstr "להתחבר אוטומטית ללקוחות עם אפשרות כתיבה"
 
 #: modules/audio_output/jack.c:85
 msgid ""
 "If enabled, this option will automatically connect sound output to the first "
 "writable JACK clients found."
 msgstr ""
+"אם אפשרות זו פעילה, היא תחבר אוטומטית את פלט השמע ללקוחות ה־JACK הראשונים "
+"שנמצאים ויש אפשרות לכתוב אליהם."
 
 #: modules/audio_output/jack.c:89
 msgid "Connect to clients matching"
@@ -10065,11 +10094,11 @@ msgstr ""
 
 #: modules/audio_output/jack.c:94
 msgid "JACK client name"
-msgstr ""
+msgstr "שם לקוח JACK"
 
 #: modules/audio_output/jack.c:101
 msgid "JACK audio output"
-msgstr ""
+msgstr "פלט שמע JACK"
 
 #: modules/audio_output/kai.c:93
 msgid "Device"
@@ -10077,7 +10106,7 @@ msgstr "התקן"
 
 #: modules/audio_output/kai.c:95
 msgid "Select a proper audio device to be used by KAI."
-msgstr ""
+msgstr "נא לבחור התקן שמע מתאים לשימוש על ידי KAI."
 
 #: modules/audio_output/kai.c:98
 msgid "Open audio in exclusive mode."
@@ -10088,10 +10117,11 @@ msgid ""
 "Enable this option if you want your audio not to be interrupted by the other "
 "audio."
 msgstr ""
+"יש להפעיל אפשרות זו אם אינך מעוניין שהשמע שלך יופרע על ידי שמע ממקור אחר."
 
 #: modules/audio_output/kai.c:110
 msgid "K Audio Interface audio output"
-msgstr ""
+msgstr "פלט שמע של מנשק שמע K ‏(KAI)"
 
 #: modules/audio_output/mmdevice.c:1451 modules/gui/qt/ui/sprefs_audio.h:419
 msgid "HDMI/SPDIF audio passthrough"
@@ -10109,23 +10139,23 @@ msgstr ""
 
 #: modules/audio_output/mmdevice.c:1461
 msgid "Enabled (AC3/DTS only)"
-msgstr ""
+msgstr "מופעל (AC3/DTS בלבד)"
 
 #: modules/audio_output/mmdevice.c:1462
 msgid "Enabled"
-msgstr ""
+msgstr "מופעל"
 
 #: modules/audio_output/mmdevice.c:1473
 msgid "Windows Multimedia Device output"
-msgstr ""
+msgstr "פלט מכשיר מולטימדיה מסוג Windows"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Output back-end"
-msgstr ""
+msgstr "מנגנון פלט"
 
 #: modules/audio_output/mmdevice.c:1479
 msgid "Audio output back-end interface."
-msgstr ""
+msgstr "מנשק מנגנון פלט שמע."
 
 #: modules/audio_output/oss.c:70
 msgid "OSS device node path."
@@ -10137,11 +10167,11 @@ msgstr ""
 
 #: modules/audio_output/pulse.c:43
 msgid "Pulseaudio audio output"
-msgstr ""
+msgstr "פלט שמע Pulseaudio"
 
 #: modules/audio_output/sndio.c:39
 msgid "OpenBSD sndio audio output"
-msgstr ""
+msgstr "פלט שמע OpenBSD sndio"
 
 #: modules/audio_output/volume.h:30
 msgid "Software gain"
@@ -10167,7 +10197,7 @@ msgstr ""
 
 #: modules/audio_output/waveout.c:149
 msgid "WaveOut audio output"
-msgstr ""
+msgstr "פלט שמע WaveOut"
 
 #: modules/audio_output/waveout.c:710
 msgid "Microsoft Soundmapper"
@@ -10241,11 +10271,11 @@ msgstr ""
 
 #: modules/codec/arib/aribsub.c:46
 msgid "Ignore ruby (furigana)"
-msgstr ""
+msgstr "התעלמות מ־ruby‏ (פוריגנה)"
 
 #: modules/codec/arib/aribsub.c:47
 msgid "Ignore ruby (furigana) in the subtitle."
-msgstr ""
+msgstr "התעלמות מ־ruby‏ (פוריגנה) בכתוביות."
 
 #: modules/codec/arib/aribsub.c:48
 msgid "Use Core Text renderer"
@@ -10257,12 +10287,12 @@ msgstr ""
 
 #: modules/codec/arib/aribsub.c:53
 msgid "ARIB subtitles decoder"
-msgstr ""
+msgstr "מפענח כתוביות ARIB"
 
 #: modules/codec/arib/aribsub.c:54 modules/demux/mpeg/ts_psi.c:1085
 #: modules/demux/mpeg/ts_psi.c:1092
 msgid "ARIB subtitles"
-msgstr ""
+msgstr "כתוביות ARIB"
 
 #: modules/codec/avcodec/avcodec.c:50 modules/codec/avcodec/avcodec.c:54
 msgid "Non-ref"
@@ -10297,7 +10327,7 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.c:80
 msgid "FFmpeg audio/video decoder"
-msgstr ""
+msgstr "מפענח שמע/וידאו FFmpeg"
 
 #: modules/codec/avcodec/avcodec.c:82 modules/codec/gstreamer/gstdecode.c:96
 #: modules/codec/omxil/mediacodec.c:185 modules/codec/omxil/omxil.c:148
@@ -10312,7 +10342,7 @@ msgstr "קידוד"
 
 #: modules/codec/avcodec/avcodec.c:148
 msgid "FFmpeg audio/video encoder"
-msgstr ""
+msgstr "מקודד שמע/וידאו FFmpeg"
 
 #: modules/codec/avcodec/avcodec.h:56
 msgid "Direct rendering"
@@ -10406,11 +10436,11 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:105
 msgid "Codec name"
-msgstr ""
+msgstr "שם המפענח"
 
 #: modules/codec/avcodec/avcodec.h:106
 msgid "Internal libavcodec codec name"
-msgstr ""
+msgstr "שם מפענח libavcodec פנימי"
 
 #: modules/codec/avcodec/avcodec.h:108
 #: modules/gui/macosx/VLCSimplePrefsController.m:299
@@ -10434,27 +10464,27 @@ msgstr ""
 
 #: modules/codec/avcodec/avcodec.h:116
 msgid "Threads"
-msgstr ""
+msgstr "תת־תהליכים"
 
 #: modules/codec/avcodec/avcodec.h:117
 msgid "Number of threads used for decoding, 0 meaning auto"
-msgstr ""
+msgstr "מספר תת־התהליכים בהם נעשה שימוש לפענוח, 0 זה אוטומטי"
 
 #: modules/codec/avcodec/avcodec.h:124
 msgid "Ratio of key frames"
-msgstr ""
+msgstr "יחס שקופיות המפתח"
 
 #: modules/codec/avcodec/avcodec.h:125
 msgid "Number of frames that will be coded for one key frame."
-msgstr ""
+msgstr "מספר השקופיות שיקודדו בתור שקופית מפתח אחת."
 
 #: modules/codec/avcodec/avcodec.h:128
 msgid "Ratio of B frames"
-msgstr ""
+msgstr "יחס של שקופיות B"
 
 #: modules/codec/avcodec/avcodec.h:129
 msgid "Number of B frames that will be coded between two reference frames."
-msgstr ""
+msgstr "מספר שקופיות B שיקודדו בין שתי שקופיות סימוכין."
 
 #: modules/codec/avcodec/avcodec.h:132
 msgid "Video bitrate tolerance"
@@ -10669,7 +10699,7 @@ msgstr ""
 
 #: modules/codec/avcodec/d3d11va.c:63
 msgid "Direct3D11 Video Acceleration"
-msgstr ""
+msgstr "האצת וידאו Direct3D11"
 
 #: modules/codec/avcodec/dxva2.c:51
 msgid "DirectX Video Acceleration (DXVA) 2.0"
@@ -10686,6 +10716,12 @@ msgid ""
 "This is not an error inside VLC media player.\n"
 "Do not contact the VideoLAN project about this issue.\n"
 msgstr ""
+"מתברר כי בהתקנה של Libav/FFmpeg‏ (libavcodec) חסר המצפין הבא:\n"
+"%s.\n"
+"אם לא ידוע לך כיצד לתקן זאת, מוטב לך לבקש עזרה מצוות התמיכה של ההפצה שלך.\n"
+"\n"
+"זו אינה שגיאה בתוך נגן המדיה VLC.\n"
+"לא ליצור קשר עם מיזם VideoLAN בנוגע לתקלה זו.\n"
 
 #: modules/codec/avcodec/encoder.c:892
 msgid "unknown"
@@ -10736,7 +10772,7 @@ msgstr "CC 608/708"
 
 #: modules/codec/cc.c:57
 msgid "Closed Captions decoder"
-msgstr ""
+msgstr "מפענח כתוביות סמויות"
 
 #: modules/codec/cdg.c:88
 msgid "CDG video decoder"
@@ -11058,15 +11094,15 @@ msgstr ""
 
 #: modules/codec/jpeg.c:111
 msgid "JPEG image decoder"
-msgstr ""
+msgstr "מפענח תמונות JPEG"
 
 #: modules/codec/jpeg.c:120
 msgid "JPEG image encoder"
-msgstr ""
+msgstr "מצפין תמונות JPEG"
 
 #: modules/codec/kate.c:191 modules/codec/subsusf.c:44
 msgid "Formatted Subtitles"
-msgstr ""
+msgstr "כתוביות מעוצבות"
 
 #: modules/codec/kate.c:192
 msgid ""
@@ -11226,23 +11262,25 @@ msgstr ""
 
 #: modules/codec/kate.c:237
 msgid "Default font color"
-msgstr ""
+msgstr "צבע גופן כבררת מחדל"
 
 #: modules/codec/kate.c:238
 msgid ""
 "Default font color to use if the Kate stream does not specify a particular "
 "font color to use."
 msgstr ""
+"צבע הגופן לשימוש כבררת מחדל אם תזרים ה־Kate אינו מציין צבע גופן מסוים לשימוש."
 
 #: modules/codec/kate.c:242
 msgid "Default font alpha"
-msgstr ""
+msgstr "שקיפות גופן כבררת מחדל"
 
 #: modules/codec/kate.c:243
 msgid ""
 "Transparency of the default font color if the Kate stream does not specify a "
 "particular font color to use."
 msgstr ""
+"שקיפות בררת המחדל לצבע הגופן אם תזרים ה־Kate אינו מציין צבע מסוים לשימוש."
 
 #: modules/codec/kate.c:247
 msgid "Default background color"
@@ -11276,11 +11314,11 @@ msgstr ""
 
 #: modules/codec/kate.c:268
 msgid "Kate"
-msgstr ""
+msgstr "Kate"
 
 #: modules/codec/kate.c:269
 msgid "Kate overlay decoder"
-msgstr ""
+msgstr "מפענח שכבת על של Kate"
 
 #: modules/codec/kate.c:288
 msgid "Tiger rendering defaults"
@@ -12468,7 +12506,7 @@ msgstr ""
 
 #: modules/codec/ttml/ttml.c:54
 msgid "TTML demuxer"
-msgstr ""
+msgstr "מפלג TTML"
 
 #: modules/codec/twolame.c:56
 msgid ""
@@ -13685,7 +13723,7 @@ msgid ""
 msgstr ""
 "\n"
 "אזהרה: אם אין לך גישה עוד למנשק הגרפי, עליך לפתוח חלון שורת פקודה, לגשת "
-"לתיקייה בה התקנת את VLC ולהריץ את הפקודה \"vlc -I qt\"\n"
+"לתיקייה בה התקנת את VLC ולהריץ את הפקודה „vlc -I qt”\n"
 
 #: modules/control/lirc.c:47
 msgid "Change the lirc configuration file"
@@ -14248,11 +14286,11 @@ msgstr ""
 
 #: modules/demux/aiff.c:50
 msgid "AIFF demuxer"
-msgstr ""
+msgstr "מפלג AIFF"
 
 #: modules/demux/asf/asf.c:62
 msgid "ASF/WMV demuxer"
-msgstr ""
+msgstr "מפלג ASF/WMV"
 
 #: modules/demux/asf/asf.c:267 modules/demux/asf/asf.c:821
 msgid "Could not demux ASF stream"
@@ -14264,11 +14302,11 @@ msgstr ""
 
 #: modules/demux/au.c:51
 msgid "AU demuxer"
-msgstr ""
+msgstr "מפלג AU"
 
 #: modules/demux/avformat/avformat.c:41
 msgid "Avformat demuxer"
-msgstr ""
+msgstr "מפלג Avformat"
 
 #: modules/demux/avformat/avformat.c:42
 msgid "Avformat"
@@ -14276,7 +14314,7 @@ msgstr ""
 
 #: modules/demux/avformat/avformat.c:45
 msgid "Demuxer"
-msgstr ""
+msgstr "מפלג"
 
 #: modules/demux/avformat/avformat.c:54
 msgid "Avformat muxer"
@@ -14334,7 +14372,7 @@ msgstr "לתקן במידת הצורך"
 
 #: modules/demux/avi/avi.c:73
 msgid "AVI demuxer"
-msgstr ""
+msgstr "מפלג AVI"
 
 #: modules/demux/avi/avi.c:841 modules/demux/mp4/mp4.c:1679
 msgid ""
@@ -14372,11 +14410,11 @@ msgstr ""
 
 #: modules/demux/caf.c:53
 msgid "CAF demuxer"
-msgstr ""
+msgstr "מפלג CAF"
 
 #: modules/demux/cdg.c:43
 msgid "CDG demuxer"
-msgstr ""
+msgstr "מפלג CDG"
 
 #: modules/demux/demuxdump.c:32
 msgid "Dump module"
@@ -14408,7 +14446,7 @@ msgstr ""
 
 #: modules/demux/dirac.c:54
 msgid "Dirac video demuxer"
-msgstr ""
+msgstr "מפלג וידאו מסוג Dirac"
 
 #: modules/demux/directory.c:94
 msgid "Directory import"
@@ -14420,7 +14458,7 @@ msgstr ""
 
 #: modules/demux/flac.c:51
 msgid "FLAC demuxer"
-msgstr ""
+msgstr "מפלג FLAC"
 
 #: modules/demux/image.c:44
 msgid "ES ID"
@@ -14432,7 +14470,7 @@ msgstr ""
 
 #: modules/demux/image.c:54
 msgid "Decode at the demuxer stage"
-msgstr ""
+msgstr "פענוח בשלב הפילוג"
 
 #: modules/demux/image.c:56
 msgid "Forced chroma"
@@ -14446,35 +14484,37 @@ msgstr ""
 
 #: modules/demux/image.c:61
 msgid "Duration in seconds"
-msgstr ""
+msgstr "משך בשניות"
 
 #: modules/demux/image.c:63
 msgid ""
 "Duration in seconds before simulating an end of file. A negative value means "
 "an unlimited play time."
 msgstr ""
+"משך הזמן בשניות בטרם הדמיית סוף הקובץ. ערך שלילי משמעו זמן נגינה בלתי מוגבל."
 
 #: modules/demux/image.c:68
 msgid "Frame rate of the elementary stream produced."
-msgstr ""
+msgstr "קצב השקופיות של התזרים הבסיסי שנוצר."
 
 #: modules/demux/image.c:70
 msgid "Real-time"
-msgstr ""
+msgstr "זמן אמת"
 
 #: modules/demux/image.c:72
 msgid ""
 "Use real-time mode suitable for being used as a master input and real-time "
 "input slaves."
 msgstr ""
+"שימוש במצב זמן אמת שמתאים לשימוש כמקור קלט ראשי וכמקורות קלט משניים בזמן אמת."
 
 #: modules/demux/image.c:76
 msgid "Image demuxer"
-msgstr ""
+msgstr "מפלג תמונה"
 
 #: modules/demux/image.c:77
 msgid "Image"
-msgstr ""
+msgstr "תמונה"
 
 #: modules/demux/mjpeg.c:46 modules/demux/mpeg/es.c:53
 #: modules/demux/mpeg/h26x.c:46 modules/demux/rawvid.c:43
@@ -14491,11 +14531,11 @@ msgstr ""
 
 #: modules/demux/mjpeg.c:53
 msgid "M-JPEG camera demuxer"
-msgstr ""
+msgstr "מפלג מצלמת M-JPEG"
 
 #: modules/demux/mkv/mkv.cpp:53
 msgid "Matroska stream demuxer"
-msgstr ""
+msgstr "מפלג תזרים Matroska"
 
 #: modules/demux/mkv/mkv.cpp:60
 msgid "Respect ordered chapters"
@@ -14588,7 +14628,7 @@ msgstr ""
 
 #: modules/demux/mod.c:74
 msgid "MOD demuxer (libmodplug)"
-msgstr ""
+msgstr "מפלג MOD‏ (libmodplug)"
 
 #: modules/demux/mod.c:85
 msgid "Reverberation level"
@@ -14683,11 +14723,11 @@ msgstr ""
 #: modules/demux/mp4/meta.c:82 modules/demux/xiph_metadata.h:57
 #: modules/demux/xiph_metadata.h:64
 msgid "Lyrics"
-msgstr ""
+msgstr "מילות השיר"
 
 #: modules/demux/mp4/meta.c:83
 msgid "Record Company"
-msgstr ""
+msgstr "חברת תקליטים"
 
 #: modules/demux/mp4/meta.c:84
 msgid "Model"
@@ -14735,11 +14775,11 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:97
 msgid "Sound Engineer"
-msgstr ""
+msgstr "הנדסת סאונד"
 
 #: modules/demux/mp4/meta.c:98
 msgid "Soloist"
-msgstr ""
+msgstr "שירת סולו"
 
 #: modules/demux/mp4/meta.c:99
 msgid "Thanks"
@@ -14747,7 +14787,7 @@ msgstr "תודות"
 
 #: modules/demux/mp4/meta.c:100
 msgid "Executive Producer"
-msgstr ""
+msgstr "הפקה בפועל"
 
 #: modules/demux/mp4/meta.c:102
 msgid "Encoding Params"
@@ -14755,11 +14795,11 @@ msgstr ""
 
 #: modules/demux/mp4/meta.c:103 modules/demux/mp4/meta.c:139
 msgid "Vendor"
-msgstr ""
+msgstr "ספק"
 
 #: modules/demux/mp4/meta.c:104
 msgid "Catalog Number"
-msgstr ""
+msgstr "מספר קטלוגי"
 
 #: modules/demux/mp4/meta.c:138 modules/mux/avi.c:57
 msgid "Keywords"
@@ -14767,23 +14807,23 @@ msgstr "מילות מפתח"
 
 #: modules/demux/mp4/meta.c:423
 msgid "Explicit"
-msgstr ""
+msgstr "מפורש"
 
 #: modules/demux/mp4/meta.c:426
 msgid "Clean"
-msgstr ""
+msgstr "נקי"
 
 #: modules/demux/mp4/mp4.c:50
 msgid "M4A audio only"
-msgstr ""
+msgstr "שמע מסוג M4A בלבד"
 
 #: modules/demux/mp4/mp4.c:51
 msgid "Ignore non audio tracks from iTunes audio files"
-msgstr ""
+msgstr "התעלמות מרצועות שאינן למטרות שמע מבין קובצי שמע של iTunes"
 
 #: modules/demux/mp4/mp4.c:56
 msgid "MP4 stream demuxer"
-msgstr ""
+msgstr "מפלג תזרימי MP4"
 
 #: modules/demux/mp4/mp4.c:57
 msgid "MP4"
@@ -14799,7 +14839,7 @@ msgstr ""
 
 #: modules/demux/mpc.c:63
 msgid "MusePack demuxer"
-msgstr ""
+msgstr "מפלג MusePack"
 
 #: modules/demux/mpeg/es.c:54
 msgid ""
@@ -14825,15 +14865,15 @@ msgstr ""
 
 #: modules/demux/mpeg/h26x.c:53 modules/demux/mpeg/h26x.c:55
 msgid "H264 video demuxer"
-msgstr ""
+msgstr "מפלג וידאו H264"
 
 #: modules/demux/mpeg/h26x.c:64 modules/demux/mpeg/h26x.c:66
 msgid "HEVC/H.265 video demuxer"
-msgstr ""
+msgstr "מפלג וידאו HEVC/H.265"
 
 #: modules/demux/mpeg/mpgv.c:46
 msgid "MPEG-I/II video demuxer"
-msgstr ""
+msgstr "מפלג וידאו MPEG-I/II"
 
 #: modules/demux/mpeg/ps.c:44
 msgid "Trust MPEG timestamps"
@@ -14848,7 +14888,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ps.c:62 modules/demux/mpeg/ps.c:75
 msgid "MPEG-PS demuxer"
-msgstr ""
+msgstr "מפלג MPEG-PS"
 
 #: modules/demux/mpeg/ps.c:63
 msgid "PS"
@@ -14860,7 +14900,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:82
 msgid "Allows a user to specify an extra pmt (pmt_pid=pid:stream_type[,...])."
-msgstr ""
+msgstr "מאפשר למשתמש לציין pmt נוסף (pmt_pid=pid:stream_type[,...]‎)."
 
 #: modules/demux/mpeg/ts.c:84
 msgid "Set id of ES to PID"
@@ -14875,42 +14915,50 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:90 modules/mux/mpeg/ts.c:173
 msgid "CSA Key"
-msgstr ""
+msgstr "מפתח CSA"
 
 #: modules/demux/mpeg/ts.c:91 modules/mux/mpeg/ts.c:174
 msgid ""
 "CSA encryption key. This must be a 16 char string (8 hexadecimal bytes)."
 msgstr ""
+"מפתח הצפנה מסוג CSA. המפתח חייב להיות מחרוזת באורך של 16 תווים (8 בתים "
+"הקסדצימליים)."
 
 #: modules/demux/mpeg/ts.c:94 modules/mux/mpeg/ts.c:177
 msgid "Second CSA Key"
-msgstr ""
+msgstr "מפתח CSA שני"
 
 #: modules/demux/mpeg/ts.c:95 modules/mux/mpeg/ts.c:178
 msgid ""
 "The even CSA encryption key. This must be a 16 char string (8 hexadecimal "
 "bytes)."
 msgstr ""
+"מפתח ההצפנה התואם מסוג CSA. המפתח חייב להיות מחרוזת באורך של 16 תווים (8 "
+"בתים הקסדצימליים)."
 
 #: modules/demux/mpeg/ts.c:99
 msgid "Packet size in bytes to decrypt"
-msgstr ""
+msgstr "גודל החבילה לפענוח בבתים"
 
 #: modules/demux/mpeg/ts.c:100
 msgid ""
 "Specify the size of the TS packet to decrypt. The decryption routines "
 "subtract the TS-header from the value before decrypting."
 msgstr ""
+"ציון גודל חבילת ה־PS לפענוח. שגרות הפענוח מסירות את כותרת ה־TS מהערך בטרם "
+"הפענוח."
 
 #: modules/demux/mpeg/ts.c:104
 msgid "Separate sub-streams"
-msgstr ""
+msgstr "הפרדת תת־תזרימים"
 
 #: modules/demux/mpeg/ts.c:106
 msgid ""
 "Separate teletex/dvbs pages into independent ES. It can be useful to turn "
 "off this option when using stream output."
 msgstr ""
+"הפרדת עמודי טלטקסט/dvbs לכדי תזרימים בסיסיים (ES) עצמאיים. יתכן שמוטב להפעיל "
+"אפשרות זו בעת הזרמת הפלט."
 
 #: modules/demux/mpeg/ts.c:111
 msgid ""
@@ -14938,7 +14986,7 @@ msgstr ""
 
 #: modules/demux/mpeg/ts.c:135
 msgid "MPEG Transport Stream demuxer"
-msgstr ""
+msgstr "מפלג תזרים תעבורת MPEG"
 
 #: modules/demux/mpeg/ts_psi.c:422
 msgid "Main audio"
@@ -14999,15 +15047,15 @@ msgstr ""
 
 #: modules/demux/nsv.c:49
 msgid "NullSoft demuxer"
-msgstr ""
+msgstr "מפלג NullSoft"
 
 #: modules/demux/nuv.c:50
 msgid "Nuv demuxer"
-msgstr ""
+msgstr "מפלג Nuv"
 
 #: modules/demux/ogg.c:57
 msgid "OGG demuxer"
-msgstr ""
+msgstr "מפלג OGG"
 
 #: modules/demux/playlist/playlist.c:46
 msgid "Show shoutcast adult content"
@@ -15019,13 +15067,15 @@ msgstr ""
 
 #: modules/demux/playlist/playlist.c:50
 msgid "Skip ads"
-msgstr ""
+msgstr "דילוג על פרסומות"
 
 #: modules/demux/playlist/playlist.c:51
 msgid ""
 "Use playlist options usually used to prevent ads skipping to detect ads and "
 "prevent adding them to the playlist."
 msgstr ""
+"להשתמש באפשרויות רשימת נגינה שבדרך כלל משמשות למנוע דילוג על פרסומות ולמנוע "
+"את הוספתן לרשימת הנגינה."
 
 #: modules/demux/playlist/playlist.c:67
 msgid "M3U playlist import"
@@ -15033,7 +15083,7 @@ msgstr "ייבוא רשימת נגינה מסוג M3U"
 
 #: modules/demux/playlist/playlist.c:72
 msgid "RAM playlist import"
-msgstr "יבוא רשימת נגינה מסוג RAM"
+msgstr "ייבוא רשימת נגינה מסוג RAM"
 
 #: modules/demux/playlist/playlist.c:76
 msgid "PLS playlist import"
@@ -15049,19 +15099,19 @@ msgstr "ייבוא רשימת נגינה מסוג DVB"
 
 #: modules/demux/playlist/playlist.c:90
 msgid "Podcast parser"
-msgstr ""
+msgstr "מפענח הסכתים"
 
 #: modules/demux/playlist/playlist.c:95
 msgid "XSPF playlist import"
-msgstr "יבוא רשימת נגינה מסוג XSPF"
+msgstr "ייבוא רשימת נגינה מסוג XSPF"
 
 #: modules/demux/playlist/playlist.c:99
 msgid "New winamp 5.2 shoutcast import"
-msgstr ""
+msgstr "ייבוא של Shoutcast חדש מסוג Winamp 5.2"
 
 #: modules/demux/playlist/playlist.c:106
 msgid "ASX playlist import"
-msgstr "יבוא רשימת נגינה מסוג ASX"
+msgstr "ייבוא רשימת נגינה מסוג ASX"
 
 #: modules/demux/playlist/playlist.c:110
 msgid "Kasenna MediaBase parser"
@@ -15069,7 +15119,7 @@ msgstr ""
 
 #: modules/demux/playlist/playlist.c:115
 msgid "QuickTime Media Link importer"
-msgstr ""
+msgstr "מייבא קישורי מדיה של QuickTime"
 
 #: modules/demux/playlist/playlist.c:120
 msgid "Dummy IFO demux"
@@ -15077,89 +15127,89 @@ msgstr ""
 
 #: modules/demux/playlist/playlist.c:124
 msgid "iTunes Music Library importer"
-msgstr ""
+msgstr "מייבא ספריית מוזיקה של iTunes"
 
 #: modules/demux/playlist/playlist.c:129
 msgid "WPL playlist import"
-msgstr "מייבא רשימות השמעה מסוג WPL"
+msgstr "ייבוא רשימות השמעה מסוג WPL"
 
 #: modules/demux/playlist/podcast.c:230 modules/demux/playlist/podcast.c:242
 #: modules/demux/playlist/podcast.c:304 modules/demux/playlist/podcast.c:327
 msgid "Podcast Info"
-msgstr ""
+msgstr "פרטים על ההסכת"
 
 #: modules/demux/playlist/podcast.c:232
 msgid "Podcast Link"
-msgstr ""
+msgstr "קישור להסכת"
 
 #: modules/demux/playlist/podcast.c:233
 msgid "Podcast Copyright"
-msgstr ""
+msgstr "זכויות יוצרים של ההסכת"
 
 #: modules/demux/playlist/podcast.c:234
 msgid "Podcast Category"
-msgstr ""
+msgstr "קטגוריית ההסכת"
 
 #: modules/demux/playlist/podcast.c:235 modules/demux/playlist/podcast.c:311
 msgid "Podcast Keywords"
-msgstr ""
+msgstr "מילות מפתח של ההסכת"
 
 #: modules/demux/playlist/podcast.c:236 modules/demux/playlist/podcast.c:312
 msgid "Podcast Subtitle"
-msgstr ""
+msgstr "כתוביות של ההסכת"
 
 #: modules/demux/playlist/podcast.c:242 modules/demux/playlist/podcast.c:313
 msgid "Podcast Summary"
-msgstr ""
+msgstr "תקציר של ההסכת"
 
 #: modules/demux/playlist/podcast.c:307
 msgid "Podcast Publication Date"
-msgstr ""
+msgstr "מועד הפרסום של ההסכת"
 
 #: modules/demux/playlist/podcast.c:308
 msgid "Podcast Author"
-msgstr ""
+msgstr "יוצר ההסכת"
 
 #: modules/demux/playlist/podcast.c:309
 msgid "Podcast Subcategory"
-msgstr ""
+msgstr "תת־קטגוריה של ההסכת"
 
 #: modules/demux/playlist/podcast.c:310
 msgid "Podcast Duration"
-msgstr ""
+msgstr "משך פודקאסט"
 
 #: modules/demux/playlist/podcast.c:314
 msgid "Podcast Type"
-msgstr ""
+msgstr "סוג הפודקאסט"
 
 #: modules/demux/playlist/podcast.c:328
 msgid "Podcast Size"
-msgstr ""
+msgstr "גודל הפודקאסט"
 
 #: modules/demux/playlist/podcast.c:329
 #, c-format
 msgid "%s bytes"
-msgstr ""
+msgstr "%s בתים"
 
 #: modules/demux/playlist/shoutcast.c:324
 msgid "Shoutcast"
-msgstr ""
+msgstr "Shoutcast"
 
 #: modules/demux/playlist/shoutcast.c:328
 msgid "Listeners"
-msgstr ""
+msgstr "מאזינים"
 
 #: modules/demux/playlist/shoutcast.c:329
 msgid "Load"
-msgstr ""
+msgstr "טעינה"
 
 #: modules/demux/playlist/wpl.c:99
 msgid "Total duration"
-msgstr ""
+msgstr "משך כולל"
 
 #: modules/demux/pva.c:43
 msgid "PVA demuxer"
-msgstr ""
+msgstr "מפלג PVA"
 
 #: modules/demux/rawaud.c:44
 msgid "Audio sample rate in Hertz. Default is 48000 Hz."
@@ -15194,16 +15244,16 @@ msgstr ""
 
 #: modules/demux/rawaud.c:64
 msgid "Raw audio demuxer"
-msgstr ""
+msgstr "מפלג שמע גולמי"
 
 #: modules/demux/rawdv.c:43
 msgid ""
 "The demuxer will advance timestamps if the input can't keep up with the rate."
-msgstr ""
+msgstr "המפלג יקדם את חותמות הזמן אם הקלט לא מצליח לשמור על קצב."
 
 #: modules/demux/rawdv.c:51
 msgid "DV (Digital Video) demuxer"
-msgstr ""
+msgstr "מפלג DV (וידאו דיגיטלי)"
 
 #: modules/demux/rawvid.c:44
 msgid ""
@@ -15229,7 +15279,7 @@ msgstr ""
 
 #: modules/demux/rawvid.c:64
 msgid "Raw video demuxer"
-msgstr ""
+msgstr "מפלג וידאו גולמי"
 
 #: modules/demux/real.c:71
 msgid "Real demuxer"
@@ -15241,7 +15291,7 @@ msgstr ""
 
 #: modules/demux/smf.c:727
 msgid "SMF demuxer"
-msgstr ""
+msgstr "מפלג SMF"
 
 #: modules/demux/stl.c:43
 msgid "EBU STL subtitles parser"
@@ -15285,7 +15335,7 @@ msgstr ""
 
 #: modules/demux/tta.c:46
 msgid "TTA demuxer"
-msgstr ""
+msgstr "מפלג TTA"
 
 #: modules/demux/ty.c:59
 msgid "TY"
@@ -15297,15 +15347,15 @@ msgstr ""
 
 #: modules/demux/ty.c:770
 msgid "Closed captions 2"
-msgstr ""
+msgstr "כתוביות סמויות 2"
 
 #: modules/demux/ty.c:771
 msgid "Closed captions 3"
-msgstr ""
+msgstr "כתוביות סמויות 3"
 
 #: modules/demux/ty.c:772
 msgid "Closed captions 4"
-msgstr ""
+msgstr "כתוביות סמויות 4"
 
 #: modules/demux/vc1.c:44
 msgid "Desired frame rate for the VC-1 stream."
@@ -15313,7 +15363,7 @@ msgstr ""
 
 #: modules/demux/vc1.c:50
 msgid "VC1 video demuxer"
-msgstr ""
+msgstr "מפלג וידאו VC1"
 
 #: modules/demux/vobsub.c:51
 msgid "Vobsub subtitles parser"
@@ -15321,15 +15371,15 @@ msgstr ""
 
 #: modules/demux/voc.c:43
 msgid "VOC demuxer"
-msgstr ""
+msgstr "מפלג VOC"
 
 #: modules/demux/wav.c:52
 msgid "WAV demuxer"
-msgstr ""
+msgstr "מפלג WAV"
 
 #: modules/demux/xa.c:44
 msgid "XA demuxer"
-msgstr ""
+msgstr "מפלג XA"
 
 #: modules/demux/xiph_metadata.c:588
 msgid "Unknown category"
@@ -15337,7 +15387,7 @@ msgstr ""
 
 #: modules/demux/xiph_metadata.h:48
 msgid "Closed captions"
-msgstr ""
+msgstr "כתוביות סמויות"
 
 #: modules/demux/xiph_metadata.h:50
 msgid "Textual audio descriptions"
@@ -15369,15 +15419,15 @@ msgstr ""
 
 #: modules/demux/xiph_metadata.h:63 modules/demux/xiph_metadata.h:67
 msgid "Subtitles (images)"
-msgstr ""
+msgstr "כתוביות (תמונות)"
 
 #: modules/demux/xiph_metadata.h:68
 msgid "Slides (text)"
-msgstr ""
+msgstr "שקופיות (טקסט)"
 
 #: modules/demux/xiph_metadata.h:69
 msgid "Slides (images)"
-msgstr ""
+msgstr "שקופיות (תמונות)"
 
 #: modules/gui/macosx/VLCAboutWindowController.m:96
 #: modules/gui/macosx/VLCMainMenu.m:339
@@ -15443,7 +15493,7 @@ msgstr ""
 #: modules/gui/qt/dialogs/plugins.cpp:389
 #: modules/gui/qt/managers/addons_manager.cpp:92
 msgid "Interfaces"
-msgstr ""
+msgstr "מנשקים"
 
 #: modules/gui/macosx/VLCAddonsWindowController.m:111
 #: modules/gui/qt/dialogs/plugins.cpp:392
@@ -15953,7 +16003,7 @@ msgstr "הכרזת RTSP"
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:194
 #: modules/gui/macosx/VLCOutput.m:106 modules/gui/macosx/VLCOutput.m:510
 msgid "Export SDP as file"
-msgstr "יצוא SDP כקובץ"
+msgstr "ייצוא SDP כקובץ"
 
 #: modules/gui/macosx/VLCConvertAndSaveWindowController.m:198
 #: modules/gui/macosx/VLCOutput.m:108
@@ -16046,16 +16096,16 @@ msgstr "ניקוי"
 
 #: modules/gui/macosx/VLCFSPanelController.m:110
 msgid "Play/Pause the current media"
-msgstr ""
+msgstr "לנגן/להשהות את המדיה שמתנגנת כעת"
 
 #: modules/gui/macosx/VLCFSPanelController.m:116
 msgid "Go to the previous item"
-msgstr ""
+msgstr "חזרה לפריט הקודם"
 
 #: modules/gui/macosx/VLCFSPanelController.m:124
 #: modules/gui/macosx/VLCFSPanelController.m:125
 msgid "Leave fullscreen"
-msgstr ""
+msgstr "יציאה ממסך מלא"
 
 #: modules/gui/macosx/VLCFSPanelController.m:127
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:80
@@ -16065,18 +16115,18 @@ msgstr "עצמת שמע"
 
 #: modules/gui/macosx/VLCFSPanelController.m:128
 msgid "Adjust the volume"
-msgstr ""
+msgstr "התאמת עצמת השמע"
 
 #: modules/gui/macosx/VLCFSPanelController.m:131
 msgid "Adjust the current playback position"
-msgstr ""
+msgstr "התאמת המיקום הנוכחי בנגינה"
 
 #: modules/gui/macosx/VLCFSPanelController.m:305
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:78
 #: modules/gui/macosx/VLCMainWindowControlsBar.m:503
 #, c-format
 msgid "Volume: %i %%"
-msgstr ""
+msgstr "עצמת שמע: %i %%"
 
 #: modules/gui/macosx/macosx.m:51
 msgid "Video device"
@@ -16489,7 +16539,7 @@ msgstr "בחירת הכול"
 
 #: modules/gui/macosx/VLCMainMenu.m:372
 msgid "Find"
-msgstr ""
+msgstr "איתור"
 
 #: modules/gui/macosx/VLCMainMenu.m:374
 msgid "View"
@@ -16540,11 +16590,11 @@ msgstr "קפיצה לזמן מסוים"
 
 #: modules/gui/macosx/VLCMainMenu.m:405
 msgid "Renderer"
-msgstr ""
+msgstr "התקן עיבוד"
 
 #: modules/gui/macosx/VLCMainMenu.m:406
 msgid "No renderer"
-msgstr ""
+msgstr "אין התקני עיבוד"
 
 #: modules/gui/macosx/VLCMainMenu.m:415
 msgid "Increase Volume"
@@ -19365,7 +19415,7 @@ msgstr "&שמירה"
 
 #: modules/gui/qt/dialogs/external.cpp:216
 msgid "Store the Password"
-msgstr ""
+msgstr "אחסון הססמה"
 
 #: modules/gui/qt/dialogs/firstrun.cpp:58
 #: modules/gui/qt/dialogs/firstrun.cpp:66
@@ -19938,11 +19988,11 @@ msgstr " ימים"
 
 #: modules/gui/qt/dialogs/vlm.cpp:130
 msgid "I&mport"
-msgstr "י&בוא"
+msgstr "יי&בוא"
 
 #: modules/gui/qt/dialogs/vlm.cpp:133
 msgid "E&xport"
-msgstr "י&צוא"
+msgstr "יי&צוא"
 
 #: modules/gui/qt/dialogs/vlm.cpp:264
 msgid "Save VLM configuration as..."
@@ -20450,7 +20500,7 @@ msgstr "מספר הימים שבין שני חיפושי עדכונים"
 
 #: modules/gui/qt/qt.cpp:130
 msgid "Ask for network policy at start"
-msgstr ""
+msgstr "לבקש מדיניות רשת עם ההפעלה"
 
 #: modules/gui/qt/qt.cpp:132
 msgid "Save the recently played items in the menu"
@@ -20458,7 +20508,7 @@ msgstr "שמירת הפריטים שהתנגנו לאחרונה בתפריט"
 
 #: modules/gui/qt/qt.cpp:134
 msgid "List of words separated by | to filter"
-msgstr ""
+msgstr "רשימת מילים מופרדות ב־| לסינון"
 
 #: modules/gui/qt/qt.cpp:135
 msgid ""
@@ -21187,7 +21237,7 @@ msgstr ""
 msgid ""
 "This is the TCP port on which this interface will listen. It defaults to "
 "4212."
-msgstr ""
+msgstr "זו פתחת ה־TCP שבה יאזין המנשק הזה. בררת המחדל היא 4212."
 
 #: modules/lua/vlc.c:76
 msgid "CLI input"
@@ -21458,7 +21508,7 @@ msgstr ""
 
 #: modules/meta_engine/ID3Genres.h:87
 msgid "Eurodance"
-msgstr ""
+msgstr "יורודאנס"
 
 #: modules/meta_engine/ID3Genres.h:88
 msgid "Dream"
@@ -21554,15 +21604,15 @@ msgstr "רוקנרול"
 
 #: modules/meta_engine/ID3Genres.h:112
 msgid "Hard Rock"
-msgstr ""
+msgstr "רוק כבד"
 
 #: modules/meta_engine/ID3Genres.h:113
 msgid "Folk"
-msgstr ""
+msgstr "פֿוֹלְק"
 
 #: modules/meta_engine/ID3Genres.h:114
 msgid "Folk-Rock"
-msgstr ""
+msgstr "פֿוֹלְק-רוֹק"
 
 #: modules/meta_engine/ID3Genres.h:115
 msgid "National Folk"
@@ -21995,11 +22045,11 @@ msgstr ""
 
 #: modules/misc/gnutls.c:782
 msgid "Export (include insecure ciphers)"
-msgstr ""
+msgstr "ייצוא (לרבות צפנים בלתי מאובטחים)"
 
 #: modules/misc/gnutls.c:787
 msgid "GNU TLS transport layer security"
-msgstr ""
+msgstr "אבטחת שכבת תעבורה של GNU TLS"
 
 #: modules/misc/gnutls.c:801
 msgid "GNU TLS server"
@@ -22061,7 +22111,7 @@ msgstr ""
 
 #: modules/misc/rtsp.c:67
 msgid "MUX for RAW RTSP transport"
-msgstr ""
+msgstr "ריבוב לתעבורת RTSP גולמית"
 
 #: modules/misc/rtsp.c:69
 msgid "Sets the timeout option in the RTSP session string"
@@ -22283,7 +22333,7 @@ msgstr ""
 
 #: modules/mux/mpeg/ts.c:112
 msgid "Assign a fixed Transport Stream ID."
-msgstr ""
+msgstr "הקצאת מזהה תזרים תעבורה קבוע."
 
 #: modules/mux/mpeg/ts.c:113
 msgid "NET ID"
@@ -22506,9 +22556,8 @@ msgid "avparser packetizer"
 msgstr ""
 
 #: modules/packetizer/av1.c:557
-#, fuzzy
 msgid "AV1 video packetizer"
-msgstr "שגיאה:"
+msgstr ""
 
 #: modules/packetizer/copy.c:48
 msgid "Copy packetizer"
@@ -23690,6 +23739,8 @@ msgid ""
 "This sets the HTTP port of the local server used to stream the media to the "
 "Chromecast."
 msgstr ""
+"תצורה זו מגדירה את פתחת ה־HTTP של השרת המקומי שמשמש להזרמת המדיה אל ה־"
+"Chromecast."
 
 #: modules/stream_out/chromecast/cast.cpp:190
 #: modules/stream_out/chromecast/cast.cpp:1200
@@ -24061,16 +24112,16 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:116
 msgid "This allows you to specify the base port for the RTP streaming."
-msgstr ""
+msgstr "הגדרה זו מאפשרת לציין את פתחת הבסיס להזרמת RTP."
 
 #: modules/stream_out/rtp.c:117
 msgid "Audio port"
-msgstr ""
+msgstr "פתחת שמע"
 
 #: modules/stream_out/rtp.c:119
 msgid ""
 "This allows you to specify the default audio port for the RTP streaming."
-msgstr ""
+msgstr "הגדרה זו מאפשרת לציין את פתחת השמע כבררת מחדל להזרמת RTP."
 
 #: modules/stream_out/rtp.c:120
 msgid "Video port"
@@ -24079,7 +24130,7 @@ msgstr "פתחת וידאו"
 #: modules/stream_out/rtp.c:122
 msgid ""
 "This allows you to specify the default video port for the RTP streaming."
-msgstr ""
+msgstr "הגדרה זו מאפשרת לציין את פתחת הווידאו כבררת מחדל להזרמת RTP."
 
 #: modules/stream_out/rtp.c:130
 msgid "RTP/RTCP multiplexing"
@@ -24101,11 +24152,11 @@ msgstr ""
 
 #: modules/stream_out/rtp.c:140
 msgid "Transport protocol"
-msgstr ""
+msgstr "פרוטוקול תעבורה"
 
 #: modules/stream_out/rtp.c:142
 msgid "This selects which transport protocol to use for RTP."
-msgstr ""
+msgstr "הגדרה זו בוחרת את פרוטוקול התעבורה לשימוש עבור RTP."
 
 #: modules/stream_out/rtp.c:146
 msgid ""
@@ -26242,7 +26293,7 @@ msgstr "מצב שולחן העבודה מאפשר לך להציג את הווי�
 #: modules/video_output/win32/direct3d9.c:72
 #: modules/video_output/win32/direct3d11.c:65
 msgid "Use hardware blending support"
-msgstr ""
+msgstr "שימוש בתמיכה בערבול חומרה"
 
 #: modules/video_output/win32/direct3d9.c:74
 #: modules/video_output/win32/direct3d11.c:67
