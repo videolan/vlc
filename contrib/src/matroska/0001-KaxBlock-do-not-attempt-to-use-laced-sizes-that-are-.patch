@@ -1,0 +1,54 @@
+From 1ec615ec2b825523ecb1132794bbe771d2817b70 Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 11 Feb 2019 12:15:58 +0100
+Subject: [PATCH] KaxBlock: do not attempt to use laced sizes that are clearly
+ invalid
+
+---
+ src/KaxBlock.cpp | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index 878d9a2..a1df83e 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -628,7 +628,8 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+       // put all Frames in the list
+       if (mLacing != LACING_NONE) {
+         // read the number of frames in the lace
+-        uint32 LastBufferSize = GetSize() - BlockHeadSize - 1; // 1 for number of frame
++        const uint32 TotalLacedSize = GetSize() - BlockHeadSize - 1; // 1 for number of frame
++        uint32 LastBufferSize = TotalLacedSize;
+         uint8 FrameNum = _TempHead[0]; // number of frames in the lace - 1
+         // read the list of frame sizes
+         uint8 Index;
+@@ -646,6 +647,8 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+               do {
+                 Result += input.read(_TempHead, 1);
+                 FrameSize += uint8(_TempHead[0]);
++                if (FrameSize > TotalLacedSize)
++                    throw SafeReadIOCallback::EndOfStreamX(0);
+                 LastBufferSize--;
+ 
+                 FirstFrameLocation++;
+@@ -662,6 +665,8 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+             cursor = _tmpBuf = new binary[FrameNum*4]; /// \warning assume the mean size will be coded in less than 4 bytes
+             Result += input.read(cursor, FrameNum*4);
+             FrameSize = ReadCodedSizeValue(cursor, SizeRead, SizeUnknown);
++            if (FrameSize > TotalLacedSize)
++                throw SafeReadIOCallback::EndOfStreamX(0);
+             SizeList[0] = FrameSize;
+             cursor += SizeRead;
+             LastBufferSize -= FrameSize + SizeRead;
+@@ -670,6 +675,8 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+               // get the size of the frame
+               SizeRead = LastBufferSize;
+               FrameSize += ReadCodedSizeSignedValue(cursor, SizeRead, SizeUnknown);
++              if (FrameSize > TotalLacedSize)
++                  throw SafeReadIOCallback::EndOfStreamX(0);
+               SizeList[Index] = FrameSize;
+               cursor += SizeRead;
+               LastBufferSize -= FrameSize + SizeRead;
+-- 
+2.19.1.windows.1
+
