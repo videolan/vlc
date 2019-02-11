@@ -500,6 +500,8 @@ int InitVideoEnc( vlc_object_t *p_this )
 
         p_context->codec_type = AVMEDIA_TYPE_VIDEO;
 
+        p_context->coded_width = p_enc->fmt_in.video.i_width;
+        p_context->coded_height = p_enc->fmt_in.video.i_height;
         p_context->width = p_enc->fmt_in.video.i_visible_width;
         p_context->height = p_enc->fmt_in.video.i_visible_height;
 
