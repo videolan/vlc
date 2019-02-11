@@ -74,14 +74,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
             case INPUT_EVENT_RATE:
                 break;
             case INPUT_EVENT_POSITION:
-
-                // Rate limit to 100 ms
-                if (lastPositionUpdate && fabs([lastPositionUpdate timeIntervalSinceNow]) < 0.1)
-                    break;
-
-                lastPositionUpdate = [NSDate date];
-
-                [inputManager performSelectorOnMainThread:@selector(playbackPositionUpdated) withObject:nil waitUntilDone:NO];
                 break;
             case INPUT_EVENT_TITLE:
             case INPUT_EVENT_CHAPTER:
@@ -277,11 +269,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
         if (p_input_changed)
             vlc_object_release(p_input_changed);
     });
-}
-
-- (void)playbackPositionUpdated
-{
-    [[[VLCMain sharedInstance] statusBarIcon] updateProgress];
 }
 
 - (void)playbackStatusUpdated

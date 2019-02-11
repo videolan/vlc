@@ -32,7 +32,6 @@
 
 // Get data from VLC and update the little status menu
 - (void)updateMenuItemRandom;
-- (void)updateProgress;
 
 - (IBAction)restoreMainWindow:(id)sender;
 - (IBAction)statusBarIconTogglePlayPause:(id)sender;

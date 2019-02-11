@@ -4,6 +4,7 @@
  * Copyright (C) 2016-2019 VLC authors and VideoLAN
  *
  * Authors: Goran Dokic <vlc at 8hz dot com>
+ *          Felix Paul Kühne <fkuehne # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +26,13 @@
 #import <vlc_common.h>
 #import <vlc_playlist_legacy.h>
 #import <vlc_input.h>
+#import <vlc_url.h>
 
 #import "coreinteraction/VLCCoreInteraction.h"
 #import "extensions/NSString+Helpers.h"
 #import "main/VLCMain.h"
-
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 @interface VLCStatusBarIcon ()
 {
@@ -48,7 +51,7 @@
     IBOutlet NSButton *backwardsButton;
     IBOutlet NSButton *playPauseButton;
     IBOutlet NSButton *forwardButton;
-    IBOutlet NSButton *randButton;
+    IBOutlet NSButton *randomButton;
 
     /* Outlets for menu items */
     IBOutlet NSMenuItem *pathActionItem;
@@ -56,7 +59,7 @@
     IBOutlet NSMenuItem *quitItem;
 
     BOOL isStopped;
-    BOOL showTimeElapsed;
+    BOOL _showTimeElapsed;
     NSString *_currentPlaybackUrl;
 }
 @end
@@ -91,14 +94,14 @@
     backwardsButton.accessibilityLabel = _NS("Go to previous item");
     playPauseButton.accessibilityLabel = _NS("Toggle Play/Pause");
     forwardButton.accessibilityLabel = _NS("Go to next item");
-    randButton.accessibilityLabel = _NS("Toggle random order playback");
+    randomButton.accessibilityLabel = _NS("Toggle random order playback");
 
     // Populate menu items with localized strings
     [showMainWindowItem setTitle:_NS("Show Main Window")];
     [pathActionItem setTitle:_NS("Path/URL Action")];
     [quitItem setTitle:_NS("Quit")];
 
-    showTimeElapsed = YES;
+    _showTimeElapsed = YES;
 
     // Set our selves up as delegate, to receive menuNeedsUpdate messages, so
     // we can update our menu as needed/before it's drawn
@@ -107,8 +110,20 @@
     // Register notifications
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
     [notificationCenter addObserver:self
-                           selector:@selector(updateNowPlayingInfo)
-                               name:VLCInputChangedNotification
+                           selector:@selector(updateTimeAndPosition:)
+                               name:VLCPlayerTimeAndPositionChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(inputItemChanged:)
+                               name:VLCPlayerCurrentMediaItemChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(hasPreviousChanged:)
+                               name:VLCPlaybackHasPreviousChanged
+                             object:nil];
+    [notificationCenter addObserver:self
+                           selector:@selector(hasNextChanged:)
+                               name:VLCPlaybackHasNextChanged
                              object:nil];
 
     [notificationCenter addObserver:self
@@ -206,56 +221,43 @@
  */
 - (void)menuNeedsUpdate:(NSMenu *)menu
 {
-    [self updateMetadata];
     [self updateMenuItemRandom];
-    [self updateDynamicMenuItemText];
-}
-
-/* This is called whenever the playback status for VLC changes and here
- * we can update our information in the menu/view
- */
-- (void) updateNowPlayingInfo
-{
-    [self updateMetadata];
-    [self updateProgress];
     [self updateDynamicMenuItemText];
 }
 
 /* Callback to update current playback time
  * Called by InputManager
  */
-- (void)updateProgress
+- (void)updateTimeAndPosition:(NSNotification *)aNotification
 {
-    input_thread_t *input = pl_CurrentInput(getIntf());
+    VLCPlayerController *playerController = aNotification.object;
 
-    if (input) {
-        NSString *elapsedTime;
-        NSString *remainingTime;
-        NSString *totalTime;
+    input_item_t *p_item = playerController.currentMedia;
 
-        /* Get elapsed and remaining time */
-        elapsedTime = [NSString stringWithTimeFromInput:input negative:NO];
-        remainingTime = [NSString stringWithTimeFromInput:input negative:YES];
+    if (p_item) {
+        vlc_tick_t duration = input_item_GetDuration(p_item);
+        vlc_tick_t time = playerController.time;
 
-        /* Check item duration */
-        vlc_tick_t dur = input_item_GetDuration(input_GetItem(input));
-
-        if (dur == -1) {
+        if (duration == -1) {
             /* Unknown duration, possibly due to buffering */
             [progressField setStringValue:@"--:--"];
             [totalField setStringValue:@"--:--"];
-        } else if (dur == 0) {
+        } else if (duration == 0) {
             /* Infinite duration */
-            [progressField setStringValue:elapsedTime];
+            [progressField setStringValue:[NSString stringWithDuration:duration currentTime:time negative:NO]];
             [totalField setStringValue:@"∞"];
         } else {
             /* Not unknown, update displayed duration */
-            totalTime = [NSString stringWithTime:SEC_FROM_VLC_TICK(dur)];
-            [progressField setStringValue:(showTimeElapsed) ? elapsedTime : remainingTime];
-            [totalField setStringValue:totalTime];
+            if (_showTimeElapsed) {
+                [progressField setStringValue:[NSString stringWithDuration:duration currentTime:time negative:NO]];
+            } else {
+                [progressField setStringValue:[NSString stringWithDuration:duration currentTime:time negative:YES]];
+            }
+
+            [totalField setStringValue:[NSString stringWithTimeFromTicks:duration]];
         }
         [self setStoppedStatus:NO];
-        vlc_object_release(input);
+
     } else {
         /* Nothing playing */
         [progressField setStringValue:@"--:--"];
@@ -264,59 +266,79 @@
     }
 }
 
-
 #pragma mark -
 #pragma mark Update functions
+
+- (void)updateCachedURLOfCurrentMedia:(input_item_t *)media
+{
+    if (!media) {
+        _currentPlaybackUrl = nil;
+        return;
+    }
+    char *psz_url = vlc_uri_decode(input_item_GetURI(media));
+    if (!psz_url) {
+        _currentPlaybackUrl = nil;
+        return;
+    }
+    _currentPlaybackUrl = toNSStr(psz_url);
+    free(psz_url);
+}
+
+- (void)hasPreviousChanged:(NSNotification *)aNotification
+{
+    backwardsButton.enabled = [[VLCMain sharedInstance] playlistController].hasPreviousPlaylistItem;
+}
+
+- (void)hasNextChanged:(NSNotification *)aNotification
+{
+    forwardButton.enabled = [[VLCMain sharedInstance] playlistController].hasNextPlaylistItem;
+}
 
 /* Updates the Metadata for the currently
  * playing item or resets it if nothing is playing
  */
-- (void)updateMetadata
+- (void)inputItemChanged:(NSNotification *)aNotification
 {
     NSImage         *coverArtImage;
     NSString        *title;
     NSString        *nowPlaying;
     NSString        *artist;
     NSString        *album;
-    input_thread_t  *input = pl_CurrentInput(getIntf());
-    input_item_t    *item  = NULL;
+    input_item_t    *mediaItem  = NULL;
 
-    // Update play/pause status
-    switch ([self getPlaylistPlayStatus]) {
-        case PLAYLIST_RUNNING:
+    VLCPlayerController *playerController = aNotification.object;
+    enum vlc_player_state playerState = playerController.playerState;
+    mediaItem = playerController.currentMedia;
+
+    switch (playerState) {
+        case VLC_PLAYER_STATE_PLAYING:
             [self setStoppedStatus:NO];
             [self setProgressTimeEnabled:YES];
             [pathActionItem setEnabled:YES];
-            _currentPlaybackUrl = [[[VLCCoreInteraction sharedInstance]
-                                    URLOfCurrentPlaylistItem] absoluteString];
+            [self updateCachedURLOfCurrentMedia:mediaItem];
             break;
-        case PLAYLIST_STOPPED:
+        case VLC_PLAYER_STATE_STOPPED:
             [self setStoppedStatus:YES];
             [self setProgressTimeEnabled:NO];
             [pathActionItem setEnabled:NO];
             _currentPlaybackUrl = nil;
             break;
-        case PLAYLIST_PAUSED:
+        case VLC_PLAYER_STATE_PAUSED:
             [self setStoppedStatus:NO];
             [self setProgressTimeEnabled:YES];
             [pathActionItem setEnabled:YES];
-            _currentPlaybackUrl = [[[VLCCoreInteraction sharedInstance]
-                                    URLOfCurrentPlaylistItem] absoluteString];
+            [self updateCachedURLOfCurrentMedia:mediaItem];
             [playPauseButton setState:NSOffState];
         default:
             break;
     }
 
-    if (input) {
-        item = input_GetItem(input);
-    }
-
-    if (item) {
+    if (mediaItem) {
         /* Something is playing */
         static char *tmp_cstr = NULL;
 
         // Get Coverart
-        tmp_cstr = input_item_GetArtworkURL(item);
+        tmp_cstr = input_item_GetArtworkURL(mediaItem);
         if (tmp_cstr) {
             NSString *tempStr = toNSStr(tmp_cstr);
             if (![tempStr hasPrefix:@"attachment://"]) {
@@ -327,28 +349,28 @@
         }
 
         // Get Titel
-        tmp_cstr = input_item_GetTitleFbName(item);
+        tmp_cstr = input_item_GetTitleFbName(mediaItem);
         if (tmp_cstr) {
             title = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
         }
 
         // Get Now Playing
-        tmp_cstr = input_item_GetNowPlaying(item);
+        tmp_cstr = input_item_GetNowPlaying(mediaItem);
         if (tmp_cstr) {
             nowPlaying = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
         }
 
         // Get author
-        tmp_cstr = input_item_GetArtist(item);
+        tmp_cstr = input_item_GetArtist(mediaItem);
         if (tmp_cstr) {
             artist = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
         }
 
         // Get album
-        tmp_cstr = input_item_GetAlbum(item);
+        tmp_cstr = input_item_GetAlbum(mediaItem);
         if (tmp_cstr) {
             album = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
@@ -371,13 +393,7 @@
 
     // Set the metadata in the UI
     [self setMetadataTitle:title artist:artist album:album andCover:coverArtImage];
-
-    // Cleanup
-    if (input)
-        vlc_object_release(input);
 }
-
-
 
 // Update dynamic copy/open menu item status
 - (void)updateDynamicMenuItemText
@@ -401,11 +417,7 @@
 - (void)updateMenuItemRandom
 {
     // Get current random status
-    bool random;
-    playlist_t *playlist = pl_Get(getIntf());
-    random = var_GetBool(playlist, "random");
-
-    [randButton setState:(random) ? NSOnState : NSOffState];
+    [randomButton setState:[[VLCMain sharedInstance] playlistController].playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM ? NSOnState : NSOffState];
 }
 
 #pragma mark -
@@ -442,22 +454,6 @@
     [progressField setEnabled:enabled];
     [separatorField setEnabled:enabled];
     [totalField setEnabled:enabled];
-}
-
-/* Returns VLC playlist status
- * Check for constants:
- *   PLAYLIST_RUNNING, PLAYLIST_STOPPED, PLAYLIST_PAUSED
- */
-- (int)getPlaylistPlayStatus
-{
-    int res;
-    playlist_t *p_playlist = pl_Get(getIntf());
-
-    PL_LOCK;
-    res = playlist_Status( p_playlist );
-    PL_UNLOCK;
-
-    return res;
 }
 
 #pragma mark -
@@ -498,37 +494,47 @@
 // Action: Toggle Play / Pause
 - (IBAction)statusBarIconTogglePlayPause:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] playOrPause];
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    VLCPlayerController *playerController = playlistController.playerController;
+    enum vlc_player_state playerState = playerController.playerState;
+    if (playerState != VLC_PLAYER_STATE_PAUSED) {
+        [playerController pause];
+    } else if (playerState == VLC_PLAYER_STATE_PAUSED) {
+        [playerController resume];
+    } else {
+        [playlistController startPlaylist];
+    }
 }
 
 // Action: Stop playback
 - (IBAction)statusBarIconStop:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] stop];
+    [[[VLCMain sharedInstance] playlistController] stopPlayback];
 }
 
 // Action: Go to next track
 - (IBAction)statusBarIconNext:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] next];
+    [[[VLCMain sharedInstance] playlistController] playNextItem];
 }
 
 // Action: Go to previous track
 - (IBAction)statusBarIconPrevious:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] previous];
+    [[[VLCMain sharedInstance] playlistController] playPreviousItem];
 }
 
 // Action: Toggle random playback (shuffle)
 - (IBAction)statusBarIconToggleRandom:(id)sender
 {
-    [[VLCCoreInteraction sharedInstance] shuffle];
+    VLCPlaylistController *playlistController = [[VLCMain sharedInstance] playlistController];
+    playlistController.playbackOrder = (playlistController.playbackOrder == VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM) ? VLC_PLAYLIST_PLAYBACK_ORDER_NORMAL : VLC_PLAYLIST_PLAYBACK_ORDER_RANDOM;
 }
 
 // Action: Toggle between elapsed and remaining time
 - (IBAction)toggelProgressTime:(id)sender
 {
-    showTimeElapsed = (!showTimeElapsed);
+    _showTimeElapsed = (!_showTimeElapsed);
 }
 
 // Action: Quit VLC
