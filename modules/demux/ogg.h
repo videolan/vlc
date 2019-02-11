@@ -60,6 +60,7 @@ typedef struct logical_stream_s
     es_out_id_t      *p_es;
     date_t           dts;
     bool             b_contiguous;              /* Granule is end of packet */
+    bool             b_interpolation_failed;    /* Don't use dts, it was not interpolated */
 
     int              i_serial_no;
 

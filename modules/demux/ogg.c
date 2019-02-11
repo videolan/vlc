@@ -615,6 +615,7 @@ static void Ogg_ResetStream( logical_stream_t *p_stream )
     p_stream->b_reinit = true;
     p_stream->i_pcr = VLC_TICK_INVALID;
     p_stream->i_next_block_flags = 0;
+    p_stream->b_interpolation_failed = false;
     date_Set( &p_stream->dts, VLC_TICK_INVALID );
     ogg_stream_reset( &p_stream->os );
     block_ChainRelease( p_stream->queue.p_blocks );
@@ -976,7 +977,10 @@ static void Ogg_SetNextFrame( demux_t *p_demux, logical_stream_t *p_stream,
                     }
                     break;
             }
-            date_Increment( &p_stream->dts, i_samples );
+            if( i_samples == 0 )
+                p_stream->b_interpolation_failed = true;
+            else
+                date_Increment( &p_stream->dts, i_samples );
         }
     }
 }
@@ -1337,7 +1341,8 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
 
     vlc_tick_t i_dts = Ogg_GranuleToTime( p_stream, p_oggpacket->granulepos, true, false );
-    vlc_tick_t i_expected_dts = date_Get( &p_stream->dts ); /* Interpolated or previous end time */
+    vlc_tick_t i_expected_dts = p_stream->b_interpolation_failed ? VLC_TICK_INVALID :
+                                date_Get( &p_stream->dts ); /* Interpolated or previous end time */
     if( i_dts == VLC_TICK_INVALID )
         i_dts = i_expected_dts;
     else
@@ -1406,13 +1411,15 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
-        p_block->i_pts = p_block->i_dts;
+        p_block->i_pts = p_stream->b_interpolation_failed ? VLC_TICK_INVALID : p_block->i_dts;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
         p_block->i_length = 0;
         p_block->i_pts = p_block->i_dts;
     }
+
+    p_stream->b_interpolation_failed = false;
 
     if( p_stream->b_oggds )
     {
