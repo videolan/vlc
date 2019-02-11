@@ -83,6 +83,7 @@ typedef struct logical_stream_s
      * granulepos */
     mtime_t          i_pcr;
     mtime_t          i_previous_pcr;
+    bool             b_interpolation_failed;    /* Don't use dts, it was not interpolated */
 
     /* Misc */
     bool b_initializing;

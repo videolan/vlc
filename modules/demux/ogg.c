@@ -715,6 +715,7 @@ static void Ogg_ResetStream( logical_stream_t *p_stream )
     p_stream->i_pcr = VLC_TS_UNKNOWN;
     p_stream->i_previous_granulepos = -1;
     p_stream->i_previous_pcr = VLC_TS_UNKNOWN;
+    p_stream->b_interpolation_failed = false;
     ogg_stream_reset( &p_stream->os );
     FREENULL( p_stream->prepcr.pp_blocks );
     p_stream->prepcr.i_size = 0;
@@ -1137,6 +1138,7 @@ static void Ogg_UpdatePCR( demux_t *p_demux, logical_stream_t *p_stream,
             p_stream->i_pcr += ( CLOCK_FREQ * p_oggpacket->bytes /
                                  p_stream->fmt.i_bitrate / 8 );
         }
+        else p_stream->b_interpolation_failed = true;
     }
 
     p_stream->i_previous_granulepos = p_oggpacket->granulepos;
@@ -1477,13 +1479,16 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
         /* Blatant abuse of the i_length field. */
         p_block->i_length = p_stream->i_end_trim;
-        p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
+        p_block->i_dts = p_stream->i_pcr;
+        p_block->i_pts = p_stream->b_interpolation_failed ? VLC_TS_INVALID : p_stream->i_pcr;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
         p_block->i_length = 0;
         p_block->i_pts = p_block->i_dts = p_stream->i_pcr;
     }
+
+    p_stream->b_interpolation_failed = false;
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
         p_stream->fmt.i_codec != VLC_CODEC_SPEEX &&
