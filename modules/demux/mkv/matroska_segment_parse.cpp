@@ -41,6 +41,7 @@ extern "C" {
 #include <vlc_codecs.h>
 #include <stdexcept>
 #include <limits>
+#include <algorithm>
 
 namespace mkv {
 
@@ -1658,16 +1659,16 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 vars.p_fmt->video.i_height= GetDWLE( &p_bih->biHeight );
                 vars.p_fmt->i_codec       = GetFOURCC( &p_bih->biCompression );
 
-                vars.p_fmt->i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( VLC_BITMAPINFOHEADER );
-                if( vars.p_fmt->i_extra > 0 )
+                /* Very unlikely yet possible: bug #5659*/
+                const unsigned int min_extra = std::min(GetDWLE( &p_bih->biSize ), vars.p_tk->i_extra_data);
+                if ( min_extra > sizeof( VLC_BITMAPINFOHEADER ))
                 {
-                    /* Very unlikely yet possible: bug #5659*/
-                    size_t maxlen = vars.p_tk->i_extra_data - sizeof( VLC_BITMAPINFOHEADER );
-                    vars.p_fmt->i_extra = ( (unsigned)vars.p_fmt->i_extra < maxlen )?
-                        vars.p_fmt->i_extra : maxlen;
-
+                    vars.p_fmt->i_extra = min_extra - sizeof( VLC_BITMAPINFOHEADER );
                     vars.p_fmt->p_extra = xmalloc( vars.p_fmt->i_extra );
-                    memcpy( vars.p_fmt->p_extra, &p_bih[1], vars.p_fmt->i_extra );
+                    if (likely(vars.p_fmt->p_extra != NULL))
+                        memcpy( vars.p_fmt->p_extra, &p_bih[1], vars.p_fmt->i_extra );
+                    else
+                        vars.p_fmt->i_extra = 0;
                 }
                 else if( vars.p_fmt->i_codec == VLC_FOURCC('W','V','C','1') )
                 {
@@ -1837,7 +1838,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
                 p_tk->fmt.audio.i_bitspersample = GetWLE( &p_wf->wBitsPerSample );
 
                 p_tk->fmt.i_extra            = GetWLE( &p_wf->cbSize );
-                if( p_tk->fmt.i_extra > 0 )
+                if( p_tk->fmt.i_extra != 0 )
                 {
                     p_tk->fmt.p_extra = xmalloc( p_tk->fmt.i_extra );
                     if( p_tk->fmt.p_extra )
