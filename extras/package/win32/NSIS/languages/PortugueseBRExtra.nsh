@@ -57,6 +57,8 @@ ${LangFileString} Action_OnArrivalSVCDMovie "Reproduzir filme em SVCD"
 ${LangFileString} Action_OnArrivalVideoFiles "Reproduzir arquivos de vídeo"
 ${LangFileString} Action_OnArrivalMusicFiles "Reproduzir arquivos de áudio"
 ${LangFileString} Action_OnArrivalDVDAudio "Reproduzir áudio em DVD"
+${LangFileString} Action_OnArrivalBluray "Reproduzir Blu-Ray"
+
 ${LangFileString} License_NextText "Agora você está ciente dos seus direitos. Clique em Próximo para continuar."
 
 ${LangFileString} Detail_CheckProcesses "Verificando processos..."
