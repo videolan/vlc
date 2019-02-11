@@ -177,6 +177,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
                 p_sys->p_subpackets[i] = NULL;
             }
         p_sys->i_subpacket = 0;
+        p_sys->i_subpackets = 0;
 
         if ( !( p_blk->i_flags & BLOCK_FLAG_TYPE_I) )
         {
@@ -236,6 +237,7 @@ void handle_real_audio(demux_t * p_demux, mkv_track_t * p_tk, block_t * p_blk, m
             p_sys->p_subpackets[i] = NULL;
         }
         p_sys->i_subpacket = 0;
+        p_sys->i_subpackets = 0;
     }
 }
 
