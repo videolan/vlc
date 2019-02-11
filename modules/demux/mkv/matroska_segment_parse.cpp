@@ -2054,7 +2054,7 @@ bool matroska_segment_c::TrackInit( mkv_track_t * p_tk )
         static bool A_REAL__is_valid (HandlerPayload& vars) {
             uint8_t *p = vars.p_tk->p_extra_data;
 
-            if (vars.p_tk->i_extra_data <= 28)
+            if (vars.p_tk->i_extra_data <= sizeof(real_audio_private))
                 return false;
 
             if( memcmp( p, ".ra", 3 ) ) {
