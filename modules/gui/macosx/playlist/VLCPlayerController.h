@@ -147,6 +147,7 @@ extern NSString *VLCPlayerMuteChanged;
 @interface VLCPlayerController : NSObject
 
 - (instancetype)initWithPlayer:(vlc_player_t *)player;
+- (void)deinitialize;
 
 /**
  * Start playback of the current media

@@ -213,8 +213,12 @@ static const struct vlc_playlist_callbacks playlist_callbacks = {
     return self;
 }
 
-- (void)dealloc
+- (void)deinitialize
 {
+    if (_playerController) {
+        [_playerController deinitialize];
+    }
+
     if (_p_playlist) {
         if (_playlistListenerID) {
             vlc_playlist_Lock(_p_playlist);

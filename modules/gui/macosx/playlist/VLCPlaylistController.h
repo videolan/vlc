@@ -37,6 +37,7 @@ extern NSString *VLCPlaybackHasNextChanged;
 @interface VLCPlaylistController : NSObject
 
 - (instancetype)initWithPlaylist:(vlc_playlist_t *)playlist;
+- (void)deinitialize;
 
 /**
  * The vlc core playlist controlled by the instance of this class

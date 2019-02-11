@@ -339,7 +339,7 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     return self;
 }
 
-- (void)dealloc
+- (void)deinitialize
 {
     if (_p_player) {
         if (_playerListenerID) {
