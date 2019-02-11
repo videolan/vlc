@@ -858,6 +858,9 @@ uint8_t *hash_from_public_key( public_key_t *p_pkey )
         p_pkey->sig.type > POSITIVE_KEY_SIGNATURE )
         return NULL;
 
+    if( p_pkey->psz_username == NULL )
+        return NULL;
+
     gcry_error_t error = 0;
     gcry_md_hd_t hd;
 
