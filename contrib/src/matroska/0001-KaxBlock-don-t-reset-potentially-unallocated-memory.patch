@@ -1,0 +1,29 @@
+From 3fa2eeae1d9148b00ff7cebda7304de90ece575b Mon Sep 17 00:00:00 2001
+From: Steve Lhomme <robux4@ycbcr.xyz>
+Date: Mon, 11 Feb 2019 09:51:30 +0100
+Subject: [PATCH] KaxBlock: don't reset potentially unallocated memory
+
+When using SCOPE_PARTIAL_DATA the GetBuffer()/Data pointer is never allocated.
+If this exception occurs we must not write on NULL pointed data.
+
+When the memory is allocated it doesn't have any use to reset the memory to 0
+since SetValueIsSet(false) is called right before, invalidating the buffer.
+---
+ src/KaxBlock.cpp | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/KaxBlock.cpp b/src/KaxBlock.cpp
+index 3fa18e5..878d9a2 100644
+--- a/src/KaxBlock.cpp
++++ b/src/KaxBlock.cpp
+@@ -703,7 +703,6 @@ filepos_t KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+   } catch (SafeReadIOCallback::EndOfStreamX &) {
+     SetValueIsSet(false);
+ 
+-    std::memset(EbmlBinary::GetBuffer(), 0, GetSize());
+     myBuffers.clear();
+     SizeList.clear();
+     Timecode           = 0;
+-- 
+2.19.1.windows.1
+
