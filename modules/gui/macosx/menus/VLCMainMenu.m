@@ -95,6 +95,7 @@
 {
     _timeSelectionPanel = [[VLCTimeSelectionPanelController alloc] init];
     _playlistController = [[VLCMain sharedInstance] playlistController];
+    _playerController = _playlistController.playerController;
 
     /* check whether the user runs OSX with a RTL language */
     NSArray* languages = [NSLocale preferredLanguages];
