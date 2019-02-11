@@ -124,7 +124,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
             case INPUT_EVENT_DEAD:
                 [inputManager performSelectorOnMainThread:@selector(updateName) withObject: nil waitUntilDone:NO];
-                [[[VLCMain sharedInstance] mainWindow] performSelectorOnMainThread:@selector(updateTimeSlider) withObject:nil waitUntilDone:NO];
                 break;
 
             default:
@@ -282,7 +281,6 @@ static int InputEvent(vlc_object_t *p_this, const char *psz_var,
 
 - (void)playbackPositionUpdated
 {
-    [[[VLCMain sharedInstance] mainWindow] updateTimeSlider];
     [[[VLCMain sharedInstance] statusBarIcon] updateProgress];
 }
 

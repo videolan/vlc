@@ -307,7 +307,6 @@ static VLCMain *sharedInstance = nil;
 
     /* update the main window */
     [[self mainWindow] updateWindow];
-    [[self mainWindow] updateTimeSlider];
     [[self mainWindow] updateVolumeSlider];
 
     // respect playlist-autostart

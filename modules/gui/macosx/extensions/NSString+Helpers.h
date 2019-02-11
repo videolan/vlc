@@ -75,6 +75,20 @@ NSImage *imageFromRes(NSString *name);
                                negative:(BOOL)negative;
 
 /**
+ Creates an NSString with the current time of the \c input_item_t
+
+ This method allocates and initializes an NSString with the current
+ elapsed or remaining time of the given input.
+
+ \param the duration
+ \param the current time
+ \param negative   If YES, calculate remaining instead of elapsed time
+ */
++ (instancetype)stringWithDuration:(vlc_tick_t)duration
+                       currentTime:(vlc_tick_t)time
+                          negative:(BOOL)negative;
+
+/**
  Creates an NSString with the given time in seconds
 
  This method allocates and initializes an NSString with the given

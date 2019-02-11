@@ -570,12 +570,7 @@ static const float f_min_window_height = 307.;
 
 - (void)updateTimeSlider
 {
-    [self.controlsBar updateTimeSlider];
     [self.fspanel updatePositionAndTime];
-
-    [[[VLCMain sharedInstance] voutProvider] updateControlsBarsUsingBlock:^(VLCControlsBarCommon *controlsBar) {
-        [controlsBar updateTimeSlider];
-    }];
 
     [[VLCCoreInteraction sharedInstance] updateAtoB];
 }
@@ -658,7 +653,6 @@ static const float f_min_window_height = 307.;
         vlc_object_release(p_input);
     }
 
-    [self updateTimeSlider];
     if ([self.fspanel respondsToSelector:@selector(setSeekable:)])
         [self.fspanel setSeekable: b_seekable];
 

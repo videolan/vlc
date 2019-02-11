@@ -69,6 +69,23 @@ NSString *const kVLCMediaUnknown = @"Unknown";
     }
 }
 
++ (instancetype)stringWithDuration:(vlc_tick_t)duration
+                       currentTime:(vlc_tick_t)time
+                          negative:(BOOL)negative
+{
+    char psz_time[MSTRTIME_MAX_SIZE];
+
+    if (negative && duration > 0) {
+        vlc_tick_t remaining = (duration > time) ? (duration - time) : 0;
+
+        return [NSString stringWithFormat:@"-%s",
+                secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(remaining))];
+    } else {
+        return [NSString stringWithUTF8String:
+                secstotimestr(psz_time, (int)SEC_FROM_VLC_TICK(time))];
+    }
+}
+
 + (instancetype)stringWithTimeFromTicks:(vlc_tick_t)time
 {
     char psz_time[MSTRTIME_MAX_SIZE];

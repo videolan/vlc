@@ -28,6 +28,8 @@
 #import "main/VLCMain.h"
 #import "main/CompatibilityFixes.h"
 #import "menus/VLCMainMenu.h"
+#import "playlist/VLCPlaylistController.h"
+#import "playlist/VLCPlayerController.h"
 
 /*****************************************************************************
  * VLCControlsBarCommon
@@ -55,7 +57,9 @@
 - (void)awakeFromNib
 {
     [super awakeFromNib];
-    
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateTimeSlider:) name:VLCPlayerTimeAndPositionChanged object:nil];
+
     _nativeFullscreenMode = var_InheritBool(getIntf(), "macosx-nativefullscreenmode");
 
     [self.dropView setDrawBorder: NO];
@@ -108,6 +112,11 @@
 
     if (config_GetInt("macosx-show-playback-buttons"))
         [self toggleForwardBackwardMode: YES];
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (CGFloat)height
@@ -232,8 +241,7 @@
 
 - (IBAction)timeSliderAction:(id)sender
 {
-    float f_updated;
-    input_thread_t * p_input;
+    float f_updatedDelta;
 
     switch([[NSApp currentEvent] type]) {
         case NSLeftMouseUp:
@@ -247,29 +255,19 @@
             return;
         case NSLeftMouseDown:
         case NSLeftMouseDragged:
-            f_updated = [sender floatValue];
+            f_updatedDelta = [sender floatValue];
             break;
         case NSScrollWheel:
-            f_updated = [sender floatValue];
+            f_updatedDelta = [sender floatValue];
             break;
 
         default:
             return;
     }
-    p_input = pl_CurrentInput(getIntf());
-    if (p_input != NULL) {
-        vlc_value_t pos;
-        NSString * o_time;
 
-        pos.f_float = f_updated / 10000.;
-        var_Set(p_input, "position", pos);
-        [self.timeSlider setFloatValue: f_updated];
-
-        o_time = [NSString stringWithTimeFromInput:p_input
-                                          negative:self.timeField.timeRemaining];
-        [self.timeField setStringValue: o_time];
-        vlc_object_release(p_input);
-    }
+    VLCPlayerController *playerController = [[[VLCMain sharedInstance] playlistController] playerController];
+    [playerController setPositionFast:f_updatedDelta / 10000.];
+    [self.timeSlider setFloatValue:f_updatedDelta];
 }
 
 - (IBAction)fullscreen:(id)sender
@@ -280,14 +278,14 @@
 #pragma mark -
 #pragma mark Updaters
 
-- (void)updateTimeSlider
+- (void)updateTimeSlider:(NSNotification *)aNotification;
 {
-    input_thread_t * p_input;
-    p_input = pl_CurrentInput(getIntf());
+    VLCPlayerController *playerController = aNotification.object;
+    input_item_t *p_item = playerController.currentMedia;
 
     [self.timeSlider setHidden:NO];
 
-    if (!p_input) {
+    if (!p_item) {
         // Nothing playing
         [self.timeSlider setKnobHidden:YES];
         [self.timeSlider setFloatValue: 0.0];
@@ -298,27 +296,25 @@
     }
 
     [self.timeSlider setKnobHidden:NO];
+    [self.timeSlider setFloatValue:(10000. * playerController.position)];
 
-    vlc_value_t pos;
-    var_Get(p_input, "position", &pos);
-    [self.timeSlider setFloatValue:(10000. * pos.f_float)];
-
-    vlc_tick_t dur = input_item_GetDuration(input_GetItem(p_input));
-    if (dur == -1) {
+    vlc_tick_t duration = input_item_GetDuration(p_item);
+    bool buffering = playerController.playerState == VLC_PLAYER_STATE_STARTED;
+    if (duration == -1) {
         // No duration, disable slider
         [self.timeSlider setEnabled:NO];
-    } else {
-        input_state_e inputState = var_GetInteger(p_input, "state");
-        bool buffering = (inputState == INIT_S || inputState == OPENING_S);
+    } else if (buffering) {
+        [self.timeSlider setEnabled:NO];
         [self.timeSlider setIndefinite:buffering];
+    } else {
+        [self.timeSlider setEnabled:playerController.seekable];
     }
 
-    NSString *time = [NSString stringWithTimeFromInput:p_input
-                                              negative:self.timeField.timeRemaining];
+    NSString *time = [NSString stringWithDuration:duration
+                                      currentTime:playerController.time
+                                         negative:self.timeField.timeRemaining];
     [self.timeField setStringValue:time];
     [self.timeField setNeedsDisplay:YES];
-
-    vlc_object_release(p_input);
 }
 
 - (void)updateControls
