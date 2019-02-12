@@ -105,17 +105,8 @@ smb2_check_status(stream_t *access, int status, const char *psz_func)
 
     if (status < 0)
     {
-        if (status != -EINTR)
-        {
-            const char *psz_error = smb2_get_error(sys->smb2);
-            msg_Err(access, "%s failed: %d, '%s'", psz_func, status, psz_error);
-            if (sys->error_status == 0)
-                vlc_dialog_display_error(access,
-                                         _("SMB2 operation failed"), "%s",
-                                         psz_error);
-        }
-        else
-            msg_Warn(access, "%s interrupted", psz_func);
+        const char *psz_error = smb2_get_error(sys->smb2);
+        msg_Warn(access, "%s failed: %d, '%s'", psz_func, status, psz_error);
         sys->error_status = status;
         return -1;
     }
@@ -659,7 +650,12 @@ Open(vlc_object_t *p_obj)
     vlc_credential_clean(&credential);
 
     if (ret != 0)
+    {
+        vlc_dialog_display_error(access,
+                                 _("SMB2 operation failed"), "%s",
+                                 smb2_get_error(sys->smb2));
         goto error;
+    }
 
     if (sys->smb2fh != NULL)
     {
