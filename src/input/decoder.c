@@ -1912,7 +1912,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     switch( fmt->i_cat )
     {
         case VIDEO_ES:
-            if( !input_priv( p_input )->b_thumbnailing )
+            if( !p_input || !input_priv( p_input )->b_thumbnailing )
                 p_dec->cbs = &dec_video_cbs;
             else
                 p_dec->cbs = &dec_thumbnailer_cbs;
