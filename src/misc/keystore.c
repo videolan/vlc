@@ -440,9 +440,6 @@ vlc_credential_get(vlc_credential *p_credential, vlc_object_t *p_parent,
 
         case GET_FROM_MEMORY_KEYSTORE:
         {
-            if (!psz_dialog_title || !psz_dialog_fmt)
-                return false;
-
             vlc_keystore *p_keystore = get_memory_keystore(p_parent);
             if (p_keystore != NULL)
                 credential_find_keystore(p_credential, p_keystore);
