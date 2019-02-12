@@ -519,8 +519,8 @@ char *MediaRenderer::getServiceURL(const char* type, const char *service)
             if ( !psz_control_url )
                 continue;
 
-            char* psz_url = ( char* ) malloc( base_url.length() + strlen( psz_control_url ) + 1 );
-            if ( psz_url && UpnpResolveURL( base_url.c_str(), psz_control_url, psz_url ) == UPNP_E_SUCCESS )
+            char* psz_url = NULL;
+            if ( UpnpResolveURL2( base_url.c_str(), psz_control_url, &psz_url ) == UPNP_E_SUCCESS )
                 return psz_url;
             return nullptr;
         }

@@ -566,25 +566,20 @@ void MediaServerList::parseNewServer( IXML_Document *doc, const std::string &loc
             }
 
             /* Try to browse content directory. */
-            char* psz_url = ( char* ) malloc( strlen( psz_base_url ) + strlen( psz_control_url ) + 1 );
-            if ( psz_url )
+            char* psz_url = NULL;
+            if ( UpnpResolveURL2( psz_base_url, psz_control_url, &psz_url ) == UPNP_E_SUCCESS )
             {
-                if ( UpnpResolveURL( psz_base_url, psz_control_url, psz_url ) == UPNP_E_SUCCESS )
-                {
-                    SD::MediaServerDesc* p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
-                            psz_friendly_name, psz_url, iconUrl );
-                    free( psz_url );
-                    if ( unlikely( !p_server ) )
-                        break;
+                SD::MediaServerDesc* p_server = new(std::nothrow) SD::MediaServerDesc( psz_udn,
+                    psz_friendly_name, psz_url, iconUrl );
+                free( psz_url );
+                if ( unlikely( !p_server ) )
+                    break;
 
-                    if ( !addServer( p_server ) )
-                    {
-                        delete p_server;
-                        continue;
-                    }
+                if ( !addServer( p_server ) )
+                {
+                    delete p_server;
+                    continue;
                 }
-                else
-                    free( psz_url );
             }
         }
         ixmlNodeList_free( p_service_list );
