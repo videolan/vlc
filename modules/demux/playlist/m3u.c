@@ -225,7 +225,7 @@ static int ReadDir( stream_t *p_demux, input_item_node_t *p_subitems )
     bool b_cleanup = false;
     input_item_t *p_input;
 
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
+    input_item_t *p_current_input = p_demux->p_input ? GetCurrentItem(p_demux) : NULL;
 
     psz_line = vlc_stream_ReadLine( p_demux->p_source );
     while( psz_line )
