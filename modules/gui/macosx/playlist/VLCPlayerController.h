@@ -192,6 +192,7 @@ extern NSString *VLCPlayerMuteChanged;
 /**
  * get the current media item
  * @return the current media item, NULL if none
+ * @note it is the receiver's obligation to release the input item
  */
 @property (readonly, nullable) input_item_t * currentMedia;
 /**

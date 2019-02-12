@@ -315,6 +315,8 @@
                                          negative:self.timeField.timeRemaining];
     [self.timeField setStringValue:time];
     [self.timeField setNeedsDisplay:YES];
+
+    input_item_Release(p_item);
 }
 
 - (void)updateControls

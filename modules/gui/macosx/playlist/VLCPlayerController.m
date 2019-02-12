@@ -420,6 +420,9 @@ static const struct vlc_player_aout_cbs player_aout_callbacks = {
     input_item_t *inputItem;
     vlc_player_Lock(_p_player);
     inputItem = vlc_player_GetCurrentMedia(_p_player);
+    if (inputItem) {
+        input_item_Hold(inputItem);
+    }
     vlc_player_Unlock(_p_player);
     return inputItem;
 }

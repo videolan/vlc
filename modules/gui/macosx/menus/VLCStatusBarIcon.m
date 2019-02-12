@@ -258,6 +258,7 @@
         }
         [self setStoppedStatus:NO];
 
+        input_item_Release(p_item);
     } else {
         /* Nothing playing */
         [progressField setStringValue:@"--:--"];
@@ -375,6 +376,8 @@
             album = toNSStr(tmp_cstr);
             FREENULL(tmp_cstr);
         }
+
+        input_item_Release(mediaItem);
     } else {
         /* Nothing playing */
         title = _NS("VLC media player");
