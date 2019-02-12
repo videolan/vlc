@@ -1506,10 +1506,7 @@ static bool CanUseTextureArray(vout_display_t *vd)
     return false;
 #else
     struct wddm_version WDDM = {
-        .wddm         = 22,
-        .d3d_features = 19,
-        .revision     = 162,
-        .build        = 0,
+        .revision     = 162, // 17.5.1 - 2017/05/04
     };
     if (D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) == VLC_SUCCESS)
         return true;
@@ -1540,10 +1537,7 @@ static bool BogusZeroCopy(vout_display_t *vd)
     case 0x15DD: // RX Vega 8/11 (Ryzen iGPU)
     {
         struct wddm_version WDDM = {
-            .wddm         = 0,
-            .d3d_features = 0,
-            .revision     = 14011,
-            .build        = 0,
+            .revision     = 14011, // 18.10.2 - 2018/06/11
         };
         return D3D11CheckDriverVersion(&vd->sys->d3d_dev, GPU_MANUFACTURER_AMD, &WDDM) != VLC_SUCCESS;
     }
