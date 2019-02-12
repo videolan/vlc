@@ -107,7 +107,7 @@ smb2_check_status(stream_t *access, int status, const char *psz_func)
     {
         if (status != -EINTR)
         {
-            const char *psz_error = vlc_strerror_c(-status);
+            const char *psz_error = smb2_get_error(sys->smb2);
             msg_Err(access, "%s failed: %d, '%s'", psz_func, status, psz_error);
             if (sys->error_status == 0)
                 vlc_dialog_display_error(access,
