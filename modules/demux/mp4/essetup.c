@@ -1061,9 +1061,15 @@ int SetupAudioES( demux_t *p_demux, mp4_track_t *p_track, MP4_Box_t *p_sample )
         case( VLC_FOURCC( 'N', 'O', 'N', 'E' ) ):
         {
             if( (p_soun->i_samplesize+7)/8 == 1 )
+            {
                 p_track->fmt.i_codec = VLC_CODEC_U8;
+                p_track->fmt.audio.i_bitspersample = 8;
+            }
             else
+            {
                 p_track->fmt.i_codec = VLC_FOURCC( 't', 'w', 'o', 's' );
+                p_track->fmt.audio.i_bitspersample = 16;
+            }
 
             /* Buggy files workaround */
             if( (p_track->i_timescale != p_soun->i_sampleratehi) )
