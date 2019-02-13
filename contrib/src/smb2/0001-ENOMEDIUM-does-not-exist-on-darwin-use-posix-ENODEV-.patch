@@ -1,0 +1,25 @@
+From 2256d19bc9fead528bac900d894d65e9b030f7f8 Mon Sep 17 00:00:00 2001
+From: "S. Davilla" <davilla@4pi.com>
+Date: Mon, 22 Oct 2018 20:53:15 -0400
+Subject: [PATCH] ENOMEDIUM does not exist on darwin, use posix ENODEV instead
+
+---
+ lib/errors.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/errors.c b/lib/errors.c
+index f2696c0..3612f9a 100644
+--- a/lib/errors.c
++++ b/lib/errors.c
+@@ -218,7 +218,7 @@ int nterror_to_errno(uint32_t status) {
+         case SMB2_STATUS_MEDIA_WRITE_PROTECTED:
+                 return EROFS;
+         case SMB2_STATUS_NO_MEDIA_IN_DEVICE:
+-                return ENOMEDIUM;
++                return ENODEV;
+         case SMB2_STATUS_DATA_ERROR:
+         case SMB2_STATUS_CRC_ERROR:
+         case SMB2_STATUS_DEVICE_DATA_ERROR:
+-- 
+2.17.2 (Apple Git-113)
+

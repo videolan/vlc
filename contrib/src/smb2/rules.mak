@@ -19,6 +19,7 @@ $(TARBALLS)/libsmb2-$(SMB2_VERSION).tar.gz:
 smb2: libsmb2-$(SMB2_VERSION).tar.gz .sum-smb2
 	$(UNPACK)
 	$(APPLY) $(SRC)/smb2/0001-master-backport.patch
+	$(APPLY) $(SRC)/smb2/0001-ENOMEDIUM-does-not-exist-on-darwin-use-posix-ENODEV-.patch
 	$(MOVE)
 
 .smb2: smb2
