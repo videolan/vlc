@@ -2605,15 +2605,11 @@ static bool Ogg_ReadTheoraHeader( logical_stream_t *p_stream,
     }
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
-    p_stream->i_keyframe_offset = 0;
+    p_stream->i_first_frame_index = (i_version >= 3002001) ? 1 : 0;
     if ( !i_fps_denominator || !i_fps_numerator )
         return false;
     date_Init( &p_stream->dts, i_fps_numerator, i_fps_denominator );
 
-    if ( i_version >= 3002001 )
-    {
-        p_stream->i_keyframe_offset = 1;
-    }
     return true;
 }
 
@@ -2670,7 +2666,7 @@ static bool Ogg_ReadDaalaHeader( logical_stream_t *p_stream,
 
     i_version = i_major * 1000000 + i_minor * 1000 + i_subminor;
     VLC_UNUSED(i_version);
-    p_stream->i_keyframe_offset = 0;
+    p_stream->i_first_frame_index = 0;
     if ( !i_timebase_numerator || !i_timebase_denominator )
         return false;
     date_Init( &p_stream->dts, i_timebase_numerator, i_timebase_denominator );

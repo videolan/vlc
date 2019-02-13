@@ -90,7 +90,7 @@ typedef struct logical_stream_s
     int i_pre_skip;
 
     /* offset of first keyframe for theora; can be 0 or 1 depending on version number */
-    int8_t i_keyframe_offset;
+    int8_t i_first_frame_index;
 
     /* keyframe index for seeking, created as we discover keyframes */
     demux_index_entry_t *idx;
