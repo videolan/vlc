@@ -1162,7 +1162,7 @@ static bool Ogg_IsHeaderPacket( const logical_stream_t *p_stream,
         return p_oggpacket->bytes > 0 &&
                (p_oggpacket->packet[0] & PACKET_TYPE_HEADER);
     }
-    else return (p_oggpacket->granulepos == 0);
+    else return ( p_oggpacket->granulepos == 0 && p_stream->i_first_frame_index > 0 );
 }
 
 /****************************************************************************
@@ -2247,6 +2247,7 @@ static void Ogg_LogicalStreamInit( logical_stream_t *p_stream )
     es_format_Init( &p_stream->fmt, UNKNOWN_ES, 0 );
     es_format_Init( &p_stream->fmt_old, UNKNOWN_ES, 0 );
     p_stream->i_pcr = VLC_TICK_INVALID;
+    p_stream->i_first_frame_index = 1;
     date_Set( &p_stream->dts, VLC_TICK_INVALID );
     p_stream->b_initializing = true;
     p_stream->b_contiguous = true; /* default */
