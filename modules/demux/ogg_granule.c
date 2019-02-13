@@ -100,6 +100,9 @@ static int64_t Ogg_GranuleToSample( const logical_stream_t *p_stream, int64_t i_
     switch( p_stream->fmt.i_codec )
     {
         case VLC_CODEC_THEORA:
+            if( p_stream->i_first_frame_index == 0 && !p_stream->b_oggds )
+                i_granule++;
+            /* fallthrough */
         case VLC_CODEC_DAALA:
         case VLC_CODEC_KATE:
         {
@@ -176,7 +179,7 @@ vlc_tick_t Ogg_SampleToTime( const logical_stream_t *p_stream, int64_t i_sample,
 bool Ogg_GranuleIsValid( const logical_stream_t *p_stream, int64_t i_granule )
 {
     /* First frame in ogm is 0 (0[header] 0[frame] -1 2 3 -1 5 ...) */
-    return !( i_granule < 1 - !!p_stream->b_oggds );
+    return !( i_granule < p_stream->i_first_frame_index - !!p_stream->b_oggds );
 }
 
 vlc_tick_t Ogg_GranuleToTime( const logical_stream_t *p_stream, int64_t i_granule,
