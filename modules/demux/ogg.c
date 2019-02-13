@@ -1411,7 +1411,10 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     }
     else if( p_stream->fmt.i_cat == AUDIO_ES )
     {
-        p_block->i_pts = p_stream->b_interpolation_failed ? VLC_TICK_INVALID : p_block->i_dts;
+        if( p_stream->b_interpolation_failed && p_oggpacket->granulepos < 0 )
+            p_block->i_pts = VLC_TICK_INVALID;
+        else
+            p_block->i_pts = p_block->i_dts;
     }
     else if( p_stream->fmt.i_cat == SPU_ES )
     {
