@@ -362,14 +362,6 @@ static int VoutDisplayCreateRender(vout_display_t *vd)
     return ret;
 }
 
-static void VoutDisplayDestroyRender(vout_display_t *vd)
-{
-    vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
-
-    if (osys->converters)
-        filter_chain_Delete(osys->converters);
-}
-
 void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {
 #ifdef _WIN32
@@ -479,12 +471,15 @@ static void vout_display_Reset(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
+    if (osys->converters != NULL) {
+        filter_chain_Delete(osys->converters);
+        osys->converters = NULL;
+    }
+
     if (osys->pool != NULL) {
         picture_pool_Release(osys->pool);
         osys->pool = NULL;
     }
-
-    VoutDisplayDestroyRender(vd);
 
     if (vout_display_Control(vd, VOUT_DISPLAY_RESET_PICTURES, &osys->cfg,
                              &vd->fmt)
@@ -807,7 +802,8 @@ void vout_display_Delete(vout_display_t *vd)
 {
     vout_display_priv_t *osys = container_of(vd, vout_display_priv_t, display);
 
-    VoutDisplayDestroyRender(vd);
+    if (osys->converters != NULL)
+        filter_chain_Delete(osys->converters);
 
     if (osys->pool != NULL)
         picture_pool_Release(osys->pool);
