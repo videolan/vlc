@@ -387,6 +387,23 @@ static void Close( vlc_object_t * p_this )
 }
 
 /*****************************************************************************
+ * Time seek:
+ *****************************************************************************/
+static int MovetoTimePos( demux_t *p_demux, vlc_tick_t i_time, uint64_t i_pos )
+{
+    demux_sys_t *p_sys  = p_demux->p_sys;
+    int i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset + i_pos );
+    if( i_ret != VLC_SUCCESS )
+        return i_ret;
+    p_sys->i_time_offset = i_time - p_sys->i_pts;
+    /* And reset buffered data */
+    if( p_sys->p_packetized_data )
+        block_ChainRelease( p_sys->p_packetized_data );
+    p_sys->p_packetized_data = NULL;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Control:
  *****************************************************************************/
 static int Control( demux_t *p_demux, int i_query, va_list args )
@@ -441,15 +458,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 vlc_tick_t i_time = va_arg(args, vlc_tick_t);
                 uint64_t i_pos = SeekByMlltTable( p_demux, &i_time );
-                int i_ret = vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset + i_pos );
-                if( i_ret != VLC_SUCCESS )
-                    return i_ret;
-                p_sys->i_time_offset = i_time - p_sys->i_pts;
-                /* And reset buffered data */
-                if( p_sys->p_packetized_data )
-                    block_ChainRelease( p_sys->p_packetized_data );
-                p_sys->p_packetized_data = NULL;
-                return VLC_SUCCESS;
+                return MovetoTimePos( p_demux, i_time, i_pos );
             }
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
