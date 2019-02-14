@@ -1103,6 +1103,37 @@ static int ID3TAG_Parse_Handler( uint32_t i_tag, const uint8_t *p_payload, size_
             vlc_meta_Delete( p_meta );
         }
     }
+    else if ( i_tag == VLC_FOURCC('C', 'H', 'A', 'P') && i_payload >= 17 )
+    {
+        char *psz_title = strndup( (const char *)p_payload, i_payload - 16 );
+        size_t i_offset = psz_title ? strlen( psz_title ) : 0;
+        if( p_payload[i_offset] != 0 )
+        {
+            free( psz_title );
+            return VLC_EGENERIC;
+        }
+        chap_entry_t e;
+        e.p_seekpoint = vlc_seekpoint_New();
+        if( e.p_seekpoint )
+        {
+            e.p_seekpoint->psz_name = psz_title;
+            e.p_seekpoint->i_time_offset = VLC_TICK_FROM_MS(GetDWBE(&p_payload[1 + i_offset]));
+            e.i_offset = GetDWBE(&p_payload[1 + i_offset + 8]);
+            p_payload += i_offset + 1 + 16;
+            i_payload -= i_offset + 1 + 16;
+            if( 12 < i_payload && !memcmp("TIT2", p_payload, 4) )
+            {
+                psz_title = NULL; /* optional alloc */
+                const char *psz = ID3TextConvert(&p_payload[10], i_payload-12, &psz_title);
+                if( psz ) /* replace with TIT2 */
+                {
+                    free( e.p_seekpoint->psz_name );
+                    e.p_seekpoint->psz_name = (psz_title) ? psz_title : strdup( psz );
+                }
+            }
+            TAB_APPEND(p_sys->chapters.i_count, p_sys->chapters.p_entry, e);
+        } else free( psz_title );
+    }
 
     return VLC_SUCCESS;
 }
