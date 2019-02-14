@@ -3034,7 +3034,8 @@ static int TrackTimeToSampleChunk( demux_t *p_demux, mp4_track_t *p_track,
     /* *** find sample in the chunk *** */
     i_sample = p_track->chunk[i_chunk].i_sample_first;
     i_dts    = p_track->chunk[i_chunk].i_first_dts;
-    for( i_index = 0; i_sample < p_track->chunk[i_chunk].i_sample_count; )
+    for( i_index = 0;  i_index < p_track->chunk[i_chunk].i_entries_dts &&
+                       i_sample < p_track->chunk[i_chunk].i_sample_count; )
     {
         if( i_dts +
             p_track->chunk[i_chunk].p_sample_count_dts[i_index] *
