@@ -124,6 +124,12 @@ typedef struct
 
 typedef struct
 {
+    uint32_t i_offset;
+    seekpoint_t *p_seekpoint;
+} chap_entry_t;
+
+typedef struct
+{
     codec_t codec;
     vlc_fourcc_t i_original;
 
@@ -146,6 +152,7 @@ typedef struct
     int i_packet_size;
 
     uint64_t i_stream_offset;
+    unsigned i_demux_flags;
 
     float   f_fps;
 
@@ -164,6 +171,12 @@ typedef struct
     float rgf_replay_peak[AUDIO_REPLAY_GAIN_MAX];
 
     sync_table_t mllt;
+    struct
+    {
+        size_t i_count;
+        size_t i_current;
+        chap_entry_t *p_entry;
+    } chapters;
 } demux_sys_t;
 
 static int MpgaProbe( demux_t *p_demux, uint64_t *pi_offset );
@@ -225,6 +238,8 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->b_big_endian = false;
     p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
     p_sys->p_packetized_data = NULL;
+    p_sys->chapters.i_current = 0;
+    TAB_INIT(p_sys->chapters.i_count, p_sys->chapters.p_entry);
 
     if( vlc_stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
     {
@@ -312,6 +327,21 @@ static int OpenVideo( vlc_object_t *p_this )
     }
     return OpenCommon( p_demux, VIDEO_ES, &codec_m4v, i_off );
 }
+
+static void IncreaseChapter( demux_t *p_demux, vlc_tick_t i_time )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    while( p_sys->chapters.i_current + 1 < p_sys->chapters.i_count )
+    {
+        const chap_entry_t *p = &p_sys->chapters.p_entry[p_sys->chapters.i_current + 1];
+        if( (p->i_offset != UINT32_MAX && vlc_stream_Tell( p_demux->s ) < p->i_offset) ||
+            (i_time == VLC_TICK_INVALID || p->p_seekpoint->i_time_offset + VLC_TICK_0 > i_time) )
+            break;
+        ++p_sys->chapters.i_current;
+        p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
+    }
+}
+
 /*****************************************************************************
  * Demux: reads and demuxes data packets
  *****************************************************************************
@@ -327,6 +357,11 @@ static int Demux( demux_t *p_demux )
         p_sys->p_packetized_data = NULL;
     else
         ret = Parse( p_demux, &p_block_out ) ? 0 : 1;
+
+    /* Update chapter if any */
+    IncreaseChapter( p_demux,
+                     p_block_out ? p_sys->i_time_offset + p_block_out->i_dts
+                                 : VLC_TICK_INVALID );
 
     while( p_block_out )
     {
@@ -380,6 +415,9 @@ static void Close( vlc_object_t * p_this )
 
     if( p_sys->p_packetized_data )
         block_ChainRelease( p_sys->p_packetized_data );
+    for( size_t i=0; i< p_sys->chapters.i_count; i++ )
+        vlc_seekpoint_Delete( p_sys->chapters.p_entry[i].p_seekpoint );
+    TAB_CLEAN( p_sys->chapters.i_count, p_sys->chapters.p_entry );
     if( p_sys->mllt.p_bits )
         free( p_sys->mllt.p_bits );
     demux_PacketizerDestroy( p_sys->p_packetizer );
@@ -400,6 +438,8 @@ static int MovetoTimePos( demux_t *p_demux, vlc_tick_t i_time, uint64_t i_pos )
     if( p_sys->p_packetized_data )
         block_ChainRelease( p_sys->p_packetized_data );
     p_sys->p_packetized_data = NULL;
+    p_sys->chapters.i_current = 0;
+    p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
     return VLC_SUCCESS;
 }
 
@@ -463,6 +503,77 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             /* FIXME TODO: implement a high precision seek (with mp3 parsing)
              * needed for multi-input */
             break;
+
+        case DEMUX_GET_TITLE_INFO:
+        {
+            if( p_sys->chapters.i_count == 0 )
+                return VLC_EGENERIC;
+            input_title_t **pp_title = malloc( sizeof(*pp_title) );
+            if( !pp_title )
+                return VLC_EGENERIC;
+            *pp_title = vlc_input_title_New();
+            if( !*pp_title )
+            {
+                free( pp_title );
+                return VLC_EGENERIC;
+            }
+            (*pp_title)->seekpoint = vlc_alloc( p_sys->chapters.i_count, sizeof(seekpoint_t) );
+            if( !(*pp_title)->seekpoint )
+            {
+                free( *pp_title );
+                free( pp_title );
+                return VLC_EGENERIC;
+            }
+            for( size_t i=0; i<p_sys->chapters.i_count; i++ )
+            {
+                seekpoint_t *s = vlc_seekpoint_Duplicate( p_sys->chapters.p_entry[i].p_seekpoint );
+                if( s )
+                    (*pp_title)->seekpoint[(*pp_title)->i_seekpoint++] = s;
+            }
+            *(va_arg( args, input_title_t *** )) = pp_title;
+            *(va_arg( args, int* )) = 1;
+            *(va_arg( args, int* )) = 0;
+            *(va_arg( args, int* )) = 0;
+            return VLC_SUCCESS;
+        }
+        break;
+
+        case DEMUX_GET_TITLE:
+            if( p_sys->chapters.i_count == 0 )
+                return VLC_EGENERIC;
+            *(va_arg( args, int* )) = 0;
+            return VLC_SUCCESS;
+
+        case DEMUX_GET_SEEKPOINT:
+            if( p_sys->chapters.i_count == 0 )
+                return VLC_EGENERIC;
+            *(va_arg( args, int* )) = p_sys->chapters.i_current;
+            return VLC_SUCCESS;
+
+        case DEMUX_SET_TITLE:
+            return va_arg( args, int) == 0 ? VLC_SUCCESS : VLC_EGENERIC;
+
+        case DEMUX_SET_SEEKPOINT:
+        {
+            int i = va_arg( args, int );
+            if( (size_t)i>=p_sys->chapters.i_count )
+                return VLC_EGENERIC;
+            const chap_entry_t *p = &p_sys->chapters.p_entry[i];
+            if( p_sys->chapters.p_entry[i].i_offset == UINT32_MAX )
+                return demux_Control( p_demux, DEMUX_SET_TIME, p->p_seekpoint->i_time_offset );
+            int i_ret= MovetoTimePos( p_demux, p->p_seekpoint->i_time_offset, p->i_offset );
+            if( i_ret == VLC_SUCCESS )
+                p_sys->chapters.i_current = i;
+            return i_ret;
+        }
+
+        case DEMUX_TEST_AND_CLEAR_FLAGS:
+        {
+            unsigned *restrict flags = va_arg( args, unsigned * );
+            *flags &= p_sys->i_demux_flags;
+            p_sys->i_demux_flags &= ~*flags;
+            return VLC_SUCCESS;
+        }
     }
 
     int ret = demux_vaControlHelper( p_demux->s, p_sys->i_stream_offset, -1,
@@ -470,21 +581,28 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     if( ret != VLC_SUCCESS )
         return ret;
 
-    if( p_sys->i_bitrate_avg > 0
-     && (i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME) )
+    if( i_query == DEMUX_SET_POSITION || i_query == DEMUX_SET_TIME )
     {
-        int64_t i_time = INT64_C(8000000)
-            * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset )
-            / p_sys->i_bitrate_avg;
+        if( p_sys->i_bitrate_avg > 0 )
+        {
+            int64_t i_time = INT64_C(8000000)
+                * ( vlc_stream_Tell(p_demux->s) - p_sys->i_stream_offset )
+                / p_sys->i_bitrate_avg;
 
-        /* Fix time_offset */
-        if( i_time >= 0 )
-            p_sys->i_time_offset = i_time - p_sys->i_pts;
-        /* And reset buffered data */
-        if( p_sys->p_packetized_data )
-            block_ChainRelease( p_sys->p_packetized_data );
-        p_sys->p_packetized_data = NULL;
+            /* Fix time_offset */
+            if( i_time >= 0 )
+                p_sys->i_time_offset = i_time - p_sys->i_pts;
+            /* And reset buffered data */
+            if( p_sys->p_packetized_data )
+                block_ChainRelease( p_sys->p_packetized_data );
+            p_sys->p_packetized_data = NULL;
+        }
+
+        /* Reset chapter if any */
+        p_sys->chapters.i_current = 0;
+        p_sys->i_demux_flags |= INPUT_UPDATE_SEEKPOINT;
     }
+
     return VLC_SUCCESS;
 }
 
