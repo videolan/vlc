@@ -6,6 +6,8 @@ POSTPROC_VERSION := $(POSTPROC_HASH)
 
 POSTPROCCONF = \
 	--cc="$(CC)" \
+	--ar="$(AR)" \
+	--ranlib="$(RANLIB)" \
 	--disable-debug \
 	--enable-gpl \
 	--enable-postproc
@@ -124,6 +126,7 @@ $(TARBALLS)/postproc-$(POSTPROC_VERSION).tar.xz:
 postproc: postproc-$(POSTPROC_VERSION).tar.xz .sum-postproc
 	$(UNPACK)
 	$(APPLY) $(SRC)/postproc/win-pic.patch
+	$(APPLY) $(SRC)/postproc/postproc-ranlib.patch
 	$(MOVE)
 
 .postproc: postproc
