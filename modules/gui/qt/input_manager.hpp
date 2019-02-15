@@ -192,7 +192,7 @@ public slots:
     void littlefaster();
     void littleslower();
     void normalRate();
-    void setRate( int );
+    void setRate( float );
     /* Jumping */
     void jumpFwd();
     void jumpBwd();

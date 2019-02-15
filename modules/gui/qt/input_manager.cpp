@@ -909,10 +909,9 @@ void InputManager::normalRate()
     var_SetFloat( THEPL, "rate", 1. );
 }
 
-void InputManager::setRate( int new_rate )
+void InputManager::setRate( float new_rate )
 {
-    var_SetFloat( THEPL, "rate",
-                 (float)INPUT_RATE_DEFAULT / (float)new_rate );
+    var_SetFloat( THEPL, "rate", new_rate );
 }
 
 void InputManager::jumpFwd()
