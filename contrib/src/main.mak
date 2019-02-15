@@ -525,7 +525,7 @@ else
 endif
 endif
 ifdef HAVE_CROSS_COMPILE
-	echo "set(CMAKE_RC_COMPILER $(HOST)-windres)" >> $@
+	echo "set(CMAKE_RC_COMPILER $(WINDRES))" >> $@
 endif
 endif
 ifdef HAVE_DARWIN_OS
