@@ -553,7 +553,11 @@ endif
 endif
 	echo "set(CMAKE_C_COMPILER $(CC))" >> $@
 	echo "set(CMAKE_CXX_COMPILER $(CXX))" >> $@
+ifeq ($(findstring msys,$(BUILD)),msys)
+	echo "set(CMAKE_FIND_ROOT_PATH `cygpath -m $(PREFIX)`)" >> $@
+else
 	echo "set(CMAKE_FIND_ROOT_PATH $(PREFIX))" >> $@
+endif
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> $@
 ifdef HAVE_CROSS_COMPILE
 	echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> $@
