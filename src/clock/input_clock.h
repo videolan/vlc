@@ -39,7 +39,7 @@ typedef struct input_clock_t input_clock_t;
  * This function creates a new input_clock_t.
  * You must use input_clock_Delete to delete it once unused.
  */
-input_clock_t *input_clock_New( int i_rate );
+input_clock_t *input_clock_New( float rate );
 
 /**
  * This function destroys a input_clock_t created by input_clock_New.
@@ -72,7 +72,7 @@ vlc_tick_t input_clock_GetWakeup( input_clock_t * );
 /**
  * This functions allows changing the actual reading speed.
  */
-void    input_clock_ChangeRate( input_clock_t *, int i_rate );
+void    input_clock_ChangeRate( input_clock_t *, float rate );
 
 /**
  * This function allows changing the pause status.
@@ -96,7 +96,7 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_ti
 /**
  * This function converts a pair of timestamp from stream clock to system clock.
  *
- * If pi_rate is provided it will be filled with the rate value used for
+ * If p_rate is provided it will be filled with the rate value used for
  * the conversion.
  * p_ts0 is a pointer to a timestamp to be converted (in place) and must be non NULL.
  * p_ts1 is a pointer to a timestamp to be converted (in place) and can be NULL.
@@ -107,13 +107,13 @@ void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, vlc_ti
  * this case, *p_ts0 and *p_ts1 will hold an invalid timestamp.
  * Otherwise it will return VLC_SUCCESS.
  */
-int input_clock_ConvertTS( vlc_object_t *, input_clock_t *, int *pi_rate,
+int input_clock_ConvertTS( vlc_object_t *, input_clock_t *, float *p_rate,
                            vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1, vlc_tick_t i_ts_bound );
 
 /**
  * This function returns the current rate.
  */
-int input_clock_GetRate( input_clock_t * );
+float input_clock_GetRate( input_clock_t * );
 
 /**
  * This function returns current clock state or VLC_EGENERIC if there is not a

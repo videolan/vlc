@@ -139,7 +139,7 @@ struct input_clock_t
 
     /* Current modifiers */
     bool    b_paused;
-    int     i_rate;
+    float   rate;
     vlc_tick_t i_pts_delay;
     vlc_tick_t i_pause_date;
 };
@@ -152,7 +152,7 @@ static vlc_tick_t ClockGetTsOffset( input_clock_t * );
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
-input_clock_t *input_clock_New( int i_rate )
+input_clock_t *input_clock_New( float rate )
 {
     input_clock_t *cl = malloc( sizeof(*cl) );
     if( !cl )
@@ -176,7 +176,7 @@ input_clock_t *input_clock_New( int i_rate )
     for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
         cl->late.pi_value[i] = 0;
 
-    cl->i_rate = i_rate;
+    cl->rate = rate;
     cl->i_pts_delay = 0;
     cl->b_paused = false;
     cl->i_pause_date = VLC_TICK_INVALID;
@@ -308,7 +308,7 @@ void input_clock_Reset( input_clock_t *cl )
 /*****************************************************************************
  * input_clock_ChangeRate:
  *****************************************************************************/
-void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
+void input_clock_ChangeRate( input_clock_t *cl, float rate )
 {
     vlc_mutex_lock( &cl->lock );
 
@@ -316,9 +316,9 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
     {
         /* Move the reference point (as if we were playing at the new rate
          * from the start */
-        cl->ref.i_system = cl->last.i_system - (cl->last.i_system - cl->ref.i_system) * i_rate / cl->i_rate;
+        cl->ref.i_system = cl->last.i_system - (cl->last.i_system - cl->ref.i_system) / rate * cl->rate;
     }
-    cl->i_rate = i_rate;
+    cl->rate = rate;
 
     vlc_mutex_unlock( &cl->lock );
 }
@@ -369,14 +369,14 @@ vlc_tick_t input_clock_GetWakeup( input_clock_t *cl )
  * input_clock_ConvertTS
  *****************************************************************************/
 int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
-                           int *pi_rate, vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1,
+                           float *p_rate, vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1,
                            vlc_tick_t i_ts_bound )
 {
     assert( pi_ts0 );
     vlc_mutex_lock( &cl->lock );
 
-    if( pi_rate )
-        *pi_rate = cl->i_rate;
+    if( p_rate )
+        *p_rate = cl->rate;
 
     if( !cl->b_has_reference )
     {
@@ -390,7 +390,7 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
     }
 
     /* */
-    const vlc_tick_t i_ts_buffering = cl->i_buffering_duration * cl->i_rate / INPUT_RATE_DEFAULT;
+    const vlc_tick_t i_ts_buffering = cl->i_buffering_duration / cl->rate;
     const vlc_tick_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
 
     /* */
@@ -427,15 +427,13 @@ int input_clock_ConvertTS( vlc_object_t *p_object, input_clock_t *cl,
 /*****************************************************************************
  * input_clock_GetRate: Return current rate
  *****************************************************************************/
-int input_clock_GetRate( input_clock_t *cl )
+float input_clock_GetRate( input_clock_t *cl )
 {
-    int i_rate;
-
     vlc_mutex_lock( &cl->lock );
-    i_rate = cl->i_rate;
+    float rate = cl->rate;
     vlc_mutex_unlock( &cl->lock );
 
-    return i_rate;
+    return rate;
 }
 
 int input_clock_GetState( input_clock_t *cl,
@@ -570,8 +568,7 @@ static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
     if( !cl->b_has_reference )
         return VLC_TICK_INVALID;
 
-    return ( i_stream - cl->ref.i_stream ) * cl->i_rate / INPUT_RATE_DEFAULT +
-           cl->ref.i_system;
+    return ( i_stream - cl->ref.i_stream ) / cl->rate + cl->ref.i_system;
 }
 
 /*****************************************************************************
@@ -582,8 +579,7 @@ static vlc_tick_t ClockStreamToSystem( input_clock_t *cl, vlc_tick_t i_stream )
 static vlc_tick_t ClockSystemToStream( input_clock_t *cl, vlc_tick_t i_system )
 {
     assert( cl->b_has_reference );
-    return ( i_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
-            cl->ref.i_stream;
+    return ( i_system - cl->ref.i_system ) * cl->rate + cl->ref.i_stream;
 }
 
 /**
@@ -592,6 +588,6 @@ static vlc_tick_t ClockSystemToStream( input_clock_t *cl, vlc_tick_t i_system )
  */
 static vlc_tick_t ClockGetTsOffset( input_clock_t *cl )
 {
-    return cl->i_pts_delay * ( cl->i_rate - INPUT_RATE_DEFAULT ) / INPUT_RATE_DEFAULT;
+    return cl->i_pts_delay * ( 1.0f / cl->rate - 1.0f );
 }
 

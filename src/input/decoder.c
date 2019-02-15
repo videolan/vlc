@@ -711,7 +711,7 @@ static float DecoderGetDisplayRate( decoder_t *p_dec )
 
     if( !p_owner->p_clock )
         return 1.f;
-    return input_clock_GetRate( p_owner->p_clock ) / (float) INPUT_RATE_DEFAULT;
+    return input_clock_GetRate( p_owner->p_clock );
 }
 
 /*****************************************************************************
@@ -811,7 +811,7 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
         return;
 
     const bool b_ephemere = pi_ts1 && *pi_ts0 == *pi_ts1;
-    int i_rate;
+    float rate;
 
     if( *pi_ts0 != VLC_TICK_INVALID )
     {
@@ -820,7 +820,7 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
             *pi_ts1 += i_es_delay;
         if( i_ts_bound != INT64_MAX )
             i_ts_bound += i_es_delay;
-        if( input_clock_ConvertTS( VLC_OBJECT(p_dec), p_clock, &i_rate, pi_ts0, pi_ts1, i_ts_bound ) ) {
+        if( input_clock_ConvertTS( VLC_OBJECT(p_dec), p_clock, &rate, pi_ts0, pi_ts1, i_ts_bound ) ) {
             const char *psz_name = module_get_name( p_dec->p_module, false );
             if( pi_ts1 != NULL )
                 msg_Err(p_dec, "Could not convert timestamps %"PRId64
@@ -832,8 +832,9 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
     }
     else
     {
-        i_rate = input_clock_GetRate( p_clock );
+        rate = input_clock_GetRate( p_clock );
     }
+    const int i_rate = INPUT_RATE_DEFAULT / rate;
 
     /* Do not create ephemere data because of rounding errors */
     if( !b_ephemere && pi_ts1 && *pi_ts1 != VLC_TICK_INVALID && *pi_ts0 == *pi_ts1 )

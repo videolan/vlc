@@ -679,7 +679,7 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date )
 static void EsOutChangeRate( es_out_t *out, int i_rate )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    float rate = (float)i_rate / (float)INPUT_RATE_DEFAULT;
+    const float rate = (float)i_rate / (float)INPUT_RATE_DEFAULT;
     es_out_id_t *es;
 
     p_sys->i_rate = i_rate;
@@ -879,9 +879,10 @@ static void EsOutProgramsChangeRate( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_pgrm_t *pgrm;
+    float rate = INPUT_RATE_DEFAULT / (float) p_sys->i_rate;
 
     vlc_list_foreach(pgrm, &p_sys->programs, node)
-        input_clock_ChangeRate(pgrm->p_input_clock, p_sys->i_rate);
+        input_clock_ChangeRate(pgrm->p_input_clock, rate);
 }
 
 static void EsOutFrameNext( es_out_t *out )
@@ -938,13 +939,12 @@ static void EsOutFrameNext( es_out_t *out )
         p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial;
     }
 
-    const int i_rate = input_clock_GetRate( p_sys->p_pgrm->p_input_clock );
+    const float rate = input_clock_GetRate( p_sys->p_pgrm->p_input_clock );
 
     p_sys->b_buffering = true;
     p_sys->i_buffering_extra_system += i_duration;
     p_sys->i_buffering_extra_stream = p_sys->i_buffering_extra_initial +
-                                      ( p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial ) *
-                                                INPUT_RATE_DEFAULT / i_rate;
+        ( p_sys->i_buffering_extra_system - p_sys->i_buffering_extra_initial ) * rate;
 
     p_sys->i_preroll_end = -1;
     p_sys->i_prev_stream_level = -1;
@@ -1113,7 +1113,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->b_selected = false;
     p_pgrm->b_scrambled = false;
     p_pgrm->p_meta = NULL;
-    p_pgrm->p_input_clock = input_clock_New( p_sys->i_rate );
+    p_pgrm->p_input_clock = input_clock_New( INPUT_RATE_DEFAULT / p_sys->i_rate );
     if( !p_pgrm->p_input_clock )
     {
         free( p_pgrm );
