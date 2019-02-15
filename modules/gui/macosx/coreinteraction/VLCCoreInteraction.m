@@ -50,7 +50,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
 
 @interface VLCCoreInteraction ()
 {
-    int i_currentPlaybackRate;
+    float f_currentPlaybackRate;
     vlc_tick_t timeA, timeB;
 
     float f_maxVolume;
@@ -176,10 +176,9 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     playlist_t * p_playlist = pl_Get(getIntf());
 
     double speed = pow(2, (double)i_value / 17);
-    int rate = INPUT_RATE_DEFAULT / speed;
-    if (i_currentPlaybackRate != rate)
-        var_SetFloat(p_playlist, "rate", (float)INPUT_RATE_DEFAULT / (float)rate);
-    i_currentPlaybackRate = rate;
+    if (f_currentPlaybackRate != speed)
+        var_SetFloat(p_playlist, "rate", speed);
+    f_currentPlaybackRate = speed;
 }
 
 - (int)playbackRate
@@ -199,6 +198,7 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
         playlist_t * p_playlist = pl_Get(getIntf());
         f_rate = var_GetFloat(p_playlist, "rate");
     }
+    f_currentPlaybackRate = f_rate;
 
     double value = 17 * log(f_rate) / log(2.);
     int returnValue = (int) ((value > 0) ? value + .5 : value - .5);
@@ -208,7 +208,6 @@ static int BossCallback(vlc_object_t *p_this, const char *psz_var,
     else if (returnValue > 34)
         returnValue = 34;
 
-    i_currentPlaybackRate = returnValue;
     return returnValue;
 }
 
