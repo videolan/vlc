@@ -27,7 +27,6 @@ ifdef HAVE_ANDROID
 	$(APPLY) $(SRC)/gnutls/no-create-time-h.patch
 endif
 ifdef HAVE_MACOSX
-	$(APPLY) $(SRC)/gnutls/gnutls-disable-getentropy-osx.patch
 	$(APPLY) $(SRC)/gnutls/gnutls-disable-connectx-macos.patch
 endif
 	$(call pkg_static,"lib/gnutls.pc.in")
