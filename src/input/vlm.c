@@ -1126,8 +1126,7 @@ static int vlm_ControlMediaInstanceGets( vlm_t *p_vlm, int64_t id, vlm_media_ins
             p_idsc->d_position = var_GetFloat( p_instance->p_input, "position" );
             if( var_GetInteger( p_instance->p_input, "state" ) == PAUSE_S )
                 p_idsc->b_paused = true;
-            p_idsc->i_rate = INPUT_RATE_DEFAULT
-                             / var_GetFloat( p_instance->p_input, "rate" );
+            p_idsc->f_rate = var_GetFloat( p_instance->p_input, "rate" );
         }
 
         TAB_APPEND( i_idsc, pp_idsc, p_idsc );

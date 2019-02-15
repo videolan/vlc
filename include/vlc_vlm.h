@@ -76,7 +76,7 @@ typedef struct
     int64_t     i_length;   /*< vlm media instance vlm media item length */
     double      d_position; /*< vlm media instance position in stream */
     bool        b_paused;   /*< vlm media instance is paused */
-    int         i_rate;     // normal is INPUT_RATE_DEFAULT
+    float       f_rate;     // normal is 1.0f
 } vlm_media_instance_t;
 
 #if 0
@@ -324,7 +324,7 @@ static inline void vlm_media_instance_Init( vlm_media_instance_t *p_instance )
     p_instance->i_length = 0;
     p_instance->d_position = 0.0;
     p_instance->b_paused = false;
-    p_instance->i_rate = INPUT_RATE_DEFAULT;
+    p_instance->f_rate = 1.0f;
 }
 
 /**
