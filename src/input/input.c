@@ -352,7 +352,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     priv->is_stopped = false;
     priv->b_recording = false;
     priv->b_thumbnailing = b_thumbnailing;
-    priv->i_rate = INPUT_RATE_DEFAULT;
+    priv->rate = 1.f;
     memset( &priv->bookmark, 0, sizeof(priv->bookmark) );
     TAB_INIT( priv->i_bookmark, priv->pp_bookmark );
     TAB_INIT( priv->i_attachment, priv->attachment );
@@ -508,7 +508,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     else
         priv->stats = NULL;
 
-    priv->p_es_out_display = input_EsOutNew( p_input, INPUT_RATE_DEFAULT / (float) priv->i_rate );
+    priv->p_es_out_display = input_EsOutNew( p_input, priv->rate );
     priv->p_es_out = NULL;
 
     /* Set the destructor when we are sure we are initialized */
@@ -1008,9 +1008,9 @@ static void RequestSubRate( input_thread_t *p_input, float f_slave_fps )
     input_thread_private_t *priv = input_priv(p_input);
     const float f_fps = input_priv(p_input)->master->f_fps;
     if( f_fps > 1.f && f_slave_fps > 1.f )
-        priv->i_slave_subs_rate = INPUT_RATE_DEFAULT / ( f_fps / f_slave_fps );
-    else if ( priv->i_slave_subs_rate != 0 )
-        priv->i_slave_subs_rate = INPUT_RATE_DEFAULT;
+        priv->slave_subs_rate = f_fps / f_slave_fps;
+    else if ( priv->slave_subs_rate != 0 )
+        priv->slave_subs_rate = 1.f;
 }
 
 static void SetSubtitlesOptions( input_thread_t *p_input )
@@ -1354,8 +1354,7 @@ static int Init( input_thread_t * p_input )
 #endif
 
     /* Create es out */
-    priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display,
-                                              INPUT_RATE_DEFAULT / (float) priv->i_rate );
+    priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display, priv->rate );
     if( priv->p_es_out == NULL )
         goto error;
 
@@ -1388,7 +1387,7 @@ static int Init( input_thread_t * p_input )
         double f_rate = var_GetFloat( p_input, "rate" );
         if( f_rate != 0.0 && f_rate != 1.0 )
         {
-            vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / f_rate };
+            vlc_value_t val = { .f_float = f_rate };
             input_ControlPushHelper( p_input, INPUT_CONTROL_SET_RATE, &val );
         }
     }
@@ -1998,19 +1997,19 @@ static bool Control( input_thread_t *p_input,
         case INPUT_CONTROL_SET_RATE:
         {
             /* Get rate and direction */
-            long long i_rate = llabs( param.val.i_int );
-            int i_rate_sign = param.val.i_int < 0 ? -1 : 1;
+            float rate = fabsf( param.val.f_float );
+            int i_rate_sign = rate < 0 ? -1 : 1;
 
             /* Check rate bound */
-            if( i_rate < INPUT_RATE_MIN )
+            if( rate > INPUT_RATE_DEFAULT / INPUT_RATE_MIN )
             {
-                msg_Dbg( p_input, "cannot set rate faster" );
-                i_rate = INPUT_RATE_MIN;
+                msg_Info( p_input, "cannot set rate faster" );
+                rate = INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
             }
-            else if( i_rate > INPUT_RATE_MAX )
+            else if( rate < INPUT_RATE_DEFAULT / INPUT_RATE_MAX )
             {
-                msg_Dbg( p_input, "cannot set rate slower" );
-                i_rate = INPUT_RATE_MAX;
+                msg_Info( p_input, "cannot set rate slower" );
+                rate = INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
             }
 
             /* Apply direction */
@@ -2019,48 +2018,46 @@ static bool Control( input_thread_t *p_input,
                 if( priv->master->b_rescale_ts )
                 {
                     msg_Dbg( p_input, "cannot set negative rate" );
-                    i_rate = priv->i_rate;
-                    assert( i_rate > 0 );
+                    rate = priv->rate;
+                    assert( rate > 0 );
                 }
                 else
                 {
-                    i_rate *= i_rate_sign;
+                    rate *= i_rate_sign;
                 }
             }
 
-            if( i_rate != INPUT_RATE_DEFAULT &&
+            if( rate != 1.f &&
                 ( ( !priv->b_can_rate_control && !priv->master->b_rescale_ts ) ||
                   ( priv->p_sout && !priv->b_out_pace_control ) ) )
             {
                 msg_Dbg( p_input, "cannot change rate" );
-                i_rate = INPUT_RATE_DEFAULT;
+                rate = 1.f;
             }
-            if( i_rate != priv->i_rate &&
+            if( rate != priv->rate &&
                 !priv->b_can_pace_control && priv->b_can_rate_control )
             {
                 if( !priv->master->b_rescale_ts )
                     es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
 
                 if( demux_Control( priv->master->p_demux, DEMUX_SET_RATE,
-                                   &i_rate ) )
+                                   &rate ) )
                 {
                     msg_Warn( p_input, "ACCESS/DEMUX_SET_RATE failed" );
-                    i_rate = priv->i_rate;
+                    rate = priv->rate;
                 }
             }
 
             /* */
-            if( i_rate != priv->i_rate )
+            if( rate != priv->rate )
             {
-                priv->i_rate = i_rate;
-                input_SendEventRate( p_input, i_rate );
+                priv->rate = rate;
+                input_SendEventRate( p_input, rate );
 
                 if( priv->master->b_rescale_ts )
                 {
-                    const int i_rate_source = (priv->b_can_pace_control || priv->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
-                    es_out_SetRate( priv->p_es_out,
-                                    INPUT_RATE_DEFAULT / (float) i_rate_source,
-                                    INPUT_RATE_DEFAULT / (float) i_rate );
+                    const float rate_source = (priv->b_can_pace_control || priv->b_can_rate_control ) ? rate : 1.f;
+                    es_out_SetRate( priv->p_es_out, rate_source, rate );
                 }
 
                 b_force_update = true;
@@ -2891,16 +2888,16 @@ static void SlaveDemux( input_thread_t *p_input )
         if( in->b_eof )
             continue;
 
-        if( priv->i_slave_subs_rate != in->i_sub_rate )
+        if( priv->slave_subs_rate != in->sub_rate )
         {
             if( in->b_slave_sub && in->b_can_rate_control )
             {
-                if( in->i_sub_rate != 0 ) /* Don't reset when it's the first time */
+                if( in->sub_rate != 0 ) /* Don't reset when it's the first time */
                     es_out_Control( priv->p_es_out, ES_OUT_RESET_PCR );
-                int i_new_rate = priv->i_slave_subs_rate;
-                demux_Control( in->p_demux, DEMUX_SET_RATE, &i_new_rate );
+                float new_rate = priv->slave_subs_rate;
+                demux_Control( in->p_demux, DEMUX_SET_RATE, &new_rate );
             }
-            in->i_sub_rate = priv->i_slave_subs_rate;
+            in->sub_rate = priv->slave_subs_rate;
         }
 
 

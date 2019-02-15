@@ -236,8 +236,8 @@ enum demux_query_e
      * (using DEMUX_SET_RATE). */
     DEMUX_CAN_CONTROL_RATE,     /* arg1= bool*pb_rate */
     /* DEMUX_SET_RATE is called only if DEMUX_CAN_CONTROL_RATE has returned true.
-     * It should return the value really used in *pi_rate */
-    DEMUX_SET_RATE,             /* arg1= int*pi_rate                                        can fail */
+     * It should return the value really used in *p_rate */
+    DEMUX_SET_RATE,             /* arg1= float*p_rate res=can fail */
 
     /** Checks whether the stream is actually a playlist, rather than a real
      * stream.

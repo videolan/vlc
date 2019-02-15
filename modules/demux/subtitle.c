@@ -808,7 +808,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             *va_arg( args, bool * ) = true;
             return VLC_SUCCESS;
         case DEMUX_SET_RATE:
-            p_sys->f_rate = (double)INPUT_RATE_DEFAULT / *va_arg( args, int * );
+            p_sys->f_rate = *va_arg( args, float * );
             ResetCurrentIndex( p_demux );
             return VLC_SUCCESS;
         case DEMUX_SET_NEXT_DEMUX_TIME:

@@ -1057,7 +1057,7 @@ static void *TsRun( void *p_data )
 
             if( !es_out_SetRate( p_ts->p_out, p_ts->rate_source, p_ts->rate ) )
             {
-                vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / p_ts->rate };
+                vlc_value_t val = { .f_float = p_ts->rate };
                 /* Warn back input
                  * FIXME it is perfectly safe BUT it is ugly as it may hide a
                  * rate change requested by user */

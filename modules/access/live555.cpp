@@ -1647,8 +1647,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_RATE:
         {
-            int *pi_int;
-            double f_scale, f_old_scale;
+            float *pf_scale, f_scale;
+            double f_old_scale;
 
             if( !p_sys->rtsp || (p_sys->f_npt_length <= 0) ||
                 !(p_sys->capabilities & CAP_RATE_CONTROL) )
@@ -1668,8 +1668,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * Scale < 0 value indicates rewind
              */
 
-            pi_int = va_arg( args, int * );
-            f_scale = (double)INPUT_RATE_DEFAULT / (*pi_int);
+            pf_scale = va_arg( args, float * );
+            f_scale = *pf_scale;
             f_old_scale = p_sys->ms->scale();
 
             /* Passing -1 for the start and end time will mean liveMedia won't
@@ -1696,8 +1696,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_pcr = VLC_TICK_INVALID;
             p_sys->f_npt = 0.0;
 
-            *pi_int = (int)( INPUT_RATE_DEFAULT / p_sys->ms->scale() );
-            msg_Dbg( p_demux, "PLAY with new Scale %0.2f (%d)", p_sys->ms->scale(), (*pi_int) );
+            *pf_scale = p_sys->ms->scale() ;
+            msg_Dbg( p_demux, "PLAY with new Scale %0.2f", p_sys->ms->scale() );
             return VLC_SUCCESS;
         }
 

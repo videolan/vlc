@@ -2357,7 +2357,7 @@ vlc_player_ChangeRate(vlc_player_t *player, float rate)
     if (input)
     {
         input_ControlPushHelper(input->thread, INPUT_CONTROL_SET_RATE,
-            &(vlc_value_t) { .i_int = INPUT_RATE_DEFAULT / rate });
+            &(vlc_value_t) { .f_float = rate });
     }
     else
         vlc_player_SendEvent(player, on_rate_changed, rate);

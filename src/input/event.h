@@ -83,11 +83,11 @@ static inline void input_SendEventStatistics(input_thread_t *p_input,
     });
 }
 
-static inline void input_SendEventRate(input_thread_t *p_input, int i_rate)
+static inline void input_SendEventRate(input_thread_t *p_input, float rate)
 {
     input_SendEvent(p_input, &(struct vlc_input_event) {
         .type = INPUT_EVENT_RATE,
-        .rate = (float)INPUT_RATE_DEFAULT / (float)i_rate,
+        .rate = rate,
     });
 }
 
