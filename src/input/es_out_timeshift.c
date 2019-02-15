@@ -198,8 +198,8 @@ typedef struct
     vlc_tick_t     i_pause_date;
 
     /* */
-    int            i_rate;
-    int            i_rate_source;
+    float          rate;
+    float          rate_source;
     vlc_tick_t     i_rate_date;
     vlc_tick_t     i_rate_delay;
 
@@ -238,8 +238,8 @@ typedef struct
     /* */
     bool           b_input_paused;
     bool           b_input_paused_source;
-    int            i_input_rate;
-    int            i_input_rate_source;
+    float          input_rate;
+    float          input_rate_source;
 
     /* */
     int            i_es;
@@ -259,7 +259,7 @@ static int          TsPopCmdLocked( ts_thread_t *, ts_cmd_t *, bool b_flush );
 static bool         TsHasCmd( ts_thread_t * );
 static bool         TsIsUnused( ts_thread_t * );
 static int          TsChangePause( ts_thread_t *, bool b_source_paused, bool b_paused, vlc_tick_t i_date );
-static int          TsChangeRate( ts_thread_t *, int i_src_rate, int i_rate );
+static int          TsChangeRate( ts_thread_t *, float src_rate, float rate );
 
 static void         *TsRun( void * );
 
@@ -298,7 +298,7 @@ static const struct es_out_callbacks es_out_timeshift_cbs;
 /*****************************************************************************
  * input_EsOutTimeshiftNew:
  *****************************************************************************/
-es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out, int i_rate )
+es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out, float rate )
 {
     es_out_sys_t *p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )
@@ -310,8 +310,8 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_sys->b_input_paused = false;
     p_sys->b_input_paused_source = false;
     p_sys->p_input = p_input;
-    p_sys->i_input_rate = i_rate;
-    p_sys->i_input_rate_source = i_rate;
+    p_sys->input_rate = rate;
+    p_sys->input_rate_source = rate;
 
     p_sys->p_out = p_next_out;
     vlc_mutex_init_recursive( &p_sys->lock );
@@ -553,14 +553,14 @@ static int ControlLockedSetPauseState( es_out_t *p_out, bool b_source_paused, bo
     }
     return i_ret;
 }
-static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
+static int ControlLockedSetRate( es_out_t *p_out, float src_rate, float rate )
 {
     es_out_sys_t *p_sys = container_of(p_out, es_out_sys_t, out);
     int i_ret;
 
-    if( !p_sys->b_delayed && i_src_rate == i_rate )
+    if( !p_sys->b_delayed && src_rate == rate )
     {
-        i_ret = es_out_SetRate( p_sys->p_out, i_src_rate, i_rate );
+        i_ret = es_out_SetRate( p_sys->p_out, src_rate, rate );
     }
     else
     {
@@ -570,7 +570,7 @@ static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
             if( !p_sys->b_delayed )
                 TsStart( p_out );
             if( p_sys->b_delayed )
-                i_ret = TsChangeRate( p_sys->p_ts, i_src_rate, i_rate );
+                i_ret = TsChangeRate( p_sys->p_ts, src_rate, rate );
         }
         else
         {
@@ -584,8 +584,8 @@ static int ControlLockedSetRate( es_out_t *p_out, int i_src_rate, int i_rate )
 
     if( !i_ret )
     {
-        p_sys->i_input_rate_source = i_src_rate;
-        p_sys->i_input_rate = i_rate;
+        p_sys->input_rate_source = src_rate;
+        p_sys->input_rate = rate;
     }
     return i_ret;
 }
@@ -707,10 +707,10 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     }
     case ES_OUT_SET_RATE:
     {
-        const int i_src_rate = va_arg( args, int );
-        const int i_rate = va_arg( args, int );
+        const float src_rate = va_arg( args, double );
+        const float rate = va_arg( args, double );
 
-        return ControlLockedSetRate( p_out, i_src_rate, i_rate );
+        return ControlLockedSetRate( p_out, src_rate, rate );
     }
     case ES_OUT_SET_FRAME_NEXT:
     {
@@ -805,8 +805,8 @@ static int TsStart( es_out_t *p_out )
     vlc_cond_init( &p_ts->wait );
     p_ts->b_paused = p_sys->b_input_paused && !p_sys->b_input_paused_source;
     p_ts->i_pause_date = p_ts->b_paused ? vlc_tick_now() : -1;
-    p_ts->i_rate_source = p_sys->i_input_rate_source;
-    p_ts->i_rate        = p_sys->i_input_rate;
+    p_ts->rate_source = p_sys->input_rate_source;
+    p_ts->rate        = p_sys->input_rate;
     p_ts->i_rate_date = -1;
     p_ts->i_rate_delay = 0;
     p_ts->i_buffering_delay = 0;
@@ -933,7 +933,7 @@ static bool TsIsUnused( ts_thread_t *p_ts )
 
     vlc_mutex_lock( &p_ts->lock );
     b_unused = !p_ts->b_paused &&
-               p_ts->i_rate == p_ts->i_rate_source &&
+               p_ts->rate == p_ts->rate_source &&
                TsStorageIsEmpty( p_ts->p_storage_r );
     vlc_mutex_unlock( &p_ts->lock );
 
@@ -971,7 +971,7 @@ static int TsChangePause( ts_thread_t *p_ts, bool b_source_paused, bool b_paused
     vlc_mutex_unlock( &p_ts->lock );
     return i_ret;
 }
-static int TsChangeRate( ts_thread_t *p_ts, int i_src_rate, int i_rate )
+static int TsChangeRate( ts_thread_t *p_ts, float src_rate, float rate )
 {
     int i_ret;
 
@@ -980,10 +980,10 @@ static int TsChangeRate( ts_thread_t *p_ts, int i_src_rate, int i_rate )
 
     p_ts->i_rate_date = -1;
     p_ts->i_rate_delay = 0;
-    p_ts->i_rate = i_rate;
-    p_ts->i_rate_source = i_src_rate;
+    p_ts->rate = rate;
+    p_ts->rate_source = src_rate;
 
-    i_ret = es_out_SetRate( p_ts->p_out, i_rate, i_rate );
+    i_ret = es_out_SetRate( p_ts->p_out, rate, rate );
     vlc_mutex_unlock( &p_ts->lock );
 
     return i_ret;
@@ -1036,28 +1036,28 @@ static void *TsRun( void *p_data )
             p_ts->i_rate_date = cmd.i_date;
 
         p_ts->i_rate_delay = 0;
-        if( p_ts->i_rate_source != p_ts->i_rate )
+        if( p_ts->rate_source != p_ts->rate )
         {
             const vlc_tick_t i_duration = cmd.i_date - p_ts->i_rate_date;
-            p_ts->i_rate_delay = i_duration * p_ts->i_rate / p_ts->i_rate_source - i_duration;
+            p_ts->i_rate_delay = i_duration * p_ts->rate_source / p_ts->rate - i_duration;
         }
-        if( p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay < 0 && p_ts->i_rate != p_ts->i_rate_source )
+        if( p_ts->i_cmd_delay + p_ts->i_rate_delay + p_ts->i_buffering_delay < 0 && p_ts->rate != p_ts->rate_source )
         {
             const int canc = vlc_savecancel();
 
             /* Auto reset to rate 1.0 */
-            msg_Warn( p_ts->p_input, "es out timeshift: auto reset rate to %d", p_ts->i_rate_source );
+            msg_Warn( p_ts->p_input, "es out timeshift: auto reset rate to %f", p_ts->rate_source );
 
             p_ts->i_cmd_delay = 0;
             p_ts->i_buffering_delay = 0;
 
             p_ts->i_rate_delay = 0;
             p_ts->i_rate_date = -1;
-            p_ts->i_rate = p_ts->i_rate_source;
+            p_ts->rate = p_ts->rate_source;
 
-            if( !es_out_SetRate( p_ts->p_out, p_ts->i_rate_source, p_ts->i_rate ) )
+            if( !es_out_SetRate( p_ts->p_out, p_ts->rate_source, p_ts->rate ) )
             {
-                vlc_value_t val = { .i_int = p_ts->i_rate };
+                vlc_value_t val = { .i_int = INPUT_RATE_DEFAULT / p_ts->rate };
                 /* Warn back input
                  * FIXME it is perfectly safe BUT it is ugly as it may hide a
                  * rate change requested by user */

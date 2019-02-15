@@ -181,7 +181,7 @@ typedef struct
     vlc_tick_t  i_pts_delay;
     vlc_tick_t  i_pts_jitter;
     int         i_cr_average;
-    int         i_rate;
+    float       rate;
 
     /* */
     bool        b_paused;
@@ -314,7 +314,7 @@ static const struct es_out_callbacks es_out_cbs;
 /*****************************************************************************
  * input_EsOutNew:
  *****************************************************************************/
-es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
+es_out_t *input_EsOutNew( input_thread_t *p_input, float rate )
 {
     es_out_sys_t *p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
@@ -344,7 +344,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 
     p_sys->i_pause_date = -1;
 
-    p_sys->i_rate = i_rate;
+    p_sys->rate = rate;
 
     p_sys->b_buffering = true;
     p_sys->i_preroll_end = -1;
@@ -676,18 +676,17 @@ static void EsOutChangePause( es_out_t *out, bool b_paused, vlc_tick_t i_date )
     p_sys->i_pause_date = i_date;
 }
 
-static void EsOutChangeRate( es_out_t *out, int i_rate )
+static void EsOutChangeRate( es_out_t *out, float rate )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
-    const float rate = (float)i_rate / (float)INPUT_RATE_DEFAULT;
     es_out_id_t *es;
 
-    p_sys->i_rate = i_rate;
+    p_sys->rate = rate;
     EsOutProgramsChangeRate( out );
 
     foreach_es_then_es_slaves(es)
         if( es->p_dec != NULL )
-            input_DecoderChangeRate( es->p_dec, rate );
+            input_DecoderChangeRate( es->p_dec, 1.f / rate );
 }
 
 static void EsOutChangePosition( es_out_t *out )
@@ -879,10 +878,9 @@ static void EsOutProgramsChangeRate( es_out_t *out )
 {
     es_out_sys_t *p_sys = container_of(out, es_out_sys_t, out);
     es_out_pgrm_t *pgrm;
-    float rate = INPUT_RATE_DEFAULT / (float) p_sys->i_rate;
 
     vlc_list_foreach(pgrm, &p_sys->programs, node)
-        input_clock_ChangeRate(pgrm->p_input_clock, rate);
+        input_clock_ChangeRate(pgrm->p_input_clock, p_sys->rate);
 }
 
 static void EsOutFrameNext( es_out_t *out )
@@ -987,7 +985,7 @@ static vlc_tick_t EsOutGetBuffering( es_out_t *out )
             i_system_duration = vlc_tick_now() - i_system_start;
         }
 
-        const vlc_tick_t i_consumed = i_system_duration * INPUT_RATE_DEFAULT / p_sys->i_rate - i_stream_duration;
+        const vlc_tick_t i_consumed = i_system_duration * p_sys->rate - i_stream_duration;
         i_delay = p_sys->i_pts_delay - i_consumed;
     }
     if( i_delay < 0 )
@@ -1113,7 +1111,7 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->b_selected = false;
     p_pgrm->b_scrambled = false;
     p_pgrm->p_meta = NULL;
-    p_pgrm->p_input_clock = input_clock_New( INPUT_RATE_DEFAULT / p_sys->i_rate );
+    p_pgrm->p_input_clock = input_clock_New( p_sys->rate );
     if( !p_pgrm->p_input_clock )
     {
         free( p_pgrm );
@@ -1775,9 +1773,7 @@ static void EsOutCreateDecoder( es_out_t *out, es_out_id_t *p_es )
                             input_priv(p_input)->p_sout );
     if( dec != NULL )
     {
-        float rate = (float)p_sys->i_rate / (float)INPUT_RATE_DEFAULT;
-
-        input_DecoderChangeRate( dec, rate );
+        input_DecoderChangeRate( dec, 1 / p_sys->rate );
 
         if( p_sys->b_buffering )
             input_DecoderStartWait( dec );
@@ -2951,11 +2947,11 @@ static int EsOutVaControlLocked( es_out_t *out, int i_query, va_list args )
 
     case ES_OUT_SET_RATE:
     {
-        const int i_src_rate = va_arg( args, int );
-        const int i_rate = va_arg( args, int );
+        const float src_rate = va_arg( args, double );
+        const float rate = va_arg( args, double );
 
-        assert( i_src_rate == i_rate );
-        EsOutChangeRate( out, i_rate );
+        assert( src_rate == rate );
+        EsOutChangeRate( out, rate );
 
         return VLC_SUCCESS;
     }

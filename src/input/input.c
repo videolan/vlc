@@ -508,7 +508,7 @@ static input_thread_t *Create( vlc_object_t *p_parent,
     else
         priv->stats = NULL;
 
-    priv->p_es_out_display = input_EsOutNew( p_input, priv->i_rate );
+    priv->p_es_out_display = input_EsOutNew( p_input, INPUT_RATE_DEFAULT / (float) priv->i_rate );
     priv->p_es_out = NULL;
 
     /* Set the destructor when we are sure we are initialized */
@@ -1355,7 +1355,7 @@ static int Init( input_thread_t * p_input )
 
     /* Create es out */
     priv->p_es_out = input_EsOutTimeshiftNew( p_input, priv->p_es_out_display,
-                                              priv->i_rate );
+                                              INPUT_RATE_DEFAULT / (float) priv->i_rate );
     if( priv->p_es_out == NULL )
         goto error;
 
@@ -2058,7 +2058,9 @@ static bool Control( input_thread_t *p_input,
                 if( priv->master->b_rescale_ts )
                 {
                     const int i_rate_source = (priv->b_can_pace_control || priv->b_can_rate_control ) ? i_rate : INPUT_RATE_DEFAULT;
-                    es_out_SetRate( priv->p_es_out, i_rate_source, i_rate );
+                    es_out_SetRate( priv->p_es_out,
+                                    INPUT_RATE_DEFAULT / (float) i_rate_source,
+                                    INPUT_RATE_DEFAULT / (float) i_rate );
                 }
 
                 b_force_update = true;

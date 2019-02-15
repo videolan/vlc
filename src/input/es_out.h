@@ -68,7 +68,7 @@ enum es_out_query_private_e
     ES_OUT_SET_PAUSE_STATE,                         /* arg1=bool b_source_paused, bool b_paused arg2=vlc_tick_t res=can fail */
 
     /* Set rate */
-    ES_OUT_SET_RATE,                                /* arg1=int i_source_rate arg2=int i_rate                  res=can fail */
+    ES_OUT_SET_RATE,                                /* arg1=double source_rate arg2=double rate res=can fail */
 
     /* Set next frame */
     ES_OUT_SET_FRAME_NEXT,                          /*                          res=can fail */
@@ -134,9 +134,9 @@ static inline int es_out_SetPauseState( es_out_t *p_out, bool b_source_paused, b
 {
     return es_out_Control( p_out, ES_OUT_SET_PAUSE_STATE, b_source_paused, b_paused, i_date );
 }
-static inline int es_out_SetRate( es_out_t *p_out, int i_source_rate, int i_rate )
+static inline int es_out_SetRate( es_out_t *p_out, float source_rate, float rate )
 {
-    return es_out_Control( p_out, ES_OUT_SET_RATE, i_source_rate, i_rate );
+    return es_out_Control( p_out, ES_OUT_SET_RATE, source_rate, rate );
 }
 static inline int es_out_SetFrameNext( es_out_t *p_out )
 {
@@ -172,7 +172,7 @@ static inline void es_out_Eos( es_out_t *p_out )
     assert( !i_ret );
 }
 
-es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
-es_out_t  *input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, int i_rate );
+es_out_t  *input_EsOutNew( input_thread_t *, float rate );
+es_out_t  *input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, float i_rate );
 
 #endif
