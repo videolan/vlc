@@ -685,7 +685,7 @@ block_t *aout_FiltersPlay(aout_filters_t *filters, block_t *block, float rate)
 
         /* Override input rate */
         nominal_rate = rate_filter->fmt_in.audio.i_rate;
-        rate_filter->fmt_in.audio.i_rate = lroundf(nominal_rate / rate);
+        rate_filter->fmt_in.audio.i_rate = lroundf(nominal_rate * rate);
     }
 
     block = aout_FiltersPipelinePlay (filters->tab, filters->count, block);

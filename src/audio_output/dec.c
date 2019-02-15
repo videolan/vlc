@@ -253,7 +253,7 @@ static void aout_DecSynchronize(audio_output_t *aout, vlc_tick_t dec_pts)
      * where supported. The other alternative is to flush the buffers
      * completely. */
     if (drift > (owner->sync.discontinuity ? 0
-                : lroundf(+3 * AOUT_MAX_PTS_DELAY * rate)))
+                : lroundf(+3 * AOUT_MAX_PTS_DELAY / rate)))
     {
         if (!owner->sync.discontinuity)
             msg_Warn (aout, "playback way too late (%"PRId64"): "

@@ -1630,7 +1630,7 @@ static void OutputChangeRate( decoder_t *p_dec, float rate )
             break;
         case AUDIO_ES:
             if( p_owner->p_aout != NULL )
-                aout_DecChangeRate( p_owner->p_aout, 1 / rate );
+                aout_DecChangeRate( p_owner->p_aout, rate );
             break;
         case SPU_ES:
             break;
