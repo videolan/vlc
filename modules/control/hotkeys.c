@@ -1569,8 +1569,8 @@ static void DisplayRate( vout_thread_t *p_vout, float f_rate )
 
 static float AdjustRateFine( vlc_object_t *p_obj, const int i_dir )
 {
-    const float f_rate_min = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
-    const float f_rate_max = (float)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
+    const float f_rate_min = INPUT_RATE_MIN;
+    const float f_rate_max = INPUT_RATE_MAX;
     float f_rate = var_GetFloat( p_obj, "rate" );
 
     int i_sign = f_rate < 0 ? -1 : 1;

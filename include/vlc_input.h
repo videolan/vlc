@@ -296,13 +296,9 @@ typedef enum input_state_e
  * Input rate.
  *
  * It is an float used by the variable "rate" in the
- * range [INPUT_RATE_DEFAULT/INPUT_RATE_MAX, INPUT_RATE_DEFAULT/INPUT_RATE_MIN]
- * the default value being 1. It represents the ratio of playback speed to
+ * range [INPUT_RATE_MIN, INPUT_RATE_MAX]
+ * the default value being 1.f. It represents the ratio of playback speed to
  * nominal speed (bigger is faster).
- *
- * Internally, the rate is stored as a value in the range
- * [INPUT_RATE_MIN, INPUT_RATE_MAX].
- * internal rate = INPUT_RATE_DEFAULT / rate variable
  */
 
 /**
@@ -312,11 +308,11 @@ typedef enum input_state_e
 /**
  * Minimal rate value
  */
-#define INPUT_RATE_MIN        32            /* Up to 32/1 */
+#define INPUT_RATE_MIN 0.03125f
 /**
  * Maximal rate value
  */
-#define INPUT_RATE_MAX     32000            /* Up to 1/32 */
+#define INPUT_RATE_MAX 31.25f
 
 /**
  * Input events

@@ -2001,15 +2001,15 @@ static bool Control( input_thread_t *p_input,
             int i_rate_sign = rate < 0 ? -1 : 1;
 
             /* Check rate bound */
-            if( rate > INPUT_RATE_DEFAULT / INPUT_RATE_MIN )
+            if( rate > INPUT_RATE_MAX )
             {
                 msg_Info( p_input, "cannot set rate faster" );
-                rate = INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
+                rate = INPUT_RATE_MAX;
             }
-            else if( rate < INPUT_RATE_DEFAULT / INPUT_RATE_MAX )
+            else if( rate < INPUT_RATE_MIN )
             {
                 msg_Info( p_input, "cannot set rate slower" );
-                rate = INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
+                rate = INPUT_RATE_MIN;
             }
 
             /* Apply direction */
