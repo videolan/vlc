@@ -302,10 +302,6 @@ typedef enum input_state_e
  */
 
 /**
- * Default rate value
- */
-#define INPUT_RATE_DEFAULT  1000
-/**
  * Minimal rate value
  */
 #define INPUT_RATE_MIN 0.03125f
