@@ -48,7 +48,6 @@
 #include <vlc_block.h>
 #include "input_internal.h"
 #include "es_out.h"
-#include "es_out_timeshift.h"
 
 /*****************************************************************************
  * Local prototypes

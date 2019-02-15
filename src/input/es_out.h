@@ -173,5 +173,6 @@ static inline void es_out_Eos( es_out_t *p_out )
 }
 
 es_out_t  *input_EsOutNew( input_thread_t *, int i_rate );
+es_out_t  *input_EsOutTimeshiftNew( input_thread_t *, es_out_t *, int i_rate );
 
 #endif
