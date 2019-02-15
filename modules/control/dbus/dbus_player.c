@@ -689,8 +689,6 @@ DBUS_METHOD( GetAllProperties )
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
 
-    msg_Dbg( (vlc_object_t*) p_this, "Getting All properties" );
-
     if( !dbus_message_iter_open_container( &args, DBUS_TYPE_ARRAY, "{sv}", &dict ) )
         return DBUS_HANDLER_RESULT_NEED_MEMORY;
 
