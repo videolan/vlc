@@ -686,7 +686,7 @@ static void EsOutChangeRate( es_out_t *out, float rate )
 
     foreach_es_then_es_slaves(es)
         if( es->p_dec != NULL )
-            input_DecoderChangeRate( es->p_dec, 1.f / rate );
+            input_DecoderChangeRate( es->p_dec, rate );
 }
 
 static void EsOutChangePosition( es_out_t *out )

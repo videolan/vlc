@@ -68,7 +68,7 @@ struct decoder_owner
     input_thread_t  *p_input;
     input_resource_t*p_resource;
     input_clock_t   *p_clock;
-    int             i_last_rate;
+    float            last_rate;
 
     int              i_spu_channel;
     int64_t          i_spu_order;
@@ -798,7 +798,7 @@ static inline void DecoderUpdatePreroll( vlc_tick_t *pi_preroll, const block_t *
 }
 
 static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_ts1,
-                          vlc_tick_t *pi_duration, int *pi_rate, vlc_tick_t i_ts_bound )
+                          vlc_tick_t *pi_duration, float *p_rate, vlc_tick_t i_ts_bound )
 {
     struct decoder_owner *p_owner = dec_get_owner( p_dec );
     input_clock_t   *p_clock = p_owner->p_clock;
@@ -811,7 +811,7 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
         return;
 
     const bool b_ephemere = pi_ts1 && *pi_ts0 == *pi_ts1;
-    float rate;
+    float rate = 1.f;
 
     if( *pi_ts0 != VLC_TICK_INVALID )
     {
@@ -834,18 +834,16 @@ static void DecoderFixTs( decoder_t *p_dec, vlc_tick_t *pi_ts0, vlc_tick_t *pi_t
     {
         rate = input_clock_GetRate( p_clock );
     }
-    const int i_rate = INPUT_RATE_DEFAULT / rate;
 
     /* Do not create ephemere data because of rounding errors */
     if( !b_ephemere && pi_ts1 && *pi_ts1 != VLC_TICK_INVALID && *pi_ts0 == *pi_ts1 )
         *pi_ts1 += 1;
 
     if( pi_duration )
-        *pi_duration = ( *pi_duration * i_rate + INPUT_RATE_DEFAULT-1 )
-            / INPUT_RATE_DEFAULT;
+        *pi_duration = ( *pi_duration / rate ) + 0.999f;
 
-    if( pi_rate )
-        *pi_rate = i_rate;
+    if( p_rate )
+        *p_rate = rate;
 }
 
 #ifdef ENABLE_SOUT
@@ -1099,9 +1097,9 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     }
 
     const bool b_dated = p_picture->date != VLC_TICK_INVALID;
-    int i_rate = INPUT_RATE_DEFAULT;
+    float rate = 1.f;
     DecoderFixTs( p_dec, &p_picture->date, NULL, NULL,
-                  &i_rate, DECODER_BOGUS_VIDEO_DELAY );
+                  &rate, DECODER_BOGUS_VIDEO_DELAY );
 
     vlc_mutex_unlock( &p_owner->lock );
 
@@ -1119,11 +1117,11 @@ static void DecoderPlayVideo( decoder_t *p_dec, picture_t *p_picture,
     if( p_picture->b_force || p_picture->date != VLC_TICK_INVALID )
         /* FIXME: VLC_TICK_INVALID -- verify video_output */
     {
-        if( i_rate != p_owner->i_last_rate || b_first_after_wait )
+        if( rate != p_owner->last_rate || b_first_after_wait )
         {
             /* Be sure to not display old picture after our own */
             vout_Flush( p_vout, p_picture->date );
-            p_owner->i_last_rate = i_rate;
+            p_owner->last_rate = rate;
         }
         else if( p_picture->b_still )
         {
@@ -1266,18 +1264,18 @@ static void DecoderPlayAudio( decoder_t *p_dec, block_t *p_audio,
     }
 
     /* */
-    int i_rate = INPUT_RATE_DEFAULT;
+    float rate = 1.f;
 
     DecoderWaitUnblock( p_dec );
     DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
-                  &i_rate, AOUT_MAX_ADVANCE_TIME );
+                  &rate, AOUT_MAX_ADVANCE_TIME );
     vlc_mutex_unlock( &p_owner->lock );
 
     audio_output_t *p_aout = p_owner->p_aout;
 
     if( p_aout != NULL && p_audio->i_pts != VLC_TICK_INVALID
-     && i_rate >= INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE
-     && i_rate <= INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE
+     && rate >= 1 / (float) AOUT_MAX_INPUT_RATE
+     && rate <= AOUT_MAX_INPUT_RATE
      && !DecoderTimedWait( p_dec, p_audio->i_pts - AOUT_MAX_PREPARE_TIME ) )
     {
         int status = aout_DecPlay( p_aout, p_audio );
@@ -1632,7 +1630,7 @@ static void OutputChangeRate( decoder_t *p_dec, float rate )
             break;
         case AUDIO_ES:
             if( p_owner->p_aout != NULL )
-                aout_DecChangeRate( p_owner->p_aout, rate );
+                aout_DecChangeRate( p_owner->p_aout, 1 / rate );
             break;
         case SPU_ES:
             break;
@@ -1838,7 +1836,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_dec = &p_owner->dec;
 
     p_owner->i_preroll_end = (vlc_tick_t)INT64_MIN;
-    p_owner->i_last_rate = INPUT_RATE_DEFAULT;
+    p_owner->last_rate = 1.f;
     p_owner->p_input = p_input;
     p_owner->p_resource = p_resource;
     p_owner->p_aout = NULL;
