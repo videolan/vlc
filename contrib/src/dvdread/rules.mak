@@ -1,5 +1,5 @@
 # DVDREAD
-LIBDVDREAD_VERSION := 6.0.0
+LIBDVDREAD_VERSION := 6.0.1
 LIBDVDREAD_URL := $(VIDEOLAN)/libdvdread/$(LIBDVDREAD_VERSION)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2
 
 ifdef BUILD_DISCS
@@ -7,7 +7,7 @@ ifdef GPL
 PKGS += dvdread
 endif
 endif
-ifeq ($(call need_pkg,"dvdread >= 5.0.3"),)
+ifeq ($(call need_pkg,"dvdread >= 6.0.0"),)
 PKGS_FOUND += dvdread
 endif
 
@@ -18,7 +18,6 @@ $(TARBALLS)/libdvdread-$(LIBDVDREAD_VERSION).tar.bz2:
 
 dvdread: libdvdread-$(LIBDVDREAD_VERSION).tar.bz2 .sum-dvdread
 	$(UNPACK)
-	$(APPLY) $(SRC)/dvdread/0001-Invalidate-cache-when-forcing-filesize.patch
 	cd $(UNPACK_DIR) && sed -i -e 's,Requires.private,Requires,g' misc/*.pc.in
 	$(MOVE)
 
