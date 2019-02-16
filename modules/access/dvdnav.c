@@ -79,10 +79,7 @@
 static int  AccessDemuxOpen ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#if DVDREAD_VERSION >= 50300 && defined( HAVE_STREAM_CB_IN_DVDNAV_H )
-#define HAVE_DVDNAV_DEMUX
 static int  DemuxOpen ( vlc_object_t * );
-#endif
 
 vlc_module_begin ()
     set_shortname( N_("DVD with menus") )
@@ -96,7 +93,6 @@ vlc_module_begin ()
     set_capability( "access", 305 )
     add_shortcut( "dvd", "dvdnav", "file" )
     set_callbacks( AccessDemuxOpen, Close )
-#ifdef HAVE_DVDNAV_DEMUX
     add_submodule()
         set_description( N_("DVDnav demuxer") )
         set_category( CAT_INPUT )
@@ -104,7 +100,6 @@ vlc_module_begin ()
         set_capability( "demux", 5 )
         set_callbacks( DemuxOpen, Close )
         add_shortcut( "dvd", "iso" )
-#endif
 vlc_module_end ()
 
 /* Shall we use libdvdnav's read ahead cache? */
@@ -391,7 +386,6 @@ bailout:
     return i_ret;
 }
 
-#ifdef HAVE_DVDNAV_DEMUX
 /*****************************************************************************
  * StreamProbeDVD: very weak probing that avoids going too often into a dvdnav_open()
  *****************************************************************************/
@@ -484,7 +478,6 @@ static int DemuxOpen ( vlc_object_t *p_this )
         dvdnav_close( p_dvdnav );
     return i_ret;
 }
-#endif
 
 /*****************************************************************************
  * Close:

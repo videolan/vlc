@@ -1898,21 +1898,12 @@ AS_IF([test "$SYS" = "linux" -a "${enable_linsys}" != "no"], [
 dnl
 dnl dvdread module: check for libdvdread
 dnl
-PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread > 4.9.0], [dvdread input module], [auto])
+PKG_ENABLE_MODULES_VLC([DVDREAD], [], [dvdread > 6.0.0], [dvdread input module], [auto])
 
 dnl
 dnl libdvdnav plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav > 4.9.0], [DVD with navigation input module (dvdnav)], [auto])
-AS_IF([test "${enable_dvdnav}" != "no"], [
-  AC_MSG_CHECKING(for dvdnav_stream_cb in dvdnav/dvdnav.h)
-    AC_EGREP_HEADER(dvdnav_stream_cb,dvdnav/dvdnav.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(HAVE_STREAM_CB_IN_DVDNAV_H, 1, For dvdnav demux support)
-      ],[
-      AC_MSG_RESULT(no)
-    ])
-])
+PKG_ENABLE_MODULES_VLC([DVDNAV], [], [dvdnav > 6.0.0], [DVD with navigation input module (dvdnav)], [auto])
 
 dnl
 dnl  Blu-ray Disc Support with libbluray
