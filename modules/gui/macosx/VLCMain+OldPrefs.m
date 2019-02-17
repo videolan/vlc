@@ -61,6 +61,11 @@ static const int kCurrentPreferencesVersion = 4;
     NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
     int version = [defaults integerForKey:kVLCPreferencesVersion];
 
+    // This was set in user defaults in VLC 2.0.x (preferences version 2), overriding any
+    // value in the Info.plist. Make sure to delete it here, always,
+    // as it could be set if an old version of VLC is launched again.
+    [defaults removeObjectForKey:@"SUFeedURL"];
+
     /*
      * Store version explicitely in file, for ease of debugging.
      * Otherwise, the value will be just defined at app startup,
